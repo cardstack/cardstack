@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import Layer2Network from '../../../services/layer2-network';
-import CardstackLogo from '../../../images/icons/cardstack-logo-opaque-efefef-bg.svg';
+import CardstackLogoForQR from '../../../images/icons/cardstack-logo-opaque-efefef-bg.svg';
+import CardstackLogo from '../../../images/icons/cardstack.svg';
 import CardstackMobileAppPhone from '../../../images/cardstack-mobile-app-phone.png';
 import CardstackMobileAppPhone2x from '../../../images/cardstack-mobile-app-phone@2x.png';
 import AppStoreBadge from '../../../images/icons/download-on-the-app-store-badge.svg';
@@ -21,6 +22,7 @@ interface CardPayLayerTwoConnectCardComponentArgs {
 
 class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConnectCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
+  cardstackLogoForQR = CardstackLogoForQR;
   cardstackLogo = CardstackLogo;
   cardstackMobileAppPhone = CardstackMobileAppPhone;
   cardstackMobileAppPhone2x = CardstackMobileAppPhone2x;
@@ -51,6 +53,15 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
   @action disconnect() {
     this.layer2Network.disconnect();
     this.args.onIncomplete?.();
+  }
+  get cardState(): string {
+    if (this.hasAccount) {
+      return 'memorialized';
+    } else if (this.isWaitingForConnection) {
+      return 'in-progress';
+    } else {
+      return 'default';
+    }
   }
 }
 
