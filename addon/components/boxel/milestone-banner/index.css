@@ -13,6 +13,7 @@
   border-radius: 100px;
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
+  scroll-margin: var(--boxel-sp);
 }
 
 .boxel-milestone-banner__title {

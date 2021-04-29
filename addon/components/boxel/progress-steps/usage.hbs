@@ -24,13 +24,19 @@
       @description="(integer) — Number of progress steps completed."
       @onInput={{fn (mut this.completedCount)}}
     />
+    <Args.Action
+      @name="onClickStep"
+      @required={{false}}
+      @description="Action to trigger when a step is clicked, the step index is passed"
+    />      
     <Args.Yield
       @description="Render custom progress steps.Yields an object with keys { title, data, index, completed, current }."
     />
   </:api>
 </Freestyle::Usage>
 
-<Freestyle::Usage @description="Usage with block">
+<Freestyle::Usage @name="ProgressSteps with block">
+  <:description>Block is yielded to once per step and is rendered in place of the step name</:description>
   <:example>
     <Boxel::ProgressSteps
       @progressSteps={{this.progressSteps}}
@@ -49,5 +55,16 @@
       {{/if}}
     </div>
     </Boxel::ProgressSteps>
+  </:example>
+</Freestyle::Usage>
+
+<Freestyle::Usage @name="ProgressSteps with onClickStep">
+  <:description>Anchor element is used, preventDefault is called for you, action called with step index</:description>
+  <:example>
+    <Boxel::ProgressSteps
+      @progressSteps={{this.progressSteps}}
+      @completedCount={{this.completedCount}}
+      @onClickStep={{this.onClickStep}}
+    />
   </:example>
 </Freestyle::Usage>
