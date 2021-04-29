@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import Layer2Network from '../../../services/layer2-network';
-import CardstackLogoForQR from '../../../images/icons/cardstack-logo-opaque-efefef-bg.svg';
+import CardstackLogoForQR from '../../../images/icons/cardstack-logo-opaque-bg.svg';
 import CardstackLogo from '../../../images/icons/cardstack.svg';
 import CardstackMobileAppPhone from '../../../images/cardstack-mobile-app-phone.png';
 import CardstackMobileAppPhone2x from '../../../images/cardstack-mobile-app-phone@2x.png';
