@@ -69,10 +69,10 @@ module('Acceptance | deposit', function (hooks) {
       dai: BigNumber.from('250500000000000000000'),
       card: BigNumber.from('10000000000000000000000'),
     });
-    await waitFor(`${post} [data-test-eth-balance]`);
-    assert.dom(`${post} [data-test-eth-balance]`).containsText('2.1411');
-    assert.dom(`${post} [data-test-dai-balance]`).containsText('250.5');
-    assert.dom(`${post} [data-test-card-balance]`).containsText('10000.0');
+    await waitFor(`${post} [data-test-balance="ETH"]`);
+    assert.dom(`${post} [data-test-balance="ETH"]`).containsText('2.1411');
+    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.5');
+    assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.0');
 
     await waitFor(milestoneCompletedSel(0));
     assert
@@ -107,9 +107,9 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateBalances({
       defaultToken: BigNumber.from('0'),
     });
-    await waitFor(`${postableSel(1, 2)} [data-test-xdai-balance]`);
+    await waitFor(`${postableSel(1, 2)} [data-test-balance="XDAI"]`);
     assert
-      .dom(`${postableSel(1, 2)} [data-test-xdai-balance]`)
+      .dom(`${postableSel(1, 2)} [data-test-balance="XDAI"]`)
       .containsText('0.0');
     await waitUntil(
       () => !document.querySelector('[data-test-wallet-connect-qr-code]')

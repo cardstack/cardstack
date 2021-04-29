@@ -26,17 +26,11 @@
           @isAddress={{true}}
         />
         <CardPay::LabeledValue @label="Balance*">
-          <ul class="layer-one-connect-card__balance-list">
-            <li class="layer-one-connect-card__field-balance-display" data-test-eth-balance>
-              {{svg-jar "ethereum-token" class="layer-one-connect-card__small-icon" role="presentation"}} {{format-token-amount this.layer1Network.defaultTokenBalance}} ETH
-            </li>
-            <li class="layer-one-connect-card__field-balance-display" data-test-dai-balance>
-              {{svg-jar "dai-token" class="layer-one-connect-card__small-icon" role="presentation"}} {{format-token-amount this.layer1Network.daiBalance}} DAI
-            </li>
-            <li class="layer-one-connect-card__field-balance-display" data-test-card-balance>
-              {{svg-jar "card-token" class="layer-one-connect-card__small-icon" role="presentation"}} {{format-token-amount this.layer1Network.cardBalance}} CARD
-            </li>
-          </ul>
+          <CardPay::BalancesList as |Balance|>
+            <Balance @symbol="ETH" @amount={{this.layer1Network.defaultTokenBalance}} />
+            <Balance @symbol="DAI" @amount={{this.layer1Network.daiBalance}} />
+            <Balance @symbol="CARD" @amount={{this.layer1Network.cardBalance}} />
+          </CardPay::BalancesList>
         </CardPay::LabeledValue>
         <CardPay::LabeledValue
           @label="Status"

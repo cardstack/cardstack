@@ -24,11 +24,9 @@
           @isAddress={{true}}
         />
         <CardPay::LabeledValue @label="Balance*">
-          <ul class="layer-two-connect-card__balance-list">
-            <li class="layer-two-connect-card__field-balance-display" data-test-xdai-balance>
-              {{svg-jar "dai-token" class="layer-two-connect-card__small-icon" role="presentation"}} {{format-token-amount this.layer2Network.defaultTokenBalance}} XDAI
-            </li>
-          </ul>
+          <CardPay::BalancesList as |Balance|>
+            <Balance @symbol="XDAI" @amount={{this.layer2Network.defaultTokenBalance}} />
+          </CardPay::BalancesList>
         </CardPay::LabeledValue>
         {{!-- future: show Prepaid Cards, Badges --}}
         <CardPay::LabeledValue

@@ -104,16 +104,6 @@
   margin-left: auto;
 }
 
-.layer-two-connect-card__field-balance-display {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-}
-
-.layer-two-connect-card__field-balance-display + .layer-two-connect-card__field-balance-display {
-  margin-top: var(--boxel-sp-xs);
-}
-
 .layer-two-connect-card__disclaimer {
   margin-top: var(--boxel-sp-xxl);
   margin-bottom: var(--boxel-sp-lg);
@@ -123,18 +113,4 @@
 
 .layer-two-connect-card__connection-status {
   --icon-color: var(--boxel-dark);
-}
-
-/* overwrite list */
-.layer-two-connect-card__balance-list {
-  font-size: 1rem;
-  line-height: var(--field-text-line-height);
-  padding-left: 0;
-  margin: 0;
-}
-
-.layer-two-connect-card__small-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-right: 0.5rem;
 }
