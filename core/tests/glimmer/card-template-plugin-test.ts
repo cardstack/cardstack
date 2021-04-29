@@ -77,5 +77,68 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       );
       assert.deepEqual(usedFields, ['items']);
     });
+
+    QUnit.only('Compononet invocation for strings', async function (assert) {
+      let template = transform('<@model.items />', {
+        fields: {
+          items: {
+            type: 'containsMany',
+            card: COMPILED_STRING_CARD,
+            localName: 'items',
+          },
+        },
+        usedFields,
+        importAndChooseName,
+      });
+
+      assert.equal(
+        template,
+        '{{#each @model.items as |item|}}{{item}}{{/each}}'
+      );
+      assert.deepEqual(usedFields, ['items']);
+    });
+
+    QUnit.test('each-as loops for dates', async function (assert) {
+      let template = transform(
+        '{{#each @model.items as |Item|}}<Item />{{/each}}',
+        {
+          fields: {
+            items: {
+              type: 'containsMany',
+              card: COMPILED_DATE_CARD,
+              localName: 'items',
+            },
+          },
+          usedFields,
+          importAndChooseName,
+        }
+      );
+
+      assert.equal(
+        template,
+        '{{#each @model.items as |item|}}<BestGuess @model={{item}} />{{/each}}'
+      );
+      assert.deepEqual(usedFields, ['items']);
+    });
+
+    QUnit.test('component invocation for dates', async function (assert) {
+      let template = transform('<@model.items />', {
+        fields: {
+          items: {
+            type: 'containsMany',
+            card: COMPILED_DATE_CARD,
+            localName: 'items',
+          },
+        },
+        usedFields,
+        importAndChooseName,
+      });
+
+      assert.equal(
+        template,
+        '{{#each @model.items as |item|}}<BestGuess @model={{item}} />{{/each}}'
+      );
+      assert.deepEqual(usedFields, ['items']);
+    });
   });
 });

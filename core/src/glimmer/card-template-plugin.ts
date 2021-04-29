@@ -47,6 +47,10 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
 
             let { inlineHBS } = field.card.embedded;
             if (inlineHBS) {
+              if (field.type === 'containsMany') {
+                return expandAndInclineContainsManyField(inlineHBS, fieldName);
+              }
+
               return inlineCardTemplateForContainsField(
                 inlineHBS,
                 fieldName,
@@ -108,6 +112,12 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   };
 }
 
+function expandAndInclineContainsManyField(
+  inlineHBS: string,
+  fieldName: string
+): syntax.ASTv1.Statement[] {
+  throw new Error('Function not implemented.');
+}
 
 function inlineCardTemplateForContainsField(
   inlineHBS: string,
