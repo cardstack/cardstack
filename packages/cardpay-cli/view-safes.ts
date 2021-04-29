@@ -50,8 +50,8 @@ const { network, mnemonic = process.env.MNEMONIC_PHRASE } = yargs(process.argv.s
     console.log('\n');
   });
 
-  process.exit(0);
+  process.exit(0); //eslint-disable-line no-process-exit
 })().catch((e) => {
   console.error(`Error: ${e}`);
-  process.exit(1);
+  process.exit(1); //eslint-disable-line no-process-exit
 });

@@ -1,4 +1,4 @@
-import BN from 'BN.js';
+import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { ContractOptions } from 'web3-eth-contract';
@@ -14,12 +14,7 @@ export default class TokenBridge {
     let from = options?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let token = new this.layer1Web3.eth.Contract(ERC20ABI as any, tokenAddress);
     let foreignBridge = await getAddress('foreignBridge', this.layer1Web3);
-    try {
-      return await token.methods.approve(foreignBridge, amount).send({ ...options, from });
-    } catch (e) {
-      debugger;
-      throw e;
-    }
+    return await token.methods.approve(foreignBridge, amount).send({ ...options, from });
   }
 
   async relayTokens(tokenAddress: string, amount: BN, options?: ContractOptions): Promise<TransactionReceipt> {

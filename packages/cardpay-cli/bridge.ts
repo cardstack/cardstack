@@ -1,7 +1,7 @@
 import HDWalletProvider from 'parity-hdwallet-provider';
 import Web3 from 'web3';
 import yargs from 'yargs';
-import BN from 'BN.js';
+import BN from 'bn.js';
 import { HttpProvider, TokenBridge, getConstant, networkIds, getAddress } from '@cardstack/cardpay-sdk';
 
 const { toWei } = Web3.utils;
@@ -61,8 +61,8 @@ const { network, mnemonic = process.env.MNEMONIC_PHRASE, amount } = yargs(proces
     console.log(`Relay tokens transaction hash: ${blockExplorer}/tx/${result.transactionHash}`);
   }
 
-  process.exit(0);
+  process.exit(0); //eslint-disable-line no-process-exit
 })().catch((e) => {
   console.error(`Error: ${e}`);
-  process.exit(1);
+  process.exit(1); //eslint-disable-line no-process-exit
 });

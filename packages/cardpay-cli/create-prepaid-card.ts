@@ -1,4 +1,4 @@
-import BN from 'BN.js';
+import BN from 'bn.js';
 import yargs from 'yargs';
 import HDWalletProvider from 'parity-hdwallet-provider';
 import Web3 from 'web3';
@@ -59,8 +59,8 @@ const { network, mnemonic = process.env.MNEMONIC_PHRASE, amount, safe } = yargs(
   let result = await prepaidCard.create(safe, daicpxd, [new BN(amountInWei)]);
   console.log(`Transaction hash: ${blockExplorer}/tx/${result.transactionHash}/token-transfers`);
 
-  process.exit(0);
+  process.exit(0); //eslint-disable-line no-process-exit
 })().catch((e) => {
   console.error(`Error: ${e}`);
-  process.exit(1);
+  process.exit(1); //eslint-disable-line no-process-exit
 });

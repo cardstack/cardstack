@@ -1,4 +1,4 @@
-import BN from 'BN.js';
+import BN from 'bn.js';
 import Web3 from 'web3';
 import fetch from 'node-fetch';
 import { ContractOptions } from 'web3-eth-contract';
@@ -135,7 +135,7 @@ export default class PrepaidCard {
     const options = {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
       },
       body: JSON.stringify({
         to,
@@ -168,8 +168,10 @@ export default class PrepaidCard {
   ): Promise<Signature[]> {
     const typedData = {
       types: {
+        //eslint-disable-next-line @typescript-eslint/naming-convention
         EIP712Domain: [{ type: 'address', name: 'verifyingContract' }],
         // "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 baseGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)"
+        //eslint-disable-next-line @typescript-eslint/naming-convention
         SafeTx: [
           { type: 'address', name: 'to' },
           { type: 'uint256', name: 'value' },
@@ -268,7 +270,7 @@ export default class PrepaidCard {
     const options = {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
       },
       body: JSON.stringify({
         to,
