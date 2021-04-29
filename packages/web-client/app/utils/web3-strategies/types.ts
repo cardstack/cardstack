@@ -24,10 +24,12 @@ export interface Layer1Web3Strategy extends Web3Strategy {
     destinationAddress: string // eslint-disable-line no-unused-vars
   ): Promise<TransactionReceipt>;
   txnViewerUrl(txnHash: TransactionHash): string; // eslint-disable-line no-unused-vars
+  bridgeExplorerUrl(txnHash: TransactionHash): string; // eslint-disable-line no-unused-vars
 }
 
 export interface Layer2Web3Strategy extends Web3Strategy {
   defaultTokenBalance: BigNumber | undefined;
+  getBlockHeight(): Promise<BigNumber>;
 }
 
 export type TransactionHash = string;

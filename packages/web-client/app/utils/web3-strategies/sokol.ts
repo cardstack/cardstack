@@ -120,4 +120,9 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     await this.provider?.disconnect();
     this.clearWalletInfo();
   }
+
+  async getBlockHeight(): Promise<BigNumber> {
+    const result = await this.web3.eth.getBlockNumber();
+    return BigNumber.from(result);
+  }
 }

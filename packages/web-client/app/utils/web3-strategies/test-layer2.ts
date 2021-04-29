@@ -18,6 +18,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return this.waitForAccount as Promise<void>;
   }
 
+  getBlockHeight(): Promise<BigNumber> {
+    return Promise.resolve(BigNumber.from(0));
+  }
+
   test__simulateWalletConnectUri() {
     this.walletConnectUri = 'This is a test of Layer2 Wallet Connect';
   }

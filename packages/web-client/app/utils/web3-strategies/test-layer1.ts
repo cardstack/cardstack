@@ -52,6 +52,10 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
   }
 
+  bridgeExplorerUrl(txnHash: string): string {
+    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
+  }
+
   test__simulateWalletConnectUri() {
     this.walletConnectUri = 'This is a test of Layer2 Wallet Connect';
   }

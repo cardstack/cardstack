@@ -76,6 +76,9 @@ export default class Layer1Network extends Service {
   txnViewerUrl(txnHash: string | undefined): string | undefined {
     return txnHash ? this.strategy.txnViewerUrl(txnHash) : undefined;
   }
+  bridgeExplorerUrl(txnHash: string) {
+    return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
+  }
 }
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.

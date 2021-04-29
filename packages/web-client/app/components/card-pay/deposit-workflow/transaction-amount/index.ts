@@ -19,7 +19,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
   @tracked isUnlocking = false;
   @tracked isDepositing = false;
   @tracked unlockTxnReceipt: TransactionReceipt | undefined;
-  @tracked depositTxnReceipt: TransactionReceipt | undefined;
+  @tracked relayTokensTxnReceipt: TransactionReceipt | undefined;
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
 
@@ -39,7 +39,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
 
   get depositTxnViewerUrl() {
     return this.layer1Network.txnViewerUrl(
-      this.depositTxnReceipt?.transactionHash
+      this.relayTokensTxnReceipt?.transactionHash
     );
   }
 
@@ -56,16 +56,21 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
         this.isUnlocking = false;
       });
   }
-  @action deposit() {
+  @action async deposit() {
     let tokenSymbol = this.args.workflowSession.state.depositSourceToken;
     let layer2Address = this.layer2Network.walletInfo.firstAddress!;
     this.isDepositing = true;
+    let layer2BlockHeightBeforeBridging = await this.layer2Network.getBlockHeight();
+    this.args.workflowSession.update(
+      'layer2BlockHeightBeforeBridging',
+      layer2BlockHeightBeforeBridging
+    );
     taskFor(this.layer1Network.relayTokens)
       .perform(this.amount, tokenSymbol, layer2Address)
       .then((transactionReceipt: TransactionReceipt) => {
-        this.depositTxnReceipt = transactionReceipt;
+        this.relayTokensTxnReceipt = transactionReceipt;
         this.args.workflowSession.update(
-          'depositTxnReceipt',
+          'relayTokensTxnReceipt',
           transactionReceipt
         );
         this.args.onComplete();

@@ -99,4 +99,9 @@ export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
   get waitForAccount() {
     return this.waitForAccountDeferred.promise;
   }
+
+  async getBlockHeight(): Promise<BigNumber> {
+    const result = await this.web3.eth.getBlockNumber();
+    return BigNumber.from(result);
+  }
 }

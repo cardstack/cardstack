@@ -197,10 +197,24 @@ module('Acceptance | deposit', function (hooks) {
       .containsText('your token will be bridged to the xDai blockchain');
 
     post = postableSel(3, 1);
-    // assert.dom(`${message} [data-test-step-1="complete"]`);
-    // assert.dom(`${message} [data-test-step-2="in-progress"]`);
+    assert
+      .dom(`${post} [data-test-token-bridge-step="0"][data-test-completed]`)
+      .exists();
+    assert.dom(`${post} [data-test-etherscan-button]`).exists();
+    assert
+      .dom(
+        `${post} [data-test-token-bridge-step="1"]:not([data-test-completed])`
+      )
+      .exists();
+    assert.dom(`${post} [data-test-bridge-explorer-button]`).exists();
+    assert
+      .dom(
+        `${post} [data-test-token-bridge-step="2"]:not([data-test-completed])`
+      )
+      .exists();
+    assert.dom(`${post} [data-test-blockscout-button]`).doesNotExist();
 
-    // layer1Service.test__simulateTokensBridged();
+    // layer2Service.test__simulateTokensBridged();
     // assert.dom(`${message} [data-test-step-2="complete"]`);
     // assert.dom(`${message} [data-test-step-3="in-progress"]`);
     // layer1Service.test__simulateCPXDMinted();

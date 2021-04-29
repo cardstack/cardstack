@@ -42,8 +42,11 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
     throw new Error('Method not implemented.');
   }
 
-  // eslint-disable-next-line no-unused-vars
-  txnViewerUrl(_txnHash: TransactionHash): string {
-    throw new Error('Method not implemented.');
+  txnViewerUrl(txnHash: TransactionHash): string {
+    return `https://etherscan.io/tx/${txnHash}`;
+  }
+
+  bridgeExplorerUrl(txnHash: string): string {
+    return `https://alm-test-amb.herokuapp.com/${txnHash}`;
   }
 }
