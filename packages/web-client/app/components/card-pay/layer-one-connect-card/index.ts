@@ -48,6 +48,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     if (currentWalletProvider) return currentWalletProvider.logo;
     else return '';
   }
+
   get cardState(): string {
     if (this.hasAccount) {
       return 'memorialized';
@@ -57,6 +58,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
       return 'default';
     }
   }
+
   @action changeWalletProvider(id: string): void {
     this.currentWalletProviderId = id;
   }
