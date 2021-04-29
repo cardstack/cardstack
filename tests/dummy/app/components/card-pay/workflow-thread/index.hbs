@@ -22,6 +22,7 @@
                     @imgURL={{@workflowBot.imgURL}}
                     @datetime={{milestone.datetime}}
                     @hideMeta={{gt i 0}}
+                    @fullWidth={{content.component}}
                   >
                     {{#if content.component}}
                       {{!-- Sample component --}}
@@ -34,7 +35,7 @@
                         @onClickButton={{fn this.toggleComplete milestone}}
                       />
                     {{else}}
-                      {{content}}
+                      <p class="card-pay-workflow-thread__message">{{content}}</p>
                     {{/if}}
                   </Boxel::ThreadMessage>
                 {{/animated-each}}

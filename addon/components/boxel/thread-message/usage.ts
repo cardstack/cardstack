@@ -4,6 +4,7 @@ import { A } from '@ember/array';
 
 import LolaSampsonThumb from '@cardstack/boxel/usage-support/images/users/Lola-Sampson.jpg';
 import CardBot from '@cardstack/boxel/usage-support/images/orgs/cardbot.svg';
+import { action } from '@ember/object';
 
 export default class ThreadMessageUsageComponent extends Component {
   cardbotIcon = CardBot;
@@ -17,4 +18,13 @@ export default class ThreadMessageUsageComponent extends Component {
     'Let’s issue a Prepaid Card.',
     'First, you can choose the look and feel of your card, so that your customers and other users recognize that this Prepaid Card came from you.',
   ]);
+  @tracked fullWidth = false;
+  @tracked layoutExampleFullWidth = false;
+  @action toggleLayoutExampleFullWidth(): void {
+    this.layoutExampleFullWidth = !this.layoutExampleFullWidth;
+  }
+  @tracked isComplete = false;
+  @action toggleIsComplete(): void {
+    this.isComplete = !this.isComplete;
+  }
 }

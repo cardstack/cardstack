@@ -6,8 +6,6 @@
   background-color: var(--boxel-light-300);
   border-radius: var(--boxel-border-radius);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp);
 }
 
 .boxel-thread__content-wrapper {
@@ -38,7 +36,7 @@
 }
 
 .boxel-thread__content > * + * {
-  margin-top: var(--boxel-sp-lg);
+  margin-top: var(--boxel-sp-xl);
 }
 
 .boxel-thread__sidebar {

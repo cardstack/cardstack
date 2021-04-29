@@ -14,3 +14,8 @@
   letter-spacing: var(--boxel-lsp);
   text-align: center;
 }
+
+.card-pay-workflow-thread__message {
+  margin: 0;
+  max-width: 585px;
+}
