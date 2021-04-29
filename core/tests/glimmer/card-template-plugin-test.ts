@@ -1,6 +1,6 @@
 import QUnit from 'qunit';
 import { ComponentInfo } from '../../src/interfaces';
-import transform from './../../src/glimmer/card-template-plugin';
+import transform, { Options } from './../../src/glimmer/card-template-plugin';
 import { COMPILED_STRING_CARD, COMPILED_DATE_CARD } from '../helpers/fixtures';
 
 function importAndChooseName() {
@@ -54,31 +54,77 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
   });
 
-  QUnit.module('Fields: containsMany', function () {
-    QUnit.test('each-as loops for strings', async function (assert) {
-      let template = transform(
-        '{{#each @model.items as |Item|}}<Item />{{/each}}',
-        {
-          fields: {
-            items: {
-              type: 'containsMany',
-              card: COMPILED_STRING_CARD,
-              localName: 'items',
-            },
+  QUnit.module('Fields: String: containsMany', function (hooks) {
+    let options: Options;
+    hooks.beforeEach(function () {
+      options = {
+        fields: {
+          items: {
+            type: 'containsMany',
+            card: COMPILED_STRING_CARD,
+            localName: 'items',
           },
-          usedFields,
-          importAndChooseName,
-        }
-      );
-
-      assert.equal(
-        template,
-        '{{#each @model.items as |Item|}}{{Item}}{{/each}}'
-      );
-      assert.deepEqual(usedFields, ['items']);
+        },
+        usedFields,
+        importAndChooseName,
+      };
     });
 
-    QUnit.only('Compononet invocation for strings', async function (assert) {
+    QUnit.test(
+      'each-as loops for strings with shallow depth',
+      async function (assert) {
+        assert.equal(
+          transform(
+            '{{#each @model.items as |Item|}}<Item />{{/each}}',
+            options
+          ),
+          '{{#each @model.items as |Item|}}{{Item}}{{/each}}'
+        );
+        assert.deepEqual(usedFields, ['items']);
+      }
+    );
+
+    QUnit.test(
+      'each-as loops for strings with greater depth',
+      async function (assert) {
+        assert.equal(
+          transform(
+            '{{#each @model.items as |Item|}}{{#if condition}}<Item />{{/if}}<Other />{{/each}}',
+            options
+          ),
+          '{{#each @model.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}'
+        );
+        assert.deepEqual(usedFields, ['items']);
+      }
+    );
+
+    QUnit.todo(
+      'each-as loop with helper as loop argument',
+      async function (assert) {
+        let template = transform(
+          '{{#each (helper @model.items) as |Item|}}<Item />{{/each}}',
+          {
+            fields: {
+              items: {
+                type: 'containsMany',
+                card: COMPILED_STRING_CARD,
+                localName: 'items',
+              },
+            },
+            usedFields,
+            importAndChooseName,
+          }
+        );
+
+        assert.equal(
+          template,
+          '{{#each (helper @model.items) as |Item|}}{{Item}}{{/each}}'
+        );
+        assert.deepEqual(usedFields, ['items']);
+      }
+    );
+
+    QUnit.test('Compononet invocation for strings', async function (assert) {
       let template = transform('<@model.items />', {
         fields: {
           items: {
@@ -97,32 +143,12 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       );
       assert.deepEqual(usedFields, ['items']);
     });
+  });
 
-    QUnit.test('each-as loops for dates', async function (assert) {
-      let template = transform(
-        '{{#each @model.items as |Item|}}<Item />{{/each}}',
-        {
-          fields: {
-            items: {
-              type: 'containsMany',
-              card: COMPILED_DATE_CARD,
-              localName: 'items',
-            },
-          },
-          usedFields,
-          importAndChooseName,
-        }
-      );
-
-      assert.equal(
-        template,
-        '{{#each @model.items as |item|}}<BestGuess @model={{item}} />{{/each}}'
-      );
-      assert.deepEqual(usedFields, ['items']);
-    });
-
-    QUnit.test('component invocation for dates', async function (assert) {
-      let template = transform('<@model.items />', {
+  QUnit.module('Fields: Date: containsMany', function (hooks) {
+    let options: Options;
+    hooks.beforeEach(function () {
+      options = {
         fields: {
           items: {
             type: 'containsMany',
@@ -132,10 +158,20 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         },
         usedFields,
         importAndChooseName,
-      });
+      };
+    });
 
+    QUnit.test('each-as loops for dates', async function (assert) {
       assert.equal(
-        template,
+        transform('{{#each @model.items as |Item|}}<Item />{{/each}}', options),
+        '{{#each @model.items as |Item|}}<BestGuess @model={{Item}} />{{/each}}'
+      );
+      assert.deepEqual(usedFields, ['items']);
+    });
+
+    QUnit.test('component invocation for dates', async function (assert) {
+      assert.equal(
+        transform('<@model.items />', options),
         '{{#each @model.items as |item|}}<BestGuess @model={{item}} />{{/each}}'
       );
       assert.deepEqual(usedFields, ['items']);
