@@ -33,9 +33,8 @@ export default function glimmerCardTemplateTransform(
 }
 
 interface RewriteFieldOptions {
-  fieldName: string;
   field: Field;
-  localName: string;
+  blockProgramUsage: string;
 }
 interface State {
   insideBlockStatement?: RewriteFieldOptions;
@@ -52,90 +51,76 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
       name: 'card-glimmer-plugin',
       visitor: {
         ElementNode(node) {
-          if (
-            state.insideBlockStatement &&
-            node.tag === state.insideBlockStatement.localName
-          ) {
-            usedFields.push(state.insideBlockStatement.fieldName);
-            let { inlineHBS } = state.insideBlockStatement.field.card.embedded;
-            if (inlineHBS) {
-              return inlineCardTemplateForField(
-                inlineHBS,
-                state.insideBlockStatement.localName
-              );
-            } else {
-              return process(
-                rewriteFieldInvocation(
-                  importAndChooseName,
-                  state.insideBlockStatement.field,
-                  node.tag
-                )
-              );
-            }
-          } else if (node.tag.startsWith(PREFIX)) {
-            let fieldName = node.tag.slice(PREFIX.length);
-            let field = fields[fieldName];
-            if (!field) {
-              return;
-            }
+          let { insideBlockStatement: inBlock } = state;
 
-            usedFields.push(fieldName);
-
+          if (inBlock && node.tag === inBlock.blockProgramUsage) {
+            let { blockProgramUsage, field } = inBlock;
             let { inlineHBS } = field.card.embedded;
+
+            usedFields.push(field.localName);
+
             if (inlineHBS) {
-              if (field.type === 'containsMany') {
-                return process(expandContainsManyShorthand(fieldName, node));
-              } else {
-                return inlineCardTemplateForField(inlineHBS, fieldName, PREFIX);
-              }
-            } else {
-              let fieldTemplate = rewriteFieldInvocation(
-                importAndChooseName,
-                field,
-                fieldName
+              return inlineTemplateForField(inlineHBS, blockProgramUsage);
+            }
+
+            return process(
+              rewriteFieldToComponent(importAndChooseName, field, node.tag)
+            );
+          }
+
+          let field = getFieldFromExpression(fields, node.tag);
+          if (!field) {
+            return;
+          }
+
+          usedFields.push(field.localName);
+
+          let { inlineHBS } = field.card.embedded;
+          if (inlineHBS) {
+            if (field.type === 'containsMany') {
+              return process(
+                expandContainsManyShorthand(field.localName, node)
               );
-
-              if (field.type === 'containsMany') {
-                fieldTemplate = expandContainsManyShorthand(
-                  fieldName,
-                  node,
-                  fieldTemplate
-                );
-              }
-
-              return process(fieldTemplate);
+            } else {
+              return inlineTemplateForField(inlineHBS, field.localName, PREFIX);
             }
           } else {
-            return undefined;
+            let fieldTemplate = '';
+
+            if (field.type === 'containsMany') {
+              fieldTemplate = expandContainsManyShorthand(
+                field.localName,
+                node,
+                rewriteFieldToComponent(
+                  importAndChooseName,
+                  field,
+                  field.localName
+                )
+              );
+            } else {
+              fieldTemplate = rewriteFieldToComponent(
+                importAndChooseName,
+                field,
+                node.tag
+              );
+            }
+
+            return process(fieldTemplate);
           }
         },
 
         BlockStatement: {
-          enter(node /*, path*/) {
-            // NOTE: For now, we only support directly looping. You cannot yet
-            // pass your containsMany field through a helper first
-            if (node.params[0].type !== 'PathExpression') {
+          enter(node) {
+            let field = getFieldFromBlockParam(fields, node);
+
+            if (!field) {
               return;
             }
 
-            // TODO: Need to manage state, ie: in a blockStatement
-            let loopParam = node.params[0].original;
-
-            if (loopParam.startsWith(PREFIX)) {
-              let fieldName = loopParam.slice(PREFIX.length);
-              let field = fields[fieldName];
-
-              if (!field) {
-                return;
-              }
-
-              let [blockParam] = node.program.blockParams;
-              state.insideBlockStatement = {
-                fieldName,
-                field,
-                localName: blockParam,
-              };
-            }
+            state.insideBlockStatement = {
+              field,
+              blockProgramUsage: node.program.blockParams[0],
+            };
           },
           exit(/*node, path*/) {
             state.insideBlockStatement = undefined;
@@ -146,6 +131,40 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   };
 }
 
+function getFieldFromExpression(
+  fields: CompiledCard['fields'],
+  usage: string
+): Field | undefined {
+  let fieldName = usage.slice(PREFIX.length);
+  return fields[fieldName];
+}
+
+function getFieldFromBlockParam(
+  fields: CompiledCard['fields'],
+  node: syntax.ASTv1.BlockStatement
+): Field | undefined {
+  let [param] = node.params;
+  let usage = '';
+
+  // ie: {{#each @model.items as...
+  if (param.type === 'PathExpression') {
+    usage = param.original;
+  }
+  // ie: {{#each (helper @model.items) as...
+  if (
+    param.type === 'SubExpression' &&
+    param.params[0].type === 'PathExpression'
+  ) {
+    usage = param.params[0].original;
+  }
+
+  if (!usage || !usage.startsWith(PREFIX)) {
+    return;
+  }
+
+  return getFieldFromExpression(fields, usage);
+}
+
 function expandContainsManyShorthand(
   fieldName: string,
   node: syntax.ASTv1.ElementNode,
@@ -154,6 +173,7 @@ function expandContainsManyShorthand(
   let singularFieldName = singularize(fieldName);
 
   if (itemTemplate) {
+    // TODO: This might be too aggressive...
     itemTemplate = itemTemplate.replace(fieldName, singularFieldName);
   } else {
     itemTemplate = `{{${singularFieldName}}}`;
@@ -162,7 +182,8 @@ function expandContainsManyShorthand(
   return `{{#each ${node.tag} as |${singularFieldName}|}}${itemTemplate}{{/each}}`;
 }
 
-function rewriteFieldInvocation(
+// <@model.createdAt /> -> <DateField @model={{@model.createdAt}} />
+function rewriteFieldToComponent(
   importAndChooseName: ImportAndChooseName,
   field: Field,
   modelArgument: string
@@ -176,7 +197,7 @@ function rewriteFieldInvocation(
   return `<${componentName} @model={{${modelArgument}}} />`;
 }
 
-function inlineCardTemplateForField(
+function inlineTemplateForField(
   inlineHBS: string,
   fieldName: string,
   prefix?: string
@@ -206,10 +227,9 @@ function rewriteLocals(remapping: {
       visitor: {
         PathExpression(node) {
           if (node.head.type === 'AtHead' && !rewritten.has(node)) {
+            let prefix = remapping.prefix ?? '';
             let result = env.syntax.builders.path(
-              `${remapping.prefix ?? ''}${[remapping.this, ...node.tail].join(
-                '.'
-              )}`
+              `${prefix}${[remapping.this, ...node.tail].join('.')}`
             );
             rewritten.add(result);
             return result;

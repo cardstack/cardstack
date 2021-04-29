@@ -54,7 +54,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
   });
 
-  QUnit.module('Fields: String: containsMany', function (hooks) {
+  QUnit.module('Fields: inlinable: containsMany', function (hooks) {
     let options: Options;
     hooks.beforeEach(function () {
       options = {
@@ -98,22 +98,12 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       }
     );
 
-    QUnit.todo(
+    QUnit.test(
       'each-as loop with helper as loop argument',
       async function (assert) {
         let template = transform(
           '{{#each (helper @model.items) as |Item|}}<Item />{{/each}}',
-          {
-            fields: {
-              items: {
-                type: 'containsMany',
-                card: COMPILED_STRING_CARD,
-                localName: 'items',
-              },
-            },
-            usedFields,
-            importAndChooseName,
-          }
+          options
         );
 
         assert.equal(
@@ -145,7 +135,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
   });
 
-  QUnit.module('Fields: Date: containsMany', function (hooks) {
+  QUnit.module('Fields: not-inlinable: containsMany', function (hooks) {
     let options: Options;
     hooks.beforeEach(function () {
       options = {
