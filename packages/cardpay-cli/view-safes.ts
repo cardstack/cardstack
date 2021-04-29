@@ -1,7 +1,11 @@
 import yargs from 'yargs';
+import fetch from 'node-fetch';
 import Web3 from 'web3';
 import HDWalletProvider from 'parity-hdwallet-provider';
 import { HttpProvider, Safes, getConstant, networkIds } from '@cardstack/cardpay-sdk';
+
+//@ts-ignore polyfilling fetch
+global.fetch = fetch;
 
 const { network, mnemonic = process.env.MNEMONIC_PHRASE } = yargs(process.argv.slice(2))
   .options({

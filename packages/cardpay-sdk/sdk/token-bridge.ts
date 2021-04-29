@@ -2,7 +2,6 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { ContractOptions } from 'web3-eth-contract';
-
 import ERC20ABI from '../contracts/abi/erc-20.js';
 import ForeignBridgeABI from '../contracts/abi/foreign-bridge-mediator.js';
 import { getAddress } from '../contracts/addresses.js';

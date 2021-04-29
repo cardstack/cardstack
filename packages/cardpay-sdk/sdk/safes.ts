@@ -1,6 +1,4 @@
 import Web3 from 'web3';
-import fetch from 'node-fetch';
-
 import PrepaidCardManagerABI from '../contracts/abi/prepaid-card-manager.js';
 import { getAddress } from '../contracts/addresses.js';
 import { getConstant, ZERO_ADDRESS } from './constants.js';

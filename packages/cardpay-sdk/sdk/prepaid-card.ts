@@ -1,8 +1,6 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
-import fetch from 'node-fetch';
 import { ContractOptions } from 'web3-eth-contract';
-
 import ERC677ABI from '../contracts/abi/erc-677.js';
 import { getAddress } from '../contracts/addresses.js';
 import { getConstant, ZERO_ADDRESS } from './constants.js';

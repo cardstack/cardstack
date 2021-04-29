@@ -1,3 +1,4 @@
+import fetch from 'node-fetch';
 import BN from 'bn.js';
 import yargs from 'yargs';
 import HDWalletProvider from 'parity-hdwallet-provider';
@@ -5,6 +6,9 @@ import Web3 from 'web3';
 import { HttpProvider, PrepaidCard, getConstant, networkIds, getAddress } from '@cardstack/cardpay-sdk';
 
 const { toWei } = Web3.utils;
+
+//@ts-ignore polyfilling fetch
+global.fetch = fetch;
 
 const { network, mnemonic = process.env.MNEMONIC_PHRASE, amount, safe } = yargs(process.argv.slice(2))
   .options({
