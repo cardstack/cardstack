@@ -9,7 +9,7 @@ import { getAddress } from '../contracts/addresses.js';
 export default class TokenBridge {
   constructor(private layer1Web3: Web3) {}
 
-  async approveTokens(tokenAddress: string, amount: BN, options?: ContractOptions): Promise<TransactionReceipt> {
+  async unlockTokens(tokenAddress: string, amount: BN, options?: ContractOptions): Promise<TransactionReceipt> {
     let from = options?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let token = new this.layer1Web3.eth.Contract(ERC20ABI as any, tokenAddress);
     let foreignBridge = await getAddress('foreignBridge', this.layer1Web3);

@@ -2,8 +2,8 @@ export { default as TokenBridge } from './sdk/token-bridge.js';
 export { default as Safes } from './sdk/safes.js';
 export { default as PrepaidCard } from './sdk/prepaid-card.js';
 
-export { default as addresses, getAddress } from './contracts/addresses.js';
-export { default as constants, getConstant, networks, networkIds } from './sdk/constants.js';
+export { getAddress } from './contracts/addresses.js';
+export { getConstant, networks, networkIds } from './sdk/constants.js';
 
 export { default as ERC20ABI } from './contracts/abi/erc-20.js';
 export { default as ERC677ABI } from './contracts/abi/erc-677.js';

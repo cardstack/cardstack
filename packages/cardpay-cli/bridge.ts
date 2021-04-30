@@ -55,7 +55,7 @@ const { network, mnemonic = process.env.MNEMONIC_PHRASE, amount } = yargs(proces
 
   {
     console.log('Sending approve transaction request');
-    let result = await tokenBridge.approveTokens(tokenAddress, new BN(amountInWei));
+    let result = await tokenBridge.unlockTokens(tokenAddress, new BN(amountInWei));
     console.log(`Approve transaction hash: ${blockExplorer}/tx/${result.transactionHash}`);
   }
 
