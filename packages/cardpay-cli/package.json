@@ -6,10 +6,13 @@
   "type": "module",
   "repository": "cardstack/cardstack",
   "scripts": {
-    "viewSafes": "node ./view-safes.js",
-    "bridge": "node ./bridge.js",
-    "createPrepaidCard": "node ./create-prepaid-card.js"
+    "build": "tsc && chmod +x ./index.js",
+    "cardpay": "node ./index.js"
   },
+  "bin": {
+    "cardpay": "./index.js"
+  },
+  "license": "MIT",
   "dependencies": {
     "@cardstack/cardpay-sdk": "0.18.17",
     "@truffle/hdwallet-provider": "^1.2.6",

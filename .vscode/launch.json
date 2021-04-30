@@ -43,12 +43,14 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: Bridge Tokens",
-      "program": "${workspaceFolder}/packages/cardpay-cli/bridge.js",
+      "program": "${workspaceFolder}/packages/cardpay-cli/index.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "bridge",
+        "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa",
+        "2",
         "--network", "kovan",
-        "--amount", "2",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
@@ -57,10 +59,11 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: View Safes",
-      "program": "${workspaceFolder}/packages/cardpay-cli/view-safes.js",
+      "program": "${workspaceFolder}/packages/cardpay-cli/index.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "safes-view",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
@@ -70,13 +73,15 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: Create Prepaid Card",
-      "program": "${workspaceFolder}/packages/cardpay-cli/create-prepaid-card",
+      "program": "${workspaceFolder}/packages/cardpay-cli/index.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        "prepaidcard-create",
+        "0xe8bdbDd5295E15566Cf550DE0A951F6849c28404",
+        "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa",
+        "2",
         "--network", "sokol",
-        "--amount", "2",
-        "--safe", "0xe8bdbDd5295E15566Cf550DE0A951F6849c28404",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
