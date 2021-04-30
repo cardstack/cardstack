@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@cardstack/boxel": "^0.5.0",
+    "@cardstack/cardpay-sdk": "*",
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.2.5",
     "@embroider/compat": "^0.39.1",
@@ -60,6 +61,7 @@
     "@types/rsvp": "^4.0.3",
     "@walletconnect/web3-provider": "^1.4.0",
     "babel-eslint": "^10.1.0",
+    "bn.js": "^5.2.0",
     "broccoli-asset-rev": "^3.0.0",
     "broccoli-concat": "^4.2.4",
     "commonmark": "^0.29.3",

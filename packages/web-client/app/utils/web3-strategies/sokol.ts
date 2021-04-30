@@ -9,10 +9,14 @@ import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
 import { BigNumber } from '@ethersproject/bignumber';
+import {
+  networkIds,
+  getConstantByNetwork,
+} from '@cardstack/cardpay-sdk/index.js';
 
 export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'Sokol Testnet';
-  chainId = 77;
+  chainId = networkIds['sokol'];
   provider: WalletConnectProvider | undefined;
 
   @reads('provider.connector') connector!: IConnector;
@@ -32,7 +36,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     this.provider = new WalletConnectProvider({
       chainId: this.chainId,
       rpc: {
-        77: 'https://sokol.stack.cards',
+        [networkIds['sokol']]: getConstantByNetwork('rpcNode', 'sokol'),
       },
       connector: new CustomStorageWalletConnect(
         {

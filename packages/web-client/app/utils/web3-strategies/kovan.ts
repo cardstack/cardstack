@@ -9,31 +9,33 @@ import detectEthereumProvider from '@metamask/detect-provider';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
 import Web3 from 'web3';
-import BRIDGE_ABI from '../../utils/contracts/bridge-contract-abi';
 import { Contract } from 'web3-eth-contract';
 import { BigNumber } from '@ethersproject/bignumber';
-import { AbiItem } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
+import {
+  TokenBridge,
+  getAddressByNetwork,
+  networkIds,
+  getConstantByNetwork,
+} from '@cardstack/cardpay-sdk/index.js';
 
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
-const HOME_BRIDGE_ADDRESS = '0x63AaCB22753d0DF234C32Ff62F5860da233cB360';
-const FOREIGN_BRIDGE_ADDRESS = '0xAfbA2216Aae9Afe23FD09Cf5dfe420F6ecdDD04B';
 
 let cardToken = new Token(
   'CARD',
   'CARD',
-  '0xd6E34821F508e4247Db359CFceE0cb5e8050972a'
+  getAddressByNetwork('cardToken', 'kovan')
 );
 
 let daiToken = new Token(
   'DAI',
   'Dai Stablecoin',
-  '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa'
+  getAddressByNetwork('daiToken', 'kovan')
 );
 
 export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   chainName = 'Kovan Testnet';
-  chainId = 42;
+  chainId = networkIds['kovan'];
   bridgeableTokens = [daiToken, cardToken];
   walletConnectUri: string | undefined;
   currentProviderId: string | undefined;
@@ -135,7 +137,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
 
   setupWalletConnect(): any {
     let provider = new WalletConnectProvider({
-      chainId: 42,
+      chainId: networkIds['kovan'],
       infuraId: config.infuraId,
       // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
       connector: new CustomStorageWalletConnect(
@@ -250,34 +252,18 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     amountInWei: BigNumber,
     tokenSymbol: string
   ): Promise<TransactionReceipt> {
+    let tokenBridge = new TokenBridge(this.web3);
     let token = this.getTokenBySymbol(tokenSymbol);
-    return this.contractForToken(token)
-      .methods.approve(FOREIGN_BRIDGE_ADDRESS, amountInWei.toString())
-      .send({ from: this.walletInfo.firstAddress });
+    return tokenBridge.unlockTokens(token.address, amountInWei.toString());
   }
 
   relayTokens(
     amountInWei: BigNumber,
-    tokenSymbol: string,
-    destinationAddress: string
+    tokenSymbol: string
   ): Promise<TransactionReceipt> {
+    let tokenBridge = new TokenBridge(this.web3);
     let token = this.getTokenBySymbol(tokenSymbol);
-    let bridgeTokenContract = new this.web3.eth.Contract(
-      BRIDGE_ABI as AbiItem[],
-      FOREIGN_BRIDGE_ADDRESS,
-      {
-        from: this.walletInfo.firstAddress,
-        gasPrice: this.web3.utils.toWei('20', 'gwei'),
-      }
-    );
-    let txnReceiptPromise = bridgeTokenContract.methods
-      .relayTokens(token.address, destinationAddress, amountInWei.toString())
-      .send({
-        from: this.walletInfo.firstAddress,
-        to: HOME_BRIDGE_ADDRESS,
-        gas: 600000, // this is the gas limit
-      });
-    return txnReceiptPromise;
+    return tokenBridge.relayTokens(token.address, amountInWei.toString());
   }
 
   getTokenBySymbol(symbol: string): Token {
@@ -300,6 +286,6 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   }
 
   txnViewerUrl(txnHash: TransactionHash) {
-    return `https://kovan.etherscan.io/tx/${txnHash}`;
+    return `${getConstantByNetwork('blockExplorer', 'kovan')}/tx/${txnHash}`;
   }
 }
