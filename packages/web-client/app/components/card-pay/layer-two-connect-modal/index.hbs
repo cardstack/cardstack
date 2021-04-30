@@ -10,6 +10,8 @@
       class="layer-two-connect-modal__card"
       @suppressHeader={{true}}
       @includeExplanations={{true}}
+      @onConnect={{@onClose}}
+      @onDisconnect={{@onClose}}
       tabindex="0"
       {{did-insert this.focus}}
       data-test-layer-two-connect-modal-card

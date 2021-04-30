@@ -1,0 +1,6 @@
+.card-pay-balances-list {
+  font-size: 1rem;
+  line-height: var(--field-text-line-height);
+  padding-left: 0;
+  margin: 0;
+}

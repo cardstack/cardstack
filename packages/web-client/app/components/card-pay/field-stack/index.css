@@ -1,0 +1,3 @@
+.card-pay-field-stack .card-pay-labeled-value + .card-pay-labeled-value {
+    margin-top: var(--boxel-sp-lg);
+}

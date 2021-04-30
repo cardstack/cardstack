@@ -7,11 +7,36 @@
     <Boxel::Header @header="Wallet Connection - xDai Chain"></Boxel::Header>
   {{/unless}}
 
-  {{#if this.layer2Network.hasAccount}}
-    Connected to wallet:
-    <div data-test-layer2-account-id>{{this.layer1Network.walletInfo.firstAddress}}</div>
-    <div>xDai balance: <span data-test-xdai-balance>{{format-token-amount this.layer2Network.defaultTokenBalance}}</span></div>
-    
+  {{#if (eq this.cardState 'memorialized')}}
+    <section class="layer-two-connect-card__body">
+      <header aria-label="Layer 2 Connected Header" class="layer-two-connect-card__body-header">
+        Cardstack
+        <img class="layer-two-connect-card__body-header-logo" src={{this.cardstackLogo}} alt="" role="presentation">
+      </header>
+      <CardPay::FieldStack>
+        <CardPay::LabeledValue
+          @label="Network"
+          @value={{this.layer2Network.chainName}}
+        />
+        <CardPay::LabeledValue
+          @label="Address"
+          @value={{this.layer2Network.walletInfo.firstAddress}}
+          @isAddress={{true}}
+        />
+        <CardPay::LabeledValue @label="Balance*">
+          <CardPay::BalancesList as |Balance|>
+            <Balance @symbol="XDAI" @amount={{this.layer2Network.defaultTokenBalance}} />
+          </CardPay::BalancesList>
+        </CardPay::LabeledValue>
+        {{!-- future: show Prepaid Cards, Badges --}}
+        <CardPay::LabeledValue
+          @label="Status"
+          @value="Connected"
+          @icon="checkbox-primary-checked"
+          class="layer-two-connect-card__connection-status"
+        />
+      </CardPay::FieldStack>
+    </section>
     <Boxel::CtaBlock @state='memorialized'>
       <:memorialized as |m|>
         <m.ActionButton {{on "click" this.disconnect}}>
@@ -71,7 +96,7 @@
         <div data-test-wallet-connect-qr-code class="layer-two-connect-card__qr-container">
           <StyledQrCode
             @data={{this.layer2Network.walletConnectUri}}
-            @image={{this.cardstackLogo}}
+            @image={{this.cardstackLogoForQR}}
             @size={{340}}
             @margin={{15}}
             @backgroundColor="#ffffff"

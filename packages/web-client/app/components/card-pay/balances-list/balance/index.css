@@ -1,0 +1,15 @@
+.card-pay-balances-list-balance {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.card-pay-balances-list-balance + .card-pay-balances-list-balance {
+  margin-top: var(--boxel-sp-xs);
+}
+
+.card-pay-balances-list-balance__small-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+}

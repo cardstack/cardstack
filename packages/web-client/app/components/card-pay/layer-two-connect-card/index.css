@@ -85,3 +85,32 @@
 .layer-two-connect-card__loading-qr > span {
   margin: auto;
 }
+
+.layer-two-connect-card__body {
+  padding: 0 var(--boxel-sp-lg);
+  margin-bottom: var(--boxel-sp-lg);
+}
+
+.layer-two-connect-card__body-header {
+  display: flex;
+  align-items: center;
+  padding: var(--boxel-sp-xl) 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+.layer-two-connect-card__body-header-logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-left: auto;
+}
+
+.layer-two-connect-card__disclaimer {
+  margin-top: var(--boxel-sp-xxl);
+  margin-bottom: var(--boxel-sp-lg);
+  font: var(--boxel-font-xs);
+  color: #969696;
+}
+
+.layer-two-connect-card__connection-status {
+  --icon-color: var(--boxel-dark);
+}

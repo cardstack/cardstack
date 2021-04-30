@@ -1,5 +1,5 @@
 <Boxel::CardContainer
-  class="card-pay-layer-one-connect-card"
+  class="layer-one-connect-card"
   data-test-mainnnet-connection-action-container
   ...attributes
 >
@@ -9,73 +9,49 @@
     />
   {{/unless}}
 
-  <section class="card-pay-layer-one-connect-card__body">
+  <section class="layer-one-connect-card__body">
     {{#if (eq this.cardState 'memorialized')}}
-      <header aria-label="Layer 1 Connected Header" class="card-pay-layer-one-connect-card__body-header">
+      <header aria-label="Layer 1 Connected Header" class="layer-one-connect-card__body-header">
         {{this.currentWalletProvider.name}}
-        <img class="card-pay-layer-one-connect-card__body-header-logo" src={{this.currentWalletProvider.logo}} alt="" role="presentation">
+        <img class="layer-one-connect-card__body-header-logo" src={{this.currentWalletProvider.logo}} alt="" role="presentation">
       </header>
-      <Boxel::Field
-        @label="Network"
-        @fieldMode="view"
-        class="card-pay-layer-one-connect-card__field"
-        @labelClass="card-pay-layer-one-connect-card__field-label"
-      >
-        <span class="card-pay-layer-one-connect-card__field-contents">
-          {{this.layer1Network.chainName}}
-        </span>
-      </Boxel::Field>
-      <Boxel::Field
-        @label="Address"
-        @fieldMode="view"
-        class="card-pay-layer-one-connect-card__field"
-        @labelClass="card-pay-layer-one-connect-card__field-label"
-      >
-      <span class="card-pay-layer-one-connect-card__field-contents card-pay-layer-one-connect-card__field-contents-address">
-        {{this.layer1Network.walletInfo.firstAddress}}
-      </span>
-      </Boxel::Field>
-      <Boxel::Field
-        @label="Balance*"
-        @fieldMode="view"
-        class="card-pay-layer-one-connect-card__field"
-        @labelClass="card-pay-layer-one-connect-card__field-label"
-      >
-        <ul class="card-pay-layer-one-connect-card__field-contents card-pay-layer-one-connect-card__balance-list">
-          <li class="card-pay-layer-one-connect-card__field-balance-display" data-test-eth-balance>
-            {{svg-jar "ethereum-token" class="card-pay-layer-one-connect-card__small-icon" role="presentation"}} {{format-token-amount this.layer1Network.defaultTokenBalance}} ETH
-          </li>
-          <li class="card-pay-layer-one-connect-card__field-balance-display" data-test-dai-balance>
-            {{svg-jar "dai-token" class="card-pay-layer-one-connect-card__small-icon" role="presentation"}} {{format-token-amount this.layer1Network.daiBalance}} DAI
-          </li>
-          <li class="card-pay-layer-one-connect-card__field-balance-display" data-test-card-balance>
-            {{svg-jar "card-token" class="card-pay-layer-one-connect-card__small-icon" role="presentation"}} {{format-token-amount this.layer1Network.cardBalance}} CARD
-          </li>
-        </ul>
-      </Boxel::Field>
-      <Boxel::Field
-        @label="Status"
-        @fieldMode="view"
-        class="card-pay-layer-one-connect-card__field"
-        @labelClass="card-pay-layer-one-connect-card__field-label"
-      >
-        <div class="card-pay-layer-one-connect-card__field-contents card-pay-layer-one-connect-card__connection-status">
-          {{svg-jar "checkbox-primary-checked" class="card-pay-layer-one-connect-card__small-icon card-pay-layer-one-connect-card__done-icon" role="presentation"}} Connected
-        </div>
-      </Boxel::Field>
+      <CardPay::FieldStack>
+        <CardPay::LabeledValue
+          @label="Network"
+          @value={{this.layer1Network.chainName}}
+        />
+        <CardPay::LabeledValue
+          @label="Address"
+          @value={{this.layer1Network.walletInfo.firstAddress}}
+          @isAddress={{true}}
+        />
+        <CardPay::LabeledValue @label="Balance*">
+          <CardPay::BalancesList as |Balance|>
+            <Balance @symbol="ETH" @amount={{this.layer1Network.defaultTokenBalance}} />
+            <Balance @symbol="DAI" @amount={{this.layer1Network.daiBalance}} />
+            <Balance @symbol="CARD" @amount={{this.layer1Network.cardBalance}} />
+          </CardPay::BalancesList>
+        </CardPay::LabeledValue>
+        <CardPay::LabeledValue
+          @label="Status"
+          @value="Connected"
+          @icon="checkbox-primary-checked"
+          class="layer-one-connect-card__connection-status"
+        />
+      </CardPay::FieldStack>
 
-      <div class="card-pay-layer-one-connect-card__disclaimer">
+      <div class="layer-one-connect-card__disclaimer">
         * This balance reflects some of the tokens that are accepted in the Card Pay network. 
   It may not reflect all the tokens in your wallet.
       </div>
     {{else}}
-      <header aria-label="Layer 1 Connection Header" class="card-pay-layer-one-connect-card__body-header">Connect your Ethereum mainnet wallet</header>
+      <header aria-label="Layer 1 Connection Header" class="layer-one-connect-card__body-header">Connect your Ethereum mainnet wallet</header>
       <CardPay::LayerOneWalletProviderSelection
         @walletProviders={{this.walletProviders}}
         @currentWalletProviderId={{this.currentWalletProviderId}}
         @changeWalletProvider={{this.changeWalletProvider}}
         @isConnecting={{this.isWaitingForConnection}}
-        class="card-pay-layer-one-connect-card__wallet-provider-selection"
+        class="layer-one-connect-card__wallet-provider-selection"
       />
     {{/if}}
   </section>
@@ -102,12 +78,12 @@
 </Boxel::CardContainer>
 
 {{#if (and this.isWaitingForConnection (not @suppressConnectingCard))}}
-  <Boxel::CardContainer class="card-pay-layer-one-connect-card__connection">
-    <div class="card-pay-layer-one-connect-card__connection-icons">
-      <img src={{this.cardstackLogo}} alt="" role="presentation" class="card-pay-layer-one-connect-card__connection-cardstack-logo">
-      <img src={{this.connectionSymbol}} alt="" role="presentation" class="card-pay-layer-one-connect-card__connection-symbol">
-      <img src={{this.currentWalletLogo}} alt="" role="presentation" class="card-pay-layer-one-connect-card__connection-wallet-logo">
+  <Boxel::CardContainer class="layer-one-connect-card__connection">
+    <div class="layer-one-connect-card__connection-icons">
+      <img src={{this.cardstackLogo}} alt="" role="presentation" class="layer-one-connect-card__connection-cardstack-logo">
+      <img src={{this.connectionSymbol}} alt="" role="presentation" class="layer-one-connect-card__connection-symbol">
+      <img src={{this.currentWalletLogo}} alt="" role="presentation" class="layer-one-connect-card__connection-wallet-logo">
     </div>
-    <div class="card-pay-layer-one-connect-card__connection-text">Waiting for you to connect Card Pay with your mainnet wallet...</div>
+    <div class="layer-one-connect-card__connection-text">Waiting for you to connect Card Pay with your mainnet wallet...</div>
   </Boxel::CardContainer>
 {{/if}}
