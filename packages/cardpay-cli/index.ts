@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+
+/* eslint no-process-exit: "off", node/shebang: "off" */
+
 import yargs from 'yargs';
 import fetch from 'node-fetch';
 import bridge from './bridge.js';
@@ -88,7 +91,7 @@ if (!mnemonic) {
   yargs.showHelp(
     'No mnemonic is defined, either specify the mnemonic as a positional arg or pass it in using the MNEMONIC_PHRASE env var'
   );
-  process.exit(1); //eslint-disable-line no-process-exit;
+  process.exit(1);
 }
 
 if (!command) {
@@ -100,7 +103,7 @@ if (!command) {
     case 'bridge':
       if (amount == null) {
         yargs.showHelp('amount is a required value');
-        process.exit(1); //eslint-disable-line no-process-exit;
+        process.exit(1);
       }
       await bridge(network, mnemonic, amount, tokenAddress);
       break;
@@ -110,17 +113,17 @@ if (!command) {
     case 'prepaidCardCreate':
       if (safeAddress == null || amounts == null) {
         yargs.showHelp('safeAddress and amounts are required values');
-        process.exit(1); //eslint-disable-line no-process-exit;
+        process.exit(1);
       }
       await createPrepaidCard(network, mnemonic, safeAddress, amounts, tokenAddress);
       break;
     default:
       assertNever(command);
   }
-  process.exit(0); //eslint-disable-line no-process-exit
+  process.exit(0);
 })().catch((e) => {
   console.error(`Error: ${e}`);
-  process.exit(1); //eslint-disable-line no-process-exit
+  process.exit(1);
 });
 
 function assertNever(_value: never): never {
