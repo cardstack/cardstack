@@ -11,12 +11,16 @@
     "allowUnreachableCode": false,
     "strict": true,
     "noUnusedLocals": true,
+    "resolveJsonModule": true,
     "noUnusedParameters": true,
+    "skipLibCheck": true
   },
   "include": [
     "./packages/eslint-config/**/*.ts",
     "./packages/hub/**/*.ts",
     "./packages/test-support/**/*.ts",
+    "./packages/cardpay-sdk/**/*.ts",
+    "./packages/cardpay-cli/**/*.ts",
     "./scripts/**/*.js",
     "./cards/**/*.ts",
     "**/.eslintrc.ts"

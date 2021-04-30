@@ -17,7 +17,15 @@
       "name": "Launch Test Suite",
       "program": "${workspaceRoot}/node_modules/.bin/_mocha",
       "cwd": "${workspaceRoot}",
-      "args": ["-r", "esm", "packages/test-support/bin/run.js", "--timeout", "600000", "--grep", "can find built-in cards from the index"],
+      "args": [
+        "-r",
+        "esm",
+        "packages/test-support/bin/run.js",
+        "--timeout",
+        "600000",
+        "--grep",
+        "can find built-in cards from the index"
+      ]
     },
     {
       "type": "node",
@@ -30,6 +38,48 @@
         "JOBS": "1"
       },
       "outputCapture": "std"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: Bridge Tokens",
+      "program": "${workspaceFolder}/packages/cardpay-cli/bridge.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "--network", "kovan",
+        "--amount", "2",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: View Safes",
+      "program": "${workspaceFolder}/packages/cardpay-cli/view-safes.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "--network", "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: Create Prepaid Card",
+      "program": "${workspaceFolder}/packages/cardpay-cli/create-prepaid-card",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "--network", "sokol",
+        "--amount", "2",
+        "--safe", "0xe8bdbDd5295E15566Cf550DE0A951F6849c28404",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
     }
   ]
 }
