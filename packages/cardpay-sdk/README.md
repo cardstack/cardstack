@@ -124,7 +124,7 @@ Note that gas is charged in the `*.CPXD` token which will be deducted from your 
 This method is invoked with the following parameters:
 - The address of the safe that you are using to pay for the prepaid card
 - The contract address of the token that you wish to use to pay for the prepaid card. Note that the face value of the prepaid card will fluctuate based on the exchange rate of this token and the **§** unit.
-- An array of amounts in units of `wei` of the token specified in the previous parameter. Note that the face value for the prepaid card will this amount minus fees. Gas charges are applied after the card has been created and will be deducted directly from your safe and not effect the face value of the prepaid card. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
+- An array of amounts in units of `wei` using `BN` instances of the token specified in the previous parameter. Note that the face value for the prepaid card will this amount minus fees. Gas charges are applied after the card has been created and will be deducted directly from your safe and not effect the face value of the prepaid card. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
 - You can optionally provide an object that specifies the from address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
 
 ```js
