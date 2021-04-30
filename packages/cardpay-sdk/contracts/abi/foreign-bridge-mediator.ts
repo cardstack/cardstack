@@ -871,4 +871,51 @@ export default [
     stateMutability: 'view',
     type: 'function',
   },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: '_token',
+        type: 'address',
+      },
+    ],
+    name: 'isTokenAllowed',
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_token',
+        type: 'address',
+      },
+    ],
+    name: 'allowToken',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: '_token',
+        type: 'address',
+      },
+    ],
+    name: 'disallowToken',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
 ];
