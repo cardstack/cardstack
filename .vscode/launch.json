@@ -47,6 +47,15 @@
       "console": "integratedTerminal",
       "env": {},
       "args": [
+        // Kovan CARD Bridge args
+        // "bridge",
+        // "0xd6E34821F508e4247Db359CFceE0cb5e8050972a",
+        // "1000",
+        // "--network", "kovan",
+        // // Hassan's testing mnemonic feel free to use your own
+        // "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+
+        // Kovan Dai Bridge args
         "bridge",
         "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa",
         "2",
@@ -78,9 +87,10 @@
       "env": {},
       "args": [
         "prepaidcard-create",
-        "0xe8bdbDd5295E15566Cf550DE0A951F6849c28404",
-        "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa",
-        "2",
+        // Hassan's depot safe feel free to use your own
+        "0xF52bc86167B2988B1A37A07f2E76eeCD9a6ee6d3",
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
+        "1",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"

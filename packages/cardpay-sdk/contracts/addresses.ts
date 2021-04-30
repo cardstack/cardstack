@@ -7,15 +7,20 @@ const addresses: {
   };
 } = {
   kovan: {
+    cardToken: '0xd6E34821F508e4247Db359CFceE0cb5e8050972a',
     daiToken: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa',
-    foreignBridge: '0xAfbA2216Aae9Afe23FD09Cf5dfe420F6ecdDD04B',
+    foreignBridge: '0x366b4cc64D30849568af65522De3a68ea6CC78cE',
   },
   sokol: {
-    homeBridge: '0x63AaCB22753d0DF234C32Ff62F5860da233cB360',
-    daiCpxd: '0x2787E0fC3D2A3F6cd09000F284fC79452D96a1ad',
-    prepaidCardManager: '0xeBDb1731dA9a5FC972DeD53E34AB2daC3B2565F7',
+    homeBridge: '0x16a80598DD2f143CFBf091638CE3fB02c9135528',
+    daiCpxd: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
+    cardCpxd: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
+    prepaidCardManager: '0x0ecAF3d3729C99F6b5F37b29A29acB4bB047Ee92',
   },
-  mainnet: {},
+  mainnet: {
+    cardToken: '0x954b890704693af242613edEf1B603825afcD708',
+    daiToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+  },
   xdai: {},
 };
 
