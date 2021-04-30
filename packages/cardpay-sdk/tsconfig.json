@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "esModuleInterop": true,
+    "module": "es6",
+    "moduleResolution": "Node",
+    "pretty": true,
+    "target": "ES6",
+    "strict": true,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "allowUnreachableCode": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "skipLibCheck": true
+  },
+}

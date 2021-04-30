@@ -43,7 +43,7 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: Bridge Tokens",
-      "program": "${workspaceFolder}/packages/cardpay-cli/index.js",
+      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
@@ -68,7 +68,7 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: View Safes",
-      "program": "${workspaceFolder}/packages/cardpay-cli/index.js",
+      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
@@ -82,7 +82,7 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: Create Prepaid Card",
-      "program": "${workspaceFolder}/packages/cardpay-cli/index.js",
+      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [

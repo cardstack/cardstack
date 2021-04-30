@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { networks } from './constants.js';
+import { networks } from './constants';
 
 export async function networkName(web3: Web3): Promise<string> {
   let id = await web3.eth.net.getId();
