@@ -8,15 +8,19 @@ import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
 import { BigNumber } from '@ethersproject/bignumber';
+import {
+  networkIds,
+  getConstantByNetwork,
+} from '@cardstack/cardpay-sdk/index.js';
 
 export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'xDai Chain';
-  chainId = 100;
+  chainId = networkIds['xdai'];
   provider = new WalletConnectProvider({
     bridge: BRIDGE,
     chainId: this.chainId,
     rpc: {
-      100: 'https://dai.poa.network',
+      [networkIds['xdai']]: getConstantByNetwork('rpcNode', 'xdai'),
     },
     qrcode: false,
   });

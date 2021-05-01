@@ -22,7 +22,12 @@ const constants: {
     rpcNode: `${KOVAN_INFURA_URL}/${INFURA_PROJECT_ID}`,
   },
   mainnet: {},
-  xdai: {},
+  xdai: {
+    blockExplorer: 'https://blockscout.com/xdai/mainnet',
+    rpcNode: 'https://dai.poa.network',
+    relayServiceURL: 'https://relay.cardstack.com/api',
+    transactionServiceURL: 'https://transactions.cardstack.com/api',
+  },
 });
 
 export const networks: { [networkId: number]: string } = Object.freeze({

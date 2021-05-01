@@ -3,6 +3,7 @@
   "description": "An SDK for using the cardpay protocol",
   "version": "0.18.17",
   "author": "Hassan Abdel-Rahman @habdelra",
+  "main": "./index.js",
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.2.6",
     "@trufflesuite/web3-provider-engine": "^15.0.13-1",
