@@ -4,6 +4,9 @@ import { networkName } from './utils';
 
 const INFURA_PROJECT_ID = 'dfb8cbe2e916420a9dbcc1d1f5828406';
 const KOVAN_INFURA_URL = 'https://kovan.infura.io/v3';
+const KOVAN_INFURA_WSS_URL = 'wss://kovan.infura.io/ws/v3';
+const MAINNET_INFURA_URL = 'https://mainnet.infura.io/v3';
+const MAINNET_INFURA_WSS_URL = 'wss://mainnet.infura.io/ws/v3';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const constants: {
@@ -14,17 +17,24 @@ const constants: {
   sokol: {
     blockExplorer: 'https://blockscout.com/poa/sokol',
     rpcNode: 'https://sokol.stack.cards',
+    rpcWssNode: 'https://sokol-wss.stack.cards',
     relayServiceURL: 'https://relay-staging.stack.cards/api',
     transactionServiceURL: 'https://transactions-staging.stack.cards/api',
   },
   kovan: {
     blockExplorer: 'https://kovan.etherscan.io',
     rpcNode: `${KOVAN_INFURA_URL}/${INFURA_PROJECT_ID}`,
+    rpcWssNode: `${KOVAN_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
   },
-  mainnet: {},
+  mainnet: {
+    blockExplorer: 'https://etherscan.io',
+    rpcNode: `${MAINNET_INFURA_URL}/${INFURA_PROJECT_ID}`,
+    rpcWssNode: `${MAINNET_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
+  },
   xdai: {
     blockExplorer: 'https://blockscout.com/xdai/mainnet',
-    rpcNode: 'https://dai.poa.network',
+    rpcNode: 'https://rpc.xdaichain.com',
+    rpcWssNode: 'wss://rpc.xdaichain.com/wss',
     relayServiceURL: 'https://relay.cardstack.com/api',
     transactionServiceURL: 'https://transactions.cardstack.com/api',
   },
