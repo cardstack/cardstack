@@ -7,7 +7,8 @@ import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import { TransactionReceipt } from 'web3-core';
-import { BigNumber } from '@ethersproject/bignumber';
+import { BigNumber, FixedNumber } from '@ethersproject/bignumber';
+import { amountInWei } from '@cardstack/web-client/utils/token';
 
 interface CardPayDepositWorkflowTransactionAmountComponentArgs {
   workflowSession: WorkflowSession;
@@ -39,7 +40,7 @@ const tokenDetails: {
 };
 
 class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPayDepositWorkflowTransactionAmountComponentArgs> {
-  @tracked amount = 0;
+  @tracked amount = '0';
   @tracked isUnlocked = false;
   @tracked isUnlocking = false;
   @tracked unlockTxnReceipt: TransactionReceipt | undefined;
@@ -82,7 +83,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
       return 'memorialized';
     } else if (this.isUnlocking) {
       return 'in-progress';
-    } else if (this.isValidAmount(this.amount)) {
+    } else if (this.isValidAmount) {
       return 'default';
     } else {
       return 'disabled';
@@ -90,10 +91,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
   }
 
   get depositCtaState() {
-    if (
-      !this.isUnlocked ||
-      (!this.hasDeposited && !this.isValidAmount(this.amount))
-    ) {
+    if (!this.isUnlocked || (!this.hasDeposited && !this.isValidAmount)) {
       return 'disabled';
     } else if (this.isDepositing) {
       return 'in-progress';
@@ -109,11 +107,13 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
     return this.amount;
   }
 
-  isValidAmount(amount: number) {
+  get isValidAmount() {
+    if (!this.amount) return false;
+    const n = FixedNumber.from(this.amount);
     return (
-      !isNaN(amount) &&
-      amount > 0 &&
-      BigNumber.from(amount).lte(this.currentTokenBalance)
+      !n.isNegative() &&
+      !n.isZero() &&
+      amountInWei(n).lte(this.currentTokenBalance)
     );
   }
 
@@ -129,11 +129,20 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
     );
   }
 
+  @action onInputAmount(event: InputEvent) {
+    const str = (event.target as HTMLInputElement).value;
+    if (!isNaN(+str)) {
+      this.amount = str;
+    } else {
+      this.amount = this.amount;
+    }
+  }
+
   @action unlock() {
     let tokenSymbol = this.args.workflowSession.state.depositSourceToken;
     this.isUnlocking = true;
     taskFor(this.layer1Network.approve)
-      .perform(this.amount, tokenSymbol)
+      .perform(FixedNumber.from(this.amount), tokenSymbol)
       .then((transactionReceipt: TransactionReceipt) => {
         this.isUnlocked = true;
         this.unlockTxnReceipt = transactionReceipt;
@@ -152,7 +161,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
       layer2BlockHeightBeforeBridging
     );
     taskFor(this.layer1Network.relayTokens)
-      .perform(this.amount, tokenSymbol, layer2Address)
+      .perform(FixedNumber.from(this.amount), tokenSymbol, layer2Address)
       .then((transactionReceipt: TransactionReceipt) => {
         this.relayTokensTxnReceipt = transactionReceipt;
         this.args.workflowSession.update(

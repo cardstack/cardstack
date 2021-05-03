@@ -32,12 +32,12 @@
       >
       <div class="card-pay-transaction-amount__amount-field-input-container">
         {{svg-jar this.currentTokenDetails.icon class="card-pay-transaction-amount__amount-field-currency-icon" role="presentation"}}
-        <Boxel::Input
+        <input
           class="card-pay-transaction-amount__amount-field-input"
-          @id="deposit-amount-input"
-          @value={{this.amount}}
+          id="deposit-amount-input"
+          value={{this.amount}}
+          {{on "input" this.onInputAmount}}
           data-test-deposit-amount-input
-          ...attributes
         />
         <div class="card-pay-transaction-amount__amount-field-currency-text">
           {{this.currentTokenDetails.symbol}}
