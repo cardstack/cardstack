@@ -36,6 +36,8 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     super(owner, args);
     if (this.hasAccount) {
       next(this, () => {
+        this.currentWalletProviderId =
+          this.layer1Network.strategy.currentProviderId || '';
         this.args.onComplete?.();
       });
     }

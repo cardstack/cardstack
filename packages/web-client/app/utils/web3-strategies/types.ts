@@ -13,6 +13,7 @@ export interface Web3Strategy {
 
 export interface Layer1Web3Strategy extends Web3Strategy {
   defaultTokenBalance: BigNumber | undefined;
+  currentProviderId: string | undefined;
   daiBalance: BigNumber | undefined;
   cardBalance: BigNumber | undefined;
   connect(walletProvider: WalletProvider): Promise<void>; // eslint-disable-line no-unused-vars

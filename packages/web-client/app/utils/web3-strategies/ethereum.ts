@@ -9,6 +9,7 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
   chainName = 'Ethereum Mainnet';
   chainId = 1;
   isConnected: boolean = false;
+  currentProviderId: string | undefined;
   walletConnectUri: string | undefined;
   #waitForAccountDeferred = defer<void>();
   get waitForAccount(): Promise<void> {
