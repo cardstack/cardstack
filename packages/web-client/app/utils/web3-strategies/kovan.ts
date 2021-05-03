@@ -285,11 +285,11 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     }
   }
 
-  txnViewerUrl(txnHash: TransactionHash) {
+  txnViewerUrl(txnHash: TransactionHash): string {
     return `${getConstantByNetwork('blockExplorer', 'kovan')}/tx/${txnHash}`;
   }
 
-  bridgeExplorerUrl(txnHash: string): string {
-    return `https://alm-test-amb.herokuapp.com/42/${txnHash}`;
+  bridgeExplorerUrl(txnHash: TransactionHash): string {
+    return `${getConstantByNetwork('bridgeExplorer', 'kovan')}/${txnHash}`;
   }
 }

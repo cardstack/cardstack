@@ -55,7 +55,6 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     await this.provider.enable();
     this.web3 = new Web3(this.provider as any);
     this.isConnected = true;
-    // this.initializePayableToken();
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
     this.connector.on('session_update', (error, payload) => {
       if (error) {

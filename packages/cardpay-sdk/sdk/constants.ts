@@ -23,11 +23,13 @@ const constants: {
   },
   kovan: {
     blockExplorer: 'https://kovan.etherscan.io',
+    bridgeExplorer: 'https://alm-test-amb.herokuapp.com/42',
     rpcNode: `${KOVAN_INFURA_URL}/${INFURA_PROJECT_ID}`,
     rpcWssNode: `${KOVAN_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
   },
   mainnet: {
     blockExplorer: 'https://etherscan.io',
+    bridgeExplorer: 'https://alm-xdai.herokuapp.com',
     rpcNode: `${MAINNET_INFURA_URL}/${INFURA_PROJECT_ID}`,
     rpcWssNode: `${MAINNET_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
   },

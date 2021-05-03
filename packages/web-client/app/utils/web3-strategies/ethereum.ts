@@ -4,6 +4,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { WalletProvider } from '../wallet-providers';
 import { defer } from 'rsvp';
 import { TransactionReceipt } from 'web3-core';
+import { getConstantByNetwork } from '@cardstack/cardpay-sdk/index.js';
 
 export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
   chainName = 'Ethereum Mainnet';
@@ -42,11 +43,11 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
     throw new Error('Method not implemented.');
   }
 
-  txnViewerUrl(txnHash: TransactionHash): string {
-    return `https://etherscan.io/tx/${txnHash}`;
+  txnViewerUrl(txnHash: TransactionHash) {
+    return `${getConstantByNetwork('blockExplorer', 'mainnet')}/tx/${txnHash}`;
   }
 
-  bridgeExplorerUrl(txnHash: string): string {
-    return `https://alm-test-amb.herokuapp.com/${txnHash}`;
+  bridgeExplorerUrl(txnHash: TransactionHash): string {
+    return `${getConstantByNetwork('bridgeExplorer', 'mainnet')}/${txnHash}`;
   }
 }
