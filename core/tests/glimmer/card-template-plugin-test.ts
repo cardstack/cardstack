@@ -172,4 +172,44 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       assert.deepEqual(usedFields, ['items']);
     });
   });
+
+  QUnit.module('Fields: iterating over all fields', function (hooks) {
+    let options: Options;
+    hooks.beforeEach(function () {
+      options = {
+        fields: {
+          title: {
+            type: 'contains',
+            card: COMPILED_STRING_CARD,
+            localName: 'title',
+          },
+          startDate: {
+            type: 'contains',
+            card: COMPILED_DATE_CARD,
+            localName: 'startDate',
+          },
+        },
+        usedFields,
+        importAndChooseName,
+      };
+    });
+
+    // Reminder: as we wrote this, we decided that `<@fields.startDate />` can
+    // just always replace `<@model.startDate />` for the invocation case, and
+    // `{{@model.startDate}}` is *always* only the data.
+    QUnit.test('each over @fields', async function (assert) {
+      assert.equal(
+        transform(
+          `
+          {{#each-in @fields as |name Field|}}
+            <label>{{name}}</label>
+            <Field />
+          {{/each-in}}
+        `,
+          options
+        ),
+        '<label>title</label>{{title}}<label>startDate</label><BestGuess @model={{@model.startDate}} />'
+      );
+    });
+  });
 });
