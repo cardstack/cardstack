@@ -1,36 +1,115 @@
-<Boxel::CardContainer>
-  <div data-test-source-token={{@workflowSession.state.depositSourceToken}}>
-    Depositing from {{@workflowSession.state.depositSourceToken}}
-  </div>
-  <Boxel::Input data-test-deposit-amount-input @value={{this.amount}} />
-  <div>
-    <Boxel::Button
-      {{on 'click' this.unlock}}
-      data-test-unlock-button
-      @disabled={{this.isUnlockButtonDisabled}}
-      @loading={{this.isUnlocking}}
-    >
-      {{if this.isUnlocking 'Unlocking...' 'Unlock'}}
-    </Boxel::Button>
-    {{#if this.unlockTxnViewerUrl}}
-      <Boxel::Button @as="anchor" @href={{this.unlockTxnViewerUrl}} target="_blank">
-        View on Etherscan
-      </Boxel::Button>
-    {{/if}}
-  </div>
-  <div>
-    <Boxel::Button
-      {{on 'click' this.deposit}}
-      data-test-deposit-button
-      @disabled={{this.isDepositButtonDisabled}}
-      @loading={{this.isDepositing}}
-    >
-      {{if this.isDepositing 'Depositing...' 'Deposit'}}
-    </Boxel::Button>
-    {{#if this.depositTxnViewerUrl}}
-      <Boxel::Button @as="anchor" @href={{this.depositTxnViewerUrl}} target="_blank">
-        View on Etherscan
-      </Boxel::Button>
-    {{/if}}
-  </div>
+<Boxel::CardContainer
+  class="card-pay-transaction-amount"
+>
+  <Boxel::Header
+    @header="Deposit amount"
+  />
+  <section class="card-pay-transaction-amount__body">
+    <header class="card-pay-transaction-amount__body-header">
+      Choose an amount to deposit into the reserve pool
+    </header>
+    <CardPay::DepositWorkflow::TransactionAmount::BalanceView
+      @tokenSymbol={{this.currentTokenDetails.symbol}}
+      @tokenIcon={{this.currentTokenDetails.icon}}
+      @tokenDescription={{this.currentTokenDetails.description}}
+      @address={{this.layer1Network.walletInfo.firstAddress}}
+      @balance={{format-token-amount this.currentTokenBalance}}
+      @balanceInUsd={{this.currentTokenBalanceInUsd}}
+    />
+    <div class="card-pay-transaction-amount__input-section">
+      {{#if this.isUnlocked}}
+      <CardPay::LabeledValue
+        @label="Amount to deposit"
+        @icon={{this.currentTokenDetails.icon}}
+        @value={{concat this.amount " " this.currentTokenDetails.symbol}}
+      />
+      {{else}}
+      <Boxel::Field 
+        @label="Amount to deposit"
+        @fieldMode="edit"
+        class="card-pay-transaction-amount__field"
+        @labelClass="card-pay-transaction-amount__field-label"
+      >
+      <div class="card-pay-transaction-amount__amount-field-input-container">
+        {{svg-jar this.currentTokenDetails.icon class="card-pay-transaction-amount__amount-field-currency-icon" role="presentation"}}
+        <Boxel::Input
+          class="card-pay-transaction-amount__amount-field-input"
+          @id="deposit-amount-input"
+          @value={{this.amount}}
+          data-test-deposit-amount-input
+          ...attributes
+        />
+        <div class="card-pay-transaction-amount__amount-field-currency-text">
+          {{this.currentTokenDetails.symbol}}
+        </div>
+      </div>
+      </Boxel::Field>
+      {{/if}}
+
+      <CardPay::LabeledValue
+        @icon="dollar"
+        @label="Approximate value"
+        @value={{concat this.amountInUsd " USD"}}
+      />
+
+    </div>
+  </section>
+  <Boxel::CtaBlock @stepNumber={{1}} @state={{this.unlockCtaState}}>
+    <:default as |a|>
+      <a.ActionButton data-test-unlock-button {{on "click" this.unlock}}>
+        Unlock
+      </a.ActionButton>
+    </:default>
+    <:disabled as |d|>
+      <d.ActionButton data-test-unlock-button>
+        Unlock
+      </d.ActionButton>
+    </:disabled>
+    <:in-progress as |i|>
+      <i.ActionButton data-test-unlock-button>
+        Unlocking
+      </i.ActionButton>
+    </:in-progress>
+    <:memorialized as |m|>
+      <m.ActionStatusArea>
+        Unlocked
+      </m.ActionStatusArea>
+      {{#if this.unlockTxnViewerUrl}}
+      <m.InfoArea>
+        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.unlockTxnViewerUrl}} target="_blank">
+          View on Etherscan
+        </Boxel::Button>
+      </m.InfoArea>
+      {{/if}}
+    </:memorialized>
+  </Boxel::CtaBlock>
+  <Boxel::CtaBlock @stepNumber={{2}} @state={{this.depositCtaState}} class={{cn card-pay-transaction-amount__deposited-memorialized-cta=(eq this.depositCtaState 'memorialized')}}>
+    <:default as |a|>
+      <a.ActionButton  {{on "click" this.deposit}} data-test-deposit-button>
+        Deposit
+      </a.ActionButton>
+    </:default>
+    <:disabled as |d|>
+      <d.ActionButton data-test-deposit-button>
+        Deposit
+      </d.ActionButton>
+    </:disabled>
+    <:in-progress as |i|>
+      <i.ActionButton data-test-deposit-button>
+        Depositing
+      </i.ActionButton>
+    </:in-progress>
+    <:memorialized as |m|>
+      <m.ActionStatusArea>
+        Deposited
+      </m.ActionStatusArea>
+      {{#if this.depositTxnViewerUrl}}
+      <m.InfoArea>
+        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.depositTxnViewerUrl}} target="_blank">
+          View on Etherscan
+        </Boxel::Button>
+      </m.InfoArea>
+      {{/if}}
+    </:memorialized>
+  </Boxel::CtaBlock>
 </Boxel::CardContainer>
