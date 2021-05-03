@@ -7,8 +7,8 @@ import { setupCardCache } from './helpers/cache';
 import { Server } from '../src/server';
 import { BASE_CARD_REALM_CONFIG } from './helpers/fixtures';
 
-QUnit.module('respondWithCard', function (hooks) {
   let realm: Project;
+QUnit.module('GET /cards/<card-id>', function (hooks) {
   let server: Koa;
 
   function getCard(cardURL: string) {
