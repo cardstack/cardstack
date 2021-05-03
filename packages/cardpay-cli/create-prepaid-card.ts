@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import HDWalletProvider from 'parity-hdwallet-provider';
 import Web3 from 'web3';
 import { HttpProvider, PrepaidCard, getConstant, networkIds, getAddress } from '@cardstack/cardpay-sdk';
@@ -23,7 +22,7 @@ export default async function (
   );
   tokenAddress = tokenAddress ?? (await getAddress('daiCpxd', web3));
 
-  const amountsInWei = amounts.map((amount) => new BN(toWei(amount.toString()).toString()));
+  const amountsInWei = amounts.map((amount) => toWei(amount.toString()).toString());
   let prepaidCard = new PrepaidCard(web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
 

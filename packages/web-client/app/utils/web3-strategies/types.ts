@@ -2,7 +2,7 @@ import { WalletProvider } from '../wallet-providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { TransactionReceipt } from 'web3-core';
 import { AbiItem } from 'web3-utils';
-import ERC_20_ABI from '../../utils/contracts/erc-20-abi';
+import { ERC20ABI } from '@cardstack/cardpay-sdk/index.js';
 
 export interface Web3Strategy {
   chainName: string;
@@ -36,7 +36,7 @@ export class Token {
   symbol: string;
   name: string;
   address: string;
-  abi = ERC_20_ABI as AbiItem[];
+  abi = ERC20ABI as AbiItem[];
 
   constructor(symbol: string, name: string, address: string) {
     this.symbol = symbol;

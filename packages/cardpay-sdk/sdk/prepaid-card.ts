@@ -64,11 +64,15 @@ export default class PrepaidCard {
   async create(
     safeAddress: string,
     tokenAddress: string,
-    amounts: BN[],
+    amounts: string[],
     options?: ContractOptions
   ): Promise<RelayTransaction> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let payload = await this.getPayload(from, tokenAddress, amounts);
+    let payload = await this.getPayload(
+      from,
+      tokenAddress,
+      amounts.map((amount) => new BN(amount))
+    );
     let estimate = await this.gasEstimate(safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
 
     if (estimate.lastUsedNonce == null) {

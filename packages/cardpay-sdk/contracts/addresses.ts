@@ -1,11 +1,11 @@
 import Web3 from 'web3';
-import { networkName } from '../sdk/utils.js';
+import { networkName } from '../sdk/utils';
 
 const addresses: {
   [network: string]: {
     [contractName: string]: string;
   };
-} = {
+} = Object.freeze({
   kovan: {
     cardToken: '0xd6E34821F508e4247Db359CFceE0cb5e8050972a',
     daiToken: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa',
@@ -22,9 +22,17 @@ const addresses: {
     daiToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
   },
   xdai: {},
-};
+});
 
 export default addresses;
+
+export function getAddressByNetwork(contractName: string, network: string): string {
+  let address = addresses[network][contractName];
+  if (!address) {
+    throw new Error(`Don't know about the address for '${contractName}' for network ${network}`);
+  }
+  return address;
+}
 
 export async function getAddress(contractName: string, web3: Web3): Promise<string> {
   let network = await networkName(web3);

@@ -1,7 +1,4 @@
-#!/usr/bin/env node
-
-/* eslint no-process-exit: "off", node/shebang: "off" */
-
+/* eslint no-process-exit: "off" */
 import yargs from 'yargs';
 import fetch from 'node-fetch';
 import bridge from './bridge.js';

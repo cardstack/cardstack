@@ -1,9 +1,9 @@
 /*global fetch */
 
 import Web3 from 'web3';
-import PrepaidCardManagerABI from '../contracts/abi/prepaid-card-manager.js';
-import { getAddress } from '../contracts/addresses.js';
-import { getConstant, ZERO_ADDRESS } from './constants.js';
+import PrepaidCardManagerABI from '../contracts/abi/prepaid-card-manager';
+import { getAddress } from '../contracts/addresses';
+import { getConstant, ZERO_ADDRESS } from './constants';
 
 interface SafeInfo {
   address: string;

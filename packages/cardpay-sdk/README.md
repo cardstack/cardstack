@@ -2,7 +2,7 @@
 This is a package that provides an SDK to use the Cardpay protocol.
 
 ### Special Considerations <!-- omit in toc -->
- One item to note that all token amounts that are provided to the API must use the `BN` class and be in units of `wei`. All token amounts returned by the API will also be in units of `wei`. `BN` is available from the `bn.js` package in npm, as well as `Web3` has a copy of this at `Web3.utils.BN`. You can use `Web3.utils.toWei()` and `Web3.utils.fromWei()` to convert to and from units of `wei`. Because ethereum numbers can be so large, it is unsafe to represent these natively in Javascript, and in fact it is very common for a smart contract to return numbers that are simply too large to be represented natively in Javascript. For this reason, within Javascript the only safe way to natively handle numbers coming from Ethereum is as a `string`. If you need to perform math on a number coming from Ethereum use the `BN` library.
+ One item to note that all token amounts that are provided to the API must strings and be in units of `wei`. All token amounts returned by the API will also be in units of `wei`. You can use `Web3.utils.toWei()` and `Web3.utils.fromWei()` to convert to and from units of `wei`. Because ethereum numbers can be so large, it is unsafe to represent these natively in Javascript, and in fact it is very common for a smart contract to return numbers that are simply too large to be represented natively in Javascript. For this reason, within Javascript the only safe way to natively handle numbers coming from Ethereum is as a `string`. If you need to perform math on a number coming from Ethereum use the `BN` library.
 
 - [`TokenBridge`](#tokenbridge)
   - [`TokenBridge.unlockTokens`](#tokenbridgeunlocktokens)
@@ -38,7 +38,7 @@ let tokenBridge = new TokenBridge(web3); // Layer 1 web3 instance
 ### `TokenBridge.unlockTokens`
 This call will perform an ERC-20 `approve` action on the tokens to grant the Token Bridge contract the ability bridge your tokens. This method is invoked with:
 - The contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridge.getSupportedTokens` method to get a list of supported tokens.
-- The amount of tokens to unlock. This amount should be in units of `wei` and as an instance of `BN`.
+- The amount of tokens to unlock. This amount should be in units of `wei` and as string.
 - You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a third argument.
 
 This method returns a promise that includes a web3 transaction receipt, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
@@ -54,7 +54,7 @@ This call will invoke the token bridge contract to relay tokens that have been u
 
 This method is invoked with the following parameters:
 - The contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridge.getSupportedTokens` method to get a list of supported tokens.
-- The amount of tokens to unlock. This amount should be in units of `wei` and as an instance of `BN`.
+- The amount of tokens to unlock. This amount should be in units of `wei` and as a string.
 - You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a third argument.
 
 This method returns a promise that includes a web3 transaction receipt, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
@@ -124,7 +124,7 @@ Note that gas is charged in the `*.CPXD` token which will be deducted from your 
 This method is invoked with the following parameters:
 - The address of the safe that you are using to pay for the prepaid card
 - The contract address of the token that you wish to use to pay for the prepaid card. Note that the face value of the prepaid card will fluctuate based on the exchange rate of this token and the **§** unit.
-- An array of amounts in units of `wei` using `BN` instances of the token specified in the previous parameter. Note that the face value for the prepaid card will this amount minus fees. Gas charges are applied after the card has been created and will be deducted directly from your safe and not effect the face value of the prepaid card. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
+- An array of amounts in units of `wei` as strings of the token specified in the previous parameter. Note that the face value for the prepaid card will this amount minus fees. Gas charges are applied after the card has been created and will be deducted directly from your safe and not effect the face value of the prepaid card. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
 - You can optionally provide an object that specifies the from address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
 
 ```js
