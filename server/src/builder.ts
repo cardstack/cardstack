@@ -100,8 +100,15 @@ export default class Builder implements BuilderInterface {
     return this.buildCard(url);
   }
 
-  copyAssets(cardURL: string, assets: Asset[], files: RawCard['files']): void {
+  copyAssets(
+    cardURL: string,
+    assets: (Asset | undefined)[],
+    files: RawCard['files']
+  ): void {
     for (const asset of assets) {
+      if (!asset) {
+        continue;
+      }
       this.cache.writeAsset(cardURL, asset.path, files[asset.path]);
     }
   }
