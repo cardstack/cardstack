@@ -80,7 +80,8 @@ export interface CompiledCard {
 export interface Field {
   type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
   card: CompiledCard;
-  localName: string;
+  typeDecoratorLocalName: string;
+  name: string;
 }
 
 export interface ComponentInfo {
