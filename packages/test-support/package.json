@@ -35,5 +35,8 @@
   "volta": {
     "node": "12.13.1",
     "yarn": "1.22.0"
+  },
+  "config": {
+    "access": "public"
   }
 }

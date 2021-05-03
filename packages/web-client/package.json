@@ -135,5 +135,8 @@
     "@walletconnect/qrcode-modal": "^1.4.1",
     "macro-decorators": "^0.1.2",
     "typescript": "^4.2.3"
+  },
+  "config": {
+    "access": "public"
   }
 }

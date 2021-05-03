@@ -37,5 +37,8 @@
   },
   "volta": {
     "extends": "../../package.json"
+  },
+  "config": {
+    "access": "public"
   }
 }
