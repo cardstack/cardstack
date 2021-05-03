@@ -7,10 +7,9 @@
   list-style-type: none;
   margin: 0;
   padding: 0 var(--boxel-sp-lg);
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--boxel-sp);
-  justify-items: center;
   white-space: nowrap;
 }
 
@@ -18,8 +17,7 @@
   --icon-color: currentColor;
   display: flex;
   align-items: center;
-  width: 100%;
-  padding: var(--boxel-sp) 0;
+  padding: var(--boxel-sp) var(--boxel-sp-sm) var(--boxel-sp) 0;
   border-bottom: 4px solid transparent;
   color: var(--boxel-purple-300);
   font: 600 var(--boxel-font);

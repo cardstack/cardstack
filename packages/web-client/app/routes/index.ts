@@ -38,7 +38,7 @@ const ORGS = [
     ],
     cta: 'Open',
     launched: true,
-    route: 'card-pay',
+    route: 'card-pay.balances',
   },
   {
     sideImage: {

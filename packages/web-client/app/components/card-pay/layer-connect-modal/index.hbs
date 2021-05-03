@@ -1,0 +1,31 @@
+<Boxel::Modal
+  class="layer-connect-modal"
+  @isOpen={{@isOpen}}
+  @onClose={{@onClose}}
+  data-test-layer-connect-modal={{@name}}
+>
+  <div class="layer-connect-modal__scroll-wrapper">
+    {{#if (eq @name "layer1")}}
+      <CardPay::LayerOneConnectCard
+        class="layer-connect-modal__card"
+        @onConnect={{@onClose}}
+        @onDisconnect={{@onClose}}
+        @suppressHeader={{true}}
+        @suppressConnectingCard={{true}}
+        tabindex="0"
+        {{did-insert this.focus}}
+        data-test-layer-one-connect-modal-card
+      />
+    {{else}}
+      <CardPay::LayerTwoConnectCard
+        @suppressHeader={{true}}
+        @includeExplanations={{true}}
+        @onConnect={{@onClose}}
+        @onDisconnect={{@onClose}}
+        tabindex="0"
+        {{did-insert this.focus}}
+        data-test-layer-two-connect-modal-card
+      />
+    {{/if}}
+  </div>
+</Boxel::Modal>

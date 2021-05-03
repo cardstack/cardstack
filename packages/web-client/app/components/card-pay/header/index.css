@@ -24,18 +24,22 @@
 /* Connect wallet component */
 .card-pay-header__item-list {
   margin: 0;
-  grid-column-end: -1;
-  display: grid;
-  grid-template-columns: auto auto;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
   gap: var(--boxel-sp);
   text-align: right;
 }
 
 .card-pay-header__item {
-  display: grid;
-  grid-template-columns: 4rem max-content;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--boxel-sp);
+}
+
+@media screen and (min-width: 51rem) {
+  .card-pay-header__item-list {
+    justify-content: flex-end;
+  }
 }

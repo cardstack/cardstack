@@ -11,10 +11,6 @@ module('Acceptance | accessibility', function (hooks) {
     await a11yAudit();
     assert.ok(true, 'no a11y errors found on cardstack orgs landing page');
 
-    await visit('/card-pay');
-    await a11yAudit();
-    assert.ok(true, 'no a11y errors found on /card-pay');
-
     await visit('/card-pay/balances');
     await a11yAudit();
     assert.ok(true, 'no a11y errors found on /card-pay/balances ');

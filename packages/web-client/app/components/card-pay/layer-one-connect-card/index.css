@@ -1,7 +1,3 @@
-.layer-one-connect-card {
-  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.15));
-}
-
 .layer-one-connect-card__body {
   padding: 0 var(--boxel-sp-lg);
 }
@@ -31,7 +27,6 @@
   font: 600 var(--boxel-font);
   letter-spacing: var(--boxel-lsp-xs);
   margin-top: var(--boxel-sp-lg);
-  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.15));
 }
 
 .layer-one-connect-card__connection-icons {

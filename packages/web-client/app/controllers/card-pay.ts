@@ -4,6 +4,7 @@ import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { tracked } from '@glimmer/tracking';
+import '../css/card-pay.css';
 
 export default class CardPayController extends Controller {
   cardPayLogo = '/images/icons/card-pay-logo.svg';
