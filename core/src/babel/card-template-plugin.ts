@@ -1,4 +1,3 @@
-import * as syntax from '@glimmer/syntax';
 // import ETC from 'ember-source/dist/ember-template-compiler';
 // const { preprocess, print } = ETC._GlimmerSyntax;
 import { NodePath } from '@babel/core';
@@ -15,9 +14,9 @@ import {
   identifier,
 } from '@babel/types';
 import { CompiledCard, ComponentInfo } from '../interfaces';
-import cardGlimmerPlugin from '../glimmer/card-template-plugin';
 
 import { getObjectKey, error } from './utils';
+import glimmerCardTemplateTransform from '../glimmer/card-template-plugin';
 
 export interface Options {
   fields: CompiledCard['fields'];
@@ -176,20 +175,11 @@ function transformTemplate(
     return candidate;
   }
 
-  let template = syntax.print(
-    syntax.preprocess(source, {
-      mode: 'codemod',
-      plugins: {
-        ast: [
-          cardGlimmerPlugin({
-            fields: opts.fields,
-            usedFields: opts.usedFields,
-            importAndChooseName,
-          }),
-        ],
-      },
-    })
-  );
+  let template = glimmerCardTemplateTransform(source, {
+    fields: opts.fields,
+    usedFields: opts.usedFields,
+    importAndChooseName,
+  });
   return { template, neededScope };
 }
 

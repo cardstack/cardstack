@@ -55,29 +55,15 @@ export class Compiler {
     }
 
     let options = {};
-
     let modelModuleName = await this.prepareSchema(cardSource, options);
     let meta = getMeta(options);
-
-    let parentCard: CompiledCard;
-    let parentCardPath = this.getCardParentPath(cardSource, meta);
-
-    if (parentCardPath) {
-      // TODO: Confirm the path correctly depthed
-      let url = new URL(parentCardPath, cardSource.url).href;
-      parentCard = await this.lookup(url);
-    } else {
-      // the base card from which all other cards derive
-      parentCard = compiledBaseCard;
-    }
-
     let fields = await this.lookupFieldsForCard(meta.fields);
+    let assets = this.buildAssetsList(cardSource);
 
+    let parentCard = await this.getParentCard(cardSource, meta);
     if (parentCard) {
       fields = this.adoptFields(fields, parentCard);
     }
-
-    let assets = this.buildAssetsList(cardSource);
 
     let card: CompiledCard = {
       url: cardSource.url,
@@ -98,23 +84,27 @@ export class Compiler {
         'embedded'
       ),
     };
+
     if (parentCard) {
       card['adoptsFrom'] = parentCard;
     }
+
     return card;
   }
 
-  private buildAssetsList(sourceCard: RawCard): Asset[] {
+  private buildAssetsList(sourceCard: RawCard): (Asset | undefined)[] {
     let assetPaths = difference(
       Object.keys(sourceCard.files),
       getNonAssetFilePaths(sourceCard)
     ).filter(Boolean);
 
-    let assets = assetPaths.map((p: string) => {
-      return {
-        type: getAssetType(p),
-        path: p,
-      };
+    let assets = assetPaths.map((p?: string) => {
+      if (p) {
+        return {
+          type: getAssetType(p),
+          path: p,
+        };
+      }
     });
 
     return assets;
@@ -141,6 +131,24 @@ export class Compiler {
     }
 
     return parent;
+  }
+
+  private async getParentCard(
+    cardSource: RawCard,
+    meta: PluginMeta
+  ): Promise<CompiledCard> {
+    let parentCard: CompiledCard;
+    let parentCardPath = this.getCardParentPath(cardSource, meta);
+
+    if (parentCardPath) {
+      // TODO: Confirm the path correctly depthed
+      let url = new URL(parentCardPath, cardSource.url).href;
+      parentCard = await this.lookup(url);
+    } else {
+      // the base card from which all other cards derive
+      parentCard = compiledBaseCard;
+    }
+    return parentCard;
   }
 
   getSource(cardSource: RawCard, path: string): string {
@@ -267,7 +275,7 @@ export class Compiler {
 // it's easier to hand-compile and hard-code the base card rather than make the
 // card compiler always support the case of an undefined parentCard. This is the
 // only card with no parentCard
-const compiledBaseCard: CompiledCard = {
+export const compiledBaseCard: CompiledCard = {
   url: 'https://cardstack.com/base/base',
   fields: {},
   data: undefined,

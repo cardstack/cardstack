@@ -75,7 +75,7 @@ export interface CompiledCard {
   modelModule: string;
   isolated: ComponentInfo;
   embedded: ComponentInfo;
-  assets: Asset[];
+  assets: (Asset | undefined)[];
 }
 export interface Field {
   type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
