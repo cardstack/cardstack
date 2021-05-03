@@ -5,6 +5,12 @@ Since this is a pre-1.0 project,
 it will track only significant breaking changes
 and features, and is not intended to be an exhaustive list.
 
+## [v0.19.0]
+This version introduces a newer hub, where our cards are actually backed
+by an javascript serialization stead of a JSON serialization and we have a
+card compiler that can compile card hbs files into javascript. We are also
+introducing a new web-client, and an SDK to use the card protocol for cardpay.
+
 ## [v0.18.0]
 
 This version included the work for the "new Hub" aka "Hub v2,"
@@ -42,7 +48,7 @@ for featured cardsin deployed environments. See #1411
 ## [v0.14.22] - 2019-08-15
 
 When upgrading, `@cardstack/eslint-config/browser` should become `@cardstack/eslint-config/ember-addon`
-throughout a project. Then, `babel-eslint` should be added as a peer dependency in the top level 
+throughout a project. Then, `babel-eslint` should be added as a peer dependency in the top level
 `package.json` with `yarn add -D -W babel-eslint`
 
 ### Added
@@ -70,9 +76,9 @@ Affected APIs include:
 - `searchers.searchFromControllingBranch()`
 - `searchers.search()`
 - `indexers.beginUpdate()`,
-- `controlling-branch` dependency injection 
+- `controlling-branch` dependency injection
 - `forBranch()`
-- `forControllingBranch()` 
+- `forControllingBranch()`
 - `writers.create()`
 - `writers.update()`
 - linting config
