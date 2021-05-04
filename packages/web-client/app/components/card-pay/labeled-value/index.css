@@ -10,17 +10,18 @@
 }
 
 .card-pay-labeled-value__contents {
-  font-size: 1rem;
+  font-size: var(--boxel-font-size);
   line-height: var(--field-text-line-height);
+  letter-spacing: var(--boxel-lsp-sm);
 }
 
-/* 
+/*
   hardcode max-width to a value that should break at 21 characters.
   this creates a display that matches the spec at full width but
   still respects flow
  */
  .card-pay-labeled-value--address .card-pay-labeled-value__contents {
-  font-family: "Roboto Mono";
+  font-family: var(--boxel-monospace-font-family);
   max-width: 22ch;
   word-break: break-all;
 }

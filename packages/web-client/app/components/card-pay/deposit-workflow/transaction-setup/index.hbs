@@ -1,32 +1,65 @@
-<Boxel::CardContainer>
-  <label>Deposit funds from Ethereum Mainnet wallet</label>
-  <button data-test-layer-1-source-trigger type="button" {{on 'click' (set this 'isShowingLayer1SourceOptions' true)}}>
-    Layer 1
-  </button>
-  {{#if this.isShowingLayer1SourceOptions}}
-    <button data-test-ethereum-option type="button" {{on 'click' (fn this.chooseSource 'default-token')}}>
-      Ethereum<br>
-      <span data-test-eth-balance>{{format-token-amount this.layer1Network.defaultTokenBalance}}</span>
-    </button>
-    <button data-test-dai-option type="button" {{on 'click' (fn this.chooseSource 'DAI')}}>
-      DAI<br>
-      <span data-test-dai-balance>{{format-token-amount this.layer1Network.daiBalance}}</span>
-    </button>
-    <button data-test-card-option type="button" {{on 'click' (fn this.chooseSource 'CARD')}}>
-      CARD<br>
-      <span data-test-card-balance>{{format-token-amount this.layer1Network.cardBalance}}</span>
-    </button>
-  {{/if}}
-  <label>Receive balance in xDai Chain wallet</label>
-  <button data-test-layer-2-target-trigger type="button" {{on 'click' (set this 'isShowingLayer2TargetOptions' true)}}>
-    Layer 2
-  </button>
-  {{#if this.isShowingLayer2TargetOptions}}
-    <div data-test-new-depot-option>
-      New Depot
-    </div>
-  {{/if}}
-  <Boxel::Button {{on 'click' @onComplete}} data-test-continue-button>
-    Continue
-  </Boxel::Button>
-</Boxel::CardContainer>
+<ActionCardContainer
+  @isComplete={{this.isComplete}}
+  @header="Deposit"
+  data-test-deposit-transaction-setup-is-complete={{this.isComplete}}
+>
+  <section class="deposit-card__section">
+    <fieldset class="deposit-card__fieldset">
+      <legend class="deposit-card__legend">Deposit tokens</legend>
+      <CardPay::LabeledValue @label="From:" class="deposit-card__field">
+        <div>
+          <div class="deposit-card__field-value">{{this.layer1Network.chainName}} wallet</div>
+          <div class="deposit-card__field-address" data-test-deposit-transaction-setup-from-address>{{this.layer1Network.walletInfo.firstAddress}}</div>
+        </div>
+        <div class={{cn "deposit-card__field-info" (unless this.isComplete "deposit-card__field-info--full-width")}}>
+          {{#each this.tokens as |token|}}
+            <CardPay::DepositWorkflow::TransactionSetup::TokenOption
+              @checked={{eq @workflowSession.state.depositSourceToken token.symbol}}
+              @onInput={{fn this.chooseSource token.symbol}}
+              @balance={{format-token-amount (if (eq token.symbol 'CARD') this.layer1Network.cardBalance this.layer1Network.daiBalance)}}
+              @tokenSymbol={{token.symbol}}
+              @tokenDescription={{token.description}}
+              @tokenIcon={{token.icon}}
+              @viewOnly={{this.isComplete}}
+            />
+          {{/each}}
+        </div>
+      </CardPay::LabeledValue>
+    </fieldset>
+    <fieldset class="deposit-card__fieldset">
+      <legend class="deposit-card__legend">Receive tokens</legend>
+      <CardPay::LabeledValue @label="In:" class="deposit-card__field">
+        <div class="deposit-card__field-value">{{this.layer2Network.chainName}} wallet</div>
+        <div class="deposit-card__field-info">
+          <div class="deposit-card__account">
+            <span class="deposit-card__field-icon deposit-card__field-icon-sm">
+              {{!-- placeholder for account icon --}}
+            </span>
+            <div>
+              <div class="deposit-card__field-value deposit-card__field-value-sm">Account</div>
+              <div class="deposit-card__field-address deposit-card__field-address-sm" data-test-deposit-transaction-setup-to-address>
+                {{truncate-middle this.layer2Network.walletInfo.firstAddress 7 4}}
+              </div>
+            </div>
+          </div>
+          <div class="deposit-card__depot">
+            {{svg-jar "depot" width="40" height="40" class="deposit-card__field-icon" role="presentation"}}
+            <div>
+              <div class="deposit-card__field-value">DEPOT:</div>
+              <div class={{cn "deposit-card__field-address" "deposit-card__field-address-sm" deposit-card__field-address--view-only=this.isComplete}} data-test-deposit-transaction-setup-depot-address>
+                {{!-- TODO: depot address --}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardPay::LabeledValue>
+    </fieldset>
+  </section>
+  <Boxel::ActionChin
+    @disabled={{not @workflowSession.state.depositSourceToken}}
+    @mode={{if this.isComplete "memorialized" "data-entry"}}
+    @buttonText={{if this.isComplete "Edit" "Continue"}}
+    @onClickButton={{this.onComplete}}
+    data-test-deposit-transaction-setup
+  />
+</ActionCardContainer>

@@ -130,15 +130,41 @@ module('Acceptance | deposit', function (hooks) {
 
     post = postableSel(2, 1);
 
-    await click(`${post} [data-test-layer-1-source-trigger]`);
-    await waitFor(`${post} [data-test-eth-balance]`);
-    assert.dom(`${post} [data-test-eth-balance]`).containsText('2.1411');
-    assert.dom(`${post} [data-test-dai-balance]`).containsText('250.5');
-    assert.dom(`${post} [data-test-card-balance]`).containsText('10000.0');
-    await click(`${post} [data-test-dai-option]`);
-    await click(`${post} [data-test-layer-2-target-trigger]`);
-    await click(`${post} [data-test-new-depot-option]`);
-    await click(`${post} [data-test-continue-button]`);
+    // transaction-setup card (not complete)
+    await waitFor(`${post} [data-test-balance="DAI"]`);
+    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.5');
+    // TODO assert.dom(`${post} [data-test-usd-balance="DAI"]`).containsText('');
+    assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.0');
+    // TODO assert.dom(`${post} [data-test-usd-balance="CARD"]`).containsText('');
+    assert
+      .dom(`${post} [data-test-deposit-transaction-setup-from-address]`)
+      .hasText(layer1AccountAddress);
+    assert
+      .dom(`${post} [data-test-deposit-transaction-setup-to-address]`)
+      .hasText('0x18261...6E44');
+    // TODO assert.dom(`${post} [data-test-deposit-transaction-setup-depot-address]`).hasText('');
+    assert
+      .dom('[data-test-deposit-transaction-setup-is-complete]')
+      .doesNotExist();
+    assert.dom(`${post} [data-test-option-view-only]`).doesNotExist();
+    assert
+      .dom('[data-test-deposit-transaction-setup] [data-test-boxel-button]')
+      .isDisabled();
+
+    await click(`${post} [data-test-option="DAI"]`);
+    await click(
+      `${post} [data-test-deposit-transaction-setup] [data-test-boxel-button]`
+    );
+    // transaction-setup card (completed)
+    assert.dom(`${post} [data-test-option]`).doesNotExist();
+    assert.dom(`${post} [data-test-option-view-only]`).exists({ count: 1 });
+    assert
+      .dom('[data-test-deposit-transaction-setup] [data-test-boxel-button]')
+      .isNotDisabled();
+    assert.dom('[data-test-deposit-transaction-setup-is-complete]').exists();
+    assert
+      .dom(`${post} [data-test-balance-view-only="DAI"]`)
+      .containsText('250.5');
 
     assert
       .dom(postableSel(2, 2))
