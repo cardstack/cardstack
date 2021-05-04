@@ -30,7 +30,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   }
 
   disconnect(): Promise<void> {
-    this.test__simulateAccountsChanged([]);
+    this.test__simulateAccountsChanged([], '');
     return this.waitForAccount;
   }
 

@@ -33,7 +33,10 @@ module('Acceptance | Connect Wallet', function (hooks) {
 
     // Simulate the user connecting their Metamask wallet
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
     await waitUntil(
       () => !document.querySelector('[data-test-layer-one-connect-modal]')
     );
