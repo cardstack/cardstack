@@ -39,6 +39,7 @@ export class Server {
     koaRouter.get(`/cards/:encodedCardURL`, respondWithCard);
     koaRouter.post(`/cards/:encodedCardURL`, createCard);
     koaRouter.patch(`/cards/:encodedCardURL`, updateCard);
+    koaRouter.delete(`/cards/:encodedCardURL`, deleteCard);
     koaRouter.get('/cardFor/:pathname', respondWithCardForPath);
 
     app.use(koaRouter.routes());

@@ -78,20 +78,24 @@ export default class Builder implements BuilderInterface {
   async getRawCard(url: string): Promise<RawCard> {
     let dir = this.locateCardDir(url);
     let files: any = {};
+
     for (let file of walkSync(dir, {
       directories: false,
     })) {
       let fullPath = join(dir, file);
       files[file] = readFileSync(fullPath, 'utf8');
     }
+
     let cardJSON = files['card.json'];
     if (!cardJSON) {
       throw new Error(`${url} is missing card.json`);
     }
+
     delete files['card.json'];
     let card = JSON.parse(cardJSON);
     Object.assign(card, { files, url });
     assertValidRawCard(card);
+
     return card;
   }
 
@@ -132,5 +136,10 @@ export default class Builder implements BuilderInterface {
     let compiledCard = await this.compiler.compile(rawCard);
     this.cache.setCard(url, compiledCard);
     return compiledCard;
+  }
+
+  destroyCard(url: string) {
+    // TODO: delete card from cache
+    // TODO: delete card from realm
   }
 }

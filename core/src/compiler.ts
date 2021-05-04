@@ -325,6 +325,7 @@ function assertValidData(
   let unexpectedFields = difference(Object.keys(data), Object.keys(fields));
 
   if (unexpectedFields.length) {
+    // TODO: This shouldn't know about requests or whether they were bad
     throw new BadRequest(
       `Field(s) "${unexpectedFields.join(
         ', '
