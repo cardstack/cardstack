@@ -76,7 +76,7 @@
       </i.ActionButton>
     </:in-progress>
     <:memorialized as |m|>
-      <m.ActionStatusArea>
+      <m.ActionStatusArea data-test-unlock-success-message>
         Unlocked
       </m.ActionStatusArea>
       {{#if this.unlockTxnViewerUrl}}
@@ -105,7 +105,7 @@
       </i.ActionButton>
     </:in-progress>
     <:memorialized as |m|>
-      <m.ActionStatusArea>
+      <m.ActionStatusArea data-test-deposit-success-message>
         Deposited
       </m.ActionStatusArea>
       {{#if this.depositTxnViewerUrl}}
