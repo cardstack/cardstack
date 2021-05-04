@@ -38,7 +38,7 @@
   gap: var(--boxel-sp);
 }
 
-@media screen and (min-width: 51rem) {
+@media screen and (min-width: 50rem) /* 800px */ {
   .card-pay-header__item-list {
     justify-content: flex-end;
   }

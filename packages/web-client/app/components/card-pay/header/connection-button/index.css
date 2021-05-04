@@ -18,3 +18,9 @@
   font: 400 var(--boxel-font-size-sm)/calc(18/13) var(--boxel-monospace-font-family);
   letter-spacing: var(--boxel-lsp-sm);
 }
+
+@media screen and (min-width: 50rem) /* 800px */ {
+  .card-pay-header-connection-button__label {
+    max-width: 4rem;
+  }
+}
