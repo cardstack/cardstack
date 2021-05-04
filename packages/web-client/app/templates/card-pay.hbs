@@ -14,7 +14,6 @@
     />
     <CardPay::HeaderNav
       @tabs={{array
-        (hash title="About Card Pay" route="card-pay.index" icon="home")
         (hash title="Card Balances" route="card-pay.balances" icon="wallet")
         (hash title="Merchant Services" route="card-pay.merchant-services" icon="merchant")
         (hash title="Reward Programs" route="card-pay.reward-programs" icon="reward")
@@ -28,12 +27,14 @@
   </:body>
 </Boxel::Dashboard>
 
-<CardPay::LayerOneConnectModal
+<CardPay::LayerConnectModal
+  @name="layer1"
   @isOpen={{this.isShowingLayer1ConnectModal}}
   @onClose={{set this 'isShowingLayer1ConnectModal' false}}
 />
 
-<CardPay::LayerTwoConnectModal
+<CardPay::LayerConnectModal
+  @name="layer2"
   @isOpen={{this.isShowingLayer2ConnectModal}}
   @onClose={{set this 'isShowingLayer2ConnectModal' false}}
 />

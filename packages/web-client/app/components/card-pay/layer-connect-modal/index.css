@@ -1,0 +1,39 @@
+.layer-connect-modal {
+  --boxel-modal-max-width: unset;
+  --boxel-modal-offset-top: 0px;
+}
+
+.layer-connect-modal > div {
+  width: auto;
+  display: flex;
+  align-items: center;
+  margin: 0 var(--boxel-sp-lg);
+}
+
+.layer-connect-modal__scroll-wrapper {
+  min-width: 36.25rem; /* 580px */
+  max-width: 43.75rem; /* 700px */
+  height: auto;
+  max-height: 100%;
+  margin: auto;
+  padding: var(--boxel-sp-xs) 0;
+  overflow-y: auto;
+}
+
+@media screen and (max-width: 40rem) {
+  .layer-connect-modal__scroll-wrapper {
+    min-width: unset;
+  }
+}
+
+.layer-connect-modal__card:focus {
+  outline-color: transparent;
+  outline-offset: -5px;
+  box-shadow: 0 0 0 2px var(--boxel-blue);
+}
+
+.layer-connect-modal__card:focus:not(:focus-visible) {
+  box-shadow: none;
+}
+
+/* TODO: Close button */
