@@ -2,13 +2,14 @@
 import yargs from 'yargs';
 import fetch from 'node-fetch';
 import bridge from './bridge.js';
+import awaitBridged from './await-bridged.js';
 import viewSafes from './view-safes.js';
 import createPrepaidCard from './create-prepaid-card.js';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
 
-type Commands = 'bridge' | 'safesView' | 'prepaidCardCreate';
+type Commands = 'bridge' | 'awaitBridged' | 'safesView' | 'prepaidCardCreate';
 
 let command: Commands | undefined;
 interface Options {
@@ -16,26 +17,56 @@ interface Options {
   mnemonic: string;
   tokenAddress?: string;
   amount?: number;
+  fromBlock?: number;
   address?: string;
   safeAddress?: string;
+  receiver?: string;
+  recipient?: string;
   amounts?: number[];
 }
-const { network, mnemonic = process.env.MNEMONIC_PHRASE, tokenAddress, amount, address, safeAddress, amounts } = yargs(
-  process.argv.slice(2)
-)
+const {
+  network,
+  mnemonic = process.env.MNEMONIC_PHRASE,
+  tokenAddress,
+  amount,
+  address,
+  safeAddress,
+  fromBlock,
+  receiver,
+  recipient,
+  amounts,
+} = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
-  .command('bridge <tokenAddress> <amount>', 'Bridge tokens to the layer 2 network', (yargs) => {
+  .command('bridge <amount> [tokenAddress]', 'Bridge tokens to the layer 2 network', (yargs) => {
+    yargs.positional('amount', {
+      type: 'number',
+      description: 'Amount of tokens you would like bridged (*not* in units of wei)',
+    });
     yargs.positional('tokenAddress', {
       type: 'string',
       default: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa', // Kovan DAI
       description: 'The token address (defaults to Kovan DAI)',
     });
-    yargs.positional('amount', {
-      type: 'number',
-      description: 'Amount of tokens you would like bridged (*not* in units of wei)',
+    yargs.option({
+      receiver: {
+        alias: 'r',
+        description: 'Layer 2 address to be owner of L2 safe, defaults to same as L1 address',
+        type: 'string',
+      },
     });
     command = 'bridge';
+  })
+  .command('await-bridged <fromBlock> [recipient]', 'Wait for token bridging to complete on L2', (yargs) => {
+    yargs.positional('fromBlock', {
+      type: 'number',
+      description: 'Layer 2 block height before bridging was initiated',
+    });
+    yargs.positional('recipient', {
+      type: 'string',
+      description: 'Layer 2 address that is the owner of the bridged tokens, defaults to wallet address',
+    });
+    command = 'awaitBridged';
   })
   .command(
     'safes-view [address]',
@@ -102,7 +133,14 @@ if (!command) {
         yargs.showHelp('amount is a required value');
         process.exit(1);
       }
-      await bridge(network, mnemonic, amount, tokenAddress);
+      await bridge(network, mnemonic, amount, receiver, tokenAddress);
+      break;
+    case 'awaitBridged':
+      if (fromBlock == null) {
+        yargs.showHelp('fromBlock is a required value');
+        process.exit(1);
+      }
+      await awaitBridged(network, mnemonic, fromBlock, recipient);
       break;
     case 'safesView':
       await viewSafes(network, mnemonic, address);

@@ -5,7 +5,7 @@ import ERC20ABI from '../contracts/abi/erc-20';
 import ForeignBridgeABI from '../contracts/abi/foreign-bridge-mediator';
 import { getAddress } from '../contracts/addresses';
 
-// The TokenBridge is is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
+// The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
 // The Foreign network can be any chain, but generally refers to the Ethereum mainnet.
 

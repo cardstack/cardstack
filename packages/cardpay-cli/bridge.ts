@@ -8,7 +8,7 @@ export default async function (
   network: string,
   mnemonic: string,
   amount: number,
-  receiverAddress: string,
+  receiverAddress?: string,
   tokenAddress?: string
 ): Promise<void> {
   const amountInWei = toWei(amount.toString()).toString();
@@ -24,6 +24,8 @@ export default async function (
   );
   let tokenBridge = new TokenBridgeForeignSide(web3);
   tokenAddress = tokenAddress ?? (await getAddress('daiToken', web3));
+  receiverAddress = receiverAddress ?? (await web3.eth.getAccounts())[0];
+
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   {

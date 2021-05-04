@@ -73,6 +73,30 @@ let txnReceipt = await tokenBridge.relayTokens(
 
 ### `TokenBridgeForeignSide.getSupportedTokens` (TBD)
 
+## `TokenBridgeHomeSide`
+The `TokenBridge` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeHomeSide` class should be instantiated with your `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+```js
+import { TokenBridgeHomeSide } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider);
+let tokenBridge = new TokenBridgeHomeSide(web3); // Layer 2 web3 instance
+```
+
+### `TokenBridgeHomeSide.waitForBridgingCompleted`
+This call will listen for a `TokensBridgedToSafe` event emitted by the TokenBridge home contract that has a recipient matching the specified address. The starting layer 2 block height should be captured before the call to relayTokens is made to begin bridging. It is used to focus the search and avoid matching on a previous bridging for this user.
+
+This method is invoked with the following parameters:
+- The address of the layer 2 account that will own the resulting safe (passed as receiver to relayTokens call) 
+- The block height of layer 2 before the relayTokens call was initiated on the foreign side of the bridge. Get it with `await layer2Web3.eth.getBlockNumber()`
+
+This method returns a promise that includes a web3 transaction receipt for the layer 2 transaction, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
+
+
+```js
+let txnReceipt = await tokenBridge.waitForBridgingCompleted(
+  recipientAddress
+  startingBlockHeight,
+);
+```
 
 ## `Safes`
 The `Safes` API is used to query the card protocol about the gnosis safes in the layer 2 network in which the Card Protocol runs. This can includes safes in which bridged tokens are deposited as well as prepaid cards (which in turn are actually gnosis safes). The `Safes` class should be instantiated with your `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
@@ -229,5 +253,6 @@ import {
   ERC20ABI,
   ERC677ABI,
   ForeignBridgeMediatorABI,
+  HomeBridgeMediatorABI,
   PrepaidCardManagerABI } from "@cardstack/cardpay-sdk";
 ```
