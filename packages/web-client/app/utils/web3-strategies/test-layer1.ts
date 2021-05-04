@@ -10,7 +10,7 @@ import { TransactionReceipt } from 'web3-core';
 export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   chainName = 'L1 Test Chain';
   chainId = -1;
-  currentProviderId: string | undefined;
+  @tracked currentProviderId: string | undefined;
   @tracked walletConnectUri: string | undefined;
   @tracked isConnected = false;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
