@@ -60,7 +60,7 @@ export default class Builder implements BuilderInterface {
     return out!.code!;
   }
 
-  private locateCardDir(url: string): string {
+  locateCardDir(url: string): string {
     for (let realm of this.realms) {
       if (!url.startsWith(realm.url)) {
         continue;
@@ -72,7 +72,7 @@ export default class Builder implements BuilderInterface {
       }
     }
 
-    throw new NotFound(`${url} is not in a card we know about`);
+    throw new NotFound(`${url} is not a card we know about`);
   }
 
   async getRawCard(url: string): Promise<RawCard> {

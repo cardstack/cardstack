@@ -88,3 +88,23 @@ export async function createCard(ctx: Context) {
   ctx.body = await serializeCard(card, format);
   ctx.status = 201;
 }
+
+export async function updateCard(ctx: Context) {
+  let {
+    builder,
+    request: { body },
+    params: { encodedCardURL: url },
+  } = ctx;
+
+  if (!builder.locateCardDir(url)) {
+    throw new NotFound(`Card ${url} does not exist`);
+  }
+
+  body.url = url;
+
+  assertValidRawCard(body);
+  let card = await builder.compileCardFromRaw(url, body);
+  let format = getCardFormatFromRequest(ctx.query.format);
+  ctx.body = await serializeCard(card, format);
+  ctx.status = 200;
+}

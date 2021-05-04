@@ -9,7 +9,7 @@ import {
 } from '@cardstack/server/tests/helpers/realm';
 import { Server } from '@cardstack/server/src/server';
 
-QUnit.module.only('POST /cards/<card-id>', function (hooks) {
+QUnit.module('POST /cards/<card-id>', function (hooks) {
   let realm: RealmHelper;
   let server: Koa;
 

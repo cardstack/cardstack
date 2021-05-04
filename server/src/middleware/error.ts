@@ -19,6 +19,6 @@ export async function errorMiddleware(ctx: any, next: any) {
       title,
     });
 
-    console.error(err);
+    // console.error(err);
   }
 }
