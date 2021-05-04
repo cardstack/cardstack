@@ -2,9 +2,12 @@ import type Koa from 'koa';
 import supertest from 'supertest';
 import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupCardCache } from '../helpers/cache';
-import { RealmHelper, setupRealms } from '../helpers/realm';
-import { Server } from '../../src/server';
+import { setupCardCache } from '@cardstack/server/tests/helpers/cache';
+import {
+  RealmHelper,
+  setupRealms,
+} from '@cardstack/server/tests/helpers/realm';
+import { Server } from '@cardstack/server/src/server';
 
 QUnit.module('GET /cards/<card-id>', function (hooks) {
   let realm: RealmHelper;
