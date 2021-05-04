@@ -17,8 +17,7 @@
 .token-option:focus,
 .token-option:focus-within {
   box-shadow: 0 0 0 2px var(--boxel-highlight);
-  outline-color: transparent;
-  outline-width: 0px;
+  outline: 1px solid transparent;
 }
 
 .token-option__input {
@@ -37,8 +36,7 @@
 }
 
 .token-option__input:focus {
-  outline-color: transparent;
-  outline-width: 0px;
+  outline: 1px solid transparent;
 }
 
 .token-option__currency {
