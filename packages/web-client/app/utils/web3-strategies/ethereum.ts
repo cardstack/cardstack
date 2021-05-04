@@ -15,6 +15,7 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
     return this.#waitForAccountDeferred.promise;
   }
 
+  @tracked currentProviderId: string | undefined;
   @tracked defaultTokenBalance: BigNumber | undefined;
   @tracked daiBalance: BigNumber | undefined;
   @tracked cardBalance: BigNumber | undefined;

@@ -27,7 +27,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.hasAccount') declare hasAccount: boolean;
   @tracked isWaitingForConnection = false;
-  @tracked currentWalletProviderId = '';
+  @tracked radioWalletProviderId = '';
 
   constructor(
     owner: unknown,
@@ -40,18 +40,19 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
       });
     }
   }
-  get currentWalletProvider(): WalletProvider | undefined {
+  get connectedWalletProvider(): WalletProvider | undefined {
     return this.walletProviders.find(
-      (walletProvider) => walletProvider.id === this.currentWalletProviderId
+      (walletProvider) =>
+        walletProvider.id === this.layer1Network.strategy.currentProviderId
     );
   }
-  get currentWalletLogo(): string {
-    let { currentWalletProvider } = this;
-    if (currentWalletProvider) return currentWalletProvider.logo;
+  get connectedWalletLogo(): string {
+    let { connectedWalletProvider } = this;
+    if (connectedWalletProvider) return connectedWalletProvider.logo;
     else return '';
   }
 
-  get cardState(): string {
+  get ctaState(): string {
     if (this.hasAccount) {
       return 'memorialized';
     } else if (this.isWaitingForConnection) {
@@ -62,7 +63,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   }
 
   @action changeWalletProvider(id: string): void {
-    this.currentWalletProviderId = id;
+    this.radioWalletProviderId = id;
   }
   @action connect() {
     if (!this.hasAccount) {
@@ -84,8 +85,10 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   }
   @task *connectWalletTask() {
     this.isWaitingForConnection = true;
-    if (this.currentWalletProvider) {
-      yield this.layer1Network.connect(this.currentWalletProvider);
+    if (this.radioWalletProviderId) {
+      yield this.layer1Network.connect({
+        id: this.radioWalletProviderId,
+      } as WalletProvider);
     }
     this.isWaitingForConnection = false;
     this.args.onConnect?.();

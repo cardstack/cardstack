@@ -38,7 +38,6 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   chainId = networkIds['kovan'];
   bridgeableTokens = [daiToken, cardToken];
   walletConnectUri: string | undefined;
-  currentProviderId: string | undefined;
   provider: any | undefined;
   web3 = new Web3();
   cardTokenContract = new this.web3.eth.Contract(
@@ -47,6 +46,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   );
   daiTokenContract = new this.web3.eth.Contract(daiToken.abi, daiToken.address);
 
+  @tracked currentProviderId: string | undefined;
   @tracked walletInfo = new WalletInfo([], this.chainId);
 
   @tracked defaultTokenBalance: BigNumber | undefined;

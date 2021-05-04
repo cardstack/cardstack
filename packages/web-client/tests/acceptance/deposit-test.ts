@@ -63,12 +63,16 @@ module('Acceptance | deposit', function (hooks) {
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
-    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
     layer1Service.test__simulateBalances({
       defaultToken: BigNumber.from('2141100000000000000'),
       dai: BigNumber.from('250500000000000000000'),
       card: BigNumber.from('10000000000000000000000'),
     });
+
     await waitFor(`${post} [data-test-balance="ETH"]`);
     assert.dom(`${post} [data-test-balance="ETH"]`).containsText('2.1411');
     assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.5');
@@ -271,7 +275,10 @@ module('Acceptance | deposit', function (hooks) {
       .strategy as Layer1TestWeb3Strategy;
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
     await waitUntil(
       () => !document.querySelector('[data-test-layer-one-connect-modal]')
     );
@@ -394,7 +401,10 @@ module('Acceptance | deposit', function (hooks) {
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
-    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
 
     await waitFor(milestoneCompletedSel(0));
     assert
@@ -421,7 +431,10 @@ module('Acceptance | deposit', function (hooks) {
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
     layer1Service.test__simulateBalances({
       defaultToken: BigNumber.from('2141100000000000000'),
       dai: BigNumber.from('250500000000000000000'),
@@ -480,7 +493,10 @@ module('Acceptance | deposit', function (hooks) {
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
     layer1Service.test__simulateBalances({
       defaultToken: BigNumber.from('2141100000000000000'),
       dai: BigNumber.from('250500000000000000000'),
