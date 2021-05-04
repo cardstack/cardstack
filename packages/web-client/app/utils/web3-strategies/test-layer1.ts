@@ -57,10 +57,18 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     this.walletConnectUri = 'This is a test of Layer2 Wallet Connect';
   }
 
-  test__simulateAccountsChanged(accounts: string[]) {
-    this.isConnected = true;
-    this.walletInfo = new WalletInfo(accounts, this.chainId);
-    this.waitForAccountDeferred.resolve();
+  test__simulateAccountsChanged(accounts: string[], walletProviderId?: string) {
+    if (accounts.length && walletProviderId) {
+      this.isConnected = true;
+      this.currentProviderId = walletProviderId;
+      this.walletInfo = new WalletInfo(accounts, this.chainId);
+      this.waitForAccountDeferred.resolve();
+    } else {
+      this.isConnected = false;
+      this.currentProviderId = '';
+      this.walletInfo = new WalletInfo([], this.chainId);
+      this.waitForAccountDeferred.resolve();
+    }
   }
 
   test__simulateBalances(balances: {
