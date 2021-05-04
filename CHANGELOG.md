@@ -1,3 +1,16 @@
+## v0.6.0 (2021-05-04)
+
+#### :rocket: Enhancement
+* [#358](https://github.com/cardstack/boxel/pull/358) Add onClickStep action to Boxel::ProgressSteps ([@lukemelia](https://github.com/lukemelia))
+* [#356](https://github.com/cardstack/boxel/pull/356) Enhancement/thread message layout ([@Aierie](https://github.com/Aierie))
+
+#### :house: Internal
+* [#359](https://github.com/cardstack/boxel/pull/359) Update ember-animated to 0.11.0 and ember-basic-dropdown to 3.0.17 ([@lukemelia](https://github.com/lukemelia))
+
+#### Committers: 2
+- Luke Melia ([@lukemelia](https://github.com/lukemelia))
+- [@Aierie](https://github.com/Aierie)
+
 ## v0.5.0 (2021-04-28)
 
 #### :rocket: Enhancement
