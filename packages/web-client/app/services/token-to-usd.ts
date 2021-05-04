@@ -29,7 +29,7 @@ export default class TokenToUsdService extends Service {
 
   etherToUsd(symbol: 'DAI' | 'ETH' | 'CARD', amount: number) {
     const rate = this.exchangeRates.getExchangeRate(symbol);
-    return rate! * amount;
+    return (rate! * amount).toFixed(2);
   }
 
   weiToUsd(symbol: 'DAI' | 'ETH' | 'CARD', amountInWei: BigNumber) {
