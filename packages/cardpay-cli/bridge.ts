@@ -1,6 +1,6 @@
 import HDWalletProvider from 'parity-hdwallet-provider';
 import Web3 from 'web3';
-import { HttpProvider, TokenBridge, getConstant, networkIds, getAddress } from '@cardstack/cardpay-sdk';
+import { HttpProvider, TokenBridgeForeignSide, getConstant, networkIds, getAddress } from '@cardstack/cardpay-sdk';
 
 const { toWei } = Web3.utils;
 
@@ -8,6 +8,7 @@ export default async function (
   network: string,
   mnemonic: string,
   amount: number,
+  receiverAddress: string,
   tokenAddress?: string
 ): Promise<void> {
   const amountInWei = toWei(amount.toString()).toString();
@@ -21,7 +22,7 @@ export default async function (
       providerOrUrl: new HttpProvider(await getConstant('rpcNode', network)),
     })
   );
-  let tokenBridge = new TokenBridge(web3);
+  let tokenBridge = new TokenBridgeForeignSide(web3);
   tokenAddress = tokenAddress ?? (await getAddress('daiToken', web3));
   let blockExplorer = await getConstant('blockExplorer', web3);
 
@@ -33,7 +34,7 @@ export default async function (
 
   {
     console.log('Sending relay tokens transaction request');
-    let result = await tokenBridge.relayTokens(tokenAddress, amountInWei);
+    let result = await tokenBridge.relayTokens(tokenAddress, receiverAddress, amountInWei);
     console.log(`Relay tokens transaction hash: ${blockExplorer}/tx/${result.transactionHash}`);
   }
 }

@@ -20,9 +20,9 @@ export interface Layer1Web3Strategy extends Web3Strategy {
   waitForAccount: Promise<void>;
   approve(amountInWei: BigNumber, token: string): Promise<TransactionReceipt>; // eslint-disable-line no-unused-vars
   relayTokens(
-    amountInWei: BigNumber, // eslint-disable-line no-unused-vars
     token: string, // eslint-disable-line no-unused-vars
-    destinationAddress: string // eslint-disable-line no-unused-vars
+    destinationAddress: string, // eslint-disable-line no-unused-vars
+    amountInWei: BigNumber // eslint-disable-line no-unused-vars
   ): Promise<TransactionReceipt>;
   blockExplorerUrl(txnHash: TransactionHash): string; // eslint-disable-line no-unused-vars
   bridgeExplorerUrl(txnHash: TransactionHash): string; // eslint-disable-line no-unused-vars

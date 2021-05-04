@@ -5,7 +5,11 @@ import ERC20ABI from '../contracts/abi/erc-20';
 import ForeignBridgeABI from '../contracts/abi/foreign-bridge-mediator';
 import { getAddress } from '../contracts/addresses';
 
-export default class TokenBridge {
+// The TokenBridge is is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
+// The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
+// The Foreign network can be any chain, but generally refers to the Ethereum mainnet.
+
+export default class TokenBridgeForeignSide {
   constructor(private layer1Web3: Web3) {}
 
   async unlockTokens(tokenAddress: string, amount: string, options?: ContractOptions): Promise<TransactionReceipt> {
@@ -15,12 +19,17 @@ export default class TokenBridge {
     return await token.methods.approve(foreignBridge, amount).send({ ...options, from });
   }
 
-  async relayTokens(tokenAddress: string, amount: string, options?: ContractOptions): Promise<TransactionReceipt> {
+  async relayTokens(
+    tokenAddress: string,
+    recipientAddress: string,
+    amount: string,
+    options?: ContractOptions
+  ): Promise<TransactionReceipt> {
     let from = options?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let foreignBridge = new this.layer1Web3.eth.Contract(
       ForeignBridgeABI as any,
       await getAddress('foreignBridge', this.layer1Web3)
     );
-    return await foreignBridge.methods.relayTokens(tokenAddress, amount).send({ ...options, from });
+    return await foreignBridge.methods.relayTokens(tokenAddress, recipientAddress, amount).send({ ...options, from });
   }
 }

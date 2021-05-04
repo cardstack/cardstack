@@ -1,4 +1,4 @@
-export { default as TokenBridge } from './sdk/token-bridge';
+export { default as TokenBridgeForeignSide } from './sdk/token-bridge-foreign-side';
 export { default as Safes } from './sdk/safes';
 export { default as PrepaidCard } from './sdk/prepaid-card';
 

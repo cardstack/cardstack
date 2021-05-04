@@ -13,11 +13,11 @@ import { Contract } from 'web3-eth-contract';
 import { BigNumber } from '@ethersproject/bignumber';
 import { TransactionReceipt } from 'web3-core';
 import {
-  TokenBridge,
+  TokenBridgeForeignSide,
   getAddressByNetwork,
   networkIds,
   getConstantByNetwork,
-} from '@cardstack/cardpay-sdk/index.js';
+} from '@cardstack/cardpay-sdk';
 
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -252,18 +252,23 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     amountInWei: BigNumber,
     tokenSymbol: string
   ): Promise<TransactionReceipt> {
-    let tokenBridge = new TokenBridge(this.web3);
+    let tokenBridge = new TokenBridgeForeignSide(this.web3);
     let token = this.getTokenBySymbol(tokenSymbol);
     return tokenBridge.unlockTokens(token.address, amountInWei.toString());
   }
 
   relayTokens(
-    amountInWei: BigNumber,
-    tokenSymbol: string
+    tokenSymbol: string,
+    receiverAddress: string,
+    amountInWei: BigNumber
   ): Promise<TransactionReceipt> {
-    let tokenBridge = new TokenBridge(this.web3);
+    let tokenBridge = new TokenBridgeForeignSide(this.web3);
     let token = this.getTokenBySymbol(tokenSymbol);
-    return tokenBridge.relayTokens(token.address, amountInWei.toString());
+    return tokenBridge.relayTokens(
+      token.address,
+      receiverAddress,
+      amountInWei.toString()
+    );
   }
 
   getTokenBySymbol(symbol: string): Token {
