@@ -1,6 +1,7 @@
 import Koa from 'koa';
 import Router from '@koa/router';
 import logger from 'koa-logger';
+import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
 import sane from 'sane';
 
@@ -9,7 +10,13 @@ import { errorMiddleware } from './middleware/error';
 import { ServerOptions } from './interfaces';
 import { setupCardBuilding } from './context/card-building';
 import { setupCardRouting } from './context/card-routing';
-import { respondWithCard, respondWithCardForPath } from './routes/card-route';
+import {
+  createCard,
+  deleteCard,
+  respondWithCard,
+  respondWithCardForPath,
+  updateCard,
+} from './routes/card-route';
 
 export class Server {
   static async create(options: ServerOptions): Promise<Server> {
@@ -19,6 +26,7 @@ export class Server {
     // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/31704
     let app = new Koa<{}, {}>()
       .use(errorMiddleware)
+      .use(bodyParser())
       .use(logger())
       .use(cors({ origin: '*' }));
 
@@ -29,6 +37,7 @@ export class Server {
     }
 
     koaRouter.get(`/cards/:encodedCardURL`, respondWithCard);
+    koaRouter.post(`/cards/:encodedCardURL`, createCard);
     koaRouter.get('/cardFor/:pathname', respondWithCardForPath);
 
     app.use(koaRouter.routes());

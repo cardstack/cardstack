@@ -1,5 +1,5 @@
 import walkSync from 'walk-sync';
-import { readFileSync } from 'fs-extra';
+import { readFileSync, existsSync } from 'fs-extra';
 import { join } from 'path';
 
 import {
@@ -60,18 +60,23 @@ export default class Builder implements BuilderInterface {
     return out!.code!;
   }
 
-  private locateRealmDir(url: string): string {
+  private locateCardDir(url: string): string {
     for (let realm of this.realms) {
-      if (url.startsWith(realm.url)) {
-        return join(realm.directory, url.replace(realm.url, ''));
+      if (!url.startsWith(realm.url)) {
+        continue;
+      }
+
+      let realmPath = join(realm.directory, url.replace(realm.url, ''));
+      if (existsSync(realmPath)) {
+        return realmPath;
       }
     }
 
-    throw new NotFound(`${url} is not in a realm we know about`);
+    throw new NotFound(`${url} is not in a card we know about`);
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    let dir = this.locateRealmDir(url);
+    let dir = this.locateCardDir(url);
     let files: any = {};
     for (let file of walkSync(dir, {
       directories: false,
@@ -115,10 +120,17 @@ export default class Builder implements BuilderInterface {
 
   async buildCard(url: string): Promise<CompiledCard> {
     let rawCard = await this.getRawCard(url);
-    let compiledCard = await this.compiler.compile(rawCard);
+    let compiledCard = await this.compileCardFromRaw(url, rawCard);
     this.copyAssets(url, compiledCard.assets, rawCard.files);
-    this.cache.setCard(url, compiledCard);
+    return compiledCard;
+  }
 
+  async compileCardFromRaw(
+    url: string,
+    rawCard: RawCard
+  ): Promise<CompiledCard> {
+    let compiledCard = await this.compiler.compile(rawCard);
+    this.cache.setCard(url, compiledCard);
     return compiledCard;
   }
 }

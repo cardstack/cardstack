@@ -1,5 +1,4 @@
 import type Koa from 'koa';
-import { Project } from 'scenario-tester';
 import supertest from 'supertest';
 import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
@@ -8,7 +7,6 @@ import {
   RealmHelper,
   setupRealms,
 } from '@cardstack/server/tests/helpers/realm';
-import { BASE_CARD_REALM_CONFIG } from '@cardstack/server/tests/helpers/fixtures';
 import { Server } from '@cardstack/server/src/server';
 
 QUnit.module('GET /cardFor/<path>', function (hooks) {

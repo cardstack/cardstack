@@ -1,6 +1,12 @@
-import { Builder, Format, formats } from '@cardstack/core/src/interfaces';
+import {
+  assertValidRawCard,
+  CompiledCard,
+  Format,
+  formats,
+} from '@cardstack/core/src/interfaces';
 import { NotFound } from '../middleware/error';
 import { Serializer } from 'jsonapi-serializer';
+import type { Context } from 'koa';
 
 function getCardFormatFromRequest(
   formatQueryParam?: string | string[]
@@ -22,12 +28,7 @@ function getCardFormatFromRequest(
   }
 }
 
-async function serializeCard(
-  url: string,
-  format: Format,
-  builder: Builder
-): Promise<any> {
-  let card = await builder.getCompiledCard(url);
+async function serializeCard(card: CompiledCard, format: Format): Promise<any> {
   let cardSerializer = new Serializer('card', {
     attributes: card[format].usedFields,
     dataMeta: {
@@ -38,16 +39,7 @@ async function serializeCard(
   return cardSerializer.serialize(data);
 }
 
-export async function respondWithCard(ctx: any) {
-  let { builder } = ctx;
-  let format = getCardFormatFromRequest(ctx.query.format);
-  let url = ctx.params.encodedCardURL;
-
-  ctx.body = await serializeCard(url, format, builder);
-  ctx.status = 200;
-}
-
-export async function respondWithCardForPath(ctx: any) {
+export async function respondWithCardForPath(ctx: Context) {
   let {
     builder,
     cardRouter,
@@ -64,6 +56,35 @@ export async function respondWithCardForPath(ctx: any) {
     throw new NotFound(`No card defined for route ${pathname}`);
   }
 
-  ctx.body = await serializeCard(url, 'isolated', builder);
+  let card = await builder.getCompiledCard(url);
+  ctx.body = await serializeCard(card, 'isolated');
   ctx.status = 200;
+}
+
+export async function respondWithCard(ctx: any) {
+  let {
+    builder,
+    params: { encodedCardURL: url },
+  } = ctx;
+
+  let format = getCardFormatFromRequest(ctx.query.format);
+  let card = await builder.getCompiledCard(url);
+  ctx.body = await serializeCard(card, format);
+  ctx.status = 200;
+}
+
+export async function createCard(ctx: Context) {
+  let {
+    builder,
+    request: { body },
+    params: { encodedCardURL: url },
+  } = ctx;
+
+  body.url = url;
+
+  assertValidRawCard(body);
+  let card = await builder.compileCardFromRaw(url, body);
+  let format = getCardFormatFromRequest(ctx.query.format);
+  ctx.body = await serializeCard(card, format);
+  ctx.status = 201;
 }

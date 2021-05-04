@@ -11,6 +11,8 @@ export type Asset = {
   path: string;
 };
 
+export type CardData = Record<string, any>;
+
 export type RawCard = {
   url: string;
 
@@ -27,7 +29,7 @@ export type RawCard = {
   files: Record<string, string>;
 
   // if this card contains data (as opposed to just schema & code), it goes here
-  data?: Record<string, any>;
+  data?: CardData;
 };
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
@@ -65,13 +67,15 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   }
 }
 
+export interface Fields {
+  [key: string]: Field;
+}
+
 export interface CompiledCard {
   url: string;
   adoptsFrom?: CompiledCard;
   data: Record<string, any> | undefined;
-  fields: {
-    [key: string]: Field;
-  };
+  fields: Fields;
   modelModule: string;
   isolated: ComponentInfo;
   embedded: ComponentInfo;
