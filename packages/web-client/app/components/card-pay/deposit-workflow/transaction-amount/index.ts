@@ -134,7 +134,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
     if (!isNaN(+str)) {
       this.amount = str;
     } else {
-      this.amount = this.amount;
+      this.amount = this.amount; // eslint-disable-line no-self-assign
     }
   }
 
