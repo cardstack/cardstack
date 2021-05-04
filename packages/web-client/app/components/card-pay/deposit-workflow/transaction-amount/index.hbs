@@ -32,8 +32,13 @@
       >
       <div class="card-pay-transaction-amount__amount-field-input-container">
         {{svg-jar this.currentTokenDetails.icon class="card-pay-transaction-amount__amount-field-currency-icon" role="presentation"}}
+        {{!-- 
+          .boxel-input is a hack to get the boxel styles.  
+          depending on how we plan to handle validation of this input,
+          we may need to change Boxel's input to use a more DDAU pattern
+        --}}
         <input
-          class="card-pay-transaction-amount__amount-field-input"
+          class="boxel-input card-pay-transaction-amount__amount-field-input"
           id="deposit-amount-input"
           value={{this.amount}}
           {{on "input" this.onInputAmount}}
