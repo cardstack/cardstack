@@ -48,7 +48,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     return this.#depositDeferred.promise;
   }
 
-  txnViewerUrl(txnHash: TransactionHash): string {
+  blockExplorerUrl(txnHash: TransactionHash): string {
     return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
   }
 

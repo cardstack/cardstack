@@ -285,7 +285,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     }
   }
 
-  txnViewerUrl(txnHash: TransactionHash): string {
+  blockExplorerUrl(txnHash: TransactionHash): string {
     return `${getConstantByNetwork('blockExplorer', 'kovan')}/tx/${txnHash}`;
   }
 

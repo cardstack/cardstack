@@ -32,13 +32,13 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
   }
 
   get unlockTxnViewerUrl() {
-    return this.layer1Network.txnViewerUrl(
+    return this.layer1Network.blockExplorerUrl(
       this.unlockTxnReceipt?.transactionHash
     );
   }
 
   get depositTxnViewerUrl() {
-    return this.layer1Network.txnViewerUrl(
+    return this.layer1Network.blockExplorerUrl(
       this.relayTokensTxnReceipt?.transactionHash
     );
   }

@@ -73,9 +73,10 @@ export default class Layer1Network extends Service {
     return txnReceipt;
   }
 
-  txnViewerUrl(txnHash: string | undefined): string | undefined {
-    return txnHash ? this.strategy.txnViewerUrl(txnHash) : undefined;
+  blockExplorerUrl(txnHash: string | undefined): string | undefined {
+    return txnHash ? this.strategy.blockExplorerUrl(txnHash) : undefined;
   }
+
   bridgeExplorerUrl(txnHash: string) {
     return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
   }
