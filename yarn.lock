@@ -7200,6 +7200,13 @@ ember-elsewhere@^1.1.0:
     ember-cli-htmlbars "^3.0.0"
     ember-let-polyfill "^0.1.0"
 
+ember-event-helpers@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/ember-event-helpers/-/ember-event-helpers-0.1.1.tgz#8df141306c927b9d1a7bc63d63095e92c0ba90a1"
+  integrity sha512-fWcbWd4W4nRv8bbato8JB6oGRpATkR+oGYxMIqnfgTgPWaCS0ww7CuUVNpwg1TulojKMCuTXi8Fem2b1NSF1ZQ==
+  dependencies:
+    ember-cli-babel "^7.19.0"
+
 ember-export-application-global@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/ember-export-application-global/-/ember-export-application-global-2.0.1.tgz#b120a70e322ab208defc9e2daebe8d0dfc2dcd46"
