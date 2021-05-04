@@ -1,3 +1,8 @@
+.workflow-thread {
+  --inner-max-width: 36.6rem; /* ~585px */
+  --outer-max-width: 43.75rem; /* 700px; */
+}
+
 .workflow-thread__status {
   color: var(--boxel-dark);
   font: 600 var(--boxel-font-sm);
@@ -5,7 +10,20 @@
   text-align: center;
 }
 
+.workflow-thread__card > .action-card-container {
+  max-width: var(--outer-max-width);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  transition: all var(--boxel-transition);
+}
+
+.workflow-thread__card--view-only > .action-card-container {
+  max-width: var(--inner-max-width);
+  margin-left: var(--boxel-thread-message-margin-left);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
 .workflow-thread__markdown {
+  max-width: var(--inner-max-width);
   font-size: 0.9375rem;
   line-height: calc(23/15);
   letter-spacing: var(--boxel-lsp-sm);

@@ -1,9 +1,8 @@
-<Boxel::CardContainer
+<ActionCardContainer
   class="card-pay-transaction-amount"
+  @header="Deposit Amount"
+  @isComplete={{@isComplete}}
 >
-  <Boxel::Header
-    @header="Deposit amount"
-  />
   <section class="card-pay-transaction-amount__body">
     <header class="card-pay-transaction-amount__body-header">
       Choose an amount to deposit into the reserve pool
@@ -24,7 +23,7 @@
         @value={{concat this.amount " " this.currentTokenDetails.symbol}}
       />
       {{else}}
-      <Boxel::Field 
+      <Boxel::Field
         @label="Amount to deposit"
         @fieldMode="edit"
         class="card-pay-transaction-amount__field"
@@ -32,8 +31,8 @@
       >
       <div class="card-pay-transaction-amount__amount-field-input-container">
         {{svg-jar this.currentTokenDetails.icon class="card-pay-transaction-amount__amount-field-currency-icon" role="presentation"}}
-        {{!-- 
-          .boxel-input is a hack to get the boxel styles.  
+        {{!--
+          .boxel-input is a hack to get the boxel styles.
           depending on how we plan to handle validation of this input,
           we may need to change Boxel's input to use a more DDAU pattern
         --}}
@@ -117,4 +116,4 @@
       {{/if}}
     </:memorialized>
   </Boxel::CtaBlock>
-</Boxel::CardContainer>
+</ActionCardContainer>

@@ -13,6 +13,7 @@ import { parseEther } from '@ethersproject/units';
 interface CardPayDepositWorkflowTransactionAmountComponentArgs {
   workflowSession: WorkflowSession;
   onComplete: () => void;
+  isComplete: boolean;
 }
 
 interface TokenDisplayDetails {

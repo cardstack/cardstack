@@ -1,7 +1,7 @@
 <ActionCardContainer
-  @isComplete={{this.isComplete}}
   @header="Deposit"
-  data-test-deposit-transaction-setup-is-complete={{this.isComplete}}
+  @isComplete={{@isComplete}}
+  data-test-deposit-transaction-setup-is-complete={{@isComplete}}
 >
   <section class="deposit-card__section">
     <fieldset class="deposit-card__fieldset">
@@ -11,7 +11,7 @@
           <div class="deposit-card__field-value">{{this.layer1Network.chainName}} wallet</div>
           <div class="deposit-card__field-address" data-test-deposit-transaction-setup-from-address>{{this.layer1Network.walletInfo.firstAddress}}</div>
         </div>
-        <div class={{cn "deposit-card__field-info" (unless this.isComplete "deposit-card__field-info--full-width")}}>
+        <div class={{cn "deposit-card__field-info" (unless @isComplete "deposit-card__field-info--full-width")}}>
           {{#each this.tokens as |token|}}
             <CardPay::DepositWorkflow::TransactionSetup::TokenOption
               @checked={{eq @workflowSession.state.depositSourceToken token.symbol}}
@@ -20,7 +20,7 @@
               @tokenSymbol={{token.symbol}}
               @tokenDescription={{token.description}}
               @tokenIcon={{token.icon}}
-              @viewOnly={{this.isComplete}}
+              @viewOnly={{@isComplete}}
             />
           {{/each}}
         </div>
@@ -46,7 +46,7 @@
             {{svg-jar "depot" width="40" height="40" class="deposit-card__field-icon" role="presentation"}}
             <div>
               <div class="deposit-card__field-value">DEPOT:</div>
-              <div class={{cn "deposit-card__field-address" "deposit-card__field-address-sm" deposit-card__field-address--view-only=this.isComplete}} data-test-deposit-transaction-setup-depot-address>
+              <div class={{cn "deposit-card__field-address" "deposit-card__field-address-sm" deposit-card__field-address--view-only=@isComplete}} data-test-deposit-transaction-setup-depot-address>
                 {{!-- TODO: depot address --}}
               </div>
             </div>
@@ -57,9 +57,9 @@
   </section>
   <Boxel::ActionChin
     @disabled={{not @workflowSession.state.depositSourceToken}}
-    @mode={{if this.isComplete "memorialized" "data-entry"}}
-    @buttonText={{if this.isComplete "Edit" "Continue"}}
-    @onClickButton={{this.onComplete}}
+    @mode={{if @isComplete "memorialized" "data-entry"}}
+    @buttonText={{if @isComplete "Edit" "Continue"}}
+    @onClickButton={{this.toggleComplete}}
     data-test-deposit-transaction-setup
   />
 </ActionCardContainer>

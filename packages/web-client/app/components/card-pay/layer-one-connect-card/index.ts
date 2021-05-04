@@ -18,6 +18,7 @@ interface CardPayDepositWorkflowConnectLayer1ComponentArgs {
   onIncomplete: (() => void) | undefined;
   onConnect: (() => void) | undefined;
   onDisconnect: (() => void) | undefined;
+  isComplete: boolean;
 }
 class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepositWorkflowConnectLayer1ComponentArgs> {
   cardstackLogo = cardstackLogo;
