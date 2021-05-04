@@ -27,7 +27,7 @@ class CardPayLayerConnectModalComponent extends Component<CardPayLayerConnectMod
     }
     this.args.onClose();
   }
-  @action focus(element: any) {
+  @action focus(element: HTMLElement): void {
     element.focus();
   }
 }
