@@ -1,6 +1,6 @@
-import HDWalletProvider from 'parity-hdwallet-provider';
 import Web3 from 'web3';
-import { HttpProvider, TokenBridge, getConstant, networkIds, getAddress } from '@cardstack/cardpay-sdk';
+import { TokenBridge, getConstant, getAddress } from '@cardstack/cardpay-sdk';
+import { getWeb3 } from './utils';
 
 const { toWei } = Web3.utils;
 
@@ -12,15 +12,7 @@ export default async function (
 ): Promise<void> {
   const amountInWei = toWei(amount.toString()).toString();
 
-  let web3 = new Web3(
-    new HDWalletProvider({
-      chainId: networkIds[network],
-      mnemonic: {
-        phrase: mnemonic,
-      },
-      providerOrUrl: new HttpProvider(await getConstant('rpcNode', network)),
-    })
-  );
+  let web3 = await getWeb3(network, mnemonic);
   let tokenBridge = new TokenBridge(web3);
   tokenAddress = tokenAddress ?? (await getAddress('daiToken', web3));
   let blockExplorer = await getConstant('blockExplorer', web3);

@@ -4,11 +4,12 @@ import fetch from 'node-fetch';
 import bridge from './bridge.js';
 import viewSafes from './view-safes.js';
 import createPrepaidCard from './create-prepaid-card.js';
+import { usdPrice, ethPrice, oracleUpdatedAt } from './exchange-rate';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
 
-type Commands = 'bridge' | 'safesView' | 'prepaidCardCreate';
+type Commands = 'bridge' | 'safesView' | 'prepaidCardCreate' | 'usdPrice' | 'ethPrice' | 'oracleUpdatedAt';
 
 let command: Commands | undefined;
 interface Options {
@@ -16,13 +17,21 @@ interface Options {
   mnemonic: string;
   tokenAddress?: string;
   amount?: number;
+  token?: string;
   address?: string;
   safeAddress?: string;
   amounts?: number[];
 }
-const { network, mnemonic = process.env.MNEMONIC_PHRASE, tokenAddress, amount, address, safeAddress, amounts } = yargs(
-  process.argv.slice(2)
-)
+const {
+  network,
+  mnemonic = process.env.MNEMONIC_PHRASE,
+  tokenAddress,
+  amount,
+  token,
+  address,
+  safeAddress,
+  amounts,
+} = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
   .command('bridge <tokenAddress> <amount>', 'Bridge tokens to the layer 2 network', (yargs) => {
@@ -66,6 +75,47 @@ const { network, mnemonic = process.env.MNEMONIC_PHRASE, tokenAddress, amount, a
         description: 'The amount of tokens used to create each prepaid card (*not* in units of wei)',
       });
       command = 'prepaidCardCreate';
+    }
+  )
+  .command(
+    'usd-price <token> <amount>',
+    'Get the USD value for the USD value for the specified token in the specified amount',
+    (yargs) => {
+      yargs.positional('token', {
+        type: 'string',
+        description: 'The token symbol (without the .CPXD suffix)',
+      });
+      yargs.positional('amount', {
+        type: 'string',
+        description: 'The amount of the specified token (*not* in units of wei)',
+      });
+      command = 'usdPrice';
+    }
+  )
+  .command(
+    'eth-price <token> <amount>',
+    'Get the ETH value for the USD value for the specified token in the specified amount',
+    (yargs) => {
+      yargs.positional('token', {
+        type: 'string',
+        description: 'The token symbol (without the .CPXD suffix)',
+      });
+      yargs.positional('amount', {
+        type: 'string',
+        description: 'The amount of the specified token (*not* in units of wei)',
+      });
+      command = 'ethPrice';
+    }
+  )
+  .command(
+    'oracle-updated-at <token>',
+    'Get the date that the oracle was last updated for the specified token',
+    (yargs) => {
+      yargs.positional('token', {
+        type: 'string',
+        description: 'The token symbol (without the .CPXD suffix)',
+      });
+      command = 'oracleUpdatedAt';
     }
   )
   .options({
@@ -113,6 +163,27 @@ if (!command) {
         process.exit(1);
       }
       await createPrepaidCard(network, mnemonic, safeAddress, amounts, tokenAddress);
+      break;
+    case 'usdPrice':
+      if (token == null || amount == null) {
+        yargs.showHelp('token and amount are required values');
+        process.exit(1);
+      }
+      await usdPrice(network, mnemonic, token, amount);
+      break;
+    case 'ethPrice':
+      if (token == null || amount == null) {
+        yargs.showHelp('token and amount are required values');
+        process.exit(1);
+      }
+      await ethPrice(network, mnemonic, token, amount);
+      break;
+    case 'oracleUpdatedAt':
+      if (token == null) {
+        yargs.showHelp('token is a required value');
+        process.exit(1);
+      }
+      await oracleUpdatedAt(network, mnemonic, token);
       break;
     default:
       assertNever(command);

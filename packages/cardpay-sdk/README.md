@@ -22,7 +22,12 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`RewardPool` (TBD)](#rewardpool-tbd)
   - [`RewardPool.balanceOf` (TBD)](#rewardpoolbalanceof-tbd)
   - [`RewardPool.withdraw` (TBD)](#rewardpoolwithdraw-tbd)
+- [`ExchangeRate`](#exchangerate)
+  - [`ExchangeRate.getUSDPrice`](#exchangerategetusdprice)
+  - [`ExchangeRate.getETHPrice`](#exchangerategetethprice)
+  - [`ExchangeRate.getUpdatedAt`](#exchangerategetupdatedat)
 - [`getAddress`](#getaddress)
+- [`getOracle`](#getoracle)
 - [`getConstant`](#getconstant)
 - [`networkIds`](#networkids)
 - [ABI's](#abis)
@@ -186,6 +191,15 @@ interface RelayTransaction {
 ### `RewardPool.balanceOf` (TBD)
 ### `RewardPool.withdraw` (TBD)
 
+## `ExchangeRate`
+The `ExchangeRate` API is used to get the current exchange rates in USD and ETH for the various stablecoin that we support. These rates are fed by the Chainlink price feeds for the stablecoin rates and the DIA oracle for the CARD token rates. As we onboard new stablecoin we'll add more exchange rates. The price oracles that we use reside in layer 2, so please supply a layer 2 web3 instance when instantiating an `ExchangeRate` instance.
+### `ExchangeRate.getUSDPrice`
+This call will return the USD value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a floating point value in units of USD. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function.
+### `ExchangeRate.getETHPrice`
+This call will return the ETH value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a string that represents the ETH value in units of `wei` as well. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function. You can also easily convert units of `wei` back into `ethers` by using the `Web3.utils.fromWei()` function.
+### `ExchangeRate.getUpdatedAt`
+This call will return a `Date` instance that indicates the date the token rate was last updated.
+
 ## `getAddress`
 `getAddress` is a utility that will retrieve the contract address for a contract that is part of the Card Protocol in the specified network. The easiest way to use this function is to just pass your web3 instance to the function, and the function will query the web3 instance to see what network it is currently using. You can also just pass in the network name.
 
@@ -195,6 +209,13 @@ let daiToken = await getAddress("daiToken", web3);
 let foreignBridge = await getAddress("foreignBridge", web3);
 let homeBridge = await getAddress("homeBridge", web3);
 let prepaidCardManager = await getAddress("prepaidCardManager", web3);
+```
+
+## `getOracle`
+`getOracle` is a utility that will retrieve the contract address for a price oracle for the specified token in the specified network. The easiest way to use this function is to just pass your web3 instance to the function, and the function will query the web3 instance to see what network it is currently using. You can also just pass in the network name. Please omit the ".CPXD" suffix in the token name that you provide.
+```js
+let daiOracle = await getOracle("DAI", web3);
+let cardOracle = await getOracle("CARD", web3);
 ```
 
 ## `getConstant`

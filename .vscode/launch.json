@@ -95,6 +95,56 @@
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: USD Price",
+      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "usd-price",
+        "DAI",
+        "100",
+        "1",
+        "--network", "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: ETH Price",
+      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "eth-price",
+        "DAI",
+        "100",
+        "1",
+        "--network", "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: Oracle Update Time",
+      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "oracle-updated-at",
+        "DAI",
+        "1",
+        "--network", "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
     }
   ]
 }

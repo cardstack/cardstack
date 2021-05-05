@@ -1,17 +1,9 @@
 import Web3 from 'web3';
-import HDWalletProvider from 'parity-hdwallet-provider';
-import { HttpProvider, Safes, getConstant, networkIds } from '@cardstack/cardpay-sdk';
+import { Safes } from '@cardstack/cardpay-sdk';
+import { getWeb3 } from './utils';
 
 export default async function (network: string, mnemonic: string, address?: string): Promise<void> {
-  let web3 = new Web3(
-    new HDWalletProvider({
-      chainId: networkIds[network],
-      mnemonic: {
-        phrase: mnemonic,
-      },
-      providerOrUrl: new HttpProvider(await getConstant('rpcNode', network)),
-    })
-  );
+  let web3 = await getWeb3(network, mnemonic);
 
   let safes = new Safes(web3);
   console.log('Getting safes');
