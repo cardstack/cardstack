@@ -1,7 +1,6 @@
 import type Koa from 'koa';
 import type Builder from '../src/builder';
 import type { RealmConfig } from '@cardstack/core/src/interfaces';
-import type { RouterContext } from '@koa/router';
 
 const ENVIRONMENTS_OBJ = {
   browser: '',
@@ -25,4 +24,3 @@ interface CardRouterContext {
   cardRouter: any;
 }
 export type ServerKoa = Koa<{}, BuilderContext & CardRouterContext>;
-export type RouteContext = RouterContext & BuilderContext & CardRouterContext;

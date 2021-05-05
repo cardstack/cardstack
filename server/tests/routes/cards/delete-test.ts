@@ -1,3 +1,5 @@
+import { join } from 'path';
+import { encodeCardURL } from '@cardstack/core/src/utils';
 import type Koa from 'koa';
 import supertest from 'supertest';
 import QUnit from 'qunit';
@@ -8,6 +10,7 @@ import {
   setupRealms,
 } from '@cardstack/server/tests/helpers/realm';
 import { Server } from '@cardstack/server/src/server';
+import { existsSync } from 'fs-extra';
 
 QUnit.module('DELETE /cards/<card-id>', function (hooks) {
   let realm: RealmHelper;
@@ -25,7 +28,7 @@ QUnit.module('DELETE /cards/<card-id>', function (hooks) {
     );
   }
 
-  let { resolveCard, getCardCacheDir } = setupCardCache(hooks);
+  let { getCardCacheDir } = setupCardCache(hooks);
   let { createRealm, getRealms } = setupRealms(hooks);
 
   hooks.beforeEach(async function () {
@@ -81,23 +84,27 @@ QUnit.module('DELETE /cards/<card-id>', function (hooks) {
   QUnit.test(
     'can delete an existing card that has no children',
     async function (assert) {
-      assert.expect(0);
+      assert.expect(2);
+      console.log({ cardCacheDir: getCardCacheDir() });
+
       await deleteCard('https://my-realm/post0').expect(204);
       await getCard('https://my-realm/post0').expect(404);
-      // TODO: Assert file doesn't exist in cache or realm
+
+      assert.notOk(
+        existsSync(
+          join(
+            getCardCacheDir(),
+            'node',
+            encodeCardURL('https://my-realm/post0')
+          )
+        ),
+        'Cache for card is deleted'
+      );
+
+      assert.notOk(
+        existsSync(join(realm.dir, 'post0')),
+        'card is deleted from realm'
+      );
     }
   );
-
-  QUnit.test('cannot delete a card that has children', async function (assert) {
-    assert.expect(0);
-    await deleteCard('https://my-realm/post').expect({
-      errors: [
-        {
-          status: 400,
-          title:
-            'Cannot delete "https://my-realm/post" because it has cards that adopt from it',
-        },
-      ],
-    });
-  });
 });

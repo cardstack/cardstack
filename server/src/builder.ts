@@ -1,5 +1,5 @@
 import walkSync from 'walk-sync';
-import { readFileSync, existsSync } from 'fs-extra';
+import { readFileSync, existsSync, removeSync } from 'fs-extra';
 import { join } from 'path';
 
 import {
@@ -138,8 +138,10 @@ export default class Builder implements BuilderInterface {
     return compiledCard;
   }
 
-  destroyCard(url: string) {
-    // TODO: delete card from cache
-    // TODO: delete card from realm
+  deleteCard(cardURL: string) {
+    this.cache.deleteCard(cardURL);
+
+    let cardDir = this.locateCardDir(cardURL);
+    removeSync(cardDir);
   }
 }

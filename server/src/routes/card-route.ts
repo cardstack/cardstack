@@ -6,7 +6,6 @@ import {
 } from '@cardstack/core/src/interfaces';
 import { NotFound } from '../middleware/error';
 import { Serializer } from 'jsonapi-serializer';
-import { RouteContext } from '../interfaces';
 
 function getCardFormatFromRequest(
   formatQueryParam?: string | string[]
@@ -39,7 +38,7 @@ async function serializeCard(card: CompiledCard, format: Format): Promise<any> {
   return cardSerializer.serialize(data);
 }
 
-export async function respondWithCardForPath(ctx: RouteContext) {
+export async function respondWithCardForPath(ctx: any) {
   let {
     builder,
     cardRouter,
@@ -61,7 +60,7 @@ export async function respondWithCardForPath(ctx: RouteContext) {
   ctx.status = 200;
 }
 
-export async function respondWithCard(ctx: RouteContext) {
+export async function respondWithCard(ctx: any) {
   let {
     builder,
     params: { encodedCardURL: url },
@@ -73,7 +72,7 @@ export async function respondWithCard(ctx: RouteContext) {
   ctx.status = 200;
 }
 
-export async function createCard(ctx: RouteContext) {
+export async function createCard(ctx: any) {
   let {
     builder,
     request: { body },
@@ -89,7 +88,7 @@ export async function createCard(ctx: RouteContext) {
   ctx.status = 201;
 }
 
-export async function updateCard(ctx: RouteContext) {
+export async function updateCard(ctx: any) {
   let {
     builder,
     request: { body },
@@ -109,7 +108,7 @@ export async function updateCard(ctx: RouteContext) {
   ctx.status = 200;
 }
 
-export async function deleteCard(ctx: RouteContext) {
+export async function deleteCard(ctx: any) {
   let {
     builder,
     params: { encodedCardURL: url },
@@ -119,5 +118,8 @@ export async function deleteCard(ctx: RouteContext) {
     throw new NotFound(`Card ${url} does not exist`);
   }
 
-  builder.destroyCard(url);
+  builder.deleteCard(url);
+
+  ctx.status = 204;
+  ctx.body = null;
 }
