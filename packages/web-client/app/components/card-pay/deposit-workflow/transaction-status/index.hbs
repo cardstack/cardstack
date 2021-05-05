@@ -1,4 +1,7 @@
-<Boxel::CardContainer>
+<ActionCardContainer
+  @header="Token Bridge"
+  @isComplete={{@isComplete}}
+>
   <Boxel::ProgressSteps
     @progressSteps={{this.progressSteps}}
     @completedCount={{this.completedCount}}
@@ -31,4 +34,4 @@
       {{/if}}
     {{/if}}
   </Boxel::ProgressSteps>
-</Boxel::CardContainer>
+</ActionCardContainer>

@@ -31,10 +31,12 @@
   @name="layer1"
   @isOpen={{this.isShowingLayer1ConnectModal}}
   @onClose={{set this 'isShowingLayer1ConnectModal' false}}
+  @isLayerConnected={{this.layer1Network.isConnected}}
 />
 
 <CardPay::LayerConnectModal
   @name="layer2"
   @isOpen={{this.isShowingLayer2ConnectModal}}
   @onClose={{set this 'isShowingLayer2ConnectModal' false}}
+  @isLayerConnected={{this.layer2Network.isConnected}}
 />

@@ -1,14 +1,11 @@
-<Boxel::CardContainer
+<ActionCardContainer
+  @suppressHeader={{@suppressHeader}}
+  @header="Wallet Connection - Ethereum Mainnet"
+  @isComplete={{@isComplete}}
   class="layer-one-connect-card"
   data-test-mainnnet-connection-action-container
   ...attributes
 >
-  {{#unless @suppressHeader}}
-    <Boxel::Header
-      @header="Wallet Connection - Ethereum Mainnet"
-    />
-  {{/unless}}
-
   <section class="layer-one-connect-card__body">
     {{#if this.connectedWalletProvider}}
       <header aria-label="Layer 1 Connected Header" class="layer-one-connect-card__body-header" data-test-mainnet-connection-header>
@@ -41,8 +38,8 @@
       </CardPay::FieldStack>
 
       <div class="layer-one-connect-card__disclaimer">
-        * This balance reflects some of the tokens that are accepted in the Card Pay network. 
-  It may not reflect all the tokens in your wallet.
+        * This balance reflects some of the tokens that are accepted in the Card Pay network.
+          It may not reflect all the tokens in your wallet.
       </div>
     {{else}}
       <header aria-label="Layer 1 Connection Header" class="layer-one-connect-card__body-header" data-test-mainnet-connection-header>Connect your Ethereum mainnet wallet</header>
@@ -75,15 +72,15 @@
       </m.ActionButton>
     </:memorialized>
   </Boxel::CtaBlock>
-</Boxel::CardContainer>
+</ActionCardContainer>
 
 {{#if (and this.isWaitingForConnection (not @suppressConnectingCard))}}
-  <Boxel::CardContainer class="layer-one-connect-card__connection">
+  <ActionCardContainer class="layer-one-connect-card__connection">
     <div class="layer-one-connect-card__connection-icons">
       <img src={{this.cardstackLogo}} alt="" role="presentation" class="layer-one-connect-card__connection-cardstack-logo">
       <img src={{this.connectionSymbol}} alt="" role="presentation" class="layer-one-connect-card__connection-symbol">
       <img src={{this.connectedWalletLogo}} alt="" role="presentation" class="layer-one-connect-card__connection-wallet-logo">
     </div>
     <div class="layer-one-connect-card__connection-text">Waiting for you to connect Card Pay with your mainnet wallet...</div>
-  </Boxel::CardContainer>
+  </ActionCardContainer>
 {{/if}}

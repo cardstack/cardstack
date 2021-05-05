@@ -15,12 +15,13 @@
     data-test-postable={{@index}}
     ...attributes
   >
-    <div class="workflow-thread__markdown">
+    <div class="workflow-thread-postable__markdown">
       {{format-workflow-message @postable.message}}
     </div>
   </Boxel::ThreadMessage>
 {{else}}
   <Boxel::ThreadMessage
+    @fullWidth={{true}}
     @datetime={{@postable.timestamp}}
     @imgURL={{@postable.author.imgURL}}
     @name={{@postable.author.name}}
@@ -29,11 +30,17 @@
     data-test-postable={{@index}}
     ...attributes
   >
-    {{component
-      @postable.componentName
-      workflowSession=@postable.session
-      onComplete=(optional @postable.onComplete)
-      onIncomplete=(optional @postable.onIncomplete)
-    }}
+    <div class={{cn
+      "workflow-thread-postable__card"
+      workflow-thread-postable__card--is-complete=@postable.isComplete
+    }}>
+      {{component
+        @postable.componentName
+        workflowSession=@postable.session
+        onComplete=(optional @postable.onComplete)
+        onIncomplete=(optional @postable.onIncomplete)
+        isComplete=@postable.isComplete
+      }}
+    </div>
   </Boxel::ThreadMessage>
 {{/if}}

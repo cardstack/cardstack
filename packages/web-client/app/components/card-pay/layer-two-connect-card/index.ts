@@ -20,6 +20,7 @@ interface CardPayLayerTwoConnectCardComponentArgs {
   onIncomplete: (() => void) | undefined;
   onConnect: (() => void) | undefined;
   onDisconnect: (() => void) | undefined;
+  isComplete: boolean;
 }
 
 class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConnectCardComponentArgs> {

@@ -41,8 +41,12 @@ class DepositWorkflow extends Workflow {
           author: cardbot,
           message: `In order to make a deposit, you need to connect two wallets:
 
-  * Ethereum Mainnet Wallet: linked to the Ethereum blockchain on mainnet
-  * xDai Chain Wallet: linked to the xDai blockchain for low-cost transactions
+  * **Ethereum mainnet wallet:**
+
+      Linked to the Ethereum blockchain on mainnet
+  * **xDai chain wallet:**
+
+      Linked to the xDai blockchain for low-cost transactions
 `,
         }),
         new WorkflowMessage({

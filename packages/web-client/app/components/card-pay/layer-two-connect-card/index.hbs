@@ -1,12 +1,11 @@
-<Boxel::CardContainer
+<ActionCardContainer
+  @suppressHeader={{@suppressHeader}}
+  @header="Wallet Connection - xDai Chain"
+  @isComplete={{@isComplete}}
   class={{if @includeExplanations 'layer-two-connect-card--with-explanations'}}
   data-test-layer-2-wallet-card
   ...attributes
 >
-  {{#unless @suppressHeader}}
-    <Boxel::Header @header="Wallet Connection - xDai Chain"></Boxel::Header>
-  {{/unless}}
-
   {{#if (eq this.cardState 'memorialized')}}
     <section class="layer-two-connect-card__body">
       <header aria-label="Layer 2 Connected Header" class="layer-two-connect-card__body-header">
@@ -101,7 +100,7 @@
             @margin={{15}}
             @backgroundColor="#ffffff"
             @dotType="dots"
-            @dotColor="#272330"
+            @dotColor="#000"
             @cornerDotType="dot"
             @cornerSquareType="extra-rounded"
             @imageMargin={{5}}
@@ -122,4 +121,4 @@
       {{svg-jar "caret-thin-right" class="layer-two-connect-card__alternate-wallet-caret"}}
     </button>
   {{/if}}
-</Boxel::CardContainer>
+</ActionCardContainer>

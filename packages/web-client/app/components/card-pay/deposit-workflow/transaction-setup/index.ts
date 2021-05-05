@@ -1,6 +1,5 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
 import { equal, and } from 'macro-decorators';
 import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
@@ -11,6 +10,7 @@ interface CardPayDepositWorkflowTransactionSetupComponentArgs {
   workflowSession: WorkflowSession;
   onComplete: (() => void) | undefined;
   onIncomplete: (() => void) | undefined;
+  isComplete: boolean;
 }
 interface token {
   symbol: string;
@@ -44,23 +44,17 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayD
   @and('daiSelected', 'layer1Network.daiBalance')
   hasDaiBalance: Boolean | undefined;
 
-  @tracked isComplete: boolean | undefined;
-
   @action chooseSource(tokenSymbol: string) {
     this.args.workflowSession.update('depositSourceToken', tokenSymbol);
   }
 
-  @action onComplete() {
-    if (this.hasCardBalance || this.hasDaiBalance) {
-      this.isComplete = !this.isComplete;
-      if (this.args.onComplete) {
-        this.args.onComplete();
-      }
+  @action toggleComplete() {
+    if (this.args.isComplete) {
+      this.args?.onIncomplete();
+    } else if (this.hasCardBalance || this.hasDaiBalance) {
+      this.args?.onComplete();
     } else {
-      this.isComplete = false;
-      if (this.args.onIncomplete) {
-        this.args.onIncomplete();
-      }
+      // TODO error message
     }
   }
 }
