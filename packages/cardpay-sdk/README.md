@@ -193,13 +193,35 @@ interface RelayTransaction {
 
 ## `ExchangeRate`
 The `ExchangeRate` API is used to get the current exchange rates in USD and ETH for the various stablecoin that we support. These rates are fed by the Chainlink price feeds for the stablecoin rates and the DIA oracle for the CARD token rates. As we onboard new stablecoin we'll add more exchange rates. The price oracles that we use reside in layer 2, so please supply a layer 2 web3 instance when instantiating an `ExchangeRate` instance.
+```js
+import { ExchangeRate } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider);
+let exchangeRate = new ExchangeRate(web3); // Layer 2 web3 instance
+```
 ### `ExchangeRate.getUSDPrice`
 This call will return the USD value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a floating point value in units of USD. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function.
+
+```js
+let exchangeRate = new ExchangeRate(web3);
+let usdPrice = await exchangeRate.getUSDPrice(token, amountInWei);
+console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
+```
 ### `ExchangeRate.getETHPrice`
 This call will return the ETH value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a string that represents the ETH value in units of `wei` as well. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function. You can also easily convert units of `wei` back into `ethers` by using the `Web3.utils.fromWei()` function.
+
+```js
+let exchangeRate = new ExchangeRate(web3);
+let ethWeiPrice = await exchangeRate.getETHPrice(token, amountInWei);
+console.log(`ETH value: ${fromWei(ethWeiPrice)} ETH`);
+```
 ### `ExchangeRate.getUpdatedAt`
 This call will return a `Date` instance that indicates the date the token rate was last updated.
 
+```js
+let exchangeRate = new ExchangeRate(web3);
+let date = await exchangeRate.getUpdatedAt(token);
+console.log(`The ${token} rate was last updated at ${date.toString()}`);
+```
 ## `getAddress`
 `getAddress` is a utility that will retrieve the contract address for a contract that is part of the Card Protocol in the specified network. The easiest way to use this function is to just pass your web3 instance to the function, and the function will query the web3 instance to see what network it is currently using. You can also just pass in the network name.
 
