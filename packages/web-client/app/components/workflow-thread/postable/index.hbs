@@ -15,7 +15,7 @@
     data-test-postable={{@index}}
     ...attributes
   >
-    <div class="workflow-thread__markdown">
+    <div class="workflow-thread-postable__markdown">
       {{format-workflow-message @postable.message}}
     </div>
   </Boxel::ThreadMessage>
@@ -30,7 +30,10 @@
     data-test-postable={{@index}}
     ...attributes
   >
-    <div class={{cn "workflow-thread__card" workflow-thread__card--view-only=@postable.isComplete}}>
+    <div class={{cn
+      "workflow-thread-postable__card"
+      workflow-thread-postable__card--is-complete=@postable.isComplete
+    }}>
       {{component
         @postable.componentName
         workflowSession=@postable.session
