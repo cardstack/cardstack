@@ -28,10 +28,13 @@ export default class TokenBridgeHomeSide {
     if (events.length) {
       event = events[events.length - 1];
     } else {
+      // // @ts-ignore
+      // let usePolling = !this.layer2Web3.currentProvider?.on;
+      let usePolling = true; // always use polling until we figure out how to get subscriptions to work properly
       event = await new Promise((resolve, reject) => {
-        // @ts-ignore
-        if (this.layer2Web3.currentProvider?.on) {
-          // supports subscriptions
+        if (usePolling) {
+          resolve(waitForEvent(homeBridge, 'TokensBridgedToSafe', opts));
+        } else {
           homeBridge.once('TokensBridgedToSafe', opts, function (error: Error, event: EventData) {
             if (error) {
               reject(error);
@@ -39,8 +42,6 @@ export default class TokenBridgeHomeSide {
               resolve(event);
             }
           });
-        } else {
-          resolve(waitForEvent(homeBridge, 'TokensBridgedToSafe', opts));
         }
       });
     }

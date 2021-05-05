@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { WalletProvider } from '../wallet-providers';
 import { BigNumber } from '@ethersproject/bignumber';
 import { TransactionReceipt } from 'web3-core';
@@ -16,30 +17,35 @@ export interface Layer1Web3Strategy extends Web3Strategy {
   currentProviderId: string | undefined;
   daiBalance: BigNumber | undefined;
   cardBalance: BigNumber | undefined;
-  connect(walletProvider: WalletProvider): Promise<void>; // eslint-disable-line no-unused-vars
+  connect(walletProvider: WalletProvider): Promise<void>;
   waitForAccount: Promise<void>;
-  approve(amountInWei: BigNumber, token: string): Promise<TransactionReceipt>; // eslint-disable-line no-unused-vars
+  approve(amountInWei: BigNumber, token: string): Promise<TransactionReceipt>;
   relayTokens(
-    token: string, // eslint-disable-line no-unused-vars
-    destinationAddress: string, // eslint-disable-line no-unused-vars
-    amountInWei: BigNumber // eslint-disable-line no-unused-vars
+    token: ChainAddress,
+    destinationAddress: ChainAddress,
+    amountInWei: BigNumber
   ): Promise<TransactionReceipt>;
-  blockExplorerUrl(txnHash: TransactionHash): string; // eslint-disable-line no-unused-vars
-  bridgeExplorerUrl(txnHash: TransactionHash): string; // eslint-disable-line no-unused-vars
+  blockExplorerUrl(txnHash: TransactionHash): string;
+  bridgeExplorerUrl(txnHash: TransactionHash): string;
 }
 
 export interface Layer2Web3Strategy extends Web3Strategy {
   defaultTokenBalance: BigNumber | undefined;
-  blockExplorerUrl(txnHash: TransactionHash): string; // eslint-disable-line no-unused-vars
+  blockExplorerUrl(txnHash: TransactionHash): string;
   getBlockHeight(): Promise<BigNumber>;
+  awaitBridged(
+    fromBlock: number,
+    receiver: ChainAddress
+  ): Promise<TransactionReceipt>;
 }
 
 export type TransactionHash = string;
+export type ChainAddress = string;
 
 export class Token {
   symbol: string;
   name: string;
-  address: string;
+  address: ChainAddress;
   abi = ERC20ABI as AbiItem[];
 
   constructor(symbol: string, name: string, address: string) {
