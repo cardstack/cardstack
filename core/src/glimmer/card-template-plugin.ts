@@ -57,7 +57,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             let { blockProgramUsage, field } = inBlock;
             let { inlineHBS } = field.card.embedded;
 
-            usedFields.push(field.localName);
+            usedFields.push(field.name);
 
             if (inlineHBS) {
               return inlineTemplateForField(inlineHBS, blockProgramUsage);
@@ -73,29 +73,23 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             return;
           }
 
-          usedFields.push(field.localName);
+          usedFields.push(field.name);
 
           let { inlineHBS } = field.card.embedded;
           if (inlineHBS) {
             if (field.type === 'containsMany') {
-              return process(
-                expandContainsManyShorthand(field.localName, node)
-              );
+              return process(expandContainsManyShorthand(field.name, node));
             } else {
-              return inlineTemplateForField(inlineHBS, field.localName, PREFIX);
+              return inlineTemplateForField(inlineHBS, field.name, PREFIX);
             }
           } else {
             let fieldTemplate = '';
 
             if (field.type === 'containsMany') {
               fieldTemplate = expandContainsManyShorthand(
-                field.localName,
+                field.name,
                 node,
-                rewriteFieldToComponent(
-                  importAndChooseName,
-                  field,
-                  field.localName
-                )
+                rewriteFieldToComponent(importAndChooseName, field, field.name)
               );
             } else {
               fieldTemplate = rewriteFieldToComponent(
@@ -136,6 +130,7 @@ function getFieldFromExpression(
   usage: string
 ): Field | undefined {
   let fieldName = usage.slice(PREFIX.length);
+
   return fields[fieldName];
 }
 
@@ -189,7 +184,7 @@ function rewriteFieldToComponent(
   modelArgument: string
 ): string {
   let componentName = importAndChooseName(
-    capitalize(field.localName),
+    capitalize(field.name),
     field.card.embedded.moduleName,
     'default'
   );

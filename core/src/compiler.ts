@@ -4,6 +4,7 @@ import decoratorsPlugin from '@babel/plugin-proposal-decorators';
 // @ts-ignore
 import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 import difference from 'lodash/difference';
+import intersection from 'lodash/intersection';
 
 import cardSchemaPlugin, {
   FieldsMeta,
@@ -16,12 +17,14 @@ import cardTemplatePlugin, {
 import {
   Asset,
   AssetType,
+  CardData,
   CompiledCard,
   ComponentInfo,
+  Fields,
   Format,
   RawCard,
 } from './interfaces';
-import intersection from 'lodash/intersection';
+import { BadRequest } from '@cardstack/server/src/middleware/error';
 
 function getNonAssetFilePaths(sourceCard: RawCard): (string | undefined)[] {
   return [sourceCard.schema, sourceCard.isolated, sourceCard.embedded].filter(
@@ -65,6 +68,8 @@ export class Compiler {
       fields = this.adoptFields(fields, parentCard);
     }
 
+    assertValidData(fields, cardSource.data, cardSource.url);
+
     let card: CompiledCard = {
       url: cardSource.url,
       modelModule: modelModuleName ?? parentCard.modelModule,
@@ -93,19 +98,27 @@ export class Compiler {
   }
 
   private buildAssetsList(sourceCard: RawCard): (Asset | undefined)[] {
+    let assets: (Asset | undefined)[] = [];
+
+    if (!sourceCard.files) {
+      return assets;
+    }
+
     let assetPaths = difference(
       Object.keys(sourceCard.files),
       getNonAssetFilePaths(sourceCard)
-    ).filter(Boolean);
+    );
 
-    let assets = assetPaths.map((p?: string) => {
-      if (p) {
-        return {
-          type: getAssetType(p),
-          path: p,
-        };
+    for (const p of assetPaths) {
+      if (!p) {
+        continue;
       }
-    });
+
+      assets.push({
+        type: getAssetType(p),
+        path: p,
+      });
+    }
 
     return assets;
   }
@@ -114,23 +127,22 @@ export class Compiler {
     cardSource: RawCard,
     meta: PluginMeta
   ): string | undefined {
-    let parent;
+    let parentPath;
 
     if (cardSource.adoptsFrom) {
-      parent = cardSource.adoptsFrom;
+      parentPath = cardSource.adoptsFrom;
     }
 
-    if (meta.parent?.cardURL) {
-      let url = meta.parent?.cardURL;
-      if (parent && parent !== url) {
+    if (meta.parent && meta.parent.cardURL) {
+      if (parentPath && parentPath !== meta.parent.cardURL) {
         throw new Error(
           `${cardSource.url} provides conflicting parent URLs in card.json and schema.js`
         );
       }
-      parent = url;
+      parentPath = meta.parent.cardURL;
     }
 
-    return parent;
+    return parentPath;
   }
 
   private async getParentCard(
@@ -170,7 +182,7 @@ export class Compiler {
   ): Promise<string | undefined> {
     let schemaLocalFilePath = cardSource.schema;
     if (!schemaLocalFilePath) {
-      if (cardSource.files['schema.js']) {
+      if (cardSource.files && cardSource.files['schema.js']) {
         console.warn(
           `You did not specify what is your schema file, but a schema.js file exists. Using schema.js. url = ${cardSource.url}`
         );
@@ -195,13 +207,15 @@ export class Compiler {
     metaFields: FieldsMeta
   ): Promise<CompiledCard['fields']> {
     let fields: CompiledCard['fields'] = {};
-    for (let [name, { cardURL, type, localName }] of Object.entries(
-      metaFields
-    )) {
+    for (let [
+      name,
+      { cardURL, type, typeDecoratorLocalName },
+    ] of Object.entries(metaFields)) {
       fields[name] = {
         card: await this.lookup(cardURL),
         type,
-        localName,
+        name,
+        typeDecoratorLocalName,
       };
     }
 
@@ -297,4 +311,25 @@ function getAssetType(filename: string): AssetType {
   }
 
   return 'unknown';
+}
+
+function assertValidData(
+  fields: Fields,
+  data: CardData | undefined,
+  url: string
+) {
+  if (!data) {
+    return;
+  }
+
+  let unexpectedFields = difference(Object.keys(data), Object.keys(fields));
+
+  if (unexpectedFields.length) {
+    // TODO: This shouldn't know about requests or whether they were bad
+    throw new BadRequest(
+      `Field(s) "${unexpectedFields.join(
+        ', '
+      )}" does not exist on card "${url}"`
+    );
+  }
 }

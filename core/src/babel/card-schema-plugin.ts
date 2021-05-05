@@ -31,7 +31,7 @@ type FieldType = keyof typeof VALID_FIELD_DECORATORS;
 export type FieldMeta = {
   cardURL: string;
   type: FieldType;
-  localName: string;
+  typeDecoratorLocalName: string;
 };
 export type FieldsMeta = {
   [name: string]: FieldMeta;
@@ -108,7 +108,7 @@ function storeMeta(key: object, path: NodePath<ImportDeclaration>) {
       return;
     }
     let {
-      local: { name: localName },
+      local: { name: fieldTypeDecorator },
     } = specifier;
     let specifierName = name(specifier.imported);
 
@@ -116,13 +116,13 @@ function storeMeta(key: object, path: NodePath<ImportDeclaration>) {
       validateUsageAndGetFieldMeta(
         path,
         fields,
-        localName,
+        fieldTypeDecorator,
         specifierName as FieldType
       );
     }
 
     if (specifierName === 'adopts') {
-      parent = validateUsageAndGetParentMeta(path, localName);
+      parent = validateUsageAndGetParentMeta(path, fieldTypeDecorator);
     }
   }
 
@@ -132,17 +132,18 @@ function storeMeta(key: object, path: NodePath<ImportDeclaration>) {
 function validateUsageAndGetFieldMeta(
   path: NodePath<ImportDeclaration>,
   fields: FieldsMeta,
-  localName: string,
+  fieldTypeDecorator: string,
   actualName: FieldType
 ) {
-  for (let fieldIdentifier of path.scope.bindings[localName].referencePaths) {
+  for (let fieldIdentifier of path.scope.bindings[fieldTypeDecorator]
+    .referencePaths) {
     if (
       !isCallExpression(fieldIdentifier.parent) ||
       fieldIdentifier.parent.callee !== fieldIdentifier.node
     ) {
       throw error(
         fieldIdentifier,
-        `the @${localName} decorator must be called`
+        `the @${fieldTypeDecorator} decorator must be called`
       );
     }
 
@@ -152,14 +153,14 @@ function validateUsageAndGetFieldMeta(
     ) {
       throw error(
         fieldIdentifier,
-        `the @${localName} decorator must be used as a decorator`
+        `the @${fieldTypeDecorator} decorator must be used as a decorator`
       );
     }
 
     if (!isClassProperty(fieldIdentifier.parentPath.parentPath.parent)) {
       throw error(
         fieldIdentifier,
-        `the @${localName} decorator can only go on class properties`
+        `the @${fieldTypeDecorator} decorator can only go on class properties`
       );
     }
 
@@ -184,7 +185,7 @@ function validateUsageAndGetFieldMeta(
     fields[fieldName] = {
       ...extractDecoratorArguments(
         fieldIdentifier.parentPath as NodePath<CallExpression>,
-        localName
+        fieldTypeDecorator
       ),
       type: actualName,
     };
@@ -193,9 +194,10 @@ function validateUsageAndGetFieldMeta(
 
 function validateUsageAndGetParentMeta(
   path: NodePath<ImportDeclaration>,
-  localName: string
+  fieldTypeDecorator: string
 ): ParentMeta {
-  let adoptsIdentifer = path.scope.bindings[localName].referencePaths[0];
+  let adoptsIdentifer =
+    path.scope.bindings[fieldTypeDecorator].referencePaths[0];
 
   if (!isClassDeclaration(adoptsIdentifer.parentPath.parentPath.parent)) {
     throw error(
@@ -206,40 +208,43 @@ function validateUsageAndGetParentMeta(
 
   return extractDecoratorArguments(
     adoptsIdentifer.parentPath as NodePath<CallExpression>,
-    localName
+    fieldTypeDecorator
   );
 }
 
 function extractDecoratorArguments(
   callExpression: NodePath<CallExpression>,
-  localName: string
+  fieldTypeDecorator: string
 ) {
   if (callExpression.node.arguments.length !== 1) {
     throw error(
       callExpression,
-      `@${localName} decorator accepts exactly one argument`
+      `@${fieldTypeDecorator} decorator accepts exactly one argument`
     );
   }
 
   let cardTypePath = callExpression.get('arguments')[0];
   let cardType = cardTypePath.node;
   if (!isIdentifier(cardType)) {
-    throw error(cardTypePath, `@${localName} argument must be an identifier`);
+    throw error(
+      cardTypePath,
+      `@${fieldTypeDecorator} argument must be an identifier`
+    );
   }
 
   let definition = cardTypePath.scope.getBinding(cardType.name)?.path;
   if (!definition) {
-    throw error(cardTypePath, `@${localName} argument is not defined`);
+    throw error(cardTypePath, `@${fieldTypeDecorator} argument is not defined`);
   }
   if (!definition.isImportDefaultSpecifier()) {
     throw error(
       definition,
-      `@${localName} argument must come from a module default export`
+      `@${fieldTypeDecorator} argument must come from a module default export`
     );
   }
 
   return {
     cardURL: (definition.parent as ImportDeclaration).source.value,
-    localName: definition.node.local.name,
+    typeDecoratorLocalName: definition.node.local.name,
   };
 }

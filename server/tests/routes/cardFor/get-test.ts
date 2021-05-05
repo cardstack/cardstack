@@ -1,14 +1,16 @@
 import type Koa from 'koa';
-import { Project } from 'scenario-tester';
 import supertest from 'supertest';
 import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupCardCache } from './helpers/cache';
-import { BASE_CARD_REALM_CONFIG } from './helpers/fixtures';
-import { Server } from '../src/server';
+import { setupCardCache } from '@cardstack/server/tests/helpers/cache';
+import {
+  RealmHelper,
+  setupRealms,
+} from '@cardstack/server/tests/helpers/realm';
+import { Server } from '@cardstack/server/src/server';
 
-QUnit.module('respondWithCardForPath', function (hooks) {
-  let realm: Project;
+QUnit.module('GET /cardFor/<path>', function (hooks) {
+  let realm: RealmHelper;
   let server: Koa;
 
   function getCardForPath(path: string) {
@@ -16,15 +18,13 @@ QUnit.module('respondWithCardForPath', function (hooks) {
   }
 
   let { resolveCard, getCardCacheDir } = setupCardCache(hooks);
+  let { createRealm, getRealms } = setupRealms(hooks);
 
   hooks.beforeEach(async function () {
-    realm = new Project('my-realm', {
-      files: {
-        routes: {
-          'card.json': JSON.stringify({
-            schema: 'schema.js',
-          }),
-          'schema.js': `
+    realm = createRealm('my-realm');
+    realm.addCard('routes', {
+      'card.json': { schema: 'schema.js' },
+      'schema.js': `
             export default class Routes {
               routeTo(path) {
                 if (path === 'homepage') {
@@ -37,37 +37,24 @@ QUnit.module('respondWithCardForPath', function (hooks) {
               }
             }
           `,
-        },
-        homepage: {
-          'card.json': JSON.stringify({
-            isolated: 'isolated.js',
-          }),
-          'isolated.js': templateOnlyComponentTemplate(
-            '<h1>Welcome to my homepage</h1>'
-          ),
-        },
-        about: {
-          'card.json': JSON.stringify({
-            isolated: 'isolated.js',
-          }),
-          'isolated.js': templateOnlyComponentTemplate(
-            '<div>I like trains</div>'
-          ),
-        },
-      },
     });
-
-    realm.writeSync();
+    realm.addCard('homepage', {
+      'card.json': { isolated: 'isolated.js' },
+      'isolated.js': templateOnlyComponentTemplate(
+        '<h1>Welcome to my homepage</h1>'
+      ),
+    });
+    realm.addCard('about', {
+      'card.json': { isolated: 'isolated.js' },
+      'isolated.js': templateOnlyComponentTemplate('<div>I like trains</div>'),
+    });
 
     // setting up a card cache directory that is also a resolvable node_modules
     // package with the appropriate exports rules
     server = (
       await Server.create({
         cardCacheDir: getCardCacheDir(),
-        realms: [
-          { url: 'https://my-realm', directory: realm.baseDir },
-          BASE_CARD_REALM_CONFIG,
-        ],
+        realms: getRealms(),
         routeCard: 'https://my-realm/routes',
       })
     ).app;

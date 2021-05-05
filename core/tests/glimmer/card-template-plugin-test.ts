@@ -19,9 +19,10 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       let template = transform('<@model.title />', {
         fields: {
           title: {
-            type: 'contains',
             card: COMPILED_STRING_CARD,
-            localName: 'title',
+            name: 'title',
+            type: 'contains',
+            typeDecoratorLocalName: 'contains',
           },
         },
         usedFields,
@@ -42,7 +43,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           createdAt: {
             type: 'contains',
             card: COMPILED_DATE_CARD,
-            localName: 'createdAt',
+            typeDecoratorLocalName: 'contains',
+            name: 'createdAt',
           },
         },
         usedFields,
@@ -60,9 +62,10 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       options = {
         fields: {
           items: {
-            type: 'containsMany',
             card: COMPILED_STRING_CARD,
-            localName: 'items',
+            name: 'items',
+            type: 'containsMany',
+            typeDecoratorLocalName: 'containsMany',
           },
         },
         usedFields,
@@ -118,9 +121,10 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       let template = transform('<@model.items />', {
         fields: {
           items: {
-            type: 'containsMany',
             card: COMPILED_STRING_CARD,
-            localName: 'items',
+            name: 'items',
+            type: 'containsMany',
+            typeDecoratorLocalName: 'containsMany',
           },
         },
         usedFields,
@@ -141,9 +145,10 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       options = {
         fields: {
           items: {
-            type: 'containsMany',
+            name: 'items',
             card: COMPILED_DATE_CARD,
-            localName: 'items',
+            type: 'containsMany',
+            typeDecoratorLocalName: 'containsMany',
           },
         },
         usedFields,

@@ -7,18 +7,26 @@ import {
   existsSync,
   mkdirpSync,
   ensureSymlinkSync,
+  removeSync,
 } from 'fs-extra';
 import { join, dirname } from 'path';
 
 export class CardCache {
   constructor(private dir: string, private pkgName: string) {}
 
-  private getLocation(
+  private getCardLocation(
+    env: Environment | 'assets',
+    cardURL: string
+  ): string {
+    return join(this.dir, env, encodeCardURL(cardURL));
+  }
+
+  private getFileLocation(
     env: Environment | 'assets',
     cardURL: string,
     localFile: string
   ): string {
-    return join(this.dir, env, encodeCardURL(cardURL), localFile);
+    return join(this.getCardLocation(env, cardURL), localFile);
   }
 
   private moduleURL(cardURL: string, localFile: string): string {
@@ -33,17 +41,20 @@ export class CardCache {
     localFile: string,
     source: string
   ) {
-    let fsLocation = this.getLocation(env, cardURL, localFile);
+    let fsLocation = this.getFileLocation(env, cardURL, localFile);
     this.writeFile(fsLocation, source);
     return this.moduleURL(cardURL, localFile);
   }
 
   writeAsset(cardURL: string, filename: string, source: string) {
-    let assetPath = this.getLocation('assets', cardURL, filename);
+    let assetPath = this.getFileLocation('assets', cardURL, filename);
     this.writeFile(assetPath, source);
 
     for (const env of ENVIRONMENTS) {
-      ensureSymlinkSync(assetPath, this.getLocation(env, cardURL, filename));
+      ensureSymlinkSync(
+        assetPath,
+        this.getFileLocation(env, cardURL, filename)
+      );
     }
   }
 
@@ -62,10 +73,27 @@ export class CardCache {
   }
 
   getCard(cardURL: string, env: Environment = NODE): CompiledCard | undefined {
-    let loc = this.getLocation(env, encodeCardURL(cardURL), 'compiled.json');
+    let loc = this.getFileLocation(
+      env,
+      encodeCardURL(cardURL),
+      'compiled.json'
+    );
     if (existsSync(loc)) {
       return readJSONSync(loc);
     }
     return;
+  }
+
+  deleteCard(cardURL: string): void {
+    for (const env of ENVIRONMENTS) {
+      let loc = this.getCardLocation(env, cardURL);
+
+      if (!existsSync(loc)) {
+        continue;
+      }
+      console.log('cache.deleteCard:', loc);
+
+      removeSync(loc);
+    }
   }
 }

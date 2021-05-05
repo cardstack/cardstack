@@ -1,14 +1,16 @@
 import type Koa from 'koa';
-import { Project } from 'scenario-tester';
 import supertest from 'supertest';
 import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupCardCache } from './helpers/cache';
-import { Server } from '../src/server';
-import { BASE_CARD_REALM_CONFIG } from './helpers/fixtures';
+import { setupCardCache } from '@cardstack/server/tests/helpers/cache';
+import {
+  RealmHelper,
+  setupRealms,
+} from '@cardstack/server/tests/helpers/realm';
+import { Server } from '@cardstack/server/src/server';
 
-QUnit.module('respondWithCard', function (hooks) {
-  let realm: Project;
+QUnit.module('GET /cards/<card-id>', function (hooks) {
+  let realm: RealmHelper;
   let server: Koa;
 
   function getCard(cardURL: string) {
@@ -18,52 +20,46 @@ QUnit.module('respondWithCard', function (hooks) {
   }
 
   let { resolveCard, getCardCacheDir } = setupCardCache(hooks);
+  let { createRealm, getRealms } = setupRealms(hooks);
 
   hooks.beforeEach(async function () {
-    realm = new Project('my-realm', {
-      files: {
-        post: {
-          'card.json': JSON.stringify({
-            schema: 'schema.js',
-            isolated: 'isolated.js',
-          }),
-          'schema.js': `
-      import { contains } from "@cardstack/types";
-      import string from "https://cardstack.com/base/string";
-      export default class Post {
-        @contains(string)
-        title;
-        @contains(string)
-        body;
-      }`,
-          'isolated.js': templateOnlyComponentTemplate(
-            '<h1><@model.title/></h1><article><@model.body/></article>'
-          ),
-        },
+    realm = createRealm('my-realm');
+    realm.addCard('post', {
+      'card.json': {
+        schema: 'schema.js',
+        isolated: 'isolated.js',
+      },
+      'schema.js': `
+        import { contains } from "@cardstack/types";
+        import string from "https://cardstack.com/base/string";
+        export default class Post {
+          @contains(string)
+          title;
+          @contains(string)
+          body;
+        }
+      `,
+      'isolated.js': templateOnlyComponentTemplate(
+        '<h1><@model.title/></h1><article><@model.body/></article>'
+      ),
+    });
 
-        post0: {
-          'card.json': JSON.stringify({
-            adoptsFrom: '../post',
-            data: {
-              title: 'Hello World',
-              body: 'First post.',
-            },
-          }),
+    realm.addCard('post0', {
+      'card.json': {
+        adoptsFrom: '../post',
+        data: {
+          title: 'Hello World',
+          body: 'First post.',
         },
       },
     });
-
-    realm.writeSync();
 
     // setting up a card cache directory that is also a resolvable node_modules
     // package with the appropriate exports rules
     server = (
       await Server.create({
         cardCacheDir: getCardCacheDir(),
-        realms: [
-          { url: 'https://my-realm', directory: realm.baseDir },
-          BASE_CARD_REALM_CONFIG,
-        ],
+        realms: getRealms(),
       })
     ).app;
   });

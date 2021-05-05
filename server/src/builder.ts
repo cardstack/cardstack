@@ -1,5 +1,5 @@
 import walkSync from 'walk-sync';
-import { readFileSync } from 'fs-extra';
+import { readFileSync, existsSync, removeSync } from 'fs-extra';
 import { join } from 'path';
 
 import {
@@ -60,33 +60,42 @@ export default class Builder implements BuilderInterface {
     return out!.code!;
   }
 
-  private locateRealmDir(url: string): string {
+  locateCardDir(url: string): string {
     for (let realm of this.realms) {
-      if (url.startsWith(realm.url)) {
-        return join(realm.directory, url.replace(realm.url, ''));
+      if (!url.startsWith(realm.url)) {
+        continue;
+      }
+
+      let realmPath = join(realm.directory, url.replace(realm.url, ''));
+      if (existsSync(realmPath)) {
+        return realmPath;
       }
     }
 
-    throw new NotFound(`${url} is not in a realm we know about`);
+    throw new NotFound(`${url} is not a card we know about`);
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    let dir = this.locateRealmDir(url);
+    let dir = this.locateCardDir(url);
     let files: any = {};
+
     for (let file of walkSync(dir, {
       directories: false,
     })) {
       let fullPath = join(dir, file);
       files[file] = readFileSync(fullPath, 'utf8');
     }
+
     let cardJSON = files['card.json'];
     if (!cardJSON) {
       throw new Error(`${url} is missing card.json`);
     }
+
     delete files['card.json'];
     let card = JSON.parse(cardJSON);
     Object.assign(card, { files, url });
     assertValidRawCard(card);
+
     return card;
   }
 
@@ -100,18 +109,39 @@ export default class Builder implements BuilderInterface {
     return this.buildCard(url);
   }
 
-  copyAssets(cardURL: string, assets: Asset[], files: RawCard['files']): void {
+  copyAssets(
+    cardURL: string,
+    assets: (Asset | undefined)[],
+    files: RawCard['files']
+  ): void {
     for (const asset of assets) {
+      if (!asset) {
+        continue;
+      }
       this.cache.writeAsset(cardURL, asset.path, files[asset.path]);
     }
   }
 
   async buildCard(url: string): Promise<CompiledCard> {
     let rawCard = await this.getRawCard(url);
-    let compiledCard = await this.compiler.compile(rawCard);
+    let compiledCard = await this.compileCardFromRaw(url, rawCard);
     this.copyAssets(url, compiledCard.assets, rawCard.files);
-    this.cache.setCard(url, compiledCard);
-
     return compiledCard;
+  }
+
+  async compileCardFromRaw(
+    url: string,
+    rawCard: RawCard
+  ): Promise<CompiledCard> {
+    let compiledCard = await this.compiler.compile(rawCard);
+    this.cache.setCard(url, compiledCard);
+    return compiledCard;
+  }
+
+  deleteCard(cardURL: string) {
+    this.cache.deleteCard(cardURL);
+
+    let cardDir = this.locateCardDir(cardURL);
+    removeSync(cardDir);
   }
 }

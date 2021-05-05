@@ -2,6 +2,9 @@ import { Error as JSONAPIError } from 'jsonapi-serializer';
 export class NotFound extends Error {
   status = 404;
 }
+export class BadRequest extends Error {
+  status = 400;
+}
 
 export async function errorMiddleware(ctx: any, next: any) {
   try {
@@ -16,6 +19,6 @@ export async function errorMiddleware(ctx: any, next: any) {
       title,
     });
 
-    console.error(err);
+    // console.error(err);
   }
 }
