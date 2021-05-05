@@ -1,5 +1,5 @@
 <Boxel::Modal
-  class="layer-connect-modal"
+  class={{cn "layer-connect-modal" layer-connect-modal--connected=@isLayerConnected}}
   @isOpen={{@isOpen}}
   @onClose={{@onClose}}
   data-test-layer-connect-modal={{@name}}
