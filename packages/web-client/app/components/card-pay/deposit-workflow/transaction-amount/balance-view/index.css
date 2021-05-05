@@ -1,0 +1,65 @@
+.card-pay-token-balance-view {
+  display: flex;
+  align-items: start;
+  padding: var(--boxel-sp);
+  box-shadow: 0 0 0 2px var(--boxel-light-400);
+  border-radius: var(--boxel-border-radius);
+}
+
+.card-pay-token-balance-view__currency-details, .card-pay-token-balance-view__balance {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-pay-token-balance-view__currency-icon {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: contain;
+  margin-right: var(--boxel-sp-sm);
+  margin-bottom: auto;
+}
+
+.card-pay-token-balance-view__currency-details-name {
+  font: 600 var(--boxel-font);
+  color: var(--boxel-dark);
+}
+
+.card-pay-token-balance-view__currency-details-description {
+  font: var(--boxel-font-sm);
+  color: var(--boxel-purple-500);
+  margin-bottom: var(--boxel-sp-xxxs);
+}
+
+.card-pay-token-balance-view__currency-details-address {
+  font-family: "Roboto Mono";
+  font-size: var(--boxel-font-size-sm);
+  line-height: 1.125rem;
+  letter-spacing: var(--boxel-lsp-sm);
+  color: var(--boxel-purple-500);
+  max-width: 22ch;
+  word-break: break-all;
+}
+
+.card-pay-token-balance-view__balance {
+  margin-left: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.card-pay-token-balance-view__balance-header {
+  font: var(--boxel-font-sm);
+  color: var(--boxel-purple-500);
+  margin-bottom: var(--boxel-sp-xxxs);
+}
+
+.card-pay-token-balance-view__balance-amount {
+  font: var(--boxel-font);
+  color: var(--boxel-dark);
+}
+
+.card-pay-token-balance-view__balance-equivalent {
+  font: var(--boxel-font-sm);
+  color: var(--boxel-purple-400);
+}

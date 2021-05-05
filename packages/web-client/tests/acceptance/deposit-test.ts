@@ -33,7 +33,7 @@ module('Acceptance | deposit', function (hooks) {
 
     await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
 
-    await click('[data-test-deposit-button]');
+    await click('[data-test-deposit-workflow-button]');
 
     let post = postableSel(0, 0);
     assert.dom(`${post} img`).exists();
@@ -178,7 +178,7 @@ module('Acceptance | deposit', function (hooks) {
     assert.dom(`${post} [data-test-source-token="DAI"]`).exists();
     assert.dom(`${post} [data-test-unlock-button]`).isDisabled();
     assert.dom(`${post} [data-test-deposit-button]`).isDisabled();
-    await fillIn('[data-test-deposit-amount-input]', '2500');
+    await fillIn('[data-test-deposit-amount-input]', '250');
     assert
       .dom(`${post} [data-test-unlock-button]`)
       .isEnabled('Unlock button is enabled once amount has been entered');
@@ -197,11 +197,11 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(`${post} [data-test-unlock-button]`)
-      .doesNotHaveClass('boxel-button--loading');
-
+      .doesNotExist('Unlock button is no longer visible after unlocking.');
     assert
-      .dom(`${post} [data-test-unlock-button]`)
-      .isDisabled('Unlock is disabled once unlocked');
+      .dom(`${post} [data-test-unlock-success-message]`)
+      .exists('There should be a success message after unlocking');
+
     assert
       .dom(`${post} [data-test-deposit-button]`)
       .isEnabled('Deposit is enabled once unlocked');
@@ -216,7 +216,11 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(`${post} [data-test-deposit-button]`)
-      .doesNotHaveClass('boxel-button--loading');
+      .doesNotExist('Deposit button is no longer visible after depositing.');
+
+    assert
+      .dom(`${post} [data-test-deposit-success-message]`)
+      .exists('There should be a success message after depositing');
 
     assert
       .dom(milestoneCompletedSel(2))
@@ -304,7 +308,7 @@ module('Acceptance | deposit', function (hooks) {
     assert.dom('[data-test-layer-connect-modal="layer1"]').doesNotExist();
 
     await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
-    await click('[data-test-deposit-button]');
+    await click('[data-test-deposit-workflow-button]');
 
     let post = postableSel(0, 0);
     assert.dom(`${post} img`).exists();
@@ -403,7 +407,7 @@ module('Acceptance | deposit', function (hooks) {
     assert.dom('[data-test-layer-connect-modal="layer2"]').doesNotExist();
 
     await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
-    await click('[data-test-deposit-button]');
+    await click('[data-test-deposit-workflow-button]');
     await click(`${postableSel(0, 3)} [data-test-wallet-option="metamask"]`);
     await click(
       `${postableSel(
@@ -463,7 +467,7 @@ module('Acceptance | deposit', function (hooks) {
     });
 
     await visit('/card-pay/balances');
-    await click('[data-test-deposit-button]');
+    await click('[data-test-deposit-workflow-button]');
 
     let post = postableSel(0, 0);
     assert.dom(post).containsText('Hi there, we’re happy to see you');
@@ -525,7 +529,7 @@ module('Acceptance | deposit', function (hooks) {
     });
 
     await visit('/card-pay/balances');
-    await click('[data-test-deposit-button]');
+    await click('[data-test-deposit-workflow-button]');
 
     let post = postableSel(0, 0);
     assert.dom(post).containsText('Hi there, we’re happy to see you');

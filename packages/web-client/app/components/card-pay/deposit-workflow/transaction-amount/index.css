@@ -1,0 +1,72 @@
+.card-pay-transaction-amount__body {
+  padding: 0 var(--boxel-sp-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-pay-transaction-amount__body-header {
+  padding: var(--boxel-sp-xl) 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.card-pay-transaction-amount__input-section {
+  padding-top: var(--boxel-sp-xl);
+  padding-bottom: var(--boxel-sp-xl);
+}
+
+.card-pay-transaction-amount__input-section > * + * {
+  margin-top: var(--boxel-sp-lg);
+}
+
+.card-pay-transaction-amount__field {
+  --boxel-field-label-width: minmax(4rem, 25%);
+}
+
+.card-pay-transaction-amount__field-contents {
+  display: flex;
+  align-items: center;
+}
+
+.card-pay-transaction-amount__small-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.5rem;
+}
+
+.card-pay-transaction-amount__amount-field-input-container {
+  --input-currency-icon-size: 1.25rem;
+  --input-currency-text-width: 5ch;
+  --input-currency-icon-space: var(--boxel-sp-xs);
+  --input-currency-text-space: var(--boxel-sp-sm);
+  position: relative;
+}
+
+.card-pay-transaction-amount__amount-field-input {
+  padding-left: calc(var(--input-currency-icon-size) + var(--input-currency-icon-space) * 2);
+  padding-right: calc(var(--input-currency-text-width) + var(--input-currency-text-space) * 2);
+}
+
+.card-pay-transaction-amount__amount-field-currency-icon {
+  position: absolute;
+  width: var(--input-currency-icon-size);
+  height: var(--input-currency-icon-size);
+  left: var(--input-currency-icon-space);
+  top: 50%;
+  transform: translateY(-50%);
+  user-select: none;
+}
+
+.card-pay-transaction-amount__amount-field-currency-text {
+  position: absolute;
+  width: var(--input-currency-text-width);
+  right: var(--input-currency-text-space);
+  text-align: right;
+  top: 50%;
+  transform: translateY(-50%);
+  user-select: none;
+}
+
+.card-pay-transaction-amount__deposited-memorialized-cta {
+  border-top: 1px solid var(--boxel-light-600);
+}

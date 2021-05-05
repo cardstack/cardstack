@@ -9,7 +9,6 @@ import WalletInfo from '../utils/wallet-info';
 import { task } from 'ember-concurrency-decorators';
 import { WalletProvider } from '../utils/wallet-providers';
 import { BigNumber } from '@ethersproject/bignumber';
-import { amountInWei } from '../utils/token';
 
 export default class Layer1Network extends Service {
   strategy!: Layer1Web3Strategy;
@@ -52,21 +51,18 @@ export default class Layer1Network extends Service {
     return this.walletInfo.accounts.length > 0;
   }
 
-  @task *approve(amount: number, tokenSymbol: string): any {
-    let txnReceipt = yield this.strategy.approve(
-      amountInWei(amount),
-      tokenSymbol
-    );
+  @task *approve(amount: BigNumber, tokenSymbol: string): any {
+    let txnReceipt = yield this.strategy.approve(amount, tokenSymbol);
     return txnReceipt;
   }
 
   @task *relayTokens(
-    amount: number,
+    amount: BigNumber,
     tokenSymbol: string,
     destinationAddress: string
   ): any {
     let txnReceipt = yield this.strategy.relayTokens(
-      amountInWei(amount),
+      amount,
       tokenSymbol,
       destinationAddress
     );

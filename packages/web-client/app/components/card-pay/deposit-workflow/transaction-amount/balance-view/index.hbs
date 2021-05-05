@@ -1,0 +1,26 @@
+<div class="card-pay-token-balance-view" ...attributes>
+  {{svg-jar @tokenIcon class="card-pay-token-balance-view__currency-icon" role="presentation"}}
+  <div class="card-pay-token-balance-view__currency-details">
+    <span class="card-pay-token-balance-view__currency-details-name" data-test-source-token={{@tokenSymbol}}>
+      {{@tokenSymbol}}
+    </span>
+    <span class="card-pay-token-balance-view__currency-details-description">
+      {{@tokenDescription}}
+    </span>
+    <span class="card-pay-token-balance-view__currency-details-address">
+      {{@address}}
+    </span>
+  </div>
+
+  <div class="card-pay-token-balance-view__balance">
+    <span class="card-pay-token-balance-view__balance-header">
+      Balance
+    </span>
+    <span class="card-pay-token-balance-view__balance-amount">
+      {{@balance}} {{@tokenSymbol}}
+    </span>
+    <span class="card-pay-token-balance-view__balance-equivalent">
+      ≈ $ {{@balanceInUsd}} USD
+    </span>
+  </div>
+</div>
