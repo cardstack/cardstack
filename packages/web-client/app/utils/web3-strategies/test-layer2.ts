@@ -1,6 +1,6 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
-import { Layer2Web3Strategy } from './types';
+import { Layer2Web3Strategy, TransactionHash } from './types';
 import { defer } from 'rsvp';
 import { BigNumber } from '@ethersproject/bignumber';
 
@@ -18,6 +18,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return this.waitForAccount as Promise<void>;
   }
 
+  getBlockHeight(): Promise<BigNumber> {
+    return Promise.resolve(BigNumber.from(0));
+  }
+
   test__simulateWalletConnectUri() {
     this.walletConnectUri = 'This is a test of Layer2 Wallet Connect';
   }
@@ -32,6 +36,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     if (balances.defaultToken) {
       this.defaultTokenBalance = balances.defaultToken;
     }
+  }
+
+  blockExplorerUrl(txnHash: TransactionHash): string {
+    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
   }
 
   get waitForAccount() {

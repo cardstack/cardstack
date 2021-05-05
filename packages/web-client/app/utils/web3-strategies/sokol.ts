@@ -4,7 +4,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import Web3 from 'web3';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
-import { Layer2Web3Strategy } from './types';
+import { Layer2Web3Strategy, TransactionHash } from './types';
 import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
@@ -55,7 +55,6 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     await this.provider.enable();
     this.web3 = new Web3(this.provider as any);
     this.isConnected = true;
-    // this.initializePayableToken();
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
     this.connector.on('session_update', (error, payload) => {
       if (error) {
@@ -119,5 +118,14 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   async disconnect(): Promise<void> {
     await this.provider?.disconnect();
     this.clearWalletInfo();
+  }
+
+  blockExplorerUrl(txnHash: TransactionHash): string {
+    return `${getConstantByNetwork('blockExplorer', 'sokol')}/tx/${txnHash}`;
+  }
+
+  async getBlockHeight(): Promise<BigNumber> {
+    const result = await this.web3.eth.getBlockNumber();
+    return BigNumber.from(result);
   }
 }
