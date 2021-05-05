@@ -38,7 +38,7 @@ const {
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
-  .command('bridge <amount> [tokenAddress]', 'Bridge tokens to the layer 2 network', (yargs) => {
+  .command('bridge <amount> [tokenAddress] [receiver]', 'Bridge tokens to the layer 2 network', (yargs) => {
     yargs.positional('amount', {
       type: 'number',
       description: 'Amount of tokens you would like bridged (*not* in units of wei)',
@@ -48,12 +48,9 @@ const {
       default: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa', // Kovan DAI
       description: 'The token address (defaults to Kovan DAI)',
     });
-    yargs.option({
-      receiver: {
-        alias: 'r',
-        description: 'Layer 2 address to be owner of L2 safe, defaults to same as L1 address',
-        type: 'string',
-      },
+    yargs.positional('receiver', {
+      description: 'Layer 2 address to be owner of L2 safe, defaults to same as L1 address',
+      type: 'string',
     });
     command = 'bridge';
   })

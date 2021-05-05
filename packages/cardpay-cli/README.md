@@ -6,20 +6,20 @@ CLI tool for basic actions in Cardpay
 
 # Commands
 - [Commands](#commands)
-  - [`yarn cardpay bridge <AMOUNT> <TOKEN_ADDRESS> --receiver=<RECEIVER> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-bridge-amount-token_address---receiverreceiver---networknetwork---mnemonicmnemonic)
+  - [`yarn cardpay bridge <AMOUNT> <TOKEN_ADDRESS> [RECEIVER] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-bridge-amount-token_address-receiver---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay await-bridged <FROM_BLOCK> [RECIPIENT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-await-bridged-from_block-recipient---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <amounts..> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-prepaidcard-create-safe_address-token_address-amounts---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay safes-view [ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-safes-view-address---networknetwork---mnemonicmnemonic)
 
 
 
-## `yarn cardpay bridge <AMOUNT> <TOKEN_ADDRESS> --receiver=RECEIVER --network=NETWORK [--mnemonic=MNEMONIC]`
+## `yarn cardpay bridge <AMOUNT> <TOKEN_ADDRESS> [RECEIVER] --network=NETWORK [--mnemonic=MNEMONIC]`
 
 Bridge tokens from L1 wallet to L2 safe
 
 ```
 USAGE
-  $ yarn cardpay bridge <amount> <tokenAddress> --receiver=RECEIVER --network=NETWORK [--mnemonic=MNEMONIC]
+  $ yarn cardpay bridge <amount> <tokenAddress> [receiver] --network=NETWORK [--mnemonic=MNEMONIC]
 
 ARGUMENTS
   AMOUNT          Amount in ether you would like bridged
