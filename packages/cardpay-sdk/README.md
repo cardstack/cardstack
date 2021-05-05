@@ -203,7 +203,7 @@ This call will return the USD value for the specified amount of the specified to
 
 ```js
 let exchangeRate = new ExchangeRate(web3);
-let usdPrice = await exchangeRate.getUSDPrice(token, amountInWei);
+let usdPrice = await exchangeRate.getUSDPrice("DAI", amountInWei);
 console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
 ```
 ### `ExchangeRate.getETHPrice`
@@ -211,7 +211,7 @@ This call will return the ETH value for the specified amount of the specified to
 
 ```js
 let exchangeRate = new ExchangeRate(web3);
-let ethWeiPrice = await exchangeRate.getETHPrice(token, amountInWei);
+let ethWeiPrice = await exchangeRate.getETHPrice("CARD", amountInWei);
 console.log(`ETH value: ${fromWei(ethWeiPrice)} ETH`);
 ```
 ### `ExchangeRate.getUpdatedAt`
@@ -219,7 +219,7 @@ This call will return a `Date` instance that indicates the date the token rate w
 
 ```js
 let exchangeRate = new ExchangeRate(web3);
-let date = await exchangeRate.getUpdatedAt(token);
+let date = await exchangeRate.getUpdatedAt("DAI");
 console.log(`The ${token} rate was last updated at ${date.toString()}`);
 ```
 ## `getAddress`
