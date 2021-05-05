@@ -180,13 +180,15 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         fields: {
           title: {
             type: 'contains',
+            typeDecoratorLocalName: 'contains',
             card: COMPILED_STRING_CARD,
-            localName: 'title',
+            name: 'title',
           },
           startDate: {
             type: 'contains',
+            typeDecoratorLocalName: 'contains',
             card: COMPILED_DATE_CARD,
-            localName: 'startDate',
+            name: 'startDate',
           },
         },
         usedFields,
@@ -199,17 +201,31 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     // `{{@model.startDate}}` is *always* only the data.
     QUnit.test('each over @fields', async function (assert) {
       assert.equal(
-        transform(
-          `
+        standardize(
+          transform(
+            `
           {{#each-in @fields as |name Field|}}
             <label>{{name}}</label>
             <Field />
           {{/each-in}}
         `,
-          options
+            options
+          )
         ),
-        '<label>title</label>{{title}}<label>startDate</label><BestGuess @model={{@model.startDate}} />'
+        standardize(`
+          <label>{{"title"}}</label>
+          {{@model.title}}
+          <label>{{"startDate"}}</label>
+          <BestGuess @model={{@model.startDate}} />
+        `)
       );
     });
   });
 });
+
+function standardize(src: string) {
+  return src
+    .replace(/\s*\n\s*/g, '\n')
+    .replace(/\s{2,}/gm, ' ')
+    .trim();
+}

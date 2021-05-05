@@ -58,7 +58,7 @@
       ]
     },
     {
-      "command": "yarn test",
+      "command": "yarn test:node",
       "name": "Core: yarn run test:node",
       "request": "launch",
       "type": "node-terminal",

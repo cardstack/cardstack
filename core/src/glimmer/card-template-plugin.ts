@@ -3,6 +3,7 @@ import * as syntax from '@glimmer/syntax';
 // import ETC from 'ember-source/dist/ember-template-compiler';
 import { CompiledCard, ComponentInfo, Field } from '../interfaces';
 import { singularize } from 'inflection';
+import { cloneDeep } from 'lodash';
 
 const PREFIX = '@model.';
 
@@ -37,21 +38,31 @@ interface RewriteFieldOptions {
   blockProgramUsage: string;
 }
 interface State {
-  insideBlockStatement?: RewriteFieldOptions;
+  insidePluralField: RewriteFieldOptions | undefined;
+  insideFieldsIterator:
+    | {
+        nodes: Map<unknown, { name: string; field: Field }>;
+        nameVar: string | undefined;
+        componentVar: string | undefined;
+      }
+    | undefined;
 }
 
 export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
-  return function transform(/*env: syntax.ASTPluginEnvironment*/): syntax.ASTPlugin {
+  return function transform(
+    env: syntax.ASTPluginEnvironment
+  ): syntax.ASTPlugin {
     let { fields, importAndChooseName, usedFields } = options;
     let state: State = {
-      insideBlockStatement: undefined,
+      insidePluralField: undefined,
+      insideFieldsIterator: undefined,
     };
 
     return {
       name: 'card-glimmer-plugin',
       visitor: {
-        ElementNode(node) {
-          let { insideBlockStatement: inBlock } = state;
+        ElementNode(node, path) {
+          let { insidePluralField: inBlock } = state;
 
           if (inBlock && node.tag === inBlock.blockProgramUsage) {
             let { blockProgramUsage, field } = inBlock;
@@ -64,11 +75,27 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             }
 
             return process(
-              rewriteFieldToComponent(importAndChooseName, field, node.tag)
+              rewriteFieldToComponent(
+                importAndChooseName,
+                field,
+                inBlock.blockProgramUsage
+              )
             );
           }
 
-          let field = getFieldFromExpression(fields, node.tag);
+          let field: Field | undefined;
+
+          if (state.insideFieldsIterator) {
+            if (node.tag === state.insideFieldsIterator.componentVar) {
+              field =
+                fields[enclosingField(path, state.insideFieldsIterator).name];
+            }
+          }
+
+          if (!field) {
+            field = getFieldFromExpression(fields, node.tag);
+          }
+
           if (!field) {
             return;
           }
@@ -95,7 +122,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               fieldTemplate = rewriteFieldToComponent(
                 importAndChooseName,
                 field,
-                node.tag
+                `@model.${field.name}`
               );
             }
 
@@ -103,21 +130,57 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
           }
         },
 
+        PathExpression(node, path) {
+          if (state.insideFieldsIterator) {
+            if (node.original === state.insideFieldsIterator.nameVar) {
+              return env.syntax.builders.string(
+                enclosingField(path, state.insideFieldsIterator).name
+              );
+            }
+          }
+          return undefined;
+        },
+
         BlockStatement: {
           enter(node) {
+            let [firstArg] = node.params;
+            if (
+              firstArg?.type === 'PathExpression' &&
+              firstArg.original === '@fields'
+            ) {
+              state.insideFieldsIterator = {
+                nodes: new Map(),
+                nameVar: node.program.blockParams[0],
+                componentVar: node.program.blockParams[1],
+              };
+              let output: any[] = [];
+              for (let [name, field] of Object.entries(fields)) {
+                let copied = cloneDeep(node.program.body);
+                for (let node of copied) {
+                  state.insideFieldsIterator.nodes.set(node, {
+                    name,
+                    field,
+                  });
+                }
+                output = output.concat(copied);
+              }
+              return output;
+            }
+
             let field = getFieldFromBlockParam(fields, node);
 
             if (!field) {
               return;
             }
 
-            state.insideBlockStatement = {
+            state.insidePluralField = {
               field,
               blockProgramUsage: node.program.blockParams[0],
             };
+            return undefined;
           },
           exit(/*node, path*/) {
-            state.insideBlockStatement = undefined;
+            state.insidePluralField = undefined;
           },
         },
       },
@@ -238,4 +301,19 @@ function rewriteLocals(remapping: {
 
 function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function enclosingField(
+  path: syntax.WalkerPath<syntax.ASTv1.Node>,
+  inside: NonNullable<State['insideFieldsIterator']>
+) {
+  let cursor: syntax.WalkerPath<syntax.ASTv1.Node> | null = path;
+  while (cursor) {
+    let entry = inside.nodes.get(cursor.node);
+    if (entry) {
+      return entry;
+    }
+    cursor = cursor.parent;
+  }
+  throw new Error(`bug: couldn't figure out which iteration we were in`);
 }
