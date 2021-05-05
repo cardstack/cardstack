@@ -1,6 +1,7 @@
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { networks } from './constants';
+import { Contract, EventData, PastEventOptions } from 'web3-eth-contract';
 
 export async function networkName(web3: Web3): Promise<string> {
   let id = await web3.eth.net.getId();
@@ -35,5 +36,29 @@ export function waitUntilTransactionMined(web3: Web3, txnHash: string): Promise<
 
   return new Promise(function (resolve, reject) {
     transactionReceiptAsync(txnHash, resolve, reject);
+  });
+}
+
+export function waitForEvent(contract: Contract, eventName: string, opts: PastEventOptions): Promise<EventData> {
+  let eventDataAsync = async function (
+    resolve: (value: EventData | Promise<EventData>) => void,
+    reject: (reason?: any) => void
+  ) {
+    try {
+      let events = await contract.getPastEvents(eventName, opts);
+      if (!events.length) {
+        setTimeout(function () {
+          eventDataAsync(resolve, reject);
+        }, POLL_INTERVAL);
+      } else {
+        resolve(events[events.length - 1]);
+      }
+    } catch (e) {
+      reject(e);
+    }
+  };
+
+  return new Promise(function (resolve, reject) {
+    eventDataAsync(resolve, reject);
   });
 }
