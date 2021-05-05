@@ -7,8 +7,8 @@ import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import { TransactionReceipt } from 'web3-core';
-import { BigNumber, FixedNumber } from '@ethersproject/bignumber';
-import { amountInWei } from '@cardstack/web-client/utils/token';
+import { BigNumber } from '@ethersproject/bignumber';
+import { parseEther } from '@ethersproject/units';
 
 interface CardPayDepositWorkflowTransactionAmountComponentArgs {
   workflowSession: WorkflowSession;
@@ -107,13 +107,23 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
     return this.amount;
   }
 
+  get amountAsBigNumber(): BigNumber {
+    // parseEther as of @ethersproject/units@5.1.0 uses @ethersproject/bignumber@5.1.0
+    // This has problems with `toBigInt`: https://github.com/ethers-io/ethers.js/pull/1485
+    // To prevent this, we use BigNumber.from to get an instance of BigNumber from
+    // @ethersproject/bignumber@5.1.1 with the fix
+    // This may need to change when tokens with precision not equal to 18 are added
+    // @ethersproject/units has a utility `parseUnits` that can provide similar functionality
+    // and is used by parseEther
+    return BigNumber.from(parseEther(this.amount || '0').toHexString());
+  }
+
   get isValidAmount() {
     if (!this.amount) return false;
-    const n = FixedNumber.from(this.amount);
     return (
-      !n.isNegative() &&
-      !n.isZero() &&
-      amountInWei(n).lte(this.currentTokenBalance)
+      !this.amountAsBigNumber.isZero() &&
+      !this.amountAsBigNumber.isNegative() &&
+      this.amountAsBigNumber.lte(this.currentTokenBalance)
     );
   }
 
@@ -142,7 +152,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
     let tokenSymbol = this.args.workflowSession.state.depositSourceToken;
     this.isUnlocking = true;
     taskFor(this.layer1Network.approve)
-      .perform(FixedNumber.from(this.amount), tokenSymbol)
+      .perform(this.amountAsBigNumber, tokenSymbol)
       .then((transactionReceipt: TransactionReceipt) => {
         this.isUnlocked = true;
         this.unlockTxnReceipt = transactionReceipt;
@@ -161,7 +171,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
       layer2BlockHeightBeforeBridging
     );
     taskFor(this.layer1Network.relayTokens)
-      .perform(FixedNumber.from(this.amount), tokenSymbol, layer2Address)
+      .perform(this.amountAsBigNumber, tokenSymbol, layer2Address)
       .then((transactionReceipt: TransactionReceipt) => {
         this.relayTokensTxnReceipt = transactionReceipt;
         this.args.workflowSession.update(
