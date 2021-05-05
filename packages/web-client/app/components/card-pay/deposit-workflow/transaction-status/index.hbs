@@ -2,36 +2,46 @@
   @header="Token Bridge"
   @isComplete={{@isComplete}}
 >
-  <Boxel::ProgressSteps
-    @progressSteps={{this.progressSteps}}
-    @completedCount={{this.completedCount}}
-    as |progressStep|
-  >
-    <span
-      data-test-token-bridge-step={{progressStep.index}}
-      data-test-completed={{progressStep.completed}}
-    >
-      {{progressStep.title}}
-    </span>
+  <div class="transaction-status">
+    <p class="transaction-status__description">
+      Bridging tokens to xDai blockchain
+    </p>
 
-    {{#if (eq progressStep.index 0)}}
-      <Boxel::Button @as="anchor" @size="extra-small" @href={{this.depositTxnViewerUrl}} target="_blank" data-test-etherscan-button>
-        View on Etherscan
-      </Boxel::Button>
-    {{/if}}
-    {{#if (eq progressStep.index 1)}}
-      <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" data-test-bridge-explorer-button>
-        View on Bridge Explorer
-      </Boxel::Button>
-    {{/if}}
-    {{#if (eq progressStep.index 2)}}
-      {{#if progressStep.completed}}
-        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.blockscoutUrl}} target="_blank" data-test-blockscout-button>
-          View on Blockscout
-        </Boxel::Button>
-      {{else}}
-        Processing...
-      {{/if}}
-    {{/if}}
-  </Boxel::ProgressSteps>
+    <Boxel::ProgressSteps
+      class="transaction-status__steps"
+      @progressSteps={{this.progressSteps}}
+      @completedCount={{this.completedCount}}
+      as |progressStep|
+    >
+      <span
+        class="transaction-status__step-title"
+        data-test-token-bridge-step={{progressStep.index}}
+        data-test-completed={{progressStep.completed}}
+      >
+        {{progressStep.title}}
+      </span>
+
+      <span class="transaction-status__step-status">
+        {{#if (eq progressStep.index 0)}}
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.depositTxnViewerUrl}} target="_blank" data-test-etherscan-button>
+            View on Etherscan
+          </Boxel::Button>
+        {{/if}}
+        {{#if (eq progressStep.index 1)}}
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" data-test-bridge-explorer-button>
+            View on Bridge Explorer
+          </Boxel::Button>
+        {{/if}}
+        {{#if (eq progressStep.index 2)}}
+          {{#if progressStep.completed}}
+            <Boxel::Button @as="anchor" @size="extra-small" @href={{this.blockscoutUrl}} target="_blank" data-test-blockscout-button>
+              View on Blockscout
+            </Boxel::Button>
+          {{else}}
+            Processing...
+          {{/if}}
+        {{/if}}
+      </span>
+    </Boxel::ProgressSteps>
+  </div>
 </ActionCardContainer>
