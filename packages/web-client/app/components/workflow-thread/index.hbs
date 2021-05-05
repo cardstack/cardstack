@@ -18,6 +18,7 @@
       {{#if milestone.isComplete}}
         <Boxel::MilestoneBanner
           @title={{milestone.completedDetail}}
+          data-milestone={{i}}
           data-test-milestone-completed
           data-test-milestone={{i}}
         />
@@ -33,6 +34,7 @@
         />
       {{/each}}
     {{/if}}
+    <div data-thread-end></div>
   </:content>
   <:sidebar as |SidebarSection|>
     <SidebarSection>
@@ -57,6 +59,7 @@
         <Boxel::ProgressSteps
           @progressSteps={{@workflow.milestones}}
           @completedCount={{@workflow.completedMilestoneCount}}
+          @onClickStep={{this.scrollMilestoneIntoView}}
         />
       </Boxel::Sidebar::CardContainer>
     </SidebarSection>
