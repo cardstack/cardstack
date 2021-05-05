@@ -4,6 +4,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { WalletProvider } from '../wallet-providers';
 import { defer } from 'rsvp';
 import { TransactionReceipt } from 'web3-core';
+import { getConstantByNetwork } from '@cardstack/cardpay-sdk/index.js';
 
 export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
   chainName = 'Ethereum Mainnet';
@@ -15,6 +16,7 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
     return this.#waitForAccountDeferred.promise;
   }
 
+  @tracked currentProviderId: string | undefined;
   @tracked defaultTokenBalance: BigNumber | undefined;
   @tracked daiBalance: BigNumber | undefined;
   @tracked cardBalance: BigNumber | undefined;
@@ -42,8 +44,11 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
     throw new Error('Method not implemented.');
   }
 
-  // eslint-disable-next-line no-unused-vars
-  txnViewerUrl(_txnHash: TransactionHash): string {
-    throw new Error('Method not implemented.');
+  blockExplorerUrl(txnHash: TransactionHash) {
+    return `${getConstantByNetwork('blockExplorer', 'mainnet')}/tx/${txnHash}`;
+  }
+
+  bridgeExplorerUrl(txnHash: TransactionHash): string {
+    return `${getConstantByNetwork('bridgeExplorer', 'mainnet')}/${txnHash}`;
   }
 }

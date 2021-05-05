@@ -13,6 +13,7 @@ export interface Web3Strategy {
 
 export interface Layer1Web3Strategy extends Web3Strategy {
   defaultTokenBalance: BigNumber | undefined;
+  currentProviderId: string | undefined;
   daiBalance: BigNumber | undefined;
   cardBalance: BigNumber | undefined;
   connect(walletProvider: WalletProvider): Promise<void>; // eslint-disable-line no-unused-vars
@@ -23,11 +24,14 @@ export interface Layer1Web3Strategy extends Web3Strategy {
     token: string, // eslint-disable-line no-unused-vars
     destinationAddress: string // eslint-disable-line no-unused-vars
   ): Promise<TransactionReceipt>;
-  txnViewerUrl(txnHash: TransactionHash): string; // eslint-disable-line no-unused-vars
+  blockExplorerUrl(txnHash: TransactionHash): string; // eslint-disable-line no-unused-vars
+  bridgeExplorerUrl(txnHash: TransactionHash): string; // eslint-disable-line no-unused-vars
 }
 
 export interface Layer2Web3Strategy extends Web3Strategy {
   defaultTokenBalance: BigNumber | undefined;
+  blockExplorerUrl(txnHash: TransactionHash): string; // eslint-disable-line no-unused-vars
+  getBlockHeight(): Promise<BigNumber>;
 }
 
 export type TransactionHash = string;

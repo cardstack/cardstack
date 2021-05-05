@@ -29,7 +29,7 @@ module('Acceptance | deposit', function (hooks) {
     await visit('/');
     assert.equal(currentURL(), '/');
     await click('[data-test-cardstack-org-link="card-pay"]');
-    assert.equal(currentURL(), '/card-pay');
+    assert.equal(currentURL(), '/card-pay/balances');
 
     await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
 
@@ -63,12 +63,16 @@ module('Acceptance | deposit', function (hooks) {
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
-    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
     layer1Service.test__simulateBalances({
       defaultToken: BigNumber.from('2141100000000000000'),
       dai: BigNumber.from('250500000000000000000'),
       card: BigNumber.from('10000000000000000000000'),
     });
+
     await waitFor(`${post} [data-test-balance="ETH"]`);
     assert.dom(`${post} [data-test-balance="ETH"]`).containsText('2.1411');
     assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.5');
@@ -130,15 +134,41 @@ module('Acceptance | deposit', function (hooks) {
 
     post = postableSel(2, 1);
 
-    await click(`${post} [data-test-layer-1-source-trigger]`);
-    await waitFor(`${post} [data-test-eth-balance]`);
-    assert.dom(`${post} [data-test-eth-balance]`).containsText('2.1411');
-    assert.dom(`${post} [data-test-dai-balance]`).containsText('250.5');
-    assert.dom(`${post} [data-test-card-balance]`).containsText('10000.0');
-    await click(`${post} [data-test-dai-option]`);
-    await click(`${post} [data-test-layer-2-target-trigger]`);
-    await click(`${post} [data-test-new-depot-option]`);
-    await click(`${post} [data-test-continue-button]`);
+    // transaction-setup card (not complete)
+    await waitFor(`${post} [data-test-balance="DAI"]`);
+    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.5');
+    // TODO assert.dom(`${post} [data-test-usd-balance="DAI"]`).containsText('');
+    assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.0');
+    // TODO assert.dom(`${post} [data-test-usd-balance="CARD"]`).containsText('');
+    assert
+      .dom(`${post} [data-test-deposit-transaction-setup-from-address]`)
+      .hasText(layer1AccountAddress);
+    assert
+      .dom(`${post} [data-test-deposit-transaction-setup-to-address]`)
+      .hasText('0x18261...6E44');
+    // TODO assert.dom(`${post} [data-test-deposit-transaction-setup-depot-address]`).hasText('');
+    assert
+      .dom('[data-test-deposit-transaction-setup-is-complete]')
+      .doesNotExist();
+    assert.dom(`${post} [data-test-option-view-only]`).doesNotExist();
+    assert
+      .dom('[data-test-deposit-transaction-setup] [data-test-boxel-button]')
+      .isDisabled();
+
+    await click(`${post} [data-test-option="DAI"]`);
+    await click(
+      `${post} [data-test-deposit-transaction-setup] [data-test-boxel-button]`
+    );
+    // transaction-setup card (completed)
+    assert.dom(`${post} [data-test-option]`).doesNotExist();
+    assert.dom(`${post} [data-test-option-view-only]`).exists({ count: 1 });
+    assert
+      .dom('[data-test-deposit-transaction-setup] [data-test-boxel-button]')
+      .isNotDisabled();
+    assert.dom('[data-test-deposit-transaction-setup-is-complete]').exists();
+    assert
+      .dom(`${post} [data-test-balance-view-only="DAI"]`)
+      .containsText('250.5');
 
     assert
       .dom(postableSel(2, 2))
@@ -197,10 +227,24 @@ module('Acceptance | deposit', function (hooks) {
       .containsText('your token will be bridged to the xDai blockchain');
 
     post = postableSel(3, 1);
-    // assert.dom(`${message} [data-test-step-1="complete"]`);
-    // assert.dom(`${message} [data-test-step-2="in-progress"]`);
+    assert
+      .dom(`${post} [data-test-token-bridge-step="0"][data-test-completed]`)
+      .exists();
+    assert.dom(`${post} [data-test-etherscan-button]`).exists();
+    assert
+      .dom(
+        `${post} [data-test-token-bridge-step="1"]:not([data-test-completed])`
+      )
+      .exists();
+    assert.dom(`${post} [data-test-bridge-explorer-button]`).exists();
+    assert
+      .dom(
+        `${post} [data-test-token-bridge-step="2"]:not([data-test-completed])`
+      )
+      .exists();
+    assert.dom(`${post} [data-test-blockscout-button]`).doesNotExist();
 
-    // layer1Service.test__simulateTokensBridged();
+    // layer2Service.test__simulateTokensBridged();
     // assert.dom(`${message} [data-test-step-2="complete"]`);
     // assert.dom(`${message} [data-test-step-3="in-progress"]`);
     // layer1Service.test__simulateCPXDMinted();
@@ -240,21 +284,24 @@ module('Acceptance | deposit', function (hooks) {
     await click(
       '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
     );
-    assert.dom('[data-test-layer-one-connect-modal]').exists();
+    assert.dom('[data-test-layer-connect-modal="layer1"]').exists();
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
 
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
     await waitUntil(
-      () => !document.querySelector('[data-test-layer-one-connect-modal]')
+      () => !document.querySelector('[data-test-layer-connect-modal="layer1"]')
     );
     assert
       .dom(
         '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
       )
       .hasText('0xaCD5f...4Fb6');
-    assert.dom('[data-test-layer-one-connect-modal]').doesNotExist();
+    assert.dom('[data-test-layer-connect-modal="layer1"]').doesNotExist();
 
     await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
     await click('[data-test-deposit-button]');
@@ -334,7 +381,7 @@ module('Acceptance | deposit', function (hooks) {
     await click(
       '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
     );
-    assert.dom('[data-test-layer-two-connect-modal]').exists();
+    assert.dom('[data-test-layer-connect-modal="layer2"]').exists();
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
 
@@ -346,14 +393,14 @@ module('Acceptance | deposit', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
-      () => !document.querySelector('[data-test-layer-two-connect-modal]')
+      () => !document.querySelector('[data-test-layer-connect-modal="layer2"]')
     );
     assert
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
       .hasText('0x18261...6E44');
-    assert.dom('[data-test-layer-two-connect-modal]').doesNotExist();
+    assert.dom('[data-test-layer-connect-modal="layer2"]').doesNotExist();
 
     await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
     await click('[data-test-deposit-button]');
@@ -368,7 +415,10 @@ module('Acceptance | deposit', function (hooks) {
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
-    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
 
     await waitFor(milestoneCompletedSel(0));
     assert
@@ -395,7 +445,10 @@ module('Acceptance | deposit', function (hooks) {
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
     layer1Service.test__simulateBalances({
       defaultToken: BigNumber.from('2141100000000000000'),
       dai: BigNumber.from('250500000000000000000'),
@@ -454,7 +507,10 @@ module('Acceptance | deposit', function (hooks) {
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
     layer1Service.test__simulateBalances({
       defaultToken: BigNumber.from('2141100000000000000'),
       dai: BigNumber.from('250500000000000000000'),

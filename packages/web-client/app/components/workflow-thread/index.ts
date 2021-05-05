@@ -3,7 +3,7 @@ import { action } from '@ember/object';
 
 export default class WorkflowThread extends Component {
   threadEl: HTMLElement | undefined;
-  @action focus(element: HTMLElement) {
+  @action focus(element: HTMLElement): void {
     this.threadEl = element;
     element.focus();
   }

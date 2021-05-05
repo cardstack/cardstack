@@ -41,6 +41,14 @@ export default class Layer2Network extends Service {
   disconnect() {
     this.strategy.disconnect();
   }
+
+  getBlockHeight() {
+    return this.strategy.getBlockHeight();
+  }
+
+  blockExplorerUrl(txnHash: string | undefined): string | undefined {
+    return txnHash ? this.strategy.blockExplorerUrl(txnHash) : undefined;
+  }
 }
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.

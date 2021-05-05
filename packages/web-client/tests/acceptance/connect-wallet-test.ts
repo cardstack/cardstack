@@ -18,14 +18,14 @@ module('Acceptance | Connect Wallet', function (hooks) {
     await visit('/');
     assert.equal(currentURL(), '/');
     await click('[data-test-cardstack-org-link="card-pay"]');
-    assert.equal(currentURL(), '/card-pay');
+    assert.equal(currentURL(), '/card-pay/balances');
 
     await click(
       '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
     );
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
-
+    assert.dom('[data-test-layer-one-connect-modal-card]').isFocused();
     await click('[data-test-wallet-option="metamask"]');
     await click(
       '[data-test-mainnnet-connection-action-container] [data-test-boxel-button]'
@@ -33,23 +33,26 @@ module('Acceptance | Connect Wallet', function (hooks) {
 
     // Simulate the user connecting their Metamask wallet
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer1Service.test__simulateAccountsChanged([layer1AccountAddress]);
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
     await waitUntil(
-      () => !document.querySelector('[data-test-layer-one-connect-modal]')
+      () => !document.querySelector('[data-test-layer-connect-modal="layer1"]')
     );
     assert
       .dom(
         '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
       )
       .hasText('0xaCD5f...4Fb6');
-    assert.dom('[data-test-layer-one-connect-modal]').doesNotExist();
+    assert.dom('[data-test-layer-connect-modal="layer1"]').doesNotExist();
   });
 
   test('Connecting a layer 2 wallet via Cardstack Mobile', async function (assert) {
     await visit('/');
     assert.equal(currentURL(), '/');
     await click('[data-test-cardstack-org-link="card-pay"]');
-    assert.equal(currentURL(), '/card-pay');
+    assert.equal(currentURL(), '/card-pay/balances');
 
     await click(
       '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
@@ -70,7 +73,7 @@ module('Acceptance | Connect Wallet', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
-      () => !document.querySelector('[data-test-layer-two-connect-modal]')
+      () => !document.querySelector('[data-test-layer-connect-modal="layer2"]')
     );
     assert
       .dom(
@@ -78,7 +81,7 @@ module('Acceptance | Connect Wallet', function (hooks) {
       )
       .hasText('0x18261...6E44');
     assert.dom('[data-test-wallet-connect-qr-code]').doesNotExist();
-    assert.dom('[data-test-layer-two-connect-modal]').doesNotExist();
+    assert.dom('[data-test-layer-connect-modal="layer2"]').doesNotExist();
   });
 
   // TODO: Connecting a layer 2 wallet via alternate wallet

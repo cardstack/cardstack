@@ -7,5 +7,6 @@
 }
 
 .styled-qr-code > canvas {
+  width: 18.75rem; /* 300px */
   max-width: 100%;
 }

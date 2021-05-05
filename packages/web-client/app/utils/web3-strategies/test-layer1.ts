@@ -10,6 +10,7 @@ import { TransactionReceipt } from 'web3-core';
 export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   chainName = 'L1 Test Chain';
   chainId = -1;
+  @tracked currentProviderId: string | undefined;
   @tracked walletConnectUri: string | undefined;
   @tracked isConnected = false;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
@@ -29,7 +30,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   }
 
   disconnect(): Promise<void> {
-    this.test__simulateAccountsChanged([]);
+    this.test__simulateAccountsChanged([], '');
     return this.waitForAccount;
   }
 
@@ -48,7 +49,11 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     return this.#depositDeferred.promise;
   }
 
-  txnViewerUrl(txnHash: TransactionHash): string {
+  blockExplorerUrl(txnHash: TransactionHash): string {
+    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
+  }
+
+  bridgeExplorerUrl(txnHash: TransactionHash): string {
     return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
   }
 
@@ -56,10 +61,18 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     this.walletConnectUri = 'This is a test of Layer2 Wallet Connect';
   }
 
-  test__simulateAccountsChanged(accounts: string[]) {
-    this.isConnected = true;
-    this.walletInfo = new WalletInfo(accounts, this.chainId);
-    this.waitForAccountDeferred.resolve();
+  test__simulateAccountsChanged(accounts: string[], walletProviderId?: string) {
+    if (accounts.length && walletProviderId) {
+      this.isConnected = true;
+      this.currentProviderId = walletProviderId;
+      this.walletInfo = new WalletInfo(accounts, this.chainId);
+      this.waitForAccountDeferred.resolve();
+    } else {
+      this.isConnected = false;
+      this.currentProviderId = '';
+      this.walletInfo = new WalletInfo([], this.chainId);
+      this.waitForAccountDeferred.resolve();
+    }
   }
 
   test__simulateBalances(balances: {
