@@ -4,6 +4,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { TransactionReceipt } from 'web3-core';
 import { AbiItem } from 'web3-utils';
 import { ERC20ABI } from '@cardstack/cardpay-sdk/index.js';
+import { SafeInfo } from '@cardstack/cardpay-sdk/sdk/safes';
 
 export interface Web3Strategy {
   chainName: string;
@@ -37,6 +38,7 @@ export interface Layer2Web3Strategy extends Web3Strategy {
     fromBlock: number,
     receiver: ChainAddress
   ): Promise<TransactionReceipt>;
+  fetchDepot(owner: ChainAddress): Promise<SafeInfo | null>;
 }
 
 export type TransactionHash = string;

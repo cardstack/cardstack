@@ -146,7 +146,9 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(`${post} [data-test-deposit-transaction-setup-to-address]`)
       .hasText('0x18261...6E44');
-    // TODO assert.dom(`${post} [data-test-deposit-transaction-setup-depot-address]`).hasText('');
+    assert
+      .dom(`${post} [data-test-deposit-transaction-setup-depot-address]`)
+      .hasText('Create a new Depot');
     assert
       .dom('[data-test-deposit-transaction-setup-is-complete]')
       .doesNotExist();

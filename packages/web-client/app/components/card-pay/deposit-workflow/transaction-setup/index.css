@@ -91,3 +91,8 @@
   height: 1.25rem; */
   margin-right: var(--boxel-sp-xs);
 }
+
+.deposit-card__loading-indicator {
+  width: var(--boxel-sp-sm);
+  height: var(--boxel-sp-sm);
+}

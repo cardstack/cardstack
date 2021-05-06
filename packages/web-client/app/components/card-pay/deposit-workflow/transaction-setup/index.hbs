@@ -47,7 +47,11 @@
             <div>
               <div class="deposit-card__field-value">DEPOT:</div>
               <div class={{cn "deposit-card__field-address" "deposit-card__field-address-sm" deposit-card__field-address--view-only=@isComplete}} data-test-deposit-transaction-setup-depot-address>
-                {{!-- TODO: depot address --}}
+                {{#if this.fetchDepotTask.last.isSuccessful}}
+                  {{or this.fetchDepotTask.last.value.address 'Create a new Depot'}}
+                {{else}}
+                  <LoadingIndicator class="deposit-card__loading-indicator"/>
+                {{/if}}
               </div>
             </div>
           </div>
