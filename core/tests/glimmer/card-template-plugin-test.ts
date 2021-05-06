@@ -22,7 +22,6 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
             card: COMPILED_STRING_CARD,
             name: 'title',
             type: 'contains',
-            typeDecoratorLocalName: 'contains',
           },
         },
         usedFields,
@@ -43,7 +42,6 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           createdAt: {
             type: 'contains',
             card: COMPILED_DATE_CARD,
-            typeDecoratorLocalName: 'contains',
             name: 'createdAt',
           },
         },
@@ -65,7 +63,6 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
             card: COMPILED_STRING_CARD,
             name: 'items',
             type: 'containsMany',
-            typeDecoratorLocalName: 'containsMany',
           },
         },
         usedFields,
@@ -124,7 +121,6 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
             card: COMPILED_STRING_CARD,
             name: 'items',
             type: 'containsMany',
-            typeDecoratorLocalName: 'containsMany',
           },
         },
         usedFields,
@@ -148,7 +144,6 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
             name: 'items',
             card: COMPILED_DATE_CARD,
             type: 'containsMany',
-            typeDecoratorLocalName: 'containsMany',
           },
         },
         usedFields,
@@ -180,13 +175,11 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         fields: {
           title: {
             type: 'contains',
-            typeDecoratorLocalName: 'contains',
             card: COMPILED_STRING_CARD,
             name: 'title',
           },
           startDate: {
             type: 'contains',
-            typeDecoratorLocalName: 'contains',
             card: COMPILED_DATE_CARD,
             name: 'startDate',
           },

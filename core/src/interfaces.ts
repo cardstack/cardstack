@@ -84,7 +84,6 @@ export interface CompiledCard {
 export interface Field {
   type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
   card: CompiledCard;
-  typeDecoratorLocalName: string;
   name: string;
 }
 

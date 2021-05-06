@@ -207,15 +207,11 @@ export class Compiler {
     metaFields: FieldsMeta
   ): Promise<CompiledCard['fields']> {
     let fields: CompiledCard['fields'] = {};
-    for (let [
-      name,
-      { cardURL, type, typeDecoratorLocalName },
-    ] of Object.entries(metaFields)) {
+    for (let [name, { cardURL, type }] of Object.entries(metaFields)) {
       fields[name] = {
         card: await this.lookup(cardURL),
         type,
         name,
-        typeDecoratorLocalName,
       };
     }
 
