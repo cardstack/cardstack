@@ -2,6 +2,7 @@
 
 import BN from 'bn.js';
 import Web3 from 'web3';
+import { AbiItem } from 'web3-utils';
 import { ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../contracts/abi/erc-677.js';
 import { getAddress } from '../contracts/addresses.js';
@@ -111,7 +112,7 @@ export default class PrepaidCard {
 
   private async getPayload(owner: string, tokenAddress: string, amounts: BN[]): Promise<string> {
     let prepaidCardManagerAddress = await getAddress('prepaidCardManager', this.layer2Web3);
-    let token = new this.layer2Web3.eth.Contract(ERC677ABI as any, tokenAddress);
+    let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], tokenAddress);
     let sum = new BN(0);
     for (let amount of amounts) {
       sum = sum.add(amount);
