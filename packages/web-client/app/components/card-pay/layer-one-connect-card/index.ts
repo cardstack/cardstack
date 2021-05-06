@@ -42,14 +42,15 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     }
   }
   get connectedWalletProvider(): WalletProvider | undefined {
-    return this.walletProviders.find(
-      (walletProvider) =>
-        walletProvider.id === this.layer1Network.strategy.currentProviderId
-    );
+    if (!this.hasAccount) return undefined;
+    else
+      return this.walletProviders.find(
+        (walletProvider) =>
+          walletProvider.id === this.layer1Network.strategy.currentProviderId
+      );
   }
   get connectedWalletLogo(): string {
-    let { connectedWalletProvider } = this;
-    if (connectedWalletProvider) return connectedWalletProvider.logo;
+    if (this.connectedWalletProvider) return this.connectedWalletProvider.logo;
     else return '';
   }
 
