@@ -6,7 +6,7 @@ import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
 import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
-import { BigNumber } from '@ethersproject/bignumber';
+import BN from 'bn.js';
 import { SafeInfo } from '@cardstack/cardpay-sdk/sdk/safes';
 
 export default class Layer2Network extends Service {
@@ -16,9 +16,7 @@ export default class Layer2Network extends Service {
   @reads('strategy.walletInfo', []) walletInfo!: WalletInfo;
   @reads('strategy.waitForAccount') waitForAccount!: Promise<void>;
   @reads('strategy.chainName') chainName!: string;
-  @reads('strategy.defaultTokenBalance') defaultTokenBalance:
-    | BigNumber
-    | undefined;
+  @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
 
   constructor(props: object | undefined) {
     super(props);
@@ -47,7 +45,7 @@ export default class Layer2Network extends Service {
     return this.strategy.getBlockHeight();
   }
 
-  async awaitBridged(fromBlock: number) {
+  async awaitBridged(fromBlock: BN) {
     return this.strategy.awaitBridged(fromBlock, this.walletInfo.firstAddress!);
   }
 

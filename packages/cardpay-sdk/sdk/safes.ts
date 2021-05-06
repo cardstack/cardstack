@@ -2,6 +2,7 @@
 
 import Web3 from 'web3';
 import PrepaidCardManagerABI from '../contracts/abi/prepaid-card-manager';
+import { AbiItem } from 'web3-utils';
 import { getAddress } from '../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from './constants';
 
@@ -30,7 +31,7 @@ export default class Safes {
     let response = await fetch(`${transactionServiceURL}/v1/owners/${owner}/`);
     let { safes } = (await response.json()) as { safes: string[] };
     let prepaidCardManager = new this.layer2Web3.eth.Contract(
-      PrepaidCardManagerABI as any,
+      PrepaidCardManagerABI as AbiItem[],
       await getAddress('prepaidCardManager', this.layer2Web3)
     );
 

@@ -65,9 +65,9 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayD
 
   @action toggleComplete() {
     if (this.args.isComplete) {
-      this.args?.onIncomplete();
+      this.args.onIncomplete?.();
     } else if (this.hasCardBalance || this.hasDaiBalance) {
-      this.args?.onComplete();
+      this.args.onComplete?.();
     } else {
       // TODO error message
     }

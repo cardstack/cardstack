@@ -2,7 +2,8 @@ import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
 import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
 import RSVP, { defer } from 'rsvp';
-import { BigNumber } from '@ethersproject/bignumber';
+import BN from 'bn.js';
+import { toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
 import { SafeInfo } from '@cardstack/cardpay-sdk/sdk/safes';
 
@@ -14,15 +15,15 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   waitForAccountDeferred = defer();
   bridgingDeferred!: RSVP.Deferred<unknown>;
-  @tracked defaultTokenBalance: BigNumber | undefined;
+  @tracked defaultTokenBalance: BN | undefined;
 
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([]);
     return this.waitForAccount as Promise<void>;
   }
 
-  getBlockHeight(): Promise<BigNumber> {
-    return Promise.resolve(BigNumber.from(0));
+  getBlockHeight(): Promise<BN> {
+    return Promise.resolve(toBN(0));
   }
 
   // eslint-disable-next-line no-unused-vars
@@ -31,7 +32,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   awaitBridged(
-    _fromBlock: number, // eslint-disable-line no-unused-vars
+    _fromBlock: BN, // eslint-disable-line no-unused-vars
     _receiver: string // eslint-disable-line no-unused-vars
   ): Promise<TransactionReceipt> {
     this.bridgingDeferred = defer<TransactionReceipt>();
@@ -48,7 +49,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.waitForAccountDeferred.resolve();
   }
 
-  test__simulateBalances(balances: { defaultToken: BigNumber | undefined }) {
+  test__simulateBalances(balances: { defaultToken: BN | undefined }) {
     if (balances.defaultToken) {
       this.defaultTokenBalance = balances.defaultToken;
     }

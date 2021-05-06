@@ -8,7 +8,8 @@ import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
 import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
-import { BigNumber } from '@ethersproject/bignumber';
+import BN from 'bn.js';
+import { toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
 import {
   networkIds,
@@ -27,7 +28,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   @tracked isConnected = false;
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo = new WalletInfo([], this.chainId) as WalletInfo;
-  @tracked defaultTokenBalance: BigNumber | undefined;
+  @tracked defaultTokenBalance: BN | undefined;
   #waitForAccountDeferred = defer();
   web3!: Web3;
 
@@ -107,7 +108,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
 
   async refreshBalances() {
     let raw = await this.getDefaultTokenBalance();
-    this.defaultTokenBalance = BigNumber.from(raw);
+    this.defaultTokenBalance = toBN(raw);
   }
 
   async getDefaultTokenBalance() {
@@ -120,7 +121,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   }
 
   awaitBridged(
-    fromBlock: number,
+    fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt> {
     let tokenBridge = new TokenBridgeHomeSide(this.web3);
@@ -146,8 +147,8 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     return `${getConstantByNetwork('blockExplorer', 'sokol')}/tx/${txnHash}`;
   }
 
-  async getBlockHeight(): Promise<BigNumber> {
+  async getBlockHeight(): Promise<BN> {
     const result = await this.web3.eth.getBlockNumber();
-    return BigNumber.from(result);
+    return toBN(result);
   }
 }

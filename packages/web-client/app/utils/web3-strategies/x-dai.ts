@@ -7,7 +7,8 @@ import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
 import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
-import { BigNumber } from '@ethersproject/bignumber';
+import BN from 'bn.js';
+import { toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
 import {
   networkIds,
@@ -40,7 +41,7 @@ export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
     this.initialize();
   }
 
-  @tracked defaultTokenBalance: BigNumber | undefined;
+  @tracked defaultTokenBalance: BN | undefined;
 
   disconnect(): Promise<void> {
     throw new Error('Method not implemented.');
@@ -107,13 +108,13 @@ export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
     return `${getConstantByNetwork('blockExplorer', 'xdai')}/tx/${txnHash}`;
   }
 
-  async getBlockHeight(): Promise<BigNumber> {
+  async getBlockHeight(): Promise<BN> {
     const result = await this.web3.eth.getBlockNumber();
-    return BigNumber.from(result);
+    return toBN(result);
   }
 
   awaitBridged(
-    fromBlock: number,
+    fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt> {
     let tokenBridge = new TokenBridgeHomeSide(this.web3);

@@ -4,7 +4,7 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import { BigNumber } from '@ethersproject/bignumber';
+import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 import { tracked } from '@glimmer/tracking';
 
@@ -17,7 +17,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<CardPay
   @service declare layer2Network: Layer2Network;
   @tracked completedCount = 1;
   @tracked completedLayer2TransactionReceipt: TransactionReceipt | undefined;
-  get layer2BlockHeightBeforeBridging(): BigNumber | undefined {
+  get layer2BlockHeightBeforeBridging(): BN | undefined {
     return this.args.workflowSession.state.layer2BlockHeightBeforeBridging;
   }
   progressSteps = [
@@ -38,7 +38,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<CardPay
   ) {
     super(owner, args);
     this.layer2Network
-      .awaitBridged(this.layer2BlockHeightBeforeBridging!.toNumber())
+      .awaitBridged(this.layer2BlockHeightBeforeBridging!)
       .then((transactionReceipt: TransactionReceipt) => {
         this.completedLayer2TransactionReceipt = transactionReceipt;
         this.completedCount = 3;

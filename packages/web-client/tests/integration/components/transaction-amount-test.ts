@@ -5,8 +5,8 @@ import hbs from 'htmlbars-inline-precompile';
 import { TransactionReceipt } from 'web3-core';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
-import { BigNumber } from '@ethersproject/bignumber';
-import { parseEther } from '@ethersproject/units';
+import BN from 'bn.js';
+import { toBN, toWei } from 'web3-utils';
 import { defer } from 'rsvp';
 import RSVP from 'rsvp';
 
@@ -15,10 +15,10 @@ module('Integration | Component | transaction-amount', function (hooks) {
 
   const hijackApprove = (
     service: Layer1TestWeb3Strategy,
-    fn: (_amountInWei: BigNumber) => void // eslint-disable-line no-unused-vars
+    fn: (_amountInWei: BN) => void // eslint-disable-line no-unused-vars
   ) => {
     service.approve = function approve(
-      _amountInWei: BigNumber, // eslint-disable-line no-unused-vars
+      _amountInWei: BN, // eslint-disable-line no-unused-vars
       _token: string // eslint-disable-line no-unused-vars
     ) {
       fn(_amountInWei);
@@ -27,8 +27,6 @@ module('Integration | Component | transaction-amount', function (hooks) {
       return resolved.promise;
     };
   };
-
-  const toWei = (str: string) => BigNumber.from(parseEther(str));
 
   test('It disables the unlock button when amount entered is less than balance (18-decimal floating point)', async function (assert) {
     const startDaiAmountString = '5.111111111111111110';
@@ -41,9 +39,9 @@ module('Integration | Component | transaction-amount', function (hooks) {
       .strategy as Layer1TestWeb3Strategy;
 
     layer1Service.test__simulateBalances({
-      defaultToken: BigNumber.from('0'),
-      dai: startDaiAmount,
-      card: BigNumber.from('0'),
+      defaultToken: toBN('0'),
+      dai: toBN(startDaiAmount),
+      card: toBN('0'),
     });
 
     this.setProperties({
@@ -69,7 +67,7 @@ module('Integration | Component | transaction-amount', function (hooks) {
     const daiToSend = '5.111111111111111111';
     const daiToSendInWei = '5111111111111111111';
     let startDaiAmount = toWei('10');
-    let weiSentToApprove: BigNumber = BigNumber.from('-1');
+    let weiSentToApprove = toBN('-1');
 
     const session = new WorkflowSession();
     session.update('depositSourceToken', 'DAI');
@@ -77,12 +75,12 @@ module('Integration | Component | transaction-amount', function (hooks) {
       .strategy as Layer1TestWeb3Strategy;
 
     layer1Service.test__simulateBalances({
-      defaultToken: BigNumber.from('0'),
-      dai: startDaiAmount,
-      card: BigNumber.from('0'),
+      defaultToken: toBN('0'),
+      dai: toBN(startDaiAmount),
+      card: toBN('0'),
     });
 
-    hijackApprove(layer1Service, (_amountInWei: BigNumber) => {
+    hijackApprove(layer1Service, (_amountInWei: BN) => {
       weiSentToApprove = _amountInWei;
     });
 
@@ -103,9 +101,6 @@ module('Integration | Component | transaction-amount', function (hooks) {
 
     await click('[data-test-unlock-button]');
 
-    assert.equal(
-      weiSentToApprove.toHexString(),
-      BigNumber.from(daiToSendInWei).toHexString()
-    );
+    assert.equal(weiSentToApprove.toString(), toBN(daiToSendInWei).toString());
   });
 });

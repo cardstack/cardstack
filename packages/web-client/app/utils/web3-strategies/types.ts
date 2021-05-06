@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { WalletProvider } from '../wallet-providers';
-import { BigNumber } from '@ethersproject/bignumber';
+import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 import { AbiItem } from 'web3-utils';
 import { ERC20ABI } from '@cardstack/cardpay-sdk/index.js';
@@ -14,28 +14,28 @@ export interface Web3Strategy {
 }
 
 export interface Layer1Web3Strategy extends Web3Strategy {
-  defaultTokenBalance: BigNumber | undefined;
+  defaultTokenBalance: BN | undefined;
   currentProviderId: string | undefined;
-  daiBalance: BigNumber | undefined;
-  cardBalance: BigNumber | undefined;
+  daiBalance: BN | undefined;
+  cardBalance: BN | undefined;
   connect(walletProvider: WalletProvider): Promise<void>;
   waitForAccount: Promise<void>;
-  approve(amountInWei: BigNumber, token: string): Promise<TransactionReceipt>;
+  approve(amountInWei: BN, token: string): Promise<TransactionReceipt>;
   relayTokens(
     token: ChainAddress,
     destinationAddress: ChainAddress,
-    amountInWei: BigNumber
+    amountInWei: BN
   ): Promise<TransactionReceipt>;
   blockExplorerUrl(txnHash: TransactionHash): string;
   bridgeExplorerUrl(txnHash: TransactionHash): string;
 }
 
 export interface Layer2Web3Strategy extends Web3Strategy {
-  defaultTokenBalance: BigNumber | undefined;
+  defaultTokenBalance: BN | undefined;
   blockExplorerUrl(txnHash: TransactionHash): string;
-  getBlockHeight(): Promise<BigNumber>;
+  getBlockHeight(): Promise<BN>;
   awaitBridged(
-    fromBlock: number,
+    fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt>;
   fetchDepot(owner: ChainAddress): Promise<SafeInfo | null>;

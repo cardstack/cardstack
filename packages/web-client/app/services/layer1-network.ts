@@ -8,7 +8,7 @@ import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import { task } from 'ember-concurrency-decorators';
 import { WalletProvider } from '../utils/wallet-providers';
-import { BigNumber } from '@ethersproject/bignumber';
+import BN from 'bn.js';
 
 export default class Layer1Network extends Service {
   strategy!: Layer1Web3Strategy;
@@ -17,11 +17,9 @@ export default class Layer1Network extends Service {
   @reads('strategy.walletInfo', new WalletInfo([], -1)) walletInfo!: WalletInfo;
   @reads('strategy.waitForAccount') waitForAccount!: Promise<void>;
   @reads('strategy.chainName') chainName!: string;
-  @reads('strategy.defaultTokenBalance') defaultTokenBalance:
-    | BigNumber
-    | undefined;
-  @reads('strategy.daiBalance') daiBalance: BigNumber | undefined;
-  @reads('strategy.cardBalance') cardBalance: BigNumber | undefined;
+  @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
+  @reads('strategy.daiBalance') daiBalance: BN | undefined;
+  @reads('strategy.cardBalance') cardBalance: BN | undefined;
 
   constructor(props: object | undefined) {
     super(props);
@@ -51,7 +49,7 @@ export default class Layer1Network extends Service {
     return this.walletInfo.accounts.length > 0;
   }
 
-  @task *approve(amount: BigNumber, tokenSymbol: string): any {
+  @task *approve(amount: BN, tokenSymbol: string): any {
     let txnReceipt = yield this.strategy.approve(amount, tokenSymbol);
     return txnReceipt;
   }
@@ -59,7 +57,7 @@ export default class Layer1Network extends Service {
   @task *relayTokens(
     tokenSymbol: string,
     destinationAddress: string,
-    amount: BigNumber
+    amount: BN
   ): any {
     let txnReceipt = yield this.strategy.relayTokens(
       tokenSymbol,
