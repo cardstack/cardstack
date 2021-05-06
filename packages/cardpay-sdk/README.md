@@ -24,8 +24,12 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`RewardPool` (TBD)](#rewardpool-tbd)
   - [`RewardPool.balanceOf` (TBD)](#rewardpoolbalanceof-tbd)
   - [`RewardPool.withdraw` (TBD)](#rewardpoolwithdraw-tbd)
-- [`getBlockHeight`](#getBlockHeight)
+- [`ExchangeRate`](#exchangerate)
+  - [`ExchangeRate.getUSDPrice`](#exchangerategetusdprice)
+  - [`ExchangeRate.getETHPrice`](#exchangerategetethprice)
+  - [`ExchangeRate.getUpdatedAt`](#exchangerategetupdatedat)
 - [`getAddress`](#getaddress)
+- [`getOracle`](#getoracle)
 - [`getConstant`](#getconstant)
 - [`networkIds`](#networkids)
 - [ABI's](#abis)
@@ -57,7 +61,7 @@ This call will invoke the token bridge contract to relay tokens that have been u
 
 This method is invoked with the following parameters:
 - The contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
-- The address of the layer 2 account that should own the resulting safe 
+- The address of the layer 2 account that should own the resulting safe
 - The amount of tokens to unlock. This amount should be in units of `wei` and as a string.
 - You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fourth argument.
 
@@ -85,7 +89,7 @@ let tokenBridge = new TokenBridgeHomeSide(web3); // Layer 2 web3 instance
 This call will listen for a `TokensBridgedToSafe` event emitted by the TokenBridge home contract that has a recipient matching the specified address. The starting layer 2 block height should be captured before the call to relayTokens is made to begin bridging. It is used to focus the search and avoid matching on a previous bridging for this user.
 
 This method is invoked with the following parameters:
-- The address of the layer 2 account that will own the resulting safe (passed as receiver to relayTokens call) 
+- The address of the layer 2 account that will own the resulting safe (passed as receiver to relayTokens call)
 - The block height of layer 2 before the relayTokens call was initiated on the foreign side of the bridge. Get it with `await layer2Web3.eth.getBlockNumber()`
 
 This method returns a promise that includes a web3 transaction receipt for the layer 2 transaction, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
@@ -216,6 +220,37 @@ interface RelayTransaction {
 ### `RewardPool.balanceOf` (TBD)
 ### `RewardPool.withdraw` (TBD)
 
+## `ExchangeRate`
+The `ExchangeRate` API is used to get the current exchange rates in USD and ETH for the various stablecoin that we support. These rates are fed by the Chainlink price feeds for the stablecoin rates and the DIA oracle for the CARD token rates. As we onboard new stablecoin we'll add more exchange rates. The price oracles that we use reside in layer 2, so please supply a layer 2 web3 instance when instantiating an `ExchangeRate` instance.
+```js
+import { ExchangeRate } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider);
+let exchangeRate = new ExchangeRate(web3); // Layer 2 web3 instance
+```
+### `ExchangeRate.getUSDPrice`
+This call will return the USD value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a floating point value in units of USD. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function.
+
+```js
+let exchangeRate = new ExchangeRate(web3);
+let usdPrice = await exchangeRate.getUSDPrice("DAI", amountInWei);
+console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
+```
+### `ExchangeRate.getETHPrice`
+This call will return the ETH value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a string that represents the ETH value in units of `wei` as well. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function. You can also easily convert units of `wei` back into `ethers` by using the `Web3.utils.fromWei()` function.
+
+```js
+let exchangeRate = new ExchangeRate(web3);
+let ethWeiPrice = await exchangeRate.getETHPrice("CARD", amountInWei);
+console.log(`ETH value: ${fromWei(ethWeiPrice)} ETH`);
+```
+### `ExchangeRate.getUpdatedAt`
+This call will return a `Date` instance that indicates the date the token rate was last updated.
+
+```js
+let exchangeRate = new ExchangeRate(web3);
+let date = await exchangeRate.getUpdatedAt("DAI");
+console.log(`The ${token} rate was last updated at ${date.toString()}`);
+```
 ## `getAddress`
 `getAddress` is a utility that will retrieve the contract address for a contract that is part of the Card Protocol in the specified network. The easiest way to use this function is to just pass your web3 instance to the function, and the function will query the web3 instance to see what network it is currently using. You can also just pass in the network name.
 
@@ -225,6 +260,13 @@ let daiToken = await getAddress("daiToken", web3);
 let foreignBridge = await getAddress("foreignBridge", web3);
 let homeBridge = await getAddress("homeBridge", web3);
 let prepaidCardManager = await getAddress("prepaidCardManager", web3);
+```
+
+## `getOracle`
+`getOracle` is a utility that will retrieve the contract address for a price oracle for the specified token in the specified network. The easiest way to use this function is to just pass your web3 instance to the function, and the function will query the web3 instance to see what network it is currently using. You can also just pass in the network name. Please omit the ".CPXD" suffix in the token name that you provide.
+```js
+let daiOracle = await getOracle("DAI", web3);
+let cardOracle = await getOracle("CARD", web3);
 ```
 
 ## `getConstant`
