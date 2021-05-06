@@ -2,6 +2,7 @@ import QUnit from 'qunit';
 import { ComponentInfo } from '../../src/interfaces';
 import transform, { Options } from './../../src/glimmer/card-template-plugin';
 import { COMPILED_STRING_CARD, COMPILED_DATE_CARD } from '../helpers/fixtures';
+import { equalIgnoringWhiteSpace } from '../helpers/assertions';
 
 function importAndChooseName() {
   return 'BestGuess';
@@ -168,8 +169,9 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
   });
 
-  QUnit.module('Fields: iterating over all fields', function (hooks) {
+  QUnit.module('@fields API', function (hooks) {
     let options: Options;
+
     hooks.beforeEach(function () {
       options = {
         fields: {
@@ -192,33 +194,20 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     // Reminder: as we wrote this, we decided that `<@fields.startDate />` can
     // just always replace `<@model.startDate />` for the invocation case, and
     // `{{@model.startDate}}` is *always* only the data.
-    QUnit.test('each over @fields', async function (assert) {
-      assert.equal(
-        standardize(
-          transform(
-            `
-          {{#each-in @fields as |name Field|}}
-            <label>{{name}}</label>
-            <Field />
-          {{/each-in}}
-        `,
-            options
-          )
+    QUnit.test('{{#each-in}} over @fields', async function () {
+      equalIgnoringWhiteSpace(
+        transform(
+          `{{#each-in @fields as |name Field|}}
+              <label>{{name}}</label>
+              <Field />
+           {{/each-in}}`,
+          options
         ),
-        standardize(`
-          <label>{{"title"}}</label>
-          {{@model.title}}
-          <label>{{"startDate"}}</label>
-          <BestGuess @model={{@model.startDate}} />
-        `)
+        `<label>{{"title"}}</label>
+         {{@model.title}}
+         <label>{{"startDate"}}</label>
+         <BestGuess @model={{@model.startDate}} />`
       );
     });
   });
 });
-
-function standardize(src: string) {
-  return src
-    .replace(/\s*\n\s*/g, '\n')
-    .replace(/\s{2,}/gm, ' ')
-    .trim();
-}
