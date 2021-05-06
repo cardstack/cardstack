@@ -57,14 +57,14 @@ export default class Layer1Network extends Service {
   }
 
   @task *relayTokens(
-    amount: BigNumber,
     tokenSymbol: string,
-    destinationAddress: string
+    destinationAddress: string,
+    amount: BigNumber
   ): any {
     let txnReceipt = yield this.strategy.relayTokens(
-      amount,
       tokenSymbol,
-      destinationAddress
+      destinationAddress,
+      amount
     );
     return txnReceipt;
   }

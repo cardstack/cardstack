@@ -4,10 +4,12 @@ This is a package that provides an SDK to use the Cardpay protocol.
 ### Special Considerations <!-- omit in toc -->
  One item to note that all token amounts that are provided to the API must strings and be in units of `wei`. All token amounts returned by the API will also be in units of `wei`. You can use `Web3.utils.toWei()` and `Web3.utils.fromWei()` to convert to and from units of `wei`. Because ethereum numbers can be so large, it is unsafe to represent these natively in Javascript, and in fact it is very common for a smart contract to return numbers that are simply too large to be represented natively in Javascript. For this reason, within Javascript the only safe way to natively handle numbers coming from Ethereum is as a `string`. If you need to perform math on a number coming from Ethereum use the `BN` library.
 
-- [`TokenBridge`](#tokenbridge)
-  - [`TokenBridge.unlockTokens`](#tokenbridgeunlocktokens)
-  - [`TokenBridge.relayTokens`](#tokenbridgerelaytokens)
-  - [`TokenBridge.getSupportedTokens` (TBD)](#tokenbridgegetsupportedtokens-tbd)
+- [`TokenBridgeForeignSide`](#tokenbridgeforeignside)
+  - [`TokenBridgeForeignSide.unlockTokens`](#tokenbridgeforeignsideunlocktokens)
+  - [`TokenBridgeForeignSide.relayTokens`](#tokenbridgeforeignsiderelaytokens)
+  - [`TokenBridgeForeignSide.getSupportedTokens` (TBD)](#tokenbridgeforeignsidegetsupportedtokens-tbd)
+- [`TokenBridgeHomeSide`](#tokenbridgehomeside)
+  - [`TokenBridgeHomeSide.waitForBridgingCompleted`](#tokenbridgehomesidewaitforbridgingcompleted)
 - [`Safes`](#safes)
   - [`Safes.view`](#safesview)
 - [`PrepaidCard`](#prepaidcard)
@@ -32,17 +34,17 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`networkIds`](#networkids)
 - [ABI's](#abis)
 
-## `TokenBridge`
-The `TokenBridge` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridge` class should be instantiated with your `Web3` instance that is configured to operate on a layer 1 network (like Ethereum Mainnet or Kovan).
+## `TokenBridgeForeignSide`
+The `TokenBridge` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeForeignSide` class should be instantiated with your `Web3` instance that is configured to operate on a layer 1 network (like Ethereum Mainnet or Kovan).
 ```js
-import { TokenBridge } from "@cardstack/cardpay-sdk";
+import { TokenBridgeForeignSide } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider);
-let tokenBridge = new TokenBridge(web3); // Layer 1 web3 instance
+let tokenBridge = new TokenBridgeForeignSide(web3); // Layer 1 web3 instance
 ```
 
-### `TokenBridge.unlockTokens`
+### `TokenBridgeForeignSide.unlockTokens`
 This call will perform an ERC-20 `approve` action on the tokens to grant the Token Bridge contract the ability bridge your tokens. This method is invoked with:
-- The contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridge.getSupportedTokens` method to get a list of supported tokens.
+- The contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
 - The amount of tokens to unlock. This amount should be in units of `wei` and as string.
 - You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a third argument.
 
@@ -54,24 +56,51 @@ let txnReceipt = await tokenBridge.unlockTokens(
   new BN("1000000000000000000") // this is 1 token in wei
 );
 ```
-### `TokenBridge.relayTokens`
+### `TokenBridgeForeignSide.relayTokens`
 This call will invoke the token bridge contract to relay tokens that have been unlocked. It is always a good idea to relay the same number of tokens that were just unlocked. So if you unlocked 10 tokens, then you should subsequently relay 10 tokens. Once the tokens have been relayed to the layer 2 network they will be deposited in a Gnosis safe that you control in layer 2. You can use the `Safes.view` to obtain the address of the safe that you control in layer 2. Your safe will be reused for any subsequent tokens that you bridge into layer 2.
 
 This method is invoked with the following parameters:
-- The contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridge.getSupportedTokens` method to get a list of supported tokens.
+- The contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
+- The address of the layer 2 account that should own the resulting safe
 - The amount of tokens to unlock. This amount should be in units of `wei` and as a string.
-- You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a third argument.
+- You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fourth argument.
 
 This method returns a promise that includes a web3 transaction receipt, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
 
 ```js
 let txnReceipt = await tokenBridge.relayTokens(
-  "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa",
+  "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", // token address
+  "0x7cc103485069bbba15799f5dac5c42e7bbb48b4d064e61548022bf04db1bfc19", // layer 2 recipient address
   new BN("1000000000000000000") // this is 1 token in wei
 );
 ```
 
-### `TokenBridge.getSupportedTokens` (TBD)
+### `TokenBridgeForeignSide.getSupportedTokens` (TBD)
+
+## `TokenBridgeHomeSide`
+The `TokenBridge` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeHomeSide` class should be instantiated with your `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+```js
+import { TokenBridgeHomeSide } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider);
+let tokenBridge = new TokenBridgeHomeSide(web3); // Layer 2 web3 instance
+```
+
+### `TokenBridgeHomeSide.waitForBridgingCompleted`
+This call will listen for a `TokensBridgedToSafe` event emitted by the TokenBridge home contract that has a recipient matching the specified address. The starting layer 2 block height should be captured before the call to relayTokens is made to begin bridging. It is used to focus the search and avoid matching on a previous bridging for this user.
+
+This method is invoked with the following parameters:
+- The address of the layer 2 account that will own the resulting safe (passed as receiver to relayTokens call)
+- The block height of layer 2 before the relayTokens call was initiated on the foreign side of the bridge. Get it with `await layer2Web3.eth.getBlockNumber()`
+
+This method returns a promise that includes a web3 transaction receipt for the layer 2 transaction, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
+
+
+```js
+let txnReceipt = await tokenBridge.waitForBridgingCompleted(
+  recipientAddress
+  startingBlockHeight,
+);
+```
 
 ## `Safes`
 The `Safes` API is used to query the card protocol about the gnosis safes in the layer 2 network in which the Card Protocol runs. This can includes safes in which bridged tokens are deposited as well as prepaid cards (which in turn are actually gnosis safes). The `Safes` class should be instantiated with your `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
@@ -266,5 +295,6 @@ import {
   ERC20ABI,
   ERC677ABI,
   ForeignBridgeMediatorABI,
+  HomeBridgeMediatorABI,
   PrepaidCardManagerABI } from "@cardstack/cardpay-sdk";
 ```

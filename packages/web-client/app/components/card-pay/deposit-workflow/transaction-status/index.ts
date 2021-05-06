@@ -15,6 +15,7 @@ interface CardPayDepositWorkflowTransactionStatusComponentArgs {
 class CardPayDepositWorkflowTransactionStatusComponent extends Component<CardPayDepositWorkflowTransactionStatusComponentArgs> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
+  @tracked completedCount = 1;
   @tracked completedLayer2TransactionReceipt: TransactionReceipt | undefined;
   get layer2BlockHeightBeforeBridging(): BigNumber | undefined {
     return this.args.workflowSession.state.layer2BlockHeightBeforeBridging;
@@ -36,14 +37,12 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<CardPay
     args: CardPayDepositWorkflowTransactionStatusComponentArgs
   ) {
     super(owner, args);
-    console.log(
-      'Start waiting for TokensBridgedForSafe event starting with block',
-      this.layer2BlockHeightBeforeBridging
-    );
-  }
-
-  get completedCount() {
-    return 1;
+    this.layer2Network
+      .awaitBridged(this.layer2BlockHeightBeforeBridging!.toNumber())
+      .then((transactionReceipt: TransactionReceipt) => {
+        this.completedLayer2TransactionReceipt = transactionReceipt;
+        this.completedCount = 3;
+      });
   }
 
   get depositTxnViewerUrl() {

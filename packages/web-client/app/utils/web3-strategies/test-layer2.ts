@@ -1,8 +1,9 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
 import { Layer2Web3Strategy, TransactionHash } from './types';
-import { defer } from 'rsvp';
+import RSVP, { defer } from 'rsvp';
 import { BigNumber } from '@ethersproject/bignumber';
+import { TransactionReceipt } from 'web3-core';
 
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainName = 'L2 Test Chain';
@@ -11,6 +12,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked isConnected = false;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   waitForAccountDeferred = defer();
+  bridgingDeferred!: RSVP.Deferred<unknown>;
   @tracked defaultTokenBalance: BigNumber | undefined;
 
   disconnect(): Promise<void> {
@@ -20,6 +22,14 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   getBlockHeight(): Promise<BigNumber> {
     return Promise.resolve(BigNumber.from(0));
+  }
+
+  awaitBridged(
+    _fromBlock: number, // eslint-disable-line no-unused-vars
+    _receiver: string // eslint-disable-line no-unused-vars
+  ): Promise<TransactionReceipt> {
+    this.bridgingDeferred = defer<TransactionReceipt>();
+    return this.bridgingDeferred.promise as Promise<TransactionReceipt>;
   }
 
   test__simulateWalletConnectUri() {
@@ -36,6 +46,12 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     if (balances.defaultToken) {
       this.defaultTokenBalance = balances.defaultToken;
     }
+  }
+
+  test__simulateBridged(txnHash: TransactionHash) {
+    this.bridgingDeferred.resolve({
+      transactionHash: txnHash,
+    } as TransactionReceipt);
   }
 
   blockExplorerUrl(txnHash: TransactionHash): string {
