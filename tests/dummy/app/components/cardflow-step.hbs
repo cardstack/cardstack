@@ -1,5 +1,5 @@
 <li class="cardflow-action-card__list-item {{if @model.completed "completed"}} {{if @model.current "current"}}">
-  <Boxel::IconButton {{on "click" this.setCompleted}} @class="cardflow-action-card__list-item--checkbox" />
+  <Boxel::IconButton {{on "click" this.setCompleted}} class="cardflow-action-card__list-item--checkbox" />
   <div>
     <div class="cardflow-action-card__list-item--title">{{@model.title}}</div>
     {{#if (and @model.completed @model.description)}}

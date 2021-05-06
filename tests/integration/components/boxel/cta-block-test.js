@@ -5,10 +5,8 @@ import { hbs } from 'ember-cli-htmlbars';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 const CTA_BLOCK_SELECTOR = '[data-test-boxel-cta-block]';
-const MAIN_ACTION_BUTTON_SELECTOR =
-  '[data-test-boxel-cta-block-button].boxel-cta-block__action-button';
-const CANCEL_ACTION_BUTTON_SELECTOR =
-  '[data-test-boxel-cta-block-button].boxel-cta-block__cancel-button';
+const MAIN_ACTION_BUTTON_SELECTOR = '.boxel-cta-block__action-button';
+const CANCEL_ACTION_BUTTON_SELECTOR = '.boxel-cta-block__cancel-button';
 const MAIN_ACTION_AREA_SELECTOR =
   '[data-test-boxel-cta-block-action-status-area]';
 const MAIN_ACTION_AREA_ICON_SELECTOR =

@@ -5,9 +5,10 @@
     "selected"
     (if @selectedItemCount "partial" "none")
   }}
+  ...attributes
 >
   <Boxel::SelectButton
-    @class="boxel-selection-control-group__select-button"
+    class="boxel-selection-control-group__select-button"
     @mode={{@mode}}
     @isPartial={{@selectedItemCount}}
     @isSelected={{@isSelected}}

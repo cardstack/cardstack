@@ -28,7 +28,7 @@
   {{#if (and this.displayItemModal this.record)}}
     <Boxel::Modal @overlayClass="cardflow-overlay" class="cardflow__modal">
       <header class="cardflow__modal-header">Workflow Thread - {{this.projectTitle}}</header>
-      <Boxel::IconButton @icon="close" @class="cardflow__modal-close-btn" {{on "click" this.closeModal}} />
+      <Boxel::IconButton @icon="close" class="cardflow__modal-close-btn" {{on "click" this.closeModal}} />
       <div class="cardflow__nested-grid">
         <CardPlatter @class="cardflow__nested-card">
           <header class="cardflow__nested-card-header">
@@ -96,7 +96,7 @@
   {{else if (and this.displayCatalogModal this.isolatedCollection)}}
     <Boxel::Modal @overlayClass="cardflow-overlay" class="cardflow__modal">
       <header class="cardflow__modal-header">Workflow Thread - {{this.projectTitle}}</header>
-      <Boxel::IconButton @icon="close" @class="cardflow__modal-close-btn" {{on "click" this.closeModal}} />
+      <Boxel::IconButton @icon="close" class="cardflow__modal-close-btn" {{on "click" this.closeModal}} />
       <div class="cardflow__nested-grid">
         <CardPlatter @class="cardflow__nested-card">
           <header class="cardflow__nested-card-header">

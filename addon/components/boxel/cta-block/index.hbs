@@ -6,6 +6,7 @@
     (if this.isMemorialized "boxel-cta-block--memorialized")
     (if @stepNumber "boxel-cta-block--has-step")
   }}
+  ...attributes
   data-test-boxel-cta-block
 >
   {{!-- Not accounting for 0 as a step number --}}
@@ -22,9 +23,9 @@
     {{yield 
       (hash 
         ActionButton=(component 
-          "boxel/cta-block/button" 
+          "boxel/button" 
           kind="primary" 
-          ctaClass="boxel-cta-block__action-button"
+          class="boxel-cta-block__action-button"
         )
         InfoArea=(component 
           "boxel/cta-block/area" 
@@ -37,10 +38,10 @@
     {{yield
       (hash 
         ActionButton=(component 
-          "boxel/cta-block/button" 
+          "boxel/button" 
           kind="primary" 
           disabled=true 
-          ctaClass="boxel-cta-block__action-button"
+          class="boxel-cta-block__action-button"
         )
       )
       to="disabled"
@@ -49,15 +50,15 @@
     {{yield
       (hash 
         ActionButton=(component 
-          "boxel/cta-block/button" 
+          "boxel/button" 
           kind="primary" 
           loading=true 
-          ctaClass="boxel-cta-block__action-button"
+          class="boxel-cta-block__action-button"
         )
         CancelButton=(component 
-          "boxel/cta-block/button" 
+          "boxel/button" 
           kind="secondary-dark" 
-          ctaClass="boxel-cta-block__cancel-button"
+          class="boxel-cta-block__cancel-button"
         )
         InfoArea=(component 
           "boxel/cta-block/area" 
@@ -74,9 +75,9 @@
     {{yield
       (hash 
         ActionButton=(component 
-          "boxel/cta-block/button" 
+          "boxel/button" 
           kind="secondary-light" 
-          ctaClass="boxel-cta-block__action-button"
+          class="boxel-cta-block__action-button"
         )
         ActionStatusArea=(component 
           "boxel/cta-block/action-status-area"
