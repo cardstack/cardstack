@@ -185,6 +185,16 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
             card: COMPILED_DATE_CARD,
             name: 'startDate',
           },
+          items: {
+            type: 'containsMany',
+            card: COMPILED_STRING_CARD,
+            name: 'items',
+          },
+          events: {
+            type: 'containsMany',
+            card: COMPILED_DATE_CARD,
+            name: 'events',
+          },
         },
         usedFields,
         importAndChooseName,
@@ -206,7 +216,12 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         `<label>{{"title"}}</label>
          {{@model.title}}
          <label>{{"startDate"}}</label>
-         <BestGuess @model={{@model.startDate}} />`
+         <BestGuess @model={{@model.startDate}} />
+         <label>{{"items"}}</label>
+         {{#each @model.items as |item|}}{{item}}{{/each}}
+         <label>{{"events"}}</label>
+         {{#each @model.events as |event|}}<BestGuess @model={{event}} />{{/each}}
+         `
       );
     });
   });
