@@ -10,7 +10,8 @@ import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
 import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract';
-import { BigNumber } from '@ethersproject/bignumber';
+import BN from 'bn.js';
+import { toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
 import {
   TokenBridgeForeignSide,
@@ -49,9 +50,9 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   @tracked currentProviderId: string | undefined;
   @tracked walletInfo = new WalletInfo([], this.chainId);
 
-  @tracked defaultTokenBalance: BigNumber | undefined;
-  @tracked daiBalance: BigNumber | undefined;
-  @tracked cardBalance: BigNumber | undefined;
+  @tracked defaultTokenBalance: BN | undefined;
+  @tracked daiBalance: BN | undefined;
+  @tracked cardBalance: BN | undefined;
   #waitForAccountDeferred = defer<void>();
 
   constructor() {
@@ -224,17 +225,15 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   }
 
   async refreshBalances() {
-    let balances = await Promise.all<String>([
+    let balances = await Promise.all<string>([
       this.getDefaultTokenBalance(),
       this.getErc20Balance(this.daiTokenContract),
       this.getErc20Balance(this.cardTokenContract),
     ]);
-    let [defaultTokenBalance, daiBalance, cardBalance] = balances.map((b) =>
-      BigNumber.from(b)
-    );
-    this.defaultTokenBalance = BigNumber.from(defaultTokenBalance);
-    this.daiBalance = BigNumber.from(daiBalance);
-    this.cardBalance = BigNumber.from(cardBalance);
+    let [defaultTokenBalance, daiBalance, cardBalance] = balances;
+    this.defaultTokenBalance = toBN(defaultTokenBalance);
+    this.daiBalance = toBN(daiBalance);
+    this.cardBalance = toBN(cardBalance);
   }
   async getDefaultTokenBalance() {
     if (this.walletInfo.firstAddress)
@@ -248,10 +247,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     return contract.methods.balanceOf(this.walletInfo.firstAddress).call();
   }
 
-  approve(
-    amountInWei: BigNumber,
-    tokenSymbol: string
-  ): Promise<TransactionReceipt> {
+  approve(amountInWei: BN, tokenSymbol: string): Promise<TransactionReceipt> {
     let tokenBridge = new TokenBridgeForeignSide(this.web3);
     let token = this.getTokenBySymbol(tokenSymbol);
     return tokenBridge.unlockTokens(token.address, amountInWei.toString());
@@ -260,7 +256,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   relayTokens(
     tokenSymbol: string,
     receiverAddress: string,
-    amountInWei: BigNumber
+    amountInWei: BN
   ): Promise<TransactionReceipt> {
     let tokenBridge = new TokenBridgeForeignSide(this.web3);
     let token = this.getTokenBySymbol(tokenSymbol);

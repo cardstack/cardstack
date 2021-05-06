@@ -7,8 +7,8 @@ import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import { TransactionReceipt } from 'web3-core';
-import { BigNumber } from '@ethersproject/bignumber';
-import { parseEther } from '@ethersproject/units';
+import BN from 'bn.js';
+import { toBN, toWei } from 'web3-utils';
 
 interface CardPayDepositWorkflowTransactionAmountComponentArgs {
   workflowSession: WorkflowSession;
@@ -64,14 +64,14 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
     }
   }
 
-  get currentTokenBalance(): BigNumber {
+  get currentTokenBalance(): BN {
     let balance;
     if (this.currentTokenSymbol === 'DAI') {
       balance = this.layer1Network.daiBalance;
     } else if (this.currentTokenSymbol === 'CARD') {
       balance = this.layer1Network.cardBalance;
     }
-    return balance || BigNumber.from(0);
+    return balance || toBN(0);
   }
 
   get currentTokenBalanceInUsd(): string {
@@ -108,22 +108,14 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
     return this.amount;
   }
 
-  get amountAsBigNumber(): BigNumber {
-    // parseEther as of @ethersproject/units@5.1.0 uses @ethersproject/bignumber@5.1.0
-    // This has problems with `toBigInt`: https://github.com/ethers-io/ethers.js/pull/1485
-    // To prevent this, we use BigNumber.from to get an instance of BigNumber from
-    // @ethersproject/bignumber@5.1.1 with the fix
-    // This may need to change when tokens with precision not equal to 18 are added
-    // @ethersproject/units has a utility `parseUnits` that can provide similar functionality
-    // and is used by parseEther
-    return BigNumber.from(parseEther(this.amount || '0').toHexString());
+  get amountAsBigNumber(): BN {
+    return toBN(toWei(this.amount || '0'));
   }
 
   get isValidAmount() {
     if (!this.amount) return false;
     return (
-      !this.amountAsBigNumber.isZero() &&
-      !this.amountAsBigNumber.isNegative() &&
+      !this.amountAsBigNumber.lte(toBN(0)) &&
       this.amountAsBigNumber.lte(this.currentTokenBalance)
     );
   }

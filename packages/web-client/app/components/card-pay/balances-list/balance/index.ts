@@ -1,11 +1,9 @@
-// ethereum-token
-
-import { BigNumber } from '@ethersproject/bignumber';
+import BN from 'bn.js';
 import Component from '@glimmer/component';
 
 interface CardPayBalancesListBalanceComponentArgs {
   symbol: string;
-  amount: BigNumber;
+  amount: BN;
 }
 
 export default class CardPayBalancesListBalanceComponent extends Component<CardPayBalancesListBalanceComponentArgs> {
