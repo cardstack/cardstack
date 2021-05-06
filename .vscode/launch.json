@@ -138,7 +138,7 @@
       "console": "integratedTerminal",
       "env": {},
       "args": [
-        "oracle-updated-at",
+        "price-oracle-updated-at",
         "DAI",
         "1",
         "--network", "sokol",

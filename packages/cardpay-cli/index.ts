@@ -5,7 +5,7 @@ import bridge from './bridge.js';
 import awaitBridged from './await-bridged.js';
 import viewSafes from './view-safes.js';
 import createPrepaidCard from './create-prepaid-card.js';
-import { usdPrice, ethPrice, oracleUpdatedAt } from './exchange-rate';
+import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -17,7 +17,7 @@ type Commands =
   | 'prepaidCardCreate'
   | 'usdPrice'
   | 'ethPrice'
-  | 'oracleUpdatedAt';
+  | 'priceOracleUpdatedAt';
 
 let command: Commands | undefined;
 interface Options {
@@ -100,7 +100,7 @@ const {
         description: 'The token address (defaults to Kovan DAI)',
       });
       yargs.positional('amounts', {
-        type: 'string',
+        type: 'number',
         description: 'The amount of tokens used to create each prepaid card (*not* in units of wei)',
       });
       command = 'prepaidCardCreate';
@@ -115,7 +115,8 @@ const {
         description: 'The token symbol (without the .CPXD suffix)',
       });
       yargs.positional('amount', {
-        type: 'string',
+        type: 'number',
+        default: 1,
         description: 'The amount of the specified token (*not* in units of wei)',
       });
       command = 'usdPrice';
@@ -130,21 +131,22 @@ const {
         description: 'The token symbol (without the .CPXD suffix)',
       });
       yargs.positional('amount', {
-        type: 'string',
+        type: 'number',
+        default: 1,
         description: 'The amount of the specified token (*not* in units of wei)',
       });
       command = 'ethPrice';
     }
   )
   .command(
-    'oracle-updated-at <token>',
+    'price-oracle-updated-at <token>',
     'Get the date that the oracle was last updated for the specified token',
     (yargs) => {
       yargs.positional('token', {
         type: 'string',
         description: 'The token symbol (without the .CPXD suffix)',
       });
-      command = 'oracleUpdatedAt';
+      command = 'priceOracleUpdatedAt';
     }
   )
   .options({
@@ -214,12 +216,12 @@ if (!command) {
       }
       await ethPrice(network, mnemonic, token, amount);
       break;
-    case 'oracleUpdatedAt':
+    case 'priceOracleUpdatedAt':
       if (token == null) {
         yargs.showHelp('token is a required value');
         process.exit(1);
       }
-      await oracleUpdatedAt(network, mnemonic, token);
+      await priceOracleUpdatedAt(network, mnemonic, token);
       break;
     default:
       assertNever(command);
