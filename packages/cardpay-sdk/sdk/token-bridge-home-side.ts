@@ -4,6 +4,7 @@ import { EventData } from 'web3-eth-contract';
 import HomeBridgeABI from '../contracts/abi/home-bridge-mediator';
 import { getAddress } from '../contracts/addresses';
 import { waitForEvent, waitUntilTransactionMined } from './utils';
+import BN from 'bn.js';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -12,7 +13,7 @@ import { waitForEvent, waitUntilTransactionMined } from './utils';
 export default class TokenBridgeHomeSide {
   constructor(private layer2Web3: Web3) {}
 
-  async waitForBridgingCompleted(recipientAddress: string, fromBlock: number): Promise<TransactionReceipt> {
+  async waitForBridgingCompleted(recipientAddress: string, fromBlock: BN): Promise<TransactionReceipt> {
     let homeBridge = new this.layer2Web3.eth.Contract(
       HomeBridgeABI as any,
       await getAddress('homeBridge', this.layer2Web3)
@@ -21,7 +22,7 @@ export default class TokenBridgeHomeSide {
       filter: {
         recipient: recipientAddress,
       },
-      fromBlock,
+      fromBlock: fromBlock.toString(),
     };
     let events = await homeBridge.getPastEvents('TokensBridgedToSafe', opts);
     let event!: EventData;

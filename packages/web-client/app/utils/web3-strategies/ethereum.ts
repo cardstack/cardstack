@@ -1,6 +1,6 @@
 import { tracked } from '@glimmer/tracking';
 import { Layer1Web3Strategy, TransactionHash } from './types';
-import { BigNumber } from '@ethersproject/bignumber';
+import BN from 'bn.js';
 import { WalletProvider } from '../wallet-providers';
 import { defer } from 'rsvp';
 import { TransactionReceipt } from 'web3-core';
@@ -17,9 +17,9 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
   }
 
   @tracked currentProviderId: string | undefined;
-  @tracked defaultTokenBalance: BigNumber | undefined;
-  @tracked daiBalance: BigNumber | undefined;
-  @tracked cardBalance: BigNumber | undefined;
+  @tracked defaultTokenBalance: BN | undefined;
+  @tracked daiBalance: BN | undefined;
+  @tracked cardBalance: BN | undefined;
 
   connect(walletProvider: WalletProvider): Promise<void> {
     throw new Error(`Method not implemented. ${walletProvider}`);
@@ -30,7 +30,7 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
   }
 
   approve(
-    _amountInWei: BigNumber, // eslint-disable-line no-unused-vars
+    _amountInWei: BN, // eslint-disable-line no-unused-vars
     _token: string // eslint-disable-line no-unused-vars
   ): Promise<TransactionReceipt> {
     throw new Error('Method not implemented.');
@@ -39,7 +39,7 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
   relayTokens(
     _token: string, // eslint-disable-line no-unused-vars
     _destinationAddress: string, // eslint-disable-line no-unused-vars
-    _amountInWei: BigNumber // eslint-disable-line no-unused-vars
+    _amountInWei: BN // eslint-disable-line no-unused-vars
   ): Promise<TransactionReceipt> {
     throw new Error('Method not implemented.');
   }

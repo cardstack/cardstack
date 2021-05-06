@@ -3,7 +3,7 @@ import WalletInfo from '../wallet-info';
 import { Layer1Web3Strategy, TransactionHash } from './types';
 import { defer } from 'rsvp';
 import RSVP from 'rsvp';
-import { BigNumber } from '@ethersproject/bignumber';
+import BN from 'bn.js';
 import { WalletProvider } from '../wallet-providers';
 import { TransactionReceipt } from 'web3-core';
 
@@ -16,9 +16,9 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
 
   // Balances are settable in this test implementation
-  @tracked defaultTokenBalance: BigNumber | undefined;
-  @tracked daiBalance: BigNumber | undefined;
-  @tracked cardBalance: BigNumber | undefined;
+  @tracked defaultTokenBalance: BN | undefined;
+  @tracked daiBalance: BN | undefined;
+  @tracked cardBalance: BN | undefined;
 
   waitForAccountDeferred = defer();
   #unlockDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
@@ -35,7 +35,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   }
 
   // eslint-disable-next-line no-unused-vars
-  approve(_amountInWei: BigNumber, _token: string) {
+  approve(_amountInWei: BN, _token: string) {
     this.#unlockDeferred = RSVP.defer();
     return this.#unlockDeferred.promise;
   }
@@ -43,7 +43,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   relayTokens(
     _token: string, // eslint-disable-line no-unused-vars
     _destinationAddress: string, // eslint-disable-line no-unused-vars
-    _amountInWei: BigNumber // eslint-disable-line no-unused-vars
+    _amountInWei: BN // eslint-disable-line no-unused-vars
   ) {
     this.#depositDeferred = RSVP.defer();
     return this.#depositDeferred.promise;
@@ -76,9 +76,9 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   }
 
   test__simulateBalances(balances: {
-    defaultToken: BigNumber | undefined;
-    dai: BigNumber | undefined;
-    card: BigNumber | undefined;
+    defaultToken: BN | undefined;
+    dai: BN | undefined;
+    card: BN | undefined;
   }) {
     if (balances.defaultToken) {
       this.defaultTokenBalance = balances.defaultToken;

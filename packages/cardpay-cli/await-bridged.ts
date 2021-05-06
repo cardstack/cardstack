@@ -1,6 +1,7 @@
 import HDWalletProvider from 'parity-hdwallet-provider';
 import Web3 from 'web3';
 import { HttpProvider, TokenBridgeHomeSide, getConstant, networkIds } from '@cardstack/cardpay-sdk';
+import { toBN } from 'web3-utils';
 
 export default async function (
   network: string,
@@ -23,6 +24,6 @@ export default async function (
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log('Waiting for bridging to complete...');
-  let result = await tokenBridge.waitForBridgingCompleted(recipient, fromBlock);
+  let result = await tokenBridge.waitForBridgingCompleted(recipient, toBN(fromBlock));
   console.log(`Bridging transaction hash: ${blockExplorer}/tx/${result.transactionHash}`);
 }
