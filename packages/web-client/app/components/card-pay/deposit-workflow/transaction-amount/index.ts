@@ -172,7 +172,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
       layer2BlockHeightBeforeBridging
     );
     taskFor(this.layer1Network.relayTokens)
-      .perform(this.amountAsBigNumber, tokenSymbol, layer2Address)
+      .perform(tokenSymbol, layer2Address, this.amountAsBigNumber)
       .then((transactionReceipt: TransactionReceipt) => {
         this.relayTokensTxnReceipt = transactionReceipt;
         this.args.workflowSession.update(

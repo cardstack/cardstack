@@ -41,9 +41,9 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   }
 
   relayTokens(
-    _amountInWei: BigNumber, // eslint-disable-line no-unused-vars
     _token: string, // eslint-disable-line no-unused-vars
-    _destinationAddress: string // eslint-disable-line no-unused-vars
+    _destinationAddress: string, // eslint-disable-line no-unused-vars
+    _amountInWei: BigNumber // eslint-disable-line no-unused-vars
   ) {
     this.#depositDeferred = RSVP.defer();
     return this.#depositDeferred.promise;

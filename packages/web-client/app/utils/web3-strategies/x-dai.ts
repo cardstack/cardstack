@@ -3,15 +3,17 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import Web3 from 'web3';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
-import { Layer2Web3Strategy, TransactionHash } from './types';
+import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
 import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
 import { BigNumber } from '@ethersproject/bignumber';
+import { TransactionReceipt } from 'web3-core';
 import {
   networkIds,
   getConstantByNetwork,
-} from '@cardstack/cardpay-sdk/index.js';
+  TokenBridgeHomeSide,
+} from '@cardstack/cardpay-sdk';
 
 export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'xDai Chain';
@@ -107,5 +109,13 @@ export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
   async getBlockHeight(): Promise<BigNumber> {
     const result = await this.web3.eth.getBlockNumber();
     return BigNumber.from(result);
+  }
+
+  awaitBridged(
+    fromBlock: number,
+    receiver: ChainAddress
+  ): Promise<TransactionReceipt> {
+    let tokenBridge = new TokenBridgeHomeSide(this.web3);
+    return tokenBridge.waitForBridgingCompleted(receiver, fromBlock);
   }
 }

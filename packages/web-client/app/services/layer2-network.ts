@@ -46,6 +46,10 @@ export default class Layer2Network extends Service {
     return this.strategy.getBlockHeight();
   }
 
+  async awaitBridged(fromBlock: number) {
+    return this.strategy.awaitBridged(fromBlock, this.walletInfo.firstAddress!);
+  }
+
   blockExplorerUrl(txnHash: string | undefined): string | undefined {
     return txnHash ? this.strategy.blockExplorerUrl(txnHash) : undefined;
   }

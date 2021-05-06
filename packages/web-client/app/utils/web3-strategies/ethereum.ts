@@ -37,9 +37,9 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
   }
 
   relayTokens(
-    _amountInWei: BigNumber, // eslint-disable-line no-unused-vars
     _token: string, // eslint-disable-line no-unused-vars
-    _destinationAddress: string // eslint-disable-line no-unused-vars
+    _destinationAddress: string, // eslint-disable-line no-unused-vars
+    _amountInWei: BigNumber // eslint-disable-line no-unused-vars
   ): Promise<TransactionReceipt> {
     throw new Error('Method not implemented.');
   }
