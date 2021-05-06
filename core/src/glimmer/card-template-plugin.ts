@@ -11,7 +11,10 @@ import { singularize } from 'inflection';
 import { capitalize, cloneDeep } from 'lodash';
 import { inlineTemplateForField } from './inline-field-plugin';
 
-const MODEL_PREFIX = '@model.';
+const MODEL = '@model';
+const MODEL_PREFIX = `${MODEL}.`;
+const FIELDS = '@fields';
+// const FIELDS_PREFIX = `${FIELDS}.`;
 
 type ImportAndChooseName = (
   desiredName: string,
@@ -71,6 +74,10 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
       name: 'card-glimmer-plugin',
       visitor: {
         ElementNode(node, path): Statement[] | undefined {
+          if (node.tag === FIELDS) {
+            throw new Error('Invalid use of @fields API');
+          }
+
           if (
             state.insidePluralFieldIterator &&
             node.tag === state.insidePluralFieldIterator.blockProgramUsage
@@ -120,6 +127,11 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               );
             }
           }
+
+          if (node.original === FIELDS) {
+            throw new Error('Invalid use of @fields API');
+          }
+
           return undefined;
         },
 
@@ -141,6 +153,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
                     field,
                   });
                 }
+
                 output = output.concat(copied);
               }
               return output;
@@ -158,13 +171,8 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             };
             return undefined;
           },
-          exit(node /*, path*/) {
+          exit(/*node , path*/) {
             state.insidePluralFieldIterator = undefined;
-
-            if (isFieldsIterator(node)) {
-              // TODO: It what scenarios do we need this
-              //   state.insideFieldsIterator = undefined;
-            }
           },
         },
       },

@@ -9,6 +9,7 @@ function importAndChooseName() {
 }
 
 QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
+  let options: Options;
   let usedFields: ComponentInfo['usedFields'];
 
   hooks.beforeEach(function () {
@@ -56,7 +57,6 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
   });
 
   QUnit.module('Fields: inlinable: containsMany', function (hooks) {
-    let options: Options;
     hooks.beforeEach(function () {
       options = {
         fields: {
@@ -137,7 +137,6 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
   });
 
   QUnit.module('Fields: not-inlinable: containsMany', function (hooks) {
-    let options: Options;
     hooks.beforeEach(function () {
       options = {
         fields: {
@@ -170,8 +169,6 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
   });
 
   QUnit.module('@fields API', function (hooks) {
-    let options: Options;
-
     hooks.beforeEach(function () {
       options = {
         fields: {
@@ -224,5 +221,32 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
          `
       );
     });
+
+    QUnit.test(
+      'Errors when trying to pass @fields API through helper',
+      async function (assert) {
+        assert.throws(function () {
+          transform(
+            `{{#each-in (some-helper @fields) as |name Field|}}
+              <label>{{name}}</label>
+             {{/each-in}}`,
+            options
+          );
+        }, /Invalid use of @fields API/);
+      }
+    );
+
+    QUnit.test(
+      'Errors when using fields anywhere other than #each loop',
+      async function (assert) {
+        assert.throws(function () {
+          transform(`<SomeCompontent @arrg={{@fields}} />`, options);
+        }, /Invalid use of @fields API/);
+
+        assert.throws(function () {
+          transform(`<@fields />`, options);
+        }, /Invalid use of @fields API/);
+      }
+    );
   });
 });
