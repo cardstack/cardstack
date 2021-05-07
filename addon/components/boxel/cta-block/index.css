@@ -29,10 +29,6 @@
   --cta-block-text-color: var(--boxel-purple-300);
 }
 
-.boxel-cta-block--dark.boxel-cta-block--disabled {
-  --cta-block-background-color: rgba(57, 54, 66, 0.9);
-}
-
 .boxel-cta-block--light {
   --cta-block-background-color: var(--boxel-purple-100);
   --cta-block-emphasis-text-color: var(--boxel-dark);
@@ -48,6 +44,7 @@
 .boxel-cta-block--disabled.boxel-cta-block--has-step {
   --cta-block-padding-horizontal: var(--boxel-sp-lg);
   --cta-block-padding-vertical: var(--boxel-sp-xs);
+  --cta-block-background-color: rgba(57, 54, 66, 0.9);
 }
 
 /* add the step using a pseudoelement */
@@ -97,7 +94,10 @@
   color: var(--cta-block-emphasis-text-color);
 }
 
-/* The lock icon and notice is not shown when the cta is disabled */
+/*
+  The lock icon and notice is not shown when the cta is disabled
+  and we have a step. This is handled in the template
+ */
 .boxel-cta-block__private-notice {
   --boxel-cta-block-lock-icon-size: 0.75rem;
 
@@ -112,11 +112,6 @@
   width: var(--boxel-cta-block-lock-icon-size);
   height: var(--boxel-cta-block-lock-icon-size);
   margin-left: var(--boxel-sp-xs);
-}
-
-.boxel-cta-block--disabled .boxel-cta-block__private-notice,
-.boxel-cta-block--disabled .boxel-cta-block__lock-icon {
-  display: none;
 }
 
 /*

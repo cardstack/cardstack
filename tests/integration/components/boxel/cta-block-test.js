@@ -54,11 +54,13 @@ module('Integration | Component | CtaBlock', function (hooks) {
   test('it accepts and renders the disabled named block with the ActionButton component', async function (assert) {
     this.setProperties({
       state: 'disabled',
+      stepNumber: null,
       mainActionButtonText,
     });
     await render(hbs`
       <Boxel::CtaBlock
         @state={{this.state}}
+        @stepNumber={{this.stepNumber}}
       >
       <:disabled as |d|>
         <d.ActionButton>
@@ -69,6 +71,9 @@ module('Integration | Component | CtaBlock', function (hooks) {
     `);
     assert.dom(MAIN_ACTION_BUTTON_SELECTOR).containsText(mainActionButtonText);
     assert.dom(MAIN_ACTION_BUTTON_SELECTOR).isDisabled();
+    assert.dom(DEFAULT_PRIVATE_NOTICE_SELECTOR).isVisible();
+
+    this.set('stepNumber', 1);
     assert.dom(DEFAULT_PRIVATE_NOTICE_SELECTOR).isNotVisible();
 
     await a11yAudit();

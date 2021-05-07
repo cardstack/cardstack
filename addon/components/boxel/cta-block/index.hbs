@@ -91,7 +91,10 @@
       to="memorialized"
     }}
   {{/if}}
-
-  <span class="boxel-cta-block__private-notice" data-test-boxel-cta-block-private-notice>Actions only visible to you</span>
-  {{svg-jar "lock" class="boxel-cta-block__lock-icon" role="presentation"}}
+  {{!-- in any state except: disabled + has a step, we want the lock shown --}}
+  {{!-- template-lint-disable simple-unless --}}
+  {{#unless (and this.isDisabled @stepNumber)}}
+    <span class="boxel-cta-block__private-notice" data-test-boxel-cta-block-private-notice>Actions only visible to you</span>
+    {{svg-jar "lock" class="boxel-cta-block__lock-icon" role="presentation"}}
+  {{/unless}}
 </div>
