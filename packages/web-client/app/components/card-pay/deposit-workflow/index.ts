@@ -10,7 +10,7 @@ import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-car
 
 let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
 
-class NetworkAwareWorflowMessage extends WorkflowMessage {
+class NetworkAwareWorkflowMessage extends WorkflowMessage {
   get hasLayer1Account() {
     let postable = this as WorkflowPostable;
     let layer1Network = postable.workflow?.owner.lookup(
@@ -55,12 +55,12 @@ class DepositWorkflow extends Workflow {
         them to the Reserve Pool on mainnet. Once you have made your deposit, an equivalent amount of
         tokens will be minted and added to your xDai Chain Wallet.`,
         }),
-        new NetworkAwareWorflowMessage({
+        new NetworkAwareWorkflowMessage({
           author: cardbot,
           message: `Looks like you've already connected your Ethereum mainnet wallet, which you can see below.
           Please continue with the next step of this workflow.`,
           includeIf() {
-            return (this as NetworkAwareWorflowMessage).hasLayer1Account;
+            return (this as NetworkAwareWorkflowMessage).hasLayer1Account;
           },
         }),
         new WorkflowCard({
@@ -73,29 +73,29 @@ class DepositWorkflow extends Workflow {
     new Milestone({
       title: 'Connect xDai chain wallet',
       postables: [
-        new NetworkAwareWorflowMessage({
+        new NetworkAwareWorkflowMessage({
           author: cardbot,
           message: `Looks like you've already connected your xDai chain wallet, which you can see below.
           Please continue with the next step of this workflow.`,
           includeIf() {
-            return (this as NetworkAwareWorflowMessage).hasLayer2Account;
+            return (this as NetworkAwareWorkflowMessage).hasLayer2Account;
           },
         }),
-        new NetworkAwareWorflowMessage({
+        new NetworkAwareWorkflowMessage({
           author: cardbot,
           message: `You have connected your Ethereum mainnet wallet. Now it's time to connect your xDai chain
           wallet via your Cardstack mobile app. If you don't have the app installed, please do so now.`,
           includeIf() {
-            return !(this as NetworkAwareWorflowMessage).hasLayer2Account;
+            return !(this as NetworkAwareWorkflowMessage).hasLayer2Account;
           },
         }),
-        new NetworkAwareWorflowMessage({
+        new NetworkAwareWorkflowMessage({
           author: cardbot,
           message: `Once you have installed the app, open the app and add an existing wallet/account or create a
           new wallet/account. Use your account to scan this QR code, which will connect your account
           with Card Pay.`,
           includeIf() {
-            return !(this as NetworkAwareWorflowMessage).hasLayer2Account;
+            return !(this as NetworkAwareWorkflowMessage).hasLayer2Account;
           },
         }),
         new WorkflowCard({

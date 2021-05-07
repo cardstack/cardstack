@@ -28,7 +28,7 @@ module('Integration | Component | transaction-amount', function (hooks) {
     };
   };
 
-  test('It disables the unlock button when amount entered is less than balance (18-decimal floating point)', async function (assert) {
+  test('It disables the unlock button when amount entered is more than balance (18-decimal floating point)', async function (assert) {
     const startDaiAmountString = '5.111111111111111110';
     const daiToSend = '5.111111111111111111';
     let startDaiAmount = toWei(startDaiAmountString);
