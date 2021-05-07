@@ -3,6 +3,7 @@ export { default as TokenBridgeHomeSide } from './sdk/token-bridge-home-side';
 export { default as Safes, SafeInfo } from './sdk/safes';
 export { default as PrepaidCard } from './sdk/prepaid-card';
 export { default as ExchangeRate } from './sdk/exchange-rate';
+export { default as Assets } from './sdk/assets';
 
 export { getAddress, getAddressByNetwork, getOracle, getOracleByNetwork } from './contracts/addresses';
 export { getConstant, getConstantByNetwork, networks, networkIds } from './sdk/constants';
