@@ -497,9 +497,9 @@ module('Acceptance | deposit', function (hooks) {
       .dom(postableSel(2, 0))
       .containsText('choose the asset you would like to deposit');
     assert
-      .dom(`${postableSel(0, 4)} [data-test-boxel-cta-block-button]`)
+      .dom(`${postableSel(0, 4)} [data-test-mainnet-disconnect-button]`)
       .containsText('Disconnect Wallet');
-    await click(`${postableSel(0, 4)} [data-test-boxel-cta-block-button]`);
+    await click(`${postableSel(0, 4)} [data-test-mainnet-disconnect-button]`);
     assert
       .dom(postableSel(0, 4))
       .containsText('Connect your Ethereum mainnet wallet');
@@ -560,10 +560,12 @@ module('Acceptance | deposit', function (hooks) {
       .containsText('choose the asset you would like to deposit');
     assert.dom('[data-test-layer-2-wallet-card]').containsText('0.1422');
     assert
-      .dom('[data-test-layer-2-wallet-card] [data-test-boxel-cta-block-button]')
+      .dom(
+        '[data-test-layer-2-wallet-card] [data-test-layer-2-wallet-disconnect-button]'
+      )
       .containsText('Disconnect Wallet');
     await click(
-      `[data-test-layer-2-wallet-card] [data-test-boxel-cta-block-button]`
+      `[data-test-layer-2-wallet-card] [data-test-layer-2-wallet-disconnect-button]`
     );
     assert
       .dom('[data-test-layer-2-wallet-card]')

@@ -22,7 +22,7 @@
     "test:ember": "ember test"
   },
   "devDependencies": {
-    "@cardstack/boxel": "^0.6.0",
+    "@cardstack/boxel": "^0.6.1",
     "@cardstack/cardpay-sdk": "0.19.3",
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.2.5",

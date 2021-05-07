@@ -49,7 +49,7 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
     assert.dom(CONNECT_BUTTON_SELECTOR).isEnabled();
   });
 
-  test('It should be able to move between default (unconneced), loading, and connected states', async function (assert) {
+  test('It should be able to move between default (unconnected), loading, and connected states', async function (assert) {
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
 
