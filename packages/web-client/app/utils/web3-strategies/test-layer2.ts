@@ -1,10 +1,11 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
-import { Layer2Web3Strategy, TransactionHash } from './types';
+import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
 import RSVP, { defer } from 'rsvp';
 import BN from 'bn.js';
 import { toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
+import { SafeInfo } from '@cardstack/cardpay-sdk/sdk/safes';
 
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainName = 'L2 Test Chain';
@@ -23,6 +24,11 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   getBlockHeight(): Promise<BN> {
     return Promise.resolve(toBN(0));
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  fetchDepot(_owner: ChainAddress): Promise<SafeInfo | null> {
+    return Promise.resolve(null);
   }
 
   awaitBridged(

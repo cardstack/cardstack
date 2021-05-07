@@ -7,6 +7,7 @@ import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
+import { SafeInfo } from '@cardstack/cardpay-sdk/sdk/safes';
 
 export default class Layer2Network extends Service {
   strategy!: Layer2Web3Strategy;
@@ -46,6 +47,10 @@ export default class Layer2Network extends Service {
 
   async awaitBridged(fromBlock: BN) {
     return this.strategy.awaitBridged(fromBlock, this.walletInfo.firstAddress!);
+  }
+
+  async fetchDepot(): Promise<SafeInfo | null> {
+    return this.strategy.fetchDepot(this.walletInfo.firstAddress!);
   }
 
   blockExplorerUrl(txnHash: string | undefined): string | undefined {

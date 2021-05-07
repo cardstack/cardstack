@@ -15,6 +15,7 @@ import {
   getConstantByNetwork,
   TokenBridgeHomeSide,
 } from '@cardstack/cardpay-sdk';
+import Safes, { SafeInfo } from '@cardstack/cardpay-sdk/sdk/safes';
 
 export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'xDai Chain';
@@ -118,5 +119,15 @@ export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
   ): Promise<TransactionReceipt> {
     let tokenBridge = new TokenBridgeHomeSide(this.web3);
     return tokenBridge.waitForBridgingCompleted(receiver, fromBlock);
+  }
+
+  async fetchDepot(owner: ChainAddress): Promise<SafeInfo | null> {
+    let safesApi = new Safes(this.web3);
+    let safeInfos = await safesApi.view(owner);
+    safeInfos = safeInfos.filter((safe) => !safe.isPrepaidCard);
+    if (safeInfos.length) {
+      return safeInfos[safeInfos.length - 1];
+    }
+    return null;
   }
 }

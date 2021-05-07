@@ -2,6 +2,8 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { equal, and } from 'macro-decorators';
 import { inject as service } from '@ember/service';
+import { taskFor } from 'ember-concurrency-ts';
+import { task } from 'ember-concurrency-decorators';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import WorkflowSession from '../../../../models/workflow/workflow-session';
@@ -43,6 +45,19 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayD
   hasCardBalance: Boolean | undefined;
   @and('daiSelected', 'layer1Network.daiBalance')
   hasDaiBalance: Boolean | undefined;
+
+  constructor(
+    owner: unknown,
+    args: CardPayDepositWorkflowTransactionSetupComponentArgs
+  ) {
+    super(owner, args);
+    taskFor(this.fetchDepotTask).perform();
+  }
+
+  @task *fetchDepotTask(): any {
+    let depot = yield this.layer2Network.fetchDepot();
+    return depot;
+  }
 
   @action chooseSource(tokenSymbol: string) {
     this.args.workflowSession.update('depositSourceToken', tokenSymbol);

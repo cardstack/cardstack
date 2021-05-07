@@ -1,0 +1,7 @@
+.loading-indicator {
+  animation: spin 6000ms linear infinite;
+}
+
+@keyframes spin {
+  to {transform:rotate(360deg);}
+}
