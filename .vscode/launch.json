@@ -99,6 +99,37 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay: Price for face value",
+      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "price-for-face-value",
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
+        "10000",
+        "--network", "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: New prepaid card gas fee",
+      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "new-prepaidcard-gas-fee",
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
+        "--network", "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay: USD Price",
       "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
       "console": "integratedTerminal",

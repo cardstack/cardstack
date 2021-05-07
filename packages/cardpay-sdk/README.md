@@ -14,7 +14,8 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`Safes.view`](#safesview)
 - [`PrepaidCard`](#prepaidcard)
   - [`PrepaidCard.create`](#prepaidcardcreate)
-  - [`PrepaidCard.costForFaceValue` (TBD)](#prepaidcardcostforfacevalue-tbd)
+  - [`PrepaidCard.priceForFaceValue`](#prepaidcardpriceforfacevalue)
+  - [`PrepaidCard.gasFee`](#prepaidcardgasfee)
   - [`PrepaidCard.payMerchant` (TBD)](#prepaidcardpaymerchant-tbd)
   - [`PrepaidCard.split` (TBD)](#prepaidcardsplit-tbd)
   - [`PrepaidCard.transfer` (TBD)](#prepaidcardtransfer-tbd)
@@ -207,8 +208,22 @@ interface RelayTransaction {
 }
 ```
 
-### `PrepaidCard.costForFaceValue` (TBD)
-(provide options to get cost with and without gas taken into account)
+### `PrepaidCard.priceForFaceValue`
+This call will return the price in terms of the specified token of how much it costs to have a face value in the specified units of SPEND (**§**). This takes into account both the exchange rate of the specified token as well as gas fees that are deducted from the face value when creating a prepaid card. Note though, that the face value of the prepaid card in SPEND will drift based on the exchange rate of the underlying token used to create the prepaid card. (However, this drift should be very slight since we are using *stable* coins to purchase prepaid cards (emphasis on "stable"). Since the units of SPEND are very small relative to wei (**§** 1 === $0.01 USD), the face value input is a number type. This API returns the amount of tokens required to achieve a particular face value as a string in units of `wei` of the specified token.
+```js
+// You must send 'amountInDai' to the prepaidCardManager contract
+// to achieve a prepaid card with §5000 face value
+let amountInDAI = await prepaidCard.priceForFaceValue(daiCpxdAddress, 5000);
+```
+
+Note that if you are creating multiple cards or splitting cards, use this API to ensure the amount to provision for each prepaid card you want to create in order to achieve teh desired face values for each of the prepaid cards created.
+
+### `PrepaidCard.gasFee`
+This call will return the gas fee in terms of the specified token for the creation of a prepaid card. All prepaid cards will be seeded with some `CARD.CPXD` in order to pay our gnosis safe relayer for gas. In order to offset these costs, a small fee will be charged when creating or splitting a prepaid card. The gas fee that is charged is returned as a string value in units of `wei` of the specified token. This is the same fee that is accounted for in the `PrepaidCard.priceForFaceValue` API.
+```js
+let gasFeeInDai = await prepaidCard.gasFee(daiCpxdAddress);
+```
+
 ### `PrepaidCard.payMerchant` (TBD)
 ### `PrepaidCard.split` (TBD)
 ### `PrepaidCard.transfer` (TBD)
