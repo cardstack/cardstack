@@ -1,0 +1,7 @@
+.card-pay-nested-items__inner {
+  margin-top: var(--boxel-sp-xxxs);
+  margin-left: var(--boxel-sp-xl);
+  padding-top: calc(var(--boxel-sp) - var(--boxel-sp-xxxs));
+  padding-left: var(--boxel-sp-sm);
+  border-left: 1px solid var(--boxel-purple-300);
+}
