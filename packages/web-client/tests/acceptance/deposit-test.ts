@@ -134,7 +134,7 @@ module('Acceptance | deposit', function (hooks) {
 
     post = postableSel(2, 1);
 
-    // transaction-setup card (not complete)
+    // transaction-setup card
     await waitFor(`${post} [data-test-balance="DAI"]`);
     assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.5');
     // TODO assert.dom(`${post} [data-test-usd-balance="DAI"]`).containsText('');
@@ -161,7 +161,7 @@ module('Acceptance | deposit', function (hooks) {
     await click(
       `${post} [data-test-deposit-transaction-setup] [data-test-boxel-button]`
     );
-    // transaction-setup card (completed)
+    // transaction-setup card (memorialized)
     assert.dom(`${post} [data-test-option]`).doesNotExist();
     assert.dom(`${post} [data-test-option-view-only]`).exists({ count: 1 });
     assert
@@ -171,7 +171,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(`${post} [data-test-balance-view-only="DAI"]`)
       .containsText('250.5');
-
+    // transaction-amount card
     assert
       .dom(postableSel(2, 2))
       .containsText('How many tokens would you like to deposit?');
@@ -233,6 +233,7 @@ module('Acceptance | deposit', function (hooks) {
       .containsText('your token will be bridged to the xDai blockchain');
 
     post = postableSel(3, 1);
+    // transaction-status card
     assert
       .dom(`${post} [data-test-token-bridge-step="0"][data-test-completed]`)
       .exists();

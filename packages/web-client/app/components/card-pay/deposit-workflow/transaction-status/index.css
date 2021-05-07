@@ -1,0 +1,47 @@
+.transaction-status {
+  padding: var(--boxel-sp-xxl) var(--boxel-sp-lg);
+}
+
+.transaction-status > * + * {
+  margin-top: var(--boxel-sp-xxl);
+}
+
+.transaction-status__description {
+  margin: 0;
+  font-size: 1.125rem; /* 18px */
+  font-weight: 700;
+  line-height: calc(24/18);
+}
+
+.transaction-status__steps {
+  color: var(--boxel-dark);
+  font: 600 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.transaction-status__steps > li > span {
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto;
+  gap: var(--boxel-sp-xs) var(--boxel-sp);
+}
+
+.transaction-status__step-title {
+  max-width: 17.5rem; /* 280px */
+}
+
+.transaction-status__step-status {
+  justify-self: end;
+  font: 400 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+/* these have to interfere with boxel classes */
+.transaction-status__steps .boxel-progress-steps__item + .boxel-progress-steps__item::before {
+  height: var(--boxel-sp-xxxl);
+}
+
+.transaction-status__steps .boxel-progress-steps__item-bullet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
