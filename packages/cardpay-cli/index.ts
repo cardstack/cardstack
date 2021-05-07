@@ -5,7 +5,7 @@ import bridge from './bridge.js';
 import awaitBridged from './await-bridged.js';
 import { viewTokenBalance } from './assets';
 import viewSafes from './view-safes.js';
-import createPrepaidCard from './create-prepaid-card.js';
+import { createPrepaidCard, priceForFaceValue, gasFee } from './prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
 
 //@ts-ignore polyfilling fetch
@@ -19,6 +19,9 @@ type Commands =
   | 'usdPrice'
   | 'ethPrice'
   | 'priceOracleUpdatedAt'
+  | 'gasFee'
+  | 'priceForFaceValue'
+  | 'priceOracleUpdatedAt'
   | 'viewTokenBalance';
 
 let command: Commands | undefined;
@@ -31,6 +34,7 @@ interface Options {
   address?: string;
   token?: string;
   safeAddress?: string;
+  spendFaceValue?: number;
   receiver?: string;
   recipient?: string;
   amounts?: number[];
@@ -43,6 +47,7 @@ const {
   address,
   token,
   safeAddress,
+  spendFaceValue,
   fromBlock,
   receiver,
   recipient,
@@ -106,6 +111,32 @@ const {
         description: 'The amount of tokens used to create each prepaid card (*not* in units of wei)',
       });
       command = 'prepaidCardCreate';
+    }
+  )
+  .command(
+    'price-for-face-value <tokenAddress> <spendFaceValue>',
+    'Get the price in the units of the specified token to achieve a prepaid card with the specified face value in SPEND',
+    (yargs) => {
+      yargs.positional('tokenAddress', {
+        type: 'string',
+        description: 'The token address of the token that will be used to pay for the prepaid card',
+      });
+      yargs.positional('spendFaceValue', {
+        type: 'number',
+        description: 'The desired face value in SPEND for the prepaid card',
+      });
+      command = 'priceForFaceValue';
+    }
+  )
+  .command(
+    'new-prepaidcard-gas-fee <tokenAddress>',
+    'Get the gas fee in the units of the specified token for creating a new prepaid card.',
+    (yargs) => {
+      yargs.positional('tokenAddress', {
+        type: 'string',
+        description: 'The token address of the token that will be used to pay for the prepaid card',
+      });
+      command = 'gasFee';
     }
   )
   .command(
@@ -231,13 +262,27 @@ if (!command) {
       break;
     case 'priceOracleUpdatedAt':
       if (token == null) {
-        yargs.showHelp('token is a required value');
+        yargs.showHelp('tokenAddress is a required value');
         process.exit(1);
       }
       await priceOracleUpdatedAt(network, mnemonic, token);
       break;
     case 'viewTokenBalance':
       await viewTokenBalance(network, mnemonic, tokenAddress);
+      break;
+    case 'priceForFaceValue':
+      if (tokenAddress == null || spendFaceValue == null) {
+        yargs.showHelp('tokenAddress and spendFaceValue are required values');
+        process.exit(1);
+      }
+      await priceForFaceValue(network, mnemonic, tokenAddress, spendFaceValue);
+      break;
+    case 'gasFee':
+      if (tokenAddress == null) {
+        yargs.showHelp('token is a required value');
+        process.exit(1);
+      }
+      await gasFee(network, mnemonic, tokenAddress);
       break;
     default:
       assertNever(command);

@@ -5,6 +5,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../contracts/abi/erc-677.js';
+import PrepaidCardManagerABI from '../contracts/abi/prepaid-card-manager';
 import { getAddress } from '../contracts/addresses.js';
 import { getConstant, ZERO_ADDRESS } from './constants.js';
 
@@ -61,6 +62,22 @@ interface Signature {
 
 export default class PrepaidCard {
   constructor(private layer2Web3: Web3) {}
+
+  async priceForFaceValue(tokenAddress: string, spendFaceValue: number): Promise<string> {
+    let prepaidCardManager = new this.layer2Web3.eth.Contract(
+      PrepaidCardManagerABI as AbiItem[],
+      await getAddress('prepaidCardManager', this.layer2Web3)
+    );
+    return await prepaidCardManager.methods.priceForFaceValue(tokenAddress, String(spendFaceValue)).call();
+  }
+
+  async gasFee(tokenAddress: string): Promise<string> {
+    let prepaidCardManager = new this.layer2Web3.eth.Contract(
+      PrepaidCardManagerABI as AbiItem[],
+      await getAddress('prepaidCardManager', this.layer2Web3)
+    );
+    return await prepaidCardManager.methods.gasFee(tokenAddress).call();
+  }
 
   async create(
     safeAddress: string,

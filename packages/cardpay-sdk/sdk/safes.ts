@@ -6,7 +6,7 @@ import { AbiItem } from 'web3-utils';
 import { getAddress } from '../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from './constants';
 
-interface SafeInfo {
+export interface SafeInfo {
   address: string;
   isPrepaidCard: boolean;
   tokens: TokenInfo[];

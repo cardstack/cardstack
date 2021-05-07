@@ -47,6 +47,31 @@ export default [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: 'address',
+        name: 'issuer',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'card',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'GasFeeCollected',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: 'address',
         name: 'previousOwner',
@@ -241,6 +266,36 @@ export default [
       {
         internalType: 'address',
         name: 'issueToken',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'gasFeeCARDAmount',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'gasFeeReceiver',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
         type: 'address',
       },
     ],
@@ -494,6 +549,16 @@ export default [
         type: 'address',
       },
       {
+        internalType: 'address',
+        name: '_gasFeeReceiver',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: '_gasFeeCARDAmount',
+        type: 'uint256',
+      },
+      {
         internalType: 'address[]',
         name: '_payableTokens',
         type: 'address[]',
@@ -595,6 +660,32 @@ export default [
         internalType: 'bool',
         name: '',
         type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'spendFaceValue',
+        type: 'uint256',
+      },
+    ],
+    name: 'priceForFaceValue',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
     payable: false,
@@ -985,6 +1076,27 @@ export default [
     ],
     payable: true,
     stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+    ],
+    name: 'gasFee',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
 ];

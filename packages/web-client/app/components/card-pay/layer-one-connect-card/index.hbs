@@ -54,12 +54,17 @@
   </section>
   <Boxel::CtaBlock @state={{this.ctaState}}>
     <:default as |a|>
-      <a.ActionButton {{on "click" this.connect}}>
+      <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
         Connect Wallet
       </a.ActionButton>
     </:default>
+    <:disabled as |d|>
+      <d.ActionButton data-test-mainnet-connect-button>
+        Connect Wallet
+      </d.ActionButton>
+    </:disabled>
     <:in-progress as |i|>
-      <i.ActionButton>
+      <i.ActionButton data-test-mainnet-connect-button>
         Connecting
       </i.ActionButton>
       <i.CancelButton {{on "click" this.cancelConnection}}>
@@ -67,7 +72,7 @@
       </i.CancelButton>
     </:in-progress>
     <:memorialized as |m|>
-      <m.ActionButton {{on "click" this.disconnect}}>
+      <m.ActionButton {{on "click" this.disconnect}} data-test-mainnet-disconnect-button>
         Disconnect Wallet
       </m.ActionButton>
     </:memorialized>
