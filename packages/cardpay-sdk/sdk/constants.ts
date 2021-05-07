@@ -9,37 +9,49 @@ const MAINNET_INFURA_URL = 'https://mainnet.infura.io/v3';
 const MAINNET_INFURA_WSS_URL = 'wss://mainnet.infura.io/ws/v3';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+
+const SOKOL = {
+  blockExplorer: 'https://blockscout.com/poa/sokol',
+  nativeCoin: 'SPOA',
+  rpcNode: 'https://sokol.stack.cards',
+  rpcWssNode: 'https://sokol-wss.stack.cards',
+  relayServiceURL: 'https://relay-staging.stack.cards/api',
+  transactionServiceURL: 'https://transactions-staging.stack.cards/api',
+};
+const KOVAN = {
+  blockExplorer: 'https://kovan.etherscan.io',
+  bridgeExplorer: 'https://alm-test-amb.herokuapp.com/42',
+  nativeCoin: 'KETH',
+  rpcNode: `${KOVAN_INFURA_URL}/${INFURA_PROJECT_ID}`,
+  rpcWssNode: `${KOVAN_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
+};
+const MAINNET = {
+  blockExplorer: 'https://etherscan.io',
+  bridgeExplorer: 'https://alm-xdai.herokuapp.com',
+  nativeCoin: 'ETH',
+  rpcNode: `${MAINNET_INFURA_URL}/${INFURA_PROJECT_ID}`,
+  rpcWssNode: `${MAINNET_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
+};
+const XDAI = {
+  blockExplorer: 'https://blockscout.com/xdai/mainnet',
+  nativeCoin: 'DAI',
+  rpcNode: 'https://rpc.xdaichain.com',
+  rpcWssNode: 'wss://rpc.xdaichain.com/wss',
+  relayServiceURL: 'https://relay.cardstack.com/api',
+  transactionServiceURL: 'https://transactions.cardstack.com/api',
+};
+
+type ConstantKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof XDAI;
+
 const constants: {
   [network: string]: {
     [prop: string]: string;
   };
 } = Object.freeze({
-  sokol: {
-    blockExplorer: 'https://blockscout.com/poa/sokol',
-    rpcNode: 'https://sokol.stack.cards',
-    rpcWssNode: 'https://sokol-wss.stack.cards',
-    relayServiceURL: 'https://relay-staging.stack.cards/api',
-    transactionServiceURL: 'https://transactions-staging.stack.cards/api',
-  },
-  kovan: {
-    blockExplorer: 'https://kovan.etherscan.io',
-    bridgeExplorer: 'https://alm-test-amb.herokuapp.com/42',
-    rpcNode: `${KOVAN_INFURA_URL}/${INFURA_PROJECT_ID}`,
-    rpcWssNode: `${KOVAN_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
-  },
-  mainnet: {
-    blockExplorer: 'https://etherscan.io',
-    bridgeExplorer: 'https://alm-xdai.herokuapp.com',
-    rpcNode: `${MAINNET_INFURA_URL}/${INFURA_PROJECT_ID}`,
-    rpcWssNode: `${MAINNET_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
-  },
-  xdai: {
-    blockExplorer: 'https://blockscout.com/xdai/mainnet',
-    rpcNode: 'https://rpc.xdaichain.com',
-    rpcWssNode: 'wss://rpc.xdaichain.com/wss',
-    relayServiceURL: 'https://relay.cardstack.com/api',
-    transactionServiceURL: 'https://transactions.cardstack.com/api',
-  },
+  sokol: SOKOL,
+  kovan: KOVAN,
+  mainnet: MAINNET,
+  xdai: XDAI,
 });
 
 export const networks: { [networkId: number]: string } = Object.freeze({
@@ -50,7 +62,7 @@ export const networks: { [networkId: number]: string } = Object.freeze({
 });
 export const networkIds = (Object.freeze(invert({ ...networks })) as unknown) as { [networkName: string]: number };
 
-export function getConstantByNetwork(name: string, network: string): string {
+export function getConstantByNetwork(name: ConstantKeys, network: string): string {
   let value = constants[network][name];
   if (!value) {
     throw new Error(`Don't know about the constant '${name}' for network ${network}`);
@@ -58,9 +70,9 @@ export function getConstantByNetwork(name: string, network: string): string {
   return value;
 }
 
-export async function getConstant(name: string, network: string): Promise<string>;
-export async function getConstant(name: string, web3: Web3): Promise<string>;
-export async function getConstant(name: string, web3OrNetwork: Web3 | string): Promise<string> {
+export async function getConstant(name: ConstantKeys, network: string): Promise<string>;
+export async function getConstant(name: ConstantKeys, web3: Web3): Promise<string>;
+export async function getConstant(name: ConstantKeys, web3OrNetwork: Web3 | string): Promise<string> {
   let network: string;
   if (typeof web3OrNetwork === 'string') {
     network = web3OrNetwork;

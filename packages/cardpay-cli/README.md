@@ -13,6 +13,7 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay usd-price <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-usd-price-token-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay eth-price <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-eth-price-token-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay price-oracle-updated-at <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-price-oracle-updated-at-token---networknetwork---mnemonicmnemonic)
+  - [`yarn cardpay view-token-balance [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-view-token-balance-token_address---networknetwork---mnemonicmnemonic)
 
 
 
@@ -117,4 +118,17 @@ ARGUMENTS
   TOKEN     The token symbol (without the .CPXD suffix)
   NETWORK   The network to use ("sokol" or "xdai")
   MNEMONIC  (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+```
+
+## `yarn cardpay view-token-balance [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]`
+This returns the token balance for the given wallet.
+
+```
+USAGE
+  $ yarn cardpay view-token-balance [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]
+
+ARGUMENTS
+  TOKEN_ADDRESS     The address of the token to get the balance of. Defaults to native token for network
+  NETWORK           The network to use ("kovan", "mainnet", "sokol", "xdai")
+  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
 ```

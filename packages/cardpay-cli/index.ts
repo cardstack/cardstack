@@ -3,6 +3,7 @@ import yargs from 'yargs';
 import fetch from 'node-fetch';
 import bridge from './bridge.js';
 import awaitBridged from './await-bridged.js';
+import { viewTokenBalance } from './assets';
 import viewSafes from './view-safes.js';
 import createPrepaidCard from './create-prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
@@ -17,7 +18,8 @@ type Commands =
   | 'prepaidCardCreate'
   | 'usdPrice'
   | 'ethPrice'
-  | 'priceOracleUpdatedAt';
+  | 'priceOracleUpdatedAt'
+  | 'viewTokenBalance';
 
 let command: Commands | undefined;
 interface Options {
@@ -149,6 +151,17 @@ const {
       command = 'priceOracleUpdatedAt';
     }
   )
+  .command(
+    'view-token-balance [tokenAddress]',
+    'Get the native token balance for the given wallet tokenAddress and network',
+    (yargs) => {
+      yargs.positional('tokenAddress', {
+        type: 'string',
+        description: 'The address of the token to get the balance of. Defaults to native token for network',
+      });
+      command = 'viewTokenBalance';
+    }
+  )
   .options({
     network: {
       alias: 'n',
@@ -222,6 +235,9 @@ if (!command) {
         process.exit(1);
       }
       await priceOracleUpdatedAt(network, mnemonic, token);
+      break;
+    case 'viewTokenBalance':
+      await viewTokenBalance(network, mnemonic, tokenAddress);
       break;
     default:
       assertNever(command);
