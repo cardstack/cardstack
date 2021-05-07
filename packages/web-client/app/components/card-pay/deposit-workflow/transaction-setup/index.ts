@@ -53,7 +53,12 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayD
     args: CardPayDepositWorkflowTransactionSetupComponentArgs
   ) {
     super(owner, args);
-    taskFor(this.fetchDepotTask).perform();
+    taskFor(this.fetchDepotTask)
+      .perform()
+      .then((depot: { address: string } | null) => {
+        if (depot)
+          this.args.workflowSession.update('depotAddress', depot.address);
+      });
   }
 
   get selectedToken() {
