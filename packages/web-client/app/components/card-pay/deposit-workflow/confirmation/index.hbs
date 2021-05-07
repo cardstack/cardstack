@@ -9,24 +9,24 @@
     </header>
     <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
       <div class="card-pay-confirmation__transfer-network">
-        <span class="card-pay-confirmation__transfer-network-name">Ethereum Mainnet Wallet</span>
-        <Boxel::Button @as="anchor" @size="extra-small" href="something">
+        <span class="card-pay-confirmation__transfer-network-name">{{this.layer1Network.chainName}}</span>
+        <Boxel::Button @as="anchor" @size="extra-small" href={{this.depositTxnViewerUrl}}>
           View on Etherscan
         </Boxel::Button>
       </div>
       <div class="card-pay-confirmation__transaction">
         <div class="card-pay-confirmation__transaction-amount">
-          {{svg-jar "dai-token" class="card-pay-confirmation__transaction-token-icon"}}
-          2500 DAI
+          {{svg-jar this.depositedToken.icon class="card-pay-confirmation__transaction-token-icon"}}
+          {{format-token-amount this.depositedAmount}} {{this.depositedToken.symbol}}
         </div>
         <div class="card-pay-confirmation__transaction-preposition">
           from
         </div>
         <div class="card-pay-confirmation__transaction-wallet">
-          Ethereum mainnet wallet
+          {{this.layer1Network.chainName}} wallet
         </div>
         <div class="card-pay-confirmation__transaction-address">
-          0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6
+          {{this.layer1Network.walletInfo.firstAddress}}
         </div>
       </div>
     </Boxel::CardContainer>
@@ -39,7 +39,7 @@
   <div class="card-pay-confirmation__bridge-container">
     <div class="card-pay-confirmation__bridge-inner">
       Bridge
-      <Boxel::Button @as="anchor" @size="extra-small" href="something" class="card-pay-confirmation__bridge-inner-button">
+      <Boxel::Button @as="anchor" @size="extra-small" href={{this.bridgeExplorerUrl}} class="card-pay-confirmation__bridge-inner-button">
         View in Bridge Explorer
       </Boxel::Button>
     </div>
@@ -50,26 +50,26 @@
     </header>
     <Boxel::CardContainer class="card-pay-confirmation__action-taken">
       {{svg-jar "coins" class="card-pay-confirmation__action-taken-icon"}}
-      Minted from CARD Protocol on xDai chain
+      Minted from CARD Protocol on {{this.layer2Network.chainName}}
     </Boxel::CardContainer>
     {{svg-jar "arrow-right" class="card-pay-confirmation__down-arrow"}}
     <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
       <div class="card-pay-confirmation__transfer-network">
-        <span class="card-pay-confirmation__transfer-network-name">xDai chain</span>
-        <Boxel::Button @as="anchor" @size="extra-small" href="something">
+        <span class="card-pay-confirmation__transfer-network-name">{{this.layer2Network.chainName}} wallet</span>
+        <Boxel::Button @as="anchor" @size="extra-small" href={{this.blockscoutUrl}}>
           View on Blockscout
         </Boxel::Button>
       </div>
       <div class="card-pay-confirmation__transaction">
         <div class="card-pay-confirmation__transaction-amount">
-          {{svg-jar "dai-token" class="card-pay-confirmation__transaction-token-icon"}}
-          2500 DAI CPXD
+          {{svg-jar this.depositedToken.icon class="card-pay-confirmation__transaction-token-icon"}}
+          {{format-token-amount this.depositedAmount}} {{this.depositedToken.symbol}} CPXD
         </div>
         <div class="card-pay-confirmation__transaction-preposition">
           in
         </div>
         <div class="card-pay-confirmation__transaction-wallet">
-          xDai chain wallet
+          {{this.layer2Network.chainName}} wallet
         </div>
         <CardPay::NestedItems class="card-pay-confirmation__transaction-depot">
           <:outer>
@@ -80,7 +80,7 @@
               <div>
                 <div class="card-pay-confirmation__entity-text">Account</div>
                 <div class="card-pay-confirmation__entity-address" data-test-deposit-confirmation-account-address>
-                  {{truncate-middle "0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6" 7 4}}
+                  {{truncate-middle this.layer2Network.walletInfo.firstAddress 7 4}}
                 </div>
               </div>
             </div>
@@ -91,8 +91,8 @@
               <div>
                 <div class="card-pay-confirmation__entity-text">DEPOT:</div>
                 <div class="card-pay-confirmation__entity-address" data-test-deposit-confirmation-depot-address>
-                  {{#if true}}
-                    {{truncate-middle "0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6" 7 4}}
+                  {{#if this.depotAddress}}
+                    {{truncate-middle this.depotAddress 7 4}}
                   {{else}}
                     <LoadingIndicator class="deposit-card__loading-indicator"/>
                   {{/if}}
