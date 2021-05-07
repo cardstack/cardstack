@@ -7,6 +7,7 @@ import { task } from 'ember-concurrency-decorators';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import WorkflowSession from '../../../../models/workflow/workflow-session';
+import { toBN } from 'web3-utils';
 
 interface CardPayDepositWorkflowTransactionSetupComponentArgs {
   workflowSession: WorkflowSession;
@@ -19,18 +20,19 @@ interface token {
   description: string;
   icon: string;
 }
-const TOKENS: token[] = [
-  {
-    symbol: 'DAI',
-    description: 'USD-based stablecoin',
-    icon: 'dai-token',
-  },
-  {
-    symbol: 'CARD',
-    description: 'ERC-20 Cardstack token',
-    icon: 'card-token',
-  },
-];
+
+const DAI_TOKEN = {
+  symbol: 'DAI',
+  description: 'USD-based stablecoin',
+  icon: 'dai-token',
+};
+const CARD_TOKEN = {
+  symbol: 'CARD',
+  description: 'ERC-20 Cardstack token',
+  icon: 'card-token',
+};
+
+const TOKENS: token[] = [DAI_TOKEN, CARD_TOKEN];
 
 class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayDepositWorkflowTransactionSetupComponentArgs> {
   tokens = TOKENS;
@@ -52,6 +54,26 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayD
   ) {
     super(owner, args);
     taskFor(this.fetchDepotTask).perform();
+  }
+
+  get selectedToken() {
+    if (this.daiSelected) {
+      return DAI_TOKEN;
+    } else if (this.cardSelected) {
+      return CARD_TOKEN;
+    } else {
+      return undefined;
+    }
+  }
+
+  get selectedTokenBalance() {
+    if (this.daiSelected) {
+      return this.layer1Network.daiBalance;
+    } else if (this.cardSelected) {
+      return this.layer1Network.cardBalance;
+    } else {
+      return toBN(0);
+    }
   }
 
   @task *fetchDepotTask(): any {

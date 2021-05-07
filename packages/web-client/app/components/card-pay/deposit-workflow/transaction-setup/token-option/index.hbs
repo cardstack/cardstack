@@ -1,49 +1,32 @@
-{{#if @viewOnly}}
-  {{#if @checked}}
-    <div class="token-option__currency-display" data-test-option-view-only>
-      {{svg-jar @tokenIcon class="token-option__icon" role="presentation" width="40" height="40"}}
-      <div>
-        <div class="token-option__title" data-test-balance-view-only={{@tokenSymbol}}>
-          {{@balance}} {{uppercase @tokenSymbol}}
-        </div>
-        <div class="token-option__desc" data-test-usd-balance-view-only={{@tokenSymbol}}>
-          {{!-- TODO: usd balance --}}
-          ≈ $ USD
-        </div>
-      </div>
-    </div>
-  {{/if}}
-{{else}}
-  <label class={{cn "token-option" token-option--checked=@checked}} ...attributes>
-    <Input
-      name="deposit-token"
-      class={{cn "token-option__input" token-option__input--checked=@checked}}
-      @type="radio"
-      @checked={{@checked}}
-      {{on "input" @onInput}}
-    />
-    <div class="token-option__currency">
-      {{svg-jar @tokenIcon class="token-option__icon" role="presentation" width="40" height="40"}}
-      <div>
-        <div class="token-option__title" data-test-option={{@tokenSymbol}}>
-          {{@tokenSymbol}}
-        </div>
-        <div class="token-option__desc">
-          {{@tokenDescription}}
-        </div>
-      </div>
-    </div>
+<label class={{cn "token-option" token-option--checked=@checked}} ...attributes>
+  <Input
+    name="deposit-token"
+    class={{cn "token-option__input" token-option__input--checked=@checked}}
+    @type="radio"
+    @checked={{@checked}}
+    {{on "input" @onInput}}
+  />
+  <div class="token-option__currency">
+    {{svg-jar @tokenIcon class="token-option__icon" role="presentation" width="40" height="40"}}
     <div>
+      <div class="token-option__title" data-test-option={{@tokenSymbol}}>
+        {{@tokenSymbol}}
+      </div>
       <div class="token-option__desc">
-        Balance
-      </div>
-      <div class="token-option__value" data-test-balance={{@tokenSymbol}}>
-        {{@balance}} {{@tokenSymbol}}
-      </div>
-      <div class="token-option__desc" data-test-usd-balance={{@tokenSymbol}}>
-        {{!-- TODO: usd balance --}}
-        ≈ $ USD
+        {{@tokenDescription}}
       </div>
     </div>
-  </label>
-{{/if}}
+  </div>
+  <div>
+    <div class="token-option__desc">
+      Balance
+    </div>
+    <div class="token-option__value" data-test-balance={{@tokenSymbol}}>
+      {{@balance}} {{@tokenSymbol}}
+    </div>
+    <div class="token-option__desc" data-test-usd-balance={{@tokenSymbol}}>
+      {{!-- TODO: usd balance --}}
+      ≈ $ USD
+    </div>
+  </div>
+</label>
