@@ -11,6 +11,17 @@ const ten = new BN('10');
 export default class ExchangeRate {
   constructor(private layer2Web3: Web3) {}
 
+  async getUSDConverter(token: string): Promise<(amountInWei: string) => number> {
+    const oracle = await this.getOracleContract(token);
+    const usdRawRate = new BN((await oracle.methods.usdPrice().call()).price);
+    const oracleDecimals = Number(await oracle.methods.decimals().call());
+
+    return function convertToUsd(amountInWei: string): number {
+      let rawAmount = usdRawRate.mul(new BN(amountInWei)).div(ten.pow(tokenDecimals));
+      return safeFloatConvert(rawAmount, oracleDecimals);
+    };
+  }
+
   async getUSDPrice(token: string, amount: string): Promise<number> {
     let oracle = await this.getOracleContract(token);
     let usdRawRate = new BN((await oracle.methods.usdPrice().call()).price);

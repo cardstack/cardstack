@@ -27,6 +27,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RewardPool.withdraw` (TBD)](#rewardpoolwithdraw-tbd)
 - [`ExchangeRate`](#exchangerate)
   - [`ExchangeRate.getUSDPrice`](#exchangerategetusdprice)
+  - [`ExchangeRate.getUSDConverter`](#exchangerategetusdconverter)
   - [`ExchangeRate.getETHPrice`](#exchangerategetethprice)
   - [`ExchangeRate.getUpdatedAt`](#exchangerategetupdatedat)
 - [`getAddress`](#getaddress)
@@ -242,6 +243,7 @@ import { ExchangeRate } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider);
 let exchangeRate = new ExchangeRate(web3); // Layer 2 web3 instance
 ```
+
 ### `ExchangeRate.getUSDPrice`
 This call will return the USD value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a floating point value in units of USD. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function.
 
@@ -249,6 +251,14 @@ This call will return the USD value for the specified amount of the specified to
 let exchangeRate = new ExchangeRate(web3);
 let usdPrice = await exchangeRate.getUSDPrice("DAI", amountInWei);
 console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
+```
+### ExchangeRate.getUSDConverter
+This returns a function that converts an amount of a token in wei to USD. Similar to `ExchangeRate.getUSDPrice`, an exception will be thrown if we don't have the exchange rate for the token. The returned function accepts a string that represents an amount in wei and returns a number that represents the USD value of that amount of the token.
+
+```js
+let exchangeRate = new ExchangeRate(web3);
+let converter = await exchangeRate.getUSDConverter("DAI");
+console.log(`USD value: $${converter(amountInWei)} USD`);
 ```
 ### `ExchangeRate.getETHPrice`
 This call will return the ETH value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a string that represents the ETH value in units of `wei` as well. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function. You can also easily convert units of `wei` back into `ethers` by using the `Web3.utils.fromWei()` function.
