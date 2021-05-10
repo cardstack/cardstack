@@ -13,7 +13,7 @@ import { reads } from 'macro-decorators';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
 import { next } from '@ember/runloop';
-import { action } from '@ember/object';
+import { timeout } from 'ember-concurrency';
 
 interface CardPayLayerTwoConnectCardComponentArgs {
   onComplete: (() => void) | undefined;
@@ -51,14 +51,20 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
     this.isWaitingForConnection = true;
     yield this.layer2Network.waitForAccount;
     this.isWaitingForConnection = false;
-    this.args.onConnect?.();
-    this.args.onComplete?.();
+    yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
+    if (this.hasAccount) {
+      this.args.onConnect?.();
+      this.args.onComplete?.();
+    }
   }
-  @action disconnect() {
-    this.layer2Network.disconnect();
+
+  @task *disconnectWalletTask() {
+    yield this.layer2Network.disconnect();
     this.args.onDisconnect?.();
     this.args.onIncomplete?.();
+    taskFor(this.connectWalletTask).perform();
   }
+
   get cardState(): string {
     if (this.hasAccount) {
       return 'memorialized';

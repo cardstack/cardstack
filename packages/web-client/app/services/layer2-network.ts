@@ -38,7 +38,7 @@ export default class Layer2Network extends Service {
   }
 
   disconnect() {
-    this.strategy.disconnect();
+    return this.strategy.disconnect();
   }
 
   getBlockHeight() {

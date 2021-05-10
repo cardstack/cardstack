@@ -29,7 +29,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo = new WalletInfo([], this.chainId) as WalletInfo;
   @tracked defaultTokenBalance: BN | undefined;
-  #waitForAccountDeferred = defer();
+  @tracked waitForAccountDeferred = defer();
   web3!: Web3;
 
   constructor() {
@@ -57,10 +57,13 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
       }
       this.walletConnectUri = payload.params[0];
     });
-    await this.provider.enable();
-    this.web3 = new Web3(this.provider as any);
-    this.isConnected = true;
-    this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
+    let strategy = this;
+    this.provider.on('chainChanged', (chainId: number) => {
+      if (String(chainId) !== String(networkIds['sokol'])) {
+        console.log(`Layer2 WC chainChanged to ${chainId}. Disconnecting`);
+        strategy.disconnect();
+      }
+    });
     this.connector.on('session_update', (error, payload) => {
       if (error) {
         throw error;
@@ -86,15 +89,23 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
         this.initialize();
       }, 1000);
     });
+    await this.provider.enable();
+    this.web3 = new Web3(this.provider as any);
+    this.isConnected = true;
+    this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
   }
 
   updateWalletInfo(accounts: string[], chainId: number) {
-    this.walletInfo = new WalletInfo(accounts, chainId);
+    let newWalletInfo = new WalletInfo(accounts, chainId);
+    if (this.walletInfo.isEqualTo(newWalletInfo)) {
+      return;
+    }
+    this.walletInfo = newWalletInfo;
     if (accounts.length) {
       this.refreshBalances();
-      this.#waitForAccountDeferred.resolve();
+      this.waitForAccountDeferred.resolve();
     } else {
-      this.#waitForAccountDeferred = defer();
+      this.waitForAccountDeferred = defer();
     }
   }
 
@@ -103,7 +114,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   }
 
   get waitForAccount() {
-    return this.#waitForAccountDeferred.promise;
+    return this.waitForAccountDeferred.promise;
   }
 
   async refreshBalances() {
