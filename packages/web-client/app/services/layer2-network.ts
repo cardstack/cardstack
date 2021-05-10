@@ -16,6 +16,9 @@ export default class Layer2Network extends Service {
   @reads('strategy.walletInfo', []) walletInfo!: WalletInfo;
   @reads('strategy.waitForAccount') waitForAccount!: Promise<void>;
   @reads('strategy.chainName') chainName!: string;
+  @reads('strategy.usdConverters') usdConverters!: {
+    [symbol: string]: (amountInWei: string) => number; // eslint-disable-line no-unused-vars
+  };
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
 
   constructor(props: object | undefined) {

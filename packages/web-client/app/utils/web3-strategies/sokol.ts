@@ -17,8 +17,8 @@ import {
   TokenBridgeHomeSide,
   Safes,
   SafeInfo,
+  ExchangeRate,
 } from '@cardstack/cardpay-sdk';
-
 export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'Sokol Testnet';
   chainId = networkIds['sokol'];
@@ -31,6 +31,10 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   @tracked defaultTokenBalance: BN | undefined;
   @tracked waitForAccountDeferred = defer();
   web3!: Web3;
+  #exchangeRateApi!: ExchangeRate;
+  @tracked usdConverters: {
+    [symbol: string]: (amountInWei: string) => number; // eslint-disable-line no-unused-vars
+  } = {};
 
   constructor() {
     // super(...arguments);
@@ -91,6 +95,17 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     });
     await this.provider.enable();
     this.web3 = new Web3(this.provider as any);
+    this.#exchangeRateApi = new ExchangeRate(this.web3);
+    Promise.all(
+      ['DAI', 'CARD'].map((symbol) =>
+        this.#exchangeRateApi.getUSDConverter(symbol)
+      )
+    ).then(([daiExchanger, cardExchanger]) => {
+      this.usdConverters = {
+        DAI: daiExchanger,
+        CARD: cardExchanger,
+      };
+    });
     this.isConnected = true;
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
   }

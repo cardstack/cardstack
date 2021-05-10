@@ -16,6 +16,18 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   waitForAccountDeferred = defer();
   bridgingDeferred!: RSVP.Deferred<unknown>;
   @tracked defaultTokenBalance: BN | undefined;
+  @tracked usdConverters: {
+    [symbol: string]: (amountInWei: string) => number; // eslint-disable-line no-unused-vars
+  } = {
+    // eslint-disable-next-line no-unused-vars
+    DAI: (_amountInWei: string) => {
+      return 0;
+    },
+    // eslint-disable-next-line no-unused-vars
+    CARD: (_amountInWei: string) => {
+      return 0;
+    },
+  };
 
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([]);
