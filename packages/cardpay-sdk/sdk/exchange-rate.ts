@@ -44,6 +44,6 @@ export default class ExchangeRate {
 // the decimal point. After this operation, the number should be safely in JS's
 // territory.
 function safeFloatConvert(rawAmount: BN, decimals: number): number {
-  let amountStr = rawAmount.toString();
+  let amountStr = rawAmount.toString().padStart(decimals, '0');
   return Number(`${amountStr.slice(0, -1 * decimals)}.${amountStr.slice(-1 * decimals)}`);
 }
