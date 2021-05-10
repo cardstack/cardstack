@@ -40,4 +40,10 @@ export default class WalletInfo {
 
     this.chainId = chainId;
   }
+
+  isEqualTo(other: WalletInfo) {
+    return (
+      this.chainId === other.chainId && this.firstAddress === other.firstAddress
+    );
+  }
 }
