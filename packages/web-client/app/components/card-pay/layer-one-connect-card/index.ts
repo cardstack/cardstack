@@ -5,6 +5,7 @@ import { task } from 'ember-concurrency-decorators';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
+import { timeout } from 'ember-concurrency';
 import { reads } from 'macro-decorators';
 import { next } from '@ember/runloop';
 import walletProviders from '@cardstack/web-client/utils/wallet-providers';
@@ -87,6 +88,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     this.args.onDisconnect?.();
     this.args.onIncomplete?.();
   }
+
   @task *connectWalletTask() {
     this.isWaitingForConnection = true;
     if (this.radioWalletProviderId) {
@@ -95,8 +97,11 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
       } as WalletProvider);
     }
     this.isWaitingForConnection = false;
-    this.args.onConnect?.();
-    this.args.onComplete?.();
+    yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
+    if (this.hasAccount) {
+      this.args.onConnect?.();
+      this.args.onComplete?.();
+    }
   }
 }
 

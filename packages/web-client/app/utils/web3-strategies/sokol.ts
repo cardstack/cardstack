@@ -57,10 +57,13 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
       }
       this.walletConnectUri = payload.params[0];
     });
-    await this.provider.enable();
-    this.web3 = new Web3(this.provider as any);
-    this.isConnected = true;
-    this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
+    let strategy = this;
+    this.provider.on('chainChanged', (chainId: number) => {
+      if (String(chainId) !== String(networkIds['sokol'])) {
+        console.log(`Layer2 WC chainChanged to ${chainId}. Disconnecting`);
+        strategy.disconnect();
+      }
+    });
     this.connector.on('session_update', (error, payload) => {
       if (error) {
         throw error;
@@ -86,6 +89,10 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
         this.initialize();
       }, 1000);
     });
+    await this.provider.enable();
+    this.web3 = new Web3(this.provider as any);
+    this.isConnected = true;
+    this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
   }
 
   updateWalletInfo(accounts: string[], chainId: number) {

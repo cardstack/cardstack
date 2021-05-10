@@ -108,6 +108,9 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
       this.provider = this.setupWalletConnect();
       this.web3.setProvider(this.provider);
       await this.provider.enable();
+      if (!this.isConnected) {
+        return;
+      }
       let accounts = await this.web3.eth.getAccounts();
       this.updateWalletInfo(accounts, this.chainId);
       this.currentProviderId = walletProvider.id;
@@ -157,8 +160,12 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     });
 
     // Subscribe to chainId change
+    let strategy = this;
     provider.on('chainChanged', (chainId: number) => {
-      console.log('chainChanged', chainId);
+      if (String(chainId) !== String(networkIds['kovan'])) {
+        console.log(`Layer1 WC chainChanged to ${chainId}. Disconnecting`);
+        strategy.disconnect();
+      }
     });
 
     // Subscribe to session disconnection
@@ -190,7 +197,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
 
     // Subscribe to chainId change
     provider.on('chainChanged', (chainId: number) => {
-      console.log(chainId);
+      console.log('Layer1 MM chainChanged', chainId);
     });
 
     // Subscribe to provider connection
