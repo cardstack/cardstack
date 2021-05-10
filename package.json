@@ -137,6 +137,7 @@
     "ember-fetch": "^8.0.4",
     "ember-freestyle": "^0.12.7",
     "ember-maybe-import-regenerator": "^0.1.6",
+    "ember-modifier": "^2.1.1",
     "ember-page-title": "^6.2.1",
     "ember-power-select": "^4.1.5",
     "ember-resolver": "^8.0.2",
