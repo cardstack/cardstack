@@ -8,28 +8,28 @@
       <legend class="deposit-card__legend">Deposit tokens</legend>
       <CardPay::LabeledValue @label="From:" class="deposit-card__field">
         {{#if @isComplete}}
-        <CardPay::NestedItems>
-          <:outer>
-            <div>
-              <div class="deposit-card__field-value">{{this.layer1Network.chainName}} wallet</div>
-              <div class="deposit-card__field-address" data-test-deposit-transaction-setup-from-address>{{this.layer1Network.walletInfo.firstAddress}}</div>
-            </div>
-          </:outer>
-          <:inner>
-            <div class="deposit-card__selected-token" data-test-option-view-only>
-              {{svg-jar this.selectedToken.icon class="deposit-card__selected-token-icon" role="presentation" width="40" height="40"}}
+          <CardPay::NestedItems>
+            <:outer>
               <div>
-                <div class="deposit-card__selected-token-title" data-test-balance-view-only={{this.selectedToken.symbol}}>
-                  {{format-token-amount this.selectedTokenBalance}} {{uppercase this.selectedToken.symbol}}
-                </div>
-                <div class="deposit-card__selected-token-desc" data-test-usd-balance-view-only={{this.selectedToken.symbol}}>
-                  {{!-- TODO: usd balance --}}
-                  ≈ $ USD
+                <div class="deposit-card__field-value">{{this.layer1Network.chainName}} wallet</div>
+                <div class="deposit-card__field-address" data-test-deposit-transaction-setup-from-address>{{this.layer1Network.walletInfo.firstAddress}}</div>
+              </div>
+            </:outer>
+            <:inner>
+              <div class="deposit-card__selected-token" data-test-option-view-only>
+                {{svg-jar this.selectedToken.icon class="deposit-card__selected-token-icon" role="presentation" width="40" height="40"}}
+                <div>
+                  <div class="deposit-card__selected-token-title" data-test-balance-view-only={{this.selectedToken.symbol}}>
+                    {{format-token-amount this.selectedTokenBalance}} {{uppercase this.selectedToken.symbol}}
+                  </div>
+                  <div class="deposit-card__selected-token-desc" data-test-usd-balance-view-only={{this.selectedToken.symbol}}>
+                    {{!-- TODO: usd balance --}}
+                    ≈ $ USD
+                  </div>
                 </div>
               </div>
-            </div>
-          </:inner>
-        </CardPay::NestedItems>
+            </:inner>
+          </CardPay::NestedItems>
         {{else}}
           <div>
             <div class="deposit-card__field-value">{{this.layer1Network.chainName}} wallet</div>
@@ -37,14 +37,17 @@
           </div>
           <div class="deposit-card__field-info deposit-card__field-info--full-width">
             {{#each this.tokens as |token|}}
-              <CardPay::DepositWorkflow::TransactionSetup::TokenOption
-                @checked={{eq @workflowSession.state.depositSourceToken token.symbol}}
-                @onInput={{fn this.chooseSource token.symbol}}
-                @balance={{format-token-amount (if (eq token.symbol 'CARD') this.layer1Network.cardBalance this.layer1Network.daiBalance)}}
-                @tokenSymbol={{token.symbol}}
-                @tokenDescription={{token.description}}
-                @tokenIcon={{token.icon}}
-              />
+              {{#let (if (eq token.symbol 'CARD') this.layer1Network.cardBalance this.layer1Network.daiBalance) as |balance|}}
+                <CardPay::DepositWorkflow::TransactionSetup::TokenOption
+                  @checked={{eq @workflowSession.state.depositSourceToken token.symbol}}
+                  @onInput={{fn this.chooseSource token.symbol}}
+                  @balance={{format-token-amount balance}}
+                  @balanceInUsd={{token-to-usd token.symbol balance}}
+                  @tokenSymbol={{token.symbol}}
+                  @tokenDescription={{token.description}}
+                  @tokenIcon={{token.icon}}
+                />
+              {{/let}}
             {{/each}}
           </div>
         {{/if}}
