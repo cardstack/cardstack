@@ -108,7 +108,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
 
   async refreshBalances() {
     let raw = await this.getDefaultTokenBalance();
-    this.defaultTokenBalance = toBN(raw);
+    this.defaultTokenBalance = toBN(String(raw ?? 0));
   }
 
   async getDefaultTokenBalance() {
