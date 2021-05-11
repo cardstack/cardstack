@@ -6,7 +6,7 @@ import type {
   Statement,
   Node,
 } from '@glimmer/syntax/dist/types/lib/v1/api';
-import { CompiledCard, ComponentInfo, Field, Fields } from '../interfaces';
+import { CompiledCard, ComponentInfo, Field } from '../interfaces';
 import { singularize } from 'inflection';
 import { capitalize, cloneDeep } from 'lodash';
 import { inlineTemplateForField } from './inline-field-plugin';
@@ -186,7 +186,7 @@ function isFieldsIterator(node: BlockStatement): boolean {
   return firstArg?.type === 'PathExpression' && firstArg.original === '@fields';
 }
 
-function inferFromFields(fields: Fields) {
+function inferFromFields(fields: CompiledCard['fields']) {
   return function (
     node: PathExpression | ElementNode | BlockStatement | undefined
   ) {

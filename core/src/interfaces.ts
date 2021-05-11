@@ -5,9 +5,8 @@ const componentFormats = {
 export type Format = keyof typeof componentFormats;
 export const formats = Object.keys(componentFormats) as Format[];
 
-export type AssetType = 'css' | 'unknown';
 export type Asset = {
-  type: AssetType;
+  type: 'css' | 'unknown';
   path: string;
 };
 
@@ -29,7 +28,7 @@ export type RawCard = {
   files: Record<string, string>;
 
   // if this card contains data (as opposed to just schema & code), it goes here
-  data?: CardData;
+  data?: Record<string, any> | undefined;
 };
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
@@ -67,15 +66,13 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   }
 }
 
-export interface Fields {
-  [key: string]: Field;
-}
-
 export interface CompiledCard {
   url: string;
   adoptsFrom?: CompiledCard;
   data: Record<string, any> | undefined;
-  fields: Fields;
+  fields: {
+    [key: string]: Field;
+  };
   modelModule: string;
   isolated: ComponentInfo;
   embedded: ComponentInfo;

@@ -16,11 +16,8 @@ import cardTemplatePlugin, {
 } from './babel/card-template-plugin';
 import {
   Asset,
-  AssetType,
-  CardData,
   CompiledCard,
   ComponentInfo,
-  Fields,
   Format,
   RawCard,
 } from './interfaces';
@@ -98,7 +95,7 @@ export class Compiler {
   }
 
   private buildAssetsList(sourceCard: RawCard): (Asset | undefined)[] {
-    let assets: (Asset | undefined)[] = [];
+    let assets: Asset[] = [];
 
     if (!sourceCard.files) {
       return assets;
@@ -163,7 +160,7 @@ export class Compiler {
     return parentCard;
   }
 
-  getSource(cardSource: RawCard, path: string): string {
+  private getSource(cardSource: RawCard, path: string): string {
     let schemaSrc = cardSource.files[path];
     if (!schemaSrc) {
       throw new Error(
@@ -203,7 +200,7 @@ export class Compiler {
     return await this.define(cardSource.url, schemaLocalFilePath, code);
   }
 
-  async lookupFieldsForCard(
+  private async lookupFieldsForCard(
     metaFields: FieldsMeta
   ): Promise<CompiledCard['fields']> {
     let fields: CompiledCard['fields'] = {};
@@ -218,7 +215,7 @@ export class Compiler {
     return fields;
   }
 
-  adoptFields(
+  private adoptFields(
     fields: CompiledCard['fields'],
     parentCard: CompiledCard
   ): CompiledCard['fields'] {
@@ -301,7 +298,7 @@ export const compiledBaseCard: CompiledCard = {
   assets: [],
 };
 
-function getAssetType(filename: string): AssetType {
+function getAssetType(filename: string): Asset['type'] {
   if (filename.endsWith('.css')) {
     return 'css';
   }
@@ -310,8 +307,8 @@ function getAssetType(filename: string): AssetType {
 }
 
 function assertValidData(
-  fields: Fields,
-  data: CardData | undefined,
+  fields: CompiledCard['fields'],
+  data: RawCard['data'],
   url: string
 ) {
   if (!data) {
