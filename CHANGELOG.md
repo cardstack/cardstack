@@ -1,3 +1,14 @@
+## v0.7.0 (2021-05-11)
+
+#### :rocket: Enhancement
+* [#364](https://github.com/cardstack/boxel/pull/364) Add autoscroll modifier and use for Boxel::Thread content ([@lukemelia](https://github.com/lukemelia))
+
+#### :bug: Bug Fix
+* [#363](https://github.com/cardstack/boxel/pull/363) Only preventDefault in progress step click if @onClickStep is specified ([@lukemelia](https://github.com/lukemelia))
+
+#### Committers: 1
+- Luke Melia ([@lukemelia](https://github.com/lukemelia))
+
 ## v0.6.1 (2021-05-07)
 
 ## v0.6.0 (2021-05-04)
