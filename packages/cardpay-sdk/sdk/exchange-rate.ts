@@ -16,7 +16,7 @@ export default class ExchangeRate {
     const usdRawRate = new BN((await oracle.methods.usdPrice().call()).price);
     const oracleDecimals = Number(await oracle.methods.decimals().call());
 
-    return function convertToUsd(amountInWei: string): number {
+    return (amountInWei) => {
       let rawAmount = usdRawRate.mul(new BN(amountInWei)).div(ten.pow(tokenDecimals));
       return safeFloatConvert(rawAmount, oracleDecimals);
     };
