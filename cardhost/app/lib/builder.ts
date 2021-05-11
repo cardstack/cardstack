@@ -12,7 +12,7 @@ import dynamicCardTransform from './dynamic-card-transform';
 
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
-    lookup: (url) => this.getCompiledCard(url),
+    builder: this,
     define: (...args) => this.defineModule(...args),
   });
 

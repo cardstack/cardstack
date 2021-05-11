@@ -76,7 +76,7 @@ export interface CompiledCard {
   modelModule: string;
   isolated: ComponentInfo;
   embedded: ComponentInfo;
-  assets: (Asset | undefined)[];
+  assets: Asset[];
 }
 export interface Field {
   type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
@@ -88,12 +88,12 @@ export interface ComponentInfo {
   moduleName: string;
   usedFields: string[]; // ["title", "author.firstName"]
   inlineHBS?: string;
+  sourceCardURL: string;
 }
 
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
-  copyAssets(url: string, assets: Asset[], files: RawCard['files']): void;
 }
 
 export interface RealmConfig {

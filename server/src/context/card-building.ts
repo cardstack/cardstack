@@ -1,4 +1,3 @@
-import { ServerKoa } from '../interfaces';
 import Builder from '../builder';
 import { ServerOptions } from '../interfaces';
 import isEqual from 'lodash/isEqual';
@@ -27,10 +26,10 @@ function validatePackageJson(cardCacheDir: string): void {
   }
 }
 
-export function setupCardBuilding(
-  app: ServerKoa,
-  options: { realms: ServerOptions['realms']; cardCacheDir: string }
-) {
+export function setupCardBuilding(options: {
+  realms: ServerOptions['realms'];
+  cardCacheDir: string;
+}) {
   let { realms, cardCacheDir } = options;
 
   validatePackageJson(cardCacheDir);
@@ -41,7 +40,7 @@ export function setupCardBuilding(
     directory: realm.directory.replace(/\/$/, '') + '/',
   }));
 
-  app.context.builder = new Builder({
+  return new Builder({
     realms,
     cardCacheDir,
     pkgName: '@cardstack/compiled',

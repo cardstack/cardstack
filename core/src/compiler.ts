@@ -16,6 +16,7 @@ import cardTemplatePlugin, {
 } from './babel/card-template-plugin';
 import {
   Asset,
+  Builder,
   CompiledCard,
   ComponentInfo,
   Format,
@@ -30,7 +31,7 @@ function getNonAssetFilePaths(sourceCard: RawCard): (string | undefined)[] {
 }
 
 export class Compiler {
-  lookup: (cardURL: string) => Promise<CompiledCard>;
+  builder: Builder;
 
   // returns the module identifier that can be used to get this module back.
   // It's exactly meaning depends on the environment. In node it's a path you
@@ -41,11 +42,8 @@ export class Compiler {
     source: string
   ) => Promise<string>;
 
-  constructor(params: {
-    lookup: (url: string) => Promise<CompiledCard>;
-    define: Compiler['define'];
-  }) {
-    this.lookup = params.lookup;
+  constructor(params: { builder: Builder; define: Compiler['define'] }) {
+    this.builder = params.builder;
     this.define = params.define;
   }
 
@@ -94,7 +92,7 @@ export class Compiler {
     return card;
   }
 
-  private buildAssetsList(sourceCard: RawCard): (Asset | undefined)[] {
+  private buildAssetsList(sourceCard: RawCard): Asset[] {
     let assets: Asset[] = [];
 
     if (!sourceCard.files) {
@@ -152,7 +150,7 @@ export class Compiler {
     if (parentCardPath) {
       // TODO: Confirm the path correctly depthed
       let url = new URL(parentCardPath, cardSource.url).href;
-      parentCard = await this.lookup(url);
+      parentCard = await this.builder.getCompiledCard(url);
     } else {
       // the base card from which all other cards derive
       parentCard = compiledBaseCard;
@@ -206,7 +204,7 @@ export class Compiler {
     let fields: CompiledCard['fields'] = {};
     for (let [name, { cardURL, type }] of Object.entries(metaFields)) {
       fields[name] = {
-        card: await this.lookup(cardURL),
+        card: await this.builder.getCompiledCard(cardURL),
         type,
         name,
       };
@@ -231,7 +229,7 @@ export class Compiler {
       );
     }
 
-    return Object.assign(fields, parentCard.fields);
+    return Object.assign({}, parentCard.fields, fields);
   }
 
   private async prepareComponent(
@@ -241,8 +239,33 @@ export class Compiler {
     which: Format
   ): Promise<ComponentInfo> {
     let localFilePath = cardSource[which];
+
     if (!localFilePath) {
-      return parentCard[which];
+      // we don't have an implementation of our own
+
+      if (cardSource.schema) {
+        // recompile parent component because we extend the schema
+        let originalRawCard = await this.builder.getRawCard(
+          parentCard[which].sourceCardURL
+        );
+        let srcLocalPath = originalRawCard[which];
+        if (!srcLocalPath) {
+          throw new Error(
+            `bug: ${parentCard.url} says it got ${which} from ${parentCard[which].sourceCardURL}, but that card does not have a ${which} component`
+          );
+        }
+        let src = this.getSource(originalRawCard, srcLocalPath);
+        return await this.compileComponent(
+          src,
+          fields,
+          originalRawCard.url,
+          srcLocalPath + 'x'
+        );
+      } else {
+        // directly reuse existing parent component because we didn't extend
+        // anything
+        return parentCard[which];
+      }
     }
 
     let src = this.getSource(cardSource, localFilePath);
@@ -275,6 +298,7 @@ export class Compiler {
       moduleName: await this.define(cardURL, localFile, out!.code!),
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
+      sourceCardURL: cardURL,
     };
   }
 }
@@ -290,10 +314,12 @@ export const compiledBaseCard: CompiledCard = {
   isolated: {
     moduleName: 'todo',
     usedFields: [],
+    sourceCardURL: 'https://cardstack.com/base/base',
   },
   embedded: {
     moduleName: 'todo',
     usedFields: [],
+    sourceCardURL: 'https://cardstack.com/base/base',
   },
   assets: [],
 };

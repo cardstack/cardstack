@@ -25,3 +25,18 @@ export function equalIgnoringWhiteSpace(
     message,
   });
 }
+
+export function containsSource(
+  actual: string | undefined,
+  expected: string,
+  message?: string
+): void {
+  let result = actual?.includes(expected) || false;
+  message ||= 'Contains source';
+  QUnit.assert.pushResult({
+    result,
+    actual,
+    expected,
+    message,
+  });
+}
