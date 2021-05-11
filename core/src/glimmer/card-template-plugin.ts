@@ -11,6 +11,10 @@ import { singularize } from 'inflection';
 import { capitalize, cloneDeep } from 'lodash';
 import { inlineTemplateForField } from './inline-field-plugin';
 
+class InvalidFieldsUsageError extends Error {
+  message = 'Invalid use of @fields API';
+}
+
 const MODEL = '@model';
 const MODEL_PREFIX = `${MODEL}.`;
 const FIELDS = '@fields';
@@ -75,7 +79,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
       visitor: {
         ElementNode(node, path): Statement[] | undefined {
           if (node.tag === FIELDS) {
-            throw new Error('Invalid use of @fields API');
+            throw new InvalidFieldsUsageError();
           }
 
           if (
@@ -129,7 +133,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
           }
 
           if (node.original === FIELDS) {
-            throw new Error('Invalid use of @fields API');
+            throw new InvalidFieldsUsageError();
           }
 
           return undefined;
@@ -183,7 +187,18 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
 function isFieldsIterator(node: BlockStatement): boolean {
   let [firstArg] = node.params;
 
-  return firstArg?.type === 'PathExpression' && firstArg.original === '@fields';
+  let isIteratingOnFields =
+    firstArg?.type === 'PathExpression' && firstArg.original === '@fields';
+
+  if (!isIteratingOnFields) {
+    return false;
+  }
+
+  if (node.path.type === 'PathExpression' && node.path.original === 'each-in') {
+    return true;
+  }
+
+  throw new InvalidFieldsUsageError();
 }
 
 function inferFromFields(fields: CompiledCard['fields']) {

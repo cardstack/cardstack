@@ -246,6 +246,34 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         assert.throws(function () {
           transform(`<@fields />`, options);
         }, /Invalid use of @fields API/);
+
+        assert.throws(
+          function () {
+            transform(
+              `{{#each @fields as |Field|}}
+              <label>{{name}}</label>
+             {{/each}}`,
+              options
+            );
+          },
+          /Invalid use of @fields API/,
+          'Errors when used with an each loops'
+        );
+
+        assert.throws(
+          function () {
+            transform(
+              `{{#each-in @fields as |name Field|}}
+                  <label>{{name}}</label>
+                  <Field />
+                  {{@fields}}
+               {{/each-in}}`,
+              options
+            );
+          },
+          /Invalid use of @fields API/,
+          'Errors when fields is used incorrectly inside of a valid use of fields'
+        );
       }
     );
   });
