@@ -23,6 +23,7 @@ export default class TokenBridgeHomeSide {
         recipient: recipientAddress,
       },
       fromBlock: fromBlock.toString(),
+      toBlock: 'latest',
     };
     let events = await homeBridge.getPastEvents('TokensBridgedToSafe', opts);
     let event!: EventData;
