@@ -34,10 +34,17 @@ export default class Layer2Network extends Service {
         this.strategy = new Layer2TestWeb3Strategy();
         break;
     }
+    window.setInterval(() => {
+      this.strategy.updateUsdConverters();
+    }, 60000);
   }
 
   get hasAccount() {
     return this.walletInfo.accounts.length > 0;
+  }
+
+  updateUsdConverters() {
+    if (this.walletInfo.firstAddress) this.strategy.updateUsdConverters();
   }
 
   disconnect() {

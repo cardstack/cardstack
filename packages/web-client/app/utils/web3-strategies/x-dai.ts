@@ -130,4 +130,6 @@ export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
     }
     return null;
   }
+
+  updateUsdConverters() {}
 }

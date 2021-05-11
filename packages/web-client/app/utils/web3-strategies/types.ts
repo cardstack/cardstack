@@ -32,6 +32,7 @@ export interface Layer1Web3Strategy extends Web3Strategy {
 
 export interface Layer2Web3Strategy extends Web3Strategy {
   defaultTokenBalance: BN | undefined;
+  updateUsdConverters(): void;
   blockExplorerUrl(txnHash: TransactionHash): string;
   getBlockHeight(): Promise<BN>;
   awaitBridged(

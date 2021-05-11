@@ -73,6 +73,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     } as TransactionReceipt);
   }
 
+  updateUsdConverters() {}
+
   blockExplorerUrl(txnHash: TransactionHash): string {
     return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
   }

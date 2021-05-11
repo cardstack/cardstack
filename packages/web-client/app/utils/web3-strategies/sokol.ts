@@ -19,6 +19,11 @@ import {
   SafeInfo,
   ExchangeRate,
 } from '@cardstack/cardpay-sdk';
+
+class UsdConverters {
+  @tracked DAI: ((amountInWei: string) => number) | undefined; // eslint-disable-line no-unused-vars
+  @tracked CARD: ((amountInWei: string) => number) | undefined; // eslint-disable-line no-unused-vars
+}
 export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'Sokol Testnet';
   chainId = networkIds['sokol'];
@@ -32,9 +37,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   @tracked waitForAccountDeferred = defer();
   web3!: Web3;
   #exchangeRateApi!: ExchangeRate;
-  @tracked usdConverters: {
-    [symbol: string]: (amountInWei: string) => number; // eslint-disable-line no-unused-vars
-  } = {};
+  @tracked usdConverters: UsdConverters = new UsdConverters();
 
   constructor() {
     // super(...arguments);
@@ -96,16 +99,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     await this.provider.enable();
     this.web3 = new Web3(this.provider as any);
     this.#exchangeRateApi = new ExchangeRate(this.web3);
-    Promise.all(
-      ['DAI', 'CARD'].map((symbol) =>
-        this.#exchangeRateApi.getUSDConverter(symbol)
-      )
-    ).then(([daiExchanger, cardExchanger]) => {
-      this.usdConverters = {
-        DAI: daiExchanger,
-        CARD: cardExchanger,
-      };
-    });
+    this.updateUsdConverters();
     this.isConnected = true;
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
   }
@@ -167,6 +161,13 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   async disconnect(): Promise<void> {
     await this.provider?.disconnect();
     this.clearWalletInfo();
+  }
+
+  async updateUsdConverters() {
+    this.usdConverters.DAI = await this.#exchangeRateApi.getUSDConverter('DAI');
+    this.usdConverters.CARD = await this.#exchangeRateApi.getUSDConverter(
+      'CARD'
+    );
   }
 
   blockExplorerUrl(txnHash: TransactionHash): string {
