@@ -1,65 +1,9 @@
 import QUnit from 'qunit';
-import { Compiler } from '@cardstack/core/src/compiler';
-import { Builder, CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { containsSource } from '@cardstack/core/tests/helpers/assertions';
-import { setupCardBuilding } from '../../src/context/card-building';
-import { BASE_CARD_REALM_CONFIG } from '../helpers/fixtures';
-import { createCardCacheDir } from '../helpers/cache';
+import { TestBuilder } from '../helpers/test-builder';
 
 const { module: Qmodule, test } = QUnit;
-
-const baseBuilder = (() => {
-  let { cardCacheDir } = createCardCacheDir();
-  return setupCardBuilding({
-    realms: [BASE_CARD_REALM_CONFIG],
-    cardCacheDir,
-  });
-})();
-
-class TestBuilder implements Builder {
-  compiler: Compiler;
-  rawCards: Map<string, RawCard> = new Map();
-  definedModules: Map<string, string> = new Map();
-
-  constructor() {
-    this.compiler = new Compiler({
-      builder: this,
-      define: this.define.bind(this),
-    });
-  }
-
-  async getRawCard(url: string): Promise<RawCard> {
-    let card = this.rawCards.get(url);
-    if (!card) {
-      card = await baseBuilder.getRawCard(url);
-    }
-    return card;
-  }
-
-  async getCompiledCard(url: string): Promise<CompiledCard> {
-    let card = this.rawCards.get(url);
-    if (card) {
-      return await this.compiler.compile(card);
-    } else {
-      return await baseBuilder.getCompiledCard(url);
-    }
-  }
-
-  private async define(
-    cardURL: string,
-    localModule: string,
-    src: string
-  ): Promise<string> {
-    let moduleName = cardURL.replace(/\/$/, '') + '/' + localModule;
-    this.definedModules.set(moduleName, src);
-    return moduleName;
-  }
-
-  addRawCard(rawCard: RawCard) {
-    this.rawCards.set(rawCard.url, rawCard);
-  }
-}
 
 Qmodule('Compiler', function (hooks) {
   let builder: TestBuilder;
@@ -126,7 +70,7 @@ Qmodule('Compiler', function (hooks) {
   });
 
   test('recompiled parent field iterator', async function () {
-    builder.addRawCard({
+    let postCard = {
       url: 'https://mirage/cards/post',
       schema: 'schema.js',
       embedded: 'embedded.js',
@@ -142,28 +86,49 @@ Qmodule('Compiler', function (hooks) {
           `<article>{{#each-in @fields as |name|}}<label>{{name}}</label>{{/each-in}}</article>`
         ),
       },
-    });
-    builder.addRawCard({
+    };
+    let fancyPostCard = {
       url: 'https://mirage/cards/fancy-post',
       schema: 'schema.js',
       files: {
         'schema.js': `
           import { contains, adopts } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
-          import Post from "https://mirage/cards/post";
+          import Post from "${postCard.url}";
           export default @adopts(Post) class FancyPost {
             @contains(string)
             body;
           }`,
       },
-    });
+    };
+    let timelyPostCard = {
+      url: 'https://mirage/cards/timely-post',
+      schema: 'schema.js',
+      files: {
+        'schema.js': `
+          import { contains, adopts } from "@cardstack/types";
+          import date from "https://cardstack.com/base/date";
+          import Post from "${postCard.url}";
+          export default @adopts(Post) class TimelyPost {
+            @contains(date)
+            createdAt;
+          }`,
+      },
+    };
 
-    let compiled = await builder.getCompiledCard(
-      'https://mirage/cards/fancy-post'
-    );
+    builder.addRawCard(postCard);
+    builder.addRawCard(fancyPostCard);
+    builder.addRawCard(timelyPostCard);
+
+    let timelyCompiled = await builder.getCompiledCard(timelyPostCard.url);
+    let fancyCompiled = await builder.getCompiledCard(fancyPostCard.url);
 
     containsSource(
-      builder.definedModules.get(compiled.embedded.moduleName),
+      builder.definedModules.get(timelyCompiled.embedded.moduleName),
+      '<article><label>{{\\"title\\"}}</label><label>{{\\"createdAt\\"}}</label></article>'
+    );
+    containsSource(
+      builder.definedModules.get(fancyCompiled.embedded.moduleName),
       '<article><label>{{\\"title\\"}}</label><label>{{\\"body\\"}}</label></article>'
     );
   });

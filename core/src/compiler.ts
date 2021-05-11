@@ -5,6 +5,8 @@ import decoratorsPlugin from '@babel/plugin-proposal-decorators';
 import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 import difference from 'lodash/difference';
 import intersection from 'lodash/intersection';
+import reduce from 'lodash/reduce';
+import md5 from 'md5';
 
 import cardSchemaPlugin, {
   FieldsMeta,
@@ -259,7 +261,7 @@ export class Compiler {
           src,
           fields,
           originalRawCard.url,
-          srcLocalPath + 'x'
+          srcLocalPath
         );
       } else {
         // directly reuse existing parent component because we didn't extend
@@ -286,7 +288,6 @@ export class Compiler {
     let options: CardTemplateOptions = {
       fields,
       cardURL,
-      localFile,
       inlineHBS: undefined,
       usedFields: [] as ComponentInfo['usedFields'],
     };
@@ -294,8 +295,10 @@ export class Compiler {
       plugins: [[cardTemplatePlugin, options]],
     });
 
+    let hashedFilename = hashFilenameFromFields(localFile, fields);
+
     return {
-      moduleName: await this.define(cardURL, localFile, out!.code!),
+      moduleName: await this.define(cardURL, hashedFilename, out!.code!),
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
       sourceCardURL: cardURL,
@@ -351,4 +354,23 @@ function assertValidData(
       )}" does not exist on card "${url}"`
     );
   }
+}
+
+function hashFilenameFromFields(
+  localFile: string,
+  fields: CompiledCard['fields']
+): string {
+  let extensionMatch = localFile.match(/\.[^/.]+$/);
+  let extension = extensionMatch ? extensionMatch[0] : '';
+  let name = localFile.replace(extension, '');
+  let hash = md5(
+    reduce(
+      fields,
+      (result, f, name) => {
+        return (result += name + f.card.url);
+      },
+      ''
+    )
+  );
+  return `${name}-${hash}${extension}`;
 }
