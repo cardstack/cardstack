@@ -8,6 +8,10 @@ import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
 import { SafeInfo } from '@cardstack/cardpay-sdk/sdk/safes';
+import {
+  ConvertibleSymbol,
+  ConversionFunction,
+} from '@cardstack/web-client/utils/web3-strategies/types';
 
 export default class Layer2Network extends Service {
   strategy!: Layer2Web3Strategy;
@@ -34,17 +38,20 @@ export default class Layer2Network extends Service {
         this.strategy = new Layer2TestWeb3Strategy();
         break;
     }
-    window.setInterval(() => {
-      this.strategy.updateUsdConverters();
-    }, 60000);
   }
 
   get hasAccount() {
     return this.walletInfo.accounts.length > 0;
   }
 
-  updateUsdConverters() {
-    if (this.walletInfo.firstAddress) this.strategy.updateUsdConverters();
+  async updateUsdConverters(
+    symbolsToUpdate: ConvertibleSymbol[]
+  ): Promise<Record<ConvertibleSymbol, ConversionFunction>> {
+    if (this.walletInfo.firstAddress) {
+      return this.strategy.updateUsdConverters(symbolsToUpdate);
+    } else {
+      return {} as Record<ConvertibleSymbol, ConversionFunction>;
+    }
   }
 
   disconnect() {

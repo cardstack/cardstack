@@ -1,6 +1,12 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
-import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
+import {
+  ChainAddress,
+  ConversionFunction,
+  ConvertibleSymbol,
+  Layer2Web3Strategy,
+  TransactionHash,
+} from './types';
 import RSVP, { defer } from 'rsvp';
 import BN from 'bn.js';
 import { toBN } from 'web3-utils';
@@ -73,7 +79,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     } as TransactionReceipt);
   }
 
-  updateUsdConverters() {}
+  // eslint-disable-next-line no-unused-vars
+  async updateUsdConverters(_symbolsToUpdate: ConvertibleSymbol[]) {
+    return {} as Record<ConvertibleSymbol, ConversionFunction>;
+  }
 
   blockExplorerUrl(txnHash: TransactionHash): string {
     return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;

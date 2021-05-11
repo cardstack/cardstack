@@ -4,10 +4,16 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import Web3 from 'web3';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
-import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
+import {
+  ChainAddress,
+  ConversionFunction,
+  ConvertibleSymbol,
+  Layer2Web3Strategy,
+  TransactionHash,
+} from './types';
 import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
-import { defer } from 'rsvp';
+import { defer, hash } from 'rsvp';
 import BN from 'bn.js';
 import { toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
@@ -19,11 +25,6 @@ import {
   SafeInfo,
   ExchangeRate,
 } from '@cardstack/cardpay-sdk';
-
-class UsdConverters {
-  @tracked DAI: ((amountInWei: string) => number) | undefined; // eslint-disable-line no-unused-vars
-  @tracked CARD: ((amountInWei: string) => number) | undefined; // eslint-disable-line no-unused-vars
-}
 export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'Sokol Testnet';
   chainId = networkIds['sokol'];
@@ -37,7 +38,6 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   @tracked waitForAccountDeferred = defer();
   web3!: Web3;
   #exchangeRateApi!: ExchangeRate;
-  @tracked usdConverters: UsdConverters = new UsdConverters();
 
   constructor() {
     // super(...arguments);
@@ -99,7 +99,6 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     await this.provider.enable();
     this.web3 = new Web3(this.provider as any);
     this.#exchangeRateApi = new ExchangeRate(this.web3);
-    this.updateUsdConverters();
     this.isConnected = true;
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
   }
@@ -163,11 +162,17 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     this.clearWalletInfo();
   }
 
-  async updateUsdConverters() {
-    this.usdConverters.DAI = await this.#exchangeRateApi.getUSDConverter('DAI');
-    this.usdConverters.CARD = await this.#exchangeRateApi.getUSDConverter(
-      'CARD'
-    );
+  async updateUsdConverters(
+    symbolsToUpdate: ConvertibleSymbol[]
+  ): Promise<Record<ConvertibleSymbol, ConversionFunction>> {
+    let promisesHash = {} as Record<
+      ConvertibleSymbol,
+      Promise<ConversionFunction>
+    >;
+    for (let symbol of symbolsToUpdate) {
+      promisesHash[symbol] = this.#exchangeRateApi.getUSDConverter(symbol);
+    }
+    return hash(promisesHash);
   }
 
   blockExplorerUrl(txnHash: TransactionHash): string {
