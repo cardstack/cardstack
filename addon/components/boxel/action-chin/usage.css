@@ -22,3 +22,16 @@
 .usage-cta-block-explanation-table tr:first-child td {
   font-weight: bold;
 }
+
+.usage-action-chin__loading-indicator {
+  --icon-color: var(--boxel-light);
+
+  margin-right: var(--boxel-sp-xs);
+  animation: spin 6000ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

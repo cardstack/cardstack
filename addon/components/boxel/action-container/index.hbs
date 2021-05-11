@@ -23,10 +23,18 @@
 
   <Boxel::ActionChin
     class="boxel-action-container__footer"
-    @mode={{if @isComplete "memorialized" "data-entry"}}
-    @buttonText={{if @isComplete @completeActionLabel @incompleteActionLabel}}
-    @onClickButton={{@onClickButton}}
-    @disabled={{@disabled}}
+    @state={{if @isComplete "memorialized" "default"}}
     data-test-boxel-action-footer
-  />
+  >
+    <:memorialized as |m|>
+      <m.ActionButton @disabled={{@disabled}} {{on "click" (optional @onClickButton)}}>
+        {{@completeActionLabel}}
+      </m.ActionButton>
+    </:memorialized>
+    <:default as |a|>
+      <a.ActionButton @disabled={{@disabled}} {{on "click" (optional @onClickButton)}}>
+        {{@incompleteActionLabel}}
+      </a.ActionButton>
+    </:default>
+  </Boxel::ActionChin>
 </Boxel::CardContainer>

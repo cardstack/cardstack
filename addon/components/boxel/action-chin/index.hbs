@@ -1,20 +1,109 @@
-<footer
+<div
   class={{cn
     "boxel-action-chin"
-    boxel-action-chin--light=this.isMemorializedMode
-    boxel-action-chin--dark=this.isDataEntryMode
+    (if @state (concat "boxel-action-chin--" @state))
+    (if @stepNumber (concat "boxel-action-chin--has-step"))
   }}
   ...attributes
+  data-test-boxel-action-chin
 >
-  <Boxel::Button
-    @kind={{if this.isDataEntryMode "primary"}}
-    @disabled={{@disabled}}
-    {{on "click" (optional @onClickButton)}}
-  >
-    {{@buttonText}}
-  </Boxel::Button>
-  <span class="boxel-action-chin__lock-text">
-    Actions only visible to you
-    {{svg-jar "lock" width="12px" height="12px"}}
-  </span>
-</footer>
+  {{!-- Not accounting for 0 as a step number --}}
+  {{#if @stepNumber}}
+    <div class="boxel-action-chin__step" data-step={{@stepNumber}} data-test-boxel-action-chin-step={{@stepNumber}}>
+      <span class="boxel-sr-only">Step {{@stepNumber}}</span>
+    </div>
+  {{/if}}
+  {{!--
+    We cannot pass splattribute classes to components in the component helper:
+    https://github.com/emberjs/ember.js/issues/18402
+  --}}
+  {{#if (and (has-block "disabled") this.isDisabled)}}
+    {{yield
+      (hash
+        ActionButton=(component
+          "boxel/button"
+          kind="primary"
+          disabled=true
+          class="boxel-action-chin__action-button"
+        )
+        InfoArea=(component
+          "boxel/action-chin/info-area"
+          class="boxel-action-chin__info-area"
+        )
+      )
+      to="disabled"
+    }}
+  {{else if (and (has-block "in-progress") this.isInProgress)}}
+    {{yield
+      (hash
+        ActionButton=(component
+          "boxel/button"
+          kind="primary"
+          loading=true
+          disabled=this.isDisabled
+          class="boxel-action-chin__action-button"
+        )
+        CancelButton=(component
+          "boxel/button"
+          kind="secondary-dark"
+          class="boxel-action-chin__cancel-button"
+        )
+        ActionStatusArea=(component
+          "boxel/action-chin/action-status-area"
+        )
+        InfoArea=(component
+          "boxel/action-chin/info-area"
+          class="boxel-action-chin__info-area"
+        )
+      )
+      to="in-progress"
+    }}
+  {{else if (and (has-block "memorialized") this.isMemorialized)}}
+    {{!--
+      if using ActionButton and ActionStatusArea together, the grid layout will put them at the exact same spot,
+      causing a visual bug.
+    --}}
+    {{yield
+      (hash
+        ActionButton=(component
+          "boxel/button"
+          kind="secondary-light"
+          disabled=this.isDisabled
+        )
+        ActionStatusArea=(component
+          "boxel/action-chin/action-status-area"
+          icon="success"
+        )
+        InfoArea=(component
+          "boxel/action-chin/info-area"
+          class="boxel-action-chin__info-area"
+        )
+      )
+      to="memorialized"
+    }}
+  {{else}}
+    {{yield
+      (hash
+        ActionButton=(component
+          "boxel/button"
+          kind="primary"
+          disabled=this.isDisabled
+        )
+        ActionStatusArea=(component
+          "boxel/action-chin/action-status-area"
+        )
+        InfoArea=(component
+          "boxel/action-chin/info-area"
+          class="boxel-action-chin__info-area"
+        )
+      )
+      to="default"
+    }}
+  {{/if}}
+  {{!-- in any state except: disabled + has a step, we want the lock shown --}}
+  {{!-- template-lint-disable simple-unless --}}
+  {{#unless (and this.isDisabled @stepNumber)}}
+    <span class="boxel-action-chin__private-notice" data-test-boxel-action-chin-private-notice>Actions only visible to you</span>
+    {{svg-jar "lock" class="boxel-action-chin__lock-icon" role="presentation"}}
+  {{/unless}}
+</div>

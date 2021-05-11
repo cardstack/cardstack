@@ -51,14 +51,13 @@ a:focus:not(:focus-visible) {
   outline-color: transparent;
 }
 
-/* TODO: convert any `role="button"` boxel component to use `button` */
-button:hover,
-[role="button"]:hover {
+button:hover:not(:disabled),
+[role="button"]:hover:not(:disabled) {
   cursor: pointer;
 }
 
-button:focus,
-[role="button"]:focus {
+button:focus:not(:disabled),
+[role="button"]:focus:not(:disabled) {
   outline: var(--boxel-outline);
 }
 

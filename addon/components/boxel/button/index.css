@@ -48,7 +48,7 @@ a.boxel-button[href=""],
 a.boxel-button.boxel-button--disabled-link {
   --boxel-button-color: var(--boxel-purple-300);
   --boxel-button-border: 1px solid var(--boxel-purple-300);
-  --boxel-button-text-color: var(--boxel-purple-400);
+  --boxel-button-text-color: var(--boxel-purple-500);
 }
 
 /* the a element does not have a disabled attribute. Clicking will still trigger event listeners */
