@@ -57,8 +57,8 @@
 
         // Kovan Dai Bridge args
         "bridge",
-        "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa",
         "2",
+        "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa",
         "--network", "kovan",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"

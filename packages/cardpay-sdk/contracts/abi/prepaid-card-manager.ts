@@ -120,32 +120,6 @@ export default [
     type: 'event',
   },
   {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'tally',
-        type: 'address',
-      },
-    ],
-    name: 'TallyAdded',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'tally',
-        type: 'address',
-      },
-    ],
-    name: 'TallyRemoved',
-    type: 'event',
-  },
-  {
     constant: true,
     inputs: [],
     name: 'MAXIMUM_NUMBER_OF_CARD',
@@ -154,6 +128,21 @@ export default [
         internalType: 'uint8',
         name: '',
         type: 'uint8',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'MINIMUM_MERCHANT_PAYMENT',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
     payable: false,
@@ -212,27 +201,6 @@ export default [
     type: 'function',
   },
   {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: '_tally',
-        type: 'address',
-      },
-    ],
-    name: 'addTally',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     constant: true,
     inputs: [],
     name: 'bridgeUtils',
@@ -276,6 +244,21 @@ export default [
   {
     constant: true,
     inputs: [],
+    name: 'cardProtocolVersion',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    stateMutability: 'pure',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'gasFeeCARDAmount',
     outputs: [
       {
@@ -297,21 +280,6 @@ export default [
         internalType: 'address',
         name: '',
         type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'getTallys',
-    outputs: [
-      {
-        internalType: 'address[]',
-        name: '',
-        type: 'address[]',
       },
     ],
     payable: false,
@@ -446,27 +414,6 @@ export default [
   },
   {
     constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: '_tally',
-        type: 'address',
-      },
-    ],
-    name: 'removeTally',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
@@ -530,11 +477,6 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: '_tally',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
         name: '_gsMasterCopy',
         type: 'address',
       },
@@ -583,7 +525,7 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'getMinimumAmount',
+    name: 'minimumFaceValue',
     outputs: [
       {
         internalType: 'uint256',
@@ -598,7 +540,7 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'getMaximumAmount',
+    name: 'maximumFaceValue',
     outputs: [
       {
         internalType: 'uint256',
@@ -608,36 +550,6 @@ export default [
     ],
     payable: false,
     stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_minValue',
-        type: 'uint256',
-      },
-    ],
-    name: 'updateMinimumAmount',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_maxValue',
-        type: 'uint256',
-      },
-    ],
-    name: 'updateMaximumAmount',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -882,7 +794,7 @@ export default [
       },
       {
         internalType: 'address',
-        name: 'merchant',
+        name: 'merchantSafe',
         type: 'address',
       },
       {
@@ -918,7 +830,7 @@ export default [
       },
       {
         internalType: 'address',
-        name: 'merchant',
+        name: 'merchantSafe',
         type: 'address',
       },
       {
