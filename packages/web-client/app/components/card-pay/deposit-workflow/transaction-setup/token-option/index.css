@@ -78,3 +78,8 @@
   padding-left: var(--boxel-sp-sm);
   border-left: 1px solid var(--boxel-purple-300);
 }
+
+.token-option__loading-indicator {
+  width: var(--boxel-sp-sm);
+  height: var(--boxel-sp-sm);
+}

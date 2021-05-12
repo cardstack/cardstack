@@ -16,7 +16,6 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<CardPay
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @tracked completedCount = 1;
-  @tracked completedLayer2TransactionReceipt: TransactionReceipt | undefined;
   get layer2BlockHeightBeforeBridging(): BN | undefined {
     return this.args.workflowSession.state.layer2BlockHeightBeforeBridging;
   }
@@ -40,7 +39,10 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<CardPay
     this.layer2Network
       .awaitBridged(this.layer2BlockHeightBeforeBridging!)
       .then((transactionReceipt: TransactionReceipt) => {
-        this.completedLayer2TransactionReceipt = transactionReceipt;
+        this.args.workflowSession.update(
+          'completedLayer2TransactionReceipt',
+          transactionReceipt
+        );
         this.completedCount = 3;
       });
   }
@@ -59,7 +61,8 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<CardPay
 
   get blockscoutUrl() {
     return this.layer2Network.blockExplorerUrl(
-      this.completedLayer2TransactionReceipt?.transactionHash
+      this.args.workflowSession.state.completedLayer2TransactionReceipt
+        .transactionHash
     );
   }
 }

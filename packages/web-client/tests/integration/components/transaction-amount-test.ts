@@ -4,6 +4,7 @@ import { render, fillIn, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { TransactionReceipt } from 'web3-core';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
+import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import BN from 'bn.js';
 import { toBN, toWei } from 'web3-utils';
@@ -12,6 +13,15 @@ import RSVP from 'rsvp';
 
 module('Integration | Component | transaction-amount', function (hooks) {
   setupRenderingTest(hooks);
+
+  hooks.beforeEach(function () {
+    let layer2Service = this.owner.lookup('service:layer2-network');
+    let layer2Strategy = layer2Service.strategy as Layer2TestWeb3Strategy;
+
+    // Simulate being connected on layer 2 -- prereq to converting to USD
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    layer2Strategy.test__simulateAccountsChanged([layer2AccountAddress]);
+  });
 
   const hijackApprove = (
     service: Layer1TestWeb3Strategy,

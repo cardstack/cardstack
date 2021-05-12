@@ -7,55 +7,86 @@
     <fieldset class="deposit-card__fieldset">
       <legend class="deposit-card__legend">Deposit tokens</legend>
       <CardPay::LabeledValue @label="From:" class="deposit-card__field">
-        <div>
-          <div class="deposit-card__field-value">{{this.layer1Network.chainName}} wallet</div>
-          <div class="deposit-card__field-address" data-test-deposit-transaction-setup-from-address>{{this.layer1Network.walletInfo.firstAddress}}</div>
-        </div>
-        <div class={{cn "deposit-card__field-info" (unless @isComplete "deposit-card__field-info--full-width")}}>
-          {{#each this.tokens as |token|}}
-            <CardPay::DepositWorkflow::TransactionSetup::TokenOption
-              @checked={{eq @workflowSession.state.depositSourceToken token.symbol}}
-              @onInput={{fn this.chooseSource token.symbol}}
-              @balance={{format-token-amount (if (eq token.symbol 'CARD') this.layer1Network.cardBalance this.layer1Network.daiBalance)}}
-              @tokenSymbol={{token.symbol}}
-              @tokenDescription={{token.description}}
-              @tokenIcon={{token.icon}}
-              @viewOnly={{@isComplete}}
-            />
-          {{/each}}
-        </div>
+        {{#if @isComplete}}
+          <CardPay::NestedItems>
+            <:outer>
+              <div>
+                <div class="deposit-card__field-value">{{this.layer1Network.chainName}} wallet</div>
+                <div class="deposit-card__field-address" data-test-deposit-transaction-setup-from-address>{{this.layer1Network.walletInfo.firstAddress}}</div>
+              </div>
+            </:outer>
+            <:inner>
+              <div class="deposit-card__selected-token" data-test-option-view-only>
+                {{svg-jar this.selectedToken.icon class="deposit-card__selected-token-icon" role="presentation" width="40" height="40"}}
+                <div>
+                  <div class="deposit-card__selected-token-title" data-test-balance-view-only={{this.selectedToken.symbol}}>
+                    {{format-token-amount this.selectedTokenBalance}} {{uppercase this.selectedToken.symbol}}
+                  </div>
+                  <div class="deposit-card__selected-token-desc" data-test-usd-balance-view-only={{this.selectedToken.symbol}}>
+                    
+                    ≈ $ {{token-to-usd this.selectedToken.symbol this.selectedTokenBalance}} USD
+                  </div>
+                </div>
+              </div>
+            </:inner>
+          </CardPay::NestedItems>
+        {{else}}
+          <div>
+            <div class="deposit-card__field-value">{{this.layer1Network.chainName}} wallet</div>
+            <div class="deposit-card__field-address" data-test-deposit-transaction-setup-from-address>{{this.layer1Network.walletInfo.firstAddress}}</div>
+          </div>
+          <div class="deposit-card__field-info deposit-card__field-info--full-width">
+            {{#each this.tokens as |token|}}
+              {{#let (if (eq token.symbol 'CARD') this.layer1Network.cardBalance this.layer1Network.daiBalance) as |balance|}}
+                <CardPay::DepositWorkflow::TransactionSetup::TokenOption
+                  @checked={{eq @workflowSession.state.depositSourceToken token.symbol}}
+                  @onInput={{fn this.chooseSource token.symbol}}
+                  @balance={{format-token-amount balance}}
+                  @balanceInUsd={{token-to-usd token.symbol balance}}
+                  @tokenSymbol={{token.symbol}}
+                  @tokenDescription={{token.description}}
+                  @tokenIcon={{token.icon}}
+                />
+              {{/let}}
+            {{/each}}
+          </div>
+        {{/if}}
       </CardPay::LabeledValue>
     </fieldset>
     <fieldset class="deposit-card__fieldset">
       <legend class="deposit-card__legend">Receive tokens</legend>
       <CardPay::LabeledValue @label="In:" class="deposit-card__field">
         <div class="deposit-card__field-value">{{this.layer2Network.chainName}} wallet</div>
-        <div class="deposit-card__field-info">
-          <div class="deposit-card__account">
-            <span class="deposit-card__field-icon deposit-card__field-icon-sm">
-              {{!-- placeholder for account icon --}}
-            </span>
-            <div>
-              <div class="deposit-card__field-value deposit-card__field-value-sm">Account</div>
-              <div class="deposit-card__field-address deposit-card__field-address-sm" data-test-deposit-transaction-setup-to-address>
-                {{truncate-middle this.layer2Network.walletInfo.firstAddress 7 4}}
+          <CardPay::NestedItems class="deposit-card__field-info">
+            <:outer>
+              <div class="deposit-card__account">
+                <span class="deposit-card__field-icon deposit-card__field-icon-sm">
+                  {{!-- placeholder for account icon --}}
+                </span>
+                <div>
+                  <div class="deposit-card__field-value deposit-card__field-value-sm">Account</div>
+                  <div class="deposit-card__field-address deposit-card__field-address-sm" data-test-deposit-transaction-setup-to-address>
+                    {{truncate-middle this.layer2Network.walletInfo.firstAddress 7 4}}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <div class="deposit-card__depot">
-            {{svg-jar "depot" width="40" height="40" class="deposit-card__field-icon" role="presentation"}}
-            <div>
-              <div class="deposit-card__field-value">DEPOT:</div>
-              <div class={{cn "deposit-card__field-address" "deposit-card__field-address-sm" deposit-card__field-address--view-only=@isComplete}} data-test-deposit-transaction-setup-depot-address>
-                {{#if this.fetchDepotTask.last.isSuccessful}}
-                  {{or this.fetchDepotTask.last.value.address 'Create a new Depot'}}
-                {{else}}
-                  <LoadingIndicator class="deposit-card__loading-indicator"/>
-                {{/if}}
+            </:outer>
+            <:inner>
+              <div class="deposit-card__depot">
+                {{svg-jar "depot" width="40" height="40" class="deposit-card__field-icon" role="presentation"}}
+                <div>
+                  <div class="deposit-card__field-value">DEPOT:</div>
+                  <div class={{cn "deposit-card__field-address" "deposit-card__field-address-sm" deposit-card__field-address--view-only=@isComplete}} data-test-deposit-transaction-setup-depot-address>
+                    {{#if this.fetchDepotTask.last.isSuccessful}}
+                      {{or this.fetchDepotTask.last.value.address 'Create a new Depot'}}
+                    {{else}}
+                      <LoadingIndicator class="deposit-card__loading-indicator"/>
+                    {{/if}}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
+            </:inner>
+          </CardPay::NestedItems>
       </CardPay::LabeledValue>
     </fieldset>
   </section>

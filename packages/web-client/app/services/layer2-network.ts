@@ -8,6 +8,10 @@ import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
 import { SafeInfo } from '@cardstack/cardpay-sdk/sdk/safes';
+import {
+  ConvertibleSymbol,
+  ConversionFunction,
+} from '@cardstack/web-client/utils/web3-strategies/types';
 
 export default class Layer2Network extends Service {
   strategy!: Layer2Web3Strategy;
@@ -16,6 +20,9 @@ export default class Layer2Network extends Service {
   @reads('strategy.walletInfo', []) walletInfo!: WalletInfo;
   @reads('strategy.waitForAccount') waitForAccount!: Promise<void>;
   @reads('strategy.chainName') chainName!: string;
+  @reads('strategy.usdConverters') usdConverters!: {
+    [symbol: string]: (amountInWei: string) => number; // eslint-disable-line no-unused-vars
+  };
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
 
   constructor(props: object | undefined) {
@@ -35,6 +42,17 @@ export default class Layer2Network extends Service {
 
   get hasAccount() {
     return this.walletInfo.accounts.length > 0;
+  }
+
+  async updateUsdConverters(
+    symbolsToUpdate: ConvertibleSymbol[]
+  ): Promise<Record<ConvertibleSymbol, ConversionFunction>> {
+    if (!this.walletInfo.firstAddress) {
+      throw new Error(
+        'Cannot fetch USD conversion without being connected to Layer 2'
+      );
+    }
+    return this.strategy.updateUsdConverters(symbolsToUpdate);
   }
 
   disconnect() {

@@ -8,19 +8,19 @@
       Choose an amount to deposit into the reserve pool
     </header>
     <CardPay::DepositWorkflow::TransactionAmount::BalanceView
-      @tokenSymbol={{this.currentTokenDetails.symbol}}
+      @tokenSymbol={{this.currentTokenSymbol}}
       @tokenIcon={{this.currentTokenDetails.icon}}
       @tokenDescription={{this.currentTokenDetails.description}}
       @address={{this.layer1Network.walletInfo.firstAddress}}
       @balance={{format-token-amount this.currentTokenBalance}}
-      @balanceInUsd={{this.currentTokenBalanceInUsd}}
+      @balanceInUsd={{token-to-usd this.currentTokenSymbol this.currentTokenBalance}}
     />
     <div class="card-pay-transaction-amount__input-section">
       {{#if this.isUnlocked}}
       <CardPay::LabeledValue
         @label="Amount to deposit"
         @icon={{this.currentTokenDetails.icon}}
-        @value={{concat this.amount " " this.currentTokenDetails.symbol}}
+        @value={{concat this.amount " " this.currentTokenSymbol}}
       />
       {{else}}
       <Boxel::Field
@@ -44,16 +44,15 @@
           data-test-deposit-amount-input
         />
         <div class="card-pay-transaction-amount__amount-field-currency-text">
-          {{this.currentTokenDetails.symbol}}
+          {{this.currentTokenSymbol}}
         </div>
       </div>
       </Boxel::Field>
       {{/if}}
 
       <CardPay::LabeledValue
-        @icon="dollar"
         @label="Approximate value"
-        {{!-- TODO @value={{concat this.amountInUsd " USD"}} --}}
+        @value={{concat "$ " (token-to-usd this.currentTokenSymbol this.amountAsBigNumber) " USD"}}
       />
 
     </div>

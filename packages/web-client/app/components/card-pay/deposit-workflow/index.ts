@@ -7,6 +7,7 @@ import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow
 import { Workflow } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
+import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
 
 let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
 
@@ -144,7 +145,7 @@ class DepositWorkflow extends Workflow {
       completedDetail: 'Tokens received on xDai',
     }),
   ];
-  epiloguePostables = [
+  epilogue = new PostableCollection([
     new WorkflowMessage({
       author: cardbot,
       message: 'Thank you for your contribution!',
@@ -174,7 +175,7 @@ class DepositWorkflow extends Workflow {
       author: cardbot,
       componentName: 'card-pay/deposit-workflow/next-steps',
     }),
-  ];
+  ]);
   constructor(owner: unknown) {
     super(owner);
     this.attachWorkflow();
