@@ -63,3 +63,8 @@
   font: var(--boxel-font-sm);
   color: var(--boxel-purple-400);
 }
+
+.card-pay-token-balance-view__loading-indicator {
+  width: var(--boxel-sp-sm);
+  height: var(--boxel-sp-sm);
+}

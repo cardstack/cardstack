@@ -32,6 +32,9 @@ export interface Layer1Web3Strategy extends Web3Strategy {
 
 export interface Layer2Web3Strategy extends Web3Strategy {
   defaultTokenBalance: BN | undefined;
+  updateUsdConverters(
+    symbolsToUpdate: ConvertibleSymbol[]
+  ): Promise<Record<ConvertibleSymbol, ConversionFunction>>;
   blockExplorerUrl(txnHash: TransactionHash): string;
   getBlockHeight(): Promise<BN>;
   awaitBridged(
@@ -56,3 +59,6 @@ export class Token {
     this.address = address;
   }
 }
+
+export type ConvertibleSymbol = 'DAI' | 'CARD';
+export type ConversionFunction = (amountInWei: string) => number; // eslint-disable-line no-unused-vars

@@ -18,15 +18,15 @@
     </div>
   </div>
   <div>
-    <div class="token-option__desc">
-      Balance
-    </div>
     <div class="token-option__value" data-test-balance={{@tokenSymbol}}>
       {{@balance}} {{@tokenSymbol}}
     </div>
     <div class="token-option__desc" data-test-usd-balance={{@tokenSymbol}}>
-      {{!-- TODO: usd balance --}}
-      ≈ $ USD
+      {{#if @balanceInUsd}}
+        ≈ $ {{@balanceInUsd}} USD
+      {{else}}
+        <LoadingIndicator class="token-option__loading-indicator"/>
+      {{/if}}
     </div>
   </div>
 </label>

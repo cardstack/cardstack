@@ -20,7 +20,11 @@
       {{@balance}} {{@tokenSymbol}}
     </span>
     <span class="card-pay-token-balance-view__balance-equivalent">
-      ≈ $ {{@balanceInUsd}} USD
+      {{#if @balanceInUsd}}
+        ≈ $ {{@balanceInUsd}} USD
+      {{else}}
+        <LoadingIndicator class="card-pay-token-balance-view__loading-indicator"/>
+      {{/if}}
     </span>
   </div>
 </div>

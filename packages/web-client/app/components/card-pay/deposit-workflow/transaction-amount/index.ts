@@ -74,11 +74,6 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
     return balance || toBN(0);
   }
 
-  get currentTokenBalanceInUsd(): string {
-    // TODO: figure out how to get this
-    return 'TODO';
-  }
-
   get unlockCtaState() {
     if (this.isUnlocked) {
       return 'memorialized';
@@ -101,11 +96,6 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
     } else {
       return 'default';
     }
-  }
-
-  get amountInUsd() {
-    // TODO:
-    return this.amount;
   }
 
   get amountAsBigNumber(): BN {

@@ -137,9 +137,11 @@ module('Acceptance | deposit', function (hooks) {
     // transaction-setup card
     await waitFor(`${post} [data-test-balance="DAI"]`);
     assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.5');
-    // TODO assert.dom(`${post} [data-test-usd-balance="DAI"]`).containsText('');
+    assert.dom(`${post} [data-test-usd-balance="DAI"]`).containsText('50.10');
     assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.0');
-    // TODO assert.dom(`${post} [data-test-usd-balance="CARD"]`).containsText('');
+    assert
+      .dom(`${post} [data-test-usd-balance="CARD"]`)
+      .containsText('2000.00');
     assert
       .dom(`${post} [data-test-deposit-transaction-setup-from-address]`)
       .hasText(layer1AccountAddress);
