@@ -43,7 +43,7 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: Bridge Tokens",
-      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
@@ -57,7 +57,7 @@
 
         // Kovan Dai Bridge args
         "bridge",
-        "2",
+        "10",
         "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa",
         "--network", "kovan",
         // Hassan's testing mnemonic feel free to use your own
@@ -68,11 +68,31 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: View Safes",
-      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
         "safes-view",
+        "--network", "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        // Hassan's testing merchant mnemonic: 0x54b11672e90B38ca52140Ac364EebC5cC07F3d91
+        // "--mnemonic", "sign crawl student excite mouse young narrow essence soul brick life slush"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: Create Prepaid Card",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "prepaidcard-create",
+        // Hassan's depot safe feel free to use your own
+        "0xaE9D292753f05b00E996F6b18E4bAe5CC9e5aa48",
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
+        "200",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
@@ -81,16 +101,18 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Create Prepaid Card",
-      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "name": "Cardpay: Pay Merchant",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
-        "prepaidcard-create",
-        // Hassan's depot safe feel free to use your own
-        "0xF52bc86167B2988B1A37A07f2E76eeCD9a6ee6d3",
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1",
-        "1",
+        "pay-merchant",
+        // currently creating a merchant is an administrative function--ping
+        // hassan to have him create a merchant for you until we get the self-serve fucntionality live
+        "0xED7e330ec63d66EDa6A8Ac772bEd0416214c76C3", // safe for merchant 0x54b11672e90B38ca52140Ac364EebC5cC07F3d91
+        // Hassan's prepaid card --feel free to use your own
+        "0xE3ecEF0C4F60562cC7ED6dDf54B8ac6Ca7c95c70",
+        "100",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
@@ -100,7 +122,7 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: Price for face value",
-      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
@@ -116,7 +138,7 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: New prepaid card gas fee",
-      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
@@ -131,14 +153,13 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: USD Price",
-      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
         "usd-price",
         "DAI",
-        "100",
-        "1",
+        "5",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
@@ -148,14 +169,13 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: ETH Price",
-      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
         "eth-price",
         "DAI",
         "100",
-        "1",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
@@ -165,13 +185,12 @@
       "type": "node",
       "request": "launch",
       "name": "Cardpay: Oracle Update Time",
-      "program": "${workspaceFolder}/packages/cardpay-cli/entrypoint.js",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
       "args": [
         "price-oracle-updated-at",
         "DAI",
-        "1",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"

@@ -9,12 +9,20 @@ export default async function (network: string, mnemonic: string, address?: stri
   console.log('Getting safes');
   let safeDetails = await safes.view(address);
   console.log('\n\n');
-  safeDetails.forEach(({ address, isPrepaidCard, tokens }) => {
+  safeDetails.forEach((detail) => {
+    let { address, isPrepaidCard, tokens } = detail;
     console.log(`${address} -- ${isPrepaidCard ? 'prepaid card' : 'depot'}`);
     console.log('-------------------------');
-
-    tokens.forEach((item: any) => {
-      console.log(`${item.token.name} - ${Web3.utils.fromWei(item.balance)} ${item.token.symbol}`);
+    if (detail.isPrepaidCard) {
+      console.log(`Face value: §${detail.spendFaceValue} SPEND`);
+    }
+    tokens.forEach((item) => {
+      let isIssuingToken = detail.isPrepaidCard && detail.issuingToken === item.tokenAddress;
+      console.log(
+        `${item.token.name} - ${Web3.utils.fromWei(item.balance)} ${item.token.symbol} ${
+          isIssuingToken ? '(issuing token)' : ''
+        }`
+      );
     });
 
     console.log('\n');

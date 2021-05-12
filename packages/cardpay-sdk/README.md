@@ -16,7 +16,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`PrepaidCard.create`](#prepaidcardcreate)
   - [`PrepaidCard.priceForFaceValue`](#prepaidcardpriceforfacevalue)
   - [`PrepaidCard.gasFee`](#prepaidcardgasfee)
-  - [`PrepaidCard.payMerchant` (TBD)](#prepaidcardpaymerchant-tbd)
+  - [`PrepaidCard.payMerchant`](#prepaidcardpaymerchant)
   - [`PrepaidCard.split` (TBD)](#prepaidcardsplit-tbd)
   - [`PrepaidCard.transfer` (TBD)](#prepaidcardtransfer-tbd)
 - [`RevenuePool` (TBD)](#revenuepool-tbd)
@@ -26,6 +26,8 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RewardPool.balanceOf` (TBD)](#rewardpoolbalanceof-tbd)
   - [`RewardPool.withdraw` (TBD)](#rewardpoolwithdraw-tbd)
 - [`ExchangeRate`](#exchangerate)
+  - [`ExchangeRate.convertToSpend`](#exchangerateconverttospend)
+  - [`ExchangeRate.convertFromSpend`](#exchangerateconvertfromspend)
   - [`ExchangeRate.getUSDPrice`](#exchangerategetusdprice)
   - [`ExchangeRate.getETHPrice`](#exchangerategetethprice)
   - [`ExchangeRate.getUpdatedAt`](#exchangerategetupdatedat)
@@ -117,12 +119,21 @@ This call is used to view the gnosis safes owned by a particular address in the 
 This method is invoked with the following parameters:
 - Optionally the address of a safe owner. If no address is supplied, then the default account in your web3 provider's wallet will be used.
 
-This method returns a promise that includes an array of all the gnosis safes owned by the specified address. The result is an object that is a `SafeInfo[]` type which conforms to the following shape:
+This method returns a promise that includes an array of all the gnosis safes owned by the specified address. The result is an object that is a `SafeInfo[]` type which conforms to the `SafeInfo` shape below:
 ```ts
-interface SafeInfo {
+type SafeInfo = DepotInfo | PrepaidCardInfo;
+interface DepotInfo {
+  isPrepaidCard: false;
   address: string;
-  isPrepaidCard: boolean;
   tokens: TokenInfo[];
+}
+interface PrepaidCardInfo {
+  isPrepaidCard: true;
+  address: string;
+  tokens: TokenInfo[];
+  issuingToken: string;
+  spendFaceValue: number;
+  issuer: string;
 }
 interface TokenInfo {
   tokenAddress: string;
@@ -159,15 +170,15 @@ Note that gas is charged in the `*.CPXD` token which will be deducted from your 
 This method is invoked with the following parameters:
 - The address of the safe that you are using to pay for the prepaid card
 - The contract address of the token that you wish to use to pay for the prepaid card. Note that the face value of the prepaid card will fluctuate based on the exchange rate of this token and the **§** unit.
-- An array of amounts in units of `wei` as strings of the token specified in the previous parameter. Note that the face value for the prepaid card will this amount minus fees. Gas charges are applied after the card has been created and will be deducted directly from your safe and not effect the face value of the prepaid card. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
-- You can optionally provide an object that specifies the from address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
+- An array of face values in units of **§** SPEND as numbers. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
+- You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
 
 ```js
 let daicpxd = await getAddress('daiCpxd', web3);
 let result = await prepaidCard.create(
   safeAddress,
   daicpxd,
-  [new BN("5000000000000000000")] // 5 DAI.CPXD tokens
+  [5000] // §5000 SPEND face value
 );
 ```
 
@@ -224,7 +235,60 @@ This call will return the gas fee in terms of the specified token for the creati
 let gasFeeInDai = await prepaidCard.gasFee(daiCpxdAddress);
 ```
 
-### `PrepaidCard.payMerchant` (TBD)
+### `PrepaidCard.payMerchant`
+This call will pay a merchant from a prepaid card.
+
+The arguments are:
+- The safe address of the merchant that will be receiving payment
+- The prepaid card address to use to pay the merchant
+- The amount of **§** SPEND to pay the merchant.
+- You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
+
+```js
+let result = await prepaidCard.payMerchant(
+  merchantSafeAddress,
+  prepaidCardAddress
+  5000 // Pay the merchant §5000 SPEND
+);
+```
+
+This method returns a promise for a gnosis relay transaction object that has the following shape:
+```ts
+interface RelayTransaction {
+  to: string;
+  ethereumTx: {
+    txHash: string;
+    to: string;
+    data: string;
+    blockNumber: string;
+    blockTimestamp: string;
+    created: string;
+    modified: string;
+    gasUsed: string;
+    status: number;
+    transactionIndex: number;
+    gas: string;
+    gasPrice: string;
+    nonce: string;
+    value: string;
+    from: string;
+  };
+  value: number;
+  data: string;
+  timestamp: string;
+  operation: string;
+  safeTxGas: number;
+  dataGas: number;
+  gasPrice: number;
+  gasToken: string;
+  refundReceiver: string;
+  nonce: number;
+  safeTxHash: string;
+  txHash: string;
+  transactionHash: string;
+}
+```
+
 ### `PrepaidCard.split` (TBD)
 ### `PrepaidCard.transfer` (TBD)
 
@@ -242,6 +306,21 @@ import { ExchangeRate } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider);
 let exchangeRate = new ExchangeRate(web3); // Layer 2 web3 instance
 ```
+
+### `ExchangeRate.convertToSpend`
+This call will convert an amount in the specified token to a SPEND amount. This function returns a number representing the SPEND amount. The input to this function is the token amount as a string in units of `wei`.
+```js
+let spendAmount = await exchangeRate.convertFromSpend(daicpxdAddress, toWei(10)); // convert 10 DAI to SPEND
+console.log(`SPEND value ${spendAmount}`);
+```
+
+### `ExchangeRate.convertFromSpend`
+This call will convert a SPEND amount into the specified token amount, where the result is a string that represents the token in units of `wei`. Since SPEND tokens represent $0.01 USD, it is safe to represent SPEND as a number when providing the input value.
+```js
+let weiAmount = await exchangeRate.convertFromSpend(daicpxdAddress, 10000); // convert 10000 SPEND into DAI
+console.log(`DAI value ${fromWei(weiAmount)}`);
+```
+
 ### `ExchangeRate.getUSDPrice`
 This call will return the USD value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a floating point value in units of USD. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function.
 

@@ -5,7 +5,7 @@ import bridge from './bridge.js';
 import awaitBridged from './await-bridged.js';
 import { viewTokenBalance } from './assets';
 import viewSafes from './view-safes.js';
-import { createPrepaidCard, priceForFaceValue, gasFee } from './prepaid-card.js';
+import { createPrepaidCard, priceForFaceValue, payMerchant, gasFee } from './prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
 
 //@ts-ignore polyfilling fetch
@@ -21,6 +21,7 @@ type Commands =
   | 'priceOracleUpdatedAt'
   | 'gasFee'
   | 'priceForFaceValue'
+  | 'payMerchant'
   | 'priceOracleUpdatedAt'
   | 'viewTokenBalance';
 
@@ -35,9 +36,11 @@ interface Options {
   token?: string;
   safeAddress?: string;
   spendFaceValue?: number;
+  merchantSafe?: string;
+  prepaidCard?: string;
   receiver?: string;
   recipient?: string;
-  amounts?: number[];
+  faceValues?: number[];
 }
 const {
   network,
@@ -48,10 +51,12 @@ const {
   token,
   safeAddress,
   spendFaceValue,
+  merchantSafe,
+  prepaidCard,
   fromBlock,
   receiver,
   recipient,
-  amounts,
+  faceValues,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -94,7 +99,7 @@ const {
     }
   )
   .command(
-    'prepaidcard-create <safeAddress> <tokenAddress> <amounts..>',
+    'prepaidcard-create <safeAddress> <tokenAddress> <faceValues..>',
     'Create prepaid cards using the specified token from the specified safe with the amounts provided',
     (yargs) => {
       yargs.positional('safeAddress', {
@@ -106,13 +111,28 @@ const {
         default: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa', // Kovan DAI
         description: 'The token address (defaults to Kovan DAI)',
       });
-      yargs.positional('amounts', {
+      yargs.positional('faceValues', {
         type: 'number',
-        description: 'The amount of tokens used to create each prepaid card (*not* in units of wei)',
+        description: 'A list of face values (separated by spaces) in units of § SPEND to create',
       });
       command = 'prepaidCardCreate';
     }
   )
+  .command('pay-merchant <merchantSafe> <prepaidCard> <amount>', 'Pay a merchant from a prepaid card.', (yargs) => {
+    yargs.positional('merchantSafe', {
+      type: 'string',
+      description: "The address of the merchant's safe who will receive the payment",
+    });
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The address of the prepaid card that is being used to pay the merchant',
+    });
+    yargs.positional('amount', {
+      type: 'number',
+      description: 'The amount to send to the merchant in units of SPEND',
+    });
+    command = 'payMerchant';
+  })
   .command(
     'price-for-face-value <tokenAddress> <spendFaceValue>',
     'Get the price in the units of the specified token to achieve a prepaid card with the specified face value in SPEND',
@@ -240,11 +260,18 @@ if (!command) {
       await viewSafes(network, mnemonic, address);
       break;
     case 'prepaidCardCreate':
-      if (safeAddress == null || amounts == null) {
+      if (safeAddress == null || faceValues == null) {
         yargs.showHelp('safeAddress and amounts are required values');
         process.exit(1);
       }
-      await createPrepaidCard(network, mnemonic, safeAddress, amounts, tokenAddress);
+      await createPrepaidCard(network, mnemonic, safeAddress, faceValues, tokenAddress);
+      break;
+    case 'payMerchant':
+      if (merchantSafe == null || prepaidCard == null || amount == null) {
+        yargs.showHelp('merchantSafe, prepaidCard, and amount are required values');
+        process.exit(1);
+      }
+      await payMerchant(network, mnemonic, merchantSafe, prepaidCard, amount);
       break;
     case 'usdPrice':
       if (token == null || amount == null) {
