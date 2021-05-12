@@ -68,13 +68,3 @@
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);
 }
-
-/* view-only */
-.token-option__currency-display {
-  display: flex;
-  align-items: center;
-  margin-top: var(--boxel-sp-xxxs);
-  padding-top: var(--boxel-sp);
-  padding-left: var(--boxel-sp-sm);
-  border-left: 1px solid var(--boxel-purple-300);
-}

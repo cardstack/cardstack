@@ -171,6 +171,10 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
           'relayTokensTxnReceipt',
           transactionReceipt
         );
+        this.args.workflowSession.update(
+          'depositedAmount',
+          this.amountAsBigNumber.toString() // BN is mutable
+        );
         this.args.onComplete();
         this.hasDeposited = true;
       })
