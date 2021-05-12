@@ -6,14 +6,18 @@ import { ConvertibleSymbol } from '../utils/web3-strategies/types';
 
 type TokenToUsdHelperParams = [ConvertibleSymbol, BN];
 const VALID_SYMBOLS = ['CARD', 'DAI'] as ConvertibleSymbol[];
+
+// This helper uses the `TokenToUsd` service to convert a given token
+// amount in wei to USD (to the penny). Supported tokens are CARD & DAI
 class TokenToUsdHelper extends Helper {
   @service('token-to-usd') declare tokenToUsdService: TokenToUsd;
+
+  // `symbol` and `amount` properties are set by compute to allow the TokenToUsd
+  // service to figure out which conversion functions are needed by the app
+  // at any given time. This allows the service to efficiently fetch just
+  // the conversions we need from our oracles.
   symbol: ConvertibleSymbol | undefined;
   amount: BN | undefined;
-
-  willDestroy() {
-    this.tokenToUsdService.unregister(this);
-  }
 
   compute([symbol, amount]: TokenToUsdHelperParams) {
     if (!VALID_SYMBOLS.includes(symbol)) {
@@ -26,6 +30,10 @@ class TokenToUsdHelper extends Helper {
     this.amount = amount;
     this.tokenToUsdService.register(this);
     return this.tokenToUsdService.toUsdFrom(symbol, amount);
+  }
+
+  willDestroy() {
+    this.tokenToUsdService.unregister(this);
   }
 }
 

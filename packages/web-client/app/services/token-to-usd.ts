@@ -20,6 +20,14 @@ class UsdConverters {
   @tracked CARD: ConversionFunction | undefined;
 }
 
+/*
+  The TokenToUsd service is responsible for efficiently polling for
+  up-to-date exchange rate converters from the Layer2Network service.
+  TokenToUsd helper instances register themselves with this service
+  so that they can be inspected. The service uses this inspection
+  to deduce whether a polling loop is necessary at all, and if so,
+  what tokens need exchange functions fetched.
+*/
 export default class TokenToUsd extends Service {
   @service declare layer2Network: Layer2Network;
   usdConverters = new UsdConverters();
@@ -27,17 +35,20 @@ export default class TokenToUsd extends Service {
 
   @task({ maxConcurrency: 1, drop: true }) *pollTask(): any {
     while (this.shouldPoll) {
-      yield waitForQueue('afterRender');
-      const updatedConverters = yield this.layer2Network.updateUsdConverters(
+      yield waitForQueue('afterRender'); // wait for all current helpers to be registered
+      let updatedConverters = yield this.layer2Network.updateUsdConverters(
         this.symbolsToUpdate
       );
-      for (const symbol of ['DAI', 'CARD'] as ConvertibleSymbol[]) {
+      for (let symbol of ['DAI', 'CARD'] as ConvertibleSymbol[]) {
         this.usdConverters[symbol] = updatedConverters[symbol];
       }
-      yield rawTimeout(INTERVAL);
+      yield rawTimeout(INTERVAL); // rawTimeout used to avoid hanging tests
     }
   }
 
+  /* Inspects registered helper instances to determine which symbols
+     should be updated. Ignores cases where the amount is zero.
+   */
   get symbolsToUpdate(): ConvertibleSymbol[] {
     let unfoundSymbols: ConvertibleSymbol[] = ['DAI', 'CARD'];
     let res: ConvertibleSymbol[] = [];
@@ -71,6 +82,8 @@ export default class TokenToUsd extends Service {
     return this.usdConverters[symbol]?.(amount.toString()).toFixed(2);
   }
 
+  // safe to call multiple times -- calls to the `pollTask` are
+  // dropped if it is already running
   register(helper: TokenToUsdHelper) {
     this.#registeredHelpers.add(helper);
     taskFor(this.pollTask).perform();
