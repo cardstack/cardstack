@@ -47,11 +47,12 @@ export default class Layer2Network extends Service {
   async updateUsdConverters(
     symbolsToUpdate: ConvertibleSymbol[]
   ): Promise<Record<ConvertibleSymbol, ConversionFunction>> {
-    if (this.walletInfo.firstAddress) {
-      return this.strategy.updateUsdConverters(symbolsToUpdate);
-    } else {
-      return {} as Record<ConvertibleSymbol, ConversionFunction>;
+    if (!this.walletInfo.firstAddress) {
+      throw new Error(
+        'Cannot fetch USD conversion without being connected to Layer 2'
+      );
     }
+    return this.strategy.updateUsdConverters(symbolsToUpdate);
   }
 
   disconnect() {

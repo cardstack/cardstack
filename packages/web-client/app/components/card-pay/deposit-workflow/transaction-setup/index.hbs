@@ -23,8 +23,8 @@
                     {{format-token-amount this.selectedTokenBalance}} {{uppercase this.selectedToken.symbol}}
                   </div>
                   <div class="deposit-card__selected-token-desc" data-test-usd-balance-view-only={{this.selectedToken.symbol}}>
-                    {{!-- TODO: usd balance --}}
-                    ≈ $ USD
+                    
+                    ≈ $ {{token-to-usd this.selectedToken.symbol this.selectedTokenBalance}} USD
                   </div>
                 </div>
               </div>

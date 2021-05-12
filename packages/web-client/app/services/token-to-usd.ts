@@ -3,7 +3,7 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
-import { timeout, waitForQueue } from 'ember-concurrency';
+import { rawTimeout, waitForQueue } from 'ember-concurrency';
 import BN from 'bn.js';
 import { toBN } from 'web3-utils';
 import TokenToUsdHelper from '@cardstack/web-client/helpers/token-to-usd';
@@ -11,8 +11,9 @@ import {
   ConvertibleSymbol,
   ConversionFunction,
 } from '@cardstack/web-client/utils/web3-strategies/types';
+import config from '@cardstack/web-client/config/environment';
 
-const INTERVAL = 60 * 1000;
+const INTERVAL = config.environment === 'test' ? 1000 : 60 * 1000;
 
 class UsdConverters {
   @tracked DAI: ConversionFunction | undefined;
@@ -33,29 +34,29 @@ export default class TokenToUsd extends Service {
       for (const symbol of ['DAI', 'CARD'] as ConvertibleSymbol[]) {
         this.usdConverters[symbol] = updatedConverters[symbol];
       }
-      yield timeout(INTERVAL);
+      yield rawTimeout(INTERVAL);
     }
   }
 
   get symbolsToUpdate(): ConvertibleSymbol[] {
     let unfoundSymbols: ConvertibleSymbol[] = ['DAI', 'CARD'];
-    const res: ConvertibleSymbol[] = [];
-    for (const helper of this.#registeredHelpers.values()) {
+    let res: ConvertibleSymbol[] = [];
+    for (let helper of this.#registeredHelpers.values()) {
       if (
         helper.symbol &&
         unfoundSymbols.includes(helper.symbol) &&
-        helper.amount?.gte(toBN(0))
+        helper.amount?.gt(toBN(0))
       ) {
         unfoundSymbols = unfoundSymbols.filter((v) => v !== helper.symbol);
         res.push(helper.symbol);
       }
 
       if (unfoundSymbols.length === 0) {
-        return res;
+        break;
       }
     }
 
-    return res;
+    return res.sort();
   }
 
   get shouldPoll(): boolean {
