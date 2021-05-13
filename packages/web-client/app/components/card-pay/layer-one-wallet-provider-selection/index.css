@@ -73,5 +73,5 @@
 
 .card-pay-layer-one-wallet-provider-selection__item-disabled:not(.card-pay-layer-one-wallet-provider-selection__item--checked) {
   opacity: 0.5;
-  box-shadow: 0 0 0 1px transparent;
+  box-shadow: 0 0 0 1px var(--boxel-light-400);
 }

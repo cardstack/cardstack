@@ -24,88 +24,88 @@
   row-gap: 0;
 }
 
-.deposit-card__field-value {
+.deposit-card__title {
   font: 600 var(--boxel-font);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.deposit-card__field-value-sm {
+.deposit-card__title-sm {
   font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xs);
 }
 
-.deposit-card__field-address {
-  color: var(--boxel-purple-400);
+.deposit-card__title-lg {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: calc(27/20);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.deposit-card__address {
+  color: var(--boxel-purple-500);
   font-family: var(--boxel-monospace-font-family);
   font-size: var(--boxel-font-size);
   line-height: calc(22 / 16);
-  letter-spacing: var(--boxel-lsp-sm);
+  letter-spacing: 0.02em;
   word-break: break-all;
 }
 
-.deposit-card__field-address--view-only {
-  max-width: 23ch;
-}
-
-.deposit-card__field-address-sm {
-  color: var(--boxel-purple-500);
+.deposit-card__address-sm {
+  color: var(--boxel-purple-400);
+  font-family: var(--boxel-monospace-font-family);
   font-size: var(--boxel-font-size-sm);
   line-height: calc(18 / 13);
 }
 
+.deposit-card__address--view-only {
+  max-width: 22ch;
+}
+
 .deposit-card__field-info {
   grid-column: 2;
+}
+
+.deposit-card__radio-buttons {
   margin-top: var(--boxel-sp);
 }
 
-.deposit-card__field-info > * + * {
+.deposit-card__radio-buttons > * + * {
   margin-top: var(--boxel-sp);
 }
 
-.deposit-card__account {
-  display: flex;
-  align-items: center;
-  margin-top: var(--boxel-sp-xxs);
-}
-
-.deposit-card__depot {
+.deposit-card__icon-group {
   display: flex;
   align-items: center;
 }
 
-.deposit-card__field-icon {
+.deposit-card__icon-group-sm {
+  display: flex;
+  align-items: center;
+  margin-top: var(--boxel-sp-xs);
+}
+
+.deposit-card__icon {
   align-self: flex-start;
-  margin-right: var(--boxel-sp-sm);
-}
-
-.deposit-card__field-icon-sm {
-  /* width: 1.25rem;
-  height: 1.25rem; */
-  margin-right: var(--boxel-sp-xs);
-}
-
-.deposit-card__loading-indicator {
-  width: var(--boxel-sp-sm);
-  height: var(--boxel-sp-sm);
-}
-
-.deposit-card__selected-token {
-  display: flex;
-  align-items: center;
-}
-
-.deposit-card__selected-token-icon {
   width: 2.5rem;
   height: 2.5rem;
   object-fit: contain;
   margin-right: var(--boxel-sp-sm);
 }
 
-.deposit-card__selected-token-title {
-  color: var(--boxel-dark);
-  font: 600 var(--boxel-font);
-  letter-spacing: var(--boxel-lsp-xs);
+.deposit-card__icon-sm {
+  align-self: flex-start;
+  width: 1.25rem;
+  height: 1.25rem;
+  object-fit: contain;
+  margin-right: var(--boxel-sp-xs);
 }
-.deposit-card__selected-token-desc {
+
+.deposit-card__loading-indicator {
+  width: var(--boxel-sp);
+  height: var(--boxel-sp);
+}
+
+.deposit-card__text-sm {
   color: var(--boxel-purple-500);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);

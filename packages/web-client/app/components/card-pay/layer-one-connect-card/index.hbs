@@ -52,7 +52,7 @@
       />
     {{/if}}
   </section>
-  <Boxel::CtaBlock @state={{this.ctaState}}>
+  <Boxel::ActionChin @state={{this.ctaState}}>
     <:default as |a|>
       <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
         Connect Wallet
@@ -64,28 +64,21 @@
       </d.ActionButton>
     </:disabled>
     <:in-progress as |i|>
-      <i.ActionButton data-test-mainnet-connect-button>
-        Connecting
-      </i.ActionButton>
+      <i.ActionStatusArea class="layer-one-connect-card__logo" @icon={{concat this.radioWalletProviderId "-logo"}} style={{css-var status-icon-size="2.5rem"}}>
+        <LoadingIndicator class="layer-one-connect-card__loading-indicator" />
+        Waiting for you to connect Card Pay with your mainnet wallet...
+      </i.ActionStatusArea>
       <i.CancelButton {{on "click" this.cancelConnection}}>
         Cancel
       </i.CancelButton>
+      <i.InfoArea>
+        Only visible to you
+      </i.InfoArea>
     </:in-progress>
     <:memorialized as |m|>
       <m.ActionButton {{on "click" this.disconnect}} data-test-mainnet-disconnect-button>
         Disconnect Wallet
       </m.ActionButton>
     </:memorialized>
-  </Boxel::CtaBlock>
+  </Boxel::ActionChin>
 </ActionCardContainer>
-
-{{#if (and this.isWaitingForConnection (not @suppressConnectingCard))}}
-  <ActionCardContainer class="layer-one-connect-card__connection">
-    <div class="layer-one-connect-card__connection-icons">
-      <img src={{this.cardstackLogo}} alt="" role="presentation" class="layer-one-connect-card__connection-cardstack-logo">
-      <img src={{this.connectionSymbol}} alt="" role="presentation" class="layer-one-connect-card__connection-symbol">
-      <img src={{this.connectedWalletLogo}} alt="" role="presentation" class="layer-one-connect-card__connection-wallet-logo">
-    </div>
-    <div class="layer-one-connect-card__connection-text">Waiting for you to connect Card Pay with your mainnet wallet...</div>
-  </ActionCardContainer>
-{{/if}}
