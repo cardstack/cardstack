@@ -56,7 +56,7 @@ const MAINNET = {
     coingeckoId: 'ethereum',
     symbol: 'ETH',
     name: 'Ethereum',
-  },,
+  },
   name: 'Ethereum Mainnet',
   rpcNode: `${MAINNET_INFURA_URL}/${INFURA_PROJECT_ID}`,
   rpcWssNode: `${MAINNET_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
