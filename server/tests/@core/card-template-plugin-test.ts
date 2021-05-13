@@ -1,8 +1,10 @@
 import QUnit from 'qunit';
-import { ComponentInfo } from '../../src/interfaces';
-import transform, { Options } from './../../src/glimmer/card-template-plugin';
-import { COMPILED_STRING_CARD, COMPILED_DATE_CARD } from '../helpers/fixtures';
-import { equalIgnoringWhiteSpace } from '../helpers/assertions';
+import { CompiledCard, ComponentInfo } from '@cardstack/core/src/interfaces';
+import transform, {
+  Options,
+} from '@cardstack/core/src/glimmer/card-template-plugin';
+import { equalIgnoringWhiteSpace } from '@cardstack/core/tests/helpers/assertions';
+import { TestBuilder } from '../helpers/test-builder';
 
 function importAndChooseName() {
   return 'BestGuess';
@@ -11,6 +13,17 @@ function importAndChooseName() {
 QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
   let options: Options;
   let usedFields: ComponentInfo['usedFields'];
+  let compiledStringCard: CompiledCard, compiledDateCard: CompiledCard;
+
+  hooks.before(async function () {
+    let builder = new TestBuilder();
+    compiledStringCard = await builder.getCompiledCard(
+      'https://cardstack.com/base/string'
+    );
+    compiledDateCard = await builder.getCompiledCard(
+      'https://cardstack.com/base/date'
+    );
+  });
 
   hooks.beforeEach(function () {
     usedFields = [];
@@ -21,7 +34,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       let template = transform('<@model.title />', {
         fields: {
           title: {
-            card: COMPILED_STRING_CARD,
+            card: compiledStringCard,
             name: 'title',
             type: 'contains',
           },
@@ -43,7 +56,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         fields: {
           createdAt: {
             type: 'contains',
-            card: COMPILED_DATE_CARD,
+            card: compiledDateCard,
             name: 'createdAt',
           },
         },
@@ -61,7 +74,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       options = {
         fields: {
           items: {
-            card: COMPILED_STRING_CARD,
+            card: compiledStringCard,
             name: 'items',
             type: 'containsMany',
           },
@@ -119,7 +132,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       let template = transform('<@model.items />', {
         fields: {
           items: {
-            card: COMPILED_STRING_CARD,
+            card: compiledStringCard,
             name: 'items',
             type: 'containsMany',
           },
@@ -142,7 +155,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         fields: {
           items: {
             name: 'items',
-            card: COMPILED_DATE_CARD,
+            card: compiledDateCard,
             type: 'containsMany',
           },
         },
@@ -174,22 +187,22 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         fields: {
           title: {
             type: 'contains',
-            card: COMPILED_STRING_CARD,
+            card: compiledStringCard,
             name: 'title',
           },
           startDate: {
             type: 'contains',
-            card: COMPILED_DATE_CARD,
+            card: compiledDateCard,
             name: 'startDate',
           },
           items: {
             type: 'containsMany',
-            card: COMPILED_STRING_CARD,
+            card: compiledStringCard,
             name: 'items',
           },
           events: {
             type: 'containsMany',
-            card: COMPILED_DATE_CARD,
+            card: compiledDateCard,
             name: 'events',
           },
         },

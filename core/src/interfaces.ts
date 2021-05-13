@@ -1,4 +1,5 @@
 import difference from 'lodash/difference';
+import { BadRequest } from '@cardstack/server/src/middleware/error';
 
 const componentFormats = {
   isolated: '',
@@ -132,7 +133,7 @@ export function assertValidCompiledCard(
     );
 
     if (unexpectedFields.length) {
-      throw new Error(
+      throw new BadRequest(
         `Field(s) "${unexpectedFields.join(', ')}" does not exist on card "${
           card.url
         }"`
