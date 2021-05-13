@@ -36,10 +36,6 @@ module.exports = function (defaults) {
     packagerOptions: {
       webpackConfig: {
         plugins: [
-          // new DefinePlugin({
-          //   'process.env': '({})',
-          //   'process.platform': '"browser"',
-          // }),
           new ProvidePlugin({
             Buffer: 'buffer',
             process: 'process',
