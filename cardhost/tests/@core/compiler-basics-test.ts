@@ -261,9 +261,8 @@ module('@core | compiler-basics', function (hooks) {
     });
 
     test('it inlines a simple field template', async function (assert) {
-      assert.equal(
-        compiled.isolated.moduleName,
-        `${card.url}/isolated.js`,
+      assert.ok(
+        compiled.isolated.moduleName.startsWith(`${card.url}/isolated`),
         'templateModule for "isolated" is full url'
       );
     });
@@ -280,9 +279,9 @@ module('@core | compiler-basics', function (hooks) {
       this.createCard(PERSON_CARD);
 
       let compiled = await builder.getCompiledCard(PERSON_CARD.url);
-      assert.equal(
-        compiled.embedded.moduleName,
-        `${PERSON_CARD.url}/embedded.js`
+      assert.ok(
+        compiled.embedded.moduleName.startsWith(`${PERSON_CARD.url}/embedded`),
+        'templateModule for "embedded" is full url'
       );
       let source = window.require(compiled.embedded.moduleName).default;
       assert.equal(source.moduleName, '@glimmer/component/template-only');

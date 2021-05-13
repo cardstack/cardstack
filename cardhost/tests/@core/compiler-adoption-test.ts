@@ -91,9 +91,9 @@ module('@core | compiler-adoption', function (hooks) {
 
       let compiled = await builder.getCompiledCard(card.url);
       assert.deepEqual(Object.keys(compiled.fields), [
-        'username',
         'name',
         'birthdate',
+        'username',
       ]);
     });
 
@@ -191,9 +191,11 @@ module('@core | compiler-adoption', function (hooks) {
       this.createCard(card);
 
       let compiledCard = await builder.getCompiledCard(card.url);
-      assert.equal(
-        compiledCard.embedded.moduleName,
-        `${PERSON_CARD.url}/embedded.js`
+      assert.ok(
+        compiledCard.embedded.moduleName.startsWith(
+          `${PERSON_CARD.url}/embedded`
+        ),
+        'Has a embedded component'
       );
     });
 
@@ -228,9 +230,11 @@ module('@core | compiler-adoption', function (hooks) {
       this.createCard(card);
 
       let compiledCard = await builder.getCompiledCard(card.url);
-      assert.equal(
-        compiledCard.embedded.moduleName,
-        `${PERSON_CARD.url}/embedded.js`
+      assert.ok(
+        compiledCard.embedded.moduleName.startsWith(
+          `${PERSON_CARD.url}/embedded`
+        ),
+        'Has a embedded component'
       );
     });
   });
