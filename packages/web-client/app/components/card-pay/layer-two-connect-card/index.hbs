@@ -36,13 +36,13 @@
         />
       </CardPay::FieldStack>
     </section>
-    <Boxel::CtaBlock @state='memorialized'>
+    <Boxel::ActionChin @state='memorialized'>
       <:memorialized as |m|>
         <m.ActionButton {{on "click" (perform this.disconnectWalletTask)}} data-test-layer-2-wallet-disconnect-button>
           Disconnect Wallet
         </m.ActionButton>
       </:memorialized>
-    </Boxel::CtaBlock>
+    </Boxel::ActionChin>
   {{else}}
     <div class="layer-two-connect-card__section-one">
       <h2 class="layer-two-connect-card__header">

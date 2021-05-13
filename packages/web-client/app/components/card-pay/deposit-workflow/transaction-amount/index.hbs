@@ -57,7 +57,7 @@
 
     </div>
   </section>
-  <Boxel::CtaBlock @stepNumber={{1}} @state={{this.unlockCtaState}}>
+  <Boxel::ActionChin @stepNumber={{1}} @state={{this.unlockCtaState}}>
     <:default as |a|>
       <a.ActionButton data-test-unlock-button {{on "click" this.unlock}}>
         Unlock
@@ -85,8 +85,8 @@
       </m.InfoArea>
       {{/if}}
     </:memorialized>
-  </Boxel::CtaBlock>
-  <Boxel::CtaBlock @stepNumber={{2}} @state={{this.depositCtaState}} class={{cn card-pay-transaction-amount__deposited-memorialized-cta=(eq this.depositCtaState 'memorialized')}}>
+  </Boxel::ActionChin>
+  <Boxel::ActionChin @stepNumber={{2}} @state={{this.depositCtaState}} class={{cn card-pay-transaction-amount__deposited-memorialized-cta=(eq this.depositCtaState 'memorialized')}}>
     <:default as |a|>
       <a.ActionButton  {{on "click" this.deposit}} data-test-deposit-button>
         Deposit
@@ -114,5 +114,5 @@
       </m.InfoArea>
       {{/if}}
     </:memorialized>
-  </Boxel::CtaBlock>
+  </Boxel::ActionChin>
 </ActionCardContainer>

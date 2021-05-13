@@ -56,12 +56,13 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
     await render(hbs`
         <CardPay::LayerOneConnectCard/>
       `);
-
     await click('[data-test-wallet-option="metamask"]');
     await click(CONNECT_BUTTON_SELECTOR);
 
     // the card should not be assuming it is connected to metamask before connection is completed
-    assert.dom(CONNECT_BUTTON_SELECTOR).hasClass(/--loading/);
+    assert
+      .dom('[data-test-boxel-action-chin-action-status-area]')
+      .containsText('Waiting for you to connect');
     assert
       .dom(HEADER_SELECTOR)
       .containsText('Connect your Ethereum mainnet wallet');

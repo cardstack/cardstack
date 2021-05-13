@@ -150,7 +150,7 @@ module('Acceptance | deposit', function (hooks) {
       .hasText('0x18261...6E44');
     assert
       .dom(`${post} [data-test-deposit-transaction-setup-depot-address]`)
-      .hasText('Create a new Depot');
+      .hasText('New Depot');
     assert
       .dom('[data-test-deposit-transaction-setup-is-complete]')
       .doesNotExist();
@@ -158,7 +158,6 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom('[data-test-deposit-transaction-setup] [data-test-boxel-button]')
       .isDisabled();
-
     await click(`${post} [data-test-option="DAI"]`);
     await click(
       `${post} [data-test-deposit-transaction-setup] [data-test-boxel-button]`
