@@ -7,7 +7,7 @@ export const viewTokenBalance = async (network: string, mnemonic: string, tokenA
   let assets = new Assets(web3);
 
   if (!tokenAddress) {
-    const nativeTokenSymbol = getConstantByNetwork('nativeCoin', network);
+    const nativeTokenSymbol = getConstantByNetwork('nativeTokenSymbol', network);
 
     const balance = await assets.getNativeTokenBalance();
 
