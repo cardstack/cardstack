@@ -17,14 +17,18 @@ import cardTemplatePlugin, {
   Options as CardTemplateOptions,
 } from './babel/card-template-plugin';
 import {
+  assertValidCompiledCard,
   Asset,
   Builder,
   CompiledCard,
   ComponentInfo,
   Format,
+  formats,
   RawCard,
 } from './interfaces';
-import { BadRequest } from '@cardstack/server/src/middleware/error';
+import { getBasenameAndExtension } from './utils';
+
+export const baseCardURL = 'https://cardstack.com/base/base';
 
 function getNonAssetFilePaths(sourceCard: RawCard): (string | undefined)[] {
   return [sourceCard.schema, sourceCard.isolated, sourceCard.embedded].filter(
@@ -34,6 +38,7 @@ function getNonAssetFilePaths(sourceCard: RawCard): (string | undefined)[] {
 
 export class Compiler {
   builder: Builder;
+  compiledBaseCard?: CompiledCard;
 
   // returns the module identifier that can be used to get this module back.
   // It's exactly meaning depends on the environment. In node it's a path you
@@ -50,46 +55,50 @@ export class Compiler {
   }
 
   async compile(cardSource: RawCard): Promise<CompiledCard> {
-    if (cardSource.url === compiledBaseCard.url) {
-      return compiledBaseCard;
-    }
-
-    let options = {};
-    let modelModuleName = await this.prepareSchema(cardSource, options);
-    let meta = getMeta(options);
-    let fields = await this.lookupFieldsForCard(meta.fields);
-    let assets = this.buildAssetsList(cardSource);
-
-    let parentCard = await this.getParentCard(cardSource, meta);
-    if (parentCard) {
-      fields = this.adoptFields(fields, parentCard);
-    }
-
-    assertValidData(fields, cardSource.data, cardSource.url);
-
-    let card: CompiledCard = {
+    let card: Partial<CompiledCard> = {
       url: cardSource.url,
-      modelModule: modelModuleName ?? parentCard.modelModule,
-      fields,
       data: cardSource.data,
-      assets,
-      isolated: await this.prepareComponent(
-        cardSource,
-        fields,
-        parentCard,
-        'isolated'
-      ),
-      embedded: await this.prepareComponent(
-        cardSource,
-        fields,
-        parentCard,
-        'embedded'
-      ),
     };
+    let options = {};
+    card.modelModule = await this.prepareSchema(cardSource, options);
+    let meta = getMeta(options);
 
-    if (parentCard) {
-      card['adoptsFrom'] = parentCard;
+    card.fields = await this.lookupFieldsForCard(meta.fields);
+    card.assets = this.buildAssetsList(cardSource);
+
+    if (!isBaseCard(cardSource.url)) {
+      let parentCard = await this.getParentCard(cardSource, meta);
+
+      if (!parentCard) {
+        throw new Error(
+          `${cardSource.url} does not have a parent card. This is wrong and should not happen.`
+        );
+      }
+
+      card.fields = this.adoptFields(card.fields, parentCard);
+      card.adoptsFrom = parentCard;
+
+      if (!card.modelModule) {
+        card.modelModule = parentCard.modelModule;
+      }
     }
+
+    if (!card.modelModule) {
+      throw new Error(
+        `${cardSource.url} does not have a schema. This is wrong and should not happen.`
+      );
+    }
+
+    for (const format of formats) {
+      card[format] = await this.prepareComponent(
+        cardSource,
+        card.fields,
+        card.adoptsFrom,
+        format
+      );
+    }
+
+    assertValidCompiledCard(card);
 
     return card;
   }
@@ -146,18 +155,16 @@ export class Compiler {
     cardSource: RawCard,
     meta: PluginMeta
   ): Promise<CompiledCard> {
-    let parentCard: CompiledCard;
     let parentCardPath = this.getCardParentPath(cardSource, meta);
 
     if (parentCardPath) {
       // TODO: Confirm the path correctly depthed
       let url = new URL(parentCardPath, cardSource.url).href;
-      parentCard = await this.builder.getCompiledCard(url);
+      return await this.builder.getCompiledCard(url);
     } else {
       // the base card from which all other cards derive
-      parentCard = compiledBaseCard;
+      return await this.builder.getCompiledCard(baseCardURL);
     }
-    return parentCard;
   }
 
   private getSource(cardSource: RawCard, path: string): string {
@@ -237,13 +244,18 @@ export class Compiler {
   private async prepareComponent(
     cardSource: RawCard,
     fields: CompiledCard['fields'],
-    parentCard: CompiledCard,
+    parentCard: CompiledCard | undefined,
     which: Format
   ): Promise<ComponentInfo> {
     let localFilePath = cardSource[which];
 
     if (!localFilePath) {
       // we don't have an implementation of our own
+      if (!parentCard) {
+        throw new Error(
+          `${cardSource.url} doesn't have a ${which} component OR a parent card. This is not right.`
+        );
+      }
 
       if (cardSource.schema) {
         // recompile parent component because we extend the schema
@@ -306,27 +318,6 @@ export class Compiler {
   }
 }
 
-// it's easier to hand-compile and hard-code the base card rather than make the
-// card compiler always support the case of an undefined parentCard. This is the
-// only card with no parentCard
-export const compiledBaseCard: CompiledCard = {
-  url: 'https://cardstack.com/base/base',
-  fields: {},
-  data: undefined,
-  modelModule: 'todo',
-  isolated: {
-    moduleName: 'todo',
-    usedFields: [],
-    sourceCardURL: 'https://cardstack.com/base/base',
-  },
-  embedded: {
-    moduleName: 'todo',
-    usedFields: [],
-    sourceCardURL: 'https://cardstack.com/base/base',
-  },
-  assets: [],
-};
-
 function getAssetType(filename: string): Asset['type'] {
   if (filename.endsWith('.css')) {
     return 'css';
@@ -335,34 +326,11 @@ function getAssetType(filename: string): Asset['type'] {
   return 'unknown';
 }
 
-function assertValidData(
-  fields: CompiledCard['fields'],
-  data: RawCard['data'],
-  url: string
-) {
-  if (!data) {
-    return;
-  }
-
-  let unexpectedFields = difference(Object.keys(data), Object.keys(fields));
-
-  if (unexpectedFields.length) {
-    // TODO: This shouldn't know about requests or whether they were bad
-    throw new BadRequest(
-      `Field(s) "${unexpectedFields.join(
-        ', '
-      )}" does not exist on card "${url}"`
-    );
-  }
-}
-
 function hashFilenameFromFields(
   localFile: string,
   fields: CompiledCard['fields']
 ): string {
-  let extensionMatch = localFile.match(/\.[^/.]+$/);
-  let extension = extensionMatch ? extensionMatch[0] : '';
-  let name = localFile.replace(extension, '');
+  let { basename, extension } = getBasenameAndExtension(localFile);
   let hash = md5(
     reduce(
       fields,
@@ -372,5 +340,8 @@ function hashFilenameFromFields(
       ''
     )
   );
-  return `${name}-${hash}${extension}`;
+  return `${basename}-${hash}${extension}`;
+}
+function isBaseCard(url: string): boolean {
+  return url === baseCardURL;
 }
