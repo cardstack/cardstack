@@ -16,10 +16,12 @@ export default class Builder implements BuilderInterface {
     define: (...args) => this.defineModule(...args),
   });
 
-  private cache: Map<string, CompiledCard>;
+  private compiledCardCache: Map<string, CompiledCard>;
+  private rawCardCache: Map<string, RawCard>;
 
   constructor(/*params: { realms: RealmConfig[] }*/) {
-    this.cache = new Map();
+    this.compiledCardCache = new Map();
+    this.rawCardCache = new Map();
   }
 
   private async defineModule(
@@ -34,16 +36,22 @@ export default class Builder implements BuilderInterface {
   }
 
   async getRawCard(url: string): Promise<RawCard> {
+    let raw = this.rawCardCache.get(url);
+    if (raw) {
+      return raw;
+    }
     let response = await fetch(`/cards/${encodeCardURL(url)}?type=raw`);
     if (!response || response.status === 404) {
       throw Error(`Card Builder: No raw card found for ${url}`);
     }
     let responseBody = await response.json();
-    return responseBody.data.attributes.raw;
+    raw = responseBody.data.attributes.raw as RawCard;
+    this.rawCardCache.set(url, raw);
+    return raw;
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
-    let compiledCard = this.cache.get(url);
+    let compiledCard = this.compiledCardCache.get(url);
 
     // Typescript didn't seem to trust this.cache.has(...) as a sufficient null guarentee
     if (compiledCard) {
@@ -53,7 +61,7 @@ export default class Builder implements BuilderInterface {
     let rawCard = await this.getRawCard(url);
     compiledCard = await this.compiler.compile(rawCard);
     this.copyAssets(url, compiledCard.assets, rawCard.files);
-    this.cache.set(url, compiledCard);
+    this.compiledCardCache.set(url, compiledCard);
     return compiledCard;
   }
 
