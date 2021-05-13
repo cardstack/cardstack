@@ -16,7 +16,12 @@ const SOKOL = {
   balanceCheckerContractAddress: '0xaeDFe60b0732924249866E3FeC71835EFb1fc9fF',
   blockExplorer: 'https://blockscout.com/poa/sokol',
   faucetUrl: 'https://faucet.poa.network',
-  nativeCoin: 'SPOA',
+  nativeToken: {
+    address: 'spoa',
+    coingeckoId: 'ethereum',
+    symbol: 'SPOA',
+    name: 'SPOA',
+  },
   name: 'Sokol',
   rpcNode: 'https://sokol.stack.cards',
   rpcWssNode: 'https://sokol-wss.stack.cards',
@@ -30,7 +35,12 @@ const KOVAN = {
   blockExplorer: 'https://kovan.etherscan.io',
   bridgeExplorer: 'https://alm-test-amb.herokuapp.com/42',
   faucetUrl: 'https://faucet.kovan.network/',
-  nativeCoin: 'KETH',
+  nativeToken: {
+    address: 'eth',
+    coingeckoId: 'ethereum',
+    symbol: 'KETH',
+    name: 'Ethereum',
+  },
   name: 'Kovan',
   rpcNode: `${KOVAN_INFURA_URL}/${INFURA_PROJECT_ID}`,
   rpcWssNode: `${KOVAN_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
@@ -41,7 +51,12 @@ const MAINNET = {
   balanceCheckerContractAddress: '0x4dcf4562268dd384fe814c00fad239f06c2a0c2b',
   blockExplorer: 'https://etherscan.io',
   bridgeExplorer: 'https://alm-xdai.herokuapp.com',
-  nativeCoin: 'ETH',
+  nativeToken: {
+    address: 'eth',
+    coingeckoId: 'ethereum',
+    symbol: 'ETH',
+    name: 'Ethereum',
+  },,
   name: 'Ethereum Mainnet',
   rpcNode: `${MAINNET_INFURA_URL}/${INFURA_PROJECT_ID}`,
   rpcWssNode: `${MAINNET_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
@@ -51,7 +66,12 @@ const XDAI = {
   /** deployed instance of this contract: https://github.com/wbobeirne/eth-balance-checker */
   balanceCheckerContractAddress: '0x6B78C121bBd10D8ef0dd3623CC1abB077b186F65',
   blockExplorer: 'https://blockscout.com/xdai/mainnet',
-  nativeCoin: 'DAI',
+  nativeToken: {
+    address: 'dai',
+    coingeckoId: 'dai',
+    symbol: 'DAI',
+    name: 'xDai',
+  },
   name: 'xDai Chain',
   rpcNode: 'https://rpc.xdaichain.com',
   rpcWssNode: 'wss://rpc.xdaichain.com/wss',
@@ -60,7 +80,6 @@ const XDAI = {
 };
 
 type ConstantKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof XDAI;
-type Network = 'sokol' | 'kovan' | 'mainnet' | 'xdai';
 
 const constants: {
   [network: string]: {
@@ -81,7 +100,7 @@ export const networks: { [networkId: number]: string } = Object.freeze({
 });
 export const networkIds = (Object.freeze(invert({ ...networks })) as unknown) as { [networkName: string]: number };
 
-export function getConstantByNetwork(name: ConstantKeys, network: Network): string {
+export function getConstantByNetwork(name: ConstantKeys, network: string): string {
   let value = constants[network][name];
   if (!value) {
     throw new Error(`Don't know about the constant '${name}' for network ${network}`);
@@ -89,7 +108,7 @@ export function getConstantByNetwork(name: ConstantKeys, network: Network): stri
   return value;
 }
 
-export async function getConstant(name: ConstantKeys, network: Network): Promise<string>;
+export async function getConstant(name: ConstantKeys, network: string): Promise<string>;
 export async function getConstant(name: ConstantKeys, web3: Web3): Promise<string>;
 export async function getConstant(name: ConstantKeys, web3OrNetwork: Web3 | Network): Promise<string> {
   let network: string;
