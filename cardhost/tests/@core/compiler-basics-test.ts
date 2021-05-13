@@ -7,6 +7,7 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import setupCardMocking from '../helpers/card-mocking';
 import Builder from 'cardhost/lib/builder';
 import { RawCard, CompiledCard } from '@cardstack/core/src/interfaces';
+import { baseCardURL } from '@cardstack/core/src/compiler';
 
 async function evalModule(src: string): Promise<any> {
   //   return import(`data:application/javascript;base64,${btoa(src)}`);
@@ -60,6 +61,25 @@ module('@core | compiler-basics', function (hooks) {
     let compiled = compileTemplate(`<div class="it-works"></div>`);
     await render(compiled);
     assert.ok(document.querySelector('.it-works'));
+  });
+
+  test('can compile the base card', async function (assert) {
+    let compiled = await builder.getCompiledCard(baseCardURL);
+    console.log('COMPILED BASE CARD', compiled);
+
+    assert.equal(compiled.url, baseCardURL, 'Includes basecard URL');
+    assert.ok(compiled.modelModule, 'base card has a model module');
+    assert.notOk(compiled.adoptsFrom, 'No parent card listed');
+    assert.deepEqual(compiled.fields, {}, 'No fields');
+    assert.deepEqual(compiled.assets, [], 'No assets');
+    assert.ok(
+      compiled.isolated.moduleName.startsWith(`${baseCardURL}/isolated-`),
+      'Isolated module exists'
+    );
+    assert.ok(
+      compiled.embedded.moduleName.startsWith(`${baseCardURL}/embedded-`),
+      'Embedded module exists'
+    );
   });
 
   test('Names and defines a module for the model', async function (assert) {
