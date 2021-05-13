@@ -15,6 +15,7 @@ const SOKOL = {
   /** deployed instance of this contract: https://github.com/wbobeirne/eth-balance-checker */
   balanceCheckerContractAddress: '0xaeDFe60b0732924249866E3FeC71835EFb1fc9fF',
   blockExplorer: 'https://blockscout.com/poa/sokol',
+  faucetUrl: 'https://faucet.poa.network',
   nativeCoin: 'SPOA',
   name: 'Sokol',
   rpcNode: 'https://sokol.stack.cards',
@@ -28,6 +29,7 @@ const KOVAN = {
   balanceCheckerContractAddress: '0xf3352813b612a2d198e437691557069316b84ebe',
   blockExplorer: 'https://kovan.etherscan.io',
   bridgeExplorer: 'https://alm-test-amb.herokuapp.com/42',
+  faucetUrl: 'https://faucet.kovan.network/',
   nativeCoin: 'KETH',
   name: 'Kovan',
   rpcNode: `${KOVAN_INFURA_URL}/${INFURA_PROJECT_ID}`,
