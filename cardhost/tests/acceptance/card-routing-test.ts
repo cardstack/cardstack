@@ -9,9 +9,10 @@ module('Acceptance | card routing', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
   setupCardMocking(hooks);
+  let personURL = 'https://mirage/cards/person';
 
   hooks.beforeEach(function () {
-    // TODO
+    // TODO: This is now how the server works
     this.server.create('space', {
       id: 'home',
       routingCard: 'https://mirage/cards/my-routes',
@@ -25,7 +26,7 @@ module('Acceptance | card routing', function (hooks) {
           export default class MyRoutes {
             routeTo(path) {
               if (path === '/welcome') {
-                return 'https://mirage/cards/person';
+                return '${personURL}';
               }
             }
           }`,
@@ -33,7 +34,7 @@ module('Acceptance | card routing', function (hooks) {
     });
 
     this.createCard({
-      url: 'https://mirage/cards/person',
+      url: personURL,
       schema: 'schema.js',
       isolated: 'isolated.js',
       data: {
@@ -60,7 +61,8 @@ module('Acceptance | card routing', function (hooks) {
     await visit('/welcome');
     assert.equal(currentURL(), '/welcome');
     assert.equal(
-      document.head.querySelector('[data-assets-for-card]')?.innerHTML,
+      document.head.querySelector(`[data-assets-for-card="${personURL}"]`)
+        ?.innerHTML,
       '/* card:https://mirage/cards/person asset:isolated.css */\n.person-isolated { background: red }\n\n'
     );
     assert.dom('[data-test-person]').containsText('Hi! I am Arthur');
