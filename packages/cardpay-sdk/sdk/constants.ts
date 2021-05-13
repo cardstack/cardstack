@@ -11,6 +11,7 @@ const MAINNET_INFURA_WSS_URL = 'wss://mainnet.infura.io/ws/v3';
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 const SOKOL = {
+  apiBaseUrl: 'https://blockscout.com/poa/sokol/api/eth-rpc',
   blockExplorer: 'https://blockscout.com/poa/sokol',
   nativeCoin: 'SPOA',
   rpcNode: 'https://sokol.stack.cards',
@@ -19,6 +20,7 @@ const SOKOL = {
   transactionServiceURL: 'https://transactions-staging.stack.cards/api',
 };
 const KOVAN = {
+  apiBaseUrl: 'https://api-kovan.etherscan.io/api',
   blockExplorer: 'https://kovan.etherscan.io',
   bridgeExplorer: 'https://alm-test-amb.herokuapp.com/42',
   nativeCoin: 'KETH',
@@ -26,6 +28,7 @@ const KOVAN = {
   rpcWssNode: `${KOVAN_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
 };
 const MAINNET = {
+  apiBaseUrl: 'https://api.etherscan.io/api',
   blockExplorer: 'https://etherscan.io',
   bridgeExplorer: 'https://alm-xdai.herokuapp.com',
   nativeCoin: 'ETH',
@@ -33,6 +36,7 @@ const MAINNET = {
   rpcWssNode: `${MAINNET_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
 };
 const XDAI = {
+  apiBaseUrl: 'https://blockscout.com/xdai/mainnet/api',
   blockExplorer: 'https://blockscout.com/xdai/mainnet',
   nativeCoin: 'DAI',
   rpcNode: 'https://rpc.xdaichain.com',
