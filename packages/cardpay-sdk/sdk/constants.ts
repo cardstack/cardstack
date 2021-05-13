@@ -110,7 +110,7 @@ export function getConstantByNetwork(name: ConstantKeys, network: string): strin
 
 export async function getConstant(name: ConstantKeys, network: string): Promise<string>;
 export async function getConstant(name: ConstantKeys, web3: Web3): Promise<string>;
-export async function getConstant(name: ConstantKeys, web3OrNetwork: Web3 | Network): Promise<string> {
+export async function getConstant(name: ConstantKeys, web3OrNetwork: Web3 | string): Promise<string> {
   let network: string;
   if (typeof web3OrNetwork === 'string') {
     network = web3OrNetwork;
