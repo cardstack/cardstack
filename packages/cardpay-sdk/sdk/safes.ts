@@ -5,11 +5,22 @@ import PrepaidCardManagerABI from '../contracts/abi/prepaid-card-manager';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from './constants';
+import ExchangeRate from './exchange-rate';
 
-export interface SafeInfo {
+type SafeInfo = DepotInfo | PrepaidCardInfo;
+interface DepotInfo {
+  isPrepaidCard: false;
   address: string;
-  isPrepaidCard: boolean;
   tokens: TokenInfo[];
+}
+
+interface PrepaidCardInfo {
+  isPrepaidCard: true;
+  address: string;
+  tokens: TokenInfo[];
+  issuingToken: string;
+  spendFaceValue: number;
+  issuer: string;
 }
 interface TokenInfo {
   tokenAddress: string;
@@ -34,24 +45,37 @@ export default class Safes {
       PrepaidCardManagerABI as AbiItem[],
       await getAddress('prepaidCardManager', this.layer2Web3)
     );
+    let exchangeRate = new ExchangeRate(this.layer2Web3);
 
     return await Promise.all(
       safes.map(async (safeAddress: string) => {
-        const { issuer } = await prepaidCardManager.methods.cardDetails(safeAddress).call();
-        const isPrepaidCard = issuer !== ZERO_ADDRESS;
-
         let balanceResponse = await fetch(`${transactionServiceURL}/v1/safes/${safeAddress}/balances/`);
         if (!balanceResponse?.ok) {
           throw new Error(await balanceResponse.text());
         }
+        let { issuer, issueToken: issuingToken } = await prepaidCardManager.methods.cardDetails(safeAddress).call();
+        let balances: TokenInfo[] = await balanceResponse.json();
+        let tokens = balances.filter((balanceItem) => balanceItem.tokenAddress);
+        let issuingTokenBalance =
+          tokens.find((t) => t.tokenAddress.toLowerCase() === issuingToken.toLowerCase())?.balance ?? '0';
 
-        const balances: TokenInfo[] = await balanceResponse.json();
-
-        return {
-          address: safeAddress,
-          isPrepaidCard,
-          tokens: balances.filter((balanceItem) => balanceItem.tokenAddress),
-        };
+        let isPrepaidCard = issuer !== ZERO_ADDRESS;
+        if (!isPrepaidCard) {
+          return {
+            isPrepaidCard: false,
+            address: safeAddress,
+            tokens,
+          } as DepotInfo;
+        } else {
+          return {
+            isPrepaidCard: true,
+            address: safeAddress,
+            tokens,
+            issuer,
+            issuingToken,
+            spendFaceValue: await exchangeRate.convertToSpend(issuingToken, issuingTokenBalance),
+          } as PrepaidCardInfo;
+        }
       })
     );
   }

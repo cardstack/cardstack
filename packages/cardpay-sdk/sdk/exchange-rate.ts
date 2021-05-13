@@ -2,7 +2,8 @@ import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
 import PriceOracle from '../contracts/abi/price-oracle';
-import { getOracle } from '../contracts/addresses';
+import RevenuePoolABI from '../contracts/abi/revenue-pool';
+import { getOracle, getAddress } from '../contracts/addresses';
 import BN from 'bn.js';
 
 const tokenDecimals = new BN('18');
@@ -10,6 +11,25 @@ const ten = new BN('10');
 
 export default class ExchangeRate {
   constructor(private layer2Web3: Web3) {}
+
+  async convertToSpend(token: string, amount: string): Promise<number> {
+    let revenuePool = new this.layer2Web3.eth.Contract(
+      RevenuePoolABI as AbiItem[],
+      await getAddress('revenuePool', this.layer2Web3)
+    );
+    let spendAmount = await revenuePool.methods.convertToSpend(token, amount).call();
+    // 1 SPEND == $0.01 USD, and SPEND decimals is 0, so this is safe to
+    // represent as a javascript number
+    return Number(spendAmount);
+  }
+
+  async convertFromSpend(token: string, amount: number): Promise<string> {
+    let revenuePool = new this.layer2Web3.eth.Contract(
+      RevenuePoolABI as AbiItem[],
+      await getAddress('revenuePool', this.layer2Web3)
+    );
+    return await revenuePool.methods.convertFromSpend(token, amount.toString()).call();
+  }
 
   async getUSDConverter(token: string): Promise<(amountInWei: string) => number> {
     const oracle = await this.getOracleContract(token);

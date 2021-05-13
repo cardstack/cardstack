@@ -2,7 +2,7 @@ import Web3 from 'web3';
 import { PrepaidCard, getConstant, getAddress } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 
-const { toWei, fromWei } = Web3.utils;
+const { fromWei } = Web3.utils;
 
 export async function priceForFaceValue(
   network: string,
@@ -29,17 +29,34 @@ export async function createPrepaidCard(
   network: string,
   mnemonic: string,
   safe: string,
-  amounts: number[],
+  faceValues: number[],
   tokenAddress?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   tokenAddress = tokenAddress ?? (await getAddress('daiCpxd', web3));
 
-  const amountsInWei = amounts.map((amount) => toWei(amount.toString()).toString());
   let prepaidCard = new PrepaidCard(web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log('Creating prepaid card');
-  let result = await prepaidCard.create(safe, tokenAddress, amountsInWei);
+  let result = await prepaidCard.create(safe, tokenAddress, faceValues);
+  console.log(`Transaction hash: ${blockExplorer}/tx/${result.transactionHash}/token-transfers`);
+}
+
+export async function payMerchant(
+  network: string,
+  mnemonic: string,
+  merchantSafe: string,
+  prepaidCardAddress: string,
+  amount: number
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let prepaidCard = new PrepaidCard(web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+
+  console.log(
+    `Paying merchant safe address ${merchantSafe} the amount §${amount} SPEND from prepaid card address ${prepaidCardAddress}...`
+  );
+  let result = await prepaidCard.payMerchant(merchantSafe, prepaidCardAddress, amount);
   console.log(`Transaction hash: ${blockExplorer}/tx/${result.transactionHash}/token-transfers`);
 }

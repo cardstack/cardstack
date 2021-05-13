@@ -16,6 +16,7 @@ const addresses: {
     daiCpxd: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
     cardCpxd: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
     prepaidCardManager: '0x0a8E59b0a616750093B36F0715d32ce2E72AEf7A',
+    revenuePool: '0x6bAba06A258104e2deB5406F53D0978Dc5C56575',
     oracles: {
       DAI: '0x31ADd0e2Cf48f42E937413dE9a47d99732591795', // eslint-disable-line @typescript-eslint/naming-convention
       CARD: '0x57757a362E578e3Fe3e5984131F6b4CC3aC8af14', // eslint-disable-line @typescript-eslint/naming-convention

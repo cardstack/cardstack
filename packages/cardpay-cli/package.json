@@ -6,10 +6,10 @@
   "repository": "cardstack/cardstack",
   "scripts": {
     "build": "tsc && chmod +x ./index.js",
-    "cardpay": "node ./entrypoint.js"
+    "cardpay": "node ./cardpay.js"
   },
   "bin": {
-    "cardpay": "./entrypoint.js"
+    "cardpay": "./cardpay.js"
   },
   "license": "MIT",
   "dependencies": {
