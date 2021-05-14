@@ -7,7 +7,7 @@ import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
-import { SafeInfo } from '@cardstack/cardpay-sdk/sdk/safes';
+import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import {
   ConvertibleSymbol,
   ConversionFunction,
@@ -67,7 +67,7 @@ export default class Layer2Network extends Service {
     return this.strategy.awaitBridged(fromBlock, this.walletInfo.firstAddress!);
   }
 
-  async fetchDepot(): Promise<SafeInfo | null> {
+  async fetchDepot(): Promise<DepotSafe | null> {
     return this.strategy.fetchDepot(this.walletInfo.firstAddress!);
   }
 

@@ -4,7 +4,7 @@ import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 import { AbiItem } from 'web3-utils';
 import { ERC20ABI } from '@cardstack/cardpay-sdk/index.js';
-import { SafeInfo } from '@cardstack/cardpay-sdk/sdk/safes';
+import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 
 export interface Web3Strategy {
   chainName: string;
@@ -41,7 +41,7 @@ export interface Layer2Web3Strategy extends Web3Strategy {
     fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt>;
-  fetchDepot(owner: ChainAddress): Promise<SafeInfo | null>;
+  fetchDepot(owner: ChainAddress): Promise<DepotSafe | null>;
 }
 
 export type TransactionHash = string;
