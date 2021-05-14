@@ -20,7 +20,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked isConnected = false;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   waitForAccountDeferred = defer();
-  bridgingDeferred!: RSVP.Deferred<unknown>;
+  bridgingDeferred!: RSVP.Deferred<TransactionReceipt>;
   @tracked defaultTokenBalance: BN | undefined;
 
   disconnect(): Promise<void> {

@@ -6,9 +6,11 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import WorkflowSession from '../../../../models/workflow/workflow-session';
 import { toBN } from 'web3-utils';
 import BN from 'bn.js';
+import { next } from '@ember/runloop';
 
 interface CardPayDepositWorkflowConfirmationComponentArgs {
   workflowSession: WorkflowSession;
+  onComplete: () => void;
 }
 
 interface token {
@@ -37,6 +39,16 @@ class CardPayDepositWorkflowConfirmationComponent extends Component<CardPayDepos
   @service declare layer2Network: Layer2Network;
   @reads('args.workflowSession.state.depositSourceToken')
   declare selectedTokenSymbol: string;
+
+  constructor(
+    owner: unknown,
+    args: CardPayDepositWorkflowConfirmationComponentArgs
+  ) {
+    super(owner, args);
+    next(this, () => {
+      this.args.onComplete();
+    });
+  }
 
   get depositedToken(): token {
     return TOKENS[this.selectedTokenSymbol] as token;

@@ -3,15 +3,15 @@
     Card Balances
   </h2>
 
-  <Boxel::Button @kind="primary" {{on "click" (set this "isShowingDepositWorkflow" true)}} data-test-deposit-workflow-button>
+  <Boxel::Button @kind="primary" {{on "click" (set this "flow" 'deposit')}} data-test-deposit-workflow-button>
     Deposit
   </Boxel::Button>
 </section>
 
 <Boxel::Modal
   style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
-  @isOpen={{this.isShowingDepositWorkflow}}
-  @onClose={{set this "isShowingDepositWorkflow" false}}
+  @isOpen={{eq this.flow 'deposit'}}
+  @onClose={{set this "flow" null}}
 >
   <CardPay::DepositWorkflow />
 </Boxel::Modal>
