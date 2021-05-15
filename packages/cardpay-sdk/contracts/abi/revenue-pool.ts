@@ -811,11 +811,6 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: 'merchantSafe',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
         name: 'payableToken',
         type: 'address',
       },
@@ -825,7 +820,7 @@ export default [
         type: 'uint256',
       },
     ],
-    name: 'claimToken',
+    name: 'claimRevenue',
     outputs: [
       {
         internalType: 'bool',
@@ -835,6 +830,53 @@ export default [
     ],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'merchantSafe',
+        type: 'address',
+      },
+    ],
+    name: 'revenueTokens',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: '',
+        type: 'address[]',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'merchantSafe',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'payableToken',
+        type: 'address',
+      },
+    ],
+    name: 'revenueBalance',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
 ];
