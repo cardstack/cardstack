@@ -40,7 +40,7 @@ export async function createPrepaidCard(
 
   console.log('Creating prepaid card');
   let result = await prepaidCard.create(safe, tokenAddress, faceValues);
-  console.log(`Transaction hash: ${blockExplorer}/tx/${result.transactionHash}/token-transfers`);
+  console.log(`Transaction hash: ${blockExplorer}/tx/${result.ethereumTx.txHash}/token-transfers`);
 }
 
 export async function payMerchant(
@@ -58,5 +58,5 @@ export async function payMerchant(
     `Paying merchant safe address ${merchantSafe} the amount §${amount} SPEND from prepaid card address ${prepaidCardAddress}...`
   );
   let result = await prepaidCard.payMerchant(merchantSafe, prepaidCardAddress, amount);
-  console.log(`Transaction hash: ${blockExplorer}/tx/${result.transactionHash}/token-transfers`);
+  console.log(`Transaction hash: ${blockExplorer}/tx/${result.ethereumTx.txHash}/token-transfers`);
 }

@@ -15,11 +15,12 @@ const addresses: {
     homeBridge: '0x16a80598DD2f143CFBf091638CE3fB02c9135528',
     daiCpxd: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
     cardCpxd: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
-    prepaidCardManager: '0x0a8E59b0a616750093B36F0715d32ce2E72AEf7A',
-    revenuePool: '0x6bAba06A258104e2deB5406F53D0978Dc5C56575',
+    prepaidCardManager: '0x4f40a6eD9CAE27Dc34b9bf733DBe062854815c8F',
+    revenuePool: '0xd44ff7a460A589bDc61Ab4e2642846ab8996c909',
+    bridgeUtils: '0xB5a5236e71b33f1F327302ec49d8729CbB9E209F',
     oracles: {
-      DAI: '0x31ADd0e2Cf48f42E937413dE9a47d99732591795', // eslint-disable-line @typescript-eslint/naming-convention
-      CARD: '0x57757a362E578e3Fe3e5984131F6b4CC3aC8af14', // eslint-disable-line @typescript-eslint/naming-convention
+      DAI: '0x42c9555F568D5b8898c78260dB26087549Ce98A9', // eslint-disable-line @typescript-eslint/naming-convention
+      CARD: '0xDefaB8C99e3259d8088DbB73Ab116156a3EBc747', // eslint-disable-line @typescript-eslint/naming-convention
     },
   },
   mainnet: {

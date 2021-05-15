@@ -27,6 +27,7 @@ interface PayMerchantPayload extends Estimate {
 }
 interface RelayTransaction {
   to: string;
+  nonce: number;
   ethereumTx: {
     txHash: string;
     to: string;
@@ -44,6 +45,15 @@ interface RelayTransaction {
     value: string;
     from: string;
   };
+}
+
+interface PayMerchantTx extends RelayTransaction {
+  merchantAddress: string;
+  payment: number; // this is not safe to use! Need to fix in relay server
+  prepaidCardTxHash: string; // this is a hash of the txn data--not to be confused with the overal txn hash
+  tokenAddress: string;
+}
+interface GnosisExecTx extends RelayTransaction {
   value: number;
   data: string;
   timestamp: string;
@@ -53,7 +63,6 @@ interface RelayTransaction {
   gasPrice: number;
   gasToken: string;
   refundReceiver: string;
-  nonce: number;
   safeTxHash: string;
   txHash: string;
   transactionHash: string;
@@ -88,7 +97,7 @@ export default class PrepaidCard {
     prepaidCardAddress: string,
     spendAmount: number,
     options?: ContractOptions
-  ): Promise<RelayTransaction> {
+  ): Promise<PayMerchantTx> {
     if (spendAmount < 50) {
       // this is hard coded in the PrepaidCardManager contract
       throw new Error(`The amount to pay merchant §${spendAmount} SPEND is below the minimum allowable amount`);
@@ -99,7 +108,7 @@ export default class PrepaidCard {
     let exchangeRate = new ExchangeRate(this.layer2Web3);
     let weiAmount = await exchangeRate.convertFromSpend(issuingToken, spendAmount);
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], issuingToken);
-    let prepaidCardBalance = new BN(await token.methods.balanceOf(prepaidCardAddress));
+    let prepaidCardBalance = new BN(await token.methods.balanceOf(prepaidCardAddress).call());
     if (prepaidCardBalance.lt(new BN(weiAmount))) {
       throw new Error(
         `Prepaid card does not have enough balance to pay merchant. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
@@ -136,6 +145,7 @@ export default class PrepaidCard {
     } else {
       signatures = [contractSignature].concat(signatures);
     }
+
     let result = await this.executePayMerchant(
       prepaidCardAddress,
       issuingToken,
@@ -152,7 +162,7 @@ export default class PrepaidCard {
     tokenAddress: string,
     faceValues: number[],
     options?: ContractOptions
-  ): Promise<RelayTransaction> {
+  ): Promise<GnosisExecTx> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let amountCache = new Map<number, string>();
     let amounts: BN[] = [];
@@ -397,7 +407,7 @@ export default class PrepaidCard {
     signatures: any,
     gasToken: string,
     refundReceiver: string
-  ): Promise<RelayTransaction> {
+  ): Promise<GnosisExecTx> {
     let relayServiceURL = await getConstant('relayServiceURL', this.layer2Web3);
     const url = `${relayServiceURL}/v1/safes/${from}/transactions/`;
     const options = {
@@ -434,7 +444,7 @@ export default class PrepaidCard {
     amount: string,
     signatures: Signature[],
     nonce: string
-  ): Promise<RelayTransaction> {
+  ): Promise<PayMerchantTx> {
     let relayServiceURL = await getConstant('relayServiceURL', this.layer2Web3);
     const url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/pay-for-merchant/`;
     const options = {
