@@ -160,16 +160,7 @@ class DepositWorkflow extends Workflow {
     }),
     new WorkflowCard({
       author: cardbot,
-      componentName: 'card-pay/deposit-workflow/connect-layer1',
-    }),
-    new WorkflowMessage({
-      author: cardbot,
-      message:
-        'You have earned a Supplier badge. It has been sent to your xDai chain address.',
-    }),
-    new WorkflowCard({
-      author: cardbot,
-      componentName: 'card-pay/deposit-workflow/supplier-badge',
+      componentName: 'card-pay/layer-one-connect-card',
     }),
     new WorkflowCard({
       author: cardbot,

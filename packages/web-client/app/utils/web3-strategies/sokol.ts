@@ -22,7 +22,7 @@ import {
   getConstantByNetwork,
   TokenBridgeHomeSide,
   Safes,
-  SafeInfo,
+  DepotSafe,
   ExchangeRate,
 } from '@cardstack/cardpay-sdk';
 export default class SokolWeb3Strategy implements Layer2Web3Strategy {
@@ -147,12 +147,14 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     return tokenBridge.waitForBridgingCompleted(receiver, fromBlock);
   }
 
-  async fetchDepot(owner: ChainAddress): Promise<SafeInfo | null> {
+  async fetchDepot(owner: ChainAddress): Promise<DepotSafe | null> {
     let safesApi = new Safes(this.web3);
-    let safeInfos = await safesApi.view(owner);
-    safeInfos = safeInfos.filter((safe) => !safe.isPrepaidCard);
-    if (safeInfos.length) {
-      return safeInfos[safeInfos.length - 1];
+    let safes = await safesApi.view(owner);
+    let depotSafes = safes.filter(
+      (safe) => safe.type === 'depot'
+    ) as DepotSafe[];
+    if (depotSafes.length) {
+      return depotSafes[depotSafes.length - 1];
     }
     return null;
   }

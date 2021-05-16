@@ -11,7 +11,7 @@ import RSVP, { defer } from 'rsvp';
 import BN from 'bn.js';
 import { fromWei, toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
-import { SafeInfo } from '@cardstack/cardpay-sdk/sdk/safes';
+import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainName = 'L2 Test Chain';
@@ -20,7 +20,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked isConnected = false;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   waitForAccountDeferred = defer();
-  bridgingDeferred!: RSVP.Deferred<unknown>;
+  bridgingDeferred!: RSVP.Deferred<TransactionReceipt>;
   @tracked defaultTokenBalance: BN | undefined;
 
   disconnect(): Promise<void> {
@@ -33,7 +33,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   // eslint-disable-next-line no-unused-vars
-  fetchDepot(_owner: ChainAddress): Promise<SafeInfo | null> {
+  fetchDepot(_owner: ChainAddress): Promise<DepotSafe | null> {
     return Promise.resolve(null);
   }
 

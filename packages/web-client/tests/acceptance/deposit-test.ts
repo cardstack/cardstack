@@ -18,6 +18,10 @@ function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
 }
 
+function epiloguePostableSel(postableIndex: number): string {
+  return `[data-test-epilogue][data-test-postable="${postableIndex}"]`;
+}
+
 function milestoneCompletedSel(milestoneIndex: number): string {
   return `[data-test-milestone-completed][data-test-milestone="${milestoneIndex}"]`;
 }
@@ -252,37 +256,62 @@ module('Acceptance | deposit', function (hooks) {
       .exists();
     assert.dom(`${post} [data-test-blockscout-button]`).doesNotExist();
 
-    // layer2Service.test__simulateTokensBridged();
-    // assert.dom(`${message} [data-test-step-2="complete"]`);
-    // assert.dom(`${message} [data-test-step-3="in-progress"]`);
-    // layer1Service.test__simulateCPXDMinted();
+    layer2Service.test__simulateBridged(
+      '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
+    );
 
-    // assert
-    //   .dom('milestoneCompletedSel(3)')
-    //   .containsText('Tokens received on xDai');
+    assert.dom(`${post} [data-test-step-2="complete"]`);
+    assert.dom(`${post} [data-test-step-3="complete"]`);
+    await waitFor(`${post} [data-test-blockscout-button]`);
+    assert.dom(`${post} [data-test-blockscout-button]`).exists();
 
-    // message = '[data-test-after-workflow][data-test-postable="0"]';
+    assert
+      .dom(milestoneCompletedSel(3))
+      .containsText('Tokens received on xDai');
 
-    // assert.dom(`${message}`).containsText('Thank you for your contribution!');
-    // assert
-    //   .dom(`${message}`)
-    //   .containsText(
-    //     "You have deposited 2,500 DAI into the CARD Protocol's Reserve Pool."
-    //   );
+    assert
+      .dom(epiloguePostableSel(0))
+      .containsText('Thank you for your contribution!');
 
-    // message = '[data-test-after-workflow][data-test-postable="1"]';
-    // assert
-    //   .dom(`${message}`)
-    //   .containsText(
-    //     'This is the remaining balance in your Ethereum Mainnet wallet'
-    //   );
+    assert
+      .dom(epiloguePostableSel(1))
+      .containsText('Minted from CARD Protocol on L2 Test Chain');
+    assert.dom(epiloguePostableSel(1)).containsText('250.0 DAI CPXD');
 
-    // await click('[data-test-show-balances-button]');
+    await waitFor(epiloguePostableSel(2));
 
-    // // assert Cards & Balances tab is active
-    // // assert balance shows deposit just made
-    // // assert only Dai CPXD balance shown
-    // // assert no Prepaid Cards yet
+    assert
+      .dom(epiloguePostableSel(2))
+      .containsText(
+        'This is the remaining balance in your Ethereum mainnet wallet'
+      );
+
+    layer1Service.test__simulateBalances({
+      defaultToken: toBN('2141100000000000000'),
+      dai: toBN('500000000000000000'),
+      card: toBN('10000000000000000000000'),
+    });
+
+    await waitFor(`${epiloguePostableSel(3)} [data-test-balance="ETH"]`);
+    assert
+      .dom(`${epiloguePostableSel(3)} [data-test-balance="ETH"]`)
+      .containsText('2.1411');
+    assert
+      .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI"]`)
+      .containsText('0.5');
+    assert
+      .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD"]`)
+      .containsText('10000.0');
+
+    assert
+      .dom(
+        `${epiloguePostableSel(4)} [data-test-deposit-next-step="dashboard"]`
+      )
+      .exists();
+    await click(
+      `${epiloguePostableSel(4)} [data-test-deposit-next-step="dashboard"]`
+    );
+    assert.dom('[data-test-workflow-thread]').doesNotExist();
   });
 
   test('Initiating workflow with layer 1 wallet already connected', async function (assert) {

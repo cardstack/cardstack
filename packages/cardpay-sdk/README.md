@@ -120,31 +120,28 @@ This call is used to view the gnosis safes owned by a particular address in the 
 This method is invoked with the following parameters:
 - Optionally the address of a safe owner. If no address is supplied, then the default account in your web3 provider's wallet will be used.
 
-This method returns a promise that includes an array of all the gnosis safes owned by the specified address. The result is an object that is a `SafeInfo[]` type which conforms to the `SafeInfo` shape below:
+This method returns a promise that includes an array of all the gnosis safes owned by the specified address. The result is an object that is a `Safe[]` type which conforms to the `Safe` shape below:
+
 ```ts
-type SafeInfo = DepotInfo | PrepaidCardInfo;
-interface DepotInfo {
-  isPrepaidCard: false;
+export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
+interface BaseSafe {
   address: string;
   tokens: TokenInfo[];
 }
-interface PrepaidCardInfo {
-  isPrepaidCard: true;
-  address: string;
-  tokens: TokenInfo[];
+interface DepotSafe extends BaseSafe {
+  type: 'depot';
+}
+interface MerchantSafe extends BaseSafe {
+  type: 'merchant';
+}
+interface ExternalSafe extends BaseSafe {
+  type: 'external';
+}
+interface PrepaidCardSafe extends BaseSafe {
+  type: 'prepaid-card';
   issuingToken: string;
   spendFaceValue: number;
   issuer: string;
-}
-interface TokenInfo {
-  tokenAddress: string;
-  token: {
-    name: string;
-    symbol: string;
-    decimals: number;
-    logoUri: string;
-  };
-  balance: string; // balance is in wei
 }
 ```
 

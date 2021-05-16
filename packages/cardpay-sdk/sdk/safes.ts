@@ -9,12 +9,12 @@ import { getAddress } from '../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from './constants';
 import ExchangeRate from './exchange-rate';
 
-type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
+export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
 interface BaseSafe {
   address: string;
   tokens: TokenInfo[];
 }
-interface DepotSafe extends BaseSafe {
+export interface DepotSafe extends BaseSafe {
   type: 'depot';
 }
 interface MerchantSafe extends BaseSafe {
