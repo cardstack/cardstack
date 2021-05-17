@@ -60,7 +60,7 @@ export class Compiler {
       data: cardSource.data,
     };
     let options = {};
-    card.modelModule = await this.prepareSchema(cardSource, options);
+    card.schemaModule = await this.prepareSchema(cardSource, options);
     let meta = getMeta(options);
 
     card.fields = await this.lookupFieldsForCard(meta.fields);
@@ -78,12 +78,12 @@ export class Compiler {
       card.fields = this.adoptFields(card.fields, parentCard);
       card.adoptsFrom = parentCard;
 
-      if (!card.modelModule) {
-        card.modelModule = parentCard.modelModule;
+      if (!card.schemaModule) {
+        card.schemaModule = parentCard.schemaModule;
       }
     }
 
-    if (!card.modelModule) {
+    if (!card.schemaModule) {
       throw new Error(
         `${cardSource.url} does not have a schema. This is wrong and should not happen.`
       );

@@ -49,7 +49,7 @@ export interface CompiledCard {
   fields: {
     [key: string]: Field;
   };
-  modelModule: string;
+  schemaModule: string;
   isolated: ComponentInfo;
   embedded: ComponentInfo;
   assets: Asset[];
@@ -121,7 +121,7 @@ export function assertValidCompiledCard(
   if (!card.url) {
     throw new Error(`CompiledCards must include a url`);
   }
-  if (!card.modelModule) {
+  if (!card.schemaModule) {
     throw new Error(
       `${card.url} does not have a schema file. This is wrong and should not happen.`
     );

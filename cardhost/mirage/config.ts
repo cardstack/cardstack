@@ -102,7 +102,7 @@ export default function (this: Server): void {
       );
     }
     let compiled = await cardServer.builder.getCompiledCard(routingCard);
-    let Klass = window.require(compiled.modelModule).default;
+    let Klass = window.require(compiled.schemaModule).default;
     let instance = new Klass();
     let cardURL = instance.routeTo('/' + request.params.pathname);
     if (!cardURL) {
