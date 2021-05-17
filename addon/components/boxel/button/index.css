@@ -28,8 +28,6 @@
 }
 
 .boxel-button__loading-indicator {
-  --icon-color: var(--boxel-button-text-color);
-
   width: var(--boxel-button-loading-icon-size);
   height: var(--boxel-button-loading-icon-size);
   margin-right: var(--boxel-sp-xxxs);

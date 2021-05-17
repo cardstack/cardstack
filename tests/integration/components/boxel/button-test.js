@@ -5,6 +5,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
 
 const BUTTON_SELECTOR = '[data-test-boxel-button]';
+const LOADING_INDICATOR_SELECTOR = '[data-test-boxel-button-loading-indicator]';
 
 module('Integration | Component | Button', function (hooks) {
   setupRenderingTest(hooks);
@@ -148,12 +149,27 @@ module('Integration | Component | Button', function (hooks) {
       clicked = true;
     });
     await render(hbs`
-      <Boxel::Button @href={{ this.href }} {{ on "click" this.onClick }}>
+      <Boxel::Button @as="anchor" @href={{ this.href }} {{ on "click" this.onClick }}>
         An anchor
       </Boxel::Button>
     `);
     await click(BUTTON_SELECTOR);
     assert.equal(clicked, true);
+  });
+
+  test('When @loading is true, it displays the loading indicator on buttons and not anchors', async function (assert) {
+    this.set('as', 'button');
+    this.set('loading', false);
+    await render(hbs`
+      <Boxel::Button @as={{this.as}} @loading={{this.loading}}>
+        A loading button
+      </Boxel::Button>
+    `);
+    assert.dom(LOADING_INDICATOR_SELECTOR).doesNotExist();
+    this.set('loading', true);
+    assert.dom(LOADING_INDICATOR_SELECTOR).isVisible();
+    this.set('as', 'anchor');
+    assert.dom(LOADING_INDICATOR_SELECTOR).doesNotExist();
   });
 
   // we can't test for disabled links because programmatic clicks bypass pointer-events:none

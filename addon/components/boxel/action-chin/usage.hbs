@@ -113,7 +113,7 @@
   <:example>
     <Boxel::ActionChin @state="in-progress" as |chin|>
       <chin.ActionStatusArea @icon="metamask" style={{css-var status-icon-size="2.5rem"}}>
-        {{svg-jar "loading-indicator" width="20" height="20" class="usage-action-chin__loading-indicator" alt="loading indicator"}}
+        <Boxel::LoadingIndicator class="usage-action-chin__loading-indicator" @color="var(--boxel-light)"/>
         Waiting for you to connect Card Pay with your mainnet wallet…
       </chin.ActionStatusArea>
       <chin.InfoArea>

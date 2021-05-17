@@ -24,10 +24,7 @@
 }
 
 .usage-action-chin__loading-indicator {
-  --icon-color: var(--boxel-light);
-
   margin-right: var(--boxel-sp-xs);
-  animation: spin 6000ms linear infinite;
 }
 
 @keyframes spin {
