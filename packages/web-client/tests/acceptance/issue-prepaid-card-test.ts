@@ -2,15 +2,12 @@ import { module, test } from 'qunit';
 import {
   click,
   currentURL,
-  fillIn,
-  settled,
   visit,
   waitFor,
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
-import a11yAudit from 'ember-a11y-testing/test-support/audit';
 import { toBN } from 'web3-utils';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
