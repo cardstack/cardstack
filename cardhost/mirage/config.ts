@@ -35,16 +35,6 @@ class FakeCardServer {
   @Memoize()
   get builder(): Builder {
     return new Builder();
-    // return new Builder({
-    //   realm: [
-    //     {
-    //       url: 'https://cardstack.com/base',
-    //     },
-    //     {
-    //       url: 'https://mirage',
-    //     },
-    //   ],
-    // });
   }
 
   async respondWithCard(url: string, format: Format) {

@@ -30,7 +30,7 @@ export class Server {
       .use(logger())
       .use(cors({ origin: '*' }));
 
-    setupCardBuilding(app, { realms, cardCacheDir });
+    app.context.builder = setupCardBuilding({ realms, cardCacheDir });
 
     if (routeCard) {
       await setupCardRouting(app, { routeCard, cardCacheDir });

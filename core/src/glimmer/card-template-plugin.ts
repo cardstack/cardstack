@@ -1,12 +1,26 @@
 import * as syntax from '@glimmer/syntax';
-// @ts-ignore
-// import ETC from 'ember-source/dist/ember-template-compiler';
+import type {
+  PathExpression,
+  ElementNode,
+  BlockStatement,
+  Statement,
+  Node,
+} from '@glimmer/syntax/dist/types/lib/v1/api';
 import { CompiledCard, ComponentInfo, Field } from '../interfaces';
 import { singularize } from 'inflection';
+import { capitalize, cloneDeep } from 'lodash';
+import { inlineTemplateForField } from './inline-field-plugin';
 
-const PREFIX = '@model.';
+class InvalidFieldsUsageError extends Error {
+  message = 'Invalid use of @fields API';
+}
 
-export type ImportAndChooseName = (
+const MODEL = '@model';
+const MODEL_PREFIX = `${MODEL}.`;
+const FIELDS = '@fields';
+// const FIELDS_PREFIX = `${FIELDS}.`;
+
+type ImportAndChooseName = (
   desiredName: string,
   moduleSpecifier: string,
   importedName: string
@@ -16,6 +30,22 @@ export interface Options {
   fields: CompiledCard['fields'];
   usedFields: ComponentInfo['usedFields'];
   importAndChooseName: ImportAndChooseName;
+}
+
+interface State {
+  insidePluralFieldIterator:
+    | {
+        field: Field;
+        blockProgramUsage: string;
+      }
+    | undefined;
+  insideFieldsIterator:
+    | {
+        nodes: Map<unknown, { name: string; field: Field }>;
+        nameVar: string | undefined;
+        componentVar: string | undefined;
+      }
+    | undefined;
 }
 
 export default function glimmerCardTemplateTransform(
@@ -32,92 +62,121 @@ export default function glimmerCardTemplateTransform(
   );
 }
 
-interface RewriteFieldOptions {
-  field: Field;
-  blockProgramUsage: string;
-}
-interface State {
-  insideBlockStatement?: RewriteFieldOptions;
-}
-
 export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
-  return function transform(/*env: syntax.ASTPluginEnvironment*/): syntax.ASTPlugin {
+  return function transform(
+    env: syntax.ASTPluginEnvironment
+  ): syntax.ASTPlugin {
     let { fields, importAndChooseName, usedFields } = options;
     let state: State = {
-      insideBlockStatement: undefined,
+      insidePluralFieldIterator: undefined,
+      insideFieldsIterator: undefined,
     };
+
+    const inferField = inferFromFields(fields);
 
     return {
       name: 'card-glimmer-plugin',
       visitor: {
-        ElementNode(node) {
-          let { insideBlockStatement: inBlock } = state;
-
-          if (inBlock && node.tag === inBlock.blockProgramUsage) {
-            let { blockProgramUsage, field } = inBlock;
-            let { inlineHBS } = field.card.embedded;
-
-            usedFields.push(field.name);
-
-            if (inlineHBS) {
-              return inlineTemplateForField(inlineHBS, blockProgramUsage);
-            }
-
-            return process(
-              rewriteFieldToComponent(importAndChooseName, field, node.tag)
-            );
+        ElementNode(node, path): Statement[] | undefined {
+          if (node.tag === FIELDS) {
+            throw new InvalidFieldsUsageError();
           }
 
-          let field = getFieldFromExpression(fields, node.tag);
+          if (
+            state.insidePluralFieldIterator &&
+            node.tag === state.insidePluralFieldIterator.blockProgramUsage
+          ) {
+            let { blockProgramUsage, field } = state.insidePluralFieldIterator;
+
+            return rewriteElementNode({
+              field,
+              usedFields,
+              importAndChooseName,
+              modelArgument: blockProgramUsage,
+              forceSingular: true,
+            });
+          }
+
+          let field: Field | undefined;
+
+          if (state.insideFieldsIterator) {
+            if (node.tag === state.insideFieldsIterator.componentVar) {
+              let { name } = enclosingField(path, state.insideFieldsIterator);
+              field = fields[name];
+            }
+          }
+
+          if (!field) {
+            field = inferField(node);
+          }
+
           if (!field) {
             return;
           }
 
-          usedFields.push(field.name);
+          return rewriteElementNode({
+            field,
+            usedFields,
+            importAndChooseName,
+            modelArgument: field.name,
+            prefix: MODEL_PREFIX,
+          });
+        },
 
-          let { inlineHBS } = field.card.embedded;
-          if (inlineHBS) {
-            if (field.type === 'containsMany') {
-              return process(expandContainsManyShorthand(field.name, node));
-            } else {
-              return inlineTemplateForField(inlineHBS, field.name, PREFIX);
-            }
-          } else {
-            let fieldTemplate = '';
-
-            if (field.type === 'containsMany') {
-              fieldTemplate = expandContainsManyShorthand(
-                field.name,
-                node,
-                rewriteFieldToComponent(importAndChooseName, field, field.name)
-              );
-            } else {
-              fieldTemplate = rewriteFieldToComponent(
-                importAndChooseName,
-                field,
-                node.tag
+        PathExpression(node, path) {
+          if (state.insideFieldsIterator) {
+            if (node.original === state.insideFieldsIterator.nameVar) {
+              return env.syntax.builders.string(
+                enclosingField(path, state.insideFieldsIterator).name
               );
             }
-
-            return process(fieldTemplate);
           }
+
+          if (node.original === FIELDS) {
+            throw new InvalidFieldsUsageError();
+          }
+
+          return undefined;
         },
 
         BlockStatement: {
           enter(node) {
-            let field = getFieldFromBlockParam(fields, node);
+            if (isFieldsIterator(node)) {
+              state.insideFieldsIterator = {
+                nodes: new Map(),
+                nameVar: node.program.blockParams[0],
+                componentVar: node.program.blockParams[1],
+              };
+
+              let output: any[] = [];
+              for (let [name, field] of Object.entries(fields)) {
+                let copied = cloneDeep(node.program.body);
+                for (let node of copied) {
+                  state.insideFieldsIterator.nodes.set(node, {
+                    name,
+                    field,
+                  });
+                }
+
+                output = output.concat(copied);
+              }
+              return output;
+            }
+
+            let field = inferField(node);
 
             if (!field) {
               return;
             }
 
-            state.insideBlockStatement = {
+            state.insidePluralFieldIterator = {
               field,
               blockProgramUsage: node.program.blockParams[0],
             };
+            return undefined;
           },
-          exit(/*node, path*/) {
-            state.insideBlockStatement = undefined;
+          exit(/*node , path*/) {
+            state.insidePluralFieldIterator = undefined;
           },
         },
       },
@@ -125,46 +184,116 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   };
 }
 
-function getFieldFromExpression(
-  fields: CompiledCard['fields'],
-  usage: string
-): Field | undefined {
-  let fieldName = usage.slice(PREFIX.length);
+function isFieldsIterator(node: BlockStatement): boolean {
+  let [firstArg] = node.params;
 
-  return fields[fieldName];
+  let isIteratingOnFields =
+    firstArg?.type === 'PathExpression' && firstArg.original === '@fields';
+
+  if (!isIteratingOnFields) {
+    return false;
+  }
+
+  if (node.path.type === 'PathExpression' && node.path.original === 'each-in') {
+    return true;
+  }
+
+  throw new InvalidFieldsUsageError();
 }
 
-function getFieldFromBlockParam(
-  fields: CompiledCard['fields'],
-  node: syntax.ASTv1.BlockStatement
-): Field | undefined {
-  let [param] = node.params;
-  let usage = '';
-
-  // ie: {{#each @model.items as...
-  if (param.type === 'PathExpression') {
-    usage = param.original;
-  }
-  // ie: {{#each (helper @model.items) as...
-  if (
-    param.type === 'SubExpression' &&
-    param.params[0].type === 'PathExpression'
+function inferFromFields(fields: CompiledCard['fields']) {
+  return function (
+    node: PathExpression | ElementNode | BlockStatement | undefined
   ) {
-    usage = param.params[0].original;
-  }
+    if (!node) {
+      return;
+    }
 
-  if (!usage || !usage.startsWith(PREFIX)) {
+    if (node.type === 'ElementNode') {
+      return fields[node.tag.slice(MODEL_PREFIX.length)];
+    }
+
+    let exp: PathExpression | undefined;
+
+    if (node.type === 'PathExpression') {
+      exp = node;
+    } else if (node.type === 'BlockStatement') {
+      let [param] = node.params;
+      // ie: {{#each @model.items as...
+      if (param.type === 'PathExpression') {
+        exp = param;
+      }
+      // ie: {{#each (helper @model.items) as...
+      if (
+        param.type === 'SubExpression' &&
+        param.params[0].type === 'PathExpression'
+      ) {
+        exp = param.params[0];
+      }
+    }
+
+    if (!exp) {
+      return;
+    }
+
+    if (exp.head.type === 'AtHead' && exp.head.name === '@model') {
+      // For now, assuming we're only going one level deep
+      return fields[exp.tail[0]];
+    }
+
     return;
-  }
+  };
+}
 
-  return getFieldFromExpression(fields, usage);
+function rewriteElementNode(options: {
+  field: Field;
+  modelArgument: string;
+  importAndChooseName: Options['importAndChooseName'];
+  usedFields: Options['usedFields'];
+  forceSingular?: boolean;
+  prefix?: string;
+}): Statement[] {
+  let { field, forceSingular, modelArgument, prefix } = options;
+  let { inlineHBS } = field.card.embedded;
+
+  options.usedFields.push(field.name);
+
+  if (!forceSingular && field.type === 'containsMany') {
+    if (inlineHBS) {
+      return process(expandContainsManyShorthand(modelArgument));
+    } else {
+      return process(
+        expandContainsManyShorthand(
+          modelArgument,
+          rewriteFieldToComponent(
+            options.importAndChooseName,
+            field,
+            modelArgument
+          )
+        )
+      );
+    }
+  } else {
+    if (inlineHBS) {
+      return inlineTemplateForField(inlineHBS, modelArgument, prefix);
+    } else {
+      return process(
+        rewriteFieldToComponent(
+          options.importAndChooseName,
+          field,
+          modelArgument,
+          prefix
+        )
+      );
+    }
+  }
 }
 
 function expandContainsManyShorthand(
   fieldName: string,
-  node: syntax.ASTv1.ElementNode,
   itemTemplate?: string
 ): string {
+  let eachParam = `${MODEL_PREFIX}${fieldName}`;
   let singularFieldName = singularize(fieldName);
 
   if (itemTemplate) {
@@ -174,14 +303,15 @@ function expandContainsManyShorthand(
     itemTemplate = `{{${singularFieldName}}}`;
   }
 
-  return `{{#each ${node.tag} as |${singularFieldName}|}}${itemTemplate}{{/each}}`;
+  return `{{#each ${eachParam} as |${singularFieldName}|}}${itemTemplate}{{/each}}`;
 }
 
 // <@model.createdAt /> -> <DateField @model={{@model.createdAt}} />
 function rewriteFieldToComponent(
   importAndChooseName: ImportAndChooseName,
   field: Field,
-  modelArgument: string
+  modelArgument: string,
+  prefix?: string
 ): string {
   let componentName = importAndChooseName(
     capitalize(field.name),
@@ -189,53 +319,28 @@ function rewriteFieldToComponent(
     'default'
   );
 
-  return `<${componentName} @model={{${modelArgument}}} />`;
-}
+  if (prefix) {
+    modelArgument = prefix + modelArgument;
+  }
 
-function inlineTemplateForField(
-  inlineHBS: string,
-  fieldName: string,
-  prefix?: string
-) {
-  let ast = syntax.preprocess(inlineHBS, {
-    plugins: {
-      ast: [rewriteLocals({ this: fieldName, prefix })],
-    },
-  });
-  return ast.body;
+  return `<${componentName} @model={{${modelArgument}}} />`;
 }
 
 function process(template: string) {
   return syntax.preprocess(template).body;
 }
 
-function rewriteLocals(remapping: {
-  this: string;
-  prefix?: string;
-}): syntax.ASTPluginBuilder {
-  let rewritten = new Set<unknown>();
-  return function transform(
-    env: syntax.ASTPluginEnvironment
-  ): syntax.ASTPlugin {
-    return {
-      name: 'card-glimmer-plugin-rewrite-locals',
-      visitor: {
-        PathExpression(node) {
-          if (node.head.type === 'AtHead' && !rewritten.has(node)) {
-            let prefix = remapping.prefix ?? '';
-            let result = env.syntax.builders.path(
-              `${prefix}${[remapping.this, ...node.tail].join('.')}`
-            );
-            rewritten.add(result);
-            return result;
-          }
-          return undefined;
-        },
-      },
-    };
-  };
-}
-
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+function enclosingField(
+  path: syntax.WalkerPath<Node>,
+  inside: NonNullable<State['insideFieldsIterator']>
+) {
+  let cursor: syntax.WalkerPath<Node> | null = path;
+  while (cursor) {
+    let entry = inside.nodes.get(cursor.node);
+    if (entry) {
+      return entry;
+    }
+    cursor = cursor.parent;
+  }
+  throw new Error(`bug: couldn't figure out which iteration we were in`);
 }

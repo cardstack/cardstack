@@ -1,8 +1,14 @@
 import { Server } from 'miragejs/server';
-import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
+import {
+  CompiledCard,
+  featureNames,
+  RawCard,
+} from '@cardstack/core/src/interfaces';
 import type { TestContext } from 'ember-test-helpers';
-import { RAW_BASE_CARDS } from '@cardstack/core/src/raw-base-cards';
-import { encodeCardURL } from '@cardstack/core/src/utils';
+import {
+  encodeCardURL,
+  getBasenameAndExtension,
+} from '@cardstack/core/src/utils';
 declare module 'ember-test-helpers' {
   interface TestContext {
     server: Server;
@@ -11,15 +17,43 @@ declare module 'ember-test-helpers' {
   }
 }
 
+const BASE_CARD_NAMES = ['base', 'string', 'date'];
+
+async function loadBaseCards() {
+  let BASE_CARDS: RawCard[] = [];
+  for (const name of BASE_CARD_NAMES) {
+    let card = (await import(`@cardstack/base-cards/${name}/card.json`))
+      .default;
+    card.url = `https://cardstack.com/base/${name}`;
+    card.files = {};
+
+    for (const feature of featureNames) {
+      let fileName = card[feature];
+      if (!fileName) {
+        continue;
+      }
+      let { basename } = getBasenameAndExtension(fileName);
+      // TODO: The assumption of JS here is sketchty, but webpack blows a gasket if no extension is presest
+      card.files[fileName] = (
+        await import(`!raw-loader!@cardstack/base-cards/${name}/${basename}.js`)
+      ).default;
+    }
+
+    BASE_CARDS.push(card);
+  }
+  return BASE_CARDS;
+}
+
 // NOTE: Mirage must be setup before this. ie:
 //    setupMirage(hooks);
 //    setupCardMocking(hooks);
 export default function setupCardMocking(hooks: NestedHooks): void {
-  hooks.beforeEach(function () {
+  hooks.beforeEach(async function () {
     this.createCard = createCard.bind(this);
     this.lookupCard = lookupCard.bind(this);
 
-    RAW_BASE_CARDS.forEach((card) => this.createCard(card));
+    const BASE_CARDS = await loadBaseCards();
+    BASE_CARDS.forEach((card) => this.createCard(card));
   });
 
   hooks.afterEach(function () {});

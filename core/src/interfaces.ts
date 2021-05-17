@@ -1,3 +1,6 @@
+import difference from 'lodash/difference';
+import { BadRequest } from '@cardstack/server/src/middleware/error';
+
 const componentFormats = {
   isolated: '',
   embedded: '',
@@ -5,9 +8,16 @@ const componentFormats = {
 export type Format = keyof typeof componentFormats;
 export const formats = Object.keys(componentFormats) as Format[];
 
-export type AssetType = 'css' | 'unknown';
+const featureNamesMap = {
+  schema: '',
+};
+export type FeatureFile = keyof typeof featureNamesMap & Format;
+export const featureNames = Object.keys(featureNamesMap).concat(
+  formats
+) as FeatureFile[];
+
 export type Asset = {
-  type: AssetType;
+  type: 'css' | 'unknown';
   path: string;
 };
 
@@ -29,8 +39,43 @@ export type RawCard = {
   files: Record<string, string>;
 
   // if this card contains data (as opposed to just schema & code), it goes here
-  data?: CardData;
+  data?: Record<string, any> | undefined;
 };
+
+export interface CompiledCard {
+  url: string;
+  adoptsFrom?: CompiledCard;
+  data: Record<string, any> | undefined;
+  fields: {
+    [key: string]: Field;
+  };
+  modelModule: string;
+  isolated: ComponentInfo;
+  embedded: ComponentInfo;
+  assets: Asset[];
+}
+export interface Field {
+  type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
+  card: CompiledCard;
+  name: string;
+}
+
+export interface ComponentInfo {
+  moduleName: string;
+  usedFields: string[]; // ["title", "author.firstName"]
+  inlineHBS?: string;
+  sourceCardURL: string;
+}
+
+export interface Builder {
+  getRawCard(url: string): Promise<RawCard>;
+  getCompiledCard(url: string): Promise<CompiledCard>;
+}
+
+export interface RealmConfig {
+  url: string;
+  directory: string;
+}
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (obj == null) {
@@ -39,17 +84,17 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (typeof obj.url !== 'string') {
     throw new Error(`card missing URL`);
   }
-  for (let fileFeature of ['isolated', 'embedded', 'schema']) {
-    if (fileFeature in obj) {
-      if (typeof obj[fileFeature] !== 'string') {
+  for (let featureFile of featureNames) {
+    if (featureFile in obj) {
+      if (typeof obj[featureFile] !== 'string') {
         throw new Error(
-          `card.json in ${obj.url} has an invalid value for "${fileFeature}"`
+          `card.json in ${obj.url} has an invalid value for "${featureFile}"`
         );
       }
       // TODO: This should resolve paths, so that isolated.js and ./isolated.js are the same
-      if (!obj.files?.[obj[fileFeature]]) {
+      if (!obj.files?.[obj[featureFile]]) {
         throw new Error(
-          `card.json in ${obj.url} refers to non-existent module ${obj[fileFeature]}`
+          `card.json in ${obj.url} refers to non-existent module ${obj[featureFile]}`
         );
       }
     }
@@ -67,40 +112,32 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   }
 }
 
-export interface Fields {
-  [key: string]: Field;
-}
+export function assertValidCompiledCard(
+  card: any
+): asserts card is CompiledCard {
+  if (!card) {
+    throw new Error(`Not a valid Compiled Card`);
+  }
+  if (!card.url) {
+    throw new Error(`CompiledCards must include a url`);
+  }
+  if (!card.modelModule) {
+    throw new Error(
+      `${card.url} does not have a schema file. This is wrong and should not happen.`
+    );
+  }
+  if (card.data) {
+    let unexpectedFields = difference(
+      Object.keys(card.data),
+      Object.keys(card.fields)
+    );
 
-export interface CompiledCard {
-  url: string;
-  adoptsFrom?: CompiledCard;
-  data: Record<string, any> | undefined;
-  fields: Fields;
-  modelModule: string;
-  isolated: ComponentInfo;
-  embedded: ComponentInfo;
-  assets: (Asset | undefined)[];
-}
-export interface Field {
-  type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
-  card: CompiledCard;
-  typeDecoratorLocalName: string;
-  name: string;
-}
-
-export interface ComponentInfo {
-  moduleName: string;
-  usedFields: string[]; // ["title", "author.firstName"]
-  inlineHBS?: string;
-}
-
-export interface Builder {
-  getRawCard(url: string): Promise<RawCard>;
-  getCompiledCard(url: string): Promise<CompiledCard>;
-  copyAssets(url: string, assets: Asset[], files: RawCard['files']): void;
-}
-
-export interface RealmConfig {
-  url: string;
-  directory: string;
+    if (unexpectedFields.length) {
+      throw new BadRequest(
+        `Field(s) "${unexpectedFields.join(', ')}" does not exist on card "${
+          card.url
+        }"`
+      );
+    }
+  }
 }

@@ -22,7 +22,7 @@ export function createCardCacheDir() {
   let tmpDir = tmp.dirSync().name;
   let cardCacheDir = join(tmpDir, 'node_modules', '@cardstack', 'compiled');
   ensureDirSync(cardCacheDir);
-
+  createMinimalPackageJSON(cardCacheDir);
   return { tmpDir, cardCacheDir };
 }
 

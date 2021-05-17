@@ -21,7 +21,6 @@ import glimmerCardTemplateTransform from '../glimmer/card-template-plugin';
 export interface Options {
   fields: CompiledCard['fields'];
   cardURL: string;
-  localFile: string;
 
   // these are for gathering output
   usedFields: ComponentInfo['usedFields'];

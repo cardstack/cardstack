@@ -1,14 +1,29 @@
 import QUnit from 'qunit';
-import { ComponentInfo } from '../../src/interfaces';
-import transform, { Options } from './../../src/glimmer/card-template-plugin';
-import { COMPILED_STRING_CARD, COMPILED_DATE_CARD } from '../helpers/fixtures';
+import { CompiledCard, ComponentInfo } from '@cardstack/core/src/interfaces';
+import transform, {
+  Options,
+} from '@cardstack/core/src/glimmer/card-template-plugin';
+import { equalIgnoringWhiteSpace } from '@cardstack/core/tests/helpers/assertions';
+import { TestBuilder } from '../helpers/test-builder';
 
 function importAndChooseName() {
   return 'BestGuess';
 }
 
 QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
+  let options: Options;
   let usedFields: ComponentInfo['usedFields'];
+  let compiledStringCard: CompiledCard, compiledDateCard: CompiledCard;
+
+  hooks.before(async function () {
+    let builder = new TestBuilder();
+    compiledStringCard = await builder.getCompiledCard(
+      'https://cardstack.com/base/string'
+    );
+    compiledDateCard = await builder.getCompiledCard(
+      'https://cardstack.com/base/date'
+    );
+  });
 
   hooks.beforeEach(function () {
     usedFields = [];
@@ -19,10 +34,9 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       let template = transform('<@model.title />', {
         fields: {
           title: {
-            card: COMPILED_STRING_CARD,
+            card: compiledStringCard,
             name: 'title',
             type: 'contains',
-            typeDecoratorLocalName: 'contains',
           },
         },
         usedFields,
@@ -42,8 +56,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         fields: {
           createdAt: {
             type: 'contains',
-            card: COMPILED_DATE_CARD,
-            typeDecoratorLocalName: 'contains',
+            card: compiledDateCard,
             name: 'createdAt',
           },
         },
@@ -57,15 +70,13 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
   });
 
   QUnit.module('Fields: inlinable: containsMany', function (hooks) {
-    let options: Options;
     hooks.beforeEach(function () {
       options = {
         fields: {
           items: {
-            card: COMPILED_STRING_CARD,
+            card: compiledStringCard,
             name: 'items',
             type: 'containsMany',
-            typeDecoratorLocalName: 'containsMany',
           },
         },
         usedFields,
@@ -121,10 +132,9 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       let template = transform('<@model.items />', {
         fields: {
           items: {
-            card: COMPILED_STRING_CARD,
+            card: compiledStringCard,
             name: 'items',
             type: 'containsMany',
-            typeDecoratorLocalName: 'containsMany',
           },
         },
         usedFields,
@@ -140,15 +150,13 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
   });
 
   QUnit.module('Fields: not-inlinable: containsMany', function (hooks) {
-    let options: Options;
     hooks.beforeEach(function () {
       options = {
         fields: {
           items: {
             name: 'items',
-            card: COMPILED_DATE_CARD,
+            card: compiledDateCard,
             type: 'containsMany',
-            typeDecoratorLocalName: 'containsMany',
           },
         },
         usedFields,
@@ -171,5 +179,115 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       );
       assert.deepEqual(usedFields, ['items']);
     });
+  });
+
+  QUnit.module('@fields API', function (hooks) {
+    hooks.beforeEach(function () {
+      options = {
+        fields: {
+          title: {
+            type: 'contains',
+            card: compiledStringCard,
+            name: 'title',
+          },
+          startDate: {
+            type: 'contains',
+            card: compiledDateCard,
+            name: 'startDate',
+          },
+          items: {
+            type: 'containsMany',
+            card: compiledStringCard,
+            name: 'items',
+          },
+          events: {
+            type: 'containsMany',
+            card: compiledDateCard,
+            name: 'events',
+          },
+        },
+        usedFields,
+        importAndChooseName,
+      };
+    });
+
+    // Reminder: as we wrote this, we decided that `<@fields.startDate />` can
+    // just always replace `<@model.startDate />` for the invocation case, and
+    // `{{@model.startDate}}` is *always* only the data.
+    QUnit.test('{{#each-in}} over @fields', async function () {
+      equalIgnoringWhiteSpace(
+        transform(
+          `{{#each-in @fields as |name Field|}}
+              <label>{{name}}</label>
+              <Field />
+           {{/each-in}}`,
+          options
+        ),
+        `<label>{{"title"}}</label>
+         {{@model.title}}
+         <label>{{"startDate"}}</label>
+         <BestGuess @model={{@model.startDate}} />
+         <label>{{"items"}}</label>
+         {{#each @model.items as |item|}}{{item}}{{/each}}
+         <label>{{"events"}}</label>
+         {{#each @model.events as |event|}}<BestGuess @model={{event}} />{{/each}}
+         `
+      );
+    });
+
+    QUnit.test(
+      'Errors when trying to pass @fields API through helper',
+      async function (assert) {
+        assert.throws(function () {
+          transform(
+            `{{#each-in (some-helper @fields) as |name Field|}}
+              <label>{{name}}</label>
+             {{/each-in}}`,
+            options
+          );
+        }, /Invalid use of @fields API/);
+      }
+    );
+
+    QUnit.test(
+      'Errors when using fields anywhere other than #each loop',
+      async function (assert) {
+        assert.throws(function () {
+          transform(`<SomeCompontent @arrg={{@fields}} />`, options);
+        }, /Invalid use of @fields API/);
+
+        assert.throws(function () {
+          transform(`<@fields />`, options);
+        }, /Invalid use of @fields API/);
+
+        assert.throws(
+          function () {
+            transform(
+              `{{#each @fields as |Field|}}
+              <label>{{name}}</label>
+             {{/each}}`,
+              options
+            );
+          },
+          /Invalid use of @fields API/,
+          'Errors when used with an each loops'
+        );
+
+        assert.throws(
+          function () {
+            transform(
+              `{{#each-in @fields as |name Field|}}
+                  <label>{{name}}</label>
+                  <Field />
+                  {{@fields}}
+               {{/each-in}}`,
+              options
+            );
+          },
+          /Invalid use of @fields API/,
+          'Errors when fields is used incorrectly inside of a valid use of fields'
+        );
+      }
+    );
   });
 });
