@@ -1,5 +1,9 @@
 'use strict';
 
+const infuraIdsByTarget = {
+  staging: '558ee533522a468e9d421d818e06fadb', // this infura id is specific to https://app-staging.stack.cards/
+};
+
 // eslint-disable-next-line no-undef
 module.exports = function (environment) {
   let ENV = {
@@ -26,7 +30,8 @@ module.exports = function (environment) {
       layer1: process.env.LAYER_1_CHAIN || 'keth', // set to "eth" for production
       layer2: process.env.LAYER_2_CHAIN || 'sokol', // set to "xdai" for production,
     },
-    infuraId: process.env.INFURA_ID,
+    infuraId:
+      infuraIdsByTarget[process.env.DEPLOY_TARGET] ?? process.env.INFURA_ID,
     urls: {
       appStoreLink: undefined,
       googlePlayStoreLink: undefined,
