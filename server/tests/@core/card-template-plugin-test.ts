@@ -31,7 +31,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
 
   QUnit.module('Fields: contains', function () {
     QUnit.test('Simple embeds', async function (assert) {
-      let template = transform('<@model.title />', {
+      let template = transform('<@fields.title />', {
         fields: {
           title: {
             card: compiledStringCard,
@@ -52,7 +52,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
 
     QUnit.test('Embedding with imports', async function (assert) {
-      let template = transform('<@model.createdAt />', {
+      let template = transform('<@fields.createdAt />', {
         fields: {
           createdAt: {
             type: 'contains',
@@ -129,7 +129,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     );
 
     QUnit.test('Compononet invocation for strings', async function (assert) {
-      let template = transform('<@model.items />', {
+      let template = transform('<@fields.items />', {
         fields: {
           items: {
             card: compiledStringCard,
@@ -174,7 +174,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
 
     QUnit.test('component invocation for dates', async function (assert) {
       assert.equal(
-        transform('<@model.items />', options),
+        transform('<@fields.items />', options),
         '{{#each @model.items as |item|}}<BestGuess @model={{item}} />{{/each}}'
       );
       assert.deepEqual(usedFields, ['items']);
@@ -212,7 +212,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
 
     // Reminder: as we wrote this, we decided that `<@fields.startDate />` can
-    // just always replace `<@model.startDate />` for the invocation case, and
+    // just always replace `<@fields.startDate />` for the invocation case, and
     // `{{@model.startDate}}` is *always* only the data.
     QUnit.test('{{#each-in}} over @fields', async function () {
       equalIgnoringWhiteSpace(

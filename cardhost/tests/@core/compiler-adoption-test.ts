@@ -31,7 +31,7 @@ module('@core | compiler-adoption', function (hooks) {
           birthdate;
         }`,
       'embedded.js': templateOnlyComponentTemplate(
-        `<@model.name/> was born on <@model.birthdate/>`
+        `<@fields.name/> was born on <@fields.birthdate/>`
       ),
     },
   };

@@ -31,7 +31,7 @@ const PERSON_CARD = {
         birthdate;
       }`,
     'embedded.js': templateOnlyComponentTemplate(
-      '<@model.name/> was born on <@model.birthdate/>'
+      '<@fields.name/> was born on <@fields.birthdate/>'
     ),
   },
 };
@@ -270,7 +270,7 @@ module('@core | compiler-basics', function (hooks) {
             }
           `,
           'isolated.js': templateOnlyComponentTemplate(
-            '<div class="post-isolated><h1><@model.title /></h1></div>'
+            '<div class="post-isolated><h1><@fields.title /></h1></div>'
           ),
           'isolated.css': '.post-isolated { background: red }',
         },

@@ -18,7 +18,7 @@ class InvalidFieldsUsageError extends Error {
 const MODEL = '@model';
 const MODEL_PREFIX = `${MODEL}.`;
 const FIELDS = '@fields';
-// const FIELDS_PREFIX = `${FIELDS}.`;
+const FIELDS_PREFIX = `${FIELDS}.`;
 
 type ImportAndChooseName = (
   desiredName: string,
@@ -209,8 +209,8 @@ function inferFromFields(fields: CompiledCard['fields']) {
       return;
     }
 
-    if (node.type === 'ElementNode') {
-      return fields[node.tag.slice(MODEL_PREFIX.length)];
+    if (node.type === 'ElementNode' && node.tag.startsWith(FIELDS_PREFIX)) {
+      return fields[node.tag.slice(FIELDS_PREFIX.length)];
     }
 
     let exp: PathExpression | undefined;

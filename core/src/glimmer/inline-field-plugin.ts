@@ -25,7 +25,11 @@ function rewriteLocals(remapping: {
       name: 'card-glimmer-plugin-rewrite-locals',
       visitor: {
         PathExpression(node) {
-          if (node.head.type === 'AtHead' && !rewritten.has(node)) {
+          if (
+            node.head.type === 'AtHead' &&
+            node.head.name == '@model' &&
+            !rewritten.has(node)
+          ) {
             let prefix = remapping.prefix ?? '';
             let result = env.syntax.builders.path(
               `${prefix}${[remapping.this, ...node.tail].join('.')}`
