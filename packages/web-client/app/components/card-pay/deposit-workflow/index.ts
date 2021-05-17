@@ -1,32 +1,11 @@
-import Layer1Network from '@cardstack/web-client/services/layer1-network';
-import Layer2Network from '@cardstack/web-client/services/layer1-network';
 import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
-import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
-import { Workflow } from '@cardstack/web-client/models/workflow';
+import NetworkAwareWorkflowMessage from '@cardstack/web-client/components/workflow-thread/network-aware-message';
+import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
 import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
-
-let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
-
-class NetworkAwareWorkflowMessage extends WorkflowMessage {
-  get hasLayer1Account() {
-    let postable = this as WorkflowPostable;
-    let layer1Network = postable.workflow?.owner.lookup(
-      'service:layer1-network'
-    ) as Layer1Network;
-    return layer1Network.hasAccount;
-  }
-  get hasLayer2Account() {
-    let postable = this as WorkflowPostable;
-    let layer2Network = postable.workflow?.owner.lookup(
-      'service:layer2-network'
-    ) as Layer2Network;
-    return layer2Network.hasAccount;
-  }
-}
 
 class DepositWorkflow extends Workflow {
   name = 'Reserve Pool Deposit';
@@ -173,7 +152,7 @@ class DepositWorkflow extends Workflow {
   }
 }
 
-class DepositWorkFlowComponent extends Component {
+class DepositWorkflowComponent extends Component {
   workflow!: DepositWorkflow;
   constructor(owner: unknown, args: {}) {
     super(owner, args);
@@ -181,4 +160,4 @@ class DepositWorkFlowComponent extends Component {
   }
 }
 
-export default DepositWorkFlowComponent;
+export default DepositWorkflowComponent;

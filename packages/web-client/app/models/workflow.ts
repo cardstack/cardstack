@@ -103,3 +103,5 @@ export abstract class Workflow {
     return result;
   }
 }
+
+export let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };

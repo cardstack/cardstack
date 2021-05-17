@@ -1,0 +1,18 @@
+<ActionCardContainer
+  @header="Prepaid card funding"
+  @isComplete={{@isComplete}}
+  data-test-layout-customization-is-complete={{@isComplete}}
+>
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    data-test-layout-customization
+  >
+    <:default as |d|>
+      <d.ActionButton
+        {{on "click" @onComplete}}
+      >
+        Set Face Value
+      </d.ActionButton>
+    </:default>
+  </Boxel::ActionChin>
+</ActionCardContainer>

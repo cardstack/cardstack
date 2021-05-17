@@ -1,5 +1,7 @@
 import Controller from '@ember/controller';
+import { tracked } from '@glimmer/tracking';
 
-class CardPayDepositController extends Controller {}
-
-export default CardPayDepositController;
+export default class CardPayTokenSuppliersController extends Controller {
+  queryParams = ['flow'];
+  @tracked flow: 'issue-prepaid-card' | null = null;
+}
