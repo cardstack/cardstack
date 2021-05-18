@@ -8,6 +8,7 @@ import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import WorkflowSession from '../../../../models/workflow/workflow-session';
 import { toBN } from 'web3-utils';
+import { TokenDisplayInfo } from '@cardstack/web-client/utils/web3-strategies/token-display-info';
 
 interface CardPayDepositWorkflowTransactionSetupComponentArgs {
   workflowSession: WorkflowSession;
@@ -15,24 +16,11 @@ interface CardPayDepositWorkflowTransactionSetupComponentArgs {
   onIncomplete: (() => void) | undefined;
   isComplete: boolean;
 }
-interface token {
-  symbol: string;
-  description: string;
-  icon: string;
-}
 
-const DAI_TOKEN = {
-  symbol: 'DAI',
-  description: 'USD-based stablecoin',
-  icon: 'dai-token',
-};
-const CARD_TOKEN = {
-  symbol: 'CARD',
-  description: 'ERC-20 Cardstack token',
-  icon: 'card-token',
-};
+const DAI_TOKEN = new TokenDisplayInfo('DAI');
+const CARD_TOKEN = new TokenDisplayInfo('CARD');
 
-const TOKENS: token[] = [DAI_TOKEN, CARD_TOKEN];
+const TOKENS = [DAI_TOKEN, CARD_TOKEN];
 
 class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayDepositWorkflowTransactionSetupComponentArgs> {
   tokens = TOKENS;

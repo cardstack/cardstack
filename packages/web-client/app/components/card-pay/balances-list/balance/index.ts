@@ -1,5 +1,6 @@
 import BN from 'bn.js';
 import Component from '@glimmer/component';
+import { TokenDisplayInfo } from '@cardstack/web-client/utils/web3-strategies/token-display-info';
 
 interface CardPayBalancesListBalanceComponentArgs {
   symbol: string;
@@ -10,12 +11,12 @@ export default class CardPayBalancesListBalanceComponent extends Component<CardP
   get icon() {
     switch (this.args.symbol) {
       case 'ETH':
-        return 'ethereum-token';
+        return TokenDisplayInfo.iconFor('ETH');
       case 'DAI':
       case 'XDAI':
-        return 'dai-token';
+        return TokenDisplayInfo.iconFor('DAI');
       case 'CARD':
-        return 'card-token';
+        return TokenDisplayInfo.iconFor('CARD');
       default:
         return undefined;
     }
