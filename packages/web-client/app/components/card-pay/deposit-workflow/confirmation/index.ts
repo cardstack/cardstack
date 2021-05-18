@@ -7,38 +7,20 @@ import WorkflowSession from '../../../../models/workflow/workflow-session';
 import { toBN } from 'web3-utils';
 import BN from 'bn.js';
 import { next } from '@ember/runloop';
+import {
+  TokenDisplayInfo,
+  TokenSymbol,
+} from '@cardstack/web-client/utils/token';
 
 interface CardPayDepositWorkflowConfirmationComponentArgs {
   workflowSession: WorkflowSession;
   onComplete: () => void;
 }
-
-interface token {
-  symbol: string;
-  description: string;
-  icon: string;
-}
-
-const DAI_TOKEN = {
-  symbol: 'DAI',
-  description: 'USD-based stablecoin',
-  icon: 'dai-token',
-};
-const CARD_TOKEN = {
-  symbol: 'CARD',
-  description: 'ERC-20 Cardstack token',
-  icon: 'card-token',
-};
-
-const TOKENS: { [symbol: string]: token } = {
-  DAI: DAI_TOKEN,
-  CARD: CARD_TOKEN,
-};
 class CardPayDepositWorkflowConfirmationComponent extends Component<CardPayDepositWorkflowConfirmationComponentArgs> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @reads('args.workflowSession.state.depositSourceToken')
-  declare selectedTokenSymbol: string;
+  declare selectedTokenSymbol: TokenSymbol;
 
   constructor(
     owner: unknown,
@@ -50,8 +32,8 @@ class CardPayDepositWorkflowConfirmationComponent extends Component<CardPayDepos
     });
   }
 
-  get depositedToken(): token {
-    return TOKENS[this.selectedTokenSymbol] as token;
+  get depositedToken() {
+    return new TokenDisplayInfo(this.selectedTokenSymbol);
   }
 
   get depositedAmount(): BN {

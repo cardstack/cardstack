@@ -2,10 +2,12 @@ import Helper from '@ember/component/helper';
 import BN from 'bn.js';
 import { inject as service } from '@ember/service';
 import TokenToUsd from '@cardstack/web-client/services/token-to-usd';
-import { ConvertibleSymbol } from '../utils/web3-strategies/types';
+import {
+  convertibleSymbols,
+  ConvertibleSymbol,
+} from '@cardstack/web-client/utils/token';
 
 type TokenToUsdHelperParams = [ConvertibleSymbol, BN];
-const VALID_SYMBOLS = ['CARD', 'DAI'] as ConvertibleSymbol[];
 
 // This helper uses the `TokenToUsd` service to convert a given token
 // amount in wei to USD (to the penny). Supported tokens are CARD & DAI
@@ -20,7 +22,7 @@ class TokenToUsdHelper extends Helper {
   amount: BN | undefined;
 
   compute([symbol, amount]: TokenToUsdHelperParams) {
-    if (!VALID_SYMBOLS.includes(symbol)) {
+    if (!convertibleSymbols.includes(symbol)) {
       throw new Error(`Invalid symbol ${symbol} passed to {{token-to-usd}}`);
     }
     if (amount === null || amount === undefined) {

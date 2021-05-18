@@ -1,12 +1,10 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
+import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
 import {
-  ChainAddress,
-  ConversionFunction,
   ConvertibleSymbol,
-  Layer2Web3Strategy,
-  TransactionHash,
-} from './types';
+  ConversionFunction,
+} from '@cardstack/web-client/utils/token';
 import RSVP, { defer } from 'rsvp';
 import BN from 'bn.js';
 import { fromWei, toBN } from 'web3-utils';

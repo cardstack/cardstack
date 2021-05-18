@@ -9,36 +9,16 @@ import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-sess
 import { TransactionReceipt } from 'web3-core';
 import BN from 'bn.js';
 import { toBN, toWei } from 'web3-utils';
+import {
+  TokenDisplayInfo,
+  TokenSymbol,
+} from '@cardstack/web-client/utils/token';
 
 interface CardPayDepositWorkflowTransactionAmountComponentArgs {
   workflowSession: WorkflowSession;
   onComplete: () => void;
   isComplete: boolean;
 }
-
-interface TokenDisplayDetails {
-  name: string;
-  description: string;
-  symbol: string;
-  icon: string;
-}
-
-const tokenDetails: {
-  [tokenId: string]: TokenDisplayDetails;
-} = {
-  CARD: {
-    name: 'Card',
-    symbol: 'CARD',
-    description: 'ERC-20 Cardstack token',
-    icon: 'card-token',
-  },
-  DAI: {
-    name: 'Dai',
-    symbol: 'DAI',
-    description: 'USD-based stablecoin',
-    icon: 'dai-token',
-  },
-};
 
 class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPayDepositWorkflowTransactionAmountComponentArgs> {
   @tracked amount = '0';
@@ -52,13 +32,13 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
 
-  get currentTokenSymbol(): string | undefined {
+  get currentTokenSymbol(): TokenSymbol | undefined {
     return this.args.workflowSession.state.depositSourceToken;
   }
 
-  get currentTokenDetails(): TokenDisplayDetails | undefined {
-    if (tokenDetails[this.currentTokenSymbol!]) {
-      return tokenDetails[this.currentTokenSymbol!];
+  get currentTokenDetails(): TokenDisplayInfo | undefined {
+    if (this.currentTokenSymbol) {
+      return new TokenDisplayInfo(this.currentTokenSymbol);
     } else {
       return undefined;
     }

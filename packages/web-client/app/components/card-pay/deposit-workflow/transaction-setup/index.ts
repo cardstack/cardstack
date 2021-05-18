@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { equal, and } from 'macro-decorators';
+import { reads } from 'macro-decorators';
 import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { task } from 'ember-concurrency-decorators';
@@ -8,6 +8,11 @@ import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import WorkflowSession from '../../../../models/workflow/workflow-session';
 import { toBN } from 'web3-utils';
+import {
+  TokenDisplayInfo,
+  TokenSymbol,
+  bridgeableSymbols,
+} from '@cardstack/web-client/utils/token';
 
 interface CardPayDepositWorkflowTransactionSetupComponentArgs {
   workflowSession: WorkflowSession;
@@ -15,38 +20,14 @@ interface CardPayDepositWorkflowTransactionSetupComponentArgs {
   onIncomplete: (() => void) | undefined;
   isComplete: boolean;
 }
-interface token {
-  symbol: string;
-  description: string;
-  icon: string;
-}
-
-const DAI_TOKEN = {
-  symbol: 'DAI',
-  description: 'USD-based stablecoin',
-  icon: 'dai-token',
-};
-const CARD_TOKEN = {
-  symbol: 'CARD',
-  description: 'ERC-20 Cardstack token',
-  icon: 'card-token',
-};
-
-const TOKENS: token[] = [DAI_TOKEN, CARD_TOKEN];
 
 class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayDepositWorkflowTransactionSetupComponentArgs> {
-  tokens = TOKENS;
+  tokens = bridgeableSymbols.map((symbol) => new TokenDisplayInfo(symbol));
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
 
-  @equal('args.workflowSession.state.depositSourceToken', 'CARD')
-  cardSelected: Boolean | undefined;
-  @equal('args.workflowSession.state.depositSourceToken', 'DAI')
-  daiSelected: Boolean | undefined;
-  @and('cardSelected', 'layer1Network.cardBalance')
-  hasCardBalance: Boolean | undefined;
-  @and('daiSelected', 'layer1Network.daiBalance')
-  hasDaiBalance: Boolean | undefined;
+  @reads('args.workflowSession.state.depositSourceToken')
+  declare selectedTokenSymbol: TokenSymbol;
 
   constructor(
     owner: unknown,
@@ -62,19 +43,20 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayD
   }
 
   get selectedToken() {
-    if (this.daiSelected) {
-      return DAI_TOKEN;
-    } else if (this.cardSelected) {
-      return CARD_TOKEN;
+    if (
+      this.selectedTokenSymbol &&
+      TokenDisplayInfo.isRecognizedSymbol(this.selectedTokenSymbol)
+    ) {
+      return new TokenDisplayInfo(this.selectedTokenSymbol);
     } else {
       return undefined;
     }
   }
 
   get selectedTokenBalance() {
-    if (this.daiSelected) {
+    if (this.selectedTokenSymbol === 'DAI') {
       return this.layer1Network.daiBalance;
-    } else if (this.cardSelected) {
+    } else if (this.selectedTokenSymbol === 'CARD') {
       return this.layer1Network.cardBalance;
     } else {
       return toBN(0);
@@ -93,7 +75,10 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayD
   @action toggleComplete() {
     if (this.args.isComplete) {
       this.args.onIncomplete?.();
-    } else if (this.hasCardBalance || this.hasDaiBalance) {
+    } else if (
+      this.selectedTokenSymbol &&
+      this.selectedTokenBalance?.gt(toBN(0))
+    ) {
       this.args.onComplete?.();
     } else {
       // TODO error message

@@ -4,7 +4,8 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import { tracked } from '@glimmer/tracking';
 import { WalletProvider } from '../wallet-providers';
-import { Layer1Web3Strategy, TransactionHash, Token } from './types';
+import { Layer1Web3Strategy, TransactionHash } from './types';
+import { TokenContractInfo } from '../token';
 import detectEthereumProvider from '@metamask/detect-provider';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
@@ -15,24 +16,15 @@ import { toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
 import {
   TokenBridgeForeignSide,
-  getAddressByNetwork,
   networkIds,
   getConstantByNetwork,
 } from '@cardstack/cardpay-sdk';
 
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
-let cardToken = new Token(
-  'CARD',
-  'CARD',
-  getAddressByNetwork('cardToken', 'kovan')
-);
+let cardToken = new TokenContractInfo('CARD', 'kovan');
 
-let daiToken = new Token(
-  'DAI',
-  'Dai Stablecoin',
-  getAddressByNetwork('daiToken', 'kovan')
-);
+let daiToken = new TokenContractInfo('DAI', 'kovan');
 
 export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   chainName = 'Kovan Testnet';
@@ -275,23 +267,12 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     );
   }
 
-  getTokenBySymbol(symbol: string): Token {
+  getTokenBySymbol(symbol: string): TokenContractInfo {
     let token = this.bridgeableTokens.findBy('symbol', symbol);
     if (!token) {
       throw new Error(`Expected to find bridgeable token for symbol ${symbol}`);
     }
     return token!;
-  }
-
-  contractForToken(token: Token): Contract {
-    switch (token) {
-      case daiToken:
-        return this.daiTokenContract;
-      case cardToken:
-        return this.cardTokenContract;
-      default:
-        throw new Error(`Expected to find contract for token ${token}`);
-    }
   }
 
   blockExplorerUrl(txnHash: TransactionHash): string {

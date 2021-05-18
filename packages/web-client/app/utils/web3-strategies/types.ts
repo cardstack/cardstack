@@ -2,9 +2,11 @@
 import { WalletProvider } from '../wallet-providers';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
-import { AbiItem } from 'web3-utils';
-import { ERC20ABI } from '@cardstack/cardpay-sdk/index.js';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import {
+  ConvertibleSymbol,
+  ConversionFunction,
+} from '@cardstack/web-client/utils/token';
 
 export interface Web3Strategy {
   chainName: string;
@@ -46,19 +48,3 @@ export interface Layer2Web3Strategy extends Web3Strategy {
 
 export type TransactionHash = string;
 export type ChainAddress = string;
-
-export class Token {
-  symbol: string;
-  name: string;
-  address: ChainAddress;
-  abi = ERC20ABI as AbiItem[];
-
-  constructor(symbol: string, name: string, address: string) {
-    this.symbol = symbol;
-    this.name = name;
-    this.address = address;
-  }
-}
-
-export type ConvertibleSymbol = 'DAI' | 'CARD';
-export type ConversionFunction = (amountInWei: string) => number; // eslint-disable-line no-unused-vars

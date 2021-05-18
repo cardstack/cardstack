@@ -106,11 +106,8 @@
       </d.ActionButton>
     </:default>
     <:memorialized as |m|>
-      <m.ActionButton
-        {{on "click" this.toggleComplete}}
-        @disabled={{not @workflowSession.state.depositSourceToken}}
-      >
-        Continue
+      <m.ActionButton {{on "click" this.toggleComplete}}>
+        Edit
       </m.ActionButton>
     </:memorialized>
   </Boxel::ActionChin>

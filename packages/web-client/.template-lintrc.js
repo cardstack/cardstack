@@ -4,7 +4,7 @@ module.exports = {
   extends: 'octane',
   rules: {
     'no-implicit-this': {
-      allow: ['noop']
-    }
-  }
+      allow: ['noop'],
+    },
+  },
 };

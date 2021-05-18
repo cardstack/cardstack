@@ -11,7 +11,7 @@ import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import {
   ConvertibleSymbol,
   ConversionFunction,
-} from '@cardstack/web-client/utils/web3-strategies/types';
+} from '@cardstack/web-client/utils/token';
 
 export default class Layer2Network extends Service {
   strategy!: Layer2Web3Strategy;
