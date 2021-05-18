@@ -94,7 +94,15 @@
                   {{#if this.depotAddress}}
                     {{truncate-middle this.depotAddress 7 4}}
                   {{else}}
-                    <LoadingIndicator class="deposit-card__loading-indicator"/>
+                    {{!-- 
+                      This depot is fetched earlier in the workflow. 
+                      If it isn't present and we got this far, it's because the
+                      user created a new repo. That's why we don't show a loading indicator here.
+                      This might change in the future if we fetch the depot address in this component
+                    --}}
+                    <div class="card-pay-confirmation__new-depot-message">
+                      New Depot
+                    </div>
                   {{/if}}
                 </div>
               </div>
