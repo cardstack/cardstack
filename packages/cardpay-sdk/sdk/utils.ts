@@ -76,7 +76,7 @@ export function waitUntilTransactionMined(web3: Web3, txnHash: string): Promise<
     reject: (reason?: any) => void
   ) {
     try {
-      let receipt = web3.eth.getTransactionReceipt(txnHash);
+      let receipt = await web3.eth.getTransactionReceipt(txnHash);
       if (!receipt) {
         setTimeout(function () {
           transactionReceiptAsync(txnHash, resolve, reject);

@@ -10,7 +10,18 @@ import { getAddress } from '../contracts/addresses.js';
 import { getConstant, ZERO_ADDRESS } from './constants.js';
 import ExchangeRate from './exchange-rate';
 import { ERC20ABI } from '../index.js';
-import { Estimate, RelayTransaction, GnosisExecTx, Signature, sign, gasEstimate, executeTransaction } from './utils';
+import {
+  Estimate,
+  RelayTransaction,
+  GnosisExecTx,
+  Signature,
+  sign,
+  gasEstimate,
+  executeTransaction,
+  waitUntilTransactionMined,
+} from './utils';
+import { TransactionReceipt } from 'web3-eth';
+import { Log } from 'web3-core';
 
 const { toBN, fromWei } = Web3.utils;
 interface PayMerchantPayload extends Estimate {
@@ -112,8 +123,10 @@ export default class PrepaidCard {
     safeAddress: string,
     tokenAddress: string,
     faceValues: number[],
+    onPrepaidCardsCreated?: (prepaidCardAddresses: string[]) => unknown,
+    onGasLoaded?: () => unknown,
     options?: ContractOptions
-  ): Promise<GnosisExecTx> {
+  ): Promise<{ prepaidCardAddresses: string[]; gnosisTxn: GnosisExecTx }> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let amountCache = new Map<number, string>();
     let amounts: BN[] = [];
@@ -146,7 +159,7 @@ export default class PrepaidCard {
       from,
       safeAddress
     );
-    let result = await executeTransaction(
+    let gnosisTxn = await executeTransaction(
       this.layer2Web3,
       safeAddress,
       tokenAddress,
@@ -161,7 +174,40 @@ export default class PrepaidCard {
       estimate.gasToken,
       ZERO_ADDRESS
     );
-    return result;
+
+    let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisTxn.ethereumTx.txHash);
+
+    if (typeof onPrepaidCardsCreated === 'function') {
+      await onPrepaidCardsCreated(prepaidCardAddresses);
+    }
+
+    await Promise.all(prepaidCardAddresses.map((address) => this.loadGasIntoPrepaidCard(address)));
+    if (typeof onGasLoaded === 'function') {
+      await onGasLoaded();
+    }
+    return {
+      prepaidCardAddresses,
+      gnosisTxn,
+    };
+  }
+
+  private async loadGasIntoPrepaidCard(prepaidCardAddress: string) {
+    let relayServiceURL = await getConstant('relayServiceURL', this.layer2Web3);
+    let url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/load-gas/`;
+    let options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
+      },
+    };
+    let response = await fetch(url, options);
+    if (!response?.ok) {
+      throw new Error(await response.text());
+    }
+    let { txnHash } = await response.json();
+    if (txnHash) {
+      await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
   }
 
   private async getPrepaidCardMgr() {
@@ -247,4 +293,52 @@ export default class PrepaidCard {
     }
     return response.json();
   }
+
+  private async getPrepaidCardsFromTxn(txnHash: string): Promise<string[]> {
+    let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
+    let txnReceipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return this.getParamsFromEvent(txnReceipt, this.createPrepaidCardEventABI(), prepaidCardMgrAddress).map(
+      (createCardLog) => createCardLog.card
+    );
+  }
+
+  private getParamsFromEvent(txnReceipt: TransactionReceipt, eventAbi: EventABI, address: string) {
+    let eventParams = txnReceipt.logs
+      .filter((log) => isEventMatch(log, eventAbi.topic, address))
+      .map((log) => this.layer2Web3.eth.abi.decodeLog(eventAbi.abis, log.data, log.topics));
+    return eventParams;
+  }
+
+  private createPrepaidCardEventABI(): EventABI {
+    return {
+      topic: this.layer2Web3.eth.abi.encodeEventSignature('CreatePrepaidCard(address,address,address,uint256)'),
+      abis: [
+        {
+          type: 'address',
+          name: 'supplier',
+        },
+        {
+          type: 'address',
+          name: 'card',
+        },
+        {
+          type: 'address',
+          name: 'token',
+        },
+        {
+          type: 'uint256',
+          name: 'amount',
+        },
+      ],
+    };
+  }
+}
+
+function isEventMatch(log: Log, topic: string, address: string) {
+  return log.topics[0] === topic && log.address === address;
+}
+
+interface EventABI {
+  topic: string;
+  abis: { type: string; name: string }[];
 }
