@@ -3,10 +3,10 @@ import WalletInfo from '../wallet-info';
 import {
   ChainAddress,
   ConversionFunction,
-  ConvertibleSymbol,
   Layer2Web3Strategy,
   TransactionHash,
 } from './types';
+import { ConvertibleSymbol } from '@cardstack/web-client/utils/web3-strategies/token-categories';
 import RSVP, { defer } from 'rsvp';
 import BN from 'bn.js';
 import { fromWei, toBN } from 'web3-utils';

@@ -8,10 +8,8 @@ import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
-import {
-  ConvertibleSymbol,
-  ConversionFunction,
-} from '@cardstack/web-client/utils/web3-strategies/types';
+import { ConversionFunction } from '@cardstack/web-client/utils/web3-strategies/types';
+import { ConvertibleSymbol } from '@cardstack/web-client/utils/web3-strategies/token-categories';
 
 export default class Layer2Network extends Service {
   strategy!: Layer2Web3Strategy;

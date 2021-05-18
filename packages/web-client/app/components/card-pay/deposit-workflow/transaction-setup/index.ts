@@ -12,6 +12,7 @@ import {
   TokenDisplayInfo,
   TokenSymbol,
 } from '@cardstack/web-client/utils/web3-strategies/token-display-info';
+import { bridgeableSymbols } from '@cardstack/web-client/utils/web3-strategies/token-categories';
 
 interface CardPayDepositWorkflowTransactionSetupComponentArgs {
   workflowSession: WorkflowSession;
@@ -20,13 +21,8 @@ interface CardPayDepositWorkflowTransactionSetupComponentArgs {
   isComplete: boolean;
 }
 
-const DAI_TOKEN = new TokenDisplayInfo('DAI');
-const CARD_TOKEN = new TokenDisplayInfo('CARD');
-
-const TOKENS = [DAI_TOKEN, CARD_TOKEN];
-
 class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayDepositWorkflowTransactionSetupComponentArgs> {
-  tokens = TOKENS;
+  tokens = bridgeableSymbols.map((symbol) => new TokenDisplayInfo(symbol));
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
 

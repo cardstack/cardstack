@@ -8,8 +8,8 @@ import {
   Layer2Web3Strategy,
   TransactionHash,
   ConversionFunction,
-  ConvertibleSymbol,
 } from './types';
+import { ConvertibleSymbol } from '@cardstack/web-client/utils/web3-strategies/token-categories';
 import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';

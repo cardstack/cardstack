@@ -7,10 +7,10 @@ import { tracked } from '@glimmer/tracking';
 import {
   ChainAddress,
   ConversionFunction,
-  ConvertibleSymbol,
   Layer2Web3Strategy,
   TransactionHash,
 } from './types';
+import { ConvertibleSymbol } from '@cardstack/web-client/utils/web3-strategies/token-categories';
 import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer, hash } from 'rsvp';

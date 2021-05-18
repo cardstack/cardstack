@@ -7,10 +7,11 @@ import { rawTimeout, waitForQueue } from 'ember-concurrency';
 import BN from 'bn.js';
 import { toBN } from 'web3-utils';
 import TokenToUsdHelper from '@cardstack/web-client/helpers/token-to-usd';
+import { ConversionFunction } from '@cardstack/web-client/utils/web3-strategies/types';
 import {
   ConvertibleSymbol,
-  ConversionFunction,
-} from '@cardstack/web-client/utils/web3-strategies/types';
+  convertibleSymbols,
+} from '@cardstack/web-client/utils/web3-strategies/token-categories';
 import config from '@cardstack/web-client/config/environment';
 
 const INTERVAL = config.environment === 'test' ? 1000 : 60 * 1000;
@@ -39,7 +40,7 @@ export default class TokenToUsd extends Service {
       let updatedConverters = yield this.layer2Network.updateUsdConverters(
         this.symbolsToUpdate
       );
-      for (let symbol of ['DAI', 'CARD'] as ConvertibleSymbol[]) {
+      for (let symbol of convertibleSymbols) {
         this.usdConverters[symbol] = updatedConverters[symbol];
       }
       yield rawTimeout(INTERVAL); // rawTimeout used to avoid hanging tests
@@ -50,7 +51,7 @@ export default class TokenToUsd extends Service {
      should be updated. Ignores cases where the amount is zero.
    */
   get symbolsToUpdate(): ConvertibleSymbol[] {
-    let unfoundSymbols: ConvertibleSymbol[] = ['DAI', 'CARD'];
+    let unfoundSymbols: ConvertibleSymbol[] = Array.from(convertibleSymbols);
     let res: ConvertibleSymbol[] = [];
     for (let helper of this.#registeredHelpers.values()) {
       if (
