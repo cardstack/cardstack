@@ -39,8 +39,10 @@ export async function createPrepaidCard(
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log('Creating prepaid card');
-  let result = await prepaidCard.create(safe, tokenAddress, faceValues);
-  console.log(`Transaction hash: ${blockExplorer}/tx/${result.ethereumTx.txHash}/token-transfers`);
+  let result = await prepaidCard.create(safe, tokenAddress, faceValues, (prepaidCardAddresses) =>
+    console.log(`Created new prepaid card: ${prepaidCardAddresses.join(', ')}`)
+  );
+  console.log(`Transaction hash: ${blockExplorer}/tx/${result.gnosisTxn.ethereumTx.txHash}/token-transfers`);
 }
 
 export async function payMerchant(
