@@ -4,6 +4,7 @@ import type {
   CompiledCard,
   Format,
   Asset,
+  ComponentInfo,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 import { encodeCardURL } from '@cardstack/core/src/utils';
@@ -72,12 +73,17 @@ export default class Builder implements BuilderInterface {
   async getBuiltCard(
     url: string,
     format: Format
-  ): Promise<{ model: any; moduleName: string }> {
+  ): Promise<{
+    model: any;
+    moduleName: string;
+    deserialize: ComponentInfo['deserialize'] | undefined;
+  }> {
     let compiledCard = await this.getCompiledCard(url);
 
     return {
       model: compiledCard.data,
       moduleName: compiledCard[format].moduleName,
+      deserialize: compiledCard[format].deserialize,
     };
   }
 

@@ -1,3 +1,5 @@
+import { cardJSONReponse } from '@cardstack/server/src/interfaces';
+import { Format, RawCard } from '@cardstack/core/src/interfaces';
 import type {
   Response as ResponseType,
   Request as RequestType,
@@ -8,7 +10,6 @@ import type { Server } from 'miragejs/server';
 import { Response } from 'ember-cli-mirage';
 
 import Builder from 'cardhost/lib/builder';
-import { Format, RawCard } from '@cardstack/core/src/interfaces';
 import { getContext } from '@ember/test-helpers';
 import { Memoize } from 'typescript-memoize';
 
@@ -37,18 +38,21 @@ class FakeCardServer {
     return new Builder();
   }
 
-  async respondWithCard(url: string, format: Format) {
+  async respondWithCard(url: string, format: Format): Promise<cardJSONReponse> {
     let {
       model,
       moduleName,
+      deserialize,
     } = await FakeCardServer.current().builder.getBuiltCard(url, format);
 
     return {
       data: {
         id: url,
+        type: 'card',
         attributes: model,
         meta: {
           componentModule: moduleName,
+          deserializationMap: deserialize,
         },
       },
     };

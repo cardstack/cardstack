@@ -6,7 +6,6 @@ import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 import difference from 'lodash/difference';
 import intersection from 'lodash/intersection';
 import reduce from 'lodash/reduce';
-import isArray from 'lodash/isArray';
 import md5 from 'md5';
 
 import cardSchemaPlugin, {
@@ -24,12 +23,11 @@ import {
   Builder,
   CompiledCard,
   ComponentInfo,
-  Deserializer,
   Format,
   FORMATS,
   RawCard,
 } from './interfaces';
-import { getBasenameAndExtension } from './utils';
+import { getBasenameAndExtension, getFieldForPath } from './utils';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -373,33 +371,18 @@ function getDeserializationMap(
   let map: any = {};
 
   for (const fieldPath of usedFields) {
-    let deserializer = getFieldDeserializer(fields, fieldPath);
-    if (!deserializer) {
+    let field = getFieldForPath(fields, fieldPath);
+    if (!field || !field.card.deserializer) {
       continue;
     }
 
-    if (!map[deserializer]) {
-      map[deserializer] = [];
+    if (!map[field.card.deserializer]) {
+      map[field.card.deserializer] = [];
     }
 
-    map[deserializer].push(fieldPath);
+    map[field.card.deserializer].push(fieldPath);
   }
+
   assertValidDeserializationMap(map);
   return map;
-}
-
-function getFieldDeserializer(
-  fields: CompiledCard['fields'],
-  path: string
-): Deserializer | undefined {
-  let paths = path.split('.');
-  let [first, ...tail] = paths;
-
-  let { card } = fields[first];
-
-  if (paths.length > 1) {
-    return getFieldDeserializer(card.fields, tail.join('.'));
-  }
-
-  return card.deserializer;
 }

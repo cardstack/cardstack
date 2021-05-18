@@ -1,3 +1,4 @@
+import { cardJSONReponse } from '@cardstack/server/src/interfaces';
 import {
   assertValidRawCard,
   CompiledCard,
@@ -27,11 +28,15 @@ function getCardFormatFromRequest(
   }
 }
 
-async function serializeCard(card: CompiledCard, format: Format): Promise<any> {
+async function serializeCard(
+  card: CompiledCard,
+  format: Format
+): Promise<cardJSONReponse> {
   let cardSerializer = new Serializer('card', {
     attributes: card[format].usedFields,
     dataMeta: {
       componentModule: card[format].moduleName,
+      deserializationMap: card[format].deserialize,
     },
   });
   let data = Object.assign({ id: card.url }, card.data);

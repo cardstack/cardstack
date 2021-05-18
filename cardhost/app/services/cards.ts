@@ -4,8 +4,10 @@ import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
 import { setComponentTemplate } from '@ember/component';
 
-import { Format } from '@cardstack/core/src/interfaces';
+import { Format, Deserializer } from '@cardstack/core/src/interfaces';
+import { cardJSONReponse } from '@cardstack/server/src/interfaces';
 import { encodeCardURL } from '@cardstack/core/src/utils';
+import serializers from '@cardstack/core/src/serializers';
 
 import config from 'cardhost/config/environment';
 const { cardServer } = config as any; // Environment types arent working
@@ -29,24 +31,8 @@ export default class Cards extends Service {
   private async internalLoad(
     url: string
   ): Promise<{ model: any; component: unknown }> {
-    let response = await fetch(url);
-
-    if (response.status !== 200) {
-      throw new Error(`unable to fetch card ${url}: status ${response.status}`);
-    }
-
-    let card = (await response.json()) as {
-      data: {
-        id: string;
-        type: string;
-        attributes?: { [name: string]: any };
-        meta: {
-          componentModule: string;
-        };
-      };
-    };
-
-    let model = Object.assign({ id: card.data.id }, card.data.attributes);
+    let card = await fetchCard(url);
+    let model = await deserializeResponse(card);
 
     let { componentModule } = card.data.meta;
     let cardComponent: unknown;
@@ -82,6 +68,40 @@ export default class Cards extends Service {
       component: CallerComponent,
     };
   }
+}
+
+async function fetchCard(url: string): Promise<cardJSONReponse> {
+  let response = await fetch(url);
+
+  if (response.status !== 200) {
+    throw new Error(`unable to fetch card ${url}: status ${response.status}`);
+  }
+
+  return await response.json();
+}
+
+function deserializeResponse(response: cardJSONReponse): any {
+  let { deserializationMap } = response.data.meta;
+  let attrs = response.data.attributes;
+
+  if (attrs && deserializationMap) {
+    for (const type in deserializationMap) {
+      let serializer = serializers[type as Deserializer];
+      let paths = deserializationMap[type as Deserializer];
+      for (const path of paths) {
+        if (!attrs[path]) {
+          throw Error(
+            `Server response said ${path} would need to be deserialized, but that path didnt exist`
+          );
+        }
+        attrs[path] = serializer.deserialize(attrs[path]);
+      }
+    }
+  }
+
+  let model = Object.assign({ id: response.data.id }, attrs);
+
+  return model;
 }
 
 declare module '@ember/service' {

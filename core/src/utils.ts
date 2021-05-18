@@ -1,3 +1,5 @@
+import { CompiledCard, Field } from './interfaces';
+
 const SPECIAL_CHAR_REPLACEMENT = '-';
 
 export function encodeCardURL(url: string): string {
@@ -5,6 +7,22 @@ export function encodeCardURL(url: string): string {
     .replace(/\/$/, '') // No need for trailing slashes
     .replace('://', SPECIAL_CHAR_REPLACEMENT)
     .replace(/([;,/?:@&=+$])/g, SPECIAL_CHAR_REPLACEMENT);
+}
+
+export function getFieldForPath(
+  fields: CompiledCard['fields'],
+  path: string
+): Field | undefined {
+  let paths = path.split('.');
+  let [first, ...tail] = paths;
+
+  let field = fields[first];
+
+  if (paths.length > 1) {
+    return getFieldForPath(field.card.fields, tail.join('.'));
+  }
+
+  return field;
 }
 
 export function getBasenameAndExtension(
