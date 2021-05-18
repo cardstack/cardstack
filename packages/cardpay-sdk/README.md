@@ -239,6 +239,29 @@ let result = await prepaidCard.create(
 
 This method returns a promise for a gnosis relay transaction object that has the following shape:
 ```ts
+interface {
+  prepaidCardAddresses: string[],
+  gnosisTxn: GnosisExecTxn
+}
+```
+where `GnosisExecTxn` looks like this:
+
+```ts
+interface GnosisExecTx extends RelayTransaction {
+  value: number;
+  nonce: number;
+  data: string;
+  timestamp: string;
+  operation: string;
+  safeTxGas: number;
+  dataGas: number;
+  gasPrice: number;
+  gasToken: string;
+  refundReceiver: string;
+  safeTxHash: string;
+  txHash: string;
+  transactionHash: string;
+}
 interface RelayTransaction {
   to: string;
   ethereumTx: {
