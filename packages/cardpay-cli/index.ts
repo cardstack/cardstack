@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import bridge from './bridge.js';
 import awaitBridged from './await-bridged.js';
 import { viewTokenBalance } from './assets';
-import viewSafes from './view-safes.js';
+import { viewSafes, transferTokens } from './safe.js';
 import { createPrepaidCard, priceForFaceValue, payMerchant, gasFee } from './prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
 
@@ -15,6 +15,7 @@ type Commands =
   | 'bridge'
   | 'awaitBridged'
   | 'safesView'
+  | 'safeTransferTokens'
   | 'prepaidCardCreate'
   | 'usdPrice'
   | 'ethPrice'
@@ -96,6 +97,29 @@ const {
         description: "The address of the safe owner. This defaults to your wallet's default account when not provided",
       });
       command = 'safesView';
+    }
+  )
+  .command(
+    'safe-transfer-tokens [safeAddress] [token] [recipient] [amount]',
+    'Transfer tokens from a safe to an arbitrary recipient.',
+    (yargs) => {
+      yargs.positional('safeAddress', {
+        type: 'string',
+        description: 'The address of the safe that is sending the tokens',
+      });
+      yargs.positional('token', {
+        type: 'string',
+        description: 'The token address of the tokens to transfer from the safe',
+      });
+      yargs.positional('recipient', {
+        type: 'string',
+        description: "The token recipient's address",
+      });
+      yargs.positional('amount', {
+        type: 'number',
+        description: 'The amount of tokens to transfer (not in units of wei)',
+      });
+      command = 'safeTransferTokens';
     }
   )
   .command(
@@ -258,6 +282,13 @@ if (!command) {
       break;
     case 'safesView':
       await viewSafes(network, mnemonic, address);
+      break;
+    case 'safeTransferTokens':
+      if (safeAddress == null || recipient == null || token == null || amount == null) {
+        yargs.showHelp('safeAddress, token, recipient, and amount are required values');
+        process.exit(1);
+      }
+      await transferTokens(network, mnemonic, safeAddress, token, recipient, amount);
       break;
     case 'prepaidCardCreate':
       if (safeAddress == null || faceValues == null) {

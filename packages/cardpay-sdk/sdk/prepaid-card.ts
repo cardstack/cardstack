@@ -10,68 +10,18 @@ import { getAddress } from '../contracts/addresses.js';
 import { getConstant, ZERO_ADDRESS } from './constants.js';
 import ExchangeRate from './exchange-rate';
 import { ERC20ABI } from '../index.js';
+import { Estimate, RelayTransaction, GnosisExecTx, Signature, sign, gasEstimate, executeTransaction } from './utils';
 
 const { toBN, fromWei } = Web3.utils;
-interface Estimate {
-  safeTxGas: string;
-  baseGas: string;
-  dataGas: string;
-  operationalGas: string;
-  gasPrice: string;
-  lastUsedNonce: number | undefined;
-  gasToken: string;
-  refundReceiver: string;
-}
 interface PayMerchantPayload extends Estimate {
   data: any;
-}
-interface RelayTransaction {
-  to: string;
-  nonce: number;
-  ethereumTx: {
-    txHash: string;
-    to: string;
-    data: string;
-    blockNumber: string;
-    blockTimestamp: string;
-    created: string;
-    modified: string;
-    gasUsed: string;
-    status: number;
-    transactionIndex: number;
-    gas: string;
-    gasPrice: string;
-    nonce: string;
-    value: string;
-    from: string;
-  };
 }
 
 interface PayMerchantTx extends RelayTransaction {
   merchantAddress: string;
   payment: number; // this is not safe to use! Need to fix in relay server
-  prepaidCardTxHash: string; // this is a hash of the txn data--not to be confused with the overal txn hash
+  prepaidCardTxHash: string; // this is a hash of the txn data--not to be confused with the overall txn hash
   tokenAddress: string;
-}
-interface GnosisExecTx extends RelayTransaction {
-  value: number;
-  data: string;
-  timestamp: string;
-  operation: string;
-  safeTxGas: number;
-  dataGas: number;
-  gasPrice: number;
-  gasToken: string;
-  refundReceiver: string;
-  safeTxHash: string;
-  txHash: string;
-  transactionHash: string;
-}
-
-interface Signature {
-  v: number;
-  r: string;
-  s: string | 0;
 }
 
 export default class PrepaidCard {
@@ -120,7 +70,8 @@ export default class PrepaidCard {
     if (payload.lastUsedNonce == null) {
       payload.lastUsedNonce = -1;
     }
-    let signatures = await this.sign(
+    let signatures = await sign(
+      this.layer2Web3,
       issuingToken,
       0,
       payload.data,
@@ -175,12 +126,13 @@ export default class PrepaidCard {
       amounts.push(new BN(weiAmount));
     }
     let payload = await this.getCreateCardPayload(from, tokenAddress, amounts);
-    let estimate = await this.gasEstimate(safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
+    let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
 
     if (estimate.lastUsedNonce == null) {
       estimate.lastUsedNonce = -1;
     }
-    let signatures = await this.sign(
+    let signatures = await sign(
+      this.layer2Web3,
       tokenAddress,
       0,
       payload,
@@ -194,7 +146,8 @@ export default class PrepaidCard {
       from,
       safeAddress
     );
-    let result = await this.executeTransaction(
+    let result = await executeTransaction(
+      this.layer2Web3,
       safeAddress,
       tokenAddress,
       0,
@@ -263,178 +216,6 @@ export default class PrepaidCard {
       throw new Error(await response.text());
     }
     return await response.json();
-  }
-
-  private async gasEstimate(
-    from: string,
-    to: string,
-    value: string,
-    data: string,
-    operation: number,
-    gasToken: string
-  ): Promise<Estimate> {
-    let relayServiceURL = await getConstant('relayServiceURL', this.layer2Web3);
-    let url = `${relayServiceURL}/v2/safes/${from}/transactions/estimate/`;
-    let options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
-      },
-      body: JSON.stringify({
-        to,
-        value,
-        data,
-        operation,
-        gasToken,
-      }),
-    };
-    let response = await fetch(url, options);
-    if (!response?.ok) {
-      throw new Error(await response.text());
-    }
-    return await response.json();
-  }
-
-  private async sign(
-    to: string,
-    value: number,
-    data: any,
-    operation: number,
-    txGasEstimate: string,
-    baseGasEstimate: string,
-    gasPrice: string,
-    txGasToken: string,
-    refundReceiver: string,
-    nonce: any,
-    owner: string,
-    gnosisSafeAddress: string
-  ): Promise<Signature[]> {
-    const typedData = {
-      types: {
-        //eslint-disable-next-line @typescript-eslint/naming-convention
-        EIP712Domain: [{ type: 'address', name: 'verifyingContract' }],
-        // "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 baseGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)"
-        //eslint-disable-next-line @typescript-eslint/naming-convention
-        SafeTx: [
-          { type: 'address', name: 'to' },
-          { type: 'uint256', name: 'value' },
-          { type: 'bytes', name: 'data' },
-          { type: 'uint8', name: 'operation' },
-          { type: 'uint256', name: 'safeTxGas' },
-          { type: 'uint256', name: 'baseGas' },
-          { type: 'uint256', name: 'gasPrice' },
-          { type: 'address', name: 'gasToken' },
-          { type: 'address', name: 'refundReceiver' },
-          { type: 'uint256', name: 'nonce' },
-        ],
-      },
-      domain: {
-        verifyingContract: gnosisSafeAddress,
-      },
-      primaryType: 'SafeTx',
-      message: {
-        to: to,
-        value: value,
-        data: data,
-        operation: operation,
-        safeTxGas: txGasEstimate,
-        baseGas: baseGasEstimate,
-        gasPrice: gasPrice,
-        gasToken: txGasToken,
-        refundReceiver: refundReceiver,
-        nonce: nonce.toNumber(),
-      },
-    };
-    const signatureBytes = [];
-    signatureBytes.push(await this.signTypedData(owner, typedData));
-
-    return signatureBytes;
-  }
-
-  private async signTypedData(account: string, data: any): Promise<Signature> {
-    let result: string = await new Promise((resolve, reject) => {
-      let provider = this.layer2Web3.currentProvider;
-      if (typeof provider === 'string') {
-        throw new Error(`The provider ${this.layer2Web3.currentProvider} is not supported`);
-      }
-      if (provider == null) {
-        throw new Error('No provider configured');
-      }
-      //@ts-ignore TS is complaining that provider might be undefined--but the
-      //check above should prevent that from ever happening
-      provider.send(
-        {
-          jsonrpc: '2.0',
-          method: 'eth_signTypedData',
-          params: [account, data],
-          id: new Date().getTime(),
-        },
-        (err, response) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(response?.result);
-        }
-      );
-    });
-    const sig = result.replace('0x', '');
-    const sigV = parseInt(sig.slice(-2), 16);
-    const sigR = Web3.utils.toBN('0x' + sig.slice(0, 64)).toString();
-    const sigS = Web3.utils.toBN('0x' + sig.slice(64, 128)).toString();
-
-    // Metamask with ledger returns v = 01, this is not valid for ethereum
-    // For ethereum valid V is 27 or 28
-    // In case V = 0 or 01 we add it to 27 and then add 4
-    // Adding 4 is required to make signature valid for safe contracts:
-    // https://gnosis-safe.readthedocs.io/en/latest/contracts/signatures.html#eth-sign-signature
-    return {
-      v: sigV,
-      r: sigR,
-      s: sigS,
-    };
-  }
-
-  private async executeTransaction(
-    from: string,
-    to: string,
-    value: number,
-    data: any,
-    operation: number,
-    safeTxGas: string,
-    dataGas: string,
-    gasPrice: string,
-    nonce: string,
-    signatures: any,
-    gasToken: string,
-    refundReceiver: string
-  ): Promise<GnosisExecTx> {
-    let relayServiceURL = await getConstant('relayServiceURL', this.layer2Web3);
-    const url = `${relayServiceURL}/v1/safes/${from}/transactions/`;
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
-      },
-      body: JSON.stringify({
-        to,
-        value,
-        data,
-        operation,
-        safeTxGas,
-        baseGas: dataGas,
-        dataGas,
-        gasPrice,
-        nonce,
-        signatures,
-        gasToken,
-        refundReceiver,
-      }),
-    };
-    let response = await fetch(url, options);
-    if (!response?.ok) {
-      throw new Error(await response.text());
-    }
-    return response.json();
   }
 
   private async executePayMerchant(

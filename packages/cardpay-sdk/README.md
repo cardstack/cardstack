@@ -12,6 +12,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`TokenBridgeHomeSide.waitForBridgingCompleted`](#tokenbridgehomesidewaitforbridgingcompleted)
 - [`Safes`](#safes)
   - [`Safes.view`](#safesview)
+  - [`Safes.sendTokens`](#safessendtokens)
 - [`PrepaidCard`](#prepaidcard)
   - [`PrepaidCard.create`](#prepaidcardcreate)
   - [`PrepaidCard.priceForFaceValue`](#prepaidcardpriceforfacevalue)
@@ -148,6 +149,62 @@ interface PrepaidCardSafe extends BaseSafe {
 Which can be called like this:
 ```js
 let safeDetails = await safes.view();
+```
+
+### `Safes.sendTokens`
+This call is used to send tokens from a gnosis safe to an arbitrary address in the layer 2 network. Note that the gas will be paid with the token you are transferring so there must be enough token balance in teh safe to cover both the transferred amount of tokens and gas.
+
+This method is invoked with the following parameters:
+- the address of the gnosis safe
+- the address of the token contract
+- the address of the recipient
+- the amount of tokens to send as a string in units of `wei`
+- optionally the address of a safe owner. If no address is supplied, then the default account in your web3 provider's wallet will be used.
+
+```js
+let cardCpxd = await getAddress('cardCpxd', web3);
+let result = await safes.sendTokens(
+  depotSafeAddress,
+  cardCpxd,
+  relayTxnFunderAddress
+  [10000000000000000000000]
+);
+```
+This method returns a promise for a gnosis relay transaction object that has the following shape:
+```ts
+interface RelayTransaction {
+  to: string;
+  ethereumTx: {
+    txHash: string;
+    to: string;
+    data: string;
+    blockNumber: string;
+    blockTimestamp: string;
+    created: string;
+    modified: string;
+    gasUsed: string;
+    status: number;
+    transactionIndex: number;
+    gas: string;
+    gasPrice: string;
+    nonce: string;
+    value: string;
+    from: string;
+  };
+  value: number;
+  data: string;
+  timestamp: string;
+  operation: string;
+  safeTxGas: number;
+  dataGas: number;
+  gasPrice: number;
+  gasToken: string;
+  refundReceiver: string;
+  nonce: number;
+  safeTxHash: string;
+  txHash: string;
+  transactionHash: string;
+}
 ```
 
 ## `PrepaidCard`

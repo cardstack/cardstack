@@ -13,6 +13,7 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-pay-merchant-merchant_safe-prepaid_card-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay new-prepaidcard-gas-fee <TOKEN_ADDRESS> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-new-prepaidcard-gas-fee-token_address---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay safes-view [ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-safes-view-address---networknetwork---mnemonicmnemonic)
+  - [`yarn cardpay safe-transfer-tokens [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-safe-transfer-tokens-token_address-recipient-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay usd-price <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-usd-price-token-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay eth-price <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-eth-price-token-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay price-oracle-updated-at <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-price-oracle-updated-at-token---networknetwork---mnemonicmnemonic)
@@ -118,6 +119,23 @@ USAGE
 
 ARGUMENTS
   ADDRESS   (Optional) an address of an owner whose safes you wish to view (defaults to the wallet's default account)
+  NETWORK   The network to use ("sokol" or "xdai")
+  MNEMONIC  (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+```
+
+## `yarn cardpay safe-transfer-tokens [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`
+
+Transfer tokens from a safe to an arbitrary recipient. The token amount specified is *not* in units of `wei`. Note that the gas will be paid with the token you are transferring so there must be enough token balance in teh safe to cover both the transferred amount of tokens and gas.
+
+```
+USAGE
+  $ yarn cardpay safes-view [ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]
+
+ARGUMENTS
+  SAFE_ADDRESS     The address of the safe that is sending the tokens
+  TOKEN_ADDRESS    The token address of the tokens to transfer from the safe
+  RECIPIENT        The token recipient's address
+  AMOUNT           The amount of tokens to transfer (*not* in units of `wei`).
   NETWORK   The network to use ("sokol" or "xdai")
   MNEMONIC  (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
 ```

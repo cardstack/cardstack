@@ -3,18 +3,27 @@ import { AbiItem } from 'web3-utils';
 import Web3 from 'web3';
 
 export default class Assets {
-  constructor(private layer2Web3: Web3) {}
+  constructor(private web3: Web3) {}
 
   async getNativeTokenBalance(userAddress?: string): Promise<string> {
-    let address = userAddress || (await this.layer2Web3.eth.getAccounts())[0];
+    let address = userAddress ?? (await this.web3.eth.getAccounts())[0];
 
-    return this.layer2Web3.eth.getBalance(address);
+    return this.web3.eth.getBalance(address);
   }
 
-  async getBalanceForToken(tokenAddress: string, userAddress?: string): Promise<string> {
-    let address = userAddress || (await this.layer2Web3.eth.getAccounts())[0];
-    const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+  async getBalanceForToken(tokenAddress: string, tokenHolderAddress?: string): Promise<string> {
+    let address = tokenHolderAddress ?? (await this.web3.eth.getAccounts())[0];
+    const tokenContract = new this.web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
 
     return tokenContract.methods.balanceOf(address).call();
+  }
+
+  async getTokenInfo(tokenAddress: string): Promise<{ decimals: number; name: string; symbol: string }> {
+    const tokenContract = new this.web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+    return {
+      decimals: Number(await tokenContract.methods.decimals().call()),
+      name: await tokenContract.methods.name().call(),
+      symbol: await tokenContract.methods.symbol().call(),
+    };
   }
 }
