@@ -1,20 +1,18 @@
 <Boxel::NextStepsBox>
-  <div class="card-pay-issue-prepaid-card-button-container">
-    <Boxel::Button 
-      @size="base" 
-      @kind="primary" 
-      {{on "click" this.openNewIssuanceWorkflow}} 
-      data-test-issue-prepaid-card-next-step="new-issuance"
-    >
-      Make Another Deposit
-    </Boxel::Button>
-    <Boxel::Button 
-      @size="base" 
-      @kind="secondary-dark" 
-      {{on "click" this.returnToDashboard}} 
-      data-test-issue-prepaid-card-next-step="dashboard"
-    >
-      Return to Dashboard
-    </Boxel::Button>
-  </div>
+  <Boxel::Button 
+    @size="base" 
+    @kind="primary" 
+    {{on "click" this.openNewIssuanceWorkflow}} 
+    data-test-issue-prepaid-card-next-step="new-issuance"
+  >
+    Make Another Deposit
+  </Boxel::Button>
+  <Boxel::Button 
+    @size="base" 
+    @kind="secondary-dark" 
+    {{on "click" this.returnToDashboard}} 
+    data-test-issue-prepaid-card-next-step="dashboard"
+  >
+    Return to Dashboard
+  </Boxel::Button>
 </Boxel::NextStepsBox>
