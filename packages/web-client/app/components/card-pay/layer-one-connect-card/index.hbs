@@ -65,7 +65,10 @@
     </:disabled>
     <:in-progress as |i|>
       <i.ActionStatusArea class="layer-one-connect-card__logo" @icon={{concat this.radioWalletProviderId "-logo"}} style={{css-var status-icon-size="2.5rem"}}>
-        <LoadingIndicator class="layer-one-connect-card__loading-indicator" />
+        <Boxel::LoadingIndicator 
+          class="layer-one-connect-card__loading-indicator" 
+          @color="var(--boxel-light)"
+        />
         Waiting for you to connect Card Pay with your mainnet wallet...
       </i.ActionStatusArea>
       <i.CancelButton {{on "click" this.cancelConnection}}>

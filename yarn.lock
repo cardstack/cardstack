@@ -933,10 +933,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@cardstack/boxel@^0.7.1":
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/@cardstack/boxel/-/boxel-0.7.1.tgz#baa64e56708e5090821eda02df68a337a2701615"
-  integrity sha512-wgRq7zz6QH/zT6jUVZC6qGjPTJl4A7qgU21TZ4jCAr6URaUnjXVXC1W1b9oHmFAYU9Cry2AydePgBHN4mpMH6Q==
+"@cardstack/boxel@^0.7.2":
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@cardstack/boxel/-/boxel-0.7.2.tgz#ce8c1650dafa583882145424c12326e377ee661d"
+  integrity sha512-IT000z75EU2YlFUc66y7CGl25zWpxxf6UTcQkjqrvc0XGssL3GM960yN0P2t6mJ+yq4TDInsd6hNoWEwpto2/A==
   dependencies:
     broccoli-concat "^4.2.4"
     broccoli-funnel "^3.0.3"
@@ -9264,7 +9264,7 @@ ember-page-title@^6.2.1:
   dependencies:
     ember-cli-babel "^7.22.1"
 
-ember-power-select-typeahead@alexspeller/ember-power-select-typeahead#6d279fb:
+"ember-power-select-typeahead@github:alexspeller/ember-power-select-typeahead#6d279fb":
   version "0.8.0"
   resolved "https://codeload.github.com/alexspeller/ember-power-select-typeahead/tar.gz/6d279fb9e6a640282a2dc887fe06f1d09a062148"
   dependencies:

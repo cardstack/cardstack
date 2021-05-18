@@ -100,11 +100,6 @@
   margin-right: var(--boxel-sp-xs);
 }
 
-.deposit-card__loading-indicator {
-  width: var(--boxel-sp);
-  height: var(--boxel-sp);
-}
-
 .deposit-card__text-sm {
   color: var(--boxel-purple-500);
   font: var(--boxel-font-sm);
