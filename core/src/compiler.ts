@@ -6,6 +6,7 @@ import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 import difference from 'lodash/difference';
 import intersection from 'lodash/intersection';
 import reduce from 'lodash/reduce';
+import isArray from 'lodash/isArray';
 import md5 from 'md5';
 
 import cardSchemaPlugin, {
@@ -18,12 +19,14 @@ import cardTemplatePlugin, {
 } from './babel/card-template-plugin';
 import {
   assertValidCompiledCard,
+  assertValidDeserializationMap,
   Asset,
   Builder,
   CompiledCard,
   ComponentInfo,
+  Deserializer,
   Format,
-  formats,
+  FORMATS,
   RawCard,
 } from './interfaces';
 import { getBasenameAndExtension } from './utils';
@@ -59,6 +62,11 @@ export class Compiler {
       url: cardSource.url,
       data: cardSource.data,
     };
+
+    if (cardSource.deserializer) {
+      card.deserializer = cardSource.deserializer;
+    }
+
     let options = {};
     card.schemaModule = await this.prepareSchema(cardSource, options);
     let meta = getMeta(options);
@@ -81,6 +89,9 @@ export class Compiler {
       if (!card.schemaModule) {
         card.schemaModule = parentCard.schemaModule;
       }
+      if (parentCard.deserializer) {
+        card.deserializer = parentCard.deserializer;
+      }
     }
 
     if (!card.schemaModule) {
@@ -89,7 +100,7 @@ export class Compiler {
       );
     }
 
-    for (const format of formats) {
+    for (const format of FORMATS) {
       card[format] = await this.prepareComponent(
         cardSource,
         card.fields,
@@ -303,18 +314,26 @@ export class Compiler {
       inlineHBS: undefined,
       usedFields: [] as ComponentInfo['usedFields'],
     };
+
     let out = transformSync(templateSource, {
       plugins: [[cardTemplatePlugin, options]],
     });
 
     let hashedFilename = hashFilenameFromFields(localFile, fields);
 
-    return {
+    let componentInfo: ComponentInfo = {
       moduleName: await this.define(cardURL, hashedFilename, out!.code!),
       usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
       sourceCardURL: cardURL,
     };
+
+    let deserialize = getDeserializationMap(fields, options.usedFields);
+    if (deserialize) {
+      componentInfo.deserialize = deserialize;
+    }
+
+    return componentInfo;
   }
 }
 
@@ -342,6 +361,45 @@ function hashFilenameFromFields(
   );
   return `${basename}-${hash}${extension}`;
 }
+
 function isBaseCard(url: string): boolean {
   return url === baseCardURL;
+}
+
+function getDeserializationMap(
+  fields: CompiledCard['fields'],
+  usedFields: string[]
+): ComponentInfo['deserialize'] {
+  let map: any = {};
+
+  for (const fieldPath of usedFields) {
+    let deserializer = getFieldDeserializer(fields, fieldPath);
+    if (!deserializer) {
+      continue;
+    }
+
+    if (!map[deserializer]) {
+      map[deserializer] = [];
+    }
+
+    map[deserializer].push(fieldPath);
+  }
+  assertValidDeserializationMap(map);
+  return map;
+}
+
+function getFieldDeserializer(
+  fields: CompiledCard['fields'],
+  path: string
+): Deserializer | undefined {
+  let paths = path.split('.');
+  let [first, ...tail] = paths;
+
+  let { card } = fields[first];
+
+  if (paths.length > 1) {
+    return getFieldDeserializer(card.fields, tail.join('.'));
+  }
+
+  return card.deserializer;
 }

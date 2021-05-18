@@ -1,7 +1,7 @@
 import { Server } from 'miragejs/server';
 import {
   CompiledCard,
-  featureNames,
+  FEATURE_NAMES,
   RawCard,
 } from '@cardstack/core/src/interfaces';
 import type { TestContext } from 'ember-test-helpers';
@@ -27,7 +27,7 @@ async function loadBaseCards() {
     card.url = `https://cardstack.com/base/${name}`;
     card.files = {};
 
-    for (const feature of featureNames) {
+    for (const feature of FEATURE_NAMES) {
       let fileName = card[feature];
       if (!fileName) {
         continue;

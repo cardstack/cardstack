@@ -6,20 +6,28 @@ const componentFormats = {
   embedded: '',
 };
 export type Format = keyof typeof componentFormats;
-export const formats = Object.keys(componentFormats) as Format[];
+export const FORMATS = Object.keys(componentFormats) as Format[];
 
 const featureNamesMap = {
   schema: '',
 };
 export type FeatureFile = keyof typeof featureNamesMap & Format;
-export const featureNames = Object.keys(featureNamesMap).concat(
-  formats
+export const FEATURE_NAMES = Object.keys(featureNamesMap).concat(
+  FORMATS
 ) as FeatureFile[];
 
 export type Asset = {
   type: 'css' | 'unknown';
   path: string;
 };
+
+// Right now Date is the only hardcoded known serializer. If we add more
+// this will become a union
+const deserializerTypes = {
+  date: '',
+};
+export type Deserializer = keyof typeof deserializerTypes;
+export const DESERIALIZERS = Object.keys(deserializerTypes) as Deserializer[];
 
 export type CardData = Record<string, any>;
 
@@ -32,6 +40,8 @@ export type RawCard = {
   schema?: string;
   containsRoutes?: boolean;
 
+  deserializer?: Deserializer;
+
   // url to the card we adopted from
   adoptsFrom?: string;
 
@@ -41,6 +51,11 @@ export type RawCard = {
   // if this card contains data (as opposed to just schema & code), it goes here
   data?: Record<string, any> | undefined;
 };
+export interface Field {
+  type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
+  card: CompiledCard;
+  name: string;
+}
 
 export interface CompiledCard {
   url: string;
@@ -50,19 +65,18 @@ export interface CompiledCard {
     [key: string]: Field;
   };
   schemaModule: string;
+  deserializer?: Deserializer;
+
   isolated: ComponentInfo;
   embedded: ComponentInfo;
   assets: Asset[];
-}
-export interface Field {
-  type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
-  card: CompiledCard;
-  name: string;
 }
 
 export interface ComponentInfo {
   moduleName: string;
   usedFields: string[]; // ["title", "author.firstName"]
+
+  deserialize?: Record<Deserializer, string[]>;
   inlineHBS?: string;
   sourceCardURL: string;
 }
@@ -84,7 +98,7 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (typeof obj.url !== 'string') {
     throw new Error(`card missing URL`);
   }
-  for (let featureFile of featureNames) {
+  for (let featureFile of FEATURE_NAMES) {
     if (featureFile in obj) {
       if (typeof obj[featureFile] !== 'string') {
         throw new Error(
@@ -139,5 +153,15 @@ export function assertValidCompiledCard(
         }"`
       );
     }
+  }
+}
+
+export function assertValidDeserializationMap(
+  map: any
+): asserts map is ComponentInfo['deserialize'] {
+  let keys = Object.keys(map);
+  let diff = difference(keys, DESERIALIZERS);
+  if (diff.length > 0) {
+    throw new Error(`Unexpected deserializer: ${diff.join(',')}`);
   }
 }

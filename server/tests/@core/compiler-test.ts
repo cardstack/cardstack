@@ -12,6 +12,45 @@ Qmodule('Compiler', function (hooks) {
     builder = new TestBuilder();
   });
 
+  test('string card', async function (assert) {
+    let compiled = await builder.getCompiledCard(
+      'https://cardstack.com/base/string'
+    );
+    assert.ok(!compiled.deserializer, 'String card has no deserializer');
+  });
+
+  test('date card', async function (assert) {
+    let compiled = await builder.getCompiledCard(
+      'https://cardstack.com/base/date'
+    );
+    assert.equal(
+      compiled.deserializer,
+      'date',
+      'Date card has date serializer'
+    );
+  });
+
+  test('deserializer is inherited', async function (assert) {
+    builder.addRawCard({
+      url: 'https://mirage/cards/fancy-date',
+      schema: 'schema.js',
+      files: {
+        'schema.js': `
+          import { adopts } from "@cardstack/types";
+          import date from "https://cardstack.com/base/date";
+          export default @adopts(date) class FancyDate { }`,
+      },
+    });
+    let compiled = await builder.getCompiledCard(
+      'https://mirage/cards/fancy-date'
+    );
+    assert.equal(
+      compiled.deserializer,
+      'date',
+      'FancyDate card has date serializer inherited from its parent'
+    );
+  });
+
   test('simplest example', async function (assert) {
     builder.addRawCard({
       url: 'https://mirage/cards/person',
@@ -40,6 +79,11 @@ Qmodule('Compiler', function (hooks) {
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
       '{{@model.name}} was born on <BirthdateField @model={{@model.birthdate}} />'
+    );
+    assert.deepEqual(
+      compiled.embedded.deserialize,
+      { date: ['birthdate'] },
+      'Embedded component has a deserialization map'
     );
   });
 

@@ -2,7 +2,7 @@ import {
   assertValidRawCard,
   CompiledCard,
   Format,
-  formats,
+  FORMATS,
 } from '@cardstack/core/src/interfaces';
 import { NotFound } from '../middleware/error';
 import { Serializer } from 'jsonapi-serializer';
@@ -20,7 +20,7 @@ function getCardFormatFromRequest(
     format = formatQueryParam;
   }
 
-  if (formats.includes(format)) {
+  if (FORMATS.includes(format)) {
     return format;
   } else {
     return 'isolated';
