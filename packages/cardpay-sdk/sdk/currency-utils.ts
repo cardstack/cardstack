@@ -1,3 +1,9 @@
+/**
+ * These functions were pulled from the Rainbow wallet
+ * They are specifically for formatting balances and currency, so we are
+ * utilizing `bignumber.js` rather than `bn.js` for floating point arithmetic
+ */
+
 import BigNumber from 'bignumber.js';
 import { get, isNil } from 'lodash';
 import supportedNativeCurrencies from './native-currencies';
