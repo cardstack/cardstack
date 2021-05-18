@@ -12,6 +12,7 @@
     "@types/node-fetch": "^2.5.10",
     "@types/web3": "^1.2.2",
     "@types/web3-provider-engine": "^14.0.0",
+    "bignumber.js": "^9.0.1",
     "bn.js": "^5.2.0",
     "esm": "^3.2.25",
     "eth-sig-util": "^3.0.1",

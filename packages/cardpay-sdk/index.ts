@@ -7,6 +7,7 @@ export { default as Assets } from './sdk/assets';
 
 export { getAddress, getAddressByNetwork, getOracle, getOracleByNetwork } from './contracts/addresses';
 export { getConstant, getConstantByNetwork, networks, networkIds } from './sdk/constants';
+export * from './sdk/currency-utils';
 
 export { default as ERC20ABI } from './contracts/abi/erc-20';
 export { default as ERC677ABI } from './contracts/abi/erc-677';
