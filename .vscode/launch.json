@@ -92,7 +92,7 @@
         "0xaE9D292753f05b00E996F6b18E4bAe5CC9e5aa48", // Hassan's depot safe feel free to use your own
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", // CARD.CPXD
         "0xD7182E380b7dFa33C186358De7E1E5d0950fCAE7", // Relay txn sender
-        "100000",
+        "1000",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
