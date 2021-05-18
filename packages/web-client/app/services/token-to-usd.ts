@@ -7,11 +7,11 @@ import { rawTimeout, waitForQueue } from 'ember-concurrency';
 import BN from 'bn.js';
 import { toBN } from 'web3-utils';
 import TokenToUsdHelper from '@cardstack/web-client/helpers/token-to-usd';
-import { ConversionFunction } from '@cardstack/web-client/utils/web3-strategies/types';
 import {
   ConvertibleSymbol,
   convertibleSymbols,
-} from '@cardstack/web-client/utils/web3-strategies/token-categories';
+  ConversionFunction,
+} from '@cardstack/web-client/utils/token';
 import config from '@cardstack/web-client/config/environment';
 
 const INTERVAL = config.environment === 'test' ? 1000 : 60 * 1000;

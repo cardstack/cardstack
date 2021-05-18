@@ -3,7 +3,10 @@ import { WalletProvider } from '../wallet-providers';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
-import { ConvertibleSymbol } from '@cardstack/web-client/utils/web3-strategies/token-categories';
+import {
+  ConvertibleSymbol,
+  ConversionFunction,
+} from '@cardstack/web-client/utils/token';
 
 export interface Web3Strategy {
   chainName: string;
@@ -45,4 +48,3 @@ export interface Layer2Web3Strategy extends Web3Strategy {
 
 export type TransactionHash = string;
 export type ChainAddress = string;
-export type ConversionFunction = (amountInWei: string) => number; // eslint-disable-line no-unused-vars

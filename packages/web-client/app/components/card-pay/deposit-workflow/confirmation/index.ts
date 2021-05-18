@@ -10,7 +10,7 @@ import { next } from '@ember/runloop';
 import {
   TokenDisplayInfo,
   TokenSymbol,
-} from '@cardstack/web-client/utils/web3-strategies/token-display-info';
+} from '@cardstack/web-client/utils/token';
 
 interface CardPayDepositWorkflowConfirmationComponentArgs {
   workflowSession: WorkflowSession;

@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import Component from '@glimmer/component';
-import { TokenDisplayInfo } from '@cardstack/web-client/utils/web3-strategies/token-display-info';
+import { TokenDisplayInfo } from '@cardstack/web-client/utils/token';
 
 interface CardPayBalancesListBalanceComponentArgs {
   symbol: string;

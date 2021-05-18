@@ -5,7 +5,7 @@ import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import { tracked } from '@glimmer/tracking';
 import { WalletProvider } from '../wallet-providers';
 import { Layer1Web3Strategy, TransactionHash } from './types';
-import { TokenContractInfo } from './token-contract-info';
+import { TokenContractInfo } from '../token';
 import detectEthereumProvider from '@metamask/detect-provider';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';

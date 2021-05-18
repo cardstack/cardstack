@@ -5,7 +5,7 @@ import TokenToUsd from '@cardstack/web-client/services/token-to-usd';
 import {
   convertibleSymbols,
   ConvertibleSymbol,
-} from '@cardstack/web-client/utils/web3-strategies/token-categories';
+} from '@cardstack/web-client/utils/token';
 
 type TokenToUsdHelperParams = [ConvertibleSymbol, BN];
 

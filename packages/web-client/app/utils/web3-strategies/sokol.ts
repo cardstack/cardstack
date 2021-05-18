@@ -4,13 +4,11 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import Web3 from 'web3';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
+import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
 import {
-  ChainAddress,
+  ConvertibleSymbol,
   ConversionFunction,
-  Layer2Web3Strategy,
-  TransactionHash,
-} from './types';
-import { ConvertibleSymbol } from '@cardstack/web-client/utils/web3-strategies/token-categories';
+} from '@cardstack/web-client/utils/token';
 import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer, hash } from 'rsvp';

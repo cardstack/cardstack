@@ -12,7 +12,7 @@ import { toBN, toWei } from 'web3-utils';
 import {
   TokenDisplayInfo,
   TokenSymbol,
-} from '@cardstack/web-client/utils/web3-strategies/token-display-info';
+} from '@cardstack/web-client/utils/token';
 
 interface CardPayDepositWorkflowTransactionAmountComponentArgs {
   workflowSession: WorkflowSession;
