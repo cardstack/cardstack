@@ -152,7 +152,7 @@ let safeDetails = await safes.view();
 ```
 
 ### `Safes.sendTokens`
-This call is used to send tokens from a gnosis safe to an arbitrary address in the layer 2 network.
+This call is used to send tokens from a gnosis safe to an arbitrary address in the layer 2 network. Note that the gas will be paid with the token you are transferring so there must be enough token balance in teh safe to cover both the transferred amount of tokens and gas.
 
 This method is invoked with the following parameters:
 - the address of the gnosis safe

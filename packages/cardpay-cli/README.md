@@ -125,7 +125,7 @@ ARGUMENTS
 
 ## `yarn cardpay safe-transfer-tokens [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`
 
-Transfer tokens from a safe to an arbitrary recipient. The token amount specified is *not* in units of `wei`.
+Transfer tokens from a safe to an arbitrary recipient. The token amount specified is *not* in units of `wei`. Note that the gas will be paid with the token you are transferring so there must be enough token balance in teh safe to cover both the transferred amount of tokens and gas.
 
 ```
 USAGE
