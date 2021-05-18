@@ -35,29 +35,13 @@
 }
 
 .boxel-next-steps-box__content {
-  --cluster-horizontal-space: var(--boxel-sp-lg);
-  --cluster-vertical-space: var(--boxel-sp);
-
   padding: var(--boxel-sp-xxs) var(--boxel-sp-lg) var(--boxel-sp-xl);
-
-  /* ↓ Suppress horizontal scrolling caused by
-  the negative margin in some circumstances */
-  overflow: hidden;
 }
 
-.boxel-next-steps-box__list {
-  list-style-type: none;
-  padding: 0;
+.boxel-next-steps-box__button-container {
   display: flex;
   flex-wrap: wrap;
-
-  /* ↓ multiply by -1 to negate the halved value */
-  margin: calc(var(--cluster-vertical-space) / 2 * -1) calc(var(--cluster-horizontal-space) / 2 * -1);
-}
-
-.boxel-next-steps-box__list-item {
-  /* ↓ half the value, because of the 'doubling up' */
-  margin: calc(var(--cluster-vertical-space) / 2) calc(var(--cluster-horizontal-space) / 2);
+  gap: var(--boxel-sp);
 }
 
 .boxel-next-steps-box__footer {

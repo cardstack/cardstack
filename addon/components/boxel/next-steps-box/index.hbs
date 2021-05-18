@@ -11,17 +11,9 @@
 
   <div class="boxel-next-steps-box__content">
     {{#if (has-block "default")}}
-      {{yield to="default"}}
-    {{/if}}
-
-    {{#if (has-block "item")}}
-      <ul class="boxel-next-steps-box__list">
-        {{#each @items as |item|}}
-          <li class="boxel-next-steps-box__list-item">
-            {{yield item to="item"}}
-          </li>
-        {{/each}}
-      </ul>
+      <div class="boxel-next-steps-box__button-container">
+        {{yield to="default"}}
+      </div>
     {{/if}}
 
     {{#if (has-block "footer")}}
