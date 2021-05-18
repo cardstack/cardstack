@@ -24,7 +24,7 @@
 
 .deposit-workflow__banner small {
   display: block;
-  color: var(--boxel-light-600);
+  color: var(--boxel-light-300);
   font-size: var(--boxel-font-size-xs);
   line-height: calc(18/11);
   letter-spacing: var(--boxel-lsp-lg);
