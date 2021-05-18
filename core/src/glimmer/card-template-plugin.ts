@@ -10,6 +10,7 @@ import { CompiledCard, ComponentInfo, Field } from '../interfaces';
 import { singularize } from 'inflection';
 import { capitalize, cloneDeep } from 'lodash';
 import { inlineTemplateForField } from './inline-field-plugin';
+import { getFieldForPath } from '../utils';
 
 class InvalidFieldsUsageError extends Error {
   message = 'Invalid use of @fields API';
@@ -72,8 +73,6 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
       insideFieldsIterator: undefined,
     };
 
-    const inferField = inferFromFields(fields);
-
     return {
       name: 'card-glimmer-plugin',
       visitor: {
@@ -98,27 +97,32 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
           }
 
           let field: Field | undefined;
+          let modelArgument: string | undefined;
 
           if (state.insideFieldsIterator) {
             if (node.tag === state.insideFieldsIterator.componentVar) {
               let { name } = enclosingField(path, state.insideFieldsIterator);
               field = fields[name];
+              modelArgument = field.name;
             }
           }
 
           if (!field) {
-            field = inferField(node);
+            let fieldDetails = inferFieldDetailsFromElementNode(fields, node);
+            if (fieldDetails) {
+              field = fieldDetails.field;
+              modelArgument = fieldDetails.path;
+            }
           }
 
-          if (!field) {
+          if (!field || !modelArgument) {
             return;
           }
-
           return rewriteElementNode({
             field,
             usedFields,
             importAndChooseName,
-            modelArgument: field.name,
+            modelArgument,
             prefix: MODEL_PREFIX,
           });
         },
@@ -163,16 +167,18 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               return output;
             }
 
-            let field = inferField(node);
+            let fieldDetails = inferFieldDetailsFromNode(fields, node);
 
-            if (!field) {
+            if (!fieldDetails) {
               return;
             }
 
             state.insidePluralFieldIterator = {
-              field,
-              blockProgramUsage: node.program.blockParams[0],
+              field: fieldDetails.field,
+              // blockProgramUsage: node.program.blockParams[0],
+              blockProgramUsage: fieldDetails.path,
             };
+
             return undefined;
           },
           exit(/*node , path*/) {
@@ -188,7 +194,7 @@ function isFieldsIterator(node: BlockStatement): boolean {
   let [firstArg] = node.params;
 
   let isIteratingOnFields =
-    firstArg?.type === 'PathExpression' && firstArg.original === '@fields';
+    firstArg.type === 'PathExpression' && firstArg.original === '@fields';
 
   if (!isIteratingOnFields) {
     return false;
@@ -201,48 +207,73 @@ function isFieldsIterator(node: BlockStatement): boolean {
   throw new InvalidFieldsUsageError();
 }
 
-function inferFromFields(fields: CompiledCard['fields']) {
-  return function (
-    node: PathExpression | ElementNode | BlockStatement | undefined
-  ) {
-    if (!node) {
-      return;
-    }
-
-    if (node.type === 'ElementNode' && node.tag.startsWith(FIELDS_PREFIX)) {
-      return fields[node.tag.slice(FIELDS_PREFIX.length)];
-    }
-
-    let exp: PathExpression | undefined;
-
-    if (node.type === 'PathExpression') {
-      exp = node;
-    } else if (node.type === 'BlockStatement') {
-      let [param] = node.params;
-      // ie: {{#each @model.items as...
-      if (param.type === 'PathExpression') {
-        exp = param;
-      }
-      // ie: {{#each (helper @model.items) as...
-      if (
-        param.type === 'SubExpression' &&
-        param.params[0].type === 'PathExpression'
-      ) {
-        exp = param.params[0];
-      }
-    }
-
-    if (!exp) {
-      return;
-    }
-
-    if (exp.head.type === 'AtHead' && exp.head.name === '@model') {
-      // For now, assuming we're only going one level deep
-      return fields[exp.tail[0]];
-    }
-
+function inferFieldDetailsFromElementNode(
+  fields: CompiledCard['fields'],
+  node: ElementNode | undefined
+): { field: Field; path: string } | undefined {
+  if (!node) {
     return;
-  };
+  }
+
+  if (node.tag.startsWith(FIELDS_PREFIX)) {
+    let path = node.tag.slice(FIELDS_PREFIX.length);
+    let field = getFieldForPath(fields, path);
+    if (field) {
+      return { field, path };
+    }
+  }
+
+  return;
+}
+
+function inferFieldDetailsFromNode(
+  fields: CompiledCard['fields'],
+  node: PathExpression | ElementNode | BlockStatement | undefined
+): { field: Field; path: string } | undefined {
+  if (!node) {
+    return;
+  }
+
+  if (node.type === 'ElementNode' && node.tag.startsWith(FIELDS_PREFIX)) {
+    let path = node.tag.slice(FIELDS_PREFIX.length);
+    let field = getFieldForPath(fields, path);
+    if (field) {
+      return { field, path };
+    }
+  }
+
+  let exp: PathExpression | undefined;
+
+  if (node.type === 'PathExpression') {
+    exp = node;
+  } else if (node.type === 'BlockStatement') {
+    let [param] = node.params;
+    // ie: {{#each @model.items as...
+    if (param.type === 'PathExpression') {
+      exp = param;
+    }
+    // ie: {{#each (helper @model.items) as...
+    if (
+      param.type === 'SubExpression' &&
+      param.params[0].type === 'PathExpression'
+    ) {
+      exp = param.params[0];
+    }
+  }
+
+  if (!exp) {
+    return;
+  }
+
+  if (exp.head.type === 'AtHead' && exp.head.name === '@model') {
+    let path = exp.tail.join('.');
+    let field = getFieldForPath(fields, path);
+    if (field) {
+      return { field, path };
+    }
+  }
+
+  return;
 }
 
 function rewriteElementNode(options: {
@@ -256,7 +287,7 @@ function rewriteElementNode(options: {
   let { field, forceSingular, modelArgument, prefix } = options;
   let { inlineHBS } = field.card.embedded;
 
-  options.usedFields.push(field.name);
+  options.usedFields.push(modelArgument);
 
   if (!forceSingular && field.type === 'containsMany') {
     if (inlineHBS) {

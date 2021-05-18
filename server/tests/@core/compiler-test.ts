@@ -1,9 +1,31 @@
-import QUnit from 'qunit';
+import QUnit, { only } from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { containsSource } from '@cardstack/core/tests/helpers/assertions';
 import { TestBuilder } from '../helpers/test-builder';
 
 const { module: Qmodule, test } = QUnit;
+
+const PERSON_CARD = {
+  url: 'https://mirage/cards/person',
+  schema: 'schema.js',
+  embedded: 'embedded.js',
+  files: {
+    'schema.js': `
+      import { contains } from "@cardstack/types";
+      import date from "https://cardstack.com/base/date";
+      import string from "https://cardstack.com/base/string";
+      export default class Person {
+        @contains(string)
+        name;
+
+        @contains(date)
+        birthdate;
+      }`,
+    'embedded.js': templateOnlyComponentTemplate(
+      '<@fields.name/> was born on <@fields.birthdate/>'
+    ),
+  },
+};
 
 Qmodule('Compiler', function (hooks) {
   let builder: TestBuilder;
@@ -51,35 +73,17 @@ Qmodule('Compiler', function (hooks) {
     );
   });
 
-  test('simplest example', async function (assert) {
-    builder.addRawCard({
-      url: 'https://mirage/cards/person',
-      schema: 'schema.js',
-      embedded: 'embedded.js',
-      files: {
-        'schema.js': `
-          import { contains } from "@cardstack/types";
-          import date from "https://cardstack.com/base/date";
-          import string from "https://cardstack.com/base/string";
-          export default class Person {
-            @contains(string)
-            name;
+  test('basic example', async function (assert) {
+    builder.addRawCard(PERSON_CARD);
 
-            @contains(date)
-            birthdate;
-          }`,
-        'embedded.js': templateOnlyComponentTemplate(
-          '<@fields.name/> was born on <@fields.birthdate/>'
-        ),
-      },
-    });
-
-    let compiled = await builder.getCompiledCard('https://mirage/cards/person');
+    let compiled = await builder.getCompiledCard(PERSON_CARD.url);
     assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
+
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
       '{{@model.name}} was born on <BirthdateField @model={{@model.birthdate}} />'
     );
+
     assert.deepEqual(
       compiled.embedded.deserialize,
       { date: ['birthdate'] },
@@ -87,7 +91,8 @@ Qmodule('Compiler', function (hooks) {
     );
   });
 
-  test('field iterator example', async function () {
+  test('nested cards', async function (assert) {
+    builder.addRawCard(PERSON_CARD);
     builder.addRawCard({
       url: 'https://mirage/cards/post',
       schema: 'schema.js',
@@ -96,24 +101,42 @@ Qmodule('Compiler', function (hooks) {
         'schema.js': `
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
+          import Person from "${PERSON_CARD.url}";
           export default class Post {
             @contains(string)
             title;
+
+            @contains(Person)
+            author;
           }`,
         'embedded.js': templateOnlyComponentTemplate(
-          `<article>{{#each-in @fields as |name|}}<label>{{name}}</label>{{/each-in}}</article>`
+          `<article><h1><@fields.title /></h1><p><@fields.author.name /></p><p><@fields.author.birthdate /></p></article>`
         ),
       },
     });
 
     let compiled = await builder.getCompiledCard('https://mirage/cards/post');
+    assert.deepEqual(Object.keys(compiled.fields), ['title', 'author']);
+
+    assert.deepEqual(compiled.embedded.usedFields, [
+      'title',
+      'author.name',
+      'author.birthdate',
+    ]);
+
+    assert.deepEqual(
+      compiled.embedded.deserialize,
+      { date: ['author.birthdate'] },
+      'Embedded component has a deserialization map'
+    );
+
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
-      '<article><label>{{\\"title\\"}}</label></article>'
+      `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><BirthdateField @model={{@model.author.birthdate}} /></p></article>`
     );
   });
 
-  test('recompiled parent field iterator', async function () {
+  Qmodule('@fields iterating', function (hooks) {
     let postCard = {
       url: 'https://mirage/cards/post',
       schema: 'schema.js',
@@ -131,11 +154,25 @@ Qmodule('Compiler', function (hooks) {
         ),
       },
     };
-    let fancyPostCard = {
-      url: 'https://mirage/cards/fancy-post',
-      schema: 'schema.js',
-      files: {
-        'schema.js': `
+
+    hooks.beforeEach(function () {
+      builder.addRawCard(postCard);
+    });
+
+    test('iterators of fields and inlines templates', async function () {
+      let compiled = await builder.getCompiledCard('https://mirage/cards/post');
+      containsSource(
+        builder.definedModules.get(compiled.embedded.moduleName),
+        '<article><label>{{\\"title\\"}}</label></article>'
+      );
+    });
+
+    test('recompiled parent field iterator', async function () {
+      let fancyPostCard = {
+        url: 'https://mirage/cards/fancy-post',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
           import { contains, adopts } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
           import Post from "${postCard.url}";
@@ -143,13 +180,13 @@ Qmodule('Compiler', function (hooks) {
             @contains(string)
             body;
           }`,
-      },
-    };
-    let timelyPostCard = {
-      url: 'https://mirage/cards/timely-post',
-      schema: 'schema.js',
-      files: {
-        'schema.js': `
+        },
+      };
+      let timelyPostCard = {
+        url: 'https://mirage/cards/timely-post',
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
           import { contains, adopts } from "@cardstack/types";
           import date from "https://cardstack.com/base/date";
           import Post from "${postCard.url}";
@@ -157,23 +194,23 @@ Qmodule('Compiler', function (hooks) {
             @contains(date)
             createdAt;
           }`,
-      },
-    };
+        },
+      };
 
-    builder.addRawCard(postCard);
-    builder.addRawCard(fancyPostCard);
-    builder.addRawCard(timelyPostCard);
+      builder.addRawCard(fancyPostCard);
+      builder.addRawCard(timelyPostCard);
 
-    let timelyCompiled = await builder.getCompiledCard(timelyPostCard.url);
-    let fancyCompiled = await builder.getCompiledCard(fancyPostCard.url);
+      let timelyCompiled = await builder.getCompiledCard(timelyPostCard.url);
+      let fancyCompiled = await builder.getCompiledCard(fancyPostCard.url);
 
-    containsSource(
-      builder.definedModules.get(timelyCompiled.embedded.moduleName),
-      '<article><label>{{\\"title\\"}}</label><label>{{\\"createdAt\\"}}</label></article>'
-    );
-    containsSource(
-      builder.definedModules.get(fancyCompiled.embedded.moduleName),
-      '<article><label>{{\\"title\\"}}</label><label>{{\\"body\\"}}</label></article>'
-    );
+      containsSource(
+        builder.definedModules.get(timelyCompiled.embedded.moduleName),
+        '<article><label>{{\\"title\\"}}</label><label>{{\\"createdAt\\"}}</label></article>'
+      );
+      containsSource(
+        builder.definedModules.get(fancyCompiled.embedded.moduleName),
+        '<article><label>{{\\"title\\"}}</label><label>{{\\"body\\"}}</label></article>'
+      );
+    });
   });
 });

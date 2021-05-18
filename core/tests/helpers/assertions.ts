@@ -31,7 +31,9 @@ export function containsSource(
   expected: string,
   message?: string
 ): void {
-  let result = actual?.includes(expected) || false;
+  actual = standardize(actual ?? '');
+  expected = standardize(expected);
+  let result = actual.includes(expected) || false;
   message ||= 'Contains source';
   QUnit.assert.pushResult({
     result,

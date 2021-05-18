@@ -11,12 +11,38 @@ function importAndChooseName() {
 }
 
 QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
+  let builder: TestBuilder;
   let options: Options;
   let usedFields: ComponentInfo['usedFields'];
-  let compiledStringCard: CompiledCard, compiledDateCard: CompiledCard;
+  let compiledStringCard: CompiledCard,
+    compiledDateCard: CompiledCard,
+    compiledListCard: CompiledCard;
 
   hooks.before(async function () {
-    let builder = new TestBuilder();
+    builder = new TestBuilder();
+    builder.addRawCard({
+      url: 'https://mirage/card/list',
+      schema: 'schema.js',
+      files: {
+        'schema.js': `
+          import { contains } from "@cardstack/types";
+          import string from "https://cardstack.com/base/string";
+          import date from "https://cardstack.com/base/date";
+          export default class NestedItems {
+            @contains(string)
+            name;
+
+            @containsMany(string)
+            items;
+
+            @containsMany(date)
+            dates;
+          }`,
+      },
+    });
+    compiledListCard = await builder.getCompiledCard(
+      'https://mirage/card/list'
+    );
     compiledStringCard = await builder.getCompiledCard(
       'https://cardstack.com/base/string'
     );
@@ -67,6 +93,32 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       assert.equal(template, '<BestGuess @model={{@model.createdAt}} />');
       assert.deepEqual(usedFields, ['createdAt']);
     });
+
+    QUnit.test('Nested fields', async function (assert) {
+      let template = transform('<@fields.title /><@fields.list.name />', {
+        fields: {
+          title: {
+            card: compiledStringCard,
+            name: 'title',
+            type: 'contains',
+          },
+          list: {
+            card: compiledListCard,
+            name: 'list',
+            type: 'contains',
+          },
+        },
+        usedFields,
+        importAndChooseName,
+      });
+
+      assert.equal(
+        template,
+        '{{@model.title}}{{@model.list.name}}',
+        'Component invocation is converted to handlebars expression'
+      );
+      assert.deepEqual(usedFields, ['title', 'list.name']);
+    });
   });
 
   QUnit.module('Fields: inlinable: containsMany', function (hooks) {
@@ -78,37 +130,39 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
             name: 'items',
             type: 'containsMany',
           },
+          list: {
+            card: compiledListCard,
+            name: 'list',
+            type: 'contains',
+          },
         },
         usedFields,
         importAndChooseName,
       };
     });
 
-    QUnit.test(
-      'each-as loops for strings with shallow depth',
-      async function (assert) {
-        assert.equal(
-          transform(
-            '{{#each @model.items as |Item|}}<Item />{{/each}}',
-            options
-          ),
-          '{{#each @model.items as |Item|}}{{Item}}{{/each}}'
-        );
-        assert.deepEqual(usedFields, ['items']);
-      }
-    );
+    QUnit.test('each-as loops for strings', async function (assert) {
+      assert.equal(
+        transform(
+          '{{#each @fields.items as |Item|}}{{#if condition}}<Item />{{/if}}<Other />{{/each}}',
+          options
+        ),
+        '{{#each @model.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}'
+      );
+      assert.deepEqual(usedFields, ['items']);
+    });
 
     QUnit.test(
-      'each-as loops for strings with greater depth',
+      'each-as loops for strings in nested cards',
       async function (assert) {
         assert.equal(
           transform(
-            '{{#each @model.items as |Item|}}{{#if condition}}<Item />{{/if}}<Other />{{/each}}',
+            '{{#each @fields.list.items as |Item|}}{{#if condition}}<Item />{{/if}}<Other />{{/each}}',
             options
           ),
-          '{{#each @model.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}'
+          '{{#each @model.list.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}'
         );
-        assert.deepEqual(usedFields, ['items']);
+        assert.deepEqual(usedFields, ['list.items']);
       }
     );
 
@@ -129,17 +183,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     );
 
     QUnit.test('Compononet invocation for strings', async function (assert) {
-      let template = transform('<@fields.items />', {
-        fields: {
-          items: {
-            card: compiledStringCard,
-            name: 'items',
-            type: 'containsMany',
-          },
-        },
-        usedFields,
-        importAndChooseName,
-      });
+      let template = transform('<@fields.items />', options);
 
       assert.equal(
         template,
@@ -147,6 +191,19 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       );
       assert.deepEqual(usedFields, ['items']);
     });
+
+    QUnit.test(
+      'Compononet invocation for nested fields',
+      async function (assert) {
+        let template = transform('<@fields.list.items />', options);
+
+        assert.equal(
+          template,
+          '{{#each @model.list.items as |item|}}{{item}}{{/each}}'
+        );
+        assert.deepEqual(usedFields, ['items']);
+      }
+    );
   });
 
   QUnit.module('Fields: not-inlinable: containsMany', function (hooks) {
@@ -157,6 +214,11 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
             name: 'items',
             card: compiledDateCard,
             type: 'containsMany',
+          },
+          list: {
+            name: 'list',
+            card: compiledListCard,
+            type: 'contains',
           },
         },
         usedFields,
@@ -171,6 +233,19 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       );
       assert.deepEqual(usedFields, ['items']);
     });
+    QUnit.test(
+      'each-as loops for dates in nested card',
+      async function (assert) {
+        assert.equal(
+          transform(
+            '{{#each @model.list.dates as |aDate|}}<aDate />{{/each}}',
+            options
+          ),
+          '{{#each @model.list.dates as |aDate|}}<BestGuess @model={{aDate}} />{{/each}}'
+        );
+        assert.deepEqual(usedFields, ['list.dates']);
+      }
+    );
 
     QUnit.test('component invocation for dates', async function (assert) {
       assert.equal(
@@ -179,6 +254,17 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       );
       assert.deepEqual(usedFields, ['items']);
     });
+
+    QUnit.test(
+      'component invocation for dates in nested card',
+      async function (assert) {
+        assert.equal(
+          transform('<@fields.list.dates />', options),
+          '{{#each @model.list.dates as |date|}}<BestGuess @model={{date}} />{{/each}}'
+        );
+        assert.deepEqual(usedFields, ['list.dates']);
+      }
+    );
   });
 
   QUnit.module('@fields API', function (hooks) {
@@ -212,7 +298,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
 
     // Reminder: as we wrote this, we decided that `<@fields.startDate />` can
-    // just always replace `<@fields.startDate />` for the invocation case, and
+    // just always replace `<@model.startDate />` for the invocation case, and
     // `{{@model.startDate}}` is *always* only the data.
     QUnit.test('{{#each-in}} over @fields', async function () {
       equalIgnoringWhiteSpace(
