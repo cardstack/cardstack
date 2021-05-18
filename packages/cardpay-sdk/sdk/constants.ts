@@ -23,7 +23,7 @@ const SOKOL = {
   name: 'Sokol',
   rpcNode: 'https://sokol.stack.cards',
   rpcWssNode: 'https://sokol-wss.stack.cards',
-  relayServiceURL: 'https://relay-staging.stack.cards/api',
+  relayServiceURL: 'http://localhost:8000/api', //'https://relay-staging.stack.cards/api',
   transactionServiceURL: 'https://transactions-staging.stack.cards/api',
 };
 const KOVAN = {
