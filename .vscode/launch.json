@@ -109,7 +109,7 @@
         "prepaidcard-create",
         "0xaE9D292753f05b00E996F6b18E4bAe5CC9e5aa48", // Hassan's depot safe feel free to use your own
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
-        "100",
+        "500",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
@@ -127,7 +127,7 @@
         // currently creating a merchant is an administrative function--ping
         // hassan to have him create a merchant for you until we get the self-serve fucntionality live
         "0x8B3A993F4f8159A5FcFEe3155a33BD1E9Bd6ABe4", // safe for merchant 0x54b11672e90B38ca52140Ac364EebC5cC07F3d91
-        "0x6931aDbbefAfFCB0E1F3a4EbA95A5017386c9752", // Hassan's prepaid card --feel free to use your own
+        "0xae3e37cB32fcC528b7388Ee592E244aAC2EacFab", // Hassan's prepaid card --feel free to use your own
         "100",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own

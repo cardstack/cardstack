@@ -294,6 +294,21 @@ export default [
   {
     constant: true,
     inputs: [],
+    name: 'gasToken',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'getTokens',
     outputs: [
       {
@@ -509,6 +524,11 @@ export default [
         internalType: 'address[]',
         name: '_payableTokens',
         type: 'address[]',
+      },
+      {
+        internalType: 'address',
+        name: '_gasToken',
+        type: 'address',
       },
       {
         internalType: 'uint256',
