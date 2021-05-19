@@ -52,6 +52,11 @@
   --icon-color: var(--boxel-dark);
 }
 
+.layer-connect-modal__card {
+  outline-color: transparent;
+  outline-style: solid;
+}
+
 .layer-connect-modal__wrapped-card {
   box-shadow: none;
 }

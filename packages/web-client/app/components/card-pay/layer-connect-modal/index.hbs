@@ -5,7 +5,36 @@
   data-test-layer-connect-modal={{@name}}
 >
   <div class="layer-connect-modal__scroll-wrapper">
-    <Boxel::CardContainer class="layer-connect-modal__card">
+    <Boxel::CardContainer 
+      class="layer-connect-modal__card" 
+      tabindex="-1"
+      {{!-- 
+        Focus is trapped within this element, with the element as the initial focus 
+        outside clicks are allowed to trigger @onClose
+
+        This should ideally be replaced with a selector for the primary/first action
+        in the modal. However, the programmatic focus it introduces does not match
+        :focus-visible. This behaviour means the user doesn't know what is being focused.
+        Forcing the user to press Tab will create focus that does match :focus-visible
+        and hence show a ring.
+
+        Also, there is no distinguishing state for focused radio buttons - leading to the same 
+        problem of the user not knowing what is being focused, if we try to select the radio
+        button for layer one as the initial focus.
+
+        Some reading, if you are up for a slight headache:
+        - https://github.com/WICG/focus-visible/issues/88
+        - https://github.com/w3c/csswg-drafts/issues/5885
+      --}}
+      {{focus-trap
+        isActive=@isOpen
+        focusTrapOptions=(hash 
+          allowOutsideClick=true 
+          clickOutsideDeactivates=true
+          initialFocus=".layer-connect-modal__card"
+        )
+      }}
+    >
       <div class="layer-connect-modal__close-button-container">
         <button
           class="layer-connect-modal__close-button"
@@ -22,8 +51,6 @@
           @onConnect={{@onClose}}
           @onDisconnect={{@onClose}}
           @suppressHeader={{true}}
-          {{did-insert this.focus}}
-          data-test-layer-one-connect-modal-card
         />
       {{else}}
         <CardPay::LayerTwoConnectCard
@@ -32,8 +59,6 @@
           @includeExplanations={{true}}
           @onConnect={{@onClose}}
           @onDisconnect={{@onClose}}
-          {{did-insert this.focus}}
-          data-test-layer-two-connect-modal-card
         />
       {{/if}}
     </Boxel::CardContainer>
