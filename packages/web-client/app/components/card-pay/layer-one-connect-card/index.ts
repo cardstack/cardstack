@@ -29,7 +29,14 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.hasAccount') declare hasAccount: boolean;
   @tracked isWaitingForConnection = false;
-  @tracked radioWalletProviderId = '';
+  /*
+     Set a starting wallet provider for the focus trap library in the modal
+     - focus trapping requires checking what the next tabbable element is
+     - radios with their roving tabindex confuse tabbable, so they cannot be the last focusable element
+       , otherwise focus leaves the page
+     - selecting a radio makes the connect button enabled and focusable.
+   */
+  @tracked radioWalletProviderId = 'metamask';
 
   constructor(
     owner: unknown,

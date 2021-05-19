@@ -25,7 +25,6 @@ module('Acceptance | Connect Wallet', function (hooks) {
     );
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
-    assert.dom('[data-test-layer-one-connect-modal-card]').isFocused();
     await click('[data-test-wallet-option="metamask"]');
     await click(
       '[data-test-mainnnet-connection-action-container] [data-test-boxel-button]'
@@ -57,7 +56,6 @@ module('Acceptance | Connect Wallet', function (hooks) {
     await click(
       '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
     );
-    assert.dom('[data-test-layer-two-connect-modal-card]').isFocused();
 
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;

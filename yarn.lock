@@ -9129,6 +9129,16 @@ ember-fetch@^8.0.4:
     node-fetch "^2.6.1"
     whatwg-fetch "^3.4.0"
 
+ember-focus-trap@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/ember-focus-trap/-/ember-focus-trap-0.6.0.tgz#49312309926835cec7bfc2e516dfa47f7821211d"
+  integrity sha512-LuEv0BNMLspTkW4c2KsAkWLwr3s5ZLlpGS6JN8YazFmYaILWvoyp82AFqgMKLjQJrONx9TpqpCqpW308KE7s4w==
+  dependencies:
+    ember-auto-import "^1.11.2"
+    ember-cli-babel "^7.26.3"
+    ember-modifier-manager-polyfill "^1.2.0"
+    focus-trap "^6.4.0"
+
 ember-getowner-polyfill@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/ember-getowner-polyfill/-/ember-getowner-polyfill-2.2.0.tgz#38e7dccbcac69d5ec694000329ec0b2be651d2b2"
@@ -11005,6 +11015,13 @@ flush-write-stream@^1.0.0:
   dependencies:
     inherits "^2.0.3"
     readable-stream "^2.3.6"
+
+focus-trap@^6.4.0:
+  version "6.4.0"
+  resolved "https://registry.yarnpkg.com/focus-trap/-/focus-trap-6.4.0.tgz#e9951484fddf933d9b9b0e95b499f9420f6a54d6"
+  integrity sha512-RpH291GjfNhy1ek+Iwe00oCaqJN0sBaB+S/v7BpCIldf39IslPI7657nOZ6HwgoEHpjCmUJoAY+Mfgrm0rohvQ==
+  dependencies:
+    tabbable "^5.2.0"
 
 follow-redirects@^1.0.0, follow-redirects@^1.10.0:
   version "1.13.3"
@@ -17910,6 +17927,11 @@ sync-disk-cache@^2.0.0:
     mkdirp "^0.5.0"
     rimraf "^3.0.0"
     username-sync "^1.0.2"
+
+tabbable@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/tabbable/-/tabbable-5.2.0.tgz#4fba60991d8bb89d06e5d9455c92b453acf88fb2"
+  integrity sha512-0uyt8wbP0P3T4rrsfYg/5Rg3cIJ8Shl1RJ54QMqYxm1TLdWqJD1u6+RQjr2Lor3wmfT7JRHkirIwy99ydBsyPg==
 
 table@^6.0.4:
   version "6.0.7"
