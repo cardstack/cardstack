@@ -37,6 +37,7 @@ interface State {
   insidePluralFieldIterator:
     | {
         field: Field;
+        fieldUsage: string;
         blockProgramUsage: string;
       }
     | undefined;
@@ -85,11 +86,15 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             state.insidePluralFieldIterator &&
             node.tag === state.insidePluralFieldIterator.blockProgramUsage
           ) {
-            let { blockProgramUsage, field } = state.insidePluralFieldIterator;
+            let {
+              blockProgramUsage,
+              field,
+              fieldUsage,
+            } = state.insidePluralFieldIterator;
 
+            usedFields.push(fieldUsage);
             return rewriteElementNode({
               field,
-              usedFields,
               importAndChooseName,
               modelArgument: blockProgramUsage,
               forceSingular: true,
@@ -118,9 +123,10 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
           if (!field || !modelArgument) {
             return;
           }
+
+          usedFields.push(modelArgument);
           return rewriteElementNode({
             field,
-            usedFields,
             importAndChooseName,
             modelArgument,
             prefix: MODEL_PREFIX,
@@ -128,16 +134,29 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
         },
 
         PathExpression(node, path) {
+          let orig = node.original;
           if (state.insideFieldsIterator) {
-            if (node.original === state.insideFieldsIterator.nameVar) {
+            if (orig === state.insideFieldsIterator.nameVar) {
               return env.syntax.builders.string(
                 enclosingField(path, state.insideFieldsIterator).name
               );
             }
           }
 
-          if (node.original === FIELDS) {
+          if (orig === FIELDS) {
             throw new InvalidFieldsUsageError();
+          }
+
+          if (
+            state.insidePluralFieldIterator &&
+            orig ===
+              `${FIELDS_PREFIX}${state.insidePluralFieldIterator.fieldUsage}`
+          ) {
+            if (node.head.type === 'AtHead') {
+              return env.syntax.builders.path(
+                `${MODEL_PREFIX}${state.insidePluralFieldIterator.fieldUsage}`
+              );
+            }
           }
 
           return undefined;
@@ -175,8 +194,8 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
 
             state.insidePluralFieldIterator = {
               field: fieldDetails.field,
-              // blockProgramUsage: node.program.blockParams[0],
-              blockProgramUsage: fieldDetails.path,
+              fieldUsage: fieldDetails.path,
+              blockProgramUsage: node.program.blockParams[0],
             };
 
             return undefined;
@@ -265,7 +284,7 @@ function inferFieldDetailsFromNode(
     return;
   }
 
-  if (exp.head.type === 'AtHead' && exp.head.name === '@model') {
+  if (exp.head.type === 'AtHead' && exp.head.name === '@fields') {
     let path = exp.tail.join('.');
     let field = getFieldForPath(fields, path);
     if (field) {
@@ -280,14 +299,11 @@ function rewriteElementNode(options: {
   field: Field;
   modelArgument: string;
   importAndChooseName: Options['importAndChooseName'];
-  usedFields: Options['usedFields'];
   forceSingular?: boolean;
   prefix?: string;
 }): Statement[] {
   let { field, forceSingular, modelArgument, prefix } = options;
   let { inlineHBS } = field.card.embedded;
-
-  options.usedFields.push(modelArgument);
 
   if (!forceSingular && field.type === 'containsMany') {
     if (inlineHBS) {
@@ -325,7 +341,8 @@ function expandContainsManyShorthand(
   itemTemplate?: string
 ): string {
   let eachParam = `${MODEL_PREFIX}${fieldName}`;
-  let singularFieldName = singularize(fieldName);
+  let segments = fieldName.split('.');
+  let singularFieldName = singularize(segments[segments.length - 1]);
 
   if (itemTemplate) {
     // TODO: This might be too aggressive...

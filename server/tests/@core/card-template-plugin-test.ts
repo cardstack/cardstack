@@ -25,7 +25,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       schema: 'schema.js',
       files: {
         'schema.js': `
-          import { contains } from "@cardstack/types";
+          import { contains, containsMany } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
           import date from "https://cardstack.com/base/date";
           export default class NestedItems {
@@ -170,7 +170,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       'each-as loop with helper as loop argument',
       async function (assert) {
         let template = transform(
-          '{{#each (helper @model.items) as |Item|}}<Item />{{/each}}',
+          '{{#each (helper @fields.items) as |Item|}}<Item />{{/each}}',
           options
         );
 
@@ -201,7 +201,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           template,
           '{{#each @model.list.items as |item|}}{{item}}{{/each}}'
         );
-        assert.deepEqual(usedFields, ['items']);
+        assert.deepEqual(usedFields, ['list.items']);
       }
     );
   });
@@ -228,7 +228,10 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
 
     QUnit.test('each-as loops for dates', async function (assert) {
       assert.equal(
-        transform('{{#each @model.items as |Item|}}<Item />{{/each}}', options),
+        transform(
+          '{{#each @fields.items as |Item|}}<Item />{{/each}}',
+          options
+        ),
         '{{#each @model.items as |Item|}}<BestGuess @model={{Item}} />{{/each}}'
       );
       assert.deepEqual(usedFields, ['items']);
@@ -238,7 +241,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       async function (assert) {
         assert.equal(
           transform(
-            '{{#each @model.list.dates as |aDate|}}<aDate />{{/each}}',
+            '{{#each @fields.list.dates as |aDate|}}<aDate />{{/each}}',
             options
           ),
           '{{#each @model.list.dates as |aDate|}}<BestGuess @model={{aDate}} />{{/each}}'
