@@ -33,21 +33,33 @@ export interface Options {
   importAndChooseName: ImportAndChooseName;
 }
 
+type PrimitiveScopeValue =
+  | { type: 'normal' }
+  | {
+      type: 'fieldComponent';
+      field: Field;
+      pathForModel: string;
+      fieldFullPath: string;
+      expandable: boolean;
+    }
+  | {
+      type: 'stringLiteral';
+      value: string;
+    };
+
+type ScopeValue =
+  | PrimitiveScopeValue
+  | {
+      type: 'listExpansion';
+      nodes: Map<unknown, PrimitiveScopeValue>;
+    };
+
+type Scope = Map<string, ScopeValue>;
+
 interface State {
-  insidePluralFieldIterator:
-    | {
-        field: Field;
-        fieldUsage: string;
-        blockProgramUsage: string;
-      }
-    | undefined;
-  insideFieldsIterator:
-    | {
-        nodes: Map<unknown, { name: string; field: Field }>;
-        nameVar: string | undefined;
-        componentVar: string | undefined;
-      }
-    | undefined;
+  scopes: Scope[];
+  nextScope: Scope | undefined;
+  handledFieldExpressions: WeakSet<PathExpression>;
 }
 
 export default function glimmerCardTemplateTransform(
@@ -70,229 +82,268 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   ): syntax.ASTPlugin {
     let { fields, importAndChooseName, usedFields } = options;
     let state: State = {
-      insidePluralFieldIterator: undefined,
-      insideFieldsIterator: undefined,
+      scopes: [],
+      nextScope: undefined,
+      handledFieldExpressions: new WeakSet(),
     };
 
     return {
       name: 'card-glimmer-plugin',
       visitor: {
-        ElementNode(node, path): Statement[] | undefined {
+        ElementNode(node, path) {
           if (node.tag === FIELDS) {
             throw new InvalidFieldsUsageError();
           }
 
-          if (
-            state.insidePluralFieldIterator &&
-            node.tag === state.insidePluralFieldIterator.blockProgramUsage
-          ) {
-            let {
-              blockProgramUsage,
-              field,
-              fieldUsage,
-            } = state.insidePluralFieldIterator;
-
-            usedFields.push(fieldUsage);
+          let fieldFullPath = fieldPathForElementNode(node);
+          if (fieldFullPath) {
+            let field = getFieldForPath(fields, fieldFullPath);
+            if (!field) {
+              throw new Error(`unknown field ${fieldFullPath}`);
+            }
+            usedFields.push(fieldFullPath);
             return rewriteElementNode({
               field,
               importAndChooseName,
-              modelArgument: blockProgramUsage,
-              forceSingular: true,
+              modelArgument: fieldFullPath,
+              prefix: MODEL_PREFIX,
             });
           }
 
-          let field: Field | undefined;
-          let modelArgument: string | undefined;
-
-          if (state.insideFieldsIterator) {
-            if (node.tag === state.insideFieldsIterator.componentVar) {
-              let { name } = enclosingField(path, state.insideFieldsIterator);
-              field = fields[name];
-              modelArgument = field.name;
-            }
-          }
-
-          if (!field) {
-            let fieldDetails = inferFieldDetailsFromElementNode(fields, node);
-            if (fieldDetails) {
-              field = fieldDetails.field;
-              modelArgument = fieldDetails.path;
-            }
-          }
-
-          if (!field || !modelArgument) {
+          if (!/[A-Z]/.test(node.tag[0])) {
+            // not a possible invocation of a local variable
             return;
           }
 
-          usedFields.push(modelArgument);
-          return rewriteElementNode({
-            field,
-            importAndChooseName,
-            modelArgument,
-            prefix: MODEL_PREFIX,
-          });
+          let val = lookupScopeVal(node.tag, path, state);
+          switch (val.type) {
+            case 'normal':
+              return;
+            case 'stringLiteral':
+              throw new Error(`tried to use a field name as a component`);
+            case 'fieldComponent':
+              return rewriteElementNode({
+                field: val.field,
+                importAndChooseName,
+                modelArgument: val.pathForModel,
+                forceSingular: !val.expandable,
+              });
+            default:
+              throw assertNever(val);
+          }
         },
 
         PathExpression(node, path) {
-          let orig = node.original;
-          if (state.insideFieldsIterator) {
-            if (orig === state.insideFieldsIterator.nameVar) {
-              return env.syntax.builders.string(
-                enclosingField(path, state.insideFieldsIterator).name
-              );
-            }
+          if (state.handledFieldExpressions.has(node)) {
+            return env.syntax.builders.path(
+              `${MODEL_PREFIX}${node.original.slice(FIELDS_PREFIX.length)}`
+            );
           }
 
-          if (orig === FIELDS) {
-            throw new InvalidFieldsUsageError();
+          let val = lookupScopeVal(node.original, path, state);
+          switch (val.type) {
+            case 'normal':
+              return;
+            case 'stringLiteral':
+              return env.syntax.builders.string(val.value);
+            case 'fieldComponent':
+              return;
+            //throw new Error(`cannot use field component as a value`);
+            default:
+              throw assertNever(val);
+          }
+        },
+
+        Block: {
+          enter() {
+            if (!state.nextScope) {
+              throw new Error(`bug: all blocks should introduce a scope`);
+            }
+            state.scopes.unshift(state.nextScope);
+            state.nextScope = undefined;
+          },
+          exit() {
+            state.scopes.shift();
+          },
+        },
+
+        BlockStatement(node) {
+          let handled:
+            | { replacement?: unknown }
+            | undefined = handleFieldsIterator(node, fields, state);
+
+          if (handled) {
+            return handled.replacement;
           }
 
-          if (
-            state.insidePluralFieldIterator &&
-            orig ===
-              `${FIELDS_PREFIX}${state.insidePluralFieldIterator.fieldUsage}`
-          ) {
-            if (node.head.type === 'AtHead') {
-              return env.syntax.builders.path(
-                `${MODEL_PREFIX}${state.insidePluralFieldIterator.fieldUsage}`
-              );
-            }
+          handled = handlePluralFieldIterator(node, fields, state);
+          if (handled) {
+            return handled.replacement;
+          }
+
+          state.nextScope = new Map();
+          for (let name of node.program.blockParams) {
+            state.nextScope.set(name, { type: 'normal' });
           }
 
           return undefined;
-        },
-
-        BlockStatement: {
-          enter(node) {
-            if (isFieldsIterator(node)) {
-              state.insideFieldsIterator = {
-                nodes: new Map(),
-                nameVar: node.program.blockParams[0],
-                componentVar: node.program.blockParams[1],
-              };
-
-              let output: any[] = [];
-              for (let [name, field] of Object.entries(fields)) {
-                let copied = cloneDeep(node.program.body);
-                for (let node of copied) {
-                  state.insideFieldsIterator.nodes.set(node, {
-                    name,
-                    field,
-                  });
-                }
-
-                output = output.concat(copied);
-              }
-              return output;
-            }
-
-            let fieldDetails = inferFieldDetailsFromNode(fields, node);
-
-            if (!fieldDetails) {
-              return;
-            }
-
-            state.insidePluralFieldIterator = {
-              field: fieldDetails.field,
-              fieldUsage: fieldDetails.path,
-              blockProgramUsage: node.program.blockParams[0],
-            };
-
-            return undefined;
-          },
-          exit(/*node , path*/) {
-            state.insidePluralFieldIterator = undefined;
-          },
         },
       },
     };
   };
 }
 
+function lookupScopeVal(
+  identifier: string,
+  path: syntax.WalkerPath<Node>,
+  state: State
+): PrimitiveScopeValue {
+  let scopeVal = state.scopes.map((s) => s.get(identifier)).find(Boolean);
+
+  if (!scopeVal) {
+    return { type: 'normal' };
+  }
+
+  if (scopeVal.type === 'listExpansion') {
+    return enclosingScopeValue(path, scopeVal.nodes);
+  } else {
+    return scopeVal;
+  }
+}
+
+function enclosingScopeValue(
+  path: syntax.WalkerPath<Node>,
+  nodes: Map<unknown, PrimitiveScopeValue>
+) {
+  let cursor: syntax.WalkerPath<Node> | null = path;
+  while (cursor) {
+    let entry = nodes.get(cursor.node);
+    if (entry) {
+      return entry;
+    }
+    cursor = cursor.parent;
+  }
+  throw new Error(`bug: couldn't figure out which iteration we were in`);
+}
+
 function isFieldsIterator(node: BlockStatement): boolean {
-  let [firstArg] = node.params;
-
-  let isIteratingOnFields =
-    firstArg.type === 'PathExpression' && firstArg.original === '@fields';
-
-  if (!isIteratingOnFields) {
-    return false;
-  }
-
-  if (node.path.type === 'PathExpression' && node.path.original === 'each-in') {
-    return true;
-  }
-
-  throw new InvalidFieldsUsageError();
+  return (
+    node.path.type === 'PathExpression' &&
+    node.path.original === 'each-in' &&
+    node.params[0]?.type === 'PathExpression' &&
+    node.params[0].original === '@fields'
+  );
 }
 
-function inferFieldDetailsFromElementNode(
+function handleFieldsIterator(
+  node: BlockStatement,
   fields: CompiledCard['fields'],
-  node: ElementNode | undefined
-): { field: Field; path: string } | undefined {
-  if (!node) {
+  state: State
+): { replacement: syntax.ASTv1.Statement[] } | undefined {
+  if (!isFieldsIterator(node)) {
     return;
   }
 
-  if (node.tag.startsWith(FIELDS_PREFIX)) {
-    let path = node.tag.slice(FIELDS_PREFIX.length);
-    let field = getFieldForPath(fields, path);
-    if (field) {
-      return { field, path };
+  let replacement: syntax.ASTv1.Statement[] = [];
+  let nameVar: ScopeValue = {
+    type: 'listExpansion',
+    nodes: new Map(),
+  };
+  let componentVar: ScopeValue = {
+    type: 'listExpansion',
+    nodes: new Map(),
+  };
+  for (let [name, field] of Object.entries(fields)) {
+    let copied = cloneDeep(node.program.body);
+    for (let node of copied) {
+      nameVar.nodes.set(node, {
+        type: 'stringLiteral',
+        value: name,
+      });
+      componentVar.nodes.set(node, {
+        type: 'fieldComponent',
+        field: field,
+        pathForModel: `@model.${name}`,
+        fieldFullPath: name,
+        expandable: true,
+      });
     }
+
+    replacement = replacement.concat(copied);
   }
 
-  return;
+  let nextScope = new Map();
+
+  if (node.program.blockParams[0]) {
+    nextScope.set(node.program.blockParams[0], nameVar);
+  }
+
+  if (node.program.blockParams[1]) {
+    nextScope.set(node.program.blockParams[1], componentVar);
+  }
+
+  state.nextScope = nextScope;
+
+  return { replacement };
 }
 
-function inferFieldDetailsFromNode(
+function handlePluralFieldIterator(
+  node: BlockStatement,
   fields: CompiledCard['fields'],
-  node: PathExpression | ElementNode | BlockStatement | undefined
-): { field: Field; path: string } | undefined {
-  if (!node) {
+  state: State
+) {
+  if (
+    node.path.type !== 'PathExpression' ||
+    node.path.original !== 'each' ||
+    node.params[0]?.type !== 'PathExpression'
+  ) {
     return;
   }
 
-  if (node.type === 'ElementNode' && node.tag.startsWith(FIELDS_PREFIX)) {
-    let path = node.tag.slice(FIELDS_PREFIX.length);
-    let field = getFieldForPath(fields, path);
-    if (field) {
-      return { field, path };
-    }
-  }
-
-  let exp: PathExpression | undefined;
-
-  if (node.type === 'PathExpression') {
-    exp = node;
-  } else if (node.type === 'BlockStatement') {
-    let [param] = node.params;
-    // ie: {{#each @model.items as...
-    if (param.type === 'PathExpression') {
-      exp = param;
-    }
-    // ie: {{#each (helper @model.items) as...
-    if (
-      param.type === 'SubExpression' &&
-      param.params[0].type === 'PathExpression'
-    ) {
-      exp = param.params[0];
-    }
-  }
-
-  if (!exp) {
+  let fieldFullPath = fieldPathForPathExpression(node.params[0]);
+  if (!fieldFullPath) {
     return;
   }
 
+  let field = getFieldForPath(fields, fieldFullPath);
+  if (!field) {
+    throw new Error(`unknown field ${fieldFullPath}`);
+  }
+
+  state.handledFieldExpressions.add(node.params[0]);
+  state.nextScope = new Map();
+
+  if (node.program.blockParams[0]) {
+    state.nextScope.set(node.program.blockParams[0], {
+      type: 'fieldComponent',
+      field,
+      pathForModel: node.program.blockParams[0],
+      fieldFullPath,
+      expandable: false,
+    });
+  }
+
+  if (node.program.blockParams[1]) {
+    state.nextScope.set(node.program.blockParams[1], {
+      type: 'normal',
+    });
+  }
+
+  return {};
+}
+
+function fieldPathForPathExpression(exp: PathExpression): string | undefined {
   if (exp.head.type === 'AtHead' && exp.head.name === '@fields') {
-    let path = exp.tail.join('.');
-    let field = getFieldForPath(fields, path);
-    if (field) {
-      return { field, path };
-    }
+    return exp.tail.join('.');
   }
+  return undefined;
+}
 
-  return;
+function fieldPathForElementNode(node: ElementNode): string | undefined {
+  if (node.tag.startsWith(FIELDS_PREFIX)) {
+    return node.tag.slice(FIELDS_PREFIX.length);
+  }
+  return undefined;
 }
 
 function rewriteElementNode(options: {
@@ -378,17 +429,6 @@ function process(template: string) {
   return syntax.preprocess(template).body;
 }
 
-function enclosingField(
-  path: syntax.WalkerPath<Node>,
-  inside: NonNullable<State['insideFieldsIterator']>
-) {
-  let cursor: syntax.WalkerPath<Node> | null = path;
-  while (cursor) {
-    let entry = inside.nodes.get(cursor.node);
-    if (entry) {
-      return entry;
-    }
-    cursor = cursor.parent;
-  }
-  throw new Error(`bug: couldn't figure out which iteration we were in`);
+function assertNever(value: never) {
+  throw new Error(`should never happen ${value}`);
 }

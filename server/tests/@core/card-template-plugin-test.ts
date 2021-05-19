@@ -378,5 +378,35 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         );
       }
     );
+
+    QUnit.test('Avoids rewriting shadowed vars', async function () {
+      equalIgnoringWhiteSpace(
+        transform(
+          `{{#each @fields.birthdays as |Birthday|}}
+              <Birthday />
+              {{#let (whatever) as |Birthday|}}
+                <Birthday />
+              {{/let}}
+           {{/each}}`,
+          {
+            usedFields,
+            importAndChooseName,
+            fields: {
+              birthdays: {
+                name: 'birthdays',
+                card: compiledDateCard,
+                type: 'containsMany',
+              },
+            },
+          }
+        ),
+        `{{#each @model.birthdays as |Birthday|}}
+          <BestGuess @model={{Birthday}} />
+          {{#let (whatever) as |Birthday|}}
+            <Birthday />
+          {{/let}}
+        {{/each}}`
+      );
+    });
   });
 });
