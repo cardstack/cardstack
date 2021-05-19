@@ -37,18 +37,6 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
     assert.dom(HEADER_SELECTOR).containsText('Metamask');
   });
 
-  test('The connect button should be disabled before a provider is selected and enabled after', async function (assert) {
-    await render(hbs`
-        <CardPay::LayerOneConnectCard/>
-      `);
-
-    assert.dom(CONNECT_BUTTON_SELECTOR).isDisabled();
-
-    await click('[data-test-wallet-option="metamask"]');
-
-    assert.dom(CONNECT_BUTTON_SELECTOR).isEnabled();
-  });
-
   test('It should be able to move between default (unconnected), loading, and connected states', async function (assert) {
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
