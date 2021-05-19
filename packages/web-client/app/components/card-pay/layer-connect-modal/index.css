@@ -33,28 +33,28 @@
   }
 }
 
-.layer-connect-modal__close-button-container {
-  display: flex; 
-  justify-content: flex-end; 
-  padding-top: var(--boxel-sp-sm);
-  padding-right: var(--boxel-sp-sm);
+.layer-connect-modal__card {
+  position: relative;
+  padding-top: calc(var(--boxel-sp-sm) + 0.75rem);
+  outline-color: transparent;
+  outline-style: solid;
 }
 
 .layer-connect-modal__close-button  {
-  padding: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+  padding: var(--boxel-sp-sm);
+  height: calc(var(--boxel-sp-sm) * 2 + 0.75rem);
+  width: calc(var(--boxel-sp-sm) * 2 + 0.75rem);
+  line-height: 0;
+
   background: transparent;
   border: none;
-  height: 0.75rem;
-  width: 0.75rem;
-  line-height: 0;
   cursor: pointer;
 
   --icon-color: var(--boxel-dark);
-}
-
-.layer-connect-modal__card {
-  outline-color: transparent;
-  outline-style: solid;
 }
 
 .layer-connect-modal__wrapped-card {
