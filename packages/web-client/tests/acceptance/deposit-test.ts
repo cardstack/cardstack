@@ -198,6 +198,10 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(`${post} [data-test-unlock-button]`)
       .hasClass('boxel-button--loading');
+    assert
+      .dom('[data-test-deposit-amount-input]')
+      .doesNotExist('Input field is no longer available when unlocking');
+    assert.dom('[data-test-deposit-amount-entered]').hasText('250 DAI');
 
     layer1Service.test__simulateUnlock();
     await settled();
@@ -208,7 +212,9 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(`${post} [data-test-unlock-success-message]`)
       .exists('There should be a success message after unlocking');
-
+    assert
+      .dom('[data-test-deposit-amount-input]')
+      .doesNotExist('Input field is no longer available after unlocking');
     assert
       .dom(`${post} [data-test-deposit-button]`)
       .isEnabled('Deposit is enabled once unlocked');
