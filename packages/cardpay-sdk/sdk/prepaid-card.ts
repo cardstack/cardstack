@@ -91,7 +91,7 @@ export default class PrepaidCard {
       payload.dataGas,
       payload.gasPrice,
       payload.gasToken,
-      ZERO_ADDRESS,
+      payload.refundReceiver,
       toBN(payload.lastUsedNonce + 1),
       from,
       prepaidCardAddress
