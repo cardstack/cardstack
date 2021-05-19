@@ -23,7 +23,7 @@ export default class CustomRadioUsage extends Component {
   @tracked checkedId = 'strawberry';
   @tracked disabled = false;
 
-  @action onChange(event: Event): void {
-    this.checkedId = (event.target as HTMLInputElement).id;
+  @action onChange(id: string): void {
+    this.checkedId = id;
   }
 }

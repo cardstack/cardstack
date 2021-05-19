@@ -1,13 +1,12 @@
 <Freestyle::Usage @name="CustomRadio" @description="A custom radio button component with some accessibility considerations built in">
     <:example>
       <Boxel::CustomRadio @groupDescription={{this.groupDescription}} @items={{this.items}} @checkedId={{this.checkedId}} @disabled={{this.disabled}} as |item|>
-          <item.component 
-            @id={{item.data.id}} 
+          <item.component  
             @name="example-radio-usage" 
             @checked={{item.checked}}
             @focusedClass="custom-radio-usage-red"
             @checkedClass="custom-radio-usage-big"
-            @onChange={{this.onChange}}
+            @onChange={{fn this.onChange item.data.id}}
           >
               {{item.data.id}}
           </item.component>
@@ -52,13 +51,13 @@
     <:example>
     <Boxel::CustomRadio::Container @groupDescription="Example Radio Usage">
       <Boxel::CustomRadio::Item
-        @id="radio-1"
+        id="radio-1"
         @name="radio-usage"
       >
         Item 1
       </Boxel::CustomRadio::Item>
       <Boxel::CustomRadio::Item
-        @id="radio-2"
+        id="radio-2"
         @name="radio-usage"
       >
         Item 2
@@ -76,27 +75,3 @@
       />
     </:api>
 </Freestyle::Usage>
-
-{{!-- 
-<Freestyle::Usage @name="CustomRadio::Item" @description>
-  <:example>
-    <Boxel::CustomRadio::Item
-      @id={{this.radioId}}
-      @name={{this.radioName}}
-      @value={{this.radioValue}}
-      @checked={{this.radioChecked}}
-      @onChange={{this.onChange}}
-    >
-      I've got custom checked styles
-    </Boxel::CustomRadio::Item>
-    <Boxel::CustomRadio::Item
-      @id={{this.radioId}}
-      @name={{this.radioName}}
-      @value={{this.radioValue}}
-      @checked={{this.radioChecked}}
-      @onChange={{this.onChange}}
-    >
-      I've got custom focus styles
-    </Boxel::CustomRadio::Item>
-  </:example>
-</Freestyle::Usage> --}}
