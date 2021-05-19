@@ -21,6 +21,7 @@ Below is a list of the most common environment variables that the Hub accepts:
 - `PGPORT`
 - `PGUSER`
 - `PGPASSWORD`
+- `SERVER_SECRET`
 
 See the `cardhost` deploy scripts for a listing of cloud-provider-specific variables.
 Also search the mono-repo for `process.env` to see these variables in use.
