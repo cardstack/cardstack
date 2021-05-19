@@ -33,13 +33,26 @@
   }
 }
 
-.layer-connect-modal__card:focus {
-  outline-color: transparent;
-  outline-offset: -5px;
-  box-shadow: 0 0 0 2px var(--boxel-blue);
+.layer-connect-modal__close-button-container {
+  display: flex; 
+  justify-content: flex-end; 
+  padding-top: var(--boxel-sp-sm);
+  padding-right: var(--boxel-sp-sm);
 }
 
-.layer-connect-modal__card:focus:not(:focus-visible) {
+.layer-connect-modal__close-button  {
+  padding: 0;
+  background: transparent;
+  border: none;
+  height: 0.75rem;
+  width: 0.75rem;
+  line-height: 0;
+  cursor: pointer;
+
+  --icon-color: var(--boxel-dark);
+}
+
+.layer-connect-modal__wrapped-card {
   box-shadow: none;
 }
 
