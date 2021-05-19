@@ -1,70 +1,138 @@
-.card-pay-token-balance-view {
-  display: flex;
-  align-items: start;
-  padding: var(--boxel-sp);
-  box-shadow: 0 0 0 2px var(--boxel-light-400);
+/* details - summary container styles */
+.balance-view {
+  --details-summary-height: 3.125rem; /* 50px */
+  --details-open-height: 11rem; /* ~180px */
+
+  position: relative;
+  border: 1px solid var(--boxel-light-400);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
   border-radius: var(--boxel-border-radius);
+  height: var(--details-summary-height);
+  overflow: hidden;
+  transition: height var(--boxel-transition);
 }
 
-.card-pay-token-balance-view__currency-details, .card-pay-token-balance-view__balance {
-  flex-shrink: 0;
+.balance-view[open] {
+  height: var(--details-open-height);
+  overflow: auto;
+}
+
+.balance-view__summary {
+  cursor: pointer;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 0 var(--boxel-sp);
+  height: var(--details-summary-height);
+  padding: var(--boxel-sp-xxs) calc(var(--boxel-sp) + 3rem) var(--boxel-sp-xxs) var(--boxel-sp);
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xs);
+  transition: padding var(--boxel-transition),
+    font var(--boxel-transition);
 }
 
-.card-pay-token-balance-view__currency-icon {
+.balance-view__summary:focus {
+  outline-color: var(--boxel-highlight);
+  outline-offset: -5px;
+}
+
+.balance-view__summary--memorialized {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.balance-view__summary-balance {
+  letter-spacing: var(--boxel-lsp);
+}
+
+.balance-view__summary--memorialized .balance-view__summary-balance {
+  color: var(--boxel-purple-500);
+  font: var(--boxel-font-sm);
+}
+
+.balance-view[open] .balance-view__summary {
+  height: auto;
+  padding: var(--boxel-sp-xl) var(--boxel-sp-lg) 0;
+  font: 600 var(--boxel-font);
+}
+
+.balance-view__details {
+  padding: 0 var(--boxel-sp-lg) var(--boxel-sp-xl);
+}
+
+.balance-view[open] .balance-view__summary-balance {
+  display: none;
+}
+
+.balance-view__marker::before {
+  display: block;
+  content: "Show";
+}
+
+.balance-view[open] .balance-view__marker::before {
+  content: "Hide";
+}
+
+.balance-view__marker {
+  position: absolute;
+  right: var(--boxel-sp-sm);
+  top: var(--boxel-sp-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.balance-view__marker-icon {
+  margin-left: var(--boxel-sp-xs);
+  transform: rotate(90deg);
+}
+
+.balance-view[open] .balance-view__marker-icon {
+  transform: rotate(-90deg);
+}
+
+/* balance display styles */
+.balance-view__address {
+  color: var(--boxel-purple-500);
+  font-family: var(--boxel-monospace-font-family);
+  font-size: var(--boxel-font-size);
+  line-height: calc(22 / 16);
+  letter-spacing: 0;
+  word-break: break-all;
+}
+
+.balance-view__token {
+  display: flex;
+  align-items: center;
+  color: var(--boxel-dark);
+}
+
+.balance-view__token-icon {
+  align-self: flex-start;
   flex-shrink: 0;
   width: 2.5rem;
   height: 2.5rem;
   object-fit: contain;
   margin-right: var(--boxel-sp-sm);
-  margin-bottom: auto;
 }
 
-.card-pay-token-balance-view__currency-details-name {
-  font: 600 var(--boxel-font);
-  color: var(--boxel-dark);
+.balance-view__token-balance {
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: calc(27 / 20);
+  letter-spacing: var(--boxel-lsp-xs);
 }
 
-.card-pay-token-balance-view__currency-details-description {
-  font: var(--boxel-font-sm);
-  color: var(--boxel-purple-500);
-  margin-bottom: var(--boxel-sp-xxxs);
-}
-
-.card-pay-token-balance-view__currency-details-address {
-  font-family: "Roboto Mono";
-  font-size: var(--boxel-font-size-sm);
-  line-height: 1.125rem;
-  letter-spacing: var(--boxel-lsp-sm);
-  color: var(--boxel-purple-500);
-  max-width: 22ch;
-  word-break: break-all;
-}
-
-.card-pay-token-balance-view__balance {
-  margin-left: auto;
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
-.card-pay-token-balance-view__balance-header {
-  font: var(--boxel-font-sm);
-  color: var(--boxel-purple-500);
-  margin-bottom: var(--boxel-sp-xxxs);
-}
-
-.card-pay-token-balance-view__balance-amount {
-  font: var(--boxel-font);
-  color: var(--boxel-dark);
-}
-
-.card-pay-token-balance-view__balance-equivalent {
-  font: var(--boxel-font-sm);
+.balance-view__usd-balance {
   color: var(--boxel-purple-400);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xs);
 }
 
-.card-pay-token-balance-view__loading-indicator {
-  width: var(--boxel-sp-sm);
-  height: var(--boxel-sp-sm);
+.balance-view__loading-indicator {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
 }

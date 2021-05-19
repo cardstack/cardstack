@@ -1,53 +1,50 @@
-.card-pay-transaction-amount__body {
-  padding: 0 var(--boxel-sp-lg);
+.transaction-amount__body {
+  --tx-amount-from-label-height: 3.125rem; /* 50px */
+  --tx-amount-input-height: 3.75rem; /* 60px */
+
   display: flex;
   flex-direction: column;
+  margin: 0 auto;
+  padding: var(--boxel-sp-xxl) var(--boxel-sp-lg);
 }
 
-.card-pay-transaction-amount__body-header {
-  padding: var(--boxel-sp-xl) 0;
-  font-size: 1.125rem;
-  font-weight: 600;
+.transaction-amount__body-header {
+  font: 700 1.125rem/calc(24/18) var(--boxel-font-family);
+  letter-spacing: 0;
 }
 
-.card-pay-transaction-amount__input-section {
-  padding-top: var(--boxel-sp-xl);
-  padding-bottom: var(--boxel-sp-xl);
+.transaction-amount__body-header + .transaction-amount__input-section {
+  margin-top: var(--boxel-sp-xxl);
 }
 
-.card-pay-transaction-amount__input-section > * + * {
+.transaction-amount__input-section > * + * {
   margin-top: var(--boxel-sp-lg);
 }
 
-.card-pay-transaction-amount__field {
-  --boxel-field-label-width: minmax(4rem, 25%);
-}
-
-.card-pay-transaction-amount__field-contents {
-  display: flex;
-  align-items: center;
-}
-
-.card-pay-transaction-amount__small-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-right: 0.5rem;
-}
-
-.card-pay-transaction-amount__amount-field-input-container {
-  --input-currency-icon-size: 1.25rem;
+.transaction-amount__input-container {
+  --input-currency-icon-size: 2.5rem;
   --input-currency-text-width: 5ch;
   --input-currency-icon-space: var(--boxel-sp-xs);
   --input-currency-text-space: var(--boxel-sp-sm);
   position: relative;
 }
 
-.card-pay-transaction-amount__amount-field-input {
-  padding-left: calc(var(--input-currency-icon-size) + var(--input-currency-icon-space) * 2);
-  padding-right: calc(var(--input-currency-text-width) + var(--input-currency-text-space) * 2);
+.transaction-amount__input-token-balance {
+  font-family: var(--boxel-font-family);
+  font-size: 1.25rem;
+  line-height: calc(27 / 20);
+  letter-spacing: var(--boxel-lsp-xs);
 }
 
-.card-pay-transaction-amount__amount-field-currency-icon {
+.transaction-amount__input {
+  height: var(--tx-amount-input-height);
+  padding-left: calc(var(--input-currency-icon-size) + var(--input-currency-icon-space) * 2);
+  padding-right: calc(var(--input-currency-text-width) + var(--input-currency-text-space) * 2);
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.transaction-amount__currency-icon {
   position: absolute;
   width: var(--input-currency-icon-size);
   height: var(--input-currency-icon-size);
@@ -57,7 +54,7 @@
   user-select: none;
 }
 
-.card-pay-transaction-amount__amount-field-currency-text {
+.transaction-amount__currency-text {
   position: absolute;
   width: var(--input-currency-text-width);
   right: var(--input-currency-text-space);
@@ -67,6 +64,60 @@
   user-select: none;
 }
 
-.card-pay-transaction-amount__deposited-memorialized-cta {
-  border-top: 1px solid var(--boxel-light-600);
+.transaction-amount__from-field-label {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  height: var(--tx-amount-from-label-height);
+}
+
+/* unlocking, unlocked, memorialized states */
+.transaction-amount--data-entered .transaction-amount__input-section > * + * {
+  margin-top: var(--boxel-sp);
+}
+
+.transaction-amount--data-entered .transaction-amount__field {
+  grid-template-columns: 1fr;
+  row-gap: var(--boxel-sp-xxs);
+}
+
+.transaction-amount--data-entered .transaction-amount__from-field-label {
+  height: unset;
+}
+
+/* token balance display styles */
+.transaction-amount__token {
+  display: flex;
+  align-items: center;
+  color: var(--boxel-dark);
+
+  /* bordered display box */
+  justify-content: center;
+  padding: var(--boxel-sp-xl) var(--boxel-sp);
+  border: 1px solid var(--boxel-light-400);
+  border-radius: var(--boxel-border-radius);
+}
+
+.transaction-amount__token-icon {
+  align-self: flex-start;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  object-fit: contain;
+  margin-right: var(--boxel-sp-sm);
+}
+
+.transaction-amount__token-balance {
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: calc(27 / 20);
+  letter-spacing: var(--boxel-lsp-xs);
+  margin-top: var(--boxel-sp-xxs);
+}
+
+.transaction-amount__usd-balance {
+  color: var(--boxel-purple-500);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xs);
+  margin-top: var(--boxel-sp-xs);
 }

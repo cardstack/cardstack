@@ -102,6 +102,12 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
     );
   }
 
+  get isUnlockingOrUnlocked() {
+    // user has entered the tx amount in the input field and started the unlocking process
+    // once the unlocking process is started, the input can no longer be changed
+    return this.isUnlocking || this.isUnlocked;
+  }
+
   @action onInputAmount(event: InputEvent) {
     const str = (event.target as HTMLInputElement).value;
     if (!isNaN(+str)) {
