@@ -5,6 +5,7 @@ import transform, {
 } from '@cardstack/core/src/glimmer/card-template-plugin';
 import { equalIgnoringWhiteSpace } from '@cardstack/core/tests/helpers/assertions';
 import { TestBuilder } from '../helpers/test-builder';
+import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 function importAndChooseName() {
   return 'BestGuess';
@@ -253,6 +254,67 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         assert.deepEqual(usedFields, ['list.dates']);
       }
     );
+  });
+
+  QUnit.only('Tracking deeply nested field usage', async function (assert) {
+    builder.addRawCard({
+      url: 'http://mirage/cards/post',
+      schema: 'schema.js',
+      isolated: 'isolated.js',
+      files: {
+        'schema.js': `
+        import { contains } from "@cardstack/types";
+        import string from "https://cardstack.com/base/string";
+        import date from "https://cardstack.com/base/date";
+
+        export default class Hello {
+          @contains(string)
+          title;
+
+          @contains(date)
+          createdAt;
+        }
+      `,
+        'isolated.js': templateOnlyComponentTemplate(
+          `<h1><@fields.title /></h1><h2><@fields.createdAt /></h2>`
+        ),
+      },
+    });
+    let template = `{{#each @fields.posts as |Post|}}<Post />{{/each}}`;
+    builder.addRawCard({
+      url: 'http://mirage/cards/post-list',
+      schema: 'schema.js',
+      isolated: 'isolated.js',
+      data: {
+        posts: [
+          {
+            title: 'A blog post title',
+            createdAt: '2021-05-17T15:31:21+0000',
+          },
+        ],
+      },
+      files: {
+        'schema.js': `
+        import { containsMany } from "@cardstack/types";
+        import post from "http://mirage/cards/post";
+
+        export default class Hello {
+          @containsMany(post)
+          posts;
+        }
+      `,
+        'isolated.js': templateOnlyComponentTemplate(template),
+      },
+    });
+
+    let card = await builder.getCompiledCard('http://mirage/cards/post-list');
+    transform(template, {
+      fields: card.fields,
+      usedFields,
+      importAndChooseName,
+    });
+    // TODO: What should be the syntax for containsMany fields?
+    assert.deepEqual(usedFields, ['posts.title', 'posts.createdAt']);
   });
 
   QUnit.module('@fields API', function (hooks) {
