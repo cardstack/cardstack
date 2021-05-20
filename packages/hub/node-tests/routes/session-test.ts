@@ -2,6 +2,7 @@ import { Server } from 'http';
 import supertest, { Test } from 'supertest';
 import { bootEnvironmentForTesting } from '../../main';
 import { Registry } from '../../dependency-injection';
+import packageJson from '../../package.json';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -42,7 +43,7 @@ describe('GET /api/session', function () {
       .get('/api/session')
       .set('Accept', 'application/vnd.api+json')
       .expect(401)
-      .expect({ data: { attributes: { nonce: stubNonce, version: '0.0.1' } } })
+      .expect({ data: { attributes: { nonce: stubNonce, version: packageJson.version } } })
       .expect('Content-Type', 'application/vnd.api+json', done);
   });
 
@@ -71,7 +72,7 @@ describe('GET /api/session', function () {
       .set('Accept', 'application/vnd.api+json')
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .expect(401)
-      .expect({ data: { attributes: { nonce: stubNonce, version: '0.0.1' } } })
+      .expect({ data: { attributes: { nonce: stubNonce, version: packageJson.version } } })
       .expect('Content-Type', 'application/vnd.api+json', done);
   });
 });

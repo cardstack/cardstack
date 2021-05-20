@@ -3,6 +3,7 @@ import { inject } from '../dependency-injection';
 import { AuthenticationUtils } from '../utils/authentication';
 import { recoverTypedSignature } from 'eth-sig-util';
 import Logger from '@cardstack/logger';
+import packageJson from '../package.json';
 
 let log = Logger('route:session');
 
@@ -25,7 +26,7 @@ export default class SessionRoute {
         data: {
           attributes: {
             nonce: this.authenticationUtils.generateNonce(),
-            version: '0.0.1',
+            version: packageJson.version,
           },
         },
       };
