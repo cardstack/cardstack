@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import { inject } from '../dependency-injection';
-import { AuthenticationUtils } from '../utils/session';
+import { AuthenticationUtils } from '../utils/authentication';
 import { recoverTypedSignature } from 'eth-sig-util';
 
 export default class SessionRoute {
