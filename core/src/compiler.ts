@@ -88,6 +88,14 @@ export class Compiler {
         card.schemaModule = parentCard.schemaModule;
       }
       if (parentCard.deserializer) {
+        if (
+          card.deserializer &&
+          parentCard.deserializer !== card.deserializer
+        ) {
+          throw new Error(
+            `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${card.url}:${card.deserializer} Parent: ${parentCard.url}:${parentCard.deserializer}`
+          );
+        }
         card.deserializer = parentCard.deserializer;
       }
     }
