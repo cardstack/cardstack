@@ -44,7 +44,7 @@ export default class HubAuth {
           { name: 'chainId', type: 'uint256' },
         ],
         //eslint-disable-next-line @typescript-eslint/naming-convention
-        Authentication: [
+        HubAuthentication: [
           { name: 'user', type: 'address' },
           { name: 'nonce', type: 'string' },
         ],
@@ -54,10 +54,10 @@ export default class HubAuth {
         version,
         chainId,
       },
-      primaryType: 'Authentication',
+      primaryType: 'HubAuthentication',
       message: {
         user: ownerAddress,
-        nonce: nonce,
+        nonce,
       },
     };
     let signature = await signTypedData(this.layer2Web3, ownerAddress, typedData);

@@ -2,20 +2,34 @@ import Koa from 'koa';
 import { inject } from '../dependency-injection';
 import { AuthenticationUtils } from '../utils/authentication';
 import { recoverTypedSignature } from 'eth-sig-util';
+import Logger from '@cardstack/logger';
+
+let log = Logger('route:session');
 
 export default class SessionRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
 
   get(ctx: Koa.Context) {
-    ctx.status = 401;
-    ctx.body = {
-      data: {
-        attributes: {
-          nonce: this.authenticationUtils.generateNonce(),
-          version: '0.0.1',
+    if (ctx.state.userAddress) {
+      ctx.status = 200;
+      ctx.body = {
+        data: {
+          attributes: {
+            user: ctx.state.userAddress,
+          },
         },
-      },
-    };
+      };
+    } else {
+      ctx.status = 401;
+      ctx.body = {
+        data: {
+          attributes: {
+            nonce: this.authenticationUtils.generateNonce(),
+            version: '0.0.1',
+          },
+        },
+      };
+    }
     ctx.type = 'application/vnd.api+json';
   }
 
@@ -44,7 +58,7 @@ export default class SessionRoute {
         return;
       }
     } catch (e) {
-      console.debug('Failure recovering address to verify ownership. Session will not be established.', e);
+      log.debug('Failure recovering address to verify ownership. Session will not be established.', e);
     }
     ctx.status = 401;
     ctx.body = {

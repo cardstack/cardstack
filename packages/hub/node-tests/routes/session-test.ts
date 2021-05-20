@@ -3,8 +3,11 @@ import supertest, { Test } from 'supertest';
 import { bootEnvironmentForTesting } from '../../main';
 import { Registry } from '../../dependency-injection';
 
-let stubNonce = 'abc:123';
+const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
+let handleValidateAuthToken = function (encryptedAuthToken: string) {
+  return '';
+};
 
 class StubAuthenticationUtils {
   generateNonce() {
@@ -12,6 +15,9 @@ class StubAuthenticationUtils {
   }
   buildAuthToken() {
     return stubAuthToken;
+  }
+  validateAuthToken(encryptedAuthToken: string) {
+    return handleValidateAuthToken(encryptedAuthToken);
   }
 }
 describe('GET /api/session', function () {
@@ -31,10 +37,39 @@ describe('GET /api/session', function () {
     server.close();
   });
 
-  it('responds with json', function (done) {
+  it('without bearer token, responds with 401 and nonce in JSON', function (done) {
     request
       .get('/api/session')
       .set('Accept', 'application/vnd.api+json')
+      .expect(401)
+      .expect({ data: { attributes: { nonce: stubNonce, version: '0.0.1' } } })
+      .expect('Content-Type', 'application/vnd.api+json', done);
+  });
+
+  it('with bearer token, responds with 200 and current owner address', function (done) {
+    let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
+    handleValidateAuthToken = function (encryptedString: string) {
+      expect(encryptedString).to.equal('abc123--def456--ghi789');
+      return stubUserAddress;
+    };
+    request
+      .get('/api/session')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .expect(200)
+      .expect({ data: { attributes: { user: stubUserAddress } } })
+      .expect('Content-Type', 'application/vnd.api+json', done);
+  });
+
+  it('with invalid (or expired) bearer token', function (done) {
+    handleValidateAuthToken = function (encryptedString: string) {
+      expect(encryptedString).to.equal('abc123--def456--ghi789');
+      throw new Error('Invalid auth token');
+    };
+    request
+      .get('/api/session')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .expect(401)
       .expect({ data: { attributes: { nonce: stubNonce, version: '0.0.1' } } })
       .expect('Content-Type', 'application/vnd.api+json', done);

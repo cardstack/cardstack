@@ -1,4 +1,7 @@
+import { inject } from '@cardstack/hub/dependency-injection';
 import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'crypto';
+import { Clock } from './clock';
+import queryString from 'query-string';
 
 const SECRET = process.env.SERVER_SECRET as string;
 const encryptionAlgorithm = 'aes-256-gcm';
@@ -34,8 +37,10 @@ if (!SECRET) {
 }
 
 export class AuthenticationUtils {
+  clock: Clock = inject('clock');
+
   generateNonce(): string {
-    let timestampInNanoseconds = process.hrtime.bigint().toString();
+    let timestampInNanoseconds = this.clock.hrNow().toString();
     let hmac = createHmac('sha256', SECRET);
     let nonceSignature = hmac.update(`${timestampInNanoseconds}:${SECRET}`).digest('hex');
     let nonce = `${Buffer.from(timestampInNanoseconds).toString('base64')}:${nonceSignature}`;
@@ -55,13 +60,23 @@ export class AuthenticationUtils {
   }
 
   buildAuthToken(userAddress: string) {
-    let timestamp = new Date(Date.now() + ONE_DAY_IN_MS).toISOString();
+    let timestamp = new Date(this.clock.now() + ONE_DAY_IN_MS).toISOString();
     let token = `current_user_id=${userAddress}&expires_at=${timestamp}`;
     return encrypt(token);
   }
 
   decryptAuthToken(encryptedAuthToken: string) {
     return decrypt(encryptedAuthToken);
+  }
+
+  validateAuthToken(encryptedAuthToken: string): string {
+    let clearAuthToken = decrypt(encryptedAuthToken);
+    let authTokenProps = queryString.parse(clearAuthToken);
+    let expiresAt = Date.parse(authTokenProps['expires_at'] as string);
+    if (expiresAt < this.clock.now()) {
+      throw new Error('Auth token expired');
+    }
+    return authTokenProps['current_user_id'] as string;
   }
 }
 

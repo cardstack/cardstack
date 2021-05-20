@@ -11,6 +11,7 @@ import DevelopmentProxyMiddleware from './development-proxy-middleware';
 import SessionRoute from './routes/session';
 import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './jsonapi-middleware';
+import { Clock } from './utils/clock';
 
 const log = logger('cardstack/hub');
 
@@ -19,6 +20,7 @@ export const builtInCardsDir = join(__dirname, '..', '..', 'cards');
 
 export function wireItUp(registryCallback?: RegistryCallback): Container {
   let registry = new Registry();
+  registry.register('clock', Clock);
   registry.register('development-config', DevelopmentConfig);
   registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
