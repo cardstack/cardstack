@@ -31,6 +31,12 @@ export const DESERIALIZERS = Object.keys(deserializerTypes) as Deserializer[];
 
 export type CardData = Record<string, any>;
 
+/* Card type IDEAS 
+  primitive
+  composite
+  data
+*/
+
 export type RawCard = {
   url: string;
 
@@ -46,7 +52,7 @@ export type RawCard = {
   adoptsFrom?: string;
 
   // flat list of files inside our card
-  files: Record<string, string>;
+  files?: Record<string, string>;
 
   // if this card contains data (as opposed to just schema & code), it goes here
   data?: Record<string, any> | undefined;

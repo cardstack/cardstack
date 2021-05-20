@@ -39,20 +39,16 @@ class FakeCardServer {
   }
 
   async respondWithCard(url: string, format: Format): Promise<cardJSONReponse> {
-    let {
-      model,
-      moduleName,
-      deserialize,
-    } = await FakeCardServer.current().builder.getBuiltCard(url, format);
+    let card = await FakeCardServer.current().builder.getCompiledCard(url);
 
     return {
       data: {
         id: url,
         type: 'card',
-        attributes: model,
+        attributes: card.data,
         meta: {
-          componentModule: moduleName,
-          deserializationMap: deserialize,
+          componentModule: card[format].moduleName,
+          deserializationMap: card[format].deserialize,
         },
       },
     };
