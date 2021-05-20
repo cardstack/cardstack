@@ -12,6 +12,7 @@ import { capitalize, cloneDeep } from 'lodash';
 import { inlineTemplateForField } from './inline-field-plugin';
 import { getFieldForPath } from '../utils';
 
+const IN_PROCESS_ELEMENT_ESCAPE = '__';
 class InvalidFieldsUsageError extends Error {
   message = 'Invalid use of @fields API';
 }
@@ -116,12 +117,15 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             });
           }
 
-          if (!/[A-Z]/.test(node.tag[0])) {
+          let { tag } = node;
+          if (tag.startsWith(IN_PROCESS_ELEMENT_ESCAPE)) {
+            tag = tag.replace(IN_PROCESS_ELEMENT_ESCAPE, '');
+          } else if (!/[A-Z]/.test(tag[0])) {
             // not a possible invocation of a local variable
             return;
           }
 
-          let val = lookupScopeVal(node.tag, path, state);
+          let val = lookupScopeVal(tag, path, state);
           switch (val.type) {
             case 'normal':
               return;
@@ -363,7 +367,10 @@ function expandContainsManyShorthand(fieldName: string): Statement[] {
   let { element, blockItself, block, path } = syntax.builders;
   let segments = fieldName.split('.');
   let singularFieldName = singularize(segments[segments.length - 1]);
-  let componentElement = element(singularFieldName, {});
+  let componentElement = element(
+    IN_PROCESS_ELEMENT_ESCAPE + singularFieldName,
+    {}
+  );
   componentElement.selfClosing = true;
 
   return [
