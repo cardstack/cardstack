@@ -82,7 +82,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   ): syntax.ASTPlugin {
     let { fields, importAndChooseName, usedFields } = options;
     let state: State = {
-      scopes: [],
+      scopes: [new Map()],
       nextScope: undefined,
       handledFieldExpressions: new WeakSet(),
     };
@@ -96,10 +96,16 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
           }
 
           let fieldFullPath = fieldPathForElementNode(node);
+
           if (fieldFullPath) {
             let field = getFieldForPath(fields, fieldFullPath);
             if (!field) {
               throw new Error(`unknown field ${fieldFullPath}`);
+            }
+            if (field.type === 'containsMany') {
+              return expandContainsManyShorthand(
+                `${FIELDS_PREFIX}${fieldFullPath}`
+              );
             }
             usedFields.push(fieldFullPath);
             return rewriteElementNode({
@@ -122,11 +128,16 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             case 'stringLiteral':
               throw new Error(`tried to use a field name as a component`);
             case 'fieldComponent':
+              if (val.expandable && val.field.type === 'containsMany') {
+                return expandContainsManyShorthand(
+                  `${FIELDS_PREFIX}${val.fieldFullPath}`
+                );
+              }
+              usedFields.push(val.fieldFullPath);
               return rewriteElementNode({
                 field: val.field,
                 importAndChooseName,
                 modelArgument: val.pathForModel,
-                forceSingular: !val.expandable,
               });
             default:
               throw assertNever(val);
@@ -143,6 +154,9 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
           let val = lookupScopeVal(node.original, path, state);
           switch (val.type) {
             case 'normal':
+              if (isFieldPathExpression(node)) {
+                throw new InvalidFieldsUsageError();
+              }
               return;
             case 'stringLiteral':
               return env.syntax.builders.string(val.value);
@@ -167,26 +181,29 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
           },
         },
 
-        BlockStatement(node) {
-          let handled:
-            | { replacement?: unknown }
-            | undefined = handleFieldsIterator(node, fields, state);
+        BlockStatement: {
+          enter(node) {
+            let handled:
+              | { replacement?: unknown }
+              | undefined = handleFieldsIterator(node, fields, state);
 
-          if (handled) {
-            return handled.replacement;
-          }
+            if (handled) {
+              return handled.replacement;
+            }
 
-          handled = handlePluralFieldIterator(node, fields, state);
-          if (handled) {
-            return handled.replacement;
-          }
+            handled = handlePluralFieldIterator(node, fields, state);
+            if (handled) {
+              return handled.replacement;
+            }
 
-          state.nextScope = new Map();
-          for (let name of node.program.blockParams) {
-            state.nextScope.set(name, { type: 'normal' });
-          }
+            state.nextScope = new Map();
+            for (let name of node.program.blockParams) {
+              state.nextScope.set(name, { type: 'normal' });
+            }
 
-          return undefined;
+            return undefined;
+          },
+          exit() {},
         },
       },
     };
@@ -226,15 +243,6 @@ function enclosingScopeValue(
   throw new Error(`bug: couldn't figure out which iteration we were in`);
 }
 
-function isFieldsIterator(node: BlockStatement): boolean {
-  return (
-    node.path.type === 'PathExpression' &&
-    node.path.original === 'each-in' &&
-    node.params[0]?.type === 'PathExpression' &&
-    node.params[0].original === '@fields'
-  );
-}
-
 function handleFieldsIterator(
   node: BlockStatement,
   fields: CompiledCard['fields'],
@@ -272,17 +280,15 @@ function handleFieldsIterator(
     replacement = replacement.concat(copied);
   }
 
-  let nextScope = new Map();
+  let scope = state.scopes[0];
 
   if (node.program.blockParams[0]) {
-    nextScope.set(node.program.blockParams[0], nameVar);
+    scope.set(node.program.blockParams[0], nameVar);
   }
 
   if (node.program.blockParams[1]) {
-    nextScope.set(node.program.blockParams[1], componentVar);
+    scope.set(node.program.blockParams[1], componentVar);
   }
-
-  state.nextScope = nextScope;
 
   return { replacement };
 }
@@ -332,77 +338,42 @@ function handlePluralFieldIterator(
   return {};
 }
 
-function fieldPathForPathExpression(exp: PathExpression): string | undefined {
-  if (exp.head.type === 'AtHead' && exp.head.name === '@fields') {
-    return exp.tail.join('.');
-  }
-  return undefined;
-}
-
-function fieldPathForElementNode(node: ElementNode): string | undefined {
-  if (node.tag.startsWith(FIELDS_PREFIX)) {
-    return node.tag.slice(FIELDS_PREFIX.length);
-  }
-  return undefined;
-}
-
 function rewriteElementNode(options: {
   field: Field;
   modelArgument: string;
   importAndChooseName: Options['importAndChooseName'];
-  forceSingular?: boolean;
   prefix?: string;
 }): Statement[] {
-  let { field, forceSingular, modelArgument, prefix } = options;
+  let { field, modelArgument, prefix } = options;
   let { inlineHBS } = field.card.embedded;
 
-  if (!forceSingular && field.type === 'containsMany') {
-    if (inlineHBS) {
-      return process(expandContainsManyShorthand(modelArgument));
-    } else {
-      return process(
-        expandContainsManyShorthand(
-          modelArgument,
-          rewriteFieldToComponent(
-            options.importAndChooseName,
-            field,
-            modelArgument
-          )
-        )
-      );
-    }
+  if (inlineHBS) {
+    return inlineTemplateForField(inlineHBS, modelArgument, prefix);
   } else {
-    if (inlineHBS) {
-      return inlineTemplateForField(inlineHBS, modelArgument, prefix);
-    } else {
-      return process(
-        rewriteFieldToComponent(
-          options.importAndChooseName,
-          field,
-          modelArgument,
-          prefix
-        )
-      );
-    }
+    return rewriteFieldToComponent(
+      options.importAndChooseName,
+      field,
+      modelArgument,
+      prefix
+    );
   }
 }
 
-function expandContainsManyShorthand(
-  fieldName: string,
-  itemTemplate?: string
-): string {
-  let eachParam = `${MODEL_PREFIX}${fieldName}`;
+function expandContainsManyShorthand(fieldName: string): Statement[] {
+  let { element, blockItself, block, path } = syntax.builders;
   let segments = fieldName.split('.');
   let singularFieldName = singularize(segments[segments.length - 1]);
+  let componentElement = element(singularFieldName, {});
+  componentElement.selfClosing = true;
 
-  if (itemTemplate) {
-    // TODO: This might be too aggressive...
-    itemTemplate = itemTemplate.replace(fieldName, singularFieldName);
-  } else {
-    itemTemplate = `{{${singularFieldName}}}`;
-  }
-
-  return `{{#each ${eachParam} as |${singularFieldName}|}}${itemTemplate}{{/each}}`;
+  return [
+    block(
+      path('each'),
+      [path(fieldName)],
+      null,
+      blockItself([componentElement], [singularFieldName])
+    ),
+  ];
 }
 
 // <@model.createdAt /> -> <DateField @model={{@model.createdAt}} />
@@ -411,7 +382,9 @@ function rewriteFieldToComponent(
   field: Field,
   modelArgument: string,
   prefix?: string
-): string {
+): Statement[] {
+  let { element, attr, mustache } = syntax.builders;
+
   let componentName = importAndChooseName(
     capitalize(field.name),
     field.card.embedded.moduleName,
@@ -422,11 +395,38 @@ function rewriteFieldToComponent(
     modelArgument = prefix + modelArgument;
   }
 
-  return `<${componentName} @model={{${modelArgument}}} />`;
+  let elementNode = element(componentName, {
+    attrs: [attr('@model', mustache(modelArgument))],
+  });
+  elementNode.selfClosing = true;
+  return [elementNode];
 }
 
-function process(template: string) {
-  return syntax.preprocess(template).body;
+function isFieldsIterator(node: BlockStatement): boolean {
+  return (
+    node.path.type === 'PathExpression' &&
+    node.path.original === 'each-in' &&
+    node.params[0]?.type === 'PathExpression' &&
+    node.params[0].original === '@fields'
+  );
+}
+
+function isFieldPathExpression(exp: PathExpression): boolean {
+  return exp.original.startsWith(FIELDS);
+}
+
+function fieldPathForPathExpression(exp: PathExpression): string | undefined {
+  if (isFieldPathExpression(exp)) {
+    return exp.tail.join('.');
+  }
+  return undefined;
+}
+
+function fieldPathForElementNode(node: ElementNode): string | undefined {
+  if (node.tag.startsWith(FIELDS_PREFIX)) {
+    return node.tag.slice(FIELDS_PREFIX.length);
+  }
+  return undefined;
 }
 
 function assertNever(value: never) {
