@@ -21,13 +21,13 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<CardPay
   }
   progressSteps = [
     {
-      title: 'Deposit tokens into Reserve Pool on Ethereum Mainnet',
+      title: 'Deposit tokens into reserve pool on Ethereum mainnet',
     },
     {
-      title: 'Bridge tokens from Ethereum Mainnet to xDai Chain',
+      title: 'Bridge tokens from Ethereum mainnet to xDai chain',
     },
     {
-      title: 'Mint tokens on xDai: DAI CPXD',
+      title: 'Mint tokens on xDai: DAI.CPXD',
     },
   ];
 

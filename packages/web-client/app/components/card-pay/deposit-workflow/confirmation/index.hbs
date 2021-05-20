@@ -10,7 +10,7 @@
     <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
       <div class="card-pay-confirmation__transfer-network">
         <span class="card-pay-confirmation__transfer-network-name">{{this.layer1Network.chainName}}</span>
-        <Boxel::Button @as="anchor" @size="extra-small" href={{this.depositTxnViewerUrl}}>
+        <Boxel::Button @as="anchor" @size="extra-small" href={{this.depositTxnViewerUrl}} target="_blank" rel="noopener">
           View on Etherscan
         </Boxel::Button>
       </div>
@@ -39,7 +39,7 @@
   <div class="card-pay-confirmation__bridge-container">
     <div class="card-pay-confirmation__bridge-inner">
       Bridge
-      <Boxel::Button @as="anchor" @size="extra-small" href={{this.bridgeExplorerUrl}} class="card-pay-confirmation__bridge-inner-button">
+      <Boxel::Button @as="anchor" @size="extra-small" href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" class="card-pay-confirmation__bridge-inner-button">
         View in Bridge Explorer
       </Boxel::Button>
     </div>
@@ -56,14 +56,14 @@
     <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
       <div class="card-pay-confirmation__transfer-network">
         <span class="card-pay-confirmation__transfer-network-name">{{this.layer2Network.chainName}} wallet</span>
-        <Boxel::Button @as="anchor" @size="extra-small" href={{this.blockscoutUrl}}>
+        <Boxel::Button @as="anchor" @size="extra-small" href={{this.blockscoutUrl}} target="_blank" rel="noopener">
           View on Blockscout
         </Boxel::Button>
       </div>
       <div class="card-pay-confirmation__transaction">
         <div class="card-pay-confirmation__transaction-amount">
           {{svg-jar this.depositedToken.icon class="card-pay-confirmation__transaction-token-icon"}}
-          {{format-token-amount this.depositedAmount}} {{this.depositedToken.symbol}} CPXD
+          {{format-token-amount this.depositedAmount}} {{this.depositedToken.symbol}}.CPXD
         </div>
         <div class="card-pay-confirmation__transaction-preposition">
           in
@@ -94,8 +94,8 @@
                   {{#if this.depotAddress}}
                     {{truncate-middle this.depotAddress 7 4}}
                   {{else}}
-                    {{!-- 
-                      This depot is fetched earlier in the workflow. 
+                    {{!--
+                      This depot is fetched earlier in the workflow.
                       If it isn't present and we got this far, it's because the
                       user created a new repo. That's why we don't show a loading indicator here.
                       This might change in the future if we fetch the depot address in this component

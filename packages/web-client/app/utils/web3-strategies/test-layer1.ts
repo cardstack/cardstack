@@ -8,7 +8,7 @@ import { WalletProvider } from '../wallet-providers';
 import { TransactionReceipt } from 'web3-core';
 
 export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
-  chainName = 'L1 Test Chain';
+  chainName = 'L1 test chain';
   chainId = -1;
   @tracked currentProviderId: string | undefined;
   @tracked walletConnectUri: string | undefined;

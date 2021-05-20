@@ -11,7 +11,7 @@ class DepositWorkflow extends Workflow {
   name = 'Reserve Pool Deposit';
   milestones = [
     new Milestone({
-      title: 'Connect Mainnet wallet',
+      title: 'Connect mainnet wallet',
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -31,9 +31,9 @@ class DepositWorkflow extends Workflow {
         }),
         new WorkflowMessage({
           author: cardbot,
-          message: `The funds you wish to deposit must be available in your Mainnet Wallet, so that you can add
-        them to the Reserve Pool on mainnet. Once you have made your deposit, an equivalent amount of
-        tokens will be minted and added to your xDai Chain Wallet.`,
+          message: `The funds you wish to deposit must be available in your mainnet wallet, so that you can add
+        them to the reserve pool on mainnet. Once you have made your deposit, an equivalent amount of
+        tokens will be minted and added to your xDai chain wallet.`,
         }),
         new NetworkAwareWorkflowMessage({
           author: cardbot,
@@ -48,7 +48,7 @@ class DepositWorkflow extends Workflow {
           componentName: 'card-pay/layer-one-connect-card',
         }),
       ],
-      completedDetail: 'Mainnet Wallet connected',
+      completedDetail: 'Mainnet wallet connected',
     }),
     new Milestone({
       title: 'Connect xDai chain wallet',
@@ -64,7 +64,7 @@ class DepositWorkflow extends Workflow {
         new NetworkAwareWorkflowMessage({
           author: cardbot,
           message: `You have connected your Ethereum mainnet wallet. Now it's time to connect your xDai chain
-          wallet via your Cardstack mobile app. If you don't have the app installed, please do so now.`,
+          wallet via your Card Wallet mobile app. If you don't have the app installed, please do so now.`,
           includeIf() {
             return !(this as NetworkAwareWorkflowMessage).hasLayer2Account;
           },
@@ -83,7 +83,7 @@ class DepositWorkflow extends Workflow {
           componentName: 'card-pay/layer-two-connect-card',
         }),
       ],
-      completedDetail: 'xDai Chain wallet connected',
+      completedDetail: 'xDai chain wallet connected',
     }),
     new Milestone({
       title: 'Deposit into reserve pool',
@@ -91,7 +91,7 @@ class DepositWorkflow extends Workflow {
         new WorkflowMessage({
           author: cardbot,
           message:
-            "Let's get down to business. Please choose the asset you would like to deposit into the CARD Protocol's Reserve Pool.",
+            "Let's get down to business. Please choose the asset you would like to deposit into the CARD Protocol's reserve pool.",
         }),
         new WorkflowCard({
           author: cardbot,
@@ -106,7 +106,7 @@ class DepositWorkflow extends Workflow {
           componentName: 'card-pay/deposit-workflow/transaction-amount',
         }),
       ],
-      completedDetail: 'Deposited into Reserve Pool',
+      completedDetail: 'Deposited into reserve pool',
     }),
     new Milestone({
       title: 'Receive tokens on xDai',
@@ -114,7 +114,7 @@ class DepositWorkflow extends Workflow {
         new WorkflowMessage({
           author: cardbot,
           message:
-            "Congrats! Now that you have deposited funds into the CARD Protocol's Reserve Pool, your token will be bridged to the xDai blockchain. You can check the status below.",
+            "Congrats! Now that you have deposited funds into the CARD Protocol's reserve pool, your token will be bridged to the xDai blockchain. You can check the status below.",
         }),
         new WorkflowCard({
           author: cardbot,

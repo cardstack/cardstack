@@ -10,7 +10,7 @@ export interface WalletProvider {
 const walletProviders: WalletProvider[] = [
   {
     id: 'metamask',
-    name: 'Metamask',
+    name: 'MetaMask',
     logo: metamaskLogo,
   },
   {

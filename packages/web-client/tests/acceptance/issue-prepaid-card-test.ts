@@ -42,7 +42,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert
       .dom(postableSel(0, 2))
       .containsText(
-        'Before we get started, please connect your xDai chain wallet via your Cardstack mobile app.'
+        'Before we get started, please connect your xDai chain wallet via your Card Wallet mobile app.'
       );
 
     assert
@@ -73,7 +73,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     // await waitFor(`${postableSel(0, 4)} [data-test-depot-balance]`);
     // assert
     //   .dom(`${postableSel(0, 4)} [data-test-depot-balance]`)
-    //   .containsText('2500 DAI CPXD');
+    //   .containsText('2500 DAI.CPXD');
     assert
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
@@ -82,7 +82,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     await waitFor(milestoneCompletedSel(0));
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('xDai Chain wallet connected');
+      .containsText('xDai chain wallet connected');
 
     assert
       .dom(postableSel(1, 0))

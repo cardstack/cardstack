@@ -24,7 +24,7 @@ import {
   ExchangeRate,
 } from '@cardstack/cardpay-sdk';
 export default class SokolWeb3Strategy implements Layer2Web3Strategy {
-  chainName = 'Sokol Testnet';
+  chainName = 'Sokol testnet';
   chainId = networkIds['sokol'];
   provider: WalletConnectProvider | undefined;
 

@@ -22,7 +22,7 @@ import {
 import Safes, { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 
 export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
-  chainName = 'xDai Chain';
+  chainName = 'xDai chain';
   chainId = networkIds['xdai'];
   provider = new WalletConnectProvider({
     bridge: BRIDGE,

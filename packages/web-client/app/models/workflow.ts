@@ -50,7 +50,7 @@ export abstract class Workflow {
   get progressStatus() {
     let completedMilestones = this.milestones.filterBy('isComplete');
     let lastMilestone = completedMilestones[completedMilestones.length - 1];
-    return lastMilestone?.completedDetail ?? 'Workflow Started';
+    return lastMilestone?.completedDetail ?? 'Workflow started';
   }
 
   peekAtVisiblePostables() {
