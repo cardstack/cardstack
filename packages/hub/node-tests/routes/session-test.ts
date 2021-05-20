@@ -4,20 +4,24 @@ import { bootEnvironmentForTesting } from '../../main';
 import { Registry } from '../../dependency-injection';
 
 let stubNonce = 'abc:123';
+let stubAuthToken = 'def--456';
 
-class StubNonceGenerator {
-  generate() {
+class StubAuthenticationUtils {
+  generateNonce() {
     return stubNonce;
   }
+  buildAuthToken() {
+    return stubAuthToken;
+  }
 }
-describe('GET /session', function () {
+describe('GET /api/session', function () {
   let server: Server;
   let request: supertest.SuperTest<Test>;
   this.beforeEach(async function () {
     server = await bootEnvironmentForTesting({
       port: 3001,
       registryCallback(registry: Registry) {
-        registry.register('nonce-generator', StubNonceGenerator);
+        registry.register('authentication-utils', StubAuthenticationUtils);
       },
     });
     request = supertest(server);
@@ -29,15 +33,15 @@ describe('GET /session', function () {
 
   it('responds with json', function (done) {
     request
-      .get('/session')
-      .set('Accept', 'application/json')
+      .get('/api/session')
+      .set('Accept', 'application/vnd.api+json')
       .expect(401)
-      .expect('Content-Type', /json/)
-      .expect({ nonce: stubNonce, version: '0.0.1' }, done);
+      .expect({ data: { nonce: stubNonce, version: '0.0.1' } })
+      .expect('Content-Type', 'application/vnd.api+json', done);
   });
 });
 
-describe('POST /session', function () {
+describe('POST /api/session', function () {
   let server: Server;
   let request: supertest.SuperTest<Test>;
   let bodyWithCorrectSignature: any;
@@ -46,7 +50,7 @@ describe('POST /session', function () {
     server = await bootEnvironmentForTesting({
       port: 3001,
       registryCallback(registry: Registry) {
-        registry.register('nonce-generator', StubNonceGenerator);
+        registry.register('authentication-utils', StubAuthenticationUtils);
       },
     });
     request = supertest(server);
@@ -83,28 +87,43 @@ describe('POST /session', function () {
 
   it('responds with json when signature is correct', function (done) {
     request
-      .post('/session')
-      .send(bodyWithCorrectSignature)
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
+      .post('/api/session')
+      .send({
+        data: {
+          attributes: bodyWithCorrectSignature,
+        },
+      })
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Accept', 'application/vnd.api+json')
       .expect(200)
       .expect('Content-Type', /json/)
-      .expect({ authToken: 'tbdauthtoken' }, done);
+      .expect(
+        {
+          data: {
+            authToken: stubAuthToken,
+          },
+        },
+        done
+      );
   });
 
   // * Server use EC recover function to verify that the signature was signed by the signer.
   // On failure, 401 "Signature not verified"
   it('responds with 401 when signature invalid', function (done) {
     let bodyWithIncorrectSignature = bodyWithCorrectSignature;
-    bodyWithIncorrectSignature.signature = '0x056e70aaaaaaaaaaaaaaaaa';
+    bodyWithIncorrectSignature.signature = bodyWithCorrectSignature.signature.replace('a', '1').replace('b', '2');
     request
-      .post('/session')
-      .send(bodyWithCorrectSignature)
-      .set('Content-Type', 'application/json')
-      .set('Accept', 'application/json')
+      .post('/api/session')
+      .send({
+        data: {
+          attributes: bodyWithIncorrectSignature,
+        },
+      })
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Accept', 'application/vnd.api+json')
       .expect(401)
       .expect('Content-Type', /json/)
-      .expect({ error: 'Invalid signature' }, done);
+      .expect({ error: 'Signature not verified' }, done);
   });
 
   // * Server verifies that nonce is less than 5 minutes old. On failure, 401 "Expired nonce"

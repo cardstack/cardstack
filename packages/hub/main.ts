@@ -9,7 +9,7 @@ import AuthenticationMiddleware from './authentication-middleware';
 import DevelopmentConfig from './development-config';
 import DevelopmentProxyMiddleware from './development-proxy-middleware';
 import SessionRoute from './routes/session';
-import { NonceGenerator } from './utils/session';
+import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './jsonapi-middleware';
 
 const log = logger('cardstack/hub');

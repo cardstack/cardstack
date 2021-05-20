@@ -4,7 +4,8 @@ import requireUncached from 'require-uncached';
 import prepare from './prepare-node-tests';
 
 export default function () {
-  process.env.SERVER_SECRET = 'test123abc';
+  process.env.SERVER_SECRET = '2Lhrsi7xSDMv1agfW+hghvQkdkTRSqW/JGApSjLT0NA=';
+  // generated with `crypto.randomBytes(32).toString('base64')`
 
   let patterns = ['packages/*/node-tests/**/*-test.js', 'node-tests/**/*-test.js'];
 
