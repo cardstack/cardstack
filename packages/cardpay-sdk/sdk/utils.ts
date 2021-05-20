@@ -285,11 +285,6 @@ export function ethSignSignatureToRSVForSafe(ethSignSignature: string) {
   const sigR = Web3.utils.toBN('0x' + sig.slice(0, 64)).toString();
   const sigS = Web3.utils.toBN('0x' + sig.slice(64, 128)).toString();
 
-  // Metamask with ledger returns v = 01, this is not valid for ethereum
-  // For ethereum valid V is 27 or 28
-  // In case V = 0 or 01 we add it to 27 and then add 4
-  // Adding 4 is required to make signature valid for safe contracts:
-  // https://docs.gnosis.io/safe/docs/contracts_signatures/
   return {
     v: sigV,
     r: sigR,
