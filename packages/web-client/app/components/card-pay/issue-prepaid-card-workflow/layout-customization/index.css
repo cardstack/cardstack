@@ -21,5 +21,5 @@
   margin-top: var(--boxel-sp-xxl);
   margin-bottom: var(--boxel-sp-lg);
   font: var(--boxel-font-xs);
-  color: #969696;
+  color: var(--boxel-purple-400);
 }

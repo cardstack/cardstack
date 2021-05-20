@@ -1,4 +1,4 @@
-<div class="layout-form-view__content">
+<div class="layout-form-view__content" data-test-layout-customization-form>
   <CardPay::FieldStack>
     <CardPay::LabeledValue
       @label="Card Preview"
@@ -19,7 +19,7 @@
       @label="Name of Issuer *"
       class="layout-form-view__input-field"
     >
-      <Boxel::Input @value={{@issuerName}} />
+      <Boxel::Input @value={{@issuerName}} data-test-layout-customization-name-input/>
     </Boxel::Field>
     <CardPay::LabeledValue
       @label="Background Color"
@@ -40,6 +40,7 @@
           @focusedClass="layout-form-view__selection-item--focused"
           @checkedClass="layout-form-view__selection-item--checked"
           class="layout-form-view__selection-item"
+          data-test-customization-background-selection-item={{backgroundItem.data.id}}
         >
           <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
             @type="background"
@@ -67,6 +68,7 @@
           @focusedClass="layout-form-view__selection-item--focused"
           @checkedClass="layout-form-view__selection-item--checked"
           class="layout-form-view__selection-item"
+          data-test-customization-theme-selection-item={{themeItem.data.id}}
         >
           {{!-- rerenders appear to cause flashes if we use a background image --}}
           <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch

@@ -5,6 +5,7 @@ import {
   visit,
   waitFor,
   waitUntil,
+  fillIn,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
@@ -90,12 +91,55 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     post = postableSel(1, 1);
 
-    // // layout-customization card
-    // TODO verify and interact with layout customization card default state
+    assert.dom('[data-test-layout-customization-form]').isVisible();
+    assert
+      .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
+      .isDisabled();
+
+    await fillIn('[data-test-layout-customization-name-input]', 'JJ');
+
+    assert
+      .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
+      .isEnabled();
+
+    let backgroundChoice = 'transparent';
+    let themeChoice =
+      'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+    assert
+      .dom(
+        `[data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+      )
+      .doesNotExist();
+    await click(
+      `[data-test-customization-background-selection-item="${backgroundChoice}"]`
+    );
+    await click(
+      `[data-test-customization-theme-selection-item="${themeChoice}"]`
+    );
+
+    assert
+      .dom(
+        `[data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+      )
+      .exists();
+
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
-    // TODO verify and interact with layout customization card memorialized state
+
+    assert.dom('[data-test-layout-customization-form]').isNotVisible();
+    assert.dom('[data-test-layout-customization-display]').isVisible();
+
+    assert
+      .dom(
+        `[data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+      )
+      .exists();
+
+    assert
+      .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
+      .containsText('Edit')
+      .isEnabled();
 
     await waitFor(milestoneCompletedSel(1));
     assert.dom(milestoneCompletedSel(1)).containsText('Layout customized');
