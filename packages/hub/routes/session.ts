@@ -7,6 +7,7 @@ import packageJson from '../package.json';
 
 let log = Logger('route:session');
 
+const MAX_NONCE_AGE_NS = BigInt(1000 * 1000 * 60 * 5); // 5 minutes
 export default class SessionRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
 
@@ -37,6 +38,17 @@ export default class SessionRoute {
   async post(ctx: Koa.Context) {
     let { authData, signature } = ctx.request.body.data.attributes;
     let userAddress = authData.message.user;
+    let nonce = authData.message.nonce;
+    let nonceTimestamp = this.authenticationUtils.extractVerifiedTimestamp(nonce);
+    if (nonceTimestamp < process.hrtime.bigint() - MAX_NONCE_AGE_NS) {
+      ctx.status = 401;
+      ctx.body = {
+        error: 'Expired nonce',
+      };
+      ctx.type = 'application/vnd.api+json';
+      return;
+    }
+
     try {
       let recoveredAddress = recoverTypedSignature({
         data: authData,

@@ -1,5 +1,5 @@
 import { AuthenticationUtils } from '../../utils/authentication';
-import { createTestEnv } from '../helpers';
+import { AcceleratableClock, createTestEnv } from '../helpers';
 import { Registry } from '../../dependency-injection';
 
 function delay(ms: number) {
@@ -102,19 +102,6 @@ describe('AuthenticationUtils', function () {
     });
 
     it('validateAuthToken with expired token throws', async function () {
-      class AcceleratableClock {
-        acceleratedByMs = 0;
-        get acceleratedByNs(): bigint {
-          return BigInt(this.acceleratedByMs) * BigInt(1000);
-        }
-
-        now() {
-          return Date.now() + this.acceleratedByMs;
-        }
-        hrNow() {
-          return process.hrtime.bigint() + this.acceleratedByNs;
-        }
-      }
       let subject = await createSubject((registry: Registry) => {
         registry.register('clock', AcceleratableClock);
       });

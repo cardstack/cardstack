@@ -3,9 +3,12 @@ import supertest, { Test } from 'supertest';
 import { bootEnvironmentForTesting } from '../../main';
 import { Registry } from '../../dependency-injection';
 import packageJson from '../../package.json';
+import { AcceleratableClock } from '../helpers';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
+let stubTimestamp = process.hrtime.bigint();
+
 let handleValidateAuthToken = function (encryptedAuthToken: string) {
   return '';
 };
@@ -17,6 +20,10 @@ class StubAuthenticationUtils {
   buildAuthToken() {
     return stubAuthToken;
   }
+  extractVerifiedTimestamp(_nonce: string) {
+    return stubTimestamp;
+  }
+
   validateAuthToken(encryptedAuthToken: string) {
     return handleValidateAuthToken(encryptedAuthToken);
   }
@@ -38,16 +45,16 @@ describe('GET /api/session', function () {
     server.close();
   });
 
-  it('without bearer token, responds with 401 and nonce in JSON', function (done) {
+  it('without bearer token, responds with 401 and nonce in JSON', async function () {
     request
       .get('/api/session')
       .set('Accept', 'application/vnd.api+json')
       .expect(401)
       .expect({ data: { attributes: { nonce: stubNonce, version: packageJson.version } } })
-      .expect('Content-Type', 'application/vnd.api+json', done);
+      .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it('with bearer token, responds with 200 and current owner address', function (done) {
+  it('with bearer token, responds with 200 and current owner address', async function () {
     let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
     handleValidateAuthToken = function (encryptedString: string) {
       expect(encryptedString).to.equal('abc123--def456--ghi789');
@@ -59,10 +66,10 @@ describe('GET /api/session', function () {
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .expect(200)
       .expect({ data: { attributes: { user: stubUserAddress } } })
-      .expect('Content-Type', 'application/vnd.api+json', done);
+      .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it('with invalid (or expired) bearer token', function (done) {
+  it('with invalid (or expired) bearer token', async function () {
     handleValidateAuthToken = function (encryptedString: string) {
       expect(encryptedString).to.equal('abc123--def456--ghi789');
       throw new Error('Invalid auth token');
@@ -73,7 +80,7 @@ describe('GET /api/session', function () {
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .expect(401)
       .expect({ data: { attributes: { nonce: stubNonce, version: packageJson.version } } })
-      .expect('Content-Type', 'application/vnd.api+json', done);
+      .expect('Content-Type', 'application/vnd.api+json');
   });
 });
 
@@ -87,6 +94,7 @@ describe('POST /api/session', function () {
       port: 3001,
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
+        registry.register('clock', AcceleratableClock);
       },
     });
     request = supertest(server);
@@ -119,10 +127,11 @@ describe('POST /api/session', function () {
 
   this.afterEach(function () {
     server.close();
+    stubTimestamp = process.hrtime.bigint();
   });
 
-  it('responds with json when signature is correct', function (done) {
-    request
+  it('responds with json when signature is correct', async function () {
+    await request
       .post('/api/session')
       .send({
         data: {
@@ -133,24 +142,21 @@ describe('POST /api/session', function () {
       .set('Accept', 'application/vnd.api+json')
       .expect(200)
       .expect('Content-Type', /json/)
-      .expect(
-        {
-          data: {
-            attributes: {
-              authToken: stubAuthToken,
-            },
+      .expect({
+        data: {
+          attributes: {
+            authToken: stubAuthToken,
           },
         },
-        done
-      );
+      });
   });
 
   // * Server use EC recover function to verify that the signature was signed by the signer.
   // On failure, 401 "Signature not verified"
-  it('responds with 401 when signature invalid', function (done) {
+  it('responds with 401 when signature invalid', async function () {
     let bodyWithIncorrectSignature = bodyWithCorrectSignature;
     bodyWithIncorrectSignature.signature = bodyWithCorrectSignature.signature.replace('a', '1').replace('b', '2');
-    request
+    await request
       .post('/api/session')
       .send({
         data: {
@@ -161,10 +167,25 @@ describe('POST /api/session', function () {
       .set('Accept', 'application/vnd.api+json')
       .expect(401)
       .expect('Content-Type', /json/)
-      .expect({ error: 'Signature not verified' }, done);
+      .expect({ error: 'Signature not verified' });
   });
 
-  // * Server verifies that nonce is less than 5 minutes old. On failure, 401 "Expired nonce"
+  it('responds with 401 when nonce is more than 5 minutes old', async function () {
+    stubTimestamp = process.hrtime.bigint() - BigInt(1000 * 1000 * 60 * 6); // 6 minutes ago
+    await request
+      .post('/api/session')
+      .send({
+        data: {
+          attributes: bodyWithCorrectSignature,
+        },
+      })
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Accept', 'application/vnd.api+json')
+      .expect(401)
+      .expect('Content-Type', /json/)
+      .expect({ error: 'Expired nonce' });
+  });
+
   // * Server verifies that nonce is not in redis SET of recently used nonces. On failure, 401 "Nonce already used"
   // * Server retires the nonce by adding it to the redis SET of used nonces (5 minute TTL on items in the set)
   // * Server builds an authorization bearer token:

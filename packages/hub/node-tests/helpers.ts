@@ -13,3 +13,17 @@ export async function createTestEnv(registryCallBack?: RegistryCallback): Promis
   }
   return { container, destroy };
 }
+
+export class AcceleratableClock {
+  acceleratedByMs = 0;
+  get acceleratedByNs(): bigint {
+    return BigInt(this.acceleratedByMs) * BigInt(1000);
+  }
+
+  now() {
+    return Date.now() + this.acceleratedByMs;
+  }
+  hrNow() {
+    return process.hrtime.bigint() + this.acceleratedByNs;
+  }
+}
