@@ -36,7 +36,7 @@ describe('GET /api/session', function () {
       .get('/api/session')
       .set('Accept', 'application/vnd.api+json')
       .expect(401)
-      .expect({ data: { nonce: stubNonce, version: '0.0.1' } })
+      .expect({ data: { attributes: { nonce: stubNonce, version: '0.0.1' } } })
       .expect('Content-Type', 'application/vnd.api+json', done);
   });
 });
@@ -100,7 +100,9 @@ describe('POST /api/session', function () {
       .expect(
         {
           data: {
-            authToken: stubAuthToken,
+            attributes: {
+              authToken: stubAuthToken,
+            },
           },
         },
         done

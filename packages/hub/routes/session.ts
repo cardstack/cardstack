@@ -10,8 +10,10 @@ export default class SessionRoute {
     ctx.status = 401;
     ctx.body = {
       data: {
-        nonce: this.authenticationUtils.generateNonce(),
-        version: '0.0.1',
+        attributes: {
+          nonce: this.authenticationUtils.generateNonce(),
+          version: '0.0.1',
+        },
       },
     };
     ctx.type = 'application/vnd.api+json';
@@ -33,7 +35,9 @@ export default class SessionRoute {
         ctx.status = 200;
         ctx.body = {
           data: {
-            authToken: this.authenticationUtils.buildAuthToken(userAddress),
+            attributes: {
+              authToken: this.authenticationUtils.buildAuthToken(userAddress),
+            },
           },
         };
         ctx.type = 'application/vnd.api+json';
