@@ -278,6 +278,9 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         'isolated.js': templateOnlyComponentTemplate(
           `<h1><@fields.title /></h1><h2><@fields.createdAt /></h2>`
         ),
+        'embedded.js': templateOnlyComponentTemplate(
+          `<h2><@fields.title /> - <@fields.createdAt /></h2>`
+        ),
       },
     });
     let template = `{{#each @fields.posts as |Post|}}<Post />{{/each}}`;
