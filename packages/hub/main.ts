@@ -4,13 +4,13 @@ import Koa from 'koa';
 import logger from '@cardstack/logger';
 import { Registry, Container, RegistryCallback } from './dependency-injection';
 import { join } from 'path';
-import router from 'koa-better-route';
 
 import AuthenticationMiddleware from './authentication-middleware';
 import DevelopmentConfig from './development-config';
 import DevelopmentProxyMiddleware from './development-proxy-middleware';
 import SessionRoute from './routes/session';
 import { NonceGenerator } from './utils/session';
+import JsonapiMiddleware from './jsonapi-middleware';
 
 const log = logger('cardstack/hub');
 
@@ -22,7 +22,8 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('development-config', DevelopmentConfig);
   registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
-  registry.register('nonce-generator', NonceGenerator);
+  registry.register('jsonapi-middleware', JsonapiMiddleware);
+  registry.register('authentication-utils', AuthenticationUtils);
   registry.register('session-route', SessionRoute);
   if (registryCallback) {
     registryCallback(registry);
@@ -42,10 +43,8 @@ export async function makeServer(registryCallback?: RegistryCallback) {
   app.use(httpLogging);
   app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
   app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
+  app.use(((await container.lookup('jsonapi-middleware')) as JsonapiMiddleware).middleware());
 
-  let sessionRoute = (await container.lookup('session-route')) as SessionRoute;
-  app.use(router.get('/session', sessionRoute.get.bind(sessionRoute)));
-  app.use(router.post('/session', sessionRoute.post.bind(sessionRoute)));
   app.use(async (ctx: Koa.Context, _next: Koa.Next) => {
     ctx.body = 'Hello World ' + ctx.environment + ' ' + ctx.host.split(':')[0];
   });
