@@ -12,10 +12,10 @@ interface NonceResponse {
 }
 
 export default class HubAuth {
-  constructor(private layer2Web3: Web3, private hubHost: string) {}
+  constructor(private layer2Web3: Web3, private hubRootUrl: string) {}
 
   async getNonce(): Promise<NonceResponse> {
-    let url = `http://${this.hubHost}/api/session`;
+    let url = `${this.hubRootUrl}/api/session`;
     let response = await global.fetch(url, {
       headers: {
         //eslint-disable-next-line @typescript-eslint/naming-convention
@@ -50,7 +50,7 @@ export default class HubAuth {
         ],
       },
       domain: {
-        name: this.hubHost,
+        name: this.hubRootUrl.replace(/https?:\/\//, ''),
         version,
         chainId,
       },
@@ -69,8 +69,7 @@ export default class HubAuth {
         },
       },
     });
-    console.log(postBody);
-    let response = await global.fetch(`http://${this.hubHost}/api/session`, {
+    let response = await global.fetch(`${this.hubRootUrl}/api/session`, {
       method: 'POST',
       headers: {
         //eslint-disable-next-line @typescript-eslint/naming-convention
@@ -82,6 +81,8 @@ export default class HubAuth {
       let responseJson = await response.json();
       return responseJson.data.attributes.authToken;
     } else {
+      let responseJson = await response.json();
+      console.error('Failed.', responseJson);
       // TODO: throw error?
       return '';
     }

@@ -9,7 +9,7 @@ const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
 let stubTimestamp = process.hrtime.bigint();
 
-let handleValidateAuthToken = function (encryptedAuthToken: string) {
+let handleValidateAuthToken = function (_encryptedAuthToken: string) {
   return '';
 };
 
@@ -130,7 +130,7 @@ describe('POST /api/session', function () {
     stubTimestamp = process.hrtime.bigint();
   });
 
-  it('responds with json when signature is correct', async function () {
+  it('responds with auth token when signature is correct', async function () {
     await request
       .post('/api/session')
       .send({
@@ -151,8 +151,6 @@ describe('POST /api/session', function () {
       });
   });
 
-  // * Server use EC recover function to verify that the signature was signed by the signer.
-  // On failure, 401 "Signature not verified"
   it('responds with 401 when signature invalid', async function () {
     let bodyWithIncorrectSignature = bodyWithCorrectSignature;
     bodyWithIncorrectSignature.signature = bodyWithCorrectSignature.signature.replace('a', '1').replace('b', '2');
@@ -188,14 +186,4 @@ describe('POST /api/session', function () {
 
   // * Server verifies that nonce is not in redis SET of recently used nonces. On failure, 401 "Nonce already used"
   // * Server retires the nonce by adding it to the redis SET of used nonces (5 minute TTL on items in the set)
-  // * Server builds an authorization bearer token:
-
-  //   ```js
-  //   let ONE_DAY_MS = 1000 * 60 * 60 * 24;
-  //   let timestamp = new Date(Date.now() + ONE_DAY_MS).toISOString();
-  //   let token = `current_user_id=${"[signer parameter]"}&expires_at=${timestamp}`;
-  //   // It is encrypted with a secret key known only to the server.
-  //   encrypt(token, secret);
-
-  // ```
 });

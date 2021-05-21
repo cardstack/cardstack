@@ -43,7 +43,7 @@ interface Options {
   prepaidCard?: string;
   receiver?: string;
   recipient?: string;
-  hubHost?: string;
+  hubRootUrl?: string;
   faceValues?: number[];
 }
 const {
@@ -61,7 +61,7 @@ const {
   receiver,
   recipient,
   faceValues,
-  hubHost,
+  hubRootUrl,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -242,10 +242,10 @@ const {
     }
   )
   .command(
-    'hub-auth [hubHost]',
+    'hub-auth [hubRootUrl]',
     'Get an authentication token that can be used to make API requests to a Carstack Hub server',
     (yargs) => {
-      yargs.positional('hubHost', {
+      yargs.positional('hubRootUrl', {
         type: 'string',
         description: 'The host name of the hub server to authenticate with',
       });
@@ -358,11 +358,11 @@ if (!command) {
       await gasFee(network, mnemonic, tokenAddress);
       break;
     case 'hubAuth':
-      if (hubHost == null) {
-        yargs.showHelp('hubHost is a required value');
+      if (hubRootUrl == null) {
+        yargs.showHelp('hubRootUrl is a required value');
         process.exit(1);
       }
-      await hubAuth(hubHost, network, mnemonic);
+      await hubAuth(hubRootUrl, network, mnemonic);
       break;
     default:
       assertNever(command);

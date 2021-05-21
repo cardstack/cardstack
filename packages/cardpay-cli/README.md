@@ -18,8 +18,8 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay eth-price <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-eth-price-token-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay price-oracle-updated-at <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-price-oracle-updated-at-token---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay view-token-balance [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-view-token-balance-token_address---networknetwork---mnemonicmnemonic)
-  - [`yarn cardpay hub-auth <HUB_HOST> --network=NETWORK [--mnemonic=MNEMONIC]` ]
-  (#yarn-cardpay-hub-auth-hub_host---networknetwork---mnemonicmnemonic)
+  - [`yarn cardpay hub-auth <HUB_ROOT_URL> --network=NETWORK [--mnemonic=MNEMONIC]` ]
+  (#yarn-cardpay-hub-auth-hub_root_url---networknetwork---mnemonicmnemonic)
 
 
 ## `yarn cardpay bridge <AMOUNT> <TOKEN_ADDRESS> [RECEIVER] --network=NETWORK [--mnemonic=MNEMONIC]`
@@ -193,15 +193,15 @@ ARGUMENTS
   NETWORK           The network to use ("kovan", "mainnet", "sokol", "xdai")
   MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
 ```
-## `yarn cardpay hub-auth [HUB_HOST] --network=NETWORK [--mnemonic=MNEMONIC]`
+## `yarn cardpay hub-auth [HUB_ROOT_URL] --network=NETWORK [--mnemonic=MNEMONIC]`
 This returns the token balance for the given wallet.
 
 ```
 USAGE
-  $ yarn cardpay hub-auth [HUB_HOST] --network=NETWORK [--mnemonic=MNEMONIC]
+  $ yarn cardpay hub-auth [HUB_ROOT_URL] --network=NETWORK [--mnemonic=MNEMONIC]
 
 ARGUMENTS
-  HUB_HOST          The host name of the hub instance to authenticate to
+  HUB_ROOT_URL      The root URL of the hub instance to authenticate to, e.g. "https://hub.cardstack.com"
   NETWORK           The network to use ("sokol", "xdai")
   MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
 ```
