@@ -74,20 +74,21 @@ export default class LayoutCustomizationCard extends Component<LayoutCustomizati
 
   @action save() {
     if (this.issuerName && this.headerBackground && this.headerTheme) {
-      this.args.workflowSession.update('issuerName', this.issuerName);
-      this.args.workflowSession.update('headerTheme', this.headerTheme);
-      this.args.workflowSession.update(
-        'headerBackground',
-        this.headerBackground
-      );
+      this.args.workflowSession.updateMany({
+        issuerName: this.issuerName,
+        headerTheme: this.headerTheme,
+        headerBackground: this.headerBackground,
+      });
       this.args.onComplete?.();
     }
   }
 
   @action edit() {
-    this.args.workflowSession.update('issuerName', '');
-    this.args.workflowSession.update('headerTheme', '');
-    this.args.workflowSession.update('headerBackground', '');
+    this.args.workflowSession.updateMany({
+      issuerName: '',
+      headerTheme: '',
+      headerBackground: '',
+    });
     this.args.onIncomplete?.();
   }
 }

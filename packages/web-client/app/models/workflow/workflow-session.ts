@@ -10,4 +10,12 @@ export default class WorkflowSession {
     // eslint-disable-next-line no-self-assign
     this.state = this.state; // for reactivity
   }
+
+  updateMany(hash: Record<string, any>) {
+    for (const key in hash) {
+      this.state[key] = hash[key];
+    }
+    // eslint-disable-next-line no-self-assign
+    this.state = this.state; // for reactivity
+  }
 }
