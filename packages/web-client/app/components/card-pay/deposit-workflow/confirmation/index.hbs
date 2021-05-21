@@ -3,10 +3,7 @@
   @isComplete={{@isComplete}}
   class="card-pay-confirmation"
 >
-  <section class="card-pay-confirmation__section card-pay-confirmation__deposited">
-    <header aria-label="Deposited section" class="card-pay-confirmation__section-header">
-      You deposited
-    </header>
+  <ActionCardContainer::Section @title="You deposited">
     <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
       <div class="card-pay-confirmation__transfer-network">
         <span class="card-pay-confirmation__transfer-network-name">{{this.layer1Network.chainName}}</span>
@@ -17,7 +14,9 @@
       <div class="card-pay-confirmation__transaction">
         <div class="card-pay-confirmation__transaction-amount">
           {{svg-jar this.depositedToken.icon class="card-pay-confirmation__transaction-token-icon"}}
-          {{format-token-amount this.depositedAmount}} {{this.depositedToken.symbol}}
+          <div class="card-pay-confirmation__transaction-balance">
+            {{format-token-amount this.depositedAmount}} {{this.depositedToken.symbol}}
+          </div>
         </div>
         <div class="card-pay-confirmation__transaction-preposition">
           from
@@ -30,29 +29,33 @@
         </div>
       </div>
     </Boxel::CardContainer>
-    {{svg-jar "arrow-right" class="card-pay-confirmation__down-arrow"}}
-    <Boxel::CardContainer class="card-pay-confirmation__action-taken">
-      {{svg-jar "lock" class="card-pay-confirmation__action-taken-icon"}}
+    {{svg-jar "arrow" class="card-pay-confirmation__down-arrow"}}
+    <p class="card-pay-confirmation__action-taken">
+      {{svg-jar "lock-wide" class="card-pay-confirmation__action-taken-icon"}}
       Locked in CARD Protocol reserve pool
-    </Boxel::CardContainer>
-  </section>
-  <div class="card-pay-confirmation__bridge-container">
-    <div class="card-pay-confirmation__bridge-inner">
-      Bridge
-      <Boxel::Button @as="anchor" @size="extra-small" href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" class="card-pay-confirmation__bridge-inner-button">
-        View in Bridge Explorer
-      </Boxel::Button>
-    </div>
+    </p>
+  </ActionCardContainer::Section>
+</ActionCardContainer>
+<div class="card-pay-confirmation__bridge-container">
+  <div class="card-pay-confirmation__bridge-inner">
+    Bridge
+    <Boxel::Button @as="anchor" @size="extra-small" href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" class="card-pay-confirmation__bridge-inner-button">
+      View in Bridge Explorer
+    </Boxel::Button>
   </div>
-  <section class="card-pay-confirmation__section card-pay-confirmation__received">
-    <header aria-label="Received section" class="card-pay-confirmation__section-header">
-      You received
-    </header>
-    <Boxel::CardContainer class="card-pay-confirmation__action-taken">
+</div>
+<ActionCardContainer
+  @header="Confirmation"
+  @suppressHeader={{true}}
+  @isComplete={{@isComplete}}
+  class="card-pay-confirmation"
+>
+  <ActionCardContainer::Section @title="You received">
+    <p class="card-pay-confirmation__action-taken">
       {{svg-jar "coins" class="card-pay-confirmation__action-taken-icon"}}
       Minted from CARD Protocol on {{this.layer2Network.chainName}}
-    </Boxel::CardContainer>
-    {{svg-jar "arrow-right" class="card-pay-confirmation__down-arrow"}}
+    </p>
+    {{svg-jar "arrow" class="card-pay-confirmation__down-arrow"}}
     <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
       <div class="card-pay-confirmation__transfer-network">
         <span class="card-pay-confirmation__transfer-network-name">{{this.layer2Network.chainName}} wallet</span>
@@ -63,7 +66,9 @@
       <div class="card-pay-confirmation__transaction">
         <div class="card-pay-confirmation__transaction-amount">
           {{svg-jar this.depositedToken.icon class="card-pay-confirmation__transaction-token-icon"}}
-          {{format-token-amount this.depositedAmount}} {{this.depositedToken.symbol}}.CPXD
+          <div class="card-pay-confirmation__transaction-balance">
+            {{format-token-amount this.depositedAmount}} {{this.depositedToken.symbol}}.CPXD
+          </div>
         </div>
         <div class="card-pay-confirmation__transaction-preposition">
           in
@@ -111,5 +116,5 @@
         </CardPay::NestedItems>
       </div>
     </Boxel::CardContainer>
-  </section>
+  </ActionCardContainer::Section>
 </ActionCardContainer>

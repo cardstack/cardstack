@@ -2,16 +2,15 @@
   @suppressHeader={{@suppressHeader}}
   @header={{concat "Wallet - " this.layer2Network.chainName}}
   @isComplete={{@isComplete}}
-  class={{if @includeExplanations 'layer-two-connect-card--with-explanations'}}
   data-test-layer-2-wallet-card
   ...attributes
 >
   {{#if (eq this.cardState 'memorialized')}}
-    <section class="layer-two-connect-card__body">
-      <header aria-label="Layer 2 Connected Header" class="layer-two-connect-card__body-header">
-        Card Wallet
-        <img class="layer-two-connect-card__body-header-logo" src={{this.cardstackLogo}} alt="" role="presentation">
-      </header>
+    <ActionCardContainer::Section
+      @title="Card Wallet"
+      @imgUrl={{this.cardstackLogo}}
+      class="layer-two-connect-card__body"
+    >
       <CardPay::FieldStack>
         <CardPay::LabeledValue
           @label="Network"
@@ -31,11 +30,10 @@
         <CardPay::LabeledValue
           @label="Status"
           @value="Connected"
-          @icon="checkbox-primary-checked"
-          class="layer-two-connect-card__connection-status"
+          @icon="success"
         />
       </CardPay::FieldStack>
-    </section>
+    </ActionCardContainer::Section>
     <Boxel::ActionChin @state='memorialized'>
       <:memorialized as |m|>
         <m.ActionButton {{on "click" (perform this.disconnectWalletTask)}} data-test-layer-2-wallet-disconnect-button>
@@ -44,76 +42,78 @@
       </:memorialized>
     </Boxel::ActionChin>
   {{else}}
-    <section class="layer-two-connect-card__section-one">
-      <h2 class="layer-two-connect-card__header">
-        1. Install the Card Wallet app on your mobile phone
-      </h2>
-      {{#if @includeExplanations}}
-        <p class="layer-two-connect-card__explanation">
-          Please install the Card Wallet app on your mobile phone and create/add an account.
-        </p>
-      {{/if}}
-      <div class="layer-two-connect-card__app-store-links">
-        <img
-          srcset="{{this.cardstackMobileAppPhone}},
-                  {{this.cardstackMobileAppPhone2x}} 2x"
-          src={{this.cardstackMobileAppPhone}}
-          alt="Card Wallet mobile app on a smartphone"
-          width="138px"
-          height="149px"
-        >
-        {{#if this.appStoreUrl}}
-          <a href={{this.appStoreUrl}} class="layer-two-connect-card__app-store-badge">
-            <img src={{this.appStoreBadge}} width="120" height="40" alt="Download on the App Store" />
-          </a>
+    <ActionCardContainer::Section>
+      <ActionCardContainer::Section
+        @title="Install the Card Wallet app on your mobile phone"
+        class="layer-two-connect-card__section layer-two-connect-card__section--one"
+      >
+        {{#if @includeExplanations}}
+          <p class="layer-two-connect-card__explanation">
+            Please install the Card Wallet app on your mobile phone and create/add an account.
+          </p>
+        {{/if}}
+        <div class="layer-two-connect-card__app-store-links">
+          <img
+            srcset="{{this.cardstackMobileAppPhone}},
+                    {{this.cardstackMobileAppPhone2x}} 2x"
+            src={{this.cardstackMobileAppPhone}}
+            alt="Card Wallet mobile app on a smartphone"
+            width="138px"
+            height="149px"
+          >
+          {{#if this.appStoreUrl}}
+            <a href={{this.appStoreUrl}} class="layer-two-connect-card__app-store-badge">
+              <img src={{this.appStoreBadge}} width="120" height="40" alt="Download on the App Store" />
+            </a>
+          {{else}}
+            <div class="layer-two-connect-card__mobile-coming-soon">
+              Coming soon for iOS
+            </div>
+          {{/if}}
+          {{#if this.googlePlayUrl}}
+            <a href="#" class="layer-two-connect-card__google-play-badge">
+              <img src={{this.googlePlayUrl}} width="144" height="56" alt="Get it on Google Play" />
+            </a>
+          {{else}}
+            <div class="layer-two-connect-card__mobile-coming-soon">
+              Coming soon for Android
+            </div>
+          {{/if}}
+        </div>
+      </ActionCardContainer::Section>
+      <ActionCardContainer::Section
+        @title="Scan this QR code with your Card Wallet app"
+        class="layer-two-connect-card__section layer-two-connect-card__section--two"
+      >
+        {{#if @includeExplanations}}
+          <p class="layer-two-connect-card__explanation">
+              Scan this QR code with your account in the mobile app to connect it with Card Pay.
+          </p>
+        {{/if}}
+        {{#if this.layer2Network.walletConnectUri}}
+          <div data-test-wallet-connect-qr-code class="layer-two-connect-card__qr-container">
+            <StyledQrCode
+              @data={{this.layer2Network.walletConnectUri}}
+              @image={{this.cardstackLogoForQR}}
+              @size={{340}}
+              @margin={{15}}
+              @backgroundColor="#ffffff"
+              @dotType="dots"
+              @dotColor="#000"
+              @cornerDotType="dot"
+              @cornerSquareType="extra-rounded"
+              @imageMargin={{5}}
+            />
+          </div>
         {{else}}
-          <div class="layer-two-connect-card__mobile-coming-soon">
-            Coming soon for iOS
+          <div class="layer-two-connect-card__loading-qr" data-test-wallet-connect-loading-qr-code>
+            <span>
+              Loading QR Code for Card Wallet connection...
+            </span>
           </div>
         {{/if}}
-        {{#if this.googlePlayUrl}}
-          <a href="#" class="layer-two-connect-card__google-play-badge">
-            <img src={{this.googlePlayUrl}} width="144" height="56" alt="Get it on Google Play" />
-          </a>
-        {{else}}
-          <div class="layer-two-connect-card__mobile-coming-soon">
-            Coming soon for Android
-          </div>
-        {{/if}}
-      </div>
-    </section>
-    <section class="layer-two-connect-card__section-two">
-      <h2 class="layer-two-connect-card__header">
-        2. Scan this QR code with your Card Wallet app
-      </h2>
-      {{#if @includeExplanations}}
-        <p class="layer-two-connect-card__explanation">
-            Scan this QR code with your account in the mobile app to connect it with Card Pay.
-        </p>
-      {{/if}}
-      {{#if this.layer2Network.walletConnectUri}}
-        <div data-test-wallet-connect-qr-code class="layer-two-connect-card__qr-container">
-          <StyledQrCode
-            @data={{this.layer2Network.walletConnectUri}}
-            @image={{this.cardstackLogoForQR}}
-            @size={{340}}
-            @margin={{15}}
-            @backgroundColor="#ffffff"
-            @dotType="dots"
-            @dotColor="#000"
-            @cornerDotType="dot"
-            @cornerSquareType="extra-rounded"
-            @imageMargin={{5}}
-          />
-        </div>
-      {{else}}
-        <div class="layer-two-connect-card__loading-qr" data-test-wallet-connect-loading-qr-code>
-          <span>
-            Loading QR Code for Card Wallet connection...
-          </span>
-        </div>
-      {{/if}}
-    </section>
+      </ActionCardContainer::Section>
+    </ActionCardContainer::Section>
     <button class="layer-two-connect-card__alternate-wallet" type="button">
       <span>
         Use a different wallet with xDai chain support

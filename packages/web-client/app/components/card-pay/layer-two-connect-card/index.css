@@ -1,29 +1,10 @@
-.layer-two-connect-card__section-one {
-  border-bottom: 1px solid var(--boxel-light-300);
-  padding: var(--boxel-sp-xl);
+.layer-two-connect-card__body {
   padding-top: var(--boxel-sp-lg);
-  padding-bottom: 0;
-}
-
-.layer-two-connect-card__header {
-  font: 600 var(--boxel-font);
-  margin: 0;
-  padding-bottom: var(--boxel-sp-xl);
-  padding-left: 0;
-  padding-right: 0;
-}
-
-.layer-two-connect-card--with-explanations .layer-two-connect-card__header {
-  font: 600 var(--boxel-font-lg);
-  padding-bottom: var(--boxel-sp-xxs);
 }
 
 .layer-two-connect-card__explanation {
-  color: var(--boxel-purple-600);
-  padding-bottom: var(--boxel-sp-xs);
-  padding-left: 0;
-  padding-right: 0;
-  margin-top: 0;
+  margin-top: var(--boxel-sp-xs);
+  color: var(--boxel-purple-500);
 }
 
 .layer-two-connect-card__app-store-links {
@@ -41,12 +22,6 @@
   padding: 1em;
 }
 
-.layer-two-connect-card__section-two {
-  padding: var(--boxel-sp-xl);
-  padding-top: var(--boxel-sp-lg);
-}
-
-
 .layer-two-connect-card__alternate-wallet {
   align-items: center;
   background-color: var(--boxel-light-400);
@@ -61,6 +36,28 @@
   display: none; /* hide this until we add the destination UI */
 }
 
+.layer-two-connect-card__section + .layer-two-connect-card__section {
+  margin-top: 0;
+}
+
+.layer-two-connect-card__section {
+  --nested-section-padding: 0 var(--boxel-sp-lg);
+}
+
+.layer-two-connect-card__section > header::before {
+  display: block;
+  position: absolute;
+  margin-left: -2ch;
+}
+
+.layer-two-connect-card__section--one > header::before {
+  content: "1.";
+}
+
+.layer-two-connect-card__section--two > header::before {
+  content: "2.";
+}
+
 .layer-two-connect-card__alternate-wallet-caret {
   height: 1.3rem;
   width: auto;
@@ -72,9 +69,8 @@
 }
 
 .layer-two-connect-card__loading-qr,
-  .layer-two-connect-card__qr-container {
+.layer-two-connect-card__qr-container {
   text-align: center;
-  padding-bottom: var(--boxel-sp);
 }
 
 .layer-two-connect-card__loading-qr {
@@ -84,33 +80,4 @@
 
 .layer-two-connect-card__loading-qr > span {
   margin: auto;
-}
-
-.layer-two-connect-card__body {
-  padding: 0 var(--boxel-sp-lg);
-  margin-bottom: var(--boxel-sp-lg);
-}
-
-.layer-two-connect-card__body-header {
-  display: flex;
-  align-items: center;
-  padding: var(--boxel-sp-xl) 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-.layer-two-connect-card__body-header-logo {
-  width: 2.5rem;
-  height: 2.5rem;
-  margin-left: auto;
-}
-
-.layer-two-connect-card__disclaimer {
-  margin-top: var(--boxel-sp-xxl);
-  margin-bottom: var(--boxel-sp-lg);
-  font: var(--boxel-font-xs);
-  color: var(--boxel-purple-400);
-}
-
-.layer-two-connect-card__connection-status {
-  --icon-color: var(--boxel-dark);
 }

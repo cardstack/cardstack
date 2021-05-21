@@ -2,11 +2,10 @@
   @header="Token Bridge"
   @isComplete={{@isComplete}}
 >
-  <div class="transaction-status">
-    <p class="transaction-status__description">
-      Bridging tokens to xDai blockchain
-    </p>
-
+  <ActionCardContainer::Section
+    @title="Bridging tokens to xDai blockchain"
+    @icon="clock"
+  >
     <Boxel::ProgressSteps
       class="transaction-status__steps"
       @progressSteps={{this.progressSteps}}
@@ -43,5 +42,5 @@
         {{/if}}
       </span>
     </Boxel::ProgressSteps>
-  </div>
+  </ActionCardContainer::Section>
 </ActionCardContainer>

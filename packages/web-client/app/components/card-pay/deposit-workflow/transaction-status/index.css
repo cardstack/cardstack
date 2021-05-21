@@ -1,18 +1,3 @@
-.transaction-status {
-  padding: var(--boxel-sp-xxl) var(--boxel-sp-lg);
-}
-
-.transaction-status > * + * {
-  margin-top: var(--boxel-sp-xxl);
-}
-
-.transaction-status__description {
-  margin: 0;
-  font-size: 1.125rem; /* 18px */
-  font-weight: 700;
-  line-height: calc(24/18);
-}
-
 .transaction-status__steps {
   color: var(--boxel-dark);
   font: 600 var(--boxel-font);

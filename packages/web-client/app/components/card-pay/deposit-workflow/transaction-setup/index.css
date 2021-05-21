@@ -1,47 +1,26 @@
-.deposit-card__section {
-  padding: var(--boxel-sp-xxl) var(--boxel-sp-lg);
-}
-
-.deposit-card__section > * + *,
-.deposit-card__fieldset > * + * {
-  margin-top: var(--boxel-sp-xxl);
-}
-
-.deposit-card__fieldset {
-  padding: 0;
-  border: none;
-}
-
-.deposit-card__legend {
-  margin: 0;
-  padding: 0;
-  font: 700 1.125rem/calc(24/18) var(--boxel-font-family);
-  letter-spacing: 0;
-}
-
-.deposit-card__field {
+.transaction-setup__field {
   grid-template-columns: 2.5rem 1fr;
   row-gap: 0;
 }
 
-.deposit-card__title {
+.transaction-setup__title {
   font: 600 var(--boxel-font);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.deposit-card__title-sm {
+.transaction-setup__title-sm {
   font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.deposit-card__title-lg {
+.transaction-setup__title-lg {
   font-size: 1.25rem;
   font-weight: 600;
   line-height: calc(27/20);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.deposit-card__address {
+.transaction-setup__address {
   color: var(--boxel-purple-500);
   font-family: var(--boxel-monospace-font-family);
   font-size: var(--boxel-font-size);
@@ -50,41 +29,41 @@
   word-break: break-all;
 }
 
-.deposit-card__address-sm {
+.transaction-setup__address-sm {
   color: var(--boxel-purple-400);
   font-family: var(--boxel-monospace-font-family);
   font-size: var(--boxel-font-size-sm);
   line-height: calc(18 / 13);
 }
 
-.deposit-card__address--view-only {
+.transaction-setup__address--wrapped {
   max-width: 22ch;
 }
 
-.deposit-card__field-info {
+.transaction-setup__field-info {
   grid-column: 2;
 }
 
-.deposit-card__radio-buttons {
+.transaction-setup__radio-buttons {
   margin-top: var(--boxel-sp);
 }
 
-.deposit-card__radio-buttons > * + * {
+.transaction-setup__radio-buttons > * + * {
   margin-top: var(--boxel-sp);
 }
 
-.deposit-card__icon-group {
+.transaction-setup__icon-group {
   display: flex;
   align-items: center;
 }
 
-.deposit-card__icon-group-sm {
+.transaction-setup__icon-group-sm {
   display: flex;
   align-items: center;
   margin-top: var(--boxel-sp-xs);
 }
 
-.deposit-card__icon {
+.transaction-setup__icon {
   align-self: flex-start;
   width: 2.5rem;
   height: 2.5rem;
@@ -92,7 +71,7 @@
   margin-right: var(--boxel-sp-sm);
 }
 
-.deposit-card__icon-sm {
+.transaction-setup__icon-sm {
   align-self: flex-start;
   width: 1.25rem;
   height: 1.25rem;
@@ -100,7 +79,7 @@
   margin-right: var(--boxel-sp-xs);
 }
 
-.deposit-card__text-sm {
+.transaction-setup__text-sm {
   color: var(--boxel-purple-500);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);
