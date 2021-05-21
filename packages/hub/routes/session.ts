@@ -7,7 +7,7 @@ import packageJson from '../package.json';
 
 let log = Logger('route:session');
 
-const MAX_NONCE_AGE_NS = BigInt(1000 * 1000 * 60 * 5); // 5 minutes
+const MAX_NONCE_AGE_NS = BigInt(1000000 * 1000 * 60 * 5); // 5 minutes
 export default class SessionRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
 

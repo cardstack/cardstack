@@ -171,7 +171,7 @@ describe('POST /api/session', function () {
   });
 
   it('responds with 401 when nonce is more than 5 minutes old', async function () {
-    stubTimestamp = process.hrtime.bigint() - BigInt(1000 * 1000 * 60 * 6); // 6 minutes ago
+    stubTimestamp = process.hrtime.bigint() - BigInt(1000000 * 1000 * 60 * 6); // 6 minutes ago
     await request
       .post('/api/session')
       .send({
