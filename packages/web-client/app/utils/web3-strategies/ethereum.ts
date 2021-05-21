@@ -7,7 +7,7 @@ import { TransactionReceipt } from 'web3-core';
 import { getConstantByNetwork } from '@cardstack/cardpay-sdk/index.js';
 
 export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
-  chainName = 'Ethereum Mainnet';
+  chainName = 'Ethereum mainnet';
   chainId = 1;
   isConnected: boolean = false;
   walletConnectUri: string | undefined;

@@ -1,6 +1,6 @@
 <ActionCardContainer
   @suppressHeader={{@suppressHeader}}
-  @header="Wallet Connection - xDai Chain"
+  @header={{concat "Wallet - " this.layer2Network.chainName}}
   @isComplete={{@isComplete}}
   class={{if @includeExplanations 'layer-two-connect-card--with-explanations'}}
   data-test-layer-2-wallet-card
@@ -9,7 +9,7 @@
   {{#if (eq this.cardState 'memorialized')}}
     <section class="layer-two-connect-card__body">
       <header aria-label="Layer 2 Connected Header" class="layer-two-connect-card__body-header">
-        Cardstack
+        Card Wallet
         <img class="layer-two-connect-card__body-header-logo" src={{this.cardstackLogo}} alt="" role="presentation">
       </header>
       <CardPay::FieldStack>
@@ -22,7 +22,7 @@
           @value={{this.layer2Network.walletInfo.firstAddress}}
           @isAddress={{true}}
         />
-        <CardPay::LabeledValue @label="Balance*">
+        <CardPay::LabeledValue @label="Depot balance">
           <CardPay::BalancesList as |Balance|>
             <Balance @symbol="XDAI" @amount={{this.layer2Network.defaultTokenBalance}} />
           </CardPay::BalancesList>
@@ -44,13 +44,13 @@
       </:memorialized>
     </Boxel::ActionChin>
   {{else}}
-    <div class="layer-two-connect-card__section-one">
+    <section class="layer-two-connect-card__section-one">
       <h2 class="layer-two-connect-card__header">
-        1. Install the Cardstack app on your mobile phone
+        1. Install the Card Wallet app on your mobile phone
       </h2>
       {{#if @includeExplanations}}
         <p class="layer-two-connect-card__explanation">
-          Please install the Cardstack app on your mobile phone and create/add an account.
+          Please install the Card Wallet app on your mobile phone and create/add an account.
         </p>
       {{/if}}
       <div class="layer-two-connect-card__app-store-links">
@@ -58,7 +58,7 @@
           srcset="{{this.cardstackMobileAppPhone}},
                   {{this.cardstackMobileAppPhone2x}} 2x"
           src={{this.cardstackMobileAppPhone}}
-          alt="Cardstack Mobile App on a smartphone"
+          alt="Card Wallet mobile app on a smartphone"
           width="138px"
           height="149px"
         >
@@ -81,10 +81,10 @@
           </div>
         {{/if}}
       </div>
-    </div>
-    <div class="layer-two-connect-card__section-two">
+    </section>
+    <section class="layer-two-connect-card__section-two">
       <h2 class="layer-two-connect-card__header">
-        2. Scan this QR code with your Cardstack app
+        2. Scan this QR code with your Card Wallet app
       </h2>
       {{#if @includeExplanations}}
         <p class="layer-two-connect-card__explanation">
@@ -109,14 +109,14 @@
       {{else}}
         <div class="layer-two-connect-card__loading-qr" data-test-wallet-connect-loading-qr-code>
           <span>
-            Loading QR Code for Cardstack Mobile wallet connection...
+            Loading QR Code for Card Wallet connection...
           </span>
         </div>
       {{/if}}
-    </div>
+    </section>
     <button class="layer-two-connect-card__alternate-wallet" type="button">
       <span>
-        Use a different wallet with xDai Chain support
+        Use a different wallet with xDai chain support
       </span>
       {{svg-jar "caret-thin-right" class="layer-two-connect-card__alternate-wallet-caret"}}
     </button>

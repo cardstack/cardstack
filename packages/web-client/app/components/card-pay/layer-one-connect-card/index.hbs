@@ -1,6 +1,6 @@
 <ActionCardContainer
   @suppressHeader={{@suppressHeader}}
-  @header="Wallet Connection - Ethereum Mainnet"
+  @header={{concat "Wallet - " this.layer1Network.chainName}}
   @isComplete={{@isComplete}}
   class="layer-one-connect-card"
   data-test-mainnnet-connection-action-container
@@ -42,7 +42,7 @@
           It may not reflect all the tokens in your wallet.
       </div>
     {{else}}
-      <header aria-label="Layer 1 Connection Header" class="layer-one-connect-card__body-header" data-test-mainnet-connection-header>Connect your Ethereum mainnet wallet</header>
+      <header aria-label="Layer 1 Connection Header" class="layer-one-connect-card__body-header" data-test-mainnet-connection-header>Connect your {{this.layer1Network.chainName}} wallet</header>
       <CardPay::LayerOneWalletProviderSelection
         @walletProviders={{this.walletProviders}}
         @currentWalletProviderId={{this.radioWalletProviderId}}

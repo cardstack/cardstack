@@ -27,7 +27,7 @@ let cardToken = new TokenContractInfo('CARD', 'kovan');
 let daiToken = new TokenContractInfo('DAI', 'kovan');
 
 export default class KovanWeb3Strategy implements Layer1Web3Strategy {
-  chainName = 'Kovan Testnet';
+  chainName = 'Kovan testnet';
   chainId = networkIds['kovan'];
   bridgeableTokens = [daiToken, cardToken];
   walletConnectUri: string | undefined;

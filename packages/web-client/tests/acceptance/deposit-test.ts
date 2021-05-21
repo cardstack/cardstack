@@ -50,7 +50,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(0, 2))
       .containsText(
-        'The funds you wish to deposit must be available in your Mainnet Wallet'
+        'The funds you wish to deposit must be available in your mainnet wallet'
       );
 
     post = postableSel(0, 3);
@@ -59,7 +59,7 @@ module('Acceptance | deposit', function (hooks) {
       `${post} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
     );
 
-    assert.dom(post).containsText('Connect your Ethereum mainnet wallet');
+    assert.dom(post).containsText('Connect your L1 test chain wallet');
 
     await a11yAudit();
     assert.ok(true, 'no a11y errors found - layer 1 connect card');
@@ -85,12 +85,12 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor(milestoneCompletedSel(0));
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet Wallet connected');
+      .containsText('Mainnet wallet connected');
 
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        'Now it’s time to connect your xDai chain wallet via your Cardstack mobile app'
+        'Now it’s time to connect your xDai chain wallet via your Card Wallet mobile app'
       );
 
     assert
@@ -130,7 +130,7 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor(milestoneCompletedSel(1));
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai Chain wallet connected');
+      .containsText('xDai chain wallet connected');
 
     assert
       .dom(postableSel(2, 0))
@@ -237,7 +237,7 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(milestoneCompletedSel(2))
-      .containsText('Deposited into Reserve Pool');
+      .containsText('Deposited into reserve pool');
 
     assert
       .dom(postableSel(3, 0))
@@ -281,8 +281,8 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(epiloguePostableSel(1))
-      .containsText('Minted from CARD Protocol on L2 Test Chain');
-    assert.dom(epiloguePostableSel(1)).containsText('250.0 DAI CPXD');
+      .containsText('Minted from CARD Protocol on L2 test chain');
+    assert.dom(epiloguePostableSel(1)).containsText('250.0 DAI.CPXD');
 
     await waitFor(epiloguePostableSel(2));
 
@@ -360,7 +360,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(0, 2))
       .containsText(
-        'The funds you wish to deposit must be available in your Mainnet Wallet'
+        'The funds you wish to deposit must be available in your mainnet wallet'
       );
 
     assert
@@ -372,12 +372,12 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor(milestoneCompletedSel(0));
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet Wallet connected');
+      .containsText('Mainnet wallet connected');
 
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        'Now it’s time to connect your xDai chain wallet via your Cardstack mobile app'
+        'Now it’s time to connect your xDai chain wallet via your Card Wallet mobile app'
       );
 
     assert
@@ -388,7 +388,7 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(postableSel(1, 2))
-      .containsText('Loading QR Code for Cardstack Mobile wallet connection');
+      .containsText('Loading QR Code for Card Wallet connection');
 
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
@@ -410,7 +410,7 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor(milestoneCompletedSel(1));
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai Chain wallet connected');
+      .containsText('xDai chain wallet connected');
 
     assert
       .dom(postableSel(2, 0))
@@ -466,7 +466,7 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor(milestoneCompletedSel(0));
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet Wallet connected');
+      .containsText('Mainnet wallet connected');
 
     assert
       .dom(postableSel(1, 0))
@@ -477,7 +477,7 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor(milestoneCompletedSel(1));
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai Chain wallet connected');
+      .containsText('xDai chain wallet connected');
 
     assert
       .dom(postableSel(2, 0))
@@ -519,7 +519,7 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet Wallet connected');
+      .containsText('Mainnet wallet connected');
 
     assert
       .dom(postableSel(1, 0))
@@ -530,7 +530,7 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor(milestoneCompletedSel(1));
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai Chain wallet connected');
+      .containsText('xDai chain wallet connected');
 
     assert
       .dom(postableSel(2, 0))
@@ -541,7 +541,7 @@ module('Acceptance | deposit', function (hooks) {
     await click(`${postableSel(0, 4)} [data-test-mainnet-disconnect-button]`);
     assert
       .dom(postableSel(0, 4))
-      .containsText('Connect your Ethereum mainnet wallet');
+      .containsText('Connect your L1 test chain wallet');
     assert.dom(milestoneCompletedSel(1)).doesNotExist();
     assert.dom(milestoneCompletedSel(0)).doesNotExist();
   });
@@ -581,7 +581,7 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet Wallet connected');
+      .containsText('Mainnet wallet connected');
 
     assert
       .dom(postableSel(1, 0))
@@ -592,7 +592,7 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor(milestoneCompletedSel(1));
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai Chain wallet connected');
+      .containsText('xDai chain wallet connected');
 
     assert
       .dom(postableSel(2, 0))
@@ -608,7 +608,7 @@ module('Acceptance | deposit', function (hooks) {
     );
     assert
       .dom('[data-test-layer-2-wallet-card]')
-      .containsText('Install the Cardstack app on your mobile phone');
+      .containsText('Install the Card Wallet app on your mobile phone');
     assert.dom(milestoneCompletedSel(1)).doesNotExist();
   });
 });

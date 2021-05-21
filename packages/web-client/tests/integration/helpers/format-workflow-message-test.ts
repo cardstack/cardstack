@@ -11,8 +11,8 @@ module('Integration | Helper | format-workflow-message', function (hooks) {
       'inputValue',
       `In order to make a deposit, you need to connect two wallets:
 
-* Ethereum Mainnet Wallet: linked to the Ethereum blockchain on mainnet
-* xDai Chain Wallet: linked to the xDai blockchain for low-cost transactions
+* Ethereum mainnet wallet: linked to the Ethereum blockchain on mainnet
+* xDai chain wallet: linked to the xDai blockchain for low-cost transactions
 `
     );
 
@@ -22,8 +22,8 @@ module('Integration | Helper | format-workflow-message', function (hooks) {
       this.element.innerHTML,
       `<p>In order to make a deposit, you need to connect two wallets:</p>
 <ul>
-<li>Ethereum Mainnet Wallet: linked to the Ethereum blockchain on mainnet</li>
-<li>xDai Chain Wallet: linked to the xDai blockchain for low-cost transactions</li>
+<li>Ethereum mainnet wallet: linked to the Ethereum blockchain on mainnet</li>
+<li>xDai chain wallet: linked to the xDai blockchain for low-cost transactions</li>
 </ul>
 `
     );

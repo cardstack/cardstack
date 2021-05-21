@@ -54,6 +54,8 @@
             id="deposit-amount-input"
             value={{this.amount}}
             {{on "input" this.onInputAmount}}
+            autocomplete="off"
+            inputmode="decimal"
             data-test-deposit-amount-input
           />
           <div class="transaction-amount__currency-text">

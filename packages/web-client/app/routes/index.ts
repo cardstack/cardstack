@@ -93,7 +93,7 @@ const ORGS = [
     },
     id: 'card-membership',
     name: 'Card Membership',
-    subtitle: 'For creators, crypto enthusiasts & NFT minting',
+    subtitle: 'Governance & voting for crypto enthusiasts',
     description: '',
     descriptionList: null,
     cta: 'Launching soon',

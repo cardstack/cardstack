@@ -12,7 +12,7 @@ import { TransactionReceipt } from 'web3-core';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
-  chainName = 'L2 Test Chain';
+  chainName = 'L2 test chain';
   chainId = '-1';
   @tracked walletConnectUri: string | undefined;
   @tracked isConnected = false;

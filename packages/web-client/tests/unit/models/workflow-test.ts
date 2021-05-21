@@ -111,10 +111,10 @@ module('Unit | Workflow model', function (hooks) {
     assert.equal(workflow.progressStatus, secondMilestone.completedDetail);
   });
 
-  test('progressStatus returns "Workflow Started" when no milestones are complete', function (assert) {
+  test('progressStatus returns "Workflow started" when no milestones are complete', function (assert) {
     let workflow = new ConcreteWorkflow({});
     workflow.milestones = [exampleMilestone];
-    assert.equal(workflow.progressStatus, 'Workflow Started');
+    assert.equal(workflow.progressStatus, 'Workflow started');
   });
 
   test('Workflow.resetTo resets each milestone and its epilogue correctly', function (assert) {

@@ -31,7 +31,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new NetworkAwareWorkflowMessage({
           author: cardbot,
-          message: `Before we get started, please connect your xDai chain wallet via your Cardstack mobile app.  If you don’t have the app installed, please do so now.`,
+          message: `Before we get started, please connect your xDai chain wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
           includeIf() {
             return !(this as NetworkAwareWorkflowMessage).hasLayer2Account;
           },
@@ -48,7 +48,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
           componentName: 'card-pay/layer-two-connect-card',
         }),
       ],
-      completedDetail: 'xDai Chain wallet connected',
+      completedDetail: 'xDai chain wallet connected',
     }),
     new Milestone({
       title: 'Customize layout',
@@ -100,7 +100,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       postables: [
         new WorkflowMessage({
           author: cardbot,
-          message: `This is what your prepaid card will look like. 
+          message: `This is what your prepaid card will look like.
             Now, we just need your confirmation to create the card.`,
         }),
         new WorkflowCard({

@@ -19,7 +19,7 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
 
     assert
       .dom(HEADER_SELECTOR)
-      .containsText('Connect your Ethereum mainnet wallet');
+      .containsText('Connect your L1 test chain wallet');
 
     assert.dom(WALLET_SELECTION_SELECTOR).isVisible();
   });
@@ -34,7 +34,7 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
         <CardPay::LayerOneConnectCard/>
       `);
 
-    assert.dom(HEADER_SELECTOR).containsText('Metamask');
+    assert.dom(HEADER_SELECTOR).containsText('MetaMask');
   });
 
   test('It should be able to move between default (unconnected), loading, and connected states', async function (assert) {
@@ -53,13 +53,13 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
       .containsText('Waiting for you to connect');
     assert
       .dom(HEADER_SELECTOR)
-      .containsText('Connect your Ethereum mainnet wallet');
+      .containsText('Connect your L1 test chain wallet');
 
     layer1Service.test__simulateAccountsChanged(['address'], 'metamask');
     // waiting for the downstream effects of resolving a promise in test__simulateAccountsChanged
     await settled();
 
-    assert.dom(HEADER_SELECTOR).containsText('Metamask');
+    assert.dom(HEADER_SELECTOR).containsText('MetaMask');
     assert.dom(CONNECT_BUTTON_SELECTOR).doesNotExist();
     assert.dom(DISCONNECT_BUTTON_SELECTOR).isVisible();
 
@@ -67,7 +67,7 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
 
     assert
       .dom(HEADER_SELECTOR)
-      .containsText('Connect your Ethereum mainnet wallet');
+      .containsText('Connect your L1 test chain wallet');
     assert.dom(CONNECT_BUTTON_SELECTOR).isVisible();
   });
 });
