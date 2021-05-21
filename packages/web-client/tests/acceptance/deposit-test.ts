@@ -79,8 +79,8 @@ module('Acceptance | deposit', function (hooks) {
 
     await waitFor(`${post} [data-test-balance="ETH"]`);
     assert.dom(`${post} [data-test-balance="ETH"]`).containsText('2.1411');
-    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.5');
-    assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.0');
+    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.50');
+    assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.00');
 
     await waitFor(milestoneCompletedSel(0));
     assert
@@ -118,7 +118,7 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor(`${postableSel(1, 2)} [data-test-balance="XDAI"]`);
     assert
       .dom(`${postableSel(1, 2)} [data-test-balance="XDAI"]`)
-      .containsText('0.0');
+      .containsText('0.00');
     await waitUntil(
       () => !document.querySelector('[data-test-wallet-connect-qr-code]')
     );
@@ -140,9 +140,9 @@ module('Acceptance | deposit', function (hooks) {
 
     // transaction-setup card
     await waitFor(`${post} [data-test-balance="DAI"]`);
-    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.5');
+    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.50');
     assert.dom(`${post} [data-test-usd-balance="DAI"]`).containsText('50.10');
-    assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.0');
+    assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.00');
     assert
       .dom(`${post} [data-test-usd-balance="CARD"]`)
       .containsText('2000.00');
@@ -175,7 +175,7 @@ module('Acceptance | deposit', function (hooks) {
     assert.dom('[data-test-deposit-transaction-setup-is-complete]').exists();
     assert
       .dom(`${post} [data-test-balance-view-only="DAI"]`)
-      .containsText('250.5');
+      .containsText('250.50');
     // transaction-amount card
     assert
       .dom(postableSel(2, 2))
@@ -282,7 +282,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(epiloguePostableSel(1))
       .containsText('Minted from CARD Protocol on L2 test chain');
-    assert.dom(epiloguePostableSel(1)).containsText('250.0 DAI.CPXD');
+    assert.dom(epiloguePostableSel(1)).containsText('250.00 DAI.CPXD');
 
     await waitFor(epiloguePostableSel(2));
 
@@ -304,10 +304,10 @@ module('Acceptance | deposit', function (hooks) {
       .containsText('2.1411');
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI"]`)
-      .containsText('0.5');
+      .containsText('0.50');
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD"]`)
-      .containsText('10000.0');
+      .containsText('10000.00');
 
     assert
       .dom(
