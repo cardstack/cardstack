@@ -1,0 +1,42 @@
+<svg id="circler" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 32.5">
+    <line x1="-8" y1="0" x2="9.683391493429934" y2="105%" stroke-width="1.4143327907300236" stroke="white"
+        opacity="0.6492960047078657"></line>
+    <line x1="-2" y1="0" x2="15.978137916459811" y2="105%" stroke-width="0.986666044860975" stroke="white"
+        opacity="0.6386901294849565"></line>
+    <line x1="1" y1="0" x2="17.060088940036785" y2="105%" stroke-width="1.0602472380722736" stroke="white"
+        opacity="0.8553425147810239"></line>
+    <line x1="4" y1="0" x2="21.358485560192104" y2="105%" stroke-width="1.3378145423727634" stroke="white"
+        opacity="0.7815314341143753"></line>
+    <line x1="7" y1="0" x2="22.035532157933414" y2="105%" stroke-width="0.8537895165133109" stroke="white"
+        opacity="0.9186628696999479"></line>
+    <line x1="16" y1="0" x2="32.85383640817878" y2="105%" stroke-width="0.980682585016303" stroke="white"
+        opacity="0.4436583019201714"></line>
+    <line x1="19" y1="0" x2="34.307432674779626" y2="105%" stroke-width="0.8969068593358624" stroke="white"
+        opacity="0.5140457135713066"></line>
+    <line x1="22" y1="0" x2="39.19796956733368" y2="105%" stroke-width="0.9717275206132987" stroke="white"
+        opacity="0.7062126954669552"></line>
+    <line x1="25" y1="0" x2="42.710423768398" y2="105%" stroke-width="1.0200848386815047" stroke="white"
+        opacity="0.650298329113137"></line>
+    <line x1="28" y1="0" x2="43.88980152928518" y2="105%" stroke-width="0.5228057989172492" stroke="white"
+        opacity="0.8333101996312078"></line>
+    <line x1="31" y1="0" x2="46.05118042163946" y2="105%" stroke-width="0.6074020613214623" stroke="white"
+        opacity="0.8255371807442073"></line>
+    <line x1="34" y1="0" x2="51.72571484840912" y2="105%" stroke-width="1.3843627989622695" stroke="white"
+        opacity="0.6590723554933073"></line>
+    <line x1="40" y1="0" x2="55.06914199653692" y2="105%" stroke-width="1.0089183642892408" stroke="white"
+        opacity="0.8644013828147479"></line>
+    <line x1="43" y1="0" x2="59.49409196348766" y2="105%" stroke-width="0.9298843239880803" stroke="white"
+        opacity="0.7592395335368916"></line>
+    <line x1="46" y1="0" x2="63.584094324371065" y2="105%" stroke-width="0.8500204418180357" stroke="white"
+        opacity="0.6251254254328609"></line>
+    <line x1="52" y1="0" x2="68.62464402004221" y2="105%" stroke-width="0.6558983004873633" stroke="white"
+        opacity="0.9236417120438227"></line>
+    <line x1="55" y1="0" x2="71.80772137155016" y2="105%" stroke-width="0.9323909396782224" stroke="white"
+        opacity="0.6044736422151697"></line>
+    <line x1="58" y1="0" x2="73.01989947316089" y2="105%" stroke-width="0.6643863548980122" stroke="white"
+        opacity="0.43608907052124724"></line>
+    <line x1="64" y1="0" x2="81.92125258795176" y2="105%" stroke-width="1.2392419751334938" stroke="white"
+        opacity="0.6360159994375827"></line>
+    <line x1="67" y1="0" x2="83.27891568485958" y2="105%" stroke-width="0.8538856010054579" stroke="white"
+        opacity="0.9495213947550918"></line>
+</svg>

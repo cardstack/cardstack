@@ -1,0 +1,33 @@
+<article
+  class="prepaid-card"
+  style={{css-var header-background=@headerBackground header-theme=(concat "url(" @headerTheme ")")}}
+  data-test-prepaid-card-background={{@headerBackground}}
+  data-test-prepaid-card-theme={{@headerTheme}}
+>
+  <header class="prepaid-card__header">
+    <div class="prepaid-card__background">
+    </div>
+    <div>
+      <div>Issued by</div>
+      <div class="prepaid-card__name">{{or @issuerName "Enter name"}}</div>
+    </div>
+    <div>
+      <div class="prepaid-card__address">{{truncate-middle @address 7 4}}</div>
+      <div>on {{@network}}</div>
+    </div>
+  </header>
+  <section class="prepaid-card__content">
+    <div>
+      <div class="prepaid-card__balance-label">Face Value</div>
+      <div class={{cn "prepaid-card__balance" prepaid-card__balance--mock=@mockBalance}}><span>§{{@balance}}</span> SPEND</div>
+      <div class={{cn "prepaid-card__usd-balance" prepaid-card__usd-balance--mock=@mockBalance}}>${{@usdBalance}} USD</div>
+    </div>
+    <div class="prepaid-card__content-rs">
+      <div class="prepaid-card__logo" />
+      <div class="prepaid-card__attributes">
+        <div>Reloadable</div>
+        <div>Transferable</div>
+      </div>
+    </div>
+  </section>
+</article>

@@ -1,0 +1,25 @@
+.layout-customization {
+  --theme-swatch-width: 5rem;
+  --theme-swatch-height: 3.25rem;
+  --background-swatch-width: 1.5rem;
+  --background-swatch-height: 1.5rem;
+}
+
+.layout-customization__body {
+  padding: 0 var(--boxel-sp-lg);
+}
+
+.layout-customization__body-header {
+  display: flex;
+  align-items: center;
+  padding: var(--boxel-sp-xl) 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.layout-customization__disclaimer {
+  margin-top: var(--boxel-sp-xxl);
+  margin-bottom: var(--boxel-sp-lg);
+  font: var(--boxel-font-xs);
+  color: var(--boxel-purple-400);
+}

@@ -2,17 +2,58 @@
   @header="Layout Customization"
   @isComplete={{@isComplete}}
   data-test-layout-customization-is-complete={{@isComplete}}
+  class="layout-customization"
 >
+<section class="layout-customization__body">
+  <header class="layout-customization__body-header">
+    Customize the layout of your prepaid card
+  </header>
+  {{#if @isComplete}}
+    <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::DisplayView
+      @issuerName={{this.issuerName}}
+      @headerBackground={{this.headerBackground}}
+      @headerTheme={{this.headerTheme}}
+    />
+  {{else}}
+    <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::FormView
+      @issuerName={{this.issuerName}}
+      @colorOptions={{this.colorOptions}}
+      @themeOptions={{this.themeOptions}}
+      @headerBackground={{this.headerBackground}}
+      @updateHeaderBackground={{this.updateHeaderBackground}}
+      @headerTheme={{this.headerTheme}}
+      @updateHeaderTheme={{this.updateHeaderTheme}}
+    />
+  {{/if}}
+
+  <div class="layout-customization__disclaimer">
+    * The issuer name will be visible to others. Please don’t include any personally identifiable information that you want to keep private.
+  </div>
+</section>
   <Boxel::ActionChin
-    @state={{if @isComplete "memorialized" "default"}}
+    @state={{this.ctaState}}
     data-test-layout-customization
   >
-    <:default as |d|>
+    <:default as |a|>
+      <a.ActionButton
+        {{on "click" this.save}}
+      >
+        Save layout
+      </a.ActionButton>
+    </:default>
+    <:disabled as |d|>
       <d.ActionButton
-        {{on "click" @onComplete}}
+        {{on "click" this.save}}
       >
         Save layout
       </d.ActionButton>
-    </:default>
+    </:disabled>
+    <:memorialized as |m|>
+      <m.ActionButton
+        {{on "click" this.edit}}
+      >
+        Edit
+      </m.ActionButton>
+    </:memorialized>
   </Boxel::ActionChin>
 </ActionCardContainer>

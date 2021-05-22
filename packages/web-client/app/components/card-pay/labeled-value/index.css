@@ -37,3 +37,21 @@
   height: 1.25rem;
   margin-right: 0.5rem;
 }
+
+
+.card-pay-labeled-value--vertical {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-pay-labeled-value--vertical .card-pay-labeled-value__label {
+  color: var(--boxel-purple-400);
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+  margin-bottom: var(--boxel-sp-xxxs);
+}
+
+.card-pay-labeled-value--vertical.card-pay-labeled-value--has-block .card-pay-labeled-value__label {
+  margin-bottom: var(--boxel-sp-xs);
+}

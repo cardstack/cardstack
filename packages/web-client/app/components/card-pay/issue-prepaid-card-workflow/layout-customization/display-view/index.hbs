@@ -1,0 +1,37 @@
+<div class="layout-display-view__content" data-test-layout-customization-display>
+  <Boxel::Field
+    @label="Card Preview"
+    @fieldMode="view"
+    class="layout-display-view__card-preview-field"
+  >
+    <div class="layout-display-view__card">
+      <CardPay::PrepaidCard
+        @issuerName={{@issuerName}}
+        @headerBackground={{@headerBackground.id}}
+        @headerTheme={{@headerTheme.id}}
+        @mockBalance={{true}}
+        @balance="123,456"
+        @usdBalance="123,456"
+        @address="0x1234...abcd"
+        @network="xDai Chain"
+      />
+    </div>
+  </Boxel::Field>
+  <CardPay::FieldStack class="layout-display-view__data">
+    <CardPay::LabeledValue @vertical={{true}} @label="Issued by*" @value={{@issuerName}}/>
+    <CardPay::LabeledValue @vertical={{true}} @label="Background color">
+      <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
+        @type="background"
+        @swatchBackground={{@headerBackground.background}}
+        @swatchImage={{@headerBackground.image}}
+      />
+    </CardPay::LabeledValue>
+    <CardPay::LabeledValue @vertical={{true}} @label="Theme">
+      <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
+        @type="theme"
+        @swatchBackground={{@headerTheme.background}}
+        @swatchImage={{@headerTheme.image}}
+      />
+    </CardPay::LabeledValue>
+  </CardPay::FieldStack>
+</div>
