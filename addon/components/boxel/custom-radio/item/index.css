@@ -4,6 +4,7 @@
 */
 .boxel-custom-radio__label {
   display: block;
+  position: relative;
 }
 
 /* https://css-tricks.com/customise-radio-buttons-without-compromising-accessibility/ */
