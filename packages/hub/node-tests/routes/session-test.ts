@@ -46,11 +46,22 @@ describe('GET /api/session', function () {
   });
 
   it('without bearer token, responds with 401 and nonce in JSON', async function () {
-    request
+    await request
       .get('/api/session')
       .set('Accept', 'application/vnd.api+json')
       .expect(401)
-      .expect({ data: { attributes: { nonce: stubNonce, version: packageJson.version } } })
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+            meta: {
+              nonce: stubNonce,
+              version: packageJson.version,
+            },
+          },
+        ],
+      })
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
@@ -60,7 +71,7 @@ describe('GET /api/session', function () {
       expect(encryptedString).to.equal('abc123--def456--ghi789');
       return stubUserAddress;
     };
-    request
+    await request
       .get('/api/session')
       .set('Accept', 'application/vnd.api+json')
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -74,12 +85,23 @@ describe('GET /api/session', function () {
       expect(encryptedString).to.equal('abc123--def456--ghi789');
       throw new Error('Invalid auth token');
     };
-    request
+    await request
       .get('/api/session')
       .set('Accept', 'application/vnd.api+json')
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .expect(401)
-      .expect({ data: { attributes: { nonce: stubNonce, version: packageJson.version } } })
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+            meta: {
+              nonce: stubNonce,
+              version: packageJson.version,
+            },
+          },
+        ],
+      })
       .expect('Content-Type', 'application/vnd.api+json');
   });
 });
@@ -165,7 +187,15 @@ describe('POST /api/session', function () {
       .set('Accept', 'application/vnd.api+json')
       .expect(401)
       .expect('Content-Type', /json/)
-      .expect({ error: 'Signature not verified' });
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'Invalid signature',
+            detail: 'Signature not verified for specified address',
+          },
+        ],
+      });
   });
 
   it('responds with 401 when nonce is more than 5 minutes old', async function () {
@@ -181,7 +211,15 @@ describe('POST /api/session', function () {
       .set('Accept', 'application/vnd.api+json')
       .expect(401)
       .expect('Content-Type', /json/)
-      .expect({ error: 'Expired nonce' });
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'Invalid signature',
+            detail: 'Expired nonce',
+          },
+        ],
+      });
   });
 
   // * Server verifies that nonce is not in redis SET of recently used nonces. On failure, 401 "Nonce already used"

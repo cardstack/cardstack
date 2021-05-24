@@ -24,28 +24,41 @@ export default class SessionRoute {
     } else {
       ctx.status = 401;
       ctx.body = {
-        data: {
-          attributes: {
-            nonce: this.authenticationUtils.generateNonce(),
-            version: packageJson.version,
+        errors: [
+          {
+            meta: {
+              nonce: this.authenticationUtils.generateNonce(),
+              version: packageJson.version,
+            },
+            status: '401',
+            title: 'No valid auth token',
           },
-        },
+        ],
       };
     }
     ctx.type = 'application/vnd.api+json';
   }
 
   async post(ctx: Koa.Context) {
+    function setUnauthorizedResponse(detail: string): void {
+      ctx.status = 401;
+      ctx.body = {
+        errors: [
+          {
+            status: '401',
+            title: 'Invalid signature',
+            detail,
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+    }
     let { authData, signature } = ctx.request.body.data.attributes;
     let userAddress = authData.message.user;
     let nonce = authData.message.nonce;
     let nonceTimestamp = this.authenticationUtils.extractVerifiedTimestamp(nonce);
     if (nonceTimestamp < process.hrtime.bigint() - MAX_NONCE_AGE_NS) {
-      ctx.status = 401;
-      ctx.body = {
-        error: 'Expired nonce',
-      };
-      ctx.type = 'application/vnd.api+json';
+      setUnauthorizedResponse('Expired nonce');
       return;
     }
 
@@ -73,11 +86,7 @@ export default class SessionRoute {
     } catch (e) {
       log.debug('Failure recovering address to verify ownership. Session will not be established.', e);
     }
-    ctx.status = 401;
-    ctx.body = {
-      error: 'Signature not verified',
-    };
-    ctx.type = 'application/vnd.api+json';
+    setUnauthorizedResponse('Signature not verified for specified address');
   }
 }
 

@@ -3,12 +3,8 @@ import { networkName, signTypedData } from './utils';
 import { networkIds } from './constants';
 
 interface NonceResponse {
-  data: {
-    attributes: {
-      nonce: string;
-      version: string;
-    };
-  };
+  nonce: string;
+  version: string;
 }
 
 export default class HubAuth {
@@ -27,12 +23,12 @@ export default class HubAuth {
       throw new Error('Failure fetching nonce');
     }
     let responseJson = await response.json();
-    return responseJson;
+    return responseJson.errors[0].meta;
   }
 
   async authenticate(): Promise<string> {
     let ownerAddress = (await this.layer2Web3.eth.getAccounts())[0];
-    let { nonce, version } = (await this.getNonce()).data.attributes;
+    let { nonce, version } = await this.getNonce();
     let name = await networkName(this.layer2Web3);
     let chainId = networkIds[name];
     const typedData = {
