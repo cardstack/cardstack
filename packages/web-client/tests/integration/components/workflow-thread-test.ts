@@ -72,6 +72,60 @@ module('Integration | Component | workflow-thread', function (hooks) {
     assert.dom('[data-test-workflow-thread]').isFocused();
   });
 
+  test('it uses the appropriate text for milestone statuses', async function (assert) {
+    let workflow = new ConcreteWorkflow(this.owner);
+    workflow.milestones = [
+      new Milestone({
+        title: 'First milestone',
+        postables: [
+          new WorkflowMessage({
+            author: { name: 'cardbot' },
+            message: 'Hello world',
+          }),
+        ],
+        completedDetail: 'You are number one!',
+      }),
+      new Milestone({
+        title: 'Second milestone',
+        postables: [
+          new WorkflowMessage({
+            author: { name: 'cardbot' },
+            message: 'Hello world',
+          }),
+        ],
+        completedDetail: 'Had to do number two!',
+      }),
+      new Milestone({
+        title: 'Third milestone',
+        postables: [
+          new WorkflowMessage({
+            author: { name: 'cardbot' },
+            message: 'Hello world',
+          }),
+        ],
+        completedDetail: 'Finished',
+      }),
+    ];
+
+    this.set('workflow', workflow);
+    workflow.attachWorkflow();
+    await render(hbs`
+      <WorkflowThread @workflow={{this.workflow}} />
+    `);
+    assert
+      .dom('[data-test-milestone-completed][data-test-milestone="0"]')
+      .containsText('Milestone reached');
+    assert
+      .dom('[data-test-milestone-completed][data-test-milestone="1"]')
+      .containsText('Milestone reached');
+    assert
+      .dom('[data-test-milestone-completed][data-test-milestone="2"]')
+      .containsText(
+        'Workflow completed',
+        "Final milestone should have text 'Workflow completed'"
+      );
+  });
+
   test('it renders epilogue posts after the workflow is complete', async function (assert) {
     let workflow = new ConcreteWorkflow(this.owner);
     let postable1 = new WorkflowPostable({ name: 'cardbot' });
