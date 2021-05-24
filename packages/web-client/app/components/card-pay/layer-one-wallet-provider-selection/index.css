@@ -26,7 +26,6 @@
   height: var(--row-height);
   width: 100%;
   max-width: var(--ideal-column-width);
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
