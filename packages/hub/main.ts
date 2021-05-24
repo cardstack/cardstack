@@ -3,7 +3,6 @@
 import Koa from 'koa';
 import logger from '@cardstack/logger';
 import { Registry, Container, RegistryCallback } from './dependency-injection';
-import { join } from 'path';
 
 import AuthenticationMiddleware from './authentication-middleware';
 import DevelopmentConfig from './development-config';
@@ -11,21 +10,21 @@ import DevelopmentProxyMiddleware from './development-proxy-middleware';
 import SessionRoute from './routes/session';
 import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './jsonapi-middleware';
+import NonceTracker from './nonce-tracker';
 import { Clock } from './utils/clock';
+import { RedisClientFactory } from './redis-client-factory';
 
 const log = logger('cardstack/hub');
 
-// Careful: this assumes that you are running the hub from a mono repo context.
-export const builtInCardsDir = join(__dirname, '..', '..', 'cards');
-
 export function wireItUp(registryCallback?: RegistryCallback): Container {
   let registry = new Registry();
+  registry.register('authentication-middleware', AuthenticationMiddleware);
+  registry.register('authentication-utils', AuthenticationUtils);
   registry.register('clock', Clock);
   registry.register('development-config', DevelopmentConfig);
-  registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
   registry.register('jsonapi-middleware', JsonapiMiddleware);
-  registry.register('authentication-utils', AuthenticationUtils);
+  registry.register('redis-client', new RedisClientFactory());
   registry.register('session-route', SessionRoute);
   if (registryCallback) {
     registryCallback(registry);
