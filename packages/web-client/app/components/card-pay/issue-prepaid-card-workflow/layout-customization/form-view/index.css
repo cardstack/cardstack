@@ -15,7 +15,6 @@
 }
 
 .layout-form-view__selection-item {
-  position: relative; /* radio input fixing */
   box-shadow: 
     0 0 1px var(--selection-item-inner-border-width) #fff, 
     0 0 1px calc(var(--selection-item-inner-border-width) + var(--selection-item-outer-border-width)) #000;

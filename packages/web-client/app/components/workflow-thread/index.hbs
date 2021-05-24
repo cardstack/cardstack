@@ -18,6 +18,7 @@
       {{#if milestone.isComplete}}
         <Boxel::MilestoneBanner
           @title={{milestone.completedDetail}}
+          @status={{if (eq i (dec @workflow.milestones.length)) "Workflow completed" "Milestone reached"}}
           data-milestone={{i}}
           data-test-milestone-completed
           data-test-milestone={{i}}
