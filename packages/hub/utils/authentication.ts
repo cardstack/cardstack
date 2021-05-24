@@ -1,4 +1,4 @@
-import { inject } from '@cardstack/hub/dependency-injection';
+import { inject } from '../dependency-injection';
 import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'crypto';
 import { Clock } from './clock';
 import queryString from 'query-string';
