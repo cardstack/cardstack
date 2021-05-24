@@ -4,10 +4,7 @@
   data-test-layout-customization-is-complete={{@isComplete}}
   class="layout-customization"
 >
-<section class="layout-customization__body">
-  <header class="layout-customization__body-header">
-    Customize the layout of your prepaid card
-  </header>
+<ActionCardContainer::Section @title="Customize the layout of your prepaid card">
   {{#if @isComplete}}
     <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::DisplayView
       @issuerName={{this.issuerName}}
@@ -29,7 +26,7 @@
   <div class="layout-customization__disclaimer">
     * The issuer name will be visible to others. Please don’t include any personally identifiable information that you want to keep private.
   </div>
-</section>
+</ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{this.ctaState}}
     data-test-layout-customization
