@@ -78,6 +78,13 @@ export interface CompiledCard {
   assets: Asset[];
 }
 
+export const MODEL = '@model';
+export const FIELDS = '@fields';
+export interface TemplateUsageMeta {
+  '@model': 'self' | Set<string>;
+  '@fields': Set<string>;
+}
+
 export interface ComponentInfo {
   moduleName: string;
   usedFields: string[]; // ["title", "author.firstName"]

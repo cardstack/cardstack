@@ -1,3 +1,4 @@
+import isEqual from 'lodash/isEqual';
 import QUnit from 'qunit';
 
 function standardize(src: string) {
@@ -39,6 +40,22 @@ export function containsSource(
     result,
     actual,
     expected,
+    message,
+  });
+}
+
+export function assertEqualSets(
+  actual: unknown,
+  expected: string[],
+  message?: string
+): void {
+  let expectedSet = new Set(expected);
+  let result = isEqual(actual, expectedSet);
+  message ||= 'Sets<> are equal';
+  QUnit.assert.pushResult({
+    result,
+    actual,
+    expected: expectedSet,
     message,
   });
 }

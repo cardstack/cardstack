@@ -23,9 +23,11 @@ import {
   Builder,
   CompiledCard,
   ComponentInfo,
+  FIELDS,
   Format,
   FORMATS,
   RawCard,
+  TemplateUsageMeta,
 } from './interfaces';
 import { getBasenameAndExtension, getFieldForPath } from './utils';
 
@@ -185,7 +187,7 @@ export class Compiler {
   }
 
   private getSource(cardSource: RawCard, path: string): string {
-    let schemaSrc = cardSource.files[path];
+    let schemaSrc = cardSource.files?.[path];
     if (!schemaSrc) {
       throw new Error(
         `${cardSource.url} refers to ${path} in its card.json but that file does not exist`
@@ -318,23 +320,28 @@ export class Compiler {
       fields,
       cardURL,
       inlineHBS: undefined,
-      usedFields: [] as ComponentInfo['usedFields'],
+      usageMeta: { '@model': new Set(), '@fields': new Set() },
     };
 
     let out = transformSync(templateSource, {
       plugins: [[cardTemplatePlugin, options]],
     });
 
-    let hashedFilename = hashFilenameFromFields(localFile, fields);
+    let moduleName = await this.define(
+      cardURL,
+      hashFilenameFromFields(localFile, fields),
+      out!.code!
+    );
+    let usedFields = buildUsedFieldsList(fields, options.usageMeta);
 
     let componentInfo: ComponentInfo = {
-      moduleName: await this.define(cardURL, hashedFilename, out!.code!),
-      usedFields: options.usedFields,
+      moduleName,
+      usedFields,
       inlineHBS: options.inlineHBS,
       sourceCardURL: cardURL,
     };
 
-    let deserialize = getDeserializationMap(fields, options.usedFields);
+    let deserialize = getDeserializationMap(fields, usedFields);
     if (deserialize) {
       componentInfo.deserialize = deserialize;
     }
@@ -393,4 +400,10 @@ function getDeserializationMap(
 
   assertValidDeserializationMap(map);
   return map;
+}
+function buildUsedFieldsList(
+  fields: CompiledCard['fields'],
+  usageMeta: TemplateUsageMeta
+): ComponentInfo['usedFields'] {
+  return [...usageMeta[FIELDS]];
 }

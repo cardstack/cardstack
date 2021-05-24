@@ -6,7 +6,13 @@ import type {
   Statement,
   Node,
 } from '@glimmer/syntax/dist/types/lib/v1/api';
-import { CompiledCard, ComponentInfo, Field } from '../interfaces';
+import {
+  CompiledCard,
+  Field,
+  FIELDS,
+  MODEL,
+  TemplateUsageMeta,
+} from '../interfaces';
 import { singularize } from 'inflection';
 import { capitalize, cloneDeep } from 'lodash';
 import { inlineTemplateForField } from './inline-field-plugin';
@@ -17,11 +23,6 @@ class InvalidFieldsUsageError extends Error {
   message = 'Invalid use of @fields API';
 }
 
-const MODEL = '@model';
-const MODEL_PREFIX = `${MODEL}.`;
-const FIELDS = '@fields';
-const FIELDS_PREFIX = `${FIELDS}.`;
-
 type ImportAndChooseName = (
   desiredName: string,
   moduleSpecifier: string,
@@ -30,7 +31,7 @@ type ImportAndChooseName = (
 
 export interface Options {
   fields: CompiledCard['fields'];
-  usedFields: ComponentInfo['usedFields'];
+  usageMeta: TemplateUsageMeta;
   importAndChooseName: ImportAndChooseName;
 }
 
@@ -81,7 +82,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   return function transform(
     env: syntax.ASTPluginEnvironment
   ): syntax.ASTPlugin {
-    let { fields, importAndChooseName, usedFields } = options;
+    let { fields, importAndChooseName, usageMeta } = options;
     let state: State = {
       scopes: [new Map()],
       nextScope: undefined,
@@ -104,16 +105,14 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               throw new Error(`unknown field ${fieldFullPath}`);
             }
             if (field.type === 'containsMany') {
-              return expandContainsManyShorthand(
-                `${FIELDS_PREFIX}${fieldFullPath}`
-              );
+              return expandContainsManyShorthand(`${FIELDS}.${fieldFullPath}`);
             }
-            usedFields.push(fieldFullPath);
+            usageMeta[FIELDS].add(fieldFullPath);
             return rewriteElementNode({
               field,
               importAndChooseName,
               modelArgument: fieldFullPath,
-              prefix: MODEL_PREFIX,
+              prefix: `${MODEL}.`,
             });
           }
 
@@ -134,10 +133,10 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             case 'fieldComponent':
               if (val.expandable && val.field.type === 'containsMany') {
                 return expandContainsManyShorthand(
-                  `${FIELDS_PREFIX}${val.fieldFullPath}`
+                  `${FIELDS}.${val.fieldFullPath}`
                 );
               }
-              usedFields.push(val.fieldFullPath);
+              usageMeta[FIELDS].add(val.fieldFullPath);
               return rewriteElementNode({
                 field: val.field,
                 importAndChooseName,
@@ -150,9 +149,9 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
 
         PathExpression(node, path) {
           if (state.handledFieldExpressions.has(node)) {
-            return env.syntax.builders.path(
-              `${MODEL_PREFIX}${node.original.slice(FIELDS_PREFIX.length)}`
-            );
+            let pathTail = node.original.slice(`${FIELDS}.`.length);
+            usageMeta[FIELDS].add(pathTail);
+            return env.syntax.builders.path(`${MODEL}.${pathTail}`);
           }
 
           let val = lookupScopeVal(node.original, path, state);
@@ -161,6 +160,8 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               if (isFieldPathExpression(node)) {
                 throw new InvalidFieldsUsageError();
               }
+              trackUsageForModel(usageMeta, node);
+
               return;
             case 'stringLiteral':
               return env.syntax.builders.string(val.value);
@@ -429,9 +430,27 @@ function fieldPathForPathExpression(exp: PathExpression): string | undefined {
   return undefined;
 }
 
+function trackUsageForModel(
+  usageMeta: TemplateUsageMeta,
+  node: syntax.ASTv1.PathExpression
+) {
+  if (node.head.type !== 'AtHead' || node.head.name !== MODEL) {
+    return;
+  }
+
+  let path = node.tail.join('.');
+  if (!path) {
+    usageMeta[MODEL] = 'self';
+  } else {
+    if (usageMeta[MODEL] !== 'self' && !usageMeta[FIELDS].has(path)) {
+      (usageMeta[MODEL] as Set<string>).add(path);
+    }
+  }
+}
+
 function fieldPathForElementNode(node: ElementNode): string | undefined {
-  if (node.tag.startsWith(FIELDS_PREFIX)) {
-    return node.tag.slice(FIELDS_PREFIX.length);
+  if (node.tag.startsWith(`${FIELDS}.`)) {
+    return node.tag.slice(`${FIELDS}.`.length);
   }
   return undefined;
 }
