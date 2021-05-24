@@ -1,6 +1,6 @@
 import { Memoize } from 'typescript-memoize';
 import { Deferred } from './deferred';
-import { Container as ContainerInterface, Factory } from './container';
+import { Container as ContainerInterface, Factory, isFactoryByCreateMethod } from './container';
 
 let nonce = 0;
 
@@ -26,7 +26,15 @@ export class Container implements ContainerInterface {
     }
 
     let factory = this.lookupFactory(name);
-    return this.provideInjections(() => new factory(), name);
+    return this.provideInjections(() => {
+      let instance: any;
+      if (isFactoryByCreateMethod(factory)) {
+        instance = factory.create();
+      } else {
+        instance = new factory();
+      }
+      return instance;
+    }, name);
   }
 
   private lookupFactory(name: string): Factory<any> {
@@ -45,7 +53,11 @@ export class Container implements ContainerInterface {
   // that they are all using the same indexer instance.
   async instantiate<T, A extends unknown[]>(factory: Factory<T, A>, ...args: A): Promise<T> {
     let { instance, promise } = this.provideInjections(() => {
-      return new factory(...args);
+      if (isFactoryByCreateMethod(factory)) {
+        return factory.create(...args);
+      } else {
+        return new factory(...args);
+      }
     });
 
     await promise;

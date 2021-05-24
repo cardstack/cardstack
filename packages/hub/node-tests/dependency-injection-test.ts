@@ -14,6 +14,7 @@ describe('hub/dependency-injection', function () {
     registry.register('testCircleTwo', CircleTwoService);
     registry.register('testCircleThree', CircleThreeService);
     registry.register('testCircleFour', CircleFourService);
+    registry.register('testCircleFive', new CircleFiveServiceFactory());
   });
 
   beforeEach(function () {
@@ -94,6 +95,12 @@ describe('hub/dependency-injection', function () {
       );
     }
   });
+
+  it('supports method factory as an alternative to constructor factories', async function () {
+    let five = await container.lookup('testCircleFive');
+    expect(five.iAmFive).equals(true);
+    expect(five.testCircleTwo?.iAmTwo).equals(true);
+  });
 });
 
 let exampleServiceTornDown = false;
@@ -157,6 +164,16 @@ class CircleFourService {
   iAmFour = true;
 }
 
+class CircleFiveService {
+  testCircleTwo = inject('testCircleTwo');
+  iAmFive = true;
+}
+class CircleFiveServiceFactory {
+  create() {
+    return new CircleFiveService();
+  }
+}
+
 declare module '@cardstack/hub/dependency-injection' {
   interface KnownServices {
     testExample: ExampleService;
@@ -167,5 +184,6 @@ declare module '@cardstack/hub/dependency-injection' {
     testCircleTwo: CircleTwoService;
     testCircleThree: CircleThreeService;
     testCircleFour: CircleFourService;
+    testCircleFive: CircleFiveService;
   }
 }
