@@ -1,15 +1,16 @@
 import Koa from 'koa';
 import { inject } from '../dependency-injection';
 import { AuthenticationUtils } from '../utils/authentication';
+import NonceTracker, { MAX_NONCE_AGE_NS } from '../nonce-tracker';
 import { recoverTypedSignature } from 'eth-sig-util';
 import Logger from '@cardstack/logger';
 import packageJson from '../package.json';
 
 let log = Logger('route:session');
 
-const MAX_NONCE_AGE_NS = BigInt(1000000 * 1000 * 60 * 5); // 5 minutes
 export default class SessionRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
+  nonceTracker: NonceTracker = inject('nonce-tracker', { as: 'nonceTracker' });
 
   get(ctx: Koa.Context) {
     if (ctx.state.userAddress) {
@@ -61,6 +62,10 @@ export default class SessionRoute {
       setUnauthorizedResponse('Expired nonce');
       return;
     }
+    if (await this.nonceTracker.wasRecentlyUsed(nonce)) {
+      setUnauthorizedResponse('Nonce already used');
+      return;
+    }
 
     try {
       let recoveredAddress = recoverTypedSignature({
@@ -81,6 +86,7 @@ export default class SessionRoute {
           },
         };
         ctx.type = 'application/vnd.api+json';
+        await this.nonceTracker.markRecentlyUsed(nonce);
         return;
       }
     } catch (e) {

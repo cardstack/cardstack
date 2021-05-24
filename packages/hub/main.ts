@@ -13,7 +13,7 @@ import JsonapiMiddleware from './jsonapi-middleware';
 import NonceTracker from './nonce-tracker';
 import { Clock } from './utils/clock';
 import { RedisClientFactory } from './redis-client-factory';
-
+import { ShutdownHelper } from './shutdown-helper';
 const log = logger('cardstack/hub');
 
 export function wireItUp(registryCallback?: RegistryCallback): Container {
@@ -24,8 +24,10 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('development-config', DevelopmentConfig);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
   registry.register('jsonapi-middleware', JsonapiMiddleware);
+  registry.register('nonce-tracker', NonceTracker);
   registry.register('redis-client', new RedisClientFactory());
   registry.register('session-route', SessionRoute);
+  registry.register('shutdown-helper', ShutdownHelper);
   if (registryCallback) {
     registryCallback(registry);
   }
@@ -50,7 +52,16 @@ export async function makeServer(registryCallback?: RegistryCallback) {
     ctx.body = 'Hello World ' + ctx.environment + ' ' + ctx.host.split(':')[0];
   });
 
+  app.on('close', async function () {
+    (await lookupShutdownHelper(container)).onShutdown();
+  });
+
   return app;
+}
+
+async function lookupShutdownHelper(container: Container): Promise<ShutdownHelper> {
+  let instance = await container.lookup('shutdown-helper');
+  return (instance as unknown) as ShutdownHelper;
 }
 
 export function bootEnvironment() {
@@ -100,6 +111,7 @@ export function bootEnvironmentForTesting(config: StartupConfig) {
       process.stderr.write(warning.stack);
     }
   });
+
   return runServer(config).catch((err: Error) => {
     log.error('Server failed to start cleanly: %s', err.stack || err);
     process.exit(-1);
@@ -113,6 +125,9 @@ async function runServer(config: StartupConfig) {
   if (process.connected) {
     process.send!('hub hello');
   }
+  server.on('close', function () {
+    app.emit('close'); // supports our ShutdownHelper
+  });
   return server;
 }
 

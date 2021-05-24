@@ -28,6 +28,19 @@ class StubAuthenticationUtils {
     return handleValidateAuthToken(encryptedAuthToken);
   }
 }
+
+let stubNonceUsed = false;
+let recentlyUsedNonce: string;
+class StubNonceTracker {
+  async wasRecentlyUsed(_nonce: string): Promise<boolean> {
+    return Promise.resolve(stubNonceUsed);
+  }
+  async markRecentlyUsed(nonce: string): Promise<void> {
+    recentlyUsedNonce = nonce;
+    return Promise.resolve();
+  }
+}
+
 describe('GET /api/session', function () {
   let server: Server;
   let request: supertest.SuperTest<Test>;
@@ -117,6 +130,7 @@ describe('POST /api/session', function () {
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
         registry.register('clock', AcceleratableClock);
+        registry.register('nonce-tracker', StubNonceTracker);
       },
     });
     request = supertest(server);
@@ -152,7 +166,7 @@ describe('POST /api/session', function () {
     stubTimestamp = process.hrtime.bigint();
   });
 
-  it('responds with auth token when signature is correct', async function () {
+  it('responds with auth token when signature is correct, and retires nonce', async function () {
     await request
       .post('/api/session')
       .send({
@@ -171,6 +185,7 @@ describe('POST /api/session', function () {
           },
         },
       });
+    expect(recentlyUsedNonce).to.equal(bodyWithCorrectSignature.authData.message.nonce);
   });
 
   it('responds with 401 when signature invalid', async function () {
@@ -217,6 +232,30 @@ describe('POST /api/session', function () {
             status: '401',
             title: 'Invalid signature',
             detail: 'Expired nonce',
+          },
+        ],
+      });
+  });
+
+  it('responds with 401 when nonce has already been used', async function () {
+    stubNonceUsed = true;
+    await request
+      .post('/api/session')
+      .send({
+        data: {
+          attributes: bodyWithCorrectSignature,
+        },
+      })
+      .set('Content-Type', 'application/vnd.api+json')
+      .set('Accept', 'application/vnd.api+json')
+      .expect(401)
+      .expect('Content-Type', /json/)
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'Invalid signature',
+            detail: 'Nonce already used',
           },
         ],
       });
