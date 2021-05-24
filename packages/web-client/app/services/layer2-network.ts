@@ -40,10 +40,6 @@ export default class Layer2Network extends Service {
     }
   }
 
-  get hasAccount() {
-    return this.walletInfo.accounts.length > 0;
-  }
-
   async updateUsdConverters(
     symbolsToUpdate: ConvertibleSymbol[]
   ): Promise<Record<ConvertibleSymbol, ConversionFunction>> {

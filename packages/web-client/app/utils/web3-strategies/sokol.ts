@@ -29,7 +29,6 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   provider: WalletConnectProvider | undefined;
 
   @reads('provider.connector') connector!: IConnector;
-  @tracked isConnected = false;
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo = new WalletInfo([], this.chainId) as WalletInfo;
   @tracked defaultTokenBalance: BN | undefined;
@@ -87,7 +86,6 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
         console.error('error disconnecting', error);
         throw error;
       }
-      this.isConnected = false;
       this.clearWalletInfo();
       this.walletConnectUri = undefined;
       setTimeout(() => {
@@ -97,8 +95,11 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     await this.provider.enable();
     this.web3 = new Web3(this.provider as any);
     this.#exchangeRateApi = new ExchangeRate(this.web3);
-    this.isConnected = true;
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
+  }
+
+  get isConnected(): boolean {
+    return this.walletInfo.accounts.length > 0;
   }
 
   updateWalletInfo(accounts: string[], chainId: number) {

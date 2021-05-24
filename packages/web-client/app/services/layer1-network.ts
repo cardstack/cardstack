@@ -45,10 +45,6 @@ export default class Layer1Network extends Service {
     this.strategy.disconnect();
   }
 
-  get hasAccount() {
-    return this.walletInfo.accounts.length > 0;
-  }
-
   @task *approve(amount: BN, tokenSymbol: string): any {
     let txnReceipt = yield this.strategy.approve(amount, tokenSymbol);
     return txnReceipt;

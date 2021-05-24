@@ -34,16 +34,16 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
   appStoreUrl = config.urls.appStoreLink;
   googlePlayUrl = config.urls.googlePlayLink;
 
-  @reads('layer2Network.hasAccount') declare hasAccount: boolean;
+  @reads('layer2Network.isConnected') declare isConnected: boolean;
   @tracked isWaitingForConnection = false;
   constructor(owner: unknown, args: CardPayLayerTwoConnectCardComponentArgs) {
     super(owner, args);
-    if (this.hasAccount) {
+    if (this.isConnected) {
       next(this, () => {
         this.args.onComplete?.();
       });
     }
-    if (!this.hasAccount) {
+    if (!this.isConnected) {
       taskFor(this.connectWalletTask).perform();
     }
   }
@@ -52,7 +52,7 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
     yield this.layer2Network.waitForAccount;
     this.isWaitingForConnection = false;
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
-    if (this.hasAccount) {
+    if (this.isConnected) {
       this.args.onConnect?.();
       this.args.onComplete?.();
     }
@@ -66,7 +66,7 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
   }
 
   get cardState(): string {
-    if (this.hasAccount) {
+    if (this.isConnected) {
       return 'memorialized';
     } else if (this.isWaitingForConnection) {
       return 'in-progress';

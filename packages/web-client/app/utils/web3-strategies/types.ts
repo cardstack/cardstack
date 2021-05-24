@@ -16,6 +16,7 @@ export interface Web3Strategy {
 }
 
 export interface Layer1Web3Strategy extends Web3Strategy {
+  isConnected: boolean;
   defaultTokenBalance: BN | undefined;
   currentProviderId: string | undefined;
   daiBalance: BN | undefined;
@@ -33,6 +34,7 @@ export interface Layer1Web3Strategy extends Web3Strategy {
 }
 
 export interface Layer2Web3Strategy extends Web3Strategy {
+  isConnected: boolean;
   defaultTokenBalance: BN | undefined;
   updateUsdConverters(
     symbolsToUpdate: ConvertibleSymbol[]
