@@ -4,7 +4,7 @@
   "description": "Shared test support for cardstack packages.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests in eslint-config package\" && exit 0"
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,6 @@
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.19.10",
-    "@cardstack/test-support": "0.19.10",
     "jsonapi-typescript": "^0.1.3"
   },
   "author": "Edward Faulkner <edward@eaf4.com>",
