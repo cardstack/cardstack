@@ -18,10 +18,11 @@
     </div>
   </div>
   <div>
-    <div class="token-option__value" data-test-balance={{@tokenSymbol}}>
+    <div class="token-option__balance-header">Balance</div>
+    <div class="token-option__balance" data-test-balance={{@tokenSymbol}}>
       {{@balance}} {{@tokenSymbol}}
     </div>
-    <div class="token-option__desc" data-test-usd-balance={{@tokenSymbol}}>
+    <div class="token-option__usd-balance" data-test-usd-balance={{@tokenSymbol}}>
       {{#if @balanceInUsd}}
         ≈ $ {{@balanceInUsd}} USD
       {{else}}

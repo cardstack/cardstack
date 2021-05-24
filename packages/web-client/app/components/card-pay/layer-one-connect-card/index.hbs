@@ -6,12 +6,13 @@
   data-test-mainnnet-connection-action-container
   ...attributes
 >
-  <section class="layer-one-connect-card__body">
-    {{#if this.connectedWalletProvider}}
-      <header aria-label="Layer 1 Connected Header" class="layer-one-connect-card__body-header" data-test-mainnet-connection-header>
-        {{this.connectedWalletProvider.name}}
-        <img class="layer-one-connect-card__body-header-logo" src={{this.connectedWalletProvider.logo}} alt="" role="presentation">
-      </header>
+  {{#if this.connectedWalletProvider}}
+    <ActionCardContainer::Section
+      class="layer-one-connect-card__body"
+      @title={{this.connectedWalletProvider.name}}
+      @imgUrl={{this.connectedWalletProvider.logo}}
+      @dataTestId="layer-one-connect"
+    >
       <CardPay::FieldStack>
         <CardPay::LabeledValue
           @label="Network"
@@ -32,26 +33,27 @@
         <CardPay::LabeledValue
           @label="Status"
           @value="Connected"
-          @icon="checkbox-primary-checked"
-          class="layer-one-connect-card__connection-status"
+          @icon="success"
         />
       </CardPay::FieldStack>
-
       <div class="layer-one-connect-card__disclaimer">
         * This balance reflects some of the tokens that are accepted in the Card Pay network.
           It may not reflect all the tokens in your wallet.
       </div>
-    {{else}}
-      <header aria-label="Layer 1 Connection Header" class="layer-one-connect-card__body-header" data-test-mainnet-connection-header>Connect your {{this.layer1Network.chainName}} wallet</header>
+    </ActionCardContainer::Section>
+  {{else}}
+    <ActionCardContainer::Section
+      @title={{concat "Connect your " this.layer1Network.chainName " wallet"}}
+      @dataTestId="layer-one-connect"
+    >
       <CardPay::LayerOneWalletProviderSelection
         @walletProviders={{this.walletProviders}}
         @currentWalletProviderId={{this.radioWalletProviderId}}
         @changeWalletProvider={{this.changeWalletProvider}}
         @isConnecting={{this.isWaitingForConnection}}
-        class="layer-one-connect-card__wallet-provider-selection"
       />
-    {{/if}}
-  </section>
+    </ActionCardContainer::Section>
+  {{/if}}
   <Boxel::ActionChin @state={{this.ctaState}}>
     <:default as |a|>
       <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
@@ -64,7 +66,7 @@
       </d.ActionButton>
     </:disabled>
     <:in-progress as |i|>
-      <i.ActionStatusArea class="layer-one-connect-card__logo" @icon={{concat this.radioWalletProviderId "-logo"}} style={{css-var status-icon-size="2.5rem"}}>
+      <i.ActionStatusArea class="layer-one-connect-card__in-progress-logo" @icon={{concat this.radioWalletProviderId "-logo"}} style={{css-var status-icon-size="2.5rem"}}>
         <Boxel::LoadingIndicator
           class="layer-one-connect-card__loading-indicator"
           @color="var(--boxel-light)"

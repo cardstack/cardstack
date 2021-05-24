@@ -3,7 +3,7 @@
   grid-template-columns: auto 1fr 1fr;
   align-items: center;
   gap: var(--boxel-sp);
-  padding: var(--boxel-sp);
+  padding: var(--boxel-sp-xl) var(--boxel-sp);
   border-radius: var(--boxel-border-radius);
   box-shadow: 0 0 0 1px var(--boxel-light-400);
   transition: box-shadow var(--boxel-transition);
@@ -57,14 +57,21 @@
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.token-option__value {
+.token-option__balance {
   color: var(--boxel-dark);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.token-option__desc {
+.token-option__desc,
+.token-option__balance-header {
   color: var(--boxel-purple-500);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.token-option__usd-balance {
+  color: var(--boxel-purple-400);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);
 }

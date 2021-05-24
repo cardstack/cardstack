@@ -1,20 +1,6 @@
-.transaction-amount__body {
+.transaction-amount {
   --tx-amount-from-label-height: 3.125rem; /* 50px */
   --tx-amount-input-height: 3.75rem; /* 60px */
-
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
-  padding: var(--boxel-sp-xxl) var(--boxel-sp-lg);
-}
-
-.transaction-amount__body-header {
-  font: 700 1.125rem/calc(24/18) var(--boxel-font-family);
-  letter-spacing: 0;
-}
-
-.transaction-amount__body-header + .transaction-amount__input-section {
-  margin-top: var(--boxel-sp-xxl);
 }
 
 .transaction-amount__input-section > * + * {

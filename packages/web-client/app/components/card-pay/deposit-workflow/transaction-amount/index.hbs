@@ -3,10 +3,7 @@
   @header="Deposit Amount"
   @isComplete={{@isComplete}}
 >
-  <section class="transaction-amount__body">
-    <header class="transaction-amount__body-header">
-      Choose an amount to deposit into the reserve pool
-    </header>
+  <ActionCardContainer::Section @title="Choose an amount to deposit into the reserve pool">
     <div class="transaction-amount__input-section">
       <Boxel::Field
         class="transaction-amount__field"
@@ -68,7 +65,7 @@
         </Boxel::Field>
       {{/if}}
     </div>
-  </section>
+  </ActionCardContainer::Section>
   <Boxel::ActionChin @stepNumber={{1}} @state={{this.unlockCtaState}}>
     <:default as |a|>
       <a.ActionButton data-test-unlock-button {{on "click" this.unlock}}>

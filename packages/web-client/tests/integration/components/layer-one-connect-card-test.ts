@@ -4,7 +4,7 @@ import { render, click, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 
-const HEADER_SELECTOR = '[data-test-mainnet-connection-header]';
+const HEADER_SELECTOR = '[data-test-action-card-title="layer-one-connect"]';
 const CONNECT_BUTTON_SELECTOR = '[data-test-mainnet-connect-button]';
 const DISCONNECT_BUTTON_SELECTOR = '[data-test-mainnet-disconnect-button]';
 const WALLET_SELECTION_SELECTOR = '[data-test-wallet-selection]';
@@ -12,7 +12,7 @@ const WALLET_SELECTION_SELECTOR = '[data-test-wallet-selection]';
 module('Integration | Component | layer-one-connect-card', function (hooks) {
   setupRenderingTest(hooks);
 
-  test('If should show a selection UI if layer 1 is not connected', async function (assert) {
+  test('It should show a selection UI if layer 1 is not connected', async function (assert) {
     await render(hbs`
         <CardPay::LayerOneConnectCard/>
       `);
