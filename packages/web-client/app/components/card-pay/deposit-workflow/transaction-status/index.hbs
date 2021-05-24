@@ -4,7 +4,7 @@
 >
   <ActionCardContainer::Section
     @title="Bridging tokens to xDai blockchain"
-    @icon="clock"
+    @icon={{if @isComplete "success" "clock"}}
   >
     <Boxel::ProgressSteps
       class="transaction-status__steps"
