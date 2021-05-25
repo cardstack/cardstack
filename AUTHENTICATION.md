@@ -39,8 +39,8 @@ When the server receives the POST, it does the following:
 * Server use EC recover function to verify that the signature was signed by the signer. On failure, 401 "Signature not verified" _Implemented_
 * Server verifies the nonce signature. On failure, 401 "Invalid nonce". [Here's the implementation of verification](./packages/hub/utils/authentication.ts#L45) _Implemented_
 * Server verifies that nonce is less than 5 minutes old. On failure, 401 "Expired nonce" _TODO_
-* Server verifies that nonce is not in redis SET of recently used nonces. On failure, 401 "Nonce already used" _TODO_
-* Server retires the nonce by adding it to the redis SET of used nonces (5 minute TTL on items in the set) _TODO_ 
+* Server verifies that nonce is not in store of recently used nonces. On failure, 401 "Nonce already used" _TODO_
+* Server retires the nonce by adding it to the store of used nonces (5 minute TTL on items in the set) _TODO_ 
 * Server builds an authorization bearer token. [Here's the code to build the auth token](./packages/hub/utils/authentication.ts#L57) _Implemented_
 
 

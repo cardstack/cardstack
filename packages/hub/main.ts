@@ -12,7 +12,6 @@ import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './jsonapi-middleware';
 import NonceTracker from './nonce-tracker';
 import { Clock } from './utils/clock';
-import { RedisClientFactory } from './redis-client-factory';
 import { ShutdownHelper } from './shutdown-helper';
 const log = logger('cardstack/hub');
 
@@ -25,7 +24,6 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
   registry.register('jsonapi-middleware', JsonapiMiddleware);
   registry.register('nonce-tracker', NonceTracker);
-  registry.register('redis-client', new RedisClientFactory());
   registry.register('session-route', SessionRoute);
   registry.register('shutdown-helper', ShutdownHelper);
   if (registryCallback) {

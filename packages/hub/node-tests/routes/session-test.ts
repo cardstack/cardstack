@@ -260,7 +260,4 @@ describe('POST /api/session', function () {
         ],
       });
   });
-
-  // * Server verifies that nonce is not in redis SET of recently used nonces. On failure, 401 "Nonce already used"
-  // * Server retires the nonce by adding it to the redis SET of used nonces (5 minute TTL on items in the set)
 });
