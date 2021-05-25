@@ -3,7 +3,5 @@
 // If anything remains bound to a port, it will prevent a clean exit and/or test completion.
 
 export class ShutdownHelper {
-
-  async onShutdown() {
-  }
+  async onShutdown() {}
 }
