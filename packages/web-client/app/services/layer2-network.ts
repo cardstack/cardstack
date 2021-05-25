@@ -12,9 +12,15 @@ import {
   ConvertibleSymbol,
   ConversionFunction,
 } from '@cardstack/web-client/utils/token';
+import {
+  DappEvents,
+  UnbindEventListener,
+} from '@cardstack/web-client/utils/events';
+import { action } from '@ember/object';
 
 export default class Layer2Network extends Service {
   strategy!: Layer2Web3Strategy;
+  dappEvents = new DappEvents();
   @reads('strategy.isConnected', false) isConnected!: boolean;
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
   @reads('strategy.walletInfo', []) walletInfo!: WalletInfo;
@@ -38,6 +44,8 @@ export default class Layer2Network extends Service {
         this.strategy = new Layer2TestWeb3Strategy();
         break;
     }
+
+    this.strategy.on('disconnect', this.onDisconnect);
   }
 
   async updateUsdConverters(
@@ -53,6 +61,14 @@ export default class Layer2Network extends Service {
 
   disconnect() {
     return this.strategy.disconnect();
+  }
+
+  @action onDisconnect() {
+    this.dappEvents.emit('disconnect');
+  }
+
+  on(event: string, cb: Function): UnbindEventListener {
+    return this.dappEvents.on(event, cb);
   }
 
   getBlockHeight() {

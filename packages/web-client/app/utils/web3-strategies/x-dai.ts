@@ -20,6 +20,7 @@ import {
   TokenBridgeHomeSide,
 } from '@cardstack/cardpay-sdk';
 import Safes, { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { UnbindEventListener } from '@cardstack/web-client/utils/events';
 
 export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'xDai chain';
@@ -49,6 +50,11 @@ export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
 
   disconnect(): Promise<void> {
     throw new Error('Method not implemented.');
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  on(event: string, cb: Function): UnbindEventListener {
+    throw new Error('Method not implemented');
   }
 
   async initialize() {

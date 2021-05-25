@@ -36,6 +36,7 @@ export interface Layer1Web3Strategy extends Web3Strategy {
 }
 
 export interface Layer2Web3Strategy extends Web3Strategy {
+  on(event: string, cb: Function): UnbindEventListener;
   isConnected: boolean;
   defaultTokenBalance: BN | undefined;
   updateUsdConverters(

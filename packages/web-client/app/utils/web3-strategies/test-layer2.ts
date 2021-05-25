@@ -10,10 +10,15 @@ import BN from 'bn.js';
 import { fromWei, toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import {
+  UnbindEventListener,
+  DappEvents,
+} from '@cardstack/web-client/utils/events';
 
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainName = 'L2 test chain';
   chainId = '-1';
+  dappEvents = new DappEvents();
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   waitForAccountDeferred = defer();
@@ -22,7 +27,16 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([]);
+    this.dappEvents.emit('disconnect');
     return this.waitForAccount as Promise<void>;
+  }
+
+  on(event: string, cb: Function): UnbindEventListener {
+    return this.dappEvents.on(event, cb);
+  }
+
+  test__simulateDisconnectFromWallet() {
+    this.disconnect();
   }
 
   getBlockHeight(): Promise<BN> {
