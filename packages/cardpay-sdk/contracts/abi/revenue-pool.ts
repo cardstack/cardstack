@@ -18,7 +18,7 @@ export default [
       {
         indexed: false,
         internalType: 'address',
-        name: 'prepaidCardArr',
+        name: 'card',
         type: 'address',
       },
       {
@@ -112,17 +112,29 @@ export default [
       {
         indexed: false,
         internalType: 'address',
-        name: 'merchant',
+        name: 'merchantSafe',
         type: 'address',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: 'merchantSafe',
+        name: 'card',
         type: 'address',
       },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'issuingToken',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
     ],
-    name: 'MerchantUpdate',
+    name: 'MerchantFeeCollected',
     type: 'event',
   },
   {
@@ -177,32 +189,6 @@ export default [
     type: 'event',
   },
   {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'tally',
-        type: 'address',
-      },
-    ],
-    name: 'TallyAdded',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'tally',
-        type: 'address',
-      },
-    ],
-    name: 'TallyRemoved',
-    type: 'event',
-  },
-  {
     constant: false,
     inputs: [
       {
@@ -212,27 +198,6 @@ export default [
       },
     ],
     name: 'addPayableToken',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: '_tally',
-        type: 'address',
-      },
-    ],
-    name: 'addTally',
     outputs: [
       {
         internalType: 'bool',
@@ -432,21 +397,6 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'getTallys',
-    outputs: [
-      {
-        internalType: 'address[]',
-        name: '',
-        type: 'address[]',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
     name: 'getTokens',
     outputs: [
       {
@@ -579,6 +529,51 @@ export default [
   {
     constant: true,
     inputs: [],
+    name: 'merchantFeePercentage',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'merchantFeeReceiver',
+    outputs: [
+      {
+        internalType: 'address payable',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'merchantRegistrationFeeInSPEND',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'owner',
     outputs: [
       {
@@ -592,29 +587,18 @@ export default [
     type: 'function',
   },
   {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'merchant',
-        type: 'address',
-      },
-      {
-        internalType: 'string',
-        name: 'merchantExternalId',
-        type: 'string',
-      },
-    ],
-    name: 'registerMerchant',
+    constant: true,
+    inputs: [],
+    name: 'prepaidCardManager',
     outputs: [
       {
-        internalType: 'address',
+        internalType: 'address payable',
         name: '',
         type: 'address',
       },
     ],
     payable: false,
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -627,27 +611,6 @@ export default [
       },
     ],
     name: 'removePayableToken',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: '_tally',
-        type: 'address',
-      },
-    ],
-    name: 'removeTally',
     outputs: [
       {
         internalType: 'bool',
@@ -694,7 +657,7 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: 'bridgeUtils',
+        name: '_bridgeUtils',
         type: 'address',
       },
     ],
@@ -744,8 +707,8 @@ export default [
     constant: false,
     inputs: [
       {
-        internalType: 'address',
-        name: '_tally',
+        internalType: 'address payable',
+        name: '_prepaidCardManager',
         type: 'address',
       },
       {
@@ -768,6 +731,21 @@ export default [
         name: '_payableTokens',
         type: 'address[]',
       },
+      {
+        internalType: 'address payable',
+        name: '_merchantFeeReceiver',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: '_merchantFeePercentage',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '_merchantRegistrationFeeInSPEND',
+        type: 'uint256',
+      },
     ],
     name: 'setup',
     outputs: [],
@@ -779,7 +757,7 @@ export default [
     constant: false,
     inputs: [
       {
-        internalType: 'address',
+        internalType: 'address payable',
         name: 'from',
         type: 'address',
       },
@@ -877,6 +855,21 @@ export default [
     ],
     payable: false,
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'merchantFeeDecimals',
+    outputs: [
+      {
+        internalType: 'uint8',
+        name: '',
+        type: 'uint8',
+      },
+    ],
+    payable: false,
+    stateMutability: 'pure',
     type: 'function',
   },
 ];
