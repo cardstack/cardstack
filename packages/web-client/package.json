@@ -90,6 +90,7 @@
     "ember-concurrency-ts": "^0.2.2",
     "ember-css-url": "^0.2.1",
     "ember-data": "~3.25.0",
+    "ember-destroyable-polyfill": "^2.0.3",
     "ember-export-application-global": "^2.0.1",
     "ember-fetch": "^8.0.4",
     "ember-focus-trap": "^0.6.0",

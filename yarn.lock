@@ -9274,7 +9274,7 @@ ember-page-title@^6.2.1:
   dependencies:
     ember-cli-babel "^7.22.1"
 
-"ember-power-select-typeahead@github:alexspeller/ember-power-select-typeahead#6d279fb":
+ember-power-select-typeahead@alexspeller/ember-power-select-typeahead#6d279fb:
   version "0.8.0"
   resolved "https://codeload.github.com/alexspeller/ember-power-select-typeahead/tar.gz/6d279fb9e6a640282a2dc887fe06f1d09a062148"
   dependencies:
