@@ -135,6 +135,7 @@
     "@walletconnect/core": "^1.4.1",
     "@walletconnect/iso-crypto": "^1.4.1",
     "@walletconnect/qrcode-modal": "^1.4.1",
+    "broadcastchannel-polyfill": "^1.0.1",
     "macro-decorators": "^0.1.2",
     "typescript": "^4.2.3"
   },
