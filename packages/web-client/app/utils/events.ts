@@ -12,13 +12,13 @@ export interface Emitter {
  * 1. Service that listens for events and emits them:
  * ```
  * import {
- *   DappEvents,
+ *   SimpleEmitter,
  *   UnbindEventListener,
  * } from '@cardstack/web-client/utils/events';
  * import Service from '@ember/service';
  *
  * export default class ResizedTarget extends Service {
- *   dappEvents = new DappEvents();
+ *   simpleEmitter = new SimpleEmitter();
  *
  *   constructor(props: object | undefined) {
  *     super(props);
@@ -33,7 +33,7 @@ export interface Emitter {
  *   // Add an on method to comply with the Emitter interface
  *   // return a method that unbinds the event listener
  *   on(event: string, cb: Function): UnbindEventListener {
- *     return this.dappEvents.on(event, cb);
+ *     return this.simpleEmitter.on(event, cb);
  *   }
  * }
  *
@@ -59,7 +59,7 @@ export interface Emitter {
  *
  */
 
-export class DappEvents {
+export class SimpleEmitter {
   events: Record<string, Function[]> = {};
 
   emit(event: string, ...args: any[]) {

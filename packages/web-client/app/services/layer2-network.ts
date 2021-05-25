@@ -13,14 +13,14 @@ import {
   ConversionFunction,
 } from '@cardstack/web-client/utils/token';
 import {
-  DappEvents,
+  SimpleEmitter,
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
 import { action } from '@ember/object';
 
 export default class Layer2Network extends Service {
   strategy!: Layer2Web3Strategy;
-  dappEvents = new DappEvents();
+  simpleEmitter = new SimpleEmitter();
   @reads('strategy.isConnected', false) isConnected!: boolean;
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
   @reads('strategy.walletInfo', []) walletInfo!: WalletInfo;
@@ -64,11 +64,11 @@ export default class Layer2Network extends Service {
   }
 
   @action onDisconnect() {
-    this.dappEvents.emit('disconnect');
+    this.simpleEmitter.emit('disconnect');
   }
 
   on(event: string, cb: Function): UnbindEventListener {
-    return this.dappEvents.on(event, cb);
+    return this.simpleEmitter.on(event, cb);
   }
 
   getBlockHeight() {

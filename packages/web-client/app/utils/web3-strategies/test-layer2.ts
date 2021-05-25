@@ -12,13 +12,13 @@ import { TransactionReceipt } from 'web3-core';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import {
   UnbindEventListener,
-  DappEvents,
+  SimpleEmitter,
 } from '@cardstack/web-client/utils/events';
 
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainName = 'L2 test chain';
   chainId = '-1';
-  dappEvents = new DappEvents();
+  simpleEmitter = new SimpleEmitter();
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   waitForAccountDeferred = defer();
@@ -27,12 +27,12 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([]);
-    this.dappEvents.emit('disconnect');
+    this.simpleEmitter.emit('disconnect');
     return this.waitForAccount as Promise<void>;
   }
 
   on(event: string, cb: Function): UnbindEventListener {
-    return this.dappEvents.on(event, cb);
+    return this.simpleEmitter.on(event, cb);
   }
 
   test__simulateDisconnectFromWallet() {

@@ -23,14 +23,14 @@ import {
   DepotSafe,
   ExchangeRate,
 } from '@cardstack/cardpay-sdk';
-import { DappEvents, UnbindEventListener } from '../events';
+import { SimpleEmitter, UnbindEventListener } from '../events';
 
 export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'Sokol testnet';
   chainId = networkIds['sokol'];
   provider: WalletConnectProvider | undefined;
 
-  dappEvents = new DappEvents();
+  simpleEmitter = new SimpleEmitter();
 
   @reads('provider.connector') connector!: IConnector;
   @tracked walletConnectUri: string | undefined;
@@ -108,7 +108,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     if (this.isConnected) {
       this.clearWalletInfo();
       this.walletConnectUri = undefined;
-      this.dappEvents.emit('disconnect');
+      this.simpleEmitter.emit('disconnect');
       setTimeout(() => {
         console.log('initializing');
         this.initialize();
@@ -117,7 +117,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   }
 
   on(event: string, cb: Function): UnbindEventListener {
-    return this.dappEvents.on(event, cb);
+    return this.simpleEmitter.on(event, cb);
   }
 
   updateWalletInfo(accounts: string[], chainId: number) {

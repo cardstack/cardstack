@@ -20,7 +20,7 @@ import {
   getConstantByNetwork,
 } from '@cardstack/cardpay-sdk';
 import {
-  DappEvents,
+  SimpleEmitter,
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
 import { registerDestructor } from '@ember/destroyable';
@@ -31,7 +31,6 @@ let cardToken = new TokenContractInfo('CARD', 'kovan');
 
 let daiToken = new TokenContractInfo('DAI', 'kovan');
 
-// emits event
 export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   chainName = 'Kovan testnet';
   chainId = networkIds['kovan'];
@@ -45,7 +44,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   );
   daiTokenContract = new this.web3.eth.Contract(daiToken.abi, daiToken.address);
 
-  dappEvents = new DappEvents();
+  simpleEmitter = new SimpleEmitter();
 
   @tracked currentProviderId: string | undefined;
   @tracked walletInfo = new WalletInfo([], this.chainId);
@@ -102,7 +101,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   }
 
   on(event: string, cb: Function): UnbindEventListener {
-    return this.dappEvents.on(event, cb);
+    return this.simpleEmitter.on(event, cb);
   }
 
   async connect(walletProvider: WalletProvider): Promise<void> {
@@ -149,7 +148,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   onDisconnect() {
     if (this.isConnected) {
       this.clearLocalConnectionState();
-      this.dappEvents.emit('disconnect');
+      this.simpleEmitter.emit('disconnect');
       this.broadcastChannel.postMessage('disconnected');
     }
   }

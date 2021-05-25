@@ -7,7 +7,7 @@ import BN from 'bn.js';
 import { WalletProvider } from '../wallet-providers';
 import { TransactionReceipt } from 'web3-core';
 import {
-  DappEvents,
+  SimpleEmitter,
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
 
@@ -17,7 +17,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   @tracked currentProviderId: string | undefined;
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
-  dappEvents = new DappEvents();
+  simpleEmitter = new SimpleEmitter();
 
   // Balances are settable in this test implementation
   @tracked defaultTokenBalance: BN | undefined;
@@ -35,12 +35,12 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
 
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([], '');
-    this.dappEvents.emit('disconnect');
+    this.simpleEmitter.emit('disconnect');
     return this.waitForAccount;
   }
 
   on(event: string, cb: Function): UnbindEventListener {
-    return this.dappEvents.on(event, cb);
+    return this.simpleEmitter.on(event, cb);
   }
 
   test__simulateDisconnectFromWallet() {
