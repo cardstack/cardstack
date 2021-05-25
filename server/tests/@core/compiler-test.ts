@@ -103,6 +103,7 @@ Qmodule('Compiler', function (hooks) {
       url: 'https://mirage/cards/post',
       schema: 'schema.js',
       embedded: 'embedded.js',
+      isolated: 'isolated.js',
       files: {
         'schema.js': `
           import { contains } from "@cardstack/types";
@@ -117,6 +118,9 @@ Qmodule('Compiler', function (hooks) {
           }`,
         'embedded.js': templateOnlyComponentTemplate(
           `<article><h1><@fields.title /></h1><p><@fields.author.name /></p><p><@fields.author.birthdate /></p></article>`
+        ),
+        'isolated.js': templateOnlyComponentTemplate(
+          `<SomeRandoComponent @attr={{@model.author}} />`
         ),
       },
     });
@@ -139,6 +143,12 @@ Qmodule('Compiler', function (hooks) {
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
       `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><BirthdateField @model={{@model.author.birthdate}} /></p></article>`
+    );
+
+    assert.deepEqual(
+      compiled.isolated.usedFields,
+      ['author.name', 'author.birthdate'],
+      'Author is expanded out because we dont know how it could be used'
     );
   });
 

@@ -24,6 +24,7 @@ import {
   CompiledCard,
   ComponentInfo,
   FIELDS,
+  MODEL,
   Format,
   FORMATS,
   RawCard,
@@ -424,24 +425,31 @@ function buildUsedFieldsListFromUsageMeta(
   usageMeta: TemplateUsageMeta,
   format: Format
 ): ComponentInfo['usedFields'] {
-  let usedFields: string[] = [];
-  for (const fieldPath of usageMeta[FIELDS]) {
-    buildUsedFieldListFromCard(usedFields, fieldPath, fields, format);
+  let usedFields: Set<string> = new Set();
+
+  if (usageMeta[MODEL] && usageMeta[MODEL] !== 'self') {
+    for (const fieldPath of usageMeta[MODEL]) {
+      buildUsedFieldListFromData(usedFields, fieldPath, fields);
+    }
   }
-  return usedFields;
+
+  for (const fieldPath of usageMeta[FIELDS]) {
+    buildUsedFieldListFromComponents(usedFields, fieldPath, fields, format);
+  }
+
+  return [...usedFields];
 }
 
-function buildUsedFieldListFromCard(
-  usedFields: string[],
+function buildUsedFieldListFromData(
+  usedFields: Set<string>,
   fieldPath: string,
   fields: CompiledCard['fields'],
-  format: Format,
   prefix?: string
-): void {
+) {
   let field = getFieldForPath(fields, fieldPath);
-  if (field && field.card[format].usedFields.length) {
-    for (const nestedFieldPath of field.card[format].usedFields) {
-      buildUsedFieldListFromCard(
+  if (field && Object.keys(field.card.fields).length) {
+    for (const nestedFieldPath of Object.keys(field.card.fields)) {
+      buildUsedFieldListFromComponents(
         usedFields,
         nestedFieldPath,
         field.card.fields,
@@ -451,9 +459,36 @@ function buildUsedFieldListFromCard(
     }
   } else {
     if (prefix) {
-      usedFields.push(`${prefix}.${fieldPath}`);
+      usedFields.add(`${prefix}.${fieldPath}`);
     } else {
-      usedFields.push(fieldPath);
+      usedFields.add(fieldPath);
+    }
+  }
+}
+
+function buildUsedFieldListFromComponents(
+  usedFields: Set<string>,
+  fieldPath: string,
+  fields: CompiledCard['fields'],
+  format: Format,
+  prefix?: string
+): void {
+  let field = getFieldForPath(fields, fieldPath);
+  if (field && field.card[format].usedFields.length) {
+    for (const nestedFieldPath of field.card[format].usedFields) {
+      buildUsedFieldListFromComponents(
+        usedFields,
+        nestedFieldPath,
+        field.card.fields,
+        'embedded',
+        fieldPath
+      );
+    }
+  } else {
+    if (prefix) {
+      usedFields.add(`${prefix}.${fieldPath}`);
+    } else {
+      usedFields.add(fieldPath);
     }
   }
 }
