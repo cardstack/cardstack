@@ -153,15 +153,21 @@ export class Compiler {
     meta: PluginMeta
   ): string | undefined {
     let parentPath;
+    let { url, adoptsFrom } = cardSource;
 
-    if (cardSource.adoptsFrom) {
+    if (adoptsFrom) {
+      if (adoptsFrom === url) {
+        throw new Error(
+          `BUG: ${url} provides itself as its parent. That should not happen.`
+        );
+      }
       parentPath = cardSource.adoptsFrom;
     }
 
     if (meta.parent && meta.parent.cardURL) {
       if (parentPath && parentPath !== meta.parent.cardURL) {
         throw new Error(
-          `${cardSource.url} provides conflicting parent URLs in card.json and schema.js`
+          `${url} provides conflicting parent URLs in card.json and schema.js`
         );
       }
       parentPath = meta.parent.cardURL;

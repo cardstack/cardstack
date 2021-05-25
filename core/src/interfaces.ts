@@ -26,8 +26,10 @@ export type Asset = {
 const deserializerTypes = {
   date: '',
 };
-export type Deserializer = keyof typeof deserializerTypes;
-export const DESERIALIZERS = Object.keys(deserializerTypes) as Deserializer[];
+export type DeserializerName = keyof typeof deserializerTypes;
+export const DESERIALIZER_NAMES = Object.keys(
+  deserializerTypes
+) as DeserializerName[];
 
 export type CardData = Record<string, any>;
 
@@ -46,7 +48,7 @@ export type RawCard = {
   schema?: string;
   containsRoutes?: boolean;
 
-  deserializer?: Deserializer;
+  deserializer?: DeserializerName;
 
   // url to the card we adopted from
   adoptsFrom?: string;
@@ -71,7 +73,7 @@ export interface CompiledCard {
     [key: string]: Field;
   };
   schemaModule: string;
-  deserializer?: Deserializer;
+  deserializer?: DeserializerName;
 
   isolated: ComponentInfo;
   embedded: ComponentInfo;
@@ -89,7 +91,7 @@ export interface ComponentInfo {
   moduleName: string;
   usedFields: string[]; // ["title", "author.firstName"]
 
-  deserialize?: Record<Deserializer, string[]>;
+  deserialize?: Record<DeserializerName, string[]>;
   inlineHBS?: string;
   sourceCardURL: string;
 }
@@ -173,7 +175,7 @@ export function assertValidDeserializationMap(
   map: any
 ): asserts map is ComponentInfo['deserialize'] {
   let keys = Object.keys(map);
-  let diff = difference(keys, DESERIALIZERS);
+  let diff = difference(keys, DESERIALIZER_NAMES);
   if (diff.length > 0) {
     throw new Error(`Unexpected deserializer: ${diff.join(',')}`);
   }

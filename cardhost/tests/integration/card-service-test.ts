@@ -26,6 +26,7 @@ module('Integration | card-service', function (hooks) {
         url: 'http://mirage/cards/post',
         schema: 'schema.js',
         isolated: 'isolated.js',
+        embedded: 'isolated.js',
         files: {
           'schema.js': `
           import { contains } from "@cardstack/types";
@@ -48,7 +49,7 @@ module('Integration | card-service', function (hooks) {
 
       this.createCard({
         url: cardID,
-        adoptsFrom: cardID,
+        adoptsFrom: 'http://mirage/cards/post',
         data: {
           title: 'A blog post title',
           createdAt: '2021-05-17T15:31:21+0000',
@@ -114,7 +115,6 @@ module('Integration | card-service', function (hooks) {
       );
       this.set('component', component);
       await render(hbs`<this.component />`);
-      await this.pauseTest();
       assert.dom('h1').containsText('A blog post title');
       assert.dom('h2').containsText('May 17, 2021');
 
