@@ -6,6 +6,11 @@
   ...attributes
 >
   {{#if (eq this.cardState 'memorialized')}}
+    <Listener
+      @emitter={{this.layer2Network}}
+      @event="disconnect"
+      @action={{optional @onIncomplete}}
+    />
     <ActionCardContainer::Section
       @title="Card Wallet"
       @imgUrl={{this.cardstackLogo}}
