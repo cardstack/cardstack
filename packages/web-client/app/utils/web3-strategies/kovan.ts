@@ -58,6 +58,10 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
 
   constructor() {
     this.initialize();
+    // the broadcast channel is really for metamask disconnections
+    // since metamask doesn't allow you to disconnect from the dapp side
+    // we want to ensure that users don't get confused by different tabs having
+    // different wallets connected
     this.broadcastChannel = new BroadcastChannel(this.chainName);
     this.broadcastChannel.onmessage = (event: MessageEvent) => {
       if (event.data === 'disconnected') this.onDisconnect();
