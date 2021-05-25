@@ -92,6 +92,9 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   }
   @action disconnect() {
     this.layer1Network.disconnect();
+  }
+
+  @action onDisconnect() {
     this.args.onDisconnect?.();
     this.args.onIncomplete?.();
   }

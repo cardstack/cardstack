@@ -7,6 +7,11 @@
   ...attributes
 >
   {{#if this.connectedWalletProvider}}
+    <Listener
+      @emitter={{this.layer1Network}}
+      @event="disconnect"
+      @action={{this.onDisconnect}}
+    />
     <ActionCardContainer::Section
       class="layer-one-connect-card__body"
       @title={{this.connectedWalletProvider.name}}
