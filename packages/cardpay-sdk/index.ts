@@ -2,6 +2,7 @@ export { default as TokenBridgeForeignSide } from './sdk/token-bridge-foreign-si
 export { default as TokenBridgeHomeSide } from './sdk/token-bridge-home-side';
 export { default as Safes, Safe, DepotSafe } from './sdk/safes';
 export { default as PrepaidCard } from './sdk/prepaid-card';
+export { default as RevenuePool } from './sdk/revenue-pool';
 export { default as ExchangeRate } from './sdk/exchange-rate';
 export { default as Assets } from './sdk/assets';
 

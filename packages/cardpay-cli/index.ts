@@ -7,6 +7,7 @@ import { viewTokenBalance } from './assets';
 import { viewSafes, transferTokens } from './safe.js';
 import { createPrepaidCard, priceForFaceValue, payMerchant, gasFee } from './prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
+import { registerMerchant } from './revenue-pool.js';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -23,6 +24,7 @@ type Commands =
   | 'gasFee'
   | 'priceForFaceValue'
   | 'payMerchant'
+  | 'registerMerchant'
   | 'priceOracleUpdatedAt'
   | 'viewTokenBalance';
 
@@ -140,6 +142,17 @@ const {
         description: 'A list of face values (separated by spaces) in units of § SPEND to create',
       });
       command = 'prepaidCardCreate';
+    }
+  )
+  .command(
+    'register-merchant <prepaidCard>',
+    'Register as a new merchant by paying a merchant registration fee',
+    (yargs) => {
+      yargs.positional('prepaidCard', {
+        type: 'string',
+        description: 'The address of the prepaid card that is being used to pay the merchant registration fee',
+      });
+      command = 'registerMerchant';
     }
   )
   .command('pay-merchant <merchantSafe> <prepaidCard> <amount>', 'Pay a merchant from a prepaid card.', (yargs) => {
@@ -296,6 +309,13 @@ if (!command) {
         process.exit(1);
       }
       await createPrepaidCard(network, mnemonic, safeAddress, faceValues, tokenAddress);
+      break;
+    case 'registerMerchant':
+      if (prepaidCard == null) {
+        yargs.showHelp('prepaidCard is a required value');
+        process.exit(1);
+      }
+      await registerMerchant(network, mnemonic, prepaidCard);
       break;
     case 'payMerchant':
       if (merchantSafe == null || prepaidCard == null || amount == null) {
