@@ -546,6 +546,70 @@ module('Acceptance | deposit', function (hooks) {
     assert.dom(milestoneCompletedSel(0)).doesNotExist();
   });
 
+  test('Disconnecting Layer 1 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
+    layer1Service.test__simulateBalances({
+      defaultToken: toBN('2141100000000000000'),
+      dai: toBN('250500000000000000000'),
+      card: toBN('10000000000000000000000'),
+    });
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateBalances({
+      defaultToken: toBN('142200000000000000'),
+    });
+
+    await visit('/card-pay/balances');
+    await click('[data-test-deposit-workflow-button]');
+
+    let post = postableSel(0, 0);
+    assert.dom(post).containsText('Hi there, we’re happy to see you');
+
+    assert
+      .dom(postableSel(0, 3))
+      .containsText(
+        'Looks like you’ve already connected your Ethereum mainnet wallet'
+      );
+
+    assert
+      .dom(milestoneCompletedSel(0))
+      .containsText('Mainnet wallet connected');
+
+    assert
+      .dom(postableSel(1, 0))
+      .containsText(
+        'Looks like you’ve already connected your xDai chain wallet'
+      );
+
+    await waitFor(milestoneCompletedSel(1));
+    assert
+      .dom(milestoneCompletedSel(1))
+      .containsText('xDai chain wallet connected');
+
+    assert
+      .dom(postableSel(2, 0))
+      .containsText('choose the asset you would like to deposit');
+
+    layer1Service.test__simulateDisconnectFromWallet();
+
+    await waitUntil(() =>
+      document
+        .querySelector(postableSel(0, 4))
+        ?.textContent?.includes('Connect your L1 test chain wallet')
+    );
+
+    assert.dom(milestoneCompletedSel(1)).doesNotExist();
+    assert.dom(milestoneCompletedSel(0)).doesNotExist();
+  });
+
   test('Disconnecting Layer 2 after proceeding beyond it', async function (assert) {
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
