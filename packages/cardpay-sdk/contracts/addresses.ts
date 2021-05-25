@@ -15,8 +15,8 @@ const addresses: {
     homeBridge: '0x16a80598DD2f143CFBf091638CE3fB02c9135528',
     daiCpxd: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
     cardCpxd: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
-    prepaidCardManager: '0x4f40a6eD9CAE27Dc34b9bf733DBe062854815c8F',
-    revenuePool: '0xd44ff7a460A589bDc61Ab4e2642846ab8996c909',
+    prepaidCardManager: '0xf7D6bd5e40E4836f0a5b892B0D62F2BE85AcB345',
+    revenuePool: '0x1dD894D65BE1a6e8A6E1Bb995e88f86D28Dd1bB7',
     bridgeUtils: '0xB5a5236e71b33f1F327302ec49d8729CbB9E209F',
     oracles: {
       DAI: '0x42c9555F568D5b8898c78260dB26087549Ce98A9', // eslint-disable-line @typescript-eslint/naming-convention

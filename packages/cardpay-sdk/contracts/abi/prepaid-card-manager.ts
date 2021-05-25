@@ -60,6 +60,12 @@ export default [
       },
       {
         indexed: false,
+        internalType: 'address',
+        name: 'issuingToken',
+        type: 'address',
+      },
+      {
+        indexed: false,
         internalType: 'uint256',
         name: 'amount',
         type: 'uint256',
@@ -117,6 +123,31 @@ export default [
     anonymous: false,
     inputs: [],
     name: 'Setup',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'previousOwner',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'TransferredPrepaidCard',
     type: 'event',
   },
   {
@@ -227,11 +258,6 @@ export default [
     name: 'cardDetails',
     outputs: [
       {
-        internalType: 'uint256',
-        name: 'blockNumber',
-        type: 'uint256',
-      },
-      {
         internalType: 'address',
         name: 'issuer',
         type: 'address',
@@ -240,6 +266,21 @@ export default [
         internalType: 'address',
         name: 'issueToken',
         type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'blockNumber',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bool',
+        name: 'reloadable',
+        type: 'bool',
+      },
+      {
+        internalType: 'bool',
+        name: 'canPayNonMerchants',
+        type: 'bool',
       },
     ],
     payable: false,
@@ -264,7 +305,7 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'gasFeeCARDAmount',
+    name: 'gasFeeInCARD',
     outputs: [
       {
         internalType: 'uint256',
@@ -282,7 +323,7 @@ export default [
     name: 'gasFeeReceiver',
     outputs: [
       {
-        internalType: 'address',
+        internalType: 'address payable',
         name: '',
         type: 'address',
       },
@@ -447,7 +488,7 @@ export default [
     name: 'revenuePool',
     outputs: [
       {
-        internalType: 'address',
+        internalType: 'address payable',
         name: '',
         type: 'address',
       },
@@ -461,7 +502,7 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: 'bridgeUtils',
+        name: '_bridgeUtils',
         type: 'address',
       },
     ],
@@ -506,18 +547,18 @@ export default [
         type: 'address',
       },
       {
-        internalType: 'address',
+        internalType: 'address payable',
         name: '_revenuePool',
         type: 'address',
       },
       {
-        internalType: 'address',
+        internalType: 'address payable',
         name: '_gasFeeReceiver',
         type: 'address',
       },
       {
         internalType: 'uint256',
-        name: '_gasFeeCARDAmount',
+        name: '_gasFeeInCARD',
         type: 'uint256',
       },
       {
@@ -630,42 +671,6 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'card',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'to',
-        type: 'address',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
-      {
-        internalType: 'uint256',
-        name: 'nonce',
-        type: 'uint256',
-      },
-    ],
-    name: 'getTransactionHash',
-    outputs: [
-      {
-        internalType: 'bytes32',
-        name: '',
-        type: 'bytes32',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     constant: false,
     inputs: [
       {
@@ -675,12 +680,12 @@ export default [
       },
       {
         internalType: 'address',
-        name: 'depot',
+        name: 'previousOwner',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: 'customer',
+        name: 'newOwner',
         type: 'address',
       },
       {
@@ -721,42 +726,6 @@ export default [
         internalType: 'bytes',
         name: '',
         type: 'bytes',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'prepaidCard',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'depot',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'customer',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'nonce',
-        type: 'uint256',
-      },
-    ],
-    name: 'getSellCardHash',
-    outputs: [
-      {
-        internalType: 'bytes32',
-        name: '',
-        type: 'bytes32',
       },
     ],
     payable: false,
@@ -911,47 +880,6 @@ export default [
     constant: true,
     inputs: [
       {
-        internalType: 'address payable',
-        name: 'card',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'depot',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256[]',
-        name: 'cardAmounts',
-        type: 'uint256[]',
-      },
-      {
-        internalType: 'uint256',
-        name: '_nonce',
-        type: 'uint256',
-      },
-    ],
-    name: 'getSplitCardHash',
-    outputs: [
-      {
-        internalType: 'bytes32',
-        name: '',
-        type: 'bytes32',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
         internalType: 'address',
         name: 'cardOwner',
         type: 'address',
@@ -984,7 +912,7 @@ export default [
       },
       {
         internalType: 'address',
-        name: 'depot',
+        name: 'owner',
         type: 'address',
       },
       {
