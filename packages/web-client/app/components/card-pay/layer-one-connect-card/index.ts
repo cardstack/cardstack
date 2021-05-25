@@ -27,7 +27,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   walletProviders = walletProviders;
 
   @service declare layer1Network: Layer1Network;
-  @reads('layer1Network.hasAccount') declare hasAccount: boolean;
+  @reads('layer1Network.isConnected') declare isConnected: boolean;
   @tracked isWaitingForConnection = false;
   /*
      Set a starting wallet provider for the focus trap library in the modal
@@ -43,14 +43,14 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     args: CardPayDepositWorkflowConnectLayer1ComponentArgs
   ) {
     super(owner, args);
-    if (this.hasAccount) {
+    if (this.isConnected) {
       next(this, () => {
         this.args.onComplete?.();
       });
     }
   }
   get connectedWalletProvider(): WalletProvider | undefined {
-    if (!this.hasAccount) return undefined;
+    if (!this.isConnected) return undefined;
     else
       return this.walletProviders.find(
         (walletProvider) =>
@@ -63,7 +63,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   }
 
   get ctaState(): string {
-    if (this.hasAccount) {
+    if (this.isConnected) {
       return 'memorialized';
     } else if (this.isWaitingForConnection) {
       return 'in-progress';
@@ -78,7 +78,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     this.radioWalletProviderId = id;
   }
   @action connect() {
-    if (!this.hasAccount) {
+    if (!this.isConnected) {
       taskFor(this.connectWalletTask).perform();
     }
   }
@@ -92,6 +92,9 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   }
   @action disconnect() {
     this.layer1Network.disconnect();
+  }
+
+  @action onDisconnect() {
     this.args.onDisconnect?.();
     this.args.onIncomplete?.();
   }
@@ -105,7 +108,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     }
     this.isWaitingForConnection = false;
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
-    if (this.hasAccount) {
+    if (this.isConnected) {
       this.args.onConnect?.();
       this.args.onComplete?.();
     }

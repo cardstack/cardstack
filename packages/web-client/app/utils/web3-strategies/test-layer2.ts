@@ -10,12 +10,16 @@ import BN from 'bn.js';
 import { fromWei, toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import {
+  UnbindEventListener,
+  SimpleEmitter,
+} from '@cardstack/web-client/utils/events';
 
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainName = 'L2 test chain';
   chainId = '-1';
+  simpleEmitter = new SimpleEmitter();
   @tracked walletConnectUri: string | undefined;
-  @tracked isConnected = false;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   waitForAccountDeferred = defer();
   bridgingDeferred!: RSVP.Deferred<TransactionReceipt>;
@@ -23,7 +27,16 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([]);
+    this.simpleEmitter.emit('disconnect');
     return this.waitForAccount as Promise<void>;
+  }
+
+  on(event: string, cb: Function): UnbindEventListener {
+    return this.simpleEmitter.on(event, cb);
+  }
+
+  test__simulateDisconnectFromWallet() {
+    this.disconnect();
   }
 
   getBlockHeight(): Promise<BN> {
@@ -62,6 +75,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
   }
 
+  get isConnected() {
+    return this.walletInfo.accounts.length > 0;
+  }
+
   get waitForAccount() {
     return this.waitForAccountDeferred.promise;
   }
@@ -75,7 +92,6 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   test__simulateAccountsChanged(accounts: string[]) {
-    this.isConnected = true;
     this.walletInfo = new WalletInfo(accounts, parseInt(this.chainId, 10));
     this.waitForAccountDeferred.resolve();
   }

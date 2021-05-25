@@ -23,13 +23,16 @@ import {
   DepotSafe,
   ExchangeRate,
 } from '@cardstack/cardpay-sdk';
+import { SimpleEmitter, UnbindEventListener } from '../events';
+
 export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   chainName = 'Sokol testnet';
   chainId = networkIds['sokol'];
   provider: WalletConnectProvider | undefined;
 
+  simpleEmitter = new SimpleEmitter();
+
   @reads('provider.connector') connector!: IConnector;
-  @tracked isConnected = false;
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo = new WalletInfo([], this.chainId) as WalletInfo;
   @tracked defaultTokenBalance: BN | undefined;
@@ -87,18 +90,34 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
         console.error('error disconnecting', error);
         throw error;
       }
-      this.isConnected = false;
-      this.clearWalletInfo();
-      this.walletConnectUri = undefined;
-      setTimeout(() => {
-        this.initialize();
-      }, 1000);
+      this.onDisconnect();
     });
     await this.provider.enable();
     this.web3 = new Web3(this.provider as any);
     this.#exchangeRateApi = new ExchangeRate(this.web3);
-    this.isConnected = true;
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
+  }
+
+  get isConnected(): boolean {
+    return this.walletInfo.accounts.length > 0;
+  }
+
+  // unlike layer 1 with metamask, there is no necessity for cross-tab communication
+  // about disconnecting. WalletConnect's disconnect event tells all tabs that you are disconnected
+  onDisconnect() {
+    if (this.isConnected) {
+      this.clearWalletInfo();
+      this.walletConnectUri = undefined;
+      this.simpleEmitter.emit('disconnect');
+      setTimeout(() => {
+        console.log('initializing');
+        this.initialize();
+      }, 1000);
+    }
+  }
+
+  on(event: string, cb: Function): UnbindEventListener {
+    return this.simpleEmitter.on(event, cb);
   }
 
   updateWalletInfo(accounts: string[], chainId: number) {
@@ -159,7 +178,6 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
 
   async disconnect(): Promise<void> {
     await this.provider?.disconnect();
-    this.clearWalletInfo();
   }
 
   async updateUsdConverters(

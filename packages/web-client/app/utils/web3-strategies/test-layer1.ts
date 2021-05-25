@@ -6,14 +6,18 @@ import RSVP from 'rsvp';
 import BN from 'bn.js';
 import { WalletProvider } from '../wallet-providers';
 import { TransactionReceipt } from 'web3-core';
+import {
+  SimpleEmitter,
+  UnbindEventListener,
+} from '@cardstack/web-client/utils/events';
 
 export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   chainName = 'L1 test chain';
   chainId = -1;
   @tracked currentProviderId: string | undefined;
   @tracked walletConnectUri: string | undefined;
-  @tracked isConnected = false;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
+  simpleEmitter = new SimpleEmitter();
 
   // Balances are settable in this test implementation
   @tracked defaultTokenBalance: BN | undefined;
@@ -31,7 +35,16 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
 
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([], '');
+    this.simpleEmitter.emit('disconnect');
     return this.waitForAccount;
+  }
+
+  on(event: string, cb: Function): UnbindEventListener {
+    return this.simpleEmitter.on(event, cb);
+  }
+
+  test__simulateDisconnectFromWallet() {
+    this.disconnect();
   }
 
   // eslint-disable-next-line no-unused-vars
@@ -63,16 +76,18 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
 
   test__simulateAccountsChanged(accounts: string[], walletProviderId?: string) {
     if (accounts.length && walletProviderId) {
-      this.isConnected = true;
       this.currentProviderId = walletProviderId;
       this.walletInfo = new WalletInfo(accounts, this.chainId);
       this.waitForAccountDeferred.resolve();
     } else {
-      this.isConnected = false;
       this.currentProviderId = '';
       this.walletInfo = new WalletInfo([], this.chainId);
       this.waitForAccountDeferred.resolve();
     }
+  }
+
+  get isConnected() {
+    return this.walletInfo.accounts.length > 0;
   }
 
   test__simulateBalances(balances: {

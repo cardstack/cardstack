@@ -9,9 +9,15 @@ import WalletInfo from '../utils/wallet-info';
 import { task } from 'ember-concurrency-decorators';
 import { WalletProvider } from '../utils/wallet-providers';
 import BN from 'bn.js';
+import {
+  SimpleEmitter,
+  UnbindEventListener,
+} from '@cardstack/web-client/utils/events';
+import { action } from '@ember/object';
 
 export default class Layer1Network extends Service {
   strategy!: Layer1Web3Strategy;
+  simpleEmitter = new SimpleEmitter();
   @reads('strategy.isConnected', false) isConnected!: boolean;
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
   @reads('strategy.walletInfo', new WalletInfo([], -1)) walletInfo!: WalletInfo;
@@ -34,6 +40,8 @@ export default class Layer1Network extends Service {
         this.strategy = new Layer1TestWeb3Strategy();
         break;
     }
+
+    this.strategy.on('disconnect', this.onDisconnect);
   }
 
   connect(walletProvider: WalletProvider) {
@@ -45,8 +53,12 @@ export default class Layer1Network extends Service {
     this.strategy.disconnect();
   }
 
-  get hasAccount() {
-    return this.walletInfo.accounts.length > 0;
+  @action onDisconnect() {
+    this.simpleEmitter.emit('disconnect');
+  }
+
+  on(event: string, cb: Function): UnbindEventListener {
+    return this.simpleEmitter.on(event, cb);
   }
 
   @task *approve(amount: BN, tokenSymbol: string): any {
