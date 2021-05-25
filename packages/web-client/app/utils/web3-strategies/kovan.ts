@@ -23,6 +23,7 @@ import {
   DappEvents,
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
+import { registerDestructor } from '@ember/destroyable';
 
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -53,9 +54,15 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   @tracked daiBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
   #waitForAccountDeferred = defer<void>();
+  broadcastChannel: BroadcastChannel;
 
   constructor() {
     this.initialize();
+    this.broadcastChannel = new BroadcastChannel(this.chainName);
+    this.broadcastChannel.onmessage = (event: MessageEvent) => {
+      if (event.data === 'disconnected') this.onDisconnect();
+    };
+    registerDestructor(this, this.broadcastChannel.close);
   }
 
   get providerStorageKey(): string {
@@ -139,6 +146,7 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     if (this.isConnected) {
       this.clearLocalConnectionState();
       this.dappEvents.emit('disconnect');
+      this.broadcastChannel.postMessage('disconnected');
     }
   }
 
