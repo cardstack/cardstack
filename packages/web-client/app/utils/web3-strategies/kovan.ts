@@ -130,9 +130,9 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     // and has not exposed any way to do this from a dapp
     if (this.currentProviderId === 'wallet-connect') {
       await this.provider.disconnect();
+    } else {
+      this.onDisconnect();
     }
-
-    this.onDisconnect();
   }
 
   onDisconnect() {
