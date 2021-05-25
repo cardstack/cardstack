@@ -14,6 +14,7 @@ import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
 import { next } from '@ember/runloop';
 import { timeout } from 'ember-concurrency';
+import { action } from '@ember/object';
 
 interface CardPayLayerTwoConnectCardComponentArgs {
   onComplete: (() => void) | undefined;
@@ -58,8 +59,11 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
     }
   }
 
-  @task *disconnectWalletTask() {
-    yield this.layer2Network.disconnect();
+  @action disconnect() {
+    this.layer2Network.disconnect();
+  }
+
+  @action onDisconnect() {
     this.args.onDisconnect?.();
     this.args.onIncomplete?.();
     taskFor(this.connectWalletTask).perform();

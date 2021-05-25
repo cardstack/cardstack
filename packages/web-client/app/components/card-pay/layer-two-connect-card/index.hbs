@@ -9,7 +9,7 @@
     <Listener
       @emitter={{this.layer2Network}}
       @event="disconnect"
-      @action={{optional @onIncomplete}}
+      @action={{this.onDisconnect}}
     />
     <ActionCardContainer::Section
       @title="Card Wallet"
@@ -41,7 +41,7 @@
     </ActionCardContainer::Section>
     <Boxel::ActionChin @state='memorialized'>
       <:memorialized as |m|>
-        <m.ActionButton {{on "click" (perform this.disconnectWalletTask)}} data-test-layer-2-wallet-disconnect-button>
+        <m.ActionButton {{on "click" this.disconnect}} data-test-layer-2-wallet-disconnect-button>
           Disconnect Wallet
         </m.ActionButton>
       </:memorialized>
