@@ -62,6 +62,7 @@ interface State {
   scopes: Scope[];
   nextScope: Scope | undefined;
   handledFieldExpressions: WeakSet<PathExpression>;
+  handledModelExpressions: WeakSet<PathExpression>;
 }
 
 export default function glimmerCardTemplateTransform(
@@ -87,6 +88,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
       scopes: [new Map()],
       nextScope: undefined,
       handledFieldExpressions: new WeakSet(),
+      handledModelExpressions: new WeakSet(),
     };
 
     return {
@@ -150,8 +152,12 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
         PathExpression(node, path) {
           if (state.handledFieldExpressions.has(node)) {
             let pathTail = node.original.slice(`${FIELDS}.`.length);
-            usageMeta[FIELDS].add(pathTail);
-            return env.syntax.builders.path(`${MODEL}.${pathTail}`);
+
+            let newExpression = env.syntax.builders.path(
+              `${MODEL}.${pathTail}`
+            );
+            state.handledModelExpressions.add(newExpression);
+            return newExpression;
           }
 
           let val = lookupScopeVal(node.original, path, state);
@@ -160,7 +166,11 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               if (isFieldPathExpression(node)) {
                 throw new InvalidFieldsUsageError();
               }
-              trackUsageForModel(usageMeta, node);
+              trackUsageForModel(
+                usageMeta,
+                node,
+                state.handledModelExpressions
+              );
 
               return;
             case 'stringLiteral':
@@ -220,12 +230,25 @@ function lookupScopeVal(
   path: syntax.WalkerPath<Node>,
   state: State
 ): PrimitiveScopeValue {
-  let scopeVal = state.scopes.map((s) => s.get(identifier)).find(Boolean);
+  let [key, ...tail] = identifier.split('.');
+  let scopeVal = state.scopes.map((s) => s.get(key)).find(Boolean);
 
   if (!scopeVal) {
     return { type: 'normal' };
   }
 
+  if (tail.length && scopeVal.type === 'fieldComponent') {
+    let field = getFieldForPath(scopeVal.field.card.fields, tail.join('.'));
+    if (field) {
+      return {
+        type: 'fieldComponent',
+        field,
+        pathForModel: identifier,
+        fieldFullPath: scopeVal.fieldFullPath + '.' + tail.join('.'),
+        expandable: true,
+      };
+    }
+  }
   if (scopeVal.type === 'listExpansion') {
     return enclosingScopeValue(path, scopeVal.nodes);
   } else {
@@ -432,9 +455,14 @@ function fieldPathForPathExpression(exp: PathExpression): string | undefined {
 
 function trackUsageForModel(
   usageMeta: TemplateUsageMeta,
-  node: syntax.ASTv1.PathExpression
+  node: syntax.ASTv1.PathExpression,
+  handledModelExpressions: State['handledModelExpressions']
 ) {
-  if (node.head.type !== 'AtHead' || node.head.name !== MODEL) {
+  if (
+    node.head.type !== 'AtHead' ||
+    node.head.name !== MODEL ||
+    handledModelExpressions.has(node)
+  ) {
     return;
   }
 

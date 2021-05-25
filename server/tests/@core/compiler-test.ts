@@ -2,6 +2,7 @@ import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { containsSource } from '@cardstack/core/tests/helpers/assertions';
 import { TestBuilder } from '../helpers/test-builder';
+import { baseCardURL } from '@cardstack/core/src/compiler';
 
 const { module: Qmodule, test } = QUnit;
 
@@ -38,6 +39,11 @@ Qmodule('Compiler', function (hooks) {
     let compiled = await builder.getCompiledCard(
       'https://cardstack.com/base/string'
     );
+    assert.equal(compiled.adoptsFrom?.url, baseCardURL);
+    assert.deepEqual(compiled.assets, []);
+    assert.notOk(compiled.data, 'no data');
+    assert.equal(compiled.embedded.inlineHBS, '{{@model}}');
+    assert.deepEqual(compiled.embedded.usedFields, []);
     assert.ok(!compiled.deserializer, 'String card has no deserializer');
   });
 
@@ -133,6 +139,104 @@ Qmodule('Compiler', function (hooks) {
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
       `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><BirthdateField @model={{@model.author.birthdate}} /></p></article>`
+    );
+  });
+
+  test('deeply nested cards', async function (assert) {
+    builder.addRawCard({
+      url: 'http://mirage/cards/post',
+      schema: 'schema.js',
+      isolated: 'isolated.js',
+      embedded: 'embedded.js',
+      files: {
+        'schema.js': `
+        import { contains } from "@cardstack/types";
+        import string from "https://cardstack.com/base/string";
+        import date from "https://cardstack.com/base/date";
+
+        export default class Hello {
+          @contains(string)
+          title;
+
+          @contains(date)
+          createdAt;
+
+          @contains(string)
+          body;
+        }
+      `,
+        'isolated.js': templateOnlyComponentTemplate(
+          `<h1><@fields.title /></h1><h2><@fields.createdAt /></h2><p>{{@model.body}}</p>`
+        ),
+        'embedded.js': templateOnlyComponentTemplate(
+          `<h2><@fields.title /> - <@fields.createdAt /></h2>`
+        ),
+      },
+    });
+    builder.addRawCard({
+      url: 'http://mirage/cards/post-list',
+      schema: 'schema.js',
+      isolated: 'isolated.js',
+      embedded: 'embedded.js',
+      data: {
+        posts: [
+          {
+            title: 'A blog post title',
+            createdAt: '2021-05-17T15:31:21+0000',
+          },
+        ],
+      },
+      files: {
+        'schema.js': `
+        import { containsMany } from "@cardstack/types";
+        import post from "http://mirage/cards/post";
+
+        export default class Hello {
+          @containsMany(post)
+          posts;
+        }
+      `,
+        'isolated.js': templateOnlyComponentTemplate(
+          '{{#each @fields.posts as |Post|}}<Post />{{/each}}'
+        ),
+        'embedded.js': templateOnlyComponentTemplate(
+          '<ul>{{#each @fields.posts as |Post|}}<li><Post.title /></li>{{/each}}</ul>'
+        ),
+      },
+    });
+
+    let compiled = await builder.getCompiledCard(
+      'http://mirage/cards/post-list'
+    );
+    assert.deepEqual(Object.keys(compiled.fields), ['posts']);
+
+    assert.deepEqual(compiled.isolated.usedFields, [
+      'posts.title',
+      'posts.createdAt',
+    ]);
+
+    assert.deepEqual(
+      compiled.isolated.deserialize,
+      { date: ['posts.createdAt'] },
+      'Isolated component has a deserialization map'
+    );
+
+    containsSource(
+      builder.definedModules.get(compiled.isolated.moduleName),
+      `{{#each @model.posts as |Post|}}<PostsField @model={{Post}} />{{/each}}`,
+      'Isolated template includes PostField component'
+    );
+
+    assert.deepEqual(compiled.embedded.usedFields, ['posts.title']);
+
+    assert.notOk(
+      compiled.embedded.deserialize,
+      'embedded component has an empty deserialization map'
+    );
+    containsSource(
+      builder.definedModules.get(compiled.embedded.moduleName),
+      `<ul>{{#each @model.posts as |Post|}}<li>{{Post.title}}</li>{{/each}}</ul>`,
+      'Embedded template inlines post title'
     );
   });
 

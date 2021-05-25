@@ -202,8 +202,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         ),
         '{{#each @model.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}'
       );
-      assertEqualSets(usageMeta[MODEL], []);
-      assertEqualSets(usageMeta[FIELDS], ['items']);
+      assertEqualSets(usageMeta[MODEL], [], 'No @model usage meta');
+      assertEqualSets(usageMeta[FIELDS], ['items'], 'items as @field meta');
     });
 
     QUnit.test(

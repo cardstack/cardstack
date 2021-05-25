@@ -187,7 +187,7 @@ export class Compiler {
   }
 
   private getSource(cardSource: RawCard, path: string): string {
-    let schemaSrc = cardSource.files?.[path];
+    let schemaSrc = cardSource.files && cardSource.files[path];
     if (!schemaSrc) {
       throw new Error(
         `${cardSource.url} refers to ${path} in its card.json but that file does not exist`
@@ -292,7 +292,8 @@ export class Compiler {
           src,
           fields,
           originalRawCard.url,
-          srcLocalPath
+          srcLocalPath,
+          which
         );
       } else {
         // directly reuse existing parent component because we didn't extend
@@ -306,7 +307,8 @@ export class Compiler {
       src,
       fields,
       cardSource.url,
-      localFilePath
+      localFilePath,
+      which
     );
   }
 
@@ -314,7 +316,8 @@ export class Compiler {
     templateSource: string,
     fields: CompiledCard['fields'],
     cardURL: string,
-    localFile: string
+    localFile: string,
+    format: Format
   ): Promise<ComponentInfo> {
     let options: CardTemplateOptions = {
       fields,
@@ -332,7 +335,11 @@ export class Compiler {
       hashFilenameFromFields(localFile, fields),
       out!.code!
     );
-    let usedFields = buildUsedFieldsList(fields, options.usageMeta);
+    let usedFields = buildUsedFieldsListFromUsageMeta(
+      fields,
+      options.usageMeta,
+      format
+    );
 
     let componentInfo: ComponentInfo = {
       moduleName,
@@ -398,12 +405,49 @@ function getDeserializationMap(
     map[field.card.deserializer].push(fieldPath);
   }
 
+  if (!Object.keys(map).length) {
+    return;
+  }
+
   assertValidDeserializationMap(map);
+
   return map;
 }
-function buildUsedFieldsList(
+function buildUsedFieldsListFromUsageMeta(
   fields: CompiledCard['fields'],
-  usageMeta: TemplateUsageMeta
+  usageMeta: TemplateUsageMeta,
+  format: Format
 ): ComponentInfo['usedFields'] {
-  return [...usageMeta[FIELDS]];
+  let usedFields: string[] = [];
+  for (const fieldPath of usageMeta[FIELDS]) {
+    buildUsedFieldListFromCard(usedFields, fieldPath, fields, format);
+  }
+  return usedFields;
+}
+
+function buildUsedFieldListFromCard(
+  usedFields: string[],
+  fieldPath: string,
+  fields: CompiledCard['fields'],
+  format: Format,
+  prefix?: string
+): void {
+  let field = getFieldForPath(fields, fieldPath);
+  if (field && field.card[format].usedFields.length) {
+    for (const nestedFieldPath of field.card[format].usedFields) {
+      buildUsedFieldListFromCard(
+        usedFields,
+        nestedFieldPath,
+        field.card.fields,
+        'embedded',
+        fieldPath
+      );
+    }
+  } else {
+    if (prefix) {
+      usedFields.push(`${prefix}.${fieldPath}`);
+    } else {
+      usedFields.push(fieldPath);
+    }
+  }
 }

@@ -45,17 +45,16 @@ export function containsSource(
 }
 
 export function assertEqualSets(
-  actual: unknown,
+  actual: Set<string> | string,
   expected: string[],
   message?: string
 ): void {
-  let expectedSet = new Set(expected);
-  let result = isEqual(actual, expectedSet);
+  let result = isEqual([...actual], expected);
   message ||= 'Sets<> are equal';
   QUnit.assert.pushResult({
     result,
-    actual,
-    expected: expectedSet,
+    actual: [...actual], // To make the qunit diff printing nicer
+    expected: expected,
     message,
   });
 }
