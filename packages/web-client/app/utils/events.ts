@@ -1,3 +1,4 @@
+// based on https://github.com/ai/nanoevents/blob/main/index.js
 export type UnbindEventListener = () => void;
 
 export interface Emitter {
