@@ -7,6 +7,7 @@ import {
   ConvertibleSymbol,
   ConversionFunction,
 } from '@cardstack/web-client/utils/token';
+import { UnbindEventListener } from '@cardstack/web-client/utils/events';
 
 export interface Web3Strategy {
   chainName: string;
@@ -16,6 +17,7 @@ export interface Web3Strategy {
 }
 
 export interface Layer1Web3Strategy extends Web3Strategy {
+  on(event: string, cb: Function): UnbindEventListener;
   isConnected: boolean;
   defaultTokenBalance: BN | undefined;
   currentProviderId: string | undefined;

@@ -5,6 +5,7 @@ import { WalletProvider } from '../wallet-providers';
 import { defer } from 'rsvp';
 import { TransactionReceipt } from 'web3-core';
 import { getConstantByNetwork } from '@cardstack/cardpay-sdk/index.js';
+import { UnbindEventListener } from '@cardstack/web-client/utils/events';
 
 export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
   chainName = 'Ethereum mainnet';
@@ -12,6 +13,7 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
   isConnected: boolean = false;
   walletConnectUri: string | undefined;
   #waitForAccountDeferred = defer<void>();
+
   get waitForAccount(): Promise<void> {
     return this.#waitForAccountDeferred.promise;
   }
@@ -27,6 +29,11 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
 
   disconnect(): Promise<void> {
     throw new Error(`Method not implemented.`);
+  }
+
+  // eslint-disable-next-line no-unused-vars
+  on(event: string, cb: Function): UnbindEventListener {
+    throw new Error('Method not implemented');
   }
 
   approve(

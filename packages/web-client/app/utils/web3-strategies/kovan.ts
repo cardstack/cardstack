@@ -19,6 +19,10 @@ import {
   networkIds,
   getConstantByNetwork,
 } from '@cardstack/cardpay-sdk';
+import {
+  DappEvents,
+  UnbindEventListener,
+} from '@cardstack/web-client/utils/events';
 
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -26,6 +30,7 @@ let cardToken = new TokenContractInfo('CARD', 'kovan');
 
 let daiToken = new TokenContractInfo('DAI', 'kovan');
 
+// emits event
 export default class KovanWeb3Strategy implements Layer1Web3Strategy {
   chainName = 'Kovan testnet';
   chainId = networkIds['kovan'];
@@ -38,6 +43,8 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     cardToken.address
   );
   daiTokenContract = new this.web3.eth.Contract(daiToken.abi, daiToken.address);
+
+  dappEvents = new DappEvents();
 
   @tracked currentProviderId: string | undefined;
   @tracked walletInfo = new WalletInfo([], this.chainId);
@@ -83,6 +90,10 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     return this.#waitForAccountDeferred.promise;
   }
 
+  on(event: string, cb: Function): UnbindEventListener {
+    return this.dappEvents.on(event, cb);
+  }
+
   async connect(walletProvider: WalletProvider): Promise<void> {
     if (walletProvider.id === 'metamask') {
       this.provider = await this.setupMetamask();
@@ -121,7 +132,14 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
       await this.provider.disconnect();
     }
 
-    this.clearLocalConnectionState();
+    this.onDisconnect();
+  }
+
+  onDisconnect() {
+    if (this.isConnected) {
+      this.clearLocalConnectionState();
+      this.dappEvents.emit('disconnect');
+    }
   }
 
   clearLocalConnectionState() {
@@ -161,9 +179,13 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     });
 
     // Subscribe to session disconnection
+    // This is how WalletConnect informs us if we disconnect the Dapp
+    // from the wallet side. Unlike MetaMask, listening to 'accountsChanged'
+    // does not work.
     provider.on('disconnect', (code: number, reason: string) => {
       console.log('disconnect', code, reason);
-      this.clearLocalConnectionState();
+      // without checking this, the event will fire twice.
+      this.onDisconnect();
     });
 
     return provider;
@@ -184,7 +206,11 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     }
 
     provider.on('accountsChanged', (accounts: string[]) => {
-      this.updateWalletInfo(accounts, this.chainId);
+      if (!accounts.length) {
+        this.onDisconnect();
+      } else {
+        this.updateWalletInfo(accounts, this.chainId);
+      }
     });
 
     // Subscribe to chainId change
@@ -198,9 +224,12 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     });
 
     // Subscribe to provider disconnection
+    // MetaMask doesn't use disconnect the same way WalletConnect does
+    // If you disconnect via the wallet, the 'accountsChanged' event is where
+    // the Dapp is notified. Disconnect is for other unforeseen stuff
     provider.on('disconnect', (error: { code: number; message: string }) => {
       console.log(error);
-      this.clearLocalConnectionState();
+      this.onDisconnect();
     });
 
     return provider;
