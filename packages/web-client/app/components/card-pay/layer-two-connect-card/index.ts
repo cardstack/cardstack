@@ -8,7 +8,6 @@ import AppStoreBadge from '../../../images/icons/download-on-the-app-store-badge
 import GooglePlayBadge from '../../../images/icons/google-play-badge.png';
 import config from '@cardstack/web-client/config/environment';
 import { inject as service } from '@ember/service';
-import { tracked } from '@glimmer/tracking';
 import { reads } from 'macro-decorators';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
@@ -36,7 +35,6 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
   googlePlayUrl = config.urls.googlePlayLink;
 
   @reads('layer2Network.isConnected') declare isConnected: boolean;
-  @tracked isWaitingForConnection = false;
   constructor(owner: unknown, args: CardPayLayerTwoConnectCardComponentArgs) {
     super(owner, args);
     if (this.isConnected) {
@@ -49,9 +47,7 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
     }
   }
   @task *connectWalletTask() {
-    this.isWaitingForConnection = true;
     yield this.layer2Network.waitForAccount;
-    this.isWaitingForConnection = false;
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
     if (this.isConnected) {
       this.args.onConnect?.();
@@ -72,8 +68,6 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
   get cardState(): string {
     if (this.isConnected) {
       return 'memorialized';
-    } else if (this.isWaitingForConnection) {
-      return 'in-progress';
     } else {
       return 'default';
     }
