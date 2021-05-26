@@ -6,17 +6,13 @@ import type {
   Statement,
   Node,
 } from '@glimmer/syntax/dist/types/lib/v1/api';
-import {
-  CompiledCard,
-  Field,
-  FIELDS,
-  MODEL,
-  TemplateUsageMeta,
-} from '../interfaces';
+import { CompiledCard, Field, Format } from '../interfaces';
 import { singularize } from 'inflection';
 import { capitalize, cloneDeep } from 'lodash';
-import { inlineTemplateForField } from './inline-field-plugin';
 import { getFieldForPath } from '../utils';
+
+const MODEL = '@model';
+const FIELDS = '@fields';
 
 const IN_PROCESS_ELEMENT_ESCAPE = '__';
 class InvalidFieldsUsageError extends Error {
@@ -28,6 +24,11 @@ type ImportAndChooseName = (
   moduleSpecifier: string,
   importedName: string
 ) => string;
+
+export interface TemplateUsageMeta {
+  model: 'self' | Set<string>;
+  fields: Map<string, Format | 'default'>;
+}
 
 export interface Options {
   fields: CompiledCard['fields'];
@@ -47,13 +48,24 @@ type PrimitiveScopeValue =
   | {
       type: 'stringLiteral';
       value: string;
+    }
+  | {
+      type: 'pathExpression';
+      value: string;
     };
 
 type ScopeValue =
   | PrimitiveScopeValue
+  // A virtualScope allows us to claim a name in *part* of a real glimmer
+  // template scope. For any given name, if it's used as a child of one of the
+  // nodes in the nodes map, it takes the value of the corresponding value in
+  // the nodes map.
+  //
+  // If it doesn't appear in the nodes map, this scope doesn't have any opinion
+  // on that name, and the search should continue in the parent scope.
   | {
-      type: 'listExpansion';
-      nodes: Map<unknown, PrimitiveScopeValue>;
+      type: 'virtualScope';
+      nodes: Map<syntax.ASTv1.Statement, PrimitiveScopeValue>;
     };
 
 type Scope = Map<string, ScopeValue>;
@@ -109,12 +121,12 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             if (field.type === 'containsMany') {
               return expandContainsManyShorthand(`${FIELDS}.${fieldFullPath}`);
             }
-            usageMeta[FIELDS].add(fieldFullPath);
+            usageMeta.fields.set(fieldFullPath, 'default');
             return rewriteElementNode({
               field,
               importAndChooseName,
-              modelArgument: fieldFullPath,
-              prefix: `${MODEL}.`,
+              modelArgument: `${MODEL}.${fieldFullPath}`,
+              state,
             });
           }
 
@@ -131,18 +143,25 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             case 'normal':
               return;
             case 'stringLiteral':
-              throw new Error(`tried to use a field name as a component`);
+              throw new Error(
+                `tried to replace a component invocation with a string literal`
+              );
+            case 'pathExpression':
+              throw new Error(
+                `tried to replace a component invocation with a path expression`
+              );
             case 'fieldComponent':
               if (val.expandable && val.field.type === 'containsMany') {
                 return expandContainsManyShorthand(
                   `${FIELDS}.${val.fieldFullPath}`
                 );
               }
-              usageMeta[FIELDS].add(val.fieldFullPath);
+              usageMeta.fields.set(val.fieldFullPath, 'default');
               return rewriteElementNode({
                 field: val.field,
                 importAndChooseName,
                 modelArgument: val.pathForModel,
+                state,
               });
             default:
               throw assertNever(val);
@@ -175,6 +194,8 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               return;
             case 'stringLiteral':
               return env.syntax.builders.string(val.value);
+            case 'pathExpression':
+              return env.syntax.builders.path(val.value);
             case 'fieldComponent':
               return;
             //throw new Error(`cannot use field component as a value`);
@@ -231,35 +252,43 @@ function lookupScopeVal(
   state: State
 ): PrimitiveScopeValue {
   let [key, ...tail] = identifier.split('.');
-  let scopeVal = state.scopes.map((s) => s.get(key)).find(Boolean);
+  for (let scope of state.scopes) {
+    let scopeVal = scope.get(key);
+    if (!scopeVal) {
+      continue;
+    }
 
-  if (!scopeVal) {
-    return { type: 'normal' };
-  }
-
-  if (tail.length && scopeVal.type === 'fieldComponent') {
-    let field = getFieldForPath(scopeVal.field.card.fields, tail.join('.'));
-    if (field) {
-      return {
-        type: 'fieldComponent',
-        field,
-        pathForModel: identifier,
-        fieldFullPath: scopeVal.fieldFullPath + '.' + tail.join('.'),
-        expandable: true,
-      };
+    if (tail.length && scopeVal.type === 'fieldComponent') {
+      // todo: we should have a complete switch statement here for all
+      // scopeVal.type cases
+      let field = getFieldForPath(scopeVal.field.card.fields, tail.join('.'));
+      if (field) {
+        return {
+          type: 'fieldComponent',
+          field,
+          pathForModel: identifier,
+          fieldFullPath: scopeVal.fieldFullPath + '.' + tail.join('.'),
+          expandable: true,
+        };
+      }
+    }
+    if (scopeVal.type === 'virtualScope') {
+      let matched = enclosingScopeValue(path, scopeVal.nodes);
+      if (matched) {
+        return matched;
+      }
+    } else {
+      return scopeVal;
     }
   }
-  if (scopeVal.type === 'listExpansion') {
-    return enclosingScopeValue(path, scopeVal.nodes);
-  } else {
-    return scopeVal;
-  }
+
+  return { type: 'normal' };
 }
 
 function enclosingScopeValue(
   path: syntax.WalkerPath<Node>,
   nodes: Map<unknown, PrimitiveScopeValue>
-) {
+): PrimitiveScopeValue | undefined {
   let cursor: syntax.WalkerPath<Node> | null = path;
   while (cursor) {
     let entry = nodes.get(cursor.node);
@@ -268,7 +297,7 @@ function enclosingScopeValue(
     }
     cursor = cursor.parent;
   }
-  throw new Error(`bug: couldn't figure out which iteration we were in`);
+  return undefined;
 }
 
 function handleFieldsIterator(
@@ -282,11 +311,11 @@ function handleFieldsIterator(
 
   let replacement: syntax.ASTv1.Statement[] = [];
   let nameVar: ScopeValue = {
-    type: 'listExpansion',
+    type: 'virtualScope',
     nodes: new Map(),
   };
   let componentVar: ScopeValue = {
-    type: 'listExpansion',
+    type: 'virtualScope',
     nodes: new Map(),
   };
   for (let [name, field] of Object.entries(fields)) {
@@ -370,19 +399,19 @@ function rewriteElementNode(options: {
   field: Field;
   modelArgument: string;
   importAndChooseName: Options['importAndChooseName'];
-  prefix?: string;
+  state: State;
 }): Statement[] {
-  let { field, modelArgument, prefix } = options;
+  let { field, modelArgument, state } = options;
   let { inlineHBS } = field.card.embedded;
 
   if (inlineHBS) {
-    return inlineTemplateForField(inlineHBS, modelArgument, prefix);
+    return inlineTemplateForField(inlineHBS, modelArgument, state);
   } else {
     return rewriteFieldToComponent(
       options.importAndChooseName,
       field,
       modelArgument,
-      prefix
+      state
     );
   }
 }
@@ -412,9 +441,10 @@ function rewriteFieldToComponent(
   importAndChooseName: ImportAndChooseName,
   field: Field,
   modelArgument: string,
+  state: State,
   prefix?: string
 ): Statement[] {
-  let { element, attr, mustache } = syntax.builders;
+  let { element, attr, mustache, path } = syntax.builders;
 
   let componentName = importAndChooseName(
     capitalize(field.name),
@@ -426,8 +456,13 @@ function rewriteFieldToComponent(
     modelArgument = prefix + modelArgument;
   }
 
+  let modelExpression = path(modelArgument);
+  state.handledModelExpressions.add(modelExpression);
+
   let elementNode = element(componentName, {
-    attrs: [attr('@model', mustache(modelArgument))],
+    // build our own PathExpression for modelArgument so we can put it onto
+    // state.handledModelExpressions
+    attrs: [attr('@model', mustache(modelExpression))],
   });
   elementNode.selfClosing = true;
   return [elementNode];
@@ -468,10 +503,10 @@ function trackUsageForModel(
 
   let path = node.tail.join('.');
   if (!path) {
-    usageMeta[MODEL] = 'self';
+    usageMeta.model = 'self';
   } else {
-    if (usageMeta[MODEL] !== 'self' && !usageMeta[FIELDS].has(path)) {
-      (usageMeta[MODEL] as Set<string>).add(path);
+    if (usageMeta.model !== 'self') {
+      usageMeta.model.add(path);
     }
   }
 }
@@ -485,4 +520,24 @@ function fieldPathForElementNode(node: ElementNode): string | undefined {
 
 function assertNever(value: never) {
   throw new Error(`should never happen ${value}`);
+}
+
+function inlineTemplateForField(
+  inlineHBS: string,
+  fieldName: string,
+  state: State
+): syntax.ASTv1.Statement[] {
+  let { body } = syntax.preprocess(inlineHBS, {});
+  let nodes: Map<syntax.ASTv1.Statement, PrimitiveScopeValue> = new Map();
+  for (let statement of body) {
+    nodes.set(statement, {
+      type: 'pathExpression',
+      value: fieldName,
+    });
+  }
+  state.scopes[0].set('@model', {
+    type: 'virtualScope',
+    nodes,
+  });
+  return body;
 }

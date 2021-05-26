@@ -33,7 +33,7 @@ export const DESERIALIZER_NAMES = Object.keys(
 
 export type CardData = Record<string, any>;
 
-/* Card type IDEAS 
+/* Card type IDEAS
   primitive
   composite
   data
@@ -77,14 +77,10 @@ export interface CompiledCard {
 
   isolated: ComponentInfo;
   embedded: ComponentInfo;
-  assets: Asset[];
-}
 
-export const MODEL = '@model';
-export const FIELDS = '@fields';
-export interface TemplateUsageMeta {
-  '@model': 'self' | Set<string>;
-  '@fields': Set<string>;
+  // TODO: remove this, instead make the `define` interface mime-type aware and
+  // define all assets
+  assets: Asset[];
 }
 
 export interface ComponentInfo {

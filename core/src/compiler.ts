@@ -16,6 +16,7 @@ import cardSchemaPlugin, {
 import cardTemplatePlugin, {
   Options as CardTemplateOptions,
 } from './babel/card-template-plugin';
+import type { TemplateUsageMeta } from './glimmer/card-template-plugin';
 import {
   assertValidCompiledCard,
   assertValidDeserializationMap,
@@ -23,12 +24,9 @@ import {
   Builder,
   CompiledCard,
   ComponentInfo,
-  FIELDS,
-  MODEL,
   Format,
   FORMATS,
   RawCard,
-  TemplateUsageMeta,
 } from './interfaces';
 import { getBasenameAndExtension, getFieldForPath } from './utils';
 
@@ -330,7 +328,7 @@ export class Compiler {
       fields,
       cardURL,
       inlineHBS: undefined,
-      usageMeta: { '@model': new Set(), '@fields': new Set() },
+      usageMeta: { model: new Set(), fields: new Map() },
     };
 
     let out = transformSync(templateSource, {
@@ -342,10 +340,11 @@ export class Compiler {
       hashFilenameFromFields(localFile, fields),
       out!.code!
     );
+
     let usedFields = buildUsedFieldsListFromUsageMeta(
       fields,
       options.usageMeta,
-      format
+      defaultFieldFormat(format)
     );
 
     let componentInfo: ComponentInfo = {
@@ -423,18 +422,23 @@ function getDeserializationMap(
 function buildUsedFieldsListFromUsageMeta(
   fields: CompiledCard['fields'],
   usageMeta: TemplateUsageMeta,
-  format: Format
+  defaultFormat: Format
 ): ComponentInfo['usedFields'] {
   let usedFields: Set<string> = new Set();
 
-  if (usageMeta[MODEL] && usageMeta[MODEL] !== 'self') {
-    for (const fieldPath of usageMeta[MODEL]) {
+  if (usageMeta.model && usageMeta.model !== 'self') {
+    for (const fieldPath of usageMeta.model) {
       buildUsedFieldListFromData(usedFields, fieldPath, fields);
     }
   }
 
-  for (const fieldPath of usageMeta[FIELDS]) {
-    buildUsedFieldListFromComponents(usedFields, fieldPath, fields, format);
+  for (const [fieldPath, fieldFormat] of usageMeta.fields.entries()) {
+    buildUsedFieldListFromComponents(
+      usedFields,
+      fieldPath,
+      fields,
+      fieldFormat === 'default' ? defaultFormat : fieldFormat
+    );
   }
 
   return [...usedFields];
@@ -490,5 +494,14 @@ function buildUsedFieldListFromComponents(
     } else {
       usedFields.add(fieldPath);
     }
+  }
+}
+
+// we expect this to expand when we add edit format
+function defaultFieldFormat(format: Format): Format {
+  switch (format) {
+    case 'isolated':
+    case 'embedded':
+      return 'embedded';
   }
 }

@@ -13,10 +13,12 @@ import {
   objectExpression,
   identifier,
 } from '@babel/types';
-import { CompiledCard, TemplateUsageMeta } from '../interfaces';
+import { CompiledCard } from '../interfaces';
 
 import { getObjectKey, error } from './utils';
-import glimmerCardTemplateTransform from '../glimmer/card-template-plugin';
+import glimmerCardTemplateTransform, {
+  TemplateUsageMeta,
+} from '../glimmer/card-template-plugin';
 
 export interface Options {
   fields: CompiledCard['fields'];

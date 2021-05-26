@@ -44,17 +44,37 @@ export function containsSource(
   });
 }
 
-export function assertEqualSets(
-  actual: Set<string> | string,
-  expected: string[],
+export function assert_isEqual<T>(
+  actual: T,
+  expected: T,
   message?: string
 ): void {
-  let result = isEqual([...actual], expected);
-  message ||= 'Sets<> are equal';
+  message ||= 'isEqual';
+  let result = isEqual(actual, expected);
+
+  let printActual: any = actual;
+  let printExpected: any = expected;
+
+  if (actual instanceof Map) {
+    printActual = Object.fromEntries(actual);
+  }
+
+  if (actual instanceof Set) {
+    printActual = [...actual];
+  }
+
+  if (expected instanceof Map) {
+    printExpected = Object.fromEntries(expected);
+  }
+
+  if (expected instanceof Set) {
+    printExpected = [...expected];
+  }
+
   QUnit.assert.pushResult({
     result,
-    actual: [...actual], // To make the qunit diff printing nicer
-    expected: expected,
+    actual: printActual,
+    expected: printExpected,
     message,
   });
 }

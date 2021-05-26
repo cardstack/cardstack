@@ -1,10 +1,10 @@
 import QUnit from 'qunit';
-import { CompiledCard, FIELDS, MODEL } from '@cardstack/core/src/interfaces';
+import { CompiledCard } from '@cardstack/core/src/interfaces';
 import transform, {
   Options,
 } from '@cardstack/core/src/glimmer/card-template-plugin';
 import {
-  assertEqualSets,
+  assert_isEqual,
   equalIgnoringWhiteSpace,
 } from '@cardstack/core/tests/helpers/assertions';
 import { TestBuilder } from '../helpers/test-builder';
@@ -56,7 +56,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
   });
 
   hooks.beforeEach(function () {
-    usageMeta = { '@model': new Set(), '@fields': new Set() };
+    usageMeta = { model: new Set(), fields: new Map() };
   });
   QUnit.module('Primitive Fields', function () {
     QUnit.test('string-like', async function (assert) {
@@ -67,8 +67,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       });
       assert.equal(template, '{{@model}}');
 
-      assert.equal(usageMeta[MODEL], 'self');
-      assertEqualSets(usageMeta[FIELDS], []);
+      assert.equal(usageMeta['model'], 'self');
+      assert_isEqual(usageMeta['fields'], new Map());
     });
 
     QUnit.test('date-like', async function (assert) {
@@ -78,8 +78,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         importAndChooseName,
       });
       assert.equal(template, '<FormatDate @date={{@model}} />');
-      assert.equal(usageMeta[MODEL], 'self');
-      assertEqualSets(usageMeta[FIELDS], []);
+      assert.equal(usageMeta['model'], 'self');
+      assert_isEqual(usageMeta['fields'], new Map());
     });
   });
 
@@ -102,8 +102,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         '{{@model.title}}',
         'Component invocation is converted to handlebars expression'
       );
-      assertEqualSets(usageMeta[MODEL], []);
-      assertEqualSets(usageMeta[FIELDS], ['title']);
+      assert_isEqual(usageMeta['model'], new Set());
+      assert_isEqual(usageMeta['fields'], new Map([['title', 'default']]));
     });
 
     QUnit.test('simple model usage', async function (assert) {
@@ -124,8 +124,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         '{{helper @model.title}}',
         'Component invocation is converted to handlebars expression'
       );
-      assertEqualSets(usageMeta[MODEL], ['title']);
-      assertEqualSets(usageMeta[FIELDS], []);
+      assert_isEqual(usageMeta['model'], new Set(['title']));
+      assert_isEqual(usageMeta['fields'], new Map());
     });
 
     QUnit.test('Embedding with imports', async function (assert) {
@@ -142,8 +142,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       });
 
       assert.equal(template, '<BestGuess @model={{@model.createdAt}} />');
-      assertEqualSets(usageMeta[MODEL], []);
-      assertEqualSets(usageMeta[FIELDS], ['createdAt']);
+      assert_isEqual(usageMeta['model'], new Set());
+      assert_isEqual(usageMeta['fields'], new Map([['createdAt', 'default']]));
     });
 
     QUnit.test('Nested fields', async function (assert) {
@@ -169,8 +169,14 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         '{{@model.title}}{{@model.list.name}}',
         'Component invocation is converted to handlebars expression'
       );
-      assertEqualSets(usageMeta[MODEL], []);
-      assertEqualSets(usageMeta[FIELDS], ['title', 'list.name']);
+      assert_isEqual(usageMeta['model'], new Set());
+      assert_isEqual(
+        usageMeta['fields'],
+        new Map([
+          ['title', 'default'],
+          ['list.name', 'default'],
+        ])
+      );
     });
   });
 
@@ -202,8 +208,12 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         ),
         '{{#each @model.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}'
       );
-      assertEqualSets(usageMeta[MODEL], [], 'No @model usage meta');
-      assertEqualSets(usageMeta[FIELDS], ['items'], 'items as @field meta');
+      assert_isEqual(usageMeta['model'], new Set(), 'No @model usage meta');
+      assert_isEqual(
+        usageMeta['fields'],
+        new Map([['items', 'default']]),
+        'items as @field meta'
+      );
     });
 
     QUnit.test(
@@ -216,8 +226,11 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           ),
           '{{#each @model.list.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}'
         );
-        assertEqualSets(usageMeta[MODEL], []);
-        assertEqualSets(usageMeta[FIELDS], ['list.items']);
+        assert_isEqual(usageMeta['model'], new Set());
+        assert_isEqual(
+          usageMeta['fields'],
+          new Map([['list.items', 'default']])
+        );
       }
     );
 
@@ -228,8 +241,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         template,
         '{{#each @model.items as |item|}}{{item}}{{/each}}'
       );
-      assertEqualSets(usageMeta[MODEL], []);
-      assertEqualSets(usageMeta[FIELDS], ['items']);
+      assert_isEqual(usageMeta['model'], new Set());
+      assert_isEqual(usageMeta['fields'], new Map([['items', 'default']]));
     });
 
     QUnit.test(
@@ -241,8 +254,11 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           template,
           '{{#each @model.list.items as |item|}}{{item}}{{/each}}'
         );
-        assertEqualSets(usageMeta[MODEL], []);
-        assertEqualSets(usageMeta[FIELDS], ['list.items']);
+        assert_isEqual(usageMeta['model'], new Set());
+        assert_isEqual(
+          usageMeta['fields'],
+          new Map([['list.items', 'default']])
+        );
       }
     );
   });
@@ -275,8 +291,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         ),
         '{{#each @model.items as |Item|}}<BestGuess @model={{Item}} />{{/each}}'
       );
-      assertEqualSets(usageMeta[MODEL], []);
-      assertEqualSets(usageMeta[FIELDS], ['items']);
+      assert_isEqual(usageMeta['model'], new Set());
+      assert_isEqual(usageMeta['fields'], new Map([['items', 'default']]));
     });
 
     QUnit.test(
@@ -289,8 +305,11 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           ),
           '{{#each @model.list.dates as |ADate|}}<BestGuess @model={{ADate}} />{{/each}}'
         );
-        assertEqualSets(usageMeta[MODEL], []);
-        assertEqualSets(usageMeta[FIELDS], ['list.dates']);
+        assert_isEqual(usageMeta['model'], new Set());
+        assert_isEqual(
+          usageMeta['fields'],
+          new Map([['list.dates', 'default']])
+        );
       }
     );
 
@@ -299,8 +318,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         transform('<@fields.items />', options),
         '{{#each @model.items as |item|}}<BestGuess @model={{item}} />{{/each}}'
       );
-      assertEqualSets(usageMeta[MODEL], []);
-      assertEqualSets(usageMeta[FIELDS], ['items']);
+      assert_isEqual(usageMeta['model'], new Set());
+      assert_isEqual(usageMeta['fields'], new Map([['items', 'default']]));
     });
 
     QUnit.test(
@@ -310,8 +329,11 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           transform('<@fields.list.dates />', options),
           '{{#each @model.list.dates as |date|}}<BestGuess @model={{date}} />{{/each}}'
         );
-        assertEqualSets(usageMeta[MODEL], []);
-        assertEqualSets(usageMeta[FIELDS], ['list.dates']);
+        assert_isEqual(usageMeta['model'], new Set());
+        assert_isEqual(
+          usageMeta['fields'],
+          new Map([['list.dates', 'default']])
+        );
       }
     );
   });
@@ -376,8 +398,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       usageMeta,
       importAndChooseName,
     });
-    assertEqualSets(usageMeta[MODEL], []);
-    assertEqualSets(usageMeta[FIELDS], ['posts']);
+    assert_isEqual(usageMeta['model'], new Set());
+    assert_isEqual(usageMeta['fields'], new Map([['posts', 'default']]));
   });
 
   QUnit.module('@fields API', function (hooks) {
@@ -413,16 +435,22 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     // Reminder: as we wrote this, we decided that `<@fields.startDate />` can
     // just always replace `<@model.startDate />` for the invocation case, and
     // `{{@model.startDate}}` is *always* only the data.
-    QUnit.test('{{#each-in}} over @fields', async function () {
+    QUnit.test('{{#each-in}} over fields', async function () {
       equalIgnoringWhiteSpace(
         transform(
-          `{{#each-in @fields as |name Field|}}
+          `
+            <Whatever @name={{name}} />
+            {{#each-in @fields as |name Field|}}
               <label>{{name}}</label>
               <Field />
-           {{/each-in}}`,
+           {{/each-in}}
+           <Whichever @field={{Field}} />
+           `,
           options
         ),
-        `<label>{{"title"}}</label>
+        `
+          <Whatever @name={{name}} />
+          <label>{{"title"}}</label>
          {{@model.title}}
          <label>{{"startDate"}}</label>
          <BestGuess @model={{@model.startDate}} />
@@ -430,15 +458,19 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
          {{#each @model.items as |item|}}{{item}}{{/each}}
          <label>{{"events"}}</label>
          {{#each @model.events as |event|}}<BestGuess @model={{event}} />{{/each}}
+         <Whichever @field={{Field}} />
          `
       );
-      assertEqualSets(usageMeta[MODEL], []);
-      assertEqualSets(usageMeta[FIELDS], [
-        'title',
-        'startDate',
-        'items',
-        'events',
-      ]);
+      assert_isEqual(usageMeta['model'], new Set());
+      assert_isEqual(
+        usageMeta['fields'],
+        new Map([
+          ['title', 'default'],
+          ['startDate', 'default'],
+          ['items', 'default'],
+          ['events', 'default'],
+        ])
+      );
     });
   });
 
@@ -470,8 +502,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           {{/let}}
         {{/each}}`
     );
-    assertEqualSets(usageMeta[MODEL], []);
-    assertEqualSets(usageMeta[FIELDS], ['birthdays']);
+    assert_isEqual(usageMeta['model'], new Set());
+    assert_isEqual(usageMeta['fields'], new Map([['birthdays', 'default']]));
   });
 
   QUnit.test(
