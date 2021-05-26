@@ -111,13 +111,14 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   }
   for (let featureFile of FEATURE_NAMES) {
     if (featureFile in obj) {
-      if (typeof obj[featureFile] !== 'string') {
+      let filePath = obj[featureFile];
+      if (typeof filePath !== 'string') {
         throw new Error(
           `card.json in ${obj.url} has an invalid value for "${featureFile}"`
         );
       }
-      // TODO: This should resolve paths, so that isolated.js and ./isolated.js are the same
-      if (!obj.files?.[obj[featureFile]]) {
+      filePath = filePath.replace(/^\.\//, '');
+      if (!obj.files?.[filePath]) {
         throw new Error(
           `card.json in ${obj.url} refers to non-existent module ${obj[featureFile]}`
         );

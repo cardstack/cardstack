@@ -46,7 +46,7 @@ export class CardCache {
     return this.moduleURL(cardURL, localFile);
   }
 
-  writeAsset(cardURL: string, filename: string, source: string) {
+  writeAsset(cardURL: string, filename: string, source: string): string {
     let assetPath = this.getFileLocation('assets', cardURL, filename);
     this.writeFile(assetPath, source);
 
@@ -56,6 +56,7 @@ export class CardCache {
         this.getFileLocation(env, cardURL, filename)
       );
     }
+    return assetPath;
   }
 
   private writeFile(fsLocation: string, source: string): void {

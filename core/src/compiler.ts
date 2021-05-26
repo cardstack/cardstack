@@ -48,6 +48,7 @@ export class Compiler {
   define: (
     cardURL: string,
     localModule: string,
+    type: Asset['type'] | 'js',
     source: string
   ) => Promise<string>;
 
@@ -138,6 +139,9 @@ export class Compiler {
         continue;
       }
 
+      let src = this.getFile(sourceCard, p);
+      this.define(sourceCard.url, p, getAssetType(p), src);
+
       assets.push({
         type: getAssetType(p),
         path: p,
@@ -191,14 +195,14 @@ export class Compiler {
     }
   }
 
-  private getSource(cardSource: RawCard, path: string): string {
-    let schemaSrc = cardSource.files && cardSource.files[path];
-    if (!schemaSrc) {
+  private getFile(cardSource: RawCard, path: string): string {
+    let fileSrc = cardSource.files && cardSource.files[path];
+    if (!fileSrc) {
       throw new Error(
         `${cardSource.url} refers to ${path} in its card.json but that file does not exist`
       );
     }
-    return schemaSrc;
+    return fileSrc;
   }
 
   // returns the module name of our own compiled schema, if we have one. Does
@@ -218,7 +222,7 @@ export class Compiler {
 
       return undefined;
     }
-    let schemaSrc = this.getSource(cardSource, schemaLocalFilePath);
+    let schemaSrc = this.getFile(cardSource, schemaLocalFilePath);
     let out = transformSync(schemaSrc, {
       plugins: [
         [cardSchemaPlugin, options],
@@ -228,7 +232,7 @@ export class Compiler {
     });
 
     let code = out!.code!;
-    return await this.define(cardSource.url, schemaLocalFilePath, code);
+    return await this.define(cardSource.url, schemaLocalFilePath, 'js', code);
   }
 
   private async lookupFieldsForCard(
@@ -292,7 +296,7 @@ export class Compiler {
             `bug: ${parentCard.url} says it got ${which} from ${parentCard[which].sourceCardURL}, but that card does not have a ${which} component`
           );
         }
-        let src = this.getSource(originalRawCard, srcLocalPath);
+        let src = this.getFile(originalRawCard, srcLocalPath);
         return await this.compileComponent(
           src,
           fields,
@@ -307,7 +311,7 @@ export class Compiler {
       }
     }
 
-    let src = this.getSource(cardSource, localFilePath);
+    let src = this.getFile(cardSource, localFilePath);
     return await this.compileComponent(
       src,
       fields,
@@ -338,6 +342,7 @@ export class Compiler {
     let moduleName = await this.define(
       cardURL,
       hashFilenameFromFields(localFile, fields),
+      'js',
       out!.code!
     );
 

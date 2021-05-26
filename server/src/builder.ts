@@ -20,7 +20,7 @@ import { CardCache } from './cache';
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
     builder: this,
-    define: (...args) => this.defineModule(...args),
+    define: (...args) => this.define(...args),
   });
 
   // private cache: Map<string, CompiledCard>;
@@ -36,17 +36,27 @@ export default class Builder implements BuilderInterface {
     this.cache = new CardCache(params.cardCacheDir, params.pkgName);
   }
 
-  private async defineModule(
+  private async define(
     cardURL: string,
-    localModule: string,
+    localPath: string,
+    type: Asset['type'] | 'js',
     source: string
   ): Promise<string> {
-    let url = this.cache.setModule(BROWSER, cardURL, localModule, source);
+    let url = this.cache.setModule(BROWSER, cardURL, localPath, source);
 
-    let nodeSource = this.transformToCommonJS(localModule, source);
-    this.cache.setModule(NODE, cardURL, localModule, nodeSource);
-
-    return url;
+    switch (type) {
+      case 'unknown':
+      case 'css':
+        return this.cache.writeAsset(cardURL, localPath, source);
+      case 'js':
+        this.cache.setModule(
+          NODE,
+          cardURL,
+          localPath,
+          this.transformToCommonJS(localPath, source)
+        );
+        return url;
+    }
   }
 
   private transformToCommonJS(moduleURL: string, source: string): string {
@@ -109,23 +119,9 @@ export default class Builder implements BuilderInterface {
     return this.buildCard(url);
   }
 
-  copyAssets(
-    cardURL: string,
-    assets: (Asset | undefined)[],
-    files: RawCard['files']
-  ): void {
-    for (const asset of assets) {
-      if (!asset) {
-        continue;
-      }
-      this.cache.writeAsset(cardURL, asset.path, files[asset.path]);
-    }
-  }
-
   async buildCard(url: string): Promise<CompiledCard> {
     let rawCard = await this.getRawCard(url);
     let compiledCard = await this.compileCardFromRaw(url, rawCard);
-    this.copyAssets(url, compiledCard.assets, rawCard.files);
     return compiledCard;
   }
 

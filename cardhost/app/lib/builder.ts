@@ -26,12 +26,19 @@ export default class Builder implements BuilderInterface {
   private async defineModule(
     cardURL: string,
     localModule: string,
+    type: Asset['type'] | 'js',
     source: string
   ): Promise<string> {
     let url = new URL(localModule, cardURL.replace(/\/$/, '') + '/').href;
-    source = dynamicCardTransform(url, source);
-    eval(source);
-    return url;
+
+    switch (type) {
+      case 'unknown':
+      case 'css':
+        return url;
+      case 'js':
+        eval(dynamicCardTransform(url, source));
+        return url;
+    }
   }
 
   async getRawCard(url: string): Promise<RawCard> {
