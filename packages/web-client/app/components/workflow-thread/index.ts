@@ -27,4 +27,8 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   get canceled() {
     return !this.args.workflow.isComplete && this.args.cancelation;
   }
+
+  get lastMilestonePostable() {
+    return this.args.workflow.peekAtVisiblePostables().slice(-1)[0];
+  }
 }
