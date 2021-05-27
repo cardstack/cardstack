@@ -46,6 +46,14 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
       taskFor(this.connectWalletTask).perform();
     }
   }
+
+  get hasBalance() {
+    return (
+      this.layer2Network.defaultTokenBalance &&
+      !this.layer2Network.defaultTokenBalance.isZero()
+    );
+  }
+
   @task *connectWalletTask() {
     yield this.layer2Network.waitForAccount;
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
