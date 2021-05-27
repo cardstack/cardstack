@@ -1,6 +1,6 @@
 import { Server } from 'http';
 import supertest, { Test } from 'supertest';
-import { bootEnvironmentForTesting } from '../../main';
+import { bootServerForTesting } from '../../main';
 import { Registry } from '../../dependency-injection';
 import packageJson from '../../package.json';
 import { AcceleratableClock } from '../helpers';
@@ -45,7 +45,7 @@ describe('GET /api/session', function () {
   let server: Server;
   let request: supertest.SuperTest<Test>;
   this.beforeEach(async function () {
-    server = await bootEnvironmentForTesting({
+    server = await bootServerForTesting({
       port: 3001,
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
@@ -125,7 +125,7 @@ describe('POST /api/session', function () {
   let bodyWithCorrectSignature: any;
 
   this.beforeEach(async function () {
-    server = await bootEnvironmentForTesting({
+    server = await bootServerForTesting({
       port: 3001,
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
