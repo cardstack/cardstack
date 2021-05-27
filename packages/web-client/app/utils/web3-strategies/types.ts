@@ -19,10 +19,11 @@ export interface Web3Strategy {
 export interface Layer1Web3Strategy extends Web3Strategy {
   on(event: string, cb: Function): UnbindEventListener;
   isConnected: boolean;
-  defaultTokenBalance: BN | undefined;
   currentProviderId: string | undefined;
+  defaultTokenBalance: BN | undefined;
   daiBalance: BN | undefined;
   cardBalance: BN | undefined;
+  refreshBalances(): void;
   connect(walletProvider: WalletProvider): Promise<void>;
   waitForAccount: Promise<void>;
   approve(amountInWei: BN, token: string): Promise<TransactionReceipt>;

@@ -189,6 +189,9 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(`${post} [data-test-unlock-button]`)
       .isEnabled('Unlock button is enabled once amount has been entered');
+
+    // make sure that our property to test if balances are refreshed is not true yet
+    layer1Service.balancesRefreshed = false;
     await click(`${post} [data-test-unlock-button]`);
 
     // // MetaMask pops up and user approves the transaction. There is a spinner
@@ -226,6 +229,11 @@ module('Acceptance | deposit', function (hooks) {
 
     layer1Service.test__simulateDeposit();
     await settled();
+
+    assert.ok(
+      layer1Service.balancesRefreshed,
+      'Balances should be refreshed after relaying tokens'
+    );
 
     assert
       .dom(`${post} [data-test-deposit-button]`)
