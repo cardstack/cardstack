@@ -24,7 +24,7 @@ package-lock.json
 /packages/hub/**/*.d.ts
 /packages/hub/**/*.js
 /packages/hub/**/*.js.map
-!/packages/hub/migrations/*.js
+!/packages/hub/db/migrations/*.js
 /cards/**/*.d.ts
 /cards/**/*.js
 /cards/**/*.js.map

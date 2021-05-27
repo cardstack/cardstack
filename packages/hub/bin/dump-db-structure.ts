@@ -11,7 +11,7 @@ const { exec } = require('child_process');
 //@ts-ignore not actually a duplicate function definition
 async function run() {
   const dbConfig = config.get('db');
-  let result = await exec(`pg_dump ${dbConfig.url} -f config/structure.sql`);
-  console.log(result);
+  await exec(`pg_dump -s ${dbConfig.url} -f config/structure.sql`);
+  console.log('Output to config/structure.sql');
 }
 run();
