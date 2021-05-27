@@ -33,6 +33,7 @@ interface PrepaidCardSafe extends BaseSafe {
   issuingToken: string;
   spendFaceValue: number;
   issuer: string;
+  reloadable: boolean;
 }
 interface TokenInfo {
   tokenAddress: string;
@@ -77,7 +78,9 @@ export default class Safes {
         let balances: TokenInfo[] = await balanceResponse.json();
         let tokens = balances.filter((balanceItem) => balanceItem.tokenAddress);
         let safeInfo = { address: safeAddress, tokens };
-        let { issuer, issueToken: issuingToken } = await prepaidCardManager.methods.cardDetails(safeAddress).call();
+        let { issuer, issueToken: issuingToken, reloadable } = await prepaidCardManager.methods
+          .cardDetails(safeAddress)
+          .call();
 
         // prepaid card safe
         if (issuer !== ZERO_ADDRESS) {
@@ -88,6 +91,7 @@ export default class Safes {
             type: 'prepaid-card' as 'prepaid-card',
             issuer,
             issuingToken,
+            reloadable,
             spendFaceValue: await exchangeRate.convertToSpend(issuingToken, issuingTokenBalance),
           };
         }
