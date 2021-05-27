@@ -74,6 +74,23 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     }
   }
 
+  get balancesToShow() {
+    return [
+      {
+        symbol: 'ETH',
+        amount: this.layer1Network.defaultTokenBalance,
+      },
+      {
+        symbol: 'DAI',
+        amount: this.layer1Network.daiBalance,
+      },
+      {
+        symbol: 'CARD',
+        amount: this.layer1Network.cardBalance,
+      },
+    ].filter((o) => !o.amount?.isZero());
+  }
+
   @action changeWalletProvider(id: string): void {
     this.radioWalletProviderId = id;
   }

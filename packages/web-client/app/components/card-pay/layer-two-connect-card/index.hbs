@@ -26,10 +26,14 @@
           @value={{this.layer2Network.walletInfo.firstAddress}}
           @isAddress={{true}}
         />
-        <CardPay::LabeledValue @label="Depot balance">
+        <CardPay::LabeledValue @label="Depot balance" data-test-balance-container>
+          {{#if this.hasBalance}}
           <CardPay::BalancesList as |Balance|>
             <Balance @symbol="XDAI" @amount={{this.layer2Network.defaultTokenBalance}} />
           </CardPay::BalancesList>
+          {{else}}
+          None
+          {{/if}}
         </CardPay::LabeledValue>
         {{!-- future: show Prepaid Cards, Badges --}}
         <CardPay::LabeledValue
