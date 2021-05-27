@@ -34,6 +34,15 @@
           data-test-epilogue
         />
       {{/each}}
+    {{else if @cancelation}}
+      {{#each @cancelation.visiblePostables as |postable k|}}
+         <WorkflowThread::Postable
+           @postable={{postable}}
+           @postables={{postable}}
+           @index={{k}}
+           data-test-cancelation
+         />
+      {{/each}}
     {{/if}}
     <div data-thread-end></div>
   </:content>
@@ -52,7 +61,7 @@
           />
         </div>
         <div class="workflow-thread__status">
-          {{@workflow.progressStatus}}
+          {{if this.canceled "Workflow canceled" @workflow.progressStatus}}
         </div>
       </Boxel::Sidebar::CardContainer>
 

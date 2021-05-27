@@ -6,6 +6,11 @@ import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
 import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import { inject as service } from '@ember/service';
+import { action } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
 
 class DepositWorkflow extends Workflow {
   name = 'Reserve Pool Deposit';
@@ -153,10 +158,52 @@ class DepositWorkflow extends Workflow {
 }
 
 class DepositWorkflowComponent extends Component {
+  @service declare layer1Network: Layer1Network;
+  @service declare layer2Network: Layer2Network;
+  @tracked layer1Disconnected = false;
+  @tracked layer2Disconnected = false;
+
   workflow!: DepositWorkflow;
   constructor(owner: unknown, args: {}) {
     super(owner, args);
     this.workflow = new DepositWorkflow(getOwner(this));
+  }
+
+  get cancelation() {
+    if (!(this.layer1Disconnected || this.layer2Disconnected)) return null;
+    else {
+      let message = '';
+
+      if (this.layer1Disconnected && this.layer2Disconnected) {
+        message =
+          'It looks like your wallets have been disconnected. If you still want to deposit funds, please start again by connecting your wallets.';
+      } else if (this.layer1Disconnected) {
+        message =
+          'It looks like your mainnet wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.';
+      } else if (this.layer2Disconnected) {
+        message =
+          'It looks like your xDai chain wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.';
+      }
+
+      let result = new PostableCollection([
+        new WorkflowMessage({
+          author: cardbot,
+          message,
+        }),
+      ]);
+
+      result.setWorkflow(this.workflow);
+
+      return result;
+    }
+  }
+
+  @action onLayer1Disconnect() {
+    this.layer1Disconnected = true;
+  }
+
+  @action onLayer2Disconnect() {
+    this.layer2Disconnected = true;
   }
 }
 
