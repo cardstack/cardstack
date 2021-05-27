@@ -169,8 +169,9 @@ class DepositWorkflowComponent extends Component {
     this.workflow = new DepositWorkflow(getOwner(this));
   }
 
-  get cancelation() {
-    if (!(this.layer1Disconnected || this.layer2Disconnected)) return null;
+  setCancelation() {
+    if (!(this.layer1Disconnected || this.layer2Disconnected))
+      this.workflow.setCancelation(undefined);
     else {
       let message = '';
 
@@ -192,18 +193,18 @@ class DepositWorkflowComponent extends Component {
         }),
       ]);
 
-      result.setWorkflow(this.workflow);
-
-      return result;
+      this.workflow.setCancelation(result);
     }
   }
 
   @action onLayer1Disconnect() {
     this.layer1Disconnected = true;
+    this.setCancelation();
   }
 
   @action onLayer2Disconnect() {
     this.layer2Disconnected = true;
+    this.setCancelation();
   }
 }
 

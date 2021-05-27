@@ -3,6 +3,7 @@ import { Milestone } from './workflow/milestone';
 import PostableCollection from './workflow/postable-collection';
 import { WorkflowPostable } from './workflow/workflow-postable';
 import WorkflowSession from './workflow/workflow-session';
+import { tracked } from '@glimmer/tracking';
 
 interface PostableIndices {
   isInMilestone: boolean;
@@ -15,6 +16,7 @@ export abstract class Workflow {
   name!: string;
   milestones: Milestone[] = [];
   epilogue: PostableCollection = new PostableCollection();
+  @tracked cancelation: PostableCollection | undefined;
   session: WorkflowSession = new WorkflowSession();
   owner: any;
 
@@ -45,6 +47,19 @@ export abstract class Workflow {
 
   get isComplete() {
     return A(this.milestones).isEvery('isComplete');
+  }
+
+  get isCanceled() {
+    return !this.isComplete && this.cancelation;
+  }
+
+  setCancelation(cancelation: PostableCollection | undefined) {
+    if (this.isComplete) this.cancelation = undefined;
+    // todo: freeze the workflow if it's canceled, to prevent anything from making changes to the workflow
+    // this will require changes to WorkflowCard
+
+    this.cancelation = cancelation;
+    this.cancelation?.setWorkflow(this);
   }
 
   get progressStatus() {

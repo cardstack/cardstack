@@ -34,11 +34,11 @@
           data-test-epilogue
         />
       {{/each}}
-    {{else if @cancelation}}
-      {{#each @cancelation.visiblePostables as |postable j|}}
+    {{else if @workflow.isCanceled}}
+      {{#each @workflow.cancelation.visiblePostables as |postable j|}}
          <WorkflowThread::Postable
            @postable={{postable}}
-           @previous={{if (eq j 0) this.lastMilestonePostable (object-at @cancelation.visiblePostables (dec j))}}
+           @previous={{if (eq j 0) this.lastMilestonePostable (object-at @workflow.cancelation.visiblePostables (dec j))}}
            @index={{j}}
            data-test-cancelation
          />
@@ -61,7 +61,7 @@
           />
         </div>
         <div class="workflow-thread__status">
-          {{if this.canceled "Workflow canceled" @workflow.progressStatus}}
+          {{if @workflow.isCanceled "Workflow canceled" @workflow.progressStatus}}
         </div>
       </Boxel::Sidebar::CardContainer>
 

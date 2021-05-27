@@ -1,10 +1,8 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
 import { Workflow } from '@cardstack/web-client/models/workflow';
 
 interface WorkflowThreadArgs {
-  cancelation: PostableCollection;
   workflow: Workflow;
 }
 
@@ -22,10 +20,6 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
     let targetEl =
       milestoneEl || this.threadEl?.querySelector('[data-thread-end]');
     targetEl?.scrollIntoView({ block: 'end', behavior: 'smooth' });
-  }
-
-  get canceled() {
-    return !this.args.workflow.isComplete && this.args.cancelation;
   }
 
   get lastMilestonePostable() {
