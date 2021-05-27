@@ -333,6 +333,7 @@ export class Compiler {
       fields,
       cardURL,
       inlineHBS: undefined,
+      fieldFormat: defaultFieldFormat(format),
       usageMeta: { model: new Set(), fields: new Map() },
     };
 
@@ -480,6 +481,7 @@ function buildUsedFieldListFromComponents(
   prefix?: string
 ): void {
   let field = getFieldForPath(fields, fieldPath);
+
   if (field && field.card[format].usedFields.length) {
     for (const nestedFieldPath of field.card[format].usedFields) {
       buildUsedFieldListFromComponents(
@@ -505,5 +507,7 @@ function defaultFieldFormat(format: Format): Format {
     case 'isolated':
     case 'embedded':
       return 'embedded';
+    case 'edit':
+      return 'edit';
   }
 }

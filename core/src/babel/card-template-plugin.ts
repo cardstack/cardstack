@@ -13,7 +13,7 @@ import {
   objectExpression,
   identifier,
 } from '@babel/types';
-import { CompiledCard } from '../interfaces';
+import { CompiledCard, Format } from '../interfaces';
 
 import { getObjectKey, error } from './utils';
 import glimmerCardTemplateTransform, {
@@ -23,7 +23,7 @@ import glimmerCardTemplateTransform, {
 export interface Options {
   fields: CompiledCard['fields'];
   cardURL: string;
-
+  fieldFormat: Format;
   // these are for gathering output
   usageMeta: TemplateUsageMeta;
   inlineHBS: string | undefined;
@@ -179,6 +179,7 @@ function transformTemplate(
   let template = glimmerCardTemplateTransform(source, {
     fields: opts.fields,
     usageMeta: opts.usageMeta,
+    fieldFormat: opts.fieldFormat,
     importAndChooseName,
   });
   return { template, neededScope };

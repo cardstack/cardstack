@@ -1,4 +1,4 @@
-import QUnit from 'qunit';
+import QUnit, { only } from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { containsSource } from '@cardstack/core/tests/helpers/assertions';
 import { TestBuilder } from '../helpers/test-builder';
@@ -79,7 +79,7 @@ Qmodule('Compiler', function (hooks) {
     );
   });
 
-  test('basic example', async function (assert) {
+  only('basic example', async function (assert) {
     builder.addRawCard(PERSON_CARD);
 
     let compiled = await builder.getCompiledCard(PERSON_CARD.url);
@@ -95,6 +95,23 @@ Qmodule('Compiler', function (hooks) {
       { date: ['birthdate'] },
       'Embedded component has a deserialization map'
     );
+
+    assert.deepEqual(compiled.edit.usedFields, ['name', 'birthdate']);
+    assert.deepEqual(
+      compiled.edit.deserialize,
+      { date: ['birthdate'] },
+      'Edit deserialization map still includes birthdate, because it was used as data'
+    );
+    containsSource(
+      builder.definedModules.get(compiled.edit.moduleName),
+      '<input type="text" value="{{@model.name}}" />',
+      'Edit template is rendered for text'
+    );
+    containsSource(
+      builder.definedModules.get(compiled.edit.moduleName),
+      '<input type="date" value="{{@model.birthday}}" />',
+      'Edit template is rendered for date'
+    );
   });
 
   test('nested cards', async function (assert) {
@@ -104,6 +121,7 @@ Qmodule('Compiler', function (hooks) {
       schema: 'schema.js',
       embedded: 'embedded.js',
       isolated: 'isolated.js',
+      edit: 'edit.js',
       files: {
         'schema.js': `
           import { contains } from "@cardstack/types";
@@ -139,7 +157,6 @@ Qmodule('Compiler', function (hooks) {
       { date: ['author.birthdate'] },
       'Embedded component has a deserialization map'
     );
-
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
       `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><BirthdateField @model={{@model.author.birthdate}} /></p></article>`
@@ -159,6 +176,7 @@ Qmodule('Compiler', function (hooks) {
       schema: 'schema.js',
       isolated: 'isolated.js',
       embedded: 'embedded.js',
+      edit: 'edit.js',
       files: {
         'schema.js': `
         import { contains } from "@cardstack/types";

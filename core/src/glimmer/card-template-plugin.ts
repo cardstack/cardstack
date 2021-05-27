@@ -33,6 +33,7 @@ export interface TemplateUsageMeta {
 export interface Options {
   fields: CompiledCard['fields'];
   usageMeta: TemplateUsageMeta;
+  fieldFormat: Format;
   importAndChooseName: ImportAndChooseName;
 }
 
@@ -95,7 +96,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   return function transform(
     env: syntax.ASTPluginEnvironment
   ): syntax.ASTPlugin {
-    let { fields, importAndChooseName, usageMeta } = options;
+    let { fields, importAndChooseName, usageMeta, fieldFormat } = options;
     let state: State = {
       scopes: [new Map()],
       nextScope: undefined,
@@ -126,6 +127,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               field,
               importAndChooseName,
               modelArgument: `${MODEL}.${fieldFullPath}`,
+              format: fieldFormat,
               state,
             });
           }
@@ -161,6 +163,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
                 field: val.field,
                 importAndChooseName,
                 modelArgument: val.pathForModel,
+                format: fieldFormat,
                 state,
               });
             default:
@@ -400,9 +403,11 @@ function rewriteElementNode(options: {
   modelArgument: string;
   importAndChooseName: Options['importAndChooseName'];
   state: State;
+  format: Format;
 }): Statement[] {
-  let { field, modelArgument, state } = options;
-  let { inlineHBS } = field.card.embedded;
+  let { field, modelArgument, state, format } = options;
+
+  let { inlineHBS } = field.card[format];
 
   if (inlineHBS) {
     return inlineTemplateForField(inlineHBS, modelArgument, state);
@@ -411,7 +416,8 @@ function rewriteElementNode(options: {
       options.importAndChooseName,
       field,
       modelArgument,
-      state
+      state,
+      format
     );
   }
 }
@@ -442,13 +448,14 @@ function rewriteFieldToComponent(
   field: Field,
   modelArgument: string,
   state: State,
+  format: Format,
   prefix?: string
 ): Statement[] {
   let { element, attr, mustache, path } = syntax.builders;
 
   let componentName = importAndChooseName(
     capitalize(field.name),
-    field.card.embedded.moduleName,
+    field.card[format].moduleName,
     'default'
   );
 

@@ -57,7 +57,7 @@ module('Integration | card-service', function (hooks) {
       });
     });
 
-    test(`load an isolated card's component`, async function (assert) {
+    test(`load a cards isolated component`, async function (assert) {
       let { component } = await cards.load(cardID, 'isolated');
       this.set('component', component);
       await render(hbs`<this.component />`);
@@ -65,7 +65,7 @@ module('Integration | card-service', function (hooks) {
       assert.dom('h2').containsText('May 17, 2021');
     });
 
-    test(`load an isolated card's model`, async function (assert) {
+    test(`load an card's isolated view and model`, async function (assert) {
       let { model } = await cards.load(cardID, 'isolated');
       assert.equal(model.id, encodeCardURL(cardID), '@model id is correct');
       assert.equal(model.title, 'A blog post title', 'post title is correct');
@@ -78,6 +78,16 @@ module('Integration | card-service', function (hooks) {
         1621265481000,
         'post created at is correct'
       );
+    });
+
+    test(`load a cards edit component`, async function (assert) {
+      let { component } = await cards.load(cardID, 'edit');
+      this.set('component', component);
+      await render(hbs`<this.component />`);
+
+      await this.pauseTest();
+      assert.dom('input[type="text"]').hasValue('A blog post title');
+      assert.dom('input[type="date"]').hasValue('May 17, 2021');
     });
 
     test('Serialization works on nested cards', async function (assert) {

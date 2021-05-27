@@ -4,6 +4,7 @@ import { BadRequest } from '@cardstack/server/src/middleware/error';
 const componentFormats = {
   isolated: '',
   embedded: '',
+  edit: '',
 };
 export type Format = keyof typeof componentFormats;
 export const FORMATS = Object.keys(componentFormats) as Format[];
@@ -34,20 +35,21 @@ export const DESERIALIZER_NAMES = Object.keys(
 export type CardData = Record<string, any>;
 
 /* Card type IDEAS
-  primitive
-  composite
-  data
+  primitive: Where card is a value, has validation and/or a serialize. IE: Date, string
+  composite: Where card is combining multifle cards, ie: A blog post
+  data: A card that likely adopts from a composite card, but only provides new data for it
 */
 
 export type RawCard = {
   url: string;
 
-  // paths within "files"
+  // Feature Files. Value is path inside the files list
+  schema?: string;
   isolated?: string;
   embedded?: string;
-  schema?: string;
-  containsRoutes?: boolean;
+  edit?: string;
 
+  containsRoutes?: boolean;
   deserializer?: DeserializerName;
 
   // url to the card we adopted from
@@ -77,6 +79,7 @@ export interface CompiledCard {
 
   isolated: ComponentInfo;
   embedded: ComponentInfo;
+  edit: ComponentInfo;
 
   // TODO: remove this, instead make the `define` interface mime-type aware and
   // define all assets

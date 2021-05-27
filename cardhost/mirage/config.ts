@@ -1,5 +1,5 @@
 import { cardJSONReponse } from '@cardstack/server/src/interfaces';
-import { Format, RawCard } from '@cardstack/core/src/interfaces';
+import { Format, RawCard, FORMATS } from '@cardstack/core/src/interfaces';
 import type {
   Response as ResponseType,
   Request as RequestType,
@@ -63,23 +63,25 @@ class FakeCardServer {
   }
 }
 
-function cardParams(queryParams: RequestType['queryParams']): CardParams {
+function assertValidQueryParams(
+  queryParams: any
+): asserts queryParams is CardParams {
   let { type, format } = queryParams;
   if (type && !['raw', 'compiled'].includes(type)) {
     throw new Error(`unsupported ?type=${type}`);
   }
-  if (format && !['isolated', 'embedded'].includes(format)) {
+  if (format && !FORMATS.includes(format)) {
     throw new Error(`unsupported ?format=${format}`);
   }
   if (type === 'compiled' && !format) {
     throw new Error(`format is required at the moment`);
   }
-  return (queryParams as unknown) as CardParams;
 }
 
 async function returnCard(schema: any, request: RequestType) {
   let cardServer = FakeCardServer.current();
-  let params = cardParams(request.queryParams);
+  let params = request.queryParams;
+  assertValidQueryParams(params);
   let cardURL = request.params.encodedCardURL;
 
   if (params.type === 'raw') {
