@@ -15,9 +15,8 @@ async function seedDatabase() {
   let db = await dbManager.getClient();
   console.log(`Seeding ${db.connectionParameters.database}...`);
   try {
-    db.connect();
     await seed(db);
-    db.end();
+    container.teardown();
   } catch (e) {
     console.error(e);
   }
