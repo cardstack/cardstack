@@ -4,12 +4,12 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
-import ERC677ABI from '../contracts/abi/erc-677.js';
-import PrepaidCardManagerABI from '../contracts/abi/prepaid-card-manager';
-import { getAddress } from '../contracts/addresses.js';
-import { getConstant, ZERO_ADDRESS } from './constants.js';
-import ExchangeRate from './exchange-rate';
-import { ERC20ABI } from '../index.js';
+import ERC677ABI from '../../contracts/abi/erc-677.js';
+import PrepaidCardManagerABI from '../../contracts/v0.2.0/abi/prepaid-card-manager';
+import { getAddress } from '../../contracts/addresses.js';
+import { getConstant, ZERO_ADDRESS } from '../constants.js';
+import getExchangeRate from '../exchange-rate';
+import { ERC20ABI } from '../../index.js';
 import {
   Estimate,
   RelayTransaction,
@@ -19,7 +19,7 @@ import {
   gasEstimate,
   executeTransaction,
   waitUntilTransactionMined,
-} from './utils';
+} from '../utils';
 import { TransactionReceipt } from 'web3-eth';
 import { Log } from 'web3-core';
 
@@ -28,7 +28,7 @@ interface PayMerchantPayload extends Estimate {
   data: any;
 }
 
-interface PayMerchantTx extends RelayTransaction {
+export interface PayMerchantTx extends RelayTransaction {
   merchantAddress: string;
   payment: number; // this is not safe to use! Need to fix in relay server
   prepaidCardTxHash: string; // this is a hash of the txn data--not to be confused with the overall txn hash
@@ -66,7 +66,7 @@ export default class PrepaidCard {
     let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let issuingToken = await this.issuingToken(prepaidCardAddress);
-    let exchangeRate = new ExchangeRate(this.layer2Web3);
+    let exchangeRate = await getExchangeRate(this.layer2Web3);
     let weiAmount = await exchangeRate.convertFromSpend(issuingToken, spendAmount);
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], issuingToken);
     let prepaidCardBalance = new BN(await token.methods.balanceOf(prepaidCardAddress).call());
