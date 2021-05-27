@@ -28,7 +28,7 @@
           @value={{this.layer1Network.walletInfo.firstAddress}}
           @isAddress={{true}}
         />
-        <CardPay::LabeledValue @label="Balance*">
+        <CardPay::LabeledValue @label="Balance*" data-test-balance-container>
           {{#if this.balancesToShow.length}}
           <CardPay::BalancesList as |Balance|>
             {{#each this.balancesToShow as |b|}}
