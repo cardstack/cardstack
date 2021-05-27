@@ -24,6 +24,7 @@ import {
   Builder,
   CompiledCard,
   ComponentInfo,
+  Field,
   Format,
   FORMATS,
   RawCard,
@@ -359,7 +360,7 @@ export class Compiler {
       sourceCardURL: cardURL,
     };
 
-    let deserialize = getDeserializationMap(fields, usedFields);
+    let deserialize = buildDeserializationMapFromUsedFields(fields, usedFields);
     if (deserialize) {
       componentInfo.deserialize = deserialize;
     }
@@ -368,6 +369,7 @@ export class Compiler {
   }
 }
 
+// TODO: Replace this with proper mime-types, used content-type package
 function getAssetType(filename: string): Asset['type'] {
   if (filename.endsWith('.css')) {
     return 'css';
@@ -397,7 +399,7 @@ function isBaseCard(url: string): boolean {
   return url === baseCardURL;
 }
 
-function getDeserializationMap(
+function buildDeserializationMapFromUsedFields(
   fields: CompiledCard['fields'],
   usedFields: string[]
 ): ComponentInfo['deserialize'] {
@@ -405,15 +407,12 @@ function getDeserializationMap(
 
   for (const fieldPath of usedFields) {
     let field = getFieldForPath(fields, fieldPath);
-    if (!field || !field.card.deserializer) {
+
+    if (!field) {
       continue;
     }
 
-    if (!map[field.card.deserializer]) {
-      map[field.card.deserializer] = [];
-    }
-
-    map[field.card.deserializer].push(fieldPath);
+    buildDeserializerMapForField(map, field, fieldPath);
   }
 
   if (!Object.keys(map).length) {
@@ -424,6 +423,30 @@ function getDeserializationMap(
 
   return map;
 }
+
+function buildDeserializerMapForField(
+  map: any,
+  field: Field,
+  usedPath: string
+): void {
+  if (Object.keys(field.card.fields).length) {
+    let { fields } = field.card;
+    for (const name in fields) {
+      buildDeserializerMapForField(map, fields[name], `${usedPath}.${name}`);
+    }
+  } else {
+    if (!field.card.deserializer) {
+      return;
+    }
+
+    if (!map[field.card.deserializer]) {
+      map[field.card.deserializer] = [];
+    }
+
+    map[field.card.deserializer].push(usedPath);
+  }
+}
+
 function buildUsedFieldsListFromUsageMeta(
   fields: CompiledCard['fields'],
   usageMeta: TemplateUsageMeta,
@@ -433,7 +456,7 @@ function buildUsedFieldsListFromUsageMeta(
 
   if (usageMeta.model && usageMeta.model !== 'self') {
     for (const fieldPath of usageMeta.model) {
-      buildUsedFieldListFromData(usedFields, fieldPath, fields);
+      usedFields.add(fieldPath);
     }
   }
 
@@ -447,32 +470,6 @@ function buildUsedFieldsListFromUsageMeta(
   }
 
   return [...usedFields];
-}
-
-function buildUsedFieldListFromData(
-  usedFields: Set<string>,
-  fieldPath: string,
-  fields: CompiledCard['fields'],
-  prefix?: string
-) {
-  let field = getFieldForPath(fields, fieldPath);
-  if (field && Object.keys(field.card.fields).length) {
-    for (const nestedFieldPath of Object.keys(field.card.fields)) {
-      buildUsedFieldListFromComponents(
-        usedFields,
-        nestedFieldPath,
-        field.card.fields,
-        'embedded',
-        fieldPath
-      );
-    }
-  } else {
-    if (prefix) {
-      usedFields.add(`${prefix}.${fieldPath}`);
-    } else {
-      usedFields.add(fieldPath);
-    }
-  }
 }
 
 function buildUsedFieldListFromComponents(

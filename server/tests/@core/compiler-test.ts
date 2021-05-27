@@ -145,10 +145,11 @@ Qmodule('Compiler', function (hooks) {
       `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><BirthdateField @model={{@model.author.birthdate}} /></p></article>`
     );
 
+    assert.deepEqual(compiled.isolated.usedFields, ['author']);
     assert.deepEqual(
-      compiled.isolated.usedFields,
-      ['author.name', 'author.birthdate'],
-      'Author is expanded out because we dont know how it could be used'
+      compiled.isolated.deserialize,
+      { date: ['author.birthdate'] },
+      'Isolated deserialization map still includes author.birthdate, because it was used as data'
     );
   });
 
