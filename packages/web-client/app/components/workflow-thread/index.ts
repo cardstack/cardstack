@@ -22,6 +22,12 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
     targetEl?.scrollIntoView({ block: 'end', behavior: 'smooth' });
   }
 
+  @action scrollToEnd() {
+    this.threadEl
+      ?.querySelector('[data-thread-end]')
+      ?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  }
+
   get lastMilestonePostable() {
     return this.args.workflow.peekAtVisiblePostables().slice(-1)[0];
   }
