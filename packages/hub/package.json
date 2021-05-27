@@ -19,6 +19,7 @@
     "@types/semver": "^7.3.6",
     "assert-never": "^1.2.1",
     "auto-bind": "^4.0.0",
+    "config": "^3.3.6",
     "dag-map": "^2.0.2",
     "esm": "^3.2.25",
     "eth-sig-util": "^3.0.1",
@@ -35,6 +36,8 @@
     "koa-proxies": "^0.12.1",
     "lodash": "^4.17.21",
     "mime-match": "^1.0.2",
+    "node-pg-migrate": "^5.9.0",
+    "pg": "^8.6.0",
     "qs": "^6.10.1",
     "query-string": "^7.0.0",
     "semver": "^7.3.5",
@@ -54,6 +57,10 @@
     "yarn": "^1.0"
   },
   "scripts": {
+    "db:setup:local": "createdb hub_development && node-pg-migrate up",
+    "db:migrate": "node-pg-migrate",
+    "db:structure:dump": "node ./bin/dump-db-structure.js",
+    "db:test:prepare": "node ./bin/dump-db-structure.js && node ./bin/setup-test-db.js",
     "test": "PACKAGE=hub mocha -r esm ../test-support/bin/run.js --timeout 60000",
     "autotest": "PACKAGE=hub mocha -w --reporter=min -r esm ../test-support/bin/run.js --timeout 60000"
   },

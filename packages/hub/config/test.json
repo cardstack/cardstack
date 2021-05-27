@@ -1,0 +1,8 @@
+{
+
+  "db": {
+
+      "url": "postgres://postgres:postgres@localhost:5432/hub_test"
+  }
+
+}
