@@ -4,14 +4,13 @@
     data-test-date-divider
   />
 {{/if}}
-
 {{#if @postable.message}}
   <Boxel::ThreadMessage
     @datetime={{@postable.timestamp}}
     @imgURL={{@postable.author.imgURL}}
     @name={{@postable.author.name}}
     @hideName={{true}}
-    @hideMeta={{postable-meta-hidden @postable previous=(object-at @postables (dec @index))}}
+    @hideMeta={{postable-meta-hidden @postable previous=@previous}}
     data-test-postable={{@index}}
     ...attributes
   >
@@ -26,7 +25,7 @@
     @imgURL={{@postable.author.imgURL}}
     @name={{@postable.author.name}}
     @hideName={{true}}
-    @hideMeta={{postable-meta-hidden @postable previous=(object-at @postables (dec @index))}}
+    @hideMeta={{postable-meta-hidden @postable previous=@previous}}
     data-test-postable={{@index}}
     ...attributes
   >

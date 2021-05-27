@@ -113,7 +113,6 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
 
   @action onDisconnect() {
     this.args.onDisconnect?.();
-    this.args.onIncomplete?.();
   }
 
   @task *connectWalletTask() {

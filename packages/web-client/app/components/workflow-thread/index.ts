@@ -1,7 +1,12 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
+import { Workflow } from '@cardstack/web-client/models/workflow';
 
-export default class WorkflowThread extends Component {
+interface WorkflowThreadArgs {
+  workflow: Workflow;
+}
+
+export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   threadEl: HTMLElement | undefined;
   @action focus(element: HTMLElement): void {
     this.threadEl = element;
@@ -15,5 +20,14 @@ export default class WorkflowThread extends Component {
     let targetEl =
       milestoneEl || this.threadEl?.querySelector('[data-thread-end]');
     targetEl?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  }
+
+  get lastMilestonePostable() {
+    let milestones = this.args.workflow.visibleMilestones;
+    let postablesInLastMilestone = milestones[
+      milestones.length - 1
+    ].peekAtVisiblePostables();
+
+    return postablesInLastMilestone[postablesInLastMilestone.length - 1];
   }
 }
