@@ -8,7 +8,8 @@ import ERC677ABI from '../../contracts/abi/erc-677.js';
 import PrepaidCardManagerABI from '../../contracts/v0.2.0/abi/prepaid-card-manager';
 import { getAddress } from '../../contracts/addresses.js';
 import { getConstant, ZERO_ADDRESS } from '../constants.js';
-import getExchangeRate from '../exchange-rate';
+import { getSDK } from '../version-resolver';
+
 import { ERC20ABI } from '../../index.js';
 import {
   Estimate,
@@ -66,7 +67,7 @@ export default class PrepaidCard {
     let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let issuingToken = await this.issuingToken(prepaidCardAddress);
-    let exchangeRate = await getExchangeRate(this.layer2Web3);
+    let exchangeRate = await getSDK('ExchangeRate', this.layer2Web3);
     let weiAmount = await exchangeRate.convertFromSpend(issuingToken, spendAmount);
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], issuingToken);
     let prepaidCardBalance = new BN(await token.methods.balanceOf(prepaidCardAddress).call());

@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { getSafes, Assets, getConstant } from '@cardstack/cardpay-sdk';
+import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 
 const { toWei } = Web3.utils;
@@ -7,7 +7,7 @@ const { toWei } = Web3.utils;
 export async function viewSafes(network: string, mnemonic: string, address?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
 
-  let safesApi = await getSafes(web3);
+  let safesApi = await getSDK('Safes', web3);
   console.log('Getting safes');
   let safes = await safesApi.view(address);
   console.log('\n\n');
@@ -45,8 +45,8 @@ export async function transferTokens(
   let web3 = await getWeb3(network, mnemonic);
   let weiAmount = toWei(String(amount));
 
-  let safes = await getSafes(web3);
-  let assets = new Assets(web3);
+  let safes = await getSDK('Safes', web3);
+  let assets = await getSDK('Assets', web3);
   let { symbol } = await assets.getTokenInfo(token);
 
   console.log(`transferring ${amount} ${symbol} from safe ${safe} to ${recipient}`);
