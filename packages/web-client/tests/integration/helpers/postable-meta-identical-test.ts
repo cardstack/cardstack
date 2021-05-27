@@ -17,8 +17,8 @@ module('Integration | Helper | postable-meta-identical', function (hooks) {
   };
   const firstPostTime = new Date(2021, 5, 15, 9, 0, 0, 0);
 
-  /* 
-    Since we aren't specifying order of arguments via named arguments, check 
+  /*
+    Since we aren't specifying order of arguments via named arguments, check
     to make sure that time comparisons and falsey comparisons
     work both ways, just in case.
   */
