@@ -4,6 +4,7 @@ export { default as Safes, Safe, DepotSafe } from './sdk/safes';
 export { default as PrepaidCard } from './sdk/prepaid-card';
 export { default as ExchangeRate } from './sdk/exchange-rate';
 export { default as Assets } from './sdk/assets';
+export { default as HubAuth } from './sdk/hub-auth';
 
 export { getAddress, getAddressByNetwork, getOracle, getOracleByNetwork } from './contracts/addresses';
 export { getConstant, getConstantByNetwork, networks, networkIds } from './sdk/constants';

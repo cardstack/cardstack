@@ -201,7 +201,8 @@ export async function sign(
     },
   };
   const signatureBytes = [];
-  signatureBytes.push(await signTypedData(web3, owner, typedData));
+  const sig = await signTypedData(web3, owner, typedData);
+  signatureBytes.push(ethSignSignatureToRSVForSafe(sig));
 
   return signatureBytes;
 }
@@ -250,8 +251,8 @@ export async function executeTransaction(
   return response.json();
 }
 
-async function signTypedData(web3: Web3, account: string, data: any): Promise<Signature> {
-  let result: string = await new Promise((resolve, reject) => {
+export function signTypedData(web3: Web3, account: string, data: any): Promise<string> {
+  return new Promise((resolve, reject) => {
     let provider = web3.currentProvider;
     if (typeof provider === 'string') {
       throw new Error(`The provider ${web3.currentProvider} is not supported`);
@@ -276,16 +277,14 @@ async function signTypedData(web3: Web3, account: string, data: any): Promise<Si
       }
     );
   });
-  const sig = result.replace('0x', '');
+}
+
+export function ethSignSignatureToRSVForSafe(ethSignSignature: string) {
+  const sig = ethSignSignature.replace('0x', '');
   const sigV = parseInt(sig.slice(-2), 16);
   const sigR = Web3.utils.toBN('0x' + sig.slice(0, 64)).toString();
   const sigS = Web3.utils.toBN('0x' + sig.slice(64, 128)).toString();
 
-  // Metamask with ledger returns v = 01, this is not valid for ethereum
-  // For ethereum valid V is 27 or 28
-  // In case V = 0 or 01 we add it to 27 and then add 4
-  // Adding 4 is required to make signature valid for safe contracts:
-  // https://gnosis-safe.readthedocs.io/en/latest/contracts/signatures.html#eth-sign-signature
   return {
     v: sigV,
     r: sigR,

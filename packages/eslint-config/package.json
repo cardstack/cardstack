@@ -4,7 +4,7 @@
   "description": "Shared eslint config for cardstack packages.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"No tests in eslint-config package\" && exit 0"
   },
   "repository": {
     "type": "git",

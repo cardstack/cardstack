@@ -7,21 +7,23 @@
   "keywords": [],
   "author": "Edward Faulkner <edward@eaf4.com>",
   "repository": "https://github.com/cardstack/cardstack",
+  "license": "MIT",
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
     "@cardstack/logger": "^0.2.1",
-    "@types/fs-extra": "^9.0.8",
+    "@types/fs-extra": "^9.0.11",
     "@types/koa": "^2.13.1",
     "@types/koa-route": "^3.2.4",
-    "@types/lodash": "^4.14.168",
+    "@types/lodash": "^4.14.169",
     "@types/qs": "^6.9.6",
-    "@types/semver": "^7.3.4",
+    "@types/semver": "^7.3.6",
     "assert-never": "^1.2.1",
     "dag-map": "^2.0.2",
     "esm": "^3.2.25",
+    "eth-sig-util": "^3.0.1",
     "fast-json-stable-stringify": "^2.1.0",
-    "fs-extra": "^9.1.0",
-    "glob": "^7.1.6",
+    "fs-extra": "^10.0.0",
+    "glob": "^7.1.7",
     "http-status-codes": "^2.1.4",
     "json-typescript": "^1.1.2",
     "jsonapi-typescript": "^0.1.3",
@@ -29,18 +31,19 @@
     "koa-better-route": "^0.4.0",
     "koa-body": "^4.2.0",
     "koa-compose": "^4.1.0",
-    "koa-proxies": "^0.11.0",
+    "koa-proxies": "^0.12.1",
     "lodash": "^4.17.21",
     "mime-match": "^1.0.2",
     "qs": "^6.10.1",
-    "semver": "^7.3.4",
+    "query-string": "^7.0.0",
+    "semver": "^7.3.5",
     "tmp-promise": "3.0.2",
-    "typescript-memoize": "^1.0.0-alpha.3"
+    "typescript-memoize": "^1.0.1"
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.19.10",
     "@cardstack/test-support": "0.19.10",
-    "@types/supertest": "^2.0.10",
+    "@types/supertest": "^2.0.11",
     "json-stable-stringify": "^1.0.1",
     "moment-timezone": "^0.5.33",
     "supertest": "^6.1.3"
@@ -49,7 +52,8 @@
     "node": ">= 12"
   },
   "scripts": {
-    "test": "mocha -r esm ../test-support/bin/run.js --timeout 60000"
+    "test": "mocha -r esm ../test-support/bin/run.js --timeout 60000",
+    "autotest": "mocha -w --reporter=min -r esm ../test-support/bin/run.js --timeout 60000"
   },
   "volta": {
     "extends": "../../package.json"

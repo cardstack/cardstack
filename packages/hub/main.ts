@@ -2,30 +2,38 @@
 
 import Koa from 'koa';
 import logger from '@cardstack/logger';
-import { Registry, Container } from './dependency-injection';
-import { join } from 'path';
+import { Registry, Container, RegistryCallback } from './dependency-injection';
 
 import AuthenticationMiddleware from './authentication-middleware';
 import DevelopmentConfig from './development-config';
 import DevelopmentProxyMiddleware from './development-proxy-middleware';
-
+import SessionRoute from './routes/session';
+import { AuthenticationUtils } from './utils/authentication';
+import JsonapiMiddleware from './jsonapi-middleware';
+import NonceTracker from './nonce-tracker';
+import { Clock } from './utils/clock';
+import { ShutdownHelper } from './shutdown-helper';
 const log = logger('cardstack/hub');
 
-// Careful: this assumes that you are running the hub from a mono repo context.
-export const builtInCardsDir = join(__dirname, '..', '..', 'cards');
-
-export async function wireItUp() {
+export function wireItUp(registryCallback?: RegistryCallback): Container {
   let registry = new Registry();
-  registry.register('development-config', DevelopmentConfig);
   registry.register('authentication-middleware', AuthenticationMiddleware);
+  registry.register('authentication-utils', AuthenticationUtils);
+  registry.register('clock', Clock);
+  registry.register('development-config', DevelopmentConfig);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
+  registry.register('jsonapi-middleware', JsonapiMiddleware);
+  registry.register('nonce-tracker', NonceTracker);
+  registry.register('session-route', SessionRoute);
+  registry.register('shutdown-helper', ShutdownHelper);
+  if (registryCallback) {
+    registryCallback(registry);
+  }
   return new Container(registry);
 }
 
-export async function makeServer(container?: Container) {
-  if (!container) {
-    container = await wireItUp();
-  }
+export async function makeServer(registryCallback?: RegistryCallback) {
+  let container = wireItUp(registryCallback);
 
   let app = new Koa();
   app.use(async (ctx: Koa.Context, next: Koa.Next) => {
@@ -36,11 +44,22 @@ export async function makeServer(container?: Container) {
   app.use(httpLogging);
   app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
   app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
+  app.use(((await container.lookup('jsonapi-middleware')) as JsonapiMiddleware).middleware());
+
   app.use(async (ctx: Koa.Context, _next: Koa.Next) => {
     ctx.body = 'Hello World ' + ctx.environment + ' ' + ctx.host.split(':')[0];
   });
 
+  app.on('close', async function () {
+    (await lookupShutdownHelper(container)).onShutdown();
+  });
+
   return app;
+}
+
+async function lookupShutdownHelper(container: Container): Promise<ShutdownHelper> {
+  let instance = await container.lookup('shutdown-helper');
+  return (instance as unknown) as ShutdownHelper;
 }
 
 export function bootEnvironment() {
@@ -75,28 +94,50 @@ export function bootEnvironment() {
     process.exit(0);
   });
 
-  runServer(startupConfig()).catch((err: Error) => {
+  return runServer(startupConfig()).catch((err: Error) => {
+    log.error('Server failed to start cleanly: %s', err.stack || err);
+    process.exit(-1);
+  });
+}
+
+export function bootEnvironmentForTesting(config: StartupConfig) {
+  logger.configure({
+    defaultLevel: 'warn',
+  });
+  process.on('warning', (warning: Error) => {
+    if (warning.stack) {
+      process.stderr.write(warning.stack);
+    }
+  });
+
+  return runServer(config).catch((err: Error) => {
     log.error('Server failed to start cleanly: %s', err.stack || err);
     process.exit(-1);
   });
 }
 
 async function runServer(config: StartupConfig) {
-  let app = await makeServer();
-  app.listen(config.port);
+  let app = await makeServer(config.registryCallback);
+  let server = app.listen(config.port);
   log.info('server listening on %s', config.port);
   if (process.connected) {
     process.send!('hub hello');
   }
+  server.on('close', function () {
+    app.emit('close'); // supports our ShutdownHelper
+  });
+  return server;
 }
 
 interface StartupConfig {
   port: number;
+  registryCallback: undefined | ((registry: Registry) => void);
 }
 
 function startupConfig(): StartupConfig {
   let config: StartupConfig = {
     port: 3000,
+    registryCallback: undefined,
   };
   if (process.env.PORT) {
     config.port = parseInt(process.env.PORT, 10);

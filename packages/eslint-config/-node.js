@@ -7,7 +7,7 @@ module.exports = {
   env: {
     node: true,
     browser: false,
-    es6: true,
+    es2020: true,
   },
   // I'm doing this instead of `extends` so that this config module
   // can be used within override blocks of other config modules.

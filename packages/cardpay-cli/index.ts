@@ -7,6 +7,7 @@ import { viewTokenBalance } from './assets';
 import { viewSafes, transferTokens } from './safe.js';
 import { createPrepaidCard, priceForFaceValue, payMerchant, gasFee } from './prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
+import { hubAuth } from './hub-auth';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -24,7 +25,8 @@ type Commands =
   | 'priceForFaceValue'
   | 'payMerchant'
   | 'priceOracleUpdatedAt'
-  | 'viewTokenBalance';
+  | 'viewTokenBalance'
+  | 'hubAuth';
 
 let command: Commands | undefined;
 interface Options {
@@ -41,6 +43,7 @@ interface Options {
   prepaidCard?: string;
   receiver?: string;
   recipient?: string;
+  hubRootUrl?: string;
   faceValues?: number[];
 }
 const {
@@ -58,6 +61,7 @@ const {
   receiver,
   recipient,
   faceValues,
+  hubRootUrl,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -237,6 +241,17 @@ const {
       command = 'viewTokenBalance';
     }
   )
+  .command(
+    'hub-auth [hubRootUrl]',
+    'Get an authentication token that can be used to make API requests to a Carstack Hub server',
+    (yargs) => {
+      yargs.positional('hubRootUrl', {
+        type: 'string',
+        description: 'The host name of the hub server to authenticate with',
+      });
+      command = 'hubAuth';
+    }
+  )
   .options({
     network: {
       alias: 'n',
@@ -341,6 +356,13 @@ if (!command) {
         process.exit(1);
       }
       await gasFee(network, mnemonic, tokenAddress);
+      break;
+    case 'hubAuth':
+      if (hubRootUrl == null) {
+        yargs.showHelp('hubRootUrl is a required value');
+        process.exit(1);
+      }
+      await hubAuth(hubRootUrl, network, mnemonic);
       break;
     default:
       assertNever(command);

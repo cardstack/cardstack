@@ -15,6 +15,10 @@ More information is available in the `README.md` within each `package`.
 
 Set up `app.cardstack.test` and `app-assets.cardstack.test` to resolve to localhost (127.0.0.1). There are a variety of ways to accomplish this, with the most direct being to [edit your /etc/hosts file](https://linuxize.com/post/how-to-edit-your-hosts-file/).
 
+### Hub environment variables
+
+See the [README in the hub package](./packages/hub/README.md) for environment variables that you'll need to setup.
+
 ### Javascript dependencies & Typescript compilation
 
 We use `volta` to manage our global javascript dependencies. In this case, specifically, we use it to manage node and yarn. To use it simply install it following the instructions here: https://docs.volta.sh/guide/getting-started
