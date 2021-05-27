@@ -6,25 +6,20 @@ For more information, see the
 
 ## Architecture
 
-The Hub consists of API endpoints, a postgres database, and an in-memory index of
-cards within realms.
+The Hub consists of API endpoints and a postgres database.
 
 ## Configuration
 
 Below is a list of the most common environment variables that the Hub accepts:
 
-- `DEV_DIR` - when in Dev Mode, this is a path to a git repository on your hard drive, in the form `path/to/your/git/repo/cards` with `cards` at the end.
-- `META_REALM_URL` - takes the form `https://<username>:<token>@github.com/<org>/<reponame>.git` if it is a GitHub URL. See [Generating `GIT REPO` urls](https://github.com/cardstack/cardstack/wiki/Generating-GIT_REPO-urls)
-- `DEFAULT_REALM_URL - - takes the form `https://<username>:<token>@github.com/<org>/<reponame>.git` if it is a GitHub URL. See [Generating `GIT REPO` urls](https://github.com/cardstack/cardstack/wiki/Generating-GIT_REPO-urls)
+- `SERVER_SECRET` (required) - to generate one for your machine, run `node --eval="console.log(crypto.randomBytes(32).toString('base64'))"`
+- `PGHOST` - defaults to "localhost"
+- `PGPORT` - defaults to "5432"
+- `PGUSER` - defaults to "postgres"
+- `PGPASSWORD` - defaults to "postgres"
 - `LOG_LEVELS` - defaults to `*=info`
-- `PGHOST`
-- `PGPORT`
-- `PGUSER`
-- `PGPASSWORD`
-- `SERVER_SECRET`
 
-See the `cardhost` deploy scripts for a listing of cloud-provider-specific variables.
-Also search the mono-repo for `process.env` to see these variables in use.
+Search the mono-repo for `process.env` to see these variables in use.
 
 ## Contributing
 
