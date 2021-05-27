@@ -8,9 +8,9 @@ import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from '../constants';
-import getExchangeRate from '../exchange-rate';
 import { ContractOptions } from 'web3-eth-contract';
 import { GnosisExecTx, sign, gasEstimate, executeTransaction } from '../utils';
+import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
 const { toBN, fromWei } = Web3.utils;
 
@@ -66,7 +66,7 @@ export default class Safes {
       await getAddress('bridgeUtils', this.layer2Web3)
     );
 
-    let exchangeRate = await getExchangeRate(this.layer2Web3);
+    let exchangeRate = await getSDK('ExchangeRate', this.layer2Web3);
 
     return await Promise.all(
       safes.map(async (safeAddress: string) => {
