@@ -38,10 +38,10 @@
 <Listener
   @emitter={{this.layer1Network}}
   @event="disconnect"
-  @action={{this.onLayer1Disconnect}}
+  @action={{this.cancelWorkflow}}
 />
 <Listener
   @emitter={{this.layer2Network}}
   @event="disconnect"
-  @action={{this.onLayer2Disconnect}}
+  @action={{this.cancelWorkflow}}
 />

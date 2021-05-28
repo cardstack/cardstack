@@ -16,7 +16,8 @@ export abstract class Workflow {
   name!: string;
   milestones: Milestone[] = [];
   epilogue: PostableCollection = new PostableCollection();
-  @tracked cancelation: PostableCollection | undefined;
+  cancelationMessages: PostableCollection = new PostableCollection();
+  @tracked isCanceled = false;
   session: WorkflowSession = new WorkflowSession();
   owner: any;
 
@@ -27,6 +28,7 @@ export abstract class Workflow {
   attachWorkflow() {
     this.milestones.invoke('setWorkflow', this);
     this.epilogue.setWorkflow(this);
+    this.cancelationMessages.setWorkflow(this);
   }
 
   get completedMilestoneCount() {
@@ -49,23 +51,17 @@ export abstract class Workflow {
     return A(this.milestones).isEvery('isComplete');
   }
 
-  get isCanceled() {
-    return !this.isComplete && this.cancelation;
-  }
-
-  setCancelation(cancelation: PostableCollection | undefined) {
-    if (this.isComplete) this.cancelation = undefined;
-    // todo: freeze the workflow if it's canceled, to prevent anything from making changes to the workflow
-    // this will require changes to WorkflowCard
-
-    this.cancelation = cancelation;
-    this.cancelation?.setWorkflow(this);
+  cancel() {
+    if (!this.isComplete) {
+      this.isCanceled = true;
+    }
   }
 
   get progressStatus() {
     let completedMilestones = this.milestones.filterBy('isComplete');
     let lastMilestone = completedMilestones[completedMilestones.length - 1];
-    return lastMilestone?.completedDetail ?? 'Workflow started';
+    if (this.isCanceled) return 'Workflow canceled';
+    else return lastMilestone?.completedDetail ?? 'Workflow started';
   }
 
   peekAtVisiblePostables() {
@@ -75,6 +71,8 @@ export abstract class Workflow {
     }
     if (this.isComplete) {
       result = result.concat(this.epilogue.peekAtVisiblePostables());
+    } else if (this.isCanceled) {
+      result = result.concat(this.cancelationMessages.peekAtVisiblePostables());
     }
     return result;
   }

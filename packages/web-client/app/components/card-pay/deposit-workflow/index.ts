@@ -1,7 +1,10 @@
 import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
-import { NetworkAwareWorkflowMessage } from '@cardstack/web-client/components/workflow-thread/network-aware-postables';
+import {
+  NetworkAwareWorkflowMessage,
+  NetworkAwareWorkflowCard,
+} from '@cardstack/web-client/components/workflow-thread/network-aware-postables';
 import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
@@ -151,6 +154,49 @@ class DepositWorkflow extends Workflow {
       componentName: 'card-pay/deposit-workflow/next-steps',
     }),
   ]);
+  cancelationMessages = new PostableCollection([
+    new NetworkAwareWorkflowMessage({
+      author: cardbot,
+      message:
+        'It looks like your wallets have been disconnected. If you still want to deposit funds, please start again by connecting your wallets.',
+      includeIf() {
+        return (
+          !(this as NetworkAwareWorkflowMessage).hasLayer2Account &&
+          !(this as NetworkAwareWorkflowMessage).hasLayer1Account
+        );
+      },
+    }),
+    new NetworkAwareWorkflowMessage({
+      author: cardbot,
+      message:
+        'It looks like your mainnet wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
+      includeIf() {
+        return (
+          !(this as NetworkAwareWorkflowMessage).hasLayer1Account &&
+          (this as NetworkAwareWorkflowMessage).hasLayer2Account
+        );
+      },
+    }),
+    new NetworkAwareWorkflowMessage({
+      author: cardbot,
+      message:
+        'It looks like your xDai chain wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
+      includeIf() {
+        return (
+          !(this as NetworkAwareWorkflowMessage).hasLayer2Account &&
+          (this as NetworkAwareWorkflowMessage).hasLayer1Account
+        );
+      },
+    }),
+    new NetworkAwareWorkflowCard({
+      author: cardbot,
+      componentName: 'card-pay/deposit-workflow/workflow-canceled-cta',
+      includeIf() {
+        return true;
+      },
+    }),
+  ]);
+
   constructor(owner: unknown) {
     super(owner);
     this.attachWorkflow();
@@ -169,42 +215,8 @@ class DepositWorkflowComponent extends Component {
     this.workflow = new DepositWorkflow(getOwner(this));
   }
 
-  setCancelation() {
-    if (!(this.layer1Disconnected || this.layer2Disconnected))
-      this.workflow.setCancelation(undefined);
-    else {
-      let message = '';
-
-      if (this.layer1Disconnected && this.layer2Disconnected) {
-        message =
-          'It looks like your wallets have been disconnected. If you still want to deposit funds, please start again by connecting your wallets.';
-      } else if (this.layer1Disconnected) {
-        message =
-          'It looks like your mainnet wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.';
-      } else if (this.layer2Disconnected) {
-        message =
-          'It looks like your xDai chain wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.';
-      }
-
-      let result = new PostableCollection([
-        new WorkflowMessage({
-          author: cardbot,
-          message,
-        }),
-      ]);
-
-      this.workflow.setCancelation(result);
-    }
-  }
-
-  @action onLayer1Disconnect() {
-    this.layer1Disconnected = true;
-    this.setCancelation();
-  }
-
-  @action onLayer2Disconnect() {
-    this.layer2Disconnected = true;
-    this.setCancelation();
+  @action cancelWorkflow() {
+    this.workflow.cancel();
   }
 }
 
