@@ -62,7 +62,7 @@ async function lookupShutdownHelper(container: Container): Promise<ShutdownHelpe
   return (instance as unknown) as ShutdownHelper;
 }
 
-export function bootEnvironment() {
+export function bootServer() {
   if (process.env.EMBER_ENV === 'test') {
     logger.configure({
       defaultLevel: 'warn',
@@ -100,7 +100,7 @@ export function bootEnvironment() {
   });
 }
 
-export function bootEnvironmentForTesting(config: StartupConfig) {
+export function bootServerForTesting(config: StartupConfig) {
   logger.configure({
     defaultLevel: 'warn',
   });
@@ -114,6 +114,10 @@ export function bootEnvironmentForTesting(config: StartupConfig) {
     log.error('Server failed to start cleanly: %s', err.stack || err);
     process.exit(-1);
   });
+}
+
+export function bootEnvironment() {
+  return wireItUp();
 }
 
 async function runServer(config: StartupConfig) {
