@@ -5,4 +5,4 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 //@ts-ignore not actually redefining block-scoped var
 const esmRequire = require('esm')(module, { cjs: true });
-module.exports = esmRequire('./../main').bootEnvironment();
+module.exports = esmRequire('./../main').bootServer();

@@ -145,6 +145,7 @@ interface PrepaidCardSafe extends BaseSafe {
   issuingToken: string;
   spendFaceValue: number;
   issuer: string;
+  reloadable: boolean;
 }
 ```
 

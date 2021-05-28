@@ -89,7 +89,7 @@
       "env": {},
       "args": [
         "safe-transfer-tokens",
-        "0xaE9D292753f05b00E996F6b18E4bAe5CC9e5aa48", // Hassan's depot safe feel free to use your own
+        "0x367F15f878DD75ec155010318F97E5dA2b3102c4", // Hassan's depot safe feel free to use your own
         "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee", // CARD.CPXD
         "0xD7182E380b7dFa33C186358De7E1E5d0950fCAE7", // Relay txn sender
         "1000",
@@ -107,9 +107,9 @@
       "env": {},
       "args": [
         "prepaidcard-create",
-        "0xaE9D292753f05b00E996F6b18E4bAe5CC9e5aa48", // Hassan's depot safe feel free to use your own
+        "0x367F15f878DD75ec155010318F97E5dA2b3102c4", // Hassan's depot safe feel free to use your own
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
-        "200",
+        "500",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
@@ -126,8 +126,8 @@
         "pay-merchant",
         // currently creating a merchant is an administrative function--ping
         // hassan to have him create a merchant for you until we get the self-serve fucntionality live
-        "0x8B3A993F4f8159A5FcFEe3155a33BD1E9Bd6ABe4", // safe for merchant 0x54b11672e90B38ca52140Ac364EebC5cC07F3d91
-        "0xae3e37cB32fcC528b7388Ee592E244aAC2EacFab", // Hassan's prepaid card --feel free to use your own
+        "", // safe for merchant
+        "0x367F15f878DD75ec155010318F97E5dA2b3102c4", // Hassan's prepaid card --feel free to use your own
         "100",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own

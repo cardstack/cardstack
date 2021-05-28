@@ -115,13 +115,13 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateBalances({
       defaultToken: toBN(0),
     });
-    await waitFor(`${postableSel(1, 2)} [data-test-balance="XDAI"]`);
+    await waitFor(`${postableSel(1, 2)} [data-test-balance-container]`);
     assert
       .dom(`${postableSel(1, 2)} [data-test-balance="XDAI"]`)
-      .containsText('0.00');
-    await waitUntil(
-      () => !document.querySelector('[data-test-wallet-connect-qr-code]')
-    );
+      .doesNotExist();
+    assert
+      .dom(`${postableSel(1, 2)} [data-test-balance-container]`)
+      .containsText('None');
     assert
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
