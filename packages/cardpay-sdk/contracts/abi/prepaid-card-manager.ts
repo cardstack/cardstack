@@ -290,7 +290,7 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'cardProtocolVersion',
+    name: 'cardpayVersion',
     outputs: [
       {
         internalType: 'string',
