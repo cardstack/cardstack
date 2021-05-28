@@ -8,14 +8,13 @@ export async function viewSafes(network: string, mnemonic: string, address?: str
   let web3 = await getWeb3(network, mnemonic);
 
   let safesApi = new Safes(web3);
-  console.log('Getting safes');
-  let safes = await safesApi.view(address);
-  console.log('\n\n');
+  console.log('Getting safes...');
+  let safes = (await safesApi.view(address)).filter((safe) => safe.type !== 'external');
+  if (safes.length === 0) {
+    console.log('You have no safes (not counting safes external to the cardpay protocol)');
+  }
   safes.forEach((safe) => {
     let { address, type, tokens } = safe;
-    if (type === 'external') {
-      return;
-    }
     console.log(`${address} -- ${type}`);
     console.log('-------------------------');
     if (safe.type === 'prepaid-card') {
