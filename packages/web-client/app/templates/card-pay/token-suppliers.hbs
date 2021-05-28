@@ -3,15 +3,15 @@
     Token Suppliers
   </h2>
 
-  <Boxel::Button @kind="primary" {{on "click" (set this "flow" 'issue-prepaid-card')}} data-test-issue-prepaid-card-workflow-button>
-    Issue Prepaid Card
+  <Boxel::Button @kind="primary" {{on "click" (set this "flow" 'deposit')}} data-test-deposit-workflow-button>
+    Deposit Tokens
   </Boxel::Button>
 </section>
 
 <Boxel::Modal
   style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
-  @isOpen={{eq this.flow 'issue-prepaid-card'}}
+  @isOpen={{eq this.flow 'deposit'}}
   @onClose={{set this "flow" null}}
 >
-  <CardPay::IssuePrepaidCardWorkflow />
+  <CardPay::DepositWorkflow />
 </Boxel::Modal>

@@ -30,13 +30,8 @@ module('Acceptance | deposit', function (hooks) {
   setupApplicationTest(hooks);
 
   test('Initiating workflow without wallet connections', async function (assert) {
-    await visit('/');
-    assert.equal(currentURL(), '/');
-    await click('[data-test-cardstack-org-link="card-pay"]');
-    assert.equal(currentURL(), '/card-pay/balances');
-
-    await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
-
+    await visit('/card-pay/token-suppliers');
+    assert.equal(currentURL(), '/card-pay/token-suppliers');
     await click('[data-test-deposit-workflow-button]');
 
     let post = postableSel(0, 0);
@@ -321,9 +316,7 @@ module('Acceptance | deposit', function (hooks) {
   });
 
   test('Initiating workflow with layer 1 wallet already connected', async function (assert) {
-    await visit('/');
-    await click('[data-test-cardstack-org-link="card-pay"]');
-
+    await visit('/card-pay/token-suppliers');
     await click(
       '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
     );
@@ -346,7 +339,6 @@ module('Acceptance | deposit', function (hooks) {
       .hasText('0xaCD5f...4Fb6');
     assert.dom('[data-test-layer-connect-modal="layer1"]').doesNotExist();
 
-    await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
     await click('[data-test-deposit-workflow-button]');
 
     let post = postableSel(0, 0);
@@ -418,9 +410,7 @@ module('Acceptance | deposit', function (hooks) {
   });
 
   test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
-    await visit('/');
-    await click('[data-test-cardstack-org-link="card-pay"]');
-
+    await visit('/card-pay/token-suppliers');
     await click(
       '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
     );
@@ -445,7 +435,6 @@ module('Acceptance | deposit', function (hooks) {
       .hasText('0x18261...6E44');
     assert.dom('[data-test-layer-connect-modal="layer2"]').doesNotExist();
 
-    await click('[data-test-card-pay-header-tab][href="/card-pay/balances"]');
     await click('[data-test-deposit-workflow-button]');
     await click(`${postableSel(0, 3)} [data-test-wallet-option="metamask"]`);
     await click(
@@ -505,7 +494,7 @@ module('Acceptance | deposit', function (hooks) {
       defaultToken: toBN('142200000000000000'),
     });
 
-    await visit('/card-pay/balances');
+    await visit('/card-pay/token-suppliers');
     await click('[data-test-deposit-workflow-button]');
 
     let post = postableSel(0, 0);
@@ -567,7 +556,7 @@ module('Acceptance | deposit', function (hooks) {
       defaultToken: toBN('142200000000000000'),
     });
 
-    await visit('/card-pay/balances');
+    await visit('/card-pay/token-suppliers');
     await click('[data-test-deposit-workflow-button]');
 
     let post = postableSel(0, 0);
@@ -631,7 +620,7 @@ module('Acceptance | deposit', function (hooks) {
       defaultToken: toBN('142200000000000000'),
     });
 
-    await visit('/card-pay/balances');
+    await visit('/card-pay/token-suppliers');
     await click('[data-test-deposit-workflow-button]');
 
     let post = postableSel(0, 0);
@@ -697,7 +686,7 @@ module('Acceptance | deposit', function (hooks) {
       defaultToken: toBN('142200000000000000'),
     });
 
-    await visit('/card-pay/balances');
+    await visit('/card-pay/token-suppliers');
     await click('[data-test-deposit-workflow-button]');
 
     let post = postableSel(0, 0);
