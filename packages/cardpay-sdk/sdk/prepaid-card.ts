@@ -11,29 +11,19 @@ import { getConstant, ZERO_ADDRESS } from './constants.js';
 import ExchangeRate from './exchange-rate';
 import { ERC20ABI } from '../index.js';
 import {
-  Estimate,
-  RelayTransaction,
+  EventABI,
+  getParamsFromEvent,
+  getPayMerchantPayload,
   GnosisExecTx,
-  Signature,
-  sign,
+  PayMerchantTx,
   gasEstimate,
   executeTransaction,
-  waitUntilTransactionMined,
-} from './utils';
-import { TransactionReceipt } from 'web3-eth';
-import { Log } from 'web3-core';
+  executePayMerchant,
+} from './utils/safe-utils';
+import { waitUntilTransactionMined } from './utils/general-utils';
+import { Signature, sign } from './utils/signing-utils';
 
 const { toBN, fromWei } = Web3.utils;
-interface PayMerchantPayload extends Estimate {
-  data: any;
-}
-
-interface PayMerchantTx extends RelayTransaction {
-  merchantAddress: string;
-  payment: number; // this is not safe to use! Need to fix in relay server
-  prepaidCardTxHash: string; // this is a hash of the txn data--not to be confused with the overall txn hash
-  tokenAddress: string;
-}
 
 export default class PrepaidCard {
   private prepaidCardManager: Contract | undefined;
@@ -66,18 +56,23 @@ export default class PrepaidCard {
     let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let issuingToken = await this.issuingToken(prepaidCardAddress);
-    let exchangeRate = new ExchangeRate(this.layer2Web3);
-    let weiAmount = await exchangeRate.convertFromSpend(issuingToken, spendAmount);
-    let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], issuingToken);
-    let prepaidCardBalance = new BN(await token.methods.balanceOf(prepaidCardAddress).call());
-    if (prepaidCardBalance.lt(new BN(weiAmount))) {
-      throw new Error(
-        `Prepaid card does not have enough balance to pay merchant. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
-          prepaidCardBalance.toString()
-        )}, payment amount in issuing token is ${fromWei(weiAmount)}`
-      );
-    }
-    let payload = await this.getPayMerchantPayload(prepaidCardAddress, merchantSafe, issuingToken, weiAmount);
+    let weiAmount = await this.convertFromSpendForPrepaidCard(
+      prepaidCardAddress,
+      spendAmount,
+      (issuingToken, balanceAmount, requiredTokenAmount) =>
+        new Error(
+          `Prepaid card does not have enough balance to pay merchant. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
+            balanceAmount
+          )}, payment amount in issuing token is ${fromWei(requiredTokenAmount)}`
+        )
+    );
+    let payload = await getPayMerchantPayload(
+      this.layer2Web3,
+      prepaidCardAddress,
+      merchantSafe,
+      issuingToken,
+      weiAmount
+    );
     if (payload.lastUsedNonce == null) {
       payload.lastUsedNonce = -1;
     }
@@ -108,7 +103,8 @@ export default class PrepaidCard {
       signatures = [contractSignature].concat(signatures);
     }
 
-    let result = await this.executePayMerchant(
+    let result = await executePayMerchant(
+      this.layer2Web3,
       prepaidCardAddress,
       issuingToken,
       merchantSafe,
@@ -191,6 +187,22 @@ export default class PrepaidCard {
     };
   }
 
+  async convertFromSpendForPrepaidCard(
+    prepaidCardAddress: string,
+    minimumSpendBalance: number,
+    onError: (issuingToken: string, balanceAmount: string, requiredTokenAmount: string) => Error
+  ): Promise<string> {
+    let issuingToken = await this.issuingToken(prepaidCardAddress);
+    let exchangeRate = new ExchangeRate(this.layer2Web3);
+    let weiAmount = await exchangeRate.convertFromSpend(issuingToken, minimumSpendBalance);
+    let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], issuingToken);
+    let prepaidCardBalance = new BN(await token.methods.balanceOf(prepaidCardAddress).call());
+    if (prepaidCardBalance.lt(new BN(weiAmount))) {
+      onError(issuingToken, prepaidCardBalance.toString(), weiAmount);
+    }
+    return weiAmount;
+  }
+
   private async loadGasIntoPrepaidCard(prepaidCardAddress: string) {
     let relayServiceURL = await getConstant('relayServiceURL', this.layer2Web3);
     let url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/load-gas/`;
@@ -238,75 +250,12 @@ export default class PrepaidCard {
       .encodeABI();
   }
 
-  private async getPayMerchantPayload(
-    prepaidCardAddress: string,
-    merchantSafe: string,
-    tokenAddress: string,
-    amount: string
-  ): Promise<PayMerchantPayload> {
-    let relayServiceURL = await getConstant('relayServiceURL', this.layer2Web3);
-    let url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/pay-for-merchant/get-params/`;
-    let options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
-      },
-      body: JSON.stringify({
-        tokenAddress,
-        merchantAddress: merchantSafe,
-        payment: amount,
-      }),
-    };
-    let response = await fetch(url, options);
-    if (!response?.ok) {
-      throw new Error(await response.text());
-    }
-    return await response.json();
-  }
-
-  private async executePayMerchant(
-    prepaidCardAddress: string,
-    tokenAddress: string,
-    merchantSafe: string,
-    amount: string,
-    signatures: Signature[],
-    nonce: string
-  ): Promise<PayMerchantTx> {
-    let relayServiceURL = await getConstant('relayServiceURL', this.layer2Web3);
-    const url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/pay-for-merchant/`;
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
-      },
-      body: JSON.stringify({
-        nonce,
-        tokenAddress,
-        merchantAddress: merchantSafe,
-        payment: amount,
-        signatures,
-      }),
-    };
-    let response = await fetch(url, options);
-    if (!response?.ok) {
-      throw new Error(await response.text());
-    }
-    return response.json();
-  }
-
   private async getPrepaidCardsFromTxn(txnHash: string): Promise<string[]> {
     let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
     let txnReceipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
-    return this.getParamsFromEvent(txnReceipt, this.createPrepaidCardEventABI(), prepaidCardMgrAddress).map(
+    return getParamsFromEvent(this.layer2Web3, txnReceipt, this.createPrepaidCardEventABI(), prepaidCardMgrAddress).map(
       (createCardLog) => createCardLog.card
     );
-  }
-
-  private getParamsFromEvent(txnReceipt: TransactionReceipt, eventAbi: EventABI, address: string) {
-    let eventParams = txnReceipt.logs
-      .filter((log) => isEventMatch(log, eventAbi.topic, address))
-      .map((log) => this.layer2Web3.eth.abi.decodeLog(eventAbi.abis, log.data, log.topics));
-    return eventParams;
   }
 
   private createPrepaidCardEventABI(): EventABI {
@@ -332,13 +281,4 @@ export default class PrepaidCard {
       ],
     };
   }
-}
-
-function isEventMatch(log: Log, topic: string, address: string) {
-  return log.topics[0] === topic && log.address === address;
-}
-
-interface EventABI {
-  topic: string;
-  abis: { type: string; name: string }[];
 }

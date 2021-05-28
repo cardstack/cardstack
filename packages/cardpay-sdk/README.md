@@ -20,9 +20,11 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`PrepaidCard.payMerchant`](#prepaidcardpaymerchant)
   - [`PrepaidCard.split` (TBD)](#prepaidcardsplit-tbd)
   - [`PrepaidCard.transfer` (TBD)](#prepaidcardtransfer-tbd)
-- [`RevenuePool` (TBD)](#revenuepool-tbd)
-  - [`RevenuePool.balanceOf` (TBD)](#revenuepoolbalanceof-tbd)
-  - [`RevenuePool.withdraw` (TBD)](#revenuepoolwithdraw-tbd)
+- [`RevenuePool`](#revenuepool)
+  - [`RevenuePool.merchantRegistrationFee`](#revenuepoolmerchantregistrationfee)
+  - [`RevenuePool.registerMerchant`](#revenuepoolregistermerchant)
+  - [`RevenuePool.balance` (TBD)](#revenuepoolbalance-tbd)
+  - [`RevenuePool.claim` (TBD)](#revenuepoolclaim-tbd)
 - [`RewardPool` (TBD)](#rewardpool-tbd)
   - [`RewardPool.balanceOf` (TBD)](#rewardpoolbalanceof-tbd)
   - [`RewardPool.withdraw` (TBD)](#rewardpoolwithdraw-tbd)
@@ -371,9 +373,46 @@ interface RelayTransaction {
 ### `PrepaidCard.split` (TBD)
 ### `PrepaidCard.transfer` (TBD)
 
-## `RevenuePool` (TBD)
-### `RevenuePool.balanceOf` (TBD)
-### `RevenuePool.withdraw` (TBD)
+## `RevenuePool`
+The `RevenuePool` API is used register merchants and view/claim merchant revenue from prepaid card payments within the layer 2 network in which the Card Protocol runs. The `RevenuePool` class should be instantiated with your `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+```js
+import { RevenuePool } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider);
+let revenuePool = new RevenuePool(web3); // Layer 2 web3 instance
+```
+### `RevenuePool.merchantRegistrationFee`
+This call will return the fee in SPEND to register as a merchant. This call returns a promise for a number which represents the amount of SPEND it costs to register as a merchant.
+```js
+  let registrationFeeInSpend = await revenuePool.merchantRegistrationFee();
+  // registrationFee = 1000
+```
+### `RevenuePool.registerMerchant`
+This call will register a merchant with the Revenue Pool. In order to register as a merchant a prepaid card is used to pay the merchant registration fee. As part of merchant registration a gnosis safe will be created for the merchant specifically to claim revenue from prepaid card payments from the Revenue Pool. When customers pay a merchant they must specify the merchant safe (created from this call) as the recipient for merchant payments.
+
+```js
+  let { merchantSafe } = await revenuePool.registerMerchant(merchantsPrepaidCardAddress);
+```
+This call takes in as a parameter the prepaid card address that the merchant is using to pay the registration fee for becoming a new merchant. This call will return an object in the shape of:
+```ts
+interface {
+  merchantSafe: string,
+  gnosisTxn: RegisterMerchantTX
+}
+```
+
+where `RegisterMerchantTX` looks like:
+```ts
+interface RegisterMerchantTx extends RelayTransaction {
+  payment: number;
+  prepaidCardTxHash: string;
+  tokenAddress: string;
+}
+
+// RelayTransaction is documented above
+```
+
+### `RevenuePool.balance` (TBD)
+### `RevenuePool.claim` (TBD)
 ## `RewardPool` (TBD)
 ### `RewardPool.balanceOf` (TBD)
 ### `RewardPool.withdraw` (TBD)

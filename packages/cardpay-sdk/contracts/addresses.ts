@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { networkName } from '../sdk/utils';
+import { networkName } from '../sdk/utils/general-utils';
 
 const addresses: {
   [network: string]: {

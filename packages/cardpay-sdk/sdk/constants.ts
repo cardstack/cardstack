@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import invert from 'lodash/invert';
-import { networkName } from './utils';
+import { networkName } from './utils/general-utils';
 
 const INFURA_PROJECT_ID = 'dfb8cbe2e916420a9dbcc1d1f5828406';
 const KOVAN_INFURA_URL = 'https://kovan.infura.io/v3';

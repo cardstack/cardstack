@@ -10,7 +10,8 @@ import { getAddress } from '../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from './constants';
 import ExchangeRate from './exchange-rate';
 import { ContractOptions } from 'web3-eth-contract';
-import { GnosisExecTx, sign, gasEstimate, executeTransaction } from './utils';
+import { GnosisExecTx, gasEstimate, executeTransaction } from './utils/safe-utils';
+import { sign } from './utils/signing-utils';
 import BN from 'bn.js';
 const { toBN, fromWei } = Web3.utils;
 
