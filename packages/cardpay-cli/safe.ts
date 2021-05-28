@@ -9,6 +9,7 @@ export async function viewSafes(network: string, mnemonic: string, address?: str
 
   let safesApi = new Safes(web3);
   console.log('Getting safes...');
+  console.log();
   let safes = (await safesApi.view(address)).filter((safe) => safe.type !== 'external');
   if (safes.length === 0) {
     console.log('You have no safes (not counting safes external to the cardpay protocol)');
@@ -29,7 +30,7 @@ export async function viewSafes(network: string, mnemonic: string, address?: str
       );
     });
 
-    console.log('\n');
+    console.log();
   });
 }
 
