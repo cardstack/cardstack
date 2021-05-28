@@ -16,13 +16,12 @@ import {
   getPayMerchantPayload,
   GnosisExecTx,
   PayMerchantTx,
-  Signature,
-  sign,
   gasEstimate,
   executeTransaction,
   executePayMerchant,
-  waitUntilTransactionMined,
-} from './utils';
+} from './utils/safe-utils';
+import { waitUntilTransactionMined } from './utils/general-utils';
+import { Signature, sign } from './utils/signing-utils';
 
 const { toBN, fromWei } = Web3.utils;
 
@@ -57,17 +56,16 @@ export default class PrepaidCard {
     let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let issuingToken = await this.issuingToken(prepaidCardAddress);
-    let exchangeRate = new ExchangeRate(this.layer2Web3);
-    let weiAmount = await exchangeRate.convertFromSpend(issuingToken, spendAmount);
-    let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], issuingToken);
-    let prepaidCardBalance = new BN(await token.methods.balanceOf(prepaidCardAddress).call());
-    if (prepaidCardBalance.lt(new BN(weiAmount))) {
-      throw new Error(
-        `Prepaid card does not have enough balance to pay merchant. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
-          prepaidCardBalance.toString()
-        )}, payment amount in issuing token is ${fromWei(weiAmount)}`
-      );
-    }
+    let weiAmount = await this.convertFromSpendForPrepaidCard(
+      prepaidCardAddress,
+      spendAmount,
+      (issuingToken, balanceAmount, requiredTokenAmount) =>
+        new Error(
+          `Prepaid card does not have enough balance to pay merchant. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
+            balanceAmount
+          )}, payment amount in issuing token is ${fromWei(requiredTokenAmount)}`
+        )
+    );
     let payload = await getPayMerchantPayload(
       this.layer2Web3,
       prepaidCardAddress,
@@ -187,6 +185,22 @@ export default class PrepaidCard {
       prepaidCardAddresses,
       gnosisTxn,
     };
+  }
+
+  async convertFromSpendForPrepaidCard(
+    prepaidCardAddress: string,
+    minimumSpendBalance: number,
+    onError: (issuingToken: string, balanceAmount: string, requiredTokenAmount: string) => Error
+  ): Promise<string> {
+    let issuingToken = await this.issuingToken(prepaidCardAddress);
+    let exchangeRate = new ExchangeRate(this.layer2Web3);
+    let weiAmount = await exchangeRate.convertFromSpend(issuingToken, minimumSpendBalance);
+    let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], issuingToken);
+    let prepaidCardBalance = new BN(await token.methods.balanceOf(prepaidCardAddress).call());
+    if (prepaidCardBalance.lt(new BN(weiAmount))) {
+      onError(issuingToken, prepaidCardBalance.toString(), weiAmount);
+    }
+    return weiAmount;
   }
 
   private async loadGasIntoPrepaidCard(prepaidCardAddress: string) {

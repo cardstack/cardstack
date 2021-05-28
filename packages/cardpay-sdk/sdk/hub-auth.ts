@@ -1,5 +1,6 @@
 import Web3 from 'web3';
-import { networkName, signTypedData } from './utils';
+import { signTypedData } from './utils/signing-utils';
+import { networkName } from './utils/general-utils';
 import { networkIds } from './constants';
 
 interface NonceResponse {

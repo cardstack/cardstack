@@ -1,23 +1,19 @@
-import BN from 'bn.js';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import RevenuePoolABI from '../contracts/abi/revenue-pool';
 import { getAddress } from '../contracts/addresses.js';
-import { ERC20ABI } from '../index.js';
 import { ZERO_ADDRESS } from './constants.js';
 import {
   EventABI,
   RelayTransaction,
-  Signature,
-  sign,
-  waitUntilTransactionMined,
   getPayMerchantPayload,
   getParamsFromEvent,
   executePayMerchant,
-} from './utils';
+} from './utils/safe-utils';
+import { waitUntilTransactionMined } from './utils/general-utils';
+import { Signature, sign } from './utils/signing-utils';
 import PrepaidCard from './prepaid-card';
-import { ExchangeRate } from '..';
 
 const { toBN, fromWei } = Web3.utils;
 
@@ -30,11 +26,9 @@ interface RegisterMerchantTx extends RelayTransaction {
 export default class RevenuePool {
   private revenuePool: Contract | undefined;
   private prepaidCard: PrepaidCard;
-  private exchangeRate: ExchangeRate;
 
   constructor(private layer2Web3: Web3) {
     this.prepaidCard = new PrepaidCard(this.layer2Web3);
-    this.exchangeRate = new ExchangeRate(this.layer2Web3);
   }
 
   async merchantRegistrationFee(): Promise<number> {
@@ -48,18 +42,17 @@ export default class RevenuePool {
   ): Promise<{ merchantSafe: string; gnosisTxn: RegisterMerchantTx }> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
-    // TODO make this pattern a util: asserting a prepaid card has a spend balance
     let issuingToken = await this.prepaidCard.issuingToken(prepaidCardAddress);
-    let weiAmount = await this.exchangeRate.convertFromSpend(issuingToken, await this.merchantRegistrationFee());
-    let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], issuingToken);
-    let prepaidCardBalance = new BN(await token.methods.balanceOf(prepaidCardAddress).call());
-    if (prepaidCardBalance.lt(new BN(weiAmount))) {
-      throw new Error(
-        `Prepaid card does not have enough balance to register a merchant. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
-          prepaidCardBalance.toString()
-        )}, payment amount in issuing token is ${fromWei(weiAmount)}`
-      );
-    }
+    let weiAmount = await this.prepaidCard.convertFromSpendForPrepaidCard(
+      prepaidCardAddress,
+      await this.merchantRegistrationFee(),
+      (issuingToken, balanceAmount, requiredTokenAmount) =>
+        new Error(
+          `Prepaid card does not have enough balance to register a merchant. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
+            balanceAmount.toString()
+          )}, payment amount in issuing token is ${fromWei(requiredTokenAmount)}`
+        )
+    );
 
     let payload = await getPayMerchantPayload(
       this.layer2Web3,
