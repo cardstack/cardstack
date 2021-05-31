@@ -1,0 +1,6 @@
+<fieldset class="boxel-thread__content workflow-thread__disabled-wrapper-fieldset" disabled={{@frozen}}>
+    <legend class="boxel-sr-only">
+        {{if @frozen "This workflow is disabled as it is complete or canceled." "This workflow is currently active"}}
+    </legend>
+    {{yield}}
+</fieldset>
