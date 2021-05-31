@@ -1,0 +1,26 @@
+<Boxel::ActionChin @state={{@state}} @stepNumber={{@stepNumber}} ...attributes>
+    <:default as |a|>
+        {{yield (hash
+          ActionButton=(if @frozen (component a.ActionButton disabled=true) a.ActionButton)
+          InfoArea=a.InfoArea
+        ) to="default"}}
+    </:default>
+    <:disabled as |d|>
+        {{yield d to="disabled"}}
+    </:disabled>
+    <:in-progress as |i|>
+        {{yield (hash
+          ActionButton=(if @frozen (component i.ActionButton disabled=true) i.ActionButton)
+          CancelButton=(if @frozen (component i.CancelButton disabled=true) i.CancelButton)
+          ActionStatusArea=i.ActionStatusArea
+          InfoArea=i.InfoArea
+        ) to="in-progress"}}
+    </:in-progress>
+    <:memorialized as |m|>
+        {{yield (hash
+          ActionButton=(if @frozen (component m.ActionButton disabled=true) m.ActionButton)
+          ActionStatusArea=m.ActionStatusArea
+          InfoArea=m.InfoArea
+        ) to="memorialized"}}
+    </:memorialized>
+</Boxel::ActionChin>

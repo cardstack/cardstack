@@ -6,25 +6,26 @@
     {{#if (has-block 'before-content')}}
       {{yield to='before-content'}}
     {{/if}}
-    {{#each @workflow.visibleMilestones as |milestone i|}}
-      {{#each milestone.visiblePostables as |postable j|}}
-        <WorkflowThread::Postable
-          @postable={{postable}}
-          @previous={{object-at milestone.visiblePostables (dec j)}}
-          @index={{j}}
-          data-test-milestone={{i}}
-        />
+      {{#each @workflow.visibleMilestones as |milestone i|}}
+        {{#each milestone.visiblePostables as |postable j|}}
+          <WorkflowThread::Postable
+            @postable={{postable}}
+            @previous={{object-at milestone.visiblePostables (dec j)}}
+            @frozen={{or @workflow.isComplete @workflow.isCanceled}}
+            @index={{j}}
+            data-test-milestone={{i}}
+          />
+        {{/each}}
+        {{#if milestone.isComplete}}
+          <Boxel::MilestoneBanner
+            @title={{milestone.completedDetail}}
+            @status={{if (eq i (dec @workflow.milestones.length)) "Workflow completed" "Milestone reached"}}
+            data-milestone={{i}}
+            data-test-milestone-completed
+            data-test-milestone={{i}}
+          />
+        {{/if}}
       {{/each}}
-      {{#if milestone.isComplete}}
-        <Boxel::MilestoneBanner
-          @title={{milestone.completedDetail}}
-          @status={{if (eq i (dec @workflow.milestones.length)) "Workflow completed" "Milestone reached"}}
-          data-milestone={{i}}
-          data-test-milestone-completed
-          data-test-milestone={{i}}
-        />
-      {{/if}}
-    {{/each}}
     {{#if @workflow.isComplete}}
       {{#each @workflow.epilogue.visiblePostables as |postable j|}}
         <WorkflowThread::Postable

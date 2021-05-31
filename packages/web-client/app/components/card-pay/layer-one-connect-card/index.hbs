@@ -63,7 +63,7 @@
       />
     </ActionCardContainer::Section>
   {{/if}}
-  <Boxel::ActionChin @state={{this.ctaState}}>
+  <ActionChin @frozen={{@frozen}} @state={{this.ctaState}}>
     <:default as |a|>
       <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
         Connect Wallet
@@ -96,5 +96,5 @@
         Disconnect Wallet
       </m.ActionButton>
     </:memorialized>
-  </Boxel::ActionChin>
+  </ActionChin>
 </ActionCardContainer>

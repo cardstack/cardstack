@@ -3,7 +3,7 @@
   @isComplete={{@isComplete}}
   data-test-layout-customization-is-complete={{@isComplete}}
 >
-  <Boxel::ActionChin
+  <ActionChin @frozen={{@frozen}}
     @state={{if @isComplete "memorialized" "default"}}
     data-test-layout-customization
   >
@@ -14,5 +14,5 @@
         Set Face Value
       </d.ActionButton>
     </:default>
-  </Boxel::ActionChin>
+  </ActionChin>
 </ActionCardContainer>

@@ -91,7 +91,7 @@
       </CardPay::LabeledValue>
     </ActionCardContainer::Section>
   </ActionCardContainer::Section>
-  <Boxel::ActionChin
+  <ActionChin @frozen={{@frozen}}
     @state={{if @isComplete "memorialized" "default"}}
     data-test-deposit-transaction-setup
   >
@@ -108,5 +108,5 @@
         Edit
       </m.ActionButton>
     </:memorialized>
-  </Boxel::ActionChin>
+  </ActionChin>
 </ActionCardContainer>

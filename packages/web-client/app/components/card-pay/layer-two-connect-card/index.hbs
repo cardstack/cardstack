@@ -43,13 +43,13 @@
         />
       </CardPay::FieldStack>
     </ActionCardContainer::Section>
-    <Boxel::ActionChin @state='memorialized'>
+    <ActionChin @frozen={{@frozen}} @state='memorialized'>
       <:memorialized as |m|>
         <m.ActionButton {{on "click" this.disconnect}} data-test-layer-2-wallet-disconnect-button>
           Disconnect Wallet
         </m.ActionButton>
       </:memorialized>
-    </Boxel::ActionChin>
+    </ActionChin>
   {{else}}
     <ActionCardContainer::Section>
       <ActionCardContainer::Section
