@@ -9,34 +9,64 @@ import { PrepaidCard, prepaidCardMeta } from './prepaid-card';
 import Assets from './assets';
 import TokenBridgeHomeSide from './token-bridge-home-side';
 import TokenBridgeForeignSide from './token-bridge-foreign-side';
+import { revenuePoolMeta, RevenuePool } from './revenue-pool';
 
-type SDK = 'Assets' | 'ExchangeRate' | 'PrepaidCard' | 'Safes' | 'TokenBridgeHomeSide' | 'TokenBridgeForeignSide';
+type SDK =
+  | 'Assets'
+  | 'ExchangeRate'
+  | 'PrepaidCard'
+  | 'RevenuePool'
+  | 'Safes'
+  | 'TokenBridgeHomeSide'
+  | 'TokenBridgeForeignSide';
 export interface ContractMeta {
   apiVersions: Record<string, any>;
-  contractABI: AbiItem[];
   contractName: string;
 }
+
+const cardPayVersionABI: AbiItem[] = [
+  {
+    constant: true,
+    inputs: [],
+    name: 'cardpayVersion',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    stateMutability: 'pure',
+    type: 'function',
+  },
+];
 
 export async function getSDK(sdk: 'Assets', web3: Web3): Promise<Assets>;
 export async function getSDK(sdk: 'ExchangeRate', web3: Web3): Promise<ExchangeRate>;
 export async function getSDK(sdk: 'PrepaidCard', web3: Web3): Promise<PrepaidCard>;
+export async function getSDK(sdk: 'RevenuePool', web3: Web3): Promise<RevenuePool>;
 export async function getSDK(sdk: 'Safes', web3: Web3): Promise<Safes>;
 export async function getSDK(sdk: 'TokenBridgeHomeSide', web3: Web3): Promise<TokenBridgeHomeSide>;
 export async function getSDK(sdk: 'TokenBridgeForeignSide', web3: Web3): Promise<TokenBridgeForeignSide>;
 export async function getSDK(sdk: SDK, ...args: any[]): Promise<any> {
+  let [web3] = args;
   let apiClass;
   switch (sdk) {
     case 'Assets':
       apiClass = Assets;
       break;
     case 'ExchangeRate':
-      apiClass = await resolveApiVersion(exchangeRateMeta, args[0]);
+      apiClass = await resolveApiVersion(exchangeRateMeta, web3);
       break;
     case 'PrepaidCard':
-      apiClass = await resolveApiVersion(prepaidCardMeta, args[0]);
+      apiClass = await resolveApiVersion(prepaidCardMeta, web3);
+      break;
+    case 'RevenuePool':
+      apiClass = await resolveApiVersion(revenuePoolMeta, web3);
       break;
     case 'Safes':
-      apiClass = await resolveApiVersion(safesMeta, args[0]);
+      apiClass = await resolveApiVersion(safesMeta, web3);
       break;
     case 'TokenBridgeForeignSide':
       apiClass = TokenBridgeForeignSide;
@@ -51,12 +81,9 @@ export async function getSDK(sdk: SDK, ...args: any[]): Promise<any> {
 }
 
 async function resolveApiVersion(meta: ContractMeta, web3: Web3) {
-  let contract = new web3.eth.Contract(
-    meta.contractABI as AbiItem[], // all versions of the ABI contain the cardpayVersion() function
-    await getAddress(meta.contractName, web3)
-  );
+  let contract = new web3.eth.Contract(cardPayVersionABI, await getAddress(meta.contractName, web3));
   let protocolVersion = await contract.methods.cardpayVersion().call();
-  let versionMap = mapKeys(meta.apiVersions, (_, key) => key.replace('v', '').replace('_', '.'));
+  let versionMap = mapKeys(meta.apiVersions, (_, key) => key.replace('v', '').replace(/_/g, '.'));
   let apiClass = getAPIVersion(versionMap, protocolVersion);
   return apiClass;
 }

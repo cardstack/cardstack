@@ -5,7 +5,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677.js';
-import PrepaidCardManagerABI from '../../contracts/v0.2.0/abi/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.3.0/prepaid-card-manager';
 import { getAddress } from '../../contracts/addresses.js';
 import { getConstant, ZERO_ADDRESS } from '../constants.js';
 import { getSDK } from '../version-resolver';

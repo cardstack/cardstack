@@ -1,9 +1,9 @@
-import { RevenuePool, getConstant } from '@cardstack/cardpay-sdk';
+import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 
 export async function registerMerchant(network: string, mnemonic: string, prepaidCardAddress: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let revenuePool = new RevenuePool(web3);
+  let revenuePool = await getSDK('RevenuePool', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(
