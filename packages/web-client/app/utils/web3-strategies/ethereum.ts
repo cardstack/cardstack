@@ -51,6 +51,8 @@ export default class EthereumWeb3Strategy implements Layer1Web3Strategy {
     throw new Error('Method not implemented.');
   }
 
+  refreshBalances() {}
+
   blockExplorerUrl(txnHash: TransactionHash) {
     return `${getConstantByNetwork('blockExplorer', 'mainnet')}/tx/${txnHash}`;
   }

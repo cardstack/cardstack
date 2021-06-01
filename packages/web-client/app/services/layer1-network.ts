@@ -76,6 +76,7 @@ export default class Layer1Network extends Service {
       destinationAddress,
       amount
     );
+    yield this.strategy.refreshBalances();
     return txnReceipt;
   }
 

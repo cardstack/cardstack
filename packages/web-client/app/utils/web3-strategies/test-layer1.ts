@@ -19,6 +19,11 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   simpleEmitter = new SimpleEmitter();
 
+  // property to test whether the refreshBalances method is called
+  // to test if balances are refreshed after relaying tokens
+  // this is only a mock property
+  @tracked balancesRefreshed = false;
+
   // Balances are settable in this test implementation
   @tracked defaultTokenBalance: BN | undefined;
   @tracked daiBalance: BN | undefined;
@@ -60,6 +65,10 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   ) {
     this.#depositDeferred = RSVP.defer();
     return this.#depositDeferred.promise;
+  }
+
+  refreshBalances() {
+    this.balancesRefreshed = true;
   }
 
   blockExplorerUrl(txnHash: TransactionHash): string {
