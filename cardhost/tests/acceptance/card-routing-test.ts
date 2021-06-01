@@ -50,7 +50,8 @@ module('Acceptance | card routing', function (hooks) {
             name;
           }`,
         'isolated.js': templateOnlyComponentTemplate(
-          `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`
+          `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`,
+          { IsolatedStyles: './isolated.css' }
         ),
         'isolated.css': '.person-isolated { background: red }',
       },
@@ -61,9 +62,10 @@ module('Acceptance | card routing', function (hooks) {
     await visit('/welcome');
     assert.equal(currentURL(), '/welcome');
     assert.equal(
-      document.head.querySelector(`[data-assets-for-card="${personURL}"]`)
-        ?.innerHTML,
-      '/* card:https://mirage/cards/person asset:isolated.css */\n.person-isolated { background: red }\n\n'
+      document.head.querySelector(
+        `[data-asset-url="https://mirage/cards/person/isolated.css"]`
+      )?.innerHTML,
+      '.person-isolated { background: red }'
     );
     assert.dom('[data-test-person]').containsText('Hi! I am Arthur');
   });

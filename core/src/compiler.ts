@@ -1,3 +1,4 @@
+import { JS_TYPE } from '@cardstack/core/src/utils/content';
 import { transformSync } from '@babel/core';
 // @ts-ignore
 import decoratorsPlugin from '@babel/plugin-proposal-decorators';
@@ -20,7 +21,6 @@ import type { TemplateUsageMeta } from './glimmer/card-template-plugin';
 import {
   assertValidCompiledCard,
   assertValidDeserializationMap,
-  Asset,
   Builder,
   CompiledCard,
   ComponentInfo,
@@ -31,6 +31,7 @@ import {
   RawCard,
 } from './interfaces';
 import { getBasenameAndExtension, getFieldForPath } from './utils';
+import { getFileType } from './utils/content';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -52,7 +53,7 @@ export class Compiler {
   define: (
     cardURL: string,
     localModule: string,
-    type: Asset['type'] | 'js',
+    type: string,
     source: string
   ) => Promise<string>;
 
@@ -76,7 +77,7 @@ export class Compiler {
     let meta = getMeta(options);
 
     card.fields = await this.lookupFieldsForCard(meta.fields);
-    card.assets = this.buildAssetsList(cardSource);
+    this.defineAssets(cardSource);
 
     if (!isBaseCard(cardSource.url)) {
       let parentCard = await this.getParentCard(cardSource, meta);
@@ -126,11 +127,9 @@ export class Compiler {
     return card;
   }
 
-  private buildAssetsList(sourceCard: RawCard): Asset[] {
-    let assets: Asset[] = [];
-
+  private defineAssets(sourceCard: RawCard) {
     if (!sourceCard.files) {
-      return assets;
+      return;
     }
 
     let assetPaths = difference(
@@ -144,15 +143,8 @@ export class Compiler {
       }
 
       let src = this.getFile(sourceCard, p);
-      this.define(sourceCard.url, p, getAssetType(p), src);
-
-      assets.push({
-        type: getAssetType(p),
-        path: p,
-      });
+      this.define(sourceCard.url, p, getFileType(p), src);
     }
-
-    return assets;
   }
 
   private getCardParentPath(
@@ -236,7 +228,12 @@ export class Compiler {
     });
 
     let code = out!.code!;
-    return await this.define(cardSource.url, schemaLocalFilePath, 'js', code);
+    return await this.define(
+      cardSource.url,
+      schemaLocalFilePath,
+      JS_TYPE,
+      code
+    );
   }
 
   private async lookupFieldsForCard(
@@ -347,7 +344,7 @@ export class Compiler {
     let moduleName = await this.define(
       cardURL,
       hashFilenameFromFields(localFile, fields),
-      'js',
+      JS_TYPE,
       out!.code!
     );
 
@@ -370,15 +367,6 @@ export class Compiler {
 
     return componentInfo;
   }
-}
-
-// TODO: Replace this with proper mime-types, used content-type package
-function getAssetType(filename: string): Asset['type'] {
-  if (filename.endsWith('.css')) {
-    return 'css';
-  }
-
-  return 'unknown';
 }
 
 function hashFilenameFromFields(

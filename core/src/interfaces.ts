@@ -17,11 +17,6 @@ export const FEATURE_NAMES = Object.keys(featureNamesMap).concat(
   FORMATS
 ) as FeatureFile[];
 
-export type Asset = {
-  type: 'css' | 'unknown';
-  path: string;
-};
-
 // Right now Date is the only hardcoded known serializer. If we add more
 // this will become a union
 const deserializerTypes = {
@@ -80,10 +75,6 @@ export interface CompiledCard {
   isolated: ComponentInfo;
   embedded: ComponentInfo;
   edit: ComponentInfo;
-
-  // TODO: remove this, instead make the `define` interface mime-type aware and
-  // define all assets
-  assets: Asset[];
 }
 
 export interface ComponentInfo {

@@ -8,7 +8,6 @@ import {
   CompiledCard,
   assertValidRawCard,
   RealmConfig,
-  Asset,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 
@@ -16,6 +15,7 @@ import { NotFound } from './middleware/error';
 import { transformSync } from '@babel/core';
 import { NODE, BROWSER } from './interfaces';
 import { CardCache } from './cache';
+import { JS_TYPE } from '@cardstack/core/src/utils/content';
 
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
@@ -39,16 +39,13 @@ export default class Builder implements BuilderInterface {
   private async define(
     cardURL: string,
     localPath: string,
-    type: Asset['type'] | 'js',
+    type: string,
     source: string
   ): Promise<string> {
     let url = this.cache.setModule(BROWSER, cardURL, localPath, source);
 
     switch (type) {
-      case 'unknown':
-      case 'css':
-        return this.cache.writeAsset(cardURL, localPath, source);
-      case 'js':
+      case JS_TYPE:
         this.cache.setModule(
           NODE,
           cardURL,
@@ -56,6 +53,8 @@ export default class Builder implements BuilderInterface {
           this.transformToCommonJS(localPath, source)
         );
         return url;
+      default:
+        return this.cache.writeAsset(cardURL, localPath, source);
     }
   }
 

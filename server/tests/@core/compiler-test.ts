@@ -1,4 +1,4 @@
-import QUnit, { only } from 'qunit';
+import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { containsSource } from '@cardstack/core/tests/helpers/assertions';
 import { TestBuilder } from '../helpers/test-builder';
@@ -23,8 +23,9 @@ const PERSON_CARD = {
         birthdate;
       }`,
     'embedded.js': templateOnlyComponentTemplate(
-      '<@fields.name/> was born on <@fields.birthdate/>'
+      '<div class="person-embedded"><@fields.name/> was born on <@fields.birthdate/></div>'
     ),
+    'embedded.css': `.person-embedded { background: green }`,
   },
 };
 
@@ -40,7 +41,6 @@ Qmodule('Compiler', function (hooks) {
       'https://cardstack.com/base/string'
     );
     assert.equal(compiled.adoptsFrom?.url, baseCardURL);
-    assert.deepEqual(compiled.assets, []);
     assert.notOk(compiled.data, 'no data');
     assert.equal(compiled.embedded.inlineHBS, '{{@model}}');
     assert.deepEqual(compiled.embedded.usedFields, []);
@@ -79,15 +79,25 @@ Qmodule('Compiler', function (hooks) {
     );
   });
 
-  only('basic example', async function (assert) {
+  test('CompiledCard fields', async function (assert) {
     builder.addRawCard(PERSON_CARD);
-
     let compiled = await builder.getCompiledCard(PERSON_CARD.url);
     assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
+  });
+
+  test('CompiledCard embedded view', async function (assert) {
+    builder.addRawCard(PERSON_CARD);
+    let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
       '{{@model.name}} was born on <BirthdateField @model={{@model.birthdate}} />'
+    );
+
+    containsSource(
+      builder.definedModules.get('https://mirage/cards/person/embedded.css'),
+      PERSON_CARD.files['embedded.css'],
+      'Styles are defined'
     );
 
     assert.deepEqual(
@@ -95,6 +105,11 @@ Qmodule('Compiler', function (hooks) {
       { date: ['birthdate'] },
       'Embedded component has a deserialization map'
     );
+  });
+
+  test('CompiledCard edit view', async function (assert) {
+    builder.addRawCard(PERSON_CARD);
+    let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
     assert.deepEqual(compiled.edit.usedFields, ['name', 'birthdate']);
     assert.deepEqual(
@@ -105,7 +120,7 @@ Qmodule('Compiler', function (hooks) {
     // prettier-ignore
     containsSource(
       builder.definedModules.get(compiled.edit.moduleName),
-      '<input type=\\\"text\\\" value=\\\"{{@model.name}}\\\" />',
+      '<input type=\\\"text\\\" value=\\\"{{@model.name}}\\\" />', // eslint-disable-line
       'Edit template is rendered for text'
     );
     containsSource(

@@ -1,8 +1,8 @@
+import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
 import type {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
-  Asset,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 import { encodeCardURL } from '@cardstack/core/src/utils';
@@ -26,17 +26,26 @@ export default class Builder implements BuilderInterface {
   private async defineModule(
     cardURL: string,
     localModule: string,
-    type: Asset['type'] | 'js',
+    type: string,
     source: string
   ): Promise<string> {
     let url = new URL(localModule, cardURL.replace(/\/$/, '') + '/').href;
 
     switch (type) {
-      case 'unknown':
-      case 'css':
-        return url;
-      case 'js':
+      case JS_TYPE:
         eval(dynamicCardTransform(url, source));
+        return url;
+      case CSS_TYPE:
+        eval(`
+          define('${url}', function(){
+            const style = document.createElement('style');
+            style.innerHTML = \`${source}\`;
+            style.setAttribute('data-asset-url', '${url}');
+            document.head.appendChild(style);
+          })
+        `);
+        return url;
+      default:
         return url;
     }
   }
@@ -66,37 +75,7 @@ export default class Builder implements BuilderInterface {
 
     let rawCard = await this.getRawCard(url);
     compiledCard = await this.compiler.compile(rawCard);
-    this.copyAssets(url, compiledCard.assets, rawCard.files);
     this.compiledCardCache.set(url, compiledCard);
     return compiledCard;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  copyAssets(url: string, assets: Asset[], files: RawCard['files']): void {
-    let styles: string[] = [];
-    if (!files) {
-      return;
-    }
-
-    for (const asset of assets) {
-      if (asset.type === 'css') {
-        styles = styles.concat([
-          `/* card:${url} asset:${asset.path} */`,
-          files[asset.path],
-          '\n',
-        ]);
-      } else {
-        console.warn(
-          `A card declared an asset that the Builder is ignoring. ${url}:${asset.path}`
-        );
-      }
-    }
-
-    if (styles.length) {
-      const style = document.createElement('style');
-      style.innerHTML = styles.join('\n');
-      style.setAttribute('data-assets-for-card', url);
-      document.head.appendChild(style);
-    }
   }
 }
