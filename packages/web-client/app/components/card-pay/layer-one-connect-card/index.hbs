@@ -28,12 +28,16 @@
           @value={{this.layer1Network.walletInfo.firstAddress}}
           @isAddress={{true}}
         />
-        <CardPay::LabeledValue @label="Balance*">
+        <CardPay::LabeledValue @label="Balance*" data-test-balance-container>
+          {{#if this.balancesToShow.length}}
           <CardPay::BalancesList as |Balance|>
-            <Balance @symbol="ETH" @amount={{this.layer1Network.defaultTokenBalance}} />
-            <Balance @symbol="DAI" @amount={{this.layer1Network.daiBalance}} />
-            <Balance @symbol="CARD" @amount={{this.layer1Network.cardBalance}} />
+            {{#each this.balancesToShow as |b|}}
+            <Balance @symbol={{b.symbol}} @amount={{b.amount}} />
+            {{/each}}
           </CardPay::BalancesList>
+          {{else}}
+          None
+          {{/if}}
         </CardPay::LabeledValue>
         <CardPay::LabeledValue
           @label="Status"

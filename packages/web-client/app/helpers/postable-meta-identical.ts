@@ -4,7 +4,7 @@ import { WorkflowPostable } from '../models/workflow/workflow-postable';
 // one minute
 const maxIntervalInMilliseconds = 1000 * 60;
 
-function postableMetaIdentical([postA, postB]: [
+export function postableMetaIdentical([postA, postB]: [
   WorkflowPostable,
   WorkflowPostable
 ]) {

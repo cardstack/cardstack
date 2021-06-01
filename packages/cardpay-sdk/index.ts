@@ -1,7 +1,8 @@
 export { default as TokenBridgeForeignSide } from './sdk/token-bridge-foreign-side';
 export { default as TokenBridgeHomeSide } from './sdk/token-bridge-home-side';
-export { Safe, DepotSafe } from './sdk/safes';
+export { DepotSafe, MerchantSafe, PrepaidCardSafe, ExternalSafe } from './sdk/safes';
 export { default as Assets } from './sdk/assets';
+export { default as HubAuth } from './sdk/hub-auth';
 
 export { getAddress, getAddressByNetwork, getOracle, getOracleByNetwork } from './contracts/addresses';
 export { getConstant, getConstantByNetwork, networks, networkIds } from './sdk/constants';
