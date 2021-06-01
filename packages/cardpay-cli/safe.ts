@@ -21,6 +21,9 @@ export async function viewSafes(network: string, mnemonic: string, address?: str
     if (safe.type === 'prepaid-card') {
       console.log(`Face value: §${safe.spendFaceValue} SPEND`);
     }
+    if (tokens.length === 0) {
+      console.log('No tokens in safe');
+    }
     tokens.forEach((item) => {
       let isIssuingToken = safe.type === 'prepaid-card' && safe.issuingToken === item.tokenAddress;
       console.log(
