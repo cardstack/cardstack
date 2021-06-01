@@ -19,7 +19,7 @@ import {
   getConstantByNetwork,
   TokenBridgeHomeSide,
 } from '@cardstack/cardpay-sdk';
-import Safes, { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { Safes, DepotSafe } from '@cardstack/cardpay-sdk';
 import { UnbindEventListener } from '@cardstack/web-client/utils/events';
 
 export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
