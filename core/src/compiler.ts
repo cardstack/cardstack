@@ -24,6 +24,7 @@ import {
   Builder,
   CompiledCard,
   ComponentInfo,
+  FEATURE_NAMES,
   Field,
   Format,
   FORMATS,
@@ -34,9 +35,11 @@ import { getBasenameAndExtension, getFieldForPath } from './utils';
 export const baseCardURL = 'https://cardstack.com/base/base';
 
 function getNonAssetFilePaths(sourceCard: RawCard): (string | undefined)[] {
-  return [sourceCard.schema, sourceCard.isolated, sourceCard.embedded].filter(
-    Boolean
-  );
+  let paths: string[] = [];
+  for (const feature of FEATURE_NAMES) {
+    paths.push(sourceCard[feature]);
+  }
+  return paths.filter(Boolean);
 }
 
 export class Compiler {

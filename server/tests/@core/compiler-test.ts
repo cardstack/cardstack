@@ -102,14 +102,15 @@ Qmodule('Compiler', function (hooks) {
       { date: ['birthdate'] },
       'Edit deserialization map still includes birthdate, because it was used as data'
     );
+    // prettier-ignore
     containsSource(
       builder.definedModules.get(compiled.edit.moduleName),
-      '<input type="text" value="{{@model.name}}" />',
+      '<input type=\\\"text\\\" value=\\\"{{@model.name}}\\\" />',
       'Edit template is rendered for text'
     );
     containsSource(
       builder.definedModules.get(compiled.edit.moduleName),
-      '<input type="date" value="{{@model.birthday}}" />',
+      '<BirthdateField @model={{@model.birthdate}} />',
       'Edit template is rendered for date'
     );
   });
@@ -121,7 +122,6 @@ Qmodule('Compiler', function (hooks) {
       schema: 'schema.js',
       embedded: 'embedded.js',
       isolated: 'isolated.js',
-      edit: 'edit.js',
       files: {
         'schema.js': `
           import { contains } from "@cardstack/types";
@@ -176,7 +176,6 @@ Qmodule('Compiler', function (hooks) {
       schema: 'schema.js',
       isolated: 'isolated.js',
       embedded: 'embedded.js',
-      edit: 'edit.js',
       files: {
         'schema.js': `
         import { contains } from "@cardstack/types";
