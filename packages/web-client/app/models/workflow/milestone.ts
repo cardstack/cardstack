@@ -9,38 +9,38 @@ interface MilestoneOptions {
 }
 export class Milestone {
   title: string;
-  #postableCollection: PostableCollection = new PostableCollection();
+  postableCollection: PostableCollection = new PostableCollection();
   setWorkflow(wf: Workflow) {
-    this.#postableCollection.setWorkflow(wf);
+    this.postableCollection.setWorkflow(wf);
   }
   get workflow() {
-    return this.#postableCollection.workflow;
+    return this.postableCollection.workflow;
   }
   get visiblePostables() {
-    return this.#postableCollection.visiblePostables;
+    return this.postableCollection.visiblePostables;
   }
 
   get isComplete() {
-    return this.#postableCollection.isComplete;
+    return this.postableCollection.isComplete;
   }
 
   completedDetail;
 
   constructor(opts: MilestoneOptions) {
     this.title = opts.title;
-    this.#postableCollection.postables = opts.postables;
+    this.postableCollection.postables = opts.postables;
     this.completedDetail = opts.completedDetail;
   }
 
   peekAtVisiblePostables() {
-    return this.#postableCollection.peekAtVisiblePostables();
+    return this.postableCollection.peekAtVisiblePostables();
   }
 
   indexOf(postable: WorkflowPostable) {
-    return this.#postableCollection.indexOf(postable);
+    return this.postableCollection.indexOf(postable);
   }
 
   resetFrom(start: number) {
-    this.#postableCollection.resetFrom(start);
+    this.postableCollection.resetFrom(start);
   }
 }
