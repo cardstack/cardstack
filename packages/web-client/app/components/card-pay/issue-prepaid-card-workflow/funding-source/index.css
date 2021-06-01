@@ -1,26 +1,36 @@
-.transaction-setup__field {
-  grid-template-columns: 2.5rem 1fr;
+.funding-source__field {
+  grid-template-columns: 3.5rem 1fr;
   row-gap: 0;
 }
 
-.transaction-setup__title {
+.funding-source__field-info {
+  --outer-icon-size: 2.5rem;
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.funding-source__field-info--complete {
+  --outer-icon-size: 1.25rem;
+}
+
+.funding-source__title {
   font: 600 var(--boxel-font);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.transaction-setup__title-sm {
+.funding-source__title-sm {
   font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.transaction-setup__title-lg {
+.funding-source__title-lg {
   font-size: 1.25rem;
   font-weight: 600;
   line-height: calc(27/20);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.transaction-setup__address {
+.funding-source__address {
   color: var(--boxel-purple-500);
   font-family: var(--boxel-monospace-font-family);
   font-size: var(--boxel-font-size);
@@ -29,56 +39,52 @@
   word-break: break-all;
 }
 
-.transaction-setup__address-sm {
+.funding-source__address-sm {
   color: var(--boxel-purple-400);
   font-family: var(--boxel-monospace-font-family);
   font-size: var(--boxel-font-size-sm);
   line-height: calc(18 / 13);
 }
 
-.transaction-setup__address--wrapped {
+.funding-source__address--wrapped {
   max-width: 22ch;
 }
 
-.transaction-setup__field-info {
+.funding-source__options {
   grid-column: 2;
-}
-
-.transaction-setup__radio-buttons {
+  grid-row: 3;
   margin-top: var(--boxel-sp);
 }
 
-.transaction-setup__radio-buttons > * + * {
+.funding-source__options > * + * {
   margin-top: var(--boxel-sp);
 }
 
-.transaction-setup__icon-group {
+.funding-source__icon-group {
   display: flex;
   align-items: center;
 }
 
-.transaction-setup__icon-group-sm {
+/* .funding-source__icon-group-sm {
   display: flex;
   align-items: center;
   margin-top: var(--boxel-sp-xs);
-}
+} */
 
-.transaction-setup__icon {
+.funding-source__icon {
   align-self: flex-start;
   width: 2.5rem;
   height: 2.5rem;
-  object-fit: contain;
-  margin-right: var(--boxel-sp-sm);
-}
-
-.transaction-setup__icon-sm {
-  width: 1.25rem;
-  height: 1.25rem;
-  object-fit: contain;
   margin-right: var(--boxel-sp-xs);
 }
 
-.transaction-setup__text-sm {
+.funding-source__icon-sm {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: var(--boxel-sp-xs);
+}
+
+.funding-source__text-sm {
   color: var(--boxel-purple-500);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);

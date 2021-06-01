@@ -16,10 +16,10 @@ export type NetworkSymbol = 'kovan' | 'sokol' | 'mainnet' | 'xdai';
 // conversion
 // eslint-disable-next-line no-unused-vars
 export type ConversionFunction = (amountInWei: string) => number;
-export const convertibleSymbols: ConvertibleSymbol[] = ['CARD', 'DAI'];
+export const convertibleSymbols: ConvertibleSymbol[] = ['DAI', 'CARD'];
 
 // contract/bridging
-export const bridgeableSymbols: BridgeableSymbol[] = ['CARD', 'DAI'];
+export const bridgeableSymbols: BridgeableSymbol[] = ['DAI', 'CARD'];
 const contractNames: Record<BridgeableSymbol, string> = {
   DAI: 'daiToken',
   CARD: 'cardToken',

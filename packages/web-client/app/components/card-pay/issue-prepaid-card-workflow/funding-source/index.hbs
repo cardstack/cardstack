@@ -3,6 +3,99 @@
   @isComplete={{@isComplete}}
   data-test-layout-customization-is-complete={{@isComplete}}
 >
+  <ActionCardContainer::Section>
+    <ActionCardContainer::Section @title="Choose a balance to fund your prepaid card">
+      <CardPay::LabeledValue @label="DEPOT:" class="funding-source__field">
+        <CardPay::NestedItems class={{cn "funding-source__field-info" funding-source__field-info--complete=@isComplete}}>
+          <:outer>
+            <div class="funding-source__icon-group">
+              {{svg-jar "avatar-default" class=(if @isComplete "funding-source__icon-sm" "funding-source__icon") role="presentation"}}
+              <div>
+                <div class="funding-source__title{{if @isComplete "-sm"}}">Account 1</div>
+                <div class="funding-source__address{{if @isComplete "-sm"}}">
+                  {{#if @isComplete}}
+                    {{truncate-middle this.layer2Network.walletInfo.firstAddress 7 4}}
+                  {{else}}
+                    {{this.layer2Network.walletInfo.firstAddress}}
+                  {{/if}}
+                </div>
+              </div>
+            </div>
+          </:outer>
+          <:inner>
+            <div class="funding-source__icon-group">
+              {{svg-jar "depot" class="funding-source__icon" role="presentation"}}
+              <div>
+                <div class="funding-source__title{{if @isComplete "-lg"}}">DEPOT:</div>
+                {{#if this.fetchDepotTask.last.isSuccessful}}
+                  {{#if this.fetchDepotTask.last.value.address}}
+                    <div class={{cn "funding-source__address" funding-source__address--wrapped=@isComplete}}>
+                      {{this.fetchDepotTask.last.value.address}}
+                    </div>
+                  {{/if}}
+                {{else}}
+                  <Boxel::LoadingIndicator/>
+                {{/if}}
+              </div>
+            </div>
+          </:inner>
+        </CardPay::NestedItems>
+      </CardPay::LabeledValue>
+    </ActionCardContainer::Section>
+    <ActionCardContainer::Section>
+      <CardPay::LabeledValue @label="BALANCE:" class="funding-source__field">
+        <CardPay::NestedItems class={{cn "funding-source__field-info" funding-source__field-info--complete=@isComplete}}>
+          <:outer>
+            <div class="funding-source__icon-group">
+              {{svg-jar "depot" class=(if @isComplete "funding-source__icon-sm" "funding-source__icon") role="presentation"}}
+              <div>
+                <div class="funding-source__title{{if @isComplete "-sm"}}">DEPOT:</div>
+                <div class="funding-source__address{{if @isComplete "-sm"}}">
+                  {{#if @isComplete}}
+                    {{truncate-middle this.fetchDepotTask.last.value.address 7 4}}
+                  {{else}}
+                    {{this.fetchDepotTask.last.value.address}}
+                  {{/if}}
+                </div>
+              </div>
+            </div>
+          </:outer>
+          <:inner>
+            {{#if @isComplete}}
+              <div class="funding-source__icon-group" data-test-option-view-only>
+                {{svg-jar this.selectedToken.icon class="funding-source__icon" role="presentation" width="40" height="40"}}
+                <div>
+                  <div class="funding-source__title-lg" data-test-balance-view-only={{this.selectedToken.symbol}}>
+                    {{format-token-amount this.selectedToken.balance}} {{uppercase this.selectedToken.symbol}}
+                  </div>
+                  <div class="funding-source__text-sm" data-test-usd-balance-view-only={{this.selectedToken.symbol}}>
+                    $ {{token-to-usd this.selectedToken.symbol this.selectedToken.balance}} USD
+                  </div>
+                </div>
+              </div>
+            {{/if}}
+          </:inner>
+          <:default>
+            {{#unless @isComplete}}
+              <div class="funding-source__options">
+                {{#each this.tokens as |token|}}
+                  <CardPay::DepositWorkflow::TransactionSetup::TokenOption
+                    @checked={{eq @workflowSession.state.prepaidFundingToken token.symbol}}
+                    @onInput={{fn this.chooseSource token.symbol}}
+                    @balance={{format-token-amount token.balance}}
+                    @balanceInUsd={{token-to-usd token.symbol token.balance}}
+                    @tokenSymbol={{token.symbol}}
+                    @tokenDescription={{token.description}}
+                    @tokenIcon={{token.icon}}
+                  />
+                {{/each}}
+              </div>
+            {{/unless}}
+          </:default>
+        </CardPay::NestedItems>
+      </CardPay::LabeledValue>
+    </ActionCardContainer::Section>
+  </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
     @disabled={{@frozen}}
@@ -11,9 +104,15 @@
     <:default as |d|>
       <d.ActionButton
         {{on "click" @onComplete}}
+        @disabled={{not @workflowSession.state.prepaidFundingToken}}
       >
         Continue
       </d.ActionButton>
     </:default>
+    <:memorialized as |m|>
+      <m.ActionButton {{on "click" @onIncomplete}}>
+        Edit
+      </m.ActionButton>
+    </:memorialized>
   </Boxel::ActionChin>
 </ActionCardContainer>

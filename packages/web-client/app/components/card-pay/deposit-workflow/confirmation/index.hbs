@@ -67,7 +67,7 @@
         <div class="card-pay-confirmation__transaction-amount">
           {{svg-jar this.depositedToken.icon class="card-pay-confirmation__transaction-token-icon"}}
           <div class="card-pay-confirmation__transaction-balance">
-            {{format-token-amount this.depositedAmount}} {{this.depositedToken.symbol}}.CPXD
+            {{format-token-amount this.depositedAmount}} {{this.depositedToken.symbol}}
           </div>
         </div>
         <div class="card-pay-confirmation__transaction-preposition">
@@ -79,11 +79,9 @@
         <CardPay::NestedItems class="card-pay-confirmation__transaction-depot">
           <:outer>
             <div class="card-pay-confirmation__entity-details">
-              {{!-- placeholder for account's icon --}}
-              <span class="card-pay-confirmation__entity-icon">
-              </span>
+              {{svg-jar "avatar-default" width="20" height="20" class="card-pay-confirmation__entity-icon" role="presentation"}}
               <div>
-                <div class="card-pay-confirmation__entity-text">Account</div>
+                <div class="card-pay-confirmation__entity-text">Account 1</div>
                 <div class="card-pay-confirmation__entity-address" data-test-deposit-confirmation-account-address>
                   {{truncate-middle this.layer2Network.walletInfo.firstAddress 7 4}}
                 </div>

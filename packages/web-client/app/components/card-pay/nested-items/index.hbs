@@ -5,4 +5,7 @@
   <div class="card-pay-nested-items__inner">
     {{yield to="inner"}}
   </div>
+  {{#if (has-block "default")}}
+    {{yield to="default"}}
+  {{/if}}
 </div>
