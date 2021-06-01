@@ -10,6 +10,7 @@ import Assets from './assets';
 import TokenBridgeHomeSide from './token-bridge-home-side';
 import TokenBridgeForeignSide from './token-bridge-foreign-side';
 
+type SDK = 'Assets' | 'ExchangeRate' | 'PrepaidCard' | 'Safes' | 'TokenBridgeHomeSide' | 'TokenBridgeForeignSide';
 export interface ContractMeta {
   apiVersions: Record<string, any>;
   contractABI: AbiItem[];
@@ -22,7 +23,7 @@ export async function getSDK(sdk: 'PrepaidCard', web3: Web3): Promise<PrepaidCar
 export async function getSDK(sdk: 'Safes', web3: Web3): Promise<Safes>;
 export async function getSDK(sdk: 'TokenBridgeHomeSide', web3: Web3): Promise<TokenBridgeHomeSide>;
 export async function getSDK(sdk: 'TokenBridgeForeignSide', web3: Web3): Promise<TokenBridgeForeignSide>;
-export async function getSDK(sdk: any, ...args: any[]): Promise<any> {
+export async function getSDK(sdk: SDK, ...args: any[]): Promise<any> {
   let apiClass;
   switch (sdk) {
     case 'Assets':
@@ -43,6 +44,8 @@ export async function getSDK(sdk: any, ...args: any[]): Promise<any> {
     case 'TokenBridgeHomeSide':
       apiClass = TokenBridgeHomeSide;
       break;
+    default:
+      assertNever(sdk);
   }
   return new apiClass(...args);
 }
@@ -88,4 +91,8 @@ function getAPIVersion<T>(apiVersionMap: APIVersionMap<T>, protocolVersion: stri
   }
 
   return apiVersionMap[satisfyingApiVersion];
+}
+
+function assertNever(_value: never): never {
+  throw new Error(`not never`);
 }

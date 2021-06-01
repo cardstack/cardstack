@@ -11,5 +11,5 @@ export type ExchangeRate = v0_2_0;
 export let exchangeRateMeta = {
   apiVersions: { v0_2_0 },
   contractABI: DefaultRevenuePoolABI,
-  contractName: 'revenuepool',
+  contractName: 'revenuePool',
 } as ContractMeta;
