@@ -333,7 +333,7 @@ export class Compiler {
       fields,
       cardURL,
       inlineHBS: undefined,
-      fieldFormat: defaultFieldFormat(format),
+      defaultFieldFormat: defaultFieldFormat(format),
       usageMeta: { model: new Set(), fields: new Map() },
     };
 
@@ -350,8 +350,7 @@ export class Compiler {
 
     let usedFields = buildUsedFieldsListFromUsageMeta(
       fields,
-      options.usageMeta,
-      defaultFieldFormat(format)
+      options.usageMeta
     );
 
     let componentInfo: ComponentInfo = {
@@ -450,8 +449,7 @@ function buildDeserializerMapForField(
 
 function buildUsedFieldsListFromUsageMeta(
   fields: CompiledCard['fields'],
-  usageMeta: TemplateUsageMeta,
-  defaultFormat: Format
+  usageMeta: TemplateUsageMeta
 ): ComponentInfo['usedFields'] {
   let usedFields: Set<string> = new Set();
 
@@ -466,7 +464,7 @@ function buildUsedFieldsListFromUsageMeta(
       usedFields,
       fieldPath,
       fields,
-      fieldFormat === 'default' ? defaultFormat : fieldFormat
+      fieldFormat
     );
   }
 

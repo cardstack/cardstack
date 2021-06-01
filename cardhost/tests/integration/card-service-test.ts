@@ -84,10 +84,8 @@ module('Integration | card-service', function (hooks) {
       let { component } = await cards.load(cardID, 'edit');
       this.set('component', component);
       await render(hbs`<this.component />`);
-
-      await this.pauseTest();
       assert.dom('input[type="text"]').hasValue('A blog post title');
-      assert.dom('input[type="date"]').hasValue('May 17, 2021');
+      assert.dom('input[type="datetime-local"]').hasValue('2021-05-17T11:31');
     });
 
     test('Serialization works on nested cards', async function (assert) {

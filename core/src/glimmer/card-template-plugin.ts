@@ -27,13 +27,13 @@ type ImportAndChooseName = (
 
 export interface TemplateUsageMeta {
   model: 'self' | Set<string>;
-  fields: Map<string, Format | 'default'>;
+  fields: Map<string, Format>;
 }
 
 export interface Options {
   fields: CompiledCard['fields'];
   usageMeta: TemplateUsageMeta;
-  fieldFormat: Format;
+  defaultFieldFormat: Format;
   importAndChooseName: ImportAndChooseName;
 }
 
@@ -96,7 +96,12 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   return function transform(
     env: syntax.ASTPluginEnvironment
   ): syntax.ASTPlugin {
-    let { fields, importAndChooseName, usageMeta, fieldFormat } = options;
+    let {
+      fields,
+      importAndChooseName,
+      usageMeta,
+      defaultFieldFormat,
+    } = options;
     let state: State = {
       scopes: [new Map()],
       nextScope: undefined,
@@ -112,6 +117,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             throw new InvalidFieldsUsageError();
           }
 
+          let fieldFormat = getFieldFormat(node, defaultFieldFormat);
           let fieldFullPath = fieldPathForElementNode(node);
 
           if (fieldFullPath) {
@@ -122,7 +128,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             if (field.type === 'containsMany') {
               return expandContainsManyShorthand(`${FIELDS}.${fieldFullPath}`);
             }
-            usageMeta.fields.set(fieldFullPath, 'default');
+            usageMeta.fields.set(fieldFullPath, fieldFormat);
             return rewriteElementNode({
               field,
               importAndChooseName,
@@ -158,7 +164,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
                   `${FIELDS}.${val.fieldFullPath}`
                 );
               }
-              usageMeta.fields.set(val.fieldFullPath, 'default');
+              usageMeta.fields.set(val.fieldFullPath, fieldFormat);
               return rewriteElementNode({
                 field: val.field,
                 importAndChooseName,
@@ -547,4 +553,12 @@ function inlineTemplateForField(
     nodes,
   });
   return body;
+}
+
+function getFieldFormat(
+  _node: ElementNode,
+  defaultFieldFormat: Format
+): Format {
+  // TODO: look at @format parameter on node to override default
+  return defaultFieldFormat;
 }

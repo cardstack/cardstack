@@ -23,7 +23,7 @@ import glimmerCardTemplateTransform, {
 export interface Options {
   fields: CompiledCard['fields'];
   cardURL: string;
-  fieldFormat: Format;
+  defaultFieldFormat: Format;
   // these are for gathering output
   usageMeta: TemplateUsageMeta;
   inlineHBS: string | undefined;
@@ -179,7 +179,7 @@ function transformTemplate(
   let template = glimmerCardTemplateTransform(source, {
     fields: opts.fields,
     usageMeta: opts.usageMeta,
-    fieldFormat: opts.fieldFormat,
+    defaultFieldFormat: opts.defaultFieldFormat,
     importAndChooseName,
   });
   return { template, neededScope };

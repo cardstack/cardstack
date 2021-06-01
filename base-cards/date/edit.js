@@ -10,17 +10,33 @@ const Format = new Intl.DateTimeFormat('us-EN', {
 
 export default setComponentTemplate(
   precompileTemplate(
-    "TEST{{this.formatted}}TEST<input type='datetime-local' value='{{this.formatted}}' />",
+    "<input type='datetime-local' value={{this.formatted}} />",
     {
       strictMode: true,
+      scope: {}, // TODO: this is tricking our inline detector into not inlining this component
     }
   ),
   class extends Component {
     get formatted() {
-      console.log('WHAT');
-      console.log('DATE EDIT', this.args.model);
-      debugger;
-      return Format.format(this.args.model);
+      let d = this.args.model;
+      if (d) {
+        return makeDateInputHappy(d);
+      }
     }
   }
 );
+
+function pad(str, length) {
+  str = String(str);
+  while (str.length < length) {
+    str = '0' + str;
+  }
+  return str;
+}
+
+function makeDateInputHappy(d) {
+  return `${d.getYear() + 1900}-${pad(d.getMonth() + 1, 2)}-${pad(
+    d.getDate(),
+    2
+  )}T${pad(d.getHours(), 2)}:${pad(d.getMinutes(), 2)}`;
+}
