@@ -10,6 +10,7 @@ import Assets from './assets';
 import TokenBridgeHomeSide from './token-bridge-home-side';
 import TokenBridgeForeignSide from './token-bridge-foreign-side';
 import { revenuePoolMeta, RevenuePool } from './revenue-pool';
+import HubAuth from './hub-auth';
 
 type SDK =
   | 'Assets'
@@ -17,6 +18,7 @@ type SDK =
   | 'PrepaidCard'
   | 'RevenuePool'
   | 'Safes'
+  | 'HubAuth'
   | 'TokenBridgeHomeSide'
   | 'TokenBridgeForeignSide';
 export interface ContractMeta {
@@ -43,6 +45,7 @@ const cardPayVersionABI: AbiItem[] = [
 ];
 
 export async function getSDK(sdk: 'Assets', web3: Web3): Promise<Assets>;
+export async function getSDK(sdk: 'HubAuth', web3: Web3, hubRootUrl: string): Promise<HubAuth>;
 export async function getSDK(sdk: 'ExchangeRate', web3: Web3): Promise<ExchangeRate>;
 export async function getSDK(sdk: 'PrepaidCard', web3: Web3): Promise<PrepaidCard>;
 export async function getSDK(sdk: 'RevenuePool', web3: Web3): Promise<RevenuePool>;
@@ -55,6 +58,9 @@ export async function getSDK(sdk: SDK, ...args: any[]): Promise<any> {
   switch (sdk) {
     case 'Assets':
       apiClass = Assets;
+      break;
+    case 'HubAuth':
+      apiClass = HubAuth;
       break;
     case 'ExchangeRate':
       apiClass = await resolveApiVersion(exchangeRateMeta, web3);

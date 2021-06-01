@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/naming-convention: "off" */
+
 import { ContractMeta } from '../version-resolver';
 
 import v0_2_0 from './v.2.0';

@@ -2,7 +2,13 @@ import ERC20ABI from '../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import Web3 from 'web3';
 
-export default class Assets {
+export interface IAssets {
+  getNativeTokenBalance(userAddress?: string): Promise<string>;
+  getBalanceForToken(tokenAddress: string, tokenHolderAddress?: string): Promise<string>;
+  getTokenInfo(tokenAddress: string): Promise<{ decimals: number; name: string; symbol: string }>;
+}
+
+export default class Assets implements IAssets {
   constructor(private web3: Web3) {}
 
   async getNativeTokenBalance(userAddress?: string): Promise<string> {

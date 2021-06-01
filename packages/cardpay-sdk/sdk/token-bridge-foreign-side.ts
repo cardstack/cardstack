@@ -10,7 +10,17 @@ import { getAddress } from '../contracts/addresses';
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
 // The Foreign network can be any chain, but generally refers to the Ethereum mainnet.
 
-export default class TokenBridgeForeignSide {
+export interface ITokenBridgeForeignSide {
+  unlockTokens(tokenAddress: string, amount: string, options?: ContractOptions): Promise<TransactionReceipt>;
+  relayTokens(
+    tokenAddress: string,
+    recipientAddress: string,
+    amount: string,
+    options?: ContractOptions
+  ): Promise<TransactionReceipt>;
+}
+
+export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   constructor(private layer1Web3: Web3) {}
 
   async unlockTokens(tokenAddress: string, amount: string, options?: ContractOptions): Promise<TransactionReceipt> {

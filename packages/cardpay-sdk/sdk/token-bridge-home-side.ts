@@ -9,7 +9,11 @@ import { waitForEvent, waitUntilTransactionMined } from './utils/general-utils';
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
 // The Foreign network can be any chain, but generally refers to the Ethereum mainnet.
 
-export default class TokenBridgeHomeSide {
+export interface ITokenBridgeHomeSide {
+  waitForBridgingCompleted(recipientAddress: string, fromBlock: string): Promise<TransactionReceipt>;
+}
+
+export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
   constructor(private layer2Web3: Web3) {}
 
   async waitForBridgingCompleted(recipientAddress: string, fromBlock: string): Promise<TransactionReceipt> {

@@ -12,14 +12,13 @@ import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer } from 'rsvp';
 import BN from 'bn.js';
-import { toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
 import {
   networkIds,
   getConstantByNetwork,
-  TokenBridgeHomeSide,
+  getSDK,
 } from '@cardstack/cardpay-sdk';
-import Safes, { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { UnbindEventListener } from '@cardstack/web-client/utils/events';
 
 export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
@@ -53,7 +52,7 @@ export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
   }
 
   // eslint-disable-next-line no-unused-vars
-  on(event: string, cb: Function): UnbindEventListener {
+  on(_event: string, _cb: Function): UnbindEventListener {
     throw new Error('Method not implemented');
   }
 
@@ -120,19 +119,19 @@ export default class XDaiWeb3Strategy implements Layer2Web3Strategy {
 
   async getBlockHeight(): Promise<BN> {
     const result = await this.web3.eth.getBlockNumber();
-    return toBN(result);
+    return new BN(result.toString());
   }
 
-  awaitBridged(
+  async awaitBridged(
     fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt> {
-    let tokenBridge = new TokenBridgeHomeSide(this.web3);
-    return tokenBridge.waitForBridgingCompleted(receiver, fromBlock);
+    let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
+    return tokenBridge.waitForBridgingCompleted(receiver, fromBlock.toString());
   }
 
   async fetchDepot(owner: ChainAddress): Promise<DepotSafe | null> {
-    let safesApi = new Safes(this.web3);
+    let safesApi = await getSDK('Safes', this.web3);
     let safes = await safesApi.view(owner);
     let depotSafes = safes.filter(
       (safe) => safe.type === 'depot'

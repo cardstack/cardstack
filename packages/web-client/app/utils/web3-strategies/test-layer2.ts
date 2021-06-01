@@ -7,7 +7,7 @@ import {
 } from '@cardstack/web-client/utils/token';
 import RSVP, { defer } from 'rsvp';
 import BN from 'bn.js';
-import { fromWei, toBN } from 'web3-utils';
+import { fromWei } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import {
@@ -40,7 +40,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   getBlockHeight(): Promise<BN> {
-    return Promise.resolve(toBN(0));
+    return Promise.resolve(new BN('0'));
   }
 
   // eslint-disable-next-line no-unused-vars

@@ -13,15 +13,13 @@ import { IConnector } from '@walletconnect/types';
 import WalletInfo from '../wallet-info';
 import { defer, hash } from 'rsvp';
 import BN from 'bn.js';
-import { toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
 import {
   networkIds,
   getConstantByNetwork,
-  TokenBridgeHomeSide,
-  Safes,
   DepotSafe,
-  ExchangeRate,
+  IExchangeRate,
+  getSDK,
 } from '@cardstack/cardpay-sdk';
 import { SimpleEmitter, UnbindEventListener } from '../events';
 
@@ -38,7 +36,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
   @tracked defaultTokenBalance: BN | undefined;
   @tracked waitForAccountDeferred = defer();
   web3!: Web3;
-  #exchangeRateApi!: ExchangeRate;
+  #exchangeRateApi!: IExchangeRate;
 
   constructor() {
     // super(...arguments);
@@ -94,7 +92,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     });
     await this.provider.enable();
     this.web3 = new Web3(this.provider as any);
-    this.#exchangeRateApi = new ExchangeRate(this.web3);
+    this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
   }
 
@@ -144,7 +142,7 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
 
   async refreshBalances() {
     let raw = await this.getDefaultTokenBalance();
-    this.defaultTokenBalance = toBN(String(raw ?? 0));
+    this.defaultTokenBalance = new BN(String(raw ?? 0));
   }
 
   async getDefaultTokenBalance() {
@@ -156,16 +154,16 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
     else return 0;
   }
 
-  awaitBridged(
+  async awaitBridged(
     fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt> {
-    let tokenBridge = new TokenBridgeHomeSide(this.web3);
-    return tokenBridge.waitForBridgingCompleted(receiver, fromBlock);
+    let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
+    return tokenBridge.waitForBridgingCompleted(receiver, fromBlock.toString());
   }
 
   async fetchDepot(owner: ChainAddress): Promise<DepotSafe | null> {
-    let safesApi = new Safes(this.web3);
+    let safesApi = await getSDK('Safes', this.web3);
     let safes = await safesApi.view(owner);
     let depotSafes = safes.filter(
       (safe) => safe.type === 'depot'
@@ -199,6 +197,6 @@ export default class SokolWeb3Strategy implements Layer2Web3Strategy {
 
   async getBlockHeight(): Promise<BN> {
     const result = await this.web3.eth.getBlockNumber();
-    return toBN(result);
+    return new BN(result.toString());
   }
 }
