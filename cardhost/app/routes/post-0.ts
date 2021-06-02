@@ -6,6 +6,6 @@ export default class Delegate extends Route {
   @inject declare cards: CardsService;
 
   model(): Promise<{ model: any; component: unknown }> {
-    return this.cards.load('https://demo.com/cards/post-0', 'isolated');
+    return this.cards.load('https://demo.com/post-0', 'isolated');
   }
 }

@@ -1,1 +1,6 @@
-<@model.component />
+<div style="border: 2px solid green">
+  <button
+    {{on 'click' (open-card-in-modal @model.model.id format='edit')}}
+  >Edit</button>
+  <@model.component />
+</div>

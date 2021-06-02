@@ -8,12 +8,22 @@ import {
 import { NotFound } from '../middleware/error';
 import { Serializer } from 'jsonapi-serializer';
 
+const DEFAULT_FORMAT = 'isolated';
+
+function assertValidFormat(format: string): asserts format is Format {
+  if (format && !FORMATS.some((f) => f === format)) {
+    // if (format && !FORMATS.includes(format)) { // Why does typescript complain about this?
+    throw new Error(`Unknown format provided: ${format}`);
+  }
+}
+
 function getCardFormatFromRequest(
   formatQueryParam?: string | string[]
 ): Format {
-  if (formatQueryParam) {
-    return 'isolated';
+  if (!formatQueryParam) {
+    return DEFAULT_FORMAT;
   }
+
   let format;
   if (Array.isArray(formatQueryParam)) {
     format = formatQueryParam[0];
@@ -21,10 +31,11 @@ function getCardFormatFromRequest(
     format = formatQueryParam;
   }
 
-  if (FORMATS.includes(format)) {
+  if (format) {
+    assertValidFormat(format);
     return format;
   } else {
-    return 'isolated';
+    return DEFAULT_FORMAT;
   }
 }
 

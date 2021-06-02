@@ -12,7 +12,18 @@ import serializers, { Serializer } from '@cardstack/core/src/serializers';
 import config from 'cardhost/config/environment';
 const { cardServer } = config as any; // Environment types arent working
 
+export interface LoadedCard {
+  model: any;
+  component: unknown;
+}
+
+import { tracked } from '@glimmer/tracking';
 export default class Cards extends Service {
+  @tracked isLoading = false;
+
+  @tracked isShowingModal = false;
+  @tracked modalModel?: LoadedCard;
+
   async load(
     url: string,
     format: Format
@@ -22,51 +33,65 @@ export default class Cards extends Service {
     return this.internalLoad(fullURL.join(''));
   }
 
+  async loadInModal(url: string, format: Format): Promise<void> {
+    this.isShowingModal = true;
+
+    this.modalModel = await this.load(url, format);
+  }
+
+  closeModal(): void {
+    this.isShowingModal = false;
+    this.modalModel = undefined;
+  }
+
   async loadForRoute(
     pathname: string
   ): Promise<{ model: any; component: unknown }> {
     return this.internalLoad(`${cardServer}cardFor${pathname}`);
   }
 
-  private async internalLoad(
-    url: string
-  ): Promise<{ model: any; component: unknown }> {
-    let card = await fetchCard(url);
-    let model = await deserializeResponse(card);
+  private async internalLoad(url: string): Promise<LoadedCard> {
+    this.isLoading = true;
+    try {
+      let card = await fetchCard(url);
+      let model = await deserializeResponse(card);
 
-    let { componentModule } = card.data.meta;
-    let cardComponent: unknown;
-    if (macroCondition(isTesting())) {
-      // in tests, our fake server inside mirage just defines these modules
-      // dynamically
-      cardComponent = window.require(componentModule)['default'];
-    } else {
-      if (!componentModule.startsWith('@cardstack/compiled/')) {
-        throw new Error(
-          `${url}'s meta.componentModule does not start with '@cardstack/compiled/`
-        );
+      let { componentModule } = card.data.meta;
+      let cardComponent: unknown;
+      if (macroCondition(isTesting())) {
+        // in tests, our fake server inside mirage just defines these modules
+        // dynamically
+        cardComponent = window.require(componentModule)['default'];
+      } else {
+        if (!componentModule.startsWith('@cardstack/compiled/')) {
+          throw new Error(
+            `${url}'s meta.componentModule does not start with '@cardstack/compiled/`
+          );
+        }
+        componentModule = componentModule.replace('@cardstack/compiled/', '');
+        cardComponent = (
+          await import(
+            /* webpackExclude: /schema\.js$/ */
+            `@cardstack/compiled/${componentModule}`
+          )
+        ).default;
       }
-      componentModule = componentModule.replace('@cardstack/compiled/', '');
-      cardComponent = (
-        await import(
-          /* webpackExclude: /schema\.js$/ */
-          `@cardstack/compiled/${componentModule}`
-        )
-      ).default;
+
+      let CallerComponent = setComponentTemplate(
+        hbs`<this.card @model = {{this.model}} />`,
+        class extends Component {
+          card = cardComponent;
+          model = model;
+        }
+      );
+
+      return {
+        model,
+        component: CallerComponent,
+      };
+    } finally {
+      this.isLoading = false;
     }
-
-    let CallerComponent = setComponentTemplate(
-      hbs`<this.card @model = {{this.model}} />`,
-      class extends Component {
-        card = cardComponent;
-        model = model;
-      }
-    );
-
-    return {
-      model,
-      component: CallerComponent,
-    };
   }
 }
 

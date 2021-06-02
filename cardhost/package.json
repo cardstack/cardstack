@@ -138,6 +138,7 @@
     "ember-cli-typescript": "^4.1.0",
     "ember-cli-typescript-blueprints": "^3.0.0",
     "ember-template-compiler": "^1.9.0-alpha",
+    "macro-decorators": "^0.1.2",
     "raw-loader": "^4.0.2"
   }
 }

@@ -1,0 +1,13 @@
+{{#if this.showModal}}
+<div style="border:3px red dashed">
+  <div>
+    <button {{on 'click' this.close}}>Close Modal</button>
+  </div>
+
+  {{#if this.isLoading}}
+    <h1>LOADING!!!</h1>
+  {{else}}
+    <this.model.component />
+  {{/if}}
+</div>
+{{/if}}
