@@ -1,4 +1,4 @@
-import { ServerKoa } from '../interfaces';
+import type { ServerKoa } from '../interfaces';
 
 const ROUTER_METHOD_NAME = 'routeTo';
 
@@ -16,9 +16,9 @@ export async function setupCardRouting(
   options: { routeCard: string; cardCacheDir: string }
 ) {
   let { routeCard, cardCacheDir } = options;
-  let { schemaModule } = await app.context.builder.getCompiledCard(routeCard);
+  let card = await app.context.builder.getCompiledCard(routeCard);
 
-  const cardRouterClassLocation = require.resolve(schemaModule, {
+  const cardRouterClassLocation = require.resolve(card.schemaModule, {
     paths: [cardCacheDir],
   });
   // eslint-disable-next-line @typescript-eslint/no-var-requires

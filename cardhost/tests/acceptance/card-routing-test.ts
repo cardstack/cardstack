@@ -8,16 +8,10 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 module('Acceptance | card routing', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
-  setupCardMocking(hooks);
+  setupCardMocking(hooks, { routingCard: 'https://mirage/cards/my-routes' });
   let personURL = 'https://mirage/cards/person';
 
   hooks.beforeEach(function () {
-    // TODO: This is now how the server works
-    this.server.create('space', {
-      id: 'home',
-      routingCard: 'https://mirage/cards/my-routes',
-    });
-
     this.createCard({
       url: 'https://mirage/cards/my-routes',
       schema: 'schema.js',

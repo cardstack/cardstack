@@ -13,6 +13,8 @@ import Builder from 'cardhost/lib/builder';
 import { getContext } from '@ember/test-helpers';
 import { Memoize } from 'typescript-memoize';
 
+import type { TestContext } from 'ember-test-helpers';
+
 // const REALM = 'https://cardstack.com/mirage';
 
 type CardParams = { type: 'raw' } | { format: Format; type?: 'compiled' };
@@ -20,14 +22,17 @@ type CardParams = { type: 'raw' } | { format: Format; type?: 'compiled' };
 class FakeCardServer {
   static cardServers = new WeakMap<object, FakeCardServer>();
 
+  routingCard?: string;
+
   static current(): FakeCardServer {
-    let testContext = getContext();
+    let testContext = getContext() as TestContext;
     if (!testContext) {
       throw new Error(`FakeCardServer only works in tests`);
     }
     let server = this.cardServers.get(testContext);
     if (!server) {
       server = new this();
+      server.routingCard = testContext.routingCard;
       this.cardServers.set(testContext, server);
     }
     return server;
@@ -94,8 +99,8 @@ export default function (this: Server): void {
   this.get(`/cards/:encodedCardURL`, returnCard);
 
   this.get('/cardFor/:pathname', async function (schema: any, request) {
-    let { routingCard } = schema.spaces.find('home');
     let cardServer = FakeCardServer.current();
+    let { routingCard } = cardServer;
     if (!routingCard) {
       return new Response(
         404,

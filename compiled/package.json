@@ -17,7 +17,9 @@
   "engines": {
     "node": ">= 15"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@glimmer/component": "^1.0.3"
+  },
   "ember-addon": {
     "version": 2,
     "type": "addon",
