@@ -29,7 +29,7 @@
 </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{this.ctaState}}
-    @disabled={{this.ctaDisabled}}
+    @disabled={{or @frozen this.ctaDisabled}}
     data-test-layout-customization
   >
     <:default as |a|>

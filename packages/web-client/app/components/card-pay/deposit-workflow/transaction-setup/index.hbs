@@ -93,6 +93,7 @@
   </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
+    @disabled={{@frozen}}
     data-test-deposit-transaction-setup
   >
     <:default as |d|>
