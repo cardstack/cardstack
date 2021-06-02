@@ -18,7 +18,7 @@ export async function viewSafes(network: string, mnemonic: string, address?: str
     let { address, type, tokens } = safe;
     console.log(`${address} -- ${type}`);
     console.log('-------------------------');
-    if (safe.type === 'prepaid-card') {
+    if (safe.type === 'prepaid-card' || safe.type === 'merchant') {
       console.log(`Face value: §${safe.spendFaceValue} SPEND`);
     }
     if (tokens.length === 0) {

@@ -28,11 +28,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
   test('Initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay');
-    await click(
-      '[data-test-card-pay-header-tab][href="/card-pay/token-suppliers"]'
-    );
-    assert.equal(currentURL(), '/card-pay/token-suppliers');
-
+    assert.equal(currentURL(), '/card-pay/balances');
     await click('[data-test-issue-prepaid-card-workflow-button]');
 
     let post = postableSel(0, 0);
