@@ -1,18 +1,18 @@
 /*global fetch */
 
 import Web3 from 'web3';
-import PrepaidCardManagerABI from '../contracts/abi/prepaid-card-manager';
-import RevenuePoolABI from '../contracts/abi/revenue-pool';
-import BridgeUtilsABI from '../contracts/abi/bridge-utils';
-import ERC20ABI from '../contracts/abi/erc-20';
-import SpendABI from '../contracts/abi/spend';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.3.0/prepaid-card-manager';
+import RevenuePoolABI from '../../contracts/abi/v0.3.0/revenue-pool';
+import BridgeUtilsABI from '../../contracts/abi/v0.3.0/bridge-utils';
+import SpendABI from '../../contracts/abi/v0.3.0/spend';
+import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
-import { getAddress } from '../contracts/addresses';
-import { getConstant, ZERO_ADDRESS } from './constants';
-import ExchangeRate from './exchange-rate';
+import { getAddress } from '../../contracts/addresses';
+import { getConstant, ZERO_ADDRESS } from '../constants';
 import { ContractOptions } from 'web3-eth-contract';
-import { GnosisExecTx, gasEstimate, executeTransaction } from './utils/safe-utils';
-import { sign } from './utils/signing-utils';
+import { GnosisExecTx, gasEstimate, executeTransaction } from '../utils/safe-utils';
+import { sign } from '../utils/signing-utils';
+import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
 const { toBN, fromWei } = Web3.utils;
 
@@ -26,9 +26,9 @@ export interface DepotSafe extends BaseSafe {
 }
 export interface MerchantSafe extends BaseSafe {
   type: 'merchant';
-  spendFaceValue: number;
+  accumulatedSpendValue: number;
 }
-interface ExternalSafe extends BaseSafe {
+export interface ExternalSafe extends BaseSafe {
   type: 'external';
 }
 export interface PrepaidCardSafe extends BaseSafe {
@@ -74,7 +74,7 @@ export default class Safes {
       await getAddress('bridgeUtils', this.layer2Web3)
     );
 
-    let exchangeRate = new ExchangeRate(this.layer2Web3);
+    let exchangeRate = await getSDK('ExchangeRate', this.layer2Web3);
 
     return await Promise.all(
       safes.map(async (safeAddress: string) => {
@@ -114,7 +114,7 @@ export default class Safes {
           return {
             ...safeInfo,
             type: 'merchant' as 'merchant',
-            spendFaceValue: await spendContract.methods.balanceOf(safeInfo.address).call(),
+            accumulatedSpendValue: await spendContract.methods.balanceOf(safeInfo.address).call(),
           };
         }
         return {

@@ -1,9 +1,9 @@
 import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
-import PriceOracle from '../contracts/abi/price-oracle';
-import RevenuePoolABI from '../contracts/abi/revenue-pool';
-import { getOracle, getAddress } from '../contracts/addresses';
+import PriceOracleABI from '../../contracts/abi/v0.3.0/price-oracle';
+import RevenuePoolABI from '../../contracts/abi/v0.3.0/revenue-pool';
+import { getOracle, getAddress } from '../../contracts/addresses';
 import BN from 'bn.js';
 
 const tokenDecimals = new BN('18');
@@ -66,7 +66,7 @@ export default class ExchangeRate {
 
   private async getOracleContract(token: string): Promise<Contract> {
     let address = await getOracle(token, this.layer2Web3);
-    return new this.layer2Web3.eth.Contract(PriceOracle as AbiItem[], address);
+    return new this.layer2Web3.eth.Contract(PriceOracleABI as AbiItem[], address);
   }
 }
 

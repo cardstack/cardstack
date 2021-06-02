@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import { getWeb3 } from './utils';
-import { TokenBridgeForeignSide, getConstant, getAddress } from '@cardstack/cardpay-sdk';
+import { getConstant, getAddress, getSDK } from '@cardstack/cardpay-sdk';
 
 const { toWei } = Web3.utils;
 
@@ -14,7 +14,7 @@ export default async function (
   const amountInWei = toWei(amount.toString()).toString();
 
   let web3 = await getWeb3(network, mnemonic);
-  let tokenBridge = new TokenBridgeForeignSide(web3);
+  let tokenBridge = await getSDK('TokenBridgeForeignSide', web3);
   tokenAddress = tokenAddress ?? (await getAddress('daiToken', web3));
   receiverAddress = receiverAddress ?? (await web3.eth.getAccounts())[0];
 

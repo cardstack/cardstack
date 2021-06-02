@@ -1,4 +1,4 @@
-import { TokenBridgeHomeSide, getConstant } from '@cardstack/cardpay-sdk';
+import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 
 export default async function (
@@ -8,7 +8,7 @@ export default async function (
   recipient?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let tokenBridge = new TokenBridgeHomeSide(web3);
+  let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
   recipient = recipient ?? (await web3.eth.getAccounts())[0];
 
   let blockExplorer = await getConstant('blockExplorer', web3);

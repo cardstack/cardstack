@@ -3,12 +3,16 @@ import { signTypedData } from './utils/signing-utils';
 import { networkName } from './utils/general-utils';
 import { networkIds } from './constants';
 
+export interface IHubAuth {
+  getNonce(): Promise<NonceResponse>;
+  authenticate(): Promise<string>;
+}
 interface NonceResponse {
   nonce: string;
   version: string;
 }
 
-export default class HubAuth {
+export default class HubAuth implements IHubAuth {
   constructor(private layer2Web3: Web3, private hubRootUrl: string) {}
 
   async getNonce(): Promise<NonceResponse> {

@@ -1,10 +1,10 @@
-import { Assets, getConstantByNetwork, ERC20ABI } from '@cardstack/cardpay-sdk';
+import { getConstantByNetwork, getSDK, ERC20ABI } from '@cardstack/cardpay-sdk';
 import { AbiItem } from 'web3-utils';
 import { getWeb3 } from './utils';
 
 export const viewTokenBalance = async (network: string, mnemonic: string, tokenAddress?: string): Promise<void> => {
   let web3 = await getWeb3(network, mnemonic);
-  let assets = new Assets(web3);
+  let assets = await getSDK('Assets', web3);
 
   if (!tokenAddress) {
     const nativeTokenSymbol = getConstantByNetwork('nativeTokenSymbol', network);

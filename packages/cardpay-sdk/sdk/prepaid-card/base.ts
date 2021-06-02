@@ -4,12 +4,13 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
-import ERC677ABI from '../contracts/abi/erc-677.js';
-import PrepaidCardManagerABI from '../contracts/abi/prepaid-card-manager';
-import { getAddress } from '../contracts/addresses.js';
-import { getConstant, ZERO_ADDRESS } from './constants.js';
-import ExchangeRate from './exchange-rate';
-import { ERC20ABI } from '../index.js';
+import ERC677ABI from '../../contracts/abi/erc-677.js';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.3.0/prepaid-card-manager';
+import { getAddress } from '../../contracts/addresses.js';
+import { getConstant, ZERO_ADDRESS } from '../constants.js';
+import { getSDK } from '../version-resolver';
+
+import { ERC20ABI } from '../../index.js';
 import {
   EventABI,
   getParamsFromEvent,
@@ -19,9 +20,9 @@ import {
   gasEstimate,
   executeTransaction,
   executePayMerchant,
-} from './utils/safe-utils';
-import { waitUntilTransactionMined } from './utils/general-utils';
-import { Signature, sign } from './utils/signing-utils';
+} from '../utils/safe-utils';
+import { waitUntilTransactionMined } from '../utils/general-utils';
+import { Signature, sign } from '../utils/signing-utils';
 
 const { toBN, fromWei } = Web3.utils;
 
@@ -193,7 +194,7 @@ export default class PrepaidCard {
     onError: (issuingToken: string, balanceAmount: string, requiredTokenAmount: string) => Error
   ): Promise<string> {
     let issuingToken = await this.issuingToken(prepaidCardAddress);
-    let exchangeRate = new ExchangeRate(this.layer2Web3);
+    let exchangeRate = await getSDK('ExchangeRate', this.layer2Web3);
     let weiAmount = await exchangeRate.convertFromSpend(issuingToken, minimumSpendBalance);
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], issuingToken);
     let prepaidCardBalance = new BN(await token.methods.balanceOf(prepaidCardAddress).call());

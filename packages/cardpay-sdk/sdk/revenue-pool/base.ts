@@ -1,19 +1,19 @@
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
-import RevenuePoolABI from '../contracts/abi/revenue-pool';
-import { getAddress } from '../contracts/addresses.js';
-import { ZERO_ADDRESS } from './constants.js';
+import RevenuePoolABI from '../../contracts/abi/v0.3.0/revenue-pool';
+import { getAddress } from '../../contracts/addresses.js';
+import { ZERO_ADDRESS } from '../constants.js';
 import {
   EventABI,
   RelayTransaction,
   getPayMerchantPayload,
   getParamsFromEvent,
   executePayMerchant,
-} from './utils/safe-utils';
-import { waitUntilTransactionMined } from './utils/general-utils';
-import { Signature, sign } from './utils/signing-utils';
-import PrepaidCard from './prepaid-card';
+} from '../utils/safe-utils';
+import { waitUntilTransactionMined } from '../utils/general-utils';
+import { Signature, sign } from '../utils/signing-utils';
+import { getSDK } from '../version-resolver';
 
 const { toBN, fromWei } = Web3.utils;
 
@@ -25,11 +25,8 @@ interface RegisterMerchantTx extends RelayTransaction {
 
 export default class RevenuePool {
   private revenuePool: Contract | undefined;
-  private prepaidCard: PrepaidCard;
 
-  constructor(private layer2Web3: Web3) {
-    this.prepaidCard = new PrepaidCard(this.layer2Web3);
-  }
+  constructor(private layer2Web3: Web3) {}
 
   async merchantRegistrationFee(): Promise<number> {
     // this is a SPEND amount which is a safe number to represent in javascript
@@ -42,8 +39,9 @@ export default class RevenuePool {
   ): Promise<{ merchantSafe: string; gnosisTxn: RegisterMerchantTx }> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
-    let issuingToken = await this.prepaidCard.issuingToken(prepaidCardAddress);
-    let weiAmount = await this.prepaidCard.convertFromSpendForPrepaidCard(
+    let prepaidCard = await getSDK('PrepaidCard', this.layer2Web3);
+    let issuingToken = await prepaidCard.issuingToken(prepaidCardAddress);
+    let weiAmount = await prepaidCard.convertFromSpendForPrepaidCard(
       prepaidCardAddress,
       await this.merchantRegistrationFee(),
       (issuingToken, balanceAmount, requiredTokenAmount) =>

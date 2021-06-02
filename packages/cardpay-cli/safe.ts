@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { Safes, Assets, getConstant } from '@cardstack/cardpay-sdk';
+import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 
 const { toWei } = Web3.utils;
@@ -7,7 +7,7 @@ const { toWei } = Web3.utils;
 export async function viewSafes(network: string, mnemonic: string, address?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
 
-  let safesApi = new Safes(web3);
+  let safesApi = await getSDK('Safes', web3);
   console.log('Getting safes...');
   console.log();
   let safes = (await safesApi.view(address)).filter((safe) => safe.type !== 'external');
@@ -18,8 +18,14 @@ export async function viewSafes(network: string, mnemonic: string, address?: str
     let { address, type, tokens } = safe;
     console.log(`${address} -- ${type}`);
     console.log('-------------------------');
-    if (safe.type === 'prepaid-card' || safe.type === 'merchant') {
+    if (safe.type === 'prepaid-card') {
       console.log(`Face value: §${safe.spendFaceValue} SPEND`);
+    }
+    if (safe.type === 'merchant') {
+      console.log(`Accumulated SPEND value: §${safe.accumulatedSpendValue} SPEND`);
+    }
+    if (tokens.length === 0) {
+      console.log('No tokens in safe');
     }
     tokens.forEach((item) => {
       let isIssuingToken = safe.type === 'prepaid-card' && safe.issuingToken === item.tokenAddress;
@@ -45,8 +51,8 @@ export async function transferTokens(
   let web3 = await getWeb3(network, mnemonic);
   let weiAmount = toWei(String(amount));
 
-  let safes = new Safes(web3);
-  let assets = new Assets(web3);
+  let safes = await getSDK('Safes', web3);
+  let assets = await getSDK('Assets', web3);
   let { symbol } = await assets.getTokenInfo(token);
 
   console.log(`transferring ${amount} ${symbol} from safe ${safe} to ${recipient}`);

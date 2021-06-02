@@ -12,12 +12,11 @@ import { defer } from 'rsvp';
 import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract';
 import BN from 'bn.js';
-import { toBN } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
 import {
-  TokenBridgeForeignSide,
   networkIds,
   getConstantByNetwork,
+  getSDK,
 } from '@cardstack/cardpay-sdk';
 import {
   SimpleEmitter,
@@ -271,9 +270,9 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
       this.getErc20Balance(this.cardTokenContract),
     ]);
     let [defaultTokenBalance, daiBalance, cardBalance] = balances;
-    this.defaultTokenBalance = toBN(defaultTokenBalance);
-    this.daiBalance = toBN(daiBalance);
-    this.cardBalance = toBN(cardBalance);
+    this.defaultTokenBalance = new BN(defaultTokenBalance);
+    this.daiBalance = new BN(daiBalance);
+    this.cardBalance = new BN(cardBalance);
   }
   async getDefaultTokenBalance() {
     if (this.walletInfo.firstAddress)
@@ -287,18 +286,21 @@ export default class KovanWeb3Strategy implements Layer1Web3Strategy {
     return contract.methods.balanceOf(this.walletInfo.firstAddress).call();
   }
 
-  approve(amountInWei: BN, tokenSymbol: string): Promise<TransactionReceipt> {
-    let tokenBridge = new TokenBridgeForeignSide(this.web3);
+  async approve(
+    amountInWei: BN,
+    tokenSymbol: string
+  ): Promise<TransactionReceipt> {
+    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
     let token = this.getTokenBySymbol(tokenSymbol);
     return tokenBridge.unlockTokens(token.address, amountInWei.toString());
   }
 
-  relayTokens(
+  async relayTokens(
     tokenSymbol: string,
     receiverAddress: string,
     amountInWei: BN
   ): Promise<TransactionReceipt> {
-    let tokenBridge = new TokenBridgeForeignSide(this.web3);
+    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
     let token = this.getTokenBySymbol(tokenSymbol);
     return tokenBridge.relayTokens(
       token.address,

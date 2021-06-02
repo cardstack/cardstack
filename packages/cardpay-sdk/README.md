@@ -4,6 +4,11 @@ This is a package that provides an SDK to use the Cardpay protocol.
 ### Special Considerations <!-- omit in toc -->
  One item to note that all token amounts that are provided to the API must strings and be in units of `wei`. All token amounts returned by the API will also be in units of `wei`. You can use `Web3.utils.toWei()` and `Web3.utils.fromWei()` to convert to and from units of `wei`. Because ethereum numbers can be so large, it is unsafe to represent these natively in Javascript, and in fact it is very common for a smart contract to return numbers that are simply too large to be represented natively in Javascript. For this reason, within Javascript the only safe way to natively handle numbers coming from Ethereum is as a `string`. If you need to perform math on a number coming from Ethereum use the `BN` library.
 
+- [`getSDK`](#getsdk)
+- [`Assets`](#assets)
+  - [`Assets.getNativeTokenBalance`](#assetsgetnativetokenbalance)
+  - [`Assets.getBalanceForToken`](#assetsgetbalancefortoken)
+  - [`Assets.getTokenInfo`](#assetsgettokeninfo)
 - [`TokenBridgeForeignSide`](#tokenbridgeforeignside)
   - [`TokenBridgeForeignSide.unlockTokens`](#tokenbridgeforeignsideunlocktokens)
   - [`TokenBridgeForeignSide.relayTokens`](#tokenbridgeforeignsiderelaytokens)
@@ -35,18 +40,63 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [ExchangeRate.getUSDConverter](#exchangerategetusdconverter)
   - [`ExchangeRate.getETHPrice`](#exchangerategetethprice)
   - [`ExchangeRate.getUpdatedAt`](#exchangerategetupdatedat)
+- [`HubAuth` (TODO)](#hubauth-todo)
 - [`getAddress`](#getaddress)
 - [`getOracle`](#getoracle)
 - [`getConstant`](#getconstant)
 - [`networkIds`](#networkids)
 - [ABI's](#abis)
 
-## `TokenBridgeForeignSide`
-The `TokenBridge` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeForeignSide` class should be instantiated with your `Web3` instance that is configured to operate on a layer 1 network (like Ethereum Mainnet or Kovan).
+## `getSDK`
+The cardpay SDK will automatically obtain the latest API version that works with the on-chain contracts. In order to obtain an API you need to leverage the `getSDK()` function and pass to it the API that you wish to work with, as well as any parameters necessary for obtaining an API (usually just an instance of Web3). This function then returns a promise for the requested API. For example, to obtain the `Safes` API, you would call:
 ```js
-import { TokenBridgeForeignSide } from "@cardstack/cardpay-sdk";
+import { getSDK } from "@cardstack/cardpay-sdk";
+let safesAPI = await getSDK('Safes', web3);
+```
+
+## `Assets`
+Thie `Assets` API is used issue queries for native coin balances and ERC-20 token balances, as well as to get ERC-20 token info. The `Assets` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on either layer 1 or layer 2, depending on where the asset you wish to query lives.
+```js
+import { getSDK } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider);
-let tokenBridge = new TokenBridgeForeignSide(web3); // Layer 1 web3 instance
+let assetAPI = await getSDK('Assets', web3);
+```
+
+### `Assets.getNativeTokenBalance`
+This call returns the balance in native token for the specified address. So in Ethereum mainnet, this would be the ether balance. In xDai this would be the DAI token balance. This call returns a promise for the native token amount as a string in units of `wei`. If no address is provided, then the balance of the first address in the wallet will be retrieved.
+```js
+let assetsAPI = await getSDK('Assets', web3);
+let etherBalance = await assetsAPI.getNativeTokenBalance(walletAddress);
+```
+
+### `Assets.getBalanceForToken`
+This call returns the balance in for an ERC-20 token from the specified address. This call returns a promise for the token amount as a string in units of `wei`. If no token holder address is provided, then the balance of the first address in the wallet will be retrieved.
+```js
+let assetsAPI = await getSDK('Assets', web3);
+let cardBalance = await assetsAPI.getBalanceForToken(cardTokenAddress, walletAddress);
+```
+
+### `Assets.getTokenInfo`
+This call returns ERC-20 token information: the token name, the token symbol, and the token decimals for an ERC-20 token.
+```js
+let assetsAPI = await getSDK('Assets', web3);
+let { name, symbol, decimals } = await assetsAPI.getTokenInfo(cardTokenAddress);
+```
+The response of this call is a promise for an object shaped like:
+```ts
+{
+  decimals: number;
+  name: string;
+  symbol: string;
+}
+```
+
+## `TokenBridgeForeignSide`
+The `TokenBridgeForeignSide` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeForeignSide` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 1 network (like Ethereum Mainnet or Kovan).
+```js
+import { getSDK } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider); // Layer 1 web3 instance
+let tokenBridge = await getSDK('TokenBridgeForeignSide', web3);
 ```
 
 ### `TokenBridgeForeignSide.unlockTokens`
@@ -85,11 +135,11 @@ let txnReceipt = await tokenBridge.relayTokens(
 ### `TokenBridgeForeignSide.getSupportedTokens` (TBD)
 
 ## `TokenBridgeHomeSide`
-The `TokenBridge` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeHomeSide` class should be instantiated with your `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+The `TokenBridgeHomeSide` API is used to bridge tokens into the layer 2 network in which the Card Protocol runs. The `TokenBridgeHomeSide` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
 ```js
-import { TokenBridgeHomeSide } from "@cardstack/cardpay-sdk";
-let web3 = new Web3(myProvider);
-let tokenBridge = new TokenBridgeHomeSide(web3); // Layer 2 web3 instance
+import { getSDK } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider); // Layer 2 web3 instance
+let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
 ```
 
 ### `TokenBridgeHomeSide.waitForBridgingCompleted`
@@ -110,11 +160,11 @@ let txnReceipt = await tokenBridge.waitForBridgingCompleted(
 ```
 
 ## `Safes`
-The `Safes` API is used to query the card protocol about the gnosis safes in the layer 2 network in which the Card Protocol runs. This can includes safes in which bridged tokens are deposited as well as prepaid cards (which in turn are actually gnosis safes). The `Safes` class should be instantiated with your `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+The `Safes` API is used to query the card protocol about the gnosis safes in the layer 2 network in which the Card Protocol runs. This can includes safes in which bridged tokens are deposited as well as prepaid cards (which in turn are actually gnosis safes). The `Safes` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
 ```js
-import { Safes } from "@cardstack/cardpay-sdk";
-let web3 = new Web3(myProvider);
-let safes = new Safes(web3); // Layer 2 web3 instance
+import { getSDK } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider); // Layer 2 web3 instance
+let safes = await getSDK('Safes', web3);
 ```
 
 ### `Safes.view`
@@ -211,11 +261,11 @@ interface RelayTransaction {
 ```
 
 ## `PrepaidCard`
-The `PrepaidCard` API is used to create and interact with prepaid cards within the layer 2 network in which the Card Protocol runs. The `PrepaidCard` class should be instantiated with your `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+The `PrepaidCard` API is used to create and interact with prepaid cards within the layer 2 network in which the Card Protocol runs. The `PrepaidCard` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
 ```js
-import { PrepaidCard } from "@cardstack/cardpay-sdk";
-let web3 = new Web3(myProvider);
-let prepaidCard = new PrepaidCard(web3); // Layer 2 web3 instance
+import { getSDK } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider); // Layer 2 web3 instance
+let prepaidCard = await getSDK('PrepaidCard', web3);
 ```
 
 ### `PrepaidCard.create`
@@ -374,11 +424,11 @@ interface RelayTransaction {
 ### `PrepaidCard.transfer` (TBD)
 
 ## `RevenuePool`
-The `RevenuePool` API is used register merchants and view/claim merchant revenue from prepaid card payments within the layer 2 network in which the Card Protocol runs. The `RevenuePool` class should be instantiated with your `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+The `RevenuePool` API is used register merchants and view/claim merchant revenue from prepaid card payments within the layer 2 network in which the Card Protocol runs. The `RevenuePool` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
 ```js
-import { RevenuePool } from "@cardstack/cardpay-sdk";
-let web3 = new Web3(myProvider);
-let revenuePool = new RevenuePool(web3); // Layer 2 web3 instance
+import { getSDK } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider); // Layer 2 web3 instance
+let revenuePool = await getSDK('RevenuePool', web3);
 ```
 ### `RevenuePool.merchantRegistrationFee`
 This call will return the fee in SPEND to register as a merchant. This call returns a promise for a number which represents the amount of SPEND it costs to register as a merchant.
@@ -418,11 +468,11 @@ interface RegisterMerchantTx extends RelayTransaction {
 ### `RewardPool.withdraw` (TBD)
 
 ## `ExchangeRate`
-The `ExchangeRate` API is used to get the current exchange rates in USD and ETH for the various stablecoin that we support. These rates are fed by the Chainlink price feeds for the stablecoin rates and the DIA oracle for the CARD token rates. As we onboard new stablecoin we'll add more exchange rates. The price oracles that we use reside in layer 2, so please supply a layer 2 web3 instance when instantiating an `ExchangeRate` instance.
+The `ExchangeRate` API is used to get the current exchange rates in USD and ETH for the various stablecoin that we support. These rates are fed by the Chainlink price feeds for the stablecoin rates and the DIA oracle for the CARD token rates. As we onboard new stablecoin we'll add more exchange rates. The price oracles that we use reside in layer 2, so please supply a layer 2 web3 instance obtaining an `ExchangeRate` API from `getSDK()`.
 ```js
-import { ExchangeRate } from "@cardstack/cardpay-sdk";
-let web3 = new Web3(myProvider);
-let exchangeRate = new ExchangeRate(web3); // Layer 2 web3 instance
+import { getSDK } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider); // Layer 2 web3 instance
+let exchangeRate = await getSDK('ExchangeRate', web3);
 ```
 ### `ExchangeRate.convertToSpend`
 This call will convert an amount in the specified token to a SPEND amount. This function returns a number representing the SPEND amount. The input to this function is the token amount as a string in units of `wei`.
@@ -440,7 +490,7 @@ console.log(`DAI value ${fromWei(weiAmount)}`);
 This call will return the USD value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a floating point value in units of USD. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function.
 
 ```js
-let exchangeRate = new ExchangeRate(web3);
+let exchangeRate = await getSDK('ExchangeRate', web3);
 let usdPrice = await exchangeRate.getUSDPrice("DAI", amountInWei);
 console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
 ```
@@ -448,7 +498,7 @@ console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
 This returns a function that converts an amount of a token in wei to USD. Similar to `ExchangeRate.getUSDPrice`, an exception will be thrown if we don't have the exchange rate for the token. The returned function accepts a string that represents an amount in wei and returns a number that represents the USD value of that amount of the token.
 
 ```js
-let exchangeRate = new ExchangeRate(web3);
+let exchangeRate = await getSDK('ExchangeRate', web3);
 let converter = await exchangeRate.getUSDConverter("DAI");
 console.log(`USD value: $${converter(amountInWei)} USD`);
 ```
@@ -456,7 +506,7 @@ console.log(`USD value: $${converter(amountInWei)} USD`);
 This call will return the ETH value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a string that represents the ETH value in units of `wei` as well. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function. You can also easily convert units of `wei` back into `ethers` by using the `Web3.utils.fromWei()` function.
 
 ```js
-let exchangeRate = new ExchangeRate(web3);
+let exchangeRate = await getSDK('ExchangeRate', web3);
 let ethWeiPrice = await exchangeRate.getETHPrice("CARD", amountInWei);
 console.log(`ETH value: ${fromWei(ethWeiPrice)} ETH`);
 ```
@@ -464,10 +514,12 @@ console.log(`ETH value: ${fromWei(ethWeiPrice)} ETH`);
 This call will return a `Date` instance that indicates the date the token rate was last updated.
 
 ```js
-let exchangeRate = new ExchangeRate(web3);
+let exchangeRate = await getSDK('ExchangeRate', web3);
 let date = await exchangeRate.getUpdatedAt("DAI");
 console.log(`The ${token} rate was last updated at ${date.toString()}`);
 ```
+
+## `HubAuth` (TODO)
 ## `getAddress`
 `getAddress` is a utility that will retrieve the contract address for a contract that is part of the Card Protocol in the specified network. The easiest way to use this function is to just pass your web3 instance to the function, and the function will query the web3 instance to see what network it is currently using. You can also just pass in the network name.
 
@@ -506,7 +558,7 @@ let networkName = networks[77]; // "sokol"
 ```
 
 ## ABI's
-All of the ABI's for the contracts that participate in the Card Protocol are also available:
+The following ABI's from the Card Protocol are also available:
 ```js
 import {
   ERC20ABI,
@@ -515,3 +567,4 @@ import {
   HomeBridgeMediatorABI,
   PrepaidCardManagerABI } from "@cardstack/cardpay-sdk";
 ```
+Note that we don't expose CardPay specific ABI's since these are upgradeable contracts whose interfaces can fluctuate.
