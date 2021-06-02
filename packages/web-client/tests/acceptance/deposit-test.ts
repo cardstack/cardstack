@@ -316,6 +316,20 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD"]`)
       .containsText('10000.00');
 
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
+
     assert
       .dom(
         `${epiloguePostableSel(4)} [data-test-deposit-next-step="dashboard"]`
@@ -540,6 +554,22 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${postableSel(0, 4)} [data-test-mainnet-disconnect-button]`)
       .containsText('Disconnect Wallet');
     await click(`${postableSel(0, 4)} [data-test-mainnet-disconnect-button]`);
+
+    // test that all cta buttons are disabled
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
+
     assert
       .dom(cancelationPostableSel(0))
       .containsText(
@@ -604,6 +634,21 @@ module('Acceptance | deposit', function (hooks) {
     layer1Service.test__simulateDisconnectFromWallet();
 
     await waitFor('[data-test-deposit-workflow-canceled-cta]');
+
+    // test that all cta buttons are disabled
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
 
     assert
       .dom(cancelationPostableSel(0))
@@ -675,12 +720,27 @@ module('Acceptance | deposit', function (hooks) {
       `[data-test-layer-2-wallet-card] [data-test-layer-2-wallet-disconnect-button]`
     );
 
+    // test that all cta buttons are disabled
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
     assert
       .dom(cancelationPostableSel(0))
       .containsText(
         'It looks like your xDai chain wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+
     assert.dom('[data-test-deposit-workflow-canceled-restart]').exists();
   });
 
@@ -745,6 +805,20 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateDisconnectFromWallet();
 
     await waitFor('[data-test-deposit-workflow-canceled-cta]');
+    // test that all cta buttons are disabled
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
     assert
       .dom(cancelationPostableSel(0))
       .containsText(
