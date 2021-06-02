@@ -5,7 +5,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677.js';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.3.0/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.4.0/prepaid-card-manager';
 import { getAddress } from '../../contracts/addresses.js';
 import { getConstant, ZERO_ADDRESS } from '../constants.js';
 import { getSDK } from '../version-resolver';
@@ -22,7 +22,7 @@ import {
   executePayMerchant,
 } from '../utils/safe-utils';
 import { waitUntilTransactionMined } from '../utils/general-utils';
-import { Signature, sign } from '../utils/signing-utils';
+import { sign } from '../utils/signing-utils';
 
 const { toBN, fromWei } = Web3.utils;
 
@@ -54,7 +54,6 @@ export default class PrepaidCard {
       // this is hard coded in the PrepaidCardManager contract
       throw new Error(`The amount to pay merchant §${spendAmount} SPEND is below the minimum allowable amount`);
     }
-    let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     let weiAmount = await this.convertFromSpendForPrepaidCard(
@@ -92,18 +91,6 @@ export default class PrepaidCard {
       from,
       prepaidCardAddress
     );
-    let contractSignature: Signature = {
-      v: 1,
-      r: toBN(prepaidCardMgrAddress).toString(),
-      s: 0,
-    };
-    // The hash for the signatures requires that owner signatures be sorted by address
-    if (prepaidCardMgrAddress.toLowerCase() > from.toLowerCase()) {
-      signatures = signatures.concat(contractSignature);
-    } else {
-      signatures = [contractSignature].concat(signatures);
-    }
-
     let result = await executePayMerchant(
       this.layer2Web3,
       prepaidCardAddress,
