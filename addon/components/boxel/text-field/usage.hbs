@@ -9,6 +9,10 @@
       @onInput={{@onInput}}
       @disabled={{this.disabled}}
       @required={{this.required}}
+      @optional={{this.optional}}
+      @invalid={{this.invalid}}
+      @errorMessage={{this.errorMessage}}
+      @helperText={{this.helperText}}
     />
   </:example>
   <:api as |Args|>
@@ -52,6 +56,28 @@
       @name="required"
       @value={{this.required}}
       @onInput={{fn (mut this.required)}}
+    />
+    <Args.Bool
+      @name="optional"
+      @value={{this.optional}}
+      @onInput={{fn (mut this.optional)}}
+      @description="Displays 'optional' label, unless the `@required` arg is also true"
+    />
+    <Args.Bool
+      @name="invalid"
+      @value={{this.invalid}}
+      @onInput={{fn (mut this.invalid)}}
+    />
+    <Args.String
+      @name="errorMessage"
+      @value={{this.errorMessage}}
+      @onInput={{fn (mut this.errorMessage)}}
+      @description="This will only show up if the `@invalid` arg returns true"
+    />
+    <Args.String
+      @name="helperText"
+      @value={{this.helperText}}
+      @onInput={{fn (mut this.helperText)}}
     />
     <Args.Action
       @name="onInput"

@@ -58,4 +58,55 @@ module('Integration | Component | Input', function (hooks) {
     await fillIn('[data-test-boxel-input]', 'Ice-cream');
     assert.dom('[data-test-boxel-input]').hasValue('Ice-cream with puppies');
   });
+
+  test('It adds appropriate aria and ids to input helper and error text', async function (assert) {
+    await render(
+      hbs`<Boxel::Input @invalid={{true}} @errorMessage="Error message" @helperText="Helper text" />`
+    );
+
+    const errorMessageId = this.element.querySelector(
+      '[data-test-boxel-input-error-message]'
+    ).id;
+    const helperTextId = this.element.querySelector(
+      '[data-test-boxel-input-helper-text]'
+    ).id;
+
+    assert
+      .dom('[data-test-boxel-input]')
+      .hasAria('errormessage', errorMessageId);
+    assert.dom('[data-test-boxel-input]').hasAria('describedby', helperTextId);
+  });
+
+  test('It only shows the error message when there is one and the input state is invalid', async function (assert) {
+    this.set('invalid', false);
+    this.set('errorMessage', 'Error message');
+
+    await render(
+      hbs`<Boxel::Input @invalid={{this.invalid}} @errorMessage={{this.errorMessage}}/>`
+    );
+
+    assert.dom('[data-test-boxel-input]').doesNotHaveAria('invalid');
+    assert.dom('[data-test-boxel-input]').doesNotHaveAria('errormessage');
+    assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
+
+    this.set('invalid', true);
+
+    const errorMessageId = this.element.querySelector(
+      '[data-test-boxel-input-error-message]'
+    ).id;
+
+    assert.dom('[data-test-boxel-input]').hasAria('invalid', 'true');
+    assert
+      .dom('[data-test-boxel-input]')
+      .hasAria('errormessage', errorMessageId);
+    assert
+      .dom('[data-test-boxel-input-error-message]')
+      .containsText('Error message');
+
+    this.set('errorMessage', '');
+
+    assert.dom('[data-test-boxel-input]').hasAria('invalid', 'true');
+    assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
+    assert.dom('[data-test-boxel-input]').doesNotHaveAria('errormessage');
+  });
 });

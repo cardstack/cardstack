@@ -7731,6 +7731,14 @@ ember-try@^1.4.0:
     rsvp "^4.7.0"
     walk-sync "^1.1.3"
 
+ember-unique-id-helper-polyfill@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/ember-unique-id-helper-polyfill/-/ember-unique-id-helper-polyfill-0.1.0.tgz#372f1272cd45dd3ee960a20a4945918264ff1bd3"
+  integrity sha512-qACD+lzMCOXRBJnJdA3tM1bHEKziVga2hhZGpTToLL8QlPj67+lwCaz+j6HBBA/Yw1yavVogO+NUwR8Q1iMKow==
+  dependencies:
+    ember-cli-babel "^7.23.0"
+    ember-cli-htmlbars "^5.3.1"
+
 ember-useragent@^0.6.0:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/ember-useragent/-/ember-useragent-0.6.1.tgz#0854b3c11acf0fdd98a165fba9bf5dc76eace804"

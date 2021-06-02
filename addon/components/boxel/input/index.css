@@ -11,14 +11,51 @@
   transition: border-color var(--boxel-transition);
 }
 
-.boxel-input:hover {
+.boxel-input:disabled {
+  background-color: var(--boxel-light);
+  border-color: var(--boxel-purple-300);
+  color: rgba(0, 0, 0, 0.5);
+  opacity: 0.5;
+}
+
+.boxel-input:hover:not(:disabled) {
   border-color: var(--boxel-dark);
 }
 
-.boxel-input:disabled {
-  background-color: var(--boxel-light-100);
-  border-color: var(--boxel-purple-300);
-  color: var(--boxel-purple-300);
+.boxel-input--invalid {
+  border-color: var(--boxel-error-100);
+  box-shadow: 0 0 0 1px var(--boxel-error-100);
 }
 
-/* TODO: required and disabled styles */
+.boxel-input--invalid:hover:not(:disabled) {
+  border-color: var(--boxel-error-100);
+}
+
+.boxel-input__optional {
+  grid-row: 1;
+  grid-column: 1 / -1;
+  margin-bottom: var(--boxel-sp-xxxs);
+  color: rgba(0, 0, 0, 0.75);
+  font: var(--boxel-font-sm);
+  font-style: oblique;
+  letter-spacing: var(--boxel-lsp);
+  text-align: right;
+}
+
+.boxel-input__error-message {
+  grid-column: 2;
+  margin-top: var(--boxel-sp-xs);
+  margin-left: var(--boxel-sp-xs);
+  color: var(--boxel-error-100);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.boxel-input__helper-text {
+  grid-column: 2;
+  margin-top: var(--boxel-sp-xs);
+  margin-left: var(--boxel-sp-xs);
+  color: rgba(0, 0, 0, 0.75);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}

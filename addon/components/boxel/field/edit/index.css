@@ -4,7 +4,7 @@
   display: grid;
   grid-template-columns: var(--boxel-field-label-width) 1fr;
   align-items: center;
-  gap: var(--boxel-sp-sm) var(--boxel-sp-lg);
+  column-gap: var(--boxel-sp-lg);
 }
 
 .boxel-edit-field__label {

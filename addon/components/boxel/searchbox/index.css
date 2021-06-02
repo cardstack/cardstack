@@ -25,14 +25,6 @@
   font: var(--boxel-font-sm);
 }
 
-.boxel-searchbox__input-label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  color: transparent;
-  background: transparent;
-}
-
 .boxel-searchbox__input::placeholder {
   color: var(--boxel-searchbox-text-color);
 }

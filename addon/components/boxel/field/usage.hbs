@@ -8,7 +8,10 @@
       style={{css-var boxel-field-label-width=this.labelWidth}}
     >
       {{#if (eq this.mode "edit")}}
-        <Boxel::Input @value={{this.value}} />
+        <Boxel::Input
+          @value={{this.value}}
+          @required={{true}}
+        />
       {{else}}
         {{this.value}}
       {{/if}}

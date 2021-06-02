@@ -90,7 +90,7 @@
   --boxel-pink: #ff009d;
 
   /* Status colors */
-  --boxel-error-100: var(--boxel-red);    /* alert - attention - error */
+  --boxel-error-100: #f00;    /* alert - attention - error */
   --boxel-warning-100: var(--boxel-yellow); /* warning - notification */
   --boxel-success-100: var(--boxel-green);
   --boxel-success-200: var(--boxel-teal);
