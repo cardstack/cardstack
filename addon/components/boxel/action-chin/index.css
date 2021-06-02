@@ -46,12 +46,12 @@
   --boxel-action-chin-padding-vertical: var(--boxel-sp-xl);
 }
 
-.boxel-action-chin--memorialized.boxel-action-chin--has-step {
+.boxel-action-chin--memorialized.boxel-action-chin--has-step,
+.boxel-action-chin--disabled.boxel-action-chin--has-step {
   --boxel-action-chin-padding-vertical: var(--boxel-sp-xs);
 }
 
-.boxel-action-chin--disabled.boxel-action-chin--has-step {
-  --boxel-action-chin-padding-vertical: var(--boxel-sp-xs);
+.boxel-action-chin--default.boxel-action-chin--disabled.boxel-action-chin--has-step {
   --boxel-action-chin-background-color: var(--boxel-purple-700-opacity90);
 }
 

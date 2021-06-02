@@ -7,6 +7,7 @@ let inProgressTimeout: number;
 export default class ActionChinUsage extends Component {
   @tracked stepNumber = 0;
   @tracked state = 'default';
+  @tracked disabled = false;
   @tracked isComplete = false;
   @tracked unlockState = 'default';
   @tracked depositState = 'disabled';

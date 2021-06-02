@@ -21,7 +21,6 @@ export default class ActionChin extends Component<ActionChinArguments> {
   // convenience getters for state booleans. they are mutually exclusive since all are
   // derived from the args.state argument.
   @equal('args.state', ActionChinState.default) declare isDefault: boolean;
-  @equal('args.state', ActionChinState.disabled) declare isDisabled: boolean;
   @equal('args.state', ActionChinState.inProgress)
   declare isInProgress: boolean;
   @equal('args.state', ActionChinState.memorialized)

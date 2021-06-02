@@ -7,6 +7,7 @@
     <Boxel::ActionChin
       @stepNumber={{this.stepNumber}}
       @state={{this.state}}
+      @disabled={{this.disabled}}
     >
       <:default as |a|>
         <a.ActionButton>
@@ -16,14 +17,6 @@
           Custom info area
         </a.InfoArea>
       </:default>
-      <:disabled as |d|>
-        <d.ActionButton>
-          Disabled
-        </d.ActionButton>
-        <d.InfoArea>
-          Custom info area
-        </d.InfoArea>
-      </:disabled>
       <:in-progress as |i|>
         <i.ActionButton>
           In-progress
@@ -48,11 +41,18 @@
   <:api as |Args|>
     <Args.String
       @name="state"
-      @description="Whether the action is at at rest, disabled, in progress, or memorialized."
-      @options={{array "default" "disabled" "in-progress" "memorialized"}}
+      @description="Whether the action is at at rest, in progress, or memorialized."
+      @options={{array "default" "in-progress" "memorialized"}}
       @defaultValue="default"
       @value={{this.state}}
       @onInput={{fn (mut this.state)}}
+    />
+    <Args.Bool
+      @name="disabled"
+      @description="Whether the action chin is disabled. If state is default, will show the disabled named block if available."
+      @defaultValue={{false}}
+      @value={{this.disabled}}
+      @onInput={{fn (mut this.disabled)}}
     />
     <Args.Number
       @name="stepNumber"
@@ -60,10 +60,6 @@
       @optional={{true}}
       @value={{this.stepNumber}}
       @onInput={{fn (mut this.stepNumber)}}
-    />
-    <Args.Yield
-      @name="disabled"
-      @description="The block shown when @state is 'disabled'. Yields { ActionButton, InfoArea }"
     />
     <Args.Yield
       @name="in-progress"
@@ -104,7 +100,6 @@
   <:description>
     <p>
       <code>ActionStatusArea</code> displays custom content in the action chin.
-      It can be used with any block except the <code>:disabled</code> named block.
       It accepts an <code>@icon</code> argument.
       In the <code>:memorialized</code> block, the icon is a checkmark by default.
     </p>
@@ -155,7 +150,8 @@
     </Boxel::ActionChin>
     <Boxel::ActionChin
       @stepNumber={{2}}
-      @state={{if this.depositIsDisabled "disabled" this.depositState}}
+      @state={{this.depositState}}
+      @disabled={{this.depositIsDisabled}}
     >
       <:default as |a|>
         <a.ActionButton
@@ -188,7 +184,6 @@
         <tbody>
           <tr><td>State</td><td>Explanation</td></tr>
           <tr><td>default</td> <td>When the user has not met the requirements for the cta to be considered done</td></tr>
-          <tr><td>disabled</td> <td>When the user cannot yet take this action</td></tr>
           <tr><td>in-progress</td> <td>When the action is in progress</td></tr>
           <tr><td>memorialized</td> <td>When the action is done</td></tr>
         </tbody>
@@ -219,7 +214,6 @@
             <td>
               <ul>
                 <li>default</li>
-                <li>disabled</li>
                 <li>memorialized</li>
                 <li>in-progress</li>
               </ul>
@@ -271,7 +265,6 @@
             <td>
               <ul>
                 <li>default</li>
-                <li>disabled</li>
                 <li>memorialized</li>
                 <li>in-progress</li>
               </ul>

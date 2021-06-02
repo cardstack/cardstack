@@ -73,41 +73,6 @@ module('Integration | Component | ActionChin', function (hooks) {
     assert.dom(MAIN_ACTION_AREA_ICON_SELECTOR).doesNotExist();
   });
 
-  test('it accepts and renders the disabled named block with the ActionButton, and InfoArea components', async function (assert) {
-    this.setProperties({
-      state: 'disabled',
-      stepNumber: null,
-      mainActionButtonText,
-      infoAreaText,
-    });
-    await render(hbs`
-      <Boxel::ActionChin
-        @state={{this.state}}
-        @stepNumber={{this.stepNumber}}
-      >
-        <:disabled as |d|>
-          <d.ActionButton>
-            {{this.mainActionButtonText}}
-          </d.ActionButton>
-          <d.InfoArea>
-            {{this.infoAreaText}}
-          </d.InfoArea>
-        </:disabled>
-      </Boxel::ActionChin>
-    `);
-    assert.dom(MAIN_ACTION_BUTTON_SELECTOR).containsText(mainActionButtonText);
-    assert.dom(MAIN_ACTION_BUTTON_SELECTOR).isDisabled();
-    assert.dom(INFO_AREA_SELECTOR).containsText(infoAreaText);
-    assert.dom(MAIN_ACTION_AREA_SELECTOR).doesNotExist();
-
-    this.set('stepNumber', 1);
-    assert.dom(INFO_AREA_SELECTOR).containsText(infoAreaText);
-    assert.dom(DEFAULT_PRIVATE_NOTICE_SELECTOR).doesNotExist();
-
-    await a11yAudit();
-    assert.ok(true, 'no a11y errors found!');
-  });
-
   test('it accepts and renders the in-progress named block with the ActionButton, CancelButton, ActionStatusArea and InfoArea components', async function (assert) {
     this.setProperties({
       state: 'in-progress',
@@ -211,7 +176,6 @@ module('Integration | Component | ActionChin', function (hooks) {
   test('it changes rendered contents when @state argument changes', async function (assert) {
     const stateText = {
       default: 'Default state here',
-      disabled: 'Disabled state here',
       'in-progress': 'In progress state here',
       memorialized: 'Memorialized state here',
     };
@@ -226,9 +190,6 @@ module('Integration | Component | ActionChin', function (hooks) {
       <:default>
         {{get this.stateText "default"}}
       </:default>
-      <:disabled>
-        {{get this.stateText "disabled"}}
-      </:disabled>
       <:in-progress>
         {{get this.stateText "in-progress"}}
       </:in-progress>
@@ -237,7 +198,7 @@ module('Integration | Component | ActionChin', function (hooks) {
       </:memorialized>
       </Boxel::ActionChin>
     `);
-    const states = ['default', 'disabled', 'in-progress', 'memorialized'];
+    const states = ['default', 'in-progress', 'memorialized'];
     for (const state of states) {
       this.set('state', state);
       assert.dom(ACTION_CHIN_SELECTOR).containsText(stateText[state]);
@@ -327,5 +288,48 @@ module('Integration | Component | ActionChin', function (hooks) {
     assert.dom(DEFAULT_PRIVATE_NOTICE_SELECTOR).exists();
     this.set('state', 'memorialized');
     assert.dom(DEFAULT_PRIVATE_NOTICE_SELECTOR).exists();
+  });
+
+  test('It renders disabled buttons for disabled states', async function (assert) {
+    this.set('state', 'default');
+    await render(hbs`
+      <Boxel::ActionChin
+        @state={{this.state}}
+        @disabled={{true}}
+      >
+      <:default as |a|>
+        <a.ActionButton>
+          Default
+        </a.ActionButton>
+      </:default>
+      <:in-progress as |i|>
+        <i.ActionButton>
+          In Progress
+        </i.ActionButton>
+        <i.CancelButton>
+          Cancel
+        </i.CancelButton>
+      </:in-progress>
+      <:memorialized as |m|>
+        <m.ActionButton>
+          Memorialized
+        </m.ActionButton>
+      </:memorialized>
+      </Boxel::ActionChin>
+    `);
+
+    assert.dom(MAIN_ACTION_BUTTON_SELECTOR).containsText('Default');
+    assert.dom(MAIN_ACTION_BUTTON_SELECTOR).isDisabled();
+
+    this.set('state', 'memorialized');
+    assert.dom(MAIN_ACTION_BUTTON_SELECTOR).containsText('Memorialized');
+    assert.dom(MAIN_ACTION_BUTTON_SELECTOR).isDisabled();
+
+    this.set('state', 'in-progress');
+    assert.dom(MAIN_ACTION_BUTTON_SELECTOR).containsText('In Progress');
+    assert.dom(MAIN_ACTION_BUTTON_SELECTOR).isDisabled();
+    assert.dom(CANCEL_CTA).isDisabled();
+
+    assert.ok(true, 'No a11y errors for disabled states');
   });
 });
