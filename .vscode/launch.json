@@ -140,8 +140,8 @@
       "args": [
         "pay-merchant",
         "0x0dAEeaA725b65aDf2f253541f59Af718f3859f00", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0xb0BFE87E9b7b9A0205559D1229e90Ee70e518678", // Hassan's prepaid card --feel free to use your own
-        "500",
+        "0xE797a6FcF8546b1EE806F55c1C9f6776Af5ad3B1", // Hassan's prepaid card --feel free to use your own
+        "100",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"

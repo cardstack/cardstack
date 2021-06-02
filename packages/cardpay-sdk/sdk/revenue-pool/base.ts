@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
-import RevenuePoolABI from '../../contracts/abi/v0.3.0/revenue-pool';
+import RevenuePoolABI from '../../contracts/abi/v0.4.0/revenue-pool';
 import { getAddress } from '../../contracts/addresses.js';
 import { ZERO_ADDRESS } from '../constants.js';
 import {
