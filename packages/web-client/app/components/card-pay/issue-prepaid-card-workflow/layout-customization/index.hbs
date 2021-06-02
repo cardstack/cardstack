@@ -29,6 +29,7 @@
 </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{this.ctaState}}
+    @disabled={{or @frozen this.ctaDisabled}}
     data-test-layout-customization
   >
     <:default as |a|>
@@ -38,13 +39,6 @@
         Save layout
       </a.ActionButton>
     </:default>
-    <:disabled as |d|>
-      <d.ActionButton
-        {{on "click" this.save}}
-      >
-        Save layout
-      </d.ActionButton>
-    </:disabled>
     <:memorialized as |m|>
       <m.ActionButton
         {{on "click" this.edit}}

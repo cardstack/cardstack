@@ -58,11 +58,11 @@ export default class LayoutCustomizationCard extends Component<LayoutCustomizati
       return 'memorialized';
     }
 
-    if (this.issuerName) {
-      return 'default';
-    }
+    return 'default';
+  }
 
-    return 'disabled';
+  get ctaDisabled() {
+    return !this.issuerName;
   }
 
   @action updateHeaderBackground(item: any) {

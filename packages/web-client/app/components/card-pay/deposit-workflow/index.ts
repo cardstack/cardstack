@@ -6,6 +6,10 @@ import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
 import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import { inject as service } from '@ember/service';
+import { action } from '@ember/object';
 
 class DepositWorkflow extends Workflow {
   name = 'Reserve Pool Deposit';
@@ -146,6 +150,40 @@ class DepositWorkflow extends Workflow {
       componentName: 'card-pay/deposit-workflow/next-steps',
     }),
   ]);
+  cancelationMessages = new PostableCollection([
+    new NetworkAwareWorkflowMessage({
+      author: cardbot,
+      message:
+        'It looks like your wallets have been disconnected. If you still want to deposit funds, please start again by connecting your wallets.',
+      includeIf() {
+        let message = this as NetworkAwareWorkflowMessage;
+        return !message.hasLayer1Account && !message.hasLayer2Account;
+      },
+    }),
+    new NetworkAwareWorkflowMessage({
+      author: cardbot,
+      message:
+        'It looks like your mainnet wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
+      includeIf() {
+        let message = this as NetworkAwareWorkflowMessage;
+        return !message.hasLayer1Account && message.hasLayer2Account;
+      },
+    }),
+    new NetworkAwareWorkflowMessage({
+      author: cardbot,
+      message:
+        'It looks like your xDai chain wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
+      includeIf() {
+        let message = this as NetworkAwareWorkflowMessage;
+        return message.hasLayer1Account && !message.hasLayer2Account;
+      },
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'card-pay/deposit-workflow/workflow-canceled-cta',
+    }),
+  ]);
+
   constructor(owner: unknown) {
     super(owner);
     this.attachWorkflow();
@@ -153,10 +191,17 @@ class DepositWorkflow extends Workflow {
 }
 
 class DepositWorkflowComponent extends Component {
+  @service declare layer1Network: Layer1Network;
+  @service declare layer2Network: Layer2Network;
+
   workflow!: DepositWorkflow;
   constructor(owner: unknown, args: {}) {
     super(owner, args);
     this.workflow = new DepositWorkflow(getOwner(this));
+  }
+
+  @action cancelWorkflow() {
+    this.workflow.cancel();
   }
 }
 

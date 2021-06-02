@@ -154,4 +154,41 @@ module('Integration | Component | workflow-thread', function (hooks) {
       .dom('[data-test-epilogue][data-test-postable]')
       .hasTextContaining('This is the epilogue');
   });
+
+  test('it renders cancelation posts after the workflow is canceled', async function (assert) {
+    let workflow = new ConcreteWorkflow(this.owner);
+    workflow.milestones = [
+      new Milestone({
+        title: 'First milestone',
+        postables: [
+          new WorkflowPostable({ name: 'cardbot' }),
+          new WorkflowPostable({ name: 'cardbot' }),
+        ],
+        completedDetail: 'You are number one!',
+      }),
+    ];
+    workflow.cancelationMessages = new PostableCollection([
+      new WorkflowMessage({
+        author: { name: 'cardbot' },
+        message: 'You canceled the workflow!',
+      }),
+    ]);
+    this.set('workflow', workflow);
+    workflow.attachWorkflow();
+
+    await render(hbs`
+      <WorkflowThread @workflow={{this.workflow}} />
+    `);
+
+    assert.dom('[data-test-postable]').exists({ count: 1 });
+    assert.dom('[data-test-cancelation][data-test-postable]').doesNotExist();
+
+    workflow.cancel();
+
+    await waitFor('[data-test-cancelation][data-test-postable]');
+    assert.dom('[data-test-postable]').exists({ count: 2 });
+    assert
+      .dom('[data-test-cancelation][data-test-postable]')
+      .hasTextContaining('You canceled the workflow!');
+  });
 });

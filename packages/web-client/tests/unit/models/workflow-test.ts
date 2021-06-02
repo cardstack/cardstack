@@ -47,6 +47,15 @@ module('Unit | Workflow model', function (hooks) {
     assert.strictEqual(workflow, exampleMessage.workflow);
   });
 
+  test('attachWorkflow sets workflow on cancelationMessages', function (assert) {
+    let workflow = new ConcreteWorkflow({});
+    workflow.milestones = [exampleMilestone];
+    workflow.cancelationMessages = new PostableCollection([exampleMessage]);
+    assert.ok(!exampleMessage.workflow);
+    workflow.attachWorkflow();
+    assert.strictEqual(workflow, exampleMessage.workflow);
+  });
+
   test('completedMilestoneCount returns count of milestones with isComplete true', function (assert) {
     let workflow = new ConcreteWorkflow({});
     let milestone2Postable = new WorkflowPostable({ name: 'cardbot' });
@@ -115,6 +124,30 @@ module('Unit | Workflow model', function (hooks) {
     let workflow = new ConcreteWorkflow({});
     workflow.milestones = [exampleMilestone];
     assert.equal(workflow.progressStatus, 'Workflow started');
+  });
+
+  test('progressStatus returns "Workflow canceled" when workflow is canceled', function (assert) {
+    let workflow = new ConcreteWorkflow({});
+    workflow.milestones = [exampleMilestone];
+    workflow.cancel();
+    assert.equal(workflow.progressStatus, 'Workflow canceled');
+  });
+
+  test('Incomplete workflow is canceled when workflow.cancel is called', function (assert) {
+    let workflow = new ConcreteWorkflow({});
+    workflow.milestones = [exampleMilestone];
+    workflow.cancel();
+    assert.equal(workflow.isCanceled, true);
+  });
+
+  test('Completed workflow is not canceled when workflow.cancel is called', function (assert) {
+    let workflow = new ConcreteWorkflow({});
+    workflow.milestones = [exampleMilestone];
+    examplePostable.isComplete = true;
+
+    assert.ok(workflow.isComplete, 'Completing workflow before canceling');
+    workflow.cancel();
+    assert.ok(!workflow.isCanceled);
   });
 
   test('Workflow.resetTo resets each milestone and its epilogue correctly', function (assert) {

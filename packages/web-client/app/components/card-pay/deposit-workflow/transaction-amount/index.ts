@@ -59,23 +59,25 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
       return 'memorialized';
     } else if (this.isUnlocking) {
       return 'in-progress';
-    } else if (this.isValidAmount) {
-      return 'default';
     } else {
-      return 'disabled';
+      return 'default';
     }
+  }
+  get unlockCtaDisabled() {
+    return !this.isUnlocked && !this.isValidAmount;
   }
 
   get depositCtaState() {
-    if (!this.isUnlocked || (!this.hasDeposited && !this.isValidAmount)) {
-      return 'disabled';
-    } else if (this.isDepositing) {
+    if (this.isDepositing) {
       return 'in-progress';
     } else if (this.hasDeposited) {
       return 'memorialized';
     } else {
       return 'default';
     }
+  }
+  get depositCtaDisabled() {
+    return !this.isUnlocked;
   }
 
   get amountAsBigNumber(): BN {

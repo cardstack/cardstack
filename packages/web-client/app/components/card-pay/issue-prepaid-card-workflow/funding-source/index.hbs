@@ -5,6 +5,7 @@
 >
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
+    @disabled={{@frozen}}
     data-test-layout-customization
   >
     <:default as |d|>

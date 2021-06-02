@@ -17,7 +17,6 @@ import { action } from '@ember/object';
 
 interface CardPayLayerTwoConnectCardComponentArgs {
   onComplete: (() => void) | undefined;
-  onIncomplete: (() => void) | undefined;
   onConnect: (() => void) | undefined;
   onDisconnect: (() => void) | undefined;
   isComplete: boolean;
@@ -69,7 +68,6 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
 
   @action onDisconnect() {
     this.args.onDisconnect?.();
-    this.args.onIncomplete?.();
     taskFor(this.connectWalletTask).perform();
   }
 

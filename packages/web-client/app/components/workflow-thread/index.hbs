@@ -10,7 +10,8 @@
       {{#each milestone.visiblePostables as |postable j|}}
         <WorkflowThread::Postable
           @postable={{postable}}
-          @postables={{milestone.visiblePostables}}
+          @previous={{object-at milestone.visiblePostables (dec j)}}
+          @frozen={{or @workflow.isComplete @workflow.isCanceled}}
           @index={{j}}
           data-test-milestone={{i}}
         />
@@ -29,10 +30,20 @@
       {{#each @workflow.epilogue.visiblePostables as |postable j|}}
         <WorkflowThread::Postable
           @postable={{postable}}
-          @postables={{@workflow.epilogue.visiblePostables}}
+          @previous={{object-at @workflow.epilogue.visiblePostables (dec j)}}
           @index={{j}}
           data-test-epilogue
         />
+      {{/each}}
+    {{else if @workflow.isCanceled}}
+      {{#each @workflow.cancelationMessages.visiblePostables as |postable j|}}
+         <WorkflowThread::Postable
+           {{did-insert this.scrollToEnd}}
+           @postable={{postable}}
+           @previous={{if (eq j 0) this.lastMilestonePostable (object-at @workflow.cancelationMessages.visiblePostables (dec j))}}
+           @index={{j}}
+           data-test-cancelation
+         />
       {{/each}}
     {{/if}}
     <div data-thread-end></div>

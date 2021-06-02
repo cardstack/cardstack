@@ -43,7 +43,7 @@
         />
       </CardPay::FieldStack>
     </ActionCardContainer::Section>
-    <Boxel::ActionChin @state='memorialized'>
+    <Boxel::ActionChin @state='memorialized' @disabled={{@frozen}}>
       <:memorialized as |m|>
         <m.ActionButton {{on "click" this.disconnect}} data-test-layer-2-wallet-disconnect-button>
           Disconnect Wallet

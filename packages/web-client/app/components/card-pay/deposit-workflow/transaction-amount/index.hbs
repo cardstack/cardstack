@@ -66,17 +66,12 @@
       {{/if}}
     </div>
   </ActionCardContainer::Section>
-  <Boxel::ActionChin @stepNumber={{1}} @state={{this.unlockCtaState}}>
+  <Boxel::ActionChin @stepNumber={{1}} @state={{this.unlockCtaState}} @disabled={{or @frozen this.unlockCtaDisabled}}>
     <:default as |a|>
       <a.ActionButton data-test-unlock-button {{on "click" this.unlock}}>
         Unlock
       </a.ActionButton>
     </:default>
-    <:disabled as |d|>
-      <d.ActionButton data-test-unlock-button>
-        Unlock
-      </d.ActionButton>
-    </:disabled>
     <:in-progress as |i|>
       <i.ActionButton data-test-unlock-button>
         Unlocking
@@ -95,7 +90,7 @@
       {{/if}}
     </:memorialized>
   </Boxel::ActionChin>
-  <Boxel::ActionChin @stepNumber={{2}} @state={{this.depositCtaState}}>
+  <Boxel::ActionChin @stepNumber={{2}} @state={{this.depositCtaState}} @disabled={{or @frozen this.depositCtaDisabled}}>
     <:default as |a|>
       <a.ActionButton  {{on "click" this.deposit}} data-test-deposit-button>
         Deposit

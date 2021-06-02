@@ -26,6 +26,10 @@ function milestoneCompletedSel(milestoneIndex: number): string {
   return `[data-test-milestone-completed][data-test-milestone="${milestoneIndex}"]`;
 }
 
+function cancelationPostableSel(postableIndex: number) {
+  return `[data-test-cancelation][data-test-postable="${postableIndex}"]`;
+}
+
 module('Acceptance | deposit', function (hooks) {
   setupApplicationTest(hooks);
 
@@ -312,6 +316,20 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD"]`)
       .containsText('10000.00');
 
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
+
     assert
       .dom(
         `${epiloguePostableSel(4)} [data-test-deposit-next-step="dashboard"]`
@@ -481,7 +499,7 @@ module('Acceptance | deposit', function (hooks) {
       .containsText('choose the asset you would like to deposit');
   });
 
-  test('Disconnecting Layer 1 after proceeding beyond it', async function (assert) {
+  test('Disconnecting Layer 1 from within the workflow', async function (assert) {
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
@@ -536,11 +554,29 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${postableSel(0, 4)} [data-test-mainnet-disconnect-button]`)
       .containsText('Disconnect Wallet');
     await click(`${postableSel(0, 4)} [data-test-mainnet-disconnect-button]`);
+
+    // test that all cta buttons are disabled
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
     assert
-      .dom(postableSel(0, 4))
-      .containsText('Connect your L1 test chain wallet');
-    assert.dom(milestoneCompletedSel(1)).doesNotExist();
-    assert.dom(milestoneCompletedSel(0)).doesNotExist();
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
+
+    assert
+      .dom(cancelationPostableSel(0))
+      .containsText(
+        'It looks like your mainnet wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
+      );
+    assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+    assert.dom('[data-test-deposit-workflow-canceled-restart]').exists();
   });
 
   test('Disconnecting Layer 1 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
@@ -597,17 +633,33 @@ module('Acceptance | deposit', function (hooks) {
 
     layer1Service.test__simulateDisconnectFromWallet();
 
-    await waitUntil(() =>
-      document
-        .querySelector(postableSel(0, 4))
-        ?.textContent?.includes('Connect your L1 test chain wallet')
-    );
+    await waitFor('[data-test-deposit-workflow-canceled-cta]');
 
-    assert.dom(milestoneCompletedSel(1)).doesNotExist();
-    assert.dom(milestoneCompletedSel(0)).doesNotExist();
+    // test that all cta buttons are disabled
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
+
+    assert
+      .dom(cancelationPostableSel(0))
+      .containsText(
+        'It looks like your mainnet wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
+      );
+    assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+    assert.dom('[data-test-deposit-workflow-canceled-restart]').exists();
   });
 
-  test('Disconnecting Layer 2 after proceeding beyond it', async function (assert) {
+  test('Disconnecting Layer 2 from within the workflow', async function (assert) {
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
@@ -667,10 +719,29 @@ module('Acceptance | deposit', function (hooks) {
     await click(
       `[data-test-layer-2-wallet-card] [data-test-layer-2-wallet-disconnect-button]`
     );
+
+    // test that all cta buttons are disabled
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
     assert
-      .dom('[data-test-layer-2-wallet-card]')
-      .containsText('Install the Card Wallet app on your mobile phone');
-    assert.dom(milestoneCompletedSel(1)).doesNotExist();
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
+    assert
+      .dom(cancelationPostableSel(0))
+      .containsText(
+        'It looks like your xDai chain wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
+      );
+    assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+
+    assert.dom('[data-test-deposit-workflow-canceled-restart]').exists();
   });
 
   test('Disconnecting Layer 2 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
@@ -733,14 +804,27 @@ module('Acceptance | deposit', function (hooks) {
 
     layer2Service.test__simulateDisconnectFromWallet();
 
-    await waitUntil(() =>
-      document
-        .querySelector('[data-test-layer-2-wallet-card]')
-        ?.textContent?.includes(
-          'Install the Card Wallet app on your mobile phone'
-        )
-    );
-
-    assert.dom(milestoneCompletedSel(1)).doesNotExist();
+    await waitFor('[data-test-deposit-workflow-canceled-cta]');
+    // test that all cta buttons are disabled
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
+    assert
+      .dom(cancelationPostableSel(0))
+      .containsText(
+        'It looks like your xDai chain wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
+      );
+    assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+    assert.dom('[data-test-deposit-workflow-canceled-restart]').exists();
   });
 });
