@@ -5,6 +5,7 @@ import PrepaidCardManagerABI from '../contracts/abi/prepaid-card-manager';
 import RevenuePoolABI from '../contracts/abi/revenue-pool';
 import BridgeUtilsABI from '../contracts/abi/bridge-utils';
 import ERC20ABI from '../contracts/abi/erc-20';
+import SpendABI from '../contracts/abi/spend';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from './constants';
@@ -23,20 +24,21 @@ interface BaseSafe {
 export interface DepotSafe extends BaseSafe {
   type: 'depot';
 }
-interface MerchantSafe extends BaseSafe {
+export interface MerchantSafe extends BaseSafe {
   type: 'merchant';
+  spendFaceValue: number;
 }
 interface ExternalSafe extends BaseSafe {
   type: 'external';
 }
-interface PrepaidCardSafe extends BaseSafe {
+export interface PrepaidCardSafe extends BaseSafe {
   type: 'prepaid-card';
   issuingToken: string;
   spendFaceValue: number;
   issuer: string;
   reloadable: boolean;
 }
-interface TokenInfo {
+export interface TokenInfo {
   tokenAddress: string;
   token: {
     name: string;
@@ -58,6 +60,10 @@ export default class Safes {
     let prepaidCardManager = new this.layer2Web3.eth.Contract(
       PrepaidCardManagerABI as AbiItem[],
       await getAddress('prepaidCardManager', this.layer2Web3)
+    );
+    let spendContract = new this.layer2Web3.eth.Contract(
+      SpendABI as AbiItem[],
+      await getAddress('spend', this.layer2Web3)
     );
     let revenuePool = new this.layer2Web3.eth.Contract(
       RevenuePoolABI as AbiItem[],
@@ -108,6 +114,7 @@ export default class Safes {
           return {
             ...safeInfo,
             type: 'merchant' as 'merchant',
+            spendFaceValue: await spendContract.methods.balanceOf(safeInfo.address).call(),
           };
         }
         return {
