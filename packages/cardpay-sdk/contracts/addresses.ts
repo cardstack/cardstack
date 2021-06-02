@@ -16,7 +16,7 @@ const addresses: {
     daiCpxd: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
     cardCpxd: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
     prepaidCardManager: '0x996dC325E81af6912F212294e12cfd727C4e06A5',
-    revenuePool: '0x996dC325E81af6912F212294e12cfd727C4e06A5',
+    revenuePool: '0x38AC1A9b96365a43CfFe306EaD1d354C25Ba6B7E',
     bridgeUtils: '0x83c9bF2b10bfc7445086e1bCc484594B740A31B1',
     spend: '0x913A6E0556F62516dEFd80838e962c9F937768Ea',
     oracles: {
