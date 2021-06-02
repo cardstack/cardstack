@@ -63,17 +63,12 @@
       />
     </ActionCardContainer::Section>
   {{/if}}
-  <Boxel::ActionChin @state={{this.ctaState}}>
+  <Boxel::ActionChin @state={{this.ctaState}} @disabled={{this.ctaDisabled}}>
     <:default as |a|>
       <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
         Connect Wallet
       </a.ActionButton>
     </:default>
-    <:disabled as |d|>
-      <d.ActionButton data-test-mainnet-connect-button>
-        Connect Wallet
-      </d.ActionButton>
-    </:disabled>
     <:in-progress as |i|>
       <i.ActionStatusArea class="layer-one-connect-card__in-progress-logo" @icon={{concat this.radioWalletProviderId "-logo"}} style={{css-var status-icon-size="2.5rem"}}>
         <Boxel::LoadingIndicator

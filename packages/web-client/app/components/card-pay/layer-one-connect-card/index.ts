@@ -67,11 +67,12 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
       return 'memorialized';
     } else if (this.isWaitingForConnection) {
       return 'in-progress';
-    } else if (!this.radioWalletProviderId) {
-      return 'disabled';
     } else {
       return 'default';
     }
+  }
+  get ctaDisabled() {
+    return !this.isConnected && !this.radioWalletProviderId;
   }
 
   get balancesToShow() {
