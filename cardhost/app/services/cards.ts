@@ -1,15 +1,18 @@
 import Service from '@ember/service';
 import { macroCondition, isTesting } from '@embroider/macros';
 import Component from '@glimmer/component';
+import { tracked } from '@glimmer/tracking';
 import { hbs } from 'ember-cli-htmlbars';
 import { setComponentTemplate } from '@ember/component';
+import { task, TaskGenerator } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
 
 import { Format, DeserializerName } from '@cardstack/core/src/interfaces';
 import { cardJSONReponse } from '@cardstack/server/src/interfaces';
 import { encodeCardURL } from '@cardstack/core/src/utils';
 import serializers, { Serializer } from '@cardstack/core/src/serializers';
-
 import config from 'cardhost/config/environment';
+
 const { cardServer } = config as any; // Environment types arent working
 
 export interface LoadedCard {
@@ -17,21 +20,10 @@ export interface LoadedCard {
   component: unknown;
 }
 
-import { tracked } from '@glimmer/tracking';
 export default class Cards extends Service {
-  @tracked isLoading = false;
-
+  // TODO: Move to modal service
   @tracked isShowingModal = false;
   @tracked modalModel?: LoadedCard;
-
-  async load(
-    url: string,
-    format: Format
-  ): Promise<{ model: any; component: unknown }> {
-    let params = new URLSearchParams({ format }).toString();
-    let fullURL = [cardServer, 'cards/', encodeCardURL(url), `?${params}`];
-    return this.internalLoad(fullURL.join(''));
-  }
 
   async loadInModal(url: string, format: Format): Promise<void> {
     this.isShowingModal = true;
@@ -44,55 +36,62 @@ export default class Cards extends Service {
     this.modalModel = undefined;
   }
 
+  async load(
+    url: string,
+    format: Format
+  ): Promise<{ model: any; component: unknown }> {
+    let params = new URLSearchParams({ format }).toString();
+    let fullURL = [cardServer, 'cards/', encodeCardURL(url), `?${params}`];
+    return this.internalLoad.perform(fullURL.join(''));
+  }
+
   async loadForRoute(
     pathname: string
   ): Promise<{ model: any; component: unknown }> {
-    return this.internalLoad(`${cardServer}cardFor${pathname}`);
+    return this.internalLoad.perform(`${cardServer}cardFor${pathname}`);
   }
 
-  private async internalLoad(url: string): Promise<LoadedCard> {
-    this.isLoading = true;
-    try {
-      let card = await fetchCard(url);
-      let model = await deserializeResponse(card);
+  @task
+  private internalLoad = taskFor(async function (
+    url: string
+  ): Promise<LoadedCard> {
+    let card = await fetchCard(url);
+    let model = await deserializeResponse(card);
 
-      let { componentModule } = card.data.meta;
-      let cardComponent: unknown;
-      if (macroCondition(isTesting())) {
-        // in tests, our fake server inside mirage just defines these modules
-        // dynamically
-        cardComponent = window.require(componentModule)['default'];
-      } else {
-        if (!componentModule.startsWith('@cardstack/compiled/')) {
-          throw new Error(
-            `${url}'s meta.componentModule does not start with '@cardstack/compiled/`
-          );
-        }
-        componentModule = componentModule.replace('@cardstack/compiled/', '');
-        cardComponent = (
-          await import(
-            /* webpackExclude: /schema\.js$/ */
-            `@cardstack/compiled/${componentModule}`
-          )
-        ).default;
+    let { componentModule } = card.data.meta;
+    let cardComponent: unknown;
+    if (macroCondition(isTesting())) {
+      // in tests, our fake server inside mirage just defines these modules
+      // dynamically
+      cardComponent = window.require(componentModule)['default'];
+    } else {
+      if (!componentModule.startsWith('@cardstack/compiled/')) {
+        throw new Error(
+          `${url}'s meta.componentModule does not start with '@cardstack/compiled/`
+        );
       }
-
-      let CallerComponent = setComponentTemplate(
-        hbs`<this.card @model = {{this.model}} />`,
-        class extends Component {
-          card = cardComponent;
-          model = model;
-        }
-      );
-
-      return {
-        model,
-        component: CallerComponent,
-      };
-    } finally {
-      this.isLoading = false;
+      componentModule = componentModule.replace('@cardstack/compiled/', '');
+      cardComponent = (
+        await import(
+          /* webpackExclude: /schema\.js$/ */
+          `@cardstack/compiled/${componentModule}`
+        )
+      ).default;
     }
-  }
+
+    let CallerComponent = setComponentTemplate(
+      hbs`<this.card @model = {{this.model}} />`,
+      class extends Component {
+        card = cardComponent;
+        model = model;
+      }
+    );
+
+    return {
+      model,
+      component: CallerComponent,
+    };
+  });
 }
 
 async function fetchCard(url: string): Promise<cardJSONReponse> {
