@@ -1,12 +1,12 @@
 import Component from '@glimmer/component';
 import { inject } from '@ember/service';
-import CardsService from '../../services/cards';
+import ModalService from '../../services/modal';
 import { action } from '@ember/object';
 
 export default class CardModal extends Component {
-  @inject declare cards: CardsService;
+  @inject declare modal: ModalService;
 
   @action close(): void {
-    this.cards.closeModal();
+    this.modal.close();
   }
 }

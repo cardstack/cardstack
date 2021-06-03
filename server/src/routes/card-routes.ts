@@ -73,7 +73,7 @@ export async function updateCard(ctx: RouterContext<any, CardStackContext>) {
   } = ctx;
 
   let data = await deserialize(body);
-  let card = await builder.updateCardData(url, data);
+  let card = await builder.updateCardData(url, data.attributes);
 
   ctx.body = await serializeCard(card, 'isolated'); // TODO: Is it safe to assume the response should be isolated?
   ctx.status = 200;

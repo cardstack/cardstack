@@ -1,0 +1,8 @@
+
+<div style="border: 2px solid green">
+  <button
+    data-test-edit-button
+    {{on 'click' (open-card-in-modal @model.id format='edit')}}
+  >Edit</button>
+  {{yield}}
+</div>

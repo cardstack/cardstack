@@ -9,18 +9,49 @@ import { encodeCardURL } from '@cardstack/core/src/utils';
 
 import dynamicCardTransform from './dynamic-card-transform';
 
+export interface Cache<CardType> {
+  get(url: string): CardType | undefined;
+  set(url: string, payload: CardType): void;
+  update(url: string, payload: CardType): void;
+  delete(url: string): void;
+}
+
+class SimpleCache<CardType> implements Cache<CardType> {
+  cache: Map<string, CardType>;
+
+  constructor() {
+    this.cache = new Map();
+  }
+  get(url: string): CardType | undefined {
+    return this.cache.get(url);
+  }
+  set(url: string, payload: CardType): void {
+    this.cache.set(url, payload);
+  }
+  update(url: string, payload: CardType): void {
+    this.cache.set(url, payload);
+  }
+  delete(url: string): void {
+    this.cache.delete(url);
+  }
+}
+
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
     builder: this,
     define: (...args) => this.defineModule(...args),
   });
 
-  private compiledCardCache: Map<string, CompiledCard>;
-  private rawCardCache: Map<string, RawCard>;
+  private compiledCardCache: Cache<CompiledCard>;
+  private rawCardCache: Cache<RawCard>;
 
-  constructor(/*params: { realms: RealmConfig[] }*/) {
-    this.compiledCardCache = new Map();
-    this.rawCardCache = new Map();
+  constructor(params?: {
+    compiledCardCache?: Cache<CompiledCard>;
+    rawCardCache?: Cache<RawCard>;
+  }) {
+    this.compiledCardCache =
+      params?.compiledCardCache || new SimpleCache<CompiledCard>();
+    this.rawCardCache = params?.rawCardCache || new SimpleCache<RawCard>();
   }
 
   private async defineModule(
@@ -68,14 +99,28 @@ export default class Builder implements BuilderInterface {
   async getCompiledCard(url: string): Promise<CompiledCard> {
     let compiledCard = this.compiledCardCache.get(url);
 
-    // Typescript didn't seem to trust this.cache.has(...) as a sufficient null guarentee
     if (compiledCard) {
       return compiledCard;
     }
-
     let rawCard = await this.getRawCard(url);
     compiledCard = await this.compiler.compile(rawCard);
     this.compiledCardCache.set(url, compiledCard);
+    return compiledCard;
+  }
+
+  async updateCardData(url: string, attributes: any): Promise<CompiledCard> {
+    let compiledCard = await this.getCompiledCard(url);
+
+    let rawCard = this.rawCardCache.get(url);
+
+    if (rawCard) {
+      rawCard.data = Object.assign(rawCard.data, attributes);
+      this.rawCardCache.update(url, rawCard);
+    }
+
+    compiledCard.data = Object.assign(compiledCard.data, attributes);
+    this.compiledCardCache.set(url, compiledCard);
+
     return compiledCard;
   }
 }

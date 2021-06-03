@@ -46,7 +46,7 @@ export class Server {
 
     // the 'cards' section of the API deals in card data. The shape of the data
     // on these endpoints is determined by each card's own schema.
-    koaRouter.post(`/cards/:encodedCardURL`, createDataCard);
+    koaRouter.post(`/cards/:adoptFromCardURL`, createDataCard);
     koaRouter.get(`/cards/:encodedCardURL`, assertCardExists, getCard);
     koaRouter.patch(`/cards/:encodedCardURL`, assertCardExists, updateCard);
     koaRouter.delete(`/cards/:encodedCardURL`, assertCardExists, deleteCard);
@@ -54,8 +54,8 @@ export class Server {
     // the 'sources' section of the API deals in RawCards. It's where you can do
     // CRUD operations on the sources themselves. It's a superset of what you
     // can do via the 'cards' section.
-    koaRouter.get(`/sources/new`, assertCardExists, unimpl);
-    koaRouter.post(`/sources/:encodedCardURL`, unimpl);
+    koaRouter.post(`/sources/new`, unimpl);
+    koaRouter.get(`/sources/:encordedCardURL`, assertCardExists, unimpl);
     koaRouter.patch(`/sources/:encodedCardURL`, assertCardExists, unimpl);
     koaRouter.delete(`/sources/:encodedCardURL`, assertCardExists, unimpl);
 

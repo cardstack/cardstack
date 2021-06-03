@@ -1,17 +1,25 @@
 import Service from '@ember/service';
 import { macroCondition, isTesting } from '@embroider/macros';
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
 import { hbs } from 'ember-cli-htmlbars';
 import { setComponentTemplate } from '@ember/component';
-import { task, TaskGenerator } from 'ember-concurrency';
+import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 
 import { Format, DeserializerName } from '@cardstack/core/src/interfaces';
 import { cardJSONReponse } from '@cardstack/server/src/interfaces';
-import { encodeCardURL } from '@cardstack/core/src/utils';
-import serializers, { Serializer } from '@cardstack/core/src/serializers';
+import serializers, {
+  PrimitiveSerializer,
+} from '@cardstack/core/src/serializers';
 import config from 'cardhost/config/environment';
+
+interface CardJSONAPIRequest {
+  data: {
+    type: 'card';
+    id: any;
+    attributes: any;
+  };
+}
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -21,7 +29,7 @@ export interface LoadedCard {
 }
 
 function buildURL(url: string, format?: Format): string {
-  let fullURL = [cardServer, 'cards/', encodeCardURL(url)];
+  let fullURL = [cardServer, 'cards/', encodeURIComponent(url)];
   if (format) {
     fullURL.push('?' + new URLSearchParams({ format }).toString());
   }
@@ -29,19 +37,13 @@ function buildURL(url: string, format?: Format): string {
 }
 
 export default class Cards extends Service {
-  // TODO: Move to modal service
-  @tracked isShowingModal = false;
-  @tracked modalModel?: LoadedCard;
+  modelCache: Map<string, any>;
+  // deserializerMapCache: WeakMap<string, any>;
 
-  async loadInModal(url: string, format: Format): Promise<void> {
-    this.isShowingModal = true;
-
-    this.modalModel = await this.load(url, format);
-  }
-
-  closeModal(): void {
-    this.isShowingModal = false;
-    this.modalModel = undefined;
+  constructor() {
+    super();
+    this.modelCache = new Map<string, any>();
+    // this.deserializerMapCache = new WeakMap<object, any>();
   }
 
   async load(
@@ -59,33 +61,25 @@ export default class Cards extends Service {
   }
 
   @task
-  private internalLoad = taskFor(async function (
-    url: string
-  ): Promise<LoadedCard> {
-    let card = await fetchCard(url);
-    let model = await deserializeResponse(card);
+  private internalLoad = taskFor(
+    async (url: string): Promise<LoadedCard> => {
+      let card = await fetchCard(url);
+      let model = await deserializeResponse(card);
+      this.modelCache.set(url, model);
 
-    let { componentModule } = card.data.meta;
-    let cardComponent: unknown;
-    if (macroCondition(isTesting())) {
-      // in tests, our fake server inside mirage just defines these modules
-      // dynamically
-      cardComponent = window.require(componentModule)['default'];
-    } else {
-      if (!componentModule.startsWith('@cardstack/compiled/')) {
-        throw new Error(
-          `${url}'s meta.componentModule does not start with '@cardstack/compiled/`
-        );
-      }
+      let cardComponent: unknown = await loadComponentModule(
+        card.data.meta.componentModule,
+        url
+      );
 
       // TODO: @set should be conditional?
       let CallerComponent = setComponentTemplate(
         hbs`<this.card @model={{this.model}} @set={{this.setters}} />`,
-        class extends Component<{
+        class WrapperComponent extends Component<{
           set: (segments: string[], value: any) => void;
         }> {
-          card = cardComponent;
           model = model;
+          card = cardComponent;
 
           get setters() {
             return makeSetter(this.args.set);
@@ -106,12 +100,41 @@ export default class Cards extends Service {
 
   @task saveTask = taskFor(
     async (cardURL: string, data: any): Promise<void> => {
-      await fetch(buildURL(cardURL), {
+      let response = await fetchCard(buildURL(cardURL), {
         method: 'PATCH',
-        body: JSON.stringify(data),
+        body: JSON.stringify(serializeCard(data)),
       });
+      let model = await deserializeResponse(response);
+      return model;
     }
   );
+}
+
+async function loadComponentModule(
+  componentModule: string,
+  url: string
+): Promise<unknown> {
+  let cardComponent: unknown;
+
+  if (macroCondition(isTesting())) {
+    // in tests, our fake server inside mirage just defines these modules
+    // dynamically
+    cardComponent = window.require(componentModule)['default'];
+  } else {
+    if (!componentModule.startsWith('@cardstack/compiled/')) {
+      throw new Error(
+        `${url}'s meta.componentModule does not start with '@cardstack/compiled/`
+      );
+    }
+    componentModule = componentModule.replace('@cardstack/compiled/', '');
+    cardComponent = (
+      await import(
+        /* webpackExclude: /schema\.js$/ */
+        `@cardstack/compiled/${componentModule}`
+      )
+    ).default;
+  }
+  return cardComponent;
 }
 
 function makeSetter(
@@ -125,7 +148,6 @@ function makeSetter(
     {},
     {
       get: (target: object, prop: string, receiver: unknown) => {
-        console.log('PROXY GET', target, prop, receiver);
         if (typeof prop === 'string') {
           return makeSetter(callback, [...segments, prop]);
         } else {
@@ -136,8 +158,21 @@ function makeSetter(
   );
   return s;
 }
-async function fetchCard(url: string): Promise<cardJSONReponse> {
-  let response = await fetch(url);
+
+async function fetchCard(
+  url: string,
+  options: any = {}
+): Promise<cardJSONReponse> {
+  let fullOptions = Object.assign(
+    {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    },
+    options
+  );
+  let response = await fetch(url, fullOptions);
 
   if (response.status !== 200) {
     throw new Error(`unable to fetch card ${url}: status ${response.status}`);
@@ -146,7 +181,23 @@ async function fetchCard(url: string): Promise<cardJSONReponse> {
   return await response.json();
 }
 
+// Eventual TODO: Full serialization?
+function serializeCard(attrs: Record<string, any>): CardJSONAPIRequest {
+  let id = attrs.id;
+  delete attrs.id;
+
+  // TODO: Once we remember the deserializationMap, serialize
+  return {
+    data: {
+      type: 'card',
+      id,
+      attributes: attrs,
+    },
+  };
+}
+
 function deserializeResponse(response: cardJSONReponse): any {
+  // TODO: We need to keep this around
   let { deserializationMap } = response.data.meta;
   let attrs = response.data.attributes;
 
@@ -169,12 +220,12 @@ function deserializeResponse(response: cardJSONReponse): any {
 function deserializeAttribute(
   attrs: { [name: string]: any },
   path: string,
-  serializer: Serializer
+  serializer: PrimitiveSerializer
 ) {
   let [key, ...tail] = path.split('.');
   let value = attrs[key];
   if (!value) {
-    throw new MissingDataError(path);
+    return;
   }
 
   if (tail.length) {
@@ -188,18 +239,5 @@ function deserializeAttribute(
     }
   } else {
     attrs[path] = serializer.deserialize(value);
-  }
-}
-
-class MissingDataError extends Error {
-  constructor(path: string) {
-    super(path);
-    this.message = `Server response said ${path} would need to be deserialized, but that path didnt exist`;
-  }
-}
-
-declare module '@ember/service' {
-  interface Registry {
-    cards: Cards;
   }
 }

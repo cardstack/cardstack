@@ -103,14 +103,14 @@ module('Integration | card-service', function (hooks) {
         },
         files: {
           'schema.js': `
-          import { containsMany } from "@cardstack/types";
-          import post from "http://mirage/cards/post";
+            import { containsMany } from "@cardstack/types";
+            import post from "http://mirage/cards/post";
 
-          export default class Hello {
-            @containsMany(post)
-            posts;
-          }
-        `,
+            export default class Hello {
+              @containsMany(post)
+              posts;
+            }
+          `,
           'isolated.js': templateOnlyComponentTemplate(
             `{{#each @fields.posts as |Post|}}<Post />{{/each}}`
           ),

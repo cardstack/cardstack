@@ -10,6 +10,7 @@ import { CompiledCard, Field, Format } from '../interfaces';
 import { singularize } from 'inflection';
 import { capitalize, cloneDeep } from 'lodash';
 import { getFieldForPath } from '../utils';
+import { BuildElementOptions } from '@glimmer/syntax/dist/types/lib/v1/public-builders';
 
 const MODEL = '@model';
 const FIELDS = '@fields';
@@ -456,7 +457,7 @@ function rewriteFieldToComponent(
   state: State,
   format: Format
 ): Statement[] {
-  let { element, attr, mustache, path } = syntax.builders;
+  let { element, attr, mustache, path, text } = syntax.builders;
 
   // TODO: What we really want it String or Date, instead of Title or Birthdate
   let componentName = importAndChooseName(
@@ -467,7 +468,10 @@ function rewriteFieldToComponent(
 
   let modelExpression = path(modelArgument);
   state.handledModelExpressions.add(modelExpression);
-  let attrs = [attr('@model', mustache(modelExpression))];
+  let attrs = [
+    attr('@model', mustache(modelExpression)),
+    attr('data-test-field-name', text(field.name)),
+  ];
 
   // TODO: Test this!
   if (format === 'edit') {

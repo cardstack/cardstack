@@ -131,17 +131,17 @@ export default class Builder implements BuilderInterface {
     return compiledCard;
   }
 
-  async updateCardData(url: string, payload: any) {
+  async updateCardData(url: string, attributes: any) {
     let fullPath = join(this.locateCardDir(url), 'card.json');
 
     // Builder: merge data into card.json
     let card = readJsonSync(fullPath);
-    card.data = Object.assign(card.data, payload);
+    card.data = Object.assign(card.data, attributes);
     writeJsonSync(fullPath, card);
 
     // Cache: Merge data into compiled.json
     let compiledCard = await this.getCompiledCard(url);
-    compiledCard.data = Object.assign(compiledCard.data, payload);
+    compiledCard.data = Object.assign(compiledCard.data, attributes);
     this.cache.setCard(url, compiledCard);
 
     return compiledCard;
