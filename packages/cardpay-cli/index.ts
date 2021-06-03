@@ -7,7 +7,7 @@ import { viewTokenBalance } from './assets';
 import { viewSafes, transferTokens } from './safe.js';
 import { createPrepaidCard, priceForFaceValue, payMerchant, gasFee } from './prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
-import { registerMerchant } from './revenue-pool.js';
+import { registerMerchant, revenueBalances } from './revenue-pool.js';
 import { hubAuth } from './hub-auth';
 
 //@ts-ignore polyfilling fetch
@@ -26,6 +26,7 @@ type Commands =
   | 'priceForFaceValue'
   | 'payMerchant'
   | 'registerMerchant'
+  | 'revenueBalances'
   | 'priceOracleUpdatedAt'
   | 'viewTokenBalance'
   | 'hubAuth';
@@ -174,6 +175,17 @@ const {
     });
     command = 'payMerchant';
   })
+  .command(
+    'revenue-balances <merchantSafe>',
+    'View token balances of unclaimed revenue in the revenue pool for a merchant',
+    (yargs) => {
+      yargs.positional('merchantSafe', {
+        type: 'string',
+        description: "The address of the merchant's safe whose balances are to be viewed",
+      });
+      command = 'revenueBalances';
+    }
+  )
   .command(
     'price-for-face-value <tokenAddress> <spendFaceValue>',
     'Get the price in the units of the specified token to achieve a prepaid card with the specified face value in SPEND',
@@ -338,6 +350,13 @@ if (!command) {
         process.exit(1);
       }
       await payMerchant(network, mnemonic, merchantSafe, prepaidCard, amount);
+      break;
+    case 'revenueBalances':
+      if (merchantSafe == null) {
+        yargs.showHelp('merchantSafe is a required value');
+        process.exit(1);
+      }
+      await revenueBalances(network, mnemonic, merchantSafe);
       break;
     case 'usdPrice':
       if (token == null || amount == null) {

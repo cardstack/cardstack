@@ -150,6 +150,21 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay: View Merchant Revenue",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "revenue-balances",
+        "0x0dAEeaA725b65aDf2f253541f59Af718f3859f00", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "--network", "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay: Price for face value",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
