@@ -68,6 +68,7 @@ export abstract class Workflow {
     let result: WorkflowPostable[] = [];
     for (const milestone of this.milestones) {
       result = result.concat(milestone.peekAtVisiblePostables());
+      if (!milestone.isComplete) break;
     }
     if (this.isComplete) {
       result = result.concat(this.epilogue.peekAtVisiblePostables());
