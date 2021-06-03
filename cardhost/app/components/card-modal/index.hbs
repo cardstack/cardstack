@@ -1,13 +1,13 @@
-{{#if this.showModal}}
+{{#if this.cards.isShowingModal}}
 <div style="border:3px red dashed">
   <div>
     <button {{on 'click' this.close}}>Close Modal</button>
   </div>
 
-  {{#if this.isLoading}}
+  {{#if this.cards.isLoading}}
     <h1>LOADING!!!</h1>
   {{else}}
-    <this.model.component />
+    <this.cards.modalModel.component />
   {{/if}}
 </div>
 {{/if}}

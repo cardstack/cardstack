@@ -1,4 +1,3 @@
-import type Koa from 'koa';
 import type Builder from '../src/builder';
 import type {
   ComponentInfo,
@@ -20,13 +19,10 @@ export interface ServerOptions {
   routeCard?: string;
 }
 
-interface BuilderContext {
+export interface CardStackContext {
   builder: Builder;
-}
-interface CardRouterContext {
   cardRouter: any;
 }
-export type ServerKoa = Koa<{}, BuilderContext & CardRouterContext>;
 
 export type cardJSONReponse = {
   data: {

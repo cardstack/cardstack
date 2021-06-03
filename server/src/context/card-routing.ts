@@ -1,18 +1,19 @@
-import type { ServerKoa } from '../interfaces';
+import type { CardStackContext } from '../interfaces';
+import type Koa from 'koa';
 
 const ROUTER_METHOD_NAME = 'routeTo';
 
 function assertValidRouterInstance(router: any, routeCard: string): void {
   if (typeof router[ROUTER_METHOD_NAME] !== 'function') {
     throw new Error(
-      `Route Card's Schema does not have proper routing method defined. 
+      `Route Card's Schema does not have proper routing method defined.
       Please make sure ${routeCard} schema has a ${ROUTER_METHOD_NAME} method`
     );
   }
 }
 
 export async function setupCardRouting(
-  app: ServerKoa,
+  app: Koa<any, CardStackContext>,
   options: { routeCard: string; cardCacheDir: string }
 ) {
   let { routeCard, cardCacheDir } = options;

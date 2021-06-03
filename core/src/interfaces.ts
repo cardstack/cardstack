@@ -9,6 +9,10 @@ const componentFormats = {
 export type Format = keyof typeof componentFormats;
 export const FORMATS = Object.keys(componentFormats) as Format[];
 
+export function isFormat(s: any): s is Format {
+  return s && (componentFormats as any)[s];
+}
+
 const featureNamesMap = {
   schema: '',
 };

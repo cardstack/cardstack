@@ -1,21 +1,18 @@
-import { cardJSONReponse } from '@cardstack/server/src/interfaces';
+import {
+  cardJSONReponse,
+  CardStackContext,
+} from '@cardstack/server/src/interfaces';
 import {
   assertValidRawCard,
   CompiledCard,
   Format,
-  FORMATS,
+  isFormat,
 } from '@cardstack/core/src/interfaces';
 import { NotFound } from '../middleware/error';
 import { Serializer } from 'jsonapi-serializer';
+import { RouterContext } from '@koa/router';
 
 const DEFAULT_FORMAT = 'isolated';
-
-function assertValidFormat(format: string): asserts format is Format {
-  if (format && !FORMATS.some((f) => f === format)) {
-    // if (format && !FORMATS.includes(format)) { // Why does typescript complain about this?
-    throw new Error(`Unknown format provided: ${format}`);
-  }
-}
 
 function getCardFormatFromRequest(
   formatQueryParam?: string | string[]
@@ -32,8 +29,11 @@ function getCardFormatFromRequest(
   }
 
   if (format) {
-    assertValidFormat(format);
-    return format;
+    if (isFormat(format)) {
+      return format;
+    } else {
+      throw new Error(`${format} is not a valid format`);
+    }
   } else {
     return DEFAULT_FORMAT;
   }
@@ -54,7 +54,9 @@ async function serializeCard(
   return cardSerializer.serialize(data);
 }
 
-export async function respondWithCardForPath(ctx: any) {
+export async function respondWithCardForPath(
+  ctx: RouterContext<any, CardStackContext>
+) {
   let {
     builder,
     cardRouter,
@@ -76,7 +78,9 @@ export async function respondWithCardForPath(ctx: any) {
   ctx.status = 200;
 }
 
-export async function respondWithCard(ctx: any) {
+export async function respondWithCard(
+  ctx: RouterContext<any, CardStackContext>
+) {
   let {
     builder,
     params: { encodedCardURL: url },
@@ -88,7 +92,7 @@ export async function respondWithCard(ctx: any) {
   ctx.status = 200;
 }
 
-export async function createCard(ctx: any) {
+export async function createCard(ctx: RouterContext<any, CardStackContext>) {
   let {
     builder,
     request: { body },
@@ -104,7 +108,7 @@ export async function createCard(ctx: any) {
   ctx.status = 201;
 }
 
-export async function updateCard(ctx: any) {
+export async function updateCard(ctx: RouterContext<any, CardStackContext>) {
   let {
     builder,
     request: { body },
@@ -124,7 +128,7 @@ export async function updateCard(ctx: any) {
   ctx.status = 200;
 }
 
-export async function deleteCard(ctx: any) {
+export async function deleteCard(ctx: RouterContext<any, CardStackContext>) {
   let {
     builder,
     params: { encodedCardURL: url },
