@@ -4,7 +4,7 @@
     <Boxel::Input
       @id={{this.id}}
       @value={{this.value}}
-      @onInput={{this.validate}}
+      @onInput={{this.logValue}}
       @disabled={{this.disabled}}
       @required={{this.required}}
       @optional={{this.optional}}
@@ -12,6 +12,7 @@
       @errorMessage={{this.errorMessage}}
       @helperText={{this.helperText}}
       {{on "blur" this.validate}}
+      {{on "input" this.set}}
     />
   </:example>
   <:api as |Args|>
@@ -59,7 +60,32 @@
     />
     <Args.Action
       @name="onInput"
-      @description="Function to update the passed in value"
+      @description="Function to update the passed in value. This receives the changed value as a string."
     />
   </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage @description="Use the @onInput argument to access the input's value in the callback directly.">
+  <:example>
+    <label for="onInputExample" class="boxel-sr-only">onInput example input</label>
+    <Boxel::Input
+      @id="onInputExample"
+      @value=""
+      @onInput={{this.logValue}}
+    />
+  </:example>
+</Freestyle::Usage>
+
+<Freestyle::Usage>
+  <:description>
+    Use `on "input" your-function-here` as an escape hatch to get the input event
+  </:description>
+  <:example>
+    <label for="modifierExample" class="boxel-sr-only">event example input</label>
+    <Boxel::Input
+      @id="modifierExample"
+      @value=""
+      {{on "input" this.logValue}}
+    />
+  </:example>
 </Freestyle::Usage>

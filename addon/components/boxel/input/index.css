@@ -27,6 +27,11 @@
   box-shadow: 0 0 0 1px var(--boxel-error-100);
 }
 
+.boxel-input--invalid:focus {
+  outline: 1px solid transparent;  /* Make sure that we make the invalid state visible */
+  box-shadow: 0 0 0 1.5px var(--boxel-error-100);
+}
+
 .boxel-input--invalid:hover:not(:disabled) {
   border-color: var(--boxel-error-100);
 }

@@ -3,11 +3,10 @@
 {{/if}}
 {{#let (and @invalid @errorMessage) as |shouldShowErrorMessage|}}
   {{#let (unique-id) as |helperId|}}
-    <Input
+    <input
       class={{cn "boxel-input" boxel-input--invalid=@invalid}}
       id={{@id}}
-      @value={{@value}}
-      {{on "input" (optional @onInput)}}
+      value={{@value}}
       required={{@required}}
       disabled={{@disabled}}
       aria-describedby={{if @helperText (concat "helper-text-" helperId) false}}
@@ -15,6 +14,7 @@
       aria-errormessage={{if shouldShowErrorMessage (concat "error-message-" helperId) false}}
       data-test-boxel-input
       data-test-boxel-input-id={{@id}}
+      {{on "input" (pick "target.value" (optional @onInput))}}
       ...attributes
     />
     {{#if shouldShowErrorMessage}}

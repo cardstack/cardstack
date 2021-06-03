@@ -12,6 +12,16 @@ export default class extends Component {
   @tracked errorMessage = '';
   @tracked helperText = '';
 
+  @action set(ev: Event): void {
+    let target = ev.target as HTMLInputElement;
+    this.value = target?.value;
+    this.validate(ev);
+  }
+
+  @action logValue(value: string): void {
+    console.log(value);
+  }
+
   @action validate(ev: Event): void {
     let target = ev.target as HTMLInputElement;
     if (!target.validity?.valid) {
