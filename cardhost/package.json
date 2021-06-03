@@ -137,6 +137,7 @@
     "babel-plugin-htmlbars-inline-precompile": "^5.2.1",
     "ember-cli-typescript": "^4.1.0",
     "ember-cli-typescript-blueprints": "^3.0.0",
+    "ember-href-to": "^4.1.0",
     "ember-template-compiler": "^1.9.0-alpha",
     "raw-loader": "^4.0.2"
   }
