@@ -8,6 +8,9 @@ import { taskFor } from 'ember-concurrency-ts';
 import { task } from 'ember-concurrency-decorators';
 import { timeout } from 'ember-concurrency';
 import { A } from '@ember/array';
+import config from '@cardstack/web-client/config/environment';
+
+let interval = config.environment === 'test' ? 100 : 1000;
 
 class AnimatedMilestone {
   model: Milestone;
@@ -104,7 +107,7 @@ export default class AnimatedWorkflow {
   *tickerTask() {
     while (true) {
       this.revealNext();
-      yield timeout(3000); // TODO: shorten?
+      yield timeout(interval);
     }
   }
 
