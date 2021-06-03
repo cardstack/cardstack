@@ -65,7 +65,8 @@
     "file-loader": "^6.2.0",
     "macro-decorators": "^0.1.2",
     "qunit": "^2.14.0",
-    "walk-sync": "^2.2.0"
+    "walk-sync": "^2.2.0",
+    "ember-unique-id-helper-polyfill": "^0.1.0"
   },
   "devDependencies": {
     "@actions/core": "^1.2.6",
@@ -147,7 +148,6 @@
     "ember-template-lint": "^3.2.0",
     "ember-toolbars": "^0.6.0",
     "ember-try": "^1.4.0",
-    "ember-unique-id-helper-polyfill": "^0.1.0",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-ember": "^10.1.1",
