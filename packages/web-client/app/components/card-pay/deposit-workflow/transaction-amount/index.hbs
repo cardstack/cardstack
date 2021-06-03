@@ -8,7 +8,7 @@
       <Boxel::Field
         class="transaction-amount__field"
         @label="Funding From:"
-        @labelClass="transaction-amount__from-field-label"
+        @labelClass="transaction-amount__banner-field-label"
       >
         <CardPay::DepositWorkflow::TransactionAmount::BalanceView
           @wallet={{this.layer1Network.chainName}}
@@ -42,15 +42,16 @@
           @label="Amount to deposit"
           @fieldMode="edit"
           class="transaction-amount__field"
+          @labelClass="transaction-amount__input-field-label"
         >
         <div class="transaction-amount__input-container transaction-amount__input-token-balance">
           {{svg-jar this.currentTokenDetails.icon class="transaction-amount__currency-icon" role="presentation"}}
-          {{!-- .boxel-input is a hack to get the boxel styles. --}}
-          <input
-            class="boxel-input transaction-amount__input"
-            id="deposit-amount-input"
-            value={{this.amount}}
-            {{on "input" this.onInputAmount}}
+          <Boxel::Input
+            class="transaction-amount__input"
+            @id="deposit-amount-input"
+            @value={{this.amount}}
+            @required={{true}}
+            @onInput={{this.onInputAmount}}
             autocomplete="off"
             inputmode="decimal"
             data-test-deposit-amount-input

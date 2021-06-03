@@ -92,7 +92,22 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
       .isDisabled();
 
+    await fillIn('[data-test-layout-customization-name-input]', 'A');
+
+    assert
+      .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
+      .isEnabled();
+
+    await fillIn('[data-test-layout-customization-name-input]', '');
+    assert
+      .dom(`${post} [data-test-boxel-input-error-message]`)
+      .containsText('required');
+    assert
+      .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
+      .isDisabled();
+
     await fillIn('[data-test-layout-customization-name-input]', 'JJ');
+    assert.dom(`${post} [data-test-boxel-input-error-message]`).doesNotExist();
 
     assert
       .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)

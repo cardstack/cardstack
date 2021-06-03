@@ -1,5 +1,5 @@
 .transaction-amount {
-  --tx-amount-from-label-height: 3.125rem; /* 50px */
+  --tx-amount-banner-height: 3.125rem; /* 50px */
   --tx-amount-input-height: 3.75rem; /* 60px */
 }
 
@@ -33,28 +33,36 @@
 .transaction-amount__currency-icon {
   position: absolute;
   width: var(--input-currency-icon-size);
-  height: var(--input-currency-icon-size);
+  height: var(--tx-amount-input-height);
   left: var(--input-currency-icon-space);
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0;
   user-select: none;
 }
 
 .transaction-amount__currency-text {
   position: absolute;
   width: var(--input-currency-text-width);
-  right: var(--input-currency-text-space);
+  height: var(--tx-amount-input-height);
+  display: flex;
+  align-items: center;
+  right: 0;
   text-align: right;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 0;
   user-select: none;
 }
 
-.transaction-amount__from-field-label {
+.transaction-amount__banner-field-label {
   align-self: flex-start;
   display: flex;
   align-items: center;
-  height: var(--tx-amount-from-label-height);
+  height: var(--tx-amount-banner-height);
+}
+
+.transaction-amount__input-field-label {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  height: var(--tx-amount-input-height);
 }
 
 /* unlocking, unlocked, memorialized states */
@@ -67,7 +75,7 @@
   row-gap: var(--boxel-sp-xxs);
 }
 
-.transaction-amount--data-entered .transaction-amount__from-field-label {
+.transaction-amount--data-entered .transaction-amount__banner-field-label {
   height: unset;
 }
 
