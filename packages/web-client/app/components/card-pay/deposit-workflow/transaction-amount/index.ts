@@ -81,7 +81,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
   }
 
   get amountAsBigNumber(): BN {
-    return toBN(toWei(this.amount || '0'));
+    const regex = /^\d*(\.\d{0,18})?$/gm;
+    if (!this.amount || !regex.test(this.amount)) {
+      return toBN(0);
+    }
+    return toBN(toWei(this.amount));
   }
 
   get isValidAmount() {
@@ -110,10 +114,9 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
     return this.isUnlocking || this.isUnlocked;
   }
 
-  @action onInputAmount(event: InputEvent) {
-    const str = (event.target as HTMLInputElement).value;
+  @action onInputAmount(str: string) {
     if (!isNaN(+str)) {
-      this.amount = str;
+      this.amount = str.trim();
     } else {
       this.amount = this.amount; // eslint-disable-line no-self-assign
     }

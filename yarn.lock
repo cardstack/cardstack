@@ -933,10 +933,10 @@
     lodash "^4.17.19"
     to-fast-properties "^2.0.0"
 
-"@cardstack/boxel@^0.7.5":
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@cardstack/boxel/-/boxel-0.7.5.tgz#838e48349cc696f965b805a25745bfed04e439c0"
-  integrity sha512-jshb7fN0UfhMYQf9rmlvle1CHDfbiKw+6kqrK+LpE08Q86wcBue8D98nozut46l2ytUy8e+h2vS3ZWJ5qkExgg==
+"@cardstack/boxel@^0.7.10":
+  version "0.7.10"
+  resolved "https://registry.yarnpkg.com/@cardstack/boxel/-/boxel-0.7.10.tgz#075a757eb4f355e41a33f775a04735f3a337b437"
+  integrity sha512-S90iQHatrCrFjuA04gan2xBKRam/oQxGaasdTJ7LoDlwV+ocHcvsnMoqOyUe9QBFNut2KVqdHQbZwnfFL5M6Tg==
   dependencies:
     broccoli-concat "^4.2.4"
     broccoli-funnel "^3.0.3"
@@ -969,6 +969,7 @@
     ember-table "^2.2.3"
     ember-test-selectors "^5.0.0"
     ember-truth-helpers "^3.0.0"
+    ember-unique-id-helper-polyfill "^0.1.0"
     file-loader "^6.2.0"
     macro-decorators "^0.1.2"
     qunit "^2.14.0"
@@ -9581,6 +9582,14 @@ ember-text-measurer@^0.6.0:
   integrity sha512-hPKG9QqruAELh0li5xaiLZtr88ioWYxWCXisAWHWE0qCP4a2hgtuMzKUPpiTCkltvKjuqpzTZCU4VhQ+IlRmew==
   dependencies:
     ember-cli-babel "^7.22.1"
+
+ember-unique-id-helper-polyfill@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/ember-unique-id-helper-polyfill/-/ember-unique-id-helper-polyfill-0.1.0.tgz#372f1272cd45dd3ee960a20a4945918264ff1bd3"
+  integrity sha512-qACD+lzMCOXRBJnJdA3tM1bHEKziVga2hhZGpTToLL8QlPj67+lwCaz+j6HBBA/Yw1yavVogO+NUwR8Q1iMKow==
+  dependencies:
+    ember-cli-babel "^7.23.0"
+    ember-cli-htmlbars "^5.3.1"
 
 ember-useragent@^0.6.0:
   version "0.6.1"

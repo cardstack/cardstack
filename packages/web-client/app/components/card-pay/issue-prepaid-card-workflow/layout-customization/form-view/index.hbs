@@ -19,7 +19,15 @@
       @label="Name of Issuer *"
       class="layout-form-view__input-field"
     >
-      <Boxel::Input @value={{@issuerName}} data-test-layout-customization-name-input/>
+      <Boxel::Input
+        @value={{@issuerName}}
+        @required={{true}}
+        @errorMessage={{@nameFieldErrorMessage}}
+        @invalid={{@isNameInvalid}}
+        @onInput={{@onNameInput}}
+        {{on "blur" (pick "target.value" @onNameInput)}}
+        data-test-layout-customization-name-input
+      />
     </Boxel::Field>
     <CardPay::LabeledValue
       @label="Background Color"
