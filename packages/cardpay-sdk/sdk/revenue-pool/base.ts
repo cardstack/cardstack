@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import RevenuePoolABI from '../../contracts/abi/v0.4.0/revenue-pool';
+import ERC20ABI from '../../contracts/abi/erc-20';
 import { getAddress } from '../../contracts/addresses.js';
 import { ZERO_ADDRESS } from '../constants.js';
 import {
@@ -23,6 +24,12 @@ interface RegisterMerchantTx extends RelayTransaction {
   tokenAddress: string;
 }
 
+interface RevenueTokenBalance {
+  tokenSymbol: string;
+  tokenAddress: string;
+  balance: string; // balance is in wei
+}
+
 export default class RevenuePool {
   private revenuePool: Contract | undefined;
 
@@ -31,6 +38,29 @@ export default class RevenuePool {
   async merchantRegistrationFee(): Promise<number> {
     // this is a SPEND amount which is a safe number to represent in javascript
     return Number(await (await this.getRevenuePool()).methods.merchantRegistrationFeeInSPEND().call());
+  }
+
+  async balances(merchantSafeAddress: string): Promise<RevenueTokenBalance[]> {
+    let revenuePool = new this.layer2Web3.eth.Contract(
+      RevenuePoolABI as AbiItem[],
+      await getAddress('revenuePool', this.layer2Web3)
+    );
+    let tokenAddresses = (await revenuePool.methods.revenueTokens(merchantSafeAddress).call()) as string[];
+    let result = await Promise.all(
+      tokenAddresses.map(async (tokenAddress) => {
+        const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+        let [tokenSymbol, balance] = await Promise.all([
+          tokenContract.methods.symbol().call() as Promise<string>,
+          revenuePool.methods.revenueBalance(merchantSafeAddress, tokenAddress).call() as Promise<string>,
+        ]);
+        return {
+          tokenAddress,
+          tokenSymbol,
+          balance,
+        };
+      })
+    );
+    return result;
   }
 
   async registerMerchant(

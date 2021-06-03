@@ -12,6 +12,7 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay price-for-face-value <TOKEN_ADDRESS> <SPEND_FACE_VALUE> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-price-for-face-value-token_address-spend_face_value---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay register-merchant <PREPAID_CARD> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-register-merchant-prepaid_card---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-pay-merchant-merchant_safe-prepaid_card-amount---networknetwork---mnemonicmnemonic)
+  - [`yarn cardpay revenue-balances <MERCHANT_SAFE> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-revenue-balances-merchant_safe---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay new-prepaidcard-gas-fee <TOKEN_ADDRESS> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-new-prepaidcard-gas-fee-token_address---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay safes-view [ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-safes-view-address---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay safe-transfer-tokens [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-safe-transfer-tokens-safe_address-token_address-recipient-amount---networknetwork---mnemonicmnemonic)
@@ -19,7 +20,7 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay eth-price <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-eth-price-token-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay price-oracle-updated-at <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-price-oracle-updated-at-token---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay view-token-balance [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-view-token-balance-token_address---networknetwork---mnemonicmnemonic)
-  - [`yarn cardpay hub-auth <HUB_ROOT_URL> --network=NETWORK [--mnemonic=MNEMONIC]` ]
+  - [`yarn cardpay hub-auth [HUB_ROOT_URL] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-hub-auth-hub_root_url---networknetwork---mnemonicmnemonic)
   (#yarn-cardpay-hub-auth-hub_root_url---networknetwork---mnemonicmnemonic)
 
 
@@ -108,6 +109,19 @@ ARGUMENTS
   MERCHANT_SAFE     The address of the merchant's safe who will receive the payment
   PREPAID_CARD      The address of the prepaid card that is being used to pay the merchant
   AMOUNT            The amount to send to the merchant in units of SPEND
+  NETWORK           The network to use ("sokol" or "xdai")
+  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+```
+
+## `yarn cardpay revenue-balances <MERCHANT_SAFE> --network=NETWORK [--mnemonic=MNEMONIC]`
+View token balances of unclaimed revenue in the revenue pool for a merchant.
+
+```
+USAGE
+  $ yarn cardpay revenue-balances <MERCHANT_SAFE> --network=NETWORK [--mnemonic=MNEMONIC]
+
+ARGUMENTS
+  MERCHANT_SAFE     The address of the merchant's safe whose revenue balances are to be viewed
   NETWORK           The network to use ("sokol" or "xdai")
   MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
 ```

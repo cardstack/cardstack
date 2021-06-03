@@ -28,7 +28,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`RevenuePool`](#revenuepool)
   - [`RevenuePool.merchantRegistrationFee`](#revenuepoolmerchantregistrationfee)
   - [`RevenuePool.registerMerchant`](#revenuepoolregistermerchant)
-  - [`RevenuePool.balance` (TBD)](#revenuepoolbalance-tbd)
+  - [`RevenuePool.balances`](#revenuepoolbalances)
   - [`RevenuePool.claim` (TBD)](#revenuepoolclaim-tbd)
 - [`RewardPool` (TBD)](#rewardpool-tbd)
   - [`RewardPool.balanceOf` (TBD)](#rewardpoolbalanceof-tbd)
@@ -461,7 +461,25 @@ interface RegisterMerchantTx extends RelayTransaction {
 // RelayTransaction is documented above
 ```
 
-### `RevenuePool.balance` (TBD)
+### `RevenuePool.balances`
+This call returns the balance in the RevenuePool for a merchant's safe address. As customers pay merchants with their prepaid cards, the payments accumulate as revenue that the merchants can claim using their merchant safes. This function reveals the revenue that has accumulated for the merchant. This function takes in a parameter, which is the merchant's safe address and returns a promise that is a list balances aggregated by token address (a merchant can accumulate balances for all the stable coin CPXD tokens that are allowed in the cardpay protocol).
+
+```js
+let balances = await revenuePool.balances(merchantSafeAddress);
+for (let balanceInfo of balances) {
+  console.log(`${balanceInfo.tokenSymbol} balance is ${fromWei(balanceInfo.balance)}`)
+}
+```
+
+where the result is a promise for an array of objects in the following shape:
+```ts
+interface RevenueTokenBalance {
+  tokenSymbol: string;
+  tokenAddress: string;
+  balance: string; // balance is in wei
+}
+```
+
 ### `RevenuePool.claim` (TBD)
 ## `RewardPool` (TBD)
 ### `RewardPool.balanceOf` (TBD)
