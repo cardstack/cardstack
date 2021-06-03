@@ -54,7 +54,7 @@ module.exports = function (deployTarget) {
       process.env.EMBER_DEPLOY_AWS_ACCESS_KEY;
     ENV.cloudfront.secretAccessKey = ENV.s3Assets.secretAccessKey = ENV.s3Pages.secretAccessKey =
       process.env.EMBER_DEPLOY_AWS_ACCESS_SECRET;
-    ENV.cloudfront.distribution = 'E34FNDP9WBZSC7';
+    ENV.cloudfront.distribution = 'E1GQBQN5EUVJ16';
   }
 
   // if (deployTarget === 'production') {
