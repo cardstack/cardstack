@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.19.14",
+  "version": "0.19.15",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },
@@ -41,8 +41,8 @@
     "typescript-memoize": "^1.0.1"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.19.14",
-    "@cardstack/test-support": "0.19.14",
+    "@cardstack/eslint-config": "0.19.15",
+    "@cardstack/test-support": "0.19.15",
     "@types/supertest": "^2.0.11",
     "json-stable-stringify": "^1.0.1",
     "moment-timezone": "^0.5.33",
