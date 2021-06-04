@@ -13,7 +13,7 @@ import {
   executePayMerchant,
 } from '../utils/safe-utils';
 import { waitUntilTransactionMined } from '../utils/general-utils';
-import { Signature, sign } from '../utils/signing-utils';
+import { sign } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 
 const { toBN, fromWei } = Web3.utils;
@@ -69,7 +69,6 @@ export default class RevenuePool {
     options?: ContractOptions
   ): Promise<{ merchantSafe: string; gnosisTxn: RegisterMerchantTx }> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let prepaidCardMgrAddress = await getAddress('prepaidCardManager', this.layer2Web3);
     let prepaidCard = await getSDK('PrepaidCard', this.layer2Web3);
     let issuingToken = await prepaidCard.issuingToken(prepaidCardAddress);
     let weiAmount = await prepaidCard.convertFromSpendForPrepaidCard(
@@ -94,7 +93,7 @@ export default class RevenuePool {
     if (payload.lastUsedNonce == null) {
       payload.lastUsedNonce = -1;
     }
-    let signatures = await sign(
+    let signature = await sign(
       this.layer2Web3,
       issuingToken,
       0,
@@ -109,25 +108,13 @@ export default class RevenuePool {
       from,
       prepaidCardAddress
     );
-    let contractSignature: Signature = {
-      v: 1,
-      r: toBN(prepaidCardMgrAddress).toString(),
-      s: 0,
-    };
-    // The hash for the signatures requires that owner signatures be sorted by address
-    if (prepaidCardMgrAddress.toLowerCase() > from.toLowerCase()) {
-      signatures = signatures.concat(contractSignature);
-    } else {
-      signatures = [contractSignature].concat(signatures);
-    }
-
     let gnosisTxn = await executePayMerchant(
       this.layer2Web3,
       prepaidCardAddress,
       issuingToken,
       ZERO_ADDRESS,
       weiAmount,
-      signatures,
+      signature,
       toBN(payload.lastUsedNonce + 1).toString(),
       infoDID
     );
