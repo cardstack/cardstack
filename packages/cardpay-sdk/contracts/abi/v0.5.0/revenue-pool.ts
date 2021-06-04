@@ -102,6 +102,12 @@ export default [
         name: 'merchantSafe',
         type: 'address',
       },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
+      },
     ],
     name: 'MerchantCreation',
     type: 'event',
@@ -558,6 +564,27 @@ export default [
   },
   {
     constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'merchantSafe',
+        type: 'address',
+      },
+    ],
+    name: 'merchantForSafe',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
     inputs: [],
     name: 'merchantRegistrationFeeInSPEND',
     outputs: [
@@ -565,6 +592,32 @@ export default [
         internalType: 'uint256',
         name: '',
         type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'merchants',
+    outputs: [
+      {
+        internalType: 'address',
+        name: 'merchantSafe',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
       },
     ],
     payable: false,

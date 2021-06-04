@@ -118,7 +118,7 @@ export default class Safes {
             infoDID: infoDID ? infoDID : undefined, // cleanse empty strings
           };
         }
-        let { merchant } = await revenuePool.methods.merchantSafes(safeAddress).call();
+        let merchant = await revenuePool.methods.merchantForSafe(safeAddress).call();
         if (merchant !== ZERO_ADDRESS) {
           let { infoDID } = await revenuePool.methods.merchants(merchant).call();
           return {
