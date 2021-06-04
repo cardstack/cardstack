@@ -23,10 +23,12 @@ interface BaseSafe {
 }
 export interface DepotSafe extends BaseSafe {
   type: 'depot';
+  infoDID?: string;
 }
 export interface MerchantSafe extends BaseSafe {
   type: 'merchant';
   accumulatedSpendValue: number;
+  infoDID?: string;
 }
 export interface ExternalSafe extends BaseSafe {
   type: 'external';
@@ -37,6 +39,7 @@ export interface PrepaidCardSafe extends BaseSafe {
   spendFaceValue: number;
   issuer: string;
   reloadable: boolean;
+  customizationDID?: string;
 }
 export interface TokenInfo {
   tokenAddress: string;
@@ -85,9 +88,12 @@ export default class Safes {
         let balances: TokenInfo[] = await balanceResponse.json();
         let tokens = balances.filter((balanceItem) => balanceItem.tokenAddress);
         let safeInfo = { address: safeAddress, tokens };
-        let { issuer, issueToken: issuingToken, reloadable } = await prepaidCardManager.methods
-          .cardDetails(safeAddress)
-          .call();
+        let {
+          issuer,
+          issueToken: issuingToken,
+          reloadable,
+          customizationDID,
+        } = await prepaidCardManager.methods.cardDetails(safeAddress).call();
 
         // prepaid card safe
         if (issuer !== ZERO_ADDRESS) {
@@ -99,21 +105,26 @@ export default class Safes {
             issuer,
             issuingToken,
             reloadable,
+            customizationDID: customizationDID ? customizationDID : undefined, // cleanse the empty strings (which solidity uses for unspecified DID's)
             spendFaceValue: await exchangeRate.convertToSpend(issuingToken, issuingTokenBalance),
           };
         }
         let supplier = await bridgeUtils.methods.safes(safeAddress).call();
         if (supplier !== ZERO_ADDRESS) {
+          let { infoDID } = await bridgeUtils.methods.suppliers(supplier).call();
           return {
             ...safeInfo,
             type: 'depot' as 'depot',
+            infoDID: infoDID ? infoDID : undefined, // cleanse empty strings
           };
         }
-        let isMerchantSafe = await revenuePool.methods.isMerchantSafe(safeAddress).call();
-        if (isMerchantSafe) {
+        let { merchant } = await revenuePool.methods.merchantSafes(safeAddress).call();
+        if (merchant !== ZERO_ADDRESS) {
+          let { infoDID } = await revenuePool.methods.merchants(merchant).call();
           return {
             ...safeInfo,
             type: 'merchant' as 'merchant',
+            infoDID: infoDID ? infoDID : undefined, // cleanse empty strings
             accumulatedSpendValue: await spendContract.methods.balanceOf(safeInfo.address).call(),
           };
         }
@@ -180,9 +191,62 @@ export default class Safes {
     return result;
   }
 
+  async setSupplierInfoDID(
+    safeAddress: string,
+    infoDID: string,
+    gasToken: string,
+    options?: ContractOptions
+  ): Promise<GnosisExecTx> {
+    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let bridgeUtilsAddress = await getAddress('bridgeUtils', this.layer2Web3);
+    let payload = await this.setSupplierInfoDIDPayload(infoDID);
+    let estimate = await gasEstimate(this.layer2Web3, safeAddress, bridgeUtilsAddress, '0', payload, 0, gasToken);
+    if (estimate.lastUsedNonce == null) {
+      estimate.lastUsedNonce = -1;
+    }
+    let signatures = await sign(
+      this.layer2Web3,
+      bridgeUtilsAddress,
+      0,
+      payload,
+      0,
+      estimate.safeTxGas,
+      estimate.dataGas,
+      estimate.gasPrice,
+      estimate.gasToken,
+      ZERO_ADDRESS,
+      toBN(estimate.lastUsedNonce + 1),
+      from,
+      safeAddress
+    );
+    let result = await executeTransaction(
+      this.layer2Web3,
+      safeAddress,
+      bridgeUtilsAddress,
+      0,
+      payload,
+      0,
+      estimate.safeTxGas,
+      estimate.dataGas,
+      estimate.gasPrice,
+      toBN(estimate.lastUsedNonce + 1).toString(),
+      signatures,
+      estimate.gasToken,
+      ZERO_ADDRESS
+    );
+    return result;
+  }
+
   private async transferTokenPayload(tokenAddress: string, recipient: string, amount: string): Promise<string> {
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
-
     return token.methods.transfer(recipient, amount).encodeABI();
+  }
+
+  private async setSupplierInfoDIDPayload(infoDID: string): Promise<string> {
+    let bridgeUtils = new this.layer2Web3.eth.Contract(
+      BridgeUtilsABI as AbiItem[],
+      await getAddress('bridgeUtils', this.layer2Web3)
+    );
+    return bridgeUtils.methods.setSupplierInfoDID(infoDID).encodeABI();
   }
 }

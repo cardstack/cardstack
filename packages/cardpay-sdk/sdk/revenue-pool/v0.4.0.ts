@@ -5,16 +5,11 @@ import RevenuePoolABI from '../../contracts/abi/v0.4.0/revenue-pool';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { getAddress } from '../../contracts/addresses.js';
 import { ZERO_ADDRESS } from '../constants.js';
-import {
-  EventABI,
-  RelayTransaction,
-  getPayMerchantPayload,
-  getParamsFromEvent,
-  executePayMerchant,
-} from '../utils/safe-utils';
+import { EventABI, RelayTransaction, getParamsFromEvent } from '../utils/safe-utils';
 import { waitUntilTransactionMined } from '../utils/general-utils';
 import { Signature, sign } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
+import { getPayMerchantPayload, executePayMerchant } from '../prepaid-card/v0.4.0';
 
 const { toBN, fromWei } = Web3.utils;
 
@@ -65,7 +60,6 @@ export default class RevenuePool {
 
   async registerMerchant(
     prepaidCardAddress: string,
-    infoDID?: string,
     options?: ContractOptions
   ): Promise<{ merchantSafe: string; gnosisTxn: RegisterMerchantTx }> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
@@ -88,8 +82,7 @@ export default class RevenuePool {
       prepaidCardAddress,
       ZERO_ADDRESS,
       issuingToken,
-      weiAmount,
-      infoDID
+      weiAmount
     );
     if (payload.lastUsedNonce == null) {
       payload.lastUsedNonce = -1;
@@ -128,8 +121,7 @@ export default class RevenuePool {
       ZERO_ADDRESS,
       weiAmount,
       signatures,
-      toBN(payload.lastUsedNonce + 1).toString(),
-      infoDID
+      toBN(payload.lastUsedNonce + 1).toString()
     );
     let merchantSafe = await this.getMerchantSafeFromTxn(gnosisTxn.ethereumTx.txHash);
     return { merchantSafe, gnosisTxn };
@@ -155,7 +147,7 @@ export default class RevenuePool {
 
   private createMerchantEventABI(): EventABI {
     return {
-      topic: this.layer2Web3.eth.abi.encodeEventSignature('MerchantCreation(address,address,string)'),
+      topic: this.layer2Web3.eth.abi.encodeEventSignature('MerchantCreation(address,address)'),
       abis: [
         {
           type: 'address',
@@ -164,10 +156,6 @@ export default class RevenuePool {
         {
           type: 'address',
           name: 'merchantSafe',
-        },
-        {
-          type: 'string',
-          name: 'infoDID',
         },
       ],
     };

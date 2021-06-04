@@ -18,6 +18,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`Safes`](#safes)
   - [`Safes.view`](#safesview)
   - [`Safes.sendTokens`](#safessendtokens)
+  - [`Safes.setSupplierInfoDID`](#safessetsupplierinfodid)
 - [`PrepaidCard`](#prepaidcard)
   - [`PrepaidCard.create`](#prepaidcardcreate)
   - [`PrepaidCard.priceForFaceValue`](#prepaidcardpriceforfacevalue)
@@ -183,9 +184,11 @@ interface BaseSafe {
 }
 interface DepotSafe extends BaseSafe {
   type: 'depot';
+  infoDID: string | undefined;
 }
 interface MerchantSafe extends BaseSafe {
   type: 'merchant';
+  infoDID: string | undefined;
 }
 interface ExternalSafe extends BaseSafe {
   type: 'external';
@@ -196,6 +199,7 @@ interface PrepaidCardSafe extends BaseSafe {
   spendFaceValue: number;
   issuer: string;
   reloadable: boolean;
+  customizationDID: string | undefined;
 }
 ```
 
@@ -260,6 +264,52 @@ interface RelayTransaction {
 }
 ```
 
+### `Safes.setSupplierInfoDID`
+This call will allow a supplier to customize their appearance within the cardpay ecosystem by letting them set an info DID, that when used with a DID resolver can retrieve supplier info, such as their name, logo, URL, etc.
+The parameters to this call are:
+- The supplier's depot safe address (the safe that was assigned to the supplier when they bridged tokens into L2)
+- The DID string that can be resolved to a DID document representing the supplier's information.
+- The token address that you want to use to pay for gas for this transaction. This should be an address of a token in the depot safe.
+```js
+await safes.setSupplierInfoDID(supplierDepotAddress, infoDID, daiCpxdAddress);
+```
+This method returns a promise for a gnosis relay transaction object that has the following shape:
+```ts
+interface RelayTransaction {
+  to: string;
+  ethereumTx: {
+    txHash: string;
+    to: string;
+    data: string;
+    blockNumber: string;
+    blockTimestamp: string;
+    created: string;
+    modified: string;
+    gasUsed: string;
+    status: number;
+    transactionIndex: number;
+    gas: string;
+    gasPrice: string;
+    nonce: string;
+    value: string;
+    from: string;
+  };
+  value: number;
+  data: string;
+  timestamp: string;
+  operation: string;
+  safeTxGas: number;
+  dataGas: number;
+  gasPrice: number;
+  gasToken: string;
+  refundReceiver: string;
+  nonce: number;
+  safeTxHash: string;
+  txHash: string;
+  transactionHash: string;
+}
+```
+
 ## `PrepaidCard`
 The `PrepaidCard` API is used to create and interact with prepaid cards within the layer 2 network in which the Card Protocol runs. The `PrepaidCard` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
 ```js
@@ -279,6 +329,7 @@ This method is invoked with the following parameters:
 - The address of the safe that you are using to pay for the prepaid card
 - The contract address of the token that you wish to use to pay for the prepaid card. Note that the face value of the prepaid card will fluctuate based on the exchange rate of this token and the **§** unit.
 - An array of face values in units of **§** SPEND as numbers. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
+- A DID string that represents the customization for the prepaid card. The customization for a prepaid card can be retrieved using a DID resolver with this DID. If there is no customization an `undefined` value can be specified here.
 - You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
 
 ```js
@@ -286,7 +337,8 @@ let daicpxd = await getAddress('daiCpxd', web3);
 let result = await prepaidCard.create(
   safeAddress,
   daicpxd,
-  [5000] // §5000 SPEND face value
+  [5000], // §5000 SPEND face value
+  "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49"
 );
 ```
 
@@ -439,8 +491,12 @@ This call will return the fee in SPEND to register as a merchant. This call retu
 ### `RevenuePool.registerMerchant`
 This call will register a merchant with the Revenue Pool. In order to register as a merchant a prepaid card is used to pay the merchant registration fee. As part of merchant registration a gnosis safe will be created for the merchant specifically to claim revenue from prepaid card payments from the Revenue Pool. When customers pay a merchant they must specify the merchant safe (created from this call) as the recipient for merchant payments.
 
+The parameters to this function are:
+- The merchant's prepaid card address that will be paying the merchant registration fee
+- The merchant's info DID which is an identifier string that can resolve merchant details like their name, URL, logo, etc.
+
 ```js
-  let { merchantSafe } = await revenuePool.registerMerchant(merchantsPrepaidCardAddress);
+  let { merchantSafe } = await revenuePool.registerMerchant(merchantsPrepaidCardAddress, infoDID);
 ```
 This call takes in as a parameter the prepaid card address that the merchant is using to pay the registration fee for becoming a new merchant. This call will return an object in the shape of:
 ```ts
