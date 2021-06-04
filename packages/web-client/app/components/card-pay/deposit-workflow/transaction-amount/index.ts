@@ -21,7 +21,7 @@ interface CardPayDepositWorkflowTransactionAmountComponentArgs {
 }
 
 class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPayDepositWorkflowTransactionAmountComponentArgs> {
-  @tracked amount = '0';
+  @tracked amount = '';
   @tracked isUnlocked = false;
   @tracked isUnlocking = false;
   @tracked unlockTxnReceipt: TransactionReceipt | undefined;

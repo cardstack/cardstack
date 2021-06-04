@@ -147,7 +147,7 @@ module('Integration | Component | transaction-amount', function (hooks) {
           />
         `);
 
-    assert.dom('[data-test-deposit-amount-input]').hasValue('0');
+    assert.dom('[data-test-deposit-amount-input]').hasValue('');
     assert.dom('[data-test-unlock-button]').isDisabled();
 
     await fillIn('[data-test-deposit-amount-input]', invalidDai1);

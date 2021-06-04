@@ -41,12 +41,11 @@
 
 .transaction-amount__currency-text {
   position: absolute;
-  width: var(--input-currency-text-width);
+  max-width: var(--input-currency-text-width);
   height: var(--tx-amount-input-height);
   display: flex;
   align-items: center;
-  right: 0;
-  text-align: right;
+  right: var(--input-currency-text-space);
   top: 0;
   user-select: none;
 }
