@@ -103,7 +103,8 @@ export async function getPayMerchantPayload(
   prepaidCardAddress: string,
   merchantSafe: string,
   tokenAddress: string,
-  amount: string
+  amount: string,
+  infoDID = ''
 ): Promise<PayMerchantPayload> {
   let relayServiceURL = await getConstant('relayServiceURL', web3);
   let url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/pay-for-merchant/get-params/`;
@@ -116,6 +117,7 @@ export async function getPayMerchantPayload(
       tokenAddress,
       merchantAddress: merchantSafe,
       payment: amount,
+      infoDid: infoDID,
     }),
   };
   let response = await fetch(url, options);
@@ -176,7 +178,8 @@ export async function executePayMerchant(
   merchantSafe: string,
   amount: string,
   signatures: Signature[],
-  nonce: string
+  nonce: string,
+  infoDID = ''
 ): Promise<PayMerchantTx> {
   let relayServiceURL = await getConstant('relayServiceURL', web3);
   const url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/pay-for-merchant/`;
@@ -190,6 +193,7 @@ export async function executePayMerchant(
       tokenAddress,
       merchantAddress: merchantSafe,
       payment: amount,
+      infoDid: infoDID,
       signatures,
     }),
   };

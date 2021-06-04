@@ -2,14 +2,14 @@
 
 import { ContractMeta } from '../version-resolver';
 
-import v0_3_0 from './v.3.0';
-import v0_4_0 from './v.4.0';
+import v0_4_0 from './v0.4.0';
+import v0_5_0 from './v0.5.0';
 
 // add more versions as we go, but also please do drop version that we don't
 // want to maintain simultaneously
-export type RevenuePool = v0_3_0 | v0_4_0;
+export type RevenuePool = v0_5_0;
 
 export const revenuePoolMeta = {
-  apiVersions: { v0_3_0, v0_4_0 },
+  apiVersions: { v0_4_0, v0_5_0 },
   contractName: 'revenuePool',
 } as ContractMeta;

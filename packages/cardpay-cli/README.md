@@ -8,14 +8,15 @@ CLI tool for basic actions in Cardpay
 - [Commands](#commands)
   - [`yarn cardpay bridge <AMOUNT> <TOKEN_ADDRESS> [RECEIVER] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-bridge-amount-token_address-receiver---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay await-bridged <FROM_BLOCK> [RECIPIENT] --network=_NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-await-bridged-from_block-recipient---network_network---mnemonicmnemonic)
-  - [`yarn cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-prepaidcard-create-safe_address-token_address-face_values---networknetwork---mnemonicmnemonic)
+  - [`yarn cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-prepaidcard-create-safe_address-token_address-customization_did-face_values---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay price-for-face-value <TOKEN_ADDRESS> <SPEND_FACE_VALUE> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-price-for-face-value-token_address-spend_face_value---networknetwork---mnemonicmnemonic)
-  - [`yarn cardpay register-merchant <PREPAID_CARD> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-register-merchant-prepaid_card---networknetwork---mnemonicmnemonic)
+  - [`yarn cardpay register-merchant <PREPAID_CARD> <INFO_DID> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-register-merchant-prepaid_card-info_did---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-pay-merchant-merchant_safe-prepaid_card-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay revenue-balances <MERCHANT_SAFE> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-revenue-balances-merchant_safe---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay new-prepaidcard-gas-fee <TOKEN_ADDRESS> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-new-prepaidcard-gas-fee-token_address---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay safes-view [ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-safes-view-address---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay safe-transfer-tokens [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-safe-transfer-tokens-safe_address-token_address-recipient-amount---networknetwork---mnemonicmnemonic)
+  - [`yarn cardpay set-supplier-info-did [SAFE_ADDRESS] [INFO_DID] [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-set-supplier-info-did-safe_address-info_did-token_address---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay usd-price <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-usd-price-token-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay eth-price <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-eth-price-token-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay price-oracle-updated-at <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-price-oracle-updated-at-token---networknetwork---mnemonicmnemonic)
@@ -55,16 +56,17 @@ ARGUMENTS
   MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
 ```
 
-## `yarn cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC]`
+## `yarn cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC]`
 
 Create a prepaid card using DAI CPXD tokens
 
 ```
 USAGE
-  $ yarn cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC]
+  $ yarn cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC]
 
 ARGUMENTS
   FACE_VALUES       A list of face values (separated by spaces) in units of § SPEND to create
+  CUSTOMIZATION_DID The DID string that represents the prepaid card customization
   SAFE_ADDRESS      Layer 2 safe address with DAI CPXD tokens
   TOKEN_ADDRESS     The token address of the token to use to pay for the prepaid cards
   NETWORK           The network to use ("sokol" or "xdai")
@@ -85,7 +87,7 @@ ARGUMENTS
   MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
 ```
 
-## `yarn cardpay register-merchant <PREPAID_CARD> --network=NETWORK [--mnemonic=MNEMONIC]`
+## `yarn cardpay register-merchant <PREPAID_CARD> <INFO_DID> --network=NETWORK [--mnemonic=MNEMONIC]`
 Register a new merchant from a prepaid card. The prepaid card will be used to pay the merchant registration fee.
 
 ```
@@ -94,6 +96,7 @@ USAGE
 
 ARGUMENTS
   PREPAID_CARD      The address of the prepaid card that is being used to pay the merchant registration fee
+  INFO_DID          The DID string that can be resolved to a DID document representing the merchant's information
   NETWORK           The network to use ("sokol" or "xdai")
   MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
 ```
@@ -165,6 +168,22 @@ ARGUMENTS
   TOKEN_ADDRESS    The token address of the tokens to transfer from the safe
   RECIPIENT        The token recipient's address
   AMOUNT           The amount of tokens to transfer (*not* in units of `wei`).
+  NETWORK   The network to use ("sokol" or "xdai")
+  MNEMONIC  (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+```
+
+## `yarn cardpay set-supplier-info-did [SAFE_ADDRESS] [INFO_DID] [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]`
+
+This allows a supplier to customize their appearance within the cardpay ecosystem by letting them set an info DID, that when used with a DID resolver can retrieve supplier info, such as their name, logo, URL, etc.
+
+```
+USAGE
+  $ yarn cardpay set-supplier-info-did [SAFE_ADDRESS] [INFO_DID] [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]
+
+ARGUMENTS
+  SAFE_ADDRESS     The supplier's depot safe address (the safe that was assigned to the supplier when they bridged tokens into L2)
+  INFO_DID         The DID string that can be resolved to a DID document representing the supplier's information
+  TOKEN_ADDRESS    The token address that you want to use to pay for gas for this transaction. This should be an address of a token in the depot safe.
   NETWORK   The network to use ("sokol" or "xdai")
   MNEMONIC  (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
 ```

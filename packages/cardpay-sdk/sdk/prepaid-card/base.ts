@@ -5,7 +5,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677.js';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.4.0/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.5.0/prepaid-card-manager';
 import { getAddress } from '../../contracts/addresses.js';
 import { getConstant, ZERO_ADDRESS } from '../constants.js';
 import { getSDK } from '../version-resolver';
@@ -107,6 +107,7 @@ export default class PrepaidCard {
     safeAddress: string,
     tokenAddress: string,
     faceValues: number[],
+    customizationDID: string | undefined,
     onPrepaidCardsCreated?: (prepaidCardAddresses: string[]) => unknown,
     onGasLoaded?: () => unknown,
     options?: ContractOptions
@@ -122,7 +123,7 @@ export default class PrepaidCard {
       }
       amounts.push(new BN(weiAmount));
     }
-    let payload = await this.getCreateCardPayload(from, tokenAddress, amounts);
+    let payload = await this.getCreateCardPayload(from, tokenAddress, amounts, customizationDID);
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
 
     if (estimate.lastUsedNonce == null) {
@@ -221,7 +222,12 @@ export default class PrepaidCard {
     return this.prepaidCardManager;
   }
 
-  private async getCreateCardPayload(owner: string, tokenAddress: string, amounts: BN[]): Promise<string> {
+  private async getCreateCardPayload(
+    owner: string,
+    tokenAddress: string,
+    amounts: BN[],
+    customizationDID = ''
+  ): Promise<string> {
     let prepaidCardManagerAddress = await getAddress('prepaidCardManager', this.layer2Web3);
     let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], tokenAddress);
     let sum = new BN(0);
@@ -233,7 +239,7 @@ export default class PrepaidCard {
       .transferAndCall(
         prepaidCardManagerAddress,
         sum,
-        this.layer2Web3.eth.abi.encodeParameters(['address', 'uint256[]'], [owner, amounts])
+        this.layer2Web3.eth.abi.encodeParameters(['address', 'uint256[]', 'string'], [owner, amounts, customizationDID])
       )
       .encodeABI();
   }
@@ -248,7 +254,7 @@ export default class PrepaidCard {
 
   private createPrepaidCardEventABI(): EventABI {
     return {
-      topic: this.layer2Web3.eth.abi.encodeEventSignature('CreatePrepaidCard(address,address,address,uint256)'),
+      topic: this.layer2Web3.eth.abi.encodeEventSignature('CreatePrepaidCard(address,address,address,uint256,string)'),
       abis: [
         {
           type: 'address',
@@ -265,6 +271,10 @@ export default class PrepaidCard {
         {
           type: 'uint256',
           name: 'amount',
+        },
+        {
+          type: 'string',
+          name: 'customizationDID',
         },
       ],
     };

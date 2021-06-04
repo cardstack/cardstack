@@ -20,9 +20,13 @@ export async function viewSafes(network: string, mnemonic: string, address?: str
     console.log('-------------------------');
     if (safe.type === 'prepaid-card') {
       console.log(`Face value: §${safe.spendFaceValue} SPEND`);
+      console.log(`customization DID: ${safe.customizationDID ? safe.customizationDID : ' - unset -'}`);
     }
     if (safe.type === 'merchant') {
       console.log(`Accumulated SPEND value: §${safe.accumulatedSpendValue} SPEND`);
+    }
+    if (safe.type === 'merchant' || safe.type === 'depot') {
+      console.log(`info DID: ${safe.infoDID ? safe.infoDID : ' - unset -'}`);
     }
     if (tokens.length === 0) {
       console.log('No tokens in safe');
@@ -57,6 +61,23 @@ export async function transferTokens(
 
   console.log(`transferring ${amount} ${symbol} from safe ${safe} to ${recipient}`);
   let result = await safes.sendTokens(safe, token, recipient, weiAmount);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  console.log(`Transaction hash: ${blockExplorer}/tx/${result.ethereumTx.txHash}/token-transfers`);
+}
+
+export async function setSupplierInfoDID(
+  network: string,
+  mnemonic: string,
+  safe: string,
+  infoDID: string,
+  gasToken: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let safes = await getSDK('Safes', web3);
+  let assets = await getSDK('Assets', web3);
+  let { symbol } = await assets.getTokenInfo(gasToken);
+  console.log(`setting the info DID for the supplier safe ${safe} to ${infoDID} using ${symbol} token to pay for gas`);
+  let result = await safes.setSupplierInfoDID(safe, infoDID, gasToken);
   let blockExplorer = await getConstant('blockExplorer', web3);
   console.log(`Transaction hash: ${blockExplorer}/tx/${result.ethereumTx.txHash}/token-transfers`);
 }

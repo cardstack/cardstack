@@ -198,7 +198,7 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'TRANSER_AND_CALL',
+    name: 'TRANSFER_AND_CALL',
     outputs: [
       {
         internalType: 'bytes4',
@@ -440,6 +440,36 @@ export default [
   {
     constant: true,
     inputs: [],
+    name: 'maximumFaceValue',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'minimumFaceValue',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'owner',
     outputs: [
       {
@@ -589,41 +619,11 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'minimumFaceValue',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'maximumFaceValue',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
+    constant: false,
     inputs: [
       {
         internalType: 'address',
-        name: 'token',
+        name: 'from',
         type: 'address',
       },
       {
@@ -631,8 +631,13 @@ export default [
         name: 'amount',
         type: 'uint256',
       },
+      {
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
     ],
-    name: 'isValidAmount',
+    name: 'onTokenTransfer',
     outputs: [
       {
         internalType: 'bool',
@@ -641,7 +646,7 @@ export default [
       },
     ],
     payable: false,
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -680,17 +685,12 @@ export default [
       },
       {
         internalType: 'address',
-        name: 'previousOwner',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
         name: 'newOwner',
         type: 'address',
       },
       {
         internalType: 'bytes',
-        name: 'issuerSignatures',
+        name: 'previousOwnerSignature',
         type: 'bytes',
       },
     ],
@@ -710,13 +710,13 @@ export default [
     constant: true,
     inputs: [
       {
-        internalType: 'address',
-        name: 'from',
+        internalType: 'address payable',
+        name: 'prepaidCard',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: 'to',
+        name: 'newOwner',
         type: 'address',
       },
     ],
@@ -725,47 +725,6 @@ export default [
       {
         internalType: 'bytes',
         name: '',
-        type: 'bytes',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'getContractSignature',
-    outputs: [
-      {
-        internalType: 'bytes',
-        name: 'contractSignature',
-        type: 'bytes',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'owner',
-        type: 'address',
-      },
-      {
-        internalType: 'bytes',
-        name: 'signature',
-        type: 'bytes',
-      },
-    ],
-    name: 'appendPrepaidCardAdminSignature',
-    outputs: [
-      {
-        internalType: 'bytes',
-        name: 'signatures',
         type: 'bytes',
       },
     ],
@@ -798,7 +757,7 @@ export default [
       },
       {
         internalType: 'bytes',
-        name: 'signatures',
+        name: 'ownerSignature',
         type: 'bytes',
       },
     ],
@@ -849,22 +808,27 @@ export default [
     constant: false,
     inputs: [
       {
-        internalType: 'address',
-        name: 'from',
+        internalType: 'address payable',
+        name: 'prepaidCard',
         type: 'address',
       },
       {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
+        internalType: 'address',
+        name: 'issuingToken',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256[]',
+        name: 'cardAmounts',
+        type: 'uint256[]',
       },
       {
         internalType: 'bytes',
-        name: 'data',
+        name: 'ownerSignature',
         type: 'bytes',
       },
     ],
-    name: 'onTokenTransfer',
+    name: 'splitCard',
     outputs: [
       {
         internalType: 'bool',
@@ -872,21 +836,21 @@ export default [
         type: 'bool',
       },
     ],
-    payable: false,
-    stateMutability: 'nonpayable',
+    payable: true,
+    stateMutability: 'payable',
     type: 'function',
   },
   {
     constant: true,
     inputs: [
       {
-        internalType: 'address',
-        name: 'cardOwner',
+        internalType: 'address payable',
+        name: 'prepaidCard',
         type: 'address',
       },
       {
         internalType: 'uint256[]',
-        name: 'subCardAmount',
+        name: 'amounts',
         type: 'uint256[]',
       },
     ],
@@ -903,35 +867,20 @@ export default [
     type: 'function',
   },
   {
-    constant: false,
+    constant: true,
     inputs: [
       {
-        internalType: 'address payable',
-        name: 'prepaidCard',
-        type: 'address',
-      },
-      {
         internalType: 'address',
-        name: 'owner',
+        name: 'token',
         type: 'address',
       },
       {
-        internalType: 'address',
-        name: 'issueToken',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256[]',
-        name: 'cardAmounts',
-        type: 'uint256[]',
-      },
-      {
-        internalType: 'bytes',
-        name: 'signatures',
-        type: 'bytes',
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
       },
     ],
-    name: 'splitCard',
+    name: 'isValidAmount',
     outputs: [
       {
         internalType: 'bool',
@@ -939,8 +888,8 @@ export default [
         type: 'bool',
       },
     ],
-    payable: true,
-    stateMutability: 'payable',
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
   {

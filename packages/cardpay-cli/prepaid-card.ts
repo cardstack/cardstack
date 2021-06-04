@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { getConstant, getAddress, getSDK } from '@cardstack/cardpay-sdk';
+import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 
 const { fromWei } = Web3.utils;
@@ -30,16 +30,16 @@ export async function createPrepaidCard(
   mnemonic: string,
   safe: string,
   faceValues: number[],
-  tokenAddress?: string
+  tokenAddress: string,
+  customizationDID?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  tokenAddress = tokenAddress ?? (await getAddress('daiCpxd', web3));
 
   let prepaidCard = await getSDK('PrepaidCard', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log('Creating prepaid card');
-  let result = await prepaidCard.create(safe, tokenAddress, faceValues, (prepaidCardAddresses) =>
+  let result = await prepaidCard.create(safe, tokenAddress, faceValues, customizationDID, (prepaidCardAddresses) =>
     console.log(`Created new prepaid card: ${prepaidCardAddresses.join(', ')}`)
   );
   console.log(`Transaction hash: ${blockExplorer}/tx/${result.gnosisTxn.ethereumTx.txHash}/token-transfers`);

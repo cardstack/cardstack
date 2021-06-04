@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import bridge from './bridge.js';
 import awaitBridged from './await-bridged.js';
 import { viewTokenBalance } from './assets';
-import { viewSafes, transferTokens } from './safe.js';
+import { viewSafes, transferTokens, setSupplierInfoDID } from './safe.js';
 import { createPrepaidCard, priceForFaceValue, payMerchant, gasFee } from './prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
 import { registerMerchant, revenueBalances } from './revenue-pool.js';
@@ -25,6 +25,7 @@ type Commands =
   | 'gasFee'
   | 'priceForFaceValue'
   | 'payMerchant'
+  | 'setSupplierInfoDID'
   | 'registerMerchant'
   | 'revenueBalances'
   | 'priceOracleUpdatedAt'
@@ -43,6 +44,8 @@ interface Options {
   safeAddress?: string;
   spendFaceValue?: number;
   merchantSafe?: string;
+  infoDID?: string;
+  customizationDID?: string;
   prepaidCard?: string;
   receiver?: string;
   recipient?: string;
@@ -59,6 +62,8 @@ const {
   safeAddress,
   spendFaceValue,
   merchantSafe,
+  infoDID,
+  customizationDID,
   prepaidCard,
   fromBlock,
   receiver,
@@ -130,7 +135,23 @@ const {
     }
   )
   .command(
-    'prepaidcard-create <safeAddress> <tokenAddress> <faceValues..>',
+    'set-supplier-info-did [safeAddress] [infoDID]',
+    'Allows a supplier to customize their appearance within the cardpay ecosystem by letting them set an info DID, that when used with a DID resolver can retrieve supplier info, such as their name, logo, URL, etc.',
+    (yargs) => {
+      yargs.positional('safeAddress', {
+        type: 'string',
+        description:
+          "The supplier's depot safe address (the safe that was assigned to the supplier when they bridged tokens into L2)",
+      });
+      yargs.positional('infoDID', {
+        type: 'string',
+        description: "The DID string that can be resolved to a DID document representing the supplier's information",
+      });
+      command = 'setSupplierInfoDID';
+    }
+  )
+  .command(
+    'prepaidcard-create <safeAddress> <tokenAddress> <customizationDID> <faceValues..>',
     'Create prepaid cards using the specified token from the specified safe with the amounts provided',
     (yargs) => {
       yargs.positional('safeAddress', {
@@ -142,6 +163,10 @@ const {
         default: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa', // Kovan DAI
         description: 'The token address (defaults to Kovan DAI)',
       });
+      yargs.positional('customizationDID', {
+        type: 'string',
+        description: 'The DID string that represents the prepaid card customization',
+      });
       yargs.positional('faceValues', {
         type: 'number',
         description: 'A list of face values (separated by spaces) in units of § SPEND to create',
@@ -150,12 +175,16 @@ const {
     }
   )
   .command(
-    'register-merchant <prepaidCard>',
+    'register-merchant <prepaidCard> <infoDID>',
     'Register as a new merchant by paying a merchant registration fee',
     (yargs) => {
       yargs.positional('prepaidCard', {
         type: 'string',
         description: 'The address of the prepaid card that is being used to pay the merchant registration fee',
+      });
+      yargs.positional('infoDID', {
+        type: 'string',
+        description: "The DID string that can be resolved to a DID document representing the merchant's information",
       });
       command = 'registerMerchant';
     }
@@ -330,19 +359,26 @@ if (!command) {
       }
       await transferTokens(network, mnemonic, safeAddress, token, recipient, amount);
       break;
-    case 'prepaidCardCreate':
-      if (safeAddress == null || faceValues == null) {
-        yargs.showHelp('safeAddress and amounts are required values');
+    case 'setSupplierInfoDID':
+      if (safeAddress == null || token == null || infoDID == null) {
+        yargs.showHelp('safeAddress, token, and infoDID are required values');
         process.exit(1);
       }
-      await createPrepaidCard(network, mnemonic, safeAddress, faceValues, tokenAddress);
+      await setSupplierInfoDID(network, mnemonic, safeAddress, infoDID, token);
+      break;
+    case 'prepaidCardCreate':
+      if (tokenAddress == null || safeAddress == null || faceValues == null) {
+        yargs.showHelp('tokenAddress, safeAddress, and amounts are required values');
+        process.exit(1);
+      }
+      await createPrepaidCard(network, mnemonic, safeAddress, faceValues, tokenAddress, customizationDID || undefined);
       break;
     case 'registerMerchant':
       if (prepaidCard == null) {
         yargs.showHelp('prepaidCard is a required value');
         process.exit(1);
       }
-      await registerMerchant(network, mnemonic, prepaidCard);
+      await registerMerchant(network, mnemonic, prepaidCard, infoDID || undefined);
       break;
     case 'payMerchant':
       if (merchantSafe == null || prepaidCard == null || amount == null) {

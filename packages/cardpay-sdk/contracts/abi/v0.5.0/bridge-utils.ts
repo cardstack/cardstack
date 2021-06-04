@@ -66,7 +66,7 @@ export default [
         type: 'address',
       },
     ],
-    name: 'UpdateToken',
+    name: 'TokenAdded',
     type: 'event',
   },
   {
@@ -372,6 +372,27 @@ export default [
     constant: false,
     inputs: [
       {
+        internalType: 'address',
+        name: 'tokenAddr',
+        type: 'address',
+      },
+    ],
+    name: 'addToken',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
         internalType: 'string',
         name: 'brandName',
         type: 'string',
@@ -409,27 +430,6 @@ export default [
         internalType: 'address',
         name: '',
         type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'tokenAddr',
-        type: 'address',
-      },
-    ],
-    name: 'updateToken',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
       },
     ],
     payable: false,
