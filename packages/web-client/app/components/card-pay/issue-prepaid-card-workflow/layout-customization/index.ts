@@ -52,6 +52,8 @@ export default class LayoutCustomizationCard extends Component<LayoutCustomizati
   @tracked headerBackground = this.colorOptions[0];
   @tracked headerTheme = this.themeOptions[0];
   @tracked issuerName = '';
+  @tracked nameFieldErrorMessage = '';
+  @tracked isNameInvalid = false;
 
   get ctaState() {
     if (this.args.isComplete) {
@@ -70,6 +72,25 @@ export default class LayoutCustomizationCard extends Component<LayoutCustomizati
   }
   @action updateHeaderTheme(item: any) {
     this.headerTheme = item;
+  }
+
+  @action onNameInput(value: string): void {
+    this.validateName(value);
+    if (this.isNameInvalid) {
+      this.issuerName = '';
+      return;
+    }
+    this.issuerName = value;
+  }
+
+  @action validateName(value: string): void {
+    if (!value) {
+      this.isNameInvalid = true;
+      this.nameFieldErrorMessage = 'This is a required field';
+      return;
+    }
+    this.isNameInvalid = false;
+    this.nameFieldErrorMessage = '';
   }
 
   @action save() {
