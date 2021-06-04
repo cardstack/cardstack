@@ -19,14 +19,14 @@ export async function viewSafes(network: string, mnemonic: string, address?: str
     console.log(`${address} -- ${type}`);
     console.log('-------------------------');
     if (safe.type === 'prepaid-card') {
-      console.log(`Face value: §${safe.spendFaceValue} SPEND`);
       console.log(`customization DID: ${safe.customizationDID ? safe.customizationDID : ' - unset -'}`);
-    }
-    if (safe.type === 'merchant') {
-      console.log(`Accumulated SPEND value: §${safe.accumulatedSpendValue} SPEND`);
+      console.log(`Face value: §${safe.spendFaceValue} SPEND`);
     }
     if (safe.type === 'merchant' || safe.type === 'depot') {
       console.log(`info DID: ${safe.infoDID ? safe.infoDID : ' - unset -'}`);
+    }
+    if (safe.type === 'merchant') {
+      console.log(`Accumulated SPEND value: §${safe.accumulatedSpendValue} SPEND`);
     }
     if (tokens.length === 0) {
       console.log('No tokens in safe');
