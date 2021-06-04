@@ -39,6 +39,12 @@ export default [
         name: 'amount',
         type: 'uint256',
       },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'customizationDID',
+        type: 'string',
+      },
     ],
     name: 'CreatePrepaidCard',
     type: 'event',
@@ -271,6 +277,11 @@ export default [
         internalType: 'uint256',
         name: 'blockNumber',
         type: 'uint256',
+      },
+      {
+        internalType: 'string',
+        name: 'customizationDID',
+        type: 'string',
       },
       {
         internalType: 'bool',
@@ -756,6 +767,11 @@ export default [
         type: 'uint256',
       },
       {
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
+      },
+      {
         internalType: 'bytes',
         name: 'ownerSignature',
         type: 'bytes',
@@ -791,6 +807,11 @@ export default [
         name: 'amount',
         type: 'uint256',
       },
+      {
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
+      },
     ],
     name: 'getPayData',
     outputs: [
@@ -813,14 +834,14 @@ export default [
         type: 'address',
       },
       {
-        internalType: 'address',
-        name: 'issuingToken',
-        type: 'address',
-      },
-      {
         internalType: 'uint256[]',
         name: 'cardAmounts',
         type: 'uint256[]',
+      },
+      {
+        internalType: 'string',
+        name: 'customizationDID',
+        type: 'string',
       },
       {
         internalType: 'bytes',
@@ -852,6 +873,11 @@ export default [
         internalType: 'uint256[]',
         name: 'amounts',
         type: 'uint256[]',
+      },
+      {
+        internalType: 'string',
+        name: 'customizationDID',
+        type: 'string',
       },
     ],
     name: 'getSplitCardData',

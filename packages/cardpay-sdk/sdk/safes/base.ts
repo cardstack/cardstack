@@ -1,10 +1,10 @@
 /*global fetch */
 
 import Web3 from 'web3';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.4.0/prepaid-card-manager';
-import RevenuePoolABI from '../../contracts/abi/v0.4.0/revenue-pool';
-import BridgeUtilsABI from '../../contracts/abi/v0.4.0/bridge-utils';
-import SpendABI from '../../contracts/abi/v0.4.0/spend';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.5.0/prepaid-card-manager';
+import RevenuePoolABI from '../../contracts/abi/v0.5.0/revenue-pool';
+import BridgeUtilsABI from '../../contracts/abi/v0.5.0/bridge-utils';
+import SpendABI from '../../contracts/abi/v0.5.0/spend';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
@@ -118,7 +118,7 @@ export default class Safes {
             infoDID: infoDID ? infoDID : undefined, // cleanse empty strings
           };
         }
-        let { merchant } = await revenuePool.methods.merchantSafes(safeAddress).call();
+        let merchant = await revenuePool.methods.merchantForSafe(safeAddress).call();
         if (merchant !== ZERO_ADDRESS) {
           let { infoDID } = await revenuePool.methods.merchants(merchant).call();
           return {

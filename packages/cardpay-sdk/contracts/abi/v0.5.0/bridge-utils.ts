@@ -33,8 +33,14 @@ export default [
         name: 'supplier',
         type: 'address',
       },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
+      },
     ],
-    name: 'SupplierUpdated',
+    name: 'SupplierInfoDID',
     type: 'event',
   },
   {
@@ -257,12 +263,7 @@ export default [
       },
       {
         internalType: 'string',
-        name: 'brandName',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'brandProfileUrl',
+        name: 'infoDID',
         type: 'string',
       },
     ],
@@ -394,16 +395,11 @@ export default [
     inputs: [
       {
         internalType: 'string',
-        name: 'brandName',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'brandProfileUrl',
+        name: 'infoDID',
         type: 'string',
       },
     ],
-    name: 'updateSupplier',
+    name: 'setSupplierInfoDID',
     outputs: [
       {
         internalType: 'bool',
