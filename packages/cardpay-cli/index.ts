@@ -135,7 +135,7 @@ const {
     }
   )
   .command(
-    'set-supplier-info-did [safeAddress] [infoDID]',
+    'set-supplier-info-did [safeAddress] [infoDID] [token]',
     'Allows a supplier to customize their appearance within the cardpay ecosystem by letting them set an info DID, that when used with a DID resolver can retrieve supplier info, such as their name, logo, URL, etc.',
     (yargs) => {
       yargs.positional('safeAddress', {
@@ -146,6 +146,11 @@ const {
       yargs.positional('infoDID', {
         type: 'string',
         description: "The DID string that can be resolved to a DID document representing the supplier's information",
+      });
+      yargs.positional('token', {
+        type: 'string',
+        description:
+          'The token address that you want to use to pay for gas for this transaction. This should be an address of a token in the depot safe.',
       });
       command = 'setSupplierInfoDID';
     }
@@ -297,7 +302,7 @@ const {
   )
   .command(
     'hub-auth [hubRootUrl]',
-    'Get an authentication token that can be used to make API requests to a Carstack Hub server',
+    'Get an authentication token that can be used to make API requests to a Cardstack Hub server',
     (yargs) => {
       yargs.positional('hubRootUrl', {
         type: 'string',
@@ -337,15 +342,15 @@ if (!command) {
   switch (command) {
     case 'bridge':
       if (amount == null) {
-        yargs.showHelp('amount is a required value');
-        process.exit(1);
+        showHelpAndExit('amount is a required value');
+        return;
       }
       await bridge(network, mnemonic, amount, receiver, tokenAddress);
       break;
     case 'awaitBridged':
       if (fromBlock == null) {
-        yargs.showHelp('fromBlock is a required value');
-        process.exit(1);
+        showHelpAndExit('fromBlock is a required value');
+        return;
       }
       await awaitBridged(network, mnemonic, fromBlock, recipient);
       break;
@@ -354,64 +359,64 @@ if (!command) {
       break;
     case 'safeTransferTokens':
       if (safeAddress == null || recipient == null || token == null || amount == null) {
-        yargs.showHelp('safeAddress, token, recipient, and amount are required values');
-        process.exit(1);
+        showHelpAndExit('safeAddress, token, recipient, and amount are required values');
+        return;
       }
       await transferTokens(network, mnemonic, safeAddress, token, recipient, amount);
       break;
     case 'setSupplierInfoDID':
       if (safeAddress == null || token == null || infoDID == null) {
-        yargs.showHelp('safeAddress, token, and infoDID are required values');
-        process.exit(1);
+        showHelpAndExit('safeAddress, token, and infoDID are required values');
+        return;
       }
       await setSupplierInfoDID(network, mnemonic, safeAddress, infoDID, token);
       break;
     case 'prepaidCardCreate':
       if (tokenAddress == null || safeAddress == null || faceValues == null) {
-        yargs.showHelp('tokenAddress, safeAddress, and amounts are required values');
-        process.exit(1);
+        showHelpAndExit('tokenAddress, safeAddress, and amounts are required values');
+        return;
       }
       await createPrepaidCard(network, mnemonic, safeAddress, faceValues, tokenAddress, customizationDID || undefined);
       break;
     case 'registerMerchant':
       if (prepaidCard == null) {
-        yargs.showHelp('prepaidCard is a required value');
-        process.exit(1);
+        showHelpAndExit('prepaidCard is a required value');
+        return;
       }
       await registerMerchant(network, mnemonic, prepaidCard, infoDID || undefined);
       break;
     case 'payMerchant':
       if (merchantSafe == null || prepaidCard == null || amount == null) {
-        yargs.showHelp('merchantSafe, prepaidCard, and amount are required values');
-        process.exit(1);
+        showHelpAndExit('merchantSafe, prepaidCard, and amount are required values');
+        return;
       }
       await payMerchant(network, mnemonic, merchantSafe, prepaidCard, amount);
       break;
     case 'revenueBalances':
       if (merchantSafe == null) {
-        yargs.showHelp('merchantSafe is a required value');
-        process.exit(1);
+        showHelpAndExit('merchantSafe is a required value');
+        return;
       }
       await revenueBalances(network, mnemonic, merchantSafe);
       break;
     case 'usdPrice':
       if (token == null || amount == null) {
-        yargs.showHelp('token and amount are required values');
-        process.exit(1);
+        showHelpAndExit('token and amount are required values');
+        return;
       }
       await usdPrice(network, mnemonic, token, amount);
       break;
     case 'ethPrice':
       if (token == null || amount == null) {
-        yargs.showHelp('token and amount are required values');
-        process.exit(1);
+        showHelpAndExit('token and amount are required values');
+        return;
       }
       await ethPrice(network, mnemonic, token, amount);
       break;
     case 'priceOracleUpdatedAt':
       if (token == null) {
-        yargs.showHelp('tokenAddress is a required value');
-        process.exit(1);
+        showHelpAndExit('tokenAddress is a required value');
+        return;
       }
       await priceOracleUpdatedAt(network, mnemonic, token);
       break;
@@ -420,22 +425,22 @@ if (!command) {
       break;
     case 'priceForFaceValue':
       if (tokenAddress == null || spendFaceValue == null) {
-        yargs.showHelp('tokenAddress and spendFaceValue are required values');
-        process.exit(1);
+        showHelpAndExit('tokenAddress and spendFaceValue are required values');
+        return;
       }
       await priceForFaceValue(network, mnemonic, tokenAddress, spendFaceValue);
       break;
     case 'gasFee':
       if (tokenAddress == null) {
-        yargs.showHelp('token is a required value');
-        process.exit(1);
+        showHelpAndExit('token is a required value');
+        return;
       }
       await gasFee(network, mnemonic, tokenAddress);
       break;
     case 'hubAuth':
       if (hubRootUrl == null) {
-        yargs.showHelp('hubRootUrl is a required value');
-        process.exit(1);
+        showHelpAndExit('hubRootUrl is a required value');
+        return;
       }
       await hubAuth(hubRootUrl, network, mnemonic);
       break;
@@ -444,9 +449,15 @@ if (!command) {
   }
   process.exit(0);
 })().catch((e) => {
-  console.error(`Error: ${e}`);
+  console.error(e);
   process.exit(1);
 });
+
+function showHelpAndExit(msg: string): void {
+  yargs.showHelp();
+  console.log(`\nERROR: ${msg}`);
+  process.exit(1);
+}
 
 function assertNever(_value: never): never {
   throw new Error(`not never`);

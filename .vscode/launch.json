@@ -67,6 +67,23 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay: Set Supplier Info DID",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "set-supplier-info-did",
+        "0xeAA4965f22D66aAd04FAC81212155442F3e5326a", // Hassan's depot
+        "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49",
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // gas token DAI.CPXD
+        "--network", "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay: View Safes",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
@@ -89,10 +106,10 @@
       "env": {},
       "args": [
         "safe-transfer-tokens",
-        "0x367F15f878DD75ec155010318F97E5dA2b3102c4", // Hassan's depot safe feel free to use your own
+        "0x367F15f878DD75ec155010318F97E5dA2b3102c4", // source safe address
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
-        "0xED3d83fa8706BB1e6795C72431907c409831211B", // arbitrary prepaid card
-        "9",
+        "0xeAA4965f22D66aAd04FAC81212155442F3e5326a", // destination addrress
+        "40.5", // amount (in ether units)
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
@@ -107,8 +124,9 @@
       "env": {},
       "args": [
         "prepaidcard-create",
-        "0x367F15f878DD75ec155010318F97E5dA2b3102c4", // Hassan's depot safe feel free to use your own
+        "0xeAA4965f22D66aAd04FAC81212155442F3e5326a", // Hassan's depot safe feel free to use your own
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49",
         "500",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
@@ -124,7 +142,8 @@
       "env": {},
       "args": [
         "register-merchant",
-        "0xED3d83fa8706BB1e6795C72431907c409831211B", // Hassan's prepaid card --feel free to use your own
+        "0xEC017db25fe89b55e32228240f04B26a332bF315", // Hassan's prepaid card --feel free to use your own
+        "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
@@ -139,8 +158,8 @@
       "env": {},
       "args": [
         "pay-merchant",
-        "0x0dAEeaA725b65aDf2f253541f59Af718f3859f00", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0xE797a6FcF8546b1EE806F55c1C9f6776Af5ad3B1", // Hassan's prepaid card --feel free to use your own
+        "0xD816073771BEb353C527A980a0FF2d768DC4491C", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "0xc2c602626f72956aE56eE4D90E180a2D8480DdeC", // Hassan's prepaid card --feel free to use your own
         "100",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
