@@ -1,0 +1,58 @@
+name: CI [web-client]
+
+on:
+  push:
+    branches:
+      - main
+      - restructure/monorepo
+  pull_request:
+    branches:
+      - main
+      - restructure/monorepo
+
+jobs:
+  test:
+    name: Build & Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: |
+          yarn global add lerna
+          yarn --prefer-offline
+          yarn lint
+          yarn run test
+
+#  deploy-web-client-staging:
+#    name: Deploy web-client to S3 staging bucket
+#    runs-on: ubuntu-latest
+#    if: github.ref == 'refs/heads/main'
+#    needs: [test]
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          fetch-depth: 1
+#      - uses: volta-cli/action@v1
+#      - name: Set up yarn cache
+#        uses: actions/cache@v2
+#        with:
+#          path: ~/.cache/yarn
+#          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+#          restore-keys: |
+#            ${{ runner.os }}-yarn-
+#      - run: yarn global add lerna
+#      - run: yarn --prefer-offline
+#      - name: Run ember-cli-deploy
+#        run: yarn deploy:web-client:staging
+#        env:
+#          EMBER_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}
+#          EMBER_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
