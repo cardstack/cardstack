@@ -19,6 +19,7 @@ import { Contract } from 'web3-eth-contract';
 import { BridgeableSymbol, NetworkSymbol, TokenContractInfo } from '../token';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { getConstantByNetwork, getSDK } from '@cardstack/cardpay-sdk';
+import { networkIds } from '@cardstack/cardpay-sdk';
 
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -42,13 +43,9 @@ export default abstract class Layer1ChainWeb3Strategy
   @tracked cardBalance: BN | undefined;
   @tracked walletInfo: WalletInfo;
 
-  constructor(
-    chainId: number,
-    networkSymbol: NetworkSymbol,
-    chainName: string
-  ) {
+  constructor(networkSymbol: NetworkSymbol, chainName: string) {
     this.chainName = chainName;
-    this.chainId = chainId;
+    this.chainId = networkIds[networkSymbol];
     this.walletInfo = new WalletInfo([], this.chainId);
     this.networkSymbol = networkSymbol;
     let cardTokenContractInfo = this.getTokenContractInfo(
