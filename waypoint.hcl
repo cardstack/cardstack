@@ -30,5 +30,9 @@ app "hub" {
                 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/hub-staging/c6e5a0b971186e25/593e42aff49acf49"
             }
         }
+        hook {
+            when    = "after"
+            command = ["./packages/hub/bin/fix-listener.sh"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+        }
     }
 }
