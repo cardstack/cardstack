@@ -1,20 +1,17 @@
-const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
-import CustomStorageWalletConnect from '../wc-connector';
-import WalletConnectProvider from '@walletconnect/web3-provider';
-import Web3 from 'web3';
-import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
-import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
-import {
-  ConvertibleSymbol,
-  ConversionFunction,
-  NetworkSymbol,
-} from '@cardstack/web-client/utils/token';
-import { IConnector } from '@walletconnect/types';
-import WalletInfo from '../wallet-info';
+import { reads } from 'macro-decorators';
 import { defer, hash } from 'rsvp';
 import BN from 'bn.js';
+import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
+import { IConnector } from '@walletconnect/types';
+import WalletConnectProvider from '@walletconnect/web3-provider';
+
+import { SimpleEmitter, UnbindEventListener } from '../events';
+import { ConvertibleSymbol, ConversionFunction, NetworkSymbol } from '../token';
+import WalletInfo from '../wallet-info';
+import CustomStorageWalletConnect from '../wc-connector';
+import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
 import {
   networkIds,
   getConstantByNetwork,
@@ -22,9 +19,11 @@ import {
   IExchangeRate,
   getSDK,
 } from '@cardstack/cardpay-sdk';
-import { SimpleEmitter, UnbindEventListener } from '../events';
 
-export default class Layer2ChainWeb3Strategy implements Layer2Web3Strategy {
+const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
+
+export default abstract class Layer2ChainWeb3Strategy
+  implements Layer2Web3Strategy {
   chainName: string;
   chainId: number;
   networkSymbol: NetworkSymbol;

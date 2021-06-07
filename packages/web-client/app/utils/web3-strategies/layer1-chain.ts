@@ -1,25 +1,26 @@
-import config from '../../config/environment';
-import CustomStorageWalletConnect from '../wc-connector';
+import { tracked } from '@glimmer/tracking';
+import { defer } from 'rsvp';
+import { registerDestructor } from '@ember/destroyable';
+import BN from 'bn.js';
+import Web3 from 'web3';
+import { TransactionReceipt } from 'web3-core';
+import { Contract } from 'web3-eth-contract';
+import detectEthereumProvider from '@metamask/detect-provider';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
-import { tracked } from '@glimmer/tracking';
-import { WalletProvider } from '../wallet-providers';
-import { Layer1Web3Strategy, TransactionHash } from './types';
-import { registerDestructor } from '@ember/destroyable';
-import WalletInfo from '../wallet-info';
-import { defer } from 'rsvp';
-import BN from 'bn.js';
-import { TransactionReceipt } from 'web3-core';
-import {
-  SimpleEmitter,
-  UnbindEventListener,
-} from '@cardstack/web-client/utils/events';
-import Web3 from 'web3';
-import { Contract } from 'web3-eth-contract';
+
+import config from '../../config/environment';
+import { SimpleEmitter, UnbindEventListener } from '../events';
 import { BridgeableSymbol, NetworkSymbol, TokenContractInfo } from '../token';
-import detectEthereumProvider from '@metamask/detect-provider';
-import { getConstantByNetwork, getSDK } from '@cardstack/cardpay-sdk';
-import { networkIds } from '@cardstack/cardpay-sdk';
+import WalletInfo from '../wallet-info';
+import { WalletProvider } from '../wallet-providers';
+import CustomStorageWalletConnect from '../wc-connector';
+import { Layer1Web3Strategy, TransactionHash } from './types';
+import {
+  getConstantByNetwork,
+  getSDK,
+  networkIds,
+} from '@cardstack/cardpay-sdk';
 
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
