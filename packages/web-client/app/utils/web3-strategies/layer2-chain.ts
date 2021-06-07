@@ -198,7 +198,7 @@ export default class Layer2ChainWeb3Strategy implements Layer2Web3Strategy {
     let safesApi = await getSDK('Safes', this.web3);
     let safes = await safesApi.view(owner);
     let depotSafes = safes.filter(
-      (safe: { type: string }) => safe.type === 'depot' // FIXME is this inferred type declaration correct?
+      (safe) => safe.type === 'depot'
     ) as DepotSafe[];
     if (depotSafes.length) {
       return depotSafes[depotSafes.length - 1];
