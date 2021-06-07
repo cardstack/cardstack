@@ -250,7 +250,7 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: 'tokenAddress',
+        name: 'token',
         type: 'address',
       },
       {
@@ -276,7 +276,7 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: 'payableTokenAddr',
+        name: 'token',
         type: 'address',
       },
       {
@@ -302,7 +302,38 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: 'payableTokenAddr',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'usdRate',
+        type: 'uint256',
+      },
+    ],
+    name: 'convertFromSpendWithRate',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'token',
         type: 'address',
       },
       {
@@ -341,6 +372,21 @@ export default [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'exchangeRateDecimals',
+    outputs: [
+      {
+        internalType: 'uint8',
+        name: '',
+        type: 'uint8',
+      },
+    ],
+    payable: false,
+    stateMutability: 'pure',
     type: 'function',
   },
   {
@@ -655,6 +701,21 @@ export default [
     type: 'function',
   },
   {
+    constant: true,
+    inputs: [],
+    name: 'rateDriftPercentage',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     constant: false,
     inputs: [
       {
@@ -799,6 +860,11 @@ export default [
         name: '_merchantRegistrationFeeInSPEND',
         type: 'uint256',
       },
+      {
+        internalType: 'uint256',
+        name: '_rateDriftPercentage',
+        type: 'uint256',
+      },
     ],
     name: 'setup',
     outputs: [],
@@ -894,7 +960,7 @@ export default [
       },
       {
         internalType: 'address',
-        name: 'payableToken',
+        name: 'token',
         type: 'address',
       },
     ],
@@ -904,6 +970,32 @@ export default [
         internalType: 'uint256',
         name: '',
         type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'requestedRate',
+        type: 'uint256',
+      },
+    ],
+    name: 'isAllowableRate',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
       },
     ],
     payable: false,

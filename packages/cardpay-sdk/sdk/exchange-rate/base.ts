@@ -1,8 +1,8 @@
 import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
-import PriceOracleABI from '../../contracts/abi/v0.5.0/price-oracle';
-import RevenuePoolABI from '../../contracts/abi/v0.5.0/revenue-pool';
+import PriceOracleABI from '../../contracts/abi/v0.5.2/price-oracle';
+import RevenuePoolABI from '../../contracts/abi/v0.5.2/revenue-pool';
 import { getOracle, getAddress } from '../../contracts/addresses';
 import BN from 'bn.js';
 
@@ -48,6 +48,13 @@ export default class ExchangeRate {
     let oracleDecimals = Number(await oracle.methods.decimals().call());
     let rawAmount = usdRawRate.mul(new BN(amount)).div(ten.pow(tokenDecimals));
     return safeFloatConvert(rawAmount, oracleDecimals);
+  }
+
+  // This returns the USD price as a decimal 8 string
+  async getCurrentUSDRate(token: string): Promise<string> {
+    let oracle = await this.getOracleContract(token);
+    let usdRawRate = new BN((await oracle.methods.usdPrice().call()).price);
+    return usdRawRate.toString();
   }
 
   async getETHPrice(token: string, amount: string): Promise<string> {

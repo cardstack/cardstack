@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
-import RevenuePoolABI from '../../contracts/abi/v0.5.0/revenue-pool';
+import RevenuePoolABI from '../../contracts/abi/v0.5.2/revenue-pool';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { getAddress } from '../../contracts/addresses.js';
 import { ZERO_ADDRESS } from '../constants.js';
@@ -67,13 +67,14 @@ export default class RevenuePool {
     prepaidCardAddress: string,
     infoDID?: string,
     options?: ContractOptions
-  ): Promise<{ merchantSafe: string; gnosisTxn: RegisterMerchantTx }> {
+  ): Promise<{ merchantSafe: string; gnosisTxn: RegisterMerchantTx } | undefined> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let prepaidCard = await getSDK('PrepaidCard', this.layer2Web3);
     let issuingToken = await prepaidCard.issuingToken(prepaidCardAddress);
-    let weiAmount = await prepaidCard.convertFromSpendForPrepaidCard(
+    let registrationFee = await this.merchantRegistrationFee();
+    await prepaidCard.convertFromSpendForPrepaidCard(
       prepaidCardAddress,
-      await this.merchantRegistrationFee(),
+      registrationFee,
       (issuingToken, balanceAmount, requiredTokenAmount) =>
         new Error(
           `Prepaid card does not have enough balance to register a merchant. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
@@ -82,44 +83,61 @@ export default class RevenuePool {
         )
     );
 
-    let payload = await getPayMerchantPayload(
-      this.layer2Web3,
-      prepaidCardAddress,
-      ZERO_ADDRESS,
-      issuingToken,
-      weiAmount,
-      infoDID
-    );
-    if (payload.lastUsedNonce == null) {
-      payload.lastUsedNonce = -1;
-    }
-    let signature = await sign(
-      this.layer2Web3,
-      issuingToken,
-      0,
-      payload.data,
-      0,
-      payload.safeTxGas,
-      payload.dataGas,
-      payload.gasPrice,
-      payload.gasToken,
-      payload.refundReceiver,
-      toBN(payload.lastUsedNonce + 1),
-      from,
-      prepaidCardAddress
-    );
-    let gnosisTxn = await executePayMerchant(
-      this.layer2Web3,
-      prepaidCardAddress,
-      issuingToken,
-      ZERO_ADDRESS,
-      weiAmount,
-      signature,
-      toBN(payload.lastUsedNonce + 1).toString(),
-      infoDID
-    );
-    let merchantSafe = await this.getMerchantSafeFromTxn(gnosisTxn.ethereumTx.txHash);
-    return { merchantSafe, gnosisTxn };
+    let rateChanged = false;
+    do {
+      let exchangeRateAPI = await getSDK('ExchangeRate', this.layer2Web3);
+      let rateLock = await exchangeRateAPI.getCurrentUSDRate(issuingToken);
+      try {
+        let payload = await getPayMerchantPayload(
+          this.layer2Web3,
+          prepaidCardAddress,
+          ZERO_ADDRESS,
+          issuingToken,
+          registrationFee,
+          rateLock,
+          infoDID
+        );
+        if (payload.lastUsedNonce == null) {
+          payload.lastUsedNonce = -1;
+        }
+        let signature = await sign(
+          this.layer2Web3,
+          issuingToken,
+          0,
+          payload.data,
+          0,
+          payload.safeTxGas,
+          payload.dataGas,
+          payload.gasPrice,
+          payload.gasToken,
+          payload.refundReceiver,
+          toBN(payload.lastUsedNonce + 1),
+          from,
+          prepaidCardAddress
+        );
+        let gnosisTxn = await executePayMerchant(
+          this.layer2Web3,
+          prepaidCardAddress,
+          issuingToken,
+          ZERO_ADDRESS,
+          registrationFee,
+          rateLock,
+          signature,
+          toBN(payload.lastUsedNonce + 1).toString(),
+          infoDID
+        );
+        let merchantSafe = await this.getMerchantSafeFromTxn(gnosisTxn.ethereumTx.txHash);
+        return { merchantSafe, gnosisTxn };
+      } catch (e) {
+        // The rate updates about once an hour, so if this is triggered, it should only be once
+        if (e.message.includes('rate is beyond the allowable bounds')) {
+          rateChanged = true;
+        } else {
+          throw e;
+        }
+      }
+    } while (rateChanged);
+    return;
   }
 
   private async getRevenuePool(): Promise<Contract> {

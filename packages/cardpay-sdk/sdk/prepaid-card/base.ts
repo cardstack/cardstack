@@ -5,7 +5,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677.js';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.5.0/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.5.2/prepaid-card-manager';
 import { getAddress } from '../../contracts/addresses.js';
 import { getConstant, ZERO_ADDRESS } from '../constants.js';
 import { getSDK } from '../version-resolver';
@@ -49,14 +49,14 @@ export default class PrepaidCard {
     prepaidCardAddress: string,
     spendAmount: number,
     options?: ContractOptions
-  ): Promise<PayMerchantTx> {
+  ): Promise<PayMerchantTx | undefined> {
     if (spendAmount < 50) {
       // this is hard coded in the PrepaidCardManager contract
       throw new Error(`The amount to pay merchant §${spendAmount} SPEND is below the minimum allowable amount`);
     }
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let issuingToken = await this.issuingToken(prepaidCardAddress);
-    let weiAmount = await this.convertFromSpendForPrepaidCard(
+    await this.convertFromSpendForPrepaidCard(
       prepaidCardAddress,
       spendAmount,
       (issuingToken, balanceAmount, requiredTokenAmount) =>
@@ -66,41 +66,58 @@ export default class PrepaidCard {
           )}, payment amount in issuing token is ${fromWei(requiredTokenAmount)}`
         )
     );
-    let payload = await getPayMerchantPayload(
-      this.layer2Web3,
-      prepaidCardAddress,
-      merchantSafe,
-      issuingToken,
-      weiAmount
-    );
-    if (payload.lastUsedNonce == null) {
-      payload.lastUsedNonce = -1;
-    }
-    let signatures = await sign(
-      this.layer2Web3,
-      issuingToken,
-      0,
-      payload.data,
-      0,
-      payload.safeTxGas,
-      payload.dataGas,
-      payload.gasPrice,
-      payload.gasToken,
-      payload.refundReceiver,
-      toBN(payload.lastUsedNonce + 1),
-      from,
-      prepaidCardAddress
-    );
-    let result = await executePayMerchant(
-      this.layer2Web3,
-      prepaidCardAddress,
-      issuingToken,
-      merchantSafe,
-      weiAmount,
-      signatures,
-      toBN(payload.lastUsedNonce + 1).toString()
-    );
-    return result;
+
+    let rateChanged = false;
+    do {
+      let exchangeRateAPI = await getSDK('ExchangeRate', this.layer2Web3);
+      let rateLock = await exchangeRateAPI.getCurrentUSDRate(issuingToken);
+      try {
+        let payload = await getPayMerchantPayload(
+          this.layer2Web3,
+          prepaidCardAddress,
+          merchantSafe,
+          issuingToken,
+          spendAmount,
+          rateLock
+        );
+        if (payload.lastUsedNonce == null) {
+          payload.lastUsedNonce = -1;
+        }
+        let signatures = await sign(
+          this.layer2Web3,
+          issuingToken,
+          0,
+          payload.data,
+          0,
+          payload.safeTxGas,
+          payload.dataGas,
+          payload.gasPrice,
+          payload.gasToken,
+          payload.refundReceiver,
+          toBN(payload.lastUsedNonce + 1),
+          from,
+          prepaidCardAddress
+        );
+        return await executePayMerchant(
+          this.layer2Web3,
+          prepaidCardAddress,
+          issuingToken,
+          merchantSafe,
+          spendAmount,
+          rateLock,
+          signatures,
+          toBN(payload.lastUsedNonce + 1).toString()
+        );
+      } catch (e) {
+        // The rate updates about once an hour, so if this is triggered, it should only be once
+        if (e.message.includes('rate is beyond the allowable bounds')) {
+          rateChanged = true;
+        } else {
+          throw e;
+        }
+      }
+    } while (rateChanged);
+    return; // should never get here
   }
 
   async create(

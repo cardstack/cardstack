@@ -705,7 +705,7 @@ export default [
         type: 'bytes',
       },
     ],
-    name: 'sellCard',
+    name: 'transferCard',
     outputs: [
       {
         internalType: 'bool',
@@ -731,7 +731,7 @@ export default [
         type: 'address',
       },
     ],
-    name: 'getSellCardData',
+    name: 'getTransferCardData',
     outputs: [
       {
         internalType: 'bytes',
@@ -753,7 +753,7 @@ export default [
       },
       {
         internalType: 'address',
-        name: 'payableTokenAddr',
+        name: 'token',
         type: 'address',
       },
       {
@@ -763,7 +763,12 @@ export default [
       },
       {
         internalType: 'uint256',
-        name: 'amount',
+        name: 'spendAmount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'rateLock',
         type: 'uint256',
       },
       {
@@ -777,7 +782,7 @@ export default [
         type: 'bytes',
       },
     ],
-    name: 'payForMerchant',
+    name: 'payMerchant',
     outputs: [
       {
         internalType: 'bool',
@@ -804,7 +809,12 @@ export default [
       },
       {
         internalType: 'uint256',
-        name: 'amount',
+        name: 'spendAmount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'rateLock',
         type: 'uint256',
       },
       {
@@ -813,7 +823,7 @@ export default [
         type: 'string',
       },
     ],
-    name: 'getPayData',
+    name: 'getPayMerchantData',
     outputs: [
       {
         internalType: 'bytes',
