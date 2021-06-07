@@ -1,0 +1,57 @@
+{{! template-lint-disable deprecated-inline-view-helper }}
+{{#if (eq @format "table")}}
+  <Card @format={{@format}} @model={{hash type="collection"}}>
+    <EmbeddedCollectionTable @model={{@collection}} @mode="view" @expandAction={{@expandAction}} />
+  </Card>
+
+{{else}}
+  {{#each @collection as |val i|}}
+    {{#if @comparisonMode}}
+      {{#let (find-by "id" val.id @addedCards) (find-by "id" val.id @changedCards) as |added changed|}}
+        {{#if (lt i this.displayCount)}}
+          <div>
+            {{component (or @cardComponent "card") model=val mode="view" status=(if added "added" (if changed "changed"))}}
+            {{#if changed}}
+              <Boxel>
+                <BoxelHighlight @status="deleted" />
+                <BoxelActions @status="deleted" />
+                <del class="field-renderer--deleted field-renderer--deleted-no-offset">{{changed.oldValue}}</del>
+              </Boxel>
+            {{/if}}
+          </div>
+        {{/if}}
+      {{/let}}
+
+      {{!-- Fix this --}}
+      {{#if (eq i (sub @collection.length 1))}}
+        {{#each @removedCards as |removed|}}
+          {{#if (and (lt i this.displayCount) (not-eq val.id removed.id) (eq val.type removed.type))}}
+            {{component (or @cardComponent "card") model=removed mode="view" status=(if removed "removed")}}
+          {{/if}}
+        {{/each}}
+      {{/if}}
+    {{else}}
+      {{#if (lt i this.displayCount)}}
+        {{component (or @cardComponent "card") model=val mode="view"}}
+      {{/if}}
+    {{/if}}
+
+    {{#if (and (gt @collection.length this.displayCount) (eq i (sub @collection.length 1)))}}
+      {{#unless this.expanded}}
+        <Boxel>
+          {{#if (and @addedCards.length (eq val.type @addedCards.0.type))}}
+            <BoxelHighlight @status="added" />
+            <BoxelActions @status="added" />
+          {{/if}}
+          <button {{on "click" this.viewAll}} class="field-renderer__view-all">View all ({{@collection.length}})</button>
+        </Boxel>
+      {{/unless}}
+    {{/if}}
+
+    {{#if (and this.expanded (eq i (sub @collection.length 1)))}}
+      <Boxel>
+        <button {{on "click" this.collapse}} class="field-renderer__view-all">Collapse</button>
+      </Boxel>
+    {{/if}}
+  {{/each}}
+{{/if}}

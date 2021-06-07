@@ -1,0 +1,47 @@
+<Freestyle::Usage @name="SelectionControlGroup">
+  <:example>
+    <Boxel::SelectionControlGroup
+      @toggleSelectAll={{this.toggleSelectAll}}
+      @mode={{this.mode}}
+      @selectedItemCount={{this.selectedItemCount}}
+      @isSelected={{this.isSelected}}
+      @menuComponent={{component "boxel/menu" items=(array
+        (menu-item "Delete" (noop))
+        (menu-item "Duplicate" (noop))
+      )}}
+    />
+  </:example>
+  <:api as |Args|>
+    <Args.Action
+      @name="toggleSelectAll"
+      @description="Invoked when user indicates she wants to toggle the select-all state"
+      @value={{this.toggleSelectAll}}
+    />
+    <Args.String
+      @name="mode"
+      @description="which card mode are we in"
+      @value={{this.mode}}
+      @onInput={{fn (mut this.mode)}}
+    />
+    <Args.Number
+      @name="selectedItemCount"
+      @description="(integer) — the number of items selected"
+      @value={{this.selectedItemCount}}
+      @defaultValue={{0}}
+      @min={{0}}
+      @max={{50}}
+      @onInput={{this.setSelectedItemCount}}
+    />
+    <Args.Bool
+      @name="isSelected"
+      @value={{this.isSelected}}
+      @description="fully selected state"
+      @defaultValue={{false}}
+      @onInput={{this.setIsSelected}}
+    />
+    <Args.Object
+      @name="menuComponent"
+      @description="(Component) component to show when more actions menu icon is clicked"
+    />
+  </:api>
+</Freestyle::Usage>

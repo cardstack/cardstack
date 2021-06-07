@@ -1,0 +1,17 @@
+<Freestyle::Usage @name="Loading Indicator" @description="Default loading indicator for Boxel components.">
+    <:example>
+      <Boxel::LoadingIndicator 
+        class="loading-indicator-usage__example" 
+        @color={{this.color}}
+      />
+    </:example>
+    <:api as |Args|>
+      <Args.String
+        @name="color"
+        @description="The color of the loading indicator"
+        @value={{this.color}}
+        @onInput={{fn (mut this.color)}}
+        @default="black"
+      />
+    </:api>
+</Freestyle::Usage>

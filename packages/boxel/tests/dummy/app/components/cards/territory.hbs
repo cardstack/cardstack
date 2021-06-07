@@ -1,0 +1,32 @@
+<Boxel>
+  {{#if @status}}
+    <BoxelHighlight @status={{@status}} />
+    <BoxelActions @status={{@status}} @class="{{if @comparisonType "boxel-actions--comparison-mode"}}">
+      {{#if @comparisonType}}
+        <ComparisonModeLabel @status={{@status}} @modifiedCount={{@fieldData.modifiedCount}} @statusText={{@statusText}} @comparisonType={{@comparisonType}} />
+      {{/if}}
+    </BoxelActions>
+  {{/if}}
+
+  <div class={{if (and @status (not-eq @status "no-change")) "territory__wrapper"}}>
+    <Card @class="territory-card territory-card--{{@model.id}}" @model={{@model}} @mode="view" />
+    <ul class="territory__publishers-list">
+      {{#each @model.value as |item|}}
+        <Card
+          @mode="view"
+          @model={{hash
+            id=item.id
+            type=item.type
+            title=item.title
+            imgURL=item.logoURL
+            fields=(array
+              (hash title="cae/ipi #" value=item.ipi)
+              (hash title="website" value=item.website)
+              (hash title="main office" value=item.main_office)
+            )
+          }}
+        />
+      {{/each}}
+    </ul>
+  </div>
+</Boxel>

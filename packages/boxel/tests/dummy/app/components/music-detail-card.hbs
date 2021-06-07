@@ -1,0 +1,41 @@
+<DetailCard
+  @class={{@class}}
+  @detailSections={{this.detailSections}}
+  @mode={{@mode}}
+  @comparisonMode={{@comparisonMode}}
+  @addedFields={{@addedFields}}
+  @addedValues={{@addedValues}}
+  @changedFields={{@changedFields}}
+  @removedFields={{@removedFields}}
+  @removedValues={{@removedValues}}
+  @addedCards={{@addedCards}}
+  @removedCards={{@removedCards}}
+  @changedCards={{@changedCards}}
+  @modifiedCard={{@modifiedCard}}
+>
+  {{#if @displayFullHeader}}
+    <header class="item__header" style={{css-url "background-image" @model.cover_art_large}}>
+      <div class="item__label">Master Detail</div>
+      <div class="item__header-content">
+        <div class="item__img" style={{css-url "background-image" @model.cover_art_medium}}>
+          <PlayButton @class="item__play-btn" @width="60px" @height="60px" />
+        </div>
+        <h1 class="item__title">{{titleize @model.title}}</h1>
+        <h2 class="item__artist">{{@model.artist}}</h2>
+        <ul class="item__header-details">
+          {{#each this.headerDetailFields as |field|}}
+            <li>
+              <Boxel::FieldRenderer
+                @class="item-header-field"
+                @mode={{@mode}}
+                @field={{field}}
+              />
+            </li>
+          {{/each}}
+        </ul>
+      </div>
+    </header>
+  {{/if}}
+
+  {{yield}}
+</DetailCard>

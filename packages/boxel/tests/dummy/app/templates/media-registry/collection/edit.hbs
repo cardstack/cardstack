@@ -1,0 +1,13 @@
+<Boxel::Modal @isOpen={{true}} @onClose={{this.transitionToView}} class="collection-edit-modal">
+  <IsolatedCollection
+    @mode="edit"
+    @model={{@model}}
+    @format="table"
+    @expandAction={{this.transitionToIsolate}}
+    @transitionToEdit={{this.transitionToEdit}}
+    @transitionToView={{this.transitionToView}}
+    @sort={{this.sort}}
+    @search={{this.search}}
+    @removeItem={{this.removeItem}}
+  />
+</Boxel::Modal>

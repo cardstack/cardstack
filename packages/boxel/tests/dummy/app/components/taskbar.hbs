@@ -1,0 +1,15 @@
+{{#if (and @activeTasks @tasksRoute)}}
+  <LinkTo @route={{@tasksRoute}} class="cardflow__taskbar">
+    <div class="cardflow__taskbar-count">{{@activeTasks.length}} {{#if (eq @activeTasks.length 1)}}task{{else}}tasks{{/if}} for this workflow</div>
+    {{#if @userTasks}}
+      <div class="cardflow__taskbar-label">
+        {{@userTasks.length}} assigned to me
+      </div>
+    {{/if}}
+    {{#if @assignedTasks}}
+      <div class="cardflow__taskbar-label cardflow__taskbar-label--assigned">
+        {{@assignedTasks.length}} pending action
+      </div>
+    {{/if}}
+  </LinkTo>
+{{/if}}

@@ -1,0 +1,135 @@
+<section class="versions">
+  <div class="versions-grid {{if this.isCompView "versions-grid--comp-view"}}">
+    <header class="versions__header" aria-label="Version history">
+      <h1 class="versions__title">Master Recording - {{@model.title}}</h1>
+      {{#if this.isCompView}}
+        <div class="versions__view">
+          <div class="versions__view-selector">
+            <div class="versions__view-selector--mode-link {{if (eq this.view "show-all") "active"}}">
+              Show all
+            </div>
+            <div class="versions__view-selector--mode-link {{if (eq this.view "changes-only") "active"}}">
+              Changes only
+            </div>
+          </div>
+        </div>
+      {{/if}}
+    </header>
+    <div class="versions__mode">
+      <Boxel::ModeIndicator
+        {{on "click" this.returnToItem}}
+        @mode="revision"
+        class="mode-indicator mode-indicator--revision"
+      />
+    </div>
+
+    <aside class="versions__nav">
+      <div class="versions__nav--shadow" />
+      <ul>
+        {{#each this.versions as |v|}}
+          <li class="versions-nav-item {{if (eq v.id this.selected) "versions-nav-item--selected"}} {{if (eq this.baseCard v.id) "is-base-card"}} {{if (eq this.comparisonCard v.id) "is-comp-card"}} {{if (and this.baseCard this.comparisonCard) "versions-nav-item--comp-view"}}">
+            <button {{on "click" (fn this.displayVersion v.id)}} class="versions-nav-item__btn versions-nav-item__selection-btn">
+              <div class="version__description">{{v.description}}</div>
+              <div class="version__title">{{dayjs-format v.published "MMM D, h:mm A"}}</div>
+              <div class="version__label">{{if (eq v.id this.latest.id) "Current"}}</div>
+            </button>
+            <button {{on "click" (fn this.setComparison v.id)}} class="versions-nav-item__btn versions-nav-item__hover-btn checkbox">
+              {{svg-jar "icon-circle-selected" width="16px" height="16px"}}
+            </button>
+            <button class="versions-nav-item__btn versions-nav-item__hover-btn more">
+              {{svg-jar "more-vertical" width="16px" height="16px"}}
+            </button>
+          </li>
+        {{/each}}
+      </ul>
+    </aside>
+
+    {{#if this.isCompView}}
+      <div class="versions__cards {{if this.isCompView "comp-view"}}" {{did-insert this.setPositions}}>
+        {{#let this.compCardContent as |c|}}
+          <div class="version-card version-card--comp-card">
+            <header class="version-card__header" aria-label="Comparison card">
+              <div class="version__title">{{dayjs-format c.published "MMM D, h:mm A"}}</div>
+              <div class="version__description">{{c.description}}</div>
+              <div class="version__label">{{if (eq c.id this.latest.id) "Current"}}</div>
+            </header>
+          </div>
+          {{svg-jar "connect" class="version-card--comp-card__arrow" width="14px" height="14px"}}
+        {{/let}}
+        {{#let this.baseCardContent as |v|}}
+          <div class="version-card version-card--base-card {{if (eq v.id this.latest.id) "current"}}">
+            <header class="version-card__header" aria-label="Selected card">
+              <div class="version__title">{{dayjs-format v.published "MMM D, h:mm A"}}</div>
+              <div class="version__description">{{v.description}}</div>
+              <div class="version__label">{{if (eq v.id this.latest.id) "Current"}}</div>
+            </header>
+            <div class="version-card__content">
+              <MusicDetailCard
+                @class="version-card__detail-card"
+                @mode="view"
+                @model={{v.card_model}}
+                @itemId={{v.record_id}}
+                @noTemplate={{true}}
+                @fields={{v.card_model.fields}}
+                @displayFullHeader={{true}}
+                @comparisonMode={{true}}
+                @addedFields={{this.addedFields}}
+                @addedValues={{this.addedValues}}
+                @changedFields={{this.changedFields}}
+                @removedFields={{this.removedFields}}
+                @removedValues={{this.removedValues}}
+                @addedCards={{this.addedCards}}
+                @removedCards={{this.removedCards}}
+                @changedCards={{this.changedCards}}
+                @modifiedCard={{this.modifiedCard}}
+              />
+            </div>
+          </div>
+        {{/let}}
+      </div>
+    {{else}}
+      <AnimatedContainer class="versions__cards" {{did-insert this.setPositions}}>
+        {{#animated-each this.versions watch="position" key="version" use=this.transition as |v|}}
+          <div class="version-card version-card--{{v.position}} {{if (eq v.id this.latest.id) "current"}} {{if (eq v.id (sub this.latest.id 1)) "current-1"}} {{if (eq v.id (sub this.latest.id 2)) "current-2"}}">
+            <header class="version-card__header" aria-label="Version">
+              <div class="version__title">{{dayjs-format v.published "MMM D, h:mm A"}}</div>
+              <div class="version__description">{{v.description}}</div>
+              <div class="version__label">{{if (eq v.id this.latest.id) "Current"}}</div>
+              {{#animated-value v watch="position" key="version" use=this.adjustOpacity as |value|}}
+                <button {{on "click" (fn this.displayVersion value.id)}} class="version-card__btn-overlay overlay--{{value.position}} {{if (eq value.id this.latest.id) "overlay--current"}} {{if (eq value.id (sub this.latest.id 1)) "overlay--current-1"}} {{if (eq value.id (sub this.latest.id 2)) "overlay--current-2"}}" />
+              {{/animated-value}}
+            </header>
+            <div class="version-card__content version-card__content--{{v.position}}">
+              <div class="item__label">Master Detail</div>
+              <MusicDetailCard
+                @class="version-card__detail-card"
+                @mode="view"
+                @model={{v.card_model}}
+                @itemId={{v.record_id}}
+                @noTemplate={{true}}
+                @fields={{v.card_model.fields}}
+              >
+                <AnimatedContainer class="version-card--item__header" style={{css-url "background-image" v.card_model.cover_art_large}} {{!--blurhash-decoder v.blur_img 800 370--}}>
+                  {{#animated-value v watch="position" use=this.outerContent as |value|}}
+                    <div class="version-card--item__header-content {{if value.stackedFront "version-card--item__header-content--front" (concat "version-card--item__header-content--" value.position)}} {{unless value.card_model.cover_art_large "no-bg-image"}}">
+                      <AnimatedContainer>
+                        {{#animated-value value watch="position" use=this.innerContent as |val|}}
+                          <div class="version-card--item__img {{if val.stackedFront "version-card--item__img--front" (concat "version-card--item__img--" val.position)}}" style={{css-url "background-image" val.card_model.cover_art_medium}}>
+                          </div>
+                        {{/animated-value}}
+                      </AnimatedContainer>
+                      <div>
+                        <div class="version-card--item__title">{{value.card_model.title}}</div>
+                        <h2 class="version-card--item__artist">by {{value.card_model.artist}}</h2>
+                      </div>
+                    </div>
+                  {{/animated-value}}
+                </AnimatedContainer>
+              </MusicDetailCard>
+            </div>
+          </div>
+        {{/animated-each}}
+      </AnimatedContainer>
+    {{/if}}
+  </div>
+</section>

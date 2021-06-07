@@ -1,0 +1,136 @@
+.media-registry {
+  --media-registry-header-background-color: var(--boxel-dark);
+  --media-registry-header-text-color: var(--boxel-light);
+}
+
+.media-registry__header-container {
+  background-color: var(--media-registry-header-background-color);
+  color: var(--media-registry-header-text-color);
+}
+
+/* Left-edge and queue */
+.media-registry__left-edge {
+  position: fixed;
+  top: 0;
+  left: 0;
+  grid-row: 1 / -1;
+  grid-column: 1;
+  z-index: 15;
+  width: 80px;
+  height: 100%;
+  transition: width var(--boxel-transition);
+}
+
+.media-registry__left-edge.with-queue {
+  width: 410px;
+}
+
+.media-registry__left-edge > *:first-child {
+  z-index: 2;
+}
+
+.media-registry__left-edge-queue {
+  z-index: 1;
+  height: 100%;
+  transform: translateX(-420px);
+  transition: transform var(--boxel-transition);
+}
+
+.media-registry__queue {
+  transition: box-shadow var(--boxel-transition);
+}
+
+.media-registry__queue.with-box-shadow {
+  box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.media-registry__hover-zone {
+  position: absolute;
+  top: 35%;
+  width: 80px;
+  height: 55px;
+  z-index: 16;
+}
+
+.media-registry__hover-zone:hover {
+  cursor: pointer;
+}
+
+.media-registry__hover-zone--crd_records {
+  transform: translateY(55px);
+  height: 60px;
+}
+
+.media-registry__left-edge-queue:hover,
+.media-registry__hover-zone:hover ~ .media-registry__left-edge-queue,
+.media-registry__left-edge-queue.slide-in {
+  transform: translateX(0);
+}
+
+.media-registry__queue-btn {
+  position: absolute;
+  left: 370px;
+  top: 0;
+}
+
+/* Navbar */
+.media-registry__nav {
+  max-width: 450px;
+  padding-right: var(--boxel-sp);
+  padding-left: var(--boxel-sp);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.media-registry__nav ul {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0 10px;
+  padding: 0;
+}
+
+.media-registry__nav li > a {
+  padding: 0 20px 10px;
+  border-bottom: 4px solid transparent;
+  color: var(--boxel-light);
+  white-space: nowrap;
+}
+
+.media-registry__nav li > a.active:not(.unselected) {
+  font-weight: 700;
+  border-color: var(--boxel-light);
+}
+
+/* Search bar */
+.media-registry__search-bar {
+  grid-area: search;
+  align-self: center;
+  justify-self: end;
+  width: 240px;
+  height: 30px;
+  padding: 6px 15px;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-lg);
+  border-radius: 100px;
+  border: 1px solid white;
+}
+
+/* Body */
+.media-registry__outlet {
+  overflow: auto;
+}
+
+/* Dummy */
+.boxel-org-switcher-button__logo--bunny_records,
+.boxel-org-switcher-button__logo--crd_records {
+  background-size: 1.7rem 1.7rem;
+}
+
+.boxel-org-switcher-button__logo--realtunes-publishing {
+  --boxel-org-switcher-button-background-size: auto 3rem;
+}
+
+.media-registry__header--realtunes-publishing {
+  --boxel-org-header-logo-position: bottom 0.5rem center;
+  --boxel-org-header-logo-size: auto 3rem;
+}

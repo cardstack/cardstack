@@ -1,0 +1,52 @@
+<Freestyle::Usage @name="NextStepsBox">
+  <:example>
+    <Boxel::NextStepsBox @title={{this.title}}>
+      <:default>
+          {{#each
+            (array
+              "Transfer Prepaid Card"
+              "Create new Prepaid Card"
+              "Split Prepaid Card"
+              "Use as template for new Prepaid Card"
+            )
+           as |item|}}
+            <Boxel::Button @kind="primary">
+              {{item}}
+            </Boxel::Button>
+          {{/each}}
+      </:default>
+      <:footer>
+        <Boxel::Button @kind="secondary-dark">
+          Return to dashboard
+        </Boxel::Button>
+      </:footer>
+    </Boxel::NextStepsBox>
+  </:example>
+
+  <:api as |Args|>
+    <Args.String
+      @name="title"
+      @value={{this.title}}
+      @defaultValue="Suggested Next Steps"
+      @onInput={{fn (mut this.title)}}
+    />
+    <Args.Yield
+      @name="default"
+      @description="Yields the body of this box. Its contents are arranged in a cluster/flex wrapped layout "
+    />
+    <Args.Yield
+      @name="footer"
+      @description="Yields footer block"
+    />
+  </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage @name="Another example">
+  <:example>
+    <Boxel::NextStepsBox @title="Workflow Canceled">
+      <Boxel::Button @kind="primary">
+        Start Again
+      </Boxel::Button>
+    </Boxel::NextStepsBox>
+  </:example>
+</Freestyle::Usage>

@@ -1,0 +1,23 @@
+{{#let @model as |item|}}
+  <Boxel @class="master-collection__boxel master-collection__boxel--{{@format}}">
+    <BoxelHighlight @expandAction={{@expandAction}} @class="master-collection__highlighter" @on={{item.selected}} />
+    <div class="isolated-collection-item isolated-collection-item--{{@format}}">
+      {{#if (eq @format "table-list")}}
+        <ul class="isolated-collection-item__list">
+          {{#each @listFields as |field i|}}
+            <li class="isolated-collection-item__list-field isolated-collection-item__list-field--{{i}}">
+              <div class="collection__list-field-label">{{field.name}}</div>
+              <div>
+                {{#if (eq field.type "date")}}
+                  {{dayjs-format (get item field.valuePath) "MMM D, YYYY h:mm A"}}
+                {{else}}
+                  {{get item field.valuePath}}
+                {{/if}}
+              </div>
+            </li>
+          {{/each}}
+        </ul>
+      {{/if}}
+    </div>
+  </Boxel>
+{{/let}}

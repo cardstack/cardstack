@@ -1,0 +1,17 @@
+.boxel-left-edge-nav-basic-button {
+  background: none;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 2.5rem 2.5rem;
+  border: none;
+  display: inline-block;
+  width: 5rem;
+  height: 2.5rem;
+  margin: auto;
+}
+
+.boxel-left-edge-nav-basic-button svg {
+  display: block;
+  margin: auto;
+  width: 100%;
+}

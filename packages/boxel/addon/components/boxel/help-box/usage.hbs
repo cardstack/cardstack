@@ -1,0 +1,37 @@
+<Freestyle::Usage @name="HelpBox">
+  <:description>
+    Used for customer support purposes.
+  </:description>
+  <:example>
+    <Boxel::HelpBox
+      @prompt={{this.prompt}}
+      @buttonText={{this.ctaText}}
+      @onClickButton={{fn this.log "clicked"}}>
+      More content here
+    </Boxel::HelpBox>
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="prompt"
+      @optional={{true}}
+      @defaultValue="Need help?"
+      @value={{this.prompt}}
+      @onInput={{fn (mut this.prompt)}}
+    />
+    <Args.String
+      @name="buttonText"
+      @optional={{true}}
+      @defaultValue="Request live support"
+      @value={{this.ctaText}}
+      @onInput={{fn (mut this.ctaText)}}
+    />
+    <Args.Object
+      @name="onClickButton"
+      @description="Action function triggered by the button"
+    />
+    <Args.Yield
+      @optional={{true}}
+      @description="Space for additional content"
+    />
+  </:api>
+</Freestyle::Usage>

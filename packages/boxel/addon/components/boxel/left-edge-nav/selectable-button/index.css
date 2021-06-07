@@ -1,0 +1,29 @@
+.boxel-left-edge-nav-selectable-button {
+  --icon-color: var(--boxel-highlight);
+
+  border: none;
+  border-left: 4px solid transparent;
+  display: inline-block;
+  width: 80px;
+  height: 40px;
+  background: none;
+  padding-left: 16px;
+  opacity: 0.5;
+}
+
+.boxel-left-edge-nav-selectable-button svg {
+  display: block;
+  margin: auto;
+}
+
+.boxel-left-edge-nav-selectable-button:hover {
+  --icon-color: var(--boxel-dark);
+
+  cursor: pointer;
+  opacity: 1;
+}
+
+.boxel-left-edge-nav-selectable-button--selected {
+  border-color: var(--boxel-highlight);
+  opacity: 1;
+}

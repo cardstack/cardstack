@@ -1,0 +1,17 @@
+.progress-steps-usage-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.progress-steps-usage-item--completed {
+  color: black;
+}
+
+.progress-steps-usage-item__title {
+  font-weight: 600;
+}
+
+.progress-steps-usage-item__number {
+  font-weight: 400;
+  font-size: 0.6875;
+}

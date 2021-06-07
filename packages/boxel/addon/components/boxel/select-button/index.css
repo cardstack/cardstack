@@ -1,0 +1,39 @@
+.boxel-select-button {
+  --icon-bg: white;
+  --icon-border: black;
+  --icon-color: transparent;
+
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: none;
+  border: none;
+  vertical-align: bottom;
+  z-index: 1;
+}
+
+.boxel-select-button--edit {
+  --icon-bg: transparent;
+}
+
+.boxel-select-button:hover,
+.boxel-select-button:focus {
+  --icon-border: black;
+}
+
+.boxel-select-button--partial {
+  --icon-bg: var(--boxel-highlight);
+  --icon-border: black;
+  --icon-color: transparent;
+}
+
+.boxel-select-button--selected {
+  --icon-bg: var(--boxel-highlight);
+  --icon-border: var(--boxel-highlight);
+  --icon-color: var(--boxel-dark);
+}
+
+.boxel-select-button > svg {
+  display: block;
+  margin: auto;
+}

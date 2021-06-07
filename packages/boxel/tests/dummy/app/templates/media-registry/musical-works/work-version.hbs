@@ -1,0 +1,26 @@
+<DetailTemplate>
+  <Boxel::Breadcrumbs>
+    {{#if this.work.masterDetail}}
+      <LinkTo @route="media-registry.version" @models={{array this.work.masterDetail.id this.work.version}} class="boxel-breadcrumbs__item">
+        <div class="boxel-breadcrumbs__item-label">Master Detail</div>
+        <div class="boxel-breadcrumbs__item-title">{{this.work.masterDetail.title}}</div>
+      </LinkTo>
+    {{/if}}
+  </Boxel::Breadcrumbs>
+
+  <DetailCard
+    @headerFields={{this.headerFields}}
+    @fields={{this.isolatedFields}}
+    @source={{this.work.source}}
+    @label="Musical Work"
+    @mode="view"
+  >
+    <BoxelActions
+      @class="media-collection__btn-overlay"
+      @displayHighlightActions={{true}}
+      @btnLeft="mode-btn"
+      @btnLeftContent="Edit"
+      @btnRight="settings"
+    />
+  </DetailCard>
+</DetailTemplate>

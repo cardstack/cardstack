@@ -1,0 +1,19 @@
+{{#let (unique-id) as |inputId|}}
+<div class="boxel-searchbox" ...attributes>
+    {{svg-jar "search" class="boxel-searchbox__search-icon"}}
+    {{#if @label}}
+      <label for={{or @id inputId}} class="boxel-sr-only">{{@label}}</label>
+    {{/if}}
+    {{!-- TODO: review accessibility of type=text vs type=search --}}
+    <Input
+      @type="text"
+      class="boxel-searchbox__input"
+      id={{or @id inputId}}
+      @value={{@value}}
+      {{on "input" (optional @onInput)}}
+      {{on "change" (optional @onChange)}}
+      disabled={{@disabled}}
+      placeholder={{@placeholder}}
+    />
+</div>
+{{/let}}

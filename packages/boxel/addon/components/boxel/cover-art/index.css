@@ -1,0 +1,36 @@
+.boxel-cover-art {
+  --cover-art-size: 80px;
+  --cover-art-count: 1;
+
+  position: relative;
+  display: grid;
+  align-items: center;
+  grid-auto-flow: column;
+  z-index: 0;
+  width: var(--cover-art-width);
+  height: var(--cover-art-size);
+  overflow: hidden;
+}
+
+.boxel-cover-art__container {
+  --cover-art-index: 0;
+  --cover-art-left: 0;
+  --cover-art-spacing-multiplier: 1;
+
+  transition: left 250ms ease-in-out;
+  position: absolute;
+  z-index: calc(var(--cover-art-count) - var(--cover-art-index));
+  left: calc(var(--cover-art-left) * var(--cover-art-spacing-multiplier));
+}
+
+.boxel-cover-art__cover {
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  height: var(--cover-art-cover-size);
+  width: var(--cover-art-cover-size);
+  transition:
+    height 150ms ease-in-out,
+    width 150ms ease-in-out;
+}

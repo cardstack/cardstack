@@ -1,0 +1,39 @@
+<div
+ class={{cn
+   "boxel-thread-message"
+   boxel-thread-message--hide-meta=@hideMeta
+   boxel-thread-message--full-width=@fullWidth
+  }}
+ data-test-boxel-thread-message
+ ...attributes
+>
+  <div class={{cn "boxel-thread-message__meta"  boxel-sr-only=@hideMeta}}>
+    {{#unless @hideMeta}}
+      {{#if @imgURL}}
+        <img
+          src={{@imgURL}}
+          alt={{or @name "participant"}}
+          width="40px"
+          height="40px"
+          class={{cn "boxel-thread-message__avatar-img" boxel-thread-message__avatar-img--not-round=@notRound}}
+          data-test-boxel-thread-message-avatar
+        />
+      {{else}}
+        {{svg-jar "profile" width="40px" height="40px" aria-label=(or @name "participant")}}
+      {{/if}}
+    {{/unless}}
+    <h3 class="boxel-thread-message__info">
+      {{#if @name}}
+        <span class={{cn "boxel-thread-message__name" boxel-sr-only=@hideName}} data-test-boxel-thread-message-name>
+          {{@name}}
+        </span>
+      {{/if}}
+      <time datetime={{or @datetime (now)}} class="boxel-thread-message__time">
+        {{dayjs-format (or @datetime (now)) "MMM D, h:mm A"}}
+      </time>
+    </h3>
+  </div>
+  <div class="boxel-thread-message__content">
+    {{yield}}
+  </div>
+</div>

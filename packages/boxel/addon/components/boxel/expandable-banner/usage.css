@@ -1,0 +1,27 @@
+.expandable-banner-usage-paragraph {
+  margin-bottom: 0;
+  font: var(--boxel-font-sm);
+}
+
+.expandable-banner-usage-paragraph:first-child {
+  margin-top: 0;
+}
+
+.expandable-banner-usage-list {
+  margin: 0;
+  padding: 0;
+  list-style-position: inside;
+}
+
+.expandable-banner-usage-list > li::marker {
+  content: "– "; /* en dash */
+}
+
+.expandable-banner-usage-fine-print {
+  font: var(--boxel-font-xs);
+  color: var(--boxel-light-600);
+}
+
+.expandable-banner-usage-link {
+  text-decoration: underline;
+}

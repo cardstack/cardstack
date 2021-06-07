@@ -1,0 +1,34 @@
+.usage-cta-block-explanation ul {
+  padding-inline-start: 20px;
+}
+
+.usage-cta-block-explanation-table {
+  font-size: 1rem;
+  border: 1px solid black;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  max-width: 90ch;
+}
+
+.usage-cta-block-explanation-table td {
+  border: 1px solid black;
+  padding: 0.25rem;
+}
+
+.usage-cta-block-explanation-table td:first-child {
+  width: 25ch;
+}
+
+.usage-cta-block-explanation-table tr:first-child td {
+  font-weight: bold;
+}
+
+.usage-action-chin__loading-indicator {
+  margin-right: var(--boxel-sp-xs);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

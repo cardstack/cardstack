@@ -1,0 +1,25 @@
+{{#let (or @iconOnly (not @title)) as |iconOnly|}}
+  <div
+    class={{cn
+      "boxel-participant"
+      boxel-participant__icon-only=iconOnly
+      boxel-participant__has-logo=@hasLogo
+    }}
+    style={{css-var boxel-participant-icon-size=this.iconSize}}
+    ...attributes
+  >
+    <div class="boxel-participant__image" style={{css-url "background-image" @image}} />
+    {{#unless iconOnly}}
+      <div>
+        <span class="boxel-participant__title">
+          {{@title}}
+        </span>
+        <p class="boxel-participant__description">
+          {{@description}}
+        </p>
+      </div>
+    {{/unless}}
+
+    {{yield}}
+  </div>
+{{/let}}

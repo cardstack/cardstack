@@ -1,0 +1,77 @@
+.boxel-breadcrumbs {
+  grid-column: 1 / -1;
+  display: flex;
+  width: 100%;
+  padding: var(--boxel-sp) 0;
+}
+
+.boxel-breadcrumbs__item {
+  width: 170px;
+  height: 50px;
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-sm);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+  border: 1px solid var(--boxel-light-600);
+  border-radius: var(--boxel-border-radius);
+  background-color: var(--boxel-light-400);
+}
+
+.boxel-breadcrumbs__item-title {
+  color: var(--boxel-dark);
+  font-weight: 700;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.boxel-breadcrumbs__item-label {
+  color: var(--boxel-purple-400);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
+  line-height: 14px;
+  text-transform: uppercase;
+}
+
+.boxel-breadcrumbs__caret {
+  width: 30px;
+  height: 50px;
+  background:
+    url('../@cardstack/boxel/images/icons/caret-thin-right.svg') center/7px
+    no-repeat;
+}
+
+/* Inverse-mode color scheme */
+.boxel-breadcrumbs__item--inverse {
+  background-color: #7c7b91;
+  border-color: transparent;
+}
+
+button.boxel-breadcrumbs__item--inverse {
+  text-align: left;
+}
+
+button.boxel-breadcrumbs__item--inverse:hover {
+  cursor: pointer;
+}
+
+.boxel-breadcrumbs__item--inverse .boxel-breadcrumbs__item-label {
+  color: var(--boxel-border-color);
+}
+
+.boxel-breadcrumbs__item--inverse .boxel-breadcrumbs__item-title {
+  color: var(--boxel-light);
+}
+
+.boxel-breadcrumbs__item--inverse + .boxel-breadcrumbs__caret {
+  filter: invert(1);
+}
+
+.boxel-breadcrumbs__item--inverse:last-child {
+  background-color: #c1c1d0;
+}
+
+.boxel-breadcrumbs__item--inverse:last-child .boxel-breadcrumbs__item-label,
+.boxel-breadcrumbs__item--inverse:last-child .boxel-breadcrumbs__item-title {
+  color: var(--boxel-purple-700);
+}

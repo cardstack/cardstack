@@ -1,0 +1,3 @@
+.boxel-sidebar > * + * {
+  margin-top: var(--boxel-sp);
+}

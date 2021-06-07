@@ -1,0 +1,26 @@
+.boxel-participant-list {
+  --icon-size: 2rem;
+  --column-size: calc(var(--icon-size) / 2);
+
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: inline-grid;
+  gap: var(--boxel-sp-sm);
+}
+
+.boxel-participant-list--full-width {
+  width: 100%;
+}
+
+.boxel-participant-list__fanned {
+  grid-auto-flow: column;
+  grid-auto-columns: var(--column-size);
+  gap: 0;
+  direction: rtl;
+  padding-left: var(--column-size);
+}
+
+.boxel-participant-list__fanned .boxel-participant-list__participant > div {
+  border: 1px solid var(--boxel-light);
+}

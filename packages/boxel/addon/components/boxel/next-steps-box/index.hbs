@@ -1,0 +1,25 @@
+<Boxel::CardContainer class="boxel-next-steps-box" ...attributes>
+  <header class="boxel-next-steps-box__header">
+    <span class="boxel-next-steps-box__header-title">
+      {{if @title @title "Suggested Next Steps"}}
+    </span>
+    <span class="boxel-next-steps-box__header-notice">
+      Only visible to you
+      {{svg-jar "lock-filled" width="12px" height="12px"}}
+    </span>
+  </header>
+
+  <div class="boxel-next-steps-box__content">
+    {{#if (has-block "default")}}
+      <div class="boxel-next-steps-box__button-container">
+        {{yield to="default"}}
+      </div>
+    {{/if}}
+
+    {{#if (has-block "footer")}}
+      <footer class="boxel-next-steps-box__footer">
+        {{yield to="footer"}}
+      </footer>
+    {{/if}}
+  </div>
+</Boxel::CardContainer>

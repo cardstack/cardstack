@@ -1,0 +1,15 @@
+{{!-- Detail Card --}}
+<DetailCard
+  @headerFields={{this.headerFields}}
+  @fields={{this.isolatedFields}}
+  @label="Musical Work"
+  @mode="view"
+>
+  <BoxelActions
+    @class="media-collection__btn-overlay"
+    @displayHighlightActions={{true}}
+    @btnLeft="mode-btn"
+    @btnLeftContent="Edit"
+    @btnRight="settings"
+  />
+</DetailCard>

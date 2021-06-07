@@ -1,0 +1,41 @@
+.collection-add__blank-card-container {
+  grid-column: 1 / -1;
+}
+
+.collection-field__item--new {
+  grid-template-columns: 1fr 45px;
+  padding-left: 15px;
+  padding-bottom: 10px;
+}
+
+.collection-add__blank-card {
+  width: 100%;
+  height: 150px;
+}
+
+.collection-field__add-btn-container {
+  grid-column: 1 / -1;
+  height: 40px;
+  padding: 0 45px;
+  text-align: center;
+}
+
+.collection-field__cancel-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: block;
+  width: 25px;
+  height: 25px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0 10px;
+  background-color: var(--boxel-highlight);
+  z-index: 2;
+  cursor: pointer;
+}
+
+.collection-field__cancel-btn > svg {
+  padding: 8px 8px 9px 9px;
+}

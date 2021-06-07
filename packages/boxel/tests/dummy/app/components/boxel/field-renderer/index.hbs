@@ -1,0 +1,295 @@
+{{! template-lint-disable }}
+{{#if (eq @mode "edit")}}
+  {{!-- Edit Mode --}}
+  {{#if (or (eq @field.type "card") (eq @field.type "collection") @field.value.id (is-array @field.value))}}
+    <Boxel::Field
+      class="field-renderer {{lowercase (dasherize (trim @field.title))}}-edit-field {{@class}}"
+      @label={{humanize @field.title}}
+      @labelClass="field-renderer__title"
+    >
+      {{#if (eq @field.type "card")}}
+        <EmbeddedCollectionEditor
+          @belongsToField={{true}}
+          @field={{@field}}
+          @format={{@field.format}}
+          @expandAction={{@expandAction}}
+          @mode="edit"
+        />
+      {{else if (eq @field.type "collection")}}
+        <EmbeddedCollectionEditor
+          @collection={{@field.value}}
+          @format={{@field.format}}
+          @title={{@field.title}}
+          @field={{@field}}
+          @mode="edit"
+        />
+      {{else}}
+        {{#let (filter-by "title" @field.value) as |multiTagList|}}
+          {{#if multiTagList.length}}
+            {{!-- Taglist with multiple sections --}}
+            <div class="field-renderer__group">
+              {{#each @field.value as |val|}}
+                <div class="field-renderer__taglist-title">{{val.title}}</div>
+                <ul class="field-renderer__taglist-editor field-renderer__taglist-editor--vertical">
+                  {{#if (is-array val.value)}}
+                    {{#each val.value as |vv|}}
+                      <li class="item__pill">
+                        <span>{{vv}}</span>
+                        <button class="item__remove-btn" aria-label="remove" />
+                      </li>
+                    {{/each}}
+                  {{else}}
+                    {{#if val.value}}
+                      <li class="item__pill">
+                        <span>{{val.value}}</span>
+                        <button class="item__remove-btn" aria-label="remove" />
+                      </li>
+                    {{/if}}
+                  {{/if}}
+                  <button class="item__add-btn" aria-label="add" />
+                </ul>
+              {{/each}}
+            </div>
+          {{else}}
+            {{!-- Horizontal tagList --}}
+            <ul class="field-renderer__taglist-editor">
+              {{#each @field.value as |val|}}
+                <li class="item__pill">
+                  <span>{{val}}</span>
+                  <button class="item__remove-btn" aria-label="remove" />
+                </li>
+              {{/each}}
+              <button class="item__add-btn" aria-label="add" />
+            </ul>
+          {{/if}}
+        {{/let}}
+      {{/if}}
+    </Boxel::Field>
+  {{else}}
+    <Boxel::Field
+      class="field-renderer"
+      @fieldMode="edit"
+      @label={{humanize @field.title}}
+      @labelClass="field-renderer__title"
+    >
+      {{#if (eq @field.type "dropdown")}}
+        <div class="field-renderer__dropdown">
+          <PowerSelect
+            @options={{@field.options}}
+            @selected={{@field.value}}
+            @onChange={{fn (mut @field.value)}}
+            @renderInPlace={{true}}
+            @verticalPosition="below"
+          as |option|>
+            {{option}}
+          </PowerSelect>
+        </div>
+      {{else if (eq @field.type "textarea")}}
+        <Textarea @type={{@field.type}} class="field-renderer__input field-renderer__textarea" @value={{@field.value}} />
+      {{else}}
+        <Boxel::Input
+          type={{@field.type}}
+          class="field-renderer__input"
+          @value={{if (eq @field.title "title") (titleize @field.value) @field.value}}
+        />
+      {{/if}}
+    </Boxel::Field>
+  {{/if}}
+
+{{else if (eq @mode "comparison")}}
+  <Boxel::Field
+    class="field-renderer field-renderer--comparison-mode field-renderer--{{@field.type}} {{dasherize @field.title}}-field {{@class}}"
+    @label={{@title}}
+    @labelClass="field-renderer__title"
+  >
+    <div class="field-renderer__value">
+      {{#if (and @field.value (or @field.id (eq @field.type "card")))}}
+        {{component (or @field.component "card") model=@field.value mode="view" status=(if @showCompHighlights (if @field.status @field.status "no-change")) comparisonType=@comparisonType drillDown=@drillDown fieldData=@field}}
+      {{else if (and @field.value (is-array @field.value))}}
+        <Boxel>
+          {{#if @showCompHighlights}}
+            <BoxelHighlight @status={{@field.status}} />
+            <BoxelActions @class="boxel-actions--comparison-mode" @status={{if @field.status @field.status "no-change"}}>
+              <ComparisonModeLabel @status={{@field.status}} @comparisonType={{@comparisonType}} />
+            </BoxelActions>
+          {{/if}}
+          <div class="field-renderer__card">
+            <Boxel::Header class="boxel-card__header" @header={{if @field.type (humanize @field.type) "text"}} />
+
+            <div class="field-renderer__inner {{if @field.status "" "field-renderer__opacity-control"}}">
+              {{#let (filter-by "title" @field.value) as |multiTagList|}}
+                {{#if multiTagList.length}}
+                  {{#each @field.value as |val|}}
+                    <Boxel::FieldRenderer
+                      @class="field-renderer__meta-field"
+                      @field={{val}}
+                      @mode="view"
+                    />
+                  {{/each}}
+                {{else}}
+                  <span>
+                    {{#each @field.value as |val|}}
+                      {{val}}{{#if (has-next val @field.value)}}, {{/if}}
+                    {{/each}}
+                  </span>
+                {{/if}}
+              {{/let}}
+            </div>
+          </div>
+        </Boxel>
+      {{else}}
+        {{#if @field.value}}
+          <Boxel>
+            {{#if @showCompHighlights}}
+              <BoxelHighlight @status={{@field.status}} />
+              <BoxelActions @class="boxel-actions--comparison-mode" @status={{if @field.status @field.status "no-change"}}>
+                <ComparisonModeLabel @status={{@field.status}} @comparisonType={{@comparisonType}} />
+              </BoxelActions>
+            {{/if}}
+            <div class="field-renderer__card">
+              <Boxel::Header class="boxel-card__header" @header={{if @field.type (humanize @field.type) "text"}} />
+
+              <div class="field-renderer__inner {{if @field.status "" "field-renderer__opacity-control"}}">
+                {{@field.value}}
+              </div>
+            </div>
+          </Boxel>
+        {{else}}
+          {{#if (includes @field.title @omittedFields)}}
+            N/A
+          {{else}}
+            <div class="field-renderer__card field-renderer__card--blank" />
+          {{/if}}
+        {{/if}}
+      {{/if}}
+    </div>
+  </Boxel::Field>
+
+{{else}}
+  {{!-- View Mode --}}
+  <Boxel::Field
+    class="field-renderer field-renderer--{{@field.type}} {{format-id @field.title}}-field {{if (eq @field.format "table") "table-field"}} {{@class}}"
+    @label={{humanize @field.title}}
+    @labelClass="field-renderer__title"
+  >
+    {{#if (includes @field.title @addedFields)}}
+      <BoxelHighlight @status="added" />
+      <BoxelActions @status="added" />
+    {{/if}}
+    <Boxel @class="field-renderer__value {{if (eq @field.type "image") "field-renderer__value--img-field"}}">
+      {{#if (and @comparisonMode (includes @field.title @addedValues))}}
+        <BoxelHighlight @status="added" />
+        <BoxelActions @status="added" />
+      {{/if}}
+      {{#if (and @comparisonMode (includes @field.title @modifiedValues))}}
+        <BoxelHighlight @status="modified" />
+        <BoxelActions @status="modified" />
+      {{/if}}
+      {{#if @field.value}}
+        {{#if (eq @field.type "card")}}
+          {{#if (and @comparisonMode @field.value.id (eq @changedCards.0.value.id @field.value.id))}}
+            <div>
+              <ins class="field-renderer--inserted">{{component (or @field.component "card") model=@field.value mode="view" status="changed"}}</ins>
+              <Boxel>
+                <BoxelHighlight @status="deleted" />
+                <BoxelActions @status="deleted" />
+                <del class="field-renderer--deleted">{{@changedCards.0.oldValue}}</del>
+              </Boxel>
+            </div>
+          {{else if (and @comparisonMode @modifiedCard.value (is-equal @modifiedCard.value @field.value))}}
+            <Boxel>
+              <BoxelHighlight @status="modified" />
+              <BoxelActions @status="modified"><div class="field-renderer__modified-count">{{@modifiedCard.value.fields.length}}</div></BoxelActions>
+              {{component (or @field.component "card") model=@field.value mode="view"}}
+            </Boxel>
+          {{else}}
+            {{component (or @field.component "card") model=@field.value mode="view" expandAction=@expandAction}}
+          {{/if}}
+        {{else if (eq @field.type "collection")}}
+          <EmbeddedCollection
+            @collection={{@field.value}}
+            @format={{@field.format}}
+            @cardComponent={{@field.component}}
+            @comparisonMode={{@comparisonMode}}
+            @addedFields={{@addedFields}}
+            @addedValues={{@addedValues}}
+            @changedFields={{@changedFields}}
+            @removedFields={{@removedFields}}
+            @removedValues={{@removedValues}}
+            @addedCards={{@addedCards}}
+            @removedCards={{@removedCards}}
+            @changedCards={{@changedCards}}
+            @modifiedCard={{@modifiedCard}}
+            @modifiedCards={{@modifiedCards}}
+            @expandAction={{@expandAction}}
+          />
+        {{else if (is-array @field.value)}}
+          <div class="field-renderer__opacity-control">
+            {{#let (filter-by "title" @field.value) as |multiTagList|}}
+              {{#if multiTagList.length}}
+                {{#each @field.value as |val|}}
+                  <Boxel::FieldRenderer
+                    @class="field-renderer__meta-field"
+                    @field={{val}}
+                    @mode="view"
+                    @status={{@status}}
+                    @comparisonMode={{@comparisonMode}}
+                  />
+                {{/each}}
+              {{else}}
+                {{#each @field.value as |val|}}
+                  {{val}}{{#if (has-next val @field.value)}}, {{/if}}
+                {{/each}}
+              {{/if}}
+            {{/let}}
+          </div>
+        {{else}}
+          {{#if (and @comparisonMode (find-by "title" @field.title @changedFields))}}
+            {{#with (find-by "title" @field.title @changedFields) as |changed|}}
+              {{#if (eq @field.type "image")}}
+                <div>
+                  <Boxel>
+                    <BoxelHighlight @status="changed" />
+                    <BoxelActions @status="changed" />
+                    <ins class="field-renderer--inserted"><img src={{@field.value}} width="260" height="260" alt="cover" /></ins>
+                  </Boxel>
+                  <Boxel>
+                    <BoxelHighlight @status="deleted" />
+                    <BoxelActions @status="deleted" />
+                    <del class="field-renderer--deleted"><img src={{changed.oldValue}} width="260" height="260" alt="cover" /></del>
+                  </Boxel>
+                </div>
+              {{else}}
+                <div>
+                  <Boxel>
+                    <BoxelHighlight @status="changed" />
+                    <BoxelActions @status="changed" />
+                    <ins class="field-renderer--inserted">{{if (eq @field.title "title") (titleize @field.value) @field.value}}</ins>
+                  </Boxel>
+                  <Boxel>
+                    <BoxelHighlight @status="deleted" />
+                    <BoxelActions @status="deleted" />
+                    <del class="field-renderer--deleted">{{changed.oldValue}}</del>
+                  </Boxel>
+                </div>
+              {{/if}}
+            {{/with}}
+          {{else}}
+            <div class="field-renderer__opacity-control basic-field">
+              {{#if (eq @field.type "date")}}
+                {{dayjs-format @field.value "MMM DD, YYYY" "YYYY-MM-DD"}}
+              {{else if (eq @field.type "image")}}
+                {{!-- Make this more generic --}}
+                <img src={{or @field.value this.albumArtSvg}} alt="cover art" width="260" height="260" />
+              {{else}}
+                {{@field.value}}
+              {{/if}}
+            </div>
+          {{/if}}
+        {{/if}}
+      {{else}}
+        <div class="field-renderer__placeholder field-renderer__placeholder--{{@field.title}} field-renderer__opacity-control">N/A</div>
+      {{/if}}
+    </Boxel>
+  </Boxel::Field>
+{{/if}}

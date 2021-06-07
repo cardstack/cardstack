@@ -1,0 +1,46 @@
+.boxel-action-container {
+  max-width: 43.75rem; /* 700px; */
+  min-width: 20rem;
+  color: var(--boxel-dark);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.boxel-action-container--is-complete {
+  max-width: 36.6rem; /* 585px; */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+/* Card Header */
+.boxel-action-container__header {
+  --boxel-header-text-color: var(--boxel-purple-400);
+  --boxel-header-background-color: transparent;
+
+  border-top-right-radius: inherit;
+  border-top-left-radius: inherit;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.boxel-action-container:hover .boxel-action-container__header {
+  background-color: var(--boxel-purple-100);
+  color: var(--boxel-dark);
+}
+
+/* Optional prompt */
+.boxel-action-container__prompt {
+  margin: 0;
+  font-size: 1.125rem; /* 18px */
+  font-weight: 700;
+  line-height: 1.33;
+  letter-spacing: 0;
+  padding: var(--boxel-sp) var(--boxel-sp-lg);
+}
+
+/* Card Chin */
+.boxel-action-container__footer {
+  border-bottom-right-radius: inherit;
+  border-bottom-left-radius: inherit;
+}

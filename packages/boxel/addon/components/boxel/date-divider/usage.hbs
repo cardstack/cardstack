@@ -1,0 +1,21 @@
+<Freestyle::Usage @name="DateDivider">
+  <:example>
+    <Boxel::DateDivider @date={{this.date}} />
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="date"
+      @required={{false}}
+      @defaultValue="now"
+      @description="Date to show"
+      @value={{this.date}}
+      @onInput={{fn (mut this.date)}}
+    />
+  </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage @slug="DateDivider-default" @description="With default value">
+  <:example>
+    <Boxel::DateDivider />
+  </:example>
+</Freestyle::Usage>

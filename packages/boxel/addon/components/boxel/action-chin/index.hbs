@@ -1,0 +1,91 @@
+<div
+  class={{cn
+    "boxel-action-chin"
+    (if @state (concat "boxel-action-chin--" @state))
+    (if @disabled "boxel-action-chin--disabled")
+    (if @stepNumber (concat "boxel-action-chin--has-step"))
+  }}
+  ...attributes
+  data-test-boxel-action-chin
+>
+  {{!-- Not accounting for 0 as a step number --}}
+  {{#if @stepNumber}}
+    <div class="boxel-action-chin__step" data-step={{@stepNumber}} data-test-boxel-action-chin-step={{@stepNumber}}>
+      <span class="boxel-sr-only">Step {{@stepNumber}}</span>
+    </div>
+  {{/if}}
+  {{#if (and (has-block "in-progress") this.isInProgress)}}
+    {{yield
+      (hash
+        ActionButton=(component
+          "boxel/button"
+          kind="primary"
+          loading=true
+          disabled=@disabled
+          class="boxel-action-chin__action-button"
+        )
+        CancelButton=(component
+          "boxel/button"
+          kind="secondary-dark"
+          disabled=@disabled
+          class="boxel-action-chin__cancel-button"
+        )
+        ActionStatusArea=(component
+          "boxel/action-chin/action-status-area"
+        )
+        InfoArea=(component
+          "boxel/action-chin/info-area"
+          class="boxel-action-chin__info-area"
+        )
+      )
+      to="in-progress"
+    }}
+  {{else if (and (has-block "memorialized") this.isMemorialized)}}
+    {{!--
+      if using ActionButton and ActionStatusArea together, the grid layout will put them at the exact same spot,
+      causing a visual bug.
+    --}}
+    {{yield
+      (hash
+        ActionButton=(component
+          "boxel/button"
+          kind="secondary-light"
+          disabled=@disabled
+        )
+        ActionStatusArea=(component
+          "boxel/action-chin/action-status-area"
+          icon="success"
+        )
+        InfoArea=(component
+          "boxel/action-chin/info-area"
+          class="boxel-action-chin__info-area"
+        )
+      )
+      to="memorialized"
+    }}
+  {{else}}
+    {{yield
+      (hash
+        ActionButton=(component
+          "boxel/button"
+          kind="primary"
+          disabled=@disabled
+        )
+        ActionStatusArea=(component
+          "boxel/action-chin/action-status-area"
+        )
+        InfoArea=(component
+          "boxel/action-chin/info-area"
+          class="boxel-action-chin__info-area"
+        )
+      )
+      to="default"
+    }}
+  {{/if}}
+  {{!-- in any state except: disabled + has a step, we want the lock shown --}}
+  {{!-- template-lint-disable simple-unless --}}
+  {{#unless (and @disabled @stepNumber)}}
+    <span class="boxel-action-chin__private-notice" data-test-boxel-action-chin-private-notice>Actions only visible to you</span>
+    {{svg-jar "lock" class="boxel-action-chin__lock-icon" role="presentation"}}
+  {{/unless}}
+</div>

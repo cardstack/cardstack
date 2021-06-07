@@ -1,0 +1,18 @@
+<div class="collection__wrapper">
+  <Boxel::Breadcrumbs @items={{array (hash route="media-registry.index" routeModel=@model.currentOrg.id title="Master Recordings" type=@model.type)}} />
+
+  <IsolatedCollection
+    @mode="view"
+    @model={{@model}}
+    @format="table"
+    @displayHighlightActions={{true}}
+    @expandAction={{this.transitionToIsolate}}
+    @transitionToEdit={{this.transitionToEdit}}
+    @transitionToView={{this.transitionToView}}
+    @sort={{this.sort}}
+    @search={{this.search}}
+    @removeItem={{this.removeItem}}
+  />
+</div>
+
+{{outlet}}

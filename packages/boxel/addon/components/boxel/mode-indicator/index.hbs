@@ -1,0 +1,12 @@
+<button
+  class={{cn
+    "boxel-mode-indicator"
+    (concat "boxel-mode-indicator--" @mode)
+  }}
+  aria-label={{concat "close " @mode " mode"}}
+  ...attributes
+>
+  {{@mode}} mode
+
+  {{svg-jar "close" width="10px" height="10px"}}
+</button>

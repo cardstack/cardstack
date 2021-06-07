@@ -1,0 +1,36 @@
+.boxel-selection-control {
+  display: flex;
+}
+
+.boxel-selection-control-group__select-all {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  width: 116px;
+  padding: var(--boxel-sp-xs) var(--boxel-sp-lg) var(--boxel-sp-xs);
+  transition: all var(--boxel-transition);
+  border-radius: 100px;
+  white-space: nowrap;
+  font: 600 var(--boxel-font-sm);
+  min-height: 41px;
+  height: min-content;
+  background-color: transparent;
+  border: 1px solid var(--boxel-purple-300);
+  color: black;
+}
+
+.boxel-selection-control-group__menu-trigger {
+  position: absolute;
+  top: 0;
+  right: 8px;
+}
+
+.boxel-selection-control-group__select-all > svg {
+  margin-right: var(--boxel-sp-xs);
+}
+
+.boxel-selection-control-group__select-all--selected-items {
+  width: 246px;
+  padding-left: var(--boxel-sp-sm);
+  padding-right: var(--boxel-sp-xxl);
+}

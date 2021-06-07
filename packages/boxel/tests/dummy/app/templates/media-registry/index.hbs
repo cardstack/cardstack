@@ -1,0 +1,12 @@
+<div class="master-collection__wrapper">
+  <IsolatedCollection
+    @mode="view"
+    @model={{@model}}
+    @expandAction={{this.transitionToIsolate}}
+    @transitionToEdit={{this.transitionToEdit}}
+    @transitionToView={{this.transitionToView}}
+    @sort={{this.sort}}
+    @search={{this.search}}
+    @removeItem={{this.removeItem}}
+  />
+</div>

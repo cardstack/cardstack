@@ -1,0 +1,44 @@
+{{#let (cn
+    "boxel-button"
+    @class
+    (concat "boxel-button--size-" (or @size this.defaultSize))
+    (concat "boxel-button--kind-" (or @kind this.defaultKind))
+ ) as |classes|}}
+{{#if (or (not @as) (eq @as "button"))}}
+  <button
+    class={{cn classes (if @loading "boxel-button--loading")}}
+    tabindex={{if @loading -1 0}}
+    disabled={{@disabled}}
+    data-test-boxel-button
+    ...attributes
+  >
+  {{#if @loading}}
+    <Boxel::LoadingIndicator class="boxel-button__loading-indicator" @color="var(--boxel-button-text-color)" data-test-boxel-button-loading-indicator/>
+  {{/if}}
+    {{yield}}
+  </button>
+{{else if (eq @as "anchor")}}
+  <a
+    class={{classes}}
+    href={{unless @disabled @href}}
+    data-test-boxel-button 
+    ...attributes
+  >
+    {{yield}}
+  </a>
+{{else if (eq @as "link-to")}}
+  <LinkTo
+    class={{classes}}
+    @route={{@route}}
+    @models={{if @models @models (array)}}
+    @query={{@query}}
+    @disabledClass="boxel-button--disabled-link"
+    @disabled={{@disabled}}
+    data-test-boxel-button 
+    tabindex={{if @disabled -1 0}}
+    ...attributes
+  >
+    {{yield}}
+  </LinkTo>
+{{/if}}
+{{/let}}

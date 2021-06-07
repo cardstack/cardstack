@@ -1,0 +1,29 @@
+.boxel-milestone-banner {
+  display: flex;
+  justify-content: space-between;
+  min-height: 50px;
+  padding: var(--boxel-sp-sm) var(--boxel-sp);
+  background-image:
+    linear-gradient(
+      to right,
+      var(--boxel-cyan),
+      var(--boxel-green)
+    );
+  border: 1px solid var(--boxel-teal);
+  border-radius: 100px;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+  scroll-margin: var(--boxel-sp);
+}
+
+.boxel-milestone-banner__title {
+  padding-left: var(--boxel-sp-lg);
+  background: url('../@cardstack/boxel/images/icons/check-mark.svg') left center/10px 10px no-repeat;
+  font-weight: 600;
+}
+
+.boxel-milestone-banner__status {
+  font-weight: 700;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}

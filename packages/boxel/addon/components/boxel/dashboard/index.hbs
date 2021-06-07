@@ -1,0 +1,22 @@
+<div
+  class={{cn
+    "boxel-dashboard"
+    boxel-dashboard--with-left-edge=@displayLeftEdge
+    boxel-dashboard--dark-theme=@darkTheme
+  }}
+  ...attributes
+>
+  {{#if @displayLeftEdge}}
+    <div class="boxel-dashboard__left-edge-container">
+      {{yield to="left-edge"}}
+    </div>
+  {{/if}}
+
+  <div class="boxel-dashboard__sticky-header-container">
+    {{yield to="header"}}
+  </div>
+
+  <div class="boxel-dashboard__body-container">
+    {{yield to="body"}}
+  </div>
+</div>

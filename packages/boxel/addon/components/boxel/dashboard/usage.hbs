@@ -1,0 +1,38 @@
+<Freestyle::Usage @name="Dashboard">
+  <:example>
+    <Boxel::Dashboard
+      @displayLeftEdge={{this.displayLeftEdge}}
+      @darkTheme={{this.darkTheme}}
+    >
+      <:left-edge>
+        <Boxel::LeftEdgeNav
+          @home={{hash icon="cardstack" height="2rem"}}
+          class="dashboard-usage-left-edge-nav"
+        >
+        </Boxel::LeftEdgeNav>
+      </:left-edge>
+      <:header>
+        <Boxel::OrgHeader @title="Cardstack" />
+      </:header>
+      <:body>
+        Content
+      </:body>
+    </Boxel::Dashboard>
+  </:example>
+  <:api as |Args|>
+    <Args.Bool
+      @name="displayLeftEdge"
+      @description="allows space for the left-edge"
+      @defaultValue="false"
+      @value={{this.displayLeftEdge}}
+      @onInput={{fn (mut this.displayLeftEdge)}}
+    />
+    <Args.Bool
+      @name="darkTheme"
+      @description="dark-themed version"
+      @defaultValue="false"
+      @value={{this.darkTheme}}
+      @onInput={{fn (mut this.darkTheme)}}
+    />
+  </:api>
+</Freestyle::Usage>

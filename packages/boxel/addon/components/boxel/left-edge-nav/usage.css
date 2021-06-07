@@ -1,0 +1,11 @@
+.left-edge-nav-usage-container {
+  height: 600px;
+  padding: 10px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 80px);
+  column-gap: 20px;
+}
+
+.left-edge-nav-usage-container .boxel-left-edge-nav {
+  position: relative; /* override default fixed position for display in docs */
+}

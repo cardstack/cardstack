@@ -1,0 +1,50 @@
+<EmberTable @class="embedded-collection-table" as |t|>
+  <t.head
+    @columns={{@model.columns}}
+    @class="embedded-collection-table__header" as |h|
+  >
+    <h.row as |r|>
+      <r.cell as |column|>
+        <span class="embedded-collection-table__header-cell">
+          {{column.name}}
+        </span>
+      </r.cell>
+    </h.row>
+  </t.head>
+
+  <t.body
+    @rows={{@model.rows}}
+    @estimateRowHeight={{60}}
+    @class="embedded-collection-table__body" as |b|
+  >
+    <b.row as |r|>
+      <r.cell as |cell column row cellMeta columnMeta|>
+        <Boxel class="embedded-collection-table__boxel-cell">
+          <BoxelHighlight {{on "click" (optional (fn @expandAction row))}} @class="embedded-collection-table__highlight" />
+          <div class="embedded-collection-table__cell {{if (eq columnMeta.index 0) "embedded-collection-table__cell--first-col"}} {{if row.selected "row-group-selected"}} embedded-collection-table__cell--{{@mode}}">
+            <div class="embedded-collection-table__cell-value {{if (eq columnMeta.index 0) "embedded-collection-table__cell-value--first-col"}}">
+              {{#if (eq column.type "image")}}
+                <div class="embedded-collection-table__img-cell" style={{css-url "background-image" cell}} />
+              {{else if column.titleCase}}
+                {{#if column.hasAudio}}
+                  <PlayButton @class="embedded-collection-table__play-btn" @width="30px" @height="30px" />
+                {{/if}}
+                {{titleize cell}}
+              {{else}}
+                {{cell}}
+              {{/if}}
+            </div>
+          </div>
+        </Boxel>
+      </r.cell>
+    </b.row>
+  </t.body>
+
+  <t.foot
+    @rows={{@model.footerRows}}
+    @estimateRowHeight={{60}}
+    @class="embedded-collection-table__footer" as |f|
+  >
+    <f.row />
+  </t.foot>
+</EmberTable>

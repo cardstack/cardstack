@@ -1,0 +1,112 @@
+/* The details element that contains everything */
+.boxel-expandable-banner__details {
+  --boxel-link-highlight: var(--boxel-highlight);
+  --boxel-expandable-banner-min-height: 5rem;
+  --boxel-expandable-banner-min-height-open: 15rem;
+  --boxel-expandable-banner-text-color: var(--boxel-light);
+  --boxel-expandable-banner-background-color: var(--boxel-purple-400);
+  --boxel-expandable-banner-vertical-gap: var(--boxel-sp);
+  --boxel-expandable-banner-horizontal-gap: var(--boxel-sp-lg);
+
+  min-height: var(--boxel-expandable-banner-min-height);
+  color: var(--boxel-expandable-banner-text-color);
+  background-color: var(--boxel-expandable-banner-background-color);
+  border-radius: var(--boxel-border-radius);
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.15));
+  overflow: hidden;
+  transition: min-height var(--boxel-transition);
+}
+
+.boxel-expandable-banner__details[open] {
+  min-height: var(--boxel-expandable-banner-min-height-open);
+}
+
+/* Content within the details element, shown when it's expanded */
+.boxel-expandable-banner__details-content {
+  padding: 0 var(--boxel-expandable-banner-horizontal-gap) var(--boxel-sp-lg);
+  font: var(--boxel-font-sm);
+}
+
+.boxel-expandable-banner__summary {
+  cursor: pointer;
+  border-radius: inherit;
+}
+
+.boxel-expandable-banner__summary-layout {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: var(--boxel-expandable-banner-min-height);
+  padding:
+    var(--boxel-expandable-banner-vertical-gap) calc(var(--boxel-sp-xs) + 3.375rem + var(--boxel-expandable-banner-horizontal-gap))
+    var(--boxel-expandable-banner-vertical-gap) var(--boxel-expandable-banner-horizontal-gap);
+}
+
+.boxel-expandable-banner__summary-text {
+  font: 600 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.boxel-expandable-banner__summary-icon {
+  --icon-color: var(--boxel-cyan);
+
+  width: 2.125rem;
+  height: 2.125rem;
+  margin-right: var(--boxel-sp-xs);
+  flex-shrink: 0;
+}
+
+/* marker styling */
+
+/*
+  remove the summary disclosure widget (the default triangle)
+  support is currently pretty decent: https://caniuse.com/?search=%3A%3Amarker
+  and certainly on our main browsers - Chrome, Safari, Firefox
+*/
+.boxel-expandable-banner__summary::marker,
+.boxel-expandable-banner__summary::-webkit-details-marker {
+  display: none;
+  content: '';
+}
+
+.boxel-expandable-banner__summary:focus {
+  outline: var(--boxel-outline);
+  outline-offset: -4px;
+}
+
+.boxel-expandable-banner__summary:focus:not(:focus-visible) {
+  outline: transparent;
+}
+
+/* style our custom markers */
+.boxel-expandable-banner__summary-marker::before {
+  display: block;
+  content: "Show";
+}
+
+.boxel-expandable-banner__details[open] .boxel-expandable-banner__summary-marker::before {
+  content: "Hide";
+}
+
+.boxel-expandable-banner__summary-marker {
+  --icon-color: var(--boxel-light);
+
+  position: absolute;
+  right: var(--boxel-expandable-banner-horizontal-gap);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.boxel-expandable-banner__summary-marker-icon {
+  margin-left: var(--boxel-sp-xs);
+  transform: rotate(180deg);
+}
+
+.boxel-expandable-banner__details[open] .boxel-expandable-banner__summary-marker-icon {
+  transform: rotate(0);
+}

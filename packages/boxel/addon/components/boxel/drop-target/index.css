@@ -1,0 +1,28 @@
+.boxel-drop-target {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--boxel-border-radius);
+  padding: var(--boxel-sp);
+  border: var(--boxel-drop-target-border);
+  background-color: var(--boxel-drop-target-background);
+}
+
+.boxel-drop-target__cta {
+  font: 400 var(--boxel-font-sm);
+  text-align: center;
+  color: rgba(0, 0, 0, 0.5);
+  margin-top: var(--boxel-sp-xs);
+  user-select: none;
+}
+
+.boxel-drop-target--rest {
+  --boxel-drop-target-border: 1px solid var(--boxel-light-500);
+  --boxel-drop-target-background: var(--boxel-light);
+}
+
+.boxel-drop-target--dragover {
+  --boxel-drop-target-border: 1px solid var(--boxel-light-500);
+  --boxel-drop-target-background: var(--boxel-purple-100);
+}

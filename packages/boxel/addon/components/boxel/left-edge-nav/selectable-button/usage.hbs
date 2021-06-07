@@ -1,0 +1,26 @@
+<Freestyle::Usage
+  @name="LeftEdgeNav::SelectableButton"
+>
+  <:example>
+    <Doc::DemoStage @width="80px" @paddingX="0px" @textAlign="center" @bg="boxel-purple-800">
+      <Boxel::LeftEdgeNav::SelectableButton
+        aria-label="Bunny Records org page"
+        @isSelected={{this.isSelected}}
+      >
+        <div
+          style={{html-safe (concat (css-url "background-image" this.orgLogo) ";background-size:contain;background-repeat:no-repeat;height:2.5rem;width:100%;")}}
+        />
+      </Boxel::LeftEdgeNav::SelectableButton>
+    </Doc::DemoStage>
+  </:example>
+  <:api as |Args|>
+    <Args.Bool
+      @name="isSelected"
+      @value={{this.isSelected}}
+      @description="when true, renders in selected state"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.isSelected)}}
+    />
+    <Args.Yield @optional={{true}} @description="The content of the button." />
+  </:api>
+</Freestyle::Usage>

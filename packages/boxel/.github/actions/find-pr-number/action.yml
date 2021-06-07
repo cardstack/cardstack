@@ -1,0 +1,12 @@
+name: 'Find PR number'
+description: 'Find a PR number for a PR that is targeting main, given the branch name'
+branding:
+  icon: 'message-circle'
+  color: 'purple'
+inputs:
+  branch:
+    description: 'Branch associated with PR'
+    required: true
+runs:
+  using: 'node12'
+  main: 'index.js'

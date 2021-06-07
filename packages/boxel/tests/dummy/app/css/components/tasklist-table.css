@@ -1,0 +1,51 @@
+.tasklist-table.ember-table {
+  --table-border-color: var(--boxel-border-color);
+  --cell-height: 50px;
+}
+
+.tasklist-table > table {
+  width: 100%;
+}
+
+.tasklist-table__header th {
+  height: 40px;
+  padding: 0;
+  background-color: var(--boxel-light);
+  border-bottom: 1px solid var(--table-border-color);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.tasklist-table__header-cell {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  padding: 12px 20px;
+  text-align: left;
+}
+
+.tasklist-table__body td {
+  padding: 0;
+}
+
+.tasklist-table__cell {
+  height: var(--cell-height);
+  display: grid;
+  align-items: center;
+  border-bottom: 1px solid var(--table-border-color);
+}
+
+.tasklist-table__cell-value {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tasklist-table__cell-important {
+  color: var(--boxel-red);
+}

@@ -1,0 +1,66 @@
+<div class="boxel-card__container boxel-card__container--{{or @format "list"}} boxel-card--{{@model.type}} boxel-card--{{@model.id}}" ...attributes>
+  {{#if @status}}
+    <BoxelHighlight @status={{@status}} />
+    <BoxelActions @status={{@status}} @class="{{if @comparisonType "boxel-actions--comparison-mode"}} {{if (and @drillDown (not-eq @status "no-change")) "with-expand"}}">
+      {{#if @comparisonType}}
+        <ComparisonModeLabel @status={{@status}} @modifiedCount={{if @model.modifiedCount @model.modifiedCount @fieldData.modifiedCount}} @statusText={{@statusText}} @comparisonType={{@comparisonType}} />
+      {{/if}}
+    </BoxelActions>
+    {{#if (and @drillDown (not-eq @status "no-change"))}}
+      <BoxelActions @status={{@status}} @class="boxel-actions__expand">
+        <Boxel::IconButton
+          @icon="expand"
+          class="boxel-actions__expand-btn"
+          aria-label="expand"
+          {{on "click" (fn @drillDown @model @fieldData)}}
+        />
+      </BoxelActions>
+    {{/if}}
+  {{/if}}
+  {{#if @expandAction}}
+    <BoxelHighlight @expandAction={{@expandAction}} @class="boxel-card__expand-overlay" />
+  {{/if}}
+  {{#if @model.type}}
+    <Boxel::Header class="boxel-card__header" @header={{humanize @model.type}} />
+  {{/if}}
+
+  {{!-- Template and the styling of the area below (the card itself) is up to the card author. --}}
+  {{!-- The template below and its styling is an embedded card template for media-registry cards. --}}
+    <article class="boxel-card boxel-card--default boxel-card--{{if @model @model.type "blank-card"}} {{@class}}">
+      <div class="boxel-card__inner boxel-card__inner--{{or @format "list"}} {{if (or @model.imgURL @hasImage) "boxel-card__inner--with-img"}} {{if (and @status (not-eq @status "no-change")) "" "field-renderer__opacity-control"}}">
+        {{#if @model.imgURL}}
+          <div class="boxel-card__bg-img boxel-card__bg-img--{{@model.id}}" style={{css-url "background-image" @model.imgURL}} />
+        {{/if}}
+        {{#if @model.title}}
+          <h3 class="boxel-card__title">{{@model.title}}</h3>
+        {{/if}}
+        {{#if @model.description}}
+          <p class="boxel-card__description">
+            {{#if @model.createdDate}}
+              Created {{dayjs-format @model.createdDate "MMM DD, YYYY" "YYYY-MM-DD"}}<br><br>
+            {{/if}}
+
+            {{@model.description}}
+          </p>
+        {{/if}}
+
+        {{yield}}
+
+        {{#if (and @model.fields (is-array @model.fields))}}
+          <ul class="boxel-card__fields">
+            {{#each @model.fields as |field|}}
+              <li>
+                <Boxel::FieldRenderer
+                  @class="boxel-card-field"
+                  @mode={{@mode}}
+                  @field={{field}}
+                />
+              </li>
+            {{/each}}
+          </ul>
+        {{/if}}
+      </div>
+    </article>
+  {{!-- End of card author jurisdiction --}}
+
+</div>

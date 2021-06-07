@@ -1,0 +1,18 @@
+<Freestyle::Usage @description="Presentational drop target. Requires assembly for drop logic">
+  <:example>
+    <Boxel::DropTarget
+      @state={{this.state}}
+    >
+    </Boxel::DropTarget>
+  </:example>
+
+  <:api as |Args|>
+    <Args.String
+      @name="state"
+      @options={{array "rest" "dragover"}}
+      @default="rest"
+      @value={{this.state}}
+      @onInput={{fn (mut this.state)}}
+    />
+  </:api>
+</Freestyle::Usage>

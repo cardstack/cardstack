@@ -1,0 +1,29 @@
+<Freestyle::Usage @name="ProgressCircle">
+  <:example>
+    <Boxel::ProgressCircle
+      @size={{this.size}}
+      @percentComplete={{this.percentComplete}}
+    />
+  </:example>
+
+  <:api as |Args|>
+    <Args.Number
+      @name="size"
+      @required={{true}}
+      @min={{40}}
+      @max={{200}}
+      @description="the size of the circle, in px"
+      @value={{this.size}}
+      @onInput={{fn (mut this.size)}}
+    />
+    <Args.Number
+      @name="percentComplete"
+      @defaultValue={{0}}
+      @min={{0}}
+      @max={{100}}
+      @description="completeness from 0 to 100"
+      @value={{this.percentComplete}}
+      @onInput={{fn (mut this.percentComplete)}}
+    />
+  </:api>
+</Freestyle::Usage>

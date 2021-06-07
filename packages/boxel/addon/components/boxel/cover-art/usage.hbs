@@ -1,0 +1,50 @@
+<Freestyle::Usage @name="CoverArt">
+  <:example>
+    <Boxel::CoverArt
+      @size={{this.size}}
+      @maxWidth={{this.maxWidth}}
+      @covers={{this.coverThumbs}}
+      @spacingMultiplier={{this.spacingMultiplier}}
+    />
+  </:example>
+
+  <:api as |Args|>
+    <Args.Number
+      @name="size"
+      @defaultValue={{80}}
+      @min={{20}}
+      @max={{200}}
+      @description="the size of the largest art, in px. Defaults to 80"
+      @value={{this.size}}
+      @onInput={{fn (mut this.size)}}
+    />
+    <Args.Number
+      @name="maxWidth"
+      @defaultValue={{190}}
+      @min={{100}}
+      @max={{500}}
+      @step={{5}}
+      @description="the maximum width of the layout"
+      @value={{this.maxWidth}}
+      @onInput={{fn (mut this.maxWidth)}}
+    />
+    <Args.Array
+      @name="covers"
+      @type="String"
+      @required={{true}}
+      @description="a collection of thumbnails to lay out. There is no reason to pass more than 5 as they are barely rendered"
+      @items={{this.coverThumbs}}
+      @onChange={{this.updateCoverThumbs}}
+    />
+    <Args.Number
+      @name="spacingMultiplier"
+      @defaultValue={{1}}
+      @min={{0}}
+      @max={{1.5}}
+      @step={{0.1}}
+      @description="Optional adjustment for how closely the covers are displayed"
+      @value={{this.spacingMultiplier}}
+      @onInput={{fn (mut this.spacingMultiplier)}}
+    />
+  </:api>
+</Freestyle::Usage>
