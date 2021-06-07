@@ -7,9 +7,9 @@ import {
   ConvertibleSymbol,
   ConversionFunction,
 } from '@cardstack/web-client/utils/token';
-import { UnbindEventListener } from '@cardstack/web-client/utils/events';
+import { Emitter } from '@cardstack/web-client/utils/events';
 
-export interface Web3Strategy {
+export interface Web3Strategy extends Emitter {
   chainName: string;
   isConnected: boolean;
   walletConnectUri: string | undefined;
@@ -17,7 +17,6 @@ export interface Web3Strategy {
 }
 
 export interface Layer1Web3Strategy extends Web3Strategy {
-  on(event: string, cb: Function): UnbindEventListener;
   isConnected: boolean;
   currentProviderId: string | undefined;
   defaultTokenBalance: BN | undefined;
@@ -37,7 +36,6 @@ export interface Layer1Web3Strategy extends Web3Strategy {
 }
 
 export interface Layer2Web3Strategy extends Web3Strategy {
-  on(event: string, cb: Function): UnbindEventListener;
   isConnected: boolean;
   defaultTokenBalance: BN | undefined;
   updateUsdConverters(
