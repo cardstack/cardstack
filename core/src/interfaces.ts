@@ -34,9 +34,14 @@ export const DESERIALIZER_NAMES = Object.keys(
 export type CardData = Record<string, any>;
 
 /* Card type IDEAS
-  primitive: Where card is a value, has validation and/or a serialize. IE: Date, string
-  composite: Where card is combining multifle cards, ie: A blog post
-  data: A card that likely adopts from a composite card, but only provides new data for it
+  primitive: 
+    Where card is a value, has validation and/or a serialize. IE: Date, string
+    Has a @value attribute
+  composite: 
+    Where card is combining multifle cards, ie: A blog post
+    Has a @model attribute
+  data: 
+    A card that likely adopts from a composite card, but only provides new data for it
 */
 
 export type RawCard = {

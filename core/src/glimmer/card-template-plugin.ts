@@ -448,14 +448,13 @@ function expandContainsManyShorthand(fieldName: string): Statement[] {
   ];
 }
 
-// <@model.createdAt /> -> <DateField @model={{@model.createdAt}} />
+// <@fields.createdAt /> -> <DateField @model={{@model.createdAt}} @set={{@set.setters.createdAt}} />
 function rewriteFieldToComponent(
   importAndChooseName: ImportAndChooseName,
   field: Field,
   modelArgument: string,
   state: State,
-  format: Format,
-  prefix?: string
+  format: Format
 ): Statement[] {
   let { element, attr, mustache, path } = syntax.builders;
 
@@ -465,18 +464,17 @@ function rewriteFieldToComponent(
     'default'
   );
 
-  if (prefix) {
-    modelArgument = prefix + modelArgument;
-  }
-
   let modelExpression = path(modelArgument);
   state.handledModelExpressions.add(modelExpression);
+  let attrs = [attr('@model', mustache(modelExpression))];
 
-  let elementNode = element(componentName, {
-    // build our own PathExpression for modelArgument so we can put it onto
-    // state.handledModelExpressions
-    attrs: [attr('@model', mustache(modelExpression))],
-  });
+  // TODO: Test this!
+  if (format === 'edit') {
+    let setterArg = modelArgument.replace(MODEL + '.', '');
+    attrs.push(attr('@set', mustache(path(`@set.setters.${setterArg}`))));
+  }
+
+  let elementNode = element(componentName, { attrs });
   elementNode.selfClosing = true;
   return [elementNode];
 }
@@ -507,6 +505,7 @@ function trackUsageForModel(
   handledModelExpressions: State['handledModelExpressions']
 ) {
   if (
+    node.original === 'debugger' ||
     node.head.type !== 'AtHead' ||
     node.head.name !== MODEL ||
     handledModelExpressions.has(node)

@@ -20,6 +20,14 @@ export interface LoadedCard {
   component: unknown;
 }
 
+function buildURL(url: string, format?: Format): string {
+  let fullURL = [cardServer, 'cards/', encodeCardURL(url)];
+  if (format) {
+    fullURL.push('?' + new URLSearchParams({ format }).toString());
+  }
+  return fullURL.join('');
+}
+
 export default class Cards extends Service {
   // TODO: Move to modal service
   @tracked isShowingModal = false;
@@ -40,9 +48,8 @@ export default class Cards extends Service {
     url: string,
     format: Format
   ): Promise<{ model: any; component: unknown }> {
-    let params = new URLSearchParams({ format }).toString();
-    let fullURL = [cardServer, 'cards/', encodeCardURL(url), `?${params}`];
-    return this.internalLoad.perform(fullURL.join(''));
+    let fullURL = buildURL(url, format);
+    return this.internalLoad.perform(fullURL);
   }
 
   async loadForRoute(
@@ -70,30 +77,65 @@ export default class Cards extends Service {
           `${url}'s meta.componentModule does not start with '@cardstack/compiled/`
         );
       }
-      componentModule = componentModule.replace('@cardstack/compiled/', '');
-      cardComponent = (
-        await import(
-          /* webpackExclude: /schema\.js$/ */
-          `@cardstack/compiled/${componentModule}`
-        )
-      ).default;
+
+      // TODO: @set should be conditional?
+      let CallerComponent = setComponentTemplate(
+        hbs`<this.card @model={{this.model}} @set={{this.setters}} />`,
+        class extends Component<{
+          set: (segments: string[], value: any) => void;
+        }> {
+          card = cardComponent;
+          model = model;
+
+          get setters() {
+            return makeSetter(this.args.set);
+          }
+        }
+      );
+
+      return {
+        model,
+        component: CallerComponent,
+      };
     }
+  );
 
-    let CallerComponent = setComponentTemplate(
-      hbs`<this.card @model = {{this.model}} />`,
-      class extends Component {
-        card = cardComponent;
-        model = model;
-      }
-    );
+  async save(cardURL: string, data: unknown): Promise<void> {
+    await this.saveTask.perform(cardURL, data);
+  }
 
-    return {
-      model,
-      component: CallerComponent,
-    };
-  });
+  @task saveTask = taskFor(
+    async (cardURL: string, data: any): Promise<void> => {
+      await fetch(buildURL(cardURL), {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      });
+    }
+  );
 }
 
+function makeSetter(
+  callback: (segments: string[], value: any) => void,
+  segments: string[] = []
+): any {
+  let s = (value: any) => {
+    callback(segments, value);
+  };
+  (s as any).setters = new Proxy(
+    {},
+    {
+      get: (target: object, prop: string, receiver: unknown) => {
+        console.log('PROXY GET', target, prop, receiver);
+        if (typeof prop === 'string') {
+          return makeSetter(callback, [...segments, prop]);
+        } else {
+          return Reflect.get(target, prop, receiver);
+        }
+      },
+    }
+  );
+  return s;
+}
 async function fetchCard(url: string): Promise<cardJSONReponse> {
   let response = await fetch(url);
 
