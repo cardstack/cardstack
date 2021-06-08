@@ -16,6 +16,7 @@
     "skipLibCheck": true
   },
   "include": [
+    "./packages/did-resolver/**/*.ts",
     "./packages/eslint-config/**/*.ts",
     "./packages/hub/**/*.ts",
     "./packages/test-support/**/*.ts",

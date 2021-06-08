@@ -43,6 +43,10 @@ package-lock.json
 /packages/cardpay-cli/**/*.js
 /packages/cardpay-cli/**/*.js.map
 
+/packages/did-resolver/**/*.js
+/packages/did-resolver/**/*.d.ts
+/packages/did-resolver/**/*.js.map
+
 # generated files you may end up with if you run the cli blueprint directly
 packages/cli/node-tests/sample-cards/*/node_modules/**/*
 
