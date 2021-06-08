@@ -15,9 +15,9 @@ export async function registerMerchant(
   console.log(
     `Paying merchant registration fee in the amount of §${await revenuePool.merchantRegistrationFee()} SPEND from prepaid card address ${prepaidCardAddress}...`
   );
-  let { merchantSafe, gnosisTxn } = await revenuePool.registerMerchant(prepaidCardAddress, infoDID);
+  let { merchantSafe, gnosisTxn } = (await revenuePool.registerMerchant(prepaidCardAddress, infoDID)) ?? {};
   console.log(`Created merchant safe: ${merchantSafe}`);
-  console.log(`Transaction hash: ${blockExplorer}/tx/${gnosisTxn.ethereumTx.txHash}/token-transfers`);
+  console.log(`Transaction hash: ${blockExplorer}/tx/${gnosisTxn?.ethereumTx.txHash}/token-transfers`);
 }
 
 export async function revenueBalances(network: string, mnemonic: string, merchantSafeAddress: string): Promise<void> {

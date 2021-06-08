@@ -60,5 +60,5 @@ export async function payMerchant(
     `Paying merchant safe address ${merchantSafe} the amount §${amount} SPEND from prepaid card address ${prepaidCardAddress}...`
   );
   let result = await prepaidCard.payMerchant(merchantSafe, prepaidCardAddress, amount);
-  console.log(`Transaction hash: ${blockExplorer}/tx/${result.ethereumTx.txHash}/token-transfers`);
+  console.log(`Transaction hash: ${blockExplorer}/tx/${result?.ethereumTx.txHash}/token-transfers`);
 }
