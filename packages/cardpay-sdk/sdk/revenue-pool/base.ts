@@ -40,6 +40,15 @@ export default class RevenuePool {
     return Number(await (await this.getRevenuePool()).methods.merchantRegistrationFeeInSPEND().call());
   }
 
+  async currentTokenUSDRate(tokenAddress: string): Promise<string> {
+    let revenuePool = new this.layer2Web3.eth.Contract(
+      RevenuePoolABI as AbiItem[],
+      await getAddress('revenuePool', this.layer2Web3)
+    );
+    let { price } = await revenuePool.methods.exchangeRateOf(tokenAddress).call();
+    return price;
+  }
+
   async balances(merchantSafeAddress: string): Promise<RevenueTokenBalance[]> {
     let revenuePool = new this.layer2Web3.eth.Contract(
       RevenuePoolABI as AbiItem[],
@@ -85,8 +94,7 @@ export default class RevenuePool {
 
     let rateChanged = false;
     do {
-      let exchangeRateAPI = await getSDK('ExchangeRate', this.layer2Web3);
-      let rateLock = await exchangeRateAPI.getCurrentUSDRate(issuingToken);
+      let rateLock = await this.currentTokenUSDRate(issuingToken);
       try {
         let payload = await getPayMerchantPayload(
           this.layer2Web3,

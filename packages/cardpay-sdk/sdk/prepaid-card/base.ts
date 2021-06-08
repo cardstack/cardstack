@@ -69,8 +69,8 @@ export default class PrepaidCard {
 
     let rateChanged = false;
     do {
-      let exchangeRateAPI = await getSDK('ExchangeRate', this.layer2Web3);
-      let rateLock = await exchangeRateAPI.getCurrentUSDRate(issuingToken);
+      let revenuePool = await getSDK('RevenuePool', this.layer2Web3);
+      let rateLock = await revenuePool.currentTokenUSDRate(issuingToken);
       try {
         let payload = await getPayMerchantPayload(
           this.layer2Web3,

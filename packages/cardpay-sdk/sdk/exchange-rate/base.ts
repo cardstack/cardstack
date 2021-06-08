@@ -50,13 +50,6 @@ export default class ExchangeRate {
     return safeFloatConvert(rawAmount, oracleDecimals);
   }
 
-  // This returns the USD price as a decimal 8 string
-  async getCurrentUSDRate(token: string): Promise<string> {
-    let oracle = await this.getOracleContract(token);
-    let usdRawRate = new BN((await oracle.methods.usdPrice().call()).price);
-    return usdRawRate.toString();
-  }
-
   async getETHPrice(token: string, amount: string): Promise<string> {
     let oracle = await this.getOracleContract(token);
     let ethRawRate = new BN((await oracle.methods.ethPrice().call()).price);
