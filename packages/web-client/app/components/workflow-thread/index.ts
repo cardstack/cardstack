@@ -1,6 +1,9 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { Workflow } from '@cardstack/web-client/models/workflow';
+import { buildWaiter } from '@ember/test-waiters';
+
+let waiter = buildWaiter('testing-waiter');
 
 interface WorkflowThreadArgs {
   workflow: Workflow;
@@ -8,6 +11,14 @@ interface WorkflowThreadArgs {
 
 export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   threadEl: HTMLElement | undefined;
+
+  constructor(owner: unknown, args: any) {
+    super(owner, args);
+
+    let token = waiter.beginAsync();
+    waiter.endAsync(token);
+  }
+
   @action focus(element: HTMLElement): void {
     this.threadEl = element;
     element.focus();
