@@ -154,33 +154,19 @@ class DepositWorkflow extends Workflow {
     new NetworkAwareWorkflowMessage({
       author: cardbot,
       message:
-        'It looks like your wallets have been disconnected. If you still want to deposit funds, please start again by connecting your wallets.',
+        'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).',
       includeIf() {
         let message = this as NetworkAwareWorkflowMessage;
-        return !message.hasLayer1Account && !message.hasLayer2Account;
-      },
-    }),
-    new NetworkAwareWorkflowMessage({
-      author: cardbot,
-      message:
-        'It looks like your mainnet wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
-      includeIf() {
-        let message = this as NetworkAwareWorkflowMessage;
-        return !message.hasLayer1Account && message.hasLayer2Account;
-      },
-    }),
-    new NetworkAwareWorkflowMessage({
-      author: cardbot,
-      message:
-        'It looks like your xDai chain wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
-      includeIf() {
-        let message = this as NetworkAwareWorkflowMessage;
-        return message.hasLayer1Account && !message.hasLayer2Account;
+        return !message.hasLayer1Account || !message.hasLayer2Account;
       },
     }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'card-pay/deposit-workflow/workflow-canceled-cta',
+      includeIf() {
+        let message = this as NetworkAwareWorkflowMessage;
+        return !message.hasLayer1Account || !message.hasLayer2Account;
+      },
     }),
   ]);
 

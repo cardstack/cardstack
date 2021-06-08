@@ -573,7 +573,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(cancelationPostableSel(0))
       .containsText(
-        'It looks like your mainnet wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
+        'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).'
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
     assert.dom('[data-test-deposit-workflow-canceled-restart]').exists();
@@ -653,7 +653,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(cancelationPostableSel(0))
       .containsText(
-        'It looks like your mainnet wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
+        'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).'
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
     assert.dom('[data-test-deposit-workflow-canceled-restart]').exists();
@@ -737,7 +737,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(cancelationPostableSel(0))
       .containsText(
-        'It looks like your xDai chain wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
+        'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).'
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
 
@@ -822,7 +822,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(cancelationPostableSel(0))
       .containsText(
-        'It looks like your xDai chain wallet has been disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
+        'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).'
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
     assert.dom('[data-test-deposit-workflow-canceled-restart]').exists();
