@@ -2,10 +2,7 @@
   <div class="card-pay-nested-items__outer">
     {{yield to="outer"}}
   </div>
-  <div class="card-pay-nested-items__inner">
+  <div class={{cn "card-pay-nested-items__inner" (if @innerClass @innerClass)}}>
     {{yield to="inner"}}
   </div>
-  {{#if (has-block "default")}}
-    {{yield to="default"}}
-  {{/if}}
 </div>

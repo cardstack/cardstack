@@ -6,12 +6,21 @@ import { taskFor } from 'ember-concurrency-ts';
 import { task } from 'ember-concurrency-decorators';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import WorkflowSession from '../../../../models/workflow/workflow-session';
+import BN from 'bn.js';
 import { toBN } from 'web3-utils';
 import {
   TokenDisplayInfo,
   TokenSymbol,
   bridgeableSymbols,
 } from '@cardstack/web-client/utils/token';
+
+interface Token {
+  balance: BN;
+  icon: string;
+  name: string;
+  description: string;
+  symbol: TokenSymbol;
+}
 
 interface FundingSourceCardArgs {
   workflowSession: WorkflowSession;
@@ -25,7 +34,7 @@ class FundingSourceCard extends Component<FundingSourceCardArgs> {
   @service declare layer2Network: Layer2Network;
 
   @reads('args.workflowSession.state.prepaidFundingToken')
-  declare selectedTokenSymbol: TokenSymbol;
+  declare selectedToken: Token;
 
   constructor(owner: unknown, args: FundingSourceCardArgs) {
     super(owner, args);
@@ -36,6 +45,9 @@ class FundingSourceCard extends Component<FundingSourceCardArgs> {
           this.args.workflowSession.update('depotAddress', depot.address);
           this.args.workflowSession.update('depotTokens', depot.tokens);
         }
+      })
+      .then(() => {
+        if (!this.selectedToken) this.chooseSource(this.tokens[0]);
       });
   }
 
@@ -48,10 +60,10 @@ class FundingSourceCard extends Component<FundingSourceCardArgs> {
     return this.args.workflowSession.state.depotTokens || [];
   }
 
-  @action getBalance(symbol: string) {
+  @action getBalance(symbol: TokenSymbol) {
     if (symbol && this.depotTokens.length) {
       let depotToken = this.depotTokens.find(
-        (item: { balance: string; token: { symbol: string } }) =>
+        (item: { balance: string; token: { symbol: TokenSymbol } }) =>
           item?.token?.symbol === symbol
       );
       if (depotToken.balance) {
@@ -67,23 +79,12 @@ class FundingSourceCard extends Component<FundingSourceCardArgs> {
       return {
         ...token,
         balance,
-      };
+      } as Token;
     });
   }
 
-  get selectedToken() {
-    if (
-      this.selectedTokenSymbol &&
-      TokenDisplayInfo.isRecognizedSymbol(this.selectedTokenSymbol)
-    ) {
-      return this.tokens.find((t) => t.symbol === this.selectedTokenSymbol);
-    } else {
-      return undefined;
-    }
-  }
-
-  @action chooseSource(tokenSymbol: string) {
-    this.args.workflowSession.update('prepaidFundingToken', tokenSymbol);
+  @action chooseSource(token: Token) {
+    this.args.workflowSession.update('prepaidFundingToken', token);
   }
 }
 

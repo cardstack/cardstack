@@ -6,7 +6,9 @@ const concat = require('broccoli-concat');
 const webpack = require('webpack');
 
 module.exports = function (defaults) {
-  let app = new EmberApp(defaults, {});
+  let app = new EmberApp(defaults, {
+    'ember-power-select': { theme: false },
+  });
 
   app.import('node_modules/broadcastchannel-polyfill/index.js');
 

@@ -1,33 +1,14 @@
-<label class={{cn "token-option" token-option--checked=@checked}} ...attributes>
-  <Input
-    name="deposit-token"
-    class={{cn "token-option__input" token-option__input--checked=@checked}}
-    @type="radio"
-    @checked={{@checked}}
-    {{on "input" @onInput}}
-  />
-  <div class="token-option__currency">
-    {{svg-jar @tokenIcon class="token-option__icon" role="presentation" width="40" height="40"}}
-    <div>
-      <div class="token-option__title" data-test-option={{@tokenSymbol}}>
-        {{@tokenSymbol}}
-      </div>
-      <div class="token-option__desc">
-        {{@tokenDescription}}
-      </div>
-    </div>
-  </div>
+<div class="funding-source-token-option" ...attributes>
+  {{svg-jar @tokenIcon class="funding-source-token-option__icon" role="presentation" width="20" height="20"}}
   <div>
-    <div class="token-option__balance-header">Balance</div>
-    <div class="token-option__balance" data-test-balance={{@tokenSymbol}}>
-      {{@balance}} {{@tokenSymbol}}
+    <div class="funding-source-token-option__title">
+      {{@tokenSymbol}}
     </div>
-    <div class="token-option__usd-balance" data-test-usd-balance={{@tokenSymbol}}>
-      {{#if @balanceInUsd}}
-        $ {{@balanceInUsd}} USD
-      {{else}}
-        <Boxel::LoadingIndicator class="token-option__loading-indicator"/>
-      {{/if}}
+    <div class="funding-source-token-option__balance" data-test-funding-source-option={{@tokenSymbol}}>
+      {{@balance}} {{@tokenSymbol}}.CPXD
     </div>
   </div>
-</label>
+  {{#if @selected}}
+    {{svg-jar "checkmark"}}
+  {{/if}}
+</div>

@@ -44,7 +44,10 @@
     </ActionCardContainer::Section>
     <ActionCardContainer::Section>
       <CardPay::LabeledValue @label="BALANCE:" class="funding-source__field">
-        <CardPay::NestedItems class={{cn "funding-source__field-info" funding-source__field-info--complete=@isComplete}}>
+        <CardPay::NestedItems
+          class={{cn "funding-source__field-info" funding-source__field-info--complete=@isComplete}}
+          @innerClass={{unless @isComplete "funding-source__nested-dropdown"}}
+        >
           <:outer>
             <div class="funding-source__icon-group">
               {{svg-jar "depot" class=(if @isComplete "funding-source__icon-sm" "funding-source__icon") role="presentation"}}
@@ -73,25 +76,24 @@
                   </div>
                 </div>
               </div>
+            {{else}}
+              <PowerSelect
+                class="funding-source__dropdown"
+                @options={{this.tokens}}
+                @selected={{this.selectedToken}}
+                @onChange={{this.chooseSource}}
+                @renderInPlace={{true}}
+                @verticalPosition="below"
+              as |token|>
+                <CardPay::IssuePrepaidCardWorkflow::FundingSource::TokenOption
+                  class={{cn "funding-source__dropdown-option" (if (eq token.symbol this.selectedToken.symbol) "funding-source__dropdown-option--selected")}}
+                  @balance={{format-token-amount token.balance}}
+                  @tokenSymbol={{token.symbol}}
+                  @tokenIcon={{token.icon}}
+                />
+              </PowerSelect>
             {{/if}}
           </:inner>
-          <:default>
-            {{#unless @isComplete}}
-              <div class="funding-source__options">
-                {{#each this.tokens as |token|}}
-                  <CardPay::DepositWorkflow::TransactionSetup::TokenOption
-                    @checked={{eq @workflowSession.state.prepaidFundingToken token.symbol}}
-                    @onInput={{fn this.chooseSource token.symbol}}
-                    @balance={{format-token-amount token.balance}}
-                    @balanceInUsd={{token-to-usd token.symbol token.balance}}
-                    @tokenSymbol={{token.symbol}}
-                    @tokenDescription={{token.description}}
-                    @tokenIcon={{token.icon}}
-                  />
-                {{/each}}
-              </div>
-            {{/unless}}
-          </:default>
         </CardPay::NestedItems>
       </CardPay::LabeledValue>
     </ActionCardContainer::Section>
@@ -104,7 +106,7 @@
     <:default as |d|>
       <d.ActionButton
         {{on "click" @onComplete}}
-        @disabled={{not @workflowSession.state.prepaidFundingToken}}
+        @disabled={{not this.selectedToken}}
       >
         Continue
       </d.ActionButton>
