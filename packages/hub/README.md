@@ -27,3 +27,25 @@ Note that this package is written in TypeScript, so be sure to run a TypesScript
 compiler as you work.
 See the [project-wide README](https://github.com/cardstack/cardstack/blob/main/README.md)
 for information about running the Hub and its tests locally.
+
+## Connecting to the database
+
+### Setup AWS Session Manager ssh config
+
+Add the following to your `~/.ssh/config` file:
+
+```
+# SSH over Session Manager
+host i-* mi-*
+    ProxyCommand sh -c "aws ssm start-session --target %h --document-name AWS-StartSSHSession --parameters 'portNumber=%p'"
+```
+
+Lookup the tunneling command and database password:
+
+```
+cd [PROJECTS]/cardstack/infra/configs/hub/[staging|production]
+AWS_PROFILE=cardstack terraform output | grep tunnel_to_database
+AWS_PROFILE=cardstack terraform output | grep postgres_password
+```
+
+Run the command, open a postgres client, and connect to localhost, port 55432 with username cardstack, password as looked up in previous step.
