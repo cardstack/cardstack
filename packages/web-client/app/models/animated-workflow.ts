@@ -112,18 +112,20 @@ export default class AnimatedWorkflow {
   }
 
   revealNext() {
-    let revealed = false;
     if (this.isCanceled) {
       this.cancelationMessages.revealNext();
       return;
     }
+
+    if (this.isComplete) {
+      this.epilogue.revealNext();
+      return;
+    }
+
     for (const animatedMilestone of this.visibleMilestones) {
       if (animatedMilestone.revealNext()) {
-        break;
+        return;
       }
-    }
-    if (!revealed) {
-      this.epilogue.revealNext();
     }
   }
 
