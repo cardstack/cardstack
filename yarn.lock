@@ -1213,6 +1213,17 @@
     ember-cli-version-checker "^5.1.2"
     semver "^7.3.2"
 
+"@ember/test-waiters@^2.4.4":
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/@ember/test-waiters/-/test-waiters-2.4.4.tgz#4239d4cd9c60dc081d83e031463c22a628db028e"
+  integrity sha512-dhz4WplPWEPZ0Z8iJBI0uvUurv6Sk4aogNiI1XQxDXDNT13aE4WI/uQdsZXZtC+4xOUkz5V6Ob7iaEHDMixjbw==
+  dependencies:
+    calculate-cache-key-for-tree "^2.0.0"
+    ember-cli-babel "^7.26.2"
+    ember-cli-typescript "^4.1.0"
+    ember-cli-version-checker "^5.1.2"
+    semver "^7.3.2"
+
 "@embroider/babel-loader-7@0.41.0":
   version "0.41.0"
   resolved "https://registry.yarnpkg.com/@embroider/babel-loader-7/-/babel-loader-7-0.41.0.tgz#3635a15f38ef5d86722c5c144d043b9fb8c26325"
