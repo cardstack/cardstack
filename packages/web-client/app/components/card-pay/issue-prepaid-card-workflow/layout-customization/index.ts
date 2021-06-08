@@ -26,10 +26,14 @@ export default class LayoutCustomizationCard extends Component<LayoutCustomizati
     '#efefef',
     '#393642',
     '#c3fc33',
-    'linear-gradient(49.27deg, #ff5050 0%, #ac00ff 100%)',
-    'linear-gradient(49.27deg, #03c4bf 0%, #3689d2 30%, #ac00ff 100%)',
-    'linear-gradient(49.27deg, #c3fc33 0%, #0069f9 100%)',
-    'linear-gradient(49.27deg, #ac00ff 0%, #ffd800 100%)',
+    // gradients generated in https://codepen.io/aierie/pen/qBryBoy?editors=0010
+    // the codepen assumes that you are only generating gradients with two colors and is hardcoded
+    // if gradient style changes, this should be modified to make sure that angle and starting point is correct
+    // to use this, copy the svg code for a swatch's gradient and paste it in the codepen's input
+    'linear-gradient(139.27deg, #ff5050 16%, #ac00ff 100%)',
+    'linear-gradient(139.27deg, #03c4bf 16%, #ac00ff 100%)',
+    'linear-gradient(139.27deg, #c3fc33 16%, #0069f9 100%)',
+    'linear-gradient(139.27deg, #ac00ff 16%, #ffd800 100%)',
     'transparent',
   ].map((color) =>
     color === 'transparent'
