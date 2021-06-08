@@ -3,6 +3,7 @@
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const path = require('path');
 const concat = require('broccoli-concat');
+const webpack = require('webpack');
 
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {});
@@ -34,6 +35,15 @@ module.exports = function (defaults) {
     extraPublicTrees: [appComponentsStylesTree],
     packagerOptions: {
       webpackConfig: {
+        resolve: {
+          fallback: {
+            stream: require.resolve('stream-browserify'),
+            http: false,
+            https: false,
+            os: false,
+            crypto: false,
+          },
+        },
         module: {
           rules: [
             {
@@ -46,9 +56,16 @@ module.exports = function (defaults) {
           ],
         },
         node: {
-          crypto: true,
           global: true,
         },
+        plugins: [
+          new webpack.ProvidePlugin({
+            Buffer: ['buffer', 'Buffer'],
+          }),
+          new webpack.ProvidePlugin({
+            process: 'process/browser',
+          }),
+        ],
       },
     },
   });
