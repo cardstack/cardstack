@@ -11,6 +11,7 @@ export type TokenSymbol =
   | ConvertibleSymbol
   | BridgeableSymbol
   | Layer1BalanceSymbol;
+export type NetworkSymbol = 'kovan' | 'sokol' | 'mainnet' | 'xdai';
 
 // conversion
 // eslint-disable-next-line no-unused-vars
