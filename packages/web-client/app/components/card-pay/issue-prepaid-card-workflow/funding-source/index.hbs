@@ -8,7 +8,7 @@
         <CardPay::NestedItems class="funding-source__field-info">
           <:outer>
             {{!-- TODO: display account avatar and name if available --}}
-            <CardPay::Account
+            <CardPay::AccountDisplay
               @isComplete={{true}}
               @icon="avatar-default"
               @title="Account 1"
@@ -16,7 +16,7 @@
             />
           </:outer>
           <:inner>
-            <CardPay::Account
+            <CardPay::AccountDisplay
               @isComplete={{@isComplete}}
               @inner={{true}}
               @icon="depot"
@@ -31,10 +31,11 @@
       <CardPay::LabeledValue @label="BALANCE:" class="funding-source__field">
         <CardPay::NestedItems
           class="funding-source__field-info"
-          @innerClass={{unless @isComplete "funding-source__nested-field"}}
+          @noBorder={{not @isComplete}}
+          @noIndent={{not @isComplete}}
         >
           <:outer>
-            <CardPay::Account
+            <CardPay::AccountDisplay
               @isComplete={{@isComplete}}
               @icon="depot"
               @title="DEPOT:"
@@ -43,29 +44,31 @@
           </:outer>
           <:inner>
             {{#if @isComplete}}
-              <CardPay::Account
+              <CardPay::AccountDisplay
                 @isComplete={{@isComplete}}
                 @icon={{this.selectedToken.icon}}
                 @balance={{this.selectedToken.balance}}
                 @symbol={{this.selectedToken.symbol}}
               />
             {{else}}
-              <PowerSelect
-                class="funding-source__dropdown"
-                @options={{this.tokens}}
-                @selected={{this.selectedToken}}
-                @onChange={{this.chooseSource}}
-                @renderInPlace={{true}}
-                @verticalPosition="below"
-              as |token|>
-                <CardPay::Account
-                  class={{cn "funding-source__dropdown-option" (if (eq token.symbol this.selectedToken.symbol) "funding-source__dropdown-option--selected")}}
-                  @isComplete={{@isComplete}}
-                  @icon={{token.icon}}
-                  @balance={{token.balance}}
-                  @symbol={{token.symbol}}
-                />
-              </PowerSelect>
+              <div class="funding-source__nested-dropdown">
+                <PowerSelect
+                  class="funding-source__dropdown"
+                  @options={{this.tokens}}
+                  @selected={{this.selectedToken}}
+                  @onChange={{this.chooseSource}}
+                  @renderInPlace={{true}}
+                  @verticalPosition="below"
+                as |token|>
+                  <CardPay::AccountDisplay
+                    class={{cn "funding-source__dropdown-option" (if (eq token.symbol this.selectedToken.symbol) "funding-source__dropdown-option--selected")}}
+                    @isComplete={{@isComplete}}
+                    @icon={{token.icon}}
+                    @balance={{token.balance}}
+                    @symbol={{token.symbol}}
+                  />
+                </PowerSelect>
+              </div>
             {{/if}}
           </:inner>
         </CardPay::NestedItems>

@@ -8,23 +8,23 @@
   grid-row: 2;
 }
 
-/* nested items - dropdown */
-.funding-source__field-info .funding-source__nested-field {
-  --left-spacing: var(--boxel-sp-xxl);
-
-  position: relative;
-  margin-left: 0;
-  padding-left: var(--left-spacing);
-  border-left: 0;
-  background-image: url('/images/icons/curve-arrow.svg');
-  background-repeat: no-repeat;
-  background-position: left var(--boxel-sp-sm) center;
-}
 
 /* dropdown */
+.funding-source__nested-dropdown {
+  --arrow-space: 2.5rem;
+
+  margin-top: var(--boxel-sp-sm);
+  padding-left: calc(var(--arrow-space) + var(--boxel-sp-xs));
+  background-image: url('/images/icons/curve-arrow.svg');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: var(--arrow-space) 14px;
+}
+
 .funding-source__dropdown {
   --field-height: 3.75rem;
 
+  position: relative;
   min-height: var(--field-height);
 }
 
@@ -44,7 +44,7 @@
 .funding-source__dropdown .ember-basic-dropdown-content {
   position: absolute;
   z-index: 1;
-  width: calc(100% - var(--left-spacing));
+  width: 100%;
   background-color: var(--boxel-light);
   border: 1px solid var(--boxel-purple-300);
   border-radius: var(--boxel-border-radius-sm);
