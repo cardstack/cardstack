@@ -126,6 +126,7 @@ export abstract class Workflow {
   }
 
   emit(event: string, ...args: any[]) {
+    console.log('emitting', event);
     this.simpleEmitter.emit(event, ...args);
   }
 }

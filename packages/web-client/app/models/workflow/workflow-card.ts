@@ -15,7 +15,6 @@ export class WorkflowCard extends WorkflowPostable {
     this.componentName = options.componentName!;
     this.reset = () => {
       if (this.isComplete) {
-        this.workflow?.emit('visible-postables-changed');
         this.isComplete = false;
       }
     };
@@ -29,7 +28,6 @@ export class WorkflowCard extends WorkflowPostable {
     this.isComplete = true;
   }
   @action onIncomplete() {
-    this.workflow?.emit('visible-postables-changed');
     this.workflow?.resetTo(this);
   }
 }
