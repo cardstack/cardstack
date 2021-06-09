@@ -13,6 +13,7 @@
               @icon="avatar-default"
               @title="Account 1"
               @address={{this.layer2Network.walletInfo.firstAddress}}
+              data-test-funding-source-account
             />
           </:outer>
           <:inner>
@@ -22,6 +23,7 @@
               @icon="depot"
               @title="DEPOT:"
               @address={{this.fetchDepotTask.last.value.address}}
+              data-test-funding-source-depot-inner
             />
           </:inner>
         </CardPay::NestedItems>
@@ -40,6 +42,7 @@
               @icon="depot"
               @title="DEPOT:"
               @address={{this.fetchDepotTask.last.value.address}}
+              data-test-funding-source-depot-outer
             />
           </:outer>
           <:inner>
@@ -49,6 +52,7 @@
                 @icon={{this.selectedToken.icon}}
                 @balance={{this.selectedToken.balance}}
                 @symbol={{this.selectedToken.symbol}}
+                data-test-funding-source-token
               />
             {{else}}
               <div class="funding-source__nested-dropdown">
@@ -59,6 +63,7 @@
                   @onChange={{this.chooseSource}}
                   @renderInPlace={{true}}
                   @verticalPosition="below"
+                  data-test-funding-source-dropdown={{this.selectedToken.symbol}}
                 as |token|>
                   <CardPay::AccountDisplay
                     class={{cn "funding-source__dropdown-option" (if (eq token.symbol this.selectedToken.symbol) "funding-source__dropdown-option--selected")}}
@@ -66,6 +71,7 @@
                     @icon={{token.icon}}
                     @balance={{token.balance}}
                     @symbol={{token.symbol}}
+                    data-test-funding-source-token-option={{token.symbol}}
                   />
                 </PowerSelect>
               </div>

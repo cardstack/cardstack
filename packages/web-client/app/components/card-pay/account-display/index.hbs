@@ -3,15 +3,15 @@
     {{#if @isComplete}}
       {{svg-jar @icon class="account-display__icon" role="presentation"}}
       <div>
-        <div class="account-display__title-lg">
+        <div class="account-display__title-lg" data-test-account-title>
           {{format-token-amount @balance}} {{uppercase @symbol}}.CPXD
         </div>
       </div>
     {{else}}
       {{svg-jar @icon class="account-display__icon-sm" role="presentation"}}
       <div>
-        <div class="account-display__title-sm">{{uppercase @symbol}}.CPXD</div>
-        <div class="account-display__text-sm">
+        <div class="account-display__title-sm" data-test-account-title>{{uppercase @symbol}}.CPXD</div>
+        <div class="account-display__text-sm" data-test-account-balance>
           {{format-token-amount @balance}} {{uppercase @symbol}}.CPXD
         </div>
       </div>
@@ -21,16 +21,16 @@
       {{#if @inner}}
         {{svg-jar @icon class="account-display__icon" role="presentation"}}
         <div>
-          <div class="account-display__title-lg">{{@title}}</div>
-          <div class="account-display__text account-display__address-wrapped">
+          <div class="account-display__title-lg" data-test-account-title>{{@title}}</div>
+          <div class="account-display__text account-display__address-wrapped" data-test-account-address>
             {{@address}}
           </div>
         </div>
       {{else}}
         {{svg-jar @icon class="account-display__icon-sm" role="presentation"}}
         <div>
-          <div class="account-display__title-sm">{{@title}}</div>
-          <div class="account-display__text-sm account-display__address account-display__text--outer">
+          <div class="account-display__title-sm" data-test-account-title>{{@title}}</div>
+          <div class="account-display__text-sm account-display__address account-display__text--outer" data-test-account-address>
             {{truncate-middle @address 7 4}}
           </div>
         </div>
@@ -39,8 +39,8 @@
       {{#if @inner}}
         {{svg-jar @icon class="account-display__icon" role="presentation"}}
         <div>
-          <div class="account-display__title">{{@title}}</div>
-          <div class="account-display__text account-display__address">
+          <div class="account-display__title" data-test-account-title>{{@title}}</div>
+          <div class="account-display__text account-display__address" data-test-account-address>
             {{#if @address}}
               {{@address}}
             {{else}}
@@ -51,8 +51,8 @@
       {{else}}
         {{svg-jar @icon class="account-display__icon" role="presentation"}}
         <div>
-          <div class="account-display__title">{{@title}}</div>
-          <div class="account-display__text account-display__address account-display__text--outer">
+          <div class="account-display__title" data-test-account-title>{{@title}}</div>
+          <div class="account-display__text account-display__address account-display__text--outer" data-test-account-address>
             {{#if @address}}
               {{@address}}
             {{else}}
