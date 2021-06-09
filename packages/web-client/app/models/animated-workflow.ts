@@ -197,6 +197,19 @@ export default class AnimatedWorkflow {
     return lastMilestone?.completedDetail ?? 'Workflow started';
   }
 
+  resetPointerTo(card: WorkflowPostable) {
+    let found = false;
+    for (let { postableCollection } of this.milestones) {
+      if (found) postableCollection.revealPointer = undefined;
+      for (let postable of postableCollection.visiblePostables) {
+        if (postable === card) {
+          found = true;
+          postableCollection.revealPointer = card;
+          break;
+        }
+      }
+    }
+  }
   async startTestWaiter() {
     if (token) {
       return;

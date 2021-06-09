@@ -84,6 +84,7 @@ export abstract class Workflow {
   // invoked when we want to revert the workflow back to a particular, formerly complete postable
   resetTo(postable: WorkflowPostable) {
     let location = this.locatePostable(postable);
+    this.animatedWrapper?.resetPointerTo(postable);
     if (location.isInMilestone) {
       for (let i = location.milestoneIndex!; i < this.milestones.length; i++) {
         let milestone = this.milestones[i];
