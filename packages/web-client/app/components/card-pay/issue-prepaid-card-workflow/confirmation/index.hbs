@@ -1,11 +1,17 @@
-Prepaid card issued
-<CardPay::PrepaidCard
-  @issuerName={{@workflowSession.state.issuerName}}
-  @headerBackground={{@workflowSession.state.headerBackground.id}}
-  @headerTheme={{@workflowSession.state.headerTheme.id}}
-  @mockBalance={{true}}
-  @balance="123,456"
-  @usdBalance="123,456"
-  @address="0x1234...abcd"
-  @network="xDai Chain"
-/>
+<ActionCardContainer
+  @header="Prepaid card"
+  @isComplete={{@isComplete}}
+>
+  <ActionCardContainer::Section @icon="success" @title="Prepaid card issued">
+    <CardPay::PrepaidCard
+      @issuerName={{@workflowSession.state.issuerName}}
+      @headerBackground={{@workflowSession.state.headerBackground.id}}
+      @headerTheme={{@workflowSession.state.headerTheme.id}}
+      @mockBalance={{true}}
+      @balance="123,456"
+      @usdBalance="123,456"
+      @address="0x1234...abcd"
+      @network="xDai Chain"
+    />
+  </ActionCardContainer::Section>
+</ActionCardContainer>
