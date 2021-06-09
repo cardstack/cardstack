@@ -4,6 +4,7 @@ import PostableCollection from './workflow/postable-collection';
 import { WorkflowPostable } from './workflow/workflow-postable';
 import WorkflowSession from './workflow/workflow-session';
 import { tracked } from '@glimmer/tracking';
+import AnimatedWorkflow from './animated-workflow';
 
 interface PostableIndices {
   isInMilestone: boolean;
@@ -20,6 +21,7 @@ export abstract class Workflow {
   @tracked isCanceled = false;
   session: WorkflowSession = new WorkflowSession();
   owner: any;
+  animatedWrapper: AnimatedWorkflow | undefined;
 
   constructor(owner: any) {
     this.owner = owner;
@@ -53,6 +55,7 @@ export abstract class Workflow {
 
   cancel() {
     if (!this.isComplete) {
+      this.animatedWrapper?.startTestWaiter();
       this.isCanceled = true;
     }
   }

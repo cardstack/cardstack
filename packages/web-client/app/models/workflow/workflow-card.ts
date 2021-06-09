@@ -15,6 +15,7 @@ export class WorkflowCard extends WorkflowPostable {
     this.componentName = options.componentName!;
     this.reset = () => {
       if (this.isComplete) {
+        this.workflow?.animatedWrapper?.startTestWaiter();
         this.isComplete = false;
       }
     };
@@ -25,8 +26,10 @@ export class WorkflowCard extends WorkflowPostable {
 
   @action onComplete() {
     this.isComplete = true;
+    this.workflow?.animatedWrapper?.startTestWaiter();
   }
   @action onIncomplete() {
+    this.workflow?.animatedWrapper?.startTestWaiter();
     this.workflow?.resetTo(this);
   }
 }

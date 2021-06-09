@@ -6,7 +6,7 @@ import { WorkflowPostable } from './workflow/workflow-postable';
 import { tracked } from '@glimmer/tracking';
 import { taskFor } from 'ember-concurrency-ts';
 import { task } from 'ember-concurrency-decorators';
-import { timeout } from 'ember-concurrency';
+import { rawTimeout } from 'ember-concurrency';
 import { A } from '@ember/array';
 import config from '@cardstack/web-client/config/environment';
 import { buildWaiter } from '@ember/test-waiters';
@@ -100,6 +100,7 @@ export default class AnimatedWorkflow {
 
   constructor(model: Workflow) {
     this.model = model;
+    this.model.animatedWrapper = this;
     this.epilogue = new AnimatedPostableCollection(model.epilogue);
     this.cancelationMessages = new AnimatedPostableCollection(
       model.cancelationMessages
@@ -111,10 +112,46 @@ export default class AnimatedWorkflow {
 
   @task
   *tickerTask() {
+    this.startTestWaiter();
+    // short timeout to prevent moving revealpointer within the same runloop
+    yield rawTimeout(10);
+
     while (true) {
       this.revealNext();
-      yield timeout(interval);
+      if (
+        (this.isCanceled && this.cancelationMessages.isComplete) ||
+        (this.isComplete && this.epilogue.isComplete) ||
+        (this.lastPostable && !this.lastPostable.isComplete)
+      ) {
+        this.stopTestWaiter();
+      }
+      yield rawTimeout(interval);
     }
+  }
+
+  get lastPostable() {
+    if (!this.visibleMilestones) {
+      return null;
+    }
+
+    let res = this.visibleMilestones[0].visiblePostables[0];
+    for (let m of this.visibleMilestones) {
+      res = m.visiblePostables[m.visiblePostables.length - 1] || res;
+      continue;
+    }
+
+    if (this.isCanceled) {
+      res =
+        this.cancelationMessages.visiblePostables[
+          this.cancelationMessages.visiblePostables.length - 1
+        ] || res;
+    } else if (this.isComplete) {
+      res =
+        this.epilogue.visiblePostables[
+          this.epilogue.visiblePostables.length - 1
+        ] || res;
+    }
+    return res;
   }
 
   revealNext() {
@@ -180,5 +217,9 @@ export default class AnimatedWorkflow {
 
   destroy() {
     taskFor(this.tickerTask).cancelAll();
+    if (token) {
+      waiting?.resolve();
+      waiter.endAsync(token);
+    }
   }
 }
