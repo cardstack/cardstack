@@ -28,6 +28,10 @@ compiler as you work.
 See the [project-wide README](https://github.com/cardstack/cardstack/blob/main/README.md)
 for information about running the Hub and its tests locally.
 
+## Deploying to staging
+
+Green builds of the main branch deploy hub to staging if the commit contains changes to the hub package or its dependencies. The deploy uses waypoint.
+
 ## Connecting to the database
 
 ### Setup AWS Session Manager ssh config
