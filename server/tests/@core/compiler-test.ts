@@ -120,12 +120,12 @@ Qmodule('Compiler', function (hooks) {
     // prettier-ignore
     containsSource(
       builder.definedModules.get(compiled.edit.moduleName),
-      '<input type=\\\"text\\\" value=\\\"{{@model.name}}\\\" />', // eslint-disable-line
+      '<NameField @model={{@model.name}} @set={{@set.setters.name}} />',
       'Edit template is rendered for text'
     );
     containsSource(
       builder.definedModules.get(compiled.edit.moduleName),
-      '<BirthdateField @model={{@model.birthdate}} />',
+      '<BirthdateField @model={{@model.birthdate}} @set={{@set.setters.birthdate}} />',
       'Edit template is rendered for date'
     );
   });

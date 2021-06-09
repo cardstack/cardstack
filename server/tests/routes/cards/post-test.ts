@@ -24,7 +24,8 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
       .post(`/cards/${encodeURIComponent(cardURL)}`)
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
-      .send(payload);
+      .send(payload)
+      .expect('Content-Type', /json/);
   }
 
   let { resolveCard, getCardCacheDir } = setupCardCache(hooks);
@@ -78,25 +79,38 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
   QUnit.test(
     'can create a new card that adopts off an another card',
     async function (assert) {
+      // TODO: It's strange we decide the id from here
+      // Should go to /cards/new and we figure out the ID
       let response = await postCard('https://my-realm/post0', {
         adoptsFrom: '../post',
         data: {
-          title: 'Hello World',
-          body: 'First post.',
+          title: 'Blogigidy blog',
+          body: 'First post!',
         },
-      })
-        .expect('Content-Type', /json/)
-        .expect(201);
+      }).expect(201);
 
       assert.deepEqual(response.body.data?.attributes, {
-        title: 'Hello World',
-        body: 'First post.',
+        title: 'Blogigidy blog',
+        body: 'First post!',
       });
       let componentModule = response.body.data?.meta.componentModule;
       assert.ok(componentModule, 'should have componentModule');
       assert.ok(resolveCard(componentModule), 'component module is resolvable');
 
       await getCard('https://my-realm/post0').expect(200);
+    }
+  );
+
+  QUnit.test(
+    '404s when you try to post a card that adopts from a non-existent card',
+    async function (assert) {
+      assert.expect(0);
+      await postCard('https://my-realm/post0', {
+        adoptsFrom: '../pizza',
+        data: {
+          title: 'Hello World',
+        },
+      }).expect(404);
     }
   );
 

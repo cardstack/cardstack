@@ -1,5 +1,5 @@
 import difference from 'lodash/difference';
-import { BadRequest } from '@cardstack/server/src/middleware/error';
+import { BadRequest } from '@cardstack/server/src/middleware/errors';
 
 const componentFormats = {
   isolated: '',

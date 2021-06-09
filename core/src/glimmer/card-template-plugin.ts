@@ -458,6 +458,7 @@ function rewriteFieldToComponent(
 ): Statement[] {
   let { element, attr, mustache, path } = syntax.builders;
 
+  // TODO: What we really want it String or Date, instead of Title or Birthdate
   let componentName = importAndChooseName(
     capitalize(field.name),
     field.card[format].moduleName,

@@ -85,17 +85,22 @@ QUnit.module('PATCH /cards/<card-id>', function (hooks) {
   );
 
   QUnit.test('can update an existing card', async function (assert) {
-    await updateCard('https://my-realm/post0', {
-      adoptsFrom: '../post',
+    let initialResponse = await updateCard('https://my-realm/post0', {
       data: {
-        title: 'Hello World!',
+        title: 'Goodbye World!',
         body: 'First post',
       },
     }).expect(200);
+    assert.deepEqual(initialResponse.body.data.attributes, {
+      title: 'Goodbye World!',
+      body: 'First post',
+    });
 
+    // TODO: Our response assumes the "isolated" format, which has the component module
+    // That feels odd
     let response = await getCard('https://my-realm/post0').expect(200);
     assert.deepEqual(response.body.data?.attributes, {
-      title: 'Hello World!',
+      title: 'Goodbye World!',
       body: 'First post',
     });
   });

@@ -1,5 +1,11 @@
 import walkSync from 'walk-sync';
-import { readFileSync, existsSync, removeSync } from 'fs-extra';
+import {
+  readFileSync,
+  existsSync,
+  removeSync,
+  readJsonSync,
+  writeJsonSync,
+} from 'fs-extra';
 import { join } from 'path';
 
 import {
@@ -11,7 +17,7 @@ import {
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 
-import { NotFound } from './middleware/error';
+import { NotFound } from './middleware/errors';
 import { transformSync } from '@babel/core';
 import { NODE, BROWSER } from './interfaces';
 import { CardCache } from './cache';
@@ -121,6 +127,22 @@ export default class Builder implements BuilderInterface {
   async buildCard(url: string): Promise<CompiledCard> {
     let rawCard = await this.getRawCard(url);
     let compiledCard = await this.compileCardFromRaw(url, rawCard);
+
+    return compiledCard;
+  }
+
+  async updateCardData(url: string, payload: any) {
+    let fullPath = join(this.locateCardDir(url), 'card.json');
+
+    // Builder: merge data into card.json
+    let card = readJsonSync(fullPath);
+    card.data = Object.assign(card.data, payload);
+    writeJsonSync(fullPath, card);
+
+    // Cache: Merge data into compiled.json
+    let compiledCard = await this.getCompiledCard(url);
+    compiledCard.data = Object.assign(compiledCard.data, payload);
+    this.cache.setCard(url, compiledCard);
     return compiledCard;
   }
 
