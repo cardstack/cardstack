@@ -9,6 +9,12 @@ import { task } from 'ember-concurrency-decorators';
 import { timeout } from 'ember-concurrency';
 import { A } from '@ember/array';
 import config from '@cardstack/web-client/config/environment';
+import { buildWaiter } from '@ember/test-waiters';
+import RSVP, { defer } from 'rsvp';
+
+let waiter = buildWaiter('thread-animation');
+let token: any = null;
+let waiting: RSVP.Deferred<void> | null = null;
 
 let interval = config.environment === 'test' ? 100 : 1000;
 
@@ -152,6 +158,24 @@ export default class AnimatedWorkflow {
     let completedMilestones = this.milestones.filterBy('isComplete');
     let lastMilestone = completedMilestones[completedMilestones.length - 1];
     return lastMilestone?.completedDetail ?? 'Workflow started';
+  }
+
+  async startTestWaiter() {
+    if (token) {
+      return;
+    }
+    token = waiter.beginAsync();
+    waiting = defer();
+
+    await waiting.promise;
+    waiter.endAsync(token);
+
+    token = null;
+    waiting = null;
+  }
+
+  stopTestWaiter() {
+    waiting?.resolve();
   }
 
   destroy() {
