@@ -3,4 +3,4 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const req = require('esm')(module, { cjs: true });
 const runner = req('../node-test-runner').default;
-runner();
+runner(process.argv[0]);
