@@ -224,6 +224,10 @@ export default class AnimatedWorkflow {
   }
 
   get progressStatus() {
+    if (this.isCanceled) {
+      return 'Workflow canceled';
+    }
+
     let completedMilestones = this.milestones.filterBy('isComplete');
     let lastMilestone = completedMilestones[completedMilestones.length - 1];
     return lastMilestone?.completedDetail ?? 'Workflow started';
