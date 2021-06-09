@@ -39,6 +39,15 @@ class AnimatedMilestone {
     );
   }
 
+  containsPostable(postable: WorkflowPostable) {
+    return this.postableCollection.containsPostable(postable);
+  }
+
+  resetTo(card: WorkflowPostable | undefined) {
+    this.postableCollection.resetTo(card);
+    this.isCompletionRevealed = false;
+  }
+
   revealNext(): RevealResult {
     let result = this.postableCollection.revealNext();
     if (!result.revealed && !this.isCompletionRevealed) {
@@ -79,6 +88,14 @@ class AnimatedPostableCollection {
       this.model.peekAtVisiblePostables().length ===
         this.visiblePostables.length
     );
+  }
+
+  containsPostable(postable: WorkflowPostable) {
+    return this.model.postables.includes(postable);
+  }
+
+  resetTo(card: WorkflowPostable | undefined) {
+    if (!card || this.containsPostable(card)) this.revealPointer = card;
   }
 
   revealNext(): RevealResult {
@@ -203,15 +220,26 @@ export default class AnimatedWorkflow {
   }
 
   resetPointerTo(card: WorkflowPostable) {
+    if (this.isComplete) {
+      this.epilogue.resetTo(card);
+      return;
+    }
+
+    if (this.isCanceled) {
+      this.cancelationMessages.resetTo(card);
+      return;
+    }
+
     let found = false;
-    for (let { postableCollection } of this.milestones) {
-      if (found) postableCollection.revealPointer = undefined;
-      for (let postable of postableCollection.visiblePostables) {
-        if (postable === card) {
-          found = true;
-          postableCollection.revealPointer = card;
-          break;
-        }
+    for (let milestone of this.milestones) {
+      if (found) {
+        milestone.resetTo(undefined);
+        continue;
+      }
+
+      if (milestone.containsPostable(card)) {
+        found = true;
+        milestone.resetTo(card);
       }
     }
   }
