@@ -5,26 +5,23 @@
   <ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Choose a balance to fund your prepaid card">
       <CardPay::LabeledValue @label="DEPOT:" class="funding-source__field">
-        <CardPay::NestedItems
-          class="funding-source__field-info"
-          @innerClass={{unless @isComplete "funding-source__nested-field"}}
-        >
+        <CardPay::NestedItems class="funding-source__field-info">
           <:outer>
             {{!-- TODO: display account avatar and name if available --}}
-            <CardPay::IssuePrepaidCardWorkflow::FundingSource::Account
-              @isComplete={{@isComplete}}
+            <CardPay::Account
+              @isComplete={{true}}
               @icon="avatar-default"
               @title="Account 1"
               @address={{this.layer2Network.walletInfo.firstAddress}}
             />
           </:outer>
           <:inner>
-            <CardPay::IssuePrepaidCardWorkflow::FundingSource::Account
+            <CardPay::Account
               @isComplete={{@isComplete}}
+              @inner={{true}}
               @icon="depot"
               @title="DEPOT:"
               @address={{this.fetchDepotTask.last.value.address}}
-              @inner={{true}}
             />
           </:inner>
         </CardPay::NestedItems>
@@ -37,7 +34,7 @@
           @innerClass={{unless @isComplete "funding-source__nested-field"}}
         >
           <:outer>
-            <CardPay::IssuePrepaidCardWorkflow::FundingSource::Account
+            <CardPay::Account
               @isComplete={{@isComplete}}
               @icon="depot"
               @title="DEPOT:"
@@ -46,7 +43,7 @@
           </:outer>
           <:inner>
             {{#if @isComplete}}
-              <CardPay::IssuePrepaidCardWorkflow::FundingSource::Account
+              <CardPay::Account
                 @isComplete={{@isComplete}}
                 @icon={{this.selectedToken.icon}}
                 @balance={{this.selectedToken.balance}}
@@ -61,7 +58,7 @@
                 @renderInPlace={{true}}
                 @verticalPosition="below"
               as |token|>
-                <CardPay::IssuePrepaidCardWorkflow::FundingSource::Account
+                <CardPay::Account
                   class={{cn "funding-source__dropdown-option" (if (eq token.symbol this.selectedToken.symbol) "funding-source__dropdown-option--selected")}}
                   @isComplete={{@isComplete}}
                   @icon={{token.icon}}

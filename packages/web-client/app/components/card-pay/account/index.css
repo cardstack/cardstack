@@ -1,6 +1,7 @@
 .funding-source__icon-group {
   display: flex;
   align-items: center;
+  flex-wrap: nowrap;
 }
 
 .funding-source__icon {
@@ -27,7 +28,7 @@
 }
 
 .funding-source__title-lg {
-  font: 1.25rem;
+  font-size: 1.25rem;
   font-weight: 600;
   line-height: calc(27/20);
   letter-spacing: var(--boxel-lsp-xs);

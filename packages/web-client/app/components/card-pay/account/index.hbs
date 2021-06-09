@@ -11,7 +11,7 @@
       {{svg-jar @icon class="funding-source__icon-sm" role="presentation"}}
       <div>
         <div class="funding-source__title-sm">{{uppercase @symbol}}.CPXD</div>
-        <div class="funding-source__text">
+        <div class="funding-source__text-sm">
           {{format-token-amount @balance}} {{uppercase @symbol}}.CPXD
         </div>
       </div>
@@ -37,10 +37,10 @@
       {{/if}}
     {{else}}
       {{#if @inner}}
-        {{svg-jar @icon class="funding-source__icon-sm" role="presentation"}}
+        {{svg-jar @icon class="funding-source__icon" role="presentation"}}
         <div>
-          <div class="funding-source__title-sm">{{@title}}</div>
-          <div class="funding-source__text-sm funding-source__address">
+          <div class="funding-source__title">{{@title}}</div>
+          <div class="funding-source__text funding-source__address">
             {{#if @address}}
               {{@address}}
             {{else}}
