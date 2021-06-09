@@ -25,8 +25,7 @@ jobs:
     - run: yarn lint
     - run: yarn test
 
-  # JOB to run change detection
-  changes:
+  change_check:
     needs: test
     runs-on: ubuntu-latest
     # Set job outputs to values from filter step
@@ -50,9 +49,9 @@ jobs:
             - 'packages/did-resolver/**'
 
   deploy-web-client-staging:
-    if: ${{ needs.changes.outputs.web_client == 'true' }}
     name: Deploy web-client to S3 staging bucket
-    needs: [changes]
+    needs: change_check
+    if: ${{ needs.change_check.outputs.web_client == 'true' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
