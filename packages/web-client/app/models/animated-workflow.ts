@@ -18,6 +18,11 @@ let waiting: RSVP.Deferred<void> | null = null;
 
 let interval = config.environment === 'test' ? 100 : 1000;
 
+interface RevealResult {
+  postable?: WorkflowPostable;
+  revealed: boolean;
+}
+
 class AnimatedMilestone {
   model: Milestone;
   @reads('model.completedDetail') declare completedDetail: string;
@@ -34,13 +39,13 @@ class AnimatedMilestone {
     );
   }
 
-  revealNext(): boolean {
-    let revealed = this.postableCollection.revealNext();
-    if (!revealed && !this.isCompletionRevealed) {
-      revealed = true;
+  revealNext(): RevealResult {
+    let result = this.postableCollection.revealNext();
+    if (!result.revealed && !this.isCompletionRevealed) {
       this.isCompletionRevealed = true;
+      result.revealed = true;
     }
-    return revealed;
+    return result;
   }
 
   get isComplete(): boolean {
@@ -68,16 +73,21 @@ class AnimatedPostableCollection {
     return result;
   }
 
-  revealNext(): boolean {
+  revealNext(): RevealResult {
     let postables = this.model.visiblePostables;
     let index = this.revealPointer
       ? postables.indexOf(this.revealPointer!)
       : -1;
     if (index === postables.length - 1) {
-      return false;
+      return {
+        revealed: false,
+      };
     }
     this.revealPointer = postables[index + 1];
-    return true;
+    return {
+      revealed: true,
+      postable: this.revealPointer,
+    };
   }
 
   get isComplete() {
@@ -117,59 +127,38 @@ export default class AnimatedWorkflow {
     yield rawTimeout(10);
 
     while (true) {
-      this.revealNext();
+      let result = this.revealNext();
       if (
         (this.isCanceled && this.cancelationMessages.isComplete) ||
         (this.isComplete && this.epilogue.isComplete) ||
-        (this.lastPostable && !this.lastPostable.isComplete)
+        (result.postable && !result.postable.isComplete)
       ) {
         this.stopTestWaiter();
       }
+
       yield rawTimeout(interval);
     }
   }
 
-  get lastPostable() {
-    if (!this.visibleMilestones) {
-      return null;
-    }
-
-    let res = this.visibleMilestones[0].visiblePostables[0];
-    for (let m of this.visibleMilestones) {
-      res = m.visiblePostables[m.visiblePostables.length - 1] || res;
-      continue;
-    }
-
+  revealNext(): RevealResult {
     if (this.isCanceled) {
-      res =
-        this.cancelationMessages.visiblePostables[
-          this.cancelationMessages.visiblePostables.length - 1
-        ] || res;
-    } else if (this.isComplete) {
-      res =
-        this.epilogue.visiblePostables[
-          this.epilogue.visiblePostables.length - 1
-        ] || res;
-    }
-    return res;
-  }
-
-  revealNext() {
-    if (this.isCanceled) {
-      this.cancelationMessages.revealNext();
-      return;
+      return this.cancelationMessages.revealNext();
     }
 
     if (this.isComplete) {
-      this.epilogue.revealNext();
-      return;
+      return this.epilogue.revealNext();
     }
 
     for (const animatedMilestone of this.visibleMilestones) {
-      if (animatedMilestone.revealNext()) {
-        return;
+      let result = animatedMilestone.revealNext();
+      if (result.revealed) {
+        return result;
       }
     }
+
+    return {
+      revealed: false,
+    };
   }
 
   get visibleMilestones(): AnimatedMilestone[] {
@@ -210,6 +199,7 @@ export default class AnimatedWorkflow {
       }
     }
   }
+
   async startTestWaiter() {
     if (token) {
       return;
