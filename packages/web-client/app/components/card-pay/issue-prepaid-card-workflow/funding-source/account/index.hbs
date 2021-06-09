@@ -1,0 +1,66 @@
+<div class="funding-source__icon-group" ...attributes>
+  {{#if @balance}}
+    {{#if @isComplete}}
+      {{svg-jar @icon class="funding-source__icon" role="presentation"}}
+      <div>
+        <div class="funding-source__title-lg">
+          {{format-token-amount @balance}} {{uppercase @symbol}}.CPXD
+        </div>
+      </div>
+    {{else}}
+      {{svg-jar @icon class="funding-source__icon-sm" role="presentation"}}
+      <div>
+        <div class="funding-source__title-sm">{{uppercase @symbol}}.CPXD</div>
+        <div class="funding-source__text">
+          {{format-token-amount @balance}} {{uppercase @symbol}}.CPXD
+        </div>
+      </div>
+    {{/if}}
+  {{else}}
+    {{#if @isComplete}}
+      {{#if @inner}}
+        {{svg-jar @icon class="funding-source__icon" role="presentation"}}
+        <div>
+          <div class="funding-source__title-lg">{{@title}}</div>
+          <div class="funding-source__text funding-source__address-wrapped">
+            {{@address}}
+          </div>
+        </div>
+      {{else}}
+        {{svg-jar @icon class="funding-source__icon-sm" role="presentation"}}
+        <div>
+          <div class="funding-source__title-sm">{{@title}}</div>
+          <div class="funding-source__text-sm funding-source__address funding-source__text--outer">
+            {{truncate-middle @address 7 4}}
+          </div>
+        </div>
+      {{/if}}
+    {{else}}
+      {{#if @inner}}
+        {{svg-jar @icon class="funding-source__icon-sm" role="presentation"}}
+        <div>
+          <div class="funding-source__title-sm">{{@title}}</div>
+          <div class="funding-source__text-sm funding-source__address">
+            {{#if @address}}
+              {{@address}}
+            {{else}}
+              <Boxel::LoadingIndicator />
+            {{/if}}
+          </div>
+        </div>
+      {{else}}
+        {{svg-jar @icon class="funding-source__icon" role="presentation"}}
+        <div>
+          <div class="funding-source__title">{{@title}}</div>
+          <div class="funding-source__text funding-source__address funding-source__text--outer">
+            {{#if @address}}
+              {{@address}}
+            {{else}}
+              <Boxel::LoadingIndicator />
+            {{/if}}
+          </div>
+        </div>
+      {{/if}}
+    {{/if}}
+  {{/if}}
+</div>
