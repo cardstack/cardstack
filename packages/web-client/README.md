@@ -52,7 +52,7 @@ Make use of the many generators for code, try `ember help generate` for more det
 
 ### Deploying
 
-This app is deployed using ember-cli-deploy.
+This app is deployed using ember-cli-deploy. CI automatically deploys passing builds of the main branch to staging.
 
 ## Further Reading / Useful Links
 

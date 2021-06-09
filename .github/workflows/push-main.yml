@@ -26,12 +26,12 @@ jobs:
     - run: yarn test
 
   change_check:
+    name: Check which packages changed
     needs: test
     runs-on: ubuntu-latest
-    # Set job outputs to values from filter step
     outputs:
-      hub: ${{ steps.filter.outputs.backend }}
-      web-client: ${{ steps.filter.outputs.frontend }}
+      hub: ${{ steps.filter.outputs.hub }}
+      web_client: ${{ steps.filter.outputs.web_client }}
     steps:
     - uses: actions/checkout@v2
       with:
