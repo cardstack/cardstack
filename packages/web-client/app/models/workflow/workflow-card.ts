@@ -15,7 +15,7 @@ export class WorkflowCard extends WorkflowPostable {
     this.componentName = options.componentName!;
     this.reset = () => {
       if (this.isComplete) {
-        this.workflow?.animatedWrapper?.startTestWaiter();
+        this.workflow?.emit('visible-postables-changed');
         this.isComplete = false;
       }
     };
@@ -25,11 +25,11 @@ export class WorkflowCard extends WorkflowPostable {
   }
 
   @action onComplete() {
+    this.workflow?.emit('visible-postables-changed');
     this.isComplete = true;
-    this.workflow?.animatedWrapper?.startTestWaiter();
   }
   @action onIncomplete() {
-    this.workflow?.animatedWrapper?.startTestWaiter();
+    this.workflow?.emit('visible-postables-changed');
     this.workflow?.resetTo(this);
   }
 }

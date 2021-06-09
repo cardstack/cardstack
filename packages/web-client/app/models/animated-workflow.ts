@@ -11,6 +11,7 @@ import { A } from '@ember/array';
 import config from '@cardstack/web-client/config/environment';
 import { buildWaiter } from '@ember/test-waiters';
 import RSVP, { defer } from 'rsvp';
+import { UnbindEventListener } from '../utils/events';
 
 let waiter = buildWaiter('thread-animation');
 let token: any = null;
@@ -132,10 +133,19 @@ export default class AnimatedWorkflow {
   epilogue: AnimatedPostableCollection;
   cancelationMessages: AnimatedPostableCollection;
   milestones: AnimatedMilestone[];
+  #listenersToCleanUp: UnbindEventListener[] = [];
 
   constructor(model: Workflow) {
     this.model = model;
-    this.model.animatedWrapper = this;
+    this.#listenersToCleanUp.push(
+      this.model.on(
+        'visible-postables-changed',
+        this.startTestWaiter.bind(this)
+      )
+    );
+    this.#listenersToCleanUp.push(
+      this.model.on('reset-postables', this.resetPointerTo.bind(this))
+    );
     this.epilogue = new AnimatedPostableCollection(model.epilogue);
     this.cancelationMessages = new AnimatedPostableCollection(
       model.cancelationMessages
@@ -263,6 +273,7 @@ export default class AnimatedWorkflow {
   }
 
   destroy() {
+    this.#listenersToCleanUp.forEach((unbind) => unbind());
     taskFor(this.tickerTask).cancelAll();
     if (token) {
       waiting?.resolve();

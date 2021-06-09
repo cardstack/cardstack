@@ -4,7 +4,7 @@ import PostableCollection from './workflow/postable-collection';
 import { WorkflowPostable } from './workflow/workflow-postable';
 import WorkflowSession from './workflow/workflow-session';
 import { tracked } from '@glimmer/tracking';
-import AnimatedWorkflow from './animated-workflow';
+import { SimpleEmitter } from '../utils/events';
 
 interface PostableIndices {
   isInMilestone: boolean;
@@ -21,7 +21,7 @@ export abstract class Workflow {
   @tracked isCanceled = false;
   session: WorkflowSession = new WorkflowSession();
   owner: any;
-  animatedWrapper: AnimatedWorkflow | undefined;
+  simpleEmitter = new SimpleEmitter();
 
   constructor(owner: any) {
     this.owner = owner;
@@ -55,7 +55,7 @@ export abstract class Workflow {
 
   cancel() {
     if (!this.isComplete) {
-      this.animatedWrapper?.startTestWaiter();
+      this.emit('visible-postables-changed');
       this.isCanceled = true;
     }
   }
@@ -84,7 +84,7 @@ export abstract class Workflow {
   // invoked when we want to revert the workflow back to a particular, formerly complete postable
   resetTo(postable: WorkflowPostable) {
     let location = this.locatePostable(postable);
-    this.animatedWrapper?.resetPointerTo(postable);
+    this.emit('reset-postables', postable);
     if (location.isInMilestone) {
       for (let i = location.milestoneIndex!; i < this.milestones.length; i++) {
         let milestone = this.milestones[i];
@@ -119,6 +119,14 @@ export abstract class Workflow {
       result.collectionIndex = postIndexInEpilogue;
     }
     return result;
+  }
+
+  on(event: string, cb: Function) {
+    return this.simpleEmitter.on(event, cb);
+  }
+
+  emit(event: string, ...args: any[]) {
+    this.simpleEmitter.emit(event, ...args);
   }
 }
 
