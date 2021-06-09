@@ -73,6 +73,14 @@ class AnimatedPostableCollection {
     return result;
   }
 
+  get allPostablesVisible() {
+    return (
+      this.model.allNecessaryPostablesVisible &&
+      this.model.peekAtVisiblePostables().length ===
+        this.visiblePostables.length
+    );
+  }
+
   revealNext(): RevealResult {
     let postables = this.model.visiblePostables;
     let index = this.revealPointer
@@ -128,11 +136,19 @@ export default class AnimatedWorkflow {
 
     while (true) {
       let result = this.revealNext();
+
+      // the last card in these things is not completed so isComplete will never
+      // be true. We check for completion by making sure all the things we need to
+      // show are shown
       if (
-        (this.isCanceled && this.cancelationMessages.isComplete) ||
-        (this.isComplete && this.epilogue.isComplete) ||
-        (result.postable && !result.postable.isComplete)
+        (this.isCanceled && this.cancelationMessages.allPostablesVisible) ||
+        (this.isComplete && this.epilogue.allPostablesVisible)
       ) {
+        this.stopTestWaiter();
+        break;
+      }
+
+      if (result.postable && !result.postable.isComplete) {
         this.stopTestWaiter();
       }
 
