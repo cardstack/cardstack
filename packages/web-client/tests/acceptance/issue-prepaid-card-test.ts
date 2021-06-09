@@ -207,6 +207,11 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText('Congratulations, you have created a prepaid card!');
 
     assert.dom(epiloguePostableSel(1)).containsText('Prepaid card issued');
+    assert
+      .dom(
+        `[data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+      )
+      .exists({ count: 2 });
 
     await waitFor(epiloguePostableSel(2));
 
