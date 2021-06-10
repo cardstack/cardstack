@@ -32,7 +32,7 @@ export default abstract class Layer2ChainWeb3Strategy
 
   simpleEmitter = new SimpleEmitter();
 
-  web3!: Web3;
+  web3: Web3 = new Web3();
   #exchangeRateApi!: IExchangeRate;
   #safesApi!: ISafes;
   @tracked depotSafe: DepotSafe | null = null;
@@ -104,7 +104,7 @@ export default abstract class Layer2ChainWeb3Strategy
       this.onDisconnect();
     });
     await this.provider.enable();
-    this.web3 = new Web3(this.provider as any);
+    this.web3.setProvider(this.provider as any);
     this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
     this.#safesApi = await getSDK('Safes', this.web3);
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
