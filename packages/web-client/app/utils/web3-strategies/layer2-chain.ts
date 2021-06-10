@@ -17,6 +17,7 @@ import {
   getConstantByNetwork,
   DepotSafe,
   IExchangeRate,
+  ISafes,
   getSDK,
 } from '@cardstack/cardpay-sdk';
 
@@ -33,6 +34,7 @@ export default abstract class Layer2ChainWeb3Strategy
 
   web3!: Web3;
   #exchangeRateApi!: IExchangeRate;
+  #safesApi!: ISafes;
 
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
@@ -103,6 +105,7 @@ export default abstract class Layer2ChainWeb3Strategy
     await this.provider.enable();
     this.web3 = new Web3(this.provider as any);
     this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
+    this.#safesApi = await getSDK('Safes', this.web3);
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
   }
 
@@ -194,8 +197,7 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   async fetchDepot(owner: ChainAddress): Promise<DepotSafe | null> {
-    let safesApi = await getSDK('Safes', this.web3);
-    let safes = await safesApi.view(owner);
+    let safes = await this.#safesApi.view(owner);
     let depotSafes = safes.filter(
       (safe) => safe.type === 'depot'
     ) as DepotSafe[];
