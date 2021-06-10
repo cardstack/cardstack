@@ -10,7 +10,7 @@
     </div>
     <div>
       <div>Issued by</div>
-      <div class="prepaid-card__name">{{or @issuerName "Enter name"}}</div>
+      <div class="prepaid-card__name" data-test-prepaid-card-issuer-name>{{or @issuerName "Enter name"}}</div>
     </div>
     <div>
       <div class="prepaid-card__address">{{truncate-middle @address 7 4}}</div>
