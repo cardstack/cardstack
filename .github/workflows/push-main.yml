@@ -53,15 +53,19 @@ jobs:
     needs: change_check
     if: ${{ needs.change_check.outputs.hub == 'true' }}
     runs-on: ubuntu-latest
-    env:
-      WAYPOINT_SERVER_TOKEN: ${{ secrets.WAYPOINT_AUTH_TOKEN }}
-      WAYPOINT_SERVER_ADDR: ${{ secrets.WAYPOINT_SERVER_ADDR }}
-      WAYPOINT_SERVER_TLS: 1
-      WAYPOINT_SERVER_TLS_SKIP_VERIFY: 0
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 1
+# add hashicorp's apt repository
+    - name: Prep for hashicorp apt repositorty
+      run: curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+    - name: Add hashicorp apt repositorty
+      run: apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+    - name: Install apt packages including waypoint
+      run: sudo apt-get install awscli waypoint docker-ce
+    - name: Configure waypoint client
+      run: waypoint context create -server-addr=${{ secrets.WAYPOINT_SERVER_ADDR }} -server-auth-token=${{ secrets.WAYPOINT_AUTH_TOKEN }} -server-tls=true -server-tls-skip-verify=false -set-default
     - uses: volta-cli/action@v1
     - name: Set up yarn cache
       uses: actions/cache@v2
@@ -72,12 +76,6 @@ jobs:
           ${{ runner.os }}-yarn-
     - run: yarn global add lerna
     - run: yarn --prefer-offline
-    - name: Install aws-cli
-      run: sudo apt-get install awscli
-    - name: Install and configure waypoint
-      uses: hashicorp/action-setup-waypoint@main
-      with:
-        version: '0.4.0'
     - name: Deploy hub
       run: waypoint up --app=hub -plain
       env:
