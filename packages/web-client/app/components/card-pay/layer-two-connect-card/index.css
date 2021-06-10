@@ -32,7 +32,6 @@
   padding-left: var(--boxel-sp-xxl);
   padding-right: var(--boxel-sp-xxl);
   text-align: left;
-
   display: none; /* hide this until we add the destination UI */
 }
 
@@ -61,6 +60,7 @@
 .layer-two-connect-card__alternate-wallet-caret {
   height: 1.3rem;
   width: auto;
+
   --icon-color: var(--boxel-purple-400);
 }
 

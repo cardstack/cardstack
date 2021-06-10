@@ -4,9 +4,10 @@
   --horizontal-card-gap: var(--boxel-sp-lg);
 
   width: 100%;
-  max-width: calc(
-    var(--card-width) * 2 + var(--horizontal-card-gap) + var(--boxel-sp-lg) * 2
-  );
+  max-width:
+    calc(
+      var(--card-width) * 2 + var(--horizontal-card-gap) + var(--boxel-sp-lg) * 2
+    );
   margin: auto;
   padding: var(--boxel-sp-lg);
 }
@@ -16,6 +17,7 @@
   justify-content: space-between;
   align-items: center;
   margin: 0;
+
   /* quick hack to prevent layout shift when connect account button is pressed */
   max-height: 1.875rem;
 }
@@ -67,6 +69,7 @@
   align-items: center;
   margin-top: var(--boxel-sp-xs);
   font: 400 var(--boxel-font);
+
   --icon-color: var(--boxel-teal);
 }
 

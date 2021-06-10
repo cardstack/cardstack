@@ -4,7 +4,7 @@
 
 .card-pay-connect-modal {
   --boxel-modal-max-width: unset;
-  --boxel-modal-offset-top: 0px;
+  --boxel-modal-offset-top: 0;
 }
 
 .card-pay-connect-modal > div {
