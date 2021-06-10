@@ -19,9 +19,24 @@ export const convertibleSymbols: ConvertibleSymbol[] = ['DAI', 'CARD'];
 
 // contract/bridging
 export const bridgeableSymbols: BridgeableSymbol[] = ['DAI', 'CARD'];
-const contractNames: Record<BridgeableSymbol, string> = {
-  DAI: 'daiToken',
-  CARD: 'cardToken',
+const contractNames: Record<NetworkSymbol, Record<BridgeableSymbol, string>> = {
+  kovan: {
+    DAI: 'daiToken',
+    CARD: 'cardToken',
+  },
+  mainnet: {
+    DAI: 'daiToken',
+    CARD: 'cardToken',
+  },
+  sokol: {
+    DAI: 'daiCpxd',
+    CARD: 'cardCpxd',
+  },
+  // xdai does not have any addresses as of yet.
+  xdai: {
+    DAI: '',
+    CARD: '',
+  },
 };
 
 export class TokenContractInfo {
@@ -29,9 +44,17 @@ export class TokenContractInfo {
   address: ChainAddress;
   abi = ERC20ABI as AbiItem[];
 
-  constructor(symbol: BridgeableSymbol, network: string) {
+  constructor(symbol: BridgeableSymbol, network: NetworkSymbol) {
     this.symbol = symbol;
-    this.address = getAddressByNetwork(contractNames[this.symbol], network);
+    if (network === 'xdai') {
+      throw new Error(
+        "XDAI addresses may not be available yet. Please check the sdk's getAddressByNetwork method to see if this has changed"
+      );
+    }
+    this.address = getAddressByNetwork(
+      contractNames[network][this.symbol],
+      network
+    );
   }
 }
 
