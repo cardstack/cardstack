@@ -96,7 +96,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
       .hasText('0x1826...6E44');
-    await waitFor(milestoneCompletedSel(0));
+
+    await settled();
+
     assert
       .dom(milestoneCompletedSel(0))
       .containsText('xDai chain wallet connected');
