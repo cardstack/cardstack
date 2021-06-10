@@ -60,10 +60,10 @@ jobs:
 # add hashicorp's apt repository
     - name: Prep for hashicorp apt repositorty
       run: sudo curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
-    - name: Add hashicorp apt repositorty
-      run: sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
     - name: Install apt packages including waypoint
-      run: sudo apt-get install awscli waypoint docker-ce
+      run: |
+        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        sudo apt-get install awscli waypoint docker-ce
     - name: Configure waypoint client
       run: waypoint context create -server-addr=${{ secrets.WAYPOINT_SERVER_ADDR }} -server-auth-token=${{ secrets.WAYPOINT_AUTH_TOKEN }} -server-tls=true -server-tls-skip-verify=false -set-default
     - uses: volta-cli/action@v1
