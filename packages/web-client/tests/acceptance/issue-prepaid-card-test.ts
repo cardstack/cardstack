@@ -95,10 +95,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
-      .hasText('0x18261...6E44');
-
-    await settled();
-
+      .hasText('0x1826...6E44');
+    await waitFor(milestoneCompletedSel(0));
     assert
       .dom(milestoneCompletedSel(0))
       .containsText('xDai chain wallet connected');
@@ -187,7 +185,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     // // funding-source card
     assert
       .dom('[data-test-funding-source-account] [data-test-account-address]')
-      .hasText('0x18261...6E44');
+      .hasText('0x1826...6E44');
     assert
       .dom('[data-test-funding-source-depot-outer] [data-test-account-address]')
       .hasText('0xB236ca8DbAB0644ffCD32518eBF4924ba8666666');

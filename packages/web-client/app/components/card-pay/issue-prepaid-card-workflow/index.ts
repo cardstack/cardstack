@@ -76,7 +76,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         new WorkflowMessage({
           author: cardbot,
           message:
-            'On to the next step: How do you want to fund your prepaid card? Please select a depot and balance from your xDai chain wallet.',
+            'On to the next step: How do you want to fund your prepaid card? Please select a balance from your xDai chain wallet.',
         }),
         new WorkflowCard({
           author: cardbot,
