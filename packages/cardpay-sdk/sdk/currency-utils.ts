@@ -207,7 +207,11 @@ export const convertRawAmountToNativeDisplay = (
 /**
  * @desc convert from raw amount to balance object
  */
-export const convertRawAmountToBalance = (value: BigNumberish, asset: { decimals: number }, buffer?: number) => {
+export const convertRawAmountToBalance = (
+  value: BigNumberish,
+  asset: { decimals: number; symbol?: string },
+  buffer?: number
+) => {
   const decimals = get(asset, 'decimals', 18);
   const assetBalance = convertRawAmountToDecimalFormat(value, decimals);
 
@@ -220,7 +224,11 @@ export const convertRawAmountToBalance = (value: BigNumberish, asset: { decimals
 /**
  * @desc convert from amount value to display formatted string
  */
-export const convertAmountToBalanceDisplay = (value: BigNumberish, asset: { decimals: number }, buffer?: number) => {
+export const convertAmountToBalanceDisplay = (
+  value: BigNumberish,
+  asset: { decimals: number; symbol?: string },
+  buffer?: number
+) => {
   const decimals = get(asset, 'decimals', 18);
   const display = handleSignificantDecimals(value, decimals, buffer);
   return `${display} ${get(asset, 'symbol', '')}`;
@@ -250,7 +258,7 @@ export const convertAmountToNativeDisplay = (value: BigNumberish, nativeCurrency
   if (nativeSelected.alignment === 'left') {
     return `${nativeSelected.symbol}${display}`;
   }
-  return `${display} ${nativeSelected.symbol}`;
+  return `${display} ${nativeSelected.symbol} ${nativeSelected.currency}`;
 };
 
 /**
