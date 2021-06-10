@@ -97,7 +97,7 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
       assert.ok(componentModule, 'should have componentModule');
       assert.ok(resolveCard(componentModule), 'component module is resolvable');
 
-      await getCard('https://my-realm/post0').expect(200);
+      await getCard(response.body.data.id).expect(200);
     }
   );
 
@@ -111,6 +111,29 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
           title: 'Hello World',
         },
       }).expect(404);
+    }
+  );
+
+  QUnit.test(
+    'Errors when you try to include other fields',
+    async function (assert) {
+      assert.expect(0);
+      await postCard('https://my-realm/post0', {
+        adoptsFrom: '../post',
+        data: {
+          title: 'Hello World',
+        },
+        isolated: 'isolated.js',
+      })
+        .expect(400)
+        .expect({
+          errors: [
+            {
+              status: 400,
+              title: 'Payload contains keys that we do not allow: "isolated"',
+            },
+          ],
+        });
     }
   );
 

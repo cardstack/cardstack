@@ -3,7 +3,8 @@ import { CardStackContext } from '../interfaces';
 import { NotFound } from './errors';
 
 export async function assertCardExists(
-  ctx: RouterContext<any, CardStackContext>
+  ctx: RouterContext<any, CardStackContext>,
+  next: any
 ) {
   let {
     builder,
@@ -13,4 +14,6 @@ export async function assertCardExists(
   if (!builder.locateCardDir(url)) {
     throw new NotFound(`Card ${url} does not exist`);
   }
+
+  await next();
 }

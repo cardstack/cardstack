@@ -156,18 +156,25 @@ export function assertValidCompiledCard(
     );
   }
   if (card.data) {
-    let unexpectedFields = difference(
+    assertValidKeys(
       Object.keys(card.data),
-      Object.keys(card.fields)
+      Object.keys(card.fields),
+      `Field(s) %list% does not exist on card "${card.url}"`
     );
+  }
+}
 
-    if (unexpectedFields.length) {
-      throw new BadRequest(
-        `Field(s) "${unexpectedFields.join(', ')}" does not exist on card "${
-          card.url
-        }"`
-      );
-    }
+export function assertValidKeys(
+  actualKeys: string[],
+  expectedKeys: string[],
+  errorMessage: string
+) {
+  let unexpectedFields = difference(actualKeys, expectedKeys);
+
+  if (unexpectedFields.length) {
+    throw new BadRequest(
+      errorMessage.replace('%list%', '"' + unexpectedFields.join(', ') + '"')
+    );
   }
 }
 

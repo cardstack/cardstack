@@ -143,6 +143,7 @@ export default class Builder implements BuilderInterface {
     let compiledCard = await this.getCompiledCard(url);
     compiledCard.data = Object.assign(compiledCard.data, payload);
     this.cache.setCard(url, compiledCard);
+
     return compiledCard;
   }
 
@@ -152,6 +153,7 @@ export default class Builder implements BuilderInterface {
   ): Promise<CompiledCard> {
     let compiledCard = await this.compiler.compile(rawCard);
     this.cache.setCard(url, compiledCard);
+
     return compiledCard;
   }
 

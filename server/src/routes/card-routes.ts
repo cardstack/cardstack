@@ -1,9 +1,9 @@
 import { CardStackContext } from '@cardstack/server/src/interfaces';
-import { assertValidRawCard } from '@cardstack/core/src/interfaces';
 import { NotFound } from '../middleware/errors';
 import { RouterContext } from '@koa/router';
 import { deserialize, serializeCard } from '../utils/serialization';
 import { getCardFormatFromRequest } from '../utils/routes';
+import { assertValidKeys } from '@cardstack/core/src/interfaces';
 
 export async function respondWithCardForPath(
   ctx: RouterContext<any, CardStackContext>
@@ -52,12 +52,15 @@ export async function createDataCard(
 
   body.url = url;
 
-  // TODO: Assert adopts from exists and is valid
-  // TODO: Assert data is the only other key
-  // TODO: Assert data keys are actual fields on the card
+  assertValidKeys(
+    Object.keys(body),
+    ['adoptsFrom', 'data', 'url'],
+    'Payload contains keys that we do not allow: %list%'
+  );
 
   let card = await builder.compileCardFromRaw(url, body);
   let format = getCardFormatFromRequest(ctx.query.format);
+
   ctx.body = await serializeCard(card, format);
   ctx.status = 201;
 }
