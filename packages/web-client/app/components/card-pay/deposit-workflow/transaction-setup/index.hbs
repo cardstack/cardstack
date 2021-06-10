@@ -93,13 +93,12 @@
   </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
-    @disabled={{@frozen}}
+    @disabled={{or @frozen (not @workflowSession.state.depositSourceToken)}}
     data-test-deposit-transaction-setup
   >
     <:default as |d|>
       <d.ActionButton
         {{on "click" this.toggleComplete}}
-        @disabled={{not @workflowSession.state.depositSourceToken}}
       >
         Continue
       </d.ActionButton>
