@@ -86,10 +86,7 @@
     @disabled={{@frozen}}
   >
     <:default as |d|>
-      <d.ActionButton
-        {{on "click" @onComplete}}
-        @disabled={{not this.selectedToken}}
-      >
+      <d.ActionButton {{on "click" @onComplete}}>
         Continue
       </d.ActionButton>
     </:default>

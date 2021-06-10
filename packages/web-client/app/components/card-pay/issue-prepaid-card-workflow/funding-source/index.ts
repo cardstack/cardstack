@@ -13,6 +13,7 @@ import {
   TokenSymbol,
   bridgeableSymbols,
 } from '@cardstack/web-client/utils/token';
+import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 
 interface Token {
   balance: BN;
@@ -40,14 +41,12 @@ class FundingSourceCard extends Component<FundingSourceCardArgs> {
     super(owner, args);
     taskFor(this.fetchDepotTask)
       .perform()
-      .then((depot: { address: string; tokens: [] }) => {
+      .then((depot: DepotSafe) => {
         if (depot) {
           this.args.workflowSession.update('depotAddress', depot.address);
           this.args.workflowSession.update('depotTokens', depot.tokens);
+          if (!this.selectedToken) this.chooseSource(this.tokens[0]);
         }
-      })
-      .then(() => {
-        if (!this.selectedToken) this.chooseSource(this.tokens[0]);
       });
   }
 
