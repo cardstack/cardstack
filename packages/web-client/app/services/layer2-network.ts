@@ -30,6 +30,7 @@ export default class Layer2Network extends Service {
     [symbol: string]: (amountInWei: string) => number;
   };
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
+  @reads('strategy.cardBalance') cardBalance: BN | undefined;
 
   constructor(props: object | undefined) {
     super(props);
