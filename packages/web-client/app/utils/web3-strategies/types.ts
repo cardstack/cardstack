@@ -37,6 +37,7 @@ export interface Layer1Web3Strategy extends Web3Strategy {
 export interface Layer2Web3Strategy extends Web3Strategy {
   isConnected: boolean;
   defaultTokenBalance: BN | undefined;
+  cardBalance: BN | undefined;
   depotSafe: DepotSafe | null;
   updateUsdConverters(
     symbolsToUpdate: ConvertibleSymbol[]

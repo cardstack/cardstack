@@ -8,7 +8,13 @@ import { IConnector } from '@walletconnect/types';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 
 import { SimpleEmitter, UnbindEventListener } from '../events';
-import { ConvertibleSymbol, ConversionFunction, NetworkSymbol } from '../token';
+import {
+  ConvertibleSymbol,
+  ConversionFunction,
+  NetworkSymbol,
+  TokenContractInfo,
+  BridgeableSymbol,
+} from '../token';
 import WalletInfo from '../wallet-info';
 import CustomStorageWalletConnect from '../wc-connector';
 import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
@@ -20,6 +26,7 @@ import {
   ISafes,
   getSDK,
 } from '@cardstack/cardpay-sdk';
+import { Contract } from 'web3-eth-contract';
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -29,17 +36,18 @@ export default abstract class Layer2ChainWeb3Strategy
   chainId: number;
   networkSymbol: NetworkSymbol;
   provider: WalletConnectProvider | undefined;
-
   simpleEmitter = new SimpleEmitter();
 
   web3: Web3 = new Web3();
   #exchangeRateApi!: IExchangeRate;
   #safesApi!: ISafes;
+  cardTokenContract: Contract;
+  daiTokenContract: Contract;
   @tracked depotSafe: DepotSafe | null = null;
-
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
   @tracked defaultTokenBalance: BN | undefined;
+  @tracked cardBalance: BN | undefined;
   @tracked waitForAccountDeferred = defer();
 
   @reads('provider.connector') connector!: IConnector;
@@ -49,6 +57,20 @@ export default abstract class Layer2ChainWeb3Strategy
     this.chainId = networkIds[networkSymbol];
     this.networkSymbol = networkSymbol;
     this.walletInfo = new WalletInfo([], this.chainId);
+
+    let cardTokenContractInfo = this.getTokenContractInfo(
+      'CARD',
+      networkSymbol
+    );
+    let daiTokenContractInfo = this.getTokenContractInfo('DAI', networkSymbol);
+    this.cardTokenContract = new this.web3.eth.Contract(
+      cardTokenContractInfo.abi,
+      cardTokenContractInfo.address
+    );
+    this.daiTokenContract = new this.web3.eth.Contract(
+      daiTokenContractInfo.abi,
+      daiTokenContractInfo.address
+    );
 
     this.initialize();
   }
@@ -83,7 +105,7 @@ export default abstract class Layer2ChainWeb3Strategy
         strategy.disconnect();
       }
     });
-    this.connector.on('session_update', (error, payload) => {
+    this.connector.on('session_update', async (error, payload) => {
       if (error) {
         throw error;
       }
@@ -94,6 +116,8 @@ export default abstract class Layer2ChainWeb3Strategy
         );
       }
       this.updateWalletInfo(accounts, chainId);
+      await this.fetchDepot();
+      this.refreshBalances();
     });
 
     this.connector.on('disconnect', (error) => {
@@ -109,6 +133,7 @@ export default abstract class Layer2ChainWeb3Strategy
     this.#safesApi = await getSDK('Safes', this.web3);
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
     await this.fetchDepot();
+    this.refreshBalances();
   }
 
   updateWalletInfo(accounts: string[], chainId: number) {
@@ -118,7 +143,6 @@ export default abstract class Layer2ChainWeb3Strategy
     }
     this.walletInfo = newWalletInfo;
     if (accounts.length) {
-      this.refreshBalances();
       this.waitForAccountDeferred.resolve();
     } else {
       this.waitForAccountDeferred = defer();
@@ -130,8 +154,15 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   private async refreshBalances() {
-    let raw = await this.getDefaultTokenBalance();
-    this.defaultTokenBalance = new BN(String(raw ?? 0));
+    if (this.depotSafe) {
+      let [daiBalance, cardBalance] = await Promise.all<string>([
+        this.getErc20Balance(this.daiTokenContract),
+        this.getErc20Balance(this.cardTokenContract),
+      ]);
+
+      this.defaultTokenBalance = new BN(daiBalance ?? 0);
+      this.cardBalance = new BN(cardBalance ?? 0);
+    }
   }
 
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
@@ -149,13 +180,8 @@ export default abstract class Layer2ChainWeb3Strategy
     }
   }
 
-  async getDefaultTokenBalance() {
-    if (this.walletInfo.firstAddress)
-      return await this.web3.eth.getBalance(
-        this.walletInfo.firstAddress,
-        'latest'
-      );
-    else return 0;
+  private getErc20Balance(contract: Contract) {
+    return contract.methods.balanceOf(this.depotSafe?.address).call();
   }
 
   get isConnected(): boolean {
@@ -219,5 +245,12 @@ export default abstract class Layer2ChainWeb3Strategy
   }
   on(event: string, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);
+  }
+
+  private getTokenContractInfo(
+    symbol: BridgeableSymbol,
+    network: NetworkSymbol
+  ): TokenContractInfo {
+    return new TokenContractInfo(symbol, network);
   }
 }
