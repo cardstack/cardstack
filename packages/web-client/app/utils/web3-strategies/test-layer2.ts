@@ -24,6 +24,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   waitForAccountDeferred = defer();
   bridgingDeferred!: RSVP.Deferred<TransactionReceipt>;
   @tracked defaultTokenBalance: BN | undefined;
+  @tracked depot: DepotSafe | null = null;
 
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([]);
@@ -45,7 +46,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   // eslint-disable-next-line no-unused-vars
   fetchDepot(_owner: ChainAddress): Promise<DepotSafe | null> {
-    return Promise.resolve(null);
+    return Promise.resolve(this.depot);
   }
 
   awaitBridged(
@@ -106,5 +107,13 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.bridgingDeferred.resolve({
       transactionHash: txnHash,
     } as TransactionReceipt);
+  }
+
+  test__simulateDepot(depot: DepotSafe | null) {
+    if (depot) {
+      this.depot = depot;
+      return;
+    }
+    this.depot = null;
   }
 }

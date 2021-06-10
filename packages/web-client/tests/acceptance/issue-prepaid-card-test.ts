@@ -11,6 +11,7 @@ import {
 import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { toBN } from 'web3-utils';
+import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -65,6 +66,24 @@ module('Acceptance | issue prepaid card', function (hooks) {
     layer2Service.test__simulateBalances({
       defaultToken: toBN(0),
     });
+    let testDepot = {
+      address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
+      tokens: [
+        {
+          balance: '250000000000000000000',
+          token: {
+            symbol: 'DAI',
+          },
+        },
+        {
+          balance: '500000000000000000000',
+          token: {
+            symbol: 'CARD',
+          },
+        },
+      ],
+    };
+    layer2Service.test__simulateDepot(testDepot as DepotSafe);
     await waitUntil(
       () => !document.querySelector('[data-test-wallet-connect-qr-code]')
     );
@@ -76,7 +95,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
-      .hasText('0x18261...6E44');
+      .hasText('0x1826...6E44');
 
     await settled();
 
@@ -166,11 +185,43 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     post = postableSel(2, 2);
     // // funding-source card
-    // TODO verify and interact with funding-source card default state
+    assert
+      .dom('[data-test-funding-source-account] [data-test-account-address]')
+      .hasText('0x1826...6E44');
+    assert
+      .dom('[data-test-funding-source-depot-outer] [data-test-account-address]')
+      .hasText('0xB236ca8DbAB0644ffCD32518eBF4924ba8666666');
+
+    assert.dom('[data-test-funding-source-dropdown="DAI"]').exists();
+    assert
+      .dom(
+        '[data-test-funding-source-dropdown="DAI"] [data-test-account-balance]'
+      )
+      .containsText('250.00 DAI');
+
+    await click('[data-test-funding-source-dropdown="DAI"] > div');
+
+    await click('[data-test-funding-source-token-option="CARD"]');
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
-    // TODO verify and interact with funding-source card memorialized state
+    assert
+      .dom('[data-test-funding-source-token] [data-test-account-title]')
+      .containsText('500.00 CARD');
+
+    await click(
+      `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
+    );
+    await click('[data-test-funding-source-dropdown="CARD"] > div');
+    await click('[data-test-funding-source-token-option="DAI"]');
+    await click(
+      `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
+    );
+
+    assert.dom('[data-test-funding-source-dropdown="DAI"]').doesNotExist();
+    assert
+      .dom('[data-test-funding-source-token] [data-test-account-title]')
+      .containsText('250.00 DAI');
 
     assert
       .dom(postableSel(2, 3))

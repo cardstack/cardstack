@@ -2,7 +2,11 @@
   <div class="card-pay-nested-items__outer">
     {{yield to="outer"}}
   </div>
-  <div class="card-pay-nested-items__inner">
+  <div class={{cn
+    "card-pay-nested-items__inner"
+    card-pay-nested-items__inner--no-border=@noBorder
+    card-pay-nested-items__inner--no-indent=@noIndent
+  }}>
     {{yield to="inner"}}
   </div>
 </div>

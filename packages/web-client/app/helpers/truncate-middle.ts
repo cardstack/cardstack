@@ -1,7 +1,7 @@
 import { helper } from '@ember/component/helper';
 
 export function truncateMiddle(
-  [input, startLength, endLength]: [string, number, number] /*, hash*/
+  [input, startLength = 6, endLength = 4]: [string, number, number] /*, hash*/
 ) {
   if (input && input.length <= startLength + endLength) {
     return input;

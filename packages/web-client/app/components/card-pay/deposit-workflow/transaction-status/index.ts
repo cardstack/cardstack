@@ -7,6 +7,8 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 import { tracked } from '@glimmer/tracking';
+import { reads } from 'macro-decorators';
+import { TokenSymbol } from '@cardstack/web-client/utils/token';
 
 interface CardPayDepositWorkflowTransactionStatusComponentArgs {
   workflowSession: WorkflowSession;
@@ -15,21 +17,25 @@ interface CardPayDepositWorkflowTransactionStatusComponentArgs {
 class CardPayDepositWorkflowTransactionStatusComponent extends Component<CardPayDepositWorkflowTransactionStatusComponentArgs> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
+  @reads('args.workflowSession.state.depositSourceToken')
+  declare selectedTokenSymbol: TokenSymbol;
   @tracked completedCount = 1;
   get layer2BlockHeightBeforeBridging(): BN | undefined {
     return this.args.workflowSession.state.layer2BlockHeightBeforeBridging;
   }
-  progressSteps = [
-    {
-      title: 'Deposit tokens into reserve pool on Ethereum mainnet',
-    },
-    {
-      title: 'Bridge tokens from Ethereum mainnet to xDai chain',
-    },
-    {
-      title: 'Mint tokens on xDai: DAI.CPXD',
-    },
-  ];
+  get progressSteps() {
+    return [
+      {
+        title: 'Deposit tokens into reserve pool on Ethereum mainnet',
+      },
+      {
+        title: 'Bridge tokens from Ethereum mainnet to xDai chain',
+      },
+      {
+        title: `Mint tokens on xDai: ${this.selectedTokenSymbol}.CPXD`,
+      },
+    ];
+  }
 
   constructor(
     owner: unknown,

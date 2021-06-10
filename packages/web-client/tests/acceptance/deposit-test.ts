@@ -126,7 +126,7 @@ module('Acceptance | deposit', function (hooks) {
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
-      .hasText('0x18261...6E44');
+      .hasText('0x1826...6E44');
 
     await settled();
 
@@ -153,7 +153,7 @@ module('Acceptance | deposit', function (hooks) {
       .hasText(layer1AccountAddress);
     assert
       .dom(`${post} [data-test-deposit-transaction-setup-to-address]`)
-      .hasText('0x18261...6E44');
+      .hasText('0x1826...6E44');
     assert
       .dom(`${post} [data-test-deposit-transaction-setup-depot-address]`)
       .hasText('New Depot');
@@ -367,7 +367,7 @@ module('Acceptance | deposit', function (hooks) {
       .dom(
         '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
       )
-      .hasText('0xaCD5f...4Fb6');
+      .hasText('0xaCD5...4Fb6');
     assert.dom('[data-test-layer-connect-modal="layer1"]').doesNotExist();
 
     await click('[data-test-deposit-workflow-button]');
@@ -429,7 +429,7 @@ module('Acceptance | deposit', function (hooks) {
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
-      .hasText('0x18261...6E44');
+      .hasText('0x1826...6E44');
     await settled();
     assert
       .dom(milestoneCompletedSel(1))
@@ -463,7 +463,7 @@ module('Acceptance | deposit', function (hooks) {
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
-      .hasText('0x18261...6E44');
+      .hasText('0x1826...6E44');
     assert.dom('[data-test-layer-connect-modal="layer2"]').doesNotExist();
 
     await click('[data-test-deposit-workflow-button]');

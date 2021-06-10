@@ -72,7 +72,6 @@
 }
 
 .transaction-setup__icon-sm {
-  align-self: flex-start;
   width: 1.25rem;
   height: 1.25rem;
   object-fit: contain;

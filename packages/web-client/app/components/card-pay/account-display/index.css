@@ -1,0 +1,65 @@
+.account-display {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.account-display__icon {
+  align-self: flex-start;
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-right: var(--boxel-sp-xs);
+}
+
+.account-display__icon-sm {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: var(--boxel-sp-xs);
+}
+
+.account-display__title {
+  font: 600 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.account-display__title-sm {
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.account-display__title-lg {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: calc(27/20);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.account-display__text {
+  color: var(--boxel-purple-500);
+  font: var(--boxel-font);
+  letter-spacing: 0.02em;
+}
+
+.account-display__text-sm {
+  color: var(--boxel-purple-500);
+  font: var(--boxel-font-sm);
+  letter-spacing: 0.02em;
+}
+
+.account-display__text--outer {
+  color: var(--boxel-purple-400);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.account-display__address {
+  font-family: var(--boxel-monospace-font-family);
+  word-break: break-all;
+}
+
+.account-display__address-wrapped {
+  font-family: var(--boxel-monospace-font-family);
+  word-break: break-all;
+  max-width: 22ch;
+}

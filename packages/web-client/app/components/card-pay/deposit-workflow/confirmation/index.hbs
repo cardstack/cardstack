@@ -79,13 +79,11 @@
         <CardPay::NestedItems class="card-pay-confirmation__transaction-depot">
           <:outer>
             <div class="card-pay-confirmation__entity-details">
-              {{!-- placeholder for account's icon --}}
-              <span class="card-pay-confirmation__entity-icon">
-              </span>
+              {{svg-jar "avatar-default" width="20" height="20" class="card-pay-confirmation__entity-icon" role="presentation"}}
               <div>
-                <div class="card-pay-confirmation__entity-text">Account</div>
+                <div class="card-pay-confirmation__entity-text">Account 1</div>
                 <div class="card-pay-confirmation__entity-address" data-test-deposit-confirmation-account-address>
-                  {{truncate-middle this.layer2Network.walletInfo.firstAddress 7 4}}
+                  {{truncate-middle this.layer2Network.walletInfo.firstAddress}}
                 </div>
               </div>
             </div>
@@ -97,7 +95,7 @@
                 <div class="card-pay-confirmation__entity-text">DEPOT:</div>
                 <div class="card-pay-confirmation__entity-address" data-test-deposit-confirmation-depot-address>
                   {{#if this.depotAddress}}
-                    {{truncate-middle this.depotAddress 7 4}}
+                    {{truncate-middle this.depotAddress}}
                   {{else}}
                     {{!--
                       This depot is fetched earlier in the workflow.
