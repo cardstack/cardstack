@@ -37,6 +37,7 @@ export interface Layer1Web3Strategy extends Web3Strategy {
 export interface Layer2Web3Strategy extends Web3Strategy {
   isConnected: boolean;
   defaultTokenBalance: BN | undefined;
+  depotSafe: DepotSafe | null;
   updateUsdConverters(
     symbolsToUpdate: ConvertibleSymbol[]
   ): Promise<Record<ConvertibleSymbol, ConversionFunction>>;
@@ -46,7 +47,7 @@ export interface Layer2Web3Strategy extends Web3Strategy {
     fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt>;
-  fetchDepot(owner: ChainAddress): Promise<DepotSafe | null>;
+  fetchDepot(): Promise<DepotSafe | null>;
 }
 
 export type TransactionHash = string;

@@ -80,7 +80,7 @@ export default class Layer2Network extends Service {
   }
 
   async fetchDepot(): Promise<DepotSafe | null> {
-    return this.strategy.fetchDepot(this.walletInfo.firstAddress!);
+    return this.strategy.depotSafe || this.strategy.fetchDepot();
   }
 
   blockExplorerUrl(txnHash: string | undefined): string | undefined {

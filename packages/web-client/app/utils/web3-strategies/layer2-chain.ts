@@ -35,6 +35,7 @@ export default abstract class Layer2ChainWeb3Strategy
   web3!: Web3;
   #exchangeRateApi!: IExchangeRate;
   #safesApi!: ISafes;
+  @tracked depotSafe: DepotSafe | null = null;
 
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
@@ -107,6 +108,7 @@ export default abstract class Layer2ChainWeb3Strategy
     this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
     this.#safesApi = await getSDK('Safes', this.web3);
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
+    await this.fetchDepot();
   }
 
   updateWalletInfo(accounts: string[], chainId: number) {
@@ -136,6 +138,7 @@ export default abstract class Layer2ChainWeb3Strategy
   // about disconnecting. WalletConnect's disconnect event tells all tabs that you are disconnected
   onDisconnect() {
     if (this.isConnected) {
+      this.depotSafe = null;
       this.clearWalletInfo();
       this.walletConnectUri = undefined;
       this.simpleEmitter.emit('disconnect');
@@ -196,15 +199,19 @@ export default abstract class Layer2ChainWeb3Strategy
     return tokenBridge.waitForBridgingCompleted(receiver, fromBlock.toString());
   }
 
-  async fetchDepot(owner: ChainAddress): Promise<DepotSafe | null> {
-    let safes = await this.#safesApi.view(owner);
-    let depotSafes = safes.filter(
-      (safe) => safe.type === 'depot'
-    ) as DepotSafe[];
-    if (depotSafes.length) {
-      return depotSafes[depotSafes.length - 1];
+  async fetchDepot(): Promise<DepotSafe | null> {
+    let result = null;
+
+    if (this.walletInfo.firstAddress) {
+      let safes = await this.#safesApi.view(this.walletInfo.firstAddress);
+      let depotSafes = safes.filter(
+        (safe) => safe.type === 'depot'
+      ) as DepotSafe[];
+      result = depotSafes[depotSafes.length - 1] ?? null;
     }
-    return null;
+
+    this.depotSafe = result;
+    return result;
   }
 
   async disconnect(): Promise<void> {
