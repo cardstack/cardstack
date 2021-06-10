@@ -57,9 +57,8 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 1
-# add hashicorp's apt repository
-    - name: Prep for hashicorp apt repositorty
-      run: sudo curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+    - name: Setup upterm session
+      uses: lhotari/action-upterm@v1
     - name: Install apt packages including waypoint
       run: |
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
