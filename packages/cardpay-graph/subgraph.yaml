@@ -1,0 +1,49 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Gnosis
+    network: sokol # sadly the network is hard coded in the subgraph--we'll need to template-ize this
+    source:
+      address: "0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B"
+      abi: GnosisProxyFactory
+      startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Safe
+      abis:
+        - name: GnosisProxyFactory
+          file: ./abis/GnosisProxyFactory.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: ProxyCreation(address)
+          handler: handleProxyCreation
+      file: ./src/mappings/gnosis-proxy-factory.ts
+
+templates:
+  - kind: ethereum/contract
+    name: GnosisSafe
+    network: sokol # sadly the network is hard coded in the subgraph--we'll need to template-ize this
+    source:
+      abi: GnosisSafe
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Owner
+        - Safe
+        - SafeOwner
+      abis:
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: ExecutionSuccess(bytes32,uint256)
+          handler: handleExecutionSuccess
+      file: ./src/mappings/gnosis-safe.ts
+

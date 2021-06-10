@@ -1,0 +1,17 @@
+type Safe @entity {
+  id: ID!               # safe address
+  createdAt: BigInt!    # unix time
+  owners: [SafeOwner]! @derivedFrom(field: "safe")
+}
+
+type Owner @entity {
+  id: ID!               # address
+  safes: [SafeOwner]! @derivedFrom(field: "owner")
+}
+
+# A mapping table is the more performant way to represent many-to-many relationships
+type SafeOwner @entity {
+  id: ID!               # Set to `${safe.id}-${owner.id}`
+  owner: Owner!
+  safe: Safe!
+}
