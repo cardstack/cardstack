@@ -59,9 +59,9 @@ jobs:
         fetch-depth: 1
 # add hashicorp's apt repository
     - name: Prep for hashicorp apt repositorty
-      run: curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
+      run: sudo curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
     - name: Add hashicorp apt repositorty
-      run: apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+      run: sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
     - name: Install apt packages including waypoint
       run: sudo apt-get install awscli waypoint docker-ce
     - name: Configure waypoint client
