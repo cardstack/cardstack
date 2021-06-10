@@ -47,7 +47,7 @@ export async function makeServer(registryCallback?: RegistryCallback) {
   app.use(((await container.lookup('jsonapi-middleware')) as JsonapiMiddleware).middleware());
 
   app.use(async (ctx: Koa.Context, _next: Koa.Next) => {
-    ctx.body = 'Hello World ' + ctx.environment + '! ' + ctx.host.split(':')[0];
+    ctx.body = 'Hello World ' + ctx.environment + '... ' + ctx.host.split(':')[0];
   });
 
   app.on('close', async function () {
