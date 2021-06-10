@@ -127,7 +127,9 @@ module('Acceptance | deposit', function (hooks) {
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
       .hasText('0x1826...6E44');
-    await waitFor(milestoneCompletedSel(1));
+
+    await settled();
+
     assert
       .dom(milestoneCompletedSel(1))
       .containsText('xDai chain wallet connected');
@@ -428,7 +430,9 @@ module('Acceptance | deposit', function (hooks) {
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
       .hasText('0x1826...6E44');
-    await waitFor(milestoneCompletedSel(1));
+
+    await settled();
+
     assert
       .dom(milestoneCompletedSel(1))
       .containsText('xDai chain wallet connected');
