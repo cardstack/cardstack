@@ -53,6 +53,11 @@ jobs:
     needs: change_check
     if: ${{ needs.change_check.outputs.hub == 'true' }}
     runs-on: ubuntu-latest
+    env:
+      WAYPOINT_SERVER_TOKEN: ${{ secrets.WAYPOINT_AUTH_TOKEN }}
+      WAYPOINT_SERVER_ADDR: ${{ secrets.WAYPOINT_SERVER_ADDR }}
+      WAYPOINT_SERVER_TLS: 1
+      WAYPOINT_SERVER_TLS_SKIP_VERIFY: 0
     steps:
     - uses: actions/checkout@v2
       with:
@@ -67,10 +72,12 @@ jobs:
           ${{ runner.os }}-yarn-
     - run: yarn global add lerna
     - run: yarn --prefer-offline
-    - name: Install waypoint
-      run: sudo apt-get install awscli waypoint
-    - name: Configure waypoint client
-      run: waypoint context create -server-addr=${{ secrets.WAYPOINT_SERVER_ADDR }} -server-auth-token=${{ secrets.WAYPOINT_AUTH_TOKEN }} -server-tls=true -server-tls-skip-verify=false -set-default
+    - name: Install aws-cli
+      run: sudo apt-get install awscli
+    - name: Install and configure waypoint
+      uses: hashicorp/action-setup-waypoint
+      with:
+        version: '0.4.0'
     - name: Deploy hub
       run: waypoint up --app=hub -plain
       env:
