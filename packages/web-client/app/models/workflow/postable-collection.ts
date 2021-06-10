@@ -20,6 +20,13 @@ export default class PostableCollection {
     return this.visiblePostables.isEvery('isComplete', true);
   }
 
+  get allNecessaryPostablesVisible() {
+    return (
+      this.#includedPostables.size + this.#excludedPostables.size ===
+      this.postables.length
+    );
+  }
+
   // return visible postables that should be visible -- all completed posts up to
   // and including the first incomplete post. Computation intentionally has some side effects:
   //   * calculate whether a post should be visible once and only once

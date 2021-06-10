@@ -6,6 +6,7 @@ import {
   waitFor,
   waitUntil,
   fillIn,
+  settled,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
@@ -76,7 +77,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
       .hasText('0x18261...6E44');
-    await waitFor(milestoneCompletedSel(0));
+
+    await settled();
+
     assert
       .dom(milestoneCompletedSel(0))
       .containsText('xDai chain wallet connected');
@@ -152,7 +155,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText('Edit')
       .isEnabled();
 
-    await waitFor(milestoneCompletedSel(1));
+    await settled();
+
     assert.dom(milestoneCompletedSel(1)).containsText('Layout customized');
 
     assert.dom(postableSel(2, 0)).containsText('Nice choice!');

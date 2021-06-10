@@ -24,6 +24,7 @@ export class WorkflowCard extends WorkflowPostable {
   }
 
   @action onComplete() {
+    this.workflow?.emit('visible-postables-changed');
     this.isComplete = true;
   }
   @action onIncomplete() {

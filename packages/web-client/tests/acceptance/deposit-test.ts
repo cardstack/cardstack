@@ -81,7 +81,8 @@ module('Acceptance | deposit', function (hooks) {
     assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.50');
     assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.00');
 
-    await waitFor(milestoneCompletedSel(0));
+    await settled();
+
     assert
       .dom(milestoneCompletedSel(0))
       .containsText('Mainnet wallet connected');
@@ -126,7 +127,9 @@ module('Acceptance | deposit', function (hooks) {
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
       .hasText('0x18261...6E44');
-    await waitFor(milestoneCompletedSel(1));
+
+    await settled();
+
     assert
       .dom(milestoneCompletedSel(1))
       .containsText('xDai chain wallet connected');
@@ -278,6 +281,8 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor(`${post} [data-test-blockscout-button]`);
     assert.dom(`${post} [data-test-blockscout-button]`).exists();
 
+    await settled();
+
     assert
       .dom(milestoneCompletedSel(3))
       .containsText('Tokens received on xDai');
@@ -387,7 +392,7 @@ module('Acceptance | deposit', function (hooks) {
         'Looks like you’ve already connected your Ethereum mainnet wallet'
       );
 
-    await waitFor(milestoneCompletedSel(0));
+    await settled();
     assert
       .dom(milestoneCompletedSel(0))
       .containsText('Mainnet wallet connected');
@@ -425,7 +430,7 @@ module('Acceptance | deposit', function (hooks) {
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
       )
       .hasText('0x18261...6E44');
-    await waitFor(milestoneCompletedSel(1));
+    await settled();
     assert
       .dom(milestoneCompletedSel(1))
       .containsText('xDai chain wallet connected');
@@ -478,7 +483,7 @@ module('Acceptance | deposit', function (hooks) {
       'metamask'
     );
 
-    await waitFor(milestoneCompletedSel(0));
+    await settled();
     assert
       .dom(milestoneCompletedSel(0))
       .containsText('Mainnet wallet connected');
@@ -489,7 +494,7 @@ module('Acceptance | deposit', function (hooks) {
         'Looks like you’ve already connected your xDai chain wallet'
       );
 
-    await waitFor(milestoneCompletedSel(1));
+    await settled();
     assert
       .dom(milestoneCompletedSel(1))
       .containsText('xDai chain wallet connected');
@@ -532,6 +537,8 @@ module('Acceptance | deposit', function (hooks) {
         'Looks like you’ve already connected your Ethereum mainnet wallet'
       );
 
+    await settled();
+
     assert
       .dom(milestoneCompletedSel(0))
       .containsText('Mainnet wallet connected');
@@ -542,7 +549,7 @@ module('Acceptance | deposit', function (hooks) {
         'Looks like you’ve already connected your xDai chain wallet'
       );
 
-    await waitFor(milestoneCompletedSel(1));
+    await settled();
     assert
       .dom(milestoneCompletedSel(1))
       .containsText('xDai chain wallet connected');
@@ -569,6 +576,8 @@ module('Acceptance | deposit', function (hooks) {
         { count: milestoneCtaButtonCount },
         'All cta buttons in milestones should be disabled'
       );
+
+    await waitFor('[data-test-cancelation][data-test-postable]');
 
     assert
       .dom(cancelationPostableSel(0))
@@ -622,7 +631,7 @@ module('Acceptance | deposit', function (hooks) {
         'Looks like you’ve already connected your xDai chain wallet'
       );
 
-    await waitFor(milestoneCompletedSel(1));
+    await settled();
     assert
       .dom(milestoneCompletedSel(1))
       .containsText('xDai chain wallet connected');
@@ -702,7 +711,7 @@ module('Acceptance | deposit', function (hooks) {
         'Looks like you’ve already connected your xDai chain wallet'
       );
 
-    await waitFor(milestoneCompletedSel(1));
+    await settled();
     assert
       .dom(milestoneCompletedSel(1))
       .containsText('xDai chain wallet connected');
@@ -787,7 +796,7 @@ module('Acceptance | deposit', function (hooks) {
         'Looks like you’ve already connected your xDai chain wallet'
       );
 
-    await waitFor(milestoneCompletedSel(1));
+    await settled();
     assert
       .dom(milestoneCompletedSel(1))
       .containsText('xDai chain wallet connected');

@@ -1,12 +1,13 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, waitFor } from '@ember/test-helpers';
+import { render, settled, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { Workflow } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
 import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
 import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
+import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
 
 module('Integration | Component | workflow-thread', function (hooks) {
   setupRenderingTest(hooks);
@@ -190,5 +191,58 @@ module('Integration | Component | workflow-thread', function (hooks) {
     assert
       .dom('[data-test-cancelation][data-test-postable]')
       .hasTextContaining('You canceled the workflow!');
+  });
+
+  test('A workflow can be rolled back', async function (assert) {
+    let workflow = new ConcreteWorkflow(this.owner);
+    let message = () =>
+      new WorkflowMessage({
+        author: { name: 'cardbot' },
+        message: 'A message',
+      });
+
+    let target = new WorkflowCard({
+      author: { name: 'cardbot' },
+      componentName: 'dummy-test',
+    });
+    target.isComplete = true;
+
+    workflow.milestones = [
+      new Milestone({
+        title: 'First milestone',
+        postables: [message(), target],
+        completedDetail: 'You are number one!',
+      }),
+      new Milestone({
+        title: 'Second milestone',
+        postables: [message(), message()],
+        completedDetail: 'You are number two!',
+      }),
+    ];
+
+    workflow.epilogue = new PostableCollection([
+      new WorkflowMessage({
+        author: { name: 'cardbot' },
+        message: 'This is the epilogue',
+      }),
+    ]);
+
+    this.set('workflow', workflow);
+    workflow.attachWorkflow();
+
+    await render(hbs`
+      <WorkflowThread @workflow={{this.workflow}} />
+    `);
+
+    assert.dom('[data-test-milestone="0"]').isVisible();
+    assert.dom('[data-test-milestone="1"]').isVisible();
+
+    target.onIncomplete();
+    await settled();
+
+    assert.dom('[data-test-milestone="1"]').doesNotExist();
+    assert
+      .dom('[data-test-milestone="0"][data-test-milestone-completed]')
+      .doesNotExist();
   });
 });
