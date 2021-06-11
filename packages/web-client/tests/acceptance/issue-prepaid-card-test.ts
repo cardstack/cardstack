@@ -193,16 +193,16 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom('[data-test-funding-source-depot-outer] [data-test-account-address]')
       .hasText('0xB236ca8DbAB0644ffCD32518eBF4924ba8666666');
 
-    assert.dom('[data-test-funding-source-dropdown="DAI"]').exists();
+    assert.dom('[data-test-funding-source-dropdown="DAI.CPXD"]').exists();
     assert
       .dom(
-        '[data-test-funding-source-dropdown="DAI"] [data-test-account-balance]'
+        '[data-test-funding-source-dropdown="DAI.CPXD"] [data-test-account-balance]'
       )
       .containsText('250.00 DAI');
 
-    await click('[data-test-funding-source-dropdown="DAI"] > div');
+    await click('[data-test-funding-source-dropdown="DAI.CPXD"] > div');
 
-    await click('[data-test-funding-source-token-option="CARD"]');
+    await click('[data-test-funding-source-token-option="CARD.CPXD"]');
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
@@ -213,13 +213,13 @@ module('Acceptance | issue prepaid card', function (hooks) {
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
-    await click('[data-test-funding-source-dropdown="CARD"] > div');
-    await click('[data-test-funding-source-token-option="DAI"]');
+    await click('[data-test-funding-source-dropdown="CARD.CPXD"] > div');
+    await click('[data-test-funding-source-token-option="DAI.CPXD"]');
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
 
-    assert.dom('[data-test-funding-source-dropdown="DAI"]').doesNotExist();
+    assert.dom('[data-test-funding-source-dropdown="DAI.CPXD"]').doesNotExist();
     assert
       .dom('[data-test-funding-source-token] [data-test-account-title]')
       .containsText('250.00 DAI');

@@ -9,7 +9,7 @@ import { toBN } from 'web3-utils';
 import {
   TokenDisplayInfo,
   TokenSymbol,
-  bridgeableSymbols,
+  bridgedSymbols,
 } from '@cardstack/web-client/utils/token';
 
 interface Token {
@@ -30,7 +30,7 @@ interface FundingSourceCardArgs {
 // we are assuming that the depot has enough tokens to create card
 // and we cancel the workflow earlier if it doesn't
 class FundingSourceCard extends Component<FundingSourceCardArgs> {
-  tokenInfo = bridgeableSymbols.map((symbol) => new TokenDisplayInfo(symbol));
+  tokenInfo = bridgedSymbols.map((symbol) => new TokenDisplayInfo(symbol));
   @service declare layer2Network: Layer2Network;
 
   @reads('args.workflowSession.state.prepaidFundingToken')
@@ -46,11 +46,11 @@ class FundingSourceCard extends Component<FundingSourceCardArgs> {
   }
 
   getBalance(symbol: TokenSymbol) {
-    if (symbol === 'DAI') {
+    if (symbol === 'DAI.CPXD') {
       return this.layer2Network.defaultTokenBalance;
     }
 
-    if (symbol === 'CARD') {
+    if (symbol === 'CARD.CPXD') {
       return this.layer2Network.cardBalance;
     }
     return toBN(0);
