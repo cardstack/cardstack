@@ -13,19 +13,38 @@ type Safe @entity {
 type Depot @entity {
   id: ID!                          # safe address
   safe: Safe!
-  did: String
+  createdAt: BigInt!
+  supplier: Account!
+  infoDid: String
+  createdPrepaidCards: [PrepaidCard]! @derivedFrom(field: "createdFromDepot")
+  bridgedTokens: [BridgeEvent]!       @derivedFrom(field: "depot")
+}
+
+type BridgeEvent @entity {
+  id: ID!
+  depot: Depot!
+  timestamp: BigInt!
+  supplier: Account!
+  token: String!
+  amount: BigInt!
 }
 
 type PrepaidCard @entity {
   id: ID!                          # safe address
   safe: Safe!
-  did: String
+  createdAt: BigInt!
+  createdFromDepot: Depot!
+  creationGasFeeCollected: BigInt
+  customizationDid: String
+  issuingToken: String!
+  issuer: String!
+  reloadable: Boolean!
 }
 
 type MerchantSafe @entity {
   id: ID!                          # safe address
   safe: Safe!
-  did: String
+  infoDid: String
 }
 
 type SafeTransaction @entity {
@@ -49,6 +68,8 @@ type Account @entity {
   safes: [SafeOwner]!              @derivedFrom(field: "owner")
   sentTokens: [TokenTransfer]!     @derivedFrom(field: "from")
   receivedTokens: [TokenTransfer]! @derivedFrom(field: "to")
+  depots: [Depot]!                 @derivedFrom(field: "supplier")
+  bridgedTokens: [BridgeEvent]!    @derivedFrom(field: "supplier")
 }
 
 # A mapping table is the more performant way to represent many-to-many
@@ -57,6 +78,12 @@ type SafeOwner @entity {
   id: ID!               # Set to safe.id-owner.id
   owner: Account!
   safe: Safe!
+}
+
+type PrepaidCardTransfer @entity {
+  id: ID!              # safe.id-from-to-txnhash
+  from: Account!
+  to: Account!
 }
 
 type TokenTransfer @entity {

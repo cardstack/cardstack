@@ -34,7 +34,7 @@ export function toHex(bytes: string): string {
 }
 
 export function decodeAbi(typesStr: string, hex: string): Array<ethereum.Value> {
-  log.info('decoding abi type: {}, hex {}', [typesStr, hex]);
+  log.debug('decoding abi type: {}, hex {}', [typesStr, hex]);
   if (hex.startsWith('0x')) {
     hex = hex.slice(2);
   }

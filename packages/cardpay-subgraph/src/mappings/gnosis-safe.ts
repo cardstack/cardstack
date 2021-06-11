@@ -33,7 +33,7 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     txEntity.refundReceiver = toChecksumAddress(decoded[8].toAddress());
     txEntity.signatures = decoded[9].toBytes();
 
-    log.info(
+    log.debug(
       'SafeTransaction indexed in txn hash {}, id {}, safe: {}, timestamp {}, to: {}, value: {}, data: {}, operation: {}, safeTxGas {}, baseGas {}, gasPrice {}, gasToken: {}, refundReceiver: {}, signatures: {}',
       [
         event.transaction.hash.toHex(),
