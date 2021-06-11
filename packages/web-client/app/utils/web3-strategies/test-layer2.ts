@@ -46,8 +46,12 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(new BN('0'));
   }
 
+  async refreshBalances() {
+    await this.fetchDepotTask();
+  }
+
   // eslint-disable-next-line no-unused-vars
-  fetchDepot(): Promise<DepotSafe | null> {
+  fetchDepotTask(): any {
     return Promise.resolve(this.depotSafe);
   }
 
