@@ -3,13 +3,14 @@
   style={{css-var header-background=@headerBackground header-theme=(concat "url(" @headerTheme ")")}}
   data-test-prepaid-card-background={{@headerBackground}}
   data-test-prepaid-card-theme={{@headerTheme}}
+  ...attributes
 >
   <header class="prepaid-card__header">
     <div class="prepaid-card__background">
     </div>
     <div>
       <div>Issued by</div>
-      <div class="prepaid-card__name">{{or @issuerName "Enter name"}}</div>
+      <div class="prepaid-card__name" data-test-prepaid-card-issuer-name>{{or @issuerName "Enter name"}}</div>
     </div>
     <div>
       <div class="prepaid-card__address">{{truncate-middle @address}}</div>
