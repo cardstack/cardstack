@@ -45,6 +45,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<CardPay
     this.layer2Network
       .awaitBridged(this.layer2BlockHeightBeforeBridging!)
       .then((transactionReceipt: TransactionReceipt) => {
+        this.layer2Network.refreshBalances();
         this.args.workflowSession.update(
           'completedLayer2TransactionReceipt',
           transactionReceipt

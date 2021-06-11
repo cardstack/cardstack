@@ -37,7 +37,6 @@ export default abstract class Layer2ChainWeb3Strategy
   web3: Web3 = new Web3();
   #exchangeRateApi!: IExchangeRate;
   #safesApi!: ISafes;
-  @tracked isFetchingDepot = false;
   @tracked depotSafe: DepotSafe | null = null;
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
@@ -46,6 +45,10 @@ export default abstract class Layer2ChainWeb3Strategy
   @tracked waitForAccountDeferred = defer();
 
   @reads('provider.connector') connector!: IConnector;
+
+  get isFetchingDepot() {
+    return taskFor(this.fetchDepotTask).isRunning;
+  }
 
   constructor(networkSymbol: NetworkSymbol, chainName: string) {
     this.chainName = chainName;
@@ -120,25 +123,7 @@ export default abstract class Layer2ChainWeb3Strategy
     }
     this.walletInfo = newWalletInfo;
     if (accounts.length) {
-      taskFor(this.fetchDepotTask)
-        .perform()
-        .then((depot: DepotSafe | null) => {
-          if (depot) {
-            let daiBalance = depot.tokens.find(
-              (tokenInfo) => tokenInfo.token.symbol === 'DAI'
-            )?.balance;
-            let cardBalance = depot.tokens.find(
-              (tokenInfo) => tokenInfo.token.symbol === 'CARD'
-            )?.balance;
-            this.defaultTokenBalance = new BN(daiBalance ?? '0');
-            this.cardBalance = new BN(cardBalance ?? '0');
-          } else {
-            this.defaultTokenBalance = new BN('0');
-            this.cardBalance = new BN('0');
-          }
-
-          this.depotSafe = depot;
-        });
+      taskFor(this.fetchDepotTask).perform();
 
       this.waitForAccountDeferred.resolve();
     } else {
@@ -148,6 +133,10 @@ export default abstract class Layer2ChainWeb3Strategy
 
   clearWalletInfo() {
     this.updateWalletInfo([], this.chainId);
+  }
+
+  async refreshBalances() {
+    return taskFor(this.fetchDepotTask).perform();
   }
 
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
@@ -214,11 +203,25 @@ export default abstract class Layer2ChainWeb3Strategy
       let depotSafes = safes.filter(
         (safe: Safe) => safe.type === 'depot'
       ) as DepotSafe[];
+
       depot = depotSafes[depotSafes.length - 1] ?? null;
+      if (depot) {
+        let daiBalance = depot.tokens.find(
+          (tokenInfo) => tokenInfo.token.symbol === 'DAI'
+        )?.balance;
+        let cardBalance = depot.tokens.find(
+          (tokenInfo) => tokenInfo.token.symbol === 'CARD'
+        )?.balance;
+        this.defaultTokenBalance = new BN(daiBalance ?? '0');
+        this.cardBalance = new BN(cardBalance ?? '0');
+      } else {
+        this.defaultTokenBalance = new BN('0');
+        this.cardBalance = new BN('0');
+      }
     }
 
     this.depotSafe = depot;
-    return depot;
+    return;
   }
 
   async disconnect(): Promise<void> {
