@@ -64,7 +64,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
-      defaultToken: toBN(0),
+      defaultToken: toBN('250000000000000000000'),
+      card: toBN('500000000000000000000'),
     });
     let testDepot = {
       address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
