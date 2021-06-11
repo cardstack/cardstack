@@ -7,10 +7,12 @@ import { ChainAddress } from './web3-strategies/types';
 export type ConvertibleSymbol = 'DAI' | 'CARD';
 export type BridgeableSymbol = 'DAI' | 'CARD';
 export type Layer1BalanceSymbol = 'DAI' | 'CARD' | 'ETH';
+export type BridgedTokenSymbol = 'DAI.CPXD' | 'CARD.CPXD';
 export type TokenSymbol =
   | ConvertibleSymbol
   | BridgeableSymbol
-  | Layer1BalanceSymbol;
+  | Layer1BalanceSymbol
+  | BridgedTokenSymbol;
 export type NetworkSymbol = 'kovan' | 'sokol' | 'mainnet' | 'xdai';
 
 // conversion
@@ -19,6 +21,7 @@ export const convertibleSymbols: ConvertibleSymbol[] = ['DAI', 'CARD'];
 
 // contract/bridging
 export const bridgeableSymbols: BridgeableSymbol[] = ['DAI', 'CARD'];
+export const bridgedSymbols: BridgedTokenSymbol[] = ['DAI.CPXD', 'CARD.CPXD'];
 const contractNames: Record<NetworkSymbol, Record<BridgeableSymbol, string>> = {
   kovan: {
     DAI: 'daiToken',
@@ -81,6 +84,18 @@ const _tokenDisplayInfoMap: Record<TokenSymbol, DisplayInfo> = {
     name: 'Dai',
     symbol: 'DAI',
     description: 'USD-based stablecoin',
+    icon: 'dai-token',
+  },
+  'CARD.CPXD': {
+    name: 'Card',
+    symbol: 'CARD',
+    description: '',
+    icon: 'card-token',
+  },
+  'DAI.CPXD': {
+    name: 'Dai',
+    symbol: 'DAI.CPXD',
+    description: '',
     icon: 'dai-token',
   },
 };
