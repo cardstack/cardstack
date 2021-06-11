@@ -44,6 +44,7 @@ dataSources:
         - Safe
         - PrepaidCard
         - Depot
+        - Transaction
       abis:
         - name: PrepaidCardManager
           file: ./abis/PrepaidCardManager.json
@@ -70,6 +71,7 @@ dataSources:
       entities:
         - Safe
         - Depot
+        - Transaction
       abis:
         - name: BridgeUtils
           file: ./abis/BridgeUtils.json
@@ -94,6 +96,7 @@ dataSources:
       entities:
         - Safe
         - Depot
+        - Transaction
       abis:
         - name: HomeMultiAMBErc20ToErc677
           file: ./abis/HomeMultiAMBErc20ToErc677.json
@@ -116,6 +119,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Safe
+        - Transaction
       abis:
         - name: GnosisProxyFactory
           file: ./abis/GnosisProxyFactory.json
@@ -138,6 +142,7 @@ templates:
       language: wasm/assemblyscript
       entities:
         - SafeTransaction
+        - Transaction
       abis:
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json

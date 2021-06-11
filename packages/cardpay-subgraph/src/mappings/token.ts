@@ -1,8 +1,10 @@
-import { toChecksumAddress } from '../utils';
+import { assertTransactionExists, toChecksumAddress } from '../utils';
 import { Transfer as TransferEvent, ERC677Token } from '../../generated/Token/ERC677Token';
-import { Token, Safe, Account, TokenTransfer } from '../../generated/schema';
+import { Token, Safe, Account, TokenTransfer, Transaction } from '../../generated/schema';
 
 export function handleTransfer(event: TransferEvent): void {
+  assertTransactionExists(event);
+
   let from = toChecksumAddress(event.params.from);
   let to = toChecksumAddress(event.params.to);
   let tokenAddress = toChecksumAddress(event.address);
@@ -29,6 +31,7 @@ export function handleTransfer(event: TransferEvent): void {
     transferEntity.toSafe = to;
   }
 
+  transferEntity.transaction = event.transaction.hash.toHex();
   transferEntity.token = tokenAddress;
   transferEntity.amount = event.params.value;
   transferEntity.timestamp = event.block.timestamp;

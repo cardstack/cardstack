@@ -1,7 +1,7 @@
 import { Address } from '@graphprotocol/graph-ts';
 import { ExecutionSuccess } from '../../generated/templates/GnosisSafe/GnosisSafe';
-import { toChecksumAddress, decodeAbi, getMethodHash, methodHashFromHex } from '../utils';
-import { SafeTransaction, Token, Account } from '../../generated/schema';
+import { toChecksumAddress, decodeAbi, getMethodHash, methodHashFromHex, assertTransactionExists } from '../utils';
+import { SafeTransaction, Transaction, Account } from '../../generated/schema';
 import { log } from '@graphprotocol/graph-ts';
 
 const EXEC_TRANSACTION = 'execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)';
@@ -17,42 +17,45 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
 
   // TODO handle all the PrepaidCardMethod's functions too
   if (method == getMethodHash(EXEC_TRANSACTION)) {
-    let txEntity = new SafeTransaction(event.transaction.hash.toHex() + '-' + event.logIndex.toString());
-    txEntity.safe = safeAddress;
-    txEntity.timestamp = event.block.timestamp;
+    assertTransactionExists(event);
+
+    let safeTxEntity = new SafeTransaction(event.transaction.hash.toHex() + '-' + event.logIndex.toString());
+    safeTxEntity.safe = safeAddress;
+    safeTxEntity.transaction = event.transaction.hash.toHex();
+    safeTxEntity.timestamp = event.block.timestamp;
 
     let decoded = decodeAbi(EXEC_TRANSACTION, bytes);
-    txEntity.to = toChecksumAddress(decoded[0].toAddress());
-    txEntity.value = decoded[1].toBigInt();
-    txEntity.data = decoded[2].toBytes();
-    txEntity.operation = decoded[3].toBigInt();
-    txEntity.safeTxGas = decoded[4].toBigInt();
-    txEntity.baseGas = decoded[5].toBigInt();
-    txEntity.gasPrice = decoded[6].toBigInt();
-    txEntity.gasToken = toChecksumAddress(decoded[7].toAddress());
-    txEntity.refundReceiver = toChecksumAddress(decoded[8].toAddress());
-    txEntity.signatures = decoded[9].toBytes();
+    safeTxEntity.to = toChecksumAddress(decoded[0].toAddress());
+    safeTxEntity.value = decoded[1].toBigInt();
+    safeTxEntity.data = decoded[2].toBytes();
+    safeTxEntity.operation = decoded[3].toBigInt();
+    safeTxEntity.safeTxGas = decoded[4].toBigInt();
+    safeTxEntity.baseGas = decoded[5].toBigInt();
+    safeTxEntity.gasPrice = decoded[6].toBigInt();
+    safeTxEntity.gasToken = toChecksumAddress(decoded[7].toAddress());
+    safeTxEntity.refundReceiver = toChecksumAddress(decoded[8].toAddress());
+    safeTxEntity.signatures = decoded[9].toBytes();
 
     log.debug(
       'SafeTransaction indexed in txn hash {}, id {}, safe: {}, timestamp {}, to: {}, value: {}, data: {}, operation: {}, safeTxGas {}, baseGas {}, gasPrice {}, gasToken: {}, refundReceiver: {}, signatures: {}',
       [
         event.transaction.hash.toHex(),
-        txEntity.id,
-        txEntity.safe,
-        txEntity.timestamp.toString(),
-        txEntity.to,
-        txEntity.value.toString(),
-        txEntity.data.toHex(),
-        txEntity.operation.toString(),
-        txEntity.safeTxGas.toString(),
-        txEntity.baseGas.toString(),
-        txEntity.gasPrice.toString(),
-        txEntity.gasToken,
-        txEntity.refundReceiver,
-        txEntity.signatures.toHex(),
+        safeTxEntity.id,
+        safeTxEntity.safe,
+        safeTxEntity.timestamp.toString(),
+        safeTxEntity.to,
+        safeTxEntity.value.toString(),
+        safeTxEntity.data.toHex(),
+        safeTxEntity.operation.toString(),
+        safeTxEntity.safeTxGas.toString(),
+        safeTxEntity.baseGas.toString(),
+        safeTxEntity.gasPrice.toString(),
+        safeTxEntity.gasToken,
+        safeTxEntity.refundReceiver,
+        safeTxEntity.signatures.toHex(),
       ]
     );
 
-    txEntity.save();
+    safeTxEntity.save();
   }
 }

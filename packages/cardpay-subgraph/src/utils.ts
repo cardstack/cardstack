@@ -1,7 +1,15 @@
 import { crypto, Address, ByteArray, Bytes, BigInt, ethereum, log } from '@graphprotocol/graph-ts';
 import { bytes } from '@protofire/subgraph-toolkit';
+import { Transaction } from '../generated/schema';
 
 const WORD_SIZE = 64;
+
+export function assertTransactionExists(event: ethereum.Event): void {
+  let txEntity = new Transaction(event.transaction.hash.toHex());
+  txEntity.timestamp = event.block.timestamp;
+  txEntity.blockNumber = event.block.number;
+  txEntity.save();
+}
 
 export function toChecksumAddress(address: Address): string {
   let lowerCaseAddress = address.toHex().slice(2);
