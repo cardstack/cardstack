@@ -28,7 +28,9 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   prepaidCardEntity.reloadable = reloadable;
   prepaidCardEntity.save();
 
-  assertPrepaidCardCreationExists(prepaidCard, event, issuer, issuingToken);
+  let creationEntity = assertPrepaidCardCreationExists(prepaidCard, event, issuer, issuingToken);
+  creationEntity.amount = event.params.amount;
+  creationEntity.save();
 }
 
 export function handleGasFeeCollected(event: GasFeeCollected): void {
