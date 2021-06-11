@@ -53,8 +53,8 @@
     "yarn": "^1.0"
   },
   "scripts": {
-    "test": "mocha -r esm ../test-support/bin/run.js --timeout 60000",
-    "autotest": "mocha -w --reporter=min -r esm ../test-support/bin/run.js --timeout 60000"
+    "test": "PACKAGE=hub mocha -r esm ../test-support/bin/run.js --timeout 60000",
+    "autotest": "PACKAGE=hub mocha -w --reporter=min -r esm ../test-support/bin/run.js --timeout 60000"
   },
   "volta": {
     "extends": "../../package.json"
