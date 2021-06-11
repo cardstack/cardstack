@@ -116,8 +116,6 @@ export default abstract class Layer2ChainWeb3Strategy
         );
       }
       this.updateWalletInfo(accounts, chainId);
-      await this.fetchDepot();
-      this.refreshBalances();
     });
 
     this.connector.on('disconnect', (error) => {
@@ -132,17 +130,26 @@ export default abstract class Layer2ChainWeb3Strategy
     this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
     this.#safesApi = await getSDK('Safes', this.web3);
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
-    await this.fetchDepot();
-    this.refreshBalances();
   }
 
-  updateWalletInfo(accounts: string[], chainId: number) {
+  async updateWalletInfo(accounts: string[], chainId: number) {
     let newWalletInfo = new WalletInfo(accounts, chainId);
     if (this.walletInfo.isEqualTo(newWalletInfo)) {
       return;
     }
     this.walletInfo = newWalletInfo;
     if (accounts.length) {
+      let depot = await this.fetchDepot();
+      if (depot) {
+        let daiBalance = depot.tokens.find(
+          (tokenInfo) => tokenInfo.token.symbol === 'DAI'
+        )?.balance;
+        let cardBalance = depot.tokens.find(
+          (tokenInfo) => tokenInfo.token.symbol === 'CARD'
+        )?.balance;
+        this.defaultTokenBalance = new BN(daiBalance ?? '0');
+        this.cardBalance = new BN(cardBalance ?? '0');
+      }
       this.waitForAccountDeferred.resolve();
     } else {
       this.waitForAccountDeferred = defer();
