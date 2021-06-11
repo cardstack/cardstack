@@ -23,8 +23,8 @@
     "node": ">= 12"
   },
   "scripts": {
-    "test": "mocha -r esm ../test-support/bin/run.js --timeout 60000",
-    "autotest": "mocha -w --reporter=min -r esm ../test-support/bin/run.js --timeout 60000"
+    "test": "PACKAGE=did-resolver mocha ../test-support/bin/run.js --timeout 60000",
+    "autotest": "PACKAGE=did-resolver mocha -w --reporter=min ../test-support/bin/run.js --timeout 60000"
   },
   "volta": {
     "extends": "../../package.json"
