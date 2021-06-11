@@ -1,8 +1,9 @@
 import { ProxyCreation } from '../../generated/Gnosis/GnosisProxyFactory';
 import { GnosisSafe } from '../../generated/Gnosis/GnosisSafe';
 import { GnosisSafe as GnosisSafeTemplate } from '../../generated/templates';
-import { Safe, Owner, SafeOwner } from '../../generated/schema';
+import { Safe, Account, SafeOwner } from '../../generated/schema';
 import { toChecksumAddress } from '../utils';
+import { log } from '@graphprotocol/graph-ts';
 
 export function handleProxyCreation(event: ProxyCreation): void {
   let safeAddress = toChecksumAddress(event.params.proxy);
@@ -14,7 +15,7 @@ export function handleProxyCreation(event: ProxyCreation): void {
 
   for (let i = 0; i < owners.length; i++) {
     let ownerAddress = toChecksumAddress(owners[i]);
-    let ownerEntity = new Owner(ownerAddress);
+    let ownerEntity = new Account(ownerAddress);
     ownerEntity.save();
 
     let safeOwnerId = safeAddress + '-' + ownerAddress;
@@ -24,6 +25,7 @@ export function handleProxyCreation(event: ProxyCreation): void {
     safeOwnerEntity.save();
   }
   safeEntity.save();
+  log.debug('=======> created safe entity {}', [safeAddress]);
 
   GnosisSafeTemplate.create(event.params.proxy);
 }

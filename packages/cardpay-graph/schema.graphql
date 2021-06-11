@@ -1,17 +1,55 @@
 type Safe @entity {
-  id: ID!               # safe address
-  createdAt: BigInt!    # unix time
-  owners: [SafeOwner]! @derivedFrom(field: "safe")
+  id: ID!                          # safe address
+  createdAt: BigInt!               # unix time
+  owners: [SafeOwner]!             @derivedFrom(field: "safe")
+  sentTokens: [TokenTransfer]!     @derivedFrom(field: "fromSafe")
+  receivedTokens: [TokenTransfer]! @derivedFrom(field: "toSafe")
+  safeTxns: [SafeTransaction]!     @derivedFrom(field: "safe")
 }
 
-type Owner @entity {
-  id: ID!               # address
-  safes: [SafeOwner]! @derivedFrom(field: "owner")
-}
-
-# A mapping table is the more performant way to represent many-to-many relationships
-type SafeOwner @entity {
-  id: ID!               # Set to `${safe.id}-${owner.id}`
-  owner: Owner!
+type SafeTransaction @entity {
+  id: ID!
   safe: Safe!
+  to: String!
+  value: BigInt!
+  data: Bytes!
+  operation: BigInt!
+  safeTxGas: BigInt!
+  baseGas: BigInt!
+  gasPrice: BigInt!
+  gasToken: String!
+  refundReceiver: String!
+  signatures: Bytes!
+}
+
+type Account @entity {
+  id: ID!                          # address
+  safes: [SafeOwner]!              @derivedFrom(field: "owner")
+  sentTokens: [TokenTransfer]!     @derivedFrom(field: "from")
+  receivedTokens: [TokenTransfer]! @derivedFrom(field: "to")
+}
+
+# A mapping table is the more performant way to represent many-to-many
+# relationships
+type SafeOwner @entity {
+  id: ID!               # Set to safe.id-owner.id
+  owner: Account!
+  safe: Safe!
+}
+
+type TokenTransfer @entity {
+  id: ID!              # Set to token address + txn-hash + log index
+  token: Token!
+  amount: BigInt!
+  timestamp: BigInt!
+  from: Account
+  fromSafe: Safe
+  to: Account
+  toSafe: Safe
+}
+
+type Token @entity {
+  id: ID!
+  transfers: [TokenTransfer]! @derivedFrom(field: "token")
+
 }

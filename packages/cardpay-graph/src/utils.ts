@@ -1,4 +1,4 @@
-import { crypto, Address, ByteArray } from '@graphprotocol/graph-ts';
+import { crypto, Address, ByteArray, Bytes } from '@graphprotocol/graph-ts';
 
 export function toChecksumAddress(address: Address): string {
   let lowerCaseAddress = address.toHex().slice(2);
@@ -31,4 +31,8 @@ function toUpper(str: string): string {
     }
   }
   return result;
+}
+
+export function bytesFromHexString(hex: string): Bytes {
+  return Bytes.fromHexString(hex) as Bytes;
 }
