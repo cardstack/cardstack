@@ -63,7 +63,7 @@ class CardPayDepositWorkflowConfirmationComponent extends Component<CardPayDepos
   }
 
   get depotAddress(): string {
-    return this.args.workflowSession.state.depotAddress;
+    return this.layer2Network.depotSafe?.address || '';
   }
 }
 

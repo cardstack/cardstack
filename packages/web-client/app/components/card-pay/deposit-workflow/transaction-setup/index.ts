@@ -2,8 +2,6 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { reads } from 'macro-decorators';
 import { inject as service } from '@ember/service';
-import { taskFor } from 'ember-concurrency-ts';
-import { task } from 'ember-concurrency-decorators';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import WorkflowSession from '../../../../models/workflow/workflow-session';
@@ -34,12 +32,6 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayD
     args: CardPayDepositWorkflowTransactionSetupComponentArgs
   ) {
     super(owner, args);
-    taskFor(this.fetchDepotTask)
-      .perform()
-      .then((depot: { address: string } | null) => {
-        if (depot)
-          this.args.workflowSession.update('depotAddress', depot.address);
-      });
   }
 
   get selectedToken() {
@@ -61,11 +53,6 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayD
     } else {
       return toBN(0);
     }
-  }
-
-  @task *fetchDepotTask(): any {
-    let depot = yield this.layer2Network.fetchDepot();
-    return depot;
   }
 
   @action chooseSource(tokenSymbol: string) {

@@ -22,7 +22,7 @@
               @inner={{true}}
               @icon="depot"
               @title="DEPOT:"
-              @address={{this.fetchDepotTask.last.value.address}}
+              @address={{this.depotAddress}}
               data-test-funding-source-depot-inner
             />
           </:inner>
@@ -41,7 +41,7 @@
               @isComplete={{@isComplete}}
               @icon="depot"
               @title="DEPOT:"
-              @address={{this.fetchDepotTask.last.value.address}}
+              @address={{this.depotAddress}}
               data-test-funding-source-depot-outer
             />
           </:outer>
