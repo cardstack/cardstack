@@ -44,20 +44,17 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(new BN('0'));
   }
 
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   fetchDepot(_owner: ChainAddress): Promise<DepotSafe | null> {
     return Promise.resolve(this.depot);
   }
 
-  awaitBridged(
-    _fromBlock: BN, // eslint-disable-line no-unused-vars
-    _receiver: string // eslint-disable-line no-unused-vars
-  ): Promise<TransactionReceipt> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  awaitBridged(_fromBlock: BN, _receiver: string): Promise<TransactionReceipt> {
     this.bridgingDeferred = defer<TransactionReceipt>();
     return this.bridgingDeferred.promise as Promise<TransactionReceipt>;
   }
 
-  // eslint-disable-next-line no-unused-vars
   async updateUsdConverters(symbolsToUpdate: ConvertibleSymbol[]) {
     this.test__lastSymbolsToUpdate = symbolsToUpdate;
     let result = {} as Record<ConvertibleSymbol, ConversionFunction>;

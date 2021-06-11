@@ -2,7 +2,7 @@
 export type UnbindEventListener = () => void;
 
 export interface Emitter {
-  on(event: string, cb: Function): UnbindEventListener; // eslint-disable-line no-unused-vars
+  on(event: string, cb: Function): UnbindEventListener;
 }
 
 /**
@@ -39,7 +39,6 @@ export interface Emitter {
  *
  * // DO NOT DELETE: this is how TypeScript knows how to look up your services.
  * declare module '@ember/service' {
- *   // eslint-disable-next-line no-unused-vars
  *   interface Registry {
  *     'resized-target': ResizedTarget;
  *   }

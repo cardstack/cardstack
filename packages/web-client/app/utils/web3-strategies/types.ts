@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { WalletProvider } from '../wallet-providers';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
