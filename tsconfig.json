@@ -22,6 +22,7 @@
     "./packages/test-support/**/*.ts",
     "./packages/cardpay-sdk/**/*.ts",
     "./packages/cardpay-cli/**/*.ts",
+    "./packages/cardpay-subgraph/**/*.ts",
     "./scripts/**/*.js",
     "./cards/**/*.ts",
     "**/.eslintrc.ts"

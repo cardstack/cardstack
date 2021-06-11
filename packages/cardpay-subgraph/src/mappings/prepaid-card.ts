@@ -47,7 +47,10 @@ export function handleGasFeeCollected(event: GasFeeCollected): void {
   creationEntity.save();
 }
 
-export function handleTransfer(event: TransferredPrepaidCard): void {}
+// TODO support prepaid card transfer events
+// export function handleTransfer(event: TransferredPrepaidCard): void {
+//
+// }
 
 function assertPrepaidCardCreationExists(
   prepaidCard: string,

@@ -7,6 +7,8 @@
 /packages/web-client/deploy/node_modules
 /packages/web-client/deploy/context
 /packages/web-client/deploy/dist
+/packages/cardpay-subgraph/build
+/packages/cardpay-subgraph/generated
 .eslintcache
 .vagrant
 .nvmrc
