@@ -48,7 +48,8 @@ export interface Layer2Web3Strategy extends Web3Strategy {
     fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt>;
-  fetchDepot(): Promise<DepotSafe | null>;
+  fetchDepotTask(): Promise<DepotSafe | null>;
+  refreshBalances(): void;
 }
 
 export type TransactionHash = string;
