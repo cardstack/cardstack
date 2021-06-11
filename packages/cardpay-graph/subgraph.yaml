@@ -63,10 +63,6 @@ templates:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Account
-        - Safe
-        - SafeOwner
-        - Token
         - SafeTransaction
       abis:
         - name: GnosisSafe

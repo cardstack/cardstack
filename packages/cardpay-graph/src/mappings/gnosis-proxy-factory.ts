@@ -25,7 +25,7 @@ export function handleProxyCreation(event: ProxyCreation): void {
     safeOwnerEntity.save();
   }
   safeEntity.save();
-  log.debug('=======> created safe entity {}', [safeAddress]);
+  log.debug('created safe entity {}', [safeAddress]);
 
   GnosisSafeTemplate.create(event.params.proxy);
 }

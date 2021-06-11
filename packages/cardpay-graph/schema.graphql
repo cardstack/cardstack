@@ -5,10 +5,32 @@ type Safe @entity {
   sentTokens: [TokenTransfer]!     @derivedFrom(field: "fromSafe")
   receivedTokens: [TokenTransfer]! @derivedFrom(field: "toSafe")
   safeTxns: [SafeTransaction]!     @derivedFrom(field: "safe")
+  depot: Depot                     @derivedFrom(field: "safe")
+  merchant: MerchantSafe           @derivedFrom(field: "safe")
+  prepaidCard: PrepaidCard         @derivedFrom(field: "safe")
+}
+
+type Depot @entity {
+  id: ID!                          # safe address
+  safe: Safe!
+  did: String
+}
+
+type PrepaidCard @entity {
+  id: ID!                          # safe address
+  safe: Safe!
+  did: String
+}
+
+type MerchantSafe @entity {
+  id: ID!                          # safe address
+  safe: Safe!
+  did: String
 }
 
 type SafeTransaction @entity {
   id: ID!
+  timestamp: BigInt!
   safe: Safe!
   to: String!
   value: BigInt!
@@ -51,5 +73,4 @@ type TokenTransfer @entity {
 type Token @entity {
   id: ID!
   transfers: [TokenTransfer]! @derivedFrom(field: "token")
-
 }
