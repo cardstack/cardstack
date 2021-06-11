@@ -46,6 +46,7 @@
     "deploy:web-client:staging": "cd packages/web-client && ember deploy staging --verbose",
     "prepare": "npm run compile",
     "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
+    "lint:css:web-client": "cd packages/web-client && yarn lint:css",
     "lint:deps": "node scripts/find-bad-deps.js",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
     "lint:js:pkg": "sh -c 'eslint packages/${0} --cache --ignore-path .gitignore --ext=js,ts'",
