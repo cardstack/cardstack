@@ -1,7 +1,7 @@
 .boxel-card-catalog-tray-item {
   --boxel-card-catalog-tray-item-title-color: var(--boxel-dark);
   --boxel-card-catalog-tray-item-description-color: var(--boxel-purple-800);
-  --boxel-card-catalog-tray-item-icon-color: var(--boxel-teal);
+  --boxel-card-catalog-tray-item-icon-color: var(--boxel-dark-highlight);
   --boxel-card-catalog-tray-item-background-color: var(--boxel-purple-100);
   --boxel-card-catalog-tray-item-border: 1px solid var(--boxel-purple-900);
 
@@ -47,8 +47,8 @@
 
 .boxel-card-catalog-tray-item__icon {
   grid-area: icon;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
 
   --icon-color: var(--boxel-card-catalog-tray-item-icon-color);
 }

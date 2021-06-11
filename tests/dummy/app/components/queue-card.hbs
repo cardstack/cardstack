@@ -1,6 +1,5 @@
 <button {{on "click" @selectCard}}
-  class="queue-card {{if (and (eq @card.id @currentCard.id) (eq @card.orgId @currentCard.orgId)) "
-  boxel--light-theme" "boxel--dark-theme" }}">
+  class="queue-card {{if (and (eq @card.id @currentCard.id) (eq @card.orgId @currentCard.orgId)) "queue-card--light-theme"}}">
   <div class="queue-card__datetime-row">
     {{#let (if @currentMilestone.timestamp @currentMilestone.timestamp @card.datetime) as |datetime|}}
     <time datetime={{datetime}} class="queue-card__datetime">{{dayjs-format datetime "MMM D, h:mm A"}}</time>

@@ -1,5 +1,5 @@
 .boxel-help-box__title {
-  --icon-color: var(--boxel-teal);
+  --icon-color: var(--boxel-dark-highlight);
 
   display: grid;
   grid-template-columns: auto 1fr;

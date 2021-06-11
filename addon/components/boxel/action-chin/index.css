@@ -2,11 +2,11 @@
   --boxel-action-chin-padding-horizontal: var(--boxel-sp-lg);
   --boxel-action-chin-padding-vertical: var(--boxel-sp-lg);
   --button-base-height: 2rem; /* The height of the boxel button, used for calculating the min-height to reduce layout shift */
-  --boxel-action-chin-background-color: var(--boxel-purple-700);
+  --boxel-action-chin-background-color: var(--boxel-purple-750);
   --boxel-action-chin-emphasis-text-color: var(--boxel-light);
   --boxel-action-chin-text-color: var(--boxel-purple-300);
   --icon-color: var(--boxel-action-chin-text-color);
-  --boxel-purple-700-opacity90: rgba(57, 54, 66, 0.9);
+  --boxel-action-chin-disabled-background: rgba(54, 52, 65, 0.9); /* bg-color at 90% opacity */
 
   position: relative;
   display: grid;
@@ -51,8 +51,8 @@
   --boxel-action-chin-padding-vertical: var(--boxel-sp-xs);
 }
 
-.boxel-action-chin--default.boxel-action-chin--disabled.boxel-action-chin--has-step {
-  --boxel-action-chin-background-color: var(--boxel-purple-700-opacity90);
+.boxel-action-chin--disabled.boxel-action-chin--has-step {
+  --boxel-action-chin-background-color: var(--boxel-action-chin-disabled-background);
 }
 
 /* add the step using a pseudoelement */

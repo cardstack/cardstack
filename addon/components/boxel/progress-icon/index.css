@@ -9,6 +9,8 @@
 }
 
 .boxel--light-theme .boxel-progress-icon {
+  --icon-color: var(--boxel-dark-highlight);
+
   background-image: url('../@cardstack/boxel/images/icons/progress-circle.svg');
 }
 

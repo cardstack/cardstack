@@ -1,8 +1,10 @@
 .queue-card {
   --queue-card-user-tasks: var(--boxel-lime);
   --queue-card-assigned-tasks: var(--boxel-lilac);
+  --queue-card-background-color: var(--boxel-purple-500);
   --queue-card-primary-color: var(--boxel-light);
   --queue-card-secondary-color: var(--boxel-purple-300);
+  --queue-card-status-color: var(--boxel-highlight);
 
   position: relative;
   display: block;
@@ -10,7 +12,7 @@
   padding: 0;
   border: none;
   border-radius: var(--boxel-border-radius);
-  background-color: var(--boxel-purple-500);
+  background-color: var(--queue-card-background-color);
   color: var(--queue-card-primary-color);
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-lg);
@@ -129,15 +131,14 @@
 }
 
 /* Light Theme */
-.queue-card.boxel--light-theme {
+.queue-card--light-theme {
   --queue-card-primary-color: var(--boxel-dark);
   --queue-card-secondary-color: var(--boxel-purple-400);
-  --boxel-highlight: var(--boxel-highlight-hover);
-
-  background-color: var(--boxel-light);
+  --queue-card-status-color: var(--boxel-dark-highlight);
+  --queue-card-background-color: var(--boxel-light);
 }
 
-.queue-card.boxel--light-theme .queue-card__footer {
+.queue-card--light-theme .queue-card__footer {
   border-color: rgba(55, 53, 67, 0.15);
 }
 
@@ -147,7 +148,7 @@
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 10px;
-  color: var(--boxel-highlight);
+  color: var(--queue-card-status-color);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp);
 }

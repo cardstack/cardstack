@@ -68,7 +68,7 @@
   margin-top: var(--boxel-sp-xs);
   font: 400 var(--boxel-font);
 
-  --icon-color: var(--boxel-teal);
+  --icon-color: var(--boxel-dark-highlight);
 }
 
 .cardstack-landing-hero__cta-icon {

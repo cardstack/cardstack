@@ -35,6 +35,12 @@
   --boxel-sp-xl: calc(var(--boxel-sp-lg) * var(--boxel-ratio));    /* 35.54px */
   --boxel-sp-xxl: calc(var(--boxel-sp-xl) * var(--boxel-ratio));   /* 47.37px */
   --boxel-sp-xxxl: calc(var(--boxel-sp-xxl) * var(--boxel-ratio)); /* 63.15px */
+
+  /* common icon sizes */
+  --boxel-icon-sm: 1.25rem; /* 20px */
+  --boxel-icon-lg: 2.5rem;  /* 40px */
+
+  /* other */
   --boxel-border-color: var(--boxel-light-500);
   --boxel-border: 1px solid var(--boxel-border-color);
   --boxel-border-dark: 1px solid var(--boxel-dark);
@@ -51,9 +57,24 @@
   /* Primary colors */
   --boxel-light: #fff;
   --boxel-dark: #000;
+
+  /*
+    --boxel-highlight (#00ebe5) use cases:
+    on dark background: text links, icons, CTA buttons
+    on light background: CTA buttons, graph line
+
+    --boxel-dark-highlight (#03c4bf) use cases:
+    on light background: copy, text links, icons only
+
+    --boxel-link-highlight:
+    it is set to var(--boxel-dark-highlight) by default - since default background is light
+    it is the color for a:hover
+    set it to var(--boxel-highlight) on dark backgrounds
+  */
   --boxel-highlight: var(--boxel-cyan);
   --boxel-highlight-hover: #00d3ce;
-  --boxel-link-highlight: var(--boxel-highlight-hover);
+  --boxel-dark-highlight: var(--boxel-teal);
+  --boxel-link-highlight: var(--boxel-dark-highlight);
 
   /* Boxel purples */
   --boxel-purple-100: #f8f7fa;
@@ -63,6 +84,7 @@
   --boxel-purple-500: #5a586a;
   --boxel-purple-600: #413e4e;
   --boxel-purple-700: #393642;
+  --boxel-purple-750: #363441;
   --boxel-purple-800: #2e2d38;
   --boxel-purple-900: #272330;
 

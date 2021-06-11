@@ -1,7 +1,8 @@
 /* zero specificity default sizing */
 :where(.boxel-loading-indicator) {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+  flex-shrink: 0;
 }
 
 /*
