@@ -43,6 +43,7 @@ export default abstract class Layer2ChainWeb3Strategy
   #safesApi!: ISafes;
   cardTokenContract: Contract;
   daiTokenContract: Contract;
+  @tracked isFetchingDepot = false;
   @tracked depotSafe: DepotSafe | null = null;
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
@@ -233,6 +234,7 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   async fetchDepot(): Promise<DepotSafe | null> {
+    this.isFetchingDepot = true;
     let result = null;
 
     if (this.walletInfo.firstAddress) {
@@ -244,6 +246,7 @@ export default abstract class Layer2ChainWeb3Strategy
     }
 
     this.depotSafe = result;
+    this.isFetchingDepot = false;
     return result;
   }
 

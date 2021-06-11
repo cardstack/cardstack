@@ -69,18 +69,16 @@
                 {{svg-jar "depot" width="40" height="40" class="transaction-setup__icon" role="presentation"}}
                 <div>
                   <div class={{if @isComplete "transaction-setup__title-lg" "transaction-setup__title"}}>DEPOT:</div>
-                  {{#if this.layer2Network.depotSafe}}
-                    {{#if this.layer2Network.depotSafe.address}}
-                      <div class={{cn "transaction-setup__address" transaction-setup__address--wrapped=@isComplete}} data-test-deposit-transaction-setup-depot-address>
-                        {{this.layer2Network.depotSafe.address}}
-                      </div>
-                    {{else}}
-                      <div class="transaction-setup__text-sm" data-test-deposit-transaction-setup-depot-address>
-                        New Depot
-                      </div>
-                    {{/if}}
-                  {{else}}
+                  {{#if this.layer2Network.isFetchingDepot}}
                     <Boxel::LoadingIndicator/>
+                  {{else if this.layer2Network.depotSafe}}
+                    <div class={{cn "transaction-setup__address" transaction-setup__address--wrapped=@isComplete}} data-test-deposit-transaction-setup-depot-address>
+                      {{this.layer2Network.depotSafe.address}}
+                    </div>
+                  {{else}}
+                    <div class="transaction-setup__text-sm" data-test-deposit-transaction-setup-depot-address>
+                      New Depot
+                    </div>
                   {{/if}}
                 </div>
               </div>
