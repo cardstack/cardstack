@@ -32,6 +32,7 @@ export default class Layer2Network extends Service {
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
   @reads('strategy.depotSafe') depotSafe: DepotSafe | undefined;
+  @reads('strategy.isFetchingDepot') isFetchingDepot: boolean;
 
   constructor(props: object | undefined) {
     super(props);
