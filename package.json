@@ -42,7 +42,7 @@
   },
   "scripts": {
     "clean": "git clean -x -f",
-    "compile": "tsc --build ./tsconfig.json",
+    "compile": "yarn subgraph:codegen tsc --build ./tsconfig.json",
     "deploy:web-client:staging": "cd packages/web-client && ember deploy staging --verbose",
     "prepare": "npm run compile",
     "subgraph:codegen": "cd ./packages/cardpay-subgraph && yarn codegen",

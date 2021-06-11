@@ -1,10 +1,5 @@
 import { ethereum } from '@graphprotocol/graph-ts';
-import {
-  CreatePrepaidCard,
-  GasFeeCollected,
-  PrepaidCardManager,
-  TransferredPrepaidCard,
-} from '../../generated/PrepaidCard/PrepaidCardManager';
+import { CreatePrepaidCard, GasFeeCollected, PrepaidCardManager } from '../../generated/PrepaidCard/PrepaidCardManager';
 import { Account, PrepaidCard, PrepaidCardCreation } from '../../generated/schema';
 import { assertTransactionExists, toChecksumAddress } from '../utils';
 

@@ -1,7 +1,7 @@
 import { Address } from '@graphprotocol/graph-ts';
 import { ExecutionSuccess } from '../../generated/templates/GnosisSafe/GnosisSafe';
 import { toChecksumAddress, decodeAbi, getMethodHash, methodHashFromHex, assertTransactionExists } from '../utils';
-import { SafeTransaction, Transaction, Account } from '../../generated/schema';
+import { SafeTransaction } from '../../generated/schema';
 import { log } from '@graphprotocol/graph-ts';
 
 const EXEC_TRANSACTION = 'execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)';

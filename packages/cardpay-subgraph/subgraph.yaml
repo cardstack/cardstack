@@ -3,31 +3,32 @@ schema:
   file: ./schema.graphql
 
 dataSources:
-#   - kind: ethereum/contract
-#     name: Token
-#     network: poa-sokol # sadly the network is hard coded in the subgraph--we'll need to template-ize this
-#     source:
-#       abi: ERC677Token
-#       # Presumably we don't want to use a start block since we don't know when
-#       # the user's wallet was first created. But for my sanity, I'm using the
-#       # first appearance of gnosis safe as the start
-#       startBlock: 20030732
-#     mapping:
-#       kind: ethereum/events
-#       apiVersion: 0.0.4
-#       language: wasm/assemblyscript
-#       entities:
-#         - Token
-#         - TokenTransfer
-#         - Account
-#         - Safe
-#       abis:
-#         - name: ERC677Token
-#           file: ./abis/ERC677Token.json
-#       eventHandlers:
-#         - event: Transfer(indexed address,indexed address,uint256)
-#           handler: handleTransfer
-#       file: ./src/mappings/token.ts
+  # - kind: ethereum/contract
+  #   name: Token
+  #   network: poa-sokol # sadly the network is hard coded in the subgraph--we'll need to template-ize this
+  #   source:
+  #     abi: ERC677Token
+  #     # Presumably we don't want to use a start block since we don't know when
+  #     # the user's wallet was first created. But for my sanity, I'm using the
+  #     # first appearance of gnosis safe as the start
+  #     startBlock: 20030732
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.4
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Token
+  #       - Transaction
+  #       - TokenTransfer
+  #       - Account
+  #       - Safe
+  #     abis:
+  #       - name: ERC677Token
+  #         file: ./abis/ERC677Token.json
+  #     eventHandlers:
+  #       - event: Transfer(indexed address,indexed address,uint256)
+  #         handler: handleTransfer
+  #     file: ./src/mappings/token.ts
 
   - kind: ethereum/contract
     name: PrepaidCard

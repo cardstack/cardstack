@@ -1,6 +1,6 @@
 import { SupplierWallet, SupplierInfoDID } from '../../generated/Depot/BridgeUtils';
 import { TokensBridgedToSafe } from '../../generated/TokenBridge/HomeMultiAMBErc20ToErc677';
-import { Depot, Account, BridgeEvent, Transaction, SupplierInfoDIDUpdate } from '../../generated/schema';
+import { Depot, Account, BridgeEvent, SupplierInfoDIDUpdate } from '../../generated/schema';
 import { assertTransactionExists, toChecksumAddress } from '../utils';
 import { log, BigInt } from '@graphprotocol/graph-ts';
 

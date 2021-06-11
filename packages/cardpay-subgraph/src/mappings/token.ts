@@ -1,6 +1,12 @@
+// we aren't ready to use this yet--but it works well. we'll uncomment this as
+// soon as we are ready to start the token indexing. Leaving it uncommented out
+// breaks the tsc build because of the missing codegen since the subgraph is
+// commented out as well.
+
+/*
 import { assertTransactionExists, toChecksumAddress } from '../utils';
-import { Transfer as TransferEvent, ERC677Token } from '../../generated/Token/ERC677Token';
-import { Token, Safe, Account, TokenTransfer, Transaction } from '../../generated/schema';
+import { Transfer as TransferEvent } from '../../generated/Token/ERC677Token';
+import { Token, Safe, Account, TokenTransfer } from '../../generated/schema';
 
 export function handleTransfer(event: TransferEvent): void {
   assertTransactionExists(event);
@@ -37,3 +43,4 @@ export function handleTransfer(event: TransferEvent): void {
   transferEntity.timestamp = event.block.timestamp;
   transferEntity.save();
 }
+*/

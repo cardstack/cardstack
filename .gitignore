@@ -49,6 +49,12 @@ package-lock.json
 /packages/did-resolver/**/*.d.ts
 /packages/did-resolver/**/*.js.map
 
+/packages/cardpay-subgraph/**/*.js
+/packages/cardpay-subgraph/**/*.d.ts
+/packages/cardpay-subgraph/**/*.js.map
+# we do want to keep this one
+!/packages/cardpay-subgraph/src/global.d.ts
+
 # generated files you may end up with if you run the cli blueprint directly
 packages/cli/node-tests/sample-cards/*/node_modules/**/*
 

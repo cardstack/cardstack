@@ -134,6 +134,7 @@ export function getMethodHash(methodSignature: string): string {
   return crypto.keccak256(ByteArray.fromUTF8(methodSignature)).toHex().slice(0, 10);
 }
 
+// @ts-ignore i32 is a legit AssemblyScript type
 function wordAt(hex: string, offset: i32): string {
   return hex.slice(offset, offset + WORD_SIZE);
 }
@@ -146,6 +147,7 @@ function bigIntFromHex(hex: string): BigInt {
   return bytes.toUnsignedInt(bytesFromHex(hex), true);
 }
 
+// @ts-ignore i32 is a legit AssemblyScript type
 function hexToI32(hex: string): i32 {
   if (hex.startsWith('0x')) {
     hex = hex.slice(2);
