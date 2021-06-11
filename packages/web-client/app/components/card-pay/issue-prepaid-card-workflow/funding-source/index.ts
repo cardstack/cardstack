@@ -2,8 +2,6 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { reads } from 'macro-decorators';
 import { inject as service } from '@ember/service';
-import { taskFor } from 'ember-concurrency-ts';
-import { task } from 'ember-concurrency-decorators';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import WorkflowSession from '../../../../models/workflow/workflow-session';
 import BN from 'bn.js';
@@ -13,7 +11,6 @@ import {
   TokenSymbol,
   bridgeableSymbols,
 } from '@cardstack/web-client/utils/token';
-import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 
 interface Token {
   balance: BN;
@@ -30,6 +27,8 @@ interface FundingSourceCardArgs {
   isComplete: boolean;
 }
 
+// we are assuming that the depot has enough tokens to create card
+// and we cancel the workflow earlier if it doesn't
 class FundingSourceCard extends Component<FundingSourceCardArgs> {
   tokenInfo = bridgeableSymbols.map((symbol) => new TokenDisplayInfo(symbol));
   @service declare layer2Network: Layer2Network;
@@ -39,47 +38,34 @@ class FundingSourceCard extends Component<FundingSourceCardArgs> {
 
   constructor(owner: unknown, args: FundingSourceCardArgs) {
     super(owner, args);
-    taskFor(this.fetchDepotTask)
-      .perform()
-      .then((depot: DepotSafe) => {
-        if (depot) {
-          this.args.workflowSession.update('depotAddress', depot.address);
-          this.args.workflowSession.update('depotTokens', depot.tokens);
-          if (!this.selectedToken) this.chooseSource(this.tokens[0]);
-        }
-      });
+    this.chooseSource(this.tokens[0]);
   }
 
-  @task *fetchDepotTask(): any {
-    let depot = yield this.layer2Network.fetchDepot();
-    return depot;
+  get depotAddress() {
+    return this.layer2Network.depotSafe?.address || undefined;
   }
 
-  get depotTokens() {
-    return this.args.workflowSession.state.depotTokens || [];
-  }
+  getBalance(symbol: TokenSymbol) {
+    if (symbol === 'DAI') {
+      return this.layer2Network.defaultTokenBalance;
+    }
 
-  @action getBalance(symbol: TokenSymbol) {
-    if (symbol && this.depotTokens.length) {
-      let depotToken = this.depotTokens.find(
-        (item: { balance: string; token: { symbol: TokenSymbol } }) =>
-          item?.token?.symbol === symbol
-      );
-      if (depotToken.balance) {
-        return toBN(depotToken.balance);
-      }
+    if (symbol === 'CARD') {
+      return this.layer2Network.cardBalance;
     }
     return toBN(0);
   }
 
   get tokens() {
-    return this.tokenInfo.map((token) => {
-      let balance = this.getBalance(token.symbol);
-      return {
-        ...token,
-        balance,
-      } as Token;
-    });
+    return this.tokenInfo
+      .map((token) => {
+        let balance = this.getBalance(token.symbol);
+        return {
+          ...token,
+          balance,
+        } as Token;
+      })
+      .filter((v) => !v.balance.isZero());
   }
 
   @action chooseSource(token: Token) {

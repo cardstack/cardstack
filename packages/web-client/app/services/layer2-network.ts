@@ -31,6 +31,7 @@ export default class Layer2Network extends Service {
   };
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
+  @reads('strategy.depotSafe') depotSafe: DepotSafe | undefined;
 
   constructor(props: object | undefined) {
     super(props);
@@ -78,10 +79,6 @@ export default class Layer2Network extends Service {
 
   async awaitBridged(fromBlock: BN) {
     return this.strategy.awaitBridged(fromBlock, this.walletInfo.firstAddress!);
-  }
-
-  async fetchDepot(): Promise<DepotSafe | null> {
-    return this.strategy.depotSafe || this.strategy.fetchDepot();
   }
 
   blockExplorerUrl(txnHash: string | undefined): string | undefined {
