@@ -11,7 +11,6 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
 
   log.debug('processing txn hash {} for safe {}', [event.transaction.hash.toHex(), safeAddress]);
 
-  // ABI decoding is not working--doing this by hand (;﹏;)
   let bytes = event.transaction.input.toHex();
   let method = methodHashFromHex(bytes);
 
