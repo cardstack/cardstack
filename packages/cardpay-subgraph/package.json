@@ -3,7 +3,7 @@
   "version": "0.19.16",
   "license": "MIT",
   "scripts": {
-    "codegen": "graph codegen && node ./codegen.js",
+    "codegen": "node ./etc/pre-codegen-entrypoint.js poa-sokol && graph codegen && node ./etc/pre-tsc-build-entrypoint.js",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ habdelra/cardpay-sokol",
     "create-local-sokol": "graph create --node http://localhost:8020/ habdelra/cardpay-sokol",
@@ -14,6 +14,7 @@
     "@graphprotocol/graph-cli": "0.20.0",
     "@graphprotocol/graph-ts": "graphprotocol/graph-ts#56adb62d9e4233c6fc6c38bc0519a8a566afdd9e",
     "@protofire/subgraph-toolkit": "0.1.2",
+    "esm": "^3.2.25",
     "fs-extra": "^10.0.0"
   },
   "private": true,

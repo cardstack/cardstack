@@ -31,10 +31,10 @@ dataSources:
   #     file: ./src/mappings/token.ts
 
   - kind: ethereum/contract
-    name: PrepaidCard
-    network: poa-sokol # sadly the network is hard coded in the subgraph--we'll need to template-ize this
+    name: Pre
+    network: {NETWORK}
     source:
-      address: "0x8b0625288cb14F29ED0519F1d281956D46e10ce0" # we'll need to generate this from our source of truth
+      address: "{PREPAID_CARD_MANAGER_ADDRESS}"
       abi: PrepaidCardManager
       startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
     mapping:
@@ -60,9 +60,9 @@ dataSources:
 
   - kind: ethereum/contract
     name: Depot
-    network: poa-sokol # sadly the network is hard coded in the subgraph--we'll need to template-ize this
+    network: {NETWORK}
     source:
-      address: "0x3498110baDFa94e26a58eFe3D834D1308e32f240" # we'll need to generate this from our source of truth
+      address: "{BRIDGE_UTILS_ADDRESS}"
       abi: BridgeUtils
       startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
     mapping:
@@ -85,9 +85,9 @@ dataSources:
 
   - kind: ethereum/contract
     name: TokenBridge
-    network: poa-sokol # sadly the network is hard coded in the subgraph--we'll need to template-ize this
+    network: {NETWORK}
     source:
-      address: "0x16a80598DD2f143CFBf091638CE3fB02c9135528" # we'll need to generate this from our source of truth
+      address: "{HOME_TOKEN_BRIDGE_ADDRESS}"
       abi: HomeMultiAMBErc20ToErc677
       startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
     mapping:
@@ -109,7 +109,7 @@ dataSources:
 
   - kind: ethereum/contract
     name: Gnosis
-    network: poa-sokol # sadly the network is hard coded in the subgraph--we'll need to template-ize this
+    network: {NETWORK}
     source:
       address: "0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B"
       abi: GnosisProxyFactory
@@ -134,7 +134,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: GnosisSafe
-    network: poa-sokol # sadly the network is hard coded in the subgraph--we'll need to template-ize this
+    network: {NETWORK}
     source:
       abi: GnosisSafe
     mapping:
