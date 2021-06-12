@@ -10,7 +10,7 @@ import { getAddress } from '../../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
 
-import { ERC20ABI } from '../../index.js';
+import { ERC20ABI } from '../../index';
 import {
   EventABI,
   getParamsFromEvent,
