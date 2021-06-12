@@ -3,7 +3,7 @@
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { Log } from 'web3-core';
-import { getConstant } from '../constants.js';
+import { getConstant } from '../constants';
 import { Signature } from './signing-utils';
 
 export interface EventABI {
