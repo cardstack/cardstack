@@ -25,7 +25,7 @@ jobs:
           ${{ runner.os }}-yarn-
     - run: yarn global add lerna
     - run: yarn --prefer-offline
-    - run: yarn codegen
+    - run: yarn subgraph:codegen
     - run: yarn lint:deps
     - run: yarn lint:js:pkg cardpay-subgraph
-    - run: yarn build
+    - run: yarn subgraph:build

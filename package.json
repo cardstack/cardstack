@@ -46,6 +46,7 @@
     "deploy:web-client:staging": "cd packages/web-client && ember deploy staging --verbose",
     "prepare": "npm run compile",
     "subgraph:codegen": "cd ./packages/cardpay-subgraph && yarn codegen",
+    "subgraph:build": "cd ./packages/cardpay-subgraph && yarn build",
     "lint": "yarn compile && npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:deps": "node scripts/find-bad-deps.js",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
