@@ -31,7 +31,7 @@ dataSources:
   #     file: ./src/mappings/token.ts
 
   - kind: ethereum/contract
-    name: Pre
+    name: PrepaidCard
     network: {NETWORK}
     source:
       address: "{PREPAID_CARD_MANAGER_ADDRESS}"
