@@ -4,10 +4,10 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
-import ERC677ABI from '../../contracts/abi/erc-677.js';
+import ERC677ABI from '../../contracts/abi/erc-677';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.5.2/prepaid-card-manager';
-import { getAddress } from '../../contracts/addresses.js';
-import { getConstant, ZERO_ADDRESS } from '../constants.js';
+import { getAddress } from '../../contracts/addresses';
+import { getConstant, ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
 
 import { ERC20ABI } from '../../index.js';
