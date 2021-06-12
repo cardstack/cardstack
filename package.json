@@ -42,10 +42,11 @@
   },
   "scripts": {
     "clean": "git clean -x -f",
-    "compile": "tsc --build ./tsconfig.json",
+    "compile": "yarn subgraph:codegen && tsc --build ./tsconfig.json",
     "deploy:web-client:staging": "cd packages/web-client && ember deploy staging --verbose",
     "prepare": "npm run compile",
-    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
+    "subgraph:codegen": "cd ./packages/cardpay-subgraph && yarn codegen",
+    "lint": "yarn subgraph:codegen && npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:deps": "node scripts/find-bad-deps.js",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
     "lint:js:pkg": "sh -c 'eslint packages/${0} --cache --ignore-path .gitignore --ext=js,ts'",
