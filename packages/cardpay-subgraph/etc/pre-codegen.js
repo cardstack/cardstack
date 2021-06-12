@@ -2,10 +2,10 @@ import { writeJSONSync, writeFileSync, readFileSync, removeSync } from 'fs-extra
 import { join, resolve } from 'path';
 import { addFilePreamble } from './pre-tsc-build-entrypoint';
 
-import PrepaidCardManagerABI from '@cardstack/cardpay-sdk/contracts/abi/latest/prepaid-card-manager';
-import BridgeUtilsABI from '@cardstack/cardpay-sdk/contracts/abi/latest/bridge-utils';
-import RevenuePoolABI from '@cardstack/cardpay-sdk/contracts/abi/latest/revenue-pool';
-import SpendABI from '@cardstack/cardpay-sdk/contracts/abi/latest/spend';
+import PrepaidCardManagerABI from '../../cardpay-sdk/contracts/abi/latest/prepaid-card-manager';
+import BridgeUtilsABI from '../../cardpay-sdk/contracts/abi/latest/bridge-utils';
+import RevenuePoolABI from '../../cardpay-sdk/contracts/abi/latest/revenue-pool';
+import SpendABI from '../../cardpay-sdk/contracts/abi/latest/spend';
 import { getAddressByNetwork } from '@cardstack/cardpay-sdk/contracts/addresses';
 
 const abiDir = resolve(join(__dirname, '..', 'abis'));
