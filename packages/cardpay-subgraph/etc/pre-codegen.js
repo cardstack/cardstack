@@ -1,3 +1,5 @@
+/* global __dirname, process, console */
+
 import { writeJSONSync, writeFileSync, readFileSync, removeSync } from 'fs-extra';
 import { join, resolve } from 'path';
 import { addFilePreamble } from './pre-tsc-build-entrypoint';
@@ -54,7 +56,7 @@ function getAbi(path) {
 
 function getAddress(contractName, network) {
   let file = readFileSync(addressFile, { encoding: 'utf8' });
-  let [, networkContents] = file.match(new RegExp(`${network}: \{([^}]*)\}`));
+  let [, networkContents] = file.match(new RegExp(`${network}: {([^}]*)}`));
   let [, address] = networkContents.match(new RegExp(`${contractName}: ['"](\\w*)['"]`));
   return address;
 }
