@@ -26,7 +26,6 @@ jobs:
           ${{ runner.os }}-yarn-
     - run: yarn global add lerna
     - run: yarn --prefer-offline
-    - run: yarn compile
     - run: yarn lint:deps
     - run: yarn lint:js:pkg did-resolver
     - run: yarn test:did-resolver
