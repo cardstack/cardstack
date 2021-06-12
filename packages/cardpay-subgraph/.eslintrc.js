@@ -39,6 +39,9 @@ module.exports = {
       },
     ],
 
+    // Sometimes it can't be avoided to add a @ts-ignore
+    '@typescript-eslint/ban-ts-comment': 'off',
+
     // This is mostly visual style, making comments look uniform.
     'spaced-comment': [
       'error',
@@ -101,9 +104,6 @@ module.exports = {
 
         // There is actually codegen difference here
         '@typescript-eslint/no-array-constructor': 'off',
-
-        // Sometimes it can't be avoided to add a @ts-ignore
-        '@typescript-eslint/ban-ts-comment': 'off',
 
         // Utilized to achieve portability in some cases
         '@typescript-eslint/no-non-null-assertion': 'off',

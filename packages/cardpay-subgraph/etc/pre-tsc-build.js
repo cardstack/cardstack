@@ -1,3 +1,6 @@
+/* global __dirname, process, console */
+/* eslint @typescript-eslint/explicit-module-boundary-types: "off" */
+
 import { writeFileSync, readFileSync } from 'fs-extra';
 import { join, resolve } from 'path';
 import { sync as glob } from 'glob';
