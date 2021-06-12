@@ -31,7 +31,7 @@ In order to develop a subgraph locally you need to run a local graph node. Instr
     ```
     yarn create-local-sokol
     ```
-6. After you have made changes to your subgraph, in order to reindex and test out your subgraph locally you can run:
+6. You can then deploy and re-index to test out your subgraph locally (then can be done as you update your subgraph in order to see your changes locally as well):
     ```
     yarn deploy-local-sokol
     ```
