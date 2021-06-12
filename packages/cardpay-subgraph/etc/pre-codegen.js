@@ -30,7 +30,7 @@ for (let [name, abi] of Object.entries(abis)) {
   writeJSONSync(join(abiDir, `${name}.json`), abi);
 }
 
-let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' });
+let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{NETWORK}/g, network)
   .replace(/{PREPAID_CARD_MANAGER_ADDRESS}/g, getAddressByNetwork('prepaidCardManager', cleanNetwork))
   .replace(/{BRIDGE_UTILS_ADDRESS}/g, getAddressByNetwork('bridgeUtils', cleanNetwork))
