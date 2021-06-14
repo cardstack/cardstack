@@ -86,7 +86,7 @@ export default class Layer2Network extends Service {
     return txnHash ? this.strategy.blockExplorerUrl(txnHash) : undefined;
   }
 
-  refreshBalances() {
+  async refreshBalances() {
     return this.strategy.refreshBalances();
   }
 }
