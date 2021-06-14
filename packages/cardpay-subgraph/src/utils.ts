@@ -1,5 +1,4 @@
-import { crypto, Address, ByteArray, Bytes, BigInt, ethereum, log } from '@graphprotocol/graph-ts';
-import { bytes } from '@protofire/subgraph-toolkit';
+import { crypto, Address, ByteArray, ethereum } from '@graphprotocol/graph-ts';
 import { Transaction } from '../generated/schema';
 
 export function assertTransactionExists(event: ethereum.Event): void {
