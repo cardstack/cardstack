@@ -60,6 +60,9 @@ module('Acceptance | deposit', function (hooks) {
 
     assert.dom(post).containsText('Connect your L1 test chain wallet');
 
+    let finishedCssAnimation = false;
+    setTimeout(() => (finishedCssAnimation = true), 1000);
+    await waitUntil(() => finishedCssAnimation);
     await a11yAudit();
     assert.ok(true, 'no a11y errors found - layer 1 connect card');
 
