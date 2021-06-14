@@ -36,7 +36,19 @@ export default [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'amount',
+        name: 'issuingTokenAmount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'spendAmount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'gasFeeCollected',
         type: 'uint256',
       },
       {
@@ -47,37 +59,6 @@ export default [
       },
     ],
     name: 'CreatePrepaidCard',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'issuer',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'card',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'issuingToken',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'GasFeeCollected',
     type: 'event',
   },
   {
@@ -845,7 +826,12 @@ export default [
       },
       {
         internalType: 'uint256[]',
-        name: 'cardAmounts',
+        name: 'issuingTokenAmounts',
+        type: 'uint256[]',
+      },
+      {
+        internalType: 'uint256[]',
+        name: 'spendAmounts',
         type: 'uint256[]',
       },
       {
@@ -881,7 +867,12 @@ export default [
       },
       {
         internalType: 'uint256[]',
-        name: 'amounts',
+        name: 'issuingTokenAmounts',
+        type: 'uint256[]',
+      },
+      {
+        internalType: 'uint256[]',
+        name: 'spendAmounts',
         type: 'uint256[]',
       },
       {

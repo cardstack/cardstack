@@ -30,13 +30,19 @@ export default [
       {
         indexed: false,
         internalType: 'address',
-        name: 'payableToken',
+        name: 'issuingToken',
         type: 'address',
       },
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'amount',
+        name: 'issuingTokenAmount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'spendAmount',
         type: 'uint256',
       },
     ],

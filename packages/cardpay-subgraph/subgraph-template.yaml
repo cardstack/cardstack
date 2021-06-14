@@ -50,12 +50,8 @@ dataSources:
         - name: PrepaidCardManager
           file: ./abis/PrepaidCardManager.json
       eventHandlers:
-        - event: CreatePrepaidCard(address,address,address,uint256,string)
+        - event: CreatePrepaidCard(address,address,address,uint256,uint256,uint256,string)
           handler: handleCreatePrepaidCard
-        - event: GasFeeCollected(address,address,address,uint256)
-          handler: handleGasFeeCollected
-        - event: TransferredPrepaidCard(address,address,address)
-          handler: handleTransfer
       file: ./src/mappings/prepaid-card.ts
 
   - kind: ethereum/contract

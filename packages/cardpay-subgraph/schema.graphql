@@ -63,8 +63,9 @@ type PrepaidCardCreation @entity {
   prepaidCard: PrepaidCard!
   issuer: Account!
   issuingToken: String!
-  amount: BigInt
-  creationGasFeeCollected: BigInt
+  issuingTokenAmount: BigInt!
+  spendAmount: BigInt!
+  creationGasFeeCollected: BigInt!
 }
 
 type MerchantCreation @entity {
