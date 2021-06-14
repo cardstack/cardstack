@@ -21,7 +21,7 @@
   border-top-right-radius: var(--boxel-border-radius);
   border-top-left-radius: var(--boxel-border-radius);
   padding: 0 var(--boxel-sp);
-  color: inherit;
+  color: var(--header-text-color);
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp);
 }
@@ -129,10 +129,20 @@
   right: 0;
   left: 0;
   border-radius: var(--boxel-border-radius) var(--boxel-border-radius) 0 0;
-  height: 102px;
   overflow: hidden;
-  background: var(--header-theme), var(--header-background);
-  background-size: cover;
-  background-position: center;
   z-index: 0;
+}
+
+.prepaid-card__background--color {
+  height: 102px;
+  background: var(--header-background);
+}
+
+.prepaid-card__background--pattern {
+  height: 14.375rem;
+  background-color: var(--header-pattern-color);
+  -webkit-mask-size: contain;
+  -webkit-mask-image: var(--header-theme);
+  mask-size: contain;
+  mask-image: var(--header-theme);
 }
