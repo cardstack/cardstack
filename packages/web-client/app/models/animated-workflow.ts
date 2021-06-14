@@ -17,7 +17,15 @@ let waiter = buildWaiter('thread-animation');
 let token: any = null;
 let waiting: RSVP.Deferred<void> | null = null;
 
-let interval = config.environment === 'test' ? 100 : 1000;
+let interval = 1000;
+if (config.environment === 'test') {
+  interval = 100;
+} else if (
+  config.environment === 'development' &&
+  config.threadAnimationInterval
+) {
+  interval = config.threadAnimationInterval;
+}
 
 interface RevealResult {
   postable?: WorkflowPostable;
@@ -137,6 +145,13 @@ export default class AnimatedWorkflow {
 
   constructor(model: Workflow) {
     this.model = model;
+    // set this so css animations shorten their duration to at most the
+    // rate of release
+    // this is purely for devx
+    document.documentElement.style.setProperty(
+      '--thread-animation-interval',
+      `${interval}ms`
+    );
     this.#listenersToCleanUp.push(
       this.model.on(
         'visible-postables-changed',

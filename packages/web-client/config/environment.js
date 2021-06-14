@@ -36,6 +36,7 @@ module.exports = function (environment) {
       appStoreLink: undefined,
       googlePlayStoreLink: undefined,
     },
+    threadAnimationInterval: process.env.THREAD_ANIMATION_INTERVAL,
   };
 
   if (environment === 'development') {

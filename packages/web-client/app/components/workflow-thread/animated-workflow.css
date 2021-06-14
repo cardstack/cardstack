@@ -1,3 +1,11 @@
+:root {
+  /*
+    this is also set in the constructor in animated-workflow.ts
+  */
+  --thread-animation-interval: 1000ms;
+}
+
+
 /*
   If the user has expressed their preference for
   reduced motion, then don't use animations.
@@ -18,8 +26,9 @@
   .workflow-postable-animated,
   .milestone-banner-animated,
   .workflow-date-divider-animated {
+    /* min() is to respect the duration thread interval duration set during development */
     animation: thread-item-revealed ease-out
-      var(--thread-item-reveal-duration, 200ms) backwards;
+      min(var(--thread-item-reveal-duration, 200ms), var(--thread-animation-interval)) backwards;
   }
 
   .workflow-postable-animated, .workflow-date-divider-animated {

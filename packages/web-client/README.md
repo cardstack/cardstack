@@ -30,6 +30,9 @@ Connecting to the Kovan Testnet with WalletConnect requires an Infura project id
 INFURA_ID=<your infura project id here>
 ```
 
+### Thread animation interval environment variable
+As a convenience for development, you can set the `THREAD_ANIMATION_INTERVAL` environment variable to control how quickly messages in workflows are shown. 
+
 ### Code Generators
 
 Make use of the many generators for code, try `ember help generate` for more details
