@@ -1,22 +1,35 @@
 <Freestyle::Usage @name="Thread">
   <:example>
-    <Boxel::Thread>
+    <button {{on "click" this.addMessage}}>Add a message</button>
+    <Boxel::Thread @autoscroll={{this.autoscroll}} class="boxel-thread-usage">
       <:header>
         <Boxel::ThreadHeader @title="Project Title" />
       </:header>
 
       <:content>
         <Boxel::DateDivider @date={{dayjs-format (now)}} />
-        <Boxel::ThreadMessage
-          @name="Cardbot"
-          @hideName={{true}}
-          @imgURL={{this.cardBotIcon}}
-        >
-          Hello, it's nice to see you!
-        </Boxel::ThreadMessage>
+        {{#each this.messages}}
+          <Boxel::ThreadMessage
+            @name="Cardbot"
+            @hideName={{true}}
+            @imgURL={{this.cardBotIcon}}
+          >
+            Hello, it's nice to see you!
+          </Boxel::ThreadMessage>
+        {{/each}}
       </:content>
     </Boxel::Thread>
   </:example>
+
+  <:api as |Args|>
+  <Args.Bool
+    @name="autoscroll"
+    @description="Whether to automatically scroll down to newly added elements if the user is close enough to the end of the thread (see the autoscroll modifier)."
+    @default={{false}}
+    @value={{this.autoscroll}}
+    @onInput={{fn (mut this.autoscroll)}}
+  />
+  </:api>
 </Freestyle::Usage>
 
 <Freestyle::Usage @slug="Thread-with-workflow">

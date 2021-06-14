@@ -1,3 +1,5 @@
+import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import CardBot from '@cardstack/boxel/usage-support/images/orgs/cardbot.svg';
 import User from '@cardstack/boxel/usage-support/images/users/Gary-Walker.jpg';
@@ -38,4 +40,10 @@ export default class ThreadMessageUsageComponent extends Component {
   orgGroup = ORG_GROUP;
   userGroup = USER_GROUP;
   milestones = MILESTONES;
+  @tracked messages: number[] = [1];
+  @tracked autoscroll = false;
+
+  @action addMessage(): void {
+    this.messages = [...this.messages, 1];
+  }
 }
