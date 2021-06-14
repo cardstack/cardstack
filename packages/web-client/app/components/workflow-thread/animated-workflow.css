@@ -12,7 +12,7 @@
 */
 @media (prefers-reduced-motion: reduce) {
   .workflow-postable-animated,
-  .milestone-banner-animated,
+  .workflow-milestone-banner-animated,
   .workflow-date-divider-animated {
     animation: none;
   }
@@ -24,7 +24,7 @@
 */
 @media (prefers-reduced-motion: no-preference) {
   .workflow-postable-animated,
-  .milestone-banner-animated,
+  .workflow-milestone-banner-animated,
   .workflow-date-divider-animated {
     /* min() is to respect the duration thread interval duration set during development */
     animation: thread-item-revealed ease-out
@@ -39,7 +39,7 @@
     --thread-item-reveal-duration: 400ms;
   }
 
-  .milestone-banner-animated {
+  .workflow-milestone-banner-animated {
     /*
     this is 1s in XD.
     However, setting to 800ms so we don't look like we have 2 items being added at once
