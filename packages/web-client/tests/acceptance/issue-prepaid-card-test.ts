@@ -248,6 +248,25 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(postableSel(3, 0))
       .containsText('This is what your prepaid card will look like.');
 
+    assert
+      .dom(`${postableSel(3, 1)} [data-test-prepaid-card-issuer-name]`)
+      .containsText('JJ');
+    assert
+      .dom(
+        `${postableSel(
+          3,
+          1
+        )} [data-test-prepaid-card-issuer-name-labeled-value]`
+      )
+      .containsText('JJ');
+
+    assert.dom(
+      `${postableSel(
+        3,
+        1
+      )} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+    );
+
     // // preview card
     // TODO verify and interact with preview card default state
     await click(
