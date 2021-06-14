@@ -28,6 +28,11 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked cardBalance: BN | undefined;
   @tracked depotSafe: DepotSafe | null = null;
 
+  // property to test whether the refreshBalances method is called
+  // to test if balances are refreshed after relaying tokens
+  // this is only a mock property
+  @tracked balancesRefreshed = false;
+
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([]);
     this.simpleEmitter.emit('disconnect');
@@ -46,11 +51,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(new BN('0'));
   }
 
-  async refreshBalances() {
-    await this.fetchDepotTask();
+  refreshBalances() {
+    this.balancesRefreshed = true;
   }
 
-  // eslint-disable-next-line no-unused-vars
   fetchDepotTask(): any {
     return Promise.resolve(this.depotSafe);
   }
