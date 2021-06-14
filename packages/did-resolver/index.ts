@@ -55,7 +55,7 @@ interface EncodeOptions {
 
 export function encodeDID(opts: EncodeOptions): string {
   return new CardstackIdentifier(
-    opts.version || CURRENT_VERSION,
+    opts.version ?? CURRENT_VERSION,
     opts.type,
     opts.uniqueId || shortUuid.generate()
   ).toDID();

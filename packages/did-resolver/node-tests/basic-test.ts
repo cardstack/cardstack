@@ -3,6 +3,7 @@ import { Resolver } from 'did-resolver';
 import { encodeDID, parseIdentifier, getResolver } from '../index';
 import shortUuid from 'short-uuid';
 import { shake_128 } from 'js-sha3';
+import * as fc from 'fast-check';
 
 describe('Cardstack DID Resolver', function () {
   beforeEach(async function () {});
@@ -22,46 +23,33 @@ describe('Cardstack DID Resolver', function () {
       expect(parsed.uniqueId).to.be.a('string');
     });
 
-    it('generates a DID with specified version 5', function () {
-      let identifier = encodeDID({ version: 5, type: 'PrepaidCardCustomization' }).split(':')[2];
-      expect(identifier).to.match(/^5/);
-      expect(parseIdentifier(identifier).version).to.eq(5);
+    it('generates for valid versions', function () {
+      fc.assert(
+        fc.property(
+          fc.integer().filter((n) => n >= 0 && n < 62),
+          (version) => {
+            let identifier = encodeDID({ version, type: 'PrepaidCardCustomization' }).split(':')[2];
+            expect(identifier).to.match(/^[0-9a-zA-Z]/);
+            expect(parseIdentifier(identifier).version).to.eq(version);
+          }
+        )
+      );
     });
 
-    it('generates a DID with specified version 15', function () {
-      let identifier = encodeDID({ version: 15, type: 'PrepaidCardCustomization' }).split(':')[2];
-      expect(identifier).to.match(/^F/);
-      expect(parseIdentifier(identifier).version).to.eq(15);
-    });
-
-    it('generates a DID with specified version 42', function () {
-      let identifier = encodeDID({ version: 42, type: 'PrepaidCardCustomization' }).split(':')[2];
-      expect(identifier).to.match(/^g/);
-      expect(parseIdentifier(identifier).version).to.eq(42);
-    });
-
-    it('fails to generate when version is below the valid range', function () {
-      try {
-        encodeDID({ version: -1, type: 'PrepaidCardCustomization' });
-        expect.fail('should throw and not reach here');
-      } catch (e) {
-        expect(e.message).to.eq('version out of supported range: -1');
-      }
-    });
-
-    it('fails to generate when version is above the valid range', function () {
-      try {
-        encodeDID({ version: 62, type: 'PrepaidCardCustomization' });
-        expect.fail('should throw and not reach here');
-      } catch (e) {
-        expect(e.message).to.eq('version out of supported range: 62');
-      }
-    });
-
-    it('generates for all valid versions', function () {
-      for (let version = 0; version < 62; version++) {
-        encodeDID({ version, type: 'PrepaidCardCustomization' });
-      }
+    it('throws for invalid versions', function () {
+      fc.assert(
+        fc.property(
+          fc.integer().filter((n) => n < 0 || n >= 62),
+          (version) => {
+            try {
+              encodeDID({ version, type: 'PrepaidCardCustomization' });
+              expect.fail('should throw and not reach here');
+            } catch (e) {
+              expect(e.message).to.eq(`version out of supported range: ${version}`);
+            }
+          }
+        )
+      );
     });
 
     it('generates a DID for merchant info', function () {

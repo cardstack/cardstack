@@ -11388,6 +11388,14 @@ fake-merkle-patricia-tree@^1.0.1:
   dependencies:
     checkpoint-store "^1.1.0"
 
+fast-check@^1.26.0:
+  version "1.26.0"
+  resolved "https://registry.yarnpkg.com/fast-check/-/fast-check-1.26.0.tgz#3a85998a9c30ed7f58976276e06046645e0de18a"
+  integrity sha512-B1AjSfe0bmi6FdFIzmrrGSjrsF6e2MCmZiM6zJaRbBMP+gIvdNakle5FIMKi0xbS9KlN9BZho1R7oB/qoNIQuA==
+  dependencies:
+    pure-rand "^2.0.0"
+    tslib "^2.0.0"
+
 fast-deep-equal@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-3.1.1.tgz#545145077c501491e33b15ec408c294376e94ae4"
@@ -17602,6 +17610,11 @@ punycode@^2.1.0, punycode@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
+
+pure-rand@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/pure-rand/-/pure-rand-2.0.0.tgz#3324633545207907fe964c2f0ebf05d8e9a7f129"
+  integrity sha512-mk98aayyd00xbfHgE3uEmAUGzz3jCdm8Mkf5DUXUhc7egmOaGG2D7qhVlynGenNe9VaNJZvzO9hkc8myuTkDgw==
 
 q@^1.1.2, q@^1.5.1:
   version "1.5.1"
