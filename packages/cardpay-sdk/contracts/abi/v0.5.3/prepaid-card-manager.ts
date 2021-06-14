@@ -36,7 +36,13 @@ export default [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'amount',
+        name: 'issuingTokenAmount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'spendAmount',
         type: 'uint256',
       },
       {
@@ -845,7 +851,12 @@ export default [
       },
       {
         internalType: 'uint256[]',
-        name: 'cardAmounts',
+        name: 'issuingTokenAmounts',
+        type: 'uint256[]',
+      },
+      {
+        internalType: 'uint256[]',
+        name: 'spendAmounts',
         type: 'uint256[]',
       },
       {
@@ -881,7 +892,12 @@ export default [
       },
       {
         internalType: 'uint256[]',
-        name: 'amounts',
+        name: 'issuingTokenAmounts',
+        type: 'uint256[]',
+      },
+      {
+        internalType: 'uint256[]',
+        name: 'spendAmounts',
         type: 'uint256[]',
       },
       {
