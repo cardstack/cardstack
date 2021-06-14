@@ -7,10 +7,11 @@ type Account @entity {
   receivedBridgedTokens: [BridgeEvent]!            @derivedFrom(field: "supplier")
   supplierInfoDIDUpdates: [SupplierInfoDIDUpdate]! @derivedFrom(field: "supplier")
   createdPrepaidCards: [PrepaidCardCreation]!      @derivedFrom(field: "issuer")
+  createdMerchants: [MerchantCreation]!            @derivedFrom(field: "merchant")
 }
 
 type Depot @entity {
-  id: ID!                             # safe address
+  id: ID!                                          # safe address
   safe: Safe!
   createdAt: BigInt!
   supplier: Account!
@@ -19,7 +20,7 @@ type Depot @entity {
 }
 
 type PrepaidCard @entity {
-  id: ID!                          # safe address
+  id: ID!                         # safe address
   safe: Safe!
   customizationDID: String
   issuingToken: String!
@@ -30,9 +31,11 @@ type PrepaidCard @entity {
 }
 
 type MerchantSafe @entity {
-  id: ID!                          # safe address
+  id: ID!                         # safe address
   safe: Safe!
+  merchant: Account!
   infoDid: String
+  creation: MerchantCreation      @derivedFrom(field: "merchantSafe")
 }
 
 type BridgeEvent @entity {
@@ -62,6 +65,14 @@ type PrepaidCardCreation @entity {
   issuingToken: String!
   amount: BigInt
   creationGasFeeCollected: BigInt
+}
+
+type MerchantCreation @entity {
+  id: ID!
+  transaction: Transaction!
+  createdAt: BigInt!
+  merchantSafe: MerchantSafe!
+  merchant: Account!
 }
 
 type PrepaidCardTransfer @entity {
