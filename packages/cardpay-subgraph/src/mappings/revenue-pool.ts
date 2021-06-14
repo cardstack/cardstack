@@ -1,6 +1,35 @@
-import { MerchantCreation as MerchantCreationEvent } from '../../generated/RevenuePool/RevenuePool';
-import { Account, MerchantSafe, MerchantCreation } from '../../generated/schema';
+import {
+  MerchantCreation as MerchantCreationEvent,
+  CustomerPayment as MerchantPaymentEvent,
+  MerchantFeeCollected as MerchantFeeEvent,
+} from '../../generated/RevenuePool/RevenuePool';
+import { Account, MerchantSafe, MerchantCreation, MerchantFeePayment, MerchantPayment } from '../../generated/schema';
 import { assertTransactionExists, toChecksumAddress } from '../utils';
+
+export function handleMerchantPayment(event: MerchantPaymentEvent): void {
+  assertTransactionExists(event);
+
+  let entity = new MerchantPayment(event.transaction.hash.toHex()); // There will only ever be one merchant payment event per txn
+  entity.transaction = event.transaction.hash.toHex();
+  entity.prepaidCard = toChecksumAddress(event.params.card);
+  entity.merchantSafe = toChecksumAddress(event.params.merchantSafe);
+  entity.issuingToken = toChecksumAddress(event.params.issuingToken);
+  entity.issuingTokenAmount = event.params.issuingTokenAmount;
+  entity.spendAmount = event.params.spendAmount;
+  entity.save();
+}
+
+export function handleMerchantFee(event: MerchantFeeEvent): void {
+  assertTransactionExists(event);
+
+  let entity = new MerchantFeePayment(event.transaction.hash.toHex()); // There will only ever be one merchant fee collection event per txn
+  entity.transaction = event.transaction.hash.toHex();
+  entity.prepaidCard = toChecksumAddress(event.params.card);
+  entity.merchantSafe = toChecksumAddress(event.params.merchantSafe);
+  entity.issuingToken = toChecksumAddress(event.params.issuingToken);
+  entity.feeCollected = event.params.amount;
+  entity.save();
+}
 
 export function handleMerchantCreation(event: MerchantCreationEvent): void {
   assertTransactionExists(event);
