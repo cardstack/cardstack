@@ -24,5 +24,5 @@ declare const config: {
   infuraId: string;
   urls: UrlsOptions;
   APP: Record<string, unknown>;
-  threadAnimationInterval: number | undefined;
+  threadAnimationInterval: number;
 };

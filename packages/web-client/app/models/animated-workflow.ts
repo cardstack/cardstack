@@ -17,15 +17,7 @@ let waiter = buildWaiter('thread-animation');
 let token: any = null;
 let waiting: RSVP.Deferred<void> | null = null;
 
-let interval = 1000;
-if (config.environment === 'test') {
-  interval = 0;
-} else if (
-  config.environment === 'development' &&
-  config.threadAnimationInterval
-) {
-  interval = config.threadAnimationInterval;
-}
+let interval = config.threadAnimationInterval;
 
 interface RevealResult {
   postable?: WorkflowPostable;

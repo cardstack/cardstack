@@ -36,7 +36,7 @@ module.exports = function (environment) {
       appStoreLink: undefined,
       googlePlayStoreLink: undefined,
     },
-    threadAnimationInterval: process.env.THREAD_ANIMATION_INTERVAL,
+    threadAnimationInterval: 1000,
   };
 
   if (environment === 'development') {
@@ -45,6 +45,8 @@ module.exports = function (environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
+    ENV.threadAnimationInterval =
+      process.env.THREAD_ANIMATION_INTERVAL ?? ENV.threadAnimationInterval;
   }
 
   if (environment === 'test') {
@@ -52,6 +54,7 @@ module.exports = function (environment) {
     ENV.locationType = 'none';
     ENV.chains.layer1 = 'test';
     ENV.chains.layer2 = 'test';
+    ENV.threadAnimationInterval = 0; // > 0 means we might have to wait for css animations in tests
 
     // keep test console output quieter
     ENV.APP.LOG_ACTIVE_GENERATION = false;
