@@ -1,6 +1,7 @@
 import { Address } from '@graphprotocol/graph-ts';
 import { ExecutionSuccess } from '../../generated/templates/GnosisSafe/GnosisSafe';
-import { toChecksumAddress, decodeAbi, getMethodHash, methodHashFromHex, assertTransactionExists } from '../utils';
+import { toChecksumAddress, assertTransactionExists } from '../utils';
+import { decode, encodeMethodSignature, methodHashFromEncodedAbi } from '../abi';
 import { SafeTransaction } from '../../generated/schema';
 import { log } from '@graphprotocol/graph-ts';
 
@@ -12,10 +13,10 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
   log.debug('processing txn hash {} for safe {}', [event.transaction.hash.toHex(), safeAddress]);
 
   let bytes = event.transaction.input.toHex();
-  let method = methodHashFromHex(bytes);
+  let method = methodHashFromEncodedAbi(bytes);
 
   // TODO handle all the PrepaidCardMethod's functions too
-  if (method == getMethodHash(EXEC_TRANSACTION)) {
+  if (method == encodeMethodSignature(EXEC_TRANSACTION)) {
     assertTransactionExists(event);
 
     let safeTxEntity = new SafeTransaction(event.transaction.hash.toHex() + '-' + event.logIndex.toString());
@@ -23,7 +24,7 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     safeTxEntity.transaction = event.transaction.hash.toHex();
     safeTxEntity.timestamp = event.block.timestamp;
 
-    let decoded = decodeAbi(EXEC_TRANSACTION, bytes);
+    let decoded = decode(EXEC_TRANSACTION, bytes);
     safeTxEntity.to = toChecksumAddress(decoded[0].toAddress());
     safeTxEntity.value = decoded[1].toBigInt();
     safeTxEntity.data = decoded[2].toBytes();
