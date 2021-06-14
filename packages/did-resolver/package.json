@@ -17,7 +17,8 @@
     "@cardstack/test-support": "0.19.16",
     "@types/chai": "^4.2.15",
     "@types/lodash": "^4.14.169",
-    "chai": "^4.3.4"
+    "chai": "^4.3.4",
+    "fast-check": "^1.26.0"
   },
   "engines": {
     "node": ">= 12"

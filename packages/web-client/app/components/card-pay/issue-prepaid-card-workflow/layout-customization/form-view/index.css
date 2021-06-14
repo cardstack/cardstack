@@ -10,18 +10,16 @@
   gap: var(--selection-gap);
   align-items: center;
   justify-items: center;
-
   max-width: calc((var(--selection-item-width) + var(--selection-gap)) * var(--selection-columns));
 }
 
 .layout-form-view__selection-item {
-  box-shadow: 
-    0 0 1px var(--selection-item-inner-border-width) #fff, 
+  box-shadow:
+    0 0 1px var(--selection-item-inner-border-width) #fff,
     0 0 1px calc(var(--selection-item-inner-border-width) + var(--selection-item-outer-border-width)) #000;
   border-radius: 3px;
   transition: box-shadow 0.1s;
 }
-
 
 .layout-form-view__selection-item--checked {
   --selection-item-outer-border-width: 3px;

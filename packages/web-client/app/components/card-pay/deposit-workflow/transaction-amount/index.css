@@ -12,6 +12,7 @@
   --input-currency-text-width: 5ch;
   --input-currency-icon-space: var(--boxel-sp-xs);
   --input-currency-text-space: var(--boxel-sp-sm);
+
   position: relative;
 }
 

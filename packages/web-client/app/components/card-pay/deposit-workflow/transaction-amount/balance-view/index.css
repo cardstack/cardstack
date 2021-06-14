@@ -26,7 +26,8 @@
   padding: var(--boxel-sp-xxs) calc(var(--boxel-sp) + 3rem) var(--boxel-sp-xxs) var(--boxel-sp);
   font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);
-  transition: padding var(--boxel-transition),
+  transition:
+    padding var(--boxel-transition),
     font var(--boxel-transition);
 }
 

@@ -29,6 +29,7 @@ jobs:
     - run: yarn global add lerna
     - run: yarn --prefer-offline
     - run: yarn lint:deps
+    - run: yarn lint:css:web-client
     - run: yarn lint:js:pkg web-client
     - run: yarn lint:hbs:web-client
     - run: yarn test:web-client

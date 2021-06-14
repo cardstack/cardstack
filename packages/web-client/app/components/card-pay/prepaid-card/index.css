@@ -11,7 +11,7 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   background: var(--boxel-light);
 }
- 
+
 .prepaid-card__header {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -25,24 +25,24 @@
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp);
 }
- 
+
 .prepaid-card__header > * {
   overflow: hidden;
   position: relative;
   z-index: 1;
 }
- 
+
 .prepaid-card__header > * > * {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
- 
+
 .prepaid-card__header > *:last-child {
   align-self: end;
   text-align: right;
 }
- 
+
 .prepaid-card__content {
   padding: var(--boxel-sp-xl) var(--boxel-sp) var(--boxel-sp-sm);
   background-image: url('/images/backgrounds/curved-platter.svg');
@@ -52,25 +52,25 @@
   overflow: hidden;
   z-index: 1;
 }
- 
+
 .prepaid-card__name {
   font: var(--boxel-font-sm);
   font-weight: 700;
 }
- 
+
 .prepaid-card__address {
   font-family: 'Roboto Mono', monospace;
   font-size: 1.125rem; /* 18px */
   letter-spacing: var(--boxel-lsp-sm);
   line-height: calc(24 / 18);
 }
- 
+
 .prepaid-card__balance-label {
   color: var(--boxel-purple-700);
   font: var(--boxel-font-sm);
   letter-spacing: 0.01em;
 }
- 
+
 .prepaid-card__balance {
   font-weight: 700;
 }
@@ -78,7 +78,7 @@
 .prepaid-card__balance--mock {
   opacity: 0.1;
 }
- 
+
 .prepaid-card__balance span {
   margin-right: 4px;
   font-size: 2.5rem; /* 40px */
@@ -86,7 +86,7 @@
   overflow-wrap: break-word;
   word-break: break-word;
 }
- 
+
 .prepaid-card__usd-balance {
   margin-top: 1rem;
   font-weight: 700;
@@ -95,7 +95,7 @@
 .prepaid-card__usd-balance--mock {
   opacity: 0.25;
 }
- 
+
 .prepaid-card__content-rs {
   position: absolute;
   right: 0;
@@ -107,14 +107,14 @@
   text-align: right;
   z-index: -1;
 }
- 
+
 .prepaid-card__logo {
   width: 45px;
   height: 45px;
   background-image: url('/images/icons/cardstack-logo-engraved.svg');
   background-repeat: no-repeat;
 }
- 
+
 .prepaid-card__attributes {
   color: var(--boxel-purple-300);
   font: var(--boxel-font-xs);
@@ -136,4 +136,3 @@
   background-position: center;
   z-index: 0;
 }
-  

@@ -14,7 +14,6 @@ export type TokenSymbol =
 export type NetworkSymbol = 'kovan' | 'sokol' | 'mainnet' | 'xdai';
 
 // conversion
-// eslint-disable-next-line no-unused-vars
 export type ConversionFunction = (amountInWei: string) => number;
 export const convertibleSymbols: ConvertibleSymbol[] = ['DAI', 'CARD'];
 

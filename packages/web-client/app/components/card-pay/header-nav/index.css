@@ -19,6 +19,7 @@
 
 .card-pay-header-nav__tab {
   --icon-color: currentColor;
+
   display: flex;
   align-items: center;
   padding: var(--boxel-sp) var(--boxel-sp-sm) var(--boxel-sp) 0;
@@ -32,6 +33,7 @@
 
 .card-pay-header-nav__tab.active {
   --icon-color: var(--boxel-highlight);
+
   border-color: var(--boxel-highlight);
   color: var(--boxel-light);
 }

@@ -25,12 +25,10 @@ module('Integration | Component | transaction-amount', function (hooks) {
 
   const hijackApprove = (
     service: Layer1TestWeb3Strategy,
-    fn: (_amountInWei: BN) => void // eslint-disable-line no-unused-vars
+    fn: (_amountInWei: BN) => void
   ) => {
-    service.approve = function approve(
-      _amountInWei: BN, // eslint-disable-line no-unused-vars
-      _token: string // eslint-disable-line no-unused-vars
-    ) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    service.approve = function approve(_amountInWei: BN, _token: string) {
       fn(_amountInWei);
       let resolved = defer() as RSVP.Deferred<TransactionReceipt>;
       resolved.resolve();

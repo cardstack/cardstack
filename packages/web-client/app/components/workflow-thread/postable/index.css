@@ -20,7 +20,7 @@
 .workflow-thread-postable__markdown {
   max-width: var(--inner-max-width);
   font-size: 0.9375rem;
-  line-height: calc(23/15);
+  line-height: calc(23 / 15);
   letter-spacing: var(--boxel-lsp-sm);
   text-align: start;
 }

@@ -15,7 +15,7 @@
   padding: var(--boxel-sp-sm);
   border-color: var(--boxel-purple-700);
   border-radius: var(--boxel-border-radius);
-  font: 400 var(--boxel-font-size-sm)/calc(18/13) var(--boxel-monospace-font-family);
+  font: 400 var(--boxel-font-size-sm)/calc(18 / 13) var(--boxel-monospace-font-family);
   letter-spacing: var(--boxel-lsp-sm);
 }
 
