@@ -32,7 +32,7 @@
 .account-display__title-lg {
   font-size: 1.25rem;
   font-weight: 600;
-  line-height: calc(27/20);
+  line-height: calc(27 / 20);
   letter-spacing: var(--boxel-lsp-xs);
 }
 

@@ -32,16 +32,15 @@
   padding-left: var(--boxel-sp-xxl);
   padding-right: var(--boxel-sp-xxl);
   text-align: left;
-
-  display: none; /* hide this until we add the destination UI */
-}
-
-.layer-two-connect-card__section + .layer-two-connect-card__section {
-  margin-top: 0;
+  display: none; /* hide this until we add the destination UI */ /* stylelint-disable-line declaration-block-no-duplicate-properties */
 }
 
 .layer-two-connect-card__section {
   --nested-section-padding: 0 var(--boxel-sp-lg);
+}
+
+.layer-two-connect-card__section + .layer-two-connect-card__section {
+  margin-top: 0;
 }
 
 .layer-two-connect-card__section > header::before {
@@ -61,6 +60,7 @@
 .layer-two-connect-card__alternate-wallet-caret {
   height: 1.3rem;
   width: auto;
+
   --icon-color: var(--boxel-purple-400);
 }
 

@@ -1,5 +1,5 @@
 .action-card__title {
-  font: 700 1.125rem/calc(24/18) var(--boxel-font-family);
+  font: 700 1.125rem/calc(24 / 18) var(--boxel-font-family);
   letter-spacing: 0;
 }
 

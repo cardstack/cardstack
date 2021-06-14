@@ -30,7 +30,6 @@
 
 .card-pay-confirmation__transaction {
   margin-top: var(--boxel-sp-sm);
-
   display: grid;
   grid-template-columns: minmax(max-content, 55%) auto;
   grid-template-rows: auto auto auto;
@@ -43,7 +42,6 @@
 .card-pay-confirmation__transaction-amount {
   grid-area: amount;
   align-self: center;
-
   display: flex;
   align-items: center;
   grid-row: 1 / -1;
@@ -65,8 +63,6 @@
 
 .card-pay-confirmation__transaction-wallet {
   grid-area: wallet;
-
-
   font-size: var(--boxel-font-size-sm);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-sm);
@@ -75,7 +71,6 @@
 .card-pay-confirmation__transaction-preposition {
   grid-area: preposition;
   margin-bottom: var(--boxel-sp-sm);
-
   font-size: var(--boxel-font-size-sm);
   color: var(--boxel-purple-400);
   letter-spacing: 0.025em;
@@ -111,7 +106,6 @@
   background: var(--boxel-purple-100);
   border-radius: var(--boxel-border-radius);
   font: var(--boxel-font-sm);
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -126,7 +120,6 @@
   z-index: 0;
   width: 100%;
   padding: 0 var(--boxel-sp-xs);
-
   background-color: var(--boxel-light-300);
 }
 
@@ -136,7 +129,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   font: 700 var(--boxel-font);
   letter-spacing: 0;
   background: url('/images/backgrounds/bridge-background.svg');
@@ -157,10 +149,12 @@
   height: 1.25rem;
   margin-right: var(--boxel-sp-xs);
 }
+
 .card-pay-confirmation__entity-text {
   font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);
 }
+
 .card-pay-confirmation__entity-address {
   font-family: var(--boxel-monospace-font-family);
   font-size: var(--boxel-font-size-sm);
@@ -168,6 +162,7 @@
   letter-spacing: var(--boxel-lsp-sm);
   color: var(--boxel-purple-500);
 }
+
 .card-pay-confirmation__new-depot-message {
   color: var(--boxel-purple-500);
   font: var(--boxel-font-sm);

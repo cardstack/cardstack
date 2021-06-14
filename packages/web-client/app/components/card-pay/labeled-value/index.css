@@ -1,6 +1,7 @@
 .card-pay-labeled-value {
   --boxel-field-label-width: minmax(4rem, 25%);
   --field-text-line-height: 1.375rem;
+
   align-items: start;
 }
 
@@ -20,7 +21,7 @@
   this creates a display that matches the spec at full width but
   still respects flow
  */
- .card-pay-labeled-value--address .card-pay-labeled-value__contents {
+.card-pay-labeled-value--address .card-pay-labeled-value__contents {
   font-family: var(--boxel-monospace-font-family);
   max-width: 22ch;
   word-break: break-all;
@@ -37,7 +38,6 @@
   height: 1.25rem;
   margin-right: 0.5rem;
 }
-
 
 .card-pay-labeled-value--vertical {
   display: flex;

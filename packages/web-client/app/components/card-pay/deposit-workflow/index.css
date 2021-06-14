@@ -2,7 +2,6 @@
   color: var(--boxel-dark);
 }
 
-
 /* Expandable banner */
 .deposit-workflow__banner {
   padding-right: var(--boxel-sp);
@@ -26,7 +25,7 @@
   display: block;
   color: var(--boxel-light-300);
   font-size: var(--boxel-font-size-xs);
-  line-height: calc(18/11);
+  line-height: calc(18 / 11);
   letter-spacing: var(--boxel-lsp-lg);
 }
 
