@@ -14,10 +14,10 @@ module.exports = Object.assign({}, node, {
       },
     }),
     Object.assign({}, node, {
-      "files": ["*.json"],
-      "rules": {
-        "semi": "off"   
-      }
-    }
-  ]
+      files: ['*.json'],
+      rules: {
+        semi: 'off',
+      },
+    }),
+  ],
 });
