@@ -5,7 +5,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.5.3/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.5.4/prepaid-card-manager';
 import { getAddress } from '../../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
@@ -276,7 +276,7 @@ export default class PrepaidCard {
   private createPrepaidCardEventABI(): EventABI {
     return {
       topic: this.layer2Web3.eth.abi.encodeEventSignature(
-        'CreatePrepaidCard(address,address,address,uint256,uint256,string)'
+        'CreatePrepaidCard(address,address,address,uint256,uint256,uint256,string)'
       ),
       abis: [
         {
@@ -298,6 +298,10 @@ export default class PrepaidCard {
         {
           type: 'uint256',
           name: 'spendAmount',
+        },
+        {
+          type: 'uint256',
+          name: 'gasFeeCollected',
         },
         {
           type: 'string',

@@ -47,43 +47,18 @@ export default [
       },
       {
         indexed: false,
+        internalType: 'uint256',
+        name: 'gasFeeCollected',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
         internalType: 'string',
         name: 'customizationDID',
         type: 'string',
       },
     ],
     name: 'CreatePrepaidCard',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'issuer',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'card',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'issuingToken',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'GasFeeCollected',
     type: 'event',
   },
   {
