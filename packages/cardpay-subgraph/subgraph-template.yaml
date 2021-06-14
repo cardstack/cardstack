@@ -1,0 +1,154 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+
+dataSources:
+  # - kind: ethereum/contract
+  #   name: Token
+  #   network: poa-sokol # sadly the network is hard coded in the subgraph--we'll need to template-ize this
+  #   source:
+  #     abi: ERC677Token
+  #     # Presumably we don't want to use a start block since we don't know when
+  #     # the user's wallet was first created. But for my sanity, I'm using the
+  #     # first appearance of gnosis safe as the start
+  #     startBlock: 20030732
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.4
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Token
+  #       - Transaction
+  #       - TokenTransfer
+  #       - Account
+  #       - Safe
+  #     abis:
+  #       - name: ERC677Token
+  #         file: ./abis/ERC677Token.json
+  #     eventHandlers:
+  #       - event: Transfer(indexed address,indexed address,uint256)
+  #         handler: handleTransfer
+  #     file: ./src/mappings/token.ts
+
+  - kind: ethereum/contract
+    name: PrepaidCard
+    network: {NETWORK}
+    source:
+      address: "{PREPAID_CARD_MANAGER_ADDRESS}"
+      abi: PrepaidCardManager
+      startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Safe
+        - PrepaidCard
+        - Depot
+        - Transaction
+      abis:
+        - name: PrepaidCardManager
+          file: ./abis/PrepaidCardManager.json
+      eventHandlers:
+        - event: CreatePrepaidCard(address,address,address,uint256,string)
+          handler: handleCreatePrepaidCard
+        - event: GasFeeCollected(address,address,address,uint256)
+          handler: handleGasFeeCollected
+        - event: TransferredPrepaidCard(address,address,address)
+          handler: handleTransfer
+      file: ./src/mappings/prepaid-card.ts
+
+  - kind: ethereum/contract
+    name: Depot
+    network: {NETWORK}
+    source:
+      address: "{BRIDGE_UTILS_ADDRESS}"
+      abi: BridgeUtils
+      startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Safe
+        - Depot
+        - Transaction
+      abis:
+        - name: BridgeUtils
+          file: ./abis/BridgeUtils.json
+      eventHandlers:
+        - event: SupplierWallet(address,address)
+          handler: handleCreateDepot
+        - event: SupplierInfoDID(address,string)
+          handler: handleSetInfoDID
+      file: ./src/mappings/depot.ts
+
+  - kind: ethereum/contract
+    name: TokenBridge
+    network: {NETWORK}
+    source:
+      address: "{HOME_TOKEN_BRIDGE_ADDRESS}"
+      abi: HomeMultiAMBErc20ToErc677
+      startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Safe
+        - Depot
+        - Transaction
+      abis:
+        - name: HomeMultiAMBErc20ToErc677
+          file: ./abis/HomeMultiAMBErc20ToErc677.json
+      eventHandlers:
+        - event: TokensBridgedToSafe(indexed address,indexed address,address,uint256,indexed bytes32)
+          handler: handleTokensBridged
+      file: ./src/mappings/depot.ts
+
+
+  - kind: ethereum/contract
+    name: Gnosis
+    network: {NETWORK}
+    source:
+      address: "0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B"
+      abi: GnosisProxyFactory
+      startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Safe
+        - Transaction
+      abis:
+        - name: GnosisProxyFactory
+          file: ./abis/GnosisProxyFactory.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: ProxyCreation(address)
+          handler: handleProxyCreation
+      file: ./src/mappings/gnosis-proxy-factory.ts
+
+templates:
+  - kind: ethereum/contract
+    name: GnosisSafe
+    network: {NETWORK}
+    source:
+      abi: GnosisSafe
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SafeTransaction
+        - Transaction
+      abis:
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: ExecutionSuccess(bytes32,uint256)
+          handler: handleExecutionSuccess
+      file: ./src/mappings/gnosis-safe.ts
+

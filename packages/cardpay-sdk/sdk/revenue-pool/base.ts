@@ -3,8 +3,8 @@ import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import RevenuePoolABI from '../../contracts/abi/v0.5.2/revenue-pool';
 import ERC20ABI from '../../contracts/abi/erc-20';
-import { getAddress } from '../../contracts/addresses.js';
-import { ZERO_ADDRESS } from '../constants.js';
+import { getAddress } from '../../contracts/addresses';
+import { ZERO_ADDRESS } from '../constants';
 import {
   EventABI,
   RelayTransaction,

@@ -1,0 +1,31 @@
+{
+  "name": "@cardstack/cardpay-subgraph",
+  "version": "0.19.16",
+  "license": "MIT",
+  "scripts": {
+    "codegen": "node ./etc/pre-codegen-entrypoint.js poa-sokol && graph codegen && node ./etc/pre-tsc-build-entrypoint.js",
+    "build": "graph build",
+    "deploy-sokol": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ habdelra/cardpay-sokol",
+    "create-local-sokol": "graph create --node http://localhost:8020/ habdelra/cardpay-sokol",
+    "remove-local-sokol": "graph remove --node http://localhost:8020/ habdelra/cardpay-sokol",
+    "deploy-local-sokol": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 habdelra/cardpay-sokol"
+  },
+  "devDependencies": {
+    "@cardstack/cardpay-sdk": "0.19.16",
+    "@graphprotocol/graph-cli": "0.20.0",
+    "@graphprotocol/graph-ts": "graphprotocol/graph-ts#56adb62d9e4233c6fc6c38bc0519a8a566afdd9e",
+    "@protofire/subgraph-toolkit": "0.1.2",
+    "esm": "^3.2.25",
+    "fs-extra": "^10.0.0"
+  },
+  "private": true,
+  "workspaces": {
+    "nohoist": [
+      "@graphprotocol/*",
+      "@protofire/*"
+    ]
+  },
+  "dependencies": {
+    "glob": "^7.1.7"
+  }
+}
