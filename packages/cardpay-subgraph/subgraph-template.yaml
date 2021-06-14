@@ -59,6 +59,30 @@ dataSources:
       file: ./src/mappings/prepaid-card.ts
 
   - kind: ethereum/contract
+    name: RevenuePool
+    network: {NETWORK}
+    source:
+      address: "{REVENUE_POOL_ADDRESS}"
+      abi: RevenuePool
+      startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Safe
+        - PrepaidCard
+        - MerchantSafe
+        - Transaction
+      abis:
+        - name: RevenuePool
+          file: ./abis/RevenuePool.json
+      eventHandlers:
+        - event: MerchantCreation(address,address,string)
+          handler: handleMerchantCreation
+      file: ./src/mappings/revenue-pool.ts
+
+  - kind: ethereum/contract
     name: Depot
     network: {NETWORK}
     source:
