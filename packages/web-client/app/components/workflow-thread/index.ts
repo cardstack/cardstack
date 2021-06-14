@@ -8,7 +8,16 @@ interface WorkflowThreadArgs {
 }
 export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   threadEl: HTMLElement | undefined;
-  workflow = new AnimatedWorkflow(this.args.workflow);
+  workflow: Workflow | AnimatedWorkflow;
+
+  constructor(owner: unknown, args: any) {
+    super(owner, args);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      this.workflow = this.args.workflow;
+    } else {
+      this.workflow = new AnimatedWorkflow(this.args.workflow);
+    }
+  }
 
   @action focus(element: HTMLElement): void {
     this.threadEl = element;
@@ -42,6 +51,6 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
 
   willDestroy() {
     super.willDestroy();
-    this.workflow.destroy();
+    if (this.workflow instanceof AnimatedWorkflow) this.workflow.destroy();
   }
 }
