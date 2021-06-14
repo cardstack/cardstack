@@ -27,4 +27,4 @@ jobs:
     - run: yarn --prefer-offline
     - run: yarn lint:deps
     - run: yarn lint:js:pkg cardpay-subgraph
-    - run: yarn subgraph:build
+    - run: yarn build:subgraph
