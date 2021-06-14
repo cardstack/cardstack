@@ -28,7 +28,7 @@
         />
         <CardPay::LabeledValue @label="Depot balance" data-test-balance-container>
           {{#if this.layer2Network.isFetchingDepot}}
-            <Boxel::LoadingIndicator/>
+            <Boxel::LoadingIndicator data-test-balance-container-loading/>
           {{else if this.balancesToShow.length}}
           <CardPay::BalancesList as |Balance|>
             {{#each this.balancesToShow as |b|}}

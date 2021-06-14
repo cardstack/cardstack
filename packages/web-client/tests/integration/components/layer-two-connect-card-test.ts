@@ -47,4 +47,18 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     assert.dom('[data-test-balance="DAI.CPXD"]').doesNotExist();
     assert.dom('[data-test-balance-container]').containsText('None');
   });
+
+  test('It should show a loading state if still fetching a depot', async function (assert) {
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+
+    layer2Service.test__simulateAccountsChanged(['address']);
+    layer2Service.isFetchingDepot = true;
+
+    await render(hbs`
+      <CardPay::LayerTwoConnectCard/>
+    `);
+
+    assert.dom('[data-test-balance-container-loading]').isVisible();
+  });
 });
