@@ -3,6 +3,38 @@
   @isComplete={{@isComplete}}
   data-test-layout-customization-is-complete={{@isComplete}}
 >
+  <ActionCardContainer::Section
+    @title="Prepaid card preview"
+  >
+    <div class="preview__content" data-test-preview>
+      <Boxel::Field
+        @label="Card Preview"
+        @fieldMode="view"
+        class="preview__card-preview-field"
+      >
+        <div class="preview__card">
+          <CardPay::PrepaidCard
+            @issuerName={{@workflowSession.state.issuerName}}
+            @headerBackground={{@workflowSession.state.headerBackground.id}}
+            @headerTheme={{@workflowSession.state.headerTheme.id}}
+            @mockBalance={{true}}
+            @balance="123,456"
+            @usdBalance="123,456"
+            @address="0x1234...abcd"
+            @network="xDai Chain"
+          />
+        </div>
+      </Boxel::Field>
+      <CardPay::FieldStack class="preview__data">
+        <CardPay::LabeledValue
+          @vertical={{true}}
+          @label="Issued by"
+          @value={{@workflowSession.state.issuerName}}
+          data-test-prepaid-card-issuer-name-labeled-value
+        />
+      </CardPay::FieldStack>
+    </div>
+  </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
     @disabled={{@frozen}}
