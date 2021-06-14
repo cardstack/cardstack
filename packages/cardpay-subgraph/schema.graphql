@@ -8,6 +8,8 @@ type Account @entity {
   supplierInfoDIDUpdates: [SupplierInfoDIDUpdate]! @derivedFrom(field: "supplier")
   createdPrepaidCards: [PrepaidCardCreation]!      @derivedFrom(field: "issuer")
   createdMerchants: [MerchantCreation]!            @derivedFrom(field: "merchant")
+  receivedPrepaidCards: [PrepaidCardTransfer]!     @derivedFrom(field: "to")
+  sentPrepaidCards: [PrepaidCardTransfer]!         @derivedFrom(field: "from")
 }
 
 type Depot @entity {
@@ -20,22 +22,26 @@ type Depot @entity {
 }
 
 type PrepaidCard @entity {
-  id: ID!                         # safe address
+  id: ID!                                          # safe address
   safe: Safe!
   customizationDID: String
   issuingToken: String!
   issuer: Account!
   owner: Account!
   reloadable: Boolean!
-  creation: PrepaidCardCreation   @derivedFrom(field: "prepaidCard")
+  creation: PrepaidCardCreation                    @derivedFrom(field: "prepaidCard")
+  merchantPayments: [MerchantPayment]!             @derivedFrom(field: "prepaidCard")
 }
 
 type MerchantSafe @entity {
-  id: ID!                         # safe address
+  id: ID!                                          # safe address
   safe: Safe!
   merchant: Account!
   infoDid: String
-  creation: MerchantCreation      @derivedFrom(field: "merchantSafe")
+  creation: MerchantCreation                       @derivedFrom(field: "merchantSafe")
+  spendAccumulations: [SpendAccumulation]!         @derivedFrom(field: "merchantSafe")
+  payments: [MerchantPayment]!                     @derivedFrom(field: "merchantSafe")
+  merchantFees: [MerchantFeePayment]!              @derivedFrom(field: "merchantSafe")
 }
 
 type BridgeEvent @entity {
@@ -54,6 +60,32 @@ type SupplierInfoDIDUpdate @entity {
   infoDID: String!
   timestamp: BigInt!
   supplier: Account!
+}
+
+type MerchantPayment @entity {
+  id: ID!
+  transaction: Transaction!
+  prepaidCard: PrepaidCard!
+  merchantSafe: MerchantSafe!
+  issuingToken: String!
+  issuingTokenAmount: BigInt!
+  spendAmount: BigInt!
+}
+
+type SpendAccumulation @entity {
+  id: ID!
+  transaction: Transaction!
+  merchantSafe: MerchantSafe!
+  amount: BigInt!
+}
+
+type MerchantFeePayment @entity {
+  id: ID!
+  transaction: Transaction!
+  prepaidCard: PrepaidCard!
+  merchantSafe: MerchantSafe!
+  issuingToken: String!
+  feeCollected: BigInt!
 }
 
 type PrepaidCardCreation @entity {
@@ -77,7 +109,7 @@ type MerchantCreation @entity {
 }
 
 type PrepaidCardTransfer @entity {
-  id: ID!              # safe.id-from-to-txnhash
+  id: ID!                          # safe.id-from-to-txnhash
   transaction: Transaction!
   from: Account!
   to: Account!
@@ -121,8 +153,14 @@ type Transaction @entity {
   safeTxns: [SafeTransaction]!                     @derivedFrom(field: "transaction")
   bridgeEvents: [BridgeEvent]!                     @derivedFrom(field: "transaction")
   supplierInfoDIDUpdates: [SupplierInfoDIDUpdate]! @derivedFrom(field: "transaction")
+  prepaidCardCreations: [PrepaidCardCreation]!     @derivedFrom(field: "transaction")
   prepaidCardTransfers: [PrepaidCardTransfer]!     @derivedFrom(field: "transaction")
   tokenTransfers: [TokenTransfer]!                 @derivedFrom(field: "transaction")
+  merchantCreations: [MerchantCreation]!           @derivedFrom(field: "transaction")
+  merchantPayments: [MerchantPayment]!             @derivedFrom(field: "transaction")
+  spendAccumulations: [SpendAccumulation]!         @derivedFrom(field: "transaction")
+  merchantFeePayments: [MerchantFeePayment]!       @derivedFrom(field: "transaction")
+
 }
 
 # A mapping table is the more performant way to represent many-to-many
