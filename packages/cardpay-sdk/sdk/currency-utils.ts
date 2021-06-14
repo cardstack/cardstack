@@ -248,9 +248,9 @@ export const convertAmountToNativeDisplay = (value: BigNumberish, nativeCurrency
   const { decimals } = nativeSelected;
   const display = handleSignificantDecimals(value, decimals, buffer);
   if (nativeSelected.alignment === 'left') {
-    return `${nativeSelected.symbol}${display}`;
+    return `${nativeSelected.symbol}${display} ${nativeSelected.currency}`;
   }
-  return `${display} ${nativeSelected.symbol}`;
+  return `${display} ${nativeSelected.symbol} ${nativeSelected.currency}`;
 };
 
 /**
