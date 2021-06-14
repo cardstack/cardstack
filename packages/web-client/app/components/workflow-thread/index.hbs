@@ -1,4 +1,11 @@
-<Boxel::Thread class="workflow-thread" tabindex="0" {{did-insert this.focus}} data-test-workflow-thread ...attributes>
+<Boxel::Thread
+  @autoscroll={{this.autoscroll}}
+  class="workflow-thread"
+  tabindex="0"
+  {{did-insert this.focus}}
+  data-test-workflow-thread
+  ...attributes
+>
   <:header>
     <Boxel::ThreadHeader @title={{this.workflow.name}} />
   </:header>

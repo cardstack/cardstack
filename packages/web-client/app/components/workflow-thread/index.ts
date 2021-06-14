@@ -2,21 +2,27 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import AnimatedWorkflow from '@cardstack/web-client/models/animated-workflow';
 import { Workflow } from '@cardstack/web-client/models/workflow';
+import { tracked } from '@glimmer/tracking';
 
 interface WorkflowThreadArgs {
   workflow: Workflow;
 }
 export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   threadEl: HTMLElement | undefined;
-  workflow: Workflow | AnimatedWorkflow;
+  workflow = new AnimatedWorkflow(this.args.workflow);
+  reducedMotionMediaQuery = window?.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  );
+  @tracked autoscroll;
 
   constructor(owner: unknown, args: any) {
     super(owner, args);
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      this.workflow = this.args.workflow;
-    } else {
-      this.workflow = new AnimatedWorkflow(this.args.workflow);
-    }
+    this.autoscroll = !this.reducedMotionMediaQuery.matches;
+    this.reducedMotionMediaQuery.addEventListener('change', this.setAutoscroll);
+  }
+
+  @action setAutoscroll(event: MediaQueryListEvent) {
+    this.autoscroll = !event.matches;
   }
 
   @action focus(element: HTMLElement): void {
@@ -50,7 +56,11 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   }
 
   willDestroy() {
+    this.reducedMotionMediaQuery.removeEventListener(
+      'change',
+      this.setAutoscroll
+    );
     super.willDestroy();
-    if (this.workflow instanceof AnimatedWorkflow) this.workflow.destroy();
+    this.workflow.destroy();
   }
 }
