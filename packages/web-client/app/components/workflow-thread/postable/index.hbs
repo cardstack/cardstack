@@ -1,6 +1,7 @@
 {{#if (is-postable-on-new-day @postable)}}
   <Boxel::DateDivider
     @date={{@postable.timestamp}}
+    class="workflow-date-divider-animated"
     data-test-date-divider
   />
 {{/if}}
@@ -12,6 +13,7 @@
     @hideName={{true}}
     @hideMeta={{postable-meta-hidden @postable previous=@previous}}
     data-test-postable={{@index}}
+    class="workflow-postable-animated"
     ...attributes
   >
     <div class="workflow-thread-postable__markdown">
@@ -27,6 +29,7 @@
     @hideName={{true}}
     @hideMeta={{postable-meta-hidden @postable previous=@previous}}
     data-test-postable={{@index}}
+    class="workflow-postable-animated workflow-postable-animated--has-card"
     ...attributes
   >
     <div class={{cn
