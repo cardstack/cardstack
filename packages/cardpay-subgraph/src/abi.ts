@@ -86,7 +86,7 @@ export function decode(typesStr: string, hex: string): Array<ethereum.Value> {
   return result;
 }
 
-export function methodHashFromEncodedAbi(hex: string): string {
+export function methodHashFromEncodedHex(hex: string): string {
   if (hex.startsWith('0x')) {
     hex = hex.slice(2);
   }

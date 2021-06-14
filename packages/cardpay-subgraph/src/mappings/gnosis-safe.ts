@@ -1,7 +1,7 @@
 import { Address } from '@graphprotocol/graph-ts';
 import { ExecutionSuccess } from '../../generated/templates/GnosisSafe/GnosisSafe';
 import { toChecksumAddress, assertTransactionExists } from '../utils';
-import { decode, encodeMethodSignature, methodHashFromEncodedAbi } from '../abi';
+import { decode, encodeMethodSignature, methodHashFromEncodedHex } from '../abi';
 import { SafeTransaction } from '../../generated/schema';
 import { log } from '@graphprotocol/graph-ts';
 
@@ -13,10 +13,10 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
   log.debug('processing txn hash {} for safe {}', [event.transaction.hash.toHex(), safeAddress]);
 
   let bytes = event.transaction.input.toHex();
-  let method = methodHashFromEncodedAbi(bytes);
+  let methodHash = methodHashFromEncodedHex(bytes);
 
   // TODO handle all the PrepaidCardMethod's functions too
-  if (method == encodeMethodSignature(EXEC_TRANSACTION)) {
+  if (methodHash == encodeMethodSignature(EXEC_TRANSACTION)) {
     assertTransactionExists(event);
 
     let safeTxEntity = new SafeTransaction(event.transaction.hash.toHex() + '-' + event.logIndex.toString());
