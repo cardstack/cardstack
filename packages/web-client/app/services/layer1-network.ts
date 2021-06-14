@@ -91,7 +91,6 @@ export default class Layer1Network extends Service {
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.
 declare module '@ember/service' {
-  // eslint-disable-next-line no-unused-vars
   interface Registry {
     'layer1-network': Layer1Network;
   }

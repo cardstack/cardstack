@@ -33,7 +33,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   #unlockDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
   #depositDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
 
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   connect(_walletProvider: WalletProvider): Promise<void> {
     return this.waitForAccount;
   }
@@ -52,17 +52,14 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     this.disconnect();
   }
 
-  // eslint-disable-next-line no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   approve(_amountInWei: BN, _token: string) {
     this.#unlockDeferred = RSVP.defer();
     return this.#unlockDeferred.promise;
   }
 
-  relayTokens(
-    _token: string, // eslint-disable-line no-unused-vars
-    _destinationAddress: string, // eslint-disable-line no-unused-vars
-    _amountInWei: BN // eslint-disable-line no-unused-vars
-  ) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  relayTokens(_token: string, _destinationAddress: string, _amountInWei: BN) {
     this.#depositDeferred = RSVP.defer();
     return this.#depositDeferred.promise;
   }

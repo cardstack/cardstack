@@ -27,7 +27,7 @@ export default class Layer2Network extends Service {
   @reads('strategy.waitForAccount') waitForAccount!: Promise<void>;
   @reads('strategy.chainName') chainName!: string;
   @reads('strategy.usdConverters') usdConverters!: {
-    [symbol: string]: (amountInWei: string) => number; // eslint-disable-line no-unused-vars
+    [symbol: string]: (amountInWei: string) => number;
   };
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
 
@@ -90,7 +90,6 @@ export default class Layer2Network extends Service {
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.
 declare module '@ember/service' {
-  // eslint-disable-next-line no-unused-vars
   interface Registry {
     'layer2-network': Layer2Network;
   }

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 class WalletAccount {
   constructor(
     readonly address: string,

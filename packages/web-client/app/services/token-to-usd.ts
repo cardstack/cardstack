@@ -97,7 +97,6 @@ export default class TokenToUsd extends Service {
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.
 declare module '@ember/service' {
-  // eslint-disable-next-line no-unused-vars
   interface Registry {
     'token-to-usd': TokenToUsd;
   }
