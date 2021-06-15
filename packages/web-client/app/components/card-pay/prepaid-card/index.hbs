@@ -19,9 +19,10 @@
       <div>Issued by</div>
       <div class="prepaid-card__name" data-test-prepaid-card-issuer-name>{{or @issuerName "Enter name"}}</div>
     </div>
-    <div>
+    <div class="prepaid-card__meta">
+      <div class="prepaid-card__type">PREPAID CARD</div>
       <div class="prepaid-card__address">{{truncate-middle @address}}</div>
-      <div>on {{@network}}</div>
+      <div class="prepaid-card__network">on {{@network}}</div>
     </div>
   </header>
   <section class="prepaid-card__content">
