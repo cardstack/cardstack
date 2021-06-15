@@ -28,11 +28,13 @@
   .workflow-milestone-banner-animated,
   .workflow-date-divider-animated {
     /* min() is to respect the duration thread interval duration set during development */
-    animation: thread-item-revealed ease-out
+    animation:
+      thread-item-revealed ease-out
       min(var(--thread-item-reveal-duration, 200ms), var(--thread-animation-interval)) backwards;
   }
 
-  .workflow-postable-animated, .workflow-date-divider-animated {
+  .workflow-postable-animated,
+  .workflow-date-divider-animated {
     --thread-item-reveal-duration: 200ms;
   }
 
