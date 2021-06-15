@@ -136,7 +136,7 @@
   top: 0;
   right: 0;
   left: 0;
-  border-radius: var(--boxel-border-radius) var(--boxel-border-radius) 0 0;
+  border-radius: var(--boxel-border-radius);
   overflow: hidden;
   z-index: 0;
   height: 14.375rem;
