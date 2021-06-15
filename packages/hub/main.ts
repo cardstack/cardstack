@@ -51,9 +51,11 @@ export async function makeServer(registryCallback?: RegistryCallback) {
     ctx.body = 'Hello World ' + ctx.environment + '! ' + ctx.host.split(':')[0];
   });
 
-  app.on('close', async function () {
+  async function onClose() {
     (await lookupShutdownHelper(container)).onShutdown();
-  });
+    app.off('close', onClose);
+  }
+  app.on('close', onClose);
 
   return app;
 }
@@ -75,11 +77,12 @@ export function bootServer() {
     });
   }
 
-  process.on('warning', (warning: Error) => {
+  function onWarning(warning: Error) {
     if (warning.stack) {
       process.stderr.write(warning.stack);
     }
-  });
+  }
+  process.on('warning', onWarning);
 
   if (process.connected === false) {
     // This happens if we were started by another node process with IPC
@@ -90,10 +93,11 @@ export function bootServer() {
     log.info(`Shutting down because connected parent process has already exited.`);
     process.exit(0);
   }
-  process.on('disconnect', () => {
+  function onDisconnect() {
     log.info(`Hub shutting down because connected parent process exited.`);
     process.exit(0);
-  });
+  }
+  process.on('disconnect', onDisconnect);
 
   return runServer(startupConfig()).catch((err: Error) => {
     log.error('Server failed to start cleanly: %s', err.stack || err);
@@ -101,20 +105,29 @@ export function bootServer() {
   });
 }
 
-export function bootServerForTesting(config: StartupConfig) {
+export async function bootServerForTesting(config: StartupConfig) {
   logger.configure({
     defaultLevel: 'warn',
   });
-  process.on('warning', (warning: Error) => {
+  function onWarning(warning: Error) {
     if (warning.stack) {
       process.stderr.write(warning.stack);
     }
-  });
+  }
+  process.on('warning', onWarning);
 
-  return runServer(config).catch((err: Error) => {
+  let server = await runServer(config).catch((err: Error) => {
     log.error('Server failed to start cleanly: %s', err.stack || err);
     process.exit(-1);
   });
+
+  function onClose() {
+    process.off('warning', onWarning);
+    server.off('close', onClose);
+  }
+  server.on('close', onClose);
+
+  return server;
 }
 
 export function bootEnvironment() {
