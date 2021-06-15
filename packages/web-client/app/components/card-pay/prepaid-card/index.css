@@ -131,15 +131,14 @@
   border-radius: var(--boxel-border-radius) var(--boxel-border-radius) 0 0;
   overflow: hidden;
   z-index: 0;
+  height: 14.375rem;
 }
 
 .prepaid-card__background--color {
-  height: 102px;
   background: var(--header-background);
 }
 
 .prepaid-card__background--pattern {
-  height: 14.375rem;
   background-color: var(--header-pattern-color);
   -webkit-mask-size: contain;
   -webkit-mask-image: var(--header-theme);
