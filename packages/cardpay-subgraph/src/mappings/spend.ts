@@ -24,7 +24,7 @@ export function handleMint(event: MintEvent): void {
   }
 
   let entity = new SpendAccumulation(event.transaction.hash.toHex()); // There will only ever be one spend minting event per txn
-  entity.transaction = event.transaction.hash.toHex();
+  entity.transaction = txnHash;
   entity.timestamp = event.block.timestamp;
   entity.merchantSafe = merchantSafe;
   entity.amount = event.params.amount;
