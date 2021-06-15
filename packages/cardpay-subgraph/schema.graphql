@@ -29,6 +29,8 @@ type PrepaidCard @entity {
   issuer: Account!
   owner: Account!
   reloadable: Boolean!
+  spendBalance: BigInt!
+  issuingTokenBalance: BigInt!
   creation: PrepaidCardCreation                    @derivedFrom(field: "prepaidCard")
   merchantPayments: [MerchantPayment]!             @derivedFrom(field: "prepaidCard")
 }
@@ -37,6 +39,7 @@ type MerchantSafe @entity {
   id: ID!                                          # safe address
   safe: Safe!
   merchant: Account!
+  spendBalance: BigInt!
   infoDid: String
   creation: MerchantCreation                       @derivedFrom(field: "merchantSafe")
   spendAccumulations: [SpendAccumulation]!         @derivedFrom(field: "merchantSafe")
@@ -64,23 +67,29 @@ type SupplierInfoDIDUpdate @entity {
 
 type MerchantPayment @entity {
   id: ID!
+  timestamp: BigInt!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
   merchantSafe: MerchantSafe!
   issuingToken: String!
   issuingTokenAmount: BigInt!
   spendAmount: BigInt!
+  historicSpendBalance: BigInt!
+  historicIssuingTokenBalance: BigInt!
 }
 
 type SpendAccumulation @entity {
   id: ID!
+  timestamp: BigInt!
   transaction: Transaction!
   merchantSafe: MerchantSafe!
   amount: BigInt!
+  historicSpendBalance: BigInt!
 }
 
 type MerchantFeePayment @entity {
   id: ID!
+  timestamp: BigInt!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
   merchantSafe: MerchantSafe!
