@@ -2,7 +2,8 @@
   --layer-max-width: 43.75rem; /* 700px */
   --layer-connected-max-width: 36.25rem; /* 580px */
   --boxel-modal-max-width: unset;
-  --boxel-modal-offset-top: 0;
+  /* stylelint-disable-next-line length-zero-no-unit */
+  --boxel-modal-offset-top: 0px; /* Do not remove the px here. It would break the `calc` calculation for the scroll. */
 }
 
 .layer-connect-modal > div {
@@ -59,5 +60,3 @@
 .layer-connect-modal__wrapped-card {
   box-shadow: none;
 }
-
-/* TODO: Close button */
