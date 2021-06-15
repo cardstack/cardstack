@@ -1,5 +1,5 @@
 import Koa from 'koa';
-import { inject } from './dependency-injection';
+import { inject } from './di/dependency-injection';
 import { Session } from './session';
 import { AuthenticationUtils } from './utils/authentication';
 import Logger from '@cardstack/logger';
@@ -30,7 +30,7 @@ export default class AuthenticationMiddleware {
   }
 }
 
-declare module '@cardstack/hub/dependency-injection' {
+declare module '@cardstack/hub/di/dependency-injection' {
   interface KnownServices {
     'authentication-middleware': AuthenticationMiddleware;
   }

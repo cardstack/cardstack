@@ -2,7 +2,7 @@
 
 import Koa from 'koa';
 import logger from '@cardstack/logger';
-import { Registry, Container, RegistryCallback } from './dependency-injection';
+import { Registry, Container, RegistryCallback } from './di/dependency-injection';
 
 import AuthenticationMiddleware from './authentication-middleware';
 import DevelopmentConfig from './development-config';

@@ -1,6 +1,6 @@
 import { AuthenticationUtils } from '../../utils/authentication';
 import { AcceleratableClock, createTestEnv } from '../helpers';
-import { Registry } from '../../dependency-injection';
+import { Registry } from '../../di/dependency-injection';
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));

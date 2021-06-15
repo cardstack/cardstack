@@ -261,7 +261,7 @@ type PendingInjections = Map<string, PendingInjection>;
 /*
   Dependency Injection HOWTO
 
-  import { inject, injectionReady } from '@cardstack/hub/dependency-injection';
+  import { inject, injectionReady } from '@cardstack/hub/di/dependency-injection';
 
   class YourClass {
 
@@ -306,7 +306,7 @@ type PendingInjections = Map<string, PendingInjection>;
   // may want to register a slightly different interface here than
   // your actual implementation, because others will only see you after
   // ready() has resolved, which may make your public interface cleaner.
-  declare module "@cardstack/hub/dependency-injection" {
+  declare module "@cardstack/hub/di/dependency-injection" {
     interface KnownServices {
       yourClass: YourClass;
     }
