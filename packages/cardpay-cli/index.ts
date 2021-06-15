@@ -7,7 +7,7 @@ import { viewTokenBalance } from './assets';
 import { viewSafes, transferTokens, setSupplierInfoDID } from './safe.js';
 import { createPrepaidCard, priceForFaceValue, payMerchant, gasFee } from './prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
-import { registerMerchant, revenueBalances } from './revenue-pool.js';
+import { claimRevenue, registerMerchant, revenueBalances } from './revenue-pool.js';
 import { hubAuth } from './hub-auth';
 
 //@ts-ignore polyfilling fetch
@@ -28,6 +28,7 @@ type Commands =
   | 'setSupplierInfoDID'
   | 'registerMerchant'
   | 'revenueBalances'
+  | 'claimRevenue'
   | 'priceOracleUpdatedAt'
   | 'viewTokenBalance'
   | 'hubAuth';
@@ -221,6 +222,25 @@ const {
     }
   )
   .command(
+    'claim-revenue <merchantSafe> <tokenAddress> <amount>',
+    'Claim merchant revenue earned from prepaid card payments',
+    (yargs) => {
+      yargs.positional('merchantSafe', {
+        type: 'string',
+        description: "The address of the merchant's safe whose revenue balance is being claimed",
+      });
+      yargs.positional('tokenAddress', {
+        type: 'string',
+        description: 'The address of the tokens that are being claimed as revenue',
+      });
+      yargs.positional('amount', {
+        type: 'number',
+        description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei)',
+      });
+      command = 'claimRevenue';
+    }
+  )
+  .command(
     'price-for-face-value <tokenAddress> <spendFaceValue>',
     'Get the price in the units of the specified token to achieve a prepaid card with the specified face value in SPEND',
     (yargs) => {
@@ -398,6 +418,13 @@ if (!command) {
         return;
       }
       await revenueBalances(network, mnemonic, merchantSafe);
+      break;
+    case 'claimRevenue':
+      if (merchantSafe == null || tokenAddress == null || amount == null) {
+        showHelpAndExit('merchantSafe, tokenAddress, and amount are required values');
+        return;
+      }
+      await claimRevenue(network, mnemonic, merchantSafe, tokenAddress, amount);
       break;
     case 'usdPrice':
       if (token == null || amount == null) {

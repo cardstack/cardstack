@@ -13,6 +13,7 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay register-merchant <PREPAID_CARD> <INFO_DID> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-register-merchant-prepaid_card-info_did---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-pay-merchant-merchant_safe-prepaid_card-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay revenue-balances <MERCHANT_SAFE> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-revenue-balances-merchant_safe---networknetwork---mnemonicmnemonic)
+  - [`yarn cardpay claim-revenue <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-claim-revenue-merchant_safe-token_address-amount---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay new-prepaidcard-gas-fee <TOKEN_ADDRESS> --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-new-prepaidcard-gas-fee-token_address---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay safes-view [ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-safes-view-address---networknetwork---mnemonicmnemonic)
   - [`yarn cardpay safe-transfer-tokens [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC]`](#yarn-cardpay-safe-transfer-tokens-safe_address-token_address-recipient-amount---networknetwork---mnemonicmnemonic)
@@ -125,6 +126,21 @@ USAGE
 
 ARGUMENTS
   MERCHANT_SAFE     The address of the merchant's safe whose revenue balances are to be viewed
+  NETWORK           The network to use ("sokol" or "xdai")
+  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+```
+
+## `yarn cardpay claim-revenue <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC]`
+Claim merchant revenue earned from prepaid card payments.
+
+```
+USAGE
+  $ yarn cardpay claim-revenue <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC]
+
+ARGUMENTS
+  MERCHANT_SAFE     The address of the merchant's safe whose revenue balance is being claimed
+  TOKEN_ADDRESS     The address of the tokens that are being claimed as revenue
+  AMOUNT            The amount of tokens that are being claimed as revenue (*not* in units of `wei`)
   NETWORK           The network to use ("sokol" or "xdai")
   MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
 ```

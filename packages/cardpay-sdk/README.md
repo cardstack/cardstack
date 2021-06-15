@@ -30,7 +30,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RevenuePool.merchantRegistrationFee`](#revenuepoolmerchantregistrationfee)
   - [`RevenuePool.registerMerchant`](#revenuepoolregistermerchant)
   - [`RevenuePool.balances`](#revenuepoolbalances)
-  - [`RevenuePool.claim` (TBD)](#revenuepoolclaim-tbd)
+  - [`RevenuePool.claim`](#revenuepoolclaim)
 - [`RewardPool` (TBD)](#rewardpool-tbd)
   - [`RewardPool.balanceOf` (TBD)](#rewardpoolbalanceof-tbd)
   - [`RewardPool.withdraw` (TBD)](#rewardpoolwithdraw-tbd)
@@ -536,7 +536,71 @@ interface RevenueTokenBalance {
 }
 ```
 
-### `RevenuePool.claim` (TBD)
+### `RevenuePool.claim`
+This call will transfer unclaimed merchant revenue from the revenue pool into the merchant's safe, thereby "claiming" the merchant's revenue earned from prepaid card payments.
+
+The parameters to this function are:
+- The merchant's safe address
+- The token address of the tokens the merchant is claiming
+- The amount of tokens that are being claimed as a string in units of `wei`
+
+```ts
+let result = await revenuePool.claim(merchantSafeAddress, tokenAddress, claimAmountInWei);
+console.log(`The txn hash for the merchant claim is ${result.ethereumTx.txHash}`);
+```
+
+This method returns a promise for a gnosis relay transaction `GnosisExecTxn` that has the following shape:
+
+```ts
+interface GnosisExecTx extends RelayTransaction {
+  value: number;
+  nonce: number;
+  data: string;
+  timestamp: string;
+  operation: string;
+  safeTxGas: number;
+  dataGas: number;
+  gasPrice: number;
+  gasToken: string;
+  refundReceiver: string;
+  safeTxHash: string;
+  txHash: string;
+  transactionHash: string;
+}
+interface RelayTransaction {
+  to: string;
+  ethereumTx: {
+    txHash: string;
+    to: string;
+    data: string;
+    blockNumber: string;
+    blockTimestamp: string;
+    created: string;
+    modified: string;
+    gasUsed: string;
+    status: number;
+    transactionIndex: number;
+    gas: string;
+    gasPrice: string;
+    nonce: string;
+    value: string;
+    from: string;
+  };
+  value: number;
+  data: string;
+  timestamp: string;
+  operation: string;
+  safeTxGas: number;
+  dataGas: number;
+  gasPrice: number;
+  gasToken: string;
+  refundReceiver: string;
+  nonce: number;
+  safeTxHash: string;
+  txHash: string;
+  transactionHash: string;
+}
+```
 ## `RewardPool` (TBD)
 ### `RewardPool.balanceOf` (TBD)
 ### `RewardPool.withdraw` (TBD)

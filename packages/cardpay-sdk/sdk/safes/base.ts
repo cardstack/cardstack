@@ -153,7 +153,7 @@ export default class Safes {
         )}, amount to transfer ${fromWei(amount)}`
       );
     }
-    let payload = await this.transferTokenPayload(tokenAddress, recipient, amount);
+    let payload = this.transferTokenPayload(tokenAddress, recipient, amount);
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
     if (estimate.lastUsedNonce == null) {
       estimate.lastUsedNonce = -1;
@@ -237,7 +237,7 @@ export default class Safes {
     return result;
   }
 
-  private async transferTokenPayload(tokenAddress: string, recipient: string, amount: string): Promise<string> {
+  private transferTokenPayload(tokenAddress: string, recipient: string, amount: string): string {
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     return token.methods.transfer(recipient, amount).encodeABI();
   }
