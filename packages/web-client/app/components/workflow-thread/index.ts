@@ -20,15 +20,18 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
 
   constructor(owner: unknown, args: any) {
     super(owner, args);
-    this.setAutoscroll(this.reducedMotionMediaQuery);
-    this.reducedMotionMediaQuery.addEventListener('change', this.setAutoscroll);
+    this.setAnimationBehaviour(this.reducedMotionMediaQuery);
+    this.reducedMotionMediaQuery.addEventListener(
+      'change',
+      this.setAnimationBehaviour
+    );
   }
 
   // sets some animation behaviour
   // - autoscroll or not
   // - a css variable that controls the maximum duration of animation
   // - postable release interval on the AnimatedWorkflow
-  @action setAutoscroll(
+  @action setAnimationBehaviour(
     eventOrQueryObject: MediaQueryListEvent | MediaQueryList
   ) {
     if (eventOrQueryObject.matches) {
@@ -78,7 +81,7 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   willDestroy() {
     this.reducedMotionMediaQuery.removeEventListener(
       'change',
-      this.setAutoscroll
+      this.setAnimationBehaviour
     );
     super.willDestroy();
     this.workflow.destroy();
