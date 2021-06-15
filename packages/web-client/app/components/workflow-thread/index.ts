@@ -24,14 +24,21 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
     this.reducedMotionMediaQuery.addEventListener('change', this.setAutoscroll);
   }
 
+  // sets some animation behaviour
+  // - autoscroll or not
+  // - a css variable that controls the maximum duration of animation
+  // - postable release interval on the AnimatedWorkflow
   @action setAutoscroll(
     eventOrQueryObject: MediaQueryListEvent | MediaQueryList
   ) {
     if (eventOrQueryObject.matches) {
+      // if prefers-reduced-motion, don't autoscroll, and release postables as soon as available
+      // this puts control on when and how to scroll in users' hands
       this.autoscroll = false;
       this.workflow.interval = 0;
       this.threadAnimationInterval = `0ms`;
     } else {
+      // otherwise, turn on autoscrolling and use the interval defined in config
       this.autoscroll = true;
       this.workflow.interval = interval;
       this.threadAnimationInterval = `${interval}ms`;
