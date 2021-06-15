@@ -9,17 +9,16 @@
           <:outer>
             {{!-- TODO: display account avatar and name if available --}}
             <CardPay::AccountDisplay
-              @isComplete={{true}}
+              @size="small"
               @icon="avatar-default"
               @title="Account 1"
-              @address={{this.layer2Network.walletInfo.firstAddress}}
+              @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
               data-test-funding-source-account
             />
           </:outer>
           <:inner>
             <CardPay::AccountDisplay
-              @isComplete={{@isComplete}}
-              @inner={{true}}
+              @size={{if @isComplete "large"}}
               @icon="depot"
               @title="DEPOT:"
               @address={{this.depotAddress}}
@@ -38,20 +37,19 @@
         >
           <:outer>
             <CardPay::AccountDisplay
-              @isComplete={{@isComplete}}
+              @size={{if @isComplete "small"}}
               @icon="depot"
               @title="DEPOT:"
-              @address={{this.depotAddress}}
+              @address={{if @isComplete (truncate-middle this.depotAddress) this.depotAddress}}
               data-test-funding-source-depot-outer
             />
           </:outer>
           <:inner>
             {{#if @isComplete}}
               <CardPay::AccountDisplay
-                @isComplete={{@isComplete}}
+                @size="large"
                 @icon={{this.selectedToken.icon}}
-                @balance={{this.selectedToken.balance}}
-                @symbol={{this.selectedToken.symbol}}
+                @title={{concat (format-token-amount this.selectedToken.balance) " " this.selectedToken.symbol}}
                 data-test-funding-source-token
               />
             {{else}}
@@ -67,10 +65,10 @@
                 as |token|>
                   <CardPay::AccountDisplay
                     class={{cn "funding-source__dropdown-option" (if (eq token.symbol this.selectedToken.symbol) "funding-source__dropdown-option--selected")}}
-                    @isComplete={{@isComplete}}
+                    @size="small"
                     @icon={{token.icon}}
-                    @balance={{token.balance}}
-                    @symbol={{token.symbol}}
+                    @title={{token.symbol}}
+                    @text={{concat (format-token-amount token.balance) " " token.symbol}}
                     data-test-funding-source-token-option={{token.symbol}}
                   />
                 </PowerSelect>

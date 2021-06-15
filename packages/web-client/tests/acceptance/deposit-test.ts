@@ -149,13 +149,19 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${post} [data-test-usd-balance="CARD"]`)
       .containsText('2000.00');
     assert
-      .dom(`${post} [data-test-deposit-transaction-setup-from-address]`)
+      .dom(
+        `${post} [data-test-deposit-transaction-setup-from-address] [data-test-account-address]`
+      )
       .hasText(layer1AccountAddress);
     assert
-      .dom(`${post} [data-test-deposit-transaction-setup-to-address]`)
+      .dom(
+        `${post} [data-test-deposit-transaction-setup-to-address] [data-test-account-address]`
+      )
       .hasText('0x1826...6E44');
     assert
-      .dom(`${post} [data-test-deposit-transaction-setup-depot-address]`)
+      .dom(
+        `${post} [data-test-deposit-transaction-setup-depot-address] [data-test-account-text]`
+      )
       .hasText('New Depot');
     assert
       .dom('[data-test-deposit-transaction-setup-is-complete]')
