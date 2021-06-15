@@ -3292,6 +3292,11 @@
   resolved "https://registry.yarnpkg.com/@types/commonmark/-/commonmark-0.27.4.tgz#8f42990e5cf3b6b95bd99eaa452e157aab679b82"
   integrity sha512-7koSjp08QxKoS1/+3T15+kD7+vqOUvZRHvM8PutF3Xsk5aAEkdlIGRsHJ3/XsC3izoqTwBdRW/vH7rzCKkIicA==
 
+"@types/config@^0.0.38":
+  version "0.0.38"
+  resolved "https://registry.yarnpkg.com/@types/config/-/config-0.0.38.tgz#ca30679b21b5b297299467e3a3f1c8e2e64b9170"
+  integrity sha512-z2WizAfIFgSv8SQfQ8c0LlbDAcK47D/o93XW6bxZ9t3bs4fmmfAPjk1nhAIBTG84PBBCHfSPM+8g7vhLdbFokg==
+
 "@types/connect@*":
   version "3.4.32"
   resolved "https://registry.yarnpkg.com/@types/connect/-/connect-3.4.32.tgz#aa0e9616b9435ccad02bc52b5b454ffc2c70ba28"
