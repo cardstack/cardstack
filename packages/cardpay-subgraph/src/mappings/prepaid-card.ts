@@ -20,6 +20,8 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   prepaidCardEntity.issuer = issuer;
   prepaidCardEntity.owner = issuer;
   prepaidCardEntity.reloadable = reloadable;
+  prepaidCardEntity.spendBalance = event.params.spendAmount;
+  prepaidCardEntity.issuingTokenBalance = event.params.issuingTokenAmount;
   prepaidCardEntity.save();
 
   let creationEntity = new PrepaidCardCreation(prepaidCard);
