@@ -1,6 +1,6 @@
 import { inject } from '../di/dependency-injection';
 import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'crypto';
-import { Clock } from './clock';
+import { Clock } from '../services/clock';
 import queryString from 'query-string';
 
 const SECRET = process.env.SERVER_SECRET as string;

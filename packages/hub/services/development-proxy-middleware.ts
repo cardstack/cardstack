@@ -1,5 +1,5 @@
 import Koa from 'koa';
-import { inject } from './di/dependency-injection';
+import { inject } from '../di/dependency-injection';
 import proxy from 'koa-proxies';
 import DevelopmentConfig from './development-config';
 

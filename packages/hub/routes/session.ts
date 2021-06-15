@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import { inject } from '../di/dependency-injection';
 import { AuthenticationUtils } from '../utils/authentication';
-import NonceTracker, { MAX_NONCE_AGE_NS } from '../nonce-tracker';
+import NonceTracker, { MAX_NONCE_AGE_NS } from '../services/nonce-tracker';
 import { recoverTypedSignature } from 'eth-sig-util';
 import Logger from '@cardstack/logger';
 import packageJson from '../package.json';

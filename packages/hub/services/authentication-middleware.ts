@@ -1,7 +1,7 @@
 import Koa from 'koa';
-import { inject } from './di/dependency-injection';
+import { inject } from '../di/dependency-injection';
 import { Session } from './session';
-import { AuthenticationUtils } from './utils/authentication';
+import { AuthenticationUtils } from '../utils/authentication';
 import Logger from '@cardstack/logger';
 
 let log = Logger('middleware:authentication');

@@ -4,15 +4,16 @@ import Koa from 'koa';
 import logger from '@cardstack/logger';
 import { Registry, Container, RegistryCallback } from './di/dependency-injection';
 
-import AuthenticationMiddleware from './authentication-middleware';
-import DevelopmentConfig from './development-config';
-import DevelopmentProxyMiddleware from './development-proxy-middleware';
+import AuthenticationMiddleware from './services/authentication-middleware';
+import DevelopmentConfig from './services/development-config';
+import DevelopmentProxyMiddleware from './services/development-proxy-middleware';
 import SessionRoute from './routes/session';
 import { AuthenticationUtils } from './utils/authentication';
-import JsonapiMiddleware from './jsonapi-middleware';
-import NonceTracker from './nonce-tracker';
-import { Clock } from './utils/clock';
-import { ShutdownHelper } from './shutdown-helper';
+import JsonapiMiddleware from './services/jsonapi-middleware';
+import NonceTracker from './services/nonce-tracker';
+import { Clock } from './services/clock';
+import { ShutdownHelper } from './services/shutdown-helper';
+
 const log = logger('cardstack/hub');
 
 export function wireItUp(registryCallback?: RegistryCallback): Container {
