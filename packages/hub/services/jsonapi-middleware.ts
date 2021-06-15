@@ -5,7 +5,7 @@ import Koa from 'koa';
 import mimeMatch from 'mime-match';
 import KoaBody from 'koa-body';
 import { Memoize } from 'typescript-memoize';
-import { CardstackError } from '../error';
+import { CardstackError } from '../utils/error';
 import { SessionContext } from './authentication-middleware';
 import SessionRoute from '../routes/session';
 import { inject } from '../di/dependency-injection';
