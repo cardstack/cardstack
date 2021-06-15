@@ -1,8 +1,9 @@
-:root {
+.workflow-thread-animated {
   /*
-    this is also set in the constructor in animated-workflow.ts
+    this is also set in workflow-thread.ts
+    based on prefers-reduced-motion
   */
-  --thread-animation-interval: 1000ms;
+  --thread-animation-interval: 0ms;
 }
 
 

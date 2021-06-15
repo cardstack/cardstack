@@ -3,6 +3,8 @@ import { action } from '@ember/object';
 import AnimatedWorkflow from '@cardstack/web-client/models/animated-workflow';
 import { Workflow } from '@cardstack/web-client/models/workflow';
 import { tracked } from '@glimmer/tracking';
+import config from '@cardstack/web-client/config/environment';
+let interval = config.threadAnimationInterval;
 
 interface WorkflowThreadArgs {
   workflow: Workflow;
@@ -13,16 +15,27 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   reducedMotionMediaQuery = window?.matchMedia(
     '(prefers-reduced-motion: reduce)'
   );
-  @tracked autoscroll;
+  @tracked autoscroll = false;
+  @tracked threadAnimationInterval = '0ms';
 
   constructor(owner: unknown, args: any) {
     super(owner, args);
-    this.autoscroll = !this.reducedMotionMediaQuery.matches;
+    this.setAutoscroll(this.reducedMotionMediaQuery);
     this.reducedMotionMediaQuery.addEventListener('change', this.setAutoscroll);
   }
 
-  @action setAutoscroll(event: MediaQueryListEvent) {
-    this.autoscroll = !event.matches;
+  @action setAutoscroll(
+    eventOrQueryObject: MediaQueryListEvent | MediaQueryList
+  ) {
+    if (eventOrQueryObject.matches) {
+      this.autoscroll = false;
+      this.workflow.interval = 0;
+      this.threadAnimationInterval = `0ms`;
+    } else {
+      this.autoscroll = true;
+      this.workflow.interval = interval;
+      this.threadAnimationInterval = `${interval}ms`;
+    }
   }
 
   @action focus(element: HTMLElement): void {
