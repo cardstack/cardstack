@@ -48,8 +48,8 @@ export default class JSONAPIMiddleware {
     return compose([
       CardstackError.withJsonErrorHandling,
       body,
-      route.get('/session', sessionRoute.get.bind(sessionRoute)),
-      route.post('/session', sessionRoute.post.bind(this.sessionRoute)),
+      route.get('/session', sessionRoute.get),
+      route.post('/session', sessionRoute.post),
     ]);
   }
 

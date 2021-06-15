@@ -5,12 +5,16 @@ import NonceTracker, { MAX_NONCE_AGE_NS } from '../services/nonce-tracker';
 import { recoverTypedSignature } from 'eth-sig-util';
 import Logger from '@cardstack/logger';
 import packageJson from '../package.json';
+import autoBind from 'auto-bind';
 
 let log = Logger('route:session');
 
 export default class SessionRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   nonceTracker: NonceTracker = inject('nonce-tracker', { as: 'nonceTracker' });
+  constructor() {
+    autoBind(this);
+  }
 
   get(ctx: Koa.Context) {
     if (ctx.state.userAddress) {
