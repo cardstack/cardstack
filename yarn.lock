@@ -1132,10 +1132,10 @@
     "@babel/helper-validator-identifier" "^7.14.5"
     to-fast-properties "^2.0.0"
 
-"@cardstack/boxel@^0.7.11":
-  version "0.7.11"
-  resolved "https://registry.yarnpkg.com/@cardstack/boxel/-/boxel-0.7.11.tgz#939fbeee0bf1707fb9b5d63d255e0ed0a95e9d8e"
-  integrity sha512-9Aal758bab2zZJDUgzFNvHj4Y5IBqVGULmX7l5XVpPZLUKn9nx7thsIFNetQmAc2QF48jzoNQK5Xv4q+toiNVA==
+"@cardstack/boxel@^0.7.12":
+  version "0.7.12"
+  resolved "https://registry.yarnpkg.com/@cardstack/boxel/-/boxel-0.7.12.tgz#80c84d89ad12503c0e8bfa085ca6a26be429b365"
+  integrity sha512-80J5EA2whU08IRVldICc45Bp2wrcr/f0iKSZoHR8DzTZXNZyWQ7naqnYUxLFA2N5/lLq0joIbqlB2iMHwgwYfw==
   dependencies:
     broccoli-concat "^4.2.4"
     broccoli-funnel "^3.0.3"

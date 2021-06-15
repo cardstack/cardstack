@@ -8,7 +8,6 @@ import { taskFor } from 'ember-concurrency-ts';
 import { task } from 'ember-concurrency-decorators';
 import { rawTimeout } from 'ember-concurrency';
 import { A } from '@ember/array';
-import config from '@cardstack/web-client/config/environment';
 import { buildWaiter } from '@ember/test-waiters';
 import RSVP, { defer } from 'rsvp';
 import { UnbindEventListener } from '../utils/events';
@@ -16,8 +15,6 @@ import { UnbindEventListener } from '../utils/events';
 let waiter = buildWaiter('thread-animation');
 let token: any = null;
 let waiting: RSVP.Deferred<void> | null = null;
-
-let interval = config.environment === 'test' ? 100 : 1000;
 
 interface RevealResult {
   postable?: WorkflowPostable;
@@ -134,6 +131,7 @@ export default class AnimatedWorkflow {
   cancelationMessages: AnimatedPostableCollection;
   milestones: AnimatedMilestone[];
   #listenersToCleanUp: UnbindEventListener[] = [];
+  interval = 0;
 
   constructor(model: Workflow) {
     this.model = model;
@@ -179,7 +177,7 @@ export default class AnimatedWorkflow {
         this.stopTestWaiter();
       }
 
-      yield rawTimeout(interval);
+      yield rawTimeout(this.interval);
     }
   }
 

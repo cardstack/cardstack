@@ -1,4 +1,12 @@
-<Boxel::Thread class="workflow-thread" tabindex="0" {{did-insert this.focus}} data-test-workflow-thread ...attributes>
+<Boxel::Thread
+  @autoscroll={{this.autoscroll}}
+  class="workflow-thread workflow-thread-animated"
+  tabindex="0"
+  {{did-insert this.focus}}
+  data-test-workflow-thread
+  style={{css-var thread-animation-interval=this.threadAnimationInterval}}
+  ...attributes
+>
   <:header>
     <Boxel::ThreadHeader @title={{this.workflow.name}} />
   </:header>
@@ -20,6 +28,7 @@
         <Boxel::MilestoneBanner
           @title={{milestone.completedDetail}}
           @status={{if (eq i (dec this.workflow.milestones.length)) "Workflow completed" "Milestone reached"}}
+          class="workflow-milestone-banner-animated"
           data-milestone={{i}}
           data-test-milestone-completed
           data-test-milestone={{i}}
