@@ -39,27 +39,24 @@
 .account-display__text {
   color: var(--boxel-purple-500);
   font: var(--boxel-font);
-  letter-spacing: 0.02em;
+  letter-spacing: var(--boxel-lsp);
 }
 
 .account-display__text-sm {
   color: var(--boxel-purple-500);
   font: var(--boxel-font-sm);
-  letter-spacing: 0.02em;
-}
-
-.account-display__text--outer {
-  color: var(--boxel-purple-400);
-  letter-spacing: var(--boxel-lsp-sm);
+  letter-spacing: var(--boxel-lsp);
 }
 
 .account-display__address {
   font-family: var(--boxel-monospace-font-family);
   word-break: break-all;
+  letter-spacing: 0.02em;
 }
 
 .account-display__address-wrapped {
   font-family: var(--boxel-monospace-font-family);
   word-break: break-all;
   max-width: 22ch;
+  letter-spacing: 0.02em;
 }

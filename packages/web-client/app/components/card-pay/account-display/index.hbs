@@ -1,66 +1,66 @@
 <div class="account-display" ...attributes>
-  {{#if @balance}}
-    {{#if @isComplete}}
-      {{svg-jar @icon class="account-display__icon" role="presentation"}}
-      <div>
-        <div class="account-display__title-lg" data-test-account-title>
-          {{format-token-amount @balance}} {{uppercase @symbol}}
-        </div>
-      </div>
-    {{else}}
+  {{#if (eq @size "small")}}
+    {{#if @icon}}
       {{svg-jar @icon class="account-display__icon-sm" role="presentation"}}
-      <div>
-        <div class="account-display__title-sm" data-test-account-title>{{uppercase @symbol}}</div>
-        <div class="account-display__text-sm" data-test-account-balance>
-          {{format-token-amount @balance}} {{uppercase @symbol}}
-        </div>
-      </div>
     {{/if}}
-  {{else}}
-    {{#if @isComplete}}
-      {{#if @inner}}
-        {{svg-jar @icon class="account-display__icon" role="presentation"}}
-        <div>
-          <div class="account-display__title-lg" data-test-account-title>{{@title}}</div>
-          <div class="account-display__text account-display__address-wrapped" data-test-account-address>
+    <div>
+      <div class="account-display__title-sm" data-test-account-title>{{@title}}</div>
+      {{#if (or @address @text)}}
+        <div class={{cn "account-display__text-sm" account-display__address=@address}}
+          data-test-account-address={{@address}}
+          data-test-account-text={{@text}}
+        >
+          {{#if @address}}
             {{@address}}
-          </div>
-        </div>
-      {{else}}
-        {{svg-jar @icon class="account-display__icon-sm" role="presentation"}}
-        <div>
-          <div class="account-display__title-sm" data-test-account-title>{{@title}}</div>
-          <div class="account-display__text-sm account-display__address account-display__text--outer" data-test-account-address>
-            {{truncate-middle @address}}
-          </div>
+          {{else if @text}}
+            {{@text}}
+          {{else}}
+            <Boxel::LoadingIndicator />
+          {{/if}}
         </div>
       {{/if}}
-    {{else}}
-      {{#if @inner}}
-        {{svg-jar @icon class="account-display__icon" role="presentation"}}
-        <div>
-          <div class="account-display__title" data-test-account-title>{{@title}}</div>
-          <div class="account-display__text account-display__address" data-test-account-address>
-            {{#if @address}}
-              {{@address}}
-            {{else}}
-              <Boxel::LoadingIndicator />
-            {{/if}}
-          </div>
-        </div>
-      {{else}}
-        {{svg-jar @icon class="account-display__icon" role="presentation"}}
-        <div>
-          <div class="account-display__title" data-test-account-title>{{@title}}</div>
-          <div class="account-display__text account-display__address account-display__text--outer" data-test-account-address>
-            {{#if @address}}
-              {{@address}}
-            {{else}}
-              <Boxel::LoadingIndicator />
-            {{/if}}
-          </div>
-        </div>
-      {{/if}}
+    </div>
+  {{else if (eq @size "large")}}
+    {{#if @icon}}
+      {{svg-jar @icon class="account-display__icon" role="presentation"}}
     {{/if}}
+    <div>
+      <div class="account-display__title-lg" data-test-account-title>{{@title}}</div>
+      {{#if (or @address @text)}}
+        <div class={{cn "account-display__text" account-display__text-sm=@text account-display__address-wrapped=@address}}
+          data-test-account-address={{@address}}
+          data-test-account-text={{@text}}
+        >
+          {{#if @address}}
+            {{@address}}
+          {{else if @text}}
+            {{@text}}
+          {{else}}
+            <Boxel::LoadingIndicator />
+          {{/if}}
+        </div>
+      {{/if}}
+    </div>
+  {{else}}
+    {{#if @icon}}
+      {{svg-jar @icon class="account-display__icon" role="presentation"}}
+    {{/if}}
+    <div>
+      <div class="account-display__title" data-test-account-title>{{@title}}</div>
+      {{#if (or @address @text)}}
+        <div class={{cn "account-display__text" account-display__address=@address}}
+          data-test-account-address={{@address}}
+          data-test-account-text={{@text}}
+        >
+          {{#if @address}}
+            {{@address}}
+          {{else if @text}}
+            {{@text}}
+          {{else}}
+            <Boxel::LoadingIndicator />
+          {{/if}}
+        </div>
+      {{/if}}
+    </div>
   {{/if}}
 </div>
