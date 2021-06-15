@@ -1,6 +1,6 @@
-import { inject } from '../dependency-injection';
+import { inject } from '../di/dependency-injection';
 import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'crypto';
-import { Clock } from './clock';
+import { Clock } from '../services/clock';
 import queryString from 'query-string';
 
 const SECRET = process.env.SERVER_SECRET as string;
@@ -80,7 +80,7 @@ export class AuthenticationUtils {
   }
 }
 
-declare module '@cardstack/hub/dependency-injection' {
+declare module '@cardstack/hub/di/dependency-injection' {
   interface KnownServices {
     'authentication-utils': AuthenticationUtils;
   }

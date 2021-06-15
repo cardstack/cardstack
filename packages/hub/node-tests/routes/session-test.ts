@@ -1,7 +1,7 @@
 import { Server } from 'http';
 import supertest, { Test } from 'supertest';
 import { bootServerForTesting } from '../../main';
-import { Registry } from '../../dependency-injection';
+import { Registry } from '../../di/dependency-injection';
 import packageJson from '../../package.json';
 import { AcceleratableClock } from '../helpers';
 

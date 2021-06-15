@@ -10,7 +10,7 @@ export default class DevelopmentConfig {
   }
 }
 
-declare module '@cardstack/hub/dependency-injection' {
+declare module '@cardstack/hub/di/dependency-injection' {
   interface KnownServices {
     'development-config': DevelopmentConfig;
   }

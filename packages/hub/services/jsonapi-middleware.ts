@@ -5,10 +5,10 @@ import Koa from 'koa';
 import mimeMatch from 'mime-match';
 import KoaBody from 'koa-body';
 import { Memoize } from 'typescript-memoize';
-import { CardstackError } from './error';
+import { CardstackError } from '../utils/error';
 import { SessionContext } from './authentication-middleware';
-import SessionRoute from './routes/session';
-import { inject } from './dependency-injection';
+import SessionRoute from '../routes/session';
+import { inject } from '../di/dependency-injection';
 
 const API_PREFIX = '/api';
 const apiPrefixPattern = new RegExp(`^${API_PREFIX}/(.*)`);
@@ -63,7 +63,7 @@ export default class JSONAPIMiddleware {
   }
 }
 
-declare module '@cardstack/hub/dependency-injection' {
+declare module '@cardstack/hub/di/dependency-injection' {
   interface KnownServices {
     'jsonapi-middleware': JSONAPIMiddleware;
   }

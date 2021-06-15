@@ -1,5 +1,5 @@
 import { wireItUp } from '../main';
-import { Container, RegistryCallback } from '../dependency-injection';
+import { Container, RegistryCallback } from '../di/dependency-injection';
 
 export interface TestEnv {
   container: Container;

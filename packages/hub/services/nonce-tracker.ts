@@ -18,7 +18,7 @@ export default class NonceTracker {
   }
 }
 
-declare module '@cardstack/hub/dependency-injection' {
+declare module '@cardstack/hub/di/dependency-injection' {
   interface KnownServices {
     'nonce-tracker': NonceTracker;
   }
