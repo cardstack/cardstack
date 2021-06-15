@@ -3,6 +3,7 @@
 .preview__content {
   display: flex;
   justify-content: space-between;
+  padding-left: var(--boxel-sp-lg); /* TODO this is the lone exception to the above */
 }
 
 .preview__card-preview-field {
