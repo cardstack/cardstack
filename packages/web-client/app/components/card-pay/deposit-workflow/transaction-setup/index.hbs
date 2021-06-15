@@ -21,7 +21,7 @@
                 @icon={{this.selectedToken.icon}}
                 @title={{concat (format-token-amount this.selectedTokenBalance) " " this.selectedToken.symbol}}
                 @text={{concat "$ " (token-to-usd this.selectedToken.symbol this.selectedTokenBalance) " USD"}}
-                data-test-option-view-only
+                data-test-deposit-transaction-setup-from-balance={{this.selectedToken.symbol}}
               />
             </:inner>
           </CardPay::NestedItems>
@@ -42,6 +42,7 @@
                   @tokenSymbol={{token.symbol}}
                   @tokenDescription={{token.description}}
                   @tokenIcon={{token.icon}}
+                  data-test-deposit-transaction-setup-from-option={{token.symbol}}
                 />
               {{/let}}
             {{/each}}

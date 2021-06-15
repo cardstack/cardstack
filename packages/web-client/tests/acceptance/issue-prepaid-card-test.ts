@@ -196,7 +196,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom('[data-test-funding-source-dropdown="DAI.CPXD"]').exists();
     assert
       .dom(
-        '[data-test-funding-source-dropdown="DAI.CPXD"] [data-test-account-balance]'
+        '[data-test-funding-source-dropdown="DAI.CPXD"] [data-test-account-text]'
       )
       .containsText('250.00 DAI');
 

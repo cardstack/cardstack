@@ -1,35 +1,38 @@
 <details class="balance-view" ...attributes>
-  <summary class={{cn "balance-view__summary" balance-view__summary--memorialized=@isComplete}}>
-    <div>{{@wallet}} wallet</div>
-    <div class="balance-view__summary-balance" data-test-source-token={{@tokenSymbol}}>
-      {{@balance}} {{@tokenSymbol}}
-    </div>
+  <summary class="balance-view__summary">
+    {{#if @isComplete}}
+      <CardPay::AccountDisplay
+        class="balance-view__summary-content"
+        @size="small"
+        @title={{concat @wallet " wallet"}}
+        @text={{concat @balance " " @tokenSymbol}}
+        data-test-source-token={{@tokenSymbol}}
+      />
+    {{else}}
+      <div class="balance-view__summary-content">
+        {{@wallet}} wallet
+        <span class="balance-view__summary-balance" data-test-source-token={{@tokenSymbol}}>{{@balance}} {{@tokenSymbol}}</span>
+      </div>
+    {{/if}}
     <div class="balance-view__marker">
       {{svg-jar "caret-right" class="balance-view__marker-icon" role="presentation"}}
     </div>
   </summary>
   <CardPay::NestedItems class="balance-view__details">
     <:outer>
-      <div class="balance-view__address">
-        {{@address}}
-      </div>
+      <CardPay::AccountDisplay
+        @title={{concat @wallet " wallet"}}
+        @address={{@address}}
+        data-test-source-token={{@tokenSymbol}}
+      />
     </:outer>
     <:inner>
-      <div class="balance-view__token">
-        {{svg-jar @tokenIcon class="balance-view__token-icon" role="presentation" width="40" height="40"}}
-        <div>
-          <div class="balance-view__token-balance">
-            {{@balance}} {{@tokenSymbol}}
-          </div>
-          {{#if @balanceInUsd}}
-            <div class="balance-view__usd-balance">
-              ≈ $ {{@balanceInUsd}} USD
-            </div>
-          {{else}}
-            <Boxel::LoadingIndicator class="balance-view__loading-indicator" />
-          {{/if}}
-        </div>
-      </div>
+      <CardPay::AccountDisplay
+        @size="large"
+        @icon={{@tokenIcon}}
+        @title={{concat @balance " " @tokenSymbol}}
+        @text={{if @balanceInUsd (concat "$ " @balanceInUsd " USD")}}
+      />
     </:inner>
   </CardPay::NestedItems>
 </details>

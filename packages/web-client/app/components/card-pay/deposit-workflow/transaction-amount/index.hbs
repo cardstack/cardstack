@@ -26,14 +26,14 @@
           @label="Amount to deposit:"
         >
           <div class="transaction-amount__token">
-            {{svg-jar this.currentTokenDetails.icon class="transaction-amount__token-icon" role="presentation" width="40" height="40"}}
-            <div>
-              <div class="transaction-amount__token-balance" data-test-deposit-amount-entered>
-                {{this.amount}} {{this.currentTokenSymbol}}
-              </div>
-              <div class="transaction-amount__usd-balance">
-                ≈ $ {{token-to-usd this.currentTokenSymbol this.amountAsBigNumber}} USD
-              </div>
+            <CardPay::AccountDisplay
+              @size="large"
+              @icon={{this.currentTokenDetails.icon}}
+              @title={{concat (format-token-amount this.amountAsBigNumber) " " this.currentTokenSymbol}}
+              data-test-deposit-amount-entered
+            />
+            <div class="transaction-amount__usd-balance">
+              $ {{token-to-usd this.currentTokenSymbol this.amountAsBigNumber}} USD
             </div>
           </div>
         </Boxel::Field>

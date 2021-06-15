@@ -82,36 +82,18 @@
 /* token balance display styles */
 .transaction-amount__token {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  color: var(--boxel-dark);
-
-  /* bordered display box */
   justify-content: center;
   padding: var(--boxel-sp-xl) var(--boxel-sp);
   border: 1px solid var(--boxel-light-400);
   border-radius: var(--boxel-border-radius);
 }
 
-.transaction-amount__token-icon {
-  align-self: flex-start;
-  flex-shrink: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  object-fit: contain;
-  margin-right: var(--boxel-sp-sm);
-}
-
-.transaction-amount__token-balance {
-  font-weight: 600;
-  font-size: 1.25rem;
-  line-height: calc(27 / 20);
-  letter-spacing: var(--boxel-lsp-xs);
-  margin-top: var(--boxel-sp-xxs);
-}
-
 .transaction-amount__usd-balance {
+  margin-top: var(--boxel-sp-xxxs);
+  margin-left: var(--boxel-sp-xxl);
   color: var(--boxel-purple-500);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);
-  margin-top: var(--boxel-sp-xs);
 }

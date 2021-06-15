@@ -166,7 +166,9 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom('[data-test-deposit-transaction-setup-is-complete]')
       .doesNotExist();
-    assert.dom(`${post} [data-test-option-view-only]`).doesNotExist();
+    assert
+      .dom(`${post} [data-test-deposit-transaction-setup-from-option]`)
+      .exists({ count: 2 });
     assert
       .dom('[data-test-deposit-transaction-setup] [data-test-boxel-button]')
       .isDisabled();
@@ -176,13 +178,17 @@ module('Acceptance | deposit', function (hooks) {
     );
     // transaction-setup card (memorialized)
     assert.dom(`${post} [data-test-option]`).doesNotExist();
-    assert.dom(`${post} [data-test-option-view-only]`).exists({ count: 1 });
+    assert
+      .dom(`${post} [data-test-deposit-transaction-setup-from-option]`)
+      .doesNotExist();
     assert
       .dom('[data-test-deposit-transaction-setup] [data-test-boxel-button]')
       .isNotDisabled();
     assert.dom('[data-test-deposit-transaction-setup-is-complete]').exists();
     assert
-      .dom(`${post} [data-test-balance-view-only="DAI"]`)
+      .dom(
+        `${post} [data-test-deposit-transaction-setup-from-balance="DAI"] [data-test-account-title]`
+      )
       .containsText('250.50');
     // transaction-amount card
     assert
@@ -212,7 +218,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom('[data-test-deposit-amount-input]')
       .doesNotExist('Input field is no longer available when unlocking');
-    assert.dom('[data-test-deposit-amount-entered]').hasText('250 DAI');
+    assert.dom('[data-test-deposit-amount-entered]').hasText('250.00 DAI');
 
     layer1Service.test__simulateUnlock();
     await settled();
