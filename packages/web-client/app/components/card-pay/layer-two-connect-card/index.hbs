@@ -27,9 +27,13 @@
           @isAddress={{true}}
         />
         <CardPay::LabeledValue @label="Depot balance" data-test-balance-container>
-          {{#if this.hasBalance}}
+          {{#if this.layer2Network.isFetchingDepot}}
+            <Boxel::LoadingIndicator data-test-balance-container-loading/>
+          {{else if this.balancesToShow.length}}
           <CardPay::BalancesList as |Balance|>
-            <Balance @symbol="XDAI" @amount={{this.layer2Network.defaultTokenBalance}} />
+            {{#each this.balancesToShow as |b|}}
+              <Balance @symbol={{b.symbol}} @amount={{b.amount}} />
+            {{/each}}
           </CardPay::BalancesList>
           {{else}}
           None

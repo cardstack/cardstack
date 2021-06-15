@@ -6,6 +6,7 @@ import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { IConnector } from '@walletconnect/types';
 import WalletConnectProvider from '@walletconnect/web3-provider';
+import { task } from 'ember-concurrency-decorators';
 
 import { SimpleEmitter, UnbindEventListener } from '../events';
 import { ConvertibleSymbol, ConversionFunction, NetworkSymbol } from '../token';
@@ -17,8 +18,11 @@ import {
   getConstantByNetwork,
   DepotSafe,
   IExchangeRate,
+  ISafes,
   getSDK,
 } from '@cardstack/cardpay-sdk';
+import { taskFor } from 'ember-concurrency-ts';
+import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -28,18 +32,23 @@ export default abstract class Layer2ChainWeb3Strategy
   chainId: number;
   networkSymbol: NetworkSymbol;
   provider: WalletConnectProvider | undefined;
-
   simpleEmitter = new SimpleEmitter();
 
-  web3!: Web3;
+  web3: Web3 = new Web3();
   #exchangeRateApi!: IExchangeRate;
-
+  #safesApi!: ISafes;
+  @tracked depotSafe: DepotSafe | null = null;
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
   @tracked defaultTokenBalance: BN | undefined;
+  @tracked cardBalance: BN | undefined;
   @tracked waitForAccountDeferred = defer();
 
   @reads('provider.connector') connector!: IConnector;
+
+  get isFetchingDepot() {
+    return taskFor(this.fetchDepotTask).isRunning;
+  }
 
   constructor(networkSymbol: NetworkSymbol, chainName: string) {
     this.chainName = chainName;
@@ -80,7 +89,7 @@ export default abstract class Layer2ChainWeb3Strategy
         strategy.disconnect();
       }
     });
-    this.connector.on('session_update', (error, payload) => {
+    this.connector.on('session_update', async (error, payload) => {
       if (error) {
         throw error;
       }
@@ -101,19 +110,21 @@ export default abstract class Layer2ChainWeb3Strategy
       this.onDisconnect();
     });
     await this.provider.enable();
-    this.web3 = new Web3(this.provider as any);
+    this.web3.setProvider(this.provider as any);
     this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
+    this.#safesApi = await getSDK('Safes', this.web3);
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
   }
 
-  updateWalletInfo(accounts: string[], chainId: number) {
+  async updateWalletInfo(accounts: string[], chainId: number) {
     let newWalletInfo = new WalletInfo(accounts, chainId);
     if (this.walletInfo.isEqualTo(newWalletInfo)) {
       return;
     }
     this.walletInfo = newWalletInfo;
     if (accounts.length) {
-      this.refreshBalances();
+      taskFor(this.fetchDepotTask).perform();
+
       this.waitForAccountDeferred.resolve();
     } else {
       this.waitForAccountDeferred = defer();
@@ -124,15 +135,15 @@ export default abstract class Layer2ChainWeb3Strategy
     this.updateWalletInfo([], this.chainId);
   }
 
-  private async refreshBalances() {
-    let raw = await this.getDefaultTokenBalance();
-    this.defaultTokenBalance = new BN(String(raw ?? 0));
+  async refreshBalances() {
+    return taskFor(this.fetchDepotTask).perform();
   }
 
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
   // about disconnecting. WalletConnect's disconnect event tells all tabs that you are disconnected
   onDisconnect() {
     if (this.isConnected) {
+      this.depotSafe = null;
       this.clearWalletInfo();
       this.walletConnectUri = undefined;
       this.simpleEmitter.emit('disconnect');
@@ -141,15 +152,6 @@ export default abstract class Layer2ChainWeb3Strategy
         this.initialize();
       }, 1000);
     }
-  }
-
-  async getDefaultTokenBalance() {
-    if (this.walletInfo.firstAddress)
-      return await this.web3.eth.getBalance(
-        this.walletInfo.firstAddress,
-        'latest'
-      );
-    else return 0;
   }
 
   get isConnected(): boolean {
@@ -193,16 +195,33 @@ export default abstract class Layer2ChainWeb3Strategy
     return tokenBridge.waitForBridgingCompleted(receiver, fromBlock.toString());
   }
 
-  async fetchDepot(owner: ChainAddress): Promise<DepotSafe | null> {
-    let safesApi = await getSDK('Safes', this.web3);
-    let safes = await safesApi.view(owner);
-    let depotSafes = safes.filter(
-      (safe) => safe.type === 'depot'
-    ) as DepotSafe[];
-    if (depotSafes.length) {
-      return depotSafes[depotSafes.length - 1];
+  @task *fetchDepotTask(): any {
+    let depot = null;
+
+    if (this.walletInfo.firstAddress) {
+      let safes = yield this.#safesApi.view(this.walletInfo.firstAddress);
+      let depotSafes = safes.filter(
+        (safe: Safe) => safe.type === 'depot'
+      ) as DepotSafe[];
+
+      depot = depotSafes[depotSafes.length - 1] ?? null;
+      if (depot) {
+        let daiBalance = depot.tokens.find(
+          (tokenInfo) => tokenInfo.token.symbol === 'DAI'
+        )?.balance;
+        let cardBalance = depot.tokens.find(
+          (tokenInfo) => tokenInfo.token.symbol === 'CARD'
+        )?.balance;
+        this.defaultTokenBalance = new BN(daiBalance ?? '0');
+        this.cardBalance = new BN(cardBalance ?? '0');
+      } else {
+        this.defaultTokenBalance = new BN('0');
+        this.cardBalance = new BN('0');
+      }
     }
-    return null;
+
+    this.depotSafe = depot;
+    return;
   }
 
   async disconnect(): Promise<void> {
