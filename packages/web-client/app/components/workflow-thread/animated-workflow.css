@@ -6,7 +6,6 @@
   --thread-animation-interval: 0ms;
 }
 
-
 /*
   If the user has expressed their preference for
   reduced motion, then don't use animations.
