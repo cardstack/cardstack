@@ -276,7 +276,10 @@ module('Acceptance | issue prepaid card', function (hooks) {
       )} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
     // TODO simulate transaction approval
-    // TODO verify and interact with preview card memorialized state
+
+    assert
+      .dom(`${postableSel(3, 1)} [data-test-boxel-action-chin]`)
+      .containsText('Confirmed');
 
     await waitFor(milestoneCompletedSel(3));
     assert.dom(milestoneCompletedSel(3)).containsText('Transaction confirmed');
