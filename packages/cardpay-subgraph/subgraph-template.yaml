@@ -81,6 +81,8 @@ dataSources:
           handler: handleMerchantPayment
         - event: MerchantFeeCollected(address,address,address,uint256)
           handler: handleMerchantFee
+        - event: MerchantClaim(address,address,uint256)
+          handler: handleMerchantClaim
       file: ./src/mappings/revenue-pool.ts
 
   - kind: ethereum/contract

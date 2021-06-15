@@ -3,6 +3,7 @@ import {
   MerchantCreation as MerchantCreationEvent,
   CustomerPayment as MerchantPaymentEvent,
   MerchantFeeCollected as MerchantFeeEvent,
+  MerchantClaim as MerchantClaimEvent,
 } from '../../generated/RevenuePool/RevenuePool';
 import {
   Account,
@@ -11,6 +12,9 @@ import {
   MerchantFeePayment,
   MerchantPayment,
   PrepaidCard,
+  MerchantRevenue,
+  MerchantClaim,
+  MerchantRevenueEvent,
 } from '../../generated/schema';
 import { assertTransactionExists, toChecksumAddress } from '../utils';
 
@@ -20,6 +24,15 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
   let prepaidCard = toChecksumAddress(event.params.card);
   let prepaidCardEntity = PrepaidCard.load(prepaidCard);
   let txnHash = event.transaction.hash.toHex();
+  let merchantSafe = toChecksumAddress(event.params.merchantSafe);
+  let issuingToken = toChecksumAddress(event.params.issuingToken);
+  let revenueEntity = assertMerchantRevenueExists(merchantSafe, issuingToken);
+  // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
+  revenueEntity.lifetimeAccumulation = revenueEntity.lifetimeAccumulation + event.params.issuingTokenAmount;
+  // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
+  revenueEntity.unclaimedBalance = revenueEntity.unclaimedBalance + event.params.issuingTokenAmount;
+  revenueEntity.save();
+
   if (prepaidCardEntity != null) {
     // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
     prepaidCardEntity.spendBalance = prepaidCardEntity.spendBalance - event.params.spendAmount;
@@ -36,17 +49,56 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
     );
     return;
   }
-  let entity = new MerchantPayment(event.transaction.hash.toHex()); // There will only ever be one merchant payment event per txn
-  entity.transaction = txnHash;
-  entity.timestamp = event.block.timestamp;
-  entity.prepaidCard = prepaidCard;
-  entity.merchantSafe = toChecksumAddress(event.params.merchantSafe);
-  entity.issuingToken = toChecksumAddress(event.params.issuingToken);
-  entity.issuingTokenAmount = event.params.issuingTokenAmount;
-  entity.spendAmount = event.params.spendAmount;
-  entity.historicIssuingTokenBalance = prepaidCardEntity.issuingTokenBalance;
-  entity.historicSpendBalance = prepaidCardEntity.spendBalance;
-  entity.save();
+
+  let paymentEntity = new MerchantPayment(txnHash); // There will only ever be one merchant payment event per txn
+  paymentEntity.transaction = txnHash;
+  paymentEntity.timestamp = event.block.timestamp;
+  paymentEntity.prepaidCard = prepaidCard;
+  paymentEntity.merchantSafe = merchantSafe;
+  paymentEntity.issuingToken = issuingToken;
+  paymentEntity.issuingTokenAmount = event.params.issuingTokenAmount;
+  paymentEntity.spendAmount = event.params.spendAmount;
+  paymentEntity.historicPrepaidCardIssuingTokenBalance = prepaidCardEntity.issuingTokenBalance;
+  paymentEntity.historicPrepaidCardSpendBalance = prepaidCardEntity.spendBalance;
+  paymentEntity.save();
+
+  let revenueEventEntity = new MerchantRevenueEvent(txnHash);
+  revenueEventEntity.transaction = txnHash;
+  revenueEventEntity.timestamp = event.block.timestamp;
+  revenueEventEntity.merchantRevenue = merchantSafe + '-' + issuingToken;
+  revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
+  revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;
+  revenueEventEntity.merchantPayment = txnHash;
+  revenueEventEntity.save();
+}
+
+export function handleMerchantClaim(event: MerchantClaimEvent): void {
+  assertTransactionExists(event);
+
+  let txnHash = event.transaction.hash.toHex();
+  let merchantSafe = toChecksumAddress(event.params.merchantSafe);
+  let token = toChecksumAddress(event.params.payableToken);
+  let revenueEntity = assertMerchantRevenueExists(merchantSafe, token);
+  // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
+  revenueEntity.unclaimedBalance = revenueEntity.unclaimedBalance - event.params.amount;
+  revenueEntity.save();
+
+  let claimEntity = new MerchantClaim(txnHash);
+  claimEntity.transaction = txnHash;
+  claimEntity.timestamp = event.block.timestamp;
+  claimEntity.merchantSafe = merchantSafe;
+  claimEntity.token = token;
+  claimEntity.amount = event.params.amount;
+  claimEntity.save();
+
+  let revenueEventEntity = new MerchantRevenueEvent(txnHash);
+  revenueEventEntity.transaction = txnHash;
+  revenueEventEntity.timestamp = event.block.timestamp;
+  revenueEventEntity.merchantRevenue = merchantSafe + '-' + token;
+  revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
+  revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;
+  revenueEventEntity.merchantClaim = txnHash;
+  revenueEventEntity.save();
 }
 
 export function handleMerchantFee(event: MerchantFeeEvent): void {
@@ -85,4 +137,18 @@ export function handleMerchantCreation(event: MerchantCreationEvent): void {
   creationEntity.merchantSafe = merchantSafe;
   creationEntity.merchant = merchant;
   creationEntity.save();
+}
+
+function assertMerchantRevenueExists(merchantSafe: string, token: string): MerchantRevenue {
+  let id = merchantSafe + '-' + token;
+  let entity = MerchantRevenue.load(id);
+  if (entity == null) {
+    entity = new MerchantRevenue(merchantSafe + '-' + token);
+    entity.token = token;
+    entity.merchantSafe = merchantSafe;
+    entity.lifetimeAccumulation = new BigInt(0);
+    entity.unclaimedBalance = new BigInt(0);
+    entity.save();
+  }
+  return entity as MerchantRevenue;
 }

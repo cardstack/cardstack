@@ -45,6 +45,7 @@ type MerchantSafe @entity {
   spendAccumulations: [SpendAccumulation]!         @derivedFrom(field: "merchantSafe")
   payments: [MerchantPayment]!                     @derivedFrom(field: "merchantSafe")
   merchantFees: [MerchantFeePayment]!              @derivedFrom(field: "merchantSafe")
+  merchantRevenue: [MerchantRevenue]!              @derivedFrom(field: "merchantSafe")
 }
 
 type BridgeEvent @entity {
@@ -74,8 +75,37 @@ type MerchantPayment @entity {
   issuingToken: String!
   issuingTokenAmount: BigInt!
   spendAmount: BigInt!
-  historicSpendBalance: BigInt!
-  historicIssuingTokenBalance: BigInt!
+  historicPrepaidCardSpendBalance: BigInt!
+  historicPrepaidCardIssuingTokenBalance: BigInt!
+}
+
+type MerchantRevenue @entity {
+  id: ID!                               # merchantSafe-token
+  token: String!
+  merchantSafe: MerchantSafe!
+  lifetimeAccumulation: BigInt!
+  unclaimedBalance: BigInt!
+  revenueEvents: [MerchantRevenueEvent]! @derivedFrom(field: "merchantRevenue")
+}
+
+type MerchantClaim @entity {
+  id: ID!
+  timestamp: BigInt!
+  transaction: Transaction!
+  merchantSafe: MerchantSafe!
+  token: String!
+  amount: BigInt!
+}
+
+type MerchantRevenueEvent @entity {
+  id: ID!
+  transaction: Transaction!
+  timestamp: BigInt!
+  historicLifetimeAccumulation: BigInt!
+  historicUnclaimedBalance: BigInt!
+  merchantRevenue: MerchantRevenue!
+  merchantPayment: MerchantPayment
+  merchantClaim: MerchantClaim
 }
 
 type SpendAccumulation @entity {
@@ -169,7 +199,8 @@ type Transaction @entity {
   merchantPayments: [MerchantPayment]!             @derivedFrom(field: "transaction")
   spendAccumulations: [SpendAccumulation]!         @derivedFrom(field: "transaction")
   merchantFeePayments: [MerchantFeePayment]!       @derivedFrom(field: "transaction")
-
+  merchantClaims: [MerchantClaim]!                 @derivedFrom(field: "transaction")
+  merchantRevenueEvents: [MerchantRevenueEvent]!   @derivedFrom(field: "transaction")
 }
 
 # A mapping table is the more performant way to represent many-to-many
