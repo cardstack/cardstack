@@ -136,10 +136,10 @@
   top: 0;
   right: 0;
   left: 0;
-  border-radius: var(--boxel-border-radius);
+  border-radius: var(--boxel-border-radius) var(--boxel-border-radius) 0 0;
   overflow: hidden;
   z-index: 0;
-  height: 14.375rem;
+  height: 102px;
 }
 
 .prepaid-card__background--color {
@@ -148,8 +148,8 @@
 
 .prepaid-card__background--pattern {
   background-color: var(--header-pattern-color);
-  -webkit-mask-size: contain;
+  -webkit-mask-size: cover;
   -webkit-mask-image: var(--header-theme);
-  mask-size: contain;
+  mask-size: cover;
   mask-image: var(--header-theme);
 }
