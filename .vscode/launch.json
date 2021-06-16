@@ -159,7 +159,7 @@
       "args": [
         "pay-merchant",
         "0x7106c2DBBB28f0cBC314f7817428839802bFC0d7", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0xBF8C3FA1c408e45E684dE718002840454bDEC3D2", // Hassan's prepaid card --feel free to use your own
+        "0xaEbDEa1454D446aE301555D5B232f528afEf9fFF", // Hassan's prepaid card --feel free to use your own
         "100",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
