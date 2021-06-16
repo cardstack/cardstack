@@ -1,6 +1,6 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
-import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
+import { Layer2Web3Strategy, TransactionHash } from './types';
 import {
   ConvertibleSymbol,
   ConversionFunction,
@@ -23,8 +23,15 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   waitForAccountDeferred = defer();
   bridgingDeferred!: RSVP.Deferred<TransactionReceipt>;
+  @tracked isFetchingDepot = false;
   @tracked defaultTokenBalance: BN | undefined;
-  @tracked depot: DepotSafe | null = null;
+  @tracked cardBalance: BN | undefined;
+  @tracked depotSafe: DepotSafe | null = null;
+
+  // property to test whether the refreshBalances method is called
+  // to test if balances are refreshed after relaying tokens
+  // this is only a mock property
+  @tracked balancesRefreshed = false;
 
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([]);
@@ -44,9 +51,12 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(new BN('0'));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  fetchDepot(_owner: ChainAddress): Promise<DepotSafe | null> {
-    return Promise.resolve(this.depot);
+  refreshBalances() {
+    this.balancesRefreshed = true;
+  }
+
+  fetchDepotTask(): any {
+    return Promise.resolve(this.depotSafe);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -94,9 +104,13 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.waitForAccountDeferred.resolve();
   }
 
-  test__simulateBalances(balances: { defaultToken: BN | undefined }) {
+  test__simulateBalances(balances: { defaultToken?: BN; card?: BN }) {
     if (balances.defaultToken) {
       this.defaultTokenBalance = balances.defaultToken;
+    }
+
+    if (balances.card) {
+      this.cardBalance = balances.card;
     }
   }
 
@@ -108,9 +122,9 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   test__simulateDepot(depot: DepotSafe | null) {
     if (depot) {
-      this.depot = depot;
+      this.depotSafe = depot;
       return;
     }
-    this.depot = null;
+    this.depotSafe = null;
   }
 }

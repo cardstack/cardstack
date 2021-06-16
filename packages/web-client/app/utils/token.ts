@@ -7,10 +7,12 @@ import { ChainAddress } from './web3-strategies/types';
 export type ConvertibleSymbol = 'DAI' | 'CARD';
 export type BridgeableSymbol = 'DAI' | 'CARD';
 export type Layer1BalanceSymbol = 'DAI' | 'CARD' | 'ETH';
+export type BridgedTokenSymbol = 'DAI.CPXD' | 'CARD.CPXD';
 export type TokenSymbol =
   | ConvertibleSymbol
   | BridgeableSymbol
-  | Layer1BalanceSymbol;
+  | Layer1BalanceSymbol
+  | BridgedTokenSymbol;
 export type NetworkSymbol = 'kovan' | 'sokol' | 'mainnet' | 'xdai';
 
 // conversion
@@ -19,9 +21,25 @@ export const convertibleSymbols: ConvertibleSymbol[] = ['DAI', 'CARD'];
 
 // contract/bridging
 export const bridgeableSymbols: BridgeableSymbol[] = ['DAI', 'CARD'];
-const contractNames: Record<BridgeableSymbol, string> = {
-  DAI: 'daiToken',
-  CARD: 'cardToken',
+export const bridgedSymbols: BridgedTokenSymbol[] = ['DAI.CPXD', 'CARD.CPXD'];
+const contractNames: Record<NetworkSymbol, Record<BridgeableSymbol, string>> = {
+  kovan: {
+    DAI: 'daiToken',
+    CARD: 'cardToken',
+  },
+  mainnet: {
+    DAI: 'daiToken',
+    CARD: 'cardToken',
+  },
+  sokol: {
+    DAI: 'daiCpxd',
+    CARD: 'cardCpxd',
+  },
+  // xdai does not have any addresses as of yet.
+  xdai: {
+    DAI: '',
+    CARD: '',
+  },
 };
 
 export class TokenContractInfo {
@@ -29,9 +47,17 @@ export class TokenContractInfo {
   address: ChainAddress;
   abi = ERC20ABI as AbiItem[];
 
-  constructor(symbol: BridgeableSymbol, network: string) {
+  constructor(symbol: BridgeableSymbol, network: NetworkSymbol) {
     this.symbol = symbol;
-    this.address = getAddressByNetwork(contractNames[this.symbol], network);
+    if (network === 'xdai') {
+      throw new Error(
+        "XDAI addresses may not be available yet. Please check the sdk's getAddressByNetwork method to see if this has changed"
+      );
+    }
+    this.address = getAddressByNetwork(
+      contractNames[network][this.symbol],
+      network
+    );
   }
 }
 
@@ -58,6 +84,18 @@ const _tokenDisplayInfoMap: Record<TokenSymbol, DisplayInfo> = {
     name: 'Dai',
     symbol: 'DAI',
     description: 'USD-based stablecoin',
+    icon: 'dai-token',
+  },
+  'CARD.CPXD': {
+    name: 'Card',
+    symbol: 'CARD',
+    description: '',
+    icon: 'card-token',
+  },
+  'DAI.CPXD': {
+    name: 'Dai',
+    symbol: 'DAI.CPXD',
+    description: '',
     icon: 'dai-token',
   },
 };

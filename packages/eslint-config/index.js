@@ -13,5 +13,11 @@ module.exports = Object.assign({}, node, {
         project: ['./tsconfig.json'], // Specify it only for TypeScript files
       },
     }),
+    Object.assign({}, node, {
+      files: ['*.json'],
+      rules: {
+        semi: 'off',
+      },
+    }),
   ],
 });

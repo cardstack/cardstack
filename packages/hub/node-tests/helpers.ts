@@ -7,11 +7,14 @@ export interface TestEnv {
 }
 
 export async function createTestEnv(registryCallBack?: RegistryCallback): Promise<TestEnv> {
-  let container = await wireItUp(registryCallBack);
+  let container = wireItUp(registryCallBack);
   async function destroy() {
     await container.teardown();
   }
-  return { container, destroy };
+  return {
+    container,
+    destroy,
+  };
 }
 
 export class AcceleratableClock {

@@ -1,4 +1,5 @@
 import { BigInt } from '@graphprotocol/graph-ts';
+import { ADDRESS_ZERO } from '@protofire/subgraph-toolkit';
 import {
   MerchantCreation as MerchantCreationEvent,
   CustomerPayment as MerchantPaymentEvent,
@@ -10,7 +11,7 @@ import {
   MerchantSafe,
   MerchantCreation,
   MerchantFeePayment,
-  MerchantPayment,
+  PrepaidCardPayment,
   PrepaidCard,
   MerchantRevenue,
   MerchantClaim,
@@ -50,16 +51,18 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
     return;
   }
 
-  let paymentEntity = new MerchantPayment(txnHash); // There will only ever be one merchant payment event per txn
+  let paymentEntity = new PrepaidCardPayment(txnHash); // There will only ever be one merchant payment event per txn
   paymentEntity.transaction = txnHash;
   paymentEntity.timestamp = event.block.timestamp;
   paymentEntity.prepaidCard = prepaidCard;
-  paymentEntity.merchantSafe = merchantSafe;
+  if (merchantSafe != ADDRESS_ZERO) {
+    paymentEntity.merchantSafe = merchantSafe;
+  }
   paymentEntity.issuingToken = issuingToken;
   paymentEntity.issuingTokenAmount = event.params.issuingTokenAmount;
   paymentEntity.spendAmount = event.params.spendAmount;
-  paymentEntity.historicPrepaidCardIssuingTokenBalance = prepaidCardEntity.issuingTokenBalance;
-  paymentEntity.historicPrepaidCardSpendBalance = prepaidCardEntity.spendBalance;
+  paymentEntity.historicIssuingTokenBalance = prepaidCardEntity.issuingTokenBalance;
+  paymentEntity.historicSpendBalance = prepaidCardEntity.spendBalance;
   paymentEntity.save();
 
   let revenueEventEntity = new MerchantRevenueEvent(txnHash);

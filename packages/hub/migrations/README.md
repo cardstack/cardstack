@@ -1,0 +1,1 @@
+Migrations currently must be authored in Javascript. `node-pg-migrate` has typescript support but I was unable to get it to work with our repository.

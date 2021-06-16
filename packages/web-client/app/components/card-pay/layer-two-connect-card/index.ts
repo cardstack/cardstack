@@ -46,11 +46,17 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
     }
   }
 
-  get hasBalance() {
-    return (
-      this.layer2Network.defaultTokenBalance &&
-      !this.layer2Network.defaultTokenBalance.isZero()
-    );
+  get balancesToShow() {
+    return [
+      {
+        symbol: 'DAI.CPXD',
+        amount: this.layer2Network.defaultTokenBalance,
+      },
+      {
+        symbol: 'CARD.CPXD',
+        amount: this.layer2Network.cardBalance,
+      },
+    ].filter((o) => o.amount && !o.amount?.isZero());
   }
 
   @task *connectWalletTask() {

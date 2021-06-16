@@ -272,13 +272,22 @@ module('Acceptance | deposit', function (hooks) {
       .exists();
     assert.dom(`${post} [data-test-blockscout-button]`).doesNotExist();
 
+    // bridging should also refresh layer 2 balances so we want to ensure that here
+    layer2Service.balancesRefreshed = false;
+
     layer2Service.test__simulateBridged(
       '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
     );
 
     assert.dom(`${post} [data-test-step-2="complete"]`);
     assert.dom(`${post} [data-test-step-3="complete"]`);
+
     await waitFor(`${post} [data-test-blockscout-button]`);
+
+    assert.ok(
+      layer2Service.balancesRefreshed,
+      'Balances for layer 2 should be refreshsed after bridging'
+    );
     assert.dom(`${post} [data-test-blockscout-button]`).exists();
 
     await settled();

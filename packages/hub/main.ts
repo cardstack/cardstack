@@ -2,9 +2,10 @@
 
 import Koa from 'koa';
 import logger from '@cardstack/logger';
-import { Registry, Container, RegistryCallback } from './di/dependency-injection';
+import { Registry, Container, RegistryCallback, ContainerCallback } from './di/dependency-injection';
 
 import AuthenticationMiddleware from './services/authentication-middleware';
+import DatabaseManager from './services/database-manager';
 import DevelopmentConfig from './services/development-config';
 import DevelopmentProxyMiddleware from './services/development-proxy-middleware';
 import SessionRoute from './routes/session';
@@ -12,7 +13,6 @@ import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './services/jsonapi-middleware';
 import NonceTracker from './services/nonce-tracker';
 import { Clock } from './services/clock';
-import { ShutdownHelper } from './services/shutdown-helper';
 
 const log = logger('cardstack/hub');
 
@@ -21,20 +21,21 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('authentication-utils', AuthenticationUtils);
   registry.register('clock', Clock);
+  registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
   registry.register('jsonapi-middleware', JsonapiMiddleware);
   registry.register('nonce-tracker', NonceTracker);
   registry.register('session-route', SessionRoute);
-  registry.register('shutdown-helper', ShutdownHelper);
   if (registryCallback) {
     registryCallback(registry);
   }
   return new Container(registry);
 }
 
-export async function makeServer(registryCallback?: RegistryCallback) {
+export async function makeServer(registryCallback?: RegistryCallback, containerCallback?: ContainerCallback) {
   let container = wireItUp(registryCallback);
+  containerCallback?.(container);
 
   let app = new Koa();
   app.use(async (ctx: Koa.Context, next: Koa.Next) => {
@@ -51,16 +52,13 @@ export async function makeServer(registryCallback?: RegistryCallback) {
     ctx.body = 'Hello World ' + ctx.environment + '! ' + ctx.host.split(':')[0];
   });
 
-  app.on('close', async function () {
-    (await lookupShutdownHelper(container)).onShutdown();
-  });
+  async function onClose() {
+    await container.teardown();
+    app.off('close', onClose);
+  }
+  app.on('close', onClose);
 
   return app;
-}
-
-async function lookupShutdownHelper(container: Container): Promise<ShutdownHelper> {
-  let instance = await container.lookup('shutdown-helper');
-  return (instance as unknown) as ShutdownHelper;
 }
 
 export function bootServer() {
@@ -75,11 +73,12 @@ export function bootServer() {
     });
   }
 
-  process.on('warning', (warning: Error) => {
+  function onWarning(warning: Error) {
     if (warning.stack) {
       process.stderr.write(warning.stack);
     }
-  });
+  }
+  process.on('warning', onWarning);
 
   if (process.connected === false) {
     // This happens if we were started by another node process with IPC
@@ -90,10 +89,11 @@ export function bootServer() {
     log.info(`Shutting down because connected parent process has already exited.`);
     process.exit(0);
   }
-  process.on('disconnect', () => {
+  function onDisconnect() {
     log.info(`Hub shutting down because connected parent process exited.`);
     process.exit(0);
-  });
+  }
+  process.on('disconnect', onDisconnect);
 
   return runServer(startupConfig()).catch((err: Error) => {
     log.error('Server failed to start cleanly: %s', err.stack || err);
@@ -101,28 +101,37 @@ export function bootServer() {
   });
 }
 
-export function bootServerForTesting(config: StartupConfig) {
+export async function bootServerForTesting(config: Partial<StartupConfig>) {
   logger.configure({
     defaultLevel: 'warn',
   });
-  process.on('warning', (warning: Error) => {
+  function onWarning(warning: Error) {
     if (warning.stack) {
       process.stderr.write(warning.stack);
     }
-  });
+  }
+  process.on('warning', onWarning);
 
-  return runServer(config).catch((err: Error) => {
+  let server = await runServer(config).catch((err: Error) => {
     log.error('Server failed to start cleanly: %s', err.stack || err);
     process.exit(-1);
   });
+
+  function onClose() {
+    process.off('warning', onWarning);
+    server.off('close', onClose);
+  }
+  server.on('close', onClose);
+
+  return server;
 }
 
 export function bootEnvironment() {
   return wireItUp();
 }
 
-async function runServer(config: StartupConfig) {
-  let app = await makeServer(config.registryCallback);
+async function runServer(config: Partial<StartupConfig>) {
+  let app = await makeServer(config.registryCallback, config.containerCallback);
   let server = app.listen(config.port);
   log.info('server listening on %s', config.port);
   if (process.connected) {
@@ -137,12 +146,14 @@ async function runServer(config: StartupConfig) {
 interface StartupConfig {
   port: number;
   registryCallback: undefined | ((registry: Registry) => void);
+  containerCallback: undefined | ((container: Container) => void);
 }
 
 function startupConfig(): StartupConfig {
   let config: StartupConfig = {
     port: 3000,
     registryCallback: undefined,
+    containerCallback: undefined,
   };
   if (process.env.PORT) {
     config.port = parseInt(process.env.PORT, 10);
