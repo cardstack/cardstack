@@ -83,6 +83,7 @@
           <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
             @type="theme"
             @swatchImage={{themeItem.data.patternUrl}}
+            @blank={{eq themeItem.data.patternUrl null}}
             @squeezed={{themeItem.checked}}
           />
         </themeItem.component>

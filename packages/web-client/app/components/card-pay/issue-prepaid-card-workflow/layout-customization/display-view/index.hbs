@@ -31,6 +31,7 @@
       <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
         @type="theme"
         @swatchImage={{@headerTheme.patternUrl}}
+        @blank={{eq @headerTheme.patternUrl null}}
       />
     </CardPay::LabeledValue>
   </CardPay::FieldStack>
