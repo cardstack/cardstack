@@ -36,16 +36,16 @@ dataSources:
     source:
       address: "{PREPAID_CARD_MANAGER_ADDRESS}"
       abi: PrepaidCardManager
-      startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
+      startBlock: 21372398 # v0.5.6 version of protocol
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Safe
         - PrepaidCard
-        - Depot
+        - PrepaidCardCreation
         - Transaction
+        - Account
       abis:
         - name: PrepaidCardManager
           file: ./abis/PrepaidCardManager.json
@@ -60,17 +60,18 @@ dataSources:
     source:
       address: "{REVENUE_POOL_ADDRESS}"
       abi: RevenuePool
-      startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
+      startBlock: 21372398 # v0.5.6 version of protocol
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Safe
-        - PrepaidCard
-        - MerchantSafe
         - Transaction
         - PrepaidCardPayment
+        - MerchantFeePayment
+        - Account
+        - MerchantSafe
+        - MerchantCreation
       abis:
         - name: RevenuePool
           file: ./abis/RevenuePool.json
@@ -89,14 +90,14 @@ dataSources:
     source:
       address: "{SPEND_ADDRESS}"
       abi: Spend
-      startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
+      startBlock: 21372398 # v0.5.6 version of protocol
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - SpendAccumulation
         - Transaction
+        - SpendAccumulation
       abis:
         - name: Spend
           file: ./abis/Spend.json
@@ -111,7 +112,7 @@ dataSources:
     source:
       address: "{BRIDGE_UTILS_ADDRESS}"
       abi: BridgeUtils
-      startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
+      startBlock: 21372398 # v0.5.6 version of protocol
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -136,15 +137,17 @@ dataSources:
     source:
       address: "{HOME_TOKEN_BRIDGE_ADDRESS}"
       abi: HomeMultiAMBErc20ToErc677
-      startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
+      startBlock: 21372398 # v0.5.6 version of protocol
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Safe
+        - Account
         - Depot
         - Transaction
+        - SupplierInfoDIDUpdate
+        - BridgeEvent
       abis:
         - name: HomeMultiAMBErc20ToErc677
           file: ./abis/HomeMultiAMBErc20ToErc677.json
@@ -160,14 +163,15 @@ dataSources:
     source:
       address: "0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B"
       abi: GnosisProxyFactory
-      startBlock: 20030732 # this is the block when gnosis safes were first added to sokol. we'll need to look this up for xDai
+      startBlock: 21372398 # v0.5.6 version of protocol
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
         - Safe
-        - Transaction
+        - Account
+        - SafeOwner
       abis:
         - name: GnosisProxyFactory
           file: ./abis/GnosisProxyFactory.json
