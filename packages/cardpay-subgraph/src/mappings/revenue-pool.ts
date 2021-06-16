@@ -1,4 +1,5 @@
 import { BigInt } from '@graphprotocol/graph-ts';
+import { ADDRESS_ZERO } from '@protofire/subgraph-toolkit';
 import {
   MerchantCreation as MerchantCreationEvent,
   CustomerPayment as MerchantPaymentEvent,
@@ -9,7 +10,7 @@ import {
   MerchantSafe,
   MerchantCreation,
   MerchantFeePayment,
-  MerchantPayment,
+  PrepaidCardPayment,
   PrepaidCard,
 } from '../../generated/schema';
 import { assertTransactionExists, toChecksumAddress } from '../utils';
@@ -36,11 +37,14 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
     );
     return;
   }
-  let entity = new MerchantPayment(event.transaction.hash.toHex()); // There will only ever be one merchant payment event per txn
+  let merchantSafe = toChecksumAddress(event.params.merchantSafe);
+  let entity = new PrepaidCardPayment(event.transaction.hash.toHex()); // There will only ever be one merchant payment event per txn
   entity.transaction = txnHash;
   entity.timestamp = event.block.timestamp;
   entity.prepaidCard = prepaidCard;
-  entity.merchantSafe = toChecksumAddress(event.params.merchantSafe);
+  if (merchantSafe != ADDRESS_ZERO) {
+    entity.merchantSafe = merchantSafe;
+  }
   entity.issuingToken = toChecksumAddress(event.params.issuingToken);
   entity.issuingTokenAmount = event.params.issuingTokenAmount;
   entity.spendAmount = event.params.spendAmount;

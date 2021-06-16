@@ -32,7 +32,7 @@ type PrepaidCard @entity {
   spendBalance: BigInt!
   issuingTokenBalance: BigInt!
   creation: PrepaidCardCreation                    @derivedFrom(field: "prepaidCard")
-  merchantPayments: [MerchantPayment]!             @derivedFrom(field: "prepaidCard")
+  payments: [PrepaidCardPayment]!                  @derivedFrom(field: "prepaidCard")
 }
 
 type MerchantSafe @entity {
@@ -43,7 +43,7 @@ type MerchantSafe @entity {
   infoDid: String
   creation: MerchantCreation                       @derivedFrom(field: "merchantSafe")
   spendAccumulations: [SpendAccumulation]!         @derivedFrom(field: "merchantSafe")
-  payments: [MerchantPayment]!                     @derivedFrom(field: "merchantSafe")
+  receivedPayments: [PrepaidCardPayment]!          @derivedFrom(field: "merchantSafe")
   merchantFees: [MerchantFeePayment]!              @derivedFrom(field: "merchantSafe")
 }
 
@@ -65,12 +65,12 @@ type SupplierInfoDIDUpdate @entity {
   supplier: Account!
 }
 
-type MerchantPayment @entity {
+type PrepaidCardPayment @entity {
   id: ID!
   timestamp: BigInt!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
-  merchantSafe: MerchantSafe!
+  merchantSafe: MerchantSafe   # for merchant registration this will not be set
   issuingToken: String!
   issuingTokenAmount: BigInt!
   spendAmount: BigInt!
@@ -166,7 +166,7 @@ type Transaction @entity {
   prepaidCardTransfers: [PrepaidCardTransfer]!     @derivedFrom(field: "transaction")
   tokenTransfers: [TokenTransfer]!                 @derivedFrom(field: "transaction")
   merchantCreations: [MerchantCreation]!           @derivedFrom(field: "transaction")
-  merchantPayments: [MerchantPayment]!             @derivedFrom(field: "transaction")
+  prepaidCardPayments: [PrepaidCardPayment]!       @derivedFrom(field: "transaction")
   spendAccumulations: [SpendAccumulation]!         @derivedFrom(field: "transaction")
   merchantFeePayments: [MerchantFeePayment]!       @derivedFrom(field: "transaction")
 

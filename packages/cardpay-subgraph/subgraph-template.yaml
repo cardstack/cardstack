@@ -70,7 +70,7 @@ dataSources:
         - PrepaidCard
         - MerchantSafe
         - Transaction
-        - MerchantPayment
+        - PrepaidCardPayment
       abis:
         - name: RevenuePool
           file: ./abis/RevenuePool.json
