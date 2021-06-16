@@ -57,7 +57,7 @@
 
         // Kovan DAI Bridge args
         "bridge",
-        "10",
+        "30",
         "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", // Kovan DAI
         "--network", "kovan",
         // Hassan's testing mnemonic feel free to use your own
@@ -127,7 +127,7 @@
         "0xeAA4965f22D66aAd04FAC81212155442F3e5326a", // Hassan's depot safe feel free to use your own
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49",
-        "500",
+        "100",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"

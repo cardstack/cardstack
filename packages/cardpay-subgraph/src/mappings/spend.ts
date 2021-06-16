@@ -1,6 +1,7 @@
 import { Mint as MintEvent } from '../../generated/Spend/Spend';
 import { SpendAccumulation, MerchantSafe } from '../../generated/schema';
 import { assertTransactionExists, toChecksumAddress } from '../utils';
+import { log } from '@graphprotocol/graph-ts';
 
 export function handleMint(event: MintEvent): void {
   assertTransactionExists(event);
@@ -13,12 +14,9 @@ export function handleMint(event: MintEvent): void {
     merchantSafeEntity.spendBalance = merchantSafeEntity.spendBalance + event.params.amount;
     merchantSafeEntity.save();
   } else {
-    assert(
-      false,
-      'Error while processing spend minting txn ' +
-        txnHash +
-        ', MerchantSafe entity does not exist for address ' +
-        merchantSafe
+    log.warning(
+      'Cannot process spend minting txn {}: MerchantSafe entity does not exist for safe address {}. This is likely due to the subgraph having a startBlock that is higher than the block the merchant safe was created in.',
+      [txnHash, merchantSafe]
     );
     return;
   }
