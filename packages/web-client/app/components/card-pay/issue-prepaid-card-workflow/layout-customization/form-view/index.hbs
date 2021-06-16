@@ -55,6 +55,7 @@
           <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
             @type="background"
             @swatchBackground={{backgroundItem.data.headerBackground}}
+            @blank={{eq backgroundItem.data.headerBackground 'transparent'}}
             @squeezed={{backgroundItem.checked}}
           />
         </backgroundItem.component>
@@ -83,6 +84,7 @@
           <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
             @type="theme"
             @swatchImage={{themeItem.data.patternUrl}}
+            @blank={{eq themeItem.data.patternUrl "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="}}
             @squeezed={{themeItem.checked}}
           />
         </themeItem.component>

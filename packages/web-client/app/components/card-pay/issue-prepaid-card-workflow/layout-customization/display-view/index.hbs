@@ -25,12 +25,14 @@
       <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
         @type="background"
         @swatchBackground={{@headerBackground.headerBackground}}
+        @blank={{eq @headerBackground.headerBackground "transparent"}}
       />
     </CardPay::LabeledValue>
     <CardPay::LabeledValue @vertical={{true}} @label="Theme">
       <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
         @type="theme"
         @swatchImage={{@headerTheme.patternUrl}}
+        @blank={{eq @headerTheme.patternUrl "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="}}
       />
     </CardPay::LabeledValue>
   </CardPay::FieldStack>
