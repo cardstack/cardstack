@@ -79,16 +79,13 @@
   letter-spacing: 0.01em;
 }
 
-.prepaid-card__balance {
-  font-weight: 700;
-}
-
 .prepaid-card__balance--mock {
   opacity: 0.1;
 }
 
-.prepaid-card__balance span {
+.prepaid-card__balance {
   margin-right: 4px;
+  font-weight: 700;
   font-size: 2.5rem; /* 40px */
   line-height: calc(55 / 40);
   overflow-wrap: break-word;
