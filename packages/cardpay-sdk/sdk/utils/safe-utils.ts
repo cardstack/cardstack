@@ -21,7 +21,7 @@ export interface Estimate {
   gasToken: string;
   refundReceiver: string;
 }
-export interface PayMerchantPayload extends Estimate {
+export interface SendPayload extends Estimate {
   data: any;
 }
 
@@ -60,12 +60,6 @@ export interface GnosisExecTx extends RelayTransaction {
   txHash: string;
   transactionHash: string;
 }
-export interface PayMerchantTx extends RelayTransaction {
-  merchantAddress: string;
-  payment: number; // this is not safe to use! Need to fix in relay server
-  prepaidCardTxHash: string; // this is a hash of the txn data--not to be confused with the overall txn hash
-  tokenAddress: string;
-}
 
 export async function gasEstimate(
   web3: Web3,
@@ -98,28 +92,26 @@ export async function gasEstimate(
   return await response.json();
 }
 
-export async function getPayMerchantPayload(
+export async function getSendPayload(
   web3: Web3,
   prepaidCardAddress: string,
-  merchantSafe: string,
-  tokenAddress: string,
   spendAmount: number,
   rate: string,
-  infoDID = ''
-): Promise<PayMerchantPayload> {
+  action: string,
+  data: string
+): Promise<SendPayload> {
   let relayServiceURL = await getConstant('relayServiceURL', web3);
-  let url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/pay-for-merchant/get-params/`;
+  let url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/send/get-params/`;
   let options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
     },
     body: JSON.stringify({
-      tokenAddress,
-      merchantAddress: merchantSafe,
       payment: spendAmount,
       rate,
-      infoDid: infoDID,
+      action,
+      data,
     }),
   };
   let response = await fetch(url, options);
@@ -173,19 +165,18 @@ export async function executeTransaction(
   return response.json();
 }
 
-export async function executePayMerchant(
+export async function executeSend(
   web3: Web3,
   prepaidCardAddress: string,
-  tokenAddress: string,
-  merchantSafe: string,
   spendAmount: number,
   rate: string,
+  action: string,
+  data: string,
   signatures: Signature[],
-  nonce: string,
-  infoDID = ''
-): Promise<PayMerchantTx> {
+  nonce: string
+): Promise<GnosisExecTx> {
   let relayServiceURL = await getConstant('relayServiceURL', web3);
-  const url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/pay-for-merchant/`;
+  const url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/send/`;
   const options = {
     method: 'POST',
     headers: {
@@ -193,11 +184,10 @@ export async function executePayMerchant(
     },
     body: JSON.stringify({
       nonce,
-      tokenAddress,
-      merchantAddress: merchantSafe,
       payment: spendAmount,
       rate,
-      infoDid: infoDID,
+      action,
+      data,
       signatures,
     }),
   };

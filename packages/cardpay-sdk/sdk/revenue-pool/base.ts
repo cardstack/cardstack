@@ -1,28 +1,22 @@
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
-import RevenuePoolABI from '../../contracts/abi/v0.5.4/revenue-pool';
+import RevenuePoolABI from '../../contracts/abi/v0.5.5/revenue-pool';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { getAddress } from '../../contracts/addresses';
-import { ZERO_ADDRESS } from '../constants';
 import {
   EventABI,
-  RelayTransaction,
-  getPayMerchantPayload,
   getParamsFromEvent,
-  executePayMerchant,
+  SendPayload,
+  getSendPayload,
+  executeSend,
+  GnosisExecTx,
 } from '../utils/safe-utils';
 import { waitUntilTransactionMined } from '../utils/general-utils';
-import { sign } from '../utils/signing-utils';
+import { sign, Signature } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 
 const { toBN, fromWei } = Web3.utils;
-
-interface RegisterMerchantTx extends RelayTransaction {
-  payment: number; // this is not safe to use! Need to fix in relay server
-  prepaidCardTxHash: string; // this is a hash of the txn data--not to be confused with the overall txn hash
-  tokenAddress: string;
-}
 
 interface RevenueTokenBalance {
   tokenSymbol: string;
@@ -76,11 +70,12 @@ export default class RevenuePool {
     prepaidCardAddress: string,
     infoDID?: string,
     options?: ContractOptions
-  ): Promise<{ merchantSafe: string; gnosisTxn: RegisterMerchantTx } | undefined> {
+  ): Promise<{ merchantSafe: string; gnosisTxn: GnosisExecTx } | undefined> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let prepaidCard = await getSDK('PrepaidCard', this.layer2Web3);
     let issuingToken = await prepaidCard.issuingToken(prepaidCardAddress);
     let registrationFee = await this.merchantRegistrationFee();
+    infoDID = infoDID ?? '';
     await prepaidCard.convertFromSpendForPrepaidCard(
       prepaidCardAddress,
       registrationFee,
@@ -96,15 +91,7 @@ export default class RevenuePool {
     do {
       let rateLock = await this.currentTokenUSDRate(issuingToken);
       try {
-        let payload = await getPayMerchantPayload(
-          this.layer2Web3,
-          prepaidCardAddress,
-          ZERO_ADDRESS,
-          issuingToken,
-          registrationFee,
-          rateLock,
-          infoDID
-        );
+        let payload = await this.getRegisterMerchantPayload(prepaidCardAddress, registrationFee, rateLock, infoDID);
         if (payload.lastUsedNonce == null) {
           payload.lastUsedNonce = -1;
         }
@@ -123,16 +110,13 @@ export default class RevenuePool {
           from,
           prepaidCardAddress
         );
-        let gnosisTxn = await executePayMerchant(
-          this.layer2Web3,
+        let gnosisTxn = await this.executeRegisterMerchant(
           prepaidCardAddress,
-          issuingToken,
-          ZERO_ADDRESS,
           registrationFee,
           rateLock,
+          infoDID,
           signature,
-          toBN(payload.lastUsedNonce + 1).toString(),
-          infoDID
+          toBN(payload.lastUsedNonce + 1).toString()
         );
         let merchantSafe = await this.getMerchantSafeFromTxn(gnosisTxn.ethereumTx.txHash);
         return { merchantSafe, gnosisTxn };
@@ -164,6 +148,42 @@ export default class RevenuePool {
     let txnReceipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
     return getParamsFromEvent(this.layer2Web3, txnReceipt, this.createMerchantEventABI(), revenuePoolAddress)[0]
       ?.merchantSafe;
+  }
+
+  private async getRegisterMerchantPayload(
+    prepaidCardAddress: string,
+    spendAmount: number,
+    rate: string,
+    infoDID: string
+  ): Promise<SendPayload> {
+    return getSendPayload(
+      this.layer2Web3,
+      prepaidCardAddress,
+      spendAmount,
+      rate,
+      'registerMerchant',
+      this.layer2Web3.eth.abi.encodeParameters(['string'], [infoDID])
+    );
+  }
+
+  private async executeRegisterMerchant(
+    prepaidCardAddress: string,
+    spendAmount: number,
+    rate: string,
+    infoDID: string,
+    signatures: Signature[],
+    nonce: string
+  ): Promise<GnosisExecTx> {
+    return await executeSend(
+      this.layer2Web3,
+      prepaidCardAddress,
+      spendAmount,
+      rate,
+      'registerMerchant',
+      this.layer2Web3.eth.abi.encodeParameters(['string'], [infoDID]),
+      signatures,
+      nonce
+    );
   }
 
   private createMerchantEventABI(): EventABI {
