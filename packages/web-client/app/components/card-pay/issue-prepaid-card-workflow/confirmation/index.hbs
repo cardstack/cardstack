@@ -10,8 +10,10 @@
     <div class="issue-prepaid-card-workflow-confirmation__card-container">
       <CardPay::PrepaidCard
         @issuerName={{@workflowSession.state.issuerName}}
-        @headerBackground={{@workflowSession.state.headerBackground.id}}
-        @headerTheme={{@workflowSession.state.headerTheme.id}}
+        @headerBackground={{@workflowSession.state.headerBackground.headerBackground}}
+        @headerTheme={{@workflowSession.state.headerTheme.patternUrl}}
+        @headerTextColor={{@workflowSession.state.headerBackground.textColor}}
+        @headerPatternColor={{@workflowSession.state.headerBackground.patternColor}}
         @mockBalance={{true}}
         @balance="123,456"
         @usdBalance="123,456"
