@@ -89,11 +89,3 @@
   border: 1px solid var(--boxel-light-400);
   border-radius: var(--boxel-border-radius);
 }
-
-.transaction-amount__usd-balance {
-  margin-top: var(--boxel-sp-xxxs);
-  margin-left: var(--boxel-sp-xxl);
-  color: var(--boxel-purple-500);
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-xs);
-}

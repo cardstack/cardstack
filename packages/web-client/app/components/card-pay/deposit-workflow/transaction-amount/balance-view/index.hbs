@@ -5,7 +5,8 @@
         class="balance-view__summary-content"
         @size="small"
         @title={{concat @wallet " wallet"}}
-        @text={{concat @balance " " @tokenSymbol}}
+        @balance={{@balance}}
+        @symbol={{@tokenSymbol}}
         data-test-source-token={{@tokenSymbol}}
       />
     {{else}}
@@ -30,8 +31,9 @@
       <CardPay::AccountDisplay
         @size="large"
         @icon={{@tokenIcon}}
-        @title={{concat @balance " " @tokenSymbol}}
-        @text={{if @balanceInUsd (concat "$ " @balanceInUsd " USD")}}
+        @balance={{@balance}}
+        @symbol={{@tokenSymbol}}
+        @usdBalance={{@balanceInUsd}}
       />
     </:inner>
   </CardPay::NestedItems>

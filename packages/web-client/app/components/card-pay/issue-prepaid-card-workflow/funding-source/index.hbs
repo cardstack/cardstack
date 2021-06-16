@@ -49,7 +49,8 @@
               <CardPay::AccountDisplay
                 @size="large"
                 @icon={{this.selectedToken.icon}}
-                @title={{concat (format-token-amount this.selectedToken.balance) " " this.selectedToken.symbol}}
+                @balance={{format-token-amount this.selectedToken.balance}}
+                @symbol={{this.selectedToken.symbol}}
                 data-test-funding-source-token
               />
             {{else}}
@@ -68,7 +69,8 @@
                     @size="small"
                     @icon={{token.icon}}
                     @title={{token.symbol}}
-                    @text={{concat (format-token-amount token.balance) " " token.symbol}}
+                    @balance={{format-token-amount token.balance}}
+                    @symbol={{token.symbol}}
                     data-test-funding-source-token-option={{token.symbol}}
                   />
                 </PowerSelect>

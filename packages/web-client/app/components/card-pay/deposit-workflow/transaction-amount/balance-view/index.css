@@ -1,7 +1,7 @@
 /* details - summary container styles */
 .balance-view {
   --details-summary-height: 3.125rem; /* 50px */
-  --details-open-height: 10rem;       /* 160px */
+  --details-open-height: 11rem;
 
   position: relative;
   border: 1px solid var(--boxel-light-400);
@@ -22,7 +22,7 @@
   display: flex;
   align-items: center;
   height: var(--details-summary-height);
-  padding: var(--boxel-sp-xxs) calc(var(--boxel-sp) + 3rem) var(--boxel-sp-xxs) var(--boxel-sp);
+  padding: 0 calc(var(--boxel-sp) + 3rem) 0 var(--boxel-sp);
   font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);
 }
@@ -39,7 +39,7 @@
 }
 
 .balance-view[open] .balance-view__summary {
-  height: var(--boxel-sp);
+  height: var(--boxel-sp-xl);
   padding-top: 0;
   padding-bottom: 0;
 }
@@ -50,8 +50,7 @@
 }
 
 .balance-view__details {
-  padding: 0 var(--boxel-sp);
-  margin-bottom: var(--boxel-sp-lg);
+  padding: 0 var(--boxel-sp-lg);
 }
 
 .balance-view[open] .balance-view__summary-content {

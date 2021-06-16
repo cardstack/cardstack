@@ -19,8 +19,9 @@
               <CardPay::AccountDisplay
                 @size="large"
                 @icon={{this.selectedToken.icon}}
-                @title={{concat (format-token-amount this.selectedTokenBalance) " " this.selectedToken.symbol}}
-                @text={{concat "$ " (token-to-usd this.selectedToken.symbol this.selectedTokenBalance) " USD"}}
+                @balance={{format-token-amount this.selectedTokenBalance}}
+                @symbol={{this.selectedToken.symbol}}
+                @usdBalance={{token-to-usd this.selectedToken.symbol this.selectedTokenBalance}}
                 data-test-deposit-transaction-setup-from-balance={{this.selectedToken.symbol}}
               />
             </:inner>
@@ -69,7 +70,7 @@
               @size={{if @isComplete "large"}}
               @icon="depot"
               @title="DEPOT:"
-              @address={{if this.layer2Network.depotSafe this.layer2Network.depotSafe.address}}
+              @address={{if this.layer2Network.isFetchingDepot "isLoading" this.layer2Network.depotSafe.address}}
               @text={{unless this.layer2Network.depotSafe "New Depot"}}
               data-test-deposit-transaction-setup-depot-address
             />
@@ -84,9 +85,7 @@
     data-test-deposit-transaction-setup
   >
     <:default as |d|>
-      <d.ActionButton
-        {{on "click" this.toggleComplete}}
-      >
+      <d.ActionButton {{on "click" this.toggleComplete}}>
         Continue
       </d.ActionButton>
     </:default>

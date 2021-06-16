@@ -1,66 +1,52 @@
-<div class="account-display" ...attributes>
-  {{#if (eq @size "small")}}
+{{#let (eq @size "small") (eq @size "large") as |isSmall isLarge|}}
+  <div class="account-display" ...attributes>
     {{#if @icon}}
-      {{svg-jar @icon class="account-display__icon-sm" role="presentation"}}
+      {{svg-jar @icon class=(if isSmall "account-display__icon-sm" "account-display__icon") role="presentation"}}
     {{/if}}
     <div>
-      <div class="account-display__title-sm" data-test-account-title>{{@title}}</div>
-      {{#if (or @address @text)}}
-        <div class={{cn "account-display__text-sm" account-display__address=@address}}
-          data-test-account-address={{@address}}
-          data-test-account-text={{@text}}
+      {{#if @label}}
+        <div class="account-display__text-sm">{{@label}}</div>
+      {{/if}}
+      {{#if @title}}
+        <div class={{cn
+          account-display__title=(not (or isSmall isLarge))
+          account-display__title-sm=isSmall
+          account-display__title-lg=isLarge
+        }} data-test-account-title>
+          {{@title}}
+        </div>
+      {{/if}}
+      {{#if @address}}
+        <div class={{cn
+          "account-display__text"
+          account-display__text-sm=isSmall
+          account-display__address=@address
+          account-display__address-wrapped=(and @address isLarge)
+        }}
+          data-test-account-address
         >
-          {{#if @address}}
-            {{@address}}
-          {{else if @text}}
-            {{@text}}
-          {{else}}
+          {{#if (eq @address "isLoading")}}
             <Boxel::LoadingIndicator />
+          {{else}}
+            {{@address}}
           {{/if}}
         </div>
       {{/if}}
-    </div>
-  {{else if (eq @size "large")}}
-    {{#if @icon}}
-      {{svg-jar @icon class="account-display__icon" role="presentation"}}
-    {{/if}}
-    <div>
-      <div class="account-display__title-lg" data-test-account-title>{{@title}}</div>
-      {{#if (or @address @text)}}
-        <div class={{cn "account-display__text" account-display__text-sm=@text account-display__address-wrapped=@address}}
-          data-test-account-address={{@address}}
-          data-test-account-text={{@text}}
-        >
-          {{#if @address}}
-            {{@address}}
-          {{else if @text}}
-            {{@text}}
-          {{else}}
-            <Boxel::LoadingIndicator />
-          {{/if}}
+      {{#if @balance}}
+        <div class={{if isLarge "account-display__title-lg" "account-display__text-sm"}} data-test-account-balance>
+          {{@balance}} {{@symbol}}
+        </div>
+      {{/if}}
+      {{#if @usdBalance}}
+        <div class="account-display__text-sm" data-test-account-usd-balance>
+          ${{@usdBalance}} USD
+        </div>
+      {{/if}}
+      {{#if @text}}
+        <div class="account-display__text-sm" data-test-account-text>
+          {{@text}}
         </div>
       {{/if}}
     </div>
-  {{else}}
-    {{#if @icon}}
-      {{svg-jar @icon class="account-display__icon" role="presentation"}}
-    {{/if}}
-    <div>
-      <div class="account-display__title" data-test-account-title>{{@title}}</div>
-      {{#if (or @address @text)}}
-        <div class={{cn "account-display__text" account-display__address=@address}}
-          data-test-account-address={{@address}}
-          data-test-account-text={{@text}}
-        >
-          {{#if @address}}
-            {{@address}}
-          {{else if @text}}
-            {{@text}}
-          {{else}}
-            <Boxel::LoadingIndicator />
-          {{/if}}
-        </div>
-      {{/if}}
-    </div>
-  {{/if}}
-</div>
+  </div>
+{{/let}}
