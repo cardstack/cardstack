@@ -104,7 +104,7 @@ type MerchantRevenueEvent @entity {
   historicLifetimeAccumulation: BigInt!
   historicUnclaimedBalance: BigInt!
   merchantRevenue: MerchantRevenue!
-  merchantPayment: MerchantPayment
+  prepaidCardPayment: PrepaidCardPayment
   merchantClaim: MerchantClaim
 }
 

@@ -61,8 +61,8 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
   paymentEntity.issuingToken = issuingToken;
   paymentEntity.issuingTokenAmount = event.params.issuingTokenAmount;
   paymentEntity.spendAmount = event.params.spendAmount;
-  paymentEntity.historicIssuingTokenBalance = prepaidCardEntity.issuingTokenBalance;
-  paymentEntity.historicSpendBalance = prepaidCardEntity.spendBalance;
+  paymentEntity.historicPrepaidCardIssuingTokenBalance = prepaidCardEntity.issuingTokenBalance;
+  paymentEntity.historicPrepaidCardSpendBalance = prepaidCardEntity.spendBalance;
   paymentEntity.save();
 
   let revenueEventEntity = new MerchantRevenueEvent(txnHash);
@@ -71,7 +71,7 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
   revenueEventEntity.merchantRevenue = merchantSafe + '-' + issuingToken;
   revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
   revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;
-  revenueEventEntity.merchantPayment = txnHash;
+  revenueEventEntity.prepaidCardPayment = txnHash;
   revenueEventEntity.save();
 }
 
