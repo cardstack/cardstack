@@ -14,18 +14,20 @@ const config = require('config');
 //@ts-ignore not actually a duplicate function definition
 async function run() {
   const dbConfig = config.get('db');
+  let dbUrl = dbConfig.url as string;
+  let dbName = dbUrl.split('/').reverse()[0];
   try {
-    console.log('Dropping hub_test db...');
-    let result = await exec(`dropdb hub_test`);
+    console.log(`Dropping ${dbName} db...`);
+    let result = await exec(`dropdb ${dbName}`);
     console.log(result);
   } catch (e) {
     // ok if this fails
   }
-  console.log('Creating new hub_test db...');
-  let result = await exec(`createdb hub_test`);
+  console.log(`Creating new ${dbName} db...`);
+  let result = await exec(`createdb ${dbName}`);
   console.log(result);
 
-  console.log('Loading structure.sql into new hub_test db...');
+  console.log(`Loading structure.sql into new ${dbName} db...`);
   result = await exec(`psql ${dbConfig.url} < config/structure.sql`);
   console.log(result);
 }
