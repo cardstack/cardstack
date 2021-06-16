@@ -1,10 +1,22 @@
 import Service from '@ember/service';
-import { tracked } from '@glimmer/tracking';
 import config from '../config/environment';
-import {
-  ColorCustomizationOption,
-  PatternCustomizationOption,
-} from '../utils/web3-strategies/types';
+import { all, task } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
+import { tracked } from '@glimmer/tracking';
+
+export interface ColorCustomizationOption {
+  headerBackground: string;
+  textColor: string;
+  patternColor: string;
+  id: string;
+  description?: string;
+}
+
+export interface PatternCustomizationOption {
+  patternUrl: string | null;
+  id: string;
+  description?: string;
+}
 
 interface ColorCustomizationResponseObject {
   attributes: {
@@ -24,6 +36,7 @@ interface PatternCustomizationResponseObject {
   id: string;
 }
 
+// TODO: move this to orbit.js/ember-data
 let convertToColorCustomizationOption = (
   o: ColorCustomizationResponseObject
 ): ColorCustomizationOption => {
@@ -48,38 +61,83 @@ let convertToPatternCustomizationOption = (
 
 export default class CardCustomizationOptions extends Service {
   @tracked loaded = false;
-  @tracked patternOptions: PatternCustomizationOption[] | null = null;
-  @tracked colorOptions: ColorCustomizationOption[] | null = null;
+  @tracked patternOptions: PatternCustomizationOption[] | null = [];
+  @tracked colorOptions: ColorCustomizationOption[] | null = [];
 
-  constructor(props: any) {
-    super(props);
-    this.fetchCustomizationOptions();
+  async ensureCustomizationOptionsLoaded() {
+    if (!this.loaded) {
+      return taskFor(this.fetchCustomizationOptions).perform();
+    }
   }
 
-  async fetchCustomizationOptions() {
-    let [_colorOptions, _patternOptions] = await Promise.all([
-      fetch(`${config.hubURL}/api/prepaid-card-color-schemes`, {
+  @task *fetchPatternOptions(): any {
+    let response = yield fetch(`${config.hubURL}/api/prepaid-card-patterns`, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/vnd.api+json',
+      },
+    });
+    let _patternOptions = yield response.json();
+    return _patternOptions.data.map(convertToPatternCustomizationOption);
+  }
+
+  @task *fetchColorOptions(): any {
+    let response = yield fetch(
+      `${config.hubURL}/api/prepaid-card-color-schemes`,
+      {
         method: 'GET',
         headers: {
           Accept: 'application/vnd.api+json',
         },
-      })
-        .then((v) => v.json())
-        .then((v) => v.data.map(convertToColorCustomizationOption)),
+      }
+    );
+    let _colorOptions = yield response.json();
+    return _colorOptions.data.map(convertToColorCustomizationOption);
+  }
 
-      fetch(`${config.hubURL}/api/prepaid-card-patterns`, {
-        method: 'GET',
-        headers: {
-          Accept: 'application/vnd.api+json',
-        },
-      })
-        .then((v) => v.json())
-        .then((v) => v.data.map(convertToPatternCustomizationOption)),
-    ]);
+  groupColors(colorOptions: ColorCustomizationOption[]) {
+    let gradientOptions = [];
+    let nonGradientOptions = [];
+    for (let option of colorOptions as ColorCustomizationOption[]) {
+      if (option.headerBackground.includes('linear-gradient')) {
+        gradientOptions.push(option);
+      } else {
+        nonGradientOptions.push(option);
+      }
+    }
+    return [...nonGradientOptions, ...gradientOptions];
+  }
 
-    this.patternOptions = _patternOptions;
-    this.colorOptions = _colorOptions;
-    this.loaded = true;
+  placeBlankPatternFirst(patternOptions: PatternCustomizationOption[]) {
+    let blankIndex = patternOptions.findIndex(
+      (a: PatternCustomizationOption) => !a.patternUrl
+    );
+    if (blankIndex !== -1) {
+      let blank = patternOptions.splice(blankIndex, 1)[0];
+      return [blank, ...patternOptions];
+    } else {
+      return patternOptions;
+    }
+  }
+
+  @task({ drop: true })
+  *fetchCustomizationOptions(): any {
+    try {
+      let [_colorOptions, _patternOptions] = yield all([
+        taskFor(this.fetchColorOptions).perform(),
+        taskFor(this.fetchPatternOptions).perform(),
+      ]);
+
+      this.colorOptions = this.groupColors(_colorOptions);
+      this.patternOptions = this.placeBlankPatternFirst(_patternOptions);
+      this.loaded = true;
+    } catch (e) {
+      console.error('Failed to fetch prepaid card customization options');
+      console.error(e);
+      this.patternOptions = [];
+      this.colorOptions = [];
+      this.loaded = false;
+    }
   }
 }
 

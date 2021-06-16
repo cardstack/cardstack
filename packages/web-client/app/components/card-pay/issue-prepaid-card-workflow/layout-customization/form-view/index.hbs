@@ -5,8 +5,10 @@
     >
       <CardPay::PrepaidCard
         @issuerName={{@issuerName}}
-        @headerBackground={{@headerBackground.id}}
-        @headerTheme={{@headerTheme.id}}
+        @headerBackground={{@headerBackground.headerBackground}}
+        @headerTheme={{@headerTheme.patternUrl}}
+        @headerTextColor={{@headerBackground.textColor}}
+        @headerPatternColor={{@headerBackground.patternColor}}
         @mockBalance={{true}}
         @balance="123,456"
         @usdBalance="123,456"
@@ -52,8 +54,7 @@
         >
           <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
             @type="background"
-            @swatchBackground={{backgroundItem.data.background}}
-            @swatchImage={{backgroundItem.data.image}}
+            @swatchBackground={{backgroundItem.data.headerBackground}}
             @squeezed={{backgroundItem.checked}}
           />
         </backgroundItem.component>
@@ -81,8 +82,7 @@
           {{!-- rerenders appear to cause flashes if we use a background image --}}
           <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
             @type="theme"
-            @swatchBackground={{themeItem.data.background}}
-            @swatchImage={{themeItem.data.image}}
+            @swatchImage={{themeItem.data.patternUrl}}
             @squeezed={{themeItem.checked}}
           />
         </themeItem.component>
