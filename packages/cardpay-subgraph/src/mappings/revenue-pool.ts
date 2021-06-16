@@ -18,6 +18,7 @@ import {
   MerchantRevenueEvent,
 } from '../../generated/schema';
 import { assertTransactionExists, toChecksumAddress } from '../utils';
+import { log } from '@graphprotocol/graph-ts';
 
 export function handleMerchantPayment(event: MerchantPaymentEvent): void {
   assertTransactionExists(event);
@@ -41,12 +42,9 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
     prepaidCardEntity.issuingTokenBalance = prepaidCardEntity.issuingTokenBalance - event.params.issuingTokenAmount;
     prepaidCardEntity.save();
   } else {
-    assert(
-      false,
-      'Error while processing merchant payment txn ' +
-        txnHash +
-        ', PrepaidCard entity does not exist for prepaid card ' +
-        prepaidCard
+    log.warning(
+      'Cannot process merchant payment txn {}: PrepaidCard entity does not exist for prepaid card {}. This is likely due to the subgraph having a startBlock that is higher than the block the prepaid card was created in.',
+      [txnHash, prepaidCard]
     );
     return;
   }
