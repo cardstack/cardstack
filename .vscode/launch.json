@@ -175,7 +175,7 @@
       "env": {},
       "args": [
         "revenue-balances",
-        "0xD816073771BEb353C527A980a0FF2d768DC4491C", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "0x7106c2DBBB28f0cBC314f7817428839802bFC0d7", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
