@@ -5,7 +5,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.5.4/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.5.5/prepaid-card-manager';
 import { getAddress } from '../../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
@@ -14,15 +14,15 @@ import { ERC20ABI } from '../../index';
 import {
   EventABI,
   getParamsFromEvent,
-  getPayMerchantPayload,
   GnosisExecTx,
-  PayMerchantTx,
   gasEstimate,
   executeTransaction,
-  executePayMerchant,
+  SendPayload,
+  getSendPayload,
+  executeSend,
 } from '../utils/safe-utils';
 import { waitUntilTransactionMined } from '../utils/general-utils';
-import { sign } from '../utils/signing-utils';
+import { sign, Signature } from '../utils/signing-utils';
 
 const { toBN, fromWei } = Web3.utils;
 
@@ -49,7 +49,7 @@ export default class PrepaidCard {
     prepaidCardAddress: string,
     spendAmount: number,
     options?: ContractOptions
-  ): Promise<PayMerchantTx | undefined> {
+  ): Promise<GnosisExecTx | undefined> {
     if (spendAmount < 50) {
       // this is hard coded in the PrepaidCardManager contract
       throw new Error(`The amount to pay merchant §${spendAmount} SPEND is below the minimum allowable amount`);
@@ -72,14 +72,7 @@ export default class PrepaidCard {
       let revenuePool = await getSDK('RevenuePool', this.layer2Web3);
       let rateLock = await revenuePool.currentTokenUSDRate(issuingToken);
       try {
-        let payload = await getPayMerchantPayload(
-          this.layer2Web3,
-          prepaidCardAddress,
-          merchantSafe,
-          issuingToken,
-          spendAmount,
-          rateLock
-        );
+        let payload = await this.getPayMerchantPayload(prepaidCardAddress, merchantSafe, spendAmount, rateLock);
         if (payload.lastUsedNonce == null) {
           payload.lastUsedNonce = -1;
         }
@@ -98,10 +91,8 @@ export default class PrepaidCard {
           from,
           prepaidCardAddress
         );
-        return await executePayMerchant(
-          this.layer2Web3,
+        return await this.executePayMerchant(
           prepaidCardAddress,
-          issuingToken,
           merchantSafe,
           spendAmount,
           rateLock,
@@ -270,6 +261,42 @@ export default class PrepaidCard {
     let txnReceipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
     return getParamsFromEvent(this.layer2Web3, txnReceipt, this.createPrepaidCardEventABI(), prepaidCardMgrAddress).map(
       (createCardLog) => createCardLog.card
+    );
+  }
+
+  private async getPayMerchantPayload(
+    prepaidCardAddress: string,
+    merchantSafe: string,
+    spendAmount: number,
+    rate: string
+  ): Promise<SendPayload> {
+    return getSendPayload(
+      this.layer2Web3,
+      prepaidCardAddress,
+      spendAmount,
+      rate,
+      'payMerchant',
+      this.layer2Web3.eth.abi.encodeParameters(['address'], [merchantSafe])
+    );
+  }
+
+  private async executePayMerchant(
+    prepaidCardAddress: string,
+    merchantSafe: string,
+    spendAmount: number,
+    rate: string,
+    signatures: Signature[],
+    nonce: string
+  ): Promise<GnosisExecTx> {
+    return await executeSend(
+      this.layer2Web3,
+      prepaidCardAddress,
+      spendAmount,
+      rate,
+      'payMerchant',
+      this.layer2Web3.eth.abi.encodeParameters(['address'], [merchantSafe]),
+      signatures,
+      nonce
     );
   }
 
