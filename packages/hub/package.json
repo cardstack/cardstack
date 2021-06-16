@@ -65,7 +65,7 @@
     "db:migrate": "node-pg-migrate",
     "db:seed": "node ./bin/seed-db.ts",
     "db:structure:dump": "node ./bin/dump-db-structure.js",
-    "db:test:prepare": "node ./bin/dump-db-structure.js && node ./bin/setup-test-db.js",
+    "db:test:prepare": "node ./bin/setup-test-db.js",
     "test": "PACKAGE=hub NODE_ENV=test mocha -r esm ../test-support/bin/run.js --timeout 60000",
     "autotest": "PACKAGE=hub NODE_ENV=test mocha -w --reporter=min -r esm ../test-support/bin/run.js --timeout 60000"
   },
