@@ -12,21 +12,23 @@
         </Boxel::Button>
       </div>
       <div class="card-pay-confirmation__transaction">
-        <div class="card-pay-confirmation__transaction-amount">
-          {{svg-jar this.depositedToken.icon class="card-pay-confirmation__transaction-token-icon"}}
-          <div class="card-pay-confirmation__transaction-balance">
-            {{format-token-amount this.depositedAmount}} {{this.depositedToken.symbol}}
-          </div>
-        </div>
+        <CardPay::AccountDisplay
+          class="card-pay-confirmation__transaction-amount"
+          @size="large"
+          @icon={{this.depositedToken.icon}}
+          @balance={{format-token-amount this.depositedAmount}}
+          @symbol={{this.depositedToken.symbol}}
+        />
         <div class="card-pay-confirmation__transaction-preposition">
           from
         </div>
-        <div class="card-pay-confirmation__transaction-wallet">
-          {{this.layer1Network.chainName}} wallet
-        </div>
-        <div class="card-pay-confirmation__transaction-address">
-          {{this.layer1Network.walletInfo.firstAddress}}
-        </div>
+        <CardPay::AccountDisplay
+          class="card-pay-confirmation__transaction-wallet"
+          @size="small"
+          @title={{concat this.layer2Network.chainName " wallet"}}
+          @address={{this.layer1Network.walletInfo.firstAddress}}
+          @wrapped={{true}}
+        />
       </div>
     </Boxel::CardContainer>
     {{svg-jar "arrow" class="card-pay-confirmation__down-arrow"}}
@@ -64,52 +66,40 @@
         </Boxel::Button>
       </div>
       <div class="card-pay-confirmation__transaction">
-        <div class="card-pay-confirmation__transaction-amount">
-          {{svg-jar this.depositedToken.icon class="card-pay-confirmation__transaction-token-icon"}}
-          <div class="card-pay-confirmation__transaction-balance">
-            {{format-token-amount this.depositedAmount}} {{this.depositedToken.symbol}}.CPXD
-          </div>
-        </div>
+        <CardPay::AccountDisplay
+          class="card-pay-confirmation__transaction-amount"
+          @size="large"
+          @icon={{this.depositedToken.icon}}
+          @balance={{format-token-amount this.depositedAmount}}
+          @symbol={{concat this.depositedToken.symbol ".CPXD"}}
+        />
         <div class="card-pay-confirmation__transaction-preposition">
           in
         </div>
-        <div class="card-pay-confirmation__transaction-wallet">
-          {{this.layer2Network.chainName}} wallet
-        </div>
+        <CardPay::AccountDisplay
+          class="card-pay-confirmation__transaction-wallet"
+          @size="small"
+          @title={{concat this.layer2Network.chainName " wallet"}}
+        />
         <CardPay::NestedItems class="card-pay-confirmation__transaction-depot">
           <:outer>
-            <div class="card-pay-confirmation__entity-details">
-              {{svg-jar "avatar-default" width="20" height="20" class="card-pay-confirmation__entity-icon" role="presentation"}}
-              <div>
-                <div class="card-pay-confirmation__entity-text">Account 1</div>
-                <div class="card-pay-confirmation__entity-address" data-test-deposit-confirmation-account-address>
-                  {{truncate-middle this.layer2Network.walletInfo.firstAddress}}
-                </div>
-              </div>
-            </div>
+            <CardPay::AccountDisplay
+              @size="small"
+              @icon="avatar-default"
+              @title="Account 1"
+              @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
+              data-test-deposit-confirmation-account-address
+            />
           </:outer>
           <:inner>
-            <div class="card-pay-confirmation__entity-details">
-              {{svg-jar "depot" class="card-pay-confirmation__entity-icon" role="presentation"}}
-              <div>
-                <div class="card-pay-confirmation__entity-text">DEPOT:</div>
-                <div class="card-pay-confirmation__entity-address" data-test-deposit-confirmation-depot-address>
-                  {{#if this.depotAddress}}
-                    {{truncate-middle this.depotAddress}}
-                  {{else}}
-                    {{!--
-                      This depot is fetched earlier in the workflow.
-                      If it isn't present and we got this far, it's because the
-                      user created a new repo. That's why we don't show a loading indicator here.
-                      This might change in the future if we fetch the depot address in this component
-                    --}}
-                    <div class="card-pay-confirmation__new-depot-message">
-                      New Depot
-                    </div>
-                  {{/if}}
-                </div>
-              </div>
-            </div>
+            <CardPay::AccountDisplay
+              @size="small"
+              @icon="depot"
+              @title="DEPOT:"
+              @address={{truncate-middle this.depotAddress}}
+              @text={{unless this.depotAddress "New Depot"}}
+              data-test-deposit-confirmation-depot-address
+            />
           </:inner>
         </CardPay::NestedItems>
       </div>

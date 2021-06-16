@@ -21,7 +21,7 @@
           "account-display__text"
           account-display__text-sm=isSmall
           account-display__address=@address
-          account-display__address-wrapped=(and @address isLarge)
+          account-display__address-wrapped=(or @wrapped (and @address isLarge))
         }}
           data-test-account-address
         >

@@ -42,30 +42,11 @@
 .card-pay-confirmation__transaction-amount {
   grid-area: amount;
   align-self: center;
-  display: flex;
-  align-items: center;
   grid-row: 1 / -1;
-}
-
-.card-pay-confirmation__transaction-token-icon {
-  align-self: flex-start;
-  flex-shrink: 0;
-  width: 2.5rem;
-  height: 2.5rem;
-  object-fit: contain;
-  margin-right: var(--boxel-sp-sm);
-}
-
-.card-pay-confirmation__transaction-balance {
-  font: 600 1.25rem/calc(27 / 20) var(--boxel-font-family);
-  letter-spacing: var(--boxel-lsp-xs);
 }
 
 .card-pay-confirmation__transaction-wallet {
   grid-area: wallet;
-  font-size: var(--boxel-font-size-sm);
-  font-weight: 600;
-  letter-spacing: var(--boxel-lsp-sm);
 }
 
 .card-pay-confirmation__transaction-preposition {
@@ -73,18 +54,7 @@
   margin-bottom: var(--boxel-sp-sm);
   font-size: var(--boxel-font-size-sm);
   color: var(--boxel-purple-400);
-  letter-spacing: 0.025em;
-}
-
-.card-pay-confirmation__transaction-address {
-  grid-area: details;
-  font-family: var(--boxel-monospace-font-family);
-  font-size: var(--boxel-font-size-sm);
-  line-height: 1.125rem;
-  letter-spacing: var(--boxel-lsp-sm);
-  color: var(--boxel-purple-500);
-  max-width: 23ch;
-  word-break: break-all;
+  letter-spacing: var(--boxel-lsp);
 }
 
 .card-pay-confirmation__transaction-depot {
@@ -137,34 +107,4 @@
 /* 2 selectors because of specificity */
 .card-pay-confirmation__bridge-inner-button.boxel-button {
   --boxel-button-color: var(--boxel-light-300);
-}
-
-.card-pay-confirmation__entity-details {
-  display: flex;
-  align-items: center;
-}
-
-.card-pay-confirmation__entity-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-right: var(--boxel-sp-xs);
-}
-
-.card-pay-confirmation__entity-text {
-  font: 600 var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-xs);
-}
-
-.card-pay-confirmation__entity-address {
-  font-family: var(--boxel-monospace-font-family);
-  font-size: var(--boxel-font-size-sm);
-  line-height: 1.125rem;
-  letter-spacing: var(--boxel-lsp-sm);
-  color: var(--boxel-purple-500);
-}
-
-.card-pay-confirmation__new-depot-message {
-  color: var(--boxel-purple-500);
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-xs);
 }

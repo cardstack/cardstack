@@ -196,7 +196,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom('[data-test-funding-source-dropdown="DAI.CPXD"]').exists();
     assert
       .dom(
-        '[data-test-funding-source-dropdown="DAI.CPXD"] [data-test-account-text]'
+        '[data-test-funding-source-dropdown="DAI.CPXD"] [data-test-account-balance]'
       )
       .containsText('250.00 DAI');
 
@@ -207,7 +207,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
     assert
-      .dom('[data-test-funding-source-token] [data-test-account-title]')
+      .dom('[data-test-funding-source-token] [data-test-account-balance]')
       .containsText('500.00 CARD');
 
     await click(
@@ -221,7 +221,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert.dom('[data-test-funding-source-dropdown="DAI.CPXD"]').doesNotExist();
     assert
-      .dom('[data-test-funding-source-token] [data-test-account-title]')
+      .dom('[data-test-funding-source-token] [data-test-account-balance]')
       .containsText('250.00 DAI');
 
     assert
