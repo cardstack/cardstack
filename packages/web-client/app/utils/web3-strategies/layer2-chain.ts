@@ -9,7 +9,12 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import { task } from 'ember-concurrency-decorators';
 
 import { SimpleEmitter, UnbindEventListener } from '../events';
-import { ConvertibleSymbol, ConversionFunction, NetworkSymbol } from '../token';
+import {
+  ConvertibleSymbol,
+  ConversionFunction,
+  NetworkSymbol,
+  TokenContractInfo,
+} from '../token';
 import WalletInfo from '../wallet-info';
 import CustomStorageWalletConnect from '../wc-connector';
 import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
@@ -43,6 +48,7 @@ export default abstract class Layer2ChainWeb3Strategy
   @tracked defaultTokenBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
   @tracked waitForAccountDeferred = defer();
+  @tracked daiTokenContractInfo: TokenContractInfo;
 
   @reads('provider.connector') connector!: IConnector;
 
@@ -55,6 +61,7 @@ export default abstract class Layer2ChainWeb3Strategy
     this.chainId = networkIds[networkSymbol];
     this.networkSymbol = networkSymbol;
     this.walletInfo = new WalletInfo([], this.chainId);
+    this.daiTokenContractInfo = new TokenContractInfo('DAI', networkSymbol);
 
     this.initialize();
   }
@@ -137,6 +144,25 @@ export default abstract class Layer2ChainWeb3Strategy
 
   async refreshBalances() {
     return taskFor(this.fetchDepotTask).perform();
+  }
+
+  async issuePrepaidCard(safeAddress: string, amount: number): Promise<String> {
+    const PrepaidCard = await getSDK('PrepaidCard', this.web3);
+
+    try {
+      const result = await PrepaidCard.create(
+        safeAddress,
+        this.daiTokenContractInfo.address,
+        [amount],
+        undefined
+      );
+
+      return Promise.resolve(result.prepaidCardAddresses[0]);
+    } catch (e) {
+      // FIXME what is to be done? in error cases
+      console.log('prepaid card create error', e);
+      return Promise.resolve('NO');
+    }
   }
 
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
