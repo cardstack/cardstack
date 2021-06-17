@@ -9,11 +9,12 @@ import DatabaseManager from './services/database-manager';
 import DevelopmentConfig from './services/development-config';
 import DevelopmentProxyMiddleware from './services/development-proxy-middleware';
 import SessionRoute from './routes/session';
+import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
+import PrepaidCardPatternsRoute from './routes/prepaid-card-patterns';
 import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './services/jsonapi-middleware';
 import NonceTracker from './services/nonce-tracker';
 import { Clock } from './services/clock';
-
 const log = logger('cardstack/hub');
 
 export function wireItUp(registryCallback?: RegistryCallback): Container {
@@ -27,6 +28,8 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('jsonapi-middleware', JsonapiMiddleware);
   registry.register('nonce-tracker', NonceTracker);
   registry.register('session-route', SessionRoute);
+  registry.register('prepaid-card-color-schemes-route', PrepaidCardColorSchemesRoute);
+  registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
   if (registryCallback) {
     registryCallback(registry);
   }

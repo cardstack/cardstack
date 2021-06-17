@@ -16,19 +16,21 @@ async function run() {
   const dbConfig = config.get('db');
   let dbUrl = dbConfig.url as string;
   let dbName = dbUrl.split('/').reverse()[0];
-  try {
-    console.log(`Dropping ${dbName} db...`);
-    let result = await exec(`dropdb ${dbName}`);
+  if (!process.env.CI) {
+    try {
+      console.log(`Dropping ${dbName} db...`);
+      let result = await exec(`dropdb ${dbName}`);
+      console.log(result);
+    } catch (e) {
+      // ok if this fails
+    }
+    console.log(`Creating new ${dbName} db...`);
+    let result = await exec(`createdb ${dbName}`);
     console.log(result);
-  } catch (e) {
-    // ok if this fails
   }
-  console.log(`Creating new ${dbName} db...`);
-  let result = await exec(`createdb ${dbName}`);
-  console.log(result);
 
   console.log(`Loading structure.sql into new ${dbName} db...`);
-  result = await exec(`psql ${dbConfig.url} < config/structure.sql`);
+  let result = await exec(`psql ${dbConfig.url} < config/structure.sql`);
   console.log(result);
 }
 run();

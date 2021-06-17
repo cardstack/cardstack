@@ -38,9 +38,11 @@
     "mime-match": "^1.0.2",
     "node-pg-migrate": "^5.9.0",
     "pg": "^8.6.0",
+    "pg-format": "^1.0.4",
     "qs": "^6.10.1",
     "query-string": "^7.0.0",
     "semver": "^7.3.5",
+    "short-uuid": "^4.2.0",
     "tmp-promise": "3.0.2",
     "typescript-memoize": "^1.0.1"
   },
@@ -48,6 +50,7 @@
     "@cardstack/eslint-config": "0.19.18",
     "@cardstack/test-support": "0.19.18",
     "@types/config": "^0.0.38",
+    "@types/pg-format": "^1.0.1",
     "@types/supertest": "^2.0.11",
     "json-stable-stringify": "^1.0.1",
     "moment-timezone": "^0.5.33",
@@ -58,12 +61,13 @@
     "yarn": "^1.0"
   },
   "scripts": {
-    "db:setup:local": "createdb hub_development && node-pg-migrate up",
+    "db:setup:local": "createdb hub_development && node-pg-migrate up && node ./bin/seed-db.ts && node ./bin/dump-db-structure.js && node ./bin/setup-test-db.js",
     "db:migrate": "node-pg-migrate",
+    "db:seed": "node ./bin/seed-db.ts",
     "db:structure:dump": "node ./bin/dump-db-structure.js",
-    "db:test:prepare": "node ./bin/dump-db-structure.js && node ./bin/setup-test-db.js",
-    "test": "PACKAGE=hub mocha -r esm ../test-support/bin/run.js --timeout 60000",
-    "autotest": "PACKAGE=hub mocha -w --reporter=min -r esm ../test-support/bin/run.js --timeout 60000"
+    "db:test:prepare": "node ./bin/setup-test-db.js",
+    "test": "PACKAGE=hub NODE_ENV=test mocha -r esm ../test-support/bin/run.js --timeout 60000",
+    "autotest": "PACKAGE=hub NODE_ENV=test mocha -w --reporter=min -r esm ../test-support/bin/run.js --timeout 60000"
   },
   "volta": {
     "extends": "../../package.json"
