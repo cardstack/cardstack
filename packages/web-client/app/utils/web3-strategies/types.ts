@@ -48,6 +48,7 @@ export interface Layer2Web3Strategy extends Web3Strategy {
     fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt>;
+  issuePrepaidCard(safeAddress: string, amount: number): Promise<String>;
   fetchDepotTask(): Promise<DepotSafe | null>;
   refreshBalances(): void;
   convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<any>;

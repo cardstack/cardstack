@@ -95,6 +95,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return await this.test__simulateConvertFromSpend(symbol, amount);
   }
 
+  async issuePrepaidCard(): Promise<string> {
+    return Promise.resolve('2423');
+  }
+
   test__lastSymbolsToUpdate: ConvertibleSymbol[] = [];
   test__simulatedExchangeRate: number = 0.2;
   test__updateUsdConvertersDeferred: RSVP.Deferred<void> | undefined;
