@@ -1,9 +1,12 @@
 :where(.prepaid-card) {
+  --prepaid-card-header-height: 6.375rem;
+  --prepaid-card-curve-height: var(--boxel-sp-xl); /* the curved part that the header and content overlap in */
+
   position: relative;
   width: 22.75rem; /* 364px */
   min-height: 14.375rem; /* 230px */
   display: grid;
-  grid-template-rows: 4.0625rem var(--boxel-sp-xl) 1fr;
+  grid-template-rows: calc(var(--prepaid-card-header-height) - var(--prepaid-card-curve-height)) var(--prepaid-card-curve-height) 1fr;
   grid-template-columns: 1fr;
   border-radius: var(--boxel-border-radius);
   color: var(--boxel-dark);
@@ -53,7 +56,10 @@
 .prepaid-card__content {
   grid-row: 2 / span 2;
   grid-column: 1 / 2;
-  padding: var(--boxel-sp-xl) var(--boxel-sp) var(--boxel-sp-sm);
+  /*
+    The top padding precludes content from sitting on the curved area of the background
+  */
+  padding: var(--prepaid-card-curve-height) var(--boxel-sp) var(--boxel-sp-sm);
   background-image: url('/images/backgrounds/curved-platter.svg');
   background-repeat: no-repeat;
   background-size: cover;
@@ -144,7 +150,7 @@
   /*
     this height is shorter because we want the gradient change to be more obvious
   */
-  height: 102px;
+  height: var(--prepaid-card-header-height);
 }
 
 .prepaid-card__background--pattern {
