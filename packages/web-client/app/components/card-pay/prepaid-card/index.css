@@ -141,7 +141,6 @@
   top: 0;
   right: 0;
   left: 0;
-  border-radius: var(--boxel-border-radius) var(--boxel-border-radius) 0 0;
   overflow: hidden;
   z-index: 0;
 }
@@ -153,6 +152,7 @@
     this height is shorter because we want the gradient change to be more obvious
   */
   height: var(--prepaid-card-header-height);
+  border-radius: var(--boxel-border-radius) var(--boxel-border-radius) 0 0;
 }
 
 .prepaid-card__background--pattern {
@@ -163,6 +163,7 @@
     the image is meant to be centered on the card.
   */
   height: 100%;
+  border-radius: var(--boxel-border-radius);
   -webkit-mask-size: cover;
   -webkit-mask-image: var(--header-theme);
   -webkit-mask-position: center;
