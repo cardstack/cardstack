@@ -1,5 +1,5 @@
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
-import { fromWei } from 'web3-utils';
+import { fromWei, toWei } from 'web3-utils';
 import { getWeb3 } from './utils';
 
 export async function registerMerchant(
@@ -28,4 +28,23 @@ export async function revenueBalances(network: string, mnemonic: string, merchan
   for (let { tokenSymbol, balance } of balanceInfo) {
     console.log(`${fromWei(balance)} ${tokenSymbol}`);
   }
+}
+
+export async function claimRevenue(
+  network: string,
+  mnemonic: string,
+  merchantSafeAddress: string,
+  tokenAddress: string,
+  amount: number
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let revenuePool = await getSDK('RevenuePool', web3);
+  let assets = await getSDK('Assets', web3);
+  let { symbol } = await assets.getTokenInfo(tokenAddress);
+  let weiAmount = toWei(String(amount));
+  console.log(`Claiming ${amount} ${symbol} in revenue for merchant safe ${merchantSafeAddress}`);
+
+  let result = await revenuePool.claim(merchantSafeAddress, tokenAddress, weiAmount);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  console.log(`Transaction hash: ${blockExplorer}/tx/${result.ethereumTx.txHash}/token-transfers`);
 }

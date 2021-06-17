@@ -159,8 +159,8 @@
       "args": [
         "pay-merchant",
         "0x7106c2DBBB28f0cBC314f7817428839802bFC0d7", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0xBF8C3FA1c408e45E684dE718002840454bDEC3D2", // Hassan's prepaid card --feel free to use your own
-        "100",
+        "0xf30152C0f9b097d7a91fcab720273d86c819fe50", // Hassan's prepaid card --feel free to use your own
+        "150",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
@@ -175,7 +175,24 @@
       "env": {},
       "args": [
         "revenue-balances",
-        "0x0dAEeaA725b65aDf2f253541f59Af718f3859f00", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "0x7106c2DBBB28f0cBC314f7817428839802bFC0d7", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "--network", "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: Claim Merchant Revenue",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "claim-revenue",
+        "0x7106c2DBBB28f0cBC314f7817428839802bFC0d7", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "0.5",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
