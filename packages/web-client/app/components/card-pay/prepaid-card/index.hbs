@@ -1,26 +1,34 @@
 <article
   class="prepaid-card"
-  style={{css-var header-background=@headerBackground header-theme=(concat "url(" @headerTheme ")")}}
+  style={{css-var
+    header-background=@headerBackground
+    header-theme=(concat "url(" @headerTheme ")")
+    header-text-color=(or @headerTextColor "var(--boxel-dark)")
+    header-pattern-color=(or @headerPatternColor "var(--boxel-light)")
+  }}
   data-test-prepaid-card-background={{@headerBackground}}
   data-test-prepaid-card-theme={{@headerTheme}}
   ...attributes
 >
+  <div class="prepaid-card__background prepaid-card__background--color">
+  </div>
+  <div class="prepaid-card__background prepaid-card__background--pattern">
+  </div>
   <header class="prepaid-card__header">
-    <div class="prepaid-card__background">
-    </div>
     <div>
       <div>Issued by</div>
       <div class="prepaid-card__name" data-test-prepaid-card-issuer-name>{{or @issuerName "Enter name"}}</div>
     </div>
-    <div>
+    <div class="prepaid-card__meta">
+      <div class="prepaid-card__type">PREPAID CARD</div>
       <div class="prepaid-card__address">{{truncate-middle @address}}</div>
-      <div>on {{@network}}</div>
+      <div class="prepaid-card__network">on {{@network}}</div>
     </div>
   </header>
   <section class="prepaid-card__content">
     <div>
-      <div class="prepaid-card__balance-label">Face Value</div>
-      <div class={{cn "prepaid-card__balance" prepaid-card__balance--mock=@mockBalance}}><span>§{{@balance}}</span> SPEND</div>
+      <div class="prepaid-card__balance-label">Spendable Balance</div>
+      <div class={{cn "prepaid-card__balance" prepaid-card__balance--mock=@mockBalance}}>§{{@balance}}</div>
       <div class={{cn "prepaid-card__usd-balance" prepaid-card__usd-balance--mock=@mockBalance}}>${{@usdBalance}} USD</div>
     </div>
     <div class="prepaid-card__content-rs">
