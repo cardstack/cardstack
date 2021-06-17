@@ -23,7 +23,7 @@
   border-top-left-radius: var(--boxel-border-radius);
   padding: var(--boxel-sp);
   color: var(--header-text-color);
-  text-shadow: 0px 1px var(--header-pattern-color);
+  text-shadow: 0 1px var(--header-pattern-color);
   font: var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp);
 }
