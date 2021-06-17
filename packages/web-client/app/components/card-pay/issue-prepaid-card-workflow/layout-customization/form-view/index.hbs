@@ -35,7 +35,7 @@
       @label="Background Color"
     >
       {{#if @loadingCustomizations}}
-        <Boxel::LoadingIndicator/>
+        <Boxel::LoadingIndicator data-test-customization-background-loading/>
       {{else}}
         <Boxel::CustomRadio
           @checkedId={{@headerBackground.id}}
@@ -53,7 +53,7 @@
             @focusedClass="layout-form-view__selection-item--focused"
             @checkedClass="layout-form-view__selection-item--checked"
             class="layout-form-view__selection-item"
-            data-test-customization-background-selection-item={{backgroundItem.data.id}}
+            data-test-customization-background-selection-item={{backgroundItem.data.headerBackground}}
           >
             <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
               @type="background"
@@ -66,7 +66,7 @@
     </CardPay::LabeledValue>
     <CardPay::LabeledValue @label="Theme">
       {{#if @loadingCustomizations}}
-         <Boxel::LoadingIndicator/>
+         <Boxel::LoadingIndicator data-test-customization-theme-loading/>
       {{else}}
         <Boxel::CustomRadio
           @checkedId={{@headerTheme.id}}
@@ -84,7 +84,7 @@
             @focusedClass="layout-form-view__selection-item--focused"
             @checkedClass="layout-form-view__selection-item--checked"
             class="layout-form-view__selection-item"
-            data-test-customization-theme-selection-item={{themeItem.data.id}}
+            data-test-customization-theme-selection-item={{or themeItem.data.patternUrl "blank"}}
           >
             {{!-- rerenders appear to cause flashes if we use a background image --}}
             <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
