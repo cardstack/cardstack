@@ -10,7 +10,7 @@ const Format = new Intl.DateTimeFormat('us-EN', {
 
 export default setComponentTemplate(
   precompileTemplate(
-    "<input type='date' value={{this.formatted}} ...attributes />",
+    "<input type='datetime-local' value={{this.formatted}} ...attributes />",
     {
       strictMode: true,
       scope: {}, // TODO: this is tricking our inline detector into not inlining this component
@@ -38,5 +38,5 @@ function makeDateInputHappy(d) {
   return `${d.getYear() + 1900}-${pad(d.getMonth() + 1, 2)}-${pad(
     d.getDate(),
     2
-  )}`;
+  )}T${pad(d.getHours(), 2)}:${pad(d.getMinutes(), 2)}`;
 }
