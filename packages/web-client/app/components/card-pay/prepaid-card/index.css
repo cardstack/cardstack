@@ -137,17 +137,27 @@
   border-radius: var(--boxel-border-radius) var(--boxel-border-radius) 0 0;
   overflow: hidden;
   z-index: 0;
-  height: 102px;
 }
 
 .prepaid-card__background--color {
   background: var(--header-background);
+  /*
+    this height is shorter because we want the gradient change to be more obvious
+  */
+  height: 102px;
 }
 
 .prepaid-card__background--pattern {
   background-color: var(--header-pattern-color);
+  /*
+    this height is the full size of the prepaid card because
+    the image is meant to be centered on the card.
+  */
+  height: 100%;
   -webkit-mask-size: cover;
   -webkit-mask-image: var(--header-theme);
+  -webkit-mask-position: center;
   mask-size: cover;
   mask-image: var(--header-theme);
+  mask-position: center;
 }
