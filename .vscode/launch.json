@@ -159,8 +159,8 @@
       "args": [
         "pay-merchant",
         "0x7106c2DBBB28f0cBC314f7817428839802bFC0d7", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0xaEbDEa1454D446aE301555D5B232f528afEf9fFF", // Hassan's prepaid card --feel free to use your own
-        "100",
+        "0xf30152C0f9b097d7a91fcab720273d86c819fe50", // Hassan's prepaid card --feel free to use your own
+        "150",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
@@ -190,7 +190,7 @@
       "env": {},
       "args": [
         "claim-revenue",
-        "0xD816073771BEb353C527A980a0FF2d768DC4491C", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "0x7106c2DBBB28f0cBC314f7817428839802bFC0d7", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "0.5",
         "--network", "sokol",
