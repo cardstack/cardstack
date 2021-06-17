@@ -281,6 +281,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(`${postableSel(3, 1)} [data-test-boxel-action-chin]`)
       .containsText('Confirmed');
 
+    assert
+      .dom(
+        `${postableSel(3, 1)} [data-test-prepaid-card-address-labeled-value]`
+      )
+      .containsText('2423');
+
     await waitFor(milestoneCompletedSel(3));
     assert.dom(milestoneCompletedSel(3)).containsText('Transaction confirmed');
 

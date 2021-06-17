@@ -32,6 +32,14 @@
           @value={{@workflowSession.state.issuerName}}
           data-test-prepaid-card-issuer-name-labeled-value
         />
+        {{#if @isComplete}}
+          <CardPay::LabeledValue
+            @vertical={{true}}
+            @label="Card address"
+            @value={{@workflowSession.state.prepaidCardAddress}}
+            data-test-prepaid-card-address-labeled-value
+          />
+        {{/if}}
       </CardPay::FieldStack>
     </div>
   </ActionCardContainer::Section>
@@ -42,7 +50,7 @@
   >
     <:default as |d|>
       <d.ActionButton
-        {{on "click" @onComplete}}
+        {{on "click" this.issue}}
       >
         Continue
       </d.ActionButton>

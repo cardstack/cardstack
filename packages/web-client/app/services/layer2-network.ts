@@ -1,5 +1,6 @@
 import Service from '@ember/service';
 import config from '../config/environment';
+import { task } from 'ember-concurrency-decorators';
 import { Layer2Web3Strategy } from '../utils/web3-strategies/types';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
 import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
@@ -60,6 +61,11 @@ export default class Layer2Network extends Service {
       );
     }
     return this.strategy.updateUsdConverters(symbolsToUpdate);
+  }
+
+  @task *issuePrepaidCard(): any {
+    let address = yield this.strategy.issuePrepaidCard();
+    return address;
   }
 
   disconnect() {
