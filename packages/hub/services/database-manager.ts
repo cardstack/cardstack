@@ -11,8 +11,8 @@ export default class DatabaseManager {
   async getClient() {
     if (!this.client) {
       this.client = new Client(this.dbConfig.url as string);
+      await this.client.connect();
       if (this.dbConfig.useTransactionalRollbacks) {
-        await this.client.connect();
         await this.client.query('START TRANSACTION');
       }
     }
@@ -22,8 +22,8 @@ export default class DatabaseManager {
   async teardown() {
     if (this.dbConfig.useTransactionalRollbacks) {
       await this.client?.query('ROLLBACK');
-      await this.client?.end();
     }
+    await this.client?.end();
   }
 }
 
