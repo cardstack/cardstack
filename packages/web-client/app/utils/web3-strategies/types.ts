@@ -54,3 +54,17 @@ export interface Layer2Web3Strategy extends Web3Strategy {
 
 export type TransactionHash = string;
 export type ChainAddress = string;
+
+export interface ColorCustomizationOption {
+  headerBackground: string;
+  textColor: string;
+  patternColor: string;
+  id: string;
+  description?: string;
+}
+
+export interface PatternCustomizationOption {
+  patternUrl: string | null;
+  id: string;
+  description?: string;
+}
