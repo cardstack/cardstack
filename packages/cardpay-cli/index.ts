@@ -348,8 +348,10 @@ const {
   .help().argv as Options;
 
 if (!mnemonic) {
-  yargs.showHelp(
-    'No mnemonic is defined, either specify the mnemonic as a positional arg or pass it in using the MNEMONIC_PHRASE env var'
+  yargs.showHelp(() =>
+    console.log(
+      'No mnemonic is defined, either specify the mnemonic as a positional arg or pass it in using the MNEMONIC_PHRASE env var'
+    )
   );
   process.exit(1);
 }
