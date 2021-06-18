@@ -12,6 +12,9 @@ import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { toBN } from 'web3-utils';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { setupMirage } from 'ember-cli-mirage/test-support';
+import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
+import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -27,8 +30,14 @@ function milestoneCompletedSel(milestoneIndex: number): string {
 
 module('Acceptance | issue prepaid card', function (hooks) {
   setupApplicationTest(hooks);
+  setupMirage(hooks);
 
   test('Initiating workflow without wallet connections', async function (assert) {
+    this.server.db.loadData({
+      prepaidCardColorSchemes: prepaidCardColorSchemes,
+      prepaidCardPatterns,
+    });
+
     await visit('/card-pay');
     assert.equal(currentURL(), '/card-pay/balances');
     await click('[data-test-issue-prepaid-card-workflow-button]');
@@ -136,9 +145,16 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
       .isEnabled();
 
-    let backgroundChoice = 'transparent';
-    let themeChoice =
-      'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+    let backgroundChoice = prepaidCardColorSchemes[4].background;
+    let themeChoice = prepaidCardPatterns[2].patternUrl;
+
+    await waitUntil(
+      () =>
+        document.querySelectorAll(
+          '[data-test-customization-background-loading],[data-test-customization-theme-loading]'
+        ).length === 0
+    );
+
     assert
       .dom(
         `[data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
