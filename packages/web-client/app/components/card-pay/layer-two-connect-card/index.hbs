@@ -21,11 +21,15 @@
           @label="Network"
           @value={{this.layer2Network.chainName}}
         />
-        <CardPay::LabeledValue
-          @label="Address"
-          @value={{this.layer2Network.walletInfo.firstAddress}}
-          @isAddress={{true}}
-        />
+        <CardPay::LabeledValue @label="Account">
+          <CardPay::AccountDisplay
+            class="layer-two-connect-card__account-display"
+            @icon="avatar-default"
+            @name="Account 1"
+            @address={{this.layer2Network.walletInfo.firstAddress}}
+            @wrapped={{true}}
+          />
+        </CardPay::LabeledValue>
         <CardPay::LabeledValue @label="Depot balance" data-test-balance-container>
           {{#if this.layer2Network.isFetchingDepot}}
             <Boxel::LoadingIndicator data-test-balance-container-loading/>

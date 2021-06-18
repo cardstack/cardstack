@@ -1,18 +1,15 @@
 .card-pay-labeled-value {
   --boxel-field-label-width: minmax(4rem, 25%);
-  --field-text-line-height: 1.375rem;
 
   align-items: start;
 }
 
-/* vertically aligning centers of the label text and the content text using line height */
 .card-pay-labeled-value__label {
-  line-height: var(--field-text-line-height);
+  margin-top: 2px;
 }
 
 .card-pay-labeled-value__contents {
-  font-size: var(--boxel-font-size);
-  line-height: var(--field-text-line-height);
+  font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-sm);
 }
 
@@ -34,9 +31,9 @@
 
 /* utility class used for small icons - currency, and the check mark */
 .card-pay-labeled-value__small-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  margin-right: 0.5rem;
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+  margin-right: var(--boxel-sp-xxs);
 }
 
 .card-pay-labeled-value--vertical {

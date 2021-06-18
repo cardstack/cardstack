@@ -68,7 +68,7 @@
                     class={{cn "funding-source__dropdown-option" (if (eq token.symbol this.selectedToken.symbol) "funding-source__dropdown-option--selected")}}
                     @size="small"
                     @icon={{token.icon}}
-                    @title={{token.symbol}}
+                    @name={{token.symbol}}
                     @balance={{token.balance}}
                     @symbol={{token.symbol}}
                     data-test-funding-source-token-option={{token.symbol}}

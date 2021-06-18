@@ -12,7 +12,9 @@
     {{else}}
       <div class="balance-view__summary-content">
         {{@wallet}} wallet
-        <span class="balance-view__summary-balance" data-test-source-token={{@tokenSymbol}}>{{@balance}} {{@tokenSymbol}}</span>
+        <span class="balance-view__summary-balance" data-test-source-token={{@tokenSymbol}}>
+          {{format-token-amount @balance}} {{@tokenSymbol}}
+        </span>
       </div>
     {{/if}}
     <div class="balance-view__marker">

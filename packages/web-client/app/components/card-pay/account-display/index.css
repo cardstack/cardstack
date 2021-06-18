@@ -26,7 +26,7 @@
 
 .account-display__name-sm {
   font: 600 var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-sm);
+  letter-spacing: var(--boxel-lsp-xs);
 }
 
 .account-display__name-lg {
@@ -41,7 +41,7 @@
   font-family: var(--boxel-monospace-font-family);
   font-size: var(--boxel-font-size);
   line-height: calc(22 / 16);
-  letter-spacing: 0.02em;
+  letter-spacing: var(--boxel-lsp-sm);
   word-break: break-all;
 }
 

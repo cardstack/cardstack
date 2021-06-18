@@ -44,7 +44,7 @@
 
 .balance-display__name-sm {
   font: 600 var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-sm);
+  letter-spacing: var(--boxel-lsp-xs);
 }
 
 .balance-display__name-lg {
