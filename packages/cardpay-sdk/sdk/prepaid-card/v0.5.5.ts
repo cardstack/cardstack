@@ -9,6 +9,14 @@ import PrepaidCardManagerABI from '../../contracts/abi/v0.5.5/prepaid-card-manag
 import { getAddress } from '../../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
+import SpendABI from '../../contracts/abi/v0.5.5/spend';
+import BridgeUtils from '../../contracts/abi/v0.5.5/bridge-utils';
+
+// a silly exercise to make eslint stop complaining that these ABI's are unused
+// (we do actually consume these in order to make ABIs for the subgraph)
+function doNothing(_stuff: any) {}
+doNothing(SpendABI);
+doNothing(BridgeUtils);
 
 import { ERC20ABI } from '../../index';
 import {
