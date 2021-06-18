@@ -30,17 +30,42 @@ export default [
       {
         indexed: false,
         internalType: 'address',
-        name: 'token',
+        name: 'supplier',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
+      },
+    ],
+    name: 'SupplierInfoDIDUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'supplier',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'safe',
         type: 'address',
       },
     ],
-    name: 'TokenAdded',
+    name: 'SupplierSafeCreated',
     type: 'event',
   },
   {
     constant: true,
     inputs: [],
-    name: 'bridgeMediator',
+    name: 'bridgeUtils',
     outputs: [
       {
         internalType: 'address',
@@ -70,7 +95,22 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'exchange',
+    name: 'gnosisProxyFactory',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'gnosisSafe',
     outputs: [
       {
         internalType: 'address',
@@ -138,8 +178,14 @@ export default [
   },
   {
     constant: true,
-    inputs: [],
-    name: 'supplierManager',
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'safes',
     outputs: [
       {
         internalType: 'address',
@@ -153,13 +199,29 @@ export default [
   },
   {
     constant: true,
-    inputs: [],
-    name: 'tokenManager',
-    outputs: [
+    inputs: [
       {
         internalType: 'address',
         name: '',
         type: 'address',
+      },
+    ],
+    name: 'suppliers',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: 'registered',
+        type: 'bool',
+      },
+      {
+        internalType: 'address',
+        name: 'safe',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
       },
     ],
     payable: false,
@@ -186,22 +248,17 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: '_tokenManager',
+        name: '_bridgeUtils',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: '_supplierManager',
+        name: '_gsMasterCopy',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: '_exchange',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_bridgeMediator',
+        name: '_gsProxyFactory',
         type: 'address',
       },
     ],
@@ -221,12 +278,12 @@ export default [
     constant: false,
     inputs: [
       {
-        internalType: 'address',
-        name: 'tokenAddr',
-        type: 'address',
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
       },
     ],
-    name: 'addToken',
+    name: 'setSupplierInfoDID',
     outputs: [
       {
         internalType: 'bool',

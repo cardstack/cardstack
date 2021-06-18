@@ -3,6 +3,31 @@ export default [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: 'address',
+        name: 'merchant',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'merchantSafe',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
+      },
+    ],
+    name: 'MerchantCreation',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: 'address',
         name: 'previousOwner',
@@ -25,22 +50,9 @@ export default [
     type: 'event',
   },
   {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-    ],
-    name: 'TokenAdded',
-    type: 'event',
-  },
-  {
     constant: true,
     inputs: [],
-    name: 'bridgeMediator',
+    name: 'actionDispatcher',
     outputs: [
       {
         internalType: 'address',
@@ -70,7 +82,22 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'exchange',
+    name: 'gnosisProxyFactory',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'gnosisSafe',
     outputs: [
       {
         internalType: 'address',
@@ -114,6 +141,53 @@ export default [
   },
   {
     constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'merchantSafes',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'merchants',
+    outputs: [
+      {
+        internalType: 'address',
+        name: 'merchantSafe',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
     inputs: [],
     name: 'owner',
     outputs: [
@@ -137,36 +211,6 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'supplierManager',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'tokenManager',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     constant: false,
     inputs: [
       {
@@ -186,75 +230,22 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: '_tokenManager',
+        name: '_actionDispatcher',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: '_supplierManager',
+        name: '_gsMasterCopy',
         type: 'address',
       },
       {
         internalType: 'address',
-        name: '_exchange',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_bridgeMediator',
+        name: '_gsProxyFactory',
         type: 'address',
       },
     ],
     name: 'setup',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'tokenAddr',
-        type: 'address',
-      },
-    ],
-    name: 'addToken',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'supplier',
-        type: 'address',
-      },
-    ],
-    name: 'registerSupplier',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
+    outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
@@ -264,11 +255,11 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: 'supplier',
+        name: 'merchantSafe',
         type: 'address',
       },
     ],
-    name: 'isRegistered',
+    name: 'isMerchantSafe',
     outputs: [
       {
         internalType: 'bool',
@@ -281,15 +272,20 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
+    constant: false,
     inputs: [
       {
         internalType: 'address',
-        name: 'supplier',
+        name: 'merchant',
         type: 'address',
       },
+      {
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
+      },
     ],
-    name: 'safeForSupplier',
+    name: 'registerMerchant',
     outputs: [
       {
         internalType: 'address',
@@ -298,7 +294,7 @@ export default [
       },
     ],
     payable: false,
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
 ];

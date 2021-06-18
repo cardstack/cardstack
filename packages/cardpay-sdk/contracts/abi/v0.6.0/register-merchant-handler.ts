@@ -52,6 +52,21 @@ export default [
   {
     constant: true,
     inputs: [],
+    name: 'actionDispatcher',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'cardpayVersion',
     outputs: [
       {
@@ -103,6 +118,21 @@ export default [
         internalType: 'bool',
         name: '',
         type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'merchantManager',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
     ],
     payable: false,
@@ -166,6 +196,16 @@ export default [
   {
     constant: false,
     inputs: [
+      {
+        internalType: 'address',
+        name: '_actionDispatcher',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_merchantManager',
+        type: 'address',
+      },
       {
         internalType: 'address',
         name: '_revenuePoolAddress',

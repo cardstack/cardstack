@@ -2,7 +2,8 @@
 
 import Web3 from 'web3';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.6.0/prepaid-card-manager';
-import RevenuePoolABI from '../../contracts/abi/v0.6.0/revenue-pool';
+import MerchantManagerABI from '../../contracts/abi/v0.6.0/merchant-manager';
+import SupplierManagerABI from '../../contracts/abi/v0.6.0/supplier-manager';
 import BridgeUtilsABI from '../../contracts/abi/v0.6.0/bridge-utils';
 import SpendABI from '../../contracts/abi/v0.6.0/spend';
 import ERC20ABI from '../../contracts/abi/erc-20';
@@ -68,13 +69,13 @@ export default class Safes {
       SpendABI as AbiItem[],
       await getAddress('spend', this.layer2Web3)
     );
-    let revenuePool = new this.layer2Web3.eth.Contract(
-      RevenuePoolABI as AbiItem[],
-      await getAddress('revenuePool', this.layer2Web3)
+    let merchantManager = new this.layer2Web3.eth.Contract(
+      MerchantManagerABI as AbiItem[],
+      await getAddress('merchantManager', this.layer2Web3)
     );
-    let bridgeUtils = new this.layer2Web3.eth.Contract(
-      BridgeUtilsABI as AbiItem[],
-      await getAddress('bridgeUtils', this.layer2Web3)
+    let supplierManager = new this.layer2Web3.eth.Contract(
+      SupplierManagerABI as AbiItem[],
+      await getAddress('supplierManager', this.layer2Web3)
     );
 
     let exchangeRate = await getSDK('ExchangeRate', this.layer2Web3);
@@ -109,18 +110,18 @@ export default class Safes {
             spendFaceValue: await exchangeRate.convertToSpend(issuingToken, issuingTokenBalance),
           };
         }
-        let supplier = await bridgeUtils.methods.safes(safeAddress).call();
+        let supplier = await supplierManager.methods.safes(safeAddress).call();
         if (supplier !== ZERO_ADDRESS) {
-          let { infoDID } = await bridgeUtils.methods.suppliers(supplier).call();
+          let { infoDID } = await supplierManager.methods.suppliers(supplier).call();
           return {
             ...safeInfo,
             type: 'depot' as 'depot',
             infoDID: infoDID ? infoDID : undefined, // cleanse empty strings
           };
         }
-        let merchant = await revenuePool.methods.merchantForSafe(safeAddress).call();
+        let merchant = await merchantManager.methods.merchantSafes(safeAddress).call();
         if (merchant !== ZERO_ADDRESS) {
-          let { infoDID } = await revenuePool.methods.merchants(merchant).call();
+          let { infoDID } = await merchantManager.methods.merchants(merchant).call();
           return {
             ...safeInfo,
             type: 'merchant' as 'merchant',
