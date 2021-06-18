@@ -6,10 +6,6 @@ import shortUuid from 'short-uuid';
 import { Container, Registry } from '../../di/dependency-injection';
 import { parseIdentifier } from '@cardstack/did-resolver';
 
-let handleValidateAuthToken = function (_encryptedAuthToken: string) {
-  return '';
-};
-
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
 let stubTimestamp = process.hrtime.bigint();
@@ -31,10 +27,10 @@ class StubAuthenticationUtils {
 }
 
 let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
-handleValidateAuthToken = function (encryptedString: string) {
+function handleValidateAuthToken(encryptedString: string) {
   expect(encryptedString).to.equal('abc123--def456--ghi789');
   return stubUserAddress;
-};
+}
 
 describe('POST /api/prepaid-card-customizations', function () {
   let server: Server;
