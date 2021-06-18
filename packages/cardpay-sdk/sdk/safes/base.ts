@@ -1,10 +1,10 @@
 /*global fetch */
 
 import Web3 from 'web3';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.5.5/prepaid-card-manager';
-import RevenuePoolABI from '../../contracts/abi/v0.5.5/revenue-pool';
-import BridgeUtilsABI from '../../contracts/abi/v0.5.5/bridge-utils';
-import SpendABI from '../../contracts/abi/v0.5.5/spend';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.6.0/prepaid-card-manager';
+import RevenuePoolABI from '../../contracts/abi/v0.6.0/revenue-pool';
+import BridgeUtilsABI from '../../contracts/abi/v0.6.0/bridge-utils';
+import SpendABI from '../../contracts/abi/v0.6.0/spend';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';

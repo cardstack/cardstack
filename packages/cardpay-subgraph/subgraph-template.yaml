@@ -50,6 +50,7 @@ dataSources:
         - name: PrepaidCardManager
           file: ./abis/PrepaidCardManager.json
       eventHandlers:
+          #TODO added depot address to event
         - event: CreatePrepaidCard(address,address,address,uint256,uint256,uint256,string)
           handler: handleCreatePrepaidCard
       file: ./src/mappings/prepaid-card.ts
@@ -78,8 +79,10 @@ dataSources:
       eventHandlers:
         - event: MerchantCreation(address,address,string)
           handler: handleMerchantCreation
+          #TODO moved to PayMerchantHandler and also added MerchantRegistrationFee
         - event: CustomerPayment(address,address,address,uint256,uint256)
           handler: handleMerchantPayment
+          #TODO moved to PayMerchantHandler
         - event: MerchantFeeCollected(address,address,address,uint256)
           handler: handleMerchantFee
         - event: MerchantClaim(address,address,uint256)

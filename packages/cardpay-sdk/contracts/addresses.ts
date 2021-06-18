@@ -18,6 +18,9 @@ const addresses: {
     prepaidCardManager: '0x8b0625288cb14F29ED0519F1d281956D46e10ce0',
     revenuePool: '0x5D11326E20C01C5bc62544e3E31F101ED6aDCBBd',
     bridgeUtils: '0x3498110baDFa94e26a58eFe3D834D1308e32f240',
+    exchange: '',
+    payMerchantHandler: '',
+    registerMerchantHandler: '',
     spend: '0x51383885587B46859a5F58b71Da9CEd7d6e947E5',
     oracles: {
       DAI: '0x8A469E82142dE001Ac51eF6BC6F7633eD0E9EfF0', // eslint-disable-line @typescript-eslint/naming-convention

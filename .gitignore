@@ -64,6 +64,9 @@ package-lock.json
 /packages/cardpay-subgraph/abis/PrepaidCardManager.json
 /packages/cardpay-subgraph/abis/RevenuePool.json
 /packages/cardpay-subgraph/abis/Spend.json
+/packages/cardpay-subgraph/abis/Exchange.json
+/packages/cardpay-subgraph/abis/PayMerchantHandler.json
+/packages/cardpay-subgraph/abis/RegisterMerchantHandler.json
 
 # generated files you may end up with if you run the cli blueprint directly
 packages/cli/node-tests/sample-cards/*/node_modules/**/*
