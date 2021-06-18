@@ -187,7 +187,7 @@ module('Acceptance | deposit', function (hooks) {
     assert.dom('[data-test-deposit-transaction-setup-is-complete]').exists();
     assert
       .dom(
-        `${post} [data-test-deposit-transaction-setup-from-balance="DAI"] [data-test-account-balance]`
+        `${post} [data-test-deposit-transaction-setup-from-balance="DAI"] [data-test-balance-display-amount]`
       )
       .containsText('250.50');
     // transaction-amount card

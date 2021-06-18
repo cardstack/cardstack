@@ -1,4 +1,8 @@
-<label class={{cn "token-option" token-option--checked=@checked}} ...attributes>
+<label
+  class={{cn "token-option" token-option--checked=@checked}}
+  data-test-option={{@tokenSymbol}}
+  ...attributes
+>
   <Input
     name="deposit-token"
     class={{cn "token-option__input" token-option__input--checked=@checked}}
@@ -6,23 +10,16 @@
     @checked={{@checked}}
     {{on "input" @onInput}}
   />
-  <CardPay::AccountDisplay
+  <CardPay::BalanceDisplay
+    @size="large"
     @icon={{@tokenIcon}}
-    @title={{@tokenSymbol}}
+    @name={{@tokenSymbol}}
     @text={{@tokenDescription}}
-    data-test-option={{@tokenSymbol}}
   />
-  <div>
-    <div class="token-option__balance-header">Balance</div>
-    <div class="token-option__balance" data-test-balance={{@tokenSymbol}}>
-      {{@balance}} {{@tokenSymbol}}
-    </div>
-    <div class="token-option__usd-balance" data-test-usd-balance={{@tokenSymbol}}>
-      {{#if @balanceInUsd}}
-        ${{@balanceInUsd}} USD
-      {{else}}
-        <Boxel::LoadingIndicator class="token-option__loading-indicator"/>
-      {{/if}}
-    </div>
-  </div>
+  <CardPay::BalanceDisplay
+    @label="Balance"
+    @balance={{@balance}}
+    @symbol={{@tokenSymbol}}
+    @usdBalance={{@balanceInUsd}}
+  />
 </label>

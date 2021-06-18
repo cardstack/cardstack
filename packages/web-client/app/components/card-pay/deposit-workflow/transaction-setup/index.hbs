@@ -10,13 +10,13 @@
           <CardPay::NestedItems>
             <:outer>
               <CardPay::AccountDisplay
-                @title={{concat this.layer1Network.chainName " wallet"}}
+                @name={{concat this.layer1Network.chainName " wallet"}}
                 @address={{this.layer1Network.walletInfo.firstAddress}}
                 data-test-deposit-transaction-setup-from-address
               />
             </:outer>
             <:inner>
-              <CardPay::AccountDisplay
+              <CardPay::BalanceDisplay
                 @size="large"
                 @icon={{this.selectedToken.icon}}
                 @balance={{format-token-amount this.selectedTokenBalance}}
@@ -28,7 +28,7 @@
           </CardPay::NestedItems>
         {{else}}
           <CardPay::AccountDisplay
-            @title={{concat this.layer1Network.chainName " wallet"}}
+            @name={{concat this.layer1Network.chainName " wallet"}}
             @address={{this.layer1Network.walletInfo.firstAddress}}
             data-test-deposit-transaction-setup-from-address
           />
@@ -53,14 +53,14 @@
     </ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Receive tokens">
       <CardPay::LabeledValue @label="In:" class="transaction-setup__field">
-        <CardPay::AccountDisplay @title={{concat this.layer2Network.chainName " wallet"}} />
+        <CardPay::AccountDisplay @name={{concat this.layer2Network.chainName " wallet"}} />
         <CardPay::NestedItems class="transaction-setup__field-info">
           <:outer>
             <CardPay::AccountDisplay
               class="transaction-setup__account"
               @size="small"
               @icon="avatar-default"
-              @title="Account 1"
+              @name="Account 1"
               @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
               data-test-deposit-transaction-setup-to-address
             />
@@ -69,7 +69,7 @@
             <CardPay::AccountDisplay
               @size={{if @isComplete "large"}}
               @icon="depot"
-              @title="DEPOT:"
+              @name="DEPOT:"
               @address={{if this.layer2Network.isFetchingDepot "isLoading" this.layer2Network.depotSafe.address}}
               @text={{unless this.layer2Network.depotSafe "New Depot"}}
               data-test-deposit-transaction-setup-depot-address

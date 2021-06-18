@@ -1,10 +1,10 @@
 <details class="balance-view" ...attributes>
   <summary class="balance-view__summary">
     {{#if @isComplete}}
-      <CardPay::AccountDisplay
+      <CardPay::BalanceDisplay
         class="balance-view__summary-content"
         @size="small"
-        @title={{concat @wallet " wallet"}}
+        @name={{concat @wallet " wallet"}}
         @balance={{@balance}}
         @symbol={{@tokenSymbol}}
         data-test-source-token={{@tokenSymbol}}
@@ -22,13 +22,13 @@
   <CardPay::NestedItems class="balance-view__details">
     <:outer>
       <CardPay::AccountDisplay
-        @title={{concat @wallet " wallet"}}
+        @name={{concat @wallet " wallet"}}
         @address={{@address}}
         data-test-source-token={{@tokenSymbol}}
       />
     </:outer>
     <:inner>
-      <CardPay::AccountDisplay
+      <CardPay::BalanceDisplay
         @size="large"
         @icon={{@tokenIcon}}
         @balance={{@balance}}

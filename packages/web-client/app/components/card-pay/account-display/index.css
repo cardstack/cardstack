@@ -19,44 +19,43 @@
   margin-right: var(--boxel-sp-xs);
 }
 
-.account-display__title {
+.account-display__name {
   font: 600 var(--boxel-font);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.account-display__title-sm {
+.account-display__name-sm {
   font: 600 var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-sm);
 }
 
-.account-display__title-lg {
+.account-display__name-lg {
   font-size: 1.25rem;
   font-weight: 600;
   line-height: calc(27 / 20);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.account-display__text {
-  color: var(--boxel-purple-500);
-  font: var(--boxel-font);
-  letter-spacing: var(--boxel-lsp);
-}
-
-.account-display__text-sm {
-  color: var(--boxel-purple-500);
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp);
-}
-
 .account-display__address {
+  color: var(--boxel-purple-500);
   font-family: var(--boxel-monospace-font-family);
-  word-break: break-all;
+  font-size: var(--boxel-font-size);
+  line-height: calc(22 / 16);
   letter-spacing: 0.02em;
+  word-break: break-all;
+}
+
+.account-display__address-sm {
+  font-size: var(--boxel-font-size-sm);
+  line-height: calc(18 / 13);
 }
 
 .account-display__address-wrapped {
-  font-family: var(--boxel-monospace-font-family);
-  word-break: break-all;
   max-width: 22ch;
-  letter-spacing: 0.02em;
+}
+
+.account-display__text {
+  color: var(--boxel-purple-500);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xs);
 }

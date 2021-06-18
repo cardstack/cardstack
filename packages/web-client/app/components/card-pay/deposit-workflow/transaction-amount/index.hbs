@@ -25,22 +25,15 @@
           class="transaction-amount__field"
           @label="Amount to deposit:"
         >
-          <CardPay::NestedItems @noBorder={{true}} class="transaction-amount__token">
-            <:outer>
-              <CardPay::AccountDisplay
-                @size="large"
-                @icon={{this.currentTokenDetails.icon}}
-                @balance={{format-token-amount this.amountAsBigNumber}}
-                @symbol={{this.currentTokenSymbol}}
-                data-test-deposit-amount-entered
-              />
-            </:outer>
-            <:inner>
-              <CardPay::AccountDisplay
-                @usdBalance={{token-to-usd this.currentTokenSymbol this.amountAsBigNumber}}
-              />
-            </:inner>
-          </CardPay::NestedItems>
+          <CardPay::BalanceDisplay
+            class="transaction-amount__token"
+            @size="large"
+            @icon={{this.currentTokenDetails.icon}}
+            @balance={{format-token-amount this.amountAsBigNumber}}
+            @symbol={{this.currentTokenSymbol}}
+            @usdBalance={{token-to-usd this.currentTokenSymbol this.amountAsBigNumber}}
+            data-test-deposit-amount-entered
+          />
         </Boxel::Field>
       {{else}}
         <Boxel::Field

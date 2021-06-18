@@ -1,0 +1,39 @@
+{{#let (eq @size "small") (eq @size "large") as |isSmall isLarge|}}
+  <div class="balance-display" ...attributes>
+    {{#if @icon}}
+      {{svg-jar @icon class=(if isLarge "balance-display__icon-lg" "balance-display__icon") role="presentation"}}
+    {{/if}}
+    <div>
+      {{#if @label}}
+        <div class="balance-display__text-sm">{{@label}}</div>
+      {{/if}}
+      {{#if @name}}
+        <div
+          class={{if isSmall "balance-display__name-sm" "balance-display__name"}}
+          data-test-balance-display-name
+        >
+          {{@name}}
+        </div>
+      {{/if}}
+      {{#if @balance}}
+        <div class={{cn
+          balance-display__text=(not (or isSmall isLarge))
+          balance-display__text-lg=isLarge
+          balance-display__text-sm=isSmall
+        }} data-test-balance-display-amount>
+          {{@balance}} {{@symbol}}
+        </div>
+      {{/if}}
+      {{#if @usdBalance}}
+        <div class="balance-display__text-sm" data-test-balance-display-usd-amount>
+          ${{@usdBalance}} USD
+        </div>
+      {{/if}}
+      {{#if @text}}
+        <div class="balance-display__text-sm" data-test-balance-display-text>
+          {{@text}}
+        </div>
+      {{/if}}
+    </div>
+  </div>
+{{/let}}

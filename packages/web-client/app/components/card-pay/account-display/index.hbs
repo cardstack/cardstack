@@ -4,24 +4,20 @@
       {{svg-jar @icon class=(if isSmall "account-display__icon-sm" "account-display__icon") role="presentation"}}
     {{/if}}
     <div>
-      {{#if @label}}
-        <div class="account-display__text-sm">{{@label}}</div>
-      {{/if}}
-      {{#if @title}}
+      {{#if @name}}
         <div class={{cn
-          account-display__title=(not (or isSmall isLarge))
-          account-display__title-sm=isSmall
-          account-display__title-lg=isLarge
-        }} data-test-account-title>
-          {{@title}}
+          account-display__name=(not (or isSmall isLarge))
+          account-display__name-sm=isSmall
+          account-display__name-lg=isLarge
+        }} data-test-account-name>
+          {{@name}}
         </div>
       {{/if}}
       {{#if @address}}
         <div class={{cn
-          "account-display__text"
-          account-display__text-sm=isSmall
-          account-display__address=@address
-          account-display__address-wrapped=(or @wrapped (and @address isLarge))
+          "account-display__address"
+          account-display__address-sm=isSmall
+          account-display__address-wrapped=(or @wrapped isLarge)
         }}
           data-test-account-address
         >
@@ -30,16 +26,6 @@
           {{else}}
             {{@address}}
           {{/if}}
-        </div>
-      {{/if}}
-      {{#if @balance}}
-        <div class={{if isLarge "account-display__title-lg" "account-display__text-sm"}} data-test-account-balance>
-          {{@balance}} {{@symbol}}
-        </div>
-      {{/if}}
-      {{#if @usdBalance}}
-        <div class="account-display__text-sm" data-test-account-usd-balance>
-          ${{@usdBalance}} USD
         </div>
       {{/if}}
       {{#if @text}}

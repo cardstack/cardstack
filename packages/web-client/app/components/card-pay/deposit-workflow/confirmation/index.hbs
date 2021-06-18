@@ -12,7 +12,7 @@
         </Boxel::Button>
       </div>
       <div class="card-pay-confirmation__transaction">
-        <CardPay::AccountDisplay
+        <CardPay::BalanceDisplay
           class="card-pay-confirmation__transaction-amount"
           @size="large"
           @icon={{this.depositedToken.icon}}
@@ -25,7 +25,7 @@
         <CardPay::AccountDisplay
           class="card-pay-confirmation__transaction-wallet"
           @size="small"
-          @title={{concat this.layer2Network.chainName " wallet"}}
+          @name={{concat this.layer2Network.chainName " wallet"}}
           @address={{this.layer1Network.walletInfo.firstAddress}}
           @wrapped={{true}}
         />
@@ -66,7 +66,7 @@
         </Boxel::Button>
       </div>
       <div class="card-pay-confirmation__transaction">
-        <CardPay::AccountDisplay
+        <CardPay::BalanceDisplay
           class="card-pay-confirmation__transaction-amount"
           @size="large"
           @icon={{this.depositedToken.icon}}
@@ -79,14 +79,14 @@
         <CardPay::AccountDisplay
           class="card-pay-confirmation__transaction-wallet"
           @size="small"
-          @title={{concat this.layer2Network.chainName " wallet"}}
+          @name={{concat this.layer2Network.chainName " wallet"}}
         />
         <CardPay::NestedItems class="card-pay-confirmation__transaction-depot">
           <:outer>
             <CardPay::AccountDisplay
               @size="small"
               @icon="avatar-default"
-              @title="Account 1"
+              @name="Account 1"
               @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
               data-test-deposit-confirmation-account-address
             />
@@ -95,7 +95,7 @@
             <CardPay::AccountDisplay
               @size="small"
               @icon="depot"
-              @title="DEPOT:"
+              @name="DEPOT:"
               @address={{truncate-middle this.depotAddress}}
               @text={{unless this.depotAddress "New Depot"}}
               data-test-deposit-confirmation-depot-address
