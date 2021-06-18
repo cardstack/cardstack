@@ -3,19 +3,6 @@ export default [
     anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: 'address',
-        name: 'bridgeUtils',
-        type: 'address',
-      },
-    ],
-    name: 'BridgeUtilsSet',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
         indexed: false,
         internalType: 'address',
         name: 'issuer',
@@ -84,32 +71,6 @@ export default [
       },
     ],
     name: 'OwnershipTransferred',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-    ],
-    name: 'PayableTokenAdded',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-    ],
-    name: 'PayableTokenRemoved',
     type: 'event',
   },
   {
@@ -204,33 +165,12 @@ export default [
     type: 'function',
   },
   {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: '_token',
-        type: 'address',
-      },
-    ],
-    name: 'addPayableToken',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     constant: true,
     inputs: [],
-    name: 'bridgeUtils',
+    name: 'actionDispatcher',
     outputs: [
       {
-        internalType: 'address',
+        internalType: 'address payable',
         name: '',
         type: 'address',
       },
@@ -363,21 +303,6 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'getTokens',
-    outputs: [
-      {
-        internalType: 'address[]',
-        name: '',
-        type: 'address[]',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
     name: 'gnosisProxyFactory',
     outputs: [
       {
@@ -418,21 +343,6 @@ export default [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'isBridgeUtils',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -497,27 +407,6 @@ export default [
   },
   {
     constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: '_token',
-        type: 'address',
-      },
-    ],
-    name: 'removePayableToken',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
@@ -528,10 +417,10 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'revenuePool',
+    name: 'supplierManager',
     outputs: [
       {
-        internalType: 'address payable',
+        internalType: 'address',
         name: '',
         type: 'address',
       },
@@ -541,24 +430,18 @@ export default [
     type: 'function',
   },
   {
-    constant: false,
-    inputs: [
+    constant: true,
+    inputs: [],
+    name: 'tokenManager',
+    outputs: [
       {
         internalType: 'address',
-        name: '_bridgeUtils',
+        name: '',
         type: 'address',
       },
     ],
-    name: 'setBridgeUtils',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
     payable: false,
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -581,6 +464,16 @@ export default [
     inputs: [
       {
         internalType: 'address',
+        name: '_tokenManager',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_supplierManager',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
         name: '_exchangeAddress',
         type: 'address',
       },
@@ -596,7 +489,7 @@ export default [
       },
       {
         internalType: 'address payable',
-        name: '_revenuePool',
+        name: '_actionDispatcher',
         type: 'address',
       },
       {
@@ -608,11 +501,6 @@ export default [
         internalType: 'uint256',
         name: '_gasFeeInCARD',
         type: 'uint256',
-      },
-      {
-        internalType: 'address[]',
-        name: '_payableTokens',
-        type: 'address[]',
       },
       {
         internalType: 'address',
