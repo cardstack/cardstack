@@ -21,13 +21,13 @@
           balance-display__text-lg=isLarge
           balance-display__text-sm=isSmall
         }} data-test-balance-display-amount>
-          {{@balance}} {{@symbol}}
+          {{format-token-amount @balance}} {{@symbol}}
         </div>
-      {{/if}}
-      {{#if @usdBalance}}
-        <div class="balance-display__text-sm" data-test-balance-display-usd-amount>
-          ${{@usdBalance}} USD
-        </div>
+        {{#if @displayUsdBalance}}
+          <div class="balance-display__text-sm" data-test-balance-display-usd-amount>
+            ${{token-to-usd @symbol @balance}} USD
+          </div>
+        {{/if}}
       {{/if}}
       {{#if @text}}
         <div class="balance-display__text-sm" data-test-balance-display-text>

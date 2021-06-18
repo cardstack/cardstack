@@ -16,7 +16,7 @@
           class="card-pay-confirmation__transaction-amount"
           @size="large"
           @icon={{this.depositedToken.icon}}
-          @balance={{format-token-amount this.depositedAmount}}
+          @balance={{this.depositedAmount}}
           @symbol={{this.depositedToken.symbol}}
         />
         <div class="card-pay-confirmation__transaction-preposition">
@@ -70,7 +70,7 @@
           class="card-pay-confirmation__transaction-amount"
           @size="large"
           @icon={{this.depositedToken.icon}}
-          @balance={{format-token-amount this.depositedAmount}}
+          @balance={{this.depositedAmount}}
           @symbol={{concat this.depositedToken.symbol ".CPXD"}}
         />
         <div class="card-pay-confirmation__transaction-preposition">

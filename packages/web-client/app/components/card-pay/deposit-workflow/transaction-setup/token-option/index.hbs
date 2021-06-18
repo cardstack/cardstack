@@ -1,6 +1,6 @@
 <label
   class={{cn "token-option" token-option--checked=@checked}}
-  data-test-option={{@tokenSymbol}}
+  data-test-option={{@token.symbol}}
   ...attributes
 >
   <Input
@@ -12,14 +12,15 @@
   />
   <CardPay::BalanceDisplay
     @size="large"
-    @icon={{@tokenIcon}}
-    @name={{@tokenSymbol}}
-    @text={{@tokenDescription}}
+    @icon={{@token.icon}}
+    @name={{@token.symbol}}
+    @text={{@token.description}}
   />
   <CardPay::BalanceDisplay
     @label="Balance"
     @balance={{@balance}}
-    @symbol={{@tokenSymbol}}
-    @usdBalance={{@balanceInUsd}}
+    @symbol={{@token.symbol}}
+    @displayUsdBalance={{true}}
+    data-test-balance={{@token.symbol}}
   />
 </label>

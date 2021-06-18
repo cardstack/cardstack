@@ -19,9 +19,9 @@
               <CardPay::BalanceDisplay
                 @size="large"
                 @icon={{this.selectedToken.icon}}
-                @balance={{format-token-amount this.selectedTokenBalance}}
+                @balance={{this.selectedTokenBalance}}
                 @symbol={{this.selectedToken.symbol}}
-                @usdBalance={{token-to-usd this.selectedToken.symbol this.selectedTokenBalance}}
+                @displayUsdBalance={{true}}
                 data-test-deposit-transaction-setup-from-balance={{this.selectedToken.symbol}}
               />
             </:inner>
@@ -38,11 +38,8 @@
                 <CardPay::DepositWorkflow::TransactionSetup::TokenOption
                   @checked={{eq @workflowSession.state.depositSourceToken token.symbol}}
                   @onInput={{fn this.chooseSource token.symbol}}
-                  @balance={{format-token-amount balance}}
-                  @balanceInUsd={{token-to-usd token.symbol balance}}
-                  @tokenSymbol={{token.symbol}}
-                  @tokenDescription={{token.description}}
-                  @tokenIcon={{token.icon}}
+                  @balance={{balance}}
+                  @token={{token}}
                   data-test-deposit-transaction-setup-from-option={{token.symbol}}
                 />
               {{/let}}
