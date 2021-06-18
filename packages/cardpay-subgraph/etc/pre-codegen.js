@@ -1,6 +1,6 @@
 /* global __dirname, process, console */
 
-import { writeJSONSync, writeFileSync, readFileSync, removeSync } from 'fs-extra';
+import { writeJSONSync, writeFileSync, readFileSync, removeSync, existsSync } from 'fs-extra';
 import { join, resolve } from 'path';
 import { addFilePreamble } from './pre-tsc-build-entrypoint';
 
@@ -25,9 +25,15 @@ let abis = {
   BridgeUtils: getAbi(join(sourceAbiDir, 'bridge-utils.ts')),
   RevenuePool: getAbi(join(sourceAbiDir, 'revenue-pool.ts')),
   Spend: getAbi(join(sourceAbiDir, 'spend.ts')),
+  PayMerchantHandler: getAbi(join(sourceAbiDir, 'pay-merchant-handler.ts')),
+  RegisterMerchantHandler: getAbi(join(sourceAbiDir, 'register-merchant-handler.ts')),
+  ExchangeMerchantHandler: getAbi(join(sourceAbiDir, 'exchange.ts')),
 };
 
 for (let [name, abi] of Object.entries(abis)) {
+  if (!abi) {
+    continue;
+  }
   writeJSONSync(join(abiDir, `${name}.json`), abi, { spaces: 2 });
 }
 
@@ -37,6 +43,9 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{BRIDGE_UTILS_ADDRESS}/g, getAddress('bridgeUtils', cleanNetwork))
   .replace(/{HOME_TOKEN_BRIDGE_ADDRESS}/g, getAddress('homeBridge', cleanNetwork))
   .replace(/{REVENUE_POOL_ADDRESS}/g, getAddress('revenuePool', cleanNetwork))
+  .replace(/{EXCHANGE_ADDRESS}/g, getAddress('exchange', cleanNetwork))
+  .replace(/{PAY_MERCHANT_HANDLER_ADDRESS}/g, getAddress('payMerchantHandler', cleanNetwork))
+  .replace(/{REGISTER_MERCHANT_HANDLER_ADDRESS}/g, getAddress('registerMerchantHandler', cleanNetwork))
   .replace(/{SPEND_ADDRESS}/g, getAddress('spend', cleanNetwork));
 removeSync(subgraphFile);
 writeFileSync(subgraphFile, subgraph);
@@ -48,6 +57,9 @@ addFilePreamble(
 );
 
 function getAbi(path) {
+  if (!existsSync(path)) {
+    return;
+  }
   let file = readFileSync(path, { encoding: 'utf8' })
     .replace(/^export default /, '')
     .replace(/;$/, '');

@@ -1,8 +1,8 @@
 import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract';
 import { AbiItem } from 'web3-utils';
-import PriceOracleABI from '../../contracts/abi/v0.5.5/price-oracle';
-import RevenuePoolABI from '../../contracts/abi/v0.5.5/revenue-pool';
+import PriceOracleABI from '../../contracts/abi/v0.6.0/price-oracle';
+import ExchangeABI from '../../contracts/abi/v0.6.0/exchange';
 import { getOracle, getAddress } from '../../contracts/addresses';
 import BN from 'bn.js';
 
@@ -13,22 +13,22 @@ export default class ExchangeRate {
   constructor(private layer2Web3: Web3) {}
 
   async convertToSpend(token: string, amount: string): Promise<number> {
-    let revenuePool = new this.layer2Web3.eth.Contract(
-      RevenuePoolABI as AbiItem[],
-      await getAddress('revenuePool', this.layer2Web3)
+    let exchange = new this.layer2Web3.eth.Contract(
+      ExchangeABI as AbiItem[],
+      await getAddress('exchange', this.layer2Web3)
     );
-    let spendAmount = await revenuePool.methods.convertToSpend(token, amount).call();
+    let spendAmount = await exchange.methods.convertToSpend(token, amount).call();
     // 1 SPEND == $0.01 USD, and SPEND decimals is 0, so this is safe to
     // represent as a javascript number
     return Number(spendAmount);
   }
 
   async convertFromSpend(token: string, amount: number): Promise<string> {
-    let revenuePool = new this.layer2Web3.eth.Contract(
-      RevenuePoolABI as AbiItem[],
-      await getAddress('revenuePool', this.layer2Web3)
+    let exchange = new this.layer2Web3.eth.Contract(
+      ExchangeABI as AbiItem[],
+      await getAddress('exchange', this.layer2Web3)
     );
-    return await revenuePool.methods.convertFromSpend(token, amount.toString()).call();
+    return await exchange.methods.convertFromSpend(token, amount.toString()).call();
   }
 
   async getUSDConverter(token: string): Promise<(amountInWei: string) => number> {

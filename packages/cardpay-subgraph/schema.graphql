@@ -15,6 +15,7 @@ type Account @entity {
 type Depot @entity {
   id: ID!                                          # safe address
   safe: Safe!
+  # TODO let's not do this, and rather make a DepotCreation entity instead
   createdAt: BigInt!
   supplier: Account!
   infoDid: String
