@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import RevenuePoolABI from '../../contracts/abi/v0.6.0/revenue-pool';
+import ExchangeABI from '../../contracts/abi/v0.6.0/exchange';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { getAddress } from '../../contracts/addresses';
 import {
@@ -39,11 +40,11 @@ export default class RevenuePool {
   }
 
   async currentTokenUSDRate(tokenAddress: string): Promise<string> {
-    let revenuePool = new this.layer2Web3.eth.Contract(
-      RevenuePoolABI as AbiItem[],
-      await getAddress('revenuePool', this.layer2Web3)
+    let exchange = new this.layer2Web3.eth.Contract(
+      ExchangeABI as AbiItem[],
+      await getAddress('exchange', this.layer2Web3)
     );
-    let { price } = await revenuePool.methods.exchangeRateOf(tokenAddress).call();
+    let { price } = await exchange.methods.exchangeRateOf(tokenAddress).call();
     return price;
   }
 
