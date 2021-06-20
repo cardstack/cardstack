@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.19.19",
+  "version": "0.19.20",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },
@@ -10,8 +10,8 @@
   "license": "MIT",
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
+    "@cardstack/did-resolver": "0.19.20",
     "@cardstack/logger": "^0.2.1",
-    "@cardstack/did-resolver": "0.19.19",
     "@types/fs-extra": "^9.0.11",
     "@types/koa": "^2.13.1",
     "@types/koa-route": "^3.2.4",
@@ -48,8 +48,8 @@
     "typescript-memoize": "^1.0.1"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.19.19",
-    "@cardstack/test-support": "0.19.19",
+    "@cardstack/eslint-config": "0.19.20",
+    "@cardstack/test-support": "0.19.20",
     "@types/config": "^0.0.38",
     "@types/pg-format": "^1.0.1",
     "@types/supertest": "^2.0.11",
