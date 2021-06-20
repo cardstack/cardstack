@@ -1,20 +1,15 @@
 import Web3 from 'web3';
 import { networkName } from '../sdk/utils/general-utils';
 
-// TODO remove this after we drop the need for the v0.5.5 abi's (subgraphs)
-// consume the v0.5.5 abi's so that lint doesn't yell at us. these are really
-// consumed by our subgraphs, but linting seems to not understand that
-import BridgeUtilsABI from './abi/v0.5.5/bridge-utils';
-import PrepaidCardManagerABI from './abi/v0.5.5/prepaid-card-manager';
-import PriceOracleABI from './abi/v0.5.5/price-oracle';
-import RevenuePoolABI from './abi/v0.5.5/revenue-pool';
-import SpendABI from './abi/v0.5.5/spend';
-function doNothing(_stuff: any) {}
-doNothing(SpendABI);
-doNothing(BridgeUtilsABI);
-doNothing(PrepaidCardManagerABI);
-doNothing(PriceOracleABI);
-doNothing(RevenuePoolABI);
+// In order to prevent ts linting from causing false positive errors, we create
+// this silly consumption of the ABI's. The ABI's are indeed consumed, however,
+// we consume them outside of ts due to the way the codegen operates for the
+// subgraph assembly script.
+import PayMerchantHandlerABI from './abi/v0.6.0/pay-merchant-handler';
+import RegisterMerchantHandlerABI from './abi/v0.6.0/register-merchant-handler';
+function consumeModule(_module: any) {}
+consumeModule(PayMerchantHandlerABI);
+consumeModule(RegisterMerchantHandlerABI);
 
 const addresses: {
   [network: string]: {
