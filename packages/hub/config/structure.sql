@@ -71,6 +71,22 @@ CREATE TABLE public.prepaid_card_color_schemes (
 ALTER TABLE public.prepaid_card_color_schemes OWNER TO postgres;
 
 --
+-- Name: prepaid_card_customizations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.prepaid_card_customizations (
+    id uuid NOT NULL,
+    owner_address text NOT NULL,
+    issuer_name text NOT NULL,
+    color_scheme_id uuid NOT NULL,
+    pattern_id uuid NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.prepaid_card_customizations OWNER TO postgres;
+
+--
 -- Name: prepaid_card_patterns; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -107,11 +123,35 @@ ALTER TABLE ONLY public.prepaid_card_color_schemes
 
 
 --
+-- Name: prepaid_card_customizations prepaid_card_customizations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.prepaid_card_customizations
+    ADD CONSTRAINT prepaid_card_customizations_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: prepaid_card_patterns prepaid_card_patterns_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.prepaid_card_patterns
     ADD CONSTRAINT prepaid_card_patterns_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: prepaid_card_customizations prepaid_card_customizations_color_scheme_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.prepaid_card_customizations
+    ADD CONSTRAINT prepaid_card_customizations_color_scheme_id_fkey FOREIGN KEY (color_scheme_id) REFERENCES public.prepaid_card_color_schemes(id);
+
+
+--
+-- Name: prepaid_card_customizations prepaid_card_customizations_pattern_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.prepaid_card_customizations
+    ADD CONSTRAINT prepaid_card_customizations_pattern_id_fkey FOREIGN KEY (pattern_id) REFERENCES public.prepaid_card_patterns(id);
 
 
 --

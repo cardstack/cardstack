@@ -11,6 +11,7 @@ import DevelopmentProxyMiddleware from './services/development-proxy-middleware'
 import SessionRoute from './routes/session';
 import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
 import PrepaidCardPatternsRoute from './routes/prepaid-card-patterns';
+import PrepaidCardCustomizationsRoute from './routes/prepaid-card-customizations';
 import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './services/jsonapi-middleware';
 import NonceTracker from './services/nonce-tracker';
@@ -28,6 +29,7 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('jsonapi-middleware', JsonapiMiddleware);
   registry.register('nonce-tracker', NonceTracker);
   registry.register('session-route', SessionRoute);
+  registry.register('prepaid-card-customizations-route', PrepaidCardCustomizationsRoute);
   registry.register('prepaid-card-color-schemes-route', PrepaidCardColorSchemesRoute);
   registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
   if (registryCallback) {

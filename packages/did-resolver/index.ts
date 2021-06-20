@@ -3,6 +3,7 @@ import { shake_128 } from 'js-sha3';
 import shortUuid from 'short-uuid';
 import invert from 'lodash/invert';
 import kebabCase from 'lodash/kebabCase';
+import * as uuidv4 from 'uuid';
 
 const CURRENT_VERSION = 1;
 
@@ -73,7 +74,7 @@ class CardstackIdentifier {
   constructor(version: number, type: CardstackIdentifierType, uniqueId: string) {
     this.version = version;
     this.type = type;
-    this.uniqueId = uniqueId;
+    this.uniqueId = normalizeUniqueId(uniqueId);
   }
 
   toDID() {
@@ -82,6 +83,21 @@ class CardstackIdentifier {
     let checksum = hashFunc(result);
     return `did:cardstack:${result}${checksum}`;
   }
+}
+
+function normalizeUniqueId(candidate: string) {
+  if (isFlickrBase58(candidate)) {
+    return candidate;
+  }
+  if (uuidv4.validate(candidate)) {
+    return shortUuid().fromUUID(candidate);
+  }
+  throw new Error(`uniqueId must be a flickrBase58 or RFC4122 v4-compliant UUID. Was: "${candidate}"`);
+}
+
+function isFlickrBase58(candidate: string) {
+  let translator = shortUuid();
+  return candidate.length === translator.maxLength && candidate.match(new RegExp(`^[${translator.alphabet}]+$`));
 }
 
 export function parseIdentifier(identifier: string): CardstackIdentifier {
