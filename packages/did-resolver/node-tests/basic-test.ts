@@ -11,7 +11,7 @@ describe('Cardstack DID Resolver', function () {
   afterEach(async function () {});
 
   describe('encoding and decoding method identifier', function () {
-    it('it can generate a DID with default version and generated ID', async function () {
+    it('generates a DID with default version and generated ID', async function () {
       let did = encodeDID({ type: 'PrepaidCardCustomization' });
       expect(did).to.be.a('string');
       expect(did).to.match(/^did:cardstack:/);
@@ -21,6 +21,39 @@ describe('Cardstack DID Resolver', function () {
       expect(parsed.version).to.eq(1);
       expect(parsed.type).to.eq('PrepaidCardCustomization');
       expect(parsed.uniqueId).to.be.a('string');
+    });
+
+    it('generates a DID with a default version and specified short ID', async function () {
+      let did = encodeDID({ type: 'PrepaidCardCustomization', uniqueId: 'm5CxFhLyitPEvmkYiEbmBG' });
+      expect(did).to.be.a('string');
+      expect(did).to.match(/^did:cardstack:/);
+      let identifier = did.split(':')[2];
+      expect(identifier).to.eq('1pm5CxFhLyitPEvmkYiEbmBG73482b8fd926847e');
+      let parsed = parseIdentifier(identifier);
+      expect(parsed.version).to.eq(1);
+      expect(parsed.type).to.eq('PrepaidCardCustomization');
+      expect(parsed.uniqueId).to.eq('m5CxFhLyitPEvmkYiEbmBG');
+    });
+
+    it('generates a DID with a default version and specified UUIDv4', async function () {
+      let did = encodeDID({ type: 'PrepaidCardCustomization', uniqueId: 'BA44CC48-E0CB-463C-919F-0A78A64EDCC4' });
+      expect(did).to.be.a('string');
+      expect(did).to.match(/^did:cardstack:/);
+      let identifier = did.split(':')[2];
+      expect(identifier).to.eq('1pp15ewvJhjjUYdFSzKVkxiEfe431497453ad30c');
+      let parsed = parseIdentifier(identifier);
+      expect(parsed.version).to.eq(1);
+      expect(parsed.type).to.eq('PrepaidCardCustomization');
+      expect(parsed.uniqueId).to.eq(shortUuid().fromUUID('BA44CC48-E0CB-463C-919F-0A78A64EDCC4'));
+    });
+
+    it('throws with an invalid unique id', async function () {
+      try {
+        encodeDID({ type: 'PrepaidCardCustomization', uniqueId: 'foo' });
+        expect.fail('should throw and not reach here');
+      } catch (e) {
+        expect(e.message).to.eq(`uniqueId must be a flickrBase58 or RFC4122 v4-compliant UUID. Was: "foo"`);
+      }
     });
 
     it('generates for valid versions', function () {
