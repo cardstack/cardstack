@@ -1,3 +1,5 @@
+## TODO template-ize start blocks for networks
+
 specVersion: 0.0.2
 schema:
   file: ./schema.graphql
@@ -36,7 +38,7 @@ dataSources:
     source:
       address: "{PREPAID_CARD_MANAGER_ADDRESS}"
       abi: PrepaidCardManager
-      startBlock: 21372398 # v0.5.6 version of protocol
+      startBlock: 21403252 # v0.6.0 version of protocol
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -48,20 +50,66 @@ dataSources:
         - Account
       abis:
         - name: PrepaidCardManager
-          file: ./abis/PrepaidCardManager.json
+          file: ./abis/generated/PrepaidCardManager.json
       eventHandlers:
-          #TODO added depot address to event
-        - event: CreatePrepaidCard(address,address,address,uint256,uint256,uint256,string)
+        - event: CreatePrepaidCard(address,address,address,address,uint256,uint256,uint256,string)
           handler: handleCreatePrepaidCard
       file: ./src/mappings/prepaid-card.ts
 
   - kind: ethereum/contract
-    name: RevenuePool
+    name: Merchant
     network: {NETWORK}
     source:
-      address: "{REVENUE_POOL_ADDRESS}"
-      abi: RevenuePool
-      startBlock: 21372398 # v0.5.6 version of protocol
+      address: "{MERCHANT_MANAGER_ADDRESS}"
+      abi: MerchantManager
+      startBlock: 21403252 # v0.6.0 version of protocol
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - Account
+        - MerchantSafe
+        - MerchantCreation
+      abis:
+        - name: MerchantManager
+          file: ./abis/generated/MerchantManager.json
+      eventHandlers:
+        - event: MerchantCreation(address,address,string)
+          handler: handleMerchantCreation
+      file: ./src/mappings/merchant-manager.ts
+
+  - kind: ethereum/contract
+    name: MerchantRegistrationFee
+    network: {NETWORK}
+    source:
+      address: "{REGISTER_MERCHANT_HANDLER_ADDRESS}"
+      abi: RegisterMerchantHandler
+      startBlock: 21403252 # v0.6.0 version of protocol
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - MerchantRegistrationPayment
+        - PrepaidCardPayment
+      abis:
+        - name: RegisterMerchantHandler
+          file: ./abis/generated/RegisterMerchantHandler.json
+      eventHandlers:
+        - event: MerchantRegistrationFee(address,address,uint256,uint256)
+          handler: handleMerchantRegistrationFee
+      file: ./src/mappings/merchant-manager.ts
+
+  - kind: ethereum/contract
+    name: Payments
+    network: {NETWORK}
+    source:
+      address: "{PAY_MERCHANT_HANDLER_ADDRESS}"
+      abi: PayMerchantHandler
+      startBlock: 21403252 # v0.6.0 version of protocol
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -70,21 +118,38 @@ dataSources:
         - Transaction
         - PrepaidCardPayment
         - MerchantFeePayment
-        - Account
-        - MerchantSafe
-        - MerchantCreation
+        - MerchantRevenue
+        - MerchantRevenueEvent
       abis:
-        - name: RevenuePool
-          file: ./abis/RevenuePool.json
+        - name: PayMerchantHandler
+          file: ./abis/generated/PayMerchantHandler.json
       eventHandlers:
-        - event: MerchantCreation(address,address,string)
-          handler: handleMerchantCreation
-          #TODO moved to PayMerchantHandler and also added MerchantRegistrationFee
         - event: CustomerPayment(address,address,address,uint256,uint256)
           handler: handleMerchantPayment
-          #TODO moved to PayMerchantHandler
         - event: MerchantFeeCollected(address,address,address,uint256)
           handler: handleMerchantFee
+      file: ./src/mappings/pay-merchant-handler.ts
+
+  - kind: ethereum/contract
+    name: RevenuePool
+    network: {NETWORK}
+    source:
+      address: "{REVENUE_POOL_ADDRESS}"
+      abi: RevenuePool
+      startBlock: 21403252 # v0.6.0 version of protocol
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - MerchantRevenue
+        - MerchantClaim
+        - MerchantRevenueEvent
+      abis:
+        - name: RevenuePool
+          file: ./abis/generated/RevenuePool.json
+      eventHandlers:
         - event: MerchantClaim(address,address,uint256)
           handler: handleMerchantClaim
       file: ./src/mappings/revenue-pool.ts
@@ -95,7 +160,7 @@ dataSources:
     source:
       address: "{SPEND_ADDRESS}"
       abi: Spend
-      startBlock: 21372398 # v0.5.6 version of protocol
+      startBlock: 21403252 # v0.6.0 version of protocol
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -105,7 +170,7 @@ dataSources:
         - SpendAccumulation
       abis:
         - name: Spend
-          file: ./abis/Spend.json
+          file: ./abis/generated/Spend.json
       eventHandlers:
         - event: Mint(address,uint256)
           handler: handleMint
@@ -115,9 +180,9 @@ dataSources:
     name: Depot
     network: {NETWORK}
     source:
-      address: "{BRIDGE_UTILS_ADDRESS}"
-      abi: BridgeUtils
-      startBlock: 21372398 # v0.5.6 version of protocol
+      address: "{SUPPLIER_MANAGER_ADDRESS}"
+      abi: SupplierManager
+      startBlock: 21403252 # v0.6.0 version of protocol
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -127,12 +192,12 @@ dataSources:
         - Depot
         - Transaction
       abis:
-        - name: BridgeUtils
-          file: ./abis/BridgeUtils.json
+        - name: SupplierManager
+          file: ./abis/generated/SupplierManager.json
       eventHandlers:
-        - event: SupplierWallet(address,address)
+        - event: SupplierSafeCreated(address,address)
           handler: handleCreateDepot
-        - event: SupplierInfoDID(address,string)
+        - event: SupplierInfoDIDUpdated(address,string)
           handler: handleSetInfoDID
       file: ./src/mappings/depot.ts
 
@@ -142,7 +207,7 @@ dataSources:
     source:
       address: "{HOME_TOKEN_BRIDGE_ADDRESS}"
       abi: HomeMultiAMBErc20ToErc677
-      startBlock: 21372398 # v0.5.6 version of protocol
+      startBlock: 21403252 # v0.6.0 version of protocol
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -161,14 +226,13 @@ dataSources:
           handler: handleTokensBridged
       file: ./src/mappings/depot.ts
 
-
   - kind: ethereum/contract
     name: Gnosis
     network: {NETWORK}
     source:
       address: "0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B"
       abi: GnosisProxyFactory
-      startBlock: 21372398 # v0.5.6 version of protocol
+      startBlock: 21403252 # v0.6.0 version of protocol
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

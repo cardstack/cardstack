@@ -1,6 +1,6 @@
 /* global __dirname, process, console */
 
-import { writeJSONSync, writeFileSync, readFileSync, removeSync, existsSync } from 'fs-extra';
+import { writeJSONSync, writeFileSync, readFileSync, removeSync, existsSync, ensureDirSync } from 'fs-extra';
 import { join, resolve } from 'path';
 import { addFilePreamble } from './pre-tsc-build-entrypoint';
 
@@ -9,7 +9,7 @@ import { addFilePreamble } from './pre-tsc-build-entrypoint';
 
 const sourceAbiDir = resolve(join(__dirname, '..', '..', 'cardpay-sdk', 'contracts', 'abi', 'latest'));
 const addressFile = resolve(join(__dirname, '..', '..', 'cardpay-sdk', 'contracts', 'addresses.ts'));
-const abiDir = resolve(join(__dirname, '..', 'abis'));
+const abiDir = resolve(join(__dirname, '..', 'abis', 'generated'));
 const subgraphTemplateFile = resolve(join(__dirname, '..', 'subgraph-template.yaml'));
 const subgraphFile = resolve(join(__dirname, '..', 'subgraph.yaml'));
 
@@ -22,14 +22,17 @@ let cleanNetwork = network.replace('poa-', '');
 
 let abis = {
   PrepaidCardManager: getAbi(join(sourceAbiDir, 'prepaid-card-manager.ts')),
-  BridgeUtils: getAbi(join(sourceAbiDir, 'bridge-utils.ts')),
   RevenuePool: getAbi(join(sourceAbiDir, 'revenue-pool.ts')),
   Spend: getAbi(join(sourceAbiDir, 'spend.ts')),
   PayMerchantHandler: getAbi(join(sourceAbiDir, 'pay-merchant-handler.ts')),
   RegisterMerchantHandler: getAbi(join(sourceAbiDir, 'register-merchant-handler.ts')),
-  ExchangeMerchantHandler: getAbi(join(sourceAbiDir, 'exchange.ts')),
+  MerchantManager: getAbi(join(sourceAbiDir, 'merchant-manager.ts')),
+  SupplierManager: getAbi(join(sourceAbiDir, 'supplier-manager.ts')),
+  Exchange: getAbi(join(sourceAbiDir, 'exchange.ts')),
 };
 
+removeSync(abiDir);
+ensureDirSync(abiDir);
 for (let [name, abi] of Object.entries(abis)) {
   if (!abi) {
     continue;
@@ -40,12 +43,13 @@ for (let [name, abi] of Object.entries(abis)) {
 let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{NETWORK}/g, network)
   .replace(/{PREPAID_CARD_MANAGER_ADDRESS}/g, getAddress('prepaidCardManager', cleanNetwork))
-  .replace(/{BRIDGE_UTILS_ADDRESS}/g, getAddress('bridgeUtils', cleanNetwork))
   .replace(/{HOME_TOKEN_BRIDGE_ADDRESS}/g, getAddress('homeBridge', cleanNetwork))
   .replace(/{REVENUE_POOL_ADDRESS}/g, getAddress('revenuePool', cleanNetwork))
   .replace(/{EXCHANGE_ADDRESS}/g, getAddress('exchange', cleanNetwork))
   .replace(/{PAY_MERCHANT_HANDLER_ADDRESS}/g, getAddress('payMerchantHandler', cleanNetwork))
   .replace(/{REGISTER_MERCHANT_HANDLER_ADDRESS}/g, getAddress('registerMerchantHandler', cleanNetwork))
+  .replace(/{MERCHANT_MANAGER_ADDRESS}/g, getAddress('merchantManager', cleanNetwork))
+  .replace(/{SUPPLIER_MANAGER_ADDRESS}/g, getAddress('supplierManager', cleanNetwork))
   .replace(/{SPEND_ADDRESS}/g, getAddress('spend', cleanNetwork));
 removeSync(subgraphFile);
 writeFileSync(subgraphFile, subgraph);

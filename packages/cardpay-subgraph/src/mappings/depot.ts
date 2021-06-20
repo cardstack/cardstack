@@ -1,12 +1,12 @@
-import { SupplierWallet, SupplierInfoDID } from '../../generated/Depot/BridgeUtils';
+import { SupplierSafeCreated, SupplierInfoDIDUpdated } from '../../generated/Depot/SupplierManager';
 import { TokensBridgedToSafe } from '../../generated/TokenBridge/HomeMultiAMBErc20ToErc677';
 import { Depot, Account, BridgeEvent, SupplierInfoDIDUpdate } from '../../generated/schema';
 import { assertTransactionExists, toChecksumAddress } from '../utils';
 import { log, BigInt } from '@graphprotocol/graph-ts';
 
-export function handleCreateDepot(event: SupplierWallet): void {
-  let supplier = toChecksumAddress(event.params.owner);
-  let safe = toChecksumAddress(event.params.wallet);
+export function handleCreateDepot(event: SupplierSafeCreated): void {
+  let supplier = toChecksumAddress(event.params.supplier);
+  let safe = toChecksumAddress(event.params.safe);
   assertDepotExists(safe, supplier, event.block.timestamp);
 }
 
@@ -28,7 +28,7 @@ export function handleTokensBridged(event: TokensBridgedToSafe): void {
   log.debug('created bridge event entity {} for depot {}', [bridgeEventEntity.id, bridgeEventEntity.depot]);
 }
 
-export function handleSetInfoDID(event: SupplierInfoDID): void {
+export function handleSetInfoDID(event: SupplierInfoDIDUpdated): void {
   assertTransactionExists(event);
 
   let supplier = toChecksumAddress(event.params.supplier);

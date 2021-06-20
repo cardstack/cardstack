@@ -78,6 +78,7 @@ type PrepaidCardPayment @entity {
   spendAmount: BigInt!
   historicPrepaidCardSpendBalance: BigInt!
   historicPrepaidCardIssuingTokenBalance: BigInt!
+  merchantRegistrationPayments: [MerchantRegistrationPayment]! @derivedFrom(field: "prepaidCardPayment")
 }
 
 type MerchantRevenue @entity {
@@ -133,6 +134,7 @@ type PrepaidCardCreation @entity {
   transaction: Transaction!
   createdAt: BigInt!
   prepaidCard: PrepaidCard!
+  depot: Depot!
   issuer: Account!
   issuingToken: String!
   issuingTokenAmount: BigInt!
@@ -146,6 +148,17 @@ type MerchantCreation @entity {
   createdAt: BigInt!
   merchantSafe: MerchantSafe!
   merchant: Account!
+}
+
+type MerchantRegistrationPayment @entity {
+  id: ID!
+  transaction: Transaction!
+  createdAt: BigInt!
+  paidWith: PrepaidCard!
+  prepaidCardPayment: PrepaidCardPayment!
+  issuingToken: String!
+  issuingTokenAmount: BigInt!
+  spendAmount: BigInt!
 }
 
 type PrepaidCardTransfer @entity {
@@ -197,6 +210,7 @@ type Transaction @entity {
   prepaidCardTransfers: [PrepaidCardTransfer]!     @derivedFrom(field: "transaction")
   tokenTransfers: [TokenTransfer]!                 @derivedFrom(field: "transaction")
   merchantCreations: [MerchantCreation]!           @derivedFrom(field: "transaction")
+  merchantRegistrationPayments: [MerchantRegistrationPayment]! @derivedFrom(field: "transaction")
   prepaidCardPayments: [PrepaidCardPayment]!       @derivedFrom(field: "transaction")
   spendAccumulations: [SpendAccumulation]!         @derivedFrom(field: "transaction")
   merchantFeePayments: [MerchantFeePayment]!       @derivedFrom(field: "transaction")

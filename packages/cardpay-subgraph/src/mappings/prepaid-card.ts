@@ -34,6 +34,7 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   creationEntity.issuer = issuer;
   creationEntity.issuingToken = issuingToken;
   creationEntity.issuingTokenAmount = event.params.issuingTokenAmount;
+  creationEntity.depot = toChecksumAddress(event.params.createdFromDepot);
   creationEntity.spendAmount = event.params.spendAmount;
   creationEntity.creationGasFeeCollected = event.params.gasFeeCollected;
   creationEntity.save();
