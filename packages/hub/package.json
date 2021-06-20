@@ -11,7 +11,7 @@
   "description": "Stock API server for the Cardstack tech stack.",
   "dependencies": {
     "@cardstack/logger": "^0.2.1",
-    "@cardstack/did-resolver": "0.19.18",
+    "@cardstack/did-resolver": "0.19.19",
     "@types/fs-extra": "^9.0.11",
     "@types/koa": "^2.13.1",
     "@types/koa-route": "^3.2.4",
