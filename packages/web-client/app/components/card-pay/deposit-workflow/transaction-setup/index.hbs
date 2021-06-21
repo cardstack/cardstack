@@ -38,8 +38,11 @@
                 <CardPay::DepositWorkflow::TransactionSetup::TokenOption
                   @checked={{eq @workflowSession.state.depositSourceToken token.symbol}}
                   @onInput={{fn this.chooseSource token.symbol}}
-                  @balance={{balance}}
-                  @token={{token}}
+                  @balance={{format-token-amount balance}}
+                  @balanceInUsd={{token-to-usd token.symbol balance}}
+                  @tokenSymbol={{token.symbol}}
+                  @tokenDescription={{token.description}}
+                  @tokenIcon={{token.icon}}
                   data-test-deposit-transaction-setup-from-option={{token.symbol}}
                 />
               {{/let}}

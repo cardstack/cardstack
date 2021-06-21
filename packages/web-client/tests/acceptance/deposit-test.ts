@@ -142,12 +142,12 @@ module('Acceptance | deposit', function (hooks) {
 
     // transaction-setup card
     await waitFor(`${post} [data-test-balance="DAI"]`);
-    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.50 DAI');
-    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('$50.10');
+    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.50');
+    assert.dom(`${post} [data-test-usd-balance="DAI"]`).containsText('50.10');
+    assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.00');
     assert
-      .dom(`${post} [data-test-balance="CARD"]`)
-      .containsText('10000.00 CARD');
-    assert.dom(`${post} [data-test-balance="CARD"]`).containsText('$2000.00');
+      .dom(`${post} [data-test-usd-balance="CARD"]`)
+      .containsText('2000.00');
     assert
       .dom(
         `${post} [data-test-deposit-transaction-setup-from-address] [data-test-account-address]`

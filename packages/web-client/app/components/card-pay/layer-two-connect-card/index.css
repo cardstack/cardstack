@@ -82,7 +82,6 @@
   margin: auto;
 }
 
-.layer-two-connect-card__account-display svg {
-  width: var(--boxel-icon-sm);
-  height: var(--boxel-icon-sm);
+.layer-two-connect-card__account-display {
+  --icon-size: var(--boxel-icon-sm);
 }

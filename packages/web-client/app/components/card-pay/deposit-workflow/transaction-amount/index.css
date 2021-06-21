@@ -83,18 +83,11 @@
 .transaction-amount__token {
   display: flex;
   align-items: center;
+  color: var(--boxel-dark);
+
+  /* bordered display box */
   justify-content: center;
   padding: var(--boxel-sp-xl) var(--boxel-sp);
   border: 1px solid var(--boxel-light-400);
   border-radius: var(--boxel-border-radius);
-}
-
-.transaction-amount__token > div > :first-child {
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-}
-
-.transaction-amount__token > div > :last-child {
-  text-align: center;
 }
