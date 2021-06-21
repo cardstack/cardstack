@@ -36,6 +36,7 @@ export default class LayoutCustomizationCard extends Component<LayoutCustomizati
   constructor(owner: unknown, args: any) {
     super(owner, args);
     taskFor(this.setInitialCustomizationOptions).perform();
+    this.cardCustomizationOptionsService.fetchCustomizationOptions();
   }
 
   @task *setInitialCustomizationOptions() {

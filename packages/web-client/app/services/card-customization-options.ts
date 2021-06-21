@@ -1,5 +1,4 @@
 import Service from '@ember/service';
-import { tracked } from '@glimmer/tracking';
 import config from '../config/environment';
 import {
   ColorCustomizationOption,
@@ -50,17 +49,36 @@ let convertToPatternCustomizationOption = (
 };
 
 export default class CardCustomizationOptions extends Service {
-  @tracked loaded = false;
-  @tracked patternOptions: PatternCustomizationOption[] | null = null;
-  @tracked colorOptions: ColorCustomizationOption[] | null = null;
-
-  constructor(props: any) {
-    super(props);
-    taskFor(this.fetchCustomizationOptions).perform();
+  async fetchCustomizationOptions() {
+    return taskFor(this.fetchCustomizationOptionsTask).perform();
   }
 
-  @task *fetchCustomizationOptions(): any {
-    let [_colorOptions, _patternOptions] = yield Promise.all([
+  get patternOptions() {
+    return this.lastValue?.patternOptions;
+  }
+
+  get colorOptions() {
+    return this.lastValue?.colorOptions;
+  }
+
+  get loaded() {
+    return taskFor(this.fetchCustomizationOptionsTask).last?.isSuccessful;
+  }
+
+  get lastValue() {
+    let v = taskFor(this.fetchCustomizationOptionsTask).last?.value;
+    if (v) {
+      return v as {
+        patternOptions: PatternCustomizationOption[];
+        colorOptions: ColorCustomizationOption[];
+      };
+    } else {
+      return null;
+    }
+  }
+
+  @task *fetchCustomizationOptionsTask(): any {
+    let [colorOptions, patternOptions] = yield Promise.all([
       fetch(`${config.hubURL}/api/prepaid-card-color-schemes`, {
         method: 'GET',
         headers: {
@@ -80,9 +98,10 @@ export default class CardCustomizationOptions extends Service {
         .then((v) => v.data.map(convertToPatternCustomizationOption)),
     ]);
 
-    this.patternOptions = _patternOptions;
-    this.colorOptions = _colorOptions;
-    this.loaded = true;
+    return {
+      patternOptions,
+      colorOptions,
+    };
   }
 }
 
