@@ -10,9 +10,6 @@ export default function () {
   });
 
   this.passthrough((request) => {
-    return (
-      !request.url.includes('/api/prepaid-card-color-schemes') &&
-      !request.url.includes('/api/prepaid-card-patterns')
-    );
+    return !request.url.includes('/api/');
   });
 }
