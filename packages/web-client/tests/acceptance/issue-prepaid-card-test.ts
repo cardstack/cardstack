@@ -32,12 +32,15 @@ module('Acceptance | issue prepaid card', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
-  test('Initiating workflow without wallet connections', async function (assert) {
-    this.server.db.loadData({
-      prepaidCardColorSchemes: prepaidCardColorSchemes,
+  hooks.beforeEach(function () {
+    // TODO: fix typescript for mirage
+    (this as any).server.db.loadData({
+      prepaidCardColorSchemes,
       prepaidCardPatterns,
     });
+  });
 
+  test('Initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay');
     assert.equal(currentURL(), '/card-pay/balances');
     await click('[data-test-issue-prepaid-card-workflow-button]');
