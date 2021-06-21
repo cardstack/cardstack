@@ -5,6 +5,8 @@ import {
   ColorCustomizationOption,
   PatternCustomizationOption,
 } from '../utils/web3-strategies/types';
+import { task } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
 
 interface ColorCustomizationResponseObject {
   attributes: {
@@ -54,11 +56,11 @@ export default class CardCustomizationOptions extends Service {
 
   constructor(props: any) {
     super(props);
-    this.fetchCustomizationOptions();
+    taskFor(this.fetchCustomizationOptions).perform();
   }
 
-  async fetchCustomizationOptions() {
-    let [_colorOptions, _patternOptions] = await Promise.all([
+  @task *fetchCustomizationOptions(): any {
+    let [_colorOptions, _patternOptions] = yield Promise.all([
       fetch(`${config.hubURL}/api/prepaid-card-color-schemes`, {
         method: 'GET',
         headers: {
