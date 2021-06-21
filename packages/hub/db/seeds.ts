@@ -71,10 +71,11 @@ async function loadPrepaidCardPatterns(db: Client) {
     pattern_url = excluded.pattern_url,
     description = excluded.description;`;
   let patternRows = [
-    ['7B93FAE4-843D-409A-87E0-B065B63C1156', '/images/backgrounds/mock-theme-1.svg', 'Overlapping Dots'],
-    ['34D069A0-4C0E-4F9A-A89A-C1195FBD7CFF', '/images/backgrounds/mock-theme-2.svg', 'Downward Arrows'],
-    ['B1A44F42-737E-48FD-8D34-30B2D8A45EB0', '/images/backgrounds/bridge-background.svg', 'Organic Stripes'],
     ['3B8B436B-A99E-4346-AB20-3BA5F9963321', null, 'None'],
+    ['451ed569-fb6f-4b61-8b80-e10e25ea7fa2', '/images/prepaid-card-customizations/pattern-1.svg', ''],
+    ['08086b26-0b2d-43aa-a7cc-dffc7ffc45eb', '/images/prepaid-card-customizations/pattern-2.svg', ''],
+    ['aec7322a-84e2-4969-a03d-022460705fee', '/images/prepaid-card-customizations/pattern-3.svg', ''],
+    ['78c26684-4e70-4152-996b-f453934d2485', '/images/prepaid-card-customizations/pattern-4.svg', ''],
   ];
   let sql = pgFormat(patternsQueryText, patternRows);
   console.log(sql);
