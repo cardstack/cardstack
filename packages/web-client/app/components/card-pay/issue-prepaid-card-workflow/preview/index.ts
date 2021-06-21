@@ -16,7 +16,7 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
 
   @action async issue() {
     taskFor(this.layer2Network.issuePrepaidCard)
-      .perform()
+      .perform('0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1')
       .then((address: string) => {
         this.args.workflowSession.update('prepaidCardAddress', address);
         this.args.onComplete();

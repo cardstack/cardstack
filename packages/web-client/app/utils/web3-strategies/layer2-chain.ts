@@ -57,6 +57,10 @@ export default abstract class Layer2ChainWeb3Strategy
     this.walletInfo = new WalletInfo([], this.chainId);
 
     this.initialize();
+
+    window.l2w3 = this.web3;
+    window.depotSafe = this.depotSafe;
+    window.getSDK = getSDK;
   }
 
   async initialize() {
@@ -137,6 +141,37 @@ export default abstract class Layer2ChainWeb3Strategy
 
   async refreshBalances() {
     return taskFor(this.fetchDepotTask).perform();
+  }
+
+  async issuePrepaidCard(
+    safeAddress: string,
+    tokenAddress: string,
+    amount: number
+  ): Promise<String> {
+    const PrepaidCard = await getSDK('PrepaidCard', this.web3);
+    window.ppcc = PrepaidCard;
+    console.log(
+      'PrepaidCard.create',
+      safeAddress,
+      tokenAddress,
+      [amount],
+      undefined
+    );
+    try {
+      const result = await PrepaidCard.create(
+        safeAddress,
+        tokenAddress,
+        [amount],
+        undefined
+      );
+      window.rrr = result;
+      console.log('prepaid card create result', result);
+      return Promise.resolve(result.prepaidCardAddresses[0]);
+    } catch (e) {
+      console.log('prepaid card create error', e);
+      window.eee = e;
+      return Promise.resolve('NO');
+    }
   }
 
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication

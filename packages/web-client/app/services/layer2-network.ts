@@ -63,8 +63,12 @@ export default class Layer2Network extends Service {
     return this.strategy.updateUsdConverters(symbolsToUpdate);
   }
 
-  @task *issuePrepaidCard(): any {
-    let address = yield this.strategy.issuePrepaidCard();
+  @task *issuePrepaidCard(tokenAddress: string): any {
+    let address = yield this.strategy.issuePrepaidCard(
+      this.depotSafe?.address || 'xyz',
+      tokenAddress,
+      100
+    );
     return address;
   }
 
