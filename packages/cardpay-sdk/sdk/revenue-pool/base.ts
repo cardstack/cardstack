@@ -2,7 +2,6 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import RevenuePoolABI from '../../contracts/abi/v0.6.0/revenue-pool';
-import ExchangeABI from '../../contracts/abi/v0.6.0/exchange';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { getAddress } from '../../contracts/addresses';
 import {
@@ -37,15 +36,6 @@ export default class RevenuePool {
   async merchantRegistrationFee(): Promise<number> {
     // this is a SPEND amount which is a safe number to represent in javascript
     return Number(await (await this.getRevenuePool()).methods.merchantRegistrationFeeInSPEND().call());
-  }
-
-  async currentTokenUSDRate(tokenAddress: string): Promise<string> {
-    let exchange = new this.layer2Web3.eth.Contract(
-      ExchangeABI as AbiItem[],
-      await getAddress('exchange', this.layer2Web3)
-    );
-    let { price } = await exchange.methods.exchangeRateOf(tokenAddress).call();
-    return price;
   }
 
   async balances(merchantSafeAddress: string): Promise<RevenueTokenBalance[]> {
@@ -156,8 +146,9 @@ export default class RevenuePool {
     );
 
     let rateChanged = false;
+    let exchange = await getSDK('ExchangeRate', this.layer2Web3);
     do {
-      let rateLock = await this.currentTokenUSDRate(issuingToken);
+      let rateLock = await exchange.getRateLock(issuingToken);
       try {
         let payload = await this.getRegisterMerchantPayload(prepaidCardAddress, registrationFee, rateLock, infoDID);
         if (payload.lastUsedNonce == null) {
