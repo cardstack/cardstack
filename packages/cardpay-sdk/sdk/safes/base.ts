@@ -4,7 +4,6 @@ import Web3 from 'web3';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.6.0/prepaid-card-manager';
 import MerchantManagerABI from '../../contracts/abi/v0.6.0/merchant-manager';
 import SupplierManagerABI from '../../contracts/abi/v0.6.0/supplier-manager';
-import BridgeUtilsABI from '../../contracts/abi/v0.6.0/bridge-utils';
 import SpendABI from '../../contracts/abi/v0.6.0/spend';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
@@ -244,10 +243,10 @@ export default class Safes {
   }
 
   private async setSupplierInfoDIDPayload(infoDID: string): Promise<string> {
-    let bridgeUtils = new this.layer2Web3.eth.Contract(
-      BridgeUtilsABI as AbiItem[],
-      await getAddress('bridgeUtils', this.layer2Web3)
+    let supplierManager = new this.layer2Web3.eth.Contract(
+      SupplierManagerABI as AbiItem[],
+      await getAddress('supplierManager', this.layer2Web3)
     );
-    return bridgeUtils.methods.setSupplierInfoDID(infoDID).encodeABI();
+    return supplierManager.methods.setSupplierInfoDID(infoDID).encodeABI();
   }
 }
