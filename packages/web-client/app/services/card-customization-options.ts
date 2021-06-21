@@ -24,6 +24,7 @@ interface PatternCustomizationResponseObject {
   id: string;
 }
 
+// TODO: move this to orbit.js/ember-data
 let convertToColorCustomizationOption = (
   o: ColorCustomizationResponseObject
 ): ColorCustomizationOption => {
