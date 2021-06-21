@@ -9,28 +9,29 @@
         {{#if @isComplete}}
           <CardPay::NestedItems>
             <:outer>
-              <div class="transaction-setup__title">{{this.layer1Network.chainName}} wallet</div>
-              <div class="transaction-setup__address" data-test-deposit-transaction-setup-from-address>{{this.layer1Network.walletInfo.firstAddress}}</div>
+              <CardPay::AccountDisplay
+                @name={{concat this.layer1Network.chainName " wallet"}}
+                @address={{this.layer1Network.walletInfo.firstAddress}}
+                data-test-deposit-transaction-setup-from-address
+              />
             </:outer>
             <:inner>
-              <div class="transaction-setup__icon-group" data-test-option-view-only>
-                {{svg-jar this.selectedToken.icon class="transaction-setup__icon" role="presentation" width="40" height="40"}}
-                <div>
-                  <div class={{if @isComplete "transaction-setup__title-lg" "transaction-setup__title"}} data-test-balance-view-only={{this.selectedToken.symbol}}>
-                    {{format-token-amount this.selectedTokenBalance}} {{uppercase this.selectedToken.symbol}}
-                  </div>
-                  <div class="transaction-setup__text-sm" data-test-usd-balance-view-only={{this.selectedToken.symbol}}>
-                    ≈ $ {{token-to-usd this.selectedToken.symbol this.selectedTokenBalance}} USD
-                  </div>
-                </div>
-              </div>
+              <CardPay::BalanceDisplay
+                @size="large"
+                @icon={{this.selectedToken.icon}}
+                @balance={{this.selectedTokenBalance}}
+                @symbol={{this.selectedToken.symbol}}
+                @displayUsdBalance={{true}}
+                data-test-deposit-transaction-setup-from-balance={{this.selectedToken.symbol}}
+              />
             </:inner>
           </CardPay::NestedItems>
         {{else}}
-          <div>
-            <div class="transaction-setup__title">{{this.layer1Network.chainName}} wallet</div>
-            <div class="transaction-setup__address" data-test-deposit-transaction-setup-from-address>{{this.layer1Network.walletInfo.firstAddress}}</div>
-          </div>
+          <CardPay::AccountDisplay
+            @name={{concat this.layer1Network.chainName " wallet"}}
+            @address={{this.layer1Network.walletInfo.firstAddress}}
+            data-test-deposit-transaction-setup-from-address
+          />
           <div class="transaction-setup__field-info transaction-setup__radio-buttons">
             {{#each this.tokens as |token|}}
               {{#let (if (eq token.symbol 'CARD') this.layer1Network.cardBalance this.layer1Network.daiBalance) as |balance|}}
@@ -42,6 +43,7 @@
                   @tokenSymbol={{token.symbol}}
                   @tokenDescription={{token.description}}
                   @tokenIcon={{token.icon}}
+                  data-test-deposit-transaction-setup-from-option={{token.symbol}}
                 />
               {{/let}}
             {{/each}}
@@ -51,39 +53,29 @@
     </ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Receive tokens">
       <CardPay::LabeledValue @label="In:" class="transaction-setup__field">
-        <div class="transaction-setup__title">{{this.layer2Network.chainName}} wallet</div>
-          <CardPay::NestedItems class="transaction-setup__field-info">
-            <:outer>
-              <div class="transaction-setup__icon-group-sm">
-                {{svg-jar "avatar-default" width="20" height="20" class="transaction-setup__icon-sm" role="presentation"}}
-                <div>
-                  <div class="transaction-setup__title-sm">Account 1</div>
-                  <div class="transaction-setup__address-sm" data-test-deposit-transaction-setup-to-address>
-                    {{truncate-middle this.layer2Network.walletInfo.firstAddress}}
-                  </div>
-                </div>
-              </div>
-            </:outer>
-            <:inner>
-              <div class="transaction-setup__icon-group">
-                {{svg-jar "depot" width="40" height="40" class="transaction-setup__icon" role="presentation"}}
-                <div>
-                  <div class={{if @isComplete "transaction-setup__title-lg" "transaction-setup__title"}}>DEPOT:</div>
-                  {{#if this.layer2Network.isFetchingDepot}}
-                    <Boxel::LoadingIndicator/>
-                  {{else if this.layer2Network.depotSafe}}
-                    <div class={{cn "transaction-setup__address" transaction-setup__address--wrapped=@isComplete}} data-test-deposit-transaction-setup-depot-address>
-                      {{this.layer2Network.depotSafe.address}}
-                    </div>
-                  {{else}}
-                    <div class="transaction-setup__text-sm" data-test-deposit-transaction-setup-depot-address>
-                      New Depot
-                    </div>
-                  {{/if}}
-                </div>
-              </div>
-            </:inner>
-          </CardPay::NestedItems>
+        <CardPay::AccountDisplay @name={{concat this.layer2Network.chainName " wallet"}} />
+        <CardPay::NestedItems class="transaction-setup__field-info">
+          <:outer>
+            <CardPay::AccountDisplay
+              class="transaction-setup__account"
+              @size="small"
+              @icon="avatar-default"
+              @name="Account 1"
+              @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
+              data-test-deposit-transaction-setup-to-address
+            />
+          </:outer>
+          <:inner>
+            <CardPay::AccountDisplay
+              @size={{if @isComplete "large"}}
+              @icon="depot"
+              @name="DEPOT:"
+              @address={{if this.layer2Network.isFetchingDepot "isLoading" this.layer2Network.depotSafe.address}}
+              @text={{unless this.layer2Network.depotSafe "New Depot"}}
+              data-test-deposit-transaction-setup-depot-address
+            />
+          </:inner>
+        </CardPay::NestedItems>
       </CardPay::LabeledValue>
     </ActionCardContainer::Section>
   </ActionCardContainer::Section>
@@ -93,9 +85,7 @@
     data-test-deposit-transaction-setup
   >
     <:default as |d|>
-      <d.ActionButton
-        {{on "click" this.toggleComplete}}
-      >
+      <d.ActionButton {{on "click" this.toggleComplete}}>
         Continue
       </d.ActionButton>
     </:default>
