@@ -142,8 +142,8 @@
       "env": {},
       "args": [
         "register-merchant",
-        "", // Hassan's prepaid card --feel free to use your own
-        "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49",
+        "0x3a58a6E39B62Fe2FF81e06B0777BB3a476e90f44", // Hassan's prepaid card --feel free to use your own
+        "",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
