@@ -135,6 +135,7 @@ type PrepaidCardCreation @entity {
   createdAt: BigInt!
   prepaidCard: PrepaidCard!
   depot: Depot # prepaid card may not heave been created from depot. TODO also handle prepaid cards created from other prepaid cards
+  createdFromAddress: String!
   issuer: Account!
   issuingToken: String!
   issuingTokenAmount: BigInt!

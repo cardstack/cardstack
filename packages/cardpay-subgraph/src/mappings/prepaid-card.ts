@@ -35,6 +35,7 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   creationEntity.issuingToken = issuingToken;
   creationEntity.issuingTokenAmount = event.params.issuingTokenAmount;
   let createdFrom = toChecksumAddress(event.params.createdFromDepot);
+  creationEntity.createdFromAddress = createdFrom;
   // TODO handle cards created from other prepaid cards (split cards)
   if (Depot.load(createdFrom) != null) {
     creationEntity.depot = createdFrom;
