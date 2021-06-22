@@ -69,7 +69,7 @@ describe('Cardstack DID Resolver', function () {
       );
     });
 
-    it('throws for invalid versions', function () {
+    it('throws for invalid versions...', function () {
       fc.assert(
         fc.property(
           fc.integer().filter((n) => n < 0 || n >= 62),
