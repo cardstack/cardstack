@@ -10,6 +10,7 @@ import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
+import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
 
 class DepositWorkflow extends Workflow {
   name = 'Reserve Pool Deposit';
@@ -152,18 +153,26 @@ class DepositWorkflow extends Workflow {
   ]);
   cancelationMessages = new PostableCollection([
     // currently we only cancel because of disconnections from either wallet
-    new NetworkAwareWorkflowMessage({
+    new WorkflowMessage({
       author: cardbot,
       message:
         'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).',
       includeIf() {
-        let message = this as NetworkAwareWorkflowMessage;
-        return !message.hasLayer1Account || !message.hasLayer2Account;
+        return (
+          (this as WorkflowPostable).workflow?.session.state
+            .cancelationReason === 'DISCONNECTED'
+        );
       },
     }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'card-pay/deposit-workflow/workflow-canceled-cta',
+      includeIf() {
+        return (
+          (this as WorkflowPostable).workflow?.session.state
+            .cancelationReason === 'DISCONNECTED'
+        );
+      },
     }),
   ]);
 
@@ -183,7 +192,8 @@ class DepositWorkflowComponent extends Component {
     this.workflow = new DepositWorkflow(getOwner(this));
   }
 
-  @action cancelWorkflow() {
+  @action onDisconnect() {
+    this.workflow.session.update('cancelationReason', 'DISCONNECTED');
     this.workflow.cancel();
   }
 }
