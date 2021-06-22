@@ -2,7 +2,7 @@ name: CI [web-client]
 
 on:
   push:
-    branches: [main]
+    branches: [main,segfault-exploration]
 
 jobs:
   test:
@@ -44,6 +44,8 @@ jobs:
     - run: yarn --prefer-offline
     - run: yarn test:hub:preparedb
     - run: yarn lint
+    - name: Setup upterm session
+      uses: lhotari/action-upterm@v1
     - run: yarn test
 
   change_check:
@@ -69,60 +71,3 @@ jobs:
             - 'packages/cardpay-sdk/**'
             - 'packages/did-resolver/**'
 
-  deploy-hub-staging:
-    name: Deploy hub to staging cluster via waypoint
-    needs: change_check
-    if: ${{ needs.change_check.outputs.hub == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
-    - name: Install apt packages including waypoint
-      run: |
-        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-        sudo apt-get install awscli waypoint
-    - name: Configure waypoint client
-      run: waypoint context create -server-addr=${{ secrets.WAYPOINT_SERVER_ADDR }} -server-auth-token=${{ secrets.WAYPOINT_AUTH_TOKEN }} -server-tls=true -server-tls-skip-verify=true -set-default -server-require-auth waypoint-staging
-    - uses: volta-cli/action@v1
-    - name: Set up yarn cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/yarn
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-    - run: yarn global add lerna
-    - run: yarn --prefer-offline
-    - name: Deploy hub
-      run: waypoint up --app=hub -plain
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.WAYPOINT_AWS_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.WAYPOINT_AWS_SECRET }}
-        AWS_DEFAULT_REGION: us-east-1
-
-  deploy-web-client-staging:
-    name: Deploy web-client to S3 staging bucket
-    needs: change_check
-    if: ${{ needs.change_check.outputs.web_client == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
-    - uses: volta-cli/action@v1
-    - name: Set up yarn cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/yarn
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-    - run: yarn global add lerna
-    - run: yarn --prefer-offline
-    - name: Run ember-cli-deploy
-      run: yarn deploy:web-client:staging
-      env:
-        EMBER_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}
-        EMBER_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
