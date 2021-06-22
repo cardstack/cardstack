@@ -145,9 +145,11 @@ export default abstract class Layer2ChainWeb3Strategy
     }
     this.walletInfo = newWalletInfo;
     if (accounts.length) {
-      taskFor(this.fetchDepotTask).perform();
-
-      this.waitForAccountDeferred.resolve();
+      taskFor(this.fetchDepotTask)
+        .perform()
+        .then(() => {
+          this.waitForAccountDeferred.resolve();
+        });
     } else {
       this.waitForAccountDeferred = defer();
     }
