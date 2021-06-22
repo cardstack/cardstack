@@ -32,7 +32,7 @@ function handleValidateAuthToken(encryptedString: string) {
   return stubUserAddress;
 }
 
-describe('POST /api/prepaid-card-customizations', function () {
+describe.skip('POST /api/prepaid-card-customizations', function () {
   let server: Server;
   let db: Client;
   let request: supertest.SuperTest<Test>;
