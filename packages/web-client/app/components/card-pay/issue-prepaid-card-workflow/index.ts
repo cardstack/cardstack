@@ -9,6 +9,7 @@ import PostableCollection from '@cardstack/web-client/models/workflow/postable-c
 import NetworkAwareWorkflowMessage from '@cardstack/web-client/components/workflow-thread/network-aware-message';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
+import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
 
 class IssuePrepaidCardWorkflow extends Workflow {
   name = 'Prepaid Card Issuance';
@@ -139,19 +140,27 @@ class IssuePrepaidCardWorkflow extends Workflow {
   ]);
   cancelationMessages = new PostableCollection([
     // if we disconnect from layer 2
-    new NetworkAwareWorkflowMessage({
+    new WorkflowMessage({
       author: cardbot,
       message:
         'It looks like your xDai chain wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
       includeIf() {
-        let message = this as NetworkAwareWorkflowMessage;
-        return !message.hasLayer1Account || !message.hasLayer2Account;
+        return (
+          (this as WorkflowPostable).workflow?.session.state
+            .cancelationReason === 'DISCONNECTED'
+        );
       },
     }),
     new WorkflowCard({
       author: cardbot,
       componentName:
         'card-pay/issue-prepaid-card-workflow/workflow-canceled-cta',
+      includeIf() {
+        return (
+          (this as WorkflowPostable).workflow?.session.state
+            .cancelationReason === 'DISCONNECTED'
+        );
+      },
     }),
     // if we don't have enough balance (50 USD equivalent)
   ]);
@@ -171,7 +180,8 @@ class IssuePrepaidCardWorkflowComponent extends Component {
     this.workflow = new IssuePrepaidCardWorkflow(getOwner(this));
   }
 
-  @action cancelWorkflow() {
+  @action onDisconnect() {
+    this.workflow.session.update('cancelationReason', 'DISCONNECTED');
     this.workflow.cancel();
   }
 }
