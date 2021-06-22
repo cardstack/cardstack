@@ -28,6 +28,10 @@ function milestoneCompletedSel(milestoneIndex: number): string {
   return `[data-test-milestone-completed][data-test-milestone="${milestoneIndex}"]`;
 }
 
+function cancelationPostableSel(postableIndex: number) {
+  return `[data-test-cancelation][data-test-postable="${postableIndex}"]`;
+}
+
 module('Acceptance | issue prepaid card', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
@@ -344,6 +348,234 @@ module('Acceptance | issue prepaid card', function (hooks) {
   // test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
   // });
 
-  // test('Disconnecting Layer 2 after proceeding beyond it', async function (assert) {
-  // });
+  test('Disconnecting Layer 2 from within the workflow', async function (assert) {
+    await visit('/card-pay');
+    assert.equal(currentURL(), '/card-pay/balances');
+    await click('[data-test-issue-prepaid-card-workflow-button]');
+
+    let post = postableSel(0, 0);
+    assert.dom(`${postableSel(0, 0)} img`).exists();
+    assert.dom(postableSel(0, 0)).containsText('Hello, it’s nice to see you!');
+    assert.dom(postableSel(0, 1)).containsText('Let’s issue a prepaid card.');
+
+    assert
+      .dom(postableSel(0, 2))
+      .containsText(
+        'Before we get started, please connect your xDai chain wallet via your Card Wallet mobile app.'
+      );
+
+    assert
+      .dom(postableSel(0, 3))
+      .containsText(
+        'Once you have installed the app, open the app and add an existing wallet/account'
+      );
+
+    assert
+      .dom(`${postableSel(0, 4)} [data-test-wallet-connect-loading-qr-code]`)
+      .exists();
+
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    layer2Service.test__simulateWalletConnectUri();
+    await waitFor('[data-test-wallet-connect-qr-code]');
+    assert.dom('[data-test-wallet-connect-qr-code]').exists();
+
+    // Simulate the user scanning the QR code and connecting their mobile wallet
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateBalances({
+      defaultToken: toBN('250000000000000000000'),
+      card: toBN('500000000000000000000'),
+    });
+    let testDepot = {
+      address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
+      tokens: [
+        {
+          balance: '250000000000000000000',
+          token: {
+            symbol: 'DAI',
+          },
+        },
+        {
+          balance: '500000000000000000000',
+          token: {
+            symbol: 'CARD',
+          },
+        },
+      ],
+    };
+    layer2Service.test__simulateDepot(testDepot as DepotSafe);
+    await waitUntil(
+      () => !document.querySelector('[data-test-wallet-connect-qr-code]')
+    );
+    // await waitFor(`${postableSel(0, 4)} [data-test-depot-balance]`);
+    // assert
+    //   .dom(`${postableSel(0, 4)} [data-test-depot-balance]`)
+    //   .containsText('2500 DAI.CPXD');
+    assert
+      .dom(
+        '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
+      )
+      .hasText('0x1826...6E44');
+
+    await settled();
+
+    assert
+      .dom(milestoneCompletedSel(0))
+      .containsText('xDai chain wallet connected');
+
+    assert
+      .dom(postableSel(1, 0))
+      .containsText('First, you can choose the look and feel of your card');
+
+    post = postableSel(1, 1);
+
+    assert.dom('[data-test-layout-customization-form]').isVisible();
+    assert
+      .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
+      .isDisabled();
+    await click(
+      `[data-test-layer-2-wallet-card] [data-test-layer-2-wallet-disconnect-button]`
+    );
+
+    // test that all cta buttons are disabled
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
+    assert
+      .dom(cancelationPostableSel(0))
+      .containsText(
+        'It looks like your xDai chain wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
+      );
+    assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+
+    assert
+      .dom('[data-test-issue-prepaid-card-workflow-canceled-restart]')
+      .exists();
+  });
+
+  test('Disconnecting Layer 2 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
+    await visit('/card-pay');
+    assert.equal(currentURL(), '/card-pay/balances');
+    await click('[data-test-issue-prepaid-card-workflow-button]');
+
+    let post = postableSel(0, 0);
+    assert.dom(`${postableSel(0, 0)} img`).exists();
+    assert.dom(postableSel(0, 0)).containsText('Hello, it’s nice to see you!');
+    assert.dom(postableSel(0, 1)).containsText('Let’s issue a prepaid card.');
+
+    assert
+      .dom(postableSel(0, 2))
+      .containsText(
+        'Before we get started, please connect your xDai chain wallet via your Card Wallet mobile app.'
+      );
+
+    assert
+      .dom(postableSel(0, 3))
+      .containsText(
+        'Once you have installed the app, open the app and add an existing wallet/account'
+      );
+
+    assert
+      .dom(`${postableSel(0, 4)} [data-test-wallet-connect-loading-qr-code]`)
+      .exists();
+
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    layer2Service.test__simulateWalletConnectUri();
+    await waitFor('[data-test-wallet-connect-qr-code]');
+    assert.dom('[data-test-wallet-connect-qr-code]').exists();
+
+    // Simulate the user scanning the QR code and connecting their mobile wallet
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateBalances({
+      defaultToken: toBN('250000000000000000000'),
+      card: toBN('500000000000000000000'),
+    });
+    let testDepot = {
+      address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
+      tokens: [
+        {
+          balance: '250000000000000000000',
+          token: {
+            symbol: 'DAI',
+          },
+        },
+        {
+          balance: '500000000000000000000',
+          token: {
+            symbol: 'CARD',
+          },
+        },
+      ],
+    };
+    layer2Service.test__simulateDepot(testDepot as DepotSafe);
+    await waitUntil(
+      () => !document.querySelector('[data-test-wallet-connect-qr-code]')
+    );
+    // await waitFor(`${postableSel(0, 4)} [data-test-depot-balance]`);
+    // assert
+    //   .dom(`${postableSel(0, 4)} [data-test-depot-balance]`)
+    //   .containsText('2500 DAI.CPXD');
+    assert
+      .dom(
+        '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
+      )
+      .hasText('0x1826...6E44');
+
+    await settled();
+
+    assert
+      .dom(milestoneCompletedSel(0))
+      .containsText('xDai chain wallet connected');
+
+    assert
+      .dom(postableSel(1, 0))
+      .containsText('First, you can choose the look and feel of your card');
+
+    post = postableSel(1, 1);
+
+    assert.dom('[data-test-layout-customization-form]').isVisible();
+    assert
+      .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
+      .isDisabled();
+
+    layer2Service.test__simulateDisconnectFromWallet();
+
+    await waitFor('[data-test-issue-prepaid-card-workflow-canceled-cta]');
+    // test that all cta buttons are disabled
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
+    assert
+      .dom(cancelationPostableSel(0))
+      .containsText(
+        'It looks like your xDai chain wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
+      );
+    assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+    assert
+      .dom('[data-test-issue-prepaid-card-workflow-canceled-restart]')
+      .exists();
+  });
 });
