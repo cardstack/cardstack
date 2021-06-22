@@ -4,7 +4,7 @@ import { inject as service } from '@ember/service';
 import RouterService from '@ember/routing/router-service';
 import { next } from '@ember/runloop';
 
-class CardPayIssuePrepaidCardWorkflowCanceledComponent extends Component {
+class CardPayIssuePrepaidCardWorkflowDisconnectionComponent extends Component {
   @service declare router: RouterService;
 
   @action async openNewPrepaidCardWorkflow() {
@@ -15,4 +15,4 @@ class CardPayIssuePrepaidCardWorkflowCanceledComponent extends Component {
   }
 }
 
-export default CardPayIssuePrepaidCardWorkflowCanceledComponent;
+export default CardPayIssuePrepaidCardWorkflowDisconnectionComponent;

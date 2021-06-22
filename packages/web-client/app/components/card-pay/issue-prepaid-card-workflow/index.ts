@@ -153,8 +153,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
     }),
     new WorkflowCard({
       author: cardbot,
-      componentName:
-        'card-pay/issue-prepaid-card-workflow/workflow-canceled-cta',
+      componentName: 'card-pay/issue-prepaid-card-workflow/disconnection-cta',
       includeIf() {
         return (
           (this as WorkflowPostable).workflow?.session.state
