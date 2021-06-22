@@ -60,7 +60,7 @@
     "start:hub": "cd ./packages/hub && node ./bin/server.ts",
     "console:hub": "node --experimental-repl-await ./packages/hub/bin/console.ts",
     "start:web-client": "cd packages/web-client && ember serve",
-    "test": "npm-run-all --aggregate-output --continue-on-error --parallel test:*",
+    "test": "npm-run-all --aggregate-output --continue-on-error --parallel --print-name test:* 2>&1",
     "test:did-resolver": "PACKAGE=did-resolver mocha ./packages/test-support/bin/run.js --timeout 60000",
     "test:hub": "cd packages/hub && PACKAGE=hub NODE_ENV=test mocha ../../packages/test-support/bin/run.js --timeout 60000",
     "test:hub:preparedb": "cd packages/hub && node ./bin/setup-test-db.js",

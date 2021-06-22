@@ -44,8 +44,6 @@ jobs:
     - run: yarn --prefer-offline
     - run: yarn test:hub:preparedb
     - run: yarn lint
-    - name: Setup upterm session
-      uses: lhotari/action-upterm@v1
     - run: yarn test
 
   change_check:
