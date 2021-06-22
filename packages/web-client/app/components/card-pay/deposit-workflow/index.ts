@@ -151,6 +151,7 @@ class DepositWorkflow extends Workflow {
     }),
   ]);
   cancelationMessages = new PostableCollection([
+    // currently we only cancel because of disconnections from either wallet
     new NetworkAwareWorkflowMessage({
       author: cardbot,
       message:
@@ -163,10 +164,6 @@ class DepositWorkflow extends Workflow {
     new WorkflowCard({
       author: cardbot,
       componentName: 'card-pay/deposit-workflow/workflow-canceled-cta',
-      includeIf() {
-        let message = this as NetworkAwareWorkflowMessage;
-        return !message.hasLayer1Account || !message.hasLayer2Account;
-      },
     }),
   ]);
 
