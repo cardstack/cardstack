@@ -5,32 +5,34 @@ schema:
   file: ./schema.graphql
 
 dataSources:
-  # - kind: ethereum/contract
-  #   name: Token
-  #   network: poa-sokol # sadly the network is hard coded in the subgraph--we'll need to template-ize this
-  #   source:
-  #     abi: ERC677Token
-  #     # Presumably we don't want to use a start block since we don't know when
-  #     # the user's wallet was first created. But for my sanity, I'm using the
-  #     # first appearance of gnosis safe as the start
-  #     startBlock: 20030732
-  #   mapping:
-  #     kind: ethereum/events
-  #     apiVersion: 0.0.4
-  #     language: wasm/assemblyscript
-  #     entities:
-  #       - Token
-  #       - Transaction
-  #       - TokenTransfer
-  #       - Account
-  #       - Safe
-  #     abis:
-  #       - name: ERC677Token
-  #         file: ./abis/ERC677Token.json
-  #     eventHandlers:
-  #       - event: Transfer(indexed address,indexed address,uint256)
-  #         handler: handleTransfer
-  #     file: ./src/mappings/token.ts
+  - kind: ethereum/contract
+    name: Token
+    network: {NETWORK}
+    source:
+      abi: ERC20
+      # startBlock: 21403252 # v0.6.0 version of protocol (nice to use for faster index times)
+      startBlock: 20644808 # the block that the token bridge was created (and hence our CPXD tokens)
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Account
+        - TokenHolder
+        - TokenTransfer
+        - TokenHistory
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/token-{NETWORK}.ts
 
   - kind: ethereum/contract
     name: PrepaidCard
@@ -51,6 +53,12 @@ dataSources:
       abis:
         - name: PrepaidCardManager
           file: ./abis/generated/PrepaidCardManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: CreatePrepaidCard(address,address,address,address,uint256,uint256,uint256,string)
           handler: handleCreatePrepaidCard
@@ -75,6 +83,12 @@ dataSources:
       abis:
         - name: MerchantManager
           file: ./abis/generated/MerchantManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: MerchantCreation(address,address,string)
           handler: handleMerchantCreation
@@ -98,6 +112,12 @@ dataSources:
       abis:
         - name: RegisterMerchantHandler
           file: ./abis/generated/RegisterMerchantHandler.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: MerchantRegistrationFee(address,address,uint256,uint256)
           handler: handleMerchantRegistrationFee
@@ -123,6 +143,12 @@ dataSources:
       abis:
         - name: PayMerchantHandler
           file: ./abis/generated/PayMerchantHandler.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: CustomerPayment(address,address,address,uint256,uint256)
           handler: handleMerchantPayment
@@ -149,6 +175,12 @@ dataSources:
       abis:
         - name: RevenuePool
           file: ./abis/generated/RevenuePool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: MerchantClaim(address,address,uint256)
           handler: handleMerchantClaim
@@ -171,6 +203,12 @@ dataSources:
       abis:
         - name: Spend
           file: ./abis/generated/Spend.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: Mint(address,uint256)
           handler: handleMint
@@ -194,6 +232,12 @@ dataSources:
       abis:
         - name: SupplierManager
           file: ./abis/generated/SupplierManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: SupplierSafeCreated(address,address)
           handler: handleCreateDepot
@@ -221,6 +265,12 @@ dataSources:
       abis:
         - name: HomeMultiAMBErc20ToErc677
           file: ./abis/HomeMultiAMBErc20ToErc677.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: TokensBridgedToSafe(indexed address,indexed address,address,uint256,indexed bytes32)
           handler: handleTokensBridged
@@ -246,6 +296,12 @@ dataSources:
           file: ./abis/GnosisProxyFactory.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: ProxyCreation(address)
           handler: handleProxyCreation
@@ -267,6 +323,12 @@ templates:
       abis:
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: ExecutionSuccess(bytes32,uint256)
           handler: handleExecutionSuccess
