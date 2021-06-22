@@ -45,9 +45,6 @@ jobs:
     - run: yarn test:hub:preparedb
     - run: yarn lint
     - run: yarn test
-    - name: Setup upterm session
-      uses: lhotari/action-upterm@v1
-
 
   change_check:
     name: Check which packages changed
