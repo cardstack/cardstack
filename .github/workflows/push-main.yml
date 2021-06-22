@@ -1,12 +1,32 @@
-name: CI [web-client]
+name: CI [main]
 
 on:
   push:
     branches: [main]
 
 jobs:
-  test:
-    name: Build & Lint & Test
+  lint:
+    name: Lint All 
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: volta-cli/action@v1
+    - name: Set up yarn cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - run: yarn --prefer-offline
+    - run: yarn lint
+
+  test_all_but_web_client:
+    name: hub, did-resolver Build/Test 
+    needs: lint
     runs-on: ubuntu-latest
 
     services:
@@ -40,15 +60,33 @@ jobs:
         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-yarn-
-    - run: yarn global add lerna
     - run: yarn --prefer-offline
     - run: yarn test:hub:preparedb
-    - run: yarn lint
-    - run: yarn test
+    - run: yarn run npm-run-all --aggregate-output --continue-on-error --parallel test:did-resolver test:hub
+
+  test_web_client:
+    name: web-client Build/Lint/Test 
+    needs: lint
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - uses: volta-cli/action@v1
+    - name: Set up yarn cache
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - run: yarn --prefer-offline
+    - run: yarn test:web-client
 
   change_check:
     name: Check which packages changed
-    needs: test
+    needs: [test_all_but_web_client, test_web_client]
     runs-on: ubuntu-latest
     outputs:
       hub: ${{ steps.filter.outputs.hub }}
@@ -93,7 +131,6 @@ jobs:
         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-yarn-
-    - run: yarn global add lerna
     - run: yarn --prefer-offline
     - name: Deploy hub
       run: waypoint up --app=hub -plain
@@ -119,7 +156,6 @@ jobs:
         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           ${{ runner.os }}-yarn-
-    - run: yarn global add lerna
     - run: yarn --prefer-offline
     - name: Run ember-cli-deploy
       run: yarn deploy:web-client:staging
