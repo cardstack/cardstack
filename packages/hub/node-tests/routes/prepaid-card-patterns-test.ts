@@ -4,7 +4,7 @@ import { bootServerForTesting } from '../../main';
 import { Client } from 'pg';
 import { Container } from '../../di/dependency-injection';
 
-describe.skip('GET /api/prepaid-card-patterns', function () {
+describe('GET /api/prepaid-card-patterns', function () {
   let server: Server;
   let db: Client;
   let request: supertest.SuperTest<Test>;
