@@ -98,7 +98,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
       'Value of isCanceled is the same on animated and wrapped workflow'
     );
 
-    workflow.cancel();
+    workflow.cancel('TEST');
 
     assert.ok(workflow.isCanceled, 'workflow is now canceled');
     assert.equal(
@@ -207,7 +207,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
     await settled();
     assert.equal(animatedWorkflow.progressStatus, 'Milestone 2 finished');
 
-    workflow.cancel();
+    workflow.cancel('TEST');
     assert.equal(animatedWorkflow.progressStatus, 'Workflow canceled');
   });
 
@@ -230,7 +230,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
       0
     );
 
-    workflow.cancel();
+    workflow.cancel('TEST');
     await settled();
 
     assert.equal(
