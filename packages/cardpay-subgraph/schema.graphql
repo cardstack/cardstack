@@ -1,8 +1,6 @@
 type Account @entity {
   id: ID!                                          # address
   safes: [SafeOwner]!                              @derivedFrom(field: "owner")
-  sentTokens: [TokenTransfer]!                     @derivedFrom(field: "from")
-  receivedTokens: [TokenTransfer]!                 @derivedFrom(field: "to")
   depots: [Depot]!                                 @derivedFrom(field: "supplier")
   receivedBridgedTokens: [BridgeEvent]!            @derivedFrom(field: "supplier")
   supplierInfoDIDUpdates: [SupplierInfoDIDUpdate]! @derivedFrom(field: "supplier")
@@ -10,6 +8,7 @@ type Account @entity {
   createdMerchants: [MerchantCreation]!            @derivedFrom(field: "merchant")
   receivedPrepaidCards: [PrepaidCardTransfer]!     @derivedFrom(field: "to")
   sentPrepaidCards: [PrepaidCardTransfer]!         @derivedFrom(field: "from")
+  tokens: [TokenHolder]!                         @derivedFrom(field: "account")
 }
 
 type Depot @entity {
@@ -26,7 +25,7 @@ type PrepaidCard @entity {
   id: ID!                                          # safe address
   safe: Safe!
   customizationDID: String
-  issuingToken: String!
+  issuingToken: Token!
   issuer: Account!
   owner: Account!
   reloadable: Boolean!
@@ -55,7 +54,7 @@ type BridgeEvent @entity {
   depot: Depot!
   timestamp: BigInt!
   supplier: Account!
-  token: String!
+  token: Token!
   amount: BigInt!
 }
 
@@ -73,7 +72,7 @@ type PrepaidCardPayment @entity {
   transaction: Transaction!
   prepaidCard: PrepaidCard!
   merchantSafe: MerchantSafe   # for merchant registration this will not be set
-  issuingToken: String!
+  issuingToken: Token!
   issuingTokenAmount: BigInt!
   spendAmount: BigInt!
   historicPrepaidCardSpendBalance: BigInt!
@@ -83,7 +82,7 @@ type PrepaidCardPayment @entity {
 
 type MerchantRevenue @entity {
   id: ID!                               # merchantSafe-token
-  token: String!
+  token: Token!
   merchantSafe: MerchantSafe!
   lifetimeAccumulation: BigInt!
   unclaimedBalance: BigInt!
@@ -95,7 +94,7 @@ type MerchantClaim @entity {
   timestamp: BigInt!
   transaction: Transaction!
   merchantSafe: MerchantSafe!
-  token: String!
+  token: Token!
   amount: BigInt!
 }
 
@@ -125,7 +124,7 @@ type MerchantFeePayment @entity {
   transaction: Transaction!
   prepaidCard: PrepaidCard!
   merchantSafe: MerchantSafe!
-  issuingToken: String!
+  issuingToken: Token!
   feeCollected: BigInt!
 }
 
@@ -137,7 +136,7 @@ type PrepaidCardCreation @entity {
   depot: Depot # prepaid card may not heave been created from depot. TODO also handle prepaid cards created from other prepaid cards
   createdFromAddress: String!
   issuer: Account!
-  issuingToken: String!
+  issuingToken: Token!
   issuingTokenAmount: BigInt!
   spendAmount: BigInt!
   creationGasFeeCollected: BigInt!
@@ -157,7 +156,7 @@ type MerchantRegistrationPayment @entity {
   createdAt: BigInt!
   paidWith: PrepaidCard!
   prepaidCardPayment: PrepaidCardPayment!
-  issuingToken: String!
+  issuingToken: Token!
   issuingTokenAmount: BigInt!
   spendAmount: BigInt!
 }
@@ -173,12 +172,11 @@ type Safe @entity {
   id: ID!                          # safe address
   createdAt: BigInt!               # unix time
   owners: [SafeOwner]!             @derivedFrom(field: "safe")
-  sentTokens: [TokenTransfer]!     @derivedFrom(field: "fromSafe")
-  receivedTokens: [TokenTransfer]! @derivedFrom(field: "toSafe")
   safeTxns: [SafeTransaction]!     @derivedFrom(field: "safe")
   depot: Depot                     @derivedFrom(field: "safe")
   merchant: MerchantSafe           @derivedFrom(field: "safe")
   prepaidCard: PrepaidCard         @derivedFrom(field: "safe")
+  tokens: [TokenHolder]!           @derivedFrom(field: "safe")
 }
 
 type SafeTransaction @entity {
@@ -193,7 +191,7 @@ type SafeTransaction @entity {
   safeTxGas: BigInt!
   baseGas: BigInt!
   gasPrice: BigInt!
-  gasToken: String!
+  gasToken: Token
   refundReceiver: String!
   signatures: Bytes!
 }
@@ -229,17 +227,39 @@ type SafeOwner @entity {
 
 type TokenTransfer @entity {
   id: ID!              # Set to token address + txn-hash + log index
+  timestamp: BigInt!
   transaction: Transaction!
   token: Token!
   amount: BigInt!
-  timestamp: BigInt!
-  from: Account
-  fromSafe: Safe
-  to: Account
-  toSafe: Safe
+  fromTokenHolder: TokenHolder
+  toTokenHolder: TokenHolder
+  from: String
+  to: String
 }
 
 type Token @entity {
   id: ID!
+  symbol: String
+  name: String
   transfers: [TokenTransfer]! @derivedFrom(field: "token")
+}
+
+type TokenHolder @entity {
+  id: ID!
+  token: Token!
+  account: Account
+  safe: Safe
+  balance: BigInt!
+  sentTokens: [TokenTransfer]!     @derivedFrom(field: "fromTokenHolder")
+  receivedTokens: [TokenTransfer]! @derivedFrom(field: "toTokenHolder")
+  history: [TokenHistory]!         @derivedFrom(field: "tokenHolder")
+}
+
+type TokenHistory @entity {
+  id: ID!              #TokenTransfer.id + TokenHolder.id
+  transaction: Transaction!
+  sent: TokenTransfer
+  received: TokenTransfer
+  timestamp: BigInt!
+  tokenHolder: TokenHolder!
 }

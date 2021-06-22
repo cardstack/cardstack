@@ -1,15 +1,30 @@
 import { crypto, Address, ByteArray, ethereum, BigInt } from '@graphprotocol/graph-ts';
 import { log } from '@graphprotocol/graph-ts';
-import { Transaction, MerchantRevenue, PrepaidCard, PrepaidCardPayment } from '../generated/schema';
+import { ERC20 } from '../generated/Token/ERC20';
+import { ERC20SymbolBytes } from '../generated/Token/ERC20SymbolBytes';
+import { ERC20NameBytes } from '../generated/Token/ERC20NameBytes';
+import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit';
+import { Transaction, MerchantRevenue, PrepaidCard, PrepaidCardPayment, Token } from '../generated/schema';
 
-export function assertTransactionExists(event: ethereum.Event): void {
+export function makeToken(address: Address): string {
+  let token = toChecksumAddress(address);
+  if (Token.load(token) == null) {
+    let tokenEntity = new Token(token);
+    tokenEntity.symbol = fetchTokenSymbol(address);
+    tokenEntity.name = fetchTokenName(address);
+    tokenEntity.save();
+  }
+  return token;
+}
+
+export function makeTransaction(event: ethereum.Event): void {
   let txEntity = new Transaction(event.transaction.hash.toHex());
   txEntity.timestamp = event.block.timestamp;
   txEntity.blockNumber = event.block.number;
   txEntity.save();
 }
 
-export function assertMerchantRevenueExists(merchantSafe: string, token: string): MerchantRevenue {
+export function makeMerchantRevenue(merchantSafe: string, token: string): MerchantRevenue {
   let id = merchantSafe + '-' + token;
   let entity = MerchantRevenue.load(id);
   if (entity == null) {
@@ -97,4 +112,57 @@ function toUpper(str: string): string {
     }
   }
   return result;
+}
+
+function fetchTokenSymbol(tokenAddress: Address): string {
+  // hard coded override
+  if (tokenAddress.toHexString() == '0xe0b7927c4af23765cb51314a0e0521a9645f0e2a') {
+    return 'DGD';
+  }
+
+  let contract = ERC20.bind(tokenAddress);
+  let contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress);
+
+  // try types string and bytes32 for symbol
+  let symbolValue = 'unknown';
+  let symbolResult = contract.try_symbol();
+  if (symbolResult.reverted) {
+    let symbolResultBytes = contractSymbolBytes.try_symbol();
+    if (!symbolResultBytes.reverted) {
+      // for token that has no symbol function exposed
+      if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
+        symbolValue = symbolResultBytes.value.toString();
+      }
+    }
+  } else {
+    symbolValue = symbolResult.value;
+  }
+
+  return symbolValue;
+}
+
+function fetchTokenName(tokenAddress: Address): string {
+  let contract = ERC20.bind(tokenAddress);
+  let contractNameBytes = ERC20NameBytes.bind(tokenAddress);
+
+  // try types string and bytes32 for name
+  let nameValue = 'unknown';
+  let nameResult = contract.try_name();
+  if (nameResult.reverted) {
+    let nameResultBytes = contractNameBytes.try_name();
+    if (!nameResultBytes.reverted) {
+      // for token that has no name function exposed
+      if (!isNullEthValue(nameResultBytes.value.toHexString())) {
+        nameValue = nameResultBytes.value.toString();
+      }
+    }
+  } else {
+    nameValue = nameResult.value;
+  }
+
+  return nameValue;
+}
+
+function isNullEthValue(value: string): boolean {
+  return value == ZERO_ADDRESS;
 }

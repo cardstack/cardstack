@@ -2,10 +2,10 @@ import { BigInt } from '@graphprotocol/graph-ts';
 import { MerchantCreation as MerchantCreationEvent } from '../../generated/Merchant/MerchantManager';
 import { MerchantRegistrationFee } from '../../generated/MerchantRegistrationFee/RegisterMerchantHandler';
 import { Account, MerchantSafe, MerchantCreation, MerchantRegistrationPayment } from '../../generated/schema';
-import { assertTransactionExists, makePrepaidCardPayment, toChecksumAddress } from '../utils';
+import { makeTransaction, makePrepaidCardPayment, toChecksumAddress, makeToken } from '../utils';
 
 export function handleMerchantCreation(event: MerchantCreationEvent): void {
-  assertTransactionExists(event);
+  makeTransaction(event);
 
   let merchant = toChecksumAddress(event.params.merchant);
   let merchantSafe = toChecksumAddress(event.params.merchantSafe);
@@ -29,11 +29,11 @@ export function handleMerchantCreation(event: MerchantCreationEvent): void {
   creationEntity.save();
 }
 export function handleMerchantRegistrationFee(event: MerchantRegistrationFee): void {
-  assertTransactionExists(event);
+  makeTransaction(event);
 
   let txnHash = event.transaction.hash.toHex();
   let prepaidCard = toChecksumAddress(event.params.card);
-  let issuingToken = toChecksumAddress(event.params.issuingToken);
+  let issuingToken = makeToken(event.params.issuingToken);
 
   makePrepaidCardPayment(
     prepaidCard,
