@@ -25,3 +25,8 @@
     </Boxel::ExpandableBanner>
   </:before-content>
 </WorkflowThread>
+<Listener
+  @emitter={{this.layer2Network}}
+  @event="disconnect"
+  @action={{this.cancelWorkflow}}
+/>

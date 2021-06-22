@@ -1,11 +1,14 @@
 import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
+import { inject as service } from '@ember/service';
 import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
 import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
 import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
 import NetworkAwareWorkflowMessage from '@cardstack/web-client/components/workflow-thread/network-aware-message';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import { action } from '@ember/object';
 
 class IssuePrepaidCardWorkflow extends Workflow {
   name = 'Prepaid Card Issuance';
@@ -134,6 +137,25 @@ class IssuePrepaidCardWorkflow extends Workflow {
       componentName: 'card-pay/issue-prepaid-card-workflow/next-steps',
     }),
   ]);
+  cancelationMessages = new PostableCollection([
+    // if we disconnect from layer 2
+    new NetworkAwareWorkflowMessage({
+      author: cardbot,
+      message:
+        'It looks like your xDai chain wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
+      includeIf() {
+        let message = this as NetworkAwareWorkflowMessage;
+        return !message.hasLayer1Account || !message.hasLayer2Account;
+      },
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName:
+        'card-pay/issue-prepaid-card-workflow/workflow-canceled-cta',
+    }),
+    // if we don't have enough balance (50 USD equivalent)
+  ]);
+
   constructor(owner: unknown) {
     super(owner);
     this.attachWorkflow();
@@ -141,10 +163,16 @@ class IssuePrepaidCardWorkflow extends Workflow {
 }
 
 class IssuePrepaidCardWorkflowComponent extends Component {
+  @service declare layer2Network: Layer2Network;
+
   workflow!: IssuePrepaidCardWorkflow;
   constructor(owner: unknown, args: {}) {
     super(owner, args);
     this.workflow = new IssuePrepaidCardWorkflow(getOwner(this));
+  }
+
+  @action cancelWorkflow() {
+    this.workflow.cancel();
   }
 }
 
