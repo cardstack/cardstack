@@ -162,6 +162,28 @@ class IssuePrepaidCardWorkflow extends Workflow {
       },
     }),
     // if we don't have enough balance (50 USD equivalent)
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        "Looks like there's no balance in your xDai chain wallet to fund a prepaid card. Before you can continue, please add funds to your xDai chain wallet by bridging some tokens from your Ethereum mainnet wallet.",
+      includeIf() {
+        return (
+          (this as WorkflowPostable).workflow?.session.state
+            .cancelationReason === 'INSUFFICIENT_FUNDS'
+        );
+      },
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName:
+        'card-pay/issue-prepaid-card-workflow/insufficient-funds-cta',
+      includeIf() {
+        return (
+          (this as WorkflowPostable).workflow?.session.state
+            .cancelationReason === 'INSUFFICIENT_FUNDS'
+        );
+      },
+    }),
   ]);
 
   constructor(owner: unknown) {
