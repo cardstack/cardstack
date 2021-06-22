@@ -5,6 +5,7 @@ import { WorkflowPostable } from './workflow/workflow-postable';
 import WorkflowSession from './workflow/workflow-session';
 import { tracked } from '@glimmer/tracking';
 import { SimpleEmitter } from '../utils/events';
+import { action } from '@ember/object';
 
 interface PostableIndices {
   isInMilestone: boolean;
@@ -54,7 +55,7 @@ export abstract class Workflow {
     return A(this.milestones).isEvery('isComplete');
   }
 
-  cancel(reason?: string) {
+  @action cancel(reason?: string) {
     if (!this.isComplete && !this.isCanceled) {
       this.emit('visible-postables-changed');
       this.cancelationReason = reason || 'UNKNOWN';
