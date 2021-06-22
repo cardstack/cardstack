@@ -184,7 +184,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
     assert.dom('[data-test-postable]').exists({ count: 1 });
     assert.dom('[data-test-cancelation][data-test-postable]').doesNotExist();
 
-    workflow.cancel();
+    workflow.cancel('TEST');
 
     await waitFor('[data-test-cancelation][data-test-postable]');
     assert.dom('[data-test-postable]').exists({ count: 2 });

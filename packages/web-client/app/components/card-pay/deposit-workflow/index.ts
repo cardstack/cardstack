@@ -159,8 +159,8 @@ class DepositWorkflow extends Workflow {
         'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).',
       includeIf() {
         return (
-          (this as WorkflowPostable).workflow?.session.state
-            .cancelationReason === 'DISCONNECTED'
+          (this as WorkflowPostable).workflow?.cancelationReason ===
+          'DISCONNECTED'
         );
       },
     }),
@@ -169,8 +169,8 @@ class DepositWorkflow extends Workflow {
       componentName: 'card-pay/deposit-workflow/disconnection-cta',
       includeIf() {
         return (
-          (this as WorkflowPostable).workflow?.session.state
-            .cancelationReason === 'DISCONNECTED'
+          (this as WorkflowPostable).workflow?.cancelationReason ===
+          'DISCONNECTED'
         );
       },
     }),
@@ -193,8 +193,7 @@ class DepositWorkflowComponent extends Component {
   }
 
   @action onDisconnect() {
-    this.workflow.session.update('cancelationReason', 'DISCONNECTED');
-    this.workflow.cancel();
+    this.workflow.cancel('DISCONNECTED');
   }
 }
 

@@ -146,8 +146,8 @@ class IssuePrepaidCardWorkflow extends Workflow {
         'It looks like your xDai chain wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
       includeIf() {
         return (
-          (this as WorkflowPostable).workflow?.session.state
-            .cancelationReason === 'DISCONNECTED'
+          (this as WorkflowPostable).workflow?.cancelationReason ===
+          'DISCONNECTED'
         );
       },
     }),
@@ -156,8 +156,8 @@ class IssuePrepaidCardWorkflow extends Workflow {
       componentName: 'card-pay/issue-prepaid-card-workflow/disconnection-cta',
       includeIf() {
         return (
-          (this as WorkflowPostable).workflow?.session.state
-            .cancelationReason === 'DISCONNECTED'
+          (this as WorkflowPostable).workflow?.cancelationReason ===
+          'DISCONNECTED'
         );
       },
     }),
@@ -168,8 +168,8 @@ class IssuePrepaidCardWorkflow extends Workflow {
         "Looks like there's no balance in your xDai chain wallet to fund a prepaid card. Before you can continue, please add funds to your xDai chain wallet by bridging some tokens from your Ethereum mainnet wallet.",
       includeIf() {
         return (
-          (this as WorkflowPostable).workflow?.session.state
-            .cancelationReason === 'INSUFFICIENT_FUNDS'
+          (this as WorkflowPostable).workflow?.cancelationReason ===
+          'INSUFFICIENT_FUNDS'
         );
       },
     }),
@@ -179,8 +179,8 @@ class IssuePrepaidCardWorkflow extends Workflow {
         'card-pay/issue-prepaid-card-workflow/insufficient-funds-cta',
       includeIf() {
         return (
-          (this as WorkflowPostable).workflow?.session.state
-            .cancelationReason === 'INSUFFICIENT_FUNDS'
+          (this as WorkflowPostable).workflow?.cancelationReason ===
+          'INSUFFICIENT_FUNDS'
         );
       },
     }),
@@ -202,8 +202,7 @@ class IssuePrepaidCardWorkflowComponent extends Component {
   }
 
   @action onDisconnect() {
-    this.workflow.session.update('cancelationReason', 'DISCONNECTED');
-    this.workflow.cancel();
+    this.workflow.cancel('DISCONNECTED');
   }
 }
 
