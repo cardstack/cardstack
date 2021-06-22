@@ -166,7 +166,7 @@ class DepositWorkflow extends Workflow {
     }),
     new WorkflowCard({
       author: cardbot,
-      componentName: 'card-pay/deposit-workflow/workflow-canceled-cta',
+      componentName: 'card-pay/deposit-workflow/disconnection-cta',
       includeIf() {
         return (
           (this as WorkflowPostable).workflow?.session.state
