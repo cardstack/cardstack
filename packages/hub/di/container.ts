@@ -6,7 +6,7 @@ export interface FactoryByConstructor<T, A extends unknown[] = []> {
   new (...a: A): T;
 }
 export interface FactoryByCreateMethod<T, A extends unknown[] = []> {
-  create(...a: A): T;
+  create(...a: A): Promise<T>;
 }
 
 export type Factory<T, A extends unknown[] = []> = FactoryByConstructor<T, A> | FactoryByCreateMethod<T, A>;
