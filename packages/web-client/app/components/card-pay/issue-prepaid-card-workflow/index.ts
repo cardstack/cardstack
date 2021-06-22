@@ -49,7 +49,8 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new WorkflowCard({
           author: cardbot,
-          componentName: 'card-pay/layer-two-connect-card',
+          componentName:
+            'card-pay/issue-prepaid-card-workflow/layer-two-connect-card',
         }),
       ],
       completedDetail: 'xDai chain wallet connected',
