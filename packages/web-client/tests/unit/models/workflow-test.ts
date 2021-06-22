@@ -129,14 +129,14 @@ module('Unit | Workflow model', function (hooks) {
   test('progressStatus returns "Workflow canceled" when workflow is canceled', function (assert) {
     let workflow = new ConcreteWorkflow({});
     workflow.milestones = [exampleMilestone];
-    workflow.cancel();
+    workflow.cancel('TEST');
     assert.equal(workflow.progressStatus, 'Workflow canceled');
   });
 
   test('Incomplete workflow is canceled when workflow.cancel is called', function (assert) {
     let workflow = new ConcreteWorkflow({});
     workflow.milestones = [exampleMilestone];
-    workflow.cancel();
+    workflow.cancel('TEST');
     assert.equal(workflow.isCanceled, true);
   });
 
@@ -146,7 +146,7 @@ module('Unit | Workflow model', function (hooks) {
     examplePostable.isComplete = true;
 
     assert.ok(workflow.isComplete, 'Completing workflow before canceling');
-    workflow.cancel();
+    workflow.cancel('TEST');
     assert.ok(!workflow.isCanceled);
   });
 
