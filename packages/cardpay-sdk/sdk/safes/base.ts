@@ -198,15 +198,15 @@ export default class Safes {
     options?: ContractOptions
   ): Promise<GnosisExecTx> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let bridgeUtilsAddress = await getAddress('bridgeUtils', this.layer2Web3);
+    let supplierManager = await getAddress('supplierManager', this.layer2Web3);
     let payload = await this.setSupplierInfoDIDPayload(infoDID);
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, bridgeUtilsAddress, '0', payload, 0, gasToken);
+    let estimate = await gasEstimate(this.layer2Web3, safeAddress, supplierManager, '0', payload, 0, gasToken);
     if (estimate.lastUsedNonce == null) {
       estimate.lastUsedNonce = -1;
     }
     let signatures = await sign(
       this.layer2Web3,
-      bridgeUtilsAddress,
+      supplierManager,
       0,
       payload,
       0,
@@ -222,7 +222,7 @@ export default class Safes {
     let result = await executeTransaction(
       this.layer2Web3,
       safeAddress,
-      bridgeUtilsAddress,
+      supplierManager,
       0,
       payload,
       0,
