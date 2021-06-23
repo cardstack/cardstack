@@ -41,7 +41,7 @@
     "typescript": "4.2.3"
   },
   "scripts": {
-    "clean": "git clean -x -f",
+    "clean": "git clean -x -f --exclude=packages/web-client/.env",
     "compile": "yarn codegen:subgraph && tsc --build ./tsconfig.json",
     "deploy:web-client:staging": "cd ./packages/web-client && ember deploy staging --verbose",
     "deploy:subgraph-local": "cd ./packages/cardpay-subgraph && yarn deploy-local-sokol",

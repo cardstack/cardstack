@@ -81,3 +81,7 @@
 .layer-two-connect-card__loading-qr > span {
   margin: auto;
 }
+
+.layer-two-connect-card__account-display {
+  --icon-size: var(--boxel-icon-sm);
+}

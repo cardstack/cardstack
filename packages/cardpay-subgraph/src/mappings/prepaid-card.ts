@@ -1,12 +1,12 @@
 import { CreatePrepaidCard, PrepaidCardManager } from '../../generated/PrepaidCard/PrepaidCardManager';
-import { Account, PrepaidCard, PrepaidCardCreation } from '../../generated/schema';
-import { assertTransactionExists, toChecksumAddress } from '../utils';
+import { Account, Depot, PrepaidCard, PrepaidCardCreation } from '../../generated/schema';
+import { makeToken, makeTransaction, toChecksumAddress } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
 export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   let prepaidCard = toChecksumAddress(event.params.card);
   log.info('indexing new prepaid card {}', [prepaidCard]);
-  assertTransactionExists(event);
+  makeTransaction(event);
   let issuer = toChecksumAddress(event.params.issuer);
   let accountEntity = new Account(issuer);
   accountEntity.save();
@@ -14,7 +14,7 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   let prepaidCardMgr = PrepaidCardManager.bind(event.address);
   let cardInfo = prepaidCardMgr.cardDetails(event.params.card);
   let reloadable = cardInfo.value4;
-  let issuingToken = toChecksumAddress(event.params.token);
+  let issuingToken = makeToken(event.params.token);
 
   let prepaidCardEntity = new PrepaidCard(prepaidCard);
   prepaidCardEntity.safe = prepaidCard;
@@ -34,7 +34,12 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   creationEntity.issuer = issuer;
   creationEntity.issuingToken = issuingToken;
   creationEntity.issuingTokenAmount = event.params.issuingTokenAmount;
-  creationEntity.depot = toChecksumAddress(event.params.createdFromDepot);
+  let createdFrom = toChecksumAddress(event.params.createdFromDepot);
+  creationEntity.createdFromAddress = createdFrom;
+  // TODO handle cards created from other prepaid cards (split cards)
+  if (Depot.load(createdFrom) != null) {
+    creationEntity.depot = createdFrom;
+  }
   creationEntity.spendAmount = event.params.spendAmount;
   creationEntity.creationGasFeeCollected = event.params.gasFeeCollected;
   creationEntity.save();

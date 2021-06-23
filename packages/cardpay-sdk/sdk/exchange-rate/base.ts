@@ -31,6 +31,15 @@ export default class ExchangeRate {
     return await exchange.methods.convertFromSpend(token, amount.toString()).call();
   }
 
+  async getRateLock(tokenAddress: string): Promise<string> {
+    let exchange = new this.layer2Web3.eth.Contract(
+      ExchangeABI as AbiItem[],
+      await getAddress('exchange', this.layer2Web3)
+    );
+    let { price } = await exchange.methods.exchangeRateOf(tokenAddress).call();
+    return price;
+  }
+
   async getUSDConverter(token: string): Promise<(amountInWei: string) => number> {
     const oracle = await this.getOracleContract(token);
     const usdRawRate = new BN((await oracle.methods.usdPrice().call()).price);

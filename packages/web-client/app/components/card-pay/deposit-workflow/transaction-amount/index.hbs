@@ -15,7 +15,7 @@
           @tokenSymbol={{this.currentTokenSymbol}}
           @tokenIcon={{this.currentTokenDetails.icon}}
           @address={{this.layer1Network.walletInfo.firstAddress}}
-          @balance={{format-token-amount this.currentTokenBalance}}
+          @balance={{this.currentTokenBalance}}
           @balanceInUsd={{token-to-usd this.currentTokenSymbol this.currentTokenBalance}}
           @isComplete={{@isComplete}}
         />
@@ -25,17 +25,15 @@
           class="transaction-amount__field"
           @label="Amount to deposit:"
         >
-          <div class="transaction-amount__token">
-            {{svg-jar this.currentTokenDetails.icon class="transaction-amount__token-icon" role="presentation" width="40" height="40"}}
-            <div>
-              <div class="transaction-amount__token-balance" data-test-deposit-amount-entered>
-                {{this.amount}} {{this.currentTokenSymbol}}
-              </div>
-              <div class="transaction-amount__usd-balance">
-                ≈ $ {{token-to-usd this.currentTokenSymbol this.amountAsBigNumber}} USD
-              </div>
-            </div>
-          </div>
+          <CardPay::BalanceDisplay
+            class="transaction-amount__token"
+            @size="large"
+            @icon={{this.currentTokenDetails.icon}}
+            @balance={{this.amountAsBigNumber}}
+            @symbol={{this.currentTokenSymbol}}
+            @displayUsdBalance={{true}}
+            data-test-deposit-amount-entered
+          />
         </Boxel::Field>
       {{else}}
         <Boxel::Field
@@ -63,7 +61,7 @@
         </div>
         </Boxel::Field>
         <Boxel::Field @label="Approximate value">
-          $ {{token-to-usd this.currentTokenSymbol this.amountAsBigNumber}} USD
+          ${{token-to-usd this.currentTokenSymbol this.amountAsBigNumber}} USD
         </Boxel::Field>
       {{/if}}
     </div>

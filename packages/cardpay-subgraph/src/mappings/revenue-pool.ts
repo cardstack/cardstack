@@ -1,14 +1,14 @@
 import { MerchantClaim as MerchantClaimEvent } from '../../generated/RevenuePool/RevenuePool';
 import { MerchantClaim, MerchantRevenueEvent } from '../../generated/schema';
-import { assertMerchantRevenueExists, assertTransactionExists, toChecksumAddress } from '../utils';
+import { makeMerchantRevenue, makeToken, makeTransaction, toChecksumAddress } from '../utils';
 
 export function handleMerchantClaim(event: MerchantClaimEvent): void {
-  assertTransactionExists(event);
+  makeTransaction(event);
 
   let txnHash = event.transaction.hash.toHex();
   let merchantSafe = toChecksumAddress(event.params.merchantSafe);
-  let token = toChecksumAddress(event.params.payableToken);
-  let revenueEntity = assertMerchantRevenueExists(merchantSafe, token);
+  let token = makeToken(event.params.payableToken);
+  let revenueEntity = makeMerchantRevenue(merchantSafe, token);
   // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
   revenueEntity.unclaimedBalance = revenueEntity.unclaimedBalance - event.params.amount;
   revenueEntity.save();

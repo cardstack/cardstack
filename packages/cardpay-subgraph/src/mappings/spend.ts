@@ -1,10 +1,10 @@
 import { Mint as MintEvent } from '../../generated/Spend/Spend';
 import { SpendAccumulation, MerchantSafe } from '../../generated/schema';
-import { assertTransactionExists, toChecksumAddress } from '../utils';
+import { makeTransaction, toChecksumAddress } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
 export function handleMint(event: MintEvent): void {
-  assertTransactionExists(event);
+  makeTransaction(event);
 
   let merchantSafe = toChecksumAddress(event.params.account);
   let txnHash = event.transaction.hash.toHex();

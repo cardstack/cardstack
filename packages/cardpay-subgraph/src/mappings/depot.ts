@@ -1,35 +1,35 @@
 import { SupplierSafeCreated, SupplierInfoDIDUpdated } from '../../generated/Depot/SupplierManager';
 import { TokensBridgedToSafe } from '../../generated/TokenBridge/HomeMultiAMBErc20ToErc677';
 import { Depot, Account, BridgeEvent, SupplierInfoDIDUpdate } from '../../generated/schema';
-import { assertTransactionExists, toChecksumAddress } from '../utils';
+import { makeToken, makeTransaction, toChecksumAddress } from '../utils';
 import { log, BigInt } from '@graphprotocol/graph-ts';
 
 export function handleCreateDepot(event: SupplierSafeCreated): void {
   let supplier = toChecksumAddress(event.params.supplier);
   let safe = toChecksumAddress(event.params.safe);
-  assertDepotExists(safe, supplier, event.block.timestamp);
+  makeDepot(safe, supplier, event.block.timestamp);
 }
 
 export function handleTokensBridged(event: TokensBridgedToSafe): void {
-  assertTransactionExists(event);
+  makeTransaction(event);
 
   let safe = toChecksumAddress(event.params.safe);
   let supplier = toChecksumAddress(event.params.recipient);
-  assertDepotExists(safe, supplier, event.block.timestamp);
+  makeDepot(safe, supplier, event.block.timestamp);
 
   let bridgeEventEntity = new BridgeEvent(event.transaction.hash.toHex() + '-' + event.logIndex.toString());
   bridgeEventEntity.transaction = event.transaction.hash.toHex();
   bridgeEventEntity.depot = toChecksumAddress(event.params.safe);
   bridgeEventEntity.timestamp = event.block.timestamp;
   bridgeEventEntity.supplier = toChecksumAddress(event.params.recipient);
-  bridgeEventEntity.token = toChecksumAddress(event.params.token);
+  bridgeEventEntity.token = makeToken(event.params.token);
   bridgeEventEntity.amount = event.params.value;
   bridgeEventEntity.save();
   log.debug('created bridge event entity {} for depot {}', [bridgeEventEntity.id, bridgeEventEntity.depot]);
 }
 
 export function handleSetInfoDID(event: SupplierInfoDIDUpdated): void {
-  assertTransactionExists(event);
+  makeTransaction(event);
 
   let supplier = toChecksumAddress(event.params.supplier);
   let infoDID = event.params.infoDID;
@@ -45,7 +45,7 @@ export function handleSetInfoDID(event: SupplierInfoDIDUpdated): void {
   updateEntity.save();
 }
 
-function assertDepotExists(safe: string, supplier: string, timestamp: BigInt): void {
+function makeDepot(safe: string, supplier: string, timestamp: BigInt): void {
   let accountEntity = new Account(supplier);
   accountEntity.save();
 
