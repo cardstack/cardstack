@@ -30,6 +30,8 @@ Connecting to the Kovan Testnet with WalletConnect requires an Infura project id
 INFURA_ID=<your infura project id here>
 ```
 
+Deployed versions will use a "HUB_URL" env var, which is processed at the time ember-cl-deploy runs.
+
 ### Thread animation interval environment variable
 As a convenience for development, you can set the `THREAD_ANIMATION_INTERVAL` environment variable to control how quickly messages in workflows are shown. 
 
