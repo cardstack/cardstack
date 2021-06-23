@@ -4,7 +4,6 @@ import Web3 from 'web3';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.6.0/prepaid-card-manager';
 import MerchantManagerABI from '../../contracts/abi/v0.6.0/merchant-manager';
 import SupplierManagerABI from '../../contracts/abi/v0.6.0/supplier-manager';
-import BridgeUtilsABI from '../../contracts/abi/v0.6.0/bridge-utils';
 import SpendABI from '../../contracts/abi/v0.6.0/spend';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
@@ -199,15 +198,15 @@ export default class Safes {
     options?: ContractOptions
   ): Promise<GnosisExecTx> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let bridgeUtilsAddress = await getAddress('bridgeUtils', this.layer2Web3);
+    let supplierManager = await getAddress('supplierManager', this.layer2Web3);
     let payload = await this.setSupplierInfoDIDPayload(infoDID);
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, bridgeUtilsAddress, '0', payload, 0, gasToken);
+    let estimate = await gasEstimate(this.layer2Web3, safeAddress, supplierManager, '0', payload, 0, gasToken);
     if (estimate.lastUsedNonce == null) {
       estimate.lastUsedNonce = -1;
     }
     let signatures = await sign(
       this.layer2Web3,
-      bridgeUtilsAddress,
+      supplierManager,
       0,
       payload,
       0,
@@ -223,7 +222,7 @@ export default class Safes {
     let result = await executeTransaction(
       this.layer2Web3,
       safeAddress,
-      bridgeUtilsAddress,
+      supplierManager,
       0,
       payload,
       0,
@@ -244,10 +243,10 @@ export default class Safes {
   }
 
   private async setSupplierInfoDIDPayload(infoDID: string): Promise<string> {
-    let bridgeUtils = new this.layer2Web3.eth.Contract(
-      BridgeUtilsABI as AbiItem[],
-      await getAddress('bridgeUtils', this.layer2Web3)
+    let supplierManager = new this.layer2Web3.eth.Contract(
+      SupplierManagerABI as AbiItem[],
+      await getAddress('supplierManager', this.layer2Web3)
     );
-    return bridgeUtils.methods.setSupplierInfoDID(infoDID).encodeABI();
+    return supplierManager.methods.setSupplierInfoDID(infoDID).encodeABI();
   }
 }

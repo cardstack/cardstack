@@ -76,7 +76,7 @@
       "env": {},
       "args": [
         "set-supplier-info-did",
-        "", // Hassan's depot
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot
         "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // gas token DAI.CPXD
         "--network", "sokol",
