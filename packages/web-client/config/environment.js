@@ -11,6 +11,7 @@ module.exports = function (environment) {
     environment,
     rootURL: '/',
     locationType: 'auto',
+    hubURL: process.env.HUB_URL,
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
@@ -37,6 +38,9 @@ module.exports = function (environment) {
       googlePlayStoreLink: undefined,
     },
     threadAnimationInterval: 1000,
+    'ember-cli-mirage': {
+      enabled: false,
+    },
   };
 
   if (environment === 'development') {
@@ -45,6 +49,7 @@ module.exports = function (environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
+    ENV.hubURL = ENV.hubURL ?? 'http://localhost:3000';
     ENV.threadAnimationInterval =
       process.env.THREAD_ANIMATION_INTERVAL ?? ENV.threadAnimationInterval;
   }
@@ -54,7 +59,9 @@ module.exports = function (environment) {
     ENV.locationType = 'none';
     ENV.chains.layer1 = 'test';
     ENV.chains.layer2 = 'test';
-    ENV.threadAnimationInterval = 0; // > 0 means we might have to wait for css animations in tests
+
+    // thread animation interval > 0 means we might have to wait for css animations in tests
+    ENV.threadAnimationInterval = 0;
 
     // keep test console output quieter
     ENV.APP.LOG_ACTIVE_GENERATION = false;
@@ -62,6 +69,12 @@ module.exports = function (environment) {
 
     ENV.APP.rootElement = '#ember-testing';
     ENV.APP.autoboot = false;
+
+    // mock server during test
+    ENV.hubURL = '';
+    ENV['ember-cli-mirage'] = {
+      enabled: true,
+    };
   }
 
   if (environment === 'production') {

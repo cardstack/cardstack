@@ -20,6 +20,7 @@ declare const config: {
   podModulePrefix: string;
   locationType: string;
   rootURL: string;
+  hubURL: string;
   chains: ChainsOptions;
   infuraId: string;
   urls: UrlsOptions;

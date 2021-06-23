@@ -7,8 +7,10 @@
     <div class="layout-display-view__card">
       <CardPay::PrepaidCard
         @issuerName={{@issuerName}}
-        @headerBackground={{@headerBackground.id}}
-        @headerTheme={{@headerTheme.id}}
+        @headerBackground={{@headerBackground.headerBackground}}
+        @headerTheme={{@headerTheme.patternUrl}}
+        @headerTextColor={{@headerBackground.textColor}}
+        @headerPatternColor={{@headerBackground.patternColor}}
         @mockBalance={{true}}
         @balance="123,456"
         @usdBalance="123,456"
@@ -22,15 +24,14 @@
     <CardPay::LabeledValue @vertical={{true}} @label="Background color">
       <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
         @type="background"
-        @swatchBackground={{@headerBackground.background}}
-        @swatchImage={{@headerBackground.image}}
+        @swatchBackground={{@headerBackground.headerBackground}}
       />
     </CardPay::LabeledValue>
     <CardPay::LabeledValue @vertical={{true}} @label="Theme">
       <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
         @type="theme"
-        @swatchBackground={{@headerTheme.background}}
-        @swatchImage={{@headerTheme.image}}
+        @swatchImage={{@headerTheme.patternUrl}}
+        @blank={{eq @headerTheme.patternUrl null}}
       />
     </CardPay::LabeledValue>
   </CardPay::FieldStack>

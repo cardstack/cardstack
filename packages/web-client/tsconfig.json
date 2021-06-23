@@ -32,11 +32,13 @@
         "types/*"
       ],
       "@ember/destroyable": ["../../node_modules/ember-destroyable-polyfill"],
+      "@cardstack/web-client/mirage/*": ["mirage/*"],
     }
   },
   "include": [
     "app/**/*",
     "tests/**/*",
-    "types/**/*"
+    "types/**/*",
+    "mirage"
   ]
 }
