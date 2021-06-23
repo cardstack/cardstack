@@ -2,8 +2,9 @@ import { inject } from '../di/dependency-injection';
 import { createCipheriv, createDecipheriv, createHmac, randomBytes } from 'crypto';
 import { Clock } from '../services/clock';
 import queryString from 'query-string';
+import config from 'config';
 
-const SECRET = process.env.SERVER_SECRET as string;
+const SECRET = config.get('serverSecret') as string;
 const encryptionAlgorithm = 'aes-256-gcm';
 const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
 

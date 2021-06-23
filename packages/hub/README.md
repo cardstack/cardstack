@@ -13,13 +13,10 @@ The Hub consists of API endpoints and a postgres database.
 Below is a list of the most common environment variables that the Hub accepts:
 
 - `SERVER_SECRET` (required) - to generate one for your machine, run `node --eval="console.log(crypto.randomBytes(32).toString('base64'))"`
-- `PGHOST` - defaults to "localhost"
-- `PGPORT` - defaults to "5432"
-- `PGUSER` - defaults to "postgres"
-- `PGPASSWORD` - defaults to "postgres"
+- `DATABASE_URL` - defaults in development to postgres://postgres:postgres@localhost:5432/hub_development
 - `LOG_LEVELS` - defaults to `*=info`
 
-Search the mono-repo for `process.env` to see these variables in use.
+Search the mono-repo for `process.env` and check the config directory to see these variables referenced.
 
 ## Setting up a local database for the first time
 
