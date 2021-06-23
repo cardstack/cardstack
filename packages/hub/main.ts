@@ -15,6 +15,7 @@ import PrepaidCardCustomizationsRoute from './routes/prepaid-card-customizations
 import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './services/jsonapi-middleware';
 import NonceTracker from './services/nonce-tracker';
+import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 const log = logger('cardstack/hub');
 
@@ -32,6 +33,7 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('prepaid-card-customizations-route', PrepaidCardCustomizationsRoute);
   registry.register('prepaid-card-color-schemes-route', PrepaidCardColorSchemesRoute);
   registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
+  registry.register('worker-client', WorkerClient);
   if (registryCallback) {
     registryCallback(registry);
   }
