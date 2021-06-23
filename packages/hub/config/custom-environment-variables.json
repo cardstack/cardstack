@@ -1,0 +1,6 @@
+{
+  "db": {
+    "url": "DATABASE_URL"
+  },
+  "serverSecret": "SERVER_SECRET"
+}

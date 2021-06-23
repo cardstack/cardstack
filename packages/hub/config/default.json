@@ -4,5 +4,6 @@
     "migrations-dir": "db/migrations",
     "migration-filename-format": "utc",
     "ignore-pattern": "README.md|.*\\.ts|.*\\.js\\.map"
-  }
+  },
+  "serverSecret": null
 }
