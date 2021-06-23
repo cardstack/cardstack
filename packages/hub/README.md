@@ -48,6 +48,15 @@ To redo the last migration (i.e. down + up):
 
 `yarn db:seed`
 
+## Running the server
+
+`yarn start:server` starts the hub web server on port 3000
+
+## Running the workers
+
+The app uses a Postgresql-based background task queue built on [graphile/worker](https://github.com/graphile/worker)
+
+`yarn start:worker` starts the hub background task worker process
 
 
 ## Deploying to staging

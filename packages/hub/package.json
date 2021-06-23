@@ -12,6 +12,7 @@
   "dependencies": {
     "@cardstack/did-resolver": "0.19.22",
     "@cardstack/logger": "^0.2.1",
+    "@graphile/logger": "^0.2.0",
     "@types/fs-extra": "^9.0.11",
     "@types/koa": "^2.13.1",
     "@types/koa-route": "^3.2.4",
@@ -68,6 +69,8 @@
     "db:seed": "node ./bin/seed-db.ts",
     "db:structure:dump": "node ./bin/dump-db-structure.js",
     "db:test:prepare": "node ./bin/setup-test-db.js",
+    "start:server": "node ./bin/server.ts",
+    "start:worker": "node ./bin/worker.ts",
     "test": "PACKAGE=hub NODE_ENV=test mocha -r esm ../test-support/bin/run.js --timeout 60000",
     "autotest": "PACKAGE=hub NODE_ENV=test mocha -w --reporter=min -r esm ../test-support/bin/run.js --timeout 60000"
   },

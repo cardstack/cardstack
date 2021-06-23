@@ -17,6 +17,11 @@ import JsonapiMiddleware from './services/jsonapi-middleware';
 import NonceTracker from './services/nonce-tracker';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
+import { LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
+import { LogLevel, LogMeta } from '@graphile/logger';
+import config from 'config';
+import path from 'path';
+
 const log = logger('cardstack/hub');
 
 export function wireItUp(registryCallback?: RegistryCallback): Container {
@@ -135,6 +140,33 @@ export async function bootServerForTesting(config: Partial<StartupConfig>) {
 
 export function bootEnvironment() {
   return wireItUp();
+}
+
+export async function bootWorker() {
+  let workerLogFactory: LogFunctionFactory = (scope: any) => {
+    return (level: LogLevel, message: any, meta?: LogMeta) => {
+      switch (level) {
+        case LogLevel.ERROR:
+          log.error(message, scope, meta);
+          break;
+        case LogLevel.WARNING:
+          log.warn(message, scope, meta);
+          break;
+        case LogLevel.INFO:
+          log.info(message, scope, meta);
+          break;
+        case LogLevel.DEBUG:
+          log.info(message, scope, meta);
+      }
+    };
+  };
+  let dbConfig = config.get('db') as Record<string, any>;
+  let runner = await runWorkers({
+    logger: new Logger(workerLogFactory),
+    connectionString: dbConfig.url,
+    taskDirectory: path.join(__dirname, 'tasks'),
+  });
+  await runner.promise;
 }
 
 async function runServer(config: Partial<StartupConfig>) {
