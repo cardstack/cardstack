@@ -47,7 +47,6 @@ export interface TokenInfo {
     name: string;
     symbol: string;
     decimals: number;
-    logoUri: string;
   };
   balance: string; // balance is in wei
 }
