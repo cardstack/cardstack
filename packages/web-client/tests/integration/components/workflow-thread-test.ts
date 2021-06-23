@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, settled, waitFor } from '@ember/test-helpers';
+import { find, render, settled, waitFor, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { Workflow } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
@@ -244,5 +244,51 @@ module('Integration | Component | workflow-thread', function (hooks) {
     assert
       .dom('[data-test-milestone="0"][data-test-milestone-completed]')
       .doesNotExist();
+  });
+
+  test('a docked footer message shows when more messages are hidden below', async function (assert) {
+    let workflow = new ConcreteWorkflow(this.owner);
+    let message = () =>
+      new WorkflowMessage({
+        author: { name: 'cardbot' },
+        message: 'A message',
+      });
+
+    let target = new WorkflowCard({
+      author: { name: 'cardbot' },
+      componentName: 'dummy-tall', // FIXME any way to register component for this test only?
+    });
+    target.isComplete = true;
+
+    workflow.milestones = [
+      new Milestone({
+        title: 'First milestone',
+        postables: [message(), target],
+        completedDetail: 'You are number one!',
+      }),
+    ];
+
+    this.set('workflow', workflow);
+    workflow.attachWorkflow();
+
+    await render(hbs`
+      <WorkflowThread @workflow={{this.workflow}} />
+    `);
+
+    // FIXME awk to wait for this to not exist and then assert that it doesn’t, probably because of autoscroll…?
+    await waitUntil(() => {
+      return find('[data-test-older]') === null;
+    });
+
+    assert.dom('[data-test-older]').doesNotExist();
+
+    // FIXME better way to address scroll container? There are two 🤔
+    find('.boxel-thread__scroll-wrapper')?.scrollTo(0, 0);
+
+    await waitUntil(() => {
+      return find('[data-test-older]');
+    });
+
+    assert.dom('[data-test-older]').exists();
   });
 });

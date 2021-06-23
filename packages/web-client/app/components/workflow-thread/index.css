@@ -20,3 +20,19 @@
 .workflow-thread:focus:not(:focus-visible) {
   box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
 }
+
+/* FIXME better name, to extract maybe? */
+.workflow-thread__older {
+  position: fixed;
+  bottom: 0;
+  background: var(--boxel-purple-500);
+  margin-left: calc(var(--boxel-sp) * -1);
+  margin-right: var(--boxel-sp);
+  width: calc(43.75rem + var(--boxel-sp) * 2);
+  color: var(--boxel-light);
+  border-radius: var(--boxel-border-radius) var(--boxel-border-radius) 0 0;
+}
+
+.workflow-thread__older .label {
+  padding: var(--boxel-sp-xxxs) var(--boxel-sp-sm);
+}

@@ -55,7 +55,13 @@
          />
       {{/each}}
     {{/if}}
-    <div data-thread-end></div>
+    <div data-thread-end {{did-insert this.setupInViewport}}></div>
+
+    {{#unless this.threadEndVisible}}
+      <div class="workflow-thread__older" data-test-older>
+        <div class="label">You’re looking at older messages</div>
+      </div>
+    {{/unless}}
   </:content>
   <:sidebar as |SidebarSection|>
     <SidebarSection>

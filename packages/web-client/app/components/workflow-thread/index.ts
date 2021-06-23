@@ -1,22 +1,28 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
+import { inject as service } from '@ember/service';
 import AnimatedWorkflow from '@cardstack/web-client/models/animated-workflow';
 import { Workflow } from '@cardstack/web-client/models/workflow';
 import { tracked } from '@glimmer/tracking';
 import config from '@cardstack/web-client/config/environment';
+import InViewport from 'ember-in-viewport/services/in-viewport';
 let interval = config.threadAnimationInterval;
 
 interface WorkflowThreadArgs {
   workflow: Workflow;
 }
 export default class WorkflowThread extends Component<WorkflowThreadArgs> {
+  @service declare inViewport: InViewport; // FIXME
+
   threadEl: HTMLElement | undefined;
+  endEl: HTMLElement | undefined;
   workflow = new AnimatedWorkflow(this.args.workflow);
   reducedMotionMediaQuery = window?.matchMedia(
     '(prefers-reduced-motion: reduce)'
   );
   @tracked autoscroll = false;
   @tracked threadAnimationInterval = '0ms';
+  @tracked threadEndVisible = false;
 
   constructor(owner: unknown, args: any) {
     super(owner, args);
@@ -69,6 +75,22 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
       ?.scrollIntoView({ block: 'end', behavior: 'smooth' });
   }
 
+  @action
+  setupInViewport(threadEndElement: HTMLElement) {
+    this.endEl = threadEndElement;
+    const { onEnter, onExit } = this.inViewport.watchElement(threadEndElement);
+    onEnter(this.threadEndEntered.bind(this));
+    onExit(this.threadEndExited.bind(this));
+  }
+
+  threadEndEntered() {
+    this.threadEndVisible = true;
+  }
+
+  threadEndExited() {
+    this.threadEndVisible = false;
+  }
+
   get lastMilestonePostable() {
     let milestones = this.args.workflow.visibleMilestones;
     let postablesInLastMilestone = milestones[
@@ -79,6 +101,7 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   }
 
   willDestroy() {
+    this.inViewport.stopWatching(this.endEl);
     this.reducedMotionMediaQuery.removeEventListener(
       'change',
       this.setAnimationBehaviour
