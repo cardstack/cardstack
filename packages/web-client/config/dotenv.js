@@ -4,8 +4,9 @@
 
 const path = require('path');
 
-module.exports = function (/* env */) {
+module.exports = function (env) {
   return {
+    enabled: env === 'development',
     clientAllowedKeys: [],
     fastbootAllowedKeys: [],
     failOnMissingKey: false,
