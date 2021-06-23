@@ -21,41 +21,60 @@ async function loadPrepaidCardColorSchemes(db: Client) {
     description = excluded.description;
 `;
   let colorSchemeRows = [
-    ['7CEE903B-E342-4BD7-A3DA-EB3AB2DC078D', '#00ebe5', 'white', 'black', 'Solid Light Blue'],
-    ['232B7E38-1F9A-4599-A870-8F7A9BCBA6E4', '#37eb77', 'white', 'black', 'Solid Lime Green'],
-    ['5ED643F8-A8BB-4748-BCD6-98E850FBA505', '#ac00ff', 'white', 'white', 'Solid Purple'],
-    ['6997F87C-D1EE-45F8-8A49-D19A9D5FAD73', '#efefef', 'white', 'black', 'Solid Light Grey'],
-    ['16B83804-1FF9-4AA2-B670-472919EFF8C3', '#393642', 'white', 'white', 'Solid Dark'],
-    ['7B05C4EA-6BAA-471F-9B49-7AC10ADF2F9A', '#c3fc33', 'white', 'black', 'Solid Yellow Green'],
+    ['4bb07815-7d4b-4312-8224-275d3c0d1af2', '#FFD800', 'white', 'black', 'School Bus Yellow'],
+    ['12dec066-d361-4dad-a637-6a8e540e3940', '#37EB77', 'white', 'black', 'Malachite'],
+    ['a1c8f96b-afcf-4d6a-8b6d-2d534fcf9b3a', '#C3FC33', 'white', 'black', 'Green Yellow'],
+    ['168f673d-3a85-4a65-b7eb-397710e16395', '#00EBE5', 'white', 'black', 'Bright Turquoise'],
+    ['ebb12dd0-becd-4242-9298-7c55056d9210', '#F5F5F5', 'white', 'black', 'White Smoke'],
+    ['6f365f9b-594c-4137-bcf6-c3e35e47ed2f', '#FFEDDB', 'white', 'black', 'Papaya Whip'],
+    ['7f2c64e6-383e-49f9-85f3-d1ec61b10afb', '#FFDBE5', 'white', 'black', 'Misty Rose'],
+    ['2b651e70-6907-49e7-a378-2a49a740d8df', '#E9DBFF', 'white', 'black', 'Magnolia'],
+    ['dbbd371d-7784-44b3-b438-2f8a286a016e', '#AC00FF', 'black', 'white', 'Electric Purple'],
+    ['326af654-f95e-4f18-8eaf-10f224e9eb8b', '#393642', 'black', 'white', 'Black Marlin'],
+    ['7693e60a-c47e-43cc-86b5-07b788c14fd0', '#0069F9', 'black', 'white', 'Navy Blue'],
+    ['54a04f2f-43a0-478a-952e-e47cd284566d', '#FF5050', 'black', 'white', 'Sunset Orange'],
     [
-      '74A8AAC0-4EDA-4146-B48E-A6FBF2DA9472',
-      'linear-gradient(139.27deg, #ff5050 16%, #ac00ff 100%)',
-      'white',
-      'white',
-      'Red to Purple Gradient',
-    ],
-    [
-      '92BE8DCE-D862-44CA-A55A-43758564854B',
-      'linear-gradient(139.27deg, #03c4bf 16%, #ac00ff 100%)',
-      'white',
-      'white',
-      'Blue to Purple Gradient',
-    ],
-    [
-      '5C2276BE-FDDD-49DD-9693-D7B3B3E91A1F',
-      'linear-gradient(139.27deg, #c3fc33 16%, #0069f9 100%)',
+      '9eb2f26f-53ea-407b-a114-8bd48c6081e7',
+      'linear-gradient(139.27deg, #00EBE5 16%, #C3FC33 100%)',
       'white',
       'black',
-      'Green to Blue Gradient',
+      'Gradient: Bright Turquoise - Green Yellow',
     ],
     [
-      '2099CE49-39EB-4353-A743-D7B310FD9D22',
-      'linear-gradient(139.27deg, #ac00ff 16%, #ffd800 100%)',
+      '05af398d-ba94-4f8c-bee9-3f22b06b42e8',
+      'linear-gradient(139.27deg, #FC8C8C 16%, #FFF5A7 100%)',
       'white',
-      'white',
-      'Purple to Orange Gradient',
+      'black',
+      'Gradient: Mona Lisa - Canary',
     ],
-    ['39A4C689-C130-4A84-BF81-0DC0BB99D846', 'transparent', 'black', 'black', 'Transparent'],
+    [
+      'ebfc37c0-7788-414d-856d-64892294eff8',
+      'linear-gradient(139.27deg, #FF88D1 16%, #A3FFFF 100%)',
+      'white',
+      'black',
+      'Gradient: Neon Pink - Columbia Blue',
+    ],
+    [
+      '22f23e4e-7efc-441f-935f-e63ad230b615',
+      'linear-gradient(139.27deg, #FFFFAA 16%, #B7FFFC 100%)',
+      'white',
+      'black',
+      'Gradient: Canary - Light Cyan',
+    ],
+    [
+      '28154a2e-c265-4f6f-9dbf-83fd3d34892b',
+      'linear-gradient(139.27deg, #004DB7 16%, #00C18D 100%)',
+      'black',
+      'white',
+      'Gradient: Cobalt - Caribbean Green',
+    ],
+    [
+      '8086ae98-5a59-4a1b-aeb6-6de815ce7c43',
+      'linear-gradient(139.27deg, #9300FF 16%, #FF0058 100%)',
+      'black',
+      'white',
+      'Gradient: Electric Purple - Torch Red',
+    ],
   ];
   let sql = pgFormat(colorSchemeQueryText, colorSchemeRows);
   console.log(sql);
@@ -71,10 +90,11 @@ async function loadPrepaidCardPatterns(db: Client) {
     pattern_url = excluded.pattern_url,
     description = excluded.description;`;
   let patternRows = [
-    ['7B93FAE4-843D-409A-87E0-B065B63C1156', '/images/backgrounds/mock-theme-1.svg', 'Overlapping Dots'],
-    ['34D069A0-4C0E-4F9A-A89A-C1195FBD7CFF', '/images/backgrounds/mock-theme-2.svg', 'Downward Arrows'],
-    ['B1A44F42-737E-48FD-8D34-30B2D8A45EB0', '/images/backgrounds/bridge-background.svg', 'Organic Stripes'],
     ['3B8B436B-A99E-4346-AB20-3BA5F9963321', null, 'None'],
+    ['451ed569-fb6f-4b61-8b80-e10e25ea7fa2', '/images/prepaid-card-customizations/pattern-1.svg', 'Cell'],
+    ['08086b26-0b2d-43aa-a7cc-dffc7ffc45eb', '/images/prepaid-card-customizations/pattern-2.svg', 'Curtain'],
+    ['aec7322a-84e2-4969-a03d-022460705fee', '/images/prepaid-card-customizations/pattern-3.svg', 'Zebra'],
+    ['78c26684-4e70-4152-996b-f453934d2485', '/images/prepaid-card-customizations/pattern-4.svg', 'Tangram'],
   ];
   let sql = pgFormat(patternsQueryText, patternRows);
   console.log(sql);

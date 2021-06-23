@@ -1,7 +1,7 @@
-import Pattern1 from '@cardstack/web-client/images/test/prepaid-card-pattern-1.svg';
-import Pattern2 from '@cardstack/web-client/images/test/prepaid-card-pattern-2.svg';
-import Pattern3 from '@cardstack/web-client/images/test/prepaid-card-pattern-3.svg';
-import Pattern4 from '@cardstack/web-client/images/test/prepaid-card-pattern-4.svg';
+import Pattern1 from '@cardstack/web-client/images/prepaid-card-customizations/pattern-1.svg';
+import Pattern2 from '@cardstack/web-client/images/prepaid-card-customizations/pattern-2.svg';
+import Pattern3 from '@cardstack/web-client/images/prepaid-card-customizations/pattern-3.svg';
+import Pattern4 from '@cardstack/web-client/images/prepaid-card-customizations/pattern-4.svg';
 
 export default [
   {
