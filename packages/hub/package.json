@@ -62,6 +62,7 @@
     "yarn": "^1.0"
   },
   "scripts": {
+    "start": "node ./bin/server.ts",
     "db:setup:local": "createdb hub_development && node-pg-migrate up && node ./bin/seed-db.ts && node ./bin/dump-db-structure.js && node ./bin/setup-test-db.js",
     "db:migrate": "node-pg-migrate",
     "db:seed": "node ./bin/seed-db.ts",
