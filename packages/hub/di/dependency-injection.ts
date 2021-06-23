@@ -16,22 +16,22 @@ export class Container implements ContainerInterface {
   async lookup<K extends keyof KnownServices>(name: K): Promise<KnownServices[K]>;
   async lookup(name: string): Promise<unknown>;
   async lookup(name: string): Promise<any> {
-    let { promise, instance } = this._lookup(name);
-    await promise;
+    let { initializing, instance } = await this._lookup(name);
+    await initializing;
     return instance;
   }
 
-  private _lookup(name: string): CacheEntry {
+  private async _lookup(name: string): Promise<CacheEntry> {
     let cached = this.cache.get(name);
     if (cached) {
       return cached;
     }
 
     let factory = this.lookupFactory(name);
-    return this.provideInjections(() => {
+    return await this.provideInjections(async () => {
       let instance: any;
       if (isFactoryByCreateMethod(factory)) {
-        instance = factory.create();
+        instance = await Promise.resolve(factory.create());
       } else {
         instance = new factory();
       }
@@ -54,31 +54,31 @@ export class Container implements ContainerInterface {
   // behavior is that there is a separate indexer instance for each realm--not
   // that they are all using the same indexer instance.
   async instantiate<T, A extends unknown[]>(factory: Factory<T, A>, ...args: A): Promise<T> {
-    let { instance, promise } = this.provideInjections(() => {
+    let { instance, initializing } = await this.provideInjections(async () => {
       if (isFactoryByCreateMethod(factory)) {
-        return factory.create(...args);
+        return await factory.create(...args);
       } else {
         return new factory(...args);
       }
     });
 
-    await promise;
+    await initializing;
     return instance;
   }
 
-  private provideInjections<T>(create: () => T, cacheKey?: CacheKey): CacheEntry {
+  private async provideInjections<T>(create: () => Promise<T>, cacheKey?: CacheKey): Promise<CacheEntry> {
     let pending = new Map() as PendingInjections;
     pendingInstantiationStack.unshift(pending);
     let result: CacheEntry;
     try {
-      let instance = create();
+      let instance = await create();
       ownership.set(instance, this);
       result = new CacheEntry(cacheKey ?? `anonymous_${nonce++}`, instance, pending);
       if (cacheKey) {
         this.cache.set(cacheKey, result);
       }
       for (let [name, entry] of pending.entries()) {
-        entry.cacheEntry = this._lookup(name);
+        entry.cacheEntry = await this._lookup(name);
       }
     } finally {
       pendingInstantiationStack.shift();
@@ -96,7 +96,7 @@ export class Container implements ContainerInterface {
           // after resolving willTeardown. You may still call your injections in
           // response to being called by someone who injected you.
           await Promise.all(
-            [...this.cache.values()].map(async ({ promise, instance }) => {
+            [...this.cache.values()].map(async ({ initializing: promise, instance }) => {
               try {
                 await promise;
               } catch (e) {
@@ -134,7 +134,7 @@ class CacheEntry {
   constructor(private identityKey: CacheKey, readonly instance: any, private injections: PendingInjections) {}
 
   // resolves when this CacheEntry is fully ready to be used
-  get promise(): Promise<void> {
+  get initializing(): Promise<void> {
     if (!this.deferredPromise) {
       this.deferredPromise = new Deferred();
       this.deferredPromise.fulfill(this.prepareSubgraph());
@@ -212,7 +212,7 @@ class CacheEntry {
             `circular dependency: ${this.identityKey} tries to eagerly inject ${name}, which depends on ${this.identityKey}`
           );
         }
-        await pending.cacheEntry!.promise;
+        await pending.cacheEntry!.initializing;
         this.installInjection(name, pending);
       })()
     );
