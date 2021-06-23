@@ -247,6 +247,14 @@ module('Integration | Component | workflow-thread', function (hooks) {
   });
 
   test('a docked footer message shows when more messages are hidden below', async function (assert) {
+    this.owner.register(
+      'template:components/dummy-tall',
+      hbs`
+        {{!-- template-lint-disable no-inline-styles --}}
+        <div style="height: 10000px">A very tall component</div>
+        It is done.`
+    );
+
     let workflow = new ConcreteWorkflow(this.owner);
     let message = () =>
       new WorkflowMessage({
@@ -256,7 +264,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
 
     let target = new WorkflowCard({
       author: { name: 'cardbot' },
-      componentName: 'dummy-tall', // FIXME any way to register component for this test only?
+      componentName: 'dummy-tall',
     });
     target.isComplete = true;
 
