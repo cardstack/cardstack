@@ -1,6 +1,13 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { find, render, settled, waitFor, waitUntil } from '@ember/test-helpers';
+import {
+  find,
+  click,
+  render,
+  settled,
+  waitFor,
+  waitUntil,
+} from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { Workflow } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
@@ -291,12 +298,26 @@ module('Integration | Component | workflow-thread', function (hooks) {
     assert.dom('[data-test-older]').doesNotExist();
 
     // FIXME better way to address scroll container? There are two 🤔
-    find('.boxel-thread__scroll-wrapper')?.scrollTo(0, 0);
+    const scrollWrapper = find('.boxel-thread__scroll-wrapper');
+    scrollWrapper?.scrollTo(0, 0);
 
     await waitUntil(() => {
       return find('[data-test-older]');
     });
 
     assert.dom('[data-test-older]').exists();
+
+    await click('[data-test-jump-to-latest]');
+    await waitUntil(() => {
+      return find('[data-test-older]') === null;
+    });
+
+    assert.dom('[data-test-older]').doesNotExist();
+    // FIXME works in development, but off by 44 in tests?
+    // assert.equal(
+    //   scrollWrapper?.clientHeight,
+    //   scrollWrapper?.scrollHeight - scrollWrapper?.scrollTop,
+    //   'scroll wrapper is scrolled to the bottom'
+    // );
   });
 });

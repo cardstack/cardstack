@@ -60,6 +60,7 @@
     {{#unless this.threadEndVisible}}
       <div class="workflow-thread__older" data-test-older>
         <div class="label">You’re looking at older messages</div>
+        <button {{on "click" this.scrollToEnd}} type="button" data-test-jump-to-latest>Jump to latest</button>
       </div>
     {{/unless}}
   </:content>
