@@ -24,6 +24,8 @@ You will need the following things properly installed on your computer.
 * Visit your app at [http://localhost:4200](http://localhost:4200).
 * Visit your tests at [http://localhost:4200/tests](http://localhost:4200/tests).
 
+Note that you will have to run the hub for some functionality of this app, see [the hub README](../hub/README.md#running).
+
 ### Required environment variables
 Connecting to the Kovan Testnet with WalletConnect requires an Infura project id. This should be specified in a `.env` file in this package's root as:
 ```

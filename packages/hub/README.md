@@ -8,6 +8,9 @@ For more information, see the
 
 The Hub consists of API endpoints and a postgres database.
 
+## Running locally
+After configuration and database setup as described below, start this by running `yarn start`. 
+
 ## Configuration
 
 Below is a list of the most common environment variables that the Hub accepts:
