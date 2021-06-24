@@ -1,4 +1,14 @@
 {
+  "aws": {
+    "config": {
+      "credentials": {
+        "AccessKeyId": null,
+        "SecretAccessKey": null
+      },
+      "region": "us-east-1"
+    },
+    "offchainStorageBucketName": "offchain-storage"
+  },
   "db": {
     "url": "postgres://postgres:postgres@localhost:5432/hub_development",
     "migrations-dir": "db/migrations",

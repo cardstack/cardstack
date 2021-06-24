@@ -15,6 +15,10 @@ After configuration and database setup as described below, start this by running
 
 Below is a list of the most common environment variables that the Hub accepts:
 
+- `HUB_AWS_ACCESS_KEY_ID` 
+- `HUB_AWS_SECRET_ACCESS_KEY` 
+- `HUB_AWS_REGION`
+- `AWS_PROFILE` - if none of the HUB_AWS_* variables are defined, no credentials or region will be passed to the aws-sdk. This will make the aws-sdk's default behavior take effect, which includes using an AWS_PROFILE env var if it is set
 - `SERVER_SECRET` (required) - to generate one for your machine, run `node --eval="console.log(crypto.randomBytes(32).toString('base64'))"`
 - `DATABASE_URL` - defaults in development to postgres://postgres:postgres@localhost:5432/hub_development
 - `LOG_LEVELS` - defaults to `*=info`
