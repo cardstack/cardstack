@@ -162,7 +162,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         );
       },
     }),
-    // if we don't have enough balance (50 USD equivalent)
+    // if we don't have enough balance (DAI equivalent of minimum amount to create a prepaid card, in SPEND)
     new WorkflowMessage({
       author: cardbot,
       message:
