@@ -2,22 +2,14 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import WorkflowSession from '../../../../models/workflow/workflow-session';
-import BN from 'bn.js';
 import { toBN } from 'web3-utils';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import {
   TokenDisplayInfo,
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
-
-interface Token {
-  balance: BN;
-  icon: string;
-  name: string;
-  description: string;
-  symbol: TokenSymbol;
-}
+import { Token } from '../workflow-config';
 
 interface FundingSourceCardArgs {
   workflowSession: WorkflowSession;
@@ -45,7 +37,7 @@ class FundingSourceCard extends Component<FundingSourceCardArgs> {
   get defaultToken(): Token {
     return {
       ...this.defaultTokenInfo,
-      balance: (this.layer2Network.defaultTokenBalance as BN) ?? toBN('0'),
+      balance: this.layer2Network.defaultTokenBalance ?? toBN('0'),
     };
   }
 

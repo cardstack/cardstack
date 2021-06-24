@@ -232,18 +232,24 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText(layer2AccountAddress);
     assert
       .dom('[data-test-balance-view-depot-address]')
-      .containsText('0xB236ca8DbAB0644ffCD32518eBF4924ba8666666');
+      .containsText(depotAddress);
     assert
       .dom('[data-test-balance-view-token-amount]')
       .containsText('250.00 DAI');
     assert.dom('[data-test-face-value-display]').doesNotExist();
     assert.dom('[data-test-face-value-option]').exists({ count: 4 });
     assert.dom('[data-test-face-value-option-checked]').doesNotExist();
+    assert.dom('[data-test-face-value-option="50000"] input').isDisabled();
+    assert.dom('[data-test-face-value-option="100000"] input').isDisabled();
     assert
       .dom('[data-test-face-value-option="50000"]')
       .containsText('50000 SPEND');
     assert.dom('[data-test-face-value-option="50000"]').containsText('500 USD');
-    // TODO: check amount in token
+    assert
+      .dom('[data-test-face-value-option="50000"]')
+      .containsText('≈ 500 DAI.CPXD');
+    assert.dom('[data-test-face-value-option="10000"] input').isNotDisabled();
+    assert.dom('[data-test-face-value-option="5000"] input').isNotDisabled();
     await click('[data-test-face-value-option="5000"]');
     assert.dom('[data-test-face-value-option="5000"] input').isChecked();
     assert.dom('[data-test-face-value-option-checked]').exists({ count: 1 });
@@ -274,7 +280,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert.dom('[data-test-face-value-display]').containsText('10000 SPEND');
     assert.dom('[data-test-face-value-display]').containsText('100 USD');
-    // TODO: check amount in token
+    assert.dom('[data-test-face-value-display]').containsText('≈ 100 DAI.CPXD');
 
     await waitFor(milestoneCompletedSel(2));
     assert.dom(milestoneCompletedSel(2)).containsText('Face value chosen');

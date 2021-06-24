@@ -9,7 +9,7 @@
         <span>Prepaid cards are denominated in SPEND:</span>
         <span class="face-value-card__exchange-rate">
           {{svg-jar "spend" width="20" height="20" role="presentation"}}
-          §1 SPEND = ${{this.spendToUSDRate}} USD
+          §1 SPEND = ${{this.spendToUsdRate}} USD
         </span>
       </p>
       <CardPay::LabeledValue @vertical={{true}} @label="Funding From:">
@@ -25,19 +25,24 @@
           <CardPay::BalanceDisplay
             class="face-value-card__selected-amount-display"
             @size="large"
-            @icon={{this.faceValueToken.icon}}
+            @icon="spend"
+            @sign="§"
+            @symbol="SPEND"
             @balance={{this.selectedFaceValue}}
-            @usdBalance={{mult this.selectedFaceValue this.spendToUSDRate}}
-            @text={{concat @amountInFundingToken " " this.fundingToken.symbol "*"}}
+            @usdBalance={{mult this.selectedFaceValue this.spendToUsdRate}}
+            @text={{concat "≈ " (mult this.selectedFaceValue this.spendToUsdRate) " " this.fundingToken.symbol "*"}}
             data-test-face-value-display
           />
         </CardPay::LabeledValue>
       {{else}}
         <div class="face-value-card__options">
-          {{#each this.amountOptions as |amount|}}
+          {{#each this.faceValueOptions as |amount|}}
             <CardPay::IssuePrepaidCardWorkflow::FaceValue::Option
+              @disabled={{lt this.balanceFromBN (mult amount this.spendToUsdRate)}}
               @checked={{eq amount this.selectedFaceValue}}
-              @spendAmount={{amount}}
+              @spendFaceValue={{amount}}
+              @usdAmount={{mult amount this.spendToUsdRate}}
+              @approxDaiAmount={{mult amount this.spendToUsdRate}}
               @onInput={{fn this.chooseFaceValue amount}}
             />
           {{/each}}
@@ -53,11 +58,11 @@
   </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
-    @disabled={{@frozen}}
+    @disabled={{or @frozen this.isDisabled}}
     data-test-layout-customization
   >
     <:default as |d|>
-      <d.ActionButton {{on "click" @onComplete}}>
+      <d.ActionButton {{on "click" this.save}}>
         Set Face Value
       </d.ActionButton>
     </:default>

@@ -1,24 +1,31 @@
 <label
-  class={{cn "face-value-option" face-value-option--checked=@checked}}
-  data-test-face-value-option={{@amount}} data-test-face-value-option-checked={{@checked}}
+  class={{cn
+    "face-value-option"
+    face-value-option--checked=@checked
+    face-value-option--disabled=@disabled
+  }}
+  data-test-face-value-option={{@spendFaceValue}}
+  data-test-face-value-option-checked={{@checked}}
+  data-test-face-value-option-disabled={{@disabled}}
 >
   <Input
     name="funding-amount"
     class={{cn "face-value-option__input" face-value-option__input--checked=@checked}}
     @type="radio"
     @checked={{@checked}}
+    disabled={{@disabled}}
     {{on "input" @onInput}}
   />
   <div class="face-value-option__value">
-    {{svg-jar @token.icon width="20" height="20" role="presentation"}}
+    {{svg-jar "spend" width="20" height="20" role="presentation"}}
     <div class="face-value-option__amount">
-      {{@token.sign}}{{@amount}} {{@token.symbol}}
+      §{{@spendFaceValue}} SPEND
     </div>
     <div class="face-value-option__conversion">
-      ${{@amountInUSD}} USD
+      ${{@usdAmount}} USD
     </div>
     <div class="face-value-option__conversion">
-      {{@amountInFundingToken}} {{@fundingTokenSymbol}}*
+      ≈ {{@approxDaiAmount}} DAI.CPXD*
     </div>
   </div>
 </label>

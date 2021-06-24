@@ -77,6 +77,10 @@
 }
 
 /* Specific to this card */
+.balance-view-banner__summary-content {
+  height: 100%;
+}
+
 .balance-view-banner[open] .balance-view-banner__summary-content {
   display: none;
 }
