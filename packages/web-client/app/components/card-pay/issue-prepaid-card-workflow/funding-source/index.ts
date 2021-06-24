@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { reads } from 'macro-decorators';
+import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import WorkflowSession from '../../../../models/workflow/workflow-session';
@@ -9,7 +9,6 @@ import { toBN } from 'web3-utils';
 import {
   TokenDisplayInfo,
   TokenSymbol,
-  bridgedSymbols,
 } from '@cardstack/web-client/utils/token';
 
 interface Token {
@@ -27,49 +26,57 @@ interface FundingSourceCardArgs {
   isComplete: boolean;
 }
 
-// we are assuming that the depot has enough tokens to create card
-// and we cancel the workflow earlier if it doesn't
 class FundingSourceCard extends Component<FundingSourceCardArgs> {
-  tokenInfo = bridgedSymbols.map((symbol) => new TokenDisplayInfo(symbol));
+  defaultTokenSymbol: TokenSymbol = 'DAI.CPXD';
+  defaultTokenInfo = new TokenDisplayInfo(this.defaultTokenSymbol);
   @service declare layer2Network: Layer2Network;
-
-  @reads('args.workflowSession.state.prepaidFundingToken')
-  declare selectedToken: Token;
+  @tracked selectedToken: Token =
+    (this.args.workflowSession.state.prepaidFundingToken as Token) ??
+    this.defaultToken;
 
   constructor(owner: unknown, args: FundingSourceCardArgs) {
     super(owner, args);
-    this.chooseSource(this.tokens[0]);
   }
 
   get depotAddress() {
     return this.layer2Network.depotSafe?.address || undefined;
   }
 
-  getBalance(symbol: TokenSymbol) {
-    if (symbol === 'DAI.CPXD') {
-      return this.layer2Network.defaultTokenBalance;
-    }
-
-    if (symbol === 'CARD.CPXD') {
-      return this.layer2Network.cardBalance;
-    }
-    return toBN(0);
+  get defaultToken(): Token {
+    return {
+      ...this.defaultTokenInfo,
+      balance: (this.layer2Network.defaultTokenBalance as BN) ?? toBN('0'),
+    };
   }
 
-  get tokens() {
-    return this.tokenInfo
-      .map((token) => {
-        let balance = this.getBalance(token.symbol);
-        return {
-          ...token,
-          balance,
-        } as Token;
-      })
-      .filter((v) => !v.balance.isZero());
+  get tokens(): Token[] {
+    return [this.defaultToken];
+  }
+
+  get isDisabled() {
+    return (
+      !this.depotAddress ||
+      !this.tokens.length ||
+      !this.selectedToken.balance ||
+      this.selectedToken.balance.isZero()
+    );
   }
 
   @action chooseSource(token: Token) {
-    this.args.workflowSession.update('prepaidFundingToken', token);
+    this.selectedToken = token;
+  }
+
+  @action save() {
+    if (this.isDisabled) {
+      return;
+    }
+    if (this.selectedToken) {
+      this.args.workflowSession.update(
+        'prepaidFundingToken',
+        this.selectedToken
+      );
+    }
+    this.args.onComplete?.();
   }
 }
 

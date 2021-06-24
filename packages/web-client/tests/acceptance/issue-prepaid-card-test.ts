@@ -79,8 +79,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
       defaultToken: toBN('250000000000000000000'),
       card: toBN('500000000000000000000'),
     });
+    let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     let testDepot = {
-      address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
+      address: depotAddress,
       tokens: [
         {
           balance: '250000000000000000000',
@@ -210,42 +211,15 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .hasText('0x1826...6E44');
     assert
       .dom('[data-test-funding-source-depot-outer] [data-test-account-address]')
-      .hasText('0xB236ca8DbAB0644ffCD32518eBF4924ba8666666');
-
-    assert.dom('[data-test-funding-source-dropdown="DAI.CPXD"]').exists();
+      .hasText(depotAddress);
     assert
-      .dom(
-        '[data-test-funding-source-dropdown="DAI.CPXD"] [data-test-balance-display-amount]'
-      )
+      .dom('[data-test-funding-source-dropdown="DAI.CPXD"]')
       .containsText('250.00 DAI');
-
-    await click('[data-test-funding-source-dropdown="DAI.CPXD"] > div');
-
-    await click('[data-test-funding-source-token-option="CARD.CPXD"]');
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
-    assert
-      .dom(
-        '[data-test-funding-source-token] [data-test-balance-display-amount]'
-      )
-      .containsText('500.00 CARD');
-
-    await click(
-      `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
-    );
-    await click('[data-test-funding-source-dropdown="CARD.CPXD"] > div');
-    await click('[data-test-funding-source-token-option="DAI.CPXD"]');
-    await click(
-      `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
-    );
-
     assert.dom('[data-test-funding-source-dropdown="DAI.CPXD"]').doesNotExist();
-    assert
-      .dom(
-        '[data-test-funding-source-token] [data-test-balance-display-amount]'
-      )
-      .containsText('250.00 DAI');
+    assert.dom('[data-test-funding-source-token]').containsText('250.00 DAI');
 
     assert
       .dom(postableSel(2, 3))
