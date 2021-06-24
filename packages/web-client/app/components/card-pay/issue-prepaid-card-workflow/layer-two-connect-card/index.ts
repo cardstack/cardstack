@@ -14,15 +14,12 @@ export default class LayerTwoConnectWrapperComponent extends Component<LayerTwoC
   constructor(owner: unknown, args: any) {
     super(owner, args);
     this.layer2Network.waitForAccount.then(() => {
-      // TODO: get real min dai amount and min card amount
-      let MIN_DAI_AMOUNT = new BN(toWei('35'));
-      let MIN_CARD_AMOUNT = new BN(toWei('21'));
+      // TODO: get real min dai amount
+      let MIN_DAI_AMOUNT = new BN(toWei('50'));
 
       if (
-        !(
-          this.layer2Network.cardBalance?.gte(MIN_CARD_AMOUNT) ||
-          this.layer2Network.defaultTokenBalance?.gte(MIN_DAI_AMOUNT)
-        )
+        !this.layer2Network.defaultTokenBalance ||
+        this.layer2Network.defaultTokenBalance?.lt(MIN_DAI_AMOUNT)
       ) {
         this.args.cancelWorkflow('INSUFFICIENT_FUNDS');
       }
