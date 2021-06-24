@@ -6,14 +6,14 @@ const componentFormats = {
   embedded: '',
 };
 export type Format = keyof typeof componentFormats;
-export const formats = Object.keys(componentFormats) as Format[];
+export const FORMATS = Object.keys(componentFormats) as Format[];
 
 const featureNamesMap = {
   schema: '',
 };
 export type FeatureFile = keyof typeof featureNamesMap & Format;
-export const featureNames = Object.keys(featureNamesMap).concat(
-  formats
+export const FEATURE_NAMES = Object.keys(featureNamesMap).concat(
+  FORMATS
 ) as FeatureFile[];
 
 export type Asset = {
@@ -21,7 +21,23 @@ export type Asset = {
   path: string;
 };
 
+// Right now Date is the only hardcoded known serializer. If we add more
+// this will become a union
+const deserializerTypes = {
+  date: '',
+};
+export type DeserializerName = keyof typeof deserializerTypes;
+export const DESERIALIZER_NAMES = Object.keys(
+  deserializerTypes
+) as DeserializerName[];
+
 export type CardData = Record<string, any>;
+
+/* Card type IDEAS
+  primitive
+  composite
+  data
+*/
 
 export type RawCard = {
   url: string;
@@ -32,15 +48,22 @@ export type RawCard = {
   schema?: string;
   containsRoutes?: boolean;
 
+  deserializer?: DeserializerName;
+
   // url to the card we adopted from
   adoptsFrom?: string;
 
   // flat list of files inside our card
-  files: Record<string, string>;
+  files?: Record<string, string>;
 
   // if this card contains data (as opposed to just schema & code), it goes here
   data?: Record<string, any> | undefined;
 };
+export interface Field {
+  type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
+  card: CompiledCard;
+  name: string;
+}
 
 export interface CompiledCard {
   url: string;
@@ -49,20 +72,22 @@ export interface CompiledCard {
   fields: {
     [key: string]: Field;
   };
-  modelModule: string;
+  schemaModule: string;
+  deserializer?: DeserializerName;
+
   isolated: ComponentInfo;
   embedded: ComponentInfo;
+
+  // TODO: remove this, instead make the `define` interface mime-type aware and
+  // define all assets
   assets: Asset[];
-}
-export interface Field {
-  type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
-  card: CompiledCard;
-  name: string;
 }
 
 export interface ComponentInfo {
   moduleName: string;
   usedFields: string[]; // ["title", "author.firstName"]
+
+  deserialize?: Record<DeserializerName, string[]>;
   inlineHBS?: string;
   sourceCardURL: string;
 }
@@ -84,15 +109,16 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (typeof obj.url !== 'string') {
     throw new Error(`card missing URL`);
   }
-  for (let featureFile of featureNames) {
+  for (let featureFile of FEATURE_NAMES) {
     if (featureFile in obj) {
-      if (typeof obj[featureFile] !== 'string') {
+      let filePath = obj[featureFile];
+      if (typeof filePath !== 'string') {
         throw new Error(
           `card.json in ${obj.url} has an invalid value for "${featureFile}"`
         );
       }
-      // TODO: This should resolve paths, so that isolated.js and ./isolated.js are the same
-      if (!obj.files?.[obj[featureFile]]) {
+      filePath = filePath.replace(/^\.\//, '');
+      if (!obj.files?.[filePath]) {
         throw new Error(
           `card.json in ${obj.url} refers to non-existent module ${obj[featureFile]}`
         );
@@ -121,7 +147,7 @@ export function assertValidCompiledCard(
   if (!card.url) {
     throw new Error(`CompiledCards must include a url`);
   }
-  if (!card.modelModule) {
+  if (!card.schemaModule) {
     throw new Error(
       `${card.url} does not have a schema file. This is wrong and should not happen.`
     );
@@ -139,5 +165,15 @@ export function assertValidCompiledCard(
         }"`
       );
     }
+  }
+}
+
+export function assertValidDeserializationMap(
+  map: any
+): asserts map is ComponentInfo['deserialize'] {
+  let keys = Object.keys(map);
+  let diff = difference(keys, DESERIALIZER_NAMES);
+  if (diff.length > 0) {
+    throw new Error(`Unexpected deserializer: ${diff.join(',')}`);
   }
 }

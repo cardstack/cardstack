@@ -50,7 +50,7 @@ module('Acceptance | card routing', function (hooks) {
             name;
           }`,
         'isolated.js': templateOnlyComponentTemplate(
-          `<div class="person-isolated" data-test-person>Hi! I am <@model.name/></div>`
+          `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`
         ),
         'isolated.css': '.person-isolated { background: red }',
       },

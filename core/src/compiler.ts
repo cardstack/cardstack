@@ -16,17 +16,20 @@ import cardSchemaPlugin, {
 import cardTemplatePlugin, {
   Options as CardTemplateOptions,
 } from './babel/card-template-plugin';
+import type { TemplateUsageMeta } from './glimmer/card-template-plugin';
 import {
   assertValidCompiledCard,
+  assertValidDeserializationMap,
   Asset,
   Builder,
   CompiledCard,
   ComponentInfo,
+  Field,
   Format,
-  formats,
+  FORMATS,
   RawCard,
 } from './interfaces';
-import { getBasenameAndExtension } from './utils';
+import { getBasenameAndExtension, getFieldForPath } from './utils';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -46,6 +49,7 @@ export class Compiler {
   define: (
     cardURL: string,
     localModule: string,
+    type: Asset['type'] | 'js',
     source: string
   ) => Promise<string>;
 
@@ -59,8 +63,13 @@ export class Compiler {
       url: cardSource.url,
       data: cardSource.data,
     };
+
+    if (cardSource.deserializer) {
+      card.deserializer = cardSource.deserializer;
+    }
+
     let options = {};
-    card.modelModule = await this.prepareSchema(cardSource, options);
+    card.schemaModule = await this.prepareSchema(cardSource, options);
     let meta = getMeta(options);
 
     card.fields = await this.lookupFieldsForCard(meta.fields);
@@ -78,18 +87,29 @@ export class Compiler {
       card.fields = this.adoptFields(card.fields, parentCard);
       card.adoptsFrom = parentCard;
 
-      if (!card.modelModule) {
-        card.modelModule = parentCard.modelModule;
+      if (!card.schemaModule) {
+        card.schemaModule = parentCard.schemaModule;
+      }
+      if (parentCard.deserializer) {
+        if (
+          card.deserializer &&
+          parentCard.deserializer !== card.deserializer
+        ) {
+          throw new Error(
+            `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${card.url}:${card.deserializer} Parent: ${parentCard.url}:${parentCard.deserializer}`
+          );
+        }
+        card.deserializer = parentCard.deserializer;
       }
     }
 
-    if (!card.modelModule) {
+    if (!card.schemaModule) {
       throw new Error(
         `${cardSource.url} does not have a schema. This is wrong and should not happen.`
       );
     }
 
-    for (const format of formats) {
+    for (const format of FORMATS) {
       card[format] = await this.prepareComponent(
         cardSource,
         card.fields,
@@ -120,6 +140,9 @@ export class Compiler {
         continue;
       }
 
+      let src = this.getFile(sourceCard, p);
+      this.define(sourceCard.url, p, getAssetType(p), src);
+
       assets.push({
         type: getAssetType(p),
         path: p,
@@ -134,15 +157,21 @@ export class Compiler {
     meta: PluginMeta
   ): string | undefined {
     let parentPath;
+    let { url, adoptsFrom } = cardSource;
 
-    if (cardSource.adoptsFrom) {
+    if (adoptsFrom) {
+      if (adoptsFrom === url) {
+        throw new Error(
+          `BUG: ${url} provides itself as its parent. That should not happen.`
+        );
+      }
       parentPath = cardSource.adoptsFrom;
     }
 
     if (meta.parent && meta.parent.cardURL) {
       if (parentPath && parentPath !== meta.parent.cardURL) {
         throw new Error(
-          `${cardSource.url} provides conflicting parent URLs in card.json and schema.js`
+          `${url} provides conflicting parent URLs in card.json and schema.js`
         );
       }
       parentPath = meta.parent.cardURL;
@@ -167,14 +196,14 @@ export class Compiler {
     }
   }
 
-  private getSource(cardSource: RawCard, path: string): string {
-    let schemaSrc = cardSource.files[path];
-    if (!schemaSrc) {
+  private getFile(cardSource: RawCard, path: string): string {
+    let fileSrc = cardSource.files && cardSource.files[path];
+    if (!fileSrc) {
       throw new Error(
         `${cardSource.url} refers to ${path} in its card.json but that file does not exist`
       );
     }
-    return schemaSrc;
+    return fileSrc;
   }
 
   // returns the module name of our own compiled schema, if we have one. Does
@@ -194,7 +223,7 @@ export class Compiler {
 
       return undefined;
     }
-    let schemaSrc = this.getSource(cardSource, schemaLocalFilePath);
+    let schemaSrc = this.getFile(cardSource, schemaLocalFilePath);
     let out = transformSync(schemaSrc, {
       plugins: [
         [cardSchemaPlugin, options],
@@ -204,7 +233,7 @@ export class Compiler {
     });
 
     let code = out!.code!;
-    return await this.define(cardSource.url, schemaLocalFilePath, code);
+    return await this.define(cardSource.url, schemaLocalFilePath, 'js', code);
   }
 
   private async lookupFieldsForCard(
@@ -268,12 +297,13 @@ export class Compiler {
             `bug: ${parentCard.url} says it got ${which} from ${parentCard[which].sourceCardURL}, but that card does not have a ${which} component`
           );
         }
-        let src = this.getSource(originalRawCard, srcLocalPath);
+        let src = this.getFile(originalRawCard, srcLocalPath);
         return await this.compileComponent(
           src,
           fields,
           originalRawCard.url,
-          srcLocalPath
+          srcLocalPath,
+          which
         );
       } else {
         // directly reuse existing parent component because we didn't extend
@@ -282,12 +312,13 @@ export class Compiler {
       }
     }
 
-    let src = this.getSource(cardSource, localFilePath);
+    let src = this.getFile(cardSource, localFilePath);
     return await this.compileComponent(
       src,
       fields,
       cardSource.url,
-      localFilePath
+      localFilePath,
+      which
     );
   }
 
@@ -295,29 +326,50 @@ export class Compiler {
     templateSource: string,
     fields: CompiledCard['fields'],
     cardURL: string,
-    localFile: string
+    localFile: string,
+    format: Format
   ): Promise<ComponentInfo> {
     let options: CardTemplateOptions = {
       fields,
       cardURL,
       inlineHBS: undefined,
-      usedFields: [] as ComponentInfo['usedFields'],
+      usageMeta: { model: new Set(), fields: new Map() },
     };
+
     let out = transformSync(templateSource, {
       plugins: [[cardTemplatePlugin, options]],
     });
 
-    let hashedFilename = hashFilenameFromFields(localFile, fields);
+    let moduleName = await this.define(
+      cardURL,
+      hashFilenameFromFields(localFile, fields),
+      'js',
+      out!.code!
+    );
 
-    return {
-      moduleName: await this.define(cardURL, hashedFilename, out!.code!),
-      usedFields: options.usedFields,
+    let usedFields = buildUsedFieldsListFromUsageMeta(
+      fields,
+      options.usageMeta,
+      defaultFieldFormat(format)
+    );
+
+    let componentInfo: ComponentInfo = {
+      moduleName,
+      usedFields,
       inlineHBS: options.inlineHBS,
       sourceCardURL: cardURL,
     };
+
+    let deserialize = buildDeserializationMapFromUsedFields(fields, usedFields);
+    if (deserialize) {
+      componentInfo.deserialize = deserialize;
+    }
+
+    return componentInfo;
   }
 }
 
+// TODO: Replace this with proper mime-types, used content-type package
 function getAssetType(filename: string): Asset['type'] {
   if (filename.endsWith('.css')) {
     return 'css';
@@ -342,6 +394,116 @@ function hashFilenameFromFields(
   );
   return `${basename}-${hash}${extension}`;
 }
+
 function isBaseCard(url: string): boolean {
   return url === baseCardURL;
+}
+
+function buildDeserializationMapFromUsedFields(
+  fields: CompiledCard['fields'],
+  usedFields: string[]
+): ComponentInfo['deserialize'] {
+  let map: any = {};
+
+  for (const fieldPath of usedFields) {
+    let field = getFieldForPath(fields, fieldPath);
+
+    if (!field) {
+      continue;
+    }
+
+    buildDeserializerMapForField(map, field, fieldPath);
+  }
+
+  if (!Object.keys(map).length) {
+    return;
+  }
+
+  assertValidDeserializationMap(map);
+
+  return map;
+}
+
+function buildDeserializerMapForField(
+  map: any,
+  field: Field,
+  usedPath: string
+): void {
+  if (Object.keys(field.card.fields).length) {
+    let { fields } = field.card;
+    for (const name in fields) {
+      buildDeserializerMapForField(map, fields[name], `${usedPath}.${name}`);
+    }
+  } else {
+    if (!field.card.deserializer) {
+      return;
+    }
+
+    if (!map[field.card.deserializer]) {
+      map[field.card.deserializer] = [];
+    }
+
+    map[field.card.deserializer].push(usedPath);
+  }
+}
+
+function buildUsedFieldsListFromUsageMeta(
+  fields: CompiledCard['fields'],
+  usageMeta: TemplateUsageMeta,
+  defaultFormat: Format
+): ComponentInfo['usedFields'] {
+  let usedFields: Set<string> = new Set();
+
+  if (usageMeta.model && usageMeta.model !== 'self') {
+    for (const fieldPath of usageMeta.model) {
+      usedFields.add(fieldPath);
+    }
+  }
+
+  for (const [fieldPath, fieldFormat] of usageMeta.fields.entries()) {
+    buildUsedFieldListFromComponents(
+      usedFields,
+      fieldPath,
+      fields,
+      fieldFormat === 'default' ? defaultFormat : fieldFormat
+    );
+  }
+
+  return [...usedFields];
+}
+
+function buildUsedFieldListFromComponents(
+  usedFields: Set<string>,
+  fieldPath: string,
+  fields: CompiledCard['fields'],
+  format: Format,
+  prefix?: string
+): void {
+  let field = getFieldForPath(fields, fieldPath);
+  if (field && field.card[format].usedFields.length) {
+    for (const nestedFieldPath of field.card[format].usedFields) {
+      buildUsedFieldListFromComponents(
+        usedFields,
+        nestedFieldPath,
+        field.card.fields,
+        'embedded',
+        fieldPath
+      );
+    }
+  } else {
+    if (prefix) {
+      usedFields.add(`${prefix}.${fieldPath}`);
+    } else {
+      usedFields.add(fieldPath);
+    }
+  }
+}
+
+// we expect this to expand when we add edit format
+function defaultFieldFormat(format: Format): Format {
+  switch (format) {
+    case 'isolated':
+    case 'embedded':
+      return 'embedded';
+  }
 }

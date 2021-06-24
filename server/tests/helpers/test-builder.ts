@@ -1,5 +1,10 @@
 import { Compiler } from '@cardstack/core/src/compiler';
-import { Builder, CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
+import {
+  Asset,
+  Builder,
+  CompiledCard,
+  RawCard,
+} from '@cardstack/core/src/interfaces';
 import { setupCardBuilding } from '../../src/context/card-building';
 import { BASE_CARD_REALM_CONFIG } from '../helpers/fixtures';
 import { createCardCacheDir } from '../helpers/cache';
@@ -44,11 +49,19 @@ export class TestBuilder implements Builder {
   private async define(
     cardURL: string,
     localModule: string,
+    type: Asset['type'] | 'js',
     src: string
   ): Promise<string> {
     let moduleName = cardURL.replace(/\/$/, '') + '/' + localModule;
-    this.definedModules.set(moduleName, src);
-    return moduleName;
+
+    switch (type) {
+      case 'unknown':
+      case 'css':
+        return moduleName;
+      case 'js':
+        this.definedModules.set(moduleName, src);
+        return moduleName;
+    }
   }
 
   addRawCard(rawCard: RawCard) {

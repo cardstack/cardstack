@@ -4,8 +4,10 @@ import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
 import { setComponentTemplate } from '@ember/component';
 
-import { Format } from '@cardstack/core/src/interfaces';
+import { Format, DeserializerName } from '@cardstack/core/src/interfaces';
+import { cardJSONReponse } from '@cardstack/server/src/interfaces';
 import { encodeCardURL } from '@cardstack/core/src/utils';
+import serializers, { Serializer } from '@cardstack/core/src/serializers';
 
 import config from 'cardhost/config/environment';
 const { cardServer } = config as any; // Environment types arent working
@@ -29,24 +31,8 @@ export default class Cards extends Service {
   private async internalLoad(
     url: string
   ): Promise<{ model: any; component: unknown }> {
-    let response = await fetch(url);
-
-    if (response.status !== 200) {
-      throw new Error(`unable to fetch card ${url}: status ${response.status}`);
-    }
-
-    let card = (await response.json()) as {
-      data: {
-        id: string;
-        type: string;
-        attributes?: { [name: string]: any };
-        meta: {
-          componentModule: string;
-        };
-      };
-    };
-
-    let model = Object.assign({ id: card.data.id }, card.data.attributes);
+    let card = await fetchCard(url);
+    let model = await deserializeResponse(card);
 
     let { componentModule } = card.data.meta;
     let cardComponent: unknown;
@@ -81,6 +67,68 @@ export default class Cards extends Service {
       model,
       component: CallerComponent,
     };
+  }
+}
+
+async function fetchCard(url: string): Promise<cardJSONReponse> {
+  let response = await fetch(url);
+
+  if (response.status !== 200) {
+    throw new Error(`unable to fetch card ${url}: status ${response.status}`);
+  }
+
+  return await response.json();
+}
+
+function deserializeResponse(response: cardJSONReponse): any {
+  let { deserializationMap } = response.data.meta;
+  let attrs = response.data.attributes;
+
+  if (attrs && deserializationMap) {
+    for (const type in deserializationMap) {
+      let serializer = serializers[type as DeserializerName];
+      let paths = deserializationMap[type as DeserializerName];
+
+      for (const path of paths) {
+        deserializeAttribute(attrs, path, serializer);
+      }
+    }
+  }
+
+  let model = Object.assign({ id: response.data.id }, attrs);
+
+  return model;
+}
+
+function deserializeAttribute(
+  attrs: { [name: string]: any },
+  path: string,
+  serializer: Serializer
+) {
+  let [key, ...tail] = path.split('.');
+  let value = attrs[key];
+  if (!value) {
+    throw new MissingDataError(path);
+  }
+
+  if (tail.length) {
+    let tailPath = tail.join('.');
+    if (Array.isArray(value)) {
+      for (let row of value) {
+        deserializeAttribute(row, tailPath, serializer);
+      }
+    } else {
+      deserializeAttribute(attrs[key], tailPath, serializer);
+    }
+  } else {
+    attrs[path] = serializer.deserialize(value);
+  }
+}
+
+class MissingDataError extends Error {
+  constructor(path: string) {
+    super(path);
+    this.message = `Server response said ${path} would need to be deserialized, but that path didnt exist`;
   }
 }
 

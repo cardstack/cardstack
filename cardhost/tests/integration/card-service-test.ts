@@ -18,66 +18,115 @@ module('Integration | card-service', function (hooks) {
     cards = this.owner.lookup('service:cards');
   });
 
-  module('hello world', function (hooks) {
-    let helloId = 'http://mirage/cards/hello';
-    let greenId = 'http://mirage/cards/green';
+  module('blog post', function (hooks) {
+    let cardID = 'http://mirage/cards/post-1';
+
     hooks.beforeEach(function () {
       this.createCard({
-        url: greenId,
+        url: 'http://mirage/cards/post',
         schema: 'schema.js',
-        embedded: 'embedded.js',
+        isolated: 'isolated.js',
+        embedded: 'isolated.js',
         files: {
-          'schema.js': `export default class Green {}`,
-          'embedded.js': templateOnlyComponentTemplate(
-            `<span class="green">{{@model}}</span>`
+          'schema.js': `
+          import { contains } from "@cardstack/types";
+          import string from "https://cardstack.com/base/string";
+          import date from "https://cardstack.com/base/date";
+
+          export default class Hello {
+            @contains(string)
+            title;
+
+            @contains(date)
+            createdAt;
+          }
+        `,
+          'isolated.js': templateOnlyComponentTemplate(
+            `<h1><@fields.title /></h1><h2><@fields.createdAt /></h2>`
           ),
         },
       });
 
       this.createCard({
-        url: helloId,
-        schema: 'schema.js',
-        isolated: 'isolated.js',
+        url: cardID,
+        adoptsFrom: 'http://mirage/cards/post',
         data: {
-          greeting: 'Hello World',
-          greenGreeting: 'it works',
-        },
-        files: {
-          'schema.js': `
-          import { contains } from "@cardstack/types";
-          import string from "https://cardstack.com/base/string";
-          import green from "${greenId}"
-
-          export default class Hello {
-            @contains(string)
-            greeting;
-
-            @contains(green)
-            greenGreeting;
-          }
-        `,
-          'isolated.js': templateOnlyComponentTemplate(
-            `<h1><@model.greeting /></h1><h2><@model.greenGreeting /></h2>`
-          ),
+          title: 'A blog post title',
+          createdAt: '2021-05-17T15:31:21+0000',
         },
       });
     });
 
     test(`load an isolated card's component`, async function (assert) {
-      let { component } = await cards.load(helloId, 'isolated');
+      let { component } = await cards.load(cardID, 'isolated');
       this.set('component', component);
       await render(hbs`<this.component />`);
-      assert.dom('h1').containsText('Hello World');
-      assert.dom('h2 .green').containsText('it works');
+      assert.dom('h1').containsText('A blog post title');
+      assert.dom('h2').containsText('May 17, 2021');
     });
 
     test(`load an isolated card's model`, async function (assert) {
-      let { model } = await cards.load(helloId, 'isolated');
-      assert.deepEqual(model, {
-        greeting: 'Hello World',
-        greenGreeting: 'it works',
-        id: encodeCardURL(helloId),
+      let { model } = await cards.load(cardID, 'isolated');
+      assert.equal(model.id, encodeCardURL(cardID), '@model id is correct');
+      assert.equal(model.title, 'A blog post title', 'post title is correct');
+      assert.ok(
+        model.createdAt instanceof Date,
+        'CreatedAt is an instance of Date'
+      );
+      assert.equal(
+        model.createdAt.getTime(),
+        1621265481000,
+        'post created at is correct'
+      );
+    });
+
+    test('Serialization works on nested cards', async function (assert) {
+      this.createCard({
+        url: 'http://mirage/cards/post-list',
+        schema: 'schema.js',
+        isolated: 'isolated.js',
+        data: {
+          posts: [
+            {
+              title: 'A blog post title',
+              createdAt: '2021-05-17T15:31:21+0000',
+            },
+          ],
+        },
+        files: {
+          'schema.js': `
+          import { containsMany } from "@cardstack/types";
+          import post from "http://mirage/cards/post";
+
+          export default class Hello {
+            @containsMany(post)
+            posts;
+          }
+        `,
+          'isolated.js': templateOnlyComponentTemplate(
+            `{{#each @fields.posts as |Post|}}<Post />{{/each}}`
+          ),
+        },
       });
+
+      let { model, component } = await cards.load(
+        'http://mirage/cards/post-list',
+        'isolated'
+      );
+      this.set('component', component);
+      await render(hbs`<this.component />`);
+      assert.dom('h1').containsText('A blog post title');
+      assert.dom('h2').containsText('May 17, 2021');
+
+      assert.ok(
+        model.posts[0].createdAt instanceof Date,
+        'CreatedAt is an instance of Date'
+      );
+      assert.equal(
+        model.posts[0].createdAt.getTime(),
+        1621265481000,
+        'post created at is correct'
+      );
     });
   });
 });

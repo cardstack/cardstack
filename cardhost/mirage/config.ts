@@ -1,3 +1,5 @@
+import { cardJSONReponse } from '@cardstack/server/src/interfaces';
+import { Format, RawCard } from '@cardstack/core/src/interfaces';
 import type {
   Response as ResponseType,
   Request as RequestType,
@@ -8,7 +10,6 @@ import type { Server } from 'miragejs/server';
 import { Response } from 'ember-cli-mirage';
 
 import Builder from 'cardhost/lib/builder';
-import { Format, RawCard } from '@cardstack/core/src/interfaces';
 import { getContext } from '@ember/test-helpers';
 import { Memoize } from 'typescript-memoize';
 
@@ -37,18 +38,17 @@ class FakeCardServer {
     return new Builder();
   }
 
-  async respondWithCard(url: string, format: Format) {
-    let {
-      model,
-      moduleName,
-    } = await FakeCardServer.current().builder.getBuiltCard(url, format);
+  async respondWithCard(url: string, format: Format): Promise<cardJSONReponse> {
+    let card = await FakeCardServer.current().builder.getCompiledCard(url);
 
     return {
       data: {
         id: url,
-        attributes: model,
+        type: 'card',
+        attributes: card.data,
         meta: {
-          componentModule: moduleName,
+          componentModule: card[format].moduleName,
+          deserializationMap: card[format].deserialize,
         },
       },
     };
@@ -102,7 +102,7 @@ export default function (this: Server): void {
       );
     }
     let compiled = await cardServer.builder.getCompiledCard(routingCard);
-    let Klass = window.require(compiled.modelModule).default;
+    let Klass = window.require(compiled.schemaModule).default;
     let instance = new Klass();
     let cardURL = instance.routeTo('/' + request.params.pathname);
     if (!cardURL) {

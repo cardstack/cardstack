@@ -2,7 +2,6 @@ import type {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
-  Format,
   Asset,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
@@ -27,12 +26,19 @@ export default class Builder implements BuilderInterface {
   private async defineModule(
     cardURL: string,
     localModule: string,
+    type: Asset['type'] | 'js',
     source: string
   ): Promise<string> {
     let url = new URL(localModule, cardURL.replace(/\/$/, '') + '/').href;
-    source = dynamicCardTransform(url, source);
-    eval(source);
-    return url;
+
+    switch (type) {
+      case 'unknown':
+      case 'css':
+        return url;
+      case 'js':
+        eval(dynamicCardTransform(url, source));
+        return url;
+    }
   }
 
   async getRawCard(url: string): Promise<RawCard> {
@@ -65,25 +71,13 @@ export default class Builder implements BuilderInterface {
     return compiledCard;
   }
 
-  // the component that comes out of here is the actual card-author-provided
-  // component, ready to run in the browser. That is different from what gets
-  // returned by the cards service, which encapsulates both the component
-  // implementation and the data to give you a single thing you can render.
-  async getBuiltCard(
-    url: string,
-    format: Format
-  ): Promise<{ model: any; moduleName: string }> {
-    let compiledCard = await this.getCompiledCard(url);
-
-    return {
-      model: compiledCard.data,
-      moduleName: compiledCard[format].moduleName,
-    };
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   copyAssets(url: string, assets: Asset[], files: RawCard['files']): void {
     let styles: string[] = [];
+    if (!files) {
+      return;
+    }
+
     for (const asset of assets) {
       if (asset.type === 'css') {
         styles = styles.concat([

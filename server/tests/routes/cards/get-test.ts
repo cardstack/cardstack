@@ -40,7 +40,7 @@ QUnit.module('GET /cards/<card-id>', function (hooks) {
         }
       `,
       'isolated.js': templateOnlyComponentTemplate(
-        '<h1><@model.title/></h1><article><@model.body/></article>'
+        '<h1><@fields.title/></h1><article><@fields.body/></article>'
       ),
     });
 

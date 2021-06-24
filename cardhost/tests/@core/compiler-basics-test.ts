@@ -31,7 +31,7 @@ const PERSON_CARD = {
         birthdate;
       }`,
     'embedded.js': templateOnlyComponentTemplate(
-      '<@model.name/> was born on <@model.birthdate/>'
+      '<@fields.name/> was born on <@fields.birthdate/>'
     ),
   },
 };
@@ -68,7 +68,7 @@ module('@core | compiler-basics', function (hooks) {
     console.log('COMPILED BASE CARD', compiled);
 
     assert.equal(compiled.url, baseCardURL, 'Includes basecard URL');
-    assert.ok(compiled.modelModule, 'base card has a model module');
+    assert.ok(compiled.schemaModule, 'base card has a model module');
     assert.notOk(compiled.adoptsFrom, 'No parent card listed');
     assert.deepEqual(compiled.fields, {}, 'No fields');
     assert.deepEqual(compiled.assets, [], 'No assets');
@@ -94,11 +94,11 @@ module('@core | compiler-basics', function (hooks) {
 
     let compiled = await builder.getCompiledCard(card.url);
     assert.equal(
-      compiled.modelModule,
+      compiled.schemaModule,
       `${card.url}/schema.js`,
       'CompiledCard moduleName is set correctly'
     );
-    let source = window.require(compiled.modelModule).default;
+    let source = window.require(compiled.schemaModule).default;
     assert.equal(source.toString(), 'class Post {}', 'Source code is correct');
   });
 
@@ -270,7 +270,7 @@ module('@core | compiler-basics', function (hooks) {
             }
           `,
           'isolated.js': templateOnlyComponentTemplate(
-            '<div class="post-isolated><h1><@model.title /></h1></div>'
+            '<div class="post-isolated><h1><@fields.title /></h1></div>'
           ),
           'isolated.css': '.post-isolated { background: red }',
         },

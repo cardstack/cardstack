@@ -16,9 +16,9 @@ export async function setupCardRouting(
   options: { routeCard: string; cardCacheDir: string }
 ) {
   let { routeCard, cardCacheDir } = options;
-  let { modelModule } = await app.context.builder.getCompiledCard(routeCard);
+  let { schemaModule } = await app.context.builder.getCompiledCard(routeCard);
 
-  const cardRouterClassLocation = require.resolve(modelModule, {
+  const cardRouterClassLocation = require.resolve(schemaModule, {
     paths: [cardCacheDir],
   });
   // eslint-disable-next-line @typescript-eslint/no-var-requires

@@ -1,8 +1,9 @@
+import { cardJSONReponse } from '@cardstack/server/src/interfaces';
 import {
   assertValidRawCard,
   CompiledCard,
   Format,
-  formats,
+  FORMATS,
 } from '@cardstack/core/src/interfaces';
 import { NotFound } from '../middleware/error';
 import { Serializer } from 'jsonapi-serializer';
@@ -20,18 +21,22 @@ function getCardFormatFromRequest(
     format = formatQueryParam;
   }
 
-  if (formats.includes(format)) {
+  if (FORMATS.includes(format)) {
     return format;
   } else {
     return 'isolated';
   }
 }
 
-async function serializeCard(card: CompiledCard, format: Format): Promise<any> {
+async function serializeCard(
+  card: CompiledCard,
+  format: Format
+): Promise<cardJSONReponse> {
   let cardSerializer = new Serializer('card', {
     attributes: card[format].usedFields,
     dataMeta: {
       componentModule: card[format].moduleName,
+      deserializationMap: card[format].deserialize,
     },
   });
   let data = Object.assign({ id: card.url }, card.data);
