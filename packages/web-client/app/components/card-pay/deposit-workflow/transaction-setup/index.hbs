@@ -19,9 +19,9 @@
               <CardPay::BalanceDisplay
                 @size="large"
                 @icon={{this.selectedToken.icon}}
-                @balance={{this.selectedTokenBalance}}
+                @balance={{format-token-amount this.selectedTokenBalance}}
                 @symbol={{this.selectedToken.symbol}}
-                @displayUsdBalance={{true}}
+                @usdBalance={{token-to-usd this.selectedToken.symbol this.selectedTokenBalance}}
                 data-test-deposit-transaction-setup-from-balance={{this.selectedToken.symbol}}
               />
             </:inner>

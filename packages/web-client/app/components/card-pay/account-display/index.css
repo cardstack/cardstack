@@ -20,7 +20,7 @@
 }
 
 .account-display__icon--sm {
-  --icon-alignment: unset;
+  --icon-alignment: center;
   --icon-size: var(--boxel-icon-sm);
 }
 
