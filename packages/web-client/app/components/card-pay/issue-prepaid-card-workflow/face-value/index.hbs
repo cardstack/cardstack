@@ -1,19 +1,70 @@
 <ActionCardContainer
+  class="face-value-card"
   @header="Prepaid card funding"
   @isComplete={{@isComplete}}
-  data-test-layout-customization-is-complete={{@isComplete}}
 >
+  <ActionCardContainer::Section @title="Choose the face value of your prepaid card" class="face-value-card__section">
+    <div class="face-value-card__container">
+      <p class="face-value-card__exchange">
+        <span>Prepaid cards are denominated in SPEND:</span>
+        <span class="face-value-card__exchange-rate">
+          {{svg-jar "spend" width="20" height="20" role="presentation"}}
+          §1 SPEND = ${{this.spendToUSDRate}} USD
+        </span>
+      </p>
+      <CardPay::LabeledValue @vertical={{true}} @label="Funding From:">
+        <CardPay::IssuePrepaidCardWorkflow::FaceValue::BalanceView
+          @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
+          @depotAddress={{this.layer2Network.depotSafe.address}}
+          @token={{this.fundingToken}}
+          @balance={{format-token-amount this.fundingToken.balance}}
+        />
+      </CardPay::LabeledValue>
+      {{#if @isComplete}}
+        <CardPay::LabeledValue @vertical={{true}} @label="Face Value:">
+          <CardPay::BalanceDisplay
+            class="face-value-card__selected-amount-display"
+            @size="large"
+            @icon={{this.faceValueToken.icon}}
+            @balance={{this.selectedFaceValue}}
+            @usdBalance={{mult this.selectedFaceValue this.spendToUSDRate}}
+            @text={{concat @amountInFundingToken " " this.fundingToken.symbol "*"}}
+            data-test-face-value-display
+          />
+        </CardPay::LabeledValue>
+      {{else}}
+        <div class="face-value-card__options">
+          {{#each this.amountOptions as |amount|}}
+            <CardPay::IssuePrepaidCardWorkflow::FaceValue::Option
+              @checked={{eq amount this.selectedFaceValue}}
+              @spendAmount={{amount}}
+              @onInput={{fn this.chooseFaceValue amount}}
+            />
+          {{/each}}
+        </div>
+      {{/if}}
+    </div>
+    <small class="face-value-card__footnote">
+      * The value of the {{this.fundingToken.symbol}} token that backs your prepaid card
+      may fluctuate based on the {{uppercase this.fundingToken.name}}-USD exchange rate.
+      Due to this, the face value of the card at the time of issuance may differ slightly
+      from the spendable balance of the card at the time the card is used for purchases.
+    </small>
+  </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
     @disabled={{@frozen}}
     data-test-layout-customization
   >
     <:default as |d|>
-      <d.ActionButton
-        {{on "click" @onComplete}}
-      >
+      <d.ActionButton {{on "click" @onComplete}}>
         Set Face Value
       </d.ActionButton>
     </:default>
+    <:memorialized as |m|>
+      <m.ActionButton {{on "click" @onIncomplete}}>
+        Edit Face Value
+      </m.ActionButton>
+    </:memorialized>
   </Boxel::ActionChin>
 </ActionCardContainer>

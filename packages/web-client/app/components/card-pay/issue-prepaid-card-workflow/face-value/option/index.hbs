@@ -1,0 +1,24 @@
+<label
+  class={{cn "face-value-option" face-value-option--checked=@checked}}
+  data-test-face-value-option={{@amount}} data-test-face-value-option-checked={{@checked}}
+>
+  <Input
+    name="funding-amount"
+    class={{cn "face-value-option__input" face-value-option__input--checked=@checked}}
+    @type="radio"
+    @checked={{@checked}}
+    {{on "input" @onInput}}
+  />
+  <div class="face-value-option__value">
+    {{svg-jar @token.icon width="20" height="20" role="presentation"}}
+    <div class="face-value-option__amount">
+      {{@token.sign}}{{@amount}} {{@token.symbol}}
+    </div>
+    <div class="face-value-option__conversion">
+      ${{@amountInUSD}} USD
+    </div>
+    <div class="face-value-option__conversion">
+      {{@amountInFundingToken}} {{@fundingTokenSymbol}}*
+    </div>
+  </div>
+</label>
