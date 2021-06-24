@@ -39,9 +39,7 @@
 }
 
 .balance-view[open] .balance-view__summary {
-  height: var(--boxel-sp-xl);
-  padding-top: 0;
-  padding-bottom: 0;
+  height: var(--boxel-sp-lg);
 }
 
 .balance-view__summary-balance {

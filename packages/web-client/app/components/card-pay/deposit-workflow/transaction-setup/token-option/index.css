@@ -45,10 +45,11 @@
 }
 
 .token-option__icon {
-  width: 2.5rem;
-  height: 2.5rem;
+  flex-shrink: 0;
+  width: var(--boxel-icon-lg);
+  height: var(--boxel-icon-lg);
   object-fit: contain;
-  margin-right: var(--boxel-sp-sm);
+  margin-right: var(--boxel-sp-xs);
 }
 
 .token-option__title {

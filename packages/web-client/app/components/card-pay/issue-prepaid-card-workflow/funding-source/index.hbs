@@ -51,7 +51,7 @@
                 <CardPay::BalanceDisplay
                   @size="large"
                   @icon={{this.selectedToken.icon}}
-                  @balance={{this.selectedToken.balance}}
+                  @balance={{format-token-amount this.selectedToken.balance}}
                   @symbol={{this.selectedToken.symbol}}
                   data-test-funding-source-token
                 />
@@ -71,7 +71,7 @@
                       @size="small"
                       @icon={{token.icon}}
                       @name={{token.symbol}}
-                      @balance={{token.balance}}
+                      @balance={{format-token-amount token.balance}}
                       @symbol={{token.symbol}}
                       data-test-funding-source-token-option={{token.symbol}}
                     />

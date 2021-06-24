@@ -15,7 +15,7 @@
           @tokenSymbol={{this.currentTokenSymbol}}
           @tokenIcon={{this.currentTokenDetails.icon}}
           @address={{this.layer1Network.walletInfo.firstAddress}}
-          @balance={{this.currentTokenBalance}}
+          @balance={{format-token-amount this.currentTokenBalance}}
           @balanceInUsd={{token-to-usd this.currentTokenSymbol this.currentTokenBalance}}
           @isComplete={{@isComplete}}
         />
@@ -29,9 +29,9 @@
             class="transaction-amount__token"
             @size="large"
             @icon={{this.currentTokenDetails.icon}}
-            @balance={{this.amountAsBigNumber}}
+            @balance={{format-token-amount this.amountAsBigNumber}}
             @symbol={{this.currentTokenSymbol}}
-            @displayUsdBalance={{true}}
+            @usdBalance={{token-to-usd this.currentTokenSymbol this.amountAsBigNumber}}
             data-test-deposit-amount-entered
           />
         </Boxel::Field>

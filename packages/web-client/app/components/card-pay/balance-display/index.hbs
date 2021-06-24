@@ -18,11 +18,11 @@
           balance-display__balance--lg=isLarge
           balance-display__balance--sm=isSmall
         }} data-test-balance-display-amount>
-          {{format-token-amount @balance}} {{@symbol}}
+          {{@sign}}{{@balance}} {{@symbol}}
         </div>
-        {{#if @displayUsdBalance}}
+        {{#if @usdBalance}}
           <div class="balance-display__text" data-test-balance-display-usd-amount>
-            ${{token-to-usd @symbol @balance}} USD
+            ${{@usdBalance}} USD
           </div>
         {{/if}}
       {{/if}}
