@@ -578,4 +578,69 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom('[data-test-issue-prepaid-card-workflow-disconnection-restart]')
       .exists();
   });
+
+  // TODO: add variant with wallet connected, make sure that zteps at least up to layer 2 connect card are shown
+  test('Workflow is canceled if balance insufficient to create prepaid card', async function (assert) {
+    await visit('/card-pay');
+    assert.equal(currentURL(), '/card-pay/balances');
+    await click('[data-test-issue-prepaid-card-workflow-button]');
+
+    assert.dom(`${postableSel(0, 0)} img`).exists();
+    assert.dom(postableSel(0, 0)).containsText('Hello, it’s nice to see you!');
+    assert.dom(postableSel(0, 1)).containsText('Let’s issue a prepaid card.');
+
+    assert
+      .dom(postableSel(0, 2))
+      .containsText(
+        'Before we get started, please connect your xDai chain wallet via your Card Wallet mobile app.'
+      );
+
+    assert
+      .dom(postableSel(0, 3))
+      .containsText(
+        'Once you have installed the app, open the app and add an existing wallet/account'
+      );
+
+    assert
+      .dom(`${postableSel(0, 4)} [data-test-wallet-connect-loading-qr-code]`)
+      .exists();
+
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    layer2Service.test__simulateWalletConnectUri();
+    await waitFor('[data-test-wallet-connect-qr-code]');
+    assert.dom('[data-test-wallet-connect-qr-code]').exists();
+
+    // Simulate the user scanning the QR code and connecting their mobile wallet
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateBalances({
+      defaultToken: toBN('250000000000'),
+    });
+    let testDepot = {
+      address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
+      tokens: [
+        {
+          balance: '250000000000',
+          token: {
+            symbol: 'DAI',
+          },
+        },
+      ],
+    };
+    layer2Service.test__simulateDepot(testDepot as DepotSafe);
+
+    await settled();
+
+    assert
+      .dom(cancelationPostableSel(0))
+      .containsText(
+        'Looks like there’s no balance in your xDai chain wallet to fund a prepaid card. Before you can continue, please add funds to your xDai chain wallet by bridging some tokens from your Ethereum mainnet wallet.'
+      );
+    assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+
+    assert
+      .dom('[data-test-issue-prepaid-card-workflow-insufficient-funds-deposit]')
+      .exists();
+  });
 });
