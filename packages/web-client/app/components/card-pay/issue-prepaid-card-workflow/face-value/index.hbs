@@ -29,8 +29,8 @@
             @sign="§"
             @symbol="SPEND"
             @balance={{this.selectedFaceValue}}
-            @usdBalance={{mult this.selectedFaceValue this.spendToUsdRate}}
-            @text={{concat "≈ " (mult this.selectedFaceValue this.spendToUsdRate) " " this.fundingToken.symbol "*"}}
+            @usdBalance={{spend-to-usd this.selectedFaceValue}}
+            @text={{concat "≈ " (spend-to-usd this.selectedFaceValue) " " this.fundingToken.symbol "*"}}
             data-test-face-value-display
           />
         </CardPay::LabeledValue>
@@ -38,11 +38,11 @@
         <div class="face-value-card__options">
           {{#each this.faceValueOptions as |amount|}}
             <CardPay::IssuePrepaidCardWorkflow::FaceValue::Option
-              @disabled={{lt this.balanceFromBN (mult amount this.spendToUsdRate)}}
+              @disabled={{lt this.balanceFromBN (spend-to-usd amount)}}
               @checked={{eq amount this.selectedFaceValue}}
               @spendFaceValue={{amount}}
-              @usdAmount={{mult amount this.spendToUsdRate}}
-              @approxDaiAmount={{mult amount this.spendToUsdRate}}
+              @usdAmount={{spend-to-usd amount}}
+              @approxDaiAmount={{spend-to-usd amount}}
               @onInput={{fn this.chooseFaceValue amount}}
             />
           {{/each}}
