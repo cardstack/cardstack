@@ -4,11 +4,12 @@ import { toWei } from 'web3-utils';
 import { BN } from 'bn.js';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
-interface LayerTwoConnectWrapperComponentArgs {
+interface WrappedLayerTwoConnectCardComponentArgs {
   cancelWorkflow: (reason: string) => void;
 }
 
-export default class LayerTwoConnectWrapperComponent extends Component<LayerTwoConnectWrapperComponentArgs> {
+// This exists because
+export default class WrappedLayerTwoConnectCardComponent extends Component<WrappedLayerTwoConnectCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
 
   constructor(owner: unknown, args: any) {
