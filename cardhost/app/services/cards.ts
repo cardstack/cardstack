@@ -1,4 +1,5 @@
 import Service from '@ember/service';
+import { set } from '@ember/object';
 import { macroCondition, isTesting } from '@embroider/macros';
 import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
@@ -21,11 +22,14 @@ interface CardJSONAPIRequest {
   };
 }
 
+type Setter = (value: any) => void;
+
 const { cardServer } = config as any; // Environment types arent working
 
 export interface LoadedCard {
-  model: any;
+  data: any;
   component: unknown;
+  setters: Setter;
 }
 
 function buildURL(url: string, format?: Format): string {
@@ -37,37 +41,25 @@ function buildURL(url: string, format?: Format): string {
 }
 
 export default class Cards extends Service {
-  modelCache: Map<string, any>;
-  // deserializerMapCache: WeakMap<string, any>;
-
-  constructor() {
-    super();
-    this.modelCache = new Map<string, any>();
-    // this.deserializerMapCache = new WeakMap<object, any>();
-  }
-
-  async load(
-    url: string,
-    format: Format
-  ): Promise<{ model: any; component: unknown }> {
+  async load(url: string, format: Format): Promise<LoadedCard> {
     let fullURL = buildURL(url, format);
     return this.internalLoad.perform(fullURL);
   }
 
-  async loadForRoute(
-    pathname: string
-  ): Promise<{ model: any; component: unknown }> {
+  async loadForRoute(pathname: string): Promise<LoadedCard> {
     return this.internalLoad.perform(`${cardServer}cardFor${pathname}`);
   }
 
-  @task
-  private internalLoad = taskFor(
+  @task private internalLoad = taskFor(
     async (url: string): Promise<LoadedCard> => {
       let card = await fetchCard(url);
-      let model = await deserializeResponse(card);
-      this.modelCache.set(url, model);
+      let data = await deserializeResponse(card);
 
-      let cardComponent: unknown = await loadComponentModule(
+      let setters = makeSetter((segments, value) => {
+        set(data, segments.join('.'), value);
+      });
+
+      let cardComponent = await loadComponentModule(
         card.data.meta.componentModule,
         url
       );
@@ -75,27 +67,23 @@ export default class Cards extends Service {
       // TODO: @set should be conditional?
       let CallerComponent = setComponentTemplate(
         hbs`<this.card @model={{this.model}} @set={{this.setters}} />`,
-        class WrapperComponent extends Component<{
-          set: (segments: string[], value: any) => void;
-        }> {
-          model = model;
+        class extends Component {
+          model = data;
           card = cardComponent;
-
-          get setters() {
-            return makeSetter(this.args.set);
-          }
+          setters = setters;
         }
       );
 
       return {
-        model,
+        data,
         component: CallerComponent,
+        setters,
       };
     }
   );
 
   async save(cardURL: string, data: unknown): Promise<void> {
-    await this.saveTask.perform(cardURL, data);
+    return this.saveTask.perform(cardURL, data);
   }
 
   @task saveTask = taskFor(
@@ -140,7 +128,7 @@ async function loadComponentModule(
 function makeSetter(
   callback: (segments: string[], value: any) => void,
   segments: string[] = []
-): any {
+): Setter {
   let s = (value: any) => {
     callback(segments, value);
   };
@@ -156,6 +144,7 @@ function makeSetter(
       },
     }
   );
+
   return s;
 }
 

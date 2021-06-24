@@ -1,3 +1,6 @@
-<CardWrapper @model={{@model.model}}>
+<CardContainer
+  @card={{@model}}
+  @editable={{true}}
+>
   <@model.component />
-</CardWrapper>
+</CardContainer>

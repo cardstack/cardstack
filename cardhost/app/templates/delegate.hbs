@@ -1,3 +1,5 @@
-<CardWrapper @model={{@model.model}}>
+<CardContainer
+  @editAction={{open-card-in-modal @model.data.id format='edit'}}
+>
   <@model.component />
-</CardWrapper>
+</CardContainer>

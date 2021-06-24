@@ -21,10 +21,9 @@ export const FEATURE_NAMES = Object.keys(featureNamesMap).concat(
   FORMATS
 ) as FeatureFile[];
 
-// Right now Date is the only hardcoded known serializer. If we add more
-// this will become a union
 const deserializerTypes = {
   date: '',
+  datetime: '',
 };
 export type DeserializerName = keyof typeof deserializerTypes;
 export const DESERIALIZER_NAMES = Object.keys(
