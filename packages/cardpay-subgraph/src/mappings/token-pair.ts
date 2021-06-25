@@ -1,4 +1,4 @@
-import { Swap as SwapEvent } from '../../generated/templates/TokenPair/UniswapV2Pair';
+import { Swap as SwapEvent } from '../../generated/templates/UniswapV2Pair/UniswapV2Pair';
 import { makeEOATransaction, makeEOATransactionForSafe, toChecksumAddress } from '../utils';
 import { Safe, TokenSwap } from '../../generated/schema';
 
