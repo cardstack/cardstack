@@ -35,6 +35,8 @@ const addresses: {
     merchantManager: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2',
     spend: '0xcd7AB5c678Bc0b90dD6f870B8F214c10A943FC67',
     actionDispatcher: '0xaE5AC3685630b33Ed2677438EEaAe0aD5372c795',
+    uniswapV2Router: '0xd57B4D7B7FED6b47492A362e113e26F9804DbCc6', // This is the UniswapV2Router02
+    uniswapV2Factory: '0x6b67f08F08B715B162aa09239488318A660F24BF',
     oracles: {
       DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB', // eslint-disable-line @typescript-eslint/naming-convention
       CARD: '0xb4Fcc975c2b6A57dd5B3d9a3B6b144499f707c7d', // eslint-disable-line @typescript-eslint/naming-convention

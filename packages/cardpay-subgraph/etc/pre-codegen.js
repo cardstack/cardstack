@@ -43,6 +43,7 @@ for (let [name, abi] of Object.entries(abis)) {
 let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{NETWORK}/g, network)
   .replace(/{PREPAID_CARD_MANAGER_ADDRESS}/g, getAddress('prepaidCardManager', cleanNetwork))
+  .replace(/{UNISWAP_V2_FACTORY_ADDRESS}/g, getAddress('uniswapV2Factory', cleanNetwork))
   .replace(/{HOME_TOKEN_BRIDGE_ADDRESS}/g, getAddress('homeBridge', cleanNetwork))
   .replace(/{REVENUE_POOL_ADDRESS}/g, getAddress('revenuePool', cleanNetwork))
   .replace(/{EXCHANGE_ADDRESS}/g, getAddress('exchange', cleanNetwork))

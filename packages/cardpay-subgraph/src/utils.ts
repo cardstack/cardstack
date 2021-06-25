@@ -4,7 +4,16 @@ import { ERC20 } from '../generated/Token/ERC20';
 import { ERC20SymbolBytes } from '../generated/Token/ERC20SymbolBytes';
 import { ERC20NameBytes } from '../generated/Token/ERC20NameBytes';
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit';
-import { Transaction, MerchantRevenue, PrepaidCard, PrepaidCardPayment, Token } from '../generated/schema';
+import {
+  EOATransaction,
+  Transaction,
+  MerchantRevenue,
+  PrepaidCard,
+  PrepaidCardPayment,
+  Token,
+  Safe,
+} from '../generated/schema';
+import { GnosisSafe } from '../generated/Gnosis/GnosisSafe';
 
 export function makeToken(address: Address): string {
   let token = toChecksumAddress(address);
@@ -24,6 +33,25 @@ export function makeTransaction(event: ethereum.Event): void {
   txEntity.save();
 }
 
+export function makeEOATransaction(event: ethereum.Event, address: string): void {
+  makeTransaction(event);
+  let txnHash = event.transaction.hash.toHex();
+  let entity = new EOATransaction(txnHash + '-' + address);
+  entity.transaction = txnHash;
+  entity.account = address;
+  entity.timestamp = event.block.timestamp;
+  entity.blockNumber = event.block.number;
+  entity.save();
+}
+
+export function makeEOATransactionForSafe(event: ethereum.Event, safe: Safe): void {
+  let safeContract = GnosisSafe.bind(Address.fromString(safe.id));
+  let owners = safeContract.getOwners();
+  for (let i = 0; i < owners.length; i++) {
+    makeEOATransaction(event, toChecksumAddress(owners[i]));
+  }
+}
+
 export function makeMerchantRevenue(merchantSafe: string, token: string): MerchantRevenue {
   let id = merchantSafe + '-' + token;
   let entity = MerchantRevenue.load(id);
@@ -39,6 +67,7 @@ export function makeMerchantRevenue(merchantSafe: string, token: string): Mercha
 }
 
 export function makePrepaidCardPayment(
+  event: ethereum.Event,
   prepaidCard: string,
   txnHash: string,
   timestamp: BigInt,
@@ -61,6 +90,7 @@ export function makePrepaidCardPayment(
     );
     return;
   }
+  makeEOATransaction(event, prepaidCardEntity.owner);
 
   let paymentEntity = new PrepaidCardPayment(txnHash); // There will only ever be one merchant payment event per txn
   paymentEntity.transaction = txnHash;

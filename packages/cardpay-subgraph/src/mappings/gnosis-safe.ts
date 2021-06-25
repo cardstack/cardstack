@@ -1,27 +1,35 @@
 import { Address } from '@graphprotocol/graph-ts';
 import { ExecutionSuccess } from '../../generated/templates/GnosisSafe/GnosisSafe';
-import { toChecksumAddress, makeTransaction, makeToken } from '../utils';
+import { toChecksumAddress, makeEOATransactionForSafe, makeToken } from '../utils';
 import { decode, encodeMethodSignature, methodHashFromEncodedHex } from '../abi';
-import { SafeTransaction } from '../../generated/schema';
+import { Safe, SafeTransaction } from '../../generated/schema';
 import { log } from '@graphprotocol/graph-ts';
 
 const EXEC_TRANSACTION = 'execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)';
 
 export function handleExecutionSuccess(event: ExecutionSuccess): void {
   let safeAddress = toChecksumAddress(event.transaction.to as Address);
+  let txnHash = event.transaction.hash.toHex();
 
-  log.debug('processing txn hash {} for safe {}', [event.transaction.hash.toHex(), safeAddress]);
+  log.debug('processing txn hash {} for safe {}', [txnHash, safeAddress]);
+  let safe = Safe.load(safeAddress);
+  if (safe == null) {
+    log.warning(
+      'Cannot process safe txn {}: Safe entity does not exist for safe address {}. This is likely due to the subgraph having a startBlock that is higher than the block the safe was created in.',
+      [txnHash, safeAddress]
+    );
+    return;
+  }
+  makeEOATransactionForSafe(event, safe as Safe);
 
   let bytes = event.transaction.input.toHex();
   let methodHash = methodHashFromEncodedHex(bytes);
 
   // TODO handle all the PrepaidCardMethod's functions too
   if (methodHash == encodeMethodSignature(EXEC_TRANSACTION)) {
-    makeTransaction(event);
-
-    let safeTxEntity = new SafeTransaction(event.transaction.hash.toHex() + '-' + event.logIndex.toString());
+    let safeTxEntity = new SafeTransaction(txnHash + '-' + event.logIndex.toString());
     safeTxEntity.safe = safeAddress;
-    safeTxEntity.transaction = event.transaction.hash.toHex();
+    safeTxEntity.transaction = txnHash;
     safeTxEntity.timestamp = event.block.timestamp;
 
     let decoded = decode(EXEC_TRANSACTION, bytes);
@@ -39,7 +47,7 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     log.debug(
       'SafeTransaction indexed in txn hash {}, id {}, safe: {}, timestamp {}, to: {}, value: {}, data: {}, operation: {}, safeTxGas {}, baseGas {}, gasPrice {}, gasToken: {}, refundReceiver: {}, signatures: {}',
       [
-        event.transaction.hash.toHex(),
+        txnHash,
         safeTxEntity.id,
         safeTxEntity.safe,
         safeTxEntity.timestamp.toString(),

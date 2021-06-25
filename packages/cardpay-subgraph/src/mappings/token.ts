@@ -1,12 +1,10 @@
 import { Address, BigInt } from '@graphprotocol/graph-ts';
-import { makeToken, makeTransaction, toChecksumAddress } from '../utils';
+import { makeToken, makeEOATransaction, makeEOATransactionForSafe, toChecksumAddress } from '../utils';
 import { ERC20, Transfer as TransferEvent } from '../../generated/Token/ERC20';
 import { Safe, Account, TokenTransfer, TokenHolder, TokenHistory } from '../../generated/schema';
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit';
 
 export function handleTransfer(event: TransferEvent): void {
-  makeTransaction(event);
-
   let tokenAddress = makeToken(event.address);
 
   let sender: TokenHolder | null = null;
@@ -15,9 +13,21 @@ export function handleTransfer(event: TransferEvent): void {
   let from = toChecksumAddress(event.params.from);
   if (to != ZERO_ADDRESS) {
     receiver = makeTokenHolder(event.params.to, event.address);
+    let receiverSafe = Safe.load(to);
+    if (receiverSafe != null) {
+      makeEOATransactionForSafe(event, receiverSafe as Safe);
+    } else {
+      makeEOATransaction(event, to);
+    }
   }
   if (from != ZERO_ADDRESS) {
     sender = makeTokenHolder(event.params.from, event.address);
+    let senderSafe = Safe.load(from);
+    if (senderSafe != null) {
+      makeEOATransactionForSafe(event, senderSafe as Safe);
+    } else {
+      makeEOATransaction(event, from);
+    }
   }
 
   let txnHash = event.transaction.hash.toHex();

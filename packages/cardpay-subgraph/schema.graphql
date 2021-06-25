@@ -8,7 +8,10 @@ type Account @entity {
   createdMerchants: [MerchantCreation]!            @derivedFrom(field: "merchant")
   receivedPrepaidCards: [PrepaidCardTransfer]!     @derivedFrom(field: "to")
   sentPrepaidCards: [PrepaidCardTransfer]!         @derivedFrom(field: "from")
-  tokens: [TokenHolder]!                         @derivedFrom(field: "account")
+  sentTokenSwaps: [TokenSwap]!                     @derivedFrom(field: "sender") # generally the "sender" and "to" addresses for token swaps are the same, but they have the ability to be different
+  receivedTokenSwaps: [TokenSwap]!                 @derivedFrom(field: "to")
+  tokens: [TokenHolder]!                           @derivedFrom(field: "account")
+  transactions: [EOATransaction]!                  @derivedFrom(field: "account")
 }
 
 type Depot @entity {
@@ -168,6 +171,19 @@ type PrepaidCardTransfer @entity {
   to: Account!
 }
 
+type TokenSwap @entity {
+  id: ID!
+  transaction: Transaction!
+  timestamp: BigInt!
+  tokenPair: TokenPair!
+  sender: Account!
+  to: Account!
+  token0AmountIn: BigInt!
+  token0AmountOut: BigInt!
+  token1AmountIn: BigInt!
+  token1AmountOut: BigInt!
+}
+
 type Safe @entity {
   id: ID!                          # safe address
   createdAt: BigInt!               # unix time
@@ -196,6 +212,16 @@ type SafeTransaction @entity {
   signatures: Bytes!
 }
 
+# this is an EOA based organization of transactions that allows us to view safe
+# txn's and EOA transaction in a consolidated view, where the account is the owner of the safe
+type EOATransaction @entity {
+  id: ID!
+  account: Account!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transaction: Transaction!
+}
+
 # this is a grouping of all the interior events that happened as part of the
 # same transaction
 type Transaction @entity {
@@ -215,6 +241,7 @@ type Transaction @entity {
   merchantFeePayments: [MerchantFeePayment]!       @derivedFrom(field: "transaction")
   merchantClaims: [MerchantClaim]!                 @derivedFrom(field: "transaction")
   merchantRevenueEvents: [MerchantRevenueEvent]!   @derivedFrom(field: "transaction")
+  tokenSwaps: [TokenSwap]!                         @derivedFrom(field: "transaction")
 }
 
 # A mapping table is the more performant way to represent many-to-many
@@ -262,4 +289,11 @@ type TokenHistory @entity {
   received: TokenTransfer
   timestamp: BigInt!
   tokenHolder: TokenHolder!
+}
+
+type TokenPair @entity {
+  id: ID!
+  token0: Token!
+  token1: Token!
+  swaps: [TokenSwap]!             @derivedFrom(field: "tokenPair")
 }

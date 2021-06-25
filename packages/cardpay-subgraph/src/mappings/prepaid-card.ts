@@ -1,13 +1,13 @@
 import { CreatePrepaidCard, PrepaidCardManager } from '../../generated/PrepaidCard/PrepaidCardManager';
 import { Account, Depot, PrepaidCard, PrepaidCardCreation } from '../../generated/schema';
-import { makeToken, makeTransaction, toChecksumAddress } from '../utils';
+import { makeToken, makeEOATransaction, toChecksumAddress } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
 export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   let prepaidCard = toChecksumAddress(event.params.card);
-  log.info('indexing new prepaid card {}', [prepaidCard]);
-  makeTransaction(event);
   let issuer = toChecksumAddress(event.params.issuer);
+  log.info('indexing new prepaid card {}', [prepaidCard]);
+  makeEOATransaction(event, issuer);
   let accountEntity = new Account(issuer);
   accountEntity.save();
 

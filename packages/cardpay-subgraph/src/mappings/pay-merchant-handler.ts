@@ -14,6 +14,7 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
   let issuingToken = makeToken(event.params.issuingToken);
 
   makePrepaidCardPayment(
+    event,
     prepaidCard,
     txnHash,
     event.block.timestamp,
