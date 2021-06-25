@@ -6,12 +6,13 @@ interface WorkflowCardOptions {
   author: Participant;
   componentName: string; // this should eventually become a card reference
   includeIf: () => boolean;
+  onRender?: () => void;
 }
 
 export class WorkflowCard extends WorkflowPostable {
   componentName: string;
   constructor(options: Partial<WorkflowCardOptions>) {
-    super(options.author!, options.includeIf);
+    super(options.author!, options.includeIf, options.onRender);
     this.componentName = options.componentName!;
     this.reset = () => {
       if (this.isComplete) {

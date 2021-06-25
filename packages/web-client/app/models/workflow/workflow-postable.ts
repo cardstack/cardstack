@@ -14,11 +14,14 @@ export class WorkflowPostable {
   @tracked isComplete: boolean = false;
   constructor(
     author: Participant,
-    includeIf: (() => boolean) | undefined = undefined
+    includeIf: (() => boolean) | undefined = undefined,
+    onRender: (() => void) | undefined = undefined
   ) {
     this.author = author;
     this.includeIf = includeIf;
+    this.onRender = onRender;
   }
   includeIf: (() => boolean) | undefined;
+  onRender: (() => void) | undefined;
   reset: (() => void) | undefined;
 }
