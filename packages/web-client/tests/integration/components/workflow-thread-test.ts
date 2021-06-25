@@ -194,6 +194,13 @@ module('Integration | Component | workflow-thread', function (hooks) {
   });
 
   test('A workflow can be rolled back', async function (assert) {
+    this.owner.register(
+      'template:components/dummy-test',
+      hbs`
+        <div>Just a dummy component so we don't have to depend on existing components for this test</div>
+        `
+    );
+
     let workflow = new ConcreteWorkflow(this.owner);
     let message = () =>
       new WorkflowMessage({
