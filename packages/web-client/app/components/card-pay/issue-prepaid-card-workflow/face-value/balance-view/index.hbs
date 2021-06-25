@@ -1,0 +1,43 @@
+<details class="balance-view-banner" ...attributes>
+  <summary class="balance-view-banner__summary">
+    <CardPay::BalanceDisplay
+      class="balance-view-banner__summary-content"
+      @size="small"
+      @icon="avatar-default"
+      @name="Account 1"
+      @text={{concat "DEPOT: " @balance " " @token.symbol}}
+      data-test-balance-view-summary
+    />
+    <div class="balance-view-banner__marker">
+      {{svg-jar "caret-right" class="balance-view-banner__marker-icon" role="presentation"}}
+    </div>
+  </summary>
+  <CardPay::NestedItems class="balance-view-banner__details">
+    <:outer>
+      <CardPay::AccountDisplay
+        @size="small"
+        @icon="avatar-default"
+        @name="Account 1"
+        @address={{@walletAddress}}
+        data-test-balance-view-account-address
+      />
+    </:outer>
+    <:inner>
+      <CardPay::AccountDisplay
+        @size="small"
+        @icon="depot"
+        @name="DEPOT:"
+        @address={{@depotAddress}}
+        data-test-balance-view-depot-address
+      />
+      <CardPay::BalanceDisplay
+        class="balance-view-banner__details-token"
+        @size="large"
+        @icon={{@token.icon}}
+        @balance={{@balance}}
+        @symbol={{@token.symbol}}
+        data-test-balance-view-token-amount
+      />
+    </:inner>
+  </CardPay::NestedItems>
+</details>

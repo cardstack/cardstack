@@ -52,7 +52,7 @@
                   @size="large"
                   @icon={{this.selectedToken.icon}}
                   @balance={{format-token-amount this.selectedToken.balance}}
-                  @symbol={{this.selectedToken.symbol}}
+                  @symbol={{this.selectedTokenSymbol}}
                   data-test-funding-source-token
                 />
               {{else}}
@@ -64,10 +64,10 @@
                     @onChange={{this.chooseSource}}
                     @renderInPlace={{true}}
                     @verticalPosition="below"
-                    data-test-funding-source-dropdown={{this.selectedToken.symbol}}
+                    data-test-funding-source-dropdown={{this.selectedTokenSymbol}}
                   as |token|>
                     <CardPay::BalanceDisplay
-                      class={{cn "funding-source__dropdown-option" (if (eq token.symbol this.selectedToken.symbol) "funding-source__dropdown-option--selected")}}
+                      class={{cn "funding-source__dropdown-option" (if (eq token.symbol this.selectedTokenSymbol) "funding-source__dropdown-option--selected")}}
                       @size="small"
                       @icon={{token.icon}}
                       @name={{token.symbol}}

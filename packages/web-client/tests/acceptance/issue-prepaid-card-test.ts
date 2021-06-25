@@ -225,14 +225,62 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(postableSel(2, 3))
       .containsText('choose the face value of your prepaid card');
     // // face-value card
-    // TODO verify and interact with face-value card default state
+    assert.dom('[data-test-balance-view-summary]').containsText('250.00 DAI');
+    await click('[data-test-balance-view-summary]');
+    assert
+      .dom('[data-test-balance-view-account-address]')
+      .containsText(layer2AccountAddress);
+    assert
+      .dom('[data-test-balance-view-depot-address]')
+      .containsText(depotAddress);
+    assert
+      .dom('[data-test-balance-view-token-amount]')
+      .containsText('250.00 DAI');
+    assert.dom('[data-test-face-value-display]').doesNotExist();
+    assert.dom('[data-test-face-value-option]').exists({ count: 4 });
+    assert.dom('[data-test-face-value-option-checked]').doesNotExist();
+    assert.dom('[data-test-face-value-option="50000"] input').isDisabled();
+    assert.dom('[data-test-face-value-option="100000"] input').isDisabled();
+    assert
+      .dom('[data-test-face-value-option="50000"]')
+      .containsText('50000 SPEND');
+    assert.dom('[data-test-face-value-option="50000"]').containsText('500 USD');
+    assert
+      .dom('[data-test-face-value-option="50000"]')
+      .containsText('≈ 500 DAI.CPXD');
+    assert.dom('[data-test-face-value-option="10000"] input').isNotDisabled();
+    assert.dom('[data-test-face-value-option="5000"] input').isNotDisabled();
+    await click('[data-test-face-value-option="5000"]');
+    assert.dom('[data-test-face-value-option="5000"] input').isChecked();
+    assert.dom('[data-test-face-value-option-checked]').exists({ count: 1 });
     await click(
       `${postableSel(
         2,
         4
       )} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
-    // TODO verify and interact with face-value card memorialized state
+
+    assert.dom('[data-test-face-value-option]').doesNotExist();
+    assert.dom('[data-test-face-value-display]').containsText('5000 SPEND');
+    await click(
+      `${postableSel(
+        2,
+        4
+      )} [data-test-boxel-action-chin] [data-test-boxel-button]`
+    );
+
+    await click('[data-test-face-value-option="10000"]');
+    assert.dom('[data-test-face-value-option="10000"] input').isChecked();
+    await click(
+      `${postableSel(
+        2,
+        4
+      )} [data-test-boxel-action-chin] [data-test-boxel-button]`
+    );
+
+    assert.dom('[data-test-face-value-display]').containsText('10000 SPEND');
+    assert.dom('[data-test-face-value-display]').containsText('100 USD');
+    assert.dom('[data-test-face-value-display]').containsText('≈ 100 DAI.CPXD');
 
     await waitFor(milestoneCompletedSel(2));
     assert.dom(milestoneCompletedSel(2)).containsText('Face value chosen');

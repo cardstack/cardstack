@@ -7,7 +7,7 @@ import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import { TransactionReceipt } from 'web3-core';
-import BN from 'bn.js';
+import BN from 'web3-core/node_modules/@types/bn.js';
 import { toBN, toWei } from 'web3-utils';
 import {
   TokenDisplayInfo,
