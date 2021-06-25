@@ -8,8 +8,7 @@ type Account @entity {
   createdMerchants: [MerchantCreation]!            @derivedFrom(field: "merchant")
   receivedPrepaidCards: [PrepaidCardTransfer]!     @derivedFrom(field: "to")
   sentPrepaidCards: [PrepaidCardTransfer]!         @derivedFrom(field: "from")
-  sentTokenSwaps: [TokenSwap]!                     @derivedFrom(field: "sender") # generally the "sender" and "to" addresses for token swaps are the same, but they have the ability to be different
-  receivedTokenSwaps: [TokenSwap]!                 @derivedFrom(field: "to")
+  tokenSwaps: [TokenSwap]!                         @derivedFrom(field: "to")
   tokens: [TokenHolder]!                           @derivedFrom(field: "account")
   transactions: [EOATransaction]!                  @derivedFrom(field: "account")
 }
@@ -176,7 +175,6 @@ type TokenSwap @entity {
   transaction: Transaction!
   timestamp: BigInt!
   tokenPair: TokenPair!
-  sender: Account!
   to: Account!
   token0AmountIn: BigInt!
   token0AmountOut: BigInt!

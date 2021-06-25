@@ -3,14 +3,7 @@ import { makeEOATransaction, makeEOATransactionForSafe, toChecksumAddress } from
 import { Safe, TokenSwap } from '../../generated/schema';
 
 export function handleSwap(event: SwapEvent): void {
-  let sender = toChecksumAddress(event.params.sender);
   let to = toChecksumAddress(event.params.to);
-  let senderSafe = Safe.load(sender);
-  if (senderSafe != null) {
-    makeEOATransactionForSafe(event, senderSafe as Safe);
-  } else {
-    makeEOATransaction(event, sender);
-  }
   let toSafe = Safe.load(to);
   if (toSafe != null) {
     makeEOATransactionForSafe(event, toSafe as Safe);
@@ -24,7 +17,6 @@ export function handleSwap(event: SwapEvent): void {
   swapEntity.transaction = txnHash;
   swapEntity.timestamp = event.block.timestamp;
   swapEntity.tokenPair = pair;
-  swapEntity.sender = sender;
   swapEntity.to = to;
   swapEntity.token0AmountIn = event.params.amount0In;
   swapEntity.token0AmountOut = event.params.amount0Out;
