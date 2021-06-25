@@ -1,4 +1,13 @@
 {
+  "aws": {
+    "config": {
+      "credentials": {
+        "AccessKeyId": "HUB_AWS_ACCESS_KEY_ID",
+        "SecretAccessKey": "HUB_AWS_SECRET_ACCESS_KEY"
+      },
+      "region": "HUB_AWS_REGION"
+    }
+  },
   "db": {
     "url": "DATABASE_URL"
   },
