@@ -12,6 +12,7 @@ import {
   PrepaidCardPayment,
   Token,
   Safe,
+  Account,
 } from '../generated/schema';
 import { GnosisSafe } from '../generated/Gnosis/GnosisSafe';
 
@@ -35,6 +36,9 @@ export function makeTransaction(event: ethereum.Event): void {
 
 export function makeEOATransaction(event: ethereum.Event, address: string): void {
   makeTransaction(event);
+  let accountEntity = new Account(address);
+  accountEntity.save();
+
   let txnHash = event.transaction.hash.toHex();
   let entity = new EOATransaction(txnHash + '-' + address);
   entity.transaction = txnHash;
