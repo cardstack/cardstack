@@ -168,6 +168,19 @@ type PrepaidCardTransfer @entity {
   to: Account!
 }
 
+type TokenSwap @entity {
+  id: ID!
+  transaction: Transaction!
+  timestamp: BigInt!
+  tokenPair: TokenPair!
+  sender: Account!
+  to: Account!
+  token0AmountIn: BigInt!
+  token0AmountOut: BigInt!
+  token1AmountIn: BigInt!
+  token1AmountOut: BigInt!
+}
+
 type Safe @entity {
   id: ID!                          # safe address
   createdAt: BigInt!               # unix time
@@ -262,4 +275,11 @@ type TokenHistory @entity {
   received: TokenTransfer
   timestamp: BigInt!
   tokenHolder: TokenHolder!
+}
+
+type TokenPair @entity {
+  id: ID!
+  token0: Token!
+  token1: Token!
+  swaps: [TokenSwap]!             @derivedFrom(field: "tokenPair")
 }

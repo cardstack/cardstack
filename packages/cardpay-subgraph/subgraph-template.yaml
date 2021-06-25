@@ -10,8 +10,8 @@ dataSources:
     network: {NETWORK}
     source:
       abi: ERC20
-      # startBlock: 21403252 # v0.6.0 version of protocol (nice to use for faster index times)
-      startBlock: 20644808 # the block that the token bridge was created (and hence our CPXD tokens)
+      startBlock: 21403252 # v0.6.0 version of protocol (nice to use for faster index times)
+      # startBlock: 20644808 # the block that the token bridge was created (and hence our CPXD tokens)
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -307,6 +307,34 @@ dataSources:
           handler: handleProxyCreation
       file: ./src/mappings/gnosis-proxy-factory.ts
 
+  - kind: ethereum/contract
+    name: UniswapFactory
+    network: {NETWORK}
+    source:
+      address: "{UNISWAP_V2_FACTORY_ADDRESS}"
+      abi: UniswapV2Factory
+      startBlock: 21474163 # UniswapV2 was deployed to sokol at #21474163
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/uniswap-factory.ts
+      entities:
+        - Token
+        - TokenPair
+      abis:
+        - name: UniswapV2Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handleNewPair
+
 templates:
   - kind: ethereum/contract
     name: GnosisSafe
@@ -334,3 +362,22 @@ templates:
           handler: handleExecutionSuccess
       file: ./src/mappings/gnosis-safe.ts
 
+  - kind: ethereum/contract
+    name: UniswapV2Pair
+    network: {NETWORK}
+    source:
+      abi: UniswapV2Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Swap
+        - Token
+      abis:
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
+      eventHandlers:
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+      file: ./src/mappings/token-pair.ts
