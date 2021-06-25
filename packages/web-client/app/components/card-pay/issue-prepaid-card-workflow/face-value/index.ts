@@ -6,12 +6,17 @@ import { inject as service } from '@ember/service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { fromWei, toBN, toWei } from 'web3-utils';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
-import { faceValueOptions, spendToUsdRate, Token } from '../workflow-config';
+import { faceValueOptions, spendToUsdRate } from '../workflow-config';
+import {
+  TokenDisplayInfo,
+  TokenSymbol,
+} from '@cardstack/web-client/utils/token';
+import BN from 'web3-core/node_modules/@types/bn.js';
 
 interface FaceValueCardArgs {
   workflowSession: WorkflowSession;
-  onComplete: (() => void) | undefined;
-  onIncomplete: (() => void) | undefined;
+  onComplete?: () => void;
+  onIncomplete?: () => void;
   isComplete: boolean;
 }
 
@@ -21,8 +26,22 @@ class FaceValueCard extends Component<FaceValueCardArgs> {
 
   @service declare layer2Network: Layer2Network;
   @reads('args.workflowSession.state.prepaidFundingToken')
-  declare fundingToken: Token;
-  @tracked selectedFaceValue: number | undefined;
+  declare fundingTokenSymbol: TokenSymbol;
+  @tracked selectedFaceValue?: number;
+
+  get fundingTokenBalance(): BN {
+    if (this.fundingTokenSymbol === 'DAI.CPXD') {
+      return this.layer2Network.defaultTokenBalance ?? toBN('0');
+    }
+    return toBN('0');
+  }
+
+  get fundingToken() {
+    if (this.fundingTokenSymbol) {
+      return new TokenDisplayInfo(this.fundingTokenSymbol);
+    }
+    return undefined;
+  }
 
   get selectedValueInBN() {
     if (!this.selectedFaceValue) {
@@ -32,21 +51,21 @@ class FaceValueCard extends Component<FaceValueCardArgs> {
   }
 
   get balanceFromBN() {
-    if (!this.fundingToken.balance || this.fundingToken.balance.isZero()) {
+    if (!this.fundingTokenBalance || this.fundingTokenBalance.isZero()) {
       return 0;
     }
-    return Number(fromWei(this.fundingToken.balance));
+    return Number(fromWei(this.fundingTokenBalance));
   }
 
   get isDisabled() {
     if (
       !this.selectedFaceValue ||
-      !this.fundingToken.balance ||
-      this.fundingToken.balance.isZero()
+      !this.fundingTokenBalance ||
+      this.fundingTokenBalance.isZero()
     ) {
       return true;
     }
-    return this.fundingToken.balance.lt(this.selectedValueInBN);
+    return this.fundingTokenBalance.lt(this.selectedValueInBN);
   }
 
   @action chooseFaceValue(amount: number) {

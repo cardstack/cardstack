@@ -17,7 +17,7 @@
           @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
           @depotAddress={{this.layer2Network.depotSafe.address}}
           @token={{this.fundingToken}}
-          @balance={{format-token-amount this.fundingToken.balance}}
+          @balance={{format-token-amount this.fundingTokenBalance}}
         />
       </CardPay::LabeledValue>
       {{#if @isComplete}}
@@ -30,7 +30,7 @@
             @symbol="SPEND"
             @balance={{this.selectedFaceValue}}
             @usdBalance={{spend-to-usd this.selectedFaceValue}}
-            @text={{concat "≈ " (spend-to-usd this.selectedFaceValue) " " this.fundingToken.symbol "*"}}
+            @text={{concat "≈ " (spend-to-usd this.selectedFaceValue) " " this.fundingTokenSymbol "*"}}
             data-test-face-value-display
           />
         </CardPay::LabeledValue>
@@ -50,7 +50,7 @@
       {{/if}}
     </div>
     <small class="face-value-card__footnote">
-      * The value of the {{this.fundingToken.symbol}} token that backs your prepaid card
+      * The value of the {{this.fundingTokenSymbol}} token that backs your prepaid card
       may fluctuate based on the {{uppercase this.fundingToken.name}}-USD exchange rate.
       Due to this, the face value of the card at the time of issuance may differ slightly
       from the spendable balance of the card at the time the card is used for purchases.
