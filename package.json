@@ -58,7 +58,7 @@
     "lint:hbs:web-client": "cd packages/web-client && ember-template-lint .",
     "start": "WAIT_ON_TIMEOUT=600000 start-server-and-test 'yarn start:web-client' http://localhost:4200 'yarn start:hub'",
     "start:hub": "cd ./packages/hub && node ./bin/server.ts",
-    "console:hub": "node --experimental-repl-await ./packages/hub/bin/console.ts",
+    "console:hub": "cd packages/hub && node --experimental-repl-await ./bin/console.ts",
     "start:web-client": "cd packages/web-client && ember serve",
     "test": "npm-run-all --aggregate-output --continue-on-error --parallel test:*",
     "test:did-resolver": "PACKAGE=did-resolver mocha ./packages/test-support/bin/run.js --timeout 60000",
