@@ -10,6 +10,8 @@ import NetworkAwareWorkflowMessage from '@cardstack/web-client/components/workfl
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
+import { BN } from 'bn.js';
+import { toWei } from 'web3-utils';
 
 class IssuePrepaidCardWorkflow extends Workflow {
   name = 'Prepaid Card Issuance';
@@ -50,6 +52,18 @@ class IssuePrepaidCardWorkflow extends Workflow {
         new WorkflowCard({
           author: cardbot,
           componentName: 'card-pay/layer-two-connect-card',
+          onRender: () => {
+            let layer2Network = this.owner.lookup(
+              'service:layer2-network'
+            ) as Layer2Network;
+
+            layer2Network.waitForAccount.then(() => {
+              let MIN_DAI_AMOUNT = new BN(toWei('50'));
+              if (layer2Network.defaultTokenBalance?.lt(MIN_DAI_AMOUNT)) {
+                this.cancel('INSUFFICIENT_FUNDS');
+              }
+            });
+          },
         }),
       ],
       completedDetail: 'xDai chain wallet connected',
