@@ -148,7 +148,7 @@ export default class Safes {
     if (safeBalance.lt(new BN(amount))) {
       throw new Error(
         `Safe does not have enough balance to transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
-          safeAddress.toString()
+          safeBalance.toString()
         )}, amount to transfer ${fromWei(amount)}`
       );
     }
