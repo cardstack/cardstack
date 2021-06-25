@@ -1,7 +1,7 @@
 import { SupplierSafeCreated, SupplierInfoDIDUpdated } from '../../generated/Depot/SupplierManager';
 import { TokensBridgedToSafe } from '../../generated/TokenBridge/HomeMultiAMBErc20ToErc677';
 import { Depot, Account, BridgeEvent, SupplierInfoDIDUpdate } from '../../generated/schema';
-import { makeToken, makeTransaction, toChecksumAddress } from '../utils';
+import { makeToken, makeEOATransaction, toChecksumAddress } from '../utils';
 import { log, BigInt } from '@graphprotocol/graph-ts';
 
 export function handleCreateDepot(event: SupplierSafeCreated): void {
@@ -11,10 +11,10 @@ export function handleCreateDepot(event: SupplierSafeCreated): void {
 }
 
 export function handleTokensBridged(event: TokensBridgedToSafe): void {
-  makeTransaction(event);
+  let supplier = toChecksumAddress(event.params.recipient);
+  makeEOATransaction(event, supplier);
 
   let safe = toChecksumAddress(event.params.safe);
-  let supplier = toChecksumAddress(event.params.recipient);
   makeDepot(safe, supplier, event.block.timestamp);
 
   let bridgeEventEntity = new BridgeEvent(event.transaction.hash.toHex() + '-' + event.logIndex.toString());
@@ -29,9 +29,9 @@ export function handleTokensBridged(event: TokensBridgedToSafe): void {
 }
 
 export function handleSetInfoDID(event: SupplierInfoDIDUpdated): void {
-  makeTransaction(event);
-
   let supplier = toChecksumAddress(event.params.supplier);
+  makeEOATransaction(event, supplier);
+
   let infoDID = event.params.infoDID;
 
   let accountEntity = new Account(supplier);

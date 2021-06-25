@@ -10,8 +10,8 @@ dataSources:
     network: {NETWORK}
     source:
       abi: ERC20
-      startBlock: 21403252 # v0.6.0 version of protocol (nice to use for faster index times)
-      # startBlock: 20644808 # the block that the token bridge was created (and hence our CPXD tokens)
+      # startBlock: 21403252 # v0.6.0 version of protocol (nice to use for faster index times)
+      startBlock: 20644808 # the block that the token bridge was created (and hence our CPXD tokens)
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -22,6 +22,8 @@ dataSources:
         - TokenHolder
         - TokenTransfer
         - TokenHistory
+        - Transaction
+        - EOATransaction
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
@@ -29,6 +31,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -50,6 +54,7 @@ dataSources:
         - PrepaidCardCreation
         - Transaction
         - Account
+        - EOATransaction
       abis:
         - name: PrepaidCardManager
           file: ./abis/generated/PrepaidCardManager.json
@@ -59,6 +64,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: CreatePrepaidCard(address,address,address,address,uint256,uint256,uint256,string)
           handler: handleCreatePrepaidCard
@@ -77,6 +84,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Transaction
+        - EOATransaction
         - Account
         - MerchantSafe
         - MerchantCreation
@@ -89,6 +97,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: MerchantCreation(address,address,string)
           handler: handleMerchantCreation
@@ -107,6 +117,8 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Transaction
+        - EOATransaction
+        - Account
         - MerchantRegistrationPayment
         - PrepaidCardPayment
       abis:
@@ -118,6 +130,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: MerchantRegistrationFee(address,address,uint256,uint256)
           handler: handleMerchantRegistrationFee
@@ -136,6 +150,8 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Transaction
+        - EOATransaction
+        - Account
         - PrepaidCardPayment
         - MerchantFeePayment
         - MerchantRevenue
@@ -149,6 +165,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: CustomerPayment(address,address,address,uint256,uint256)
           handler: handleMerchantPayment
@@ -169,6 +187,8 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Transaction
+        - EOATransaction
+        - Account
         - MerchantRevenue
         - MerchantClaim
         - MerchantRevenueEvent
@@ -181,6 +201,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: MerchantClaim(address,address,uint256)
           handler: handleMerchantClaim
@@ -199,6 +221,8 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Transaction
+        - EOATransaction
+        - Account
         - SpendAccumulation
       abis:
         - name: Spend
@@ -209,6 +233,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: Mint(address,uint256)
           handler: handleMint
@@ -229,6 +255,8 @@ dataSources:
         - Safe
         - Depot
         - Transaction
+        - EOATransaction
+        - Account
       abis:
         - name: SupplierManager
           file: ./abis/generated/SupplierManager.json
@@ -238,6 +266,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: SupplierSafeCreated(address,address)
           handler: handleCreateDepot
@@ -262,6 +292,8 @@ dataSources:
         - Transaction
         - SupplierInfoDIDUpdate
         - BridgeEvent
+        - EOATransaction
+        - Account
       abis:
         - name: HomeMultiAMBErc20ToErc677
           file: ./abis/HomeMultiAMBErc20ToErc677.json
@@ -271,6 +303,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: TokensBridgedToSafe(indexed address,indexed address,address,uint256,indexed bytes32)
           handler: handleTokensBridged
@@ -302,6 +336,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: ProxyCreation(address)
           handler: handleProxyCreation
@@ -322,6 +358,9 @@ dataSources:
       entities:
         - Token
         - TokenPair
+        - Transaction
+        - EOATransaction
+        - Account
       abis:
         - name: UniswapV2Factory
           file: ./abis/UniswapV2Factory.json
@@ -331,6 +370,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handleNewPair
@@ -348,6 +389,8 @@ templates:
       entities:
         - SafeTransaction
         - Transaction
+        - EOATransaction
+        - Account
       abis:
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
@@ -373,10 +416,21 @@ templates:
       language: wasm/assemblyscript
       entities:
         - Swap
-        - Token
+        - TokenSwap
+        - Transaction
+        - EOATransaction
+        - Account
       abis:
         - name: UniswapV2Pair
           file: ./abis/UniswapV2Pair.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
           handler: handleSwap
