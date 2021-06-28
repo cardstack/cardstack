@@ -8,9 +8,6 @@ For more information, see the
 
 The Hub consists of API endpoints and a postgres database.
 
-## Running locally
-After configuration and database setup as described below, start this by running `yarn start`. 
-
 ## Configuration
 
 Below is a list of the most common environment variables that the Hub accepts:
@@ -57,7 +54,7 @@ To redo the last migration (i.e. down + up):
 
 ## Running the server
 
-`yarn start:server` starts the hub web server on port 3000
+`yarn start` or `yarn start:server` starts the hub web server on port 3000
 
 ## Running the workers
 
