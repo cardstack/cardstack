@@ -300,6 +300,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
         )} [data-test-prepaid-card-issuer-name-labeled-value]`
       )
       .containsText('JJ');
+    assert
+      .dom(
+        `${postableSel(3, 1)} [data-test-prepaid-card-face-value-labeled-value]`
+      )
+      .containsText('10000 SPEND')
+      .containsText('100 USD');
 
     assert.dom(
       `${postableSel(

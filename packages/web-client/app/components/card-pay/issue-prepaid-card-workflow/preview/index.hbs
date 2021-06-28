@@ -32,6 +32,21 @@
           @value={{@workflowSession.state.issuerName}}
           data-test-prepaid-card-issuer-name-labeled-value
         />
+        <CardPay::LabeledValue
+          @vertical={{true}}
+          @label="Face value"
+          data-test-prepaid-card-face-value-labeled-value
+        >
+          <CardPay::BalanceDisplay
+            class="preview__spend-face-value"
+            @icon="spend"
+            @sign="§"
+            @symbol="SPEND"
+            @balance={{@workflowSession.state.spendFaceValue}}
+            @usdBalance={{spend-to-usd @workflowSession.state.spendFaceValue}}
+          />
+        </CardPay::LabeledValue>
+
         {{#if @isComplete}}
           <CardPay::LabeledValue
             @vertical={{true}}
