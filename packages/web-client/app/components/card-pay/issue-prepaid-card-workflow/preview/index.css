@@ -31,3 +31,7 @@
 }
 
 /* FIXME add gutter space */
+
+.preview__spend-face-value {
+  --icon-alignment: start;
+}
