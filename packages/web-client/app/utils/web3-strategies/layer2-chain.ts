@@ -12,12 +12,16 @@ import { SimpleEmitter, UnbindEventListener } from '../events';
 import {
   ConvertibleSymbol,
   ConversionFunction,
-  NetworkSymbol,
   TokenContractInfo,
 } from '../token';
 import WalletInfo from '../wallet-info';
 import CustomStorageWalletConnect from '../wc-connector';
-import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
+import {
+  ChainAddress,
+  Layer2Web3Strategy,
+  TransactionHash,
+  NetworkSymbol,
+} from './types';
 import {
   networkIds,
   getConstantByNetwork,

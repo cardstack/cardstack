@@ -2,6 +2,7 @@ import { AbiItem } from 'web3-utils';
 import { ERC20ABI } from '@cardstack/cardpay-sdk/index.js';
 import { getAddressByNetwork } from '@cardstack/cardpay-sdk';
 import { ChainAddress } from './web3-strategies/types';
+import { NetworkSymbol } from './web3-strategies/types';
 
 // symbols
 export type ConvertibleSymbol = 'DAI' | 'CARD';
@@ -13,7 +14,6 @@ export type TokenSymbol =
   | BridgeableSymbol
   | Layer1BalanceSymbol
   | BridgedTokenSymbol;
-export type NetworkSymbol = 'kovan' | 'sokol' | 'mainnet' | 'xdai';
 
 // conversion
 export type ConversionFunction = (amountInWei: string) => number;

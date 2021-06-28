@@ -11,11 +11,11 @@ import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 
 import config from '../../config/environment';
 import { SimpleEmitter, UnbindEventListener } from '../events';
-import { BridgeableSymbol, NetworkSymbol, TokenContractInfo } from '../token';
+import { BridgeableSymbol, TokenContractInfo } from '../token';
 import WalletInfo from '../wallet-info';
 import { WalletProvider } from '../wallet-providers';
 import CustomStorageWalletConnect from '../wc-connector';
-import { Layer1Web3Strategy, TransactionHash } from './types';
+import { Layer1Web3Strategy, TransactionHash, NetworkSymbol } from './types';
 import {
   getConstantByNetwork,
   getSDK,
