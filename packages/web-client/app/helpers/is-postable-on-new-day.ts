@@ -1,19 +1,18 @@
 import { helper } from '@ember/component/helper';
 import { WorkflowPostable } from '../models/workflow/workflow-postable';
 
-function isPostableOnNewDay([postable]: [WorkflowPostable]) {
+function isPostableOnNewDay(
+  [postable]: [WorkflowPostable],
+  { previous }: { previous: WorkflowPostable }
+) {
   if (!postable) {
     return false;
   }
 
-  let workflowVisiblePostables = postable!.workflow!.peekAtVisiblePostables();
-
-  let previousPostable =
-    workflowVisiblePostables[workflowVisiblePostables.indexOf(postable) - 1];
-  if (!previousPostable) {
+  if (!previous) {
     return true;
   }
-  let previousDate = previousPostable.timestamp!.getDate();
+  let previousDate = previous.timestamp!.getDate();
   let postableDate = postable.timestamp!.getDate();
   return previousDate !== postableDate;
 }
