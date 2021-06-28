@@ -4,7 +4,7 @@ set -e
 CLUSTER=$1
 TASK_DEFINITION=${2:-waypoint-hub}
 if [ -z "$CLUSTER" ] || [ -z "$TASK_DEFINITION" ]; then
-  echo "usage: purge-service.sh CLUSTER [TASK_DEFINITION]"
+  echo "usage: $0 CLUSTER [TASK_DEFINITION]"
   exit 1
 fi
 
