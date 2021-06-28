@@ -5,7 +5,6 @@ import Layer1Network from '../../../../services/layer1-network';
 import Layer2Network from '../../../../services/layer2-network';
 import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
-import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import { TransactionReceipt } from 'web3-core';
 import BN from 'web3-core/node_modules/@types/bn.js';
 import { toBN, toWei } from 'web3-utils';
@@ -13,14 +12,9 @@ import {
   TokenDisplayInfo,
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
-interface CardPayDepositWorkflowTransactionAmountComponentArgs {
-  workflowSession: WorkflowSession;
-  onComplete: () => void;
-  isComplete: boolean;
-}
-
-class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPayDepositWorkflowTransactionAmountComponentArgs> {
+class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @tracked amount = '';
   @tracked isUnlocked = false;
   @tracked isUnlocking = false;
@@ -156,7 +150,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<CardPay
           'depositedAmount',
           this.amountAsBigNumber.toString() // BN is mutable
         );
-        this.args.onComplete();
+        this.args.onComplete?.();
         this.hasDeposited = true;
       })
       .finally(() => {

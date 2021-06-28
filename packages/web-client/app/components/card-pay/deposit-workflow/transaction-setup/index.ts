@@ -4,22 +4,15 @@ import { reads } from 'macro-decorators';
 import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import WorkflowSession from '../../../../models/workflow/workflow-session';
 import { toBN } from 'web3-utils';
 import {
   TokenDisplayInfo,
   TokenSymbol,
   bridgeableSymbols,
 } from '@cardstack/web-client/utils/token';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
-interface CardPayDepositWorkflowTransactionSetupComponentArgs {
-  workflowSession: WorkflowSession;
-  onComplete: (() => void) | undefined;
-  onIncomplete: (() => void) | undefined;
-  isComplete: boolean;
-}
-
-class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayDepositWorkflowTransactionSetupComponentArgs> {
+class CardPayDepositWorkflowTransactionSetupComponent extends Component<WorkflowCardComponentArgs> {
   tokens = bridgeableSymbols.map((symbol) => new TokenDisplayInfo(symbol));
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
@@ -27,10 +20,7 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<CardPayD
   @reads('args.workflowSession.state.depositSourceToken')
   declare selectedTokenSymbol: TokenSymbol;
 
-  constructor(
-    owner: unknown,
-    args: CardPayDepositWorkflowTransactionSetupComponentArgs
-  ) {
+  constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
   }
 

@@ -5,11 +5,11 @@ import { inject as service } from '@ember/service';
 import BN from 'web3-core/node_modules/@types/bn.js';
 import { toBN } from 'web3-utils';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import {
   TokenDisplayInfo,
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
 interface Token {
   balance?: BN;
@@ -19,14 +19,7 @@ interface Token {
   symbol: TokenSymbol;
 }
 
-interface FundingSourceCardArgs {
-  workflowSession: WorkflowSession;
-  onComplete: (() => void) | undefined;
-  onIncomplete: (() => void) | undefined;
-  isComplete: boolean;
-}
-
-class FundingSourceCard extends Component<FundingSourceCardArgs> {
+class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
   defaultTokenSymbol: TokenSymbol = 'DAI.CPXD';
   tokenOptions = [this.defaultTokenSymbol];
   @service declare layer2Network: Layer2Network;
@@ -35,7 +28,7 @@ class FundingSourceCard extends Component<FundingSourceCardArgs> {
     this.defaultTokenSymbol;
   @tracked selectedToken: Token;
 
-  constructor(owner: unknown, args: FundingSourceCardArgs) {
+  constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
     this.selectedToken =
       this.tokens.find((t) => t.symbol === this.selectedTokenSymbol) ??

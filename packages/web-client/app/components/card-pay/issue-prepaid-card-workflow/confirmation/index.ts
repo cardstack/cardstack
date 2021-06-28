@@ -1,18 +1,12 @@
 import Component from '@glimmer/component';
 import { next } from '@ember/runloop';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
-interface CardPayIssuePrepaidCardWorkflowConfirmationComponentArgs {
-  onComplete: () => void;
-}
-
-export default class CardPayDepositWorkflowConfirmationComponent extends Component<CardPayIssuePrepaidCardWorkflowConfirmationComponentArgs> {
-  constructor(
-    owner: unknown,
-    args: CardPayIssuePrepaidCardWorkflowConfirmationComponentArgs
-  ) {
+export default class CardPayDepositWorkflowConfirmationComponent extends Component<WorkflowCardComponentArgs> {
+  constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
     next(this, () => {
-      this.args.onComplete();
+      this.args.onComplete?.();
     });
   }
 }

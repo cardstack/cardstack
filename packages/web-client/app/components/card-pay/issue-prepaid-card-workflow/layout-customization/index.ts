@@ -7,17 +7,10 @@ import {
   PatternCustomizationOption,
   default as CardCustomizationOptionsService,
 } from '@cardstack/web-client/services/card-customization-options';
-import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import { reads } from 'macro-decorators';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
-interface LayoutCustomizationCardArgs {
-  workflowSession: WorkflowSession;
-  isComplete: boolean;
-  onComplete: () => void;
-  onIncomplete: () => void;
-}
-
-export default class LayoutCustomizationCard extends Component<LayoutCustomizationCardArgs> {
+export default class LayoutCustomizationCard extends Component<WorkflowCardComponentArgs> {
   @service('card-customization-options')
   declare cardCustomizationOptionsService: CardCustomizationOptionsService;
   @reads('cardCustomizationOptionsService.colorOptions')
