@@ -10,9 +10,10 @@ import {
   SimpleEmitter,
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
+import { networkDisplayInfo } from './network-display-info';
 
 export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
-  chainName = 'L1 test chain';
+  chainName = networkDisplayInfo['test-layer1'].fullName;
   chainId = -1;
   @tracked currentProviderId: string | undefined;
   @tracked walletConnectUri: string | undefined;
