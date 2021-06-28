@@ -13,6 +13,8 @@ import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
 import { toBN } from 'web3-utils';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import { capitalize } from '@ember/string';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -49,7 +51,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(0, 2))
       .containsText(
-        'The funds you wish to deposit must be available in your mainnet wallet'
+        `The funds you wish to deposit must be available in your ${c.layer1.networkType} wallet`
       );
 
     post = postableSel(0, 3);
@@ -58,7 +60,7 @@ module('Acceptance | deposit', function (hooks) {
       `${post} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
     );
 
-    assert.dom(post).containsText('Connect your L1 test chain wallet');
+    assert.dom(post).containsText(`Connect your ${c.layer1.fullName} wallet`);
 
     await a11yAudit();
     assert.ok(true, 'no a11y errors found - layer 1 connect card');
@@ -85,12 +87,12 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet wallet connected');
+      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
 
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        'Now it’s time to connect your xDai chain wallet via your Card Wallet mobile app'
+        `Now it’s time to connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app`
       );
 
     assert
@@ -132,7 +134,7 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai chain wallet connected');
+      .containsText(`${c.layer2.fullName} wallet connected`);
 
     assert
       .dom(postableSel(2, 0))
@@ -264,7 +266,9 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(postableSel(3, 0))
-      .containsText('your token will be bridged to the xDai blockchain');
+      .containsText(
+        `your token will be bridged to the ${c.layer2.shortName} blockchain`
+      );
 
     post = postableSel(3, 1);
     // transaction-status card
@@ -307,7 +311,7 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(milestoneCompletedSel(3))
-      .containsText('Tokens received on xDai');
+      .containsText(`Tokens received on ${c.layer2.shortName}`);
 
     assert
       .dom(epiloguePostableSel(0))
@@ -315,7 +319,7 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(epiloguePostableSel(1))
-      .containsText('Minted from CARD Protocol on L2 test chain');
+      .containsText(`Minted from CARD Protocol on ${c.layer2.fullName}`);
     assert.dom(epiloguePostableSel(1)).containsText('250.00 DAI.CPXD');
 
     await waitFor(epiloguePostableSel(2));
@@ -323,7 +327,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(epiloguePostableSel(2))
       .containsText(
-        'This is the remaining balance in your Ethereum mainnet wallet'
+        `This is the remaining balance in your ${c.layer1.fullName} wallet`
       );
 
     layer1Service.test__simulateBalances({
@@ -405,24 +409,24 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(0, 2))
       .containsText(
-        'The funds you wish to deposit must be available in your mainnet wallet'
+        `The funds you wish to deposit must be available in your ${c.layer1.networkType} wallet`
       );
 
     assert
       .dom(postableSel(0, 3))
       .containsText(
-        'Looks like you’ve already connected your Ethereum mainnet wallet'
+        `Looks like you’ve already connected your ${c.layer1.fullName} wallet`
       );
 
     await settled();
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet wallet connected');
+      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
 
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        'Now it’s time to connect your xDai chain wallet via your Card Wallet mobile app'
+        `Now it’s time to connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app`
       );
 
     assert
@@ -455,7 +459,7 @@ module('Acceptance | deposit', function (hooks) {
     await settled();
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai chain wallet connected');
+      .containsText(`${c.layer2.fullName} wallet connected`);
 
     assert
       .dom(postableSel(2, 0))
@@ -508,18 +512,18 @@ module('Acceptance | deposit', function (hooks) {
     await settled();
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet wallet connected');
+      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
 
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        'Looks like you’ve already connected your xDai chain wallet'
+        `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
       );
 
     await settled();
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai chain wallet connected');
+      .containsText(`${c.layer2.fullName} wallet connected`);
 
     assert
       .dom(postableSel(2, 0))
@@ -556,25 +560,25 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(0, 3))
       .containsText(
-        'Looks like you’ve already connected your Ethereum mainnet wallet'
+        `Looks like you’ve already connected your ${c.layer1.fullName} wallet`
       );
 
     await settled();
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet wallet connected');
+      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
 
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        'Looks like you’ve already connected your xDai chain wallet'
+        `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
       );
 
     await settled();
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai chain wallet connected');
+      .containsText(`${c.layer2.fullName} wallet connected`);
 
     assert
       .dom(postableSel(2, 0))
@@ -640,23 +644,23 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(0, 3))
       .containsText(
-        'Looks like you’ve already connected your Ethereum mainnet wallet'
+        `Looks like you’ve already connected your ${c.layer1.fullName} wallet`
       );
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet wallet connected');
+      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
 
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        'Looks like you’ve already connected your xDai chain wallet'
+        `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
       );
 
     await settled();
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai chain wallet connected');
+      .containsText(`${c.layer2.fullName} wallet connected`);
 
     assert
       .dom(postableSel(2, 0))
@@ -720,23 +724,23 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(0, 3))
       .containsText(
-        'Looks like you’ve already connected your Ethereum mainnet wallet'
+        `Looks like you’ve already connected your ${c.layer1.fullName} wallet`
       );
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet wallet connected');
+      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
 
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        'Looks like you’ve already connected your xDai chain wallet'
+        `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
       );
 
     await settled();
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai chain wallet connected');
+      .containsText(`${c.layer2.fullName} wallet connected`);
 
     assert
       .dom(postableSel(2, 0))
@@ -805,23 +809,23 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(0, 3))
       .containsText(
-        'Looks like you’ve already connected your Ethereum mainnet wallet'
+        `Looks like you’ve already connected your ${c.layer1.fullName} wallet`
       );
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet wallet connected');
+      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
 
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        'Looks like you’ve already connected your xDai chain wallet'
+        `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
       );
 
     await settled();
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai chain wallet connected');
+      .containsText(`${c.layer2.fullName} wallet connected`);
 
     assert
       .dom(postableSel(2, 0))
