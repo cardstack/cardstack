@@ -4,9 +4,9 @@ import { getWeb3 } from './utils';
 
 export async function registerMerchant(
   network: string,
-  mnemonic: string,
   prepaidCardAddress: string,
-  infoDID?: string
+  infoDID: string | undefined,
+  mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let revenuePool = await getSDK('RevenuePool', web3);
@@ -20,7 +20,7 @@ export async function registerMerchant(
   console.log(`Transaction hash: ${blockExplorer}/tx/${gnosisTxn?.ethereumTx.txHash}/token-transfers`);
 }
 
-export async function revenueBalances(network: string, mnemonic: string, merchantSafeAddress: string): Promise<void> {
+export async function revenueBalances(network: string, merchantSafeAddress: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let revenuePool = await getSDK('RevenuePool', web3);
   let balanceInfo = await revenuePool.balances(merchantSafeAddress);
@@ -32,10 +32,10 @@ export async function revenueBalances(network: string, mnemonic: string, merchan
 
 export async function claimRevenue(
   network: string,
-  mnemonic: string,
   merchantSafeAddress: string,
   tokenAddress: string,
-  amount: number
+  amount: number,
+  mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let revenuePool = await getSDK('RevenuePool', web3);

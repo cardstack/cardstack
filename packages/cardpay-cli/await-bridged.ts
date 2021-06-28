@@ -3,9 +3,9 @@ import { getWeb3 } from './utils';
 
 export default async function (
   network: string,
-  mnemonic: string,
   fromBlock: number,
-  recipient?: string
+  recipient: string | undefined,
+  mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);

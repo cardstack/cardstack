@@ -6,9 +6,9 @@ const { fromWei } = Web3.utils;
 
 export async function priceForFaceValue(
   network: string,
-  mnemonic: string,
   tokenAddress: string,
-  spendFaceValue: number
+  spendFaceValue: number,
+  mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let prepaidCard = await getSDK('PrepaidCard', web3);
@@ -18,7 +18,7 @@ export async function priceForFaceValue(
   );
 }
 
-export async function gasFee(network: string, mnemonic: string, tokenAddress: string): Promise<void> {
+export async function gasFee(network: string, tokenAddress: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let prepaidCard = await getSDK('PrepaidCard', web3);
   let weiAmount = await prepaidCard.gasFee(tokenAddress);
@@ -27,11 +27,11 @@ export async function gasFee(network: string, mnemonic: string, tokenAddress: st
 
 export async function createPrepaidCard(
   network: string,
-  mnemonic: string,
   safe: string,
   faceValues: number[],
   tokenAddress: string,
-  customizationDID?: string
+  customizationDID: string | undefined,
+  mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
 
@@ -47,10 +47,10 @@ export async function createPrepaidCard(
 
 export async function payMerchant(
   network: string,
-  mnemonic: string,
   merchantSafe: string,
   prepaidCardAddress: string,
-  amount: number
+  amount: number,
+  mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let prepaidCard = await getSDK('PrepaidCard', web3);

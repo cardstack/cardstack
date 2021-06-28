@@ -4,7 +4,7 @@ import { getWeb3 } from './utils';
 
 const { toWei } = Web3.utils;
 
-export async function viewSafes(network: string, mnemonic: string, address?: string): Promise<void> {
+export async function viewSafes(network: string, address: string | undefined, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
 
   let safesApi = await getSDK('Safes', web3);
@@ -46,11 +46,11 @@ export async function viewSafes(network: string, mnemonic: string, address?: str
 
 export async function transferTokens(
   network: string,
-  mnemonic: string,
   safe: string,
   token: string,
   recipient: string,
-  amount: number
+  amount: number,
+  mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let weiAmount = toWei(String(amount));
@@ -67,10 +67,10 @@ export async function transferTokens(
 
 export async function setSupplierInfoDID(
   network: string,
-  mnemonic: string,
   safe: string,
   infoDID: string,
-  gasToken: string
+  gasToken: string,
+  mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let safes = await getSDK('Safes', web3);

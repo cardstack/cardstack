@@ -6,10 +6,10 @@ const { toWei } = Web3.utils;
 
 export default async function (
   network: string,
-  mnemonic: string,
   amount: number,
-  receiverAddress?: string,
-  tokenAddress?: string
+  receiverAddress: string | undefined,
+  tokenAddress: string | undefined,
+  mnemonic?: string
 ): Promise<void> {
   const amountInWei = toWei(amount.toString()).toString();
 

@@ -95,7 +95,7 @@
         "safes-view",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        // "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
         // Hassan's testing merchant mnemonic: 0x54b11672e90B38ca52140Ac364EebC5cC07F3d91
         // "--mnemonic", "sign crawl student excite mouse young narrow essence soul brick life slush"
       ]
@@ -133,7 +133,7 @@
         "1000",
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        // "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {

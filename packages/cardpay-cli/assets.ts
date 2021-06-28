@@ -2,7 +2,11 @@ import { getConstantByNetwork, getSDK, ERC20ABI } from '@cardstack/cardpay-sdk';
 import { AbiItem } from 'web3-utils';
 import { getWeb3 } from './utils';
 
-export const viewTokenBalance = async (network: string, mnemonic: string, tokenAddress?: string): Promise<void> => {
+export const viewTokenBalance = async (
+  network: string,
+  tokenAddress: string | undefined,
+  mnemonic?: string
+): Promise<void> => {
   let web3 = await getWeb3(network, mnemonic);
   let assets = await getSDK('Assets', web3);
 
