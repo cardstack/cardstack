@@ -14,12 +14,12 @@ import { taskFor } from 'ember-concurrency-ts';
 import { next } from '@ember/runloop';
 import { timeout } from 'ember-concurrency';
 import { action } from '@ember/object';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
-interface CardPayLayerTwoConnectCardComponentArgs {
-  onComplete: (() => void) | undefined;
+interface CardPayLayerTwoConnectCardComponentArgs
+  extends WorkflowCardComponentArgs {
   onConnect: (() => void) | undefined;
   onDisconnect: (() => void) | undefined;
-  isComplete: boolean;
 }
 
 class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConnectCardComponentArgs> {

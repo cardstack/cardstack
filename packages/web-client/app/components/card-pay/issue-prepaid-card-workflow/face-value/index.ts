@@ -5,22 +5,15 @@ import { reads } from 'macro-decorators';
 import { inject as service } from '@ember/service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { fromWei, toBN, toWei } from 'web3-utils';
-import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import { faceValueOptions, spendToUsdRate } from '../workflow-config';
 import {
   TokenDisplayInfo,
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import BN from 'web3-core/node_modules/@types/bn.js';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
-interface FaceValueCardArgs {
-  workflowSession: WorkflowSession;
-  onComplete?: () => void;
-  onIncomplete?: () => void;
-  isComplete: boolean;
-}
-
-class FaceValueCard extends Component<FaceValueCardArgs> {
+class FaceValueCard extends Component<WorkflowCardComponentArgs> {
   faceValueOptions = faceValueOptions;
   spendToUsdRate = spendToUsdRate;
 

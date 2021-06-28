@@ -1,6 +1,13 @@
 import { action } from '@ember/object';
 import { Participant, WorkflowPostable } from './workflow-postable';
-import WorkflowSession from './workflow-session';
+import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
+
+export interface WorkflowCardComponentArgs {
+  workflowSession: WorkflowSession;
+  onComplete: (() => void) | undefined;
+  onIncomplete: (() => void) | undefined;
+  isComplete: boolean;
+}
 
 interface WorkflowCardOptions {
   author: Participant;

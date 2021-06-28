@@ -1,5 +1,3 @@
-/* eslint-disable ember/no-empty-glimmer-component-classes */
-import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
@@ -9,12 +7,9 @@ import { TransactionReceipt } from 'web3-core';
 import { tracked } from '@glimmer/tracking';
 import { reads } from 'macro-decorators';
 import { TokenSymbol } from '@cardstack/web-client/utils/token';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
-interface CardPayDepositWorkflowTransactionStatusComponentArgs {
-  workflowSession: WorkflowSession;
-  onComplete: () => void;
-}
-class CardPayDepositWorkflowTransactionStatusComponent extends Component<CardPayDepositWorkflowTransactionStatusComponentArgs> {
+class CardPayDepositWorkflowTransactionStatusComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @reads('args.workflowSession.state.depositSourceToken')
@@ -37,10 +32,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<CardPay
     ];
   }
 
-  constructor(
-    owner: unknown,
-    args: CardPayDepositWorkflowTransactionStatusComponentArgs
-  ) {
+  constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
     this.layer2Network
       .awaitBridged(this.layer2BlockHeightBeforeBridging!)
