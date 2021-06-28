@@ -33,7 +33,7 @@ app "hub" {
 
         hook {
             when    = "before"
-            command = ["./packages/hub/bin/purge-services.sh"] # need this to purge old ecs services
+            command = ["./packages/hub/bin/purge-services.sh", "hub-staging", "waypoint-hub"] # need this to purge old ecs services
         }
 
         hook {
