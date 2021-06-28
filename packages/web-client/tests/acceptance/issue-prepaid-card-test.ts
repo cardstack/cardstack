@@ -122,10 +122,10 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText('xDai chain wallet connected');
 
     assert
-      .dom(postableSel(1, 0))
+      .dom(postableSel(1, 1))
       .containsText('First, you can choose the look and feel of your card');
 
-    post = postableSel(1, 1);
+    post = postableSel(1, 2);
 
     assert.dom('[data-test-layout-customization-form]').isVisible();
     assert
@@ -425,10 +425,10 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText('xDai chain wallet connected');
 
     assert
-      .dom(postableSel(1, 0))
+      .dom(postableSel(1, 1))
       .containsText('First, you can choose the look and feel of your card');
 
-    post = postableSel(1, 1);
+    post = postableSel(1, 2);
 
     assert.dom('[data-test-layout-customization-form]').isVisible();
     assert
@@ -541,10 +541,10 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText('xDai chain wallet connected');
 
     assert
-      .dom(postableSel(1, 0))
+      .dom(postableSel(1, 1))
       .containsText('First, you can choose the look and feel of your card');
 
-    post = postableSel(1, 1);
+    post = postableSel(1, 2);
 
     assert.dom('[data-test-layout-customization-form]').isVisible();
     assert
