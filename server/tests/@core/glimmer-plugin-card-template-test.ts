@@ -2,7 +2,7 @@ import QUnit from 'qunit';
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 import transform, {
   Options,
-} from '@cardstack/core/src/glimmer/card-template-plugin';
+} from '../../../core/src/glimmer-plugin-card-template';
 import {
   assert_isEqual,
   equalIgnoringWhiteSpace,
@@ -541,85 +541,87 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     );
   });
 
-  QUnit.test(
-    'Errors when you wrap a field invocation in a helper',
-    async function (assert) {
-      assert.throws(function () {
-        transform(
-          '{{#each (helper @fields.items) as |Item|}}<Item />{{/each}}',
-          options
-        );
-      }, /Invalid use of @fields API/);
-    }
-  );
-
-  QUnit.test(
-    'Errors when trying to pass @fields API through helper',
-    async function (assert) {
-      assert.throws(function () {
-        transform(
-          `{{#each-in (some-helper @fields) as |name Field|}}
-              <label>{{name}}</label>
-             {{/each-in}}`,
-          options
-        );
-      }, /Invalid use of @fields API/);
-    }
-  );
-
-  QUnit.test(
-    'Errors when using @fields as a component argument',
-    async function (assert) {
-      assert.throws(function () {
-        transform(`<SomeCompontent @arrg={{@fields}} />`, options);
-      }, /Invalid use of @fields API/);
-    }
-  );
-
-  QUnit.test(
-    'Errors when calling @fields as a element node',
-    async function (assert) {
-      assert.throws(function () {
-        transform(`<@fields />`, options);
-      }, /Invalid use of @fields API/);
-    }
-  );
-
-  QUnit.test(
-    'Errors when using @fields in a each loop',
-    async function (assert) {
-      assert.throws(
-        function () {
+  QUnit.module('Error Scenarios', function () {
+    QUnit.test(
+      'Errors when you wrap a field invocation in a helper',
+      async function (assert) {
+        assert.throws(function () {
           transform(
-            `{{#each @fields as |Field|}}
-              <label>{{name}}</label>
-             {{/each}}`,
+            '{{#each (helper @fields.items) as |Item|}}<Item />{{/each}}',
             options
           );
-        },
-        /Invalid use of @fields API/,
-        'Errors when used with an each loops'
-      );
-    }
-  );
+        }, /Invalid use of @fields API/);
+      }
+    );
 
-  QUnit.test(
-    'Errors when using @fields as path expression',
-    async function (assert) {
-      assert.throws(
-        function () {
+    QUnit.test(
+      'Errors when trying to pass @fields API through helper',
+      async function (assert) {
+        assert.throws(function () {
           transform(
-            `{{#each-in @fields as |name Field|}}
-                  <label>{{name}}</label>
-                  <Field />
-                  {{@fields}}
+            `{{#each-in (some-helper @fields) as |name Field|}}
+                <label>{{name}}</label>
                {{/each-in}}`,
             options
           );
-        },
-        /Invalid use of @fields API/,
-        'Errors when fields is used incorrectly inside of a valid use of fields'
-      );
-    }
-  );
+        }, /Invalid use of @fields API/);
+      }
+    );
+
+    QUnit.test(
+      'Errors when using @fields as a component argument',
+      async function (assert) {
+        assert.throws(function () {
+          transform(`<SomeCompontent @arrg={{@fields}} />`, options);
+        }, /Invalid use of @fields API/);
+      }
+    );
+
+    QUnit.test(
+      'Errors when calling @fields as a element node',
+      async function (assert) {
+        assert.throws(function () {
+          transform(`<@fields />`, options);
+        }, /Invalid use of @fields API/);
+      }
+    );
+
+    QUnit.test(
+      'Errors when using @fields in a each loop',
+      async function (assert) {
+        assert.throws(
+          function () {
+            transform(
+              `{{#each @fields as |Field|}}
+                <label>{{name}}</label>
+               {{/each}}`,
+              options
+            );
+          },
+          /Invalid use of @fields API/,
+          'Errors when used with an each loops'
+        );
+      }
+    );
+
+    QUnit.test(
+      'Errors when using @fields as path expression',
+      async function (assert) {
+        assert.throws(
+          function () {
+            transform(
+              `{{#each-in @fields as |name Field|}}
+                    <label>{{name}}</label>
+                    <Field />
+                    {{@fields}}
+                 {{/each-in}}`,
+              options
+            );
+          },
+          /Invalid use of @fields API/,
+          'Errors when fields is used incorrectly inside of a valid use of fields'
+        );
+      }
+    );
+  });
 });
