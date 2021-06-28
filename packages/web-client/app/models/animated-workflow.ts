@@ -11,6 +11,7 @@ import { A } from '@ember/array';
 import { buildWaiter } from '@ember/test-waiters';
 import RSVP, { defer } from 'rsvp';
 import { UnbindEventListener } from '../utils/events';
+import { WorkflowCheck } from './workflow/workflow-check';
 
 let waiter = buildWaiter('thread-animation');
 let token: any = null;
@@ -177,7 +178,8 @@ export default class AnimatedWorkflow {
         this.stopTestWaiter();
       }
 
-      yield rawTimeout(this.interval);
+      if (!(result.postable instanceof WorkflowCheck))
+        yield rawTimeout(this.interval);
     }
   }
 
