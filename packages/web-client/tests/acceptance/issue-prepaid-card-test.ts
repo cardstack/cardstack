@@ -307,6 +307,13 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText('10000 SPEND')
       .containsText('100 USD');
 
+    assert
+      .dom(`${postableSel(3, 1)} [data-test-prepaid-card-balance]`)
+      .containsText('10000');
+    assert
+      .dom(`${postableSel(3, 1)} [data-test-prepaid-card-usd-balance]`)
+      .containsText('100');
+
     assert.dom(
       `${postableSel(
         3,
