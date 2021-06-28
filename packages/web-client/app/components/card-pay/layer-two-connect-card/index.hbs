@@ -1,5 +1,5 @@
 <ActionCardContainer
-  {{did-insert @onRender}}
+  {{did-insert (optional @onRender)}}
   @suppressHeader={{@suppressHeader}}
   @header={{concat "Wallet - " this.layer2Network.chainName}}
   @isComplete={{@isComplete}}
