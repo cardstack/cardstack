@@ -9,7 +9,12 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import { task } from 'ember-concurrency-decorators';
 
 import { SimpleEmitter, UnbindEventListener } from '../events';
-import { ConvertibleSymbol, ConversionFunction, NetworkSymbol } from '../token';
+import {
+  ConvertibleSymbol,
+  ConversionFunction,
+  NetworkSymbol,
+  TokenContractInfo,
+} from '../token';
 import WalletInfo from '../wallet-info';
 import CustomStorageWalletConnect from '../wc-connector';
 import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
@@ -33,7 +38,8 @@ export default abstract class Layer2ChainWeb3Strategy
   networkSymbol: NetworkSymbol;
   provider: WalletConnectProvider | undefined;
   simpleEmitter = new SimpleEmitter();
-
+  defaultTokenSymbol: ConvertibleSymbol = 'DAI';
+  defaultTokenContractAddress?: string;
   web3: Web3 = new Web3();
   #exchangeRateApi!: IExchangeRate;
   #safesApi!: ISafes;
@@ -55,7 +61,11 @@ export default abstract class Layer2ChainWeb3Strategy
     this.chainId = networkIds[networkSymbol];
     this.networkSymbol = networkSymbol;
     this.walletInfo = new WalletInfo([], this.chainId);
-
+    let defaultTokenContractInfo = this.getTokenContractInfo(
+      this.defaultTokenSymbol,
+      networkSymbol
+    );
+    this.defaultTokenContractAddress = defaultTokenContractInfo.address;
     this.initialize();
   }
 
@@ -114,6 +124,13 @@ export default abstract class Layer2ChainWeb3Strategy
     this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
     this.#safesApi = await getSDK('Safes', this.web3);
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
+  }
+
+  private getTokenContractInfo(
+    symbol: ConvertibleSymbol,
+    network: NetworkSymbol
+  ): TokenContractInfo {
+    return new TokenContractInfo(symbol, network);
   }
 
   async updateWalletInfo(accounts: string[], chainId: number) {
@@ -211,13 +228,13 @@ export default abstract class Layer2ChainWeb3Strategy
 
       depot = depotSafes[depotSafes.length - 1] ?? null;
       if (depot) {
-        let daiBalance = depot.tokens.find(
-          (tokenInfo) => tokenInfo.token.symbol === 'DAI'
+        let defaultBalance = depot.tokens.find(
+          (tokenInfo) => tokenInfo.token.symbol === this.defaultTokenSymbol
         )?.balance;
         let cardBalance = depot.tokens.find(
           (tokenInfo) => tokenInfo.token.symbol === 'CARD'
         )?.balance;
-        this.defaultTokenBalance = new BN(daiBalance ?? '0');
+        this.defaultTokenBalance = new BN(defaultBalance ?? '0');
         this.cardBalance = new BN(cardBalance ?? '0');
       } else {
         this.defaultTokenBalance = new BN('0');
@@ -227,6 +244,25 @@ export default abstract class Layer2ChainWeb3Strategy
 
     this.depotSafe = depot;
     return;
+  }
+
+  async convertFromSpend(symbol: ConvertibleSymbol, amount: number) {
+    let address: string | undefined;
+    if (symbol === this.defaultTokenSymbol) {
+      address = this.defaultTokenContractAddress;
+    } else {
+      let tokenContractInfo = this.getTokenContractInfo(
+        symbol,
+        this.networkSymbol
+      );
+      address = tokenContractInfo.address;
+    }
+
+    if (!address) {
+      return '0';
+    }
+
+    return await this.#exchangeRateApi.convertFromSpend(address, amount);
   }
 
   async disconnect(): Promise<void> {
