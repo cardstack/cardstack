@@ -19,11 +19,16 @@ module.exports = {
   env: {
     browser: true,
   },
-  rules: {
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error'],
-  },
   overrides: [
+    // typescript-specific
+    {
+      files: ['*.ts'],
+      rules: {
+        'no-undef': 'off',
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': ['error'],
+      },
+    },
     // node files
     {
       files: [
