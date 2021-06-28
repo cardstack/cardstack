@@ -50,6 +50,7 @@ export interface Layer2Web3Strategy extends Web3Strategy {
   ): Promise<TransactionReceipt>;
   fetchDepotTask(): Promise<DepotSafe | null>;
   refreshBalances(): void;
+  convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<string>;
 }
 
 export type TransactionHash = string;

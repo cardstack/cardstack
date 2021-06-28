@@ -62,6 +62,10 @@ export default class Layer2Network extends Service {
     return this.strategy.updateUsdConverters(symbolsToUpdate);
   }
 
+  async convertFromSpend(symbol: ConvertibleSymbol, amount: number) {
+    return await this.strategy.convertFromSpend(symbol, amount);
+  }
+
   disconnect() {
     return this.strategy.disconnect();
   }
