@@ -17,9 +17,8 @@
             @issuerName={{@workflowSession.state.issuerName}}
             @headerBackground={{@workflowSession.state.headerBackground.id}}
             @headerTheme={{@workflowSession.state.headerTheme.id}}
-            @mockBalance={{true}}
-            @balance="123,456"
-            @usdBalance="123,456"
+            @balance={{@workflowSession.state.spendFaceValue}}
+            @usdBalance={{spend-to-usd @workflowSession.state.spendFaceValue}}
             @address="0x1234...abcd"
             @network="xDai Chain"
           />
