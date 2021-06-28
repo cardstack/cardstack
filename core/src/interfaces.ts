@@ -78,6 +78,7 @@ export interface CompiledCard {
     [key: string]: Field;
   };
   schemaModule: string;
+  // TODO: This is confusingly named. Maybe it's should be serializerName
   deserializer?: DeserializerName;
 
   isolated: ComponentInfo;
@@ -89,7 +90,7 @@ export interface ComponentInfo {
   moduleName: string;
   usedFields: string[]; // ["title", "author.firstName"]
 
-  deserialize?: { [key in DeserializerName]?: string[] };
+  serializerMap?: { [key in DeserializerName]?: string[] };
   inlineHBS?: string;
   sourceCardURL: string;
 }
@@ -179,7 +180,7 @@ export function assertValidKeys(
 
 export function assertValidDeserializationMap(
   map: any
-): asserts map is ComponentInfo['deserialize'] {
+): asserts map is ComponentInfo['serializerMap'] {
   let keys = Object.keys(map);
   let diff = difference(keys, DESERIALIZER_NAMES);
   if (diff.length > 0) {

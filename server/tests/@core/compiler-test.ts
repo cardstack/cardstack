@@ -101,7 +101,7 @@ Qmodule('Compiler', function (hooks) {
     );
 
     assert.deepEqual(
-      compiled.embedded.deserialize,
+      compiled.embedded.serializerMap,
       { date: ['birthdate'] },
       'Embedded component has a deserialization map'
     );
@@ -113,7 +113,7 @@ Qmodule('Compiler', function (hooks) {
 
     assert.deepEqual(compiled.edit.usedFields, ['name', 'birthdate']);
     assert.deepEqual(
-      compiled.edit.deserialize,
+      compiled.edit.serializerMap,
       { date: ['birthdate'] },
       'Edit deserialization map still includes birthdate, because it was used as data'
     );
@@ -168,7 +168,7 @@ Qmodule('Compiler', function (hooks) {
     ]);
 
     assert.deepEqual(
-      compiled.embedded.deserialize,
+      compiled.embedded.serializerMap,
       { date: ['author.birthdate'] },
       'Embedded component has a deserialization map'
     );
@@ -179,7 +179,7 @@ Qmodule('Compiler', function (hooks) {
 
     assert.deepEqual(compiled.isolated.usedFields, ['author']);
     assert.deepEqual(
-      compiled.isolated.deserialize,
+      compiled.isolated.serializerMap,
       { date: ['author.birthdate'] },
       'Isolated deserialization map still includes author.birthdate, because it was used as data'
     );
@@ -259,7 +259,7 @@ Qmodule('Compiler', function (hooks) {
     ]);
 
     assert.deepEqual(
-      compiled.isolated.deserialize,
+      compiled.isolated.serializerMap,
       { date: ['posts.createdAt'] },
       'Isolated component has a deserialization map'
     );
@@ -273,7 +273,7 @@ Qmodule('Compiler', function (hooks) {
     assert.deepEqual(compiled.embedded.usedFields, ['posts.title']);
 
     assert.notOk(
-      compiled.embedded.deserialize,
+      compiled.embedded.serializerMap,
       'embedded component has an empty deserialization map'
     );
     containsSource(

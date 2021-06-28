@@ -12,7 +12,7 @@ export async function serializeCard(
     attributes: card[format].usedFields,
     dataMeta: {
       componentModule: card[format].moduleName,
-      deserializationMap: card[format].deserialize,
+      deserializationMap: card[format].serializerMap,
     },
   });
   let data = Object.assign({ id: card.url }, card.data);

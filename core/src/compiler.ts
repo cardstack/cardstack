@@ -363,7 +363,7 @@ export class Compiler {
 
     let deserialize = buildDeserializationMapFromUsedFields(fields, usedFields);
     if (deserialize) {
-      componentInfo.deserialize = deserialize;
+      componentInfo.serializerMap = deserialize;
     }
 
     return componentInfo;
@@ -394,7 +394,7 @@ function isBaseCard(url: string): boolean {
 function buildDeserializationMapFromUsedFields(
   fields: CompiledCard['fields'],
   usedFields: string[]
-): ComponentInfo['deserialize'] {
+): ComponentInfo['serializerMap'] {
   let map: any = {};
 
   for (const fieldPath of usedFields) {

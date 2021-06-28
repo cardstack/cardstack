@@ -154,7 +154,7 @@ class FakeCardServer {
         attributes: card.data,
         meta: {
           componentModule: card[format].moduleName,
-          deserializationMap: card[format].deserialize,
+          deserializationMap: card[format].serializerMap,
         },
       },
     };
@@ -175,7 +175,7 @@ class FakeCardServer {
         attributes: card.data,
         meta: {
           componentModule: card[format].moduleName,
-          deserializationMap: card[format].deserialize,
+          deserializationMap: card[format].serializerMap,
         },
       },
     };
