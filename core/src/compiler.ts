@@ -13,11 +13,11 @@ import cardSchemaPlugin, {
   FieldsMeta,
   getMeta,
   PluginMeta,
-} from './babel/card-schema-plugin';
+} from './babel-plugin-card-schema';
 import cardTemplatePlugin, {
   Options as CardTemplateOptions,
-} from './babel/card-template-plugin';
-import type { TemplateUsageMeta } from './glimmer/card-template-plugin';
+} from './babel-plugin-card-template';
+import type { TemplateUsageMeta } from './glimmer-plugin-card-template';
 import {
   assertValidCompiledCard,
   assertValidDeserializationMap,
@@ -77,6 +77,7 @@ export class Compiler {
     let meta = getMeta(options);
 
     card.fields = await this.lookupFieldsForCard(meta.fields);
+
     this.defineAssets(cardSource);
 
     if (!isBaseCard(cardSource.url)) {

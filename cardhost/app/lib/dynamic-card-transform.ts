@@ -1,6 +1,6 @@
 import { transformSync } from '@babel/core';
 import type { TransformOptions } from '@babel/core';
-import { ColocatedBabelPlugin } from '@cardstack/core/src/babel/utils';
+import { ColocatedBabelPlugin } from '@cardstack/core/src/utils/babel';
 
 import { precompile } from '@glimmer/compiler';
 // import { precompile } from 'ember-source/dist/ember-template-compiler';

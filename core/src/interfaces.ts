@@ -89,7 +89,7 @@ export interface ComponentInfo {
   moduleName: string;
   usedFields: string[]; // ["title", "author.firstName"]
 
-  deserialize?: Record<DeserializerName, string[]>;
+  deserialize?: { [key in DeserializerName]?: string[] };
   inlineHBS?: string;
   sourceCardURL: string;
 }

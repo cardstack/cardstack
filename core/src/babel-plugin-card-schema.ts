@@ -18,7 +18,7 @@ import {
   isClassDeclaration,
 } from '@babel/types';
 import { NodePath } from '@babel/traverse';
-import { name, error } from './utils';
+import { name, error } from './utils/babel';
 
 const VALID_FIELD_DECORATORS = {
   hasMany: true,
