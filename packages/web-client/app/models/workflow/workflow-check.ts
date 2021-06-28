@@ -4,7 +4,6 @@ import WorkflowSession from './workflow-session';
 
 interface WorkflowCheckOptions {
   author: Participant;
-  componentName: string; // this should eventually become a card reference
   includeIf: () => boolean;
   check: () => Promise<boolean>;
   failureReason: string;
