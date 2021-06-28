@@ -33,6 +33,8 @@ const SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER =
 const SLIGHTLY_LESS_THAN_MAX_VALUE = toBN(
   toWei(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER}`)
 );
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
 }
@@ -74,7 +76,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert
       .dom(postableSel(0, 2))
       .containsText(
-        'Before we get started, please connect your xDai chain wallet via your Card Wallet mobile app.'
+        `Before we get started, please connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app.`
       );
 
     assert
@@ -137,7 +139,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('xDai chain wallet connected');
+      .containsText(`${c.layer2.fullName} wallet connected`);
 
     assert
       .dom(postableSel(1, 0))
@@ -466,7 +468,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert
       .dom(epiloguePostableSel(2))
-      .containsText('This is the remaining balance in your xDai chain wallet');
+      .containsText(
+        `This is the remaining balance in your ${c.layer2.fullName} wallet`
+      );
 
     await waitFor(epiloguePostableSel(3));
 
