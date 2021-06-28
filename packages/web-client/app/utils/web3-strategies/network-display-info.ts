@@ -3,7 +3,7 @@ import { NetworkSymbol } from './types';
 
 type TestNetworkSymbol = 'test-layer1' | 'test-layer2';
 
-type NetworkCopywriting = {
+export type NetworkCopywriting = {
   fullName: string;
   shortName: string;
   networkType: 'testnet' | 'mainnet';
@@ -45,10 +45,9 @@ export let networkDisplayInfo: Record<
   },
 };
 
-let currentNetworkDisplayInfo: Record<
-  'layer1' | 'layer2',
-  NetworkCopywriting
-> = {
+export type Layer = 'layer1' | 'layer2';
+
+let currentNetworkDisplayInfo: Record<Layer, NetworkCopywriting> = {
   layer1: networkDisplayInfo['test-layer1'],
   layer2: networkDisplayInfo['test-layer2'],
 };
