@@ -5,7 +5,7 @@ import { WorkflowCard } from '../models/workflow/workflow-card';
 
 function postableMetaHidden(
   [post]: [WorkflowPostable | WorkflowCard],
-  { previous }: WorkflowPostable | WorkflowCard
+  { previous }: { previous: WorkflowPostable }
 ) {
   let isSameGroup = postableMetaIdentical([post, previous]);
 
