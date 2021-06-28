@@ -17,6 +17,7 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   );
   @tracked autoscroll = false;
   @tracked threadAnimationInterval = '0ms';
+  @tracked lastElement: HTMLElement | null = null;
 
   constructor(owner: unknown, args: any) {
     super(owner, args);
@@ -58,15 +59,18 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
     let milestoneEl = this.threadEl?.querySelector(
       `[data-milestone="${milestoneIndex}"]`
     );
-    let targetEl =
-      milestoneEl || this.threadEl?.querySelector('[data-thread-end]');
+    let targetEl = milestoneEl || this.lastElement;
     targetEl?.scrollIntoView({ block: 'end', behavior: 'smooth' });
   }
 
   @action scrollToEnd() {
-    this.threadEl
-      ?.querySelector('[data-thread-end]')
-      ?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+    this.lastElement?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  }
+
+  @action onThreadContentChanged(threadRoot: HTMLElement): void {
+    this.lastElement = threadRoot.querySelector(
+      '.thread__content > *:last-child'
+    );
   }
 
   get lastMilestonePostable() {

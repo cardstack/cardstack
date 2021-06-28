@@ -104,6 +104,7 @@
     "ember-maybe-import-regenerator": "^0.1.6",
     "ember-page-title": "^6.2.1",
     "ember-qunit": "^5.1.4",
+    "ember-ref-bucket": "^2.0.0",
     "ember-resolver": "^8.0.2",
     "ember-set-helper": "^2.0.0",
     "ember-source": "~3.25.1",

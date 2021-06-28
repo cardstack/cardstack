@@ -1,0 +1,47 @@
+{{#let (optional @onThreadContentChanged) as |contentChanged|}}
+<article class="thread" data-test-thread {{create-ref "threadRoot"}} {{did-insert contentChanged}} ...attributes>
+  <div class="thread__sticky-container">
+    {{yield to="header"}}
+  </div>
+
+  <div class="thread__content-wrapper">
+    <div
+      class="thread__messages-container thread__scroll-wrapper"
+      tabindex="0"
+      {{did-insert this.setScrollEl}}
+      {{visibility-checker
+        watchedElement=@lastElement
+        onElementVisible=this.onElementVisible
+        onElementHidden=this.onElementHidden
+        initArgs=(hash
+          rootMargin="0px 0px 40px 0px"
+          threshold=0
+        )
+      }}
+    >
+      <div class="thread__sticky-container">
+        {{yield to="taskbar"}}
+      </div>
+      <section
+        class="thread__content"
+        {{contents-modified
+          onChildrenAdded=this.scrollDownToFirst
+          onChildrenChanged=(fn contentChanged this.threadRoot)
+        }}
+      >
+        {{yield this.setWatchedElement to="content"}}
+      </section>
+    </div>
+    <div class="thread__footer-container">
+      {{#if this.showFooter}}
+        {{yield to="footer"}}
+      {{/if}}
+    </div>
+    <div class="thread__sidebar-container thread__scroll-wrapper" tabindex="0">
+      <Boxel::Sidebar class="thread__sidebar" as |SidebarSection|>
+        {{yield SidebarSection to="sidebar"}}
+      </Boxel::Sidebar>
+    </div>
+  </div>
+</article>
+{{/let}}

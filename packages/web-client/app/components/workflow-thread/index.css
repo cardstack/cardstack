@@ -20,3 +20,7 @@
 .workflow-thread:focus:not(:focus-visible) {
   box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
 }
+
+.workflow-thread__footer {
+  background: white;
+}

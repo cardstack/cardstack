@@ -1,0 +1,70 @@
+.thread {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  background-color: var(--boxel-light-300);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.thread__messages-container {
+  grid-column: 1/2;
+  grid-row: 1/span 2;
+}
+
+.thread__sidebar-container {
+  grid-column: 2/3;
+  grid-row: 1/span 2;
+}
+
+.thread__content-wrapper {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  background-color: var(--boxel-light-300);
+  overflow: hidden;
+}
+
+.thread__scroll-wrapper {
+  padding-bottom: var(--boxel-sp-lg);
+  overflow-y: auto;
+}
+
+.thread__scroll-wrapper:focus {
+  outline-color: var(--boxel-outline-color);
+  outline-offset: -1px;
+}
+
+.thread__scroll-wrapper:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.thread__content {
+  padding: var(--boxel-sp);
+  padding-left: var(--boxel-sp-xl);
+}
+
+.thread__content > * + * {
+  margin-top: var(--boxel-sp-xl);
+}
+
+.thread__sidebar {
+  margin: var(--boxel-sp);
+}
+
+.thread__sticky-container {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-top-right-radius: inherit;
+  border-top-left-radius: inherit;
+}
+
+.thread__footer-container {
+  grid-row: 2/3;
+  grid-column: 1/2;
+  position: relative;
+  z-index: 1;
+}
