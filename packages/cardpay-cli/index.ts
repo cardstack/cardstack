@@ -37,6 +37,7 @@ let command: Commands | undefined;
 interface Options {
   network: string;
   mnemonic: string;
+  walletConnect: boolean;
   tokenAddress?: string;
   amount?: number;
   fromBlock?: number;
@@ -53,9 +54,10 @@ interface Options {
   hubRootUrl?: string;
   faceValues?: number[];
 }
-const {
+let {
   network,
   mnemonic = process.env.MNEMONIC_PHRASE,
+  walletConnect,
   tokenAddress,
   amount,
   address,
@@ -342,18 +344,26 @@ const {
       type: 'string',
       description: 'Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE',
     },
+    walletConnect: {
+      alias: 'w',
+      type: 'boolean',
+      description: 'A flag to indicate that wallet connect should be used for the wallet',
+    },
   })
   .demandOption(['network'], `'network' must be specified.`)
   .demandCommand(1, 'Please specify a command')
   .help().argv as Options;
 
-if (!mnemonic) {
+if (!mnemonic && !walletConnect) {
   yargs.showHelp(() =>
     console.log(
-      'No mnemonic is defined, either specify the mnemonic as a positional arg or pass it in using the MNEMONIC_PHRASE env var'
+      'Wallet is not specified. Either specify that wallet connect should be used for the wallet, or specify the mnemonic as a positional arg, or pass the mnemonic in using the MNEMONIC_PHRASE env var'
     )
   );
   process.exit(1);
+}
+if (walletConnect) {
+  mnemonic = undefined;
 }
 
 if (!command) {
@@ -367,104 +377,104 @@ if (!command) {
         showHelpAndExit('amount is a required value');
         return;
       }
-      await bridge(network, mnemonic, amount, receiver, tokenAddress);
+      await bridge(network, amount, receiver, tokenAddress, mnemonic);
       break;
     case 'awaitBridged':
       if (fromBlock == null) {
         showHelpAndExit('fromBlock is a required value');
         return;
       }
-      await awaitBridged(network, mnemonic, fromBlock, recipient);
+      await awaitBridged(network, fromBlock, recipient, mnemonic);
       break;
     case 'safesView':
-      await viewSafes(network, mnemonic, address);
+      await viewSafes(network, address, mnemonic);
       break;
     case 'safeTransferTokens':
       if (safeAddress == null || recipient == null || token == null || amount == null) {
         showHelpAndExit('safeAddress, token, recipient, and amount are required values');
         return;
       }
-      await transferTokens(network, mnemonic, safeAddress, token, recipient, amount);
+      await transferTokens(network, safeAddress, token, recipient, amount, mnemonic);
       break;
     case 'setSupplierInfoDID':
       if (safeAddress == null || token == null || infoDID == null) {
         showHelpAndExit('safeAddress, token, and infoDID are required values');
         return;
       }
-      await setSupplierInfoDID(network, mnemonic, safeAddress, infoDID, token);
+      await setSupplierInfoDID(network, safeAddress, infoDID, token, mnemonic);
       break;
     case 'prepaidCardCreate':
       if (tokenAddress == null || safeAddress == null || faceValues == null) {
         showHelpAndExit('tokenAddress, safeAddress, and amounts are required values');
         return;
       }
-      await createPrepaidCard(network, mnemonic, safeAddress, faceValues, tokenAddress, customizationDID || undefined);
+      await createPrepaidCard(network, safeAddress, faceValues, tokenAddress, customizationDID || undefined, mnemonic);
       break;
     case 'registerMerchant':
       if (prepaidCard == null) {
         showHelpAndExit('prepaidCard is a required value');
         return;
       }
-      await registerMerchant(network, mnemonic, prepaidCard, infoDID || undefined);
+      await registerMerchant(network, prepaidCard, infoDID || undefined, mnemonic);
       break;
     case 'payMerchant':
       if (merchantSafe == null || prepaidCard == null || amount == null) {
         showHelpAndExit('merchantSafe, prepaidCard, and amount are required values');
         return;
       }
-      await payMerchant(network, mnemonic, merchantSafe, prepaidCard, amount);
+      await payMerchant(network, merchantSafe, prepaidCard, amount, mnemonic);
       break;
     case 'revenueBalances':
       if (merchantSafe == null) {
         showHelpAndExit('merchantSafe is a required value');
         return;
       }
-      await revenueBalances(network, mnemonic, merchantSafe);
+      await revenueBalances(network, merchantSafe, mnemonic);
       break;
     case 'claimRevenue':
       if (merchantSafe == null || tokenAddress == null || amount == null) {
         showHelpAndExit('merchantSafe, tokenAddress, and amount are required values');
         return;
       }
-      await claimRevenue(network, mnemonic, merchantSafe, tokenAddress, amount);
+      await claimRevenue(network, merchantSafe, tokenAddress, amount, mnemonic);
       break;
     case 'usdPrice':
       if (token == null || amount == null) {
         showHelpAndExit('token and amount are required values');
         return;
       }
-      await usdPrice(network, mnemonic, token, amount);
+      await usdPrice(network, token, amount, mnemonic);
       break;
     case 'ethPrice':
       if (token == null || amount == null) {
         showHelpAndExit('token and amount are required values');
         return;
       }
-      await ethPrice(network, mnemonic, token, amount);
+      await ethPrice(network, token, amount, mnemonic);
       break;
     case 'priceOracleUpdatedAt':
       if (token == null) {
         showHelpAndExit('tokenAddress is a required value');
         return;
       }
-      await priceOracleUpdatedAt(network, mnemonic, token);
+      await priceOracleUpdatedAt(network, token, mnemonic);
       break;
     case 'viewTokenBalance':
-      await viewTokenBalance(network, mnemonic, tokenAddress);
+      await viewTokenBalance(network, tokenAddress, mnemonic);
       break;
     case 'priceForFaceValue':
       if (tokenAddress == null || spendFaceValue == null) {
         showHelpAndExit('tokenAddress and spendFaceValue are required values');
         return;
       }
-      await priceForFaceValue(network, mnemonic, tokenAddress, spendFaceValue);
+      await priceForFaceValue(network, tokenAddress, spendFaceValue, mnemonic);
       break;
     case 'gasFee':
       if (tokenAddress == null) {
         showHelpAndExit('token is a required value');
         return;
       }
-      await gasFee(network, mnemonic, tokenAddress);
+      await gasFee(network, tokenAddress, mnemonic);
       break;
     case 'hubAuth':
       if (hubRootUrl == null) {
