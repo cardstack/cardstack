@@ -11,7 +11,7 @@
       />
     {{else}}
       <div class="balance-view__summary-content">
-        {{@wallet}} wallet
+        <span class="balance-view__summary-wallet">{{@wallet}} wallet</span>
         <span class="balance-view__summary-balance" data-test-source-token={{@tokenSymbol}}>
           {{@balance}} {{@tokenSymbol}}
         </span>

@@ -14,7 +14,7 @@
 }
 
 .balance-view-banner[open] {
-  min-height: var(--details-open-height);
+  height: var(--details-open-height);
   overflow: auto;
 }
 
@@ -38,7 +38,7 @@
 }
 
 .balance-view-banner[open] .balance-view-banner__summary {
-  --details-summary-height: var(--boxel-sp-lg);
+  height: var(--boxel-sp-lg);
 }
 
 /* Show/hide marker */
@@ -79,10 +79,31 @@
 /* Specific to this card */
 .balance-view-banner__summary-content {
   height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
 }
 
 .balance-view-banner[open] .balance-view-banner__summary-content {
   display: none;
+}
+
+.balance-view-banner__summary-name {
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.balance-view-banner__summary-address {
+  font-family: var(--boxel-monospace-font-family);
+  font-size: var(--boxel-font-size-sm);
+  line-height: calc(18 / 13);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.balance-view-banner__summary-depot-balance {
+  color: var(--boxel-purple-500);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
 }
 
 .balance-view-banner__details-token {

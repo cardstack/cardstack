@@ -1,13 +1,12 @@
 <details class="balance-view-banner" ...attributes>
   <summary class="balance-view-banner__summary">
-    <CardPay::BalanceDisplay
-      class="balance-view-banner__summary-content"
-      @size="small"
-      @icon="avatar-default"
-      @name="Account 1"
-      @text={{concat "DEPOT: " @balance " " @token.symbol}}
-      data-test-balance-view-summary
-    />
+    <div class="balance-view-banner__summary-content" data-test-balance-view-summary>
+      <div>
+        <span class="balance-view-banner__summary-name">Account </span>
+        <span class="balance-view-banner__summary-address">({{truncate-middle @walletAddress}})</span>
+      </div>
+      <div class="balance-view-banner__summary-depot-balance">DEPOT: {{@balance}} {{@token.symbol}}</div>
+    </div>
     <div class="balance-view-banner__marker">
       {{svg-jar "caret-right" class="balance-view-banner__marker-icon" role="presentation"}}
     </div>
@@ -16,8 +15,7 @@
     <:outer>
       <CardPay::AccountDisplay
         @size="small"
-        @icon="avatar-default"
-        @name="Account 1"
+        @name="Account:"
         @address={{@walletAddress}}
         data-test-balance-view-account-address
       />

@@ -7,11 +7,9 @@
       <CardPay::LabeledValue @label="DEPOT:" class="funding-source__field">
         <CardPay::NestedItems class="funding-source__field-info">
           <:outer>
-            {{!-- TODO: display account avatar and name if available --}}
             <CardPay::AccountDisplay
               @size="small"
-              @icon="avatar-default"
-              @name="Account 1"
+              @name="Account:"
               @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
               data-test-funding-source-account
             />
