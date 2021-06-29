@@ -7,23 +7,25 @@
     @title="Prepaid card preview"
   >
     <div class="preview__content" data-test-preview>
-      <Boxel::Field
-        @label="Card Preview"
-        @fieldMode="view"
-        class="preview__card-preview-field"
-      >
-        <div class="preview__card">
-          <CardPay::PrepaidCard
-            @issuerName={{@workflowSession.state.issuerName}}
-            @headerBackground={{@workflowSession.state.headerBackground.id}}
-            @headerTheme={{@workflowSession.state.headerTheme.id}}
-            @balance={{@workflowSession.state.spendFaceValue}}
-            @usdBalance={{spend-to-usd @workflowSession.state.spendFaceValue}}
-            @address="0x1234...abcd"
-            @network="xDai Chain"
-          />
-        </div>
-      </Boxel::Field>
+      {{#unless @isComplete}}
+        <Boxel::Field
+          @label="Card Preview"
+          @fieldMode="view"
+          class="preview__card-preview-field"
+        >
+          <div class="preview__card">
+            <CardPay::PrepaidCard
+              @issuerName={{@workflowSession.state.issuerName}}
+              @headerBackground={{@workflowSession.state.headerBackground.id}}
+              @headerTheme={{@workflowSession.state.headerTheme.id}}
+              @balance={{@workflowSession.state.spendFaceValue}}
+              @usdBalance={{spend-to-usd @workflowSession.state.spendFaceValue}}
+              @address="0x1234...abcd"
+              @network="xDai Chain"
+            />
+          </div>
+        </Boxel::Field>
+      {{/unless}}
       <CardPay::FieldStack class="preview__data">
         <CardPay::LabeledValue
           @vertical={{true}}
