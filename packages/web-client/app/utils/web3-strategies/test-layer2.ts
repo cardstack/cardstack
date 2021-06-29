@@ -27,7 +27,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked defaultTokenBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
   @tracked depotSafe: DepotSafe | null = null;
-  issuePrepaidCardDeferred = defer();
+  issuePrepaidCardDeferredForNumber: Map<
+    number,
+    RSVP.Deferred<String>
+  > = new Map();
 
   // property to test whether the refreshBalances method is called
   // to test if balances are refreshed after relaying tokens
@@ -92,8 +95,13 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return this.waitForAccountDeferred.promise;
   }
 
-  async issuePrepaidCard(): Promise<any> {
-    return this.issuePrepaidCardDeferred.promise;
+  async issuePrepaidCard(
+    _safeAddress: string,
+    faceValue: number
+  ): Promise<String> {
+    let deferred: RSVP.Deferred<String> = defer();
+    this.issuePrepaidCardDeferredForNumber.set(faceValue, deferred);
+    return deferred.promise;
   }
 
   test__lastSymbolsToUpdate: ConvertibleSymbol[] = [];
@@ -133,7 +141,12 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.depotSafe = null;
   }
 
-  test__simulateIssuePrepaidCard(walletAddress: string) {
-    return this.issuePrepaidCardDeferred.resolve(walletAddress);
+  test__simulateIssuePrepaidCardForAmount(
+    faceValue: number,
+    walletAddress: string
+  ) {
+    return this.issuePrepaidCardDeferredForNumber
+      .get(faceValue)
+      ?.resolve(walletAddress);
   }
 }

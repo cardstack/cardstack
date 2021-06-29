@@ -336,7 +336,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
         'You will receive a confirmation request from the Card Wallet app in a few moments…'
       );
 
-    layer2Service.test__simulateIssuePrepaidCard(
+    layer2Service.test__simulateIssuePrepaidCardForAmount(
+      10000,
       '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8'
     );
 
