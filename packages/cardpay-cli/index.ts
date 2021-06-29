@@ -37,6 +37,7 @@ let command: Commands | undefined;
 interface Options {
   network: string;
   mnemonic: string;
+  walletConnect: boolean;
   tokenAddress?: string;
   amount?: number;
   fromBlock?: number;
@@ -53,9 +54,10 @@ interface Options {
   hubRootUrl?: string;
   faceValues?: number[];
 }
-const {
+let {
   network,
   mnemonic = process.env.MNEMONIC_PHRASE,
+  walletConnect,
   tokenAddress,
   amount,
   address,
@@ -342,19 +344,27 @@ const {
       type: 'string',
       description: 'Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE',
     },
+    walletConnect: {
+      alias: 'w',
+      type: 'boolean',
+      description: 'A flag to indicate that wallet connect should be used for the wallet',
+    },
   })
   .demandOption(['network'], `'network' must be specified.`)
   .demandCommand(1, 'Please specify a command')
   .help().argv as Options;
 
-// if (!mnemonic) {
-//   yargs.showHelp(() =>
-//     console.log(
-//       'No mnemonic is defined, either specify the mnemonic as a positional arg or pass it in using the MNEMONIC_PHRASE env var'
-//     )
-//   );
-//   process.exit(1);
-// }
+if (!mnemonic && !walletConnect) {
+  yargs.showHelp(() =>
+    console.log(
+      'Wallet is not specified. Either specify that wallet connect should be used for the wallet, or specify the mnemonic as a positional arg, or pass the mnemonic in using the MNEMONIC_PHRASE env var'
+    )
+  );
+  process.exit(1);
+}
+if (walletConnect) {
+  mnemonic = undefined;
+}
 
 if (!command) {
   throw new Error('missing command--should never get here');
