@@ -6,7 +6,8 @@
         "SecretAccessKey": "HUB_AWS_SECRET_ACCESS_KEY"
       },
       "region": "HUB_AWS_REGION"
-    }
+    },
+    "accountId": "HUB_AWS_ACCOUNT_ID"
   },
   "db": {
     "url": "DATABASE_URL"
