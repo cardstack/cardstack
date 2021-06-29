@@ -6,6 +6,7 @@
 
 .preview__content--is-complete {
   padding-left: 0;
+  padding-right: var(--boxel-sp-lg);
   flex-direction: column;
 }
 
