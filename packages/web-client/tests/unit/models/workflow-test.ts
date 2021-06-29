@@ -138,6 +138,16 @@ module('Unit | Workflow model', function (hooks) {
     workflow.milestones = [exampleMilestone];
     workflow.cancel('TEST');
     assert.equal(workflow.isCanceled, true);
+    assert.equal(workflow.cancelationReason, 'TEST');
+  });
+
+  test('Workflow cannot be canceled twice', function (assert) {
+    let workflow = new ConcreteWorkflow({});
+    workflow.milestones = [exampleMilestone];
+    workflow.cancel('FIRST');
+    workflow.cancel('SECOND');
+    assert.equal(workflow.isCanceled, true);
+    assert.equal(workflow.cancelationReason, 'FIRST');
   });
 
   test('Completed workflow is not canceled when workflow.cancel is called', function (assert) {
