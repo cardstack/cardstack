@@ -1,9 +1,12 @@
-/* TODO this is copied from layout-customization/display-view/index.css, is it extractable? 🤔 */
-
 .preview__content {
   display: flex;
   justify-content: space-between;
-  padding-left: var(--boxel-sp-lg); /* TODO this is the lone exception to the above */
+  padding-left: var(--boxel-sp-lg);
+}
+
+.preview__content--is-complete {
+  padding-left: 0;
+  flex-direction: column;
 }
 
 .preview__card-preview-field {
@@ -16,6 +19,18 @@
 .preview__data {
   flex-grow: 1;
   margin-left: var(--boxel-sp-xl);
+}
+
+/* FIXME but how */
+.preview__data.card-pay-field-stack > * + * {
+  margin-top: 0;
+}
+
+.preview__data--is-complete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-left: 0;
 }
 
 .preview__card {
