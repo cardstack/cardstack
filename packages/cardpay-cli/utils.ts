@@ -23,12 +23,17 @@ export async function getWeb3(network: string, mnemonic?: string): Promise<Web3>
     );
   } else {
     let provider = new WalletConnectProvider({
+      clientMeta: {
+        description: '',
+        url: 'http://localhost:3000',
+        icons: [],
+        name: 'Cardstack',
+      },
       rpc: {
         [networkIds[network]]: getConstantByNetwork('rpcNode', network),
       },
       bridge: BRIDGE,
     });
-    provider.sendAsync = provider.send;
     await provider.enable();
     return new Web3((provider as unknown) as AbstractProvider);
   }
