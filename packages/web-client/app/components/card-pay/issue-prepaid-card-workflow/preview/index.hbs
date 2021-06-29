@@ -58,7 +58,7 @@
     </div>
   </ActionCardContainer::Section>
   <Boxel::ActionChin
-    @state={{if @isComplete "memorialized" "default"}}
+    @state={{this.issueState}}
     @disabled={{@frozen}}
     data-test-layout-customization
   >
@@ -69,6 +69,15 @@
         Continue
       </d.ActionButton>
     </:default>
+    <:in-progress as |i|>
+      <i.ActionStatusArea @icon="card-wallet-app-icon" style={{css-var status-icon-size="2.5rem"}}>
+        <Boxel::LoadingIndicator
+          class="preview__loading-indicator"
+          @color="var(--boxel-light)"
+        />
+        You will receive a confirmation request from the Card Wallet app in a few moments…
+      </i.ActionStatusArea>
+    </:in-progress>
     <:memorialized as |m|>
       <m.ActionStatusArea>
         Confirmed
