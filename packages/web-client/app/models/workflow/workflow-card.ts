@@ -6,6 +6,8 @@ interface WorkflowCardOptions {
   author: Participant;
   componentName: string; // this should eventually become a card reference
   includeIf: () => boolean;
+  check?: () => Promise<boolean>;
+  failureReason: string;
 }
 
 export class WorkflowCard extends WorkflowPostable {
@@ -18,14 +20,27 @@ export class WorkflowCard extends WorkflowPostable {
         this.isComplete = false;
       }
     };
+    if (options.check && !options.failureReason) {
+      throw new Error(
+        'If providing the check option in a WorkflowCard, you should also be providing a failureReason'
+      );
+    }
+    this.check = options.check ?? (async () => true);
+    this.failureReason = options.failureReason;
   }
   get session(): WorkflowSession | undefined {
     return this.workflow?.session;
   }
 
   @action onComplete() {
-    this.workflow?.emit('visible-postables-changed');
-    this.isComplete = true;
+    this.check!().then((successful) => {
+      if (successful) {
+        this.workflow?.emit('visible-postables-changed');
+        this.isComplete = true;
+      } else {
+        this.workflow?.cancel(this.failureReason);
+      }
+    });
   }
   @action onIncomplete() {
     this.workflow?.resetTo(this);
