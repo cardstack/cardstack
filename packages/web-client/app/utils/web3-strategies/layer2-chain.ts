@@ -147,11 +147,16 @@ export default abstract class Layer2ChainWeb3Strategy
       this.clearWalletInfo();
       this.walletConnectUri = undefined;
       this.simpleEmitter.emit('disconnect');
-      setTimeout(() => {
-        console.log('initializing');
-        this.initialize();
-      }, 1000);
     }
+
+    // we always want to re-generate the uri, because the 'disconnect' event from WalletConnect
+    // covers clicking the 'cancel' button in the wallet/mobile app
+    // if we don't re-generate the uri, then users might be stuck with the old one that cannot
+    // scan/fails silently
+    setTimeout(() => {
+      console.log('initializing');
+      this.initialize();
+    }, 500);
   }
 
   get isConnected(): boolean {
