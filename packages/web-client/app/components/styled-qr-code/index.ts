@@ -30,9 +30,10 @@ class StyledQrCodeComponent extends Component<StyledQrCodeComponentArgs> {
   @reads('args.dotType', 'square') declare dotType: DotType;
   @reads('args.margin', 0) declare margin: number;
   @reads('args.imageMargin', 0) declare imageMargin: number;
+  qrCode: any;
 
-  @action generateQrCode(element: HTMLElement) {
-    let qrOptions = {
+  get qrOptions() {
+    return {
       width: this.size,
       height: this.size,
       margin: this.margin,
@@ -59,8 +60,15 @@ class StyledQrCodeComponent extends Component<StyledQrCodeComponentArgs> {
         hideBackgroundDots: false,
       },
     };
-    const qrCode = new QRCodeStyling(qrOptions);
-    qrCode.append(element);
+  }
+
+  @action generateQrCode(element: HTMLElement) {
+    this.qrCode = new QRCodeStyling(this.qrOptions);
+    this.qrCode.append(element);
+  }
+
+  @action updateQrCode() {
+    this.qrCode.update(this.qrOptions);
   }
 }
 
