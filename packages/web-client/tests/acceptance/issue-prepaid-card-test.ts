@@ -336,7 +336,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
         'You will receive a confirmation request from the Card Wallet app in a few moments…'
       );
 
-    layer2Service.test__simulateIssuePrepaidCard('2423');
+    layer2Service.test__simulateIssuePrepaidCard(
+      '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8'
+    );
 
     await waitFor(milestoneCompletedSel(3));
     assert.dom(milestoneCompletedSel(3)).containsText('Transaction confirmed');
@@ -349,7 +351,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(
         `${postableSel(3, 1)} [data-test-prepaid-card-address-labeled-value]`
       )
-      .containsText('2423');
+      .containsText('0xaeFbA62A2B3e90FD131209CC94480E722704E1F8');
 
     assert
       .dom(epiloguePostableSel(0))
