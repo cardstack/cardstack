@@ -57,10 +57,8 @@
         <CardPay::NestedItems class="transaction-setup__field-info">
           <:outer>
             <CardPay::AccountDisplay
-              class="transaction-setup__account"
+              {{!-- class="transaction-setup__account" --}}
               @size="small"
-              @icon="avatar-default"
-              @name="Account 1"
               @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
               data-test-deposit-transaction-setup-to-address
             />

@@ -25,7 +25,7 @@
         <CardPay::AccountDisplay
           class="card-pay-confirmation__transaction-wallet"
           @size="small"
-          @name={{concat this.layer2Network.chainName " wallet"}}
+          @name={{concat this.layer1Network.chainName " wallet"}}
           @address={{this.layer1Network.walletInfo.firstAddress}}
           @wrapped={{true}}
         />
@@ -60,7 +60,7 @@
     {{svg-jar "arrow" class="card-pay-confirmation__down-arrow"}}
     <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
       <div class="card-pay-confirmation__transfer-network">
-        <span class="card-pay-confirmation__transfer-network-name">{{this.layer2Network.chainName}} wallet</span>
+        <span class="card-pay-confirmation__transfer-network-name">{{this.layer2Network.chainName}}</span>
         <Boxel::Button @as="anchor" @size="extra-small" href={{this.blockscoutUrl}} target="_blank" rel="noopener">
           View on Blockscout
         </Boxel::Button>
@@ -81,12 +81,10 @@
           @size="small"
           @name={{concat this.layer2Network.chainName " wallet"}}
         />
-        <CardPay::NestedItems class="card-pay-confirmation__transaction-depot">
+        <CardPay::NestedItems {{!-- class="card-pay-confirmation__transaction-depot" --}}>
           <:outer>
             <CardPay::AccountDisplay
               @size="small"
-              @icon="avatar-default"
-              @name="Account 1"
               @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
               data-test-deposit-confirmation-account-address
             />

@@ -1,13 +1,14 @@
-/* details - summary container styles */
 .balance-view {
   --details-summary-height: 3.125rem; /* 50px */
   --details-open-height: 11rem;
+  --details-padding-right: calc(var(--boxel-sp) + 3rem);
 
   position: relative;
-  border: 1px solid var(--boxel-light-400);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
-  border-radius: var(--boxel-border-radius);
+  width: 100%;
   height: var(--details-summary-height);
+  border: 1px solid var(--boxel-light-400);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
   overflow: hidden;
   transition: height var(--boxel-transition);
 }
@@ -22,9 +23,7 @@
   display: flex;
   align-items: center;
   height: var(--details-summary-height);
-  padding: 0 calc(var(--boxel-sp) + 3rem) 0 var(--boxel-sp);
-  font: 600 var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-xs);
+  padding: 0 var(--details-padding-right) 0 var(--boxel-sp);
 }
 
 .balance-view__summary::marker,
@@ -40,19 +39,6 @@
 
 .balance-view[open] .balance-view__summary {
   height: var(--boxel-sp-lg);
-}
-
-.balance-view__summary-balance {
-  margin-left: var(--boxel-sp);
-  letter-spacing: var(--boxel-lsp);
-}
-
-.balance-view__details {
-  padding: 0 var(--boxel-sp-lg);
-}
-
-.balance-view[open] .balance-view__summary-content {
-  display: none;
 }
 
 .balance-view__marker::before {
@@ -82,4 +68,31 @@
 
 .balance-view[open] .balance-view__marker-icon {
   transform: rotate(-90deg);
+}
+
+/* Details */
+.balance-view__details {
+  padding: 0 var(--boxel-sp-lg);
+}
+
+/* Specific to this card */
+.balance-view__summary-content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.balance-view[open] .balance-view__summary-content {
+  display: none;
+}
+
+.balance-view__summary-wallet {
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.balance-view__summary-balance {
+  margin-left: var(--boxel-sp);
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
 }
