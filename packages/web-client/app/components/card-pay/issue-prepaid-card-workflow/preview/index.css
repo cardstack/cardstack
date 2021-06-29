@@ -35,3 +35,11 @@
 .preview__spend-face-value {
   --icon-alignment: start;
 }
+
+.preview__loading-indicator {
+  --icon-color: white;
+
+  margin-right: var(--boxel-sp-sm);
+  flex-grow: 0;
+  flex-shrink: 0;
+}

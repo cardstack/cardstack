@@ -329,7 +329,17 @@ module('Acceptance | issue prepaid card', function (hooks) {
         1
       )} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
-    // TODO simulate transaction approval
+
+    assert
+      .dom('[data-test-boxel-action-chin-action-status-area]')
+      .containsText(
+        'You will receive a confirmation request from the Card Wallet app in a few moments…'
+      );
+
+    layer2Service.test__simulateIssuePrepaidCard('2423');
+
+    await waitFor(milestoneCompletedSel(3));
+    assert.dom(milestoneCompletedSel(3)).containsText('Transaction confirmed');
 
     assert
       .dom(`${postableSel(3, 1)} [data-test-boxel-action-chin]`)
@@ -341,12 +351,11 @@ module('Acceptance | issue prepaid card', function (hooks) {
       )
       .containsText('2423');
 
-    await waitFor(milestoneCompletedSel(3));
-    assert.dom(milestoneCompletedSel(3)).containsText('Transaction confirmed');
-
     assert
       .dom(epiloguePostableSel(0))
       .containsText('Congratulations, you have created a prepaid card!');
+
+    await waitFor(epiloguePostableSel(1));
 
     assert.dom(epiloguePostableSel(1)).containsText('Prepaid card issued');
     assert
@@ -366,6 +375,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     // TODO: simulate depot balance
     // TODO: assert depot balance shown
+
+    await waitFor(epiloguePostableSel(4));
 
     assert
       .dom(

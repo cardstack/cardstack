@@ -22,4 +22,14 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
         this.args.onComplete();
       });
   }
+
+  get issueState() {
+    if (taskFor(this.layer2Network.issuePrepaidCard).isRunning) {
+      return 'in-progress';
+    } else if (this.args.isComplete) {
+      return 'memorialized';
+    } else {
+      return 'default';
+    }
+  }
 }
