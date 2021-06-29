@@ -24,7 +24,7 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
   faceValueOptions = faceValueOptions;
   spendToUsdRate = spendToUsdRate;
 
-  @service('layer2-network') declare layer2Network: Layer2Network;
+  @service declare layer2Network: Layer2Network;
   @reads('args.workflowSession.state.prepaidFundingToken')
   declare fundingTokenSymbol: TokenSymbol;
   @tracked selectedFaceValue?: FaceValue;
