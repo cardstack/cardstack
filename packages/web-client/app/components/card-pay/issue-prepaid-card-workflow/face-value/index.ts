@@ -4,7 +4,7 @@ import { tracked } from '@glimmer/tracking';
 import { reads } from 'macro-decorators';
 import { inject as service } from '@ember/service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import { fromWei, toBN, toWei } from 'web3-utils';
+import { fromWei, toBN } from 'web3-utils';
 import BN from 'web3-core/node_modules/@types/bn.js';
 import {
   ConvertibleSymbol,
@@ -16,14 +16,15 @@ import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow
 
 interface FaceValue {
   spendAmount: number;
-  tokenAmount: string;
+  approxTokenAmount: number;
+  isOptionDisabled: boolean;
 }
 
 class FaceValueCard extends Component<WorkflowCardComponentArgs> {
   faceValueOptions = faceValueOptions;
   spendToUsdRate = spendToUsdRate;
 
-  @service declare layer2Network: Layer2Network;
+  @service('layer2-network') declare layer2Network: Layer2Network;
   @reads('args.workflowSession.state.prepaidFundingToken')
   declare fundingTokenSymbol: TokenSymbol;
   @tracked selectedFaceValue?: FaceValue;
@@ -35,20 +36,21 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
   }
 
   async getTokenAmounts(symbol: ConvertibleSymbol, spendArr: number[]) {
-    spendArr.map(async (spendAmount) => {
-      let result = await this.layer2Network.convertFromSpend(
-        symbol,
-        spendAmount
-      );
-      let tokenAmount = parseFloat(fromWei(result)).toFixed(2);
-      this.options = [
-        ...this.options,
-        {
+    this.options = await Promise.all(
+      spendArr.map(async (spendAmount) => {
+        let result: string = await this.layer2Network.convertFromSpend(
+          symbol,
+          spendAmount
+        );
+        let approxTokenAmount = Math.ceil(parseFloat(fromWei(result))); // for display only
+        return {
           spendAmount,
-          tokenAmount,
-        },
-      ];
-    });
+          approxTokenAmount,
+          isOptionDisabled: this.fundingTokenBalance.lt(toBN(result)),
+        };
+      })
+    );
+    return;
   }
 
   get fundingTokenBalance(): BN {
@@ -65,21 +67,6 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
     return undefined;
   }
 
-  get selectedValueInBN() {
-    let amount = this.selectedFaceValue?.spendAmount;
-    if (!amount) {
-      return toBN('0');
-    }
-    return toBN(toWei(`${amount * spendToUsdRate}`));
-  }
-
-  get balanceFromBN() {
-    if (!this.fundingTokenBalance || this.fundingTokenBalance.isZero()) {
-      return 0;
-    }
-    return Number(fromWei(this.fundingTokenBalance));
-  }
-
   get isDisabled() {
     if (
       !this.selectedFaceValue?.spendAmount ||
@@ -88,7 +75,7 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
     ) {
       return true;
     }
-    return this.fundingTokenBalance.lt(this.selectedValueInBN);
+    return this.selectedFaceValue.isOptionDisabled;
   }
 
   @action chooseFaceValue(val: FaceValue) {
