@@ -18,8 +18,8 @@
               @issuerName={{@workflowSession.state.issuerName}}
               @headerBackground={{@workflowSession.state.headerBackground.id}}
               @headerTheme={{@workflowSession.state.headerTheme.id}}
-              @balance={{@workflowSession.state.spendFaceValue}}
-              @usdBalance={{spend-to-usd @workflowSession.state.spendFaceValue}}
+              @balance={{this.faceValue}}
+              @usdBalance={{spend-to-usd this.faceValue}}
               @address="0x1234...abcd"
               @network="xDai Chain"
             />
@@ -43,8 +43,8 @@
             @icon="spend"
             @sign="§"
             @symbol="SPEND"
-            @balance={{@workflowSession.state.spendFaceValue}}
-            @usdBalance={{spend-to-usd @workflowSession.state.spendFaceValue}}
+            @balance={{this.faceValue}}
+            @usdBalance={{spend-to-usd this.faceValue}}
           />
         </CardPay::LabeledValue>
 
