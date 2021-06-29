@@ -23060,7 +23060,7 @@ web3-eth@1.3.5:
     web3-net "1.3.5"
     web3-utils "1.3.5"
 
-web3-eth@^1.3.6:
+web3-eth@^1.3.5:
   version "1.3.6"
   resolved "https://registry.yarnpkg.com/web3-eth/-/web3-eth-1.3.6.tgz#2c650893d540a7a0eb1365dd5b2dca24ac919b7c"
   integrity sha512-9+rnywRRpyX3C4hfsAQXPQh6vHh9XzQkgLxo3gyeXfbhbShUoq2gFVuy42vsRs//6JlsKdyZS7Z3hHPHz2wreA==
