@@ -6,7 +6,10 @@
   <ActionCardContainer::Section
     @title="Prepaid card preview"
   >
-    <div class="preview__content" data-test-preview>
+    <div
+      class={{cn "preview__content" preview__content--is-complete=@isComplete}}
+      data-test-preview
+    >
       {{#unless @isComplete}}
         <Boxel::Field
           @label="Card Preview"
@@ -26,7 +29,9 @@
           </div>
         </Boxel::Field>
       {{/unless}}
-      <CardPay::FieldStack class="preview__data">
+      <CardPay::FieldStack
+        class={{cn "preview__data" preview__data--is-complete=@isComplete}}
+      >
         <CardPay::LabeledValue
           @vertical={{true}}
           @label="Issued by"
