@@ -352,7 +352,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(
         `${postableSel(3, 1)} [data-test-prepaid-card-address-labeled-value]`
       )
-      .containsText('0xaeFbA62A2B3e90FD131209CC94480E722704E1F8');
+      .containsText('0xaeFb...E1F8');
 
     assert
       .dom(epiloguePostableSel(0))

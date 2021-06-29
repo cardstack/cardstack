@@ -57,7 +57,7 @@
           <CardPay::LabeledValue
             @vertical={{true}}
             @label="Card address"
-            @value={{@workflowSession.state.prepaidCardAddress}}
+            @value={{truncate-middle @workflowSession.state.prepaidCardAddress}}
             data-test-prepaid-card-address-labeled-value
           />
         {{/if}}
