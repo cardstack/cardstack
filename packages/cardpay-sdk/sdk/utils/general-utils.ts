@@ -24,7 +24,7 @@ export function waitUntilTransactionMined(web3: Web3, txnHash: string): Promise<
       let receipt = await web3.eth.getTransactionReceipt(txnHash);
       if (!receipt) {
         setTimeout(function () {
-          transactionReceiptAsync(txnHash, resolve, reject);
+          return transactionReceiptAsync(txnHash, resolve, reject);
         }, POLL_INTERVAL);
       } else {
         resolve(receipt);
