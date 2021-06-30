@@ -7,7 +7,7 @@ import {
 } from '@cardstack/web-client/utils/token';
 import RSVP, { defer } from 'rsvp';
 import BN from 'bn.js';
-import { fromWei } from 'web3-utils';
+import { fromWei, toWei } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import {
@@ -91,6 +91,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return this.waitForAccountDeferred.promise;
   }
 
+  async convertFromSpend(symbol: ConvertibleSymbol, amount: number) {
+    return await this.test__simulateConvertFromSpend(symbol, amount);
+  }
+
   test__lastSymbolsToUpdate: ConvertibleSymbol[] = [];
   test__simulatedExchangeRate: number = 0.2;
   test__updateUsdConvertersDeferred: RSVP.Deferred<void> | undefined;
@@ -126,5 +130,14 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       return;
     }
     this.depotSafe = null;
+  }
+
+  test__simulateConvertFromSpend(symbol: ConvertibleSymbol, amount: number) {
+    let spendToDaiSimRate = 0.01;
+    if (symbol === 'DAI') {
+      return toWei(`${amount * spendToDaiSimRate}`);
+    } else {
+      return '0';
+    }
   }
 }

@@ -28,22 +28,23 @@
             @icon="spend"
             @sign="§"
             @symbol="SPEND"
-            @balance={{this.selectedFaceValue}}
-            @usdBalance={{spend-to-usd this.selectedFaceValue}}
-            @text={{concat "≈ " (spend-to-usd this.selectedFaceValue) " " this.fundingTokenSymbol "*"}}
+            @balance={{this.selectedFaceValue.spendAmount}}
+            @usdBalance={{spend-to-usd this.selectedFaceValue.spendAmount}}
+            @text={{concat "≈ " this.selectedFaceValue.approxTokenAmount " " this.fundingTokenSymbol "*"}}
             data-test-face-value-display
           />
         </CardPay::LabeledValue>
       {{else}}
         <div class="face-value-card__options">
-          {{#each this.faceValueOptions as |amount|}}
+          {{#each this.options as |option|}}
             <CardPay::IssuePrepaidCardWorkflow::FaceValue::Option
-              @disabled={{lt this.balanceFromBN (spend-to-usd amount)}}
-              @checked={{eq amount this.selectedFaceValue}}
-              @spendFaceValue={{amount}}
-              @usdAmount={{spend-to-usd amount}}
-              @approxDaiAmount={{spend-to-usd amount}}
-              @onInput={{fn this.chooseFaceValue amount}}
+              @disabled={{option.isOptionDisabled}}
+              @checked={{eq option.spendAmount this.selectedFaceValue.spendAmount}}
+              @spendFaceValue={{option.spendAmount}}
+              @usdAmount={{spend-to-usd option.spendAmount}}
+              @approxTokenAmount={{option.approxTokenAmount}}
+              @tokenSymbol={{this.fundingTokenSymbol}}
+              @onInput={{fn this.chooseFaceValue option}}
             />
           {{/each}}
         </div>
