@@ -85,13 +85,13 @@ Qmodule('Compiler', function (hooks) {
     assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
   });
 
-  test('CompiledCard embedded view', async function (assert) {
+  test('CompiledCard embedded view', async function () {
     builder.addRawCard(PERSON_CARD);
     let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
-      '{{@model.name}} was born on <BirthdateField @model={{@model.birthdate}} />'
+      '{{@model.name}} was born on <BirthdateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
     );
 
     containsSource(
@@ -108,12 +108,12 @@ Qmodule('Compiler', function (hooks) {
     assert.deepEqual(compiled.edit.usedFields, ['name', 'birthdate']);
     containsSource(
       builder.definedModules.get(compiled.edit.moduleName),
-      '<NameField @model={{@model.name}} @set={{@set.setters.name}} />',
+      '<NameField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />',
       'Edit template is rendered for text'
     );
     containsSource(
       builder.definedModules.get(compiled.edit.moduleName),
-      '<BirthdateField @model={{@model.birthdate}} @set={{@set.setters.birthdate}} />',
+      '<BirthdateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />',
       'Edit template is rendered for date'
     );
   });
@@ -157,7 +157,7 @@ Qmodule('Compiler', function (hooks) {
 
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
-      `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><BirthdateField @model={{@model.author.birthdate}} /></p></article>`
+      `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><BirthdateField @model={{@model.author.birthdate}} data-test-field-name=\\"birthdate\\"  /></p></article>`
     );
 
     assert.deepEqual(compiled.isolated.usedFields, ['author']);
@@ -238,7 +238,7 @@ Qmodule('Compiler', function (hooks) {
 
     containsSource(
       builder.definedModules.get(compiled.isolated.moduleName),
-      `{{#each @model.posts as |Post|}}<PostsField @model={{Post}} />{{/each}}`,
+      `{{#each @model.posts as |Post|}}<PostsField @model={{Post}} data-test-field-name=\\"posts\\" />{{/each}}`,
       'Isolated template includes PostField component'
     );
 
