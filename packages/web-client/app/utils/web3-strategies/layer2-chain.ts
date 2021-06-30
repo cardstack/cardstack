@@ -34,6 +34,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { IHubAuth } from '../../../../cardpay-sdk/sdk/hub-auth';
 import config from '../../config/environment';
+import { networkDisplayInfo } from './network-display-info';
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -63,8 +64,8 @@ export default abstract class Layer2ChainWeb3Strategy
     return taskFor(this.fetchDepotTask).isRunning;
   }
 
-  constructor(networkSymbol: NetworkSymbol, chainName: string) {
-    this.chainName = chainName;
+  constructor(networkSymbol: NetworkSymbol) {
+    this.chainName = networkDisplayInfo[networkSymbol].fullName;
     this.chainId = networkIds[networkSymbol];
     this.networkSymbol = networkSymbol;
     this.walletInfo = new WalletInfo([], this.chainId);

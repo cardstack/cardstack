@@ -21,6 +21,7 @@ import {
   getSDK,
   networkIds,
 } from '@cardstack/cardpay-sdk';
+import { networkDisplayInfo } from './network-display-info';
 
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -44,8 +45,8 @@ export default abstract class Layer1ChainWeb3Strategy
   @tracked cardBalance: BN | undefined;
   @tracked walletInfo: WalletInfo;
 
-  constructor(networkSymbol: NetworkSymbol, chainName: string) {
-    this.chainName = chainName;
+  constructor(networkSymbol: NetworkSymbol) {
+    this.chainName = networkDisplayInfo[networkSymbol].fullName;
     this.chainId = networkIds[networkSymbol];
     this.walletInfo = new WalletInfo([], this.chainId);
     this.networkSymbol = networkSymbol;
