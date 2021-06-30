@@ -14,7 +14,9 @@ export async function networkName(web3: Web3): Promise<string> {
   return name;
 }
 
-export function waitUntilTransactionMined(web3: Web3, txnHash: string): Promise<TransactionReceipt> {
+export function waitUntilTransactionMined(web3: Web3, txnHash: string, duration = 30000): Promise<TransactionReceipt> {
+  let endTime = Number(new Date()) + duration;
+
   let transactionReceiptAsync = async function (
     txnHash: string,
     resolve: (value: TransactionReceipt | Promise<TransactionReceipt>) => void,
@@ -22,12 +24,14 @@ export function waitUntilTransactionMined(web3: Web3, txnHash: string): Promise<
   ) {
     try {
       let receipt = await web3.eth.getTransactionReceipt(txnHash);
-      if (!receipt) {
+      if (receipt) {
+        resolve(receipt);
+      } else if (Number(new Date()) > endTime) {
+        throw new Error(`Transaction took too long to complete, waited ${duration / 1000} seconds`);
+      } else {
         setTimeout(function () {
           return transactionReceiptAsync(txnHash, resolve, reject);
         }, POLL_INTERVAL);
-      } else {
-        resolve(receipt);
       }
     } catch (e) {
       reject(e);
