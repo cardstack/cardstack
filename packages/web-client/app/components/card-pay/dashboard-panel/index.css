@@ -1,0 +1,30 @@
+.dashboard-panel {
+  --spacing: calc(var(--boxel-sp-xxxl) * var(--boxel-ratio));
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+  gap: var(--spacing);
+  padding: var(--spacing);
+  color: var(--boxel-dark);
+  background-color: var(--boxel-light-400);
+  border-radius: var(--boxel-border-radius);
+}
+
+.dashboard-panel__header {
+  grid-column: 1 / -1;
+}
+
+.dashboard-panel__section {
+  /* padding: var(--boxel-sp); */
+}
+
+.dashboard-panel__list {
+  list-style-type: disc;
+  padding-left: var(--boxel-sp-lg);
+}
+
+
+/* tab section */
+.card-pay-dashboard__section {
+  padding: var(--boxel-sp-xxl) var(--boxel-sp-xl);
+}

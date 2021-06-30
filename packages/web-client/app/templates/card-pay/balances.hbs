@@ -1,11 +1,9 @@
-<section role="tabpanel" aria-labelledby="card-pay.balances">
-  <h2>
-    Card Balances
-  </h2>
-
+<section class="card-pay-dashboard__section" role="tabpanel" aria-labelledby="card-pay.balances">
   <Boxel::Button @kind="primary" {{on "click" (set this "flow" 'issue-prepaid-card')}} data-test-issue-prepaid-card-workflow-button>
     Issue a Prepaid Card
   </Boxel::Button>
+
+  <CardPay::DashboardPanel />
 </section>
 
 <Boxel::Modal
