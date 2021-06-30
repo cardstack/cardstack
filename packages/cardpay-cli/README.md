@@ -16,6 +16,7 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay claim-revenue <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-claim-revenue-merchant_safe-token_address-amount---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay new-prepaidcard-gas-fee <TOKEN_ADDRESS> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-new-prepaidcard-gas-fee-token_address---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay safes-view [ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-safes-view-address---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay safe-view [SAFE_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-safe-view-safe_address---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay safe-transfer-tokens [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-safe-transfer-tokens-safe_address-token_address-recipient-amount---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay set-supplier-info-did [SAFE_ADDRESS] [INFO_DID] [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-set-supplier-info-did-safe_address-info_did-token_address---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay usd-price <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-usd-price-token-amount---networknetwork---mnemonicmnemonic---walletconnect)
@@ -175,6 +176,21 @@ USAGE
 
 ARGUMENTS
   ADDRESS         (Optional) an address of an owner whose safes you wish to view (defaults to the wallet's default account)
+  NETWORK         The network to use ("sokol" or "xdai")
+  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+```
+
+## `yarn cardpay safe-view [SAFE_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+
+View a particular safe
+
+```
+USAGE
+  $ yarn cardpay safe-view [SAFE_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+
+ARGUMENTS
+  SAFE_ADDRESS    The address of a safe to view
   NETWORK         The network to use ("sokol" or "xdai")
   MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet

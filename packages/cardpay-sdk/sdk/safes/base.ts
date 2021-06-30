@@ -9,11 +9,12 @@ import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from '../constants';
-import { ContractOptions } from 'web3-eth-contract';
+import { Contract, ContractOptions } from 'web3-eth-contract';
 import { GnosisExecTx, gasEstimate, executeTransaction } from '../utils/safe-utils';
 import { sign } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
+import { ExchangeRate } from '../exchange-rate';
 const { toBN, fromWei } = Web3.utils;
 
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
@@ -51,8 +52,107 @@ export interface TokenInfo {
   balance: string; // balance is in wei
 }
 
+interface Context {
+  transactionServiceURL: string;
+  spendContract: Contract;
+  merchantManager: Contract;
+  prepaidCardManager: Contract;
+  supplierManager: Contract;
+  exchangeRate: ExchangeRate;
+}
+
 export default class Safes {
   constructor(private layer2Web3: Web3) {}
+
+  async viewSafe(safeAddress: string, context?: Context): Promise<Safe> {
+    let transactionServiceURL: string;
+    let spendContract: Contract;
+    let merchantManager: Contract;
+    let supplierManager: Contract;
+    let prepaidCardManager: Contract;
+    let exchangeRate: ExchangeRate;
+    if (context) {
+      ({
+        prepaidCardManager,
+        transactionServiceURL,
+        spendContract,
+        merchantManager,
+        supplierManager,
+        exchangeRate,
+      } = context);
+    } else {
+      transactionServiceURL = await getConstant('transactionServiceURL', this.layer2Web3);
+      prepaidCardManager = new this.layer2Web3.eth.Contract(
+        PrepaidCardManagerABI as AbiItem[],
+        await getAddress('prepaidCardManager', this.layer2Web3)
+      );
+      spendContract = new this.layer2Web3.eth.Contract(
+        SpendABI as AbiItem[],
+        await getAddress('spend', this.layer2Web3)
+      );
+      merchantManager = new this.layer2Web3.eth.Contract(
+        MerchantManagerABI as AbiItem[],
+        await getAddress('merchantManager', this.layer2Web3)
+      );
+      supplierManager = new this.layer2Web3.eth.Contract(
+        SupplierManagerABI as AbiItem[],
+        await getAddress('supplierManager', this.layer2Web3)
+      );
+      exchangeRate = await getSDK('ExchangeRate', this.layer2Web3);
+    }
+
+    let balanceResponse = await fetch(`${transactionServiceURL}/v1/safes/${safeAddress}/balances/`);
+    if (!balanceResponse?.ok) {
+      throw new Error(await balanceResponse.text());
+    }
+    let balances: TokenInfo[] = await balanceResponse.json();
+    let tokens = balances.filter((balanceItem) => balanceItem.tokenAddress);
+    let safeInfo = { address: safeAddress, tokens };
+    let {
+      issuer,
+      issueToken: issuingToken,
+      reloadable,
+      customizationDID,
+    } = await prepaidCardManager.methods.cardDetails(safeAddress).call();
+
+    // prepaid card safe
+    if (issuer !== ZERO_ADDRESS) {
+      let issuingTokenBalance =
+        tokens.find((t) => t.tokenAddress.toLowerCase() === issuingToken.toLowerCase())?.balance ?? '0';
+      return {
+        ...safeInfo,
+        type: 'prepaid-card' as 'prepaid-card',
+        issuer,
+        issuingToken,
+        reloadable,
+        customizationDID: customizationDID ? customizationDID : undefined, // cleanse the empty strings (which solidity uses for unspecified DID's)
+        spendFaceValue: await exchangeRate.convertToSpend(issuingToken, issuingTokenBalance),
+      };
+    }
+    let supplier = await supplierManager.methods.safes(safeAddress).call();
+    if (supplier !== ZERO_ADDRESS) {
+      let { infoDID } = await supplierManager.methods.suppliers(supplier).call();
+      return {
+        ...safeInfo,
+        type: 'depot' as 'depot',
+        infoDID: infoDID ? infoDID : undefined, // cleanse empty strings
+      };
+    }
+    let merchant = await merchantManager.methods.merchantSafes(safeAddress).call();
+    if (merchant !== ZERO_ADDRESS) {
+      let { infoDID } = await merchantManager.methods.merchants(merchant).call();
+      return {
+        ...safeInfo,
+        type: 'merchant' as 'merchant',
+        infoDID: infoDID ? infoDID : undefined, // cleanse empty strings
+        accumulatedSpendValue: await spendContract.methods.balanceOf(safeInfo.address).call(),
+      };
+    }
+    return {
+      ...safeInfo,
+      type: 'external' as 'external',
+    };
+  }
 
   async view(owner?: string): Promise<Safe[]> {
     owner = owner ?? (await this.layer2Web3.eth.getAccounts())[0];
@@ -79,59 +179,16 @@ export default class Safes {
     let exchangeRate = await getSDK('ExchangeRate', this.layer2Web3);
 
     return await Promise.all(
-      safes.map(async (safeAddress: string) => {
-        let balanceResponse = await fetch(`${transactionServiceURL}/v1/safes/${safeAddress}/balances/`);
-        if (!balanceResponse?.ok) {
-          throw new Error(await balanceResponse.text());
-        }
-        let balances: TokenInfo[] = await balanceResponse.json();
-        let tokens = balances.filter((balanceItem) => balanceItem.tokenAddress);
-        let safeInfo = { address: safeAddress, tokens };
-        let {
-          issuer,
-          issueToken: issuingToken,
-          reloadable,
-          customizationDID,
-        } = await prepaidCardManager.methods.cardDetails(safeAddress).call();
-
-        // prepaid card safe
-        if (issuer !== ZERO_ADDRESS) {
-          let issuingTokenBalance =
-            tokens.find((t) => t.tokenAddress.toLowerCase() === issuingToken.toLowerCase())?.balance ?? '0';
-          return {
-            ...safeInfo,
-            type: 'prepaid-card' as 'prepaid-card',
-            issuer,
-            issuingToken,
-            reloadable,
-            customizationDID: customizationDID ? customizationDID : undefined, // cleanse the empty strings (which solidity uses for unspecified DID's)
-            spendFaceValue: await exchangeRate.convertToSpend(issuingToken, issuingTokenBalance),
-          };
-        }
-        let supplier = await supplierManager.methods.safes(safeAddress).call();
-        if (supplier !== ZERO_ADDRESS) {
-          let { infoDID } = await supplierManager.methods.suppliers(supplier).call();
-          return {
-            ...safeInfo,
-            type: 'depot' as 'depot',
-            infoDID: infoDID ? infoDID : undefined, // cleanse empty strings
-          };
-        }
-        let merchant = await merchantManager.methods.merchantSafes(safeAddress).call();
-        if (merchant !== ZERO_ADDRESS) {
-          let { infoDID } = await merchantManager.methods.merchants(merchant).call();
-          return {
-            ...safeInfo,
-            type: 'merchant' as 'merchant',
-            infoDID: infoDID ? infoDID : undefined, // cleanse empty strings
-            accumulatedSpendValue: await spendContract.methods.balanceOf(safeInfo.address).call(),
-          };
-        }
-        return {
-          ...safeInfo,
-          type: 'external' as 'external',
-        };
-      })
+      safes.map((safeAddress: string) =>
+        this.viewSafe(safeAddress, {
+          transactionServiceURL,
+          prepaidCardManager,
+          spendContract,
+          merchantManager,
+          supplierManager,
+          exchangeRate,
+        })
+      )
     );
   }
 

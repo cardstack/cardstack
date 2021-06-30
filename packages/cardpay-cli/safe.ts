@@ -1,8 +1,20 @@
 import Web3 from 'web3';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
+import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 
 const { toWei } = Web3.utils;
+
+export async function viewSafe(network: string, address: string, mnemonic?: string): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+
+  let safesApi = await getSDK('Safes', web3);
+  console.log(`Getting safe ${address}`);
+  let safe = await safesApi.viewSafe(address);
+  console.log();
+  displaySafe(address, safe);
+  console.log();
+}
 
 export async function viewSafes(network: string, address: string | undefined, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
@@ -15,32 +27,35 @@ export async function viewSafes(network: string, address: string | undefined, mn
     console.log('You have no safes (not counting safes external to the cardpay protocol)');
   }
   safes.forEach((safe) => {
-    let { address, type, tokens } = safe;
-    console.log(`${address} -- ${type}`);
-    console.log('-------------------------');
-    if (safe.type === 'prepaid-card') {
-      console.log(`customization DID: ${safe.customizationDID ? safe.customizationDID : ' - unset -'}`);
-      console.log(`Face value: §${safe.spendFaceValue} SPEND`);
-    }
-    if (safe.type === 'merchant' || safe.type === 'depot') {
-      console.log(`info DID: ${safe.infoDID ? safe.infoDID : ' - unset -'}`);
-    }
-    if (safe.type === 'merchant') {
-      console.log(`Accumulated SPEND value: §${safe.accumulatedSpendValue} SPEND`);
-    }
-    if (tokens.length === 0) {
-      console.log('No tokens in safe');
-    }
-    tokens.forEach((item) => {
-      let isIssuingToken = safe.type === 'prepaid-card' && safe.issuingToken === item.tokenAddress;
-      console.log(
-        `${item.token.name} - ${Web3.utils.fromWei(item.balance)} ${item.token.symbol} ${
-          isIssuingToken ? '(issuing token)' : ''
-        }`
-      );
-    });
-
+    displaySafe(safe.address, safe);
     console.log();
+  });
+}
+
+function displaySafe(address: string, safe: Safe): void {
+  let { type, tokens } = safe;
+  console.log(`${address} -- ${type}`);
+  console.log('-------------------------');
+  if (safe.type === 'prepaid-card') {
+    console.log(`customization DID: ${safe.customizationDID ? safe.customizationDID : ' - unset -'}`);
+    console.log(`Face value: §${safe.spendFaceValue} SPEND`);
+  }
+  if (safe.type === 'merchant' || safe.type === 'depot') {
+    console.log(`info DID: ${safe.infoDID ? safe.infoDID : ' - unset -'}`);
+  }
+  if (safe.type === 'merchant') {
+    console.log(`Accumulated SPEND value: §${safe.accumulatedSpendValue} SPEND`);
+  }
+  if (tokens.length === 0) {
+    console.log('No tokens in safe');
+  }
+  tokens.forEach((item) => {
+    let isIssuingToken = safe.type === 'prepaid-card' && safe.issuingToken === item.tokenAddress;
+    console.log(
+      `${item.token.name} - ${Web3.utils.fromWei(item.balance)} ${item.token.symbol} ${
+        isIssuingToken ? '(issuing token)' : ''
+      }`
+    );
   });
 }
 

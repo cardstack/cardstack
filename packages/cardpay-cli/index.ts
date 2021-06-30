@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import bridge from './bridge.js';
 import awaitBridged from './await-bridged.js';
 import { viewTokenBalance } from './assets';
-import { viewSafes, transferTokens, setSupplierInfoDID } from './safe.js';
+import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe } from './safe.js';
 import { createPrepaidCard, priceForFaceValue, payMerchant, gasFee } from './prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
 import { claimRevenue, registerMerchant, revenueBalances } from './revenue-pool.js';
@@ -17,6 +17,7 @@ type Commands =
   | 'bridge'
   | 'awaitBridged'
   | 'safesView'
+  | 'safeView'
   | 'safeTransferTokens'
   | 'prepaidCardCreate'
   | 'usdPrice'
@@ -114,6 +115,13 @@ let {
       command = 'safesView';
     }
   )
+  .command('safe-view [safeAddress]', 'View contents of the safe at the specified address', (yargs) => {
+    yargs.positional('safeAddress', {
+      type: 'string',
+      description: 'The address of the safe to view',
+    });
+    command = 'safeView';
+  })
   .command(
     'safe-transfer-tokens [safeAddress] [token] [recipient] [amount]',
     'Transfer tokens from a safe to an arbitrary recipient.',
@@ -388,6 +396,13 @@ if (!command) {
       break;
     case 'safesView':
       await viewSafes(network, address, mnemonic);
+      break;
+    case 'safeView':
+      if (safeAddress == null) {
+        showHelpAndExit('safeAddress is a required value');
+        return;
+      }
+      await viewSafe(network, safeAddress, mnemonic);
       break;
     case 'safeTransferTokens':
       if (safeAddress == null || recipient == null || token == null || amount == null) {
