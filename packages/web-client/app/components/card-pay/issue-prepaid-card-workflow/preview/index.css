@@ -17,23 +17,6 @@
   text-align: center;
 }
 
-.preview__data {
-  flex-grow: 1;
-  margin-left: var(--boxel-sp-xl);
-}
-
-/* FIXME but how */
-.preview__data.card-pay-field-stack > * + * {
-  margin-top: 0;
-}
-
-.preview__data--is-complete {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-left: 0;
-}
-
 .preview__card {
   --preview-card-width: 14.375rem;
   --preview-card-height: 9.06rem;
@@ -44,6 +27,15 @@
   max-width: var(--preview-card-width);
   max-height: var(--preview-card-height);
   text-align: left;
+}
+
+.preview__data {
+  flex-grow: 1;
+  margin-left: var(--boxel-sp-xl);
+}
+
+.preview__data--is-complete {
+  margin-left: 0;
 }
 
 /* FIXME add gutter space */
