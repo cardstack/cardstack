@@ -31,6 +31,7 @@
       {{/unless}}
       <CardPay::FieldStack
         class={{cn "preview__data" preview__data--is-complete=@isComplete}}
+        @horizontal={{@isComplete}}
       >
         <CardPay::LabeledValue
           @vertical={{true}}
