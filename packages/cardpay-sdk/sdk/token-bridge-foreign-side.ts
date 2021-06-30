@@ -5,6 +5,7 @@ import { AbiItem } from 'web3-utils';
 import ERC20ABI from '../contracts/abi/erc-20';
 import ForeignBridgeABI from '../contracts/abi/foreign-bridge-mediator';
 import { getAddress } from '../contracts/addresses';
+import { waitUntilTransactionMined } from './utils/general-utils';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -27,7 +28,15 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     let from = options?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let token = new this.layer1Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let foreignBridge = await getAddress('foreignBridge', this.layer1Web3);
-    return await token.methods.approve(foreignBridge, amount).send({ ...options, from });
+
+    return await new Promise((resolve) => {
+      token.methods
+        .approve(foreignBridge, amount)
+        .send({ ...options, from })
+        .on('transactionHash', async (txnHash: string) => {
+          resolve(await waitUntilTransactionMined(this.layer1Web3, txnHash));
+        });
+    });
   }
 
   async relayTokens(
@@ -41,6 +50,14 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
       ForeignBridgeABI as any,
       await getAddress('foreignBridge', this.layer1Web3)
     );
-    return await foreignBridge.methods.relayTokens(tokenAddress, recipientAddress, amount).send({ ...options, from });
+
+    return await new Promise((resolve) => {
+      foreignBridge.methods
+        .relayTokens(tokenAddress, recipientAddress, amount)
+        .send({ ...options, from })
+        .on('transactionHash', async (txnHash: string) => {
+          resolve(await waitUntilTransactionMined(this.layer1Web3, txnHash));
+        });
+    });
   }
 }
