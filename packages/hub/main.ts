@@ -10,17 +10,21 @@ import DevelopmentConfig from './services/development-config';
 import DevelopmentProxyMiddleware from './services/development-proxy-middleware';
 import SessionRoute from './routes/session';
 import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
+import PrepaidCardColorSchemeSerializer from './services/serializers/prepaid-card-color-scheme-serializer';
+import PrepaidCardPatternSerializer from './services/serializers/prepaid-card-pattern-serializer';
 import PrepaidCardPatternsRoute from './routes/prepaid-card-patterns';
+import PrepaidCardCustomizationSerializer from './services/serializers/prepaid-card-customization-serializer';
 import PrepaidCardCustomizationsRoute from './routes/prepaid-card-customizations';
+import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
 import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './services/jsonapi-middleware';
 import NonceTracker from './services/nonce-tracker';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
-import { LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
+import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
 import config from 'config';
-import path from 'path';
+import s3PutJson from './tasks/s3-put-json';
 
 const log = logger('cardstack/hub');
 
@@ -35,9 +39,13 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('jsonapi-middleware', JsonapiMiddleware);
   registry.register('nonce-tracker', NonceTracker);
   registry.register('session-route', SessionRoute);
+  registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
   registry.register('prepaid-card-customizations-route', PrepaidCardCustomizationsRoute);
+  registry.register('prepaid-card-customization-serializer', PrepaidCardCustomizationSerializer);
   registry.register('prepaid-card-color-schemes-route', PrepaidCardColorSchemesRoute);
+  registry.register('prepaid-card-color-scheme-serializer', PrepaidCardColorSchemeSerializer);
   registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
+  registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
   registry.register('worker-client', WorkerClient);
   if (registryCallback) {
     registryCallback(registry);
@@ -161,10 +169,17 @@ export async function bootWorker() {
     };
   };
   let dbConfig = config.get('db') as Record<string, any>;
+  let container = wireItUp();
   let runner = await runWorkers({
     logger: new Logger(workerLogFactory),
     connectionString: dbConfig.url,
-    taskDirectory: path.join(__dirname, 'tasks'),
+    taskList: {
+      'persist-off-chain-prepaid-card-customization': async (payload: any, helpers: Helpers) => {
+        let task = await container.instantiate(PersistOffChainPrepaidCardCustomizationTask);
+        return task.perform(payload, helpers);
+      },
+      's3-put-json': s3PutJson,
+    },
   });
   await runner.promise;
 }

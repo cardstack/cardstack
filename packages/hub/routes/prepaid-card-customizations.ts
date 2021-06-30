@@ -6,11 +6,17 @@ import { inject } from '../di/dependency-injection';
 import shortUuid from 'short-uuid';
 // let log = Logger('route:prepaid-card-customizations');
 import { AuthenticationUtils } from '../utils/authentication';
-import { encodeDID } from '@cardstack/did-resolver';
+import WorkerClient from '../services/worker-client';
+import PrepaidCardCustomizationSerializer from '../services/serializers/prepaid-card-customization-serializer';
 
 export default class PrepaidCardCustomizationsRoute {
-  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
+  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
+  prepaidCardCustomizationSerializer: PrepaidCardCustomizationSerializer = inject(
+    'prepaid-card-customization-serializer',
+    { as: 'prepaidCardCustomizationSerializer' }
+  );
+  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);
@@ -45,38 +51,23 @@ export default class PrepaidCardCustomizationsRoute {
         throw e;
       }
     }
-    let did = encodeDID({ type: 'PrepaidCardCustomization', uniqueId: newId });
-    let data = {
+    await this.workerClient.addJob('persist-off-chain-prepaid-card-customization', {
       id: newId,
-      type: 'prepaid-card-customizations',
-      attributes: {
-        did,
-        'issuer-name': issuerName,
-        'owner-address': ownerAddress,
+    });
+
+    let serializedPcc = await this.prepaidCardCustomizationSerializer.serialize(
+      {
+        id: newId,
+        issuerName,
+        ownerAddress,
+        colorSchemeId,
+        patternId,
       },
-      relationships: {
-        pattern: {
-          data: {
-            id: patternId,
-            type: 'prepaid-card-patterns',
-          },
-        },
-        'color-scheme': {
-          data: {
-            id: colorSchemeId,
-            type: 'prepaid-card-color-schemes',
-          },
-        },
-      },
-    };
+      {}
+    );
     ctx.status = 201;
-    ctx.body = {
-      data,
-    };
+    ctx.body = serializedPcc;
     ctx.type = 'application/vnd.api+json';
-    // } catch (e) {
-    //   log.error(e);
-    // }
   }
 }
 

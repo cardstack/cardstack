@@ -5,6 +5,7 @@ import { Client } from 'pg';
 import shortUuid from 'short-uuid';
 import { Container, Registry } from '../../di/dependency-injection';
 import { parseIdentifier } from '@cardstack/did-resolver';
+import { Job, TaskSpec } from 'graphile-worker';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -26,6 +27,17 @@ class StubAuthenticationUtils {
   }
 }
 
+let lastAddedJobIdentifier: string | undefined;
+let lastAddedJobPayload: any | undefined;
+
+class StubWorkerClient {
+  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
+    lastAddedJobIdentifier = identifier;
+    lastAddedJobPayload = payload;
+    return Promise.resolve({} as Job);
+  }
+}
+
 let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
 function handleValidateAuthToken(encryptedString: string) {
   expect(encryptedString).to.equal('abc123--def456--ghi789');
@@ -43,6 +55,7 @@ describe('POST /api/prepaid-card-customizations', function () {
       port: 3001,
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
+        registry.register('worker-client', StubWorkerClient);
       },
       containerCallback(serverContainer: Container) {
         container = serverContainer;
@@ -110,6 +123,8 @@ describe('POST /api/prepaid-card-customizations', function () {
 
   this.afterEach(async function () {
     server.close();
+    lastAddedJobIdentifier = undefined;
+    lastAddedJobPayload = undefined;
   });
 
   it('without bearer token, in returns a 401', async function () {
@@ -267,7 +282,9 @@ describe('POST /api/prepaid-card-customizations', function () {
     expect(parsed.type).to.eq('PrepaidCardCustomization');
     expect(parsed.version).to.eq(1);
     expect(parsed.uniqueId).to.eq(shortUuid().fromUUID(resourceId!));
-  });
 
-  //TODO intiates S3 storage
+    // expect a persist-off-chain-prepaid-card-customization task to be queued
+    expect(lastAddedJobIdentifier).to.equal('persist-off-chain-prepaid-card-customization');
+    expect(lastAddedJobPayload).to.deep.equal({ id: resourceId! });
+  });
 });

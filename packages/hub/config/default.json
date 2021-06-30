@@ -7,8 +7,11 @@
       },
       "region": "us-east-1"
     },
-    "offchainStorageBucketName": "offchain-storage",
-    "offchainStorageRoleChain": ["prod:storage-bucket-writer-role"],
+    "offchainStorage": {
+      "bucketName": "storage.cardstack.com",
+      "region": "ap-southeast-1",
+      "roleChain": ["prod:storage-bucket-writer-role"]
+    },
     "accountId": "680542703984",
     "prodAccountId": "120317779495"
   },
