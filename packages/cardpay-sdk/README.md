@@ -16,6 +16,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`TokenBridgeHomeSide`](#tokenbridgehomeside)
   - [`TokenBridgeHomeSide.waitForBridgingCompleted`](#tokenbridgehomesidewaitforbridgingcompleted)
 - [`Safes`](#safes)
+  - [`Safe.viewSafe`](#safeviewsafe)
   - [`Safes.view`](#safesview)
   - [`Safes.sendTokens`](#safessendtokens)
   - [`Safes.setSupplierInfoDID`](#safessetsupplierinfodid)
@@ -168,8 +169,20 @@ let web3 = new Web3(myProvider); // Layer 2 web3 instance
 let safes = await getSDK('Safes', web3);
 ```
 
+### `Safe.viewSafe`
+This call is used to view a specific safe in the layer 2 network in which the Card Protocol runs.
+
+This method is invoked with the following parameters:
+  - safe address
+
+This method returns a promise for an object that is a `Safe` type:
+Which can be called like this:
+```js
+let safeDetails = await safes.viewSafe(safeAddress);
+```
+
 ### `Safes.view`
-This call is used to view the gnosis safes owned by a particular address in the layer 2 network in which the Card Protocol runs.
+This call is used to view all the gnosis safes owned by a particular address in the layer 2 network in which the Card Protocol runs.
 
 This method is invoked with the following parameters:
 - Optionally the address of a safe owner. If no address is supplied, then the default account in your web3 provider's wallet will be used.
