@@ -58,12 +58,13 @@ class IssuePrepaidCardWorkflow extends Workflow {
               'service:layer2-network'
             ) as Layer2Network;
 
-            // TODO: replace this with usage of ExchangeRate.convertFromSpend
-            // this will be async
-            let daiMinValue = `${Math.min(...faceValueOptions) / 100}`;
+            let daiMinValue = await layer2Network.convertFromSpend(
+              'DAI',
+              Math.min(...faceValueOptions)
+            );
 
             return !!layer2Network.defaultTokenBalance?.gte(
-              new BN(toWei(daiMinValue))
+              new BN(daiMinValue)
             );
           },
           failureReason: 'INSUFFICIENT_FUNDS',
