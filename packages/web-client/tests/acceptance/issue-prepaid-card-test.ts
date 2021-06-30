@@ -322,7 +322,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
     );
 
     // // preview card
-    // TODO verify and interact with preview card default state
     await click(
       `${postableSel(
         3,
