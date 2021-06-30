@@ -43,9 +43,11 @@
           <CardPay::LabeledValue
             @vertical={{true}}
             @label="Card address"
-            @value={{truncate-middle @workflowSession.state.prepaidCardAddress}}
             data-test-prepaid-card-address-labeled-value
-          />
+          >
+            {{truncate-middle @workflowSession.state.prepaidCardAddress}}<br>
+            on xDai chain {{!-- FIXME when 1768 is merged --}}
+          </CardPay::LabeledValue>
         {{/if}}
 
         <CardPay::LabeledValue
