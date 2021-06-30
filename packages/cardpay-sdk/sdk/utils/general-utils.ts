@@ -14,7 +14,11 @@ export async function networkName(web3: Web3): Promise<string> {
   return name;
 }
 
-export function waitUntilTransactionMined(web3: Web3, txnHash: string, duration = 30000): Promise<TransactionReceipt> {
+export function waitUntilTransactionMined(
+  web3: Web3,
+  txnHash: string,
+  duration = 60 * 5 * 1000
+): Promise<TransactionReceipt> {
   let endTime = Number(new Date()) + duration;
 
   let transactionReceiptAsync = async function (
