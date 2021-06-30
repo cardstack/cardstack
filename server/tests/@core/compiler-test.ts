@@ -99,12 +99,6 @@ Qmodule('Compiler', function (hooks) {
       PERSON_CARD.files['embedded.css'],
       'Styles are defined'
     );
-
-    assert.deepEqual(
-      compiled.embedded.serializerMap,
-      { date: ['birthdate'] },
-      'Embedded component has a deserialization map'
-    );
   });
 
   test('CompiledCard edit view', async function (assert) {
@@ -112,12 +106,6 @@ Qmodule('Compiler', function (hooks) {
     let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
     assert.deepEqual(compiled.edit.usedFields, ['name', 'birthdate']);
-    assert.deepEqual(
-      compiled.edit.serializerMap,
-      { date: ['birthdate'] },
-      'Edit deserialization map still includes birthdate, because it was used as data'
-    );
-    // prettier-ignore
     containsSource(
       builder.definedModules.get(compiled.edit.moduleName),
       '<NameField @model={{@model.name}} @set={{@set.setters.name}} />',
@@ -167,22 +155,12 @@ Qmodule('Compiler', function (hooks) {
       'author.birthdate',
     ]);
 
-    assert.deepEqual(
-      compiled.embedded.serializerMap,
-      { date: ['author.birthdate'] },
-      'Embedded component has a deserialization map'
-    );
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
       `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><BirthdateField @model={{@model.author.birthdate}} /></p></article>`
     );
 
     assert.deepEqual(compiled.isolated.usedFields, ['author']);
-    assert.deepEqual(
-      compiled.isolated.serializerMap,
-      { date: ['author.birthdate'] },
-      'Isolated deserialization map still includes author.birthdate, because it was used as data'
-    );
   });
 
   test('deeply nested cards', async function (assert) {
@@ -258,12 +236,6 @@ Qmodule('Compiler', function (hooks) {
       'posts.createdAt',
     ]);
 
-    assert.deepEqual(
-      compiled.isolated.serializerMap,
-      { date: ['posts.createdAt'] },
-      'Isolated component has a deserialization map'
-    );
-
     containsSource(
       builder.definedModules.get(compiled.isolated.moduleName),
       `{{#each @model.posts as |Post|}}<PostsField @model={{Post}} />{{/each}}`,
@@ -272,10 +244,6 @@ Qmodule('Compiler', function (hooks) {
 
     assert.deepEqual(compiled.embedded.usedFields, ['posts.title']);
 
-    assert.notOk(
-      compiled.embedded.serializerMap,
-      'embedded component has an empty deserialization map'
-    );
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
       `<ul>{{#each @model.posts as |Post|}}<li>{{Post.title}}</li>{{/each}}</ul>`,

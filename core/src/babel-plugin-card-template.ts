@@ -1,51 +1,67 @@
+import { TemplateUsageMeta } from './glimmer-plugin-card-template';
 // import ETC from 'ember-source/dist/ember-template-compiler';
 // const { preprocess, print } = ETC._GlimmerSyntax;
-import { NodePath } from '@babel/core';
-import {
-  CallExpression,
-  ObjectExpression,
-  Program,
-  importDefaultSpecifier,
-  importSpecifier,
-  importDeclaration,
-  stringLiteral,
-  objectProperty,
-  objectExpression,
-  identifier,
-} from '@babel/types';
-import { CompiledCard, Format } from './interfaces';
+
+// @ts-ignore
+import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
+
+import { NodePath, transformSync } from '@babel/core';
+import * as t from '@babel/types';
+
+import { CompiledCard, DeserializerName, Format } from './interfaces';
 
 import { getObjectKey, error } from './utils/babel';
-import glimmerCardTemplateTransform, {
-  TemplateUsageMeta,
-} from './glimmer-plugin-card-template';
-
-export interface Options {
+import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
+import {
+  buildSerializerMapFromUsedFields,
+  buildUsedFieldsListFromUsageMeta,
+} from './utils/fields';
+export interface CardComponentPluginOptions {
   fields: CompiledCard['fields'];
   cardURL: string;
   defaultFieldFormat: Format;
   // these are for gathering output
-  usageMeta: TemplateUsageMeta;
+  usedFields: string[];
   inlineHBS: string | undefined;
 }
 
 interface State {
-  opts: Options;
+  opts: CardComponentPluginOptions;
   insideExportDefault: boolean;
 
   // keys are local names in this module that we have chosen.
   neededImports: Map<string, { moduleSpecifier: string; exportedName: string }>;
 }
 
-export default function main() {
+const BASE_MODEL_VAR_NAME = 'BaseModel';
+
+export default function (
+  templateSource: string,
+  options: CardComponentPluginOptions
+): string {
+  let out = transformSync(templateSource, {
+    plugins: [[babelPluginCardTemplate, options], classPropertiesPlugin],
+  });
+
+  return out!.code!;
+}
+
+export function babelPluginCardTemplate() {
   return {
     visitor: {
       Program: {
         enter(_path: NodePath, state: State) {
           state.insideExportDefault = false;
           state.neededImports = new Map();
+          state.neededImports.set(BASE_MODEL_VAR_NAME, {
+            moduleSpecifier: '@cardstack/core/src/base-component-module',
+            exportedName: 'default',
+          });
         },
-        exit: programExit,
+        exit(path: NodePath<t.Program>, state: State) {
+          addImports(state.neededImports, path);
+          addModelClass(path, state);
+        },
       },
 
       ExportDefaultDeclaration: {
@@ -62,25 +78,76 @@ export default function main() {
   };
 }
 
-function programExit(path: NodePath<Program>, state: State) {
-  for (let [
-    localName,
-    { moduleSpecifier, exportedName },
-  ] of state.neededImports) {
+function addImports(
+  neededImports: State['neededImports'],
+  path: NodePath<t.Program>
+) {
+  for (let [localName, { moduleSpecifier, exportedName }] of neededImports) {
     path.node.body.push(
-      importDeclaration(
+      t.importDeclaration(
         [
           exportedName === 'default'
-            ? importDefaultSpecifier(identifier(localName))
-            : importSpecifier(identifier(localName), identifier(exportedName)),
+            ? t.importDefaultSpecifier(t.identifier(localName))
+            : t.importSpecifier(
+                t.identifier(localName),
+                t.identifier(exportedName)
+              ),
         ],
-        stringLiteral(moduleSpecifier)
+        t.stringLiteral(moduleSpecifier)
       )
     );
   }
 }
 
-function callExpressionEnter(path: NodePath<CallExpression>, state: State) {
+function addModelClass(path: NodePath<t.Program>, state: State) {
+  let serializerMapPropertyDefinition = buildSerializerMapProp(
+    state.opts.fields,
+    state.opts.usedFields
+  );
+  let classBody = t.classBody([serializerMapPropertyDefinition]);
+
+  path.node.body.push(
+    t.exportNamedDeclaration(
+      t.classDeclaration(
+        t.identifier(findVariableName('Model', path, state.neededImports)),
+        t.identifier(BASE_MODEL_VAR_NAME),
+        classBody
+      )
+    )
+  );
+}
+
+function buildSerializerMapProp(
+  fields: CompiledCard['fields'],
+  usedFields: CardComponentPluginOptions['usedFields']
+): t.ClassProperty {
+  let serializerMap = buildSerializerMapFromUsedFields(fields, usedFields);
+  let props: t.ObjectExpression['properties'] = [];
+
+  for (let serializer in serializerMap) {
+    let fieldList = serializerMap[serializer as DeserializerName];
+    if (!fieldList) {
+      continue;
+    }
+
+    let fieldListElements: t.ArrayExpression['elements'] = [];
+    for (let field of fieldList) {
+      fieldListElements.push(t.stringLiteral(field));
+    }
+    props.push(
+      t.objectProperty(
+        t.identifier(serializer),
+        t.arrayExpression(fieldListElements)
+      )
+    );
+  }
+  return t.classProperty(
+    t.identifier('serializerMap'),
+    t.objectExpression(props)
+  );
+}
+
+function callExpressionEnter(path: NodePath<t.CallExpression>, state: State) {
   if (shouldSkipExpression(path, state)) {
     return;
   }
@@ -93,7 +160,7 @@ function callExpressionEnter(path: NodePath<CallExpression>, state: State) {
     state.opts,
     state.neededImports
   );
-  path.node.arguments[0] = stringLiteral(template);
+  path.node.arguments[0] = t.stringLiteral(template);
 
   if (shouldInlineHBS(options, neededScope)) {
     state.opts.inlineHBS = template;
@@ -103,7 +170,7 @@ function callExpressionEnter(path: NodePath<CallExpression>, state: State) {
 }
 
 function shouldSkipExpression(
-  path: NodePath<CallExpression>,
+  path: NodePath<t.CallExpression>,
   state: State
 ): boolean {
   return (
@@ -115,7 +182,7 @@ function shouldSkipExpression(
 }
 
 function shouldInlineHBS(
-  options: NodePath<ObjectExpression>,
+  options: NodePath<t.ObjectExpression>,
   neededScope: Set<string>
 ) {
   // TODO: this also needs to depend on whether they have a backing class other than templateOnlyComponent
@@ -123,8 +190,8 @@ function shouldInlineHBS(
 }
 
 function handleArguments(
-  path: NodePath<CallExpression>
-): { options: NodePath<ObjectExpression>; template: string } {
+  path: NodePath<t.CallExpression>
+): { options: NodePath<t.ObjectExpression>; template: string } {
   let args = path.get('arguments');
   if (args.length < 2) {
     throw error(path, 'precompileTemplate needs two arguments');
@@ -152,8 +219,8 @@ function handleArguments(
 
 function transformTemplate(
   source: string,
-  path: NodePath<CallExpression>,
-  opts: Options,
+  path: NodePath<t.CallExpression>,
+  opts: CardComponentPluginOptions,
   importNames: State['neededImports']
 ): { template: string; neededScope: Set<string> } {
   let neededScope = new Set<string>();
@@ -163,37 +230,51 @@ function transformTemplate(
     moduleSpecifier: string,
     importedName: string
   ): string {
-    let candidate = `${desiredName}Field`;
-    let counter = 0;
-    while (path.scope.getBinding(candidate) || importNames.has(candidate)) {
-      candidate = `${desiredName}${counter++}`;
-    }
-    importNames.set(candidate, {
+    let name = findVariableName(`${desiredName}Field`, path, importNames);
+    importNames.set(name, {
       moduleSpecifier,
       exportedName: importedName,
     });
-    neededScope.add(candidate);
-    return candidate;
+    neededScope.add(name);
+    return name;
   }
+
+  let usageMeta: TemplateUsageMeta = { model: new Set(), fields: new Map() };
 
   let template = glimmerCardTemplateTransform(source, {
     fields: opts.fields,
-    usageMeta: opts.usageMeta,
+    usageMeta,
     defaultFieldFormat: opts.defaultFieldFormat,
     importAndChooseName,
   });
+
+  opts.usedFields = buildUsedFieldsListFromUsageMeta(opts.fields, usageMeta);
+
   return { template, neededScope };
 }
 
+function findVariableName(
+  desiredName: string,
+  path: NodePath<t.CallExpression> | NodePath<t.Program>,
+  importNames: State['neededImports']
+) {
+  let candidate = desiredName;
+  let counter = 0;
+  while (path.scope.getBinding(candidate) || importNames.has(candidate)) {
+    candidate = `${desiredName}${counter++}`;
+  }
+  return candidate;
+}
+
 function updateScope(
-  options: NodePath<ObjectExpression>,
+  options: NodePath<t.ObjectExpression>,
   names: Set<string>
 ): void {
-  let scopeVars: ObjectExpression['properties'] = [];
+  let scopeVars: t.ObjectExpression['properties'] = [];
 
   for (let name of names) {
     scopeVars.push(
-      objectProperty(identifier(name), identifier(name), undefined, true)
+      t.objectProperty(t.identifier(name), t.identifier(name), undefined, true)
     );
   }
 
@@ -203,7 +284,7 @@ function updateScope(
     scope.node.properties = scope.node.properties.concat(scopeVars);
   } else {
     options.node.properties.push(
-      objectProperty(identifier('scope'), objectExpression(scopeVars))
+      t.objectProperty(t.identifier('scope'), t.objectExpression(scopeVars))
     );
   }
 }

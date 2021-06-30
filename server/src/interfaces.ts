@@ -1,8 +1,5 @@
 import type Builder from '../src/builder';
-import type {
-  ComponentInfo,
-  RealmConfig,
-} from '@cardstack/core/src/interfaces';
+import type { RealmConfig } from '@cardstack/core/src/interfaces';
 
 const ENVIRONMENTS_OBJ = {
   browser: '',
@@ -31,7 +28,6 @@ export type cardJSONReponse = {
     attributes?: { [name: string]: any };
     meta: {
       componentModule: string;
-      deserializationMap: ComponentInfo['deserialize'];
     };
   };
 };

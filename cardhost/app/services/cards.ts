@@ -175,7 +175,7 @@ function serializeCard(attrs: Record<string, any>): CardJSONAPIRequest {
   let id = attrs.id;
   delete attrs.id;
 
-  // TODO: Once we remember the deserializationMap, serialize
+  // TODO: Once we remember the serializerMap, serialize
   return {
     data: {
       type: 'card',
@@ -187,13 +187,13 @@ function serializeCard(attrs: Record<string, any>): CardJSONAPIRequest {
 
 function deserializeResponse(response: cardJSONReponse): any {
   // TODO: We need to keep this around
-  let { deserializationMap } = response.data.meta;
+  let { serializerMap } = response.data.meta;
   let attrs = response.data.attributes;
 
-  if (attrs && deserializationMap) {
-    for (const type in deserializationMap) {
+  if (attrs && serializerMap) {
+    for (const type in serializerMap) {
       let serializer = serializers[type as DeserializerName];
-      let paths = deserializationMap[type as DeserializerName];
+      let paths = serializerMap[type as DeserializerName];
 
       for (const path of paths) {
         deserializeAttribute(attrs, path, serializer);

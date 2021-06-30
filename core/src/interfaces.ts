@@ -29,6 +29,7 @@ export type DeserializerName = keyof typeof deserializerTypes;
 export const DESERIALIZER_NAMES = Object.keys(
   deserializerTypes
 ) as DeserializerName[];
+export type SerializerMap = { [key in DeserializerName]?: string[] };
 
 export type CardData = Record<string, any>;
 
@@ -90,7 +91,6 @@ export interface ComponentInfo {
   moduleName: string;
   usedFields: string[]; // ["title", "author.firstName"]
 
-  serializerMap?: { [key in DeserializerName]?: string[] };
   inlineHBS?: string;
   sourceCardURL: string;
 }
@@ -178,12 +178,12 @@ export function assertValidKeys(
   }
 }
 
-export function assertValidDeserializationMap(
+export function assertValidSerializerMap(
   map: any
-): asserts map is ComponentInfo['serializerMap'] {
+): asserts map is SerializerMap {
   let keys = Object.keys(map);
   let diff = difference(keys, DESERIALIZER_NAMES);
   if (diff.length > 0) {
-    throw new Error(`Unexpected deserializer: ${diff.join(',')}`);
+    throw new Error(`Unexpected serializer: ${diff.join(',')}`);
   }
 }

@@ -10,6 +10,8 @@ import HTMLBarsInlinePrecompile from 'babel-plugin-htmlbars-inline-precompile';
 import EmberModulesApiPolyfill from 'babel-plugin-ember-modules-api-polyfill';
 // @ts-ignore
 import TransformModulesAmd from '@babel/plugin-transform-modules-amd';
+// @ts-ignore
+import ClassPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 
 /**
  * Transfrom a compiled card to a runtime card
@@ -51,6 +53,7 @@ function babelConfig(moduleURL: string): TransformOptions {
     plugins.push([EmberModulesApiPolyfill]);
   }
   plugins.push([ColocatedBabelPlugin]);
+  plugins.push([ClassPropertiesPlugin]);
   plugins.push([
     TransformModulesAmd,
     {
