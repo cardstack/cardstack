@@ -15,7 +15,11 @@ import { BridgeableSymbol, TokenContractInfo } from '../token';
 import WalletInfo from '../wallet-info';
 import { WalletProvider } from '../wallet-providers';
 import CustomStorageWalletConnect from '../wc-connector';
-import { Layer1Web3Strategy, TransactionHash, NetworkSymbol } from './types';
+import {
+  Layer1Web3Strategy,
+  TransactionHash,
+  Layer1NetworkSymbol,
+} from './types';
 import {
   getConstantByNetwork,
   getSDK,
@@ -29,7 +33,7 @@ export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy {
   chainName: string;
   chainId: number;
-  networkSymbol: NetworkSymbol;
+  networkSymbol: Layer1NetworkSymbol;
   web3 = new Web3();
   provider: any | undefined;
   broadcastChannel: BroadcastChannel;
@@ -45,7 +49,7 @@ export default abstract class Layer1ChainWeb3Strategy
   @tracked cardBalance: BN | undefined;
   @tracked walletInfo: WalletInfo;
 
-  constructor(networkSymbol: NetworkSymbol) {
+  constructor(networkSymbol: Layer1NetworkSymbol) {
     this.chainName = networkDisplayInfo[networkSymbol].fullName;
     this.chainId = networkIds[networkSymbol];
     this.walletInfo = new WalletInfo([], this.chainId);
@@ -104,7 +108,7 @@ export default abstract class Layer1ChainWeb3Strategy
 
   private getTokenContractInfo(
     symbol: BridgeableSymbol,
-    network: NetworkSymbol
+    network: Layer1NetworkSymbol
   ): TokenContractInfo {
     return new TokenContractInfo(symbol, network);
   }

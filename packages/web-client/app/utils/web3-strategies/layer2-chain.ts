@@ -20,7 +20,7 @@ import {
   ChainAddress,
   Layer2Web3Strategy,
   TransactionHash,
-  NetworkSymbol,
+  Layer2NetworkSymbol,
 } from './types';
 import {
   networkIds,
@@ -42,7 +42,7 @@ export default abstract class Layer2ChainWeb3Strategy
   implements Layer2Web3Strategy {
   chainName: string;
   chainId: number;
-  networkSymbol: NetworkSymbol;
+  networkSymbol: Layer2NetworkSymbol;
   provider: WalletConnectProvider | undefined;
   simpleEmitter = new SimpleEmitter();
   defaultTokenSymbol: ConvertibleSymbol = 'DAI';
@@ -64,7 +64,7 @@ export default abstract class Layer2ChainWeb3Strategy
     return taskFor(this.fetchDepotTask).isRunning;
   }
 
-  constructor(networkSymbol: NetworkSymbol) {
+  constructor(networkSymbol: Layer2NetworkSymbol) {
     this.chainName = networkDisplayInfo[networkSymbol].fullName;
     this.chainId = networkIds[networkSymbol];
     this.networkSymbol = networkSymbol;

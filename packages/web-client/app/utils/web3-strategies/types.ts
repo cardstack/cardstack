@@ -61,4 +61,9 @@ export interface Layer2Web3Strategy extends Web3Strategy {
 
 export type TransactionHash = string;
 export type ChainAddress = string;
-export type NetworkSymbol = 'kovan' | 'sokol' | 'mainnet' | 'xdai';
+
+export type Layer1NetworkSymbol = 'kovan' | 'mainnet';
+export type TestLayer1NetworkSymbol = 'test-layer1';
+export type Layer2NetworkSymbol = 'xdai' | 'sokol';
+export type TestLayer2NetworkSymbol = 'test-layer2';
+export type NetworkSymbol = Layer1NetworkSymbol | Layer2NetworkSymbol;
