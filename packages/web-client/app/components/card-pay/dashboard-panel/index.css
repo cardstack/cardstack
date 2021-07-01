@@ -1,19 +1,86 @@
-.dashboard-panel {
+.dashboard-details-container {
   --spacing: calc(var(--boxel-sp-xxxl) * var(--boxel-ratio));
-  /* --section-min-width: 26rem; */
-
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  /* repeat(auto-fill, minmax(var(--section-min-width), 1fr)); */
-  gap: var(--spacing);
-  padding: var(--spacing);
+  position: relative;
+  max-width: 72rem;
+  margin: 0 auto;
   color: var(--boxel-dark);
   background-color: var(--boxel-light-400);
   border-radius: var(--boxel-border-radius);
+  overflow: hidden;
+}
+
+.dashboard-details-container__summary {
+  height: 5rem;
+}
+
+.dashboard-details-container[open] .dashboard-details-container__summary {
+  height: 1.25rem;
+  background-color: var(--boxel-green);
+}
+
+.dashboard-details-container[open] .dashboard-details-container__summary + * {
+  margin-top: -1.25rem;
+}
+
+.dashboard-details-container__summary::marker,
+.dashboard-details-container__summary::-webkit-details-marker {
+  display: none;
+  content: '';
+}
+
+.dashboard-details-container__marker::before {
+  display: block;
+  content: "Show details";
+}
+
+.dashboard-details-container[open] .dashboard-details-container__marker::before {
+  content: "Hide details";
+}
+
+.dashboard-details-container__marker {
+  position: absolute;
+  padding: var(--boxel-sp-sm);
+  right: 0;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-sm);
+  z-index: 1;
+}
+
+.dashboard-details-container[open] .dashboard-details-container__marker {
+  top: initial;
+  bottom: 0;
+}
+
+.dashboard-details-container__marker-icon {
+  margin-left: var(--boxel-sp-xs);
+  transform: rotate(90deg);
+}
+
+.dashboard-details-container[open] .dashboard-details-container__marker-icon {
+  transform: rotate(-90deg);
+}
+
+
+.dashboard-panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing);
+  padding: var(--spacing);
+
+  background-image: url('/images/dashboard/balances-hero-sm.svg');
+  background-position: top right;
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .dashboard-panel__header {
   grid-column: 1 / -1;
+  max-width: 28rem;
 }
 
 .dashboard-panel__header-title {

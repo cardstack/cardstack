@@ -1,14 +1,16 @@
-{{!-- <details open ...attributes>
-  <summary>
-
+<details open class="dashboard-details-container" ...attributes>
+  <summary class="dashboard-details-container__summary">
+    <div class="dashboard-details-container__marker">
+      {{svg-jar "caret-right" class="dashboard-details-container__marker-icon" role="presentation"}}
+    </div>
   </summary>
-</details> --}}
-  <section class="dashboard-panel" ...attributes>
+  <section class="dashboard-panel">
     <header class="dashboard-panel__header">
       <h3 class="dashboard-panel__header-title">Easy Payments</h3>
       <p class="dashboard-panel__header-desc">DeFi payments that are fast, easy and cheap for everyone</p>
     </header>
     <section class="dashboard-panel__section">
+      {{svg-jar "balances-1-customers" width="80" height="80"}}
       <h4 class="dashboard-panel__section-title">Customers</h4>
       <p>You need a prepaid card to pay for products and services offered by merchants in the Card Pay network. To start, you can buy a prepaid card via Apple Pay in the Card Wallet mobile app.</p>
       <ul class="dashboard-panel__list">
@@ -17,11 +19,12 @@
         <li>Reload your prepaid card at any time</li>
         <li>Earn rewards for the purchases you make</li>
       </ul>
-      <Boxel::Button class="dashboard-panel__cta" @kind="primary" @size="touch">
+      <Boxel::Button class="dashboard-panel__cta" @kind="primary" @size="touch" @disabled={{true}}>
         Buy Prepaid Card
       </Boxel::Button>
     </section>
     <section class="dashboard-panel__section">
+      {{svg-jar "balances-2-issuers" width="80" height="80"}}
       <h4 class="dashboard-panel__section-title">Issuers</h4>
       <p>You can issue prepaid cards yourself, which you can use for purchases in the network or transfer to other users.</p>
       <ul class="dashboard-panel__list">
@@ -38,4 +41,4 @@
       </small>
     </section>
   </section>
-
+</details>
