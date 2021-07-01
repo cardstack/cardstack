@@ -73,7 +73,9 @@ type PrepaidCardPayment @entity {
   timestamp: BigInt!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
+  prepaidCardOwner: Account!
   merchantSafe: MerchantSafe   # for merchant registration this will not be set
+  merchant: Account
   issuingToken: Token!
   issuingTokenAmount: BigInt!
   spendAmount: BigInt!
