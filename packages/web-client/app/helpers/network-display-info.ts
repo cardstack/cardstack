@@ -1,12 +1,16 @@
 import { helper } from '@ember/component/helper';
 import {
   currentNetworkDisplayInfo,
-  Layer,
   NetworkCopywriting,
 } from '../utils/web3-strategies/network-display-info';
 
 export function networkDisplayInfo(
-  [layer, key]: [Layer, keyof NetworkCopywriting] /*, hash*/
+  [layer, key]: [
+    keyof typeof currentNetworkDisplayInfo,
+    // this typing is not correct. it should have accommodations for the 2 different network copywriting types
+    // but i'm not very sure how to do this
+    keyof NetworkCopywriting
+  ] /*, hash*/
 ) {
   let networkInfo = currentNetworkDisplayInfo[layer];
   if (!networkInfo) {
