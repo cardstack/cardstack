@@ -50,9 +50,11 @@ module('Unit | WorkflowCard model', function (hooks) {
     let subject = new WorkflowCard({
       author: participant,
       componentName: 'foo/bar',
-      failureReason: 'TEST',
       async check() {
-        return false;
+        return {
+          success: false,
+          reason: 'TEST',
+        };
       },
     });
 

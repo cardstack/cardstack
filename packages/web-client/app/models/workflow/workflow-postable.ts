@@ -20,7 +20,6 @@ export class WorkflowPostable {
     this.includeIf = includeIf;
   }
   includeIf: (() => boolean) | undefined;
-  check: (() => Promise<boolean>) | undefined;
   reset: (() => void) | undefined;
   failureReason: string | undefined;
 }
