@@ -29,12 +29,16 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     let token = new this.layer1Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let foreignBridge = await getAddress('foreignBridge', this.layer1Web3);
 
-    return await new Promise((resolve) => {
+    return await new Promise((resolve, reject) => {
       token.methods
         .approve(foreignBridge, amount)
         .send({ ...options, from })
         .on('transactionHash', async (txnHash: string) => {
-          resolve(await waitUntilTransactionMined(this.layer1Web3, txnHash));
+          try {
+            resolve(await waitUntilTransactionMined(this.layer1Web3, txnHash));
+          } catch (e) {
+            reject(e);
+          }
         });
     });
   }
@@ -51,12 +55,16 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
       await getAddress('foreignBridge', this.layer1Web3)
     );
 
-    return await new Promise((resolve) => {
+    return await new Promise((resolve, reject) => {
       foreignBridge.methods
         .relayTokens(tokenAddress, recipientAddress, amount)
         .send({ ...options, from })
         .on('transactionHash', async (txnHash: string) => {
-          resolve(await waitUntilTransactionMined(this.layer1Web3, txnHash));
+          try {
+            resolve(await waitUntilTransactionMined(this.layer1Web3, txnHash));
+          } catch (e) {
+            reject(e);
+          }
         });
     });
   }
