@@ -25,6 +25,7 @@
           @label="Account"
           @value={{this.layer2Network.walletInfo.firstAddress}}
           @isAddress={{true}}
+          data-test-address-field
         />
         <CardPay::LabeledValue @label="Depot balance" data-test-balance-container>
           {{#if this.layer2Network.isFetchingDepot}}
