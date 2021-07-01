@@ -76,7 +76,7 @@
   >
     <:default as |d|>
       <d.ActionButton
-        {{on "click" this.issue}}
+        {{on "click" (perform this.issueTask)}}
       >
         Continue
       </d.ActionButton>

@@ -3,6 +3,8 @@ import config from '../config/environment';
 import { all, task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
+import HubAuthentication from './hub-authentication';
 
 export interface ColorCustomizationOption {
   background: string;
@@ -16,6 +18,10 @@ export interface PatternCustomizationOption {
   patternUrl: string | null;
   id: string;
   description?: string;
+}
+
+export interface PrepaidCardCustomization {
+  did: string;
 }
 
 interface ColorCustomizationResponseObject {
@@ -59,7 +65,14 @@ let convertToPatternCustomizationOption = (
   };
 };
 
-export default class CardCustomizationOptions extends Service {
+interface CreateCustomizationTaskParams {
+  issuerName: string;
+  colorSchemeId: string;
+  patternId: string;
+}
+
+export default class CardCustomization extends Service {
+  @service declare hubAuthentication: HubAuthentication;
   @tracked loaded = false;
   @tracked patternOptions: PatternCustomizationOption[] | null = [];
   @tracked colorSchemeOptions: ColorCustomizationOption[] | null = [];
@@ -139,11 +152,52 @@ export default class CardCustomizationOptions extends Service {
       this.loaded = false;
     }
   }
+
+  @task *createCustomizationTask(
+    params: CreateCustomizationTaskParams
+  ): PrepaidCardCustomization {
+    let response = yield fetch(
+      `${config.hubURL}/api/prepaid-card-customizations`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer: ' + this.hubAuthentication.authToken,
+          Accept: 'application/vnd.api+json',
+        },
+        body: JSON.stringify({
+          data: {
+            type: 'prepaid-card-customizations',
+            attributes: {
+              'issuer-name': params.issuerName,
+            },
+            relationships: {
+              'color-scheme': {
+                data: {
+                  type: 'prepaid-card-color-schemes',
+                  id: params.colorSchemeId,
+                },
+              },
+              pattern: {
+                data: {
+                  type: 'prepaid-card-patterns',
+                  id: params.patternId,
+                },
+              },
+            },
+          },
+        }),
+      }
+    );
+    let customization = yield response.json();
+    return {
+      did: customization.data.attributes.did,
+    };
+  }
 }
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.
 declare module '@ember/service' {
   interface Registry {
-    'card-customization-options': CardCustomizationOptions;
+    'card-customization': CardCustomization;
   }
 }
