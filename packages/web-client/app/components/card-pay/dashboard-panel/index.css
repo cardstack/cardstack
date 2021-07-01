@@ -93,59 +93,8 @@
   right: 0;
   width: 100%;
   height: 21rem;
-  background-image: url('/images/dashboard/balances-hero-sm.svg');
+  /* background-image: url('/images/dashboard/balances-hero-sm.svg'); */
   background-position: top right;
   background-repeat: no-repeat;
   background-size: contain;
-}
-
-.dashboard-panel__section {
-  letter-spacing: var(--boxel-lsp-sm);
-}
-
-.dashboard-panel__section:nth-child(even) {
-  border-left: 1px solid var(--border-color);
-  margin-left: var(--spacing);
-  padding-left: var(--spacing);
-}
-
-.dashboard-panel__section-title {
-  margin-bottom: var(--boxel-sp-xxxs);
-  font-size: 1.25rem;
-}
-
-.dashboard-panel__list {
-  list-style-type: disc;
-  margin-top: var(--boxel-sp-xl);
-  padding-left: var(--boxel-sp-lg);
-  color: var(--boxel-purple-500);
-  font: var(--boxel-font-sm);
-}
-
-.dashboard-panel__list li + li {
-  margin-top: var(--boxel-sp);
-}
-
-.dashboard-panel__list li::marker {
-  color: var(--boxel-dark);
-}
-
-.dashboard-panel__cta {
-  width: 100%;
-  max-width: 26rem;
-  margin-top: var(--boxel-sp-xxl);
-}
-
-.dashboard-panel__note {
-  display: block;
-  margin-top: var(--boxel-sp);
-  font-size: var(--boxel-font-size-xs);
-  line-height: 1.8;
-  letter-spacing: var(--boxel-lsp);
-  color: var(--boxel-purple-500);
-}
-
-/* tab section */
-.card-pay-dashboard__section {
-  padding: var(--boxel-sp-xxl) var(--boxel-sp-xl);
 }

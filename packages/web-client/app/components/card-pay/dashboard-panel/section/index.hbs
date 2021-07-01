@@ -1,0 +1,8 @@
+<section class="dashboard-panel__section">
+  {{#if @icon}}
+    {{svg-jar @icon width="80" height="80"}}
+  {{/if}}
+  <h4 class="dashboard-panel__section-title">{{@sectionTitle}}</h4>
+  <p>{{@sectionDescription}}</p>
+  {{yield}}
+</section>
