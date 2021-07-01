@@ -13,15 +13,15 @@ export default class CardContainer extends Component<CardContainerArgs> {
   @inject declare modal: ModalService;
 
   get cardURL(): string {
-    return this.args.card.data.id;
+    return this.args.card.model.url;
   }
 
   @action async editCard(): Promise<void> {
-    let { data } = this.args.card;
-    let newData = await this.modal.openWithCard.perform(this.cardURL, 'edit');
-    // TODO: THIS IS GROSSSS
-    for (const key in newData) {
-      set(data, key, newData[key]);
+    let data = this.args.card.model.data;
+    let model = await this.modal.openWithCard.perform(this.cardURL, 'edit');
+    // TODO: THIS IS GROSSSS. Why does this even work?
+    for (const key in model.data) {
+      set(data, key, model.data[key]);
     }
   }
 }

@@ -18,7 +18,8 @@
     "node": ">= 15"
   },
   "dependencies": {
-    "@glimmer/component": "^1.0.3"
+    "@glimmer/component": "^1.0.3",
+    "@cardstack/core": "0.0.0"
   },
   "ember-addon": {
     "version": 2,

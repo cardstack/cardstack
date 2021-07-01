@@ -21,17 +21,19 @@ export const FEATURE_NAMES = Object.keys(featureNamesMap).concat(
   FORMATS
 ) as FeatureFile[];
 
-const deserializerTypes = {
+const serializerTypes = {
   date: '',
   datetime: '',
 };
-export type DeserializerName = keyof typeof deserializerTypes;
-export const DESERIALIZER_NAMES = Object.keys(
-  deserializerTypes
-) as DeserializerName[];
-export type SerializerMap = { [key in DeserializerName]?: string[] };
+export type SerializerName = keyof typeof serializerTypes;
+export const SERIALIZER_NAMES = Object.keys(
+  serializerTypes
+) as SerializerName[];
+export type SerializerMap = { [key in SerializerName]?: string[] };
 
 export type CardData = Record<string, any>;
+
+export type Setter = (value: any) => void;
 
 /* Card type IDEAS
   primitive: 
@@ -54,7 +56,7 @@ export type RawCard = {
   edit?: string;
 
   containsRoutes?: boolean;
-  deserializer?: DeserializerName;
+  deserializer?: SerializerName;
 
   // url to the card we adopted from
   adoptsFrom?: string;
@@ -80,7 +82,7 @@ export interface CompiledCard {
   };
   schemaModule: string;
   // TODO: This is confusingly named. Maybe it's should be serializerName
-  deserializer?: DeserializerName;
+  deserializer?: SerializerName;
 
   isolated: ComponentInfo;
   embedded: ComponentInfo;
@@ -104,6 +106,17 @@ export interface RealmConfig {
   url: string;
   directory: string;
 }
+
+export type cardJSONReponse = {
+  data: {
+    id: string;
+    type: string;
+    attributes?: { [name: string]: any };
+    meta: {
+      componentModule: string;
+    };
+  };
+};
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (obj == null) {
@@ -182,7 +195,7 @@ export function assertValidSerializerMap(
   map: any
 ): asserts map is SerializerMap {
   let keys = Object.keys(map);
-  let diff = difference(keys, DESERIALIZER_NAMES);
+  let diff = difference(keys, SERIALIZER_NAMES);
   if (diff.length > 0) {
     throw new Error(`Unexpected serializer: ${diff.join(',')}`);
   }

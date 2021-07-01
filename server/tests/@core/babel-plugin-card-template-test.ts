@@ -99,7 +99,7 @@ QUnit.module('Babel CardTemplatePlugin', function (hooks) {
     containsSource(
       code,
       // eslint-disable-next-line no-useless-escape
-      `import BaseModel from \"@cardstack/core/src/base-component-module\";`
+      `import BaseModel from \"@cardstack/core/src/base-component-model\";`
     );
     containsSource(
       code,

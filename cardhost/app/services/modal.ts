@@ -59,7 +59,7 @@ export default class Modal extends Service {
     }
     let model = await this.cards.save(
       this.state.url,
-      this.state.loadedCard.data
+      this.state.loadedCard.model
     );
     this.state.resolve(model);
     this.close();

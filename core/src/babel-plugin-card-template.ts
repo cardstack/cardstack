@@ -8,7 +8,7 @@ import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 import { NodePath, transformSync } from '@babel/core';
 import * as t from '@babel/types';
 
-import { CompiledCard, DeserializerName, Format } from './interfaces';
+import { CompiledCard, SerializerName, Format } from './interfaces';
 
 import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
@@ -54,7 +54,7 @@ export function babelPluginCardTemplate() {
           state.insideExportDefault = false;
           state.neededImports = new Map();
           state.neededImports.set(BASE_MODEL_VAR_NAME, {
-            moduleSpecifier: '@cardstack/core/src/base-component-module',
+            moduleSpecifier: '@cardstack/core/src/base-component-model',
             exportedName: 'default',
           });
         },
@@ -125,7 +125,7 @@ function buildSerializerMapProp(
   let props: t.ObjectExpression['properties'] = [];
 
   for (let serializer in serializerMap) {
-    let fieldList = serializerMap[serializer as DeserializerName];
+    let fieldList = serializerMap[serializer as SerializerName];
     if (!fieldList) {
       continue;
     }

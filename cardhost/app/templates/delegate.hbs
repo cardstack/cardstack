@@ -1,5 +1,6 @@
 <CardContainer
-  @editAction={{open-card-in-modal @model.data.id format='edit'}}
+  @card={{@model}}
+  @editable={{true}}
 >
   <@model.component />
 </CardContainer>

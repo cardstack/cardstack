@@ -1,5 +1,4 @@
 import Service from '@ember/service';
-import { set } from '@ember/object';
 import { macroCondition, isTesting } from '@embroider/macros';
 import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
@@ -7,29 +6,15 @@ import { setComponentTemplate } from '@ember/component';
 import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 
-import { Format, DeserializerName } from '@cardstack/core/src/interfaces';
-import { cardJSONReponse } from '@cardstack/server/src/interfaces';
-import serializers, {
-  PrimitiveSerializer,
-} from '@cardstack/core/src/serializers';
+import { Format, cardJSONReponse } from '@cardstack/core/src/interfaces';
+import type ComponentModel from '@cardstack/core/src/base-component-model';
 import config from 'cardhost/config/environment';
-
-interface CardJSONAPIRequest {
-  data: {
-    type: 'card';
-    id: any;
-    attributes: any;
-  };
-}
-
-type Setter = (value: any) => void;
 
 const { cardServer } = config as any; // Environment types arent working
 
 export interface LoadedCard {
-  data: any;
+  model: ComponentModel;
   component: unknown;
-  setters: Setter;
 }
 
 function buildURL(url: string, format?: Format): string {
@@ -52,100 +37,77 @@ export default class Cards extends Service {
 
   @task private internalLoad = taskFor(
     async (url: string): Promise<LoadedCard> => {
-      let card = await fetchCard(url);
-      let data = await deserializeResponse(card);
+      let cardResponse = await fetchCard(url);
+      let { component, model } = await loadComponentModule(cardResponse, url);
 
-      let setters = makeSetter((segments, value) => {
-        set(data, segments.join('.'), value);
-      });
-
-      let cardComponent = await loadComponentModule(
-        card.data.meta.componentModule,
-        url
-      );
-
-      // TODO: @set should be conditional?
       let CallerComponent = setComponentTemplate(
-        hbs`<this.card @model={{this.model}} @set={{this.setters}} />`,
+        hbs`<this.card @model={{this.model.data}} @set={{this.model.setters}} />`,
         class extends Component {
-          model = data;
-          card = cardComponent;
-          setters = setters;
+          model = model;
+          card = component;
         }
       );
 
       return {
-        data,
+        model,
         component: CallerComponent,
-        setters,
       };
     }
   );
 
-  async save(cardURL: string, data: unknown): Promise<void> {
-    return this.saveTask.perform(cardURL, data);
+  async save(cardURL: string, model: ComponentModel): Promise<ComponentModel> {
+    return this.saveTask.perform(cardURL, model);
   }
 
   @task saveTask = taskFor(
-    async (cardURL: string, data: any): Promise<void> => {
+    async (cardURL: string, model: ComponentModel): Promise<ComponentModel> => {
       let response = await fetchCard(buildURL(cardURL), {
         method: 'PATCH',
-        body: JSON.stringify(serializeCard(data)),
+        body: JSON.stringify(model.serialize()),
       });
-      let model = await deserializeResponse(response);
+      model.updateFromResponse(response);
       return model;
     }
   );
 }
 
 async function loadComponentModule(
-  componentModule: string,
+  card: cardJSONReponse,
   url: string
-): Promise<unknown> {
-  let cardComponent: unknown;
+): Promise<{ component: unknown; model: ComponentModel }> {
+  let componentModuleName = card.data.meta.componentModule;
+  let component: unknown;
+  let ModelClass: typeof ComponentModel;
 
   if (macroCondition(isTesting())) {
     // in tests, our fake server inside mirage just defines these modules
     // dynamically
-    cardComponent = window.require(componentModule)['default'];
+    let cardComponentModule = window.require(componentModuleName);
+    component = cardComponentModule['default'];
+    ModelClass = cardComponentModule['Model'];
   } else {
-    if (!componentModule.startsWith('@cardstack/compiled/')) {
+    if (!componentModuleName.startsWith('@cardstack/compiled/')) {
       throw new Error(
         `${url}'s meta.componentModule does not start with '@cardstack/compiled/`
       );
     }
-    componentModule = componentModule.replace('@cardstack/compiled/', '');
-    cardComponent = (
-      await import(
-        /* webpackExclude: /schema\.js$/ */
-        `@cardstack/compiled/${componentModule}`
-      )
-    ).default;
+    componentModuleName = componentModuleName.replace(
+      '@cardstack/compiled/',
+      ''
+    );
+    let cardComponentModule = await import(
+      /* webpackExclude: /schema\.js$/ */
+      `@cardstack/compiled/${componentModuleName}`
+    );
+
+    component = cardComponentModule.default;
+    ModelClass = cardComponentModule.Model;
   }
-  return cardComponent;
-}
 
-function makeSetter(
-  callback: (segments: string[], value: any) => void,
-  segments: string[] = []
-): Setter {
-  let s = (value: any) => {
-    callback(segments, value);
+  return {
+    component,
+    model: new ModelClass(card),
   };
-  (s as any).setters = new Proxy(
-    {},
-    {
-      get: (target: object, prop: string, receiver: unknown) => {
-        if (typeof prop === 'string') {
-          return makeSetter(callback, [...segments, prop]);
-        } else {
-          return Reflect.get(target, prop, receiver);
-        }
-      },
-    }
-  );
-
-  return s;
 }
 
 async function fetchCard(
@@ -168,65 +130,4 @@ async function fetchCard(
   }
 
   return await response.json();
-}
-
-// Eventual TODO: Full serialization?
-function serializeCard(attrs: Record<string, any>): CardJSONAPIRequest {
-  let id = attrs.id;
-  delete attrs.id;
-
-  // TODO: Once we remember the serializerMap, serialize
-  return {
-    data: {
-      type: 'card',
-      id,
-      attributes: attrs,
-    },
-  };
-}
-
-function deserializeResponse(response: cardJSONReponse): any {
-  // TODO: We need to keep this around
-  let { serializerMap } = response.data.meta;
-  let attrs = response.data.attributes;
-
-  if (attrs && serializerMap) {
-    for (const type in serializerMap) {
-      let serializer = serializers[type as DeserializerName];
-      let paths = serializerMap[type as DeserializerName];
-
-      for (const path of paths) {
-        deserializeAttribute(attrs, path, serializer);
-      }
-    }
-  }
-
-  let model = Object.assign({ id: response.data.id }, attrs);
-
-  return model;
-}
-
-function deserializeAttribute(
-  attrs: { [name: string]: any },
-  path: string,
-  serializer: PrimitiveSerializer
-) {
-  let [key, ...tail] = path.split('.');
-  let value = attrs[key];
-  if (!value) {
-    return;
-  }
-
-  if (tail.length) {
-    let tailPath = tail.join('.');
-    if (Array.isArray(value)) {
-      for (let row of value) {
-        deserializeAttribute(row, tailPath, serializer);
-      }
-    } else {
-      deserializeAttribute(attrs[key], tailPath, serializer);
-    }
-  } else {
-    attrs[path] = serializer.deserialize(value);
-  }
 }

@@ -1,5 +1,8 @@
-import type { cardJSONReponse } from '@cardstack/server/src/interfaces';
-import type { CompiledCard, Format } from '@cardstack/core/src/interfaces';
+import type {
+  CompiledCard,
+  Format,
+  cardJSONReponse,
+} from '@cardstack/core/src/interfaces';
 import { Serializer } from 'jsonapi-serializer';
 import _mapKeys from 'lodash/mapKeys';
 import _camelCase from 'lodash/camelCase';
@@ -10,9 +13,9 @@ export async function serializeCard(
 ): Promise<cardJSONReponse> {
   let cardSerializer = new Serializer('card', {
     attributes: card[format].usedFields,
+    keyForAttribute: 'camelCase',
     dataMeta: {
       componentModule: card[format].moduleName,
-      serializerMap: card[format].serializerMap,
     },
   });
   let data = Object.assign({ id: card.url }, card.data);
