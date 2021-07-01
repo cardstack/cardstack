@@ -1,8 +1,10 @@
 .dashboard-panel {
   --spacing: calc(var(--boxel-sp-xxxl) * var(--boxel-ratio));
+  /* --section-min-width: 26rem; */
 
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(30rem, 1fr));
+  grid-template-columns: 1fr 1fr;
+  /* repeat(auto-fill, minmax(var(--section-min-width), 1fr)); */
   gap: var(--spacing);
   padding: var(--spacing);
   color: var(--boxel-dark);
@@ -14,15 +16,55 @@
   grid-column: 1 / -1;
 }
 
+.dashboard-panel__header-title {
+  font-size: 3.125rem;
+  font-weight: 600;
+}
+
+.dashboard-panel__header-desc {
+  font-size: 1.25rem;
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
 .dashboard-panel__section {
-  /* padding: var(--boxel-sp); */
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.dashboard-panel__section-title {
+  margin-bottom: var(--boxel-sp-xxxs);
+  font-size: 1.25rem;
 }
 
 .dashboard-panel__list {
   list-style-type: disc;
+  margin-top: var(--boxel-sp-xl);
   padding-left: var(--boxel-sp-lg);
+  color: var(--boxel-purple-500);
+  font: var(--boxel-font-sm);
 }
 
+.dashboard-panel__list li + li {
+  margin-top: var(--boxel-sp);
+}
+
+.dashboard-panel__list li::marker {
+  color: var(--boxel-dark);
+}
+
+.dashboard-panel__cta {
+  width: 100%;
+  max-width: 26rem;
+  margin-top: var(--boxel-sp-xxl);
+}
+
+.dashboard-panel__note {
+  display: block;
+  margin-top: var(--boxel-sp);
+  font-size: var(--boxel-font-size-xs);
+  line-height: 1.8;
+  letter-spacing: var(--boxel-lsp);
+  color: var(--boxel-purple-500);
+}
 
 /* tab section */
 .card-pay-dashboard__section {
