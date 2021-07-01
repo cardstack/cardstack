@@ -67,10 +67,15 @@ export default class Layer2Network extends Service {
     return await this.strategy.convertFromSpend(symbol, amount);
   }
 
-  @task *issuePrepaidCard(faceValue: number): any {
+  authenticate(): Promise<string> {
+    return this.strategy.authenticate();
+  }
+
+  @task *issuePrepaidCard(faceValue: number, customizationDid: string): any {
     let address = yield this.strategy.issuePrepaidCard(
       this.depotSafe?.address || 'FIXME',
-      faceValue
+      faceValue,
+      customizationDid
     );
     return address;
   }

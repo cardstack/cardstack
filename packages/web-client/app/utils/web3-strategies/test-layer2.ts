@@ -101,16 +101,24 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   async issuePrepaidCard(
     _safeAddress: string,
-    faceValue: number
+    faceValue: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _customizationDID: string
   ): Promise<String> {
     let deferred: RSVP.Deferred<String> = defer();
     this.issuePrepaidCardDeferredForNumber.set(faceValue, deferred);
     return deferred.promise;
   }
 
+  authenticate(): Promise<string> {
+    this.test__deferredHubAuthentication = defer();
+    return this.test__deferredHubAuthentication.promise;
+  }
+
   test__lastSymbolsToUpdate: ConvertibleSymbol[] = [];
   test__simulatedExchangeRate: number = 0.2;
   test__updateUsdConvertersDeferred: RSVP.Deferred<void> | undefined;
+  test__deferredHubAuthentication!: RSVP.Deferred<string>;
 
   test__simulateWalletConnectUri() {
     this.walletConnectUri = 'This is a test of Layer2 Wallet Connect';
@@ -145,7 +153,6 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.depotSafe = null;
   }
 
-<<<<<<< HEAD
   test__simulateConvertFromSpend(symbol: ConvertibleSymbol, amount: number) {
     let spendToDaiSimRate = 0.01;
     if (symbol === 'DAI') {
@@ -155,9 +162,6 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     }
   }
 
-  test__simulateIssuePrepaidCard(walletAddress: string) {
-    return this.issuePrepaidCardDeferred.resolve(walletAddress);
-=======
   test__simulateIssuePrepaidCardForAmount(
     faceValue: number,
     walletAddress: string
@@ -165,6 +169,9 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return this.issuePrepaidCardDeferredForNumber
       .get(faceValue)
       ?.resolve(walletAddress);
->>>>>>> cba1bb26c (Update call to actually use chosen value)
+  }
+
+  test__simulateHubAuthentication(authToken: string) {
+    return this.test__deferredHubAuthentication.resolve(authToken);
   }
 }

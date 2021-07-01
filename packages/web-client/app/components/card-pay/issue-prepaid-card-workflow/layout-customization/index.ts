@@ -5,17 +5,17 @@ import { inject as service } from '@ember/service';
 import {
   ColorCustomizationOption,
   PatternCustomizationOption,
-  default as CardCustomizationOptionsService,
-} from '@cardstack/web-client/services/card-customization-options';
+  default as CardCustomizationService,
+} from '@cardstack/web-client/services/card-customization';
 import { reads } from 'macro-decorators';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
 export default class LayoutCustomizationCard extends Component<WorkflowCardComponentArgs> {
-  @service('card-customization-options')
-  declare cardCustomizationOptionsService: CardCustomizationOptionsService;
-  @reads('cardCustomizationOptionsService.colorSchemeOptions')
+  @service('card-customization')
+  declare cardCustomizationService: CardCustomizationService;
+  @reads('cardCustomizationService.colorSchemeOptions')
   declare colorSchemeOptions: ColorCustomizationOption[];
-  @reads('cardCustomizationOptionsService.patternOptions')
+  @reads('cardCustomizationService.patternOptions')
   declare patternOptions: PatternCustomizationOption[];
   @tracked colorScheme: ColorCustomizationOption | undefined;
   @tracked pattern: PatternCustomizationOption | undefined;
@@ -25,7 +25,7 @@ export default class LayoutCustomizationCard extends Component<WorkflowCardCompo
 
   constructor(owner: unknown, args: any) {
     super(owner, args);
-    this.cardCustomizationOptionsService
+    this.cardCustomizationService
       .ensureCustomizationOptionsLoaded()
       .then(() => {
         this.colorScheme = this.colorSchemeOptions[0];

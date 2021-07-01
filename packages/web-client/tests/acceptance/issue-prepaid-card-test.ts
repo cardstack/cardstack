@@ -12,9 +12,12 @@ import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { toBN } from 'web3-utils';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { encodeDID } from '@cardstack/did-resolver';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
+import { Response as MirageResponse } from 'ember-cli-mirage';
+import { timeout } from 'ember-concurrency';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -322,6 +325,62 @@ module('Acceptance | issue prepaid card', function (hooks) {
       )} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
     );
 
+    let prepaidCardCustomizationId = '75218c05-3899-46d6-b431-e7237ba293ca';
+    let did = encodeDID({
+      type: 'PrepaidCardCustomization',
+      uniqueId: prepaidCardCustomizationId,
+      version: 1,
+    });
+    // simulate POST /api/prepaid-card-customizations to persist customizations and return DID
+    this.server.post('/prepaid-card-customizations', (_schema, request) => {
+      assert.equal(
+        request.requestHeaders['authorization'],
+        'Bearer: abc123--def456--ghi789'
+      );
+      let requestJson = JSON.parse(request.requestBody);
+      assert.equal(requestJson.data.attributes['issuer-name'], 'JJ');
+      assert.equal(
+        requestJson.data.relationships.pattern.data.id,
+        '80cb8f99-c5f7-419e-9c95-2e87a9d8db32'
+      );
+      assert.equal(
+        requestJson.data.relationships['color-scheme'].data.id,
+        '4f219852-33ee-4e4c-81f7-76318630a423'
+      );
+
+      return new MirageResponse(
+        201,
+        {
+          'Content-Type': 'application/vnd.api+json',
+        },
+        JSON.stringify({
+          data: {
+            type: 'prepaid-card-customizations',
+            id: prepaidCardCustomizationId,
+            attributes: {
+              did,
+              'issuer-name': 'JJ',
+              'owner-address': layer2AccountAddress,
+            },
+            relationships: {
+              pattern: {
+                data: {
+                  type: 'prepaid-card-patterns',
+                  id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
+                },
+              },
+              'color-scheme': {
+                data: {
+                  type: 'prepaid-card-color-schemes',
+                  id: '"4f219852-33ee-4e4c-81f7-76318630a423"',
+                },
+              },
+            },
+          },
+        })
+      );
+    });
+
     // // preview card
     await click(
       `${postableSel(
@@ -336,6 +395,11 @@ module('Acceptance | issue prepaid card', function (hooks) {
         'You will receive a confirmation request from the Card Wallet app in a few moments…'
       );
 
+    await layer2Service.test__simulateHubAuthentication(
+      'abc123--def456--ghi789'
+    );
+
+    await timeout(250);
     layer2Service.test__simulateIssuePrepaidCardForAmount(
       10000,
       '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8'

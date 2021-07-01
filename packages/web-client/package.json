@@ -15,8 +15,8 @@
     "lint:fix": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*:fix",
     "lint:hbs": "ember-template-lint .",
     "lint:hbs:fix": "ember-template-lint . --fix",
-    "lint:css": "stylelint **/*.css --cache",
-    "lint:css:fix": "stylelint **/*.css --fix",
+    "lint:css": "stylelint app/**/*.css --cache",
+    "lint:css:fix": "stylelint app/**/*.css --fix",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
     "lint:js:fix": "eslint . --fix",
     "start": "ember serve",
@@ -27,6 +27,7 @@
   "devDependencies": {
     "@cardstack/boxel": "^0.7.12",
     "@cardstack/cardpay-sdk": "0.19.24",
+    "@cardstack/did-resolver": "0.19.24",
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.2.5",
     "@ember/test-waiters": "2.4.3",
