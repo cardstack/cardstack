@@ -9,11 +9,13 @@ const CURRENT_VERSION = 1;
 
 type CardstackIdentifierType = 'PrepaidCardCustomization' | 'MerchantInfo' | 'SupplierInfo';
 
+/* eslint-disable @typescript-eslint/naming-convention */
 const DID_TYPE_TO_SHORT_TYPE = {
-  PrepaidCardCustomization: 'p', // eslint-disable-line @typescript-eslint/naming-convention
-  MerchantInfo: 'm', // eslint-disable-line @typescript-eslint/naming-convention
-  SupplierInfo: 's', // eslint-disable-line @typescript-eslint/naming-convention
+  PrepaidCardCustomization: 'p',
+  MerchantInfo: 'm',
+  SupplierInfo: 's',
 } as Record<CardstackIdentifierType, string>;
+/* eslint-enable @typescript-eslint/naming-convention */
 
 const SHORT_TYPE_TO_DID_TYPE = invert({ ...DID_TYPE_TO_SHORT_TYPE }) as Record<string, CardstackIdentifierType>;
 

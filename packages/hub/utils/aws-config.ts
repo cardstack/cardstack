@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import config from 'config';
 import { STSClient, AssumeRoleCommand } from '@aws-sdk/client-sts';
 import Logger from '@cardstack/logger';
@@ -39,10 +38,14 @@ export default async function awsConfig({ roleChain = [] }) {
 
 async function assumeRole(roleName: string, config: any) {
   const stsClient = new STSClient(config);
+
+  /* eslint-disable @typescript-eslint/naming-convention */
   const stsParams = {
     RoleArn: roleArn(roleName),
     RoleSessionName: roleSessionName(roleName),
   };
+  /* eslint-enable @typescript-eslint/naming-convention */
+
   const stsCommand = new AssumeRoleCommand(stsParams);
   try {
     let result = await stsClient.send(stsCommand);
