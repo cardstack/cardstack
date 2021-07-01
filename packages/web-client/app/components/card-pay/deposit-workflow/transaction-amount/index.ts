@@ -25,6 +25,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   @tracked hasDeposited = false;
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
+  @tracked errorMessage = '';
 
   get currentTokenSymbol(): TokenSymbol | undefined {
     return this.args.workflowSession.state.depositSourceToken;
@@ -117,6 +118,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   }
 
   @action unlock() {
+    this.errorMessage = '';
     let tokenSymbol = this.args.workflowSession.state.depositSourceToken;
     this.isUnlocking = true;
     taskFor(this.layer1Network.approve)
@@ -125,11 +127,18 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
         this.isUnlocked = true;
         this.unlockTxnReceipt = transactionReceipt;
       })
+      .catch(() => {
+        this.errorMessage = `There was a problem unlocking your tokens for deposit.
+          This may be due to a network issue, or perhaps you canceled the request in your wallet.
+          Please try again if you want to continue with this workflow, or contact Cardstack support at
+          <TODO:appropriate place for support>.`;
+      })
       .finally(() => {
         this.isUnlocking = false;
       });
   }
   @action async deposit() {
+    this.errorMessage = '';
     let tokenSymbol = this.args.workflowSession.state.depositSourceToken;
     let layer2Address = this.layer2Network.walletInfo.firstAddress!;
     this.isDepositing = true;
@@ -152,6 +161,12 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
         );
         this.args.onComplete?.();
         this.hasDeposited = true;
+      })
+      .catch(() => {
+        this.errorMessage = `There was a problem initiating the bridging of your tokens to the xDai chain. This may be due
+          to a network issue, or perhaps you canceled the request in your wallet. Please try again if you
+          want to continue with this workflow, or contact Cardstack support at
+          <TODO:appropriate place for support>.`;
       })
       .finally(() => {
         this.isDepositing = false;
