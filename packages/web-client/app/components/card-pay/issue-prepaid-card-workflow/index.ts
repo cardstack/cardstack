@@ -11,7 +11,6 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
 import { BN } from 'bn.js';
-import { toWei } from 'web3-utils';
 import { faceValueOptions } from './workflow-config';
 
 class IssuePrepaidCardWorkflow extends Workflow {
@@ -63,11 +62,21 @@ class IssuePrepaidCardWorkflow extends Workflow {
               Math.min(...faceValueOptions)
             );
 
-            return !!layer2Network.defaultTokenBalance?.gte(
+            let sufficientFunds = !!layer2Network.defaultTokenBalance?.gte(
               new BN(daiMinValue)
             );
+
+            if (sufficientFunds) {
+              return {
+                success: true,
+              };
+            } else {
+              return {
+                success: false,
+                reason: 'INSUFFICIENT_FUNDS',
+              };
+            }
           },
-          failureReason: 'INSUFFICIENT_FUNDS',
         }),
       ],
       completedDetail: 'xDai chain wallet connected',
