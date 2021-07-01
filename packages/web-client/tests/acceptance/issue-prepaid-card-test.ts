@@ -10,7 +10,7 @@ import {
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
-import { toBN } from 'web3-utils';
+import { toBN, toWei } from 'web3-utils';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { encodeDID } from '@cardstack/did-resolver';
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -19,6 +19,20 @@ import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns
 import { Response as MirageResponse } from 'ember-cli-mirage';
 import { timeout } from 'ember-concurrency';
 
+import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/workflow-config';
+
+// Dai amounts based on available prepaid card options
+const MIN_AMOUNT_TO_PASS = toBN(
+  toWei(`${Math.ceil(Math.min(...faceValueOptions) / 100)}`)
+);
+const FAILING_AMOUNT = toBN(
+  toWei(`${Math.floor(Math.min(...faceValueOptions) / 100) - 1}`)
+);
+const SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER =
+  Math.floor(Math.max(...faceValueOptions) / 100) - 1;
+const SLIGHTLY_LESS_THAN_MAX_VALUE = toBN(
+  toWei(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER}`)
+);
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
 }
@@ -83,7 +97,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
-      defaultToken: toBN('250000000000000000000'),
+      defaultToken: SLIGHTLY_LESS_THAN_MAX_VALUE,
       card: toBN('500000000000000000000'),
     });
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
@@ -223,18 +237,22 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .hasText(depotAddress);
     assert
       .dom('[data-test-funding-source-dropdown="DAI.CPXD"]')
-      .containsText('250.00 DAI');
+      .containsText(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER.toFixed(2)} DAI`);
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
     assert.dom('[data-test-funding-source-dropdown="DAI.CPXD"]').doesNotExist();
-    assert.dom('[data-test-funding-source-token]').containsText('250.00 DAI');
+    assert
+      .dom('[data-test-funding-source-token]')
+      .containsText(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER.toFixed(2)} DAI`);
 
     assert
       .dom(postableSel(2, 3))
       .containsText('choose the face value of your prepaid card');
     // // face-value card
-    assert.dom('[data-test-balance-view-summary]').containsText('250.00 DAI');
+    assert
+      .dom('[data-test-balance-view-summary]')
+      .containsText(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER.toFixed(2)} DAI`);
     await click('[data-test-balance-view-summary]');
     assert
       .dom('[data-test-balance-view-account-address]')
@@ -244,11 +262,11 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText(depotAddress);
     assert
       .dom('[data-test-balance-view-token-amount]')
-      .containsText('250.00 DAI');
+      .containsText(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER.toFixed(2)} DAI`);
     assert.dom('[data-test-face-value-display]').doesNotExist();
     assert.dom('[data-test-face-value-option]').exists({ count: 4 });
     assert.dom('[data-test-face-value-option-checked]').doesNotExist();
-    assert.dom('[data-test-face-value-option="50000"] input').isDisabled();
+    assert.dom('[data-test-face-value-option="50000"] input').isNotDisabled();
     assert.dom('[data-test-face-value-option="100000"] input').isDisabled();
     assert
       .dom('[data-test-face-value-option="50000"]')
@@ -485,7 +503,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
       layer2Service.test__simulateBalances({
-        defaultToken: toBN('250000000000000000000'),
+        defaultToken: MIN_AMOUNT_TO_PASS,
         card: toBN('500000000000000000000'),
       });
       let testDepot = {
@@ -612,7 +630,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert.equal(currentURL(), '/card-pay/balances');
 
       layer2Service.test__simulateBalances({
-        defaultToken: toBN('0'),
+        defaultToken: FAILING_AMOUNT,
       });
 
       await click('[data-test-issue-prepaid-card-workflow-button]');
