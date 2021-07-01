@@ -18,8 +18,10 @@
           <div class="preview__card">
             <CardPay::PrepaidCard
               @issuerName={{@workflowSession.state.issuerName}}
-              @headerBackground={{@workflowSession.state.headerBackground.id}}
-              @headerTheme={{@workflowSession.state.headerTheme.id}}
+              @headerBackground={{@workflowSession.state.colorScheme.background}}
+              @headerPatternUrl={{@workflowSession.state.pattern.patternUrl}}
+              @headerTextColor={{@workflowSession.state.colorScheme.textColor}}
+              @headerPatternColor={{@workflowSession.state.colorScheme.patternColor}}
               @balance={{this.faceValue}}
               @usdBalance={{spend-to-usd this.faceValue}}
               @address={{placeholder-address}}

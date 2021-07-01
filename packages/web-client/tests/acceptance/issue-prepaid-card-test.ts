@@ -149,8 +149,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
       .isEnabled();
 
-    let backgroundChoice = prepaidCardColorSchemes[4].background;
-    let themeChoice = prepaidCardPatterns[2].patternUrl;
+    let backgroundChoice = prepaidCardColorSchemes[1].background;
+    let patternChoice = prepaidCardPatterns[3].patternUrl;
 
     await waitUntil(
       () =>
@@ -161,19 +161,20 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert
       .dom(
-        `[data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+        `${post}  [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
       )
       .doesNotExist();
+
     await click(
-      `[data-test-customization-background-selection-item="${backgroundChoice}"]`
+      `${post}  [data-test-customization-background-selection-item="${backgroundChoice}"]`
     );
     await click(
-      `[data-test-customization-theme-selection-item="${themeChoice}"]`
+      `${post} [data-test-customization-pattern-selection-item="${patternChoice}"]`
     );
 
     assert
       .dom(
-        `[data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+        `${post} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
       )
       .exists();
 
@@ -181,12 +182,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
 
-    assert.dom('[data-test-layout-customization-form]').isNotVisible();
-    assert.dom('[data-test-layout-customization-display]').isVisible();
+    assert.dom(`${post} [data-test-layout-customization-form]`).isNotVisible();
+    assert.dom(`${post} [data-test-layout-customization-display]`).isVisible();
 
     assert
       .dom(
-        `[data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+        `${post} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
       )
       .exists();
 
@@ -318,7 +319,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       `${postableSel(
         3,
         1
-      )} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+      )} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
     );
 
     // // preview card
@@ -366,7 +367,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom(
       `${epiloguePostableSel(
         1
-      )} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+      )} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
     );
 
     await waitFor(epiloguePostableSel(2));
