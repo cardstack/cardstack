@@ -1,68 +1,82 @@
 import config from '../../config/environment';
-import { NetworkSymbol } from './types';
+import {
+  Layer1NetworkSymbol,
+  TestLayer1NetworkSymbol,
+  Layer2NetworkSymbol,
+  TestLayer2NetworkSymbol,
+} from './types';
 
-type TestNetworkSymbol = 'test-layer1' | 'test-layer2';
-
-export type NetworkCopywriting = {
+type Layer1NetworkCopywriting = {
   fullName: string;
   shortName: string;
-  networkType: 'testnet' | 'mainnet';
+  conversationalName: string;
+};
+type Layer2NetworkCopywriting = {
+  fullName: string;
+  shortName: string;
 };
 
-export let networkDisplayInfo: Record<
-  NetworkSymbol | TestNetworkSymbol,
-  NetworkCopywriting
+export type NetworkCopywriting =
+  | Layer1NetworkCopywriting
+  | Layer2NetworkCopywriting;
+
+let layer1NetworkDisplayInfo: Record<
+  Layer1NetworkSymbol | TestLayer1NetworkSymbol,
+  Layer1NetworkCopywriting
 > = {
   mainnet: {
     fullName: 'Ethereum mainnet',
     shortName: 'Ethereum',
-    networkType: 'mainnet',
-  },
-  xdai: {
-    fullName: 'xDai chain',
-    shortName: 'xDai',
-    networkType: 'mainnet',
+    conversationalName: 'mainnet',
   },
   kovan: {
     fullName: 'Kovan testnet',
     shortName: 'Kovan',
-    networkType: 'testnet',
-  },
-  sokol: {
-    fullName: 'Sokol testnet',
-    shortName: 'Sokol',
-    networkType: 'testnet',
+    conversationalName: 'Kovan testnet',
   },
   'test-layer1': {
     fullName: 'L1 test chain',
     shortName: 'L1',
-    networkType: 'testnet',
+    conversationalName: 'L1 test chain',
+  },
+};
+let layer2NetworkDisplayInfo: Record<
+  Layer2NetworkSymbol | TestLayer2NetworkSymbol,
+  Layer2NetworkCopywriting
+> = {
+  xdai: {
+    fullName: 'xDai chain',
+    shortName: 'xDai',
+  },
+  sokol: {
+    fullName: 'Sokol testnet',
+    shortName: 'Sokol',
   },
   'test-layer2': {
     fullName: 'L2 test chain',
     shortName: 'L2',
-    networkType: 'testnet',
   },
 };
 
-export type Layer = 'layer1' | 'layer2';
-
-let currentNetworkDisplayInfo: Record<Layer, NetworkCopywriting> = {
-  layer1: networkDisplayInfo['test-layer1'],
-  layer2: networkDisplayInfo['test-layer2'],
+let currentNetworkDisplayInfo: {
+  layer1: Layer1NetworkCopywriting;
+  layer2: Layer2NetworkCopywriting;
+} = {
+  layer1: layer1NetworkDisplayInfo['test-layer1'],
+  layer2: layer2NetworkDisplayInfo['test-layer2'],
 };
 
 switch (config.chains.layer1) {
   case 'test': {
-    currentNetworkDisplayInfo.layer1 = networkDisplayInfo['test-layer1'];
+    currentNetworkDisplayInfo.layer1 = layer1NetworkDisplayInfo['test-layer1'];
     break;
   }
   case 'keth': {
-    currentNetworkDisplayInfo.layer1 = networkDisplayInfo.kovan;
+    currentNetworkDisplayInfo.layer1 = layer1NetworkDisplayInfo.kovan;
     break;
   }
   case 'eth': {
-    currentNetworkDisplayInfo.layer1 = networkDisplayInfo.mainnet;
+    currentNetworkDisplayInfo.layer1 = layer1NetworkDisplayInfo.mainnet;
     break;
   }
   default:
@@ -71,19 +85,24 @@ switch (config.chains.layer1) {
 
 switch (config.chains.layer2) {
   case 'test': {
-    currentNetworkDisplayInfo.layer2 = networkDisplayInfo['test-layer2'];
+    currentNetworkDisplayInfo.layer2 = layer2NetworkDisplayInfo['test-layer2'];
     break;
   }
   case 'sokol': {
-    currentNetworkDisplayInfo.layer2 = networkDisplayInfo.sokol;
+    currentNetworkDisplayInfo.layer2 = layer2NetworkDisplayInfo.sokol;
     break;
   }
   case 'xdai': {
-    currentNetworkDisplayInfo.layer2 = networkDisplayInfo.xdai;
+    currentNetworkDisplayInfo.layer2 = layer2NetworkDisplayInfo.xdai;
     break;
   }
   default:
-    throw new Error('Unrecognised layer 1 network, failed to get copywriting');
+    throw new Error('Unrecognised layer 2 network, failed to get copywriting');
 }
+
+export let networkDisplayInfo = {
+  ...layer1NetworkDisplayInfo,
+  ...layer2NetworkDisplayInfo,
+};
 
 export { currentNetworkDisplayInfo };
