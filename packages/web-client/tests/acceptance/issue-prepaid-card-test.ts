@@ -706,38 +706,13 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .exists();
   });
 
-  // TODO: add variant with wallet connected, make sure that zteps at least up to layer 2 connect card are shown
-  test('Workflow is canceled if balance insufficient to create prepaid card', async function (assert) {
+  test('Workflow is canceled after showing wallet connection card if balance insufficient to create prepaid card', async function (assert) {
     await visit('/card-pay');
     assert.equal(currentURL(), '/card-pay/balances');
-    await click('[data-test-issue-prepaid-card-workflow-button]');
-
-    assert.dom(`${postableSel(0, 0)} img`).exists();
-    assert.dom(postableSel(0, 0)).containsText('Hello, it’s nice to see you!');
-    assert.dom(postableSel(0, 1)).containsText('Let’s issue a prepaid card.');
-
-    assert
-      .dom(postableSel(0, 2))
-      .containsText(
-        'Before we get started, please connect your xDai chain wallet via your Card Wallet mobile app.'
-      );
-
-    assert
-      .dom(postableSel(0, 3))
-      .containsText(
-        'Once you have installed the app, open the app and add an existing wallet/account'
-      );
-
-    assert
-      .dom(`${postableSel(0, 4)} [data-test-wallet-connect-loading-qr-code]`)
-      .exists();
 
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateWalletConnectUri();
-    await waitFor('[data-test-wallet-connect-qr-code]');
-    assert.dom('[data-test-wallet-connect-qr-code]').exists();
-
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -756,6 +731,26 @@ module('Acceptance | issue prepaid card', function (hooks) {
       ],
     };
     layer2Service.test__simulateDepot(testDepot as DepotSafe);
+
+    await settled();
+
+    await click('[data-test-issue-prepaid-card-workflow-button]');
+
+    assert.dom(`${postableSel(0, 0)} img`).exists();
+    assert.dom(postableSel(0, 0)).containsText('Hello, it’s nice to see you!');
+    assert.dom(postableSel(0, 1)).containsText('Let’s issue a prepaid card.');
+
+    assert
+      .dom(postableSel(0, 2))
+      .containsText(
+        'Looks like you’ve already connected your xDai chain wallet, which you can see below. Please continue with the next step of this workflow.'
+      );
+
+    assert
+      .dom(
+        '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
+      )
+      .hasText('0x1826...6E44');
 
     await settled();
 
