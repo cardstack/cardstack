@@ -2,12 +2,12 @@
   class="prepaid-card"
   style={{css-var
     header-background=@headerBackground
-    header-theme=(concat "url(" @headerTheme ")")
+    header-theme=(concat "url(" @headerPatternUrl ")")
     header-text-color=(or @headerTextColor "var(--boxel-dark)")
     header-pattern-color=(or @headerPatternColor "var(--boxel-light)")
   }}
   data-test-prepaid-card-background={{@headerBackground}}
-  data-test-prepaid-card-theme={{@headerTheme}}
+  data-test-prepaid-card-pattern={{@headerPatternUrl}}
   ...attributes
 >
   <div class="prepaid-card__background prepaid-card__background--color">
