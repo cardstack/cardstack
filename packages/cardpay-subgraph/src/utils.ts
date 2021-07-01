@@ -13,6 +13,7 @@ import {
   Token,
   Safe,
   Account,
+  MerchantSafe,
 } from '../generated/schema';
 import { GnosisSafe } from '../generated/Gnosis/GnosisSafe';
 
@@ -100,8 +101,20 @@ export function makePrepaidCardPayment(
   paymentEntity.transaction = txnHash;
   paymentEntity.timestamp = timestamp;
   paymentEntity.prepaidCard = prepaidCard;
+  paymentEntity.prepaidCardOwner = prepaidCardEntity.owner;
   if (merchantSafe != null) {
-    paymentEntity.merchantSafe = merchantSafe;
+    let merchantSafeEntity = MerchantSafe.load(merchantSafe);
+    if (merchantSafeEntity != null) {
+      paymentEntity.merchantSafe = merchantSafe;
+      paymentEntity.merchant = merchantSafeEntity.merchant;
+      makeEOATransaction(event, merchantSafeEntity.merchant);
+    } else {
+      log.warning(
+        'Cannot process merchant payment txn {}: MerchantSafe entity does not exist for merchant safe address {}. This is likely due to the subgraph having a startBlock that is higher than the block the merchant safe was created in.',
+        [txnHash, merchantSafe]
+      );
+      return;
+    }
   }
   paymentEntity.issuingToken = issuingToken;
   paymentEntity.issuingTokenAmount = issuingTokenAmount;
