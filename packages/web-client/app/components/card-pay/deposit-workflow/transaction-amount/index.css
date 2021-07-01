@@ -91,3 +91,8 @@
   border: 1px solid var(--boxel-light-400);
   border-radius: var(--boxel-border-radius);
 }
+
+.transaction-amount__error {
+  color: var(--boxel-error-100);
+  font: 600 var(--boxel-font-sm);
+}

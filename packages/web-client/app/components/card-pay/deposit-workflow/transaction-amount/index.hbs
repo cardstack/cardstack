@@ -65,6 +65,11 @@
         </Boxel::Field>
       {{/if}}
     </div>
+    {{#if this.errorMessage}}
+      <div class="transaction-amount__error">
+        {{this.errorMessage}}
+      </div>
+    {{/if}}
   </ActionCardContainer::Section>
   <Boxel::ActionChin @stepNumber={{1}} @state={{this.unlockCtaState}} @disabled={{or @frozen this.unlockCtaDisabled}}>
     <:default as |a|>
