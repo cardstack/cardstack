@@ -51,7 +51,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(0, 2))
       .containsText(
-        `The funds you wish to deposit must be available in your ${c.layer1.networkType} wallet`
+        `The funds you wish to deposit must be available in your ${c.layer1.conversationalName} wallet`
       );
 
     post = postableSel(0, 3);
@@ -87,7 +87,9 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
+      .containsText(
+        `${capitalize(c.layer1.conversationalName)} wallet connected`
+      );
 
     assert
       .dom(postableSel(1, 0))
@@ -409,7 +411,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(0, 2))
       .containsText(
-        `The funds you wish to deposit must be available in your ${c.layer1.networkType} wallet`
+        `The funds you wish to deposit must be available in your ${c.layer1.conversationalName} wallet`
       );
 
     assert
@@ -421,7 +423,9 @@ module('Acceptance | deposit', function (hooks) {
     await settled();
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
+      .containsText(
+        `${capitalize(c.layer1.conversationalName)} wallet connected`
+      );
 
     assert
       .dom(postableSel(1, 0))
@@ -512,7 +516,9 @@ module('Acceptance | deposit', function (hooks) {
     await settled();
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
+      .containsText(
+        `${capitalize(c.layer1.conversationalName)} wallet connected`
+      );
 
     assert
       .dom(postableSel(1, 0))
@@ -567,7 +573,9 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
+      .containsText(
+        `${capitalize(c.layer1.conversationalName)} wallet connected`
+      );
 
     assert
       .dom(postableSel(1, 0))
@@ -649,7 +657,9 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
+      .containsText(
+        `${capitalize(c.layer1.conversationalName)} wallet connected`
+      );
 
     assert
       .dom(postableSel(1, 0))
@@ -729,7 +739,9 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
+      .containsText(
+        `${capitalize(c.layer1.conversationalName)} wallet connected`
+      );
 
     assert
       .dom(postableSel(1, 0))
@@ -814,7 +826,9 @@ module('Acceptance | deposit', function (hooks) {
 
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText(`${capitalize(c.layer1.networkType)} wallet connected`);
+      .containsText(
+        `${capitalize(c.layer1.conversationalName)} wallet connected`
+      );
 
     assert
       .dom(postableSel(1, 0))

@@ -21,7 +21,7 @@ class DepositWorkflow extends Workflow {
   name = 'Reserve Pool Deposit';
   milestones = [
     new Milestone({
-      title: `Connect ${c.layer1.networkType} wallet`,
+      title: `Connect ${c.layer1.conversationalName} wallet`,
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -33,7 +33,7 @@ class DepositWorkflow extends Workflow {
 
   * **${c.layer1.fullName} wallet:**
 
-      Linked to the ${c.layer1.shortName} blockchain on ${c.layer1.networkType}
+      Linked to the ${c.layer1.shortName} blockchain on ${c.layer1.conversationalName}
   * **${c.layer2.fullName} wallet:**
 
       Linked to the ${c.layer2.shortName} blockchain for low-cost transactions
@@ -41,8 +41,8 @@ class DepositWorkflow extends Workflow {
         }),
         new WorkflowMessage({
           author: cardbot,
-          message: `The funds you wish to deposit must be available in your ${c.layer1.networkType} wallet, so that you can add
-        them to the reserve pool on ${c.layer1.networkType}. Once you have made your deposit, an equivalent amount of
+          message: `The funds you wish to deposit must be available in your ${c.layer1.conversationalName} wallet, so that you can add
+        them to the reserve pool on ${c.layer1.conversationalName}. Once you have made your deposit, an equivalent amount of
         tokens will be minted and added to your ${c.layer2.fullName} wallet.`,
         }),
         new NetworkAwareWorkflowMessage({
@@ -58,7 +58,9 @@ class DepositWorkflow extends Workflow {
           componentName: 'card-pay/layer-one-connect-card',
         }),
       ],
-      completedDetail: `${capitalize(c.layer1.networkType)} wallet connected`,
+      completedDetail: `${capitalize(
+        c.layer1.conversationalName
+      )} wallet connected`,
     }),
     new Milestone({
       title: `Connect ${c.layer2.fullName} wallet`,
