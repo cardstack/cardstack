@@ -11,7 +11,7 @@ import { getAddress } from '../../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from '../constants';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { GnosisExecTx, gasEstimate, executeTransaction } from '../utils/safe-utils';
-import { sign } from '../utils/signing-utils';
+import { signSafeTxAsRSV } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
 import { ExchangeRate } from '../exchange-rate';
@@ -225,7 +225,7 @@ export default class Safes {
     if (estimate.lastUsedNonce == null) {
       estimate.lastUsedNonce = -1;
     }
-    let signatures = await sign(
+    let signatures = await signSafeTxAsRSV(
       this.layer2Web3,
       tokenAddress,
       0,
@@ -271,7 +271,7 @@ export default class Safes {
     if (estimate.lastUsedNonce == null) {
       estimate.lastUsedNonce = -1;
     }
-    let signatures = await sign(
+    let signatures = await signSafeTxAsRSV(
       this.layer2Web3,
       supplierManager,
       0,

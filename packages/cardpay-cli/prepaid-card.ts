@@ -70,6 +70,22 @@ export async function split(
   console.log(`Transaction hash: ${blockExplorer}/tx/${result!.gnosisTxn.ethereumTx.txHash}/token-transfers`);
 }
 
+export async function transfer(
+  network: string,
+  prepaidCard: string,
+  newOwner: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+
+  let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+
+  console.log(`Transferring prepaid card ${prepaidCard} to new owner ${newOwner}...`);
+  let result = await prepaidCardAPI.transfer(prepaidCard, newOwner);
+  console.log(`Transaction hash: ${blockExplorer}/tx/${result!.ethereumTx.txHash}/token-transfers`);
+}
+
 export async function payMerchant(
   network: string,
   merchantSafe: string,

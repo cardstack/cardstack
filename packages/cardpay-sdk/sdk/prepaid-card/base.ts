@@ -5,6 +5,7 @@ import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
+import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.6.1/prepaid-card-manager';
 import { getAddress } from '../../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from '../constants';
@@ -22,7 +23,7 @@ import {
   executeSend,
 } from '../utils/safe-utils';
 import { waitUntilTransactionMined } from '../utils/general-utils';
-import { sign, Signature } from '../utils/signing-utils';
+import { signSafeTxAsRSV, Signature, signSafeTxAsBytes } from '../utils/signing-utils';
 
 const { toBN, fromWei } = Web3.utils;
 export const MAX_PREPAID_CARD_AMOUNT = 10;
@@ -50,6 +51,14 @@ export default class PrepaidCard {
     let owner = await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCard).call();
     let issuer = await prepaidCardMgr.methods.getPrepaidCardIssuer(prepaidCard).call();
     return owner === issuer && owner !== ZERO_ADDRESS;
+  }
+
+  async canTransfer(prepaidCard: string): Promise<boolean> {
+    let prepaidCardMgr = await this.getPrepaidCardMgr();
+    let owner = await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCard).call();
+    let issuer = await prepaidCardMgr.methods.getPrepaidCardIssuer(prepaidCard).call();
+    let hasBeenSplit = await prepaidCardMgr.methods.hasBeenSplit(prepaidCard).call();
+    return !hasBeenSplit && owner === issuer && owner !== ZERO_ADDRESS;
   }
 
   async payMerchant(
@@ -84,7 +93,7 @@ export default class PrepaidCard {
         if (payload.lastUsedNonce == null) {
           payload.lastUsedNonce = -1;
         }
-        let signatures = await sign(
+        let signatures = await signSafeTxAsRSV(
           this.layer2Web3,
           issuingToken,
           0,
@@ -107,6 +116,85 @@ export default class PrepaidCard {
           signatures,
           toBN(payload.lastUsedNonce + 1).toString()
         );
+      } catch (e) {
+        // The rate updates about once an hour, so if this is triggered, it should only be once
+        if (e.message.includes('rate is beyond the allowable bounds')) {
+          rateChanged = true;
+        } else {
+          throw e;
+        }
+      }
+    } while (rateChanged);
+    return; // should never get here
+  }
+
+  async transfer(
+    prepaidCardAddress: string,
+    newOwner: string,
+    options?: ContractOptions
+  ): Promise<GnosisExecTx | undefined> {
+    if (!(await this.canTransfer(prepaidCardAddress))) {
+      throw new Error(`The prepaid card ${prepaidCardAddress} is not allowed to be transferred`);
+    }
+    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let rateChanged = false;
+    let prepaidCardMgr = await this.getPrepaidCardMgr();
+    let exchange = await getSDK('ExchangeRate', this.layer2Web3);
+    let gasToken = await getAddress('cardCpxd', this.layer2Web3);
+    let issuingToken = await this.issuingToken(prepaidCardAddress);
+    let transferData = await prepaidCardMgr.methods.getTransferCardData(prepaidCardAddress, newOwner).call();
+    let prepaidCard = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], prepaidCardAddress);
+    let currentNonce = new BN(await prepaidCard.methods.nonce().call());
+    // the quirk here is that we are signing this txn in advance so we need to
+    // optimistically advance the nonce by 2 to account for the fact that we are
+    // executing the "send" action before this one (which advances the nonce by 1).
+    let transferNonce = currentNonce.toString() === '0' ? new BN('1') : currentNonce.add(new BN('2'));
+    let [previousOwnerSignature] = await signSafeTxAsBytes(
+      this.layer2Web3,
+      prepaidCardAddress,
+      0,
+      transferData,
+      0,
+      '0',
+      '0',
+      '0',
+      gasToken,
+      ZERO_ADDRESS,
+      transferNonce,
+      from,
+      prepaidCardAddress
+    );
+    do {
+      let rateLock = await exchange.getRateLock(issuingToken);
+      try {
+        let payload = await this.getTransferPayload(prepaidCardAddress, newOwner, previousOwnerSignature, rateLock);
+        if (payload.lastUsedNonce == null) {
+          payload.lastUsedNonce = -1;
+        }
+        let signatures = await signSafeTxAsRSV(
+          this.layer2Web3,
+          issuingToken,
+          0,
+          payload.data,
+          0,
+          payload.safeTxGas,
+          payload.dataGas,
+          payload.gasPrice,
+          payload.gasToken,
+          payload.refundReceiver,
+          toBN(payload.lastUsedNonce + 1),
+          from,
+          prepaidCardAddress
+        );
+        let result = await this.executeTransfer(
+          prepaidCardAddress,
+          newOwner,
+          previousOwnerSignature,
+          rateLock,
+          signatures,
+          toBN(payload.lastUsedNonce + 1).toString()
+        );
+        return result;
       } catch (e) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
@@ -183,7 +271,7 @@ export default class PrepaidCard {
         if (payload.lastUsedNonce == null) {
           payload.lastUsedNonce = -1;
         }
-        let signatures = await sign(
+        let signatures = await signSafeTxAsRSV(
           this.layer2Web3,
           issuingToken,
           0,
@@ -279,7 +367,7 @@ export default class PrepaidCard {
     if (estimate.lastUsedNonce == null) {
       estimate.lastUsedNonce = -1;
     }
-    let signatures = await sign(
+    let signatures = await signSafeTxAsRSV(
       this.layer2Web3,
       tokenAddress,
       0,
@@ -444,6 +532,22 @@ export default class PrepaidCard {
     );
   }
 
+  private async getTransferPayload(
+    prepaidCardAddress: string,
+    newOwner: string,
+    previousOwnerSignature: string,
+    rate: string
+  ): Promise<SendPayload> {
+    return getSendPayload(
+      this.layer2Web3,
+      prepaidCardAddress,
+      0,
+      rate,
+      'transfer',
+      this.layer2Web3.eth.abi.encodeParameters(['address', 'bytes'], [newOwner, previousOwnerSignature])
+    );
+  }
+
   private async executePayMerchant(
     prepaidCardAddress: string,
     merchantSafe: string,
@@ -483,6 +587,26 @@ export default class PrepaidCard {
         ['uint256[]', 'uint256[]', 'string'],
         [issuingTokenAmounts, spendAmounts, customizationDID]
       ),
+      signatures,
+      nonce
+    );
+  }
+
+  private async executeTransfer(
+    prepaidCardAddress: string,
+    newOwner: string,
+    previousOwnerSignature: string,
+    rate: string,
+    signatures: Signature[],
+    nonce: string
+  ): Promise<GnosisExecTx> {
+    return await executeSend(
+      this.layer2Web3,
+      prepaidCardAddress,
+      0,
+      rate,
+      'transfer',
+      this.layer2Web3.eth.abi.encodeParameters(['address', 'bytes'], [newOwner, previousOwnerSignature]),
       signatures,
       nonce
     );

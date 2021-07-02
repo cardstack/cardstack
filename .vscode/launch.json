@@ -1,5 +1,7 @@
 // Hassan's testing mnemonic for address 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13
 // "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+// Hassan's testing mnemonic for address 0xb21851B00bd13C008f703A21DFDd292b28A736b3
+// "vicious kiwi join thing voice spice library piano panel weird sense extra"
 
 {
   // Use IntelliSense to learn about possible Node.js debug attributes.
@@ -96,8 +98,6 @@
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
-        // Hassan's testing merchant mnemonic: 0x54b11672e90B38ca52140Ac364EebC5cC07F3d91
-        // "--mnemonic", "sign crawl student excite mouse young narrow essence soul brick life slush"
       ]
     },
     {
@@ -165,6 +165,22 @@
         "200", // face values
         "200", // face values
         "100", // face values
+        "--network", "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: Transfer Prepaid Card",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "prepaidcard-transfer",
+        "0xDedb9311bb46A654EaA815F32E98Ec092B0c2655", // prepaid card address
+        "0xb21851B00bd13C008f703A21DFDd292b28A736b3", // new owner
         "--network", "sokol",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"

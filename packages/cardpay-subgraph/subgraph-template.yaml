@@ -69,6 +69,8 @@ dataSources:
       eventHandlers:
         - event: CreatePrepaidCard(address,address,address,address,uint256,uint256,uint256,string)
           handler: handleCreatePrepaidCard
+        - event: TransferredPrepaidCard(address,address,address)
+          handler: handleTransferPrepaidCard
       file: ./src/mappings/prepaid-card.ts
 
   - kind: ethereum/contract
@@ -189,7 +191,6 @@ dataSources:
         - Transaction
         - EOATransaction
         - Account
-        - PrepaidCardPayment
         - PrepaidCardSplit
       abis:
         - name: SplitPrepaidCardHandler
