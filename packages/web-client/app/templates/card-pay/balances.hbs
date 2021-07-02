@@ -1,20 +1,13 @@
 <section class="card-pay-dashboard__section" role="tabpanel" aria-labelledby="card-pay.balances">
-  {{!-- <Boxel::Button
-    {{on "click" (set this "flow" 'issue-prepaid-card')}}
-    class="dashboard-panel__cta"
-    @kind="primary"
-    @size="touch"
-    data-test-issue-prepaid-card-workflow-button
-  >
-    Issue Prepaid Card
-  </Boxel::Button> --}}
   <CardPay::DashboardPanel
     @title={{@model.panel.title}}
     @description={{@model.panel.description}}
     @heroImageUrl={{@model.panel.heroImageUrl}}
     @sections={{@model.panel.sections}}
     @ctaActions={{array null (set this "flow" 'issue-prepaid-card')}}
+    style={{css-var hero-max-height="20rem"}}
   />
+  {{!-- data-test-issue-prepaid-card-workflow-button --}}
 </section>
 
 <Boxel::Modal

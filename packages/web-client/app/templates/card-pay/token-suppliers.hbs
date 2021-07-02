@@ -1,15 +1,11 @@
-<section role="tabpanel" aria-labelledby="card-pay.token-suppliers">
-  <h2>
-    Token Suppliers
-  </h2>
-
-  <Boxel::Button @kind="primary" {{on "click" (set this "flow" 'deposit')}} data-test-deposit-workflow-button>
-    Deposit Tokens
-  </Boxel::Button>
-
-  <Boxel::Button @kind="primary" {{on "click" (set this "flow" 'withdrawal')}} data-test-withdrawal-workflow-button>
-    Withdraw Tokens
-  </Boxel::Button>
+<section class="card-pay-dashboard__section" role="tabpanel" aria-labelledby="card-pay.token-suppliers">
+  <CardPay::DashboardPanel
+    @title={{@model.panel.title}}
+    @description={{@model.panel.description}}
+    @heroImageUrl={{@model.panel.heroImageUrl}}
+    @sections={{@model.panel.sections}}
+    @ctaActions={{array (set this "flow" 'deposit') (set this "flow" 'withdrawal')}}
+  />
 </section>
 
 <Boxel::Modal

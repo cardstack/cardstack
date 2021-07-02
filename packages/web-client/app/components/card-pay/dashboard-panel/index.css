@@ -1,10 +1,16 @@
+/* Details container styles */
 .dashboard-details-container {
+  --spacing: calc(var(--boxel-sp-xxxl) * var(--boxel-ratio));
+  --border-color: #d3d3d3;
+  --hero-max-height: 50rem;
+
   position: relative;
   max-width: 72rem;
   margin: 0 auto;
   color: var(--boxel-dark);
   background-color: var(--boxel-light-400);
   border-radius: var(--boxel-border-radius);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   overflow: hidden;
 }
 
@@ -59,11 +65,8 @@
   transform: rotate(-90deg);
 }
 
-
+/* Panel styles */
 .dashboard-panel {
-  --spacing: calc(var(--boxel-sp-xxxl) * var(--boxel-ratio));
-  --border-color: #d3d3d3;
-
   display: grid;
   grid-template-columns: auto auto;
   gap: var(--spacing) 0;
@@ -92,8 +95,7 @@
   top: 0;
   right: 0;
   width: 100%;
-  height: 21rem;
-  /* background-image: url('/images/dashboard/balances-hero-sm.svg'); */
+  height: var(--hero-max-height);
   background-position: top right;
   background-repeat: no-repeat;
   background-size: contain;

@@ -4,7 +4,7 @@ import '../../css/card-pay/balances.css';
 const BALANCES_PANEL = {
   title: 'Easy Payments',
   description: 'DeFi payments that are fast, easy and cheap for everyone',
-  heroImageUrl: '/images/dashboard/balances-hero-sm.svg',
+  heroImageUrl: '/images/dashboard/balances-hero.svg',
   sections: [
     {
       icon: 'balances-1-customers',
