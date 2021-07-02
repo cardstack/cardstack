@@ -129,9 +129,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       })
       .catch(() => {
         this.errorMessage = `There was a problem unlocking your tokens for deposit.
-          This may be due to a network issue, or perhaps you canceled the request in your wallet.
-          Please try again if you want to continue with this workflow, or contact Cardstack support at
-          <TODO:appropriate place for support>.`;
+          This may be due to a network issue, or perhaps you canceled the request in your wallet.`;
       })
       .finally(() => {
         this.isUnlocking = false;
@@ -164,9 +162,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       })
       .catch(() => {
         this.errorMessage = `There was a problem initiating the bridging of your tokens to the xDai chain. This may be due
-          to a network issue, or perhaps you canceled the request in your wallet. Please try again if you
-          want to continue with this workflow, or contact Cardstack support at
-          <TODO:appropriate place for support>.`;
+          to a network issue, or perhaps you canceled the request in your wallet.`;
       })
       .finally(() => {
         this.isDepositing = false;

@@ -96,3 +96,14 @@
   color: var(--boxel-error-100);
   font: 600 var(--boxel-font-sm);
 }
+
+.transaction-amount__support-link {
+  color: var(--boxel-error-100);
+  text-decoration: underline;
+}
+
+.transaction-amount__support-link:hover {
+  color: var(--boxel-error-100);
+  /* Opting for filter instead of introducing a new color */
+  filter: brightness(0.9);
+}
