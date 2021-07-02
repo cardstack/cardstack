@@ -403,6 +403,27 @@ export default [
     type: 'function',
   },
   {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'hasBeenUsed',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     constant: false,
     inputs: [
       {
@@ -667,7 +688,7 @@ export default [
         type: 'address',
       },
     ],
-    name: 'setPrepaidCardUsedForSplit',
+    name: 'setPrepaidCardUsed',
     outputs: [
       {
         internalType: 'bool',

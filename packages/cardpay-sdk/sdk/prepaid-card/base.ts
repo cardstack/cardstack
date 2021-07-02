@@ -6,7 +6,7 @@ import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.6.1/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.6.2/prepaid-card-manager';
 import { getAddress } from '../../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
@@ -57,8 +57,8 @@ export default class PrepaidCard {
     let prepaidCardMgr = await this.getPrepaidCardMgr();
     let owner = await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCard).call();
     let issuer = await prepaidCardMgr.methods.getPrepaidCardIssuer(prepaidCard).call();
-    let hasBeenSplit = await prepaidCardMgr.methods.hasBeenSplit(prepaidCard).call();
-    return !hasBeenSplit && owner === issuer && owner !== ZERO_ADDRESS;
+    let hasBeenUsed = await prepaidCardMgr.methods.hasBeenUsed(prepaidCard).call();
+    return !hasBeenUsed && owner === issuer && owner !== ZERO_ADDRESS;
   }
 
   async payMerchant(
