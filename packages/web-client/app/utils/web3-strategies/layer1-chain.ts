@@ -35,12 +35,14 @@ export default abstract class Layer1ChainWeb3Strategy
   chainId: number;
   networkSymbol: Layer1NetworkSymbol;
   web3 = new Web3();
-  provider: any | undefined;
   broadcastChannel: BroadcastChannel;
-  simpleEmitter = new SimpleEmitter();
   cardTokenContract: Contract;
   daiTokenContract: Contract;
   bridgeableTokens: TokenContractInfo[];
+  simpleEmitter = new SimpleEmitter();
+
+  // changes with connection state
+  provider: any | undefined;
   #waitForAccountDeferred = defer<void>();
   @tracked currentProviderId: string | undefined;
   @tracked defaultTokenBalance: BN | undefined;
