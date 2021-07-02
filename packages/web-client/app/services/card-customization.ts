@@ -1,6 +1,6 @@
 import Service from '@ember/service';
 import config from '../config/environment';
-import { all, task } from 'ember-concurrency';
+import { all, task, TaskGenerator } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
@@ -155,7 +155,7 @@ export default class CardCustomization extends Service {
 
   @task *createCustomizationTask(
     params: CreateCustomizationTaskParams
-  ): PrepaidCardCustomization {
+  ): TaskGenerator<PrepaidCardCustomization> {
     let response = yield fetch(
       `${config.hubURL}/api/prepaid-card-customizations`,
       {
@@ -163,6 +163,7 @@ export default class CardCustomization extends Service {
         headers: {
           Authorization: 'Bearer: ' + this.hubAuthentication.authToken,
           Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
         },
         body: JSON.stringify({
           data: {
