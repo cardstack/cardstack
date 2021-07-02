@@ -24,11 +24,11 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`PrepaidCard.create`](#prepaidcardcreate)
   - [`PrepaidCard.canSplit`](#prepaidcardcansplit)
   - [`PrepaidCard.split`](#prepaidcardsplit)
+  - [`PrepaidCard.canTransfer`](#prepaidcardcantransfer)
+  - [`PrepaidCard.transfer`](#prepaidcardtransfer)
   - [`PrepaidCard.priceForFaceValue`](#prepaidcardpriceforfacevalue)
   - [`PrepaidCard.gasFee`](#prepaidcardgasfee)
   - [`PrepaidCard.payMerchant`](#prepaidcardpaymerchant)
-  - [`PrepaidCard.split` (TBD)](#prepaidcardsplit-tbd)
-  - [`PrepaidCard.transfer` (TBD)](#prepaidcardtransfer-tbd)
 - [`RevenuePool`](#revenuepool)
   - [`RevenuePool.merchantRegistrationFee`](#revenuepoolmerchantregistrationfee)
   - [`RevenuePool.registerMerchant`](#revenuepoolregistermerchant)
@@ -420,7 +420,7 @@ interface RelayTransaction {
 ```
 
 ### `PrepaidCard.canSplit`
-This call will return a  promise for a boolean indicating if the prepaid card can be split.
+This call will return a promise for a boolean indicating if the prepaid card can be split.
 ```js
 let canSplit = await prepaidCard.canSplit(prepaidCardAddress);
 ```
@@ -445,6 +445,26 @@ let result = await prepaidCard.split(
 ```
 
 The result is a promise that has the exact same shape as `PrepaidCard.create`.
+
+### `PrepaidCard.canTransfer`
+This call will return a promise for a boolean indicating if the prepaid card can be transferred.
+```js
+let canTransfer = await prepaidCard.canTransfer(prepaidCardAddress);
+```
+
+### `PrepaidCard.transfer`
+This call will transfer a prepaid card from an issuer to a customer. Note that currently, once a prepaid card has been transferred to a customer (and EOA that did not create the prepaid card), then it becomes no longer transferrable. Additionally, if a prepaid card was used to fund a prepaid card split, the funding prepaid card also becomes non-transferrable, as it is considered the issuer's own personal prepaid card at that point.
+
+This method is invoked with the following parameters:
+- The address of the prepaid card to be transferred
+- The address of the new prepaid card owner
+- You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
+
+```js
+let result = await prepaidCard.transfer(prepaidCardAddress, newOwner);
+```
+
+This call will return a promise for a `GnosisExecTx`.
 
 ### `PrepaidCard.priceForFaceValue`
 This call will return the price in terms of the specified token of how much it costs to have a face value in the specified units of SPEND (**§**). This takes into account both the exchange rate of the specified token as well as gas fees that are deducted from the face value when creating a prepaid card. Note though, that the face value of the prepaid card in SPEND will drift based on the exchange rate of the underlying token used to create the prepaid card. (However, this drift should be very slight since we are using *stable* coins to purchase prepaid cards (emphasis on "stable"). Since the units of SPEND are very small relative to wei (**§** 1 === $0.01 USD), the face value input is a number type. This API returns the amount of tokens required to achieve a particular face value as a string in units of `wei` of the specified token.
@@ -515,9 +535,6 @@ interface RelayTransaction {
   transactionHash: string;
 }
 ```
-
-### `PrepaidCard.split` (TBD)
-### `PrepaidCard.transfer` (TBD)
 
 ## `RevenuePool`
 The `RevenuePool` API is used register merchants and view/claim merchant revenue from prepaid card payments within the layer 2 network in which the Card Protocol runs. The `RevenuePool` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).

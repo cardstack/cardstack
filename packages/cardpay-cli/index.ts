@@ -8,6 +8,7 @@ import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe } from './safe.
 import {
   create as createPrepaidCard,
   split as splitPrepaidCard,
+  transfer as transferPrepaidCard,
   priceForFaceValue,
   payMerchant,
   gasFee,
@@ -27,6 +28,7 @@ type Commands =
   | 'safeTransferTokens'
   | 'prepaidCardCreate'
   | 'prepaidCardSplit'
+  | 'prepaidCardTransfer'
   | 'usdPrice'
   | 'ethPrice'
   | 'priceOracleUpdatedAt'
@@ -52,6 +54,7 @@ interface Options {
   address?: string;
   token?: string;
   safeAddress?: string;
+  newOwner?: string;
   spendFaceValue?: number;
   merchantSafe?: string;
   infoDID?: string;
@@ -70,6 +73,7 @@ let {
   amount,
   address,
   token,
+  newOwner,
   safeAddress,
   spendFaceValue,
   merchantSafe,
@@ -215,6 +219,17 @@ let {
       command = 'prepaidCardSplit';
     }
   )
+  .command('prepaidcard-transfer <prepaidCard> <newOwner>', 'Transfer a prepaid card to a new owner', (yargs) => {
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The address of the prepaid card to transfer',
+    });
+    yargs.positional('newOwner', {
+      type: 'string',
+      description: 'The address of the new owner',
+    });
+    command = 'prepaidCardTransfer';
+  })
   .command(
     'register-merchant <prepaidCard> <infoDID>',
     'Register as a new merchant by paying a merchant registration fee',
@@ -456,6 +471,13 @@ if (!command) {
         return;
       }
       await splitPrepaidCard(network, prepaidCard, faceValues, customizationDID || undefined, mnemonic);
+      break;
+    case 'prepaidCardTransfer':
+      if (prepaidCard == null || newOwner == null) {
+        showHelpAndExit('prepaidCard and newOwner are required values');
+        return;
+      }
+      await transferPrepaidCard(network, prepaidCard, newOwner, mnemonic);
       break;
     case 'registerMerchant':
       if (prepaidCard == null) {

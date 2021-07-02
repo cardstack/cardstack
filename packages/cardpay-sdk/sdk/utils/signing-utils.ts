@@ -6,7 +6,7 @@ export interface Signature {
   s: string | 0;
 }
 
-export async function sign(
+export async function signSafeTxAsRSV(
   web3: Web3,
   to: string,
   value: number,
@@ -21,7 +21,71 @@ export async function sign(
   owner: string,
   gnosisSafeAddress: string
 ): Promise<Signature[]> {
-  const typedData = {
+  const typedData = safeTransactionTypedData(
+    to,
+    value,
+    data,
+    operation,
+    txGasEstimate,
+    baseGasEstimate,
+    gasPrice,
+    txGasToken,
+    refundReceiver,
+    nonce,
+    gnosisSafeAddress
+  );
+  const signatureRSV = [];
+  const sig = await signTypedData(web3, owner, typedData);
+  signatureRSV.push(ethSignSignatureToRSVForSafe(sig));
+
+  return signatureRSV;
+}
+
+export async function signSafeTxAsBytes(
+  web3: Web3,
+  to: string,
+  value: number,
+  data: any,
+  operation: number,
+  txGasEstimate: string,
+  baseGasEstimate: string,
+  gasPrice: string,
+  txGasToken: string,
+  refundReceiver: string,
+  nonce: any,
+  owner: string,
+  gnosisSafeAddress: string
+): Promise<string[]> {
+  const typedData = safeTransactionTypedData(
+    to,
+    value,
+    data,
+    operation,
+    txGasEstimate,
+    baseGasEstimate,
+    gasPrice,
+    txGasToken,
+    refundReceiver,
+    nonce,
+    gnosisSafeAddress
+  );
+  return [await signTypedData(web3, owner, typedData)];
+}
+
+function safeTransactionTypedData(
+  to: string,
+  value: number,
+  data: any,
+  operation: number,
+  txGasEstimate: string,
+  baseGasEstimate: string,
+  gasPrice: string,
+  txGasToken: string,
+  refundReceiver: string,
+  nonce: any,
+  gnosisSafeAddress: string
+) {
+  return {
     types: {
       //eslint-disable-next-line @typescript-eslint/naming-convention
       EIP712Domain: [{ type: 'address', name: 'verifyingContract' }],
@@ -57,11 +121,6 @@ export async function sign(
       nonce: nonce.toNumber(),
     },
   };
-  const signatureBytes = [];
-  const sig = await signTypedData(web3, owner, typedData);
-  signatureBytes.push(ethSignSignatureToRSVForSafe(sig));
-
-  return signatureBytes;
 }
 
 export function signTypedData(web3: Web3, account: string, data: any): Promise<string> {

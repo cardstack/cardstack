@@ -16,7 +16,7 @@ import {
 } from '../utils/safe-utils';
 import { ZERO_ADDRESS } from '../constants';
 import { waitUntilTransactionMined } from '../utils/general-utils';
-import { sign, Signature } from '../utils/signing-utils';
+import { signSafeTxAsRSV, Signature } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
 
@@ -91,7 +91,7 @@ export default class RevenuePool {
     if (estimate.lastUsedNonce == null) {
       estimate.lastUsedNonce = -1;
     }
-    let signatures = await sign(
+    let signatures = await signSafeTxAsRSV(
       this.layer2Web3,
       revenuePoolAddress,
       0,
@@ -154,7 +154,7 @@ export default class RevenuePool {
         if (payload.lastUsedNonce == null) {
           payload.lastUsedNonce = -1;
         }
-        let signature = await sign(
+        let signature = await signSafeTxAsRSV(
           this.layer2Web3,
           issuingToken,
           0,
