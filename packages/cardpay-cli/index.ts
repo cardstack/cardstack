@@ -5,7 +5,13 @@ import bridge from './bridge.js';
 import awaitBridged from './await-bridged.js';
 import { viewTokenBalance } from './assets';
 import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe } from './safe.js';
-import { createPrepaidCard, priceForFaceValue, payMerchant, gasFee } from './prepaid-card.js';
+import {
+  create as createPrepaidCard,
+  split as splitPrepaidCard,
+  priceForFaceValue,
+  payMerchant,
+  gasFee,
+} from './prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
 import { claimRevenue, registerMerchant, revenueBalances } from './revenue-pool.js';
 import { hubAuth } from './hub-auth';
@@ -20,6 +26,7 @@ type Commands =
   | 'safeView'
   | 'safeTransferTokens'
   | 'prepaidCardCreate'
+  | 'prepaidCardSplit'
   | 'usdPrice'
   | 'ethPrice'
   | 'priceOracleUpdatedAt'
@@ -176,7 +183,6 @@ let {
       });
       yargs.positional('tokenAddress', {
         type: 'string',
-        default: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa', // Kovan DAI
         description: 'The token address (defaults to Kovan DAI)',
       });
       yargs.positional('customizationDID', {
@@ -188,6 +194,25 @@ let {
         description: 'A list of face values (separated by spaces) in units of § SPEND to create',
       });
       command = 'prepaidCardCreate';
+    }
+  )
+  .command(
+    'prepaidcard-split <prepaidCard> <customizationDID> <faceValues..>',
+    'Split a prepaid card into more prepaid cards',
+    (yargs) => {
+      yargs.positional('prepaidCard', {
+        type: 'string',
+        description: 'The address of the prepaid card to split',
+      });
+      yargs.positional('customizationDID', {
+        type: 'string',
+        description: 'The DID string that represents the prepaid card customization',
+      });
+      yargs.positional('faceValues', {
+        type: 'number',
+        description: 'A list of face values (separated by spaces) in units of § SPEND to create',
+      });
+      command = 'prepaidCardSplit';
     }
   )
   .command(
@@ -420,10 +445,17 @@ if (!command) {
       break;
     case 'prepaidCardCreate':
       if (tokenAddress == null || safeAddress == null || faceValues == null) {
-        showHelpAndExit('tokenAddress, safeAddress, and amounts are required values');
+        showHelpAndExit('tokenAddress, safeAddress, and faceValues are required values');
         return;
       }
       await createPrepaidCard(network, safeAddress, faceValues, tokenAddress, customizationDID || undefined, mnemonic);
+      break;
+    case 'prepaidCardSplit':
+      if (prepaidCard == null || faceValues == null) {
+        showHelpAndExit('prepaidCard and faceValues are required values');
+        return;
+      }
+      await splitPrepaidCard(network, prepaidCard, faceValues, customizationDID || undefined, mnemonic);
       break;
     case 'registerMerchant':
       if (prepaidCard == null) {

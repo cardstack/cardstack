@@ -58,6 +58,31 @@ export default [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: 'string',
+        name: 'action',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'bool',
+        name: 'useIssuingTokenForGas',
+        type: 'bool',
+      },
+      {
+        indexed: false,
+        internalType: 'bool',
+        name: 'payGasRecipient',
+        type: 'bool',
+      },
+    ],
+    name: 'GasPolicyAdded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: 'address',
         name: 'previousOwner',
@@ -287,6 +312,32 @@ export default [
   },
   {
     constant: true,
+    inputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    name: 'gasPolicies',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: 'useIssuingTokenForGas',
+        type: 'bool',
+      },
+      {
+        internalType: 'bool',
+        name: 'payGasRecipient',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
     inputs: [],
     name: 'gasToken',
     outputs: [
@@ -324,6 +375,27 @@ export default [
         internalType: 'address',
         name: '',
         type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'hasBeenSplit',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
       },
     ],
     payable: false,
@@ -528,6 +600,37 @@ export default [
     constant: false,
     inputs: [
       {
+        internalType: 'string',
+        name: 'action',
+        type: 'string',
+      },
+      {
+        internalType: 'bool',
+        name: 'useIssuingTokenForGas',
+        type: 'bool',
+      },
+      {
+        internalType: 'bool',
+        name: 'payGasRecipient',
+        type: 'bool',
+      },
+    ],
+    name: 'addGasPolicy',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
         internalType: 'address',
         name: 'from',
         type: 'address',
@@ -544,6 +647,27 @@ export default [
       },
     ],
     name: 'onTokenTransfer',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+    ],
+    name: 'setPrepaidCardUsedForSplit',
     outputs: [
       {
         internalType: 'bool',
@@ -575,63 +699,6 @@ export default [
         internalType: 'uint256',
         name: '',
         type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'prepaidCard',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
-      },
-      {
-        internalType: 'bytes',
-        name: 'previousOwnerSignature',
-        type: 'bytes',
-      },
-    ],
-    name: 'transferCard',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: true,
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'prepaidCard',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
-      },
-    ],
-    name: 'getTransferCardData',
-    outputs: [
-      {
-        internalType: 'bytes',
-        name: '',
-        type: 'bytes',
       },
     ],
     payable: false,
@@ -734,27 +801,17 @@ export default [
         type: 'address',
       },
       {
-        internalType: 'uint256[]',
-        name: 'issuingTokenAmounts',
-        type: 'uint256[]',
-      },
-      {
-        internalType: 'uint256[]',
-        name: 'spendAmounts',
-        type: 'uint256[]',
-      },
-      {
-        internalType: 'string',
-        name: 'customizationDID',
-        type: 'string',
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
       },
       {
         internalType: 'bytes',
-        name: 'ownerSignature',
+        name: 'previousOwnerSignature',
         type: 'bytes',
       },
     ],
-    name: 'splitCard',
+    name: 'transfer',
     outputs: [
       {
         internalType: 'bool',
@@ -762,8 +819,8 @@ export default [
         type: 'bool',
       },
     ],
-    payable: true,
-    stateMutability: 'payable',
+    payable: false,
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -775,22 +832,12 @@ export default [
         type: 'address',
       },
       {
-        internalType: 'uint256[]',
-        name: 'issuingTokenAmounts',
-        type: 'uint256[]',
-      },
-      {
-        internalType: 'uint256[]',
-        name: 'spendAmounts',
-        type: 'uint256[]',
-      },
-      {
-        internalType: 'string',
-        name: 'customizationDID',
-        type: 'string',
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
       },
     ],
-    name: 'getSplitCardData',
+    name: 'getTransferCardData',
     outputs: [
       {
         internalType: 'bytes',
@@ -859,6 +906,27 @@ export default [
       },
     ],
     name: 'getPrepaidCardOwner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+    ],
+    name: 'getPrepaidCardIssuer',
     outputs: [
       {
         internalType: 'address',

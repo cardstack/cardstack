@@ -26,6 +26,8 @@ let abis = {
   Spend: getAbi(join(sourceAbiDir, 'spend.ts')),
   PayMerchantHandler: getAbi(join(sourceAbiDir, 'pay-merchant-handler.ts')),
   RegisterMerchantHandler: getAbi(join(sourceAbiDir, 'register-merchant-handler.ts')),
+  SplitPrepaidCardHandler: getAbi(join(sourceAbiDir, 'split-prepaid-card-handler.ts')),
+  TransferPrepaidCardHandler: getAbi(join(sourceAbiDir, 'transfer-prepaid-card-handler.ts')),
   MerchantManager: getAbi(join(sourceAbiDir, 'merchant-manager.ts')),
   SupplierManager: getAbi(join(sourceAbiDir, 'supplier-manager.ts')),
   Exchange: getAbi(join(sourceAbiDir, 'exchange.ts')),
@@ -49,6 +51,8 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{EXCHANGE_ADDRESS}/g, getAddress('exchange', cleanNetwork))
   .replace(/{PAY_MERCHANT_HANDLER_ADDRESS}/g, getAddress('payMerchantHandler', cleanNetwork))
   .replace(/{REGISTER_MERCHANT_HANDLER_ADDRESS}/g, getAddress('registerMerchantHandler', cleanNetwork))
+  .replace(/{SPLIT_PREPAID_CARD_HANDLER_ADDRESS}/g, getAddress('splitPrepaidCardHandler', cleanNetwork))
+  .replace(/{TRANSFER_PREPAID_CARD_HANDLER_ADDRESS}/g, getAddress('transferPrepaidCardHandler', cleanNetwork))
   .replace(/{MERCHANT_MANAGER_ADDRESS}/g, getAddress('merchantManager', cleanNetwork))
   .replace(/{SUPPLIER_MANAGER_ADDRESS}/g, getAddress('supplierManager', cleanNetwork))
   .replace(/{SPEND_ADDRESS}/g, getAddress('spend', cleanNetwork));

@@ -1,10 +1,10 @@
 /*global fetch */
 
 import Web3 from 'web3';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.6.0/prepaid-card-manager';
-import MerchantManagerABI from '../../contracts/abi/v0.6.0/merchant-manager';
-import SupplierManagerABI from '../../contracts/abi/v0.6.0/supplier-manager';
-import SpendABI from '../../contracts/abi/v0.6.0/spend';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.6.1/prepaid-card-manager';
+import MerchantManagerABI from '../../contracts/abi/v0.6.1/merchant-manager';
+import SupplierManagerABI from '../../contracts/abi/v0.6.1/supplier-manager';
+import SpendABI from '../../contracts/abi/v0.6.1/spend';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
@@ -103,7 +103,7 @@ export default class Safes {
 
     let balanceResponse = await fetch(`${transactionServiceURL}/v1/safes/${safeAddress}/balances/`);
     if (!balanceResponse?.ok) {
-      throw new Error(await balanceResponse.text());
+      throw new Error(`Error retrieving safe ${safeAddress}: ${await balanceResponse.text()}`);
     }
     let balances: TokenInfo[] = await balanceResponse.json();
     let tokens = balances.filter((balanceItem) => balanceItem.tokenAddress);
@@ -178,18 +178,29 @@ export default class Safes {
 
     let exchangeRate = await getSDK('ExchangeRate', this.layer2Web3);
 
-    return await Promise.all(
-      safes.map((safeAddress: string) =>
-        this.viewSafe(safeAddress, {
-          transactionServiceURL,
-          prepaidCardManager,
-          spendContract,
-          merchantManager,
-          supplierManager,
-          exchangeRate,
-        })
-      )
-    );
+    // The transaction server can get overwhelmed and return 500's if too many
+    // calls are executed in parallel, so we'll batch up the requests
+    const batchSize = 20;
+    let result: Safe[] = [];
+    while (safes.length > 0) {
+      let batch = safes.slice(0, batchSize);
+      safes = safes.slice(batchSize);
+      result.push(
+        ...(await Promise.all(
+          batch.map((safeAddress: string) =>
+            this.viewSafe(safeAddress, {
+              transactionServiceURL,
+              prepaidCardManager,
+              spendContract,
+              merchantManager,
+              supplierManager,
+              exchangeRate,
+            })
+          )
+        ))
+      );
+    }
+    return result;
   }
 
   async sendTokens(

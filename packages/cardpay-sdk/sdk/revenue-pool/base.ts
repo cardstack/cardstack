@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
-import RevenuePoolABI from '../../contracts/abi/v0.6.0/revenue-pool';
+import RevenuePoolABI from '../../contracts/abi/v0.6.1/revenue-pool';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { getAddress } from '../../contracts/addresses';
 import {
@@ -137,11 +137,11 @@ export default class RevenuePool {
     await prepaidCard.convertFromSpendForPrepaidCard(
       prepaidCardAddress,
       registrationFee,
-      (issuingToken, balanceAmount, requiredTokenAmount) =>
+      (issuingToken, balanceAmount, requiredTokenAmount, symbol) =>
         new Error(
           `Prepaid card does not have enough balance to register a merchant. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
             balanceAmount.toString()
-          )}, payment amount in issuing token is ${fromWei(requiredTokenAmount)}`
+          )} ${symbol}, payment amount in issuing token is ${fromWei(requiredTokenAmount)} ${symbol}`
         )
     );
 

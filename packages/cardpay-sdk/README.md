@@ -22,6 +22,8 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`Safes.setSupplierInfoDID`](#safessetsupplierinfodid)
 - [`PrepaidCard`](#prepaidcard)
   - [`PrepaidCard.create`](#prepaidcardcreate)
+  - [`PrepaidCard.canSplit`](#prepaidcardcansplit)
+  - [`PrepaidCard.split`](#prepaidcardsplit)
   - [`PrepaidCard.priceForFaceValue`](#prepaidcardpriceforfacevalue)
   - [`PrepaidCard.gasFee`](#prepaidcardgasfee)
   - [`PrepaidCard.payMerchant`](#prepaidcardpaymerchant)
@@ -343,6 +345,8 @@ This method is invoked with the following parameters:
 - The contract address of the token that you wish to use to pay for the prepaid card. Note that the face value of the prepaid card will fluctuate based on the exchange rate of this token and the **§** unit.
 - An array of face values in units of **§** SPEND as numbers. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
 - A DID string that represents the customization for the prepaid card. The customization for a prepaid card can be retrieved using a DID resolver with this DID. If there is no customization an `undefined` value can be specified here.
+- You can optionally provide a callback to obtain the prepaid card addresses before the creation process is complete
+- You can optionally provide a callback to obtain a hook to know when the gas has been loaded into the prepaid card before the creation process is complete
 - You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
 
 ```js
@@ -414,6 +418,33 @@ interface RelayTransaction {
   transactionHash: string;
 }
 ```
+
+### `PrepaidCard.canSplit`
+This call will return a  promise for a boolean indicating if the prepaid card can be split.
+```js
+let canSplit = await prepaidCard.canSplit(prepaidCardAddress);
+```
+
+### `PrepaidCard.split`
+This call will use a prepaid card as the source of funds when creating more prepaid cards, in effect "splitting" the prepaid card being used to fund the transaction. (Note that use a prepaid card is used to fund the creation of more prepaid cards, the funding prepaid card may not be transferred and is considered the issuer's own personal prepaid card.) The creation mechanisms for prepaid cards created via a `PrepaidCard.split` are identical to `PrepaidCard.create` in terms of the total cost and gas charges.
+
+This method is invoked with the following parameters:
+- The address of the prepaid card that you are using to fund the creation of more prepaid cards
+- An array of face values in units of **§** SPEND as numbers. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
+- A DID string that represents the customization for the prepaid card. The customization for a prepaid card can be retrieved using a DID resolver with this DID. If there is no customization an `undefined` value can be specified here.
+- You can optionally provide a callback to obtain the prepaid card addresses before the creation process is complete
+- You can optionally provide a callback to obtain a hook to know when the gas has been loaded into the prepaid card before the creation process is complete
+- You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
+
+```js
+let result = await prepaidCard.split(
+  prepaidCardAddress,
+  [5000, 4000], // split into 2 cards: §5000 SPEND face value and §4000 SPEND face value
+  "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49"
+);
+```
+
+The result is a promise that has the exact same shape as `PrepaidCard.create`.
 
 ### `PrepaidCard.priceForFaceValue`
 This call will return the price in terms of the specified token of how much it costs to have a face value in the specified units of SPEND (**§**). This takes into account both the exchange rate of the specified token as well as gas fees that are deducted from the face value when creating a prepaid card. Note though, that the face value of the prepaid card in SPEND will drift based on the exchange rate of the underlying token used to create the prepaid card. (However, this drift should be very slight since we are using *stable* coins to purchase prepaid cards (emphasis on "stable"). Since the units of SPEND are very small relative to wei (**§** 1 === $0.01 USD), the face value input is a number type. This API returns the amount of tokens required to achieve a particular face value as a string in units of `wei` of the specified token.

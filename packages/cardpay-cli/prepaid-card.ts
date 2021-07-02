@@ -25,7 +25,7 @@ export async function gasFee(network: string, tokenAddress: string, mnemonic?: s
   console.log(`The gas fee for a new prepaid card in units of this token is ${fromWei(weiAmount)}`);
 }
 
-export async function createPrepaidCard(
+export async function create(
   network: string,
   safe: string,
   faceValues: number[],
@@ -37,12 +37,37 @@ export async function createPrepaidCard(
 
   let prepaidCard = await getSDK('PrepaidCard', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
+  let assets = await getSDK('Assets', web3);
+  let { symbol } = await assets.getTokenInfo(tokenAddress);
 
-  console.log('Creating prepaid card');
+  console.log(
+    `Creating prepaid card(s) with face value(s) §${faceValues.join(
+      ' SPEND, §'
+    )} SPEND and issuing token ${symbol} from depot ${safe}...`
+  );
   let result = await prepaidCard.create(safe, tokenAddress, faceValues, customizationDID, (prepaidCardAddresses) =>
-    console.log(`Created new prepaid card: ${prepaidCardAddresses.join(', ')}`)
+    console.log(`Created new prepaid card(s): ${prepaidCardAddresses.join(', ')}`)
   );
   console.log(`Transaction hash: ${blockExplorer}/tx/${result.gnosisTxn.ethereumTx.txHash}/token-transfers`);
+}
+
+export async function split(
+  network: string,
+  prepaidCard: string,
+  faceValues: number[],
+  customizationDID: string | undefined,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+
+  let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+
+  console.log(`Splitting prepaid card ${prepaidCard} into face value(s) §${faceValues.join(' SPEND, §')} SPEND...`);
+  let result = await prepaidCardAPI.split(prepaidCard, faceValues, customizationDID, (prepaidCardAddresses) =>
+    console.log(`Created new prepaid card(s): ${prepaidCardAddresses.join(', ')}`)
+  );
+  console.log(`Transaction hash: ${blockExplorer}/tx/${result!.gnosisTxn.ethereumTx.txHash}/token-transfers`);
 }
 
 export async function payMerchant(

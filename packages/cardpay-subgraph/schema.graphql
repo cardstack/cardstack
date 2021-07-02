@@ -5,6 +5,7 @@ type Account @entity {
   receivedBridgedTokens: [BridgeEvent]!            @derivedFrom(field: "supplier")
   supplierInfoDIDUpdates: [SupplierInfoDIDUpdate]! @derivedFrom(field: "supplier")
   createdPrepaidCards: [PrepaidCardCreation]!      @derivedFrom(field: "issuer")
+  splitPrepaidCards: [PrepaidCardSplit]!           @derivedFrom(field: "issuer")
   createdMerchants: [MerchantCreation]!            @derivedFrom(field: "merchant")
   receivedPrepaidCards: [PrepaidCardTransfer]!     @derivedFrom(field: "to")
   sentPrepaidCards: [PrepaidCardTransfer]!         @derivedFrom(field: "from")
@@ -35,6 +36,7 @@ type PrepaidCard @entity {
   issuingTokenBalance: BigInt!
   creation: PrepaidCardCreation                    @derivedFrom(field: "prepaidCard")
   payments: [PrepaidCardPayment]!                  @derivedFrom(field: "prepaidCard")
+  splits: [PrepaidCardSplit]!                      @derivedFrom(field: "prepaidCard")
 }
 
 type MerchantSafe @entity {
@@ -82,6 +84,17 @@ type PrepaidCardPayment @entity {
   historicPrepaidCardSpendBalance: BigInt!
   historicPrepaidCardIssuingTokenBalance: BigInt!
   merchantRegistrationPayments: [MerchantRegistrationPayment]! @derivedFrom(field: "prepaidCardPayment")
+}
+
+type PrepaidCardSplit @entity {
+  id: ID!
+  timestamp: BigInt!
+  transaction: Transaction!
+  prepaidCard: PrepaidCard!
+  issuer: Account!
+  faceValues: [BigInt!]!
+  issuingTokenAmounts: [BigInt!]!
+  customizationDID: String
 }
 
 type MerchantRevenue @entity {
@@ -237,6 +250,7 @@ type Transaction @entity {
   merchantCreations: [MerchantCreation]!           @derivedFrom(field: "transaction")
   merchantRegistrationPayments: [MerchantRegistrationPayment]! @derivedFrom(field: "transaction")
   prepaidCardPayments: [PrepaidCardPayment]!       @derivedFrom(field: "transaction")
+  prepaidCardSplits: [PrepaidCardSplit]!           @derivedFrom(field: "transaction")
   spendAccumulations: [SpendAccumulation]!         @derivedFrom(field: "transaction")
   merchantFeePayments: [MerchantFeePayment]!       @derivedFrom(field: "transaction")
   merchantClaims: [MerchantClaim]!                 @derivedFrom(field: "transaction")
