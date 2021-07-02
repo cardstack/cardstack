@@ -28,6 +28,8 @@ import {
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { IHubAuth } from '../../../../cardpay-sdk/sdk/hub-auth';
+import config from '../../config/environment';
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -43,6 +45,7 @@ export default abstract class Layer2ChainWeb3Strategy
   web3: Web3 = new Web3();
   #exchangeRateApi!: IExchangeRate;
   #safesApi!: ISafes;
+  #hubAuthApi!: IHubAuth;
   @tracked depotSafe: DepotSafe | null = null;
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
@@ -126,6 +129,7 @@ export default abstract class Layer2ChainWeb3Strategy
     this.web3.setProvider(this.provider as any);
     this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
     this.#safesApi = await getSDK('Safes', this.web3);
+    this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
   }
 
@@ -285,6 +289,10 @@ export default abstract class Layer2ChainWeb3Strategy
     }
 
     return await this.#exchangeRateApi.convertFromSpend(address, amount);
+  }
+
+  async authenticate(): Promise<string> {
+    return this.#hubAuthApi.authenticate();
   }
 
   async disconnect(): Promise<void> {
