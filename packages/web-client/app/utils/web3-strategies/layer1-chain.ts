@@ -37,7 +37,6 @@ export default abstract class Layer1ChainWeb3Strategy
   web3 = new Web3();
   provider: any | undefined;
   broadcastChannel: BroadcastChannel;
-  walletConnectUri: string | undefined;
   simpleEmitter = new SimpleEmitter();
   cardTokenContract: Contract;
   daiTokenContract: Contract;
