@@ -104,6 +104,7 @@
 
 .transaction-amount__support-link:hover {
   color: var(--boxel-error-100);
+
   /* Opting for filter instead of introducing a new color */
   filter: brightness(0.9);
 }
