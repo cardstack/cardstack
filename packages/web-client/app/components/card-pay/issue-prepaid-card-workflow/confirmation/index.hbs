@@ -14,11 +14,11 @@
         @headerPatternUrl={{@workflowSession.state.pattern.patternUrl}}
         @headerTextColor={{@workflowSession.state.colorScheme.textColor}}
         @headerPatternColor={{@workflowSession.state.colorScheme.patternColor}}
-        @mockBalance={{true}}
-        @balance="123,456"
-        @usdBalance="1,234.56"
-        @address="0x1234...abcd"
-        @network="xDai Chain"
+        @mockBalance={{false}}
+        @balance={{@workflowSession.state.spendFaceValue}}
+        @usdBalance={{spend-to-usd @workflowSession.state.spendFaceValue}}
+        @address={{@workflowSession.state.prepaidCardAddress}}
+        @network={{this.layer2Network.chainName}}
         class="issue-prepaid-card-workflow-confirmation__card"
       />
     </div>

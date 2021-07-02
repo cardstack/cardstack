@@ -26,7 +26,8 @@
               @balance={{this.faceValue}}
               @usdBalance={{spend-to-usd this.faceValue}}
               @address="0x1234...abcd"
-              @network="xDai Chain"
+              @network={{this.layer2Network.chainName}}
+
             />
           </div>
         </Boxel::Field>
