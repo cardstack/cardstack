@@ -50,6 +50,12 @@ export default [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [],
+    name: 'Setup',
+    type: 'event',
+  },
+  {
     constant: true,
     inputs: [],
     name: 'actionDispatcher',

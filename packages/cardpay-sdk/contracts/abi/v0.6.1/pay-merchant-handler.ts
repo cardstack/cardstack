@@ -87,6 +87,12 @@ export default [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [],
+    name: 'Setup',
+    type: 'event',
+  },
+  {
     constant: true,
     inputs: [],
     name: 'actionDispatcher',
@@ -177,6 +183,21 @@ export default [
     type: 'function',
   },
   {
+    constant: true,
+    inputs: [],
+    name: 'prepaidCardManager',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     constant: false,
     inputs: [],
     name: 'renounceOwnership',
@@ -241,6 +262,11 @@ export default [
       {
         internalType: 'address',
         name: '_merchantManager',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_prepaidCardManager',
         type: 'address',
       },
       {
