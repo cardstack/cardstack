@@ -7,9 +7,13 @@ import { networkName } from '../sdk/utils/general-utils';
 // subgraph assembly script.
 import PayMerchantHandlerABI from './abi/v0.6.1/pay-merchant-handler';
 import RegisterMerchantHandlerABI from './abi/v0.6.1/register-merchant-handler';
+import TransferPrepaidCardHandlerABI from './abi/v0.6.1/transfer-prepaid-card-handler';
+import SplitPrepaidCardHandlerABI from './abi/v0.6.1/split-prepaid-card-handler';
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
 consumeModule(RegisterMerchantHandlerABI);
+consumeModule(TransferPrepaidCardHandlerABI);
+consumeModule(SplitPrepaidCardHandlerABI);
 
 const addresses: {
   [network: string]: {
@@ -31,6 +35,8 @@ const addresses: {
     exchange: '0x2605718656E317D2347Af082094f239cc7d4D52c',
     payMerchantHandler: '0xB2Dc4A31bAdaF8962B882b67958033DCF1FbEE6c',
     registerMerchantHandler: '0xc267d67cDbb5aCC6f477D4eAb173Dcc54F00e762',
+    splitPrepaidCardHandler: '0x938533e9533f5F9E67DDC693ffE78710A5C096c2',
+    transferPrepaidCardHandler: '0x311529D6DB926441c352725448eeF4A64f71438e',
     supplierManager: '0xBB6BaE445c8E43d929c0EE4C915c8ef002088D25',
     merchantManager: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2',
     spend: '0xcd7AB5c678Bc0b90dD6f870B8F214c10A943FC67',

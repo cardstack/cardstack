@@ -175,6 +175,39 @@ dataSources:
       file: ./src/mappings/pay-merchant-handler.ts
 
   - kind: ethereum/contract
+    name: Splits
+    network: {NETWORK}
+    source:
+      address: "{SPLIT_PREPAID_CARD_HANDLER_ADDRESS}"
+      abi: SplitPrepaidCardHandler
+      startBlock: 21403252 # v0.6.0 version of protocol
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - EOATransaction
+        - Account
+        - PrepaidCardPayment
+        - PrepaidCardSplit
+      abis:
+        - name: SplitPrepaidCardHandler
+          file: ./abis/generated/SplitPrepaidCardHandler.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: SplitPrepaidCard(address,uint256[],uint256[],address,address,string)
+          handler: handlePrepaidCardSplit
+      file: ./src/mappings/split-prepaid-card-handler.ts
+
+  - kind: ethereum/contract
     name: RevenuePool
     network: {NETWORK}
     source:
