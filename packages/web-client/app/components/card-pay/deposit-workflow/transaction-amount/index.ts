@@ -130,6 +130,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       this.isUnlocked = true;
       this.unlockTxnReceipt = transactionReceipt;
     } catch (e) {
+      console.error(e);
       this.errorMessage =
         'There was a problem unlocking your tokens for deposit. This may be due to a network issue, or perhaps you canceled the request in your wallet.';
     } finally {
@@ -162,6 +163,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       this.args.onComplete?.();
       this.hasDeposited = true;
     } catch (e) {
+      console.error(e);
       this.errorMessage =
         'There was a problem initiating the bridging of your tokens to the xDai chain. This may be due to a network issue, or perhaps you canceled the request in your wallet.';
     } finally {
