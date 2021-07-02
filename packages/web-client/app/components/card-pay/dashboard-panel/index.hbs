@@ -10,8 +10,22 @@
       <p class="dashboard-panel__header-desc">{{@description}}</p>
     </header>
     {{#if @heroImageUrl}}
-      <div class="dashboard-panel__hero" style={{css-url "background-image" @heroImageUrl}} />
+      <div
+        class="dashboard-panel__hero"
+        style={{css-url "background-image" @heroImageUrl}}
+      />
     {{/if}}
-    {{yield}}
+    {{#each @sections as |section i|}}
+      <CardPay::DashboardPanel::Section
+        @icon={{section.icon}}
+        @title={{section.title}}
+        @description={{section.description}}
+        @bullets={{section.bullets}}
+        @cta={{section.cta}}
+        @isCtaDisabled={{section.isCtaDisabled}}
+        @footnote={{section.footnote}}
+        @ctaAction={{get @ctaActions i}}
+      />
+    {{/each}}
   </section>
 </details>

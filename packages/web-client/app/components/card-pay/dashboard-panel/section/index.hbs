@@ -2,7 +2,28 @@
   {{#if @icon}}
     {{svg-jar @icon width="80" height="80"}}
   {{/if}}
-  <h4 class="dashboard-panel__section-title">{{@sectionTitle}}</h4>
-  <p>{{@sectionDescription}}</p>
-  {{yield}}
+  <h4 class="dashboard-panel__section-title">{{@title}}</h4>
+  <p>{{@description}}</p>
+
+  {{#if @bullets}}
+    <ul class="dashboard-panel__list">
+      {{#each @bullets as |bullet|}}
+        <li class="dashboard-panel__list-item">{{bullet}}</li>
+      {{/each}}
+    </ul>
+  {{/if}}
+
+  <Boxel::Button
+    class="dashboard-panel__cta"
+    @kind="primary"
+    @size="touch"
+    @disabled={{@isCtaDisabled}}
+    {{on "click" (optional @ctaAction)}}
+  >
+    {{@cta}}
+  </Boxel::Button>
+
+  {{#if @footnote}}
+    <p><small class="dashboard-panel__note">{{@footnote}}</small></p>
+  {{/if}}
 </section>

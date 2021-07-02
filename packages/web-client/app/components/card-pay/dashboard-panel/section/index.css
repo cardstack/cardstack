@@ -21,11 +21,11 @@
   font: var(--boxel-font-sm);
 }
 
-.dashboard-panel__list li + li {
+.dashboard-panel__list-item + .dashboard-panel__list-item {
   margin-top: var(--boxel-sp);
 }
 
-.dashboard-panel__list li::marker {
+.dashboard-panel__list-item::marker {
   color: var(--boxel-dark);
 }
 

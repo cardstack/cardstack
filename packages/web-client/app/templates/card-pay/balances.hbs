@@ -1,56 +1,20 @@
 <section class="card-pay-dashboard__section" role="tabpanel" aria-labelledby="card-pay.balances">
-  <CardPay::DashboardPanel
-    @title="Easy Payments"
-    @description="DeFi payments that are fast, easy and cheap for everyone"
-    @heroImageUrl="/images/dashboard/balances-hero-sm.svg"
+  {{!-- <Boxel::Button
+    {{on "click" (set this "flow" 'issue-prepaid-card')}}
+    class="dashboard-panel__cta"
+    @kind="primary"
+    @size="touch"
+    data-test-issue-prepaid-card-workflow-button
   >
-    <CardPay::DashboardPanel::Section
-      @icon="balances-1-customers"
-      @sectionTitle="Customers"
-      @sectionDescription="You need a prepaid card to pay for products and services
-        offered by merchants in the Card Pay network. To start, you can buy a prepaid
-        card via Apple Pay in the Card Wallet mobile app."
-    >
-      <ul class="dashboard-panel__list">
-        <li>Pay with your prepaid card as you make purchases in the network</li>
-        <li>Confirm your payments with Touch ID or Face ID in the Card Wallet mobile app</li>
-        <li>Reload your prepaid card at any time</li>
-        <li>Earn rewards for the purchases you make</li>
-      </ul>
-      <Boxel::Button class="dashboard-panel__cta" @kind="primary" @size="touch" @disabled={{true}}>
-        Buy Prepaid Card
-      </Boxel::Button>
-    </CardPay::DashboardPanel::Section>
-    <CardPay::DashboardPanel::Section
-      @icon="balances-2-issuers"
-      @sectionTitle="Issuers"
-      @sectionDescription="You can issue prepaid cards yourself, which you
-        can use for purchases in the network or transfer to other users."
-    >
-      <ul class="dashboard-panel__list">
-        <li>Issue your own prepaid card with crypto funding</li>
-        <li>Split a prepaid card into several cards of smaller denominations</li>
-        <li>Transfer prepaid cards to other users and charge an issuance and/or processing fee</li>
-        <li>Reload your prepaid cards by adding more crypto funds</li>
-      </ul>
-      <Boxel::Button
-        {{on "click" (set this "flow" 'issue-prepaid-card')}}
-        class="dashboard-panel__cta"
-        @kind="primary"
-        @size="touch"
-        data-test-issue-prepaid-card-workflow-button
-      >
-        Issue Prepaid Card
-      </Boxel::Button>
-      <p>
-        <small class="dashboard-panel__note">
-          This is possible if you have a balance of DAI CPXD in your xDai chain wallet.
-          (You can deposit DAI from your mainnet wallet to get a balance of DAI CPXD in
-          your xDai chain wallet.)
-        </small>
-      </p>
-    </CardPay::DashboardPanel::Section>
-  </CardPay::DashboardPanel>
+    Issue Prepaid Card
+  </Boxel::Button> --}}
+  <CardPay::DashboardPanel
+    @title={{@model.panel.title}}
+    @description={{@model.panel.description}}
+    @heroImageUrl={{@model.panel.heroImageUrl}}
+    @sections={{@model.panel.sections}}
+    @ctaActions={{array null (set this "flow" 'issue-prepaid-card')}}
+  />
 </section>
 
 <Boxel::Modal
