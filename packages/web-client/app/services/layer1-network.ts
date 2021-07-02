@@ -8,12 +8,14 @@ import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import { task } from 'ember-concurrency-decorators';
 import { WalletProvider } from '../utils/wallet-providers';
+import { TransactionReceipt } from 'web3-core';
 import BN from 'bn.js';
 import {
   SimpleEmitter,
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
 import { action } from '@ember/object';
+import { TaskGenerator } from 'ember-concurrency';
 
 export default class Layer1Network extends Service {
   strategy!: Layer1Web3Strategy;
@@ -61,7 +63,10 @@ export default class Layer1Network extends Service {
     return this.simpleEmitter.on(event, cb);
   }
 
-  @task *approve(amount: BN, tokenSymbol: string): any {
+  @task *approve(
+    amount: BN,
+    tokenSymbol: string
+  ): TaskGenerator<TransactionReceipt> {
     let txnReceipt = yield this.strategy.approve(amount, tokenSymbol);
     return txnReceipt;
   }
@@ -70,7 +75,7 @@ export default class Layer1Network extends Service {
     tokenSymbol: string,
     destinationAddress: string,
     amount: BN
-  ): any {
+  ): TaskGenerator<TransactionReceipt> {
     let txnReceipt = yield this.strategy.relayTokens(
       tokenSymbol,
       destinationAddress,
