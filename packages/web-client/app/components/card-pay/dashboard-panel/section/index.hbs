@@ -1,31 +1,17 @@
-<section class="dashboard-panel__section">
-  {{#if @icon}}
-    <div class="dashboard-panel__section-icon">
-      {{svg-jar @icon class="dashboard-panel__section-icon-svg" alt="" role="presentation"}}
-    </div>
+<section class={{cn "dashboard-panel-section" dashboard-panel-section--bottom-aligned=(not @section.title)}} ...attributes>
+  {{#if @section.icon}}
+    {{svg-jar @section.icon alt="" role="presentation"}}
   {{/if}}
-  <h4 class="dashboard-panel__section-title">{{@title}}</h4>
-  <p>{{@description}}</p>
+  <h4 class="dashboard-panel-section__title">{{@section.title}}</h4>
+  <p class="dashboard-panel-section__desc">{{@section.description}}</p>
 
-  {{#if @bullets}}
-    <ul class="dashboard-panel__list">
-      {{#each @bullets as |bullet|}}
-        <li class="dashboard-panel__list-item">{{bullet}}</li>
+  {{#if @section.bullets}}
+    <ul class="dashboard-panel-section__list">
+      {{#each @section.bullets as |bullet|}}
+        <li class="dashboard-panel-section__list-item">{{bullet}}</li>
       {{/each}}
     </ul>
   {{/if}}
 
-  <Boxel::Button
-    class="dashboard-panel__cta"
-    @kind="primary"
-    @size="touch"
-    @disabled={{@isCtaDisabled}}
-    {{on "click" (optional @ctaAction)}}
-  >
-    {{@cta}}
-  </Boxel::Button>
-
-  {{#if @footnote}}
-    <p><small class="dashboard-panel__note">{{@footnote}}</small></p>
-  {{/if}}
+  {{yield}}
 </section>

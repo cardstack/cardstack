@@ -6,26 +6,16 @@
   </summary>
   <section class="dashboard-panel">
     <header class="dashboard-panel__header">
-      <h3 class="dashboard-panel__header-title">{{@title}}</h3>
-      <p class="dashboard-panel__header-desc">{{@description}}</p>
+      <h3 class="dashboard-panel__header-title">{{@panel.title}}</h3>
+      <p class="dashboard-panel__header-desc">{{@panel.description}}</p>
     </header>
-    {{#if @heroImageUrl}}
+    {{#if @panel.heroImageUrl}}
       <div
         class="dashboard-panel__hero"
-        style={{css-url "background-image" @heroImageUrl}}
+        style={{css-url "background-image" @panel.heroImageUrl}}
       />
     {{/if}}
-    {{#each @sections as |section i|}}
-      <CardPay::DashboardPanel::Section
-        @icon={{section.icon}}
-        @title={{section.title}}
-        @description={{section.description}}
-        @bullets={{section.bullets}}
-        @cta={{section.cta}}
-        @isCtaDisabled={{section.isCtaDisabled}}
-        @footnote={{section.footnote}}
-        @ctaAction={{get @ctaActions i}}
-      />
-    {{/each}}
+
+    {{yield}}
   </section>
 </details>

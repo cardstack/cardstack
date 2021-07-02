@@ -1,14 +1,15 @@
 import Route from '@ember/routing/route';
-// import '../../css/card-pay/balances.css';
+import heroImageUrl from '@cardstack/web-client/images/dashboard/merchants-hero.svg';
 
 const MERCHANTS_PANEL = {
   title: 'Easy Earnings',
   description:
     'Revenue backed by stablecoins with automatically managed currency conversions',
-  heroImageUrl: '/images/dashboard/merchants-hero.svg',
+  heroImageUrl,
   sections: [
     {
-      icon: 'marchants-1',
+      workflow: 'create-merchant',
+      icon: 'merchants',
       title: 'Merchants',
       description: `Set up your merchant account and start receiving payments via Card Pay in just a few minutes!`,
       bullets: [
@@ -21,11 +22,11 @@ const MERCHANTS_PANEL = {
       isCtaDisabled: true,
     },
     {
-      icon: 'merchants-2-payment',
+      workflow: 'request-payment',
+      icon: 'merchants-payment',
       description: `Send your customers a link or a QR code they can scan to make a payment.`,
       cta: 'Request Payment',
       isCtaDisabled: true,
-      footnote: `This is possible once you have connected your xDai chain wallet and created a merchant.`,
     },
   ],
 };

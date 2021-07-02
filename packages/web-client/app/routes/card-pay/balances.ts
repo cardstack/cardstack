@@ -1,13 +1,15 @@
 import Route from '@ember/routing/route';
 import '../../css/card-pay/balances.css';
+import heroImageUrl from '@cardstack/web-client/images/dashboard/balances-hero.svg';
 
 const BALANCES_PANEL = {
   title: 'Easy Payments',
   description: 'DeFi payments that are fast, easy and cheap for everyone',
-  heroImageUrl: '/images/dashboard/balances-hero.svg',
+  heroImageUrl,
   sections: [
     {
-      icon: 'balances-1-customers',
+      workflow: 'buy-prepaid-card',
+      icon: 'balances-customers',
       title: 'Customers',
       description: `You need a prepaid card to pay for products and services
         offered by merchants in the Card Pay network. To start, you can buy
@@ -22,7 +24,8 @@ const BALANCES_PANEL = {
       isCtaDisabled: true,
     },
     {
-      icon: 'balances-2-issuers',
+      workflow: 'issue-prepaid-card',
+      icon: 'balances-issuers',
       title: 'Issuers',
       description: `You can issue prepaid cards yourself, which you can use
         for purchases in the network or transfer to other users.`,
@@ -33,9 +36,6 @@ const BALANCES_PANEL = {
         'Reload your prepaid cards by adding more crypto funds',
       ],
       cta: 'Issue Prepaid Card',
-      footnote: `This is possible if you have a balance of DAI.CPXD in your xDai
-        chain wallet. (You can deposit DAI from your mainnet wallet to get a
-        balance of DAI.CPXD in your xDai chain wallet.)`,
     },
   ],
 };

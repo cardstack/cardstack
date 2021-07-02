@@ -1,9 +1,22 @@
 <section class="card-pay-dashboard__section" role="tabpanel" aria-labelledby="card-pay.merchant-services">
-  <CardPay::DashboardPanel
-    @title={{@model.panel.title}}
-    @description={{@model.panel.description}}
-    @heroImageUrl={{@model.panel.heroImageUrl}}
-    @sections={{@model.panel.sections}}
-    style={{css-var hero-max-height="50rem"}}
-  />
+  <CardPay::DashboardPanel @panel={{@model.panel}}>
+    {{#each @model.panel.sections as |section|}}
+      <CardPay::DashboardPanel::Section @section={{section}}>
+        <Boxel::Button
+          {{on "click" (set this "flow" section.workflow)}}
+          @kind="primary"
+          @size="touch"
+          @disabled={{section.isCtaDisabled}}
+          data-test-workflow-button={{section.workflow}}
+        >
+          {{section.cta}}
+        </Boxel::Button>
+        {{#if (eq section.workflow 'request-payment')}}
+          <small>
+            This is possible once you have connected your xDai chain wallet and created a merchant.
+          </small>
+        {{/if}}
+      </CardPay::DashboardPanel::Section>
+    {{/each}}
+  </CardPay::DashboardPanel>
 </section>

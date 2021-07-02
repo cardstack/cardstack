@@ -2,7 +2,6 @@
 .dashboard-details-container {
   --spacing: calc(var(--boxel-sp-xxxl) * var(--boxel-ratio));
   --border-color: #d3d3d3;
-  --hero-max-height: 50rem;
 
   position: relative;
   max-width: 72rem;
@@ -18,11 +17,6 @@
   height: 5rem;
 }
 
-.dashboard-details-container[open] .dashboard-details-container__summary {
-  height: 1.25rem;
-  background-color: var(--boxel-green);
-}
-
 .dashboard-details-container__summary::marker,
 .dashboard-details-container__summary::-webkit-details-marker {
   display: none;
@@ -36,6 +30,11 @@
 
 .dashboard-details-container[open] .dashboard-details-container__marker::before {
   content: "Hide details";
+}
+
+.dashboard-details-container[open] .dashboard-details-container__summary {
+  height: 1.25rem;
+  background-color: var(--boxel-green);
 }
 
 .dashboard-details-container__marker {
@@ -75,7 +74,7 @@
 
 .dashboard-panel__header {
   grid-column: 1 / -1;
-  max-width: 28rem;
+  max-width: 30rem;
 }
 
 .dashboard-panel__header-title {
@@ -95,7 +94,7 @@
   top: 0;
   right: 0;
   width: 100%;
-  height: var(--hero-max-height);
+  height: 50rem;
   background-position: top right;
   background-repeat: no-repeat;
   background-size: contain;

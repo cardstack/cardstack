@@ -1,14 +1,15 @@
 import Route from '@ember/routing/route';
-// import '../../css/card-pay/balances.css';
+import heroImageUrl from '@cardstack/web-client/images/dashboard/suppliers-hero.svg';
 
 const SUPPLIERS_PANEL = {
   title: 'Easy Rewards',
   description:
     'Token bridging between layer 1 and layer 2 with protocol fees as rewards',
-  heroImageUrl: '/images/dashboard/suppliers-hero.svg',
+  heroImageUrl,
   sections: [
     {
-      icon: 'suppliers-1-deposit',
+      workflow: 'deposit',
+      icon: 'suppliers',
       title: 'Token Suppliers',
       description: `Deposit tokens from your mainnet wallet into the CARD Protocol’s reserve pool to receive an equivalent amount of CPXD tokens in your xDai chain wallet.`,
       bullets: [
@@ -18,7 +19,8 @@ const SUPPLIERS_PANEL = {
       cta: 'Deposit Tokens',
     },
     {
-      icon: 'suppliers-2-payment',
+      workflow: 'withdrawal',
+      icon: 'suppliers-merchants',
       title: 'Token Suppliers & Merchants',
       description: `Withdraw tokens from your xDai chain wallet to receive an equivalent amount of tokens in your mainnet wallet.`,
       bullets: [

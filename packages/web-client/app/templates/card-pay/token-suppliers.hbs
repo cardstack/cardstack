@@ -1,11 +1,19 @@
 <section class="card-pay-dashboard__section" role="tabpanel" aria-labelledby="card-pay.token-suppliers">
-  <CardPay::DashboardPanel
-    @title={{@model.panel.title}}
-    @description={{@model.panel.description}}
-    @heroImageUrl={{@model.panel.heroImageUrl}}
-    @sections={{@model.panel.sections}}
-    @ctaActions={{array (set this "flow" 'deposit') (set this "flow" 'withdrawal')}}
-  />
+  <CardPay::DashboardPanel @panel={{@model.panel}}>
+    {{#each @model.panel.sections as |section|}}
+      <CardPay::DashboardPanel::Section @section={{section}}>
+        <Boxel::Button
+          {{on "click" (set this "flow" section.workflow)}}
+          @kind="primary"
+          @size="touch"
+          @disabled={{section.isCtaDisabled}}
+          data-test-workflow-button={{section.workflow}}
+        >
+          {{section.cta}}
+        </Boxel::Button>
+      </CardPay::DashboardPanel::Section>
+    {{/each}}
+  </CardPay::DashboardPanel>
 </section>
 
 <Boxel::Modal
