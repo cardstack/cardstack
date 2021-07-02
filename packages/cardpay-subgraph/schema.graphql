@@ -37,6 +37,7 @@ type PrepaidCard @entity {
   creation: PrepaidCardCreation                    @derivedFrom(field: "prepaidCard")
   payments: [PrepaidCardPayment]!                  @derivedFrom(field: "prepaidCard")
   splits: [PrepaidCardSplit]!                      @derivedFrom(field: "prepaidCard")
+  transfers: [PrepaidCardTransfer]!                @derivedFrom(field: "prepaidCard")
 }
 
 type MerchantSafe @entity {
@@ -97,6 +98,15 @@ type PrepaidCardSplit @entity {
   customizationDID: String
 }
 
+type PrepaidCardTransfer @entity {
+  id: ID!
+  timestamp: BigInt!
+  transaction: Transaction!
+  prepaidCard: PrepaidCard!
+  from: Account!
+  to: Account!
+}
+
 type MerchantRevenue @entity {
   id: ID!                               # merchantSafe-token
   token: Token!
@@ -150,7 +160,7 @@ type PrepaidCardCreation @entity {
   transaction: Transaction!
   createdAt: BigInt!
   prepaidCard: PrepaidCard!
-  depot: Depot # prepaid card may not heave been created from depot. TODO also handle prepaid cards created from other prepaid cards
+  depot: Depot # prepaid card may not heave been created from depot.
   createdFromAddress: String!
   issuer: Account!
   issuingToken: Token!
@@ -176,13 +186,6 @@ type MerchantRegistrationPayment @entity {
   issuingToken: Token!
   issuingTokenAmount: BigInt!
   spendAmount: BigInt!
-}
-
-type PrepaidCardTransfer @entity {
-  id: ID!                          # safe.id-from-to-txnhash
-  transaction: Transaction!
-  from: Account!
-  to: Account!
 }
 
 type TokenSwap @entity {

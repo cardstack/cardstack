@@ -1,6 +1,10 @@
-import { CreatePrepaidCard, PrepaidCardManager } from '../../generated/PrepaidCard/PrepaidCardManager';
-import { Account, Depot, PrepaidCard, PrepaidCardCreation } from '../../generated/schema';
-import { makeToken, makeEOATransaction, toChecksumAddress } from '../utils';
+import {
+  CreatePrepaidCard,
+  PrepaidCardManager,
+  TransferredPrepaidCard,
+} from '../../generated/PrepaidCard/PrepaidCardManager';
+import { Account, Depot, PrepaidCard, PrepaidCardCreation, PrepaidCardTransfer } from '../../generated/schema';
+import { makeToken, makeEOATransaction, toChecksumAddress, makeTransaction } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
 export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
@@ -36,11 +40,30 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   creationEntity.issuingTokenAmount = event.params.issuingTokenAmount;
   let createdFrom = toChecksumAddress(event.params.createdFromDepot);
   creationEntity.createdFromAddress = createdFrom;
-  // TODO handle cards created from other prepaid cards (split cards)
   if (Depot.load(createdFrom) != null) {
     creationEntity.depot = createdFrom;
   }
   creationEntity.spendAmount = event.params.spendAmount;
   creationEntity.creationGasFeeCollected = event.params.gasFeeCollected;
   creationEntity.save();
+}
+
+export function handleTransferPrepaidCard(event: TransferredPrepaidCard): void {
+  makeTransaction(event);
+
+  let prepaidCard = toChecksumAddress(event.params.prepaidCard);
+  let from = toChecksumAddress(event.params.previousOwner);
+  let to = toChecksumAddress(event.params.newOwner);
+  let txnHash = event.transaction.hash.toHex();
+
+  makeEOATransaction(event, from);
+  makeEOATransaction(event, to);
+
+  let transferEntity = new PrepaidCardTransfer(txnHash);
+  transferEntity.timestamp = event.block.timestamp;
+  transferEntity.transaction = txnHash;
+  transferEntity.prepaidCard = prepaidCard;
+  transferEntity.from = from;
+  transferEntity.to = to;
+  transferEntity.save();
 }
