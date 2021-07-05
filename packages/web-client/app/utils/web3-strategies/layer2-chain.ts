@@ -170,9 +170,8 @@ export default abstract class Layer2ChainWeb3Strategy
 
       return Promise.resolve(result.prepaidCardAddresses[0]);
     } catch (e) {
-      // FIXME what is to be done? in error cases
       console.log('prepaid card create error', e);
-      return Promise.resolve('NO');
+      return Promise.reject(e);
     }
   }
 
