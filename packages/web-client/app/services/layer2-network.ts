@@ -1,5 +1,6 @@
 import Service from '@ember/service';
 import config from '../config/environment';
+import { task } from 'ember-concurrency-decorators';
 import { Layer2Web3Strategy } from '../utils/web3-strategies/types';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
 import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
@@ -64,6 +65,19 @@ export default class Layer2Network extends Service {
 
   async convertFromSpend(symbol: ConvertibleSymbol, amount: number) {
     return await this.strategy.convertFromSpend(symbol, amount);
+  }
+
+  authenticate(): Promise<string> {
+    return this.strategy.authenticate();
+  }
+
+  @task *issuePrepaidCard(faceValue: number, customizationDid: string): any {
+    let address = yield this.strategy.issuePrepaidCard(
+      this.depotSafe?.address!,
+      faceValue,
+      customizationDid
+    );
+    return address;
   }
 
   disconnect() {

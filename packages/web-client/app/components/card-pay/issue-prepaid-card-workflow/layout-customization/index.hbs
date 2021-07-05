@@ -8,19 +8,19 @@
   {{#if @isComplete}}
     <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::DisplayView
       @issuerName={{this.issuerName}}
-      @headerBackground={{this.headerBackground}}
-      @headerTheme={{this.headerTheme}}
+      @colorScheme={{this.colorScheme}}
+      @pattern={{this.pattern}}
     />
   {{else}}
     <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::FormView
       @issuerName={{this.issuerName}}
-      @colorOptions={{this.colorOptions}}
-      @themeOptions={{this.themeOptions}}
-      @loadingCustomizations={{not this.cardCustomizationOptionsService.loaded}}
-      @headerBackground={{this.headerBackground}}
-      @updateHeaderBackground={{this.updateHeaderBackground}}
-      @headerTheme={{this.headerTheme}}
-      @updateHeaderTheme={{this.updateHeaderTheme}}
+      @colorSchemeOptions={{this.colorSchemeOptions}}
+      @patternOptions={{this.patternOptions}}
+      @loadingCustomizations={{not this.cardCustomizationService.loaded}}
+      @colorScheme={{this.colorScheme}}
+      @updateColorScheme={{this.updateColorScheme}}
+      @pattern={{this.pattern}}
+      @updatePattern={{this.updatePattern}}
       @onNameInput={{this.onNameInput}}
       @isNameInvalid={{this.isNameInvalid}}
       @nameFieldErrorMessage={{this.nameFieldErrorMessage}}

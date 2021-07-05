@@ -10,15 +10,15 @@
     <div class="issue-prepaid-card-workflow-confirmation__card-container">
       <CardPay::PrepaidCard
         @issuerName={{@workflowSession.state.issuerName}}
-        @headerBackground={{@workflowSession.state.headerBackground.headerBackground}}
-        @headerTheme={{@workflowSession.state.headerTheme.patternUrl}}
-        @headerTextColor={{@workflowSession.state.headerBackground.textColor}}
-        @headerPatternColor={{@workflowSession.state.headerBackground.patternColor}}
-        @mockBalance={{true}}
-        @balance="123,456"
-        @usdBalance="1,234.56"
-        @address="0x1234...abcd"
-        @network="xDai Chain"
+        @headerBackground={{@workflowSession.state.colorScheme.background}}
+        @headerPatternUrl={{@workflowSession.state.pattern.patternUrl}}
+        @headerTextColor={{@workflowSession.state.colorScheme.textColor}}
+        @headerPatternColor={{@workflowSession.state.colorScheme.patternColor}}
+        @mockBalance={{false}}
+        @balance={{@workflowSession.state.spendFaceValue}}
+        @usdBalance={{spend-to-usd @workflowSession.state.spendFaceValue}}
+        @address={{@workflowSession.state.prepaidCardAddress}}
+        @network={{this.layer2Network.chainName}}
         class="issue-prepaid-card-workflow-confirmation__card"
       />
     </div>

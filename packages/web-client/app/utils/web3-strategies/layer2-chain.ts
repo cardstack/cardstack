@@ -28,6 +28,8 @@ import {
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { IHubAuth } from '../../../../cardpay-sdk/sdk/hub-auth';
+import config from '../../config/environment';
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -43,6 +45,7 @@ export default abstract class Layer2ChainWeb3Strategy
   web3: Web3 = new Web3();
   #exchangeRateApi!: IExchangeRate;
   #safesApi!: ISafes;
+  #hubAuthApi!: IHubAuth;
   @tracked depotSafe: DepotSafe | null = null;
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
@@ -66,6 +69,7 @@ export default abstract class Layer2ChainWeb3Strategy
       networkSymbol
     );
     this.defaultTokenContractAddress = defaultTokenContractInfo.address;
+
     this.initialize();
   }
 
@@ -123,6 +127,7 @@ export default abstract class Layer2ChainWeb3Strategy
     this.web3.setProvider(this.provider as any);
     this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
     this.#safesApi = await getSDK('Safes', this.web3);
+    this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
     this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
   }
 
@@ -154,6 +159,24 @@ export default abstract class Layer2ChainWeb3Strategy
 
   async refreshBalances() {
     return taskFor(this.fetchDepotTask).perform();
+  }
+
+  async issuePrepaidCard(safeAddress: string, amount: number): Promise<String> {
+    const PrepaidCard = await getSDK('PrepaidCard', this.web3);
+
+    try {
+      const result = await PrepaidCard.create(
+        safeAddress,
+        this.defaultTokenContractAddress!,
+        [amount],
+        undefined
+      );
+
+      return Promise.resolve(result.prepaidCardAddresses[0]);
+    } catch (e) {
+      console.log('prepaid card create error', e);
+      return Promise.reject(e);
+    }
   }
 
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
@@ -263,6 +286,10 @@ export default abstract class Layer2ChainWeb3Strategy
     }
 
     return await this.#exchangeRateApi.convertFromSpend(address, amount);
+  }
+
+  async authenticate(): Promise<string> {
+    return this.#hubAuthApi.authenticate();
   }
 
   async disconnect(): Promise<void> {

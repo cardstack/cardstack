@@ -1,11 +1,13 @@
 import Service from '@ember/service';
 import config from '../config/environment';
-import { all, task } from 'ember-concurrency';
+import { all, task, TaskGenerator } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { tracked } from '@glimmer/tracking';
+import { inject as service } from '@ember/service';
+import HubAuthentication from './hub-authentication';
 
 export interface ColorCustomizationOption {
-  headerBackground: string;
+  background: string;
   textColor: string;
   patternColor: string;
   id: string;
@@ -16,6 +18,10 @@ export interface PatternCustomizationOption {
   patternUrl: string | null;
   id: string;
   description?: string;
+}
+
+export interface PrepaidCardCustomization {
+  did: string;
 }
 
 interface ColorCustomizationResponseObject {
@@ -43,7 +49,7 @@ let convertToColorCustomizationOption = (
   return {
     patternColor: o.attributes['pattern-color'],
     textColor: o.attributes['text-color'],
-    headerBackground: o.attributes.background,
+    background: o.attributes.background,
     description: o.attributes.description,
     id: o.id,
   };
@@ -59,10 +65,17 @@ let convertToPatternCustomizationOption = (
   };
 };
 
-export default class CardCustomizationOptions extends Service {
+interface CreateCustomizationTaskParams {
+  issuerName: string;
+  colorSchemeId: string;
+  patternId: string;
+}
+
+export default class CardCustomization extends Service {
+  @service declare hubAuthentication: HubAuthentication;
   @tracked loaded = false;
   @tracked patternOptions: PatternCustomizationOption[] | null = [];
-  @tracked colorOptions: ColorCustomizationOption[] | null = [];
+  @tracked colorSchemeOptions: ColorCustomizationOption[] | null = [];
 
   async ensureCustomizationOptionsLoaded() {
     if (!this.loaded) {
@@ -81,7 +94,7 @@ export default class CardCustomizationOptions extends Service {
     return _patternOptions.data.map(convertToPatternCustomizationOption);
   }
 
-  @task *fetchColorOptions(): any {
+  @task *fetchColorSchemeOptions(): any {
     let response = yield fetch(
       `${config.hubURL}/api/prepaid-card-color-schemes`,
       {
@@ -91,15 +104,15 @@ export default class CardCustomizationOptions extends Service {
         },
       }
     );
-    let _colorOptions = yield response.json();
-    return _colorOptions.data.map(convertToColorCustomizationOption);
+    let _colorSchemeOptions = yield response.json();
+    return _colorSchemeOptions.data.map(convertToColorCustomizationOption);
   }
 
-  groupColors(colorOptions: ColorCustomizationOption[]) {
+  groupColors(colorSchemeOptions: ColorCustomizationOption[]) {
     let gradientOptions = [];
     let nonGradientOptions = [];
-    for (let option of colorOptions as ColorCustomizationOption[]) {
-      if (option.headerBackground.includes('linear-gradient')) {
+    for (let option of colorSchemeOptions as ColorCustomizationOption[]) {
+      if (option.background.includes('linear-gradient')) {
         gradientOptions.push(option);
       } else {
         nonGradientOptions.push(option);
@@ -123,27 +136,69 @@ export default class CardCustomizationOptions extends Service {
   @task({ drop: true })
   *fetchCustomizationOptions(): any {
     try {
-      let [_colorOptions, _patternOptions] = yield all([
-        taskFor(this.fetchColorOptions).perform(),
+      let [_colorSchemeOptions, _patternOptions] = yield all([
+        taskFor(this.fetchColorSchemeOptions).perform(),
         taskFor(this.fetchPatternOptions).perform(),
       ]);
 
-      this.colorOptions = this.groupColors(_colorOptions);
+      this.colorSchemeOptions = this.groupColors(_colorSchemeOptions);
       this.patternOptions = this.placeBlankPatternFirst(_patternOptions);
       this.loaded = true;
     } catch (e) {
       console.error('Failed to fetch prepaid card customization options');
       console.error(e);
       this.patternOptions = [];
-      this.colorOptions = [];
+      this.colorSchemeOptions = [];
       this.loaded = false;
     }
+  }
+
+  @task *createCustomizationTask(
+    params: CreateCustomizationTaskParams
+  ): TaskGenerator<PrepaidCardCustomization> {
+    let response = yield fetch(
+      `${config.hubURL}/api/prepaid-card-customizations`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer: ' + this.hubAuthentication.authToken,
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+        body: JSON.stringify({
+          data: {
+            type: 'prepaid-card-customizations',
+            attributes: {
+              'issuer-name': params.issuerName,
+            },
+            relationships: {
+              'color-scheme': {
+                data: {
+                  type: 'prepaid-card-color-schemes',
+                  id: params.colorSchemeId,
+                },
+              },
+              pattern: {
+                data: {
+                  type: 'prepaid-card-patterns',
+                  id: params.patternId,
+                },
+              },
+            },
+          },
+        }),
+      }
+    );
+    let customization = yield response.json();
+    return {
+      did: customization.data.attributes.did,
+    };
   }
 }
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.
 declare module '@ember/service' {
   interface Registry {
-    'card-customization-options': CardCustomizationOptions;
+    'card-customization': CardCustomization;
   }
 }

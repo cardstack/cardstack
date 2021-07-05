@@ -5,14 +5,14 @@
     >
       <CardPay::PrepaidCard
         @issuerName={{@issuerName}}
-        @headerBackground={{@headerBackground.headerBackground}}
-        @headerTheme={{@headerTheme.patternUrl}}
-        @headerTextColor={{@headerBackground.textColor}}
-        @headerPatternColor={{@headerBackground.patternColor}}
+        @headerBackground={{@colorScheme.background}}
+        @headerPatternUrl={{@pattern.patternUrl}}
+        @headerTextColor={{@colorScheme.textColor}}
+        @headerPatternColor={{@colorScheme.patternColor}}
         @mockBalance={{true}}
         @balance="123,456"
         @usdBalance="1,234.56"
-        @address="0x1234...abcd"
+        @address={{placeholder-address}}
         @network="xDai Chain"
       />
     </CardPay::LabeledValue>
@@ -38,29 +38,29 @@
         <Boxel::LoadingIndicator data-test-customization-background-loading/>
       {{else}}
         <Boxel::CustomRadio
-          @checkedId={{@headerBackground.id}}
+          @checkedId={{@colorScheme.id}}
           @groupDescription="Pick a background color for your card's header"
-          @items={{@colorOptions}}
+          @items={{@colorSchemeOptions}}
           class="layout-form-view__selection layout-form-view__selection--background"
-          as |backgroundItem|
+          as |colorSchemeItem|
         >
-          <backgroundItem.component
+          <colorSchemeItem.component
             @name="prepaid-card-background-selection"
-            @id={{backgroundItem.data.id}}
-            @value={{backgroundItem.data.id}}
-            @checked={{backgroundItem.checked}}
-            @onChange={{fn (optional @updateHeaderBackground) backgroundItem.data}}
+            @id={{colorSchemeItem.data.id}}
+            @value={{colorSchemeItem.data.id}}
+            @checked={{colorSchemeItem.checked}}
+            @onChange={{fn (optional @updateColorScheme) colorSchemeItem.data}}
             @focusedClass="layout-form-view__selection-item--focused"
             @checkedClass="layout-form-view__selection-item--checked"
             class="layout-form-view__selection-item"
-            data-test-customization-background-selection-item={{backgroundItem.data.headerBackground}}
+            data-test-customization-background-selection-item={{colorSchemeItem.data.background}}
           >
             <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
               @type="background"
-              @swatchBackground={{backgroundItem.data.headerBackground}}
-              @squeezed={{backgroundItem.checked}}
+              @swatchBackground={{colorSchemeItem.data.background}}
+              @squeezed={{colorSchemeItem.checked}}
             />
-          </backgroundItem.component>
+          </colorSchemeItem.component>
         </Boxel::CustomRadio>
       {{/if}}
     </CardPay::LabeledValue>
@@ -69,31 +69,31 @@
          <Boxel::LoadingIndicator data-test-customization-theme-loading/>
       {{else}}
         <Boxel::CustomRadio
-          @checkedId={{@headerTheme.id}}
+          @checkedId={{@pattern.id}}
           @groupDescription="Pick a theme for your card's header"
-          @items={{@themeOptions}}
+          @items={{@patternOptions}}
           class="layout-form-view__selection layout-form-view__selection--theme"
-          as |themeItem|
+          as |patternItem|
         >
-          <themeItem.component
-            @name="prepaid-card-theme-selection"
-            @id={{themeItem.data.id}}
-            @value={{themeItem.data.id}}
-            @checked={{themeItem.checked}}
-            @onChange={{fn (optional @updateHeaderTheme) themeItem.data}}
+          <patternItem.component
+            @name="prepaid-card-pattern-selection"
+            @id={{patternItem.data.id}}
+            @value={{patternItem.data.id}}
+            @checked={{patternItem.checked}}
+            @onChange={{fn (optional @updatePattern) patternItem.data}}
             @focusedClass="layout-form-view__selection-item--focused"
             @checkedClass="layout-form-view__selection-item--checked"
             class="layout-form-view__selection-item"
-            data-test-customization-theme-selection-item={{or themeItem.data.patternUrl "blank"}}
+            data-test-customization-pattern-selection-item={{or patternItem.data.patternUrl "blank"}}
           >
             {{!-- rerenders appear to cause flashes if we use a background image --}}
             <CardPay::IssuePrepaidCardWorkflow::LayoutCustomization::Swatch
               @type="theme"
-              @swatchImage={{themeItem.data.patternUrl}}
-              @blank={{eq themeItem.data.patternUrl null}}
-              @squeezed={{themeItem.checked}}
+              @swatchImage={{patternItem.data.patternUrl}}
+              @blank={{eq patternItem.data.patternUrl null}}
+              @squeezed={{patternItem.checked}}
             />
-          </themeItem.component>
+          </patternItem.component>
         </Boxel::CustomRadio>
       {{/if}}
     </CardPay::LabeledValue>

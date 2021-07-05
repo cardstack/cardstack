@@ -16,9 +16,6 @@
 }
 
 .layout-display-view__card {
-  --preview-card-width: 14.375rem;
-  --preview-card-height: 9.06rem;
-
   grid-row: 1/2;
   transform: scale(0.63);
   transform-origin: top left;

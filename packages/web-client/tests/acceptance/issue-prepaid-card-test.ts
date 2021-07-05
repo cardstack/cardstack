@@ -12,9 +12,12 @@ import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { toBN } from 'web3-utils';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { encodeDID } from '@cardstack/did-resolver';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
+import { Response as MirageResponse } from 'ember-cli-mirage';
+import { timeout } from 'ember-concurrency';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -149,8 +152,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
       .isEnabled();
 
-    let backgroundChoice = prepaidCardColorSchemes[4].background;
-    let themeChoice = prepaidCardPatterns[2].patternUrl;
+    let backgroundChoice = prepaidCardColorSchemes[1].background;
+    let patternChoice = prepaidCardPatterns[3].patternUrl;
 
     await waitUntil(
       () =>
@@ -161,19 +164,20 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert
       .dom(
-        `[data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+        `${post}  [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
       )
       .doesNotExist();
+
     await click(
-      `[data-test-customization-background-selection-item="${backgroundChoice}"]`
+      `${post}  [data-test-customization-background-selection-item="${backgroundChoice}"]`
     );
     await click(
-      `[data-test-customization-theme-selection-item="${themeChoice}"]`
+      `${post} [data-test-customization-pattern-selection-item="${patternChoice}"]`
     );
 
     assert
       .dom(
-        `[data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+        `${post} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
       )
       .exists();
 
@@ -181,12 +185,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
 
-    assert.dom('[data-test-layout-customization-form]').isNotVisible();
-    assert.dom('[data-test-layout-customization-display]').isVisible();
+    assert.dom(`${post} [data-test-layout-customization-form]`).isNotVisible();
+    assert.dom(`${post} [data-test-layout-customization-display]`).isVisible();
 
     assert
       .dom(
-        `[data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+        `${post} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
       )
       .exists();
 
@@ -289,23 +293,136 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(postableSel(3, 0))
       .containsText('This is what your prepaid card will look like.');
 
+    assert
+      .dom(`${postableSel(3, 1)} [data-test-prepaid-card-issuer-name]`)
+      .containsText('JJ');
+    assert
+      .dom(
+        `${postableSel(
+          3,
+          1
+        )} [data-test-prepaid-card-issuer-name-labeled-value]`
+      )
+      .containsText('JJ');
+    assert
+      .dom(
+        `${postableSel(3, 1)} [data-test-prepaid-card-face-value-labeled-value]`
+      )
+      .containsText('10000 SPEND')
+      .containsText('100 USD');
+
+    assert
+      .dom(`${postableSel(3, 1)} [data-test-prepaid-card-balance]`)
+      .containsText('10000');
+    assert
+      .dom(`${postableSel(3, 1)} [data-test-prepaid-card-usd-balance]`)
+      .containsText('100');
+
+    assert.dom(
+      `${postableSel(
+        3,
+        1
+      )} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
+    );
+
+    let prepaidCardCustomizationId = '75218c05-3899-46d6-b431-e7237ba293ca';
+    let did = encodeDID({
+      type: 'PrepaidCardCustomization',
+      uniqueId: prepaidCardCustomizationId,
+      version: 1,
+    });
+    // simulate POST /api/prepaid-card-customizations to persist customizations and return DID
+    this.server.post('/prepaid-card-customizations', (_schema, request) => {
+      assert.equal(
+        request.requestHeaders['authorization'],
+        'Bearer: abc123--def456--ghi789'
+      );
+      let requestJson = JSON.parse(request.requestBody);
+      assert.equal(requestJson.data.attributes['issuer-name'], 'JJ');
+      assert.equal(
+        requestJson.data.relationships.pattern.data.id,
+        '80cb8f99-c5f7-419e-9c95-2e87a9d8db32'
+      );
+      assert.equal(
+        requestJson.data.relationships['color-scheme'].data.id,
+        '4f219852-33ee-4e4c-81f7-76318630a423'
+      );
+
+      return new MirageResponse(
+        201,
+        {
+          'Content-Type': 'application/vnd.api+json',
+        },
+        JSON.stringify({
+          data: {
+            type: 'prepaid-card-customizations',
+            id: prepaidCardCustomizationId,
+            attributes: {
+              did,
+              'issuer-name': 'JJ',
+              'owner-address': layer2AccountAddress,
+            },
+            relationships: {
+              pattern: {
+                data: {
+                  type: 'prepaid-card-patterns',
+                  id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
+                },
+              },
+              'color-scheme': {
+                data: {
+                  type: 'prepaid-card-color-schemes',
+                  id: '"4f219852-33ee-4e4c-81f7-76318630a423"',
+                },
+              },
+            },
+          },
+        })
+      );
+    });
+
     // // preview card
-    // TODO verify and interact with preview card default state
     await click(
       `${postableSel(
         3,
         1
       )} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
-    // TODO simulate transaction approval
-    // TODO verify and interact with preview card memorialized state
+
+    assert
+      .dom('[data-test-boxel-action-chin-action-status-area]')
+      .containsText(
+        'You will receive a confirmation request from the Card Wallet app in a few moments…'
+      );
+
+    await layer2Service.test__simulateHubAuthentication(
+      'abc123--def456--ghi789'
+    );
+
+    await timeout(250);
+    layer2Service.test__simulateIssuePrepaidCardForAmount(
+      10000,
+      '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8'
+    );
 
     await waitFor(milestoneCompletedSel(3));
     assert.dom(milestoneCompletedSel(3)).containsText('Transaction confirmed');
 
     assert
+      .dom(`${postableSel(3, 1)} [data-test-boxel-action-chin]`)
+      .containsText('Confirmed');
+
+    assert
+      .dom(
+        `${postableSel(3, 1)} [data-test-prepaid-card-address-labeled-value]`
+      )
+      .containsText('0xaeFb...E1F8 on xDai chain');
+
+    assert
       .dom(epiloguePostableSel(0))
       .containsText('Congratulations, you have created a prepaid card!');
+
+    await waitFor(epiloguePostableSel(1));
 
     assert.dom(epiloguePostableSel(1)).containsText('Prepaid card issued');
     assert
@@ -314,7 +431,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom(
       `${epiloguePostableSel(
         1
-      )} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-theme="${themeChoice}"]`
+      )} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
     );
 
     await waitFor(epiloguePostableSel(2));
@@ -325,6 +442,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     // TODO: simulate depot balance
     // TODO: assert depot balance shown
+
+    await waitFor(epiloguePostableSel(4));
 
     assert
       .dom(

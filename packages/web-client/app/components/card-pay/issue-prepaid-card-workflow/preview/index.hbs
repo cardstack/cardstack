@@ -1,19 +1,99 @@
 <ActionCardContainer
   @header="Prepaid card preview"
   @isComplete={{@isComplete}}
-  data-test-layout-customization-is-complete={{@isComplete}}
 >
+  <ActionCardContainer::Section
+    @title="Prepaid card preview"
+  >
+    <div
+      class={{cn "preview__content" preview__content--is-complete=@isComplete}}
+      data-test-preview
+    >
+      {{#unless @isComplete}}
+        <Boxel::Field
+          @label="Card Preview"
+          @fieldMode="view"
+          class="preview__card-preview-field"
+        >
+          <div class="preview__card">
+            <CardPay::PrepaidCard
+              @issuerName={{@workflowSession.state.issuerName}}
+              @headerBackground={{@workflowSession.state.colorScheme.background}}
+              @headerPatternUrl={{@workflowSession.state.pattern.patternUrl}}
+              @headerTextColor={{@workflowSession.state.colorScheme.textColor}}
+              @headerPatternColor={{@workflowSession.state.colorScheme.patternColor}}
+              @balance={{this.faceValue}}
+              @usdBalance={{spend-to-usd this.faceValue}}
+              @address={{placeholder-address}}
+              @network={{this.layer2Network.chainName}}
+            />
+          </div>
+        </Boxel::Field>
+      {{/unless}}
+      <CardPay::FieldStack
+        class={{cn "preview__data" preview__data--is-complete=@isComplete}}
+        @horizontal={{@isComplete}}
+      >
+        <CardPay::LabeledValue
+          @vertical={{true}}
+          @label="Issued by"
+          @value={{@workflowSession.state.issuerName}}
+          data-test-prepaid-card-issuer-name-labeled-value
+        />
+
+        {{#if @isComplete}}
+          <CardPay::LabeledValue
+            @vertical={{true}}
+            @label="Card address"
+            data-test-prepaid-card-address-labeled-value
+          >
+            {{truncate-middle @workflowSession.state.prepaidCardAddress}}<br>
+            on xDai chain
+          </CardPay::LabeledValue>
+        {{/if}}
+
+        <CardPay::LabeledValue
+          @vertical={{true}}
+          @label="Face value"
+          data-test-prepaid-card-face-value-labeled-value
+        >
+          <CardPay::BalanceDisplay
+            class="preview__spend-face-value"
+            @icon="spend"
+            @sign="§"
+            @symbol="SPEND"
+            @balance={{this.faceValue}}
+            @usdBalance={{spend-to-usd this.faceValue}}
+          />
+        </CardPay::LabeledValue>
+      </CardPay::FieldStack>
+    </div>
+  </ActionCardContainer::Section>
   <Boxel::ActionChin
-    @state={{if @isComplete "memorialized" "default"}}
+    @state={{this.issueState}}
     @disabled={{@frozen}}
     data-test-layout-customization
   >
     <:default as |d|>
       <d.ActionButton
-        {{on "click" @onComplete}}
+        {{on "click" (perform this.issueTask)}}
       >
         Continue
       </d.ActionButton>
     </:default>
+    <:in-progress as |i|>
+      <i.ActionStatusArea @icon="card-wallet-app-icon" style={{css-var status-icon-size="2.5rem"}}>
+        <Boxel::LoadingIndicator
+          class="preview__loading-indicator"
+          @color="var(--boxel-light)"
+        />
+        You will receive a confirmation request from the Card Wallet app in a few moments…
+      </i.ActionStatusArea>
+    </:in-progress>
+    <:memorialized as |m|>
+      <m.ActionStatusArea>
+        Confirmed
+      </m.ActionStatusArea>
+    </:memorialized>
   </Boxel::ActionChin>
 </ActionCardContainer>

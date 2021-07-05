@@ -5,31 +5,31 @@ import { inject as service } from '@ember/service';
 import {
   ColorCustomizationOption,
   PatternCustomizationOption,
-  default as CardCustomizationOptionsService,
-} from '@cardstack/web-client/services/card-customization-options';
+  default as CardCustomizationService,
+} from '@cardstack/web-client/services/card-customization';
 import { reads } from 'macro-decorators';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
 export default class LayoutCustomizationCard extends Component<WorkflowCardComponentArgs> {
-  @service('card-customization-options')
-  declare cardCustomizationOptionsService: CardCustomizationOptionsService;
-  @reads('cardCustomizationOptionsService.colorOptions')
-  declare colorOptions: ColorCustomizationOption[];
-  @reads('cardCustomizationOptionsService.patternOptions')
-  declare themeOptions: PatternCustomizationOption[];
-  @tracked headerBackground: ColorCustomizationOption | undefined;
-  @tracked headerTheme: PatternCustomizationOption | undefined;
+  @service('card-customization')
+  declare cardCustomizationService: CardCustomizationService;
+  @reads('cardCustomizationService.colorSchemeOptions')
+  declare colorSchemeOptions: ColorCustomizationOption[];
+  @reads('cardCustomizationService.patternOptions')
+  declare patternOptions: PatternCustomizationOption[];
+  @tracked colorScheme: ColorCustomizationOption | undefined;
+  @tracked pattern: PatternCustomizationOption | undefined;
   @tracked issuerName = '';
   @tracked nameFieldErrorMessage = '';
   @tracked isNameInvalid = false;
 
   constructor(owner: unknown, args: any) {
     super(owner, args);
-    this.cardCustomizationOptionsService
+    this.cardCustomizationService
       .ensureCustomizationOptionsLoaded()
       .then(() => {
-        this.headerBackground = this.colorOptions[0];
-        this.headerTheme = this.themeOptions[0];
+        this.colorScheme = this.colorSchemeOptions[0];
+        this.pattern = this.patternOptions[0];
       });
   }
 
@@ -45,11 +45,11 @@ export default class LayoutCustomizationCard extends Component<WorkflowCardCompo
     return !this.issuerName;
   }
 
-  @action updateHeaderBackground(item: any) {
-    this.headerBackground = item;
+  @action updateColorScheme(item: any) {
+    this.colorScheme = item;
   }
-  @action updateHeaderTheme(item: any) {
-    this.headerTheme = item;
+  @action updatePattern(item: any) {
+    this.pattern = item;
   }
 
   @action onNameInput(value: string): void {
@@ -72,11 +72,11 @@ export default class LayoutCustomizationCard extends Component<WorkflowCardCompo
   }
 
   @action save() {
-    if (this.issuerName && this.headerBackground && this.headerTheme) {
+    if (this.issuerName && this.colorScheme && this.pattern) {
       this.args.workflowSession.updateMany({
         issuerName: this.issuerName,
-        headerTheme: this.headerTheme,
-        headerBackground: this.headerBackground,
+        pattern: this.pattern,
+        colorScheme: this.colorScheme,
       });
       this.args.onComplete?.();
     }
@@ -85,8 +85,8 @@ export default class LayoutCustomizationCard extends Component<WorkflowCardCompo
   @action edit() {
     this.args.workflowSession.updateMany({
       issuerName: '',
-      headerTheme: '',
-      headerBackground: '',
+      pattern: '',
+      colorScheme: '',
     });
     this.args.onIncomplete?.();
   }

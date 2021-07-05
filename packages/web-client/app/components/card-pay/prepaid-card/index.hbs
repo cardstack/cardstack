@@ -2,12 +2,12 @@
   class="prepaid-card"
   style={{css-var
     header-background=@headerBackground
-    header-theme=(concat "url(" @headerTheme ")")
+    header-theme=(concat "url(" @headerPatternUrl ")")
     header-text-color=(or @headerTextColor "var(--boxel-dark)")
     header-pattern-color=(or @headerPatternColor "var(--boxel-light)")
   }}
   data-test-prepaid-card-background={{@headerBackground}}
-  data-test-prepaid-card-theme={{@headerTheme}}
+  data-test-prepaid-card-pattern={{@headerPatternUrl}}
   ...attributes
 >
   <div class="prepaid-card__background prepaid-card__background--color">
@@ -28,8 +28,18 @@
   <section class="prepaid-card__content">
     <div>
       <div class="prepaid-card__balance-label">Spendable Balance</div>
-      <div class={{cn "prepaid-card__balance" prepaid-card__balance--mock=@mockBalance}}>§{{@balance}}</div>
-      <div class={{cn "prepaid-card__usd-balance" prepaid-card__usd-balance--mock=@mockBalance}}>${{@usdBalance}} USD</div>
+      <div
+        class={{cn "prepaid-card__balance" prepaid-card__balance--mock=@mockBalance}}
+        data-test-prepaid-card-balance
+      >
+        §{{@balance}}
+      </div>
+      <div
+        class={{cn "prepaid-card__usd-balance" prepaid-card__usd-balance--mock=@mockBalance}}
+        data-test-prepaid-card-usd-balance
+      >
+        ${{@usdBalance}} USD
+      </div>
     </div>
     <div class="prepaid-card__content-rs">
       <div class="prepaid-card__logo" />
