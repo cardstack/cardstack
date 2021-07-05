@@ -34,7 +34,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RevenuePool.registerMerchant`](#revenuepoolregistermerchant)
   - [`RevenuePool.balances`](#revenuepoolbalances)
   - [`RevenuePool.claim`](#revenuepoolclaim)
-- [`RewardPool` (TBD)](#rewardpool-tbd)
+- [`RewardPool`](#rewardpool)
   - [`RewardPool.balanceOf` (TBD)](#rewardpoolbalanceof-tbd)
   - [`RewardPool.withdraw` (TBD)](#rewardpoolwithdraw-tbd)
 - [`ExchangeRate`](#exchangerate)
@@ -662,10 +662,28 @@ interface RelayTransaction {
   transactionHash: string;
 }
 ```
-## `RewardPool` (TBD)
-### `RewardPool.balanceOf` (TBD)
-### `RewardPool.withdraw` (TBD)
+## `RewardPool` 
 
+The `RewardPool` API is used to interact with tally (an offchain service similar to relayer) and the reward pool contract. As customers use their prepaid card they will be given rewards based the amount of spend they use and a reward-based algorithm.  
+
+### `RewardPool.rewardTokenBalance`
+This call returns the balance of a token in the RewardPool for prepaid card owners address. This function takes in a parameter of the prepaid card owner address and the reward token address. This balance also accounts for the claims of a prepaid card owner in the past. The tokens that are part of the rewards are CARDPXD and DAICPXD -- federated tokens of the card protocol.
+
+```ts
+interface RewardTokenBalance {
+  tokenSymbol: string;
+  tokenAddress: string;
+  balance: BN; 
+}
+```
+
+```js
+let balanceForSingleToken = await rewardPool.rewardTokenBalance(address, tokenAddress);
+//You can also use rewardTokenBalances()
+let balanceForAllTokens = await rewardPool.rewardTokenBalances(address)
+```
+
+### `RewardPool.claim` (TBD)
 ## `ExchangeRate`
 The `ExchangeRate` API is used to get the current exchange rates in USD and ETH for the various stablecoin that we support. These rates are fed by the Chainlink price feeds for the stablecoin rates and the DIA oracle for the CARD token rates. As we onboard new stablecoin we'll add more exchange rates. The price oracles that we use reside in layer 2, so please supply a layer 2 web3 instance obtaining an `ExchangeRate` API from `getSDK()`.
 ```js
