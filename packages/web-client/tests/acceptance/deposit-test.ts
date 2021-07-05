@@ -36,7 +36,7 @@ module('Acceptance | deposit', function (hooks) {
   test('Initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay/token-suppliers');
     assert.equal(currentURL(), '/card-pay/token-suppliers');
-    await click('[data-test-deposit-workflow-button]');
+    await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);
     assert.dom(`${post} img`).exists();
@@ -392,7 +392,7 @@ module('Acceptance | deposit', function (hooks) {
       .hasText('0xaCD5...4Fb6');
     assert.dom('[data-test-layer-connect-modal="layer1"]').doesNotExist();
 
-    await click('[data-test-deposit-workflow-button]');
+    await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);
     assert.dom(`${post} img`).exists();
@@ -488,7 +488,7 @@ module('Acceptance | deposit', function (hooks) {
       .hasText('0x1826...6E44');
     assert.dom('[data-test-layer-connect-modal="layer2"]').doesNotExist();
 
-    await click('[data-test-deposit-workflow-button]');
+    await click('[data-test-workflow-button="deposit"]');
     await click(`${postableSel(0, 3)} [data-test-wallet-option="metamask"]`);
     await click(
       `${postableSel(
@@ -548,7 +548,7 @@ module('Acceptance | deposit', function (hooks) {
     });
 
     await visit('/card-pay/token-suppliers');
-    await click('[data-test-deposit-workflow-button]');
+    await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);
     assert.dom(post).containsText('Hi there, we’re happy to see you');
@@ -632,7 +632,7 @@ module('Acceptance | deposit', function (hooks) {
     });
 
     await visit('/card-pay/token-suppliers');
-    await click('[data-test-deposit-workflow-button]');
+    await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);
     assert.dom(post).containsText('Hi there, we’re happy to see you');
@@ -712,7 +712,7 @@ module('Acceptance | deposit', function (hooks) {
     });
 
     await visit('/card-pay/token-suppliers');
-    await click('[data-test-deposit-workflow-button]');
+    await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);
     assert.dom(post).containsText('Hi there, we’re happy to see you');
@@ -797,7 +797,7 @@ module('Acceptance | deposit', function (hooks) {
     });
 
     await visit('/card-pay/token-suppliers');
-    await click('[data-test-deposit-workflow-button]');
+    await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);
     assert.dom(post).containsText('Hi there, we’re happy to see you');

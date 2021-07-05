@@ -30,7 +30,7 @@ module('Acceptance | withdrawal', function (hooks) {
   test('Initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay/token-suppliers');
     assert.equal(currentURL(), '/card-pay/token-suppliers');
-    await click('[data-test-withdrawal-workflow-button]');
+    await click('[data-test-workflow-button="withdrawal"]');
     let post = postableSel(0, 0);
     assert.dom(`${post} img`).exists();
     assert.dom(post).containsText('Hi there, it’s good to see you');

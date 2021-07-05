@@ -1,4 +1,4 @@
-<section class="card-pay-dashboard__section" role="tabpanel" aria-labelledby="card-pay.token-suppliers">
+<section class="card-pay-dashboard__section" role="tabpanel" aria-labelledby="card-pay.merchant-services">
   <CardPay::DashboardPanel @panel={{@model.panel}}>
     {{#each @model.panel.sections as |section|}}
       <CardPay::DashboardPanel::Section @section={{section}}>
@@ -11,20 +11,12 @@
         >
           {{section.cta}}
         </Boxel::Button>
+        {{#if (eq section.workflow 'request-payment')}}
+          <small>
+            This is possible once you have connected your xDai chain wallet and created a merchant.
+          </small>
+        {{/if}}
       </CardPay::DashboardPanel::Section>
     {{/each}}
   </CardPay::DashboardPanel>
 </section>
-
-<Boxel::Modal
-  style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
-  @isOpen={{or (eq this.flow 'deposit') (eq this.flow 'withdrawal')}}
-  @onClose={{set this "flow" null}}
->
-  {{#if (eq this.flow 'deposit')}}
-    <CardPay::DepositWorkflow />
-  {{/if}}
-  {{#if (eq this.flow 'withdrawal')}}
-    <CardPay::WithdrawalWorkflow />
-  {{/if}}
-</Boxel::Modal>
