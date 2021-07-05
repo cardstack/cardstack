@@ -434,14 +434,22 @@ module('Acceptance | issue prepaid card', function (hooks) {
       )} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
     );
 
+    layer2Service.test__simulateBalances({
+      defaultToken: toBN('150000000000000000000'),
+      card: toBN('500000000000000000000'),
+    });
+
     await waitFor(epiloguePostableSel(2));
 
     assert
       .dom(epiloguePostableSel(2))
       .containsText('This is the remaining balance in your xDai chain wallet');
 
-    // TODO: simulate depot balance
-    // TODO: assert depot balance shown
+    await waitFor(epiloguePostableSel(3));
+
+    assert
+      .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
+      .containsText('150.0');
 
     await waitFor(epiloguePostableSel(4));
 
