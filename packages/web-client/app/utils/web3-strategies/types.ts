@@ -7,8 +7,7 @@ import {
   ConversionFunction,
 } from '@cardstack/web-client/utils/token';
 import { Emitter } from '@cardstack/web-client/utils/events';
-
-export interface Web3Strategy extends Emitter {
+export interface Web3Strategy extends Emitter<'disconnect'> {
   isConnected: boolean;
   disconnect(): Promise<void>;
 }
