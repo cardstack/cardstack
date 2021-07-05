@@ -1,0 +1,21 @@
+<ActionCardContainer
+  @header="Withdrawal"
+  @isComplete={{@isComplete}}
+  data-test-withdrawal-transaction-confirmed-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section>
+    You withdrew
+    You received
+  </ActionCardContainer::Section>
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    data-test-withdrawal-transaction-confirmed
+  >
+    <:default as |d|>
+      <d.ActionButton {{on "click" this.toggleComplete}}>
+        Confirm
+      </d.ActionButton>
+    </:default>
+  </Boxel::ActionChin>
+
+</ActionCardContainer>
