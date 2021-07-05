@@ -60,6 +60,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
       }),
     ];
     workflow.epilogue.postables = [postable4];
+    // Date.parse below is returning NaN on Safari
     postable1.timestamp = new Date(Date.parse('2021-05-20 00:00:00'));
     postable2.timestamp = new Date(Date.parse('2021-05-20 00:00:00'));
     postable3.timestamp = new Date(Date.parse('2021-05-21 00:00:00'));
