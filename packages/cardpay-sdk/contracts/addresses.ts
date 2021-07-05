@@ -43,6 +43,7 @@ const addresses: {
     actionDispatcher: '0xaE5AC3685630b33Ed2677438EEaAe0aD5372c795',
     uniswapV2Router: '0xd57B4D7B7FED6b47492A362e113e26F9804DbCc6', // This is the UniswapV2Router02
     uniswapV2Factory: '0x6b67f08F08B715B162aa09239488318A660F24BF',
+    rewardPool: '0x9d8Ea61555Ee7A5d1Ca9422de7Fd7866430710bB',
     oracles: {
       DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB', // eslint-disable-line @typescript-eslint/naming-convention
       CARD: '0xb4Fcc975c2b6A57dd5B3d9a3B6b144499f707c7d', // eslint-disable-line @typescript-eslint/naming-convention

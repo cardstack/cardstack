@@ -25,6 +25,7 @@ const SOKOL = {
   rpcWssNode: 'https://sokol-wss.stack.cards',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
   transactionServiceURL: 'https://transactions-staging.stack.cards/api',
+  tallyServiceURL: 'https://tally-service-staging.stack.cards/api/v1',
 };
 const KOVAN = {
   apiBaseUrl: 'https://api-kovan.etherscan.io/api',

@@ -10,6 +10,7 @@ import Assets from './assets';
 import TokenBridgeHomeSide from './token-bridge-home-side';
 import TokenBridgeForeignSide from './token-bridge-foreign-side';
 import { revenuePoolMeta, RevenuePool } from './revenue-pool';
+import { rewardPoolMeta, RewardPool } from './reward-pool';
 import HubAuth from './hub-auth';
 
 type SDK =
@@ -20,7 +21,8 @@ type SDK =
   | 'Safes'
   | 'HubAuth'
   | 'TokenBridgeHomeSide'
-  | 'TokenBridgeForeignSide';
+  | 'TokenBridgeForeignSide'
+  | 'RewardPool';
 export interface ContractMeta {
   apiVersions: Record<string, any>;
   contractName: string;
@@ -49,6 +51,7 @@ export async function getSDK(sdk: 'HubAuth', web3: Web3, hubRootUrl: string): Pr
 export async function getSDK(sdk: 'ExchangeRate', web3: Web3): Promise<ExchangeRate>;
 export async function getSDK(sdk: 'PrepaidCard', web3: Web3): Promise<PrepaidCard>;
 export async function getSDK(sdk: 'RevenuePool', web3: Web3): Promise<RevenuePool>;
+export async function getSDK(sdk: 'RewardPool', web3: Web3): Promise<RewardPool>;
 export async function getSDK(sdk: 'Safes', web3: Web3): Promise<Safes>;
 export async function getSDK(sdk: 'TokenBridgeHomeSide', web3: Web3): Promise<TokenBridgeHomeSide>;
 export async function getSDK(sdk: 'TokenBridgeForeignSide', web3: Web3): Promise<TokenBridgeForeignSide>;
@@ -70,6 +73,9 @@ export async function getSDK(sdk: SDK, ...args: any[]): Promise<any> {
       break;
     case 'RevenuePool':
       apiClass = await resolveApiVersion(revenuePoolMeta, web3);
+      break;
+    case 'RewardPool':
+      apiClass = await resolveApiVersion(rewardPoolMeta, web3);
       break;
     case 'Safes':
       apiClass = await resolveApiVersion(safesMeta, web3);
