@@ -42,7 +42,6 @@ export default abstract class Layer1ChainWeb3Strategy
   simpleEmitter = new SimpleEmitter();
 
   // changes with connection state
-  provider: any | undefined;
   #waitForAccountDeferred = defer<void>();
   @tracked currentProviderId: string | undefined;
   @tracked defaultTokenBalance: BN | undefined;
@@ -153,21 +152,21 @@ export default abstract class Layer1ChainWeb3Strategy
 
   async connect(walletProvider: WalletProvider): Promise<void> {
     if (walletProvider.id === 'metamask') {
-      this.provider = await this.setupMetamask();
-      if (!this.provider) {
+      let provider = await this.setupMetamask();
+      if (!provider) {
         return;
       }
-      this.web3.setProvider(this.provider);
-      let accounts = await this.provider.request({
+      this.web3.setProvider(provider);
+      let accounts = await provider.request({
         method: 'eth_requestAccounts',
       });
       this.updateWalletInfo(accounts, this.chainId);
       this.currentProviderId = walletProvider.id;
       window.localStorage.setItem(this.providerStorageKey, walletProvider.id);
     } else if (walletProvider.id === 'wallet-connect') {
-      this.provider = this.setupWalletConnect();
-      this.web3.setProvider(this.provider);
-      await this.provider.enable();
+      let provider = this.setupWalletConnect();
+      this.web3.setProvider(provider);
+      await provider.enable();
       if (!this.isConnected) {
         return;
       }
@@ -246,8 +245,7 @@ export default abstract class Layer1ChainWeb3Strategy
 
   private clearLocalConnectionState() {
     this.clearWalletInfo();
-    this.provider = undefined;
-    this.web3.setProvider(this.provider);
+    this.web3.setProvider(undefined);
     this.currentProviderId = '';
     window.localStorage.removeItem(this.providerStorageKey);
   }
@@ -264,7 +262,8 @@ export default abstract class Layer1ChainWeb3Strategy
     // The metamask team believes you should be disconnecting via the extension
     // and has not exposed any way to do this from a dapp
     if (this.currentProviderId === 'wallet-connect') {
-      await this.provider.disconnect();
+      // typescript is unhappy with this but it's actually the walletconnect provider that we gave in the connect method
+      await (this.web3.currentProvider as any).disconnect();
     } else {
       this.onDisconnect();
     }
