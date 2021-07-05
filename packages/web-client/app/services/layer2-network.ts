@@ -69,7 +69,7 @@ export default class Layer2Network extends Service {
 
   @task *issuePrepaidCard(faceValue: number): any {
     let address = yield this.strategy.issuePrepaidCard(
-      this.depotSafe?.address || 'FIXME',
+      this.depotSafe?.address!,
       faceValue
     );
     return address;
