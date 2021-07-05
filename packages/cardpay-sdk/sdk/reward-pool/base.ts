@@ -47,6 +47,9 @@ export default class RewardPool {
       },
     };
     let response = await fetch(url, options);
+    if (!response?.ok) {
+      throw new Error(await response.text());
+    }
     let json = await response.json();
     return json['tokenAddresses'];
   }
