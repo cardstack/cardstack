@@ -24,7 +24,7 @@ const SUPPLIERS_PANEL = {
       title: 'Token Suppliers & Merchants',
       description: `Withdraw tokens from your xDai chain wallet to receive an equivalent amount of tokens in your mainnet wallet.`,
       bullets: [
-        'Inspect your balances on Ethereum mainnet and xDai chain ',
+        'Inspect your balances on Ethereum mainnet and xDai chain',
         'Withdraw funds from your xDai chain wallet to your mainnet wallet',
       ],
       cta: 'Withdraw Tokens',
