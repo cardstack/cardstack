@@ -25,8 +25,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   @tracked hasDeposited = false;
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
+  @tracked errorMessage = '';
 
-  get currentTokenSymbol(): TokenSymbol | undefined {
+  // assumption is this is always set by cards before it. It should be defined by the time
+  // it gets to this part of the workflow
+  get currentTokenSymbol(): TokenSymbol {
     return this.args.workflowSession.state.depositSourceToken;
   }
 
@@ -116,46 +119,56 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     }
   }
 
-  @action unlock() {
-    let tokenSymbol = this.args.workflowSession.state.depositSourceToken;
-    this.isUnlocking = true;
-    taskFor(this.layer1Network.approve)
-      .perform(this.amountAsBigNumber, tokenSymbol)
-      .then((transactionReceipt: TransactionReceipt) => {
-        this.isUnlocked = true;
-        this.unlockTxnReceipt = transactionReceipt;
-      })
-      .finally(() => {
-        this.isUnlocking = false;
-      });
+  @action async unlock() {
+    this.errorMessage = '';
+
+    try {
+      this.isUnlocking = true;
+      let transactionReceipt = await taskFor(
+        this.layer1Network.approve
+      ).perform(this.amountAsBigNumber, this.currentTokenSymbol);
+      this.isUnlocked = true;
+      this.unlockTxnReceipt = transactionReceipt;
+    } catch (e) {
+      console.error(e);
+      this.errorMessage =
+        'There was a problem unlocking your tokens for deposit. This may be due to a network issue, or perhaps you canceled the request in your wallet.';
+    } finally {
+      this.isUnlocking = false;
+    }
   }
   @action async deposit() {
-    let tokenSymbol = this.args.workflowSession.state.depositSourceToken;
-    let layer2Address = this.layer2Network.walletInfo.firstAddress!;
-    this.isDepositing = true;
-    let layer2BlockHeightBeforeBridging = await this.layer2Network.getBlockHeight();
-    this.args.workflowSession.update(
-      'layer2BlockHeightBeforeBridging',
-      layer2BlockHeightBeforeBridging
-    );
-    taskFor(this.layer1Network.relayTokens)
-      .perform(tokenSymbol, layer2Address, this.amountAsBigNumber)
-      .then((transactionReceipt: TransactionReceipt) => {
-        this.relayTokensTxnReceipt = transactionReceipt;
-        this.args.workflowSession.update(
-          'relayTokensTxnReceipt',
-          transactionReceipt
-        );
-        this.args.workflowSession.update(
-          'depositedAmount',
-          this.amountAsBigNumber.toString() // BN is mutable
-        );
-        this.args.onComplete?.();
-        this.hasDeposited = true;
-      })
-      .finally(() => {
-        this.isDepositing = false;
-      });
+    this.errorMessage = '';
+
+    try {
+      let layer2Address = this.layer2Network.walletInfo.firstAddress!;
+      this.isDepositing = true;
+      let layer2BlockHeightBeforeBridging = await this.layer2Network.getBlockHeight();
+      this.args.workflowSession.update(
+        'layer2BlockHeightBeforeBridging',
+        layer2BlockHeightBeforeBridging
+      );
+      let transactionReceipt = await taskFor(
+        this.layer1Network.relayTokens
+      ).perform(this.currentTokenSymbol, layer2Address, this.amountAsBigNumber);
+      this.relayTokensTxnReceipt = transactionReceipt;
+      this.args.workflowSession.update(
+        'relayTokensTxnReceipt',
+        transactionReceipt
+      );
+      this.args.workflowSession.update(
+        'depositedAmount',
+        this.amountAsBigNumber.toString()
+      );
+      this.args.onComplete?.();
+      this.hasDeposited = true;
+    } catch (e) {
+      console.error(e);
+      this.errorMessage =
+        'There was a problem initiating the bridging of your tokens to the xDai chain. This may be due to a network issue, or perhaps you canceled the request in your wallet.';
+    } finally {
+      this.isDepositing = false;
+    }
   }
 }
 
