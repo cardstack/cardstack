@@ -338,8 +338,7 @@
       "env": {},
       "args": [
         "reward-balances",
-        "0x76271cb51c7e5C0F0E9d2f1e4d6DFCD621e99eB7",
-        // "0x159ADe032073d930E85f95AbBAB9995110c43C71",
+        "0x159ADe032073d930E85f95AbBAB9995110c43C71", // Justin's address
         "--network", "sokol",
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
