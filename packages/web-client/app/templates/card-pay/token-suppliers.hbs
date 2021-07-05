@@ -6,12 +6,21 @@
   <Boxel::Button @kind="primary" {{on "click" (set this "flow" 'deposit')}} data-test-deposit-workflow-button>
     Deposit Tokens
   </Boxel::Button>
+
+  <Boxel::Button @kind="primary" {{on "click" (set this "flow" 'withdrawal')}} data-test-withdrawal-workflow-button>
+    Withdraw Tokens
+  </Boxel::Button>
 </section>
 
 <Boxel::Modal
   style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
-  @isOpen={{eq this.flow 'deposit'}}
+  @isOpen={{or (eq this.flow 'deposit') (eq this.flow 'withdrawal')}}
   @onClose={{set this "flow" null}}
 >
-  <CardPay::DepositWorkflow />
+  {{#if (eq this.flow 'deposit')}}
+    <CardPay::DepositWorkflow />
+  {{/if}}
+  {{#if (eq this.flow 'withdrawal')}}
+    <CardPay::WithdrawalWorkflow />
+  {{/if}}
 </Boxel::Modal>
