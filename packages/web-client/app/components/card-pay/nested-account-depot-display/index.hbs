@@ -1,0 +1,22 @@
+<CardPay::LabeledValue @label="DEPOT:" ...attributes>
+  <CardPay::NestedItems>
+    <:outer>
+      <CardPay::AccountDisplay
+        @size="small"
+        @name="Account:"
+        @address={{truncate-middle @accountAddress}}
+        data-test-funding-source-account
+      />
+    </:outer>
+    <:inner>
+      <CardPay::AccountDisplay
+        @size={{@size}}
+        @icon="depot"
+        @name="DEPOT:"
+        @address={{@depotAddress}}
+        @text={{unless @depotAddress "None"}}
+        data-test-funding-source-depot-inner
+      />
+    </:inner>
+  </CardPay::NestedItems>
+</CardPay::LabeledValue>

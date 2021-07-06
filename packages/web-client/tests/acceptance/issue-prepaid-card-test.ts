@@ -234,17 +234,21 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom('[data-test-funding-source-account] [data-test-account-address]')
       .hasText('0x1826...6E44');
     assert
-      .dom('[data-test-funding-source-depot-outer] [data-test-account-address]')
+      .dom(
+        `${post} [data-test-account-depot-outer] [data-test-account-address]`
+      )
       .hasText(depotAddress);
     assert
-      .dom('[data-test-funding-source-dropdown="DAI.CPXD"]')
+      .dom(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`)
       .containsText(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER.toFixed(2)} DAI`);
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
-    assert.dom('[data-test-funding-source-dropdown="DAI.CPXD"]').doesNotExist();
     assert
-      .dom('[data-test-funding-source-token]')
+      .dom(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`)
+      .doesNotExist();
+    assert
+      .dom(`${post} [data-test-account-balance]`)
       .containsText(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER.toFixed(2)} DAI`);
 
     assert
