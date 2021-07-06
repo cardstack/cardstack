@@ -60,11 +60,16 @@
           </div>
         </div>
         </Boxel::Field>
-        <Boxel::Field @label="Approximate value">
+        <Boxel::Field @label={{concat "Approximate value" (if (eq @flow "withdrawal") "*")}} data-test-approximate-value-label>
           ${{token-to-usd this.tokenSymbolForConversion this.amountAsBigNumber}} USD
         </Boxel::Field>
       {{/if}}
     </div>
+    {{#if (eq @flow "withdrawal")}}
+      <div class="transaction-amount__footnote" data-test-approximate-value-footnote>
+        * The actual value depends on the current exchange rate and is determined at the time of authorization.
+      </div>
+    {{/if}}
     {{#if this.errorMessage}}
       <div class="transaction-amount__error">
         {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact <a class="transaction-amount__support-link" href="mailto:support@cardstack.com" target="_blank" rel="noopener noreferrer">Cardstack support</a>.

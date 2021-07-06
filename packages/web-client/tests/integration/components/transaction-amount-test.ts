@@ -145,6 +145,11 @@ module('Integration | Component | transaction-amount', function (hooks) {
           />
         `);
 
+    assert
+      .dom('[data-test-approximate-value-label]')
+      .includesText('Approximate value');
+    assert.dom('[data-test-approximate-value-footnote]').doesNotExist();
+
     assert.dom('[data-test-amount-input]').hasValue('');
     assert.dom('[data-test-unlock-button]').isDisabled();
 
@@ -181,5 +186,35 @@ module('Integration | Component | transaction-amount', function (hooks) {
     await fillIn('[data-test-amount-input]', startDaiString);
     assert.dom('[data-test-amount-input]').hasValue(startDaiString);
     assert.dom('[data-test-unlock-button]').isNotDisabled();
+  });
+
+  test('It renders a footnote for the withdrawal flow', async function (assert) {
+    const session = new WorkflowSession();
+    session.update('depositSourceToken', 'DAI');
+    const layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
+
+    layer1Service.test__simulateBalances({
+      defaultToken: toBN('0'),
+      dai: toBN('0'),
+      card: toBN('0'),
+    });
+
+    this.setProperties({
+      session,
+    });
+
+    await render(hbs`
+          <CardPay::WithdrawalWorkflow::TransactionAmount
+            @workflowSession={{this.session}}
+            @onComplete={{noop}}
+            @onIncomplete={{noop}}
+          />
+        `);
+
+    assert
+      .dom('[data-test-approximate-value-label]')
+      .includesText('Approximate value*');
+    assert.dom('[data-test-approximate-value-footnote]').exists();
   });
 });
