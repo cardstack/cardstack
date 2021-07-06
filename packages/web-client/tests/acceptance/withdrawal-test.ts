@@ -194,6 +194,9 @@ module('Acceptance | withdrawal', function (hooks) {
       `${post} [data-test-transaction-amount] [data-test-boxel-button]`
     );
     assert.dom(milestoneCompletedSel(2)).containsText('Withdrawal amount set');
+    assert
+      .dom(`${post} [data-test-transaction-amount] [data-test-boxel-button]`)
+      .hasText('Edit');
 
     assert
       .dom(postableSel(3, 0))

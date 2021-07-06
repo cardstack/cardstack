@@ -194,8 +194,9 @@ class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmou
     }
   }
 
-  @action toggleComplete() {
-    if (this.args.isComplete) {
+  @action toggleAmountSet() {
+    if (this.isAmountSet) {
+      this.isAmountSet = false;
       this.args.onIncomplete?.();
     } else {
       this.args.workflowSession.update(
@@ -203,6 +204,7 @@ class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmou
         this.amountAsBigNumber.toString()
       );
       this.args.onComplete?.();
+      this.isAmountSet = true;
     }
   }
 }

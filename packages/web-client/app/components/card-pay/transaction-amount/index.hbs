@@ -137,7 +137,7 @@
       data-test-transaction-amount
     >
       <:default as |d|>
-        <d.ActionButton {{on "click" this.toggleComplete}}>
+        <d.ActionButton {{on "click" this.toggleAmountSet}}>
           Set Amount
         </d.ActionButton>
       </:default>
@@ -147,7 +147,7 @@
         </d.ActionButton>
       </:disabled>
       <:memorialized as |m|>
-        <m.ActionButton {{on "click" this.toggleComplete}}>
+        <m.ActionButton {{on "click" this.toggleAmountSet}}>
           Edit
         </m.ActionButton>
       </:memorialized>
