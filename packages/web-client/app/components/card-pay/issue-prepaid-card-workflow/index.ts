@@ -12,6 +12,11 @@ import { action } from '@ember/object';
 import { BN } from 'bn.js';
 import { faceValueOptions } from './workflow-config';
 
+const FAILURE_REASONS = {
+  DISCONNECTED: 'DISCONNECTED',
+  INSUFFICIENT_FUNDS: 'INSUFFICIENT_FUNDS',
+} as const;
+
 class IssuePrepaidCardWorkflow extends Workflow {
   name = 'Prepaid Card Issuance';
   milestones = [
@@ -72,7 +77,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
             } else {
               return {
                 success: false,
-                reason: 'INSUFFICIENT_FUNDS',
+                reason: FAILURE_REASONS.INSUFFICIENT_FUNDS,
               };
             }
           },
@@ -171,14 +176,18 @@ class IssuePrepaidCardWorkflow extends Workflow {
       message:
         'It looks like your xDai chain wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
       includeIf() {
-        return this.workflow?.cancelationReason === 'DISCONNECTED';
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
+        );
       },
     }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'card-pay/issue-prepaid-card-workflow/disconnection-cta',
       includeIf() {
-        return this.workflow?.cancelationReason === 'DISCONNECTED';
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
+        );
       },
     }),
     // if we don't have enough balance (50 USD equivalent)
@@ -187,7 +196,10 @@ class IssuePrepaidCardWorkflow extends Workflow {
       message:
         "Looks like there's no balance in your xDai chain wallet to fund a prepaid card. Before you can continue, please add funds to your xDai chain wallet by bridging some tokens from your Ethereum mainnet wallet.",
       includeIf() {
-        return this.workflow?.cancelationReason === 'INSUFFICIENT_FUNDS';
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.INSUFFICIENT_FUNDS
+        );
       },
     }),
     new WorkflowCard({
@@ -195,7 +207,10 @@ class IssuePrepaidCardWorkflow extends Workflow {
       componentName:
         'card-pay/issue-prepaid-card-workflow/insufficient-funds-cta',
       includeIf() {
-        return this.workflow?.cancelationReason === 'INSUFFICIENT_FUNDS';
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.INSUFFICIENT_FUNDS
+        );
       },
     }),
   ]);
@@ -216,7 +231,7 @@ class IssuePrepaidCardWorkflowComponent extends Component {
   }
 
   @action onDisconnect() {
-    this.workflow.cancel('DISCONNECTED');
+    this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
   }
 }
 

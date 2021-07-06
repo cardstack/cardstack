@@ -11,6 +11,10 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 
+const FAILURE_REASONS = {
+  DISCONNECTED: 'DISCONNECTED',
+} as const;
+
 class DepositWorkflow extends Workflow {
   name = 'Reserve Pool Deposit';
   milestones = [
@@ -157,14 +161,18 @@ class DepositWorkflow extends Workflow {
       message:
         'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).',
       includeIf() {
-        return this.workflow?.cancelationReason === 'DISCONNECTED';
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
+        );
       },
     }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'card-pay/deposit-workflow/disconnection-cta',
       includeIf() {
-        return this.workflow?.cancelationReason === 'DISCONNECTED';
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
+        );
       },
     }),
   ]);
@@ -186,7 +194,7 @@ class DepositWorkflowComponent extends Component {
   }
 
   @action onDisconnect() {
-    this.workflow.cancel('DISCONNECTED');
+    this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
   }
 }
 
