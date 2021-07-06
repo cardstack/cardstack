@@ -56,7 +56,8 @@ export abstract class Workflow {
 
   cancel(reason?: string) {
     if (!this.isComplete && !this.isCanceled) {
-      this.emit('visible-postables-changed');
+      // visible-postables-will-change starts test waiters in animated-workflow.ts
+      this.emit('visible-postables-will-change');
       this.cancelationReason = reason || 'UNKNOWN';
       this.isCanceled = true;
     }

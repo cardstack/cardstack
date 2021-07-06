@@ -47,14 +47,15 @@ export class WorkflowCard extends WorkflowPostable {
     if (this.check) {
       this.check().then((checkResult) => {
         if (checkResult.success) {
-          this.workflow?.emit('visible-postables-changed');
+          // visible-postables-will-change starts test waiters in animated-workflow.ts
+          this.workflow?.emit('visible-postables-will-change');
           this.isComplete = true;
         } else {
           this.workflow?.cancel(checkResult.reason);
         }
       });
     } else {
-      this.workflow?.emit('visible-postables-changed');
+      this.workflow?.emit('visible-postables-will-change');
       this.isComplete = true;
     }
   }

@@ -137,7 +137,7 @@ export default class AnimatedWorkflow {
     this.model = model;
     this.#listenersToCleanUp.push(
       this.model.on(
-        'visible-postables-changed',
+        'visible-postables-will-change',
         this.startTestWaiter.bind(this)
       )
     );
