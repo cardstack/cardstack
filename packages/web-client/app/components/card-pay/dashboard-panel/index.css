@@ -68,11 +68,6 @@
 }
 
 /* Summary content */
-.dashboard-details-container[open] .dashboard-details-container__summary-content,
-.dashboard-details-container[open] .dashboard-panel__summary-hero {
-  display: none;
-}
-
 .dashboard-details-container__summary-content {
   height: 100%;
   padding: var(--boxel-sp-sm) var(--boxel-sp-xl) var(--boxel-sp-sm) 11rem;
@@ -101,6 +96,11 @@
   color: var(--boxel-purple-500);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-xs);
+}
+
+.dashboard-details-container[open] .dashboard-details-container__summary-content,
+.dashboard-details-container[open] .dashboard-panel__summary-hero {
+  display: none;
 }
 
 /* Panel styles */

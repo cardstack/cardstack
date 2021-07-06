@@ -3,7 +3,7 @@
     {{#each @tabs as |tab i|}}
       {{#if tab.inactive}}
         <div class="card-pay-header-nav__list-item card-pay-header-nav__list-item--inactive">
-          <div class="card-pay-header-nav__tab" data-test-card-pay-header-tab-disabled>
+          <div class="card-pay-header-nav__tab" aria-disabled="true" data-test-card-pay-header-tab-disabled>
             {{svg-jar tab.icon aria-hidden="true"}}
             {{tab.title}}
           </div>
