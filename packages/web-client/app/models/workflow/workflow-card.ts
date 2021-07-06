@@ -21,13 +21,13 @@ type CheckResult = SuccessCheckResult | FailureCheckResult;
 interface WorkflowCardOptions {
   author: Participant;
   componentName: string; // this should eventually become a card reference
-  includeIf: () => boolean;
-  check(): Promise<CheckResult>;
+  includeIf(this: WorkflowCard): boolean;
+  check(this: WorkflowCard): Promise<CheckResult>;
 }
 
 export class WorkflowCard extends WorkflowPostable {
   componentName: string;
-  check?: () => Promise<CheckResult>;
+  check?: (this: WorkflowCard) => Promise<CheckResult>;
 
   constructor(options: Partial<WorkflowCardOptions>) {
     super(options.author!, options.includeIf);

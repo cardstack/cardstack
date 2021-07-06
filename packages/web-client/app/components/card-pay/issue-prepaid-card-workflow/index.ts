@@ -9,7 +9,6 @@ import PostableCollection from '@cardstack/web-client/models/workflow/postable-c
 import NetworkAwareWorkflowMessage from '@cardstack/web-client/components/workflow-thread/network-aware-message';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
-import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
 import { BN } from 'bn.js';
 import { faceValueOptions } from './workflow-config';
 
@@ -32,28 +31,28 @@ class IssuePrepaidCardWorkflow extends Workflow {
           message: `Looks like you've already connected your xDai chain wallet, which you can see below.
           Please continue with the next step of this workflow.`,
           includeIf() {
-            return (this as NetworkAwareWorkflowMessage).hasLayer2Account;
+            return this.hasLayer2Account;
           },
         }),
         new NetworkAwareWorkflowMessage({
           author: cardbot,
           message: `Before we get started, please connect your xDai chain wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
           includeIf() {
-            return !(this as NetworkAwareWorkflowMessage).hasLayer2Account;
+            return !this.hasLayer2Account;
           },
         }),
         new NetworkAwareWorkflowMessage({
           author: cardbot,
           message: `Once you have installed the app, open the app and add an existing wallet/account or create a new wallet/account. Use your account to scan this QR code, which will connect your account with Card Pay.`,
           includeIf() {
-            return !(this as NetworkAwareWorkflowMessage).hasLayer2Account;
+            return !this.hasLayer2Account;
           },
         }),
         new WorkflowCard({
           author: cardbot,
           componentName: 'card-pay/layer-two-connect-card',
-          check: async () => {
-            let layer2Network = this.owner.lookup(
+          async check() {
+            let layer2Network = this.workflow?.owner.lookup(
               'service:layer2-network'
             ) as Layer2Network;
 
@@ -172,20 +171,14 @@ class IssuePrepaidCardWorkflow extends Workflow {
       message:
         'It looks like your xDai chain wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
       includeIf() {
-        return (
-          (this as WorkflowPostable).workflow?.cancelationReason ===
-          'DISCONNECTED'
-        );
+        return this.workflow?.cancelationReason === 'DISCONNECTED';
       },
     }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'card-pay/issue-prepaid-card-workflow/disconnection-cta',
       includeIf() {
-        return (
-          (this as WorkflowPostable).workflow?.cancelationReason ===
-          'DISCONNECTED'
-        );
+        return this.workflow?.cancelationReason === 'DISCONNECTED';
       },
     }),
     // if we don't have enough balance (50 USD equivalent)
@@ -194,10 +187,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       message:
         "Looks like there's no balance in your xDai chain wallet to fund a prepaid card. Before you can continue, please add funds to your xDai chain wallet by bridging some tokens from your Ethereum mainnet wallet.",
       includeIf() {
-        return (
-          (this as WorkflowPostable).workflow?.cancelationReason ===
-          'INSUFFICIENT_FUNDS'
-        );
+        return this.workflow?.cancelationReason === 'INSUFFICIENT_FUNDS';
       },
     }),
     new WorkflowCard({
@@ -205,10 +195,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       componentName:
         'card-pay/issue-prepaid-card-workflow/insufficient-funds-cta',
       includeIf() {
-        return (
-          (this as WorkflowPostable).workflow?.cancelationReason ===
-          'INSUFFICIENT_FUNDS'
-        );
+        return this.workflow?.cancelationReason === 'INSUFFICIENT_FUNDS';
       },
     }),
   ]);

@@ -14,7 +14,7 @@ export class WorkflowPostable {
   @tracked isComplete: boolean = false;
   constructor(
     author: Participant,
-    includeIf: (() => boolean) | undefined = undefined
+    includeIf: ((this: WorkflowPostable) => boolean) | undefined = undefined
   ) {
     this.author = author;
     this.includeIf = includeIf;

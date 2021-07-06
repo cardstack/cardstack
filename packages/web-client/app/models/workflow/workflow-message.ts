@@ -3,7 +3,7 @@ import { Participant, WorkflowPostable } from './workflow-postable';
 interface WorkflowMessageOptions {
   author: Participant;
   message: string;
-  includeIf: () => boolean;
+  includeIf: (this: WorkflowMessage) => boolean;
 }
 
 export class WorkflowMessage extends WorkflowPostable {
