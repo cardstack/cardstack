@@ -3,18 +3,27 @@
   color: var(--boxel-light);
 
   /* Remove the below two lines after hamburger menu is implemented */
-  max-height: 66px;
+  height: 3.75rem;
   overflow: auto;
 }
 
 .card-pay-header-nav__list {
   list-style-type: none;
+  height: 100%;
   margin: 0;
-  padding: 0 var(--boxel-sp-lg);
+  padding: 0 var(--boxel-sp-xxxl);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--boxel-sp);
   white-space: nowrap;
+}
+
+.card-pay-header-nav__list-item {
+  flex-grow: 1;
+  height: 100%;
+}
+
+.card-pay-header-nav__list-item--inactive {
+  opacity: 0.45;
 }
 
 .card-pay-header-nav__tab {
@@ -22,11 +31,14 @@
 
   display: flex;
   align-items: center;
-  padding: var(--boxel-sp) var(--boxel-sp-sm) var(--boxel-sp) 0;
-  border-bottom: 4px solid transparent;
-  color: var(--boxel-purple-300);
-  font: 600 var(--boxel-font);
-  letter-spacing: var(--boxel-lsp-xxs);
+  width: max-content;
+  height: 100%;
+  margin: 0 auto;
+  padding: var(--boxel-sp-sm) var(--boxel-sp-xl) var(--boxel-sp-sm) var(--boxel-sp);
+  border-bottom: 2px solid transparent;
+  color: var(--boxel-light);
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
   text-align: center;
   transition: color var(--boxel-transition);
 }
@@ -35,12 +47,10 @@
   --icon-color: var(--boxel-highlight);
 
   border-color: var(--boxel-highlight);
-  color: var(--boxel-light);
+  color: var(--boxel-highlight);
 }
 
 .card-pay-header-nav__tab svg {
   margin-right: var(--boxel-sp-xs);
   flex-shrink: 0;
-  width: 1rem;
-  height: 1rem;
 }

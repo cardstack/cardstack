@@ -1,11 +1,13 @@
 import Route from '@ember/routing/route';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/merchants-hero.svg';
+import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/merchants-summary-hero.svg';
 
 const MERCHANTS_PANEL = {
   title: 'Easy Earnings',
   description:
     'Revenue backed by stablecoins with automatically managed currency conversions',
   heroImageUrl,
+  summaryHeroImageUrl,
   sections: [
     {
       workflow: 'create-merchant',

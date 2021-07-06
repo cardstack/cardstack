@@ -1,5 +1,10 @@
 <details open class="dashboard-details-container" ...attributes>
   <summary class="dashboard-details-container__summary">
+    <div class="dashboard-panel__summary-hero" style={{css-url "background-image" @panel.summaryHeroImageUrl}} />
+    <div class="dashboard-details-container__summary-content">
+      <h2 class="dashboard-panel__summary-title">{{@panel.title}}</h2>
+      <p class="dashboard-panel__summary-desc">{{@panel.description}}</p>
+    </div>
     <div class="dashboard-details-container__marker">
       {{svg-jar "caret-right" class="dashboard-details-container__marker-icon" role="presentation"}}
     </div>
@@ -9,13 +14,7 @@
       <h2 class="dashboard-panel__header-title">{{@panel.title}}</h2>
       <p class="dashboard-panel__header-desc">{{@panel.description}}</p>
     </header>
-    {{#if @panel.heroImageUrl}}
-      <div
-        class="dashboard-panel__hero"
-        style={{css-url "background-image" @panel.heroImageUrl}}
-      />
-    {{/if}}
-
+    <div class="dashboard-panel__hero" style={{css-url "background-image" @panel.heroImageUrl}} />
     {{yield}}
   </section>
 </details>

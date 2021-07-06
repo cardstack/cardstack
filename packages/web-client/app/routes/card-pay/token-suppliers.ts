@@ -1,5 +1,6 @@
 import Route from '@ember/routing/route';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/suppliers-hero.svg';
+import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/suppliers-summary-hero.svg';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 const SUPPLIERS_PANEL = {
@@ -7,6 +8,7 @@ const SUPPLIERS_PANEL = {
   description:
     'Token bridging between layer 1 and layer 2 with protocol fees as rewards',
   heroImageUrl,
+  summaryHeroImageUrl,
   sections: [
     {
       workflow: 'deposit',

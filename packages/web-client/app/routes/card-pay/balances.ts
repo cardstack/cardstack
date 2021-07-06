@@ -1,11 +1,13 @@
 import Route from '@ember/routing/route';
 import '../../css/card-pay/balances.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/balances-hero.svg';
+import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/balances-summary-hero.svg';
 
 const BALANCES_PANEL = {
   title: 'Easy Payments',
   description: 'DeFi payments that are fast, easy and cheap for everyone',
   heroImageUrl,
+  summaryHeroImageUrl,
   sections: [
     {
       workflow: 'buy-prepaid-card',
