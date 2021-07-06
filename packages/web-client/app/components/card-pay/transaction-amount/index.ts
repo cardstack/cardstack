@@ -198,6 +198,10 @@ class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmou
     if (this.args.isComplete) {
       this.args.onIncomplete?.();
     } else {
+      this.args.workflowSession.update(
+        'withdrawnAmount', // FIXME generalise entered amount (depositedAmount above), add to integration tests?
+        this.amountAsBigNumber.toString()
+      );
       this.args.onComplete?.();
     }
   }
