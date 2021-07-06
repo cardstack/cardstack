@@ -1,6 +1,5 @@
 import { tracked } from '@glimmer/tracking';
 import { defer } from 'rsvp';
-import { registerDestructor } from '@ember/destroyable';
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
@@ -28,7 +27,6 @@ export default abstract class Layer1ChainWeb3Strategy
   private chainName: string;
   chainId: number;
   networkSymbol: Layer1NetworkSymbol;
-  broadcastChannel: BroadcastChannel;
   simpleEmitter = new SimpleEmitter();
 
   // changes with connection state
@@ -46,16 +44,6 @@ export default abstract class Layer1ChainWeb3Strategy
     this.chainId = networkIds[networkSymbol];
     this.walletInfo = new WalletInfo([], this.chainId);
     this.networkSymbol = networkSymbol;
-
-    // the broadcast channel is really for metamask disconnections
-    // since metamask doesn't allow you to disconnect from the dapp side
-    // we want to ensure that users don't get confused by different tabs having
-    // different wallets connected
-    this.broadcastChannel = new BroadcastChannel(this.chainName);
-    this.broadcastChannel.onmessage = (event: MessageEvent) => {
-      if (event.data === 'disconnected') this.onDisconnect();
-    };
-    registerDestructor(this, this.broadcastChannel.close);
     this.initialize();
   }
 
@@ -140,7 +128,6 @@ export default abstract class Layer1ChainWeb3Strategy
       this.web3 = undefined;
       this.currentProviderId = '';
       this.simpleEmitter.emit('disconnect');
-      this.broadcastChannel.postMessage('disconnected');
     }
     this.#waitForAccountDeferred = defer();
   }

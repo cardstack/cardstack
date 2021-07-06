@@ -9,6 +9,7 @@ import CustomStorageWalletConnect, {
 } from '../wc-connector';
 import { Emitter, SimpleEmitter } from '../events';
 import { WalletProviderId } from '../wallet-providers';
+import { registerDestructor } from '@ember/destroyable';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: string | number) =>
   `cardstack-chain-${chainId}-provider`;
@@ -31,6 +32,7 @@ export abstract class ConnectionManager
   networkSymbol: NetworkSymbol;
   chainId: number;
   simpleEmitter: SimpleEmitter;
+  broadcastChannel: BroadcastChannel;
   protected provider: any;
   abstract providerId: WalletProviderId;
 
@@ -38,6 +40,19 @@ export abstract class ConnectionManager
     this.networkSymbol = options.networkSymbol;
     this.chainId = options.chainId;
     this.simpleEmitter = new SimpleEmitter();
+    // the broadcast channel is really for metamask disconnections
+    // since metamask doesn't allow you to disconnect from the dapp side
+    // we want to ensure that users don't get confused by different tabs having
+    // different wallets connected
+    this.broadcastChannel = new BroadcastChannel(
+      `cardstack-connection-manager-${this.chainId}`
+    );
+    this.broadcastChannel.onmessage = (event: MessageEvent) => {
+      if (event.data === 'disconnected') {
+        this.onDisconnect(false);
+      }
+    };
+    registerDestructor(this, this.broadcastChannel.close);
   }
 
   static create(
@@ -76,9 +91,10 @@ export abstract class ConnectionManager
     return this.simpleEmitter.emit(event, ...args);
   }
 
-  onDisconnect() {
+  onDisconnect(broadcast = true) {
     ConnectionManager.removeProviderFromStorage(this.chainId);
     this.emit('disconnected');
+    if (broadcast) this.broadcastChannel.postMessage('disconnected');
   }
 
   onConnect(accounts: string[]) {
