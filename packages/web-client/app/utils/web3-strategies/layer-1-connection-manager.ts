@@ -14,73 +14,7 @@ const GET_PROVIDER_STORAGE_KEY = (chainId: string | number) =>
   `cardstack-chain-${chainId}-provider`;
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
-export async function createConnectionManagerFromLocalStorage(
-  web3: Web3,
-  options: ConnectionManagerOptions
-): Promise<ConnectionManager | void> {
-  try {
-    let providerId = ConnectionManager.getProviderIdForChain(options.chainId);
-    if (providerId !== 'wallet-connect' && providerId !== 'metamask') {
-      return;
-    }
-
-    let connectionManager: ConnectionManager = ConnectionManager.create(
-      providerId,
-      options
-    );
-
-    connectionManager.on('connected', options.onConnect);
-    connectionManager.on('disconnected', options.onDisconnect);
-    connectionManager.on('incorrect-chain', options.onIncorrectChain);
-
-    await connectionManager.setup();
-    connectionManager.setWeb3Provider(web3);
-
-    return connectionManager;
-  } catch (e) {
-    console.error('Failed to create connection manager from local storage');
-    console.error(e);
-    return;
-  }
-}
-
-export async function createConnectionManager(
-  providerId: WalletProviderId,
-  web3: Web3,
-  options: ConnectionManagerOptions
-): Promise<ConnectionManager | void> {
-  try {
-    let connectionManager: ConnectionManager = ConnectionManager.create(
-      providerId,
-      options
-    );
-
-    connectionManager.on('connected', options.onConnect);
-    connectionManager.on('disconnected', options.onDisconnect);
-    connectionManager.on('incorrect-chain', options.onIncorrectChain);
-
-    await connectionManager.setup();
-
-    connectionManager.setWeb3Provider(web3);
-
-    return connectionManager;
-  } catch (e) {
-    console.error(`Failed to create connection manager: ${providerId}`);
-    console.error(e);
-    ConnectionManager.removeProviderFromStorage(options.chainId);
-    return;
-  }
-}
-
-interface EventCallbacks {
-  // events here are different from EIP 1193
-  onDisconnect(): void;
-  onConnect(accounts: string[]): void;
-  onIncorrectChain(): void;
-  onError(error: Error): void;
-}
-
-interface ConnectionManagerOptions extends EventCallbacks {
+interface ConnectionManagerOptions {
   chainId: number;
   networkSymbol: NetworkSymbol;
 }

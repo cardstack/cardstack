@@ -21,11 +21,7 @@ import {
   networkIds,
 } from '@cardstack/cardpay-sdk';
 import { networkDisplayInfo } from './network-display-info';
-import {
-  createConnectionManagerFromLocalStorage,
-  createConnectionManager,
-  ConnectionManager,
-} from './layer-1-connection-manager';
+import { ConnectionManager } from './layer-1-connection-manager';
 
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy {
@@ -66,56 +62,65 @@ export default abstract class Layer1ChainWeb3Strategy
   async initialize() {
     try {
       let web3 = new Web3();
-      // add necessary init options here
-      let connectionManager = await createConnectionManagerFromLocalStorage(
-        web3,
-        this.connectionManagerOptions
+      let providerId = ConnectionManager.getProviderIdForChain(this.chainId);
+      if (providerId !== 'wallet-connect' && providerId !== 'metamask') {
+        return;
+      }
+
+      let connectionManager: ConnectionManager = ConnectionManager.create(
+        providerId,
+        {
+          networkSymbol: this.networkSymbol,
+          chainId: this.chainId,
+        }
       );
+
+      connectionManager.on('connected', this.onConnect.bind(this));
+      connectionManager.on('disconnected', this.onDisconnect.bind(this));
+      connectionManager.on('incorrect-chain', this.disconnect.bind(this));
+
+      await connectionManager.setup();
+
+      connectionManager.setWeb3Provider(web3);
 
       if (connectionManager) {
         this.web3 = web3;
         this.connectionManager = connectionManager;
         await connectionManager.reconnect(); // use the reconnect method because of edge cases
-      } else {
-        this.clearLocalConnectionState();
       }
     } catch (e) {
       // clean up if anything goes wrong.
       this.disconnect();
-      // probably extraneous, but in case the thing that went wrong prevents the onDisconnect callback
-      // from being called, we clear the local state anyway
-      this.clearLocalConnectionState();
+      ConnectionManager.removeProviderFromStorage(this.chainId);
     }
   }
 
   async connect(walletProvider: WalletProvider): Promise<void> {
-    let web3 = new Web3();
-    let connectionManager = await createConnectionManager(
-      walletProvider.id,
-      web3,
-      this.connectionManagerOptions
-    );
-    if (connectionManager) {
+    try {
+      let web3 = new Web3();
+      let connectionManager: ConnectionManager = ConnectionManager.create(
+        walletProvider.id,
+        {
+          networkSymbol: this.networkSymbol,
+          chainId: this.chainId,
+        }
+      );
+      connectionManager.on('connected', this.onConnect.bind(this));
+      connectionManager.on('disconnected', this.onDisconnect.bind(this));
+      connectionManager.on('incorrect-chain', this.disconnect.bind(this));
+      await connectionManager.setup();
+      connectionManager.setWeb3Provider(web3);
       this.web3 = web3;
       this.connectionManager = connectionManager;
       await connectionManager.connect();
+    } catch (e) {
+      console.error(
+        `Failed to create connection manager: ${walletProvider.id}`
+      );
+      console.error(e);
+      ConnectionManager.removeProviderFromStorage(this.chainId);
+      return;
     }
-  }
-
-  get connectionManagerOptions() {
-    let bound = {
-      onDisconnect: this.onDisconnect.bind(this),
-      onConnect: this.onConnect.bind(this),
-      disconnect: this.disconnect.bind(this),
-    };
-    return {
-      onDisconnect: bound.onDisconnect,
-      onConnect: bound.onConnect,
-      onIncorrectChain: bound.disconnect,
-      onError: bound.disconnect,
-      networkSymbol: this.networkSymbol,
-      chainId: this.chainId,
-    };
   }
 
   async onConnect(accounts: string[]) {
