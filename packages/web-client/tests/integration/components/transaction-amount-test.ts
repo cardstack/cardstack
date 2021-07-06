@@ -150,6 +150,8 @@ module('Integration | Component | transaction-amount', function (hooks) {
       .includesText('Approximate value');
     assert.dom('[data-test-approximate-value-footnote]').doesNotExist();
 
+    assert.dom('[data-test-amount-label]').includesText('Amount to deposit');
+
     assert.dom('[data-test-amount-input]').hasValue('');
     assert.dom('[data-test-unlock-button]').isDisabled();
 
@@ -188,7 +190,7 @@ module('Integration | Component | transaction-amount', function (hooks) {
     assert.dom('[data-test-unlock-button]').isNotDisabled();
   });
 
-  test('It renders a footnote for the withdrawal flow', async function (assert) {
+  test('It renders differently for the withdrawal flow', async function (assert) {
     const session = new WorkflowSession();
     session.update('depositSourceToken', 'DAI');
     const layer1Service = this.owner.lookup('service:layer1-network')
@@ -211,6 +213,8 @@ module('Integration | Component | transaction-amount', function (hooks) {
             @onIncomplete={{noop}}
           />
         `);
+
+    assert.dom('[data-test-amount-label]').includesText('Amount to withdraw');
 
     assert
       .dom('[data-test-approximate-value-label]')

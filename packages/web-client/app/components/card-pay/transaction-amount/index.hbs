@@ -37,10 +37,11 @@
         </Boxel::Field>
       {{else}}
         <Boxel::Field
-          @label="Amount to deposit"
+          @label={{concat "Amount to " (if (eq @flow "withdrawal") "withdraw" "deposit")}}
           @fieldMode="edit"
           class="transaction-amount__field"
           @labelClass="transaction-amount__input-field-label"
+          data-test-amount-label
         >
         <div class="transaction-amount__input-container transaction-amount__input-token-balance">
           {{svg-jar this.currentTokenDetails.icon class="transaction-amount__currency-icon" role="presentation"}}
