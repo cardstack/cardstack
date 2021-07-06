@@ -98,4 +98,5 @@
   background-position: top right;
   background-repeat: no-repeat;
   background-size: contain;
+  pointer-events: none;
 }
