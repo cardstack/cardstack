@@ -14,6 +14,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`TokenBridgeForeignSide.relayTokens`](#tokenbridgeforeignsiderelaytokens)
   - [`TokenBridgeForeignSide.getSupportedTokens` (TBD)](#tokenbridgeforeignsidegetsupportedtokens-tbd)
 - [`TokenBridgeHomeSide`](#tokenbridgehomeside)
+  - [`TokenBridgeHomeSide.relayTokens`](#tokenbridgehomesiderelaytokens)
   - [`TokenBridgeHomeSide.waitForBridgingCompleted`](#tokenbridgehomesidewaitforbridgingcompleted)
 - [`Safes`](#safes)
   - [`Safe.viewSafe`](#safeviewsafe)
@@ -35,8 +36,8 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RevenuePool.balances`](#revenuepoolbalances)
   - [`RevenuePool.claim`](#revenuepoolclaim)
 - [`RewardPool`](#rewardpool)
-  - [`RewardPool.balanceOf` (TBD)](#rewardpoolbalanceof-tbd)
-  - [`RewardPool.withdraw` (TBD)](#rewardpoolwithdraw-tbd)
+  - [`RewardPool.rewardTokenBalance`](#rewardpoolrewardtokenbalance)
+  - [`RewardPool.claim` (TBD)](#rewardpoolclaim-tbd)
 - [`ExchangeRate`](#exchangerate)
   - [`ExchangeRate.convertToSpend`](#exchangerateconverttospend)
   - [`ExchangeRate.convertFromSpend`](#exchangerateconvertfromspend)
@@ -118,10 +119,10 @@ let txnReceipt = await tokenBridge.unlockTokens(
 );
 ```
 ### `TokenBridgeForeignSide.relayTokens`
-This call will invoke the token bridge contract to relay tokens that have been unlocked. It is always a good idea to relay the same number of tokens that were just unlocked. So if you unlocked 10 tokens, then you should subsequently relay 10 tokens. Once the tokens have been relayed to the layer 2 network they will be deposited in a Gnosis safe that you control in layer 2. You can use the `Safes.view` to obtain the address of the safe that you control in layer 2. Your safe will be reused for any subsequent tokens that you bridge into layer 2.
+This call will invoke the token bridge contract to relay tokens that have been unlocked in layer 1 and relay them to layer 2. It is always a good idea to relay the same number of tokens that were just unlocked. So if you unlocked 10 tokens, then you should subsequently relay 10 tokens. Once the tokens have been relayed to the layer 2 network they will be deposited in a Gnosis safe that you control in layer 2. You can use the `Safes.view` to obtain the address of the safe that you control in layer 2. Your safe will be reused for any subsequent tokens that you bridge into layer 2.
 
 This method is invoked with the following parameters:
-- The contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
+- The layer 1 contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
 - The address of the layer 2 account that should own the resulting safe
 - The amount of tokens to unlock. This amount should be in units of `wei` and as a string.
 - You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fourth argument.
@@ -145,6 +146,26 @@ import { getSDK } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider); // Layer 2 web3 instance
 let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
 ```
+
+### `TokenBridgeHomeSide.relayTokens`
+This call will invoke the token bridge contract to relay tokens from a layer 2 safe into the account specified in layer 1.
+
+This method is invoked with the following parameters:
+- The layer 2 safe address that contains the tokens to be relayed to layer 1
+- The layer 2 token address of the tokens to be relayed
+- The address of the layer 1 recipient that will receive the tokens in layer 1
+- The amount of tokens to relay as a string in units of `wei`. Note that in addition to the amount of tokens being relayed, the safe will also be changed the layer 2 gas costs for performing the relay as well (the gas cost will be charged in the same tokens as is being relayed). So the safe must have a balance that includes both the amount being relayed as well as the layer 2 gas charged in order to perform the relay.
+
+```js
+let result = await tokenBridge.relayTokens(
+  layer2SafeAddress,
+  tokenAddress,
+  layer1RecipientAddress,
+  amountInWei
+);
+```
+
+The result is a promise for a `GnosisExecTx` object which is documented in the following API calls.
 
 ### `TokenBridgeHomeSide.waitForBridgingCompleted`
 This call will listen for a `TokensBridgedToSafe` event emitted by the TokenBridge home contract that has a recipient matching the specified address. The starting layer 2 block height should be captured before the call to relayTokens is made to begin bridging. It is used to focus the search and avoid matching on a previous bridging for this user.
@@ -662,9 +683,9 @@ interface RelayTransaction {
   transactionHash: string;
 }
 ```
-## `RewardPool` 
+## `RewardPool`
 
-The `RewardPool` API is used to interact with tally (an offchain service similar to relayer) and the reward pool contract. As customers use their prepaid card they will be given rewards based the amount of spend they use and a reward-based algorithm.  
+The `RewardPool` API is used to interact with tally (an offchain service similar to relayer) and the reward pool contract. As customers use their prepaid card they will be given rewards based the amount of spend they use and a reward-based algorithm.
 
 ### `RewardPool.rewardTokenBalance`
 This call returns the balance of a token in the RewardPool for prepaid card owners address. This function takes in a parameter of the prepaid card owner address and the reward token address. This balance also accounts for the claims of a prepaid card owner in the past. The tokens that are part of the rewards are CARDPXD and DAICPXD -- federated tokens of the card protocol.
@@ -673,7 +694,7 @@ This call returns the balance of a token in the RewardPool for prepaid card owne
 interface RewardTokenBalance {
   tokenSymbol: string;
   tokenAddress: string;
-  balance: BN; 
+  balance: BN;
 }
 ```
 
