@@ -55,7 +55,7 @@ interface CardMockingOptions {
 
 export default function setupCardMocking(
   hooks: NestedHooks,
-  options: CardMockingOptions
+  options?: CardMockingOptions
 ): void {
   hooks.beforeEach(async function () {
     this.createCard = createCard.bind(this);

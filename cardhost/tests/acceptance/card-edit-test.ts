@@ -7,7 +7,7 @@ import setupCardMocking from '../helpers/card-mocking';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import click from '@ember/test-helpers/dom/click';
 import fillIn from '@ember/test-helpers/dom/fill-in';
-import { setupMirage } from '../helpers/mirage';
+import { setupMirage } from 'ember-cli-mirage/test-support';
 import waitFor from '@ember/test-helpers/dom/wait-for';
 
 const PERSON = '[data-test-person]';
@@ -87,7 +87,7 @@ module('Acceptance | Card Editing', function (hooks) {
     await click(SAVE);
     await waitFor(MODAL, { count: 0 });
     assert.dom(MODAL).doesNotExist('The modal is closed');
-    let card = this.server.schema.cards.find(encodeCardURL(personURL));
+    let card = (this.server.schema as any).cards.find(encodeCardURL(personURL));
     assert.equal(
       card.attrs.raw.data.name,
       'Bob Barker',

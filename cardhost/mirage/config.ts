@@ -1,6 +1,10 @@
 import DbCollection from 'miragejs/db-collection';
-import { cardJSONReponse } from '@cardstack/server/src/interfaces';
-import { Format, RawCard, FORMATS } from '@cardstack/core/src/interfaces';
+import {
+  Format,
+  RawCard,
+  FORMATS,
+  cardJSONReponse,
+} from '@cardstack/core/src/interfaces';
 
 import type {
   Response as ResponseType,
@@ -56,7 +60,7 @@ async function returnCard(schema: any, request: RequestType) {
   return cardServer.respondWithCard(cardURL, params.format);
 }
 
-async function updateCard(schema: any, request: RequestType) {
+async function updateCard(_schema: any, request: RequestType) {
   let cardServer = FakeCardServer.current();
   let cardURL = request.params.encodedCardURL;
 

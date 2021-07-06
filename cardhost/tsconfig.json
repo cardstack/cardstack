@@ -27,9 +27,6 @@
       "cardhost/mirage/*": [
         "mirage/*"
       ],
-      "cardhost/config/*": [
-        "config/*"
-      ],
       "cardhost/*": [
         "app/*"
       ],

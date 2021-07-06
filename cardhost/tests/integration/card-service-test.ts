@@ -66,7 +66,7 @@ module('Integration | card-service', function (hooks) {
     });
 
     test(`load an card's isolated view and model`, async function (assert) {
-      let { model } = await cards.load(cardID, 'isolated');
+      let { model } = (await cards.load(cardID, 'isolated')) as any;
       assert.equal(model.id, encodeCardURL(cardID), '@model id is correct');
       assert.equal(model.title, 'A blog post title', 'post title is correct');
       assert.ok(
@@ -117,10 +117,10 @@ module('Integration | card-service', function (hooks) {
         },
       });
 
-      let { model, component } = await cards.load(
+      let { model, component } = (await cards.load(
         'http://mirage/cards/post-list',
         'isolated'
-      );
+      )) as any;
       this.set('component', component);
       await render(hbs`<this.component />`);
       assert.dom('h1').containsText('A blog post title');
