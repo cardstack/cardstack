@@ -135,18 +135,14 @@ export default abstract class Layer1ChainWeb3Strategy
 
   private onDisconnect() {
     if (this.isConnected) {
-      this.clearLocalConnectionState();
+      this.clearWalletInfo();
+      this.connectionManager = undefined;
+      this.web3 = undefined;
+      this.currentProviderId = '';
       this.simpleEmitter.emit('disconnect');
       this.broadcastChannel.postMessage('disconnected');
     }
     this.#waitForAccountDeferred = defer();
-  }
-
-  private clearLocalConnectionState() {
-    this.clearWalletInfo();
-    this.connectionManager = undefined;
-    this.web3 = undefined;
-    this.currentProviderId = '';
   }
 
   get waitForAccount(): Promise<void> {
