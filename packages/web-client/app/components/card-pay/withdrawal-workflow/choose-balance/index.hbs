@@ -1,24 +1,45 @@
 <ActionCardContainer
   @header="Withdrawal"
   @isComplete={{@isComplete}}
+  data-test-withdrawal-choose-balance
   data-test-withdrawal-choose-balance-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section>
+    <ActionCardContainer::Section @title="Choose a depot and balance to withdraw from">
+      <CardPay::NestedAccountDepotDisplay
+        @accountAddress={{this.layer2Network.walletInfo.firstAddress}}
+        @depotAddress={{this.depotAddress}}
+        @size={{if @isComplete "large"}}
+        class="choose-balance__field"
+      />
+    </ActionCardContainer::Section>
+    {{#if this.depotAddress}}
+      <ActionCardContainer::Section>
+        <CardPay::NestedDepotBalanceChooser
+          @isComplete={{@isComplete}}
+          @depotAddress={{this.depotAddress}}
+          @tokens={{this.tokens}}
+          @selectedToken={{this.selectedToken}}
+          @selectedTokenSymbol={{this.selectedTokenSymbol}}
+          @chooseToken={{this.chooseSource}}
+          class="choose-balance__field"
+        />
+      </ActionCardContainer::Section>
+    {{/if}}
   </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
-    data-test-withdrawal-choose-balance
+    @disabled={{or @frozen this.isDisabled}}
   >
     <:default as |d|>
-      <d.ActionButton {{on "click" this.toggleComplete}}>
+      <d.ActionButton {{on "click" this.save}}>
         Continue
       </d.ActionButton>
     </:default>
     <:memorialized as |m|>
-      <m.ActionButton {{on "click" this.toggleComplete}}>
+      <m.ActionButton {{on "click" @onIncomplete}}>
         Edit
       </m.ActionButton>
     </:memorialized>
   </Boxel::ActionChin>
-
 </ActionCardContainer>

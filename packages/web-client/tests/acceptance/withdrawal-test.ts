@@ -58,12 +58,12 @@ module('Acceptance | withdrawal', function (hooks) {
     );
     layer1Service.test__simulateBalances({
       defaultToken: toBN('2141100000000000000'),
-      dai: toBN('250500000000000000000'),
+      dai: toBN('150500000000000000000'),
       card: toBN('10000000000000000000000'),
     });
     await waitFor(`${post} [data-test-balance="ETH"]`);
     assert.dom(`${post} [data-test-balance="ETH"]`).containsText('2.1411');
-    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.50');
+    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('150.50');
     assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.00');
     await settled();
     assert
@@ -93,15 +93,33 @@ module('Acceptance | withdrawal', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
-      defaultToken: toBN(0),
+      defaultToken: toBN('250000000000000000000'),
+      card: toBN('500000000000000000000'),
     });
+    let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
+    let testDepot = {
+      address: depotAddress,
+      tokens: [
+        {
+          balance: '250000000000000000000',
+          token: {
+            symbol: 'DAI',
+          },
+        },
+        {
+          balance: '500000000000000000000',
+          token: {
+            symbol: 'CARD',
+          },
+        },
+      ],
+    };
+    layer2Service.test__simulateDepot(testDepot as DepotSafe);
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitFor(`${postableSel(1, 2)} [data-test-balance-container]`);
     assert
-      .dom(`${postableSel(1, 2)} [data-test-balance="XDAI"]`)
-      .doesNotExist();
-    assert
-      .dom(`${postableSel(1, 2)} [data-test-balance-container]`)
-      .containsText('None');
+      .dom(`${postableSel(1, 2)} [data-test-balance="DAI.CPXD"]`)
+      .containsText('250.00 DAI.CPXD');
     assert
       .dom(
         '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
@@ -118,48 +136,38 @@ module('Acceptance | withdrawal', function (hooks) {
       );
     post = postableSel(2, 1);
     // // choose-balance card
-    // await waitFor(`${post} [data-test-balance="DAI CPXD"]`);
-    // assert.dom(`${post} [data-test-balance="DAI CPXD"]`).containsText('250.50');
-    // assert.dom(`${post} [data-test-usd-balance="DAI CPXD"]`).containsText('50.10');
-    // assert.dom(`${post} [data-test-balance="CARD CPXD"]`).containsText('10000.00');
-    // assert
-    //   .dom(`${post} [data-test-usd-balance="CARD CPXD"]`)
-    //   .containsText('2000.00');
-    // assert
-    //   .dom(
-    //     `${post} [data-test-withdrawal-choose-balance-from-depot] [data-test-account-address]`
-    //   )
-    //   .hasText(layer2AccountAddress); // TODO: should be depot address
-    // assert
-    //   .dom(
-    //     `${post} [data-test-withdrawal-choose-balance-balance] [data-test-token-option]`
-    //   )
-    //   .hasText('DAI CPXD');
-    // assert
-    //   .dom('[data-test-withdrawal-choose-balance-is-complete]')
-    //   .doesNotExist();
-    // assert
-    //   .dom(`${post} [data-test-withdrawal-choose-balance-balance-option]`)
-    //   .exists({ count: 2 });
-    // await click(`${post} [data-test-option="CARD CPXD"]`);
-    await waitFor(`${post} [data-test-withdrawal-choose-balance]`);
+    await waitFor(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`);
+    assert
+      .dom(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`)
+      .containsText('250.00 DAI.CPXD');
+    assert
+      .dom(
+        `${post} [data-test-withdrawal-choose-balance] [data-test-depot-address]`
+      )
+      .hasText(`DEPOT: ${depotAddress}`);
+    await click(
+      '[data-test-balance-chooser-dropdown] .ember-power-select-trigger'
+    );
+    assert
+      .dom(`${post} li:nth-child(1) [data-test-balance-display-name]`)
+      .containsText('DAI.CPXD');
+    assert
+      .dom(`${post} li:nth-child(2) [data-test-balance-display-name]`)
+      .containsText('CARD.CPXD');
     await click(
       `${post} [data-test-withdrawal-choose-balance] [data-test-boxel-button]`
     );
     // // choose-balance card (memorialized)
-    // assert.dom(`${post} [data-test-option]`).doesNotExist();
-    // assert
-    //   .dom(`${post} [data-test-withdrawal-choose-balance-balance-option]`)
-    //   .doesNotExist();
-    // assert
-    //   .dom('[data-test-withdrawal-choose-balance] [data-test-boxel-button]')
-    //   .isNotDisabled();
-    // assert.dom('[data-test-withdrawal-choose-balance-is-complete]').exists();
-    // assert
-    //   .dom(
-    //     `${post} [data-test-withdrawal-choose-balance-from-balance="DAI CPXD"] [data-test-balance-display-amount]`
-    //   )
-    //   .containsText('250.50');
+    assert.dom(`${post} [data-test-balance-chooser-dropdown]`).doesNotExist();
+    assert
+      .dom('[data-test-withdrawal-choose-balance] [data-test-boxel-button]')
+      .hasText('Edit');
+    assert.dom('[data-test-withdrawal-choose-balance-is-complete]').exists();
+    assert
+      .dom(
+        `${post} [data-test-account-balance] [data-test-balance-display-amount]`
+      )
+      .containsText('250.00 DAI.CPXD');
 
     // // transaction-amount card
     await waitFor(postableSel(2, 2));

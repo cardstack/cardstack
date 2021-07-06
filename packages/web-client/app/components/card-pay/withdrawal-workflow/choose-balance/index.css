@@ -1,0 +1,9 @@
+.choose-balance__field {
+  grid-template-columns: 3.5rem 1fr;
+  row-gap: 0;
+}
+
+.choose-balance__field > .card-pay-nested-items {
+  grid-column: 2;
+  grid-row: 2;
+}
