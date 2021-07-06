@@ -11,12 +11,12 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import { BN } from 'bn.js';
 import { faceValueOptions } from './workflow-config';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   INSUFFICIENT_FUNDS: 'INSUFFICIENT_FUNDS',
 } as const;
-import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 class IssuePrepaidCardWorkflow extends Workflow {
   name = 'Prepaid Card Issuance';

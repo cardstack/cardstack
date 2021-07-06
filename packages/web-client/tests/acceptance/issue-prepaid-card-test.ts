@@ -18,7 +18,7 @@ import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-colo
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
 import { Response as MirageResponse } from 'ember-cli-mirage';
 import { timeout } from 'ember-concurrency';
-
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/workflow-config';
 
 // Dai amounts based on available prepaid card options
@@ -33,7 +33,6 @@ const SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER =
 const SLIGHTLY_LESS_THAN_MAX_VALUE = toBN(
   toWei(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER}`)
 );
-import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
