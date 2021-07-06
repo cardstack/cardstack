@@ -341,7 +341,9 @@ dataSources:
           file: ./abis/GnosisSafe.json
       eventHandlers:
         - event: TokensBridgedToSafe(indexed address,indexed address,address,uint256,indexed bytes32)
-          handler: handleTokensBridged
+          handler: handleReceivedBridgedTokens
+        - event: TokensBridgingInitiated(indexed address,indexed address,uint256,indexed bytes32)
+          handler: handleSentBridgedTokens
       file: ./src/mappings/depot.ts
 
   - kind: ethereum/contract

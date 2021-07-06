@@ -1,8 +1,16 @@
 import { SupplierSafeCreated, SupplierInfoDIDUpdated } from '../../generated/Depot/SupplierManager';
-import { TokensBridgedToSafe } from '../../generated/TokenBridge/HomeMultiAMBErc20ToErc677';
-import { Depot, Account, BridgeEvent, SupplierInfoDIDUpdate } from '../../generated/schema';
-import { makeToken, makeEOATransaction, toChecksumAddress } from '../utils';
-import { log, BigInt } from '@graphprotocol/graph-ts';
+import { TokensBridgedToSafe, TokensBridgingInitiated } from '../../generated/TokenBridge/HomeMultiAMBErc20ToErc677';
+import {
+  Depot,
+  Account,
+  BridgeToLayer1Event,
+  BridgeToLayer2Event,
+  SupplierInfoDIDUpdate,
+  Safe,
+} from '../../generated/schema';
+import { makeToken, makeEOATransaction, toChecksumAddress, makeEOATransactionForSafe } from '../utils';
+import { log, BigInt, Address } from '@graphprotocol/graph-ts';
+import { GnosisSafe } from '../../generated/Gnosis/GnosisSafe';
 
 export function handleCreateDepot(event: SupplierSafeCreated): void {
   let supplier = toChecksumAddress(event.params.supplier);
@@ -10,15 +18,16 @@ export function handleCreateDepot(event: SupplierSafeCreated): void {
   makeDepot(safe, supplier, event.block.timestamp);
 }
 
-export function handleTokensBridged(event: TokensBridgedToSafe): void {
+export function handleReceivedBridgedTokens(event: TokensBridgedToSafe): void {
   let supplier = toChecksumAddress(event.params.recipient);
   makeEOATransaction(event, supplier);
 
   let safe = toChecksumAddress(event.params.safe);
   makeDepot(safe, supplier, event.block.timestamp);
 
-  let bridgeEventEntity = new BridgeEvent(event.transaction.hash.toHex() + '-' + event.logIndex.toString());
-  bridgeEventEntity.transaction = event.transaction.hash.toHex();
+  let txnHash = event.transaction.hash.toHex();
+  let bridgeEventEntity = new BridgeToLayer2Event(txnHash);
+  bridgeEventEntity.transaction = txnHash;
   bridgeEventEntity.depot = toChecksumAddress(event.params.safe);
   bridgeEventEntity.timestamp = event.block.timestamp;
   bridgeEventEntity.supplier = toChecksumAddress(event.params.recipient);
@@ -26,6 +35,36 @@ export function handleTokensBridged(event: TokensBridgedToSafe): void {
   bridgeEventEntity.amount = event.params.value;
   bridgeEventEntity.save();
   log.debug('created bridge event entity {} for depot {}', [bridgeEventEntity.id, bridgeEventEntity.depot]);
+}
+
+export function handleSentBridgedTokens(event: TokensBridgingInitiated): void {
+  let sender = toChecksumAddress(event.params.sender);
+  let txnHash = event.transaction.hash.toHex();
+
+  let bridgeEventEntity = new BridgeToLayer1Event(txnHash);
+  bridgeEventEntity.transaction = txnHash;
+  bridgeEventEntity.timestamp = event.block.timestamp;
+  bridgeEventEntity.token = makeToken(event.params.token);
+  bridgeEventEntity.amount = event.params.value;
+
+  let safe = Safe.load(sender);
+  if (safe != null) {
+    bridgeEventEntity.safe = safe.id;
+    makeEOATransactionForSafe(event, safe as Safe);
+    let safeContract = GnosisSafe.bind(Address.fromString(safe.id));
+    let owners = safeContract.getOwners();
+    if (owners.length > 0) {
+      let account = new Account(toChecksumAddress(owners[0]));
+      account.save();
+      bridgeEventEntity.account = account.id;
+    }
+  } else {
+    let account = new Account(sender);
+    account.save();
+    bridgeEventEntity.account = sender;
+    makeEOATransaction(event, sender);
+  }
+  bridgeEventEntity.save();
 }
 
 export function handleSetInfoDID(event: SupplierInfoDIDUpdated): void {

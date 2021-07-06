@@ -6,8 +6,9 @@ CLI tool for basic actions in Cardpay
 
 # Commands
 - [Commands](#commands)
-  - [`yarn cardpay bridge <AMOUNT> <TOKEN_ADDRESS> [RECEIVER] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-bridge-amount-token_address-receiver---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`yarn cardpay await-bridged <FROM_BLOCK> [RECIPIENT] --network=_NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-await-bridged-from_block-recipient---network_network---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay bridge-to-l2 <AMOUNT> <TOKEN_ADDRESS> [RECEIVER] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-bridge-to-l2-amount-token_address-receiver---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay await-bridged-to-l2 <FROM_BLOCK> [RECIPIENT] --network=_NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-await-bridged-to-l2-from_block-recipient---network_network---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay bridge-to-l1 <SAFE_ADDRESS> <AMOUNT> <TOKEN_ADDRESS> <RECEIVER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-bridge-to-l1-safe_address-amount-token_address-receiver---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-create-safe_address-token_address-customization_did-face_values---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaidcard-split <PREPAID_CARD> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-split-prepaid_card-customization_did-face_values---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaidcard-transfer <PREPAID_CARD> <NEW_OWNER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-transfer-prepaid_card-new_owner---networknetwork---mnemonicmnemonic---walletconnect)
@@ -28,34 +29,52 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay hub-auth [HUB_ROOT_URL] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-hub-auth-hub_root_url---networknetwork---mnemonicmnemonic---walletconnect)
 
 
-## `yarn cardpay bridge <AMOUNT> <TOKEN_ADDRESS> [RECEIVER] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `yarn cardpay bridge-to-l2 <AMOUNT> <TOKEN_ADDRESS> [RECEIVER] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
 
-Bridge tokens from L1 wallet to L2 safe
+Bridge tokens from L1 address to L2 safe
 
 ```
 USAGE
-  $ yarn cardpay bridge <amount> <tokenAddress> [receiver] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+  $ yarn cardpay bridge-to-l2 <amount> <tokenAddress> [receiver] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
 
 ARGUMENTS
   AMOUNT          Amount in ether you would like bridged
-  TOKEN_ADDRESS   The token address of the token to bridge
+  TOKEN_ADDRESS   The layer 1 token address of the token to bridge
   RECEIVER        Layer 2 address to be owner of L2 safe, defaults to same as L1 address
   NETWORK         The Layer 1 network to use ("kovan" or "mainnet")
   MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
 ```
 
-## `yarn cardpay await-bridged <FROM_BLOCK> [RECIPIENT] --network=_NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `yarn cardpay await-bridged-to-l2 <FROM_BLOCK> [RECIPIENT] --network=_NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
 
 Wait for token bridging to complete on L2
 
 ```
 USAGE
-  $ yarn cardpay await-bridged <fromBlock> [recipient] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+  $ yarn cardpay await-bridged-to-l2 <fromBlock> [recipient] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
 
 ARGUMENTS
   FROM_BLOCK      Layer 2 block height before bridging was initiated
   RECIPIENT       Layer 2 address that is the owner of the bridged tokens, defaults to wallet address
+  NETWORK         The Layer 2 network to use ("sokol" or "xdai")
+  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+```
+
+## `yarn cardpay bridge-to-l1 <SAFE_ADDRESS> <AMOUNT> <TOKEN_ADDRESS> <RECEIVER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+
+Bridge tokens from L2 safe to L1 address
+
+```
+USAGE
+  $ yarn cardpay bridge-to-l1 <SAFE_ADDRESS> <AMOUNT> <TOKEN_ADDRESS> <RECEIVER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+
+ARGUMENTS
+  SAFE_ADDRESS    The layer 2 safe address to bridge the tokens from
+  AMOUNT          Amount in ether you would like bridged
+  TOKEN_ADDRESS   The layer 2 token address of the token to bridge
+  RECEIVER        Layer 1 address to receive the bridge tokens
   NETWORK         The Layer 2 network to use ("sokol" or "xdai")
   MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet

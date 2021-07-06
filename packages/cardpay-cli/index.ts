@@ -1,7 +1,7 @@
 /* eslint no-process-exit: "off" */
 import yargs from 'yargs';
 import fetch from 'node-fetch';
-import bridge from './bridge.js';
+import { bridgeToLayer1, bridgeToLayer2 } from './bridge.js';
 import awaitBridged from './await-bridged.js';
 import { viewTokenBalance } from './assets';
 import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe } from './safe.js';
@@ -22,8 +22,9 @@ import { hubAuth } from './hub-auth';
 global.fetch = fetch;
 
 type Commands =
-  | 'bridge'
-  | 'awaitBridged'
+  | 'bridgeToL2'
+  | 'bridgeToL1'
+  | 'awaitBridgedToL2'
   | 'safesView'
   | 'safeView'
   | 'safeTransferTokens'
@@ -90,23 +91,22 @@ let {
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
-  .command('bridge <amount> [tokenAddress] [receiver]', 'Bridge tokens to the layer 2 network', (yargs) => {
+  .command('bridge-to-l2 <amount> <tokenAddress> [receiver]', 'Bridge tokens to the layer 2 network', (yargs) => {
     yargs.positional('amount', {
       type: 'number',
       description: 'Amount of tokens you would like bridged (*not* in units of wei)',
     });
     yargs.positional('tokenAddress', {
       type: 'string',
-      default: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa', // Kovan DAI
-      description: 'The token address (defaults to Kovan DAI)',
+      description: 'The layer 1 token address',
     });
     yargs.positional('receiver', {
-      description: 'Layer 2 address to be owner of L2 safe, defaults to same as L1 address',
+      description: 'Layer 2 address to be the owner of L2 safe, defaults to same as L1 address',
       type: 'string',
     });
-    command = 'bridge';
+    command = 'bridgeToL2';
   })
-  .command('await-bridged <fromBlock> [recipient]', 'Wait for token bridging to complete on L2', (yargs) => {
+  .command('await-bridged-to-l2 <fromBlock> [recipient]', 'Wait for token bridging to complete on L2', (yargs) => {
     yargs.positional('fromBlock', {
       type: 'number',
       description: 'Layer 2 block height before bridging was initiated',
@@ -115,8 +115,31 @@ let {
       type: 'string',
       description: 'Layer 2 address that is the owner of the bridged tokens, defaults to wallet address',
     });
-    command = 'awaitBridged';
+    command = 'awaitBridgedToL2';
   })
+  .command(
+    'bridge-to-l1 <safeAddress> <amount> <tokenAddress> <receiver>',
+    'Bridge tokens to the layer 1 network',
+    (yargs) => {
+      yargs.positional('safeAddress', {
+        type: 'string',
+        description: 'The layer 2 safe to bridge the tokens from',
+      });
+      yargs.positional('amount', {
+        type: 'number',
+        description: 'Amount of tokens you would like bridged (*not* in units of wei)',
+      });
+      yargs.positional('tokenAddress', {
+        type: 'string',
+        description: 'The layer 2 token address',
+      });
+      yargs.positional('receiver', {
+        description: 'Layer 1 address to receive the bridged tokens',
+        type: 'string',
+      });
+      command = 'bridgeToL1';
+    }
+  )
   .command(
     'safes-view [address]',
     'View contents of the safes owned by the specified address (or default wallet account)',
@@ -429,19 +452,26 @@ if (!command) {
 
 (async () => {
   switch (command) {
-    case 'bridge':
-      if (amount == null) {
-        showHelpAndExit('amount is a required value');
+    case 'bridgeToL2':
+      if (amount == null || tokenAddress == null) {
+        showHelpAndExit('tokenAddress and amount are required values');
         return;
       }
-      await bridge(network, amount, receiver, tokenAddress, mnemonic);
+      await bridgeToLayer2(network, amount, receiver, tokenAddress, mnemonic);
       break;
-    case 'awaitBridged':
+    case 'awaitBridgedToL2':
       if (fromBlock == null) {
         showHelpAndExit('fromBlock is a required value');
         return;
       }
       await awaitBridged(network, fromBlock, recipient, mnemonic);
+      break;
+    case 'bridgeToL1':
+      if (safeAddress == null || receiver == null || amount == null || tokenAddress == null) {
+        showHelpAndExit('safeAddress, receiver, tokenAddress, and amount are required values');
+        return;
+      }
+      await bridgeToLayer1(network, safeAddress, tokenAddress, receiver, amount, mnemonic);
       break;
     case 'safesView':
       await viewSafes(network, address, mnemonic);

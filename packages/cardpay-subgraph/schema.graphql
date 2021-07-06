@@ -2,7 +2,8 @@ type Account @entity {
   id: ID!                                          # address
   safes: [SafeOwner]!                              @derivedFrom(field: "owner")
   depots: [Depot]!                                 @derivedFrom(field: "supplier")
-  receivedBridgedTokens: [BridgeEvent]!            @derivedFrom(field: "supplier")
+  sentBridgedTokens: [BridgeToLayer1Event]!        @derivedFrom(field: "account")
+  receivedBridgedTokens: [BridgeToLayer2Event]!    @derivedFrom(field: "supplier")
   supplierInfoDIDUpdates: [SupplierInfoDIDUpdate]! @derivedFrom(field: "supplier")
   createdPrepaidCards: [PrepaidCardCreation]!      @derivedFrom(field: "issuer")
   splitPrepaidCards: [PrepaidCardSplit]!           @derivedFrom(field: "issuer")
@@ -17,11 +18,10 @@ type Account @entity {
 type Depot @entity {
   id: ID!                                          # safe address
   safe: Safe!
-  # TODO let's not do this, and rather make a DepotCreation entity instead
   createdAt: BigInt!
   supplier: Account!
   infoDid: String
-  receivedBridgedTokens: [BridgeEvent]!            @derivedFrom(field: "depot")
+  receivedBridgedTokens: [BridgeToLayer2Event]!            @derivedFrom(field: "depot")
 }
 
 type PrepaidCard @entity {
@@ -53,7 +53,17 @@ type MerchantSafe @entity {
   merchantRevenue: [MerchantRevenue]!              @derivedFrom(field: "merchantSafe")
 }
 
-type BridgeEvent @entity {
+type BridgeToLayer1Event @entity {
+  id: ID!
+  transaction: Transaction!
+  safe: Safe
+  timestamp: BigInt!
+  account: Account!
+  token: Token!
+  amount: BigInt!
+}
+
+type BridgeToLayer2Event @entity {
   id: ID!
   transaction: Transaction!
   depot: Depot!
@@ -201,14 +211,15 @@ type TokenSwap @entity {
 }
 
 type Safe @entity {
-  id: ID!                          # safe address
-  createdAt: BigInt!               # unix time
-  owners: [SafeOwner]!             @derivedFrom(field: "safe")
-  safeTxns: [SafeTransaction]!     @derivedFrom(field: "safe")
-  depot: Depot                     @derivedFrom(field: "safe")
-  merchant: MerchantSafe           @derivedFrom(field: "safe")
-  prepaidCard: PrepaidCard         @derivedFrom(field: "safe")
-  tokens: [TokenHolder]!           @derivedFrom(field: "safe")
+  id: ID!                                   # safe address
+  createdAt: BigInt!                        # unix time
+  owners: [SafeOwner]!                      @derivedFrom(field: "safe")
+  safeTxns: [SafeTransaction]!              @derivedFrom(field: "safe")
+  depot: Depot                              @derivedFrom(field: "safe")
+  merchant: MerchantSafe                    @derivedFrom(field: "safe")
+  prepaidCard: PrepaidCard                  @derivedFrom(field: "safe")
+  tokens: [TokenHolder]!                    @derivedFrom(field: "safe")
+  sentBridgedTokens: [BridgeToLayer1Event]! @derivedFrom(field: "safe")
 }
 
 type SafeTransaction @entity {
@@ -245,7 +256,8 @@ type Transaction @entity {
   timestamp: BigInt!
   blockNumber: BigInt!
   safeTxns: [SafeTransaction]!                     @derivedFrom(field: "transaction")
-  bridgeEvents: [BridgeEvent]!                     @derivedFrom(field: "transaction")
+  bridgeToLayer1Events: [BridgeToLayer1Event]!     @derivedFrom(field: "transaction")
+  bridgeToLayer2Events: [BridgeToLayer2Event]!     @derivedFrom(field: "transaction")
   supplierInfoDIDUpdates: [SupplierInfoDIDUpdate]! @derivedFrom(field: "transaction")
   prepaidCardCreations: [PrepaidCardCreation]!     @derivedFrom(field: "transaction")
   prepaidCardTransfers: [PrepaidCardTransfer]!     @derivedFrom(field: "transaction")

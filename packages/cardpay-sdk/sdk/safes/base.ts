@@ -212,6 +212,7 @@ export default class Safes {
   ): Promise<GnosisExecTx> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+    let symbol = await token.methods.symbol().call();
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
     if (safeBalance.lt(new BN(amount))) {
       throw new Error(
@@ -222,6 +223,15 @@ export default class Safes {
     }
     let payload = this.transferTokenPayload(tokenAddress, recipient, amount);
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
+    let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    if (safeBalance.lt(new BN(amount).add(gasCost))) {
+      throw new Error(
+        `Safe does not have enough balance to pay for gas when transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
+          safeBalance.toString()
+        )} ${symbol}, amount to transfer ${fromWei(amount)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
+      );
+    }
+
     if (estimate.lastUsedNonce == null) {
       estimate.lastUsedNonce = -1;
     }
