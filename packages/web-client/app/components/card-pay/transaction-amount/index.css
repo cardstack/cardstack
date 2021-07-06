@@ -42,7 +42,6 @@
 
 .transaction-amount__currency-text {
   position: absolute;
-  max-width: var(--input-currency-text-width);
   height: var(--tx-amount-input-height);
   display: flex;
   align-items: center;
