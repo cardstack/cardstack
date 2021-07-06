@@ -20,10 +20,11 @@
           @isComplete={{@isComplete}}
         />
       </Boxel::Field>
-      {{#if this.isUnlockingOrUnlocked}}
+      {{#if (or this.isUnlockingOrUnlocked this.isAmountSet)}}
         <Boxel::Field
           class="transaction-amount__field"
-          @label="Amount to deposit:"
+          @label={{concat this.amountLabel ":"}}
+          data-test-amount-label
         >
           <CardPay::BalanceDisplay
             class="transaction-amount__token"
@@ -37,7 +38,7 @@
         </Boxel::Field>
       {{else}}
         <Boxel::Field
-          @label={{concat "Amount to " (if (eq @flow "withdrawal") "withdraw" "deposit")}}
+          @label={{this.amountLabel}}
           @fieldMode="edit"
           class="transaction-amount__field"
           @labelClass="transaction-amount__input-field-label"

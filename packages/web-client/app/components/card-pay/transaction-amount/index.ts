@@ -135,6 +135,12 @@ class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmou
     return this.isUnlocking || this.isUnlocked;
   }
 
+  get amountLabel() {
+    return `Amount to ${
+      this.args.flow === 'withdrawal' ? 'withdraw' : 'deposit'
+    }`;
+  }
+
   @action onInputAmount(str: string) {
     if (!isNaN(+str)) {
       this.amount = str.trim();

@@ -199,6 +199,13 @@ module('Acceptance | withdrawal', function (hooks) {
       .hasText('Edit');
 
     assert
+      .dom(`${post} [data-test-amount-label]`)
+      .includesText('Amount to withdraw:');
+    assert
+      .dom(`${post} [data-test-amount-entered]`)
+      .includesText('250.00 DAI.CPXD'); // FIXME remove period, also hide empty cents?
+
+    assert
       .dom(postableSel(3, 0))
       .containsText('we just need your confirmation to make the withdrawal');
     post = postableSel(3, 1);
