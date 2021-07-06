@@ -15,6 +15,7 @@ import {
 } from './prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
 import { claimRevenue, registerMerchant, revenueBalances } from './revenue-pool.js';
+import { rewardTokenBalances } from './reward-pool.js';
 import { hubAuth } from './hub-auth';
 
 //@ts-ignore polyfilling fetch
@@ -41,7 +42,8 @@ type Commands =
   | 'claimRevenue'
   | 'priceOracleUpdatedAt'
   | 'viewTokenBalance'
-  | 'hubAuth';
+  | 'hubAuth'
+  | 'rewardTokenBalances';
 
 let command: Commands | undefined;
 interface Options {
@@ -381,6 +383,13 @@ let {
       command = 'hubAuth';
     }
   )
+  .command('reward-balances [address]', 'View token balances of unclaimed rewards in the reward pool.', (yargs) => {
+    yargs.positional('address', {
+      type: 'string',
+      description: 'The address that tally rewarded -- The owner of prepaid card.',
+    });
+    command = 'rewardTokenBalances';
+  })
   .options({
     network: {
       alias: 'n',
@@ -551,6 +560,13 @@ if (!command) {
         return;
       }
       await hubAuth(hubRootUrl, network, mnemonic);
+      break;
+    case 'rewardTokenBalances':
+      if (address == null) {
+        showHelpAndExit('address is a required value');
+        return;
+      }
+      await rewardTokenBalances(network, address, mnemonic);
       break;
     default:
       assertNever(command);

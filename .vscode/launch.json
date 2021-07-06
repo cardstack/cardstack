@@ -328,6 +328,20 @@
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
+    }, 
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: View Reward Balances",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "reward-balances",
+        "0x159ADe032073d930E85f95AbBAB9995110c43C71", // Justin's address
+        "--network", "sokol",
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
     }
   ]
 }
