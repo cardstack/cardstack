@@ -1,6 +1,6 @@
 import detectEthereumProvider from '@metamask/detect-provider';
 import Web3 from 'web3';
-import { NetworkSymbol } from '../token';
+import { NetworkSymbol } from './types';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import config from '../../config/environment';
