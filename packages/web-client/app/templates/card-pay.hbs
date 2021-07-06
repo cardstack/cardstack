@@ -3,9 +3,9 @@
     <CardPay::Header
       @title="Card Pay"
       @logoURL={{this.cardPayLogo}}
-      @layer1ChainName={{this.layer1Network.chainName}}
+      @layer1ChainName={{network-display-info "layer1" "fullName"}}
       @layer1Connect={{set this 'isShowingLayer1ConnectModal' true}}
-      @layer2ChainName={{this.layer2Network.chainName}}
+      @layer2ChainName={{network-display-info "layer2" "fullName"}}
       @layer2Connect={{set this 'isShowingLayer2ConnectModal' true}}
       @isLayer1Connected={{this.layer1Network.isConnected}}
       @isLayer2Connected={{this.layer2Network.isConnected}}

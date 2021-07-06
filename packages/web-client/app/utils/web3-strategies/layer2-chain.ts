@@ -40,7 +40,7 @@ const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 export default abstract class Layer2ChainWeb3Strategy
   implements Layer2Web3Strategy {
-  chainName: string;
+  private chainName: string;
   chainId: number;
   networkSymbol: Layer2NetworkSymbol;
   provider: WalletConnectProvider | undefined;

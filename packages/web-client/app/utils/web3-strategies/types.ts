@@ -9,7 +9,6 @@ import {
 import { Emitter } from '@cardstack/web-client/utils/events';
 
 export interface Web3Strategy extends Emitter {
-  chainName: string;
   isConnected: boolean;
   walletConnectUri: string | undefined;
   disconnect(): Promise<void>;

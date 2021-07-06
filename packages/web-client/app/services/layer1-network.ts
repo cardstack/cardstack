@@ -24,7 +24,6 @@ export default class Layer1Network extends Service {
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
   @reads('strategy.walletInfo', new WalletInfo([], -1)) walletInfo!: WalletInfo;
   @reads('strategy.waitForAccount') waitForAccount!: Promise<void>;
-  @reads('strategy.chainName') chainName!: string;
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
   @reads('strategy.daiBalance') daiBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;

@@ -10,7 +10,7 @@
           <CardPay::NestedItems>
             <:outer>
               <CardPay::AccountDisplay
-                @name={{concat this.layer1Network.chainName " wallet"}}
+                @name={{concat (network-display-info "layer1" "fullName") " wallet"}}
                 @address={{this.layer1Network.walletInfo.firstAddress}}
                 data-test-deposit-transaction-setup-from-address
               />
@@ -28,7 +28,7 @@
           </CardPay::NestedItems>
         {{else}}
           <CardPay::AccountDisplay
-            @name={{concat this.layer1Network.chainName " wallet"}}
+            @name={{concat (network-display-info "layer1" "fullName") " wallet"}}
             @address={{this.layer1Network.walletInfo.firstAddress}}
             data-test-deposit-transaction-setup-from-address
           />
@@ -53,7 +53,7 @@
     </ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Receive tokens">
       <CardPay::LabeledValue @label="In:" class="transaction-setup__field">
-        <CardPay::AccountDisplay @name={{concat this.layer2Network.chainName " wallet"}} />
+        <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} />
         <CardPay::NestedItems class="transaction-setup__field-info">
           <:outer>
             <CardPay::AccountDisplay

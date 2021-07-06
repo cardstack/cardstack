@@ -31,7 +31,7 @@ const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy {
-  chainName: string;
+  private chainName: string;
   chainId: number;
   networkSymbol: Layer1NetworkSymbol;
   web3 = new Web3();

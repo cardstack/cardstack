@@ -14,10 +14,8 @@ import {
   UnbindEventListener,
   SimpleEmitter,
 } from '@cardstack/web-client/utils/events';
-import { networkDisplayInfo } from './network-display-info';
 
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
-  chainName = networkDisplayInfo['test-layer2'].fullName;
   chainId = '-1';
   simpleEmitter = new SimpleEmitter();
   @tracked walletConnectUri: string | undefined;

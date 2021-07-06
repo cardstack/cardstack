@@ -1,6 +1,6 @@
 <ActionCardContainer
   @suppressHeader={{@suppressHeader}}
-  @header={{concat "Wallet - " this.layer1Network.chainName}}
+  @header={{concat "Wallet - " (network-display-info "layer1" "fullName")}}
   @isComplete={{@isComplete}}
   class="layer-one-connect-card"
   data-test-mainnnet-connection-action-container
@@ -21,7 +21,7 @@
       <CardPay::FieldStack>
         <CardPay::LabeledValue
           @label="Network"
-          @value={{this.layer1Network.chainName}}
+          @value={{network-display-info "layer1" "fullName"}}
         />
         <CardPay::LabeledValue
           @label="Address"
@@ -52,7 +52,7 @@
     </ActionCardContainer::Section>
   {{else}}
     <ActionCardContainer::Section
-      @title={{concat "Connect your " this.layer1Network.chainName " wallet"}}
+      @title={{concat "Connect your " (network-display-info "layer1" "fullName") " wallet"}}
       @dataTestId="layer-one-connect"
     >
       <CardPay::LayerOneWalletProviderSelection

@@ -18,7 +18,7 @@
         @balance={{@workflowSession.state.spendFaceValue}}
         @usdBalance={{spend-to-usd @workflowSession.state.spendFaceValue}}
         @address={{@workflowSession.state.prepaidCardAddress}}
-        @network={{this.layer2Network.chainName}}
+        @network={{network-display-info "layer2" "fullName"}}
         class="issue-prepaid-card-workflow-confirmation__card"
       />
     </div>
