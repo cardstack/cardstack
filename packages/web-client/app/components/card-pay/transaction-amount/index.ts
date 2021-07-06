@@ -1,8 +1,8 @@
 import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
-import Layer1Network from '../../../../services/layer1-network';
-import Layer2Network from '../../../../services/layer2-network';
+import Layer1Network from '../../../services/layer1-network';
+import Layer2Network from '../../../services/layer2-network';
 import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { TransactionReceipt } from 'web3-core';
@@ -15,7 +15,7 @@ import {
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
-class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
+class CardPayTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @tracked amount = '';
   @tracked isUnlocked = false;
   @tracked isUnlocking = false;
@@ -24,6 +24,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   @tracked depositTxnReceipt: TransactionReceipt | undefined;
   @tracked isDepositing = false;
   @tracked hasDeposited = false;
+  @tracked isAmountSet = false;
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @tracked errorMessage = '';
@@ -31,7 +32,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
   get currentTokenSymbol(): TokenSymbol {
-    return this.args.workflowSession.state.depositSourceToken;
+    return this.args.workflowSession.state.depositSourceToken || 'DAI.CPXD';
+  }
+
+  get tokenSymbolForConversion(): TokenSymbol {
+    return this.args.flow === 'withdrawal' ? 'DAI' : this.currentTokenSymbol;
   }
 
   get currentTokenDetails(): TokenDisplayInfo | undefined {
@@ -48,6 +53,8 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       balance = this.layer1Network.daiBalance;
     } else if (this.currentTokenSymbol === 'CARD') {
       balance = this.layer1Network.cardBalance;
+    } else if (this.currentTokenSymbol === 'DAI.CPXD') {
+      balance = this.layer2Network.defaultTokenBalance;
     }
     return balance || toBN(0);
   }
@@ -63,6 +70,18 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   }
   get unlockCtaDisabled() {
     return !this.isUnlocked && !this.isValidAmount;
+  }
+
+  get setAmountCtaState() {
+    if (this.isAmountSet) {
+      return 'memorialized';
+    } else {
+      return 'default';
+    }
+  }
+
+  get setAmountCtaDisabled() {
+    return !this.isAmountSet && !this.isValidAmount;
   }
 
   get depositCtaState() {
@@ -170,6 +189,14 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       this.isDepositing = false;
     }
   }
+
+  @action toggleComplete() {
+    if (this.args.isComplete) {
+      this.args.onIncomplete?.();
+    } else {
+      this.args.onComplete?.();
+    }
+  }
 }
 
-export default CardPayDepositWorkflowTransactionAmountComponent;
+export default CardPayTransactionAmountComponent;

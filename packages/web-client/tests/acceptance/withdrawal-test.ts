@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import {
   click,
   currentURL,
+  fillIn,
   settled,
   visit,
   waitFor,
@@ -13,6 +14,7 @@ import a11yAudit from 'ember-a11y-testing/test-support/audit';
 import { toBN } from 'web3-utils';
 import { capitalize } from '@ember/string';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import { DepotSafe } from '@cardstack/cardpay-sdk';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -175,17 +177,21 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom(postableSel(2, 2))
       .containsText('How much would you like to withdraw from your balance?');
     post = postableSel(2, 3);
-    // assert.dom(`${post} [data-test-source-token="DAI.CPXD"]`).exists();
-    // assert
-    //   .dom(`${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`)
-    //   .isDisabled('Set amount button is disabled until amount has been entered');
-    // await fillIn('[data-test-withdrawal-amount-input]', '250');
-    // assert
-    //   .dom(`${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`)
-    //   .isEnabled('Set amount button is enabled once amount has been entered');
-    await waitFor(`${post} [data-test-withdrawal-transaction-amount]`);
+
+    assert.dom(`${post} [data-test-source-token="DAI.CPXD"]`).exists();
+
+    assert
+      .dom(`${post} [data-test-transaction-amount] [data-test-boxel-button]`)
+      .isDisabled(
+        'Set amount button is disabled until amount has been entered'
+      );
+    await fillIn('[data-test-amount-input]', '250');
+    assert
+      .dom(`${post} [data-test-transaction-amount] [data-test-boxel-button]`)
+      .isEnabled('Set amount button is enabled once amount has been entered');
+    await waitFor(`${post} [data-test-transaction-amount]`);
     await click(
-      `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
+      `${post} [data-test-transaction-amount] [data-test-boxel-button]`
     );
     assert.dom(milestoneCompletedSel(2)).containsText('Withdrawal amount set');
 

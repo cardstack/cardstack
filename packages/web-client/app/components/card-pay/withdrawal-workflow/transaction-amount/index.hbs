@@ -1,24 +1,7 @@
-<ActionCardContainer
-  @header="Withdrawal"
+<CardPay::TransactionAmount
+  @flow="withdrawal"
+  @workflowSession={{@workflowSession}}
   @isComplete={{@isComplete}}
-  data-test-withdrawal-transaction-amount-is-complete={{@isComplete}}
->
-  <ActionCardContainer::Section>
-  </ActionCardContainer::Section>
-  <Boxel::ActionChin
-    @state={{if @isComplete "memorialized" "default"}}
-    data-test-withdrawal-transaction-amount
-  >
-    <:default as |d|>
-      <d.ActionButton {{on "click" this.toggleComplete}}>
-        Set Amount
-      </d.ActionButton>
-    </:default>
-    <:memorialized as |m|>
-      <m.ActionButton {{on "click" this.toggleComplete}}>
-        Edit
-      </m.ActionButton>
-    </:memorialized>
-  </Boxel::ActionChin>
-
-</ActionCardContainer>
+  @onComplete={{@onComplete}}
+  ...attributes
+/>

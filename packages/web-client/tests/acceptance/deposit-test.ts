@@ -202,8 +202,8 @@ module('Acceptance | deposit', function (hooks) {
     post = postableSel(2, 3);
     assert.dom(`${post} [data-test-source-token="DAI"]`).exists();
     assert.dom(`${post} [data-test-unlock-button]`).isDisabled();
-    assert.dom(`${post} [data-test-deposit-button]`).isDisabled();
-    await fillIn('[data-test-deposit-amount-input]', '250');
+    assert.dom(`${post} [data-test-perform-button]`).isDisabled();
+    await fillIn('[data-test-amount-input]', '250');
     assert
       .dom(`${post} [data-test-unlock-button]`)
       .isEnabled('Unlock button is enabled once amount has been entered');
@@ -220,10 +220,10 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${post} [data-test-unlock-button]`)
       .hasClass('boxel-button--loading');
     assert
-      .dom('[data-test-deposit-amount-input]')
+      .dom('[data-test-amount-input]')
       .doesNotExist('Input field is no longer available when unlocking');
 
-    assert.dom('[data-test-deposit-amount-entered]').containsText('250.00 DAI');
+    assert.dom('[data-test-amount-entered]').containsText('250.00 DAI');
 
     layer1Service.test__simulateUnlock();
     await settled();
@@ -235,15 +235,15 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${post} [data-test-unlock-success-message]`)
       .exists('There should be a success message after unlocking');
     assert
-      .dom('[data-test-deposit-amount-input]')
+      .dom('[data-test-amount-input]')
       .doesNotExist('Input field is no longer available after unlocking');
     assert
-      .dom(`${post} [data-test-deposit-button]`)
+      .dom(`${post} [data-test-perform-button]`)
       .isEnabled('Deposit is enabled once unlocked');
-    await click(`${post} [data-test-deposit-button]`);
+    await click(`${post} [data-test-perform-button]`);
 
     assert
-      .dom(`${post} [data-test-deposit-button]`)
+      .dom(`${post} [data-test-perform-button]`)
       .hasClass('boxel-button--loading');
 
     layer1Service.test__simulateDeposit();
@@ -255,11 +255,11 @@ module('Acceptance | deposit', function (hooks) {
     );
 
     assert
-      .dom(`${post} [data-test-deposit-button]`)
+      .dom(`${post} [data-test-perform-button]`)
       .doesNotExist('Deposit button is no longer visible after depositing.');
 
     assert
-      .dom(`${post} [data-test-deposit-success-message]`)
+      .dom(`${post} [data-test-success-message]`)
       .exists('There should be a success message after depositing');
 
     assert
