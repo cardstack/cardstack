@@ -60,11 +60,10 @@ module('Integration | Component | workflow-thread', function (hooks) {
       }),
     ];
     workflow.epilogue.postables = [postable4];
-    // Date.parse below is returning NaN on Safari
-    postable1.timestamp = new Date(Date.parse('2021-05-20 00:00:00'));
-    postable2.timestamp = new Date(Date.parse('2021-05-20 00:00:00'));
-    postable3.timestamp = new Date(Date.parse('2021-05-21 00:00:00'));
-    postable4.timestamp = new Date(Date.parse('2021-05-21 00:00:00'));
+    postable1.timestamp = new Date(Date.parse('2021-05-20T00:00:00'));
+    postable2.timestamp = new Date(Date.parse('2021-05-20T00:00:00'));
+    postable3.timestamp = new Date(Date.parse('2021-05-21T00:00:00'));
+    postable4.timestamp = new Date(Date.parse('2021-05-21T00:00:00'));
     this.set('workflow', workflow);
     workflow.attachWorkflow();
     await render(hbs`
