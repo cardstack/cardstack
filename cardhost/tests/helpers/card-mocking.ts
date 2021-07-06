@@ -9,9 +9,11 @@ import {
   encodeCardURL,
   getBasenameAndExtension,
 } from '@cardstack/core/src/utils';
+
 declare module 'ember-test-helpers' {
   interface TestContext {
     server: Server;
+    routingCard?: string;
     createCard: typeof createCard;
     lookupCard: typeof lookupCard;
   }
@@ -47,10 +49,21 @@ async function loadBaseCards() {
 // NOTE: Mirage must be setup before this. ie:
 //    setupMirage(hooks);
 //    setupCardMocking(hooks);
-export default function setupCardMocking(hooks: NestedHooks): void {
+interface CardMockingOptions {
+  routingCard: string;
+}
+
+export default function setupCardMocking(
+  hooks: NestedHooks,
+  options: CardMockingOptions
+): void {
   hooks.beforeEach(async function () {
     this.createCard = createCard.bind(this);
     this.lookupCard = lookupCard.bind(this);
+
+    if (options) {
+      this.routingCard = options.routingCard;
+    }
 
     const BASE_CARDS = await loadBaseCards();
     BASE_CARDS.forEach((card) => this.createCard(card));

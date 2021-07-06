@@ -23,8 +23,9 @@ const PERSON_CARD = {
         birthdate;
       }`,
     'embedded.js': templateOnlyComponentTemplate(
-      '<@fields.name/> was born on <@fields.birthdate/>'
+      '<div class="person-embedded"><@fields.name/> was born on <@fields.birthdate/></div>'
     ),
+    'embedded.css': `.person-embedded { background: green }`,
   },
 };
 
@@ -40,7 +41,6 @@ Qmodule('Compiler', function (hooks) {
       'https://cardstack.com/base/string'
     );
     assert.equal(compiled.adoptsFrom?.url, baseCardURL);
-    assert.deepEqual(compiled.assets, []);
     assert.notOk(compiled.data, 'no data');
     assert.equal(compiled.embedded.inlineHBS, '{{@model}}');
     assert.deepEqual(compiled.embedded.usedFields, []);
@@ -79,21 +79,42 @@ Qmodule('Compiler', function (hooks) {
     );
   });
 
-  test('basic example', async function (assert) {
+  test('CompiledCard fields', async function (assert) {
     builder.addRawCard(PERSON_CARD);
-
     let compiled = await builder.getCompiledCard(PERSON_CARD.url);
     assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
+  });
+
+  test('CompiledCard embedded view', async function () {
+    builder.addRawCard(PERSON_CARD);
+    let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
-      '{{@model.name}} was born on <BirthdateField @model={{@model.birthdate}} />'
+      '{{@model.name}} was born on <BirthdateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
     );
 
-    assert.deepEqual(
-      compiled.embedded.deserialize,
-      { date: ['birthdate'] },
-      'Embedded component has a deserialization map'
+    containsSource(
+      builder.definedModules.get('https://mirage/cards/person/embedded.css'),
+      PERSON_CARD.files['embedded.css'],
+      'Styles are defined'
+    );
+  });
+
+  test('CompiledCard edit view', async function (assert) {
+    builder.addRawCard(PERSON_CARD);
+    let compiled = await builder.getCompiledCard(PERSON_CARD.url);
+
+    assert.deepEqual(compiled.edit.usedFields, ['name', 'birthdate']);
+    containsSource(
+      builder.definedModules.get(compiled.edit.moduleName),
+      '<NameField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />',
+      'Edit template is rendered for text'
+    );
+    containsSource(
+      builder.definedModules.get(compiled.edit.moduleName),
+      '<BirthdateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />',
+      'Edit template is rendered for date'
     );
   });
 
@@ -134,23 +155,12 @@ Qmodule('Compiler', function (hooks) {
       'author.birthdate',
     ]);
 
-    assert.deepEqual(
-      compiled.embedded.deserialize,
-      { date: ['author.birthdate'] },
-      'Embedded component has a deserialization map'
-    );
-
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
-      `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><BirthdateField @model={{@model.author.birthdate}} /></p></article>`
+      `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><BirthdateField @model={{@model.author.birthdate}} data-test-field-name=\\"birthdate\\"  /></p></article>`
     );
 
     assert.deepEqual(compiled.isolated.usedFields, ['author']);
-    assert.deepEqual(
-      compiled.isolated.deserialize,
-      { date: ['author.birthdate'] },
-      'Isolated deserialization map still includes author.birthdate, because it was used as data'
-    );
   });
 
   test('deeply nested cards', async function (assert) {
@@ -226,24 +236,14 @@ Qmodule('Compiler', function (hooks) {
       'posts.createdAt',
     ]);
 
-    assert.deepEqual(
-      compiled.isolated.deserialize,
-      { date: ['posts.createdAt'] },
-      'Isolated component has a deserialization map'
-    );
-
     containsSource(
       builder.definedModules.get(compiled.isolated.moduleName),
-      `{{#each @model.posts as |Post|}}<PostsField @model={{Post}} />{{/each}}`,
+      `{{#each @model.posts as |Post|}}<PostsField @model={{Post}} data-test-field-name=\\"posts\\" />{{/each}}`,
       'Isolated template includes PostField component'
     );
 
     assert.deepEqual(compiled.embedded.usedFields, ['posts.title']);
 
-    assert.notOk(
-      compiled.embedded.deserialize,
-      'embedded component has an empty deserialization map'
-    );
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
       `<ul>{{#each @model.posts as |Post|}}<li>{{Post.title}}</li>{{/each}}</ul>`,

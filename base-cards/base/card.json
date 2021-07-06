@@ -1,5 +1,6 @@
 {
     "schema": "schema.js",
     "embedded": "embedded.js",
-    "isolated": "isolated.js"
+    "isolated": "isolated.js",
+    "edit": "edit.js"
 }

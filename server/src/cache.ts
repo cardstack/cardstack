@@ -79,9 +79,11 @@ export class CardCache {
       encodeCardURL(cardURL),
       'compiled.json'
     );
+
     if (existsSync(loc)) {
       return readJSONSync(loc);
     }
+
     return;
   }
 

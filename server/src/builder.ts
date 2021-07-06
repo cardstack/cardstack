@@ -1,5 +1,11 @@
 import walkSync from 'walk-sync';
-import { readFileSync, existsSync, removeSync } from 'fs-extra';
+import {
+  readFileSync,
+  existsSync,
+  removeSync,
+  readJsonSync,
+  writeJsonSync,
+} from 'fs-extra';
 import { join } from 'path';
 
 import {
@@ -8,14 +14,14 @@ import {
   CompiledCard,
   assertValidRawCard,
   RealmConfig,
-  Asset,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 
-import { NotFound } from './middleware/error';
+import { NotFound } from './middleware/errors';
 import { transformSync } from '@babel/core';
 import { NODE, BROWSER } from './interfaces';
 import { CardCache } from './cache';
+import { JS_TYPE } from '@cardstack/core/src/utils/content';
 
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
@@ -39,16 +45,13 @@ export default class Builder implements BuilderInterface {
   private async define(
     cardURL: string,
     localPath: string,
-    type: Asset['type'] | 'js',
+    type: string,
     source: string
   ): Promise<string> {
     let url = this.cache.setModule(BROWSER, cardURL, localPath, source);
 
     switch (type) {
-      case 'unknown':
-      case 'css':
-        return this.cache.writeAsset(cardURL, localPath, source);
-      case 'js':
+      case JS_TYPE:
         this.cache.setModule(
           NODE,
           cardURL,
@@ -56,6 +59,8 @@ export default class Builder implements BuilderInterface {
           this.transformToCommonJS(localPath, source)
         );
         return url;
+      default:
+        return this.cache.writeAsset(cardURL, localPath, source);
     }
   }
 
@@ -64,7 +69,10 @@ export default class Builder implements BuilderInterface {
       configFile: false,
       babelrc: false,
       filenameRelative: moduleURL,
-      plugins: ['@babel/plugin-transform-modules-commonjs'],
+      plugins: [
+        '@babel/plugin-proposal-class-properties',
+        '@babel/plugin-transform-modules-commonjs',
+      ],
     });
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return out!.code!;
@@ -122,6 +130,23 @@ export default class Builder implements BuilderInterface {
   async buildCard(url: string): Promise<CompiledCard> {
     let rawCard = await this.getRawCard(url);
     let compiledCard = await this.compileCardFromRaw(url, rawCard);
+
+    return compiledCard;
+  }
+
+  async updateCardData(url: string, attributes: any) {
+    let fullPath = join(this.locateCardDir(url), 'card.json');
+
+    // Builder: merge data into card.json
+    let card = readJsonSync(fullPath);
+    card.data = Object.assign(card.data, attributes);
+    writeJsonSync(fullPath, card);
+
+    // Cache: Merge data into compiled.json
+    let compiledCard = await this.getCompiledCard(url);
+    compiledCard.data = Object.assign(compiledCard.data, attributes);
+    this.cache.setCard(url, compiledCard);
+
     return compiledCard;
   }
 
@@ -131,6 +156,7 @@ export default class Builder implements BuilderInterface {
   ): Promise<CompiledCard> {
     let compiledCard = await this.compiler.compile(rawCard);
     this.cache.setCard(url, compiledCard);
+
     return compiledCard;
   }
 

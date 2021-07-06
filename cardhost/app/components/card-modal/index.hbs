@@ -1,0 +1,31 @@
+{{#if this.modal.isShowing}}
+  <div style="border:5px red dashed; margin: 5vw;padding:1vw" data-test-modal>
+    <div>
+      <button data-test-modal-close {{on 'click' this.close}}>Close Modal</button>
+    </div>
+
+    {{#if this.modal.isLoading}}
+      <h1>LOADING!!!</h1>
+    {{else}}
+      {{#if (eq this.modal.state.format 'edit')}}
+        <CardContainer
+          @selected={{true}}
+        >
+          <:default>
+            <this.modal.cardComponent />
+          </:default>
+
+          <:action-chin>
+            <button data-test-modal-save {{on 'click' this.modal.save}}>Save</button>
+            <button data-test-modal-cancel {{on 'click' this.modal.close}}>Cancel</button>
+          </:action-chin>
+        </CardContainer>
+      {{else}}
+        <CardContainer>
+          <this.modal.cardComponent />
+        </CardContainer>
+      {{/if}}
+    {{/if}}
+  </div>
+{{/if}}
+

@@ -1,13 +1,9 @@
 import { Compiler } from '@cardstack/core/src/compiler';
-import {
-  Asset,
-  Builder,
-  CompiledCard,
-  RawCard,
-} from '@cardstack/core/src/interfaces';
+import { Builder, CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { setupCardBuilding } from '../../src/context/card-building';
 import { BASE_CARD_REALM_CONFIG } from '../helpers/fixtures';
 import { createCardCacheDir } from '../helpers/cache';
+import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
 
 const baseBuilder = (() => {
   let { cardCacheDir } = createCardCacheDir();
@@ -49,17 +45,21 @@ export class TestBuilder implements Builder {
   private async define(
     cardURL: string,
     localModule: string,
-    type: Asset['type'] | 'js',
+    type: string,
     src: string
   ): Promise<string> {
     let moduleName = cardURL.replace(/\/$/, '') + '/' + localModule;
 
     switch (type) {
-      case 'unknown':
-      case 'css':
-        return moduleName;
-      case 'js':
+      case JS_TYPE:
         this.definedModules.set(moduleName, src);
+        return moduleName;
+
+      case CSS_TYPE:
+        this.definedModules.set(moduleName, src);
+        return moduleName;
+
+      default:
         return moduleName;
     }
   }

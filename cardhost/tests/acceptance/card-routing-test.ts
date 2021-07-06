@@ -8,16 +8,10 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 module('Acceptance | card routing', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
-  setupCardMocking(hooks);
+  setupCardMocking(hooks, { routingCard: 'https://mirage/cards/my-routes' });
   let personURL = 'https://mirage/cards/person';
 
   hooks.beforeEach(function () {
-    // TODO: This is now how the server works
-    this.server.create('space', {
-      id: 'home',
-      routingCard: 'https://mirage/cards/my-routes',
-    });
-
     this.createCard({
       url: 'https://mirage/cards/my-routes',
       schema: 'schema.js',
@@ -50,7 +44,8 @@ module('Acceptance | card routing', function (hooks) {
             name;
           }`,
         'isolated.js': templateOnlyComponentTemplate(
-          `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`
+          `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`,
+          { IsolatedStyles: './isolated.css' }
         ),
         'isolated.css': '.person-isolated { background: red }',
       },
@@ -61,9 +56,10 @@ module('Acceptance | card routing', function (hooks) {
     await visit('/welcome');
     assert.equal(currentURL(), '/welcome');
     assert.equal(
-      document.head.querySelector(`[data-assets-for-card="${personURL}"]`)
-        ?.innerHTML,
-      '/* card:https://mirage/cards/person asset:isolated.css */\n.person-isolated { background: red }\n\n'
+      document.head.querySelector(
+        `[data-asset-url="https://mirage/cards/person/isolated.css"]`
+      )?.innerHTML,
+      '.person-isolated { background: red }'
     );
     assert.dom('[data-test-person]').containsText('Hi! I am Arthur');
   });

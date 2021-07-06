@@ -1,15 +1,8 @@
 import { NodePath } from '@babel/core';
-import {
-  StringLiteral,
-  Expression,
-  Identifier,
-  isIdentifier,
-  ObjectExpression,
-  ObjectProperty,
-} from '@babel/types';
+import * as t from '@babel/types';
 
-export function name(node: StringLiteral | Identifier): string {
-  if (isIdentifier(node)) {
+export function name(node: t.StringLiteral | t.Identifier): string {
+  if (t.isIdentifier(node)) {
     return node.name;
   } else {
     return node.value;
@@ -17,17 +10,17 @@ export function name(node: StringLiteral | Identifier): string {
 }
 
 export function getObjectKey(
-  obj: NodePath<ObjectExpression>,
+  obj: NodePath<t.ObjectExpression>,
   key: string
-): NodePath<Expression> | undefined {
+): NodePath<t.Expression> | undefined {
   for (let prop of obj.get('properties')) {
     if (prop.isObjectProperty() && !prop.node.computed) {
-      let propKey = (prop as NodePath<ObjectProperty>).get('key');
+      let propKey = (prop as NodePath<t.ObjectProperty>).get('key');
       if (
         (propKey.isStringLiteral() || propKey.isIdentifier()) &&
         name(propKey.node) === key
       ) {
-        return prop.get('value') as NodePath<Expression>;
+        return prop.get('value') as NodePath<t.Expression>;
       }
     }
   }

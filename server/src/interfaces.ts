@@ -1,9 +1,5 @@
-import type Koa from 'koa';
 import type Builder from '../src/builder';
-import type {
-  ComponentInfo,
-  RealmConfig,
-} from '@cardstack/core/src/interfaces';
+import type { RealmConfig } from '@cardstack/core/src/interfaces';
 
 const ENVIRONMENTS_OBJ = {
   browser: '',
@@ -20,22 +16,7 @@ export interface ServerOptions {
   routeCard?: string;
 }
 
-interface BuilderContext {
+export interface CardStackContext {
   builder: Builder;
-}
-interface CardRouterContext {
   cardRouter: any;
 }
-export type ServerKoa = Koa<{}, BuilderContext & CardRouterContext>;
-
-export type cardJSONReponse = {
-  data: {
-    id: string;
-    type: string;
-    attributes?: { [name: string]: any };
-    meta: {
-      componentModule: string;
-      deserializationMap: ComponentInfo['deserialize'];
-    };
-  };
-};

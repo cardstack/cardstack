@@ -6,10 +6,10 @@ import type {
   Statement,
   Node,
 } from '@glimmer/syntax/dist/types/lib/v1/api';
-import { CompiledCard, Field, Format } from '../interfaces';
+import { CompiledCard, Field, Format } from './interfaces';
 import { singularize } from 'inflection';
 import { capitalize, cloneDeep } from 'lodash';
-import { getFieldForPath } from '../utils';
+import { getFieldForPath } from './utils';
 
 const MODEL = '@model';
 const FIELDS = '@fields';
@@ -27,12 +27,13 @@ type ImportAndChooseName = (
 
 export interface TemplateUsageMeta {
   model: 'self' | Set<string>;
-  fields: Map<string, Format | 'default'>;
+  fields: Map<string, Format>;
 }
 
 export interface Options {
   fields: CompiledCard['fields'];
   usageMeta: TemplateUsageMeta;
+  defaultFieldFormat: Format;
   importAndChooseName: ImportAndChooseName;
 }
 
@@ -95,7 +96,12 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   return function transform(
     env: syntax.ASTPluginEnvironment
   ): syntax.ASTPlugin {
-    let { fields, importAndChooseName, usageMeta } = options;
+    let {
+      fields,
+      importAndChooseName,
+      usageMeta,
+      defaultFieldFormat,
+    } = options;
     let state: State = {
       scopes: [new Map()],
       nextScope: undefined,
@@ -111,6 +117,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             throw new InvalidFieldsUsageError();
           }
 
+          let fieldFormat = getFieldFormat(node, defaultFieldFormat);
           let fieldFullPath = fieldPathForElementNode(node);
 
           if (fieldFullPath) {
@@ -121,11 +128,12 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             if (field.type === 'containsMany') {
               return expandContainsManyShorthand(`${FIELDS}.${fieldFullPath}`);
             }
-            usageMeta.fields.set(fieldFullPath, 'default');
+            usageMeta.fields.set(fieldFullPath, fieldFormat);
             return rewriteElementNode({
               field,
               importAndChooseName,
               modelArgument: `${MODEL}.${fieldFullPath}`,
+              format: fieldFormat,
               state,
             });
           }
@@ -156,11 +164,12 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
                   `${FIELDS}.${val.fieldFullPath}`
                 );
               }
-              usageMeta.fields.set(val.fieldFullPath, 'default');
+              usageMeta.fields.set(val.fieldFullPath, fieldFormat);
               return rewriteElementNode({
                 field: val.field,
                 importAndChooseName,
                 modelArgument: val.pathForModel,
+                format: fieldFormat,
                 state,
               });
             default:
@@ -400,9 +409,11 @@ function rewriteElementNode(options: {
   modelArgument: string;
   importAndChooseName: Options['importAndChooseName'];
   state: State;
+  format: Format;
 }): Statement[] {
-  let { field, modelArgument, state } = options;
-  let { inlineHBS } = field.card.embedded;
+  let { field, modelArgument, state, format } = options;
+
+  let { inlineHBS } = field.card[format];
 
   if (inlineHBS) {
     return inlineTemplateForField(inlineHBS, modelArgument, state);
@@ -411,7 +422,8 @@ function rewriteElementNode(options: {
       options.importAndChooseName,
       field,
       modelArgument,
-      state
+      state,
+      format
     );
   }
 }
@@ -436,34 +448,37 @@ function expandContainsManyShorthand(fieldName: string): Statement[] {
   ];
 }
 
-// <@model.createdAt /> -> <DateField @model={{@model.createdAt}} />
+// <@fields.createdAt /> -> <DateField @model={{@model.createdAt}} @set={{@set.setters.createdAt}} />
 function rewriteFieldToComponent(
   importAndChooseName: ImportAndChooseName,
   field: Field,
   modelArgument: string,
   state: State,
-  prefix?: string
+  format: Format
 ): Statement[] {
-  let { element, attr, mustache, path } = syntax.builders;
+  let { element, attr, mustache, path, text } = syntax.builders;
 
+  // TODO: What we really want it String or Date, instead of Title or Birthdate
   let componentName = importAndChooseName(
     capitalize(field.name),
-    field.card.embedded.moduleName,
+    field.card[format].moduleName,
     'default'
   );
 
-  if (prefix) {
-    modelArgument = prefix + modelArgument;
-  }
-
   let modelExpression = path(modelArgument);
   state.handledModelExpressions.add(modelExpression);
+  let attrs = [
+    attr('@model', mustache(modelExpression)),
+    attr('data-test-field-name', text(field.name)),
+  ];
 
-  let elementNode = element(componentName, {
-    // build our own PathExpression for modelArgument so we can put it onto
-    // state.handledModelExpressions
-    attrs: [attr('@model', mustache(modelExpression))],
-  });
+  // TODO: Test this!
+  if (format === 'edit') {
+    let setterArg = modelArgument.replace(MODEL + '.', '');
+    attrs.push(attr('@set', mustache(path(`@set.setters.${setterArg}`))));
+  }
+
+  let elementNode = element(componentName, { attrs });
   elementNode.selfClosing = true;
   return [elementNode];
 }
@@ -494,6 +509,7 @@ function trackUsageForModel(
   handledModelExpressions: State['handledModelExpressions']
 ) {
   if (
+    node.original === 'debugger' ||
     node.head.type !== 'AtHead' ||
     node.head.name !== MODEL ||
     handledModelExpressions.has(node)
@@ -540,4 +556,12 @@ function inlineTemplateForField(
     nodes,
   });
   return body;
+}
+
+function getFieldFormat(
+  _node: ElementNode,
+  defaultFieldFormat: Format
+): Format {
+  // TODO: look at @format parameter on node to override default
+  return defaultFieldFormat;
 }

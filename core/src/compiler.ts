@@ -1,3 +1,4 @@
+import { JS_TYPE } from '@cardstack/core/src/utils/content';
 import { transformSync } from '@babel/core';
 // @ts-ignore
 import decoratorsPlugin from '@babel/plugin-proposal-decorators';
@@ -12,31 +13,31 @@ import cardSchemaPlugin, {
   FieldsMeta,
   getMeta,
   PluginMeta,
-} from './babel/card-schema-plugin';
-import cardTemplatePlugin, {
-  Options as CardTemplateOptions,
-} from './babel/card-template-plugin';
-import type { TemplateUsageMeta } from './glimmer/card-template-plugin';
+} from './babel-plugin-card-schema';
+import transformCardComponent, {
+  CardComponentPluginOptions as CardComponentPluginOptions,
+} from './babel-plugin-card-template';
 import {
   assertValidCompiledCard,
-  assertValidDeserializationMap,
-  Asset,
   Builder,
   CompiledCard,
   ComponentInfo,
-  Field,
+  FEATURE_NAMES,
   Format,
   FORMATS,
   RawCard,
 } from './interfaces';
-import { getBasenameAndExtension, getFieldForPath } from './utils';
+import { getBasenameAndExtension } from './utils';
+import { getFileType } from './utils/content';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
 function getNonAssetFilePaths(sourceCard: RawCard): (string | undefined)[] {
-  return [sourceCard.schema, sourceCard.isolated, sourceCard.embedded].filter(
-    Boolean
-  );
+  let paths: string[] = [];
+  for (const feature of FEATURE_NAMES) {
+    paths.push(sourceCard[feature]);
+  }
+  return paths.filter(Boolean);
 }
 
 export class Compiler {
@@ -49,7 +50,7 @@ export class Compiler {
   define: (
     cardURL: string,
     localModule: string,
-    type: Asset['type'] | 'js',
+    type: string,
     source: string
   ) => Promise<string>;
 
@@ -73,7 +74,8 @@ export class Compiler {
     let meta = getMeta(options);
 
     card.fields = await this.lookupFieldsForCard(meta.fields);
-    card.assets = this.buildAssetsList(cardSource);
+
+    this.defineAssets(cardSource);
 
     if (!isBaseCard(cardSource.url)) {
       let parentCard = await this.getParentCard(cardSource, meta);
@@ -123,11 +125,9 @@ export class Compiler {
     return card;
   }
 
-  private buildAssetsList(sourceCard: RawCard): Asset[] {
-    let assets: Asset[] = [];
-
+  private defineAssets(sourceCard: RawCard) {
     if (!sourceCard.files) {
-      return assets;
+      return;
     }
 
     let assetPaths = difference(
@@ -141,15 +141,8 @@ export class Compiler {
       }
 
       let src = this.getFile(sourceCard, p);
-      this.define(sourceCard.url, p, getAssetType(p), src);
-
-      assets.push({
-        type: getAssetType(p),
-        path: p,
-      });
+      this.define(sourceCard.url, p, getFileType(p), src);
     }
-
-    return assets;
   }
 
   private getCardParentPath(
@@ -233,7 +226,12 @@ export class Compiler {
     });
 
     let code = out!.code!;
-    return await this.define(cardSource.url, schemaLocalFilePath, 'js', code);
+    return await this.define(
+      cardSource.url,
+      schemaLocalFilePath,
+      JS_TYPE,
+      code
+    );
   }
 
   private async lookupFieldsForCard(
@@ -329,53 +327,32 @@ export class Compiler {
     localFile: string,
     format: Format
   ): Promise<ComponentInfo> {
-    let options: CardTemplateOptions = {
+    let options: CardComponentPluginOptions = {
       fields,
       cardURL,
       inlineHBS: undefined,
-      usageMeta: { model: new Set(), fields: new Map() },
+      defaultFieldFormat: defaultFieldFormat(format),
+      usedFields: [],
     };
 
-    let out = transformSync(templateSource, {
-      plugins: [[cardTemplatePlugin, options]],
-    });
+    let code = transformCardComponent(templateSource, options);
 
     let moduleName = await this.define(
       cardURL,
       hashFilenameFromFields(localFile, fields),
-      'js',
-      out!.code!
-    );
-
-    let usedFields = buildUsedFieldsListFromUsageMeta(
-      fields,
-      options.usageMeta,
-      defaultFieldFormat(format)
+      JS_TYPE,
+      code
     );
 
     let componentInfo: ComponentInfo = {
       moduleName,
-      usedFields,
+      usedFields: options.usedFields,
       inlineHBS: options.inlineHBS,
       sourceCardURL: cardURL,
     };
 
-    let deserialize = buildDeserializationMapFromUsedFields(fields, usedFields);
-    if (deserialize) {
-      componentInfo.deserialize = deserialize;
-    }
-
     return componentInfo;
   }
-}
-
-// TODO: Replace this with proper mime-types, used content-type package
-function getAssetType(filename: string): Asset['type'] {
-  if (filename.endsWith('.css')) {
-    return 'css';
-  }
-
-  return 'unknown';
 }
 
 function hashFilenameFromFields(
@@ -399,111 +376,13 @@ function isBaseCard(url: string): boolean {
   return url === baseCardURL;
 }
 
-function buildDeserializationMapFromUsedFields(
-  fields: CompiledCard['fields'],
-  usedFields: string[]
-): ComponentInfo['deserialize'] {
-  let map: any = {};
-
-  for (const fieldPath of usedFields) {
-    let field = getFieldForPath(fields, fieldPath);
-
-    if (!field) {
-      continue;
-    }
-
-    buildDeserializerMapForField(map, field, fieldPath);
-  }
-
-  if (!Object.keys(map).length) {
-    return;
-  }
-
-  assertValidDeserializationMap(map);
-
-  return map;
-}
-
-function buildDeserializerMapForField(
-  map: any,
-  field: Field,
-  usedPath: string
-): void {
-  if (Object.keys(field.card.fields).length) {
-    let { fields } = field.card;
-    for (const name in fields) {
-      buildDeserializerMapForField(map, fields[name], `${usedPath}.${name}`);
-    }
-  } else {
-    if (!field.card.deserializer) {
-      return;
-    }
-
-    if (!map[field.card.deserializer]) {
-      map[field.card.deserializer] = [];
-    }
-
-    map[field.card.deserializer].push(usedPath);
-  }
-}
-
-function buildUsedFieldsListFromUsageMeta(
-  fields: CompiledCard['fields'],
-  usageMeta: TemplateUsageMeta,
-  defaultFormat: Format
-): ComponentInfo['usedFields'] {
-  let usedFields: Set<string> = new Set();
-
-  if (usageMeta.model && usageMeta.model !== 'self') {
-    for (const fieldPath of usageMeta.model) {
-      usedFields.add(fieldPath);
-    }
-  }
-
-  for (const [fieldPath, fieldFormat] of usageMeta.fields.entries()) {
-    buildUsedFieldListFromComponents(
-      usedFields,
-      fieldPath,
-      fields,
-      fieldFormat === 'default' ? defaultFormat : fieldFormat
-    );
-  }
-
-  return [...usedFields];
-}
-
-function buildUsedFieldListFromComponents(
-  usedFields: Set<string>,
-  fieldPath: string,
-  fields: CompiledCard['fields'],
-  format: Format,
-  prefix?: string
-): void {
-  let field = getFieldForPath(fields, fieldPath);
-  if (field && field.card[format].usedFields.length) {
-    for (const nestedFieldPath of field.card[format].usedFields) {
-      buildUsedFieldListFromComponents(
-        usedFields,
-        nestedFieldPath,
-        field.card.fields,
-        'embedded',
-        fieldPath
-      );
-    }
-  } else {
-    if (prefix) {
-      usedFields.add(`${prefix}.${fieldPath}`);
-    } else {
-      usedFields.add(fieldPath);
-    }
-  }
-}
-
 // we expect this to expand when we add edit format
 function defaultFieldFormat(format: Format): Format {
   switch (format) {
     case 'isolated':
     case 'embedded':
       return 'embedded';
+    case 'edit':
+      return 'edit';
   }
 }

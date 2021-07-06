@@ -71,7 +71,6 @@ module('@core | compiler-basics', function (hooks) {
     assert.ok(compiled.schemaModule, 'base card has a model module');
     assert.notOk(compiled.adoptsFrom, 'No parent card listed');
     assert.deepEqual(compiled.fields, {}, 'No fields');
-    assert.deepEqual(compiled.assets, [], 'No assets');
     assert.ok(
       compiled.isolated.moduleName.startsWith(`${baseCardURL}/isolated-`),
       'Isolated module exists'
@@ -284,14 +283,6 @@ module('@core | compiler-basics', function (hooks) {
       assert.ok(
         compiled.isolated.moduleName.startsWith(`${card.url}/isolated`),
         'templateModule for "isolated" is full url'
-      );
-    });
-
-    test('it builds a list of assets to be included', async function (assert) {
-      assert.deepEqual(
-        compiled.assets,
-        [{ type: 'css', path: 'isolated.css' }],
-        'Builds a list of assets'
       );
     });
 

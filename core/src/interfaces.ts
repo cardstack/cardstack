@@ -1,12 +1,17 @@
 import difference from 'lodash/difference';
-import { BadRequest } from '@cardstack/server/src/middleware/error';
+import { BadRequest } from '@cardstack/server/src/middleware/errors';
 
 const componentFormats = {
   isolated: '',
   embedded: '',
+  edit: '',
 };
 export type Format = keyof typeof componentFormats;
 export const FORMATS = Object.keys(componentFormats) as Format[];
+
+export function isFormat(s: any): s is Format {
+  return s && s in componentFormats;
+}
 
 const featureNamesMap = {
   schema: '',
@@ -16,39 +21,42 @@ export const FEATURE_NAMES = Object.keys(featureNamesMap).concat(
   FORMATS
 ) as FeatureFile[];
 
-export type Asset = {
-  type: 'css' | 'unknown';
-  path: string;
-};
-
-// Right now Date is the only hardcoded known serializer. If we add more
-// this will become a union
-const deserializerTypes = {
+const serializerTypes = {
   date: '',
+  datetime: '',
 };
-export type DeserializerName = keyof typeof deserializerTypes;
-export const DESERIALIZER_NAMES = Object.keys(
-  deserializerTypes
-) as DeserializerName[];
+export type SerializerName = keyof typeof serializerTypes;
+export const SERIALIZER_NAMES = Object.keys(
+  serializerTypes
+) as SerializerName[];
+export type SerializerMap = { [key in SerializerName]?: string[] };
 
 export type CardData = Record<string, any>;
 
+export type Setter = (value: any) => void;
+
 /* Card type IDEAS
-  primitive
-  composite
-  data
+  primitive: 
+    Where card is a value, has validation and/or a serialize. IE: Date, string
+    Has a @value attribute
+  composite: 
+    Where card is combining multifle cards, ie: A blog post
+    Has a @model attribute
+  data: 
+    A card that likely adopts from a composite card, but only provides new data for it
 */
 
 export type RawCard = {
   url: string;
 
-  // paths within "files"
+  // Feature Files. Value is path inside the files list
+  schema?: string;
   isolated?: string;
   embedded?: string;
-  schema?: string;
-  containsRoutes?: boolean;
+  edit?: string;
 
-  deserializer?: DeserializerName;
+  containsRoutes?: boolean;
+  deserializer?: SerializerName;
 
   // url to the card we adopted from
   adoptsFrom?: string;
@@ -73,21 +81,18 @@ export interface CompiledCard {
     [key: string]: Field;
   };
   schemaModule: string;
-  deserializer?: DeserializerName;
+  // TODO: This is confusingly named. Maybe it's should be serializerName
+  deserializer?: SerializerName;
 
   isolated: ComponentInfo;
   embedded: ComponentInfo;
-
-  // TODO: remove this, instead make the `define` interface mime-type aware and
-  // define all assets
-  assets: Asset[];
+  edit: ComponentInfo;
 }
 
 export interface ComponentInfo {
   moduleName: string;
   usedFields: string[]; // ["title", "author.firstName"]
 
-  deserialize?: Record<DeserializerName, string[]>;
   inlineHBS?: string;
   sourceCardURL: string;
 }
@@ -101,6 +106,17 @@ export interface RealmConfig {
   url: string;
   directory: string;
 }
+
+export type cardJSONReponse = {
+  data: {
+    id: string;
+    type: string;
+    attributes?: { [name: string]: any };
+    meta: {
+      componentModule: string;
+    };
+  };
+};
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (obj == null) {
@@ -153,27 +169,34 @@ export function assertValidCompiledCard(
     );
   }
   if (card.data) {
-    let unexpectedFields = difference(
+    assertValidKeys(
       Object.keys(card.data),
-      Object.keys(card.fields)
+      Object.keys(card.fields),
+      `Field(s) %list% does not exist on card "${card.url}"`
     );
-
-    if (unexpectedFields.length) {
-      throw new BadRequest(
-        `Field(s) "${unexpectedFields.join(', ')}" does not exist on card "${
-          card.url
-        }"`
-      );
-    }
   }
 }
 
-export function assertValidDeserializationMap(
+export function assertValidKeys(
+  actualKeys: string[],
+  expectedKeys: string[],
+  errorMessage: string
+) {
+  let unexpectedFields = difference(actualKeys, expectedKeys);
+
+  if (unexpectedFields.length) {
+    throw new BadRequest(
+      errorMessage.replace('%list%', '"' + unexpectedFields.join(', ') + '"')
+    );
+  }
+}
+
+export function assertValidSerializerMap(
   map: any
-): asserts map is ComponentInfo['deserialize'] {
+): asserts map is SerializerMap {
   let keys = Object.keys(map);
-  let diff = difference(keys, DESERIALIZER_NAMES);
+  let diff = difference(keys, SERIALIZER_NAMES);
   if (diff.length > 0) {
-    throw new Error(`Unexpected deserializer: ${diff.join(',')}`);
+    throw new Error(`Unexpected serializer: ${diff.join(',')}`);
   }
 }

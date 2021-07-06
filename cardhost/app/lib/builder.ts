@@ -1,13 +1,40 @@
+import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
 import type {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
-  Asset,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 import { encodeCardURL } from '@cardstack/core/src/utils';
 
 import dynamicCardTransform from './dynamic-card-transform';
+
+export interface Cache<CardType> {
+  get(url: string): CardType | undefined;
+  set(url: string, payload: CardType): void;
+  update(url: string, payload: CardType): void;
+  delete(url: string): void;
+}
+
+class SimpleCache<CardType> implements Cache<CardType> {
+  cache: Map<string, CardType>;
+
+  constructor() {
+    this.cache = new Map();
+  }
+  get(url: string): CardType | undefined {
+    return this.cache.get(url);
+  }
+  set(url: string, payload: CardType): void {
+    this.cache.set(url, payload);
+  }
+  update(url: string, payload: CardType): void {
+    this.cache.set(url, payload);
+  }
+  delete(url: string): void {
+    this.cache.delete(url);
+  }
+}
 
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
@@ -15,28 +42,41 @@ export default class Builder implements BuilderInterface {
     define: (...args) => this.defineModule(...args),
   });
 
-  private compiledCardCache: Map<string, CompiledCard>;
-  private rawCardCache: Map<string, RawCard>;
+  private compiledCardCache: Cache<CompiledCard>;
+  private rawCardCache: Cache<RawCard>;
 
-  constructor(/*params: { realms: RealmConfig[] }*/) {
-    this.compiledCardCache = new Map();
-    this.rawCardCache = new Map();
+  constructor(params?: {
+    compiledCardCache?: Cache<CompiledCard>;
+    rawCardCache?: Cache<RawCard>;
+  }) {
+    this.compiledCardCache =
+      params?.compiledCardCache || new SimpleCache<CompiledCard>();
+    this.rawCardCache = params?.rawCardCache || new SimpleCache<RawCard>();
   }
 
   private async defineModule(
     cardURL: string,
     localModule: string,
-    type: Asset['type'] | 'js',
+    type: string,
     source: string
   ): Promise<string> {
     let url = new URL(localModule, cardURL.replace(/\/$/, '') + '/').href;
 
     switch (type) {
-      case 'unknown':
-      case 'css':
-        return url;
-      case 'js':
+      case JS_TYPE:
         eval(dynamicCardTransform(url, source));
+        return url;
+      case CSS_TYPE:
+        eval(`
+          define('${url}', function(){
+            const style = document.createElement('style');
+            style.innerHTML = \`${source}\`;
+            style.setAttribute('data-asset-url', '${url}');
+            document.head.appendChild(style);
+          })
+        `);
+        return url;
+      default:
         return url;
     }
   }
@@ -59,44 +99,28 @@ export default class Builder implements BuilderInterface {
   async getCompiledCard(url: string): Promise<CompiledCard> {
     let compiledCard = this.compiledCardCache.get(url);
 
-    // Typescript didn't seem to trust this.cache.has(...) as a sufficient null guarentee
     if (compiledCard) {
       return compiledCard;
     }
-
     let rawCard = await this.getRawCard(url);
     compiledCard = await this.compiler.compile(rawCard);
-    this.copyAssets(url, compiledCard.assets, rawCard.files);
     this.compiledCardCache.set(url, compiledCard);
     return compiledCard;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  copyAssets(url: string, assets: Asset[], files: RawCard['files']): void {
-    let styles: string[] = [];
-    if (!files) {
-      return;
+  async updateCardData(url: string, attributes: any): Promise<CompiledCard> {
+    let compiledCard = await this.getCompiledCard(url);
+
+    let rawCard = this.rawCardCache.get(url);
+
+    if (rawCard) {
+      rawCard.data = Object.assign(rawCard.data, attributes);
+      this.rawCardCache.update(url, rawCard);
     }
 
-    for (const asset of assets) {
-      if (asset.type === 'css') {
-        styles = styles.concat([
-          `/* card:${url} asset:${asset.path} */`,
-          files[asset.path],
-          '\n',
-        ]);
-      } else {
-        console.warn(
-          `A card declared an asset that the Builder is ignoring. ${url}:${asset.path}`
-        );
-      }
-    }
+    compiledCard.data = Object.assign(compiledCard.data, attributes);
+    this.compiledCardCache.set(url, compiledCard);
 
-    if (styles.length) {
-      const style = document.createElement('style');
-      style.innerHTML = styles.join('\n');
-      style.setAttribute('data-assets-for-card', url);
-      document.head.appendChild(style);
-    }
+    return compiledCard;
   }
 }
