@@ -48,7 +48,7 @@
             data-test-prepaid-card-address-labeled-value
           >
             {{truncate-middle @workflowSession.state.prepaidCardAddress}}<br>
-            on xDai chain
+            on {{this.layer2Network.chainName}}
           </CardPay::LabeledValue>
         {{/if}}
 

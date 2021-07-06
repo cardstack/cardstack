@@ -440,7 +440,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(
         `${postableSel(3, 1)} [data-test-prepaid-card-address-labeled-value]`
       )
-      .containsText('0xaeFb...E1F8 on xDai chain');
+      .containsText(`0xaeFb...E1F8 on ${c.layer2.fullName}`);
 
     assert
       .dom(epiloguePostableSel(0))
@@ -545,7 +545,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
       assert
         .dom(milestoneCompletedSel(0))
-        .containsText('xDai chain wallet connected');
+        .containsText(`${c.layer2.fullName} wallet connected`);
 
       await click(
         `[data-test-layer-2-wallet-card] [data-test-layer-2-wallet-disconnect-button]`
@@ -569,7 +569,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert
         .dom(cancelationPostableSel(0))
         .containsText(
-          'It looks like your xDai chain wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
+          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.`
         );
       assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
 
@@ -594,7 +594,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
       assert
         .dom(milestoneCompletedSel(0))
-        .containsText('xDai chain wallet connected');
+        .containsText(`${c.layer2.fullName} wallet connected`);
 
       assert.dom('[data-test-layout-customization-form]').isVisible();
 
@@ -620,7 +620,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert
         .dom(cancelationPostableSel(0))
         .containsText(
-          'It looks like your xDai chain wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.'
+          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.`
         );
       assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
       assert
@@ -650,7 +650,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert
         .dom(cancelationPostableSel(0))
         .containsText(
-          'Looks like there’s no balance in your xDai chain wallet to fund a prepaid card. Before you can continue, please add funds to your xDai chain wallet by bridging some tokens from your Ethereum mainnet wallet.'
+          `Looks like there’s no balance in your ${c.layer2.fullName} wallet to fund a prepaid card. Before you can continue, please add funds to your ${c.layer2.fullName} wallet by bridging some tokens from your ${c.layer1.fullName} wallet.`
         );
       assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
 

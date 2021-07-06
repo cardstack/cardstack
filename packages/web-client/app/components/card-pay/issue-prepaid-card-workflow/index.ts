@@ -172,8 +172,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
     // if we disconnect from layer 2
     new WorkflowMessage({
       author: cardbot,
-      message:
-        'It looks like your xDai chain wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
+      message: `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
@@ -192,8 +191,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
     // if we don't have enough balance (50 USD equivalent)
     new WorkflowMessage({
       author: cardbot,
-      message:
-        "Looks like there's no balance in your xDai chain wallet to fund a prepaid card. Before you can continue, please add funds to your xDai chain wallet by bridging some tokens from your Ethereum mainnet wallet.",
+      message: `Looks like there's no balance in your ${c.layer2.fullName} wallet to fund a prepaid card. Before you can continue, please add funds to your ${c.layer2.fullName} wallet by bridging some tokens from your ${c.layer1.fullName} wallet.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason ===

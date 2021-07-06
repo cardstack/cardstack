@@ -11,6 +11,8 @@ import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
 import { toBN } from 'web3-utils';
+import { capitalize } from '@ember/string';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -44,7 +46,7 @@ module('Acceptance | withdrawal', function (hooks) {
     await click(
       `${post} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
     );
-    assert.dom(post).containsText('Connect your L1 test chain wallet');
+    assert.dom(post).containsText(`Connect your ${c.layer1.fullName} wallet`);
     await a11yAudit();
     assert.ok(true, 'no a11y errors found - layer 1 connect card');
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
@@ -66,11 +68,13 @@ module('Acceptance | withdrawal', function (hooks) {
     await settled();
     assert
       .dom(milestoneCompletedSel(0))
-      .containsText('Mainnet wallet connected');
+      .containsText(
+        `${capitalize(c.layer1.conversationalName)} wallet connected`
+      );
     assert
       .dom(postableSel(1, 0))
       .containsText(
-        'Now it’s time to connect your xDai chain wallet via your Card Wallet mobile app'
+        `Now it’s time to connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app`
       );
     assert
       .dom(postableSel(1, 1))
@@ -106,11 +110,11 @@ module('Acceptance | withdrawal', function (hooks) {
     await settled();
     assert
       .dom(milestoneCompletedSel(1))
-      .containsText('xDai chain wallet connected');
+      .containsText(`${c.layer2.fullName} wallet connected`);
     assert
       .dom(postableSel(2, 0))
       .containsText(
-        'From which balance in your xDai chain wallet do you want to withdraw'
+        `From which balance in your ${c.layer2.fullName} wallet do you want to withdraw`
       );
     post = postableSel(2, 1);
     // // choose-balance card
@@ -196,7 +200,9 @@ module('Acceptance | withdrawal', function (hooks) {
     await waitFor(epiloguePostableSel(2));
     assert
       .dom(epiloguePostableSel(2))
-      .containsText('This is the remaining balance in your xDai chain wallet');
+      .containsText(
+        `This is the remaining balance in your ${c.layer2.fullName} wallet`
+      );
     layer2Service.test__simulateBalances({
       defaultToken: toBN('2141100000000000000'), // TODO: choose numbers that make sense with the scenario
       card: toBN('10000000000000000000000'), // TODO: choose numbers that make sense with the scenario
