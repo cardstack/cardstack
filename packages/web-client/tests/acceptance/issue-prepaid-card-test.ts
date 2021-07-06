@@ -231,7 +231,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     post = postableSel(2, 2);
     // // funding-source card
     assert
-      .dom('[data-test-funding-source-account] [data-test-account-address]')
+      .dom('[data-test-account-outer] [data-test-account-address]')
       .hasText('0x1826...6E44');
     assert
       .dom(
