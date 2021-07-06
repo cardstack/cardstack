@@ -11,7 +11,7 @@
         @labelClass="transaction-amount__banner-field-label"
       >
         <CardPay::DepositWorkflow::TransactionAmount::BalanceView
-          @wallet={{this.layer1Network.chainName}}
+        @wallet={{network-display-info "layer1" "fullName"}}
           @tokenSymbol={{this.currentTokenSymbol}}
           @tokenIcon={{this.currentTokenDetails.icon}}
           @address={{this.layer1Network.walletInfo.firstAddress}}

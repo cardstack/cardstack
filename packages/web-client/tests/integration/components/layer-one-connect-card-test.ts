@@ -4,6 +4,7 @@ import { render, click, settled, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import { toBN } from 'web3-utils';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 const HEADER_SELECTOR = '[data-test-action-card-title="layer-one-connect"]';
 const CONNECT_BUTTON_SELECTOR = '[data-test-mainnet-connect-button]';
@@ -20,7 +21,7 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
 
     assert
       .dom(HEADER_SELECTOR)
-      .containsText('Connect your L1 test chain wallet');
+      .containsText(`Connect your ${c.layer1.fullName} wallet`);
 
     assert.dom(WALLET_SELECTION_SELECTOR).isVisible();
   });
@@ -104,7 +105,7 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
       .containsText('Waiting for you to connect');
     assert
       .dom(HEADER_SELECTOR)
-      .containsText('Connect your L1 test chain wallet');
+      .containsText(`Connect your ${c.layer1.fullName} wallet`);
 
     layer1Service.test__simulateAccountsChanged(['address'], 'metamask');
     // waiting for the downstream effects of resolving a promise in test__simulateAccountsChanged
@@ -118,7 +119,7 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
 
     assert
       .dom(HEADER_SELECTOR)
-      .containsText('Connect your L1 test chain wallet');
+      .containsText(`Connect your ${c.layer1.fullName} wallet`);
     assert.dom(CONNECT_BUTTON_SELECTOR).isVisible();
   });
 });

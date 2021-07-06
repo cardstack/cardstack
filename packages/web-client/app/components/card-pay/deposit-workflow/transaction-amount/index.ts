@@ -13,6 +13,7 @@ import {
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @tracked amount = '';
@@ -164,8 +165,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       this.hasDeposited = true;
     } catch (e) {
       console.error(e);
-      this.errorMessage =
-        'There was a problem initiating the bridging of your tokens to the xDai chain. This may be due to a network issue, or perhaps you canceled the request in your wallet.';
+      this.errorMessage = `There was a problem initiating the bridging of your tokens to the ${c.layer2.fullName}. This may be due to a network issue, or perhaps you canceled the request in your wallet.`;
     } finally {
       this.isDepositing = false;
     }

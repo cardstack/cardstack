@@ -6,7 +6,7 @@
   <ActionCardContainer::Section @title="You deposited">
     <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
       <div class="card-pay-confirmation__transfer-network">
-        <span class="card-pay-confirmation__transfer-network-name">{{this.layer1Network.chainName}}</span>
+        <span class="card-pay-confirmation__transfer-network-name">{{network-display-info "layer1" "fullName"}}</span>
         <Boxel::Button @as="anchor" @size="extra-small" href={{this.depositTxnViewerUrl}} target="_blank" rel="noopener">
           View on Etherscan
         </Boxel::Button>
@@ -25,7 +25,7 @@
         <CardPay::AccountDisplay
           class="card-pay-confirmation__transaction-wallet"
           @size="small"
-          @name={{concat this.layer1Network.chainName " wallet"}}
+          @name={{concat (network-display-info "layer1" "fullName") " wallet"}}
           @address={{this.layer1Network.walletInfo.firstAddress}}
           @wrapped={{true}}
         />
@@ -55,12 +55,12 @@
   <ActionCardContainer::Section @title="You received">
     <p class="card-pay-confirmation__action-taken">
       {{svg-jar "coins" class="card-pay-confirmation__action-taken-icon"}}
-      Minted from CARD Protocol on {{this.layer2Network.chainName}}
+      Minted from CARD Protocol on {{network-display-info "layer2" "fullName"}}
     </p>
     {{svg-jar "arrow" class="card-pay-confirmation__down-arrow"}}
     <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
       <div class="card-pay-confirmation__transfer-network">
-        <span class="card-pay-confirmation__transfer-network-name">{{this.layer2Network.chainName}}</span>
+        <span class="card-pay-confirmation__transfer-network-name">{{network-display-info "layer2" "fullName"}}</span>
         <Boxel::Button @as="anchor" @size="extra-small" href={{this.blockscoutUrl}} target="_blank" rel="noopener">
           View on Blockscout
         </Boxel::Button>
@@ -79,7 +79,7 @@
         <CardPay::AccountDisplay
           class="card-pay-confirmation__transaction-wallet"
           @size="small"
-          @name={{concat this.layer2Network.chainName " wallet"}}
+          @name={{concat (network-display-info "layer2" "fullName") " wallet"}}
         />
         <CardPay::NestedItems {{!-- class="card-pay-confirmation__transaction-depot" --}}>
           <:outer>

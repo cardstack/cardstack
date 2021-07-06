@@ -1,5 +1,6 @@
 import Route from '@ember/routing/route';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/suppliers-hero.svg';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 const SUPPLIERS_PANEL = {
   title: 'Easy Rewards',
@@ -11,10 +12,10 @@ const SUPPLIERS_PANEL = {
       workflow: 'deposit',
       icon: 'suppliers',
       title: 'Token Suppliers',
-      description: `Deposit tokens from your mainnet wallet into the CARD Protocol’s reserve pool to receive an equivalent amount of CPXD tokens in your xDai chain wallet.`,
+      description: `Deposit tokens from your ${c.layer1.conversationalName} wallet into the CARD Protocol’s reserve pool to receive an equivalent amount of CPXD tokens in your ${c.layer2.fullName} wallet.`,
       bullets: [
         'Deposit funds into the CARD Protocol reserve pool and earn rewards',
-        'Bridge tokens from Ethereum mainnet to xDai chain',
+        `Bridge tokens from ${c.layer1.fullName} to ${c.layer2.fullName}`,
       ],
       cta: 'Deposit Tokens',
     },
@@ -22,10 +23,10 @@ const SUPPLIERS_PANEL = {
       workflow: 'withdrawal',
       icon: 'suppliers-merchants',
       title: 'Token Suppliers & Merchants',
-      description: `Withdraw tokens from your xDai chain wallet to receive an equivalent amount of tokens in your mainnet wallet.`,
+      description: `Withdraw tokens from your ${c.layer2.fullName} wallet to receive an equivalent amount of tokens in your ${c.layer1.conversationalName} wallet.`,
       bullets: [
-        'Inspect your balances on Ethereum mainnet and xDai chain',
-        'Withdraw funds from your xDai chain wallet to your mainnet wallet',
+        `Inspect your balances on ${c.layer1.fullName} and ${c.layer2.fullName}`,
+        `Withdraw funds from your ${c.layer2.fullName} wallet to your ${c.layer1.conversationalName} wallet`,
       ],
       cta: 'Withdraw Tokens',
     },

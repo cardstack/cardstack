@@ -16,7 +16,6 @@ import {
 } from '@cardstack/web-client/utils/events';
 
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
-  chainName = 'L2 test chain';
   chainId = '-1';
   simpleEmitter = new SimpleEmitter();
   @tracked walletConnectUri: string | undefined;

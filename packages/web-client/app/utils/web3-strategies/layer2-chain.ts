@@ -12,12 +12,16 @@ import { SimpleEmitter, UnbindEventListener } from '../events';
 import {
   ConvertibleSymbol,
   ConversionFunction,
-  NetworkSymbol,
   TokenContractInfo,
 } from '../token';
 import WalletInfo from '../wallet-info';
 import CustomStorageWalletConnect from '../wc-connector';
-import { ChainAddress, Layer2Web3Strategy, TransactionHash } from './types';
+import {
+  ChainAddress,
+  Layer2Web3Strategy,
+  TransactionHash,
+  Layer2NetworkSymbol,
+} from './types';
 import {
   networkIds,
   getConstantByNetwork,
@@ -30,14 +34,15 @@ import { taskFor } from 'ember-concurrency-ts';
 import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { IHubAuth } from '../../../../cardpay-sdk/sdk/hub-auth';
 import config from '../../config/environment';
+import { networkDisplayInfo } from './network-display-info';
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 export default abstract class Layer2ChainWeb3Strategy
   implements Layer2Web3Strategy {
-  chainName: string;
+  private chainName: string;
   chainId: number;
-  networkSymbol: NetworkSymbol;
+  networkSymbol: Layer2NetworkSymbol;
   provider: WalletConnectProvider | undefined;
   simpleEmitter = new SimpleEmitter();
   defaultTokenSymbol: ConvertibleSymbol = 'DAI';
@@ -59,8 +64,8 @@ export default abstract class Layer2ChainWeb3Strategy
     return taskFor(this.fetchDepotTask).isRunning;
   }
 
-  constructor(networkSymbol: NetworkSymbol, chainName: string) {
-    this.chainName = chainName;
+  constructor(networkSymbol: Layer2NetworkSymbol) {
+    this.chainName = networkDisplayInfo[networkSymbol].fullName;
     this.chainId = networkIds[networkSymbol];
     this.networkSymbol = networkSymbol;
     this.walletInfo = new WalletInfo([], this.chainId);

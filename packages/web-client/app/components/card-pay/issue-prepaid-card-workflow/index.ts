@@ -11,6 +11,7 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import { BN } from 'bn.js';
 import { faceValueOptions } from './workflow-config';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -21,7 +22,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
   name = 'Prepaid Card Issuance';
   milestones = [
     new Milestone({
-      title: 'Connect xDai chain wallet',
+      title: `Connect ${c.layer2.fullName} wallet`,
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -33,7 +34,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new NetworkAwareWorkflowMessage({
           author: cardbot,
-          message: `Looks like you've already connected your xDai chain wallet, which you can see below.
+          message: `Looks like you've already connected your ${c.layer2.fullName} wallet, which you can see below.
           Please continue with the next step of this workflow.`,
           includeIf() {
             return this.hasLayer2Account;
@@ -41,7 +42,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new NetworkAwareWorkflowMessage({
           author: cardbot,
-          message: `Before we get started, please connect your xDai chain wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
+          message: `Before we get started, please connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
           includeIf() {
             return !this.hasLayer2Account;
           },
@@ -83,7 +84,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
           },
         }),
       ],
-      completedDetail: 'xDai chain wallet connected',
+      completedDetail: `${c.layer2.fullName} wallet connected`,
     }),
     new Milestone({
       title: 'Customize layout',
@@ -110,8 +111,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new WorkflowMessage({
           author: cardbot,
-          message:
-            'On to the next step: How do you want to fund your prepaid card? Please select a depot and balance from your xDai chain wallet.',
+          message: `On to the next step: How do you want to fund your prepaid card? Please select a depot and balance from your ${c.layer2.fullName} wallet.`,
         }),
         new WorkflowCard({
           author: cardbot,
@@ -149,8 +149,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
   epilogue = new PostableCollection([
     new WorkflowMessage({
       author: cardbot,
-      message:
-        'Congratulations, you have created a prepaid card! This prepaid card has been added to your xDai chain wallet.',
+      message: `Congratulations, you have created a prepaid card! This prepaid card has been added to your ${c.layer2.fullName} wallet.`,
     }),
     new WorkflowCard({
       author: cardbot,
@@ -158,7 +157,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
     }),
     new WorkflowMessage({
       author: cardbot,
-      message: 'This is the remaining balance in your xDai chain wallet:',
+      message: `This is the remaining balance in your ${c.layer2.fullName} wallet:`,
     }),
     new WorkflowCard({
       author: cardbot,
@@ -173,8 +172,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
     // if we disconnect from layer 2
     new WorkflowMessage({
       author: cardbot,
-      message:
-        'It looks like your xDai chain wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.',
+      message: `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
@@ -193,8 +191,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
     // if we don't have enough balance (50 USD equivalent)
     new WorkflowMessage({
       author: cardbot,
-      message:
-        "Looks like there's no balance in your xDai chain wallet to fund a prepaid card. Before you can continue, please add funds to your xDai chain wallet by bridging some tokens from your Ethereum mainnet wallet.",
+      message: `Looks like there's no balance in your ${c.layer2.fullName} wallet to fund a prepaid card. Before you can continue, please add funds to your ${c.layer2.fullName} wallet by bridging some tokens from your ${c.layer1.fullName} wallet.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason ===

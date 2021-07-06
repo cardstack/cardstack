@@ -8,6 +8,7 @@ import { tracked } from '@glimmer/tracking';
 import { reads } from 'macro-decorators';
 import { TokenSymbol } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 class CardPayDepositWorkflowTransactionStatusComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
@@ -21,13 +22,13 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
   get progressSteps() {
     return [
       {
-        title: 'Deposit tokens into reserve pool on Ethereum mainnet',
+        title: `Deposit tokens into reserve pool on ${c.layer1.fullName}`,
       },
       {
-        title: 'Bridge tokens from Ethereum mainnet to xDai chain',
+        title: `Bridge tokens from ${c.layer1.fullName} to ${c.layer2.fullName}`,
       },
       {
-        title: `Mint tokens on xDai: ${this.selectedTokenSymbol}.CPXD`,
+        title: `Mint tokens on ${c.layer2.shortName}: ${this.selectedTokenSymbol}.CPXD`,
       },
     ];
   }

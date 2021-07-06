@@ -25,7 +25,7 @@
               @balance={{this.faceValue}}
               @usdBalance={{spend-to-usd this.faceValue}}
               @address={{placeholder-address}}
-              @network={{this.layer2Network.chainName}}
+              @network={{network-display-info "layer2" "fullName"}}
             />
           </div>
         </Boxel::Field>
@@ -48,7 +48,7 @@
             data-test-prepaid-card-address-labeled-value
           >
             {{truncate-middle @workflowSession.state.prepaidCardAddress}}<br>
-            on xDai chain
+            on {{network-display-info "layer2" "fullName"}}
           </CardPay::LabeledValue>
         {{/if}}
 
