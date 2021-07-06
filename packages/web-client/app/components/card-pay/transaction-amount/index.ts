@@ -15,7 +15,11 @@ import {
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
-class CardPayTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
+interface CardPayTransactionAmountComponentArgs
+  extends WorkflowCardComponentArgs {
+  flow: 'deposit' | 'withdrawal';
+}
+class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmountComponentArgs> {
   @tracked amount = '';
   @tracked isUnlocked = false;
   @tracked isUnlocking = false;
