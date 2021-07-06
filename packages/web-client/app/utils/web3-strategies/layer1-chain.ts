@@ -163,6 +163,9 @@ export default abstract class Layer1ChainWeb3Strategy
       this.refreshBalances();
       this.#waitForAccountDeferred.resolve();
     } else {
+      this.defaultTokenBalance = undefined;
+      this.cardBalance = undefined;
+      this.daiBalance = undefined;
       this.#waitForAccountDeferred = defer();
     }
   }
