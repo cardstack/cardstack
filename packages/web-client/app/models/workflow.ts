@@ -19,6 +19,7 @@ export abstract class Workflow {
   epilogue: PostableCollection = new PostableCollection();
   cancelationMessages: PostableCollection = new PostableCollection();
   @tracked isCanceled = false;
+  @tracked cancelationReason: null | string = null;
   session: WorkflowSession = new WorkflowSession();
   owner: any;
   simpleEmitter = new SimpleEmitter();
@@ -53,9 +54,11 @@ export abstract class Workflow {
     return A(this.milestones).isEvery('isComplete');
   }
 
-  cancel() {
-    if (!this.isComplete) {
-      this.emit('visible-postables-changed');
+  cancel(reason?: string) {
+    if (!this.isComplete && !this.isCanceled) {
+      // visible-postables-will-change starts test waiters in animated-workflow.ts
+      this.emit('visible-postables-will-change');
+      this.cancelationReason = reason || 'UNKNOWN';
       this.isCanceled = true;
     }
   }
