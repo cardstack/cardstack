@@ -4,42 +4,41 @@ import {
   SerializerName,
   Setter,
 } from './interfaces';
-import { set } from '@ember/object';
 import serializers, {
   PrimitiveSerializer,
 } from '@cardstack/core/src/serializers';
+import { tracked } from '@glimmer/tracking';
 
-export default class ComponentModel {
-  _data: any;
+export default class CardModel {
+  @tracked private _data: any;
   url: string;
   serializerMap!: SerializerMap;
   setters: Setter;
   private cardResponse: cardJSONReponse;
+  private deserialized = false;
 
   constructor(cardResponse: cardJSONReponse) {
     this.cardResponse = cardResponse;
     this.url = cardResponse.data.id;
-    this.setters = makeSetter((segments, value) => {
-      set(this._data, segments.join('.'), value);
-    });
+    this.setters = this.makeSetter();
   }
 
   updateFromResponse(cardResponse: cardJSONReponse) {
+    this.deserialized = false;
     this.cardResponse = cardResponse;
-    this._data = this.deserialize();
+    this._data = null;
   }
 
   get data(): any {
-    if (this._data) {
-      return this._data;
-    } else {
+    if (!this.deserialized) {
       let data = this.deserialize();
       this._data = data;
-      return data;
+      this.deserialized = true;
     }
+    return this._data;
   }
 
-  deserialize(): any {
+  private deserialize(): any {
     let { attributes } = this.cardResponse.data;
     return this.serializeAttributes(attributes, 'deserialize');
   }
@@ -80,29 +79,43 @@ export default class ComponentModel {
 
     return attributes;
   }
-}
 
-function makeSetter(
-  callback: (segments: string[], value: any) => void,
-  segments: string[] = []
-): Setter {
-  let s = (value: any) => {
-    callback(segments, value);
-  };
-  (s as any).setters = new Proxy(
-    {},
-    {
-      get: (target: object, prop: string, receiver: unknown) => {
-        if (typeof prop === 'string') {
-          return makeSetter(callback, [...segments, prop]);
-        } else {
-          return Reflect.get(target, prop, receiver);
+  private makeSetter(segments: string[] = []): Setter {
+    let s = (value: any) => {
+      let innerSegments = segments.slice();
+      let lastSegment = innerSegments.pop();
+      if (!lastSegment) {
+        this._data = value;
+        return;
+      }
+      let data = this._data;
+      let cursor: any = data;
+      for (let segment of innerSegments) {
+        let nextCursor = cursor[segment];
+        if (!nextCursor) {
+          nextCursor = {};
+          cursor[segment] = nextCursor;
         }
-      },
-    }
-  );
+        cursor = nextCursor;
+      }
+      cursor[lastSegment] = value;
+      this._data = data;
+    };
+    (s as any).setters = new Proxy(
+      {},
+      {
+        get: (target: object, prop: string, receiver: unknown) => {
+          if (typeof prop === 'string') {
+            return this.makeSetter([...segments, prop]);
+          } else {
+            return Reflect.get(target, prop, receiver);
+          }
+        },
+      }
+    );
 
-  return s;
+    return s;
+  }
 }
 
 function deserializeAttribute(

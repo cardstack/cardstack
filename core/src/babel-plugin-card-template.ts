@@ -197,8 +197,20 @@ function handleArguments(
     throw error(path, 'precompileTemplate needs two arguments');
   }
   let template = args[0];
-  if (!template.isStringLiteral()) {
-    throw error(template, 'must be a string literal');
+  let templateString: string;
+  if (template.isStringLiteral()) {
+    templateString = template.node.value;
+  } else if (template.isTemplateLiteral()) {
+    if (template.node.quasis.length > 1) {
+      throw error(template, 'must not contain expressions');
+    }
+    let str = template.node.quasis[0].value.cooked;
+    if (!str) {
+      throw error(template, 'bug: no cooked value');
+    }
+    templateString = str;
+  } else {
+    throw error(template, 'must be a sting literal or template literal');
   }
 
   let options = args[1];
@@ -214,7 +226,7 @@ function handleArguments(
       'Card Template precompileOptions requires strictMode to be true'
     );
   }
-  return { options, template: template.node.value };
+  return { options, template: templateString };
 }
 
 function transformTemplate(

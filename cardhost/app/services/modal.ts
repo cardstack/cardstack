@@ -1,4 +1,3 @@
-import { Format } from '@cardstack/core/src/interfaces';
 import Service, { inject } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
@@ -6,67 +5,65 @@ import { action } from '@ember/object';
 import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 
-import { LoadedCard } from './cards';
+import { Card } from './cards';
 import CardsService from '../services/cards';
+import type CardModel from '@cardstack/core/src/base-component-model';
+import { Format } from '@cardstack/core/src/interfaces';
+
+type State =
+  | {
+      name: 'empty';
+    }
+  | {
+      name: 'loading';
+    }
+  | {
+      name: 'loaded';
+      loadedCard: Card;
+      format: Format;
+    };
 
 export default class Modal extends Service {
   @inject declare cards: CardsService;
 
-  @tracked isShowing = false;
-
-  @tracked state?: {
-    format: Format;
-    url: string;
-    loadedCard: LoadedCard;
-    resolve: Function;
-    reject: Function;
-  };
-
-  get cardComponent(): unknown {
-    return this.state?.loadedCard.component;
+  get isShowing(): boolean {
+    return this.state.name === 'loading' || this.state.name === 'loaded';
   }
 
-  @task openWithCard = taskFor(
-    async (url: string, format: Format): Promise<any> => {
-      this.isShowing = true;
+  get isLoading(): boolean {
+    return this.state.name === 'loading';
+  }
 
-      let loadedCard = await this.cards.load(url, format);
+  @tracked state: State = { name: 'empty' };
 
+  get cardComponent(): unknown {
+    if (this.state.name === 'loaded') {
+      return this.state.loadedCard.component;
+    }
+    return;
+  }
+
+  @task editCard = taskFor(
+    async (model: CardModel): Promise<void> => {
+      this.state = { name: 'loading' };
+      let loadedCard = await this.cards.loadForEdit(model);
       this.state = {
+        name: 'loaded',
         loadedCard,
-        format,
-        url,
-        resolve() {}, // Stub
-        reject() {}, // stub
+        format: 'edit',
       };
-
-      let promise = new Promise((resolve, reject) => {
-        if (!this.state) {
-          throw new Error('what');
-        }
-
-        this.state.resolve = resolve;
-        this.state.reject = reject;
-      });
-
-      return promise;
     }
   );
 
   @action async save(): Promise<void> {
-    if (!this.state) {
+    if (this.state.name !== 'loaded') {
       return;
     }
-    let model = await this.cards.save(
-      this.state.url,
-      this.state.loadedCard.model
-    );
-    this.state.resolve(model);
+    await this.cards.save(this.state.loadedCard.model);
     this.close();
   }
 
   @action close(): void {
-    this.isShowing = false;
-    this.state = undefined;
+    this.state = { name: 'empty' };
   }
 }

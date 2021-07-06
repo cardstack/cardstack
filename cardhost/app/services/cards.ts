@@ -7,13 +7,13 @@ import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 
 import { Format, cardJSONReponse } from '@cardstack/core/src/interfaces';
-import type ComponentModel from '@cardstack/core/src/base-component-model';
+import type CardModel from '@cardstack/core/src/base-component-model';
 import config from 'cardhost/config/environment';
 
 const { cardServer } = config as any; // Environment types arent working
 
-export interface LoadedCard {
-  model: ComponentModel;
+export interface Card {
+  model: CardModel;
   component: unknown;
 }
 
@@ -25,21 +25,36 @@ function buildURL(url: string, format?: Format): string {
   return fullURL.join('');
 }
 
+// when you put a card under edit, we load a new copy in edit mode. This lets us
+// look up the original copy from the editable copy.
+let originals = new WeakMap();
+
 export default class Cards extends Service {
-  async load(url: string, format: Format): Promise<LoadedCard> {
+  async load(url: string, format: Format): Promise<Card> {
     let fullURL = buildURL(url, format);
     return this.internalLoad.perform(fullURL);
   }
 
-  async loadForRoute(pathname: string): Promise<LoadedCard> {
+  async loadForRoute(pathname: string): Promise<Card> {
     return this.internalLoad.perform(`${cardServer}cardFor${pathname}`);
   }
 
-  @task private internalLoad = taskFor(
-    async (url: string): Promise<LoadedCard> => {
-      let cardResponse = await fetchCard(url);
-      let { component, model } = await loadComponentModule(cardResponse, url);
+  // TODO: adjust api to accept Card and not CardModel for symmetry with what we
+  // return from our load methods
+  async loadForEdit(model: CardModel): Promise<Card> {
+    let loaded = await this.internalLoad.perform(buildURL(model.url, 'edit'));
+    originals.set(loaded.model, model);
+    return loaded;
+  }
 
+  @task private internalLoad = taskFor(
+    async (url: string): Promise<Card> => {
+      let cardResponse = await fetchCard(url);
+      let { component, ModelClass } = await loadComponentModule(
+        cardResponse,
+        url
+      );
+      let model = new ModelClass(cardResponse);
       let CallerComponent = setComponentTemplate(
         hbs`<this.card @model={{this.model.data}} @set={{this.model.setters}} />`,
         class extends Component {
@@ -55,18 +70,26 @@ export default class Cards extends Service {
     }
   );
 
-  async save(cardURL: string, model: ComponentModel): Promise<ComponentModel> {
-    return this.saveTask.perform(cardURL, model);
+  // TODO: adjust api to accept Card and not CardModel for symmetry with what we
+  // return from our load methods
+  async save(model: CardModel): Promise<void> {
+    await this.saveTask.perform(model);
+    let original = originals.get(model);
+    if (original) {
+      // TODO: this should probably be selective and only update fields that
+      // already appear in original (which will be a subset of the editable
+      // card)
+      original.setters(model.data);
+    }
   }
 
   @task saveTask = taskFor(
-    async (cardURL: string, model: ComponentModel): Promise<ComponentModel> => {
-      let response = await fetchCard(buildURL(cardURL), {
+    async (model: CardModel): Promise<void> => {
+      let response = await fetchCard(buildURL(model.url), {
         method: 'PATCH',
         body: JSON.stringify(model.serialize()),
       });
       model.updateFromResponse(response);
-      return model;
     }
   );
 }
@@ -74,17 +97,18 @@ export default class Cards extends Service {
 async function loadComponentModule(
   card: cardJSONReponse,
   url: string
-): Promise<{ component: unknown; model: ComponentModel }> {
+): Promise<{ component: unknown; ModelClass: typeof CardModel }> {
   let componentModuleName = card.data.meta.componentModule;
-  let component: unknown;
-  let ModelClass: typeof ComponentModel;
 
+  // TODO: base this on the componentModuleName prefix instead of isTesting()
   if (macroCondition(isTesting())) {
     // in tests, our fake server inside mirage just defines these modules
     // dynamically
     let cardComponentModule = window.require(componentModuleName);
-    component = cardComponentModule['default'];
-    ModelClass = cardComponentModule['Model'];
+    return {
+      component: cardComponentModule['default'],
+      ModelClass: cardComponentModule['Model'],
+    };
   } else {
     if (!componentModuleName.startsWith('@cardstack/compiled/')) {
       throw new Error(
@@ -100,14 +124,11 @@ async function loadComponentModule(
       `@cardstack/compiled/${componentModuleName}`
     );
 
-    component = cardComponentModule.default;
-    ModelClass = cardComponentModule.Model;
+    return {
+      component: cardComponentModule.default,
+      ModelClass: cardComponentModule.Model,
+    };
   }
-
-  return {
-    component,
-    model: new ModelClass(card),
-  };
 }
 
 async function fetchCard(
