@@ -13,6 +13,10 @@ import { action } from '@ember/object';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { capitalize } from '@ember/string';
 
+const FAILURE_REASONS = {
+  DISCONNECTED: 'DISCONNECTED',
+} as const;
+
 class WithdrawalWorkflow extends Workflow {
   name = 'Withdrawal';
   milestones = [
@@ -40,7 +44,7 @@ class WithdrawalWorkflow extends Workflow {
           message: `Looks like you've already connected your ${c.layer1.fullName} wallet, which you can see below.
           Please continue with the next step of this workflow.`,
           includeIf() {
-            return (this as NetworkAwareWorkflowMessage).hasLayer1Account;
+            return this.hasLayer1Account;
           },
         }),
         new WorkflowCard({
@@ -60,7 +64,7 @@ class WithdrawalWorkflow extends Workflow {
           message: `Looks like you've already connected your ${c.layer2.fullName} wallet, which you can see below.
           Please continue with the next step of this workflow.`,
           includeIf() {
-            return (this as NetworkAwareWorkflowMessage).hasLayer2Account;
+            return this.hasLayer2Account;
           },
         }),
         new NetworkAwareWorkflowMessage({
@@ -68,7 +72,7 @@ class WithdrawalWorkflow extends Workflow {
           message: `You have connected your ${c.layer1.fullName} wallet. Now it's time to connect your ${c.layer2.fullName}
           wallet via your Card Wallet mobile app. If you don't have the app installed, please do so now.`,
           includeIf() {
-            return !(this as NetworkAwareWorkflowMessage).hasLayer2Account;
+            return !this.hasLayer2Account;
           },
         }),
         new NetworkAwareWorkflowMessage({
@@ -77,7 +81,7 @@ class WithdrawalWorkflow extends Workflow {
           new wallet/account. Use your account to scan this QR code, which will connect your account
           with Card Pay.`,
           includeIf() {
-            return !(this as NetworkAwareWorkflowMessage).hasLayer2Account;
+            return !this.hasLayer2Account;
           },
         }),
         new WorkflowCard({
@@ -153,16 +157,18 @@ class WithdrawalWorkflow extends Workflow {
       message:
         'It looks like your wallet(s) got disconnected. If you still want to withdraw tokens, please start again by connecting your wallet(s).',
       includeIf() {
-        let message = this as NetworkAwareWorkflowMessage;
-        return !message.hasLayer1Account || !message.hasLayer2Account;
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
+        );
       },
     }),
     new WorkflowCard({
       author: cardbot,
-      componentName: 'card-pay/withdrawal-workflow/workflow-canceled-cta',
+      componentName: 'card-pay/withdrawal-workflow/disconnection-cta',
       includeIf() {
-        let message = this as NetworkAwareWorkflowMessage;
-        return !message.hasLayer1Account || !message.hasLayer2Account;
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
+        );
       },
     }),
   ]);
@@ -184,7 +190,7 @@ class WithdrawalWorkflowComponent extends Component {
   }
 
   @action cancelWorkflow() {
-    this.workflow.cancel();
+    this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
   }
 }
 
