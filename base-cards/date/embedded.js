@@ -19,7 +19,9 @@ const FormatDate = setComponentTemplate(
   }),
   class extends Component {
     get formatted() {
-      return Format.format(this.args.date);
+      if (this.args.date) {
+        return Format.format(this.args.date);
+      }
     }
   }
 );

@@ -69,7 +69,10 @@ export default class Builder implements BuilderInterface {
       configFile: false,
       babelrc: false,
       filenameRelative: moduleURL,
-      plugins: ['@babel/plugin-transform-modules-commonjs'],
+      plugins: [
+        '@babel/plugin-proposal-class-properties',
+        '@babel/plugin-transform-modules-commonjs',
+      ],
     });
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return out!.code!;

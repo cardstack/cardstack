@@ -2,7 +2,7 @@ import QUnit from 'qunit';
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 import transform, {
   Options,
-} from '@cardstack/core/src/glimmer/card-template-plugin';
+} from '../../../core/src/glimmer-plugin-card-template';
 import {
   assert_isEqual,
   equalIgnoringWhiteSpace,
@@ -152,7 +152,10 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         importAndChooseName,
       });
 
-      assert.equal(template, '<BestGuess @model={{@model.createdAt}} />');
+      assert.equal(
+        template,
+        '<BestGuess @model={{@model.createdAt}} data-test-field-name="createdAt" />'
+      );
       assert_isEqual(usageMeta['model'], new Set());
       assert_isEqual(
         usageMeta['fields'],
@@ -309,7 +312,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           '{{#each @fields.items as |Item|}}<Item />{{/each}}',
           options
         ),
-        '{{#each @model.items as |Item|}}<BestGuess @model={{Item}} />{{/each}}'
+        '{{#each @model.items as |Item|}}<BestGuess @model={{Item}} data-test-field-name="items" />{{/each}}'
       );
       assert_isEqual(usageMeta['model'], new Set());
       assert_isEqual(
@@ -326,7 +329,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
             '{{#each @fields.list.dates as |ADate|}}<ADate />{{/each}}',
             options
           ),
-          '{{#each @model.list.dates as |ADate|}}<BestGuess @model={{ADate}} />{{/each}}'
+          '{{#each @model.list.dates as |ADate|}}<BestGuess @model={{ADate}} data-test-field-name="dates" />{{/each}}'
         );
         assert_isEqual(usageMeta['model'], new Set());
         assert_isEqual(
@@ -339,7 +342,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     QUnit.test('component invocation for dates', async function (assert) {
       assert.equal(
         transform('<@fields.items />', options),
-        '{{#each @model.items as |item|}}<BestGuess @model={{item}} />{{/each}}'
+        '{{#each @model.items as |item|}}<BestGuess @model={{item}} data-test-field-name="items" />{{/each}}'
       );
       assert_isEqual(usageMeta['model'], new Set());
       assert_isEqual(
@@ -353,7 +356,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       async function (assert) {
         assert.equal(
           transform('<@fields.list.dates />', options),
-          '{{#each @model.list.dates as |date|}}<BestGuess @model={{date}} />{{/each}}'
+          '{{#each @model.list.dates as |date|}}<BestGuess @model={{date}} data-test-field-name="dates" />{{/each}}'
         );
         assert_isEqual(usageMeta['model'], new Set());
         assert_isEqual(
@@ -484,11 +487,11 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           <label>{{"title"}}</label>
          {{@model.title}}
          <label>{{"startDate"}}</label>
-         <BestGuess @model={{@model.startDate}} />
+         <BestGuess @model={{@model.startDate}} data-test-field-name="startDate" />
          <label>{{"items"}}</label>
          {{#each @model.items as |item|}}{{item}}{{/each}}
          <label>{{"events"}}</label>
-         {{#each @model.events as |event|}}<BestGuess @model={{event}} />{{/each}}
+         {{#each @model.events as |event|}}<BestGuess @model={{event}} data-test-field-name="events" />{{/each}}
          <Whichever @field={{Field}} />
          `
       );
@@ -528,7 +531,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         }
       ),
       `{{#each @model.birthdays as |Birthday|}}
-          <BestGuess @model={{Birthday}} />
+          <BestGuess @model={{Birthday}} data-test-field-name="birthdays" />
           {{#let (whatever) as |Birthday|}}
             <Birthday />
           {{/let}}
@@ -541,85 +544,87 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     );
   });
 
-  QUnit.test(
-    'Errors when you wrap a field invocation in a helper',
-    async function (assert) {
-      assert.throws(function () {
-        transform(
-          '{{#each (helper @fields.items) as |Item|}}<Item />{{/each}}',
-          options
-        );
-      }, /Invalid use of @fields API/);
-    }
-  );
-
-  QUnit.test(
-    'Errors when trying to pass @fields API through helper',
-    async function (assert) {
-      assert.throws(function () {
-        transform(
-          `{{#each-in (some-helper @fields) as |name Field|}}
-              <label>{{name}}</label>
-             {{/each-in}}`,
-          options
-        );
-      }, /Invalid use of @fields API/);
-    }
-  );
-
-  QUnit.test(
-    'Errors when using @fields as a component argument',
-    async function (assert) {
-      assert.throws(function () {
-        transform(`<SomeCompontent @arrg={{@fields}} />`, options);
-      }, /Invalid use of @fields API/);
-    }
-  );
-
-  QUnit.test(
-    'Errors when calling @fields as a element node',
-    async function (assert) {
-      assert.throws(function () {
-        transform(`<@fields />`, options);
-      }, /Invalid use of @fields API/);
-    }
-  );
-
-  QUnit.test(
-    'Errors when using @fields in a each loop',
-    async function (assert) {
-      assert.throws(
-        function () {
+  QUnit.module('Error Scenarios', function () {
+    QUnit.test(
+      'Errors when you wrap a field invocation in a helper',
+      async function (assert) {
+        assert.throws(function () {
           transform(
-            `{{#each @fields as |Field|}}
-              <label>{{name}}</label>
-             {{/each}}`,
+            '{{#each (helper @fields.items) as |Item|}}<Item />{{/each}}',
             options
           );
-        },
-        /Invalid use of @fields API/,
-        'Errors when used with an each loops'
-      );
-    }
-  );
+        }, /Invalid use of @fields API/);
+      }
+    );
 
-  QUnit.test(
-    'Errors when using @fields as path expression',
-    async function (assert) {
-      assert.throws(
-        function () {
+    QUnit.test(
+      'Errors when trying to pass @fields API through helper',
+      async function (assert) {
+        assert.throws(function () {
           transform(
-            `{{#each-in @fields as |name Field|}}
-                  <label>{{name}}</label>
-                  <Field />
-                  {{@fields}}
+            `{{#each-in (some-helper @fields) as |name Field|}}
+                <label>{{name}}</label>
                {{/each-in}}`,
             options
           );
-        },
-        /Invalid use of @fields API/,
-        'Errors when fields is used incorrectly inside of a valid use of fields'
-      );
-    }
-  );
+        }, /Invalid use of @fields API/);
+      }
+    );
+
+    QUnit.test(
+      'Errors when using @fields as a component argument',
+      async function (assert) {
+        assert.throws(function () {
+          transform(`<SomeCompontent @arrg={{@fields}} />`, options);
+        }, /Invalid use of @fields API/);
+      }
+    );
+
+    QUnit.test(
+      'Errors when calling @fields as a element node',
+      async function (assert) {
+        assert.throws(function () {
+          transform(`<@fields />`, options);
+        }, /Invalid use of @fields API/);
+      }
+    );
+
+    QUnit.test(
+      'Errors when using @fields in a each loop',
+      async function (assert) {
+        assert.throws(
+          function () {
+            transform(
+              `{{#each @fields as |Field|}}
+                <label>{{name}}</label>
+               {{/each}}`,
+              options
+            );
+          },
+          /Invalid use of @fields API/,
+          'Errors when used with an each loops'
+        );
+      }
+    );
+
+    QUnit.test(
+      'Errors when using @fields as path expression',
+      async function (assert) {
+        assert.throws(
+          function () {
+            transform(
+              `{{#each-in @fields as |name Field|}}
+                    <label>{{name}}</label>
+                    <Field />
+                    {{@fields}}
+                 {{/each-in}}`,
+              options
+            );
+          },
+          /Invalid use of @fields API/,
+          'Errors when fields is used incorrectly inside of a valid use of fields'
+        );
+      }
+    );
+  });
 });

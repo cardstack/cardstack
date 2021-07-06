@@ -6,11 +6,10 @@ import type {
   Statement,
   Node,
 } from '@glimmer/syntax/dist/types/lib/v1/api';
-import { CompiledCard, Field, Format } from '../interfaces';
+import { CompiledCard, Field, Format } from './interfaces';
 import { singularize } from 'inflection';
 import { capitalize, cloneDeep } from 'lodash';
-import { getFieldForPath } from '../utils';
-import { BuildElementOptions } from '@glimmer/syntax/dist/types/lib/v1/public-builders';
+import { getFieldForPath } from './utils';
 
 const MODEL = '@model';
 const FIELDS = '@fields';
