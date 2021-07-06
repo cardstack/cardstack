@@ -189,7 +189,7 @@ class WithdrawalWorkflowComponent extends Component {
     this.workflow = new WithdrawalWorkflow(getOwner(this));
   }
 
-  @action cancelWorkflow() {
+  @action onDisconnect() {
     this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
   }
 }
