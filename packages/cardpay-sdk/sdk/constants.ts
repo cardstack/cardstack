@@ -22,7 +22,6 @@ const SOKOL = {
   nativeTokenName: 'SPOA',
   name: 'Sokol',
   rpcNode: 'https://sokol.stack.cards',
-  rpcWssNode: 'https://sokol-wss.stack.cards',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
   subgraphURL: 'https://api.thegraph.com/subgraphs/name/habdelra/cardpay-sokol',
   tallyServiceURL: 'https://tally-service-staging.stack.cards/api/v1',
@@ -40,7 +39,6 @@ const KOVAN = {
   nativeTokenName: 'Ethereum',
   name: 'Kovan',
   rpcNode: `${KOVAN_INFURA_URL}/${INFURA_PROJECT_ID}`,
-  rpcWssNode: `${KOVAN_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
 };
 const MAINNET = {
   apiBaseUrl: 'https://api.etherscan.io/api',
@@ -54,7 +52,6 @@ const MAINNET = {
   nativeTokenName: 'Ethereum',
   name: 'Ethereum Mainnet',
   rpcNode: `${MAINNET_INFURA_URL}/${INFURA_PROJECT_ID}`,
-  rpcWssNode: `${MAINNET_INFURA_WSS_URL}/${INFURA_PROJECT_ID}`,
 };
 const XDAI = {
   apiBaseUrl: 'https://blockscout.com/xdai/mainnet/api',
@@ -67,7 +64,6 @@ const XDAI = {
   nativeTokenName: 'xDai',
   name: 'xDai Chain',
   rpcNode: 'https://rpc.xdaichain.com',
-  rpcWssNode: 'wss://rpc.xdaichain.com/wss',
   relayServiceURL: 'https://relay.cardstack.com/api',
   transactionServiceURL: 'https://transactions.cardstack.com/api',
 };
