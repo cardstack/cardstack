@@ -60,10 +60,13 @@ module('Integration | Component | workflow-thread', function (hooks) {
       }),
     ];
     workflow.epilogue.postables = [postable4];
-    postable1.timestamp = new Date(Date.parse('2021-05-20T00:00:00'));
-    postable2.timestamp = new Date(Date.parse('2021-05-20T00:00:00'));
-    postable3.timestamp = new Date(Date.parse('2021-05-21T00:00:00'));
-    postable4.timestamp = new Date(Date.parse('2021-05-21T00:00:00'));
+
+    // new Date(year, monthIndex, day, hour, minute, second)
+    postable1.timestamp = new Date(2021, 4, 20, 0, 0, 0);
+    postable2.timestamp = new Date(2021, 4, 20, 0, 0, 0);
+    postable3.timestamp = new Date(2021, 4, 21, 0, 0, 0);
+    postable4.timestamp = new Date(2021, 4, 21, 0, 0, 0);
+
     this.set('workflow', workflow);
     workflow.attachWorkflow();
     await render(hbs`
