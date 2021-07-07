@@ -54,7 +54,7 @@
       "args": [
         "bridge-to-l1",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // L2 safe address
-        "30",
+        "10",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L1 receiver
         "--network", "sokol",
@@ -82,6 +82,41 @@
         "bridge-to-l2",
         "30",
         "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", // Kovan DAI
+        "--network", "kovan",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: Wait for Bridge Validators",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "await-bridged-to-l1",
+        "21665245", // from block
+        "0xc7556fe94b96d06d91f0377ba889313a398b4f4bc1f70a3c781cffe624fc0934", // txn hash
+        "--network", "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: Claim Layer 1 Tokens",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "claim-tokens-bridged-to-l1",
+        "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000a08", // messageId
+        // encodedData
+        "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000a0816a80598dd2f143cfbf091638ce3fb02c9135528366b4cc64d30849568af65522de3a68ea6cc78ce001e84800101004d2a125e4cfb0000000000000000000000004f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa0000000000000000000000002f58630ca445ab1a6de2bb9892aa2e1d60876c130000000000000000000000000000000000000000000000008ac7230489e80000",
+        // signatures (add each signature as a separate command line arg)
+        "0x6d3ddbb811bb0b8519ba7fd7c1fe916228a1186aab35eb350e694820b68359bf0d5989dc254b311ccae8abeb49f8c7e9f2002238ea1cb37afcd5c799e8e1341f1b",
         "--network", "kovan",
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"

@@ -1,8 +1,10 @@
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
-import { ContractOptions, EventData } from 'web3-eth-contract';
+import { Contract, ContractOptions, EventData } from 'web3-eth-contract';
 import HomeBridgeABI from '../contracts/abi/home-bridge-mediator';
 import ERC677ABI from '../contracts/abi/erc-677';
+import HomeAMBABI from '../contracts/abi/home-amb';
+import BridgeValidatorsABI from '../contracts/abi/bridge-validators';
 import { getAddress } from '../contracts/addresses';
 import { waitForEvent, waitUntilTransactionMined } from './utils/general-utils';
 import { executeTransaction, gasEstimate, GnosisExecTx } from './utils/safe-utils';
@@ -15,7 +17,7 @@ import { ZERO_ADDRESS } from './constants';
 // The Foreign network can be any chain, but generally refers to the Ethereum mainnet.
 
 export interface ITokenBridgeHomeSide {
-  waitForBridgingCompleted(recipientAddress: string, fromBlock: string): Promise<TransactionReceipt>;
+  waitForBridgingToLayer2Completed(recipientAddress: string, fromBlock: string): Promise<TransactionReceipt>;
 }
 
 export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
@@ -88,7 +90,82 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     return result;
   }
 
-  async waitForBridgingCompleted(recipientAddress: string, fromBlock: string): Promise<TransactionReceipt> {
+  async waitForBridgingValidation(
+    fromBlock: number,
+    bridgingTxnHash: string
+  ): Promise<{ messageId: string; encodedData: string; signatures: string[] }> {
+    const POLL_INTERVAL = 5 * 1000;
+    const TIMEOUT = 1000 * 60 * 5;
+    let signatureEvents: EventData[] | undefined;
+    let homeAmb: Contract | undefined;
+    {
+      let start = Date.now();
+      do {
+        homeAmb = new this.layer2Web3.eth.Contract(
+          HomeAMBABI as AbiItem[],
+          await getAddress('homeAMB', this.layer2Web3)
+        );
+        if (signatureEvents) {
+          await new Promise<void>((res) => setTimeout(() => res(), POLL_INTERVAL));
+        }
+        signatureEvents = (
+          await homeAmb.getPastEvents('UserRequestForSignature', {
+            fromBlock,
+          })
+        ).filter((e) => e.transactionHash === bridgingTxnHash);
+      } while (signatureEvents.length === 0 || Date.now() < start + TIMEOUT);
+    }
+    if (!homeAmb) {
+      throw new Error(`should be impossible to get here--no Home AMB contract has been instantiated`);
+    }
+
+    if (signatureEvents.length === 0) {
+      throw new Error(
+        `Timed out waiting for bridge validation for bridging to layer 1 for txn hash ${bridgingTxnHash}`
+      );
+    }
+    if (signatureEvents.length > 1) {
+      throw new Error(
+        `Do not know how to handle multiple UserRequestForSignature events in the same txn for txn hash ${bridgingTxnHash}`
+      );
+    }
+
+    let { messageId, encodedData } = signatureEvents[0].returnValues;
+    let messageHash = this.layer2Web3.utils.soliditySha3Raw(encodedData);
+    let signatureCount: number | undefined;
+    let validatorContractAddress = await homeAmb.methods.validatorContract().call();
+    let validator = new this.layer2Web3.eth.Contract(BridgeValidatorsABI as AbiItem[], validatorContractAddress);
+    let requiredSignatures = toBN(await validator.methods.requiredSignatures().call()).toNumber();
+    {
+      let start = Date.now();
+      do {
+        let validators = await validator.methods.validatorList().call();
+        if (signatureCount != null) {
+          await new Promise<void>((res) => setTimeout(() => res(), POLL_INTERVAL));
+        }
+        signatureCount = 0;
+        for (let validator of validators) {
+          const hashSenderMsg = this.layer2Web3.utils.soliditySha3Raw(validator, messageHash);
+          if (await homeAmb.methods.messagesSigned(hashSenderMsg).call()) {
+            signatureCount++;
+          }
+        }
+      } while (signatureCount < requiredSignatures || Date.now() < start + TIMEOUT);
+    }
+
+    if (signatureCount < requiredSignatures) {
+      throw new Error(
+        `Timed out waiting for ${requiredSignatures} bridge validators to sign bridging request for ${bridgingTxnHash}, only received ${signatureCount} validation signatures`
+      );
+    }
+    const signatures = await Promise.all(
+      Array.from(Array(requiredSignatures).keys()).map((i) => homeAmb!.methods.signature(messageHash, i).call())
+    );
+
+    return { messageId, encodedData, signatures };
+  }
+
+  async waitForBridgingToLayer2Completed(recipientAddress: string, fromBlock: string): Promise<TransactionReceipt> {
     let homeBridge = new this.layer2Web3.eth.Contract(
       HomeBridgeABI as any,
       await getAddress('homeBridge', this.layer2Web3)

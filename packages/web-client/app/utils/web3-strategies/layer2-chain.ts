@@ -244,7 +244,10 @@ export default abstract class Layer2ChainWeb3Strategy
     receiver: ChainAddress
   ): Promise<TransactionReceipt> {
     let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
-    return tokenBridge.waitForBridgingCompleted(receiver, fromBlock.toString());
+    return tokenBridge.waitForBridgingToLayer2Completed(
+      receiver,
+      fromBlock.toString()
+    );
   }
 
   @task *fetchDepotTask(): any {
