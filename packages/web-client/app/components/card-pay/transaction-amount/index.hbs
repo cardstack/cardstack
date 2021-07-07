@@ -1,6 +1,6 @@
 <ActionCardContainer
   class={{cn "transaction-amount" transaction-amount--data-entered=this.dataEntered}}
-  @header="Deposit Amount"
+  @header={{titleize @flow}}
   @isComplete={{@isComplete}}
 >
   <ActionCardContainer::Section @title={{this.title}} @dataTestId="transaction-amount">
