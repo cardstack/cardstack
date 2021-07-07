@@ -80,6 +80,8 @@ class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmou
       balance = this.layer1Network.cardBalance;
     } else if (this.currentTokenSymbol === 'DAI.CPXD') {
       balance = this.layer2Network.defaultTokenBalance;
+    } else if (this.currentTokenSymbol === 'CARD.CPXD') {
+      balance = this.layer2Network.cardBalance;
     }
     return balance || toBN(0);
   }
