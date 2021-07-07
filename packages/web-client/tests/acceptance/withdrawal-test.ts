@@ -207,7 +207,8 @@ module('Acceptance | withdrawal', function (hooks) {
       .includesText('Amount to withdraw:');
     assert
       .dom(`${post} [data-test-amount-entered]`)
-      .includesText('250.00 DAI.CPXD');
+      .includesText('250.00 DAI.CPXD')
+      .includesText('$50.00 USD*');
 
     assert
       .dom(postableSel(3, 0))
