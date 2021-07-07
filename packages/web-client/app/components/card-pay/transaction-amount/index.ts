@@ -48,7 +48,9 @@ class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmou
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
   get currentTokenSymbol(): TokenSymbol {
-    return this.args.workflowSession.state.depositSourceToken || 'DAI.CPXD';
+    return this.args.flow === 'withdrawal'
+      ? this.args.workflowSession.state.withdrawalToken
+      : this.args.workflowSession.state.depositSourceToken;
   }
 
   get tokenSymbolForConversion(): TokenSymbol {
