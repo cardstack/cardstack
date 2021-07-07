@@ -9,8 +9,10 @@ import { TransactionReceipt } from 'web3-core';
 import BN from 'web3-core/node_modules/@types/bn.js';
 import { toBN, toWei } from 'web3-utils';
 import {
+  BridgedTokenSymbol,
   TokenDisplayInfo,
   TokenSymbol,
+  getUnbridgedSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
@@ -57,7 +59,9 @@ class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmou
   }
 
   get tokenSymbolForConversion(): TokenSymbol {
-    return this.isWithdrawal ? 'DAI' : this.currentTokenSymbol;
+    return this.isWithdrawal
+      ? getUnbridgedSymbol(this.currentTokenSymbol as BridgedTokenSymbol)
+      : this.currentTokenSymbol;
   }
 
   get currentTokenDetails(): TokenDisplayInfo | undefined {

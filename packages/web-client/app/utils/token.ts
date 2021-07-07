@@ -43,6 +43,15 @@ const contractNames: Record<NetworkSymbol, Record<BridgeableSymbol, string>> = {
   },
 };
 
+export function getUnbridgedSymbol(
+  bridgedSymbol: BridgedTokenSymbol
+): BridgeableSymbol {
+  if (bridgedSymbol === 'DAI.CPXD') {
+    return 'DAI';
+  } else {
+    return 'CARD';
+  }
+}
 export class TokenContractInfo {
   symbol: BridgeableSymbol;
   address: ChainAddress;
