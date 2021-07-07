@@ -9,7 +9,7 @@ import CustomStorageWalletConnect, {
 } from '../wc-connector';
 import { Emitter, SimpleEmitter } from '../events';
 import { WalletProviderId } from '../wallet-providers';
-import { registerDestructor } from '@ember/destroyable';
+import { action } from '@ember/object';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: string | number) =>
   `cardstack-chain-${chainId}-provider`;
@@ -25,6 +25,10 @@ type ConnectionManagerEvents =
   | 'disconnected'
   | 'incorrect-chain'
   | 'error';
+
+const BROADCAST_CHANNEL_MESSAGES = {
+  DISCONNECTED: 'DISCONNECTED',
+} as const;
 
 export abstract class ConnectionManager
   implements Emitter<ConnectionManagerEvents> {
@@ -47,12 +51,10 @@ export abstract class ConnectionManager
     this.broadcastChannel = new BroadcastChannel(
       `cardstack-connection-manager-${this.chainId}`
     );
-    this.broadcastChannel.onmessage = (event: MessageEvent) => {
-      if (event.data === 'disconnected') {
-        this.onDisconnect(false);
-      }
-    };
-    registerDestructor(this, this.broadcastChannel.close);
+    this.broadcastChannel.addEventListener(
+      'message',
+      this.onBroadcastChannelMessage
+    );
   }
 
   static create(
@@ -91,10 +93,21 @@ export abstract class ConnectionManager
     return this.simpleEmitter.emit(event, ...args);
   }
 
+  @action
+  onBroadcastChannelMessage(event: MessageEvent) {
+    if (event.data === BROADCAST_CHANNEL_MESSAGES.DISCONNECTED) {
+      this.onDisconnect(false);
+    }
+  }
+
   onDisconnect(broadcast = true) {
     ConnectionManager.removeProviderFromStorage(this.chainId);
+    if (broadcast)
+      this.broadcastChannel.postMessage(
+        BROADCAST_CHANNEL_MESSAGES.DISCONNECTED
+      );
+    // disconnect will destroy this object so it has to be last
     this.emit('disconnected');
-    if (broadcast) this.broadcastChannel.postMessage('disconnected');
   }
 
   onConnect(accounts: string[]) {
@@ -117,6 +130,10 @@ export abstract class ConnectionManager
 
   setWeb3Provider(web3: Web3) {
     web3.setProvider(this.provider);
+  }
+
+  destroy() {
+    this.broadcastChannel.close();
   }
 }
 

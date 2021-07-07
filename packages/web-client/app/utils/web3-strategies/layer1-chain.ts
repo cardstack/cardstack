@@ -124,6 +124,7 @@ export default abstract class Layer1ChainWeb3Strategy
   private onDisconnect() {
     if (this.isConnected) {
       this.clearWalletInfo();
+      this.connectionManager?.destroy();
       this.connectionManager = undefined;
       this.web3 = undefined;
       this.currentProviderId = '';
