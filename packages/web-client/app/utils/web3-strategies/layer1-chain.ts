@@ -60,6 +60,9 @@ export default abstract class Layer1ChainWeb3Strategy
         }
       );
 
+      // these events might need unbinding in the future. For now, since we create a new instance
+      // of ConnectionManager each time we connect, and destroy it when we disconnect, not keeping
+      // references to the returned UnbindEventListener function
       connectionManager.on('connected', this.onConnect.bind(this));
       connectionManager.on('disconnected', this.onDisconnect.bind(this));
       connectionManager.on('incorrect-chain', this.disconnect.bind(this));
@@ -74,7 +77,6 @@ export default abstract class Layer1ChainWeb3Strategy
         await connectionManager.reconnect(); // use the reconnect method because of edge cases
       }
     } catch (e) {
-      // clean up if anything goes wrong.
       this.disconnect();
       ConnectionManager.removeProviderFromStorage(this.chainId);
     }
