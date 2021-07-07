@@ -10,7 +10,6 @@
         @accountAddress={{this.layer2Network.walletInfo.firstAddress}}
         @depotAddress={{this.depotAddress}}
         @size={{if @isComplete "large"}}
-        class="choose-balance__field"
       />
     </ActionCardContainer::Section>
     {{#if this.depotAddress}}
@@ -22,7 +21,6 @@
           @selectedToken={{this.selectedToken}}
           @selectedTokenSymbol={{this.selectedTokenSymbol}}
           @chooseToken={{this.chooseSource}}
-          class="choose-balance__field"
         />
       </ActionCardContainer::Section>
     {{/if}}

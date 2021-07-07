@@ -1,3 +1,13 @@
+.nested-depot-balance-chooser {
+  grid-template-columns: 3.5rem 1fr;
+  row-gap: 0;
+}
+
+.nested-depot-balance-chooser__nested-items {
+  grid-column: 2;
+  grid-row: 2;
+}
+
 .nested-depot-balance-chooser__nested-dropdown {
   --arrow-space: 2.5rem;
 

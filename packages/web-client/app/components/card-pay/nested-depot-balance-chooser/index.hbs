@@ -1,7 +1,8 @@
-<CardPay::LabeledValue @label="BALANCE:" ...attributes>
+<CardPay::LabeledValue @label="BALANCE:" class="nested-depot-balance-chooser" ...attributes>
   <CardPay::NestedItems
     @noBorder={{not @isComplete}}
     @noIndent={{not @isComplete}}
+    class="nested-depot-balance-chooser__nested-items"
   >
     <:outer>
       <CardPay::AccountDisplay
