@@ -33,12 +33,14 @@ class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmou
   @service declare layer2Network: Layer2Network;
   @tracked errorMessage = '';
 
+  get isWithdrawal(): boolean {
+    return this.args.flow === 'withdrawal';
+  }
+
   get title(): string {
-    if (this.args.flow === 'withdrawal') {
-      return 'Choose a withdrawal amount';
-    } else {
-      return 'Choose an amount to deposit into the reserve pool';
-    }
+    return this.isWithdrawal
+      ? 'Choose a withdrawal amount'
+      : 'Choose an amount to deposit into the reserve pool';
   }
 
   get dataEntered(): boolean {
@@ -48,13 +50,13 @@ class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmou
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
   get currentTokenSymbol(): TokenSymbol {
-    return this.args.flow === 'withdrawal'
+    return this.isWithdrawal
       ? this.args.workflowSession.state.withdrawalToken
       : this.args.workflowSession.state.depositSourceToken;
   }
 
   get tokenSymbolForConversion(): TokenSymbol {
-    return this.args.flow === 'withdrawal' ? 'DAI' : this.currentTokenSymbol;
+    return this.isWithdrawal ? 'DAI' : this.currentTokenSymbol;
   }
 
   get currentTokenDetails(): TokenDisplayInfo | undefined {
@@ -150,9 +152,7 @@ class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmou
   }
 
   get amountLabel() {
-    return `Amount to ${
-      this.args.flow === 'withdrawal' ? 'withdraw' : 'deposit'
-    }`;
+    return `Amount to ${this.isWithdrawal ? 'withdraw' : 'deposit'}`;
   }
 
   @action onInputAmount(str: string) {
