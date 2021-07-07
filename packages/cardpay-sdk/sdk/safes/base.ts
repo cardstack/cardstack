@@ -1,20 +1,15 @@
 /*global fetch */
 
 import Web3 from 'web3';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.6.2/prepaid-card-manager';
-import MerchantManagerABI from '../../contracts/abi/v0.6.2/merchant-manager';
 import SupplierManagerABI from '../../contracts/abi/v0.6.2/supplier-manager';
-import SpendABI from '../../contracts/abi/v0.6.2/spend';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from '../constants';
-import { Contract, ContractOptions } from 'web3-eth-contract';
+import { ContractOptions } from 'web3-eth-contract';
 import { GnosisExecTx, gasEstimate, executeTransaction } from '../utils/safe-utils';
 import { signSafeTxAsRSV } from '../utils/signing-utils';
-import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
-import { ExchangeRate } from '../exchange-rate';
 const { toBN, fromWei } = Web3.utils;
 
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
@@ -52,153 +47,132 @@ export interface TokenInfo {
   balance: string; // balance is in wei
 }
 
-interface Context {
-  transactionServiceURL: string;
-  spendContract: Contract;
-  merchantManager: Contract;
-  prepaidCardManager: Contract;
-  supplierManager: Contract;
-  exchangeRate: ExchangeRate;
-}
+const safesQuery = `
+  query($account: ID!) {
+    account(id: $account) {
+      safes {
+        safe {
+          id
+          tokens {
+            balance
+            token {
+              id
+              name
+              symbol
+            }
+          }
+          depot {
+            id
+            infoDid
+          }
+          prepaidCard {
+            id
+            customizationDID
+            issuingToken {
+              symbol,
+              id
+            }
+            spendBalance,
+            issuer {id}
+            reloadable
+          }
+          merchant {
+            id
+            spendBalance
+            infoDid
+          }
+        }
+      }
+    }
+  }
+`;
+
+const safeQuery = `
+  query ($id: ID!) {
+    safe(id: $id) {
+      id
+      tokens {
+        balance
+        token {
+          id
+          name
+          symbol
+        }
+      }
+      depot {
+        id
+        infoDid
+      }
+      prepaidCard {
+        id
+        customizationDID
+        issuingToken {
+          symbol
+          id
+        }
+        spendBalance
+        issuer {
+          id
+        }
+        reloadable
+      }
+      merchant {
+        id
+        spendBalance
+        infoDid
+      }
+    }
+  }
+`;
 
 export default class Safes {
   constructor(private layer2Web3: Web3) {}
 
-  async viewSafe(safeAddress: string, context?: Context): Promise<Safe> {
-    let transactionServiceURL: string;
-    let spendContract: Contract;
-    let merchantManager: Contract;
-    let supplierManager: Contract;
-    let prepaidCardManager: Contract;
-    let exchangeRate: ExchangeRate;
-    if (context) {
-      ({
-        prepaidCardManager,
-        transactionServiceURL,
-        spendContract,
-        merchantManager,
-        supplierManager,
-        exchangeRate,
-      } = context);
-    } else {
-      transactionServiceURL = await getConstant('transactionServiceURL', this.layer2Web3);
-      prepaidCardManager = new this.layer2Web3.eth.Contract(
-        PrepaidCardManagerABI as AbiItem[],
-        await getAddress('prepaidCardManager', this.layer2Web3)
-      );
-      spendContract = new this.layer2Web3.eth.Contract(
-        SpendABI as AbiItem[],
-        await getAddress('spend', this.layer2Web3)
-      );
-      merchantManager = new this.layer2Web3.eth.Contract(
-        MerchantManagerABI as AbiItem[],
-        await getAddress('merchantManager', this.layer2Web3)
-      );
-      supplierManager = new this.layer2Web3.eth.Contract(
-        SupplierManagerABI as AbiItem[],
-        await getAddress('supplierManager', this.layer2Web3)
-      );
-      exchangeRate = await getSDK('ExchangeRate', this.layer2Web3);
-    }
-
-    let balanceResponse = await fetch(`${transactionServiceURL}/v1/safes/${safeAddress}/balances/`);
-    if (!balanceResponse?.ok) {
-      throw new Error(`Error retrieving safe ${safeAddress}: ${await balanceResponse.text()}`);
-    }
-    let balances: TokenInfo[] = await balanceResponse.json();
-    let tokens = balances.filter((balanceItem) => balanceItem.tokenAddress);
-    let safeInfo = { address: safeAddress, tokens };
+  async viewSafe(safeAddress: string): Promise<Safe | undefined> {
+    let subgraphURL = await getConstant('subgraphURL', this.layer2Web3);
+    let response = await fetch(subgraphURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        query: safeQuery,
+        variables: { id: safeAddress },
+      }),
+    });
     let {
-      issuer,
-      issueToken: issuingToken,
-      reloadable,
-      customizationDID,
-    } = await prepaidCardManager.methods.cardDetails(safeAddress).call();
-
-    // prepaid card safe
-    if (issuer !== ZERO_ADDRESS) {
-      let issuingTokenBalance =
-        tokens.find((t) => t.tokenAddress.toLowerCase() === issuingToken.toLowerCase())?.balance ?? '0';
-      return {
-        ...safeInfo,
-        type: 'prepaid-card' as 'prepaid-card',
-        issuer,
-        issuingToken,
-        reloadable,
-        customizationDID: customizationDID ? customizationDID : undefined, // cleanse the empty strings (which solidity uses for unspecified DID's)
-        spendFaceValue: await exchangeRate.convertToSpend(issuingToken, issuingTokenBalance),
-      };
-    }
-    let supplier = await supplierManager.methods.safes(safeAddress).call();
-    if (supplier !== ZERO_ADDRESS) {
-      let { infoDID } = await supplierManager.methods.suppliers(supplier).call();
-      return {
-        ...safeInfo,
-        type: 'depot' as 'depot',
-        infoDID: infoDID ? infoDID : undefined, // cleanse empty strings
-      };
-    }
-    let merchant = await merchantManager.methods.merchantSafes(safeAddress).call();
-    if (merchant !== ZERO_ADDRESS) {
-      let { infoDID } = await merchantManager.methods.merchants(merchant).call();
-      return {
-        ...safeInfo,
-        type: 'merchant' as 'merchant',
-        infoDID: infoDID ? infoDID : undefined, // cleanse empty strings
-        accumulatedSpendValue: await spendContract.methods.balanceOf(safeInfo.address).call(),
-      };
-    }
-    return {
-      ...safeInfo,
-      type: 'external' as 'external',
-    };
+      data: { safe },
+    } = await response.json();
+    return processSafeResult(safe as GraphQLSafeResult);
   }
 
   async view(owner?: string): Promise<Safe[]> {
     owner = owner ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let transactionServiceURL = await getConstant('transactionServiceURL', this.layer2Web3);
-    let response = await fetch(`${transactionServiceURL}/v1/owners/${owner}/`);
-    let { safes } = (await response.json()) as { safes: string[] };
-    let prepaidCardManager = new this.layer2Web3.eth.Contract(
-      PrepaidCardManagerABI as AbiItem[],
-      await getAddress('prepaidCardManager', this.layer2Web3)
-    );
-    let spendContract = new this.layer2Web3.eth.Contract(
-      SpendABI as AbiItem[],
-      await getAddress('spend', this.layer2Web3)
-    );
-    let merchantManager = new this.layer2Web3.eth.Contract(
-      MerchantManagerABI as AbiItem[],
-      await getAddress('merchantManager', this.layer2Web3)
-    );
-    let supplierManager = new this.layer2Web3.eth.Contract(
-      SupplierManagerABI as AbiItem[],
-      await getAddress('supplierManager', this.layer2Web3)
-    );
+    let subgraphURL = await getConstant('subgraphURL', this.layer2Web3);
+    let response = await fetch(subgraphURL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        query: safesQuery,
+        variables: { account: owner },
+      }),
+    });
 
-    let exchangeRate = await getSDK('ExchangeRate', this.layer2Web3);
-
-    // The transaction server can get overwhelmed and return 500's if too many
-    // calls are executed in parallel, so we'll batch up the requests
-    const batchSize = 20;
+    let {
+      data: {
+        account: { safes },
+      },
+    } = await response.json();
     let result: Safe[] = [];
-    while (safes.length > 0) {
-      let batch = safes.slice(0, batchSize);
-      safes = safes.slice(batchSize);
-      result.push(
-        ...(await Promise.all(
-          batch.map((safeAddress: string) =>
-            this.viewSafe(safeAddress, {
-              transactionServiceURL,
-              prepaidCardManager,
-              spendContract,
-              merchantManager,
-              supplierManager,
-              exchangeRate,
-            })
-          )
-        ))
-      );
+    for (let { safe } of safes as { safe: GraphQLSafeResult }[]) {
+      let safeResult = processSafeResult(safe);
+      if (safeResult) {
+        result.push(safeResult);
+      }
     }
     return result;
   }
@@ -325,5 +299,92 @@ export default class Safes {
       await getAddress('supplierManager', this.layer2Web3)
     );
     return supplierManager.methods.setSupplierInfoDID(infoDID).encodeABI();
+  }
+}
+
+interface GraphQLSafeResult {
+  id: string;
+  tokens: {
+    balance: string;
+    token: {
+      id: string;
+      name: string;
+      symbol: string;
+    };
+  }[];
+  depot: {
+    id: string;
+    infoDid: string | null;
+  } | null;
+  prepaidCard: {
+    id: string;
+    customizationDID: string | null;
+    issuingToken: {
+      symbol: string;
+      id: string;
+    };
+    spendBalance: string;
+    issuer: { id: string };
+    reloadable: boolean;
+  } | null;
+  merchant: {
+    id: string;
+    spendBalance: string;
+    infoDid: string | null;
+  };
+}
+
+function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
+  let tokens: TokenInfo[] = [];
+  for (let tokenDetail of safe.tokens) {
+    tokens.push({
+      tokenAddress: tokenDetail.token.id,
+      balance: tokenDetail.balance,
+      token: {
+        name: tokenDetail.token.name,
+        symbol: tokenDetail.token.symbol,
+        // we should really get this from teh subgraph--but honestly having
+        // a non-decimal 18 token messes so many other things up on-chain
+        // that likely we'll never support a non-decimal 18 token
+        decimals: 18,
+      },
+    });
+  }
+  if (safe.depot) {
+    let depot: DepotSafe = {
+      type: 'depot',
+      address: safe.depot.id,
+      infoDID: safe.depot.infoDid ? safe.depot.infoDid : undefined,
+      tokens,
+    };
+    return depot;
+  } else if (safe.merchant) {
+    let merchant: MerchantSafe = {
+      type: 'merchant',
+      address: safe.merchant.id,
+      infoDID: safe.merchant.infoDid ? safe.merchant.infoDid : undefined,
+      accumulatedSpendValue: parseInt(safe.merchant.spendBalance),
+      tokens,
+    };
+    return merchant;
+  } else if (safe.prepaidCard) {
+    let prepaidCard: PrepaidCardSafe = {
+      type: 'prepaid-card',
+      address: safe.prepaidCard.id,
+      customizationDID: safe.prepaidCard.customizationDID ? safe.prepaidCard.customizationDID : undefined,
+      issuingToken: safe.prepaidCard.issuingToken.id,
+      spendFaceValue: parseInt(safe.prepaidCard.spendBalance),
+      issuer: safe.prepaidCard.issuer.id,
+      reloadable: safe.prepaidCard.reloadable,
+      tokens,
+    };
+    return prepaidCard;
+  } else {
+    let externalSafe: ExternalSafe = {
+      type: 'external',
+      address: safe.id,
+      tokens,
+    };
+    return externalSafe;
   }
 }
