@@ -14,7 +14,6 @@ import a11yAudit from 'ember-a11y-testing/test-support/audit';
 import { toBN } from 'web3-utils';
 import { capitalize } from '@ember/string';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import { DepotSafe } from '@cardstack/cardpay-sdk';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
