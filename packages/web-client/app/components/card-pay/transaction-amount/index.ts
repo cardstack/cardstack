@@ -41,6 +41,10 @@ class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmou
     }
   }
 
+  get dataEntered(): boolean {
+    return this.isUnlockingOrUnlocked || this.isAmountSet;
+  }
+
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
   get currentTokenSymbol(): TokenSymbol {

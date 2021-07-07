@@ -1,5 +1,5 @@
 <ActionCardContainer
-  class={{cn "transaction-amount" transaction-amount--data-entered=this.isUnlockingOrUnlocked}}
+  class={{cn "transaction-amount" transaction-amount--data-entered=this.dataEntered}}
   @header="Deposit Amount"
   @isComplete={{@isComplete}}
 >
@@ -20,7 +20,7 @@
           @isComplete={{@isComplete}}
         />
       </Boxel::Field>
-      {{#if (or this.isUnlockingOrUnlocked this.isAmountSet)}}
+      {{#if this.dataEntered}}
         <Boxel::Field
           class="transaction-amount__field"
           @label={{concat this.amountLabel ":"}}
