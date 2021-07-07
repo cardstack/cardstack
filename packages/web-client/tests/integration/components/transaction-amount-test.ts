@@ -191,8 +191,6 @@ module('Integration | Component | transaction-amount', function (hooks) {
   });
 
   test('It renders differently for the withdrawal flow', async function (assert) {
-    const session = new WorkflowSession();
-    session.update('depositSourceToken', 'DAI');
     const layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;
 
@@ -203,7 +201,7 @@ module('Integration | Component | transaction-amount', function (hooks) {
     });
 
     this.setProperties({
-      session,
+      session: new WorkflowSession(),
     });
 
     await render(hbs`
