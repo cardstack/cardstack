@@ -19,12 +19,10 @@ import {
   getSDK,
   networkIds,
 } from '@cardstack/cardpay-sdk';
-import { networkDisplayInfo } from './network-display-info';
 import { ConnectionManager } from './layer-1-connection-manager';
 
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy {
-  private chainName: string;
   chainId: number;
   networkSymbol: Layer1NetworkSymbol;
   simpleEmitter = new SimpleEmitter();
@@ -40,7 +38,6 @@ export default abstract class Layer1ChainWeb3Strategy
   @tracked walletInfo: WalletInfo;
 
   constructor(networkSymbol: Layer1NetworkSymbol) {
-    this.chainName = networkDisplayInfo[networkSymbol].fullName;
     this.chainId = networkIds[networkSymbol];
     this.walletInfo = new WalletInfo([], this.chainId);
     this.networkSymbol = networkSymbol;
