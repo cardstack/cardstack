@@ -24,7 +24,7 @@ const SOKOL = {
   rpcNode: 'https://sokol.stack.cards',
   rpcWssNode: 'https://sokol-wss.stack.cards',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
-  transactionServiceURL: 'https://transactions-staging.stack.cards/api',
+  subgraphURL: 'https://api.thegraph.com/subgraphs/name/habdelra/cardpay-sokol',
   tallyServiceURL: 'https://tally-service-staging.stack.cards/api/v1',
 };
 const KOVAN = {
