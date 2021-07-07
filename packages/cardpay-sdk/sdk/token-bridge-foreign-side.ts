@@ -39,6 +39,9 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
           } catch (e) {
             reject(e);
           }
+        })
+        .on('error', (error: Error) => {
+          reject(error);
         });
     });
   }
@@ -65,6 +68,9 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
           } catch (e) {
             reject(e);
           }
+        })
+        .on('error', (error: Error) => {
+          reject(error);
         });
     });
   }
