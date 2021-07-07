@@ -5,7 +5,7 @@ import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { Contract } from 'web3-eth-contract';
 
-import { SimpleEmitter, UnbindEventListener } from '../events';
+import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
 import { BridgeableSymbol, TokenContractInfo } from '../token';
 import WalletInfo from '../wallet-info';
 import { WalletProvider } from '../wallet-providers';
@@ -22,7 +22,7 @@ import {
 import { ConnectionManager } from './layer-1-connection-manager';
 
 export default abstract class Layer1ChainWeb3Strategy
-  implements Layer1Web3Strategy {
+  implements Layer1Web3Strategy, Emitter<'disconnect'> {
   chainId: number;
   networkSymbol: Layer1NetworkSymbol;
   simpleEmitter = new SimpleEmitter();
