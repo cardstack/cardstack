@@ -19,6 +19,7 @@ interface CardPayTransactionAmountComponentArgs
   extends WorkflowCardComponentArgs {
   flow: 'deposit' | 'withdrawal';
 }
+
 class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmountComponentArgs> {
   @tracked amount = '';
   @tracked isUnlocked = false;
