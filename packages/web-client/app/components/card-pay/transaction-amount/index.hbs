@@ -3,7 +3,7 @@
   @header="Deposit Amount"
   @isComplete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Choose an amount to deposit into the reserve pool">
+  <ActionCardContainer::Section @title={{this.title}} @dataTestId="transaction-amount">
     <div class="transaction-amount__input-section">
       <Boxel::Field
         class="transaction-amount__field"

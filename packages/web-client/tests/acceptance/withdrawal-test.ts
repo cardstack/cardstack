@@ -178,6 +178,10 @@ module('Acceptance | withdrawal', function (hooks) {
       .containsText('How much would you like to withdraw from your balance?');
     post = postableSel(2, 3);
 
+    assert
+      .dom(`${post} [data-test-action-card-title="transaction-amount"]`)
+      .includesText('Choose a withdrawal amount');
+
     assert.dom(`${post} [data-test-source-token="DAI.CPXD"]`).exists();
 
     assert

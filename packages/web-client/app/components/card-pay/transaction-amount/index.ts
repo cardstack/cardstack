@@ -33,6 +33,14 @@ class CardPayTransactionAmountComponent extends Component<CardPayTransactionAmou
   @service declare layer2Network: Layer2Network;
   @tracked errorMessage = '';
 
+  get title(): string {
+    if (this.args.flow === 'withdrawal') {
+      return 'Choose a withdrawal amount';
+    } else {
+      return 'Choose an amount to deposit into the reserve pool';
+    }
+  }
+
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
   get currentTokenSymbol(): TokenSymbol {
