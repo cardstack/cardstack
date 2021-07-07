@@ -133,8 +133,8 @@ export default class Safes {
     let response = await fetch(subgraphURL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
+        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
+        Accept: 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
       },
       body: JSON.stringify({
         query: safeQuery,
@@ -153,8 +153,8 @@ export default class Safes {
     let response = await fetch(subgraphURL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
+        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
+        Accept: 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
       },
       body: JSON.stringify({
         query: safesQuery,
