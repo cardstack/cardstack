@@ -104,7 +104,6 @@ export default abstract class Layer1ChainWeb3Strategy
       );
       console.error(e);
       ConnectionManager.removeProviderFromStorage(this.chainId);
-      return;
     }
   }
 
