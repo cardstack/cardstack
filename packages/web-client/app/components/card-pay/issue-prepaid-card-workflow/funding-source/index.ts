@@ -2,22 +2,10 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
-import BN from 'web3-core/node_modules/@types/bn.js';
 import { toBN } from 'web3-utils';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import {
-  TokenDisplayInfo,
-  TokenSymbol,
-} from '@cardstack/web-client/utils/token';
+import { TokenBalance, TokenSymbol } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
-
-interface Token {
-  balance?: BN;
-  icon: string;
-  name: string;
-  description?: string;
-  symbol: TokenSymbol;
-}
 
 class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
   defaultTokenSymbol: TokenSymbol = 'DAI.CPXD';
@@ -26,7 +14,7 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
   @tracked selectedTokenSymbol: TokenSymbol =
     this.args.workflowSession.state.prepaidFundingToken ??
     this.defaultTokenSymbol;
-  @tracked selectedToken: Token;
+  @tracked selectedToken: TokenBalance;
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
@@ -41,12 +29,8 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
 
   get tokens() {
     return this.tokenOptions.map((symbol) => {
-      let tokenInfo = new TokenDisplayInfo(symbol);
       let balance = this.getTokenBalance(symbol);
-      return {
-        ...tokenInfo,
-        balance,
-      };
+      return new TokenBalance(symbol, balance);
     });
   }
 
@@ -66,7 +50,7 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
     );
   }
 
-  @action chooseSource(token: Token) {
+  @action chooseSource(token: TokenBalance) {
     this.selectedToken = token;
   }
 

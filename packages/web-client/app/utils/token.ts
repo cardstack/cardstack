@@ -3,6 +3,7 @@ import { ERC20ABI } from '@cardstack/cardpay-sdk/index.js';
 import { getAddressByNetwork } from '@cardstack/cardpay-sdk';
 import { ChainAddress } from './web3-strategies/types';
 import { NetworkSymbol } from './web3-strategies/types';
+import BN from 'web3-core/node_modules/@types/bn.js';
 
 // symbols
 export type ConvertibleSymbol = 'DAI' | 'CARD';
@@ -128,5 +129,26 @@ export class TokenDisplayInfo implements DisplayInfo {
 
   static iconFor(symbol: TokenSymbol) {
     return _tokenDisplayInfoMap[symbol].icon;
+  }
+}
+
+export class TokenBalance implements DisplayInfo {
+  tokenDisplayInfo: TokenDisplayInfo;
+  balance: BN;
+  constructor(symbol: TokenSymbol, balance: BN) {
+    this.tokenDisplayInfo = new TokenDisplayInfo(symbol);
+    this.balance = balance;
+  }
+  get name() {
+    return this.tokenDisplayInfo.name;
+  }
+  get symbol() {
+    return this.tokenDisplayInfo.symbol;
+  }
+  get description() {
+    return this.tokenDisplayInfo.description;
+  }
+  get icon() {
+    return this.tokenDisplayInfo.icon;
   }
 }
