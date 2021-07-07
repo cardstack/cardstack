@@ -211,8 +211,8 @@ export default class PrepaidCard {
     prepaidCardAddress: string,
     faceValues: number[],
     customizationDID: string | undefined,
-    onPrepaidCardsCreated?: (prepaidCardAddresses: string[]) => unknown,
-    onGasLoaded?: () => unknown,
+    onPrepaidCardsCreated?: (prepaidCardAddresses: string[], txnHash: string) => unknown,
+    onGasLoaded?: (txnHashes: string[]) => unknown,
     options?: ContractOptions
   ): Promise<{ prepaidCardAddresses: string[]; gnosisTxn: GnosisExecTx } | undefined> {
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
@@ -299,13 +299,20 @@ export default class PrepaidCard {
         let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisTxn.ethereumTx.txHash);
 
         if (typeof onPrepaidCardsCreated === 'function') {
-          await onPrepaidCardsCreated(prepaidCardAddresses);
+          await onPrepaidCardsCreated(prepaidCardAddresses, gnosisTxn.ethereumTx.txHash);
         }
 
-        await Promise.all(prepaidCardAddresses.map((address) => this.loadGasIntoPrepaidCard(address)));
-        if (typeof onGasLoaded === 'function') {
-          await onGasLoaded();
-        }
+        let txnHashes = new Set<string>();
+        await Promise.all(
+          prepaidCardAddresses.map((address) =>
+            this.loadGasIntoPrepaidCard(address, (txnHash) => {
+              txnHashes.add(txnHash);
+              if (txnHashes.size === prepaidCardAddresses.length && typeof onGasLoaded === 'function') {
+                onGasLoaded([...txnHashes]);
+              }
+            })
+          )
+        );
         return {
           prepaidCardAddresses,
           gnosisTxn,
@@ -327,8 +334,8 @@ export default class PrepaidCard {
     tokenAddress: string,
     faceValues: number[],
     customizationDID: string | undefined,
-    onPrepaidCardsCreated?: (prepaidCardAddresses: string[]) => unknown,
-    onGasLoaded?: () => unknown,
+    onPrepaidCardsCreated?: (prepaidCardAddresses: string[], txnHash: string) => unknown,
+    onGasLoaded?: (txnHashes: string[]) => unknown,
     options?: ContractOptions
   ): Promise<{ prepaidCardAddresses: string[]; gnosisTxn: GnosisExecTx }> {
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
@@ -401,13 +408,20 @@ export default class PrepaidCard {
     let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisTxn.ethereumTx.txHash);
 
     if (typeof onPrepaidCardsCreated === 'function') {
-      await onPrepaidCardsCreated(prepaidCardAddresses);
+      await onPrepaidCardsCreated(prepaidCardAddresses, gnosisTxn.ethereumTx.txHash);
     }
 
-    await Promise.all(prepaidCardAddresses.map((address) => this.loadGasIntoPrepaidCard(address)));
-    if (typeof onGasLoaded === 'function') {
-      await onGasLoaded();
-    }
+    let txnHashes = new Set<string>();
+    await Promise.all(
+      prepaidCardAddresses.map((address) =>
+        this.loadGasIntoPrepaidCard(address, (txnHash) => {
+          txnHashes.add(txnHash);
+          if (txnHashes.size === prepaidCardAddresses.length && typeof onGasLoaded === 'function') {
+            onGasLoaded([...txnHashes]);
+          }
+        })
+      )
+    );
     return {
       prepaidCardAddresses,
       gnosisTxn,
@@ -431,7 +445,10 @@ export default class PrepaidCard {
     return weiAmount;
   }
 
-  private async loadGasIntoPrepaidCard(prepaidCardAddress: string) {
+  private async loadGasIntoPrepaidCard(
+    prepaidCardAddress: string,
+    onTxnHash?: (txnHash: string) => void
+  ): Promise<void> {
     let relayServiceURL = await getConstant('relayServiceURL', this.layer2Web3);
     let url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/load-gas/`;
     let options = {
@@ -446,6 +463,9 @@ export default class PrepaidCard {
     }
     let { txnHash } = await response.json();
     if (txnHash) {
+      if (typeof onTxnHash == 'function') {
+        onTxnHash(txnHash);
+      }
       await waitUntilTransactionMined(this.layer2Web3, txnHash);
     }
   }
