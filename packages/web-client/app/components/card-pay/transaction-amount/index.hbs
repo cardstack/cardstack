@@ -63,12 +63,12 @@
           </div>
         </div>
         </Boxel::Field>
-        <Boxel::Field @label={{concat "Approximate value" (if (eq @flow "withdrawal") "*")}} data-test-approximate-value-label>
+        <Boxel::Field @label={{concat "Approximate value" (if this.isWithdrawal "*")}} data-test-approximate-value-label>
           ${{token-to-usd this.tokenSymbolForConversion this.amountAsBigNumber}} USD
         </Boxel::Field>
       {{/if}}
     </div>
-    {{#if (eq @flow "withdrawal")}}
+    {{#if this.isWithdrawal}}
       <div class="transaction-amount__footnote" data-test-approximate-value-footnote>
         * The actual value depends on the current exchange rate and is determined at the time of authorization.
       </div>
@@ -79,7 +79,28 @@
       </div>
     {{/if}}
   </ActionCardContainer::Section>
-  {{#if (eq @flow "deposit")}}
+  {{#if this.isWithdrawal}}
+    <Boxel::ActionChin
+      @state={{this.setAmountCtaState}} @disabled={{this.setAmountCtaDisabled}}
+      data-test-transaction-amount
+    >
+      <:default as |d|>
+        <d.ActionButton {{on "click" this.toggleAmountSet}}>
+          Set Amount
+        </d.ActionButton>
+      </:default>
+      <:disabled as |d|>
+        <d.ActionButton>
+          Set Amount
+        </d.ActionButton>
+      </:disabled>
+      <:memorialized as |m|>
+        <m.ActionButton {{on "click" this.toggleAmountSet}}>
+          Edit
+        </m.ActionButton>
+      </:memorialized>
+    </Boxel::ActionChin>
+  {{else}}
     <Boxel::ActionChin @stepNumber={{1}} @state={{this.unlockCtaState}} @disabled={{or @frozen this.unlockCtaDisabled}}>
       <:default as |a|>
         <a.ActionButton data-test-unlock-button {{on "click" this.unlock}}>
@@ -131,27 +152,6 @@
           </Boxel::Button>
         </m.InfoArea>
         {{/if}}
-      </:memorialized>
-    </Boxel::ActionChin>
-  {{else}}
-    <Boxel::ActionChin
-      @state={{this.setAmountCtaState}} @disabled={{this.setAmountCtaDisabled}}
-      data-test-transaction-amount
-    >
-      <:default as |d|>
-        <d.ActionButton {{on "click" this.toggleAmountSet}}>
-          Set Amount
-        </d.ActionButton>
-      </:default>
-      <:disabled as |d|>
-        <d.ActionButton>
-          Set Amount
-        </d.ActionButton>
-      </:disabled>
-      <:memorialized as |m|>
-        <m.ActionButton {{on "click" this.toggleAmountSet}}>
-          Edit
-        </m.ActionButton>
       </:memorialized>
     </Boxel::ActionChin>
   {{/if}}
