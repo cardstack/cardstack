@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
-import { Contract, ContractOptions, EventData } from 'web3-eth-contract';
+import { ContractOptions, EventData } from 'web3-eth-contract';
 import HomeBridgeABI from '../contracts/abi/home-bridge-mediator';
 import ERC677ABI from '../contracts/abi/erc-677';
 import HomeAMBABI from '../contracts/abi/home-amb';
