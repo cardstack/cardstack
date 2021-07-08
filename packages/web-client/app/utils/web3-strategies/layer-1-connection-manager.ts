@@ -20,11 +20,7 @@ interface ConnectionManagerOptions {
   networkSymbol: NetworkSymbol;
 }
 
-type ConnectionManagerEvents =
-  | 'connected'
-  | 'disconnected'
-  | 'incorrect-chain'
-  | 'error';
+type ConnectionManagerEvents = 'connected' | 'disconnected' | 'incorrect-chain';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   DISCONNECTED: 'DISCONNECTED',
