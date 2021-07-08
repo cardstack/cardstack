@@ -97,26 +97,21 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     const POLL_INTERVAL = 5 * 1000;
     const TIMEOUT = 1000 * 60 * 5;
     let signatureEvents: EventData[] | undefined;
-    let homeAmb: Contract | undefined;
+    let homeAmb = new this.layer2Web3.eth.Contract(
+      HomeAMBABI as AbiItem[],
+      await getAddress('homeAMB', this.layer2Web3)
+    );
     {
       let start = Date.now();
       do {
-        homeAmb = new this.layer2Web3.eth.Contract(
-          HomeAMBABI as AbiItem[],
-          await getAddress('homeAMB', this.layer2Web3)
-        );
         if (signatureEvents) {
           await new Promise<void>((res) => setTimeout(() => res(), POLL_INTERVAL));
         }
-        signatureEvents = (
-          await homeAmb.getPastEvents('UserRequestForSignature', {
-            fromBlock,
-          })
-        ).filter((e) => e.transactionHash === bridgingTxnHash);
-      } while (signatureEvents.length === 0 || Date.now() < start + TIMEOUT);
-    }
-    if (!homeAmb) {
-      throw new Error(`should be impossible to get here--no Home AMB contract has been instantiated`);
+        signatureEvents = await homeAmb.getPastEvents('UserRequestForSignature', {
+          fromBlock,
+        });
+        signatureEvents = signatureEvents.filter((e) => e.transactionHash === bridgingTxnHash);
+      } while (signatureEvents.length === 0 && Date.now() < start + TIMEOUT);
     }
 
     if (signatureEvents.length === 0) {
@@ -150,7 +145,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
             signatureCount++;
           }
         }
-      } while (signatureCount < requiredSignatures || Date.now() < start + TIMEOUT);
+      } while (signatureCount < requiredSignatures && Date.now() < start + TIMEOUT);
     }
 
     if (signatureCount < requiredSignatures) {
@@ -159,7 +154,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
       );
     }
     const signatures = await Promise.all(
-      Array.from(Array(requiredSignatures).keys()).map((i) => homeAmb!.methods.signature(messageHash, i).call())
+      Array.from(Array(requiredSignatures).keys()).map((i) => homeAmb.methods.signature(messageHash, i).call())
     );
 
     return { messageId, encodedData, signatures };
