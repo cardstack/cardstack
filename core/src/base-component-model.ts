@@ -73,7 +73,7 @@ export default class CardModel {
         continue;
       }
       for (const path of paths) {
-        deserializeAttribute(attributes, path, serializer, action);
+        serializeAttribute(attributes, path, serializer, action);
       }
     }
 
@@ -118,7 +118,7 @@ export default class CardModel {
   }
 }
 
-function deserializeAttribute(
+function serializeAttribute(
   attrs: { [name: string]: any },
   path: string,
   serializer: PrimitiveSerializer,
@@ -134,10 +134,10 @@ function deserializeAttribute(
     let tailPath = tail.join('.');
     if (Array.isArray(value)) {
       for (let row of value) {
-        deserializeAttribute(row, tailPath, serializer, action);
+        serializeAttribute(row, tailPath, serializer, action);
       }
     } else {
-      deserializeAttribute(attrs[key], tailPath, serializer, action);
+      serializeAttribute(attrs[key], tailPath, serializer, action);
     }
   } else {
     attrs[path] = serializer[action](value);

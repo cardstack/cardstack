@@ -6,7 +6,6 @@ import type Cards from 'cardhost/services/cards';
 import setupCardMocking from '../helpers/card-mocking';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { encodeCardURL } from '@cardstack/core/src/utils';
 
 module('Integration | card-service', function (hooks) {
   setupRenderingTest(hooks);
@@ -67,14 +66,18 @@ module('Integration | card-service', function (hooks) {
 
     test(`load an card's isolated view and model`, async function (assert) {
       let { model } = (await cards.load(cardID, 'isolated')) as any;
-      assert.equal(model.id, encodeCardURL(cardID), '@model id is correct');
-      assert.equal(model.title, 'A blog post title', 'post title is correct');
+      assert.equal(model.url, cardID, '@model id is correct');
+      assert.equal(
+        model.data.title,
+        'A blog post title',
+        'post title is correct'
+      );
       assert.ok(
-        model.createdAt instanceof Date,
+        model.data.createdAt instanceof Date,
         'CreatedAt is an instance of Date'
       );
       assert.equal(
-        model.createdAt.getTime(),
+        model.data.createdAt.getTime(),
         1621265481000,
         'post created at is correct'
       );
@@ -84,8 +87,10 @@ module('Integration | card-service', function (hooks) {
       let { component } = await cards.load(cardID, 'edit');
       this.set('component', component);
       await render(hbs`<this.component />`);
-      assert.dom('input[type="text"]').hasValue('A blog post title');
-      assert.dom('input[type="datetime-local"]').hasValue('2021-05-17T11:31');
+      assert
+        .dom('[data-test-field-name="title"]')
+        .hasValue('A blog post title');
+      assert.dom('[data-test-field-name="createdAt"]').hasValue('2021-05-17');
     });
 
     test('Serialization works on nested cards', async function (assert) {
@@ -127,11 +132,11 @@ module('Integration | card-service', function (hooks) {
       assert.dom('h2').containsText('May 17, 2021');
 
       assert.ok(
-        model.posts[0].createdAt instanceof Date,
+        model.data.posts[0].createdAt instanceof Date,
         'CreatedAt is an instance of Date'
       );
       assert.equal(
-        model.posts[0].createdAt.getTime(),
+        model.data.posts[0].createdAt.getTime(),
         1621265481000,
         'post created at is correct'
       );

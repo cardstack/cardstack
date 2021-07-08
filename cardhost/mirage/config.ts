@@ -120,7 +120,7 @@ class MirageCache implements Cache<RawCard> {
   }
 }
 
-class FakeCardServer {
+export class FakeCardServer {
   static cardServers = new WeakMap<object, FakeCardServer>();
 
   routingCard?: string;
@@ -141,6 +141,10 @@ class FakeCardServer {
     }
 
     return server;
+  }
+
+  cleanup(): void {
+    this.builder.cleanup();
   }
 
   @Memoize()

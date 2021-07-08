@@ -9,6 +9,12 @@ import { encodeCardURL } from '@cardstack/core/src/utils';
 
 import dynamicCardTransform from './dynamic-card-transform';
 
+// This is neccessary to get the base model available to ember
+import * as CardModel from '@cardstack/core/src/base-component-model';
+(window as any).define('@cardstack/core/src/base-component-model', function () {
+  return CardModel;
+});
+
 export interface Cache<CardType> {
   get(url: string): CardType | undefined;
   set(url: string, payload: CardType): void;
@@ -44,6 +50,7 @@ export default class Builder implements BuilderInterface {
 
   private compiledCardCache: Cache<CompiledCard>;
   private rawCardCache: Cache<RawCard>;
+  private seenModuleCache: Set<string> = new Set();
 
   constructor(params?: {
     compiledCardCache?: Cache<CompiledCard>;
@@ -61,7 +68,7 @@ export default class Builder implements BuilderInterface {
     source: string
   ): Promise<string> {
     let url = new URL(localModule, cardURL.replace(/\/$/, '') + '/').href;
-
+    this.seenModuleCache.add(url);
     switch (type) {
       case JS_TYPE:
         eval(dynamicCardTransform(url, source));
@@ -78,6 +85,13 @@ export default class Builder implements BuilderInterface {
         return url;
       default:
         return url;
+    }
+  }
+
+  cleanup(): void {
+    for (const url of this.seenModuleCache) {
+      // Clear the require registry because it's a noop if we require the same modules in another test
+      delete (window.require as any).entries[url];
     }
   }
 

@@ -2,9 +2,12 @@ import Service from '@ember/service';
 import { macroCondition, isTesting } from '@embroider/macros';
 import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
-import { setComponentTemplate } from '@ember/component';
 import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
+
+// TODO: @ember/component doesn't declare setCOmponentTemplate...yet!
+// @ts-ignore
+import { setComponentTemplate } from '@ember/component';
 
 import { Format, cardJSONReponse } from '@cardstack/core/src/interfaces';
 import type CardModel from '@cardstack/core/src/base-component-model';

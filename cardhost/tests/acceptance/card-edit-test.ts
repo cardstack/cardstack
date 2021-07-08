@@ -74,16 +74,6 @@ module('Acceptance | Card Editing', function (hooks) {
 
     await waitFor('[data-test-field-name="name"]');
     await fillIn('[data-test-field-name="name"]', 'Bob Barker');
-
-    // this.onRequest(
-    //   'patch',
-    //   `/cards/${encodeURIComponent(personURL)}`,
-    //   ({ payload }) => {
-    //     debugger;
-    //     // TODO: Assert the right payload shape
-    //   }
-    // );
-
     await click(SAVE);
     await waitFor(MODAL, { count: 0 });
     assert.dom(MODAL).doesNotExist('The modal is closed');

@@ -9,6 +9,7 @@ import {
   encodeCardURL,
   getBasenameAndExtension,
 } from '@cardstack/core/src/utils';
+import { FakeCardServer } from './../../mirage/config';
 
 declare module 'ember-test-helpers' {
   interface TestContext {
@@ -69,7 +70,12 @@ export default function setupCardMocking(
     BASE_CARDS.forEach((card) => this.createCard(card));
   });
 
-  hooks.afterEach(function () {});
+  hooks.afterEach(function () {
+    if (this.routingCard) {
+      FakeCardServer.current().cleanup();
+      this.routingCard = undefined;
+    }
+  });
 }
 
 function createCard(this: TestContext, card: RawCard): unknown {
