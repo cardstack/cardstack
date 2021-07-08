@@ -245,6 +245,9 @@ class WalletConnectConnectionManager extends ConnectionManager {
   async setup(web3: Web3) {
     let { chainId } = this;
     // in case we've disconnected, we should clear wallet connect's local storage data as well
+    // As per https://github.com/WalletConnect/walletconnect-monorepo/issues/258 there is no way
+    // for us to tell if this is valid before we connect, but we don't want to connect to something
+    // if we have disconnected from it in the first place (since we cleared our local storage identification of provider)
     if (ConnectionManager.getProviderIdForChain(chainId) !== this.providerId) {
       clearWalletConnectStorage(chainId);
     }
@@ -280,7 +283,6 @@ class WalletConnectConnectionManager extends ConnectionManager {
     // does not work.
     provider.on('disconnect', (code: number, reason: string) => {
       console.log('disconnect from wallet connect', code, reason);
-      // without checking this, the event will fire twice.
       this.onDisconnect(false);
     });
 
