@@ -123,7 +123,7 @@ export abstract class ConnectionManager
       this.broadcastChannel.postMessage(
         BROADCAST_CHANNEL_MESSAGES.DISCONNECTED
       );
-    // disconnect will destroy this object so it has to be last
+    // the layer1-chain will destroy the instance of ConnectionManager so we emit as the last item
     this.emit('disconnected');
   }
 
@@ -133,7 +133,6 @@ export abstract class ConnectionManager
     this.emit('connected', accounts);
   }
 
-  // maybe should be onError
   onIncorrectChain() {
     ConnectionManager.removeProviderFromStorage(this.chainId);
     this.emit('incorrect-chain');
@@ -172,7 +171,6 @@ class MetaMaskConnectionManager extends ConnectionManager {
 
     // remove all listeners that previous instances of metamask connections have added
     // otherwise disconnecting and reconnecting might cause "duplicate" event listeners
-    // it doesn't seem like it should be a problem, but unsure
     provider.removeAllListeners();
 
     provider.on('accountsChanged', (accounts: string[]) => {
