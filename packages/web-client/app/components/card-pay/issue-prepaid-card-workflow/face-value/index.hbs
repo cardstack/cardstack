@@ -13,7 +13,7 @@
         </span>
       </p>
       <CardPay::LabeledValue @vertical={{true}} @label="Funding From:">
-        <CardPay::IssuePrepaidCardWorkflow::FaceValue::BalanceView
+        <CardPay::Layer2BalanceView
           @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
           @depotAddress={{this.layer2Network.depotSafe.address}}
           @token={{this.fundingToken}}

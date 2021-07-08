@@ -10,7 +10,7 @@
         @label="Funding From"
         @labelClass="withdrawal-transaction-amount__banner-field-label"
       >
-        <CardPay::IssuePrepaidCardWorkflow::FaceValue::BalanceView
+        <CardPay::Layer2BalanceView
           @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
           @depotAddress={{this.layer2Network.depotSafe.address}}
           @token={{this.currentTokenDetails}}

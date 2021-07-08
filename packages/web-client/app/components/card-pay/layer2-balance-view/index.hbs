@@ -1,0 +1,41 @@
+<details class="layer2-balance-view-banner" ...attributes>
+  <summary class="layer2-balance-view-banner__summary">
+    <div class="layer2-balance-view-banner__summary-content" data-test-balance-view-summary>
+      <div>
+        <span class="layer2-balance-view-banner__summary-name">Account </span>
+        <span class="layer2-balance-view-banner__summary-address">({{truncate-middle @walletAddress}})</span>
+      </div>
+      <div class="layer2-balance-view-banner__summary-depot-balance">DEPOT: {{@balance}} {{@token.symbol}}</div>
+    </div>
+    <div class="layer2-balance-view-banner__marker">
+      {{svg-jar "caret-right" class="layer2-balance-view-banner__marker-icon" role="presentation"}}
+    </div>
+  </summary>
+  <CardPay::NestedItems class="layer2-balance-view-banner__details">
+    <:outer>
+      <CardPay::AccountDisplay
+        @size="small"
+        @name="Account:"
+        @address={{@walletAddress}}
+        data-test-balance-view-account-address
+      />
+    </:outer>
+    <:inner>
+      <CardPay::AccountDisplay
+        @size="small"
+        @icon="depot"
+        @name="DEPOT:"
+        @address={{@depotAddress}}
+        data-test-balance-view-depot-address
+      />
+      <CardPay::BalanceDisplay
+        class="layer2-balance-view-banner__details-token"
+        @size="large"
+        @icon={{@token.icon}}
+        @balance={{@balance}}
+        @symbol={{@token.symbol}}
+        data-test-balance-view-token-amount
+      />
+    </:inner>
+  </CardPay::NestedItems>
+</details>
