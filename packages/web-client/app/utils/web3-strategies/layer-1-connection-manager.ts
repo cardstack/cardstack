@@ -45,7 +45,6 @@ const BROADCAST_CHANNEL_MESSAGES = {
  */
 export abstract class ConnectionManager
   implements Emitter<ConnectionManagerEvents> {
-  web3: Web3 | undefined;
   networkSymbol: NetworkSymbol;
   chainId: number;
   simpleEmitter: SimpleEmitter;
@@ -139,11 +138,8 @@ export abstract class ConnectionManager
   abstract disconnect(): Promise<void>;
 
   // create provider and setup event listeners here
-  abstract setup(): Promise<any>;
-
-  setWeb3Provider(web3: Web3) {
-    web3.setProvider(this.provider);
-  }
+  // also call web3.setProvider
+  abstract setup(web3: Web3): Promise<any>;
 
   destroy() {
     this.broadcastChannel.close();
@@ -153,7 +149,7 @@ export abstract class ConnectionManager
 class MetaMaskConnectionManager extends ConnectionManager {
   providerId = 'metamask' as WalletProviderId;
 
-  async setup() {
+  async setup(web3: Web3) {
     let provider: any | undefined = await detectEthereumProvider();
 
     if (!provider) {
@@ -201,6 +197,7 @@ class MetaMaskConnectionManager extends ConnectionManager {
     });
 
     this.provider = provider;
+    web3?.setProvider(provider);
   }
 
   async connect() {
@@ -249,7 +246,7 @@ class MetaMaskConnectionManager extends ConnectionManager {
 class WalletConnectConnectionManager extends ConnectionManager {
   providerId = 'wallet-connect' as WalletProviderId;
 
-  async setup() {
+  async setup(web3: Web3) {
     let { chainId } = this;
     // in case we've disconnected, we should clear wallet connect's local storage data as well
     if (ConnectionManager.getProviderIdForChain(chainId) !== this.providerId) {
@@ -291,11 +288,12 @@ class WalletConnectConnectionManager extends ConnectionManager {
     provider.on('disconnect', (code: number, reason: string) => {
       console.log('disconnect from wallet connect', code, reason);
       // without checking this, the event will fire twice.
-      this.onDisconnect();
+      this.onDisconnect(false);
     });
 
     this.provider = provider;
-
+    // ts is not happy with WalletConnectProvider
+    web3.setProvider(provider as any);
     return;
   }
 
@@ -304,8 +302,7 @@ class WalletConnectConnectionManager extends ConnectionManager {
   }
 
   async disconnect() {
-    await this.provider.disconnect();
-    return;
+    return await this.provider.disconnect();
   }
 
   async reconnect() {

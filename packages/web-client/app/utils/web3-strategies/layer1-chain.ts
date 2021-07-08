@@ -67,9 +67,7 @@ export default abstract class Layer1ChainWeb3Strategy
       connectionManager.on('disconnected', this.onDisconnect.bind(this));
       connectionManager.on('incorrect-chain', this.disconnect.bind(this));
 
-      await connectionManager.setup();
-
-      connectionManager.setWeb3Provider(web3);
+      await connectionManager.setup(web3);
 
       if (connectionManager) {
         this.web3 = web3;
@@ -95,8 +93,9 @@ export default abstract class Layer1ChainWeb3Strategy
       connectionManager.on('connected', this.onConnect.bind(this));
       connectionManager.on('disconnected', this.onDisconnect.bind(this));
       connectionManager.on('incorrect-chain', this.disconnect.bind(this));
-      await connectionManager.setup();
-      connectionManager.setWeb3Provider(web3);
+
+      await connectionManager.setup(web3);
+
       this.web3 = web3;
       this.connectionManager = connectionManager;
       await connectionManager.connect();
