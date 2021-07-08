@@ -138,7 +138,7 @@ export default abstract class Layer2ChainWeb3Strategy
 
   private getTokenContractInfo(
     symbol: ConvertibleSymbol,
-    network: NetworkSymbol
+    network: Layer2NetworkSymbol
   ): TokenContractInfo {
     return new TokenContractInfo(symbol, network);
   }
