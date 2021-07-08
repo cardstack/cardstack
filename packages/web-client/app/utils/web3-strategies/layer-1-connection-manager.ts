@@ -43,8 +43,8 @@ export abstract class ConnectionManager
   implements Emitter<ConnectionManagerEvents> {
   networkSymbol: NetworkSymbol;
   chainId: number;
-  simpleEmitter: SimpleEmitter;
-  broadcastChannel: BroadcastChannel;
+  protected simpleEmitter: SimpleEmitter;
+  protected broadcastChannel: BroadcastChannel;
   protected provider: any;
   protected connected = false;
   abstract providerId: WalletProviderId;
