@@ -12,10 +12,12 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`TokenBridgeForeignSide`](#tokenbridgeforeignside)
   - [`TokenBridgeForeignSide.unlockTokens`](#tokenbridgeforeignsideunlocktokens)
   - [`TokenBridgeForeignSide.relayTokens`](#tokenbridgeforeignsiderelaytokens)
+  - [`TokenBridgeForeignSide.claimBridgedTokens`](#tokenbridgeforeignsideclaimbridgedtokens)
   - [`TokenBridgeForeignSide.getSupportedTokens` (TBD)](#tokenbridgeforeignsidegetsupportedtokens-tbd)
 - [`TokenBridgeHomeSide`](#tokenbridgehomeside)
   - [`TokenBridgeHomeSide.relayTokens`](#tokenbridgehomesiderelaytokens)
-  - [`TokenBridgeHomeSide.waitForBridgingCompleted`](#tokenbridgehomesidewaitforbridgingcompleted)
+  - [`TokenBridgeHomeSide.waitForBridgingValidation`](#tokenbridgehomesidewaitforbridgingvalidation)
+  - [`TokenBridgeHomeSide.waitForBridgingToLayer2Completed`](#tokenbridgehomesidewaitforbridgingtolayer2completed)
 - [`Safes`](#safes)
   - [`Safe.viewSafe`](#safeviewsafe)
   - [`Safes.view`](#safesview)
@@ -137,6 +139,20 @@ let txnReceipt = await tokenBridge.relayTokens(
 );
 ```
 
+### `TokenBridgeForeignSide.claimBridgedTokens`
+This call will allow the recipient of tokens bridge from layer 2 to layer 1 to be able to claim their bridge tokens in layer 1.
+
+This method is invoked with the following parameters (which are output from `TokenBridgeHomeSide.waitForBridgingValidation`):
+- The `messageId` of the bridging request
+- The `encodedData` of the bridging request
+- The `signatures` of the bridge validators
+
+```js
+let txnReceipt = await tokenBridge.claimBridgedTokens(messageId, encodedData, signatures);
+```
+
+This method returns a promise for a web3 transaction receipt.
+
 ### `TokenBridgeForeignSide.getSupportedTokens` (TBD)
 
 ## `TokenBridgeHomeSide`
@@ -167,7 +183,33 @@ let result = await tokenBridge.relayTokens(
 
 The result is a promise for a `GnosisExecTx` object which is documented in the following API calls.
 
-### `TokenBridgeHomeSide.waitForBridgingCompleted`
+### `TokenBridgeHomeSide.waitForBridgingValidation`
+This call waits for the token bridge validators to perform their necessary signatures on the token bridge request from layer 2 to layer 1. After the bridge validators have signed the bridging request, this call will return a `messageId`, `encodedData`, and `signatures` for the bridging request. These items can then be used to claim the bridged tokens in layer 1.
+
+This method is invoked with:
+- The block height of layer 2 before the relayTokens call was initiated on the home side of the bridge. Get it with `await layer2Web3.eth.getBlockNumber()`
+- The layer 2 transaction hash for the bridging transaction (the result of `TokenBridgeHomeSide.relayTokens`).
+
+```js
+let {
+  messageId,
+  encodedData,
+  signatures
+} = await tokenBridge.waitForBridgingValidation(fromBlock, txnHash);
+```
+
+ This call returns a promise in the shape of:
+```ts
+Promise<{
+  messageId: string,
+  encodedData: string,
+  signatures: string[]
+}>
+```
+
+
+
+### `TokenBridgeHomeSide.waitForBridgingToLayer2Completed`
 This call will listen for a `TokensBridgedToSafe` event emitted by the TokenBridge home contract that has a recipient matching the specified address. The starting layer 2 block height should be captured before the call to relayTokens is made to begin bridging. It is used to focus the search and avoid matching on a previous bridging for this user.
 
 This method is invoked with the following parameters:
@@ -178,7 +220,7 @@ This method returns a promise that includes a web3 transaction receipt for the l
 
 
 ```js
-let txnReceipt = await tokenBridge.waitForBridgingCompleted(
+let txnReceipt = await tokenBridge.waitForBridgingToLayer2Completed(
   recipientAddress
   startingBlockHeight,
 );
