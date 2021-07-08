@@ -30,6 +30,19 @@ const BROADCAST_CHANNEL_MESSAGES = {
   DISCONNECTED: 'DISCONNECTED',
 } as const;
 
+/**
+ * # ConnectionManager
+ * This class instantiates a web3 provider given a WalletProviderId. It then handles the EIP-1193
+ * events that come from the web3 provider and filters them for events that we want to handle
+ * in the Dapp:
+ *
+ * - connected: A wallet is connected, or the address is changed
+ * - disconnected: A wallet is disconnected
+ * - incorrect-chain: A wallet is connected to the wrong chain
+ *
+ * It handles cross-tab communication and persistence of connection information across refreshes.
+ * This class does not, at the moment, store any state used directly by the UI besides providerId.
+ */
 export abstract class ConnectionManager
   implements Emitter<ConnectionManagerEvents> {
   web3: Web3 | undefined;
