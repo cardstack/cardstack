@@ -183,7 +183,9 @@ module('Acceptance | withdrawal', function (hooks) {
       )
       .containsText('Choose a withdrawal amount');
 
-    assert.dom(`${post} [data-test-source-token="DAI.CPXD"]`).exists();
+    assert
+      .dom(`${post} [data-test-balance-display-amount]`)
+      .containsText('250.00 DAI.CPXD');
 
     assert
       .dom(

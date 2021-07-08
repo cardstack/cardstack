@@ -10,14 +10,11 @@
         @label="Funding From"
         @labelClass="withdrawal-transaction-amount__banner-field-label"
       >
-        <CardPay::DepositWorkflow::TransactionAmount::BalanceView
-          @wallet={{network-display-info "layer2" "fullName"}}
-          @tokenSymbol={{this.currentTokenSymbol}}
-          @tokenIcon={{this.currentTokenDetails.icon}}
-          @address={{this.layer2Network.walletInfo.firstAddress}}
+        <CardPay::IssuePrepaidCardWorkflow::FaceValue::BalanceView
+          @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
+          @depotAddress={{this.layer2Network.depotSafe.address}}
+          @token={{this.currentTokenDetails}}
           @balance={{format-token-amount this.currentTokenBalance}}
-          @balanceInUsd={{token-to-usd this.tokenSymbolForConversion this.currentTokenBalance}}
-          @isComplete={{@isComplete}}
         />
       </Boxel::Field>
       {{#if this.isAmountSet}}
