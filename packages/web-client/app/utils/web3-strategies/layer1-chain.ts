@@ -75,7 +75,11 @@ export default abstract class Layer1ChainWeb3Strategy
         await connectionManager.reconnect(); // use the reconnect method because of edge cases
       }
     } catch (e) {
-      this.disconnect();
+      this.clearWalletInfo();
+      this.connectionManager?.destroy();
+      this.connectionManager = undefined;
+      this.web3 = undefined;
+      this.currentProviderId = '';
       ConnectionManager.removeProviderFromStorage(this.chainId);
     }
   }
@@ -104,6 +108,11 @@ export default abstract class Layer1ChainWeb3Strategy
         `Failed to create connection manager: ${walletProvider.id}`
       );
       console.error(e);
+      this.clearWalletInfo();
+      this.connectionManager?.destroy();
+      this.connectionManager = undefined;
+      this.web3 = undefined;
+      this.currentProviderId = '';
       ConnectionManager.removeProviderFromStorage(this.chainId);
     }
   }
