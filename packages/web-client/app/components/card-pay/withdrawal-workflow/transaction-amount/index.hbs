@@ -1,24 +1,94 @@
 <ActionCardContainer
+  class={{cn "withdrawal-transaction-amount" withdrawal-transaction-amount--data-entered=this.isAmountSet}}
   @header="Withdrawal"
   @isComplete={{@isComplete}}
-  data-test-withdrawal-transaction-amount-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section>
+  <ActionCardContainer::Section @title="Choose a withdrawal amount" @dataTestId="withdrawal-transaction-amount">
+    <div class="withdrawal-transaction-amount__input-section">
+      <Boxel::Field
+        class="withdrawal-transaction-amount__field"
+        @label="Funding From"
+        @labelClass="withdrawal-transaction-amount__banner-field-label"
+      >
+        <CardPay::DepositWorkflow::TransactionAmount::BalanceView
+          @wallet={{network-display-info "layer2" "fullName"}}
+          @tokenSymbol={{this.currentTokenSymbol}}
+          @tokenIcon={{this.currentTokenDetails.icon}}
+          @address={{this.layer2Network.walletInfo.firstAddress}}
+          @balance={{format-token-amount this.currentTokenBalance}}
+          @balanceInUsd={{token-to-usd this.tokenSymbolForConversion this.currentTokenBalance}}
+          @isComplete={{@isComplete}}
+        />
+      </Boxel::Field>
+      {{#if this.isAmountSet}}
+        <Boxel::Field
+          class="withdrawal-transaction-amount__field"
+          @label="Amount to withdraw"
+          data-test-amount-label
+        >
+          <CardPay::BalanceDisplay
+            class="withdrawal-transaction-amount__token"
+            @size="large"
+            @icon={{this.currentTokenDetails.icon}}
+            @balance={{format-token-amount this.amountAsBigNumber}}
+            @symbol={{this.currentTokenSymbol}}
+            @usdBalance={{token-to-usd this.tokenSymbolForConversion this.amountAsBigNumber}}
+            data-test-amount-entered
+          />
+        </Boxel::Field>
+      {{else}}
+        <Boxel::Field
+          @label="Amount to withdraw"
+          @fieldMode="edit"
+          class="withdrawal-transaction-amount__field"
+          @labelClass="withdrawal-transaction-amount__input-field-label"
+          data-test-amount-label
+        >
+        <div class="withdrawal-transaction-amount__input-container withdrawal-transaction-amount__input-token-balance">
+          {{svg-jar this.currentTokenDetails.icon class="withdrawal-transaction-amount__currency-icon" role="presentation"}}
+          <Boxel::Input
+            class="withdrawal-transaction-amount__input"
+            @id="withdrawal-amount-input"
+            @value={{this.amount}}
+            @required={{true}}
+            @onInput={{this.onInputAmount}}
+            placeholder="0.00"
+            autocomplete="off"
+            inputmode="decimal"
+            data-test-amount-input
+          />
+          <div class="withdrawal-transaction-amount__currency-text">
+            {{this.currentTokenSymbol}}
+          </div>
+        </div>
+        </Boxel::Field>
+        <Boxel::Field @label="Approximate value*" data-test-approximate-value-label>
+          ${{token-to-usd this.tokenSymbolForConversion this.amountAsBigNumber}} USD
+        </Boxel::Field>
+      {{/if}}
+    </div>
+    <div class="withdrawal-transaction-amount__footnote" data-test-approximate-value-footnote>
+      * The actual value depends on the current exchange rate and is determined at the time of authorization.
+    </div>
   </ActionCardContainer::Section>
   <Boxel::ActionChin
-    @state={{if @isComplete "memorialized" "default"}}
+    @state={{this.setAmountCtaState}} @disabled={{this.setAmountCtaDisabled}}
     data-test-withdrawal-transaction-amount
   >
     <:default as |d|>
-      <d.ActionButton {{on "click" this.toggleComplete}}>
+      <d.ActionButton {{on "click" this.toggleAmountSet}}>
         Set Amount
       </d.ActionButton>
     </:default>
+    <:disabled as |d|>
+      <d.ActionButton>
+        Set Amount
+      </d.ActionButton>
+    </:disabled>
     <:memorialized as |m|>
-      <m.ActionButton {{on "click" this.toggleComplete}}>
+      <m.ActionButton {{on "click" this.toggleAmountSet}}>
         Edit
       </m.ActionButton>
     </:memorialized>
   </Boxel::ActionChin>
-
 </ActionCardContainer>
