@@ -50,6 +50,7 @@ export abstract class ConnectionManager
   simpleEmitter: SimpleEmitter;
   broadcastChannel: BroadcastChannel;
   protected provider: any;
+  protected connected = false;
   abstract providerId: WalletProviderId;
 
   constructor(options: ConnectionManagerOptions) {
@@ -113,6 +114,10 @@ export abstract class ConnectionManager
   }
 
   onDisconnect(broadcast = true) {
+    if (!this.connected) {
+      return;
+    }
+    this.connected = false;
     ConnectionManager.removeProviderFromStorage(this.chainId);
     if (broadcast)
       this.broadcastChannel.postMessage(
@@ -123,6 +128,7 @@ export abstract class ConnectionManager
   }
 
   onConnect(accounts: string[]) {
+    this.connected = true;
     ConnectionManager.addProviderToStorage(this.chainId, this.providerId);
     this.emit('connected', accounts);
   }
