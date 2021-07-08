@@ -75,11 +75,9 @@ export default abstract class Layer1ChainWeb3Strategy
         await connectionManager.reconnect(); // use the reconnect method because of edge cases
       }
     } catch (e) {
-      this.clearWalletInfo();
-      this.connectionManager?.destroy();
-      this.connectionManager = undefined;
-      this.web3 = undefined;
-      this.currentProviderId = '';
+      console.error('Failed to initialize connection from local storage');
+      console.error(e);
+      this.cleanupConnectionState();
       ConnectionManager.removeProviderFromStorage(this.chainId);
     }
   }
@@ -108,11 +106,7 @@ export default abstract class Layer1ChainWeb3Strategy
         `Failed to create connection manager: ${walletProvider.id}`
       );
       console.error(e);
-      this.clearWalletInfo();
-      this.connectionManager?.destroy();
-      this.connectionManager = undefined;
-      this.web3 = undefined;
-      this.currentProviderId = '';
+      this.cleanupConnectionState();
       ConnectionManager.removeProviderFromStorage(this.chainId);
     }
   }
@@ -127,13 +121,17 @@ export default abstract class Layer1ChainWeb3Strategy
     return this.connectionManager?.disconnect();
   }
 
+  cleanupConnectionState() {
+    this.clearWalletInfo();
+    this.connectionManager?.destroy();
+    this.connectionManager = undefined;
+    this.web3 = undefined;
+    this.currentProviderId = '';
+  }
+
   private onDisconnect() {
     if (this.isConnected) {
-      this.clearWalletInfo();
-      this.connectionManager?.destroy();
-      this.connectionManager = undefined;
-      this.web3 = undefined;
-      this.currentProviderId = '';
+      this.cleanupConnectionState();
       this.simpleEmitter.emit('disconnect');
     }
     this.#waitForAccountDeferred = defer();
@@ -155,7 +153,6 @@ export default abstract class Layer1ChainWeb3Strategy
     this.walletInfo = new WalletInfo(accounts, chainId);
     if (accounts.length > 0) {
       this.refreshBalances();
-      this.#waitForAccountDeferred.resolve();
     } else {
       this.defaultTokenBalance = undefined;
       this.cardBalance = undefined;
