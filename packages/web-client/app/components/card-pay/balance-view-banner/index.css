@@ -1,6 +1,6 @@
 .balance-view-banner {
   --details-summary-height: 3.75rem; /* 60px */
-  --details-open-height: 12rem;
+  --details-open-height: 13rem;
   --details-padding-right: calc(var(--boxel-sp) + 3rem);
 
   position: relative;
@@ -104,9 +104,4 @@
   color: var(--boxel-purple-500);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
-}
-
-.balance-view-banner__details-token {
-  margin-top: var(--boxel-sp-xs);
-  margin-left: var(--boxel-sp-lg);
 }

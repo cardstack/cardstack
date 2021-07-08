@@ -4,6 +4,9 @@
       {{svg-jar @icon class=(cn "balance-display__icon" balance-display__icon--lg=isLarge) role="presentation"}}
     {{/if}}
     <div>
+      {{#if @label}}
+        <div class="balance-display__text">{{@label}}</div>
+      {{/if}}
       {{#if @name}}
         <div
           class={{cn "balance-display__name" balance-display__name--sm=isSmall}}
