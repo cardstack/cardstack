@@ -211,10 +211,12 @@ module('Acceptance | withdrawal', function (hooks) {
       )
       .hasText('Edit');
 
+    await waitFor(`${post} [data-test-balance-display-usd-amount]`);
+
     assert
       .dom(`${post} [data-test-amount-entered]`)
-      .containsText('250.00 DAI.CPXD');
-    // .containsText('$50.00 USD*'); FIXME restore conditional asterisk?
+      .containsText('250.00 DAI.CPXD')
+      .containsText('$50.00 USD*');
 
     assert
       .dom(postableSel(3, 0))

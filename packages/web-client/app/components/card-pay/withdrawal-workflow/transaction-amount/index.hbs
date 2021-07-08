@@ -30,6 +30,7 @@
             @balance={{format-token-amount this.amountAsBigNumber}}
             @symbol={{this.currentTokenSymbol}}
             @usdBalance={{token-to-usd this.tokenSymbolForConversion this.amountAsBigNumber}}
+            @usdFootnote={{true}}
             data-test-amount-entered
           />
         </Boxel::Field>
