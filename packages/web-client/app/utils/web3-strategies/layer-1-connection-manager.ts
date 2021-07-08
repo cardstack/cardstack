@@ -110,6 +110,11 @@ export abstract class ConnectionManager
   }
 
   onDisconnect(broadcast = true) {
+    // NOTE: if the ConnectionManager thinks that it's disconnected and Layer1Chain thinks
+    // that it's connected, this can result in never being able to disconnect
+    // The problem here is that WalletConnect gives you two disconnect events when you disconnect
+    // from the Dapp
+    // and one when you disconnect from the wallet
     if (!this.connected) {
       return;
     }
