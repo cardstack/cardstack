@@ -185,10 +185,6 @@ class MetaMaskConnectionManager extends ConnectionManager {
       }
     });
 
-    provider.on('connect', (info: { chainId: number }) => {
-      console.log(info);
-    });
-
     // Note that this is, following EIP-1193, about connection of the wallet to the
     // chain, not our dapp to the wallet
     provider.on('disconnect', (error: { code: number; message: string }) => {
@@ -277,9 +273,6 @@ class WalletConnectConnectionManager extends ConnectionManager {
         this.onIncorrectChain();
       }
     });
-
-    // TODO: fill this in w connect callback
-    // provider.on('connect', function () {});
 
     // Subscribe to session disconnection
     // This is how WalletConnect informs us if we disconnect the Dapp
