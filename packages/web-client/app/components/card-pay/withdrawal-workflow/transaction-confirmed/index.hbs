@@ -1,9 +1,12 @@
 <ActionCardContainer
-  @header="Withdrawal"
+  @header="Token bridge"
   @isComplete={{@isComplete}}
   data-test-withdrawal-transaction-confirmed-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section>
+  <ActionCardContainer::Section
+    @title={{concat "Bridging tokens to " (network-display-info "layer1" "fullName")}}
+    @dataTestId="withdrawal-confirmed"
+  >
     You withdrew
     You received
   </ActionCardContainer::Section>

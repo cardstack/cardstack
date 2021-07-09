@@ -292,6 +292,14 @@ module('Acceptance | withdrawal', function (hooks) {
     assert
       .dom(epiloguePostableSel(0))
       .containsText('You have successfully withdrawn tokens');
+
+    assert
+      .dom(
+        `${epiloguePostableSel(
+          1
+        )} [data-test-action-card-title="withdrawal-confirmed"]`
+      )
+      .containsText(`Bridging tokens to ${c.layer1.fullName}`);
     assert.dom(epiloguePostableSel(1)).containsText('You withdrew');
     assert.dom(epiloguePostableSel(1)).containsText('You received');
     await waitFor(epiloguePostableSel(2));
