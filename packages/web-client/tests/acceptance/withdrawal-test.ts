@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import {
   click,
   currentURL,
+  fillIn,
   settled,
   visit,
   waitFor,
@@ -175,19 +176,48 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom(postableSel(2, 2))
       .containsText('How much would you like to withdraw from your balance?');
     post = postableSel(2, 3);
-    // assert.dom(`${post} [data-test-source-token="DAI.CPXD"]`).exists();
-    // assert
-    //   .dom(`${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`)
-    //   .isDisabled('Set amount button is disabled until amount has been entered');
-    // await fillIn('[data-test-withdrawal-amount-input]', '250');
-    // assert
-    //   .dom(`${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`)
-    //   .isEnabled('Set amount button is enabled once amount has been entered');
+
+    assert
+      .dom(
+        `${post} [data-test-action-card-title="withdrawal-transaction-amount"]`
+      )
+      .containsText('Choose a withdrawal amount');
+
+    assert
+      .dom(`${post} [data-test-balance-display-amount]`)
+      .containsText('250.00 DAI.CPXD');
+
+    assert
+      .dom(
+        `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
+      )
+      .isDisabled(
+        'Set amount button is disabled until amount has been entered'
+      );
+    await fillIn('[data-test-amount-input]', '250');
+    assert
+      .dom(
+        `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
+      )
+      .isEnabled('Set amount button is enabled once amount has been entered');
     await waitFor(`${post} [data-test-withdrawal-transaction-amount]`);
     await click(
       `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
     );
     assert.dom(milestoneCompletedSel(2)).containsText('Withdrawal amount set');
+
+    assert
+      .dom(
+        `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
+      )
+      .hasText('Edit');
+
+    await waitFor(`${post} [data-test-balance-display-usd-amount]`);
+
+    assert
+      .dom(`${post} [data-test-amount-entered]`)
+      .containsText('250.00 DAI.CPXD')
+      .containsText('$50.00 USD'); // FIXME add asterisk for footnote
 
     assert
       .dom(postableSel(3, 0))
