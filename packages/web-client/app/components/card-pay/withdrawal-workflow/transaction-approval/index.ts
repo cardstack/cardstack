@@ -41,8 +41,7 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
   }
 
   get withdrawalAmount() {
-    // TODO: Replace with the amount selected in previous card
-    return this.tokenBalance;
+    return toBN(this.args.workflowSession.state.withdrawnAmount);
   }
 
   get depotAddress() {

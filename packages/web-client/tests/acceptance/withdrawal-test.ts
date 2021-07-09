@@ -196,7 +196,7 @@ module('Acceptance | withdrawal', function (hooks) {
       .isDisabled(
         'Set amount button is disabled until amount has been entered'
       );
-    await fillIn('[data-test-amount-input]', '250');
+    await fillIn('[data-test-amount-input]', '200');
     assert
       .dom(
         `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
@@ -216,14 +216,14 @@ module('Acceptance | withdrawal', function (hooks) {
 
     await waitUntil(function () {
       return find('[data-test-balance-display-text]')?.textContent?.includes(
-        '50'
+        '40'
       );
     });
 
     assert
       .dom(`${post} [data-test-amount-entered]`)
-      .containsText('250.00 DAI.CPXD')
-      .containsText('$50.00 USD*');
+      .containsText('200.00 DAI.CPXD')
+      .containsText('$40.00 USD*');
 
     assert
       .dom(postableSel(3, 0))
@@ -260,13 +260,12 @@ module('Acceptance | withdrawal', function (hooks) {
       )
       .containsText('250.00 DAI.CPXD');
 
-    // TODO: replace the amounts below with the user-chosen amount
     assert
       .dom('[data-test-withdrawal-tx-approval-amount]')
-      .containsText('250.00 DAI.CPXD');
+      .containsText('200.00 DAI.CPXD');
     assert
       .dom('[data-test-withdrawal-tx-approval-amount]')
-      .containsText('50.00 USD');
+      .containsText('40.00 USD');
 
     await click(
       `${post} [data-test-withdrawal-transaction-approval] [data-test-boxel-button]`
