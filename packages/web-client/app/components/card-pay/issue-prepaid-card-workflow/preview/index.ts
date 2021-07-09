@@ -3,10 +3,16 @@ import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
-import { task } from 'ember-concurrency';
-import CardCustomization from '../../../../services/card-customization';
-import HubAuthentication from '../../../../services/hub-authentication';
-import Layer2Network from '../../../../services/layer2-network';
+import { task, TaskGenerator } from 'ember-concurrency';
+import CardCustomization, {
+  PrepaidCardCustomization,
+} from '@cardstack/web-client/services/card-customization';
+import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
+
+// http://ember-concurrency.com/docs/typescript
+// infer whether we should treat the return of a yield statement as a promise
+type Resolved<T> = T extends PromiseLike<infer R> ? R : T;
 
 interface CardPayDepositWorkflowPreviewComponentArgs {
   workflowSession: WorkflowSession;
@@ -22,10 +28,12 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
   @reads('args.workflowSession.state.spendFaceValue')
   declare faceValue: number;
 
-  @task *issueTask() {
+  @task *issueTask(): TaskGenerator<void> {
     let { workflowSession } = this.args;
     yield this.hubAuthentication.ensureAuthenticated();
-    let customization = yield taskFor(
+    // yield statements require manual typing
+    // https://github.com/machty/ember-concurrency/pull/357#discussion_r434850096
+    let customization: Resolved<PrepaidCardCustomization> = yield taskFor(
       this.cardCustomization.createCustomizationTask
     ).perform({
       issuerName: workflowSession.state.issuerName,
