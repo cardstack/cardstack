@@ -12,7 +12,7 @@ module(
   function (hooks) {
     setupRenderingTest(hooks);
 
-    test('It should show a selection UI if layer 1 is not connected', async function (assert) {
+    test('It should allow a layer 2 balance to be chosen', async function (assert) {
       let session = new WorkflowSession();
       this.set('session', session);
       let layer2Service = this.owner.lookup('service:layer2-network')
