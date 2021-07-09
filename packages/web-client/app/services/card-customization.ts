@@ -190,6 +190,27 @@ export default class CardCustomization extends Service {
       }
     );
     let customization = yield response.json();
+    if (customization.errors) {
+      if (
+        customization.errors.length === 1 &&
+        Number(customization.errors[0].status) === 401 &&
+        customization.errors[0].title === 'No valid auth token'
+      ) {
+        console.error(
+          'Failed to store prepaid card customization due to invalid auth token'
+        );
+        this.hubAuthentication.authToken = null;
+        throw new Error('No valid auth token');
+      } else {
+        // TODO: this should be changed to a form that communicates the errors
+        console.error(
+          'Failed to store prepaid card customization, got errors:',
+          customization.errors
+        );
+        throw new Error('Failed to store prepaid card customizations');
+      }
+    }
+
     return {
       did: customization.data.attributes.did,
     };
