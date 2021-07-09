@@ -293,15 +293,32 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom(epiloguePostableSel(0))
       .containsText('You have successfully withdrawn tokens');
 
+    post = epiloguePostableSel(1);
+
+    assert
+      .dom(`${post} [data-test-action-card-title="withdrawal-confirmed"]`)
+      .containsText(`Bridging tokens to ${c.layer1.fullName}`);
+
+    assert
+      .dom(`${post} [data-test-token-bridge-step="0"][data-test-completed]`)
+      .containsText(`Withdraw tokens from ${c.layer2.fullName}`);
+    assert.dom(`${post} [data-test-blockscout-button]`).exists();
     assert
       .dom(
-        `${epiloguePostableSel(
-          1
-        )} [data-test-action-card-title="withdrawal-confirmed"]`
+        `${post} [data-test-token-bridge-step="1"]:not([data-test-completed])`
       )
-      .containsText(`Bridging tokens to ${c.layer1.fullName}`);
-    assert.dom(epiloguePostableSel(1)).containsText('You withdrew');
-    assert.dom(epiloguePostableSel(1)).containsText('You received');
+      .containsText(
+        `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.fullName}`
+      );
+    assert.dom(`${post} [data-test-bridge-explorer-button]`).exists();
+    assert
+      .dom(
+        `${post} [data-test-token-bridge-step="2"]:not([data-test-completed])`
+      )
+      .containsText(
+        `Release tokens on ${c.layer1.conversationalName}: ${c.layer2.shortName}`
+      );
+    assert.dom(`${post} [data-test-etherscan-button]`).doesNotExist();
     await waitFor(epiloguePostableSel(2));
     assert
       .dom(epiloguePostableSel(2))
