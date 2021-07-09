@@ -12,7 +12,12 @@ export async function viewSafe(network: string, address: string, mnemonic?: stri
   console.log(`Getting safe ${address}`);
   let safe = await safesApi.viewSafe(address);
   console.log();
-  displaySafe(address, safe);
+  if (!safe) {
+    console.log(`The address ${address} is not a safe`);
+  } else {
+    displaySafe(address, safe);
+  }
+
   console.log();
 }
 

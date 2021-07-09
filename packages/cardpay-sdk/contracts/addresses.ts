@@ -9,11 +9,15 @@ import PayMerchantHandlerABI from './abi/v0.6.2/pay-merchant-handler';
 import RegisterMerchantHandlerABI from './abi/v0.6.2/register-merchant-handler';
 import TransferPrepaidCardHandlerABI from './abi/v0.6.2/transfer-prepaid-card-handler';
 import SplitPrepaidCardHandlerABI from './abi/v0.6.2/split-prepaid-card-handler';
+import SpendABI from './abi/v0.6.2/spend';
+import MerchantManagerABI from './abi/v0.6.2/merchant-manager';
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
 consumeModule(RegisterMerchantHandlerABI);
 consumeModule(TransferPrepaidCardHandlerABI);
 consumeModule(SplitPrepaidCardHandlerABI);
+consumeModule(SpendABI);
+consumeModule(MerchantManagerABI);
 
 const addresses: {
   [network: string]: {
