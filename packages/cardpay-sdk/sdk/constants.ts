@@ -19,7 +19,7 @@ const SOKOL = {
   nativeTokenSymbol: 'SPOA',
   nativeTokenName: 'SPOA',
   name: 'Sokol',
-  rpcNode: 'https://sokol-archive.blockscout.com',
+  rpcNode: 'https://sokol.stack.cards',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
   subgraphURL: 'https://graph.stack.cards',
   tallyServiceURL: 'https://tally-service-staging.stack.cards/api/v1',
