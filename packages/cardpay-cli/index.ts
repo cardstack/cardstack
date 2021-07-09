@@ -1,8 +1,13 @@
 /* eslint no-process-exit: "off" */
 import yargs from 'yargs';
 import fetch from 'node-fetch';
-import { bridgeToLayer1, bridgeToLayer2 } from './bridge.js';
-import awaitBridged from './await-bridged.js';
+import {
+  bridgeToLayer1,
+  bridgeToLayer2,
+  awaitBridgedToLayer1,
+  awaitBridgedToLayer2,
+  claimLayer1BridgedTokens,
+} from './bridge.js';
 import { viewTokenBalance } from './assets';
 import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe } from './safe.js';
 import {
@@ -24,7 +29,9 @@ global.fetch = fetch;
 type Commands =
   | 'bridgeToL2'
   | 'bridgeToL1'
+  | 'awaitBridgedToL1'
   | 'awaitBridgedToL2'
+  | 'claimL1BridgedTokens'
   | 'safesView'
   | 'safeView'
   | 'safeTransferTokens'
@@ -66,6 +73,10 @@ interface Options {
   receiver?: string;
   recipient?: string;
   hubRootUrl?: string;
+  txnHash?: string;
+  messageId?: string;
+  encodedData?: string;
+  signatures?: string[];
   faceValues?: number[];
 }
 let {
@@ -87,6 +98,10 @@ let {
   receiver,
   recipient,
   faceValues,
+  txnHash,
+  messageId,
+  encodedData,
+  signatures,
   hubRootUrl,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
@@ -106,17 +121,21 @@ let {
     });
     command = 'bridgeToL2';
   })
-  .command('await-bridged-to-l2 <fromBlock> [recipient]', 'Wait for token bridging to complete on L2', (yargs) => {
-    yargs.positional('fromBlock', {
-      type: 'number',
-      description: 'Layer 2 block height before bridging was initiated',
-    });
-    yargs.positional('recipient', {
-      type: 'string',
-      description: 'Layer 2 address that is the owner of the bridged tokens, defaults to wallet address',
-    });
-    command = 'awaitBridgedToL2';
-  })
+  .command(
+    'await-bridged-to-l2 <fromBlock> [recipient]',
+    'Wait for token bridging from L1 to L2 to complete',
+    (yargs) => {
+      yargs.positional('fromBlock', {
+        type: 'number',
+        description: 'Layer 2 block height before bridging was initiated',
+      });
+      yargs.positional('recipient', {
+        type: 'string',
+        description: 'Layer 2 address that is the owner of the bridged tokens, defaults to wallet address',
+      });
+      command = 'awaitBridgedToL2';
+    }
+  )
   .command(
     'bridge-to-l1 <safeAddress> <amount> <tokenAddress> <receiver>',
     'Bridge tokens to the layer 1 network',
@@ -138,6 +157,41 @@ let {
         type: 'string',
       });
       command = 'bridgeToL1';
+    }
+  )
+  .command(
+    'await-bridged-to-l1 <fromBlock> <txnHash>',
+    'Wait for token bridging from L2 to L1 to complete validation.',
+    (yargs) => {
+      yargs.positional('fromBlock', {
+        type: 'number',
+        description: 'Layer 2 block height before bridging was initiated',
+      });
+      yargs.positional('txnHash', {
+        type: 'string',
+        description: 'Layer 2 transaction hash of the bridging transaction',
+      });
+      command = 'awaitBridgedToL1';
+    }
+  )
+  .command(
+    'claim-tokens-bridged-to-l1 <messageId> <encodedData> <signatures..>',
+    'Claim tokens that have been bridged from L2 to L1',
+    (yargs) => {
+      yargs.positional('messageId', {
+        type: 'string',
+        description: 'The message id for the bridging (obtained from `cardpay await-bridged-to-l1`)',
+      });
+      yargs.positional('encodedData', {
+        type: 'string',
+        description: 'The encoded data for the bridging (obtained from `cardpay await-bridged-to-l1`)',
+      });
+      yargs.positional('signatures', {
+        type: 'string',
+        description:
+          'The bridge validator signatures received from bridging (obtained from `cardpay await-bridged-to-l1`)',
+      });
+      command = 'claimL1BridgedTokens';
     }
   )
   .command(
@@ -464,7 +518,7 @@ if (!command) {
         showHelpAndExit('fromBlock is a required value');
         return;
       }
-      await awaitBridged(network, fromBlock, recipient, mnemonic);
+      await awaitBridgedToLayer2(network, fromBlock, recipient, mnemonic);
       break;
     case 'bridgeToL1':
       if (safeAddress == null || receiver == null || amount == null || tokenAddress == null) {
@@ -472,6 +526,20 @@ if (!command) {
         return;
       }
       await bridgeToLayer1(network, safeAddress, tokenAddress, receiver, amount, mnemonic);
+      break;
+    case 'awaitBridgedToL1':
+      if (txnHash == null || fromBlock == null) {
+        showHelpAndExit('txnHash is a required value');
+        return;
+      }
+      await awaitBridgedToLayer1(network, fromBlock, txnHash, mnemonic);
+      break;
+    case 'claimL1BridgedTokens':
+      if (messageId == null || encodedData == null || signatures == null || signatures.length === 0) {
+        showHelpAndExit('messageId, encodedData, and signatures are required values');
+        return;
+      }
+      await claimLayer1BridgedTokens(network, messageId, encodedData, signatures, mnemonic);
       break;
     case 'safesView':
       await viewSafes(network, address, mnemonic);
@@ -498,7 +566,7 @@ if (!command) {
       await setSupplierInfoDID(network, safeAddress, infoDID, token, mnemonic);
       break;
     case 'prepaidCardCreate':
-      if (tokenAddress == null || safeAddress == null || faceValues == null) {
+      if (tokenAddress == null || safeAddress == null || faceValues == null || faceValues.length === 0) {
         showHelpAndExit('tokenAddress, safeAddress, and faceValues are required values');
         return;
       }

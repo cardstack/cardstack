@@ -7,10 +7,8 @@ import {
   ConversionFunction,
 } from '@cardstack/web-client/utils/token';
 import { Emitter } from '@cardstack/web-client/utils/events';
-
-export interface Web3Strategy extends Emitter {
+export interface Web3Strategy extends Emitter<'disconnect'> {
   isConnected: boolean;
-  walletConnectUri: string | undefined;
   disconnect(): Promise<void>;
 }
 
@@ -38,6 +36,7 @@ export interface Layer2Web3Strategy extends Web3Strategy {
   defaultTokenBalance: BN | undefined;
   cardBalance: BN | undefined;
   depotSafe: DepotSafe | null;
+  walletConnectUri: string | undefined;
   updateUsdConverters(
     symbolsToUpdate: ConvertibleSymbol[]
   ): Promise<Record<ConvertibleSymbol, ConversionFunction>>;

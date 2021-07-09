@@ -28,14 +28,16 @@
         @address={{@depotAddress}}
         data-test-balance-view-depot-address
       />
+    </:inner>
+    <:innermost>
       <CardPay::BalanceDisplay
-        class="balance-view-banner__details-token"
+        @label="Available Balance"
         @size="large"
         @icon={{@token.icon}}
         @balance={{@balance}}
         @symbol={{@token.symbol}}
         data-test-balance-view-token-amount
       />
-    </:inner>
+    </:innermost>
   </CardPay::NestedItems>
 </details>

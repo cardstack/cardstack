@@ -54,12 +54,14 @@
       "args": [
         "bridge-to-l1",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // L2 safe address
-        "30",
+        "11",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L1 receiver
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -82,9 +84,50 @@
         "bridge-to-l2",
         "30",
         "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", // Kovan DAI
-        "--network", "kovan",
+        "--network",
+        "kovan",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: Wait for Bridge Validators",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "await-bridged-to-l1",
+        "21668783", // from block
+        "0xcd7eae7310f944e1b34dcb07c6fe5b891ff0ac5574760fb0d88818a1aa134a7c", // txn hash
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay: Claim Layer 1 Tokens",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "claim-tokens-bridged-to-l1",
+        "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000a13", // messageId
+        // encodedData
+        "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000a1316a80598dd2f143cfbf091638ce3fb02c9135528366b4cc64d30849568af65522de3a68ea6cc78ce001e84800101004d2a125e4cfb0000000000000000000000004f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa0000000000000000000000002f58630ca445ab1a6de2bb9892aa2e1d60876c1300000000000000000000000000000000000000000000000098a7d9b8314c0000",
+        // signatures (add each signature as a separate command line arg)
+        "0x059bab6897002710374f9c1a2ca2130b115b8a73cccac30f841048574c54cff80d2d4df266fcc2d73a660ac17bc3a89fde4af8f103490739d979da40e5146cfe1c",
+        "--network",
+        "kovan",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -99,9 +142,11 @@
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot
         "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // gas token DAI.CPXD
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -113,9 +158,11 @@
       "env": {},
       "args": [
         "safes-view",
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -127,10 +174,12 @@
       "env": {},
       "args": [
         "safe-view",
-        "--network", "sokol",
+        "--network",
+        "sokol",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // safe to view
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -146,9 +195,11 @@
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "0x09FBEDDc5f94fA2713CDa75A68457cA8A4527adf", // destination addrress
         "100", // amount (in ether units)
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -164,9 +215,11 @@
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "",
         "500",
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -183,9 +236,11 @@
         "200", // face values
         "200", // face values
         "100", // face values
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -199,9 +254,11 @@
         "prepaidcard-transfer",
         "0xc87d1C057787218BB0c929f7e4e3f49CAd3B15cE", // prepaid card address
         "0xb21851B00bd13C008f703A21DFDd292b28A736b3", // new owner
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -215,9 +272,11 @@
         "register-merchant",
         "0x3a58a6E39B62Fe2FF81e06B0777BB3a476e90f44", // Hassan's prepaid card --feel free to use your own
         "",
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -232,9 +291,11 @@
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "0x19601E6825D2715CBD22B6AEC9B2528eDEe974A6", // Hassan's prepaid card --feel free to use your own
         "100",
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -247,9 +308,11 @@
       "args": [
         "revenue-balances",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -264,9 +327,11 @@
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "0.5",
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -280,9 +345,11 @@
         "price-for-face-value",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "10000",
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -295,9 +362,11 @@
       "args": [
         "new-prepaidcard-gas-fee",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -311,9 +380,11 @@
         "usd-price",
         "DAI",
         "5",
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -327,9 +398,11 @@
         "eth-price",
         "DAI",
         "100",
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -342,9 +415,11 @@
       "args": [
         "price-oracle-updated-at",
         "DAI",
-        "--network", "sokol",
+        "--network",
+        "sokol",
         // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
@@ -357,8 +432,10 @@
       "args": [
         "reward-balances",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", // Justin's address
-        "--network", "sokol",
-        "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     }
   ]

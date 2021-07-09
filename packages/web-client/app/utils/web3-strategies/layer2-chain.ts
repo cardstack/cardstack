@@ -8,7 +8,7 @@ import { IConnector } from '@walletconnect/types';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { task } from 'ember-concurrency-decorators';
 
-import { SimpleEmitter, UnbindEventListener } from '../events';
+import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
 import {
   ConvertibleSymbol,
   ConversionFunction,
@@ -39,7 +39,7 @@ import { networkDisplayInfo } from './network-display-info';
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 export default abstract class Layer2ChainWeb3Strategy
-  implements Layer2Web3Strategy {
+  implements Layer2Web3Strategy, Emitter<'disconnect'> {
   private chainName: string;
   chainId: number;
   networkSymbol: Layer2NetworkSymbol;
@@ -138,7 +138,7 @@ export default abstract class Layer2ChainWeb3Strategy
 
   private getTokenContractInfo(
     symbol: ConvertibleSymbol,
-    network: NetworkSymbol
+    network: Layer2NetworkSymbol
   ): TokenContractInfo {
     return new TokenContractInfo(symbol, network);
   }
@@ -244,7 +244,10 @@ export default abstract class Layer2ChainWeb3Strategy
     receiver: ChainAddress
   ): Promise<TransactionReceipt> {
     let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
-    return tokenBridge.waitForBridgingCompleted(receiver, fromBlock.toString());
+    return tokenBridge.waitForBridgingToLayer2Completed(
+      receiver,
+      fromBlock.toString()
+    );
   }
 
   @task *fetchDepotTask(): any {

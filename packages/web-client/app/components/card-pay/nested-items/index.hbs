@@ -4,9 +4,18 @@
   </div>
   <div class={{cn
     "card-pay-nested-items__inner"
-    card-pay-nested-items__inner--no-border=@noBorder
     card-pay-nested-items__inner--no-indent=@noIndent
   }}>
-    {{yield to="inner"}}
+    <div class={{unless @noBorder "card-pay-nested-items__inner-content"}}>
+      {{yield to="inner"}}
+    </div>
+
+    {{#if (has-block "innermost")}}
+      <div class="card-pay-nested-items__innermost">
+        <div class={{unless @noBorder "card-pay-nested-items__inner-content"}}>
+          {{yield to="innermost"}}
+        </div>
+      </div>
+    {{/if}}
   </div>
 </div>

@@ -9,6 +9,8 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay bridge-to-l2 <AMOUNT> <TOKEN_ADDRESS> [RECEIVER] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-bridge-to-l2-amount-token_address-receiver---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay await-bridged-to-l2 <FROM_BLOCK> [RECIPIENT] --network=_NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-await-bridged-to-l2-from_block-recipient---network_network---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay bridge-to-l1 <SAFE_ADDRESS> <AMOUNT> <TOKEN_ADDRESS> <RECEIVER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-bridge-to-l1-safe_address-amount-token_address-receiver---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay await-bridged-to-l1 <FROM_BLOCK> <TXN_HASH> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-await-bridged-to-l1-from_block-txn_hash---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay claim-tokens-bridged-to-l1 <MESSAGE_ID> <ENCODED_DATA> <SIGNATURES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-claim-tokens-bridged-to-l1-message_id-encoded_data-signatures---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-create-safe_address-token_address-customization_did-face_values---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaidcard-split <PREPAID_CARD> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-split-prepaid_card-customization_did-face_values---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaidcard-transfer <PREPAID_CARD> <NEW_OWNER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-transfer-prepaid_card-new_owner---networknetwork---mnemonicmnemonic---walletconnect)
@@ -48,7 +50,7 @@ ARGUMENTS
 
 ## `yarn cardpay await-bridged-to-l2 <FROM_BLOCK> [RECIPIENT] --network=_NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
 
-Wait for token bridging to complete on L2
+Wait for token bridging from L1 to L2 to complete
 
 ```
 USAGE
@@ -76,6 +78,39 @@ ARGUMENTS
   TOKEN_ADDRESS   The layer 2 token address of the token to bridge
   RECEIVER        Layer 1 address to receive the bridge tokens
   NETWORK         The Layer 2 network to use ("sokol" or "xdai")
+  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+```
+
+## `yarn cardpay await-bridged-to-l1 <FROM_BLOCK> <TXN_HASH> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+
+Wait for token bridging from L2 to L1 to complete validation. This will return the messageId, encodedData, and signatures that can be used to claim the bridge tokens in L1
+
+```
+USAGE
+  $ yarn cardpay await-bridged-to-l1 <TXN_HASH> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+
+ARGUMENTS
+  FROM_BLOCK      Layer 2 block height before bridging was initiated
+  TXN_HASH        Layer 2 transaction hash of the bridging transaction
+  NETWORK         The Layer 2 network to use ("sokol" or "xdai")
+  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+```
+
+## `yarn cardpay claim-tokens-bridged-to-l1 <MESSAGE_ID> <ENCODED_DATA> <SIGNATURES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+
+Claim tokens that have been bridged from L2 to L1
+
+```
+USAGE
+  $ yarn cardpay claim-tokens-bridged-to-l1 <MESSAGE_ID> <ENCODED_DATA> <SIGNATURES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+
+ARGUMENTS
+  MESSAGE_ID      The message id for the bridging (obtained from `cardpay await-bridged-to-l1`)
+  ENCODED_DATA    The encoded data for the bridging (obtained from `cardpay await-bridged-to-l1`)
+  SIGNATURES      The bridge validator signatures received from bridging (obtained from `cardpay await-bridged-to-l1`)
+  NETWORK         The Layer 1 network to use ("kovan" or "mainnet")
   MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
 ```

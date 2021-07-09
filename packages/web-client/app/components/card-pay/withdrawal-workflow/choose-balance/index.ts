@@ -12,8 +12,11 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
   cardTokenSymbol: TokenSymbol = 'CARD.CPXD';
   tokenOptions = [this.defaultTokenSymbol, this.cardTokenSymbol];
   @service declare layer2Network: Layer2Network;
-  @tracked selectedTokenSymbol: TokenSymbol =
-    this.args.workflowSession.state.withdrawalToken ?? this.defaultTokenSymbol;
+  get selectedTokenSymbol(): TokenSymbol {
+    return (
+      this.args.workflowSession.state.withdrawalToken ?? this.defaultTokenSymbol
+    );
+  }
   @tracked selectedToken: TokenBalance;
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
@@ -61,10 +64,10 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
     if (this.isDisabled) {
       return;
     }
-    if (this.selectedTokenSymbol) {
+    if (this.selectedToken) {
       this.args.workflowSession.update(
         'withdrawalToken',
-        this.selectedTokenSymbol
+        this.selectedToken.symbol
       );
     }
     this.args.onComplete?.();
