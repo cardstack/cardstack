@@ -2,9 +2,12 @@ import { module, test } from 'qunit';
 import {
   click,
   currentURL,
+  fillIn,
+  find,
   settled,
   visit,
   waitFor,
+  waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
@@ -175,19 +178,52 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom(postableSel(2, 2))
       .containsText('How much would you like to withdraw from your balance?');
     post = postableSel(2, 3);
-    // assert.dom(`${post} [data-test-source-token="DAI.CPXD"]`).exists();
-    // assert
-    //   .dom(`${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`)
-    //   .isDisabled('Set amount button is disabled until amount has been entered');
-    // await fillIn('[data-test-withdrawal-amount-input]', '250');
-    // assert
-    //   .dom(`${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`)
-    //   .isEnabled('Set amount button is enabled once amount has been entered');
+
+    assert
+      .dom(
+        `${post} [data-test-action-card-title="withdrawal-transaction-amount"]`
+      )
+      .containsText('Choose a withdrawal amount');
+
+    assert
+      .dom(`${post} [data-test-balance-display-amount]`)
+      .containsText('250.00 DAI.CPXD');
+
+    assert
+      .dom(
+        `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
+      )
+      .isDisabled(
+        'Set amount button is disabled until amount has been entered'
+      );
+    await fillIn('[data-test-amount-input]', '200');
+    assert
+      .dom(
+        `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
+      )
+      .isEnabled('Set amount button is enabled once amount has been entered');
     await waitFor(`${post} [data-test-withdrawal-transaction-amount]`);
     await click(
       `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
     );
     assert.dom(milestoneCompletedSel(2)).containsText('Withdrawal amount set');
+
+    assert
+      .dom(
+        `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
+      )
+      .hasText('Edit');
+
+    await waitUntil(function () {
+      return find('[data-test-balance-display-text]')?.textContent?.includes(
+        '40'
+      );
+    });
+
+    assert
+      .dom(`${post} [data-test-amount-entered]`)
+      .containsText('200.00 DAI.CPXD')
+      .containsText('$40.00 USD*');
 
     assert
       .dom(postableSel(3, 0))
@@ -224,13 +260,12 @@ module('Acceptance | withdrawal', function (hooks) {
       )
       .containsText('250.00 DAI.CPXD');
 
-    // TODO: replace the amounts below with the user-chosen amount
     assert
       .dom('[data-test-withdrawal-tx-approval-amount]')
-      .containsText('250.00 DAI.CPXD');
+      .containsText('200.00 DAI.CPXD');
     assert
       .dom('[data-test-withdrawal-tx-approval-amount]')
-      .containsText('50.00 USD');
+      .containsText('40.00 USD');
 
     await click(
       `${post} [data-test-withdrawal-transaction-approval] [data-test-boxel-button]`
