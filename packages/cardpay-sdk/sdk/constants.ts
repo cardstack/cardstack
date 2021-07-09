@@ -19,9 +19,9 @@ const SOKOL = {
   nativeTokenSymbol: 'SPOA',
   nativeTokenName: 'SPOA',
   name: 'Sokol',
-  rpcNode: 'https://sokol.stack.cards',
+  rpcNode: 'https://sokol-archive.blockscout.com',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
-  subgraphURL: 'https://api.thegraph.com/subgraphs/name/habdelra/cardpay-sokol',
+  subgraphURL: 'https://graph.stack.cards',
   tallyServiceURL: 'https://tally-service-staging.stack.cards/api/v1',
 };
 const KOVAN = {
