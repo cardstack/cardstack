@@ -3,9 +3,11 @@ import {
   click,
   currentURL,
   fillIn,
+  find,
   settled,
   visit,
   waitFor,
+  waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
@@ -212,12 +214,16 @@ module('Acceptance | withdrawal', function (hooks) {
       )
       .hasText('Edit');
 
-    await waitFor(`${post} [data-test-balance-display-usd-amount]`);
+    await waitUntil(function () {
+      return find('[data-test-balance-display-text]')?.textContent?.includes(
+        '50'
+      );
+    });
 
     assert
       .dom(`${post} [data-test-amount-entered]`)
       .containsText('250.00 DAI.CPXD')
-      .containsText('$50.00 USD'); // FIXME add asterisk for footnote
+      .containsText('$50.00 USD*');
 
     assert
       .dom(postableSel(3, 0))
