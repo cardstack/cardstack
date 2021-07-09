@@ -1,17 +1,19 @@
 .card-pay-nested-items__inner {
   margin-top: var(--boxel-sp-xxxs);
   margin-left: var(--boxel-sp-xl);
-  padding-top: calc(var(--boxel-sp) - var(--boxel-sp-xxxs));
-  padding-left: var(--boxel-sp-sm);
-  border-left: 1px solid var(--boxel-purple-300);
-}
-
-.card-pay-nested-items__inner--no-border {
-  padding-top: 0;
-  padding-left: 0;
-  border-left: none;
 }
 
 .card-pay-nested-items__inner--no-indent {
   margin-left: 0;
+}
+
+.card-pay-nested-items__inner-content {
+  padding-top: calc(var(--boxel-sp) - var(--boxel-sp-xxxs));
+  padding-left: var(--boxel-sp-xs);
+  border-left: 1px solid var(--boxel-purple-300);
+}
+
+.card-pay-nested-items__innermost {
+  margin-top: var(--boxel-sp-xxxs);
+  margin-left: var(--boxel-sp-xxl);
 }

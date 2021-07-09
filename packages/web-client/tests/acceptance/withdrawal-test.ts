@@ -195,11 +195,65 @@ module('Acceptance | withdrawal', function (hooks) {
     post = postableSel(3, 1);
     // // transaction-approval card
     await waitFor(`${post} [data-test-withdrawal-transaction-approval]`);
+    assert
+      .dom(
+        `[data-test-withdrawal-tx-approval-balance] [data-test-balance-view-summary]`
+      )
+      .containsText('0x1826...6E44');
+    assert
+      .dom(
+        `[data-test-withdrawal-tx-approval-balance] [data-test-balance-view-summary]`
+      )
+      .containsText('250.00 DAI.CPXD');
+    await click(
+      `[data-test-withdrawal-tx-approval-balance] [data-test-balance-view-summary]`
+    );
+    assert
+      .dom(
+        `[data-test-withdrawal-tx-approval-balance] [data-test-balance-view-account-address]`
+      )
+      .containsText('0x1826...6E44');
+    assert
+      .dom(
+        `[data-test-withdrawal-tx-approval-balance] [data-test-balance-view-depot-address]`
+      )
+      .containsText('0xB236...6666');
+    assert
+      .dom(
+        `[data-test-withdrawal-tx-approval-balance] [data-test-balance-display-amount]`
+      )
+      .containsText('250.00 DAI.CPXD');
+
+    // TODO: replace the amounts below with the user-chosen amount
+    assert
+      .dom('[data-test-withdrawal-tx-approval-amount]')
+      .containsText('250.00 DAI.CPXD');
+    assert
+      .dom('[data-test-withdrawal-tx-approval-amount]')
+      .containsText('50.00 USD');
+
     await click(
       `${post} [data-test-withdrawal-transaction-approval] [data-test-boxel-button]`
     );
-    // TODO: simulate approval and bridge success
+    // TODO: simulate approval
+    assert
+      .dom('[data-test-withdrawal-transaction-approval-is-complete]')
+      .exists();
+    assert
+      .dom(
+        `${post} [data-test-withdrawal-transaction-approval] [data-test-boxel-button]`
+      )
+      .doesNotExist();
+    assert
+      .dom('[data-test-withdrawal-transaction-approval]')
+      .containsText('Confirmed');
+
     assert.dom(milestoneCompletedSel(3)).containsText('Transaction confirmed');
+
+    // // transaction-status step card
+    // TODO: simulate bridge success
+
+    // // transaction-summary card
     assert
       .dom(epiloguePostableSel(0))
       .containsText('You have successfully withdrawn tokens');
