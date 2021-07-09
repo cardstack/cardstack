@@ -55,8 +55,19 @@ cd packages/cardpay-subgraph
 
 ## Deploying
 
+### Authentication
+If you have never performed a deploy then you will need to perform a first time authentication for each of the graph nodes that we deploy too. Currently we deploy to 2 nodes: a graph node hosted by Cardstack and a graph node hosted by The Graph. Each has different access tokens. The access token for Cardstack can be found in the AWS secrets manager. Ask Hassan for the access token for The graph.
+
+Once you have located your access token, from the `packages/cardpay-subgraph` directory execute:
+```sh
+$ graph auth https://graph-admin.stack.cards <Cardstack access token>
+$ graph auth https://api.thegraph.com/deploy/ <The Graph access token>
+```
+
+After you have performed this authorization you will not need to perform this again for subsequent deployments.
+
+### Deployment
 To deploy the subgraph to The Graph, just run the following in the `@cardstack/cardpay-subgraph`:
 ```
 yarn deploy-sokol
 ```
-You may need to authenticate first if you have never authenticated with The Graph. If so, instructions will be provided to do that and ask Hassan for the access token.
