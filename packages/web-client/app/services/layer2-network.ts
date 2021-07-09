@@ -14,12 +14,16 @@ import {
   ConversionFunction,
 } from '@cardstack/web-client/utils/token';
 import {
+  Emitter,
   SimpleEmitter,
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
 import { action } from '@ember/object';
 
-export default class Layer2Network extends Service {
+type Layer2NetworkEvent = 'disconnect';
+export default class Layer2Network
+  extends Service
+  implements Emitter<Layer2NetworkEvent> {
   strategy!: Layer2Web3Strategy;
   simpleEmitter = new SimpleEmitter();
   @reads('strategy.isConnected', false) isConnected!: boolean;
@@ -87,7 +91,7 @@ export default class Layer2Network extends Service {
     this.simpleEmitter.emit('disconnect');
   }
 
-  on(event: string, cb: Function): UnbindEventListener {
+  on(event: Layer2NetworkEvent, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);
   }
 

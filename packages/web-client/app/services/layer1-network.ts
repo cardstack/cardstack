@@ -11,13 +11,17 @@ import { WalletProvider } from '../utils/wallet-providers';
 import { TransactionReceipt } from 'web3-core';
 import BN from 'bn.js';
 import {
+  Emitter,
   SimpleEmitter,
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
 import { action } from '@ember/object';
 import { TaskGenerator } from 'ember-concurrency';
 
-export default class Layer1Network extends Service {
+type Layer1NetworkEvent = 'disconnect';
+export default class Layer1Network
+  extends Service
+  implements Emitter<Layer1NetworkEvent> {
   strategy!: Layer1Web3Strategy;
   simpleEmitter = new SimpleEmitter();
   @reads('strategy.isConnected', false) isConnected!: boolean;
@@ -58,7 +62,7 @@ export default class Layer1Network extends Service {
     this.simpleEmitter.emit('disconnect');
   }
 
-  on(event: string, cb: Function): UnbindEventListener {
+  on(event: Layer1NetworkEvent, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);
   }
 
