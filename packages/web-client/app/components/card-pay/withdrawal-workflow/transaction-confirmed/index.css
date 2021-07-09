@@ -1,0 +1,110 @@
+.card-pay-confirmation {
+  /* needed to control z-index of children */
+  z-index: 1;
+}
+
+.card-pay-confirmation__section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-pay-confirmation__transfer-info {
+  width: 100%;
+  padding: var(--boxel-sp);
+  box-shadow: 0 0 0 1px var(--boxel-light-400);
+}
+
+.card-pay-confirmation__transfer-network {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-pay-confirmation__transfer-network-name {
+  font: 600 var(--boxel-font-xs);
+  color: var(--boxel-purple-400);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.card-pay-confirmation__transaction {
+  margin-top: var(--boxel-sp-sm);
+  display: grid;
+  grid-template-columns: minmax(max-content, 55%) auto;
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "_1 preposition"
+    "amount wallet"
+    "_2 details";
+}
+
+.card-pay-confirmation__transaction-amount {
+  grid-area: amount;
+  align-self: center;
+  grid-row: 1 / -1;
+}
+
+.card-pay-confirmation__transaction-wallet {
+  grid-area: wallet;
+}
+
+.card-pay-confirmation__transaction-preposition {
+  grid-area: preposition;
+  margin-bottom: var(--boxel-sp-sm);
+  font-size: var(--boxel-font-size-sm);
+  color: var(--boxel-purple-400);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.card-pay-confirmation__transaction-depot {
+  grid-area: details;
+  margin-top: var(--boxel-sp-xs);
+}
+
+.card-pay-confirmation__down-arrow {
+  position: absolute;
+  left: calc(50% - 1.25rem);
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: var(--boxel-sp-xs);
+}
+
+.card-pay-confirmation__action-taken {
+  width: 100%;
+  padding: var(--boxel-sp-lg);
+  background: var(--boxel-purple-100);
+  border-radius: var(--boxel-border-radius);
+  font: var(--boxel-font-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-pay-confirmation__action-taken-icon {
+  margin-right: var(--boxel-sp-sm);
+}
+
+.card-pay-confirmation__bridge-container {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  padding: 0 var(--boxel-sp-xs);
+  background-color: var(--boxel-light-300);
+}
+
+.card-pay-confirmation__bridge-inner {
+  width: 100%;
+  padding: calc(var(--boxel-sp) - 1px) var(--boxel-sp-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font: 700 var(--boxel-font);
+  letter-spacing: 0;
+  background: url('/images/backgrounds/bridge-background.svg');
+}
+
+/* 2 selectors because of specificity */
+.card-pay-confirmation__bridge-inner-button.boxel-button {
+  --boxel-button-color: var(--boxel-light-300);
+}
