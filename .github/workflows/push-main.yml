@@ -84,7 +84,7 @@ jobs:
 
   change_check:
     name: Check which packages changed
-    needs: [test_all_but_web_client, test_web_client]
+    needs: [test_all_but_web_client, test_boxel_and_web_client]
     runs-on: ubuntu-latest
     outputs:
       hub: ${{ steps.filter.outputs.hub }}
