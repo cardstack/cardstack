@@ -1,0 +1,146 @@
+name: CI [boxel]
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/boxel/**'
+
+jobs:
+  test:
+    name: Build & Lint & Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install dependencies
+        run: |
+          yarn global add lerna
+          yarn --prefer-offline
+      - name: Lint
+        run: |
+          yarn lint:deps
+          yarn lint:js:pkg boxel
+      - name: Test
+        run: yarn test:boxel
+
+  try-scenarios:
+    name: Tests - ${{ matrix.ember-try-scenario }}
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    needs: test
+    strategy:
+      fail-fast: true
+      matrix:
+        ember-try-scenario: [ember-release, ember-beta]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install dependencies
+        run: |
+          yarn global add lerna
+          yarn --prefer-offline
+      - name: Test
+        env:
+          EMBER_TRY_SCENARIO: ${{ matrix.ember-try-scenario }}
+        run: yarn test:boxel:try $EMBER_TRY_SCENARIO
+        timeout-minutes: 10
+
+  deploy-preview:
+    name: Deploy a preview to S3
+    runs-on: ubuntu-latest
+    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
+    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref
+    needs: try-scenarios
+    env:
+      S3_PREVIEW_INDEX_BUCKET_NAME: boxel-preview.cardstack.com
+      S3_PREVIEW_ASSET_BUCKET_NAME: boxel-preview-assets.cardstack.com
+      S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com/boxel-preview-assets.cardstack.com
+      S3_PREVIEW_REGION: us-east-1
+    steps:
+      - uses: actions/checkout@v2
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install dependencies
+        run: |
+          yarn global add lerna
+          yarn --prefer-offline
+      - name: Set PR branch name
+        run: echo "PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
+      - name: Deploy preview
+        run: yarn deploy:boxel:preview
+        env:
+          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_KEY }}
+          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_SECRET }}
+
+  comment-on-pr:
+    name: Comment on PR
+    runs-on: ubuntu-latest
+    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
+    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref
+    needs: deploy-preview
+    env:
+      S3_PREVIEW_WEBSITE_URL: http://boxel-preview.cardstack.com.s3-website-us-east-1.amazonaws.com
+    steps:
+      - uses: actions/checkout@v2
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install dependencies
+        run: |
+          yarn --prefer-offline
+      - name: Find pull request number for branch
+        uses: ./.github/actions/find-pr-number
+        id: fpr
+        env:
+          BOXEL_PREVIEW_GITHUB_TOKEN: ${{ secrets.BOXEL_PREVIEW_GITHUB_TOKEN }}
+        with:
+          branch: ${{ github.head_ref }}
+
+      - name: Set env var for message
+        shell: bash
+        run: |
+          echo "COMMENT_TEXT=### :sparkles: Preview this change [here](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ github.head_ref }})" >> $GITHUB_ENV
+
+      # finding a comment in given PR that contains the identifier string
+      - name: Find comment that contains identifier
+        uses: peter-evans/find-comment@v1
+        id: fc
+        with:
+          body-includes: ${{ env.COMMENT_TEXT }}
+          issue-number: ${{ steps.fpr.outputs.pr-number }}
+
+      - name: Create new comment if none exists
+        uses: peter-evans/create-or-update-comment@v1
+        if: steps.fc.outputs.comment-id == ''
+        with:
+          issue-number: ${{ steps.fpr.outputs.pr-number }}
+          body: |
+            ${{ env.COMMENT_TEXT }}

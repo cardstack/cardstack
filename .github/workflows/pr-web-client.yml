@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'packages/web-client/**'
+      - 'packages/boxel/**'
       - 'packages/cardpay-sdk/**'
       - 'packages/did-resolver/**'
       - 'packages/test-support/**'
@@ -15,21 +16,21 @@ jobs:
     name: Build & Lint & Test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - uses: volta-cli/action@v1
-    - name: Set up yarn cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/yarn
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-    - run: yarn global add lerna
-    - run: yarn --prefer-offline
-    - run: yarn lint:deps
-    - run: yarn lint:css:web-client
-    - run: yarn lint:js:pkg web-client
-    - run: yarn lint:hbs:web-client
-    - run: yarn test:web-client
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn global add lerna
+      - run: yarn --prefer-offline
+      - run: yarn lint:deps
+      - run: yarn lint:css:web-client
+      - run: yarn lint:js:pkg web-client
+      - run: yarn lint:hbs:web-client
+      - run: yarn test:web-client

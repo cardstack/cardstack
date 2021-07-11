@@ -1,0 +1,11 @@
+.boxel-action-chin__action-status-area {
+  --status-icon-size: 1.25rem;
+}
+
+.boxel-action-chin__action-status-area-icon {
+  display: block;
+  width: var(--status-icon-size);
+  height: var(--status-icon-size);
+  margin-right: var(--boxel-sp-xs);
+  flex-shrink: 0;
+}

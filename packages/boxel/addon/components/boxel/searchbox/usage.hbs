@@ -1,0 +1,39 @@
+<Freestyle::Usage @name="Searchbox">
+  <:example>
+    <Boxel::Searchbox @id={{this.id}} @label={{this.label}} @placeholder={{this.placeholder}} @value={{this.value}} @onInput={{this.onInput}} @onChange={{this.onChange}}/>
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="id"
+      @description="The id of the searchbox input"
+      @value={{this.id}}
+      @onInput={{fn (mut this.id)}}
+    />
+    <Args.String
+      @name="label"
+      @description="The label of the searchbox input"
+      @value={{this.label}}
+      @onInput={{fn (mut this.label)}}
+    />
+    <Args.String
+      @name="placeholder"
+      @description="The placeholder of the searchbox input."
+      @value={{this.placeholder}}
+      @onInput={{fn (mut this.placeholder)}}
+    />
+    <Args.String
+      @name="value"
+      @description="The string entered in the searchbox"
+      @value={{this.value}}
+      @onInput={{fn (mut this.value)}}
+    />
+    <Args.Action
+      @name="onInput"
+      @description="The action called when a user types in the searchbox. Receives the input event"
+    />
+    <Args.Action
+      @name="onChange"
+      @description="The action called when a user presses enter in the searchbox."
+    />
+  </:api>
+</Freestyle::Usage>

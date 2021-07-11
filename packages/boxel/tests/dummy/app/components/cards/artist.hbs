@@ -1,0 +1,59 @@
+<Boxel class="boxel-card__container boxel-card__container--{{or @format "list"}}">
+  <div class="card__gradient" />
+  {{#if @status}}
+    <BoxelHighlight @status={{@status}} />
+    <BoxelActions @status={{@status}} @class="{{if @comparisonType "boxel-actions--comparison-mode"}} {{if (and @drillDown (not-eq @status "no-change")) "with-expand"}}">
+      {{#if @comparisonType}}
+        <ComparisonModeLabel @status={{@status}} @statusText={{@statusText}} @comparisonType={{@comparisonType}} />
+      {{/if}}
+    </BoxelActions>
+    {{#if (and @drillDown (not-eq @status "no-change"))}}
+      <BoxelActions @status={{@status}} @class="boxel-actions__expand">
+        <Boxel::IconButton
+          @icon="expand"
+          class="boxel-actions__expand-btn"
+          aria-label="expand"
+          {{on "click" (fn @drillDown @model @fieldData)}}
+        />
+      </BoxelActions>
+    {{/if}}
+  {{/if}}
+  {{#if @expandAction}}
+    <BoxelHighlight {{on "click" @expandAction}} @class="boxel-card__expand-overlay" />
+  {{/if}}
+  <div class="boxel-card boxel-card--default boxel-card--profile">
+    <Boxel::Header class="boxel-card__header" @header={{humanize @model.type}} />
+
+    <div class="boxel-card__inner boxel-card__inner--with-img boxel-card__inner--{{or @format "list"}} {{if (and @status (not-eq @status "no-change")) "" "field-renderer__opacity-control"}}">
+      {{#if (eq @model.organization "verifi")}}
+        <div class="boxel-card__profile-org" />
+      {{/if}}
+      <div class="boxel-card__bg-img" style={{css-url "background-image" @model.imgURL}} />
+      <h3 class="boxel-card__title">{{@model.title}}</h3>
+      <p class="boxel-card__description">{{@model.description}}</p>
+      <ul class="boxel-card__fields">
+        <li>
+          <Boxel::FieldRenderer
+            @class="boxel-card-field"
+            @mode={{@mode}}
+            @field={{hash title="Email" value=@model.email}}
+          />
+        </li>
+        <li>
+          <Boxel::FieldRenderer
+            @class="boxel-card-field"
+            @mode={{@mode}}
+            @field={{hash title="Website" value=@model.website}}
+          />
+        </li>
+        <li>
+          <Boxel::FieldRenderer
+            @class="boxel-card-field"
+            @mode={{@mode}}
+            @field={{hash title="No. of recordings" value=@model.number_of_recordings}}
+          />
+        </li>
+      </ul>
+    </div>
+  </div>
+</Boxel>

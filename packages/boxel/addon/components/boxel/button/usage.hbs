@@ -1,0 +1,175 @@
+<Freestyle::Usage @name="Button">
+  <:description>
+  Depending on the value of `@as`, the button will accept different arguments.
+      <table class="usage-button-explanation">
+      <tbody>
+        <tr>
+        <td>
+          <code>
+            @as
+          </code>
+        </td>
+        <td>
+          Accepted arguments
+        </td>
+        <td>
+          Used for
+        </td>
+      </tr>
+      <tr>
+        <td>
+          button
+        </td>
+        <td>
+          <ul>
+            <li><code>@size</code></li>
+            <li><code>@kind</code></li>
+            <li><code>@disabled</code></li>
+            <li><code>@loading</code></li>
+          </ul>
+        </td>
+        <td>
+          Actions
+        </td>
+      </tr>
+        <tr>
+        <td>
+          anchor
+        </td>
+        <td>
+          <ul>
+            <li><code>@size</code></li>
+            <li><code>@kind</code></li>
+            <li><code>@disabled</code></li>
+            <li><code>@href</code></li>
+          </ul>
+        </td>
+        <td>
+          Any navigation, eg. external CTA
+        </td>
+      </tr>
+      <tr>
+        <td>
+          link-to
+        </td>
+        <td>
+          <ul>
+            <li><code>@size</code></li>
+            <li><code>@kind</code></li>
+            <li><code>@disabled</code></li>
+            <li><code>@route</code></li>
+            <li><code>@models</code></li>
+            <li><code>@query</code></li>
+          </ul>
+          <br>
+          <code>@route, @models,</code> and <code>@query</code> are passed to <code>LinkTo</code> directly
+        </td>
+        <td>
+          Navigation within the app
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </:description>
+  <:example>
+    <div class={{cn "usage-button-centers-component" usage-button-dark-mode-background=(eq this.kind "secondary-dark")}}>
+      <Boxel::Button
+        @as={{this.as}}
+        @kind={{this.kind}}
+        @size={{this.size}}
+        @disabled={{this.disabled}}
+        @loading={{this.loading}}
+        @href={{this.href}}
+        @route={{this.route}}
+        {{on "click" this.alert}}
+      >
+        Button Text
+      </Boxel::Button>
+    </div>
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="as"
+      @optional={{true}}
+      @value={{this.as}}
+      @options={{array "button" "anchor" "link-to"}}
+      @description="Determines the component/tag that is used to render the element. `button` renders a `button`, `anchor` renders an `a`, and `link-to` renders a `LinkTo`. Note that for accessibility purposes, you should be careful about adding aria/other attributes to a disabled link."
+      @onInput={{fn (mut this.as)}}
+    />
+    <Args.String
+      @name="route"
+      @optional={{true}}
+      @description="The route argument for LinkTo"
+      @onInput={{fn (mut this.route)}}
+      @value={{this.route}}
+    />
+    <Args.Object
+      @name="models"
+      @description="The models argument for LinkTo"
+      @optional={{true}}
+      @defaultValue="[]"
+    />
+    <Args.String
+      @name="query"
+      @description="The query argument for LinkTo"
+      @optional={{true}}
+    />
+    <Args.String
+      @name="href"
+      @optional={{true}}
+      @description="A url that the button can lead to."
+      @onInput={{fn (mut this.href)}}
+      @value={{this.href}}
+    />
+    <Args.String
+      @name="kind"
+      @optional={{true}}
+      @description="Controls the colors of the button"
+      @defaultValue={{"secondary-light"}}
+      @options={{this.kindVariants.all}}
+      @onInput={{fn (mut this.kind)}}
+      @value={{this.kind}}
+    />
+    <Args.String
+      @name="size"
+      @optional={{true}}
+      @description="Controls the size of the button"
+      @defaultValue={{"base"}}
+      @options={{this.sizeVariants}}
+      @onInput={{fn (mut this.size)}}
+      @value={{this.size}}
+    />
+    <Args.Bool
+      @name="disabled"
+      @optional={{true}}
+      @description="Controls whether the button is disabled"
+      @onInput={{fn (mut this.disabled)}}
+      @value={{this.disabled}}
+    />
+    <Args.Bool
+      @name="loading"
+      @optional={{true}}
+      @description="Controls whether the button is loading."
+      @onInput={{fn (mut this.loading)}}
+      @value={{this.loading}}
+    />
+    <Args.Yield @description="Contents of the button" />
+  </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage @name="LinkTo button" @description="This button links you to the media registry page">
+  <:example>
+    <div class={{cn "usage-button-centers-component" usage-button-dark-mode-background=(eq this.kind "secondary-dark")}}>
+      <Boxel::Button
+        @as="link-to"
+        @kind="primary"
+        @size="base"
+        @route="media-registry"
+        @models={{array "bunny_records"}}
+        @query=""
+      >
+        Button Text
+      </Boxel::Button>
+    </div>
+  </:example>
+</Freestyle::Usage>

@@ -1,0 +1,59 @@
+.freestyle-list {
+  padding: 0 1em;
+}
+
+.FreestyleMenu-item,
+.FreestyleMenu-submenuItem,
+.FreestyleSubsection-name {
+  text-transform: none;
+}
+
+.freestyle-components-section .FreestyleSubsection-name {
+  display: none;
+}
+
+.FreestyleUsage-apiTable input,
+.FreestyleUsage-apiTable select {
+  width: 100%;
+  min-height: 1rem;
+  padding: var(--boxel-sp-xxs);
+  border: 1px solid var(--boxel-purple-300);
+  border-radius: var(--boxel-border-radius-sm);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+  transition: border-color var(--boxel-transition);
+}
+
+.FreestyleUsage-apiTable input:hover,
+.FreestyleUsage-apiTable select:hover {
+  border-color: var(--boxel-dark);
+}
+
+.FreestyleUsageBoolean::after {
+  color: var(--boxel-dark);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.FreestyleUsage-preview::after {
+  padding: 3px var(--boxel-sp-xs) 4px;
+  background: var(--boxel-purple-100);
+  border-bottom-left-radius: var(--boxel-border-radius-sm);
+  color: var(--boxel-purple-400);
+  font-size: var(--boxel-font-size-xs);
+  font-weight: 600;
+  line-height: calc(15 / 11);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.FreestyleUsage-sourceContainer pre,
+.FreestyleUsageArgument-jsonViewer {
+  font-family: var(--boxel-monospace-font-family);
+  font-size: var(--boxel-font-size);
+}
+
+.u-codePill {
+  color: var(--boxel-dark);
+  font: 400 var(--boxel-font-size-sm)/calc(18 / 13) var(--boxel-monospace-font-family);
+  letter-spacing: var(--boxel-lsp-sm);
+}

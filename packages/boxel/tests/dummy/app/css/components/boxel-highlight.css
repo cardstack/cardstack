@@ -1,0 +1,59 @@
+.boxel-highlight {
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: var(--boxel-border-radius);
+  z-index: 1;
+  transition:
+    border-color var(--boxel-transition),
+    box-shadow var(--boxel-transition);
+}
+
+.boxel-highlight--on {
+  border-color: var(--boxel-highlight);
+}
+
+.boxel-highlight--offset {
+  height: auto;
+  width: auto;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+}
+
+.boxel-highlight--added,
+.boxel-highlight--changed {
+  border-color: var(--boxel-success-100);
+}
+
+.boxel-highlight--changed {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.boxel-highlight--removed {
+  border-color: var(--boxel-error-100);
+}
+
+.boxel-highlight--deleted {
+  background-color: var(--boxel-light-400);
+  top: 0;
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  z-index: 0;
+}
+
+.boxel-highlight--modified {
+  border-color: var(--boxel-warning-100);
+}
+
+.boxel-highlight--removed ~ .boxel-card {
+  opacity: 0.5;
+}

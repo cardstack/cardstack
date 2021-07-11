@@ -1,0 +1,298 @@
+{{! template-lint-disable deprecated-inline-view-helper }}
+<section class="discrepancy" {{did-insert (if this.nestedView this.getNestedFields this.adjustCount)}}>
+  <div class="discrepancy__container">
+    <header class="discrepancy__header">
+      <h1 class="discrepancy__title">Discrepancy Card: Different Data</h1>
+      {{#let (if @model.topLevelCard @model.topLevelCard @model) as |model|}}
+        <Link @route={{@exitRoute}} @model={{model.baseCard.ownerId}} @query={{hash version=model.baseCard.version}} as |link|>
+          <Boxel::ModeIndicator @mode="comparison" {{on "click" link.transitionTo}} />
+        </Link>
+      {{/let}}
+    </header>
+
+    <Boxel::Breadcrumbs class="discrepancy__breadcrumbs">
+      <LinkTo @route={{@topLevelRoute}} @model={{if @model.topLevelCard @model.topLevelCard.id @model.id}} class="boxel-breadcrumbs__item boxel-breadcrumbs__item--inverse">
+        <div class="boxel-breadcrumbs__item-label">Field</div>
+        <div class="boxel-breadcrumbs__item-title">Musical Work</div>
+      </LinkTo>
+
+      {{#if @model.parentCard.cardType}}
+        <span class="boxel-breadcrumbs__caret" />
+        <LinkTo @route={{@model.parentCard.route}} @model={{@model.parentCard}} class="boxel-breadcrumbs__item boxel-breadcrumbs__item--inverse">
+          <div class="boxel-breadcrumbs__item-label">Field</div>
+          <div class="boxel-breadcrumbs__item-title">{{humanize @model.parentCard.cardType}}</div>
+        </LinkTo>
+      {{/if}}
+
+      {{#if @model.parentCard}}
+        <span class="boxel-breadcrumbs__caret" />
+        <div class="boxel-breadcrumbs__item boxel-breadcrumbs__item--inverse">
+          <div class="boxel-breadcrumbs__item-label">{{@model.nestedCompField.type}}</div>
+          <div class="boxel-breadcrumbs__item-title">{{@model.nestedCompField.title}}</div>
+        </div>
+      {{else if @model.cardType}}
+        <span class="boxel-breadcrumbs__caret" />
+        <div class="boxel-breadcrumbs__item boxel-breadcrumbs__item--inverse">
+          <div class="boxel-breadcrumbs__item-label">Field</div>
+          <div class="boxel-breadcrumbs__item-title">{{humanize @model.cardType}}</div>
+        </div>
+      {{/if}}
+    </Boxel::Breadcrumbs>
+
+    <div class="discrepancy__main {{if (eq this.mode "comparison") "discrepancy__main--comp-view"}}">
+      <div class="discrepancy__comparison-header {{if (eq this.mode "comparison") "discrepancy__comparison-header--comp-mode"}}">
+        <div class="discrepancy__comparison-header-title-group">
+          {{#if this.nestedView}}
+            <LinkTo @route={{@topLevelRoute}} @model={{@model.topLevelCard.id}} class="discrepancy__nested-level-back-btn">
+              Go back to {{@model.topLevelCard.type}}
+            </LinkTo>
+          {{else}}
+            <div class="discrepancy__comparison-header-icons">
+              <div class="discrepancy__profile-icon discrepancy__profile-icon--{{@model.baseCard.ownerId}}" style={{css-url "background-image" @model.baseCard.iconURL}}>
+                {{#unless @model.baseCard.iconURL}}
+                  {{truncate @model.baseCard.owner 1 false}}
+                {{/unless}}
+              </div>
+              <div class="discrepancy__comparison-header-icons-caret">
+                {{svg-jar "caret-left"}}
+              </div>
+              <div class="discrepancy__profile-icon discrepancy__profile-icon--{{@model.compCard.ownerId}}" style={{css-url "background-image" @model.compCard.iconURL}}>
+                {{#unless @model.compCard.iconURL}}
+                  {{truncate @model.compCard.owner 1 false}}
+                {{/unless}}
+              </div>
+            </div>
+            <div>Comparison between these 2 versions</div>
+          {{/if}}
+        </div>
+        {{#unless this.nestedView}}
+          <PillButton
+            {{on "click" (fn this.selectView "comparison")}}
+            @class="discrepancy-card__header-btn discrepancy-card__header-btn--toggle {{if (eq this.mode "comparison") "checked"}}"
+          >
+            Adjust current version
+          </PillButton>
+        {{/unless}}
+      </div>
+
+      <div class="discrepancy__cards {{if (eq this.mode "comparison") "discrepancy__cards--comp-view"}}">
+        {{#let (if @model.topLevelCard @model.topLevelCard @model) as |model|}}
+          <div class="discrepancy-card__header your-version {{if (eq this.mode "keep-current") "selected-version"}}">
+            <div class="discrepancy-card__header-label">Your version</div>
+            <div class="discrepancy-card__header-title-group">
+              <div class="discrepancy-card__header-icons">
+                <div class="discrepancy__profile-icon discrepancy__profile-icon--{{model.baseCard.ownerId}}" style={{css-url "background-image" model.baseCard.iconURL}}>
+                  {{#unless model.baseCard.iconURL}}
+                    {{truncate model.baseCard.owner 1 false}}
+                  {{/unless}}
+                </div>
+              </div>
+              <div>
+                <div class="discrepancy-card__title">{{model.baseCard.owner}}</div>
+                <div class="discrepancy-card__datetime">{{dayjs-format model.baseCard.datetime "MMM D, YYYY h:mm A"}}</div>
+              </div>
+            </div>
+            {{#unless this.nestedView}}
+              <PillButton
+                {{on "click" (fn this.selectView "keep-current")}}
+                @class="discrepancy-card__header-btn {{if (eq this.mode "keep-current") "checked"}}"
+              >
+                Keep current version
+              </PillButton>
+            {{/unless}}
+          </div>
+          <div class="discrepancy-card__header other-version {{if (eq this.mode "linked") "selected-version"}}">
+            <div class="discrepancy-card__header-label">Other version</div>
+            <div class="discrepancy-card__header-title-group">
+              <div class="discrepancy-card__header-icons">
+                <div class="discrepancy__profile-icon discrepancy__profile-icon--{{model.compCard.ownerId}}" style={{css-url "background-image" model.compCard.iconURL}}>
+                  {{#unless model.compCard.iconURL}}
+                    {{truncate model.compCard.owner 1 false}}
+                  {{/unless}}
+                </div>
+              </div>
+              <div>
+                <div class="discrepancy-card__title">{{model.compCard.owner}}</div>
+                <div class="discrepancy-card__datetime">{{dayjs-format model.compCard.datetime "MMM D, YYYY h:mm A"}}</div>
+              </div>
+            </div>
+            {{#unless this.nestedView}}
+              {{#unless this.model.baseCard.isPublisher}}
+                <PillButton
+                  {{on "click" (fn this.selectView "linked")}}
+                  @class="discrepancy-card__header-btn {{if (eq this.mode "linked") "checked"}}"
+                >
+                  Link this version
+                </PillButton>
+              {{/unless}}
+            {{/unless}}
+          </div>
+        {{/let}}
+
+        {{#each this.compFieldGroup as |compField|}}
+          {{#if (not (includes compField.title this.fieldsNotRendered))}}
+            {{#with (find-by "title" compField.title this.baseFieldGroup) as |field|}}
+              <div class="discrepancy-field discrepancy-field--base-field {{compField.title}} {{this.mode}}-view">
+
+                {{#if (eq field.type "collection")}}
+                  {{#let (if (eq this.mode "comparison") "comparison" "view") as |mode|}}
+                    {{#if (or field.tempField.value field.value)}}
+                      {{#each (if field.tempField.value field.tempField.value field.value) as |f i|}}
+                        {{!-- {{compute (fn this.compareFields f (get compField.value i))}} --}}
+                        <Boxel::Field
+                          class="field-renderer field-renderer--{{mode}}-mode field-renderer--{{field.type}} {{dasherize field.title}}-field discrepancy-field-renderer base-card-field {{if (eq mode "comparison") "comp-view"}}"
+                          style={{html-safe (concat "height: calc(100%/" compField.value.length ")")}}
+                          @label={{if (eq i 0) compField.title}}
+                          @labelClass="field-renderer__title"
+                        >
+                          <div class="field-renderer__value">
+                            <Boxel>
+                            {{#if (or f.type (and (eq mode "comparison") f.tempField))}}
+                              {{component
+                                (or field.component "card")
+                                model=(if (and (eq mode "comparison") f.tempField) f.tempField f)
+                                mode="view"
+                                status=(if (and (eq mode "comparison") f.tempField) (if f.tempField.status f.tempField.status "no-change"))
+                                comparisonType="base"
+                                drillDown=(if (eq mode "comparison") (fn @drillDown field))
+                                fieldData=f}}
+                            {{else}}
+                              <div class="field-renderer__card field-renderer__card--blank" />
+                            {{/if}}
+                            </Boxel>
+                          </div>
+                        </Boxel::Field>
+                      {{/each}}
+                    {{else}}
+                      {{#each compField.value as |f i|}}
+                        <Boxel::Field
+                          class="field-renderer field-renderer--{{mode}}-mode field-renderer--{{field.type}} {{dasherize field.title}}-field discrepancy-field-renderer base-card-field {{if (eq mode "comparison") "comp-view"}}"
+                          style={{html-safe (concat "height: calc(100%/" compField.value.length ")")}}
+                          @label={{if (eq i 0) compField.title}}
+                          @labelClass="field-renderer__title"
+                        >
+                          <div class="field-renderer__value">
+                            <div class="field-renderer__card field-renderer__card--blank" />
+                          </div>
+                        </Boxel::Field>
+                      {{/each}}
+                    {{/if}}
+                  {{/let}}
+
+                {{else}}
+                  {{compute (fn this.compareFields field compField)}}
+
+                  <Boxel::FieldRenderer
+                    @mode={{if (eq this.mode "comparison") "comparison" "view"}}
+                    @class="discrepancy-field-renderer base-card-field {{if (eq this.mode "comparison") "comp-view"}}"
+                    @title={{unless compField.collection (humanize compField.title)}}
+                    @field={{if (and field.tempField (eq this.mode "comparison")) field.tempField field}}
+                    @showCompHighlights={{if (or field.tempField field.status) true false}}
+                    @comparisonType="base"
+                    @drillDown={{if (eq this.mode "comparison") (fn @drillDown field)}}
+                    @omittedFields={{this.omittedFields}}
+                  />
+                {{/if}}
+              </div>
+              <div class="discrepancy-field discrepancy-field--comp-field {{this.mode}}-view">
+
+                {{#if (eq compField.type "collection")}}
+                  {{#let (if (eq this.mode "linked") "view" "comparison") as |mode|}}
+                    {{#each compField.value as |f i|}}
+                      {{compute (fn this.compareFields (get field.value i) f)}}
+
+                      <Boxel::Field
+                        class="field-renderer field-renderer--{{mode}}-mode field-renderer--{{compField.type}} {{dasherize compField.title}}-field discrepancy-field-renderer comp-card-field {{if (eq this.mode "comparison") "comp-view"}}"
+                        @label={{if (eq i 0) compField.title}}
+                        @labelClass="field-renderer__title"
+                      >
+                        <div class="field-renderer__value">
+                          {{#if (and f.status (eq this.mode "comparison"))}}
+                            {{#let (get (get field.value i) "tempField") as |isActive|}}
+                              <Boxel::ApplyChangesToggle
+                                @isActive={{isActive}}
+                                {{on "click" (if isActive
+                                  (fn this.revertField (get field.value i) f)
+                                  (fn this.reconciliateField (get field.value i) f)
+                                )}}
+                              />
+                            {{/let}}
+                          {{/if}}
+                          {{component
+                            (or compField.component "card")
+                            model=f
+                            mode="view"
+                            status=(if (eq mode "comparison") (if f.status f.status "no-change"))
+                            comparisonType="comp"
+                            drillDown=(if (eq this.mode "comparison") (fn @drillDown field))
+                            fieldData=f}}
+                        </div>
+                      </Boxel::Field>
+                    {{/each}}
+                  {{/let}}
+                {{else}}
+
+                  {{#if (and compField.status (eq this.mode "comparison") (not (includes field.title this.omittedFields)))}}
+                    {{#let field.tempField as |isActive|}}
+                      <Boxel::ApplyChangesToggle
+                        @isActive={{isActive}}
+                        {{on "click" (if isActive
+                          (fn this.revertField field)
+                          (fn this.reconciliateField field compField)
+                        )}}
+                      />
+                    {{/let}}
+                  {{/if}}
+                  <Boxel::FieldRenderer
+                    @mode={{if (eq this.mode "linked") "view" "comparison"}}
+                    @class="discrepancy-field-renderer comp-card-field {{if (eq this.mode "comparison") "comp-view"}}"
+                    @title={{if compField.displayTitle compField.displayTitle (unless compField.collection (humanize compField.title))}}
+                    @field={{compField}}
+                    @showCompHighlights={{true}}
+                    @comparisonType="comp"
+                    @nestedView={{this.nestedView}}
+                    @drillDown={{if (eq this.mode "comparison") (fn @drillDown field)}}
+                  />
+                {{/if}}
+              </div>
+            {{/with}}
+          {{/if}}
+        {{/each}}
+
+        {{#unless this.nestedView}}
+          <div class="discrepancy-card__footer discrepancy-field--base-field {{this.mode}}-view">
+            <div class="discrepancy__count-btn-container discrepancy__count-btn-container--{{this.mode}} container-left {{if (or (and this.model.count (eq this.mode "comparison")) (eq this.mode "keep-current")) "visible"}}">
+              {{#if (and this.model.count (eq this.mode "comparison"))}}
+                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@exitRoute}} @routeModel={{this.model.baseCard.ownerId}} @query={{hash version=this.model.compCard.version}}>
+                  {{#if (eq this.model.count 1)}}
+                    Make 1 change to your version
+                  {{else}}
+                    Make {{this.model.count}} changes to your version
+                  {{/if}}
+                </PillButton>
+              {{else if (eq this.mode "keep-current")}}
+                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@exitRoute}} @routeModel={{this.model.baseCard.ownerId}} @query={{hash version=this.model.baseCard.version}}>
+                  Keep current version and exit comparison mode
+                </PillButton>
+              {{/if}}
+            </div>
+          </div>
+
+          <div class="discrepancy-card__footer discrepancy-field--comp-field {{this.mode}}-view">
+            <div class="discrepancy__count-btn-container discrepancy__count-btn-container--{{this.mode}} container-right {{if (eq this.mode "linked") "visible"}}">
+              {{#if (eq this.mode "linked")}}
+                <PillButton @class="discrepancy__count-btn" @variant="primary" @route={{@exitRoute}} @routeModel={{this.model.baseCard.ownerId}} @query={{hash version=this.model.compCard.version}}>
+                  Link this {{lowercase (humanize this.model.compCard.type)}} card
+                </PillButton>
+                <div class="discrepancy__count-btn__link-copy">
+                  Your entry will always reflect the updated version of this
+                  {{lowercase (humanize this.model.compCard.type)}} card.
+                </div>
+              {{/if}}
+            </div>
+          </div>
+        {{/unless}}
+      </div>
+    </div>
+  </div>
+</section>

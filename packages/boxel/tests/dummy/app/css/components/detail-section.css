@@ -1,0 +1,26 @@
+.media-detail-section {
+  display: grid;
+  gap: 10px;
+  padding: 25px 0 60px;
+}
+
+.media-detail-section + .media-detail-section {
+  border-top: var(--boxel-border);
+}
+
+.media-detail-section__title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: calc(24 / 18);
+  letter-spacing: 0;
+  padding-left: 45px;
+  padding-bottom: 5px;
+}
+
+.media-detail-section--edit {
+  background-color: var(--boxel-light);
+}
+
+.media-detail-section__contents {
+  padding: 0 50px;
+}

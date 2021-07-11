@@ -1,0 +1,19 @@
+<Freestyle::Usage @name="MilestoneBanner">
+  <:example>
+    <Boxel::MilestoneBanner @title={{this.title}} @status={{this.status}} />
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="title"
+      @value={{this.title}}
+      @description="The milestone title"
+      @onInput={{fn (mut this.title)}}
+    />
+    <Args.String
+      @name="status"
+      @value={{this.status}}
+      @description="The milestone status"
+      @onInput={{fn (mut this.status)}}
+    />
+  </:api>
+</Freestyle::Usage>

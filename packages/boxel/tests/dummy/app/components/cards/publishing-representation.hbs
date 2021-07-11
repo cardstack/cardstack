@@ -1,0 +1,17 @@
+<Card
+  @class="publishing-representation"
+  @model={{@model}}
+  @mode={{@mode}}
+  @status={{@status}}
+  @drillDown={{@drillDown}}
+  @fieldData={{@fieldData}}
+  @comparisonType={{@comparisonType}}
+>
+  <div class="publishing-representation__writers">
+    <Boxel::FieldRenderer @class="publishing-representation__field" @field={{hash title="writer" value=@model.writer type="card" component="cards/composer"}} @mode="view" />
+    <Boxel::FieldRenderer @class="publishing-representation__field publishing-representation__additional-field" @field={{hash title="role" value=@model.role}} @mode="view" />
+  </div>
+  <div class="publishing-representation__publishers">
+    <Boxel::FieldRenderer @class="publishing-representation__field" @field={{hash title="publisher" value=@model.publisher type="card" component="cards/territory"}} @mode="view" />
+  </div>
+</Card>

@@ -1,0 +1,49 @@
+.boxel-next-steps-box {
+  background-color: var(--boxel-purple-750);
+  color: var(--boxel-light);
+  min-width: min-content;
+}
+
+.boxel-next-steps-box__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--boxel-sp-sm) var(--boxel-sp-lg);
+  min-width: max-content;
+}
+
+.boxel-next-steps-box__header-title {
+  color: inherit;
+  font: 700 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.boxel-next-steps-box__header-notice {
+  display: grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: end;
+  gap: var(--boxel-sp-xs);
+  text-align: right;
+  margin-left: var(--boxel-sp-sm);
+  font: var(--boxel-font-xs);
+  color: var(--boxel-purple-300);
+  letter-spacing: var(--boxel-lsp-lg);
+
+  --icon-color: var(--boxel-purple-300);
+}
+
+.boxel-next-steps-box__content {
+  padding: var(--boxel-sp-xxs) var(--boxel-sp-lg) var(--boxel-sp-xl);
+}
+
+.boxel-next-steps-box__button-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--boxel-sp);
+}
+
+.boxel-next-steps-box__footer {
+  margin-top: var(--boxel-sp-xl);
+}

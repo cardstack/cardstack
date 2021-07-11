@@ -1,0 +1,15 @@
+.boxel-org-switcher-button__logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 var(--boxel-font);
+  border: 1px solid var(--boxel-dark);
+  border-radius: var(--boxel-border-radius);
+  background-color: var(--boxel-org-switcher-button-background-color);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  color: var(--boxel-light);
+}

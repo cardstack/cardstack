@@ -1,0 +1,90 @@
+{{! template-lint-disable deprecated-inline-view-helper }}
+<Boxel>
+  <div class="collection-field">
+    {{#if @belongsToField}}
+      {{#if this.field.value}}
+        <div class="collection-field__item collection-field__item--{{this.format}}">
+          {{component (or this.field.component "card") model=this.field.value mode="view" format=this.format expandAction=@expandAction}}
+          <Boxel::IconButton
+            @icon="icon-minus-circle"
+            class="collection-field__remove-btn"
+            aria-label="remove"
+            {{on "click" this.removeBelongsToItem}}
+          />
+        </div>
+      {{else}}
+        <CollectionAddButton
+          @searchFn={{@field.search}}
+          @field={{this.field}}
+          @fieldName={{@field.title}}
+          @addItem={{this.addBelongsToItem}}
+          @format={{this.format}}
+          @component={{this.field.component}}
+          @newItemComponent={{component "card" mode="view"}}
+        />
+      {{/if}}
+    {{else}}
+      {{#if (gt this.collection.length 1)}}
+        <header class="collection-field__header">
+          <Boxel::SelectionControlGroup
+            @toggleSelectAll={{this.toggleSelectAll}}
+            @mode={{@mode}}
+            @selectedItemCount={{this.collection.selectedItemCount}}
+            @isSelected={{this.collection.selectedAll}}
+            @menuComponent={{component "boxel/menu" items=(array
+              (menu-item "Delete" (noop))
+              (menu-item "Duplicate" (noop))
+            )}}
+          />
+        </header>
+      {{/if}}
+      <div class="collection-field__items collection-field__items--{{this.format}}">
+        {{#each this.collection as |item i|}}
+          {{#if (lt i this.displayCount)}}
+            <div class="collection-field__item collection-field__item--{{this.format}} {{if (gt this.collection.length 1) "collection-field__item--multiple"}}">
+              {{#if (gt this.collection.length 1)}}
+                <Boxel::SelectButton
+                  {{on "click" (fn this.toggleSelect item)}}
+                  @isSelected={{item.selected}}
+                  @class="collection-field__select-button"
+                  @mode={{@mode}}
+                />
+              {{/if}}
+              {{component (or item.component @field.component "card") model=item format=this.format}}
+              <Boxel::IconButton
+                @icon="icon-minus-circle"
+                class="collection-field__remove-btn"
+                aria-label="remove"
+                {{on "click" (fn this.removeItem item)}}
+              />
+            </div>
+          {{/if}}
+        {{/each}}
+        <CollectionAddButton
+          @searchFn={{@field.search}}
+          @field={{@field}}
+          @fieldName={{@field.title}}
+          @addItem={{this.addItem}}
+          @format={{this.format}}
+          @component={{@field.component}}
+          @newItemComponent={{component "card" mode="view"}}
+        >
+          {{#if (and (gt this.collection.length this.displayCount) (not this.expanded))}}
+            <div class="collection-field__view-all-btn-container">
+              <button {{on "click" this.viewAll}} class="collection-field__view-all-btn">
+                View all ({{this.collection.length}})
+              </button>
+            </div>
+          {{/if}}
+          {{#if (and (gt this.collection.length 2) this.expanded)}}
+            <div class="collection-field__view-all-btn-container">
+              <button {{on "click" this.collapse}} class="collection-field__view-all-btn">
+                Collapse
+              </button>
+            </div>
+          {{/if}}
+        </CollectionAddButton>
+      </div>
+    {{/if}}
+  </div>
+</Boxel>

@@ -1,0 +1,32 @@
+<header class="boxel-thread-header" data-test-boxel-thread-header ...attributes>
+  {{#if @notificationCount}}
+    <div class="boxel-thread-header__notification">{{@notificationCount}}</div>
+  {{/if}}
+  <div>
+    <div class="boxel-thread-header__label">{{@label}}</div>
+    <h2 class="boxel-thread-header__title">{{@title}}</h2>
+  </div>
+  <div>
+    {{#if @toggleExpand}}
+      <button {{on "click" @toggleExpand}} class="boxel-thread-header__expand-button">
+        {{#if @expanded}}
+          <span>Collapse</span> {{svg-jar "contract" width="16px" height="16px"}}
+        {{else}}
+          <span>Full screen</span> {{svg-jar "expand" width="16px" height="16px"}}
+        {{/if}}
+      </button>
+    {{/if}}
+    {{#if @participants}}
+      <div class="boxel-thread-header__participants">
+        <span>{{@participants.length}} {{svg-jar "users" width="16px" height="16px"}}</span>
+        <Boxel::ParticipantList
+          @participants={{@participants}}
+          @iconSize="2rem"
+          @fanned={{true}}
+        />
+      </div>
+    {{/if}}
+  </div>
+
+  {{yield}}
+</header>

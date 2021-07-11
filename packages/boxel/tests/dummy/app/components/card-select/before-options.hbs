@@ -1,0 +1,13 @@
+<div class="cs-card-select--before-options">
+  <Boxel::IconButton
+    @icon="gear"
+    class="before-options__gear-btn"
+    aria-label="configure"
+  />
+
+  {{#if @dataSource}}
+    <span class="cs-card-select--data-source">
+      {{@dataSource}}
+    </span>
+  {{/if}}
+</div>

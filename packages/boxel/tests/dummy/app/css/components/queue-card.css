@@ -1,0 +1,154 @@
+.queue-card {
+  --queue-card-user-tasks: var(--boxel-lime);
+  --queue-card-assigned-tasks: var(--boxel-lilac);
+  --queue-card-background-color: var(--boxel-purple-500);
+  --queue-card-primary-color: var(--boxel-light);
+  --queue-card-secondary-color: var(--boxel-purple-300);
+  --queue-card-status-color: var(--boxel-highlight);
+
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  border-radius: var(--boxel-border-radius);
+  background-color: var(--queue-card-background-color);
+  color: var(--queue-card-primary-color);
+  font: var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
+  text-align: left;
+  transition:
+    color var(--boxel-transition),
+    background-color var(--boxel-transition);
+}
+
+.queue-card:hover {
+  cursor: pointer;
+}
+
+.queue-card__datetime-row {
+  padding-left: 20px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.queue-card__label {
+  font: var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.queue-card__label,
+.queue-card__datetime {
+  margin: 0;
+  color: var(--queue-card-secondary-color);
+  font-weight: 600;
+  transition: color var(--boxel-transition);
+}
+
+.queue-card__datetime {
+  padding-top: 8px;
+}
+
+.queue-card__datetime:last-child {
+  padding-right: 10px;
+}
+
+.queue-card__notification {
+  align-self: start;
+  padding: 2px 13px 3px;
+  border-radius: 0 10px 0 5px;
+  background-color: var(--boxel-error-100);
+  color: var(--boxel-light);
+  font-weight: 700;
+  letter-spacing: var(--boxel-lsp-sm);
+  text-align: center;
+}
+
+.queue-card__content {
+  padding: 10px 20px 17px;
+}
+
+.queue-card__project-title {
+  margin: 0;
+  font: var(--boxel-font-sm);
+  font-weight: 700;
+  letter-spacing: var(--boxel-lsp);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.queue-card__label + .queue-card__project-title {
+  padding-top: 5px;
+}
+
+.queue-card__participants {
+  --icon-color: var(--queue-card-primary-color);
+
+  color: var(--queue-card-secondary-color);
+}
+
+.queue-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--boxel-purple-700);
+}
+
+.queue-card__task-labels {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  white-space: nowrap;
+  gap: 10px;
+  padding-right: 7px;
+}
+
+.queue-card__task-label {
+  padding: 5px 10px;
+  background-color: var(--queue-card-user-tasks);
+  border-radius: 5px;
+  color: var(--boxel-dark);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.queue-card__task-label--awaiting-reply {
+  background-color: var(--queue-card-assigned-tasks);
+  color: var(--boxel-light);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Light Theme */
+.queue-card--light-theme {
+  --queue-card-primary-color: var(--boxel-dark);
+  --queue-card-secondary-color: var(--boxel-purple-400);
+  --queue-card-status-color: var(--boxel-dark-highlight);
+  --queue-card-background-color: var(--boxel-light);
+}
+
+.queue-card--light-theme .queue-card__footer {
+  border-color: rgba(55, 53, 67, 0.15);
+}
+
+/* Status */
+.queue-card__status {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  color: var(--queue-card-status-color);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp);
+}

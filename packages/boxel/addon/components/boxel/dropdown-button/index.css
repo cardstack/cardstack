@@ -1,0 +1,41 @@
+.boxel-dropdown-button {
+  --dropdown-button-size: 40px;
+
+  width: var(--dropdown-button-size);
+  height: var(--dropdown-button-size);
+}
+
+.boxel-dropdown-button__trigger {
+  height: 100%;
+}
+
+.boxel-dropdown-button__trigger:hover {
+  --icon-color: var(--boxel-highlight);
+}
+
+.boxel-dropdown-button--no-hover .boxel-dropdown-button__trigger:hover {
+  --icon-color: inherit;
+}
+
+.boxel-dropdown-button__trigger > svg {
+  display: block;
+  height: 100%;
+  margin: auto;
+}
+
+.boxel-dropdown-button__dropdown {
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.25);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-sm);
+  min-width: 210px;
+  overflow: hidden;
+}
+
+.boxel-dropdown-button__dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-in {
+  animation: drop-fade-below var(--boxel-transition);
+}
+
+.boxel-dropdown-button__dropdown.ember-basic-dropdown-content--below.ember-basic-dropdown--transitioning-out {
+  animation: drop-fade-below var(--boxel-transition) reverse;
+}

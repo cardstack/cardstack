@@ -9,6 +9,8 @@
     "node": "^14.0.0"
   },
   "dependencies": {
+    "@actions/core": "^1.2.6",
+    "@actions/github": "^4.0.0",
     "@types/chai": "^4.2.15",
     "@types/chai-as-promised": "^7.1.3",
     "@types/console-ui": "^2.2.3",
@@ -43,6 +45,8 @@
   "scripts": {
     "clean": "git clean -x -f --exclude=packages/web-client/.env",
     "compile": "yarn codegen:subgraph && tsc --build ./tsconfig.json",
+    "deploy:boxel": "cd ./packages/boxel && ember deploy production --verbose",
+    "deploy:boxel:preview": "cd ./packages/boxel && ember deploy s3-preview --verbose",
     "deploy:web-client:staging": "cd ./packages/web-client && ember deploy staging --verbose",
     "deploy:subgraph-local": "cd ./packages/cardpay-subgraph && yarn deploy-local-sokol",
     "deploy:subgraph-sokol": "cd ./packages/cardpay-subgraph && yarn deploy-sokol",
@@ -61,11 +65,16 @@
     "console:hub": "cd packages/hub && node --experimental-repl-await ./bin/console.ts",
     "start:web-client": "cd packages/web-client && ember serve",
     "test": "npm-run-all --aggregate-output --continue-on-error --parallel test:*",
+    "test:boxel": "cd packages/boxel && ember test",
+    "test:boxel:try": "cd packages/boxel && ember try:one",
     "test:did-resolver": "PACKAGE=did-resolver mocha ./packages/test-support/bin/run.js --timeout 60000",
     "test:hub": "cd packages/hub && PACKAGE=hub NODE_ENV=test mocha ../../packages/test-support/bin/run.js --timeout 60000",
     "test:hub:preparedb": "cd packages/hub && node ./bin/setup-test-db.js",
     "test:web-client": "cd packages/web-client && ember test",
     "test:web-client:serve": "cd packages/web-client && ember test --serve --no-launch"
+  },
+  "resolutions": {
+    "ember-test-selectors": "^5.0.0"
   },
   "workspaces": [
     "packages/*",

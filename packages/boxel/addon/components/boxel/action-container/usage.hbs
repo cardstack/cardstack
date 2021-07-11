@@ -1,0 +1,65 @@
+<Freestyle::Usage @name="ActionContainer">
+  <:description>
+    Preconfigured CardContainer for an action card
+  </:description>
+  <:example>
+    <Boxel::ActionContainer
+      @header={{this.header}}
+      @prompt={{this.prompt}}
+      @incompleteActionLabel={{this.incompleteActionLabel}}
+      @completeActionLabel={{this.completeActionLabel}}
+      @isComplete={{this.isComplete}}
+      @onClickButton={{fn (mut this.isComplete) (not this.isComplete)}}
+    >
+      {{!-- Sample block yield --}}
+        <div>Action Card here</div>
+      {{!-- End of sample block yield --}}
+    </Boxel::ActionContainer>
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="header"
+      @description="action card header/label"
+      @required={{true}}
+      @onInput={{fn (mut this.header)}}
+      @value={{this.header}}
+    />
+    <Args.String
+      @name="prompt"
+      @optional={{true}}
+      @description="Optional main prompt with styling"
+      @onInput={{fn (mut this.prompt)}}
+      @value={{this.prompt}}
+    />
+    <Args.String
+      @name="incompleteActionLabel"
+      @description="CTA button label for blocking action. It means the action is incomplete"
+      @required={{true}}
+      @onInput={{fn (mut this.incompleteActionLabel)}}
+      @value={{this.incompleteActionLabel}}
+    />
+    <Args.String
+      @name="completeActionLabel"
+      @description="CTA button label for non-blocking action"
+      @required={{true}}
+      @onInput={{fn (mut this.completeActionLabel)}}
+      @value={{this.completeActionLabel}}
+    />
+    <Args.Action
+      @name="onClickButton"
+      @description="Function for the CTA button action"
+      @required={{true}}
+    />
+    <Args.Bool
+      @name="isComplete"
+      @description="Condition for action's completeness (Boolean)"
+      @required={{true}}
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.isComplete)}}
+    />
+    <Args.Yield
+      @optional={{true}}
+      @description="Unstyled area for custom card content and fields"
+    />
+  </:api>
+</Freestyle::Usage>

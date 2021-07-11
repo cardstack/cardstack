@@ -1,0 +1,105 @@
+<Freestyle::Usage @name="Thread">
+  <:example>
+    <button {{on "click" this.addMessage}}>Add a message</button>
+    <Boxel::Thread @autoscroll={{this.autoscroll}} class="boxel-thread-usage">
+      <:header>
+        <Boxel::ThreadHeader @title="Project Title" />
+      </:header>
+
+      <:content>
+        <Boxel::DateDivider @date={{dayjs-format (now)}} />
+        {{#each this.messages}}
+          <Boxel::ThreadMessage
+            @name="Cardbot"
+            @hideName={{true}}
+            @imgURL={{this.cardBotIcon}}
+          >
+            Hello, it's nice to see you!
+          </Boxel::ThreadMessage>
+        {{/each}}
+      </:content>
+    </Boxel::Thread>
+  </:example>
+
+  <:api as |Args|>
+  <Args.Bool
+    @name="autoscroll"
+    @description="Whether to automatically scroll down to newly added elements if the user is close enough to the end of the thread (see the autoscroll modifier)."
+    @default={{false}}
+    @value={{this.autoscroll}}
+    @onInput={{fn (mut this.autoscroll)}}
+  />
+  </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage @slug="Thread-with-workflow">
+  <:example>
+    <Boxel::Thread>
+      <:header>
+        <Boxel::ThreadHeader @title="Project Title" />
+      </:header>
+
+      <:content>
+        <Boxel::DateDivider @date={{dayjs-format (now)}} />
+        <Boxel::ThreadMessage
+          @name="Cardbot"
+          @hideName={{true}}
+          @imgURL={{this.milestones.0.senderIcon}}
+        >
+          {{this.milestones.0.message}}
+        </Boxel::ThreadMessage>
+      </:content>
+
+      <:sidebar as |SidebarSection|>
+        <SidebarSection>
+          <Boxel::Sidebar::CardContainer
+            @header="Workflow: Project Title"
+            @attachNext={{true}}
+          >
+            <div>
+              <Boxel::ProgressCircle
+                @percentComplete={{percent-complete total=this.milestones.length completed=0}}
+              />
+            </div>
+            <div>
+              Workflow started
+            </div>
+          </Boxel::Sidebar::CardContainer>
+
+          <Boxel::Sidebar::CardContainer @header="Milestones">
+            <Boxel::ProgressSteps
+              @progressSteps={{this.milestones}}
+              @completedCount={{0}}
+            />
+          </Boxel::Sidebar::CardContainer>
+        </SidebarSection>
+
+        <SidebarSection>
+          <Boxel::HelpBox />
+        </SidebarSection>
+
+        <SidebarSection>
+          <Boxel::Sidebar::CardContainer
+            @header="Participants"
+            @attachNext={{true}}
+          >
+            <Boxel::ParticipantList
+              @fullWidth={{true}}
+              @participants={{this.userGroup}}
+            />
+          </Boxel::Sidebar::CardContainer>
+
+          <Boxel::Sidebar::CardContainer>
+            <Boxel::ParticipantList
+              @fullWidth={{true}}
+              @participants={{this.orgGroup}}
+            />
+            <Boxel::AddParticipantButton
+              {{on "click" (optional @addParticipant)}}
+            />
+          </Boxel::Sidebar::CardContainer>
+        </SidebarSection>
+      </:sidebar>
+    </Boxel::Thread>
+  </:example>
+</Freestyle::Usage>
