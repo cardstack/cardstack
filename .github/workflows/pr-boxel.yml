@@ -108,7 +108,7 @@ jobs:
         uses: ./.github/actions/find-pr-number
         id: fpr
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BOXEL_PREVIEW_GITHUB_TOKEN: ${{ secrets.BOXEL_PREVIEW_GITHUB_TOKEN }}
         with:
           branch: ${{ github.head_ref }}
 

@@ -5,13 +5,11 @@ const github = require('@actions/github'); // eslint-disable-line node/no-unpubl
 async function run() {
   const branch = core.getInput('branch');
 
-  if (!branch)
-    throw new Error('The branch was not provided to the find-pr-number action');
+  if (!branch) throw new Error('The branch was not provided to the find-pr-number action');
 
-  if (!process.env.GITHUB_TOKEN)
-    throw new Error('Required Github access token');
+  if (!process.env.BOXEL_PREVIEW_GITHUB_TOKEN) throw new Error('Required Github access token');
 
-  const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+  const octokit = github.getOctokit(process.env.BOXEL_PREVIEW_GITHUB_TOKEN);
 
   const { data: pullRequests } = await octokit.pulls.list({
     owner: github.context.repo.owner,
@@ -23,10 +21,7 @@ async function run() {
     return base.ref === 'main' && head.ref === branch;
   });
 
-  core.setOutput(
-    'pr-number',
-    prAssociatedWithBranch && prAssociatedWithBranch.number
-  );
+  core.setOutput('pr-number', prAssociatedWithBranch && prAssociatedWithBranch.number);
 }
 
 try {
