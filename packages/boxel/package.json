@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/boxel",
-  "version": "0.7.12",
+  "version": "0.19.26",
   "description": "Cardstack Boxel Design System development app.",
   "repository": "https://github.com/cardstack/boxel",
   "license": "MIT",
@@ -180,8 +180,7 @@
     }
   },
   "volta": {
-    "node": "12.20.1",
-    "yarn": "1.22.10"
+    "extends": "../../package.json"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
