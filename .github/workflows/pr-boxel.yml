@@ -104,6 +104,7 @@ jobs:
     env:
       S3_PREVIEW_WEBSITE_URL: http://boxel-preview.cardstack.com.s3-website-us-east-1.amazonaws.com
     steps:
+      - uses: actions/checkout@v2
       - name: Find pull request number for branch
         uses: ./.github/actions/find-pr-number
         id: fpr
