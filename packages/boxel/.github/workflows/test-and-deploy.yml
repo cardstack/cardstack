@@ -1,0 +1,314 @@
+name: Node CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '12.x'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+
+    - uses: actions/setup-node@v2-beta
+      with:
+        node-version: '${{ env.NODE_VERSION }}'
+
+    - name: Get package manager's global cache path
+      id: global-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+
+    - name: Cache package manager's global cache and node_modules
+      id: cache-dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ${{ steps.global-cache-dir-path.outputs.dir }}
+          node_modules
+        key: ${{ runner.os }}-${{ matrix.node-version }}-${{
+          hashFiles('**/yarn.lock'
+          ) }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.node-version }}-
+
+    - name: Install Dependencies
+      run: yarn install --frozen-lockfile
+      if: |
+        steps.cache-dependencies.outputs.cache-hit != 'true'
+
+    - name: Lint
+      run: yarn lint
+
+  test:
+    name: Tests
+    runs-on: ${{ matrix.os }}
+    needs: lint
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        browser: [chrome]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+
+    - uses: actions/setup-node@v2-beta
+      with:
+        node-version: '${{ env.NODE_VERSION }}'
+
+    - name: Get package manager's global cache path
+      id: global-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+
+    - name: Cache package manager's global cache and node_modules
+      id: cache-dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ${{ steps.global-cache-dir-path.outputs.dir }}
+          node_modules
+        key: v4-${{ runner.os }}-${{ matrix.node-version }}-${{
+          hashFiles('**/yarn.lock'
+          ) }}
+        restore-keys: |
+          v4-${{ runner.os }}-${{ matrix.node-version }}-
+
+    - name: Install Dependencies
+      run: yarn install --frozen-lockfile
+      if: |
+        steps.cache-dependencies.outputs.cache-hit != 'true'
+
+    # - name: Setup tmate session
+    #   uses: mxschmitt/action-tmate@v4
+    #   timeout-minutes: 90
+
+    - name: Test
+      run: yarn test:ember --launch ${{ matrix.browser }}
+      timeout-minutes: 5
+
+  floating-dependencies:
+    name: Floating Dependencies
+    runs-on: ${{ matrix.os }}
+    needs: test
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        browser: [chrome]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+
+    - uses: actions/setup-node@v2-beta
+      with:
+        node-version: '${{ env.NODE_VERSION }}'
+
+    - name: Get package manager's global cache path
+      id: global-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+
+    - name: Cache package manager's global cache and node_modules
+      id: cache-dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ${{ steps.global-cache-dir-path.outputs.dir }}
+          node_modules
+        key: v4-${{ runner.os }}-${{ matrix.node-version }}-floating-deps
+        restore-keys: |
+          v4-${{ runner.os }}-${{ matrix.node-version }}-
+
+    - name: Install Dependencies
+      run: yarn install --no-lockfile --non-interactive
+
+    - name: Test
+      run: yarn test:ember --launch ${{ matrix.browser }}
+      timeout-minutes: 5
+
+
+  try-scenarios:
+    name: Tests - ${{ matrix.ember-try-scenario }}
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.allow-failure }}
+    needs: test
+
+    strategy:
+      fail-fast: true
+      matrix: # Some scenarios disabled to save Github Actions minutes
+        ember-try-scenario: [
+          # ember-default-with-jquery,
+          ember-release,
+          ember-beta
+        ]
+        allow-failure: [false]
+        #   - ember-try-scenario: ember-canary
+        #     allow-failure: true
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+
+    - uses: actions/setup-node@v2-beta
+      with:
+        node-version: '${{ env.NODE_VERSION }}'
+
+    - name: Get package manager's global cache path
+      id: global-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn cache dir)"
+
+    - name: Cache package manager's global cache and node_modules
+      id: cache-dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ${{ steps.global-cache-dir-path.outputs.dir }}
+          node_modules
+        key: v4-${{ runner.os }}-${{ matrix.node-version }}-${{
+          hashFiles('**/yarn.lock'
+          ) }}
+        restore-keys: |
+          v4-${{ runner.os }}-${{ matrix.node-version }}-
+
+    - name: Install Dependencies
+      run: yarn install --frozen-lockfile
+      if: |
+        steps.cache-dependencies.outputs.cache-hit != 'true'
+
+    - name: Test
+      env:
+        EMBER_TRY_SCENARIO: ${{ matrix.ember-try-scenario }}
+      run: node_modules/.bin/ember try:one $EMBER_TRY_SCENARIO
+      timeout-minutes: 10
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [try-scenarios, floating-dependencies]
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: Set up build cache (yarn)
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-${{ hashFiles('/**/yarn.lock') }}-1
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: yarn install
+      run: yarn install
+    - name: Deploy
+      env:
+        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+      run: |
+        # switch from HTTP to SSH and load our deploy key
+        mkdir ~/.ssh
+        cat <<< "$DEPLOY_KEY" > ~/.ssh/id_ecdsa
+        chmod 600 ~/.ssh/id_ecdsa
+        git remote set-url origin git@github.com:cardstack/boxel
+        git config --replace-all "remote.origin.fetch" "+refs/heads/*:refs/remotes/origin/*"
+        git fetch
+        git branch --track gh-pages origin/gh-pages
+        git config --global user.email "deploy@cardstack.com"
+        git config --global user.name "Cardstack Deploy User"
+        ./node_modules/.bin/ember deploy production --verbose
+  
+  deploy-preview:
+    name: Deploy a preview to S3
+    runs-on: ubuntu-latest
+    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
+    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref
+    needs: [try-scenarios, floating-dependencies]
+    env:
+      S3_PREVIEW_INDEX_BUCKET_NAME: boxel-preview.cardstack.com
+      S3_PREVIEW_ASSET_BUCKET_NAME: boxel-preview-assets.cardstack.com
+      S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com/boxel-preview-assets.cardstack.com
+      S3_PREVIEW_REGION: us-east-1
+    steps:
+    - uses: actions/checkout@v1
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - name: Set up build cache (yarn)
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-${{ hashFiles('/**/yarn.lock') }}-1
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: yarn install
+      run: yarn install
+    - name: Set PR branch name
+      shell: bash
+      run: echo "PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
+    - name: Deploy preview
+      run: ./node_modules/.bin/ember deploy s3-preview
+      env:
+        PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_KEY }}
+        PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_SECRET }}
+
+  comment-on-pr:
+    name: Comment on PR
+    runs-on: ubuntu-latest
+    # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
+    # github.head_ref: the branch that the pull request is from. only appears on pull_request events
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref
+    needs: [deploy-preview]
+    env:
+      S3_PREVIEW_WEBSITE_URL: http://boxel-preview.cardstack.com.s3-website-us-east-1.amazonaws.com
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+    - uses: actions/setup-node@v2-beta
+      with:
+        node-version: '${{ env.NODE_VERSION }}'
+    - name: Install dependencies
+      run: yarn install
+
+    - name: Find pull request number for branch
+      uses: ./.github/actions/find-pr-number
+      id: fpr
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with: 
+        branch: ${{ github.head_ref }}
+
+    - name: Set env var for message
+      shell: bash
+      run: |
+        echo "COMMENT_TEXT=### :sparkles: Preview this change [here](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ github.head_ref }})" >> $GITHUB_ENV
+
+    # finding a comment in given PR that contains the identifier string
+    - name: Find comment that contains identifier
+      uses: peter-evans/find-comment@v1
+      id: fc
+      with:
+        body-includes: ${{ env.COMMENT_TEXT }}
+        issue-number: ${{ steps.fpr.outputs.pr-number }}
+    
+    - name: Create new comment if none exists
+      uses: peter-evans/create-or-update-comment@v1
+      if: steps.fc.outputs.comment-id == ''
+      with: 
+        issue-number: ${{ steps.fpr.outputs.pr-number }}
+        body: |
+          ${{ env.COMMENT_TEXT }}
+

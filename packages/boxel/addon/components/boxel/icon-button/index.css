@@ -1,0 +1,34 @@
+.boxel-icon-button {
+  width: var(--icon-button-width, 40px);
+  height: var(--icon-button-height, 40px);
+  padding: 0;
+  background: none;
+  border: none;
+  z-index: 1;
+}
+
+.boxel-icon-button:hover {
+  cursor: pointer;
+}
+
+.boxel-icon-button--primary {
+  --icon-bg: var(--boxel-highlight);
+  --icon-border: var(--boxel-highlight);
+}
+
+.boxel-icon-button--secondary {
+  --icon-color: var(--boxel-highlight);
+
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 100px;
+  background-color: #41404d;
+}
+
+.boxel-icon-button--secondary:hover {
+  background-color: var(--boxel-purple-800);
+}
+
+.boxel-icon-button > svg {
+  display: block;
+  margin: auto;
+}

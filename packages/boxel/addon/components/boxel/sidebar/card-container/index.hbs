@@ -1,0 +1,16 @@
+<div class={{cn
+    "boxel-sidebar-card-container"
+    boxel-sidebar-card-container--attach-next=@attachNext
+  }}
+  ...attributes
+>
+  {{#if @header}}
+    <header class="boxel-sidebar-card-container__header">
+      {{@header}}
+    </header>
+  {{/if}}
+
+  <div class="boxel-sidebar-card-container__content">
+    {{yield}}
+  </div>
+</div>

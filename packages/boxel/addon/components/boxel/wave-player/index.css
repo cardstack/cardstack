@@ -1,0 +1,22 @@
+.boxel-wave-player {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: var(--boxel-sp-xs);
+  padding-top: var(--boxel-sp-sm);
+}
+
+.boxel-wave-player > canvas {
+  max-width: 100%;
+}
+
+.boxel-wave-player__play.is-playing,
+.play-button.is-playing {
+  --icon-color: var(--boxel-highlight);
+}
+
+.boxel-wave-player__times {
+  color: var(--boxel-purple-400);
+  font: var(--boxel-font-sm);
+  white-space: nowrap;
+}

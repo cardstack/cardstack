@@ -1,0 +1,293 @@
+.field-renderer {
+  --boxel-field-label-width: 12rem;
+
+  position: relative;
+  align-items: start;
+  gap: 30px;
+  padding: 10px;
+  width: 100%;
+  max-width: 690px;
+  margin: 0 auto;
+}
+
+.field-renderer.table-field {
+  grid-template-columns: 1fr;
+  gap: 10px;
+  max-width: 845px;
+  padding: 0;
+}
+
+.field-renderer__title {
+  color: var(--boxel-dark);
+  font: 700 var(--boxel-font-sm);
+  text-align: right;
+}
+
+.field-renderer.table-field .field-renderer__title {
+  text-align: left;
+}
+
+.field-renderer__meta-field {
+  width: 100%;
+  max-width: 450px;
+  grid-template-columns: 1fr;
+  justify-items: start;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.field-renderer__meta-field.field-renderer--collection {
+  padding: 0;
+}
+
+.field-renderer__meta-field.field-renderer--collection > .field-renderer__title {
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp);
+  text-transform: capitalize;
+}
+
+.field-renderer__value {
+  display: grid;
+  gap: 20px 0;
+  width: 100%;
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.field-renderer__group {
+  display: grid;
+  gap: 10px 0;
+  padding: 10px;
+  border: var(--boxel-border);
+  border-radius: 5px;
+}
+
+.field-renderer__value--img-field {
+  max-width: max-content;
+}
+
+.field-renderer--inserted {
+  display: block;
+  height: 100%;
+  padding: 10px;
+  text-decoration: none;
+}
+
+.field-renderer--deleted {
+  display: block;
+  height: 100%;
+  padding: 10px;
+  opacity: 0.5;
+}
+
+/* for cards */
+.field-renderer--removed {
+  opacity: 0.5;
+  text-decoration: none;
+}
+
+.boxel-highlight--added ~ .basic-field,
+.boxel-highlight--modified ~ .basic-field {
+  padding: 10px;
+}
+
+.field-renderer__placeholder.field-renderer__placeholder--album_art {
+  color: transparent;
+  width: 260px;
+  height: 260px;
+  background:
+    url('../@cardstack/boxel/images/placeholders/album_art.svg') center/cover
+    no-repeat;
+}
+
+.cover-art-field img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.field-renderer__modified-count {
+  font: var(--boxel-font-xs);
+  font-weight: 700;
+  padding: 7px 28px 8px 10px;
+}
+
+.field-renderer__view-all {
+  position: relative;
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 20px 30px;
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+  text-align: right;
+  z-index: 1;
+}
+
+.field-renderer__view-all:hover {
+  cursor: pointer;
+}
+
+/* Taglist */
+.field-renderer__taglist-title {
+  font: var(--boxel-font-sm);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.field-renderer__taglist-editor {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40%, max-content));
+  gap: 5px;
+  min-height: 50px;
+  padding: 10px 30px 10px 15px;
+  background-color: var(--boxel-light-200);
+  border: none;
+  border-radius: 5px;
+  text-align: left;
+}
+
+.field-renderer__taglist-editor--vertical {
+  grid-template-columns: max-content;
+}
+
+.item__pill {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 3px 5px 20px;
+  background-color: var(--boxel-highlight);
+  border-radius: 100px;
+  white-space: nowrap;
+}
+
+.item__add-btn,
+.item__remove-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  background:
+    url('../@cardstack/boxel/images/icons/icon-minus-circle.svg') center/16px
+    16px no-repeat;
+}
+
+.item__add-btn {
+  background-image: url('../@cardstack/boxel/images/icons/icon-plus-circle-highlight-bg.svg');
+  position: absolute;
+  top: 15px;
+  right: 0;
+}
+
+.field-renderer__input {
+  width: 100%;
+  height: 50px;
+  padding: 15px;
+  background-color: var(--boxel-light);
+  color: var(--boxel-dark);
+  border: var(--boxel-border);
+  border-radius: 5px;
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.field-renderer__input:focus {
+  border-color: var(--boxel-highlight);
+}
+
+.field-renderer__input:hover:not(:focus) {
+  border-color: var(--boxel-purple-900);
+}
+
+.field-renderer__input.field-renderer__textarea {
+  height: 126px;
+}
+
+/* Dropdown */
+.field-renderer__dropdown .ember-power-select-trigger,
+.field-renderer__dropdown .ember-power-select-dropdown {
+  width: 100%;
+  min-height: 50px;
+  padding: 14px 50px 14px 15px;
+  background-color: var(--boxel-light);
+  border: var(--boxel-border);
+  border-radius: 5px;
+  color: var(--boxel-dark);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.field-renderer__dropdown .ember-power-select-status-icon {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50px;
+  height: 50px;
+  background:
+    url('../@cardstack/boxel/images/icons/dropdown-arrows.svg') center/15px 15px
+    no-repeat;
+}
+
+.field-renderer__dropdown .ember-power-select-trigger:hover {
+  border-color: var(--boxel-purple-900);
+  cursor: pointer;
+}
+
+.field-renderer__dropdown .ember-power-select-trigger:focus {
+  border-color: var(--boxel-highlight);
+}
+
+.field-renderer__dropdown .ember-power-select-dropdown {
+  padding: 0;
+  box-shadow: var(--boxel-box-shadow);
+}
+
+.field-renderer__dropdown .ember-power-select-option {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 9px 15px;
+  cursor: pointer;
+}
+
+/* comparison mode */
+.field-renderer--comparison-mode {
+  height: 100%;
+  padding: 0;
+}
+
+.field-renderer--comparison-mode.field-renderer--collection {
+  height: auto;
+}
+
+.field-renderer--comparison-mode.field-renderer--collection + .field-renderer--comparison-mode.field-renderer--collection {
+  margin-top: 20px;
+}
+
+.field-renderer__card {
+  width: 100%;
+  min-width: 230px;
+  min-height: auto;
+  background-color: var(--boxel-light);
+  border: var(--boxel-border);
+  border-radius: var(--boxel-border-radius);
+  overflow: hidden;
+}
+
+.field-renderer__inner {
+  padding: 15px;
+}
+
+.field-renderer__card--blank {
+  min-height: 80px;
+  height: 100%;
+  border: 1.5px dashed var(--boxel-border-color);
+  background-color: transparent;
+}
+
+.field-renderer--collection .field-renderer__card--blank {
+  min-height: 180px;
+}

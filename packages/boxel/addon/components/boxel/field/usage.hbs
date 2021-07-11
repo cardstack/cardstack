@@ -1,0 +1,58 @@
+<Freestyle::Usage @name="Field">
+  <:example>
+    <Boxel::Field
+      @label={{this.label}}
+      @labelClass={{this.labelClass}}
+      @fieldMode={{this.mode}}
+      @fieldId={{this.id}}
+      style={{css-var boxel-field-label-width=this.labelWidth}}
+    >
+      {{#if (eq this.mode "edit")}}
+        <Boxel::Input
+          @value={{this.value}}
+          @required={{true}}
+        />
+      {{else}}
+        {{this.value}}
+      {{/if}}
+    </Boxel::Field>
+  </:example>
+
+  <:api as |Args|>
+    <Args.String
+      @name="fieldMode"
+      @description="field mode"
+      @value={{this.mode}}
+      @options={{w "view edit"}}
+      @defaultValue="view"
+      @onInput={{fn (mut this.mode)}}
+    />
+    <Args.String
+      @name="fieldId"
+      @description="optional field id"
+      @value={{this.id}}
+      @onInput={{fn (mut this.id)}}
+    />
+    <Args.String
+      @name="label"
+      @description="field label"
+      @value={{this.label}}
+      @onInput={{fn (mut this.label)}}
+    />
+    <Args.String
+      @name="labelClass"
+      @description="optional css class name for the field label"
+      @value={{this.labelClass}}
+      @onInput={{fn (mut this.labelClass)}}
+    />
+    <Args.String
+      @name="--boxel-field-label-width"
+      @description="css variable for the width of the label column"
+      @value={{this.labelWidth}}
+      @onInput={{fn (mut this.labelWidth)}}
+    />
+    <Args.Yield
+      @description="Yield value or form field"
+    />
+  </:api>
+</Freestyle::Usage>

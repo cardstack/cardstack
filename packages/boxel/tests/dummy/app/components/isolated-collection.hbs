@@ -1,0 +1,146 @@
+<Boxel class="media-collection media-collection--{{@model.type}} media-collection--{{@mode}} {{@class}}" {{did-update this.updateCollections @model}}>
+  <header class="media-collection__sticky-header">
+    <div class="media-collection__title-row media-collection__title-row--{{@mode}}">
+      <h2 class="media-collection__title">{{humanize @model.title}}</h2>
+      <div class="media-collection__count">
+        <span>{{if this.collection.length this.collection.length 0}}</span>
+        {{#if (eq this.collection.length 1)}}
+          {{capitalize (if @model.itemType @model.itemType "item")}}
+        {{else}}
+          {{capitalize (if @model.itemTypePlural @model.itemTypePlural "items")}}
+        {{/if}}
+      </div>
+      {{#if (eq @mode "edit")}}
+        <Boxel::ModeIndicator @mode="edit" {{on "click" @transitionToView}} />
+      {{else}}
+        <BoxelActions
+          @class="media-collection__btn-overlay"
+          @displayHighlightActions={{@displayHighlightActions}}
+          @btnLeft="mode-btn"
+          @btnLeftContent="Edit"
+          @btnLeftAction={{@transitionToEdit}}
+          @btnRight="settings"
+          @transferAgreement={{true}}
+        />
+      {{/if}}
+    </div>
+
+    <div class="media-collection__actions-row">
+      {{#if this.collection.length}}
+        <Boxel::SelectionControlGroup
+          @toggleSelectAll={{this.toggleSelectAll}}
+          @mode={{@mode}}
+          @selectedItemCount={{this.collection.selectedItemCount}}
+          @isSelected={{this.collection.selectedAll}}
+          @menuComponent={{component "boxel/menu" items=(array
+            (menu-item "Duplicate" (noop))
+            (if (eq @model.type "collection") (menu-item "Add To Collection" (noop)))
+            (if (eq @model.type "master-collection") (menu-item "Transfer Catalog" (link route="media-registry.agreements" model="TA-38185847898")))
+            (menu-item "Delete" (noop))
+          )}}
+        />
+      {{/if}}
+      {{#if (and (eq @model.type "collection") this.collection.selectedItemCount)}}
+        <button class="media-collection__actions-row-pill-button">
+          Add to Collection
+          {{svg-jar "caret-down" width=8 height=8}}
+        </button>
+      {{/if}}
+      <div class="media-collection__btn-group">
+        <div class="media-collection__btn-trio media-collection__filters">
+          {{#if this.sortColumns.length}}
+            <Boxel::DropdownButton class="media-collection__btn" @button="sort" @icon="sort" @size={{30}} as |Menu dd|>
+              <Boxel::SortMenu
+                @sortableColumns={{this.sortColumns}}
+                @sortedColumn={{this.sortColumn}}
+                @sortedDirection={{this.sortDirection}}
+                @onSort={{this.sort}}
+                @maxHeight={{available-height-for-menu dd}}
+              />
+            </Boxel::DropdownButton>
+          {{/if}}
+          <Boxel::DropdownButton class="media-collection__btn media-collection__filter" @button="filter" @icon="filter" @size={{30}}>
+          </Boxel::DropdownButton>
+
+          {{#if @search}}
+            <Boxel::DropdownButton class="media-collection__btn media-collection__search" @button="search" @icon="search" @size={{30}}>
+              <Boxel::Input type="search" class="field-renderer__input media-collection__search-input"
+                {{on "input" this.search}}
+              />
+            </Boxel::DropdownButton>
+          {{/if}}
+        </div>
+        {{#if (not-eq this.format "table-list")}}
+          <div class="media-collection__btn-trio media-collection__view-selectors">
+            <button {{on "click" (fn this.changeFormat "list")}} class="media-collection__btn list {{if (eq this.format "list") "selected"}}" aria-label="view as list"></button>
+            <button {{on "click" (fn this.changeFormat "grid")}} class="media-collection__btn grid {{if (eq this.format "grid") "selected"}}" aria-label="view as grid"></button>
+            <button {{on "click" (fn this.changeFormat "table")}} class="media-collection__btn table {{if (eq this.format "table") "selected"}}" aria-label="view as table"></button>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+  </header>
+
+  {{#if (eq this.format "table")}}
+    <IsolatedCollectionTable
+      @mode={{@mode}}
+      @type={{@model.type}}
+      @expandAction={{@expandAction}}
+      @org={{@model.orgModel}}
+      @collection={{this.collection}}
+      @columns={{@model.columns}}
+      @removeItem={{this.removeItem}}
+      @sortColumn={{this.sortColumn}}
+      @sortDirection={{this.sortDirection}}
+      @onUpdateSorts={{this.tableSort}}
+    />
+  {{else}}
+    <div class="media-collection__scroll-container">
+      <div class="media-collection__inner-container">
+        {{#if (eq this.format "table-list")}}
+          <div class="isolated-collection__table-list-header">
+            {{#each @model.listTitleFields as |title|}}
+              <div class="isolated-collection__table-list-header-field">{{title}}</div>
+            {{/each}}
+          </div>
+        {{/if}}
+        <ul class="media-collection__grid media-collection__grid--{{this.format}} media-collection__grid--{{@model.type}}-{{this.format}}">
+          {{#each this.collection as |item|}}
+            <li class="media-collection__grid-item media-collection__grid-item--{{this.format}}">
+              {{#if @model.itemComponent}}
+                {{component
+                  @model.itemComponent
+                  model=item
+                  format=this.format
+                  listFields=@model.listFields
+                  expandAction=(fn @expandAction item)
+                  mode=@mode}}
+              {{else}}
+                <Cards::IsolatedCollectionItem
+                  @model={{item}}
+                  @format={{this.format}}
+                  @listFields={{@model.listFields}}
+                  @expandAction={{fn @expandAction item}}
+                  @mode={{@mode}}
+                />
+              {{/if}}
+
+              <div class="media-collection__grid-item-btn-group {{if (eq @mode "view") "isolated-collection__select-button"}} {{if item.selected "isolated-collection__select-button--selected"}}">
+                <Boxel::SelectButton
+                  class="media-collection__grid-item-select-button"
+                  aria-label="select"
+                  @isSelected={{item.selected}}
+                  {{on "click" (fn this.toggleSelect item)}}
+                />
+                {{#if (eq @mode "edit")}}
+                  <button {{on "click" (fn this.removeItem item)}} class="media-collection__grid-item-select-button remove-btn" aria-label="remove">{{svg-jar "icon-minus-circle" width="16px" height="16px"}}</button>
+                {{/if}}
+              </div>
+            </li>
+          {{/each}}
+          {{!-- Add new --}}
+        </ul>
+      </div>
+    </div>
+  {{/if}}
+</Boxel>

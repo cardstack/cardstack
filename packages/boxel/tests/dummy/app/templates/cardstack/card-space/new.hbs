@@ -1,0 +1,27 @@
+<div class={{cn
+    "card-space-new"
+    card-space-new--logged-in=this.cardstackSession.isAuthenticated
+  }}
+  {{did-insert this.updateEdges}}
+  data-test-card-space-new
+  ...attributes
+>
+  {{#unless this.cardstackSession.isAuthenticated}}
+    <Boxel::Button
+      class="card-space-login-button"
+      @kind="secondary-light"
+      @size="tall"
+      {{on "click" this.login}}
+      data-test-cardstack-login-button
+    >
+      Connect Account
+    </Boxel::Button>
+  {{/unless}}
+  <Boxel::LayoutContainer
+    @displayTools={{this.cardstackSession.isAuthenticated}}
+    @selectAction={{this.toggleSelect}}
+    @isSelected={{this.isSelected}}
+    data-test-card-space-layout-container
+  >
+  </Boxel::LayoutContainer>
+</div>

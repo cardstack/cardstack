@@ -1,0 +1,42 @@
+<Freestyle::Usage @name="InfoBox">
+    <:example>
+      <Boxel::Infobox 
+        @title={{this.title}} 
+        @description={{this.description}} 
+        style={{css-var 
+          boxel-infobox-image=this.imageUrl
+          boxel-infobox-image-size=this.imageSize
+          boxel-infobox-image-position=this.imagePosition
+        }}
+      >
+      </Boxel::Infobox>
+    </:example>
+
+    <:api as |Args|>
+      <Args.String
+        @name="title"
+        @value={{this.title}}
+        @onInput={{fn (mut this.title)}}
+      />
+      <Args.String
+        @name="description"
+        @value={{this.description}}
+        @onInput={{fn (mut this.description)}}
+      />
+      <Args.String
+        @name="--boxel-infobox-image"
+        @value={{this.image}}
+        @onInput={{fn (mut this.image)}}
+      />
+      <Args.String
+        @name="--boxel-infobox-image-position"
+        @value={{this.imagePosition}}
+        @onInput={{fn (mut this.imagePosition)}}
+      />
+      <Args.String
+        @name="--boxel-infobox-image-size"
+        @value={{this.imageSize}}
+        @onInput={{fn (mut this.imageSize)}}
+      />
+    </:api>
+</Freestyle::Usage>

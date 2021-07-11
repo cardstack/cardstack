@@ -1,0 +1,40 @@
+<Boxel::CardContainer
+  class={{cn
+    "boxel-action-container"
+    boxel-action-container--is-complete=@isComplete
+  }}
+  data-test-boxel-action-container
+  data-test-boxel-action-container-is-complete={{@isComplete}}
+  ...attributes
+>
+  <Boxel::Header
+    class="boxel-action-container__header"
+    @header={{@header}}
+    data-test-boxel-action-header
+  />
+
+  {{#if @prompt}}
+    <p class="boxel-action-container__prompt" data-test-boxel-action-prompt>
+      {{@prompt}}
+    </p>
+  {{/if}}
+
+  {{yield}}
+
+  <Boxel::ActionChin
+    class="boxel-action-container__footer"
+    @state={{if @isComplete "memorialized" "default"}}
+    data-test-boxel-action-footer
+  >
+    <:memorialized as |m|>
+      <m.ActionButton @disabled={{@disabled}} {{on "click" (optional @onClickButton)}}>
+        {{@completeActionLabel}}
+      </m.ActionButton>
+    </:memorialized>
+    <:default as |a|>
+      <a.ActionButton @disabled={{@disabled}} {{on "click" (optional @onClickButton)}}>
+        {{@incompleteActionLabel}}
+      </a.ActionButton>
+    </:default>
+  </Boxel::ActionChin>
+</Boxel::CardContainer>

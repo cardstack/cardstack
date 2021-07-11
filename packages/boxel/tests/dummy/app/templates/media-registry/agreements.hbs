@@ -1,0 +1,70 @@
+<div class="agreements">
+  <div class="detail-card agreements-card">
+    <header class="agreements-card__header">
+      {{#if (or (eq this.status "view") (eq this.status "complete"))}}
+        Catalog transfer agreement
+      {{else}}
+        Transfer a catalog
+      {{/if}}
+    </header>
+
+    <div class="detail-card__body agreements-card__body">
+      {{#if (eq this.status "complete")}}
+        <Boxel::FieldRenderer
+          @mode="view"
+          @field={{hash title="Agreement ID" value=this.agreement.reference_id}}
+          @class="agreements-edit-field"
+        />
+        <Boxel::FieldRenderer
+          @mode="view"
+          @field={{hash title="Date & Time" value=(dayjs-format (now) "MM/DD/YYYY HH:mm")}}
+          @class="agreements-edit-field"
+        />
+      {{/if}}
+
+      {{#each this.agreementFields as |field|}}
+        {{#if (eq field.title "Catalog")}}
+          <Boxel::FieldRenderer
+            @mode={{if (or (not this.status) (eq this.status "create")) "edit" "view"}}
+            @field={{field}}
+            @class="agreements-edit-field"
+            @expandAction={{this.expandAction}}
+          />
+        {{else}}
+          <Boxel::FieldRenderer
+            @mode={{if (or (not this.status) (eq this.status "create")) "edit" "view"}}
+            @field={{field}}
+            @class="agreements-edit-field"
+          />
+        {{/if}}
+      {{/each}}
+
+      {{#if (eq this.status "complete")}}
+        <Boxel::FieldRenderer
+          @mode="view"
+          @field={{hash title="Status" value=(capitalize this.status)}}
+          @class="agreements-edit-field"
+        />
+      {{/if}}
+    </div>
+
+    {{#if (not-eq this.status "complete")}}
+      <footer class="agreements-card__footer">
+        {{#if (and (eq this.status "view") (eq @model.org.id "crd_records"))}}
+          <Boxel::Button {{on "click" this.completeAgreement}} @kind="primary" @size="tall" @disabled={{true}}>Accept Transfer</Boxel::Button>
+          <Boxel::Button {{on "click" this.rejectAgreement}} @kind="primary" @size="tall">Reject Transfer</Boxel::Button>
+        {{else if (and (eq this.status "view") (eq @model.org.id "bunny_records"))}}
+          <div />
+          <Boxel::Button @size="tall" @disabled={{true}}>
+            Transfer request sent
+          </Boxel::Button>
+        {{else}}
+          <div />
+          <Boxel::Button {{on "click" this.viewAgreement}} @kind="primary" @size="tall">
+            Initiate Transfer
+          </Boxel::Button>
+        {{/if}}
+      </footer>
+    {{/if}}
+  </div>
+</div>

@@ -1,0 +1,48 @@
+<CardPlatter @class="tasklist__platter">
+  <div class="tasklist">
+    <section class="tasklist__section">
+      <header class="tasklist__header" aria-label="My tasks">
+        {{svg-jar "task" width="15px" height="15px"}}
+        <div class="tasklist__label">
+          {{@userTasks.length}} assigned to me
+        </div>
+      </header>
+      <TasklistTable
+        @columns={{@tableHeaders}}
+        @rows={{@userTasks}}
+        @now={{@now}}
+      />
+    </section>
+    <section class="tasklist__section">
+      <header class="tasklist__header" aria-label="Tasks assigned to others">
+        {{svg-jar "task" width="15px" height="15px"}}
+        <div class="tasklist__label tasklist__label--assigned">
+          {{@assignedTasks.length}} assigned to others
+        </div>
+      </header>
+      <TasklistTable
+        @columns={{@tableHeaders}}
+        @rows={{@assignedTasks}}
+        @now={{@now}}
+      />
+    </section>
+    <section class="tasklist__section">
+      <header class="tasklist__header" aria-label="Completed tasks">
+        {{svg-jar "task-checkmark" width="16px" height="16px"}}
+        <div class="tasklist__label tasklist__label--completed">
+          {{@completedTasks.length}} completed
+        </div>
+      </header>
+      <TasklistTable
+        @columns={{@tableHeaders}}
+        @rows={{@completedTasks}}
+        @isCompleted={{true}}
+        @now={{@now}}
+      />
+    </section>
+    <footer class="tasklist__footer">
+      {{svg-jar "icon-plus-circle" width="18px" height="18px" class="tasklist__add-item-svg"}}
+      <div class="tasklist__task-title">Create new task</div>
+    </footer>
+  </div>
+</CardPlatter>

@@ -1,0 +1,61 @@
+<Boxel @tag="section" @class="detail-card detail-card--{{@mode}} {{@class}}">
+  {{#if @label}}
+    <div class="detail-card__label">{{@label}}</div>
+  {{/if}}
+
+  {{#if @headerFields}}
+    <header class="detail-card__header">
+      <div class="detail-card__header-img" style={{css-url "background-image" @headerFields.image}} />
+      <div>
+        <h1 class="detail-card__header-title">{{titleize @headerFields.title}}</h1>
+        <div class="detail-card__header-desc">{{@headerFields.description}}</div>
+      </div>
+    </header>
+  {{/if}}
+
+  {{yield}}
+
+  {{#if @detailSections}}
+    {{#each @detailSections as |s|}}
+      <DetailSection
+        @title={{s.title}}
+        @fields={{s.content}}
+        @mode={{@mode}}
+        @comparisonMode={{@comparisonMode}}
+        @addedFields={{@addedFields}}
+        @addedValues={{@addedValues}}
+        @changedFields={{@changedFields}}
+        @removedFields={{@removedFields}}
+        @removedValues={{@removedValues}}
+        @addedCards={{@addedCards}}
+        @removedCards={{@removedCards}}
+        @changedCards={{@changedCards}}
+        @modifiedCard={{@modifiedCard}}
+        @expandAction={{@expandAction}}
+      />
+    {{/each}}
+  {{else}}
+    <DetailSection
+      @title={{@title}}
+      @fields={{@fields}}
+      @mode={{@mode}}
+      @comparisonMode={{@comparisonMode}}
+      @addedFields={{@addedFields}}
+      @addedValues={{@addedValues}}
+      @changedFields={{@changedFields}}
+      @removedFields={{@removedFields}}
+      @removedValues={{@removedValues}}
+      @addedCards={{@addedCards}}
+      @removedCards={{@removedCards}}
+      @changedCards={{@changedCards}}
+      @modifiedCard={{@modifiedCard}}
+      @expandAction={{@expandAction}}
+    />
+  {{/if}}
+
+  {{#if @source}}
+    <div class="detail-card__source">
+      <span class="field-renderer__title">Source:</span> {{@source}}
+    </div>
+  {{/if}}
+</Boxel>

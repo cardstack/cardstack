@@ -1,0 +1,89 @@
+<Boxel::Thread class="cardflow">
+  <:header>
+    <Boxel::ThreadHeader
+      class="cardflow__header"
+      @title={{or this.thread.description this.thread.title}}
+      @label={{this.thread.project}}
+      @notificationCount={{if (eq this.thread.status "unread") 1 null}}
+      @participants={{this.participants}}
+    />
+  </:header>
+
+  <:taskbar>
+    <Taskbar
+      @tasksRoute={{@tasksRoute}}
+      @activeTasks={{@activeTasks}}
+      @userTasks={{@userTasks}}
+      @assignedTasks={{@assignedTasks}}
+    />
+  </:taskbar>
+
+  <:content>
+    {{#each @model.posts as |post|}}
+      <Boxel::ThreadMessage
+        @name={{post.sender.title}}
+        @imgURL={{post.sender.imgURL}}
+        @datetime={{post.datetime}}
+        @notRound={{eq post.participantType "bot"}}
+      >
+        {{post.content}}
+      </Boxel::ThreadMessage>
+    {{/each}}
+
+    {{!-- TODO: Extract component - Reply to message box --}}
+    {{#if (includes @model.user.id @model.thread.participant_ids)}}
+      <div class="cardflow__message">
+        <div class="cardflow__message-icon__profile" style={{css-url "background-image" @model.user.imgURL}} />
+        <Boxel::Input class="cardflow__reply-to field-renderer__input" placeholder="Post a message to this thread" />
+      </div>
+    {{/if}}
+  </:content>
+
+  <:sidebar as |SidebarSection|>
+    {{#if @model.workflow}}
+      <SidebarSection>
+        <Boxel::Sidebar::CardContainer
+          @header={{if @model.workflow.title (html-safe (concat "Workflow:<br>" @model.workflow.title)) "Workflow Progress"}}
+          @attachNext={{true}}
+        >
+          <Boxel::ProgressCircle
+            @percentComplete={{percent-complete total=@model.workflow.milestones.length completed=this.progress}}
+          />
+          <div class="cardflow__milestone-progress-status">
+            {{this.progressStatus}}
+          </div>
+        </Boxel::Sidebar::CardContainer>
+        <Boxel::Sidebar::CardContainer @header="Milestones">
+          <Boxel::ProgressSteps
+            @progressSteps={{@model.workflow.milestones}}
+            @completedCount={{this.progress}}
+          />
+        </Boxel::Sidebar::CardContainer>
+      </SidebarSection>
+    {{/if}}
+
+    <SidebarSection>
+      <Boxel::HelpBox />
+    </SidebarSection>
+
+    <SidebarSection>
+      {{#if this.otherParticipants}}
+        <Boxel::Sidebar::CardContainer @header="Participants" @attachNext={{true}}>
+          <Boxel::ParticipantList
+            @fullWidth={{true}}
+            @participants={{this.otherParticipants}}
+          />
+        </Boxel::Sidebar::CardContainer>
+      {{/if}}
+
+      <Boxel::Sidebar::CardContainer
+        @header={{unless this.otherParticipants "Participants" ""}}
+      >
+        <Boxel::ParticipantList
+          @fullWidth={{true}}
+          @participants={{this.participatingOrgMembers}}
+        />
+      </Boxel::Sidebar::CardContainer>
+    </SidebarSection>
+  </:sidebar>
+</Boxel::Thread>
