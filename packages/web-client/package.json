@@ -25,12 +25,12 @@
     "test:ember": "ember test"
   },
   "devDependencies": {
-    "@cardstack/boxel": "^0.7.12",
+    "@cardstack/boxel": "0.7.12",
     "@cardstack/cardpay-sdk": "0.19.26",
     "@cardstack/did-resolver": "0.19.26",
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.2.5",
-    "@ember/test-waiters": "2.4.3",
+    "@ember/test-waiters": "^2.4.3",
     "@embroider/compat": "^0.41.0",
     "@embroider/core": "^0.41.0",
     "@embroider/webpack": "^0.41.0",
@@ -103,6 +103,7 @@
     "ember-focus-trap": "^0.6.0",
     "ember-load-initializers": "^2.1.2",
     "ember-maybe-import-regenerator": "^0.1.6",
+    "ember-named-blocks-polyfill": "^0.2.4",
     "ember-page-title": "^6.2.1",
     "ember-qunit": "^5.1.4",
     "ember-resolver": "^8.0.2",
@@ -146,6 +147,7 @@
     "@walletconnect/iso-crypto": "^1.4.1",
     "@walletconnect/qrcode-modal": "^1.4.1",
     "broadcastchannel-polyfill": "^1.0.1",
+    "ember-cli-dependency-lint": "^2.0.0",
     "macro-decorators": "^0.1.2",
     "typescript": "^4.2.3"
   },

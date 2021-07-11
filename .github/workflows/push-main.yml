@@ -6,29 +6,28 @@ on:
 
 jobs:
   lint:
-    name: Lint All 
+    name: Lint All
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - uses: volta-cli/action@v1
-    - name: Set up yarn cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/yarn
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-    - run: yarn --prefer-offline
-    - run: yarn lint
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn --prefer-offline
+      - run: yarn lint
 
   test_all_but_web_client:
-    name: hub, did-resolver Build/Test 
+    name: hub, did-resolver Build/Test
     needs: lint
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:13
@@ -45,44 +44,43 @@ jobs:
           --health-timeout 5s
           --health-retries 5
           -v /var/run/postgresql/:/var/run/postgresql
-
     steps:
-    - name: Create database
-      run: sudo -u postgres createdb hub_test
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - uses: volta-cli/action@v1
-    - name: Set up yarn cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/yarn
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-    - run: yarn --prefer-offline
-    - run: yarn test:hub:preparedb
-    - run: yarn run npm-run-all --aggregate-output --continue-on-error --parallel test:did-resolver test:hub
+      - name: Create database
+        run: sudo -u postgres createdb hub_test
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn --prefer-offline
+      - run: yarn test:hub:preparedb
+      - run: yarn run npm-run-all --aggregate-output --continue-on-error --parallel test:did-resolver test:hub
 
-  test_web_client:
-    name: web-client Build/Lint/Test 
+  test_boxel_and_web_client:
+    name: web-client Build/Lint/Test
     needs: lint
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - uses: volta-cli/action@v1
-    - name: Set up yarn cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/yarn
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-    - run: yarn --prefer-offline
-    - run: yarn test:web-client
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn --prefer-offline
+      - run: yarn test:boxel
+      - run: yarn test:web-client
 
   change_check:
     name: Check which packages changed
@@ -92,20 +90,23 @@ jobs:
       hub: ${{ steps.filter.outputs.hub }}
       web_client: ${{ steps.filter.outputs.web_client }}
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - uses: dorny/paths-filter@v2
-      id: filter
-      with:
-        filters: |
-          hub:
-            - 'packages/hub/**'
-            - 'packages/did-resolver/**'
-          web_client:
-            - 'packages/web-client/**'
-            - 'packages/cardpay-sdk/**'
-            - 'packages/did-resolver/**'
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            hub:
+              - 'packages/hub/**'
+              - 'packages/did-resolver/**'
+            web_client:
+              - 'packages/web-client/**'
+              - 'packages/boxel/**'
+              - 'packages/cardpay-sdk/**'
+              - 'packages/did-resolver/**'
+            boxel:
+              - 'packages/boxel/**'
 
   deploy-hub-staging:
     name: Deploy hub to staging cluster via waypoint
@@ -113,31 +114,31 @@ jobs:
     if: ${{ needs.change_check.outputs.hub == 'true' }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
-    - name: Install apt packages including waypoint
-      run: |
-        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-        sudo apt-get install awscli waypoint
-    - name: Configure waypoint client
-      run: waypoint context create -server-addr=${{ secrets.WAYPOINT_SERVER_ADDR }} -server-auth-token=${{ secrets.WAYPOINT_AUTH_TOKEN }} -server-tls=true -server-tls-skip-verify=true -set-default -server-require-auth waypoint-staging
-    - uses: volta-cli/action@v1
-    - name: Set up yarn cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/yarn
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-    - run: yarn --prefer-offline
-    - name: Deploy hub
-      run: waypoint up --app=hub -plain
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.WAYPOINT_AWS_ACCESS_KEY }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.WAYPOINT_AWS_SECRET }}
-        AWS_DEFAULT_REGION: us-east-1
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Install apt packages including waypoint
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get install awscli waypoint
+      - name: Configure waypoint client
+        run: waypoint context create -server-addr=${{ secrets.WAYPOINT_SERVER_ADDR }} -server-auth-token=${{ secrets.WAYPOINT_AUTH_TOKEN }} -server-tls=true -server-tls-skip-verify=true -set-default -server-require-auth waypoint-staging
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn --prefer-offline
+      - name: Deploy hub
+        run: waypoint up --app=hub -plain
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.WAYPOINT_AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.WAYPOINT_AWS_SECRET }}
+          AWS_DEFAULT_REGION: us-east-1
 
   deploy-web-client-staging:
     name: Deploy web-client to S3 staging bucket
@@ -145,21 +146,21 @@ jobs:
     if: ${{ needs.change_check.outputs.web_client == 'true' }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
-    - uses: volta-cli/action@v1
-    - name: Set up yarn cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/yarn
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-    - run: yarn --prefer-offline
-    - name: Run ember-cli-deploy
-      run: yarn deploy:web-client:staging
-      env:
-        EMBER_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}
-        EMBER_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
-        HUB_URL: https://hub-staging.stack.cards
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn --prefer-offline
+      - name: Run ember-cli-deploy
+        run: yarn deploy:web-client:staging
+        env:
+          EMBER_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}
+          EMBER_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
+          HUB_URL: https://hub-staging.stack.cards
