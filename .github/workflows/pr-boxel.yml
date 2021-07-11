@@ -1,7 +1,7 @@
 name: CI [boxel]
 
 on:
-  push:
+  pull_request:
     branches: [main]
     paths:
       - 'packages/boxel/**'
