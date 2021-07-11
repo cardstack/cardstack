@@ -69,8 +69,6 @@
     "ember-unique-id-helper-polyfill": "^0.1.0"
   },
   "devDependencies": {
-    "@actions/core": "^1.2.6",
-    "@actions/github": "^4.0.0",
     "@ember/jquery": "^1.1.0",
     "@ember/optional-features": "^2.0.0",
     "@ember/render-modifiers": "^1.0.2",
