@@ -68,6 +68,12 @@
         </CardPay::LabeledValue>
       </CardPay::FieldStack>
     </div>
+    {{#if this.errorMessage}}
+      <CardPay::ErrorMessage>
+        {{this.errorMessage}}
+        Please try again if you want to continue with this workflow, or contact <a href="mailto:support@cardstack.com" target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+      </CardPay::ErrorMessage>
+    {{/if}}
   </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{this.issueState}}
