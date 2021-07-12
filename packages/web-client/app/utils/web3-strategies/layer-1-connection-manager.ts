@@ -227,7 +227,7 @@ class MetaMaskConnectionManager extends ConnectionManager {
       this.onConnect(accounts);
     } else {
       // if we didn't find accounts, then the stored provider key is not useful, delete it
-      window.localStorage.removeItem(GET_PROVIDER_STORAGE_KEY(this.chainId));
+      ConnectionManager.removeProviderFromStorage(this.chainId);
       return;
     }
   }
