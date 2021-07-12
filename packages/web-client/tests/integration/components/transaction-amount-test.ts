@@ -2,14 +2,12 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, fillIn, typeIn, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { TransactionReceipt } from 'web3-core';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import BN from 'bn.js';
 import { toBN, toWei } from 'web3-utils';
-import { defer } from 'rsvp';
-import RSVP from 'rsvp';
+import sinon from 'sinon';
 
 module('Integration | Component | transaction-amount', function (hooks) {
   setupRenderingTest(hooks);
@@ -22,19 +20,6 @@ module('Integration | Component | transaction-amount', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Strategy.test__simulateAccountsChanged([layer2AccountAddress]);
   });
-
-  const hijackApprove = (
-    service: Layer1TestWeb3Strategy,
-    fn: (_amountInWei: BN) => void
-  ) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    service.approve = function approve(_amountInWei: BN, _token: string) {
-      fn(_amountInWei);
-      let resolved = defer() as RSVP.Deferred<TransactionReceipt>;
-      resolved.resolve();
-      return resolved.promise;
-    };
-  };
 
   test('It disables the unlock button when amount entered is more than balance (18-decimal floating point)', async function (assert) {
     const startDaiAmountString = '5.111111111111111110';
@@ -75,7 +60,6 @@ module('Integration | Component | transaction-amount', function (hooks) {
     const daiToSend = '5.111111111111111111';
     const daiToSendInWei = '5111111111111111111';
     let startDaiAmount = toWei('10');
-    let weiSentToApprove = toBN('-1');
 
     const session = new WorkflowSession();
     session.update('depositSourceToken', 'DAI');
@@ -88,9 +72,7 @@ module('Integration | Component | transaction-amount', function (hooks) {
       card: toBN('0'),
     });
 
-    hijackApprove(layer1Service, (_amountInWei: BN) => {
-      weiSentToApprove = _amountInWei;
-    });
+    let approveSpy = sinon.spy(layer1Service, 'approve');
 
     this.setProperties({
       session,
@@ -109,7 +91,10 @@ module('Integration | Component | transaction-amount', function (hooks) {
 
     await click('[data-test-unlock-button]');
 
-    assert.equal(weiSentToApprove.toString(), toBN(daiToSendInWei).toString());
+    assert.ok(
+      approveSpy.calledOnceWith(new BN(daiToSendInWei), 'DAI'),
+      'The amount that the approve call is made with matches the amount shown in the UI'
+    );
   });
 
   test('It does not accept invalid values and ignores invalid characters typed in', async function (assert) {

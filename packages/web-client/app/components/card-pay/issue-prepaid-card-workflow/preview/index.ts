@@ -9,7 +9,7 @@ import CardCustomization, {
 } from '@cardstack/web-client/services/card-customization';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
 
 // http://ember-concurrency.com/docs/typescript
 // infer whether we should treat the return of a yield statement as a promise
@@ -28,27 +28,53 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
 
   @reads('args.workflowSession.state.spendFaceValue')
   declare faceValue: number;
+  @reads('issueTask.last.error') declare error: Error | undefined;
 
-  @tracked errorMessage = '';
+  @action issuePrepaidCard() {
+    taskFor(this.issueTask)
+      .perform()
+      .catch((e) => console.error(e));
+  }
 
   @task *issueTask(): TaskGenerator<void> {
     let { workflowSession } = this.args;
-    yield this.hubAuthentication.ensureAuthenticated();
-    // yield statements require manual typing
-    // https://github.com/machty/ember-concurrency/pull/357#discussion_r434850096
-    let customization: Resolved<PrepaidCardCustomization> = yield taskFor(
-      this.cardCustomization.createCustomizationTask
-    ).perform({
-      issuerName: workflowSession.state.issuerName,
-      colorSchemeId: workflowSession.state.colorScheme.id,
-      patternId: workflowSession.state.pattern.id,
-    });
-    yield taskFor(this.layer2Network.issuePrepaidCard)
-      .perform(this.faceValue, customization.did)
-      .then((address: string) => {
-        this.args.workflowSession.update('prepaidCardAddress', address);
-        this.args.onComplete();
+    try {
+      yield this.hubAuthentication.ensureAuthenticated();
+
+      // yield statements require manual typing
+      // https://github.com/machty/ember-concurrency/pull/357#discussion_r434850096
+      let customization: Resolved<PrepaidCardCustomization> = yield taskFor(
+        this.cardCustomization.createCustomizationTask
+      ).perform({
+        issuerName: workflowSession.state.issuerName,
+        colorSchemeId: workflowSession.state.colorScheme.id,
+        patternId: workflowSession.state.pattern.id,
       });
+
+      yield taskFor(this.layer2Network.issuePrepaidCard)
+        .perform(this.faceValue, customization.did)
+        .then((address: string) => {
+          this.args.workflowSession.update('prepaidCardAddress', address);
+          this.args.onComplete();
+        });
+    } catch (e) {
+      let insufficientFunds = e.message.startsWith(
+        'Safe does not have enough balance to make prepaid card(s).'
+      );
+      let tookTooLong = e.message.startsWith(
+        'Transaction took too long to complete'
+      );
+      if (insufficientFunds) {
+        // We probably want to cancel the workflow at this point
+        // And tell the user to go deposit funds
+        throw new Error('INSUFFICIENT_FUNDS');
+      } else if (tookTooLong) {
+        throw new Error('TIMEOUT');
+      } else {
+        // Basically, for pretty much everything we want to make the user retry or seek support
+        throw e;
+      }
+    }
   }
 
   get issueState() {
