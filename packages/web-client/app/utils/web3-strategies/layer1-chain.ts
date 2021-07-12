@@ -127,6 +127,7 @@ export default abstract class Layer1ChainWeb3Strategy
     this.connectionManager = undefined;
     this.web3 = undefined;
     this.currentProviderId = '';
+    this.#waitForAccountDeferred = defer();
   }
 
   private onDisconnect() {
@@ -134,7 +135,6 @@ export default abstract class Layer1ChainWeb3Strategy
       this.simpleEmitter.emit('disconnect');
     }
     this.cleanupConnectionState();
-    this.#waitForAccountDeferred = defer();
   }
 
   get waitForAccount(): Promise<void> {
@@ -157,7 +157,6 @@ export default abstract class Layer1ChainWeb3Strategy
       this.defaultTokenBalance = undefined;
       this.cardBalance = undefined;
       this.daiBalance = undefined;
-      this.#waitForAccountDeferred = defer();
     }
   }
 
