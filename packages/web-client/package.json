@@ -108,6 +108,7 @@
     "ember-qunit": "^5.1.4",
     "ember-resolver": "^8.0.2",
     "ember-set-helper": "^2.0.0",
+    "ember-sinon-qunit": "^6.0.0",
     "ember-source": "~3.25.1",
     "ember-svg-jar": "^2.3.3",
     "ember-template-lint": "^3.2.0",
