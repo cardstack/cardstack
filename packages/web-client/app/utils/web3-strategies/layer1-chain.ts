@@ -131,9 +131,9 @@ export default abstract class Layer1ChainWeb3Strategy
 
   private onDisconnect() {
     if (this.isConnected) {
-      this.cleanupConnectionState();
       this.simpleEmitter.emit('disconnect');
     }
+    this.cleanupConnectionState();
     this.#waitForAccountDeferred = defer();
   }
 
