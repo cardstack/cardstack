@@ -22,7 +22,6 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Install dependencies
         run: |
-          yarn global add lerna
           yarn --prefer-offline
       - name: Lint
         run: |
@@ -51,9 +50,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Install dependencies
-        run: |
-          yarn global add lerna
-          yarn --prefer-offline
+        run: yarn --prefer-offline
       - name: Test
         env:
           EMBER_TRY_SCENARIO: ${{ matrix.ember-try-scenario }}
@@ -83,9 +80,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Install dependencies
-        run: |
-          yarn global add lerna
-          yarn --prefer-offline
+        run: yarn --prefer-offline
       - name: Set PR branch name
         run: echo "PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
       - name: Deploy preview
@@ -114,8 +109,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Install dependencies
-        run: |
-          yarn --prefer-offline
+        run: yarn --prefer-offline
       - name: Find pull request number for branch
         uses: ./.github/actions/find-pr-number
         id: fpr
