@@ -1,0 +1,16 @@
+.cardstack-error-message {
+  color: var(--boxel-error-100);
+  font: 600 var(--boxel-font-sm);
+}
+
+.cardstack-error-message a {
+  color: var(--boxel-error-100);
+  text-decoration: underline;
+}
+
+.cardstack-error-message a:hover {
+  color: var(--boxel-error-100);
+
+  /* Opting for filter instead of introducing a new color */
+  filter: brightness(0.9);
+}

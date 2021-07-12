@@ -69,10 +69,10 @@
       </CardPay::FieldStack>
     </div>
     {{#if this.errorMessage}}
-      <div class="preview__error">
+      <CardPay::ErrorMessage>
         {{this.errorMessage}}
-        Please try again if you want to continue with this workflow, or contact <a class="preview__support-link" href="mailto:support@cardstack.com" target="_blank" rel="noopener noreferrer">Cardstack support</a>.
-      </div>
+        Please try again if you want to continue with this workflow, or contact <a href="mailto:support@cardstack.com" target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+      </CardPay::ErrorMessage>
     {{/if}}
   </ActionCardContainer::Section>
   <Boxel::ActionChin
