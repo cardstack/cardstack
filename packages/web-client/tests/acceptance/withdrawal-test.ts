@@ -294,6 +294,42 @@ module('Acceptance | withdrawal', function (hooks) {
       .containsText('You have successfully withdrawn tokens');
     assert.dom(epiloguePostableSel(1)).containsText('You withdrew');
     assert.dom(epiloguePostableSel(1)).containsText('You received');
+    assert
+      .dom(
+        '[data-test-withdrawal-transaction-confirmed-from] [data-test-bridge-item-network]'
+      )
+      .containsText('L2 test chain');
+    assert
+      .dom(
+        '[data-test-withdrawal-transaction-confirmed-from] [data-test-bridge-item-amount]'
+      )
+      .containsText('200.00 DAI.CPXD');
+    assert
+      .dom(
+        '[data-test-withdrawal-transaction-confirmed-from] [data-test-bridge-item-wallet]'
+      )
+      .containsText('0x1826...6E44');
+    assert
+      .dom(
+        '[data-test-withdrawal-transaction-confirmed-from] [data-test-bridge-item-depot]'
+      )
+      .containsText('0xB236...6666');
+    assert
+      .dom(
+        '[data-test-withdrawal-transaction-confirmed-to] [data-test-bridge-item-network]'
+      )
+      .containsText('L1 test chain');
+    assert
+      .dom(
+        '[data-test-withdrawal-transaction-confirmed-to] [data-test-bridge-item-amount]'
+      )
+      .containsText('200.00 DAI');
+    assert
+      .dom(
+        '[data-test-withdrawal-transaction-confirmed-to] [data-test-bridge-item-wallet]'
+      )
+      .containsText(layer1AccountAddress);
+
     await waitFor(epiloguePostableSel(2));
     assert
       .dom(epiloguePostableSel(2))

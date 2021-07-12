@@ -4,87 +4,35 @@
   data-test-withdrawal-transaction-confirmed-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section @title="You withdrew">
-    <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
-      <div class="card-pay-confirmation__transfer-network">
-        <span class="card-pay-confirmation__transfer-network-name">{{network-display-info "layer2" "fullName"}}</span>
-        <Boxel::Button @as="anchor" @size="extra-small" href="#" target="_blank" rel="noopener">
-          View on Blockscout
-        </Boxel::Button>
-      </div>
-      <div class="card-pay-confirmation__transaction">
-        <CardPay::BalanceDisplay
-          class="card-pay-confirmation__transaction-amount"
-          @size="large"
-          @icon={{this.withdrawToken.icon}}
-          @balance={{format-token-amount this.withdrawAmount}}
-          @symbol={{this.withdrawToken.symbol}}
-        />
-        <div class="card-pay-confirmation__transaction-preposition">
-          from
-        </div>
-        <CardPay::AccountDisplay
-          class="card-pay-confirmation__transaction-wallet"
-          @size="small"
-          @name={{concat (network-display-info "layer2" "fullName") " wallet"}}
-        />
-        <CardPay::NestedItems {{!-- class="card-pay-confirmation__transaction-depot" --}}>
-          <:outer>
-            <CardPay::AccountDisplay
-              @size="small"
-              @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
-              data-test-withdraw-confirmation-account
-            />
-          </:outer>
-          <:inner>
-            <CardPay::AccountDisplay
-              @size="small"
-              @icon="depot"
-              @name="DEPOT:"
-              @address={{truncate-middle this.depotAddress}}
-              data-test-withdraw-confirmation-depot
-            />
-          </:inner>
-        </CardPay::NestedItems>
-      </div>
-    </Boxel::CardContainer>
+    <CardPay::Bridge::Item
+      @isLayer2={{true}}
+      @link="#"
+      @token={{this.withdrawToken}}
+      @amount={{format-token-amount this.withdrawAmount}}
+      @preposition="from"
+      @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
+      @depotAddress={{this.depotAddress}}
+      data-test-withdrawal-transaction-confirmed-from
+    />
   </ActionCardContainer::Section>
+</ActionCardContainer>
 
-  <div class="card-pay-confirmation__bridge-container">
-    <div class="card-pay-confirmation__bridge-inner">
-      Bridge
-      <Boxel::Button @as="anchor" @size="extra-small" href="#" target="_blank" rel="noopener" class="card-pay-confirmation__bridge-inner-button">
-        View in Bridge Explorer
-      </Boxel::Button>
-    </div>
-  </div>
+<CardPay::Bridge @link="#" />
 
+<ActionCardContainer
+  @header="Confirmation"
+  @suppressHeader={{true}}
+  @isComplete={{@isComplete}}
+>
   <ActionCardContainer::Section @title="You received">
-    <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
-      <div class="card-pay-confirmation__transfer-network">
-        <span class="card-pay-confirmation__transfer-network-name">{{network-display-info "layer1" "fullName"}}</span>
-        <Boxel::Button @as="anchor" @size="extra-small" href="#" target="_blank" rel="noopener">
-          View on Etherscan
-        </Boxel::Button>
-      </div>
-      <div class="card-pay-confirmation__transaction">
-        <CardPay::BalanceDisplay
-          class="card-pay-confirmation__transaction-amount"
-          @size="large"
-          @icon={{this.receivedToken.icon}}
-          @balance={{format-token-amount this.withdrawAmount}}
-          @symbol={{this.receivedToken.symbol}}
-        />
-        <div class="card-pay-confirmation__transaction-preposition">
-          in
-        </div>
-        <CardPay::AccountDisplay
-          class="card-pay-confirmation__transaction-wallet"
-          @size="small"
-          @name={{concat (network-display-info "layer1" "fullName") " wallet"}}
-          @address={{this.layer1Network.walletInfo.firstAddress}}
-          @wrapped={{true}}
-        />
-      </div>
-    </Boxel::CardContainer>
+    <CardPay::Bridge::Item
+      @isLayer1={{true}}
+      @link="#"
+      @token={{this.receivedToken}}
+      @amount={{format-token-amount this.withdrawAmount}}
+      @preposition="in"
+      @walletAddress={{this.layer1Network.walletInfo.firstAddress}}
+      data-test-withdrawal-transaction-confirmed-to
+    />
   </ActionCardContainer::Section>
 </ActionCardContainer>

@@ -1,0 +1,10 @@
+{{#unless @isArrowAfter}}
+  {{svg-jar "arrow" class="card-pay-bridge-action__arrow"}}
+{{/unless}}
+<p class="card-pay-bridge-action">
+  {{svg-jar @icon class="card-pay-bridge-action__icon"}}
+  {{@actionTaken}}
+</p>
+{{#if @isArrowAfter}}
+  {{svg-jar "arrow" class="card-pay-bridge-action__arrow"}}
+{{/if}}

@@ -1,106 +1,44 @@
 <ActionCardContainer
   @header="Confirmation"
   @isComplete={{@isComplete}}
-  class="card-pay-confirmation"
 >
   <ActionCardContainer::Section @title="You deposited">
-    <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
-      <div class="card-pay-confirmation__transfer-network">
-        <span class="card-pay-confirmation__transfer-network-name">{{network-display-info "layer1" "fullName"}}</span>
-        <Boxel::Button @as="anchor" @size="extra-small" href={{this.depositTxnViewerUrl}} target="_blank" rel="noopener">
-          View on Etherscan
-        </Boxel::Button>
-      </div>
-      <div class="card-pay-confirmation__transaction">
-        <CardPay::BalanceDisplay
-          class="card-pay-confirmation__transaction-amount"
-          @size="large"
-          @icon={{this.depositedToken.icon}}
-          @balance={{format-token-amount this.depositedAmount}}
-          @symbol={{this.depositedToken.symbol}}
-        />
-        <div class="card-pay-confirmation__transaction-preposition">
-          from
-        </div>
-        <CardPay::AccountDisplay
-          class="card-pay-confirmation__transaction-wallet"
-          @size="small"
-          @name={{concat (network-display-info "layer1" "fullName") " wallet"}}
-          @address={{this.layer1Network.walletInfo.firstAddress}}
-          @wrapped={{true}}
-        />
-      </div>
-    </Boxel::CardContainer>
-    {{svg-jar "arrow" class="card-pay-confirmation__down-arrow"}}
-    <p class="card-pay-confirmation__action-taken">
-      {{svg-jar "lock-wide" class="card-pay-confirmation__action-taken-icon"}}
-      Locked in CARD Protocol reserve pool
-    </p>
+    <CardPay::Bridge::Item
+      @isLayer1={{true}}
+      @link={{this.depositTxnViewerUrl}}
+      @token={{this.depositedToken}}
+      @amount={{format-token-amount this.depositedAmount}}
+      @preposition="from"
+      @walletAddress={{this.layer1Network.walletInfo.firstAddress}}
+      data-test-deposit-confirmation-from
+    />
+    <CardPay::Bridge::Action
+      @icon="lock-wide"
+      @actionTaken="Locked in CARD Protocol reserve pool"
+    />
   </ActionCardContainer::Section>
 </ActionCardContainer>
-<div class="card-pay-confirmation__bridge-container">
-  <div class="card-pay-confirmation__bridge-inner">
-    Bridge
-    <Boxel::Button @as="anchor" @size="extra-small" href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" class="card-pay-confirmation__bridge-inner-button">
-      View in Bridge Explorer
-    </Boxel::Button>
-  </div>
-</div>
+<CardPay::Bridge @link={{this.bridgeExplorerUrl}} />
 <ActionCardContainer
   @header="Confirmation"
   @suppressHeader={{true}}
   @isComplete={{@isComplete}}
-  class="card-pay-confirmation"
 >
   <ActionCardContainer::Section @title="You received">
-    <p class="card-pay-confirmation__action-taken">
-      {{svg-jar "coins" class="card-pay-confirmation__action-taken-icon"}}
-      Minted from CARD Protocol on {{network-display-info "layer2" "fullName"}}
-    </p>
-    {{svg-jar "arrow" class="card-pay-confirmation__down-arrow"}}
-    <Boxel::CardContainer @displayBoundaries={{true}} class="card-pay-confirmation__transfer-info">
-      <div class="card-pay-confirmation__transfer-network">
-        <span class="card-pay-confirmation__transfer-network-name">{{network-display-info "layer2" "fullName"}}</span>
-        <Boxel::Button @as="anchor" @size="extra-small" href={{this.blockscoutUrl}} target="_blank" rel="noopener">
-          View on Blockscout
-        </Boxel::Button>
-      </div>
-      <div class="card-pay-confirmation__transaction">
-        <CardPay::BalanceDisplay
-          class="card-pay-confirmation__transaction-amount"
-          @size="large"
-          @icon={{this.depositedToken.icon}}
-          @balance={{format-token-amount this.depositedAmount}}
-          @symbol={{concat this.depositedToken.symbol ".CPXD"}}
-        />
-        <div class="card-pay-confirmation__transaction-preposition">
-          in
-        </div>
-        <CardPay::AccountDisplay
-          class="card-pay-confirmation__transaction-wallet"
-          @size="small"
-          @name={{concat (network-display-info "layer2" "fullName") " wallet"}}
-        />
-        <CardPay::NestedItems {{!-- class="card-pay-confirmation__transaction-depot" --}}>
-          <:outer>
-            <CardPay::AccountDisplay
-              @size="small"
-              @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
-              data-test-deposit-confirmation-account-address
-            />
-          </:outer>
-          <:inner>
-            <CardPay::AccountDisplay
-              @size="small"
-              @icon="depot"
-              @name="DEPOT:"
-              @address={{truncate-middle this.depotAddress}}
-              @text={{unless this.depotAddress "New Depot"}}
-              data-test-deposit-confirmation-depot-address
-            />
-          </:inner>
-        </CardPay::NestedItems>
-      </div>
-    </Boxel::CardContainer>
+    <CardPay::Bridge::Action
+      @isArrowAfter={{true}}
+      @icon="coins"
+      @actionTaken={{concat "Minted from CARD Protocol on " (network-display-info "layer2" "fullName")}}
+    />
+    <CardPay::Bridge::Item
+      @isLayer2={{true}}
+      @link={{this.blockscoutUrl}}
+      @token={{this.receivedToken}}
+      @amount={{format-token-amount this.depositedAmount}}
+      @preposition="in"
+      @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
+      @depotAddress={{this.depotAddress}}
+      data-test-deposit-confirmation-to
+    />
   </ActionCardContainer::Section>
 </ActionCardContainer>

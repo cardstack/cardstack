@@ -6,6 +6,7 @@
 
   /* box-shadow is implemented here so it follows the border-radius of this container */
   transition: box-shadow var(--boxel-transition);
+  z-index: 1;
 }
 
 .action-card-container--is-complete {
