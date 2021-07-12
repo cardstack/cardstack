@@ -68,12 +68,19 @@
         </CardPay::LabeledValue>
       </CardPay::FieldStack>
     </div>
-    {{#if this.errorMessage}}
+        {{#if this.error}}
       <CardPay::ErrorMessage>
-        {{this.errorMessage}}
-        Please try again if you want to continue with this workflow, or contact <a href="mailto:support@cardstack.com" target="_blank" rel="noopener noreferrer">Cardstack support</a>.
-      </CardPay::ErrorMessage>
-    {{/if}}
+        {{#if (eq this.error "INSUFFICIENT_FUNDS")}}
+          {{!-- TODO: This should be accompanied by canceling the workflow --}}
+          Looks like there's no balance in your {{network-display-info "layer2" "fullName"}} wallet to fund your selected prepaid card. Before you can continue, please add funds to your {{network-display-info "layer2" "fullName"}} wallet by bridging some tokens from your {{network-display-info "layer1" "fullName"}} wallet.
+          {{!-- TODO: "The balance required to create your desired prepaid card is ${}" --}}
+        {{else if (eq this.error "TIMEOUT")}}
+          There was a problem creating your prepaid card. Please contact <a href="mailto:support@cardstack.com" target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
+        {{else}}
+           There was a problem creating your prepaid card. Please try again if you want to continue with this workflow, or contact <a href="mailto:support@cardstack.com" target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+        {{/if}}
+        </CardPay::ErrorMessage>
+        {{/if}}
   </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{this.issueState}}
