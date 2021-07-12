@@ -1,5 +1,5 @@
 {{#if this.modal.isShowing}}
-  <div style="border:5px red dashed; margin: 5vw;padding:1vw" data-test-modal>
+  <div class={{cn "modal" this.modal.state.format}} style="border:5px red dashed; margin: 5vw;padding:1vw" data-test-modal>
     <div>
       <button data-test-modal-close {{on 'click' this.close}}>Close Modal</button>
     </div>

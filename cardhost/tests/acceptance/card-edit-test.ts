@@ -4,11 +4,15 @@ import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import setupCardMocking from '../helpers/card-mocking';
 
-import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import click from '@ember/test-helpers/dom/click';
 import fillIn from '@ember/test-helpers/dom/fill-in';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import waitFor from '@ember/test-helpers/dom/wait-for';
+
+import {
+  ADDRESS_RAW_CARD,
+  PERSON_RAW_CARD,
+} from '@cardstack/core/tests/helpers/fixtures';
 
 const PERSON = '[data-test-person]';
 const MODAL = '[data-test-modal]';
@@ -30,38 +34,28 @@ module('Acceptance | Card Editing', function (hooks) {
           export default class MyRoutes {
             routeTo(path) {
               if (path === '/person') {
-                return '${personURL}';
+                return '${PERSON_RAW_CARD.url}';
               }
             }
           }`,
       },
     });
 
-    this.createCard({
-      url: personURL,
-      schema: 'schema.js',
-      isolated: 'isolated.js',
-      data: {
-        name: 'Arthur',
-        birthdate: '2021-05-17',
-      },
-      files: {
-        'schema.js': `
-          import { contains } from "@cardstack/types";
-          import './isolated.css'
-          import string from "https://cardstack.com/base/string";
-          import date from "https://cardstack.com/base/date";
-          export default class Person {
-            @contains(string) name;
-            @contains(date) birthdate;
-          }`,
-        'isolated.js': templateOnlyComponentTemplate(
-          `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`,
-          { IsolatedStyles: './isolated.css' }
-        ),
-        'isolated.css': '.person-isolated { background: red }',
-      },
-    });
+    this.createCard(ADDRESS_RAW_CARD);
+    this.createCard(
+      Object.assign(
+        {
+          data: {
+            name: 'Arthur',
+            birthdate: '2021-05-17',
+            address: {
+              street: 'Seasame Place',
+            },
+          },
+        },
+        PERSON_RAW_CARD
+      )
+    );
   });
 
   test('Editing a card', async function (assert) {
@@ -74,6 +68,8 @@ module('Acceptance | Card Editing', function (hooks) {
 
     await waitFor('[data-test-field-name="name"]');
     await fillIn('[data-test-field-name="name"]', 'Bob Barker');
+    await fillIn('[data-test-field-name="city"]', 'San Francisco');
+    await this.pauseTest();
     await click(SAVE);
     await waitFor(MODAL, { count: 0 });
     assert.dom(MODAL).doesNotExist('The modal is closed');
@@ -81,6 +77,11 @@ module('Acceptance | Card Editing', function (hooks) {
     assert.equal(
       card.attrs.raw.data.name,
       'Bob Barker',
+      'RawCard cache is updated'
+    );
+    assert.equal(
+      card.attrs.raw.data.address.city,
+      'San Francisco',
       'RawCard cache is updated'
     );
     assert

@@ -1,47 +1,47 @@
-"use strict";
+'use strict';
 
 module.exports = {
   root: true,
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: "module",
+    sourceType: 'module',
   },
-  plugins: ["@typescript-eslint"],
+  plugins: ['@typescript-eslint'],
   extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended",
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
   ],
   env: {
     browser: true,
   },
   rules: {
-    "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-unused-vars": "error",
-    "@typescript-eslint/no-explicit-any": "off",
-    "prefer-const": "off",
-    "@typescript-eslint/no-non-null-assertion": "off",
-    "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/ban-types": "off",
+    '@typescript-eslint/no-empty-function': 'off',
+    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/no-explicit-any': 'off',
+    'prefer-const': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/ban-types': 'off',
   },
   overrides: [
     // node files
     {
-      files: ["*.cjs"],
+      files: ['*.cjs'],
       parserOptions: {
-        sourceType: "script",
+        sourceType: 'script',
       },
       env: {
         browser: false,
         node: true,
       },
-      plugins: ["node"],
-      extends: ["plugin:node/recommended"],
+      plugins: ['node'],
+      extends: ['plugin:node/recommended'],
       rules: {
-        "node/no-unpublished-require": "off",
-        "@typescript-eslint/no-var-requires": "off",
+        'node/no-unpublished-require': 'off',
+        '@typescript-eslint/no-var-requires': 'off',
       },
     },
   ],
