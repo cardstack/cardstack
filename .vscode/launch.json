@@ -94,6 +94,24 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay: Wait for Bridge to Layer 2",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "await-bridged-to-l2",
+        "21746764", // from block
+        "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // recipient (depot safe owner)
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay: Wait for Bridge Validators",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",

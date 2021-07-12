@@ -108,7 +108,7 @@ export async function awaitBridgedToLayer2(
 
   let blockExplorer = await getConstant('blockExplorer', web3);
 
-  console.log('Waiting for bridging to complete...');
+  console.log(`Waiting for bridging to complete for depot owner ${recipient} from block ${fromBlock}...`);
   let result = await tokenBridge.waitForBridgingToLayer2Completed(recipient, String(fromBlock));
   console.log(`Bridging transaction hash: ${blockExplorer}/tx/${result.transactionHash}`);
 }

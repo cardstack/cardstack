@@ -1,16 +1,15 @@
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { ContractOptions, EventData } from 'web3-eth-contract';
-import HomeBridgeABI from '../contracts/abi/home-bridge-mediator';
 import ERC677ABI from '../contracts/abi/erc-677';
 import HomeAMBABI from '../contracts/abi/home-amb';
 import BridgeValidatorsABI from '../contracts/abi/bridge-validators';
 import { getAddress } from '../contracts/addresses';
-import { waitForEvent, waitUntilTransactionMined } from './utils/general-utils';
 import { executeTransaction, gasEstimate, GnosisExecTx } from './utils/safe-utils';
 import { AbiItem, fromWei, toBN } from 'web3-utils';
 import { signSafeTxAsRSV } from './utils/signing-utils';
 import { ZERO_ADDRESS } from './constants';
+import { query } from './utils/graphql';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -19,6 +18,24 @@ import { ZERO_ADDRESS } from './constants';
 export interface ITokenBridgeHomeSide {
   waitForBridgingToLayer2Completed(recipientAddress: string, fromBlock: string): Promise<TransactionReceipt>;
 }
+
+const POLL_INTERVAL = 1000;
+const TIMEOUT = 1000 * 60 * 5;
+const bridgedTokensQuery = `
+  query ($account: ID!, $fromBlock: BigInt!) {
+    account(id: $account) {
+      depots {
+        id
+        receivedBridgedTokens(where: {blockNumber_gte: $fromBlock}) {
+          blockNumber
+          transaction {
+            id
+          }
+        }
+      }
+    }
+  }
+`;
 
 export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
   constructor(private layer2Web3: Web3) {}
@@ -94,8 +111,6 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     fromBlock: number,
     bridgingTxnHash: string
   ): Promise<{ messageId: string; encodedData: string; signatures: string[] }> {
-    const POLL_INTERVAL = 5 * 1000;
-    const TIMEOUT = 1000 * 60 * 5;
     let signatureEvents: EventData[] | undefined;
     let homeAmb = new this.layer2Web3.eth.Contract(
       HomeAMBABI as AbiItem[],
@@ -160,41 +175,46 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     return { messageId, encodedData, signatures };
   }
 
+  // We use the subgraph to act as our indicator that bridging has completed, as
+  // this is the same mechanism that is populating the card wallet's
+  // displayed token balances
   async waitForBridgingToLayer2Completed(recipientAddress: string, fromBlock: string): Promise<TransactionReceipt> {
-    let homeBridge = new this.layer2Web3.eth.Contract(
-      HomeBridgeABI as any,
-      await getAddress('homeBridge', this.layer2Web3)
-    );
-    let opts = {
-      filter: {
-        recipient: recipientAddress,
-      },
-      fromBlock: fromBlock,
-      toBlock: 'latest',
-    };
-    let events = await homeBridge.getPastEvents('TokensBridgedToSafe', opts);
-    let event!: EventData;
-    if (events.length) {
-      event = events[events.length - 1];
-    } else {
-      // // @ts-ignore
-      // let usePolling = !this.layer2Web3.currentProvider?.on;
-      let usePolling = true; // always use polling until we figure out how to get subscriptions to work properly
-      event = await new Promise((resolve, reject) => {
-        if (usePolling) {
-          resolve(waitForEvent(homeBridge, 'TokensBridgedToSafe', opts));
-        } else {
-          homeBridge.once('TokensBridgedToSafe', opts, function (error: Error, event: EventData) {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(event);
-            }
-          });
-        }
-      });
+    let start = Date.now();
+    let queryResults: GraphQLBridgeResult | undefined;
+    let receivedBridgedTokens: GraphQLBridgeResult['data']['account']['depots'][0]['receivedBridgedTokens'];
+    do {
+      if (queryResults) {
+        await new Promise<void>((res) => setTimeout(() => res(), POLL_INTERVAL));
+      }
+      queryResults = await query(this.layer2Web3, bridgedTokensQuery, { account: recipientAddress, fromBlock });
+      receivedBridgedTokens = queryResults.data.account.depots[0]?.receivedBridgedTokens ?? [];
+    } while (receivedBridgedTokens.length === 0 && Date.now() < start + TIMEOUT);
+
+    if (receivedBridgedTokens.length === 0) {
+      throw new Error(
+        `Timed out waiting for tokens to be bridged to layer 2 for safe owned by ${recipientAddress} after block ${fromBlock}`
+      );
     }
-    let transactionReceipt = await waitUntilTransactionMined(this.layer2Web3, event.transactionHash);
-    return transactionReceipt;
+    let {
+      transaction: { id: txnHash },
+    } = receivedBridgedTokens[0];
+    let receipt = await this.layer2Web3.eth.getTransactionReceipt(txnHash);
+    return receipt;
   }
+}
+
+interface GraphQLBridgeResult {
+  data: {
+    account: {
+      depots: {
+        id: string;
+        receivedBridgedTokens: {
+          blockNumber: string;
+          transaction: {
+            id: string;
+          };
+        }[];
+      }[];
+    };
+  };
 }

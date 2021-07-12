@@ -30,6 +30,7 @@ export function handleReceivedBridgedTokens(event: TokensBridgedToSafe): void {
   bridgeEventEntity.transaction = txnHash;
   bridgeEventEntity.depot = toChecksumAddress(event.params.safe);
   bridgeEventEntity.timestamp = event.block.timestamp;
+  bridgeEventEntity.blockNumber = event.block.number;
   bridgeEventEntity.supplier = toChecksumAddress(event.params.recipient);
   bridgeEventEntity.token = makeToken(event.params.token);
   bridgeEventEntity.amount = event.params.value;
