@@ -159,10 +159,6 @@ class MetaMaskConnectionManager extends ConnectionManager {
       return;
     }
 
-    // remove all listeners that previous instances of metamask connections have added
-    // otherwise disconnecting and reconnecting might cause "duplicate" event listeners
-    provider.removeAllListeners();
-
     provider.on('accountsChanged', (accounts: string[]) => {
       if (!accounts.length) {
         this.onDisconnect();
@@ -230,6 +226,14 @@ class MetaMaskConnectionManager extends ConnectionManager {
       ConnectionManager.removeProviderFromStorage(this.chainId);
       return;
     }
+  }
+
+  // eslint-disable-next-line ember/classic-decorator-hooks
+  destroy() {
+    super.destroy();
+    // remove all listeners that previous instances of metamask connections have added
+    // otherwise disconnecting and reconnecting might cause "duplicate" event listeners
+    this.provider?.removeAllListeners();
   }
 }
 
