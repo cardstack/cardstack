@@ -60,7 +60,6 @@ module('Integration | Component | transaction-amount', function (hooks) {
     const daiToSend = '5.111111111111111111';
     const daiToSendInWei = '5111111111111111111';
     let startDaiAmount = toWei('10');
-    let weiSentToApprove = toBN('-1');
 
     const session = new WorkflowSession();
     session.update('depositSourceToken', 'DAI');
