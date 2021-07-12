@@ -171,19 +171,14 @@ export default abstract class Layer2ChainWeb3Strategy
   async issuePrepaidCard(safeAddress: string, amount: number): Promise<String> {
     const PrepaidCard = await getSDK('PrepaidCard', this.web3);
 
-    try {
-      const result = await PrepaidCard.create(
-        safeAddress,
-        this.defaultTokenContractAddress!,
-        [amount],
-        undefined
-      );
+    const result = await PrepaidCard.create(
+      safeAddress,
+      this.defaultTokenContractAddress!,
+      [amount],
+      undefined
+    );
 
-      return Promise.resolve(result.prepaidCardAddresses[0]);
-    } catch (e) {
-      console.log('prepaid card create error', e);
-      return Promise.reject(e);
-    }
+    return result.prepaidCardAddresses[0];
   }
 
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
