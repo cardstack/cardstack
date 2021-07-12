@@ -56,7 +56,7 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
         });
     } catch (e) {
       let insufficientFunds = e.message.startsWith(
-        'Safe not have enough balance to make prepaid card(s).'
+        'Safe does not have enough balance to make prepaid card(s).'
       );
       let tookTooLong = e.message.startsWith(
         'Transaction took too long to complete'

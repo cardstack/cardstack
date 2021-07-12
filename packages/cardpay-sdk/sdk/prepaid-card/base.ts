@@ -360,7 +360,7 @@ export default class PrepaidCard {
     let balance = new BN(await token.methods.balanceOf(safeAddress).call());
     if (balance.lt(totalWeiAmount)) {
       throw new Error(
-        `Safe not have enough balance to make prepaid card(s). The issuing token ${tokenAddress} balance of the safe ${safeAddress} is ${fromWei(
+        `Safe does not have enough balance to make prepaid card(s). The issuing token ${tokenAddress} balance of the safe ${safeAddress} is ${fromWei(
           balance
         )}, the total amount necessary to create prepaid cards is ${fromWei(
           totalWeiAmount
