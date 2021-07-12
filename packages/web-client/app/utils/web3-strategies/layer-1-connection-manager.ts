@@ -46,7 +46,6 @@ export abstract class ConnectionManager
   protected simpleEmitter: SimpleEmitter;
   protected broadcastChannel: BroadcastChannel;
   protected provider: any;
-  protected connected = false;
   abstract providerId: WalletProviderId;
 
   constructor(options: ConnectionManagerOptions) {
@@ -110,15 +109,6 @@ export abstract class ConnectionManager
   }
 
   onDisconnect(broadcast = true) {
-    // NOTE: if the ConnectionManager thinks that it's disconnected and Layer1Chain thinks
-    // that it's connected, this can result in never being able to disconnect
-    // The problem here is that WalletConnect gives you two disconnect events when you disconnect
-    // from the Dapp
-    // and one when you disconnect from the wallet
-    if (!this.connected) {
-      return;
-    }
-    this.connected = false;
     ConnectionManager.removeProviderFromStorage(this.chainId);
     if (broadcast)
       this.broadcastChannel.postMessage(
@@ -129,7 +119,6 @@ export abstract class ConnectionManager
   }
 
   onConnect(accounts: string[]) {
-    this.connected = true;
     ConnectionManager.addProviderToStorage(this.chainId, this.providerId);
     this.emit('connected', accounts);
   }
