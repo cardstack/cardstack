@@ -203,7 +203,13 @@ class MetaMaskConnectionManager extends ConnectionManager {
         method: 'eth_requestAccounts',
       });
     }
-    return;
+
+    // This is last, because we actually want to have a working connection
+    // in order to be able to listen for changes in network
+    // either to allow the user to change network and reconnect or ? reload the page
+    if (await this.isIncorrectChain()) {
+      this.onIncorrectChain();
+    }
   }
 
   // metamask actually doesn't allow you to disconnect via its API
@@ -215,16 +221,18 @@ class MetaMaskConnectionManager extends ConnectionManager {
 
   // unlike the connect method, here we do not try to open the popup (eth_requestAccounts) if there is no account
   async reconnect() {
-    let provider: any | undefined = await detectEthereumProvider();
-    let accounts = await provider.request({ method: 'eth_accounts' });
+    let accounts = await this.provider.request({ method: 'eth_accounts' });
     if (accounts.length) {
       // metamask's disconnection is a faux-disconnection - the wallet still thinks
       // it is connected to the account so it will not fire the connection/account change events
       this.onConnect(accounts);
+
+      if (await this.isIncorrectChain()) {
+        this.onIncorrectChain();
+      }
     } else {
       // if we didn't find accounts, then the stored provider key is not useful, delete it
       ConnectionManager.removeProviderFromStorage(this.chainId);
-      return;
     }
   }
 
@@ -234,6 +242,13 @@ class MetaMaskConnectionManager extends ConnectionManager {
     // remove all listeners that previous instances of metamask connections have added
     // otherwise disconnecting and reconnecting might cause "duplicate" event listeners
     this.provider?.removeAllListeners();
+  }
+
+  async isIncorrectChain() {
+    let currentChainId = await this.provider.request({
+      method: 'eth_chainId',
+    });
+    return parseInt(currentChainId) !== Number(this.chainId);
   }
 }
 
