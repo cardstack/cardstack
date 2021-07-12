@@ -9,6 +9,7 @@ import CardCustomization, {
 } from '@cardstack/web-client/services/card-customization';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import { tracked } from '@glimmer/tracking';
 
 // http://ember-concurrency.com/docs/typescript
 // infer whether we should treat the return of a yield statement as a promise
@@ -27,6 +28,8 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
 
   @reads('args.workflowSession.state.spendFaceValue')
   declare faceValue: number;
+
+  @tracked errorMessage = '';
 
   @task *issueTask(): TaskGenerator<void> {
     let { workflowSession } = this.args;

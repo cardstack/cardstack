@@ -46,3 +46,20 @@
   flex-grow: 0;
   flex-shrink: 0;
 }
+
+.preview__error {
+  color: var(--boxel-error-100);
+  font: 600 var(--boxel-font-sm);
+}
+
+.preview__support-link {
+  color: var(--boxel-error-100);
+  text-decoration: underline;
+}
+
+.preview__support-link:hover {
+  color: var(--boxel-error-100);
+
+  /* Opting for filter instead of introducing a new color */
+  filter: brightness(0.9);
+}
