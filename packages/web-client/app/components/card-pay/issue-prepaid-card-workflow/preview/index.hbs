@@ -69,7 +69,7 @@
       </CardPay::FieldStack>
     </div>
         {{#if this.error}}
-      <CardPay::ErrorMessage>
+      <CardPay::ErrorMessage data-test-issue-prepaid-card-error-message>
         {{#if (eq this.error "INSUFFICIENT_FUNDS")}}
           {{!-- TODO: This should be accompanied by canceling the workflow --}}
           Looks like there's no balance in your {{network-display-info "layer2" "fullName"}} wallet to fund your selected prepaid card. Before you can continue, please add funds to your {{network-display-info "layer2" "fullName"}} wallet by bridging some tokens from your {{network-display-info "layer1" "fullName"}} wallet.
@@ -85,11 +85,11 @@
   <Boxel::ActionChin
     @state={{this.issueState}}
     @disabled={{@frozen}}
-    data-test-layout-customization
   >
     <:default as |d|>
       <d.ActionButton
         {{on "click" (perform this.issueTask)}}
+        data-test-issue-prepaid-card-button
       >
         Continue
       </d.ActionButton>
