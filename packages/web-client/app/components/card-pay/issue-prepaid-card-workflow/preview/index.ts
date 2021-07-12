@@ -9,7 +9,7 @@ import CardCustomization, {
 } from '@cardstack/web-client/services/card-customization';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
 
 // http://ember-concurrency.com/docs/typescript
 // infer whether we should treat the return of a yield statement as a promise
@@ -28,12 +28,15 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
 
   @reads('args.workflowSession.state.spendFaceValue')
   declare faceValue: number;
+  @reads('issueTask.last.error') declare error: Error | undefined;
 
-  @tracked error = '';
+  @action issuePrepaidCard() {
+    taskFor(this.issueTask)
+      .perform()
+      .catch((e) => console.error(e));
+  }
 
   @task *issueTask(): TaskGenerator<void> {
-    this.error = '';
-
     let { workflowSession } = this.args;
     try {
       yield this.hubAuthentication.ensureAuthenticated();
@@ -64,12 +67,12 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
       if (insufficientFunds) {
         // We probably want to cancel the workflow at this point
         // And tell the user to go deposit funds
-        this.error = 'INSUFFICIENT_FUNDS';
+        throw new Error('INSUFFICIENT_FUNDS');
       } else if (tookTooLong) {
-        this.error = 'TIMEOUT';
+        throw new Error('TIMEOUT');
       } else {
         // Basically, for pretty much everything we want to make the user retry or seek support
-        this.error = 'DEFAULT';
+        throw e;
       }
     }
   }
