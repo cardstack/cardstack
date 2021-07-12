@@ -1,15 +1,14 @@
-/*global fetch */
-
 import Web3 from 'web3';
 import SupplierManagerABI from '../../contracts/abi/v0.6.2/supplier-manager';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
-import { getConstant, ZERO_ADDRESS } from '../constants';
+import { ZERO_ADDRESS } from '../constants';
 import { ContractOptions } from 'web3-eth-contract';
 import { GnosisExecTx, gasEstimate, executeTransaction } from '../utils/safe-utils';
 import { signSafeTxAsRSV } from '../utils/signing-utils';
 import BN from 'bn.js';
+import { query } from '../utils/graphql';
 const { toBN, fromWei } = Web3.utils;
 
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
@@ -129,44 +128,19 @@ export default class Safes {
   constructor(private layer2Web3: Web3) {}
 
   async viewSafe(safeAddress: string): Promise<Safe | undefined> {
-    let subgraphURL = await getConstant('subgraphURL', this.layer2Web3);
-    let response = await fetch(subgraphURL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
-        Accept: 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
-      },
-      body: JSON.stringify({
-        query: safeQuery,
-        variables: { id: safeAddress },
-      }),
-    });
     let {
       data: { safe },
-    } = await response.json();
+    } = await query(this.layer2Web3, safeQuery, { id: safeAddress });
     return processSafeResult(safe as GraphQLSafeResult);
   }
 
   async view(owner?: string): Promise<Safe[]> {
     owner = owner ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let subgraphURL = await getConstant('subgraphURL', this.layer2Web3);
-    let response = await fetch(subgraphURL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
-        Accept: 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
-      },
-      body: JSON.stringify({
-        query: safesQuery,
-        variables: { account: owner },
-      }),
-    });
-
     let {
       data: {
         account: { safes },
       },
-    } = await response.json();
+    } = await query(this.layer2Web3, safesQuery, { account: owner });
     let result: Safe[] = [];
     for (let { safe } of safes as { safe: GraphQLSafeResult }[]) {
       let safeResult = processSafeResult(safe);

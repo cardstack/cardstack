@@ -68,6 +68,7 @@ type BridgeToLayer2Event @entity {
   transaction: Transaction!
   depot: Depot!
   timestamp: BigInt!
+  blockNumber: BigInt!
   supplier: Account!
   token: Token!
   amount: BigInt!
