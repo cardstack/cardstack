@@ -1,0 +1,58 @@
+<ActionCardContainer
+  @header="Token bridge"
+  @isComplete={{@isComplete}}
+  data-test-withdrawal-transaction-confirmed-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section
+    @title={{concat "Bridging tokens to " (network-display-info "layer1" "fullName")}}
+    @dataTestId="withdrawal-confirmed"
+  >
+    <Boxel::ProgressSteps
+      class="transaction-status__steps"
+      @progressSteps={{this.progressSteps}}
+      @completedCount={{this.completedCount}}
+      as |progressStep|
+    >
+      <span
+        class="transaction-status__step-title"
+        data-test-token-bridge-step={{progressStep.index}}
+        data-test-completed={{progressStep.completed}}
+      >
+        {{progressStep.title}}
+      </span>
+
+      <span class="transaction-status__step-status">
+        {{#if (eq progressStep.index 0)}}
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.blockscoutUrl}} target="_blank" rel="noopener" data-test-blockscout-button>
+            View on Blockscout
+          </Boxel::Button>
+        {{/if}}
+        {{#if (eq progressStep.index 1)}}
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" data-test-bridge-explorer-button>
+            View in Bridge Explorer
+          </Boxel::Button>
+        {{/if}}
+        {{#if (eq progressStep.index 2)}}
+          {{#if progressStep.completed}}
+            <Boxel::Button @as="anchor" @size="extra-small" @href={{this.depositTxnViewerUrlFIXME}} target="_blank" rel="noopener" data-test-etherscan-button>
+              View on Etherscan
+            </Boxel::Button>
+          {{else}}
+            Processing...
+          {{/if}}
+        {{/if}}
+      </span>
+    </Boxel::ProgressSteps>
+  </ActionCardContainer::Section>
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    data-test-withdrawal-transaction-confirmed
+  >
+    <:default as |d|>
+      <d.ActionButton {{on "click" this.toggleComplete}}>
+        Confirm
+      </d.ActionButton>
+    </:default>
+  </Boxel::ActionChin>
+
+</ActionCardContainer>

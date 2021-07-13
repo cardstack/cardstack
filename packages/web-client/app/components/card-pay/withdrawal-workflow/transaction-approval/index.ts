@@ -75,6 +75,15 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
     // TODO: Need to get confirm action result from Card Wallet
     this.isConfirmed = true; // mock result
 
+    this.args.workflowSession.updateMany({
+      relayTokensTxnReceipt: {
+        transactionHash: 'TODO',
+      },
+      completedLayer2TransactionReceipt: {
+        transactionHash: 'TODO',
+      },
+    });
+
     if (this.isConfirmed) {
       this.args.onComplete?.();
     } else {
