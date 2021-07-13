@@ -1,9 +1,10 @@
 import { Transfer as TransferEvent } from '../../generated/Token/ERC20';
 import { handleTransfer as baseHandleTransfer } from './token';
+import { allowedTokens } from '../allowed-tokens/xdai';
+import { toChecksumAddress } from '../utils';
 
 export function handleTransfer(event: TransferEvent): void {
-  // for now we are indexing all the tokens we find, but if we start to run into
-  // trouble with bad token contracts consider using the token list from
-  // HoneySwap (located in ../allowedTokens/xdai)
-  baseHandleTransfer(event);
+  if (allowedTokens.includes(toChecksumAddress(event.address))) {
+    baseHandleTransfer(event);
+  }
 }
