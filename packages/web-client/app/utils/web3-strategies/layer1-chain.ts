@@ -156,6 +156,12 @@ export default abstract class Layer1ChainWeb3Strategy
 
   cleanupConnectionState() {
     this.clearWalletInfo();
+    Object.entries(this.eventListenersToUnbind).forEach(
+      ([event, unbind]: [ConnectionManagerEvent, UnbindEventListener]) => {
+        unbind();
+        delete this.eventListenersToUnbind[event];
+      }
+    );
     this.connectionManager?.destroy();
     this.connectionManager = undefined;
     this.web3 = undefined;
