@@ -81,8 +81,7 @@ export interface CompiledCard {
     [key: string]: Field;
   };
   schemaModule: string;
-  // TODO: This is confusingly named. Maybe it's should be serializerName
-  deserializer?: SerializerName;
+  serializer?: SerializerName;
 
   isolated: ComponentInfo;
   embedded: ComponentInfo;

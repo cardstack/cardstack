@@ -36,7 +36,7 @@ async function loadBaseCards() {
         continue;
       }
       let { basename } = getBasenameAndExtension(fileName);
-      // TODO: The assumption of JS here is sketchty, but webpack blows a gasket if no extension is presest
+      // NOTE: The assumption of JS here is sketchty, but webpack blows a gasket if no extension is presest
       card.files[fileName] = (
         await import(`!raw-loader!@cardstack/base-cards/${name}/${basename}.js`)
       ).default;

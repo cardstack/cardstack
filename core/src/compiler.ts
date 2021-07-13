@@ -66,7 +66,7 @@ export class Compiler {
     };
 
     if (cardSource.deserializer) {
-      card.deserializer = cardSource.deserializer;
+      card.serializer = cardSource.deserializer;
     }
 
     let options = {};
@@ -92,16 +92,13 @@ export class Compiler {
       if (!card.schemaModule) {
         card.schemaModule = parentCard.schemaModule;
       }
-      if (parentCard.deserializer) {
-        if (
-          card.deserializer &&
-          parentCard.deserializer !== card.deserializer
-        ) {
+      if (parentCard.serializer) {
+        if (card.serializer && parentCard.serializer !== card.serializer) {
           throw new Error(
-            `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${card.url}:${card.deserializer} Parent: ${parentCard.url}:${parentCard.deserializer}`
+            `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${card.url}:${card.serializer} Parent: ${parentCard.url}:${parentCard.serializer}`
           );
         }
-        card.deserializer = parentCard.deserializer;
+        card.serializer = parentCard.serializer;
       }
     }
 
@@ -180,7 +177,6 @@ export class Compiler {
     let parentCardPath = this.getCardParentPath(cardSource, meta);
 
     if (parentCardPath) {
-      // TODO: Confirm the path correctly depthed
       let url = new URL(parentCardPath, cardSource.url).href;
       return await this.builder.getCompiledCard(url);
     } else {

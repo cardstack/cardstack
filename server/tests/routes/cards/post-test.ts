@@ -81,8 +81,6 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
   QUnit.todo(
     'can create a new card that adopts off an another card',
     async function (assert) {
-      // TODO: It's strange we decide the id from here
-      // Should go to /cards/new and we figure out the ID
       let response = await postCard('https://my-realm/post0', {
         adoptsFrom: '../post',
         data: {

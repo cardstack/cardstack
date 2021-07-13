@@ -92,14 +92,14 @@ function buildDeserializerMapForField(
       buildDeserializerMapForField(map, fields[name], `${usedPath}.${name}`);
     }
   } else {
-    if (!field.card.deserializer) {
+    if (!field.card.serializer) {
       return;
     }
 
-    if (!map[field.card.deserializer]) {
-      map[field.card.deserializer] = [];
+    if (!map[field.card.serializer]) {
+      map[field.card.serializer] = [];
     }
 
-    map[field.card.deserializer].push(usedPath);
+    map[field.card.serializer].push(usedPath);
   }
 }
