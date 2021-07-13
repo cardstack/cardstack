@@ -29,6 +29,10 @@ export interface Layer1Web3Strategy extends Web3Strategy {
   ): Promise<TransactionReceipt>;
   blockExplorerUrl(txnHash: TransactionHash): string;
   bridgeExplorerUrl(txnHash: TransactionHash): string;
+  awaitBridged(
+    fromBlock: BN,
+    receiver: ChainAddress
+  ): Promise<TransactionReceipt>;
 }
 
 export interface Layer2Web3Strategy extends Web3Strategy {

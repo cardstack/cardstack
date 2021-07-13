@@ -6,7 +6,9 @@ import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import { next } from '@ember/runloop';
+
+import BN from 'bn.js';
+import { TransactionReceipt } from 'web3-core';
 
 class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
@@ -16,9 +18,20 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    next(this, () => {
-      this.args.onComplete?.();
-    });
+    this.layer1Network
+      .awaitBridged(this.layer1BlockHeightBeforeBridging!)
+      .then((transactionReceipt: TransactionReceipt) => {
+        this.args.workflowSession.update(
+          'completedLayer1TransactionReceipt',
+          transactionReceipt
+        );
+        this.completedCount = 3;
+        this.args.onComplete();
+      });
+  }
+
+  get layer1BlockHeightBeforeBridging(): BN | undefined {
+    return this.args.workflowSession.state.layer1BlockHeightBeforeBridging;
   }
 
   get progressSteps() {
@@ -52,6 +65,13 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
   get blockscoutUrl() {
     return this.layer2Network.blockExplorerUrl(
       this.args.workflowSession.state.completedLayer2TransactionReceipt
+        .transactionHash
+    );
+  }
+
+  get withdrawalTxnViewerUrl() {
+    return this.layer1Network.blockExplorerUrl(
+      this.args.workflowSession.state.completedLayer1TransactionReceipt
         .transactionHash
     );
   }

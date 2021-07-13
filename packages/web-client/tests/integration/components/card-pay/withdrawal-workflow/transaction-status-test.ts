@@ -1,13 +1,18 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render } from '@ember/test-helpers';
+import { render, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
+
+import sinon from 'sinon';
 
 module(
   'Integration | Component | card-pay/withdrawal-workflow/transaction-status',
   function (hooks) {
+    let onComplete = sinon.spy();
+
     setupRenderingTest(hooks);
 
     hooks.beforeEach(async function () {
@@ -19,10 +24,11 @@ module(
         completedLayer2TransactionReceipt: {
           transactionHash: 'blockscout',
         },
+        layer1BlockHeightBeforeBridging: 1234,
       });
 
       this.setProperties({
-        onComplete: () => {},
+        onComplete,
         onIncomplete: () => {},
         isComplete: false,
         frozen: false,
@@ -63,6 +69,31 @@ module(
           `Release tokens on ${c.layer1.conversationalName}: ${c.layer2.shortName}`
         );
       assert.dom(`[data-test-etherscan-button]`).doesNotExist();
+    });
+
+    test('It completes when the bridged transaction completes', async function (assert) {
+      assert.ok(onComplete.notCalled);
+
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+
+      layer1Service.test__simulateBridged('0xetherscan');
+
+      await settled();
+
+      assert
+        .dom(`[data-test-token-bridge-step="1"][data-test-completed]`)
+        .exists();
+
+      assert
+        .dom(`[data-test-token-bridge-step="2"][data-test-completed]`)
+        .exists();
+
+      assert
+        .dom(`[data-test-etherscan-button]`)
+        .hasAttribute('href', /etherscan$/);
+
+      assert.ok(onComplete.called);
     });
   }
 );

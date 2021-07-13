@@ -297,6 +297,11 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom(epiloguePostableSel(1))
       .containsText(`Bridging tokens to ${c.layer1.fullName}`);
 
+    layer1Service.test__simulateBridged(
+      '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
+    );
+    await settled();
+
     assert
       .dom(
         '[data-test-withdrawal-transaction-confirmed-from] [data-test-bridge-item-amount]'

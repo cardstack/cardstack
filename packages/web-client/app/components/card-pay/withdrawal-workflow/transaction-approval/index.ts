@@ -76,6 +76,7 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
     this.isConfirmed = true; // mock result
 
     this.args.workflowSession.updateMany({
+      layer1BlockHeightBeforeBridging: 1234,
       relayTokensTxnReceipt: {
         transactionHash: 'TODO',
       },
