@@ -9,10 +9,10 @@ export async function bridgeToLayer1(
   safeAddress: string,
   tokenAddress: string,
   receiverAddress: string,
-  amount: number,
+  amount: string,
   mnemonic?: string
 ): Promise<void> {
-  const amountInWei = toWei(amount.toString()).toString();
+  const amountInWei = toWei(amount);
 
   let web3 = await getWeb3(network, mnemonic);
   let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
@@ -66,12 +66,12 @@ export async function claimLayer1BridgedTokens(
 
 export async function bridgeToLayer2(
   network: string,
-  amount: number,
+  amount: string,
   receiverAddress: string | undefined,
   tokenAddress: string,
   mnemonic?: string
 ): Promise<void> {
-  const amountInWei = toWei(amount.toString()).toString();
+  const amountInWei = toWei(amount);
 
   let web3 = await getWeb3(network, mnemonic);
   let tokenBridge = await getSDK('TokenBridgeForeignSide', web3);

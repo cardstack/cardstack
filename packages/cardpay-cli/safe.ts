@@ -69,11 +69,11 @@ export async function transferTokens(
   safe: string,
   token: string,
   recipient: string,
-  amount: number,
+  amount: string,
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let weiAmount = toWei(String(amount));
+  let weiAmount = toWei(amount);
 
   let safes = await getSDK('Safes', web3);
   let assets = await getSDK('Assets', web3);

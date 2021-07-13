@@ -16,7 +16,7 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay prepaidcard-transfer <PREPAID_CARD> <NEW_OWNER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-transfer-prepaid_card-new_owner---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay price-for-face-value <TOKEN_ADDRESS> <SPEND_FACE_VALUE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-price-for-face-value-token_address-spend_face_value---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay register-merchant <PREPAID_CARD> <INFO_DID> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-register-merchant-prepaid_card-info_did---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`yarn cardpay pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-pay-merchant-merchant_safe-prepaid_card-amount---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <SPEND_AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-pay-merchant-merchant_safe-prepaid_card-amount---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay revenue-balances <MERCHANT_SAFE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-revenue-balances-merchant_safe---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay claim-revenue <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-claim-revenue-merchant_safe-token_address-amount---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay new-prepaidcard-gas-fee <TOKEN_ADDRESS> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-new-prepaidcard-gas-fee-token_address---networknetwork---mnemonicmnemonic---walletconnect)
@@ -196,17 +196,17 @@ ARGUMENTS
   WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
 ```
 
-## `yarn cardpay pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `yarn cardpay pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <SPEND_AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
 Pay a merchant from a prepaid card. The amount of tokens to send to the merchant in units of SPEND.
 
 ```
 USAGE
-  $ yarn cardpay pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+  $ yarn cardpay pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <SPEND_AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
 
 ARGUMENTS
   MERCHANT_SAFE     The address of the merchant's safe who will receive the payment
   PREPAID_CARD      The address of the prepaid card that is being used to pay the merchant
-  AMOUNT            The amount to send to the merchant in units of SPEND
+  SPEND_AMOUNT      The amount to send to the merchant in units of SPEND
   NETWORK           The network to use ("sokol" or "xdai")
   MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet

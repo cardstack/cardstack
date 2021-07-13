@@ -34,14 +34,14 @@ export async function claimRevenue(
   network: string,
   merchantSafeAddress: string,
   tokenAddress: string,
-  amount: number,
+  amount: string,
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let revenuePool = await getSDK('RevenuePool', web3);
   let assets = await getSDK('Assets', web3);
   let { symbol } = await assets.getTokenInfo(tokenAddress);
-  let weiAmount = toWei(String(amount));
+  let weiAmount = toWei(amount);
   console.log(`Claiming ${amount} ${symbol} in revenue for merchant safe ${merchantSafeAddress}`);
 
   let result = await revenuePool.claim(merchantSafeAddress, tokenAddress, weiAmount);

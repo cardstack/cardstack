@@ -59,7 +59,8 @@ interface Options {
   mnemonic: string;
   walletConnect: boolean;
   tokenAddress?: string;
-  amount?: number;
+  amount?: string;
+  spendAmount?: number;
   fromBlock?: number;
   address?: string;
   token?: string;
@@ -85,6 +86,7 @@ let {
   walletConnect,
   tokenAddress,
   amount,
+  spendAmount,
   address,
   token,
   newOwner,
@@ -108,7 +110,7 @@ let {
   .usage('Usage: $0 <command> [options]')
   .command('bridge-to-l2 <amount> <tokenAddress> [receiver]', 'Bridge tokens to the layer 2 network', (yargs) => {
     yargs.positional('amount', {
-      type: 'number',
+      type: 'string',
       description: 'Amount of tokens you would like bridged (*not* in units of wei)',
     });
     yargs.positional('tokenAddress', {
@@ -145,7 +147,7 @@ let {
         description: 'The layer 2 safe to bridge the tokens from',
       });
       yargs.positional('amount', {
-        type: 'number',
+        type: 'string',
         description: 'Amount of tokens you would like bridged (*not* in units of wei)',
       });
       yargs.positional('tokenAddress', {
@@ -229,7 +231,7 @@ let {
         description: "The token recipient's address",
       });
       yargs.positional('amount', {
-        type: 'number',
+        type: 'string',
         description: 'The amount of tokens to transfer (not in units of wei)',
       });
       command = 'safeTransferTokens';
@@ -324,21 +326,25 @@ let {
       command = 'registerMerchant';
     }
   )
-  .command('pay-merchant <merchantSafe> <prepaidCard> <amount>', 'Pay a merchant from a prepaid card.', (yargs) => {
-    yargs.positional('merchantSafe', {
-      type: 'string',
-      description: "The address of the merchant's safe who will receive the payment",
-    });
-    yargs.positional('prepaidCard', {
-      type: 'string',
-      description: 'The address of the prepaid card that is being used to pay the merchant',
-    });
-    yargs.positional('amount', {
-      type: 'number',
-      description: 'The amount to send to the merchant in units of SPEND',
-    });
-    command = 'payMerchant';
-  })
+  .command(
+    'pay-merchant <merchantSafe> <prepaidCard> <spendAmount>',
+    'Pay a merchant from a prepaid card.',
+    (yargs) => {
+      yargs.positional('merchantSafe', {
+        type: 'string',
+        description: "The address of the merchant's safe who will receive the payment",
+      });
+      yargs.positional('prepaidCard', {
+        type: 'string',
+        description: 'The address of the prepaid card that is being used to pay the merchant',
+      });
+      yargs.positional('spendAmount', {
+        type: 'number',
+        description: 'The amount to send to the merchant in units of SPEND',
+      });
+      command = 'payMerchant';
+    }
+  )
   .command(
     'revenue-balances <merchantSafe>',
     'View token balances of unclaimed revenue in the revenue pool for a merchant',
@@ -363,7 +369,7 @@ let {
         description: 'The address of the tokens that are being claimed as revenue',
       });
       yargs.positional('amount', {
-        type: 'number',
+        type: 'string',
         description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei)',
       });
       command = 'claimRevenue';
@@ -404,7 +410,7 @@ let {
         description: 'The token symbol (without the .CPXD suffix)',
       });
       yargs.positional('amount', {
-        type: 'number',
+        type: 'string',
         default: 1,
         description: 'The amount of the specified token (*not* in units of wei)',
       });
@@ -420,7 +426,7 @@ let {
         description: 'The token symbol (without the .CPXD suffix)',
       });
       yargs.positional('amount', {
-        type: 'number',
+        type: 'string',
         default: 1,
         description: 'The amount of the specified token (*not* in units of wei)',
       });
@@ -594,11 +600,11 @@ if (!command) {
       await registerMerchant(network, prepaidCard, infoDID || undefined, mnemonic);
       break;
     case 'payMerchant':
-      if (merchantSafe == null || prepaidCard == null || amount == null) {
-        showHelpAndExit('merchantSafe, prepaidCard, and amount are required values');
+      if (merchantSafe == null || prepaidCard == null || spendAmount == null) {
+        showHelpAndExit('merchantSafe, prepaidCard, and spendAmount are required values');
         return;
       }
-      await payMerchant(network, merchantSafe, prepaidCard, amount, mnemonic);
+      await payMerchant(network, merchantSafe, prepaidCard, spendAmount, mnemonic);
       break;
     case 'revenueBalances':
       if (merchantSafe == null) {

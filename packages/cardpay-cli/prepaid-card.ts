@@ -90,7 +90,7 @@ export async function payMerchant(
   network: string,
   merchantSafe: string,
   prepaidCardAddress: string,
-  amount: number,
+  spendAmount: number,
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
@@ -98,8 +98,8 @@ export async function payMerchant(
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(
-    `Paying merchant safe address ${merchantSafe} the amount §${amount} SPEND from prepaid card address ${prepaidCardAddress}...`
+    `Paying merchant safe address ${merchantSafe} the amount §${spendAmount} SPEND from prepaid card address ${prepaidCardAddress}...`
   );
-  let result = await prepaidCard.payMerchant(merchantSafe, prepaidCardAddress, amount);
+  let result = await prepaidCard.payMerchant(merchantSafe, prepaidCardAddress, spendAmount);
   console.log(`Transaction hash: ${blockExplorer}/tx/${result?.ethereumTx.txHash}/token-transfers`);
 }
