@@ -285,13 +285,11 @@ module('Acceptance | withdrawal', function (hooks) {
 
     assert.dom(milestoneCompletedSel(3)).containsText('Transaction confirmed');
 
-    // // transaction-status step card
-    // TODO: simulate bridge success
-
-    // // transaction-summary card
     assert
       .dom(epiloguePostableSel(0))
       .containsText('You have successfully withdrawn tokens');
+
+    // // transaction-status step card
 
     assert
       .dom(epiloguePostableSel(1))
@@ -301,6 +299,8 @@ module('Acceptance | withdrawal', function (hooks) {
       '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
     );
     await settled();
+
+    // // transaction-summary card
 
     assert
       .dom(
