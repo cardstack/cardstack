@@ -20,7 +20,7 @@ interface ConnectionManagerOptions {
   networkSymbol: NetworkSymbol;
 }
 
-type ConnectionManagerEvents = 'connected' | 'disconnected' | 'incorrect-chain';
+type ConnectionManagerEvent = 'connected' | 'disconnected' | 'incorrect-chain';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   DISCONNECTED: 'DISCONNECTED',
@@ -40,7 +40,7 @@ const BROADCAST_CHANNEL_MESSAGES = {
  * This class does not, at the moment, store any state used directly by the UI besides providerId.
  */
 export abstract class ConnectionManager
-  implements Emitter<ConnectionManagerEvents> {
+  implements Emitter<ConnectionManagerEvent> {
   networkSymbol: NetworkSymbol;
   chainId: number;
   protected simpleEmitter: SimpleEmitter;
@@ -93,11 +93,11 @@ export abstract class ConnectionManager
     window.localStorage.setItem(GET_PROVIDER_STORAGE_KEY(chainId), providerId);
   }
 
-  on(event: ConnectionManagerEvents, cb: Function) {
+  on(event: ConnectionManagerEvent, cb: Function) {
     return this.simpleEmitter.on(event, cb);
   }
 
-  emit(event: ConnectionManagerEvents, ...args: any[]) {
+  emit(event: ConnectionManagerEvent, ...args: any[]) {
     return this.simpleEmitter.emit(event, ...args);
   }
 
