@@ -27,7 +27,7 @@ app "hub" {
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
             task_role_name = "hub-staging-hub_ecr_task"
             alb {
-                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/hub-staging/c6e5a0b971186e25/593e42aff49acf49"
+                listener_arn = "arn:aws:elasticloadbalancing:us-east-1:680542703984:listener/app/hub-staging/c6e5a0b971186e25/70f754699500538e"
             }
         }
 
