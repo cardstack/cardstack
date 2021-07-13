@@ -370,6 +370,17 @@ export default class PrepaidCard {
 
     let payload = await this.getCreateCardPayload(from, tokenAddress, amounts, faceValues, customizationDID);
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
+    let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+
+    if (balance.lt(totalWeiAmount.add(gasCost))) {
+      throw new Error(
+        `Safe does not have enough balance to make prepaid card(s). The issuing token ${tokenAddress} balance of the safe ${safeAddress} is ${fromWei(
+          balance
+        )}, the total amount necessary to create prepaid cards is ${fromWei(
+          totalWeiAmount
+        )} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
+      );
+    }
 
     if (estimate.lastUsedNonce == null) {
       estimate.lastUsedNonce = -1;
