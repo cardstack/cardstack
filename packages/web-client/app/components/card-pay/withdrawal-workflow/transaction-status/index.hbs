@@ -44,15 +44,4 @@
       </span>
     </Boxel::ProgressSteps>
   </ActionCardContainer::Section>
-  <Boxel::ActionChin
-    @state={{if @isComplete "memorialized" "default"}}
-    data-test-withdrawal-transaction-confirmed
-  >
-    <:default as |d|>
-      <d.ActionButton {{on "click" this.toggleComplete}}>
-        Confirm
-      </d.ActionButton>
-    </:default>
-  </Boxel::ActionChin>
-
 </ActionCardContainer>

@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
@@ -46,14 +45,6 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
         title: `Release tokens on ${c.layer1.conversationalName}: ${c.layer2.shortName}`, // FIXME script says "DAI", not "xDai" 🤔
       },
     ];
-  }
-
-  @action toggleComplete() {
-    if (this.args.isComplete) {
-      this.args.onIncomplete?.();
-    } else {
-      this.args.onComplete?.();
-    }
   }
 
   get bridgeExplorerUrl() {
