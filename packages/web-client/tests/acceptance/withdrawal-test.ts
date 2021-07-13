@@ -292,8 +292,16 @@ module('Acceptance | withdrawal', function (hooks) {
     assert
       .dom(epiloguePostableSel(0))
       .containsText('You have successfully withdrawn tokens');
-    assert.dom(epiloguePostableSel(1)).containsText('You withdrew');
-    assert.dom(epiloguePostableSel(1)).containsText('You received');
+    assert
+      .dom(
+        '[data-test-withdrawal-transaction-confirmed-from] [data-test-bridge-item-amount]'
+      )
+      .containsText('200.00 DAI.CPXD');
+    assert
+      .dom(
+        '[data-test-withdrawal-transaction-confirmed-to] [data-test-bridge-item-amount]'
+      )
+      .containsText('200.00 DAI');
     await waitFor(epiloguePostableSel(2));
     assert
       .dom(epiloguePostableSel(2))

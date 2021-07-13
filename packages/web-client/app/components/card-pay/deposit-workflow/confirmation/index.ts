@@ -33,6 +33,14 @@ class CardPayDepositWorkflowConfirmationComponent extends Component<WorkflowCard
     return toBN(this.args.workflowSession.state.depositedAmount);
   }
 
+  get receivedToken() {
+    if (this.selectedTokenSymbol === 'CARD') {
+      return new TokenDisplayInfo('CARD.CPXD');
+    } else {
+      return new TokenDisplayInfo('DAI.CPXD');
+    }
+  }
+
   get depositTxnViewerUrl(): string | undefined {
     return this.layer1Network.blockExplorerUrl(
       this.args.workflowSession.state.relayTokensTxnReceipt.transactionHash
