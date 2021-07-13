@@ -25,8 +25,8 @@ let cardpayGenesisBlock = {
   xdai: 0, // TODO update after cardpay is deployed
 };
 let tokenStartBlock = {
-  //sokol: 21403252 // v0.6.0 version of protocol (nice to use for faster index times)
-  sokol: 20644808, //the block that the token bridge was created (and hence our CPXD tokens)
+  // sokol: 21403252 // v0.6.0 version of protocol (nice to use for faster index times)
+  sokol: 20644808, // the block that the token bridge was created (and hence our CPXD tokens)
   xdai: 0,
 };
 let gnosisSafeGenesisBlock = {
