@@ -64,8 +64,7 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
 
   get blockscoutUrl() {
     return this.layer2Network.blockExplorerUrl(
-      this.args.workflowSession.state.completedLayer2TransactionReceipt
-        .transactionHash
+      this.args.workflowSession.state.relayTokensTxnReceipt.transactionHash
     );
   }
 

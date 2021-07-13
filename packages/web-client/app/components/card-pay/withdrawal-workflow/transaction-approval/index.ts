@@ -80,9 +80,6 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
       relayTokensTxnReceipt: {
         transactionHash: 'TODO',
       },
-      completedLayer2TransactionReceipt: {
-        transactionHash: 'TODO',
-      },
     });
 
     if (this.isConfirmed) {

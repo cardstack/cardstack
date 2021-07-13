@@ -19,10 +19,7 @@ module(
       let workflowSession = new WorkflowSession();
       workflowSession.updateMany({
         relayTokensTxnReceipt: {
-          transactionHash: 'bridgeexplorer',
-        },
-        completedLayer2TransactionReceipt: {
-          transactionHash: 'blockscout',
+          transactionHash: 'relay',
         },
         layer1BlockHeightBeforeBridging: 1234,
       });
@@ -52,7 +49,7 @@ module(
         .containsText(`Withdraw tokens from ${c.layer2.fullName}`);
       assert
         .dom(`[data-test-blockscout-button]`)
-        .hasAttribute('href', /blockscout$/);
+        .hasAttribute('href', /relay$/);
 
       assert
         .dom(`[data-test-token-bridge-step="1"]:not([data-test-completed])`)
@@ -61,7 +58,7 @@ module(
         );
       assert
         .dom(`[data-test-bridge-explorer-button]`)
-        .hasAttribute('href', /bridgeexplorer$/);
+        .hasAttribute('href', /relay$/);
 
       assert
         .dom(`[data-test-token-bridge-step="2"]:not([data-test-completed])`)
@@ -77,7 +74,7 @@ module(
       let layer1Service = this.owner.lookup('service:layer1-network')
         .strategy as Layer1TestWeb3Strategy;
 
-      layer1Service.test__simulateBridged('0xetherscan');
+      layer1Service.test__simulateBridged('0xbridged');
 
       await settled();
 
@@ -91,7 +88,7 @@ module(
 
       assert
         .dom(`[data-test-etherscan-button]`)
-        .hasAttribute('href', /etherscan$/);
+        .hasAttribute('href', /bridged$/);
 
       assert.ok(onComplete.called);
     });
