@@ -24,7 +24,7 @@ import {
   ConnectionManagerEvent,
 } from './layer-1-connection-manager';
 
-type Layer1ChainEvent = 'disconnect';
+type Layer1ChainEvent = 'disconnect' | 'incorrect-chain';
 
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
@@ -143,6 +143,7 @@ export default abstract class Layer1ChainWeb3Strategy
   onIncorrectChain() {
     console.error('Incorrect chain connected for layer 1');
 
+    this.simpleEmitter.emit('incorrect-chain');
     // we don't actually want to disconnect. we want to:
     // - show an overlay in the ui
     // - listen for eip 1193 event that changes to correct chain and reload if necessary
