@@ -65,7 +65,7 @@ export default abstract class Layer1ChainWeb3Strategy
       // references to the returned UnbindEventListener function
       connectionManager.on('connected', this.onConnect.bind(this));
       connectionManager.on('disconnected', this.onDisconnect.bind(this));
-      connectionManager.on('incorrect-chain', this.disconnect.bind(this));
+      connectionManager.on('incorrect-chain', this.onIncorrectChain.bind(this));
 
       await connectionManager.setup(web3);
 
@@ -94,7 +94,7 @@ export default abstract class Layer1ChainWeb3Strategy
       );
       connectionManager.on('connected', this.onConnect.bind(this));
       connectionManager.on('disconnected', this.onDisconnect.bind(this));
-      connectionManager.on('incorrect-chain', this.disconnect.bind(this));
+      connectionManager.on('incorrect-chain', this.onIncorrectChain.bind(this));
 
       await connectionManager.setup(web3);
 
@@ -115,6 +115,15 @@ export default abstract class Layer1ChainWeb3Strategy
     this.updateWalletInfo(accounts, this.chainId);
     this.currentProviderId = this.connectionManager?.providerId;
     this.#waitForAccountDeferred.resolve();
+  }
+
+  onIncorrectChain() {
+    console.error('Incorrect chain connected for layer 1');
+
+    // we don't actually want to disconnect. we want to:
+    // - show an overlay in the ui
+    // - listen for eip 1193 event that changes to correct chain and reload if necessary
+    this.disconnect();
   }
 
   async disconnect(): Promise<void> {
