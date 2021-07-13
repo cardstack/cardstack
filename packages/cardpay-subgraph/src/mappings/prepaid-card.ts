@@ -28,6 +28,7 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   prepaidCardEntity.owner = issuer;
   prepaidCardEntity.reloadable = reloadable;
   prepaidCardEntity.spendBalance = event.params.spendAmount;
+  prepaidCardEntity.faceValue = prepaidCardMgr.faceValue(event.params.card);
   prepaidCardEntity.issuingTokenBalance = event.params.issuingTokenAmount;
   prepaidCardEntity.save();
 

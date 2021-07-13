@@ -5,12 +5,12 @@ import { networkName } from '../sdk/utils/general-utils';
 // this silly consumption of the ABI's. The ABI's are indeed consumed, however,
 // we consume them outside of ts due to the way the codegen operates for the
 // subgraph assembly script.
-import PayMerchantHandlerABI from './abi/v0.6.2/pay-merchant-handler';
-import RegisterMerchantHandlerABI from './abi/v0.6.2/register-merchant-handler';
-import TransferPrepaidCardHandlerABI from './abi/v0.6.2/transfer-prepaid-card-handler';
-import SplitPrepaidCardHandlerABI from './abi/v0.6.2/split-prepaid-card-handler';
-import SpendABI from './abi/v0.6.2/spend';
-import MerchantManagerABI from './abi/v0.6.2/merchant-manager';
+import PayMerchantHandlerABI from './abi/v0.6.3/pay-merchant-handler';
+import RegisterMerchantHandlerABI from './abi/v0.6.3/register-merchant-handler';
+import TransferPrepaidCardHandlerABI from './abi/v0.6.3/transfer-prepaid-card-handler';
+import SplitPrepaidCardHandlerABI from './abi/v0.6.3/split-prepaid-card-handler';
+import SpendABI from './abi/v0.6.3/spend';
+import MerchantManagerABI from './abi/v0.6.3/merchant-manager';
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
 consumeModule(RegisterMerchantHandlerABI);

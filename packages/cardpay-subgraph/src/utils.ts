@@ -4,6 +4,7 @@ import { ERC20 } from '../generated/Token/ERC20';
 import { ERC20SymbolBytes } from '../generated/Token/ERC20SymbolBytes';
 import { ERC20NameBytes } from '../generated/Token/ERC20NameBytes';
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit';
+import { PrepaidCardManager } from '../generated/PrepaidCard/PrepaidCardManager';
 import {
   EOATransaction,
   Transaction,
@@ -73,6 +74,7 @@ export function makeMerchantRevenue(merchantSafe: string, token: string): Mercha
 
 export function makePrepaidCardPayment(
   event: ethereum.Event,
+  prepaidCardMgrAddress: Address,
   prepaidCard: string,
   txnHash: string,
   timestamp: BigInt,
@@ -83,6 +85,8 @@ export function makePrepaidCardPayment(
 ): void {
   let prepaidCardEntity = PrepaidCard.load(prepaidCard);
   if (prepaidCardEntity != null) {
+    let prepaidCardMgr = PrepaidCardManager.bind(prepaidCardMgrAddress);
+    prepaidCardEntity.faceValue = prepaidCardMgr.faceValue(Address.fromString(prepaidCard));
     // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
     prepaidCardEntity.spendBalance = prepaidCardEntity.spendBalance - spendAmount;
     // @ts-ignore this is legit AssemblyScript that tsc doesn't understand

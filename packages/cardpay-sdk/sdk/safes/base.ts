@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import SupplierManagerABI from '../../contracts/abi/v0.6.2/supplier-manager';
+import SupplierManagerABI from '../../contracts/abi/v0.6.3/supplier-manager';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
@@ -68,10 +68,11 @@ const safesQuery = `
             id
             customizationDID
             issuingToken {
-              symbol,
+              symbol
               id
             }
-            spendBalance,
+            spendBalance
+            faceValue
             issuer {id}
             reloadable
           }
@@ -110,6 +111,7 @@ const safeQuery = `
           id
         }
         spendBalance
+        faceValue
         issuer {
           id
         }
@@ -298,6 +300,7 @@ interface GraphQLSafeResult {
       id: string;
     };
     spendBalance: string;
+    faceValue: string;
     issuer: { id: string };
     reloadable: boolean;
   } | null;
@@ -347,7 +350,7 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       address: safe.prepaidCard.id,
       customizationDID: safe.prepaidCard.customizationDID ? safe.prepaidCard.customizationDID : undefined,
       issuingToken: safe.prepaidCard.issuingToken.id,
-      spendFaceValue: parseInt(safe.prepaidCard.spendBalance),
+      spendFaceValue: parseInt(safe.prepaidCard.faceValue),
       issuer: safe.prepaidCard.issuer.id,
       reloadable: safe.prepaidCard.reloadable,
       tokens,

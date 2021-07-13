@@ -126,6 +126,8 @@ dataSources:
       abis:
         - name: RegisterMerchantHandler
           file: ./abis/generated/RegisterMerchantHandler.json
+        - name: PrepaidCardManager
+          file: ./abis/generated/PrepaidCardManager.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20SymbolBytes
@@ -161,6 +163,8 @@ dataSources:
       abis:
         - name: PayMerchantHandler
           file: ./abis/generated/PayMerchantHandler.json
+        - name: PrepaidCardManager
+          file: ./abis/generated/PrepaidCardManager.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20SymbolBytes
