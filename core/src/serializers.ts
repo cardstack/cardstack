@@ -1,4 +1,5 @@
 import format from 'date-fns/format';
+import parse from 'date-fns/parse';
 export interface PrimitiveSerializer {
   serialize(val: any): any;
   deserialize(val: any): any;
@@ -18,7 +19,7 @@ let DateSerializer: PrimitiveSerializer = {
     return format(d, 'yyyy-MM-dd');
   },
   deserialize(d: string): Date {
-    return new Date(d);
+    return parse(d, 'yyyy-MM-dd', new Date());
   },
 };
 

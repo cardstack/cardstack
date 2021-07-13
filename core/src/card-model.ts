@@ -1,5 +1,7 @@
 import {
   cardJSONReponse,
+  CompiledCard,
+  Format,
   SerializerMap,
   SerializerName,
   Setter,
@@ -10,10 +12,12 @@ import serializers, {
 import { tracked } from '@glimmer/tracking';
 
 export default class CardModel {
-  @tracked private _data: any;
+  static serializerMap: SerializerMap;
+
   url: string;
-  serializerMap!: SerializerMap;
   setters: Setter;
+
+  @tracked private _data: any;
   private cardResponse: cardJSONReponse;
   private deserialized = false;
 
@@ -40,44 +44,36 @@ export default class CardModel {
 
   private deserialize(): any {
     let { attributes } = this.cardResponse.data;
-    return this.serializeAttributes(attributes, 'deserialize');
+    return serializeAttributes(
+      attributes,
+      'deserialize',
+      CardModel.serializerMap
+    );
   }
 
-  serialize() {
+  serialize(): cardJSONReponse {
     let { data, url } = this;
-    let attributes = this.serializeAttributes(data, 'serialize');
+    let attributes = serializeAttributes(
+      data,
+      'serialize',
+      CardModel.serializerMap
+    );
 
-    return {
-      data: {
-        type: 'card',
-        id: url,
-        attributes,
-      },
-    };
+    return constructJSONAPIResponse(url, attributes);
   }
 
-  private serializeAttributes(
-    attrs: cardJSONReponse['data']['attributes'],
-    action: 'serialize' | 'deserialize'
-  ): any {
-    if (!attrs) {
-      return;
-    }
-    let attributes = Object.assign({}, attrs);
+  static serialize(card: CompiledCard, format: Format): cardJSONReponse {
+    let attributes = serializeAttributes(
+      card.data,
+      'serialize',
+      this.serializerMap
+    );
 
-    let serializerName: SerializerName;
-    for (serializerName in this.serializerMap) {
-      let serializer = serializers[serializerName];
-      let paths = this.serializerMap[serializerName];
-      if (!paths) {
-        continue;
-      }
-      for (const path of paths) {
-        serializeAttribute(attributes, path, serializer, action);
-      }
-    }
-
-    return attributes;
+    return constructJSONAPIResponse(
+      card.url,
+      attributes,
+      card[format].moduleName
+    );
   }
 
   private makeSetter(segments: string[] = []): Setter {
@@ -116,6 +112,52 @@ export default class CardModel {
 
     return s;
   }
+}
+
+function constructJSONAPIResponse(
+  url: string,
+  attributes: any,
+  componentModule?: string
+): cardJSONReponse {
+  let response: cardJSONReponse = {
+    data: {
+      id: url,
+      type: 'card',
+      attributes,
+    },
+  };
+  if (componentModule) {
+    response.data.meta = {
+      componentModule,
+    };
+  }
+
+  return response;
+}
+
+function serializeAttributes(
+  attrs: { [name: string]: any } | undefined,
+  action: 'serialize' | 'deserialize',
+  serializerMap: SerializerMap
+): any {
+  if (!attrs) {
+    return;
+  }
+  let attributes = Object.assign({}, attrs);
+
+  let serializerName: SerializerName;
+  for (serializerName in serializerMap) {
+    let serializer = serializers[serializerName];
+    let paths = serializerMap[serializerName];
+    if (!paths) {
+      continue;
+    }
+    for (const path of paths) {
+      serializeAttribute(attributes, path, serializer, action);
+    }
+  }
+
+  return attributes;
 }
 
 function serializeAttribute(

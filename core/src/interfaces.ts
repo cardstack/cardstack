@@ -111,7 +111,7 @@ export type cardJSONReponse = {
     id: string;
     type: string;
     attributes?: { [name: string]: any };
-    meta: {
+    meta?: {
       componentModule: string;
     };
   };

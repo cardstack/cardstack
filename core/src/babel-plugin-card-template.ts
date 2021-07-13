@@ -143,7 +143,11 @@ function buildSerializerMapProp(
   }
   return t.classProperty(
     t.identifier('serializerMap'),
-    t.objectExpression(props)
+    t.objectExpression(props),
+    undefined,
+    undefined,
+    undefined,
+    true
   );
 }
 
