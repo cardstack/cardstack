@@ -24,7 +24,7 @@ import {
   ConnectionManagerEvent,
 } from './layer-1-connection-manager';
 
-type Layer1ChainEvent = 'disconnect';
+type Layer1ChainEvent = 'disconnect' | 'incorrect-chain' | 'correct-chain';
 
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
@@ -44,6 +44,7 @@ export default abstract class Layer1ChainWeb3Strategy
   @tracked daiBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
   @tracked walletInfo: WalletInfo;
+  @tracked connectedChainId: number | undefined;
 
   constructor(networkSymbol: Layer1NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
@@ -76,9 +77,9 @@ export default abstract class Layer1ChainWeb3Strategy
         'disconnected',
         this.onDisconnect.bind(this)
       );
-      this.eventListenersToUnbind['incorrect-chain'] = connectionManager.on(
-        'incorrect-chain',
-        this.onIncorrectChain.bind(this)
+      this.eventListenersToUnbind['chain-changed'] = connectionManager.on(
+        'chain-changed',
+        this.onChainChanged.bind(this)
       );
 
       await connectionManager.setup(web3);
@@ -114,9 +115,9 @@ export default abstract class Layer1ChainWeb3Strategy
         'disconnected',
         this.onDisconnect.bind(this)
       );
-      this.eventListenersToUnbind['incorrect-chain'] = connectionManager.on(
-        'incorrect-chain',
-        this.onIncorrectChain.bind(this)
+      this.eventListenersToUnbind['chain-changed'] = connectionManager.on(
+        'chain-changed',
+        this.onChainChanged.bind(this)
       );
 
       await connectionManager.setup(web3);
@@ -140,13 +141,14 @@ export default abstract class Layer1ChainWeb3Strategy
     this.#waitForAccountDeferred.resolve();
   }
 
-  onIncorrectChain() {
-    console.error('Incorrect chain connected for layer 1');
-
-    // we don't actually want to disconnect. we want to:
-    // - show an overlay in the ui
-    // - listen for eip 1193 event that changes to correct chain and reload if necessary
-    this.disconnect();
+  onChainChanged(chainId: number) {
+    this.connectedChainId = chainId;
+    if (this.connectedChainId !== this.chainId) {
+      this.simpleEmitter.emit('incorrect-chain');
+      this.disconnect();
+    } else {
+      this.simpleEmitter.emit('correct-chain');
+    }
   }
 
   async disconnect(): Promise<void> {
@@ -165,6 +167,7 @@ export default abstract class Layer1ChainWeb3Strategy
     this.connectionManager = undefined;
     this.web3 = undefined;
     this.currentProviderId = '';
+    this.connectedChainId = undefined;
     this.#waitForAccountDeferred = defer();
   }
 
