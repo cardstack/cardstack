@@ -1,4 +1,4 @@
-import Service from '@ember/service';
+import { inject as service, default as Service } from '@ember/service';
 import config from '../config/environment';
 import {
   Layer1NetworkEvent,
@@ -19,6 +19,8 @@ import {
 } from '@cardstack/web-client/utils/events';
 import { action } from '@ember/object';
 import { TaskGenerator } from 'ember-concurrency';
+import NetworkCorrection from '@cardstack/web-client/services/network-correction';
+
 export default class Layer1Network extends Service {
   strategy!: Layer1Web3Strategy;
   simpleEmitter = new SimpleEmitter();
@@ -29,6 +31,7 @@ export default class Layer1Network extends Service {
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
   @reads('strategy.daiBalance') daiBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
+  @service declare networkCorrection: NetworkCorrection;
 
   constructor(props: object | undefined) {
     super(props);
@@ -63,11 +66,11 @@ export default class Layer1Network extends Service {
   }
 
   @action onIncorrectChain() {
-    this.simpleEmitter.emit('incorrect-chain');
+    this.networkCorrection.onLayer1Incorrect();
   }
 
   @action onCorrectChain() {
-    this.simpleEmitter.emit('correct-chain');
+    this.networkCorrection.onLayer1Correct();
   }
 
   on(event: Layer1NetworkEvent, cb: Function): UnbindEventListener {
