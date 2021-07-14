@@ -30,23 +30,23 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
 
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
-  get currentTokenSymbol(): TokenSymbol {
+  get tokenSymbol(): TokenSymbol {
     return this.args.workflowSession.state.depositSourceToken;
   }
 
-  get currentTokenDetails(): TokenDisplayInfo | undefined {
-    if (this.currentTokenSymbol) {
-      return new TokenDisplayInfo(this.currentTokenSymbol);
+  get tokenDisplayInfo(): TokenDisplayInfo | undefined {
+    if (this.tokenSymbol) {
+      return new TokenDisplayInfo(this.tokenSymbol);
     } else {
       return undefined;
     }
   }
 
-  get currentTokenBalance(): BN {
+  get tokenBalance(): BN {
     let balance;
-    if (this.currentTokenSymbol === 'DAI') {
+    if (this.tokenSymbol === 'DAI') {
       balance = this.layer1Network.daiBalance;
-    } else if (this.currentTokenSymbol === 'CARD') {
+    } else if (this.tokenSymbol === 'CARD') {
       balance = this.layer1Network.cardBalance;
     }
     return balance || toBN(0);
@@ -78,7 +78,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     return !this.isUnlocked;
   }
 
-  get amountAsBigNumber(): BN {
+  get amountAsBN(): BN {
     const regex = /^\d*(\.\d{0,18})?$/gm;
     if (!this.amount || !regex.test(this.amount)) {
       return toBN(0);
@@ -89,8 +89,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   get isValidAmount() {
     if (!this.amount) return false;
     return (
-      !this.amountAsBigNumber.lte(toBN(0)) &&
-      this.amountAsBigNumber.lte(this.currentTokenBalance)
+      !this.amountAsBN.lte(toBN(0)) && this.amountAsBN.lte(this.tokenBalance)
     );
   }
 
@@ -127,7 +126,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       this.isUnlocking = true;
       let transactionReceipt = await taskFor(
         this.layer1Network.approve
-      ).perform(this.amountAsBigNumber, this.currentTokenSymbol);
+      ).perform(this.amountAsBN, this.tokenSymbol);
       this.isUnlocked = true;
       this.unlockTxnReceipt = transactionReceipt;
     } catch (e) {
@@ -151,7 +150,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       );
       let transactionReceipt = await taskFor(
         this.layer1Network.relayTokens
-      ).perform(this.currentTokenSymbol, layer2Address, this.amountAsBigNumber);
+      ).perform(this.tokenSymbol, layer2Address, this.amountAsBN);
       this.relayTokensTxnReceipt = transactionReceipt;
       this.args.workflowSession.update(
         'relayTokensTxnReceipt',
@@ -159,7 +158,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       );
       this.args.workflowSession.update(
         'depositedAmount',
-        this.amountAsBigNumber.toString()
+        this.amountAsBN.toString()
       );
       this.args.onComplete?.();
       this.hasDeposited = true;

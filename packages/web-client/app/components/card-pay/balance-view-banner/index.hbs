@@ -2,10 +2,10 @@
   <summary class="balance-view-banner__summary">
     <div class="balance-view-banner__summary-content" data-test-balance-view-summary>
       <div>
-        <span class="balance-view-banner__summary-name">Account </span>
-        <span class="balance-view-banner__summary-address">({{truncate-middle @walletAddress}})</span>
+        <span class="balance-view-banner__summary-name">{{or @walletName "Account: "}}</span>
+        <span class="balance-view-banner__summary-address">({{@walletAddress}})</span>
       </div>
-      <div class="balance-view-banner__summary-depot-balance">DEPOT: {{@balance}} {{@token.symbol}}</div>
+      <div class="balance-view-banner__summary-depot-balance">{{@balance}} {{@token.symbol}}</div>
     </div>
     <div class="balance-view-banner__marker">
       {{svg-jar "caret-right" class="balance-view-banner__marker-icon" role="presentation"}}
@@ -15,7 +15,7 @@
     <:outer>
       <CardPay::AccountDisplay
         @size="small"
-        @name="Account:"
+        @name={{or @walletName "Account:"}}
         @address={{@walletAddress}}
         data-test-balance-view-account-address
       />

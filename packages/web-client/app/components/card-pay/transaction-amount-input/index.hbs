@@ -1,0 +1,15 @@
+<div class="transaction-amount-input-group" ...attributes>
+  {{svg-jar @icon class="transaction-amount-input-group__icon" role="presentation"}}
+  <Boxel::Input
+    class="transaction-amount-input-group__input"
+    @id="deposit-amount-input"
+    @value={{@value}}
+    @required={{true}}
+    @onInput={{@onInput}}
+    placeholder="0.00"
+    autocomplete="off"
+    inputmode="decimal"
+    data-test-transaction-amount-input
+  />
+  <div class="transaction-amount-input-group__symbol">{{@symbol}}</div>
+</div>
