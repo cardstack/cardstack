@@ -3,11 +3,11 @@ import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import Layer1Network from './layer1-network';
-// import Layer2Network from './layer2-network';
+import Layer2Network from './layer2-network';
 
 export default class NetworkCorrection extends Service {
   @service('layer1-network') declare layer1Network: Layer1Network;
-  // @service('layer2-network') declare layer2Network: Layer2Network;
+  @service('layer2-network') declare layer2Network: Layer2Network;
 
   // this property will be used to determine not just whether we need to reload,
   // but whether we need to prevent the user from performing any actions in the UI
@@ -18,7 +18,7 @@ export default class NetworkCorrection extends Service {
   // we might want a clause in the component that displays the messages that says that
   // if you disconnect, you need to reload yourself.
   @tracked layer1Incorrect = false;
-  // @tracked layer2Incorrect = false;
+  @tracked layer2Incorrect = false;
 
   @action
   onLayer1Incorrect() {
@@ -38,22 +38,22 @@ export default class NetworkCorrection extends Service {
     this.maybeReload();
   }
 
-  // @action
-  // onLayer2Incorrect() {
-  // let layer2PreviouslyIncorrect = this.layer2Incorrect;
-  // this.needsReload = true;
-  // this.layer2Incorrect = true;
-  // if (!layer2PreviouslyIncorrect) {
-  //   this.informUser();
-  // }
-  // }
+  @action
+  onLayer2Incorrect() {
+    let layer2PreviouslyIncorrect = this.layer2Incorrect;
+    this.needsReload = true;
+    this.layer2Incorrect = true;
+    if (!layer2PreviouslyIncorrect) {
+      this.informUser();
+    }
+  }
 
-  // @action
-  // onLayer2Correct() {
-  //   // change this to also include layer 2
-  //   this.layer2Incorrect = false;
-  //   this.maybeReload();
-  // }
+  @action
+  onLayer2Correct() {
+    // change this to also include layer 2
+    this.layer2Incorrect = false;
+    this.maybeReload();
+  }
 
   informUser() {
     console.log(

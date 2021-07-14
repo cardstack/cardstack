@@ -24,10 +24,12 @@ import {
 } from '@cardstack/web-client/utils/events';
 import { action } from '@ember/object';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
+import NetworkCorrection from './network-correction';
 export default class Layer2Network
   extends Service
   implements Emitter<Layer2ChainEvent> {
   @service declare hubAuthentication: HubAuthentication;
+  @service declare networkCorrection: NetworkCorrection;
   strategy!: Layer2Web3Strategy;
   simpleEmitter = new SimpleEmitter();
   @reads('strategy.isConnected', false) isConnected!: boolean;
@@ -57,6 +59,8 @@ export default class Layer2Network
     }
 
     this.strategy.on('disconnect', this.onDisconnect);
+    this.strategy.on('correct-chain', this.onCorrectChain);
+    this.strategy.on('incorrect-chain', this.onIncorrectChain);
   }
 
   async updateUsdConverters(
@@ -94,6 +98,16 @@ export default class Layer2Network
   @action onDisconnect() {
     this.hubAuthentication.authToken = null;
     this.simpleEmitter.emit('disconnect');
+  }
+
+  @action onCorrectChain() {
+    console.log('on correct chain in l2 network');
+    this.networkCorrection.onLayer2Correct();
+  }
+
+  @action onIncorrectChain() {
+    console.log('on incorrect chain in l2 network');
+    this.networkCorrection.onLayer2Incorrect();
   }
 
   on(event: Layer2ChainEvent, cb: Function): UnbindEventListener {
