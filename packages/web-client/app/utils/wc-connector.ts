@@ -7,10 +7,9 @@ import * as cryptoLib from '@walletconnect/iso-crypto';
 import Connector from '@walletconnect/core';
 import SessionStorage from '@walletconnect/core/dist/cjs/storage';
 
-const GET_STORAGE_ID = (chainId: string | number) =>
-  `wallet-connect-chain-${chainId}`;
+const GET_STORAGE_ID = (chainId: number) => `wallet-connect-chain-${chainId}`;
 
-export function clearWalletConnectStorage(chainId: string | number) {
+export function clearWalletConnectStorage(chainId: number) {
   window.localStorage.removeItem(GET_STORAGE_ID(chainId));
 }
 
@@ -18,7 +17,7 @@ export function clearWalletConnectStorage(chainId: string | number) {
 export default class CustomStorageWalletConnect extends Connector {
   constructor(
     connectorOpts: IWalletConnectOptions,
-    chainId: string | number,
+    chainId: number,
     pushServerOpts?: IPushServerOptions
   ) {
     if (!chainId) {

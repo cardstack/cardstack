@@ -11,7 +11,7 @@ import { Emitter, SimpleEmitter } from '../events';
 import { WalletProviderId } from '../wallet-providers';
 import { action } from '@ember/object';
 
-const GET_PROVIDER_STORAGE_KEY = (chainId: string | number) =>
+const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -78,18 +78,15 @@ export abstract class ConnectionManager
     }
   }
 
-  static getProviderIdForChain(chainId: string | number) {
+  static getProviderIdForChain(chainId: number) {
     return window.localStorage.getItem(GET_PROVIDER_STORAGE_KEY(chainId));
   }
 
-  static removeProviderFromStorage(chainId: string | number) {
+  static removeProviderFromStorage(chainId: number) {
     window.localStorage.removeItem(GET_PROVIDER_STORAGE_KEY(chainId));
   }
 
-  static addProviderToStorage(
-    chainId: string | number,
-    providerId: WalletProviderId
-  ) {
+  static addProviderToStorage(chainId: number, providerId: WalletProviderId) {
     window.localStorage.setItem(GET_PROVIDER_STORAGE_KEY(chainId), providerId);
   }
 
