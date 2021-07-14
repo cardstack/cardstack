@@ -5,6 +5,7 @@
 >
   <ActionCardContainer::Section
     @title={{concat "Bridging tokens to " (network-display-info "layer1" "fullName")}}
+    @icon={{if this.isInProgress "clock" "success-bordered"}}
     @dataTestId="withdrawal-confirmed"
   >
     <Boxel::ProgressSteps

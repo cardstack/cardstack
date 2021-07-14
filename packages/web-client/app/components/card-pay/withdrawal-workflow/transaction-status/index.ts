@@ -30,6 +30,10 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
       });
   }
 
+  get isInProgress() {
+    return !this.args.workflowSession.state.completedLayer1TransactionReceipt;
+  }
+
   get currentTokenSymbol(): BridgedTokenSymbol {
     return this.args.workflowSession.state.withdrawalToken;
   }

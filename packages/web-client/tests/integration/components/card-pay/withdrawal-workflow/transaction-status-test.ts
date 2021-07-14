@@ -45,6 +45,8 @@ module(
     });
 
     test('It renders transaction status and links', async function (assert) {
+      assert.dom('[data-test-action-card-title-icon-name="clock"]').exists();
+
       assert
         .dom(`[data-test-token-bridge-step="0"][data-test-completed]`)
         .containsText(`Withdraw tokens from ${c.layer2.fullName}`);
@@ -69,6 +71,10 @@ module(
       layer1Service.test__simulateBridged('0xbridged');
 
       await settled();
+
+      assert
+        .dom('[data-test-action-card-title-icon-name="success-bordered"]')
+        .exists();
 
       assert
         .dom(`[data-test-token-bridge-step="1"][data-test-completed]`)
