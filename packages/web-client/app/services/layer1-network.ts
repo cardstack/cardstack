@@ -1,7 +1,7 @@
 import { inject as service, default as Service } from '@ember/service';
 import config from '../config/environment';
 import {
-  Layer1NetworkEvent,
+  Layer1ChainEvent,
   Layer1Web3Strategy,
 } from '../utils/web3-strategies/types';
 import Layer1TestWeb3Strategy from '../utils/web3-strategies/test-layer1';
@@ -73,7 +73,8 @@ export default class Layer1Network extends Service {
     this.networkCorrection.onLayer1Correct();
   }
 
-  on(event: Layer1NetworkEvent, cb: Function): UnbindEventListener {
+  // basically only allow re-emitting of events from the strategy
+  on(event: Layer1ChainEvent, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);
   }
 

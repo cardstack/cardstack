@@ -6,10 +6,13 @@ import {
   ConvertibleSymbol,
   ConversionFunction,
 } from '@cardstack/web-client/utils/token';
-import { Layer1ChainEvent } from '@cardstack/web-client/utils/web3-strategies/layer1-chain';
 import { Emitter } from '../events';
 
-export type Layer1NetworkEvent = Layer1ChainEvent;
+export type Layer1ChainEvent =
+  | 'disconnect'
+  | 'incorrect-chain'
+  | 'correct-chain';
+
 export interface Web3Strategy {
   isConnected: boolean;
   disconnect(): Promise<void>;
@@ -17,7 +20,7 @@ export interface Web3Strategy {
 
 export interface Layer1Web3Strategy
   extends Web3Strategy,
-    Emitter<Layer1NetworkEvent> {
+    Emitter<Layer1ChainEvent> {
   isConnected: boolean;
   currentProviderId: string | undefined;
   defaultTokenBalance: BN | undefined;
