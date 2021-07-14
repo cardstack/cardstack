@@ -155,35 +155,16 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.2.1",
     "qunit-dom": "^1.6.0",
-    "release-it": "^14.2.2",
-    "release-it-lerna-changelog": "^3.1.0",
     "stylelint-config-standard": "^21.0.0",
     "typescript": "^4.2.3"
   },
   "engines": {
     "node": "12.* || >= 14.*"
   },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org"
-  },
-  "release-it": {
-    "plugins": {
-      "release-it-lerna-changelog": {
-        "infile": "CHANGELOG.md"
-      }
-    },
-    "git": {
-      "tagName": "v${version}"
-    },
-    "github": {
-      "release": true
-    }
-  },
   "volta": {
     "extends": "../../package.json"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
-  },
-  "gitHead": "bbeee2f2841f3f857ab7a2edfb4ded89973cf969"
+  }
 }
