@@ -44,7 +44,7 @@
   },
   "scripts": {
     "clean": "git clean -x -f --exclude=packages/web-client/.env",
-    "compile": "yarn codegen:subgraph && tsc --build ./tsconfig.json",
+    "compile": "yarn codegen:subgraph-sokol && tsc --build ./tsconfig.json",
     "deploy:boxel": "cd ./packages/boxel && ember deploy production --verbose",
     "deploy:boxel:preview": "cd ./packages/boxel && ember deploy s3-preview --verbose",
     "deploy:web-client:staging": "cd ./packages/web-client && ember deploy staging --verbose",
