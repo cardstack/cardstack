@@ -5,14 +5,12 @@
   <ActionCardContainer::Section @title="Choose an amount to deposit into the reserve pool">
     <div class="transaction-amount__fields">
       <CardPay::LabeledValue @vertical={{@isComplete}} @label="Funding from">
-        <CardPay::DepositWorkflow::TransactionAmount::BalanceView
-          @wallet={{network-display-info "layer1" "fullName"}}
-          @tokenSymbol={{this.tokenSymbol}}
-          @tokenIcon={{this.tokenDisplayInfo.icon}}
+        <CardPay::BalanceViewBanner
+          @wallet={{concat (network-display-info "layer1" "fullName") " wallet"}}
           @address={{this.layer1Network.walletInfo.firstAddress}}
+          @token={{this.tokenDisplayInfo}}
           @balance={{format-token-amount this.tokenBalance}}
-          @balanceInUsd={{token-to-usd this.tokenSymbol this.tokenBalance}}
-          @isComplete={{@isComplete}}
+          @usdBalance={{token-to-usd this.tokenSymbol this.tokenBalance}}
         />
       </CardPay::LabeledValue>
       <CardPay::LabeledValue
@@ -27,7 +25,7 @@
             @icon={{this.tokenDisplayInfo.icon}}
             @balance={{format-token-amount this.amountAsBN}}
             @symbol={{this.tokenSymbol}}
-            @text={{concat "$" (token-to-usd this.tokenSymbol this.amountAsBN) " USD*"}}
+            @usdBalance={{token-to-usd this.tokenSymbol this.amountAsBN}}
             data-test-deposit-amount-entered
           />
         {{else}}

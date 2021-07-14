@@ -6,11 +6,12 @@
     <div class="withdrawal-transaction-amount__fields">
       <CardPay::LabeledValue @vertical={{@isComplete}} @label="Funding from">
         <CardPay::BalanceViewBanner
-          @walletName={{concat (network-display-info "layer2" "fullName") " wallet"}}
-          @walletAddress={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
+          @wallet={{concat (network-display-info "layer2" "fullName") " wallet"}}
+          @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
           @depotAddress={{truncate-middle this.layer2Network.depotSafe.address}}
           @token={{this.tokenDisplayInfo}}
           @balance={{format-token-amount this.tokenBalance}}
+          @usdBalance={{token-to-usd this.tokenSymbolForConversion this.tokenBalance}}
         />
       </CardPay::LabeledValue>
       <CardPay::LabeledValue
@@ -26,7 +27,7 @@
             @icon={{this.tokenDisplayInfo.icon}}
             @balance={{format-token-amount this.amountAsBN}}
             @symbol={{this.tokenSymbol}}
-            @text={{concat "$" (token-to-usd this.tokenSymbolForConversion this.amountAsBN) " USD*"}}
+            @usdBalance={{token-to-usd this.tokenSymbolForConversion this.amountAsBN}}
             data-test-amount-entered
           />
         {{else}}

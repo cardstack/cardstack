@@ -1,43 +1,51 @@
-<details class="balance-view-banner" ...attributes>
+<details class={{cn "balance-view-banner" balance-view-banner--with-depot=@depotAddress}} ...attributes>
   <summary class="balance-view-banner__summary">
-    <div class="balance-view-banner__summary-content" data-test-balance-view-summary>
-      <div>
-        <span class="balance-view-banner__summary-name">{{or @walletName "Account: "}}</span>
-        <span class="balance-view-banner__summary-address">({{@walletAddress}})</span>
-      </div>
-      <div class="balance-view-banner__summary-depot-balance">{{@balance}} {{@token.symbol}}</div>
-    </div>
+    <CardPay::BalanceDisplay
+      class="balance-view-banner__summary-content"
+      @size="small"
+      @name={{@wallet}}
+      @balance={{@balance}}
+      @symbol={{@token.symbol}}
+      data-test-balance-view-summary
+    />
     <div class="balance-view-banner__marker">
       {{svg-jar "caret-right" class="balance-view-banner__marker-icon" role="presentation"}}
     </div>
   </summary>
-  <CardPay::NestedItems class="balance-view-banner__details">
-    <:outer>
-      <CardPay::AccountDisplay
-        @size="small"
-        @name={{or @walletName "Account:"}}
-        @address={{@walletAddress}}
-        data-test-balance-view-account-address
-      />
-    </:outer>
-    <:inner>
-      <CardPay::AccountDisplay
-        @size="small"
-        @icon="depot"
-        @name="DEPOT:"
-        @address={{@depotAddress}}
-        data-test-balance-view-depot-address
-      />
-    </:inner>
-    <:innermost>
-      <CardPay::BalanceDisplay
-        @label="Available Balance"
-        @size="large"
-        @icon={{@token.icon}}
-        @balance={{@balance}}
-        @symbol={{@token.symbol}}
-        data-test-balance-view-token-amount
-      />
-    </:innermost>
-  </CardPay::NestedItems>
+  <div class="balance-view-banner__details">
+    <CardPay::AccountDisplay @name={{@wallet}} />
+    <CardPay::NestedItems
+      @noIndent={{unless @depotAddress true}}
+      @noBorder={{unless @depotAddress true}}
+    >
+      <:outer>
+        <CardPay::AccountDisplay
+          @size={{if @depotAddress "small"}}
+          @address={{@address}}
+          data-test-balance-view-account-address
+        />
+      </:outer>
+      <:inner>
+        {{#if @depotAddress}}
+          <CardPay::AccountDisplay
+            @size="small"
+            @icon="depot"
+            @name="DEPOT:"
+            @address={{@depotAddress}}
+            data-test-balance-view-depot-address
+          />
+        {{/if}}
+      </:inner>
+      <:innermost>
+        <CardPay::BalanceDisplay
+          @size="large"
+          @icon={{@token.icon}}
+          @balance={{@balance}}
+          @symbol={{@token.symbol}}
+          @usdBalance={{@usdBalance}}
+          data-test-balance-view-token-amount
+        />
+      </:innermost>
+    </CardPay::NestedItems>
+  </div>
 </details>

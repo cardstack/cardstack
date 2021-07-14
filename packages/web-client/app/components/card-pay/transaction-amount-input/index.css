@@ -1,7 +1,7 @@
 .transaction-amount-input-group {
   --input-height: 3.75rem; /* 60px */
   --input-icon-size: var(--boxel-icon-lg);
-  --input-symbol-width: 5ch;
+  --input-symbol-width: 7rem;
   --input-icon-space: var(--boxel-sp-xs);
   --input-symbol-space: var(--boxel-sp-sm);
 

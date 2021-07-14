@@ -1,6 +1,6 @@
 .balance-view-banner {
   --details-summary-height: 3.75rem; /* 60px */
-  --details-open-height: 13rem;
+  --details-open-height: 11rem;
   --details-padding-right: calc(var(--boxel-sp) + 3rem);
 
   position: relative;
@@ -11,6 +11,10 @@
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
   overflow: hidden;
   transition: height var(--boxel-transition);
+}
+
+.balance-view-banner--with-depot {
+  --details-open-height: 13rem;
 }
 
 .balance-view-banner[open] {
@@ -39,6 +43,17 @@
 
 .balance-view-banner[open] .balance-view-banner__summary {
   height: var(--boxel-sp-lg);
+}
+
+.balance-view-banner__summary-content {
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+}
+
+.balance-view-banner[open] .balance-view-banner__summary-content {
+  display: none;
 }
 
 /* Show/hide marker */
@@ -73,35 +88,5 @@
 
 /* Details */
 .balance-view-banner__details {
-  padding: 0 var(--details-padding-right) 0 var(--boxel-sp);
-}
-
-/* Specific to this card */
-.balance-view-banner__summary-content {
-  height: 100%;
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-}
-
-.balance-view-banner[open] .balance-view-banner__summary-content {
-  display: none;
-}
-
-.balance-view-banner__summary-name {
-  font: 600 var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp-xs);
-}
-
-.balance-view-banner__summary-address {
-  font-family: var(--boxel-monospace-font-family);
-  font-size: var(--boxel-font-size-sm);
-  line-height: calc(18 / 13);
-  letter-spacing: var(--boxel-lsp-xs);
-}
-
-.balance-view-banner__summary-depot-balance {
-  color: var(--boxel-purple-500);
-  font: var(--boxel-font-sm);
-  letter-spacing: var(--boxel-lsp);
+  padding: 0 var(--boxel-sp-lg) 0 var(--boxel-sp);
 }
