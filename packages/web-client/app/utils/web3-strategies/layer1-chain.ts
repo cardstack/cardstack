@@ -24,7 +24,7 @@ import {
   ConnectionManagerEvent,
 } from './layer-1-connection-manager';
 
-type Layer1ChainEvent = 'disconnect' | 'incorrect-chain';
+type Layer1ChainEvent = 'disconnect' | 'incorrect-chain' | 'correct-chain';
 
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
@@ -44,6 +44,7 @@ export default abstract class Layer1ChainWeb3Strategy
   @tracked daiBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
   @tracked walletInfo: WalletInfo;
+  @tracked connectedChainId: number | undefined;
 
   constructor(networkSymbol: Layer1NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
@@ -76,9 +77,9 @@ export default abstract class Layer1ChainWeb3Strategy
         'disconnected',
         this.onDisconnect.bind(this)
       );
-      this.eventListenersToUnbind['incorrect-chain'] = connectionManager.on(
-        'incorrect-chain',
-        this.onIncorrectChain.bind(this)
+      this.eventListenersToUnbind['chain-changed'] = connectionManager.on(
+        'chain-changed',
+        this.onChainChanged.bind(this)
       );
 
       await connectionManager.setup(web3);
@@ -114,9 +115,9 @@ export default abstract class Layer1ChainWeb3Strategy
         'disconnected',
         this.onDisconnect.bind(this)
       );
-      this.eventListenersToUnbind['incorrect-chain'] = connectionManager.on(
-        'incorrect-chain',
-        this.onIncorrectChain.bind(this)
+      this.eventListenersToUnbind['chain-changed'] = connectionManager.on(
+        'chain-changed',
+        this.onChainChanged.bind(this)
       );
 
       await connectionManager.setup(web3);
@@ -140,14 +141,44 @@ export default abstract class Layer1ChainWeb3Strategy
     this.#waitForAccountDeferred.resolve();
   }
 
-  onIncorrectChain() {
-    console.error('Incorrect chain connected for layer 1');
+  onChainChanged(chainId: number) {
+    let previousConnectedChainId = this.connectedChainId;
+    let previousConnectedChainIdIncorrect =
+      previousConnectedChainId !== undefined &&
+      previousConnectedChainId !== this.chainId;
 
-    this.simpleEmitter.emit('incorrect-chain');
-    // we don't actually want to disconnect. we want to:
-    // - show an overlay in the ui
-    // - listen for eip 1193 event that changes to correct chain and reload if necessary
-    this.disconnect();
+    this.connectedChainId = chainId;
+
+    let currentConnectedChainIdIncorrect =
+      this.connectedChainId !== this.chainId;
+    console.log('chain changed to chain with id', chainId);
+
+    // none-incorrect (handled in currentChainIncorrect)
+    // none-correct (ignore)
+    // incorrect-incorrect (handled)
+    // incorrect-correct (handled)
+    // correct-incorrect (handled in currentChainIncorrect)
+    // correct-correct (seems irrelevant)
+
+    // do we need correct-none and incorrect-none?
+    if (previousConnectedChainIdIncorrect && currentConnectedChainIdIncorrect) {
+      // don't bother re-emitting if the chain is incorrect
+      console.log(
+        'chain was incorrect anyway and so we are not doing anything'
+      );
+      return;
+    } else if (
+      previousConnectedChainIdIncorrect &&
+      !currentConnectedChainIdIncorrect
+    ) {
+      // time to reload. this may need some coordination with layer 2, if both are wrong
+      // so we emit an event instead.
+      console.log('chain corrected, we might reload the page');
+      this.simpleEmitter.emit('correct-chain');
+    } else if (currentConnectedChainIdIncorrect) {
+      console.error('Newly detected incorrect chain on layer 1');
+      this.simpleEmitter.emit('incorrect-chain');
+    }
   }
 
   async disconnect(): Promise<void> {
@@ -166,6 +197,7 @@ export default abstract class Layer1ChainWeb3Strategy
     this.connectionManager = undefined;
     this.web3 = undefined;
     this.currentProviderId = '';
+    this.connectedChainId = undefined;
     this.#waitForAccountDeferred = defer();
   }
 
