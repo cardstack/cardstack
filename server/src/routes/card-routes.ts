@@ -3,7 +3,10 @@ import { NotFound } from '../middleware/errors';
 import { RouterContext } from '@koa/router';
 import { deserialize, serializeCard } from '../utils/serialization';
 import { getCardFormatFromRequest } from '../utils/routes';
-import { assertValidKeys } from '@cardstack/core/src/interfaces';
+import {
+  assertValidKeys,
+  assertValidRawCard,
+} from '@cardstack/core/src/interfaces';
 
 export async function respondWithCardForPath(
   ctx: RouterContext<any, CardStackContext>
@@ -47,10 +50,14 @@ export async function createDataCard(
   let {
     builder,
     request: { body },
-    params: { encodedCardURL: url },
+    params: { parentCardURL, realmURL },
   } = ctx;
 
-  body.url = url;
+  if (typeof body === 'string') {
+    throw new Error('Request body is a string and it shouldnt be');
+  }
+
+  body.url = ctx.realms.getRealm(realmURL).getNextID(parentCardURL);
 
   assertValidKeys(
     Object.keys(body),
@@ -58,7 +65,9 @@ export async function createDataCard(
     'Payload contains keys that we do not allow: %list%'
   );
 
-  let card = await builder.compileCardFromRaw(url, body);
+  assertValidRawCard(body);
+
+  let card = await builder.compileCardFromRaw(body.url, body);
   let format = getCardFormatFromRequest(ctx.query.format);
 
   ctx.body = await serializeCard(card, format);
@@ -75,7 +84,8 @@ export async function updateCard(ctx: RouterContext<any, CardStackContext>) {
   let data = await deserialize(body);
   let card = await builder.updateCardData(url, data.attributes);
 
-  ctx.body = await serializeCard(card, 'isolated'); // TODO: Is it safe to assume the response should be isolated?
+  // Question: Is it safe to assume the response should be isolated?
+  ctx.body = await serializeCard(card, 'isolated');
   ctx.status = 200;
 }
 

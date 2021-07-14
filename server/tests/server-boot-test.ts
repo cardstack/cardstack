@@ -18,7 +18,7 @@ QUnit.module('Server boot', function () {
       assert.rejects(
         Server.create({
           cardCacheDir,
-          realms: [BASE_CARD_REALM_CONFIG],
+          realmConfigs: [BASE_CARD_REALM_CONFIG],
         }),
         /package.json is required in cardCacheDir/
       );
@@ -39,7 +39,7 @@ QUnit.module('Server boot', function () {
       assert.rejects(
         Server.create({
           cardCacheDir,
-          realms: [BASE_CARD_REALM_CONFIG],
+          realmConfigs: [BASE_CARD_REALM_CONFIG],
         }),
         /package.json of cardCacheDir does not have properly configured exports/
       );
@@ -52,7 +52,7 @@ QUnit.module('Server boot', function () {
       assert.rejects(
         Server.create({
           cardCacheDir,
-          realms: [BASE_CARD_REALM_CONFIG],
+          realmConfigs: [BASE_CARD_REALM_CONFIG],
         }),
         /package.json of cardCacheDir does not have properly configured exports/
       );
@@ -92,7 +92,7 @@ QUnit.module('Server boot', function () {
       assert.rejects(
         Server.create({
           cardCacheDir,
-          realms: [
+          realmConfigs: [
             { url: 'https://my-realm', directory: realm.baseDir },
             BASE_CARD_REALM_CONFIG,
           ],

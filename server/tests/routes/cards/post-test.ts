@@ -4,24 +4,26 @@ import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { setupCardCache } from '@cardstack/server/tests/helpers/cache';
 import {
-  RealmHelper,
+  ProjectTestRealm,
   setupRealms,
 } from '@cardstack/server/tests/helpers/realm';
 import { Server } from '@cardstack/server/src/server';
 
+let e = encodeURIComponent;
+
 QUnit.module('POST /cards/<card-id>', function (hooks) {
-  let realm: RealmHelper;
+  const REALM_NAME = 'super-realm.com';
+  let realm: ProjectTestRealm;
   let server: Koa;
 
   function getCard(cardURL: string) {
-    return supertest(server.callback()).get(
-      `/cards/${encodeURIComponent(cardURL)}`
-    );
+    return supertest(server.callback()).get(`/cards/${e(cardURL)}`);
   }
 
-  function postCard(cardURL: string, payload: any) {
+  function postCard(parentCardURL: string, payload: any) {
+    // localhost/cards/https%3A%2F%2Fdemo.com%2F/https%3A%2F%2Fbase%2Fbase
     return supertest(server.callback())
-      .post(`/cards/${encodeURIComponent(cardURL)}`)
+      .post(`/cards/${e('https://super-realm.com')}/${e(parentCardURL)}`)
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
       .send(payload)
@@ -29,10 +31,11 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
   }
 
   let { resolveCard, getCardCacheDir } = setupCardCache(hooks);
-  let { createRealm, getRealms } = setupRealms(hooks);
+  let { createRealm, getRealmConfigs } = setupRealms(hooks);
 
   hooks.beforeEach(async function () {
-    realm = createRealm('my-realm');
+    realm = createRealm(REALM_NAME);
+
     realm.addCard('post', {
       'card.json': {
         schema: 'schema.js',
@@ -42,10 +45,8 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
         import { contains } from "@cardstack/types";
         import string from "https://cardstack.com/base/string";
         export default class Post {
-          @contains(string)
-          title;
-          @contains(string)
-          body;
+          @contains(string) title;
+          @contains(string) body;
         }
       `,
       'isolated.js': templateOnlyComponentTemplate(
@@ -58,55 +59,45 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     server = (
       await Server.create({
         cardCacheDir: getCardCacheDir(),
-        realms: getRealms(),
+        realmConfigs: getRealmConfigs(),
       })
     ).app;
   });
 
-  QUnit.todo(
-    'returns a 404 when trying to adopt from a card that doesnt exist',
-    async function (assert) {
-      assert.expect(0);
-      await postCard('https://my-realm/car0', {
-        adoptsFrom: '../car',
-        data: {
-          attributes: {
-            vin: '123',
-          },
-        },
-      }).expect(404);
-    }
-  );
-
-  QUnit.todo(
+  QUnit.test(
     'can create a new card that adopts off an another card',
     async function (assert) {
-      let response = await postCard('https://my-realm/post0', {
-        adoptsFrom: '../post',
+      let {
+        body: { data },
+      } = await postCard('https://super-realm.com/post', {
         data: {
           title: 'Blogigidy blog',
           body: 'First post!',
         },
       }).expect(201);
 
-      assert.deepEqual(response.body.data?.attributes, {
+      assert.equal(
+        data.id,
+        'https://super-realm.com/post-0',
+        'Generates a new ID'
+      );
+      assert.deepEqual(data.attributes, {
         title: 'Blogigidy blog',
         body: 'First post!',
       });
-      let componentModule = response.body.data?.meta.componentModule;
+      let componentModule = data.meta.componentModule;
       assert.ok(componentModule, 'should have componentModule');
       assert.ok(resolveCard(componentModule), 'component module is resolvable');
 
-      await getCard(response.body.data.id).expect(200);
+      await getCard(data.id).expect(200);
     }
   );
 
-  QUnit.todo(
+  QUnit.test(
     '404s when you try to post a card that adopts from a non-existent card',
     async function (assert) {
       assert.expect(0);
-      await postCard('https://my-realm/post0', {
-        adoptsFrom: '../pizza',
+      await postCard('https://super-realm.com/post', {
         data: {
           title: 'Hello World',
         },
@@ -114,12 +105,11 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     }
   );
 
-  QUnit.todo(
+  QUnit.test(
     'Errors when you try to include other fields',
     async function (assert) {
       assert.expect(0);
-      await postCard('https://my-realm/post0', {
-        adoptsFrom: '../post',
+      await postCard('https://super-realm.com/post', {
         data: {
           title: 'Hello World',
         },
@@ -137,12 +127,11 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     }
   );
 
-  QUnit.todo(
+  QUnit.test(
     'errors when you try to post attributes that dont exist on parent card',
     async function (assert) {
       assert.expect(0);
-      await postCard('https://my-realm/post0', {
-        adoptsFrom: '../post',
+      await postCard('https://super-realm.com/post', {
         data: {
           attributes: {
             pizza: 'Hello World',
@@ -155,7 +144,7 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
             {
               status: 400,
               title:
-                'Field(s) "pizza" does not exist on card "https://my-realm/post0"',
+                'Field(s) "pizza" does not exist on card "https://super-realm.com/post0"',
             },
           ],
         });

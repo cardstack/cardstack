@@ -4,7 +4,7 @@ import { join } from 'path';
 async function run() {
   const cardCacheDir = join(__dirname, '..', '..', 'compiled');
 
-  const realms = [
+  const realmConfigs = [
     {
       url: 'https://cardstack.com/base/',
       directory: join(__dirname, '..', '..', 'base-cards'),
@@ -15,7 +15,7 @@ async function run() {
     },
   ];
   let server = await Server.create({
-    realms,
+    realmConfigs,
     cardCacheDir,
     routeCard: 'https://demo.com/routes',
   });

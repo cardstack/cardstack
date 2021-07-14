@@ -1,6 +1,10 @@
-import Builder from '../builder';
-import { ServerOptions } from '../interfaces';
+import Koa from 'koa';
 import isEqual from 'lodash/isEqual';
+import { RealmConfig } from '@cardstack/core/src/interfaces';
+
+import Builder from '../builder';
+import { CardStackContext } from '../interfaces';
+import RealmManager from '../realm-manager';
 
 const EXPORTS_PATHS = ['.', './*'];
 const EXPORTS_ENVIRONMENTS = ['browser', 'default'];
@@ -11,7 +15,7 @@ function hasValidExports(pkg: any): boolean {
   });
 }
 
-function validatePackageJson(cardCacheDir: string): void {
+function validateCacheDirSetup(cardCacheDir: string): void {
   let pkg;
   try {
     pkg = require(`${cardCacheDir}/package.json`);
@@ -26,22 +30,29 @@ function validatePackageJson(cardCacheDir: string): void {
   }
 }
 
-export function setupCardBuilding(options: {
-  realms: ServerOptions['realms'];
-  cardCacheDir: string;
-}) {
+export function setupCardBuilding(
+  app: Koa<any, CardStackContext>,
+  options: {
+    realms: RealmConfig[];
+    cardCacheDir: string;
+  }
+) {
   let { realms, cardCacheDir } = options;
 
-  validatePackageJson(cardCacheDir);
+  validateCacheDirSetup(cardCacheDir);
 
-  // Make sure there is always a line ending on the realm.directory
-  realms = realms.map((realm) => ({
-    url: realm.url,
-    directory: realm.directory.replace(/\/$/, '') + '/',
-  }));
+  app.context.requireCard = function (path: string): any {
+    const module = require.resolve(path, {
+      paths: [cardCacheDir],
+    });
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require(module);
+  };
 
-  return new Builder({
-    realms,
+  app.context.realms = new RealmManager(realms);
+
+  app.context.builder = new Builder({
+    realms: app.context.realms,
     cardCacheDir,
     pkgName: '@cardstack/compiled',
   });

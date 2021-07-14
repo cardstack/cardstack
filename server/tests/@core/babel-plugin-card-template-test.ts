@@ -66,7 +66,7 @@ QUnit.module('Babel CardTemplatePlugin', function (hooks) {
     containsSource(
       code,
       `export class Model extends BaseModel {
-        serializerMap = {
+        static serializerMap = {
           date: ["birthdate", "address.settlementDate"]
         };
       }`

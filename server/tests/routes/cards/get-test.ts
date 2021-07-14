@@ -4,13 +4,13 @@ import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { setupCardCache } from '@cardstack/server/tests/helpers/cache';
 import {
-  RealmHelper,
+  ProjectTestRealm,
   setupRealms,
 } from '@cardstack/server/tests/helpers/realm';
 import { Server } from '@cardstack/server/src/server';
 
 QUnit.module('GET /cards/<card-id>', function (hooks) {
-  let realm: RealmHelper;
+  let realm: ProjectTestRealm;
   let server: Koa;
 
   function getCard(cardURL: string) {
@@ -20,7 +20,7 @@ QUnit.module('GET /cards/<card-id>', function (hooks) {
   }
 
   let { resolveCard, getCardCacheDir } = setupCardCache(hooks);
-  let { createRealm, getRealms } = setupRealms(hooks);
+  let { createRealm, getRealmConfigs } = setupRealms(hooks);
 
   hooks.beforeEach(async function () {
     realm = createRealm('my-realm');
@@ -32,11 +32,12 @@ QUnit.module('GET /cards/<card-id>', function (hooks) {
       'schema.js': `
         import { contains } from "@cardstack/types";
         import string from "https://cardstack.com/base/string";
+        import datetime from "https://cardstack.com/base/datetime";
         export default class Post {
-          @contains(string)
-          title;
-          @contains(string)
-          body;
+          @contains(string) title;
+          @contains(string) body;
+          @contains(datetime) createdAt;
+          @contains(string) extra;
         }
       `,
       'isolated.js': templateOnlyComponentTemplate(
@@ -59,7 +60,7 @@ QUnit.module('GET /cards/<card-id>', function (hooks) {
     server = (
       await Server.create({
         cardCacheDir: getCardCacheDir(),
-        realms: getRealms(),
+        realmConfigs: getRealmConfigs(),
       })
     ).app;
   });
@@ -74,10 +75,24 @@ QUnit.module('GET /cards/<card-id>', function (hooks) {
 
   QUnit.test("can load a simple isolated card's data", async function (assert) {
     let response = await getCard('https://my-realm/post0').expect(200);
+
+    assert.deepEqual(
+      Object.keys(response.body),
+      ['data'],
+      'data is the only top level key'
+    );
+    assert.deepEqual(Object.keys(response.body.data), [
+      'type',
+      'id',
+      'meta',
+      'attributes',
+    ]);
     assert.deepEqual(response.body.data?.attributes, {
       title: 'Hello World',
       body: 'First post.',
     });
+    assert.ok(response.body.data?.meta.componentModule);
+
     let componentModule = response.body.data?.meta.componentModule;
     assert.ok(componentModule, 'should have componentModule');
     assert.ok(resolveCard(componentModule), 'component module is resolvable');

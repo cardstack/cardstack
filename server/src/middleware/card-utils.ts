@@ -7,11 +7,11 @@ export async function assertCardExists(
   next: any
 ) {
   let {
-    builder,
+    realms,
     params: { encodedCardURL: url },
   } = ctx;
 
-  if (!builder.locateCardDir(url)) {
+  if (!realms.doesCardExist(url)) {
     throw new NotFound(`Card ${url} does not exist`);
   }
 

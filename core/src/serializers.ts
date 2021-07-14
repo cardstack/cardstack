@@ -1,5 +1,6 @@
 import format from 'date-fns/format';
 import parse from 'date-fns/parse';
+
 export interface PrimitiveSerializer {
   serialize(val: any): any;
   deserialize(val: any): any;

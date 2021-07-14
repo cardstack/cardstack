@@ -1,19 +1,28 @@
+import {
+  CompiledCard,
+  Builder as BuilderInterface,
+  RawCard,
+} from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
-import { Builder, CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
-import { setupCardBuilding } from '../../src/context/card-building';
-import { BASE_CARD_REALM_CONFIG } from '../helpers/fixtures';
 import { createCardCacheDir } from '../helpers/cache';
 import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
+import { ensureTrailingSlash } from '../../src/utils/path';
+import Builder from '@cardstack/server/src/builder';
+import RealmManager from '../../src/realm-manager';
+import { BASE_CARD_REALM_CONFIG } from './fixtures';
 
 const baseBuilder = (() => {
   let { cardCacheDir } = createCardCacheDir();
-  return setupCardBuilding({
-    realms: [BASE_CARD_REALM_CONFIG],
+  let realms = new RealmManager([BASE_CARD_REALM_CONFIG]);
+
+  return new Builder({
+    realms,
     cardCacheDir,
+    pkgName: '@cardstack/compiled',
   });
 })();
 
-export class TestBuilder implements Builder {
+export class TestBuilder implements BuilderInterface {
   compiler: Compiler;
   rawCards: Map<string, RawCard> = new Map();
   definedModules: Map<string, string> = new Map();
@@ -48,7 +57,7 @@ export class TestBuilder implements Builder {
     type: string,
     src: string
   ): Promise<string> {
-    let moduleName = cardURL.replace(/\/$/, '') + '/' + localModule;
+    let moduleName = ensureTrailingSlash(cardURL) + localModule;
 
     switch (type) {
       case JS_TYPE:

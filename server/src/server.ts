@@ -1,8 +1,8 @@
 import Koa from 'koa';
 import Router from '@koa/router';
+import cors from '@koa/cors';
 import logger from 'koa-logger';
 import bodyParser from 'koa-bodyparser';
-import cors from '@koa/cors';
 import sane from 'sane';
 
 import { cleanCache, primeCache, setupWatchers } from './watcher';
@@ -26,7 +26,7 @@ function unimpl() {
 
 export class Server {
   static async create(options: ServerOptions): Promise<Server> {
-    let { realms, cardCacheDir, routeCard } = options;
+    let { realmConfigs: realms, cardCacheDir, routeCard } = options;
 
     let koaRouter = new Router<{}, CardStackContext>();
 
@@ -38,15 +38,15 @@ export class Server {
       .use(logger())
       .use(cors({ origin: '*' }));
 
-    app.context.builder = setupCardBuilding({ realms, cardCacheDir });
+    setupCardBuilding(app, { realms, cardCacheDir });
 
     if (routeCard) {
-      await setupCardRouting(app, { routeCard, cardCacheDir });
+      await setupCardRouting(app, { routeCard });
     }
 
     // the 'cards' section of the API deals in card data. The shape of the data
     // on these endpoints is determined by each card's own schema.
-    koaRouter.post(`/cards/:adoptFromCardURL`, createDataCard);
+    koaRouter.post(`/cards/:realmURL/:parentCardURL`, createDataCard);
     koaRouter.get(`/cards/:encodedCardURL`, assertCardExists, getCard);
     koaRouter.patch(`/cards/:encodedCardURL`, assertCardExists, updateCard);
     koaRouter.delete(`/cards/:encodedCardURL`, assertCardExists, deleteCard);
@@ -75,7 +75,7 @@ export class Server {
 
   async startWatching() {
     let {
-      options: { cardCacheDir, realms },
+      options: { cardCacheDir, realmConfigs: realms },
       app: {
         context: { builder },
       },
