@@ -102,11 +102,13 @@ export default abstract class Layer2ChainWeb3Strategy
       }
       this.walletConnectUri = payload.params[0];
     });
-    let strategy = this;
+
     this.provider.on('chainChanged', (chainId: number) => {
-      if (String(chainId) !== String(networkIds[this.networkSymbol])) {
-        console.log(`Layer2 WC chainChanged to ${chainId}. Disconnecting`);
-        strategy.disconnect();
+      if (chainId !== this.chainId) {
+        this.simpleEmitter.emit('incorrect-chain');
+        this.disconnect();
+      } else {
+        this.simpleEmitter.emit('correct-chain');
       }
     });
     this.connector.on('session_update', async (error, payload) => {
