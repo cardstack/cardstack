@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/boxel",
-  "version": "0.19.26",
+  "version": "0.19.27",
   "description": "Cardstack Boxel Design System development app.",
   "repository": "https://github.com/cardstack/boxel",
   "license": "MIT",
@@ -62,11 +62,11 @@
     "ember-table": "^2.2.3",
     "ember-test-selectors": "^5.0.0",
     "ember-truth-helpers": "^3.0.0",
+    "ember-unique-id-helper-polyfill": "^0.1.0",
     "file-loader": "^6.2.0",
     "macro-decorators": "^0.1.2",
     "qunit": "^2.14.0",
-    "walk-sync": "^2.2.0",
-    "ember-unique-id-helper-polyfill": "^0.1.0"
+    "walk-sync": "^2.2.0"
   },
   "devDependencies": {
     "@ember/jquery": "^1.1.0",
