@@ -1,0 +1,43 @@
+<ActionCardContainer
+  @header="Token bridge"
+  @isComplete={{@isComplete}}
+  data-test-withdrawal-transaction-confirmed-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section
+    @title={{concat "Bridging tokens to " (network-display-info "layer1" "fullName")}}
+    @icon={{if this.isInProgress "clock" "success-bordered"}}
+    @dataTestId="withdrawal-confirmed"
+  >
+    <Boxel::ProgressSteps
+      class="transaction-status__steps"
+      @progressSteps={{this.progressSteps}}
+      @completedCount={{this.completedCount}}
+      as |progressStep|
+    >
+      <span
+        class="transaction-status__step-title"
+        data-test-token-bridge-step={{progressStep.index}}
+        data-test-completed={{progressStep.completed}}
+      >
+        {{progressStep.title}}
+      </span>
+
+      <span class="transaction-status__step-status">
+        {{#if (eq progressStep.index 0)}}
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.blockscoutUrl}} target="_blank" rel="noopener" data-test-blockscout-button>
+            View on Blockscout
+          </Boxel::Button>
+        {{/if}}
+        {{#if (eq progressStep.index 1)}}
+          {{#if progressStep.completed}}
+            <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" data-test-bridge-explorer-button>
+              View in Bridge Explorer
+            </Boxel::Button>
+          {{else}}
+            Processing...
+          {{/if}}
+        {{/if}}
+      </span>
+    </Boxel::ProgressSteps>
+  </ActionCardContainer::Section>
+</ActionCardContainer>

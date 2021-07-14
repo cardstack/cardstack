@@ -95,6 +95,10 @@ export default class Layer1Network
   bridgeExplorerUrl(txnHash: string) {
     return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
   }
+
+  async awaitBridged(fromBlock: BN) {
+    return this.strategy.awaitBridged(fromBlock, this.walletInfo.firstAddress!);
+  }
 }
 
 // DO NOT DELETE: this is how TypeScript knows how to look up your services.

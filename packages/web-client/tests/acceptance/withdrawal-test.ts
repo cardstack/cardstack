@@ -285,13 +285,23 @@ module('Acceptance | withdrawal', function (hooks) {
 
     assert.dom(milestoneCompletedSel(3)).containsText('Transaction confirmed');
 
-    // // transaction-status step card
-    // TODO: simulate bridge success
-
-    // // transaction-summary card
     assert
       .dom(epiloguePostableSel(0))
       .containsText('You have successfully withdrawn tokens');
+
+    // // transaction-status step card
+
+    assert
+      .dom(epiloguePostableSel(1))
+      .containsText(`Bridging tokens to ${c.layer1.fullName}`);
+
+    layer1Service.test__simulateBridged(
+      '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
+    );
+    await settled();
+
+    // // transaction-summary card
+
     assert
       .dom(
         '[data-test-withdrawal-transaction-confirmed-from] [data-test-bridge-item-amount]'
@@ -302,9 +312,11 @@ module('Acceptance | withdrawal', function (hooks) {
         '[data-test-withdrawal-transaction-confirmed-to] [data-test-bridge-item-amount]'
       )
       .containsText('200.00 DAI');
-    await waitFor(epiloguePostableSel(2));
+
+    await waitFor(epiloguePostableSel(3));
+
     assert
-      .dom(epiloguePostableSel(2))
+      .dom(epiloguePostableSel(3))
       .containsText(
         `This is the remaining balance in your ${c.layer2.fullName} wallet`
       );
@@ -312,12 +324,12 @@ module('Acceptance | withdrawal', function (hooks) {
       defaultToken: toBN('2141100000000000000'), // TODO: choose numbers that make sense with the scenario
       card: toBN('10000000000000000000000'), // TODO: choose numbers that make sense with the scenario
     });
-    await waitFor(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`);
+    await waitFor(`${epiloguePostableSel(4)} [data-test-balance="DAI.CPXD"]`);
     assert
-      .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
+      .dom(`${epiloguePostableSel(4)} [data-test-balance="DAI.CPXD"]`)
       .containsText('2.1411');
     assert
-      .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD.CPXD"]`)
+      .dom(`${epiloguePostableSel(4)} [data-test-balance="CARD.CPXD"]`)
       .containsText('10000.00');
     // let milestoneCtaButtonCount = Array.from(
     //   document.querySelectorAll(
@@ -334,11 +346,11 @@ module('Acceptance | withdrawal', function (hooks) {
     //   );
     assert
       .dom(
-        `${epiloguePostableSel(4)} [data-test-withdrawal-next-step="dashboard"]`
+        `${epiloguePostableSel(5)} [data-test-withdrawal-next-step="dashboard"]`
       )
       .exists();
     await click(
-      `${epiloguePostableSel(4)} [data-test-withdrawal-next-step="dashboard"]`
+      `${epiloguePostableSel(5)} [data-test-withdrawal-next-step="dashboard"]`
     );
     assert.dom('[data-test-workflow-thread]').doesNotExist();
   });
