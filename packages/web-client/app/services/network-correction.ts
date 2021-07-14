@@ -67,10 +67,19 @@ export default class NetworkCorrection extends Service {
       return;
     }
 
-    // check if both layer 1 and 2 are ok to go
-    console.log(
-      'reloading via service if both layer 1 and 2 are on the right chains'
-    );
+    // there might be a condition with disconnections later
+    let layer1ReadyForReload = !this.layer1Incorrect;
+    let layer2ReadyForReload = !this.layer2Incorrect;
+
+    if (!layer1ReadyForReload && !layer2ReadyForReload) {
+      console.error('Both networks are not ready for reload');
+    } else if (!layer1ReadyForReload) {
+      console.error('Layer 1 is not ready for reload');
+    } else if (!layer2ReadyForReload) {
+      console.error('Layer 2 is not ready for reload');
+    } else {
+      console.log('reloading via service');
+    }
   }
 }
 
