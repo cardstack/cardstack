@@ -145,42 +145,11 @@ export default abstract class Layer1ChainWeb3Strategy
   }
 
   onChainChanged(chainId: number) {
-    let previousConnectedChainId = this.connectedChainId;
-    let previousConnectedChainIdIncorrect =
-      previousConnectedChainId !== undefined &&
-      previousConnectedChainId !== this.chainId;
-
     this.connectedChainId = chainId;
-
-    let currentConnectedChainIdIncorrect =
-      this.connectedChainId !== this.chainId;
-    console.log('chain changed to chain with id', chainId);
-
-    // none-incorrect (handled in currentChainIncorrect)
-    // none-correct (ignore)
-    // incorrect-incorrect (handled)
-    // incorrect-correct (handled)
-    // correct-incorrect (handled in currentChainIncorrect)
-    // correct-correct (seems irrelevant)
-
-    // do we need correct-none and incorrect-none?
-    if (previousConnectedChainIdIncorrect && currentConnectedChainIdIncorrect) {
-      // don't bother re-emitting if the chain is incorrect
-      console.log(
-        'chain was incorrect anyway and so we are not doing anything'
-      );
-      return;
-    } else if (
-      previousConnectedChainIdIncorrect &&
-      !currentConnectedChainIdIncorrect
-    ) {
-      // time to reload. this may need some coordination with layer 2, if both are wrong
-      // so we emit an event instead.
-      console.log('chain corrected, we might reload the page');
-      this.simpleEmitter.emit('correct-chain');
-    } else if (currentConnectedChainIdIncorrect) {
-      console.error('Newly detected incorrect chain on layer 1');
+    if (this.connectedChainId !== this.chainId) {
       this.simpleEmitter.emit('incorrect-chain');
+    } else {
+      this.simpleEmitter.emit('correct-chain');
     }
   }
 
