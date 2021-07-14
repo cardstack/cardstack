@@ -45,6 +45,8 @@ export default class Layer1Network extends Service {
     }
 
     this.strategy.on('disconnect', this.onDisconnect);
+    this.strategy.on('incorrect-chain', this.onIncorrectChain);
+    this.strategy.on('correct-chain', this.onCorrectChain);
   }
 
   connect(walletProvider: WalletProvider) {
@@ -58,6 +60,14 @@ export default class Layer1Network extends Service {
 
   @action onDisconnect() {
     this.simpleEmitter.emit('disconnect');
+  }
+
+  @action onIncorrectChain() {
+    this.simpleEmitter.emit('incorrect-chain');
+  }
+
+  @action onCorrectChain() {
+    this.simpleEmitter.emit('correct-chain');
   }
 
   on(event: Layer1NetworkEvent, cb: Function): UnbindEventListener {
