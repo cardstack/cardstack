@@ -136,10 +136,7 @@ export const allowedTokens: string[] = [
   '0x2F0E755Efe6b58238A67DB420Ff3513Ec1fb31eF', // RPL - Rocket Pool on xDai
   '0x5A87eaC5642BfEd4e354Ee8738DACd298E07D1Af', // RSR - Reserve Rights on xDai
   '0x5c8c83e5d5f7be815863b810d45d7bc706d7b15b', // rSURF - rSURF
-  // This token has had an "emergency shutdown" operation performed against it
-  // https://forum.poa.network/t/migration-of-the-xdai-tokenbridge-completed/3212
-  // removing from our list.
-  // '0xc439E5B1DEe4f866B681E7c5E5dF140aA47fBf19', // SAI - Sai on xDai
+  '0xc439E5B1DEe4f866B681E7c5E5dF140aA47fBf19', // SAI - Sai on xDai
   '0x8F365b41B98Fe84aCB287540b4B4AB633e07EDb2', // SETH - Synth sETH on xDai
   '0x27B9C2Bd4BaEa18ABdF49169054c1C1c12af9862', // SNAFU - SNAFU
   '0x044F6ae3aEF34fdB8FdDc7c05F9cC17F19Acd516', // SNT - Status Network Token on xDai

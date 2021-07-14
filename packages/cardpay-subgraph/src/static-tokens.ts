@@ -17,16 +17,18 @@ export class StaticToken {
 
   // Get all tokens with a static definition
   static getStaticTokens(): Array<StaticToken> {
-    let staticTokens = new Array<StaticToken>(1);
+    let staticTokens = new Array<StaticToken>(0);
+    // add any static tokens detail here that are unable to be obtained via
+    // token contract
 
-    // Add SAI
-    let tokenSAI = new StaticToken(
-      Address.fromString('0xc439E5B1DEe4f866B681E7c5E5dF140aA47fBf19'),
-      'SAI',
-      'SAI on xDai',
-      BigInt.fromI32(18)
-    );
-    staticTokens.push(tokenSAI);
+    // let token = new StaticToken(
+    //   Address.fromString('0x12345'),
+    //   'TOKEN',
+    //   'Token Name',
+    //   BigInt.fromI32(18)
+    // );
+    // staticTokens.push(token);
+
     return staticTokens;
   }
 
