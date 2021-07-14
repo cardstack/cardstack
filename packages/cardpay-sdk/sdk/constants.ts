@@ -22,6 +22,7 @@ const SOKOL = {
   name: 'Sokol',
   // this needs to be an "archive" node
   rpcNode: 'https://sokol.stack.cards',
+  rpcWssNode: 'https://sokol-wss.stack.cards',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
   subgraphURL: 'https://graph.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
   tallyServiceURL: 'https://tally-service-staging.stack.cards/api/v1',
@@ -64,7 +65,8 @@ const XDAI = {
   nativeTokenName: 'xDai',
   name: 'xDai Chain',
   // this needs to be an "archive" node
-  rpcNode: 'https://rpc.xdaichain.com',
+  rpcNode: 'https://xdai-archive.blockscout.com',
+  rpcWssNode: 'wss://rpc.xdaichain.com/wss',
   relayServiceURL: 'https://relay.cardstack.com/api',
   transactionServiceURL: 'https://transactions.cardstack.com/api',
 };
