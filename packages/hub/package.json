@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.19.29",
+  "version": "0.19.30",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },
@@ -12,7 +12,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.18.0",
     "@aws-sdk/client-sts": "^3.18.0",
-    "@cardstack/did-resolver": "0.19.29",
+    "@cardstack/did-resolver": "0.19.30",
     "@cardstack/logger": "^0.2.1",
     "@graphile/logger": "^0.2.0",
     "@types/fs-extra": "^9.0.11",
@@ -52,8 +52,8 @@
     "typescript-memoize": "^1.0.1"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.19.29",
-    "@cardstack/test-support": "0.19.29",
+    "@cardstack/eslint-config": "0.19.30",
+    "@cardstack/test-support": "0.19.30",
     "@types/config": "^0.0.38",
     "@types/pg-format": "^1.0.1",
     "@types/supertest": "^2.0.11",
@@ -83,5 +83,5 @@
   "config": {
     "access": "public"
   },
-  "gitHead": "db1c0337c046a98495c25aa452958f4f0b45aa6b"
+  "gitHead": "bbeee2f2841f3f857ab7a2edfb4ded89973cf969"
 }
