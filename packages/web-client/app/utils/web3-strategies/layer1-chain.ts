@@ -10,6 +10,7 @@ import { BridgeableSymbol, TokenContractInfo } from '../token';
 import WalletInfo from '../wallet-info';
 import { WalletProvider } from '../wallet-providers';
 import {
+  Layer1ChainEvent,
   Layer1Web3Strategy,
   TransactionHash,
   Layer1NetworkSymbol,
@@ -23,8 +24,6 @@ import {
   ConnectionManager,
   ConnectionManagerEvent,
 } from './layer-1-connection-manager';
-
-type Layer1ChainEvent = 'disconnect' | 'incorrect-chain' | 'correct-chain';
 
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
@@ -186,7 +185,7 @@ export default abstract class Layer1ChainWeb3Strategy
     return this.walletInfo.accounts.length > 0;
   }
 
-  on(event: string, cb: Function): UnbindEventListener {
+  on(event: Layer1ChainEvent, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);
   }
 
