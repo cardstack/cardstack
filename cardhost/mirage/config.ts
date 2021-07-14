@@ -22,7 +22,9 @@ import { Memoize } from 'typescript-memoize';
 import type { TestContext } from 'ember-test-helpers';
 import { encodeCardURL } from '@cardstack/core/src/utils';
 
-type CardParams = { type: 'raw' } | { format: Format; type?: 'compiled' };
+type CardParams =
+  | { type: 'raw'; format?: Format }
+  | { format: Format; type?: 'compiled' };
 
 function assertValidQueryParams(
   queryParams: any
@@ -62,11 +64,14 @@ async function returnCard(schema: any, request: RequestType) {
 
 async function updateCard(_schema: any, request: RequestType) {
   let cardServer = FakeCardServer.current();
+  let params = request.queryParams;
+  assertValidQueryParams(params);
   let cardURL = request.params.encodedCardURL;
 
   return cardServer.updateCardData(
     cardURL,
-    JSON.parse(request.requestBody).data.attributes
+    JSON.parse(request.requestBody).data.attributes,
+    params.format
   );
 }
 
@@ -167,21 +172,23 @@ export class FakeCardServer {
     };
   }
 
-  async updateCardData(url: string, payload: any): Promise<cardJSONReponse> {
-    let format: Format = 'isolated'; // TODO: Assuming isolated, maybe not?
+  async updateCardData(
+    url: string,
+    payload: any,
+    format?: Format
+  ): Promise<cardJSONReponse> {
     let card = await FakeCardServer.current().builder.updateCardData(
       url,
       payload
     );
 
-    // TODO: Should server/src/utils/serialization be moved to core and reused here?
     return {
       data: {
         id: url,
         type: 'card',
         attributes: card.data,
         meta: {
-          componentModule: card[format].moduleName,
+          componentModule: card[format || 'isolated'].moduleName,
         },
       },
     };

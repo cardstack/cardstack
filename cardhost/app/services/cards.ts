@@ -5,12 +5,11 @@ import { hbs } from 'ember-cli-htmlbars';
 import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 
-// TODO: @ember/component doesn't declare setCOmponentTemplate...yet!
-// @ts-ignore
+// @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
 import { setComponentTemplate } from '@ember/component';
 
 import { Format, cardJSONReponse } from '@cardstack/core/src/interfaces';
-import type CardModel from '@cardstack/core/src/base-component-model';
+import type CardModel from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
 
 const { cardServer } = config as any; // Environment types arent working
@@ -42,11 +41,11 @@ export default class Cards extends Service {
     return this.internalLoad.perform(`${cardServer}cardFor${pathname}`);
   }
 
-  // TODO: adjust api to accept Card and not CardModel for symmetry with what we
-  // return from our load methods
-  async loadForEdit(model: CardModel): Promise<Card> {
-    let loaded = await this.internalLoad.perform(buildURL(model.url, 'edit'));
-    originals.set(loaded.model, model);
+  async loadForEdit(card: Card): Promise<Card> {
+    let loaded = await this.internalLoad.perform(
+      buildURL(card.model.url, 'edit')
+    );
+    originals.set(loaded.model, card.model);
     return loaded;
   }
 
@@ -73,16 +72,14 @@ export default class Cards extends Service {
     }
   );
 
-  // TODO: adjust api to accept Card and not CardModel for symmetry with what we
-  // return from our load methods
-  async save(model: CardModel): Promise<void> {
-    await this.saveTask.perform(model);
-    let original = originals.get(model);
+  async save(card: Card): Promise<void> {
+    await this.saveTask.perform(card.model);
+    let original = originals.get(card.model);
     if (original) {
       // TODO: this should probably be selective and only update fields that
       // already appear in original (which will be a subset of the editable
       // card)
-      original.setters(model.data);
+      original.setters(card.model.data);
     }
   }
 
@@ -101,7 +98,10 @@ async function loadComponentModule(
   card: cardJSONReponse,
   url: string
 ): Promise<{ component: unknown; ModelClass: typeof CardModel }> {
-  let componentModuleName = card.data.meta.componentModule;
+  let componentModuleName = card.data.meta?.componentModule;
+  if (!componentModuleName) {
+    throw new Error('No componentModule to load');
+  }
 
   // TODO: base this on the componentModuleName prefix instead of isTesting()
   if (macroCondition(isTesting())) {

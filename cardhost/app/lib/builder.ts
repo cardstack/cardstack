@@ -10,7 +10,7 @@ import { encodeCardURL } from '@cardstack/core/src/utils';
 import dynamicCardTransform from './dynamic-card-transform';
 
 // This is neccessary to get the base model available to ember
-import * as CardModel from '@cardstack/core/src/base-component-model';
+import * as CardModel from '@cardstack/core/src/card-model';
 (window as any).define('@cardstack/core/src/base-component-model', function () {
   return CardModel;
 });
