@@ -21,6 +21,7 @@ import {
   Layer2Web3Strategy,
   TransactionHash,
   Layer2NetworkSymbol,
+  Layer2ChainEvent,
 } from './types';
 import {
   networkIds,
@@ -39,7 +40,7 @@ import { networkDisplayInfo } from './network-display-info';
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 export default abstract class Layer2ChainWeb3Strategy
-  implements Layer2Web3Strategy, Emitter<'disconnect'> {
+  implements Layer2Web3Strategy, Emitter<Layer2ChainEvent> {
   private chainName: string;
   chainId: number;
   networkSymbol: Layer2NetworkSymbol;
@@ -300,7 +301,7 @@ export default abstract class Layer2ChainWeb3Strategy
   async disconnect(): Promise<void> {
     await this.provider?.disconnect();
   }
-  on(event: string, cb: Function): UnbindEventListener {
+  on(event: Layer2ChainEvent, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);
   }
 }

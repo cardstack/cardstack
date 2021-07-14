@@ -12,6 +12,10 @@ export type Layer1ChainEvent =
   | 'disconnect'
   | 'incorrect-chain'
   | 'correct-chain';
+export type Layer2ChainEvent =
+  | 'disconnect'
+  | 'incorrect-chain'
+  | 'correct-chain';
 
 export interface Web3Strategy {
   isConnected: boolean;
@@ -45,7 +49,7 @@ export interface Layer1Web3Strategy
 
 export interface Layer2Web3Strategy
   extends Web3Strategy,
-    Emitter<'disconnect'> {
+    Emitter<Layer2ChainEvent> {
   isConnected: boolean;
   defaultTokenBalance: BN | undefined;
   cardBalance: BN | undefined;
