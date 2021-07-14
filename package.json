@@ -51,7 +51,7 @@
     "deploy:subgraph-local": "cd ./packages/cardpay-subgraph && yarn deploy-local",
     "deploy:subgraph-sokol-green": "cd ./packages/cardpay-subgraph && yarn deploy-sokol-green",
     "prepare": "npm run compile",
-    "codegen:subgraph": "cd ./packages/cardpay-subgraph && yarn codegen",
+    "codegen:subgraph-sokol": "cd ./packages/cardpay-subgraph && yarn codegen-sokol",
     "build:subgraph": "cd ./packages/cardpay-subgraph && yarn build",
     "lint": "yarn compile && npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:css:web-client": "cd packages/web-client && yarn lint:css",

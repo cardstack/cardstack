@@ -3,7 +3,7 @@
   "version": "0.19.33",
   "license": "MIT",
   "scripts": {
-    "codegen": "node ./etc/pre-codegen-entrypoint.js poa-sokol && graph codegen && node ./etc/pre-tsc-build-entrypoint.js",
+    "codegen-sokol": "node ./etc/pre-codegen-entrypoint.js poa-sokol && graph codegen && node ./etc/pre-tsc-build-entrypoint.js",
     "build": "graph build",
     "deploy-sokol-green": "yarn deploy-thegraph-sokol && yarn deploy-cardstack-sokol-green",
     "deploy-thegraph-sokol": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ habdelra/cardpay-sokol",
