@@ -5,25 +5,56 @@
   data-test-withdrawal-choose-balance-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section>
-    <ActionCardContainer::Section @title="Choose a depot and balance to withdraw from">
-      <CardPay::NestedAccountDepotDisplay
-        @accountAddress={{this.layer2Network.walletInfo.firstAddress}}
-        @depotAddress={{this.depotAddress}}
-        @size={{if @isComplete "large"}}
-      />
+    <ActionCardContainer::Section @title="Withdraw tokens">
+      <CardPay::LabeledValue @label="From:" class="choose-balance__field">
+        <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} />
+        <CardPay::NestedItems @noInnerBorder={{not @isComplete}} class="choose-balance__nested-items">
+          <:outer>
+            <CardPay::AccountDisplay
+              {{!-- class="transaction-setup__account" --}}
+              @size="small"
+              @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
+            />
+          </:outer>
+          <:inner>
+            <CardPay::AccountDisplay
+              @size={{if @isComplete "small"}}
+              @icon="depot"
+              @name="DEPOT:"
+              @address={{if @isComplete (truncate-middle this.depotAddress) this.depotAddress}}
+            />
+          </:inner>
+          <:innermost>
+            {{#if @isComplete}}
+              <CardPay::BalanceDisplay
+                @label="Available Balance"
+                @size="large"
+                @icon={{this.selectedToken.icon}}
+                @balance={{format-token-amount this.selectedToken.balance}}
+                @symbol={{this.selectedToken.symbol}}
+              />
+            {{else}}
+              <div class="choose-balance__dropdown-container">
+                <CardPay::BalanceChooserDropdown
+                  @tokens={{this.tokens}}
+                  @selectedToken={{this.selectedToken}}
+                  @selectedTokenSymbol={{this.selectedTokenSymbol}}
+                  @chooseToken={{this.chooseSource}}
+                />
+              </div>
+            {{/if}}
+          </:innermost>
+        </CardPay::NestedItems>
+      </CardPay::LabeledValue>
     </ActionCardContainer::Section>
-    {{#if this.depotAddress}}
-      <ActionCardContainer::Section>
-        <CardPay::NestedDepotBalanceChooser
-          @isComplete={{@isComplete}}
-          @depotAddress={{this.depotAddress}}
-          @tokens={{this.tokens}}
-          @selectedToken={{this.selectedToken}}
-          @selectedTokenSymbol={{this.selectedTokenSymbol}}
-          @chooseToken={{this.chooseSource}}
+    <ActionCardContainer::Section @title="Receive tokens">
+      <CardPay::LabeledValue @label="In:" class="choose-balance__field">
+        <CardPay::AccountDisplay
+          @name={{concat (network-display-info "layer1" "fullName") " wallet"}}
+          @address={{this.layer1Network.walletInfo.firstAddress}}
         />
-      </ActionCardContainer::Section>
-    {{/if}}
+      </CardPay::LabeledValue>
+    </ActionCardContainer::Section>
   </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}

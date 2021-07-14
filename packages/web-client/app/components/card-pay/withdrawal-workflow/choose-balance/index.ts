@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { TokenBalance, TokenSymbol } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
@@ -11,6 +12,7 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
   defaultTokenSymbol: TokenSymbol = 'DAI.CPXD';
   cardTokenSymbol: TokenSymbol = 'CARD.CPXD';
   tokenOptions = [this.defaultTokenSymbol, this.cardTokenSymbol];
+  @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   get selectedTokenSymbol(): TokenSymbol {
     return (

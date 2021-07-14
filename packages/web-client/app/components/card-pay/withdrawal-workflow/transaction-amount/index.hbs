@@ -12,7 +12,7 @@
       >
         <CardPay::BalanceViewBanner
           @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
-          @depotAddress={{this.layer2Network.depotSafe.address}}
+          @depotAddress={{truncate-middle this.layer2Network.depotSafe.address}}
           @token={{this.currentTokenDetails}}
           @balance={{format-token-amount this.currentTokenBalance}}
         />

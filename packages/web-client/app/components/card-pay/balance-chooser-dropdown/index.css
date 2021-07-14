@@ -1,32 +1,11 @@
-.nested-depot-balance-chooser {
-  grid-template-columns: 3.5rem 1fr;
-  row-gap: 0;
-}
-
-.nested-depot-balance-chooser__nested-items {
-  grid-column: 2;
-  grid-row: 2;
-}
-
-.nested-depot-balance-chooser__nested-dropdown {
-  --arrow-space: 2.5rem;
-
-  margin-top: var(--boxel-sp-sm);
-  padding-left: calc(var(--arrow-space) + var(--boxel-sp-xs));
-  background-image: url('/images/icons/curve-arrow.svg');
-  background-repeat: no-repeat;
-  background-position: left center;
-  background-size: var(--arrow-space) 14px;
-}
-
-.nested-depot-balance-chooser__dropdown {
+.balance-chooser-dropdown {
   --field-height: 3.75rem;
 
   position: relative;
   min-height: var(--field-height);
 }
 
-.nested-depot-balance-chooser__dropdown > .ember-power-select-trigger {
+.balance-chooser-dropdown > .ember-power-select-trigger {
   background: url('/images/icons/caret-dropdown.svg') right 1.125rem center/auto 0.5rem no-repeat;
   background-color: var(--boxel-light);
   border: 1px solid var(--boxel-purple-300);
@@ -34,12 +13,12 @@
   transition: border-color var(--boxel-transition);
 }
 
-.nested-depot-balance-chooser__dropdown > .ember-power-select-trigger:hover {
+.balance-chooser-dropdown > .ember-power-select-trigger:hover {
   border-color: var(--boxel-dark);
   cursor: pointer;
 }
 
-.nested-depot-balance-chooser__dropdown .ember-basic-dropdown-content {
+.balance-chooser-dropdown .ember-basic-dropdown-content {
   position: absolute;
   z-index: 1;
   width: 100%;
@@ -49,37 +28,37 @@
   overflow: hidden;
 }
 
-.nested-depot-balance-chooser__dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
+.balance-chooser-dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
   animation: drop-fade-below var(--boxel-transition);
 }
 
-.nested-depot-balance-chooser__dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
+.balance-chooser-dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
   animation: drop-fade-below var(--boxel-transition) reverse;
 }
 
-.nested-depot-balance-chooser__dropdown-option {
+.balance-chooser-dropdown__option {
   min-height: var(--field-height);
   padding-right: var(--boxel-sp-xxl);
   padding-left: var(--boxel-sp);
 }
 
-.nested-depot-balance-chooser__dropdown-option--selected {
+.balance-chooser-dropdown__option--selected {
   background-image: url('/images/icons/checkmark.svg');
   background-repeat: no-repeat;
   background-position: right 1.125rem center;
   background-size: 0.75rem 0.75rem;
 }
 
-.ember-power-select-selected-item .nested-depot-balance-chooser__dropdown-option--selected {
+.ember-power-select-selected-item .balance-chooser-dropdown__option--selected {
   background-image: unset;
 }
 
-.nested-depot-balance-chooser__dropdown-option:hover {
+.balance-chooser-dropdown__option:hover {
   background-color: var(--boxel-light-300);
   cursor: pointer;
 }
 
-.ember-power-select-selected-item .nested-depot-balance-chooser__dropdown-option:hover {
+.ember-power-select-selected-item .balance-chooser-dropdown__option:hover {
   background-color: initial;
 }
 
