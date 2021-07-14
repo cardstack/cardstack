@@ -10,6 +10,7 @@ import serializers, {
   PrimitiveSerializer,
 } from '@cardstack/core/src/serializers';
 import { tracked } from '@glimmer/tracking';
+import { cloneDeep } from 'lodash';
 
 export default class CardModel {
   static serializerMap: SerializerMap;
@@ -22,14 +23,14 @@ export default class CardModel {
   private deserialized = false;
 
   constructor(cardResponse: cardJSONReponse) {
-    this.cardResponse = cardResponse;
+    this.cardResponse = cloneDeep(cardResponse);
     this.url = cardResponse.data.id;
     this.setters = this.makeSetter();
   }
 
   updateFromResponse(cardResponse: cardJSONReponse) {
     this.deserialized = false;
-    this.cardResponse = cardResponse;
+    this.cardResponse = cloneDeep(cardResponse);
     this._data = null;
   }
 
@@ -47,7 +48,8 @@ export default class CardModel {
     return serializeAttributes(
       attributes,
       'deserialize',
-      CardModel.serializerMap
+      // @ts-ignore
+      this.constructor.serializerMap
     );
   }
 
@@ -56,7 +58,8 @@ export default class CardModel {
     let attributes = serializeAttributes(
       data,
       'serialize',
-      CardModel.serializerMap
+      // @ts-ignore
+      this.constructor.serializerMap
     );
 
     return constructJSONAPIResponse(url, attributes);
@@ -143,8 +146,6 @@ function serializeAttributes(
   if (!attrs) {
     return;
   }
-  let attributes = Object.assign({}, attrs);
-
   let serializerName: SerializerName;
   for (serializerName in serializerMap) {
     let serializer = serializers[serializerName];
@@ -153,11 +154,11 @@ function serializeAttributes(
       continue;
     }
     for (const path of paths) {
-      serializeAttribute(attributes, path, serializer, action);
+      serializeAttribute(attrs, path, serializer, action);
     }
   }
 
-  return attributes;
+  return attrs;
 }
 
 function serializeAttribute(

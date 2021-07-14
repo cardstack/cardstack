@@ -1,3 +1,9 @@
+import { parse, isSameDay } from 'date-fns';
+
+function p(dateString: string): Date {
+  return parse(dateString, 'yyyy-MM-dd', new Date());
+}
+
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 import {
   ADDRESS_RAW_CARD,
@@ -11,7 +17,7 @@ import CardModel from '@cardstack/core/src/card-model';
 import { TestBuilder } from '../helpers/test-builder';
 
 export class PersonCardModel extends CardModel {
-  serializerMap = {
+  static serializerMap = {
     date: ['birthdate', 'address.settlementDate'],
   };
 }
@@ -23,7 +29,7 @@ let attributes = {
     street: '101 Price is Right ln',
     city: 'Los Angeles',
     state: 'CA',
-    settlementDate: '2000-01-01',
+    settlementDate: '1990-01-01',
   },
 };
 
@@ -42,21 +48,20 @@ Qmodule('CardModel', function () {
   test('.data', async function (assert) {
     let model = new PersonCardModel(cardJSONResponse);
     assert.equal(model.data.name, attributes.name);
-    assert.equal(
-      model.data.birthdate.getTime(),
-      new Date('1923-12-12').getTime(),
+    assert.ok(
+      isSameDay(model.data.birthdate, p('1923-12-12')),
       'Dates are serialized to Dates'
     );
     assert.equal(model.data.address.street, attributes.address.street);
-    assert.equal(
-      model.data.address.settlementDate.getTime(),
-      new Date('2000-01-01').getTime(),
+    assert.ok(
+      isSameDay(model.data.address.settlementDate, p('1990-01-01')),
       'Dates are serialized to Dates'
     );
   });
 
   test('.serialize', async function (assert) {
     let model = new PersonCardModel(cardJSONResponse);
+    model.data; // lazy deserializing
     let serialized = model.serialize();
     assert.deepEqual(
       serialized,
