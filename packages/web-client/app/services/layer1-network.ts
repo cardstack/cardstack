@@ -1,6 +1,9 @@
 import Service from '@ember/service';
 import config from '../config/environment';
-import { Layer1Web3Strategy } from '../utils/web3-strategies/types';
+import {
+  Layer1NetworkEvent,
+  Layer1Web3Strategy,
+} from '../utils/web3-strategies/types';
 import Layer1TestWeb3Strategy from '../utils/web3-strategies/test-layer1';
 import EthWeb3Strategy from '../utils/web3-strategies/ethereum';
 import KovanWeb3Strategy from '../utils/web3-strategies/kovan';
@@ -11,17 +14,12 @@ import { WalletProvider } from '../utils/wallet-providers';
 import { TransactionReceipt } from 'web3-core';
 import BN from 'bn.js';
 import {
-  Emitter,
   SimpleEmitter,
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
 import { action } from '@ember/object';
 import { TaskGenerator } from 'ember-concurrency';
-
-type Layer1NetworkEvent = 'disconnect';
-export default class Layer1Network
-  extends Service
-  implements Emitter<Layer1NetworkEvent> {
+export default class Layer1Network extends Service {
   strategy!: Layer1Web3Strategy;
   simpleEmitter = new SimpleEmitter();
   @reads('strategy.isConnected', false) isConnected!: boolean;
