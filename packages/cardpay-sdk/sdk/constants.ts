@@ -20,6 +20,7 @@ const SOKOL = {
   nativeTokenSymbol: 'SPOA',
   nativeTokenName: 'SPOA',
   name: 'Sokol',
+  // this needs to be an "archive" node
   rpcNode: 'https://sokol.stack.cards',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
   subgraphURL: 'https://graph.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
@@ -62,6 +63,7 @@ const XDAI = {
   nativeTokenSymbol: 'DAI',
   nativeTokenName: 'xDai',
   name: 'xDai Chain',
+  // this needs to be an "archive" node
   rpcNode: 'https://rpc.xdaichain.com',
   relayServiceURL: 'https://relay.cardstack.com/api',
   transactionServiceURL: 'https://transactions.cardstack.com/api',

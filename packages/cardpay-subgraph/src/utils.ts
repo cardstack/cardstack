@@ -16,6 +16,7 @@ import {
   MerchantSafe,
 } from '../generated/schema';
 import { GnosisSafe } from '../generated/Gnosis/GnosisSafe';
+import { StaticToken } from './static-tokens';
 
 export function makeToken(address: Address): string {
   let token = toChecksumAddress(address);
@@ -23,6 +24,7 @@ export function makeToken(address: Address): string {
     let tokenEntity = new Token(token);
     tokenEntity.symbol = fetchTokenSymbol(address);
     tokenEntity.name = fetchTokenName(address);
+    tokenEntity.decimals = fetchTokenDecimals(address);
     tokenEntity.save();
   }
   return token;
@@ -162,9 +164,9 @@ function toUpper(str: string): string {
 }
 
 function fetchTokenSymbol(tokenAddress: Address): string {
-  // hard coded override
-  if (tokenAddress.toHexString() == '0xe0b7927c4af23765cb51314a0e0521a9645f0e2a') {
-    return 'DGD';
+  let staticToken = StaticToken.fromAddress(tokenAddress);
+  if (staticToken != null) {
+    return (staticToken as StaticToken).symbol;
   }
 
   let contract = ERC20.bind(tokenAddress);
@@ -189,6 +191,10 @@ function fetchTokenSymbol(tokenAddress: Address): string {
 }
 
 function fetchTokenName(tokenAddress: Address): string {
+  let staticToken = StaticToken.fromAddress(tokenAddress);
+  if (staticToken != null) {
+    return (staticToken as StaticToken).name;
+  }
   let contract = ERC20.bind(tokenAddress);
   let contractNameBytes = ERC20NameBytes.bind(tokenAddress);
 
@@ -208,6 +214,21 @@ function fetchTokenName(tokenAddress: Address): string {
   }
 
   return nameValue;
+}
+
+export function fetchTokenDecimals(tokenAddress: Address): BigInt {
+  let staticToken = StaticToken.fromAddress(tokenAddress);
+  if (staticToken != null) {
+    return (staticToken as StaticToken).decimals;
+  }
+  let contract = ERC20.bind(tokenAddress);
+  // try types uint8 for decimals
+  let decimalValue = null;
+  let decimalResult = contract.try_decimals();
+  if (!decimalResult.reverted) {
+    decimalValue = decimalResult.value;
+  }
+  return BigInt.fromI32(decimalValue as i32);
 }
 
 function isNullEthValue(value: string): boolean {

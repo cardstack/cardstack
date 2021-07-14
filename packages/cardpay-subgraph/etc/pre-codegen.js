@@ -20,6 +20,24 @@ if (!network) {
 }
 let cleanNetwork = network.replace('poa-', '');
 
+let cardpayGenesisBlock = {
+  sokol: 21403252,
+  xdai: 0, // TODO update after cardpay is deployed
+};
+let tokenStartBlock = {
+  // sokol: 21403252 // v0.6.0 version of protocol (nice to use for faster index times)
+  sokol: 20644808, // the block that the token bridge was created (and hence our CPXD tokens)
+  xdai: 0,
+};
+let gnosisSafeGenesisBlock = {
+  sokol: cardpayGenesisBlock.sokol,
+  xdai: 0,
+};
+let uniswapV2GenesisBlock = {
+  sokol: 21474163,
+  xdai: 0,
+};
+
 let abis = {
   PrepaidCardManager: getAbi(join(sourceAbiDir, 'prepaid-card-manager.ts')),
   RevenuePool: getAbi(join(sourceAbiDir, 'revenue-pool.ts')),
@@ -55,7 +73,12 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{TRANSFER_PREPAID_CARD_HANDLER_ADDRESS}/g, getAddress('transferPrepaidCardHandler', cleanNetwork))
   .replace(/{MERCHANT_MANAGER_ADDRESS}/g, getAddress('merchantManager', cleanNetwork))
   .replace(/{SUPPLIER_MANAGER_ADDRESS}/g, getAddress('supplierManager', cleanNetwork))
-  .replace(/{SPEND_ADDRESS}/g, getAddress('spend', cleanNetwork));
+  .replace(/{SPEND_ADDRESS}/g, getAddress('spend', cleanNetwork))
+  .replace(/{CARDPAY_GENESIS_BLOCK}/g, cardpayGenesisBlock[cleanNetwork])
+  .replace(/{SAFE_GENESIS_BLOCK}/g, gnosisSafeGenesisBlock[cleanNetwork])
+  .replace(/{UNISWAP_V2_GENESIS_BLOCK}/g, uniswapV2GenesisBlock[cleanNetwork])
+  .replace(/{TOKEN_START_BLOCK}/g, tokenStartBlock[cleanNetwork]);
+
 removeSync(subgraphFile);
 writeFileSync(subgraphFile, subgraph);
 

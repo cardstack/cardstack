@@ -298,6 +298,7 @@ type Token @entity {
   id: ID!
   symbol: String
   name: String
+  decimals: BigInt
   transfers: [TokenTransfer]! @derivedFrom(field: "token")
 }
 
