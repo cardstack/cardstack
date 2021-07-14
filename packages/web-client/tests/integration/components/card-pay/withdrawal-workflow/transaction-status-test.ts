@@ -18,10 +18,11 @@ module(
     hooks.beforeEach(async function () {
       let workflowSession = new WorkflowSession();
       workflowSession.updateMany({
+        layer1BlockHeightBeforeBridging: 1234,
         relayTokensTxnReceipt: {
           transactionHash: 'relay',
         },
-        layer1BlockHeightBeforeBridging: 1234,
+        withdrawalToken: 'CARD.CPXD',
       });
 
       this.setProperties({
@@ -56,16 +57,7 @@ module(
         .containsText(
           `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.fullName}`
         );
-      assert
-        .dom(`[data-test-bridge-explorer-button]`)
-        .hasAttribute('href', /relay$/);
-
-      assert
-        .dom(`[data-test-token-bridge-step="2"]:not([data-test-completed])`)
-        .containsText(
-          `Release tokens on ${c.layer1.conversationalName}: ${c.layer2.shortName}`
-        );
-      assert.dom(`[data-test-etherscan-button]`).doesNotExist();
+      assert.dom(`[data-test-bridge-explorer-button]`).doesNotExist();
     });
 
     test('It completes when the bridged transaction completes', async function (assert) {
@@ -81,14 +73,9 @@ module(
       assert
         .dom(`[data-test-token-bridge-step="1"][data-test-completed]`)
         .exists();
-
       assert
-        .dom(`[data-test-token-bridge-step="2"][data-test-completed]`)
-        .exists();
-
-      assert
-        .dom(`[data-test-etherscan-button]`)
-        .hasAttribute('href', /bridged$/);
+        .dom(`[data-test-bridge-explorer-button]`)
+        .hasAttribute('href', /relay$/);
 
       assert.ok(onComplete.called);
     });

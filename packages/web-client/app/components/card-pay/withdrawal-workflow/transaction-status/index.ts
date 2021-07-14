@@ -5,6 +5,7 @@ import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import { BridgedTokenSymbol } from '@cardstack/web-client/utils/token';
 
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
@@ -24,9 +25,13 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
           'completedLayer1TransactionReceipt',
           transactionReceipt
         );
-        this.completedCount = 3;
+        this.completedCount = 2;
         this.args.onComplete();
       });
+  }
+
+  get currentTokenSymbol(): BridgedTokenSymbol {
+    return this.args.workflowSession.state.withdrawalToken;
   }
 
   get layer1BlockHeightBeforeBridging(): BN | undefined {
@@ -40,9 +45,6 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
       },
       {
         title: `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.fullName}`,
-      },
-      {
-        title: `Release tokens on ${c.layer1.conversationalName}: ${c.layer2.shortName}`, // FIXME script says "DAI", not "xDai" 🤔
       },
     ];
   }

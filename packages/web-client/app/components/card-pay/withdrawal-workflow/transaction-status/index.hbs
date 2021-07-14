@@ -28,14 +28,9 @@
           </Boxel::Button>
         {{/if}}
         {{#if (eq progressStep.index 1)}}
-          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" data-test-bridge-explorer-button>
-            View in Bridge Explorer
-          </Boxel::Button>
-        {{/if}}
-        {{#if (eq progressStep.index 2)}}
           {{#if progressStep.completed}}
-            <Boxel::Button @as="anchor" @size="extra-small" @href={{this.withdrawalTxnViewerUrl}} target="_blank" rel="noopener" data-test-etherscan-button>
-              View on Etherscan
+            <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" data-test-bridge-explorer-button>
+              View in Bridge Explorer
             </Boxel::Button>
           {{else}}
             Processing...
