@@ -1,6 +1,9 @@
 import Service from '@ember/service';
 import config from '../config/environment';
-import { Layer1Web3Strategy } from '../utils/web3-strategies/types';
+import {
+  Layer1ChainEvent,
+  Layer1Web3Strategy,
+} from '../utils/web3-strategies/types';
 import Layer1TestWeb3Strategy from '../utils/web3-strategies/test-layer1';
 import EthWeb3Strategy from '../utils/web3-strategies/ethereum';
 import KovanWeb3Strategy from '../utils/web3-strategies/kovan';
@@ -17,11 +20,9 @@ import {
 } from '@cardstack/web-client/utils/events';
 import { action } from '@ember/object';
 import { TaskGenerator } from 'ember-concurrency';
-
-type Layer1NetworkEvent = 'disconnect';
 export default class Layer1Network
   extends Service
-  implements Emitter<Layer1NetworkEvent> {
+  implements Emitter<Layer1ChainEvent> {
   strategy!: Layer1Web3Strategy;
   simpleEmitter = new SimpleEmitter();
   @reads('strategy.isConnected', false) isConnected!: boolean;
@@ -62,7 +63,8 @@ export default class Layer1Network
     this.simpleEmitter.emit('disconnect');
   }
 
-  on(event: Layer1NetworkEvent, cb: Function): UnbindEventListener {
+  // basically only allow re-emitting of events from the strategy
+  on(event: Layer1ChainEvent, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);
   }
 

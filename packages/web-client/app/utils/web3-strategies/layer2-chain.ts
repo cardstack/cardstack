@@ -21,6 +21,7 @@ import {
   Layer2Web3Strategy,
   TransactionHash,
   Layer2NetworkSymbol,
+  Layer2ChainEvent,
 } from './types';
 import {
   networkIds,
@@ -39,7 +40,7 @@ import { networkDisplayInfo } from './network-display-info';
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 export default abstract class Layer2ChainWeb3Strategy
-  implements Layer2Web3Strategy, Emitter<'disconnect'> {
+  implements Layer2Web3Strategy, Emitter<Layer2ChainEvent> {
   private chainName: string;
   chainId: number;
   networkSymbol: Layer2NetworkSymbol;
@@ -101,11 +102,13 @@ export default abstract class Layer2ChainWeb3Strategy
       }
       this.walletConnectUri = payload.params[0];
     });
-    let strategy = this;
+
     this.provider.on('chainChanged', (chainId: number) => {
-      if (String(chainId) !== String(networkIds[this.networkSymbol])) {
-        console.log(`Layer2 WC chainChanged to ${chainId}. Disconnecting`);
-        strategy.disconnect();
+      if (chainId !== this.chainId) {
+        this.simpleEmitter.emit('incorrect-chain');
+        this.disconnect();
+      } else {
+        this.simpleEmitter.emit('correct-chain');
       }
     });
     this.connector.on('session_update', async (error, payload) => {
@@ -300,7 +303,7 @@ export default abstract class Layer2ChainWeb3Strategy
   async disconnect(): Promise<void> {
     await this.provider?.disconnect();
   }
-  on(event: string, cb: Function): UnbindEventListener {
+  on(event: Layer2ChainEvent, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);
   }
 }

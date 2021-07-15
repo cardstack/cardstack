@@ -10,6 +10,7 @@ import { BridgeableSymbol, TokenContractInfo } from '../token';
 import WalletInfo from '../wallet-info';
 import { WalletProvider } from '../wallet-providers';
 import {
+  Layer1ChainEvent,
   Layer1Web3Strategy,
   TransactionHash,
   Layer1NetworkSymbol,
@@ -19,10 +20,13 @@ import {
   getSDK,
   networkIds,
 } from '@cardstack/cardpay-sdk';
-import { ConnectionManager } from './layer-1-connection-manager';
+import {
+  ConnectionManager,
+  ConnectionManagerEvent,
+} from './layer-1-connection-manager';
 
 export default abstract class Layer1ChainWeb3Strategy
-  implements Layer1Web3Strategy, Emitter<'disconnect'> {
+  implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
   chainId: number;
   networkSymbol: Layer1NetworkSymbol;
   simpleEmitter = new SimpleEmitter();
@@ -31,11 +35,15 @@ export default abstract class Layer1ChainWeb3Strategy
   #waitForAccountDeferred = defer<void>();
   web3: Web3 | undefined;
   connectionManager: ConnectionManager | undefined;
+  eventListenersToUnbind: {
+    [event in ConnectionManagerEvent]?: UnbindEventListener;
+  } = {};
   @tracked currentProviderId: string | undefined;
   @tracked defaultTokenBalance: BN | undefined;
   @tracked daiBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
   @tracked walletInfo: WalletInfo;
+  @tracked connectedChainId: number | undefined;
 
   constructor(networkSymbol: Layer1NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
@@ -60,12 +68,18 @@ export default abstract class Layer1ChainWeb3Strategy
         }
       );
 
-      // these events might need unbinding in the future. For now, since we create a new instance
-      // of ConnectionManager each time we connect, and destroy it when we disconnect, not keeping
-      // references to the returned UnbindEventListener function
-      connectionManager.on('connected', this.onConnect.bind(this));
-      connectionManager.on('disconnected', this.onDisconnect.bind(this));
-      connectionManager.on('incorrect-chain', this.disconnect.bind(this));
+      this.eventListenersToUnbind.connected = connectionManager.on(
+        'connected',
+        this.onConnect.bind(this)
+      );
+      this.eventListenersToUnbind.disconnected = connectionManager.on(
+        'disconnected',
+        this.onDisconnect.bind(this)
+      );
+      this.eventListenersToUnbind['chain-changed'] = connectionManager.on(
+        'chain-changed',
+        this.onChainChanged.bind(this)
+      );
 
       await connectionManager.setup(web3);
 
@@ -92,9 +106,18 @@ export default abstract class Layer1ChainWeb3Strategy
           chainId: this.chainId,
         }
       );
-      connectionManager.on('connected', this.onConnect.bind(this));
-      connectionManager.on('disconnected', this.onDisconnect.bind(this));
-      connectionManager.on('incorrect-chain', this.disconnect.bind(this));
+      this.eventListenersToUnbind.connected = connectionManager.on(
+        'connected',
+        this.onConnect.bind(this)
+      );
+      this.eventListenersToUnbind.disconnected = connectionManager.on(
+        'disconnected',
+        this.onDisconnect.bind(this)
+      );
+      this.eventListenersToUnbind['chain-changed'] = connectionManager.on(
+        'chain-changed',
+        this.onChainChanged.bind(this)
+      );
 
       await connectionManager.setup(web3);
 
@@ -117,16 +140,33 @@ export default abstract class Layer1ChainWeb3Strategy
     this.#waitForAccountDeferred.resolve();
   }
 
+  onChainChanged(chainId: number) {
+    this.connectedChainId = chainId;
+    if (this.connectedChainId !== this.chainId) {
+      this.simpleEmitter.emit('incorrect-chain');
+      this.disconnect();
+    } else {
+      this.simpleEmitter.emit('correct-chain');
+    }
+  }
+
   async disconnect(): Promise<void> {
     return this.connectionManager?.disconnect();
   }
 
   cleanupConnectionState() {
     this.clearWalletInfo();
+    Object.entries(this.eventListenersToUnbind).forEach(
+      ([event, unbind]: [ConnectionManagerEvent, UnbindEventListener]) => {
+        unbind();
+        delete this.eventListenersToUnbind[event];
+      }
+    );
     this.connectionManager?.destroy();
     this.connectionManager = undefined;
     this.web3 = undefined;
     this.currentProviderId = '';
+    this.connectedChainId = undefined;
     this.#waitForAccountDeferred = defer();
   }
 
@@ -145,7 +185,7 @@ export default abstract class Layer1ChainWeb3Strategy
     return this.walletInfo.accounts.length > 0;
   }
 
-  on(event: string, cb: Function): UnbindEventListener {
+  on(event: Layer1ChainEvent, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);
   }
 

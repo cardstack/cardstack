@@ -2,7 +2,10 @@ import Service from '@ember/service';
 import config from '../config/environment';
 import { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency-decorators';
-import { Layer2Web3Strategy } from '../utils/web3-strategies/types';
+import {
+  Layer2ChainEvent,
+  Layer2Web3Strategy,
+} from '../utils/web3-strategies/types';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
 import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
 import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
@@ -21,11 +24,9 @@ import {
 } from '@cardstack/web-client/utils/events';
 import { action } from '@ember/object';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
-
-type Layer2NetworkEvent = 'disconnect';
 export default class Layer2Network
   extends Service
-  implements Emitter<Layer2NetworkEvent> {
+  implements Emitter<Layer2ChainEvent> {
   @service declare hubAuthentication: HubAuthentication;
   strategy!: Layer2Web3Strategy;
   simpleEmitter = new SimpleEmitter();
@@ -95,7 +96,7 @@ export default class Layer2Network
     this.simpleEmitter.emit('disconnect');
   }
 
-  on(event: Layer2NetworkEvent, cb: Function): UnbindEventListener {
+  on(event: Layer2ChainEvent, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);
   }
 

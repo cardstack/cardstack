@@ -11,7 +11,7 @@ import { Emitter, SimpleEmitter } from '../events';
 import { WalletProviderId } from '../wallet-providers';
 import { action } from '@ember/object';
 
-const GET_PROVIDER_STORAGE_KEY = (chainId: string | number) =>
+const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -20,7 +20,10 @@ interface ConnectionManagerOptions {
   networkSymbol: NetworkSymbol;
 }
 
-type ConnectionManagerEvents = 'connected' | 'disconnected' | 'incorrect-chain';
+export type ConnectionManagerEvent =
+  | 'connected'
+  | 'disconnected'
+  | 'chain-changed';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   DISCONNECTED: 'DISCONNECTED',
@@ -34,13 +37,13 @@ const BROADCAST_CHANNEL_MESSAGES = {
  *
  * - connected: A wallet is connected, or the address is changed
  * - disconnected: A wallet is disconnected
- * - incorrect-chain: A wallet is connected to the wrong chain
+ * - chain-changed: A wallet's chain is updated or detected for the first time
  *
  * It handles cross-tab communication and persistence of connection information across refreshes.
  * This class does not, at the moment, store any state used directly by the UI besides providerId.
  */
 export abstract class ConnectionManager
-  implements Emitter<ConnectionManagerEvents> {
+  implements Emitter<ConnectionManagerEvent> {
   networkSymbol: NetworkSymbol;
   chainId: number;
   protected simpleEmitter: SimpleEmitter;
@@ -78,26 +81,23 @@ export abstract class ConnectionManager
     }
   }
 
-  static getProviderIdForChain(chainId: string | number) {
+  static getProviderIdForChain(chainId: number) {
     return window.localStorage.getItem(GET_PROVIDER_STORAGE_KEY(chainId));
   }
 
-  static removeProviderFromStorage(chainId: string | number) {
+  static removeProviderFromStorage(chainId: number) {
     window.localStorage.removeItem(GET_PROVIDER_STORAGE_KEY(chainId));
   }
 
-  static addProviderToStorage(
-    chainId: string | number,
-    providerId: WalletProviderId
-  ) {
+  static addProviderToStorage(chainId: number, providerId: WalletProviderId) {
     window.localStorage.setItem(GET_PROVIDER_STORAGE_KEY(chainId), providerId);
   }
 
-  on(event: ConnectionManagerEvents, cb: Function) {
+  on(event: ConnectionManagerEvent, cb: Function) {
     return this.simpleEmitter.on(event, cb);
   }
 
-  emit(event: ConnectionManagerEvents, ...args: any[]) {
+  emit(event: ConnectionManagerEvent, ...args: any[]) {
     return this.simpleEmitter.emit(event, ...args);
   }
 
@@ -123,9 +123,8 @@ export abstract class ConnectionManager
     this.emit('connected', accounts);
   }
 
-  onIncorrectChain() {
-    ConnectionManager.removeProviderFromStorage(this.chainId);
-    this.emit('incorrect-chain');
+  onChainChanged(chainId: number) {
+    this.emit('chain-changed', chainId);
   }
 
   abstract reconnect(): Promise<void>;
@@ -168,11 +167,8 @@ class MetaMaskConnectionManager extends ConnectionManager {
     });
 
     // Subscribe to chainId change
-    provider.on('chainChanged', (changedChainId: number) => {
-      if (String(changedChainId) !== String(this.chainId)) {
-        console.error('connected to incorrect chain');
-        this.onIncorrectChain();
-      }
+    provider.on('chainChanged', (changedChainId: string) => {
+      this.onChainChanged(parseInt(changedChainId));
     });
 
     // Note that this is, following EIP-1193, about connection of the wallet to the
@@ -204,12 +200,13 @@ class MetaMaskConnectionManager extends ConnectionManager {
       });
     }
 
-    // This is last, because we actually want to have a working connection
-    // in order to be able to listen for changes in network
-    // either to allow the user to change network and reconnect or ? reload the page
-    if (await this.isIncorrectChain()) {
-      this.onIncorrectChain();
-    }
+    let chainId = parseInt(
+      await this.provider.request({
+        method: 'eth_chainId',
+      })
+    );
+
+    this.onChainChanged(chainId);
   }
 
   // metamask actually doesn't allow you to disconnect via its API
@@ -227,9 +224,13 @@ class MetaMaskConnectionManager extends ConnectionManager {
       // it is connected to the account so it will not fire the connection/account change events
       this.onConnect(accounts);
 
-      if (await this.isIncorrectChain()) {
-        this.onIncorrectChain();
-      }
+      let chainId = parseInt(
+        await this.provider.request({
+          method: 'eth_chainId',
+        })
+      );
+
+      this.onChainChanged(chainId);
     } else {
       // if we didn't find accounts, then the stored provider key is not useful, delete it
       ConnectionManager.removeProviderFromStorage(this.chainId);
@@ -242,13 +243,6 @@ class MetaMaskConnectionManager extends ConnectionManager {
     // remove all listeners that previous instances of metamask connections have added
     // otherwise disconnecting and reconnecting might cause "duplicate" event listeners
     this.provider?.removeAllListeners();
-  }
-
-  async isIncorrectChain() {
-    let currentChainId = await this.provider.request({
-      method: 'eth_chainId',
-    });
-    return parseInt(currentChainId) !== Number(this.chainId);
   }
 }
 
@@ -284,10 +278,7 @@ class WalletConnectConnectionManager extends ConnectionManager {
 
     // Subscribe to chainId change
     provider.on('chainChanged', (changedChainId: number) => {
-      if (String(changedChainId) !== String(chainId)) {
-        console.error('connected to incorrect chain');
-        this.onIncorrectChain();
-      }
+      this.onChainChanged(changedChainId);
     });
 
     // Subscribe to session disconnection
