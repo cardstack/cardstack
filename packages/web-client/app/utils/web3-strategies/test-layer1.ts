@@ -32,6 +32,8 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   #unlockDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
   #depositDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
 
+  bridgingDeferred!: RSVP.Deferred<TransactionReceipt>;
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   connect(_walletProvider: WalletProvider): Promise<void> {
     return this.waitForAccount;
@@ -145,6 +147,18 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
       logsBloom: '',
       events: {},
     });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  awaitBridged(_fromBlock: BN, _receiver: string): Promise<TransactionReceipt> {
+    this.bridgingDeferred = defer<TransactionReceipt>();
+    return this.bridgingDeferred.promise as Promise<TransactionReceipt>;
+  }
+
+  test__simulateBridged(txnHash: TransactionHash) {
+    this.bridgingDeferred.resolve({
+      transactionHash: txnHash,
+    } as TransactionReceipt);
   }
 
   get waitForAccount() {

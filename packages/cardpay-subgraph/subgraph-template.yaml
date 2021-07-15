@@ -10,8 +10,7 @@ dataSources:
     network: {NETWORK}
     source:
       abi: ERC20
-      # startBlock: 21403252 # v0.6.0 version of protocol (nice to use for faster index times)
-      startBlock: 20644808 # the block that the token bridge was created (and hence our CPXD tokens)
+      startBlock: {TOKEN_START_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -44,7 +43,7 @@ dataSources:
     source:
       address: "{PREPAID_CARD_MANAGER_ADDRESS}"
       abi: PrepaidCardManager
-      startBlock: 21403252 # v0.6.0 version of protocol
+      startBlock: {CARDPAY_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -79,7 +78,7 @@ dataSources:
     source:
       address: "{MERCHANT_MANAGER_ADDRESS}"
       abi: MerchantManager
-      startBlock: 21403252 # v0.6.0 version of protocol
+      startBlock: {CARDPAY_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -112,7 +111,7 @@ dataSources:
     source:
       address: "{REGISTER_MERCHANT_HANDLER_ADDRESS}"
       abi: RegisterMerchantHandler
-      startBlock: 21403252 # v0.6.0 version of protocol
+      startBlock: {CARDPAY_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -147,7 +146,7 @@ dataSources:
     source:
       address: "{PAY_MERCHANT_HANDLER_ADDRESS}"
       abi: PayMerchantHandler
-      startBlock: 21403252 # v0.6.0 version of protocol
+      startBlock: {CARDPAY_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -186,7 +185,7 @@ dataSources:
     source:
       address: "{SPLIT_PREPAID_CARD_HANDLER_ADDRESS}"
       abi: SplitPrepaidCardHandler
-      startBlock: 21403252 # v0.6.0 version of protocol
+      startBlock: {CARDPAY_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -218,7 +217,7 @@ dataSources:
     source:
       address: "{REVENUE_POOL_ADDRESS}"
       abi: RevenuePool
-      startBlock: 21403252 # v0.6.0 version of protocol
+      startBlock: {CARDPAY_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -252,7 +251,7 @@ dataSources:
     source:
       address: "{SPEND_ADDRESS}"
       abi: Spend
-      startBlock: 21403252 # v0.6.0 version of protocol
+      startBlock: {CARDPAY_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -284,7 +283,7 @@ dataSources:
     source:
       address: "{SUPPLIER_MANAGER_ADDRESS}"
       abi: SupplierManager
-      startBlock: 21403252 # v0.6.0 version of protocol
+      startBlock: {CARDPAY_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -319,7 +318,7 @@ dataSources:
     source:
       address: "{HOME_TOKEN_BRIDGE_ADDRESS}"
       abi: HomeMultiAMBErc20ToErc677
-      startBlock: 21403252 # v0.6.0 version of protocol
+      startBlock: {CARDPAY_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -356,7 +355,7 @@ dataSources:
     source:
       address: "0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B"
       abi: GnosisProxyFactory
-      startBlock: 21403252 # v0.6.0 version of protocol
+      startBlock: {SAFE_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -389,7 +388,7 @@ dataSources:
     source:
       address: "{UNISWAP_V2_FACTORY_ADDRESS}"
       abi: UniswapV2Factory
-      startBlock: 21474163 # UniswapV2 was deployed to sokol at #21474163
+      startBlock: {UNISWAP_V2_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4

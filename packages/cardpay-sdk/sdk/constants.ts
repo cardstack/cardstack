@@ -1,5 +1,6 @@
 import Web3 from 'web3';
 import invert from 'lodash/invert';
+import mapValues from 'lodash/mapValues';
 import { networkName } from './utils/general-utils';
 
 const INFURA_PROJECT_ID = 'dfb8cbe2e916420a9dbcc1d1f5828406';
@@ -19,9 +20,11 @@ const SOKOL = {
   nativeTokenSymbol: 'SPOA',
   nativeTokenName: 'SPOA',
   name: 'Sokol',
+  // this needs to be an "archive" node
   rpcNode: 'https://sokol.stack.cards',
+  rpcWssNode: 'wss://sokol.poa.network/wss',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
-  subgraphURL: 'https://graph.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
+  subgraphURL: 'https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
   tallyServiceURL: 'https://tally-service-staging.stack.cards/api/v1',
 };
 const KOVAN = {
@@ -61,7 +64,9 @@ const XDAI = {
   nativeTokenSymbol: 'DAI',
   nativeTokenName: 'xDai',
   name: 'xDai Chain',
-  rpcNode: 'https://rpc.xdaichain.com',
+  // this needs to be an "archive" node
+  rpcNode: 'https://xdai-archive.blockscout.com',
+  rpcWssNode: 'wss://rpc.xdaichain.com/wss',
   relayServiceURL: 'https://relay.cardstack.com/api',
   transactionServiceURL: 'https://transactions.cardstack.com/api',
 };
@@ -85,7 +90,14 @@ export const networks: { [networkId: number]: string } = Object.freeze({
   77: 'sokol',
   100: 'xdai',
 });
-export const networkIds = (Object.freeze(invert({ ...networks })) as unknown) as { [networkName: string]: number };
+
+// invert the networks object, so { '1': 'mainnet', ... } becomes { mainnet: '1', ... }
+// then map over the values, so that { mainnet: '1', ... } has its values casted as numbers: { mainnet: 1, ... }
+export const networkIds = (Object.freeze(
+  mapValues(invert({ ...networks }), (networkIdString: string) => Number(networkIdString))
+) as unknown) as {
+  [networkName: string]: number;
+};
 
 export function getConstantByNetwork(name: ConstantKeys, network: string): string {
   let value = constants[network][name];

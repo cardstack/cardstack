@@ -136,6 +136,10 @@ class WithdrawalWorkflow extends Workflow {
     }),
     new WorkflowCard({
       author: cardbot,
+      componentName: 'card-pay/withdrawal-workflow/transaction-status',
+    }),
+    new WorkflowCard({
+      author: cardbot,
       componentName: 'card-pay/withdrawal-workflow/transaction-confirmed',
     }),
     new WorkflowMessage({

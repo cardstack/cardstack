@@ -1,21 +1,21 @@
 {
   "name": "@cardstack/cardpay-subgraph",
-  "version": "0.19.26",
+  "version": "0.19.33",
   "license": "MIT",
   "scripts": {
-    "codegen": "node ./etc/pre-codegen-entrypoint.js poa-sokol && graph codegen && node ./etc/pre-tsc-build-entrypoint.js",
+    "codegen-sokol": "node ./etc/pre-codegen-entrypoint.js poa-sokol && graph codegen && node ./etc/pre-tsc-build-entrypoint.js",
     "build": "graph build",
-    "deploy-sokol": "yarn deploy-thegraph-sokol && yarn deploy-cardstack-sokol",
+    "deploy-sokol-green": "yarn deploy-thegraph-sokol && yarn deploy-cardstack-sokol-green",
     "deploy-thegraph-sokol": "graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ habdelra/cardpay-sokol",
-    "create-cardstack-sokol": "graph create --node https://graph-admin.stack.cards/ habdelra/cardpay-sokol",
-    "remove-cardstack-sokol": "graph remove --node https://graph-admin.stack.cards/ habdelra/cardpay-sokol",
-    "deploy-cardstack-sokol": "graph deploy --node https://graph-admin.stack.cards/ --ipfs https://ipfs.stack.cards habdelra/cardpay-sokol",
-    "create-local-sokol": "graph create --node http://localhost:8020/ habdelra/cardpay-sokol",
-    "remove-local-sokol": "graph remove --node http://localhost:8020/ habdelra/cardpay-sokol",
-    "deploy-local-sokol": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 habdelra/cardpay-sokol"
+    "create-cardstack-sokol-green": "graph create --node https://admin-graph-staging-green.stack.cards/ habdelra/cardpay-sokol",
+    "remove-cardstack-sokol-green": "graph remove --node https://admin-graph-staging-green.stack.cards/ habdelra/cardpay-sokol",
+    "deploy-cardstack-sokol-green": "graph deploy --node https://admin-graph-staging-green.stack.cards/ --ipfs https://ipfs-graph-staging-green.stack.cards habdelra/cardpay-sokol",
+    "create-local": "graph create --node http://localhost:8020/ habdelra/cardpay-sokol",
+    "remove-local": "graph remove --node http://localhost:8020/ habdelra/cardpay-sokol",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 habdelra/cardpay-sokol"
   },
   "devDependencies": {
-    "@cardstack/cardpay-sdk": "0.19.26",
+    "@cardstack/cardpay-sdk": "0.19.33",
     "@graphprotocol/graph-cli": "0.20.0",
     "@graphprotocol/graph-ts": "graphprotocol/graph-ts#56adb62d9e4233c6fc6c38bc0519a8a566afdd9e",
     "@protofire/subgraph-toolkit": "0.1.2",
