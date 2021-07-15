@@ -5,7 +5,7 @@ import { allowedTokens } from '../allowed-tokens/sokol';
 import { toChecksumAddress } from '../utils';
 
 export function handleTransfer(event: TransferEvent): void {
-  if (allowedTokens.includes(toChecksumAddress(event.address))) {
+  if (allowedTokens.has(toChecksumAddress(event.address))) {
     baseHandleTransfer(event);
   }
 }
