@@ -94,7 +94,6 @@ export class CardCache {
       if (!existsSync(loc)) {
         continue;
       }
-      console.log('cache.deleteCard:', loc);
 
       removeSync(loc);
     }

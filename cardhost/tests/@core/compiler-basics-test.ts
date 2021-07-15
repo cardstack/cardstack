@@ -65,7 +65,6 @@ module('@core | compiler-basics', function (hooks) {
 
   test('can compile the base card', async function (assert) {
     let compiled = await builder.getCompiledCard(baseCardURL);
-    console.log('COMPILED BASE CARD', compiled);
 
     assert.equal(compiled.url, baseCardURL, 'Includes basecard URL');
     assert.ok(compiled.schemaModule, 'base card has a model module');

@@ -85,7 +85,6 @@ QUnit.module('DELETE /cards/<card-id>', function (hooks) {
     'can delete an existing card that has no children',
     async function (assert) {
       assert.expect(2);
-      console.log({ cardCacheDir: getCardCacheDir() });
 
       await deleteCard('https://my-realm/post0').expect(204);
       await getCard('https://my-realm/post0').expect(404);
