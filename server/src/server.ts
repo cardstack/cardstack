@@ -26,7 +26,7 @@ function unimpl() {
 
 export class Server {
   static async create(options: ServerOptions): Promise<Server> {
-    let { realmConfigs: realms, cardCacheDir, routeCard } = options;
+    let { realms, cardCacheDir, routeCard } = options;
 
     let koaRouter = new Router<{}, CardStackContext>();
 
@@ -35,7 +35,7 @@ export class Server {
     let app = new Koa<{}, CardStackContext>()
       .use(errorMiddleware)
       .use(bodyParser())
-      .use(logger())
+      // .use(logger())
       .use(cors({ origin: '*' }));
 
     setupCardBuilding(app, { realms, cardCacheDir });
@@ -75,7 +75,7 @@ export class Server {
 
   async startWatching() {
     let {
-      options: { cardCacheDir, realmConfigs: realms },
+      options: { cardCacheDir, realms },
       app: {
         context: { builder },
       },

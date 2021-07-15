@@ -1,6 +1,5 @@
 import Koa from 'koa';
 import isEqual from 'lodash/isEqual';
-import { RealmConfig } from '@cardstack/core/src/interfaces';
 
 import Builder from '../builder';
 import { CardStackContext } from '../interfaces';
@@ -33,7 +32,7 @@ function validateCacheDirSetup(cardCacheDir: string): void {
 export function setupCardBuilding(
   app: Koa<any, CardStackContext>,
   options: {
-    realms: RealmConfig[];
+    realms: RealmManager;
     cardCacheDir: string;
   }
 ) {
@@ -49,10 +48,10 @@ export function setupCardBuilding(
     return require(module);
   };
 
-  app.context.realms = new RealmManager(realms);
+  app.context.realms = realms;
 
   app.context.builder = new Builder({
-    realms: app.context.realms,
+    realms,
     cardCacheDir,
     pkgName: '@cardstack/compiled',
   });

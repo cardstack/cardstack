@@ -1,15 +1,22 @@
 import { RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
-import Realm from './realm';
+import Realm from './realms/fs-realm';
 import { NotFound } from './middleware/errors';
+import { RealmInterface } from './interfaces';
 
 export default class RealmManager {
   realms: Realm[];
 
   constructor(realmConfigs: RealmConfig[]) {
-    this.realms = realmConfigs.map((realm) => new Realm(realm));
+    this.realms = realmConfigs.map((realm) => new Realm(realm, this));
   }
 
-  getRealm(url: string): Realm {
+  createRealm(config: RealmConfig, klass?: any) {
+    let realm = klass ? new klass(config, this) : new Realm(config, this);
+    this.realms.push(realm);
+    return realm;
+  }
+
+  getRealm(url: string): RealmInterface {
     for (let realm of this.realms) {
       if (!url.startsWith(realm.url)) {
         continue;

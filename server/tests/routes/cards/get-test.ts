@@ -20,10 +20,10 @@ QUnit.module('GET /cards/<card-id>', function (hooks) {
   }
 
   let { resolveCard, getCardCacheDir } = setupCardCache(hooks);
-  let { createRealm, getRealmConfigs } = setupRealms(hooks);
+  let { createRealm, getRealmManager } = setupRealms(hooks);
 
   hooks.beforeEach(async function () {
-    realm = createRealm('my-realm');
+    realm = createRealm('https://my-realm');
     realm.addCard('post', {
       'card.json': {
         schema: 'schema.js',
@@ -60,7 +60,7 @@ QUnit.module('GET /cards/<card-id>', function (hooks) {
     server = (
       await Server.create({
         cardCacheDir: getCardCacheDir(),
-        realmConfigs: getRealmConfigs(),
+        realms: getRealmManager(),
       })
     ).app;
   });

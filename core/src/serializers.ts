@@ -17,6 +17,10 @@ let DateTimeSerializer: PrimitiveSerializer = {
 
 let DateSerializer: PrimitiveSerializer = {
   serialize(d: Date): string {
+    // If the model hasn't been deserialized yet it will still be a string
+    if (typeof d === 'string') {
+      return d;
+    }
     return format(d, 'yyyy-MM-dd');
   },
   deserialize(d: string): Date {

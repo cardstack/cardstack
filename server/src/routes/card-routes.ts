@@ -1,12 +1,10 @@
+import { RawCard } from './../../../core/src/interfaces';
 import { CardStackContext } from '@cardstack/server/src/interfaces';
 import { NotFound } from '../middleware/errors';
 import { RouterContext } from '@koa/router';
 import { deserialize, serializeCard } from '../utils/serialization';
 import { getCardFormatFromRequest } from '../utils/routes';
-import {
-  assertValidKeys,
-  assertValidRawCard,
-} from '@cardstack/core/src/interfaces';
+import { assertValidKeys } from '@cardstack/core/src/interfaces';
 
 export async function respondWithCardForPath(
   ctx: RouterContext<any, CardStackContext>
@@ -57,20 +55,26 @@ export async function createDataCard(
     throw new Error('Request body is a string and it shouldnt be');
   }
 
-  body.url = ctx.realms.getRealm(realmURL).getNextID(parentCardURL);
-
   assertValidKeys(
     Object.keys(body),
     ['adoptsFrom', 'data', 'url'],
     'Payload contains keys that we do not allow: %list%'
   );
 
-  assertValidRawCard(body);
+  let data = body.data as any;
 
-  let card = await builder.compileCardFromRaw(body.url, body);
+  let card: Partial<RawCard> = {
+    adoptsFrom: parentCardURL,
+    data: data.attributes,
+  };
+
+  let rawCard = await ctx.realms
+    .getRealm(realmURL)
+    .createDataCard(card, data.id);
+  let compiledCard = await builder.compileCardFromRaw(rawCard.url, rawCard);
   let format = getCardFormatFromRequest(ctx.query.format);
 
-  ctx.body = await serializeCard(card, format);
+  ctx.body = await serializeCard(compiledCard, format);
   ctx.status = 201;
 }
 

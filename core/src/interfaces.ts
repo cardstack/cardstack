@@ -103,7 +103,7 @@ export interface Builder {
 
 export interface RealmConfig {
   url: string;
-  directory: string;
+  directory?: string;
 }
 
 export type cardJSONReponse = {

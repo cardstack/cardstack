@@ -12,7 +12,7 @@ import { Server } from '@cardstack/server/src/server';
 let e = encodeURIComponent;
 
 QUnit.module('POST /cards/<card-id>', function (hooks) {
-  const REALM_NAME = 'super-realm.com';
+  const REALM_NAME = 'https://super-realm.com';
   let realm: ProjectTestRealm;
   let server: Koa;
 
@@ -23,7 +23,7 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
   function postCard(parentCardURL: string, payload: any) {
     // localhost/cards/https%3A%2F%2Fdemo.com%2F/https%3A%2F%2Fbase%2Fbase
     return supertest(server.callback())
-      .post(`/cards/${e('https://super-realm.com')}/${e(parentCardURL)}`)
+      .post(`/cards/${e(REALM_NAME)}/${e(parentCardURL)}`)
       .set('Content-Type', 'application/json')
       .set('Accept', 'application/json')
       .send(payload)
@@ -31,7 +31,16 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
   }
 
   let { resolveCard, getCardCacheDir } = setupCardCache(hooks);
-  let { createRealm, getRealmConfigs } = setupRealms(hooks);
+  let { createRealm, getRealmManager } = setupRealms(hooks);
+
+  const PAYLOAD = {
+    data: {
+      attributes: {
+        title: 'Blogigidy blog',
+        body: 'First post!',
+      },
+    },
+  };
 
   hooks.beforeEach(async function () {
     realm = createRealm(REALM_NAME);
@@ -59,7 +68,7 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     server = (
       await Server.create({
         cardCacheDir: getCardCacheDir(),
-        realmConfigs: getRealmConfigs(),
+        realms: getRealmManager(),
       })
     ).app;
   });
@@ -69,16 +78,10 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     async function (assert) {
       let {
         body: { data },
-      } = await postCard('https://super-realm.com/post', {
-        data: {
-          title: 'Blogigidy blog',
-          body: 'First post!',
-        },
-      }).expect(201);
+      } = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
 
-      assert.equal(
-        data.id,
-        'https://super-realm.com/post-0',
+      assert.ok(
+        data.id.match(/https:\/\/super-realm.com\/post-\w{15}/),
         'Generates a new ID'
       );
       assert.deepEqual(data.attributes, {
@@ -93,15 +96,64 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     }
   );
 
+  QUnit.test('Changes the ID every time', async function (assert) {
+    let card1 = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
+    let card2 = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
+    let card3 = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
+
+    assert.notEqual(card1.body.data.id, card2.body.data.id);
+    assert.notEqual(card1.body.data.id, card3.body.data.id);
+    assert.notEqual(card2.body.data.id, card3.body.data.id);
+  });
+
+  QUnit.test(
+    'can create a new card that provides its own id',
+    async function (assert) {
+      let { body } = await postCard(`${REALM_NAME}/post`, {
+        data: Object.assign(
+          { id: `${REALM_NAME}/post-is-the-most` },
+          PAYLOAD.data
+        ),
+      }).expect(201);
+
+      assert.equal(
+        body.data.id,
+        'https://super-realm.com/post-is-the-most',
+        'Uses the provided ID'
+      );
+
+      await getCard(body.data.id).expect(200);
+    }
+  );
+
+  QUnit.test(
+    'Errors when you provide an ID that alreay exists',
+    async function (assert) {
+      realm.addCard('post-is-the-most', {
+        'card.json': {
+          adoptsFrom: '../post',
+          data: {
+            title: 'Hello World',
+            body: 'First post.',
+          },
+        },
+      });
+
+      let response = await postCard(`${REALM_NAME}/post`, {
+        data: Object.assign(
+          { id: `${REALM_NAME}/post-is-the-most` },
+          PAYLOAD.data
+        ),
+      });
+      assert.equal(response.body.errors[0].status, 409);
+    }
+  );
+
   QUnit.test(
     '404s when you try to post a card that adopts from a non-existent card',
     async function (assert) {
       assert.expect(0);
-      await postCard('https://super-realm.com/post', {
-        data: {
-          title: 'Hello World',
-        },
-      }).expect(404);
+      await postCard('https://not-created.com/post', PAYLOAD).expect(404);
     }
   );
 
@@ -109,13 +161,11 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     'Errors when you try to include other fields',
     async function (assert) {
       assert.expect(0);
-      await postCard('https://super-realm.com/post', {
-        data: {
-          title: 'Hello World',
-        },
-        isolated: 'isolated.js',
-      })
-        .expect(500)
+      await postCard(
+        `${REALM_NAME}/post`,
+        Object.assign({ isolated: 'isolated.js' }, PAYLOAD)
+      )
+        .expect(400)
         .expect({
           errors: [
             {
@@ -131,23 +181,13 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     'errors when you try to post attributes that dont exist on parent card',
     async function (assert) {
       assert.expect(0);
-      await postCard('https://super-realm.com/post', {
+      await postCard(`${REALM_NAME}/post`, {
         data: {
           attributes: {
             pizza: 'Hello World',
           },
         },
-      })
-        .expect(400)
-        .expect({
-          errors: [
-            {
-              status: 400,
-              title:
-                'Field(s) "pizza" does not exist on card "https://super-realm.com/post0"',
-            },
-          ],
-        });
+      }).expect(400);
     }
   );
 });
