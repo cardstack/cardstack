@@ -2,6 +2,7 @@
 
 const infuraIdsByTarget = {
   staging: '558ee533522a468e9d421d818e06fadb', // this infura id is specific to https://app-staging.stack.cards/
+  production: '5d6efa6b750b45459184cd11dd2c8697', // this infura id is specific to https://app.cardstack.com/
 };
 
 // eslint-disable-next-line no-undef
