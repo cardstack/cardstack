@@ -137,10 +137,12 @@ export default class Safes {
   async view(owner?: string): Promise<Safe[]> {
     owner = owner ?? (await this.layer2Web3.eth.getAccounts())[0];
     let {
-      data: {
-        account: { safes },
-      },
+      data: { account },
     } = await query(this.layer2Web3, safesQuery, { account: owner });
+    if (account == null) {
+      return [];
+    }
+    let { safes } = account;
     let result: Safe[] = [];
     for (let { safe } of safes as { safe: GraphQLSafeResult }[]) {
       let safeResult = processSafeResult(safe);
