@@ -34,31 +34,15 @@
           />
         </Boxel::Field>
       {{else}}
-        <Boxel::Field
+        <CardPay::TokenAmountInput
           @label="Amount to withdraw"
-          @fieldMode="edit"
-          class="withdrawal-transaction-amount__field"
-          @labelClass="withdrawal-transaction-amount__input-field-label"
-          data-test-amount-label
-        >
-        <div class="withdrawal-transaction-amount__input-container withdrawal-transaction-amount__input-token-balance">
-          {{svg-jar this.currentTokenDetails.icon class="withdrawal-transaction-amount__currency-icon" role="presentation"}}
-          <Boxel::Input
-            class="withdrawal-transaction-amount__input"
-            @id="withdrawal-amount-input"
-            @value={{this.amount}}
-            @required={{true}}
-            @onInput={{this.onInputAmount}}
-            placeholder="0.00"
-            autocomplete="off"
-            inputmode="decimal"
-            data-test-amount-input
-          />
-          <div class="withdrawal-transaction-amount__currency-text">
-            {{this.currentTokenSymbol}}
-          </div>
-        </div>
-        </Boxel::Field>
+          @amount={{this.amount}}
+          @tokenSymbol={{this.currentTokenSymbol}}
+          @tokenBalance={{this.currentTokenBalance}}
+          @onInputAmount={{this.onInputAmount}}
+          @invalid={{this.isInvalid}}
+          @errorMessage={{this.errorMessage}}
+        />
         <Boxel::Field @label="Approximate value*" data-test-approximate-value-label>
           ${{token-to-usd this.tokenSymbolForConversion this.amountAsBigNumber}} USD
         </Boxel::Field>

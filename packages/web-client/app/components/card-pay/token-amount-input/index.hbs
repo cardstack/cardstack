@@ -1,0 +1,25 @@
+<Boxel::Field
+  @label={{@label}}
+  @fieldMode="edit"
+  class="token-amount-input"
+  data-test-amount-label
+>
+  <div class="token-amount-input__input-container">
+    {{svg-jar this.tokenDetails.icon class="token-amount-input__currency-icon" role="presentation" data-test-currency-icon-name=this.tokenDetails.icon}}
+    <Boxel::Input
+      class="token-amount-input__input"
+      @value={{@amount}}
+      @required={{true}}
+      @onInput={{@onInputAmount}}
+      @invalid={{@invalid}}
+      @errorMessage={{@errorMessage}}
+      placeholder="0.00"
+      autocomplete="off"
+      inputmode="decimal"
+      data-test-token-amount-input
+    />
+    <div class="token-amount-input__currency-text" data-test-token-amount-input-currency-label>
+      {{@tokenSymbol}}
+    </div>
+  </div>
+</Boxel::Field>
