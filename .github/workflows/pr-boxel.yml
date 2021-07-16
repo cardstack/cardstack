@@ -22,7 +22,6 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Install dependencies
         run: |
-          yarn global add lerna
           yarn --prefer-offline
       - name: Lint
         run: |
@@ -51,16 +50,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Install dependencies
-        run: |
-          yarn global add lerna
-          yarn --prefer-offline
+        run: yarn --prefer-offline
       - name: Test
         env:
           EMBER_TRY_SCENARIO: ${{ matrix.ember-try-scenario }}
         run: yarn test:boxel:try $EMBER_TRY_SCENARIO
         timeout-minutes: 10
 
-  deploy-preview:
+  deploy-boxel-preview:
     name: Deploy a preview to S3
     runs-on: ubuntu-latest
     # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
@@ -83,9 +80,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Install dependencies
-        run: |
-          yarn global add lerna
-          yarn --prefer-offline
+        run: yarn --prefer-offline
       - name: Set PR branch name
         run: echo "PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
       - name: Deploy preview
@@ -94,13 +89,13 @@ jobs:
           PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_KEY }}
           PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_SECRET }}
 
-  comment-on-pr:
+  comment-on-boxel-pr:
     name: Comment on PR
     runs-on: ubuntu-latest
     # github.event.pull_request.head.repo.full_name == github.repository: true if pr is from the original repo, false if it's from a fork
     # github.head_ref: the branch that the pull request is from. only appears on pull_request events
     if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref
-    needs: deploy-preview
+    needs: deploy-boxel-preview
     env:
       S3_PREVIEW_WEBSITE_URL: http://boxel-preview.cardstack.com.s3-website-us-east-1.amazonaws.com
     steps:
@@ -114,8 +109,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Install dependencies
-        run: |
-          yarn --prefer-offline
+        run: yarn --prefer-offline
       - name: Find pull request number for branch
         uses: ./.github/actions/find-pr-number
         id: fpr
@@ -127,7 +121,7 @@ jobs:
       - name: Set env var for message
         shell: bash
         run: |
-          echo "COMMENT_TEXT=### :sparkles: Preview this change [here](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ github.head_ref }})" >> $GITHUB_ENV
+          echo "COMMENT_TEXT=### :sparkles: Preview Boxel changes [here](${{ env.S3_PREVIEW_WEBSITE_URL }}/${{ github.head_ref }})" >> $GITHUB_ENV
 
       # finding a comment in given PR that contains the identifier string
       - name: Find comment that contains identifier
