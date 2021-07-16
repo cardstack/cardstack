@@ -7,18 +7,8 @@ module.exports = function (deployTarget) {
       environment: 'production',
     },
   };
-  if (deployTarget === 'production') {
+  if (deployTarget === 'production' || deployTarget === 's3-preview') {
     ENV.pipeline = {
-      disabled: {
-        allExcept: ['build', 'git'],
-      },
-    };
-  }
-  if (deployTarget === 's3-preview') {
-    ENV.pipeline = {
-      disabled: {
-        allExcept: ['build', 'revision-data', 's3', 's3-index', 'manifest'],
-      },
       activateOnDeploy: true,
     };
     ENV.s3 = {
@@ -38,9 +28,14 @@ module.exports = function (deployTarget) {
       secretAccessKey: process.env.PREVIEW_DEPLOY_AWS_ACCESS_SECRET,
       bucket: process.env.S3_PREVIEW_INDEX_BUCKET_NAME,
       region: process.env.S3_PREVIEW_REGION,
-      prefix: process.env.PR_BRANCH_NAME,
       allowOverwrite: true,
     };
   }
+  if (deployTarget === 's3-preview') {
+    ENV['s3-index']['prefix'] = process.env.PR_BRANCH_NAME;
+  } else if (deployTarget === 'production') {
+    ENV['s3-index']['prefix'] = 'main';
+  }
+
   return ENV;
 };
