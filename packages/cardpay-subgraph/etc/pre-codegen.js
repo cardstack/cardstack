@@ -12,7 +12,7 @@ const addressFile = resolve(join(__dirname, '..', '..', 'cardpay-sdk', 'contract
 const abiDir = resolve(join(__dirname, '..', 'abis', 'generated'));
 const subgraphTemplateFile = resolve(join(__dirname, '..', 'subgraph-template.yaml'));
 const subgraphFile = resolve(join(__dirname, '..', 'subgraph.yaml'));
-const generatedAddresses = resolve(join(__dirname, '..', 'src', 'generated', 'addresses.ts'));
+const generatedAddresses = join(__dirname, '..', 'src', 'generated', 'addresses.ts');
 
 const network = process.argv.slice(2)[0];
 if (!network) {
