@@ -61,6 +61,7 @@ package-lock.json
 # generated files for the subgraph
 /packages/cardpay-subgraph/subgraph.yaml
 /packages/cardpay-subgraph/abis/generated/
+/packages/cardpay-subgraph/src/generated/
 
 # generated files you may end up with if you run the cli blueprint directly
 packages/cli/node-tests/sample-cards/*/node_modules/**/*

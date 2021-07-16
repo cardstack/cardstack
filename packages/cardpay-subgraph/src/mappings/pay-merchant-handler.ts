@@ -1,7 +1,6 @@
 import {
   CustomerPayment as MerchantPaymentEvent,
   MerchantFeeCollected as MerchantFeeEvent,
-  PayMerchantHandler,
 } from '../../generated/Payments/PayMerchantHandler';
 import { MerchantFeePayment, MerchantRevenueEvent } from '../../generated/schema';
 import { makeMerchantRevenue, makeTransaction, makePrepaidCardPayment, toChecksumAddress, makeToken } from '../utils';
@@ -13,14 +12,10 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
   let txnHash = event.transaction.hash.toHex();
   let merchantSafe = toChecksumAddress(event.params.merchantSafe);
   let issuingToken = makeToken(event.params.issuingToken);
-  let payMerchantHandler = PayMerchantHandler.bind(event.address);
 
   makePrepaidCardPayment(
     event,
-    payMerchantHandler.prepaidCardManager(),
     prepaidCard,
-    txnHash,
-    event.block.timestamp,
     merchantSafe,
     issuingToken,
     event.params.issuingTokenAmount,

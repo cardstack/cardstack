@@ -1,9 +1,6 @@
 import { BigInt } from '@graphprotocol/graph-ts';
 import { MerchantCreation as MerchantCreationEvent } from '../../generated/Merchant/MerchantManager';
-import {
-  MerchantRegistrationFee,
-  RegisterMerchantHandler,
-} from '../../generated/MerchantRegistrationFee/RegisterMerchantHandler';
+import { MerchantRegistrationFee } from '../../generated/MerchantRegistrationFee/RegisterMerchantHandler';
 import { Account, MerchantSafe, MerchantCreation, MerchantRegistrationPayment } from '../../generated/schema';
 import { makeEOATransaction, makeTransaction, makePrepaidCardPayment, toChecksumAddress, makeToken } from '../utils';
 
@@ -37,14 +34,10 @@ export function handleMerchantRegistrationFee(event: MerchantRegistrationFee): v
   let txnHash = event.transaction.hash.toHex();
   let prepaidCard = toChecksumAddress(event.params.card);
   let issuingToken = makeToken(event.params.issuingToken);
-  let registerMerchantHandler = RegisterMerchantHandler.bind(event.address);
 
   makePrepaidCardPayment(
     event,
-    registerMerchantHandler.prepaidCardManager(),
     prepaidCard,
-    txnHash,
-    event.block.timestamp,
     null,
     issuingToken,
     event.params.issuingTokenAmount,
