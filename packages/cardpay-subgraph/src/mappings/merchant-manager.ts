@@ -38,8 +38,6 @@ export function handleMerchantRegistrationFee(event: MerchantRegistrationFee): v
   makePrepaidCardPayment(
     event,
     prepaidCard,
-    txnHash,
-    event.block.timestamp,
     null,
     issuingToken,
     event.params.issuingTokenAmount,

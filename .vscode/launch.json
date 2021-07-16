@@ -196,7 +196,7 @@
         "safe-view",
         "--network",
         "sokol",
-        "0x0a74A3AC2F6f508b4f7420D87919c126a1CcF76c",
+        "0x0BdB46E41c80749F5506f51037a981276Dd982E4",
         // "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // safe to view
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic",
@@ -235,7 +235,7 @@
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot safe feel free to use your own
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "",
-        "1000",
+        "2000",
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own
@@ -252,16 +252,9 @@
       "env": {},
       "args": [
         "prepaidcard-split",
-        "0x0a74A3AC2F6f508b4f7420D87919c126a1CcF76c", // prepaid card address
-        "did:split-test-07-16-21", // customization DID
-        "100", // face values
-        "100", // face values
-        "100", // face values
-        "100", // face values
-        "100", // face values
-        "100", // face values
-        "100", // face values
-        "100", // face values
+        "0x0BdB46E41c80749F5506f51037a981276Dd982E4", // prepaid card address
+        "did:split-test-07-16-21-AAA", // customization DID
+        "300", // face values
         "100", // face values
         "100", // face values
         "--network",
@@ -317,8 +310,8 @@
       "args": [
         "pay-merchant",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0x19601E6825D2715CBD22B6AEC9B2528eDEe974A6", // Hassan's prepaid card --feel free to use your own
-        "100",
+        "0x0BdB46E41c80749F5506f51037a981276Dd982E4", // Hassan's prepaid card --feel free to use your own
+        "500",
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own

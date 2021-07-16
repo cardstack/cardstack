@@ -4,7 +4,7 @@ import {
   TransferredPrepaidCard,
 } from '../../generated/PrepaidCard/PrepaidCardManager';
 import { Account, Depot, PrepaidCard, PrepaidCardCreation, PrepaidCardTransfer } from '../../generated/schema';
-import { makeToken, makeEOATransaction, toChecksumAddress, makeTransaction } from '../utils';
+import { makeToken, makeEOATransaction, toChecksumAddress, makeTransaction, getPrepaidCardFaceValue } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
 export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
@@ -28,6 +28,7 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   prepaidCardEntity.owner = issuer;
   prepaidCardEntity.reloadable = reloadable;
   prepaidCardEntity.spendBalance = event.params.spendAmount;
+  prepaidCardEntity.faceValue = getPrepaidCardFaceValue(prepaidCard);
   prepaidCardEntity.issuingTokenBalance = event.params.issuingTokenAmount;
   prepaidCardEntity.save();
 

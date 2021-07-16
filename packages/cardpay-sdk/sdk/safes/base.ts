@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import SupplierManagerABI from '../../contracts/abi/v0.6.2/supplier-manager';
+import SupplierManagerABI from '../../contracts/abi/v0.6.3/supplier-manager';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
@@ -35,6 +35,7 @@ export interface PrepaidCardSafe extends BaseSafe {
   issuingToken: string;
   spendFaceValue: number;
   prepaidCardOwner: string;
+  hasBeenUsed: boolean;
   issuer: string;
   reloadable: boolean;
   customizationDID?: string;
@@ -76,6 +77,10 @@ const safeQueryFields = `
       id
     }
     spendBalance
+    faceValue
+    payments {
+      id
+    }
     issuer {
       id
     }
@@ -297,7 +302,11 @@ interface GraphQLSafeResult {
     owner: {
       id: string;
     };
+    payments: {
+      id: string;
+    }[];
     spendBalance: string;
+    faceValue: string;
     issuer: { id: string };
     reloadable: boolean;
   } | null;
@@ -360,8 +369,9 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       address: safe.prepaidCard.id,
       customizationDID: safe.prepaidCard.customizationDID ? safe.prepaidCard.customizationDID : undefined,
       issuingToken: safe.prepaidCard.issuingToken.id,
-      spendFaceValue: parseInt(safe.prepaidCard.spendBalance),
+      spendFaceValue: parseInt(safe.prepaidCard.faceValue),
       issuer: safe.prepaidCard.issuer.id,
+      hasBeenUsed: safe.prepaidCard.payments.length > 0,
       reloadable: safe.prepaidCard.reloadable,
       prepaidCardOwner: safe.prepaidCard.owner.id,
       tokens,

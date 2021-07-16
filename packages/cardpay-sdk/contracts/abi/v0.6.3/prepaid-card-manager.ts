@@ -705,6 +705,27 @@ export default [
     inputs: [
       {
         internalType: 'address',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+    ],
+    name: 'faceValue',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
         name: 'token',
         type: 'address',
       },

@@ -16,8 +16,6 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
   makePrepaidCardPayment(
     event,
     prepaidCard,
-    txnHash,
-    event.block.timestamp,
     merchantSafe,
     issuingToken,
     event.params.issuingTokenAmount,
