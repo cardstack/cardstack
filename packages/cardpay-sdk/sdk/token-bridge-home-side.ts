@@ -187,7 +187,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
         await new Promise<void>((res) => setTimeout(() => res(), POLL_INTERVAL));
       }
       queryResults = await query(this.layer2Web3, bridgedTokensQuery, { account: recipientAddress, fromBlock });
-      receivedBridgedTokens = queryResults.data.account.depots[0]?.receivedBridgedTokens ?? [];
+      receivedBridgedTokens = queryResults.data.account?.depots[0]?.receivedBridgedTokens ?? [];
     } while (receivedBridgedTokens.length === 0 && Date.now() < start + TIMEOUT);
 
     if (receivedBridgedTokens.length === 0) {

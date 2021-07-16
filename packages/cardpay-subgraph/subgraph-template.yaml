@@ -442,6 +442,10 @@ templates:
       eventHandlers:
         - event: ExecutionSuccess(bytes32,uint256)
           handler: handleExecutionSuccess
+        - event: AddedOwner(address)
+          handler: handleAddedOwner
+        - event: RemovedOwner(address)
+          handler: handleRemovedOwner
       file: ./src/mappings/gnosis-safe.ts
 
   - kind: ethereum/contract

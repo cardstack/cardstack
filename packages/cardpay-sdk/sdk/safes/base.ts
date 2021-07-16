@@ -15,6 +15,7 @@ export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
 interface BaseSafe {
   address: string;
   tokens: TokenInfo[];
+  owners: string[];
 }
 export interface DepotSafe extends BaseSafe {
   type: 'depot';
@@ -23,6 +24,7 @@ export interface DepotSafe extends BaseSafe {
 export interface MerchantSafe extends BaseSafe {
   type: 'merchant';
   accumulatedSpendValue: number;
+  merchant: string;
   infoDID?: string;
 }
 export interface ExternalSafe extends BaseSafe {
@@ -32,6 +34,7 @@ export interface PrepaidCardSafe extends BaseSafe {
   type: 'prepaid-card';
   issuingToken: string;
   spendFaceValue: number;
+  prepaidCardOwner: string;
   issuer: string;
   reloadable: boolean;
   customizationDID?: string;
@@ -46,43 +49,48 @@ export interface TokenInfo {
   balance: string; // balance is in wei
 }
 
-const safesQuery = `
-  query($account: ID!) {
-    account(id: $account) {
-      safes {
-        safe {
-          id
-          tokens {
-            balance
-            token {
-              id
-              name
-              symbol
-            }
-          }
-          depot {
-            id
-            infoDid
-          }
-          prepaidCard {
-            id
-            customizationDID
-            issuingToken {
-              symbol
-              id
-            }
-            spendBalance
-            faceValue
-            issuer {id}
-            reloadable
-          }
-          merchant {
-            id
-            spendBalance
-            infoDid
-          }
-        }
-      }
+const safeQueryFields = `
+  id
+  owners {
+    owner {
+      id
+    }
+  }
+  tokens {
+    balance
+    token {
+      id
+      name
+      symbol
+    }
+  }
+  depot {
+    id
+    infoDid
+  }
+  prepaidCard {
+    id
+    customizationDID
+    issuingToken {
+      symbol
+      id
+    }
+    spendBalance
+    faceValue
+    issuer {
+      id
+    }
+    owner {
+      id
+    }
+    reloadable
+  }
+  merchant {
+    id
+    spendBalance
+    infoDid
+    merchant {
+      id
     }
   }
 `;
@@ -90,37 +98,18 @@ const safesQuery = `
 const safeQuery = `
   query ($id: ID!) {
     safe(id: $id) {
-      id
-      tokens {
-        balance
-        token {
-          id
-          name
-          symbol
+      ${safeQueryFields}
+    }
+  }
+`;
+
+const safesQuery = `
+  query($account: ID!) {
+    account(id: $account) {
+      safes {
+        safe {
+          ${safeQueryFields}
         }
-      }
-      depot {
-        id
-        infoDid
-      }
-      prepaidCard {
-        id
-        customizationDID
-        issuingToken {
-          symbol
-          id
-        }
-        spendBalance
-        faceValue
-        issuer {
-          id
-        }
-        reloadable
-      }
-      merchant {
-        id
-        spendBalance
-        infoDid
       }
     }
   }
@@ -139,10 +128,12 @@ export default class Safes {
   async view(owner?: string): Promise<Safe[]> {
     owner = owner ?? (await this.layer2Web3.eth.getAccounts())[0];
     let {
-      data: {
-        account: { safes },
-      },
+      data: { account },
     } = await query(this.layer2Web3, safesQuery, { account: owner });
+    if (account == null) {
+      return [];
+    }
+    let { safes } = account;
     let result: Safe[] = [];
     for (let { safe } of safes as { safe: GraphQLSafeResult }[]) {
       let safeResult = processSafeResult(safe);
@@ -280,6 +271,11 @@ export default class Safes {
 
 interface GraphQLSafeResult {
   id: string;
+  owners: {
+    owner: {
+      id: string;
+    };
+  }[];
   tokens: {
     balance: string;
     token: {
@@ -299,6 +295,9 @@ interface GraphQLSafeResult {
       symbol: string;
       id: string;
     };
+    owner: {
+      id: string;
+    };
     spendBalance: string;
     faceValue: string;
     issuer: { id: string };
@@ -308,6 +307,9 @@ interface GraphQLSafeResult {
     id: string;
     spendBalance: string;
     infoDid: string | null;
+    merchant: {
+      id: string;
+    };
   };
 }
 
@@ -327,12 +329,20 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       },
     });
   }
+  let owners: string[] = [];
+  for (let ownerInfo of safe.owners) {
+    let {
+      owner: { id: owner },
+    } = ownerInfo;
+    owners.push(owner);
+  }
   if (safe.depot) {
     let depot: DepotSafe = {
       type: 'depot',
       address: safe.depot.id,
       infoDID: safe.depot.infoDid ? safe.depot.infoDid : undefined,
       tokens,
+      owners,
     };
     return depot;
   } else if (safe.merchant) {
@@ -341,7 +351,9 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       address: safe.merchant.id,
       infoDID: safe.merchant.infoDid ? safe.merchant.infoDid : undefined,
       accumulatedSpendValue: parseInt(safe.merchant.spendBalance),
+      merchant: safe.merchant.merchant.id,
       tokens,
+      owners,
     };
     return merchant;
   } else if (safe.prepaidCard) {
@@ -353,7 +365,9 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       spendFaceValue: parseInt(safe.prepaidCard.faceValue),
       issuer: safe.prepaidCard.issuer.id,
       reloadable: safe.prepaidCard.reloadable,
+      prepaidCardOwner: safe.prepaidCard.owner.id,
       tokens,
+      owners,
     };
     return prepaidCard;
   } else {
@@ -361,6 +375,7 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       type: 'external',
       address: safe.id,
       tokens,
+      owners,
     };
     return externalSafe;
   }

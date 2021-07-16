@@ -60,6 +60,17 @@ export function handleTransferPrepaidCard(event: TransferredPrepaidCard): void {
   makeEOATransaction(event, from);
   makeEOATransaction(event, to);
 
+  let prepaidCardEntity = PrepaidCard.load(prepaidCard);
+  if (prepaidCardEntity == null) {
+    log.warning(
+      'Cannot process transfer prepaid card txn {}: PrepaidCard entity does not exist for prepaid card {}. This is likely due to the subgraph having a startBlock that is higher than the block the prepaid card was created in.',
+      [txnHash, prepaidCard]
+    );
+    return;
+  }
+  prepaidCardEntity.owner = to;
+  prepaidCardEntity.save();
+
   let transferEntity = new PrepaidCardTransfer(txnHash);
   transferEntity.timestamp = event.block.timestamp;
   transferEntity.transaction = txnHash;
