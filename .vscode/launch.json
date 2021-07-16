@@ -280,7 +280,7 @@
       "env": {},
       "args": [
         "prepaidcard-transfer",
-        "0xFB1248819b82928230b2861166c8A55eb9D1d8ea", // prepaid card address
+        "0xf68168d127cb307706493a3345FAce4593039440", // prepaid card address
         "0xb21851B00bd13C008f703A21DFDd292b28A736b3", // new owner
         "--network",
         "sokol",

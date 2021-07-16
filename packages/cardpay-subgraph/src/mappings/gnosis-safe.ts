@@ -1,11 +1,24 @@
-import { Address } from '@graphprotocol/graph-ts';
-import { ExecutionSuccess } from '../../generated/templates/GnosisSafe/GnosisSafe';
+import { Address, store } from '@graphprotocol/graph-ts';
+import { ExecutionSuccess, AddedOwner, RemovedOwner } from '../../generated/templates/GnosisSafe/GnosisSafe';
 import { toChecksumAddress, makeEOATransactionForSafe, makeToken } from '../utils';
 import { decode, encodeMethodSignature, methodHashFromEncodedHex } from '../abi';
-import { Safe, SafeTransaction } from '../../generated/schema';
+import { Safe, SafeOwner, SafeTransaction } from '../../generated/schema';
 import { log } from '@graphprotocol/graph-ts';
 
 const EXEC_TRANSACTION = 'execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)';
+
+export function handleAddedOwner(event: AddedOwner): void {
+  let owner = toChecksumAddress(event.params.owner);
+  let safe = toChecksumAddress(event.address);
+  let safeOwnerEntity = new SafeOwner(safe + '-' + owner);
+  safeOwnerEntity.safe = safe;
+  safeOwnerEntity.owner = owner;
+  safeOwnerEntity.save();
+}
+export function handleRemovedOwner(event: RemovedOwner): void {
+  let id = toChecksumAddress(event.address) + '-' + toChecksumAddress(event.params.owner);
+  store.remove('SafeOwner', id);
+}
 
 export function handleExecutionSuccess(event: ExecutionSuccess): void {
   let safeAddress = toChecksumAddress(event.transaction.to as Address);

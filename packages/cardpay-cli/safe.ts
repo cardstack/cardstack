@@ -62,7 +62,13 @@ function displaySafe(address: string, safe: Safe): void {
       }`
     );
   });
-  console.log(`owners: ${owners.join(', ')}`);
+  if (safe.type === 'prepaid-card') {
+    console.log(`owner: ${safe.prepaidCardOwner}`);
+  } else if (safe.type === 'merchant') {
+    console.log(`merchant: ${safe.merchant}`);
+  } else {
+    console.log(`owner(s): ${owners.join(', ')}`);
+  }
 }
 
 export async function transferTokens(

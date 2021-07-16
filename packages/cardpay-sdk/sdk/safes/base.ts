@@ -24,6 +24,7 @@ export interface DepotSafe extends BaseSafe {
 export interface MerchantSafe extends BaseSafe {
   type: 'merchant';
   accumulatedSpendValue: number;
+  merchant: string;
   infoDID?: string;
 }
 export interface ExternalSafe extends BaseSafe {
@@ -33,6 +34,7 @@ export interface PrepaidCardSafe extends BaseSafe {
   type: 'prepaid-card';
   issuingToken: string;
   spendFaceValue: number;
+  prepaidCardOwner: string;
   issuer: string;
   reloadable: boolean;
   customizationDID?: string;
@@ -77,12 +79,18 @@ const safeQueryFields = `
     issuer {
       id
     }
+    owner {
+      id
+    }
     reloadable
   }
   merchant {
     id
     spendBalance
     infoDid
+    merchant {
+      id
+    }
   }
 `;
 
@@ -286,6 +294,9 @@ interface GraphQLSafeResult {
       symbol: string;
       id: string;
     };
+    owner: {
+      id: string;
+    };
     spendBalance: string;
     issuer: { id: string };
     reloadable: boolean;
@@ -294,6 +305,9 @@ interface GraphQLSafeResult {
     id: string;
     spendBalance: string;
     infoDid: string | null;
+    merchant: {
+      id: string;
+    };
   };
 }
 
@@ -335,6 +349,7 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       address: safe.merchant.id,
       infoDID: safe.merchant.infoDid ? safe.merchant.infoDid : undefined,
       accumulatedSpendValue: parseInt(safe.merchant.spendBalance),
+      merchant: safe.merchant.merchant.id,
       tokens,
       owners,
     };
@@ -348,6 +363,7 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       spendFaceValue: parseInt(safe.prepaidCard.spendBalance),
       issuer: safe.prepaidCard.issuer.id,
       reloadable: safe.prepaidCard.reloadable,
+      prepaidCardOwner: safe.prepaidCard.owner.id,
       tokens,
       owners,
     };
