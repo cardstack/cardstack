@@ -2,6 +2,8 @@
 // "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
 // Hassan's testing mnemonic for address 0xb21851B00bd13C008f703A21DFDd292b28A736b3
 // "vicious kiwi join thing voice spice library piano panel weird sense extra"
+// Hassan's testing mnemonic for address 0x5ae158659942D346bd788b17B2307972DAEb6dDd
+// "ribbon nerve ordinary they relief device flame resemble faculty car alarm caught"
 
 {
   // Use IntelliSense to learn about possible Node.js debug attributes.
@@ -194,7 +196,8 @@
         "safe-view",
         "--network",
         "sokol",
-        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // safe to view
+        "0x0a74A3AC2F6f508b4f7420D87919c126a1CcF76c",
+        // "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // safe to view
         // Hassan's testing mnemonic feel free to use your own
         "--mnemonic",
         "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
@@ -232,7 +235,7 @@
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot safe feel free to use your own
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "",
-        "500",
+        "1000",
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own
@@ -249,10 +252,17 @@
       "env": {},
       "args": [
         "prepaidcard-split",
-        "0xfCEd399eBd5B4aCE5518B5AC8Bc1602139dB8386", // prepaid card address
-        "did:split-testing-1234-1234", // customization DID
-        "200", // face values
-        "200", // face values
+        "0x0a74A3AC2F6f508b4f7420D87919c126a1CcF76c", // prepaid card address
+        "did:split-test-07-16-21", // customization DID
+        "100", // face values
+        "100", // face values
+        "100", // face values
+        "100", // face values
+        "100", // face values
+        "100", // face values
+        "100", // face values
+        "100", // face values
+        "100", // face values
         "100", // face values
         "--network",
         "sokol",
@@ -270,7 +280,7 @@
       "env": {},
       "args": [
         "prepaidcard-transfer",
-        "0xc87d1C057787218BB0c929f7e4e3f49CAd3B15cE", // prepaid card address
+        "0xf68168d127cb307706493a3345FAce4593039440", // prepaid card address
         "0xb21851B00bd13C008f703A21DFDd292b28A736b3", // new owner
         "--network",
         "sokol",
