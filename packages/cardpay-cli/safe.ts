@@ -44,6 +44,7 @@ function displaySafe(address: string, safe: Safe): void {
   if (safe.type === 'prepaid-card') {
     console.log(`customization DID: ${safe.customizationDID ? safe.customizationDID : ' - unset -'}`);
     console.log(`Face value: §${safe.spendFaceValue} SPEND`);
+    console.log(`has been used: ${safe.hasBeenUsed}`);
   }
   if (safe.type === 'merchant' || safe.type === 'depot') {
     console.log(`info DID: ${safe.infoDID ? safe.infoDID : ' - unset -'}`);

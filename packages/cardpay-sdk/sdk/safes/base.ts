@@ -35,6 +35,7 @@ export interface PrepaidCardSafe extends BaseSafe {
   issuingToken: string;
   spendFaceValue: number;
   prepaidCardOwner: string;
+  hasBeenUsed: boolean;
   issuer: string;
   reloadable: boolean;
   customizationDID?: string;
@@ -77,6 +78,9 @@ const safeQueryFields = `
     }
     spendBalance
     faceValue
+    payments {
+      id
+    }
     issuer {
       id
     }
@@ -298,6 +302,9 @@ interface GraphQLSafeResult {
     owner: {
       id: string;
     };
+    payments: {
+      id: string;
+    }[];
     spendBalance: string;
     faceValue: string;
     issuer: { id: string };
@@ -364,6 +371,7 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       issuingToken: safe.prepaidCard.issuingToken.id,
       spendFaceValue: parseInt(safe.prepaidCard.faceValue),
       issuer: safe.prepaidCard.issuer.id,
+      hasBeenUsed: safe.prepaidCard.payments.length > 0,
       reloadable: safe.prepaidCard.reloadable,
       prepaidCardOwner: safe.prepaidCard.owner.id,
       tokens,
