@@ -5,6 +5,8 @@ const path = require('path');
 const concat = require('broccoli-concat');
 const webpack = require('webpack');
 
+process.env.EMBROIDER_REBUILD_ADDONS = '@cardstack/boxel';
+
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
     'ember-power-select': { theme: false },
