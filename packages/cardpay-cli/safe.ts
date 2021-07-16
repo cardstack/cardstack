@@ -38,7 +38,7 @@ export async function viewSafes(network: string, address: string | undefined, mn
 }
 
 function displaySafe(address: string, safe: Safe): void {
-  let { type, tokens } = safe;
+  let { type, tokens, owners } = safe;
   console.log(`${address} -- ${type}`);
   console.log('-------------------------');
   if (safe.type === 'prepaid-card') {
@@ -62,6 +62,7 @@ function displaySafe(address: string, safe: Safe): void {
       }`
     );
   });
+  console.log(`owners: ${owners.join(', ')}`);
 }
 
 export async function transferTokens(
