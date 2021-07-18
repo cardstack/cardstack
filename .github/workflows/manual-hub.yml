@@ -1,0 +1,50 @@
+name: Manual Deploy [hub]
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git branch/tag
+        required: true
+      environment:
+        description: Deployment environment
+        required: false
+        default: production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - uses: hashicorp/action-setup-waypoint
+        with:
+          version: '0.4.0'
+
+      - name: Set up env
+        env:
+          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+        run: |
+          if [ "$INPUT_ENVIRONMENT" = "production" ]; then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.PRODUCTION_WAYPOINT_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.PRODUCTION_WAYPOINT_AWS_SECRET }}" >> $GITHUB_ENV
+            echo "WAYPOINT_SERVER_TOKEN=${{ secrets.PRODUCTION_WAYPOINT_SERVER_TOKEN }}" >> $GITHUB_ENV
+            echo "WAYPOINT_SERVER_ADDR=${{ secrets.PRODUCTION_WAYPOINT_SERVER_ADDR }}" >> $GITHUB_ENV
+          elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}" >> $GITHUB_ENV
+            echo "WAYPOINT_SERVER_TOKEN=${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}" >> $GITHUB_ENV
+            echo "WAYPOINT_SERVER_ADDR=${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}" >> $GITHUB_ENV
+          else
+            echo "unrecognized environment"
+            exit 1;
+          fi
+
+      - name: Deploy
+        run: waypoint up --app=hub -plain
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          WAYPOINT_SERVER_TLS: 1
+          WAYPOINT_SERVER_TLS_SKIP_VERIFY: 1
