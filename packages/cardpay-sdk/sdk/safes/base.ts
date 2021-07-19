@@ -50,6 +50,11 @@ export interface TokenInfo {
   balance: string; // balance is in wei
 }
 
+export interface Options {
+  viewAll: boolean;
+}
+const defaultOptions: Options = { viewAll: false };
+
 const safeQueryFields = `
   id
   owners {
@@ -129,8 +134,19 @@ export default class Safes {
     return processSafeResult(safe as GraphQLSafeResult);
   }
 
-  async view(owner?: string): Promise<Safe[]> {
-    owner = owner ?? (await this.layer2Web3.eth.getAccounts())[0];
+  async view(options?: Partial<Options>): Promise<Safe[]>;
+  async view(owner?: string): Promise<Safe[]>;
+  async view(owner?: string, options?: Partial<Options>): Promise<Safe[]>;
+  async view(ownerOrOptions?: string | Partial<Options>, options?: Partial<Options>): Promise<Safe[]> {
+    let owner: string;
+    let _options: Options | undefined;
+    if (typeof ownerOrOptions === 'string') {
+      owner = ownerOrOptions;
+    } else {
+      owner = (await this.layer2Web3.eth.getAccounts())[0];
+      _options = { ...defaultOptions, ...(ownerOrOptions ?? {}) };
+    }
+    _options = { ...defaultOptions, ...(options ?? _options ?? {}) };
     let {
       data: { account },
     } = await query(this.layer2Web3, safesQuery, { account: owner });
@@ -142,7 +158,13 @@ export default class Safes {
     for (let { safe } of safes as { safe: GraphQLSafeResult }[]) {
       let safeResult = processSafeResult(safe);
       if (safeResult) {
-        result.push(safeResult);
+        if (_options.viewAll) {
+          result.push(safeResult);
+        } else if (safeResult.type === 'prepaid-card' && safeResult.spendFaceValue > 0) {
+          result.push(safeResult);
+        } else if (safeResult.type === 'merchant' || safeResult.type === 'depot') {
+          result.push(safeResult);
+        }
       }
     }
     return result;
