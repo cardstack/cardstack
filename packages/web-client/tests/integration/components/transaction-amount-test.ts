@@ -50,9 +50,9 @@ module('Integration | Component | transaction-amount', function (hooks) {
         `);
 
     assert.dom('[data-test-unlock-button]').isDisabled();
-    await fillIn('[data-test-deposit-amount-input]', daiToSend);
+    await fillIn('[data-test-amount-input]', daiToSend);
     assert.dom('[data-test-unlock-button]').isDisabled();
-    await fillIn('[data-test-deposit-amount-input]', startDaiAmountString);
+    await fillIn('[data-test-amount-input]', startDaiAmountString);
     assert.dom('[data-test-unlock-button]').isNotDisabled();
   });
 
@@ -86,7 +86,7 @@ module('Integration | Component | transaction-amount', function (hooks) {
           />
         `);
 
-    await fillIn('[data-test-deposit-amount-input]', daiToSend);
+    await fillIn('[data-test-amount-input]', daiToSend);
     assert.dom('[data-test-unlock-button]').isNotDisabled();
 
     await click('[data-test-unlock-button]');
@@ -130,41 +130,41 @@ module('Integration | Component | transaction-amount', function (hooks) {
           />
         `);
 
-    assert.dom('[data-test-deposit-amount-input]').hasValue('');
+    assert.dom('[data-test-amount-input]').hasValue('');
     assert.dom('[data-test-unlock-button]').isDisabled();
 
-    await fillIn('[data-test-deposit-amount-input]', invalidDai1);
-    assert.dom('[data-test-deposit-amount-input]').hasValue(invalidDai1);
+    await fillIn('[data-test-amount-input]', invalidDai1);
+    // assert.dom('[data-test-amount-input]').hasValue(invalidDai1); FIXME should it be…?
     assert.dom('[data-test-unlock-button]').isDisabled();
 
-    await fillIn('[data-test-deposit-amount-input]', validAmount);
-    assert.dom('[data-test-deposit-amount-input]').hasValue(validAmount);
+    await fillIn('[data-test-amount-input]', validAmount);
+    assert.dom('[data-test-amount-input]').hasValue(validAmount);
     assert.dom('[data-test-unlock-button]').isNotDisabled();
 
-    await fillIn('[data-test-deposit-amount-input]', invalidDai2);
-    assert.dom('[data-test-deposit-amount-input]').hasValue(validAmount);
+    await fillIn('[data-test-amount-input]', invalidDai2);
+    assert.dom('[data-test-amount-input]').hasValue(validAmount);
     assert.dom('[data-test-unlock-button]').isNotDisabled();
 
-    await fillIn('[data-test-deposit-amount-input]', '');
-    assert.dom('[data-test-deposit-amount-input]').hasValue('');
+    await fillIn('[data-test-amount-input]', '');
+    assert.dom('[data-test-amount-input]').hasValue('');
     assert.dom('[data-test-unlock-button]').isDisabled();
 
-    await typeIn('[data-test-deposit-amount-input]', invalidDai2);
-    assert.dom('[data-test-deposit-amount-input]').hasValue('11');
+    await typeIn('[data-test-amount-input]', invalidDai2);
+    assert.dom('[data-test-amount-input]').hasValue('11');
     assert.dom('[data-test-unlock-button]').isNotDisabled();
 
-    await fillIn('[data-test-deposit-amount-input]', '');
-    await typeIn('[data-test-deposit-amount-input]', invalidDai3);
-    assert.dom('[data-test-deposit-amount-input]').hasValue('1');
+    await fillIn('[data-test-amount-input]', '');
+    await typeIn('[data-test-amount-input]', invalidDai3);
+    assert.dom('[data-test-amount-input]').hasValue('1');
     assert.dom('[data-test-unlock-button]').isNotDisabled();
 
-    await fillIn('[data-test-deposit-amount-input]', '');
-    await typeIn('[data-test-deposit-amount-input]', invalidDai4);
-    assert.dom('[data-test-deposit-amount-input]').hasValue('12');
+    await fillIn('[data-test-amount-input]', '');
+    await typeIn('[data-test-amount-input]', invalidDai4);
+    assert.dom('[data-test-amount-input]').hasValue('12');
     assert.dom('[data-test-unlock-button]').isNotDisabled();
 
-    await fillIn('[data-test-deposit-amount-input]', startDaiString);
-    assert.dom('[data-test-deposit-amount-input]').hasValue(startDaiString);
+    await fillIn('[data-test-amount-input]', startDaiString);
+    assert.dom('[data-test-amount-input]').hasValue(startDaiString);
     assert.dom('[data-test-unlock-button]').isNotDisabled();
   });
 });

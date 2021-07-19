@@ -17,6 +17,8 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 
 class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @tracked amount = '';
+  @tracked amountIsValid = false;
+
   @tracked isUnlocked = false;
   @tracked isUnlocking = false;
   @tracked unlockTxnReceipt: TransactionReceipt | undefined;
@@ -62,7 +64,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     }
   }
   get unlockCtaDisabled() {
-    return !this.isUnlocked && !this.isValidAmount;
+    return !this.isUnlocked && !this.amountIsValid;
   }
 
   get depositCtaState() {
@@ -79,19 +81,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   }
 
   get amountAsBigNumber(): BN {
-    const regex = /^\d*(\.\d{0,18})?$/gm;
-    if (!this.amount || !regex.test(this.amount)) {
+    if (this.amountIsValid) {
+      return toBN(toWei(this.amount));
+    } else {
       return toBN(0);
     }
-    return toBN(toWei(this.amount));
-  }
-
-  get isValidAmount() {
-    if (!this.amount) return false;
-    return (
-      !this.amountAsBigNumber.lte(toBN(0)) &&
-      this.amountAsBigNumber.lte(this.currentTokenBalance)
-    );
   }
 
   get unlockTxnViewerUrl() {
@@ -112,12 +106,9 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     return this.isUnlocking || this.isUnlocked;
   }
 
-  @action onInputAmount(str: string) {
-    if (!isNaN(+str)) {
-      this.amount = str.trim();
-    } else {
-      this.amount = this.amount; // eslint-disable-line no-self-assign
-    }
+  @action onInputAmount(str: string, isValid: boolean) {
+    this.amount = str;
+    this.amountIsValid = isValid;
   }
 
   @action async unlock() {

@@ -15,6 +15,7 @@ import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow
 
 class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @tracked amount = '';
+  @tracked amountIsValid = false;
   @tracked isAmountSet = false;
   @service declare layer2Network: Layer2Network;
 
@@ -55,31 +56,20 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   }
 
   get setAmountCtaDisabled() {
-    return !this.isAmountSet && !this.isValidAmount;
+    return !this.amountIsValid;
   }
 
   get amountAsBigNumber(): BN {
-    const regex = /^\d*(\.\d{0,18})?$/gm;
-    if (!this.amount || !regex.test(this.amount)) {
+    if (this.amountIsValid) {
+      return toBN(toWei(this.amount));
+    } else {
       return toBN(0);
     }
-    return toBN(toWei(this.amount));
   }
 
-  get isValidAmount() {
-    if (!this.amount) return false;
-    return (
-      !this.amountAsBigNumber.lte(toBN(0)) &&
-      this.amountAsBigNumber.lte(this.currentTokenBalance)
-    );
-  }
-
-  @action onInputAmount(str: string) {
-    if (!isNaN(+str)) {
-      this.amount = str.trim();
-    } else {
-      this.amount = this.amount; // eslint-disable-line no-self-assign
-    }
+  @action onInputAmount(str: string, isValid: boolean) {
+    this.amount = str;
+    this.amountIsValid = isValid;
   }
 
   @action toggleAmountSet() {

@@ -7,48 +7,11 @@
   margin-top: var(--boxel-sp-lg);
 }
 
-.transaction-amount__input-container {
-  --input-currency-icon-size: 2.5rem;
-  --input-currency-text-width: 5ch;
-  --input-currency-icon-space: var(--boxel-sp-xs);
-  --input-currency-text-space: var(--boxel-sp-sm);
-
-  position: relative;
-}
-
 .transaction-amount__input-token-balance {
   font-family: var(--boxel-font-family);
   font-size: 1.25rem;
   line-height: calc(27 / 20);
   letter-spacing: var(--boxel-lsp-xs);
-}
-
-.transaction-amount__input {
-  height: var(--tx-amount-input-height);
-  padding-left: calc(var(--input-currency-icon-size) + var(--input-currency-icon-space) * 2);
-  padding-right: calc(var(--input-currency-text-width) + var(--input-currency-text-space) * 2);
-  font: inherit;
-  letter-spacing: inherit;
-}
-
-.transaction-amount__currency-icon {
-  position: absolute;
-  width: var(--input-currency-icon-size);
-  height: var(--tx-amount-input-height);
-  left: var(--input-currency-icon-space);
-  top: 0;
-  user-select: none;
-}
-
-.transaction-amount__currency-text {
-  position: absolute;
-  max-width: var(--input-currency-text-width);
-  height: var(--tx-amount-input-height);
-  display: flex;
-  align-items: center;
-  right: var(--input-currency-text-space);
-  top: 0;
-  user-select: none;
 }
 
 .transaction-amount__banner-field-label {
