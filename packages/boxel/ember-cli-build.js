@@ -47,7 +47,8 @@ module.exports = function (defaults) {
     staticAppPaths: ['data'],
     packagerOptions: {
       publicAssetURL:
-        process.env.DEPLOY_TARGET === 's3-preview'
+        process.env.DEPLOY_TARGET === 's3-preview' ||
+        process.env.DEPLOY_TARGET === 'production'
           ? process.env.S3_PREVIEW_ASSET_BUCKET_ENDPOINT + '/'
           : undefined,
       webpackConfig: {
