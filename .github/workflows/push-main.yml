@@ -89,6 +89,7 @@ jobs:
     outputs:
       hub: ${{ steps.filter.outputs.hub }}
       web_client: ${{ steps.filter.outputs.web_client }}
+      boxel: ${{ steps.filter.outputs.boxel }}
     steps:
       - uses: actions/checkout@v2
         with:
