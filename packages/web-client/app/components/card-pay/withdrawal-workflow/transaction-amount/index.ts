@@ -65,10 +65,10 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   }
 
   get amountAsBigNumber(): BN {
-    if (this.amountIsValid) {
-      return toBN(toWei(this.amount));
-    } else {
+    if (this.isInvalid || this.amount === '') {
       return toBN(0);
+    } else {
+      return toBN(toWei(this.amount));
     }
   }
 
