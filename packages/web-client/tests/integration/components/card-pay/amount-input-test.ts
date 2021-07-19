@@ -44,22 +44,26 @@ module('Integration | Component | card-pay/amount-input', function (hooks) {
   test('it calls the onInputAmount callback on render with an empty string that is marked invalid', async function (assert) {
     assert.equal(enteredValue, '');
     assert.notOk(valueIsValid);
+    assert.dom('input').hasAria('invalid', 'true');
   });
 
   test('it accepts a well-formatted value that is less than or equal to the balance', async function (assert) {
     await fillIn('input', '50');
     assert.equal(enteredValue, '50');
     assert.ok(valueIsValid);
+    assert.dom('input').doesNotHaveAria('invalid', 'true');
     assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
 
     await fillIn('input', '50.5');
     assert.equal(enteredValue, '50.5');
     assert.ok(valueIsValid);
+    assert.dom('input').doesNotHaveAria('invalid', 'true');
     assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
 
     await fillIn('input', '100');
     assert.equal(enteredValue, '100');
     assert.ok(valueIsValid);
+    assert.dom('input').doesNotHaveAria('invalid', 'true');
     assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
   });
 
@@ -67,6 +71,7 @@ module('Integration | Component | card-pay/amount-input', function (hooks) {
     await fillIn('input', '150');
     assert.equal(enteredValue, '150');
     assert.notOk(valueIsValid);
+    assert.dom('input').hasAria('invalid', 'true');
     assert
       .dom('[data-test-boxel-input-error-message]')
       .containsText('must not exceed balance');
@@ -74,6 +79,7 @@ module('Integration | Component | card-pay/amount-input', function (hooks) {
     await fillIn('input', '100.1');
     assert.equal(enteredValue, '100.1');
     assert.notOk(valueIsValid);
+    assert.dom('input').hasAria('invalid', 'true');
     assert
       .dom('[data-test-boxel-input-error-message]')
       .containsText('must not exceed balance');
@@ -83,6 +89,7 @@ module('Integration | Component | card-pay/amount-input', function (hooks) {
     await fillIn('input', ' 11 ');
     assert.equal(enteredValue, '11');
     assert.ok(valueIsValid);
+    assert.dom('input').doesNotHaveAria('invalid', 'true');
     assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
   });
 
@@ -90,6 +97,7 @@ module('Integration | Component | card-pay/amount-input', function (hooks) {
     await fillIn('input', '1.1234567890123456789');
     assert.equal(enteredValue, '1.123456789012345678');
     assert.notOk(valueIsValid);
+    assert.dom('input').hasAria('invalid', 'true');
     assert
       .dom('[data-test-boxel-input-error-message]')
       .containsText('must not exceed eighteen decimal places');
@@ -99,6 +107,7 @@ module('Integration | Component | card-pay/amount-input', function (hooks) {
     await typeIn('input', '-1.5');
     assert.equal(enteredValue, '1.5');
     assert.ok(valueIsValid);
+    assert.dom('input').doesNotHaveAria('invalid', 'true');
     assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
   });
 
@@ -107,8 +116,9 @@ module('Integration | Component | card-pay/amount-input', function (hooks) {
     assert.dom('input').hasValue('11');
     assert.equal(enteredValue, '11');
     assert.ok(valueIsValid);
+    assert.dom('input').doesNotHaveAria('invalid', 'true');
     assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
   });
 
-  // TODO assert on aria-valid? And don’t make empty look invalid, but do make it return invalid…?
+  // TODO don’t make empty look invalid, but do make it return invalid…?
 });
