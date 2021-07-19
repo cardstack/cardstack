@@ -74,12 +74,7 @@ export default class CardPayAmountInput extends Component<CardPayAmountInputArgs
   get cleanedAmount() {
     if (this.isValidNumber) {
       if (this.isInvalid) {
-        if (this.amountExceedsEighteenDecimalPlaces) {
-          let [before, after] = this.amount.split('.');
-          return `${before}.${after.substring(0, 18)}`;
-        } else {
-          return this.amount;
-        }
+        return this.amount;
       }
     } else {
       return '';
@@ -94,19 +89,17 @@ export default class CardPayAmountInput extends Component<CardPayAmountInputArgs
   }
 
   setAmount(amount: string) {
-    if (!isNaN(+amount)) {
-      this.amount = amount.trim();
+    let trimmedAmount = amount.trim();
+
+    if (!isNaN(+trimmedAmount) && !trimmedAmount.startsWith('-')) {
+      this.amount = trimmedAmount;
     } else {
       // eslint-disable-next-line no-self-assign
       this.amount = this.amount; // reject invalid characters as they’re entered
     }
 
     if (this.isValidNumber) {
-      if (this.isInvalid) {
-        this.args.onInputAmount(this.cleanedAmount, false);
-      } else {
-        this.args.onInputAmount(this.amount, true);
-      }
+      this.args.onInputAmount(this.amount, !this.isInvalid);
     } else {
       this.args.onInputAmount('', false);
     }

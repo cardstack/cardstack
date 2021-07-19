@@ -134,7 +134,7 @@ module('Integration | Component | transaction-amount', function (hooks) {
     assert.dom('[data-test-unlock-button]').isDisabled();
 
     await fillIn('[data-test-amount-input]', invalidDai1);
-    // assert.dom('[data-test-amount-input]').hasValue(invalidDai1); FIXME should it be…?
+    assert.dom('[data-test-amount-input]').hasValue(invalidDai1);
     assert.dom('[data-test-unlock-button]').isDisabled();
 
     await fillIn('[data-test-amount-input]', validAmount);

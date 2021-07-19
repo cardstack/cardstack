@@ -100,9 +100,9 @@ module('Integration | Component | card-pay/amount-input', function (hooks) {
     assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
   });
 
-  test('it truncates a well-formatted value that exceeds 18 decimal places', async function (assert) {
+  test('it rejects a well-formatted value that exceeds 18 decimal places', async function (assert) {
     await fillIn('input', '1.1234567890123456789');
-    assert.equal(enteredValue, '1.123456789012345678');
+    assert.equal(enteredValue, '1.1234567890123456789');
     assert.notOk(valueIsValid);
     assert.dom('input').hasAria('invalid', 'true');
     assert
