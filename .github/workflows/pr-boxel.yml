@@ -97,7 +97,7 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref
     needs: deploy-boxel-preview
     env:
-      S3_PREVIEW_WEBSITE_URL: http://boxel-preview.cardstack.com.s3-website-us-east-1.amazonaws.com
+      S3_PREVIEW_WEBSITE_URL: https://boxel.stack.cards
     steps:
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
