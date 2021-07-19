@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
 import { Layer2Web3Strategy, TransactionHash } from './types';
@@ -85,8 +86,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   awaitBridgedToLayer1(
-    fromBlock: BN,
-    txnHash: string
+    _fromBlock: BN,
+    _txnHash: string
   ): Promise<BridgeValidationResult> {
     return this.bridgingToLayer1Deferred
       .promise as Promise<BridgeValidationResult>;
