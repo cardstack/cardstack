@@ -9,7 +9,7 @@
   border: none;
   background-color: rgba(0, 0, 0, 0.75);
   text-align: left;
-  z-index: 10;
+  z-index: calc(var(--boxel-modal-z-index) - 1);
 }
 
 .boxel-modal {
@@ -29,7 +29,7 @@
   background: none;
   border: none;
   overflow: hidden;
-  z-index: 15;
+  z-index: var(--boxel-modal-z-index);
   pointer-events: none;
 }
 
