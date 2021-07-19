@@ -41,8 +41,15 @@ module('Integration | Component | card-pay/amount-input', function (hooks) {
       .containsText('DAI.CPXD');
   });
 
-  test('it calls the onInputAmount callback on render with an empty string that is marked invalid', async function (assert) {
+  test('it calls the onInputAmount callback on render with an empty string that is marked invalid in the callback but not on the element', async function (assert) {
     assert.equal(enteredValue, '');
+    assert.notOk(valueIsValid);
+    assert.dom('input').doesNotHaveAria('invalid', 'true');
+  });
+
+  test('the element is marked invalid when a value is entered and then cleared', async function (assert) {
+    await fillIn('input', '50');
+    await fillIn('input', '');
     assert.notOk(valueIsValid);
     assert.dom('input').hasAria('invalid', 'true');
   });
@@ -119,6 +126,4 @@ module('Integration | Component | card-pay/amount-input', function (hooks) {
     assert.dom('input').doesNotHaveAria('invalid', 'true');
     assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
   });
-
-  // TODO don’t make empty look invalid, but do make it return invalid…?
 });

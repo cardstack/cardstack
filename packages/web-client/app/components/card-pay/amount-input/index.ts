@@ -17,10 +17,11 @@ interface CardPayAmountInputArgs {
 
 export default class CardPayAmountInput extends Component<CardPayAmountInputArgs> {
   @tracked amount: string = '';
+  @tracked isDirty = false;
 
   constructor(owner: unknown, args: CardPayAmountInputArgs) {
     super(owner, args);
-    this.onInputAmount('');
+    this.setAmount('');
   }
 
   get tokenDetails(): TokenDisplayInfo | undefined {
@@ -50,6 +51,10 @@ export default class CardPayAmountInput extends Component<CardPayAmountInputArgs
 
   get isInvalid() {
     return !this.isValidNumber || !!this.errorMessage;
+  }
+
+  get elementIsInvalid() {
+    return this.isDirty && this.isInvalid;
   }
 
   get errorMessage() {
@@ -84,6 +89,11 @@ export default class CardPayAmountInput extends Component<CardPayAmountInputArgs
   }
 
   @action onInputAmount(amount: string) {
+    this.isDirty = true;
+    this.setAmount(amount);
+  }
+
+  setAmount(amount: string) {
     if (!isNaN(+amount)) {
       this.amount = amount.trim();
     } else {
