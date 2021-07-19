@@ -187,5 +187,9 @@ jobs:
       - name: Deploy preview
         run: yarn deploy:boxel
         env:
+          S3_PREVIEW_INDEX_BUCKET_NAME: boxel-preview.cardstack.com
+          S3_PREVIEW_ASSET_BUCKET_NAME: boxel-preview-assets.cardstack.com
+          S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com/boxel-preview-assets.cardstack.com
+          S3_PREVIEW_REGION: us-east-1
           PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_KEY }}
           PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_SECRET }}
