@@ -10,6 +10,7 @@ import { task } from 'ember-concurrency-decorators';
 
 import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
 import {
+  BridgeableSymbol,
   ConvertibleSymbol,
   ConversionFunction,
   TokenContractInfo,
@@ -26,14 +27,15 @@ import {
 import {
   networkIds,
   getConstantByNetwork,
-  DepotSafe,
-  IExchangeRate,
-  ISafes,
   getSDK,
+  BridgeValidationResult,
+  DepotSafe,
+  Safe,
+  IExchangeRate,
+  IHubAuth,
+  ISafes,
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
-import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
-import { IHubAuth } from '../../../../cardpay-sdk/sdk/hub-auth';
 import config from '../../config/environment';
 import { networkDisplayInfo } from './network-display-info';
 
@@ -246,6 +248,33 @@ export default abstract class Layer2ChainWeb3Strategy
       receiver,
       fromBlock.toString()
     );
+  }
+
+  async bridgeToLayer1(
+    safeAddress: string,
+    tokenSymbol: BridgeableSymbol,
+    amountInWei: string
+  ): Promise<TransactionHash> {
+    let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
+    let tokenAddress = new TokenContractInfo(tokenSymbol, this.networkSymbol)!
+      .address;
+    let receiverAddress = this.walletInfo.firstAddress!;
+
+    let result = await tokenBridge.relayTokens(
+      safeAddress,
+      tokenAddress,
+      receiverAddress,
+      amountInWei
+    );
+    return result.ethereumTx.txHash;
+  }
+
+  async awaitBridgedToLayer1(
+    fromBlock: BN,
+    txnHash: TransactionHash
+  ): Promise<BridgeValidationResult> {
+    let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
+    return tokenBridge.waitForBridgingValidation(fromBlock.toString(), txnHash);
   }
 
   @task *fetchDepotTask(): any {

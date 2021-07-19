@@ -5,6 +5,7 @@ import { task } from 'ember-concurrency-decorators';
 import {
   Layer2ChainEvent,
   Layer2Web3Strategy,
+  TransactionHash,
 } from '../utils/web3-strategies/types';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
 import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
@@ -14,6 +15,7 @@ import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import {
+  BridgeableSymbol,
   ConvertibleSymbol,
   ConversionFunction,
 } from '@cardstack/web-client/utils/token';
@@ -117,6 +119,18 @@ export default class Layer2Network
 
   async refreshBalances() {
     return this.strategy.refreshBalances();
+  }
+
+  async bridgeToLayer1(
+    safeAddress: string,
+    tokenSymbol: BridgeableSymbol,
+    amount: string
+  ): Promise<TransactionHash> {
+    return this.strategy.bridgeToLayer1(safeAddress, tokenSymbol, amount);
+  }
+
+  async awaitBridgedToLayer1(fromBlock: BN, transactionHash: TransactionHash) {
+    return this.strategy.awaitBridgedToLayer1(fromBlock, transactionHash);
   }
 }
 

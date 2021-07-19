@@ -155,12 +155,6 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     return this.bridgingDeferred.promise as Promise<TransactionReceipt>;
   }
 
-  test__simulateBridged(txnHash: TransactionHash) {
-    this.bridgingDeferred.resolve({
-      transactionHash: txnHash,
-    } as TransactionReceipt);
-  }
-
   get waitForAccount() {
     return this.waitForAccountDeferred.promise as Promise<void>;
   }

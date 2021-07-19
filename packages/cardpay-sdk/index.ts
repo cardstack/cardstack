@@ -1,6 +1,6 @@
 export { ITokenBridgeForeignSide } from './sdk/token-bridge-foreign-side';
-export { ITokenBridgeHomeSide } from './sdk/token-bridge-home-side';
-export { Safes as ISafes, DepotSafe, MerchantSafe, PrepaidCardSafe, ExternalSafe, TokenInfo } from './sdk/safes';
+export { ITokenBridgeHomeSide, BridgeValidationResult } from './sdk/token-bridge-home-side';
+export { Safes as ISafes, Safe, DepotSafe, MerchantSafe, PrepaidCardSafe, ExternalSafe, TokenInfo } from './sdk/safes';
 export { ExchangeRate as IExchangeRate } from './sdk/exchange-rate';
 export { IAssets } from './sdk/assets';
 export { IHubAuth } from './sdk/hub-auth';

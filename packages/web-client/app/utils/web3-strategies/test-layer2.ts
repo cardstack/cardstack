@@ -2,6 +2,7 @@ import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
 import { Layer2Web3Strategy, TransactionHash } from './types';
 import {
+  BridgeableSymbol,
   ConvertibleSymbol,
   ConversionFunction,
 } from '@cardstack/web-client/utils/token';
@@ -9,7 +10,7 @@ import RSVP, { defer } from 'rsvp';
 import BN from 'bn.js';
 import { fromWei, toWei } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
-import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { BridgeValidationResult, DepotSafe } from '@cardstack/cardpay-sdk';
 import {
   UnbindEventListener,
   SimpleEmitter,
@@ -21,7 +22,9 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   waitForAccountDeferred = defer();
-  bridgingDeferred!: RSVP.Deferred<TransactionReceipt>;
+  bridgingToLayer2Deferred!: RSVP.Deferred<TransactionReceipt>;
+  bridgingToLayer1HashDeferred!: RSVP.Deferred<TransactionHash>;
+  bridgingToLayer1Deferred!: RSVP.Deferred<BridgeValidationResult>;
   @tracked isFetchingDepot = false;
   @tracked defaultTokenBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
@@ -67,8 +70,26 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     _fromBlock: BN,
     _receiver: string
   ): Promise<TransactionReceipt> {
-    this.bridgingDeferred = defer<TransactionReceipt>();
-    return this.bridgingDeferred.promise as Promise<TransactionReceipt>;
+    this.bridgingToLayer2Deferred = defer<TransactionReceipt>();
+    return this.bridgingToLayer2Deferred.promise as Promise<TransactionReceipt>;
+  }
+
+  bridgeToLayer1(
+    _safeAddress: string,
+    _tokenSymbol: BridgeableSymbol,
+    _amountInWei: string
+  ): Promise<TransactionHash> {
+    this.bridgingToLayer1HashDeferred = defer<TransactionHash>();
+    this.bridgingToLayer1Deferred = defer<BridgeValidationResult>();
+    return this.bridgingToLayer1HashDeferred.promise;
+  }
+
+  awaitBridgedToLayer1(
+    fromBlock: BN,
+    txnHash: string
+  ): Promise<BridgeValidationResult> {
+    return this.bridgingToLayer1Deferred
+      .promise as Promise<BridgeValidationResult>;
   }
 
   async updateUsdConverters(symbolsToUpdate: ConvertibleSymbol[]) {
@@ -141,8 +162,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     }
   }
 
-  test__simulateBridged(txnHash: TransactionHash) {
-    this.bridgingDeferred.resolve({
+  test__simulateBridgedToLayer2(txnHash: TransactionHash) {
+    this.bridgingToLayer2Deferred.resolve({
       transactionHash: txnHash,
     } as TransactionReceipt);
   }
@@ -175,5 +196,13 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   test__simulateHubAuthentication(authToken: string) {
     return this.test__deferredHubAuthentication.resolve(authToken);
+  }
+
+  test__simulateBridgedToLayer1() {
+    this.bridgingToLayer1Deferred.resolve({
+      messageId: 'example-message-id',
+      encodedData: 'example-encoded-data',
+      signatures: ['example-sig'],
+    });
   }
 }
