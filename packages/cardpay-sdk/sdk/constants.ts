@@ -21,7 +21,7 @@ const SOKOL = {
   nativeTokenName: 'SPOA',
   name: 'Sokol',
   // this needs to be an "archive" node
-  rpcNode: 'https://sokol.stack.cards',
+  rpcNode: 'https://sokol-archive.blockscout.com',
   rpcWssNode: 'wss://sokol.poa.network/wss',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
   subgraphURL: 'https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
