@@ -1,29 +1,29 @@
 {{#if @isOpen}}
   {{set-body-class "has-modal"}}
   {{on-key "Escape" @onClose event="keydown"}}
-<div
-  style={{css-var
-    boxel-modal-z-index=(if (eq @layer "urgent" ) "var(--boxel-layer-modal-urgent)" "var(--boxel-layer-modal-default)")
-  }}
->
-  <button
-    type="button"
-    {{on "click" @onClose}}
-    class="boxel-modal-overlay {{@overlayClass}}"
-    tabindex="-1"
+  <div
+    style={{css-var
+      boxel-modal-z-index=(if (eq @layer "urgent" ) "var(--boxel-layer-modal-urgent)" "var(--boxel-layer-modal-default)")
+    }}
   >
-    <span class="boxel-sr-only">Close modal</span>
-  </button>
+    <button
+      type="button"
+      {{on "click" @onClose}}
+      class="boxel-modal-overlay {{@overlayClass}}"
+      tabindex="-1"
+    >
+      <span class="boxel-sr-only">Close modal</span>
+    </button>
 
-  <dialog
-    class="boxel-modal"
-    open={{@isOpen}}
-    aria-modal="true"
-    ...attributes
-  >
-    <div class="boxel-modal__inner">
-      {{yield}}
-    </div>
-  </dialog>
-</div>
+    <dialog
+      class="boxel-modal"
+      open={{@isOpen}}
+      aria-modal="true"
+      ...attributes
+    >
+      <div class="boxel-modal__inner">
+        {{yield}}
+      </div>
+    </dialog>
+  </div>
 {{/if}}
