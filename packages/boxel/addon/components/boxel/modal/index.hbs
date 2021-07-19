@@ -1,7 +1,11 @@
 {{#if @isOpen}}
   {{set-body-class "has-modal"}}
   {{on-key "Escape" @onClose event="keydown"}}
-
+<div
+  style={{css-var
+    boxel-modal-z-index=(if (eq @layer "urgent" ) "var(--boxel-layer-modal-urgent)" "var(--boxel-layer-modal-default)")
+  }}
+>
   <button
     type="button"
     {{on "click" @onClose}}
@@ -21,4 +25,5 @@
       {{yield}}
     </div>
   </dialog>
+</div>
 {{/if}}

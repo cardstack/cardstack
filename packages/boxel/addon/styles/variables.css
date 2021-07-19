@@ -119,6 +119,10 @@
 
   /* Fix: Other colors used in app, potentially not in color palette: */
 
+  /* z-index layers */
+  --boxel-layer-modal-default: 15;
+  --boxel-layer-modal-urgent: 20;
+
   /*
     #A5A5A5
     #C1C1D0

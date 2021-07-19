@@ -39,6 +39,15 @@
     @onInput={{fn (mut this.isOpen)}}
     @required={{true}}
   />
+  <Args.String
+    @name="layer"
+    @description="Which of Boxel's z-index layers should be used for this modal"
+    @value={{this.layer}}
+    @defaultValue={{"default"}}
+    @options={{array "default" "urgent"}}
+    @onInput={{fn (mut this.layer)}}
+    @optional={{true}}
+  />
   <Args.Action
     @name="onClose"
     @description="Callback when the modal's background overlay is clicked or the escape key is pressed"
@@ -47,4 +56,40 @@
   />
   <Args.Yield @description="The content of the modal. This visually sits directly on the overlay - there is no 'container' rendered by default." />
 </:api>
+</Freestyle::Usage>
+
+
+<Freestyle::Usage
+  @description="Modals have two different layers, urgent and default"
+>
+<:example>
+<Boxel::Button @kind="primary" {{on "click" this.openDefault}}>Open</Boxel::Button>
+<Boxel::Modal
+  @onClose={{this.closeDefault}}
+  @isOpen={{this.isDefaultOpen}}
+>
+  <Boxel::CardContainer class="boxel-modal-usage-container">
+    <h2>Boxel Modal Default Layer</h2>
+    <p>
+      This modal is on the default layer. It should be below the modal on the urgent layer.
+    </p>
+
+    <Boxel::Button {{on "click" this.openUrgent}}>Open an urgent modal</Boxel::Button>
+    <Boxel::Button {{on "click" this.closeDefault}}>Close this</Boxel::Button>
+  </Boxel::CardContainer>
+</Boxel::Modal>
+<Boxel::Modal
+  @onClose={{this.closeUrgent}}
+  @isOpen={{this.isUrgentOpen}}
+>
+  <Boxel::CardContainer class="boxel-modal-usage-container">
+    <h2>Boxel Modal Urgent Layer</h2>
+    <p>
+      This modal is on the urgent layer. It should be above the default layer modal.
+    </p>
+
+    <Boxel::Button {{on "click" this.closeUrgent}}>Close this</Boxel::Button>
+  </Boxel::CardContainer>
+</Boxel::Modal>
+</:example>
 </Freestyle::Usage>
