@@ -57,12 +57,17 @@ module.exports = function (deployTarget) {
     ENV.cloudfront.distribution = 'E330O30QIWNDYA';
   }
 
-  // if (deployTarget === 'production') {
-  //   ENV.build.environment = 'production';
-  //   ENV.s3Assets.bucket = ENV.s3Pages.bucket = 'web-client-prod';
-  //   ENV.s3Assets.region = ENV.s3Pages.region = 'us-east-1';
-  //   ENV.cloudfront.distribution = 'TBD';
-  // }
+  if (deployTarget === 'production') {
+    ENV.build.environment = 'production';
+    ENV.s3Assets.bucket = ENV.s3Pages.bucket = 'app-assets-cardstack';
+    ENV.cloudfront.region = ENV.s3Assets.region = ENV.s3Pages.region =
+      'us-east-1';
+    ENV.cloudfront.accessKeyId = ENV.s3Assets.accessKeyId = ENV.s3Pages.accessKeyId =
+      process.env.EMBER_DEPLOY_AWS_ACCESS_KEY;
+    ENV.cloudfront.secretAccessKey = ENV.s3Assets.secretAccessKey = ENV.s3Pages.secretAccessKey =
+      process.env.EMBER_DEPLOY_AWS_ACCESS_SECRET;
+    ENV.cloudfront.distribution = 'E3VPNGI7F1WEW8';
+  }
 
   // Note: if you need to build some configuration asynchronously, you can return
   // a promise that resolves with the ENV object instead of returning the
