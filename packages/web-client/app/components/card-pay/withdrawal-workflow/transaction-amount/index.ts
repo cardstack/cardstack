@@ -12,11 +12,16 @@ import {
   getUnbridgedSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import {
+  shouldUseTokenInput,
+  validateTokenInput,
+} from '@cardstack/web-client/utils/validation';
 
 class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @tracked amount = '';
   @tracked amountIsValid = false;
   @tracked isAmountSet = false;
+  @tracked errorMessage = '';
   @service declare layer2Network: Layer2Network;
 
   // assumption is this is always set by cards before it. It should be defined by the time
@@ -56,7 +61,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   }
 
   get setAmountCtaDisabled() {
-    return !this.amountIsValid;
+    return this.isInvalid;
   }
 
   get amountAsBigNumber(): BN {
@@ -65,11 +70,6 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
     } else {
       return toBN(0);
     }
-  }
-
-  @action onInputAmount(str: string, isValid: boolean) {
-    this.amount = str;
-    this.amountIsValid = isValid;
   }
 
   @action toggleAmountSet() {
@@ -84,6 +84,30 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       this.args.onComplete?.();
       this.isAmountSet = true;
     }
+  }
+
+  @action
+  onInputAmount(amount: string) {
+    let trimmed = amount.trim();
+    if (shouldUseTokenInput(trimmed)) {
+      this.amount = trimmed;
+    } else {
+      // eslint-disable-next-line no-self-assign
+      this.amount = this.amount;
+    }
+
+    this.validate();
+  }
+
+  get isInvalid() {
+    return this.errorMessage !== '';
+  }
+
+  validate() {
+    this.errorMessage = validateTokenInput(this.amount, {
+      min: toBN(0),
+      max: this.currentTokenBalance,
+    });
   }
 }
 
