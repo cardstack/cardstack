@@ -29,13 +29,9 @@
           </Boxel::Button>
         {{/if}}
         {{#if (eq progressStep.index 1)}}
-          {{#if progressStep.completed}}
-            <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" data-test-bridge-explorer-button>
-              View in Bridge Explorer
-            </Boxel::Button>
-          {{else}}
-            Processing...
-          {{/if}}
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" data-test-bridge-explorer-button>
+            View in Bridge Explorer
+          </Boxel::Button>
         {{/if}}
       </span>
     </Boxel::ProgressSteps>

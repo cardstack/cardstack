@@ -4,9 +4,11 @@ import { render, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 
 import sinon from 'sinon';
+import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
+
+let layer2Service: Layer2TestWeb3Strategy;
 
 module(
   'Integration | Component | card-pay/withdrawal-workflow/transaction-status',
@@ -18,10 +20,8 @@ module(
     hooks.beforeEach(async function () {
       let workflowSession = new WorkflowSession();
       workflowSession.updateMany({
-        layer1BlockHeightBeforeBridging: 1234,
-        relayTokensTxnReceipt: {
-          transactionHash: 'relay',
-        },
+        layer2BlockHeightBeforeBridging: 1234,
+        relayTokensTxnHash: 'relay',
         withdrawalToken: 'CARD.CPXD',
       });
 
@@ -32,6 +32,11 @@ module(
         frozen: false,
         workflowSession,
       });
+
+      layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
+
+      layer2Service.bridgeToLayer1('0xbridged', 'DAI', '20');
 
       await render(hbs`
         <CardPay::WithdrawalWorkflow::TransactionStatus
@@ -59,22 +64,17 @@ module(
         .containsText(
           `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.fullName}`
         );
-      assert.dom(`[data-test-bridge-explorer-button]`).doesNotExist();
+      assert
+        .dom(`[data-test-bridge-explorer-button]`)
+        .hasAttribute('href', /relay$/);
     });
 
     test('It completes when the bridged transaction completes', async function (assert) {
       assert.ok(onComplete.notCalled);
 
-      let layer1Service = this.owner.lookup('service:layer1-network')
-        .strategy as Layer1TestWeb3Strategy;
-
-      layer1Service.test__simulateBridged('0xbridged');
+      layer2Service.test__simulateBridgedToLayer1();
 
       await settled();
-
-      assert
-        .dom('[data-test-action-card-title-icon-name="success-bordered"]')
-        .exists();
 
       assert
         .dom(`[data-test-token-bridge-step="1"][data-test-completed]`)
@@ -82,6 +82,10 @@ module(
       assert
         .dom(`[data-test-bridge-explorer-button]`)
         .hasAttribute('href', /relay$/);
+
+      assert
+        .dom('[data-test-action-card-title-icon-name="success-bordered"]')
+        .exists();
 
       assert.ok(onComplete.called);
     });
