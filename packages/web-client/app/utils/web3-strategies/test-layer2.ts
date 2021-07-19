@@ -63,7 +63,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  awaitBridged(_fromBlock: BN, _receiver: string): Promise<TransactionReceipt> {
+  awaitBridgedToLayer2(
+    _fromBlock: BN,
+    _receiver: string
+  ): Promise<TransactionReceipt> {
     this.bridgingDeferred = defer<TransactionReceipt>();
     return this.bridgingDeferred.promise as Promise<TransactionReceipt>;
   }

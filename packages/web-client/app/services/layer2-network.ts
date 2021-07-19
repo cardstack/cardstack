@@ -104,8 +104,11 @@ export default class Layer2Network
     return this.strategy.getBlockHeight();
   }
 
-  async awaitBridged(fromBlock: BN) {
-    return this.strategy.awaitBridged(fromBlock, this.walletInfo.firstAddress!);
+  async awaitBridgedToLayer2(fromBlock: BN) {
+    return this.strategy.awaitBridgedToLayer2(
+      fromBlock,
+      this.walletInfo.firstAddress!
+    );
   }
 
   blockExplorerUrl(txnHash: string | undefined): string | undefined {

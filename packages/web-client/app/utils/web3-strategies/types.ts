@@ -60,7 +60,7 @@ export interface Layer2Web3Strategy
   ): Promise<Record<ConvertibleSymbol, ConversionFunction>>;
   blockExplorerUrl(txnHash: TransactionHash): string;
   getBlockHeight(): Promise<BN>;
-  awaitBridged(
+  awaitBridgedToLayer2(
     fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt>;

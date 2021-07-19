@@ -237,7 +237,7 @@ export default abstract class Layer2ChainWeb3Strategy
     return this.waitForAccountDeferred.promise;
   }
 
-  async awaitBridged(
+  async awaitBridgedToLayer2(
     fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt> {
