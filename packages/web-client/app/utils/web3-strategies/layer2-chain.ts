@@ -50,7 +50,7 @@ export default abstract class Layer2ChainWeb3Strategy
   simpleEmitter = new SimpleEmitter();
   defaultTokenSymbol: ConvertibleSymbol = 'DAI';
   defaultTokenContractAddress?: string;
-  web3: Web3 = new Web3();
+  web3!: Web3;
   #exchangeRateApi!: IExchangeRate;
   #safesApi!: ISafes;
   #hubAuthApi!: IHubAuth;
@@ -82,6 +82,7 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   async initialize() {
+    this.web3 = new Web3();
     this.provider = new WalletConnectProvider({
       chainId: this.chainId,
       rpc: {
