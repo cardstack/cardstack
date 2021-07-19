@@ -99,7 +99,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
       defaultToken: SLIGHTLY_LESS_THAN_MAX_VALUE,
-      card: toBN('500000000000000000000'),
+      card: toBN('250000000000000000000'),
     });
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     let testDepot = {
@@ -112,7 +112,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
           },
         },
         {
-          balance: '500000000000000000000',
+          balance: '250000000000000000000',
           token: {
             symbol: 'CARD',
           },
@@ -269,10 +269,10 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom('[data-test-balance-view-token-amount]')
       .containsText(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER.toFixed(2)} DAI`);
     assert.dom('[data-test-face-value-display]').doesNotExist();
-    assert.dom('[data-test-face-value-option]').exists({ count: 4 });
+    assert.dom('[data-test-face-value-option]').exists({ count: 6 });
     assert.dom('[data-test-face-value-option-checked]').doesNotExist();
-    assert.dom('[data-test-face-value-option="50000"] input').isNotDisabled();
-    assert.dom('[data-test-face-value-option="100000"] input').isDisabled();
+    assert.dom('[data-test-face-value-option="10000"] input').isNotDisabled();
+    assert.dom('[data-test-face-value-option="50000"] input').isDisabled();
     assert
       .dom('[data-test-face-value-option="50000"]')
       .containsText('50000 SPEND');
