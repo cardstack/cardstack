@@ -77,8 +77,6 @@ export default abstract class Layer2ChainWeb3Strategy
       networkSymbol
     );
     this.defaultTokenContractAddress = defaultTokenContractInfo.address;
-
-    this.initialize();
   }
 
   async initialize() {

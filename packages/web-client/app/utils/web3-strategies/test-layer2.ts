@@ -40,6 +40,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   // this is only a mock property
   @tracked balancesRefreshed = false;
 
+  async initialize() {}
+
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([]);
     this.simpleEmitter.emit('disconnect');

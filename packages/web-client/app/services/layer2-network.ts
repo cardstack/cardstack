@@ -42,7 +42,7 @@ export default class Layer2Network
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
   @reads('strategy.depotSafe') depotSafe: DepotSafe | undefined;
-  @reads('strategy.isFetchingDepot') isFetchingDepot: boolean;
+  @reads('strategy.isFetchingDepot') declare isFetchingDepot: boolean;
 
   constructor(props: object | undefined) {
     super(props);
@@ -59,6 +59,7 @@ export default class Layer2Network
     }
 
     this.strategy.on('disconnect', this.onDisconnect);
+    this.strategy.initialize();
   }
 
   async updateUsdConverters(
