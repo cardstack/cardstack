@@ -22,6 +22,7 @@ export type Layer2ChainEvent =
 export interface Web3Strategy {
   isConnected: boolean;
   disconnect(): Promise<void>;
+  bridgeExplorerUrl(txnHash: TransactionHash): string;
 }
 
 export interface Layer1Web3Strategy
@@ -42,7 +43,6 @@ export interface Layer1Web3Strategy
     amountInWei: BN
   ): Promise<TransactionReceipt>;
   blockExplorerUrl(txnHash: TransactionHash): string;
-  bridgeExplorerUrl(txnHash: TransactionHash): string;
   awaitBridged(
     fromBlock: BN,
     receiver: ChainAddress

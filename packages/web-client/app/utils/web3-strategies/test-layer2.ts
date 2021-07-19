@@ -110,6 +110,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
   }
 
+  bridgeExplorerUrl(txnHash: TransactionHash): string {
+    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
+  }
+
   get isConnected() {
     return this.walletInfo.accounts.length > 0;
   }

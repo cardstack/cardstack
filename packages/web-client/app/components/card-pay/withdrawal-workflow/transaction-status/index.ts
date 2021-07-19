@@ -57,7 +57,7 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
   }
 
   get bridgeExplorerUrl() {
-    return this.layer1Network.bridgeExplorerUrl(
+    return this.layer2Network.bridgeExplorerUrl(
       this.args.workflowSession.state.relayTokensTxnHash
     );
   }

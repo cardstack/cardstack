@@ -80,6 +80,10 @@ export default class Layer2Network
     return this.strategy.authenticate();
   }
 
+  bridgeExplorerUrl(txnHash: string) {
+    return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
+  }
+
   @task *issuePrepaidCard(faceValue: number, customizationDid: string): any {
     let address = yield this.strategy.issuePrepaidCard(
       this.depotSafe?.address!,

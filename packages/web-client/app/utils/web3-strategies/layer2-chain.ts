@@ -332,7 +332,15 @@ export default abstract class Layer2ChainWeb3Strategy
   async disconnect(): Promise<void> {
     await this.provider?.disconnect();
   }
+
   on(event: Layer2ChainEvent, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);
+  }
+
+  bridgeExplorerUrl(txnHash: TransactionHash): string {
+    return `${getConstantByNetwork(
+      'bridgeExplorer',
+      this.networkSymbol
+    )}/${txnHash}`;
   }
 }
