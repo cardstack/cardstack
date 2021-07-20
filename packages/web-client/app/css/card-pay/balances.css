@@ -1,3 +1,51 @@
+.card-pay-dashboard__container {
+  display: flex;
+  justify-content: center;
+}
+
+.card-pay-dashboard__balances {
+  padding: var(--boxel-sp-xxl) var(--boxel-sp-xl);
+}
+
+.card-pay-dashboard__balances-title {
+  margin-bottom: var(--boxel-sp-xxl);
+  font-weight: normal;
+}
+
+.card-pay-dashboard__balances-section {
+  max-width: 72rem;
+  border-top: 1px solid #5f5d71;
+  padding-top: var(--boxel-sp);
+}
+
+.card-pay-dashboard__balances-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-pay-dashboard__balances-section-header-button-icon {
+  margin-left: var(--boxel-sp-xs);
+
+  --icon-color: var(--boxel-cyan);
+}
+
+.card-pay-dashboard__balances-section-title {
+  font-weight: normal;
+}
+
+.card-pay-dashboard__balances-count {
+  padding-left: var(--boxel-sp-xxs);
+  color: var(--boxel-cyan);
+}
+
+.card-pay-dashboard__balances-cards {
+  display: grid;
+  gap: var(--boxel-sp);
+  grid-template-columns: repeat(auto-fill, 22.75rem);
+  margin-top: var(--boxel-sp);
+}
+
 .card-pay-dashboard__section {
   padding: var(--boxel-sp-xxl) var(--boxel-sp-xl);
 }

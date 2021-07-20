@@ -97,6 +97,7 @@ module.exports = function (environment) {
     ENV.hubURL = '';
     ENV['ember-cli-mirage'] = {
       enabled: true,
+      trackRequests: true,
     };
   }
 
