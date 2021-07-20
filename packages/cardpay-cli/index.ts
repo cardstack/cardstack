@@ -61,7 +61,7 @@ interface Options {
   tokenAddress?: string;
   amount?: string;
   spendAmount?: number;
-  fromBlock?: number;
+  fromBlock?: string;
   address?: string;
   token?: string;
   safeAddress?: string;
@@ -128,7 +128,7 @@ let {
     'Wait for token bridging from L1 to L2 to complete',
     (yargs) => {
       yargs.positional('fromBlock', {
-        type: 'number',
+        type: 'string',
         description: 'Layer 2 block height before bridging was initiated',
       });
       yargs.positional('recipient', {
@@ -166,7 +166,7 @@ let {
     'Wait for token bridging from L2 to L1 to complete validation.',
     (yargs) => {
       yargs.positional('fromBlock', {
-        type: 'number',
+        type: 'string',
         description: 'Layer 2 block height before bridging was initiated',
       });
       yargs.positional('txnHash', {

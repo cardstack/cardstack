@@ -29,7 +29,7 @@ export async function bridgeToLayer1(
 
 export async function awaitBridgedToLayer1(
   network: string,
-  fromBlock: number,
+  fromBlock: string,
   txnHash: string,
   mnemonic?: string
 ): Promise<void> {
@@ -98,7 +98,7 @@ export async function bridgeToLayer2(
 
 export async function awaitBridgedToLayer2(
   network: string,
-  fromBlock: number,
+  fromBlock: string,
   recipient: string | undefined,
   mnemonic?: string
 ): Promise<void> {
@@ -109,6 +109,6 @@ export async function awaitBridgedToLayer2(
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(`Waiting for bridging to complete for depot owner ${recipient} from block ${fromBlock}...`);
-  let result = await tokenBridge.waitForBridgingToLayer2Completed(recipient, String(fromBlock));
+  let result = await tokenBridge.waitForBridgingToLayer2Completed(recipient, fromBlock);
   console.log(`Bridging transaction hash: ${blockExplorer}/tx/${result.transactionHash}`);
 }

@@ -270,7 +270,8 @@ module('Acceptance | withdrawal', function (hooks) {
     await click(
       `${post} [data-test-withdrawal-transaction-approval] [data-test-boxel-button]`
     );
-    // TODO: simulate approval
+    layer2Service.bridgingToLayer1HashDeferred.resolve('abc123');
+    await waitFor('[data-test-withdrawal-transaction-approval-is-complete]');
     assert
       .dom('[data-test-withdrawal-transaction-approval-is-complete]')
       .exists();
@@ -291,13 +292,15 @@ module('Acceptance | withdrawal', function (hooks) {
 
     // // transaction-status step card
 
+    await waitFor(epiloguePostableSel(1));
     assert
       .dom(epiloguePostableSel(1))
       .containsText(`Bridging tokens to ${c.layer1.fullName}`);
 
-    layer1Service.test__simulateBridged(
+    layer2Service.test__simulateBridgedToLayer1(
       '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
     );
+
     await settled();
 
     // // transaction-summary card

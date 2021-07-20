@@ -294,7 +294,7 @@ module('Acceptance | deposit', function (hooks) {
     // bridging should also refresh layer 2 balances so we want to ensure that here
     layer2Service.balancesRefreshed = false;
 
-    layer2Service.test__simulateBridged(
+    layer2Service.test__simulateBridgedToLayer2(
       '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
     );
 

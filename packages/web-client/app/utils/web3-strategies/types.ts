@@ -5,8 +5,10 @@ import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import {
   ConvertibleSymbol,
   ConversionFunction,
+  BridgeableSymbol,
 } from '@cardstack/web-client/utils/token';
 import { Emitter } from '../events';
+import { BridgeValidationResult } from '@cardstack/cardpay-sdk/sdk/token-bridge-home-side';
 
 export type Layer1ChainEvent =
   | 'disconnect'
@@ -20,6 +22,7 @@ export type Layer2ChainEvent =
 export interface Web3Strategy {
   isConnected: boolean;
   disconnect(): Promise<void>;
+  bridgeExplorerUrl(txnHash: TransactionHash): string;
 }
 
 export interface Layer1Web3Strategy
@@ -40,7 +43,6 @@ export interface Layer1Web3Strategy
     amountInWei: BN
   ): Promise<TransactionReceipt>;
   blockExplorerUrl(txnHash: TransactionHash): string;
-  bridgeExplorerUrl(txnHash: TransactionHash): string;
   awaitBridged(
     fromBlock: BN,
     receiver: ChainAddress
@@ -60,10 +62,19 @@ export interface Layer2Web3Strategy
   ): Promise<Record<ConvertibleSymbol, ConversionFunction>>;
   blockExplorerUrl(txnHash: TransactionHash): string;
   getBlockHeight(): Promise<BN>;
-  awaitBridged(
+  awaitBridgedToLayer2(
     fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt>;
+  bridgeToLayer1(
+    safeAddress: string,
+    tokenSymbol: BridgeableSymbol,
+    amountInWei: string
+  ): Promise<TransactionHash>;
+  awaitBridgedToLayer1(
+    fromBlock: BN,
+    txnHash: TransactionHash
+  ): Promise<BridgeValidationResult>;
   authenticate(): Promise<string>;
   issuePrepaidCard(
     safeAddress: string,

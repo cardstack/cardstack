@@ -14,6 +14,7 @@ const SOKOL = {
   /** deployed instance of this contract: https://github.com/wbobeirne/eth-balance-checker */
   balanceCheckerContractAddress: '0xaeDFe60b0732924249866E3FeC71835EFb1fc9fF',
   blockExplorer: 'https://blockscout.com/poa/sokol',
+  bridgeExplorer: 'https://alm-test-amb.herokuapp.com/77',
   faucetUrl: 'https://faucet.poa.network',
   nativeTokenAddress: 'spoa',
   nativeTokenCoingeckoId: 'ethereum',
@@ -59,6 +60,7 @@ const XDAI = {
   /** deployed instance of this contract: https://github.com/wbobeirne/eth-balance-checker */
   balanceCheckerContractAddress: '0x6B78C121bBd10D8ef0dd3623CC1abB077b186F65',
   blockExplorer: 'https://blockscout.com/xdai/mainnet',
+  bridgeExplorer: 'https://alm-xdai.herokuapp.com',
   nativeTokenAddress: 'dai',
   nativeTokenCoingeckoId: 'dai',
   nativeTokenSymbol: 'DAI',

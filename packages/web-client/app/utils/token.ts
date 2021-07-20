@@ -48,8 +48,10 @@ export function getUnbridgedSymbol(
 ): BridgeableSymbol {
   if (bridgedSymbol === 'DAI.CPXD') {
     return 'DAI';
-  } else {
+  } else if (bridgedSymbol === 'CARD.CPXD') {
     return 'CARD';
+  } else {
+    throw new Error(`Unknown bridgedSymbol ${bridgedSymbol}`);
   }
 }
 

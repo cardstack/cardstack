@@ -19,6 +19,12 @@ export interface ITokenBridgeHomeSide {
   waitForBridgingToLayer2Completed(recipientAddress: string, fromBlock: string): Promise<TransactionReceipt>;
 }
 
+export interface BridgeValidationResult {
+  messageId: string;
+  encodedData: string;
+  signatures: string[];
+}
+
 const POLL_INTERVAL = 1000;
 const TIMEOUT = 1000 * 60 * 5;
 const bridgedTokensQuery = `
@@ -107,10 +113,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     return result;
   }
 
-  async waitForBridgingValidation(
-    fromBlock: number,
-    bridgingTxnHash: string
-  ): Promise<{ messageId: string; encodedData: string; signatures: string[] }> {
+  async waitForBridgingValidation(fromBlock: string, bridgingTxnHash: string): Promise<BridgeValidationResult> {
     let signatureEvents: EventData[] | undefined;
     let homeAmb = new this.layer2Web3.eth.Contract(
       HomeAMBABI as AbiItem[],

@@ -6,7 +6,10 @@ import { reads } from 'macro-decorators';
 import { toBN } from 'web3-utils';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import {
+  bridgedSymbols,
+  BridgedTokenSymbol,
   ConvertibleSymbol,
+  getUnbridgedSymbol,
   TokenDisplayInfo,
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
@@ -68,26 +71,35 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
     }
   }
 
-  @action save() {
+  @action async save() {
     if (this.isDisabled) {
       return;
     }
-    // TODO: Need to get confirm action result from Card Wallet
-    this.isConfirmed = true; // mock result
+    this.isConfirmed = true;
+    let { tokenSymbol } = this;
+    assertBridgedTokenSymbol(tokenSymbol);
+    let transactionHash = await this.layer2Network.bridgeToLayer1(
+      this.depotAddress!,
+      getUnbridgedSymbol(tokenSymbol),
+      this.withdrawalAmount.toString()
+    );
+    let layer2BlockHeight = await this.layer2Network.getBlockHeight();
 
     this.args.workflowSession.updateMany({
-      layer1BlockHeightBeforeBridging: 1234,
-      relayTokensTxnReceipt: {
-        transactionHash: 'TODO',
-      },
+      layer2BlockHeightBeforeBridging: layer2BlockHeight,
+      relayTokensTxnHash: transactionHash,
     });
 
-    if (this.isConfirmed) {
-      this.args.onComplete?.();
-    } else {
-      this.args.onIncomplete?.();
-    }
+    this.args.onComplete?.();
   }
 }
 
 export default CardPayWithdrawalWorkflowChooseBalanceComponent;
+
+function assertBridgedTokenSymbol(
+  token: TokenSymbol
+): asserts token is BridgedTokenSymbol {
+  if (!bridgedSymbols.includes(token as BridgedTokenSymbol)) {
+    throw new Error(`${token} is not a bridged token`);
+  }
+}
