@@ -32,6 +32,7 @@ jobs:
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.PRODUCTION_WAYPOINT_AWS_SECRET }}" >> $GITHUB_ENV
             echo "WAYPOINT_SERVER_TOKEN=${{ secrets.PRODUCTION_WAYPOINT_SERVER_TOKEN }}" >> $GITHUB_ENV
             echo "WAYPOINT_SERVER_ADDR=${{ secrets.PRODUCTION_WAYPOINT_SERVER_ADDR }}" >> $GITHUB_ENV
+            cp waypoint.prod.hcl waypoint.hcl
           elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
             echo "AWS_ACCESS_KEY_ID=${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}" >> $GITHUB_ENV
