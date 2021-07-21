@@ -14,9 +14,15 @@ import {
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import {
+  shouldUseTokenInput,
+  validateTokenInput,
+} from '@cardstack/web-client/utils/validation';
 
 class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @tracked amount = '';
+  @tracked validationErrorMessage = '';
+
   @tracked isUnlocked = false;
   @tracked isUnlocking = false;
   @tracked unlockTxnReceipt: TransactionReceipt | undefined;
@@ -62,7 +68,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     }
   }
   get unlockCtaDisabled() {
-    return !this.isUnlocked && !this.isValidAmount;
+    return !this.isUnlocked && (this.isInvalid || this.amount === '');
   }
 
   get depositCtaState() {
@@ -79,19 +85,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   }
 
   get amountAsBigNumber(): BN {
-    const regex = /^\d*(\.\d{0,18})?$/gm;
-    if (!this.amount || !regex.test(this.amount)) {
+    if (this.isInvalid || this.amount === '') {
       return toBN(0);
+    } else {
+      return toBN(toWei(this.amount));
     }
-    return toBN(toWei(this.amount));
-  }
-
-  get isValidAmount() {
-    if (!this.amount) return false;
-    return (
-      !this.amountAsBigNumber.lte(toBN(0)) &&
-      this.amountAsBigNumber.lte(this.currentTokenBalance)
-    );
   }
 
   get unlockTxnViewerUrl() {
@@ -112,12 +110,27 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     return this.isUnlocking || this.isUnlocked;
   }
 
-  @action onInputAmount(str: string) {
-    if (!isNaN(+str)) {
-      this.amount = str.trim();
+  @action onInputAmount(amount: string) {
+    let trimmed = amount.trim();
+    if (shouldUseTokenInput(trimmed)) {
+      this.amount = trimmed;
     } else {
-      this.amount = this.amount; // eslint-disable-line no-self-assign
+      // eslint-disable-next-line no-self-assign
+      this.amount = this.amount;
     }
+
+    this.validate();
+  }
+
+  get isInvalid() {
+    return this.validationErrorMessage !== '';
+  }
+
+  validate() {
+    this.validationErrorMessage = validateTokenInput(this.amount, {
+      min: toBN(0),
+      max: this.currentTokenBalance,
+    });
   }
 
   @action async unlock() {

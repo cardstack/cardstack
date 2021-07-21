@@ -12,10 +12,16 @@ import {
   getUnbridgedSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import {
+  shouldUseTokenInput,
+  validateTokenInput,
+} from '@cardstack/web-client/utils/validation';
 
 class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @tracked amount = '';
+  @tracked amountIsValid = false;
   @tracked isAmountSet = false;
+  @tracked errorMessage = '';
   @service declare layer2Network: Layer2Network;
 
   // assumption is this is always set by cards before it. It should be defined by the time
@@ -55,30 +61,14 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   }
 
   get setAmountCtaDisabled() {
-    return !this.isAmountSet && !this.isValidAmount;
+    return this.isInvalid || this.amount === '';
   }
 
   get amountAsBigNumber(): BN {
-    const regex = /^\d*(\.\d{0,18})?$/gm;
-    if (!this.amount || !regex.test(this.amount)) {
+    if (this.isInvalid || this.amount === '') {
       return toBN(0);
-    }
-    return toBN(toWei(this.amount));
-  }
-
-  get isValidAmount() {
-    if (!this.amount) return false;
-    return (
-      !this.amountAsBigNumber.lte(toBN(0)) &&
-      this.amountAsBigNumber.lte(this.currentTokenBalance)
-    );
-  }
-
-  @action onInputAmount(str: string) {
-    if (!isNaN(+str)) {
-      this.amount = str.trim();
     } else {
-      this.amount = this.amount; // eslint-disable-line no-self-assign
+      return toBN(toWei(this.amount));
     }
   }
 
@@ -94,6 +84,29 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       this.args.onComplete?.();
       this.isAmountSet = true;
     }
+  }
+
+  @action onInputAmount(amount: string) {
+    let trimmed = amount.trim();
+    if (shouldUseTokenInput(trimmed)) {
+      this.amount = trimmed;
+    } else {
+      // eslint-disable-next-line no-self-assign
+      this.amount = this.amount;
+    }
+
+    this.validate();
+  }
+
+  get isInvalid() {
+    return this.errorMessage !== '';
+  }
+
+  validate() {
+    this.errorMessage = validateTokenInput(this.amount, {
+      min: toBN(0),
+      max: this.currentTokenBalance,
+    });
   }
 }
 

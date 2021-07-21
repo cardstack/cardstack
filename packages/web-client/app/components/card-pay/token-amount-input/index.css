@@ -1,0 +1,44 @@
+.token-amount-input {
+  --tx-amount-banner-height: 3.125rem; /* 50px */
+  --tx-token-amount-input-height: 3.75rem; /* 60px */
+}
+
+.token-amount-input__input-container {
+  --input-currency-icon-size: 2.5rem;
+  --input-currency-text-width: 5ch;
+  --input-currency-icon-space: var(--boxel-sp-xs);
+  --input-currency-text-space: var(--boxel-sp-sm);
+
+  position: relative;
+  font-family: var(--boxel-font-family);
+  font-size: 1.25rem;
+  line-height: calc(27 / 20);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.token-amount-input__input {
+  height: var(--tx-token-amount-input-height);
+  padding-left: calc(var(--input-currency-icon-size) + var(--input-currency-icon-space) * 2);
+  padding-right: calc(var(--input-currency-text-width) + var(--input-currency-text-space) * 2);
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+.token-amount-input__currency-icon {
+  position: absolute;
+  width: var(--input-currency-icon-size);
+  height: var(--tx-token-amount-input-height);
+  left: var(--input-currency-icon-space);
+  top: 0;
+  user-select: none;
+}
+
+.token-amount-input__currency-text {
+  position: absolute;
+  height: var(--tx-token-amount-input-height);
+  display: flex;
+  align-items: center;
+  right: var(--input-currency-text-space);
+  top: 0;
+  user-select: none;
+}

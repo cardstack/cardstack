@@ -203,7 +203,7 @@ module('Acceptance | deposit', function (hooks) {
     assert.dom(`${post} [data-test-source-token="DAI"]`).exists();
     assert.dom(`${post} [data-test-unlock-button]`).isDisabled();
     assert.dom(`${post} [data-test-deposit-button]`).isDisabled();
-    await fillIn('[data-test-deposit-amount-input]', '250');
+    await fillIn('[data-test-token-amount-input]', '250');
     assert
       .dom(`${post} [data-test-unlock-button]`)
       .isEnabled('Unlock button is enabled once amount has been entered');
