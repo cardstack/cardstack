@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, fillIn, typeIn } from '@ember/test-helpers';
+import { click, fillIn, render, typeIn } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
@@ -47,6 +47,15 @@ module(
     test('the amount is marked invalid when a value is entered and then cleared', async function (assert) {
       await fillIn('input', '50');
       await fillIn('input', '');
+      assert.dom('input').hasAria('invalid', 'true');
+      assert
+        .dom('[data-test-boxel-input-error-message]')
+        .containsText('You need to enter an amount');
+    });
+
+    test('the amount is marked invalid when the field loses focus', async function (assert) {
+      await click('input');
+      await click('[data-test-balance-view-summary]');
       assert.dom('input').hasAria('invalid', 'true');
       assert
         .dom('[data-test-boxel-input-error-message]')

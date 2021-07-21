@@ -16,6 +16,7 @@
       placeholder="0.00"
       autocomplete="off"
       inputmode="decimal"
+      {{on "blur" (fn @onInputAmount @amount)}} 
       data-test-token-amount-input
     />
     <div class="token-amount-input__currency-text" data-test-token-amount-input-currency-label>
