@@ -89,6 +89,10 @@ export default class Layer2Network
     return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
   }
 
+  @task *viewSafes(account: string): any {
+    return yield this.strategy.viewSafes(account);
+  }
+
   @task *issuePrepaidCard(
     faceValue: number,
     customizationDid: string,

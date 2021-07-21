@@ -34,8 +34,20 @@
 </section>
 
 {{#if this.layer2Network.isConnected}}
-  <section data-test-card-balances>
+  <section data-test-card-balances {{did-insert (perform this.layer2Network.viewSafes)}}>
     Card Balances
+
+    {{#each this.layer2Network.viewSafes.lastSuccessful.value as |safe|}}
+      {{#if (eq safe.type "prepaid-card")}}
+        <CardPay::PrepaidCard
+          @mockBalance={{false}}
+          @balance={{safe.spendFaceValue}}
+          @usdBalance={{spend-to-usd safe.spendFaceValue}}
+          @address={{safe.address}}
+          @network={{network-display-info "layer2" "fullName"}}
+        />
+      {{/if}}
+    {{/each}}
   </section>
 {{/if}}
 

@@ -18,6 +18,7 @@ import {
   BridgeValidationResult,
   DepotSafe,
   PrepaidCardSafe,
+  Safe,
 } from '@cardstack/cardpay-sdk';
 import {
   UnbindEventListener,
@@ -142,6 +143,46 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   async convertFromSpend(symbol: ConvertibleSymbol, amount: number) {
     return await this.test__simulateConvertFromSpend(symbol, amount);
+  }
+
+  async viewSafes(account: string): Promise<Safe[]> {
+    return Promise.resolve([
+      {
+        type: 'prepaid-card',
+
+        address: '0x123400000000000000000000000000000000abcd',
+
+        tokens: [
+          {
+            tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
+            balance: '1000000000000000000',
+            token: {
+              name: 'CARD Token Kovan.CPXD',
+              symbol: 'CARD',
+              decimals: 18,
+            },
+          },
+          {
+            tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
+            balance: '998003992015968163',
+            token: {
+              name: 'Dai Stablecoin.CPXD',
+              symbol: 'DAI',
+              decimals: 18,
+            },
+          },
+        ],
+        owners: [account],
+
+        issuingToken: '0xTOKEN',
+        spendFaceValue: 2324,
+        prepaidCardOwner: account,
+        hasBeenUsed: false,
+        issuer: account,
+        reloadable: false,
+        customizationDID: 'did:hello',
+      },
+    ]);
   }
 
   async issuePrepaidCard(

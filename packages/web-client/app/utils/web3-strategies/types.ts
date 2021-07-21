@@ -1,7 +1,11 @@
 import { WalletProvider } from '../wallet-providers';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
-import { DepotSafe, PrepaidCardSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import {
+  DepotSafe,
+  PrepaidCardSafe,
+  Safe,
+} from '@cardstack/cardpay-sdk/sdk/safes';
 import {
   ConvertibleSymbol,
   ConversionFunction,
@@ -84,6 +88,7 @@ export interface Layer2Web3Strategy
     fromBlock: BN,
     txnHash: TransactionHash
   ): Promise<BridgeValidationResult>;
+  viewSafes(account: string): Promise<Safe[]>;
   authenticate(): Promise<string>;
   issuePrepaidCard(
     safeAddress: string,
