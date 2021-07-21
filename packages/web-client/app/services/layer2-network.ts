@@ -59,7 +59,10 @@ export default class Layer2Network
     }
 
     this.strategy.on('disconnect', this.onDisconnect);
-    this.strategy.initialize();
+    this.strategy.on('incorrect-chain', this.onIncorrectChain);
+
+    // test chain does not need to be initialized
+    this.strategy.initialize?.();
   }
 
   async updateUsdConverters(
@@ -101,6 +104,10 @@ export default class Layer2Network
   @action onDisconnect() {
     this.hubAuthentication.authToken = null;
     this.simpleEmitter.emit('disconnect');
+  }
+
+  @action onIncorrectChain() {
+    this.simpleEmitter.emit('incorrect-chain');
   }
 
   on(event: Layer2ChainEvent, cb: Function): UnbindEventListener {
