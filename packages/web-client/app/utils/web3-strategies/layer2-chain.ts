@@ -50,7 +50,7 @@ export default abstract class Layer2ChainWeb3Strategy
   simpleEmitter = new SimpleEmitter();
   defaultTokenSymbol: ConvertibleSymbol = 'DAI';
   defaultTokenContractAddress?: string;
-  web3: Web3 = new Web3();
+  web3!: Web3;
   #exchangeRateApi!: IExchangeRate;
   #safesApi!: ISafes;
   #hubAuthApi!: IHubAuth;
@@ -77,11 +77,10 @@ export default abstract class Layer2ChainWeb3Strategy
       networkSymbol
     );
     this.defaultTokenContractAddress = defaultTokenContractInfo.address;
-
-    this.initialize();
   }
 
   async initialize() {
+    this.web3 = new Web3();
     this.provider = new WalletConnectProvider({
       chainId: this.chainId,
       rpc: {
@@ -97,6 +96,8 @@ export default abstract class Layer2ChainWeb3Strategy
         this.chainId
       ),
     });
+    this.web3.setProvider(this.provider as any);
+
     this.connector.on('display_uri', (err, payload) => {
       if (err) {
         console.error('Error in display_uri callback', err);
@@ -105,25 +106,36 @@ export default abstract class Layer2ChainWeb3Strategy
       this.walletConnectUri = payload.params[0];
     });
 
-    this.provider.on('chainChanged', (chainId: number) => {
-      if (chainId !== this.chainId) {
+    this.provider.on('accountsChanged', async (accounts: string[]) => {
+      // this actually doesn't ever happen with walletconnect. we instead go through the disconnect event
+      // added just-in-case
+      if (!accounts.length) {
+        this.onDisconnect();
+      }
+
+      try {
+        // try to initialize things safely
+        // one expected failure is if we connect to a chain which we don't have an rpc url for
+        this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
+        this.#safesApi = await getSDK('Safes', this.web3);
+        this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
+        this.updateWalletInfo(accounts, this.chainId);
+      } catch (e) {
+        console.error(
+          'Error initializing layer 2 wallet and services. Wallet may be connected to an unsupported chain'
+        );
+        console.error(e);
+        this.disconnect();
+      }
+    });
+
+    this.provider.on('chainChanged', async (connectedChainId: number) => {
+      if (connectedChainId !== this.chainId) {
         this.simpleEmitter.emit('incorrect-chain');
         this.disconnect();
       } else {
         this.simpleEmitter.emit('correct-chain');
       }
-    });
-    this.connector.on('session_update', async (error, payload) => {
-      if (error) {
-        throw error;
-      }
-      let { accounts, chainId } = payload.params[0];
-      if (chainId !== this.chainId) {
-        throw new Error(
-          `Expected connection on ${this.chainName} (chain ID ${this.chainId}) but connected to chain ID ${chainId}`
-        );
-      }
-      this.updateWalletInfo(accounts, chainId);
     });
 
     this.connector.on('disconnect', (error) => {
@@ -134,11 +146,6 @@ export default abstract class Layer2ChainWeb3Strategy
       this.onDisconnect();
     });
     await this.provider.enable();
-    this.web3.setProvider(this.provider as any);
-    this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
-    this.#safesApi = await getSDK('Safes', this.web3);
-    this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
-    this.updateWalletInfo(this.connector.accounts, this.connector.chainId);
   }
 
   private getTokenContractInfo(
@@ -161,6 +168,8 @@ export default abstract class Layer2ChainWeb3Strategy
           this.waitForAccountDeferred.resolve();
         });
     } else {
+      this.defaultTokenBalance = new BN('0');
+      this.cardBalance = new BN('0');
       this.waitForAccountDeferred = defer();
     }
   }
@@ -189,12 +198,11 @@ export default abstract class Layer2ChainWeb3Strategy
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
   // about disconnecting. WalletConnect's disconnect event tells all tabs that you are disconnected
   onDisconnect() {
-    if (this.isConnected) {
-      this.depotSafe = null;
-      this.clearWalletInfo();
-      this.walletConnectUri = undefined;
-      this.simpleEmitter.emit('disconnect');
-    }
+    this.depotSafe = null;
+    this.clearWalletInfo();
+    this.walletConnectUri = undefined;
+
+    this.simpleEmitter.emit('disconnect');
 
     // we always want to re-generate the uri, because the 'disconnect' event from WalletConnect
     // covers clicking the 'cancel' button in the wallet/mobile app

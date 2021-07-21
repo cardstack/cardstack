@@ -48,6 +48,8 @@ export default class Layer1Network
     }
 
     this.strategy.on('disconnect', this.onDisconnect);
+    this.strategy.on('incorrect-chain', this.onIncorrectChain);
+    this.strategy.on('correct-chain', this.onCorrectChain);
   }
 
   connect(walletProvider: WalletProvider) {
@@ -61,6 +63,14 @@ export default class Layer1Network
 
   @action onDisconnect() {
     this.simpleEmitter.emit('disconnect');
+  }
+
+  @action onIncorrectChain() {
+    this.simpleEmitter.emit('incorrect-chain');
+  }
+
+  @action onCorrectChain() {
+    this.simpleEmitter.emit('correct-chain');
   }
 
   // basically only allow re-emitting of events from the strategy

@@ -42,7 +42,7 @@ export default class Layer2Network
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
   @reads('strategy.depotSafe') depotSafe: DepotSafe | undefined;
-  @reads('strategy.isFetchingDepot') isFetchingDepot: boolean;
+  @reads('strategy.isFetchingDepot') declare isFetchingDepot: boolean;
 
   constructor(props: object | undefined) {
     super(props);
@@ -59,6 +59,10 @@ export default class Layer2Network
     }
 
     this.strategy.on('disconnect', this.onDisconnect);
+    this.strategy.on('incorrect-chain', this.onIncorrectChain);
+
+    // test chain does not need to be initialized
+    this.strategy.initialize?.();
   }
 
   async updateUsdConverters(
@@ -100,6 +104,10 @@ export default class Layer2Network
   @action onDisconnect() {
     this.hubAuthentication.authToken = null;
     this.simpleEmitter.emit('disconnect');
+  }
+
+  @action onIncorrectChain() {
+    this.simpleEmitter.emit('incorrect-chain');
   }
 
   on(event: Layer2ChainEvent, cb: Function): UnbindEventListener {

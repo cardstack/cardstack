@@ -40,3 +40,15 @@
   @onClose={{set this 'isShowingLayer2ConnectModal' false}}
   @isLayerConnected={{this.layer2Network.isConnected}}
 />
+
+{{#if this.chainChangeModalOptions}}
+  <CardPay::ChainChangeModal
+    @isOpen={{true}}
+    @title={{this.chainChangeModalOptions.title}}
+    @body={{this.chainChangeModalOptions.body}}
+    @actionText={{this.chainChangeModalOptions.actionText}}
+    @action={{this.chainChangeModalOptions.action}}
+    @onClose={{this.chainChangeModalOptions.onClose}}
+    @dismissable={{this.chainChangeModalOptions.dismissable}}
+  />
+{{/if}}

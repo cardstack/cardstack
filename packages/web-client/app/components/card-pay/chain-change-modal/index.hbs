@@ -1,0 +1,25 @@
+<Boxel::Modal
+  class="chain-change-modal"
+  @isOpen={{@isOpen}}
+  @onClose={{@onClose}}
+  @layer="urgent"
+>
+  <div
+    class="chain-change-modal__scroll-wrapper"
+    {{focus-trap
+      focusTrapOptions=(hash
+        allowOutsideClick=@dismissable
+        clickOutsideDeactivates=@dismissable
+      )
+    }}
+  >
+    <Boxel::CardContainer
+      class=" chain-change-modal__card"
+      tabindex="-1"
+    >
+      <h2>{{@title}}</h2>
+      {{@body}}
+      <Boxel::Button {{on "click" (optional @action)}}>{{@actionText}}</Boxel::Button>
+    </Boxel::CardContainer>
+  </div>
+</Boxel::Modal>
