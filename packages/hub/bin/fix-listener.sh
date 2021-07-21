@@ -1,5 +1,6 @@
 #!/bin/sh
-CERTIFICATE_ARN=$(aws acm list-certificates | grep -C1 hub-staging.stack.cards | grep CertificateArn | awk '{print $2}' | sed 's/[",]//g')
+DOMAIN_NAME=$1
+CERTIFICATE_ARN=$(aws acm list-certificates | grep -C1 $DOMAIN_NAME | grep CertificateArn | awk '{print $2}' | sed 's/[",]//g')
 LISTENER_ARN=$(cat waypoint.hcl | grep listener_arn | awk '{ print $3 }' | sed 's/"//g')
 PAGER=""
 export PAGER
