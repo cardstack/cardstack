@@ -118,9 +118,9 @@ export default abstract class Layer2ChainWeb3Strategy
       }
       let { accounts, chainId } = payload.params[0];
       if (chainId !== this.chainId) {
-        throw new Error(
-          `Expected connection on ${this.chainName} (chain ID ${this.chainId}) but connected to chain ID ${chainId}`
-        );
+        this.simpleEmitter.emit('incorrect-chain');
+      } else {
+        this.simpleEmitter.emit('correct-chain');
       }
       this.updateWalletInfo(accounts, chainId);
     });
