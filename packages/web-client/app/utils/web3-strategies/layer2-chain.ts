@@ -190,12 +190,11 @@ export default abstract class Layer2ChainWeb3Strategy
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
   // about disconnecting. WalletConnect's disconnect event tells all tabs that you are disconnected
   onDisconnect() {
-    if (this.isConnected) {
-      this.depotSafe = null;
-      this.clearWalletInfo();
-      this.walletConnectUri = undefined;
-      this.simpleEmitter.emit('disconnect');
-    }
+    this.depotSafe = null;
+    this.clearWalletInfo();
+    this.walletConnectUri = undefined;
+
+    this.simpleEmitter.emit('disconnect');
 
     // we always want to re-generate the uri, because the 'disconnect' event from WalletConnect
     // covers clicking the 'cancel' button in the wallet/mobile app
