@@ -4,6 +4,7 @@
   @onClose={{@onClose}}
   @layer="urgent"
 >
+  {{!-- TODO: modify this so that there is a specific modal for layer 2 and a specific modal for layer 1 --}}
   {{!-- docs are a bit misleading. if you want focus-trap to be happy with something that has no focusable elements, then the tabindex HAS to be greater than -1 --}}
   {{#if this.isDismissable}}
     <div
@@ -42,6 +43,11 @@
       >
         <h2>{{this.title}}</h2>
         {{this.message}}
+        {{!--
+          TODO: make it possible for the user to disconnect here.
+          They are stuck because they need to reload the page anyway, so add a button to do that
+          here. It seems kind of confusing to find your connected dApps in some wallets
+        --}}
       </Boxel::CardContainer>
     </div>
   {{/if}}
