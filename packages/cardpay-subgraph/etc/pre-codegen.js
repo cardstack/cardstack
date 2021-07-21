@@ -111,7 +111,7 @@ function getAbi(path) {
 
 function getAddress(contractName, network) {
   let file = readFileSync(addressFile, { encoding: 'utf8' });
-  let [, networkContents] = file.match(new RegExp(`${network}: {([^}]*)}`));
+  let [, networkContents] = file.match(new RegExp(`${network.toUpperCase()} = {([^}]*)}`));
   let [, address] = networkContents.match(new RegExp(`${contractName}: ['"](\\w*)['"]`));
   return address;
 }
