@@ -144,7 +144,6 @@ export default abstract class Layer1ChainWeb3Strategy
     this.connectedChainId = chainId;
     if (this.connectedChainId !== this.chainId) {
       this.simpleEmitter.emit('incorrect-chain');
-      this.disconnect();
     } else {
       this.simpleEmitter.emit('correct-chain');
     }
