@@ -120,6 +120,11 @@ export default class PrepaidCard {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
+          // TODO in this situation we should surface a message to the user that
+          // the rate has changed and that we need to try again with a new rate
+          console.warn(
+            'The USD rate has fluctuated beyond allowable bounds between when the txn was signed and when it was executed, prompting the user to sign the txn again with a new rate'
+          );
         } else {
           throw e;
         }
@@ -199,6 +204,11 @@ export default class PrepaidCard {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
+          // TODO in this situation we should surface a message to the user that
+          // the rate has changed and that we need to try again with a new rate
+          console.warn(
+            'The USD rate has fluctuated beyond allowable bounds between when the txn was signed and when it was executed, prompting the user to sign the txn again with a new rate'
+          );
         } else {
           throw e;
         }
@@ -321,6 +331,11 @@ export default class PrepaidCard {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
+          // TODO in this situation we should surface a message to the user that
+          // the rate has changed and that we need to try again with a new rate
+          console.warn(
+            'The USD rate has fluctuated beyond allowable bounds between when the txn was signed and when it was executed, prompting the user to sign the txn again with a new rate'
+          );
         } else {
           throw e;
         }
