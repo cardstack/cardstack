@@ -23,7 +23,6 @@
   transition: max-width var(--boxel-transition);
 }
 
-
 @media screen and (max-width: 40rem) {
   .chain-change-modal__scroll-wrapper {
     min-width: unset;
@@ -37,7 +36,6 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--boxel-sp);
-
   outline-color: transparent;
   outline-style: solid;
 }
