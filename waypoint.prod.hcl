@@ -38,7 +38,7 @@ app "hub" {
 
         hook {
             when    = "after"
-            command = ["./packages/hub/bin/fix-listener.sh"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+            command = ["./packages/hub/bin/fix-listener.sh", "hub.cardstack.com"] # need this until https://github.com/hashicorp/waypoint/issues/1568
         }
     }
 }
