@@ -26,6 +26,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   @tracked txHash: string | undefined;
   @tracked isConfirmed = false;
   @tracked errorMessage = '';
+  @tracked validationMessage = '';
 
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
@@ -97,11 +98,11 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   }
 
   get isInvalid() {
-    return this.errorMessage !== '';
+    return this.validationMessage !== '';
   }
 
   validate() {
-    this.errorMessage = validateTokenInput(this.amount, {
+    this.validationMessage = validateTokenInput(this.amount, {
       min: toBN(0),
       max: this.currentTokenBalance,
     });

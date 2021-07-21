@@ -21,8 +21,6 @@ import {
 
 class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @tracked amount = '';
-  @tracked validationErrorMessage = '';
-
   @tracked isUnlocked = false;
   @tracked isUnlocking = false;
   @tracked unlockTxnReceipt: TransactionReceipt | undefined;
@@ -33,7 +31,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @tracked errorMessage = '';
-  @tracked validationErrorMessage = '';
+  @tracked validationMessage = '';
 
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
@@ -124,11 +122,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   }
 
   get isInvalid() {
-    return this.validationErrorMessage !== '';
+    return this.validationMessage !== '';
   }
 
   validate() {
-    this.validationErrorMessage = validateTokenInput(this.amount, {
+    this.validationMessage = validateTokenInput(this.amount, {
       min: toBN(0),
       max: this.currentTokenBalance,
     });

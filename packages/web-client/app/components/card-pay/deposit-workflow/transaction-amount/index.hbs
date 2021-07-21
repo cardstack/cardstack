@@ -7,7 +7,7 @@
       <CardPay::LabeledValue
         class="transaction-amount__label"
         @vertical={{this.isUnlockingOrUnlocked}}
-        @label="Funding from:"
+        @label="Funding from"
       >
         <CardPay::DepositWorkflow::TransactionAmount::BalanceView
           @wallet={{network-display-info "layer1" "fullName"}}
@@ -42,7 +42,7 @@
             @onInput={{this.onInputAmount}}
             @symbol={{this.currentTokenSymbol}}
             @invalid={{this.isInvalid}}
-            @errorMessage={{this.validationErrorMessage}}
+            @errorMessage={{this.validationMessage}}
           />
         {{/if}}
       </CardPay::LabeledValue>
@@ -54,7 +54,7 @@
     </div>
     {{#if this.errorMessage}}
       <CardPay::ErrorMessage>
-        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact <a href="mailto:support@cardstack.com" target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact Cardstack support.
       </CardPay::ErrorMessage>
     {{/if}}
     <div class="transaction-amount__footnote">

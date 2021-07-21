@@ -25,7 +25,7 @@ let orderedTokenInputValidations: Array<
   | ((amount: string) => string)
 > = [
   (amount: string) => {
-    return amount.trim().length === 0 ? 'You need to enter an amount' : '';
+    return amount.trim().length === 0 ? 'This field is required' : '';
   },
   (amount: string) => {
     return isInvalidAsNumber(amount) ? 'Amount must be a valid number' : '';
@@ -41,7 +41,9 @@ let orderedTokenInputValidations: Array<
   },
   (amount: string, options: TokenInputValidationOptions) => {
     if (!options.max) return '';
-    return toBN(toWei(amount)).gt(options.max) ? 'Amount is too high' : '';
+    return toBN(toWei(amount)).gt(options.max)
+      ? 'Insufficient balance in your account'
+      : '';
   },
   (amount: string, options: TokenInputValidationOptions) => {
     return toBN(toWei(amount)).lte(options.min) ? 'Amount is too low' : '';

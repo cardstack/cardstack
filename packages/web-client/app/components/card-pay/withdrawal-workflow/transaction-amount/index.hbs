@@ -5,7 +5,7 @@
 >
   <ActionCardContainer::Section @title="Choose an amount to withdraw" @dataTestId="withdrawal-transaction-amount">
     <div class="withdrawal-transaction-amount__fields">
-      <CardPay::LabeledValue @vertical={{this.isConfirmed}} @label="Funding from:" class="withdrawal-transaction-amount__label">
+      <CardPay::LabeledValue @vertical={{this.isConfirmed}} @label="Funding from" class="withdrawal-transaction-amount__label">
         <CardPay::BalanceViewBanner
           @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
           @depotAddress={{this.layer2Network.depotSafe.address}}
@@ -37,7 +37,7 @@
             @icon={{this.currentTokenDetails.icon}}
             @symbol={{this.currentTokenSymbol}}
             @invalid={{this.isInvalid}}
-            @errorMessage={{this.errorMessage}}
+            @errorMessage={{this.validationMessage}}
           />
         {{/if}}
       </CardPay::LabeledValue>
@@ -53,7 +53,7 @@
     </div>
     {{#if this.errorMessage}}
       <CardPay::ErrorMessage>
-        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact <a href="mailto:support@cardstack.com" target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact Cardstack support.
       </CardPay::ErrorMessage>
     {{/if}}
     <div class="withdrawal-transaction-amount__footnote" data-test-approximate-value-footnote>
