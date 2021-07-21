@@ -160,6 +160,8 @@ export default abstract class Layer2ChainWeb3Strategy
           this.waitForAccountDeferred.resolve();
         });
     } else {
+      this.defaultTokenBalance = new BN('0');
+      this.cardBalance = new BN('0');
       this.waitForAccountDeferred = defer();
     }
   }
