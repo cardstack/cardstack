@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { getAddress } from '../contracts/addresses';
+import { AddressKeys, getAddress } from '../contracts/addresses';
 import { AbiItem } from 'web3-utils';
 import { satisfies } from 'semver';
 import mapKeys from 'lodash/mapKeys';
@@ -25,7 +25,7 @@ type SDK =
   | 'RewardPool';
 export interface ContractMeta {
   apiVersions: Record<string, any>;
-  contractName: string;
+  contractName: AddressKeys;
 }
 
 const cardPayVersionABI: AbiItem[] = [

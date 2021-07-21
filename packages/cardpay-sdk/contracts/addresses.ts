@@ -66,7 +66,7 @@ const addresses: {
   xdai: XDAI,
 });
 
-type AddressKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof XDAI;
+export type AddressKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof XDAI;
 
 export default addresses;
 
