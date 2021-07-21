@@ -10,19 +10,22 @@ import {
   TokenDisplayInfo,
   TokenSymbol,
   getUnbridgedSymbol,
+  bridgedSymbols,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import {
   shouldUseTokenInput,
   validateTokenInput,
 } from '@cardstack/web-client/utils/validation';
 
 class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
+  @service declare layer2Network: Layer2Network;
   @tracked amount = '';
   @tracked amountIsValid = false;
-  @tracked isAmountSet = false;
+  @tracked txHash: string | undefined;
+  @tracked isConfirmed = false;
   @tracked errorMessage = '';
-  @service declare layer2Network: Layer2Network;
 
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
@@ -52,15 +55,17 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
     return balance || toBN(0);
   }
 
-  get setAmountCtaState() {
-    if (this.isAmountSet) {
+  get amountCtaState() {
+    if (this.args.isComplete) {
       return 'memorialized';
+    } else if (this.isConfirmed) {
+      return 'in-progress';
     } else {
       return 'default';
     }
   }
 
-  get setAmountCtaDisabled() {
+  get isAmountCtaDisabled() {
     return this.isInvalid || this.amount === '';
   }
 
@@ -72,18 +77,11 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
     }
   }
 
-  @action toggleAmountSet() {
-    if (this.isAmountSet) {
-      this.isAmountSet = false;
-      this.args.onIncomplete?.();
-    } else {
-      this.args.workflowSession.update(
-        'withdrawnAmount',
-        this.amountAsBigNumber.toString()
-      );
-      this.args.onComplete?.();
-      this.isAmountSet = true;
+  get txViewerUrl() {
+    if (!this.txHash) {
+      return '';
     }
+    return this.layer2Network.blockExplorerUrl(this.txHash);
   }
 
   @action onInputAmount(amount: string) {
@@ -108,6 +106,47 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       max: this.currentTokenBalance,
     });
   }
+
+  @action async withdraw() {
+    this.errorMessage = '';
+    if (this.isAmountCtaDisabled) {
+      return;
+    }
+    try {
+      this.isConfirmed = true;
+      let { currentTokenSymbol } = this;
+      let withdrawnAmount = this.amountAsBigNumber.toString();
+
+      assertBridgedTokenSymbol(currentTokenSymbol);
+
+      let transactionHash = await this.layer2Network.bridgeToLayer1(
+        this.layer2Network.depotSafe?.address!,
+        getUnbridgedSymbol(currentTokenSymbol),
+        withdrawnAmount
+      );
+      let layer2BlockHeight = await this.layer2Network.getBlockHeight();
+
+      this.txHash = transactionHash;
+
+      this.args.workflowSession.updateMany({
+        withdrawnAmount,
+        layer2BlockHeightBeforeBridging: layer2BlockHeight,
+        relayTokensTxnHash: transactionHash,
+      });
+      this.args.onComplete?.();
+    } catch (e) {
+      console.error(e);
+      this.errorMessage = `There was a problem initiating the withdrawal of your tokens from ${c.layer2.fullName}. This may be due to a network issue, or perhaps you canceled the request in your wallet.`;
+    }
+  }
 }
 
 export default CardPayWithdrawalWorkflowTransactionAmountComponent;
+
+function assertBridgedTokenSymbol(
+  token: TokenSymbol
+): asserts token is BridgedTokenSymbol {
+  if (!bridgedSymbols.includes(token as BridgedTokenSymbol)) {
+    throw new Error(`${token} is not a bridged token`);
+  }
+}

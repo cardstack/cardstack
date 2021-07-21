@@ -1,5 +1,6 @@
 .card-pay-labeled-value {
-  --boxel-field-label-width: minmax(4rem, 25%);
+  --label-width: minmax(4rem, 25%);
+  --boxel-field-label-width: var(--field-label-width, var(--label-width));
 
   align-items: start;
 }

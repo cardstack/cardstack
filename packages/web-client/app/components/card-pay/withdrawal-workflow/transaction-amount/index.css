@@ -1,55 +1,16 @@
-.withdrawal-transaction-amount {
-  --tx-amount-banner-height: 3.125rem; /* 50px */
-  --tx-amount-input-height: 3.75rem; /* 60px */
-}
-
-.withdrawal-transaction-amount__input-section > * + * {
+.withdrawal-transaction-amount__fields > * + * {
   margin-top: var(--boxel-sp-lg);
 }
 
-.withdrawal-transaction-amount__input-token-balance {
-  font-family: var(--boxel-font-family);
-  font-size: 1.25rem;
-  line-height: calc(27 / 20);
-  letter-spacing: var(--boxel-lsp-xs);
+.withdrawal-transaction-amount__label {
+  --field-label-width: 15%;
 }
 
-.withdrawal-transaction-amount__banner-field-label {
-  align-self: flex-start;
-  display: flex;
-  align-items: center;
-  height: var(--tx-amount-banner-height);
-}
-
-.withdrawal-transaction-amount__input-field-label {
-  align-self: flex-start;
-  display: flex;
-  align-items: center;
-  height: var(--tx-amount-input-height);
-}
-
-/* unlocking, unlocked, memorialized states */
-.withdrawal-transaction-amount--data-entered .withdrawal-transaction-amount__input-section > * + * {
-  margin-top: var(--boxel-sp);
-}
-
-.withdrawal-transaction-amount--data-entered .withdrawal-transaction-amount__field {
-  grid-template-columns: 1fr;
-  row-gap: var(--boxel-sp-xxs);
-}
-
-.withdrawal-transaction-amount--data-entered .withdrawal-transaction-amount__banner-field-label {
-  height: unset;
-}
-
-/* token balance display styles */
 .withdrawal-transaction-amount__token {
   display: flex;
   align-items: center;
-  color: var(--boxel-dark);
-
-  /* bordered display box */
   justify-content: center;
+  width: 100%;
   padding: var(--boxel-sp-xl) var(--boxel-sp);
   border: 1px solid var(--boxel-light-400);
   border-radius: var(--boxel-border-radius);
@@ -57,6 +18,15 @@
 
 .withdrawal-transaction-amount__footnote {
   margin-top: var(--boxel-sp-xxl);
-  font: var(--boxel-font-xs);
   color: var(--boxel-purple-400);
+  font: var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.withdrawal-transaction-amount__loading-indicator {
+  margin-right: var(--boxel-sp-xs);
+}
+
+.withdrawal-transaction-amount__loading-message {
+  max-width: 20rem;
 }

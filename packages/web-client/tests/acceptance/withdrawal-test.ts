@@ -3,11 +3,9 @@ import {
   click,
   currentURL,
   fillIn,
-  find,
   settled,
   visit,
   waitFor,
-  waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
@@ -183,7 +181,7 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom(
         `${post} [data-test-action-card-title="withdrawal-transaction-amount"]`
       )
-      .containsText('Choose a withdrawal amount');
+      .containsText('Choose an amount to withdraw');
 
     assert
       .dom(`${post} [data-test-balance-display-amount]`)
@@ -206,85 +204,22 @@ module('Acceptance | withdrawal', function (hooks) {
     await click(
       `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
     );
-    assert.dom(milestoneCompletedSel(2)).containsText('Withdrawal amount set');
-
+    layer2Service.bridgingToLayer1HashDeferred.resolve('abc123');
     assert
       .dom(
         `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
       )
-      .hasText('Edit');
-
-    await waitUntil(function () {
-      return find('[data-test-balance-display-text]')?.textContent?.includes(
-        '40'
-      );
-    });
-
-    assert
-      .dom(`${post} [data-test-amount-entered]`)
-      .containsText('200.00 DAI.CPXD')
-      .containsText('$40.00 USD*');
-
-    assert
-      .dom(postableSel(3, 0))
-      .containsText('we just need your confirmation to make the withdrawal');
-    post = postableSel(3, 1);
-    // // transaction-approval card
-    await waitFor(`${post} [data-test-withdrawal-transaction-approval]`);
-    assert
-      .dom(
-        `[data-test-withdrawal-tx-approval-balance] [data-test-balance-view-summary]`
-      )
-      .containsText('0x1826...6E44');
-    assert
-      .dom(
-        `[data-test-withdrawal-tx-approval-balance] [data-test-balance-view-summary]`
-      )
-      .containsText('250.00 DAI.CPXD');
-    await click(
-      `[data-test-withdrawal-tx-approval-balance] [data-test-balance-view-summary]`
-    );
-    assert
-      .dom(
-        `[data-test-withdrawal-tx-approval-balance] [data-test-balance-view-account-address]`
-      )
-      .containsText('0x1826...6E44');
-    assert
-      .dom(
-        `[data-test-withdrawal-tx-approval-balance] [data-test-balance-view-depot-address]`
-      )
-      .containsText('0xB236...6666');
-    assert
-      .dom(
-        `[data-test-withdrawal-tx-approval-balance] [data-test-balance-display-amount]`
-      )
-      .containsText('250.00 DAI.CPXD');
-
-    assert
-      .dom('[data-test-withdrawal-tx-approval-amount]')
-      .containsText('200.00 DAI.CPXD');
-    assert
-      .dom('[data-test-withdrawal-tx-approval-amount]')
-      .containsText('40.00 USD');
-
-    await click(
-      `${post} [data-test-withdrawal-transaction-approval] [data-test-boxel-button]`
-    );
-    layer2Service.bridgingToLayer1HashDeferred.resolve('abc123');
-    await waitFor('[data-test-withdrawal-transaction-approval-is-complete]');
-    assert
-      .dom('[data-test-withdrawal-transaction-approval-is-complete]')
-      .exists();
-    assert
-      .dom(
-        `${post} [data-test-withdrawal-transaction-approval] [data-test-boxel-button]`
-      )
       .doesNotExist();
     assert
-      .dom('[data-test-withdrawal-transaction-approval]')
+      .dom('[data-test-withdrawal-transaction-amount]')
+      .containsText('Waiting for you to confirm');
+    await waitFor('[data-test-withdrawal-transaction-amount-is-complete]');
+    assert
+      .dom('[data-test-withdrawal-transaction-amount]')
       .containsText('Confirmed');
-
-    assert.dom(milestoneCompletedSel(3)).containsText('Transaction confirmed');
+    assert
+      .dom(milestoneCompletedSel(2))
+      .containsText('Withdrawn from L2 test chain');
 
     assert
       .dom(epiloguePostableSel(0))

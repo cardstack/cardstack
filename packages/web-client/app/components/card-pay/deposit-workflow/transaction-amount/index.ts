@@ -33,6 +33,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @tracked errorMessage = '';
+  @tracked validationErrorMessage = '';
 
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
