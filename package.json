@@ -48,6 +48,7 @@
     "deploy:boxel": "cd ./packages/boxel && ember deploy production --verbose",
     "deploy:boxel:preview": "cd ./packages/boxel && ember deploy s3-preview --verbose",
     "deploy:web-client:staging": "cd ./packages/web-client && ember deploy staging --verbose",
+    "deploy:web-client:production": "cd ./packages/web-client && ember deploy production --verbose",
     "deploy:subgraph-local": "cd ./packages/cardpay-subgraph && yarn deploy-local",
     "deploy:subgraph-sokol-green": "cd ./packages/cardpay-subgraph && yarn deploy-sokol-green",
     "prepare": "npm run compile",
