@@ -70,11 +70,10 @@ export default class CardPayController extends Controller {
   @action
   maybeReload() {
     if (!this.needsReload) {
-      console.log('do not need to reload via service');
       return;
     }
 
-    console.log('reloading via service');
+    window.location.reload();
   }
 
   @action
@@ -84,7 +83,10 @@ export default class CardPayController extends Controller {
 
   @action
   hideChainChangeModal() {
-    if (!this.needsReload) this.isShowingChainChangeModal = false;
+    if (!this.needsReload) {
+      this.isShowingChainChangeModal = false;
+      this.layer2Incorrect = false;
+    }
   }
 
   @action transitionTo(routeName: string) {
