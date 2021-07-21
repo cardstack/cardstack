@@ -38,6 +38,7 @@ export interface PrepaidCardSafe extends BaseSafe {
   hasBeenUsed: boolean;
   issuer: string;
   reloadable: boolean;
+  transferrable: boolean;
   customizationDID?: string;
 }
 export interface TokenInfo {
@@ -395,6 +396,7 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       issuer: safe.prepaidCard.issuer.id,
       hasBeenUsed: safe.prepaidCard.payments.length > 0,
       reloadable: safe.prepaidCard.reloadable,
+      transferrable: safe.prepaidCard.payments.length === 0 && safe.prepaidCard.issuer.id === safe.prepaidCard.owner.id,
       prepaidCardOwner: safe.prepaidCard.owner.id,
       tokens,
       owners,
