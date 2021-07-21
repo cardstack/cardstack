@@ -134,9 +134,7 @@ module('Acceptance | withdrawal', function (hooks) {
       .containsText(`${c.layer2.fullName} wallet connected`);
     assert
       .dom(postableSel(2, 0))
-      .containsText(
-        `From which balance in your ${c.layer2.fullName} wallet do you want to withdraw`
-      );
+      .containsText(`Please choose the asset you would like to withdraw`);
     post = postableSel(2, 1);
     // // choose-balance card
     await waitFor(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`);
@@ -144,9 +142,7 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`)
       .containsText('250.00 DAI.CPXD');
     assert
-      .dom(
-        `${post} [data-test-withdrawal-choose-balance] [data-test-depot-address]`
-      )
+      .dom(`${post} [data-test-choose-balance-from-depot]`)
       .hasText(`DEPOT: ${depotAddress}`);
     await click(
       '[data-test-balance-chooser-dropdown] .ember-power-select-trigger'
@@ -167,10 +163,9 @@ module('Acceptance | withdrawal', function (hooks) {
       .hasText('Edit');
     assert.dom('[data-test-withdrawal-choose-balance-is-complete]').exists();
     assert
-      .dom(
-        `${post} [data-test-account-balance] [data-test-balance-display-amount]`
-      )
+      .dom(`${post} [data-test-choose-balance-from-display]`)
       .containsText('250.00 DAI.CPXD');
+    assert.dom('[data-test-choose-balance-footnote]').containsText('gas fee');
 
     // // transaction-amount card
     await waitFor(postableSel(2, 2));

@@ -24,24 +24,12 @@
         />
       {{else}}
         <div class="nested-depot-balance-chooser__nested-dropdown">
-          <PowerSelect
-            class="nested-depot-balance-chooser__dropdown"
-            @options={{@tokens}}
-            @selected={{@selectedToken}}
-            @onChange={{@chooseToken}}
-            @renderInPlace={{true}}
-            @verticalPosition="below"
-            data-test-balance-chooser-dropdown={{@selectedTokenSymbol}}
-          as |token|>
-            <CardPay::BalanceDisplay
-              class={{cn "nested-depot-balance-chooser__dropdown-option" (if (eq token.symbol @selectedTokenSymbol) "funding-source__dropdown-option--selected")}}
-              @size="small"
-              @icon={{token.icon}}
-              @name={{token.symbol}}
-              @balance={{format-token-amount token.balance}}
-              @symbol={{token.symbol}}
-            />
-          </PowerSelect>
+          <CardPay::BalanceChooserDropdown
+            @tokens={{@tokens}}
+            @selectedToken={{@selectedToken}}
+            @selectedTokenSymbol={{@selectedTokenSymbol}}
+            @chooseToken={{@chooseToken}}
+          />
         </div>
       {{/if}}
     </:inner>

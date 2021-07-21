@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { click, render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
+import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { toBN } from 'web3-utils';
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
@@ -15,6 +16,19 @@ module(
     test('It should allow a layer 2 balance to be chosen', async function (assert) {
       let session = new WorkflowSession();
       this.set('session', session);
+
+      let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+      layer1Service.test__simulateAccountsChanged(
+        [layer1AccountAddress],
+        'metamask'
+      );
+      layer1Service.test__simulateBalances({
+        dai: toBN('150500000000000000000'),
+        card: toBN('350000000000000000000'),
+      });
+
       let layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
@@ -50,11 +64,15 @@ module(
           @isComplete={{this.isComplete}}
         />
       `);
+      assert.dom('.action-card__title').containsText('Withdraw tokens');
       assert
-        .dom('.action-card__title')
-        .containsText('Choose a depot and balance to withdraw from');
+        .dom('[data-test-choose-balance-from-wallet]')
+        .containsText('L2 test chain');
       assert
-        .dom('[data-test-account-depot-outer] [data-test-account-address]')
+        .dom('[data-test-choose-balance-from-address]')
+        .containsText('0x1826...6E44');
+      assert
+        .dom('[data-test-choose-balance-from-depot]')
         .containsText(depotAddress);
       assert
         .dom(
@@ -77,6 +95,15 @@ module(
           '[data-test-balance-chooser-dropdown] [data-test-balance-display-name]'
         )
         .containsText('CARD.CPXD');
+
+      assert
+        .dom('[data-test-choose-balance-receive] [data-test-account-name]')
+        .containsText('L1 test chain');
+      assert
+        .dom('[data-test-choose-balance-receive] [data-test-account-address]')
+        .containsText(layer1AccountAddress);
+      assert.dom('[data-test-choose-balance-from-display]').doesNotExist();
+
       await click('[data-test-boxel-action-chin] [data-test-boxel-button]');
       assert.equal(
         session.state.withdrawalToken,

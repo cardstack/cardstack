@@ -11,10 +11,8 @@
     </div>
 
     {{#if (has-block "innermost")}}
-      <div class="card-pay-nested-items__innermost">
-        <div class={{unless @noBorder "card-pay-nested-items__inner-content"}}>
-          {{yield to="innermost"}}
-        </div>
+      <div class={{unless @noInnerBorder "card-pay-nested-items__innermost card-pay-nested-items__inner-content"}}>
+        {{yield to="innermost"}}
       </div>
     {{/if}}
   </div>

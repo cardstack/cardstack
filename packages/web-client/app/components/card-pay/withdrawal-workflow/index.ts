@@ -96,7 +96,7 @@ class WithdrawalWorkflow extends Workflow {
       postables: [
         new WorkflowMessage({
           author: cardbot,
-          message: `From which balance in your ${c.layer2.fullName} wallet do you want to withdraw funds?`,
+          message: `Please choose the asset you would like to withdraw.`,
         }),
         new WorkflowCard({
           author: cardbot,
