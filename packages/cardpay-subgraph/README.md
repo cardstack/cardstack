@@ -67,7 +67,21 @@ $ graph auth https://api.thegraph.com/deploy/ <The Graph access token>
 After you have performed this authorization you will not need to perform this again for subsequent deployments.
 
 ### Deployment
-To deploy the subgraph to The Graph, just run the following in the `@cardstack/cardpay-subgraph`:
+To deploy the subgraph to both The Graph and one of our hosted graph nodes, run either the following in the `@cardstack/cardpay-subgraph`:
 ```
-yarn deploy-sokol
+yarn deploy-sokol-green
+```
+which deploys to our green node and The Graph, or
+```
+yarn deploy-sokol-blue
+```
+which deploys to our blue node and The Graph
+
+To check the sync status of either node, run:
+```
+yarn green-status
+```
+or
+```
+yarn blue-status
 ```
