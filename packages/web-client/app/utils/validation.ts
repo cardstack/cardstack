@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import { toBN, toWei } from 'web3-utils';
 
-// token input validations that assume string inputs are in wei
+// token input validations that assume string inputs are in ether
 function isInvalidAsNumber(amount: string) {
   return isNaN(Number(amount));
 }
