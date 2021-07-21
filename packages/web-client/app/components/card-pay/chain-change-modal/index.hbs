@@ -4,51 +4,22 @@
   @onClose={{@onClose}}
   @layer="urgent"
 >
-  {{!-- TODO: modify this so that there is a specific modal for layer 2 and a specific modal for layer 1 --}}
-  {{!-- docs are a bit misleading. if you want focus-trap to be happy with something that has no focusable elements, then the tabindex HAS to be greater than -1 --}}
-  {{#if this.isDismissable}}
-    <div
-      class="chain-change-modal__scroll-wrapper"
-      {{focus-trap
-        focusTrapOptions=(hash
-          allowOutsideClick=true
-          clickOutsideDeactivates=true
-        )
-      }}
+  <div
+    class="chain-change-modal__scroll-wrapper"
+    {{focus-trap
+      focusTrapOptions=(hash
+        allowOutsideClick=@dismissable
+        clickOutsideDeactivates=@dismissable
+      )
+    }}
+  >
+    <Boxel::CardContainer
+      class=" chain-change-modal__card"
+      tabindex="-1"
     >
-      {{!-- We have a close button if this is dismissable, so we don't want/need the container to be focusable or in the tab order --}}
-      <Boxel::CardContainer
-        class=" chain-change-modal__card"
-        tabindex="-1"
-      >
-        <h2>{{this.title}}</h2>
-        {{this.message}}
-        <Boxel::Button {{on "click" (optional @onClose)}}>Dismiss</Boxel::Button>
-      </Boxel::CardContainer>
-    </div>
-  {{else}}
-    {{!-- We don't have any focusable elements in here if it's not dismissable. We need the tabindex to be 0 for tabbable to be happy as of tabbable 5.2.0 --}}
-    <div
-      class="chain-change-modal__scroll-wrapper"
-      {{focus-trap
-        focusTrapOptions=(hash
-          allowOutsideClick=false
-          clickOutsideDeactivates=false
-        )
-      }}
-    >
-      <Boxel::CardContainer
-        class=" chain-change-modal__card"
-        tabindex="0"
-      >
-        <h2>{{this.title}}</h2>
-        {{this.message}}
-        {{!--
-          TODO: make it possible for the user to disconnect here.
-          They are stuck because they need to reload the page anyway, so add a button to do that
-          here. It seems kind of confusing to find your connected dApps in some wallets
-        --}}
-      </Boxel::CardContainer>
-    </div>
-  {{/if}}
+      <h2>{{@title}}</h2>
+      {{@body}}
+      <Boxel::Button {{on "click" (optional @action)}}>{{@actionText}}</Boxel::Button>
+    </Boxel::CardContainer>
+  </div>
 </Boxel::Modal>

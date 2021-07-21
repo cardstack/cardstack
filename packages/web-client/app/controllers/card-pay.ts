@@ -6,6 +6,15 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { tracked } from '@glimmer/tracking';
 import { currentNetworkDisplayInfo as c } from '../utils/web3-strategies/network-display-info';
 
+interface ChainChangeModalOptions {
+  title: string;
+  body: string;
+  actionText: string;
+  action: Function;
+  onClose: Function;
+  dismissable: boolean;
+}
+
 const networkCorrectionMessages = {
   layer1: {
     title: `Please connect to ${c.layer1.fullName}`,
@@ -23,10 +32,8 @@ export default class CardPayController extends Controller {
   @service declare layer2Network: Layer2Network;
   @tracked isShowingLayer1ConnectModal = false;
   @tracked isShowingLayer2ConnectModal = false;
-  @tracked layer1Incorrect = false;
-  @tracked layer2Incorrect = false;
   @tracked needsReload = false;
-  @tracked isShowingChainChangeModal = false;
+  @tracked chainChangeModalOptions: ChainChangeModalOptions | null = null;
 
   constructor() {
     super(...arguments);
@@ -38,33 +45,33 @@ export default class CardPayController extends Controller {
     this.layer2Network.on('incorrect-chain', this.onLayer2Incorrect);
   }
 
-  get chainChangeModalLayer() {
-    if (this.layer1Incorrect) return 'layer1';
-    else if (this.layer2Incorrect) return 'layer2';
-    else return '';
-  }
-
-  get chainChangeModalTitle() {
-    if (!this.chainChangeModalLayer) return '';
-    return networkCorrectionMessages[this.chainChangeModalLayer].title;
-  }
-
-  get chainChangeModalBody() {
-    if (!this.chainChangeModalLayer) return '';
-    return networkCorrectionMessages[this.chainChangeModalLayer].body;
+  @action disconnectLayer1() {
+    this.layer1Network.disconnect();
   }
 
   @action
   onLayer1Incorrect() {
     this.needsReload = true;
-    this.layer1Incorrect = true;
-    this.showChainChangeModal();
+    this.showChainChangeModal({
+      ...networkCorrectionMessages.layer1,
+      onClose: () => {},
+      action: this.disconnectLayer1,
+      actionText: 'Disconnect and reload',
+      dismissable: false,
+    });
   }
 
   @action
   onLayer2Incorrect() {
-    this.layer2Incorrect = true;
-    this.showChainChangeModal();
+    // don't allow layer 2 modal options to override layer 1
+    if (this.chainChangeModalOptions) return;
+    this.showChainChangeModal({
+      ...networkCorrectionMessages.layer2,
+      onClose: this.hideChainChangeModal,
+      action: this.hideChainChangeModal,
+      actionText: 'Dismiss',
+      dismissable: true,
+    });
   }
 
   @action
@@ -77,16 +84,13 @@ export default class CardPayController extends Controller {
   }
 
   @action
-  showChainChangeModal() {
-    this.isShowingChainChangeModal = true;
+  showChainChangeModal(options: ChainChangeModalOptions) {
+    this.chainChangeModalOptions = options;
   }
 
   @action
   hideChainChangeModal() {
-    if (!this.needsReload) {
-      this.isShowingChainChangeModal = false;
-      this.layer2Incorrect = false;
-    }
+    this.chainChangeModalOptions = null;
   }
 
   @action transitionTo(routeName: string) {
