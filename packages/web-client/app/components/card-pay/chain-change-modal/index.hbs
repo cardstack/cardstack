@@ -1,0 +1,48 @@
+<Boxel::Modal
+  class="chain-change-modal"
+  @isOpen={{@isOpen}}
+  @onClose={{@onClose}}
+  @layer="urgent"
+>
+  {{!-- docs are a bit misleading. if you want focus-trap to be happy with something that has no focusable elements, then the tabindex HAS to be greater than -1 --}}
+  {{#if this.isDismissable}}
+    <div
+      class="chain-change-modal__scroll-wrapper"
+      {{focus-trap
+        focusTrapOptions=(hash
+          allowOutsideClick=true
+          clickOutsideDeactivates=true
+        )
+      }}
+    >
+      {{!-- We have a close button if this is dismissable, so we don't want/need the container to be focusable or in the tab order --}}
+      <Boxel::CardContainer
+        class=" chain-change-modal__card"
+        tabindex="-1"
+      >
+        <h2>{{this.title}}</h2>
+        {{this.message}}
+        <Boxel::Button {{on "click" (optional @onClose)}}>Dismiss</Boxel::Button>
+      </Boxel::CardContainer>
+    </div>
+  {{else}}
+    {{!-- We don't have any focusable elements in here if it's not dismissable. We need the tabindex to be 0 for tabbable to be happy as of tabbable 5.2.0 --}}
+    <div
+      class="chain-change-modal__scroll-wrapper"
+      {{focus-trap
+        focusTrapOptions=(hash
+          allowOutsideClick=false
+          clickOutsideDeactivates=false
+        )
+      }}
+    >
+      <Boxel::CardContainer
+        class=" chain-change-modal__card"
+        tabindex="0"
+      >
+        <h2>{{this.title}}</h2>
+        {{this.message}}
+      </Boxel::CardContainer>
+    </div>
+  {{/if}}
+</Boxel::Modal>
