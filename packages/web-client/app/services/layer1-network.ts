@@ -1,4 +1,4 @@
-import { inject as service, default as Service } from '@ember/service';
+import Service from '@ember/service';
 import config from '../config/environment';
 import {
   Layer1ChainEvent,
