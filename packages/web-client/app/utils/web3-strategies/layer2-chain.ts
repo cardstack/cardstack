@@ -182,14 +182,18 @@ export default abstract class Layer2ChainWeb3Strategy
     return taskFor(this.fetchDepotTask).perform();
   }
 
-  async issuePrepaidCard(safeAddress: string, amount: number): Promise<String> {
+  async issuePrepaidCard(
+    safeAddress: string,
+    amount: number,
+    customizationDid: string
+  ): Promise<String> {
     const PrepaidCard = await getSDK('PrepaidCard', this.web3);
 
     const result = await PrepaidCard.create(
       safeAddress,
       this.defaultTokenContractAddress!,
       [amount],
-      undefined
+      customizationDid
     );
 
     return result.prepaidCardAddresses[0];
