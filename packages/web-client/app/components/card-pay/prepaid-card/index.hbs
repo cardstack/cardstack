@@ -44,8 +44,19 @@
     <div class="prepaid-card__content-rs">
       <div class="prepaid-card__logo" />
       <div class="prepaid-card__attributes">
-        <div>Reloadable</div>
-        <div>Transferable</div>
+
+        {{#if (eq @reloadable true)}}
+          <div data-test-prepaid-card-reloadable>Reloadable</div>
+        {{else if (eq @reloadable false)}}
+          <div data-test-prepaid-card-non-reloadable>Non-reloadable</div>
+        {{/if}}
+
+        {{#if (eq @transferrable true)}}
+          <div data-test-prepaid-card-transferrable>Transferrable</div>
+        {{else if (eq @reloadable false)}}
+          <div data-test-prepaid-card-non-transferrable>Non-transferrable</div>
+        {{/if}}
+
       </div>
     </div>
   </section>

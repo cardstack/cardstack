@@ -180,6 +180,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
         hasBeenUsed: false,
         issuer: account,
         reloadable: false,
+        transferrable: false,
         customizationDID:
           'did:cardstack:1prcYScXTPjrxb8Sej8o95DR2d1f42bcf30268f9',
       },

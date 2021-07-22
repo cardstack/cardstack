@@ -8,6 +8,7 @@
     @title="Prepaid card issued"
   >
     <div class="issue-prepaid-card-workflow-confirmation__card-container">
+      {{!-- FIXME reloadable/transferable missing, and can this be obtained as a PrepaidCardSafe? --}}
       <CardPay::PrepaidCard
         @issuerName={{@workflowSession.state.issuerName}}
         @headerBackground={{@workflowSession.state.colorScheme.background}}

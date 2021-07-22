@@ -50,6 +50,9 @@ module('Acceptance | card balances', function (hooks) {
       .containsText('§2324')
       .containsText('0x1234...abcd');
 
+    assert.dom('[data-test-prepaid-card-non-reloadable]').exists();
+    assert.dom('[data-test-prepaid-card-non-transferrable]').exists();
+
     await settled();
 
     assert.dom('[data-test-prepaid-card-issuer-name]').containsText('jortleby');
