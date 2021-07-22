@@ -20,3 +20,8 @@
 .workflow-thread:focus:not(:focus-visible) {
   box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
 }
+
+.workflow-thread__help-content {
+  font-size: var(--boxel-font-size-sm);
+  font-weight: 300;
+}
