@@ -25,3 +25,10 @@
   font-size: var(--boxel-font-size-sm);
   font-weight: 300;
 }
+
+.workflow-thread__app-version {
+  text-align: center;
+  font-size: var(--boxel-font-size-sm);
+  font-weight: 300;
+  color: var(--boxel-dark);
+}
