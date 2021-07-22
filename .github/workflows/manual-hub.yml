@@ -57,8 +57,15 @@ jobs:
 
       - run: yarn --prefer-offline
 
-      - name: Deploy
+      - name: Deploy server
         run: waypoint up --app=hub -plain
+        env:
+          AWS_DEFAULT_REGION: us-east-1
+          WAYPOINT_SERVER_TLS: 1
+          WAYPOINT_SERVER_TLS_SKIP_VERIFY: 1
+
+      - name: Deploy worker
+        run: waypoint up --app=hub-worker -plain
         env:
           AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TLS: 1

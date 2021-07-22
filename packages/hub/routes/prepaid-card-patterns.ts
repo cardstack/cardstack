@@ -32,7 +32,7 @@ export default class PrepaidCardPatternsRoute {
       };
       ctx.type = 'application/vnd.api+json';
     } catch (e) {
-      log.error(e);
+      log.error('Failed to retrieve prepaid_card_patterns', e);
     }
   }
 }

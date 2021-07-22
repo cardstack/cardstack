@@ -140,6 +140,12 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.WAYPOINT_AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.WAYPOINT_AWS_SECRET }}
           AWS_DEFAULT_REGION: us-east-1
+      - name: Deploy hub worker
+        run: waypoint up --app=hub-worker -plain
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.WAYPOINT_AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.WAYPOINT_AWS_SECRET }}
+          AWS_DEFAULT_REGION: us-east-1
 
   deploy-web-client-staging:
     name: Deploy web-client to S3 staging bucket

@@ -51,7 +51,7 @@ async function assumeRole(roleName: string, config: any) {
     let result = await stsClient.send(stsCommand);
     return result;
   } catch (e) {
-    log.error(e);
+    log.error(`Failed to assumeRole '${roleName}'`, e);
     throw e;
   }
 }

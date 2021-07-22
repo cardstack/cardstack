@@ -42,3 +42,38 @@ app "hub" {
         }
     }
 }
+
+app "hub-worker" {
+    path = "./packages/hub"
+
+    build {
+        use "pack" {
+            process_type = "worker"
+        }
+
+        registry {
+            use "aws-ecr" {
+                region     = "us-east-1"
+                repository = "hub-worker-staging"
+                tag        = "latest"
+            }
+        }
+    }
+
+    deploy {
+        use "aws-ecs" {
+            region = "us-east-1"
+            memory = "512"
+            cluster = "hub-worker-staging"
+            count = 2
+            subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
+            task_role_name = "hub-staging-hub_ecr_task"
+            disable_alb = true
+        }
+
+        hook {
+            when    = "before"
+            command = ["./packages/hub/bin/purge-services.sh", "hub-worker-staging"] # need this to purge old ecs services
+        }
+    }
+}
