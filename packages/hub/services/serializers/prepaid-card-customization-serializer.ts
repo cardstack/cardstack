@@ -16,7 +16,7 @@ interface PrepaidCardCustomizationSerializationOptions {
 }
 interface JSONAPIDocument {
   data: any;
-  includes?: any[];
+  included?: any[];
 }
 type PrepaidCardCustomizationRelationship = 'colorScheme' | 'pattern';
 
@@ -69,12 +69,12 @@ export default class PrepaidCardCustomizationSerializer {
       data,
     } as JSONAPIDocument;
     if (options.include?.includes('colorScheme')) {
-      result.includes = result.includes || [];
-      result.includes.push(await this.prepaidCardColorSchemeSerializer.serialize(content.colorSchemeId));
+      result.included = result.included || [];
+      result.included.push((await this.prepaidCardColorSchemeSerializer.serialize(content.colorSchemeId)).data);
     }
     if (options.include?.includes('pattern')) {
-      result.includes = result.includes || [];
-      result.includes.push(await this.prepaidCardPatternSerializer.serialize(content.patternId));
+      result.included = result.included || [];
+      result.included.push((await this.prepaidCardPatternSerializer.serialize(content.patternId)).data);
     }
     return result;
   }
