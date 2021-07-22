@@ -18,11 +18,11 @@ interface ChainChangeModalOptions {
 const networkCorrectionMessages = {
   layer1: {
     title: `Please connect to ${c.layer1.fullName}`,
-    body: `You need to be connected to ${c.layer1.fullName} on Layer 1 in order to use Card Pay. To ensure the safety of your mainnet assets and transactions, this page will reload as soon as you connect to the correct network, or disconnect from the layer 1 network.`,
+    body: `Card Pay uses ${c.layer1.fullName} as its Layer 1 network. To ensure the safety of your assets and transactions, this page will reload as soon as you change your wallet's network to ${c.layer1.fullName} or disconnect your wallet.`,
   },
   layer2: {
     title: `Please connect to ${c.layer2.fullName}`,
-    body: `You need to be connected to ${c.layer2.fullName} on Layer 2 in order to use Card Pay. We've disconnected you from the current network, and canceled your workflows.`,
+    body: `Card Pay uses ${c.layer2.fullName} as its Layer 2 network. To ensure the safety of your assets and transactions, we've disconnected your wallet. You can restart any incomplete workflows after reconnecting with ${c.layer2.fullName}.`,
   },
 };
 
@@ -56,7 +56,7 @@ export default class CardPayController extends Controller {
       ...networkCorrectionMessages.layer1,
       onClose: () => {},
       action: this.disconnectLayer1,
-      actionText: 'Disconnect and reload',
+      actionText: 'Disconnect and Reload',
       dismissable: false,
     });
   }
