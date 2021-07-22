@@ -220,7 +220,7 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${post} [data-test-unlock-button]`)
       .hasClass('boxel-button--loading');
     assert
-      .dom('[data-test-deposit-amount-input]')
+      .dom('[data-test-token-amount-input]')
       .doesNotExist('Input field is no longer available when unlocking');
 
     assert.dom('[data-test-deposit-amount-entered]').containsText('250.00 DAI');
@@ -235,7 +235,7 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${post} [data-test-unlock-success-message]`)
       .exists('There should be a success message after unlocking');
     assert
-      .dom('[data-test-deposit-amount-input]')
+      .dom('[data-test-token-amount-input]')
       .doesNotExist('Input field is no longer available after unlocking');
     assert
       .dom(`${post} [data-test-deposit-button]`)

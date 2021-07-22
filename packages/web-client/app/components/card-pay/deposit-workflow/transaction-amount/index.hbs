@@ -1,17 +1,16 @@
 <ActionCardContainer
-  class={{cn "transaction-amount" transaction-amount--data-entered=this.isUnlockingOrUnlocked}}
   @header="Deposit Amount"
   @isComplete={{@isComplete}}
 >
   <ActionCardContainer::Section @title="Choose an amount to deposit into the reserve pool">
-    <div class="transaction-amount__input-section">
-      <Boxel::Field
-        class="transaction-amount__field"
-        @label="Funding From:"
-        @labelClass="transaction-amount__banner-field-label"
+    <div class="transaction-amount__fields">
+      <CardPay::LabeledValue
+        class="transaction-amount__label"
+        @vertical={{this.isUnlockingOrUnlocked}}
+        @label="Funding from"
       >
         <CardPay::DepositWorkflow::TransactionAmount::BalanceView
-        @wallet={{network-display-info "layer1" "fullName"}}
+          @wallet={{network-display-info "layer1" "fullName"}}
           @tokenSymbol={{this.currentTokenSymbol}}
           @tokenIcon={{this.currentTokenDetails.icon}}
           @address={{this.layer1Network.walletInfo.firstAddress}}
@@ -19,42 +18,48 @@
           @balanceInUsd={{token-to-usd this.currentTokenSymbol this.currentTokenBalance}}
           @isComplete={{@isComplete}}
         />
-      </Boxel::Field>
-      {{#if this.isUnlockingOrUnlocked}}
-        <Boxel::Field
-          class="transaction-amount__field"
-          @label="Amount to deposit:"
-        >
+      </CardPay::LabeledValue>
+      <CardPay::LabeledValue
+        @fieldMode={{if this.isUnlockingOrUnlocked "view" "edit"}}
+        @vertical={{this.isUnlockingOrUnlocked}}
+        @label="Amount to deposit"
+        class="transaction-amount__label"
+      >
+        {{#if this.isUnlockingOrUnlocked}}
           <CardPay::BalanceDisplay
             class="transaction-amount__token"
             @size="large"
             @icon={{this.currentTokenDetails.icon}}
             @balance={{format-token-amount this.amountAsBigNumber}}
             @symbol={{this.currentTokenSymbol}}
-            @usdBalance={{token-to-usd this.currentTokenSymbol this.amountAsBigNumber}}
+            @text={{concat "$" (token-to-usd this.currentTokenSymbol this.amountAsBigNumber) " USD*"}}
             data-test-deposit-amount-entered
           />
-        </Boxel::Field>
-      {{else}}
-        <CardPay::TokenAmountInput
-          @label="Amount to deposit"
-          @amount={{this.amount}}
-          @tokenSymbol={{this.currentTokenSymbol}}
-          @tokenBalance={{this.currentTokenBalance}}
-          @onInputAmount={{this.onInputAmount}}
-          @invalid={{this.isInvalid}}
-          @errorMessage={{this.validationErrorMessage}}
-        />
-        <Boxel::Field @label="Approximate value">
+        {{else}}
+          <CardPay::TokenAmountInput
+            @icon={{this.currentTokenDetails.icon}}
+            @value={{this.amount}}
+            @onInput={{this.onInputAmount}}
+            @symbol={{this.currentTokenSymbol}}
+            @invalid={{this.isInvalid}}
+            @errorMessage={{this.validationMessage}}
+          />
+        {{/if}}
+      </CardPay::LabeledValue>
+      {{#unless this.isUnlockingOrUnlocked}}
+        <CardPay::LabeledValue @label="Approximate value*" class="transaction-amount__label">
           ${{token-to-usd this.currentTokenSymbol this.amountAsBigNumber}} USD
-        </Boxel::Field>
-      {{/if}}
+        </CardPay::LabeledValue>
+      {{/unless}}
     </div>
     {{#if this.errorMessage}}
       <CardPay::ErrorMessage>
-        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact <a href="mailto:support@cardstack.com" target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact Cardstack support.
       </CardPay::ErrorMessage>
     {{/if}}
+    <div class="transaction-amount__footnote">
+      * The actual value depends on the current exchange rate and is determined at the time of authorization.
+    </div>
   </ActionCardContainer::Section>
   <Boxel::ActionChin @stepNumber={{1}} @state={{this.unlockCtaState}} @disabled={{or @frozen this.unlockCtaDisabled}}>
     <:default as |a|>

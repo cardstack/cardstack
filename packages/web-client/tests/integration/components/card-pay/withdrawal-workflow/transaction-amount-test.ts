@@ -50,7 +50,7 @@ module(
       assert.dom('input').hasAria('invalid', 'true');
       assert
         .dom('[data-test-boxel-input-error-message]')
-        .containsText('You need to enter an amount');
+        .containsText('This field is required');
     });
 
     test('the amount is marked invalid when the field loses focus', async function (assert) {
@@ -59,7 +59,7 @@ module(
       assert.dom('input').hasAria('invalid', 'true');
       assert
         .dom('[data-test-boxel-input-error-message]')
-        .containsText('You need to enter an amount');
+        .containsText('This field is required');
     });
 
     test('it accepts a well-formatted value that is less than or equal to the balance', async function (assert) {
@@ -85,14 +85,14 @@ module(
       assert.dom('input').hasAria('invalid', 'true');
       assert
         .dom('[data-test-boxel-input-error-message]')
-        .containsText('Amount is too high');
+        .containsText('Insufficient balance in your account');
 
       await fillIn('input', '100.2');
       assert.dom('input').hasValue('100.2');
       assert.dom('input').hasAria('invalid', 'true');
       assert
         .dom('[data-test-boxel-input-error-message]')
-        .containsText('Amount is too high');
+        .containsText('Insufficient balance in your account');
     });
 
     test('it strips whitespace from the beginning and end', async function (assert) {

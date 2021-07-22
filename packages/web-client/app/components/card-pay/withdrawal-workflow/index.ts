@@ -92,7 +92,7 @@ class WithdrawalWorkflow extends Workflow {
       completedDetail: `${c.layer2.fullName} wallet connected`,
     }),
     new Milestone({
-      title: 'Set withdrawal amount',
+      title: `Withdraw from ${c.layer2.fullName}`,
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -111,22 +111,7 @@ class WithdrawalWorkflow extends Workflow {
           componentName: 'card-pay/withdrawal-workflow/transaction-amount',
         }),
       ],
-      completedDetail: 'Withdrawal amount set',
-    }),
-    new Milestone({
-      title: 'Confirm transaction',
-      postables: [
-        new WorkflowMessage({
-          author: cardbot,
-          message:
-            'Now, we just need your confirmation to make the withdrawal.',
-        }),
-        new WorkflowCard({
-          author: cardbot,
-          componentName: 'card-pay/withdrawal-workflow/transaction-approval',
-        }),
-      ],
-      completedDetail: 'Transaction confirmed',
+      completedDetail: `Withdrawn from ${c.layer2.fullName}`,
     }),
   ];
   epilogue = new PostableCollection([
