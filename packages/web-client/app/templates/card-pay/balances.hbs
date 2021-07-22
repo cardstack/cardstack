@@ -39,13 +39,7 @@
 
     {{#each this.layer2Network.viewSafes.lastSuccessful.value as |safe|}}
       {{#if (eq safe.type "prepaid-card")}}
-        <CardPay::PrepaidCard
-          @mockBalance={{false}}
-          @balance={{safe.spendFaceValue}}
-          @usdBalance={{spend-to-usd safe.spendFaceValue}}
-          @address={{safe.address}}
-          @network={{network-display-info "layer2" "fullName"}}
-        />
+        <CardPay::PrepaidCardSafe @safe={{safe}} />
       {{/if}}
     {{/each}}
   </section>

@@ -5,6 +5,8 @@ import { taskFor } from 'ember-concurrency-ts';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import HubAuthentication from './hub-authentication';
+import { getResolver } from '@cardstack/did-resolver';
+import { Resolver } from 'did-resolver';
 
 export interface ColorCustomizationOption {
   background: string;
@@ -214,6 +216,52 @@ export default class CardCustomization extends Service {
     return {
       did: customization.data.attributes.did,
     };
+  }
+
+  get didResolver() {
+    return new Resolver(getResolver());
+  }
+
+  @task *fetchCardCustomization(customizationDID: string): any {
+    try {
+      let did = yield this.didResolver.resolve(customizationDID);
+
+      let alsoKnownAs = did?.didDocument?.alsoKnownAs;
+
+      if (alsoKnownAs) {
+        let jsonApiDocument = yield (yield fetch(alsoKnownAs)).json();
+
+        // FIXME stored documents are currently not following the standard (CS-1353)
+        let included = jsonApiDocument.included || jsonApiDocument.includes;
+
+        // FIXME there shouldn’t be a data wrapper
+        let colorScheme =
+          included.findBy('data.type', 'prepaid-card-color-schemes') ||
+          included.findBy('type', 'prepaid-card-color-schemes');
+        let pattern =
+          included.findBy('data.type', 'prepaid-card-patterns') ||
+          included.findBy('type', 'prepaid-card-patterns');
+
+        if (colorScheme.data) {
+          colorScheme = colorScheme.data.attributes;
+          pattern = pattern.data.attributes;
+        } else {
+          colorScheme = colorScheme.attributes;
+          pattern = pattern.attributes;
+        }
+
+        return {
+          issuerName: jsonApiDocument.data.attributes['issuer-name'],
+          background: colorScheme.background,
+          patternColor: colorScheme['pattern-color'],
+          textColor: colorScheme['text-color'],
+          patternUrl: pattern['pattern-url'],
+        };
+      }
+    } catch (e) {
+      // FIXME what to do
+      console.log('error resolving did', e);
+    }
   }
 }
 

@@ -48,7 +48,18 @@ export default function () {
     );
   });
 
+  this.get(
+    'https://storage.cardstack.com/prepaid-card-customization/:id',
+    function (schema, { params: { id } }) {
+      // FIXME :id includes the .json extension
+      return schema.prepaidCardCustomizations.find(id.split('.')[0]);
+    }
+  );
+
   this.passthrough((request) => {
-    return !request.url.includes('/api/');
+    return (
+      !request.url.includes('/api/') &&
+      !request.url.includes('storage.cardstack.com')
+    );
   });
 }
