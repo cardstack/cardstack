@@ -214,27 +214,43 @@ module('Acceptance | withdrawal', function (hooks) {
       .containsText('Confirmed');
     assert
       .dom(milestoneCompletedSel(2))
-      .containsText('Withdrawn from L2 test chain');
-
-    assert
-      .dom(epiloguePostableSel(0))
-      .containsText('You have successfully withdrawn tokens');
+      .containsText(`Withdrawn from ${c.layer2.fullName}`);
 
     // // transaction-status step card
-
-    await waitFor(epiloguePostableSel(1));
     assert
-      .dom(epiloguePostableSel(1))
-      .containsText(`Bridging tokens to ${c.layer1.fullName}`);
-
+      .dom(postableSel(3, 0))
+      .containsText(
+        `withdrawn funds from the ${c.layer2.fullName}, your tokens will be bridged to ${c.layer1.fullName}`
+      );
+    await waitFor(postableSel(3, 1));
     layer2Service.test__simulateBridgedToLayer1(
       '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
     );
-
     await settled();
+    assert
+      .dom(milestoneCompletedSel(3))
+      .containsText(`Tokens bridged to ${c.layer1.fullName}`);
+
+    // // token claim step card
+    assert
+      .dom(postableSel(4, 0))
+      .containsText(
+        `You will have to pay ${c.layer1.conversationalName} gas fee`
+      );
+    // TODO: add claim token tests
+    await waitFor(postableSel(4, 1));
+    post = postableSel(4, 1);
+    await click(`${post} [data-test-boxel-button]`);
+    await waitFor('[data-test-withdrawal-token-claim-is-complete]');
+    assert
+      .dom(milestoneCompletedSel(4))
+      .containsText(`Tokens claimed on ${c.layer1.conversationalName}`);
 
     // // transaction-summary card
-
+    await waitFor(epiloguePostableSel(0));
+    assert
+      .dom(epiloguePostableSel(0))
+      .containsText('Congrats! Your withdrawal is complete.');
     assert
       .dom(
         '[data-test-withdrawal-transaction-confirmed-from] [data-test-bridge-item-amount]'
@@ -246,10 +262,9 @@ module('Acceptance | withdrawal', function (hooks) {
       )
       .containsText('200.00 DAI');
 
-    await waitFor(epiloguePostableSel(3));
-
+    await waitFor(epiloguePostableSel(2));
     assert
-      .dom(epiloguePostableSel(3))
+      .dom(epiloguePostableSel(2))
       .containsText(
         `This is the remaining balance in your ${c.layer2.fullName} wallet`
       );
@@ -257,12 +272,12 @@ module('Acceptance | withdrawal', function (hooks) {
       defaultToken: toBN('2141100000000000000'), // TODO: choose numbers that make sense with the scenario
       card: toBN('10000000000000000000000'), // TODO: choose numbers that make sense with the scenario
     });
-    await waitFor(`${epiloguePostableSel(4)} [data-test-balance="DAI.CPXD"]`);
+    await waitFor(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`);
     assert
-      .dom(`${epiloguePostableSel(4)} [data-test-balance="DAI.CPXD"]`)
+      .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
       .containsText('2.1411');
     assert
-      .dom(`${epiloguePostableSel(4)} [data-test-balance="CARD.CPXD"]`)
+      .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD.CPXD"]`)
       .containsText('10000.00');
     // let milestoneCtaButtonCount = Array.from(
     //   document.querySelectorAll(
@@ -279,11 +294,11 @@ module('Acceptance | withdrawal', function (hooks) {
     //   );
     assert
       .dom(
-        `${epiloguePostableSel(5)} [data-test-withdrawal-next-step="dashboard"]`
+        `${epiloguePostableSel(4)} [data-test-withdrawal-next-step="dashboard"]`
       )
       .exists();
     await click(
-      `${epiloguePostableSel(5)} [data-test-withdrawal-next-step="dashboard"]`
+      `${epiloguePostableSel(4)} [data-test-withdrawal-next-step="dashboard"]`
     );
     assert.dom('[data-test-workflow-thread]').doesNotExist();
   });

@@ -57,7 +57,7 @@ class WithdrawalWorkflow extends Workflow {
       )} wallet connected`,
     }),
     new Milestone({
-      title: `Connect ${c.layer2.fullName} wallet`,
+      title: `Connect ${c.layer2.conversationalName} wallet`,
       postables: [
         new NetworkAwareWorkflowMessage({
           author: cardbot,
@@ -89,10 +89,10 @@ class WithdrawalWorkflow extends Workflow {
           componentName: 'card-pay/layer-two-connect-card',
         }),
       ],
-      completedDetail: `${c.layer2.fullName} wallet connected`,
+      completedDetail: `${c.layer2.conversationalName} wallet connected`,
     }),
     new Milestone({
-      title: `Withdraw from ${c.layer2.fullName}`,
+      title: `Withdraw from ${c.layer2.conversationalName}`,
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -111,17 +111,43 @@ class WithdrawalWorkflow extends Workflow {
           componentName: 'card-pay/withdrawal-workflow/transaction-amount',
         }),
       ],
-      completedDetail: `Withdrawn from ${c.layer2.fullName}`,
+      completedDetail: `Withdrawn from ${c.layer2.conversationalName}`,
+    }),
+    new Milestone({
+      title: `Bridge tokens to ${c.layer1.conversationalName}`,
+      postables: [
+        new WorkflowMessage({
+          author: cardbot,
+          message: `Now that you have withdrawn funds from the ${c.layer2.fullName},
+          your tokens will be bridged to ${c.layer1.fullName}. You can check the status below.`,
+        }),
+        new WorkflowCard({
+          author: cardbot,
+          componentName: 'card-pay/withdrawal-workflow/transaction-status',
+        }),
+      ],
+      completedDetail: `Tokens bridged to ${c.layer1.conversationalName}`,
+    }),
+    new Milestone({
+      title: `Claim tokens on ${c.layer1.conversationalName}`,
+      postables: [
+        new WorkflowMessage({
+          author: cardbot,
+          message: `As a final step, please sign this transaction to claim the bridged tokens into your
+          ${c.layer1.fullName} wallet. You will have to pay ${c.layer1.conversationalName} gas fee for this operation.`,
+        }),
+        new WorkflowCard({
+          author: cardbot,
+          componentName: 'card-pay/withdrawal-workflow/token-claim',
+        }),
+      ],
+      completedDetail: `Tokens claimed on ${c.layer1.conversationalName}`,
     }),
   ];
   epilogue = new PostableCollection([
     new WorkflowMessage({
       author: cardbot,
-      message: `You have successfully withdrawn tokens from your ${c.layer2.fullName} wallet! The corresponding amount of tokens has been added to your ${c.layer1.fullName} wallet.`,
-    }),
-    new WorkflowCard({
-      author: cardbot,
-      componentName: 'card-pay/withdrawal-workflow/transaction-status',
+      message: `Congrats! Your withdrawal is complete.`,
     }),
     new WorkflowCard({
       author: cardbot,
