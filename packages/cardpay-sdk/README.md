@@ -409,6 +409,7 @@ This method is invoked with the following parameters:
 - An array of face values in units of **§** SPEND as numbers. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
 - A DID string that represents the customization for the prepaid card. The customization for a prepaid card can be retrieved using a DID resolver with this DID. If there is no customization an `undefined` value can be specified here.
 - You can optionally provide a callback to obtain the prepaid card addresses before the creation process is complete
+- You can optionally provide a callback to obtain the transaction hash of the  card addresses before the creation process is complete
 - You can optionally provide a callback to obtain a hook to know when the gas has been loaded into the prepaid card before the creation process is complete
 - You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
 

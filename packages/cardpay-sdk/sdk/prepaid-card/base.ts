@@ -350,6 +350,7 @@ export default class PrepaidCard {
     faceValues: number[],
     customizationDID: string | undefined,
     onPrepaidCardsCreated?: (prepaidCardAddresses: string[], txnHash: string) => unknown,
+    onTxHash?: (txHash: string) => unknown,
     onGasLoaded?: (txnHashes: string[]) => unknown,
     options?: ContractOptions
   ): Promise<{ prepaidCardAddresses: string[]; gnosisTxn: GnosisExecTx }> {
@@ -430,6 +431,10 @@ export default class PrepaidCard {
       estimate.gasToken,
       ZERO_ADDRESS
     );
+
+    if (typeof onTxHash === 'function') {
+      await onTxHash(gnosisTxn.ethereumTx.txHash);
+    }
 
     let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisTxn.ethereumTx.txHash);
 

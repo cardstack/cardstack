@@ -45,10 +45,10 @@ export async function create(
       ' SPEND, §'
     )} SPEND and issuing token ${symbol} from depot ${safe}...`
   );
-  let result = await prepaidCard.create(safe, tokenAddress, faceValues, customizationDID, (prepaidCardAddresses) =>
-    console.log(`Created new prepaid card(s): ${prepaidCardAddresses.join(', ')}`)
-  );
-  console.log(`Transaction hash: ${blockExplorer}/tx/${result.gnosisTxn.ethereumTx.txHash}/token-transfers`);
+  let onPrepaidCardCreated = (prepaidCardAddresses: string[]) =>
+    console.log(`Created new prepaid card(s): ${prepaidCardAddresses.join(', ')}`);
+  let onTxHash = (txHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txHash}/token-transfers`);
+  await prepaidCard.create(safe, tokenAddress, faceValues, customizationDID, onPrepaidCardCreated, onTxHash);
 }
 
 export async function split(
