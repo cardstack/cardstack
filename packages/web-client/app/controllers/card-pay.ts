@@ -56,7 +56,7 @@ export default class CardPayController extends Controller {
       ...networkCorrectionMessages.layer1,
       onClose: () => {},
       action: this.disconnectLayer1,
-      actionText: 'Disconnect and reload',
+      actionText: 'Disconnect and Reload',
       dismissable: false,
     });
   }
