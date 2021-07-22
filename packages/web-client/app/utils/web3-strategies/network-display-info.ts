@@ -14,6 +14,7 @@ type Layer1NetworkCopywriting = {
 type Layer2NetworkCopywriting = {
   fullName: string;
   shortName: string;
+  conversationalName: string;
 };
 
 export type NetworkCopywriting =
@@ -32,7 +33,7 @@ let layer1NetworkDisplayInfo: Record<
   kovan: {
     fullName: 'Kovan testnet',
     shortName: 'Kovan',
-    conversationalName: 'Kovan testnet',
+    conversationalName: 'Kovan',
   },
   'test-layer1': {
     fullName: 'L1 test chain',
@@ -47,14 +48,17 @@ let layer2NetworkDisplayInfo: Record<
   xdai: {
     fullName: 'xDai chain',
     shortName: 'xDai',
+    conversationalName: 'xDai chain',
   },
   sokol: {
     fullName: 'Sokol testnet',
     shortName: 'Sokol',
+    conversationalName: 'Sokol',
   },
   'test-layer2': {
     fullName: 'L2 test chain',
     shortName: 'L2',
+    conversationalName: 'L2 test chain',
   },
 };
 

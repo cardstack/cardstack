@@ -1,0 +1,34 @@
+<ActionCardContainer
+  @header="Token Claim"
+  @isComplete={{@isComplete}}
+  data-test-withdrawal-token-claim-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section
+    @title={{concat "Claim the bridged tokens into your " (network-display-info "layer1" "conversationalName") " wallet"}}
+  >
+    {{!-- TODO --}}
+  </ActionCardContainer::Section>
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    @disabled={{@frozen}}
+  >
+    <:default as |d|>
+      <d.ActionButton {{on "click" @onComplete}}>
+        Claim
+      </d.ActionButton>
+    </:default>
+    <:memorialized as |m|>
+      <m.ActionStatusArea>
+        Claimed
+      </m.ActionStatusArea>
+      {{#if this.txViewerUrl}}
+        <m.InfoArea>
+          {{!-- TODO: add url --}}
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} target="_blank" rel="noopener">
+            View on Etherscan
+          </Boxel::Button>
+        </m.InfoArea>
+      {{/if}}
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>
