@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
 import { Layer2Web3Strategy, TransactionHash } from './types';
@@ -68,7 +67,6 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(this.depotSafe);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   awaitBridgedToLayer2(
     _fromBlock: BN,
     _receiver: string
@@ -132,7 +130,6 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   async issuePrepaidCard(
     _safeAddress: string,
     faceValue: number,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _customizationDID: string
   ): Promise<String> {
     let deferred: RSVP.Deferred<String> = defer();
