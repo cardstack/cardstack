@@ -14,12 +14,17 @@
     }}
   >
     <Boxel::CardContainer
-      class=" chain-change-modal__card"
+      class="chain-change-modal__card"
       tabindex="-1"
     >
-      <h2>{{@title}}</h2>
+      <header class="chain-change-modal__card-title">
+          {{svg-jar "warning" class="chain-change-modal__card-title-icon" width="30" height="30"}}
+          <div class="chain-change-modal__card-title-content">
+            {{@title}}
+          </div>
+      </header>
       {{@body}}
-      <Boxel::Button {{on "click" (optional @action)}}>{{@actionText}}</Boxel::Button>
+      <Boxel::Button @kind="primary" {{on "click" (optional @action)}}>{{@actionText}}</Boxel::Button>
     </Boxel::CardContainer>
   </div>
 </Boxel::Modal>
