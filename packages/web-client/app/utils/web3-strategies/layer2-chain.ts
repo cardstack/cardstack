@@ -23,6 +23,7 @@ import {
   TransactionHash,
   Layer2NetworkSymbol,
   Layer2ChainEvent,
+  IssuePrepaidCardOptions,
 } from './types';
 import {
   networkIds,
@@ -185,15 +186,18 @@ export default abstract class Layer2ChainWeb3Strategy
   async issuePrepaidCard(
     safeAddress: string,
     amount: number,
-    customizationDid: string
-  ): Promise<String> {
+    customizationDid: string,
+    options: IssuePrepaidCardOptions
+  ): Promise<ChainAddress> {
     const PrepaidCard = await getSDK('PrepaidCard', this.web3);
 
     const result = await PrepaidCard.create(
       safeAddress,
       this.defaultTokenContractAddress!,
       [amount],
-      customizationDid
+      customizationDid,
+      undefined,
+      options.onTxHash
     );
 
     return result.prepaidCardAddresses[0];

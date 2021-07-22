@@ -10,6 +10,8 @@ import CardCustomization, {
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
+import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 
 // http://ember-concurrency.com/docs/typescript
 // infer whether we should treat the return of a yield statement as a promise
@@ -25,6 +27,7 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
   @service declare cardCustomization: CardCustomization;
   @service declare hubAuthentication: HubAuthentication;
   @service declare layer2Network: Layer2Network;
+  @tracked txHash?: TransactionHash;
 
   @reads('args.workflowSession.state.spendFaceValue')
   declare faceValue: number;
@@ -51,12 +54,17 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
         patternId: workflowSession.state.pattern.id,
       });
 
-      yield taskFor(this.layer2Network.issuePrepaidCard)
-        .perform(this.faceValue, customization.did)
-        .then((address: string) => {
-          this.args.workflowSession.update('prepaidCardAddress', address);
-          this.args.onComplete();
-        });
+      let address = yield taskFor(this.layer2Network.issuePrepaidCard).perform(
+        this.faceValue,
+        customization.did,
+        {
+          onTxHash: (txHash: TransactionHash) => {
+            this.txHash = txHash;
+          },
+        }
+      );
+      this.args.workflowSession.update('prepaidCardAddress', address);
+      this.args.onComplete();
     } catch (e) {
       let insufficientFunds = e.message.startsWith(
         'Safe does not have enough balance to make prepaid card(s).'
@@ -85,5 +93,9 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
     } else {
       return 'default';
     }
+  }
+
+  get txViewerUrl() {
+    return this.txHash && this.layer2Network.blockExplorerUrl(this.txHash);
   }
 }

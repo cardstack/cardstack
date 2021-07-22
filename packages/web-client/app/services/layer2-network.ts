@@ -88,11 +88,16 @@ export default class Layer2Network
     return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
   }
 
-  @task *issuePrepaidCard(faceValue: number, customizationDid: string): any {
+  @task *issuePrepaidCard(
+    faceValue: number,
+    customizationDid: string,
+    options: IssuePrepaidCardOptions
+  ): any {
     let address = yield this.strategy.issuePrepaidCard(
       this.depotSafe?.address!,
       faceValue,
-      customizationDid
+      customizationDid,
+      options
     );
     return address;
   }

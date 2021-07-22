@@ -102,11 +102,25 @@
         />
         You will receive a confirmation request from the Card Wallet app in a few moments…
       </i.ActionStatusArea>
+      {{#if this.txViewerUrl}}
+        <i.InfoArea>
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} @kind="secondary-dark" target="_blank" rel="noopener">
+            View on Blockscout
+          </Boxel::Button>
+        </i.InfoArea>
+      {{/if}}
     </:in-progress>
     <:memorialized as |m|>
       <m.ActionStatusArea>
         Confirmed
       </m.ActionStatusArea>
+      {{#if this.txViewerUrl}}
+        <m.InfoArea>
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} @kind="secondary-light" target="_blank" rel="noopener">
+            View on Blockscout
+          </Boxel::Button>
+        </m.InfoArea>
+      {{/if}}
     </:memorialized>
   </Boxel::ActionChin>
 </ActionCardContainer>
