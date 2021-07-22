@@ -1,6 +1,11 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
-import { Layer2Web3Strategy, TransactionHash } from './types';
+import {
+  ChainAddress,
+  IssuePrepaidCardOptions,
+  Layer2Web3Strategy,
+  TransactionHash,
+} from './types';
 import {
   BridgeableSymbol,
   ConvertibleSymbol,
@@ -16,6 +21,10 @@ import {
   SimpleEmitter,
 } from '@cardstack/web-client/utils/events';
 
+interface IssuePrepaidCardRequest {
+  deferred: RSVP.Deferred<String>;
+  onTxHash?: (txHash: TransactionHash) => void;
+}
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainId = '-1';
   simpleEmitter = new SimpleEmitter();
@@ -29,10 +38,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked defaultTokenBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
   @tracked depotSafe: DepotSafe | null = null;
-  issuePrepaidCardDeferredForNumber: Map<
-    number,
-    RSVP.Deferred<String>
-  > = new Map();
+  issuePrepaidCardRequests: Map<number, IssuePrepaidCardRequest> = new Map();
 
   // property to test whether the refreshBalances method is called
   // to test if balances are refreshed after relaying tokens
@@ -130,10 +136,14 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   async issuePrepaidCard(
     _safeAddress: string,
     faceValue: number,
-    _customizationDID: string
-  ): Promise<String> {
-    let deferred: RSVP.Deferred<String> = defer();
-    this.issuePrepaidCardDeferredForNumber.set(faceValue, deferred);
+    _customizationDID: string,
+    options: IssuePrepaidCardOptions
+  ): Promise<ChainAddress> {
+    let deferred: RSVP.Deferred<ChainAddress> = defer();
+    this.issuePrepaidCardRequests.set(faceValue, {
+      deferred,
+      onTxHash: options.onTxHash,
+    });
     return deferred.promise;
   }
 
@@ -193,9 +203,9 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     faceValue: number,
     walletAddress: string
   ) {
-    return this.issuePrepaidCardDeferredForNumber
-      .get(faceValue)
-      ?.resolve(walletAddress);
+    let request = this.issuePrepaidCardRequests.get(faceValue);
+    request?.onTxHash?.('exampleTxHash');
+    return request?.deferred.resolve(walletAddress);
   }
 
   test__simulateHubAuthentication(authToken: string) {
