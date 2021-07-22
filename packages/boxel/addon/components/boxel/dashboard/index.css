@@ -6,18 +6,11 @@
   position: relative;
   display: grid;
   grid-template-rows: auto 1fr;
-  height: 100%;
   background-color: var(--boxel-dashboard-background-color);
   color: var(--boxel-dashboard-color);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
   z-index: 0;
-}
-
-.boxel-dashboard__sticky-header-container {
-  position: sticky;
-  top: 0;
-  z-index: 1;
 }
 
 .boxel-dashboard__body-container {
