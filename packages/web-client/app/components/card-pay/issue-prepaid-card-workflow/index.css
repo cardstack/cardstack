@@ -1,7 +1,3 @@
-.issue-prepaid-card-workflow {
-  color: var(--boxel-dark);
-}
-
 /* TODO: shared styles with deposit-workflow__banner -- extract common component? */
 .issue-prepaid-card-workflow__banner {
   padding-right: var(--boxel-sp);
