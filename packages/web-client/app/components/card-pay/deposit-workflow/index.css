@@ -1,7 +1,3 @@
-.deposit-workflow {
-  color: var(--boxel-dark);
-}
-
 /* Expandable banner */
 .deposit-workflow__banner {
   padding-right: var(--boxel-sp);
