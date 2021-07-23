@@ -51,6 +51,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked cardBalance: BN | undefined;
   @tracked depotSafe: DepotSafe | null = null;
   issuePrepaidCardRequests: Map<number, IssuePrepaidCardRequest> = new Map();
+  accountSafes: Map<string, Safe[]> = new Map();
 
   // property to test whether the refreshBalances method is called
   // to test if balances are refreshed after relaying tokens
@@ -146,45 +147,15 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   async viewSafes(account: string): Promise<Safe[]> {
-    return Promise.resolve([
-      {
-        type: 'prepaid-card',
+    return Promise.resolve(this.accountSafes.get(account)!);
+  }
 
-        address: '0x123400000000000000000000000000000000abcd',
+  test__simulateAccountSafes(account: string, safes: Safe[]) {
+    if (!this.accountSafes.has(account)) {
+      this.accountSafes.set(account, []);
+    }
 
-        tokens: [
-          {
-            tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
-            balance: '1000000000000000000',
-            token: {
-              name: 'CARD Token Kovan.CPXD',
-              symbol: 'CARD',
-              decimals: 18,
-            },
-          },
-          {
-            tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
-            balance: '998003992015968163',
-            token: {
-              name: 'Dai Stablecoin.CPXD',
-              symbol: 'DAI',
-              decimals: 18,
-            },
-          },
-        ],
-        owners: [account],
-
-        issuingToken: '0xTOKEN',
-        spendFaceValue: 2324,
-        prepaidCardOwner: account,
-        hasBeenUsed: false,
-        issuer: account,
-        reloadable: false,
-        transferrable: false,
-        customizationDID:
-          'did:cardstack:1prcYScXTPjrxb8Sej8o95DR2d1f42bcf30268f9',
-      },
-    ]);
+    this.accountSafes.get(account)?.push(...safes);
   }
 
   async issuePrepaidCard(

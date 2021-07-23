@@ -34,7 +34,7 @@
 </section>
 
 {{#if this.layer2Network.isConnected}}
-  <section data-test-card-balances {{did-insert (perform this.layer2Network.viewSafes)}}>
+  <section data-test-card-balances {{did-insert (perform this.layer2Network.viewSafes this.layer2Network.walletInfo.firstAddress)}}>
     Card Balances
 
     {{#each this.layer2Network.viewSafes.lastSuccessful.value as |safe|}}
