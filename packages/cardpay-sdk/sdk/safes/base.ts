@@ -344,6 +344,10 @@ interface GraphQLSafeResult {
 }
 
 function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
+  if (!safe) {
+    return;
+  }
+
   let tokens: TokenInfo[] = [];
   for (let tokenDetail of safe.tokens) {
     tokens.push({
