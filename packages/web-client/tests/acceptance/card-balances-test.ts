@@ -96,6 +96,8 @@ module('Acceptance | card balances', function (hooks) {
 
     assert.dom('[data-test-account-sidebar]').containsText('0x1826...6E44');
 
+    assert.dom('[data-test-prepaid-cards-count]').containsText('1');
+
     assert
       .dom('[data-test-card-balances]')
       .containsText('§2324')

@@ -26,6 +26,11 @@
   font-weight: normal;
 }
 
+.card-pay-dashboard__balances-count {
+  padding-left: var(--boxel-sp-xxs);
+  color: #00ebe5;
+}
+
 .card-pay-dashboard__balances-cards {
   display: grid;
   gap: var(--boxel-sp); /* FIXME cards seem to have an extra right-side gap? */
