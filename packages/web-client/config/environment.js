@@ -5,6 +5,8 @@ const infuraIdsByTarget = {
   production: '5d6efa6b750b45459184cd11dd2c8697', // this infura id is specific to https://app.cardstack.com/
 };
 
+const pkg = require('../package.json');
+
 // eslint-disable-next-line no-undef
 module.exports = function (environment) {
   let ENV = {
@@ -13,6 +15,7 @@ module.exports = function (environment) {
     rootURL: '/',
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
+    version: pkg.version,
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build

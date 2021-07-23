@@ -22,6 +22,7 @@ declare const config: {
   rootURL: string;
   hubURL: string;
   chains: ChainsOptions;
+  version: string;
   infuraId: string;
   urls: UrlsOptions;
   APP: Record<string, unknown>;

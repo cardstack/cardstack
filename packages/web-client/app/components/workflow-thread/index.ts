@@ -9,6 +9,10 @@ let interval = config.threadAnimationInterval;
 interface WorkflowThreadArgs {
   workflow: Workflow;
 }
+
+const TESTNET_FAUCET_CHANNEL_URL =
+  'https://discord.com/channels/584043165066199050/867588838524190762';
+
 export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   threadEl: HTMLElement | undefined;
   workflow = new AnimatedWorkflow(this.args.workflow);
@@ -17,6 +21,7 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   );
   @tracked autoscroll = false;
   @tracked threadAnimationInterval = '0ms';
+  appVersion = config.version;
 
   constructor(owner: unknown, args: any) {
     super(owner, args);
@@ -67,6 +72,10 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
     this.threadEl
       ?.querySelector('[data-thread-end]')
       ?.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  }
+
+  @action openDiscord() {
+    window.open(TESTNET_FAUCET_CHANNEL_URL, '_blank');
   }
 
   get lastMilestonePostable() {
