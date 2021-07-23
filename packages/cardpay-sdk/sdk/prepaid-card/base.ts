@@ -227,7 +227,7 @@ export default class PrepaidCard {
     onPrepaidCardsCreated?: (prepaidCards: PrepaidCardSafe[], txnHash: string) => unknown,
     onGasLoaded?: (txnHashes: string[]) => unknown,
     options?: ContractOptions
-  ): Promise<{ prepaidCardAddresses: string[]; gnosisTxn: GnosisExecTx } | undefined> {
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; gnosisTxn: GnosisExecTx } | undefined> {
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
     }
@@ -330,7 +330,7 @@ export default class PrepaidCard {
           )
         );
         return {
-          prepaidCardAddresses,
+          prepaidCards: await this.resolvePrepaidCards(prepaidCardAddresses),
           gnosisTxn,
         };
       } catch (e) {
@@ -359,7 +359,7 @@ export default class PrepaidCard {
     onTxHash?: (txHash: string) => unknown,
     onGasLoaded?: (txnHashes: string[]) => unknown,
     options?: ContractOptions
-  ): Promise<{ prepaidCardAddresses: string[]; gnosisTxn: GnosisExecTx }> {
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; gnosisTxn: GnosisExecTx }> {
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
     }
@@ -460,7 +460,7 @@ export default class PrepaidCard {
       )
     );
     return {
-      prepaidCardAddresses,
+      prepaidCards: await this.resolvePrepaidCards(prepaidCardAddresses),
       gnosisTxn,
     };
   }
