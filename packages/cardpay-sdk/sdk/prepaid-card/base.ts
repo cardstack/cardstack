@@ -24,8 +24,11 @@ import {
 } from '../utils/safe-utils';
 import { waitUntilTransactionMined } from '../utils/general-utils';
 import { signSafeTxAsRSV, Signature, signSafeTxAsBytes } from '../utils/signing-utils';
+import { PrepaidCardSafe } from '../safes';
 
 const { toBN, fromWei } = Web3.utils;
+const POLL_INTERVAL = 500;
+const TIMEOUT = 1000 * 60 * 5;
 export const MAX_PREPAID_CARD_AMOUNT = 10;
 
 export default class PrepaidCard {
@@ -221,7 +224,7 @@ export default class PrepaidCard {
     prepaidCardAddress: string,
     faceValues: number[],
     customizationDID: string | undefined,
-    onPrepaidCardsCreated?: (prepaidCardAddresses: string[], txnHash: string) => unknown,
+    onPrepaidCardsCreated?: (prepaidCards: PrepaidCardSafe[], txnHash: string) => unknown,
     onGasLoaded?: (txnHashes: string[]) => unknown,
     options?: ContractOptions
   ): Promise<{ prepaidCardAddresses: string[]; gnosisTxn: GnosisExecTx } | undefined> {
@@ -309,7 +312,10 @@ export default class PrepaidCard {
         let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisTxn.ethereumTx.txHash);
 
         if (typeof onPrepaidCardsCreated === 'function') {
-          await onPrepaidCardsCreated(prepaidCardAddresses, gnosisTxn.ethereumTx.txHash);
+          await onPrepaidCardsCreated(
+            await this.resolvePrepaidCards(prepaidCardAddresses),
+            gnosisTxn.ethereumTx.txHash
+          );
         }
 
         let txnHashes = new Set<string>();
@@ -349,7 +355,7 @@ export default class PrepaidCard {
     tokenAddress: string,
     faceValues: number[],
     customizationDID: string | undefined,
-    onPrepaidCardsCreated?: (prepaidCardAddresses: string[], txnHash: string) => unknown,
+    onPrepaidCardsCreated?: (prepaidCards: PrepaidCardSafe[], txnHash: string) => unknown,
     onTxHash?: (txHash: string) => unknown,
     onGasLoaded?: (txnHashes: string[]) => unknown,
     options?: ContractOptions
@@ -439,7 +445,7 @@ export default class PrepaidCard {
     let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisTxn.ethereumTx.txHash);
 
     if (typeof onPrepaidCardsCreated === 'function') {
-      await onPrepaidCardsCreated(prepaidCardAddresses, gnosisTxn.ethereumTx.txHash);
+      await onPrepaidCardsCreated(await this.resolvePrepaidCards(prepaidCardAddresses), gnosisTxn.ethereumTx.txHash);
     }
 
     let txnHashes = new Set<string>();
@@ -499,6 +505,32 @@ export default class PrepaidCard {
       }
       await waitUntilTransactionMined(this.layer2Web3, txnHash);
     }
+  }
+
+  private async resolvePrepaidCards(prepaidCardAddresses: string[]): Promise<PrepaidCardSafe[]> {
+    let safes = await getSDK('Safes', this.layer2Web3);
+    let prepaidCards: PrepaidCardSafe[] | undefined;
+    let startTime = Date.now();
+    do {
+      if (prepaidCards) {
+        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
+      } else {
+        prepaidCards = [];
+      }
+      for (let prepaidCardAddress of prepaidCardAddresses) {
+        if (prepaidCards.find((p) => p.address === prepaidCardAddress)) {
+          continue;
+        }
+        let prepaidCard = await safes.viewSafe(prepaidCardAddress);
+        if (prepaidCard?.type === 'prepaid-card') {
+          prepaidCards.push(prepaidCard);
+        }
+      }
+    } while (prepaidCards.length < prepaidCardAddresses.length && Date.now() - startTime < TIMEOUT);
+    if (prepaidCards.length < prepaidCardAddresses.length) {
+      throw new Error(`Timeout while waiting for the prepaid cards to be created.`);
+    }
+    return prepaidCards;
   }
 
   private async getPrepaidCardMgr() {
