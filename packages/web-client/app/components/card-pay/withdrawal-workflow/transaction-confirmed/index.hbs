@@ -6,7 +6,7 @@
   <ActionCardContainer::Section @title="You withdrew" data-test-transaction-confirmed-from-section>
     <CardPay::Bridge::Item
       @isLayer2={{true}}
-      @link="#"
+      @link={{this.blockscoutUrl}}
       @token={{this.withdrawToken}}
       @amount={{format-token-amount this.withdrawAmount}}
       @preposition="from"
@@ -20,7 +20,7 @@
   </ActionCardContainer::Section>
 </ActionCardContainer>
 
-<CardPay::Bridge @link="#" />
+<CardPay::Bridge @link={{this.bridgeExplorerUrl}} />
 
 <ActionCardContainer
   @header="Confirmation"
@@ -33,7 +33,7 @@
     />
     <CardPay::Bridge::Item
       @isLayer1={{true}}
-      @link="#"
+      @link={{this.withdrawTxnViewerUrl}}
       @token={{this.receivedToken}}
       @amount={{format-token-amount this.withdrawAmount}}
       @preposition="in"

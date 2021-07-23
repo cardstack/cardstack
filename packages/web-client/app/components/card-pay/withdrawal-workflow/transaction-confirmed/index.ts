@@ -12,11 +12,15 @@ import {
 } from '@cardstack/web-client/utils/token';
 import BN from 'web3-core/node_modules/@types/bn.js';
 
-class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<WorkflowCardComponentArgs> {
+class CardPayWithdrawalWorkflowTransactionConfirmedComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @reads('args.workflowSession.state.withdrawalToken')
   declare tokenSymbol: TokenSymbol;
+  @reads('args.workflowSession.state.relayTokensTxnHash')
+  declare relayTokensTxnHash: string;
+  @reads('args.workflowSession.state.claimTokensTxnHash')
+  declare claimTokensTxnHash: string;
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
@@ -41,26 +45,19 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
     return toBN(this.args.workflowSession.state.withdrawnAmount);
   }
 
-  get withdrawTxnViewerUrl(): string | undefined {
-    return this.layer1Network.blockExplorerUrl(
-      this.args.workflowSession.state.relayTokensTxnReceipt.transactionHash
-    );
-  }
-
   get bridgeExplorerUrl(): string | undefined {
-    return this.layer1Network.bridgeExplorerUrl(
-      this.args.workflowSession.state.relayTokensTxnReceipt.transactionHash
-    );
+    return this.layer2Network.bridgeExplorerUrl(this.relayTokensTxnHash);
   }
 
   get blockscoutUrl(): string {
     return (
-      this.args.workflowSession.state.completedLayer2TransactionReceipt &&
-      this.layer2Network.blockExplorerUrl(
-        this.args.workflowSession.state.completedLayer2TransactionReceipt
-          .transactionHash
-      )
+      this.args.workflowSession.state.relayTokensTxnHash &&
+      this.layer2Network.blockExplorerUrl(this.relayTokensTxnHash)
     );
+  }
+
+  get withdrawTxnViewerUrl(): string | undefined {
+    return this.layer1Network.blockExplorerUrl(this.claimTokensTxnHash);
   }
 
   get depotAddress() {
@@ -68,4 +65,4 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
   }
 }
 
-export default CardPayWithdrawalWorkflowChooseBalanceComponent;
+export default CardPayWithdrawalWorkflowTransactionConfirmedComponent;

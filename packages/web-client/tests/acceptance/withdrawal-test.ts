@@ -243,7 +243,7 @@ module('Acceptance | withdrawal', function (hooks) {
     await click(`${post} [data-test-boxel-button]`);
     assert
       .dom(`${post} [data-test-boxel-action-chin]`)
-      .containsText('Waiting for you to confirm on metamask');
+      .containsText('Waiting for you to confirm on MetaMask');
 
     layer1Service.test__simulateBridgedTokensClaimed('example-message-id');
     await waitFor('[data-test-withdrawal-token-claim-is-complete]');

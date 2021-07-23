@@ -15,8 +15,12 @@ import {
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 import { BridgeValidationResult } from '../../../../../../cardpay-sdk/sdk/token-bridge-home-side';
 import { taskFor } from 'ember-concurrency-ts';
+import walletProviders, {
+  WalletProvider,
+} from '@cardstack/web-client/utils/wallet-providers';
 
 class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCardComponentArgs> {
+  walletProviders = walletProviders;
   @service declare layer1Network: Layer1Network;
   @reads('args.workflowSession.state.withdrawalToken')
   declare tokenSymbol: TokenSymbol;
@@ -51,6 +55,12 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
     }
   }
 
+  get walletProvider(): WalletProvider | undefined {
+    return this.walletProviders.find(
+      (w) => w.id === this.layer1Network.strategy.currentProviderId
+    );
+  }
+
   get txViewerUrl() {
     return this.txHash && this.layer1Network.blockExplorerUrl(this.txHash);
   }
@@ -76,7 +86,7 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
           onTxHash: (txHash: string) => (this.txHash = txHash),
         }
       );
-
+      this.args.workflowSession.update('claimTokensTxnHash', this.txHash);
       this.args.onComplete?.();
     } catch (e) {
       console.error(e);

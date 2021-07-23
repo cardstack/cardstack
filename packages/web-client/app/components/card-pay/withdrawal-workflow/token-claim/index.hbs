@@ -35,10 +35,10 @@
       </d.ActionButton>
     </:default>
     <:in-progress as |i|>
-      <i.ActionStatusArea class="token-claim__in-progress" @icon={{concat this.layer1Network.strategy.currentProviderId "-logo"}} style={{css-var status-icon-size="2.5rem"}}>
+      <i.ActionStatusArea class="token-claim__in-progress" @icon={{this.walletProvider.iconName}} style={{css-var status-icon-size="2.5rem"}}>
         <Boxel::LoadingIndicator @color="var(--boxel-light)" />
         <div class="token-claim__in-progress-message">
-          Waiting for you to confirm on {{this.layer1Network.strategy.currentProviderId}}...
+          Waiting for you to confirm on {{this.walletProvider.name}}...
         </div>
       </i.ActionStatusArea>
       {{#if this.txViewerUrl}}
