@@ -8,7 +8,7 @@ interface PrepaidCardPattern {
 }
 interface JSONAPIDocument {
   data: any;
-  includes?: any[];
+  included?: any[];
 }
 
 export default class PrepaidCardPatternSerializer {
