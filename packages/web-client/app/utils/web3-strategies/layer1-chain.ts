@@ -14,8 +14,10 @@ import {
   Layer1Web3Strategy,
   TransactionHash,
   Layer1NetworkSymbol,
+  ClaimBridgedTokensOptions,
 } from './types';
 import {
+  BridgeValidationResult,
   getConstantByNetwork,
   getSDK,
   networkIds,
@@ -259,6 +261,20 @@ export default abstract class Layer1ChainWeb3Strategy
       new TokenContractInfo(tokenSymbol, this.networkSymbol).address,
       receiverAddress,
       amountInWei.toString()
+    );
+  }
+
+  async claimBridgedTokens(
+    bridgeValidationResult: BridgeValidationResult,
+    options?: ClaimBridgedTokensOptions
+  ): Promise<TransactionReceipt> {
+    if (!this.web3) throw new Error('Cannot claim bridged tokens without web3');
+    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
+    return tokenBridge.claimBridgedTokens(
+      bridgeValidationResult.messageId,
+      bridgeValidationResult.encodedData,
+      bridgeValidationResult.signatures,
+      options?.onTxHash
     );
   }
 

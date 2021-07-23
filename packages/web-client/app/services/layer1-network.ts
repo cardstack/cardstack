@@ -1,8 +1,10 @@
 import Service from '@ember/service';
 import config from '../config/environment';
 import {
+  ClaimBridgedTokensOptions,
   Layer1ChainEvent,
   Layer1Web3Strategy,
+  TransactionHash,
 } from '../utils/web3-strategies/types';
 import Layer1TestWeb3Strategy from '../utils/web3-strategies/test-layer1';
 import EthWeb3Strategy from '../utils/web3-strategies/ethereum';
@@ -20,6 +22,7 @@ import {
 } from '@cardstack/web-client/utils/events';
 import { action } from '@ember/object';
 import { TaskGenerator } from 'ember-concurrency';
+import { BridgeValidationResult } from '@cardstack/cardpay-sdk';
 export default class Layer1Network
   extends Service
   implements Emitter<Layer1ChainEvent> {
@@ -110,6 +113,18 @@ export default class Layer1Network
 
   async awaitBridged(fromBlock: BN) {
     return this.strategy.awaitBridged(fromBlock, this.walletInfo.firstAddress!);
+  }
+
+  @task *claimBridgedTokens(
+    bridgeValidationResult: BridgeValidationResult,
+    options?: ClaimBridgedTokensOptions
+  ): TaskGenerator<TransactionReceipt> {
+    let result = yield this.strategy.claimBridgedTokens(
+      bridgeValidationResult,
+      options
+    );
+    yield this.strategy.refreshBalances();
+    return result;
   }
 }
 

@@ -13,6 +13,8 @@ import {
   getUnbridgedSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { BridgeValidationResult } from '../../../../../../cardpay-sdk/sdk/token-bridge-home-side';
+import { taskFor } from 'ember-concurrency-ts';
 
 class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
@@ -21,6 +23,14 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
   @tracked isConfirming = false;
   @tracked txHash: string | undefined;
   @tracked errorMessage = '';
+
+  get bridgeValidationResult(): BridgeValidationResult {
+    if (!this.args.workflowSession.state.bridgeValidationResult) {
+      throw new Error('missing bridgeValidationResult in workflow session');
+    }
+    return this.args.workflowSession.state
+      .bridgeValidationResult as BridgeValidationResult;
+  }
 
   get withdrawalAmount(): BN {
     if (!this.args.workflowSession.state.withdrawnAmount) {
@@ -42,11 +52,7 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
   }
 
   get txViewerUrl() {
-    if (!this.txHash) {
-      return '';
-    }
-    // TODO: get hash
-    return this.layer1Network.blockExplorerUrl(this.txHash);
+    return this.txHash && this.layer1Network.blockExplorerUrl(this.txHash);
   }
 
   get ctaState() {
@@ -59,19 +65,18 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
     }
   }
 
-  get isCtaDisabled() {
-    return !this.withdrawalAmount || this.withdrawalAmount.isZero();
-  }
-
   @action
   async claim() {
     this.errorMessage = '';
-    if (this.isCtaDisabled) {
-      return;
-    }
     try {
       this.isConfirming = true;
-      // TODO: get confirmation response
+      await taskFor(this.layer1Network.claimBridgedTokens).perform(
+        this.bridgeValidationResult,
+        {
+          onTxHash: (txHash: string) => (this.txHash = txHash),
+        }
+      );
+
       this.args.onComplete?.();
     } catch (e) {
       console.error(e);

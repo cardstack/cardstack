@@ -27,7 +27,7 @@
   </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{this.ctaState}}
-    @disabled={{or @frozen this.isCtaDisabled}}
+    @disabled={{@frozen}}
   >
     <:default as |d|>
       <d.ActionButton {{on "click" this.claim}}>
@@ -43,13 +43,9 @@
       </i.ActionStatusArea>
       {{#if this.txViewerUrl}}
         <i.InfoArea>
-          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} target="_blank" rel="noopener">
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} @kind="secondary-dark" target="_blank" rel="noopener">
             View on Etherscan
           </Boxel::Button>
-        </i.InfoArea>
-      {{else}}
-        <i.InfoArea>
-          Only visible to you
         </i.InfoArea>
       {{/if}}
     </:in-progress>
@@ -58,7 +54,7 @@
         Confirmed
       </m.ActionStatusArea>
       <m.InfoArea>
-        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} target="_blank" rel="noopener">
+        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} @kind="secondary-light" target="_blank" rel="noopener">
           View on Etherscan
         </Boxel::Button>
       </m.InfoArea>
