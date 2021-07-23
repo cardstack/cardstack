@@ -237,10 +237,15 @@ module('Acceptance | withdrawal', function (hooks) {
       .containsText(
         `You will have to pay ${c.layer1.conversationalName} gas fee`
       );
-    // TODO: add claim token tests
+
     await waitFor(postableSel(4, 1));
     post = postableSel(4, 1);
     await click(`${post} [data-test-boxel-button]`);
+    assert
+      .dom(`${post} [data-test-boxel-action-chin]`)
+      .containsText('Waiting for you to confirm on metamask');
+
+    layer1Service.test__simulateBridgedTokensClaimed('example-message-id');
     await waitFor('[data-test-withdrawal-token-claim-is-complete]');
     assert
       .dom(milestoneCompletedSel(4))
@@ -279,19 +284,20 @@ module('Acceptance | withdrawal', function (hooks) {
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD.CPXD"]`)
       .containsText('10000.00');
-    // let milestoneCtaButtonCount = Array.from(
-    //   document.querySelectorAll(
-    //     '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-    //   )
-    // ).length;
-    // assert
-    //   .dom(
-    //     '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
-    //   )
-    //   .exists(
-    //     { count: milestoneCtaButtonCount },
-    //     'All cta buttons in milestones should be disabled'
-    //   );
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
+    await waitFor(epiloguePostableSel(4));
     assert
       .dom(
         `${epiloguePostableSel(4)} [data-test-withdrawal-next-step="dashboard"]`

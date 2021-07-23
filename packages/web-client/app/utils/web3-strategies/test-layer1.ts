@@ -1,15 +1,25 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
-import { Layer1Web3Strategy, TransactionHash } from './types';
+import {
+  Layer1Web3Strategy,
+  TransactionHash,
+  ClaimBridgedTokensOptions,
+} from './types';
 import { defer } from 'rsvp';
 import RSVP from 'rsvp';
 import BN from 'bn.js';
 import { WalletProvider } from '../wallet-providers';
 import { TransactionReceipt } from 'web3-core';
+import { BridgeValidationResult } from '@cardstack/cardpay-sdk';
 import {
   SimpleEmitter,
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
+
+interface ClaimBridgedTokensRequest {
+  deferred: RSVP.Deferred<TransactionReceipt>;
+  onTxHash?: (txHash: TransactionHash) => void;
+}
 
 export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   chainId = -1;
@@ -31,8 +41,10 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   waitForAccountDeferred = defer();
   #unlockDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
   #depositDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
-
-  bridgingDeferred!: RSVP.Deferred<TransactionReceipt>;
+  claimBridgedTokensRequests: Map<
+    string,
+    ClaimBridgedTokensRequest
+  > = new Map();
 
   connect(_walletProvider: WalletProvider): Promise<void> {
     return this.waitForAccount;
@@ -146,9 +158,22 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     });
   }
 
-  awaitBridged(_fromBlock: BN, _receiver: string): Promise<TransactionReceipt> {
-    this.bridgingDeferred = defer<TransactionReceipt>();
-    return this.bridgingDeferred.promise as Promise<TransactionReceipt>;
+  async claimBridgedTokens(
+    bridgeValidationResult: BridgeValidationResult,
+    options?: ClaimBridgedTokensOptions
+  ): Promise<TransactionReceipt> {
+    let deferred: RSVP.Deferred<TransactionReceipt> = defer();
+    this.claimBridgedTokensRequests.set(bridgeValidationResult.messageId, {
+      deferred,
+      onTxHash: options?.onTxHash,
+    });
+    return deferred.promise;
+  }
+
+  test__simulateBridgedTokensClaimed(messageId: string) {
+    let request = this.claimBridgedTokensRequests.get(messageId);
+    request?.onTxHash?.('exampleTxHash');
+    return request?.deferred.resolve({} as TransactionReceipt);
   }
 
   get waitForAccount() {

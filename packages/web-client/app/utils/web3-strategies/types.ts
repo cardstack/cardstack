@@ -28,6 +28,11 @@ export interface Web3Strategy {
 export interface IssuePrepaidCardOptions {
   onTxHash?(txHash: TransactionHash): void;
 }
+
+export interface ClaimBridgedTokensOptions {
+  onTxHash?(txHash: TransactionHash): void;
+}
+
 export interface Layer1Web3Strategy
   extends Web3Strategy,
     Emitter<Layer1ChainEvent> {
@@ -46,9 +51,9 @@ export interface Layer1Web3Strategy
     amountInWei: BN
   ): Promise<TransactionReceipt>;
   blockExplorerUrl(txnHash: TransactionHash): string;
-  awaitBridged(
-    fromBlock: BN,
-    receiver: ChainAddress
+  claimBridgedTokens(
+    bridgeValidationResult: BridgeValidationResult,
+    options?: ClaimBridgedTokensOptions
   ): Promise<TransactionReceipt>;
 }
 

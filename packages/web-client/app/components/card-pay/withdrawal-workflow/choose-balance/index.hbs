@@ -50,7 +50,7 @@
         </CardPay::NestedItems>
       </CardPay::LabeledValue>
     </ActionCardContainer::Section>
-    <ActionCardContainer::Section @title="Receive tokens" data-test-choose-balance-receive>
+    <ActionCardContainer::Section @title="Receive tokens*" data-test-choose-balance-receive>
       <CardPay::LabeledValue @label="In:" class="choose-balance__field">
         <CardPay::AccountDisplay
           @name={{concat (network-display-info "layer1" "fullName") " wallet"}}
@@ -59,7 +59,7 @@
       </CardPay::LabeledValue>
     </ActionCardContainer::Section>
     <div class="choose-balance__footnote" data-test-choose-balance-footnote>
-      Note: You will need to pay the gas fee with your Layer 1 wallet on {{network-display-info "layer1" "fullName"}}
+      * You will need to pay the gas fee with your Layer 1 wallet on {{network-display-info "layer1" "fullName"}}
       to claim tokens once they are bridged. Make sure you have enough ETH for gas payment before bridging, as this is not reversible.
     </div>
   </ActionCardContainer::Section>
