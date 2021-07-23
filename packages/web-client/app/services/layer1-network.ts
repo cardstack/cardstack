@@ -4,7 +4,6 @@ import {
   ClaimBridgedTokensOptions,
   Layer1ChainEvent,
   Layer1Web3Strategy,
-  TransactionHash,
 } from '../utils/web3-strategies/types';
 import Layer1TestWeb3Strategy from '../utils/web3-strategies/test-layer1';
 import EthWeb3Strategy from '../utils/web3-strategies/ethereum';

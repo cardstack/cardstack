@@ -46,8 +46,6 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     ClaimBridgedTokensRequest
   > = new Map();
 
-  bridgingDeferred!: RSVP.Deferred<TransactionReceipt>;
-
   connect(_walletProvider: WalletProvider): Promise<void> {
     return this.waitForAccount;
   }
@@ -158,11 +156,6 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
       logsBloom: '',
       events: {},
     });
-  }
-
-  awaitBridged(_fromBlock: BN, _receiver: string): Promise<TransactionReceipt> {
-    this.bridgingDeferred = defer<TransactionReceipt>();
-    return this.bridgingDeferred.promise as Promise<TransactionReceipt>;
   }
 
   async claimBridgedTokens(

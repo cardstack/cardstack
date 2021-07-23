@@ -51,10 +51,6 @@ export interface Layer1Web3Strategy
     amountInWei: BN
   ): Promise<TransactionReceipt>;
   blockExplorerUrl(txnHash: TransactionHash): string;
-  awaitBridged(
-    fromBlock: BN,
-    receiver: ChainAddress
-  ): Promise<TransactionReceipt>;
   claimBridgedTokens(
     bridgeValidationResult: BridgeValidationResult,
     options?: ClaimBridgedTokensOptions
