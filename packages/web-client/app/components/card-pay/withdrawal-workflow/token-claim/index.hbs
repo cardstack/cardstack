@@ -4,31 +4,64 @@
   data-test-withdrawal-token-claim-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section
-    @title={{concat "Claim the bridged tokens into your " (network-display-info "layer1" "conversationalName") " wallet"}}
+    @title={{concat "Claim " (network-display-info "layer1" "conversationalName") " tokens"}}
   >
-    {{!-- TODO --}}
+    <div class="token-claim__display-box">
+      <div class="token-claim__label">Amount to claim</div>
+      <CardPay::BalanceDisplay
+        class="token-claim__balance-display"
+        @size="large"
+        @icon={{this.tokenDetails.icon}}
+        @balance={{format-token-amount this.withdrawalAmount}}
+        @symbol={{this.tokenSymbol}}
+        @text={{concat "$" (token-to-usd this.tokenSymbolForConversion this.withdrawalAmount) " USD*"}}
+        data-test-withdrawal-token-claim-amount
+      />
+    </div>
+    {{#if this.errorMessage}}
+      <CardPay::ErrorMessage>{{this.errorMessage}}</CardPay::ErrorMessage>
+    {{/if}}
+    <div class="token-claim__footnote">
+      * The actual value depends on the current exchange rate and is determined at the time of authorization.
+    </div>
   </ActionCardContainer::Section>
   <Boxel::ActionChin
-    @state={{if @isComplete "memorialized" "default"}}
-    @disabled={{@frozen}}
+    @state={{this.ctaState}}
+    @disabled={{or @frozen this.isCtaDisabled}}
   >
     <:default as |d|>
-      <d.ActionButton {{on "click" @onComplete}}>
+      <d.ActionButton {{on "click" this.claim}}>
         Claim
       </d.ActionButton>
     </:default>
-    <:memorialized as |m|>
-      <m.ActionStatusArea>
-        Claimed
-      </m.ActionStatusArea>
+    <:in-progress as |i|>
+      <i.ActionStatusArea class="token-claim__in-progress" @icon={{concat this.layer1Network.strategy.currentProviderId "-logo"}} style={{css-var status-icon-size="2.5rem"}}>
+        <Boxel::LoadingIndicator @color="var(--boxel-light)" />
+        <div class="token-claim__in-progress-message">
+          Waiting for you to confirm on {{this.layer1Network.strategy.currentProviderId}}...
+        </div>
+      </i.ActionStatusArea>
       {{#if this.txViewerUrl}}
-        <m.InfoArea>
-          {{!-- TODO: add url --}}
+        <i.InfoArea>
           <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} target="_blank" rel="noopener">
             View on Etherscan
           </Boxel::Button>
-        </m.InfoArea>
+        </i.InfoArea>
+      {{else}}
+        <i.InfoArea>
+          Only visible to you
+        </i.InfoArea>
       {{/if}}
+    </:in-progress>
+    <:memorialized as |m|>
+      <m.ActionStatusArea>
+        Confirmed
+      </m.ActionStatusArea>
+      <m.InfoArea>
+        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} target="_blank" rel="noopener">
+          View on Etherscan
+        </Boxel::Button>
+      </m.InfoArea>
     </:memorialized>
   </Boxel::ActionChin>
 </ActionCardContainer>
