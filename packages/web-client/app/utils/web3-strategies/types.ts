@@ -88,6 +88,7 @@ export interface Layer2Web3Strategy
     fromBlock: BN,
     txnHash: TransactionHash
   ): Promise<BridgeValidationResult>;
+  viewSafe(address: string): Promise<Safe | undefined>;
   viewSafes(account: string): Promise<Safe[]>;
   authenticate(): Promise<string>;
   issuePrepaidCard(

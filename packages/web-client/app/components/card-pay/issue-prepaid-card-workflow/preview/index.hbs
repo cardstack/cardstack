@@ -47,7 +47,7 @@
             @label="Card address"
             data-test-prepaid-card-address-labeled-value
           >
-            {{truncate-middle @workflowSession.state.prepaidCardAddress}}<br>
+            {{truncate-middle @workflowSession.state.prepaidCardSafe.address}}<br>
             on {{network-display-info "layer2" "fullName"}}
           </CardPay::LabeledValue>
         {{/if}}

@@ -67,6 +67,7 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
         prepaidCardSafe.address
       );
 
+      this.args.workflowSession.update('prepaidCardSafe', prepaidCardSafe);
       this.args.onComplete();
     } catch (e) {
       let insufficientFunds = e.message.startsWith(

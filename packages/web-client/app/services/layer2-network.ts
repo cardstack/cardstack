@@ -89,6 +89,10 @@ export default class Layer2Network
     return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
   }
 
+  @task *viewSafe(address: string): any {
+    return yield this.strategy.viewSafe(address);
+  }
+
   @task *viewSafes(account: string): any {
     return yield this.strategy.viewSafes(account);
   }

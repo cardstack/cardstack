@@ -14,11 +14,11 @@ import { toWei } from 'web3-utils';
 import BN from 'bn.js';
 
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
-import { encodeDID } from '@cardstack/did-resolver';
+import { encodeDID, getResolver } from '@cardstack/did-resolver';
+import { Resolver } from 'did-resolver';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
-import { Response as MirageResponse } from 'ember-cli-mirage';
 import { timeout } from 'ember-concurrency';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/workflow-config';
@@ -365,55 +365,40 @@ module('Acceptance | issue prepaid card', function (hooks) {
       uniqueId: prepaidCardCustomizationId,
       version: 1,
     });
-    // simulate POST /api/prepaid-card-customizations to persist customizations and return DID
-    this.server.post('/prepaid-card-customizations', (_schema, request) => {
-      assert.equal(
-        request.requestHeaders['authorization'],
-        'Bearer: abc123--def456--ghi789'
-      );
-      let requestJson = JSON.parse(request.requestBody);
-      assert.equal(requestJson.data.attributes['issuer-name'], 'JJ');
-      assert.equal(
-        requestJson.data.relationships.pattern.data.id,
-        '80cb8f99-c5f7-419e-9c95-2e87a9d8db32'
-      );
-      assert.equal(
-        requestJson.data.relationships['color-scheme'].data.id,
-        '4f219852-33ee-4e4c-81f7-76318630a423'
-      );
 
-      return new MirageResponse(
-        201,
-        {
-          'Content-Type': 'application/vnd.api+json',
-        },
-        JSON.stringify({
-          data: {
-            type: 'prepaid-card-customizations',
-            id: prepaidCardCustomizationId,
-            attributes: {
-              did,
-              'issuer-name': 'JJ',
-              'owner-address': layer2AccountAddress,
-            },
-            relationships: {
-              pattern: {
-                data: {
-                  type: 'prepaid-card-patterns',
-                  id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
-                },
-              },
-              'color-scheme': {
-                data: {
-                  type: 'prepaid-card-color-schemes',
-                  id: '"4f219852-33ee-4e4c-81f7-76318630a423"',
-                },
-              },
-            },
-          },
-        })
-      );
-    });
+    let resolver = new Resolver({ ...getResolver() });
+    let resolvedDID = await resolver.resolve(did);
+    let didAlsoKnownAs = resolvedDID?.didDocument?.alsoKnownAs[0]!;
+    let customizationJsonFilename = didAlsoKnownAs.split('/')[4].split('.')[0];
+
+    // simulate POST /api/prepaid-card-customizations to persist customizations and return DID
+    this.server.post(
+      '/prepaid-card-customizations',
+      function (schema, request) {
+        assert.equal(
+          request.requestHeaders['authorization'],
+          'Bearer: abc123--def456--ghi789'
+        );
+        let requestJson = JSON.parse(request.requestBody);
+        assert.equal(requestJson.data.attributes['issuer-name'], 'JJ');
+        assert.equal(
+          requestJson.data.relationships.pattern.data.id,
+          '80cb8f99-c5f7-419e-9c95-2e87a9d8db32'
+        );
+        assert.equal(
+          requestJson.data.relationships['color-scheme'].data.id,
+          '4f219852-33ee-4e4c-81f7-76318630a423'
+        );
+
+        let customization = schema.prepaidCardCustomizations.create({
+          id: customizationJsonFilename,
+          did,
+          ...this.normalizedRequestAttrs(),
+        });
+
+        return customization;
+      }
+    );
 
     layer2Service.balancesRefreshed = false;
 
@@ -436,10 +421,17 @@ module('Acceptance | issue prepaid card', function (hooks) {
     );
 
     await timeout(250);
+
+    let prepaidCardAddress = '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8';
+
     layer2Service.test__simulateIssuePrepaidCardForAmount(
       10000,
       layer2AccountAddress,
-      '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8'
+      prepaidCardAddress,
+      {
+        reloadable: true,
+        transferrable: true,
+      }
     );
 
     await waitFor(milestoneCompletedSel(3));
@@ -449,11 +441,16 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(`${postableSel(3, 1)} [data-test-boxel-action-chin]`)
       .containsText('Confirmed');
 
+    await settled();
+
     assert
       .dom(
         `${postableSel(3, 1)} [data-test-prepaid-card-address-labeled-value]`
       )
       .containsText(`0xaeFb...E1F8 on ${c.layer2.fullName}`);
+
+    assert.dom('[data-test-prepaid-card-reloadable]').exists();
+    assert.dom('[data-test-prepaid-card-transferrable]').exists();
 
     assert
       .dom(epiloguePostableSel(0))

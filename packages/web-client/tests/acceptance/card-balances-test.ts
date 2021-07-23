@@ -87,9 +87,8 @@ module('Acceptance | card balances', function (hooks) {
     this.server.create('prepaid-card-customization', {
       id: customizationJsonFilename,
       issuerName: 'jortleby',
-      prepaidCardColorScheme: this.server.schema.prepaidCardColorSchemes.first(),
-      prepaidCardPattern: this.server.schema.prepaidCardPatterns.all()
-        .models[4],
+      colorScheme: this.server.schema.prepaidCardColorSchemes.first(),
+      pattern: this.server.schema.prepaidCardPatterns.all().models[4],
     });
 
     await visit('/card-pay/balances');

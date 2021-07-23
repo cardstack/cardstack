@@ -146,6 +146,14 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return await this.test__simulateConvertFromSpend(symbol, amount);
   }
 
+  async viewSafe(address: string): Promise<Safe | undefined> {
+    return Promise.resolve(
+      [...this.accountSafes.values()]
+        .flat() // FIXME why is this needed? it’s [[…]] otherwise
+        .find((safe) => safe.address === address)
+    );
+  }
+
   async viewSafes(account: string): Promise<Safe[]> {
     return Promise.resolve(this.accountSafes.get(account)!);
   }
@@ -232,7 +240,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   test__simulateIssuePrepaidCardForAmount(
     faceValue: number,
     walletAddress: string,
-    cardAddress: string
+    cardAddress: string,
+    options: Object
   ) {
     let request = this.issuePrepaidCardRequests.get(faceValue);
     let prepaidCardSafe: PrepaidCardSafe = {
@@ -248,6 +257,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       reloadable: true,
       transferrable: false,
       customizationDID: request?.customizationDID,
+
+      ...options,
     };
     request?.onTxHash?.('exampleTxHash');
     return request?.deferred.resolve(prepaidCardSafe);
