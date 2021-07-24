@@ -53,8 +53,34 @@ const SOKOL = {
 const MAINNET = {
   cardToken: '0x954b890704693af242613edEf1B603825afcD708',
   daiToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+  foreignBridge: '0xd9d0f8f727C4607d89aB897656aAa921054AD1e3',
+  foreignAMB: '0x4C36d2919e407f0Cc2Ee3c993ccF8ac26d9CE64e',
 };
-const XDAI = {};
+const XDAI = {
+  homeBridge: '0x453614197C9Adf05b3375446286957b991eE359d',
+  homeAMB: '0x75Df5AF045d91108662D8080fD1FEFAd6aA0bb59',
+  // daiCpxd: '',
+  // cardCpxd: '',
+  prepaidCardManager: '0x15a4Cc5b3CfeBe900e5F514348bC077Eb883224D',
+  revenuePool: '0xE097ec255eA9fE4e199E920E105b0f61d6e09C34',
+  bridgeUtils: '0xa79206F956461e053DbCF33ADDFa77553Df58D7F',
+  exchange: '0x12Dd0632428e02CfBA0FE834a6969FDC9C28219E',
+  payMerchantHandler: '0xdDc6709482ee4072D562C4a9f04Fc6E3249b785e',
+  registerMerchantHandler: '0x4101A6C673cBA6afDB2Ef082Cb578b64f81aB3D1',
+  splitPrepaidCardHandler: '0x0672c77D9a9C8D81D8082a1fB925fE44f475e600',
+  transferPrepaidCardHandler: '0x60d6c7bE551C5D399247C6683f93CC37cf06a4aB',
+  supplierManager: '0xf2380376aBFEE5234bb46d8A919D42eE1A395aF3',
+  merchantManager: '0x3C29B2A563F4bB9D625175bE823c528A4Ddd1107',
+  spend: '0xc0247D53Ce3C6abB39b67856eDEfF79b767dB93c',
+  actionDispatcher: '0x3cC7DeB8dE522E2176e8c599FaAf7503d0c78AE9',
+  uniswapV2Router: '0x1C232F01118CB8B424793ae03F870aa7D0ac7f77', // This is the UniswapV2Router02
+  uniswapV2Factory: '0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7',
+  rewardPool: '0x42628325845B3e01EfdD6ce4b3665453dC6c9A13',
+  oracles: {
+    DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2', // eslint-disable-line @typescript-eslint/naming-convention
+    CARD: '0xd570Ed8b313Fe6aEEA4064bd1713b5Cc6d41D3C5', // eslint-disable-line @typescript-eslint/naming-convention
+  },
+};
 const addresses: {
   [network: string]: {
     [contractName: string]: string | { [tokenName: string]: string };
