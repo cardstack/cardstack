@@ -13,5 +13,11 @@
     </ul>
   {{/if}}
 
-  {{yield}}
+  {{yield to="cta"}}
+
+  {{#if (has-block "disclaimer")}}
+    <small>
+      {{yield to="disclaimer"}}
+    </small>
+  {{/if}}
 </section>
