@@ -15,40 +15,66 @@ import { cloneDeep } from 'lodash';
 export default class CardModel {
   static serializerMap: SerializerMap;
 
-  url: string;
+  parentCardUrl?: string;
+  url!: string;
+
   setters: Setter;
 
   @tracked private _data: any;
-  private cardResponse: cardJSONReponse;
+  private rawServerResponse?: cardJSONReponse;
   private deserialized = false;
 
-  constructor(cardResponse: cardJSONReponse) {
-    this.cardResponse = cloneDeep(cardResponse);
-    this.url = cardResponse.data.id;
+  constructor() {
     this.setters = this.makeSetter();
+  }
+
+  static newFromResponse(
+    klass: typeof CardModel,
+    cardResponse: cardJSONReponse
+  ): CardModel {
+    let model = new klass();
+    model.updateFromResponse(cardResponse);
+    return model;
+  }
+
+  static newFromParentCardResponse(
+    klass: typeof CardModel,
+    cardResponse: cardJSONReponse
+  ): CardModel {
+    let model = new klass();
+    model.parentCardUrl = cardResponse.data.id;
+    return model;
   }
 
   updateFromResponse(cardResponse: cardJSONReponse) {
     this.deserialized = false;
-    this.cardResponse = cloneDeep(cardResponse);
+    this.rawServerResponse = cloneDeep(cardResponse);
+
+    if (!this.url && cardResponse.data.id) {
+      this.url = cardResponse.data.id;
+    }
+
     this._data = null;
   }
 
   get data(): any {
     if (!this.deserialized) {
-      let data = this.deserialize();
-      this._data = data;
+      this._data = this.deserialize();
       this.deserialized = true;
     }
     return this._data;
   }
 
   private deserialize(): any {
-    let { attributes } = this.cardResponse.data;
+    if (!this.rawServerResponse) {
+      return;
+    }
+
+    let { attributes } = this.rawServerResponse.data;
     return serializeAttributes(
       attributes,
       'deserialize',
-      // @ts-ignore
+      // @ts-ignore This works as expected, whats up typescript?
       this.constructor.serializerMap
     );
   }
@@ -62,7 +88,7 @@ export default class CardModel {
       this.constructor.serializerMap
     );
 
-    return constructJSONAPIResponse(url, attributes);
+    return constructJSONAPIResponse(attributes, url);
   }
 
   static serialize(card: CompiledCard, format: Format): cardJSONReponse {
@@ -73,8 +99,8 @@ export default class CardModel {
     );
 
     return constructJSONAPIResponse(
-      card.url,
       attributes,
+      card.url,
       card[format].moduleName
     );
   }
@@ -87,7 +113,7 @@ export default class CardModel {
         this._data = value;
         return;
       }
-      let data = this._data;
+      let data = this._data || {};
       let cursor: any = data;
       for (let segment of innerSegments) {
         let nextCursor = cursor[segment];
@@ -118,17 +144,21 @@ export default class CardModel {
 }
 
 function constructJSONAPIResponse(
-  url: string,
   attributes: any,
+  url?: string,
   componentModule?: string
 ): cardJSONReponse {
   let response: cardJSONReponse = {
     data: {
-      id: url,
       type: 'card',
       attributes,
     },
   };
+
+  if (url) {
+    response.data.id = url;
+  }
+
   if (componentModule) {
     response.data.meta = {
       componentModule,

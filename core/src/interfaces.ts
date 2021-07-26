@@ -108,7 +108,7 @@ export interface RealmConfig {
 
 export type cardJSONReponse = {
   data: {
-    id: string;
+    id?: string;
     type: string;
     attributes?: { [name: string]: any };
     meta?: {

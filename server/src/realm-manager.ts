@@ -2,6 +2,7 @@ import { RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
 import Realm from './realms/fs-realm';
 import { NotFound } from './middleware/errors';
 import { RealmInterface } from './interfaces';
+import { ensureTrailingSlash } from './utils/path';
 
 export default class RealmManager {
   realms: Realm[];
@@ -17,6 +18,8 @@ export default class RealmManager {
   }
 
   getRealm(url: string): RealmInterface {
+    url = ensureTrailingSlash(url);
+
     for (let realm of this.realms) {
       if (!url.startsWith(realm.url)) {
         continue;

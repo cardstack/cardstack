@@ -1,9 +1,10 @@
 import Service, { inject } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
+import type RouterService from '@ember/routing/router-service';
 
-import { task } from 'ember-concurrency';
-import { taskFor } from 'ember-concurrency-ts';
+import { task, TaskGenerator } from 'ember-concurrency';
+// import { taskFor } from 'ember-concurrency-ts';
 
 import { Card } from './cards';
 import CardsService from '../services/cards';
@@ -19,11 +20,15 @@ type State =
   | {
       name: 'loaded';
       loadedCard: Card;
+      new: boolean;
       format: Format;
     };
 
 export default class Modal extends Service {
   @inject declare cards: CardsService;
+  @inject declare router: RouterService;
+
+  @tracked state: State = { name: 'empty' };
 
   get isShowing(): boolean {
     return this.state.name === 'loading' || this.state.name === 'loaded';
@@ -33,8 +38,6 @@ export default class Modal extends Service {
     return this.state.name === 'loading';
   }
 
-  @tracked state: State = { name: 'empty' };
-
   get cardComponent(): unknown {
     if (this.state.name === 'loaded') {
       return this.state.loadedCard.component;
@@ -42,23 +45,36 @@ export default class Modal extends Service {
     return;
   }
 
-  @task editCard = taskFor(
-    async (card: Card): Promise<void> => {
-      this.state = { name: 'loading' };
-      let loadedCard = await this.cards.loadForEdit(card);
-      this.state = {
-        name: 'loaded',
-        loadedCard,
-        format: 'edit',
-      };
-    }
-  );
+  @task *editCard(card: Card): TaskGenerator<void> {
+    this.state = { name: 'loading' };
+    let loadedCard = yield this.cards.loadForEdit(card);
+    this.state = {
+      name: 'loaded',
+      loadedCard,
+      format: 'edit',
+      new: false,
+    };
+  }
+
+  @task *newCard(card: Card): TaskGenerator<void> {
+    this.state = { name: 'loading' };
+    let loadedCard = yield this.cards.loadForNew(card);
+    this.state = {
+      name: 'loaded',
+      loadedCard,
+      format: 'edit',
+      new: true,
+    };
+  }
 
   @action async save(): Promise<void> {
     if (this.state.name !== 'loaded') {
       return;
     }
     await this.cards.save(this.state.loadedCard);
+    if (this.state.new) {
+      this.router.transitionTo(`/card?url=${this.state.loadedCard.model.url}`);
+    }
     this.close();
   }
 

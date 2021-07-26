@@ -2,7 +2,7 @@ import Service from '@ember/service';
 import { macroCondition, isTesting } from '@embroider/macros';
 import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
-import { task } from 'ember-concurrency';
+import { task, TaskGenerator } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
@@ -14,17 +14,29 @@ import config from 'cardhost/config/environment';
 
 const { cardServer } = config as any; // Environment types arent working
 
+// TODO: This is hardcoded for now. We need to decide how this should work.
+const REALM = 'https://demo.com';
+
 export interface Card {
   model: CardModel;
   component: unknown;
 }
 
-function buildURL(url: string, format?: Format): string {
+function buildCardURL(url: string, format?: Format): string {
   let fullURL = [cardServer, 'cards/', encodeURIComponent(url)];
   if (format) {
     fullURL.push('?' + new URLSearchParams({ format }).toString());
   }
   return fullURL.join('');
+}
+
+function buildNewURL(realm: string, parentCardURL: string): string {
+  return [
+    cardServer,
+    'cards/',
+    encodeURIComponent(realm) + '/',
+    encodeURIComponent(parentCardURL),
+  ].join('');
 }
 
 // when you put a card under edit, we load a new copy in edit mode. This lets us
@@ -33,47 +45,58 @@ let originals = new WeakMap();
 
 export default class Cards extends Service {
   async load(url: string, format: Format): Promise<Card> {
-    let fullURL = buildURL(url, format);
-    return this.internalLoad.perform(fullURL);
+    let fullURL = buildCardURL(url, format);
+    return taskFor(this.internalLoad).perform(fullURL);
   }
 
   async loadForRoute(pathname: string): Promise<Card> {
-    return this.internalLoad.perform(`${cardServer}cardFor${pathname}`);
+    return taskFor(this.internalLoad).perform(
+      `${cardServer}cardFor${pathname}`
+    );
   }
 
   async loadForEdit(card: Card): Promise<Card> {
-    let loaded = await this.internalLoad.perform(
-      buildURL(card.model.url, 'edit')
+    let loaded = await taskFor(this.internalLoad).perform(
+      buildCardURL(card.model.url, 'edit')
     );
     originals.set(loaded.model, card.model);
+
+    return loaded;
+  }
+  async loadForNew(card: Card): Promise<Card> {
+    let loaded = await taskFor(this.internalLoad).perform(
+      buildCardURL(card.model.url, 'edit'),
+      { dataShapeOnly: true }
+    );
+    originals.set(loaded.model, card.model);
+
     return loaded;
   }
 
-  @task private internalLoad = taskFor(
-    async (url: string): Promise<Card> => {
-      let cardResponse = await fetchCard(url);
-      let { component, ModelClass } = await loadComponentModule(
-        cardResponse,
-        url
-      );
-      let model = new ModelClass(cardResponse);
-      let CallerComponent = setComponentTemplate(
-        hbs`<this.card @model={{this.model.data}} @set={{this.model.setters}} />`,
-        class extends Component {
-          model = model;
-          card = component;
-        }
-      );
+  @task private *internalLoad(
+    url: string,
+    options?: { dataShapeOnly: boolean }
+  ): TaskGenerator<Card> {
+    let cardResponse = yield fetchCard(url);
+    let { component, ModelClass } = yield loadComponentModule(
+      cardResponse,
+      url
+    );
 
-      return {
-        model,
-        component: CallerComponent,
-      };
-    }
-  );
+    let model =
+      options && options.dataShapeOnly
+        ? ModelClass.newFromParentCardResponse(ModelClass, cardResponse)
+        : ModelClass.newFromResponse(ModelClass, cardResponse);
+
+    return {
+      model,
+      component: buildCallerComponent(model, component),
+    };
+  }
 
   async save(card: Card): Promise<void> {
-    await this.saveTask.perform(card.model);
+    await taskFor(this.saveTask).perform(card.model);
+
     let original = originals.get(card.model);
     if (original) {
       // TODO: this should probably be selective and only update fields that
@@ -83,13 +106,33 @@ export default class Cards extends Service {
     }
   }
 
-  @task saveTask = taskFor(
-    async (model: CardModel): Promise<void> => {
-      let response = await fetchCard(buildURL(model.url), {
+  @task private *saveTask(model: CardModel): TaskGenerator<void> {
+    // TODO: Need to consider what is responsible for
+    // determinaing the URL and the current state of the CardModel.
+    if (model.url) {
+      let url = buildCardURL(model.url);
+      let response = yield fetchCard(url, {
         method: 'PATCH',
         body: JSON.stringify(model.serialize()),
       });
       model.updateFromResponse(response);
+    } else if (model.parentCardUrl) {
+      let url = buildNewURL(REALM, model.parentCardUrl);
+      let response = yield fetchCard(url, {
+        method: 'POST',
+        body: JSON.stringify(model.serialize()),
+      });
+      model.updateFromResponse(response);
+    }
+  }
+}
+
+function buildCallerComponent(model: CardModel, component: unknown): unknown {
+  return setComponentTemplate(
+    hbs`<this.card @model={{this.model.data}} @set={{this.model.setters}} />`,
+    class extends Component {
+      model = model;
+      card = component;
     }
   );
 }
@@ -98,33 +141,33 @@ async function loadComponentModule(
   card: cardJSONReponse,
   url: string
 ): Promise<{ component: unknown; ModelClass: typeof CardModel }> {
-  let componentModuleName = card.data.meta?.componentModule;
-  if (!componentModuleName) {
+  let { meta } = card.data;
+
+  if (!meta || !meta.componentModule) {
     throw new Error('No componentModule to load');
   }
+
+  let { componentModule } = meta;
 
   // TODO: base this on the componentModuleName prefix instead of isTesting()
   if (macroCondition(isTesting())) {
     // in tests, our fake server inside mirage just defines these modules
     // dynamically
-    let cardComponentModule = window.require(componentModuleName);
+    let cardComponentModule = window.require(componentModule);
     return {
       component: cardComponentModule['default'],
       ModelClass: cardComponentModule['Model'],
     };
   } else {
-    if (!componentModuleName.startsWith('@cardstack/compiled/')) {
+    if (!componentModule.startsWith('@cardstack/compiled/')) {
       throw new Error(
         `${url}'s meta.componentModule does not start with '@cardstack/compiled/`
       );
     }
-    componentModuleName = componentModuleName.replace(
-      '@cardstack/compiled/',
-      ''
-    );
+    componentModule = componentModule.replace('@cardstack/compiled/', '');
     let cardComponentModule = await import(
       /* webpackExclude: /schema\.js$/ */
-      `@cardstack/compiled/${componentModuleName}`
+      `@cardstack/compiled/${componentModule}`
     );
 
     return {
@@ -149,7 +192,7 @@ async function fetchCard(
   );
   let response = await fetch(url, fullOptions);
 
-  if (response.status !== 200) {
+  if (!response.ok) {
     throw new Error(`unable to fetch card ${url}: status ${response.status}`);
   }
 
