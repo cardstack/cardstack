@@ -24,19 +24,19 @@ let cleanNetwork = network.replace('poa-', '');
 
 let cardpayGenesisBlock = {
   sokol: 21403252,
-  xdai: 0, // TODO update after cardpay is deployed
+  xdai: 17265698,
 };
 let tokenStartBlock = {
   sokol: 20644808, // the block that the token bridge was created (and hence our CPXD tokens)
-  xdai: 0,
+  xdai: cardpayGenesisBlock.xdai,
 };
 let gnosisSafeGenesisBlock = {
   sokol: cardpayGenesisBlock.sokol,
-  xdai: 0,
+  xdai: cardpayGenesisBlock.xdai,
 };
 let uniswapV2GenesisBlock = {
   sokol: 21474163,
-  xdai: 0,
+  xdai: cardpayGenesisBlock.xdai,
 };
 
 let abis = {
