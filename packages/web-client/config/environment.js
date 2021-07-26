@@ -40,6 +40,8 @@ module.exports = function (environment) {
     urls: {
       appStoreLink: undefined,
       googlePlayStoreLink: undefined,
+      discordBetaChannelLink:
+        'https://discord.com/channels/584043165066199050/867588838524190762',
     },
     threadAnimationInterval: 1000,
     'ember-cli-mirage': {

@@ -8,6 +8,7 @@ interface ChainsOptions {
 interface UrlsOptions {
   appStoreLink: string | undefined;
   googlePlayLink: string | undefined;
+  discordBetaChannelLink: string | undefined;
 }
 
 /**

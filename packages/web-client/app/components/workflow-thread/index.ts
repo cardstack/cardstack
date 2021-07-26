@@ -10,9 +10,6 @@ interface WorkflowThreadArgs {
   workflow: Workflow;
 }
 
-const TESTNET_FAUCET_CHANNEL_URL =
-  'https://discord.com/channels/584043165066199050/867588838524190762';
-
 export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   threadEl: HTMLElement | undefined;
   workflow = new AnimatedWorkflow(this.args.workflow);
@@ -75,7 +72,7 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   }
 
   @action openDiscord() {
-    window.open(TESTNET_FAUCET_CHANNEL_URL, '_blank');
+    window.open(config.urls.discordBetaChannelLink, '_blank');
   }
 
   get lastMilestonePostable() {
