@@ -91,10 +91,26 @@ async function loadPrepaidCardPatterns(db: Client) {
     description = excluded.description;`;
   let patternRows = [
     ['3B8B436B-A99E-4346-AB20-3BA5F9963321', null, 'None'],
-    ['451ed569-fb6f-4b61-8b80-e10e25ea7fa2', '/images/prepaid-card-customizations/pattern-1.svg', 'Cell'],
-    ['08086b26-0b2d-43aa-a7cc-dffc7ffc45eb', '/images/prepaid-card-customizations/pattern-2.svg', 'Curtain'],
-    ['aec7322a-84e2-4969-a03d-022460705fee', '/images/prepaid-card-customizations/pattern-3.svg', 'Zebra'],
-    ['78c26684-4e70-4152-996b-f453934d2485', '/images/prepaid-card-customizations/pattern-4.svg', 'Tangram'],
+    [
+      '451ed569-fb6f-4b61-8b80-e10e25ea7fa2',
+      'https://app.cardstack.com/images/prepaid-card-customizations/pattern-1.svg',
+      'Cell',
+    ],
+    [
+      '08086b26-0b2d-43aa-a7cc-dffc7ffc45eb',
+      'https://app.cardstack.com/images/prepaid-card-customizations/pattern-2.svg',
+      'Curtain',
+    ],
+    [
+      'aec7322a-84e2-4969-a03d-022460705fee',
+      'https://app.cardstack.com/images/prepaid-card-customizations/pattern-3.svg',
+      'Zebra',
+    ],
+    [
+      '78c26684-4e70-4152-996b-f453934d2485',
+      'https://app.cardstack.com/images/prepaid-card-customizations/pattern-4.svg',
+      'Tangram',
+    ],
   ];
   let sql = pgFormat(patternsQueryText, patternRows);
   console.log(sql);
