@@ -1,4 +1,4 @@
-<section class={{cn "dashboard-panel-section" dashboard-panel-section--bottom-aligned=(not @section.title)}} ...attributes>
+<section class={{cn "dashboard-panel-section" dashboard-panel-section--has-disclaimer=(has-block "disclaimer")}} ...attributes>
   {{#if @section.icon}}
     {{svg-jar @section.icon alt="" role="presentation"}}
   {{/if}}
@@ -16,7 +16,7 @@
   {{yield to="cta"}}
 
   {{#if (has-block "disclaimer")}}
-    <small>
+    <small class="dashboard-panel-section__disclaimer">
       {{yield to="disclaimer"}}
     </small>
   {{/if}}
