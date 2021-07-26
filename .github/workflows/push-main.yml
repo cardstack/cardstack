@@ -168,6 +168,7 @@ jobs:
       - name: Run ember-cli-deploy
         run: yarn deploy:web-client:staging
         env:
+          SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
           EMBER_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}
           EMBER_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
           HUB_URL: https://hub-staging.stack.cards
