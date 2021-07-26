@@ -3,6 +3,10 @@
   letter-spacing: var(--boxel-lsp-sm);
   display: flex;
   flex-flow: column nowrap;
+  justify-content: space-between;
+}
+
+.dashboard-panel-section--bottom-aligned {
   justify-content: flex-end;
 }
 
@@ -80,6 +84,7 @@
 
   .dashboard-panel-section__disclaimer {
     position: absolute;
+    bottom: 0;
     transform: translateY(calc(var(--boxel-sp) + 100%));
   }
 }
