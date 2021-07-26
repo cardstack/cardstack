@@ -2,15 +2,17 @@
   <CardPay::DashboardPanel @panel={{@model.panel}}>
     {{#each @model.panel.sections as |section|}}
       <CardPay::DashboardPanel::Section @section={{section}}>
-        <Boxel::Button
-          {{on "click" (set this "flow" section.workflow)}}
-          @kind="primary"
-          @size="touch"
-          @disabled={{section.isCtaDisabled}}
-          data-test-workflow-button={{section.workflow}}
-        >
-          {{section.cta}}
-        </Boxel::Button>
+        <:cta>
+          <Boxel::Button
+            {{on "click" (set this "flow" section.workflow)}}
+            @kind="primary"
+            @size="touch"
+            @disabled={{section.isCtaDisabled}}
+            data-test-workflow-button={{section.workflow}}
+          >
+            {{section.cta}}
+          </Boxel::Button>
+        </:cta>
       </CardPay::DashboardPanel::Section>
     {{/each}}
   </CardPay::DashboardPanel>

@@ -115,7 +115,6 @@
 .dashboard-panel__header {
   grid-column: 1 / -1;
   max-width: 30rem;
-  z-index: 1;
 }
 
 .dashboard-panel__header-title {
@@ -140,6 +139,11 @@
   background-repeat: no-repeat;
   background-size: contain;
   pointer-events: none;
+  z-index: 0;
+}
+
+.dashboard-panel > *:not(.dashboard-panel__hero) {
+  z-index: 1;
 }
 
 @media screen and (max-width: 1000px) {
