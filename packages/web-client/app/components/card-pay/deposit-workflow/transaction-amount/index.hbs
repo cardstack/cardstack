@@ -53,8 +53,8 @@
       {{/unless}}
     </div>
     {{#if this.errorMessage}}
-      <CardPay::ErrorMessage>
-        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact Cardstack support.
+      <CardPay::ErrorMessage as |supportURL|>
+        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
       </CardPay::ErrorMessage>
     {{/if}}
     <div class="transaction-amount__footnote">

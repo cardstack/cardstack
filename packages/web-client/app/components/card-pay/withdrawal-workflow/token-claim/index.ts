@@ -91,8 +91,7 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
     } catch (e) {
       console.error(e);
       this.errorMessage = `There was a problem with claiming your tokens. This may be due
-      to a network issue, or perhaps you canceled the request in your wallet. Please try
-      again if you want to continue with this workflow, or contact Cardstack support.`;
+      to a network issue, or perhaps you canceled the request in your wallet.`;
     } finally {
       this.isConfirming = false;
     }
