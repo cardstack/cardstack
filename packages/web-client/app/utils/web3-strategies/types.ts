@@ -1,7 +1,7 @@
 import { WalletProvider } from '../wallet-providers';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
-import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { DepotSafe, PrepaidCardSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import {
   ConvertibleSymbol,
   ConversionFunction,
@@ -90,7 +90,7 @@ export interface Layer2Web3Strategy
     amount: number,
     customizationDid: string,
     options?: IssuePrepaidCardOptions
-  ): Promise<ChainAddress>;
+  ): Promise<PrepaidCardSafe>;
   fetchDepotTask(): Promise<DepotSafe | null>;
   refreshBalances(): void;
   convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<any>;

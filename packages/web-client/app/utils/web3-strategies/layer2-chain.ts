@@ -35,6 +35,7 @@ import {
   IExchangeRate,
   IHubAuth,
   ISafes,
+  PrepaidCardSafe,
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
@@ -188,7 +189,7 @@ export default abstract class Layer2ChainWeb3Strategy
     amount: number,
     customizationDid: string,
     options: IssuePrepaidCardOptions
-  ): Promise<ChainAddress> {
+  ): Promise<PrepaidCardSafe> {
     const PrepaidCard = await getSDK('PrepaidCard', this.web3);
 
     const result = await PrepaidCard.create(
@@ -200,7 +201,7 @@ export default abstract class Layer2ChainWeb3Strategy
       options.onTxHash
     );
 
-    return result.prepaidCardAddresses[0];
+    return result.prepaidCards[0];
   }
 
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
