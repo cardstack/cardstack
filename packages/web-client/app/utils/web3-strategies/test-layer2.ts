@@ -1,7 +1,6 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
 import {
-  ChainAddress,
   IssuePrepaidCardOptions,
   Layer2Web3Strategy,
   TransactionHash,
@@ -15,15 +14,20 @@ import RSVP, { defer } from 'rsvp';
 import BN from 'bn.js';
 import { fromWei, toWei } from 'web3-utils';
 import { TransactionReceipt } from 'web3-core';
-import { BridgeValidationResult, DepotSafe } from '@cardstack/cardpay-sdk';
+import {
+  BridgeValidationResult,
+  DepotSafe,
+  PrepaidCardSafe,
+} from '@cardstack/cardpay-sdk';
 import {
   UnbindEventListener,
   SimpleEmitter,
 } from '@cardstack/web-client/utils/events';
 
 interface IssuePrepaidCardRequest {
-  deferred: RSVP.Deferred<String>;
+  deferred: RSVP.Deferred<PrepaidCardSafe>;
   onTxHash?: (txHash: TransactionHash) => void;
+  customizationDID: string;
 }
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainId = '-1';
@@ -136,13 +140,14 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   async issuePrepaidCard(
     _safeAddress: string,
     faceValue: number,
-    _customizationDID: string,
+    customizationDID: string,
     options: IssuePrepaidCardOptions
-  ): Promise<ChainAddress> {
-    let deferred: RSVP.Deferred<ChainAddress> = defer();
+  ): Promise<PrepaidCardSafe> {
+    let deferred: RSVP.Deferred<PrepaidCardSafe> = defer();
     this.issuePrepaidCardRequests.set(faceValue, {
       deferred,
       onTxHash: options.onTxHash,
+      customizationDID,
     });
     return deferred.promise;
   }
@@ -201,11 +206,26 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   test__simulateIssuePrepaidCardForAmount(
     faceValue: number,
-    walletAddress: string
+    walletAddress: string,
+    cardAddress: string
   ) {
     let request = this.issuePrepaidCardRequests.get(faceValue);
+    let prepaidCardSafe: PrepaidCardSafe = {
+      type: 'prepaid-card',
+      address: cardAddress,
+      tokens: [],
+      owners: [walletAddress],
+      issuingToken: '0xTOKEN',
+      spendFaceValue: faceValue,
+      prepaidCardOwner: walletAddress,
+      hasBeenUsed: false,
+      issuer: walletAddress,
+      reloadable: true,
+      transferrable: false,
+      customizationDID: request?.customizationDID,
+    };
     request?.onTxHash?.('exampleTxHash');
-    return request?.deferred.resolve(walletAddress);
+    return request?.deferred.resolve(prepaidCardSafe);
   }
 
   test__simulateHubAuthentication(authToken: string) {

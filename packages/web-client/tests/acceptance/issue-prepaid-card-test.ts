@@ -430,6 +430,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     await timeout(250);
     layer2Service.test__simulateIssuePrepaidCardForAmount(
       10000,
+      layer2AccountAddress,
       '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8'
     );
 

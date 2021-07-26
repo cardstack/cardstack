@@ -54,16 +54,19 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
         patternId: workflowSession.state.pattern.id,
       });
 
-      let address = yield taskFor(this.layer2Network.issuePrepaidCard).perform(
-        this.faceValue,
-        customization.did,
-        {
-          onTxHash: (txHash: TransactionHash) => {
-            this.txHash = txHash;
-          },
-        }
+      let prepaidCardSafe = yield taskFor(
+        this.layer2Network.issuePrepaidCard
+      ).perform(this.faceValue, customization.did, {
+        onTxHash: (txHash: TransactionHash) => {
+          this.txHash = txHash;
+        },
+      });
+
+      this.args.workflowSession.update(
+        'prepaidCardAddress',
+        prepaidCardSafe.address
       );
-      this.args.workflowSession.update('prepaidCardAddress', address);
+
       this.args.onComplete();
     } catch (e) {
       let insufficientFunds = e.message.startsWith(
