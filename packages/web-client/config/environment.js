@@ -30,6 +30,9 @@ module.exports = function (environment) {
         tracesSampleRate: 1.0,
       },
     },
+    pageTitle: {
+      separator: ' · ',
+    },
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
