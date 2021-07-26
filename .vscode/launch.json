@@ -49,7 +49,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Bridge to Layer 1",
+      "name": "Cardpay testnet: Bridge to Layer 1",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -69,7 +69,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Bridge to Layer 2",
+      "name": "Cardpay testnet: Bridge to Layer 2",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -96,7 +96,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Wait for Bridge to Layer 2",
+      "name": "Cardpay testnet: Wait for Bridge to Layer 2",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -114,7 +114,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Wait for Bridge Validators",
+      "name": "Cardpay testnet: Wait for Bridge Validators",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -132,7 +132,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Claim Layer 1 Tokens",
+      "name": "Cardpay testnet: Claim Layer 1 Tokens",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -153,26 +153,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Set Supplier Info DID",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
-      "console": "integratedTerminal",
-      "env": {},
-      "args": [
-        "set-supplier-info-did",
-        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot
-        "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49",
-        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // gas token DAI.CPXD
-        "--network",
-        "sokol",
-        // Hassan's testing mnemonic feel free to use your own
-        "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
-      ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Cardpay: View Safes",
+      "name": "Cardpay testnet: View Safes",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -188,7 +169,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: View Safe",
+      "name": "Cardpay testnet: View Safe",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -205,7 +186,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Transfer Tokens from Safe",
+      "name": "Cardpay testnet: Transfer Tokens from Safe",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -225,7 +206,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Create Prepaid Card",
+      "name": "Cardpay testnet: Create Prepaid Card",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -245,7 +226,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Split Prepaid Card",
+      "name": "Cardpay testnet: Split Prepaid Card",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -266,7 +247,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Transfer Prepaid Card",
+      "name": "Cardpay testnet: Transfer Prepaid Card",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -284,7 +265,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Register New Merchant",
+      "name": "Cardpay testnet: Register New Merchant",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -302,7 +283,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Pay Merchant",
+      "name": "Cardpay testnet: Pay Merchant",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -321,7 +302,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: View Merchant Revenue",
+      "name": "Cardpay testnet: View Merchant Revenue",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -338,7 +319,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Claim Merchant Revenue",
+      "name": "Cardpay testnet: Claim Merchant Revenue",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -357,7 +338,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Price for face value",
+      "name": "Cardpay testnet: Price for face value",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -375,7 +356,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: New prepaid card gas fee",
+      "name": "Cardpay testnet: New prepaid card gas fee",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -392,7 +373,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: USD Price",
+      "name": "Cardpay testnet: USD Price",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -410,7 +391,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: ETH Price",
+      "name": "Cardpay testnet: ETH Price",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -428,7 +409,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: Oracle Update Time",
+      "name": "Cardpay testnet: Oracle Update Time",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -445,7 +426,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Cardpay: View Reward Balances",
+      "name": "Cardpay testnet: View Reward Balances",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
       "env": {},
@@ -457,6 +438,23 @@
         "--mnemonic",
         "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
-    }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay mainnet: Bridge to Layer 2",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        // DAI Bridge args
+        "bridge-to-l2",
+        "10",
+        "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
+        "--network",
+        "mainnet",
+        "--walletConnect"
+      ]
+    },
   ]
 }
