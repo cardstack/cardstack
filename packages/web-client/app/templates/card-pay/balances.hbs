@@ -43,10 +43,28 @@
 
         {{#if this.prepaidCards}}
           <section class="card-pay-dashboard__balances-section">
-            <h4 class="card-pay-dashboard__balances-section-title">
-              Prepaid Cards
-              <span class="card-pay-dashboard__balances-count" data-test-prepaid-cards-count>{{this.prepaidCards.length}}</span>
-            </h4>
+            <header class="card-pay-dashboard__balances-section-header">
+              <h4 class="card-pay-dashboard__balances-section-title">
+                Prepaid Cards
+                <span class="card-pay-dashboard__balances-count" data-test-prepaid-cards-count>{{this.prepaidCards.length}}</span>
+              </h4>
+
+              {{#let @model.panel.sections.lastObject as |section|}}
+                <Boxel::Button
+                  {{on "click" (set this "flow" section.workflow)}}
+                  @kind="secondary-dark"
+                  @size="small"
+                  @disabled={{section.isCtaDisabled}}
+                  data-test-workflow-button={{section.workflow}}
+                >
+                  <span>{{section.cta}}</span>
+                  {{svg-jar "plus"
+                    class="card-pay-dashboard__balances-section-header-button-icon"
+                    role="presentation"
+                  }}
+                </Boxel::Button>
+              {{/let}}
+            </header>
 
             <section class="card-pay-dashboard__balances-cards">
               {{#each this.prepaidCards as |prepaidCard|}}

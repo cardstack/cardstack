@@ -22,6 +22,18 @@
   padding-top: var(--boxel-sp);
 }
 
+.card-pay-dashboard__balances-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-pay-dashboard__balances-section-header-button-icon {
+  margin-left: var(--boxel-sp-xs);
+
+  --icon-color: #00ebe5 !important;
+}
+
 .card-pay-dashboard__balances-section-title {
   font-weight: normal;
 }
