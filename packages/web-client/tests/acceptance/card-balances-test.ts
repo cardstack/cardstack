@@ -93,7 +93,10 @@ module('Acceptance | card balances', function (hooks) {
 
     await visit('/card-pay/balances');
 
-    assert.dom('[data-test-account-sidebar]').containsText('0x1826...6E44');
+    assert
+      .dom('[data-test-account-sidebar]')
+      .containsText('0x1826...6E44')
+      .containsText('1 Card');
 
     assert.dom('[data-test-prepaid-cards-count]').containsText('1');
 

@@ -6,6 +6,21 @@
       <SidebarSection>
         My Account: {{truncate-middle this.layer2Network.walletInfo.firstAddress}}
       </SidebarSection>
+
+      {{!-- FIXME this should be in a higher level so it can show on all routes --}}
+      {{#if this.prepaidCards}}
+        <SidebarSection>
+          <LinkTo class="card-pay-dashboard__sidebar-link" @route="card-pay.balances">
+            {{svg-jar "active-sidebar-link-triangle" class="card-pay-dashboard__sidebar-link-icon" width="15" height="15" role="presentation"}}
+            <div>
+              <div class="card-pay-dashboard__sidebar-link-header">
+                Prepaid Cards
+              </div>
+              {{pluralize this.prepaidCards.length "Card"}}
+            </div>
+          </LinkTo>
+        </SidebarSection>
+      {{/if}}
     </Boxel::Sidebar>
   {{/if}}
 
