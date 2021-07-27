@@ -409,6 +409,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
       );
     });
 
+    layer2Service.balancesRefreshed = false;
+
     // // preview card
     await click(
       `${postableSel(
@@ -481,6 +483,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
       .containsText('150.0');
+
+    assert.ok(layer2Service.balancesRefreshed);
 
     await waitFor(epiloguePostableSel(4));
 
