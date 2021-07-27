@@ -3,7 +3,7 @@ import { ERC20ABI } from '@cardstack/cardpay-sdk/index.js';
 import { getAddressByNetwork, AddressKeys } from '@cardstack/cardpay-sdk';
 import { ChainAddress } from './web3-strategies/types';
 import { NetworkSymbol } from './web3-strategies/types';
-import BN from 'web3-core/node_modules/@types/bn.js';
+import BN from 'bn.js';
 
 // symbols
 export type ConvertibleSymbol = 'DAI' | 'CARD';
