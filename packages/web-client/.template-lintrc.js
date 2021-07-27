@@ -6,5 +6,8 @@ module.exports = {
     'no-implicit-this': {
       allow: ['noop', 'placeholder-address'],
     },
+    'no-curly-component-invocation': {
+      allow: ['sentry-breadcrumb'],
+    },
   },
 };

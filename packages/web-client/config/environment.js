@@ -16,6 +16,20 @@ module.exports = function (environment) {
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
     version: pkg.version,
+    sentryDsn: process.env.SENTRY_DSN,
+    '@sentry/ember': {
+      sentry: {
+        dsn: process.env.SENTRY_DSN,
+        // debug: true, // uncomment this to get helpful logs about sentry's behavior
+        enabled: !!process.env.DEPLOY_TARGET,
+        environment: process.env.DEPLOY_TARGET || 'development',
+        release: 'web-client@' + pkg.version,
+        // Set tracesSampleRate to 1.0 to capture 100%
+        // of transactions for performance monitoring.
+        // We recommend adjusting this value in production,
+        tracesSampleRate: 1.0,
+      },
+    },
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build

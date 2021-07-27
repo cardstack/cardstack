@@ -35,6 +35,7 @@ jobs:
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
         run: |
+          echo "SENTRY_DSN=${{ secrets.WEB_CLIENT_SENTRY_DSN }}" >> $GITHUB_ENV
           if [ "$INPUT_ENVIRONMENT" = "production" ]; then
             echo "EMBER_DEPLOY_AWS_ACCESS_KEY=${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
             echo "EMBER_DEPLOY_AWS_ACCESS_SECRET=${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_SECRET }}" >> $GITHUB_ENV

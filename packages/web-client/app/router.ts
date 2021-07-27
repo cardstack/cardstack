@@ -13,4 +13,5 @@ Router.map(function () {
     this.route('reward-programs');
     this.route('token-suppliers');
   });
+  this.route('boom');
 });
