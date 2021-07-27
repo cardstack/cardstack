@@ -1,6 +1,7 @@
 import Service from '@ember/service';
 import config from '../config/environment';
 import { inject as service } from '@ember/service';
+import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import {
   IssuePrepaidCardOptions,
@@ -14,7 +15,7 @@ import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
-import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { DepotSafe, Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import {
   BridgeableSymbol,
   ConvertibleSymbol,
@@ -93,7 +94,7 @@ export default class Layer2Network
     return yield this.strategy.viewSafe(address);
   }
 
-  @task *viewSafes(account: string): any {
+  @task *viewSafes(account: string): TaskGenerator<Safe[]> {
     return yield this.strategy.viewSafes(account);
   }
 

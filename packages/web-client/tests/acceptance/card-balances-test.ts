@@ -8,6 +8,10 @@ import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns
 import { encodeDID, getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 
+import { MirageTestContext } from 'ember-cli-mirage/test-support';
+
+interface Context extends MirageTestContext {}
+
 module('Acceptance | card balances', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
@@ -27,7 +31,7 @@ module('Acceptance | card balances', function (hooks) {
     assert.dom('[data-test-card-balances]').doesNotExist();
   });
 
-  test('Sidebar shows and cards are listed when wallet is connected', async function (assert) {
+  test('Sidebar shows and cards are listed when wallet is connected', async function (this: Context, assert) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
 
@@ -42,7 +46,7 @@ module('Acceptance | card balances', function (hooks) {
 
     let resolver = new Resolver({ ...getResolver() });
     let resolvedDID = await resolver.resolve(customizationDID);
-    let didAlsoKnownAs = resolvedDID?.didDocument?.alsoKnownAs[0]!;
+    let didAlsoKnownAs = resolvedDID?.didDocument?.alsoKnownAs![0]!;
     let customizationJsonFilename = didAlsoKnownAs.split('/')[4].split('.')[0];
 
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
@@ -87,8 +91,8 @@ module('Acceptance | card balances', function (hooks) {
     this.server.create('prepaid-card-customization', {
       id: customizationJsonFilename,
       issuerName: 'jortleby',
-      colorScheme: this.server.schema.prepaidCardColorSchemes.first(),
-      pattern: this.server.schema.prepaidCardPatterns.all().models[4],
+      colorScheme: this.server.schema.first('prepaid-card-color-scheme'),
+      pattern: this.server.schema.all('prepaid-card-pattern').models[4],
     });
 
     await visit('/card-pay/balances');

@@ -25,7 +25,9 @@ import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issu
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 
-interface Context extends MirageTestContext {}
+interface Context extends MirageTestContext {
+  normalizedRequestAttrs(): any;
+}
 
 // Dai amounts based on available prepaid card options
 const MIN_AMOUNT_TO_PASS = new BN(
@@ -368,13 +370,13 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     let resolver = new Resolver({ ...getResolver() });
     let resolvedDID = await resolver.resolve(did);
-    let didAlsoKnownAs = resolvedDID?.didDocument?.alsoKnownAs[0]!;
+    let didAlsoKnownAs = resolvedDID?.didDocument?.alsoKnownAs![0]!;
     let customizationJsonFilename = didAlsoKnownAs.split('/')[4].split('.')[0];
 
     // simulate POST /api/prepaid-card-customizations to persist customizations and return DID
     this.server.post(
       '/prepaid-card-customizations',
-      function (schema, request) {
+      function (this: Context, schema, request) {
         assert.equal(
           request.requestHeaders['authorization'],
           'Bearer: abc123--def456--ghi789'
@@ -390,7 +392,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
           '4f219852-33ee-4e4c-81f7-76318630a423'
         );
 
-        let customization = schema.prepaidCardCustomizations.create({
+        let customization = schema.create('prepaid-card-customization', {
           id: customizationJsonFilename,
           did,
           ...this.normalizedRequestAttrs(),
