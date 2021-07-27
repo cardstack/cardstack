@@ -40,6 +40,8 @@ export interface RelayTokensOptions {
 
 export interface IssuePrepaidCardOptions {
   onTxHash?(txHash: TransactionHash): void;
+  nonce?: string;
+  onNonce?(nonce: string): void;
 }
 
 export interface ClaimBridgedTokensOptions {

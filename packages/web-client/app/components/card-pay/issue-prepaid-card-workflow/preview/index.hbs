@@ -103,7 +103,12 @@
           class="preview__loading-indicator"
           @color="var(--boxel-light)"
         />
-        You will receive a confirmation request from the Card Wallet app in a few moments…
+        <div>
+          {{this.chinInProgressMessage}}
+          {{#if this.enableCancelation}}
+            <a href="#" class="preview__cancel-button" data-test-issue-prepaid-card-cancel-button {{on 'click' (queue (prevent-default) this.retryIssuePrepaidCard)}}>Cancel</a>
+          {{/if}}
+        </div>
       </i.ActionStatusArea>
       {{#if this.txViewerUrl}}
         <i.InfoArea>
