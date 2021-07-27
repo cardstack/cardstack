@@ -403,7 +403,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
-      file: ./src/mappings/uniswap-factory.ts
+      file: ./src/mappings/uniswap-factory-{NETWORK}.ts
       entities:
         - Token
         - TokenPair

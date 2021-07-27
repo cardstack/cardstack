@@ -47,6 +47,7 @@
     "compile": "yarn codegen:subgraph-sokol && tsc --build ./tsconfig.json",
     "prepare": "npm run compile",
     "codegen:subgraph-sokol": "cd ./packages/cardpay-subgraph && yarn codegen-sokol",
+    "codegen:subgraph-xdai": "cd ./packages/cardpay-subgraph && yarn codegen-xdai",
     "build:subgraph": "cd ./packages/cardpay-subgraph && yarn build",
     "lint": "yarn compile && npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:css:web-client": "cd packages/web-client && yarn lint:css",
@@ -74,8 +75,12 @@
     "deploy:subgraph-local": "cd ./packages/cardpay-subgraph && yarn deploy-local",
     "deploy:subgraph-sokol-green": "cd ./packages/cardpay-subgraph && yarn deploy-sokol-green",
     "deploy:subgraph-sokol-blue": "cd ./packages/cardpay-subgraph && yarn deploy-sokol-blue",
-    "status:subgraph-sokol-green": "cd ./packages/cardpay-subgraph && yarn green-status",
-    "status:subgraph-sokol-blue": "cd ./packages/cardpay-subgraph && yarn blue-status"
+    "deploy:subgraph-xdai-green": "cd ./packages/cardpay-subgraph && yarn deploy-xdai-green",
+    "deploy:subgraph-xdai-blue": "cd ./packages/cardpay-subgraph && yarn deploy-xdai-blue",
+    "status:subgraph-sokol-green": "cd ./packages/cardpay-subgraph && yarn sokol-green-status",
+    "status:subgraph-sokol-blue": "cd ./packages/cardpay-subgraph && yarn sokol-blue-status",
+    "status:subgraph-xdai-green": "cd ./packages/cardpay-subgraph && yarn xdai-green-status",
+    "status:subgraph-xdai-blue": "cd ./packages/cardpay-subgraph && yarn xdai-blue-status"
   },
   "resolutions": {
     "ember-test-selectors": "^5.0.0"

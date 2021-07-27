@@ -70,7 +70,7 @@ const XDAI = {
   rpcNode: 'https://xdai-archive.blockscout.com',
   rpcWssNode: 'wss://rpc.xdaichain.com/wss',
   relayServiceURL: 'https://relay.cardstack.com/api',
-  transactionServiceURL: 'https://transactions.cardstack.com/api',
+  subgraphURL: 'https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai',
 };
 
 type ConstantKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof XDAI;

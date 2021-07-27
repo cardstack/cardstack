@@ -5,8 +5,10 @@ global.fetch = fetch;
 
 const USAGE = `node sync-status <green | blue>`;
 const nodes: { [node: string]: string } = {
-  green: 'https://graph-staging-green.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
-  blue: 'https://graph-staging-blue.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
+  'sokol-green': 'https://graph-staging-green.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
+  'sokol-blue': 'https://graph-staging-blue.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
+  'xdai-green': 'https://graph-production-green.cardstack.com/subgraphs/name/habdelra/cardpay-xdai',
+  'xdai-blue': 'https://graph-production-blue.cardstack.com/subgraphs/name/habdelra/cardpay-xdai',
 };
 
 let node = process.argv[2];
