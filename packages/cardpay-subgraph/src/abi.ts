@@ -128,5 +128,8 @@ function removeZeroPadding(hex: string): string {
   while (hex.startsWith('0')) {
     hex = hex.slice(1);
   }
+  if (hex == '') {
+    return '0';
+  }
   return hex;
 }
