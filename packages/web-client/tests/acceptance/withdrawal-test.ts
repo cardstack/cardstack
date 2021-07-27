@@ -11,9 +11,11 @@ import { setupApplicationTest } from 'ember-qunit';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
-import { toBN } from 'web3-utils';
+import BN from 'bn.js';
+
 import { capitalize } from '@ember/string';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import { DepotSafe } from '@cardstack/cardpay-sdk';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -58,9 +60,9 @@ module('Acceptance | withdrawal', function (hooks) {
       'metamask'
     );
     layer1Service.test__simulateBalances({
-      defaultToken: toBN('2141100000000000000'),
-      dai: toBN('150500000000000000000'),
-      card: toBN('10000000000000000000000'),
+      defaultToken: new BN('2141100000000000000'),
+      dai: new BN('150500000000000000000'),
+      card: new BN('10000000000000000000000'),
     });
     await waitFor(`${post} [data-test-balance="ETH"]`);
     assert.dom(`${post} [data-test-balance="ETH"]`).containsText('2.1411');
@@ -94,8 +96,8 @@ module('Acceptance | withdrawal', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
-      defaultToken: toBN('250000000000000000000'),
-      card: toBN('500000000000000000000'),
+      defaultToken: new BN('250000000000000000000'),
+      card: new BN('500000000000000000000'),
     });
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     let testDepot = {
@@ -223,9 +225,7 @@ module('Acceptance | withdrawal', function (hooks) {
         `withdrawn funds from the ${c.layer2.fullName}, your tokens will be bridged to ${c.layer1.fullName}`
       );
     await waitFor(postableSel(3, 1));
-    layer2Service.test__simulateBridgedToLayer1(
-      '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
-    );
+    layer2Service.test__simulateBridgedToLayer1();
     await settled();
     assert
       .dom(milestoneCompletedSel(3))
@@ -274,8 +274,8 @@ module('Acceptance | withdrawal', function (hooks) {
         `This is the remaining balance in your ${c.layer2.fullName} wallet`
       );
     layer2Service.test__simulateBalances({
-      defaultToken: toBN('2141100000000000000'), // TODO: choose numbers that make sense with the scenario
-      card: toBN('10000000000000000000000'), // TODO: choose numbers that make sense with the scenario
+      defaultToken: new BN('2141100000000000000'), // TODO: choose numbers that make sense with the scenario
+      card: new BN('10000000000000000000000'), // TODO: choose numbers that make sense with the scenario
     });
     await waitFor(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`);
     assert

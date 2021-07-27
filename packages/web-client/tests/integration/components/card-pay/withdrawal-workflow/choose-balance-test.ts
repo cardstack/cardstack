@@ -4,7 +4,8 @@ import { click, render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
-import { toBN } from 'web3-utils';
+import BN from 'bn.js';
+
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 
@@ -25,16 +26,16 @@ module(
         'metamask'
       );
       layer1Service.test__simulateBalances({
-        dai: toBN('150500000000000000000'),
-        card: toBN('350000000000000000000'),
+        dai: new BN('150500000000000000000'),
+        card: new BN('350000000000000000000'),
       });
 
       let layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
       layer2Service.test__simulateBalances({
-        defaultToken: toBN('250000000000000000000'),
-        card: toBN('500000000000000000000'),
+        defaultToken: new BN('250000000000000000000'),
+        card: new BN('500000000000000000000'),
       });
       let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
       let testDepot = {

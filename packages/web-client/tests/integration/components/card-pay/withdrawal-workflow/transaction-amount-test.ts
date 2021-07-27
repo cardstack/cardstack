@@ -4,7 +4,8 @@ import { click, fillIn, render, typeIn } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
-import { toBN, toWei } from 'web3-utils';
+import { toWei } from 'web3-utils';
+import BN from 'bn.js';
 
 module(
   'Integration | Component | card-pay/withdrawal-workflow/transaction-amount',
@@ -26,9 +27,9 @@ module(
       session.update('withdrawalToken', 'DAI.CPXD');
 
       layer2Strategy.test__simulateBalances({
-        defaultToken: toBN(startDaiAmount),
-        dai: toBN(startDaiAmount),
-        card: toBN('0'),
+        defaultToken: new BN(startDaiAmount),
+        dai: new BN(startDaiAmount),
+        card: new BN('0'),
       });
 
       this.setProperties({

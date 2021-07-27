@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { toBN, toWei } from 'web3-utils';
+import { toWei } from 'web3-utils';
 
 // token input validations that assume string inputs are in ether
 function isInvalidAsNumber(amount: string) {
@@ -8,7 +8,7 @@ function isInvalidAsNumber(amount: string) {
 
 function failsToCreateBN(amount: string) {
   try {
-    toBN(toWei(amount));
+    new BN(toWei(amount));
   } catch (e) {
     return true;
   }
@@ -41,12 +41,12 @@ let orderedTokenInputValidations: Array<
   },
   (amount: string, options: TokenInputValidationOptions) => {
     if (!options.max) return '';
-    return toBN(toWei(amount)).gt(options.max)
+    return new BN(toWei(amount)).gt(options.max)
       ? 'Insufficient balance in your account'
       : '';
   },
   (amount: string, options: TokenInputValidationOptions) => {
-    return toBN(toWei(amount)).lte(options.min) ? 'Amount is too low' : '';
+    return new BN(toWei(amount)).lte(options.min) ? 'Amount is too low' : '';
   },
 ];
 

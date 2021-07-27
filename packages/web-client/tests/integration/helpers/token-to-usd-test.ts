@@ -3,7 +3,8 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render, settled, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
-import { toBN } from 'web3-utils';
+import BN from 'bn.js';
+
 import Layer2Network from '../../../app/services/layer2-network';
 import { setupOnerror, resetOnerror } from '@ember/test-helpers';
 import { defer } from 'rsvp';
@@ -25,7 +26,7 @@ module('Integration | Helper | token-to-usd', function (hooks) {
   });
 
   test('it returns 0.00 without fetching converters if the amount requested is 0', async function (assert) {
-    this.set('inputValue', toBN(0));
+    this.set('inputValue', new BN(0));
     await render(
       hbs`
         <div class="dai">{{token-to-usd 'DAI' this.inputValue}}</div>
@@ -51,7 +52,7 @@ module('Integration | Helper | token-to-usd', function (hooks) {
   });
 
   test('it fetches two converters when DAI and CARD are requested', async function (assert) {
-    this.set('inputValue', toBN(100));
+    this.set('inputValue', new BN(100));
     await render(
       hbs`{{token-to-usd 'DAI' this.inputValue}} {{token-to-usd 'CARD' this.inputValue}}`
     );
@@ -63,7 +64,7 @@ module('Integration | Helper | token-to-usd', function (hooks) {
   });
 
   test('it fetches only DAI when only DAI is requested', async function (assert) {
-    this.set('inputValue', toBN(100));
+    this.set('inputValue', new BN(100));
     await render(hbs`{{token-to-usd 'DAI' this.inputValue}}`);
     assert.deepEqual(
       layer2Strategy.test__lastSymbolsToUpdate,
@@ -73,7 +74,7 @@ module('Integration | Helper | token-to-usd', function (hooks) {
   });
 
   test('it fetches only CARD when only CARD is requested', async function (assert) {
-    this.set('inputValue', toBN(100));
+    this.set('inputValue', new BN(100));
     await render(hbs`{{token-to-usd 'CARD' this.inputValue}}`);
     assert.deepEqual(
       layer2Strategy.test__lastSymbolsToUpdate,
@@ -94,17 +95,17 @@ module('Integration | Helper | token-to-usd', function (hooks) {
 
   test('it renders conversion result to 2 decimal places', async function (assert) {
     this.set('tokenSymbol', 'DAI');
-    this.set('inputValue', toBN('123000000000000000000'));
+    this.set('inputValue', new BN('123000000000000000000'));
     await render(hbs`{{token-to-usd this.tokenSymbol this.inputValue}}`);
     assert.dom(this.element).hasText('24.60');
 
-    this.set('inputValue', toBN('223000000000000000000'));
+    this.set('inputValue', new BN('223000000000000000000'));
     assert.dom(this.element).hasText('44.60');
   });
 
   test('it updates conversion result when exchange rate changes', async function (assert) {
     this.set('tokenSymbol', 'DAI');
-    this.set('inputValue', toBN('123000000000000000000'));
+    this.set('inputValue', new BN('123000000000000000000'));
     await render(hbs`{{token-to-usd this.tokenSymbol this.inputValue}}`);
     assert.dom(this.element).hasText('24.60'); // based on default exchange rate
 
@@ -118,7 +119,7 @@ module('Integration | Helper | token-to-usd', function (hooks) {
     layer2Strategy.test__updateUsdConvertersDeferred = defer<void>();
 
     this.set('tokenSymbol', 'DAI');
-    this.set('inputValue', toBN('123000000000000000000'));
+    this.set('inputValue', new BN('123000000000000000000'));
     await render(hbs`{{token-to-usd this.tokenSymbol this.inputValue}}`);
     assert.dom(this.element).hasText('');
 

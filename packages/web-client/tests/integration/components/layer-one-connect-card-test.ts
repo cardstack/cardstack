@@ -3,7 +3,8 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render, click, settled, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
-import { toBN } from 'web3-utils';
+import BN from 'bn.js';
+
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 const HEADER_SELECTOR = '[data-test-action-card-title="layer-one-connect"]';
@@ -45,9 +46,9 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
 
     layer1Service.test__simulateAccountsChanged(['address'], 'metamask');
     layer1Service.test__simulateBalances({
-      defaultToken: toBN('2141100000000000000'),
-      dai: toBN('500000000000000000'),
-      card: toBN('10000000000000000000000'),
+      defaultToken: new BN('2141100000000000000'),
+      dai: new BN('500000000000000000'),
+      card: new BN('10000000000000000000000'),
     });
 
     await render(hbs`
@@ -59,9 +60,9 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
     assert.dom('[data-test-balance="CARD"]').containsText('10000.00');
 
     layer1Service.test__simulateBalances({
-      defaultToken: toBN('0'),
-      dai: toBN('0'),
-      card: toBN('10000000000000000000000'),
+      defaultToken: new BN('0'),
+      dai: new BN('0'),
+      card: new BN('10000000000000000000000'),
     });
 
     await waitUntil(() => {
@@ -73,9 +74,9 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
     assert.dom('[data-test-balance="CARD"]').containsText('10000.00');
 
     layer1Service.test__simulateBalances({
-      defaultToken: toBN('0'),
-      dai: toBN('0'),
-      card: toBN('0'),
+      defaultToken: new BN('0'),
+      dai: new BN('0'),
+      card: new BN('0'),
     });
 
     await waitUntil(() => {

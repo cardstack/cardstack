@@ -10,7 +10,9 @@ import {
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
-import { toBN, toWei } from 'web3-utils';
+import { toWei } from 'web3-utils';
+import BN from 'bn.js';
+
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { encodeDID } from '@cardstack/did-resolver';
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -21,16 +23,20 @@ import { timeout } from 'ember-concurrency';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/workflow-config';
 
+import { MirageTestContext } from 'ember-cli-mirage/test-support';
+
+interface Context extends MirageTestContext {}
+
 // Dai amounts based on available prepaid card options
-const MIN_AMOUNT_TO_PASS = toBN(
+const MIN_AMOUNT_TO_PASS = new BN(
   toWei(`${Math.ceil(Math.min(...faceValueOptions) / 100)}`)
 );
-const FAILING_AMOUNT = toBN(
+const FAILING_AMOUNT = new BN(
   toWei(`${Math.floor(Math.min(...faceValueOptions) / 100) - 1}`)
 );
 const SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER =
   Math.floor(Math.max(...faceValueOptions) / 100) - 1;
-const SLIGHTLY_LESS_THAN_MAX_VALUE = toBN(
+const SLIGHTLY_LESS_THAN_MAX_VALUE = new BN(
   toWei(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER}`)
 );
 
@@ -62,7 +68,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     });
   });
 
-  test('Initiating workflow without wallet connections', async function (assert) {
+  test('Initiating workflow without wallet connections', async function (this: Context, assert) {
     await visit('/card-pay');
     assert.equal(currentURL(), '/card-pay/balances');
     await click('[data-test-workflow-button="issue-prepaid-card"]');
@@ -99,7 +105,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
       defaultToken: SLIGHTLY_LESS_THAN_MAX_VALUE,
-      card: toBN('250000000000000000000'),
+      card: new BN('250000000000000000000'),
     });
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     let testDepot = {
@@ -466,8 +472,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
     );
 
     layer2Service.test__simulateBalances({
-      defaultToken: toBN('150000000000000000000'),
-      card: toBN('500000000000000000000'),
+      defaultToken: new BN('150000000000000000000'),
+      card: new BN('500000000000000000000'),
     });
 
     await waitFor(epiloguePostableSel(2));
@@ -516,7 +522,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
       layer2Service.test__simulateBalances({
         defaultToken: MIN_AMOUNT_TO_PASS,
-        card: toBN('500000000000000000000'),
+        card: new BN('500000000000000000000'),
       });
       let testDepot = {
         address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',

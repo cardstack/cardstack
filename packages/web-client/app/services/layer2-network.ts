@@ -3,6 +3,7 @@ import config from '../config/environment';
 import { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency-decorators';
 import {
+  IssuePrepaidCardOptions,
   Layer2ChainEvent,
   Layer2Web3Strategy,
   TransactionHash,

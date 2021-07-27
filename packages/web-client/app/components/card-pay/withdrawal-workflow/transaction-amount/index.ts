@@ -3,8 +3,8 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { inject as service } from '@ember/service';
-import BN from 'web3-core/node_modules/@types/bn.js';
-import { toBN, toWei } from 'web3-utils';
+import BN from 'bn.js';
+import { toWei } from 'web3-utils';
 import {
   BridgedTokenSymbol,
   TokenDisplayInfo,
@@ -53,7 +53,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
     } else if (this.currentTokenSymbol === 'CARD.CPXD') {
       balance = this.layer2Network.cardBalance;
     }
-    return balance || toBN(0);
+    return balance || new BN(0);
   }
 
   get amountCtaState() {
@@ -72,9 +72,9 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
 
   get amountAsBigNumber(): BN {
     if (this.isInvalid || this.amount === '') {
-      return toBN(0);
+      return new BN(0);
     } else {
-      return toBN(toWei(this.amount));
+      return new BN(toWei(this.amount));
     }
   }
 
@@ -103,7 +103,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
 
   validate() {
     this.validationMessage = validateTokenInput(this.amount, {
-      min: toBN(0),
+      min: new BN(0),
       max: this.currentTokenBalance,
     });
   }

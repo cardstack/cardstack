@@ -6,8 +6,8 @@ import Layer2Network from '../../../../services/layer2-network';
 import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { TransactionReceipt } from 'web3-core';
-import BN from 'web3-core/node_modules/@types/bn.js';
-import { toBN, toWei } from 'web3-utils';
+import BN from 'bn.js';
+import { toWei } from 'web3-utils';
 import {
   TokenDisplayInfo,
   TokenSymbol,
@@ -54,7 +54,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     } else if (this.currentTokenSymbol === 'CARD') {
       balance = this.layer1Network.cardBalance;
     }
-    return balance || toBN(0);
+    return balance || new BN(0);
   }
 
   get unlockCtaState() {
@@ -85,9 +85,9 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
 
   get amountAsBigNumber(): BN {
     if (this.isInvalid || this.amount === '') {
-      return toBN(0);
+      return new BN(0);
     } else {
-      return toBN(toWei(this.amount));
+      return new BN(toWei(this.amount));
     }
   }
 
@@ -127,7 +127,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
 
   validate() {
     this.validationMessage = validateTokenInput(this.amount, {
-      min: toBN(0),
+      min: new BN(0),
       max: this.currentTokenBalance,
     });
   }

@@ -2,7 +2,8 @@ import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
-import { toBN } from 'web3-utils';
+import BN from 'bn.js';
+
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { TokenBalance, TokenSymbol } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
@@ -36,9 +37,9 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
 
   getTokenBalance(symbol: TokenSymbol) {
     if (symbol === this.defaultTokenSymbol) {
-      return this.layer2Network.defaultTokenBalance ?? toBN('0');
+      return this.layer2Network.defaultTokenBalance ?? new BN('0');
     }
-    return toBN('0');
+    return new BN('0');
   }
 
   get isDisabled() {

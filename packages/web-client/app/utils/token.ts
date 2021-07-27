@@ -1,6 +1,6 @@
 import { AbiItem } from 'web3-utils';
 import { ERC20ABI } from '@cardstack/cardpay-sdk/index.js';
-import { getAddressByNetwork } from '@cardstack/cardpay-sdk';
+import { getAddressByNetwork, AddressKeys } from '@cardstack/cardpay-sdk';
 import { ChainAddress } from './web3-strategies/types';
 import { NetworkSymbol } from './web3-strategies/types';
 import BN from 'web3-core/node_modules/@types/bn.js';
@@ -68,7 +68,7 @@ export class TokenContractInfo {
       );
     }
     this.address = getAddressByNetwork(
-      contractNames[network][this.symbol],
+      contractNames[network][this.symbol] as AddressKeys,
       network
     );
   }

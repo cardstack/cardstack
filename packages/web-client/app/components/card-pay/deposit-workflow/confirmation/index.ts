@@ -3,7 +3,6 @@ import { reads } from 'macro-decorators';
 import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import { toBN } from 'web3-utils';
 import BN from 'bn.js';
 import { next } from '@ember/runloop';
 import {
@@ -30,7 +29,7 @@ class CardPayDepositWorkflowConfirmationComponent extends Component<WorkflowCard
   }
 
   get depositedAmount(): BN {
-    return toBN(this.args.workflowSession.state.depositedAmount);
+    return new BN(this.args.workflowSession.state.depositedAmount);
   }
 
   get receivedToken() {

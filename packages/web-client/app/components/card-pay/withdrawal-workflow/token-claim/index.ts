@@ -4,8 +4,8 @@ import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
-import BN from 'web3-core/node_modules/@types/bn.js';
-import { toBN } from 'web3-utils';
+import BN from 'bn.js';
+
 import {
   BridgedTokenSymbol,
   TokenDisplayInfo,
@@ -38,9 +38,9 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
 
   get withdrawalAmount(): BN {
     if (!this.args.workflowSession.state.withdrawnAmount) {
-      return toBN('0');
+      return new BN('0');
     }
-    return toBN(this.args.workflowSession.state.withdrawnAmount);
+    return new BN(this.args.workflowSession.state.withdrawnAmount);
   }
 
   get tokenSymbolForConversion(): TokenSymbol {

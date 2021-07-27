@@ -5,7 +5,7 @@ import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
 import { rawTimeout, waitForQueue } from 'ember-concurrency';
 import BN from 'bn.js';
-import { toBN } from 'web3-utils';
+
 import TokenToUsdHelper from '@cardstack/web-client/helpers/token-to-usd';
 import {
   ConvertibleSymbol,
@@ -57,7 +57,7 @@ export default class TokenToUsd extends Service {
       if (
         helper.symbol &&
         unfoundSymbols.includes(helper.symbol) &&
-        helper.amount?.gt(toBN(0))
+        helper.amount?.gt(new BN(0))
       ) {
         unfoundSymbols = unfoundSymbols.filter((v) => v !== helper.symbol);
         res.push(helper.symbol);

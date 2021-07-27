@@ -106,11 +106,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     return this.walletInfo.accounts.length > 0;
   }
 
-  test__simulateBalances(balances: {
-    defaultToken: BN | undefined;
-    dai: BN | undefined;
-    card: BN | undefined;
-  }) {
+  test__simulateBalances(balances: { defaultToken?: BN; dai?: BN; card?: BN }) {
     if (balances.defaultToken) {
       this.defaultTokenBalance = balances.defaultToken;
     }

@@ -9,12 +9,18 @@ import CardCustomization from '@cardstack/web-client/services/card-customization
 import { taskFor } from 'ember-concurrency-ts';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
+import { setupMirage } from 'ember-cli-mirage/test-support';
+import prepaidCardColorSchemes from '../../../../../mirage/fixture-data/prepaid-card-color-schemes';
+import prepaidCardPatterns from '../../../../../mirage/fixture-data/prepaid-card-patterns';
+import { MirageTestContext } from 'ember-cli-mirage/test-support';
 
 const TIMEOUT_ERROR_MESSAGE =
   'There was a problem creating your prepaid card. Please contact Cardstack support to find out the status of your transaction.';
 const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `Looks like there's no balance in your ${c.layer2.fullName} wallet to fund your selected prepaid card. Before you can continue, please add funds to your ${c.layer2.fullName} wallet by bridging some tokens from your ${c.layer1.fullName} wallet.`;
 const DEFAULT_ERROR_MESSAGE =
   'There was a problem creating your prepaid card. Please try again if you want to continue with this workflow, or contact Cardstack support.';
+
+interface Context extends MirageTestContext {}
 
 module(
   'Integration | Component | card-pay/issue-prepaid-card-workflow/preview',
@@ -24,8 +30,13 @@ module(
     let cardCustomizationService: CardCustomization;
 
     setupRenderingTest(hooks);
+    setupMirage(hooks);
 
-    hooks.beforeEach(async function () {
+    hooks.beforeEach(async function (this: Context) {
+      this.server.db.loadData({
+        prepaidCardColorSchemes,
+        prepaidCardPatterns,
+      });
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       cardCustomizationService = this.owner.lookup(
@@ -65,16 +76,7 @@ module(
     `);
     });
 
-    module('Test the sdk prepaid card creation calls', async function (hooks) {
-      hooks.beforeEach(function () {
-        sinon
-          .stub(
-            taskFor(cardCustomizationService.createCustomizationTask),
-            'perform'
-          )
-          .returns(Promise.resolve({ did: 'some-did' }));
-      });
-
+    module('Test the sdk prepaid card creation calls', async function () {
       test('It shows the correct error message for a timeout', async function (assert) {
         sinon
           .stub(layer2Service, 'issuePrepaidCard')

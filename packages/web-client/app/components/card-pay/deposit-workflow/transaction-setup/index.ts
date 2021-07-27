@@ -4,7 +4,8 @@ import { reads } from 'macro-decorators';
 import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import { toBN } from 'web3-utils';
+import BN from 'bn.js';
+
 import {
   TokenDisplayInfo,
   TokenSymbol,
@@ -41,7 +42,7 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<Workflow
     } else if (this.selectedTokenSymbol === 'CARD') {
       return this.layer1Network.cardBalance;
     } else {
-      return toBN(0);
+      return new BN(0);
     }
   }
 
@@ -54,7 +55,7 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<Workflow
       this.args.onIncomplete?.();
     } else if (
       this.selectedTokenSymbol &&
-      this.selectedTokenBalance?.gt(toBN(0))
+      this.selectedTokenBalance?.gt(new BN(0))
     ) {
       this.args.onComplete?.();
     } else {

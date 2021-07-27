@@ -3,14 +3,13 @@ import { reads } from 'macro-decorators';
 import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import { toBN } from 'web3-utils';
+import BN from 'bn.js';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 import { next } from '@ember/runloop';
 import {
   TokenDisplayInfo,
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
-import BN from 'web3-core/node_modules/@types/bn.js';
 
 class CardPayWithdrawalWorkflowTransactionConfirmedComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
@@ -42,7 +41,7 @@ class CardPayWithdrawalWorkflowTransactionConfirmedComponent extends Component<W
   }
 
   get withdrawAmount(): BN {
-    return toBN(this.args.workflowSession.state.withdrawnAmount);
+    return new BN(this.args.workflowSession.state.withdrawnAmount);
   }
 
   get bridgeExplorerUrl(): string | undefined {

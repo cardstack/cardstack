@@ -29,6 +29,12 @@ interface IssuePrepaidCardRequest {
   onTxHash?: (txHash: TransactionHash) => void;
   customizationDID: string;
 }
+
+interface SimulateBalancesParams {
+  defaultToken?: BN;
+  dai?: BN;
+  card?: BN;
+}
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainId = '-1';
   simpleEmitter = new SimpleEmitter();
@@ -39,6 +45,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   bridgingToLayer1HashDeferred!: RSVP.Deferred<TransactionHash>;
   bridgingToLayer1Deferred!: RSVP.Deferred<BridgeValidationResult>;
   @tracked isFetchingDepot = false;
+  @tracked daiBalance: BN | undefined;
   @tracked defaultTokenBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
   @tracked depotSafe: DepotSafe | null = null;
@@ -171,7 +178,11 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.waitForAccountDeferred.resolve();
   }
 
-  test__simulateBalances(balances: { defaultToken?: BN; card?: BN }) {
+  test__simulateBalances(balances: SimulateBalancesParams) {
+    if (balances.dai) {
+      this.daiBalance = balances.dai;
+    }
+
     if (balances.defaultToken) {
       this.defaultTokenBalance = balances.defaultToken;
     }

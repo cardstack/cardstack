@@ -12,7 +12,8 @@ import { setupApplicationTest } from 'ember-qunit';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
-import { toBN } from 'web3-utils';
+import BN from 'bn.js';
+
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { capitalize } from '@ember/string';
 
@@ -73,9 +74,9 @@ module('Acceptance | deposit', function (hooks) {
       'metamask'
     );
     layer1Service.test__simulateBalances({
-      defaultToken: toBN('2141100000000000000'),
-      dai: toBN('250500000000000000000'),
-      card: toBN('10000000000000000000000'),
+      defaultToken: new BN('2141100000000000000'),
+      dai: new BN('250500000000000000000'),
+      card: new BN('10000000000000000000000'),
     });
 
     await waitFor(`${post} [data-test-balance="ETH"]`);
@@ -117,7 +118,7 @@ module('Acceptance | deposit', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
-      defaultToken: toBN(0),
+      defaultToken: new BN(0),
     });
     await waitFor(`${postableSel(1, 2)} [data-test-balance-container]`);
     assert
@@ -333,9 +334,9 @@ module('Acceptance | deposit', function (hooks) {
       );
 
     layer1Service.test__simulateBalances({
-      defaultToken: toBN('2141100000000000000'),
-      dai: toBN('500000000000000000'),
-      card: toBN('10000000000000000000000'),
+      defaultToken: new BN('2141100000000000000'),
+      dai: new BN('500000000000000000'),
+      card: new BN('10000000000000000000000'),
     });
 
     await waitFor(`${epiloguePostableSel(3)} [data-test-balance="ETH"]`);
@@ -545,16 +546,16 @@ module('Acceptance | deposit', function (hooks) {
       'metamask'
     );
     layer1Service.test__simulateBalances({
-      defaultToken: toBN('2141100000000000000'),
-      dai: toBN('250500000000000000000'),
-      card: toBN('10000000000000000000000'),
+      defaultToken: new BN('2141100000000000000'),
+      dai: new BN('250500000000000000000'),
+      card: new BN('10000000000000000000000'),
     });
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
-      defaultToken: toBN('142200000000000000'),
+      defaultToken: new BN('142200000000000000'),
     });
 
     await visit('/card-pay/token-suppliers');
@@ -631,16 +632,16 @@ module('Acceptance | deposit', function (hooks) {
       'metamask'
     );
     layer1Service.test__simulateBalances({
-      defaultToken: toBN('2141100000000000000'),
-      dai: toBN('250500000000000000000'),
-      card: toBN('10000000000000000000000'),
+      defaultToken: new BN('2141100000000000000'),
+      dai: new BN('250500000000000000000'),
+      card: new BN('10000000000000000000000'),
     });
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
-      defaultToken: toBN('142200000000000000'),
+      defaultToken: new BN('142200000000000000'),
     });
 
     await visit('/card-pay/token-suppliers');
@@ -713,16 +714,16 @@ module('Acceptance | deposit', function (hooks) {
       'metamask'
     );
     layer1Service.test__simulateBalances({
-      defaultToken: toBN('2141100000000000000'),
-      dai: toBN('250500000000000000000'),
-      card: toBN('10000000000000000000000'),
+      defaultToken: new BN('2141100000000000000'),
+      dai: new BN('250500000000000000000'),
+      card: new BN('10000000000000000000000'),
     });
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
-      defaultToken: toBN('142200000000000000'),
+      defaultToken: new BN('142200000000000000'),
     });
 
     await visit('/card-pay/token-suppliers');
@@ -800,16 +801,16 @@ module('Acceptance | deposit', function (hooks) {
       'metamask'
     );
     layer1Service.test__simulateBalances({
-      defaultToken: toBN('2141100000000000000'),
-      dai: toBN('250500000000000000000'),
-      card: toBN('10000000000000000000000'),
+      defaultToken: new BN('2141100000000000000'),
+      dai: new BN('250500000000000000000'),
+      card: new BN('10000000000000000000000'),
     });
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
-      defaultToken: toBN('142200000000000000'),
+      defaultToken: new BN('142200000000000000'),
     });
 
     await visit('/card-pay/token-suppliers');

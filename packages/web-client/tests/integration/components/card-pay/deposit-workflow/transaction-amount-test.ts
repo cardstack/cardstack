@@ -6,7 +6,7 @@ import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import BN from 'bn.js';
-import { toBN, toWei } from 'web3-utils';
+import { toWei } from 'web3-utils';
 import sinon from 'sinon';
 
 module(
@@ -34,9 +34,9 @@ module(
         .strategy as Layer1TestWeb3Strategy;
 
       layer1Service.test__simulateBalances({
-        defaultToken: toBN('0'),
-        dai: toBN(startDaiAmount),
-        card: toBN('0'),
+        defaultToken: new BN('0'),
+        dai: new BN(startDaiAmount),
+        card: new BN('0'),
       });
 
       this.setProperties({
@@ -69,9 +69,9 @@ module(
         .strategy as Layer1TestWeb3Strategy;
 
       layer1Service.test__simulateBalances({
-        defaultToken: toBN('0'),
-        dai: toBN(startDaiAmount),
-        card: toBN('0'),
+        defaultToken: new BN('0'),
+        dai: new BN(startDaiAmount),
+        card: new BN('0'),
       });
 
       let approveSpy = sinon.spy(layer1Service, 'approve');
@@ -115,9 +115,9 @@ module(
         .strategy as Layer1TestWeb3Strategy;
 
       layer1Service.test__simulateBalances({
-        defaultToken: toBN('0'),
-        dai: toBN(startDaiAmount),
-        card: toBN('0'),
+        defaultToken: new BN('0'),
+        dai: new BN(startDaiAmount),
+        card: new BN('0'),
       });
 
       this.setProperties({

@@ -4,8 +4,8 @@ import { tracked } from '@glimmer/tracking';
 import { reads } from 'macro-decorators';
 import { inject as service } from '@ember/service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import { fromWei, toBN } from 'web3-utils';
-import BN from 'web3-core/node_modules/@types/bn.js';
+import { fromWei } from 'web3-utils';
+import BN from 'bn.js';
 import {
   ConvertibleSymbol,
   TokenDisplayInfo,
@@ -46,7 +46,7 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
         return {
           spendAmount,
           approxTokenAmount,
-          isOptionDisabled: this.fundingTokenBalance.lt(toBN(result)),
+          isOptionDisabled: this.fundingTokenBalance.lt(new BN(result)),
         };
       })
     );
@@ -55,9 +55,9 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
 
   get fundingTokenBalance(): BN {
     if (this.fundingTokenSymbol === 'DAI.CPXD') {
-      return this.layer2Network.defaultTokenBalance ?? toBN('0');
+      return this.layer2Network.defaultTokenBalance ?? new BN('0');
     }
-    return toBN('0');
+    return new BN('0');
   }
 
   get fundingToken() {

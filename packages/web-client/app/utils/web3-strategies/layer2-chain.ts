@@ -39,13 +39,11 @@ import {
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
-import { networkDisplayInfo } from './network-display-info';
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 export default abstract class Layer2ChainWeb3Strategy
   implements Layer2Web3Strategy, Emitter<Layer2ChainEvent> {
-  private chainName: string;
   chainId: number;
   networkSymbol: Layer2NetworkSymbol;
   provider: WalletConnectProvider | undefined;
@@ -70,7 +68,6 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   constructor(networkSymbol: Layer2NetworkSymbol) {
-    this.chainName = networkDisplayInfo[networkSymbol].fullName;
     this.chainId = networkIds[networkSymbol];
     this.networkSymbol = networkSymbol;
     this.walletInfo = new WalletInfo([], this.chainId);

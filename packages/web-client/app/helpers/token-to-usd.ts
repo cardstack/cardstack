@@ -6,7 +6,6 @@ import {
   convertibleSymbols,
   ConvertibleSymbol,
 } from '@cardstack/web-client/utils/token';
-import { toBN } from 'web3-utils';
 
 type TokenToUsdHelperParams = [ConvertibleSymbol, BN];
 
@@ -31,7 +30,7 @@ class TokenToUsdHelper extends Helper {
     }
     this.symbol = symbol;
     this.amount = amount;
-    if (amount?.gt(toBN(0))) {
+    if (amount?.gt(new BN(0))) {
       this.tokenToUsdService.register(this);
       return this.tokenToUsdService.toUsdFrom(symbol, amount);
     } else {

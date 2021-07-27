@@ -44,7 +44,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
           transactionReceipt
         );
         this.completedCount = 3;
-        this.args.onComplete();
+        this.args.onComplete?.();
       });
   }
 

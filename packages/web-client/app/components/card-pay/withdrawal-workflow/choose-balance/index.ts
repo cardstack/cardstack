@@ -6,7 +6,7 @@ import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { TokenBalance, TokenSymbol } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
-import { toBN } from 'web3-utils';
+import BN from 'bn.js';
 
 class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<WorkflowCardComponentArgs> {
   defaultTokenSymbol: TokenSymbol = 'DAI.CPXD';
@@ -41,12 +41,12 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
 
   getTokenBalance(symbol: TokenSymbol) {
     if (symbol === this.defaultTokenSymbol) {
-      return this.layer2Network.defaultTokenBalance ?? toBN('0');
+      return this.layer2Network.defaultTokenBalance ?? new BN('0');
     }
     if (symbol === this.cardTokenSymbol) {
-      return this.layer2Network.cardBalance ?? toBN('0');
+      return this.layer2Network.cardBalance ?? new BN('0');
     }
-    return toBN('0');
+    return new BN('0');
   }
 
   get isDisabled() {
