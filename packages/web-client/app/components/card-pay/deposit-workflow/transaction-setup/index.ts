@@ -1,65 +1,92 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
-import { reads } from 'macro-decorators';
+import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import BN from 'bn.js';
 
 import {
-  TokenDisplayInfo,
   TokenSymbol,
   bridgeableSymbols,
+  TokenBalance,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
 class CardPayDepositWorkflowTransactionSetupComponent extends Component<WorkflowCardComponentArgs> {
-  tokens = bridgeableSymbols.map((symbol) => new TokenDisplayInfo(symbol));
+  tokenOptions = bridgeableSymbols;
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
+  @tracked selectedToken: TokenBalance | undefined;
 
-  @reads('args.workflowSession.state.depositSourceToken')
-  declare selectedTokenSymbol: TokenSymbol;
+  get selectedTokenSymbol() {
+    if (this.args.workflowSession.state.depositSourceToken) {
+      return this.args.workflowSession.state.depositSourceToken;
+    } else if (this.layer1Network.daiBalance?.gt(new BN('0'))) {
+      return 'DAI';
+    } else if (this.layer1Network.cardBalance?.gt(new BN('0'))) {
+      return 'CARD';
+    }
+    return undefined;
+  }
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
+    this.selectedToken = this.tokens.find(
+      (t) => t.symbol === this.selectedTokenSymbol
+    );
   }
 
-  get selectedToken() {
+  get noTokenBalance() {
+    return (
+      (!this.layer1Network.daiBalance ||
+        this.layer1Network.daiBalance.isZero()) &&
+      (!this.layer1Network.cardBalance ||
+        this.layer1Network.cardBalance.isZero())
+    );
+  }
+
+  get tokens() {
+    return this.tokenOptions.map((symbol) => {
+      let balance = this.getTokenBalance(symbol);
+      return new TokenBalance(symbol, balance);
+    });
+  }
+
+  getTokenBalance(symbol: TokenSymbol) {
+    if (symbol === 'DAI') {
+      return this.layer1Network.daiBalance ?? new BN('0');
+    } else if (symbol === 'CARD') {
+      return this.layer1Network.cardBalance ?? new BN('0');
+    } else {
+      return new BN('0');
+    }
+  }
+
+  get isCtaDisabled() {
     if (
       this.selectedTokenSymbol &&
-      TokenDisplayInfo.isRecognizedSymbol(this.selectedTokenSymbol)
+      this.selectedToken?.balance.gt(new BN('0'))
     ) {
-      return new TokenDisplayInfo(this.selectedTokenSymbol);
-    } else {
-      return undefined;
+      return false;
     }
+    return true;
   }
 
-  get selectedTokenBalance() {
-    if (this.selectedTokenSymbol === 'DAI') {
-      return this.layer1Network.daiBalance;
-    } else if (this.selectedTokenSymbol === 'CARD') {
-      return this.layer1Network.cardBalance;
-    } else {
-      return new BN(0);
+  @action chooseSource(token: TokenBalance) {
+    this.selectedToken = token;
+  }
+
+  @action save() {
+    if (this.isCtaDisabled) {
+      return;
     }
-  }
-
-  @action chooseSource(tokenSymbol: string) {
-    this.args.workflowSession.update('depositSourceToken', tokenSymbol);
-  }
-
-  @action toggleComplete() {
-    if (this.args.isComplete) {
-      this.args.onIncomplete?.();
-    } else if (
-      this.selectedTokenSymbol &&
-      this.selectedTokenBalance?.gt(new BN(0))
-    ) {
+    if (this.selectedToken) {
+      this.args.workflowSession.update(
+        'depositSourceToken',
+        this.selectedToken.symbol
+      );
       this.args.onComplete?.();
-    } else {
-      // TODO error message
     }
   }
 }

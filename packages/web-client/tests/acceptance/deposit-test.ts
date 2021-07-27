@@ -147,54 +147,15 @@ module('Acceptance | deposit', function (hooks) {
 
     // transaction-setup card
     await waitFor(`${post} [data-test-balance="DAI"]`);
-    assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.50');
-    assert.dom(`${post} [data-test-usd-balance="DAI"]`).containsText('50.10');
-    assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.00');
-    assert
-      .dom(`${post} [data-test-usd-balance="CARD"]`)
-      .containsText('2000.00');
-    assert
-      .dom(
-        `${post} [data-test-deposit-transaction-setup-from-address] [data-test-account-address]`
-      )
-      .hasText(layer1AccountAddress);
-    assert
-      .dom(
-        `${post} [data-test-deposit-transaction-setup-to-address] [data-test-account-address]`
-      )
-      .hasText('0x1826...6E44');
-    assert
-      .dom(
-        `${post} [data-test-deposit-transaction-setup-depot-address] [data-test-account-text]`
-      )
-      .hasText('New Depot');
-    assert
-      .dom('[data-test-deposit-transaction-setup-is-complete]')
-      .doesNotExist();
-    assert
-      .dom(`${post} [data-test-deposit-transaction-setup-from-option]`)
-      .exists({ count: 2 });
-    assert
-      .dom('[data-test-deposit-transaction-setup] [data-test-boxel-button]')
-      .isDisabled();
-    await click(`${post} [data-test-option="DAI"]`);
     await click(
       `${post} [data-test-deposit-transaction-setup] [data-test-boxel-button]`
     );
-    // transaction-setup card (memorialized)
-    assert.dom(`${post} [data-test-option]`).doesNotExist();
-    assert
-      .dom(`${post} [data-test-deposit-transaction-setup-from-option]`)
-      .doesNotExist();
-    assert
-      .dom('[data-test-deposit-transaction-setup] [data-test-boxel-button]')
-      .isNotDisabled();
-    assert.dom('[data-test-deposit-transaction-setup-is-complete]').exists();
     assert
       .dom(
         `${post} [data-test-deposit-transaction-setup-from-balance="DAI"] [data-test-balance-display-amount]`
       )
-      .containsText('250.50');
+      .hasText('250.50 DAI');
+
     // transaction-amount card
     assert
       .dom(postableSel(2, 2))
