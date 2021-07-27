@@ -438,23 +438,6 @@
         "--mnemonic",
         "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Cardpay mainnet: Bridge to Layer 2",
-      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
-      "console": "integratedTerminal",
-      "env": {},
-      "args": [
-        // DAI Bridge args
-        "bridge-to-l2",
-        "10",
-        "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
-        "--network",
-        "mainnet",
-        "--walletConnect"
-      ]
-    },
+    }
   ]
 }
