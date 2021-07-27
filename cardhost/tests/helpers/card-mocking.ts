@@ -20,7 +20,8 @@ declare module 'ember-test-helpers' {
   }
 }
 
-const BASE_CARD_NAMES = ['base', 'string', 'date'];
+// TODO: This should be loaded automatically from the base card directory
+const BASE_CARD_NAMES = ['base', 'string', 'date', 'datetime'];
 
 async function loadBaseCards() {
   let BASE_CARDS: RawCard[] = [];

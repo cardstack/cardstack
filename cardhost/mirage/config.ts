@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import DbCollection from 'miragejs/db-collection';
 import {
   Format,
@@ -47,6 +48,7 @@ function assertValidQueryParams(
 export default function (this: Server): void {
   this.get(`/cards/:encodedCardURL`, returnCard);
   this.patch(`/cards/:encodedCardURL`, updateCard);
+  this.post(`/cards/:realm/:parentCardURL`, createDataCard);
   this.get('/cardFor/:pathname', returnCardForRoute);
 }
 
@@ -75,6 +77,17 @@ async function updateCard(_schema: any, request: RequestType) {
   );
 }
 
+async function createDataCard(_schema: any, request: RequestType) {
+  let cardServer = FakeCardServer.current();
+  let { realm, parentCardURL } = request.params;
+
+  return cardServer.createDataCard(
+    realm,
+    parentCardURL,
+    JSON.parse(request.requestBody).data
+  );
+}
+
 async function returnCardForRoute(_schema: any, request: RequestType) {
   let cardServer = FakeCardServer.current();
   let { routingCard } = cardServer;
@@ -86,6 +99,9 @@ async function returnCardForRoute(_schema: any, request: RequestType) {
     );
   }
   let compiled = await cardServer.builder.getCompiledCard(routingCard);
+  if (!compiled.schemaModule) {
+    throw new Error('Your route card does not have a scehma');
+  }
   let Klass = window.require(compiled.schemaModule).default;
   let instance = new Klass();
   let cardURL = instance.routeTo('/' + request.params.pathname);
@@ -189,6 +205,29 @@ export class FakeCardServer {
         attributes: card.data,
         meta: {
           componentModule: card[format || 'isolated'].moduleName,
+        },
+      },
+    };
+  }
+
+  async createDataCard(
+    realm: string,
+    parentCardURL: string,
+    data: cardJSONReponse['data']
+  ): Promise<cardJSONReponse> {
+    let card = await FakeCardServer.current().builder.createDataCard(
+      realm,
+      parentCardURL,
+      data
+    );
+
+    return {
+      data: {
+        id: card.url,
+        type: 'card',
+        attributes: card.data,
+        meta: {
+          componentModule: card['isolated'].moduleName,
         },
       },
     };

@@ -80,7 +80,7 @@ export interface CompiledCard {
   fields: {
     [key: string]: Field;
   };
-  schemaModule: string;
+  schemaModule?: string;
   serializer?: SerializerName;
 
   isolated: ComponentInfo;
@@ -99,6 +99,13 @@ export interface ComponentInfo {
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
+  updateCardData(url: string, attributes: any): Promise<CompiledCard>;
+  createDataCard(
+    realmURL: string,
+    parentCardURL: string,
+    data: cardJSONReponse['data']
+  ): Promise<CompiledCard>;
+  deleteCard(cardURL: string): Promise<void>;
 }
 
 export interface RealmConfig {
@@ -159,14 +166,11 @@ export function assertValidCompiledCard(
   if (!card) {
     throw new Error(`Not a valid Compiled Card`);
   }
+
   if (!card.url) {
     throw new Error(`CompiledCards must include a url`);
   }
-  if (!card.schemaModule) {
-    throw new Error(
-      `${card.url} does not have a schema file. This is wrong and should not happen.`
-    );
-  }
+
   if (card.data) {
     assertValidKeys(
       Object.keys(card.data),

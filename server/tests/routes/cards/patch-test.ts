@@ -98,8 +98,6 @@ QUnit.module('PATCH /cards/<card-id>', function (hooks) {
       body: 'First post',
     });
 
-    // TODO: Our response assumes the "isolated" format, which has the component module
-    // That feels odd
     let response = await getCard('https://my-realm/post0').expect(200);
     assert.deepEqual(response.body.data?.attributes, {
       title: 'Goodbye World!',

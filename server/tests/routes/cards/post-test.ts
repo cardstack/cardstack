@@ -96,6 +96,39 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     }
   );
 
+  QUnit.test(
+    'Detirmines the last card with schema when providing a parent card that is only data',
+    async function (assert) {
+      realm.addCard('post-is-the-most', {
+        'card.json': {
+          adoptsFrom: '../post',
+          data: {
+            title: 'Hello World',
+            body: 'First post.',
+          },
+        },
+      });
+
+      let {
+        body: { data },
+      } = await postCard(`${REALM_NAME}/post-is-the-most`, PAYLOAD).expect(201);
+
+      assert.ok(
+        data.id.match(/https:\/\/super-realm.com\/post-\w{15}/),
+        'Generates a new ID'
+      );
+      assert.deepEqual(data.attributes, {
+        title: 'Blogigidy blog',
+        body: 'First post!',
+      });
+      let componentModule = data.meta.componentModule;
+      assert.ok(componentModule, 'should have componentModule');
+      assert.ok(resolveCard(componentModule), 'component module is resolvable');
+
+      await getCard(data.id).expect(200);
+    }
+  );
+
   QUnit.test('Changes the ID every time', async function (assert) {
     let card1 = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
     let card2 = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
@@ -110,15 +143,12 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     'can create a new card that provides its own id',
     async function (assert) {
       let { body } = await postCard(`${REALM_NAME}/post`, {
-        data: Object.assign(
-          { id: `${REALM_NAME}/post-is-the-most` },
-          PAYLOAD.data
-        ),
+        data: Object.assign({ id: `${REALM_NAME}/post-it-note` }, PAYLOAD.data),
       }).expect(201);
 
       assert.equal(
         body.data.id,
-        'https://super-realm.com/post-is-the-most',
+        'https://super-realm.com/post-it-note',
         'Uses the provided ID'
       );
 

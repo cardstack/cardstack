@@ -89,9 +89,6 @@ export class Compiler {
       card.fields = this.adoptFields(card.fields, parentCard);
       card.adoptsFrom = parentCard;
 
-      if (!card.schemaModule) {
-        card.schemaModule = parentCard.schemaModule;
-      }
       if (parentCard.serializer) {
         if (card.serializer && parentCard.serializer !== card.serializer) {
           throw new Error(
@@ -100,12 +97,6 @@ export class Compiler {
         }
         card.serializer = parentCard.serializer;
       }
-    }
-
-    if (!card.schemaModule) {
-      throw new Error(
-        `${cardSource.url} does not have a schema. This is wrong and should not happen.`
-      );
     }
 
     for (const format of FORMATS) {

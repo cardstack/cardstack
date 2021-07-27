@@ -1,7 +1,6 @@
 import Koa from 'koa';
 import Router from '@koa/router';
 import cors from '@koa/cors';
-import logger from 'koa-logger';
 import bodyParser from 'koa-bodyparser';
 import sane from 'sane';
 

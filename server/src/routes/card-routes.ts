@@ -1,4 +1,3 @@
-import { RawCard } from './../../../core/src/interfaces';
 import { CardStackContext } from '@cardstack/server/src/interfaces';
 import { NotFound } from '../middleware/errors';
 import { RouterContext } from '@koa/router';
@@ -63,15 +62,12 @@ export async function createDataCard(
 
   let data = body.data as any;
 
-  let card: Partial<RawCard> = {
-    adoptsFrom: parentCardURL,
-    data: data.attributes,
-  };
+  let compiledCard = await builder.createDataCard(
+    realmURL,
+    parentCardURL,
+    data
+  );
 
-  let rawCard = await ctx.realms
-    .getRealm(realmURL)
-    .createDataCard(card, data.id);
-  let compiledCard = await builder.compileCardFromRaw(rawCard.url, rawCard);
   let format = getCardFormatFromRequest(ctx.query.format);
 
   ctx.body = await serializeCard(compiledCard, format);

@@ -2,6 +2,7 @@ import {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
+  cardJSONReponse,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 
@@ -86,7 +87,7 @@ export default class Builder implements BuilderInterface {
     return compiledCard;
   }
 
-  async updateCardData(url: string, attributes: any) {
+  async updateCardData(url: string, attributes: any): Promise<CompiledCard> {
     this.realms.updateCardData(url, attributes);
 
     // Cache: Merge data into compiled.json
@@ -95,6 +96,25 @@ export default class Builder implements BuilderInterface {
     this.cache.setCard(url, compiledCard);
 
     return compiledCard;
+  }
+
+  async createDataCard(
+    realmURL: string,
+    parentCardURL: string,
+    data: cardJSONReponse['data']
+  ): Promise<CompiledCard> {
+    let parentCard = await this.getTrueParentCard(parentCardURL);
+
+    let card: Partial<RawCard> = {
+      adoptsFrom: parentCard.url,
+      data: data.attributes,
+    };
+
+    let rawCard = await this.realms
+      .getRealm(realmURL)
+      .createDataCard(card, data.id);
+
+    return this.compileCardFromRaw(rawCard.url, rawCard);
   }
 
   async compileCardFromRaw(
@@ -107,8 +127,29 @@ export default class Builder implements BuilderInterface {
     return compiledCard;
   }
 
-  deleteCard(cardURL: string) {
-    this.cache.deleteCard(cardURL);
-    this.realms.deleteCard(cardURL);
+  async deleteCard(cardURL: string) {
+    await this.cache.deleteCard(cardURL);
+    await this.realms.deleteCard(cardURL);
+  }
+
+  // Find the card that actually defines schema
+  private async getTrueParentCard(
+    parentCardURL: string
+  ): Promise<CompiledCard> {
+    let parentCard: CompiledCard | undefined = undefined;
+    let possibleParent = await this.getCompiledCard(parentCardURL);
+
+    while (!parentCard) {
+      if (possibleParent.schemaModule) {
+        parentCard = possibleParent;
+      } else if (possibleParent.adoptsFrom) {
+        possibleParent = possibleParent.adoptsFrom;
+      } else {
+        throw new Error(
+          'Card doesnt have a parent card with a schema. This should not happen'
+        );
+      }
+    }
+    return parentCard;
   }
 }

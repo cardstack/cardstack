@@ -1,8 +1,10 @@
 import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
-import type {
+import {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
+  assertValidRawCard,
+  cardJSONReponse,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 import { encodeCardURL } from '@cardstack/core/src/utils';
@@ -11,7 +13,7 @@ import dynamicCardTransform from './dynamic-card-transform';
 
 // This is neccessary to get the base model available to ember
 import * as CardModel from '@cardstack/core/src/card-model';
-(window as any).define('@cardstack/core/src/card-mode', function () {
+(window as any).define('@cardstack/core/src/card-model', function () {
   return CardModel;
 });
 
@@ -56,9 +58,10 @@ export default class Builder implements BuilderInterface {
     compiledCardCache?: Cache<CompiledCard>;
     rawCardCache?: Cache<RawCard>;
   }) {
+    let { compiledCardCache, rawCardCache } = params || {};
     this.compiledCardCache =
-      params?.compiledCardCache || new SimpleCache<CompiledCard>();
-    this.rawCardCache = params?.rawCardCache || new SimpleCache<RawCard>();
+      compiledCardCache || new SimpleCache<CompiledCard>();
+    this.rawCardCache = rawCardCache || new SimpleCache<RawCard>();
   }
 
   private async defineModule(
@@ -122,7 +125,10 @@ export default class Builder implements BuilderInterface {
     return compiledCard;
   }
 
-  async updateCardData(url: string, attributes: any): Promise<CompiledCard> {
+  async updateCardData(
+    url: string,
+    attributes: unknown
+  ): Promise<CompiledCard> {
     let compiledCard = await this.getCompiledCard(url);
 
     let rawCard = this.rawCardCache.get(url);
@@ -137,4 +143,36 @@ export default class Builder implements BuilderInterface {
 
     return compiledCard;
   }
+
+  async createDataCard(
+    realmURL: string,
+    parentCardURL: string,
+    data: cardJSONReponse['data']
+  ): Promise<CompiledCard> {
+    let url = this.generateIdFromParent(realmURL, parentCardURL);
+
+    let rawCard: Partial<RawCard> = {
+      url,
+      adoptsFrom: parentCardURL,
+      data: data.attributes,
+    };
+    assertValidRawCard(rawCard);
+    this.rawCardCache.set(url, rawCard);
+
+    return this.getCompiledCard(url);
+  }
+
+  private generateIdFromParent(realmURL: string, parentURL: string): string {
+    let name = parentURL.replace(realmURL, '');
+    let id = nanoid();
+    return `${realmURL}${name}-${id}`;
+  }
+
+  async deleteCard(cardURL: string): Promise<void> {
+    await this.rawCardCache.delete(cardURL);
+    await this.compiledCardCache.delete(cardURL);
+  }
+}
+function nanoid() {
+  throw new Error('Function not implemented.');
 }

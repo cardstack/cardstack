@@ -30,13 +30,13 @@ module('Integration | card-service', function (hooks) {
           'schema.js': `
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
-          import date from "https://cardstack.com/base/date";
+          import datetime from "https://cardstack.com/base/datetime";
 
           export default class Hello {
             @contains(string)
             title;
 
-            @contains(date)
+            @contains(datetime)
             createdAt;
           }
         `,
@@ -90,7 +90,9 @@ module('Integration | card-service', function (hooks) {
       assert
         .dom('[data-test-field-name="title"]')
         .hasValue('A blog post title');
-      assert.dom('[data-test-field-name="createdAt"]').hasValue('2021-05-17');
+      assert
+        .dom('[data-test-field-name="createdAt"]')
+        .hasValue('2021-05-17T11:31');
     });
 
     test('Serialization works on nested cards', async function (assert) {

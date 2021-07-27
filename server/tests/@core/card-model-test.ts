@@ -46,7 +46,10 @@ let cardJSONResponse = {
 
 Qmodule('CardModel', function () {
   test('.data', async function (assert) {
-    let model = new PersonCardModel(cardJSONResponse);
+    let model = PersonCardModel.newFromResponse(
+      PersonCardModel,
+      cardJSONResponse
+    );
     assert.equal(model.data.name, attributes.name);
     assert.ok(
       isSameDay(model.data.birthdate, p('1923-12-12')),
@@ -60,7 +63,10 @@ Qmodule('CardModel', function () {
   });
 
   test('.serialize', async function (assert) {
-    let model = new PersonCardModel(cardJSONResponse);
+    let model = PersonCardModel.newFromResponse(
+      PersonCardModel,
+      cardJSONResponse
+    );
     model.data; // lazy deserializing
     let serialized = model.serialize();
     assert.deepEqual(
