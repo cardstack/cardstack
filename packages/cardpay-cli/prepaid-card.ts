@@ -64,8 +64,8 @@ export async function split(
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(`Splitting prepaid card ${prepaidCard} into face value(s) §${faceValues.join(' SPEND, §')} SPEND...`);
-  let result = await prepaidCardAPI.split(prepaidCard, faceValues, customizationDID, (prepaidCardAddresses) =>
-    console.log(`Created new prepaid card(s): ${prepaidCardAddresses.join(', ')}`)
+  let result = await prepaidCardAPI.split(prepaidCard, faceValues, customizationDID, (prepaidCards) =>
+    console.log(`Created new prepaid card(s): ${prepaidCards.map((p) => p.address).join(', ')}`)
   );
   console.log(`Transaction hash: ${blockExplorer}/tx/${result!.gnosisTxn.ethereumTx.txHash}/token-transfers`);
 }
