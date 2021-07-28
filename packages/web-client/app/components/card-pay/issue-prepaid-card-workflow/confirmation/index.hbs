@@ -15,9 +15,12 @@
         @headerTextColor={{@workflowSession.state.colorScheme.textColor}}
         @headerPatternColor={{@workflowSession.state.colorScheme.patternColor}}
         @mockBalance={{false}}
+        @mockOptions={{false}}
         @balance={{@workflowSession.state.spendFaceValue}}
         @usdBalance={{spend-to-usd @workflowSession.state.spendFaceValue}}
         @address={{@workflowSession.state.prepaidCardAddress}}
+        @reloadable={{@workflowSession.state.reloadable}}
+        @transferrable={{@workflowSession.state.transferrable}}
         @network={{network-display-info "layer2" "fullName"}}
         class="issue-prepaid-card-workflow-confirmation__card"
       />

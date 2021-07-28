@@ -219,6 +219,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         `${post} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
       )
       .exists();
+    assert.dom(`${post} [data-test-prepaid-card-attributes]`).doesNotExist();
 
     assert
       .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
@@ -351,6 +352,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert
       .dom(`${postableSel(3, 1)} [data-test-prepaid-card-usd-balance]`)
       .containsText('100');
+    assert.dom(`${post} [data-test-prepaid-card-attributes]`).doesNotExist();
 
     assert.dom(
       `${postableSel(
@@ -465,6 +467,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert
       .dom(`${epiloguePostableSel(1)} [data-test-prepaid-card-issuer-name]`)
       .containsText('JJ');
+    assert
+      .dom(`${epiloguePostableSel(1)} [data-test-prepaid-card-attributes]`)
+      .containsText('Reloadable Non-transferrable');
     assert.dom(
       `${epiloguePostableSel(
         1

@@ -43,10 +43,12 @@
     </div>
     <div class="prepaid-card__content-rs">
       <div class="prepaid-card__logo" />
-      <div class="prepaid-card__attributes">
-        <div>Reloadable</div>
-        <div>Transferable</div>
-      </div>
+      {{#unless @mockOptions}}
+        <div class="prepaid-card__attributes" data-test-prepaid-card-attributes>
+          <div>{{if @reloadable "Reloadable" "Non-reloadable"}}</div>
+          <div>{{if @transferrable "Transferrable" "Non-transferrable"}}</div>
+        </div>
+      {{/unless}}
     </div>
   </section>
 </article>

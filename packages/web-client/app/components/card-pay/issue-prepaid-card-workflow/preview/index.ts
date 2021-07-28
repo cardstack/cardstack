@@ -62,10 +62,11 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
         },
       });
 
-      this.args.workflowSession.update(
-        'prepaidCardAddress',
-        prepaidCardSafe.address
-      );
+      this.args.workflowSession.updateMany({
+        prepaidCardAddress: prepaidCardSafe.address,
+        reloadable: prepaidCardSafe.reloadable,
+        transferrable: prepaidCardSafe.transferrable,
+      });
 
       this.args.onComplete();
     } catch (e) {
