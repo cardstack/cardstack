@@ -27,6 +27,7 @@ export default class Layer1Network
   implements Emitter<Layer1ChainEvent> {
   strategy!: Layer1Web3Strategy;
   simpleEmitter = new SimpleEmitter();
+  @reads('strategy.isInitializing') declare isInitializing: boolean;
   @reads('strategy.isConnected', false) isConnected!: boolean;
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
   @reads('strategy.walletInfo', new WalletInfo([], -1)) walletInfo!: WalletInfo;

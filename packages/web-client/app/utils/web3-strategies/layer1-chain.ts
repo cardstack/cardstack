@@ -26,6 +26,8 @@ import {
   ConnectionManager,
   ConnectionManagerEvent,
 } from './layer-1-connection-manager';
+import { task } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
 
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
@@ -51,10 +53,14 @@ export default abstract class Layer1ChainWeb3Strategy
     this.chainId = networkIds[networkSymbol];
     this.walletInfo = new WalletInfo([], this.chainId);
     this.networkSymbol = networkSymbol;
-    this.initialize();
+    taskFor(this.initializeTask).perform();
   }
 
-  async initialize() {
+  get isInitializing() {
+    return taskFor(this.initializeTask).isRunning;
+  }
+
+  @task *initializeTask() {
     try {
       let web3 = new Web3();
       let providerId = ConnectionManager.getProviderIdForChain(this.chainId);
@@ -83,12 +89,12 @@ export default abstract class Layer1ChainWeb3Strategy
         this.onChainChanged.bind(this)
       );
 
-      await connectionManager.setup(web3);
+      yield connectionManager.setup(web3);
 
       if (connectionManager) {
         this.web3 = web3;
         this.connectionManager = connectionManager;
-        await connectionManager.reconnect(); // use the reconnect method because of edge cases
+        yield connectionManager.reconnect(); // use the reconnect method because of edge cases
       }
     } catch (e) {
       console.error('Failed to initialize connection from local storage');

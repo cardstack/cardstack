@@ -23,6 +23,7 @@ import {
   UnbindEventListener,
   SimpleEmitter,
 } from '@cardstack/web-client/utils/events';
+import { task, TaskGenerator } from 'ember-concurrency';
 
 interface IssuePrepaidCardRequest {
   deferred: RSVP.Deferred<PrepaidCardSafe>;
@@ -49,6 +50,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked defaultTokenBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
   @tracked depotSafe: DepotSafe | null = null;
+  @tracked isInitializing = false;
   issuePrepaidCardRequests: Map<number, IssuePrepaidCardRequest> = new Map();
 
   // property to test whether the refreshBalances method is called
@@ -56,7 +58,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   // this is only a mock property
   @tracked balancesRefreshed = false;
 
-  async initialize() {}
+  @task *initializeTask(): TaskGenerator<void> {
+    yield '';
+    return;
+  }
 
   disconnect(): Promise<void> {
     this.test__simulateAccountsChanged([]);

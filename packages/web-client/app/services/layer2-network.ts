@@ -27,12 +27,14 @@ import {
 } from '@cardstack/web-client/utils/events';
 import { action } from '@ember/object';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
+import { taskFor } from 'ember-concurrency-ts';
 export default class Layer2Network
   extends Service
   implements Emitter<Layer2ChainEvent> {
   @service declare hubAuthentication: HubAuthentication;
   strategy!: Layer2Web3Strategy;
   simpleEmitter = new SimpleEmitter();
+  @reads('strategy.isInitializing') declare isInitializing: boolean;
   @reads('strategy.isConnected', false) isConnected!: boolean;
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
   @reads('strategy.walletInfo', []) walletInfo!: WalletInfo;
@@ -62,8 +64,7 @@ export default class Layer2Network
     this.strategy.on('disconnect', this.onDisconnect);
     this.strategy.on('incorrect-chain', this.onIncorrectChain);
 
-    // test chain does not need to be initialized
-    this.strategy.initialize?.();
+    taskFor(this.strategy.initializeTask).perform();
   }
 
   async updateUsdConverters(

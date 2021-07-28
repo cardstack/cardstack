@@ -25,10 +25,12 @@
   @isOpen={{or (eq this.flow 'deposit') (eq this.flow 'withdrawal')}}
   @onClose={{set this "flow" null}}
 >
+{{#if (is-network-initialized)}}
   {{#if (eq this.flow 'deposit')}}
     <CardPay::DepositWorkflow />
   {{/if}}
   {{#if (eq this.flow 'withdrawal')}}
     <CardPay::WithdrawalWorkflow />
   {{/if}}
+{{/if}}
 </Boxel::Modal>

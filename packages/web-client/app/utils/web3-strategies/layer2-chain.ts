@@ -39,6 +39,7 @@ import {
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
+import { TaskGenerator } from 'ember-concurrency';
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -60,6 +61,7 @@ export default abstract class Layer2ChainWeb3Strategy
   @tracked defaultTokenBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
   @tracked waitForAccountDeferred = defer();
+  @tracked isInitializing = true;
 
   @reads('provider.connector') connector!: IConnector;
 
@@ -78,7 +80,7 @@ export default abstract class Layer2ChainWeb3Strategy
     this.defaultTokenContractAddress = defaultTokenContractInfo.address;
   }
 
-  async initialize() {
+  @task *initializeTask(): TaskGenerator<void> {
     this.web3 = new Web3();
     this.provider = new WalletConnectProvider({
       chainId: this.chainId,
@@ -102,23 +104,21 @@ export default abstract class Layer2ChainWeb3Strategy
         console.error('Error in display_uri callback', err);
         return;
       }
+      // if we get here when a user loads a page, then it means that the user did not have
+      // a connection from local storage. We can safely say they are initialized
+      this.isInitializing = false;
       this.walletConnectUri = payload.params[0];
     });
 
     this.provider.on('accountsChanged', async (accounts: string[]) => {
-      // this actually doesn't ever happen with walletconnect. we instead go through the disconnect event
-      // added just-in-case
-      if (!accounts.length) {
-        this.onDisconnect();
-      }
-
       try {
         // try to initialize things safely
         // one expected failure is if we connect to a chain which we don't have an rpc url for
         this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
         this.#safesApi = await getSDK('Safes', this.web3);
         this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
-        this.updateWalletInfo(accounts, this.chainId);
+        await this.updateWalletInfo(accounts, this.chainId);
+        this.isInitializing = false;
       } catch (e) {
         console.error(
           'Error initializing layer 2 wallet and services. Wallet may be connected to an unsupported chain'
@@ -144,7 +144,8 @@ export default abstract class Layer2ChainWeb3Strategy
       }
       this.onDisconnect();
     });
-    await this.provider.enable();
+
+    yield this.provider.enable();
   }
 
   private getTokenContractInfo(
@@ -161,11 +162,8 @@ export default abstract class Layer2ChainWeb3Strategy
     }
     this.walletInfo = newWalletInfo;
     if (accounts.length) {
-      taskFor(this.fetchDepotTask)
-        .perform()
-        .then(() => {
-          this.waitForAccountDeferred.resolve();
-        });
+      await taskFor(this.fetchDepotTask).perform();
+      this.waitForAccountDeferred.resolve();
     } else {
       this.defaultTokenBalance = new BN('0');
       this.cardBalance = new BN('0');
@@ -216,7 +214,7 @@ export default abstract class Layer2ChainWeb3Strategy
     // scan/fails silently
     setTimeout(() => {
       console.log('initializing');
-      this.initialize();
+      taskFor(this.initializeTask).perform();
     }, 500);
   }
 
