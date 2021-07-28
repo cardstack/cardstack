@@ -117,7 +117,8 @@ export default abstract class Layer2ChainWeb3Strategy
         this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
         this.#safesApi = await getSDK('Safes', this.web3);
         this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
-        this.updateWalletInfo(accounts, this.chainId);
+        await this.updateWalletInfo(accounts, this.chainId);
+        this.isInitializing = false;
       } catch (e) {
         console.error(
           'Error initializing layer 2 wallet and services. Wallet may be connected to an unsupported chain'
@@ -145,14 +146,6 @@ export default abstract class Layer2ChainWeb3Strategy
     });
 
     yield this.provider.enable();
-
-    // we only get here if the user has an account
-    // we wait for the logic in accountsChanged to run and fetch the user's depots
-    // before considering initialization done
-    // the connector is from WalletConnect and knows of accounts before the
-    // the accountsChanged event is triggered
-    yield this.waitForAccountDeferred.promise;
-    this.isInitializing = false;
   }
 
   private getTokenContractInfo(
@@ -169,11 +162,8 @@ export default abstract class Layer2ChainWeb3Strategy
     }
     this.walletInfo = newWalletInfo;
     if (accounts.length) {
-      taskFor(this.fetchDepotTask)
-        .perform()
-        .then(() => {
-          this.waitForAccountDeferred.resolve();
-        });
+      await taskFor(this.fetchDepotTask).perform();
+      this.waitForAccountDeferred.resolve();
     } else {
       this.defaultTokenBalance = new BN('0');
       this.cardBalance = new BN('0');
