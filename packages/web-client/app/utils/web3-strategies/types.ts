@@ -9,6 +9,7 @@ import {
 } from '@cardstack/web-client/utils/token';
 import { Emitter } from '../events';
 import { BridgeValidationResult } from '@cardstack/cardpay-sdk/sdk/token-bridge-home-side';
+import { TaskGenerator } from 'ember-concurrency';
 
 export type Layer1ChainEvent =
   | 'disconnect'
@@ -61,12 +62,13 @@ export interface Layer1Web3Strategy
 export interface Layer2Web3Strategy
   extends Web3Strategy,
     Emitter<Layer2ChainEvent> {
+  isInitializing: boolean;
   isConnected: boolean;
   defaultTokenBalance: BN | undefined;
   cardBalance: BN | undefined;
   depotSafe: DepotSafe | null;
   walletConnectUri: string | undefined;
-  initialize(): Promise<void>;
+  initializeTask(): TaskGenerator<void>;
   updateUsdConverters(
     symbolsToUpdate: ConvertibleSymbol[]
   ): Promise<Record<ConvertibleSymbol, ConversionFunction>>;

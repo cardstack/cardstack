@@ -39,6 +39,7 @@ import {
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
+import { TaskGenerator } from 'ember-concurrency';
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -60,6 +61,7 @@ export default abstract class Layer2ChainWeb3Strategy
   @tracked defaultTokenBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
   @tracked waitForAccountDeferred = defer();
+  @tracked isInitializing = true;
 
   @reads('provider.connector') connector!: IConnector;
 
@@ -78,7 +80,7 @@ export default abstract class Layer2ChainWeb3Strategy
     this.defaultTokenContractAddress = defaultTokenContractInfo.address;
   }
 
-  async initialize() {
+  @task *initializeTask(): TaskGenerator<void> {
     this.web3 = new Web3();
     this.provider = new WalletConnectProvider({
       chainId: this.chainId,
@@ -102,16 +104,13 @@ export default abstract class Layer2ChainWeb3Strategy
         console.error('Error in display_uri callback', err);
         return;
       }
+      // if we get here when a user loads a page, then it means that the user did not have
+      // a connection from local storage. We can safely say they are initialized
+      this.isInitializing = false;
       this.walletConnectUri = payload.params[0];
     });
 
     this.provider.on('accountsChanged', async (accounts: string[]) => {
-      // this actually doesn't ever happen with walletconnect. we instead go through the disconnect event
-      // added just-in-case
-      if (!accounts.length) {
-        this.onDisconnect();
-      }
-
       try {
         // try to initialize things safely
         // one expected failure is if we connect to a chain which we don't have an rpc url for
@@ -144,7 +143,16 @@ export default abstract class Layer2ChainWeb3Strategy
       }
       this.onDisconnect();
     });
-    await this.provider.enable();
+
+    yield this.provider.enable();
+
+    // we only get here if the user has an account
+    // we wait for the logic in accountsChanged to run and fetch the user's depots
+    // before considering initialization done
+    // the connector is from WalletConnect and knows of accounts before the
+    // the accountsChanged event is triggered
+    yield this.waitForAccountDeferred.promise;
+    this.isInitializing = false;
   }
 
   private getTokenContractInfo(
@@ -216,7 +224,7 @@ export default abstract class Layer2ChainWeb3Strategy
     // scan/fails silently
     setTimeout(() => {
       console.log('initializing');
-      this.initialize();
+      taskFor(this.initializeTask).perform();
     }, 500);
   }
 
