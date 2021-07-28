@@ -9,6 +9,7 @@ import { task, TaskGenerator } from 'ember-concurrency';
 import { Card } from './cards';
 import CardsService from '../services/cards';
 import { Format } from '@cardstack/core/src/interfaces';
+import { taskFor } from 'ember-concurrency-ts';
 
 type State =
   | {
@@ -43,6 +44,22 @@ export default class Modal extends Service {
       return this.state.loadedCard.component;
     }
     return;
+  }
+
+  // TODO: Consolidate with edit new
+  openCard(cardURL: string, format: Format): Promise<void> {
+    return taskFor(this.openCardTask).perform(cardURL, format);
+  }
+
+  @task *openCardTask(cardURL: string, format: Format): TaskGenerator<void> {
+    this.state = { name: 'loading' };
+    let loadedCard = yield this.cards.load(cardURL, format);
+    this.state = {
+      name: 'loaded',
+      loadedCard,
+      format,
+      new: false,
+    };
   }
 
   @task *editCard(card: Card): TaskGenerator<void> {
