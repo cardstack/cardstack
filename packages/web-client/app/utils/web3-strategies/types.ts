@@ -36,6 +36,7 @@ export interface ClaimBridgedTokensOptions {
 export interface Layer1Web3Strategy
   extends Web3Strategy,
     Emitter<Layer1ChainEvent> {
+  isInitializing: boolean;
   isConnected: boolean;
   currentProviderId: string | undefined;
   defaultTokenBalance: BN | undefined;

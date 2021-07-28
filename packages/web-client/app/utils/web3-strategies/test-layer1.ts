@@ -23,6 +23,7 @@ interface ClaimBridgedTokensRequest {
 
 export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   chainId = -1;
+  @tracked isInitializing = false;
   @tracked currentProviderId: string | undefined;
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
