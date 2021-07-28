@@ -16,7 +16,7 @@ type FailureCheckResult = {
   success: false;
   reason: string;
 };
-type CheckResult = SuccessCheckResult | FailureCheckResult;
+export type CheckResult = SuccessCheckResult | FailureCheckResult;
 
 interface WorkflowCardOptions {
   author: Participant;

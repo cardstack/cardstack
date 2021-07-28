@@ -349,6 +349,10 @@ export default abstract class Layer2ChainWeb3Strategy
     return this.#hubAuthApi.authenticate();
   }
 
+  checkHubAuthenticationValid(authToken: string): Promise<boolean> {
+    return this.#hubAuthApi.checkValidAuth(authToken);
+  }
+
   async disconnect(): Promise<void> {
     await this.provider?.disconnect();
   }

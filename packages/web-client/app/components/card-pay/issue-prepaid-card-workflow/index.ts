@@ -6,6 +6,7 @@ import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
 import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
+import NetworkAwareWorkflowCard from '@cardstack/web-client/components/workflow-thread/network-aware-card';
 import NetworkAwareWorkflowMessage from '@cardstack/web-client/components/workflow-thread/network-aware-message';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
@@ -90,6 +91,21 @@ class IssuePrepaidCardWorkflow extends Workflow {
     new Milestone({
       title: 'Customize layout',
       postables: [
+        new NetworkAwareWorkflowMessage({
+          author: cardbot,
+          message: `To store card customization data in the Cardstack Hub, you need to authenticate using your Card Wallet.
+          You only need to do this once per browser/device.`,
+          includeIf() {
+            return !this.isHubAuthenticated;
+          },
+        }),
+        new NetworkAwareWorkflowCard({
+          author: cardbot,
+          componentName: 'card-pay/issue-prepaid-card-workflow/authentication',
+          includeIf(this: NetworkAwareWorkflowCard) {
+            return !this.isHubAuthenticated;
+          },
+        }),
         new WorkflowMessage({
           author: cardbot,
           message:

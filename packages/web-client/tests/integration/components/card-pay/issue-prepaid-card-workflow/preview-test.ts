@@ -8,7 +8,6 @@ import sinon from 'sinon';
 import CardCustomization from '@cardstack/web-client/services/card-customization';
 import { taskFor } from 'ember-concurrency-ts';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../../../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../../../../mirage/fixture-data/prepaid-card-patterns';
@@ -27,7 +26,6 @@ interface Context extends MirageTestContext {}
 module(
   'Integration | Component | card-pay/issue-prepaid-card-workflow/preview',
   function (hooks) {
-    let hubAuthentication: HubAuthentication;
     let layer2Service: Layer2TestWeb3Strategy;
     let cardCustomizationService: CardCustomization;
 
@@ -44,9 +42,6 @@ module(
       cardCustomizationService = this.owner.lookup(
         'service:card-customization'
       ) as CardCustomization;
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
 
       let workflowSession = new WorkflowSession();
       workflowSession.updateMany({
@@ -106,8 +101,6 @@ module(
 
         await click('[data-test-issue-prepaid-card-button]');
 
-        layer2Service.test__simulateHubAuthentication('some-token');
-
         await waitFor('[data-test-issue-prepaid-card-error-message]');
 
         assert
@@ -126,8 +119,6 @@ module(
 
         await click('[data-test-issue-prepaid-card-button]');
 
-        layer2Service.test__simulateHubAuthentication('some-token');
-
         await waitFor('[data-test-issue-prepaid-card-error-message]');
 
         assert
@@ -141,8 +132,6 @@ module(
           .throws(new Error('Not any matched error'));
 
         await click('[data-test-issue-prepaid-card-button]');
-
-        layer2Service.test__simulateHubAuthentication('some-token');
 
         await waitFor('[data-test-issue-prepaid-card-error-message]');
 
@@ -158,22 +147,6 @@ module(
           taskFor(cardCustomizationService.createCustomizationTask),
           'perform'
         )
-        .throws(new Error('Any error will do'));
-
-      await click('[data-test-issue-prepaid-card-button]');
-
-      layer2Service.test__simulateHubAuthentication('some-token');
-
-      await waitFor('[data-test-issue-prepaid-card-error-message]');
-
-      assert
-        .dom('[data-test-issue-prepaid-card-error-message]')
-        .containsText(DEFAULT_ERROR_MESSAGE);
-    });
-
-    test('It shows the fallback error message if the card customization service fails', async function (assert) {
-      sinon
-        .stub(hubAuthentication, 'ensureAuthenticated')
         .throws(new Error('Any error will do'));
 
       await click('[data-test-issue-prepaid-card-button]');

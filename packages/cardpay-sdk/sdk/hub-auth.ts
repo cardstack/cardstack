@@ -6,6 +6,7 @@ import { networkIds } from './constants';
 export interface IHubAuth {
   getNonce(): Promise<NonceResponse>;
   authenticate(): Promise<string>;
+  checkValidAuth(authToken: string): Promise<boolean>;
 }
 interface NonceResponse {
   nonce: string;
@@ -15,14 +16,13 @@ interface NonceResponse {
 export default class HubAuth implements IHubAuth {
   constructor(private layer2Web3: Web3, private hubRootUrl: string) {}
 
+  async checkValidAuth(authToken: string): Promise<boolean> {
+    let response = await this.httpGetSession(authToken);
+    return response.status === 200;
+  }
+
   async getNonce(): Promise<NonceResponse> {
-    let url = `${this.hubRootUrl}/api/session`;
-    let response = await global.fetch(url, {
-      headers: {
-        //eslint-disable-next-line @typescript-eslint/naming-convention
-        'Content-Type': 'application/vnd.api+json',
-      },
-    });
+    let response = await this.httpGetSession();
     if (response.status !== 401) {
       console.error('Failure fetching nonce', await response.text());
       throw new Error('Failure fetching nonce');
@@ -87,5 +87,17 @@ export default class HubAuth implements IHubAuth {
       // TODO: throw error?
       return '';
     }
+  }
+
+  private async httpGetSession(authToken?: string): Promise<Response> {
+    let url = `${this.hubRootUrl}/api/session`;
+    let headers = {
+      //eslint-disable-next-line @typescript-eslint/naming-convention
+      'Content-Type': 'application/vnd.api+json',
+    } as Record<string, string>;
+    if (authToken) {
+      headers['Authorization'] = `Bearer: ${authToken}`;
+    }
+    return global.fetch(url, { headers });
   }
 }
