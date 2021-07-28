@@ -32,5 +32,7 @@
   @isOpen={{eq this.flow 'issue-prepaid-card'}}
   @onClose={{set this "flow" null}}
 >
+{{#if (is-network-initialized)}}
   <CardPay::IssuePrepaidCardWorkflow />
+{{/if}}
 </Boxel::Modal>
