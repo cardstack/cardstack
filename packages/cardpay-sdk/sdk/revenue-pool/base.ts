@@ -203,9 +203,9 @@ export default class RevenuePool {
   }
 
   private async getMerchantSafeFromTxn(txnHash: string): Promise<string> {
-    let revenuePoolAddress = await getAddress('revenuePool', this.layer2Web3);
+    let merchantManager = await getAddress('merchantManager', this.layer2Web3);
     let txnReceipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
-    return getParamsFromEvent(this.layer2Web3, txnReceipt, this.createMerchantEventABI(), revenuePoolAddress)[0]
+    return getParamsFromEvent(this.layer2Web3, txnReceipt, this.createMerchantEventABI(), merchantManager)[0]
       ?.merchantSafe;
   }
 
