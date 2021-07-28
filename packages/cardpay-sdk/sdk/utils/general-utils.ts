@@ -31,7 +31,9 @@ export function waitUntilTransactionMined(
       if (receipt) {
         resolve(receipt);
       } else if (Number(new Date()) > endTime) {
-        throw new Error(`Transaction ${txnHash} took too long to complete, waited ${duration / 1000} seconds`);
+        throw new Error(
+          `Transaction took too long to complete, waited ${duration / 1000} seconds. txn hash: ${txnHash}`
+        );
       } else {
         setTimeout(function () {
           return transactionReceiptAsync(txnHash, resolve, reject);
