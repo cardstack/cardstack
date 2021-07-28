@@ -8,6 +8,8 @@ export default class IsNetworkInitializedHelper extends Helper {
   @service declare layer2Network: Layer2Network;
 
   compute() {
-    return !this.layer1Network.isInitializing;
+    return (
+      !this.layer1Network.isInitializing && !this.layer2Network.isInitializing
+    );
   }
 }
