@@ -19,9 +19,9 @@
               <CardPay::BalanceDisplay
                 @size="large"
                 @icon={{this.selectedToken.icon}}
-                @balance={{format-token-amount this.selectedTokenBalance}}
+                @balance={{format-token-amount this.selectedToken.balance}}
                 @symbol={{this.selectedToken.symbol}}
-                @usdBalance={{token-to-usd this.selectedToken.symbol this.selectedTokenBalance}}
+                @usdBalance={{token-to-usd this.selectedToken.symbol this.selectedToken.balance}}
                 data-test-deposit-transaction-setup-from-balance={{this.selectedToken.symbol}}
               />
             </:inner>
@@ -34,18 +34,15 @@
           />
           <div class="transaction-setup__field-info transaction-setup__radio-buttons">
             {{#each this.tokens as |token|}}
-              {{#let (if (eq token.symbol 'CARD') this.layer1Network.cardBalance this.layer1Network.daiBalance) as |balance|}}
-                <CardPay::DepositWorkflow::TransactionSetup::TokenOption
-                  @checked={{eq @workflowSession.state.depositSourceToken token.symbol}}
-                  @onInput={{fn this.chooseSource token.symbol}}
-                  @balance={{format-token-amount balance}}
-                  @balanceInUsd={{token-to-usd token.symbol balance}}
-                  @tokenSymbol={{token.symbol}}
-                  @tokenDescription={{token.description}}
-                  @tokenIcon={{token.icon}}
-                  data-test-deposit-transaction-setup-from-option={{token.symbol}}
-                />
-              {{/let}}
+              <CardPay::DepositWorkflow::TransactionSetup::TokenOption
+                @checked={{unless this.noTokenBalance (eq this.selectedToken.symbol token.symbol)}}
+                @onInput={{fn this.chooseSource token}}
+                @balance={{format-token-amount token.balance}}
+                @balanceInUsd={{token-to-usd token.symbol token.balance}}
+                @token={{token}}
+                @disabled={{eq (format-token-amount token.balance) "0.00"}}
+                data-test-deposit-transaction-setup-from-option={{token.symbol}}
+              />
             {{/each}}
           </div>
         {{/if}}
@@ -53,7 +50,7 @@
     </ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Receive tokens">
       <CardPay::LabeledValue @label="In:" class="transaction-setup__field">
-        <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} />
+        <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} data-test-deposit-transaction-setup-to-wallet />
         <CardPay::NestedItems class="transaction-setup__field-info">
           <:outer>
             <CardPay::AccountDisplay
@@ -76,19 +73,27 @@
         </CardPay::NestedItems>
       </CardPay::LabeledValue>
     </ActionCardContainer::Section>
+    {{#if this.noTokenBalance}}
+      <CardPay::ErrorMessage data-test-deposit-transaction-setup-validation as |supportURL|>
+        You need DAI or CARD tokens to continue with this workflow.
+        <a href={{supportURL}} target="_blank" rel="noopener noreferrer">
+          Please request test tokens from Cardstack Discord.
+        </a>
+      </CardPay::ErrorMessage>
+    {{/if}}
   </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
-    @disabled={{or @frozen (not @workflowSession.state.depositSourceToken)}}
+    @disabled={{or @frozen this.isCtaDisabled}}
     data-test-deposit-transaction-setup
   >
     <:default as |d|>
-      <d.ActionButton {{on "click" this.toggleComplete}}>
+      <d.ActionButton {{on "click" this.save}}>
         Continue
       </d.ActionButton>
     </:default>
     <:memorialized as |m|>
-      <m.ActionButton {{on "click" this.toggleComplete}}>
+      <m.ActionButton {{on "click" @onIncomplete}}>
         Edit
       </m.ActionButton>
     </:memorialized>

@@ -71,8 +71,8 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
         'withdrawalToken',
         this.selectedToken.symbol
       );
+      this.args.onComplete?.();
     }
-    this.args.onComplete?.();
   }
 }
 
