@@ -64,7 +64,7 @@
     "@types/qunit": "^2.11.1",
     "@types/rsvp": "^4.0.3",
     "@types/web3": "^1.2.2",
-    "@walletconnect/web3-provider": "^1.4.0",
+    "@walletconnect/web3-provider": "^1.5.0",
     "babel-eslint": "^10.1.0",
     "bn.js": "^5.2.0",
     "broccoli-asset-rev": "^3.0.0",
@@ -145,10 +145,10 @@
     "extends": "../../package.json"
   },
   "dependencies": {
-    "@walletconnect/client": "^1.4.1",
-    "@walletconnect/core": "^1.4.1",
-    "@walletconnect/iso-crypto": "^1.4.1",
-    "@walletconnect/qrcode-modal": "^1.4.1",
+    "@walletconnect/client": "^1.5.0",
+    "@walletconnect/core": "^1.5.0",
+    "@walletconnect/iso-crypto": "^1.5.0",
+    "@walletconnect/qrcode-modal": "^1.5.0",
     "broadcastchannel-polyfill": "^1.0.1",
     "ember-cli-dependency-lint": "^2.0.0",
     "macro-decorators": "^0.1.2",
