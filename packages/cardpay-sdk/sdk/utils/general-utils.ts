@@ -17,7 +17,7 @@ export async function networkName(web3: Web3): Promise<string> {
 export function waitUntilTransactionMined(
   web3: Web3,
   txnHash: string,
-  duration = 60 * 5 * 1000
+  duration = 60 * 10 * 1000
 ): Promise<TransactionReceipt> {
   let endTime = Number(new Date()) + duration;
 
@@ -31,7 +31,7 @@ export function waitUntilTransactionMined(
       if (receipt) {
         resolve(receipt);
       } else if (Number(new Date()) > endTime) {
-        throw new Error(`Transaction took too long to complete, waited ${duration / 1000} seconds`);
+        throw new Error(`Transaction ${txnHash} took too long to complete, waited ${duration / 1000} seconds`);
       } else {
         setTimeout(function () {
           return transactionReceiptAsync(txnHash, resolve, reject);
