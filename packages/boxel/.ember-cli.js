@@ -1,7 +1,7 @@
 /* eslint-disable */
 'use strict';
 
-process.env.EMBER_VERSION = "OCTANE";
+process.env.EMBER_VERSION = 'OCTANE';
 
 const { setEdition } = require('@ember/edition-utils');
 
@@ -14,5 +14,6 @@ module.exports = {
 
     Setting `disableAnalytics` to true will prevent any data from being sent.
   */
-  "disableAnalytics": false
-}
+  testPort: 7356,
+  disableAnalytics: false,
+};
