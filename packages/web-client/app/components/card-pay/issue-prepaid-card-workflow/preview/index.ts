@@ -12,6 +12,7 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
+import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-rejection-error';
 
 // http://ember-concurrency.com/docs/typescript
 // infer whether we should treat the return of a yield statement as a promise
@@ -81,6 +82,8 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
         throw new Error('INSUFFICIENT_FUNDS');
       } else if (tookTooLong) {
         throw new Error('TIMEOUT');
+      } else if (isLayer2UserRejectionError(e)) {
+        throw new Error('USER_REJECTION');
       } else {
         // Basically, for pretty much everything we want to make the user retry or seek support
         throw e;
