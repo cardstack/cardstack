@@ -81,8 +81,6 @@ module(
 
         await click('[data-test-issue-prepaid-card-button]');
 
-        layer2Service.test__simulateHubAuthentication('some-token');
-
         await waitFor('[data-test-issue-prepaid-card-error-message]');
 
         assert
