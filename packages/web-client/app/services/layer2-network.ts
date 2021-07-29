@@ -99,6 +99,13 @@ export default class Layer2Network
     return yield this.strategy.viewSafes(account);
   }
 
+  get prepaidCards() {
+    return taskFor(this.viewSafes).lastSuccessful?.value?.filterBy(
+      'type',
+      'prepaid-card'
+    );
+  }
+
   @task *issuePrepaidCard(
     faceValue: number,
     customizationDid: string,

@@ -33,12 +33,12 @@
       <aside class="card-pay-dashboard__balances" data-test-card-balances {{did-insert (perform this.layer2Network.viewSafes this.layer2Network.walletInfo.firstAddress)}}>
         <h3 class="card-pay-dashboard__balances-title">Card Balances</h3>
 
-        {{#if this.prepaidCards}}
+        {{#if this.layer2Network.prepaidCards}}
           <section class="card-pay-dashboard__balances-section">
             <header class="card-pay-dashboard__balances-section-header">
               <h4 class="card-pay-dashboard__balances-section-title">
                 Prepaid Cards
-                <span class="card-pay-dashboard__balances-count" data-test-prepaid-cards-count>{{this.prepaidCards.length}}</span>
+                <span class="card-pay-dashboard__balances-count" data-test-prepaid-cards-count>{{this.layer2Network.prepaidCards.length}}</span>
               </h4>
 
               {{#let @model.panel.sections.lastObject as |section|}}
@@ -59,7 +59,7 @@
             </header>
 
             <section class="card-pay-dashboard__balances-cards">
-              {{#each this.prepaidCards as |prepaidCard|}}
+              {{#each this.layer2Network.prepaidCards as |prepaidCard|}}
                 <CardPay::PrepaidCardSafe @safe={{prepaidCard}} />
               {{/each}}
             </section>
