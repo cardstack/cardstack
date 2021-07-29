@@ -12,10 +12,16 @@ import serializers, {
 import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
 
+export interface newCardParams {
+  realm: string;
+  parentCardURL: string;
+}
+
 export default class CardModel {
   static serializerMap: SerializerMap;
 
-  parentCardUrl?: string;
+  realm?: string;
+  parentCardURL?: string;
   url!: string;
 
   setters: Setter;
@@ -24,15 +30,16 @@ export default class CardModel {
   private rawServerResponse?: cardJSONReponse;
   private deserialized = false;
 
-  constructor() {
+  constructor(params?: newCardParams) {
     this.setters = this.makeSetter();
+    if (params) {
+      this.realm = params.realm;
+      this.parentCardURL = params.parentCardURL;
+    }
   }
 
-  static newFromResponse(
-    klass: typeof CardModel,
-    cardResponse: cardJSONReponse
-  ): CardModel {
-    let model = new klass();
+  static newFromResponse(cardResponse: cardJSONReponse): CardModel {
+    let model = new this();
     model.updateFromResponse(cardResponse);
     return model;
   }
@@ -42,8 +49,12 @@ export default class CardModel {
     cardResponse: cardJSONReponse
   ): CardModel {
     let model = new klass();
-    model.parentCardUrl = cardResponse.data.id;
+    model.parentCardURL = cardResponse.data.id;
     return model;
+  }
+
+  get isNew() {
+    return !this.url;
   }
 
   updateFromResponse(cardResponse: cardJSONReponse) {

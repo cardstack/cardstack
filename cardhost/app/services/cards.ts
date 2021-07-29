@@ -10,12 +10,10 @@ import { setComponentTemplate } from '@ember/component';
 
 import { Format, cardJSONReponse } from '@cardstack/core/src/interfaces';
 import type CardModel from '@cardstack/core/src/card-model';
+import { newCardParams } from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
 
 const { cardServer } = config as any; // Environment types arent working
-
-// TODO: This is hardcoded for now. We need to decide how this should work.
-const REALM = 'https://demo.com';
 
 export interface Card {
   model: CardModel;
@@ -30,18 +28,23 @@ function buildCardURL(url: string, format?: Format): string {
   return fullURL.join('');
 }
 
-function buildNewURL(realm: string, parentCardURL: string): string {
+function buildNewURL(card: CardModel): string {
+  if (!card.realm || !card.parentCardURL) {
+    throw new Error(
+      'Cant create a new card URL if the model doesnt know its realm or parent card'
+    );
+  }
   return [
     cardServer,
     'cards/',
-    encodeURIComponent(realm) + '/',
-    encodeURIComponent(parentCardURL),
+    encodeURIComponent(card.realm) + '/',
+    encodeURIComponent(card.parentCardURL),
   ].join('');
 }
 
 // when you put a card under edit, we load a new copy in edit mode. This lets us
 // look up the original copy from the editable copy.
-let originals = new WeakMap();
+let orginalModels = new WeakMap();
 
 export default class Cards extends Service {
   async load(url: string, format: Format): Promise<Card> {
@@ -55,27 +58,19 @@ export default class Cards extends Service {
     );
   }
 
-  async loadForEdit(card: Card): Promise<Card> {
-    let loaded = await taskFor(this.internalLoad).perform(
-      buildCardURL(card.model.url, 'edit')
-    );
-    originals.set(loaded.model, card.model);
-
-    return loaded;
-  }
-  async loadForNew(card: Card): Promise<Card> {
+  async loadForEdit(card: Card, params?: newCardParams): Promise<Card> {
     let loaded = await taskFor(this.internalLoad).perform(
       buildCardURL(card.model.url, 'edit'),
-      { dataShapeOnly: true }
+      params
     );
-    originals.set(loaded.model, card.model);
+    orginalModels.set(loaded.model, card.model);
 
     return loaded;
   }
 
   @task private *internalLoad(
     url: string,
-    options?: { dataShapeOnly: boolean }
+    newCardParams?: newCardParams
   ): TaskGenerator<Card> {
     let cardResponse = yield fetchCard(url);
     let { component, ModelClass } = yield loadComponentModule(
@@ -83,10 +78,9 @@ export default class Cards extends Service {
       url
     );
 
-    let model =
-      options && options.dataShapeOnly
-        ? ModelClass.newFromParentCardResponse(ModelClass, cardResponse)
-        : ModelClass.newFromResponse(ModelClass, cardResponse);
+    let model = newCardParams
+      ? new ModelClass(newCardParams)
+      : ModelClass.newFromResponse(cardResponse);
 
     return {
       model,
@@ -97,7 +91,7 @@ export default class Cards extends Service {
   async save(card: Card): Promise<void> {
     await taskFor(this.saveTask).perform(card.model);
 
-    let original = originals.get(card.model);
+    let original = orginalModels.get(card.model);
     if (original) {
       // TODO: this should probably be selective and only update fields that
       // already appear in original (which will be a subset of the editable
@@ -107,23 +101,18 @@ export default class Cards extends Service {
   }
 
   @task private *saveTask(model: CardModel): TaskGenerator<void> {
-    // TODO: Need to consider what is responsible for
-    // determinaing the URL and the current state of the CardModel.
-    if (model.url) {
-      let url = buildCardURL(model.url);
-      let response = yield fetchCard(url, {
-        method: 'PATCH',
-        body: JSON.stringify(model.serialize()),
-      });
-      model.updateFromResponse(response);
-    } else if (model.parentCardUrl) {
-      let url = buildNewURL(REALM, model.parentCardUrl);
-      let response = yield fetchCard(url, {
-        method: 'POST',
-        body: JSON.stringify(model.serialize()),
-      });
-      model.updateFromResponse(response);
+    let body = JSON.stringify(model.serialize());
+    let method, url;
+    if (model.isNew) {
+      url = buildNewURL(model);
+      method = 'POST';
+    } else {
+      url = buildCardURL(model.url);
+      method = 'PATCH';
     }
+
+    let response = yield fetchCard(url, { method, body });
+    model.updateFromResponse(response);
   }
 }
 

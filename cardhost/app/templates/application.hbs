@@ -6,4 +6,8 @@
 
 {{outlet}}
 
-<CardModal @url={{this.url}} />
+<CardModal
+  @url={{this.url}}
+  @format={{this.format}}
+  @onClose={{this.onModalClose}}
+/>

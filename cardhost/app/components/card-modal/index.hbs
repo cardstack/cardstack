@@ -21,7 +21,10 @@
           </:action-chin>
         </CardContainer>
       {{else}}
-        <CardContainer>
+        <CardContainer
+          @card={{this.modal.card}}
+          @editable={{true}}
+        >
           <this.modal.cardComponent />
         </CardContainer>
       {{/if}}
@@ -31,7 +34,7 @@
 
 <div
   class="CardModal-urlWatcher"
-  {{did-insert this.updateModal @url}}
-  {{did-update this.updateModal @url}}
+  {{did-insert this.updateModal @url @format}}
+  {{did-update this.updateModal @url @format}}
 ></div>
 

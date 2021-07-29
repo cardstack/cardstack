@@ -26,21 +26,6 @@ module('Acceptance | Card Editing', function (hooks) {
   let personURL = 'https://mirage/cards/person';
 
   hooks.beforeEach(function () {
-    this.createCard({
-      url: 'https://mirage/cards/my-routes',
-      schema: 'schema.js',
-      files: {
-        'schema.js': `
-          export default class MyRoutes {
-            routeTo(path) {
-              if (path === '/person') {
-                return '${PERSON_RAW_CARD.url}';
-              }
-            }
-          }`,
-      },
-    });
-
     this.createCard(ADDRESS_RAW_CARD);
     this.createCard(
       Object.assign(
@@ -59,8 +44,9 @@ module('Acceptance | Card Editing', function (hooks) {
   });
 
   test('Editing a card', async function (assert) {
-    await visit('/person');
-    assert.equal(currentURL(), '/person');
+    await visit(`/?url=${personURL}`);
+    assert.equal(currentURL(), `/?url=${personURL}`);
+    await waitFor(MODAL);
     assert.dom(PERSON).hasText('Hi! I am Arthur');
 
     await click(EDIT);
@@ -70,8 +56,15 @@ module('Acceptance | Card Editing', function (hooks) {
     await fillIn('[data-test-field-name="name"]', 'Bob Barker');
     await fillIn('[data-test-field-name="city"]', 'San Francisco');
     await click(SAVE);
-    await waitFor(MODAL, { count: 0 });
-    assert.dom(MODAL).doesNotExist('The modal is closed');
+    assert.dom(MODAL).exists('The modal stays open');
+    await waitFor(PERSON);
+    assert
+      .dom(PERSON)
+      .hasText(
+        'Hi! I am Bob Barker',
+        'The original instance of the card is updated'
+      );
+
     let card = (this.server.schema as any).cards.find(encodeCardURL(personURL));
     assert.equal(
       card.attrs.raw.data.name,
@@ -83,11 +76,5 @@ module('Acceptance | Card Editing', function (hooks) {
       'San Francisco',
       'RawCard cache is updated'
     );
-    assert
-      .dom(PERSON)
-      .hasText(
-        'Hi! I am Bob Barker',
-        'The original instance of the card is updated'
-      );
   });
 });

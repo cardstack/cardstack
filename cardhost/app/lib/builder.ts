@@ -17,6 +17,10 @@ import * as CardModel from '@cardstack/core/src/card-model';
   return CardModel;
 });
 
+import { urlAlphabet, customAlphabet } from 'nanoid';
+
+// Use the default nanoid alphabet, but remove dashes, as that's our deliminator
+export const nanoid = customAlphabet(urlAlphabet.replace('-', ''), 15);
 export interface Cache<CardType> {
   get(url: string): CardType | undefined;
   set(url: string, payload: CardType): void;
@@ -172,7 +176,4 @@ export default class Builder implements BuilderInterface {
     await this.rawCardCache.delete(cardURL);
     await this.compiledCardCache.delete(cardURL);
   }
-}
-function nanoid() {
-  throw new Error('Function not implemented.');
 }

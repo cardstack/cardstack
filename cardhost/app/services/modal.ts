@@ -10,6 +10,7 @@ import { Card } from './cards';
 import CardsService from '../services/cards';
 import { Format } from '@cardstack/core/src/interfaces';
 import { taskFor } from 'ember-concurrency-ts';
+import { newCardParams } from '../../../core/src/card-model';
 
 type State =
   | {
@@ -21,7 +22,6 @@ type State =
   | {
       name: 'loaded';
       loadedCard: Card;
-      new: boolean;
       format: Format;
     };
 
@@ -39,48 +39,49 @@ export default class Modal extends Service {
     return this.state.name === 'loading';
   }
 
-  get cardComponent(): unknown {
+  get card(): Card | undefined {
     if (this.state.name === 'loaded') {
-      return this.state.loadedCard.component;
+      return this.state.loadedCard;
     }
     return;
   }
-
-  // TODO: Consolidate with edit new
-  openCard(cardURL: string, format: Format): Promise<void> {
-    return taskFor(this.openCardTask).perform(cardURL, format);
+  get cardComponent(): unknown {
+    return this.card && this.card.component;
   }
 
-  @task *openCardTask(cardURL: string, format: Format): TaskGenerator<void> {
+  openCard(card: string, format: Format): Promise<void> {
+    return taskFor(this.openCardTask).perform(card, format);
+  }
+
+  @task *openCardTask(url: string, format: Format): TaskGenerator<void> {
     this.state = { name: 'loading' };
-    let loadedCard = yield this.cards.load(cardURL, format);
+
+    let loadedCard = yield this.cards.load(url, format);
+
     this.state = {
       name: 'loaded',
       loadedCard,
       format,
-      new: false,
     };
   }
 
-  @task *editCard(card: Card): TaskGenerator<void> {
+  @task *editCardTask(
+    card: Card,
+    cardParams?: newCardParams | Event,
+    event?: Event
+  ): TaskGenerator<void> {
+    if (cardParams instanceof Event) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      event = cardParams as Event;
+      cardParams = undefined;
+    }
+
     this.state = { name: 'loading' };
-    let loadedCard = yield this.cards.loadForEdit(card);
+    let loadedCard = yield this.cards.loadForEdit(card, cardParams);
     this.state = {
       name: 'loaded',
       loadedCard,
       format: 'edit',
-      new: false,
-    };
-  }
-
-  @task *newCard(card: Card): TaskGenerator<void> {
-    this.state = { name: 'loading' };
-    let loadedCard = yield this.cards.loadForNew(card);
-    this.state = {
-      name: 'loaded',
-      loadedCard,
-      format: 'edit',
-      new: true,
     };
   }
 
@@ -89,9 +90,9 @@ export default class Modal extends Service {
       return;
     }
     await this.cards.save(this.state.loadedCard);
-    if (this.state.new) {
-      this.router.transitionTo(`/card?url=${this.state.loadedCard.model.url}`);
-    }
+    this.router.transitionTo({
+      queryParams: { url: this.state.loadedCard.model.url, format: 'isolated' },
+    });
     this.close();
   }
 

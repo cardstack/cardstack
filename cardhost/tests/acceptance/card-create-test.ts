@@ -43,8 +43,9 @@ module('Acceptance | Card Creation', function (hooks) {
   });
 
   test('Creating a card', async function (assert) {
-    await visit(`/card?url=${personURL}`);
-    assert.equal(currentURL(), `/card?url=${personURL}`);
+    await visit(`/?url=${personURL}`);
+    assert.equal(currentURL(), `/?url=${personURL}`);
+    await waitFor(PERSON);
     assert.dom(PERSON).hasText('Hi! I am Arthur');
 
     await click(NEW);
@@ -54,8 +55,8 @@ module('Acceptance | Card Creation', function (hooks) {
     await fillIn('[data-test-field-name="name"]', 'Bob Barker');
     await fillIn('[data-test-field-name="city"]', 'San Francisco');
     await click(SAVE);
-    await waitFor(MODAL, { count: 0 });
-    assert.dom(MODAL).doesNotExist('The modal is closed');
+    await waitFor(PERSON);
+    assert.dom(MODAL).exists('The modal stays open');
     assert
       .dom(PERSON)
       .hasText(

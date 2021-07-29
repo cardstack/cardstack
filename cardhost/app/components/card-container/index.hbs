@@ -1,8 +1,8 @@
 <div style="border: 2px solid green;border-radius:10px;padding:1vw">
   <div style="display:flex; background-color:lightgray">
     {{#if @editable}}
-      <button data-test-edit-button {{on 'click' (perform this.modal.editCard @card) }}>Edit</button>
-      <button data-test-new-button {{on 'click' (perform this.modal.newCard @card) }}>New</button>
+      <button data-test-edit-button {{on 'click' (perform this.modal.editCardTask @card)}}>Edit</button>
+      <button data-test-new-button {{on 'click' (fn this.createNew @card)}}>New</button>
     {{/if}}
   </div>
 
