@@ -33,6 +33,7 @@ module(
         },
         onIncomplete: () => {},
         isComplete: false,
+        frozen: false,
       });
 
       await render(hbs`
@@ -40,8 +41,15 @@ module(
         @onComplete={{this.onComplete}}
         @isComplete={{this.isComplete}}
         @onIncomplete={{this.onIncomplete}}
+        @frozen={{this.frozen}}
       />
     `);
+    });
+
+    test('it disables the chin button when card is frozen', async function (assert) {
+      assert.dom('[data-test-authentication-button]').isNotDisabled();
+      this.set('frozen', true);
+      assert.dom('[data-test-authentication-button]').isDisabled();
     });
 
     module('Test the sdk hub authentication calls', async function () {

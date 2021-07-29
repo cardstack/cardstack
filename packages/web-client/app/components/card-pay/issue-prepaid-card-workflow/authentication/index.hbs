@@ -3,6 +3,7 @@
 >
   <Boxel::ActionChin
     @state={{this.authState}}
+    @disabled={{@frozen}}
   >
     <:default as |d|>
       {{#if (and this.error this.authenticationTask.isIdle)}}

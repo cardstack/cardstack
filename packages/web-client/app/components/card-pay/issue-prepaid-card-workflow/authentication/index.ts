@@ -8,6 +8,7 @@ import { tracked } from '@glimmer/tracking';
 interface CardPayWorkflowHubAuthComponentArgs {
   onComplete: () => void;
   isComplete: boolean;
+  frozen: boolean;
 }
 
 export default class CardPayWorkflowHubAuthComponent extends Component<CardPayWorkflowHubAuthComponentArgs> {
