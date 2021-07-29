@@ -14,6 +14,8 @@ import prepaidCardColorSchemes from '../../../../../mirage/fixture-data/prepaid-
 import prepaidCardPatterns from '../../../../../mirage/fixture-data/prepaid-card-patterns';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 
+const USER_REJECTION_ERROR_MESSAGE =
+  'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
 const TIMEOUT_ERROR_MESSAGE =
   'There was a problem creating your prepaid card. Please contact Cardstack support to find out the status of your transaction.';
 const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `Looks like there's no balance in your ${c.layer2.fullName} wallet to fund your selected prepaid card. Before you can continue, please add funds to your ${c.layer2.fullName} wallet by bridging some tokens from your ${c.layer1.fullName} wallet.`;
@@ -77,6 +79,22 @@ module(
     });
 
     module('Test the sdk prepaid card creation calls', async function () {
+      test('It shows the correct error message for a user rejection', async function (assert) {
+        sinon
+          .stub(layer2Service, 'issuePrepaidCard')
+          .throws(new Error('User rejected request'));
+
+        await click('[data-test-issue-prepaid-card-button]');
+
+        layer2Service.test__simulateHubAuthentication('some-token');
+
+        await waitFor('[data-test-issue-prepaid-card-error-message]');
+
+        assert
+          .dom('[data-test-issue-prepaid-card-error-message]')
+          .containsText(USER_REJECTION_ERROR_MESSAGE);
+      });
+
       test('It shows the correct error message for a timeout', async function (assert) {
         sinon
           .stub(layer2Service, 'issuePrepaidCard')
