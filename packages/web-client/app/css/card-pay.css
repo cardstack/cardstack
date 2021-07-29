@@ -34,6 +34,22 @@
   min-width: 16rem;
 }
 
+.card-pay-dashboard__sidebar-section-header {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid #5f5d71;
+  padding-top: var(--boxel-sp);
+  text-transform: uppercase;
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-xxl);
+}
+
+.card-pay-dashboard__sidebar-section-icon {
+  margin-right: var(--boxel-sp-xs);
+
+  --icon-color: var(--boxel-light);
+}
+
 .card-pay-dashboard__sidebar-link {
   display: flex;
   align-items: flex-start;
