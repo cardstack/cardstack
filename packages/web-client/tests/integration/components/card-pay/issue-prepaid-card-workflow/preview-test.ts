@@ -53,10 +53,10 @@ module(
         spendFaceValue: 100000,
         issuerName: 'Some name',
         colorScheme: {
-          id: 'Color scheme id',
+          id: prepaidCardColorSchemes[0].id,
         },
         pattern: {
-          id: 'Pattern id',
+          id: prepaidCardPatterns[0].id,
         },
       });
       this.setProperties({

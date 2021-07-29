@@ -18,6 +18,7 @@ import {
   BridgeValidationResult,
   DepotSafe,
   PrepaidCardSafe,
+  Safe,
 } from '@cardstack/cardpay-sdk';
 import {
   UnbindEventListener,
@@ -52,6 +53,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked depotSafe: DepotSafe | null = null;
   @tracked isInitializing = false;
   issuePrepaidCardRequests: Map<number, IssuePrepaidCardRequest> = new Map();
+  accountSafes: Map<string, Safe[]> = new Map();
 
   // property to test whether the refreshBalances method is called
   // to test if balances are refreshed after relaying tokens
@@ -149,6 +151,26 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return await this.test__simulateConvertFromSpend(symbol, amount);
   }
 
+  async viewSafe(address: string): Promise<Safe | undefined> {
+    return Promise.resolve(
+      [...this.accountSafes.values()]
+        .flat()
+        .find((safe) => safe.address === address)
+    );
+  }
+
+  async viewSafes(account: string): Promise<Safe[]> {
+    return Promise.resolve(this.accountSafes.get(account)!);
+  }
+
+  test__simulateAccountSafes(account: string, safes: Safe[]) {
+    if (!this.accountSafes.has(account)) {
+      this.accountSafes.set(account, []);
+    }
+
+    this.accountSafes.get(account)?.push(...safes);
+  }
+
   async issuePrepaidCard(
     _safeAddress: string,
     faceValue: number,
@@ -223,7 +245,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   test__simulateIssuePrepaidCardForAmount(
     faceValue: number,
     walletAddress: string,
-    cardAddress: string
+    cardAddress: string,
+    options: Object
   ) {
     let request = this.issuePrepaidCardRequests.get(faceValue);
     let prepaidCardSafe: PrepaidCardSafe = {
@@ -239,6 +262,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       reloadable: true,
       transferrable: false,
       customizationDID: request?.customizationDID,
+
+      ...options,
     };
     request?.onTxHash?.('exampleTxHash');
     return request?.deferred.resolve(prepaidCardSafe);

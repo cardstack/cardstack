@@ -179,6 +179,14 @@ export default abstract class Layer2ChainWeb3Strategy
     return taskFor(this.fetchDepotTask).perform();
   }
 
+  async viewSafe(address: string): Promise<Safe | undefined> {
+    return await this.#safesApi.viewSafe(address);
+  }
+
+  async viewSafes(account: string): Promise<Safe[]> {
+    return await this.#safesApi.view(account);
+  }
+
   async issuePrepaidCard(
     safeAddress: string,
     amount: number,

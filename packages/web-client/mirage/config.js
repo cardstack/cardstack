@@ -1,6 +1,5 @@
-import { Response as MirageResponse } from 'ember-cli-mirage';
-import * as uuid from 'uuid';
-import { encodeDID } from '@cardstack/did-resolver';
+import { encodeDID, getResolver } from '@cardstack/did-resolver';
+import { Resolver } from 'did-resolver';
 
 export default function () {
   this.namespace = 'api';
@@ -13,42 +12,40 @@ export default function () {
     return schema.prepaidCardPatterns.all();
   });
 
-  this.post('/prepaid-card-customizations', (_schema, request) => {
-    let requestJson = JSON.parse(request.requestBody);
-    return new MirageResponse(
-      201,
-      {
-        'Content-Type': 'application/vnd.api+json',
-      },
-      JSON.stringify({
-        data: {
-          type: 'prepaid-card-customizations',
-          id: uuid.v4(),
-          attributes: {
-            did: encodeDID({ type: 'PrepaidCardCustomization' }),
-            'issuer-name': requestJson.data.attributes['issuer-name'],
-            'owner-address': '0x0000000',
-          },
-          relationships: {
-            pattern: {
-              data: {
-                type: 'prepaid-card-patterns',
-                id: requestJson.data.relationships.pattern.data.id,
-              },
-            },
-            'color-scheme': {
-              data: {
-                type: 'prepaid-card-color-schemes',
-                id: requestJson.data.relationships['color-scheme'].data.id,
-              },
-            },
-          },
-        },
-      })
-    );
+  this.post('/prepaid-card-customizations', async function (schema) {
+    let prepaidCardCustomizationId = '75218c05-3899-46d6-b431-e7237ba293ca';
+    let did = encodeDID({
+      type: 'PrepaidCardCustomization',
+      uniqueId: prepaidCardCustomizationId,
+      version: 1,
+    });
+
+    let resolver = new Resolver({ ...getResolver() });
+    let resolvedDID = await resolver.resolve(did);
+    let didAlsoKnownAs = resolvedDID.didDocument.alsoKnownAs[0];
+    let customizationJsonFilename = didAlsoKnownAs.split('/')[4].split('.')[0];
+
+    let customization = schema.create('prepaid-card-customization', {
+      id: customizationJsonFilename,
+      did,
+      ...this.normalizedRequestAttrs(),
+    });
+
+    return customization;
   });
 
+  this.get(
+    'https://storage.cardstack.com/prepaid-card-customization/:idWithExtension',
+    function (schema, { params: { idWithExtension } }) {
+      let [id] = idWithExtension.split('.');
+      return schema.prepaidCardCustomizations.find(id);
+    }
+  );
+
   this.passthrough((request) => {
-    return !request.url.includes('/api/');
+    return (
+      !request.url.includes('/api/') &&
+      !request.url.includes('storage.cardstack.com')
+    );
   });
 }
