@@ -24,3 +24,39 @@
   padding: var(--boxel-sp-lg) 0;
   overflow-y: auto;
 }
+
+.card-pay-dashboard__body {
+  display: flex;
+}
+
+.card-pay-dashboard__sidebar {
+  padding: var(--boxel-sp-xxl) 0 0 var(--boxel-sp-xl);
+  min-width: 16rem;
+}
+
+.card-pay-dashboard__sidebar-link {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--boxel-sp-sm);
+  border-radius: var(--boxel-border-radius);
+}
+
+.card-pay-dashboard__sidebar-link.active {
+  background: var(--boxel-cyan);
+  color: var(--boxel-dark);
+}
+
+.card-pay-dashboard__sidebar-link .card-pay-dashboard__sidebar-link-header {
+  font-weight: 600;
+}
+
+.card-pay-dashboard__sidebar-link .card-pay-dashboard__sidebar-link-icon {
+  opacity: 0;
+  margin-right: var(--boxel-sp);
+}
+
+.card-pay-dashboard__sidebar-link.active .card-pay-dashboard__sidebar-link-icon {
+  opacity: 1;
+
+  --icon-color: #000;
+}

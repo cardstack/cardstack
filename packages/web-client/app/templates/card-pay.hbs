@@ -25,7 +25,31 @@
   </:header>
 
   <:body>
-    {{outlet}}
+    <section class="card-pay-dashboard__body">
+      {{#if this.layer2Network.isConnected}}
+        <Boxel::Sidebar class="card-pay-dashboard__sidebar" data-test-wallet-sidebar as |SidebarSection|>
+          <SidebarSection>
+            My Account: {{truncate-middle this.layer2Network.walletInfo.firstAddress}}
+          </SidebarSection>
+
+          {{#if this.prepaidCards}}
+            <SidebarSection>
+              <LinkTo class="card-pay-dashboard__sidebar-link" @route="card-pay.balances">
+                {{svg-jar "active-sidebar-link-triangle" class="card-pay-dashboard__sidebar-link-icon" width="15" height="15" role="presentation"}}
+                <div>
+                  <div class="card-pay-dashboard__sidebar-link-header">
+                    Prepaid Cards
+                  </div>
+                  {{pluralize this.prepaidCards.length "Card"}}
+                </div>
+              </LinkTo>
+            </SidebarSection>
+          {{/if}}
+        </Boxel::Sidebar>
+      {{/if}}
+
+      {{outlet}}
+    </section>
   </:body>
 </Boxel::Dashboard>
 

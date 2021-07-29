@@ -5,6 +5,7 @@ import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { tracked } from '@glimmer/tracking';
 import { currentNetworkDisplayInfo as c } from '../utils/web3-strategies/network-display-info';
+import { taskFor } from 'ember-concurrency-ts';
 
 interface ChainChangeModalOptions {
   title: string;
@@ -95,5 +96,11 @@ export default class CardPayController extends Controller {
 
   @action transitionTo(routeName: string) {
     this.transitionToRoute(routeName);
+  }
+
+  get prepaidCards() {
+    return taskFor(
+      this.layer2Network.viewSafes
+    ).lastSuccessful?.value?.filterBy('type', 'prepaid-card');
   }
 }
