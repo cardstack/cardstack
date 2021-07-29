@@ -76,6 +76,7 @@ export async function gasEstimate(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
+      Accept: 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
     },
     body: JSON.stringify({
       to,
@@ -105,7 +106,8 @@ export async function getSendPayload(
   let options = {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
+      'Content-Type': 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
+      Accept: 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
     },
     body: JSON.stringify({
       payment: spendAmount,
@@ -142,6 +144,7 @@ export async function executeTransaction(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
+      Accept: 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
     },
     body: JSON.stringify({
       to,
@@ -181,6 +184,7 @@ export async function executeSend(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
+      Accept: 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
     },
     body: JSON.stringify({
       nonce,
