@@ -87,6 +87,10 @@ export default class Layer2Network
     return this.strategy.authenticate();
   }
 
+  checkHubAuthenticationValid(authToken: string): Promise<boolean> {
+    return this.strategy.checkHubAuthenticationValid(authToken);
+  }
+
   bridgeExplorerUrl(txnHash: string) {
     return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
   }

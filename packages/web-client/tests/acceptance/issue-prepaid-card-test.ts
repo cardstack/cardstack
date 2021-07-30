@@ -127,10 +127,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
     await waitUntil(
       () => !document.querySelector('[data-test-wallet-connect-qr-code]')
     );
-    // await waitFor(`${postableSel(0, 4)} [data-test-depot-balance]`);
-    // assert
-    //   .dom(`${postableSel(0, 4)} [data-test-depot-balance]`)
-    //   .containsText('2500 DAI.CPXD');
     assert
       .dom(
         '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
@@ -146,10 +142,23 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert
       .dom(postableSel(1, 0))
+      .containsText(
+        'To store card customization data in the Cardstack Hub, you need to authenticate using your Card Wallet'
+      );
+    post = postableSel(1, 1);
+    await click(
+      `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
+    );
+    layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
+
+    await waitFor(postableSel(1, 2));
+    assert
+      .dom(postableSel(1, 2))
       .containsText('First, you can choose the look and feel of your card');
 
-    post = postableSel(1, 1);
+    post = postableSel(1, 3);
 
+    await waitFor('[data-test-layout-customization-form]');
     assert.dom('[data-test-layout-customization-form]').isVisible();
     assert
       .dom(`${post} [data-test-boxel-action-chin] [data-test-boxel-button]`)
@@ -361,23 +370,17 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     layer2Service.balancesRefreshed = false;
 
-    // // preview card
+    // preview card
+    post = postableSel(3, 1);
     await click(
-      `${postableSel(
-        3,
-        1
-      )} [data-test-boxel-action-chin] [data-test-boxel-button]`
+      `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
 
     assert
-      .dom('[data-test-boxel-action-chin-action-status-area]')
+      .dom(`${post} [data-test-boxel-action-chin-action-status-area]`)
       .containsText(
         'You will receive a confirmation request from the Card Wallet app in a few moments…'
       );
-
-    await layer2Service.test__simulateHubAuthentication(
-      'abc123--def456--ghi789'
-    );
 
     await timeout(250);
 
@@ -497,6 +500,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
     hooks.beforeEach(function () {
+      window.TEST__AUTH_TOKEN = 'abc123--def456--ghi789';
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -522,6 +526,10 @@ module('Acceptance | issue prepaid card', function (hooks) {
         ],
       };
       layer2Service.test__simulateDepot(testDepot as DepotSafe);
+    });
+
+    hooks.afterEach(function () {
+      window.TEST__AUTH_TOKEN = undefined;
     });
 
     test('Disconnecting Layer 2 from within the workflow', async function (assert) {

@@ -1,20 +1,24 @@
 import {
+  CheckResult,
+  WorkflowCard,
+} from '@cardstack/web-client/models/workflow/workflow-card';
+import {
   Participant,
   WorkflowPostable,
 } from '@cardstack/web-client/models/workflow/workflow-postable';
-import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer1-network';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 
-interface NetworkAwareWorkflowMessageOptions {
+interface NetworkAwareWorkflowCardOptions {
   author: Participant;
-  message: string;
-  includeIf: (this: NetworkAwareWorkflowMessage) => boolean;
+  componentName: string; // this should eventually become a card reference
+  includeIf(this: NetworkAwareWorkflowCard): boolean;
+  check(this: NetworkAwareWorkflowCard): Promise<CheckResult>;
 }
 
-export default class NetworkAwareWorkflowMessage extends WorkflowMessage {
-  constructor(options: Partial<NetworkAwareWorkflowMessageOptions>) {
+export default class NetworkAwareWorkflowCard extends WorkflowCard {
+  constructor(options: Partial<NetworkAwareWorkflowCardOptions>) {
     super(options);
   }
 

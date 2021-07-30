@@ -7,7 +7,6 @@ import { task, TaskGenerator } from 'ember-concurrency';
 import CardCustomization, {
   PrepaidCardCustomization,
 } from '@cardstack/web-client/services/card-customization';
-import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
@@ -18,15 +17,14 @@ import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-
 // infer whether we should treat the return of a yield statement as a promise
 type Resolved<T> = T extends PromiseLike<infer R> ? R : T;
 
-interface CardPayDepositWorkflowPreviewComponentArgs {
+interface CardPayPrepaidCardWorkflowPreviewComponentArgs {
   workflowSession: WorkflowSession;
   onComplete: () => void;
   isComplete: boolean;
 }
 
-export default class CardPayDepositWorkflowPreviewComponent extends Component<CardPayDepositWorkflowPreviewComponentArgs> {
+export default class CardPayPrepaidCardWorkflowPreviewComponent extends Component<CardPayPrepaidCardWorkflowPreviewComponentArgs> {
   @service declare cardCustomization: CardCustomization;
-  @service declare hubAuthentication: HubAuthentication;
   @service declare layer2Network: Layer2Network;
   @tracked txHash?: TransactionHash;
 
@@ -43,8 +41,6 @@ export default class CardPayDepositWorkflowPreviewComponent extends Component<Ca
   @task *issueTask(): TaskGenerator<void> {
     let { workflowSession } = this.args;
     try {
-      yield this.hubAuthentication.ensureAuthenticated();
-
       // yield statements require manual typing
       // https://github.com/machty/ember-concurrency/pull/357#discussion_r434850096
       let customization: Resolved<PrepaidCardCustomization> = yield taskFor(

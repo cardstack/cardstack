@@ -191,6 +191,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return this.test__deferredHubAuthentication.promise;
   }
 
+  checkHubAuthenticationValid(_authToken: string): Promise<boolean> {
+    return Promise.resolve(true);
+  }
+
   test__lastSymbolsToUpdate: ConvertibleSymbol[] = [];
   test__simulatedExchangeRate: number = 0.2;
   test__updateUsdConvertersDeferred: RSVP.Deferred<void> | undefined;

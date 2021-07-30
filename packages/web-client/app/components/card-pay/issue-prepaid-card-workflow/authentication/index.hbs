@@ -1,0 +1,54 @@
+<ActionCardContainer
+  @isComplete={{@isComplete}}
+>
+  <Boxel::ActionChin
+    @state={{this.authState}}
+    @disabled={{@frozen}}
+  >
+    <:default as |d|>
+      {{#if (and this.error this.authenticationTask.isIdle)}}
+        <d.ActionStatusArea
+          @icon="card-wallet-app-icon"
+          style={{css-var status-icon-size="2.5rem"}}
+          data-test-failed
+        >
+          Authentication failed or was canceled.
+        </d.ActionStatusArea>
+        <d.InfoArea>
+          <Boxel::Button
+            @as="button"
+            @size="extra-small"
+            @kind="secondary-dark"
+            {{on "click" (perform this.authenticationTask)}}
+          >
+            Try Again
+          </Boxel::Button>
+        </d.InfoArea>
+      {{else}}
+        <d.ActionButton
+          {{on "click" (perform this.authenticationTask)}}
+          data-test-authentication-button
+        >
+          Authenticate with Card Wallet
+        </d.ActionButton>
+      {{/if}}
+    </:default>
+    <:in-progress as |i|>
+      <i.ActionStatusArea
+        @icon="card-wallet-app-icon"
+        style={{css-var status-icon-size="2.5rem"}}
+      >
+        <Boxel::LoadingIndicator
+          class="authentication__loading-indicator"
+          @color="var(--boxel-light)"
+        />
+        You will receive a confirmation request from the Card Wallet app in a few moments…
+      </i.ActionStatusArea>
+    </:in-progress>
+    <:memorialized as |m|>
+      <m.ActionStatusArea>
+        Authenticated with Hub
+      </m.ActionStatusArea>
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

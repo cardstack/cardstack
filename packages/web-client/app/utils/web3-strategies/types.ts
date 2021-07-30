@@ -93,6 +93,7 @@ export interface Layer2Web3Strategy
   ): Promise<BridgeValidationResult>;
   viewSafe(address: string): Promise<Safe | undefined>;
   viewSafes(account: string): Promise<Safe[]>;
+  checkHubAuthenticationValid(authToken: string): Promise<boolean>;
   authenticate(): Promise<string>;
   issuePrepaidCard(
     safeAddress: string,
