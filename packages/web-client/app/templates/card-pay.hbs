@@ -32,23 +32,25 @@
             My Account: {{truncate-middle this.layer2Network.walletInfo.firstAddress}}
           </SidebarSection>
 
-          {{#if this.layer2Network.prepaidCards}}
+          {{#each this.sidebarSections as |section|}}
             <SidebarSection>
               <h4 class="card-pay-dashboard__sidebar-section-header">
-                {{svg-jar "tab-icon-card" class="card-pay-dashboard__sidebar-section-icon" width="18" height="18" role="presentation"}}
-                Card Balances
+                {{svg-jar section.icon class="card-pay-dashboard__sidebar-section-icon" width="18" height="18" role="presentation"}}
+                {{section.title}}
               </h4>
-              <LinkTo class="card-pay-dashboard__sidebar-link" @route="card-pay.balances">
-                {{svg-jar "active-sidebar-link-triangle" class="card-pay-dashboard__sidebar-link-icon" width="15" height="15" role="presentation"}}
-                <div>
-                  <div class="card-pay-dashboard__sidebar-link-header">
-                    Prepaid Cards
+              {{#each section.links as |link|}}
+                <LinkTo class="card-pay-dashboard__sidebar-link" @route={{link.route}}>
+                  {{svg-jar "active-sidebar-link-triangle" class="card-pay-dashboard__sidebar-link-icon" width="15" height="15" role="presentation"}}
+                  <div>
+                    <div class="card-pay-dashboard__sidebar-link-header">
+                      {{link.title}}
+                    </div>
+                    {{link.content}}
                   </div>
-                  {{pluralize this.layer2Network.prepaidCards.length "Card"}}
-                </div>
-              </LinkTo>
+                </LinkTo>
+              {{/each}}
             </SidebarSection>
-          {{/if}}
+          {{/each}}
         </Boxel::Sidebar>
       {{/if}}
 

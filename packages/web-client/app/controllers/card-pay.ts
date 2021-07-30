@@ -1,6 +1,7 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
+import { pluralize } from 'ember-inflector';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { tracked } from '@glimmer/tracking';
@@ -95,5 +96,51 @@ export default class CardPayController extends Controller {
 
   @action transitionTo(routeName: string) {
     this.transitionToRoute(routeName);
+  }
+
+  get sidebarSections() {
+    return [
+      {
+        title: 'Card Balances',
+        icon: 'tab-icon-card',
+        links: [
+          {
+            route: 'card-pay.balances',
+            title: 'Prepaid Cards',
+            content: pluralize(
+              this.layer2Network.prepaidCards?.length || 0,
+              'Card'
+            ),
+          },
+          {
+            route: 'boom',
+            title: 'Reward Cards',
+            content: '0 Cards',
+          },
+        ],
+      },
+      {
+        title: 'Merchant Services',
+        icon: 'tab-icon-merchant',
+        links: [
+          {
+            route: 'card-pay.merchant-services',
+            title: 'Merchant Name',
+            content: '0x1234...abcd',
+          },
+        ],
+      },
+      {
+        title: 'Token Suppliers',
+        icon: 'tab-icon-token',
+        links: [
+          {
+            route: 'card-pay.token-suppliers',
+            title: 'Depot X',
+            content: '0x1234....abcd',
+          },
+        ],
+      },
+    ];
   }
 }
