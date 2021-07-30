@@ -13,11 +13,14 @@ import {
   bridgedSymbols,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
-import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import {
   shouldUseTokenInput,
   validateTokenInput,
 } from '@cardstack/web-client/utils/validation';
+import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-rejection-error';
+import { taskFor } from 'ember-concurrency-ts';
+import { task, TaskGenerator } from 'ember-concurrency';
+import { reads } from 'macro-decorators';
 
 class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
@@ -25,8 +28,8 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   @tracked amountIsValid = false;
   @tracked txHash: string | undefined;
   @tracked isConfirmed = false;
-  @tracked errorMessage = '';
   @tracked validationMessage = '';
+  @reads('withdrawTask.last.error') declare error: Error | undefined;
 
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
@@ -108,11 +111,23 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
     });
   }
 
-  @action async withdraw() {
-    this.errorMessage = '';
+  @action withdraw() {
     if (this.isAmountCtaDisabled) {
       return;
     }
+
+    taskFor(this.withdrawTask)
+      .perform()
+      .catch((e) => {
+        console.error(e);
+        this.isConfirmed = false;
+        if (!this.error) {
+          throw new Error('DEFAULT_ERROR');
+        }
+      });
+  }
+
+  @task *withdrawTask(): TaskGenerator<void> {
     try {
       this.isConfirmed = true;
       let { currentTokenSymbol } = this;
@@ -120,12 +135,12 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
 
       assertBridgedTokenSymbol(currentTokenSymbol);
 
-      let transactionHash = await this.layer2Network.bridgeToLayer1(
+      let transactionHash = yield this.layer2Network.bridgeToLayer1(
         this.layer2Network.depotSafe?.address!,
         getUnbridgedSymbol(currentTokenSymbol),
         withdrawnAmount
       );
-      let layer2BlockHeight = await this.layer2Network.getBlockHeight();
+      let layer2BlockHeight = yield this.layer2Network.getBlockHeight();
 
       this.txHash = transactionHash;
 
@@ -136,8 +151,12 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       });
       this.args.onComplete?.();
     } catch (e) {
-      console.error(e);
-      this.errorMessage = `There was a problem initiating the withdrawal of your tokens from ${c.layer2.fullName}. This may be due to a network issue, or perhaps you canceled the request in your wallet.`;
+      this.isConfirmed = false;
+      if (isLayer2UserRejectionError(e)) {
+        throw new Error('USER_REJECTION');
+      } else {
+        throw e;
+      }
     }
   }
 }

@@ -1,11 +1,12 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { click, fillIn, render, typeIn } from '@ember/test-helpers';
+import { click, fillIn, render, typeIn, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import { toWei } from 'web3-utils';
 import BN from 'bn.js';
+import sinon from 'sinon';
 
 module(
   'Integration | Component | card-pay/withdrawal-workflow/transaction-amount',
@@ -124,6 +125,32 @@ module(
       assert.dom('input').hasValue('11');
       assert.dom('input').doesNotHaveAria('invalid', 'true');
       assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
+    });
+
+    test('it displays the correct error message if user rejects confirmation', async function (assert) {
+      let layer2Service = this.owner.lookup('service:layer2-network');
+      sinon
+        .stub(layer2Service, 'bridgeToLayer1')
+        .throws(new Error('User rejected request'));
+      await fillIn('input', '5');
+      await click('[data-test-withdrawal-transaction-amount] button');
+      await waitFor('[data-test-withdrawal-transaction-amount-error]');
+      assert
+        .dom('[data-test-withdrawal-transaction-amount-error]')
+        .containsText('It looks like you have canceled the request');
+    });
+
+    test('it displays the default error message', async function (assert) {
+      let layer2Service = this.owner.lookup('service:layer2-network');
+      sinon.stub(layer2Service, 'bridgeToLayer1').throws(new Error('Huh?'));
+      await fillIn('input', '5');
+      await click('[data-test-withdrawal-transaction-amount] button');
+      await waitFor('[data-test-withdrawal-transaction-amount-error]');
+      assert
+        .dom('[data-test-withdrawal-transaction-amount-error]')
+        .containsText(
+          'There was a problem initiating the withdrawal of your tokens'
+        );
     });
   }
 );
