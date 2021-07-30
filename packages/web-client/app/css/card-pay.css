@@ -34,10 +34,14 @@
   min-width: 16rem;
 }
 
+.card-pay-dashboard__sidebar-account {
+  padding-bottom: var(--boxel-sp);
+  border-bottom: 1px solid #5f5d71;
+}
+
 .card-pay-dashboard__sidebar-section-header {
   display: flex;
   align-items: center;
-  border-top: 1px solid #5f5d71;
   padding-top: var(--boxel-sp);
   text-transform: uppercase;
   font: 600 var(--boxel-font-xs);

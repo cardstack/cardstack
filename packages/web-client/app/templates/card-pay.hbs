@@ -28,7 +28,7 @@
     <section class="card-pay-dashboard__body">
       {{#if this.layer2Network.isConnected}}
         <Boxel::Sidebar class="card-pay-dashboard__sidebar" data-test-wallet-sidebar as |SidebarSection|>
-          <SidebarSection>
+          <SidebarSection class="card-pay-dashboard__sidebar-account">
             My Account: {{truncate-middle this.layer2Network.walletInfo.firstAddress}}
           </SidebarSection>
 
