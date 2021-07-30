@@ -8,11 +8,21 @@ import { log } from '@graphprotocol/graph-ts';
 const EXEC_TRANSACTION = 'execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)';
 
 export function handleAddedOwner(event: AddedOwner): void {
+  let txnHash = event.transaction.hash.toHex();
   let owner = toChecksumAddress(event.params.owner);
-  let safe = toChecksumAddress(event.address);
-  let safeOwnerEntity = new SafeOwner(safe + '-' + owner);
-  safeOwnerEntity.safe = safe;
+  let safeAddress = toChecksumAddress(event.address);
+  let safe = Safe.load(safeAddress);
+  if (safe == null) {
+    log.warning(
+      'Cannot process safe txn {}: Safe entity does not exist for safe address {}. This is likely due to the subgraph having a startBlock that is higher than the block the safe was created in.',
+      [txnHash, safeAddress]
+    );
+    return;
+  }
+  let safeOwnerEntity = new SafeOwner(safeAddress + '-' + owner);
+  safeOwnerEntity.safe = safeAddress;
   safeOwnerEntity.owner = owner;
+  safeOwnerEntity.createdAt = safe.createdAt;
   safeOwnerEntity.save();
 }
 export function handleRemovedOwner(event: RemovedOwner): void {

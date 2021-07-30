@@ -22,6 +22,7 @@ export function handleProxyCreation(event: ProxyCreation): void {
     let safeOwnerEntity = new SafeOwner(safeOwnerId);
     safeOwnerEntity.owner = ownerAddress;
     safeOwnerEntity.safe = safeAddress;
+    safeOwnerEntity.createdAt = event.block.timestamp;
     safeOwnerEntity.save();
   }
   safeEntity.save();

@@ -14,6 +14,7 @@ const { toBN, fromWei } = Web3.utils;
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
 interface BaseSafe {
   address: string;
+  createdAt: number;
   tokens: TokenInfo[];
   owners: string[];
 }
@@ -58,6 +59,7 @@ const defaultOptions: Options = { viewAll: false };
 
 const safeQueryFields = `
   id
+  createdAt
   owners {
     owner {
       id
@@ -116,7 +118,7 @@ const safeQuery = `
 const safesQuery = `
   query($account: ID!) {
     account(id: $account) {
-      safes {
+      safes(orderBy:createdAt orderDirection:desc) {
         safe {
           ${safeQueryFields}
         }
@@ -298,6 +300,7 @@ export default class Safes {
 
 interface GraphQLSafeResult {
   id: string;
+  createdAt: string;
   owners: {
     owner: {
       id: string;
@@ -349,6 +352,7 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
   }
 
   let tokens: TokenInfo[] = [];
+  let createdAt = parseInt(safe.createdAt);
   for (let tokenDetail of safe.tokens) {
     tokens.push({
       tokenAddress: tokenDetail.token.id,
@@ -376,6 +380,7 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       address: safe.depot.id,
       infoDID: safe.depot.infoDid ? safe.depot.infoDid : undefined,
       tokens,
+      createdAt,
       owners,
     };
     return depot;
@@ -387,6 +392,7 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       accumulatedSpendValue: parseInt(safe.merchant.spendBalance),
       merchant: safe.merchant.merchant.id,
       tokens,
+      createdAt,
       owners,
     };
     return merchant;
@@ -403,6 +409,7 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       transferrable: safe.prepaidCard.payments.length === 0 && safe.prepaidCard.issuer.id === safe.prepaidCard.owner.id,
       prepaidCardOwner: safe.prepaidCard.owner.id,
       tokens,
+      createdAt,
       owners,
     };
     return prepaidCard;
@@ -411,6 +418,7 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       type: 'external',
       address: safe.id,
       tokens,
+      createdAt,
       owners,
     };
     return externalSafe;
