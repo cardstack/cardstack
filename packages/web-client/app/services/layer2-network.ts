@@ -114,6 +114,9 @@ export default class Layer2Network
       customizationDid,
       options
     );
+
+    taskFor(this.viewSafes).perform(this.walletInfo.firstAddress!);
+
     return address;
   }
 
