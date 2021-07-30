@@ -69,7 +69,7 @@ module('Acceptance | Card Editing', function (hooks) {
     await waitFor('[data-test-field-name="name"]');
     await fillIn('[data-test-field-name="name"]', 'Bob Barker');
     await fillIn('[data-test-field-name="city"]', 'San Francisco');
-    await this.pauseTest();
+
     await click(SAVE);
     await waitFor(MODAL, { count: 0 });
     assert.dom(MODAL).doesNotExist('The modal is closed');

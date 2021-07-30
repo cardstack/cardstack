@@ -1,0 +1,13 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "lint",
+			"path": "cardhost/",
+			"problemMatcher": [],
+			"label": "npm: lint - cardhost",
+			"detail": "npm-run-all --aggregate-output --continue-on-error --parallel 'lint:!(fix)'"
+		}
+	]
+}
