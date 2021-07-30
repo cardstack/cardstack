@@ -88,7 +88,7 @@ module(
         await waitFor('[data-test-issue-prepaid-card-error-message]');
         assert
           .dom('[data-test-issue-prepaid-card-button]')
-          .containsText('Retry');
+          .containsText('Try Again');
       });
       test('It shows the correct error message for a user rejection', async function (assert) {
         sinon
