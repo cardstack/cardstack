@@ -272,13 +272,13 @@ export default abstract class Layer2ChainWeb3Strategy
 
   async bridgeToLayer1(
     safeAddress: string,
+    receiverAddress: string,
     tokenSymbol: BridgeableSymbol,
     amountInWei: string
   ): Promise<TransactionHash> {
     let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
     let tokenAddress = new TokenContractInfo(tokenSymbol, this.networkSymbol)!
       .address;
-    let receiverAddress = this.walletInfo.firstAddress!;
 
     let result = await tokenBridge.relayTokens(
       safeAddress,
