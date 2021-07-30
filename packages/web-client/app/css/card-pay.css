@@ -57,22 +57,6 @@
   border-radius: var(--boxel-border-radius);
 }
 
-.card-pay-dashboard__sidebar-link.active {
-  background: var(--boxel-cyan);
-  color: var(--boxel-dark);
-}
-
 .card-pay-dashboard__sidebar-link .card-pay-dashboard__sidebar-link-header {
   font-weight: 600;
-}
-
-.card-pay-dashboard__sidebar-link .card-pay-dashboard__sidebar-link-icon {
-  opacity: 0;
-  margin-right: var(--boxel-sp);
-}
-
-.card-pay-dashboard__sidebar-link.active .card-pay-dashboard__sidebar-link-icon {
-  opacity: 1;
-
-  --icon-color: #000;
 }
