@@ -74,6 +74,22 @@ module(
     });
 
     module('Test the sdk prepaid card creation calls', async function () {
+      test('It shows the correct text in the creation button in the beginning and after errors', async function (assert) {
+        sinon
+          .stub(layer2Service, 'issuePrepaidCard')
+          .throws(new Error('An arbitrary error'));
+
+        assert
+          .dom('[data-test-issue-prepaid-card-button]')
+          .containsText('Create');
+
+        await click('[data-test-issue-prepaid-card-button]');
+
+        await waitFor('[data-test-issue-prepaid-card-error-message]');
+        assert
+          .dom('[data-test-issue-prepaid-card-button]')
+          .containsText('Retry');
+      });
       test('It shows the correct error message for a user rejection', async function (assert) {
         sinon
           .stub(layer2Service, 'issuePrepaidCard')

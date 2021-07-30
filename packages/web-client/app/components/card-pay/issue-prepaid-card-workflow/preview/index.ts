@@ -99,6 +99,10 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
     }
   }
 
+  get hasTriedCreatingPrepaidCard() {
+    return taskFor(this.issueTask).performCount > 0;
+  }
+
   get txViewerUrl() {
     return this.txHash && this.layer2Network.blockExplorerUrl(this.txHash);
   }
