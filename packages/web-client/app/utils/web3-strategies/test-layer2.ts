@@ -255,6 +255,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     let request = this.issuePrepaidCardRequests.get(faceValue);
     let prepaidCardSafe: PrepaidCardSafe = {
       type: 'prepaid-card',
+      createdAt: Date.now() / 1000,
       address: cardAddress,
       tokens: [],
       owners: [walletAddress],

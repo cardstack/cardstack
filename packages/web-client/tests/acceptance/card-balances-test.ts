@@ -45,6 +45,7 @@ module('Acceptance | card balances', function (hooks) {
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
       {
         type: 'prepaid-card',
+        createdAt: Date.now() / 1000,
 
         address: '0x123400000000000000000000000000000000abcd',
 
