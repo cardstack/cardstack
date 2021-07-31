@@ -23,7 +23,9 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   @tracked amount = '';
   @tracked isUnlocked = false;
   @tracked isUnlocking = false;
+  @tracked unlockTokensTxHash: string | undefined;
   @tracked unlockTxnReceipt: TransactionReceipt | undefined;
+  @tracked relayTokensTxHash: string | undefined;
   @tracked relayTokensTxnReceipt: TransactionReceipt | undefined;
   @tracked depositTxnReceipt: TransactionReceipt | undefined;
   @tracked isDepositing = false;
@@ -92,15 +94,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   }
 
   get unlockTxnViewerUrl() {
-    return this.layer1Network.blockExplorerUrl(
-      this.unlockTxnReceipt?.transactionHash
-    );
+    return this.layer1Network.blockExplorerUrl(this.unlockTokensTxHash);
   }
 
   get depositTxnViewerUrl() {
-    return this.layer1Network.blockExplorerUrl(
-      this.relayTokensTxnReceipt?.transactionHash
-    );
+    return this.layer1Network.blockExplorerUrl(this.relayTokensTxHash);
   }
 
   get isUnlockingOrUnlocked() {
@@ -139,7 +137,9 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       this.isUnlocking = true;
       let transactionReceipt = await taskFor(
         this.layer1Network.approve
-      ).perform(this.amountAsBigNumber, this.currentTokenSymbol);
+      ).perform(this.amountAsBigNumber, this.currentTokenSymbol, (txHash) => {
+        this.unlockTokensTxHash = txHash;
+      });
       this.isUnlocked = true;
       this.unlockTxnReceipt = transactionReceipt;
     } catch (e) {
@@ -163,7 +163,14 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       );
       let transactionReceipt = await taskFor(
         this.layer1Network.relayTokens
-      ).perform(this.currentTokenSymbol, layer2Address, this.amountAsBigNumber);
+      ).perform(
+        this.currentTokenSymbol,
+        layer2Address,
+        this.amountAsBigNumber,
+        (txHash) => {
+          this.relayTokensTxHash = txHash;
+        }
+      );
       this.relayTokensTxnReceipt = transactionReceipt;
       this.args.workflowSession.update(
         'relayTokensTxnReceipt',

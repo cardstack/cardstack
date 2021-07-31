@@ -71,6 +71,13 @@
       <i.ActionButton data-test-unlock-button>
         Unlocking
       </i.ActionButton>
+      {{#if this.unlockTxnViewerUrl}}
+        <i.InfoArea>
+          <Boxel::Button @as="anchor" @kind="secondary-dark" @size="extra-small" @href={{this.unlockTxnViewerUrl}} target="_blank" rel="noopener" data-test-unlock-etherscan-button>
+            View on Etherscan
+          </Boxel::Button>
+        </i.InfoArea>
+      {{/if}}
     </:in-progress>
     <:memorialized as |m|>
       <m.ActionStatusArea data-test-unlock-success-message>
@@ -78,7 +85,7 @@
       </m.ActionStatusArea>
       {{#if this.unlockTxnViewerUrl}}
       <m.InfoArea>
-        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.unlockTxnViewerUrl}} target="_blank" rel="noopener">
+        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.unlockTxnViewerUrl}} target="_blank" rel="noopener" data-test-unlock-etherscan-button>
           View on Etherscan
         </Boxel::Button>
       </m.InfoArea>
@@ -100,6 +107,13 @@
       <i.ActionButton data-test-deposit-button>
         Depositing
       </i.ActionButton>
+      {{#if this.depositTxnViewerUrl}}
+        <i.InfoArea>
+          <Boxel::Button @as="anchor" @kind="secondary-dark" @size="extra-small" @href={{this.depositTxnViewerUrl}} target="_blank" rel="noopener" data-test-deposit-etherscan-button>
+            View on Etherscan
+          </Boxel::Button>
+        </i.InfoArea>
+      {{/if}}
     </:in-progress>
     <:memorialized as |m|>
       <m.ActionStatusArea data-test-deposit-success-message>
@@ -107,7 +121,7 @@
       </m.ActionStatusArea>
       {{#if this.depositTxnViewerUrl}}
       <m.InfoArea>
-        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.depositTxnViewerUrl}} target="_blank" rel="noopener">
+        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.depositTxnViewerUrl}} target="_blank" rel="noopener" data-test-deposit-etherscan-button>
           View on Etherscan
         </Boxel::Button>
       </m.InfoArea>

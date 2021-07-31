@@ -10,11 +10,13 @@ import { BridgeableSymbol, TokenContractInfo } from '../token';
 import WalletInfo from '../wallet-info';
 import { WalletProvider } from '../wallet-providers';
 import {
+  ApproveOptions,
   Layer1ChainEvent,
   Layer1Web3Strategy,
   TransactionHash,
   Layer1NetworkSymbol,
   ClaimBridgedTokensOptions,
+  RelayTokensOptions,
 } from './types';
 import {
   BridgeValidationResult,
@@ -246,27 +248,31 @@ export default abstract class Layer1ChainWeb3Strategy
 
   async approve(
     amountInWei: BN,
-    tokenSymbol: BridgeableSymbol
+    tokenSymbol: BridgeableSymbol,
+    { onTxHash }: ApproveOptions
   ): Promise<TransactionReceipt> {
     if (!this.web3) throw new Error('Cannot unlock tokens without web3');
     let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
     return tokenBridge.unlockTokens(
       new TokenContractInfo(tokenSymbol, this.networkSymbol).address,
-      amountInWei.toString()
+      amountInWei.toString(),
+      onTxHash
     );
   }
 
   async relayTokens(
     tokenSymbol: BridgeableSymbol,
     receiverAddress: string,
-    amountInWei: BN
+    amountInWei: BN,
+    { onTxHash }: RelayTokensOptions
   ): Promise<TransactionReceipt> {
     if (!this.web3) throw new Error('Cannot relay tokens without web3');
     let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
     return tokenBridge.relayTokens(
       new TokenContractInfo(tokenSymbol, this.networkSymbol).address,
       receiverAddress,
-      amountInWei.toString()
+      amountInWei.toString(),
+      onTxHash
     );
   }
 

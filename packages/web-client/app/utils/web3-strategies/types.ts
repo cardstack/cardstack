@@ -30,6 +30,14 @@ export interface Web3Strategy {
   bridgeExplorerUrl(txnHash: TransactionHash): string;
 }
 
+export interface ApproveOptions {
+  onTxHash?(txHash: TransactionHash): void;
+}
+
+export interface RelayTokensOptions {
+  onTxHash?(txHash: TransactionHash): void;
+}
+
 export interface IssuePrepaidCardOptions {
   onTxHash?(txHash: TransactionHash): void;
 }
@@ -50,11 +58,16 @@ export interface Layer1Web3Strategy
   refreshBalances(): void;
   connect(walletProvider: WalletProvider): Promise<void>;
   waitForAccount: Promise<void>;
-  approve(amountInWei: BN, token: string): Promise<TransactionReceipt>;
+  approve(
+    amountInWei: BN,
+    token: string,
+    options?: ApproveOptions
+  ): Promise<TransactionReceipt>;
   relayTokens(
     token: ChainAddress,
     destinationAddress: ChainAddress,
-    amountInWei: BN
+    amountInWei: BN,
+    options?: RelayTokensOptions
   ): Promise<TransactionReceipt>;
   blockExplorerUrl(txnHash: TransactionHash): string;
   claimBridgedTokens(

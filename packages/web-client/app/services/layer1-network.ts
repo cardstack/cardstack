@@ -4,6 +4,7 @@ import {
   ClaimBridgedTokensOptions,
   Layer1ChainEvent,
   Layer1Web3Strategy,
+  TransactionHash,
 } from '../utils/web3-strategies/types';
 import Layer1TestWeb3Strategy from '../utils/web3-strategies/test-layer1';
 import EthWeb3Strategy from '../utils/web3-strategies/ethereum';
@@ -83,21 +84,26 @@ export default class Layer1Network
 
   @task *approve(
     amount: BN,
-    tokenSymbol: string
+    tokenSymbol: string,
+    onTxHash: (txHash: TransactionHash) => void
   ): TaskGenerator<TransactionReceipt> {
-    let txnReceipt = yield this.strategy.approve(amount, tokenSymbol);
+    let txnReceipt = yield this.strategy.approve(amount, tokenSymbol, {
+      onTxHash,
+    });
     return txnReceipt;
   }
 
   @task *relayTokens(
     tokenSymbol: string,
     destinationAddress: string,
-    amount: BN
+    amount: BN,
+    onTxHash: (txHash: TransactionHash) => void
   ): TaskGenerator<TransactionReceipt> {
     let txnReceipt = yield this.strategy.relayTokens(
       tokenSymbol,
       destinationAddress,
-      amount
+      amount,
+      { onTxHash }
     );
     yield this.strategy.refreshBalances();
     return txnReceipt;

@@ -187,6 +187,13 @@ module('Acceptance | deposit', function (hooks) {
 
     assert.dom('[data-test-deposit-amount-entered]').containsText('250.00 DAI');
 
+    assert.dom(`${post} [data-test-unlock-etherscan-button]`).doesNotExist();
+
+    layer1Service.test__simulateUnlockTxHash();
+    await settled();
+
+    assert.dom(`${post} [data-test-unlock-etherscan-button]`).exists();
+
     layer1Service.test__simulateUnlock();
     await settled();
 
@@ -207,6 +214,13 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(`${post} [data-test-deposit-button]`)
       .hasClass('boxel-button--loading');
+
+    assert.dom(`${post} [data-test-deposit-etherscan-button]`).doesNotExist();
+
+    layer1Service.test__simulateDepositTxHash();
+    await settled();
+
+    assert.dom(`${post} [data-test-deposit-etherscan-button]`).exists();
 
     layer1Service.test__simulateDeposit();
     await settled();
