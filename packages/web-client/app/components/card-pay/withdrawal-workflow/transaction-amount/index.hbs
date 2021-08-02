@@ -51,9 +51,13 @@
         </CardPay::LabeledValue>
       {{/unless}}
     </div>
-    {{#if this.errorMessage}}
-      <CardPay::ErrorMessage as |supportURL|>
-        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+    {{#if this.error}}
+      <CardPay::ErrorMessage data-test-withdrawal-transaction-amount-error as |supportURL|>
+        {{#if (eq this.error.message "USER_REJECTION")}}
+          It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.
+        {{else}}
+          There was a problem initiating the withdrawal of your tokens from {{network-display-info "layer2" "fullName"}}. Please try again, or contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+        {{/if}}
       </CardPay::ErrorMessage>
     {{/if}}
     <div class="withdrawal-transaction-amount__footnote" data-test-approximate-value-footnote>
@@ -67,7 +71,7 @@
   >
     <:default as |d|>
       <d.ActionButton {{on "click" this.withdraw}}>
-        Withdraw
+        {{if this.error "Try Again" "Withdraw"}}
       </d.ActionButton>
     </:default>
     <:in-progress as |i|>
