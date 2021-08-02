@@ -83,6 +83,7 @@ export default abstract class Layer2ChainWeb3Strategy
   @task *initializeTask(): TaskGenerator<void> {
     this.web3 = new Web3();
     this.provider = new WalletConnectProvider({
+      pollingInterval: 30000,
       chainId: this.chainId,
       rpc: {
         [networkIds[this.networkSymbol]]: getConstantByNetwork(
