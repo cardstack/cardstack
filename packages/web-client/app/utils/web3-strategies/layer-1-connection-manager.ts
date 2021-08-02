@@ -1,7 +1,7 @@
 import detectEthereumProvider from '@metamask/detect-provider';
 import Web3 from 'web3';
 import { NetworkSymbol } from './types';
-import WalletConnectProvider from '@walletconnect/web3-provider';
+import WalletConnectProvider from '../wc-provider';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import config from '../../config/environment';
 import CustomStorageWalletConnect, {
@@ -10,6 +10,7 @@ import CustomStorageWalletConnect, {
 import { Emitter, SimpleEmitter } from '../events';
 import { WalletProviderId } from '../wallet-providers';
 import { action } from '@ember/object';
+import { getConstantByNetwork, networkIds } from '@cardstack/cardpay-sdk';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
@@ -262,6 +263,18 @@ class WalletConnectConnectionManager extends ConnectionManager {
       pollingInterval: 30000,
       chainId,
       infuraId: config.infuraId,
+      rpc: {
+        [networkIds[this.networkSymbol]]: getConstantByNetwork(
+          'rpcNode',
+          this.networkSymbol
+        ),
+      },
+      rpcWss: {
+        [networkIds[this.networkSymbol]]: getConstantByNetwork(
+          'rpcWssNode',
+          this.networkSymbol
+        ),
+      },
       // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
       connector: new CustomStorageWalletConnect(
         {

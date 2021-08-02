@@ -24,24 +24,52 @@ import HookedWalletSubprovider from 'web3-provider-engine/subproviders/hooked-wa
 import NonceSubprovider from 'web3-provider-engine/subproviders/nonce-tracker';
 import SubscriptionsSubprovider from 'web3-provider-engine/subproviders/subscriptions';
 
+import Web3 from 'web3';
+import { SubscribeBlockTracker } from 'eth-block-tracker';
+
+export interface ICardstackWalletConnectProviderOptions
+  extends IWalletConnectProviderOptions {
+  rpcWss: IRPCMap;
+}
+
+class PatchedSubscribeBlockTracker extends SubscribeBlockTracker {
+  _handleSubData(response: any): void {
+    super._handleSubData(null, response);
+  }
+}
+
 class WalletConnectProvider extends ProviderEngine {
   public bridge = 'https://bridge.walletconnect.org';
   public qrcode = true;
   public qrcodeModal = QRCodeModal;
   public qrcodeModalOptions: IQRCodeModalOptions | undefined = undefined;
   public rpc: IRPCMap | null = null;
-  public infuraId = '';
+  public rpcWss: IRPCMap;
   public http: HttpConnection | null = null;
   public wc: IConnector;
   public isConnecting = false;
   public connected = false;
   public connectCallbacks: any[] = [];
   public accounts: string[] = [];
-  public chainId = 1;
+  public chainId!: number;
   public rpcUrl = '';
+  public websocketProvider!: Web3.providers.WebsocketProvider;
 
-  constructor(opts: IWalletConnectProviderOptions) {
-    super({ pollingInterval: opts.pollingInterval || 8000 });
+  constructor(opts: ICardstackWalletConnectProviderOptions) {
+    let rpcWss: IRPCMap = opts.rpcWss || null;
+    let chainId: number = opts.chainId!;
+    let websocketProvider = new Web3.providers.WebsocketProvider(
+      rpcWss[chainId]
+    );
+    websocketProvider.sendAsync = websocketProvider.send;
+    super({
+      blockTracker: new PatchedSubscribeBlockTracker({
+        provider: websocketProvider,
+      }),
+    });
+    this.rpcWss = rpcWss;
+    this.chainId = chainId;
+    this.websocketProvider = websocketProvider;
     this.bridge = opts.connector
       ? opts.connector.bridge
       : opts.bridge || 'https://bridge.walletconnect.org';
@@ -70,8 +98,18 @@ class WalletConnectProvider extends ProviderEngine {
       );
     }
     this.infuraId = opts.infuraId || '';
-    this.chainId = opts?.chainId || this.chainId;
     this.initialize();
+
+    let socket = new WebSocket(this.rpcWss[this.chainId], []);
+    socket.addEventListener('close', function () {
+      console.log('close', ...arguments);
+    });
+    socket.addEventListener('message', function () {
+      console.log('message', ...arguments);
+    });
+    socket.addEventListener('open', function () {
+      console.log('open', ...arguments);
+    });
   }
 
   get isWalletConnect() {
@@ -205,6 +243,17 @@ class WalletConnectProvider extends ProviderEngine {
   }
 
   async handleReadRequests(payload: any): Promise<IJsonRpcResponseSuccess> {
+    if (this.websocketProvider) {
+      return new Promise((resolve, reject) => {
+        this.websocketProvider.sendAsync(payload, (err: Error, res: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(res);
+          }
+        });
+      });
+    }
     if (!this.http) {
       const error = new Error('HTTP Connection not available');
       this.emit('error', error);

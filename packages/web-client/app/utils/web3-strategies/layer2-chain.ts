@@ -91,6 +91,12 @@ export default abstract class Layer2ChainWeb3Strategy
           this.networkSymbol
         ),
       },
+      rpcWss: {
+        [networkIds[this.networkSymbol]]: getConstantByNetwork(
+          'rpcWssNode',
+          this.networkSymbol
+        ),
+      },
       connector: new CustomStorageWalletConnect(
         {
           bridge: BRIDGE,
