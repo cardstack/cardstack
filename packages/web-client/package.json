@@ -61,10 +61,10 @@
     "@types/ember__test-helpers": "^1.7.3",
     "@types/ember__utils": "^3.16.2",
     "@types/htmlbars-inline-precompile": "^1.0.1",
+    "@types/web3-provider-engine": "^14.0.1",
     "@types/qunit": "^2.11.1",
     "@types/rsvp": "^4.0.3",
     "@types/web3": "^1.2.2",
-    "@walletconnect/web3-provider": "^1.5.0",
     "babel-eslint": "^10.1.0",
     "bn.js": "^5.2.0",
     "broccoli-asset-rev": "^3.0.0",
@@ -146,14 +146,19 @@
     "extends": "../../package.json"
   },
   "dependencies": {
-    "@walletconnect/client": "^1.5.0",
+    "@walletconnect/client": "^1.5.2",
+    "@walletconnect/http-connection": "^1.5.2",
+    "@walletconnect/qrcode-modal": "^1.5.2",
+    "@walletconnect/types": "^1.5.2",
+    "@walletconnect/utils": "^1.5.2",
+    "@walletconnect/web3-provider": "^1.5.0",
     "@walletconnect/core": "^1.5.0",
     "@walletconnect/iso-crypto": "^1.5.0",
-    "@walletconnect/qrcode-modal": "^1.5.0",
     "broadcastchannel-polyfill": "^1.0.1",
     "ember-cli-dependency-lint": "^2.0.0",
     "macro-decorators": "^0.1.2",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.3",
+    "web3-provider-engine": "^16.0.3"
   },
   "config": {
     "access": "public"
