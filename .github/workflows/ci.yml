@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: rwjblue/setup-volta@v1
         with:
-          node-version: '14'
+          node-version: '16'
       - name: 'Global yarn'
         run: volta install yarn
       - name: Find yarn cache
