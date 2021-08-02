@@ -61,8 +61,7 @@
     "lint:types": "tsc",
     "start": "webpack serve",
     "test": "npm-run-all lint test:*",
-    "test:node": "node --loader ts-node/esm ../node_modules/.bin/qunit 'tests/**/*-test.ts'",
-    "test:browser": "webpack && testem ci"
+    "test:stub": "echo 'test stub'"
   },
   "volta": {
     "extends": "../package.json"
