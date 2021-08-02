@@ -155,10 +155,16 @@ export default class Layer2Network
 
   async bridgeToLayer1(
     safeAddress: string,
+    receiverAddress: string,
     tokenSymbol: BridgeableSymbol,
     amount: string
   ): Promise<TransactionHash> {
-    return this.strategy.bridgeToLayer1(safeAddress, tokenSymbol, amount);
+    return this.strategy.bridgeToLayer1(
+      safeAddress,
+      receiverAddress,
+      tokenSymbol,
+      amount
+    );
   }
 
   async awaitBridgedToLayer1(fromBlock: BN, transactionHash: TransactionHash) {

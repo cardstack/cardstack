@@ -84,6 +84,7 @@ export interface Layer2Web3Strategy
   ): Promise<TransactionReceipt>;
   bridgeToLayer1(
     safeAddress: string,
+    receiverAddress: string,
     tokenSymbol: BridgeableSymbol,
     amountInWei: string
   ): Promise<TransactionHash>;

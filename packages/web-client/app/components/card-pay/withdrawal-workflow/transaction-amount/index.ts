@@ -1,6 +1,7 @@
 import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { inject as service } from '@ember/service';
 import BN from 'bn.js';
@@ -20,6 +21,7 @@ import {
 } from '@cardstack/web-client/utils/validation';
 
 class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
+  @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @tracked amount = '';
   @tracked amountIsValid = false;
@@ -114,6 +116,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       return;
     }
     try {
+      let layer1Address = this.layer1Network.walletInfo.firstAddress;
       this.isConfirmed = true;
       let { currentTokenSymbol } = this;
       let withdrawnAmount = this.amountAsBigNumber.toString();
@@ -122,6 +125,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
 
       let transactionHash = await this.layer2Network.bridgeToLayer1(
         this.layer2Network.depotSafe?.address!,
+        layer1Address!,
         getUnbridgedSymbol(currentTokenSymbol),
         withdrawnAmount
       );
