@@ -105,6 +105,27 @@ module('Acceptance | issue prepaid card', function (hooks) {
       defaultToken: SLIGHTLY_LESS_THAN_MAX_VALUE,
       card: new BN('250000000000000000000'),
     });
+
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      {
+        type: 'prepaid-card',
+        createdAt: Date.now() / 1000,
+
+        address: '0x123400000000000000000000000000000000abcd',
+
+        tokens: [],
+        owners: [layer2AccountAddress],
+
+        issuingToken: '0xTOKEN',
+        spendFaceValue: 2324,
+        prepaidCardOwner: layer2AccountAddress,
+        hasBeenUsed: false,
+        issuer: layer2AccountAddress,
+        reloadable: false,
+        transferrable: false,
+      },
+    ]);
+
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     let testDepot = {
       address: depotAddress,
@@ -135,6 +156,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .isVisible();
 
     await settled();
+
+    assert.dom('[data-test-prepaid-cards-count]').containsText('1');
 
     assert
       .dom(milestoneCompletedSel(0))
@@ -490,6 +513,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
       )} [data-test-issue-prepaid-card-next-step="dashboard"]`
     );
     assert.dom('[data-test-workflow-thread]').doesNotExist();
+
+    assert.dom('[data-test-prepaid-cards-count]').containsText('2');
   });
 
   // test('Initiating workflow with layer 2 wallet already connected', async function (assert) {

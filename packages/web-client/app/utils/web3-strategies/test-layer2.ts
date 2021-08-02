@@ -271,6 +271,9 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       ...options,
     };
     request?.onTxHash?.('exampleTxHash');
+
+    this.test__simulateAccountSafes(walletAddress, [prepaidCardSafe]);
+
     return request?.deferred.resolve(prepaidCardSafe);
   }
 
