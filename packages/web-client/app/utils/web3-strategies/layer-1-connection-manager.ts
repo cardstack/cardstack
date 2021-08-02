@@ -259,6 +259,7 @@ class WalletConnectConnectionManager extends ConnectionManager {
       clearWalletConnectStorage(chainId);
     }
     let provider = new WalletConnectProvider({
+      pollingInterval: 30000,
       chainId,
       infuraId: config.infuraId,
       // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
