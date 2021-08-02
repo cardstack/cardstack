@@ -17,7 +17,6 @@ import {
   respondWithCardForPath,
   updateCard,
 } from './routes/card-routes';
-import { assertCardExists } from './middleware/card-utils';
 
 function unimpl() {
   throw new Error('unimplemented');
@@ -46,17 +45,17 @@ export class Server {
     // the 'cards' section of the API deals in card data. The shape of the data
     // on these endpoints is determined by each card's own schema.
     koaRouter.post(`/cards/:realmURL/:parentCardURL`, createDataCard);
-    koaRouter.get(`/cards/:encodedCardURL`, assertCardExists, getCard);
-    koaRouter.patch(`/cards/:encodedCardURL`, assertCardExists, updateCard);
-    koaRouter.delete(`/cards/:encodedCardURL`, assertCardExists, deleteCard);
+    koaRouter.get(`/cards/:encodedCardURL`, getCard);
+    koaRouter.patch(`/cards/:encodedCardURL`, updateCard);
+    koaRouter.delete(`/cards/:encodedCardURL`, deleteCard);
 
     // the 'sources' section of the API deals in RawCards. It's where you can do
     // CRUD operations on the sources themselves. It's a superset of what you
     // can do via the 'cards' section.
     koaRouter.post(`/sources/new`, unimpl);
-    koaRouter.get(`/sources/:encordedCardURL`, assertCardExists, unimpl);
-    koaRouter.patch(`/sources/:encodedCardURL`, assertCardExists, unimpl);
-    koaRouter.delete(`/sources/:encodedCardURL`, assertCardExists, unimpl);
+    koaRouter.get(`/sources/:encordedCardURL`, unimpl);
+    koaRouter.patch(`/sources/:encodedCardURL`, unimpl);
+    koaRouter.delete(`/sources/:encodedCardURL`, unimpl);
 
     // card-based routing is a layer on top of the 'cards' section where you can
     // fetch card data indirectly.
