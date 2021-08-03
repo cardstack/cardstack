@@ -94,7 +94,7 @@ module(
       await click('[data-test-unlock-button]');
 
       assert.ok(
-        approveSpy.calledOnceWith(new BN(daiToSendInWei), 'DAI'),
+        approveSpy.calledWith(new BN(daiToSendInWei), 'DAI'),
         'The amount that the approve call is made with matches the amount shown in the UI'
       );
     });

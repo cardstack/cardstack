@@ -1,9 +1,11 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
 import {
+  ApproveOptions,
   Layer1Web3Strategy,
   TransactionHash,
   ClaimBridgedTokensOptions,
+  RelayTokensOptions,
 } from './types';
 import { defer } from 'rsvp';
 import RSVP from 'rsvp';
@@ -40,7 +42,9 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   @tracked cardBalance: BN | undefined;
 
   waitForAccountDeferred = defer();
+  #unlockOnTxHash: Function | undefined;
   #unlockDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
+  #depositOnTxHash: Function | undefined;
   #depositDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
   claimBridgedTokensRequests: Map<
     string,
@@ -65,12 +69,19 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     this.disconnect();
   }
 
-  approve(_amountInWei: BN, _token: string) {
+  approve(_amountInWei: BN, _token: string, { onTxHash }: ApproveOptions) {
+    this.#unlockOnTxHash = onTxHash;
     this.#unlockDeferred = RSVP.defer();
     return this.#unlockDeferred.promise;
   }
 
-  relayTokens(_token: string, _destinationAddress: string, _amountInWei: BN) {
+  relayTokens(
+    _token: string,
+    _destinationAddress: string,
+    _amountInWei: BN,
+    { onTxHash }: RelayTokensOptions
+  ) {
+    this.#depositOnTxHash = onTxHash;
     this.#depositDeferred = RSVP.defer();
     return this.#depositDeferred.promise;
   }
@@ -119,6 +130,10 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     }
   }
 
+  test__simulateUnlockTxHash() {
+    this.#unlockOnTxHash?.('0xABC');
+  }
+
   test__simulateUnlock() {
     this.#unlockDeferred?.resolve({
       status: true,
@@ -135,6 +150,10 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
       logsBloom: '',
       events: {},
     });
+  }
+
+  test__simulateDepositTxHash() {
+    this.#depositOnTxHash?.('0xDEF');
   }
 
   test__simulateDeposit() {
