@@ -114,7 +114,6 @@ export class Compiler {
 
     return {
       url: cardSource.url,
-      data: cardSource.data,
       serializer,
       schemaModule,
       fields,

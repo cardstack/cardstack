@@ -76,7 +76,6 @@ export interface Field {
 export interface CompiledCard {
   url: string;
   adoptsFrom?: CompiledCard;
-  data: Record<string, any> | undefined;
   fields: {
     [key: string]: Field;
   };

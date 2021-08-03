@@ -25,13 +25,15 @@ export interface CardStackContext {
 }
 
 export interface RealmInterface {
-  directory: string;
-  manager: RealmManager;
-  getRawCard(cardURL: string): RawCard;
-  updateCardData(cardURL: string, attributes: any): void;
+  getRawCard(cardURL: string): Promise<RawCard>;
+  updateCardData(cardURL: string, attributes: any): Promise<RawCard>;
   deleteCard(cardURL: string): void;
   doesCardExist(cardURL: string): boolean;
-  createDataCard(card: Partial<RawCard>, cardURL?: string): Promise<RawCard>;
+  createDataCard(
+    data: any,
+    adoptsFrom: string,
+    cardURL?: string
+  ): Promise<RawCard>;
 }
 
 export interface Cache<CardType> {

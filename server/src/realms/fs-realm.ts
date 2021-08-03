@@ -61,7 +61,7 @@ export default class FSRealm implements RealmInterface {
     }
   }
 
-  getRawCard(cardURL: string): RawCard {
+  async getRawCard(cardURL: string): Promise<RawCard> {
     let dir = this.getRawCardLocation(cardURL);
     let files: any = {};
 
@@ -86,29 +86,35 @@ export default class FSRealm implements RealmInterface {
   }
 
   async createDataCard(
-    card: Partial<RawCard>,
+    data: any,
+    adoptsFrom: string,
     cardURL?: string
   ): Promise<RawCard> {
-    if (!card.adoptsFrom) {
+    if (!adoptsFrom) {
       throw new Error('Card needs a parent!');
     }
 
-    if (!this.manager.doesCardExist(card.adoptsFrom)) {
-      throw new NotFound(`Parent card does not exist: ${card.adoptsFrom}`);
+    if (!this.manager.doesCardExist(adoptsFrom)) {
+      throw new NotFound(`Parent card does not exist: ${adoptsFrom}`);
     }
 
     if (!cardURL) {
-      cardURL = await this.generateIdFromParent(card.adoptsFrom);
+      cardURL = await this.generateIdFromParent(adoptsFrom);
     } else {
       this.ensureIDIsUnique(cardURL);
     }
 
     let cardDir = this.buildCardPath(cardURL);
     ensureDirSync(cardDir);
-    writeJsonSync(join(cardDir, 'card.json'), card);
 
-    Object.assign(card, { url: cardURL });
+    let card: RawCard = {
+      url: cardURL,
+      adoptsFrom,
+      data,
+    };
+
     assertValidRawCard(card);
+    writeJsonSync(join(cardDir, 'card.json'), card);
 
     return card;
   }
@@ -119,12 +125,15 @@ export default class FSRealm implements RealmInterface {
     return `${this.url}${name}-${id}`;
   }
 
-  updateCardData(cardURL: string, attributes: any): void {
+  async updateCardData(cardURL: string, attributes: any): Promise<RawCard> {
     let cardJSONPath = join(this.getRawCardLocation(cardURL), 'card.json');
 
     let card = readJsonSync(cardJSONPath);
     card.data = Object.assign(card.data, attributes);
     writeJsonSync(cardJSONPath, card);
+    Object.assign(card, { url: cardURL });
+    assertValidRawCard(card);
+    return card;
   }
 
   deleteCard(cardURL: string) {

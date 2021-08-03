@@ -95,7 +95,11 @@ Qmodule('CardModel', function () {
     });
 
     test('#serialize', async function (assert) {
-      let serialized = PersonCardModel.serialize(personCard, 'isolated');
+      let serialized = PersonCardModel.serialize(
+        PERSON_RAW_CARD.url,
+        attributes,
+        personCard['isolated']
+      );
       assert.deepEqual(serialized, {
         data: {
           id: PERSON_RAW_CARD.url,

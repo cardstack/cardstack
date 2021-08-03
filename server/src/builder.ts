@@ -2,7 +2,6 @@ import {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
-  cardJSONReponse,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 
@@ -85,36 +84,6 @@ export default class Builder implements BuilderInterface {
     let compiledCard = await this.compileCardFromRaw(url, rawCard);
 
     return compiledCard;
-  }
-
-  async updateCardData(url: string, attributes: any): Promise<CompiledCard> {
-    this.realms.updateCardData(url, attributes);
-
-    // Cache: Merge data into compiled.json
-    let compiledCard = await this.getCompiledCard(url);
-    compiledCard.data = Object.assign(compiledCard.data, attributes);
-    this.cache.setCard(url, compiledCard);
-
-    return compiledCard;
-  }
-
-  async createDataCard(
-    realmURL: string,
-    parentCardURL: string,
-    data: cardJSONReponse['data']
-  ): Promise<CompiledCard> {
-    let parentCard = await this.getCompiledCard(parentCardURL);
-
-    let card: Partial<RawCard> = {
-      adoptsFrom: parentCard.url,
-      data: data.attributes,
-    };
-
-    let rawCard = await this.realms
-      .getRealm(realmURL)
-      .createDataCard(card, data.id);
-
-    return this.compileCardFromRaw(rawCard.url, rawCard);
   }
 
   async compileCardFromRaw(

@@ -41,7 +41,6 @@ Qmodule('Compiler', function (hooks) {
       'https://cardstack.com/base/string'
     );
     assert.equal(compiled.adoptsFrom?.url, baseCardURL);
-    assert.notOk(compiled.data, 'no data');
     assert.equal(compiled.embedded.inlineHBS, '{{@model}}');
     assert.deepEqual(compiled.embedded.usedFields, []);
     assert.ok(!compiled.serializer, 'String card has no deserializer');

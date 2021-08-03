@@ -4,7 +4,7 @@ import { NotFound } from './middleware/errors';
 import { RealmInterface } from './interfaces';
 import { ensureTrailingSlash } from './utils/path';
 
-export default class RealmManager {
+export default class RealmManager implements RealmInterface {
   realms: Realm[];
 
   constructor(realmConfigs: RealmConfig[]) {
@@ -32,22 +32,28 @@ export default class RealmManager {
   }
 
   doesCardExist(url: string): boolean {
-    let realm = this.getRealm(url);
-    return realm.doesCardExist(url);
+    return this.getRealm(url).doesCardExist(url);
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    let realm = this.getRealm(url);
-    return realm.getRawCard(url);
+    return this.getRealm(url).getRawCard(url);
   }
 
-  async updateCardData(cardURL: string, attributes: any): Promise<void> {
-    let realm = this.getRealm(cardURL);
-    realm.updateCardData(cardURL, attributes);
+  async updateCardData(cardURL: string, attributes: any): Promise<RawCard> {
+    return this.getRealm(cardURL).updateCardData(cardURL, attributes);
+  }
+
+  async createDataCard(
+    realmURL: string,
+    data: any,
+    adoptsFrom: string,
+    cardURL?: string
+  ): Promise<RawCard> {
+    let realm = this.getRealm(realmURL);
+    return realm.createDataCard(data, adoptsFrom, cardURL);
   }
 
   async deleteCard(cardURL: string) {
-    let realm = this.getRealm(cardURL);
-    realm.deleteCard(cardURL);
+    return this.getRealm(cardURL).deleteCard(cardURL);
   }
 }

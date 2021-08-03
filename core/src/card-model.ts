@@ -1,7 +1,6 @@
 import {
   cardJSONReponse,
-  CompiledCard,
-  Format,
+  ComponentInfo,
   SerializerMap,
   SerializerName,
   Setter,
@@ -102,18 +101,14 @@ export default class CardModel {
     return constructJSONAPIResponse(attributes, url);
   }
 
-  static serialize(card: CompiledCard, format: Format): cardJSONReponse {
-    let attributes = serializeAttributes(
-      card.data,
-      'serialize',
-      this.serializerMap
-    );
+  static serialize(
+    url: string,
+    data: any,
+    component: ComponentInfo
+  ): cardJSONReponse {
+    let attributes = serializeAttributes(data, 'serialize', this.serializerMap);
 
-    return constructJSONAPIResponse(
-      attributes,
-      card.url,
-      card[format].moduleName
-    );
+    return constructJSONAPIResponse(attributes, url, component.moduleName);
   }
 
   private makeSetter(segments: string[] = []): Setter {
