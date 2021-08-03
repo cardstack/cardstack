@@ -103,7 +103,7 @@ export default class Builder implements BuilderInterface {
     parentCardURL: string,
     data: cardJSONReponse['data']
   ): Promise<CompiledCard> {
-    let parentCard = await this.getTrueParentCard(parentCardURL);
+    let parentCard = await this.getCompiledCard(parentCardURL);
 
     let card: Partial<RawCard> = {
       adoptsFrom: parentCard.url,
@@ -130,26 +130,5 @@ export default class Builder implements BuilderInterface {
   async deleteCard(cardURL: string) {
     await this.cache.deleteCard(cardURL);
     await this.realms.deleteCard(cardURL);
-  }
-
-  // Find the card that actually defines schema
-  private async getTrueParentCard(
-    parentCardURL: string
-  ): Promise<CompiledCard> {
-    let parentCard: CompiledCard | undefined = undefined;
-    let possibleParent = await this.getCompiledCard(parentCardURL);
-
-    while (!parentCard) {
-      if (possibleParent.schemaModule) {
-        parentCard = possibleParent;
-      } else if (possibleParent.adoptsFrom) {
-        possibleParent = possibleParent.adoptsFrom;
-      } else {
-        throw new Error(
-          'Card doesnt have a parent card with a schema. This should not happen'
-        );
-      }
-    }
-    return parentCard;
   }
 }

@@ -153,26 +153,6 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   }
 }
 
-export function assertValidCompiledCard(
-  card: any
-): asserts card is CompiledCard {
-  if (!card) {
-    throw new Error(`Not a valid Compiled Card`);
-  }
-
-  if (!card.url) {
-    throw new Error(`CompiledCards must include a url`);
-  }
-
-  if (card.data) {
-    assertValidKeys(
-      Object.keys(card.data),
-      Object.keys(card.fields),
-      `Field(s) %list% does not exist on card "${card.url}"`
-    );
-  }
-}
-
 export function assertValidKeys(
   actualKeys: string[],
   expectedKeys: string[],
