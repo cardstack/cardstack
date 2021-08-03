@@ -10,6 +10,7 @@
     <div class="issue-prepaid-card-workflow-confirmation__card-container">
       <CardPay::PrepaidCardSafe
         @safe={{@workflowSession.state.prepaidCardSafe}}
+        @waitForCustomization={{true}}
         class="issue-prepaid-card-workflow-confirmation__card"
       />
     </div>
