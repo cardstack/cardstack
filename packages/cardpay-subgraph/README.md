@@ -4,7 +4,7 @@ This project includes the subgraph necessary to generate a GraphQL based query s
 
 The subgraph is hosted at:
 - sokol: https://thegraph.com/explorer/subgraph/habdelra/cardpay-sokol
-- xdai: https://thegraph.com/explorer/subgraph/habdelra/cardpay-xdai (TBD)
+- xdai: https://thegraph.com/explorer/subgraph/habdelra/cardpay-xdai
 
 On these URL's you will find a GraphQL explorer to help craft your queries.
 
