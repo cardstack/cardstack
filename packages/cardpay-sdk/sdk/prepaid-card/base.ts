@@ -22,7 +22,7 @@ import {
   getSendPayload,
   executeSend,
 } from '../utils/safe-utils';
-import { waitUntilTransactionMined } from '../utils/general-utils';
+import { waitUntilBlock, waitUntilTransactionMined } from '../utils/general-utils';
 import { signSafeTxAsRSV, Signature, signSafeTxAsBytes } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
 
@@ -321,7 +321,7 @@ export default class PrepaidCard {
         let txnHashes = new Set<string>();
         await Promise.all(
           prepaidCardAddresses.map((address) =>
-            this.loadGasIntoPrepaidCard(address, (txnHash) => {
+            this.loadGasIntoPrepaidCard(address, gnosisTxn.ethereumTx.txHash, (txnHash) => {
               txnHashes.add(txnHash);
               if (txnHashes.size === prepaidCardAddresses.length && typeof onGasLoaded === 'function') {
                 onGasLoaded([...txnHashes]);
@@ -451,7 +451,7 @@ export default class PrepaidCard {
     let txnHashes = new Set<string>();
     await Promise.all(
       prepaidCardAddresses.map((address) =>
-        this.loadGasIntoPrepaidCard(address, (txnHash) => {
+        this.loadGasIntoPrepaidCard(address, gnosisTxn.ethereumTx.txHash, (txnHash) => {
           txnHashes.add(txnHash);
           if (txnHashes.size === prepaidCardAddresses.length && typeof onGasLoaded === 'function') {
             onGasLoaded([...txnHashes]);
@@ -484,8 +484,13 @@ export default class PrepaidCard {
 
   private async loadGasIntoPrepaidCard(
     prepaidCardAddress: string,
+    createPrepaidCardTxnHash: string,
     onTxnHash?: (txnHash: string) => void
   ): Promise<void> {
+    let receipt = await waitUntilTransactionMined(this.layer2Web3, createPrepaidCardTxnHash);
+    // wait 2 block confirmations to ensure blocks have propagated to relay server
+    await waitUntilBlock(this.layer2Web3, receipt.blockNumber + 2);
+
     let relayServiceURL = await getConstant('relayServiceURL', this.layer2Web3);
     let url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/load-gas/`;
     let options = {

@@ -49,6 +49,35 @@ export function waitUntilTransactionMined(
   });
 }
 
+export function waitUntilBlock(web3: Web3, blockNumber: number, duration = 60 * 10 * 1000): Promise<void> {
+  let endTime = Number(new Date()) + duration;
+
+  let desiredBlockAsync = async function (blockNumber: number, resolve: () => void, reject: (reason?: any) => void) {
+    try {
+      let currentBlockNumber = await web3.eth.getBlockNumber();
+      if (currentBlockNumber >= blockNumber) {
+        resolve();
+      } else if (Number(new Date()) > endTime) {
+        throw new Error(
+          `Desired block number did not appear after waiting ${
+            duration / 1000
+          } seconds. Current block number is: ${currentBlockNumber}`
+        );
+      } else {
+        setTimeout(function () {
+          return desiredBlockAsync(blockNumber, resolve, reject);
+        }, POLL_INTERVAL);
+      }
+    } catch (e) {
+      reject(e);
+    }
+  };
+
+  return new Promise(function (resolve, reject) {
+    desiredBlockAsync(blockNumber, resolve, reject);
+  });
+}
+
 export function waitForEvent(contract: Contract, eventName: string, opts: PastEventOptions): Promise<EventData> {
   let eventDataAsync = async function (
     resolve: (value: EventData | Promise<EventData>) => void,
