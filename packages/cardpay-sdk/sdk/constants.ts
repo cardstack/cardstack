@@ -37,7 +37,7 @@ const KOVAN = {
   faucetUrl: 'https://faucet.kovan.network/',
   nativeTokenAddress: 'eth',
   nativeTokenCoingeckoId: 'ethereum',
-  nativeTokenSymbol: 'KETH',
+  nativeTokenSymbol: 'ETH',
   nativeTokenName: 'Ethereum',
   name: 'Kovan',
   rpcNode: `${KOVAN_INFURA_URL}/${INFURA_PROJECT_ID}`,
