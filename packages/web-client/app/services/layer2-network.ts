@@ -115,6 +115,7 @@ export default class Layer2Network
       options
     );
 
+    // Refreshes the safes as the task value is read by an external component that displays the user's prepaid cards
     taskFor(this.viewSafes).perform(this.walletInfo.firstAddress!);
 
     return address;
