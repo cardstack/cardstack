@@ -15,11 +15,13 @@
   padding-top: var(--boxel-sp);
 }
 
-.layer-two-connect-card__mobile-coming-soon {
-  font: 600 var(--boxel-font-sm);
-  text-align: center;
-  max-width: 8rem;
-  padding: 1em;
+.layer-two-connect-card__testflight-link {
+  --icon-color: currentColor;
+
+  display: flex;
+  align-items: center;
+  gap: var(--boxel-sp-xs);
+  font: 600 var(--boxel-font);
 }
 
 .layer-two-connect-card__alternate-wallet {
