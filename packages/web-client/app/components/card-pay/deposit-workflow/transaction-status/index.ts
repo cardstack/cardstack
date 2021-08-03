@@ -3,7 +3,6 @@ import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import BN from 'bn.js';
-import { TransactionReceipt } from 'web3-core';
 import { tracked } from '@glimmer/tracking';
 import { reads } from 'macro-decorators';
 import { TokenSymbol } from '@cardstack/web-client/utils/token';
@@ -16,6 +15,8 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
   @reads('args.workflowSession.state.depositSourceToken')
   declare selectedTokenSymbol: TokenSymbol;
   @tracked completedCount = 1;
+  @tracked errored = false;
+
   get layer2BlockHeightBeforeBridging(): BN | undefined {
     return this.args.workflowSession.state.layer2BlockHeightBeforeBridging;
   }
@@ -35,17 +36,24 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    this.layer2Network
-      .awaitBridgedToLayer2(this.layer2BlockHeightBeforeBridging!)
-      .then((transactionReceipt: TransactionReceipt) => {
-        this.layer2Network.refreshBalances();
-        this.args.workflowSession.update(
-          'completedLayer2TransactionReceipt',
-          transactionReceipt
-        );
-        this.completedCount = 3;
-        this.args.onComplete?.();
-      });
+    this.waitForBridgingToComplete();
+  }
+
+  async waitForBridgingToComplete() {
+    try {
+      let transactionReceipt = await this.layer2Network.awaitBridgedToLayer2(
+        this.layer2BlockHeightBeforeBridging!
+      );
+      this.layer2Network.refreshBalances();
+      this.args.workflowSession.update(
+        'completedLayer2TransactionReceipt',
+        transactionReceipt
+      );
+      this.completedCount = 3;
+      this.args.onComplete?.();
+    } catch (e) {
+      this.errored = true;
+    }
   }
 
   get depositTxnViewerUrl() {
