@@ -242,8 +242,8 @@ module('@core | compiler-basics', function (hooks) {
 
       this.createCard(card);
 
-      let compiled = await builder.getCompiledCard(card.url);
-      assert.deepEqual(compiled.data, { title: 'Hello World' });
+      let raw = await builder.getRawCard(card.url);
+      assert.deepEqual(raw.data, { title: 'Hello World' });
     });
   });
 

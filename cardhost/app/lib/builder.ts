@@ -3,8 +3,6 @@ import {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
-  assertValidRawCard,
-  cardJSONReponse,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 import { encodeCardURL } from '@cardstack/core/src/utils';
@@ -17,10 +15,6 @@ import * as CardModel from '@cardstack/core/src/card-model';
   return CardModel;
 });
 
-import { urlAlphabet, customAlphabet } from 'nanoid';
-
-// Use the default nanoid alphabet, but remove dashes, as that's our deliminator
-export const nanoid = customAlphabet(urlAlphabet.replace('-', ''), 15);
 export interface Cache<CardType> {
   get(url: string): CardType | undefined;
   set(url: string, payload: CardType): void;
@@ -127,49 +121,6 @@ export default class Builder implements BuilderInterface {
     compiledCard = await this.compiler.compile(rawCard);
     this.compiledCardCache.set(url, compiledCard);
     return compiledCard;
-  }
-
-  async updateCardData(
-    url: string,
-    attributes: unknown
-  ): Promise<CompiledCard> {
-    let compiledCard = await this.getCompiledCard(url);
-
-    let rawCard = this.rawCardCache.get(url);
-
-    if (rawCard) {
-      rawCard.data = Object.assign(rawCard.data, attributes);
-      this.rawCardCache.update(url, rawCard);
-    }
-
-    compiledCard.data = Object.assign(compiledCard.data, attributes);
-    this.compiledCardCache.set(url, compiledCard);
-
-    return compiledCard;
-  }
-
-  async createDataCard(
-    realmURL: string,
-    parentCardURL: string,
-    data: cardJSONReponse['data']
-  ): Promise<CompiledCard> {
-    let url = this.generateIdFromParent(realmURL, parentCardURL);
-
-    let rawCard: Partial<RawCard> = {
-      url,
-      adoptsFrom: parentCardURL,
-      data: data.attributes,
-    };
-    assertValidRawCard(rawCard);
-    this.rawCardCache.set(url, rawCard);
-
-    return this.getCompiledCard(url);
-  }
-
-  private generateIdFromParent(realmURL: string, parentURL: string): string {
-    let name = parentURL.replace(realmURL, '');
-    let id = nanoid();
-    return `${realmURL}${name}-${id}`;
   }
 
   async deleteCard(cardURL: string): Promise<void> {

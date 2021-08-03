@@ -5,6 +5,7 @@ import {
   RawCard,
   FORMATS,
   cardJSONReponse,
+  assertValidRawCard,
 } from '@cardstack/core/src/interfaces';
 
 import type {
@@ -22,6 +23,10 @@ import { Memoize } from 'typescript-memoize';
 
 import type { TestContext } from 'ember-test-helpers';
 import { encodeCardURL } from '@cardstack/core/src/utils';
+
+import { urlAlphabet, customAlphabet } from 'nanoid';
+// Use the default nanoid alphabet, but remove dashes, as that's our deliminator
+export const nanoid = customAlphabet(urlAlphabet.replace('-', ''), 15);
 
 type CardParams =
   | { type: 'raw'; format?: Format }
@@ -169,18 +174,28 @@ export class FakeCardServer {
   }
 
   @Memoize()
+  get cache(): MirageCache {
+    return new MirageCache(this.db);
+  }
+
+  @Memoize()
   get builder(): Builder {
-    return new Builder({ rawCardCache: new MirageCache(this.db) });
+    return new Builder({ rawCardCache: this.cache });
   }
 
   async respondWithCard(url: string, format: Format): Promise<cardJSONReponse> {
-    let card = await FakeCardServer.current().builder.getCompiledCard(url);
+    let server = FakeCardServer.current();
+    let rawCard = await server.cache.get(url);
+    if (!rawCard) {
+      throw new Error('No card');
+    }
+    let card = await server.builder.getCompiledCard(url);
 
     return {
       data: {
         id: url,
         type: 'card',
-        attributes: card.data,
+        attributes: rawCard.data,
         meta: {
           componentModule: card[format].moduleName,
         },
@@ -190,19 +205,24 @@ export class FakeCardServer {
 
   async updateCardData(
     url: string,
-    payload: any,
+    data: any,
     format?: Format
   ): Promise<cardJSONReponse> {
-    let card = await FakeCardServer.current().builder.updateCardData(
-      url,
-      payload
-    );
+    let server = FakeCardServer.current();
+    let rawCard = await server.cache.get(url);
+    if (!rawCard) {
+      throw new Error('No card');
+    }
+    rawCard.data = Object.assign(rawCard.data, data);
+    server.cache.update(url, rawCard);
+
+    let card = await server.builder.getCompiledCard(url);
 
     return {
       data: {
         id: url,
         type: 'card',
-        attributes: card.data,
+        attributes: rawCard.data,
         meta: {
           componentModule: card[format || 'isolated'].moduleName,
         },
@@ -215,17 +235,23 @@ export class FakeCardServer {
     parentCardURL: string,
     data: cardJSONReponse['data']
   ): Promise<cardJSONReponse> {
-    let card = await FakeCardServer.current().builder.createDataCard(
-      realm,
-      parentCardURL,
-      data
-    );
+    let server = FakeCardServer.current();
+
+    let url = this.generateIdFromParent(realm, parentCardURL);
+    let rawCard: Partial<RawCard> = {
+      url,
+      adoptsFrom: parentCardURL,
+      data: data.attributes,
+    };
+    assertValidRawCard(rawCard);
+    server.cache.set(url, rawCard);
+    let card = await server.builder.getCompiledCard(parentCardURL);
 
     return {
       data: {
-        id: card.url,
+        id: url,
         type: 'card',
-        attributes: card.data,
+        attributes: data,
         meta: {
           componentModule: card['isolated'].moduleName,
         },
@@ -239,5 +265,11 @@ export class FakeCardServer {
       return new Response(404, {}, { error: `Not Found: No card for '${url}` });
     }
     return rawCard;
+  }
+
+  private generateIdFromParent(realmURL: string, parentURL: string): string {
+    let name = parentURL.replace(realmURL, '');
+    let id = nanoid();
+    return `${realmURL}${name}-${id}`;
   }
 }
