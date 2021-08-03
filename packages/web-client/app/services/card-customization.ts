@@ -1,6 +1,6 @@
 import Service from '@ember/service';
 import config from '../config/environment';
-import { all, task, TaskGenerator } from 'ember-concurrency';
+import { all, task, TaskGenerator, timeout } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
@@ -8,6 +8,7 @@ import HubAuthentication from './hub-authentication';
 import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 
+const FIRST_RETRY_DELAY = config.environment === 'test' ? 100 : 1000;
 export interface ColorCustomizationOption {
   background: string;
   textColor: string;
@@ -222,13 +223,41 @@ export default class CardCustomization extends Service {
     return new Resolver(getResolver());
   }
 
-  @task *fetchCardCustomization(customizationDID: string): any {
+  @task *fetchJson(alsoKnownAs: string, waitForCustomization: boolean): any {
+    let maxAttempts = waitForCustomization ? 10 : 1;
+    let attemptNum = 1;
+    while (attemptNum <= maxAttempts) {
+      try {
+        let jsonApiResponse = yield fetch(alsoKnownAs);
+        if (!jsonApiResponse.ok) {
+          let errorBodyText = yield jsonApiResponse.text();
+          throw new Error(errorBodyText);
+        }
+        let jsonApiDocument = yield jsonApiResponse.json();
+        return jsonApiDocument;
+      } catch (err) {
+        if (attemptNum === maxAttempts) {
+          throw err;
+        }
+        attemptNum++;
+        yield timeout(FIRST_RETRY_DELAY * attemptNum);
+      }
+    }
+  }
+
+  @task *fetchCardCustomization(
+    customizationDID: string,
+    waitForCustomization = false
+  ): any {
     let did = yield this.didResolver.resolve(customizationDID);
 
     let alsoKnownAs = did?.didDocument?.alsoKnownAs;
 
     if (alsoKnownAs) {
-      let jsonApiDocument = yield (yield fetch(alsoKnownAs)).json();
+      let jsonApiDocument = yield taskFor(this.fetchJson).perform(
+        alsoKnownAs,
+        waitForCustomization
+      );
 
       let included = jsonApiDocument.included;
 

@@ -10,6 +10,7 @@ import { TaskInstance } from 'ember-concurrency';
 
 interface CardPayPrepaidCardSafeComponentArgs {
   safe: PrepaidCardSafe;
+  waitForCustomization?: boolean;
 }
 
 export default class CardPayPrepaidCardSafeComponent extends Component<CardPayPrepaidCardSafeComponentArgs> {
@@ -21,7 +22,10 @@ export default class CardPayPrepaidCardSafeComponent extends Component<CardPayPr
     if (this.args.safe.customizationDID) {
       this.fetchTask = taskFor(
         this.cardCustomization.fetchCardCustomization
-      ).perform(this.args.safe.customizationDID);
+      ).perform(
+        this.args.safe.customizationDID,
+        this.args.waitForCustomization
+      );
     }
   }
 
