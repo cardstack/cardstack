@@ -36,13 +36,13 @@ export type CardData = Record<string, any>;
 export type Setter = (value: any) => void;
 
 /* Card type IDEAS
-  primitive: 
+  primitive:
     Where card is a value, has validation and/or a serialize. IE: Date, string
     Has a @value attribute
-  composite: 
+  composite:
     Where card is combining multifle cards, ie: A blog post
     Has a @model attribute
-  data: 
+  data:
     A card that likely adopts from a composite card, but only provides new data for it
 */
 
@@ -80,7 +80,7 @@ export interface CompiledCard {
   fields: {
     [key: string]: Field;
   };
-  schemaModule?: string;
+  schemaModule: string;
   serializer?: SerializerName;
 
   isolated: ComponentInfo;
@@ -99,13 +99,6 @@ export interface ComponentInfo {
 export interface Builder {
   getRawCard(url: string): Promise<RawCard>;
   getCompiledCard(url: string): Promise<CompiledCard>;
-  updateCardData(url: string, attributes: any): Promise<CompiledCard>;
-  createDataCard(
-    realmURL: string,
-    parentCardURL: string,
-    data: cardJSONReponse['data']
-  ): Promise<CompiledCard>;
-  deleteCard(cardURL: string): Promise<void>;
 }
 
 export interface RealmConfig {

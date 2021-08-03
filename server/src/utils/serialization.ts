@@ -30,7 +30,7 @@ export function deserialize(payload: any): any {
   }
 
   if (data) {
-    data = _mapKeys(data, (val, key) => _camelCase(key));
+    data = _mapKeys(data, (_val, key) => _camelCase(key));
   }
 
   return data;
