@@ -12,7 +12,7 @@ class CardPayBalancesController extends Controller {
 
   get prepaidCards() {
     return taskFor(
-      this.layer2Network.viewSafes
+      this.layer2Network.refreshSafes
     ).lastSuccessful?.value?.filterBy('type', 'prepaid-card');
   }
 }

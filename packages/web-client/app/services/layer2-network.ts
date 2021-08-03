@@ -103,6 +103,10 @@ export default class Layer2Network
     return yield this.strategy.viewSafes(account);
   }
 
+  @task *refreshSafes(): TaskGenerator<Safe[]> {
+    return yield taskFor(this.viewSafes).perform(this.walletInfo.firstAddress!);
+  }
+
   @task *issuePrepaidCard(
     faceValue: number,
     customizationDid: string,
@@ -116,7 +120,7 @@ export default class Layer2Network
     );
 
     // Refreshes the safes as the task value is read by an external component that displays the user's prepaid cards
-    taskFor(this.viewSafes).perform(this.walletInfo.firstAddress!);
+    taskFor(this.refreshSafes).perform();
 
     return address;
   }
