@@ -5,9 +5,9 @@ import { networkName } from './utils/general-utils';
 
 const INFURA_PROJECT_ID = 'dfb8cbe2e916420a9dbcc1d1f5828406';
 const KOVAN_INFURA_URL = 'https://kovan.infura.io/v3';
-const KOVAN_WSS_INFURA_URL = 'wss://kovan.infura.io/v3';
+const KOVAN_WSS_INFURA_URL = 'wss://kovan.infura.io/ws/v3';
 const MAINNET_INFURA_URL = 'https://mainnet.infura.io/v3';
-const MAINNET_WSS_INFURA_URL = 'wss://mainnet.infura.io/v3';
+const MAINNET_WSS_INFURA_URL = 'wss://mainnet.infura.io/ws/v3';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
