@@ -16,6 +16,7 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
   @service declare layer2Network: Layer2Network;
 
   @tracked completedCount = 1;
+  @tracked error = false;
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
@@ -23,14 +24,18 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
   }
 
   @task *awaitBridgingTask(): TaskGenerator<void> {
-    let result = yield this.layer2Network.awaitBridgedToLayer1(
-      this.layer2BlockHeightBeforeBridging!,
-      this.args.workflowSession.state.relayTokensTxnHash
-    );
-    this.args.workflowSession.update('bridgeValidationResult', result);
-    this.layer2Network.refreshBalances();
-    this.completedCount = 2;
-    this.args.onComplete?.();
+    try {
+      let result = yield this.layer2Network.awaitBridgedToLayer1(
+        this.layer2BlockHeightBeforeBridging!,
+        this.args.workflowSession.state.relayTokensTxnHash
+      );
+      this.args.workflowSession.update('bridgeValidationResult', result);
+      this.layer2Network.refreshBalances();
+      this.completedCount = 2;
+      this.args.onComplete?.();
+    } catch (e) {
+      this.error = true;
+    }
   }
 
   get isInProgress() {
