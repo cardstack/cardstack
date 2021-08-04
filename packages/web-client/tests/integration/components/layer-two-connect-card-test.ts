@@ -61,4 +61,27 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
 
     assert.dom('[data-test-balance-container-loading]').isVisible();
   });
+
+  test('It shows the connect prompt by default', async function (assert) {
+    await render(hbs`
+        <CardPay::LayerTwoConnectCard />
+      `);
+
+    assert
+      .dom('[data-test-layer-2-connect-prompt]')
+      .containsText('Install the Card Wallet app on your mobile phone');
+  });
+
+  test('It does not show the connect prompt when workflow is completed and wallet is disconnected', async function (assert) {
+    await render(hbs`
+        <CardPay::LayerTwoConnectCard @isComplete=true />
+      `);
+
+    assert.dom('[data-test-layer-2-connect-prompt]').doesNotExist();
+    assert.dom('[data-test-layer-2-wallet-disconnect-button]').doesNotExist();
+    assert.dom('[data-test-layer-2-wallet-summary]').exists();
+    assert
+      .dom('[data-test-layer-2-wallet-connected-status]')
+      .includesText('Disconnected');
+  });
 });
