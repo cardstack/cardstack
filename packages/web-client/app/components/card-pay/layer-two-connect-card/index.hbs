@@ -47,8 +47,8 @@
         {{!-- future: show Prepaid Cards, Badges --}}
         <CardPay::LabeledValue
           @label="Status"
-          @value="Connected"
-          @icon="success-bordered"
+          @value={{if this.isConnected "Connected" "Disconnected"}}
+          @icon={{if this.isConnected "success-bordered" "failure-bordered"}}
         />
       </CardPay::FieldStack>
     </ActionCardContainer::Section>
