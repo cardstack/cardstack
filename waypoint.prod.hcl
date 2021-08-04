@@ -33,12 +33,12 @@ app "hub" {
 
         hook {
             when    = "before"
-            command = ["./packages/hub/bin/purge-services.sh", "hub-prod", "waypoint-hub"] # need this to purge old ecs services
+            command = ["./scripts/purge-services.sh", "hub-prod", "waypoint-hub", "2"] # need this to purge old ecs services
         }
 
         hook {
             when    = "after"
-            command = ["./packages/hub/bin/fix-listener.sh", "hub.cardstack.com"] # need this until https://github.com/hashicorp/waypoint/issues/1568
+            command = ["./scripts/fix-listener.sh", "hub.cardstack.com", "hub-prod"] # need this until https://github.com/hashicorp/waypoint/issues/1568
         }
     }
 }
@@ -73,8 +73,8 @@ app "hub-worker" {
         }
 
         hook {
-            when    = "before"
-            command = ["./packages/hub/bin/purge-services.sh", "hub-worker-prod"] # need this to purge old ecs services
+            when    = "after"
+            command = ["./scripts/purge-services.sh", "hub-worker-prod", "waypoint-hub-worker", "1"] # need this to purge old ecs services
         }
     }
 }
