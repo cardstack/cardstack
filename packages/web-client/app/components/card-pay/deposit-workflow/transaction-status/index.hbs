@@ -1,6 +1,7 @@
 <ActionCardContainer
   @header="Token Bridge"
   @isComplete={{@isComplete}}
+  data-test-deposit-transaction-status-card
 >
   <ActionCardContainer::Section
     @title={{concat "Bridging tokens to " (network-display-info "layer2" "shortName") " blockchain"}}
@@ -37,7 +38,7 @@
               View on Blockscout
             </Boxel::Button>
           {{else if this.error}}
-            Failed
+            <span data-test-deposit-minting-step-failed>Failed</span>
           {{else}}
             Processing...
           {{/if}}
@@ -45,7 +46,7 @@
       </span>
     </Boxel::ProgressSteps>
     {{#if this.error}}
-      <CardPay::ErrorMessage as |supportURL|>
+      <CardPay::ErrorMessage data-test-deposit-transaction-status-error as |supportURL|>
         There was a problem completing the bridging of your tokens to {{network-display-info "layer2" "fullName"}}. Please contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a> so that we can investigate and resolve this issue for you.
       </CardPay::ErrorMessage>
     {{/if}}
