@@ -9,6 +9,8 @@
       @layer1Connect={{set this 'isShowingLayer1ConnectModal' true}}
       @layer2ChainName={{network-display-info "layer2" "fullName"}}
       @layer2Connect={{set this 'isShowingLayer2ConnectModal' true}}
+      @isLayer1Initializing={{this.layer1Network.isInitializing}}
+      @isLayer2Initializing={{this.layer2Network.isInitializing}}
       @isLayer1Connected={{this.layer1Network.isConnected}}
       @isLayer2Connected={{this.layer2Network.isConnected}}
       @layer1Address={{this.layer1Network.walletInfo.firstAddress}}

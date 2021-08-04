@@ -2,15 +2,18 @@
   {{@chainName}}
 </div>
 <Boxel::Button
-  @kind={{if @isConnected "secondary-dark" "primary"}}
+  @kind={{if (or @isConnected @isInitializing) "secondary-dark" "primary"}}
+  @loading={{@isInitializing}}
   class={{cn
     "card-pay-header-connection-button__button"
-    card-pay-header-connection-button__button--connected=@isConnected
+    card-pay-header-connection-button__button--connected=(or @isConnected @isInitializing)
   }}
   {{on "click" @onConnect}}
   data-test-card-pay-connect-button
 >
-  {{#if @isConnected}}
+  {{#if @isInitializing}}
+    {{!-- just show the spinner --}}
+  {{else if @isConnected}}
     {{truncate-middle @address}}
   {{else}}
     Connect Wallet
