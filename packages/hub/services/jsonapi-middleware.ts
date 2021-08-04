@@ -7,6 +7,7 @@ import KoaBody from 'koa-body';
 import { Memoize } from 'typescript-memoize';
 import { CardstackError } from '../utils/error';
 import { SessionContext } from './authentication-middleware';
+import BoomRoute from '../routes/boom';
 import SessionRoute from '../routes/session';
 import PrepaidCardColorSchemesRoute from '../routes/prepaid-card-color-schemes';
 import PrepaidCardPatternsRoute from '../routes/prepaid-card-patterns';
@@ -17,6 +18,7 @@ const API_PREFIX = '/api';
 const apiPrefixPattern = new RegExp(`^${API_PREFIX}/(.*)`);
 
 export default class JSONAPIMiddleware {
+  boomRoute: BoomRoute = inject('boom-route', { as: 'boomRoute' });
   sessionRoute: SessionRoute = inject('session-route', { as: 'sessionRoute' });
   prepaidCardColorSchemesRoute: PrepaidCardColorSchemesRoute = inject('prepaid-card-color-schemes-route', {
     as: 'prepaidCardColorSchemesRoute',
@@ -55,11 +57,18 @@ export default class JSONAPIMiddleware {
         throw new CardstackError(`error while parsing body: ${error.message}`, { status: 400 });
       },
     });
-    let { prepaidCardColorSchemesRoute, prepaidCardPatternsRoute, prepaidCardCustomizationsRoute, sessionRoute } = this;
+    let {
+      boomRoute,
+      prepaidCardColorSchemesRoute,
+      prepaidCardPatternsRoute,
+      prepaidCardCustomizationsRoute,
+      sessionRoute,
+    } = this;
 
     return compose([
       CardstackError.withJsonErrorHandling,
       body,
+      route.get('/boom', boomRoute.get),
       route.get('/session', sessionRoute.get),
       route.post('/session', sessionRoute.post),
       route.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get),

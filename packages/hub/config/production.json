@@ -1,5 +1,8 @@
 {
   "aws": {
     "accountId": "120317779495"
+  },
+  "sentry": {
+    "enabled": true
   }
 }

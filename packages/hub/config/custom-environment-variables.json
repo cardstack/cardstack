@@ -12,5 +12,9 @@
   "db": {
     "url": "DATABASE_URL"
   },
+  "sentry": {
+    "dsn": "HUB_SENTRY_DSN",
+    "environment": "HUB_ENVIRONMENT"
+  },
   "serverSecret": "SERVER_SECRET"
 }
