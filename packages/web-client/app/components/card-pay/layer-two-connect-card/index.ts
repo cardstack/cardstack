@@ -77,7 +77,7 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
   }
 
   get cardState(): string {
-    if (this.isConnected) {
+    if (this.isConnected || this.args.isComplete) {
       return 'memorialized';
     } else {
       return 'default';
