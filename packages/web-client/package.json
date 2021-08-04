@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/web-client",
-  "version": "0.19.44",
+  "version": "0.19.45",
   "description": "The cardstack web front-end app",
   "repository": "",
   "license": "MIT",
@@ -25,9 +25,9 @@
     "test:ember": "ember test"
   },
   "devDependencies": {
-    "@cardstack/boxel": "0.19.44",
-    "@cardstack/cardpay-sdk": "0.19.44",
-    "@cardstack/did-resolver": "0.19.44",
+    "@cardstack/boxel": "0.19.45",
+    "@cardstack/cardpay-sdk": "0.19.45",
+    "@cardstack/did-resolver": "0.19.45",
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.2.5",
     "@ember/test-waiters": "^2.4.3",
