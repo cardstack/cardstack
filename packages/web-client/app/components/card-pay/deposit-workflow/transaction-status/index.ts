@@ -15,7 +15,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
   @reads('args.workflowSession.state.depositSourceToken')
   declare selectedTokenSymbol: TokenSymbol;
   @tracked completedCount = 1;
-  @tracked errored = false;
+  @tracked error = false;
 
   get layer2BlockHeightBeforeBridging(): BN | undefined {
     return this.args.workflowSession.state.layer2BlockHeightBeforeBridging;
@@ -52,7 +52,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
       this.completedCount = 3;
       this.args.onComplete?.();
     } catch (e) {
-      this.errored = true;
+      this.error = true;
     }
   }
 
