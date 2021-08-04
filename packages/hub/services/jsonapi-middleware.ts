@@ -40,7 +40,7 @@ export default class JSONAPIMiddleware {
       if (this.isJSONAPI(ctxt)) {
         return this.jsonHandlers(ctxt, next);
       } else {
-        throw new CardstackError(`not implemented`);
+        throw new CardstackError(`Only JSON-API requests are supported at this endpoint`);
       }
     };
   }
