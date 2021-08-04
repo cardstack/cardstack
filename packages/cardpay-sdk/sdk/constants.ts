@@ -43,7 +43,7 @@ const KOVAN = {
   nativeTokenName: 'Ethereum',
   name: 'Kovan',
   rpcNode: `${KOVAN_INFURA_URL}/${INFURA_PROJECT_ID}`,
-  rpcWssNode: `${KOVAN_WSS_INFURA_URL}/${INFURA_PROJECT_ID}`
+  rpcWssNode: `${KOVAN_WSS_INFURA_URL}/${INFURA_PROJECT_ID}`,
 };
 const MAINNET = {
   apiBaseUrl: 'https://api.etherscan.io/api',
