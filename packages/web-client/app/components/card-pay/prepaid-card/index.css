@@ -72,6 +72,10 @@
 .prepaid-card__name {
   font: var(--boxel-font-sm);
   font-weight: 700;
+  max-width: 10rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
 }
 
 .prepaid-card__address {
