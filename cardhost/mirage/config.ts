@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import DbCollection from 'miragejs/db-collection';
 import {
   Format,
