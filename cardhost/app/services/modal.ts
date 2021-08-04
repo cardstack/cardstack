@@ -10,7 +10,7 @@ import { Card } from './cards';
 import CardsService from '../services/cards';
 import { Format } from '@cardstack/core/src/interfaces';
 import { taskFor } from 'ember-concurrency-ts';
-import { newCardParams } from '@cardstack/core/src/card-model';
+import type { NewCardParams } from 'cardhost/lib/card-model';
 
 type State =
   | {
@@ -67,7 +67,7 @@ export default class Modal extends Service {
 
   @task *editCardTask(
     card: Card,
-    cardParams?: newCardParams | Event
+    cardParams?: NewCardParams | Event
   ): TaskGenerator<void> {
     if (cardParams instanceof Event) {
       cardParams = undefined;

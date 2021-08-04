@@ -4,19 +4,14 @@ function p(dateString: string): Date {
   return parse(dateString, 'yyyy-MM-dd', new Date());
 }
 
-import { CompiledCard } from '@cardstack/core/src/interfaces';
-import {
-  ADDRESS_RAW_CARD,
-  PERSON_RAW_CARD,
-} from '@cardstack/core/tests/helpers/fixtures';
+import { PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
 import QUnit from 'qunit';
 
 const { module: Qmodule, test } = QUnit;
 
-import CardModel from '@cardstack/core/src/card-model';
-import { TestBuilder } from '../helpers/test-builder';
+import CardModel from 'cardhost/lib/card-model';
 
-export class PersonCardModel extends CardModel {
+class PersonCardModel extends CardModel {
   static serializerMap = {
     date: ['birthdate', 'address.settlementDate'],
   };
@@ -74,42 +69,5 @@ Qmodule('CardModel', function () {
       },
       'A model can be serialized once instantiated'
     );
-  });
-
-  Qmodule('Static methods', async function (hooks) {
-    let builder: TestBuilder;
-    let personCard: CompiledCard;
-
-    hooks.beforeEach(async () => {
-      builder = new TestBuilder();
-      builder.addRawCard(ADDRESS_RAW_CARD);
-      builder.addRawCard(
-        Object.assign(
-          {
-            data: attributes,
-          },
-          PERSON_RAW_CARD
-        )
-      );
-      personCard = await builder.getCompiledCard(PERSON_RAW_CARD.url);
-    });
-
-    test('#serialize', async function (assert) {
-      let serialized = PersonCardModel.serialize(
-        PERSON_RAW_CARD.url,
-        attributes,
-        personCard['isolated']
-      );
-      assert.deepEqual(serialized, {
-        data: {
-          id: PERSON_RAW_CARD.url,
-          type: 'card',
-          attributes,
-          meta: {
-            componentModule: personCard.isolated.moduleName,
-          },
-        },
-      });
-    });
   });
 });

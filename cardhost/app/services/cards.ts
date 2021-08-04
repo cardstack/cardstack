@@ -1,16 +1,11 @@
 import Service from '@ember/service';
 import { macroCondition, isTesting } from '@embroider/macros';
-import Component from '@glimmer/component';
-import { hbs } from 'ember-cli-htmlbars';
-import { task, TaskGenerator } from 'ember-concurrency';
+import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 
-// @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
-import { setComponentTemplate } from '@ember/component';
-
 import { Format, CardJSONResponse } from '@cardstack/core/src/interfaces';
-import type CardModel from '@cardstack/core/src/card-model';
-import { newCardParams } from '@cardstack/core/src/card-model';
+import type CardModel from 'cardhost/lib/card-model';
+import type { NewCardParams } from 'cardhost/lib/card-model';
 import config from 'cardhost/config/environment';
 
 const { cardServer } = config as any; // Environment types arent working
@@ -20,113 +15,97 @@ export interface Card {
   component: unknown;
 }
 
-function buildCardURL(url: string, format?: Format): string {
-  let fullURL = [cardServer, 'cards/', encodeURIComponent(url)];
-  if (format) {
-    fullURL.push('?' + new URLSearchParams({ format }).toString());
-  }
-  return fullURL.join('');
+// the methods our service makes available for CardModel's exclusive use
+export interface CardServiceHandle {
+  load: Cards['load'];
+  buildCardURL: Cards['buildCardURL'];
+  buildNewURL: Cards['buildNewURL'];
+  fetchJSON: Cards['fetchJSON'];
 }
-
-function buildNewURL(card: CardModel): string {
-  if (!card.realm || !card.parentCardURL) {
-    throw new Error(
-      'Cant create a new card URL if the model doesnt know its realm or parent card'
-    );
-  }
-  return [
-    cardServer,
-    'cards/',
-    encodeURIComponent(card.realm) + '/',
-    encodeURIComponent(card.parentCardURL),
-  ].join('');
-}
-
-// when you put a card under edit, we load a new copy in edit mode. This lets us
-// look up the original copy from the editable copy.
-let orginalModels = new WeakMap();
 
 export default class Cards extends Service {
-  async load(url: string, format: Format): Promise<Card> {
-    let fullURL = buildCardURL(url, format);
-    return taskFor(this.internalLoad).perform(fullURL);
+  async load(url: string, format: Format): Promise<CardModel> {
+    let fullURL = this.buildCardURL(url, format);
+    let loaded = await taskFor(this.internalLoad).perform(fullURL);
+    return loaded.ModelClass.newFromResponse(
+      this.serviceHandle(),
+      loaded.cardResponse,
+      loaded.component
+    );
   }
 
-  async loadForRoute(pathname: string): Promise<Card> {
-    return taskFor(this.internalLoad).perform(
+  async loadForRoute(pathname: string): Promise<CardModel> {
+    let loaded = await taskFor(this.internalLoad).perform(
       `${cardServer}cardFor${pathname}`
     );
+    return loaded.ModelClass.newFromResponse(
+      this.serviceHandle(),
+      loaded.cardResponse,
+      loaded.component
+    );
   }
 
-  async loadForEdit(card: Card, params?: newCardParams): Promise<Card> {
-    let loaded = await taskFor(this.internalLoad).perform(
-      buildCardURL(card.model.url, 'edit'),
-      params
-    );
-    orginalModels.set(loaded.model, card.model);
-
-    return loaded;
+  async createNew(params: NewCardParams): Promise<CardModel> {
+    let parent = await this.load(params.parentCardURL, 'edit');
+    return parent.adoptIntoRealm(params.realm);
   }
 
-  @task private *internalLoad(
-    url: string,
-    newCardParams?: newCardParams
-  ): TaskGenerator<Card> {
-    let cardResponse = yield fetchCard(url);
-    let { component, ModelClass } = yield loadComponentModule(
-      cardResponse,
-      url
-    );
+  @task private async internalLoad(url: string) {
+    let cardResponse = await this.fetchJSON(url);
+    let { component, ModelClass } = await loadCode(cardResponse, url);
+    return { cardResponse, component, ModelClass };
+  }
 
-    let model = newCardParams
-      ? new ModelClass(newCardParams)
-      : ModelClass.newFromResponse(cardResponse);
-
+  private serviceHandle() {
     return {
-      model,
-      component: buildCallerComponent(model, component),
+      load: this.load.bind(this),
+      buildNewURL: this.buildNewURL.bind(this),
+      buildCardURL: this.buildCardURL.bind(this),
+      fetchJSON: this.fetchJSON.bind(this),
     };
   }
 
-  async save(card: Card): Promise<void> {
-    await taskFor(this.saveTask).perform(card.model);
-
-    let original = orginalModels.get(card.model);
-    if (original) {
-      // TODO: this should probably be selective and only update fields that
-      // already appear in original (which will be a subset of the editable
-      // card)
-      original.setters(card.model.data);
-    }
+  private buildNewURL(realm: string, parentCardURL: string): string {
+    return [
+      cardServer,
+      'cards/',
+      encodeURIComponent(realm) + '/',
+      encodeURIComponent(parentCardURL),
+    ].join('');
   }
 
-  @task private *saveTask(model: CardModel): TaskGenerator<void> {
-    let body = JSON.stringify(model.serialize());
-    let method, url;
-    if (model.isNew) {
-      url = buildNewURL(model);
-      method = 'POST';
-    } else {
-      url = buildCardURL(model.url);
-      method = 'PATCH';
+  private buildCardURL(url: string, format?: Format): string {
+    let fullURL = [cardServer, 'cards/', encodeURIComponent(url)];
+    if (format) {
+      fullURL.push('?' + new URLSearchParams({ format }).toString());
+    }
+    return fullURL.join('');
+  }
+
+  private async fetchJSON(
+    url: string,
+    options: any = {}
+  ): Promise<CardJSONResponse> {
+    let fullOptions = Object.assign(
+      {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      },
+      options
+    );
+    let response = await fetch(url, fullOptions);
+
+    if (!response.ok) {
+      throw new Error(`unable to fetch card ${url}: status ${response.status}`);
     }
 
-    let response = yield fetchCard(url, { method, body });
-    model.updateFromResponse(response);
+    return await response.json();
   }
 }
 
-function buildCallerComponent(model: CardModel, component: unknown): unknown {
-  return setComponentTemplate(
-    hbs`<this.card @model={{this.model.data}} @set={{this.model.setters}} />`,
-    class extends Component {
-      model = model;
-      card = component;
-    }
-  );
-}
-
-async function loadComponentModule(
+async function loadCode(
   card: CardJSONResponse,
   url: string
 ): Promise<{ component: unknown; ModelClass: typeof CardModel }> {
@@ -164,26 +143,4 @@ async function loadComponentModule(
       ModelClass: cardComponentModule.Model,
     };
   }
-}
-
-async function fetchCard(
-  url: string,
-  options: any = {}
-): Promise<CardJSONResponse> {
-  let fullOptions = Object.assign(
-    {
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-    },
-    options
-  );
-  let response = await fetch(url, fullOptions);
-
-  if (!response.ok) {
-    throw new Error(`unable to fetch card ${url}: status ${response.status}`);
-  }
-
-  return await response.json();
 }

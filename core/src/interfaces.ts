@@ -107,12 +107,20 @@ export interface RealmConfig {
 
 export type CardJSONResponse = {
   data: {
-    id?: string;
+    id: string;
     type: string;
     attributes?: { [name: string]: any };
     meta?: {
       componentModule: string;
     };
+  };
+};
+
+export type CardJSONRequest = {
+  data: {
+    id?: string;
+    type: string;
+    attributes?: { [name: string]: any };
   };
 };
 
