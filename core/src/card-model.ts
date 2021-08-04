@@ -1,5 +1,5 @@
 import {
-  cardJSONReponse,
+  CardJSONResponse,
   ComponentInfo,
   SerializerMap,
   SerializerName,
@@ -26,7 +26,7 @@ export default class CardModel {
   setters: Setter;
 
   @tracked private _data: any;
-  private rawServerResponse?: cardJSONReponse;
+  private rawServerResponse?: CardJSONResponse;
   private deserialized = false;
 
   constructor(params?: newCardParams) {
@@ -37,7 +37,7 @@ export default class CardModel {
     }
   }
 
-  static newFromResponse(cardResponse: cardJSONReponse): CardModel {
+  static newFromResponse(cardResponse: CardJSONResponse): CardModel {
     let model = new this();
     model.updateFromResponse(cardResponse);
     return model;
@@ -45,7 +45,7 @@ export default class CardModel {
 
   static newFromParentCardResponse(
     klass: typeof CardModel,
-    cardResponse: cardJSONReponse
+    cardResponse: CardJSONResponse
   ): CardModel {
     let model = new klass();
     model.parentCardURL = cardResponse.data.id;
@@ -56,7 +56,7 @@ export default class CardModel {
     return !this.url;
   }
 
-  updateFromResponse(cardResponse: cardJSONReponse) {
+  updateFromResponse(cardResponse: CardJSONResponse) {
     this.deserialized = false;
     this.rawServerResponse = cloneDeep(cardResponse);
 
@@ -89,7 +89,7 @@ export default class CardModel {
     );
   }
 
-  serialize(): cardJSONReponse {
+  serialize(): CardJSONResponse {
     let { data, url } = this;
     let attributes = serializeAttributes(
       data,
@@ -105,7 +105,7 @@ export default class CardModel {
     url: string,
     data: any,
     component: ComponentInfo
-  ): cardJSONReponse {
+  ): CardJSONResponse {
     let attributes = serializeAttributes(data, 'serialize', this.serializerMap);
 
     return constructJSONAPIResponse(attributes, url, component.moduleName);
@@ -153,8 +153,8 @@ function constructJSONAPIResponse(
   attributes: any,
   url?: string,
   componentModule?: string
-): cardJSONReponse {
-  let response: cardJSONReponse = {
+): CardJSONResponse {
+  let response: CardJSONResponse = {
     data: {
       type: 'card',
       attributes,

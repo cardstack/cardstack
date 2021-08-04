@@ -105,7 +105,7 @@ export interface RealmConfig {
   directory?: string;
 }
 
-export type cardJSONReponse = {
+export type CardJSONResponse = {
   data: {
     id?: string;
     type: string;

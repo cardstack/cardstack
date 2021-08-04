@@ -3,7 +3,7 @@ import {
   Format,
   RawCard,
   FORMATS,
-  cardJSONReponse,
+  CardJSONResponse,
   assertValidRawCard,
 } from '@cardstack/core/src/interfaces';
 
@@ -182,7 +182,10 @@ export class FakeCardServer {
     return new Builder({ rawCardCache: this.cache });
   }
 
-  async respondWithCard(url: string, format: Format): Promise<cardJSONReponse> {
+  async respondWithCard(
+    url: string,
+    format: Format
+  ): Promise<CardJSONResponse> {
     let server = FakeCardServer.current();
     let rawCard = await server.cache.get(url);
     if (!rawCard) {
@@ -206,7 +209,7 @@ export class FakeCardServer {
     url: string,
     data: any,
     format?: Format
-  ): Promise<cardJSONReponse> {
+  ): Promise<CardJSONResponse> {
     let server = FakeCardServer.current();
     let rawCard = await server.cache.get(url);
     if (!rawCard) {
@@ -232,8 +235,8 @@ export class FakeCardServer {
   async createDataCard(
     realm: string,
     parentCardURL: string,
-    data: cardJSONReponse['data']
-  ): Promise<cardJSONReponse> {
+    data: CardJSONResponse['data']
+  ): Promise<CardJSONResponse> {
     let server = FakeCardServer.current();
 
     let url = this.generateIdFromParent(realm, parentCardURL);

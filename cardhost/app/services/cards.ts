@@ -8,7 +8,7 @@ import { taskFor } from 'ember-concurrency-ts';
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
 import { setComponentTemplate } from '@ember/component';
 
-import { Format, cardJSONReponse } from '@cardstack/core/src/interfaces';
+import { Format, CardJSONResponse } from '@cardstack/core/src/interfaces';
 import type CardModel from '@cardstack/core/src/card-model';
 import { newCardParams } from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
@@ -127,7 +127,7 @@ function buildCallerComponent(model: CardModel, component: unknown): unknown {
 }
 
 async function loadComponentModule(
-  card: cardJSONReponse,
+  card: CardJSONResponse,
   url: string
 ): Promise<{ component: unknown; ModelClass: typeof CardModel }> {
   let { meta } = card.data;
@@ -169,7 +169,7 @@ async function loadComponentModule(
 async function fetchCard(
   url: string,
   options: any = {}
-): Promise<cardJSONReponse> {
+): Promise<CardJSONResponse> {
   let fullOptions = Object.assign(
     {
       headers: {
