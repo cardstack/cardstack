@@ -22,7 +22,7 @@ module.exports = {
   },
   rules: {
     '@typescript-eslint/no-empty-function': 'off',
-    '@typescript-eslint/no-unused-vars': 'error',
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'prefer-const': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-types': 'off',

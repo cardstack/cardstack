@@ -40,7 +40,7 @@ export default class CardModel {
   setters: Setter;
   @tracked private _data: any;
 
-  private constructor(
+  constructor(
     private cards: CardServiceHandle,
     private innerComponent: unknown,
     private state: CreatedState | LoadedState
@@ -129,7 +129,7 @@ export default class CardModel {
     );
   }
 
-  serialize(): CardJSONRequest {
+  private serialize(): CardJSONRequest {
     let { data } = this;
     let attributes = serializeAttributes(
       data,

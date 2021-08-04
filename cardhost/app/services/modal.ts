@@ -3,14 +3,12 @@ import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import type RouterService from '@ember/routing/router-service';
 
-import { task, TaskGenerator } from 'ember-concurrency';
-// import { taskFor } from 'ember-concurrency-ts';
+import { task } from 'ember-concurrency';
 
-import { Card } from './cards';
+import CardModel from '../lib/card-model';
 import CardsService from '../services/cards';
 import { Format } from '@cardstack/core/src/interfaces';
 import { taskFor } from 'ember-concurrency-ts';
-import type { NewCardParams } from 'cardhost/lib/card-model';
 
 type State =
   | {
@@ -21,7 +19,7 @@ type State =
     }
   | {
       name: 'loaded';
-      loadedCard: Card;
+      loadedCard: CardModel;
       format: Format;
     };
 
@@ -39,24 +37,24 @@ export default class Modal extends Service {
     return this.state.name === 'loading';
   }
 
-  get card(): Card | undefined {
+  get card(): CardModel | undefined {
     if (this.state.name === 'loaded') {
       return this.state.loadedCard;
     }
     return;
   }
   get cardComponent(): unknown {
-    return this.card && this.card.component;
+    return this.card?.component;
   }
 
   openCard(card: string, format: Format): Promise<void> {
     return taskFor(this.openCardTask).perform(card, format);
   }
 
-  @task *openCardTask(url: string, format: Format): TaskGenerator<void> {
+  @task async openCardTask(url: string, format: Format): Promise<void> {
     this.state = { name: 'loading' };
 
-    let loadedCard = yield this.cards.load(url, format);
+    let loadedCard = await this.cards.load(url, format);
 
     this.state = {
       name: 'loaded',
@@ -65,16 +63,19 @@ export default class Modal extends Service {
     };
   }
 
-  @task *editCardTask(
-    card: Card,
-    cardParams?: NewCardParams | Event
-  ): TaskGenerator<void> {
-    if (cardParams instanceof Event) {
-      cardParams = undefined;
-    }
-
+  @task async newCardTask(parentCard: CardModel, realm: string) {
     this.state = { name: 'loading' };
-    let loadedCard = yield this.cards.loadForEdit(card, cardParams);
+    let loadedCard = parentCard.adoptIntoRealm(realm);
+    this.state = {
+      name: 'loaded',
+      loadedCard,
+      format: 'edit',
+    };
+  }
+
+  @task async editCardTask(card: CardModel): Promise<void> {
+    this.state = { name: 'loading' };
+    let loadedCard = await card.editable();
     this.state = {
       name: 'loaded',
       loadedCard,
@@ -86,9 +87,9 @@ export default class Modal extends Service {
     if (this.state.name !== 'loaded') {
       return;
     }
-    await this.cards.save(this.state.loadedCard);
+    await this.state.loadedCard.save();
     this.router.transitionTo({
-      queryParams: { url: this.state.loadedCard.model.url, format: 'isolated' },
+      queryParams: { url: this.state.loadedCard.url, format: 'isolated' },
     });
     this.close();
   }

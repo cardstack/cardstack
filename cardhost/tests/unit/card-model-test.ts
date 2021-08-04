@@ -10,6 +10,7 @@ import QUnit from 'qunit';
 const { module: Qmodule, test } = QUnit;
 
 import CardModel from 'cardhost/lib/card-model';
+import { CardJSONResponse, Format } from '@cardstack/core/src/interfaces';
 
 class PersonCardModel extends CardModel {
   static serializerMap = {
@@ -39,9 +40,30 @@ let cardJSONResponse = {
   },
 };
 
+class StubCards {
+  async load(_url: string, _format: Format): Promise<CardModel> {
+    throw new Error('unimplemented');
+  }
+  buildNewURL(_realm: string, _parentCardURL: string): string {
+    throw new Error('unimplemented');
+  }
+  buildCardURL(_url: string, _format?: Format): string {
+    throw new Error('unimplemented');
+  }
+  async fetchJSON(_url: string, _options: any = {}): Promise<CardJSONResponse> {
+    throw new Error('unimplemented');
+  }
+}
+const fakeComponent: unknown = {};
+
 Qmodule('CardModel', function () {
   test('.data', async function (assert) {
-    let model = PersonCardModel.newFromResponse(cardJSONResponse);
+    let stub = new StubCards();
+    let model = PersonCardModel.newFromResponse(
+      stub,
+      cardJSONResponse,
+      fakeComponent
+    );
     assert.equal(model.data.name, attributes.name);
     assert.ok(
       isSameDay(model.data.birthdate, p('1923-12-12')),
@@ -55,11 +77,16 @@ Qmodule('CardModel', function () {
   });
 
   test('.serialize', async function (assert) {
-    let model = PersonCardModel.newFromResponse(cardJSONResponse);
-    model.data; // lazy deserializing
-    let serialized = model.serialize();
+    let stub = new StubCards();
+    let model = PersonCardModel.newFromResponse(
+      stub,
+      cardJSONResponse,
+      fakeComponent
+    );
+
+    await model.save();
     assert.deepEqual(
-      serialized,
+      stub.lastBody,
       {
         data: {
           id: PERSON_RAW_CARD.url,

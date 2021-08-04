@@ -10,11 +10,6 @@ import config from 'cardhost/config/environment';
 
 const { cardServer } = config as any; // Environment types arent working
 
-export interface Card {
-  model: CardModel;
-  component: unknown;
-}
-
 // the methods our service makes available for CardModel's exclusive use
 export interface CardServiceHandle {
   load: Cards['load'];
