@@ -1,0 +1,36 @@
+name: Manual Deploy [firebase-functions]
+
+on:
+  workflow_dispatch:
+    inputs:
+      functionToDeploy:
+        description: 'options -> push, check-version, maintenance-status, minimum-version, review-feature'
+        required: true
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Decrypt services account
+        run: ./.github/scripts/decrypt-fb-credentials.sh
+        env:
+          FIREBASE_CREDENTIALS_PASSPHRASE: ${{ secrets.FIREBASE_CREDENTIALS_PASSPHRASE }}
+      - uses: volta-cli/action@v1
+
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - run: yarn --prefer-offline
+      - name: Deploy
+        working-directory: packages/firebase-functions/$FUNCTION_PATH/functions
+        run: npx firebase-tools deploy --token "$FIREBASE_TOKEN" --project "$PROJECT_ID"
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FUNCTION_PATH: ${{ github.event.inputs.functionToDeploy }}
