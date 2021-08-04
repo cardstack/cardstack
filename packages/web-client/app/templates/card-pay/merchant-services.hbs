@@ -24,3 +24,15 @@
     {{/each}}
   </CardPay::DashboardPanel>
 </section>
+
+<Boxel::Modal
+  style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
+  @isOpen={{eq this.flow 'create-merchant'}}
+  @onClose={{set this 'flow' null}}
+>
+  {{#if (is-network-initialized)}}
+    {{#if (eq this.flow 'create-merchant')}}
+      <CardPay::CreateMerchantWorkflow />
+    {{/if}}
+  {{/if}}
+</Boxel::Modal>
