@@ -4,13 +4,13 @@ import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { setupCardCache } from '@cardstack/server/tests/helpers/cache';
 import {
-  RealmHelper,
+  ProjectTestRealm,
   setupRealms,
 } from '@cardstack/server/tests/helpers/realm';
 import { Server } from '@cardstack/server/src/server';
 
 QUnit.module('GET /cardFor/<path>', function (hooks) {
-  let realm: RealmHelper;
+  let realm: ProjectTestRealm;
   let server: Koa;
 
   function getCardForPath(path: string) {
@@ -18,10 +18,10 @@ QUnit.module('GET /cardFor/<path>', function (hooks) {
   }
 
   let { resolveCard, getCardCacheDir } = setupCardCache(hooks);
-  let { createRealm, getRealms } = setupRealms(hooks);
+  let { createRealm, getRealmManager } = setupRealms(hooks);
 
   hooks.beforeEach(async function () {
-    realm = createRealm('my-realm');
+    realm = createRealm('https://my-realm');
     realm.addCard('routes', {
       'card.json': { schema: 'schema.js' },
       'schema.js': `
@@ -54,7 +54,7 @@ QUnit.module('GET /cardFor/<path>', function (hooks) {
     server = (
       await Server.create({
         cardCacheDir: getCardCacheDir(),
-        realms: getRealms(),
+        realms: getRealmManager(),
         routeCard: 'https://my-realm/routes',
       })
     ).app;

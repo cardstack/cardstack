@@ -1,5 +1,6 @@
 import difference from 'lodash/difference';
 import { BadRequest } from '@cardstack/server/src/middleware/errors';
+import type CardModel from './card-model';
 
 const componentFormats = {
   isolated: '',
@@ -36,13 +37,13 @@ export type CardData = Record<string, any>;
 export type Setter = (value: any) => void;
 
 /* Card type IDEAS
-  primitive: 
+  primitive:
     Where card is a value, has validation and/or a serialize. IE: Date, string
     Has a @value attribute
-  composite: 
+  composite:
     Where card is combining multifle cards, ie: A blog post
     Has a @model attribute
-  data: 
+  data:
     A card that likely adopts from a composite card, but only provides new data for it
 */
 
@@ -76,13 +77,11 @@ export interface Field {
 export interface CompiledCard {
   url: string;
   adoptsFrom?: CompiledCard;
-  data: Record<string, any> | undefined;
   fields: {
     [key: string]: Field;
   };
   schemaModule: string;
-  // TODO: This is confusingly named. Maybe it's should be serializerName
-  deserializer?: SerializerName;
+  serializer?: SerializerName;
 
   isolated: ComponentInfo;
   embedded: ComponentInfo;
@@ -104,19 +103,37 @@ export interface Builder {
 
 export interface RealmConfig {
   url: string;
-  directory: string;
+  directory?: string;
 }
 
-export type cardJSONReponse = {
+export type CardJSONResponse = {
   data: {
     id: string;
     type: string;
     attributes?: { [name: string]: any };
-    meta: {
+    meta?: {
       componentModule: string;
     };
   };
 };
+
+export type CardJSONRequest = {
+  data: {
+    id?: string;
+    type: string;
+    attributes?: { [name: string]: any };
+  };
+};
+
+// this is the set of enviroment-specific capabilities a CardModel gets access
+// to
+export interface CardEnv {
+  load(url: string, format: Format): Promise<CardModel>;
+  buildCardURL(url: string, format?: Format): string;
+  buildNewURL(realm: string, parentCardURL: string): string;
+  fetchJSON(url: string, options: any): Promise<CardJSONResponse>;
+  prepareComponent(component: unknown, data: any, set: Setter): unknown;
+}
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (obj == null) {
@@ -151,29 +168,6 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
     if (typeof obj.data !== 'object' || obj.data == null) {
       throw new Error(`invalid data property in ${obj.url}`);
     }
-  }
-}
-
-export function assertValidCompiledCard(
-  card: any
-): asserts card is CompiledCard {
-  if (!card) {
-    throw new Error(`Not a valid Compiled Card`);
-  }
-  if (!card.url) {
-    throw new Error(`CompiledCards must include a url`);
-  }
-  if (!card.schemaModule) {
-    throw new Error(
-      `${card.url} does not have a schema file. This is wrong and should not happen.`
-    );
-  }
-  if (card.data) {
-    assertValidKeys(
-      Object.keys(card.data),
-      Object.keys(card.fields),
-      `Field(s) %list% does not exist on card "${card.url}"`
-    );
   }
 }
 

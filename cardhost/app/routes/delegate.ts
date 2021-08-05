@@ -5,9 +5,7 @@ import CardsService from '../services/cards';
 export default class Delegate extends Route {
   @inject declare cards: CardsService;
 
-  model(params: {
-    pathname: string;
-  }): Promise<{ model: any; component: unknown }> {
+  model(params: { pathname: string; url?: string }) {
     return this.cards.loadForRoute('/' + params.pathname);
   }
 }

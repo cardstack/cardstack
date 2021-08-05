@@ -1,4 +1,5 @@
-import format from 'date-fns/format';
+import { parseISO, parse, format } from 'date-fns';
+
 export interface PrimitiveSerializer {
   serialize(val: any): any;
   deserialize(val: any): any;
@@ -9,16 +10,20 @@ let DateTimeSerializer: PrimitiveSerializer = {
     return d.toISOString();
   },
   deserialize(d: string): Date {
-    return new Date(d);
+    return parseISO(d);
   },
 };
 
 let DateSerializer: PrimitiveSerializer = {
   serialize(d: Date): string {
+    // If the model hasn't been deserialized yet it will still be a string
+    if (typeof d === 'string') {
+      return d;
+    }
     return format(d, 'yyyy-MM-dd');
   },
   deserialize(d: string): Date {
-    return new Date(d);
+    return parse(d, 'yyyy-MM-dd', new Date());
   },
 };
 

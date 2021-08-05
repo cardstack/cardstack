@@ -2,8 +2,12 @@
 
 <a href='/welcome'>Welcome</a>
 <a href='/about'>About</a>
+<a href='/?url=https://demo.com/post-0'>Blog Post</a>
 
 {{outlet}}
 
-
-<CardModal />
+<CardModal
+  @url={{this.url}}
+  @format={{this.format}}
+  @onClose={{this.onModalClose}}
+/>

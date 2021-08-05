@@ -5,7 +5,7 @@ import { join } from 'path';
 import walkSync from 'walk-sync';
 import sane from 'sane';
 import { sep } from 'path';
-import { RealmConfig } from '@cardstack/core/src/interfaces';
+import RealmManager from './realm-manager';
 
 export function cleanCache(dir: string): void {
   console.debug('Cleaning cardCache dir: ' + dir);
@@ -16,12 +16,12 @@ export function cleanCache(dir: string): void {
 }
 
 export async function primeCache(
-  realms: RealmConfig[],
+  realManager: RealmManager,
   builder: Builder
 ): Promise<void> {
   let promises = [];
 
-  for (let realm of realms) {
+  for (let realm of realManager.realms) {
     let cards = walkSync(realm.directory, { globs: ['**/card.json'] });
     for (let cardPath of cards) {
       let fullCardUrl = new URL(cardPath.replace('card.json', ''), realm.url)
@@ -35,8 +35,8 @@ export async function primeCache(
   console.debug(`--> Cache primed`);
 }
 
-export function setupWatchers(realms: RealmConfig[], builder: Builder) {
-  return realms.map((realm) => {
+export function setupWatchers(realmManager: RealmManager, builder: Builder) {
+  return realmManager.realms.map((realm) => {
     let watcher = sane(realm.directory);
     const handler = (filepath: string /* root: string, stat?: Stats */) => {
       let segments = filepath.split(sep);

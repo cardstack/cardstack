@@ -4,13 +4,13 @@ import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { setupCardCache } from '@cardstack/server/tests/helpers/cache';
 import {
-  RealmHelper,
+  ProjectTestRealm,
   setupRealms,
 } from '@cardstack/server/tests/helpers/realm';
 import { Server } from '@cardstack/server/src/server';
 
 QUnit.module('PATCH /cards/<card-id>', function (hooks) {
-  let realm: RealmHelper;
+  let realm: ProjectTestRealm;
   let server: Koa;
 
   function getCard(cardURL: string) {
@@ -28,10 +28,10 @@ QUnit.module('PATCH /cards/<card-id>', function (hooks) {
   }
 
   let { getCardCacheDir } = setupCardCache(hooks);
-  let { createRealm, getRealms } = setupRealms(hooks);
+  let { createRealm, getRealmManager } = setupRealms(hooks);
 
   hooks.beforeEach(async function () {
-    realm = createRealm('my-realm');
+    realm = createRealm('https://my-realm');
     realm.addCard('post', {
       'card.json': {
         schema: 'schema.js',
@@ -67,7 +67,7 @@ QUnit.module('PATCH /cards/<card-id>', function (hooks) {
     server = (
       await Server.create({
         cardCacheDir: getCardCacheDir(),
-        realms: getRealms(),
+        realms: getRealmManager(),
       })
     ).app;
   });
@@ -98,8 +98,6 @@ QUnit.module('PATCH /cards/<card-id>', function (hooks) {
       body: 'First post',
     });
 
-    // TODO: Our response assumes the "isolated" format, which has the component module
-    // That feels odd
     let response = await getCard('https://my-realm/post0').expect(200);
     assert.deepEqual(response.body.data?.attributes, {
       title: 'Goodbye World!',

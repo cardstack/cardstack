@@ -6,6 +6,7 @@ import { Server } from '../src/server';
 import { createCardCacheDir, createMinimalPackageJSON } from './helpers/cache';
 import { Project } from 'scenario-tester';
 import { BASE_CARD_REALM_CONFIG } from './helpers/fixtures';
+import RealmManager from '../src/realm-manager';
 
 QUnit.module('Server boot', function () {
   QUnit.test(
@@ -18,7 +19,7 @@ QUnit.module('Server boot', function () {
       assert.rejects(
         Server.create({
           cardCacheDir,
-          realms: [BASE_CARD_REALM_CONFIG],
+          realms: new RealmManager([BASE_CARD_REALM_CONFIG]),
         }),
         /package.json is required in cardCacheDir/
       );
@@ -39,7 +40,7 @@ QUnit.module('Server boot', function () {
       assert.rejects(
         Server.create({
           cardCacheDir,
-          realms: [BASE_CARD_REALM_CONFIG],
+          realms: new RealmManager([BASE_CARD_REALM_CONFIG]),
         }),
         /package.json of cardCacheDir does not have properly configured exports/
       );
@@ -52,7 +53,7 @@ QUnit.module('Server boot', function () {
       assert.rejects(
         Server.create({
           cardCacheDir,
-          realms: [BASE_CARD_REALM_CONFIG],
+          realms: new RealmManager([BASE_CARD_REALM_CONFIG]),
         }),
         /package.json of cardCacheDir does not have properly configured exports/
       );
@@ -92,10 +93,10 @@ QUnit.module('Server boot', function () {
       assert.rejects(
         Server.create({
           cardCacheDir,
-          realms: [
+          realms: new RealmManager([
             { url: 'https://my-realm', directory: realm.baseDir },
             BASE_CARD_REALM_CONFIG,
-          ],
+          ]),
           routeCard: 'https://my-realm/routes',
         }),
         /Route Card's Schema does not have proper routing method defined/

@@ -458,7 +458,9 @@ function rewriteFieldToComponent(
 ): Statement[] {
   let { element, attr, mustache, path, text } = syntax.builders;
 
-  // TODO: What we really want it String or Date, instead of Title or Birthdate
+  // TODO: What we really want it String or Date, instead of Title
+  // or Birthdate.This will require some additional information
+  // in the field decloration
   let componentName = importAndChooseName(
     capitalize(field.name),
     field.card[format].moduleName,
@@ -472,7 +474,6 @@ function rewriteFieldToComponent(
     attr('data-test-field-name', text(field.name)),
   ];
 
-  // TODO: Test this!
   if (format === 'edit') {
     let setterArg = modelArgument.replace(MODEL + '.', '');
     attrs.push(attr('@set', mustache(path(`@set.setters.${setterArg}`))));

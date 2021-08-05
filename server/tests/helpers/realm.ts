@@ -1,53 +1,48 @@
 import { RealmConfig } from '@cardstack/core/src/interfaces';
 import { Project } from 'scenario-tester';
 import { BASE_CARD_REALM_CONFIG } from './fixtures';
+import RealmManager from '../../src/realm-manager';
+import FSRealm from '../../src/realms/fs-realm';
 
-export class RealmHelper {
-  realm: Project;
+export class ProjectTestRealm extends FSRealm {
+  project: Project;
 
-  constructor(name: string) {
-    this.realm = new Project(name);
-    this.write();
+  constructor(config: RealmConfig, manager: RealmManager) {
+    let project = new Project(config.url);
+    project.writeSync();
+    config.directory = project.baseDir;
+    super(config, manager);
+    this.project = project;
   }
 
-  addCard(id: string, files: Project['files']): void {
+  addCard(cardID: string, files: Project['files']): void {
     files['card.json'] = JSON.stringify(files['card.json'], null, 2);
-    this.realm.files[id] = files;
-
-    this.write();
-  }
-  write(): void {
-    this.realm.writeSync();
-  }
-  get dir(): string {
-    return this.realm.baseDir;
+    this.project.files[cardID] = files;
+    this.project.writeSync();
   }
 }
 
 export function setupRealms(
   hooks: NestedHooks
 ): {
-  createRealm: (name: string) => RealmHelper;
-  getRealms: () => RealmConfig[];
+  createRealm: (name: string) => ProjectTestRealm;
+  getRealmManager: () => RealmManager;
 } {
-  let realms: RealmConfig[] = [BASE_CARD_REALM_CONFIG];
+  let realmConfigs: RealmConfig[] = [BASE_CARD_REALM_CONFIG];
+  let realmManager: RealmManager;
 
-  function createRealm(name: string): RealmHelper {
-    let realm = new RealmHelper(name);
-    realms.unshift({ url: `https://${name}`, directory: realm.dir });
-    return realm;
-  }
-
-  function getRealms(): RealmConfig[] {
-    return realms;
+  function createRealm(name: string): ProjectTestRealm {
+    return realmManager!.createRealm({ url: name }, ProjectTestRealm);
   }
 
   hooks.beforeEach(function () {
-    realms = [BASE_CARD_REALM_CONFIG];
-  });
-  hooks.afterEach(function () {
-    realms = [];
+    realmManager = new RealmManager(realmConfigs);
   });
 
-  return { createRealm, getRealms };
+  return {
+    createRealm,
+    getRealmManager() {
+      return realmManager;
+    },
+  };
 }

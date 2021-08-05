@@ -54,7 +54,7 @@ export function babelPluginCardTemplate() {
           state.insideExportDefault = false;
           state.neededImports = new Map();
           state.neededImports.set(BASE_MODEL_VAR_NAME, {
-            moduleSpecifier: '@cardstack/core/src/base-component-model',
+            moduleSpecifier: '@cardstack/core/src/card-model',
             exportedName: 'default',
           });
         },
@@ -143,7 +143,11 @@ function buildSerializerMapProp(
   }
   return t.classProperty(
     t.identifier('serializerMap'),
-    t.objectExpression(props)
+    t.objectExpression(props),
+    undefined,
+    undefined,
+    undefined,
+    true
   );
 }
 

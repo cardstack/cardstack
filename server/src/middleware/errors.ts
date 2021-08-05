@@ -6,6 +6,10 @@ export class BadRequest extends Error {
   status = 400;
 }
 
+export class Conflict extends Error {
+  status = 409;
+}
+
 export async function errorMiddleware(ctx: any, next: any) {
   try {
     await next();

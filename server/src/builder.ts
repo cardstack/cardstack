@@ -1,27 +1,15 @@
-import walkSync from 'walk-sync';
-import {
-  readFileSync,
-  existsSync,
-  removeSync,
-  readJsonSync,
-  writeJsonSync,
-} from 'fs-extra';
-import { join } from 'path';
-
 import {
   Builder as BuilderInterface,
   RawCard,
   CompiledCard,
-  assertValidRawCard,
-  RealmConfig,
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 
-import { NotFound } from './middleware/errors';
 import { transformSync } from '@babel/core';
 import { NODE, BROWSER } from './interfaces';
 import { CardCache } from './cache';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
+import RealmManager from './realm-manager';
 
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
@@ -29,12 +17,11 @@ export default class Builder implements BuilderInterface {
     define: (...args) => this.define(...args),
   });
 
-  // private cache: Map<string, CompiledCard>;
-  private realms: RealmConfig[];
+  private realms: RealmManager;
   private cache: CardCache;
 
   constructor(params: {
-    realms: RealmConfig[];
+    realms: RealmManager;
     cardCacheDir: string;
     pkgName: string;
   }) {
@@ -78,43 +65,8 @@ export default class Builder implements BuilderInterface {
     return out!.code!;
   }
 
-  locateCardDir(url: string): string {
-    for (let realm of this.realms) {
-      if (!url.startsWith(realm.url)) {
-        continue;
-      }
-
-      let realmPath = join(realm.directory, url.replace(realm.url, ''));
-      if (existsSync(realmPath)) {
-        return realmPath;
-      }
-    }
-
-    throw new NotFound(`${url} is not a card we know about`);
-  }
-
   async getRawCard(url: string): Promise<RawCard> {
-    let dir = this.locateCardDir(url);
-    let files: any = {};
-
-    for (let file of walkSync(dir, {
-      directories: false,
-    })) {
-      let fullPath = join(dir, file);
-      files[file] = readFileSync(fullPath, 'utf8');
-    }
-
-    let cardJSON = files['card.json'];
-    if (!cardJSON) {
-      throw new Error(`${url} is missing card.json`);
-    }
-
-    delete files['card.json'];
-    let card = JSON.parse(cardJSON);
-    Object.assign(card, { files, url });
-    assertValidRawCard(card);
-
-    return card;
+    return this.realms.getRawCard(url);
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
@@ -134,22 +86,6 @@ export default class Builder implements BuilderInterface {
     return compiledCard;
   }
 
-  async updateCardData(url: string, attributes: any) {
-    let fullPath = join(this.locateCardDir(url), 'card.json');
-
-    // Builder: merge data into card.json
-    let card = readJsonSync(fullPath);
-    card.data = Object.assign(card.data, attributes);
-    writeJsonSync(fullPath, card);
-
-    // Cache: Merge data into compiled.json
-    let compiledCard = await this.getCompiledCard(url);
-    compiledCard.data = Object.assign(compiledCard.data, attributes);
-    this.cache.setCard(url, compiledCard);
-
-    return compiledCard;
-  }
-
   async compileCardFromRaw(
     url: string,
     rawCard: RawCard
@@ -160,10 +96,8 @@ export default class Builder implements BuilderInterface {
     return compiledCard;
   }
 
-  deleteCard(cardURL: string) {
-    this.cache.deleteCard(cardURL);
-
-    let cardDir = this.locateCardDir(cardURL);
-    removeSync(cardDir);
+  async deleteCard(cardURL: string) {
+    await this.cache.deleteCard(cardURL);
+    await this.realms.deleteCard(cardURL);
   }
 }

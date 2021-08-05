@@ -14,16 +14,11 @@ function assertValidRouterInstance(router: any, routeCard: string): void {
 
 export async function setupCardRouting(
   app: Koa<any, CardStackContext>,
-  options: { routeCard: string; cardCacheDir: string }
+  options: { routeCard: string }
 ) {
-  let { routeCard, cardCacheDir } = options;
+  let { routeCard } = options;
   let card = await app.context.builder.getCompiledCard(routeCard);
-
-  const cardRouterClassLocation = require.resolve(card.schemaModule, {
-    paths: [cardCacheDir],
-  });
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const CardRouterClass = require(cardRouterClassLocation).default;
+  const CardRouterClass = app.context.requireCard(card.schemaModule).default;
   const cardRouterInstance = new CardRouterClass();
 
   assertValidRouterInstance(cardRouterInstance, routeCard);

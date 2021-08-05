@@ -20,7 +20,8 @@ declare module 'ember-test-helpers' {
   }
 }
 
-const BASE_CARD_NAMES = ['base', 'string', 'date'];
+// TODO: This should be loaded automatically from the base card directory
+const BASE_CARD_NAMES = ['base', 'string', 'date', 'datetime'];
 
 async function loadBaseCards() {
   let BASE_CARDS: RawCard[] = [];
@@ -36,7 +37,7 @@ async function loadBaseCards() {
         continue;
       }
       let { basename } = getBasenameAndExtension(fileName);
-      // TODO: The assumption of JS here is sketchty, but webpack blows a gasket if no extension is presest
+      // NOTE: The assumption of JS here is sketchty, but webpack blows a gasket if no extension is presest
       card.files[fileName] = (
         await import(`!raw-loader!@cardstack/base-cards/${name}/${basename}.js`)
       ).default;

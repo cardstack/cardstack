@@ -30,13 +30,13 @@ module('Integration | card-service', function (hooks) {
           'schema.js': `
           import { contains } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
-          import date from "https://cardstack.com/base/date";
+          import datetime from "https://cardstack.com/base/datetime";
 
           export default class Hello {
             @contains(string)
             title;
 
-            @contains(date)
+            @contains(datetime)
             createdAt;
           }
         `,
@@ -51,7 +51,7 @@ module('Integration | card-service', function (hooks) {
         adoptsFrom: 'http://mirage/cards/post',
         data: {
           title: 'A blog post title',
-          createdAt: '2021-05-17T15:31:21+0000',
+          createdAt: '2021-03-02T19:51:32.121Z',
         },
       });
     });
@@ -61,11 +61,11 @@ module('Integration | card-service', function (hooks) {
       this.set('component', component);
       await render(hbs`<this.component />`);
       assert.dom('h1').containsText('A blog post title');
-      assert.dom('h2').containsText('May 17, 2021');
+      assert.dom('h2').containsText('Mar 2, 2021');
     });
 
-    test(`load an card's isolated view and model`, async function (assert) {
-      let { model } = (await cards.load(cardID, 'isolated')) as any;
+    test(`load a card's isolated view and model`, async function (assert) {
+      let model = await cards.load(cardID, 'isolated');
       assert.equal(model.url, cardID, '@model id is correct');
       assert.equal(
         model.data.title,
@@ -78,7 +78,7 @@ module('Integration | card-service', function (hooks) {
       );
       assert.equal(
         model.data.createdAt.getTime(),
-        1621265481000,
+        1614714692121,
         'post created at is correct'
       );
     });
@@ -90,7 +90,7 @@ module('Integration | card-service', function (hooks) {
       assert
         .dom('[data-test-field-name="title"]')
         .hasValue('A blog post title');
-      assert.dom('[data-test-field-name="createdAt"]').hasValue('2021-05-17');
+      assert.dom('[data-test-field-name="createdAt"]').hasAnyValue();
     });
 
     test('Serialization works on nested cards', async function (assert) {
@@ -122,11 +122,8 @@ module('Integration | card-service', function (hooks) {
         },
       });
 
-      let { model, component } = (await cards.load(
-        'http://mirage/cards/post-list',
-        'isolated'
-      )) as any;
-      this.set('component', component);
+      let model = await cards.load('http://mirage/cards/post-list', 'isolated');
+      this.set('component', model.component);
       await render(hbs`<this.component />`);
       assert.dom('h1').containsText('A blog post title');
       assert.dom('h2').containsText('May 17, 2021');

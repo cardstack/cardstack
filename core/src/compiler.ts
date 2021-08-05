@@ -18,7 +18,7 @@ import transformCardComponent, {
   CardComponentPluginOptions as CardComponentPluginOptions,
 } from './babel-plugin-card-template';
 import {
-  assertValidCompiledCard,
+  assertValidKeys,
   Builder,
   CompiledCard,
   ComponentInfo,
@@ -60,25 +60,21 @@ export class Compiler {
   }
 
   async compile(cardSource: RawCard): Promise<CompiledCard> {
-    let card: Partial<CompiledCard> = {
-      url: cardSource.url,
-      data: cardSource.data,
-    };
-
-    if (cardSource.deserializer) {
-      card.deserializer = cardSource.deserializer;
-    }
-
     let options = {};
-    card.schemaModule = await this.prepareSchema(cardSource, options);
+    let schemaModule = await this.prepareSchema(cardSource, options);
     let meta = getMeta(options);
 
-    card.fields = await this.lookupFieldsForCard(meta.fields);
+    let fields = await this.lookupFieldsForCard(meta.fields);
 
     this.defineAssets(cardSource);
 
-    if (!isBaseCard(cardSource.url)) {
-      let parentCard = await this.getParentCard(cardSource, meta);
+    let parentCard;
+    let serializer = cardSource.deserializer;
+
+    if (isBaseCard(cardSource.url)) {
+      schemaModule = 'todo';
+    } else {
+      parentCard = await this.getParentCard(cardSource, meta);
 
       if (!parentCard) {
         throw new Error(
@@ -86,43 +82,44 @@ export class Compiler {
         );
       }
 
-      card.fields = this.adoptFields(card.fields, parentCard);
-      card.adoptsFrom = parentCard;
-
-      if (!card.schemaModule) {
-        card.schemaModule = parentCard.schemaModule;
+      if (!schemaModule) {
+        schemaModule = parentCard.schemaModule;
       }
-      if (parentCard.deserializer) {
-        if (
-          card.deserializer &&
-          parentCard.deserializer !== card.deserializer
-        ) {
+
+      fields = this.adoptFields(fields, parentCard);
+
+      if (parentCard.serializer) {
+        if (serializer && parentCard.serializer !== serializer) {
           throw new Error(
-            `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${card.url}:${card.deserializer} Parent: ${parentCard.url}:${parentCard.deserializer}`
+            `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${cardSource.url}:${serializer} Parent: ${parentCard.url}:${parentCard.serializer}`
           );
         }
-        card.deserializer = parentCard.deserializer;
+        serializer = parentCard.serializer;
       }
     }
 
-    if (!card.schemaModule) {
-      throw new Error(
-        `${cardSource.url} does not have a schema. This is wrong and should not happen.`
+    let components = await this.prepareComponents(
+      cardSource,
+      fields,
+      parentCard
+    );
+
+    if (cardSource.data) {
+      assertValidKeys(
+        Object.keys(cardSource.data),
+        Object.keys(fields),
+        `Field(s) %list% does not exist on card "${cardSource.url}"`
       );
     }
 
-    for (const format of FORMATS) {
-      card[format] = await this.prepareComponent(
-        cardSource,
-        card.fields,
-        card.adoptsFrom,
-        format
-      );
-    }
-
-    assertValidCompiledCard(card);
-
-    return card;
+    return {
+      url: cardSource.url,
+      serializer,
+      schemaModule,
+      fields,
+      adoptsFrom: parentCard,
+      ...components,
+    };
   }
 
   private defineAssets(sourceCard: RawCard) {
@@ -180,7 +177,6 @@ export class Compiler {
     let parentCardPath = this.getCardParentPath(cardSource, meta);
 
     if (parentCardPath) {
-      // TODO: Confirm the path correctly depthed
       let url = new URL(parentCardPath, cardSource.url).href;
       return await this.builder.getCompiledCard(url);
     } else {
@@ -266,6 +262,23 @@ export class Compiler {
     }
 
     return Object.assign({}, parentCard.fields, fields);
+  }
+
+  private async prepareComponents(
+    cardSource: RawCard,
+    fields: CompiledCard['fields'],
+    parentCard: CompiledCard | undefined
+  ) {
+    let components: Partial<Pick<CompiledCard, Format>> = {};
+    for (const format of FORMATS) {
+      components[format] = await this.prepareComponent(
+        cardSource,
+        fields,
+        parentCard,
+        format
+      );
+    }
+    return components as Pick<CompiledCard, Format>;
   }
 
   private async prepareComponent(

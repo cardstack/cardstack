@@ -1,5 +1,6 @@
 import type Builder from '../src/builder';
-import type { RealmConfig } from '@cardstack/core/src/interfaces';
+import type { RawCard } from '@cardstack/core/src/interfaces';
+import type RealmManager from './realm-manager';
 
 const ENVIRONMENTS_OBJ = {
   browser: '',
@@ -11,7 +12,7 @@ export const BROWSER = ENVIRONMENTS[0];
 export const NODE = ENVIRONMENTS[1];
 
 export interface ServerOptions {
-  realms: RealmConfig[];
+  realms: RealmManager;
   cardCacheDir: string;
   routeCard?: string;
 }
@@ -19,4 +20,25 @@ export interface ServerOptions {
 export interface CardStackContext {
   builder: Builder;
   cardRouter: any;
+  realms: RealmManager;
+  requireCard: (path: string) => any;
+}
+
+export interface RealmInterface {
+  getRawCard(cardURL: string): Promise<RawCard>;
+  updateCardData(cardURL: string, attributes: any): Promise<RawCard>;
+  deleteCard(cardURL: string): void;
+  doesCardExist(cardURL: string): boolean;
+  createDataCard(
+    data: any,
+    adoptsFrom: string,
+    cardURL?: string
+  ): Promise<RawCard>;
+}
+
+export interface Cache<CardType> {
+  get(url: string): CardType | undefined;
+  set(url: string, payload: CardType): void;
+  update(url: string, payload: CardType): void;
+  delete(url: string): void;
 }

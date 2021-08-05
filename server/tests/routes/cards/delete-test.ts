@@ -6,14 +6,14 @@ import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { setupCardCache } from '@cardstack/server/tests/helpers/cache';
 import {
-  RealmHelper,
+  ProjectTestRealm,
   setupRealms,
 } from '@cardstack/server/tests/helpers/realm';
 import { Server } from '@cardstack/server/src/server';
 import { existsSync } from 'fs-extra';
 
 QUnit.module('DELETE /cards/<card-id>', function (hooks) {
-  let realm: RealmHelper;
+  let realm: ProjectTestRealm;
   let server: Koa;
 
   function getCard(cardURL: string) {
@@ -29,10 +29,10 @@ QUnit.module('DELETE /cards/<card-id>', function (hooks) {
   }
 
   let { getCardCacheDir } = setupCardCache(hooks);
-  let { createRealm, getRealms } = setupRealms(hooks);
+  let { createRealm, getRealmManager } = setupRealms(hooks);
 
   hooks.beforeEach(async function () {
-    realm = createRealm('my-realm');
+    realm = createRealm('https://my-realm');
     realm.addCard('post', {
       'card.json': {
         schema: 'schema.js',
@@ -68,7 +68,7 @@ QUnit.module('DELETE /cards/<card-id>', function (hooks) {
     server = (
       await Server.create({
         cardCacheDir: getCardCacheDir(),
-        realms: getRealms(),
+        realms: getRealmManager(),
       })
     ).app;
   });
@@ -85,7 +85,6 @@ QUnit.module('DELETE /cards/<card-id>', function (hooks) {
     'can delete an existing card that has no children',
     async function (assert) {
       assert.expect(2);
-      console.log({ cardCacheDir: getCardCacheDir() });
 
       await deleteCard('https://my-realm/post0').expect(204);
       await getCard('https://my-realm/post0').expect(404);
@@ -102,7 +101,7 @@ QUnit.module('DELETE /cards/<card-id>', function (hooks) {
       );
 
       assert.notOk(
-        existsSync(join(realm.dir, 'post0')),
+        existsSync(join(realm.directory, 'post0')),
         'card is deleted from realm'
       );
     }

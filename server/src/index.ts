@@ -1,11 +1,12 @@
 import { Server } from './server';
 import { join } from 'path';
+import RealmManager from './realm-manager';
 import yargs from 'yargs/yargs';
 import { hideBin } from 'yargs/helpers';
 
 const cardCacheDir = join(__dirname, '..', '..', 'compiled');
 
-const realms = [
+const realms = new RealmManager([
   {
     url: 'https://cardstack.com/base/',
     directory: join(__dirname, '..', '..', 'base-cards'),
@@ -14,7 +15,7 @@ const realms = [
     url: 'https://demo.com/',
     directory: join(__dirname, '..', '..', 'demo-cards'),
   },
-];
+]);
 
 async function serve(args: any) {
   let server = await Server.create({
@@ -27,7 +28,7 @@ async function serve(args: any) {
   server.app.listen(args.port);
 }
 
-async function prime(args: any) {
+async function prime() {
   let server = await Server.create({
     realms,
     cardCacheDir,

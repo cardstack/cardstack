@@ -41,21 +41,16 @@ Qmodule('Compiler', function (hooks) {
       'https://cardstack.com/base/string'
     );
     assert.equal(compiled.adoptsFrom?.url, baseCardURL);
-    assert.notOk(compiled.data, 'no data');
     assert.equal(compiled.embedded.inlineHBS, '{{@model}}');
     assert.deepEqual(compiled.embedded.usedFields, []);
-    assert.ok(!compiled.deserializer, 'String card has no deserializer');
+    assert.ok(!compiled.serializer, 'String card has no deserializer');
   });
 
   test('date card', async function (assert) {
     let compiled = await builder.getCompiledCard(
       'https://cardstack.com/base/date'
     );
-    assert.equal(
-      compiled.deserializer,
-      'date',
-      'Date card has date serializer'
-    );
+    assert.equal(compiled.serializer, 'date', 'Date card has date serializer');
   });
 
   test('deserializer is inherited', async function (assert) {
@@ -73,7 +68,7 @@ Qmodule('Compiler', function (hooks) {
       'https://mirage/cards/fancy-date'
     );
     assert.equal(
-      compiled.deserializer,
+      compiled.serializer,
       'date',
       'FancyDate card has date serializer inherited from its parent'
     );
