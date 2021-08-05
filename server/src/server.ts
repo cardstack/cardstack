@@ -71,16 +71,25 @@ export class Server {
 
   private constructor(public app: Koa, private options: ServerOptions) {}
 
-  async startWatching() {
+  async primeCache() {
     let {
       options: { cardCacheDir, realms },
       app: {
         context: { builder },
       },
     } = this;
-
     cleanCache(cardCacheDir);
     await primeCache(realms, builder);
+  }
+
+  async startWatching() {
+    let {
+      options: { realms },
+      app: {
+        context: { builder },
+      },
+    } = this;
+
     this.watchers = setupWatchers(realms, builder);
   }
 
