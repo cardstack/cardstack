@@ -1,10 +1,11 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
-import Layer1Network from '@cardstack/web-client/services/layer1-network';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import BN from 'bn.js';
 import { tracked } from '@glimmer/tracking';
 import { reads } from 'macro-decorators';
+import * as Sentry from '@sentry/browser';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { TokenSymbol } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
@@ -52,6 +53,9 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
       this.completedCount = 3;
       this.args.onComplete?.();
     } catch (e) {
+      console.error('Failed to complete bridging to layer 2');
+      console.error(e);
+      Sentry.captureException(e);
       this.error = true;
     }
   }
