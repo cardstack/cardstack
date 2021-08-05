@@ -49,10 +49,16 @@ class StubCards {
     throw new Error('unimplemented');
   }
   buildCardURL(_url: string, _format?: Format): string {
-    throw new Error('unimplemented');
+    return 'http://fake.com';
   }
-  async fetchJSON(_url: string, _options: any = {}): Promise<CardJSONResponse> {
-    throw new Error('unimplemented');
+  async fetchJSON(_url: string, options: any = {}): Promise<CardJSONResponse> {
+    this.lastBody = options.body;
+    return {
+      data: {
+        type: options.body.type,
+        id: 'fakeid',
+      },
+    };
   }
   prepareComponent() {}
 }
@@ -88,7 +94,7 @@ Qmodule('CardModel', function () {
 
     await model.save();
     assert.deepEqual(
-      stub.lastBody,
+      JSON.parse(stub.lastBody),
       {
         data: {
           id: PERSON_RAW_CARD.url,
