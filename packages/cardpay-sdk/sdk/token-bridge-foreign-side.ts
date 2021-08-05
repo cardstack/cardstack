@@ -56,8 +56,9 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     let from = options?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let token = new this.layer1Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let foreignBridge = await getAddress('foreignBridge', this.layer1Web3);
+    let nextNonce = await this.getNextNonce(from);
 
-    return await new Promise(async (resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       let data = token.methods.approve(foreignBridge, amount).encodeABI();
       let tx: TransactionConfig = {
         ...options,
@@ -68,7 +69,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
       if (nonce != null) {
         tx.nonce = parseInt(nonce.toString()); // the web3 API requires this be a number, it should be ok to downcast this
       } else if (typeof onNonce === 'function') {
-        onNonce(await this.getNextNonce(from));
+        onNonce(nextNonce);
       }
 
       this.layer1Web3.eth
@@ -101,8 +102,9 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     let from = options?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let foreignBridgeAddress = await getAddress('foreignBridge', this.layer1Web3);
     let foreignBridge = new this.layer1Web3.eth.Contract(ForeignBridgeABI as any, foreignBridgeAddress);
+    let nextNonce = await this.getNextNonce(from);
 
-    return await new Promise(async (resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       let data = foreignBridge.methods.relayTokens(tokenAddress, recipientAddress, amount).encodeABI();
       let tx: TransactionConfig = {
         ...options,
@@ -113,7 +115,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
       if (nonce != null) {
         tx.nonce = parseInt(nonce.toString()); // the web3 API requires this be a number, it should be ok to downcast this
       } else if (typeof onNonce === 'function') {
-        onNonce(await this.getNextNonce(from));
+        onNonce(nextNonce);
       }
 
       this.layer1Web3.eth
@@ -157,7 +159,8 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
       return receipt;
     }
     const packedSignatures = prepSignaturesForExecution(signatures);
-    return await new Promise(async (resolve, reject) => {
+    let nextNonce = await this.getNextNonce(from);
+    return await new Promise((resolve, reject) => {
       let data = foreignAmb.methods.executeSignatures(encodedData, packedSignatures).encodeABI();
       let tx: TransactionConfig = {
         ...options,
@@ -168,7 +171,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
       if (nonce != null) {
         tx.nonce = parseInt(nonce.toString()); // the web3 API requires this be a number, it should be ok to downcast this
       } else if (typeof onNonce === 'function') {
-        onNonce(await this.getNextNonce(from));
+        onNonce(nextNonce);
       }
 
       this.layer1Web3.eth
