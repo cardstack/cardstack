@@ -1,5 +1,4 @@
-import format from 'date-fns/format';
-import parse from 'date-fns/parse';
+import { parseISO, parse, format } from 'date-fns';
 
 export interface PrimitiveSerializer {
   serialize(val: any): any;
@@ -11,7 +10,7 @@ let DateTimeSerializer: PrimitiveSerializer = {
     return d.toISOString();
   },
   deserialize(d: string): Date {
-    return new Date(d);
+    return parseISO(d);
   },
 };
 
