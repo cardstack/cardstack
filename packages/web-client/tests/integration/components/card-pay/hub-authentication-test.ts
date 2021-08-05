@@ -15,7 +15,7 @@ interface Context extends MirageTestContext {
 }
 
 module(
-  'Integration | Component | card-pay/issue-prepaid-card-workflow/authentication',
+  'Integration | Component | card-pay/hub-authentication',
   function (hooks) {
     let hubAuthentication: HubAuthentication;
 
@@ -37,7 +37,7 @@ module(
       });
 
       await render(hbs`
-      <CardPay::IssuePrepaidCardWorkflow::Authentication
+      <CardPay::HubAuthentication
         @onComplete={{this.onComplete}}
         @isComplete={{this.isComplete}}
         @onIncomplete={{this.onIncomplete}}

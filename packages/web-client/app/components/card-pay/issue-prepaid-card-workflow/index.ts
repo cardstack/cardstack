@@ -101,7 +101,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new NetworkAwareWorkflowCard({
           author: cardbot,
-          componentName: 'card-pay/issue-prepaid-card-workflow/authentication',
+          componentName: 'card-pay/hub-authentication',
           includeIf(this: NetworkAwareWorkflowCard) {
             return !this.isHubAuthenticated;
           },
