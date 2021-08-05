@@ -17,7 +17,9 @@
   <header class="prepaid-card__header">
     <div>
       <div>Issued by</div>
-      <div class="prepaid-card__name" data-test-prepaid-card-issuer-name>{{or @issuerName "Enter name"}}</div>
+      {{#let (or @issuerName "Enter name") as |name|}}
+        <div class="prepaid-card__name" title={{name}} data-test-prepaid-card-issuer-name>{{name}}</div>
+      {{/let}}
     </div>
     <div class="prepaid-card__meta">
       <div class="prepaid-card__type">PREPAID CARD</div>
