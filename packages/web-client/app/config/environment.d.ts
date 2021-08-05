@@ -5,6 +5,10 @@ interface ChainsOptions {
   layer2: string;
 }
 
+interface FeaturesOptions {
+  createMerchant: boolean;
+}
+
 interface UrlsOptions {
   appStoreLink: string | undefined;
   googlePlayLink: string | undefined;
@@ -24,6 +28,7 @@ declare const config: {
   rootURL: string;
   hubURL: string;
   chains: ChainsOptions;
+  features: FeaturesOptions;
   version: string;
   infuraId: string;
   urls: UrlsOptions;
