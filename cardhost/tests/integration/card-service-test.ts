@@ -64,8 +64,8 @@ module('Integration | card-service', function (hooks) {
       assert.dom('h2').containsText('May 17, 2021');
     });
 
-    test(`load an card's isolated view and model`, async function (assert) {
-      let { model } = (await cards.load(cardID, 'isolated')) as any;
+    test(`load a card's isolated view and model`, async function (assert) {
+      let model = await cards.load(cardID, 'isolated');
       assert.equal(model.url, cardID, '@model id is correct');
       assert.equal(
         model.data.title,
@@ -124,11 +124,8 @@ module('Integration | card-service', function (hooks) {
         },
       });
 
-      let { model, component } = (await cards.load(
-        'http://mirage/cards/post-list',
-        'isolated'
-      )) as any;
-      this.set('component', component);
+      let model = await cards.load('http://mirage/cards/post-list', 'isolated');
+      this.set('component', model.component);
       await render(hbs`<this.component />`);
       assert.dom('h1').containsText('A blog post title');
       assert.dom('h2').containsText('May 17, 2021');

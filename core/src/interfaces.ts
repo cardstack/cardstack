@@ -1,5 +1,6 @@
 import difference from 'lodash/difference';
 import { BadRequest } from '@cardstack/server/src/middleware/errors';
+import type CardModel from './card-model';
 
 const componentFormats = {
   isolated: '',
@@ -123,6 +124,16 @@ export type CardJSONRequest = {
     attributes?: { [name: string]: any };
   };
 };
+
+// this is the set of enviroment-specific capabilities a CardModel gets access
+// to
+export interface CardEnv {
+  load(url: string, format: Format): Promise<CardModel>;
+  buildCardURL(url: string, format?: Format): string;
+  buildNewURL(realm: string, parentCardURL: string): string;
+  fetchJSON(url: string, options: any): Promise<CardJSONResponse>;
+  prepareComponent(component: unknown, data: any, set: Setter): unknown;
+}
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (obj == null) {

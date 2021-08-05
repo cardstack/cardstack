@@ -3,27 +3,31 @@ import { macroCondition, isTesting } from '@embroider/macros';
 import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 
-import { Format, CardJSONResponse } from '@cardstack/core/src/interfaces';
-import type CardModel from 'cardhost/lib/card-model';
-import type { NewCardParams } from 'cardhost/lib/card-model';
+import {
+  Format,
+  CardJSONResponse,
+  Setter,
+  CardEnv,
+} from '@cardstack/core/src/interfaces';
+import type CardModel from '@cardstack/core/src/card-model';
+import type { NewCardParams } from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
+
+// @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
+import { setComponentTemplate } from '@ember/component';
+import Component from '@glimmer/component';
+import { hbs } from 'ember-cli-htmlbars';
 
 const { cardServer } = config as any; // Environment types arent working
 
 // the methods our service makes available for CardModel's exclusive use
-export interface CardServiceHandle {
-  load: Cards['load'];
-  buildCardURL: Cards['buildCardURL'];
-  buildNewURL: Cards['buildNewURL'];
-  fetchJSON: Cards['fetchJSON'];
-}
 
 export default class Cards extends Service {
   async load(url: string, format: Format): Promise<CardModel> {
     let fullURL = this.buildCardURL(url, format);
     let loaded = await taskFor(this.internalLoad).perform(fullURL);
     return loaded.ModelClass.newFromResponse(
-      this.serviceHandle(),
+      this.cardEnv(),
       loaded.cardResponse,
       loaded.component
     );
@@ -34,7 +38,7 @@ export default class Cards extends Service {
       `${cardServer}cardFor${pathname}`
     );
     return loaded.ModelClass.newFromResponse(
-      this.serviceHandle(),
+      this.cardEnv(),
       loaded.cardResponse,
       loaded.component
     );
@@ -51,12 +55,13 @@ export default class Cards extends Service {
     return { cardResponse, component, ModelClass };
   }
 
-  private serviceHandle() {
+  private cardEnv(): CardEnv {
     return {
       load: this.load.bind(this),
       buildNewURL: this.buildNewURL.bind(this),
       buildCardURL: this.buildCardURL.bind(this),
       fetchJSON: this.fetchJSON.bind(this),
+      prepareComponent: this.prepareComponent.bind(this),
     };
   }
 
@@ -97,6 +102,21 @@ export default class Cards extends Service {
     }
 
     return await response.json();
+  }
+
+  private prepareComponent(
+    component: unknown,
+    data: any,
+    set: Setter
+  ): unknown {
+    return setComponentTemplate(
+      hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
+      class extends Component {
+        component = component;
+        data = data;
+        set = set;
+      }
+    );
   }
 }
 

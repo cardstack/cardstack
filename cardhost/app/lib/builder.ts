@@ -8,6 +8,12 @@ import { Compiler } from '@cardstack/core/src/compiler';
 import { encodeCardURL } from '@cardstack/core/src/utils';
 import dynamicCardTransform from './dynamic-card-transform';
 
+// This is neccessary to get the base model available to ember
+import * as CardModel from '@cardstack/core/src/card-model';
+(window as any).define('@cardstack/core/src/card-model', function () {
+  return CardModel;
+});
+
 export interface Cache<CardType> {
   get(url: string): CardType | undefined;
   set(url: string, payload: CardType): void;

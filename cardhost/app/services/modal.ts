@@ -5,7 +5,7 @@ import type RouterService from '@ember/routing/router-service';
 
 import { task } from 'ember-concurrency';
 
-import CardModel from '../lib/card-model';
+import CardModel from '@cardstack/core/src/card-model';
 import CardsService from '../services/cards';
 import { Format } from '@cardstack/core/src/interfaces';
 import { taskFor } from 'ember-concurrency-ts';
@@ -65,7 +65,8 @@ export default class Modal extends Service {
 
   @task async newCardTask(parentCard: CardModel, realm: string) {
     this.state = { name: 'loading' };
-    let loadedCard = parentCard.adoptIntoRealm(realm);
+    let editableParent = await parentCard.editable();
+    let loadedCard = editableParent.adoptIntoRealm(realm);
     this.state = {
       name: 'loaded',
       loadedCard,

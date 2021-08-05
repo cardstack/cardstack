@@ -4,17 +4,13 @@ import {
   SerializerMap,
   SerializerName,
   Setter,
+  CardEnv,
 } from '@cardstack/core/src/interfaces';
 import serializers, {
   PrimitiveSerializer,
 } from '@cardstack/core/src/serializers';
 import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
-import type { CardServiceHandle } from 'cardhost/services/cards';
-// @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
-import { setComponentTemplate } from '@ember/component';
-import Component from '@glimmer/component';
-import { hbs } from 'ember-cli-htmlbars';
 
 export interface NewCardParams {
   realm: string;
@@ -38,10 +34,10 @@ export interface LoadedState {
 export default class CardModel {
   static serializerMap: SerializerMap;
   setters: Setter;
-  @tracked private _data: any;
+  @tracked private _data: any = {};
 
   constructor(
-    private cards: CardServiceHandle,
+    private cards: CardEnv,
     private innerComponent: unknown,
     private state: CreatedState | LoadedState
   ) {
@@ -49,7 +45,7 @@ export default class CardModel {
   }
 
   static newFromResponse(
-    cards: CardServiceHandle,
+    cards: CardEnv,
     cardResponse: CardJSONResponse,
     component: unknown
   ): CardModel {
@@ -104,9 +100,6 @@ export default class CardModel {
         }
         return this._data;
       case 'created':
-        if (!this._data) {
-          this._data = {};
-        }
         return this._data;
       default:
         throw assertNever(this.state);
@@ -117,12 +110,10 @@ export default class CardModel {
 
   get component(): unknown {
     if (!this.wrapperComponent) {
-      let model = this;
-      this.wrapperComponent = setComponentTemplate(
-        hbs`<this.model.innerComponent @model={{this.model.data}} @set={{this.model.setters}} />`,
-        class extends Component {
-          model = model;
-        }
+      this.wrapperComponent = this.cards.prepareComponent(
+        this.innerComponent,
+        this.data,
+        this.setters
       );
     }
     return this.wrapperComponent;

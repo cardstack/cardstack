@@ -2,7 +2,7 @@
   <div style="display:flex; background-color:lightgray">
     {{#if @editable}}
       <button data-test-edit-button {{on 'click' (perform this.modal.editCardTask @card)}}>Edit</button>
-      <button data-test-new-button {{on 'click' (perform this.model.newCardTask @card this.REALM)}}>New</button>
+      <button data-test-new-button {{on 'click' (perform this.modal.newCardTask @card this.REALM)}}>New</button>
     {{/if}}
   </div>
 

@@ -9,7 +9,7 @@ import QUnit from 'qunit';
 
 const { module: Qmodule, test } = QUnit;
 
-import CardModel from 'cardhost/lib/card-model';
+import CardModel from '@cardstack/core/src/card-model';
 import { CardJSONResponse, Format } from '@cardstack/core/src/interfaces';
 
 class PersonCardModel extends CardModel {
@@ -54,6 +54,7 @@ class StubCards {
   async fetchJSON(_url: string, _options: any = {}): Promise<CardJSONResponse> {
     throw new Error('unimplemented');
   }
+  prepareComponent() {}
 }
 const fakeComponent: unknown = {};
 
