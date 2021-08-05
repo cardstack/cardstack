@@ -62,6 +62,15 @@ export default class CardModel {
     });
   }
 
+  get url(): string {
+    if (this.state.type === 'loaded') {
+      return this.state.url;
+    }
+    throw new Error(
+      `bug: card in state ${this.state.type} does not have a url`
+    );
+  }
+
   async editable(): Promise<CardModel> {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to derive an editable card from an unsaved card`);

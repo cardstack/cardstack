@@ -41,6 +41,7 @@ let cardJSONResponse = {
 };
 
 class StubCards {
+  lastBody: any;
   async load(_url: string, _format: Format): Promise<CardModel> {
     throw new Error('unimplemented');
   }
