@@ -3,7 +3,7 @@ import { inject } from '@ember/service';
 import ModalService from 'cardhost/services/modal';
 import { action } from '@ember/object';
 import './index.css';
-import { Format } from '../../../../core/src/interfaces';
+import { Format } from '@cardstack/core/src/interfaces';
 
 export default class CardModal extends Component<{
   url: string;

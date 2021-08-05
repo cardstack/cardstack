@@ -10,7 +10,7 @@ import serializers, {
 } from '@cardstack/core/src/serializers';
 import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
-import { CardServiceHandle } from 'cardhost/services/cards';
+import type { CardServiceHandle } from 'cardhost/services/cards';
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
 import { setComponentTemplate } from '@ember/component';
 import Component from '@glimmer/component';
