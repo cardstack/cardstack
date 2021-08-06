@@ -5,12 +5,13 @@ import { networkName } from '../sdk/utils/general-utils';
 // this silly consumption of the ABI's. The ABI's are indeed consumed, however,
 // we consume them outside of ts due to the way the codegen operates for the
 // subgraph assembly script.
-import PayMerchantHandlerABI from './abi/v0.6.3/pay-merchant-handler';
-import RegisterMerchantHandlerABI from './abi/v0.6.3/register-merchant-handler';
-import TransferPrepaidCardHandlerABI from './abi/v0.6.3/transfer-prepaid-card-handler';
-import SplitPrepaidCardHandlerABI from './abi/v0.6.3/split-prepaid-card-handler';
-import SpendABI from './abi/v0.6.3/spend';
-import MerchantManagerABI from './abi/v0.6.3/merchant-manager';
+import PayMerchantHandlerABI from './abi/v0.7.0/pay-merchant-handler';
+import RegisterMerchantHandlerABI from './abi/v0.7.0/register-merchant-handler';
+import TransferPrepaidCardHandlerABI from './abi/v0.7.0/transfer-prepaid-card-handler';
+import SplitPrepaidCardHandlerABI from './abi/v0.7.0/split-prepaid-card-handler';
+import SpendABI from './abi/v0.7.0/spend';
+import MerchantManagerABI from './abi/v0.7.0/merchant-manager';
+import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.7.0/deprecated-merchant-manager-0_6_7';
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
 consumeModule(RegisterMerchantHandlerABI);
@@ -18,6 +19,8 @@ consumeModule(TransferPrepaidCardHandlerABI);
 consumeModule(SplitPrepaidCardHandlerABI);
 consumeModule(SpendABI);
 consumeModule(MerchantManagerABI);
+// we include this because we are still interested in indexing events from this contract
+consumeModule(DeprecatedMerchantManagerABI_0_6_7);
 
 const KOVAN = {
   cardToken: '0xd6E34821F508e4247Db359CFceE0cb5e8050972a',
@@ -45,6 +48,7 @@ const SOKOL = {
   uniswapV2Router: '0xd57B4D7B7FED6b47492A362e113e26F9804DbCc6', // This is the UniswapV2Router02
   uniswapV2Factory: '0x6b67f08F08B715B162aa09239488318A660F24BF',
   rewardPool: '0x9d8Ea61555Ee7A5d1Ca9422de7Fd7866430710bB',
+  deprecatedMerchantManager_v0_6_7: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2', // eslint-disable-line @typescript-eslint/naming-convention
   oracles: {
     DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB', // eslint-disable-line @typescript-eslint/naming-convention
     CARD: '0xb4Fcc975c2b6A57dd5B3d9a3B6b144499f707c7d', // eslint-disable-line @typescript-eslint/naming-convention
@@ -76,6 +80,7 @@ const XDAI = {
   uniswapV2Router: '0x1C232F01118CB8B424793ae03F870aa7D0ac7f77', // This is the UniswapV2Router02
   uniswapV2Factory: '0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7',
   rewardPool: '0x42628325845B3e01EfdD6ce4b3665453dC6c9A13',
+  deprecatedMerchantManager_v0_6_7: '0x3C29B2A563F4bB9D625175bE823c528A4Ddd1107', // eslint-disable-line @typescript-eslint/naming-convention
   oracles: {
     DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2', // eslint-disable-line @typescript-eslint/naming-convention
     CARD: '0xd570Ed8b313Fe6aEEA4064bd1713b5Cc6d41D3C5', // eslint-disable-line @typescript-eslint/naming-convention
