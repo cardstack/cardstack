@@ -17,6 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
+          fetch-depth: 0
           ref: ${{ github.event.inputs.ref }}
 
       - uses: volta-cli/action@v1
@@ -53,3 +54,28 @@ jobs:
 
       - name: Deploy
         run: yarn deploy:web-client:${{ github.event.inputs.environment }}
+      - name: Get current lerna version
+        id: lerna-version
+        uses: saulonunesdev/lerna-get-version-action@v1.0.4
+      - name: Create decompressed copies of assets for Sentry
+        shell: bash
+        run: |
+          cd packages/web-client/tmp
+          mkdir -p deploy-dist-uncompressed/assets
+          cd deploy-dist/assets
+          echo *.js *.map | tr ' ' '\n' | xargs -n1 -I{} cp "{}" "../../deploy-dist-uncompressed/assets/{}.br"
+          cd ../../deploy-dist-uncompressed/assets
+          brotli --rm --decompress *.br
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: cardstack
+          SENTRY_PROJECT: web-client
+        with:
+          environment: ${{ github.event.inputs.environment }}
+          ignore_empty: true
+          ignore_missing: true
+          sourcemaps: packages/web-client/tmp/deploy-dist-uncompressed
+          version: web-client-${{ github.sha }}@${{ steps.lerna-version.outputs.lerna-version }}
+          url_prefix: https://${{ fromJSON('["app-staging.stack.cards", "app.cardstack.com"]')[github.event.inputs.environment != 'staging'] }}

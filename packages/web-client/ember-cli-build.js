@@ -39,6 +39,7 @@ module.exports = function (defaults) {
     extraPublicTrees: [appComponentsStylesTree],
     packagerOptions: {
       webpackConfig: {
+        devtool: 'source-map',
         resolve: {
           fallback: {
             stream: require.resolve('stream-browserify'),

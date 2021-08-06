@@ -23,7 +23,10 @@ module.exports = function (environment) {
         // debug: true, // uncomment this to get helpful logs about sentry's behavior
         enabled: !!process.env.DEPLOY_TARGET,
         environment: process.env.DEPLOY_TARGET || 'development',
-        release: 'web-client@' + pkg.version,
+        release:
+          `web-client${
+            process.env.GITHUB_SHA ? `-${process.env.GITHUB_SHA}` : ''
+          }@` + pkg.version,
         // Set tracesSampleRate to 1.0 to capture 100%
         // of transactions for performance monitoring.
         // We recommend adjusting this value in production,
