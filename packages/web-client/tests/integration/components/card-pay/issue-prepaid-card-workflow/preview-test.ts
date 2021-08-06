@@ -17,7 +17,7 @@ const USER_REJECTION_ERROR_MESSAGE =
   'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
 const TIMEOUT_ERROR_MESSAGE =
   'There was a problem creating your prepaid card. Please contact Cardstack support to find out the status of your transaction.';
-const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `Looks like there's no balance in your ${c.layer2.fullName} wallet to fund your selected prepaid card. Before you can continue, please add funds to your ${c.layer2.fullName} wallet by bridging some tokens from your ${c.layer1.fullName} wallet.`;
+const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `Looks like there’s no balance in your ${c.layer2.fullName} wallet to fund your selected prepaid card. Before you can continue, please add funds to your ${c.layer2.fullName} wallet by bridging some tokens from your ${c.layer1.fullName} wallet.`;
 const DEFAULT_ERROR_MESSAGE =
   'There was a problem creating your prepaid card. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact Cardstack support.';
 
