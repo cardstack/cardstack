@@ -15,51 +15,61 @@
       @title="Card Wallet"
       @imgUrl={{this.cardstackLogo}}
       class="layer-two-connect-card__body"
+      data-test-layer-2-wallet-summary
     >
       <CardPay::FieldStack>
         <CardPay::LabeledValue
           @label="Network"
           @value={{network-display-info "layer2" "fullName"}}
         />
-        <CardPay::LabeledValue
-          @label="Account"
-          @value={{this.layer2Network.walletInfo.firstAddress}}
-          @isAddress={{true}}
-          data-test-address-field
-        />
-        <CardPay::LabeledValue @label="Depot balance" data-test-balance-container>
-          {{#if this.layer2Network.isFetchingDepot}}
-            <Boxel::LoadingIndicator data-test-balance-container-loading/>
-          {{else if this.balancesToShow.length}}
-          <CardPay::BalancesList as |Balance|>
-            {{#each this.balancesToShow as |b|}}
-              <Balance @symbol={{b.symbol}} @amount={{b.amount}} />
-            {{/each}}
-          </CardPay::BalancesList>
-          {{else}}
-          None
-          {{/if}}
-        </CardPay::LabeledValue>
+
+        {{#if this.isConnected}}
+          <CardPay::LabeledValue
+            @label="Account"
+            @value={{this.layer2Network.walletInfo.firstAddress}}
+            @isAddress={{true}}
+            data-test-address-field
+          />
+          <CardPay::LabeledValue @label="Depot balance" data-test-balance-container>
+            {{#if this.layer2Network.isFetchingDepot}}
+              <Boxel::LoadingIndicator data-test-balance-container-loading/>
+            {{else if this.balancesToShow.length}}
+            <CardPay::BalancesList as |Balance|>
+              {{#each this.balancesToShow as |b|}}
+                <Balance @symbol={{b.symbol}} @amount={{b.amount}} />
+              {{/each}}
+            </CardPay::BalancesList>
+            {{else}}
+              None
+            {{/if}}
+          </CardPay::LabeledValue>
+        {{/if}}
+
         {{!-- future: show Prepaid Cards, Badges --}}
         <CardPay::LabeledValue
           @label="Status"
-          @value="Connected"
-          @icon="success-bordered"
+          @value={{if this.isConnected "Connected" "Disconnected"}}
+          @icon={{if this.isConnected "success-bordered" "failure-bordered"}}
+          data-test-layer-2-wallet-connected-status
         />
       </CardPay::FieldStack>
     </ActionCardContainer::Section>
-    <Boxel::ActionChin @state='memorialized' @disabled={{@frozen}}>
-      <:memorialized as |m|>
-        <m.ActionButton {{on "click" this.disconnect}} data-test-layer-2-wallet-disconnect-button>
-          Disconnect Wallet
-        </m.ActionButton>
-      </:memorialized>
-    </Boxel::ActionChin>
+
+    {{#if this.isConnected}}
+      <Boxel::ActionChin @state='memorialized' @disabled={{@frozen}}>
+        <:memorialized as |m|>
+          <m.ActionButton {{on "click" this.disconnect}} data-test-layer-2-wallet-disconnect-button>
+            Disconnect Wallet
+          </m.ActionButton>
+        </:memorialized>
+      </Boxel::ActionChin>
+    {{/if}}
   {{else}}
     <ActionCardContainer::Section>
       <ActionCardContainer::Section
         @title="Install the Card Wallet app on your mobile phone"
         class="layer-two-connect-card__section layer-two-connect-card__section--one"
+        data-test-layer-2-connect-prompt
       >
         {{#if @includeExplanations}}
           <p class="layer-two-connect-card__explanation">
