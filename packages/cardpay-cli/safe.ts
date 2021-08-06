@@ -89,9 +89,11 @@ export async function transferTokens(
   let { symbol } = await assets.getTokenInfo(token);
 
   console.log(`transferring ${amount} ${symbol} from safe ${safe} to ${recipient}`);
-  let result = await safes.sendTokens(safe, token, recipient, weiAmount);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  console.log(`Transaction hash: ${blockExplorer}/tx/${result.ethereumTx.txHash}/token-transfers`);
+  await safes.sendTokens(safe, token, recipient, weiAmount, (txnHash) =>
+    console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
+  );
+  console.log('done');
 }
 
 export async function setSupplierInfoDID(
@@ -106,7 +108,9 @@ export async function setSupplierInfoDID(
   let assets = await getSDK('Assets', web3);
   let { symbol } = await assets.getTokenInfo(gasToken);
   console.log(`setting the info DID for the supplier safe ${safe} to ${infoDID} using ${symbol} token to pay for gas`);
-  let result = await safes.setSupplierInfoDID(safe, infoDID, gasToken);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  console.log(`Transaction hash: ${blockExplorer}/tx/${result.ethereumTx.txHash}/token-transfers`);
+  await safes.setSupplierInfoDID(safe, infoDID, gasToken, (txnHash) =>
+    console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
+  );
+  console.log('done');
 }

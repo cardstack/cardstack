@@ -20,8 +20,12 @@ import { waitUntilTransactionMined } from '../utils/general-utils';
 import { signSafeTxAsRSV, Signature } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
+import { TransactionReceipt } from 'web3-core';
+import { MerchantSafe, Safe } from '../safes';
 
 const { fromWei } = Web3.utils;
+const POLL_INTERVAL = 500;
+const TIMEOUT = 1000 * 60 * 5;
 
 interface RevenueTokenBalance {
   tokenSymbol: string;
@@ -66,10 +70,11 @@ export default class RevenuePool {
     merchantSafeAddress: string,
     tokenAddress: string,
     amount: string,
+    onTxHash?: (txHash: string) => unknown,
     onNonce?: (nonce: BN) => void,
     nonce?: BN,
     options?: ContractOptions
-  ): Promise<GnosisExecTx> {
+  ): Promise<TransactionReceipt> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let revenuePoolAddress = await getAddress('revenuePool', this.layer2Web3);
     let revenuePool = new this.layer2Web3.eth.Contract(RevenuePoolABI as AbiItem[], revenuePoolAddress);
@@ -112,7 +117,7 @@ export default class RevenuePool {
       from,
       merchantSafeAddress
     );
-    let result = await executeTransaction(
+    let gnosisResult = await executeTransaction(
       this.layer2Web3,
       merchantSafeAddress,
       revenuePoolAddress,
@@ -127,16 +132,21 @@ export default class RevenuePool {
       estimate.gasToken,
       ZERO_ADDRESS
     );
-    return result;
+
+    if (typeof onTxHash === 'function') {
+      await onTxHash(gnosisResult.ethereumTx.txHash);
+    }
+    return await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
   }
 
   async registerMerchant(
     prepaidCardAddress: string,
-    infoDID?: string,
+    infoDID: string | undefined,
+    onTxHash?: (txHash: string) => unknown,
     onNonce?: (nonce: BN) => void,
     nonce?: BN,
     options?: ContractOptions
-  ): Promise<{ merchantSafe: string; gnosisTxn: GnosisExecTx } | undefined> {
+  ): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let prepaidCard = await getSDK('PrepaidCard', this.layer2Web3);
     let issuingToken = await prepaidCard.issuingToken(prepaidCardAddress);
@@ -155,6 +165,7 @@ export default class RevenuePool {
 
     let rateChanged = false;
     let exchange = await getSDK('ExchangeRate', this.layer2Web3);
+    let gnosisResult: GnosisExecTx | undefined;
     do {
       let rateLock = await exchange.getRateLock(issuingToken);
       try {
@@ -180,7 +191,7 @@ export default class RevenuePool {
           from,
           prepaidCardAddress
         );
-        let gnosisTxn = await this.executeRegisterMerchant(
+        gnosisResult = await this.executeRegisterMerchant(
           prepaidCardAddress,
           registrationFee,
           rateLock,
@@ -188,8 +199,7 @@ export default class RevenuePool {
           signature,
           nonce
         );
-        let merchantSafe = await this.getMerchantSafeFromTxn(gnosisTxn.ethereumTx.txHash);
-        return { merchantSafe, gnosisTxn };
+        break;
       } catch (e) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
@@ -199,7 +209,19 @@ export default class RevenuePool {
         }
       }
     } while (rateChanged);
-    return;
+
+    if (!gnosisResult) {
+      throw new Error(`Unable to register merchant with prepaid card ${prepaidCardAddress}`);
+    }
+    if (typeof onTxHash === 'function') {
+      await onTxHash(gnosisResult.ethereumTx.txHash);
+    }
+
+    let merchantSafeAddress = await this.getMerchantSafeFromTxn(gnosisResult.ethereumTx.txHash);
+    return {
+      merchantSafe: await this.resolveMerchantSafe(merchantSafeAddress),
+      txReceipt: await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash),
+    };
   }
 
   private async getRevenuePool(): Promise<Contract> {
@@ -234,6 +256,22 @@ export default class RevenuePool {
       'registerMerchant',
       this.layer2Web3.eth.abi.encodeParameters(['string'], [infoDID])
     );
+  }
+
+  private async resolveMerchantSafe(merchantSafeAddress: string): Promise<MerchantSafe> {
+    let safes = await getSDK('Safes', this.layer2Web3);
+    let startTime = Date.now();
+    let merchantSafe: Safe | undefined;
+
+    do {
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
+      merchantSafe = await safes.viewSafe(merchantSafeAddress);
+      if (merchantSafe?.type === 'merchant') {
+        return merchantSafe;
+      }
+    } while (!merchantSafe && Date.now() - startTime < TIMEOUT);
+
+    throw new Error(`Timeout while waiting for the merchant safe to be created.`);
   }
 
   private async executeRegisterMerchant(

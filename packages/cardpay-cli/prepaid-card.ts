@@ -49,6 +49,7 @@ export async function create(
     console.log(`Created new prepaid card(s): ${prepaidCards.map((p) => p.address).join(', ')}`);
   let onTxHash = (txHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txHash}/token-transfers`);
   await prepaidCard.create(safe, tokenAddress, faceValues, customizationDID, onPrepaidCardCreated, onTxHash);
+  console.log('done');
 }
 
 export async function split(
@@ -64,10 +65,14 @@ export async function split(
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(`Splitting prepaid card ${prepaidCard} into face value(s) §${faceValues.join(' SPEND, §')} SPEND...`);
-  let result = await prepaidCardAPI.split(prepaidCard, faceValues, customizationDID, (prepaidCards) =>
-    console.log(`Created new prepaid card(s): ${prepaidCards.map((p) => p.address).join(', ')}`)
+  await prepaidCardAPI.split(
+    prepaidCard,
+    faceValues,
+    customizationDID,
+    (prepaidCards) => console.log(`Created new prepaid card(s): ${prepaidCards.map((p) => p.address).join(', ')}`),
+    (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
   );
-  console.log(`Transaction hash: ${blockExplorer}/tx/${result!.gnosisTxn.ethereumTx.txHash}/token-transfers`);
+  console.log('done');
 }
 
 export async function transfer(
@@ -82,8 +87,10 @@ export async function transfer(
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(`Transferring prepaid card ${prepaidCard} to new owner ${newOwner}...`);
-  let result = await prepaidCardAPI.transfer(prepaidCard, newOwner);
-  console.log(`Transaction hash: ${blockExplorer}/tx/${result!.ethereumTx.txHash}/token-transfers`);
+  await prepaidCardAPI.transfer(prepaidCard, newOwner, (txnHash) =>
+    console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
+  );
+  console.log('done');
 }
 
 export async function payMerchant(
@@ -100,6 +107,8 @@ export async function payMerchant(
   console.log(
     `Paying merchant safe address ${merchantSafe} the amount §${spendAmount} SPEND from prepaid card address ${prepaidCardAddress}...`
   );
-  let result = await prepaidCard.payMerchant(merchantSafe, prepaidCardAddress, spendAmount);
-  console.log(`Transaction hash: ${blockExplorer}/tx/${result?.ethereumTx.txHash}/token-transfers`);
+  await prepaidCard.payMerchant(merchantSafe, prepaidCardAddress, spendAmount, (txnHash) =>
+    console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
+  );
+  console.log('done');
 }

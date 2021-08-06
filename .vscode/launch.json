@@ -56,7 +56,7 @@
       "args": [
         "bridge-to-l1",
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // L2 safe address
-        "11",
+        "10",
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L1 receiver
         "--network",
@@ -84,7 +84,7 @@
 
         // Kovan DAI Bridge args
         "bridge-to-l2",
-        "30",
+        "10",
         "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", // Kovan DAI
         "--network",
         "kovan",
@@ -120,8 +120,8 @@
       "env": {},
       "args": [
         "await-bridged-to-l1",
-        "21668783", // from block
-        "0xcd7eae7310f944e1b34dcb07c6fe5b891ff0ac5574760fb0d88818a1aa134a7c", // txn hash
+        "22144982", // from block
+        "0x7ccf62e3f83186c695a4a6e54febff97856eef99be8c5a26aaad8bb58f2e99ae", // txn hash
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own
@@ -138,11 +138,11 @@
       "env": {},
       "args": [
         "claim-tokens-bridged-to-l1",
-        "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000a13", // messageId
+        "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000abb", // messageId
         // encodedData
-        "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000a1316a80598dd2f143cfbf091638ce3fb02c9135528366b4cc64d30849568af65522de3a68ea6cc78ce001e84800101004d2a125e4cfb0000000000000000000000004f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa0000000000000000000000002f58630ca445ab1a6de2bb9892aa2e1d60876c1300000000000000000000000000000000000000000000000098a7d9b8314c0000",
+        "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000abb16a80598dd2f143cfbf091638ce3fb02c9135528366b4cc64d30849568af65522de3a68ea6cc78ce001e84800101004d2a125e4cfb0000000000000000000000004f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa0000000000000000000000002f58630ca445ab1a6de2bb9892aa2e1d60876c130000000000000000000000000000000000000000000000008ac7230489e80000",
         // signatures (add each signature as a separate command line arg)
-        "0x059bab6897002710374f9c1a2ca2130b115b8a73cccac30f841048574c54cff80d2d4df266fcc2d73a660ac17bc3a89fde4af8f103490739d979da40e5146cfe1c",
+        "0x6cf76b8f7abc547f6fe6e4eff5cfbc82d9ee90e399a29de5f861c9b46b108a8f3b2da2c4736617d15a424e4ee02c6d5274f94c3c29a170ce6a9a42bcd90482511b",
         "--network",
         "kovan",
         // Hassan's testing mnemonic feel free to use your own
@@ -232,9 +232,8 @@
       "env": {},
       "args": [
         "prepaidcard-split",
-        "0x2952bC69739c9534d09525ccCa33950F311CbE88", // prepaid card address
-        "did:split-test-07-19-21-B", // customization DID
-        "300", // face values
+        "0xe732F27E31e8e0A17c5069Af7cDF277bA7E6Eff5", // prepaid card address
+        "", // customization DID
         "100", // face values
         "100", // face values
         "--network",
@@ -253,7 +252,7 @@
       "env": {},
       "args": [
         "prepaidcard-transfer",
-        "0xf68168d127cb307706493a3345FAce4593039440", // prepaid card address
+        "0x494C18D80C822f81129bBdaF0bfa70D7E1387F9F", // prepaid card address
         "0xb21851B00bd13C008f703A21DFDd292b28A736b3", // new owner
         "--network",
         "sokol",
@@ -290,7 +289,7 @@
       "args": [
         "pay-merchant",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0x2952bC69739c9534d09525ccCa33950F311CbE88", // Hassan's prepaid card --feel free to use your own
+        "0x673Fd582FED2CD8201d58552B912F0D1DaA37bB2", // Hassan's prepaid card --feel free to use your own
         "200",
         "--network",
         "sokol",
@@ -327,7 +326,7 @@
         "claim-revenue",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
-        "0.5",
+        "5",
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own

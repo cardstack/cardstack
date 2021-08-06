@@ -26,6 +26,7 @@ import {
 import { waitUntilTransactionMined } from '../utils/general-utils';
 import { signSafeTxAsRSV, Signature, signSafeTxAsBytes } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
+import { TransactionReceipt } from 'web3-core';
 
 const { fromWei } = Web3.utils;
 const POLL_INTERVAL = 500;
@@ -69,10 +70,11 @@ export default class PrepaidCard {
     merchantSafe: string,
     prepaidCardAddress: string,
     spendAmount: number,
+    onTxHash?: (txHash: string) => unknown,
     onNonce?: (nonce: BN) => void,
     nonce?: BN,
     options?: ContractOptions
-  ): Promise<GnosisExecTx | undefined> {
+  ): Promise<TransactionReceipt> {
     if (spendAmount < 50) {
       // this is hard coded in the PrepaidCardManager contract
       throw new Error(`The amount to pay merchant §${spendAmount} SPEND is below the minimum allowable amount`);
@@ -92,6 +94,7 @@ export default class PrepaidCard {
 
     let rateChanged = false;
     let exchange = await getSDK('ExchangeRate', this.layer2Web3);
+    let gnosisResult: GnosisExecTx | undefined;
     do {
       let rateLock = await exchange.getRateLock(issuingToken);
       try {
@@ -117,7 +120,7 @@ export default class PrepaidCard {
           from,
           prepaidCardAddress
         );
-        return await this.executePayMerchant(
+        gnosisResult = await this.executePayMerchant(
           prepaidCardAddress,
           merchantSafe,
           spendAmount,
@@ -125,6 +128,7 @@ export default class PrepaidCard {
           signatures,
           nonce
         );
+        break;
       } catch (e) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
@@ -139,16 +143,28 @@ export default class PrepaidCard {
         }
       }
     } while (rateChanged);
-    return; // should never get here
+
+    if (!gnosisResult) {
+      throw new Error(
+        `Unable to obtain a gnosis transaction result for merchant payment from prepaid card ${prepaidCardAddress} to merchant safe ${merchantSafe} for ${spendAmount} SPEND`
+      );
+    }
+
+    if (typeof onTxHash === 'function') {
+      await onTxHash(gnosisResult.ethereumTx.txHash);
+    }
+
+    return await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
   }
 
   async transfer(
     prepaidCardAddress: string,
     newOwner: string,
+    onTxHash?: (txHash: string) => unknown,
     onNonce?: (nonce: BN) => void,
     nonce?: BN,
     options?: ContractOptions
-  ): Promise<GnosisExecTx | undefined> {
+  ): Promise<TransactionReceipt> {
     if (!(await this.canTransfer(prepaidCardAddress))) {
       throw new Error(`The prepaid card ${prepaidCardAddress} is not allowed to be transferred`);
     }
@@ -189,6 +205,7 @@ export default class PrepaidCard {
       from,
       prepaidCardAddress
     );
+    let gnosisResult: GnosisExecTx | undefined;
     do {
       let rateLock = await exchange.getRateLock(issuingToken);
       try {
@@ -214,7 +231,7 @@ export default class PrepaidCard {
           from,
           prepaidCardAddress
         );
-        let result = await this.executeTransfer(
+        gnosisResult = await this.executeTransfer(
           prepaidCardAddress,
           newOwner,
           previousOwnerSignature,
@@ -222,7 +239,7 @@ export default class PrepaidCard {
           signatures,
           nonce
         );
-        return result;
+        break;
       } catch (e) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
@@ -237,7 +254,17 @@ export default class PrepaidCard {
         }
       }
     } while (rateChanged);
-    return; // should never get here
+    if (!gnosisResult) {
+      throw new Error(
+        `Unable to obtain a gnosis transaction result for prepaid card transfer of prepaid card ${prepaidCardAddress} to new owner ${newOwner}`
+      );
+    }
+
+    if (typeof onTxHash === 'function') {
+      await onTxHash(gnosisResult.ethereumTx.txHash);
+    }
+
+    return await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
   }
 
   async split(
@@ -245,11 +272,12 @@ export default class PrepaidCard {
     faceValues: number[],
     customizationDID: string | undefined,
     onPrepaidCardsCreated?: (prepaidCards: PrepaidCardSafe[], txnHash: string) => unknown,
+    onTxHash?: (txHash: string) => unknown,
     onNonce?: (nonce: BN) => void,
     nonce?: BN,
     onGasLoaded?: (txnHashes: string[]) => unknown,
     options?: ContractOptions
-  ): Promise<{ prepaidCards: PrepaidCardSafe[]; gnosisTxn: GnosisExecTx } | undefined> {
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }> {
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
     }
@@ -292,6 +320,7 @@ export default class PrepaidCard {
     );
 
     let rateChanged = false;
+    let gnosisResult: GnosisExecTx | undefined;
     do {
       let rateLock = await exchange.getRateLock(issuingToken);
       try {
@@ -324,7 +353,7 @@ export default class PrepaidCard {
           from,
           prepaidCardAddress
         );
-        let gnosisTxn = await this.executeSplit(
+        gnosisResult = await this.executeSplit(
           prepaidCardAddress,
           totalAmountInSpend,
           amounts,
@@ -334,30 +363,7 @@ export default class PrepaidCard {
           nonce,
           customizationDID
         );
-        let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisTxn.ethereumTx.txHash);
-
-        if (typeof onPrepaidCardsCreated === 'function') {
-          await onPrepaidCardsCreated(
-            await this.resolvePrepaidCards(prepaidCardAddresses),
-            gnosisTxn.ethereumTx.txHash
-          );
-        }
-
-        let txnHashes = new Set<string>();
-        await Promise.all(
-          prepaidCardAddresses.map((address) =>
-            this.loadGasIntoPrepaidCard(address, gnosisTxn.ethereumTx.txHash, (txnHash) => {
-              txnHashes.add(txnHash);
-              if (txnHashes.size === prepaidCardAddresses.length && typeof onGasLoaded === 'function') {
-                onGasLoaded([...txnHashes]);
-              }
-            })
-          )
-        );
-        return {
-          prepaidCards: await this.resolvePrepaidCards(prepaidCardAddresses),
-          gnosisTxn,
-        };
+        break;
       } catch (e) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
@@ -372,7 +378,35 @@ export default class PrepaidCard {
         }
       }
     } while (rateChanged);
-    return; // should never get here
+    if (!gnosisResult) {
+      throw new Error(`Unable to split prepaid card ${prepaidCardAddress} into face values: ${faceValues.join(', ')}`);
+    }
+
+    if (typeof onTxHash === 'function') {
+      await onTxHash(gnosisResult.ethereumTx.txHash);
+    }
+
+    let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisResult.ethereumTx.txHash);
+    if (typeof onPrepaidCardsCreated === 'function') {
+      await onPrepaidCardsCreated(await this.resolvePrepaidCards(prepaidCardAddresses), gnosisResult.ethereumTx.txHash);
+    }
+
+    let txnHashes = new Set<string>();
+    await Promise.all(
+      prepaidCardAddresses.map((address) =>
+        this.loadGasIntoPrepaidCard(address, gnosisResult!.ethereumTx.txHash, (txnHash) => {
+          txnHashes.add(txnHash);
+          if (txnHashes.size === prepaidCardAddresses.length && typeof onGasLoaded === 'function') {
+            onGasLoaded([...txnHashes]);
+          }
+        })
+      )
+    );
+
+    return {
+      prepaidCards: await this.resolvePrepaidCards(prepaidCardAddresses),
+      txReceipt: await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash),
+    };
   }
 
   async create(
