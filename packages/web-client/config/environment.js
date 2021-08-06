@@ -52,6 +52,9 @@ module.exports = function (environment) {
       layer1: process.env.LAYER_1_CHAIN || 'keth', // set to "eth" for production
       layer2: process.env.LAYER_2_CHAIN || 'sokol', // set to "xdai" for production,
     },
+    features: {
+      createMerchant: process.env.DEPLOY_TARGET !== 'production',
+    },
     infuraId:
       infuraIdsByTarget[process.env.DEPLOY_TARGET] ?? process.env.INFURA_ID,
     urls: {

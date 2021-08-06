@@ -1,6 +1,7 @@
 import Route from '@ember/routing/route';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/merchants-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/merchants-summary-hero.svg';
+import config from '@cardstack/web-client/config/environment';
 
 const MERCHANTS_PANEL = {
   title: 'Easy Earnings',
@@ -21,7 +22,7 @@ const MERCHANTS_PANEL = {
         'Confirm transactions with Touch ID or Face ID in the Card Wallet mobile app',
       ],
       cta: 'Create Merchant',
-      isCtaDisabled: false,
+      isCtaDisabled: !config.features.createMerchant,
     },
     {
       workflow: 'request-payment',
