@@ -21,12 +21,13 @@ import {
   SendPayload,
   getSendPayload,
   executeSend,
+  getNextNonceFromEstimate,
 } from '../utils/safe-utils';
 import { waitUntilTransactionMined } from '../utils/general-utils';
 import { signSafeTxAsRSV, Signature, signSafeTxAsBytes } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
 
-const { toBN, fromWei } = Web3.utils;
+const { fromWei } = Web3.utils;
 const POLL_INTERVAL = 500;
 const TIMEOUT = 1000 * 60 * 5;
 export const MAX_PREPAID_CARD_AMOUNT = 10;
@@ -68,6 +69,8 @@ export default class PrepaidCard {
     merchantSafe: string,
     prepaidCardAddress: string,
     spendAmount: number,
+    onNonce?: (nonce: BN) => void,
+    nonce?: BN,
     options?: ContractOptions
   ): Promise<GnosisExecTx | undefined> {
     if (spendAmount < 50) {
@@ -93,8 +96,11 @@ export default class PrepaidCard {
       let rateLock = await exchange.getRateLock(issuingToken);
       try {
         let payload = await this.getPayMerchantPayload(prepaidCardAddress, merchantSafe, spendAmount, rateLock);
-        if (payload.lastUsedNonce == null) {
-          payload.lastUsedNonce = -1;
+        if (nonce == null) {
+          nonce = getNextNonceFromEstimate(payload);
+          if (typeof onNonce === 'function') {
+            onNonce(nonce);
+          }
         }
         let signatures = await signSafeTxAsRSV(
           this.layer2Web3,
@@ -107,7 +113,7 @@ export default class PrepaidCard {
           payload.gasPrice,
           payload.gasToken,
           payload.refundReceiver,
-          toBN(payload.lastUsedNonce + 1),
+          nonce,
           from,
           prepaidCardAddress
         );
@@ -117,7 +123,7 @@ export default class PrepaidCard {
           spendAmount,
           rateLock,
           signatures,
-          toBN(payload.lastUsedNonce + 1).toString()
+          nonce
         );
       } catch (e) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
@@ -139,6 +145,8 @@ export default class PrepaidCard {
   async transfer(
     prepaidCardAddress: string,
     newOwner: string,
+    onNonce?: (nonce: BN) => void,
+    nonce?: BN,
     options?: ContractOptions
   ): Promise<GnosisExecTx | undefined> {
     if (!(await this.canTransfer(prepaidCardAddress))) {
@@ -151,12 +159,21 @@ export default class PrepaidCard {
     let gasToken = await getAddress('cardCpxd', this.layer2Web3);
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     let transferData = await prepaidCardMgr.methods.getTransferCardData(prepaidCardAddress, newOwner).call();
-    let prepaidCard = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], prepaidCardAddress);
-    let currentNonce = new BN(await prepaidCard.methods.nonce().call());
+
     // the quirk here is that we are signing this txn in advance so we need to
     // optimistically advance the nonce by 2 to account for the fact that we are
     // executing the "send" action before this one (which advances the nonce by 1).
-    let transferNonce = currentNonce.toString() === '0' ? new BN('1') : currentNonce.add(new BN('2'));
+    let transferNonce: BN;
+    if (nonce != null) {
+      // a passed in nonce represents the next nonce to use, so we add 1 to it
+      // to get the nonce we'd want to use for the transfer execTransaction
+      transferNonce = nonce.add(new BN(1));
+    } else {
+      let prepaidCard = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], prepaidCardAddress);
+      let currentNonce = new BN(await prepaidCard.methods.nonce().call());
+      transferNonce = currentNonce.toString() === '0' ? new BN('1') : currentNonce.add(new BN('2'));
+    }
+
     let [previousOwnerSignature] = await signSafeTxAsBytes(
       this.layer2Web3,
       prepaidCardAddress,
@@ -176,8 +193,11 @@ export default class PrepaidCard {
       let rateLock = await exchange.getRateLock(issuingToken);
       try {
         let payload = await this.getTransferPayload(prepaidCardAddress, newOwner, previousOwnerSignature, rateLock);
-        if (payload.lastUsedNonce == null) {
-          payload.lastUsedNonce = -1;
+        if (nonce == null) {
+          nonce = getNextNonceFromEstimate(payload);
+          if (typeof onNonce === 'function') {
+            onNonce(nonce);
+          }
         }
         let signatures = await signSafeTxAsRSV(
           this.layer2Web3,
@@ -190,7 +210,7 @@ export default class PrepaidCard {
           payload.gasPrice,
           payload.gasToken,
           payload.refundReceiver,
-          toBN(payload.lastUsedNonce + 1),
+          nonce,
           from,
           prepaidCardAddress
         );
@@ -200,7 +220,7 @@ export default class PrepaidCard {
           previousOwnerSignature,
           rateLock,
           signatures,
-          toBN(payload.lastUsedNonce + 1).toString()
+          nonce
         );
         return result;
       } catch (e) {
@@ -225,6 +245,8 @@ export default class PrepaidCard {
     faceValues: number[],
     customizationDID: string | undefined,
     onPrepaidCardsCreated?: (prepaidCards: PrepaidCardSafe[], txnHash: string) => unknown,
+    onNonce?: (nonce: BN) => void,
+    nonce?: BN,
     onGasLoaded?: (txnHashes: string[]) => unknown,
     options?: ContractOptions
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; gnosisTxn: GnosisExecTx } | undefined> {
@@ -281,8 +303,11 @@ export default class PrepaidCard {
           rateLock,
           customizationDID
         );
-        if (payload.lastUsedNonce == null) {
-          payload.lastUsedNonce = -1;
+        if (nonce == null) {
+          nonce = getNextNonceFromEstimate(payload);
+          if (typeof onNonce === 'function') {
+            onNonce(nonce);
+          }
         }
         let signatures = await signSafeTxAsRSV(
           this.layer2Web3,
@@ -295,7 +320,7 @@ export default class PrepaidCard {
           payload.gasPrice,
           payload.gasToken,
           payload.refundReceiver,
-          toBN(payload.lastUsedNonce + 1),
+          nonce,
           from,
           prepaidCardAddress
         );
@@ -306,7 +331,7 @@ export default class PrepaidCard {
           faceValues,
           rateLock,
           signatures,
-          toBN(payload.lastUsedNonce + 1).toString(),
+          nonce,
           customizationDID
         );
         let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisTxn.ethereumTx.txHash);
@@ -357,6 +382,8 @@ export default class PrepaidCard {
     customizationDID: string | undefined,
     onPrepaidCardsCreated?: (prepaidCards: PrepaidCardSafe[], txnHash: string) => unknown,
     onTxHash?: (txHash: string) => unknown,
+    onNonce?: (nonce: BN) => void,
+    nonce?: BN,
     onGasLoaded?: (txnHashes: string[]) => unknown,
     options?: ContractOptions
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; gnosisTxn: GnosisExecTx }> {
@@ -404,8 +431,11 @@ export default class PrepaidCard {
       );
     }
 
-    if (estimate.lastUsedNonce == null) {
-      estimate.lastUsedNonce = -1;
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
     }
     let signatures = await signSafeTxAsRSV(
       this.layer2Web3,
@@ -418,7 +448,7 @@ export default class PrepaidCard {
       estimate.gasPrice,
       estimate.gasToken,
       ZERO_ADDRESS,
-      toBN(estimate.lastUsedNonce + 1),
+      nonce,
       from,
       safeAddress
     );
@@ -432,7 +462,7 @@ export default class PrepaidCard {
       estimate.safeTxGas,
       estimate.dataGas,
       estimate.gasPrice,
-      toBN(estimate.lastUsedNonce + 1).toString(),
+      nonce,
       signatures,
       estimate.gasToken,
       ZERO_ADDRESS
@@ -639,7 +669,7 @@ export default class PrepaidCard {
     spendAmount: number,
     rate: string,
     signatures: Signature[],
-    nonce: string
+    nonce: BN
   ): Promise<GnosisExecTx> {
     return await executeSend(
       this.layer2Web3,
@@ -659,7 +689,7 @@ export default class PrepaidCard {
     spendAmounts: number[],
     rate: string,
     signatures: Signature[],
-    nonce: string,
+    nonce: BN,
     customizationDID = ''
   ): Promise<GnosisExecTx> {
     return await executeSend(
@@ -683,7 +713,7 @@ export default class PrepaidCard {
     previousOwnerSignature: string,
     rate: string,
     signatures: Signature[],
-    nonce: string
+    nonce: BN
   ): Promise<GnosisExecTx> {
     return await executeSend(
       this.layer2Web3,

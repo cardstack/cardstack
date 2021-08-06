@@ -1,5 +1,6 @@
 /*global fetch */
 
+import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { Log } from 'web3-core';
@@ -133,7 +134,7 @@ export async function executeTransaction(
   safeTxGas: string,
   dataGas: string,
   gasPrice: string,
-  nonce: string,
+  nonce: BN,
   signatures: any,
   gasToken: string,
   refundReceiver: string
@@ -155,7 +156,7 @@ export async function executeTransaction(
       baseGas: dataGas,
       dataGas,
       gasPrice,
-      nonce,
+      nonce: nonce.toString(),
       signatures,
       gasToken,
       refundReceiver,
@@ -176,7 +177,7 @@ export async function executeSend(
   action: string,
   data: string,
   signatures: Signature[],
-  nonce: string
+  nonce: BN
 ): Promise<GnosisExecTx> {
   let relayServiceURL = await getConstant('relayServiceURL', web3);
   const url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/send/`;
@@ -187,7 +188,7 @@ export async function executeSend(
       Accept: 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
     },
     body: JSON.stringify({
-      nonce,
+      nonce: nonce.toString(),
       payment: spendAmount,
       rate,
       action,
@@ -207,6 +208,13 @@ export function getParamsFromEvent(web3: Web3, txnReceipt: TransactionReceipt, e
     .filter((log) => isEventMatch(log, eventAbi.topic, address))
     .map((log) => web3.eth.abi.decodeLog(eventAbi.abis, log.data, log.topics));
   return eventParams;
+}
+
+export function getNextNonceFromEstimate(estimate: Estimate | SendPayload): BN {
+  if (estimate.lastUsedNonce == null) {
+    estimate.lastUsedNonce = -1;
+  }
+  return new BN(estimate.lastUsedNonce + 1);
 }
 
 function isEventMatch(log: Log, topic: string, address: string) {

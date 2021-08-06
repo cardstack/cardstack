@@ -13,6 +13,7 @@ import {
   GnosisExecTx,
   gasEstimate,
   executeTransaction,
+  getNextNonceFromEstimate,
 } from '../utils/safe-utils';
 import { ZERO_ADDRESS } from '../constants';
 import { waitUntilTransactionMined } from '../utils/general-utils';
@@ -20,7 +21,7 @@ import { signSafeTxAsRSV, Signature } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
 
-const { toBN, fromWei } = Web3.utils;
+const { fromWei } = Web3.utils;
 
 interface RevenueTokenBalance {
   tokenSymbol: string;
@@ -65,6 +66,8 @@ export default class RevenuePool {
     merchantSafeAddress: string,
     tokenAddress: string,
     amount: string,
+    onNonce?: (nonce: BN) => void,
+    nonce?: BN,
     options?: ContractOptions
   ): Promise<GnosisExecTx> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
@@ -88,8 +91,11 @@ export default class RevenuePool {
       0,
       tokenAddress
     );
-    if (estimate.lastUsedNonce == null) {
-      estimate.lastUsedNonce = -1;
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
     }
     let signatures = await signSafeTxAsRSV(
       this.layer2Web3,
@@ -102,7 +108,7 @@ export default class RevenuePool {
       estimate.gasPrice,
       estimate.gasToken,
       ZERO_ADDRESS,
-      toBN(estimate.lastUsedNonce + 1),
+      nonce,
       from,
       merchantSafeAddress
     );
@@ -116,7 +122,7 @@ export default class RevenuePool {
       estimate.safeTxGas,
       estimate.dataGas,
       estimate.gasPrice,
-      toBN(estimate.lastUsedNonce + 1).toString(),
+      nonce,
       signatures,
       estimate.gasToken,
       ZERO_ADDRESS
@@ -127,6 +133,8 @@ export default class RevenuePool {
   async registerMerchant(
     prepaidCardAddress: string,
     infoDID?: string,
+    onNonce?: (nonce: BN) => void,
+    nonce?: BN,
     options?: ContractOptions
   ): Promise<{ merchantSafe: string; gnosisTxn: GnosisExecTx } | undefined> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
@@ -151,8 +159,11 @@ export default class RevenuePool {
       let rateLock = await exchange.getRateLock(issuingToken);
       try {
         let payload = await this.getRegisterMerchantPayload(prepaidCardAddress, registrationFee, rateLock, infoDID);
-        if (payload.lastUsedNonce == null) {
-          payload.lastUsedNonce = -1;
+        if (nonce == null) {
+          nonce = getNextNonceFromEstimate(payload);
+          if (typeof onNonce === 'function') {
+            onNonce(nonce);
+          }
         }
         let signature = await signSafeTxAsRSV(
           this.layer2Web3,
@@ -165,7 +176,7 @@ export default class RevenuePool {
           payload.gasPrice,
           payload.gasToken,
           payload.refundReceiver,
-          toBN(payload.lastUsedNonce + 1),
+          nonce,
           from,
           prepaidCardAddress
         );
@@ -175,7 +186,7 @@ export default class RevenuePool {
           rateLock,
           infoDID,
           signature,
-          toBN(payload.lastUsedNonce + 1).toString()
+          nonce
         );
         let merchantSafe = await this.getMerchantSafeFromTxn(gnosisTxn.ethereumTx.txHash);
         return { merchantSafe, gnosisTxn };
@@ -231,7 +242,7 @@ export default class RevenuePool {
     rate: string,
     infoDID: string,
     signatures: Signature[],
-    nonce: string
+    nonce: BN
   ): Promise<GnosisExecTx> {
     return await executeSend(
       this.layer2Web3,

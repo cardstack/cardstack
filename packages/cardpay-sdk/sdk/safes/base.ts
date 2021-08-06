@@ -5,11 +5,11 @@ import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 import { ZERO_ADDRESS } from '../constants';
 import { ContractOptions } from 'web3-eth-contract';
-import { GnosisExecTx, gasEstimate, executeTransaction } from '../utils/safe-utils';
+import { GnosisExecTx, gasEstimate, executeTransaction, getNextNonceFromEstimate } from '../utils/safe-utils';
 import { signSafeTxAsRSV } from '../utils/signing-utils';
 import BN from 'bn.js';
 import { query } from '../utils/graphql';
-const { toBN, fromWei } = Web3.utils;
+const { fromWei } = Web3.utils;
 
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
 interface BaseSafe {
@@ -178,6 +178,8 @@ export default class Safes {
     tokenAddress: string,
     recipient: string,
     amount: string,
+    onNonce?: (nonce: BN) => void,
+    nonce?: BN,
     options?: ContractOptions
   ): Promise<GnosisExecTx> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
@@ -202,9 +204,13 @@ export default class Safes {
       );
     }
 
-    if (estimate.lastUsedNonce == null) {
-      estimate.lastUsedNonce = -1;
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
     }
+
     let signatures = await signSafeTxAsRSV(
       this.layer2Web3,
       tokenAddress,
@@ -216,7 +222,7 @@ export default class Safes {
       estimate.gasPrice,
       estimate.gasToken,
       ZERO_ADDRESS,
-      toBN(estimate.lastUsedNonce + 1),
+      nonce,
       from,
       safeAddress
     );
@@ -230,7 +236,7 @@ export default class Safes {
       estimate.safeTxGas,
       estimate.dataGas,
       estimate.gasPrice,
-      toBN(estimate.lastUsedNonce + 1).toString(),
+      nonce,
       signatures,
       estimate.gasToken,
       ZERO_ADDRESS
@@ -242,14 +248,19 @@ export default class Safes {
     safeAddress: string,
     infoDID: string,
     gasToken: string,
+    onNonce?: (nonce: BN) => void,
+    nonce?: BN,
     options?: ContractOptions
   ): Promise<GnosisExecTx> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let supplierManager = await getAddress('supplierManager', this.layer2Web3);
     let payload = await this.setSupplierInfoDIDPayload(infoDID);
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, supplierManager, '0', payload, 0, gasToken);
-    if (estimate.lastUsedNonce == null) {
-      estimate.lastUsedNonce = -1;
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
     }
     let signatures = await signSafeTxAsRSV(
       this.layer2Web3,
@@ -262,7 +273,7 @@ export default class Safes {
       estimate.gasPrice,
       estimate.gasToken,
       ZERO_ADDRESS,
-      toBN(estimate.lastUsedNonce + 1),
+      nonce,
       from,
       safeAddress
     );
@@ -276,7 +287,7 @@ export default class Safes {
       estimate.safeTxGas,
       estimate.dataGas,
       estimate.gasPrice,
-      toBN(estimate.lastUsedNonce + 1).toString(),
+      nonce,
       signatures,
       estimate.gasToken,
       ZERO_ADDRESS
