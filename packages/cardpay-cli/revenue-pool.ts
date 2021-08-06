@@ -15,9 +15,11 @@ export async function registerMerchant(
   console.log(
     `Paying merchant registration fee in the amount of §${await revenuePool.merchantRegistrationFee()} SPEND from prepaid card address ${prepaidCardAddress}...`
   );
-  let { merchantSafe, gnosisTxn } = (await revenuePool.registerMerchant(prepaidCardAddress, infoDID)) ?? {};
-  console.log(`Created merchant safe: ${merchantSafe}`);
-  console.log(`Transaction hash: ${blockExplorer}/tx/${gnosisTxn?.ethereumTx.txHash}/token-transfers`);
+  let { merchantSafe } =
+    (await revenuePool.registerMerchant(prepaidCardAddress, infoDID, (txnHash) =>
+      console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
+    )) ?? {};
+  console.log(`Created merchant safe: ${merchantSafe.address}`);
 }
 
 export async function revenueBalances(network: string, merchantSafeAddress: string, mnemonic?: string): Promise<void> {
@@ -44,7 +46,9 @@ export async function claimRevenue(
   let weiAmount = toWei(amount);
   console.log(`Claiming ${amount} ${symbol} in revenue for merchant safe ${merchantSafeAddress}`);
 
-  let result = await revenuePool.claim(merchantSafeAddress, tokenAddress, weiAmount);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  console.log(`Transaction hash: ${blockExplorer}/tx/${result.ethereumTx.txHash}/token-transfers`);
+  await revenuePool.claim(merchantSafeAddress, tokenAddress, weiAmount, (txnHash) =>
+    console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
+  );
+  console.log('done');
 }

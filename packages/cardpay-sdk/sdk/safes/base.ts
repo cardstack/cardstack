@@ -5,10 +5,12 @@ import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 import { ZERO_ADDRESS } from '../constants';
 import { ContractOptions } from 'web3-eth-contract';
-import { GnosisExecTx, gasEstimate, executeTransaction, getNextNonceFromEstimate } from '../utils/safe-utils';
+import { gasEstimate, executeTransaction, getNextNonceFromEstimate } from '../utils/safe-utils';
 import { signSafeTxAsRSV } from '../utils/signing-utils';
 import BN from 'bn.js';
 import { query } from '../utils/graphql';
+import { TransactionReceipt } from 'web3-core';
+import { waitUntilTransactionMined } from '../utils/general-utils';
 const { fromWei } = Web3.utils;
 
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
@@ -178,10 +180,11 @@ export default class Safes {
     tokenAddress: string,
     recipient: string,
     amount: string,
+    onTxHash?: (txHash: string) => unknown,
     onNonce?: (nonce: BN) => void,
     nonce?: BN,
     options?: ContractOptions
-  ): Promise<GnosisExecTx> {
+  ): Promise<TransactionReceipt> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let symbol = await token.methods.symbol().call();
@@ -241,17 +244,21 @@ export default class Safes {
       estimate.gasToken,
       ZERO_ADDRESS
     );
-    return result;
+    if (typeof onTxHash === 'function') {
+      await onTxHash(result.ethereumTx.txHash);
+    }
+    return await waitUntilTransactionMined(this.layer2Web3, result.ethereumTx.txHash);
   }
 
   async setSupplierInfoDID(
     safeAddress: string,
     infoDID: string,
     gasToken: string,
+    onTxHash?: (txHash: string) => unknown,
     onNonce?: (nonce: BN) => void,
     nonce?: BN,
     options?: ContractOptions
-  ): Promise<GnosisExecTx> {
+  ): Promise<TransactionReceipt> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let supplierManager = await getAddress('supplierManager', this.layer2Web3);
     let payload = await this.setSupplierInfoDIDPayload(infoDID);
@@ -292,7 +299,10 @@ export default class Safes {
       estimate.gasToken,
       ZERO_ADDRESS
     );
-    return result;
+    if (typeof onTxHash === 'function') {
+      await onTxHash(result.ethereumTx.txHash);
+    }
+    return await waitUntilTransactionMined(this.layer2Web3, result.ethereumTx.txHash);
   }
 
   private transferTokenPayload(tokenAddress: string, recipient: string, amount: string): string {

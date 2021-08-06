@@ -5,12 +5,13 @@ import ERC677ABI from '../contracts/abi/erc-677';
 import HomeAMBABI from '../contracts/abi/home-amb';
 import BridgeValidatorsABI from '../contracts/abi/bridge-validators';
 import { getAddress } from '../contracts/addresses';
-import { executeTransaction, gasEstimate, getNextNonceFromEstimate, GnosisExecTx } from './utils/safe-utils';
+import { executeTransaction, gasEstimate, getNextNonceFromEstimate } from './utils/safe-utils';
 import { AbiItem, fromWei, toBN } from 'web3-utils';
 import { signSafeTxAsRSV } from './utils/signing-utils';
 import { ZERO_ADDRESS } from './constants';
 import { query } from './utils/graphql';
 import BN from 'bn.js';
+import { waitUntilTransactionMined } from './utils/general-utils';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -52,10 +53,11 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     tokenAddress: string,
     recipientAddress: string,
     amount: string,
+    onTxHash?: (txHash: string) => unknown,
     onNonce?: (nonce: BN) => void,
     nonce?: BN,
     options?: ContractOptions
-  ): Promise<GnosisExecTx> {
+  ): Promise<TransactionReceipt> {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let homeBridgeAddress = await getAddress('homeBridge', this.layer2Web3);
     let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], tokenAddress);
@@ -116,7 +118,10 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
       estimate.gasToken,
       ZERO_ADDRESS
     );
-    return result;
+    if (typeof onTxHash === 'function') {
+      await onTxHash(result.ethereumTx.txHash);
+    }
+    return await waitUntilTransactionMined(this.layer2Web3, result.ethereumTx.txHash);
   }
 
   async waitForBridgingValidation(fromBlock: string, bridgingTxnHash: string): Promise<BridgeValidationResult> {

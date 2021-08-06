@@ -83,16 +83,20 @@ export async function bridgeToLayer2(
 
   {
     console.log(`Sending approve transaction request for ${amount} ${symbol}`);
-    let result = await tokenBridge.unlockTokens(tokenAddress, amountInWei);
-    console.log(`Approve transaction hash: ${blockExplorer}/tx/${result.transactionHash}`);
+    await tokenBridge.unlockTokens(tokenAddress, amountInWei, (txnHash) =>
+      console.log(`Approve transaction hash: ${blockExplorer}/tx/${txnHash}`)
+    );
+    console.log('completed approval');
   }
 
   {
     console.log(
       `Sending relay tokens transaction request for ${amount} ${symbol} into layer 2 safe owned by ${receiverAddress}`
     );
-    let result = await tokenBridge.relayTokens(tokenAddress, receiverAddress, amountInWei);
-    console.log(`Relay tokens transaction hash: ${blockExplorer}/tx/${result.transactionHash}`);
+    await tokenBridge.relayTokens(tokenAddress, receiverAddress, amountInWei, (txnHash) =>
+      console.log(`Relay tokens transaction hash: ${blockExplorer}/tx/${txnHash}`)
+    );
+    console.log('completed relay');
   }
 }
 

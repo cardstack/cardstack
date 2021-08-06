@@ -6,7 +6,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
 
 - [Function Parameters](#function-parameters)
   - [Nonce](#nonce)
-  - [Transaction Hash (TBD)](#transaction-hash-tbd)
+  - [Transaction Hash](#transaction-hash)
 - [`getSDK`](#getsdk)
 - [`Assets`](#assets)
   - [`Assets.getNativeTokenBalance`](#assetsgetnativetokenbalance)
@@ -59,13 +59,17 @@ This is a package that provides an SDK to use the Cardpay protocol.
 
 ## Function Parameters
 ### Nonce
-All the API's that mutate the state of the blockchain have 2 optional parameters:
+All the API's that mutate the state of the blockchain have 2 optional parameters for nonce:
 - `onNonce: (nonce: BN) => void`
 - `nonce: BN`
 
 The purpose of these nonce parameters are to allow the client to reattempt sending the transaction. Specifically this can be used to handle re-requesting a wallet to sign a transaction. When the `nonce` parameter is not specified, then the SDK will use the next available nonce for the transaction based on the transaction count for the EOA or safe (as the case may be). The `onNonce` callback will return the next available nonce (which is the nonce included in the signing request for the wallet). If the caller wishes to re-attempt sending the same transaction, the caller can specify the `nonce` to use when re-signing the transaction based on the nonce that was provided from the original `onNonce` callback. This will prevent the scenarios where the nonce will be increased on when the caller wants to force the wallet to resign the transaction. Care should be take though not to reuse a `nonce` value associated with a completed transaction. Such a situation could lead to the transaction being rejected because the nonce value is too low, or because the txn hash is identical to an already mined transaction.
 
-### Transaction Hash (TBD)
+### Transaction Hash
+All the API's that mutate the state of the blockchain have an optional parameters for obtaining the transaction hash:
+- `onTxHash(txHash: string) => unknown`
+
+The promise returned by all the API's that mutate the state of the blockchain will resolve after the transaction has been mined with a transaction receipt. In order for callers of the SDK to obtain the transaction hash (for purposes of tracking the transaction) before the transaction has been mined, all API's that mutate the state of the blockchain will also contain a callback `onTxnHash` that callers can use to obtain the transaction hash as soon as it is available.
 
 ## `getSDK`
 The cardpay SDK will automatically obtain the latest API version that works with the on-chain contracts. In order to obtain an API you need to leverage the `getSDK()` function and pass to it the API that you wish to work with, as well as any parameters necessary for obtaining an API (usually just an instance of Web3). This function then returns a promise for the requested API. For example, to obtain the `Safes` API, you would call:

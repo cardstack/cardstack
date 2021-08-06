@@ -281,13 +281,19 @@ export default abstract class Layer2ChainWeb3Strategy
     let tokenAddress = new TokenContractInfo(tokenSymbol, this.networkSymbol)!
       .address;
 
-    let result = await tokenBridge.relayTokens(
-      safeAddress,
-      tokenAddress,
-      receiverAddress,
-      amountInWei
-    );
-    return result.ethereumTx.txHash;
+    // in this case we don't want to wait for mining to complete. there is a
+    // purpose built await in the SDK for the bridge validators that is
+    // performed after this action--we can just rely on that for the timing
+    let transactionHash = await new Promise<TransactionHash>((res) => {
+      tokenBridge.relayTokens(
+        safeAddress,
+        tokenAddress,
+        receiverAddress,
+        amountInWei,
+        (txnHash) => res(txnHash)
+      );
+    });
+    return transactionHash;
   }
 
   async awaitBridgedToLayer1(
