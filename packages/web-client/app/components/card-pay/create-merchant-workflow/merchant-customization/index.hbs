@@ -1,0 +1,19 @@
+<ActionCardContainer
+  @header="Merchant Customization"
+  @isComplete={{@isComplete}}
+  data-test-layout-customization-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section @title="Choose a name for the merchant" />
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    data-test-layout-customization
+  >
+    <:default as |d|>
+      <d.ActionButton
+        {{on "click" @onComplete}}
+      >
+        Create Merchant
+      </d.ActionButton>
+    </:default>
+  </Boxel::ActionChin>
+</ActionCardContainer>

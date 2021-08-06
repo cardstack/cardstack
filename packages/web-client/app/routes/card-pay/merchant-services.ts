@@ -21,7 +21,7 @@ const MERCHANTS_PANEL = {
         'Confirm transactions with Touch ID or Face ID in the Card Wallet mobile app',
       ],
       cta: 'Create Merchant',
-      isCtaDisabled: true,
+      isCtaDisabled: false,
     },
     {
       workflow: 'request-payment',
