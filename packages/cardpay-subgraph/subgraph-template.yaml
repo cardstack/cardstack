@@ -74,12 +74,15 @@ dataSources:
           handler: handleTransferPrepaidCard
       file: ./src/mappings/prepaid-card.ts
 
+  # TODO add the non-deprecated MerchantManager as soon as we get an address for it
+  # it's startBlock should be v0.7.0 of the card protocol
+
   - kind: ethereum/contract
-    name: Merchant
+    name: DeprecatedMerchant
     network: {NETWORK}
     source:
-      address: "{MERCHANT_MANAGER_ADDRESS}"
-      abi: MerchantManager
+      address: "{DEPRECATED_MERCHANT_MANAGER_v0_6_7_ADDRESS}"
+      abi: DeprecatedMerchantManager_v0_6_7
       startBlock: {CARDPAY_GENESIS_BLOCK}
     mapping:
       kind: ethereum/events
@@ -92,8 +95,8 @@ dataSources:
         - MerchantSafe
         - MerchantCreation
       abis:
-        - name: MerchantManager
-          file: ./abis/generated/MerchantManager.json
+        - name: DeprecatedMerchantManager_v0_6_7
+          file: ./abis/generated/DeprecatedMerchantManager_v0_6_7.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: ERC20SymbolBytes
@@ -105,10 +108,10 @@ dataSources:
       eventHandlers:
         - event: MerchantCreation(address,address,string)
           handler: handleMerchantCreation
-      file: ./src/mappings/merchant-manager.ts
+      file: ./src/mappings/deprecated/merchant-manager-v0_6_7.ts
 
   - kind: ethereum/contract
-    name: MerchantRegistrationFee
+    name: MerchantRegistration
     network: {NETWORK}
     source:
       address: "{REGISTER_MERCHANT_HANDLER_ADDRESS}"
@@ -142,7 +145,7 @@ dataSources:
       eventHandlers:
         - event: MerchantRegistrationFee(address,address,uint256,uint256)
           handler: handleMerchantRegistrationFee
-      file: ./src/mappings/merchant-manager.ts
+      file: ./src/mappings/merchant-registration.ts
 
   - kind: ethereum/contract
     name: Payments

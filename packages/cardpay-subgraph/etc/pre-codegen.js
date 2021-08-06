@@ -39,6 +39,12 @@ let uniswapV2GenesisBlock = {
   xdai: cardpayGenesisBlock.xdai,
 };
 
+// TODO populate these after the contract deployment for v0.7.0
+let v0_7_0_startBlock = {
+  sokol: 0,
+  xdai: 0,
+};
+
 let abis = {
   PrepaidCardManager: getAbi(join(sourceAbiDir, 'prepaid-card-manager.ts')),
   RevenuePool: getAbi(join(sourceAbiDir, 'revenue-pool.ts')),
@@ -50,6 +56,7 @@ let abis = {
   MerchantManager: getAbi(join(sourceAbiDir, 'merchant-manager.ts')),
   SupplierManager: getAbi(join(sourceAbiDir, 'supplier-manager.ts')),
   Exchange: getAbi(join(sourceAbiDir, 'exchange.ts')),
+  DeprecatedMerchantManager_v0_6_7: getAbi(join(sourceAbiDir, 'deprecated-merchant-manager-0_6_7.ts')),
 };
 
 removeSync(abiDir);
@@ -78,7 +85,12 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{CARDPAY_GENESIS_BLOCK}/g, cardpayGenesisBlock[cleanNetwork])
   .replace(/{SAFE_GENESIS_BLOCK}/g, gnosisSafeGenesisBlock[cleanNetwork])
   .replace(/{UNISWAP_V2_GENESIS_BLOCK}/g, uniswapV2GenesisBlock[cleanNetwork])
-  .replace(/{TOKEN_START_BLOCK}/g, tokenStartBlock[cleanNetwork]);
+  .replace(/{TOKEN_START_BLOCK}/g, tokenStartBlock[cleanNetwork])
+  .replace(/{v0_7_0_START_BLOCK}/g, v0_7_0_startBlock[cleanNetwork])
+  .replace(
+    /{DEPRECATED_MERCHANT_MANAGER_v0_6_7_ADDRESS}/g,
+    getAddress('deprecatedMerchantManager_v0_6_7', cleanNetwork)
+  );
 
 removeSync(subgraphFile);
 writeFileSync(subgraphFile, subgraph);
