@@ -41,7 +41,7 @@ class WithdrawalWorkflow extends Workflow {
         }),
         new NetworkAwareWorkflowMessage({
           author: cardbot,
-          message: `Looks like you've already connected your ${c.layer1.fullName} wallet, which you can see below.
+          message: `Looks like you’ve already connected your ${c.layer1.fullName} wallet, which you can see below.
           Please continue with the next step of this workflow.`,
           includeIf() {
             return this.hasLayer1Account;
@@ -61,7 +61,7 @@ class WithdrawalWorkflow extends Workflow {
       postables: [
         new NetworkAwareWorkflowMessage({
           author: cardbot,
-          message: `Looks like you've already connected your ${c.layer2.fullName} wallet, which you can see below.
+          message: `Looks like you’ve already connected your ${c.layer2.fullName} wallet, which you can see below.
           Please continue with the next step of this workflow.`,
           includeIf() {
             return this.hasLayer2Account;

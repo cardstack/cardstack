@@ -36,7 +36,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new NetworkAwareWorkflowMessage({
           author: cardbot,
-          message: `Looks like you've already connected your ${c.layer2.fullName} wallet, which you can see below.
+          message: `Looks like you’ve already connected your ${c.layer2.fullName} wallet, which you can see below.
           Please continue with the next step of this workflow.`,
           includeIf() {
             return this.hasLayer2Account;
@@ -208,7 +208,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
     // if we don't have enough balance (50 USD equivalent)
     new WorkflowMessage({
       author: cardbot,
-      message: `Looks like there's no balance in your ${c.layer2.fullName} wallet to fund a prepaid card. Before you can continue, please add funds to your ${c.layer2.fullName} wallet by bridging some tokens from your ${c.layer1.fullName} wallet.`,
+      message: `Looks like there’s no balance in your ${c.layer2.fullName} wallet to fund a prepaid card. Before you can continue, please add funds to your ${c.layer2.fullName} wallet by bridging some tokens from your ${c.layer1.fullName} wallet.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
