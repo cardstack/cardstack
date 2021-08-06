@@ -50,7 +50,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [ExchangeRate.getUSDConverter](#exchangerategetusdconverter)
   - [`ExchangeRate.getETHPrice`](#exchangerategetethprice)
   - [`ExchangeRate.getUpdatedAt`](#exchangerategetupdatedat)
-- [`HubAuth`](#hubauth)
+- [`HubAuth` (TODO)](#hubauth-todo)
 - [`getAddress`](#getaddress)
 - [`getOracle`](#getoracle)
 - [`getConstant`](#getconstant)
@@ -813,7 +813,7 @@ let date = await exchangeRate.getUpdatedAt("DAI");
 console.log(`The ${token} rate was last updated at ${date.toString()}`);
 ```
 
-## `HubAuth`
+## `HubAuth` (TODO)
 ## `getAddress`
 `getAddress` is a utility that will retrieve the contract address for a contract that is part of the Card Protocol in the specified network. The easiest way to use this function is to just pass your web3 instance to the function, and the function will query the web3 instance to see what network it is currently using. You can also just pass in the network name.
 
