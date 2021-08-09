@@ -1,13 +1,19 @@
 /* eslint-disable no-process-exit */
 
 import Koa from 'koa';
+import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
+import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
+import { LogLevel, LogMeta } from '@graphile/logger';
+import config from 'config';
+import packageJson from './package.json';
 import { Registry, Container, RegistryCallback, ContainerCallback } from './di/dependency-injection';
 
 import AuthenticationMiddleware from './services/authentication-middleware';
 import DatabaseManager from './services/database-manager';
 import DevelopmentConfig from './services/development-config';
 import DevelopmentProxyMiddleware from './services/development-proxy-middleware';
+import BoomRoute from './routes/boom';
 import SessionRoute from './routes/session';
 import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
 import PrepaidCardColorSchemeSerializer from './services/serializers/prepaid-card-color-scheme-serializer';
@@ -21,9 +27,7 @@ import JsonapiMiddleware from './services/jsonapi-middleware';
 import NonceTracker from './services/nonce-tracker';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
-import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
-import { LogLevel, LogMeta } from '@graphile/logger';
-import config from 'config';
+import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 
 const log = logger('cardstack/hub');
@@ -38,6 +42,7 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
   registry.register('jsonapi-middleware', JsonapiMiddleware);
   registry.register('nonce-tracker', NonceTracker);
+  registry.register('boom-route', BoomRoute);
   registry.register('session-route', SessionRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
   registry.register('prepaid-card-customizations-route', PrepaidCardCustomizationsRoute);
@@ -57,6 +62,8 @@ export async function makeServer(registryCallback?: RegistryCallback, containerC
   let container = wireItUp(registryCallback);
   containerCallback?.(container);
 
+  initSentry();
+
   let app = new Koa();
   app.use(async (ctx: Koa.Context, next: Koa.Next) => {
     ctx.environment = process.env.NODE_ENV || 'development';
@@ -72,13 +79,35 @@ export async function makeServer(registryCallback?: RegistryCallback, containerC
     ctx.body = 'Hello World ' + ctx.environment + '... ' + ctx.host.split(':')[0];
   });
 
+  function onError(err: Error, ctx: Koa.Context) {
+    Sentry.withScope(function (scope) {
+      scope.addEventProcessor(function (event) {
+        return Sentry.Handlers.parseRequest(event, ctx.request);
+      });
+      Sentry.captureException(err);
+    });
+  }
+
   async function onClose() {
     await container.teardown();
     app.off('close', onClose);
+    app.off('error', onError);
   }
   app.on('close', onClose);
+  app.on('error', onError);
 
   return app;
+}
+
+function initSentry() {
+  if (config.get('sentry.enabled')) {
+    Sentry.init({
+      dsn: config.get('sentry.dsn'),
+      enabled: config.get('sentry.enabled'),
+      environment: config.get('sentry.environment'),
+      release: 'hub@' + packageJson.version,
+    });
+  }
 }
 
 export function bootServer() {
@@ -151,6 +180,8 @@ export function bootEnvironment() {
 }
 
 export async function bootWorker() {
+  initSentry();
+
   let workerLogFactory: LogFunctionFactory = (scope: any) => {
     return (level: LogLevel, message: any, meta?: LogMeta) => {
       switch (level) {
@@ -174,6 +205,7 @@ export async function bootWorker() {
     logger: new Logger(workerLogFactory),
     connectionString: dbConfig.url,
     taskList: {
+      boom: boom,
       'persist-off-chain-prepaid-card-customization': async (payload: any, helpers: Helpers) => {
         let task = await container.instantiate(PersistOffChainPrepaidCardCustomizationTask);
         return task.perform(payload, helpers);
@@ -181,6 +213,17 @@ export async function bootWorker() {
       's3-put-json': s3PutJson,
     },
   });
+
+  runner.events.on('job:error', ({ error, job }) => {
+    Sentry.withScope(function (scope) {
+      scope.setTags({
+        jobId: job.id,
+        jobTask: job.task_identifier,
+      });
+      Sentry.captureException(error);
+    });
+  });
+
   await runner.promise;
 }
 

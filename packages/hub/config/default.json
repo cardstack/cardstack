@@ -21,5 +21,10 @@
     "migration-filename-format": "utc",
     "ignore-pattern": "README.md|.*\\.ts|.*\\.js\\.map"
   },
-  "serverSecret": null
+  "serverSecret": null,
+  "sentry": {
+    "dsn": null,
+    "enabled": false,
+    "environment": null
+  }
 }
