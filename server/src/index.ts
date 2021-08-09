@@ -24,6 +24,7 @@ async function serve(args: any) {
     routeCard: args.routeCard,
   });
 
+  await server.primeCache();
   await server.startWatching();
   server.app.listen(args.port);
 }
