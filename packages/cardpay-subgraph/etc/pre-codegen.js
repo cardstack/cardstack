@@ -39,9 +39,9 @@ let uniswapV2GenesisBlock = {
   xdai: cardpayGenesisBlock.xdai,
 };
 
-// TODO populate these after the contract deployment for v0.7.0
 let v0_7_0_startBlock = {
-  sokol: 0,
+  sokol: 22189483,
+  // TODO populate this after the contract deployment for v0.7.0
   xdai: 0,
 };
 
