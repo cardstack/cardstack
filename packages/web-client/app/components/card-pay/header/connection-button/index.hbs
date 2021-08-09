@@ -13,6 +13,7 @@
 >
   {{#if @isInitializing}}
     {{!-- just show the spinner --}}
+    <span class="boxel-sr-only">Reconnecting to {{@chainName}}</span>
   {{else if @isConnected}}
     {{truncate-middle @address}}
   {{else}}
