@@ -8,14 +8,13 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 import sinon from 'sinon';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 
-let layer2Service: Layer2TestWeb3Strategy;
-
 module(
   'Integration | Component | card-pay/withdrawal-workflow/transaction-status',
   function (hooks) {
-    let onComplete = sinon.spy();
-
     setupRenderingTest(hooks);
+
+    let layer2Service: Layer2TestWeb3Strategy;
+    let onComplete: sinon.SinonSpy;
 
     hooks.beforeEach(async function () {
       let workflowSession = new WorkflowSession();
@@ -24,6 +23,8 @@ module(
         relayTokensTxnHash: 'relay',
         withdrawalToken: 'CARD.CPXD',
       });
+
+      onComplete = sinon.spy();
 
       this.setProperties({
         onComplete,
@@ -37,7 +38,9 @@ module(
         .strategy as Layer2TestWeb3Strategy;
 
       layer2Service.bridgeToLayer1('0xbridged', 'DAI', '20');
+    });
 
+    test('It renders transaction status and links', async function (assert) {
       await render(hbs`
         <CardPay::WithdrawalWorkflow::TransactionStatus
           @onComplete={{this.onComplete}}
@@ -47,9 +50,7 @@ module(
           @frozen={{this.frozen}}
         />
       `);
-    });
 
-    test('It renders transaction status and links', async function (assert) {
       assert.dom('[data-test-action-card-title-icon-name="clock"]').exists();
 
       assert
@@ -72,6 +73,16 @@ module(
     test('It completes when the bridged transaction completes', async function (assert) {
       assert.ok(onComplete.notCalled);
 
+      await render(hbs`
+        <CardPay::WithdrawalWorkflow::TransactionStatus
+          @onComplete={{this.onComplete}}
+          @isComplete={{this.isComplete}}
+          @onIncomplete={{this.onIncomplete}}
+          @workflowSession={{this.workflowSession}}
+          @frozen={{this.frozen}}
+        />
+      `);
+
       layer2Service.test__simulateBridgedToLayer1();
 
       await settled();
@@ -88,6 +99,40 @@ module(
         .exists();
 
       assert.ok(onComplete.called);
+    });
+
+    test('It shows an appropriate error message if bridging fails', async function (assert) {
+      assert.ok(onComplete.notCalled);
+
+      sinon
+        .stub(layer2Service, 'awaitBridgedToLayer1')
+        .throws(new Error('Huh?'));
+
+      await render(hbs`
+        <CardPay::WithdrawalWorkflow::TransactionStatus
+          @onComplete={{this.onComplete}}
+          @isComplete={{this.isComplete}}
+          @onIncomplete={{this.onIncomplete}}
+          @workflowSession={{this.workflowSession}}
+          @frozen={{this.frozen}}
+        />
+      `);
+
+      assert.dom(`[data-test-bridge-explorer-button]`).doesNotExist();
+      assert
+        .dom('[data-test-action-card-title-icon-name="success-bordered"]')
+        .doesNotExist();
+
+      assert
+        .dom('[data-test-withdrawal-bridging-failed]')
+        .containsText('Failed');
+      assert
+        .dom('[data-test-withdrawal-transaction-status-error]')
+        .containsText(
+          `There was a problem completing the bridging of your tokens to ${c.layer1.fullName}. Please contact Cardstack support so that we can investigate and resolve this issue for you.`
+        );
+
+      assert.ok(onComplete.notCalled);
     });
   }
 );

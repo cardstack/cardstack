@@ -29,11 +29,20 @@
           </Boxel::Button>
         {{/if}}
         {{#if (eq progressStep.index 1)}}
-          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" data-test-bridge-explorer-button>
-            View in Bridge Explorer
-          </Boxel::Button>
+          {{#if this.error}}
+            <span data-test-withdrawal-bridging-failed>Failed</span>
+          {{else}}
+            <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" data-test-bridge-explorer-button>
+              View in Bridge Explorer
+            </Boxel::Button>
+          {{/if}}
         {{/if}}
       </span>
     </Boxel::ProgressSteps>
+    {{#if this.error}}
+      <CardPay::ErrorMessage data-test-withdrawal-transaction-status-error as |supportURL|>
+        There was a problem completing the bridging of your tokens to {{network-display-info "layer1" "fullName"}}. Please contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a> so that we can investigate and resolve this issue for you.
+      </CardPay::ErrorMessage>
+    {{/if}}
   </ActionCardContainer::Section>
 </ActionCardContainer>

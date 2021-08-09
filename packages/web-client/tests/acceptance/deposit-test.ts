@@ -250,39 +250,13 @@ module('Acceptance | deposit', function (hooks) {
 
     post = postableSel(3, 1);
     // transaction-status card
-    assert
-      .dom(`${post} [data-test-token-bridge-step="0"][data-test-completed]`)
-      .exists();
-    assert.dom(`${post} [data-test-etherscan-button]`).exists();
-    assert
-      .dom(
-        `${post} [data-test-token-bridge-step="1"]:not([data-test-completed])`
-      )
-      .exists();
-    assert.dom(`${post} [data-test-bridge-explorer-button]`).exists();
-    assert
-      .dom(
-        `${post} [data-test-token-bridge-step="2"]:not([data-test-completed])`
-      )
-      .exists();
-    assert.dom(`${post} [data-test-blockscout-button]`).doesNotExist();
-
-    // bridging should also refresh layer 2 balances so we want to ensure that here
-    layer2Service.balancesRefreshed = false;
-
+    // we assert that it exists, and will show a blockscout button after completion of bridging (success state)
+    // the rest is handled in an integration test
+    assert.dom(`${post} [data-test-deposit-transaction-status-card]`).exists();
     layer2Service.test__simulateBridgedToLayer2(
       '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
     );
-
-    assert.dom(`${post} [data-test-step-2="complete"]`);
-    assert.dom(`${post} [data-test-step-3="complete"]`);
-
     await waitFor(`${post} [data-test-blockscout-button]`);
-
-    assert.ok(
-      layer2Service.balancesRefreshed,
-      'Balances for layer 2 should be refreshsed after bridging'
-    );
     assert.dom(`${post} [data-test-blockscout-button]`).exists();
 
     await settled();
