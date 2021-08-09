@@ -49,6 +49,10 @@ package-lock.json
 /packages/did-resolver/**/*.d.ts
 /packages/did-resolver/**/*.js.map
 
+/packages/cardie/**/*.js
+/packages/cardie/**/*.d.ts
+/packages/cardie/**/*.js.map
+
 /packages/cardpay-subgraph/**/*.js
 /packages/cardpay-subgraph/**/*.d.ts
 /packages/cardpay-subgraph/**/*.js.map
