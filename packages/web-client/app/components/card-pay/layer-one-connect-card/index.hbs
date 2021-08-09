@@ -71,7 +71,7 @@
       />
     </ActionCardContainer::Section>
   {{/if}}
-  <Boxel::ActionChin @state={{this.ctaState}} @disabled={{or @frozen this.ctaDisabled}}>
+  <Boxel::ActionChin @state={{this.ctaState}} @disabled={{@frozen}}>
     <:default as |a|>
       <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
         Connect Wallet
