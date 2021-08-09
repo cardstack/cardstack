@@ -117,11 +117,9 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
 
   @task *connectWalletTask() {
     this.isWaitingForConnection = true;
-    if (this.radioWalletProviderId) {
-      yield this.layer1Network.connect({
-        id: this.radioWalletProviderId,
-      } as WalletProvider);
-    }
+    yield this.layer1Network.connect({
+      id: this.radioWalletProviderId,
+    } as WalletProvider);
     this.isWaitingForConnection = false;
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
     if (this.isConnected) {
