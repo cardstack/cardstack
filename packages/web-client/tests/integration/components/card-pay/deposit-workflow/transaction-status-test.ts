@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
+import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import BN from 'bn.js';
@@ -23,6 +24,8 @@ module(
           transactionHash: 'RelayTokensTransactionHash',
         },
       });
+      const layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
       const layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
 
@@ -49,15 +52,35 @@ module(
       assert
         .dom(`[data-test-token-bridge-step="0"][data-test-completed]`)
         .exists();
-      assert.dom('[data-test-etherscan-button]').exists();
+      assert.dom(`[data-test-etherscan-button]`).exists();
       assert
-        .dom(`[data-test-token-bridge-step="1"]:not([data-test-completed])`)
-        .exists();
-      assert.dom('[data-test-bridge-explorer-button]').exists();
+        .dom(`[data-test-token-bridge-step][data-test-completed]`)
+        .exists({ count: 1 });
       assert
-        .dom(`[data-test-token-bridge-step="2"]:not([data-test-completed])`)
-        .exists();
-      assert.dom('[data-test-blockscout-button]').doesNotExist();
+        .dom(`[data-test-token-bridge-step-status="1"]`)
+        .hasText(`Waiting for 1 of 12 block confirmations`);
+
+      layer1Service.test__simulateBlockConfirmation();
+
+      await waitFor(`[data-test-token-bridge-step-block-count="11"]`);
+      assert
+        .dom(`[data-test-token-bridge-step-status="1"]`)
+        .hasText(`Waiting for 12 of 12 block confirmations`);
+
+      layer1Service.test__simulateBlockConfirmation();
+
+      await waitFor(`[data-test-token-bridge-step-block-count="12"]`);
+      assert
+        .dom(`[data-test-token-bridge-step-status="1"]`)
+        .hasText(`Waiting for bridge validators`);
+
+      layer1Service.test__simulateBlockConfirmation();
+      await waitFor(`[data-test-token-bridge-step="1"][data-test-completed]`);
+      assert.dom(`[data-test-bridge-explorer-button]`).exists();
+      assert
+        .dom(`[data-test-token-bridge-step="2"][data-test-completed]`)
+        .doesNotExist();
+      assert.dom(`[data-test-blockscout-button]`).doesNotExist();
 
       // bridging should also refresh layer 2 balances so we want to ensure that here
       layer2Service.balancesRefreshed = false;

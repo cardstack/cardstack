@@ -27,7 +27,6 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   @tracked unlockTxnReceipt: TransactionReceipt | undefined;
   @tracked relayTokensTxHash: string | undefined;
   @tracked relayTokensTxnReceipt: TransactionReceipt | undefined;
-  @tracked depositTxnReceipt: TransactionReceipt | undefined;
   @tracked isDepositing = false;
   @tracked hasDeposited = false;
   @service declare layer1Network: Layer1Network;

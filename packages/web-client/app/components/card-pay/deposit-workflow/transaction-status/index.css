@@ -16,8 +16,14 @@
 
 .transaction-status__step-status {
   justify-self: end;
+  display: flex;
+  align-items: center;
   font: 400 var(--boxel-font-xs);
   letter-spacing: var(--boxel-lsp-lg);
+}
+
+.transaction-status__spinner {
+  margin-left: var(--boxel-sp-xxs);
 }
 
 /* these have to interfere with boxel classes */

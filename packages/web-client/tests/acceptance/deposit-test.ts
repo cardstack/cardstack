@@ -257,6 +257,12 @@ module('Acceptance | deposit', function (hooks) {
       '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
     );
     await waitFor(`${post} [data-test-blockscout-button]`);
+
+    assert.ok(
+      layer2Service.balancesRefreshed,
+      'Balances for layer 2 should be refreshed after bridging'
+    );
+
     assert.dom(`${post} [data-test-blockscout-button]`).exists();
 
     await settled();

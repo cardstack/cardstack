@@ -14,6 +14,7 @@ import {
   Layer1ChainEvent,
   Layer1Web3Strategy,
   TransactionHash,
+  TxnBlockNumber,
   Layer1NetworkSymbol,
   ClaimBridgedTokensOptions,
   RelayTokensOptions,
@@ -24,6 +25,7 @@ import {
   getSDK,
   networkIds,
 } from '@cardstack/cardpay-sdk';
+import { waitUntilBlock } from '@cardstack/cardpay-sdk/sdk/utils/general-utils';
 import {
   ConnectionManager,
   ConnectionManagerEvent,
@@ -288,6 +290,12 @@ export default abstract class Layer1ChainWeb3Strategy
       bridgeValidationResult.signatures,
       options?.onTxHash
     );
+  }
+
+  async getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
+    if (!this.web3)
+      throw new Error('Cannot get block confirmations without web3');
+    return await waitUntilBlock(this.web3, blockNumber);
   }
 
   blockExplorerUrl(txnHash: TransactionHash): string {
