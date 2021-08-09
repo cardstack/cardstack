@@ -74,8 +74,38 @@ dataSources:
           handler: handleTransferPrepaidCard
       file: ./src/mappings/prepaid-card.ts
 
-  # TODO add the non-deprecated MerchantManager as soon as we get an address for it
-  # it's startBlock should be v0.7.0 of the card protocol
+  - kind: ethereum/contract
+    name: Merchant
+    network: {NETWORK}
+    source:
+      address: "{MERCHANT_MANAGER_ADDRESS}"
+      abi: MerchantManager
+      startBlock: {v0_7_0_START_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - EOATransaction
+        - Account
+        - MerchantSafe
+        - MerchantCreation
+      abis:
+        - name: MerchantManager
+          file: ./abis/generated/MerchantManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: MerchantCreation(address,address,string)
+          handler: handleMerchantCreation
+      file: ./src/mappings/merchant-manager.ts
 
   - kind: ethereum/contract
     name: DeprecatedMerchant

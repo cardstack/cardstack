@@ -262,16 +262,22 @@ export default class RevenuePool {
     let safes = await getSDK('Safes', this.layer2Web3);
     let startTime = Date.now();
     let merchantSafe: Safe | undefined;
+    let isFirstTime = true;
 
     do {
-      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
-      merchantSafe = await safes.viewSafe(merchantSafeAddress);
-      if (merchantSafe?.type === 'merchant') {
-        return merchantSafe;
+      if (!isFirstTime) {
+        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
       }
-    } while (!merchantSafe && Date.now() - startTime < TIMEOUT);
-
-    throw new Error(`Timeout while waiting for the merchant safe to be created.`);
+      isFirstTime = false;
+      merchantSafe = await safes.viewSafe(merchantSafeAddress);
+    } while (merchantSafe?.type !== 'merchant' && Date.now() - startTime < TIMEOUT);
+    if (!merchantSafe) {
+      throw new Error(`Timeout while waiting for the merchant safe to be created.`);
+    }
+    if (merchantSafe.type !== 'merchant') {
+      throw new Error(`Safe ${merchantSafeAddress} is not a merchant safe.`);
+    }
+    return merchantSafe;
   }
 
   private async executeRegisterMerchant(
