@@ -9,7 +9,7 @@ import {
 import serializers, {
   PrimitiveSerializer,
 } from '@cardstack/core/src/serializers';
-import { tracked } from '@glimmer/tracking';
+// import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
 
 export interface NewCardParams {
@@ -34,7 +34,7 @@ export interface LoadedState {
 export default class CardModel {
   static serializerMap: SerializerMap;
   setters: Setter;
-  @tracked private _data: any = {};
+  // @tracked private _data: any = {};
 
   constructor(
     private cards: CardEnv,
