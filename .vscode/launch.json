@@ -270,7 +270,7 @@
       "env": {},
       "args": [
         "register-merchant",
-        "0x3a58a6E39B62Fe2FF81e06B0777BB3a476e90f44", // Hassan's prepaid card --feel free to use your own
+        "0xb51C321b30a173Fd160Ddc21DEa46f91a75E24a4", // Hassan's prepaid card --feel free to use your own
         "",
         "--network",
         "sokol",
