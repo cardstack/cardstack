@@ -15,7 +15,7 @@ const Format = new Intl.DateTimeFormat('us-EN', {
 const FormatDate = setComponentTemplate(
   precompileTemplate('{{this.formatted}}', {
     strictMode: true,
-    scope: { FormatDate },
+    scope: {},
   }),
   class extends Component {
     get formatted() {
