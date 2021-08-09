@@ -16,29 +16,27 @@ import {
   IQRCodeModalOptions,
 } from '@walletconnect/types';
 
-import ProviderEngine from 'web3-provider-engine';
 import CacheSubprovider from 'web3-provider-engine/subproviders/cache';
 import FixtureSubprovider from 'web3-provider-engine/subproviders/fixture';
 import FilterSubprovider from 'web3-provider-engine/subproviders/filters';
 import HookedWalletSubprovider from 'web3-provider-engine/subproviders/hooked-wallet';
 import NonceSubprovider from 'web3-provider-engine/subproviders/nonce-tracker';
 import SubscriptionsSubprovider from 'web3-provider-engine/subproviders/subscriptions';
-
-import Web3 from 'web3';
-import { SubscribeBlockTracker } from 'eth-block-tracker';
+import { JsonRpcRequest, JsonRpcResponse } from 'json-rpc-engine';
+import { Provider } from 'eth-block-tracker';
+import { JsonRpcPayload } from 'web3-core-helpers';
+import BlockTracker, {
+  ExtendedProviderEngine,
+  TypedWebsocketProviderWithConstructor,
+  WebsocketProvider,
+} from './block-tracker';
 
 export interface ICardstackWalletConnectProviderOptions
   extends IWalletConnectProviderOptions {
   rpcWss: IRPCMap;
 }
 
-class PatchedSubscribeBlockTracker extends SubscribeBlockTracker {
-  _handleSubData(response: any): void {
-    super._handleSubData(null, response);
-  }
-}
-
-class WalletConnectProvider extends ProviderEngine {
+class WalletConnectProvider extends ExtendedProviderEngine {
   public bridge = 'https://bridge.walletconnect.org';
   public qrcode = true;
   public qrcodeModal = QRCodeModal;
@@ -53,20 +51,32 @@ class WalletConnectProvider extends ProviderEngine {
   public accounts: string[] = [];
   public chainId!: number;
   public rpcUrl = '';
-  public websocketProvider!: Web3.providers.WebsocketProvider;
+  public websocketProvider!: TypedWebsocketProviderWithConstructor;
+  public networkId!: number;
+  public infuraId?: string;
 
   constructor(opts: ICardstackWalletConnectProviderOptions) {
-    let rpcWss: IRPCMap = opts.rpcWss || null;
-    let chainId: number = opts.chainId!;
-    let websocketProvider = new Web3.providers.WebsocketProvider(
-      rpcWss[chainId]
-    );
-    websocketProvider.sendAsync = websocketProvider.send;
     super({
-      blockTracker: new PatchedSubscribeBlockTracker({
-        provider: websocketProvider,
+      blockTracker: new BlockTracker({
+        provider: (new WebsocketProvider(
+          opts.rpcWss[opts.chainId!]
+        ) as unknown) as Provider,
       }),
     });
+    let rpcWss: IRPCMap = opts.rpcWss || null;
+    let chainId: number = opts.chainId!;
+    let websocketProvider = this.blockTracker.provider;
+    //@ts-ignore allow assignment of new property
+    websocketProvider.sendAsync = function <T, U>(
+      this: TypedWebsocketProviderWithConstructor,
+      req: JsonRpcRequest<T>,
+      cb: (err: Error, res: JsonRpcResponse<U>) => void
+    ): void {
+      this.send(
+        (req as unknown) as JsonRpcPayload,
+        cb as (error: Error | null, result?: unknown) => void
+      );
+    };
     this.rpcWss = rpcWss;
     this.chainId = chainId;
     this.websocketProvider = websocketProvider;
@@ -99,17 +109,6 @@ class WalletConnectProvider extends ProviderEngine {
     }
     this.infuraId = opts.infuraId || '';
     this.initialize();
-
-    let socket = new WebSocket(this.rpcWss[this.chainId], []);
-    socket.addEventListener('close', function () {
-      console.log('close', ...arguments);
-    });
-    socket.addEventListener('message', function () {
-      console.log('message', ...arguments);
-    });
-    socket.addEventListener('open', function () {
-      console.log('open', ...arguments);
-    });
   }
 
   get isWalletConnect() {
@@ -245,6 +244,7 @@ class WalletConnectProvider extends ProviderEngine {
   async handleReadRequests(payload: any): Promise<IJsonRpcResponseSuccess> {
     if (this.websocketProvider) {
       return new Promise((resolve, reject) => {
+        //@ts-ignore typescript doesn't know about sendAsync
         this.websocketProvider.sendAsync(payload, (err: Error, res: any) => {
           if (err) {
             reject(err);
