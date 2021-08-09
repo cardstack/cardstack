@@ -7,7 +7,7 @@ import { precompileTemplate } from '@ember/template-compilation';
 import templateOnlyComponent from '@ember/component/template-only';
 export default setComponentTemplate(precompileTemplate("<h1>{{@model.title}}</h1>", {
   strictMode: true,
-  scope: {}
+  scope: () => ({})
 }), templateOnlyComponent());`;
 
 module('Unit | Lib | dynamic-card-transform', function () {
