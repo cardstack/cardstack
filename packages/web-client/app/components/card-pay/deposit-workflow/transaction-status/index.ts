@@ -15,7 +15,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { TaskGenerator } from 'ember-concurrency';
 
 class CardPayDepositWorkflowTransactionStatusComponent extends Component<WorkflowCardComponentArgs> {
-  totalBlockCount = 12;
+  totalBlockCount: number;
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @reads('args.workflowSession.state.depositSourceToken')
@@ -46,19 +46,22 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
+    this.totalBlockCount = this.layer1Network.strategy.bridgeConfirmationBlockCount;
     taskFor(this.waitForBlockConfirmationsTask)
       .perform()
       .catch((e) => {
-        this.blockCountError = true;
+        console.error('Failed to complete block confirmations');
         console.error(e);
+        Sentry.captureException(e);
+        this.blockCountError = true;
       });
   }
 
-  get displaySubstate() {
+  get displayBridgingSubstate() {
     return taskFor(this.waitForBlockConfirmationsTask).isRunning;
   }
 
-  get substate() {
+  get bridgingSubstate() {
     if (this.blockCount < this.totalBlockCount) {
       return `Waiting for ${this.blockCount + 1} of ${
         this.totalBlockCount

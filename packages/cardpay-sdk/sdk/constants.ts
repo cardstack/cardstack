@@ -44,6 +44,7 @@ const KOVAN = {
   name: 'Kovan',
   rpcNode: `${KOVAN_INFURA_URL}/${INFURA_PROJECT_ID}`,
   rpcWssNode: `${KOVAN_WSS_INFURA_URL}/${INFURA_PROJECT_ID}`,
+  ambFinalizationRate: '12' /* 12 block confirmations */,
 };
 const MAINNET = {
   apiBaseUrl: 'https://api.etherscan.io/api',
@@ -58,6 +59,7 @@ const MAINNET = {
   name: 'Ethereum Mainnet',
   rpcNode: `${MAINNET_INFURA_URL}/${INFURA_PROJECT_ID}`,
   rpcWssNode: `${MAINNET_WSS_INFURA_URL}/${INFURA_PROJECT_ID}`,
+  ambFinalizationRate: '12' /* 12 block confirmations */,
 };
 const XDAI = {
   apiBaseUrl: 'https://blockscout.com/xdai/mainnet/api',

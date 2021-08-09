@@ -33,9 +33,9 @@
               View in Bridge Explorer
             </Boxel::Button>
           {{else if this.blockCountError}}
-            Failed
-          {{else if this.displaySubstate}}
-            {{this.substate}} <Boxel::LoadingIndicator class="transaction-status__spinner" />
+            <span data-test-deposit-bridging-step-failed>Failed</span>
+          {{else if this.displayBridgingSubstate}}
+            {{this.bridgingSubstate}} <Boxel::LoadingIndicator class="transaction-status__spinner" />
           {{/if}}
         {{/if}}
         {{#if (eq progressStep.index 2)}}

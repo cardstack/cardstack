@@ -24,8 +24,8 @@ import {
   getConstantByNetwork,
   getSDK,
   networkIds,
+  waitUntilBlock,
 } from '@cardstack/cardpay-sdk';
-import { waitUntilBlock } from '@cardstack/cardpay-sdk/sdk/utils/general-utils';
 import {
   ConnectionManager,
   ConnectionManagerEvent,
@@ -52,11 +52,15 @@ export default abstract class Layer1ChainWeb3Strategy
   @tracked cardBalance: BN | undefined;
   @tracked walletInfo: WalletInfo;
   @tracked connectedChainId: number | undefined;
+  @tracked bridgeConfirmationBlockCount: number;
 
   constructor(networkSymbol: Layer1NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
     this.walletInfo = new WalletInfo([], this.chainId);
     this.networkSymbol = networkSymbol;
+    this.bridgeConfirmationBlockCount = Number(
+      getConstantByNetwork('ambFinalizationRate', this.networkSymbol)
+    );
     taskFor(this.initializeTask).perform();
   }
 

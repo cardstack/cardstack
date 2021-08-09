@@ -253,6 +253,17 @@ module('Acceptance | deposit', function (hooks) {
     // we assert that it exists, and will show a blockscout button after completion of bridging (success state)
     // the rest is handled in an integration test
     assert.dom(`${post} [data-test-deposit-transaction-status-card]`).exists();
+    const blockCount = layer1Service.bridgeConfirmationBlockCount;
+    layer1Service.test__simulateBlockConfirmation();
+    await waitFor(
+      `[data-test-token-bridge-step-block-count="${blockCount - 1}"]`
+    );
+    layer1Service.test__simulateBlockConfirmation();
+    await waitFor(`[data-test-token-bridge-step-block-count="${blockCount}"]`);
+    layer1Service.test__simulateBlockConfirmation();
+    await waitFor(`[data-test-token-bridge-step="1"][data-test-completed]`);
+    assert.dom(`${post} [data-test-bridge-explorer-button]`).exists();
+
     layer2Service.test__simulateBridgedToLayer2(
       '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
     );
