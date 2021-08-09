@@ -52,3 +52,23 @@ export async function claimRevenue(
   );
   console.log('done');
 }
+
+export async function claimRevenueGasEstimate(
+  network: string,
+  merchantSafeAddress: string,
+  tokenAddress: string,
+  amount: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let revenuePool = await getSDK('RevenuePool', web3);
+  let assets = await getSDK('Assets', web3);
+  let { symbol } = await assets.getTokenInfo(tokenAddress);
+  let weiAmount = toWei(amount);
+  let estimate = await revenuePool.claimGasEstimate(merchantSafeAddress, tokenAddress, weiAmount);
+  console.log(
+    `The gas estimate for claiming ${amount} ${symbol} in revenue for merchant safe ${merchantSafeAddress} is ${fromWei(
+      estimate
+    )} ${symbol}`
+  );
+}

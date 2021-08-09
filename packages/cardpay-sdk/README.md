@@ -39,6 +39,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RevenuePool.merchantRegistrationFee`](#revenuepoolmerchantregistrationfee)
   - [`RevenuePool.registerMerchant`](#revenuepoolregistermerchant)
   - [`RevenuePool.balances`](#revenuepoolbalances)
+  - [`RevenuePool.claimGasEstimate`](#revenuepoolclaimgasestimate)
   - [`RevenuePool.claim`](#revenuepoolclaim)
 - [`RewardPool`](#rewardpool)
   - [`RewardPool.rewardTokenBalance`](#rewardpoolrewardtokenbalance)
@@ -198,7 +199,7 @@ let result = await tokenBridge.relayTokens(
 );
 ```
 
-The result is a promise for a `GnosisExecTx` object which is documented in the following API calls.
+This method returns a promise for a web3 transaction receipt.
 
 ### `TokenBridgeHomeSide.waitForBridgingValidation`
 This call waits for the token bridge validators to perform their necessary signatures on the token bridge request from layer 2 to layer 1. After the bridge validators have signed the bridging request, this call will return a `messageId`, `encodedData`, and `signatures` for the bridging request. These items can then be used to claim the bridged tokens in layer 1.
@@ -322,42 +323,8 @@ let result = await safes.sendTokens(
   [10000000000000000000000]
 );
 ```
-This method returns a promise for a gnosis relay transaction object that has the following shape:
-```ts
-interface RelayTransaction {
-  to: string;
-  ethereumTx: {
-    txHash: string;
-    to: string;
-    data: string;
-    blockNumber: string;
-    blockTimestamp: string;
-    created: string;
-    modified: string;
-    gasUsed: string;
-    status: number;
-    transactionIndex: number;
-    gas: string;
-    gasPrice: string;
-    nonce: string;
-    value: string;
-    from: string;
-  };
-  value: number;
-  data: string;
-  timestamp: string;
-  operation: string;
-  safeTxGas: number;
-  dataGas: number;
-  gasPrice: number;
-  gasToken: string;
-  refundReceiver: string;
-  nonce: number;
-  safeTxHash: string;
-  txHash: string;
-  transactionHash: string;
-}
-```
+
+This method returns a promise for a web3 transaction receipt.
 
 ### `Safes.setSupplierInfoDID`
 This call will allow a supplier to customize their appearance within the cardpay ecosystem by letting them set an info DID, that when used with a DID resolver can retrieve supplier info, such as their name, logo, URL, etc.
@@ -368,43 +335,7 @@ The parameters to this call are:
 ```js
 await safes.setSupplierInfoDID(supplierDepotAddress, infoDID, daiCpxdAddress);
 ```
-This method returns a promise for a gnosis relay transaction object that has the following shape:
-```ts
-interface RelayTransaction {
-  to: string;
-  ethereumTx: {
-    txHash: string;
-    to: string;
-    data: string;
-    blockNumber: string;
-    blockTimestamp: string;
-    created: string;
-    modified: string;
-    gasUsed: string;
-    status: number;
-    transactionIndex: number;
-    gas: string;
-    gasPrice: string;
-    nonce: string;
-    value: string;
-    from: string;
-  };
-  value: number;
-  data: string;
-  timestamp: string;
-  operation: string;
-  safeTxGas: number;
-  dataGas: number;
-  gasPrice: number;
-  gasToken: string;
-  refundReceiver: string;
-  nonce: number;
-  safeTxHash: string;
-  txHash: string;
-  transactionHash: string;
-}
-```
-
+This method returns a promise for a web3 transaction receipt.
 ## `PrepaidCard`
 The `PrepaidCard` API is used to create and interact with prepaid cards within the layer 2 network in which the Card Protocol runs. The `PrepaidCard` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
 ```js
@@ -440,63 +371,11 @@ let result = await prepaidCard.create(
 );
 ```
 
-This method returns a promise for a gnosis relay transaction object that has the following shape:
+This method returns a promise for an object shaped like:
 ```ts
-interface {
-  prepaidCards: PrepaidCardSafe[],
-  gnosisTxn: GnosisExecTxn
-}
-```
-where `GnosisExecTxn` looks like this:
-
-```ts
-interface GnosisExecTx extends RelayTransaction {
-  value: number;
-  nonce: number;
-  data: string;
-  timestamp: string;
-  operation: string;
-  safeTxGas: number;
-  dataGas: number;
-  gasPrice: number;
-  gasToken: string;
-  refundReceiver: string;
-  safeTxHash: string;
-  txHash: string;
-  transactionHash: string;
-}
-interface RelayTransaction {
-  to: string;
-  ethereumTx: {
-    txHash: string;
-    to: string;
-    data: string;
-    blockNumber: string;
-    blockTimestamp: string;
-    created: string;
-    modified: string;
-    gasUsed: string;
-    status: number;
-    transactionIndex: number;
-    gas: string;
-    gasPrice: string;
-    nonce: string;
-    value: string;
-    from: string;
-  };
-  value: number;
-  data: string;
-  timestamp: string;
-  operation: string;
-  safeTxGas: number;
-  dataGas: number;
-  gasPrice: number;
-  gasToken: string;
-  refundReceiver: string;
-  nonce: number;
-  safeTxHash: string;
-  txHash: string;
-  transactionHash: string;
+{
+  prepaidCards: PrepaidCardSafe[]; // from Safes.view
+  txnReceipt: TransactionReceipt;
 }
 ```
 
@@ -525,7 +404,13 @@ let result = await prepaidCard.split(
 );
 ```
 
-The result is a promise that has the exact same shape as `PrepaidCard.create`.
+This method returns a promise for an object shaped like:
+```ts
+{
+  prepaidCards: PrepaidCardSafe[]; // from Safes.view
+  txnReceipt: TransactionReceipt;
+}
+```
 
 ### `PrepaidCard.canTransfer`
 This call will return a promise for a boolean indicating if the prepaid card can be transferred.
@@ -545,7 +430,7 @@ This method is invoked with the following parameters:
 let result = await prepaidCard.transfer(prepaidCardAddress, newOwner);
 ```
 
-This call will return a promise for a `GnosisExecTx`.
+This method returns a promise for a web3 transaction receipt.
 
 ### `PrepaidCard.priceForFaceValue`
 This call will return the price in terms of the specified token of how much it costs to have a face value in the specified units of SPEND (**§**). This takes into account both the exchange rate of the specified token as well as gas fees that are deducted from the face value when creating a prepaid card. Note though, that the face value of the prepaid card in SPEND will drift based on the exchange rate of the underlying token used to create the prepaid card. (However, this drift should be very slight since we are using *stable* coins to purchase prepaid cards (emphasis on "stable"). Since the units of SPEND are very small relative to wei (**§** 1 === $0.01 USD), the face value input is a number type. This API returns the amount of tokens required to achieve a particular face value as a string in units of `wei` of the specified token.
@@ -580,42 +465,7 @@ let result = await prepaidCard.payMerchant(
 );
 ```
 
-This method returns a promise for a gnosis relay transaction object that has the following shape:
-```ts
-interface RelayTransaction {
-  to: string;
-  ethereumTx: {
-    txHash: string;
-    to: string;
-    data: string;
-    blockNumber: string;
-    blockTimestamp: string;
-    created: string;
-    modified: string;
-    gasUsed: string;
-    status: number;
-    transactionIndex: number;
-    gas: string;
-    gasPrice: string;
-    nonce: string;
-    value: string;
-    from: string;
-  };
-  value: number;
-  data: string;
-  timestamp: string;
-  operation: string;
-  safeTxGas: number;
-  dataGas: number;
-  gasPrice: number;
-  gasToken: string;
-  refundReceiver: string;
-  nonce: number;
-  safeTxHash: string;
-  txHash: string;
-  transactionHash: string;
-}
-```
+This method returns a promise for a web3 transaction receipt.
 
 ## `RevenuePool`
 The `RevenuePool` API is used register merchants and view/claim merchant revenue from prepaid card payments within the layer 2 network in which the Card Protocol runs. The `RevenuePool` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
@@ -640,24 +490,9 @@ The parameters to this function are:
 ```js
   let { merchantSafe } = await revenuePool.registerMerchant(merchantsPrepaidCardAddress, infoDID);
 ```
-This call takes in as a parameter the prepaid card address that the merchant is using to pay the registration fee for becoming a new merchant. This call will return an object in the shape of:
-```ts
-interface {
-  merchantSafe: string,
-  gnosisTxn: RegisterMerchantTX
-}
-```
+This call takes in as a parameter the prepaid card address that the merchant is using to pay the registration fee for becoming a new merchant.
 
-where `RegisterMerchantTX` looks like:
-```ts
-interface RegisterMerchantTx extends RelayTransaction {
-  payment: number;
-  prepaidCardTxHash: string;
-  tokenAddress: string;
-}
-
-// RelayTransaction is documented above
-```
+This method returns a promise for a web3 transaction receipt.
 
 ### `RevenuePool.balances`
 This call returns the balance in the RevenuePool for a merchant's safe address. As customers pay merchants with their prepaid cards, the payments accumulate as revenue that the merchants can claim using their merchant safes. This function reveals the revenue that has accumulated for the merchant. This function takes in a parameter, which is the merchant's safe address and returns a promise that is a list balances aggregated by token address (a merchant can accumulate balances for all the stable coin CPXD tokens that are allowed in the cardpay protocol).
@@ -678,6 +513,20 @@ interface RevenueTokenBalance {
 }
 ```
 
+### `RevenuePool.claimGasEstimate`
+This call will return the gas estimate for claiming revenue.
+
+The parameters to this function are:
+- The merchant's safe address
+- The token address of the tokens the merchant is claiming
+- The amount of tokens that are being claimed as a string in units of `wei`
+
+```ts
+let result = await revenuePool.claim(merchantSafeAddress, tokenAddress, claimAmountInWei);
+```
+
+This method returns a promise for the amount of the tokens specified as the token address in the parameters that are estimated to be used to pay for gas as a string in units of `wei`.
+
 ### `RevenuePool.claim`
 This call will transfer unclaimed merchant revenue from the revenue pool into the merchant's safe, thereby "claiming" the merchant's revenue earned from prepaid card payments.
 
@@ -688,61 +537,8 @@ The parameters to this function are:
 
 ```ts
 let result = await revenuePool.claim(merchantSafeAddress, tokenAddress, claimAmountInWei);
-console.log(`The txn hash for the merchant claim is ${result.ethereumTx.txHash}`);
 ```
-
-This method returns a promise for a gnosis relay transaction `GnosisExecTxn` that has the following shape:
-
-```ts
-interface GnosisExecTx extends RelayTransaction {
-  value: number;
-  nonce: number;
-  data: string;
-  timestamp: string;
-  operation: string;
-  safeTxGas: number;
-  dataGas: number;
-  gasPrice: number;
-  gasToken: string;
-  refundReceiver: string;
-  safeTxHash: string;
-  txHash: string;
-  transactionHash: string;
-}
-interface RelayTransaction {
-  to: string;
-  ethereumTx: {
-    txHash: string;
-    to: string;
-    data: string;
-    blockNumber: string;
-    blockTimestamp: string;
-    created: string;
-    modified: string;
-    gasUsed: string;
-    status: number;
-    transactionIndex: number;
-    gas: string;
-    gasPrice: string;
-    nonce: string;
-    value: string;
-    from: string;
-  };
-  value: number;
-  data: string;
-  timestamp: string;
-  operation: string;
-  safeTxGas: number;
-  dataGas: number;
-  gasPrice: number;
-  gasToken: string;
-  refundReceiver: string;
-  nonce: number;
-  safeTxHash: string;
-  txHash: string;
-  transactionHash: string;
-}
-```
+This method returns a promise for a web3 transaction receipt.
 ## `RewardPool`
 
 The `RewardPool` API is used to interact with tally (an offchain service similar to relayer) and the reward pool contract. As customers use their prepaid card they will be given rewards based the amount of spend they use and a reward-based algorithm.

@@ -420,7 +420,7 @@ export default class PrepaidCard {
     nonce?: BN,
     onGasLoaded?: (txnHashes: string[]) => unknown,
     options?: ContractOptions
-  ): Promise<{ prepaidCards: PrepaidCardSafe[]; gnosisTxn: GnosisExecTx }> {
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }> {
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
     }
@@ -523,9 +523,10 @@ export default class PrepaidCard {
         })
       )
     );
+    let txnReceipt = await waitUntilTransactionMined(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
     return {
       prepaidCards: await this.resolvePrepaidCards(prepaidCardAddresses),
-      gnosisTxn,
+      txnReceipt,
     };
   }
 

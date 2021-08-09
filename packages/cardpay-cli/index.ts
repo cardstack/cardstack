@@ -19,7 +19,7 @@ import {
   gasFee,
 } from './prepaid-card.js';
 import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
-import { claimRevenue, registerMerchant, revenueBalances } from './revenue-pool.js';
+import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
 import { rewardTokenBalances } from './reward-pool.js';
 import { hubAuth } from './hub-auth';
 
@@ -48,6 +48,7 @@ type Commands =
   | 'registerMerchant'
   | 'revenueBalances'
   | 'claimRevenue'
+  | 'claimRevenueGasEstimate'
   | 'priceOracleUpdatedAt'
   | 'viewTokenBalance'
   | 'hubAuth'
@@ -376,6 +377,25 @@ let {
     }
   )
   .command(
+    'claim-revenue-gas-estimate <merchantSafe> <tokenAddress> <amount>',
+    'Obtain a gas estimate for claiming merchant revenue',
+    (yargs) => {
+      yargs.positional('merchantSafe', {
+        type: 'string',
+        description: "The address of the merchant's safe whose revenue balance is being claimed",
+      });
+      yargs.positional('tokenAddress', {
+        type: 'string',
+        description: 'The address of the tokens that are being claimed as revenue',
+      });
+      yargs.positional('amount', {
+        type: 'string',
+        description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei)',
+      });
+      command = 'claimRevenueGasEstimate';
+    }
+  )
+  .command(
     'price-for-face-value <tokenAddress> <spendFaceValue>',
     'Get the price in the units of the specified token to achieve a prepaid card with the specified face value in SPEND',
     (yargs) => {
@@ -619,6 +639,13 @@ if (!command) {
         return;
       }
       await claimRevenue(network, merchantSafe, tokenAddress, amount, mnemonic);
+      break;
+    case 'claimRevenueGasEstimate':
+      if (merchantSafe == null || tokenAddress == null || amount == null) {
+        showHelpAndExit('merchantSafe, tokenAddress, and amount are required values');
+        return;
+      }
+      await claimRevenueGasEstimate(network, merchantSafe, tokenAddress, amount, mnemonic);
       break;
     case 'usdPrice':
       if (token == null || amount == null) {
