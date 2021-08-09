@@ -61,8 +61,8 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     else return '';
   }
 
-  get ctaState(): string {
-    if (this.isConnected) {
+  get cardState(): string {
+    if (this.isConnected || this.args.isComplete) {
       return 'memorialized';
     } else if (this.isWaitingForConnection) {
       return 'in-progress';
@@ -70,8 +70,13 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
       return 'default';
     }
   }
-  get ctaDisabled() {
-    return !this.isConnected && !this.radioWalletProviderId;
+
+  get ctaState(): string {
+    if (this.cardState === 'materialized') {
+      return 'default';
+    }
+
+    return this.cardState;
   }
 
   get balancesToShow() {
