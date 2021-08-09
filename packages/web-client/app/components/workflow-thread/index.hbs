@@ -19,7 +19,7 @@
         <WorkflowThread::Postable
           @postable={{postable}}
           @previous={{object-at milestone.visiblePostables (dec j)}}
-          @frozen={{or this.workflow.isComplete this.workflow.isCanceled}}
+          @frozen={{this.frozen}}
           @index={{j}}
           data-test-milestone={{i}}
         />
@@ -43,6 +43,7 @@
         <WorkflowThread::Postable
           @postable={{postable}}
           @previous={{object-at this.workflow.epilogue.visiblePostables (dec j)}}
+          @frozen={{this.frozen}}
           @index={{j}}
           data-test-epilogue
         />

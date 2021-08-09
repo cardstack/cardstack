@@ -84,6 +84,10 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
     return postablesInLastMilestone[postablesInLastMilestone.length - 1];
   }
 
+  get frozen(): boolean {
+    return this.workflow.isComplete || this.workflow.isCanceled;
+  }
+
   willDestroy() {
     this.reducedMotionMediaQuery.removeEventListener(
       'change',
