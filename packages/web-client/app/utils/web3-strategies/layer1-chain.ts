@@ -14,6 +14,7 @@ import {
   Layer1ChainEvent,
   Layer1Web3Strategy,
   TransactionHash,
+  TxnBlockNumber,
   Layer1NetworkSymbol,
   ClaimBridgedTokensOptions,
   RelayTokensOptions,
@@ -23,6 +24,7 @@ import {
   getConstantByNetwork,
   getSDK,
   networkIds,
+  waitUntilBlock,
 } from '@cardstack/cardpay-sdk';
 import {
   ConnectionManager,
@@ -50,11 +52,15 @@ export default abstract class Layer1ChainWeb3Strategy
   @tracked cardBalance: BN | undefined;
   @tracked walletInfo: WalletInfo;
   @tracked connectedChainId: number | undefined;
+  @tracked bridgeConfirmationBlockCount: number;
 
   constructor(networkSymbol: Layer1NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
     this.walletInfo = new WalletInfo([], this.chainId);
     this.networkSymbol = networkSymbol;
+    this.bridgeConfirmationBlockCount = Number(
+      getConstantByNetwork('ambFinalizationRate', this.networkSymbol)
+    );
     taskFor(this.initializeTask).perform();
   }
 
@@ -288,6 +294,12 @@ export default abstract class Layer1ChainWeb3Strategy
       bridgeValidationResult.signatures,
       options?.onTxHash
     );
+  }
+
+  async getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
+    if (!this.web3)
+      throw new Error('Cannot get block confirmations without web3');
+    return await waitUntilBlock(this.web3, blockNumber);
   }
 
   blockExplorerUrl(txnHash: TransactionHash): string {

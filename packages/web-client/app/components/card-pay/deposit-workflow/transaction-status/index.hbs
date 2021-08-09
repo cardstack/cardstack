@@ -10,42 +10,48 @@
     <Boxel::ProgressSteps
       class="transaction-status__steps"
       @progressSteps={{this.progressSteps}}
-      @completedCount={{this.completedCount}}
+      @completedCount={{this.completedStepCount}}
       as |progressStep|
     >
-      <span
+      <div
         class="transaction-status__step-title"
         data-test-token-bridge-step={{progressStep.index}}
         data-test-completed={{progressStep.completed}}
       >
         {{progressStep.title}}
-      </span>
+      </div>
 
-      <span class="transaction-status__step-status">
+      <div class="transaction-status__step-status" data-test-token-bridge-step-status={{progressStep.index}} data-test-token-bridge-step-block-count={{this.blockCount}}>
         {{#if (eq progressStep.index 0)}}
           <Boxel::Button @as="anchor" @size="extra-small" @href={{this.depositTxnViewerUrl}} target="_blank" rel="noopener" data-test-etherscan-button>
             View on Etherscan
           </Boxel::Button>
         {{/if}}
         {{#if (eq progressStep.index 1)}}
-          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" data-test-bridge-explorer-button>
-            View in Bridge Explorer
-          </Boxel::Button>
+          {{#if progressStep.completed}}
+            <Boxel::Button @as="anchor" @size="extra-small" @href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener" data-test-bridge-explorer-button>
+              View in Bridge Explorer
+            </Boxel::Button>
+          {{else if this.blockCountError}}
+            <span data-test-deposit-bridging-step-failed>Failed</span>
+          {{else if this.displayBridgingSubstate}}
+            {{this.bridgingSubstate}} <Boxel::LoadingIndicator class="transaction-status__spinner" />
+          {{/if}}
         {{/if}}
         {{#if (eq progressStep.index 2)}}
           {{#if progressStep.completed}}
             <Boxel::Button @as="anchor" @size="extra-small" @href={{this.blockscoutUrl}} target="_blank" rel="noopener" data-test-blockscout-button>
               View on Blockscout
             </Boxel::Button>
-          {{else if this.error}}
+          {{else if this.bridgeError}}
             <span data-test-deposit-minting-step-failed>Failed</span>
-          {{else}}
-            Processing...
+          {{else if (eq this.completedStepCount progressStep.index)}}
+            Processing... <Boxel::LoadingIndicator class="transaction-status__spinner" />
           {{/if}}
         {{/if}}
-      </span>
+      </div>
     </Boxel::ProgressSteps>
-    {{#if this.error}}
+    {{#if (or this.bridgeError this.blockCountError)}}
       <CardPay::ErrorMessage data-test-deposit-transaction-status-error as |supportURL|>
         There was a problem completing the bridging of your tokens to {{network-display-info "layer2" "fullName"}}. Please contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a> so that we can investigate and resolve this issue for you.
       </CardPay::ErrorMessage>

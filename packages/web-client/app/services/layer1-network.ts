@@ -5,6 +5,7 @@ import {
   Layer1ChainEvent,
   Layer1Web3Strategy,
   TransactionHash,
+  TxnBlockNumber,
 } from '../utils/web3-strategies/types';
 import Layer1TestWeb3Strategy from '../utils/web3-strategies/test-layer1';
 import EthWeb3Strategy from '../utils/web3-strategies/ethereum';
@@ -127,6 +128,10 @@ export default class Layer1Network
     );
     yield this.strategy.refreshBalances();
     return result;
+  }
+
+  getBlockConfirmation(blockNumber: TxnBlockNumber) {
+    return this.strategy.getBlockConfirmation(blockNumber);
   }
 }
 

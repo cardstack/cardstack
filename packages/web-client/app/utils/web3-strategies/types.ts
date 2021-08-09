@@ -55,6 +55,7 @@ export interface Layer1Web3Strategy
   defaultTokenBalance: BN | undefined;
   daiBalance: BN | undefined;
   cardBalance: BN | undefined;
+  bridgeConfirmationBlockCount: number;
   refreshBalances(): void;
   connect(walletProvider: WalletProvider): Promise<void>;
   waitForAccount: Promise<void>;
@@ -74,6 +75,7 @@ export interface Layer1Web3Strategy
     bridgeValidationResult: BridgeValidationResult,
     options?: ClaimBridgedTokensOptions
   ): Promise<TransactionReceipt>;
+  getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void>;
 }
 
 export interface Layer2Web3Strategy
@@ -121,6 +123,7 @@ export interface Layer2Web3Strategy
 }
 
 export type TransactionHash = string;
+export type TxnBlockNumber = number;
 export type ChainAddress = string;
 
 export type Layer1NetworkSymbol = 'kovan' | 'mainnet';

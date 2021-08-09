@@ -6,6 +6,7 @@ import {
   TransactionHash,
   ClaimBridgedTokensOptions,
   RelayTokensOptions,
+  TxnBlockNumber,
 } from './types';
 import { defer } from 'rsvp';
 import RSVP from 'rsvp';
@@ -25,6 +26,7 @@ interface ClaimBridgedTokensRequest {
 
 export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   chainId = -1;
+  bridgeConfirmationBlockCount = 5;
   @tracked isInitializing = false;
   @tracked currentProviderId: string | undefined;
   @tracked walletConnectUri: string | undefined;
@@ -50,6 +52,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     string,
     ClaimBridgedTokensRequest
   > = new Map();
+  blockConfirmationDeferred!: RSVP.Deferred<void>;
 
   connect(_walletProvider: WalletProvider): Promise<void> {
     return this.waitForAccount;
@@ -194,5 +197,18 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
 
   get waitForAccount() {
     return this.waitForAccountDeferred.promise as Promise<void>;
+  }
+
+  getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
+    if (blockNumber > 1 && blockNumber < this.bridgeConfirmationBlockCount) {
+      return Promise.resolve();
+    } else {
+      this.blockConfirmationDeferred = defer<void>();
+      return this.blockConfirmationDeferred.promise as Promise<void>;
+    }
+  }
+
+  test__simulateBlockConfirmation() {
+    this.blockConfirmationDeferred.resolve();
   }
 }
