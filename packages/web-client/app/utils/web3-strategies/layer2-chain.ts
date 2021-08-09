@@ -5,7 +5,7 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { IConnector } from '@walletconnect/types';
-import WalletConnectProvider from '@walletconnect/web3-provider';
+import WalletConnectProvider from '../wc-provider';
 import { task } from 'ember-concurrency-decorators';
 
 import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
@@ -88,6 +88,12 @@ export default abstract class Layer2ChainWeb3Strategy
       rpc: {
         [networkIds[this.networkSymbol]]: getConstantByNetwork(
           'rpcNode',
+          this.networkSymbol
+        ),
+      },
+      rpcWss: {
+        [networkIds[this.networkSymbol]]: getConstantByNetwork(
+          'rpcWssNode',
           this.networkSymbol
         ),
       },
