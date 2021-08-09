@@ -66,6 +66,37 @@ export default class RevenuePool {
     return result;
   }
 
+  // We'll probably want to add this capability for the other API's...
+  // Note that the returned amount is in units of the token specified in the
+  // function params, tokenAddress
+  async claimGasEstimate(merchantSafeAddress: string, tokenAddress: string, amount: string): Promise<string> {
+    let revenuePoolAddress = await getAddress('revenuePool', this.layer2Web3);
+    let revenuePool = new this.layer2Web3.eth.Contract(RevenuePoolABI as AbiItem[], revenuePoolAddress);
+    let unclaimedBalance = new BN(await revenuePool.methods.revenueBalance(merchantSafeAddress, tokenAddress).call());
+    if (unclaimedBalance.lt(new BN(amount))) {
+      throw new Error(
+        `Merchant safe does not have enough enough unclaimed revenue balance to make this claim. The merchant safe ${merchantSafeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
+          unclaimedBalance
+        )}, amount being claimed is ${fromWei(amount)}`
+      );
+    }
+    let payload = revenuePool.methods.claimRevenue(tokenAddress, amount).encodeABI();
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      merchantSafeAddress,
+      revenuePoolAddress,
+      '0',
+      payload,
+      0,
+      tokenAddress
+    );
+    let gasInToken = new BN(String(estimate.baseGas))
+      .add(new BN(String(estimate.safeTxGas)))
+      .mul(new BN(String(estimate.gasPrice)))
+      .toString();
+    return gasInToken;
+  }
+
   async claim(
     merchantSafeAddress: string,
     tokenAddress: string,
