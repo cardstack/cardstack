@@ -74,18 +74,27 @@ module('Acceptance | withdrawal', function (hooks) {
       .containsText(
         `${capitalize(c.layer1.conversationalName)} wallet connected`
       );
+
     assert
       .dom(postableSel(1, 0))
+      .containsText(`It looks like you have enough ETH`);
+    assert
+      .dom(postableSel(1, 1))
+      .containsText(`Sufficient funds for claiming withdrawn tokens`);
+    assert.dom(milestoneCompletedSel(1)).containsText(`ETH balance checked`);
+
+    assert
+      .dom(postableSel(2, 0))
       .containsText(
         `Now it’s time to connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app`
       );
     assert
-      .dom(postableSel(1, 1))
+      .dom(postableSel(2, 1))
       .containsText(
         'Once you have installed the app, open the app and add an existing wallet/account'
       );
     assert
-      .dom(`${postableSel(1, 2)} [data-test-wallet-connect-loading-qr-code]`)
+      .dom(`${postableSel(2, 2)} [data-test-wallet-connect-loading-qr-code]`)
       .exists();
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
@@ -119,9 +128,9 @@ module('Acceptance | withdrawal', function (hooks) {
     };
     layer2Service.test__simulateDepot(testDepot as DepotSafe);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    await waitFor(`${postableSel(1, 2)} [data-test-balance-container]`);
+    await waitFor(`${postableSel(2, 2)} [data-test-balance-container]`);
     assert
-      .dom(`${postableSel(1, 2)} [data-test-balance="DAI.CPXD"]`)
+      .dom(`${postableSel(2, 2)} [data-test-balance="DAI.CPXD"]`)
       .containsText('250.00 DAI.CPXD');
     assert
       .dom(
@@ -130,12 +139,12 @@ module('Acceptance | withdrawal', function (hooks) {
       .hasText('0x1826...6E44');
     await settled();
     assert
-      .dom(milestoneCompletedSel(1))
+      .dom(milestoneCompletedSel(2))
       .containsText(`${c.layer2.fullName} wallet connected`);
     assert
-      .dom(postableSel(2, 0))
+      .dom(postableSel(3, 0))
       .containsText(`Please choose the asset you would like to withdraw`);
-    post = postableSel(2, 1);
+    post = postableSel(3, 1);
     // // choose-balance card
     await waitFor(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`);
     assert
@@ -168,11 +177,11 @@ module('Acceptance | withdrawal', function (hooks) {
     assert.dom('[data-test-choose-balance-footnote]').containsText('gas fee');
 
     // // transaction-amount card
-    await waitFor(postableSel(2, 2));
+    await waitFor(postableSel(3, 2));
     assert
-      .dom(postableSel(2, 2))
+      .dom(postableSel(3, 2))
       .containsText('How much would you like to withdraw from your balance?');
-    post = postableSel(2, 3);
+    post = postableSel(3, 3);
 
     assert
       .dom(
@@ -215,31 +224,31 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom('[data-test-withdrawal-transaction-amount]')
       .containsText('Confirmed');
     assert
-      .dom(milestoneCompletedSel(2))
+      .dom(milestoneCompletedSel(3))
       .containsText(`Withdrawn from ${c.layer2.fullName}`);
 
     // // transaction-status step card
     assert
-      .dom(postableSel(3, 0))
+      .dom(postableSel(4, 0))
       .containsText(
         `withdrawn funds from the ${c.layer2.fullName}, your tokens will be bridged to ${c.layer1.fullName}`
       );
-    await waitFor(postableSel(3, 1));
+    await waitFor(postableSel(4, 1));
     layer2Service.test__simulateBridgedToLayer1();
     await settled();
     assert
-      .dom(milestoneCompletedSel(3))
+      .dom(milestoneCompletedSel(4))
       .containsText(`Tokens bridged to ${c.layer1.fullName}`);
 
     // // token claim step card
     assert
-      .dom(postableSel(4, 0))
+      .dom(postableSel(5, 0))
       .containsText(
         `You will have to pay ${c.layer1.conversationalName} gas fee`
       );
 
-    await waitFor(postableSel(4, 1));
-    post = postableSel(4, 1);
+    await waitFor(postableSel(5, 1));
+    post = postableSel(5, 1);
     await click(`${post} [data-test-boxel-button]`);
     assert
       .dom(`${post} [data-test-boxel-action-chin]`)
@@ -248,7 +257,7 @@ module('Acceptance | withdrawal', function (hooks) {
     layer1Service.test__simulateBridgedTokensClaimed('example-message-id');
     await waitFor('[data-test-withdrawal-token-claim-is-complete]');
     assert
-      .dom(milestoneCompletedSel(4))
+      .dom(milestoneCompletedSel(5))
       .containsText(`Tokens claimed on ${c.layer1.conversationalName}`);
 
     // // transaction-summary card

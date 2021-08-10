@@ -2,9 +2,13 @@ import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
 import NetworkAwareWorkflowMessage from '@cardstack/web-client/components/workflow-thread/network-aware-message';
+import NetworkAwareWorkflowCard from '@cardstack/web-client/components/workflow-thread/network-aware-card';
 import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
-import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
+import {
+  CheckResult,
+  WorkflowCard,
+} from '@cardstack/web-client/models/workflow/workflow-card';
 import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
@@ -12,10 +16,31 @@ import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { capitalize } from '@ember/string';
+import { BN } from 'bn.js';
+import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
 } as const;
+
+class NotEnoughBalanceWorkflowMessage extends WorkflowPostable {
+  constructor() {
+    super({ name: 'cardbot' }, () => {
+      let balance = this.layer1Network.defaultTokenBalance;
+      return !!balance && balance <= new BN(0.01);
+    });
+  }
+  get message() {
+    return `The last step of this withdrawal requires that you have at least **~${this.layer1Network.minimumBalanceForWithdrawalClaim} ${c.layer1.nativeTokenSymbol}**.
+            You only have **${this.layer1Network.defaultTokenBalance} ${c.layer1.nativeTokenSymbol}**. You will need to deposit more
+            ${c.layer1.nativeTokenSymbol} to your account shown below to continue the withdrawal.`;
+  }
+  get layer1Network() {
+    return this.workflow?.owner.lookup(
+      'service:layer1-network'
+    ) as Layer1Network;
+  }
+}
 
 class WithdrawalWorkflow extends Workflow {
   name = 'Withdrawal';
@@ -47,14 +72,44 @@ class WithdrawalWorkflow extends Workflow {
             return this.hasLayer1Account;
           },
         }),
-        new WorkflowCard({
+        new NetworkAwareWorkflowCard({
           author: cardbot,
           componentName: 'card-pay/layer-one-connect-card',
+          async check(this: NetworkAwareWorkflowCard): Promise<CheckResult> {
+            // delay completion until balances are loaded
+            await this.waitUntil(() => {
+              return !!this.layer1Network.defaultTokenBalance;
+            }, 200);
+            return {
+              success: true,
+            };
+          },
         }),
       ],
       completedDetail: `${capitalize(
         c.layer1.conversationalName
       )} wallet connected`,
+    }),
+    new Milestone({
+      title: `Check ${c.layer1.nativeTokenSymbol} balance`,
+      postables: [
+        new NetworkAwareWorkflowMessage({
+          author: cardbot,
+          message: `It looks like you have enough ${c.layer1.nativeTokenSymbol} in you account on ${c.layer1.fullName}, to perform the last step of this withrawal workflow, which requires ~0.01 ${c.layer1.nativeTokenSymbol}.`,
+          includeIf() {
+            return (
+              !!this.layer1NativeTokenBalance &&
+              this.layer1NativeTokenBalance > new BN(0.01)
+            );
+          },
+        }),
+        new NotEnoughBalanceWorkflowMessage(),
+        new WorkflowCard({
+          author: cardbot,
+          componentName: 'card-pay/withdrawal-workflow/check-balance',
+        }),
+      ],
+      completedDetail: `${c.layer1.nativeTokenSymbol} balance checked`,
     }),
     new Milestone({
       title: `Connect ${c.layer2.conversationalName} wallet`,
@@ -194,7 +249,7 @@ class WithdrawalWorkflow extends Workflow {
   }
 }
 
-class WithdrawalWorkflowComponent extends Component {
+export default class WithdrawalWorkflowComponent extends Component {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
 
@@ -208,5 +263,3 @@ class WithdrawalWorkflowComponent extends Component {
     this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
   }
 }
-
-export default WithdrawalWorkflowComponent;
