@@ -18,12 +18,16 @@ export default class NetworkAwareWorkflowMessage extends WorkflowMessage {
     super(options);
   }
 
-  get hasLayer1Account() {
+  get layer1Network() {
     let postable = this as WorkflowPostable;
     let layer1Network = postable.workflow?.owner.lookup(
       'service:layer1-network'
     ) as Layer1Network;
-    return layer1Network.isConnected;
+    return layer1Network;
+  }
+
+  get hasLayer1Account() {
+    return this.layer1Network.isConnected;
   }
 
   get hasLayer2Account() {
@@ -40,5 +44,9 @@ export default class NetworkAwareWorkflowMessage extends WorkflowMessage {
       'service:hub-authentication'
     ) as HubAuthentication;
     return hubAuthentication.isAuthenticated;
+  }
+
+  get layer1NativeTokenBalance() {
+    return this.layer1Network.defaultTokenBalance;
   }
 }

@@ -13,7 +13,6 @@ import KovanWeb3Strategy from '../utils/web3-strategies/kovan';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import { task } from 'ember-concurrency-decorators';
-import { WalletProvider } from '../utils/wallet-providers';
 import { TransactionReceipt } from 'web3-core';
 import BN from 'bn.js';
 import {
@@ -24,11 +23,16 @@ import {
 import { action } from '@ember/object';
 import { TaskGenerator } from 'ember-concurrency';
 import { BridgeValidationResult } from '@cardstack/cardpay-sdk';
+import walletProviders, {
+  WalletProvider,
+} from '@cardstack/web-client/utils/wallet-providers';
+
 export default class Layer1Network
   extends Service
   implements Emitter<Layer1ChainEvent> {
   strategy!: Layer1Web3Strategy;
   simpleEmitter = new SimpleEmitter();
+  walletProviders = walletProviders;
   @reads('strategy.isInitializing') declare isInitializing: boolean;
   @reads('strategy.isConnected', false) isConnected!: boolean;
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
@@ -37,6 +41,7 @@ export default class Layer1Network
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
   @reads('strategy.daiBalance') daiBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
+  @reads('strategy.nativeTokenSymbol') nativeTokenSymbol: string | undefined;
 
   getEstimatedGasForWithdrawalClaim(): Promise<BN> {
     return this.strategy.getEstimatedGasForWithdrawalClaim();
@@ -136,6 +141,16 @@ export default class Layer1Network
 
   getBlockConfirmation(blockNumber: TxnBlockNumber) {
     return this.strategy.getBlockConfirmation(blockNumber);
+  }
+
+  get walletProvider(): WalletProvider | undefined {
+    return this.walletProviders.find(
+      (w) => w.id === this.strategy.currentProviderId
+    );
+  }
+
+  refreshBalances() {
+    return this.strategy.refreshBalances();
   }
 }
 
