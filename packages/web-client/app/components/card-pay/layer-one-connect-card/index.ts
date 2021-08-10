@@ -71,12 +71,8 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     }
   }
 
-  get ctaState(): string {
-    if (this.cardState === 'materialized') {
-      return 'default';
-    }
-
-    return this.cardState;
+  get showActions(): boolean {
+    return !this.args.isComplete || this.isConnected;
   }
 
   get balancesToShow() {
