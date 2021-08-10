@@ -38,6 +38,10 @@ export default class Layer1Network
   @reads('strategy.daiBalance') daiBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
 
+  getEstimatedGasForWithdrawalClaim(): Promise<BN> {
+    return this.strategy.getEstimatedGasForWithdrawalClaim();
+  }
+
   constructor(props: object | undefined) {
     super(props);
     switch (config.chains.layer1) {

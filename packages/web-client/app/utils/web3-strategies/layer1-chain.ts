@@ -34,7 +34,9 @@ import {
 import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { action } from '@ember/object';
+import { toWei } from 'web3-utils';
 
+const APPROXIMATE_WITHDRAWAL_GAS_AMOUNT = new BN('290000');
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
   chainId: number;
@@ -311,5 +313,12 @@ export default abstract class Layer1ChainWeb3Strategy
       'bridgeExplorer',
       this.networkSymbol
     )}/${txnHash}`;
+  }
+
+  async getEstimatedGasForWithdrawalClaim(): Promise<BN> {
+    let gasPrice = await this.web3!.eth.getGasPrice();
+    return APPROXIMATE_WITHDRAWAL_GAS_AMOUNT.mul(
+      new BN(toWei(gasPrice, 'gwei'))
+    );
   }
 }
