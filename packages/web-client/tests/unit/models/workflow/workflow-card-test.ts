@@ -8,6 +8,8 @@ import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-car
 import { Workflow } from '@cardstack/web-client/models/workflow';
 import { settled } from '@ember/test-helpers';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
+import { taskFor } from 'ember-concurrency-ts';
+import { timeout } from 'ember-concurrency';
 
 module('Unit | WorkflowCard model', function (hooks) {
   setupTest(hooks);
@@ -91,5 +93,32 @@ module('Unit | WorkflowCard model', function (hooks) {
     subject.setWorkflow(wf);
     subject.onIncomplete();
     assert.equal(subject.isComplete, false);
+  });
+
+  test('waitUntil task polls and completes once the predicate is true', async function (assert) {
+    let subject = new WorkflowCard({
+      author: participant,
+      componentName: 'foo/bar',
+    });
+    let toggle = false;
+    taskFor(subject.waitUntilTask).perform(() => toggle, 50);
+    assert.equal(
+      taskFor(subject.waitUntilTask).isRunning,
+      true,
+      'task is running'
+    );
+    await timeout(100);
+    assert.equal(
+      taskFor(subject.waitUntilTask).isRunning,
+      true,
+      'task is running'
+    );
+    toggle = true;
+    await timeout(50);
+    assert.equal(
+      taskFor(subject.waitUntilTask).isRunning,
+      false,
+      'task is no longer running'
+    );
   });
 });

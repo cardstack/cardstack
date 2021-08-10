@@ -1,6 +1,8 @@
 import { action } from '@ember/object';
 import { Participant, WorkflowPostable } from './workflow-postable';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
+import { rawTimeout, task, TaskGenerator } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
 
 export interface WorkflowCardComponentArgs {
   workflowSession: WorkflowSession;
@@ -59,7 +61,24 @@ export class WorkflowCard extends WorkflowPostable {
       this.isComplete = true;
     }
   }
+
   @action onIncomplete() {
     this.workflow?.resetTo(this);
+  }
+
+  @action async waitUntil(
+    predicate: () => boolean,
+    delayMs = 1000
+  ): Promise<void> {
+    return taskFor(this.waitUntilTask).perform(predicate, delayMs);
+  }
+
+  @task *waitUntilTask(
+    predicate: () => boolean,
+    delayMs = 1000
+  ): TaskGenerator<void> {
+    while (!predicate()) {
+      yield rawTimeout(delayMs);
+    }
   }
 }
