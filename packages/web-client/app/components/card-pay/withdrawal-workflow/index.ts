@@ -179,7 +179,7 @@ class WithdrawalWorkflow extends Workflow {
     }),
     new WorkflowCard({
       author: cardbot,
-      componentName: 'card-pay/withdrawal-workflow/disconnection-cta',
+      componentName: 'workflow-thread/disconnection-cta',
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED

@@ -106,7 +106,7 @@ class CreateMerchantWorkflow extends Workflow {
     // if we disconnect from layer 2
     new WorkflowMessage({
       author: cardbot,
-      message: `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.`,
+      message: `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a merchant, please start again by connecting your wallet.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
@@ -115,7 +115,7 @@ class CreateMerchantWorkflow extends Workflow {
     }),
     new WorkflowCard({
       author: cardbot,
-      componentName: 'card-pay/issue-prepaid-card-workflow/disconnection-cta',
+      componentName: 'workflow-thread/disconnection-cta',
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED

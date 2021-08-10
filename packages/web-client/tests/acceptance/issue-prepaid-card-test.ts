@@ -602,7 +602,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
 
       assert
-        .dom('[data-test-issue-prepaid-card-workflow-disconnection-restart]')
+        .dom('[data-test-workflow-disconnection-restart="issue-prepaid-card"]')
         .exists();
     });
 
@@ -629,7 +629,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       layer2Service.test__simulateDisconnectFromWallet();
 
       await waitFor(
-        '[data-test-issue-prepaid-card-workflow-disconnection-cta]'
+        '[data-test-workflow-disconnection-cta="issue-prepaid-card"]'
       );
       // test that all cta buttons are disabled
       let milestoneCtaButtonCount = Array.from(
@@ -652,7 +652,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         );
       assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
       assert
-        .dom('[data-test-issue-prepaid-card-workflow-disconnection-restart]')
+        .dom('[data-test-workflow-disconnection-restart="issue-prepaid-card"]')
         .exists();
     });
 

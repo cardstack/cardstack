@@ -3,17 +3,23 @@ import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import RouterService from '@ember/routing/router-service';
 import { next } from '@ember/runloop';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
-class CardPayWithdrawalWorkflowCanceledComponent extends Component<WorkflowCardComponentArgs> {
+class WorkflowThreadDisconnectionComponent extends Component {
   @service declare router: RouterService;
 
-  @action async openNewWithdrawalWorkflow() {
+  get currentWorkflow() {
+    return this.router.currentRoute?.queryParams?.flow;
+  }
+
+  @action async restartWorkflow() {
+    const { queryParams } = this.router.currentRoute;
     await this.router.transitionTo({ queryParams: { flow: null } });
     next(this, () => {
-      this.router.transitionTo({ queryParams: { flow: 'withdrawal' } });
+      this.router.transitionTo({
+        queryParams,
+      });
     });
   }
 }
 
-export default CardPayWithdrawalWorkflowCanceledComponent;
+export default WorkflowThreadDisconnectionComponent;
