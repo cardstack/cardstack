@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/rest';
-import { Message, TextChannel } from 'discord.js';
+import { Message } from 'discord.js';
 import { Command } from '../types';
 import config from '../config.json';
 
@@ -18,14 +18,14 @@ const init = () => {
 };
 
 const auth = async (message: Message): Promise<boolean> => {
-  const allowedChannels = config.deploy.allowedChannels;
+  const allowedChannels: string[] = config.deploy.allowedChannels;
   if (allowedChannels.length > 0 && !allowedChannels.includes(message.channel.id)) {
     console.error(`Unauthoirzed channel: ${message.channel.id}`);
     await message.reply("Command 'deploy' is disallowed in this channel");
     return false;
   }
 
-  const allowedRoles = config.deploy.allowedRoles.map((role) => role.toLowerCase());
+  const allowedRoles: string[] = config.deploy.allowedRoles.map((role: string) => role.toLowerCase());
   if (
     allowedRoles.length > 0 &&
     !message.member?.roles.cache.find((role) => allowedRoles.includes(role.name.toLowerCase()))
