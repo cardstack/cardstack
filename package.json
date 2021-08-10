@@ -88,7 +88,7 @@
     "axe-core": "4.1.4"
   },
   "workspaces": [
-    "packages/*",
+    "packages/**",
     "cards/*"
   ],
   "private": true,
