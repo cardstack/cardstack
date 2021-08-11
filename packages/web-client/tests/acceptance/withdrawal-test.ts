@@ -309,10 +309,155 @@ module('Acceptance | withdrawal', function (hooks) {
     assert.dom('[data-test-workflow-thread]').doesNotExist();
   });
 
-  // Initiating workflow with layer 1 wallet already connected
-  // Initiating workflow with layer 2 wallet already connected
-  // Disconnecting Layer 1 from within the workflow
-  // Disconnecting Layer 1 from outside the current tab (mobile wallet / other tabs)
-  // Disconnecting Layer 2 from within the workflow
-  // Disconnecting Layer 2 from outside the current tab (mobile wallet / other tabs
+  module('Tests with the layer 1 wallet already connected', function (hooks) {
+    let layer1Service: Layer1TestWeb3Strategy;
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+
+    hooks.beforeEach(function () {
+      layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+      layer1Service.test__simulateAccountsChanged(
+        [layer1AccountAddress],
+        'metamask'
+      );
+    });
+
+    test('Initiating workflow with layer 1 wallet already connected', async function (assert) {
+      await visit('/card-pay/token-suppliers?flow=withdrawal');
+      assert.equal(currentURL(), '/card-pay/token-suppliers?flow=withdrawal');
+
+      assert
+        .dom(postableSel(0, 2))
+        .containsText(
+          `Looks like you’ve already connected your ${c.layer1.fullName} wallet`
+        );
+      assert
+        .dom('[data-test-layer-1-wallet-summary]')
+        .containsText(layer1AccountAddress);
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer1.fullName} wallet connected`);
+      assert
+        .dom(postableSel(1, 0))
+        .containsText(
+          `You have connected your ${c.layer1.fullName} wallet. Now it’s time to connect your ${c.layer2.fullName} wallet`
+        );
+      assert.dom('[data-test-layer-2-wallet-card]').exists();
+    });
+
+    test('Disconnecting Layer 1 after proceeding beyond it', async function (assert) {
+      await visit('/card-pay/token-suppliers?flow=withdrawal');
+      assert.equal(currentURL(), '/card-pay/token-suppliers?flow=withdrawal');
+
+      assert
+        .dom(postableSel(0, 2))
+        .containsText(
+          `Looks like you’ve already connected your ${c.layer1.fullName} wallet`
+        );
+      assert
+        .dom('[data-test-layer-1-wallet-summary]')
+        .containsText(layer1AccountAddress);
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer1.fullName} wallet connected`);
+
+      layer1Service.test__simulateDisconnectFromWallet();
+      await settled();
+
+      assert
+        .dom('[data-test-postable="0"][data-test-cancelation]')
+        .containsText(`It looks like your wallet(s) got disconnected.`);
+      assert
+        .dom('[data-test-workflow-disconnection-cta="withdrawal"]')
+        .containsText('Workflow canceled');
+
+      await click('[data-test-workflow-disconnection-restart="withdrawal"]');
+      assert.equal(currentURL(), '/card-pay/token-suppliers?flow=withdrawal');
+
+      assert
+        .dom(
+          '[data-test-mainnnet-connection-action-container] [data-test-mainnet-connect-button]'
+        )
+        .exists();
+      assert
+        .dom('[data-test-workflow-disconnection-cta="withdrawal"]')
+        .doesNotExist();
+    });
+  });
+
+  module('Tests with the layer 2 wallet already connected', function (hooks) {
+    let layer1Service: Layer1TestWeb3Strategy;
+    let layer2Service: Layer2TestWeb3Strategy;
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+
+    hooks.beforeEach(function () {
+      layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+      layer1Service.test__simulateAccountsChanged(
+        [layer1AccountAddress],
+        'metamask'
+      );
+      layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
+      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      layer2Service.test__simulateBalances({
+        defaultToken: new BN(0),
+      });
+    });
+
+    test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
+      await visit('/card-pay/token-suppliers?flow=withdrawal');
+      assert.equal(currentURL(), '/card-pay/token-suppliers?flow=withdrawal');
+
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer1.fullName} wallet connected`);
+      assert
+        .dom(postableSel(1, 0))
+        .containsText(
+          `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
+        );
+      assert
+        .dom(milestoneCompletedSel(1))
+        .containsText(`${c.layer2.fullName} wallet connected`);
+      assert.dom('[data-test-postable="0"][data-test-milestone="2"]').exists();
+    });
+
+    test('Disconnecting Layer 2 after proceeding beyond it', async function (assert) {
+      await visit('/card-pay/token-suppliers?flow=withdrawal');
+      assert.equal(currentURL(), '/card-pay/token-suppliers?flow=withdrawal');
+
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer1.fullName} wallet connected`);
+      assert
+        .dom(milestoneCompletedSel(1))
+        .containsText(`${c.layer2.fullName} wallet connected`);
+
+      layer2Service.test__simulateDisconnectFromWallet();
+      await settled();
+
+      assert
+        .dom('[data-test-postable="0"][data-test-cancelation]')
+        .containsText(`It looks like your wallet(s) got disconnected.`);
+      assert
+        .dom('[data-test-workflow-disconnection-cta="withdrawal"]')
+        .containsText('Workflow canceled');
+
+      await click('[data-test-workflow-disconnection-restart="withdrawal"]');
+      assert.equal(currentURL(), '/card-pay/token-suppliers?flow=withdrawal');
+
+      layer2Service.test__simulateWalletConnectUri();
+      await waitFor('[data-test-wallet-connect-qr-code]');
+      assert
+        .dom(
+          '[data-test-layer-2-wallet-card] [data-test-wallet-connect-qr-code]'
+        )
+        .exists();
+      assert
+        .dom('[data-test-workflow-disconnection-cta="withdrawal"]')
+        .doesNotExist();
+    });
+  });
 });

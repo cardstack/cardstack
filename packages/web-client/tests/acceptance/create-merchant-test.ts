@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import {
   click,
   currentURL,
+  settled,
   visit,
   waitFor,
   waitUntil,
@@ -150,9 +151,8 @@ module('Acceptance | create merchant', function (hooks) {
         currentURL(),
         '/card-pay/merchant-services?flow=create-merchant'
       );
-
       assert
-        .dom(postableSel(2, 0))
+        .dom(postableSel(0, 2))
         .containsText(
           `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
         );
@@ -188,23 +188,10 @@ module('Acceptance | create merchant', function (hooks) {
         .containsText(`${c.layer2.fullName} wallet connected`);
 
       layer2Service.test__simulateDisconnectFromWallet();
+      await settled();
 
-      // test that all cta buttons are disabled
-      let milestoneCtaButtonCount = Array.from(
-        document.querySelectorAll(
-          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-        )
-      ).length;
       assert
-        .dom(
-          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
-        )
-        .exists(
-          { count: milestoneCtaButtonCount },
-          'All cta buttons in milestones should be disabled'
-        );
-      assert
-        .dom('[data-test-cancelation][data-test-postable="0"]')
+        .dom('[data-test-postable="0"][data-test-cancelation]')
         .containsText(
           `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a merchant, please start again by connecting your wallet.`
         );
@@ -215,15 +202,21 @@ module('Acceptance | create merchant', function (hooks) {
       await click(
         '[data-test-workflow-disconnection-restart="create-merchant"]'
       );
-      assert.equal(currentURL(), '/card-pay/merchant-services');
-      assert
-        .dom('[data-test-workflow-disconnection-cta="create-merchant"]')
-        .doesNotExist();
+      assert.equal(
+        currentURL(),
+        '/card-pay/merchant-services?flow=create-merchant'
+      );
+
+      layer2Service.test__simulateWalletConnectUri();
+      await waitFor('[data-test-wallet-connect-qr-code]');
       assert
         .dom(
           '[data-test-layer-2-wallet-card] [data-test-wallet-connect-qr-code]'
         )
         .exists();
+      assert
+        .dom('[data-test-workflow-disconnection-cta="create-merchant"]')
+        .doesNotExist();
     });
   });
 });
