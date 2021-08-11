@@ -22,6 +22,8 @@ import PrepaidCardPatternsRoute from './routes/prepaid-card-patterns';
 import PrepaidCardCustomizationSerializer from './services/serializers/prepaid-card-customization-serializer';
 import PrepaidCardCustomizationsRoute from './routes/prepaid-card-customizations';
 import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
+import MerchantInfosRoute from './routes/merchant-infos';
+import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './services/jsonapi-middleware';
 import NonceTracker from './services/nonce-tracker';
@@ -51,6 +53,8 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('prepaid-card-color-scheme-serializer', PrepaidCardColorSchemeSerializer);
   registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
   registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
+  registry.register('merchant-infos-route', MerchantInfosRoute);
+  registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('worker-client', WorkerClient);
   if (registryCallback) {
     registryCallback(registry);
