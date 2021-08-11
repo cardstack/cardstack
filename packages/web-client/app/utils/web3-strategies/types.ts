@@ -55,6 +55,7 @@ export interface Layer1Web3Strategy
   defaultTokenBalance: BN | undefined;
   daiBalance: BN | undefined;
   cardBalance: BN | undefined;
+  nativeTokenSymbol: string | undefined;
   bridgeConfirmationBlockCount: number;
   refreshBalances(): void;
   connect(walletProvider: WalletProvider): Promise<void>;

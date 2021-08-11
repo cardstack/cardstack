@@ -55,6 +55,7 @@ export default abstract class Layer1ChainWeb3Strategy
   @tracked walletInfo: WalletInfo;
   @tracked connectedChainId: number | undefined;
   @tracked bridgeConfirmationBlockCount: number;
+  nativeTokenSymbol: string;
 
   constructor(networkSymbol: Layer1NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
@@ -62,6 +63,10 @@ export default abstract class Layer1ChainWeb3Strategy
     this.networkSymbol = networkSymbol;
     this.bridgeConfirmationBlockCount = Number(
       getConstantByNetwork('ambFinalizationRate', this.networkSymbol)
+    );
+    this.nativeTokenSymbol = getConstantByNetwork(
+      'nativeTokenSymbol',
+      this.networkSymbol
     );
     taskFor(this.initializeTask).perform();
   }

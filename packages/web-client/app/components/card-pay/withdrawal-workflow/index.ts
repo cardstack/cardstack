@@ -16,29 +16,93 @@ import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { capitalize } from '@ember/string';
-import { BN } from 'bn.js';
+import BN from 'bn.js';
 import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
+import { tracked } from '@glimmer/tracking';
+import { taskFor } from 'ember-concurrency-ts';
+import {
+  rawTimeout,
+  TaskGenerator,
+  waitForProperty,
+  waitForQueue,
+} from 'ember-concurrency';
+import { task } from 'ember-concurrency-decorators';
+import { formatTokenAmount } from '@cardstack/web-client/helpers/format-token-amount';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
 } as const;
 
-class NotEnoughBalanceWorkflowMessage extends WorkflowPostable {
+class CheckBalanceWorkflowMessage extends WorkflowPostable {
+  @tracked minimumBalanceForWithdrawalClaim: BN | undefined;
+
   constructor() {
-    super({ name: 'cardbot' }, () => {
-      let balance = this.layer1Network.defaultTokenBalance;
-      return !!balance && balance <= new BN(0.01);
-    });
+    super({ name: 'cardbot' });
+    taskFor(this.fetchMininumBalanceForWithdrawalClaimTask).perform();
   }
+
+  @task
+  *fetchMininumBalanceForWithdrawalClaimTask() {
+    yield waitForQueue('afterRender'); // avoid error from using and setting workflow in the render queue
+    yield waitForProperty(this, 'workflow', Boolean);
+    yield waitForProperty(this, 'layer1Network', Boolean);
+    // couldn't use waitForProperty for the layer1Network.defaultTokenBalance because waitForProperty is not reliable for tracked properties
+    yield taskFor(this.waitUntilTask).perform(
+      () => !!this.layer1Network.defaultTokenBalance
+    );
+    let minimum: BN = yield this.layer1Network.getEstimatedGasForWithdrawalClaim();
+    this.minimumBalanceForWithdrawalClaim = minimum;
+
+    this.workflow!.emit('visible-postables-will-change');
+    this.isComplete = true;
+  }
+
   get message() {
-    return `The last step of this withdrawal requires that you have at least **~${this.layer1Network.minimumBalanceForWithdrawalClaim} ${c.layer1.nativeTokenSymbol}**.
-            You only have **${this.layer1Network.defaultTokenBalance} ${c.layer1.nativeTokenSymbol}**. You will need to deposit more
-            ${c.layer1.nativeTokenSymbol} to your account shown below to continue the withdrawal.`;
+    let { layer1Network, minimumBalanceForWithdrawalClaim } = this;
+    if (
+      layer1Network.defaultTokenBalance === undefined ||
+      minimumBalanceForWithdrawalClaim === undefined
+    ) {
+      return 'Checking your balance...';
+    }
+    if (
+      layer1Network.defaultTokenBalance!.gte(minimumBalanceForWithdrawalClaim)!
+    ) {
+      return `Checking your balance...
+      
+It looks like you have enough ${c.layer1.nativeTokenSymbol} in you account on ${
+        c.layer1.fullName
+      }, to perform the last step of this withrawal workflow, which requires ~${formatTokenAmount(
+        minimumBalanceForWithdrawalClaim
+      )} ${c.layer1.nativeTokenSymbol}.`;
+    } else {
+      return `Checking your balance...
+      
+The last step of this withdrawal requires that you have at least **~${formatTokenAmount(
+        minimumBalanceForWithdrawalClaim
+      )} ${c.layer1.nativeTokenSymbol}**.
+You only have **${formatTokenAmount(layer1Network.defaultTokenBalance)} ${
+        c.layer1.nativeTokenSymbol
+      }**. You will need to deposit more
+${
+  c.layer1.nativeTokenSymbol
+} to your account shown below to continue the withdrawal.`;
+    }
   }
+
   get layer1Network() {
     return this.workflow?.owner.lookup(
       'service:layer1-network'
     ) as Layer1Network;
+  }
+
+  @task *waitUntilTask(
+    predicate: () => boolean,
+    delayMs = 1000
+  ): TaskGenerator<void> {
+    while (!predicate()) {
+      yield rawTimeout(delayMs);
+    }
   }
 }
 
@@ -93,17 +157,7 @@ class WithdrawalWorkflow extends Workflow {
     new Milestone({
       title: `Check ${c.layer1.nativeTokenSymbol} balance`,
       postables: [
-        new NetworkAwareWorkflowMessage({
-          author: cardbot,
-          message: `It looks like you have enough ${c.layer1.nativeTokenSymbol} in you account on ${c.layer1.fullName}, to perform the last step of this withrawal workflow, which requires ~0.01 ${c.layer1.nativeTokenSymbol}.`,
-          includeIf() {
-            return (
-              !!this.layer1NativeTokenBalance &&
-              this.layer1NativeTokenBalance > new BN(0.01)
-            );
-          },
-        }),
-        new NotEnoughBalanceWorkflowMessage(),
+        new CheckBalanceWorkflowMessage(),
         new WorkflowCard({
           author: cardbot,
           componentName: 'card-pay/withdrawal-workflow/check-balance',
@@ -117,7 +171,7 @@ class WithdrawalWorkflow extends Workflow {
         new NetworkAwareWorkflowMessage({
           author: cardbot,
           message: `Looks like you’ve already connected your ${c.layer2.fullName} wallet, which you can see below.
-          Please continue with the next step of this workflow.`,
+Please continue with the next step of this workflow.`,
           includeIf() {
             return this.hasLayer2Account;
           },
@@ -125,7 +179,7 @@ class WithdrawalWorkflow extends Workflow {
         new NetworkAwareWorkflowMessage({
           author: cardbot,
           message: `You have connected your ${c.layer1.fullName} wallet. Now it's time to connect your ${c.layer2.fullName}
-          wallet via your Card Wallet mobile app. If you don't have the app installed, please do so now.`,
+wallet via your Card Wallet mobile app. If you don't have the app installed, please do so now.`,
           includeIf() {
             return !this.hasLayer2Account;
           },
@@ -133,8 +187,8 @@ class WithdrawalWorkflow extends Workflow {
         new NetworkAwareWorkflowMessage({
           author: cardbot,
           message: `Once you have installed the app, open the app and add an existing wallet/account or create a
-          new wallet/account. Use your account to scan this QR code, which will connect your account
-          with Card Pay.`,
+new wallet/account. Use your account to scan this QR code, which will connect your account
+with Card Pay.`,
           includeIf() {
             return !this.hasLayer2Account;
           },

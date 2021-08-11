@@ -33,7 +33,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
   simpleEmitter = new SimpleEmitter();
-  minimumBalanceForWithdrawalClaim = 0.01;
+  nativeTokenSymbol = 'ETH';
 
   // property to test whether the refreshBalances method is called
   // to test if balances are refreshed after relaying tokens

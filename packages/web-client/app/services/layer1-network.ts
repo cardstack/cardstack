@@ -37,6 +37,7 @@ export default class Layer1Network
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
   @reads('strategy.daiBalance') daiBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
+  @reads('strategy.nativeTokenSymbol') nativeTokenSymbol: string | undefined;
 
   getEstimatedGasForWithdrawalClaim(): Promise<BN> {
     return this.strategy.getEstimatedGasForWithdrawalClaim();

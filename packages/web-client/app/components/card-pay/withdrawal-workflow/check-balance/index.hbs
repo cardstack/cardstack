@@ -1,1 +1,29 @@
-Sufficient funds for claiming withdrawn tokens
+<ActionCardContainer
+  @header={{this.header}}
+  @isComplete={{@isComplete}}
+>
+  <ActionCardContainer::Section>
+    <ActionCardContainer::Section @title="Sufficient funds for claiming withdrawn tokens">
+      <CardPay::LabeledValue @label="TEST:">
+        <CardPay::BalanceDisplay
+          @size="large"
+          @icon={{this.nativeTokenDisplayInfo.icon}}
+          @balance={{format-token-amount this.layer1Network.defaultTokenBalance}}
+          @symbol={{this.nativeTokenDisplayInfo.symbol}}
+        />
+      </CardPay::LabeledValue>
+    </ActionCardContainer::Section>
+  </ActionCardContainer::Section>
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    @disabled={{true}}
+  >
+    <:default as |d|>
+      TODO
+    </:default>
+    <:memorialized>
+      Passed the check for {{this.nativeTokenDisplayInfo.symbol}} balance on
+      {{this.networkDisplayInfo.conversationalName}} for claim step
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>
