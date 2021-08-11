@@ -7,7 +7,6 @@ import { tracked } from '@glimmer/tracking';
 import { taskFor } from 'ember-concurrency-ts';
 import { task } from 'ember-concurrency-decorators';
 import { rawTimeout } from 'ember-concurrency';
-import { A } from '@ember/array';
 import { buildWaiter } from '@ember/test-waiters';
 import RSVP, { defer } from 'rsvp';
 import { UnbindEventListener } from '../utils/events';
@@ -214,11 +213,24 @@ export default class AnimatedWorkflow {
   }
 
   get isComplete() {
-    return A(this.milestones).isEvery('isComplete');
+    return this.completedMilestoneCount === this.milestones.length;
+  }
+
+  get completedMilestones() {
+    let milestones = [];
+    for (let i = 0; i < this.milestones.length; i++) {
+      let milestone = this.milestones[i];
+      if (milestone.isComplete) {
+        milestones.push(milestone);
+      } else {
+        break;
+      }
+    }
+    return milestones;
   }
 
   get completedMilestoneCount() {
-    return this.milestones.filterBy('isComplete').length;
+    return this.completedMilestones.length;
   }
 
   get progressStatus() {
@@ -226,7 +238,7 @@ export default class AnimatedWorkflow {
       return 'Workflow canceled';
     }
 
-    let completedMilestones = this.milestones.filterBy('isComplete');
+    let { completedMilestones } = this;
     let lastMilestone = completedMilestones[completedMilestones.length - 1];
     return lastMilestone?.completedDetail ?? 'Workflow started';
   }
