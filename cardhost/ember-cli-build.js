@@ -44,6 +44,9 @@ module.exports = function (defaults) {
         node: {
           global: true,
         },
+        module: {
+          noParse: /rsvp/,
+        },
         resolve: {
           fallback: {
             path: require.resolve('path-browserify'),
