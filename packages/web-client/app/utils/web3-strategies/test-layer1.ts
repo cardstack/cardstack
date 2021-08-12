@@ -32,7 +32,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   @tracked isInitializing = false;
   @tracked currentProviderId: string | undefined;
   @tracked walletConnectUri: string | undefined;
-  @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
+  @tracked walletInfo: WalletInfo = new WalletInfo([]);
   simpleEmitter = new SimpleEmitter();
   nativeTokenSymbol = 'ETH';
 
@@ -111,11 +111,11 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   test__simulateAccountsChanged(accounts: string[], walletProviderId?: string) {
     if (accounts.length && walletProviderId) {
       this.currentProviderId = walletProviderId;
-      this.walletInfo = new WalletInfo(accounts, this.chainId);
+      this.walletInfo = new WalletInfo(accounts);
       this.waitForAccountDeferred.resolve();
     } else {
       this.currentProviderId = '';
-      this.walletInfo = new WalletInfo([], this.chainId);
+      this.walletInfo = new WalletInfo([]);
       this.waitForAccountDeferred.resolve();
     }
   }

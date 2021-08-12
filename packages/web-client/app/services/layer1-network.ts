@@ -37,7 +37,7 @@ export default class Layer1Network
   @reads('strategy.isInitializing') declare isInitializing: boolean;
   @reads('strategy.isConnected', false) isConnected!: boolean;
   @reads('strategy.walletConnectUri') walletConnectUri: string | undefined;
-  @reads('strategy.walletInfo', new WalletInfo([], -1)) walletInfo!: WalletInfo;
+  @reads('strategy.walletInfo', new WalletInfo([])) walletInfo!: WalletInfo;
   @reads('strategy.waitForAccount') waitForAccount!: Promise<void>;
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
   @reads('strategy.daiBalance') daiBalance: BN | undefined;

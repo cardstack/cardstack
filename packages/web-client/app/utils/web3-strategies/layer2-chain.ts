@@ -84,7 +84,7 @@ export default abstract class Layer2ChainWeb3Strategy
   constructor(networkSymbol: Layer2NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
     this.networkSymbol = networkSymbol;
-    this.walletInfo = new WalletInfo([], this.chainId);
+    this.walletInfo = new WalletInfo([]);
     let defaultTokenContractInfo = this.getTokenContractInfo(
       this.defaultTokenSymbol,
       networkSymbol
@@ -158,7 +158,7 @@ export default abstract class Layer2ChainWeb3Strategy
         this.#layerTwoOracleApi = await getSDK('LayerTwoOracle', this.web3);
         this.#safesApi = await getSDK('Safes', this.web3);
         this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
-        await this.updateWalletInfo(accounts, this.chainId);
+        await this.updateWalletInfo(accounts);
         this.isInitializing = false;
         this.#broadcastChannel.postMessage({
           type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
@@ -200,8 +200,8 @@ export default abstract class Layer2ChainWeb3Strategy
     return new TokenContractInfo(symbol, network);
   }
 
-  async updateWalletInfo(accounts: string[], chainId: number) {
-    let newWalletInfo = new WalletInfo(accounts, chainId);
+  async updateWalletInfo(accounts: string[]) {
+    let newWalletInfo = new WalletInfo(accounts);
     if (this.walletInfo.isEqualTo(newWalletInfo)) {
       return;
     }
@@ -217,7 +217,7 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   clearWalletInfo() {
-    this.updateWalletInfo([], this.chainId);
+    this.updateWalletInfo([]);
   }
 
   async refreshBalances() {
