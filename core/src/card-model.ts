@@ -5,10 +5,8 @@ import {
   SerializerName,
   Setter,
   CardEnv,
-} from '@cardstack/core/src/interfaces';
-import serializers, {
-  PrimitiveSerializer,
-} from '@cardstack/core/src/serializers';
+} from './interfaces';
+import serializers, { PrimitiveSerializer } from './serializers';
 // import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
 
@@ -34,7 +32,7 @@ export interface LoadedState {
 export default class CardModel {
   static serializerMap: SerializerMap;
   setters: Setter;
-  // @tracked private _data: any = {};
+  private declare _data: any;
 
   constructor(
     private cards: CardEnv,
@@ -42,6 +40,15 @@ export default class CardModel {
     private state: CreatedState | LoadedState
   ) {
     this.setters = this.makeSetter();
+    Object.defineProperty(
+      this,
+      '_data',
+      cards.tracked(this, '_data', {
+        enumerable: true,
+        writable: true,
+        configurable: true,
+      })
+    );
   }
 
   static newFromResponse(
@@ -111,9 +118,8 @@ export default class CardModel {
   get component(): unknown {
     if (!this.wrapperComponent) {
       this.wrapperComponent = this.cards.prepareComponent(
-        this.innerComponent,
-        this.data,
-        this.setters
+        this,
+        this.innerComponent
       );
     }
     return this.wrapperComponent;
