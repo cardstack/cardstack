@@ -4,11 +4,12 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { Contract } from 'web3-eth-contract';
+import * as Sentry from '@sentry/browser';
 
 import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
 import { BridgeableSymbol, TokenContractInfo } from '../token';
 import WalletInfo from '../wallet-info';
-import { WalletProvider } from '../wallet-providers';
+import { WalletProvider, WalletProviderId } from '../wallet-providers';
 import {
   ApproveOptions,
   Layer1ChainEvent,
@@ -32,6 +33,7 @@ import {
 } from './layer-1-connection-manager';
 import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
+import { action } from '@ember/object';
 
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
@@ -42,7 +44,7 @@ export default abstract class Layer1ChainWeb3Strategy
   // changes with connection state
   #waitForAccountDeferred = defer<void>();
   web3: Web3 | undefined;
-  connectionManager: ConnectionManager | undefined;
+  connectionManager: ConnectionManager;
   eventListenersToUnbind: {
     [event in ConnectionManagerEvent]?: UnbindEventListener;
   } = {};
@@ -61,6 +63,15 @@ export default abstract class Layer1ChainWeb3Strategy
     this.bridgeConfirmationBlockCount = Number(
       getConstantByNetwork('ambFinalizationRate', this.networkSymbol)
     );
+    this.connectionManager = new ConnectionManager(networkSymbol);
+    // may need this for testing?
+    this.connectionManager.on('connected', this.onConnect);
+    this.connectionManager.on('disconnected', this.onDisconnect);
+    this.connectionManager.on('chain-changed', this.onChainChanged);
+    this.connectionManager.on(
+      'cross-tab-connection',
+      this.onCrossTabConnection
+    );
     taskFor(this.initializeTask).perform();
   }
 
@@ -69,44 +80,76 @@ export default abstract class Layer1ChainWeb3Strategy
   }
 
   @task *initializeTask() {
+    yield this.reconnect();
+  }
+
+  @action
+  async onCrossTabConnection(payload: {
+    providerId: WalletProviderId;
+    session?: any;
+  }) {
     try {
-      let web3 = new Web3();
+      if (
+        payload.providerId !== 'wallet-connect' &&
+        payload.providerId !== 'metamask'
+      ) {
+        return;
+      }
+
+      this.web3 = new Web3();
+      await this.connectionManager.reconnect(
+        this.web3,
+        payload.providerId,
+        payload.session
+      );
+    } catch (e) {
+      console.error(
+        `Failed to establish connection to ${payload.providerId} from cross-tab communication`
+      );
+      console.error(e);
+      Sentry.captureException(e);
+      this.cleanupConnectionState();
+    }
+  }
+
+  @action
+  async onConnect(accounts: string[]) {
+    this.updateWalletInfo(accounts, this.chainId);
+    this.currentProviderId = this.connectionManager?.providerId;
+    this.#waitForAccountDeferred.resolve();
+  }
+
+  @action
+  onChainChanged(chainId: number) {
+    this.connectedChainId = chainId;
+    if (this.connectedChainId !== this.chainId) {
+      this.simpleEmitter.emit('incorrect-chain');
+    } else {
+      this.simpleEmitter.emit('correct-chain');
+    }
+  }
+
+  @action
+  private onDisconnect() {
+    if (this.isConnected) {
+      this.simpleEmitter.emit('disconnect');
+    }
+    this.cleanupConnectionState();
+  }
+
+  async reconnect() {
+    try {
       let providerId = ConnectionManager.getProviderIdForChain(this.chainId);
       if (providerId !== 'wallet-connect' && providerId !== 'metamask') {
         return;
       }
 
-      let connectionManager: ConnectionManager = ConnectionManager.create(
-        providerId,
-        {
-          networkSymbol: this.networkSymbol,
-          chainId: this.chainId,
-        }
-      );
-
-      this.eventListenersToUnbind.connected = connectionManager.on(
-        'connected',
-        this.onConnect.bind(this)
-      );
-      this.eventListenersToUnbind.disconnected = connectionManager.on(
-        'disconnected',
-        this.onDisconnect.bind(this)
-      );
-      this.eventListenersToUnbind['chain-changed'] = connectionManager.on(
-        'chain-changed',
-        this.onChainChanged.bind(this)
-      );
-
-      yield connectionManager.setup(web3);
-
-      if (connectionManager) {
-        this.web3 = web3;
-        this.connectionManager = connectionManager;
-        yield connectionManager.reconnect(); // use the reconnect method because of edge cases
-      }
+      this.web3 = new Web3();
+      await this.connectionManager.reconnect(this.web3, providerId);
     } catch (e) {
       console.error('Failed to initialize connection from local storage');
       console.error(e);
+      Sentry.captureException(e);
       this.cleanupConnectionState();
       ConnectionManager.removeProviderFromStorage(this.chainId);
     }
@@ -114,54 +157,16 @@ export default abstract class Layer1ChainWeb3Strategy
 
   async connect(walletProvider: WalletProvider): Promise<void> {
     try {
-      let web3 = new Web3();
-      let connectionManager: ConnectionManager = ConnectionManager.create(
-        walletProvider.id,
-        {
-          networkSymbol: this.networkSymbol,
-          chainId: this.chainId,
-        }
-      );
-      this.eventListenersToUnbind.connected = connectionManager.on(
-        'connected',
-        this.onConnect.bind(this)
-      );
-      this.eventListenersToUnbind.disconnected = connectionManager.on(
-        'disconnected',
-        this.onDisconnect.bind(this)
-      );
-      this.eventListenersToUnbind['chain-changed'] = connectionManager.on(
-        'chain-changed',
-        this.onChainChanged.bind(this)
-      );
-
-      await connectionManager.setup(web3);
-
-      this.web3 = web3;
-      this.connectionManager = connectionManager;
-      await connectionManager.connect();
+      this.web3 = new Web3();
+      await this.connectionManager.connect(this.web3, walletProvider.id);
     } catch (e) {
       console.error(
         `Failed to create connection manager: ${walletProvider.id}`
       );
       console.error(e);
+      Sentry.captureException(e);
       this.cleanupConnectionState();
       ConnectionManager.removeProviderFromStorage(this.chainId);
-    }
-  }
-
-  async onConnect(accounts: string[]) {
-    this.updateWalletInfo(accounts, this.chainId);
-    this.currentProviderId = this.connectionManager?.providerId;
-    this.#waitForAccountDeferred.resolve();
-  }
-
-  onChainChanged(chainId: number) {
-    this.connectedChainId = chainId;
-    if (this.connectedChainId !== this.chainId) {
-      this.simpleEmitter.emit('incorrect-chain');
-    } else {
-      this.simpleEmitter.emit('correct-chain');
     }
   }
 
@@ -177,19 +182,11 @@ export default abstract class Layer1ChainWeb3Strategy
         delete this.eventListenersToUnbind[event];
       }
     );
-    this.connectionManager?.destroy();
-    this.connectionManager = undefined;
+    this.connectionManager?.reset();
     this.web3 = undefined;
     this.currentProviderId = '';
     this.connectedChainId = undefined;
     this.#waitForAccountDeferred = defer();
-  }
-
-  private onDisconnect() {
-    if (this.isConnected) {
-      this.simpleEmitter.emit('disconnect');
-    }
-    this.cleanupConnectionState();
   }
 
   get waitForAccount(): Promise<void> {

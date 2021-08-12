@@ -1,6 +1,4 @@
 import detectEthereumProvider from '@metamask/detect-provider';
-import Web3 from 'web3';
-import { NetworkSymbol } from './types';
 import WalletConnectProvider from '../wc-provider';
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 import config from '../../config/environment';
@@ -11,6 +9,9 @@ import { Emitter, SimpleEmitter } from '../events';
 import { WalletProviderId } from '../wallet-providers';
 import { action } from '@ember/object';
 import { getConstantByNetwork, networkIds } from '@cardstack/cardpay-sdk';
+import { NetworkSymbol } from './types';
+import Web3 from 'web3';
+import { TypedChannel } from '../typed-channel';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
@@ -21,65 +22,70 @@ interface ConnectionManagerOptions {
   networkSymbol: NetworkSymbol;
 }
 
-export type ConnectionManagerEvent =
+type ConnectionManagerWalletEvent =
   | 'connected'
   | 'disconnected'
   | 'chain-changed';
 
+type ConnectionManagerCrossTabEvent = 'cross-tab-connection';
+
+export type ConnectionManagerEvent =
+  | ConnectionManagerWalletEvent
+  | ConnectionManagerCrossTabEvent;
+
 const BROADCAST_CHANNEL_MESSAGES = {
   DISCONNECTED: 'DISCONNECTED',
+  CONNECTED: 'CONNECTED',
 } as const;
+
+interface Layer1ConnectEvent {
+  type: typeof BROADCAST_CHANNEL_MESSAGES.CONNECTED;
+  providerId: WalletProviderId;
+  session?: any;
+}
+
+interface Layer1DisconnectEvent {
+  type: typeof BROADCAST_CHANNEL_MESSAGES.DISCONNECTED;
+}
+type Layer1ConnectionEvent = Layer1ConnectEvent | Layer1DisconnectEvent;
 
 /**
  * # ConnectionManager
- * This class instantiates a web3 provider given a WalletProviderId. It then handles the EIP-1193
- * events that come from the web3 provider and filters them for events that we want to handle
- * in the Dapp:
+ * This class simplifies the interface to communicate with wallet providers (MetaMask or WalletConnect).
+ * It also handles cross-tab communication and persistence of connection information across refreshes.
+ * Cross-tab disconnection is handled internally while cross-tab connection is handled by emitting the event
+ * to this class' consumer (layer 1 chain), which needs to set up a web3 instance first so that the event handlers
+ * it has can work correctly as they use the web3 instance.
+ *
+ * This class emits a number of events that can be listened for with `ConnectionManager.on()`:
  *
  * - connected: A wallet is connected, or the address is changed
  * - disconnected: A wallet is disconnected
  * - chain-changed: A wallet's chain is updated or detected for the first time
  *
- * It handles cross-tab communication and persistence of connection information across refreshes.
+ *
  * This class does not, at the moment, store any state used directly by the UI besides providerId.
  */
-export abstract class ConnectionManager
-  implements Emitter<ConnectionManagerEvent> {
-  networkSymbol: NetworkSymbol;
+export class ConnectionManager {
+  private strategy: ConnectionStrategy | undefined;
+  private broadcastChannel: TypedChannel<Layer1ConnectionEvent>;
   chainId: number;
-  protected simpleEmitter: SimpleEmitter;
-  protected broadcastChannel: BroadcastChannel;
-  protected provider: any;
-  abstract providerId: WalletProviderId;
+  networkSymbol: NetworkSymbol;
+  simpleEmitter = new SimpleEmitter();
 
-  constructor(options: ConnectionManagerOptions) {
-    this.networkSymbol = options.networkSymbol;
-    this.chainId = options.chainId;
-    this.simpleEmitter = new SimpleEmitter();
-    // the broadcast channel is really for metamask disconnections
-    // since metamask doesn't allow you to disconnect from the dapp side
+  constructor(networkSymbol: NetworkSymbol) {
+    this.networkSymbol = networkSymbol;
+    this.chainId = networkIds[networkSymbol];
+
     // we want to ensure that users don't get confused by different tabs having
-    // different wallets connected
-    this.broadcastChannel = new BroadcastChannel(
-      `cardstack-connection-manager-${this.chainId}`
+    // different wallets connected so we communicate connections and disconnections across tabs
+    this.broadcastChannel = new TypedChannel(
+      `cardstack-layer-1-connection-sync`
     );
     this.broadcastChannel.addEventListener(
       'message',
       this.onBroadcastChannelMessage
     );
-  }
-
-  static create(
-    providerId: WalletProviderId,
-    options: ConnectionManagerOptions
-  ): ConnectionManager {
-    if (providerId === 'metamask') {
-      return new MetaMaskConnectionManager(options);
-    } else if (providerId === 'wallet-connect') {
-      return new WalletConnectConnectionManager(options);
-    } else {
-      throw new Error(`Unrecognised id for connection manager: ${providerId}`);
-    }
   }
 
   static getProviderIdForChain(chainId: number) {
@@ -94,6 +100,59 @@ export abstract class ConnectionManager
     window.localStorage.setItem(GET_PROVIDER_STORAGE_KEY(chainId), providerId);
   }
 
+  get provider() {
+    return this.strategy?.provider;
+  }
+
+  get providerId() {
+    return this.strategy?.providerId;
+  }
+
+  createStrategy(providerId: WalletProviderId) {
+    if (providerId === 'metamask') {
+      return new MetaMaskConnectionStrategy({
+        chainId: this.chainId,
+        networkSymbol: this.networkSymbol,
+      });
+    } else if (providerId === 'wallet-connect') {
+      return new WalletConnectConnectionStrategy({
+        chainId: this.chainId,
+        networkSymbol: this.networkSymbol,
+      });
+    } else {
+      throw new Error(`Unrecognised id for connection manager: ${providerId}`);
+    }
+  }
+
+  reset() {
+    this.strategy?.destroy();
+    this.strategy = undefined;
+  }
+
+  private async setup(providerId: WalletProviderId, session?: any) {
+    this.strategy = this.createStrategy(providerId);
+    this.strategy.on('connected', this.onConnect);
+    this.strategy.on('disconnected', this.onDisconnect);
+    this.strategy.on('chain-changed', this.onChainChanged);
+    await this.strategy.setup(session);
+  }
+
+  async connect(web3: Web3, providerId: WalletProviderId) {
+    await this.setup(providerId);
+    web3.setProvider(this.provider);
+    await this.strategy?.connect();
+  }
+
+  async reconnect(web3: Web3, providerId: WalletProviderId, session?: any) {
+    await this.setup(providerId, session);
+    web3.setProvider(this.provider);
+    await this.strategy?.reconnect();
+  }
+
+  disconnect() {
+    this.strategy?.disconnect();
+  }
+
   on(event: ConnectionManagerEvent, cb: Function) {
     return this.simpleEmitter.on(event, cb);
   }
@@ -103,48 +162,99 @@ export abstract class ConnectionManager
   }
 
   @action
-  onBroadcastChannelMessage(event: MessageEvent) {
-    if (event.data === BROADCAST_CHANNEL_MESSAGES.DISCONNECTED) {
+  onBroadcastChannelMessage(event: MessageEvent<Layer1ConnectionEvent>) {
+    if (event.data.type === BROADCAST_CHANNEL_MESSAGES.DISCONNECTED) {
       this.onDisconnect(false);
+    } else if (
+      event.data.type === BROADCAST_CHANNEL_MESSAGES.CONNECTED &&
+      !this.strategy
+    ) {
+      this.emit('cross-tab-connection', event.data);
     }
   }
 
-  onDisconnect(broadcast = true) {
+  @action onDisconnect(broadcast: boolean) {
+    if (!this.strategy) return;
     ConnectionManager.removeProviderFromStorage(this.chainId);
-    if (broadcast)
-      this.broadcastChannel.postMessage(
-        BROADCAST_CHANNEL_MESSAGES.DISCONNECTED
-      );
-    // the layer1-chain will destroy the instance of ConnectionManager so we emit as the last item
     this.emit('disconnected');
+    if (broadcast)
+      this.broadcastChannel?.postMessage({
+        type: BROADCAST_CHANNEL_MESSAGES.DISCONNECTED,
+      });
+  }
+
+  @action onConnect(accounts: string[]) {
+    if (!this.strategy) return;
+    ConnectionManager.addProviderToStorage(
+      this.chainId,
+      this.strategy.providerId
+    );
+    this.emit('connected', accounts);
+    this.broadcastChannel?.postMessage({
+      type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
+      providerId: this.providerId!,
+      session: this.strategy.getSession(),
+    });
+  }
+
+  @action onChainChanged(chainId: number) {
+    this.emit('chain-changed', chainId);
+  }
+}
+
+abstract class ConnectionStrategy
+  implements Emitter<ConnectionManagerWalletEvent> {
+  private simpleEmitter: SimpleEmitter;
+
+  // concrete classes will need to implement these
+  abstract providerId: WalletProviderId;
+  abstract setup(session?: any): Promise<any>;
+  abstract reconnect(): Promise<void>;
+  abstract connect(): Promise<void>;
+  abstract disconnect(): Promise<void>;
+
+  // concrete classes may optionally implement these methods
+  getSession() {}
+  destroy() {}
+
+  // networkSymbol and chainId are initialized in the constructor
+  networkSymbol: NetworkSymbol;
+  chainId: number;
+
+  // this is initialized in the `setup` method of concrete classes
+  provider: any;
+
+  constructor(options: ConnectionManagerOptions) {
+    this.chainId = options.chainId;
+    this.networkSymbol = options.networkSymbol;
+    this.simpleEmitter = new SimpleEmitter();
+  }
+
+  on(event: ConnectionManagerWalletEvent, cb: Function) {
+    return this.simpleEmitter.on(event, cb);
+  }
+
+  emit(event: ConnectionManagerWalletEvent, ...args: any[]) {
+    return this.simpleEmitter.emit(event, ...args);
+  }
+
+  onDisconnect(broadcast = true) {
+    this.emit('disconnected', broadcast);
   }
 
   onConnect(accounts: string[]) {
-    ConnectionManager.addProviderToStorage(this.chainId, this.providerId);
     this.emit('connected', accounts);
   }
 
   onChainChanged(chainId: number) {
     this.emit('chain-changed', chainId);
   }
-
-  abstract reconnect(): Promise<void>;
-  abstract connect(): Promise<void>;
-  abstract disconnect(): Promise<void>;
-
-  // create provider and setup event listeners here
-  // also call web3.setProvider
-  abstract setup(web3: Web3): Promise<any>;
-
-  destroy() {
-    this.broadcastChannel.close();
-  }
 }
 
-class MetaMaskConnectionManager extends ConnectionManager {
+class MetaMaskConnectionStrategy extends ConnectionStrategy {
   providerId = 'metamask' as WalletProviderId;
 
-  async setup(web3: Web3) {
+  async setup() {
     let provider: any | undefined = await detectEthereumProvider();
 
     if (!provider) {
@@ -180,7 +290,6 @@ class MetaMaskConnectionManager extends ConnectionManager {
     });
 
     this.provider = provider;
-    web3?.setProvider(provider);
   }
 
   async connect() {
@@ -247,10 +356,14 @@ class MetaMaskConnectionManager extends ConnectionManager {
   }
 }
 
-class WalletConnectConnectionManager extends ConnectionManager {
+class WalletConnectConnectionStrategy extends ConnectionStrategy {
   providerId = 'wallet-connect' as WalletProviderId;
 
-  async setup(web3: Web3) {
+  getSession() {
+    return this.provider.connector.session;
+  }
+
+  async setup(session?: any) {
     let { chainId } = this;
     // in case we've disconnected, we should clear wallet connect's local storage data as well
     // As per https://github.com/WalletConnect/walletconnect-monorepo/issues/258 there is no way
@@ -259,8 +372,17 @@ class WalletConnectConnectionManager extends ConnectionManager {
     if (ConnectionManager.getProviderIdForChain(chainId) !== this.providerId) {
       clearWalletConnectStorage(chainId);
     }
+
+    let connectorOptions;
+    if (session) {
+      connectorOptions = { session };
+    } else {
+      connectorOptions = {
+        bridge: WALLET_CONNECT_BRIDGE,
+        qrcodeModal: WalletConnectQRCodeModal,
+      };
+    }
     let provider = new WalletConnectProvider({
-      pollingInterval: 30000,
       chainId,
       infuraId: config.infuraId,
       rpc: {
@@ -276,13 +398,7 @@ class WalletConnectConnectionManager extends ConnectionManager {
         ),
       },
       // based on https://github.com/WalletConnect/walletconnect-monorepo/blob/7aa9a7213e15489fa939e2e020c7102c63efd9c4/packages/providers/web3-provider/src/index.ts#L47-L52
-      connector: new CustomStorageWalletConnect(
-        {
-          bridge: WALLET_CONNECT_BRIDGE,
-          qrcodeModal: WalletConnectQRCodeModal,
-        },
-        chainId
-      ),
+      connector: new CustomStorageWalletConnect(connectorOptions, chainId),
     });
 
     // Subscribe to accounts change
@@ -305,8 +421,6 @@ class WalletConnectConnectionManager extends ConnectionManager {
     });
 
     this.provider = provider;
-    // ts is not happy with WalletConnectProvider
-    web3.setProvider(provider as any);
     return;
   }
 
