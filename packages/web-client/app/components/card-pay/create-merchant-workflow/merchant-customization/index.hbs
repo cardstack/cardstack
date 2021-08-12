@@ -3,17 +3,57 @@
   @isComplete={{@isComplete}}
   data-test-layout-customization-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Choose a name and ID for the merchant" />
+  <ActionCardContainer::Section @title="Choose a name and ID for the merchant">
+    {{#if this.error}}
+      <CardPay::ErrorMessage data-test-issue-prepaid-card-error-message as |supportURL|>
+        {{#if (eq this.error.message "INSUFFICIENT_FUNDS")}}
+          {{!-- TODO: This should be accompanied by canceling the workflow --}}
+          TODO insufficient funds message
+        {{else}}
+          There was a problem creating your merchant. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+        {{/if}}
+      </CardPay::ErrorMessage>
+    {{/if}}
+  </ActionCardContainer::Section>
   <Boxel::ActionChin
-    @state={{if @isComplete "memorialized" "default"}}
+    @state={{this.createState}}
     data-test-layout-customization
   >
     <:default as |d|>
       <d.ActionButton
-        {{on "click" @onComplete}}
+        {{on "click" this.createMerchant}}
+        data-test-create-merchant-button
       >
-        Create Merchant
+        {{if this.hasTriedCreatingMerchant "Try Again" "Create Merchant"}}
       </d.ActionButton>
     </:default>
+    <:in-progress as |i|>
+      <i.ActionStatusArea @icon="card-wallet-app-icon" style={{css-var status-icon-size="2.5rem"}}>
+        <Boxel::LoadingIndicator
+          class="preview__loading-indicator"
+          @color="var(--boxel-light)"
+        />
+        You will receive a confirmation request from the Card Wallet app in a few moments…
+      </i.ActionStatusArea>
+      {{#if this.txViewerUrl}}
+        <i.InfoArea>
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} @kind="secondary-dark" target="_blank" rel="noopener">
+            View on Blockscout
+          </Boxel::Button>
+        </i.InfoArea>
+      {{/if}}
+    </:in-progress>
+    <:memorialized as |m|>
+      <m.ActionStatusArea>
+        Confirmed
+      </m.ActionStatusArea>
+      {{#if this.txViewerUrl}}
+        <m.InfoArea>
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} @kind="secondary-light" target="_blank" rel="noopener">
+            View on Blockscout
+          </Boxel::Button>
+        </m.InfoArea>
+      {{/if}}
+    </:memorialized>
   </Boxel::ActionChin>
 </ActionCardContainer>

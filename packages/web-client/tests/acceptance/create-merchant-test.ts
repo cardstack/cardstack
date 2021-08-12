@@ -110,6 +110,28 @@ module('Acceptance | create merchant', function (hooks) {
 
     assert.dom(post).containsText('Choose a name and ID for the merchant');
 
+    let prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
+
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      {
+        type: 'prepaid-card',
+        createdAt: Date.now() / 1000,
+
+        address: prepaidCardAddress,
+
+        tokens: [],
+        owners: [layer2AccountAddress],
+
+        issuingToken: '0xTOKEN',
+        spendFaceValue: 2324,
+        prepaidCardOwner: layer2AccountAddress,
+        hasBeenUsed: false,
+        issuer: layer2AccountAddress,
+        reloadable: false,
+        transferrable: false,
+      },
+    ]);
+
     // // merchant-customization card
     // TODO verify and interact with merchant customization card default state
     await click(
@@ -117,12 +139,20 @@ module('Acceptance | create merchant', function (hooks) {
     );
     // TODO verify and interact with merchant customization card memorialized state
 
+    layer2Service.test__simulateRegisterMerchantForAddress(
+      prepaidCardAddress,
+      'FIXME',
+      {}
+    );
+
     await waitFor(milestoneCompletedSel(1));
     assert.dom(milestoneCompletedSel(1)).containsText('Merchant created');
 
     assert
       .dom(epiloguePostableSel(0))
       .containsText('You have created a merchant.');
+
+    await waitFor(epiloguePostableSel(1));
 
     await click(
       `${epiloguePostableSel(

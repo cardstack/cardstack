@@ -3,6 +3,7 @@ import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 import {
   DepotSafe,
+  MerchantSafe,
   PrepaidCardSafe,
   Safe,
 } from '@cardstack/cardpay-sdk/sdk/safes';
@@ -39,6 +40,10 @@ export interface RelayTokensOptions {
 }
 
 export interface IssuePrepaidCardOptions {
+  onTxHash?(txHash: TransactionHash): void;
+}
+
+export interface RegisterMerchantOptions {
   onTxHash?(txHash: TransactionHash): void;
 }
 
@@ -117,6 +122,11 @@ export interface Layer2Web3Strategy
     customizationDid: string,
     options?: IssuePrepaidCardOptions
   ): Promise<PrepaidCardSafe>;
+  registerMerchant(
+    prepaidCardAddress: string,
+    infoDid: string,
+    options: RegisterMerchantOptions
+  ): Promise<MerchantSafe>;
   fetchDepotTask(): Promise<DepotSafe | null>;
   refreshBalances(): void;
   convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<any>;

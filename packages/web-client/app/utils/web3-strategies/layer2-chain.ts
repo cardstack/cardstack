@@ -24,6 +24,7 @@ import {
   Layer2NetworkSymbol,
   Layer2ChainEvent,
   IssuePrepaidCardOptions,
+  RegisterMerchantOptions,
 } from './types';
 import {
   networkIds,
@@ -31,6 +32,7 @@ import {
   getSDK,
   BridgeValidationResult,
   DepotSafe,
+  MerchantSafe,
   Safe,
   IExchangeRate,
   IHubAuth,
@@ -250,6 +252,22 @@ export default abstract class Layer2ChainWeb3Strategy
     );
 
     return result.prepaidCards[0];
+  }
+
+  async registerMerchant(
+    prepaidCardAddress: string,
+    infoDid: string,
+    options: RegisterMerchantOptions
+  ): Promise<MerchantSafe> {
+    const RevenuePool = await getSDK('RevenuePool', this.web3);
+
+    return (
+      await RevenuePool.registerMerchant(
+        prepaidCardAddress,
+        infoDid,
+        options.onTxHash
+      )
+    ).merchantSafe;
   }
 
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
