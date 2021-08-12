@@ -24,6 +24,7 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay safes-view [ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-safes-view-address---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay safe-view [SAFE_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-safe-view-safe_address---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay safe-transfer-tokens [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-safe-transfer-tokens-safe_address-token_address-recipient-amount---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay safe-transfer-tokens-gas-estimate [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-safe-transfer-tokens-gas-estimate-safe_address-token_address-recipient-amount---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay set-supplier-info-did [SAFE_ADDRESS] [INFO_DID] [TOKEN_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-set-supplier-info-did-safe_address-info_did-token_address---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay usd-price <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-usd-price-token-amount---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay eth-price <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-eth-price-token-amount---networknetwork---mnemonicmnemonic---walletconnect)
@@ -237,7 +238,7 @@ USAGE
 ARGUMENTS
   MERCHANT_SAFE     The address of the merchant's safe whose revenue balance is being claimed
   TOKEN_ADDRESS     The address of the tokens that are being claimed as revenue
-  AMOUNT            The amount of tokens that are being claimed as revenue (*not* in units of `wei`)
+  AMOUNT            The amount of tokens that are being claimed as revenue (*not* in units of `wei`, but in `eth`)
   NETWORK           The network to use ("sokol" or "xdai")
   MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
@@ -252,7 +253,7 @@ USAGE
 ARGUMENTS
   MERCHANT_SAFE     The address of the merchant's safe whose revenue balance is being claimed
   TOKEN_ADDRESS     The address of the tokens that are being claimed as revenue
-  AMOUNT            The amount of tokens that are being claimed as revenue (*not* in units of `wei`)
+  AMOUNT            The amount of tokens that are being claimed as revenue (*not* in units of `wei`, but in `eth`)
   NETWORK           The network to use ("sokol" or "xdai")
   MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
@@ -303,7 +304,7 @@ ARGUMENTS
 
 ## `yarn cardpay safe-transfer-tokens [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
 
-Transfer tokens from a safe to an arbitrary recipient. The token amount specified is *not* in units of `wei`. Note that the gas will be paid with the token you are transferring so there must be enough token balance in teh safe to cover both the transferred amount of tokens and gas.
+Transfer tokens from a safe to an arbitrary recipient. The token amount specified is *not* in units of `wei`, but in `eth`. Note that the gas will be paid with the token you are transferring so there must be enough token balance in teh safe to cover both the transferred amount of tokens and gas.
 
 ```
 USAGE
@@ -313,7 +314,25 @@ ARGUMENTS
   SAFE_ADDRESS     The address of the safe that is sending the tokens
   TOKEN_ADDRESS    The token address of the tokens to transfer from the safe
   RECIPIENT        The token recipient's address
-  AMOUNT           The amount of tokens to transfer (*not* in units of `wei`).
+  AMOUNT           The amount of tokens to transfer (*not* in units of `wei`, but in `eth`).
+  NETWORK          The network to use ("sokol" or "xdai")
+  MNEMONIC         (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+  WALLET_CONNECT   (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+```
+
+## `yarn cardpay safe-transfer-tokens-gas-estimate [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+
+Obtain the gas estimate to transfer tokens from a safe to an arbitrary recipient. The token amount specified is *not* in units of `wei`, but in `eth`.
+
+```
+USAGE
+  $ yarn cardpay safes-view [ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC]
+
+ARGUMENTS
+  SAFE_ADDRESS     The address of the safe that is sending the tokens
+  TOKEN_ADDRESS    The token address of the tokens to transfer from the safe
+  RECIPIENT        The token recipient's address
+  AMOUNT           The amount of tokens to transfer (*not* in units of `wei`, but in `eth`).
   NETWORK          The network to use ("sokol" or "xdai")
   MNEMONIC         (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT   (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
@@ -344,22 +363,22 @@ USAGE
 
 ARGUMENTS
   TOKEN           The token symbol (without the .CPXD suffix)
-  AMOUNT          (Optional) The amount of the specified token (not in units of wei).
+  AMOUNT          (Optional) The amount of the specified token (not in units of wei, but in `eth`).
   NETWORK         The network to use ("sokol" or "xdai")
   MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
 ```
 
 ## `yarn cardpay eth-price <TOKEN> [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
-Get the ETH value for the specified token name in the specified amount (in units `ether`).
+Get the ETH value for the specified token name in the specified amount (in units `eth`).
 ```
 USAGE
   $ yarn cardpay eth-price <TOKEN> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
 
 ARGUMENTS
   TOKEN           The token symbol (without the .CPXD suffix)
-  AMOUNT          The amount of the specified token (not in units of wei)
-  AMOUNT          (Optional) The amount of the specified token (not in units of wei).
+  AMOUNT          The amount of the specified token (not in units of `wei`, but in `eth`)
+  AMOUNT          (Optional) The amount of the specified token (not in units of `wei`, but in `eth`).
   NETWORK         The network to use ("sokol" or "xdai")
   MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet

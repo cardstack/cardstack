@@ -9,7 +9,7 @@ import {
   claimLayer1BridgedTokens,
 } from './bridge.js';
 import { viewTokenBalance } from './assets';
-import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe } from './safe.js';
+import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe, transferTokensGasEstimate } from './safe.js';
 import {
   create as createPrepaidCard,
   split as splitPrepaidCard,
@@ -35,6 +35,7 @@ type Commands =
   | 'safesView'
   | 'safeView'
   | 'safeTransferTokens'
+  | 'safeTransferTokensGasEstimate'
   | 'prepaidCardCreate'
   | 'prepaidCardSplit'
   | 'prepaidCardTransfer'
@@ -112,7 +113,7 @@ let {
   .command('bridge-to-l2 <amount> <tokenAddress> [receiver]', 'Bridge tokens to the layer 2 network', (yargs) => {
     yargs.positional('amount', {
       type: 'string',
-      description: 'Amount of tokens you would like bridged (*not* in units of wei)',
+      description: 'Amount of tokens you would like bridged (*not* in units of wei, but in eth)',
     });
     yargs.positional('tokenAddress', {
       type: 'string',
@@ -149,7 +150,7 @@ let {
       });
       yargs.positional('amount', {
         type: 'string',
-        description: 'Amount of tokens you would like bridged (*not* in units of wei)',
+        description: 'Amount of tokens you would like bridged (*not* in units of wei, but in eth)',
       });
       yargs.positional('tokenAddress', {
         type: 'string',
@@ -216,6 +217,29 @@ let {
     command = 'safeView';
   })
   .command(
+    'safe-transfer-tokens-gas-estimate [safeAddress] [token] [recipient] [amount]',
+    'Obtain a gas estimate to transfer tokens from a safe to an arbitrary recipient.',
+    (yargs) => {
+      yargs.positional('safeAddress', {
+        type: 'string',
+        description: 'The address of the safe that is sending the tokens',
+      });
+      yargs.positional('token', {
+        type: 'string',
+        description: 'The token address of the tokens to transfer from the safe',
+      });
+      yargs.positional('recipient', {
+        type: 'string',
+        description: "The token recipient's address",
+      });
+      yargs.positional('amount', {
+        type: 'string',
+        description: 'The amount of tokens to transfer (not in units of wei, but in eth)',
+      });
+      command = 'safeTransferTokensGasEstimate';
+    }
+  )
+  .command(
     'safe-transfer-tokens [safeAddress] [token] [recipient] [amount]',
     'Transfer tokens from a safe to an arbitrary recipient.',
     (yargs) => {
@@ -233,7 +257,7 @@ let {
       });
       yargs.positional('amount', {
         type: 'string',
-        description: 'The amount of tokens to transfer (not in units of wei)',
+        description: 'The amount of tokens to transfer (not in units of wei, but in eth)',
       });
       command = 'safeTransferTokens';
     }
@@ -371,7 +395,7 @@ let {
       });
       yargs.positional('amount', {
         type: 'string',
-        description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei)',
+        description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)',
       });
       command = 'claimRevenue';
     }
@@ -390,7 +414,7 @@ let {
       });
       yargs.positional('amount', {
         type: 'string',
-        description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei)',
+        description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)',
       });
       command = 'claimRevenueGasEstimate';
     }
@@ -432,7 +456,7 @@ let {
       yargs.positional('amount', {
         type: 'string',
         default: 1,
-        description: 'The amount of the specified token (*not* in units of wei)',
+        description: 'The amount of the specified token (*not* in units of wei, but in eth)',
       });
       command = 'usdPrice';
     }
@@ -448,7 +472,7 @@ let {
       yargs.positional('amount', {
         type: 'string',
         default: 1,
-        description: 'The amount of the specified token (*not* in units of wei)',
+        description: 'The amount of the specified token (*not* in units of wei, but in eth)',
       });
       command = 'ethPrice';
     }
@@ -583,6 +607,13 @@ if (!command) {
         return;
       }
       await transferTokens(network, safeAddress, token, recipient, amount, mnemonic);
+      break;
+    case 'safeTransferTokensGasEstimate':
+      if (safeAddress == null || recipient == null || token == null || amount == null) {
+        showHelpAndExit('safeAddress, token, recipient, and amount are required values');
+        return;
+      }
+      await transferTokensGasEstimate(network, safeAddress, token, recipient, amount, mnemonic);
       break;
     case 'setSupplierInfoDID':
       if (safeAddress == null || token == null || infoDID == null) {
