@@ -61,6 +61,9 @@ class StubCards {
     };
   }
   prepareComponent() {}
+  tracked(_target: object, _prop: string, desc: PropertyDescriptor) {
+    return desc;
+  }
 }
 const fakeComponent: unknown = {};
 
