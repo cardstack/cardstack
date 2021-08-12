@@ -65,7 +65,7 @@ jobs:
           WAYPOINT_SERVER_TLS_SKIP_VERIFY: 1
 
       - name: Deploy worker
-        run: waypoint up --app=hub-worker -plain
+        run: waypoint up --app=hub-worker -prune-retain=0 -plain
         env:
           AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_SERVER_TLS: 1
