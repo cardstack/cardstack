@@ -62,11 +62,9 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
   }
 
   get bridgingSubstate() {
-    if (this.blockCount < this.totalBlockCount) {
-      return `Waiting for ${this.blockCount + 1} of ${
-        this.totalBlockCount
-      } block confirmations`;
-    } else if (this.blockCount === this.totalBlockCount) {
+    if (this.blockCount <= this.totalBlockCount) {
+      return `${this.blockCount} of ${this.totalBlockCount} blocks confirmed`;
+    } else if (this.blockCount > this.totalBlockCount) {
       return `Waiting for bridge validators`;
     } else {
       return '';
@@ -75,7 +73,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
 
   @task *waitForBlockConfirmationsTask(): TaskGenerator<void> {
     let blockNumber = this.relayTxnReceipt.blockNumber;
-    while (this.blockCount <= this.totalBlockCount) {
+    while (this.blockCount <= this.totalBlockCount + 1) {
       yield this.layer1Network.getBlockConfirmation(blockNumber++);
       this.blockCount++;
     }

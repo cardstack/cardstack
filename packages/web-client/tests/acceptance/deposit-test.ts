@@ -255,11 +255,11 @@ module('Acceptance | deposit', function (hooks) {
     assert.dom(`${post} [data-test-deposit-transaction-status-card]`).exists();
     const blockCount = layer1Service.bridgeConfirmationBlockCount;
     layer1Service.test__simulateBlockConfirmation();
-    await waitFor(
-      `[data-test-token-bridge-step-block-count="${blockCount - 1}"]`
-    );
-    layer1Service.test__simulateBlockConfirmation();
     await waitFor(`[data-test-token-bridge-step-block-count="${blockCount}"]`);
+    layer1Service.test__simulateBlockConfirmation();
+    await waitFor(
+      `[data-test-token-bridge-step-block-count="${blockCount + 1}"]`
+    );
     layer1Service.test__simulateBlockConfirmation();
     await waitFor(`[data-test-token-bridge-step="1"][data-test-completed]`);
     assert.dom(`${post} [data-test-bridge-explorer-button]`).exists();
