@@ -5,6 +5,8 @@ import { register } from './routes/register';
 import cors from 'cors';
 import { IResponse } from './types';
 
+// Disabling eslint bc we need to use require since service-account will be generated on deploy
+// eslint-disable-next-line @typescript-eslint/no-require-imports, node/no-missing-require
 const serviceAccount = require('./service-account.json') || {};
 
 const adminConfig = process.env.FIREBASE_CONFIG ? JSON.parse(process.env.FIREBASE_CONFIG) : undefined;
