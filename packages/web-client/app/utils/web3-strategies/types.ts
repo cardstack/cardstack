@@ -18,11 +18,13 @@ import { TaskGenerator } from 'ember-concurrency';
 export type Layer1ChainEvent =
   | 'disconnect'
   | 'incorrect-chain'
-  | 'correct-chain';
+  | 'correct-chain'
+  | 'account-changed';
 export type Layer2ChainEvent =
   | 'disconnect'
   | 'incorrect-chain'
-  | 'correct-chain';
+  | 'correct-chain'
+  | 'account-changed';
 
 export interface Web3Strategy {
   isConnected: boolean;

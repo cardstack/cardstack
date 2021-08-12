@@ -63,6 +63,7 @@ export default class Layer1Network
     }
 
     this.strategy.on('disconnect', this.onDisconnect);
+    this.strategy.on('account-changed', this.onAccountChanged);
     this.strategy.on('incorrect-chain', this.onIncorrectChain);
     this.strategy.on('correct-chain', this.onCorrectChain);
   }
@@ -86,6 +87,10 @@ export default class Layer1Network
 
   @action onCorrectChain() {
     this.simpleEmitter.emit('correct-chain');
+  }
+
+  @action onAccountChanged() {
+    this.simpleEmitter.emit('account-changed');
   }
 
   // basically only allow re-emitting of events from the strategy
