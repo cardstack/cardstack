@@ -6,10 +6,9 @@ import { taskFor } from 'ember-concurrency-ts';
 import {
   Format,
   CardJSONResponse,
-  Setter,
   CardEnv,
 } from '@cardstack/core/src/interfaces';
-import type CardModel from '@cardstack/core/src/card-model';
+import CardModel from '@cardstack/core/src/card-model';
 import type { NewCardParams } from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
 
@@ -17,11 +16,11 @@ import config from 'cardhost/config/environment';
 import { setComponentTemplate } from '@ember/component';
 import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
+import { tracked } from '@glimmer/tracking';
 
 const { cardServer } = config as any; // Environment types arent working
 
 // the methods our service makes available for CardModel's exclusive use
-
 export default class Cards extends Service {
   async load(url: string, format: Format): Promise<CardModel> {
     let fullURL = this.buildCardURL(url, format);
@@ -62,6 +61,7 @@ export default class Cards extends Service {
       buildCardURL: this.buildCardURL.bind(this),
       fetchJSON: this.fetchJSON.bind(this),
       prepareComponent: this.prepareComponent.bind(this),
+      tracked: tracked as unknown as CardEnv['tracked'], // ¯\_(ツ)_/¯
     };
   }
 
@@ -104,17 +104,15 @@ export default class Cards extends Service {
     return await response.json();
   }
 
-  private prepareComponent(
-    component: unknown,
-    data: any,
-    set: Setter
-  ): unknown {
+  private prepareComponent(cardModel: CardModel, component: unknown): unknown {
     return setComponentTemplate(
       hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
       class extends Component {
         component = component;
-        data = data;
-        set = set;
+        get data() {
+          return cardModel.data;
+        }
+        set = cardModel.setters;
       }
     );
   }

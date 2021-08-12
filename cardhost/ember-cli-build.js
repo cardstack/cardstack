@@ -2,7 +2,7 @@
 
 process.env.EMBROIDER_REBUILD_ADDONS = [
   process.env.EMBROIDER_REBUILD_ADDONS,
-  // '@cardstack/compiled',
+  '@cardstack/compiled',
   '@cardstack/base-cards',
   'ember-cli-mirage',
 ]
@@ -47,6 +47,7 @@ module.exports = function (defaults) {
         resolve: {
           fallback: {
             path: require.resolve('path-browserify'),
+            process: require.resolve('process/'),
             fs: false,
           },
         },

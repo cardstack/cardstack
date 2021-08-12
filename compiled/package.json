@@ -19,7 +19,8 @@
   },
   "dependencies": {
     "@glimmer/component": "^1.0.3",
-    "@cardstack/core": "0.0.0"
+    "@cardstack/core": "0.0.0",
+    "@embroider/addon-shim": "*"
   },
   "ember-addon": {
     "version": 2,

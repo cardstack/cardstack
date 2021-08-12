@@ -13,7 +13,7 @@ export function templateOnlyComponentTemplate(
     for (const varName in imports) {
       otherImports += `import ${varName} from '${imports[varName]}';`;
     }
-    options += `, scope: {${Object.keys(imports).join(', ')}}`;
+    options += `, scope: () => ({${Object.keys(imports).join(', ')}})`;
   }
   options += '}';
 

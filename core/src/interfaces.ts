@@ -132,7 +132,12 @@ export interface CardEnv {
   buildCardURL(url: string, format?: Format): string;
   buildNewURL(realm: string, parentCardURL: string): string;
   fetchJSON(url: string, options: any): Promise<CardJSONResponse>;
-  prepareComponent(component: unknown, data: any, set: Setter): unknown;
+  prepareComponent(cardModel: CardModel, component: unknown): unknown;
+  tracked(
+    taret: object,
+    prop: string,
+    desc: PropertyDescriptor
+  ): PropertyDescriptor;
 }
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {

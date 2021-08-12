@@ -18,7 +18,7 @@ export default setComponentTemplate(
     '<input type="text" value="{{@model}}" {{on "input" (getTargetValue @set)}} ...attributes />',
     {
       strictMode: true,
-      scope: { on, getTargetValue },
+      scope: () => ({ on, getTargetValue }),
     }
   ),
   templateOnlyComponent()

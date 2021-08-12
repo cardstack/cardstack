@@ -193,9 +193,10 @@ function shouldInlineHBS(
   return !getObjectKey(options, 'scope') && neededScope.size == 0;
 }
 
-function handleArguments(
-  path: NodePath<t.CallExpression>
-): { options: NodePath<t.ObjectExpression>; template: string } {
+function handleArguments(path: NodePath<t.CallExpression>): {
+  options: NodePath<t.ObjectExpression>;
+  template: string;
+} {
   let args = path.get('arguments');
   if (args.length < 2) {
     throw error(path, 'precompileTemplate needs two arguments');
@@ -296,11 +297,22 @@ function updateScope(
 
   let scope = getObjectKey(options, 'scope');
 
-  if (scope?.isObjectExpression()) {
-    scope.node.properties = scope.node.properties.concat(scopeVars);
-  } else {
+  if (!scope) {
     options.node.properties.push(
-      t.objectProperty(t.identifier('scope'), t.objectExpression(scopeVars))
+      t.objectProperty(
+        t.identifier('scope'),
+        t.arrowFunctionExpression([], t.objectExpression(scopeVars))
+      )
     );
+    return;
   }
+
+  if (
+    !scope.isArrowFunctionExpression() ||
+    scope.node.body.type !== 'ObjectExpression'
+  ) {
+    throw new Error('BUG: component scope is not a function and it should be');
+  }
+
+  scope.node.body.properties = scope.node.body.properties.concat(scopeVars);
 }

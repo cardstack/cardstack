@@ -8,7 +8,7 @@ export default setComponentTemplate(
     '<div class="welcome-isolated"><h1><marquee>👋 Welcome to my website</marquee></h1></div>',
     {
       strictMode: true,
-      scope: {},
+      scope: () => ({}),
     }
   ),
   templateOnlyComponent()

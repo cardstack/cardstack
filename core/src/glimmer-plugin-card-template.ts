@@ -96,12 +96,8 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   return function transform(
     env: syntax.ASTPluginEnvironment
   ): syntax.ASTPlugin {
-    let {
-      fields,
-      importAndChooseName,
-      usageMeta,
-      defaultFieldFormat,
-    } = options;
+    let { fields, importAndChooseName, usageMeta, defaultFieldFormat } =
+      options;
     let state: State = {
       scopes: [new Map()],
       nextScope: undefined,
@@ -228,9 +224,8 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
 
         BlockStatement: {
           enter(node) {
-            let handled:
-              | { replacement?: unknown }
-              | undefined = handleFieldsIterator(node, fields, state);
+            let handled: { replacement?: unknown } | undefined =
+              handleFieldsIterator(node, fields, state);
 
             if (handled) {
               return handled.replacement;

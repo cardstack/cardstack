@@ -13,7 +13,7 @@ export default setComponentTemplate(
     "<input type='datetime-local' value={{this.formatted}} ...attributes />",
     {
       strictMode: true,
-      scope: {}, // NOTE: this is tricking our inline detector into not inlining this component
+      scope: () => ({}), // NOTE: this is tricking our inline detector into not inlining this component
     }
   ),
   class extends Component {

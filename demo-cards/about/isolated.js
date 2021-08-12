@@ -4,7 +4,7 @@ import templateOnlyComponent from '@ember/component/template-only';
 export default setComponentTemplate(
   precompileTemplate('<table><tr><td>spacer.gif</td></tr></table>', {
     strictMode: true,
-    scope: {},
+    scope: () => ({}),
   }),
   templateOnlyComponent()
 );

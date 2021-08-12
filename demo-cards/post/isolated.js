@@ -6,7 +6,7 @@ export default setComponentTemplate(
     '<h1><@fields.title/></h1><article><@fields.body/> <div>Created At: <@fields.createdAt /></div></article>',
     {
       strictMode: true,
-      scope: {},
+      scope: () => ({}),
     }
   ),
   templateOnlyComponent()
