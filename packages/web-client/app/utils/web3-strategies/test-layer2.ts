@@ -3,6 +3,7 @@ import WalletInfo from '../wallet-info';
 import {
   IssuePrepaidCardOptions,
   Layer2Web3Strategy,
+  RegisterMerchantOptions,
   TransactionHash,
 } from './types';
 import {
@@ -17,6 +18,7 @@ import { TransactionReceipt } from 'web3-core';
 import {
   BridgeValidationResult,
   DepotSafe,
+  MerchantSafe,
   PrepaidCardSafe,
   Safe,
 } from '@cardstack/cardpay-sdk';
@@ -32,6 +34,12 @@ interface IssuePrepaidCardRequest {
   onNonce?: (nonce: string) => void;
   nonce?: string;
   customizationDID: string;
+}
+
+interface RegisterMerchantRequest {
+  deferred: RSVP.Deferred<MerchantSafe>;
+  onTxHash?: (txHash: TransactionHash) => void;
+  infoDID: string;
 }
 
 interface SimulateBalancesParams {
@@ -54,7 +62,9 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked cardBalance: BN | undefined;
   @tracked depotSafe: DepotSafe | null = null;
   @tracked isInitializing = false;
+
   issuePrepaidCardRequests: Map<number, IssuePrepaidCardRequest> = new Map();
+  registerMerchantRequests: Map<string, RegisterMerchantRequest> = new Map();
   accountSafes: Map<string, Safe[]> = new Map();
 
   // property to test whether the refreshBalances method is called
@@ -190,6 +200,20 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return deferred.promise;
   }
 
+  async registerMerchant(
+    prepaidCardAddress: string,
+    infoDID: string,
+    options: RegisterMerchantOptions
+  ): Promise<MerchantSafe> {
+    let deferred: RSVP.Deferred<MerchantSafe> = defer();
+    this.registerMerchantRequests.set(prepaidCardAddress, {
+      deferred,
+      onTxHash: options.onTxHash,
+      infoDID,
+    });
+    return deferred.promise;
+  }
+
   authenticate(): Promise<string> {
     this.test__deferredHubAuthentication = defer();
     return this.test__deferredHubAuthentication.promise;
@@ -304,6 +328,29 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.test__simulateAccountSafes(walletAddress, [prepaidCardSafe]);
 
     return request?.deferred.resolve(prepaidCardSafe);
+  }
+
+  test__simulateRegisterMerchantForAddress(
+    prepaidCardAddress: string,
+    merchantSafeAddress: string,
+    options: Object
+  ) {
+    let request = this.registerMerchantRequests.get(prepaidCardAddress);
+    let merchantSafe: MerchantSafe = {
+      type: 'merchant',
+      createdAt: Date.now() / 1000,
+      address: merchantSafeAddress,
+      merchant: prepaidCardAddress,
+      tokens: [],
+      owners: [],
+      accumulatedSpendValue: 100,
+      infoDID: request?.infoDID,
+
+      ...options,
+    };
+    request?.onTxHash?.('exampleTxHash');
+
+    return request?.deferred.resolve(merchantSafe);
   }
 
   test__simulateHubAuthentication(authToken: string) {
