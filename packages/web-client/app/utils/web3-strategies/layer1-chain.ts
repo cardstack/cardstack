@@ -4,6 +4,7 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { Contract } from 'web3-eth-contract';
+import * as Sentry from '@sentry/browser';
 
 import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
 import { BridgeableSymbol, TokenContractInfo } from '../token';
@@ -108,6 +109,7 @@ export default abstract class Layer1ChainWeb3Strategy
         `Failed to establish connection to ${payload.providerId} from cross-tab communication`
       );
       console.error(e);
+      Sentry.captureException(e);
       this.cleanupConnectionState();
     }
   }
