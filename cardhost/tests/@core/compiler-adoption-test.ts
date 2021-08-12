@@ -44,7 +44,7 @@ module('@core | compiler-adoption', function (hooks) {
     parentCard = await builder.getCompiledCard('http://mirage/cards/person');
   });
 
-  module('fields', async function (/*hooks*/) {
+  module('fields', function (/*hooks*/) {
     test('a blank card can adopt fields from a card', async function (assert) {
       let card = {
         url: 'http://mirage/cards/user',
@@ -121,8 +121,8 @@ module('@core | compiler-adoption', function (hooks) {
         await builder.getCompiledCard(card.url);
       } catch (err) {
         assert.equal(
-          'Field collision on birthdate with parent card http://mirage/cards/person',
-          err.message
+          err.message,
+          'Field collision on birthdate with parent card http://mirage/cards/person'
         );
       }
     });
@@ -167,14 +167,14 @@ module('@core | compiler-adoption', function (hooks) {
         await builder.getCompiledCard(card.url);
       } catch (err) {
         assert.equal(
-          'Field collision on name with parent card http://mirage/cards/user',
-          err.message
+          err.message,
+          'Field collision on name with parent card http://mirage/cards/user'
         );
       }
     });
   });
 
-  module('templates', async function (/*hooks*/) {
+  module('templates', function (/*hooks*/) {
     test('a child card inherits a parent card template', async function (assert) {
       let card = {
         url: 'http://mirage/cards/user',
