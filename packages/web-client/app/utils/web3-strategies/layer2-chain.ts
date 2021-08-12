@@ -41,10 +41,16 @@ import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
 import { TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
+import { TypedChannel } from '../typed-channel';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
 } as const;
+
+interface Layer2ConnectEvent {
+  type: typeof BROADCAST_CHANNEL_MESSAGES.CONNECTED;
+  session?: any;
+}
 
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
@@ -60,7 +66,7 @@ export default abstract class Layer2ChainWeb3Strategy
   #exchangeRateApi!: IExchangeRate;
   #safesApi!: ISafes;
   #hubAuthApi!: IHubAuth;
-  #broadcastChannel: BroadcastChannel;
+  #broadcastChannel: TypedChannel<Layer2ConnectEvent>;
   @tracked depotSafe: DepotSafe | null = null;
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
@@ -84,7 +90,7 @@ export default abstract class Layer2ChainWeb3Strategy
       networkSymbol
     );
     this.defaultTokenContractAddress = defaultTokenContractInfo.address;
-    this.#broadcastChannel = new BroadcastChannel(
+    this.#broadcastChannel = new TypedChannel(
       `cardstack-layer-2-connection-sync`
     );
     this.#broadcastChannel.addEventListener(
@@ -93,7 +99,7 @@ export default abstract class Layer2ChainWeb3Strategy
     );
   }
 
-  @action onBroadcastChannelMessage(event: MessageEvent) {
+  @action onBroadcastChannelMessage(event: MessageEvent<Layer2ConnectEvent>) {
     // only try to connect if we weren't already connected
     // if we were already connected and there was an account change
     // we should be receiving the same "accountsChanged" event in each tab

@@ -11,6 +11,7 @@ import { action } from '@ember/object';
 import { getConstantByNetwork, networkIds } from '@cardstack/cardpay-sdk';
 import { NetworkSymbol } from './types';
 import Web3 from 'web3';
+import { TypedChannel } from '../typed-channel';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
@@ -36,6 +37,17 @@ const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
 } as const;
 
+interface Layer1ConnectEvent {
+  type: typeof BROADCAST_CHANNEL_MESSAGES.CONNECTED;
+  providerId: WalletProviderId;
+  session?: any;
+}
+
+interface Layer1DisconnectEvent {
+  type: typeof BROADCAST_CHANNEL_MESSAGES.DISCONNECTED;
+}
+type Layer1ConnectionEvent = Layer1ConnectEvent | Layer1DisconnectEvent;
+
 /**
  * # ConnectionManager
  * This class simplifies the interface to communicate with wallet providers (MetaMask or WalletConnect).
@@ -56,7 +68,7 @@ const BROADCAST_CHANNEL_MESSAGES = {
  */
 export class ConnectionManager {
   private strategy: ConnectionStrategy | undefined;
-  private broadcastChannel: BroadcastChannel | undefined;
+  private broadcastChannel: TypedChannel<Layer1ConnectionEvent>;
   chainId: number;
   networkSymbol: NetworkSymbol;
   simpleEmitter = new SimpleEmitter();
@@ -67,7 +79,7 @@ export class ConnectionManager {
 
     // we want to ensure that users don't get confused by different tabs having
     // different wallets connected so we communicate disconnections across tabs
-    this.broadcastChannel = new BroadcastChannel(
+    this.broadcastChannel = new TypedChannel(
       `cardstack-layer-1-connection-sync`
     );
     this.broadcastChannel.addEventListener(
@@ -150,7 +162,7 @@ export class ConnectionManager {
   }
 
   @action
-  onBroadcastChannelMessage(event: MessageEvent) {
+  onBroadcastChannelMessage(event: MessageEvent<Layer1ConnectionEvent>) {
     if (event.data.type === BROADCAST_CHANNEL_MESSAGES.DISCONNECTED) {
       this.onDisconnect(false);
     } else if (
@@ -180,7 +192,7 @@ export class ConnectionManager {
     this.emit('connected', accounts);
     this.broadcastChannel?.postMessage({
       type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
-      providerId: this.providerId,
+      providerId: this.providerId!,
       session: this.strategy.getSession(),
     });
   }
