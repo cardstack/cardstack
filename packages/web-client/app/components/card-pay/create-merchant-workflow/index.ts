@@ -62,7 +62,7 @@ class CreateMerchantWorkflow extends Workflow {
       completedDetail: `${c.layer2.fullName} wallet connected`,
     }),
     new Milestone({
-      title: 'Choose merchant name',
+      title: 'Create merchant account',
       postables: [
         new NetworkAwareWorkflowMessage({
           author: cardbot,
@@ -81,7 +81,7 @@ class CreateMerchantWorkflow extends Workflow {
         }),
         new WorkflowMessage({
           author: cardbot,
-          message: 'Let’s give your merchant a name.',
+          message: 'Let’s create a new merchant account.',
         }),
         new WorkflowCard({
           author: cardbot,
