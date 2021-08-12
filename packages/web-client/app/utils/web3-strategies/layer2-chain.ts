@@ -205,6 +205,11 @@ export default abstract class Layer2ChainWeb3Strategy
     if (this.walletInfo.isEqualTo(newWalletInfo)) {
       return;
     }
+
+    if (this.walletInfo.firstAddress && newWalletInfo.firstAddress) {
+      this.simpleEmitter.emit('account-changed');
+    }
+
     this.walletInfo = newWalletInfo;
     if (accounts.length) {
       await taskFor(this.fetchDepotTask).perform();

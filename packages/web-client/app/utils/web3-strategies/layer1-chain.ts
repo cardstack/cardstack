@@ -207,7 +207,16 @@ export default abstract class Layer1ChainWeb3Strategy
   }
 
   private async updateWalletInfo(accounts: string[]) {
-    this.walletInfo = new WalletInfo(accounts);
+    let newWalletInfo = new WalletInfo(accounts);
+    if (this.walletInfo.isEqualTo(newWalletInfo)) {
+      return;
+    }
+
+    if (this.walletInfo.firstAddress && newWalletInfo.firstAddress) {
+      this.simpleEmitter.emit('account-changed');
+    }
+
+    this.walletInfo = newWalletInfo;
     if (accounts.length > 0) {
       await this.refreshBalances();
     } else {
