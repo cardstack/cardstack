@@ -25,9 +25,10 @@ export function getFieldForPath(
   return field;
 }
 
-export function getBasenameAndExtension(
-  filename: string
-): { basename: string; extension: string } {
+export function getBasenameAndExtension(filename: string): {
+  basename: string;
+  extension: string;
+} {
   let extensionMatch = filename.match(/\.[^/.]+$/);
   let extension = extensionMatch ? extensionMatch[0] : '';
   let basename = filename.replace(extension, '');
