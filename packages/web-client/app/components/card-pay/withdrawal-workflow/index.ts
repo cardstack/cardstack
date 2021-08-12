@@ -261,7 +261,7 @@ with Card Pay.`,
     }),
     new WorkflowCard({
       author: cardbot,
-      componentName: 'workflow-thread/disconnection-cta',
+      componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED

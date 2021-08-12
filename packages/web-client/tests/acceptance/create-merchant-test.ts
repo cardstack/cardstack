@@ -206,11 +206,11 @@ module('Acceptance | create merchant', function (hooks) {
           `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a merchant, please start again by connecting your wallet.`
         );
       assert
-        .dom('[data-test-workflow-disconnection-cta="create-merchant"]')
+        .dom('[data-test-workflow-default-cancelation-cta="create-merchant"]')
         .containsText('Workflow canceled');
 
       await click(
-        '[data-test-workflow-disconnection-restart="create-merchant"]'
+        '[data-test-workflow-default-cancelation-restart="create-merchant"]'
       );
       assert.equal(
         currentURL(),
@@ -225,7 +225,7 @@ module('Acceptance | create merchant', function (hooks) {
         )
         .exists();
       assert
-        .dom('[data-test-workflow-disconnection-cta="create-merchant"]')
+        .dom('[data-test-workflow-default-cancelation-cta="create-merchant"]')
         .doesNotExist();
     });
   });

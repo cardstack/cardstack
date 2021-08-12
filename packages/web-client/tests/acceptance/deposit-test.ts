@@ -586,7 +586,9 @@ module('Acceptance | deposit', function (hooks) {
         'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).'
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
-    assert.dom('[data-test-workflow-disconnection-restart="deposit"]').exists();
+    assert
+      .dom('[data-test-workflow-default-cancelation-restart="deposit"]')
+      .exists();
   });
 
   test('Disconnecting Layer 1 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
@@ -645,7 +647,7 @@ module('Acceptance | deposit', function (hooks) {
 
     layer1Service.test__simulateDisconnectFromWallet();
 
-    await waitFor('[data-test-workflow-disconnection-cta="deposit"]');
+    await waitFor('[data-test-workflow-default-cancelation-cta="deposit"]');
 
     // test that all cta buttons are disabled
     let milestoneCtaButtonCount = Array.from(
@@ -668,7 +670,9 @@ module('Acceptance | deposit', function (hooks) {
         'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).'
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
-    assert.dom('[data-test-workflow-disconnection-restart="deposit"]').exists();
+    assert
+      .dom('[data-test-workflow-default-cancelation-restart="deposit"]')
+      .exists();
   });
 
   test('Disconnecting Layer 2 from within the workflow', async function (assert) {
@@ -755,7 +759,9 @@ module('Acceptance | deposit', function (hooks) {
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
 
-    assert.dom('[data-test-workflow-disconnection-restart="deposit"]').exists();
+    assert
+      .dom('[data-test-workflow-default-cancelation-restart="deposit"]')
+      .exists();
   });
 
   test('Disconnecting Layer 2 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
@@ -820,7 +826,7 @@ module('Acceptance | deposit', function (hooks) {
 
     layer2Service.test__simulateDisconnectFromWallet();
 
-    await waitFor('[data-test-workflow-disconnection-cta="deposit"]');
+    await waitFor('[data-test-workflow-default-cancelation-cta="deposit"]');
     // test that all cta buttons are disabled
     let milestoneCtaButtonCount = Array.from(
       document.querySelectorAll(
@@ -841,6 +847,8 @@ module('Acceptance | deposit', function (hooks) {
         'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).'
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
-    assert.dom('[data-test-workflow-disconnection-restart="deposit"]').exists();
+    assert
+      .dom('[data-test-workflow-default-cancelation-restart="deposit"]')
+      .exists();
   });
 });

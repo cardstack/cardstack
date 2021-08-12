@@ -458,10 +458,12 @@ module('Acceptance | withdrawal', function (hooks) {
         .dom('[data-test-postable="0"][data-test-cancelation]')
         .containsText(`It looks like your wallet(s) got disconnected.`);
       assert
-        .dom('[data-test-workflow-disconnection-cta="withdrawal"]')
+        .dom('[data-test-workflow-default-cancelation-cta="withdrawal"]')
         .containsText('Workflow canceled');
 
-      await click('[data-test-workflow-disconnection-restart="withdrawal"]');
+      await click(
+        '[data-test-workflow-default-cancelation-restart="withdrawal"]'
+      );
       assert.equal(currentURL(), '/card-pay/token-suppliers?flow=withdrawal');
 
       assert
@@ -470,7 +472,7 @@ module('Acceptance | withdrawal', function (hooks) {
         )
         .exists();
       assert
-        .dom('[data-test-workflow-disconnection-cta="withdrawal"]')
+        .dom('[data-test-workflow-default-cancelation-cta="withdrawal"]')
         .doesNotExist();
     });
   });
@@ -537,10 +539,12 @@ module('Acceptance | withdrawal', function (hooks) {
         .dom('[data-test-postable="0"][data-test-cancelation]')
         .containsText(`It looks like your wallet(s) got disconnected.`);
       assert
-        .dom('[data-test-workflow-disconnection-cta="withdrawal"]')
+        .dom('[data-test-workflow-default-cancelation-cta="withdrawal"]')
         .containsText('Workflow canceled');
 
-      await click('[data-test-workflow-disconnection-restart="withdrawal"]');
+      await click(
+        '[data-test-workflow-default-cancelation-restart="withdrawal"]'
+      );
       assert.equal(currentURL(), '/card-pay/token-suppliers?flow=withdrawal');
 
       layer2Service.test__simulateWalletConnectUri();
@@ -551,7 +555,7 @@ module('Acceptance | withdrawal', function (hooks) {
         )
         .exists();
       assert
-        .dom('[data-test-workflow-disconnection-cta="withdrawal"]')
+        .dom('[data-test-workflow-default-cancelation-cta="withdrawal"]')
         .doesNotExist();
     });
   });
