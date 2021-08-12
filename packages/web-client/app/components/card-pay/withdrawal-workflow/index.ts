@@ -310,4 +310,8 @@ export default class WithdrawalWorkflowComponent extends Component {
   @action onDisconnect() {
     this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
   }
+
+  @action onAccountChanged() {
+    this.workflow.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
+  }
 }
