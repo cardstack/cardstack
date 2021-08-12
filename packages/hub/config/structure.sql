@@ -591,6 +591,23 @@ CREATE TABLE graphile_worker.migrations (
 ALTER TABLE graphile_worker.migrations OWNER TO postgres;
 
 --
+-- Name: merchant_infos; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.merchant_infos (
+    id uuid NOT NULL,
+    name text NOT NULL,
+    slug text NOT NULL,
+    color text NOT NULL,
+    text_color text NOT NULL,
+    owner_address text NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.merchant_infos OWNER TO postgres;
+
+--
 -- Name: pgmigrations; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -724,6 +741,14 @@ ALTER TABLE ONLY graphile_worker.migrations
 
 
 --
+-- Name: merchant_infos merchant_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.merchant_infos
+    ADD CONSTRAINT merchant_infos_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: pgmigrations pgmigrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -760,6 +785,13 @@ ALTER TABLE ONLY public.prepaid_card_patterns
 --
 
 CREATE INDEX jobs_priority_run_at_id_locked_at_without_failures_idx ON graphile_worker.jobs USING btree (priority, run_at, id, locked_at) WHERE (attempts < max_attempts);
+
+
+--
+-- Name: merchant_infos_slug_unique_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX merchant_infos_slug_unique_index ON public.merchant_infos USING btree (slug);
 
 
 --
@@ -884,6 +916,8 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 1	20210527151505645_create-prepaid-card-tables	2021-07-29 23:45:29.577801
 2	20210614080132698_create-prepaid-card-customizations-table	2021-07-29 23:45:29.577801
 3	20210623052200757_create-graphile-worker-schema	2021-07-29 23:45:29.577801
+4	20210809113449561_merchant-infos	2021-08-09 14:47:15.726385
+5	20210809113449561_merchant-infos	2021-08-12 09:52:27.790806
 \.
 
 
@@ -891,7 +925,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 3, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 4, true);
 
 
 --
