@@ -156,6 +156,7 @@ export default abstract class Layer1ChainWeb3Strategy
     } catch (e) {
       console.error('Failed to initialize connection from local storage');
       console.error(e);
+      Sentry.captureException(e);
       this.cleanupConnectionState();
       ConnectionManager.removeProviderFromStorage(this.chainId);
     }
@@ -175,6 +176,7 @@ export default abstract class Layer1ChainWeb3Strategy
         `Failed to create connection manager: ${walletProvider.id}`
       );
       console.error(e);
+      Sentry.captureException(e);
       this.cleanupConnectionState();
       ConnectionManager.removeProviderFromStorage(this.chainId);
     }
