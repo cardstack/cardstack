@@ -200,7 +200,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   }
 
   getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
-    if (blockNumber > 1 && blockNumber < this.bridgeConfirmationBlockCount) {
+    if (blockNumber > 1 && blockNumber <= this.bridgeConfirmationBlockCount) {
       return Promise.resolve();
     } else {
       this.blockConfirmationDeferred = defer<void>();
