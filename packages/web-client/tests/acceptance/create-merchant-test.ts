@@ -102,13 +102,13 @@ module('Acceptance | create merchant', function (hooks) {
 
     assert
       .dom(postableSel(1, 2))
-      .containsText('Let’s give your merchant a name.');
+      .containsText('Let’s create a new merchant account.');
 
     post = postableSel(1, 3);
 
     await waitFor(post);
 
-    assert.dom(post).containsText('Choose a name for the merchant');
+    assert.dom(post).containsText('Choose a name and ID for the merchant');
 
     // // merchant-customization card
     // TODO verify and interact with merchant customization card default state

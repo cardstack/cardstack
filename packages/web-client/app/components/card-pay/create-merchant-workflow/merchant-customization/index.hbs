@@ -1,9 +1,9 @@
 <ActionCardContainer
-  @header="Merchant Customization"
+  @header="Merchant Account"
   @isComplete={{@isComplete}}
   data-test-layout-customization-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Choose a name for the merchant" />
+  <ActionCardContainer::Section @title="Choose a name and ID for the merchant" />
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
     data-test-layout-customization
