@@ -171,7 +171,7 @@ class DepositWorkflow extends Workflow {
     }),
     new WorkflowCard({
       author: cardbot,
-      componentName: 'card-pay/deposit-workflow/disconnection-cta',
+      componentName: 'workflow-thread/disconnection-cta',
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED

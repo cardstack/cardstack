@@ -74,7 +74,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
 
   test('It does not show the connect prompt when workflow is completed and wallet is disconnected', async function (assert) {
     await render(hbs`
-        <CardPay::LayerTwoConnectCard @isComplete=true />
+        <CardPay::LayerTwoConnectCard @isComplete={{true}} />
       `);
 
     assert.dom('[data-test-layer-2-connect-prompt]').doesNotExist();

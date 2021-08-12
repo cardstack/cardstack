@@ -2,12 +2,14 @@ import { module, test } from 'qunit';
 import {
   click,
   currentURL,
+  settled,
   visit,
   waitFor,
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import BN from 'bn.js';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
@@ -130,9 +132,91 @@ module('Acceptance | create merchant', function (hooks) {
     assert.dom('[data-test-workflow-thread]').doesNotExist();
   });
 
-  // test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
-  // });
+  module('Tests with the layer 2 wallet already connected', function (hooks) {
+    let layer2Service: Layer2TestWeb3Strategy;
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
-  // test('Disconnecting Layer 2 after proceeding beyond it', async function (assert) {
-  // });
+    hooks.beforeEach(function () {
+      layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
+      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      layer2Service.test__simulateBalances({
+        defaultToken: new BN(0),
+      });
+    });
+
+    test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
+      await visit('/card-pay/merchant-services?flow=create-merchant');
+      assert.equal(
+        currentURL(),
+        '/card-pay/merchant-services?flow=create-merchant'
+      );
+      assert
+        .dom(postableSel(0, 2))
+        .containsText(
+          `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
+        );
+      assert
+        .dom(
+          '[data-test-layer-2-wallet-card] [data-test-layer-2-wallet-connected-status]'
+        )
+        .containsText('Connected');
+      assert
+        .dom(
+          '[data-test-layer-2-wallet-card] [data-test-wallet-connect-qr-code]'
+        )
+        .doesNotExist();
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer2.fullName} wallet connected`);
+    });
+
+    test('Disconnecting Layer 2 after proceeding beyond it', async function (assert) {
+      await visit('/card-pay/merchant-services?flow=create-merchant');
+      assert.equal(
+        currentURL(),
+        '/card-pay/merchant-services?flow=create-merchant'
+      );
+      assert
+        .dom(
+          '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
+        )
+        .containsText(layer2AccountAddress)
+        .isVisible();
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer2.fullName} wallet connected`);
+
+      layer2Service.test__simulateDisconnectFromWallet();
+      await settled();
+
+      assert
+        .dom('[data-test-postable="0"][data-test-cancelation]')
+        .containsText(
+          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a merchant, please start again by connecting your wallet.`
+        );
+      assert
+        .dom('[data-test-workflow-disconnection-cta="create-merchant"]')
+        .containsText('Workflow canceled');
+
+      await click(
+        '[data-test-workflow-disconnection-restart="create-merchant"]'
+      );
+      assert.equal(
+        currentURL(),
+        '/card-pay/merchant-services?flow=create-merchant'
+      );
+
+      layer2Service.test__simulateWalletConnectUri();
+      await waitFor('[data-test-wallet-connect-qr-code]');
+      assert
+        .dom(
+          '[data-test-layer-2-wallet-card] [data-test-wallet-connect-qr-code]'
+        )
+        .exists();
+      assert
+        .dom('[data-test-workflow-disconnection-cta="create-merchant"]')
+        .doesNotExist();
+    });
+  });
 });
