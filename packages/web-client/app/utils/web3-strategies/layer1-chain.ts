@@ -96,15 +96,13 @@ export default abstract class Layer1ChainWeb3Strategy
         return;
       }
 
-      await this.connectionManager.setup(payload.providerId, payload.session);
-
-      if (this.connectionManager.provider) {
-        this.web3 = new Web3();
-        this.web3.setProvider(this.connectionManager.provider);
-        await this.connectionManager.reconnect(); // use the reconnect method because of edge cases
-      }
+      this.web3 = new Web3();
+      await this.connectionManager.reconnect(
+        this.web3,
+        payload.providerId,
+        payload.session
+      );
     } catch (e) {
-      // we might want to get the user to reload the page here
       console.error(
         `Failed to establish connection to ${payload.providerId} from cross-tab communication`
       );
@@ -146,13 +144,8 @@ export default abstract class Layer1ChainWeb3Strategy
         return;
       }
 
-      await this.connectionManager.setup(providerId);
-
-      if (this.connectionManager.provider) {
-        this.web3 = new Web3();
-        this.web3.setProvider(this.connectionManager.provider);
-        await this.connectionManager.reconnect(); // use the reconnect method because of edge cases
-      }
+      this.web3 = new Web3();
+      await this.connectionManager.reconnect(this.web3, providerId);
     } catch (e) {
       console.error('Failed to initialize connection from local storage');
       console.error(e);
@@ -164,13 +157,8 @@ export default abstract class Layer1ChainWeb3Strategy
 
   async connect(walletProvider: WalletProvider): Promise<void> {
     try {
-      await this.connectionManager.setup(walletProvider.id);
-
-      if (this.connectionManager.provider) {
-        this.web3 = new Web3();
-        this.web3.setProvider(this.connectionManager.provider);
-        await this.connectionManager.connect();
-      }
+      this.web3 = new Web3();
+      await this.connectionManager.connect(this.web3, walletProvider.id);
     } catch (e) {
       console.error(
         `Failed to create connection manager: ${walletProvider.id}`

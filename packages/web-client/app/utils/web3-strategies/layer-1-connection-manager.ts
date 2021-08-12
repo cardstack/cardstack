@@ -10,6 +10,7 @@ import { WalletProviderId } from '../wallet-providers';
 import { action } from '@ember/object';
 import { getConstantByNetwork, networkIds } from '@cardstack/cardpay-sdk';
 import { NetworkSymbol } from './types';
+import Web3 from 'web3';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
@@ -116,19 +117,23 @@ export class ConnectionManager {
     this.strategy = undefined;
   }
 
-  async setup(providerId: WalletProviderId, session?: any) {
+  private async setup(providerId: WalletProviderId, session?: any) {
     this.strategy = this.createStrategy(providerId);
     this.strategy.on('connected', this.onConnect);
     this.strategy.on('disconnected', this.onDisconnect);
     this.strategy.on('chain-changed', this.onChainChanged);
-    await this.strategy?.setup(session);
+    await this.strategy.setup(session);
   }
 
-  async connect() {
+  async connect(web3: Web3, providerId: WalletProviderId) {
+    await this.setup(providerId);
+    web3.setProvider(this.provider);
     await this.strategy?.connect();
   }
 
-  async reconnect() {
+  async reconnect(web3: Web3, providerId: WalletProviderId, session?: any) {
+    await this.setup(providerId, session);
+    web3.setProvider(this.provider);
     await this.strategy?.reconnect();
   }
 
