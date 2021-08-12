@@ -24,6 +24,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`Safes`](#safes)
   - [`Safe.viewSafe`](#safeviewsafe)
   - [`Safes.view`](#safesview)
+  - [`Safes.sendTokensGasEstimate`](#safessendtokensgasestimate)
   - [`Safes.sendTokens`](#safessendtokens)
   - [`Safes.setSupplierInfoDID`](#safessetsupplierinfodid)
 - [`PrepaidCard`](#prepaidcard)
@@ -303,6 +304,22 @@ Which can be called like this:
 ```js
 let safeDetails = await safes.view();
 ```
+
+### `Safes.sendTokensGasEstimate`
+This call will return the gas estimate for sending tokens from a safe.
+
+The parameters to this function are:
+- The safe address to send the tokens from
+- The token address of the tokens being sent
+- The recipient of the tokens
+- The amount of tokens that are being sent string in units of `wei`
+
+```ts
+let result = await safes.sendTokensGasEstimate(depotSafeAddress, daiCpxdAddress, aliceAddress, toWei("10"));
+```
+
+This method returns a promise for the amount of the tokens specified as the token address in the parameters that are estimated to be used to pay for gas as a string in units of `wei`.
+
 
 ### `Safes.sendTokens`
 This call is used to send tokens from a gnosis safe to an arbitrary address in the layer 2 network. Note that the gas will be paid with the token you are transferring so there must be enough token balance in teh safe to cover both the transferred amount of tokens and gas.

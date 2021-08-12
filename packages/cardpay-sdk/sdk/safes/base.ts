@@ -175,6 +175,32 @@ export default class Safes {
     return result;
   }
 
+  // Note that the returned amount is in units of the token specified in the
+  // function params, tokenAddress
+  async sendTokensGasEstimate(
+    safeAddress: string,
+    tokenAddress: string,
+    recipient: string,
+    amount: string
+  ): Promise<string> {
+    let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+    let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
+    if (safeBalance.lt(new BN(amount))) {
+      throw new Error(
+        `Safe does not have enough balance to transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
+          safeBalance.toString()
+        )}, amount to transfer ${fromWei(amount)}`
+      );
+    }
+    let payload = this.transferTokenPayload(tokenAddress, recipient, amount);
+    let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
+    let gasInToken = new BN(String(estimate.baseGas))
+      .add(new BN(String(estimate.safeTxGas)))
+      .mul(new BN(String(estimate.gasPrice)))
+      .toString();
+    return gasInToken;
+  }
+
   async sendTokens(
     safeAddress: string,
     tokenAddress: string,

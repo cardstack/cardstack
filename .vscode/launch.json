@@ -206,6 +206,26 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay testnet: Gas Estimate for Transfer Tokens from Safe",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "safe-transfer-tokens-gas-estimate",
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // source safe address
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "0x09FBEDDc5f94fA2713CDa75A68457cA8A4527adf", // destination addrress
+        "5", // amount (in ether units)
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay testnet: Create Prepaid Card",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
