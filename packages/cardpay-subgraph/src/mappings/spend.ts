@@ -1,4 +1,4 @@
-import { Mint as MintEvent } from '../../generated/Spend/Spend';
+import { Mint as MintEvent, Spend } from '../../generated/Spend/Spend';
 import { SpendAccumulation, MerchantSafe } from '../../generated/schema';
 import { makeTransaction, toChecksumAddress } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
@@ -9,9 +9,10 @@ export function handleMint(event: MintEvent): void {
   let merchantSafe = toChecksumAddress(event.params.account);
   let txnHash = event.transaction.hash.toHex();
   let merchantSafeEntity = MerchantSafe.load(merchantSafe);
+  let spend = Spend.bind(event.address);
+  let spendBalance = spend.balanceOf(event.params.account);
   if (merchantSafeEntity != null) {
-    // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
-    merchantSafeEntity.spendBalance = merchantSafeEntity.spendBalance + event.params.amount;
+    merchantSafeEntity.spendBalance = spendBalance;
     merchantSafeEntity.save();
   } else {
     log.warning(
@@ -26,6 +27,6 @@ export function handleMint(event: MintEvent): void {
   entity.timestamp = event.block.timestamp;
   entity.merchantSafe = merchantSafe;
   entity.amount = event.params.amount;
-  entity.historicSpendBalance = merchantSafeEntity.spendBalance;
+  entity.historicSpendBalance = spendBalance;
   entity.save();
 }
