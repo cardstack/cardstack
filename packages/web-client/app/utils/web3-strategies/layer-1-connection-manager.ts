@@ -16,6 +16,7 @@ import { TypedChannel } from '../typed-channel';
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
 const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
+
 interface ConnectionManagerOptions {
   chainId: number;
   networkSymbol: NetworkSymbol;
@@ -51,18 +52,17 @@ type Layer1ConnectionEvent = Layer1ConnectEvent | Layer1DisconnectEvent;
 /**
  * # ConnectionManager
  * This class simplifies the interface to communicate with wallet providers (MetaMask or WalletConnect).
+ * It also handles cross-tab communication and persistence of connection information across refreshes.
+ * Cross-tab disconnection is handled internally while cross-tab connection is handled by emitting the event
+ * to this class' consumer (layer 1 chain), which needs to set up a web3 instance first so that the event handlers
+ * it has can work correctly as they use the web3 instance.
  *
- * Calling setup with a valid provider id and optionally a session will set up a provider and bind
- * event handlers for connection, disconnection, and chain change events.
+ * This class emits a number of events that can be listened for with `ConnectionManager.on()`:
  *
  * - connected: A wallet is connected, or the address is changed
  * - disconnected: A wallet is disconnected
  * - chain-changed: A wallet's chain is updated or detected for the first time
  *
- * It also handles cross-tab communication and persistence of connection information across refreshes.
- * Cross-tab disconnection is handled internally while cross-tab connection is handled by emitting the event
- * to this class' consumer (layer 1 chain), which needs to set up a web3 instance first so that the event handlers
- * it has can work correctly as they use the web3 instance.
  *
  * This class does not, at the moment, store any state used directly by the UI besides providerId.
  */
@@ -78,7 +78,7 @@ export class ConnectionManager {
     this.chainId = networkIds[networkSymbol];
 
     // we want to ensure that users don't get confused by different tabs having
-    // different wallets connected so we communicate disconnections across tabs
+    // different wallets connected so we communicate connections and disconnections across tabs
     this.broadcastChannel = new TypedChannel(
       `cardstack-layer-1-connection-sync`
     );
