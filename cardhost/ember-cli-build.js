@@ -2,7 +2,7 @@
 
 process.env.EMBROIDER_REBUILD_ADDONS = [
   process.env.EMBROIDER_REBUILD_ADDONS,
-  // '@cardstack/compiled',
+  '@cardstack/compiled',
   '@cardstack/base-cards',
   'ember-cli-mirage',
 ]
@@ -14,7 +14,7 @@ const { Webpack } = require('@embroider/webpack');
 const { compatBuild } = require('@embroider/compat');
 const withSideWatch = require('./lib/with-side-watch');
 const Funnel = require('broccoli-funnel');
-const { ProvidePlugin } = require('webpack');
+const { ProvidePlugin, DefinePlugin } = require('webpack');
 
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
@@ -36,16 +36,16 @@ module.exports = function (defaults) {
     packagerOptions: {
       webpackConfig: {
         plugins: [
+          new DefinePlugin({
+            'process.env': '{}',
+            'process.platform': 'undefined',
+          }),
           new ProvidePlugin({
             Buffer: 'buffer',
-            process: 'process',
           }),
         ],
         node: {
           global: true,
-        },
-        module: {
-          noParse: /rsvp/,
         },
         resolve: {
           fallback: {
