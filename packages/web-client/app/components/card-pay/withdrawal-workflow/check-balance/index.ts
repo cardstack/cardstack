@@ -7,16 +7,25 @@ import {
   TokenDisplayInfo,
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
+import { reads } from 'macro-decorators';
+import { WalletProvider } from '@cardstack/web-client/utils/wallet-providers';
 
 export default class CardPayWithdrawalWorkflowCheckBalanceComponent extends Component<WorkflowCardComponentArgs> {
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    next(this, () => {
-      this.args.onComplete?.();
-    });
+    if (
+      this.minimumBalanceForWithdrawalClaim.lte(
+        this.layer1Network.defaultTokenBalance
+      )
+    ) {
+      next(this, () => {
+        this.args.onComplete?.();
+      });
+    }
   }
 
   @service declare layer1Network: Layer1Network;
+  @reads('layer1Network.walletProvider') declare walletProvider: WalletProvider;
 
   get header() {
     return `Check ${this.layer1Network.nativeTokenSymbol} balance`;
@@ -26,5 +35,8 @@ export default class CardPayWithdrawalWorkflowCheckBalanceComponent extends Comp
     return new TokenDisplayInfo(
       this.layer1Network.nativeTokenSymbol as TokenSymbol
     );
+  }
+  get minimumBalanceForWithdrawalClaim() {
+    return this.args.workflowSession.state['minimumBalanceForWithdrawalClaim'];
   }
 }

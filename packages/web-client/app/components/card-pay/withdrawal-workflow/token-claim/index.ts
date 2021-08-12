@@ -22,8 +22,10 @@ import walletProviders, {
 class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCardComponentArgs> {
   walletProviders = walletProviders;
   @service declare layer1Network: Layer1Network;
+  @reads('layer1Network.walletProvider') declare walletProvider: WalletProvider;
   @reads('args.workflowSession.state.withdrawalToken')
   declare tokenSymbol: TokenSymbol;
+
   @tracked isConfirming = false;
   @tracked txHash: string | undefined;
   @tracked errorMessage = '';
@@ -53,12 +55,6 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
     } else {
       return undefined;
     }
-  }
-
-  get walletProvider(): WalletProvider | undefined {
-    return this.walletProviders.find(
-      (w) => w.id === this.layer1Network.strategy.currentProviderId
-    );
   }
 
   get txViewerUrl() {

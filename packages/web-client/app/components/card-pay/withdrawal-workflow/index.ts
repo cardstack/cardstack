@@ -37,7 +37,7 @@ class CheckBalanceWorkflowMessage extends WorkflowPostable {
   @tracked minimumBalanceForWithdrawalClaim: BN | undefined;
 
   constructor() {
-    super({ name: 'cardbot' });
+    super(cardbot);
     taskFor(this.fetchMininumBalanceForWithdrawalClaimTask).perform();
   }
 
@@ -52,6 +52,7 @@ class CheckBalanceWorkflowMessage extends WorkflowPostable {
     );
     let minimum: BN = yield this.layer1Network.getEstimatedGasForWithdrawalClaim();
     this.minimumBalanceForWithdrawalClaim = minimum;
+    this.workflow?.session.update('minimumBalanceForWithdrawalClaim', minimum);
 
     this.workflow!.emit('visible-postables-will-change');
     this.isComplete = true;
