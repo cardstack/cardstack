@@ -15,6 +15,7 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
+  ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
 } as const;
 
 class CreateMerchantWorkflow extends Workflow {
@@ -124,6 +125,26 @@ class CreateMerchantWorkflow extends Workflow {
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
+        );
+      },
+    }),
+    // cancelation for changing accounts
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'It looks like you changed accounts in the middle of this workflow. If you still want to create a merchant, please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
+        );
+      },
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'workflow-thread/default-cancelation-cta',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
         );
       },
     }),
