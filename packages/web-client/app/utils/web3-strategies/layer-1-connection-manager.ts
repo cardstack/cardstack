@@ -9,7 +9,7 @@ import { Emitter, SimpleEmitter } from '../events';
 import { WalletProviderId } from '../wallet-providers';
 import { action } from '@ember/object';
 import { getConstantByNetwork, networkIds } from '@cardstack/cardpay-sdk';
-import { NetworkSymbol } from './types';
+import { Layer1NetworkSymbol } from './types';
 import Web3 from 'web3';
 import { TypedChannel } from '../typed-channel';
 import { MockLocalStorage } from '../browser-mocks';
@@ -20,7 +20,7 @@ const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 interface ConnectionManagerOptions {
   chainId: number;
-  networkSymbol: NetworkSymbol;
+  networkSymbol: Layer1NetworkSymbol;
 }
 
 type ConnectionManagerWalletEvent =
@@ -76,10 +76,10 @@ export class ConnectionManager {
   broadcastChannel: TypedChannel<Layer1ConnectionEvent>;
   strategy: ConnectionStrategy | undefined;
   chainId: number;
-  networkSymbol: NetworkSymbol;
+  networkSymbol: Layer1NetworkSymbol;
   simpleEmitter = new SimpleEmitter();
 
-  constructor(networkSymbol: NetworkSymbol) {
+  constructor(networkSymbol: Layer1NetworkSymbol) {
     this.networkSymbol = networkSymbol;
     this.chainId = networkIds[networkSymbol];
 
@@ -232,7 +232,7 @@ abstract class ConnectionStrategy
   destroy() {}
 
   // networkSymbol and chainId are initialized in the constructor
-  networkSymbol: NetworkSymbol;
+  networkSymbol: Layer1NetworkSymbol;
   chainId: number;
 
   // this is initialized in the `setup` method of concrete classes

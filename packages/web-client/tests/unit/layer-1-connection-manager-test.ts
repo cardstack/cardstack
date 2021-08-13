@@ -7,14 +7,8 @@ import Sinon from 'sinon';
 module('Unit | layer 1 connection manager', function (hooks) {
   setupTest(hooks);
 
-  test('It should be able to be instantiated for Kovan and Sokol', async function (assert) {
-    let sokolConnectionManager = new ConnectionManager('sokol');
+  test('It should be able to be instantiated for the Kovan network', async function (assert) {
     let kovanConnectionManager = new ConnectionManager('kovan');
-
-    assert.ok(
-      sokolConnectionManager,
-      'Sokol connection manager is instantiated'
-    );
 
     assert.ok(
       kovanConnectionManager,
