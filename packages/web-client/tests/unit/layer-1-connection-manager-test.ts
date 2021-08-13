@@ -204,4 +204,50 @@ module('Unit | layer 1 connection manager', function (hooks) {
       'The disconnect callback was not called upon receiving the message'
     );
   });
+
+  test('The onConnect method of the layer 1 connection manager sets the providerId in storage', async function (assert) {
+    let connectionManager = new ConnectionManager('kovan');
+    let web3 = {
+      setProvider: () => {},
+    };
+
+    let onDisconnect = Sinon.spy();
+    connectionManager.on('disconnected', onDisconnect);
+
+    await connectionManager.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
+    connectionManager.onConnect(['some-account']);
+
+    assert.equal(
+      ConnectionManager.getProviderIdForChain(connectionManager.chainId),
+      connectionManager.providerId,
+      'Storage contains the connected provider id after connection'
+    );
+  });
+
+  test('The onDisconnect method of the layer 1 connection manager removes the providerId from storage', async function (assert) {
+    let connectionManager = new ConnectionManager('kovan');
+    let web3 = {
+      setProvider: () => {},
+    };
+
+    let onDisconnect = Sinon.spy();
+    connectionManager.on('disconnected', onDisconnect);
+
+    await connectionManager.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
+    connectionManager.onConnect(['some-account']);
+
+    assert.equal(
+      ConnectionManager.getProviderIdForChain(connectionManager.chainId),
+      connectionManager.providerId,
+      'Storage contains the connected provider id after connection'
+    );
+
+    connectionManager.onDisconnect(false);
+
+    assert.equal(
+      ConnectionManager.getProviderIdForChain(connectionManager.chainId),
+      null,
+      'Storage does not contain a provider id for the given chain, after disconnection'
+    );
+  });
 });

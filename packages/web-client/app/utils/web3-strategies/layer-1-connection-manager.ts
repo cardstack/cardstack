@@ -12,6 +12,7 @@ import { getConstantByNetwork, networkIds } from '@cardstack/cardpay-sdk';
 import { NetworkSymbol } from './types';
 import Web3 from 'web3';
 import { TypedChannel } from '../typed-channel';
+import { MockLocalStorage } from '../browser-mocks';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
@@ -67,6 +68,11 @@ type Layer1ConnectionEvent = Layer1ConnectEvent | Layer1DisconnectEvent;
  * This class does not, at the moment, store any state used directly by the UI besides providerId.
  */
 export class ConnectionManager {
+  static storage =
+    config.environment === 'test'
+      ? new MockLocalStorage()
+      : window.localStorage;
+
   broadcastChannel: TypedChannel<Layer1ConnectionEvent>;
   strategy: ConnectionStrategy | undefined;
   chainId: number;
@@ -89,15 +95,18 @@ export class ConnectionManager {
   }
 
   static getProviderIdForChain(chainId: number) {
-    return window.localStorage.getItem(GET_PROVIDER_STORAGE_KEY(chainId));
+    return ConnectionManager.storage.getItem(GET_PROVIDER_STORAGE_KEY(chainId));
   }
 
   static removeProviderFromStorage(chainId: number) {
-    window.localStorage.removeItem(GET_PROVIDER_STORAGE_KEY(chainId));
+    ConnectionManager.storage.removeItem(GET_PROVIDER_STORAGE_KEY(chainId));
   }
 
   static addProviderToStorage(chainId: number, providerId: WalletProviderId) {
-    window.localStorage.setItem(GET_PROVIDER_STORAGE_KEY(chainId), providerId);
+    ConnectionManager.storage.setItem(
+      GET_PROVIDER_STORAGE_KEY(chainId),
+      providerId
+    );
   }
 
   get provider() {
