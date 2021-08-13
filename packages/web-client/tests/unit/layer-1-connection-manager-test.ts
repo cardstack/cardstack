@@ -7,47 +7,22 @@ import Sinon from 'sinon';
 module('Unit | layer 1 connection manager', function (hooks) {
   setupTest(hooks);
 
-  test('It should be able to be instantiated for the Kovan network', async function (assert) {
-    let kovanConnectionManager = new ConnectionManager('kovan');
-
-    assert.ok(
-      kovanConnectionManager,
-      'Kovan connection manager is instantiated'
-    );
-  });
-
-  test('It should not have a strategy, provider, or providerId at instantiation', async function (assert) {
+  test('It should not have a providerId at instantiation', async function (assert) {
     let connectionManager = new ConnectionManager('kovan');
 
     assert.ok(
-      !connectionManager.strategy,
-      'There is no strategy at first instantiation'
-    );
-    assert.ok(
-      !connectionManager.provider,
-      'There is no provider at first instantiation'
-    );
-    assert.ok(
       !connectionManager.providerId,
-      'There is no providerId at first instantiation'
+      'There is no providerId at instantiation'
     );
   });
 
-  test('It should have a strategy, provider, and providerId after calling connect + call web3.setProvider', async function (assert) {
+  test("It should have a providerId, and assign web3's provider after calling connect", async function (assert) {
     let connectionManager = new ConnectionManager('kovan');
     let web3 = {
       setProvider: Sinon.spy(),
     };
     await connectionManager.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
 
-    assert.ok(
-      connectionManager.strategy,
-      'There is a strategy after connecting'
-    );
-    assert.ok(
-      connectionManager.provider,
-      'There is a provider after connecting'
-    );
     assert.ok(
       connectionManager.providerId,
       'There is a providerId after connecting'
@@ -59,21 +34,13 @@ module('Unit | layer 1 connection manager', function (hooks) {
     );
   });
 
-  test('It should have a strategy, provider, and providerId after calling connect + call web3.setProvider', async function (assert) {
+  test("It should have a providerId, and assign web3's provider after calling reconnect", async function (assert) {
     let connectionManager = new ConnectionManager('kovan');
     let web3 = {
       setProvider: Sinon.spy(),
     };
-    await connectionManager.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
+    await connectionManager.reconnect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
 
-    assert.ok(
-      connectionManager.strategy,
-      'There is a strategy after reconnecting'
-    );
-    assert.ok(
-      connectionManager.provider,
-      'There is a provider after reconnecting'
-    );
     assert.ok(
       connectionManager.providerId,
       'There is a providerId after reconnecting'
@@ -85,7 +52,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
     );
   });
 
-  test('Its strategy, provider, and providerId should be cleared after calling reset', async function (assert) {
+  test('Its providerId should be cleared after calling reset', async function (assert) {
     let connectionManager = new ConnectionManager('kovan');
     let web3 = {
       setProvider: () => {},
@@ -93,22 +60,12 @@ module('Unit | layer 1 connection manager', function (hooks) {
     await connectionManager.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
 
     assert.ok(
-      connectionManager.strategy,
-      'There is a strategy after connecting'
-    );
-    assert.ok(
-      connectionManager.provider,
-      'There is a provider after connecting'
-    );
-    assert.ok(
       connectionManager.providerId,
       'There is a providerId after connecting'
     );
 
     connectionManager.reset();
 
-    assert.ok(!connectionManager.strategy, 'There is no strategy after reset');
-    assert.ok(!connectionManager.provider, 'There is no provider after reset');
     assert.ok(
       !connectionManager.providerId,
       'There is no providerId after reset'
