@@ -21,17 +21,19 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Test Suite",
+      "name": "Node tests",
       "program": "${workspaceRoot}/node_modules/.bin/_mocha",
-      "cwd": "${workspaceRoot}",
+      "cwd": "${workspaceRoot}/packages/hub",
+      "env": {
+        "PACKAGE": "hub",
+        "NODE_ENV": "test"
+      },
       "args": [
         "-r",
         "esm",
-        "packages/test-support/bin/run.js",
+        "../test-support/bin/run.js",
         "--timeout",
-        "600000",
-        "--grep",
-        "can find built-in cards from the index"
+        "600000"
       ]
     },
     {
