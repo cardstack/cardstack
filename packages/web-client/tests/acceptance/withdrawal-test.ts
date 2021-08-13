@@ -30,6 +30,10 @@ function milestoneCompletedSel(milestoneIndex: number): string {
   return `[data-test-milestone-completed][data-test-milestone="${milestoneIndex}"]`;
 }
 
+function cancelationPostableSel(postableIndex: number) {
+  return `[data-test-cancelation][data-test-postable="${postableIndex}"]`;
+}
+
 module('Acceptance | withdrawal', function (hooks) {
   setupApplicationTest(hooks);
 
@@ -481,7 +485,11 @@ module('Acceptance | withdrawal', function (hooks) {
     let layer1Service: Layer1TestWeb3Strategy;
     let layer2Service: Layer2TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    let secondLayer1AccountAddress =
+      '0x5416C61193C3393B46C2774ac4717C252031c0bE';
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    let secondLayer2AccountAddress =
+      '0x0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7';
 
     hooks.beforeEach(function () {
       layer1Service = this.owner.lookup('service:layer1-network')
@@ -557,6 +565,93 @@ module('Acceptance | withdrawal', function (hooks) {
       assert
         .dom('[data-test-workflow-default-cancelation-cta="withdrawal"]')
         .doesNotExist();
+    });
+
+    test('Changing layer 1 account should cancel the workflow', async function (assert) {
+      await visit('/card-pay/token-suppliers?flow=withdrawal');
+      assert.equal(currentURL(), '/card-pay/token-suppliers?flow=withdrawal');
+
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer1.fullName} wallet connected`);
+      assert
+        .dom(milestoneCompletedSel(2))
+        .containsText(`${c.layer2.fullName} wallet connected`);
+
+      layer1Service.test__simulateAccountsChanged(
+        [secondLayer1AccountAddress],
+        'metamask'
+      );
+      await settled();
+
+      // test that all cta buttons are disabled
+      let milestoneCtaButtonCount = Array.from(
+        document.querySelectorAll(
+          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+        )
+      ).length;
+      assert
+        .dom(
+          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+        )
+        .exists(
+          { count: milestoneCtaButtonCount },
+          'All cta buttons in milestones should be disabled'
+        );
+
+      await waitFor('[data-test-cancelation][data-test-postable]');
+
+      assert
+        .dom(cancelationPostableSel(0))
+        .containsText(
+          'It looks like you changed accounts in the middle of this workflow. If you still want to withdraw funds, please restart the workflow.'
+        );
+      assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+      assert
+        .dom('[data-test-workflow-default-cancelation-restart="withdrawal"]')
+        .exists();
+    });
+
+    test('Changing layer 2 account should cancel the workflow', async function (assert) {
+      await visit('/card-pay/token-suppliers?flow=withdrawal');
+      assert.equal(currentURL(), '/card-pay/token-suppliers?flow=withdrawal');
+
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer1.fullName} wallet connected`);
+      assert
+        .dom(milestoneCompletedSel(2))
+        .containsText(`${c.layer2.fullName} wallet connected`);
+
+      layer2Service.test__simulateAccountsChanged([secondLayer2AccountAddress]);
+      await settled();
+
+      // test that all cta buttons are disabled
+      let milestoneCtaButtonCount = Array.from(
+        document.querySelectorAll(
+          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+        )
+      ).length;
+      assert
+        .dom(
+          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+        )
+        .exists(
+          { count: milestoneCtaButtonCount },
+          'All cta buttons in milestones should be disabled'
+        );
+
+      await waitFor('[data-test-cancelation][data-test-postable]');
+
+      assert
+        .dom(cancelationPostableSel(0))
+        .containsText(
+          'It looks like you changed accounts in the middle of this workflow. If you still want to withdraw funds, please restart the workflow.'
+        );
+      assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+      assert
+        .dom('[data-test-workflow-default-cancelation-restart="withdrawal"]')
+        .exists();
     });
   });
 });

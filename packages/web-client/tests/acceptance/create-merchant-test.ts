@@ -228,5 +228,44 @@ module('Acceptance | create merchant', function (hooks) {
         .dom('[data-test-workflow-default-cancelation-cta="create-merchant"]')
         .doesNotExist();
     });
+
+    test('Changing Layer 2 account should cancel the workflow', async function (assert) {
+      let secondLayer2AccountAddress =
+        '0x5416C61193C3393B46C2774ac4717C252031c0bE';
+      await visit('/card-pay/merchant-services?flow=create-merchant');
+      assert.equal(
+        currentURL(),
+        '/card-pay/merchant-services?flow=create-merchant'
+      );
+      assert
+        .dom(
+          '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
+        )
+        .containsText(layer2AccountAddress)
+        .isVisible();
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer2.fullName} wallet connected`);
+
+      layer2Service.test__simulateAccountsChanged([secondLayer2AccountAddress]);
+      await settled();
+
+      assert
+        .dom('[data-test-postable="0"][data-test-cancelation]')
+        .containsText(
+          'It looks like you changed accounts in the middle of this workflow. If you still want to create a merchant, please restart the workflow.'
+        );
+      assert
+        .dom('[data-test-workflow-default-cancelation-cta="create-merchant"]')
+        .containsText('Workflow canceled');
+
+      await click(
+        '[data-test-workflow-default-cancelation-restart="create-merchant"]'
+      );
+      assert.equal(
+        currentURL(),
+        '/card-pay/merchant-services?flow=create-merchant'
+      );
+    });
   });
 });
