@@ -67,8 +67,8 @@ type Layer1ConnectionEvent = Layer1ConnectEvent | Layer1DisconnectEvent;
  * This class does not, at the moment, store any state used directly by the UI besides providerId.
  */
 export class ConnectionManager {
-  private strategy: ConnectionStrategy | undefined;
-  private broadcastChannel: TypedChannel<Layer1ConnectionEvent>;
+  broadcastChannel: TypedChannel<Layer1ConnectionEvent>;
+  strategy: ConnectionStrategy | undefined;
   chainId: number;
   networkSymbol: NetworkSymbol;
   simpleEmitter = new SimpleEmitter();
@@ -109,7 +109,12 @@ export class ConnectionManager {
   }
 
   createStrategy(providerId: WalletProviderId) {
-    if (providerId === 'metamask') {
+    if (config.environment == 'test') {
+      return new TestConnectionStrategy({
+        chainId: this.chainId,
+        networkSymbol: this.networkSymbol,
+      });
+    } else if (providerId === 'metamask') {
       return new MetaMaskConnectionStrategy({
         chainId: this.chainId,
         networkSymbol: this.networkSymbol,
@@ -438,4 +443,16 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
     // valid session from localStorage
     return await this.provider.enable();
   }
+}
+
+class TestConnectionStrategy extends ConnectionStrategy {
+  providerId: WalletProviderId = 'metamask'; // does not actually follow the metamask connection strategy behaviour, but we need a valid wallet provider here for the sake of the ui
+
+  async setup(_session?: any) {
+    // set an arbitrary non-nullish value for purposes of the tests
+    this.provider = 'PROVIDER';
+  }
+  async reconnect() {}
+  async connect() {}
+  async disconnect() {}
 }
