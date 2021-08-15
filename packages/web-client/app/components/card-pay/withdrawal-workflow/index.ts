@@ -44,7 +44,6 @@ class CheckBalanceWorkflowMessage extends WorkflowPostable {
   @task
   *fetchMininumBalanceForWithdrawalClaimTask() {
     yield waitForQueue('afterRender'); // avoid error from using and setting workflow in the render queue
-    yield waitForProperty(this, 'workflow', Boolean);
     yield waitForProperty(this, 'layer1Network', Boolean);
     // couldn't use waitForProperty for the layer1Network.defaultTokenBalance because waitForProperty is not reliable for tracked properties
     yield taskFor(this.waitUntilTask).perform(
