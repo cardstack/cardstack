@@ -77,7 +77,7 @@ export interface Layer1Web3Strategy
     options?: ClaimBridgedTokensOptions
   ): Promise<TransactionReceipt>;
   getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void>;
-  getEstimatedGasForWithdrawalClaim(): Promise<BN>;
+  getEstimatedGasForWithdrawalClaim(symbol: BridgeableSymbol): Promise<BN>;
 }
 
 export interface Layer2Web3Strategy

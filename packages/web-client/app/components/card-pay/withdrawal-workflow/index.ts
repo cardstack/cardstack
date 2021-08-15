@@ -50,7 +50,10 @@ class CheckBalanceWorkflowMessage extends WorkflowPostable {
     yield taskFor(this.waitUntilTask).perform(
       () => !!this.layer1Network.defaultTokenBalance
     );
-    let minimum: BN = yield this.layer1Network.getEstimatedGasForWithdrawalClaim();
+    // HACK: We are passing "DAI" in the next line, but the user hasn't actually specified what token they will be withdrawing yet.
+    let minimum: BN = yield this.layer1Network.getEstimatedGasForWithdrawalClaim(
+      'DAI'
+    );
     this.minimumBalanceForWithdrawalClaim = minimum;
     this.workflow?.session.update('minimumBalanceForWithdrawalClaim', minimum);
 

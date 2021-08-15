@@ -26,6 +26,7 @@ import { BridgeValidationResult } from '@cardstack/cardpay-sdk';
 import walletProviders, {
   WalletProvider,
 } from '@cardstack/web-client/utils/wallet-providers';
+import { BridgeableSymbol } from '../utils/token';
 
 export default class Layer1Network
   extends Service
@@ -43,8 +44,8 @@ export default class Layer1Network
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
   @reads('strategy.nativeTokenSymbol') nativeTokenSymbol: string | undefined;
 
-  getEstimatedGasForWithdrawalClaim(): Promise<BN> {
-    return this.strategy.getEstimatedGasForWithdrawalClaim();
+  getEstimatedGasForWithdrawalClaim(symbol: BridgeableSymbol): Promise<BN> {
+    return this.strategy.getEstimatedGasForWithdrawalClaim(symbol);
   }
 
   constructor(props: object | undefined) {

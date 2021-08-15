@@ -34,9 +34,7 @@ import {
 import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { action } from '@ember/object';
-// import { toWei } from 'web3-utils';
 
-const WITHDRAWAL_GAS_LIMIT = new BN('290000');
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
   chainId: number;
@@ -320,10 +318,14 @@ export default abstract class Layer1ChainWeb3Strategy
     )}/${txnHash}`;
   }
 
-  async getEstimatedGasForWithdrawalClaim(): Promise<BN> {
-    let gasPrice = await this.web3!.eth.getGasPrice();
-    let estimatedGasInWei = WITHDRAWAL_GAS_LIMIT.mul(new BN(gasPrice));
-    let rounder = new BN(1e12);
-    return estimatedGasInWei.divRound(rounder).mul(rounder);
+  async getEstimatedGasForWithdrawalClaim(
+    symbol: BridgeableSymbol
+  ): Promise<BN> {
+    if (!this.web3)
+      throw new Error('Cannot getEstimatedGasForWithdrawalClaim without web3');
+
+    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
+    let { address } = new TokenContractInfo(symbol, this.networkSymbol);
+    return tokenBridge.getEstimatedGasForWithdrawalClaim(address);
   }
 }

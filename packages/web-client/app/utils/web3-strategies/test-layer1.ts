@@ -19,6 +19,7 @@ import {
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
 import { toWei } from 'web3-utils';
+import { BridgeableSymbol } from '../token';
 
 interface ClaimBridgedTokensRequest {
   deferred: RSVP.Deferred<TransactionReceipt>;
@@ -214,7 +215,9 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     this.blockConfirmationDeferred.resolve();
   }
 
-  async getEstimatedGasForWithdrawalClaim(): Promise<BN> {
+  async getEstimatedGasForWithdrawalClaim(
+    _symbol: BridgeableSymbol
+  ): Promise<BN> {
     return Promise.resolve(new BN(290000).mul(new BN(toWei('48', 'gwei'))));
   }
 }
