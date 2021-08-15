@@ -119,7 +119,7 @@ export default abstract class Layer1ChainWeb3Strategy
 
   @action
   async onConnect(accounts: string[]) {
-    this.updateWalletInfo(accounts, this.chainId);
+    await this.updateWalletInfo(accounts, this.chainId);
     this.currentProviderId = this.connectionManager?.providerId;
     this.#waitForAccountDeferred.resolve();
   }
@@ -206,10 +206,10 @@ export default abstract class Layer1ChainWeb3Strategy
     return this.simpleEmitter.on(event, cb);
   }
 
-  private updateWalletInfo(accounts: string[], chainId: number) {
+  private async updateWalletInfo(accounts: string[], chainId: number) {
     this.walletInfo = new WalletInfo(accounts, chainId);
     if (accounts.length > 0) {
-      this.refreshBalances();
+      await this.refreshBalances();
     } else {
       this.defaultTokenBalance = undefined;
       this.cardBalance = undefined;

@@ -5,10 +5,7 @@ import NetworkAwareWorkflowMessage from '@cardstack/web-client/components/workfl
 import NetworkAwareWorkflowCard from '@cardstack/web-client/components/workflow-thread/network-aware-card';
 import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
-import {
-  CheckResult,
-  WorkflowCard,
-} from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
 import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
@@ -142,15 +139,6 @@ class WithdrawalWorkflow extends Workflow {
         new NetworkAwareWorkflowCard({
           author: cardbot,
           componentName: 'card-pay/layer-one-connect-card',
-          async check(this: NetworkAwareWorkflowCard): Promise<CheckResult> {
-            // delay completion until balances are loaded
-            await this.waitUntil(() => {
-              return !!this.layer1Network.defaultTokenBalance;
-            }, 200);
-            return {
-              success: true,
-            };
-          },
         }),
       ],
       completedDetail: `${capitalize(
