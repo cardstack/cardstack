@@ -351,7 +351,7 @@ module('Acceptance | withdrawal', function (hooks) {
       card: new BN('10000000000000000000000'),
     });
     await waitFor(`${post} [data-test-balance="ETH"]`);
-    await settled();
+    await waitFor(milestoneCompletedSel(0));
     assert.dom(milestoneCompletedSel(0));
 
     await waitUntil(() => {

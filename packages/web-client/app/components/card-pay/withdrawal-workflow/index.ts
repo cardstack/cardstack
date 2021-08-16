@@ -17,12 +17,7 @@ import BN from 'bn.js';
 import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
 import { tracked } from '@glimmer/tracking';
 import { taskFor } from 'ember-concurrency-ts';
-import {
-  rawTimeout,
-  TaskGenerator,
-  waitForProperty,
-  waitForQueue,
-} from 'ember-concurrency';
+import { waitForProperty, waitForQueue } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { formatTokenAmount } from '@cardstack/web-client/helpers/format-token-amount';
 
@@ -42,10 +37,6 @@ class CheckBalanceWorkflowMessage extends WorkflowPostable {
   *fetchMininumBalanceForWithdrawalClaimTask() {
     yield waitForQueue('afterRender'); // avoid error from using and setting workflow in the render queue
     yield waitForProperty(this, 'layer1Network', Boolean);
-    // couldn't use waitForProperty for the layer1Network.defaultTokenBalance because waitForProperty is not reliable for tracked properties
-    yield taskFor(this.waitUntilTask).perform(
-      () => !!this.layer1Network.defaultTokenBalance
-    );
     // HACK: We are passing "DAI" in the next line, but the user hasn't actually specified what token they will be withdrawing yet.
     let minimum: BN = yield this.layer1Network.getEstimatedGasForWithdrawalClaim(
       'DAI'
@@ -94,15 +85,6 @@ ${
     return this.workflow?.owner.lookup(
       'service:layer1-network'
     ) as Layer1Network;
-  }
-
-  @task *waitUntilTask(
-    predicate: () => boolean,
-    delayMs = 1000
-  ): TaskGenerator<void> {
-    while (!predicate()) {
-      yield rawTimeout(delayMs);
-    }
   }
 }
 
