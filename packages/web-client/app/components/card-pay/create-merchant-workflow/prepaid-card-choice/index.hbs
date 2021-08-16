@@ -1,9 +1,9 @@
 <ActionCardContainer
-  @header="Merchant Account"
+  @header="Prepaid Card Choice"
   @isComplete={{@isComplete}}
   data-test-layout-customization-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Choose a name and ID for the merchant" />
+  <ActionCardContainer::Section @title="Choose a prepaid card to fund merchant creation" />
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
     data-test-layout-customization
@@ -12,7 +12,7 @@
       <d.ActionButton
         {{on "click" @onComplete}}
       >
-        Save Details
+        Create Merchant
       </d.ActionButton>
     </:default>
   </Boxel::ActionChin>

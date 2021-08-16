@@ -117,6 +117,16 @@ module('Acceptance | create merchant', function (hooks) {
     );
     // TODO verify and interact with merchant customization card memorialized state
 
+    // prepaid-card-choice card
+    post = postableSel(1, 4);
+    await waitFor(post);
+    assert
+      .dom(post)
+      .containsText('Choose a prepaid card to fund merchant creation');
+    await click(
+      `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
+    );
+
     await waitFor(milestoneCompletedSel(1));
     assert.dom(milestoneCompletedSel(1)).containsText('Merchant created');
 
