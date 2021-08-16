@@ -32,10 +32,10 @@ import {
   BridgeValidationResult,
   DepotSafe,
   Safe,
-  IExchangeRate,
   IHubAuth,
   ISafes,
   PrepaidCardSafe,
+  ILayerTwoOracle,
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
@@ -63,7 +63,7 @@ export default abstract class Layer2ChainWeb3Strategy
   defaultTokenSymbol: ConvertibleSymbol = 'DAI';
   defaultTokenContractAddress?: string;
   web3!: Web3;
-  #exchangeRateApi!: IExchangeRate;
+  #layerTwoOracleApi!: ILayerTwoOracle;
   #safesApi!: ISafes;
   #hubAuthApi!: IHubAuth;
   #broadcastChannel: TypedChannel<Layer2ConnectEvent>;
@@ -155,7 +155,7 @@ export default abstract class Layer2ChainWeb3Strategy
       try {
         // try to initialize things safely
         // one expected failure is if we connect to a chain which we don't have an rpc url for
-        this.#exchangeRateApi = await getSDK('ExchangeRate', this.web3);
+        this.#layerTwoOracleApi = await getSDK('LayerTwoOracle', this.web3);
         this.#safesApi = await getSDK('Safes', this.web3);
         this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
         await this.updateWalletInfo(accounts, this.chainId);
@@ -283,7 +283,7 @@ export default abstract class Layer2ChainWeb3Strategy
       Promise<ConversionFunction>
     >;
     for (let symbol of symbolsToUpdate) {
-      promisesHash[symbol] = this.#exchangeRateApi.getUSDConverter(symbol);
+      promisesHash[symbol] = this.#layerTwoOracleApi.getUSDConverter(symbol);
     }
     return hash(promisesHash);
   }
@@ -393,7 +393,7 @@ export default abstract class Layer2ChainWeb3Strategy
       return '0';
     }
 
-    return await this.#exchangeRateApi.convertFromSpend(address, amount);
+    return await this.#layerTwoOracleApi.convertFromSpend(address, amount);
   }
 
   async authenticate(): Promise<string> {
