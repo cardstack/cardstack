@@ -88,6 +88,11 @@ class CreateMerchantWorkflow extends Workflow {
           componentName:
             'card-pay/create-merchant-workflow/merchant-customization',
         }),
+        new WorkflowCard({
+          author: cardbot,
+          componentName:
+            'card-pay/create-merchant-workflow/prepaid-card-choice',
+        }),
       ],
       completedDetail: 'Merchant created',
     }),
