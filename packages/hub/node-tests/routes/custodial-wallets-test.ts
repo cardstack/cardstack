@@ -2,7 +2,9 @@ import { Server } from 'http';
 import supertest, { Test } from 'supertest';
 import { bootServerForTesting } from '../../main';
 import { Registry } from '../../di/dependency-injection';
+import Web3 from 'web3';
 
+const { toChecksumAddress } = Web3.utils;
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
 let stubTimestamp = process.hrtime.bigint();
@@ -53,7 +55,7 @@ function handleValidateAuthToken(encryptedString: string) {
 
 function handleCreateWyreWallet(address: string) {
   wyreCreateCallCount++;
-  expect(address).to.equal(stubUserAddress1.toLowerCase());
+  expect(address).to.equal(stubUserAddress1);
   return {
     status: null,
     callbackUrl: null,
@@ -74,7 +76,7 @@ function handleCreateWyreWallet(address: string) {
 }
 
 function handleGetWyreWalletByName(address: string) {
-  if (address === stubUserAddress2.toLowerCase()) {
+  if (address === stubUserAddress2) {
     return {
       status: null,
       callbackUrl: null,
@@ -126,10 +128,10 @@ describe('GET /api/custodial-wallet', function () {
       .expect({
         data: {
           type: 'custodial-wallets',
-          id: stubUserAddress1.toLowerCase(),
+          id: stubUserAddress1,
           attributes: {
             'wyre-wallet-id': stubWyreWalletId1,
-            'deposit-address': stubDepositAddress1,
+            'deposit-address': toChecksumAddress(stubDepositAddress1),
           },
         },
       })
@@ -148,10 +150,10 @@ describe('GET /api/custodial-wallet', function () {
       .expect({
         data: {
           type: 'custodial-wallets',
-          id: stubUserAddress2.toLowerCase(),
+          id: stubUserAddress2,
           attributes: {
             'wyre-wallet-id': stubWyreWalletId2,
-            'deposit-address': stubDepositAddress2,
+            'deposit-address': toChecksumAddress(stubDepositAddress2),
           },
         },
       })

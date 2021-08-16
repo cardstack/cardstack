@@ -31,7 +31,7 @@
     "accountId": null,
     "apiKey": null,
     "secretKey": null,
-    "callbackUrl": "http://localhost:3000/api/wyre-callback",
+    "callbackUrl": "https://hookb.in/r1WOE90pYLsqk2XXkEwr",
     "url": "https://api.testwyre.com"
   }
 }
