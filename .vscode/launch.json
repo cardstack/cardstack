@@ -24,6 +24,7 @@
       "name": "Node tests",
       "program": "${workspaceRoot}/node_modules/.bin/_mocha",
       "cwd": "${workspaceRoot}/packages/hub",
+      "console": "integratedTerminal",
       "env": {
         "PACKAGE": "hub",
         "NODE_ENV": "test"
