@@ -18,7 +18,7 @@ import {
   payMerchant,
   gasFee,
 } from './prepaid-card.js';
-import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
+import { usdPrice, ethPrice, priceOracleUpdatedAt } from './layer-two-oracle';
 import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
 import { rewardTokenBalances } from './reward-pool.js';
 import { hubAuth } from './hub-auth';
