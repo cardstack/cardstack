@@ -53,6 +53,10 @@ To redo the last migration (i.e. down + up):
 
 Documentation on how to create migration scripts is available at https://salsita.github.io/node-pg-migrate/#/migrations
 
+After you have completed running your new DB migration script create a pg_dump of the DB in the `config/structure.sql` file using:
+
+`yarn db:structure:dump`
+
 ## Loading database seed data
 
 `yarn db:seed`
