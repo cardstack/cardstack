@@ -9,9 +9,10 @@ import { Emitter, SimpleEmitter } from '../events';
 import { WalletProviderId } from '../wallet-providers';
 import { action } from '@ember/object';
 import { getConstantByNetwork, networkIds } from '@cardstack/cardpay-sdk';
-import { NetworkSymbol } from './types';
+import { Layer1NetworkSymbol } from './types';
 import Web3 from 'web3';
 import { TypedChannel } from '../typed-channel';
+import { MockLocalStorage } from '../browser-mocks';
 
 const GET_PROVIDER_STORAGE_KEY = (chainId: number) =>
   `cardstack-chain-${chainId}-provider`;
@@ -19,7 +20,7 @@ const WALLET_CONNECT_BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 interface ConnectionManagerOptions {
   chainId: number;
-  networkSymbol: NetworkSymbol;
+  networkSymbol: Layer1NetworkSymbol;
 }
 
 type ConnectionManagerWalletEvent =
@@ -49,6 +50,14 @@ interface Layer1DisconnectEvent {
 }
 type Layer1ConnectionEvent = Layer1ConnectEvent | Layer1DisconnectEvent;
 
+export interface ConnectionManagerStrategyFactory {
+  createStrategy(
+    chainId: number,
+    networkSymbol: Layer1NetworkSymbol,
+    providerId: WalletProviderId
+  ): ConnectionStrategy;
+}
+
 /**
  * # ConnectionManager
  * This class simplifies the interface to communicate with wallet providers (MetaMask or WalletConnect).
@@ -67,13 +76,21 @@ type Layer1ConnectionEvent = Layer1ConnectEvent | Layer1DisconnectEvent;
  * This class does not, at the moment, store any state used directly by the UI besides providerId.
  */
 export class ConnectionManager {
-  private strategy: ConnectionStrategy | undefined;
-  private broadcastChannel: TypedChannel<Layer1ConnectionEvent>;
+  static storage =
+    config.environment === 'test'
+      ? new MockLocalStorage()
+      : window.localStorage;
+
+  broadcastChannel: TypedChannel<Layer1ConnectionEvent>;
+  strategy: ConnectionStrategy | undefined;
   chainId: number;
-  networkSymbol: NetworkSymbol;
+  networkSymbol: Layer1NetworkSymbol;
   simpleEmitter = new SimpleEmitter();
 
-  constructor(networkSymbol: NetworkSymbol) {
+  constructor(
+    networkSymbol: Layer1NetworkSymbol,
+    readonly strategyFactory = new ConcreteStrategyFactory()
+  ) {
     this.networkSymbol = networkSymbol;
     this.chainId = networkIds[networkSymbol];
 
@@ -89,15 +106,18 @@ export class ConnectionManager {
   }
 
   static getProviderIdForChain(chainId: number) {
-    return window.localStorage.getItem(GET_PROVIDER_STORAGE_KEY(chainId));
+    return ConnectionManager.storage.getItem(GET_PROVIDER_STORAGE_KEY(chainId));
   }
 
   static removeProviderFromStorage(chainId: number) {
-    window.localStorage.removeItem(GET_PROVIDER_STORAGE_KEY(chainId));
+    ConnectionManager.storage.removeItem(GET_PROVIDER_STORAGE_KEY(chainId));
   }
 
   static addProviderToStorage(chainId: number, providerId: WalletProviderId) {
-    window.localStorage.setItem(GET_PROVIDER_STORAGE_KEY(chainId), providerId);
+    ConnectionManager.storage.setItem(
+      GET_PROVIDER_STORAGE_KEY(chainId),
+      providerId
+    );
   }
 
   get provider() {
@@ -108,29 +128,17 @@ export class ConnectionManager {
     return this.strategy?.providerId;
   }
 
-  createStrategy(providerId: WalletProviderId) {
-    if (providerId === 'metamask') {
-      return new MetaMaskConnectionStrategy({
-        chainId: this.chainId,
-        networkSymbol: this.networkSymbol,
-      });
-    } else if (providerId === 'wallet-connect') {
-      return new WalletConnectConnectionStrategy({
-        chainId: this.chainId,
-        networkSymbol: this.networkSymbol,
-      });
-    } else {
-      throw new Error(`Unrecognised id for connection manager: ${providerId}`);
-    }
-  }
-
   reset() {
     this.strategy?.destroy();
     this.strategy = undefined;
   }
 
   private async setup(providerId: WalletProviderId, session?: any) {
-    this.strategy = this.createStrategy(providerId);
+    this.strategy = this.strategyFactory.createStrategy(
+      this.chainId,
+      this.networkSymbol,
+      providerId
+    );
     this.strategy.on('connected', this.onConnect);
     this.strategy.on('disconnected', this.onDisconnect);
     this.strategy.on('chain-changed', this.onChainChanged);
@@ -202,7 +210,29 @@ export class ConnectionManager {
   }
 }
 
-abstract class ConnectionStrategy
+class ConcreteStrategyFactory implements ConnectionManagerStrategyFactory {
+  createStrategy(
+    chainId: number,
+    networkSymbol: Layer1NetworkSymbol,
+    providerId: WalletProviderId
+  ) {
+    if (providerId === 'metamask') {
+      return new MetaMaskConnectionStrategy({
+        chainId,
+        networkSymbol,
+      });
+    } else if (providerId === 'wallet-connect') {
+      return new WalletConnectConnectionStrategy({
+        chainId,
+        networkSymbol,
+      });
+    } else {
+      throw new Error(`Unrecognised wallet provider id: ${providerId}`);
+    }
+  }
+}
+
+export abstract class ConnectionStrategy
   implements Emitter<ConnectionManagerWalletEvent> {
   private simpleEmitter: SimpleEmitter;
 
@@ -218,7 +248,7 @@ abstract class ConnectionStrategy
   destroy() {}
 
   // networkSymbol and chainId are initialized in the constructor
-  networkSymbol: NetworkSymbol;
+  networkSymbol: Layer1NetworkSymbol;
   chainId: number;
 
   // this is initialized in the `setup` method of concrete classes

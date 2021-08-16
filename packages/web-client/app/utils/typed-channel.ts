@@ -1,10 +1,17 @@
+import config from '../config/environment';
+import { MockBroadcastChannel } from './browser-mocks';
+
 export class TypedChannel<MessageType = any> {
   channelName: string;
-  private broadcastChannel: BroadcastChannel;
+  broadcastChannel: BroadcastChannel | MockBroadcastChannel;
 
   constructor(channelName: string) {
     this.channelName = channelName;
-    this.broadcastChannel = new BroadcastChannel(channelName);
+    if (config.environment === 'test') {
+      this.broadcastChannel = new MockBroadcastChannel(channelName);
+    } else {
+      this.broadcastChannel = new BroadcastChannel(channelName);
+    }
   }
 
   addEventListener(
@@ -27,5 +34,10 @@ export class TypedChannel<MessageType = any> {
 
   postMessage(message: MessageType) {
     this.broadcastChannel.postMessage(message);
+  }
+
+  test__simulateMessageEvent(data: any) {
+    if (this.broadcastChannel instanceof MockBroadcastChannel)
+      this.broadcastChannel.test__simulateMessageEvent(data);
   }
 }
