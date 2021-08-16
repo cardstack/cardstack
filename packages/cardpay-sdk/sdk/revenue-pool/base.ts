@@ -195,10 +195,10 @@ export default class RevenuePool {
     );
 
     let rateChanged = false;
-    let exchange = await getSDK('ExchangeRate', this.layer2Web3);
+    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let gnosisResult: GnosisExecTx | undefined;
     do {
-      let rateLock = await exchange.getRateLock(issuingToken);
+      let rateLock = await layerTwoOracle.getRateLock(issuingToken);
       try {
         let payload = await this.getRegisterMerchantPayload(prepaidCardAddress, registrationFee, rateLock, infoDID);
         if (nonce == null) {
