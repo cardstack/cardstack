@@ -22,12 +22,16 @@ export default class NetworkAwareWorkflowCard extends WorkflowCard {
     super(options);
   }
 
-  get hasLayer1Account() {
+  get layer1Network() {
     let postable = this as WorkflowPostable;
     let layer1Network = postable.workflow?.owner.lookup(
       'service:layer1-network'
     ) as Layer1Network;
-    return layer1Network.isConnected;
+    return layer1Network;
+  }
+
+  get hasLayer1Account() {
+    return this.layer1Network.isConnected;
   }
 
   get hasLayer2Account() {

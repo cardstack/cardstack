@@ -136,6 +136,15 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     });
   }
 
+  async getEstimatedGasForWithdrawalClaim(_tokenAddress: string): Promise<BN> {
+    // per Hassan, eventually this will be a token address specific amount, hence the for-now unused arg
+    let withdrawalGasLimit = new BN('290000');
+    let gasPrice = await this.layer1Web3.eth.getGasPrice();
+    let estimatedGasInWei = withdrawalGasLimit.mul(new BN(gasPrice));
+    let rounder = new BN(1e12);
+    return estimatedGasInWei.divRound(rounder).mul(rounder);
+  }
+
   async claimBridgedTokens(
     messageId: string,
     encodedData: string,

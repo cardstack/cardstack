@@ -105,6 +105,7 @@
   --boxel-cyan: #00ebe5;
   --boxel-teal: #03c4bf;
   --boxel-green: #37eb77;
+  --boxel-dark-green: #00ac3d;
   --boxel-lime: #c3fc33;
   --boxel-yellow: #ffd800;
   --boxel-orange: #ff7f00;
@@ -116,6 +117,7 @@
   --boxel-warning-100: var(--boxel-yellow); /* warning - notification */
   --boxel-success-100: var(--boxel-green);
   --boxel-success-200: var(--boxel-teal);
+  --boxel-success-300: var(--boxel-dark-green);
 
   /* z-index layers */
   --boxel-layer-modal-default: 15;

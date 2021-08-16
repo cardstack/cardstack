@@ -5,6 +5,8 @@
   --name-line-height: calc(22 / 16);
   --balance-font-size: var(--boxel-font-size);
   --balance-line-height: calc(22 / 16);
+  --large-text-color: var(--boxel-dark);
+  --small-text-color: var(--boxel-purple-500);
 
   display: flex;
   align-items: center;
@@ -51,6 +53,7 @@
   --balance-font-size: 1.25rem;
   --balance-line-height: calc(27 / 20);
 
+  color: var(--large-text-color);
   font-weight: 600;
 }
 
@@ -58,11 +61,11 @@
   --balance-font-size: var(--boxel-font-size-sm);
   --balance-line-height: calc(18 / 13);
 
-  color: var(--boxel-purple-500);
+  color: var(--small-text-color);
 }
 
 .balance-display__text {
-  color: var(--boxel-purple-500);
+  color: var(--small-text-color);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-xs);
 }

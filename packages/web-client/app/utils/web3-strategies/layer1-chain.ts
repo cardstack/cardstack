@@ -55,6 +55,7 @@ export default abstract class Layer1ChainWeb3Strategy
   @tracked walletInfo: WalletInfo;
   @tracked connectedChainId: number | undefined;
   @tracked bridgeConfirmationBlockCount: number;
+  nativeTokenSymbol: string;
 
   constructor(networkSymbol: Layer1NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
@@ -71,6 +72,10 @@ export default abstract class Layer1ChainWeb3Strategy
     this.connectionManager.on(
       'cross-tab-connection',
       this.onCrossTabConnection
+    );
+    this.nativeTokenSymbol = getConstantByNetwork(
+      'nativeTokenSymbol',
+      this.networkSymbol
     );
     taskFor(this.initializeTask).perform();
   }
@@ -114,7 +119,7 @@ export default abstract class Layer1ChainWeb3Strategy
 
   @action
   async onConnect(accounts: string[]) {
-    this.updateWalletInfo(accounts, this.chainId);
+    await this.updateWalletInfo(accounts, this.chainId);
     this.currentProviderId = this.connectionManager?.providerId;
     this.#waitForAccountDeferred.resolve();
   }
@@ -201,10 +206,10 @@ export default abstract class Layer1ChainWeb3Strategy
     return this.simpleEmitter.on(event, cb);
   }
 
-  private updateWalletInfo(accounts: string[], chainId: number) {
+  private async updateWalletInfo(accounts: string[], chainId: number) {
     this.walletInfo = new WalletInfo(accounts, chainId);
     if (accounts.length > 0) {
-      this.refreshBalances();
+      await this.refreshBalances();
     } else {
       this.defaultTokenBalance = undefined;
       this.cardBalance = undefined;
@@ -311,5 +316,16 @@ export default abstract class Layer1ChainWeb3Strategy
       'bridgeExplorer',
       this.networkSymbol
     )}/${txnHash}`;
+  }
+
+  async getEstimatedGasForWithdrawalClaim(
+    symbol: BridgeableSymbol
+  ): Promise<BN> {
+    if (!this.web3)
+      throw new Error('Cannot getEstimatedGasForWithdrawalClaim without web3');
+
+    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
+    let { address } = new TokenContractInfo(symbol, this.networkSymbol);
+    return tokenBridge.getEstimatedGasForWithdrawalClaim(address);
   }
 }

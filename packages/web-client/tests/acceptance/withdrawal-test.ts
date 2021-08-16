@@ -6,6 +6,7 @@ import {
   settled,
   visit,
   waitFor,
+  waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
@@ -74,18 +75,36 @@ module('Acceptance | withdrawal', function (hooks) {
       .containsText(
         `${capitalize(c.layer1.conversationalName)} wallet connected`
       );
+
+    await waitUntil(() =>
+      document
+        .querySelector(postableSel(1, 0))
+        ?.textContent?.includes('It looks like you have enough ETH')
+    );
     assert
       .dom(postableSel(1, 0))
+      .containsText('It looks like you have enough ETH');
+    await waitFor(postableSel(1, 1));
+    assert
+      .dom(postableSel(1, 1))
+      .containsText(`Sufficient funds for claiming withdrawn tokens`);
+    assert.dom(milestoneCompletedSel(1)).containsText(`ETH balance checked`);
+
+    await waitFor(postableSel(2, 0));
+    assert
+      .dom(postableSel(2, 0))
       .containsText(
         `Now it’s time to connect your ${c.layer2.fullName} wallet via your Card Wallet mobile app`
       );
+    await waitFor(postableSel(2, 1));
     assert
-      .dom(postableSel(1, 1))
+      .dom(postableSel(2, 1))
       .containsText(
         'Once you have installed the app, open the app and add an existing wallet/account'
       );
+    await waitFor(postableSel(2, 2));
     assert
-      .dom(`${postableSel(1, 2)} [data-test-wallet-connect-loading-qr-code]`)
+      .dom(`${postableSel(2, 2)} [data-test-wallet-connect-loading-qr-code]`)
       .exists();
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
@@ -119,9 +138,9 @@ module('Acceptance | withdrawal', function (hooks) {
     };
     layer2Service.test__simulateDepot(testDepot as DepotSafe);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    await waitFor(`${postableSel(1, 2)} [data-test-balance-container]`);
+    await waitFor(`${postableSel(2, 2)} [data-test-balance-container]`);
     assert
-      .dom(`${postableSel(1, 2)} [data-test-balance="DAI.CPXD"]`)
+      .dom(`${postableSel(2, 2)} [data-test-balance="DAI.CPXD"]`)
       .containsText('250.00 DAI.CPXD');
     assert
       .dom(
@@ -130,12 +149,12 @@ module('Acceptance | withdrawal', function (hooks) {
       .hasText('0x1826...6E44');
     await settled();
     assert
-      .dom(milestoneCompletedSel(1))
+      .dom(milestoneCompletedSel(2))
       .containsText(`${c.layer2.fullName} wallet connected`);
     assert
-      .dom(postableSel(2, 0))
+      .dom(postableSel(3, 0))
       .containsText(`Please choose the asset you would like to withdraw`);
-    post = postableSel(2, 1);
+    post = postableSel(3, 1);
     // // choose-balance card
     await waitFor(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`);
     assert
@@ -168,11 +187,11 @@ module('Acceptance | withdrawal', function (hooks) {
     assert.dom('[data-test-choose-balance-footnote]').containsText('gas fee');
 
     // // transaction-amount card
-    await waitFor(postableSel(2, 2));
+    await waitFor(postableSel(3, 2));
     assert
-      .dom(postableSel(2, 2))
+      .dom(postableSel(3, 2))
       .containsText('How much would you like to withdraw from your balance?');
-    post = postableSel(2, 3);
+    post = postableSel(3, 3);
 
     assert
       .dom(
@@ -215,31 +234,31 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom('[data-test-withdrawal-transaction-amount]')
       .containsText('Confirmed');
     assert
-      .dom(milestoneCompletedSel(2))
+      .dom(milestoneCompletedSel(3))
       .containsText(`Withdrawn from ${c.layer2.fullName}`);
 
     // // transaction-status step card
     assert
-      .dom(postableSel(3, 0))
+      .dom(postableSel(4, 0))
       .containsText(
         `withdrawn funds from the ${c.layer2.fullName}, your tokens will be bridged to ${c.layer1.fullName}`
       );
-    await waitFor(postableSel(3, 1));
+    await waitFor(postableSel(4, 1));
     layer2Service.test__simulateBridgedToLayer1();
     await settled();
     assert
-      .dom(milestoneCompletedSel(3))
+      .dom(milestoneCompletedSel(4))
       .containsText(`Tokens bridged to ${c.layer1.fullName}`);
 
     // // token claim step card
     assert
-      .dom(postableSel(4, 0))
+      .dom(postableSel(5, 0))
       .containsText(
         `You will have to pay ${c.layer1.conversationalName} gas fee`
       );
 
-    await waitFor(postableSel(4, 1));
-    post = postableSel(4, 1);
+    await waitFor(postableSel(5, 1));
+    post = postableSel(5, 1);
     await click(`${post} [data-test-boxel-button]`);
     assert
       .dom(`${post} [data-test-boxel-action-chin]`)
@@ -248,7 +267,7 @@ module('Acceptance | withdrawal', function (hooks) {
     layer1Service.test__simulateBridgedTokensClaimed('example-message-id');
     await waitFor('[data-test-withdrawal-token-claim-is-complete]');
     assert
-      .dom(milestoneCompletedSel(4))
+      .dom(milestoneCompletedSel(5))
       .containsText(`Tokens claimed on ${c.layer1.conversationalName}`);
 
     // // transaction-summary card
@@ -309,6 +328,56 @@ module('Acceptance | withdrawal', function (hooks) {
     assert.dom('[data-test-workflow-thread]').doesNotExist();
   });
 
+  test('Initiating workflow without enough ETH to claim', async function (assert) {
+    await visit('/card-pay/token-suppliers');
+    assert.equal(currentURL(), '/card-pay/token-suppliers');
+    await click('[data-test-workflow-button="withdrawal"]');
+    let post = postableSel(0, 2);
+    await click(`${post} [data-test-wallet-option="metamask"]`);
+    await click(
+      `${post} [data-test-mainnnet-connection-action-container] [data-test-boxel-button]`
+    );
+    assert.dom(post).containsText(`Connect your ${c.layer1.fullName} wallet`);
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
+    layer1Service.test__simulateBalances({
+      defaultToken: new BN('1100000000000000'),
+      dai: new BN('150500000000000000000'),
+      card: new BN('10000000000000000000000'),
+    });
+    await waitFor(`${post} [data-test-balance="ETH"]`);
+    await waitFor(milestoneCompletedSel(0));
+    assert.dom(milestoneCompletedSel(0));
+
+    await waitUntil(() => {
+      return document
+        .querySelector(postableSel(1, 0))
+        ?.textContent?.includes('You will need to deposit more');
+    });
+    assert
+      .dom(postableSel(1, 0))
+      .containsText('You will need to deposit more ETH to your account');
+    await waitFor(postableSel(1, 1));
+    assert
+      .dom(postableSel(1, 1))
+      .containsText(`Insufficient funds for claiming withdrawn tokens`);
+    assert.dom(milestoneCompletedSel(1)).doesNotExist();
+
+    layer1Service.test__simulateBalances({
+      defaultToken: new BN('21100000000000000'),
+    });
+    await waitFor(milestoneCompletedSel(1));
+    assert
+      .dom(postableSel(1, 1))
+      .containsText(`Sufficient funds for claiming withdrawn tokens`);
+    assert.dom(milestoneCompletedSel(1)).containsText(`ETH balance checked`);
+  });
+
   module('Tests with the layer 1 wallet already connected', function (hooks) {
     let layer1Service: Layer1TestWeb3Strategy;
     let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
@@ -320,6 +389,11 @@ module('Acceptance | withdrawal', function (hooks) {
         [layer1AccountAddress],
         'metamask'
       );
+      layer1Service.test__simulateBalances({
+        defaultToken: new BN('2141100000000000000'),
+        dai: new BN('150500000000000000000'),
+        card: new BN('10000000000000000000000'),
+      });
     });
 
     test('Initiating workflow with layer 1 wallet already connected', async function (assert) {
@@ -334,14 +408,30 @@ module('Acceptance | withdrawal', function (hooks) {
       assert
         .dom('[data-test-layer-1-wallet-summary]')
         .containsText(layer1AccountAddress);
+      await waitFor(milestoneCompletedSel(0));
       assert
         .dom(milestoneCompletedSel(0))
         .containsText(`${c.layer1.fullName} wallet connected`);
+      await waitUntil(() =>
+        document
+          .querySelector(postableSel(1, 0))
+          ?.textContent?.includes('It looks like you have enough ETH')
+      );
       assert
         .dom(postableSel(1, 0))
+        .containsText('It looks like you have enough ETH');
+      await waitFor(postableSel(1, 1));
+      assert
+        .dom(postableSel(1, 1))
+        .containsText(`Sufficient funds for claiming withdrawn tokens`);
+      assert.dom(milestoneCompletedSel(1)).containsText(`ETH balance checked`);
+      await waitFor(postableSel(2, 0));
+      assert
+        .dom(postableSel(2, 0))
         .containsText(
           `You have connected your ${c.layer1.fullName} wallet. Now it’s time to connect your ${c.layer2.fullName} wallet`
         );
+      await waitFor('[data-test-layer-2-wallet-card]');
       assert.dom('[data-test-layer-2-wallet-card]').exists();
     });
 
@@ -398,6 +488,11 @@ module('Acceptance | withdrawal', function (hooks) {
         [layer1AccountAddress],
         'metamask'
       );
+      layer1Service.test__simulateBalances({
+        defaultToken: new BN('2141100000000000000'),
+        dai: new BN('150500000000000000000'),
+        card: new BN('10000000000000000000000'),
+      });
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -414,12 +509,12 @@ module('Acceptance | withdrawal', function (hooks) {
         .dom(milestoneCompletedSel(0))
         .containsText(`${c.layer1.fullName} wallet connected`);
       assert
-        .dom(postableSel(1, 0))
+        .dom(postableSel(2, 0))
         .containsText(
           `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
         );
       assert
-        .dom(milestoneCompletedSel(1))
+        .dom(milestoneCompletedSel(2))
         .containsText(`${c.layer2.fullName} wallet connected`);
       assert.dom('[data-test-postable="0"][data-test-milestone="2"]').exists();
     });
@@ -432,7 +527,7 @@ module('Acceptance | withdrawal', function (hooks) {
         .dom(milestoneCompletedSel(0))
         .containsText(`${c.layer1.fullName} wallet connected`);
       assert
-        .dom(milestoneCompletedSel(1))
+        .dom(milestoneCompletedSel(2))
         .containsText(`${c.layer2.fullName} wallet connected`);
 
       layer2Service.test__simulateDisconnectFromWallet();
