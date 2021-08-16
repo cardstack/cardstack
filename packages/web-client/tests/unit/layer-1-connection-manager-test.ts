@@ -162,9 +162,6 @@ module('Unit | layer 1 connection manager', function (hooks) {
       setProvider: () => {},
     };
 
-    let onDisconnect = Sinon.spy();
-    connectionManager.on('disconnected', onDisconnect);
-
     await connectionManager.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
     connectionManager.onConnect(['some-account']);
 
@@ -180,9 +177,6 @@ module('Unit | layer 1 connection manager', function (hooks) {
     let web3 = {
       setProvider: () => {},
     };
-
-    let onDisconnect = Sinon.spy();
-    connectionManager.on('disconnected', onDisconnect);
 
     await connectionManager.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
     connectionManager.onConnect(['some-account']);
