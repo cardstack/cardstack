@@ -106,7 +106,7 @@
         <div>
           {{this.chinInProgressMessage}}
           {{#if this.enableCancelation}}
-            <a href="#" class="preview__cancel-button" data-test-issue-prepaid-card-cancel-button {{on 'click' (queue (prevent-default) this.retryIssuePrepaidCard)}}>Cancel</a>
+            <a href="#" class="preview__cancel-button" data-test-issue-prepaid-card-cancel-button {{on 'click' (queue (prevent-default) this.cancel)}}>Cancel</a>
           {{/if}}
         </div>
       </i.ActionStatusArea>

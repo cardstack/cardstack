@@ -49,7 +49,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
       .catch((e) => console.error(e));
   }
 
-  @action retryIssuePrepaidCard() {
+  @action cancel() {
     taskFor(this.issueTask).cancelAll();
   }
 
