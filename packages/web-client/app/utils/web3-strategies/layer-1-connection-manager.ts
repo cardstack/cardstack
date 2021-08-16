@@ -50,6 +50,14 @@ interface Layer1DisconnectEvent {
 }
 type Layer1ConnectionEvent = Layer1ConnectEvent | Layer1DisconnectEvent;
 
+export interface ConnectionManagerStrategyFactory {
+  createStrategy(
+    chainId: number,
+    networkSymbol: Layer1NetworkSymbol,
+    providerId: WalletProviderId
+  ): ConnectionStrategy;
+}
+
 /**
  * # ConnectionManager
  * This class simplifies the interface to communicate with wallet providers (MetaMask or WalletConnect).
@@ -79,7 +87,10 @@ export class ConnectionManager {
   networkSymbol: Layer1NetworkSymbol;
   simpleEmitter = new SimpleEmitter();
 
-  constructor(networkSymbol: Layer1NetworkSymbol) {
+  constructor(
+    networkSymbol: Layer1NetworkSymbol,
+    readonly strategyFactory = new ConcreteStrategyFactory()
+  ) {
     this.networkSymbol = networkSymbol;
     this.chainId = networkIds[networkSymbol];
 
@@ -117,34 +128,17 @@ export class ConnectionManager {
     return this.strategy?.providerId;
   }
 
-  createStrategy(providerId: WalletProviderId) {
-    if (config.environment == 'test') {
-      return new TestConnectionStrategy({
-        chainId: this.chainId,
-        networkSymbol: this.networkSymbol,
-      });
-    } else if (providerId === 'metamask') {
-      return new MetaMaskConnectionStrategy({
-        chainId: this.chainId,
-        networkSymbol: this.networkSymbol,
-      });
-    } else if (providerId === 'wallet-connect') {
-      return new WalletConnectConnectionStrategy({
-        chainId: this.chainId,
-        networkSymbol: this.networkSymbol,
-      });
-    } else {
-      throw new Error(`Unrecognised id for connection manager: ${providerId}`);
-    }
-  }
-
   reset() {
     this.strategy?.destroy();
     this.strategy = undefined;
   }
 
   private async setup(providerId: WalletProviderId, session?: any) {
-    this.strategy = this.createStrategy(providerId);
+    this.strategy = this.strategyFactory.createStrategy(
+      this.chainId,
+      this.networkSymbol,
+      providerId
+    );
     this.strategy.on('connected', this.onConnect);
     this.strategy.on('disconnected', this.onDisconnect);
     this.strategy.on('chain-changed', this.onChainChanged);
@@ -216,7 +210,29 @@ export class ConnectionManager {
   }
 }
 
-abstract class ConnectionStrategy
+class ConcreteStrategyFactory implements ConnectionManagerStrategyFactory {
+  createStrategy(
+    chainId: number,
+    networkSymbol: Layer1NetworkSymbol,
+    providerId: WalletProviderId
+  ) {
+    if (providerId === 'metamask') {
+      return new MetaMaskConnectionStrategy({
+        chainId,
+        networkSymbol,
+      });
+    } else if (providerId === 'wallet-connect') {
+      return new WalletConnectConnectionStrategy({
+        chainId,
+        networkSymbol,
+      });
+    } else {
+      throw new Error(`Unrecognised wallet provider id: ${providerId}`);
+    }
+  }
+}
+
+export abstract class ConnectionStrategy
   implements Emitter<ConnectionManagerWalletEvent> {
   private simpleEmitter: SimpleEmitter;
 
@@ -452,16 +468,4 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
     // valid session from localStorage
     return await this.provider.enable();
   }
-}
-
-class TestConnectionStrategy extends ConnectionStrategy {
-  providerId: WalletProviderId = 'metamask'; // does not actually follow the metamask connection strategy behaviour, but we need a valid wallet provider here for the sake of the ui
-
-  async setup(_session?: any) {
-    // set an arbitrary non-nullish value for purposes of the tests
-    this.provider = 'PROVIDER';
-  }
-  async reconnect() {}
-  async connect() {}
-  async disconnect() {}
 }
