@@ -401,9 +401,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert
       .dom(`${post} [data-test-boxel-action-chin-action-status-area]`)
-      .containsText(
-        'You will receive a confirmation request from the Card Wallet app in a few moments…'
-      );
+      .containsText('Preparing to create your custom prepaid card…');
 
     await timeout(250);
 

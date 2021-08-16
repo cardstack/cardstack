@@ -46,3 +46,8 @@
   flex-grow: 0;
   flex-shrink: 0;
 }
+
+.preview__cancel-button {
+  display: inline;
+  text-decoration: underline;
+}

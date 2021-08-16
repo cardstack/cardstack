@@ -29,6 +29,8 @@ import { task, TaskGenerator } from 'ember-concurrency';
 interface IssuePrepaidCardRequest {
   deferred: RSVP.Deferred<PrepaidCardSafe>;
   onTxHash?: (txHash: TransactionHash) => void;
+  onNonce?: (nonce: string) => void;
+  nonce?: string;
   customizationDID: string;
 }
 
@@ -181,6 +183,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.issuePrepaidCardRequests.set(faceValue, {
       deferred,
       onTxHash: options.onTxHash,
+      onNonce: options.onNonce,
+      nonce: options.nonce,
       customizationDID,
     });
     return deferred.promise;
@@ -244,6 +248,21 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     } else {
       return '0';
     }
+  }
+
+  test__getNonceForIssuePrepaidCardRequest(
+    faceValue: number
+  ): string | undefined {
+    let request = this.issuePrepaidCardRequests.get(faceValue);
+    return request?.nonce;
+  }
+
+  test__simulateOnNonceForIssuePrepaidCardRequest(
+    faceValue: number,
+    nonce: string
+  ): void {
+    let request = this.issuePrepaidCardRequests.get(faceValue);
+    request?.onNonce?.(nonce);
   }
 
   test__simulateIssuePrepaidCardForAmount(

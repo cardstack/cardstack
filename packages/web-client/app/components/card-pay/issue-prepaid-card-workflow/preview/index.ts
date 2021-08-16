@@ -3,7 +3,13 @@ import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
-import { task, TaskGenerator } from 'ember-concurrency';
+import {
+  task,
+  TaskGenerator,
+  rawTimeout,
+  waitForProperty,
+  race,
+} from 'ember-concurrency';
 import CardCustomization, {
   PrepaidCardCustomization,
 } from '@cardstack/web-client/services/card-customization';
@@ -12,6 +18,8 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-rejection-error';
+import { IssuePrepaidCardOptions } from '../../../../utils/web3-strategies/types';
+import config from '../../../../config/environment';
 
 // http://ember-concurrency.com/docs/typescript
 // infer whether we should treat the return of a yield statement as a promise
@@ -23,10 +31,13 @@ interface CardPayPrepaidCardWorkflowPreviewComponentArgs {
   isComplete: boolean;
 }
 
+const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
+
 export default class CardPayPrepaidCardWorkflowPreviewComponent extends Component<CardPayPrepaidCardWorkflowPreviewComponentArgs> {
   @service declare cardCustomization: CardCustomization;
   @service declare layer2Network: Layer2Network;
   @tracked txHash?: TransactionHash;
+  @tracked chinInProgressMessage?: string;
 
   @reads('args.workflowSession.state.spendFaceValue')
   declare faceValue: number;
@@ -38,9 +49,26 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
       .catch((e) => console.error(e));
   }
 
+  @action cancel() {
+    taskFor(this.issueTask).cancelAll();
+  }
+
+  @tracked issueTaskRunningForAWhile = false;
+  get enableCancelation() {
+    return (
+      taskFor(this.issueTask).isRunning &&
+      this.issueTaskRunningForAWhile &&
+      !this.txHash
+    );
+  }
+
+  lastNonce?: string;
+
   @task *issueTask(): TaskGenerator<void> {
     let { workflowSession } = this.args;
     try {
+      this.chinInProgressMessage =
+        'Preparing to create your custom prepaid card…';
       // yield statements require manual typing
       // https://github.com/machty/ember-concurrency/pull/357#discussion_r434850096
       let customization: Resolved<PrepaidCardCustomization> = yield taskFor(
@@ -51,13 +79,30 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
         patternId: workflowSession.state.pattern.id,
       });
 
-      let prepaidCardSafe = yield taskFor(
-        this.layer2Network.issuePrepaidCard
-      ).perform(this.faceValue, customization.did, {
+      this.chinInProgressMessage =
+        'You will receive a confirmation request from the Card Wallet app in a few moments…';
+      let options: IssuePrepaidCardOptions = {
         onTxHash: (txHash: TransactionHash) => {
           this.txHash = txHash;
+          this.chinInProgressMessage =
+            'Waiting for the transaction to be finalized…';
         },
-      });
+      };
+      if (this.lastNonce) {
+        options.nonce = this.lastNonce;
+      } else {
+        options.onNonce = (nonce: string) => {
+          this.lastNonce = nonce;
+        };
+      }
+      let prepaidCardSafeTaskInstance = taskFor(
+        this.layer2Network.issuePrepaidCard
+      ).perform(this.faceValue, customization.did, options);
+      let prepaidCardSafe = yield race([
+        prepaidCardSafeTaskInstance,
+        taskFor(this.timerTask).perform(),
+      ]);
+      this.issueTaskRunningForAWhile = false;
 
       this.args.workflowSession.updateMany({
         prepaidCardAddress: prepaidCardSafe.address,
@@ -87,6 +132,14 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
         throw e;
       }
     }
+    this.issueTaskRunningForAWhile = false;
+  }
+
+  @task *timerTask(): TaskGenerator<void> {
+    this.issueTaskRunningForAWhile = false;
+    yield rawTimeout(A_WHILE);
+    this.issueTaskRunningForAWhile = true;
+    yield waitForProperty(this, 'issueTaskRunningForAWhile', false);
   }
 
   get issueState() {
