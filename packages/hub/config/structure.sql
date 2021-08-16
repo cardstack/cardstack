@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 13.3
--- Dumped by pg_dump version 13.3
+-- Dumped by pg_dump version 13.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -591,6 +591,20 @@ CREATE TABLE graphile_worker.migrations (
 ALTER TABLE graphile_worker.migrations OWNER TO postgres;
 
 --
+-- Name: custodial_wallets; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.custodial_wallets (
+    id text NOT NULL,
+    wyre_wallet_id text NOT NULL,
+    deposit_address text NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.custodial_wallets OWNER TO postgres;
+
+--
 -- Name: merchant_infos; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -741,6 +755,14 @@ ALTER TABLE ONLY graphile_worker.migrations
 
 
 --
+-- Name: custodial_wallets custodial_wallets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.custodial_wallets
+    ADD CONSTRAINT custodial_wallets_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: merchant_infos merchant_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -785,6 +807,13 @@ ALTER TABLE ONLY public.prepaid_card_patterns
 --
 
 CREATE INDEX jobs_priority_run_at_id_locked_at_without_failures_idx ON graphile_worker.jobs USING btree (priority, run_at, id, locked_at) WHERE (attempts < max_attempts);
+
+
+--
+-- Name: custodial_wallets_wyre_wallet_id_unique_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX custodial_wallets_wyre_wallet_id_unique_index ON public.custodial_wallets USING btree (wyre_wallet_id);
 
 
 --
@@ -879,7 +908,7 @@ ALTER TABLE graphile_worker.known_crontabs ENABLE ROW LEVEL SECURITY;
 --
 
 -- Dumped from database version 13.3
--- Dumped by pg_dump version 13.3
+-- Dumped by pg_dump version 13.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -897,14 +926,14 @@ SET row_security = off;
 --
 
 COPY graphile_worker.migrations (id, ts) FROM stdin;
-1	2021-07-29 23:45:29.577801+08
-2	2021-07-29 23:45:29.577801+08
-3	2021-07-29 23:45:29.577801+08
-4	2021-07-29 23:45:29.577801+08
-5	2021-07-29 23:45:29.577801+08
-6	2021-07-29 23:45:29.577801+08
-7	2021-07-29 23:45:29.577801+08
-8	2021-07-29 23:45:29.577801+08
+1	2021-07-29 14:31:17.108453-04
+2	2021-07-29 14:31:17.108453-04
+3	2021-07-29 14:31:17.108453-04
+4	2021-07-29 14:31:17.108453-04
+5	2021-07-29 14:31:17.108453-04
+6	2021-07-29 14:31:17.108453-04
+7	2021-07-29 14:31:17.108453-04
+8	2021-07-29 14:31:17.108453-04
 \.
 
 
@@ -913,11 +942,11 @@ COPY graphile_worker.migrations (id, ts) FROM stdin;
 --
 
 COPY public.pgmigrations (id, name, run_on) FROM stdin;
-1	20210527151505645_create-prepaid-card-tables	2021-07-29 23:45:29.577801
-2	20210614080132698_create-prepaid-card-customizations-table	2021-07-29 23:45:29.577801
-3	20210623052200757_create-graphile-worker-schema	2021-07-29 23:45:29.577801
-4	20210809113449561_merchant-infos	2021-08-09 14:47:15.726385
-5	20210809113449561_merchant-infos	2021-08-12 09:52:27.790806
+1	20210527151505645_create-prepaid-card-tables	2021-07-29 14:31:17.108453
+2	20210614080132698_create-prepaid-card-customizations-table	2021-07-29 14:31:17.108453
+3	20210623052200757_create-graphile-worker-schema	2021-07-29 14:31:17.108453
+4	20210809113449561_merchant-infos	2021-08-13 10:14:04.408554
+14	20210813140554986_create-custodial-wallets	2021-08-13 13:22:31.776909
 \.
 
 
@@ -925,7 +954,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 4, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 14, true);
 
 
 --

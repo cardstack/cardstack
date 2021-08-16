@@ -4,5 +4,8 @@
   },
   "sentry": {
     "enabled": true
+  },
+  "wyre": {
+    "url": "https://api.sendwyre.com"
   }
 }

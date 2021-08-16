@@ -13,6 +13,7 @@ import AuthenticationMiddleware from './services/authentication-middleware';
 import DatabaseManager from './services/database-manager';
 import DevelopmentConfig from './services/development-config';
 import DevelopmentProxyMiddleware from './services/development-proxy-middleware';
+import WyreService from './services/wyre';
 import BoomRoute from './routes/boom';
 import SessionRoute from './routes/session';
 import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
@@ -31,6 +32,7 @@ import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
+import CustodialWalletRoute from './routes/custodial-wallet';
 
 const log = logger('cardstack/hub');
 
@@ -39,6 +41,7 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('authentication-utils', AuthenticationUtils);
   registry.register('clock', Clock);
+  registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
@@ -56,6 +59,7 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('worker-client', WorkerClient);
+  registry.register('wyre', WyreService);
   if (registryCallback) {
     registryCallback(registry);
   }

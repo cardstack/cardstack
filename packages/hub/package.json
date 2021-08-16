@@ -42,6 +42,7 @@
     "koa-proxies": "^0.12.1",
     "lodash": "^4.17.21",
     "mime-match": "^1.0.2",
+    "node-fetch": "^2.6.1",
     "node-pg-migrate": "^5.9.0",
     "pg": "^8.6.0",
     "pg-format": "^1.0.4",

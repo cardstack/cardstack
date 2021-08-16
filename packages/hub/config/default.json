@@ -26,5 +26,12 @@
     "dsn": null,
     "enabled": false,
     "environment": null
+  },
+  "wyre": {
+    "accountId": null,
+    "apiKey": null,
+    "secretKey": null,
+    "callbackUrl": "http://localhost:3000/api/wyre-callback",
+    "url": "https://api.testwyre.com"
   }
 }
