@@ -21,20 +21,20 @@ export default class CustodialWalletRoute {
 
     let userAddress = ctx.state.userAddress.toLowerCase();
     let db = await this.databaseManager.getClient();
-    let result = await db.query('SELECT id, wyre_wallet_id, deposit_address FROM custodial_wallets WHERE id = $1', [
-      userAddress,
-    ]);
+    let result = await db.query(
+      'SELECT user_address, wyre_wallet_id, deposit_address FROM custodial_wallets WHERE user_address = $1',
+      [userAddress]
+    );
     let depositAddress: string, wyreWalletId: string;
     if (result.rows.length === 0) {
       ({
         depositAddresses: { ETH: depositAddress },
         id: wyreWalletId,
       } = await this.wyre.createCustodialWallet(userAddress));
-      await db.query('INSERT INTO custodial_wallets (id, wyre_wallet_id, deposit_address) VALUES ($1, $2, $3)', [
-        userAddress,
-        wyreWalletId,
-        depositAddress,
-      ]);
+      await db.query(
+        'INSERT INTO custodial_wallets (user_address, wyre_wallet_id, deposit_address) VALUES ($1, $2, $3)',
+        [userAddress, wyreWalletId, depositAddress]
+      );
     } else {
       let {
         rows: [row],

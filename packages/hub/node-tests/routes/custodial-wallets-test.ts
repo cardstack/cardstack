@@ -83,11 +83,10 @@ describe('GET /api/custodial-wallet', function () {
     db = await dbManager.getClient();
     await db.query('DELETE FROM custodial_wallets');
     // Add foil test data to assert we never get this result
-    await db.query('INSERT INTO custodial_wallets (id, wyre_wallet_id, deposit_address) VALUES ($1, $2, $3)', [
-      `foil-${stubUserAddress}`.toLowerCase(),
-      `foil-${stubWyreWalletId}`,
-      `foil-${stubDepositAddress}`,
-    ]);
+    await db.query(
+      'INSERT INTO custodial_wallets (user_address, wyre_wallet_id, deposit_address) VALUES ($1, $2, $3)',
+      [`foil-${stubUserAddress}`.toLowerCase(), `foil-${stubWyreWalletId}`, `foil-${stubDepositAddress}`]
+    );
 
     request = supertest(server);
   });
@@ -120,21 +119,22 @@ describe('GET /api/custodial-wallet', function () {
 
     let results = await db.query('SELECT * from custodial_wallets');
     expect(results.rowCount).to.equal(numWallets + 1);
-    results = await db.query('SELECT * from custodial_wallets WHERE id = $1', [stubUserAddress.toLowerCase()]);
+    results = await db.query('SELECT * from custodial_wallets WHERE user_address = $1', [
+      stubUserAddress.toLowerCase(),
+    ]);
     let {
       rows: [row],
     } = results;
-    expect(row.id).to.equal(stubUserAddress.toLowerCase());
+    expect(row.user_address).to.equal(stubUserAddress.toLowerCase());
     expect(row.wyre_wallet_id).to.equal(stubWyreWalletId);
     expect(row.deposit_address).to.equal(stubDepositAddress);
   });
 
   it('gets the custodial wallet for an EOA that has already been assigned a custodial wallet', async function () {
-    await db.query('INSERT INTO custodial_wallets (id, wyre_wallet_id, deposit_address) VALUES ($1, $2, $3)', [
-      stubUserAddress.toLowerCase(),
-      stubWyreWalletId,
-      stubDepositAddress,
-    ]);
+    await db.query(
+      'INSERT INTO custodial_wallets (user_address, wyre_wallet_id, deposit_address) VALUES ($1, $2, $3)',
+      [stubUserAddress.toLowerCase(), stubWyreWalletId, stubDepositAddress]
+    );
     let numWallets = (await db.query('SELECT * from custodial_wallets')).rowCount;
     await request
       .get(`/api/custodial-wallet`)

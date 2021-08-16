@@ -595,7 +595,7 @@ ALTER TABLE graphile_worker.migrations OWNER TO postgres;
 --
 
 CREATE TABLE public.custodial_wallets (
-    id text NOT NULL,
+    user_address text NOT NULL,
     wyre_wallet_id text NOT NULL,
     deposit_address text NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -759,7 +759,7 @@ ALTER TABLE ONLY graphile_worker.migrations
 --
 
 ALTER TABLE ONLY public.custodial_wallets
-    ADD CONSTRAINT custodial_wallets_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT custodial_wallets_pkey PRIMARY KEY (user_address);
 
 
 --
@@ -946,7 +946,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 2	20210614080132698_create-prepaid-card-customizations-table	2021-07-29 14:31:17.108453
 3	20210623052200757_create-graphile-worker-schema	2021-07-29 14:31:17.108453
 4	20210809113449561_merchant-infos	2021-08-13 10:14:04.408554
-14	20210813140554986_create-custodial-wallets	2021-08-13 13:22:31.776909
+15	20210813140554986_create-custodial-wallets	2021-08-16 12:55:12.874072
 \.
 
 
@@ -954,7 +954,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 14, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 15, true);
 
 
 --
