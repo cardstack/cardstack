@@ -103,7 +103,6 @@ export async function updateCard(ctx: RouterContext<any, CardStackContext>) {
 
 export async function deleteCard(ctx: RouterContext<any, CardStackContext>) {
   let {
-    builder,
     realms,
     params: { encodedCardURL: url },
   } = ctx;
@@ -112,7 +111,7 @@ export async function deleteCard(ctx: RouterContext<any, CardStackContext>) {
     throw new NotFound(`Card ${url} does not exist`);
   }
 
-  builder.deleteCard(url);
+  realms.deleteCard(url);
 
   ctx.status = 204;
   ctx.body = null;

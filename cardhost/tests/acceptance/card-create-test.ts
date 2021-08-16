@@ -22,11 +22,11 @@ module('Acceptance | Card Creation', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
   setupCardMocking(hooks);
-  let personURL = 'https://mirage/cards/person';
+  let personURL = PERSON_RAW_CARD.url;
 
-  hooks.beforeEach(function () {
-    this.createCard(ADDRESS_RAW_CARD);
-    this.createCard(
+  hooks.beforeEach(async function () {
+    await this.cardService().createRawCard(ADDRESS_RAW_CARD);
+    await this.cardService().createRawCard(
       Object.assign(
         {
           data: {
@@ -50,7 +50,6 @@ module('Acceptance | Card Creation', function (hooks) {
 
     await click(NEW);
     assert.dom(MODAL).exists('The modal is opened');
-
     await waitFor('[data-test-field-name="name"]');
     await fillIn('[data-test-field-name="name"]', 'Bob Barker');
     await fillIn('[data-test-field-name="city"]', 'San Francisco');

@@ -10,6 +10,7 @@ import {
   getBasenameAndExtension,
 } from '@cardstack/core/src/utils';
 import { FakeCardServer } from './../../mirage/config';
+import Cards from 'cardhost/services/cards';
 
 declare module 'ember-test-helpers' {
   interface TestContext {
@@ -17,6 +18,7 @@ declare module 'ember-test-helpers' {
     routingCard?: string;
     createCard: typeof createCard;
     lookupCard: typeof lookupCard;
+    cardService: typeof cardService;
   }
 }
 
@@ -62,6 +64,7 @@ export default function setupCardMocking(
   hooks.beforeEach(async function () {
     this.createCard = createCard.bind(this);
     this.lookupCard = lookupCard.bind(this);
+    this.cardService = cardService.bind(this);
 
     if (options) {
       this.routingCard = options.routingCard;
@@ -81,6 +84,10 @@ export default function setupCardMocking(
 
 function createCard(this: TestContext, card: RawCard): unknown {
   return this.server.create('card', { id: encodeCardURL(card.url), raw: card });
+}
+
+export function cardService(this: TestContext): Cards {
+  return this.owner.lookup('service:cards');
 }
 
 function lookupCard(this: TestContext, id: string): Promise<CompiledCard> {

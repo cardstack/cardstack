@@ -100,7 +100,7 @@ export default class Builder implements BuilderInterface {
     if (raw) {
       return raw;
     }
-    let response = await fetch(`/cards/${encodeCardURL(url)}?type=raw`);
+    let response = await fetch(`/sources/${encodeCardURL(url)}`);
     if (!response || response.status === 404) {
       throw Error(`Card Builder: No raw card found for ${url}`);
     }
@@ -120,10 +120,5 @@ export default class Builder implements BuilderInterface {
     compiledCard = await this.compiler.compile(rawCard);
     this.compiledCardCache.set(url, compiledCard);
     return compiledCard;
-  }
-
-  async deleteCard(cardURL: string): Promise<void> {
-    await this.rawCardCache.delete(cardURL);
-    await this.compiledCardCache.delete(cardURL);
   }
 }

@@ -8,9 +8,9 @@ import {
   CardJSONResponse,
   CardEnv,
   CardOperation,
+  RawCard,
 } from '@cardstack/core/src/interfaces';
 import CardModel from '@cardstack/core/src/card-model';
-import type { NewCardParams } from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
 
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
@@ -18,42 +18,60 @@ import { setComponentTemplate } from '@ember/component';
 import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
 import { tracked } from '@glimmer/tracking';
+import type LocalRealm from 'cardhost/lib/local-realm';
 
 const { cardServer } = config as any; // Environment types arent working
 
 // the methods our service makes available for CardModel's exclusive use
 export default class Cards extends Service {
+  localRealmURL = 'https://cardstack-local';
+
   async load(url: string, format: Format): Promise<CardModel> {
-    let fullURL = this.buildCardURL(url, format);
-    let loaded = await taskFor(this.internalLoad).perform(fullURL);
-    return loaded.ModelClass.fromResponse(
-      this.cardEnv(),
-      loaded.cardResponse,
-      loaded.component
-    );
+    let cardResponse: CardJSONResponse;
+    if (this.inLocalRealm(url)) {
+      let localRealm = await this.localRealm();
+      cardResponse = await localRealm.load(url, format);
+    } else {
+      cardResponse = await this.fetchJSON(this.buildCardURL(url, format));
+    }
+    let { component, ModelClass } = await loadCode(cardResponse, url);
+    return ModelClass.fromResponse(this.cardEnv(), cardResponse, component);
   }
 
   async loadForRoute(pathname: string): Promise<CardModel> {
-    let loaded = await taskFor(this.internalLoad).perform(
-      `${cardServer}cardFor${pathname}`
-    );
-    return loaded.ModelClass.fromResponse(
-      this.cardEnv(),
-      loaded.cardResponse,
-      loaded.component
-    );
-  }
-
-  async createNew(params: NewCardParams): Promise<CardModel> {
-    let parent = await this.load(params.parentCardURL, 'edit');
-    return parent.adoptIntoRealm(params.realm);
-  }
-
-  @task private async internalLoad(url: string) {
+    let url = `${cardServer}cardFor${pathname}`;
     let cardResponse = await this.fetchJSON(url);
     let { component, ModelClass } = await loadCode(cardResponse, url);
-    return { cardResponse, component, ModelClass };
+    return ModelClass.fromResponse(this.cardEnv(), cardResponse, component);
   }
+
+  private inLocalRealm(cardURL: string): boolean {
+    return cardURL.startsWith(this.localRealmURL);
+  }
+
+  // open question: do we keep RawCard methods on here, or split them out and
+  // keep this service focused only on CardModel?
+  async createRawCard(rawCard: RawCard): Promise<void> {
+    if (this.inLocalRealm(rawCard.url)) {
+      let localRealm = await this.localRealm();
+      localRealm.store(rawCard);
+    } else {
+      // TODO: post raw card to server
+      throw new Error('unimplemented');
+    }
+  }
+
+  async getRawCard(url: string): Promise<RawCard> {
+    if (this.inLocalRealm(url)) {
+      let localRealm = await this.localRealm();
+      return localRealm.loadRaw(url);
+    } else {
+      // TODO: get raw card to server
+      throw new Error('need to fetch raw card from server');
+    }
+  }
+
+  @task private async internalLoad(url: string) {}
 
   private cardEnv(): CardEnv {
     return {
@@ -62,6 +80,28 @@ export default class Cards extends Service {
       prepareComponent: this.prepareComponent.bind(this),
       tracked: tracked as unknown as CardEnv['tracked'], // ¯\_(ツ)_/¯
     };
+  }
+
+  private _localRealmPromise: Promise<LocalRealm> | undefined;
+
+  private async localRealm(): Promise<LocalRealm> {
+    if (this._localRealmPromise) {
+      return this._localRealmPromise;
+    }
+    let resolve: any, reject: any;
+    this._localRealmPromise = new Promise((r, e) => {
+      resolve = r;
+      reject = e;
+    });
+    try {
+      let { default: LocalRealm } = await import('../lib/local-realm');
+      let localRealm = new LocalRealm();
+      resolve(localRealm);
+      return localRealm;
+    } catch (err) {
+      reject(err);
+      throw err;
+    }
   }
 
   private async send(op: CardOperation): Promise<CardJSONResponse> {
@@ -79,7 +119,7 @@ export default class Cards extends Service {
         body: JSON.stringify(op.update.payload),
       });
     } else {
-      throw new Error(`unsupported card operation ${JSON.stringify(op)}`);
+      throw assertNever(op);
     }
   }
 
@@ -174,4 +214,8 @@ async function loadCode(
       ModelClass: cardComponentModule.Model,
     };
   }
+}
+
+function assertNever(value: never) {
+  throw new Error(`unsupported operation ${value}`);
 }
