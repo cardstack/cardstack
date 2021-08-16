@@ -12,7 +12,7 @@ export default class NonceTracker {
   async markRecentlyUsed(nonce: string): Promise<void> {
     // TODO: Add a key which expiring shortly after the nonce reaches its max age. There is
     // no need to track it after that as it will be considered unusable due to being expired.
-    console.log('Key shouuld be set to expire in ', MAX_NONCE_AGE_SEC * 1.1, ' seconds');
+    console.log('Key should be set to expire in ', MAX_NONCE_AGE_SEC * 1.1, ' seconds');
     this.#set.add(`${KEY_PREFIX}${nonce}`);
     return Promise.resolve();
   }

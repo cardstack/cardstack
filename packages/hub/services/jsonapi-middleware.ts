@@ -14,6 +14,7 @@ import PrepaidCardPatternsRoute from '../routes/prepaid-card-patterns';
 import PrepaidCardCustomizationsRoute from '../routes/prepaid-card-customizations';
 import MerchantInfosRoute from '../routes/merchant-infos';
 import { inject } from '../di/dependency-injection';
+import CustodialWalletRoute from '../routes/custodial-wallet';
 
 const API_PREFIX = '/api';
 const apiPrefixPattern = new RegExp(`^${API_PREFIX}/(.*)`);
@@ -33,6 +34,7 @@ export default class JSONAPIMiddleware {
   merchantInfosRoute: MerchantInfosRoute = inject('merchant-infos-route', {
     as: 'merchantInfosRoute',
   });
+  custodialWalletRoute: CustodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
   middleware() {
     return (ctxt: Koa.ParameterizedContext<SessionContext, Record<string, unknown>>, next: Koa.Next) => {
       let m = apiPrefixPattern.exec(ctxt.request.path);
@@ -67,6 +69,7 @@ export default class JSONAPIMiddleware {
       prepaidCardPatternsRoute,
       prepaidCardCustomizationsRoute,
       merchantInfosRoute,
+      custodialWalletRoute,
       sessionRoute,
     } = this;
 
@@ -80,6 +83,7 @@ export default class JSONAPIMiddleware {
       route.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get),
       route.post('/prepaid-card-customizations', prepaidCardCustomizationsRoute.post),
       route.post('/merchant-infos', merchantInfosRoute.post),
+      route.get('/custodial-wallet', custodialWalletRoute.get),
       route.all('/(.*)', notFound),
     ]);
   }

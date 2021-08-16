@@ -5,7 +5,7 @@ import { inject } from '../di/dependency-injection';
 import shortUuid from 'short-uuid';
 import { AuthenticationUtils } from '../utils/authentication';
 import MerchantInfoSerializer from '../services/serializers/merchant-info-serializer';
-
+import { ensureLoggedIn } from './utils/auth';
 export default class MerchantInfosRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -53,23 +53,6 @@ export default class MerchantInfosRoute {
     ctx.body = serialized;
     ctx.type = 'application/vnd.api+json';
   }
-}
-
-function ensureLoggedIn(ctx: Koa.Context) {
-  if (ctx.state.userAddress) {
-    return true;
-  }
-  ctx.body = {
-    errors: [
-      {
-        status: '401',
-        title: 'No valid auth token',
-      },
-    ],
-  };
-  ctx.status = 401;
-  ctx.type = 'application/vnd.api+json';
-  return false;
 }
 
 function ensureValidPayload(ctx: Koa.Context) {

@@ -12,8 +12,8 @@ The Hub consists of API endpoints and a postgres database.
 
 Below is a list of the most common environment variables that the Hub accepts:
 
-- `HUB_AWS_ACCESS_KEY_ID` 
-- `HUB_AWS_SECRET_ACCESS_KEY` 
+- `HUB_AWS_ACCESS_KEY_ID`
+- `HUB_AWS_SECRET_ACCESS_KEY`
 - `HUB_AWS_REGION`
 - `AWS_PROFILE` - if none of the HUB_AWS_* variables are defined, no credentials or region will be passed to the aws-sdk. This will make the aws-sdk's default behavior take effect, which includes using an AWS_PROFILE env var if it is set
 - `SERVER_SECRET` (required) - to generate one for your machine, run `node --eval="console.log(crypto.randomBytes(32).toString('base64'))"`
@@ -47,6 +47,15 @@ To reverse the last migration:
 To redo the last migration (i.e. down + up):
 
 `yarn db:migrate redo`
+
+## Creating database migrations
+`yarn db:migrate create <migration-name>`
+
+Documentation on how to create migration scripts is available at https://salsita.github.io/node-pg-migrate/#/migrations
+
+After you have completed running your new DB migration script create a pg_dump of the DB in the `config/structure.sql` file using:
+
+`yarn db:structure:dump`
 
 ## Loading database seed data
 
@@ -92,7 +101,7 @@ Run the command, open a postgres client, and connect to localhost, port 55432 wi
 
 
 ## Provided APIs
-APIs conform to the [JSON API specification](https://jsonapi.org/). 
+APIs conform to the [JSON API specification](https://jsonapi.org/).
 
 ### GET /api/prepaid-card-patterns
 
