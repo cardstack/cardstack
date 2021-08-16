@@ -15,6 +15,12 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "cSpell.ignoreWords": [
     "ambabi",
-    "home"
+    "qrqzupcr"
+  ],
+  "cSpell.words": [
+    "autotest",
+    "createdb",
+    "nakamoto",
+    "satoshi"
   ]
 }
