@@ -51,7 +51,7 @@ export default class CardModel {
     );
   }
 
-  static newFromResponse(
+  static fromResponse(
     cards: CardEnv,
     cardResponse: CardJSONResponse,
     component: unknown
@@ -190,28 +190,30 @@ export default class CardModel {
   }
 
   async save(): Promise<void> {
-    let body = JSON.stringify(this.serialize());
-    let url, method, original;
+    let response: CardJSONResponse;
+    let original: CardModel | undefined;
     switch (this.state.type) {
       case 'created':
-        url = this.cards.buildNewURL(
-          this.state.realm,
-          this.state.parentCardURL
-        );
-        method = 'POST';
+        response = await this.cards.send({
+          create: {
+            targetRealm: this.state.realm,
+            parentCardURL: this.state.parentCardURL,
+            payload: this.serialize(),
+          },
+        });
         break;
       case 'loaded':
-        url = this.cards.buildCardURL(this.state.url);
-        method = 'PATCH';
         original = this.state.original;
+        response = await this.cards.send({
+          update: {
+            cardURL: this.state.url,
+            payload: this.serialize(),
+          },
+        });
         break;
       default:
         throw assertNever(this.state);
     }
-    let response = await this.cards.fetchJSON(url, {
-      method,
-      body,
-    });
     this.state = {
       type: 'loaded',
       url: response.data.id,

@@ -125,13 +125,26 @@ export type CardJSONRequest = {
   };
 };
 
+export type CardOperation =
+  | {
+      create: {
+        targetRealm: string;
+        parentCardURL: string;
+        payload: CardJSONRequest;
+      };
+    }
+  | {
+      update: {
+        cardURL: string;
+        payload: CardJSONRequest;
+      };
+    };
+
 // this is the set of enviroment-specific capabilities a CardModel gets access
 // to
 export interface CardEnv {
   load(url: string, format: Format): Promise<CardModel>;
-  buildCardURL(url: string, format?: Format): string;
-  buildNewURL(realm: string, parentCardURL: string): string;
-  fetchJSON(url: string, options: any): Promise<CardJSONResponse>;
+  send(operation: CardOperation): Promise<CardJSONResponse>;
   prepareComponent(cardModel: CardModel, component: unknown): unknown;
   tracked(
     taret: object,

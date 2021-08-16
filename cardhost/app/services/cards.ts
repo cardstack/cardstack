@@ -7,6 +7,7 @@ import {
   Format,
   CardJSONResponse,
   CardEnv,
+  CardOperation,
 } from '@cardstack/core/src/interfaces';
 import CardModel from '@cardstack/core/src/card-model';
 import type { NewCardParams } from '@cardstack/core/src/card-model';
@@ -25,7 +26,7 @@ export default class Cards extends Service {
   async load(url: string, format: Format): Promise<CardModel> {
     let fullURL = this.buildCardURL(url, format);
     let loaded = await taskFor(this.internalLoad).perform(fullURL);
-    return loaded.ModelClass.newFromResponse(
+    return loaded.ModelClass.fromResponse(
       this.cardEnv(),
       loaded.cardResponse,
       loaded.component
@@ -36,7 +37,7 @@ export default class Cards extends Service {
     let loaded = await taskFor(this.internalLoad).perform(
       `${cardServer}cardFor${pathname}`
     );
-    return loaded.ModelClass.newFromResponse(
+    return loaded.ModelClass.fromResponse(
       this.cardEnv(),
       loaded.cardResponse,
       loaded.component
@@ -57,12 +58,29 @@ export default class Cards extends Service {
   private cardEnv(): CardEnv {
     return {
       load: this.load.bind(this),
-      buildNewURL: this.buildNewURL.bind(this),
-      buildCardURL: this.buildCardURL.bind(this),
-      fetchJSON: this.fetchJSON.bind(this),
+      send: this.send.bind(this),
       prepareComponent: this.prepareComponent.bind(this),
       tracked: tracked as unknown as CardEnv['tracked'], // ¯\_(ツ)_/¯
     };
+  }
+
+  private async send(op: CardOperation): Promise<CardJSONResponse> {
+    if ('create' in op) {
+      return await this.fetchJSON(
+        this.buildNewURL(op.create.targetRealm, op.create.parentCardURL),
+        {
+          method: 'POST',
+          body: JSON.stringify(op.create.payload),
+        }
+      );
+    } else if ('update' in op) {
+      return await this.fetchJSON(this.buildCardURL(op.update.cardURL), {
+        method: 'PATCH',
+        body: JSON.stringify(op.update.payload),
+      });
+    } else {
+      throw new Error(`unsupported card operation ${JSON.stringify(op)}`);
+    }
   }
 
   private buildNewURL(realm: string, parentCardURL: string): string {

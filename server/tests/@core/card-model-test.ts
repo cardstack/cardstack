@@ -10,7 +10,11 @@ import QUnit from 'qunit';
 const { module: Qmodule, test } = QUnit;
 
 import CardModel from '@cardstack/core/src/card-model';
-import { CardJSONResponse, Format } from '@cardstack/core/src/interfaces';
+import {
+  CardJSONResponse,
+  CardOperation,
+  Format,
+} from '@cardstack/core/src/interfaces';
 
 class PersonCardModel extends CardModel {
   static serializerMap = {
@@ -41,24 +45,13 @@ let cardJSONResponse = {
 };
 
 class StubCards {
-  lastBody: any;
+  lastOp: CardOperation | undefined;
   async load(_url: string, _format: Format): Promise<CardModel> {
     throw new Error('unimplemented');
   }
-  buildNewURL(_realm: string, _parentCardURL: string): string {
-    throw new Error('unimplemented');
-  }
-  buildCardURL(_url: string, _format?: Format): string {
-    return 'http://fake.com';
-  }
-  async fetchJSON(_url: string, options: any = {}): Promise<CardJSONResponse> {
-    this.lastBody = options.body;
-    return {
-      data: {
-        type: options.body.type,
-        id: 'fakeid',
-      },
-    };
+  async send(op: CardOperation): Promise<CardJSONResponse> {
+    this.lastOp = op;
+    return { data: { type: 'cards', id: 'x' } };
   }
   prepareComponent() {}
   tracked(_target: object, _prop: string, desc: PropertyDescriptor) {
@@ -70,7 +63,7 @@ const fakeComponent: unknown = {};
 Qmodule('CardModel', function () {
   test('.data', async function (assert) {
     let stub = new StubCards();
-    let model = PersonCardModel.newFromResponse(
+    let model = PersonCardModel.fromResponse(
       stub,
       cardJSONResponse,
       fakeComponent
@@ -89,15 +82,19 @@ Qmodule('CardModel', function () {
 
   test('.serialize', async function (assert) {
     let stub = new StubCards();
-    let model = PersonCardModel.newFromResponse(
+    let model = PersonCardModel.fromResponse(
       stub,
       cardJSONResponse,
       fakeComponent
     );
 
     await model.save();
+    let op = stub.lastOp;
+    if (!op || !('update' in op)) {
+      throw new Error(`did not find create operation`);
+    }
     assert.deepEqual(
-      JSON.parse(stub.lastBody),
+      op.update.payload,
       {
         data: {
           id: PERSON_RAW_CARD.url,
