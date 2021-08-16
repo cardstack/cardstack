@@ -1,0 +1,100 @@
+.merchant-card {
+  --merchant-logo-background: var(--boxel-red);
+  --merchant-logo-text-color: var(--boxel-light);
+
+  display: grid;
+  grid-template-rows: auto 1fr;
+  width: 22.75rem; /* 364px */
+  min-height: 14.375rem; /* 230px */
+  color: var(--boxel-dark);
+  background-color: var(--boxel-light);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.merchant-card__header {
+  display: flex;
+  padding: var(--boxel-sp-xs) var(--boxel-sp-sm);
+  border-top-right-radius: var(--boxel-border-radius);
+  border-top-left-radius: var(--boxel-border-radius);
+  color: var(--boxel-light);
+  background-color: var(--boxel-dark);
+}
+
+.merchant-card__header-network {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: var(--boxel-sp-xxs);
+  padding-left: var(--boxel-sp-xxs);
+  color: var(--boxel-dark);
+  background-color: var(--boxel-light-400);
+  border-radius: 50px;
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.merchant-card__header-address {
+  margin-left: var(--boxel-sp-sm);
+  font-family: var(--boxel-monospace-font-family);
+  font-size: var(--boxel-font-size-sm);
+  letter-spacing: var(--boxel-lsp-sm);
+  line-height: calc(18 / 13);
+}
+
+.merchant-card__content {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  padding: var(--boxel-sp-lg) var(--boxel-sp) var(--boxel-sp-xs);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.merchant-card__merchant {
+  text-align: center;
+}
+
+.merchant-card__logo {
+  /* This will become merchant logo upload */
+  background: var(--merchant-logo-background);
+  color: var(--merchant-logo-text-color);
+  width: 5rem;
+  height: 5rem;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  border-radius: 50%;
+}
+
+.merchant-card__name {
+  margin-top: var(--boxel-sp-xxxs);
+  font: 700 var(--boxel-font-lg);
+  letter-spacing: 0;
+}
+
+.merchant-card__type {
+  color: var(--boxel-purple-400);
+  font: var(--boxel-font-sm);
+}
+
+.merchant-card__info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: var(--boxel-sp);
+}
+
+.merchant-card__label {
+  font: 600 var(--boxel-font-xs);
+}
+
+.merchant-card__value {
+  font: 700 var(--boxel-font-sm);
+}
+
+.merchant-card__manager-icon {
+  vertical-align: top;
+}

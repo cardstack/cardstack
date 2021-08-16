@@ -1,0 +1,35 @@
+<article
+  class="merchant-card"
+  style={{css-var
+    merchant-logo-background=@logoBackground
+    merchant-logo-text-color=(or @logoTextColor "var(--boxel-light)")
+  }}
+  data-test-merchant-card-logo-background={{@logoBackground}}
+  data-test-merchant-card-logo-text-color={{@logoTextColor}}
+  data-test-merchant-card={{@id}}
+  ...attributes
+>
+  <header class="merchant-card__header">
+    <div class="merchant-card__header-network">on {{@network}}</div>
+    <div class="merchant-card__header-address">{{truncate-middle @address}}</div>
+  </header>
+  <section class="merchant-card__content">
+    <div class="merchant-card__merchant">
+      {{!-- Make the logo + name a new component if needed. --}}
+      <div class="merchant-card__logo">{{truncate @name 1 false}}</div>
+      <h3 class="merchant-card__name">{{@name}}</h3>
+      <h4 class="merchant-card__type">Merchant Account</h4>
+    </div>
+    <div class="merchant-card__info">
+      <div>
+        <div class="merchant-card__label">Merchant ID</div>
+        <div class="merchant-card__value">{{@id}}</div>
+      </div>
+      <div>
+        <span class="merchant-card__value">{{@managerCount}}</span>
+        {{if (eq @managerCount 1) "Manager" "Managers"}}
+        {{svg-jar "user-avatar" width="16" height="14" class="merchant-card__manager-icon"}}
+      </div>
+    </div>
+  </section>
+</article>
