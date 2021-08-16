@@ -591,20 +591,6 @@ CREATE TABLE graphile_worker.migrations (
 ALTER TABLE graphile_worker.migrations OWNER TO postgres;
 
 --
--- Name: custodial_wallets; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.custodial_wallets (
-    user_address text NOT NULL,
-    wyre_wallet_id text NOT NULL,
-    deposit_address text NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
-ALTER TABLE public.custodial_wallets OWNER TO postgres;
-
---
 -- Name: merchant_infos; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -755,14 +741,6 @@ ALTER TABLE ONLY graphile_worker.migrations
 
 
 --
--- Name: custodial_wallets custodial_wallets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.custodial_wallets
-    ADD CONSTRAINT custodial_wallets_pkey PRIMARY KEY (user_address);
-
-
---
 -- Name: merchant_infos merchant_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -807,13 +785,6 @@ ALTER TABLE ONLY public.prepaid_card_patterns
 --
 
 CREATE INDEX jobs_priority_run_at_id_locked_at_without_failures_idx ON graphile_worker.jobs USING btree (priority, run_at, id, locked_at) WHERE (attempts < max_attempts);
-
-
---
--- Name: custodial_wallets_wyre_wallet_id_unique_index; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE UNIQUE INDEX custodial_wallets_wyre_wallet_id_unique_index ON public.custodial_wallets USING btree (wyre_wallet_id);
 
 
 --
@@ -946,7 +917,6 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 2	20210614080132698_create-prepaid-card-customizations-table	2021-07-29 14:31:17.108453
 3	20210623052200757_create-graphile-worker-schema	2021-07-29 14:31:17.108453
 4	20210809113449561_merchant-infos	2021-08-13 10:14:04.408554
-15	20210813140554986_create-custodial-wallets	2021-08-16 12:55:12.874072
 \.
 
 

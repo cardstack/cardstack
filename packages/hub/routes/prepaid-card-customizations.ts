@@ -8,6 +8,7 @@ import shortUuid from 'short-uuid';
 import { AuthenticationUtils } from '../utils/authentication';
 import WorkerClient from '../services/worker-client';
 import PrepaidCardCustomizationSerializer from '../services/serializers/prepaid-card-customization-serializer';
+import { ensureLoggedIn } from './utils/auth';
 
 export default class PrepaidCardCustomizationsRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
@@ -69,23 +70,6 @@ export default class PrepaidCardCustomizationsRoute {
     ctx.body = serializedPcc;
     ctx.type = 'application/vnd.api+json';
   }
-}
-
-function ensureLoggedIn(ctx: Koa.Context) {
-  if (ctx.state.userAddress) {
-    return true;
-  }
-  ctx.body = {
-    errors: [
-      {
-        status: '401',
-        title: 'No valid auth token',
-      },
-    ],
-  };
-  ctx.status = 401;
-  ctx.type = 'application/vnd.api+json';
-  return false;
 }
 
 function ensureValidPayload(ctx: Koa.Context) {

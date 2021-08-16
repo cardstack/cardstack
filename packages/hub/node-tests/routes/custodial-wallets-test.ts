@@ -1,8 +1,7 @@
 import { Server } from 'http';
 import supertest, { Test } from 'supertest';
-import { Client as DBClient } from 'pg';
 import { bootServerForTesting } from '../../main';
-import { Container, Registry } from '../../di/dependency-injection';
+import { Registry } from '../../di/dependency-injection';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -26,68 +25,90 @@ class StubAuthenticationUtils {
 
 class StubWyreService {
   createCustodialWallet(address: string) {
-    return handleCreateWyreWallet(address);
+    return Promise.resolve(handleCreateWyreWallet(address));
+  }
+  getCustodialWalletByUserAddress(userAddress: string) {
+    return Promise.resolve(handleGetWyreWalletByName(userAddress));
   }
 }
 
-let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
-let stubWyreWalletId = 'WA_L36QRQZUPCR';
-let stubDepositAddress = '0x59faede86fb650d956ca633a5c1a21fa53fe151c'; // wyre always returns lowercase addresses
-let wyreCallCount = 0;
+let stubUserAddress1 = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
+let stubWyreWalletId1 = 'WA_L36QRQZUPCR';
+let stubDepositAddress1 = '0x59faede86fb650d956ca633a5c1a21fa53fe151c'; // wyre always returns lowercase addresses
+
+let stubUserAddress2 = '0xb21851B00bd13C008f703A21DFDd292b28A736b3';
+let stubWyreWalletId2 = 'WA_TWTJ9QQZV9R';
+let stubDepositAddress2 = '0x59faede86fb650d956ca633a5c1a21fa53fe151c'; // wyre always returns lowercase addresses
+
+let wyreCreateCallCount = 0;
 
 function handleValidateAuthToken(encryptedString: string) {
-  expect(encryptedString).to.equal('abc123--def456--ghi789');
-  return stubUserAddress;
+  switch (encryptedString) {
+    case 'abc123--def456--ghi789':
+      return stubUserAddress1;
+    case 'mno123--pqr456--stu789':
+      return stubUserAddress2;
+  }
 }
 
 function handleCreateWyreWallet(address: string) {
-  wyreCallCount++;
+  wyreCreateCallCount++;
+  expect(address).to.equal(stubUserAddress1.toLowerCase());
   return {
     status: null,
     callbackUrl: null,
-    srn: `wallet:${stubWyreWalletId}`,
+    srn: `wallet:${stubWyreWalletId1}`,
     pusherChannel: 'blah',
     notes: null,
     balances: {},
     depositAddresses: {
-      ETH: stubDepositAddress, // eslint-disable-line @typescript-eslint/naming-convention
+      ETH: stubDepositAddress1, // eslint-disable-line @typescript-eslint/naming-convention
     },
     totalBalances: {},
     availableBalances: {},
     savingsReferralSRN: null,
-    name: address,
-    id: stubWyreWalletId,
+    name: address.toLowerCase(),
+    id: stubWyreWalletId1,
     type: 'DEFAULT',
   };
 }
 
+function handleGetWyreWalletByName(address: string) {
+  if (address === stubUserAddress2.toLowerCase()) {
+    return {
+      status: null,
+      callbackUrl: null,
+      srn: `wallet:${stubWyreWalletId2}`,
+      pusherChannel: 'blah',
+      notes: null,
+      balances: {},
+      depositAddresses: {
+        ETH: stubDepositAddress2, // eslint-disable-line @typescript-eslint/naming-convention
+      },
+      totalBalances: {},
+      availableBalances: {},
+      savingsReferralSRN: null,
+      name: address.toLowerCase(),
+      id: stubWyreWalletId2,
+      type: 'DEFAULT',
+    };
+  }
+  return;
+}
+
 describe('GET /api/custodial-wallet', function () {
   let server: Server;
-  let db: DBClient;
   let request: supertest.SuperTest<Test>;
 
   this.beforeEach(async function () {
-    let container!: Container;
-    wyreCallCount = 0;
+    wyreCreateCallCount = 0;
     server = await bootServerForTesting({
       port: 3001,
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
         registry.register('wyre', StubWyreService);
       },
-      containerCallback(serverContainer: Container) {
-        container = serverContainer;
-      },
     });
-    let dbManager = await container.lookup('database-manager');
-    db = await dbManager.getClient();
-    await db.query('DELETE FROM custodial_wallets');
-    // Add foil test data to assert we never get this result
-    await db.query(
-      'INSERT INTO custodial_wallets (user_address, wyre_wallet_id, deposit_address) VALUES ($1, $2, $3)',
-      [`foil-${stubUserAddress}`.toLowerCase(), `foil-${stubWyreWalletId}`, `foil-${stubDepositAddress}`]
-    );
-
     request = supertest(server);
   });
 
@@ -96,7 +117,6 @@ describe('GET /api/custodial-wallet', function () {
   });
 
   it('gets a the custodial wallet for an EOA that is not yet assigned a custodial wallet', async function () {
-    let numWallets = (await db.query('SELECT * from custodial_wallets')).rowCount;
     await request
       .get(`/api/custodial-wallet`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -106,58 +126,38 @@ describe('GET /api/custodial-wallet', function () {
       .expect({
         data: {
           type: 'custodial-wallets',
-          id: stubUserAddress.toLowerCase(),
+          id: stubUserAddress1.toLowerCase(),
           attributes: {
-            'wyre-wallet-id': stubWyreWalletId,
-            'deposit-address': stubDepositAddress,
+            'wyre-wallet-id': stubWyreWalletId1,
+            'deposit-address': stubDepositAddress1,
           },
         },
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    expect(wyreCallCount).to.equal(1);
-
-    let results = await db.query('SELECT * from custodial_wallets');
-    expect(results.rowCount).to.equal(numWallets + 1);
-    results = await db.query('SELECT * from custodial_wallets WHERE user_address = $1', [
-      stubUserAddress.toLowerCase(),
-    ]);
-    let {
-      rows: [row],
-    } = results;
-    expect(row.user_address).to.equal(stubUserAddress.toLowerCase());
-    expect(row.wyre_wallet_id).to.equal(stubWyreWalletId);
-    expect(row.deposit_address).to.equal(stubDepositAddress);
+    expect(wyreCreateCallCount).to.equal(1);
   });
 
   it('gets the custodial wallet for an EOA that has already been assigned a custodial wallet', async function () {
-    await db.query(
-      'INSERT INTO custodial_wallets (user_address, wyre_wallet_id, deposit_address) VALUES ($1, $2, $3)',
-      [stubUserAddress.toLowerCase(), stubWyreWalletId, stubDepositAddress]
-    );
-    let numWallets = (await db.query('SELECT * from custodial_wallets')).rowCount;
     await request
       .get(`/api/custodial-wallet`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer: mno123--pqr456--stu789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .expect({
         data: {
           type: 'custodial-wallets',
-          id: stubUserAddress.toLowerCase(),
+          id: stubUserAddress2.toLowerCase(),
           attributes: {
-            'wyre-wallet-id': stubWyreWalletId,
-            'deposit-address': stubDepositAddress,
+            'wyre-wallet-id': stubWyreWalletId2,
+            'deposit-address': stubDepositAddress2,
           },
         },
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    expect(wyreCallCount).to.equal(0);
-
-    let results = await db.query('SELECT * from custodial_wallets');
-    expect(results.rowCount).to.equal(numWallets);
+    expect(wyreCreateCallCount).to.equal(0);
   });
 
   it('returns 401 without bearer token', async function () {

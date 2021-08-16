@@ -47,11 +47,28 @@ export default class Wyre {
         Authorization: `Bearer ${secretKey}`, // eslint-disable-line @typescript-eslint/naming-convention
       },
       body: JSON.stringify({
-        name: address,
+        name: address.toLowerCase(),
         callbackUrl,
       }),
     });
     return (await result.json()) as WyreWallet;
+  }
+
+  async getCustodialWalletByUserAddress(address: string): Promise<WyreWallet | undefined> {
+    let { url, secretKey } = this.config;
+    let result = await fetch(`${url}/v2/wallets?name=${address}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
+        Authorization: `Bearer ${secretKey}`, // eslint-disable-line @typescript-eslint/naming-convention
+      },
+    });
+    let status = result.status;
+    // when no wallet exists for the name specified wyre returns a 204 no-content
+    if (status === 204) {
+      return;
+    }
+    (await result.json()) as WyreWallet;
   }
 }
 
