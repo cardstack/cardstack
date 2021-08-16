@@ -1,25 +1,15 @@
-<article
-  class="merchant-card"
-  style={{css-var
-    merchant-logo-background=@logoBackground
-    merchant-logo-text-color=(or @logoTextColor "var(--boxel-light)")
-  }}
-  data-test-merchant-card-logo-background={{@logoBackground}}
-  data-test-merchant-card-logo-text-color={{@logoTextColor}}
-  data-test-merchant-card={{@id}}
-  ...attributes
->
+<article class="merchant-card" data-test-merchant-card={{@id}} ...attributes>
   <header class="merchant-card__header">
     <div class="merchant-card__header-network">on {{@network}}</div>
     <div class="merchant-card__header-address">{{truncate-middle @address}}</div>
   </header>
   <section class="merchant-card__content">
-    <div class="merchant-card__merchant">
-      {{!-- Make the logo + name a new component if needed. --}}
-      <div class="merchant-card__logo">{{truncate @name 1 false}}</div>
-      <h3 class="merchant-card__name">{{@name}}</h3>
-      <h4 class="merchant-card__type">Merchant Account</h4>
-    </div>
+    <CardPay::Merchant
+      @size="large"
+      @vertical={{true}}
+      @name={{@name}}
+      @text="Merchant Account"
+    />
     <div class="merchant-card__info">
       <div>
         <div class="merchant-card__label">Merchant ID</div>
