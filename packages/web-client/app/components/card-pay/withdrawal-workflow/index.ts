@@ -17,7 +17,12 @@ import BN from 'bn.js';
 import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
 import { tracked } from '@glimmer/tracking';
 import { taskFor } from 'ember-concurrency-ts';
-import { waitForProperty, waitForQueue } from 'ember-concurrency';
+import {
+  rawTimeout,
+  TaskGenerator,
+  waitForProperty,
+  waitForQueue,
+} from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { formatTokenAmount } from '@cardstack/web-client/helpers/format-token-amount';
 
@@ -38,6 +43,10 @@ class CheckBalanceWorkflowMessage extends WorkflowPostable {
   *fetchMininumBalanceForWithdrawalClaimTask() {
     yield waitForQueue('afterRender'); // avoid error from using and setting workflow in the render queue
     yield waitForProperty(this, 'layer1Network', Boolean);
+    // couldn't use waitForProperty for the layer1Network.defaultTokenBalance because waitForProperty is not reliable for tracked properties
+    yield taskFor(this.waitUntilTask).perform(
+      () => !!this.layer1Network.defaultTokenBalance
+    );
     // HACK: We are passing "DAI" in the next line, but the user hasn't actually specified what token they will be withdrawing yet.
     let minimum: BN = yield this.layer1Network.getEstimatedGasForWithdrawalClaim(
       'DAI'
@@ -61,7 +70,7 @@ class CheckBalanceWorkflowMessage extends WorkflowPostable {
       layer1Network.defaultTokenBalance!.gte(minimumBalanceForWithdrawalClaim)!
     ) {
       return `Checking your balance...
-      
+
 It looks like you have enough ${c.layer1.nativeTokenSymbol} in you account on ${
         c.layer1.fullName
       }, to perform the last step of this withrawal workflow, which requires ~${formatTokenAmount(
@@ -69,7 +78,7 @@ It looks like you have enough ${c.layer1.nativeTokenSymbol} in you account on ${
       )} ${c.layer1.nativeTokenSymbol}.`;
     } else {
       return `Checking your balance...
-      
+
 The last step of this withdrawal requires that you have at least **~${formatTokenAmount(
         minimumBalanceForWithdrawalClaim
       )} ${c.layer1.nativeTokenSymbol}**.
@@ -86,6 +95,15 @@ ${
     return this.workflow?.owner.lookup(
       'service:layer1-network'
     ) as Layer1Network;
+  }
+
+  @task *waitUntilTask(
+    predicate: () => boolean,
+    delayMs = 1000
+  ): TaskGenerator<void> {
+    while (!predicate()) {
+      yield rawTimeout(delayMs);
+    }
   }
 }
 
