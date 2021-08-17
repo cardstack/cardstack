@@ -6,7 +6,6 @@ import setupCardMocking from '../helpers/card-mocking';
 
 import click from '@ember/test-helpers/dom/click';
 import fillIn from '@ember/test-helpers/dom/fill-in';
-import { setupMirage } from 'ember-cli-mirage/test-support';
 import waitFor from '@ember/test-helpers/dom/wait-for';
 
 import {
@@ -21,7 +20,6 @@ const SAVE = '[data-test-modal-save]';
 
 module('Acceptance | Card Editing', function (hooks) {
   setupApplicationTest(hooks);
-  setupMirage(hooks);
   setupCardMocking(hooks, { routingCard: 'https://mirage/cards/my-routes' });
   let personURL = 'https://mirage/cards/person';
 

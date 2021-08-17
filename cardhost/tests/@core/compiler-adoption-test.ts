@@ -1,6 +1,5 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { setupMirage } from 'ember-cli-mirage/test-support';
 import setupCardMocking from '../helpers/card-mocking';
 import Builder from 'cardhost/lib/builder';
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
@@ -8,7 +7,6 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 
 module('@core | compiler-adoption', function (hooks) {
   setupRenderingTest(hooks);
-  setupMirage(hooks);
   setupCardMocking(hooks);
 
   let builder: Builder;

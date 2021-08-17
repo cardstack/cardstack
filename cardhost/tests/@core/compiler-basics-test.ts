@@ -3,7 +3,6 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { compileTemplate } from '../helpers/template-compiler';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupMirage } from 'ember-cli-mirage/test-support';
 import setupCardMocking from '../helpers/card-mocking';
 import Builder from 'cardhost/lib/builder';
 import { RawCard, CompiledCard } from '@cardstack/core/src/interfaces';
@@ -40,7 +39,6 @@ module('@core | compiler-basics', function (hooks) {
   let builder: Builder;
 
   setupRenderingTest(hooks);
-  setupMirage(hooks);
   setupCardMocking(hooks);
 
   hooks.beforeEach(async function () {

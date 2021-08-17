@@ -3,14 +3,19 @@ import type {
   Format,
   RawCard,
 } from '@cardstack/core/src/interfaces';
+import Cards from 'cardhost/services/cards';
 import Builder from './builder';
 
 export default class LocalRealm {
-  private cards = new Map<string, RawCard>();
-  builder = new Builder({ rawCardCache: this.cacheShim() });
+  private rawCards = new Map<string, RawCard>();
+  private builder: Builder;
+
+  constructor(cards: Cards, ownRealmURL: string) {
+    this.builder = new Builder(cards, ownRealmURL);
+  }
 
   store(card: RawCard) {
-    this.cards.set(card.url, card);
+    this.rawCards.set(card.url, card);
   }
 
   async load(url: string, format: Format): Promise<CardJSONResponse> {
@@ -31,30 +36,10 @@ export default class LocalRealm {
   }
 
   loadRaw(url: string): RawCard {
-    let card = this.cards.get(url);
+    let card = this.rawCards.get(url);
     if (!card) {
       throw new Error(`${url} not found in local realm`);
     }
     return card;
-  }
-
-  // TODO: refactor so we have a clearer way to hook into Builder and there's no
-  // more need for `interface Cache`. Once we drop mirage I think it will be
-  // "easy".
-  private cacheShim() {
-    return {
-      get: (url: string): RawCard | undefined => {
-        return this.cards.get(url);
-      },
-      set: (url: string, payload: RawCard): void => {
-        this.cards.set(url, payload);
-      },
-      update: (url: string, payload: RawCard): void => {
-        this.cards.set(url, payload);
-      },
-      delete: (url: string): void => {
-        this.cards.delete(url);
-      },
-    };
   }
 }

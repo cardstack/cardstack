@@ -1,7 +1,5 @@
 import Service from '@ember/service';
 import { macroCondition, isTesting } from '@embroider/macros';
-import { task } from 'ember-concurrency';
-import { taskFor } from 'ember-concurrency-ts';
 
 import {
   Format,
@@ -9,6 +7,7 @@ import {
   CardEnv,
   CardOperation,
   RawCard,
+  CompiledCard,
 } from '@cardstack/core/src/interfaces';
 import CardModel from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
@@ -24,7 +23,7 @@ const { cardServer } = config as any; // Environment types arent working
 
 // the methods our service makes available for CardModel's exclusive use
 export default class Cards extends Service {
-  localRealmURL = 'https://cardstack-local';
+  private localRealmURL = 'https://cardstack-local';
 
   async load(url: string, format: Format): Promise<CardModel> {
     let cardResponse: CardJSONResponse;
@@ -71,7 +70,13 @@ export default class Cards extends Service {
     }
   }
 
-  @task private async internalLoad(url: string) {}
+  async getCompiledCard(url: string): Promise<CompiledCard> {
+    if (this.inLocalRealm(url)) {
+      let localRealm = await this.localRealm();
+      return localRealm.loadCompiled(url);
+    } else {
+    }
+  }
 
   private cardEnv(): CardEnv {
     return {
@@ -95,7 +100,7 @@ export default class Cards extends Service {
     });
     try {
       let { default: LocalRealm } = await import('../lib/local-realm');
-      let localRealm = new LocalRealm();
+      let localRealm = new LocalRealm(this, this.localRealmURL);
       resolve(localRealm);
       return localRealm;
     } catch (err) {

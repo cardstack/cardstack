@@ -2,12 +2,10 @@ import { module, test } from 'qunit';
 import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import setupCardMocking from '../helpers/card-mocking';
-import { setupMirage } from 'ember-cli-mirage/test-support';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 module('Acceptance | card routing', function (hooks) {
   setupApplicationTest(hooks);
-  setupMirage(hooks);
   setupCardMocking(hooks, { routingCard: 'https://mirage/cards/my-routes' });
   let personURL = 'https://mirage/cards/person';
 
