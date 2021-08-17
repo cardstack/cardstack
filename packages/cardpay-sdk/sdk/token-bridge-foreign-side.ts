@@ -42,6 +42,7 @@ export interface ITokenBridgeForeignSide {
   ): Promise<TransactionReceipt>;
 }
 
+const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 290000;
 export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   constructor(private layer1Web3: Web3) {}
 
@@ -138,7 +139,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
 
   async getEstimatedGasForWithdrawalClaim(_tokenAddress: string): Promise<BN> {
     // per Hassan, eventually this will be a token address specific amount, hence the for-now unused arg
-    let withdrawalGasLimit = new BN('290000');
+    let withdrawalGasLimit = new BN(CLAIM_BRIDGED_TOKENS_GAS_LIMIT);
     let gasPrice = await this.layer1Web3.eth.getGasPrice();
     let estimatedGasInWei = withdrawalGasLimit.mul(new BN(gasPrice));
     let rounder = new BN(1e12);
