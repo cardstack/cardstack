@@ -14,7 +14,7 @@
     merchant__logo--sm=(eq @size "small")
     merchant__logo--lg=(eq @size "large")
   }}>
-    {{truncate @name 1 false}}
+    {{first-char @name}}
   </div>
   <div>
     <div class={{cn "merchant__name" merchant__name--lg=(eq @size "large")}}>
