@@ -37,7 +37,7 @@ let layer1NetworkDisplayInfo: Record<
     fullName: 'Kovan testnet',
     shortName: 'Kovan',
     conversationalName: 'Kovan',
-    nativeTokenSymbol: 'KETH',
+    nativeTokenSymbol: 'ETH',
   },
   'test-layer1': {
     fullName: 'L1 test chain',
