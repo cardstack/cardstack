@@ -4,6 +4,35 @@
   data-test-layout-customization-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section @title="Choose a prepaid card to fund merchant creation">
+    <CardPay::LabeledValue @label="Merchant Name">
+      <CardPay::Merchant @name={{@name}} @size="small" />
+    </CardPay::LabeledValue>
+    <CardPay::LabeledValue @label="Merchant ID">
+      {{@id}}
+    </CardPay::LabeledValue>
+    <CardPay::LabeledValue @label="Merchant Creation Fee">
+      {{!-- TODO: Do not hardcode 100 SPEND amount --}}
+      <CardPay::BalanceDisplay
+        class="prepaid-card-choice__cost"
+        @icon="spend"
+        @sign="§"
+        @symbol="SPEND"
+        @balance="100"
+        @usdBalance={{spend-to-usd 100}}
+      />
+    </CardPay::LabeledValue>
+    <CardPay::LabeledValue @label="Pay Using Prepaid Card">
+      {{!-- TODO card picker and appearance --}}
+    </CardPay::LabeledValue>
+    {{#if @isComplete}}
+      <CardPay::LabeledValue @label="Merchant Address">
+        <CardPay::Merchant
+          @size="small"
+          @name={{@name}}
+          @address={{@address}}
+        />
+      </CardPay::LabeledValue>
+    {{/if}}
     {{#if this.error}}
       <CardPay::ErrorMessage data-test-prepaid-card-choice-error-message as |supportURL|>
         {{#if (eq this.error.message "INSUFFICIENT_FUNDS")}}

@@ -12,7 +12,7 @@
 }
 
 .merchant__logo {
-  --logo-size: var(--boxel-icon-lg);
+  --logo-size: var(--boxel-icon-sm);
 
   background: var(--merchant-logo-background);
   color: var(--merchant-logo-text-color);
@@ -23,7 +23,7 @@
   width: var(--logo-size);
   height: var(--logo-size);
   margin-right: var(--boxel-sp-xxs);
-  font-size: var(--boxel-font-size-lg);
+  font-size: var(--boxel-font-size-sm);
   font-weight: 600;
   border-radius: 50%;
 }
@@ -32,12 +32,6 @@
   margin-right: auto;
   margin-left: auto;
   margin-bottom: var(--boxel-sp-xxxs);
-}
-
-.merchant__logo--sm {
-  --logo-size: var(--boxel-icon-sm);
-
-  font-size: var(--boxel-font-size-sm);
 }
 
 .merchant__logo--lg {
@@ -58,7 +52,7 @@
 }
 
 .merchant__address {
-  color: var(--boxel-purple-400);
+  color: var(--boxel-purple-500);
   font: var(--boxel-font-size)/calc(22 / 16) var(--boxel-monospace-font-family);
   letter-spacing: var(--boxel-lsp-sm);
   max-width: 22ch;

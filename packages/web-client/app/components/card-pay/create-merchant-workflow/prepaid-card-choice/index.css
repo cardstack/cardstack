@@ -1,3 +1,9 @@
+.prepaid-card-choice__cost {
+  --icon-alignment: flex-start;
+
+  font-weight: 600;
+}
+
 .prepaid-card-choice__loading-indicator {
   --icon-color: white;
 
