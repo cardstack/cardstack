@@ -1,7 +1,11 @@
 import { CardStackContext } from '@cardstack/server/src/interfaces';
 import { NotFound } from '../middleware/errors';
 import { RouterContext } from '@koa/router';
-import { deserialize, serializeCard } from '../utils/serialization';
+import {
+  deserialize,
+  serializeCard,
+  serializeRawCard,
+} from '../utils/serialization';
 import { getCardFormatFromRequest } from '../utils/routes';
 import { assertValidKeys } from '@cardstack/core/src/interfaces';
 import Router from '@koa/router';
@@ -144,6 +148,15 @@ function unimpl() {
   throw new Error('unimplemented');
 }
 
+async function getSource(ctx: RouterContext<any, CardStackContext>) {
+  let {
+    realms,
+    params: { encodedCardURL: url },
+  } = ctx;
+  let rawCard = await realms.getRawCard(url);
+  ctx.body = serializeRawCard(rawCard);
+}
+
 export async function cardRoutes(
   context: CardStackContext,
   routeCard: string | undefined
@@ -164,7 +177,7 @@ export async function cardRoutes(
   // CRUD operations on the sources themselves. It's a superset of what you
   // can do via the 'cards' section.
   koaRouter.post(`/sources/new`, unimpl);
-  koaRouter.get(`/sources/:encordedCardURL`, unimpl);
+  koaRouter.get(`/sources/:encodedCardURL`, getSource);
   koaRouter.patch(`/sources/:encodedCardURL`, unimpl);
   koaRouter.delete(`/sources/:encodedCardURL`, unimpl);
 

@@ -32,3 +32,20 @@ export function deserialize(payload: any): any {
 
   return data;
 }
+
+const rawSerializer = new Serializer('raw-card', {
+  attributes: [
+    'schema',
+    'isolated',
+    'embedded',
+    'edit',
+    'deserializer',
+    'adoptsFrom',
+    'files',
+    'data',
+  ],
+});
+
+export function serializeRawCard(card: RawCard): Promise<object> {
+  return rawSerializer.serialize(Object.assign({ id: card.url }, card));
+}

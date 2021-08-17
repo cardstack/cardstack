@@ -56,7 +56,6 @@ export type RawCard = {
   embedded?: string;
   edit?: string;
 
-  containsRoutes?: boolean;
   deserializer?: SerializerName;
 
   // url to the card we adopted from

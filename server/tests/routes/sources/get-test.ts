@@ -9,6 +9,23 @@ import {
 } from '@cardstack/server/tests/helpers/realm';
 import { Server } from '@cardstack/server/src/server';
 
+let postFiles = Object.freeze({
+  'schema.js': `
+import { contains } from "@cardstack/types";
+import string from "https://cardstack.com/base/string";
+import datetime from "https://cardstack.com/base/datetime";
+export default class Post {
+  @contains(string) title;
+  @contains(string) body;
+  @contains(datetime) createdAt;
+  @contains(string) extra;
+}
+`,
+  'isolated.js': templateOnlyComponentTemplate(
+    '<h1><@fields.title/></h1><article><@fields.body/></article>'
+  ),
+});
+
 QUnit.module('GET /sources/<card-id>', function (hooks) {
   let realm: ProjectTestRealm;
   let server: Koa;
@@ -29,20 +46,7 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
         schema: 'schema.js',
         isolated: 'isolated.js',
       },
-      'schema.js': `
-        import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/string";
-        import datetime from "https://cardstack.com/base/datetime";
-        export default class Post {
-          @contains(string) title;
-          @contains(string) body;
-          @contains(datetime) createdAt;
-          @contains(string) extra;
-        }
-      `,
-      'isolated.js': templateOnlyComponentTemplate(
-        '<h1><@fields.title/></h1><article><@fields.body/></article>'
-      ),
+      ...postFiles,
     });
 
     realm.addCard('post0', {
@@ -94,13 +98,20 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
       assert.deepEqual(Object.keys(response.body.data), [
         'type',
         'id',
-        'meta',
         'attributes',
       ]);
       assert.deepEqual(response.body.data?.attributes, {
-        title: 'Hello World',
-        body: 'First post.',
+        files: postFiles,
+        isolated: 'isolated.js',
+        schema: 'schema.js',
       });
     }
   );
+
+  QUnit.test(
+    'can get source for a card with only data',
+    async function (assert) {}
+  );
+
+  QUnit.test('can include compiled meta', async function (assert) {});
 });
