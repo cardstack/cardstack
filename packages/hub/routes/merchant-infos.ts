@@ -6,12 +6,16 @@ import shortUuid from 'short-uuid';
 import { AuthenticationUtils } from '../utils/authentication';
 import MerchantInfoSerializer from '../services/serializers/merchant-info-serializer';
 import { ensureLoggedIn } from './utils/auth';
+import WorkerClient from '../services/worker-client';
+
 export default class MerchantInfosRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
   merchantInfoSerializer: MerchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
   });
+
+  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);
@@ -39,6 +43,10 @@ export default class MerchantInfosRoute {
       'INSERT INTO merchant_infos (id, name, slug, color, text_color, owner_address) VALUES($1, $2, $3, $4, $5, $6)',
       [newId, name, slug, color, textColor, ownerAddress]
     );
+
+    await this.workerClient.addJob('persist-off-chain-merchant-info', {
+      id: newId,
+    });
 
     let serialized = await this.merchantInfoSerializer.serialize({
       id: newId,
