@@ -30,3 +30,8 @@
   @event="disconnect"
   @action={{this.onDisconnect}}
 />
+<Listener
+  @emitter={{this.layer2Network}}
+  @event="account-changed"
+  @action={{this.onAccountChanged}}
+/>

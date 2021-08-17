@@ -209,7 +209,17 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   test__simulateAccountsChanged(accounts: string[]) {
-    this.walletInfo = new WalletInfo(accounts);
+    let newWalletInfo = new WalletInfo(accounts);
+
+    if (
+      this.walletInfo.firstAddress &&
+      newWalletInfo.firstAddress &&
+      !this.walletInfo.isEqualTo(newWalletInfo)
+    ) {
+      this.simpleEmitter.emit('account-changed');
+    }
+
+    this.walletInfo = newWalletInfo;
     this.waitForAccountDeferred.resolve();
   }
 

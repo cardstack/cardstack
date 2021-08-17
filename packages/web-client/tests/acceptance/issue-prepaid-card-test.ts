@@ -595,12 +595,14 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert
         .dom(cancelationPostableSel(0))
         .containsText(
-          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.`
+          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a prepaid card, please start again by connecting your wallet.`
         );
       assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
 
       assert
-        .dom('[data-test-workflow-disconnection-restart="issue-prepaid-card"]')
+        .dom(
+          '[data-test-workflow-default-cancelation-restart="issue-prepaid-card"]'
+        )
         .exists();
     });
 
@@ -627,7 +629,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       layer2Service.test__simulateDisconnectFromWallet();
 
       await waitFor(
-        '[data-test-workflow-disconnection-cta="issue-prepaid-card"]'
+        '[data-test-workflow-default-cancelation-cta="issue-prepaid-card"]'
       );
       // test that all cta buttons are disabled
       let milestoneCtaButtonCount = Array.from(
@@ -646,11 +648,13 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert
         .dom(cancelationPostableSel(0))
         .containsText(
-          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.`
+          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a prepaid card, please start again by connecting your wallet.`
         );
       assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
       assert
-        .dom('[data-test-workflow-disconnection-restart="issue-prepaid-card"]')
+        .dom(
+          '[data-test-workflow-default-cancelation-restart="issue-prepaid-card"]'
+        )
         .exists();
     });
 
@@ -683,6 +687,59 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert
         .dom(
           '[data-test-issue-prepaid-card-workflow-insufficient-funds-deposit]'
+        )
+        .exists();
+    });
+
+    test('Changing Layer 2 account should cancel the workflow', async function (assert) {
+      let secondLayer2AccountAddress =
+        '0x5416C61193C3393B46C2774ac4717C252031c0bE';
+      await visit('/card-pay');
+      assert.equal(currentURL(), '/card-pay/balances');
+      await click('[data-test-workflow-button="issue-prepaid-card"]');
+
+      assert
+        .dom(
+          '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
+        )
+        .containsText(layer2AccountAddress)
+        .isVisible();
+
+      await settled();
+
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer2.fullName} wallet connected`);
+
+      layer2Service.test__simulateAccountsChanged([secondLayer2AccountAddress]);
+
+      await settled();
+
+      // test that all cta buttons are disabled
+      let milestoneCtaButtonCount = Array.from(
+        document.querySelectorAll(
+          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+        )
+      ).length;
+      assert
+        .dom(
+          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+        )
+        .exists(
+          { count: milestoneCtaButtonCount },
+          'All cta buttons in milestones should be disabled'
+        );
+
+      assert
+        .dom(cancelationPostableSel(0))
+        .containsText(
+          'It looks like you changed accounts in the middle of this workflow. If you still want to create a prepaid card, please restart the workflow.'
+        );
+      assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+
+      assert
+        .dom(
+          '[data-test-workflow-default-cancelation-restart="issue-prepaid-card"]'
         )
         .exists();
     });

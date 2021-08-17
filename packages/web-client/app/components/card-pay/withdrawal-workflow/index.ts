@@ -23,6 +23,7 @@ import { formatTokenAmount } from '@cardstack/web-client/helpers/format-token-am
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
+  ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
 } as const;
 
 class CheckBalanceWorkflowMessage extends WorkflowPostable {
@@ -261,10 +262,30 @@ with Card Pay.`,
     }),
     new WorkflowCard({
       author: cardbot,
-      componentName: 'workflow-thread/disconnection-cta',
+      componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
+        );
+      },
+    }),
+    // cancelation for changing accounts
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'It looks like you changed accounts in the middle of this workflow. If you still want to withdraw funds, please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
+        );
+      },
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'workflow-thread/default-cancelation-cta',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
         );
       },
     }),
@@ -288,5 +309,9 @@ export default class WithdrawalWorkflowComponent extends Component {
 
   @action onDisconnect() {
     this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
+  }
+
+  @action onAccountChanged() {
+    this.workflow.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
   }
 }

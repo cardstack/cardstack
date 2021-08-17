@@ -109,9 +109,19 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   }
 
   test__simulateAccountsChanged(accounts: string[], walletProviderId?: string) {
+    let newWalletInfo = new WalletInfo(accounts);
+
+    if (
+      this.walletInfo.firstAddress &&
+      newWalletInfo.firstAddress &&
+      !this.walletInfo.isEqualTo(newWalletInfo)
+    ) {
+      this.simpleEmitter.emit('account-changed');
+    }
+
     if (accounts.length && walletProviderId) {
       this.currentProviderId = walletProviderId;
-      this.walletInfo = new WalletInfo(accounts);
+      this.walletInfo = newWalletInfo;
       this.waitForAccountDeferred.resolve();
     } else {
       this.currentProviderId = '';
