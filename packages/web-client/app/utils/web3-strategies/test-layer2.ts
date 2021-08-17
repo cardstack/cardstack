@@ -25,6 +25,7 @@ import {
   SimpleEmitter,
 } from '@cardstack/web-client/utils/events';
 import { task, TaskGenerator } from 'ember-concurrency';
+import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 
 interface IssuePrepaidCardRequest {
   deferred: RSVP.Deferred<PrepaidCardSafe>;
@@ -119,9 +120,9 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       .promise as Promise<BridgeValidationResult>;
   }
 
-  async updateUsdConverters(symbolsToUpdate: ConvertibleSymbol[]) {
+  async updateUsdConverters(symbolsToUpdate: UsdConvertibleSymbol[]) {
     this.test__lastSymbolsToUpdate = symbolsToUpdate;
-    let result = {} as Record<ConvertibleSymbol, ConversionFunction>;
+    let result = {} as Record<UsdConvertibleSymbol, ConversionFunction>;
     for (let symbol of symbolsToUpdate) {
       result[symbol] = (amountInWei: string) => {
         return Number(fromWei(amountInWei)) * this.test__simulatedExchangeRate;
@@ -199,7 +200,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(true);
   }
 
-  test__lastSymbolsToUpdate: ConvertibleSymbol[] = [];
+  test__lastSymbolsToUpdate: UsdConvertibleSymbol[] = [];
   test__simulatedExchangeRate: number = 0.2;
   test__updateUsdConvertersDeferred: RSVP.Deferred<void> | undefined;
   test__deferredHubAuthentication!: RSVP.Deferred<string>;

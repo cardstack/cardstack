@@ -26,7 +26,8 @@ import { BridgeValidationResult } from '@cardstack/cardpay-sdk';
 import walletProviders, {
   WalletProvider,
 } from '@cardstack/web-client/utils/wallet-providers';
-import { BridgeableSymbol } from '../utils/token';
+import { BridgeableSymbol, ConversionFunction } from '../utils/token';
+import { UsdConvertibleSymbol } from './token-to-usd';
 
 export default class Layer1Network
   extends Service
@@ -143,6 +144,20 @@ export default class Layer1Network
     );
     yield this.strategy.refreshBalances();
     return result;
+  }
+
+  async updateUsdConverters(
+    symbolsToUpdate: UsdConvertibleSymbol[]
+  ): Promise<Partial<Record<UsdConvertibleSymbol, ConversionFunction>>> {
+    if (symbolsToUpdate.length === 0) {
+      return {};
+    }
+    if (!this.walletInfo.firstAddress) {
+      throw new Error(
+        'Cannot fetch USD conversion without being connected to Layer 1'
+      );
+    }
+    return this.strategy.updateUsdConverters(symbolsToUpdate);
   }
 
   getBlockConfirmation(blockNumber: TxnBlockNumber) {

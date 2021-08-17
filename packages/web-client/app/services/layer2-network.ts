@@ -29,6 +29,7 @@ import {
 import { action } from '@ember/object';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { taskFor } from 'ember-concurrency-ts';
+import { UsdConvertibleSymbol } from './token-to-usd';
 export default class Layer2Network
   extends Service
   implements Emitter<Layer2ChainEvent> {
@@ -70,8 +71,11 @@ export default class Layer2Network
   }
 
   async updateUsdConverters(
-    symbolsToUpdate: ConvertibleSymbol[]
-  ): Promise<Record<ConvertibleSymbol, ConversionFunction>> {
+    symbolsToUpdate: UsdConvertibleSymbol[]
+  ): Promise<Partial<Record<UsdConvertibleSymbol, ConversionFunction>>> {
+    if (symbolsToUpdate.length === 0) {
+      return {};
+    }
     if (!this.walletInfo.firstAddress) {
       throw new Error(
         'Cannot fetch USD conversion without being connected to Layer 2'

@@ -14,6 +14,7 @@ import {
 import { Emitter } from '../events';
 import { BridgeValidationResult } from '@cardstack/cardpay-sdk/sdk/token-bridge-home-side';
 import { TaskGenerator } from 'ember-concurrency';
+import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 
 export type Layer1ChainEvent =
   | 'disconnect'
@@ -82,6 +83,9 @@ export interface Layer1Web3Strategy
   ): Promise<TransactionReceipt>;
   getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void>;
   getEstimatedGasForWithdrawalClaim(symbol: BridgeableSymbol): Promise<BN>;
+  updateUsdConverters(
+    symbolsToUpdate: UsdConvertibleSymbol[]
+  ): Promise<Record<UsdConvertibleSymbol, ConversionFunction>>;
 }
 
 export interface Layer2Web3Strategy
@@ -95,8 +99,8 @@ export interface Layer2Web3Strategy
   walletConnectUri: string | undefined;
   initializeTask(): TaskGenerator<void>;
   updateUsdConverters(
-    symbolsToUpdate: ConvertibleSymbol[]
-  ): Promise<Record<ConvertibleSymbol, ConversionFunction>>;
+    symbolsToUpdate: UsdConvertibleSymbol[]
+  ): Promise<Record<UsdConvertibleSymbol, ConversionFunction>>;
   blockExplorerUrl(txnHash: TransactionHash): string;
   getBlockHeight(): Promise<BN>;
   awaitBridgedToLayer2(

@@ -23,6 +23,7 @@ export const convertibleSymbols: ConvertibleSymbol[] = ['DAI', 'CARD'];
 // contract/bridging
 export const bridgeableSymbols: BridgeableSymbol[] = ['DAI', 'CARD'];
 export const bridgedSymbols: BridgedTokenSymbol[] = ['DAI.CPXD', 'CARD.CPXD'];
+
 const contractNames: Record<NetworkSymbol, Record<BridgeableSymbol, string>> = {
   kovan: {
     DAI: 'daiToken',
@@ -53,6 +54,12 @@ export function getUnbridgedSymbol(
   } else {
     throw new Error(`Unknown bridgedSymbol ${bridgedSymbol}`);
   }
+}
+
+export function isBridgedTokenSymbol(
+  symbol: TokenSymbol
+): symbol is BridgedTokenSymbol {
+  return bridgedSymbols.includes(symbol as BridgedTokenSymbol);
 }
 
 export class TokenContractInfo {
