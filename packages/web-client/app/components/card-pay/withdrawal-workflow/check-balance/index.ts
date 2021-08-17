@@ -43,8 +43,11 @@ export default class CardPayWithdrawalWorkflowCheckBalanceComponent extends Comp
   @reads('layer1Network.walletProvider') declare walletProvider: WalletProvider;
 
   get hasSufficientBalance() {
-    return this.minimumBalanceForWithdrawalClaim.lte(
-      this.layer1Network.defaultTokenBalance
+    return (
+      this.layer1Network.defaultTokenBalance &&
+      this.minimumBalanceForWithdrawalClaim.lte(
+        this.layer1Network.defaultTokenBalance
+      )
     );
   }
 
