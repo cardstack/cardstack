@@ -5,6 +5,7 @@ import PriceOracleABI from '../../contracts/abi/v0.7.0/price-oracle';
 import ExchangeABI from '../../contracts/abi/v0.7.0/exchange';
 import { getOracle, getAddress } from '../../contracts/addresses';
 import BN from 'bn.js';
+import { safeFloatConvert } from '../utils/general-utils';
 
 const tokenDecimals = new BN('18');
 const ten = new BN('10');
@@ -77,13 +78,4 @@ export default class LayerTwoOracle {
     let address = await getOracle(token, this.layer2Web3);
     return new this.layer2Web3.eth.Contract(PriceOracleABI as AbiItem[], address);
   }
-}
-
-// because BN does not handle floating point, and the numbers from ethereum
-// might be too large for JS to handle, we'll use string manipulation to move
-// the decimal point. After this operation, the number should be safely in JS's
-// territory.
-function safeFloatConvert(rawAmount: BN, decimals: number): number {
-  let amountStr = rawAmount.toString().padStart(decimals, '0');
-  return Number(`${amountStr.slice(0, -1 * decimals)}.${amountStr.slice(-1 * decimals)}`);
 }

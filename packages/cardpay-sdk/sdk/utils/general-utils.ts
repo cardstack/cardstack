@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import { networks } from '../constants';
 import { Contract, EventData, PastEventOptions } from 'web3-eth-contract';
 import { TransactionReceipt } from 'web3-core';
+import BN from 'bn.js';
 
 const POLL_INTERVAL = 500;
 
@@ -100,4 +101,13 @@ export function waitForEvent(contract: Contract, eventName: string, opts: PastEv
   return new Promise(function (resolve, reject) {
     eventDataAsync(resolve, reject);
   });
+}
+
+// because BN does not handle floating point, and the numbers from ethereum
+// might be too large for JS to handle, we'll use string manipulation to move
+// the decimal point. After this operation, the number should be safely in JS's
+// territory.
+export function safeFloatConvert(rawAmount: BN, decimals: number): number {
+  let amountStr = rawAmount.toString().padStart(decimals, '0');
+  return Number(`${amountStr.slice(0, -1 * decimals)}.${amountStr.slice(-1 * decimals)}`);
 }
