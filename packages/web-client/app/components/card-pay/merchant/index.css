@@ -11,18 +11,11 @@
   text-align: center;
 }
 
-.merchant--vertical .merchant__logo {
-  margin-right: auto;
-  margin-left: auto;
-  margin-bottom: var(--boxel-sp-xxxs);
-}
-
 .merchant__logo {
   --logo-size: var(--boxel-icon-lg);
 
   background: var(--merchant-logo-background);
   color: var(--merchant-logo-text-color);
-
   align-self: flex-start;
   display: flex;
   align-items: center;
@@ -33,6 +26,12 @@
   font-size: var(--boxel-font-size-lg);
   font-weight: 600;
   border-radius: 50%;
+}
+
+.merchant--vertical .merchant__logo {
+  margin-right: auto;
+  margin-left: auto;
+  margin-bottom: var(--boxel-sp-xxxs);
 }
 
 .merchant__logo--sm {
