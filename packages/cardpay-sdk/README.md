@@ -45,7 +45,6 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`RewardPool`](#rewardpool)
   - [`RewardPool.rewardTokenBalance`](#rewardpoolrewardtokenbalance)
   - [`RewardPool.claim` (TBD)](#rewardpoolclaim-tbd)
-- [`ExchangeRate`](#exchangerate)
 - [`LayerTwoOracle`](#layertwooracle)
   - [`LayerTwoOracle.convertToSpend`](#layertwooracleconverttospend)
   - [`LayerTwoOracle.convertFromSpend`](#layertwooracleconvertfromspend)
@@ -579,8 +578,6 @@ let balanceForAllTokens = await rewardPool.rewardTokenBalances(address)
 ```
 
 ### `RewardPool.claim` (TBD)
-## `ExchangeRate`
-The `ExchangeRate` API is deprecated. Please move to use the `LayerTwoOracle` API.
 
 ## `LayerTwoOracle`
 The `LayerTwoOracle` API is used to get the current exchange rates in USD and ETH for the various stablecoin that we support. These rates are fed by the Chainlink price feeds for the stablecoin rates and the DIA oracle for the CARD token rates. As we onboard new stablecoin we'll add more exchange rates. The price oracles that we use reside in layer 2, so please supply a layer 2 web3 instance obtaining an `LayerTwoOracle` API from `getSDK()`.
