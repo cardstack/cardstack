@@ -151,10 +151,19 @@ function unimpl() {
 async function getSource(ctx: RouterContext<any, CardStackContext>) {
   let {
     realms,
+    builder,
     params: { encodedCardURL: url },
+    query,
   } = ctx;
+
+  let compiledCard;
   let rawCard = await realms.getRawCard(url);
-  ctx.body = serializeRawCard(rawCard);
+
+  if (query.include === 'compiled-meta') {
+    compiledCard = await builder.getCompiledCard(url);
+  }
+
+  ctx.body = serializeRawCard(rawCard, compiledCard);
 }
 
 export async function cardRoutes(

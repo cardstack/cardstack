@@ -1,4 +1,9 @@
-import { ComponentInfo, RawCard } from '@cardstack/core/src/interfaces';
+import {
+  ComponentInfo,
+  RawCard,
+  CompiledCard,
+  FORMATS,
+} from '@cardstack/core/src/interfaces';
 import type { CardJSONResponse } from '@cardstack/core/src/interfaces';
 import { Serializer } from 'jsonapi-serializer';
 import _mapKeys from 'lodash/mapKeys';
@@ -33,19 +38,69 @@ export function deserialize(payload: any): any {
   return data;
 }
 
-const rawSerializer = new Serializer('raw-card', {
-  attributes: [
-    'schema',
-    'isolated',
-    'embedded',
-    'edit',
-    'deserializer',
-    'adoptsFrom',
-    'files',
-    'data',
-  ],
-});
+let fieldSerializerConfig = {
+  attributes: ['name', 'fieldType', 'card'],
 
-export function serializeRawCard(card: RawCard): Promise<object> {
-  return rawSerializer.serialize(Object.assign({ id: card.url }, card));
+  ref(parentCompiledCard, field) {
+    return parentCompiledCard.url + '/' + field.name;
+  },
+};
+
+let compiledCardSerializerConfig = {
+  ref: 'url',
+  attributes: [
+    'schemaModule',
+    'serializer',
+    'fields',
+    'adoptsFrom',
+    ...FORMATS,
+  ],
+  fields: fieldSerializerConfig,
+  transform(compiledCard) {
+    debugger;
+    return compiledCard;
+  },
+};
+compiledCardSerializerConfig.adoptsFrom = compiledCardSerializerConfig;
+fieldSerializerConfig.card = compiledCardSerializerConfig;
+
+export function serializeRawCard(
+  card: RawCard,
+  compiled?: CompiledCard
+): Promise<object> {
+  let config: any = {
+    id: 'url',
+    attributes: [
+      'schema',
+      'isolated',
+      'embedded',
+      'edit',
+      'deserializer',
+      'adoptsFrom',
+      'files',
+      'data',
+      'compiled-meta',
+    ],
+    'compiled-meta': compiledCardSerializerConfig,
+    nullIfMissing: true,
+    transform(compiledCard) {
+      debugger;
+      return compiledCard;
+    },
+    typeForAttribute: function (type: string) {
+      if (type === 'adoptsFrom') {
+        return 'compiled-meta';
+      }
+      return type;
+    },
+  };
+
+  if (compiled) {
+    card['compiled-meta'] = compiled;
+  }
+
+  let rawSerializer = new Serializer('raw-card', config);
+
+  debugger;
+  return rawSerializer.serialize(card);
 }

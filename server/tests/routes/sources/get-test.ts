@@ -30,10 +30,12 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
   let realm: ProjectTestRealm;
   let server: Koa;
 
-  function getSource(cardURL: string) {
-    return supertest(server.callback()).get(
-      `/sources/${encodeURIComponent(cardURL)}`
-    );
+  function getSource(cardURL: string, params?: any) {
+    let url = `/sources/${encodeURIComponent(cardURL)}`;
+    if (params) {
+      url += '?' + new URLSearchParams(params).toString();
+    }
+    return supertest(server.callback()).get(url);
   }
 
   let { getCardCacheDir } = setupCardCache(hooks);
@@ -110,8 +112,54 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
 
   QUnit.test(
     'can get source for a card with only data',
-    async function (assert) {}
+    async function (assert) {
+      let response = await getSource('https://my-realm/post0').expect(200);
+
+      assert.deepEqual(
+        Object.keys(response.body),
+        ['data'],
+        'data is the only top level key'
+      );
+      assert.deepEqual(Object.keys(response.body.data), [
+        'type',
+        'id',
+        'attributes',
+      ]);
+      assert.deepEqual(response.body.data?.attributes, {
+        'adopts-from': '../post', // TODO: Full card URL
+        files: {},
+        data: { title: 'Hello World', body: 'First post.' },
+      });
+    }
   );
 
-  QUnit.test('can include compiled meta', async function (assert) {});
+  QUnit.test('can include compiled meta', async function (assert) {
+    let response = await getSource('https://my-realm/post0', {
+      include: 'compiled-meta',
+    }).expect(200);
+    console.log(response);
+
+    assert.deepEqual(Object.keys(response.body.data), [
+      'type',
+      'id',
+      'attributes',
+      'includes',
+    ]);
+    assert.deepEqual(response.body.data?.attributes, {
+      'adopts-from': '../post',
+      files: {},
+      data: { title: 'Hello World', body: 'First post.' },
+    });
+
+    assert.deepEqual(
+      response.body.data.included.map((r: any) => r.id),
+      [
+        'https://my-realm/post',
+        'https://cardstack.com/base/datetime',
+        'https://cardstack.com/base/string',
+        'https://cardstack.com/base/base',
+      ],
+      'There should be 4 included resources'
+    );
+  });
 });
