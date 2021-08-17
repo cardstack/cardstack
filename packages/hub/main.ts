@@ -23,6 +23,7 @@ import PrepaidCardPatternsRoute from './routes/prepaid-card-patterns';
 import PrepaidCardCustomizationSerializer from './services/serializers/prepaid-card-customization-serializer';
 import PrepaidCardCustomizationsRoute from './routes/prepaid-card-customizations';
 import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
+import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
 import MerchantInfosRoute from './routes/merchant-infos';
 import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import { AuthenticationUtils } from './utils/authentication';
@@ -50,6 +51,7 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('boom-route', BoomRoute);
   registry.register('session-route', SessionRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
+  registry.register('persist-off-chain-merchant-info', PersistOffChainMerchantInfoTask);
   registry.register('prepaid-card-customizations-route', PrepaidCardCustomizationsRoute);
   registry.register('prepaid-card-customization-serializer', PrepaidCardCustomizationSerializer);
   registry.register('prepaid-card-color-schemes-route', PrepaidCardColorSchemesRoute);
@@ -216,6 +218,10 @@ export async function bootWorker() {
       boom: boom,
       'persist-off-chain-prepaid-card-customization': async (payload: any, helpers: Helpers) => {
         let task = await container.instantiate(PersistOffChainPrepaidCardCustomizationTask);
+        return task.perform(payload, helpers);
+      },
+      'persist-off-chain-merchant-info': async (payload: any, helpers: Helpers) => {
+        let task = await container.instantiate(PersistOffChainMerchantInfoTask);
         return task.perform(payload, helpers);
       },
       's3-put-json': s3PutJson,
