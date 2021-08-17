@@ -17,6 +17,7 @@ import BN from 'bn.js';
 import { capitalize } from '@ember/string';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { DepotSafe } from '@cardstack/cardpay-sdk';
+import { toWei } from 'web3-utils';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -350,7 +351,7 @@ module('Acceptance | withdrawal', function (hooks) {
       'metamask'
     );
     layer1Service.test__simulateBalances({
-      defaultToken: new BN('1100000000000000'),
+      defaultToken: new BN(toWei('0.011')),
       dai: new BN('150500000000000000000'),
       card: new BN('10000000000000000000000'),
     });
@@ -366,18 +367,29 @@ module('Acceptance | withdrawal', function (hooks) {
     assert
       .dom(postableSel(1, 0))
       .containsText('You will need to deposit more ETH to your account');
-    await waitFor(postableSel(1, 1));
+    post = postableSel(1, 1);
+    await waitFor(post);
     assert
-      .dom(postableSel(1, 1))
+      .dom(post)
       .containsText(`Insufficient funds for claiming withdrawn tokens`);
+    assert
+      .dom(
+        `${post} [data-test-balance-amount] [data-test-balance-display-usd-amount]`
+      )
+      .containsText('$33.00');
+    assert
+      .dom(
+        `${post} [data-test-funds-needed] [data-test-balance-display-usd-amount]`
+      )
+      .containsText('$41.76');
     assert.dom(milestoneCompletedSel(1)).doesNotExist();
 
     layer1Service.test__simulateBalances({
-      defaultToken: new BN('21100000000000000'),
+      defaultToken: new BN(toWei('0.211')),
     });
     await waitFor(milestoneCompletedSel(1));
     assert
-      .dom(postableSel(1, 1))
+      .dom(post)
       .containsText(`Sufficient funds for claiming withdrawn tokens`);
     assert.dom(milestoneCompletedSel(1)).containsText(`ETH balance checked`);
   });
