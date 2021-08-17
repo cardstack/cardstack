@@ -363,8 +363,8 @@ USAGE
 
 ARGUMENTS
   TOKEN           The token symbol (without the .CPXD suffix)
-  AMOUNT          (Optional) The amount of the specified token (not in units of wei, but in `eth`).
-  NETWORK         The network to use ("sokol" or "xdai")
+  AMOUNT          (Optional) The amount of the specified token (not in units of wei, but in `eth`). Defaults to '1'
+  NETWORK         The network to use ("sokol" or "xdai", or if pricing ETH, "kovan" or "mainnet")
   MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
 ```
@@ -377,8 +377,7 @@ USAGE
 
 ARGUMENTS
   TOKEN           The token symbol (without the .CPXD suffix)
-  AMOUNT          The amount of the specified token (not in units of `wei`, but in `eth`)
-  AMOUNT          (Optional) The amount of the specified token (not in units of `wei`, but in `eth`).
+  AMOUNT          (Optional) The amount of the specified token (not in units of `wei`, but in `eth`). Defaults to '1'
   NETWORK         The network to use ("sokol" or "xdai")
   MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
@@ -393,7 +392,7 @@ USAGE
 
 ARGUMENTS
   TOKEN           The token symbol (without the .CPXD suffix)
-  NETWORK         The network to use ("sokol" or "xdai")
+  NETWORK         The network to use ("sokol" or "xdai", or if checking ETH price "kovan" or "mainnet")
   MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
 ```

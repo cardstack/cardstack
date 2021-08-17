@@ -18,7 +18,12 @@ import {
   payMerchant,
   gasFee,
 } from './prepaid-card.js';
-import { usdPrice, ethPrice, priceOracleUpdatedAt } from './layer-two-oracle';
+import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
+import {
+  usdPrice as layer2UsdPrice,
+  ethPrice as layer2EthPrice,
+  priceOracleUpdatedAt as layer2PriceOracleUpdatedAt,
+} from './layer-two-oracle';
 import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
 import { rewardTokenBalances } from './reward-pool.js';
 import { hubAuth } from './hub-auth';
@@ -446,7 +451,7 @@ let {
     }
   )
   .command(
-    'usd-price <token> <amount>',
+    'usd-price <token> [amount]',
     'Get the USD value for the USD value for the specified token in the specified amount',
     (yargs) => {
       yargs.positional('token', {
@@ -455,14 +460,14 @@ let {
       });
       yargs.positional('amount', {
         type: 'string',
-        default: 1,
+        default: '1',
         description: 'The amount of the specified token (*not* in units of wei, but in eth)',
       });
       command = 'usdPrice';
     }
   )
   .command(
-    'eth-price <token> <amount>',
+    'eth-price <token> [amount]',
     'Get the ETH value for the USD value for the specified token in the specified amount',
     (yargs) => {
       yargs.positional('token', {
@@ -471,7 +476,7 @@ let {
       });
       yargs.positional('amount', {
         type: 'string',
-        default: 1,
+        default: '1',
         description: 'The amount of the specified token (*not* in units of wei, but in eth)',
       });
       command = 'ethPrice';
@@ -521,7 +526,7 @@ let {
     network: {
       alias: 'n',
       type: 'string',
-      description: "The Layer 1 network to ruin this script in ('kovan' or 'mainnet')",
+      description: "The Layer 1 network to run this script in ('kovan' or 'mainnet')",
     },
     mnemonic: {
       alias: 'm',
@@ -683,21 +688,29 @@ if (!command) {
         showHelpAndExit('token and amount are required values');
         return;
       }
-      await usdPrice(network, token, amount, mnemonic);
+      if (token.toUpperCase() === 'ETH') {
+        await ethToUsdPrice(network, amount, mnemonic);
+      } else {
+        await layer2UsdPrice(network, token, amount, mnemonic);
+      }
       break;
     case 'ethPrice':
       if (token == null || amount == null) {
         showHelpAndExit('token and amount are required values');
         return;
       }
-      await ethPrice(network, token, amount, mnemonic);
+      await layer2EthPrice(network, token, amount, mnemonic);
       break;
     case 'priceOracleUpdatedAt':
       if (token == null) {
-        showHelpAndExit('tokenAddress is a required value');
+        showHelpAndExit('token is a required value');
         return;
       }
-      await priceOracleUpdatedAt(network, token, mnemonic);
+      if (token.toUpperCase() === 'ETH') {
+        await layer1PriceOracleUpdatedAt(network, mnemonic);
+      } else {
+        await layer2PriceOracleUpdatedAt(network, token, mnemonic);
+      }
       break;
     case 'viewTokenBalance':
       await viewTokenBalance(network, tokenAddress, mnemonic);
