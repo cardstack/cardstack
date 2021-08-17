@@ -43,7 +43,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainId = '-1';
   simpleEmitter = new SimpleEmitter();
   @tracked walletConnectUri: string | undefined;
-  @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
+  @tracked walletInfo: WalletInfo = new WalletInfo([]);
   waitForAccountDeferred = defer();
   bridgingToLayer2Deferred!: RSVP.Deferred<TransactionReceipt>;
   bridgingToLayer1HashDeferred!: RSVP.Deferred<TransactionHash>;
@@ -209,7 +209,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   test__simulateAccountsChanged(accounts: string[]) {
-    this.walletInfo = new WalletInfo(accounts, parseInt(this.chainId, 10));
+    this.walletInfo = new WalletInfo(accounts);
     this.waitForAccountDeferred.resolve();
   }
 

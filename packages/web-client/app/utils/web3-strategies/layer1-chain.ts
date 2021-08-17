@@ -59,7 +59,7 @@ export default abstract class Layer1ChainWeb3Strategy
 
   constructor(networkSymbol: Layer1NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
-    this.walletInfo = new WalletInfo([], this.chainId);
+    this.walletInfo = new WalletInfo([]);
     this.networkSymbol = networkSymbol;
     this.bridgeConfirmationBlockCount = Number(
       getConstantByNetwork('ambFinalizationRate', this.networkSymbol)
@@ -119,7 +119,7 @@ export default abstract class Layer1ChainWeb3Strategy
 
   @action
   async onConnect(accounts: string[]) {
-    await this.updateWalletInfo(accounts, this.chainId);
+    await this.updateWalletInfo(accounts);
     this.currentProviderId = this.connectionManager?.providerId;
     this.#waitForAccountDeferred.resolve();
   }
@@ -206,8 +206,17 @@ export default abstract class Layer1ChainWeb3Strategy
     return this.simpleEmitter.on(event, cb);
   }
 
-  private async updateWalletInfo(accounts: string[], chainId: number) {
-    this.walletInfo = new WalletInfo(accounts, chainId);
+  private async updateWalletInfo(accounts: string[]) {
+    let newWalletInfo = new WalletInfo(accounts);
+    if (this.walletInfo.isEqualTo(newWalletInfo)) {
+      return;
+    }
+
+    if (this.walletInfo.firstAddress && newWalletInfo.firstAddress) {
+      this.simpleEmitter.emit('account-changed');
+    }
+
+    this.walletInfo = newWalletInfo;
     if (accounts.length > 0) {
       await this.refreshBalances();
     } else {
@@ -218,7 +227,7 @@ export default abstract class Layer1ChainWeb3Strategy
   }
 
   private clearWalletInfo() {
-    this.updateWalletInfo([], -1);
+    this.updateWalletInfo([]);
   }
 
   contractForToken(symbol: BridgeableSymbol) {
