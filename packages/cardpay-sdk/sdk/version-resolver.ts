@@ -3,7 +3,6 @@ import { AddressKeys, getAddress } from '../contracts/addresses';
 import { AbiItem } from 'web3-utils';
 import { satisfies } from 'semver';
 import mapKeys from 'lodash/mapKeys';
-import { ExchangeRate, exchangeRateMeta } from './exchange-rate';
 import { LayerTwoOracle, layerTwoOracleMeta } from './layer-two-oracle';
 import { Safes, safesMeta } from './safes';
 import { PrepaidCard, prepaidCardMeta } from './prepaid-card';
@@ -17,7 +16,6 @@ import HubAuth from './hub-auth';
 
 type SDK =
   | 'Assets'
-  | 'ExchangeRate'
   | 'LayerOneOracle'
   | 'LayerTwoOracle'
   | 'PrepaidCard'
@@ -52,7 +50,6 @@ const cardPayVersionABI: AbiItem[] = [
 
 export async function getSDK(sdk: 'Assets', web3: Web3): Promise<Assets>;
 export async function getSDK(sdk: 'HubAuth', web3: Web3, hubRootUrl: string): Promise<HubAuth>;
-export async function getSDK(sdk: 'ExchangeRate', web3: Web3): Promise<ExchangeRate>;
 export async function getSDK(sdk: 'LayerOneOracle', web3: Web3): Promise<LayerOneOracle>;
 export async function getSDK(sdk: 'LayerTwoOracle', web3: Web3): Promise<LayerTwoOracle>;
 export async function getSDK(sdk: 'PrepaidCard', web3: Web3): Promise<PrepaidCard>;
@@ -70,9 +67,6 @@ export async function getSDK(sdk: SDK, ...args: any[]): Promise<any> {
       break;
     case 'HubAuth':
       apiClass = HubAuth;
-      break;
-    case 'ExchangeRate':
-      apiClass = await resolveApiVersion(exchangeRateMeta, web3);
       break;
     case 'LayerOneOracle':
       apiClass = LayerOneOracle;
