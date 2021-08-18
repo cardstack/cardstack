@@ -160,7 +160,6 @@ export default abstract class Layer2ChainWeb3Strategy
         this.#safesApi = await getSDK('Safes', this.web3);
         this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
         await this.updateWalletInfo(accounts);
-        this.isInitializing = false;
         this.#broadcastChannel.postMessage({
           type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
           session: this.connector?.session,
@@ -171,6 +170,8 @@ export default abstract class Layer2ChainWeb3Strategy
         );
         console.error(e);
         this.disconnect();
+      } finally {
+        this.isInitializing = false;
       }
     });
 
