@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import {
   click,
   currentURL,
+  fillIn,
   settled,
   visit,
   waitFor,
@@ -135,10 +136,21 @@ module('Acceptance | create merchant', function (hooks) {
 
     // // merchant-customization card
     // TODO verify and interact with merchant customization card default state
-    await click(
-      `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
+    await fillIn(
+      `[data-test-merchant-customization-merchant-name-field] input`,
+      'HELLO!'
     );
-    // TODO verify and interact with merchant customization card memorialized state
+    await fillIn(
+      `[data-test-merchant-customization-merchant-id-field] input`,
+      'a-valid-id'
+    );
+    await waitUntil(
+      () =>
+        (document.querySelector(
+          '[data-test-validation-state-input]'
+        ) as HTMLElement).dataset.testValidationStateInput === 'valid'
+    );
+    await click(`[data-test-merchant-customization-save-details]`);
 
     // prepaid-card-choice card
     post = postableSel(1, 4);
