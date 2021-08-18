@@ -71,10 +71,34 @@ The app uses a Postgresql-based background task queue built on [graphile/worker]
 
 `yarn start:worker` starts the hub background task worker process
 
-
 ## Deploying to staging
 
 Green builds of the main branch deploy hub to staging if the commit contains changes to the hub package or its dependencies. The deploy uses waypoint.
+
+## Application console
+
+To test, debug and call isolated parts of the application within its context.
+
+`yarn console` starts the application console.
+
+Examples:
+
+### Make a DB query (call installed modules)
+
+```js
+Hub > const { Client } = require('pg');
+Hub > const config = require('config');
+Hub > const client = new Client(config.db.url);
+Hub > await client.connect();
+Hub > await client.query('SELECT * FROM merchant_infos');
+```
+
+### Call a service (call application modules)
+
+```js
+Hub > const workerClient = await container.lookup('worker-client');
+Hub > await workerClient.addJob('persist-off-chain-merchant-info', { id: 1 });
+```
 
 ## Connecting to the database
 
