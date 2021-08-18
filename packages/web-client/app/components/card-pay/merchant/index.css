@@ -1,5 +1,5 @@
 .merchant {
-  --merchant-logo-background: var(--boxel-red);
+  --merchant-logo-background: var(--boxel-blue);
   --merchant-logo-text-color: var(--boxel-light);
 
   display: flex;
