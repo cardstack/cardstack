@@ -1,10 +1,12 @@
 import type { TestContext } from 'ember-test-helpers';
 import Cards from 'cardhost/services/cards';
+import LocalRealm from 'cardhost/lib/local-realm';
 
 declare module 'ember-test-helpers' {
   interface TestContext {
     routingCard?: string;
-    cardService: typeof cardService;
+    cardService(): Cards;
+    localRealm: LocalRealm;
   }
 }
 
@@ -22,6 +24,8 @@ export default function setupCardMocking(
     if (options) {
       this.routingCard = options.routingCard;
     }
+
+    this.localRealm = await this.cardService().localRealm();
   });
 
   hooks.afterEach(function () {

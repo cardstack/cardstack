@@ -6,14 +6,7 @@ import {
 } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
 import dynamicCardTransform from './dynamic-card-transform';
-
-// This is neccessary to get the base model available to ember
-import * as CardModel from '@cardstack/core/src/card-model';
-import Cards from 'cardhost/services/cards';
-
-(window as any).define('@cardstack/core/src/card-model', function () {
-  return CardModel;
-});
+import type LocalRealm from './local-realm';
 
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
@@ -24,7 +17,7 @@ export default class Builder implements BuilderInterface {
   private seenModuleCache: Set<string> = new Set();
   private compiledCardCache: Map<string, CompiledCard> = new Map();
 
-  constructor(private cards: Cards, private ownRealmURL: string) {}
+  constructor(private localRealm: LocalRealm, private ownRealmURL: string) {}
 
   private async defineModule(
     cardURL: string,
@@ -62,18 +55,18 @@ export default class Builder implements BuilderInterface {
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    return this.cards.getRawCard(url);
+    return this.localRealm.getRawCard(url);
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
     if (!url.startsWith(this.ownRealmURL)) {
-      return this.cards.getCompiledCard(url);
+      return this.localRealm.getCompiledCard(url);
     }
     let compiledCard = this.compiledCardCache.get(url);
     if (compiledCard) {
       return compiledCard;
     }
-    let rawCard = await this.cards.getRawCard(url);
+    let rawCard = await this.localRealm.getRawCard(url);
     compiledCard = await this.compiler.compile(rawCard);
     this.compiledCardCache.set(url, compiledCard);
     return compiledCard;

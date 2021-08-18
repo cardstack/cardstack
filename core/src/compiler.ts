@@ -77,6 +77,7 @@ export class Compiler {
       parentCard = await this.getParentCard(cardSource, meta);
 
       if (!parentCard) {
+        debugger;
         throw new Error(
           `${cardSource.url} does not have a parent card. This is wrong and should not happen.`
         );

@@ -159,7 +159,7 @@ async function getSource(ctx: RouterContext<any, CardStackContext>) {
   let compiledCard;
   let rawCard = await realms.getRawCard(url);
 
-  if (query.include === 'compiled-meta') {
+  if (query.include === 'compiledMeta') {
     compiledCard = await builder.getCompiledCard(url);
   }
 

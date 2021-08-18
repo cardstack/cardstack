@@ -23,8 +23,8 @@ module('Acceptance | Card Creation', function (hooks) {
   let personURL = PERSON_RAW_CARD.url;
 
   hooks.beforeEach(async function () {
-    await this.cardService().createRawCard(ADDRESS_RAW_CARD);
-    await this.cardService().createRawCard(
+    await this.localRealm.createRawCard(ADDRESS_RAW_CARD);
+    await this.localRealm.createRawCard(
       Object.assign(
         {
           data: {

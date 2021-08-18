@@ -6,8 +6,6 @@ import {
   CardJSONResponse,
   CardEnv,
   CardOperation,
-  RawCard,
-  CompiledCard,
 } from '@cardstack/core/src/interfaces';
 import CardModel from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
@@ -18,6 +16,7 @@ import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
 import { tracked } from '@glimmer/tracking';
 import type LocalRealm from 'cardhost/lib/local-realm';
+import { fetchJSON } from 'cardhost/lib/jsonapi-fetch';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -31,7 +30,9 @@ export default class Cards extends Service {
       let localRealm = await this.localRealm();
       cardResponse = await localRealm.load(url, format);
     } else {
-      cardResponse = await this.fetchJSON(this.buildCardURL(url, format));
+      cardResponse = await fetchJSON<CardJSONResponse>(
+        this.buildCardURL(url, format)
+      );
     }
     let { component, ModelClass } = await loadCode(cardResponse, url);
     return ModelClass.fromResponse(this.cardEnv(), cardResponse, component);
@@ -39,43 +40,13 @@ export default class Cards extends Service {
 
   async loadForRoute(pathname: string): Promise<CardModel> {
     let url = `${cardServer}cardFor${pathname}`;
-    let cardResponse = await this.fetchJSON(url);
+    let cardResponse = await fetchJSON<CardJSONResponse>(url);
     let { component, ModelClass } = await loadCode(cardResponse, url);
     return ModelClass.fromResponse(this.cardEnv(), cardResponse, component);
   }
 
   private inLocalRealm(cardURL: string): boolean {
     return cardURL.startsWith(this.localRealmURL);
-  }
-
-  // open question: do we keep RawCard methods on here, or split them out and
-  // keep this service focused only on CardModel?
-  async createRawCard(rawCard: RawCard): Promise<void> {
-    if (this.inLocalRealm(rawCard.url)) {
-      let localRealm = await this.localRealm();
-      localRealm.store(rawCard);
-    } else {
-      // TODO: post raw card to server
-      throw new Error('unimplemented');
-    }
-  }
-
-  async getRawCard(url: string): Promise<RawCard> {
-    if (this.inLocalRealm(url)) {
-      let localRealm = await this.localRealm();
-      return localRealm.loadRaw(url);
-    } else {
-      // TODO: get raw card to server
-      throw new Error('need to fetch raw card from server');
-    }
-  }
-
-  async getCompiledCard(url: string): Promise<CompiledCard> {
-    if (this.inLocalRealm(url)) {
-      let localRealm = await this.localRealm();
-      return localRealm.loadCompiled(url);
-    } else {
-    }
   }
 
   private cardEnv(): CardEnv {
@@ -89,7 +60,7 @@ export default class Cards extends Service {
 
   private _localRealmPromise: Promise<LocalRealm> | undefined;
 
-  private async localRealm(): Promise<LocalRealm> {
+  async localRealm(): Promise<LocalRealm> {
     if (this._localRealmPromise) {
       return this._localRealmPromise;
     }
@@ -100,7 +71,7 @@ export default class Cards extends Service {
     });
     try {
       let { default: LocalRealm } = await import('../lib/local-realm');
-      let localRealm = new LocalRealm(this, this.localRealmURL);
+      let localRealm = new LocalRealm(this.localRealmURL);
       resolve(localRealm);
       return localRealm;
     } catch (err) {
@@ -111,7 +82,7 @@ export default class Cards extends Service {
 
   private async send(op: CardOperation): Promise<CardJSONResponse> {
     if ('create' in op) {
-      return await this.fetchJSON(
+      return await fetchJSON<CardJSONResponse>(
         this.buildNewURL(op.create.targetRealm, op.create.parentCardURL),
         {
           method: 'POST',
@@ -119,10 +90,13 @@ export default class Cards extends Service {
         }
       );
     } else if ('update' in op) {
-      return await this.fetchJSON(this.buildCardURL(op.update.cardURL), {
-        method: 'PATCH',
-        body: JSON.stringify(op.update.payload),
-      });
+      return await fetchJSON<CardJSONResponse>(
+        this.buildCardURL(op.update.cardURL),
+        {
+          method: 'PATCH',
+          body: JSON.stringify(op.update.payload),
+        }
+      );
     } else {
       throw assertNever(op);
     }
@@ -143,28 +117,6 @@ export default class Cards extends Service {
       fullURL.push('?' + new URLSearchParams({ format }).toString());
     }
     return fullURL.join('');
-  }
-
-  private async fetchJSON(
-    url: string,
-    options: any = {}
-  ): Promise<CardJSONResponse> {
-    let fullOptions = Object.assign(
-      {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      },
-      options
-    );
-    let response = await fetch(url, fullOptions);
-
-    if (!response.ok) {
-      throw new Error(`unable to fetch card ${url}: status ${response.status}`);
-    }
-
-    return await response.json();
   }
 
   private prepareComponent(cardModel: CardModel, component: unknown): unknown {
