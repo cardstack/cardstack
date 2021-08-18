@@ -3,17 +3,61 @@
   @isComplete={{@isComplete}}
   data-test-layout-customization-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Choose a prepaid card to fund merchant creation" />
+  <ActionCardContainer::Section @title="Choose a prepaid card to fund merchant creation">
+    {{#if this.error}}
+      <CardPay::ErrorMessage data-test-prepaid-card-choice-error-message as |supportURL|>
+        {{#if (eq this.error.message "INSUFFICIENT_FUNDS")}}
+          {{!-- TODO: This should be accompanied by canceling the workflow CS-1620 --}}
+          TODO insufficient funds message
+        {{else if (eq this.error.message "TIMEOUT")}}
+          There was a problem creating your merchant. Please contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
+        {{else if (eq this.error.message "USER_REJECTION")}}
+          It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.
+        {{else}}
+          There was a problem creating your merchant. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+        {{/if}}
+      </CardPay::ErrorMessage>
+    {{/if}}
+  </ActionCardContainer::Section>
   <Boxel::ActionChin
-    @state={{if @isComplete "memorialized" "default"}}
+    @state={{this.creationState}}
     data-test-layout-customization
   >
     <:default as |d|>
       <d.ActionButton
-        {{on "click" @onComplete}}
+        {{on "click" this.createMerchant}}
+        data-test-create-merchant-button
       >
-        Create Merchant
+        {{if this.hasTriedCreatingMerchant "Try Again" "Create Merchant"}}
       </d.ActionButton>
     </:default>
+    <:in-progress as |i|>
+      <i.ActionStatusArea @icon="card-wallet-app-icon" style={{css-var status-icon-size="2.5rem"}}>
+        <Boxel::LoadingIndicator
+          class="prepaid-card-choice__loading-indicator"
+          @color="var(--boxel-light)"
+        />
+        {{this.chinInProgressMessage}}
+      </i.ActionStatusArea>
+      {{#if this.txViewerUrl}}
+        <i.InfoArea>
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} @kind="secondary-dark" target="_blank" rel="noopener">
+            View on Blockscout
+          </Boxel::Button>
+        </i.InfoArea>
+      {{/if}}
+    </:in-progress>
+    <:memorialized as |m|>
+      <m.ActionStatusArea>
+        Confirmed
+      </m.ActionStatusArea>
+      {{#if this.txViewerUrl}}
+        <m.InfoArea>
+          <Boxel::Button @as="anchor" @size="extra-small" @href={{this.txViewerUrl}} @kind="secondary-light" target="_blank" rel="noopener">
+            View on Blockscout
+          </Boxel::Button>
+        </m.InfoArea>
+      {{/if}}
+    </:memorialized>
   </Boxel::ActionChin>
 </ActionCardContainer>

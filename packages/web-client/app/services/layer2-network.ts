@@ -7,6 +7,7 @@ import {
   IssuePrepaidCardOptions,
   Layer2ChainEvent,
   Layer2Web3Strategy,
+  RegisterMerchantOptions,
   TransactionHash,
 } from '../utils/web3-strategies/types';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
@@ -128,6 +129,18 @@ export default class Layer2Network
     taskFor(this.refreshSafes).perform();
 
     return address;
+  }
+
+  @task *registerMerchant(
+    prepaidCardAddress: string,
+    infoDid: string,
+    options: RegisterMerchantOptions
+  ): any {
+    return yield this.strategy.registerMerchant(
+      prepaidCardAddress,
+      infoDid,
+      options
+    );
   }
 
   disconnect() {

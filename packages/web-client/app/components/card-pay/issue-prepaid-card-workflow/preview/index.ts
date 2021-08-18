@@ -16,14 +16,11 @@ import CardCustomization, {
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
+import Resolved from '@cardstack/web-client/utils/resolved';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-rejection-error';
 import { IssuePrepaidCardOptions } from '../../../../utils/web3-strategies/types';
 import config from '../../../../config/environment';
-
-// http://ember-concurrency.com/docs/typescript
-// infer whether we should treat the return of a yield statement as a promise
-type Resolved<T> = T extends PromiseLike<infer R> ? R : T;
 
 interface CardPayPrepaidCardWorkflowPreviewComponentArgs {
   workflowSession: WorkflowSession;
