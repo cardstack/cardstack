@@ -8,6 +8,15 @@ import MerchantInfoSerializer from '../services/serializers/merchant-info-serial
 import { ensureLoggedIn } from './utils/auth';
 import WorkerClient from '../services/worker-client';
 
+export interface MerchantInfo {
+  id: string;
+  name: string;
+  slug: string;
+  color: string;
+  textColor: string;
+  ownerAddress: string;
+}
+
 export default class MerchantInfosRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });

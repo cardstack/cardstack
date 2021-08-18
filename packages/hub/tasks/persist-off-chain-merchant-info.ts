@@ -3,15 +3,21 @@ import MerchantInfoSerializer from '../services/serializers/merchant-info-serial
 import { inject } from '../di/dependency-injection';
 import config from 'config';
 import shortUuid from 'short-uuid';
+import MerchantInfoQueries from '../services/queries/merchant-info';
 
 export default class PersistOffChainMerchantInfo {
   merchantInfoSerializer: MerchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
   });
+  merchantInfoQueries: MerchantInfoQueries = inject('merchant-info-queries', {
+    as: 'merchantInfoQueries',
+  });
 
   async perform(payload: any, helpers: Helpers) {
     const { id } = payload;
-    let jsonAPIDoc = await this.merchantInfoSerializer.serialize(id);
+
+    let merchantInfo = await this.merchantInfoQueries.fetch(id);
+    let jsonAPIDoc = await this.merchantInfoSerializer.serialize(merchantInfo);
 
     helpers.addJob('s3-put-json', {
       bucket: config.get('aws.offchainStorage.bucketName'),
