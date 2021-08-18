@@ -7,6 +7,7 @@ import { AuthenticationUtils } from '../utils/authentication';
 import MerchantInfoSerializer from '../services/serializers/merchant-info-serializer';
 import { ensureLoggedIn } from './utils/auth';
 import WorkerClient from '../services/worker-client';
+import MerchantInfoQueries from '../services/queries/merchant-info';
 
 export interface MerchantInfo {
   id: string;
@@ -23,6 +24,9 @@ export default class MerchantInfosRoute {
   merchantInfoSerializer: MerchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
   });
+  merchantInfoQueries: MerchantInfoQueries = inject('merchant-info-queries', {
+    as: 'merchantInfoQueries',
+  });
 
   workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
@@ -35,36 +39,26 @@ export default class MerchantInfosRoute {
       return;
     }
 
-    let db = await this.databaseManager.getClient();
-
     if (!ensureValidPayload(ctx)) {
       return;
     }
 
-    let newId = shortUuid.uuid();
-    let name = ctx.request.body.data.attributes['name'];
-    let slug = ctx.request.body.data.attributes['slug']; // TODO: validate uniqueness
-    let color = ctx.request.body.data.attributes['color'];
-    let textColor = ctx.request.body.data.attributes['text-color'];
-    let ownerAddress = ctx.state.userAddress;
+    const merchantInfo: MerchantInfo = {
+      id: shortUuid.uuid(),
+      name: ctx.request.body.data.attributes['name'],
+      slug: ctx.request.body.data.attributes['slug'],
+      color: ctx.request.body.data.attributes['color'],
+      textColor: ctx.request.body.data.attributes['text-color'],
+      ownerAddress: ctx.state.userAddress,
+    };
 
-    await db.query(
-      'INSERT INTO merchant_infos (id, name, slug, color, text_color, owner_address) VALUES($1, $2, $3, $4, $5, $6)',
-      [newId, name, slug, color, textColor, ownerAddress]
-    );
+    await this.merchantInfoQueries.insert(merchantInfo);
 
     await this.workerClient.addJob('persist-off-chain-merchant-info', {
-      id: newId,
+      id: merchantInfo.id,
     });
 
-    let serialized = await this.merchantInfoSerializer.serialize({
-      id: newId,
-      name,
-      slug,
-      color,
-      textColor,
-      ownerAddress,
-    });
+    let serialized = await this.merchantInfoSerializer.serialize(merchantInfo);
 
     ctx.status = 201;
     ctx.body = serialized;
