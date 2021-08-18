@@ -30,7 +30,7 @@
     </section>
 
     {{#if this.layer2Network.isConnected}}
-      <aside class="card-pay-dashboard__balances" data-test-card-balances {{did-insert (perform this.layer2Network.refreshSafes)}}>
+      <aside class="card-pay-dashboard__balances" data-test-card-balances>
         <h3 class="card-pay-dashboard__balances-title">Card Balances</h3>
 
         {{#if this.prepaidCards}}

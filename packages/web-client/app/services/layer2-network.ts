@@ -3,6 +3,7 @@ import config from '../config/environment';
 import { inject as service } from '@ember/service';
 import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
+import { useResource } from 'ember-resources';
 import {
   IssuePrepaidCardOptions,
   Layer2ChainEvent,
@@ -17,6 +18,7 @@ import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
 import { DepotSafe, Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { Safes } from '@cardstack/web-client/resources/safes';
 import {
   BridgeableSymbol,
   ConvertibleSymbol,
@@ -109,9 +111,10 @@ export default class Layer2Network
     return yield this.strategy.viewSafes(account);
   }
 
-  @task *refreshSafes(): TaskGenerator<Safe[]> {
-    return yield taskFor(this.viewSafes).perform(this.walletInfo.firstAddress!);
-  }
+  safes = useResource(this, Safes, () => ({
+    strategy: this.strategy,
+    walletAddress: this.walletInfo.firstAddress!,
+  }));
 
   @task *issuePrepaidCard(
     faceValue: number,
@@ -126,7 +129,7 @@ export default class Layer2Network
     );
 
     // Refreshes the safes as the task value is read by an external component that displays the user's prepaid cards
-    taskFor(this.refreshSafes).perform();
+    this.safes.fetch();
 
     return address;
   }

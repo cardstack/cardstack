@@ -75,9 +75,11 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         },
       };
 
-      let prepaidCards = (yield taskFor(
-        this.layer2Network.refreshSafes
-      ).perform()).filterBy('type', 'prepaid-card');
+      // await this.layer2Network.safes.value doesn’t trigger a fetch
+      yield this.layer2Network.safes.fetch();
+
+      let safes = this.layer2Network.safes.value;
+      let prepaidCards = safes.filterBy('type', 'prepaid-card');
       let placeholderPrepaidCard = prepaidCards[0]!;
 
       let merchantSafe = yield taskFor(
