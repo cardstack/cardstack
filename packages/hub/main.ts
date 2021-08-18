@@ -26,6 +26,7 @@ import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-cha
 import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
 import MerchantInfosRoute from './routes/merchant-infos';
 import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
+import MerchantInfoQueries from './services/queries/merchant-info';
 import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './services/jsonapi-middleware';
 import NonceTracker from './services/nonce-tracker';
@@ -60,6 +61,7 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
   registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
+  registry.register('merchant-info-queries', MerchantInfoQueries);
   registry.register('worker-client', WorkerClient);
   registry.register('wyre', WyreService);
   if (registryCallback) {
