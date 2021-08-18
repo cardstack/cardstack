@@ -14,7 +14,7 @@ class StubWyreService {
   async getWalletById(walletId: string): Promise<WyreWallet> {
     return Promise.resolve(handleGetWyreWalletById(walletId));
   }
-  async getTransfer(transferId: string): Promise<WyreTransfer> {
+  async getTransfer(transferId: string): Promise<WyreTransfer | undefined> {
     return Promise.resolve(handleGetWyreTransfer(transferId));
   }
   async getOrder(orderId: string): Promise<WyreOrder> {
@@ -80,16 +80,29 @@ function handleGetWyreWalletById(walletId: string) {
   };
 }
 
-function handleGetWyreTransfer(_transferId: string) {
-  return {
-    id: stubWalletOrderTransferId,
-    status: 'COMPLETED' as 'COMPLETED',
-    source: `walletorderholding:${stubWalletOrderId}`,
-    dest: `wallet:${stubCustodialWalletId}`,
-    sourceCurrency: 'DAI',
-    destCurrency: 'DAI',
-    destAmount: 100,
-  };
+function handleGetWyreTransfer(transferId: string) {
+  if (transferId === stubWalletOrderTransferId) {
+    return {
+      id: stubWalletOrderTransferId,
+      status: 'COMPLETED' as 'COMPLETED',
+      source: `walletorderholding:${stubWalletOrderId}`,
+      dest: `wallet:${stubCustodialWalletId}`,
+      sourceCurrency: 'DAI',
+      destCurrency: 'DAI',
+      destAmount: 100,
+    };
+  } else if (transferId === stubCustodialTransferId) {
+    return {
+      id: stubCustodialTransferId,
+      status: 'COMPLETED' as 'COMPLETED',
+      source: `wallet:${stubCustodialWalletId}`,
+      dest: `wallet:${adminWalletId}`,
+      sourceCurrency: 'DAI',
+      destCurrency: 'DAI',
+      destAmount: 100,
+    };
+  }
+  return;
 }
 
 function handleGetWyreOrder(_orderId: string) {
@@ -164,7 +177,7 @@ describe.only('POST /api/wyre-callback', function () {
   describe('wallet order callbacks', function () {
     this.beforeEach(async function () {});
 
-    it.only(`can process callback for wallet order that doesn't yet exist in DB`, async function () {
+    it(`can process callback for wallet order that doesn't yet exist in DB`, async function () {
       await request
         .post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
@@ -189,9 +202,6 @@ describe.only('POST /api/wyre-callback', function () {
       expect(row.wallet_id).to.equal(stubCustodialWalletId);
       expect(row.custodial_transfer_id).to.equal(stubCustodialTransferId);
       expect(row.status).to.equal('received-order');
-      expect(row.reservation_id).to.equal(null);
-      expect(row.created_at).to.be.ok;
-      expect(row.updated_at.valueOf()).to.equal(row.created_at.valueOf());
     });
 
     // This is the scenario where the reservationId/orderId correlation has been
@@ -234,8 +244,46 @@ describe.only('POST /api/wyre-callback', function () {
   });
 
   describe('custodial transfer callbacks', function () {
+    this.beforeEach(async function () {
+      await db.query(
+        `INSERT INTO wallet_orders (order_id, user_address, wallet_id, custodial_transfer_id, status) VALUES ($1, $2, $3, $4, $5)`,
+        [
+          stubWalletOrderId,
+          stubUserAddress.toLowerCase(),
+          stubCustodialWalletId,
+          stubCustodialTransferId,
+          'received-order',
+        ]
+      );
+    });
+
     it(`can provision a prepaid card after receiving custodial transfer callback when a reservation ID exists`, async function () {
-      expect(true).to.equal(false, 'TODO');
+      await db.query(`UPDATE wallet_orders SET reservation_id = $2 WHERE order_id = $1`, [
+        stubWalletOrderId,
+        stubReservationId,
+      ]);
+
+      await request
+        .post(`/callbacks/wyre`)
+        .set('Content-Type', 'application/json')
+        .set('Content-Type', 'application/json')
+        .send({
+          source: `wallet:${stubCustodialWalletId}`,
+          dest: `transfer:${stubCustodialTransferId}`,
+          currency: 'DAI',
+          amount: 100,
+          status: 'CONFIRMED',
+        })
+        .expect(204);
+
+      expect(wyreTransferCallCount).to.equal(0);
+      expect(provisionPrepaidCardCallCount).to.equal(1);
+
+      let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
+      expect(rows.length).to.equal(1);
+
+      let [row] = rows;
+      expect(row.status).to.equal('complete');
     });
 
     it(`can transition to 'waiting-for-reservation' state after receiving custodial transfer callback when a reservation ID has not be received`, async function () {

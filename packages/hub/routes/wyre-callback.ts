@@ -133,7 +133,7 @@ export default class WyreCallbackRoute {
            custodial_transfer_id = $4,
            status = $5,
            updated_at = NOW()`,
-        [orderId, userAddress, walletId, custodialTransferId, 'received-order']
+        [orderId, userAddress.toLowerCase(), walletId, custodialTransferId, 'received-order']
       );
     } catch (err) {
       log.error(
@@ -173,7 +173,7 @@ export default class WyreCallbackRoute {
     let orders: { id: string; reservationId: string; userAddress: string }[] = [];
     try {
       let result = await db.query(
-        `SELECT order_id, reservation_id, user_address FROM wallet_orders WHERE custodial_transfer_id`,
+        `SELECT order_id, reservation_id, user_address FROM wallet_orders WHERE custodial_transfer_id = $1`,
         [transferId]
       );
       orders = result.rows.map((row) => ({
@@ -204,7 +204,7 @@ export default class WyreCallbackRoute {
     }
 
     try {
-      await db.query(`UPDATE wallet_orders SET status = $2 WHERE order_id = $1`, [
+      await db.query(`UPDATE wallet_orders SET status = $2, updated_at = NOW() WHERE order_id = $1`, [
         order.id,
         order.reservationId ? 'complete' : 'waiting-for-reservation',
       ]);
