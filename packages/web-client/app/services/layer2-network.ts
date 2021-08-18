@@ -3,6 +3,7 @@ import config from '../config/environment';
 import { inject as service } from '@ember/service';
 import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
+import { useTask } from 'ember-resources';
 import {
   IssuePrepaidCardOptions,
   Layer2ChainEvent,
@@ -108,6 +109,10 @@ export default class Layer2Network
   @task *viewSafes(account: string): TaskGenerator<Safe[]> {
     return yield this.strategy.viewSafes(account);
   }
+
+  safes = useTask(this, taskFor(this.viewSafes), () => [
+    this.walletInfo.firstAddress!,
+  ]);
 
   @task *refreshSafes(): TaskGenerator<Safe[]> {
     return yield taskFor(this.viewSafes).perform(this.walletInfo.firstAddress!);

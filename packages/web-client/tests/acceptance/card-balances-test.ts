@@ -29,7 +29,7 @@ module('Acceptance | card balances', function (hooks) {
     assert.dom('[data-test-card-balances]').doesNotExist();
   });
 
-  test('Cards are listed when wallet is connected', async function (this: Context, assert) {
+  test('Cards are listed when wallet is connected and update when the account changes', async function (this: Context, assert) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
 
@@ -97,5 +97,36 @@ module('Acceptance | card balances', function (hooks) {
         `[data-test-prepaid-card-background="${prepaidCardColorSchemes[0].background}"][data-test-prepaid-card-pattern="${prepaidCardPatterns[4].patternUrl}"]`
       )
       .exists();
+
+    let secondAddress = '0x1826000000000000000000000000000000000000';
+
+    layer2Service.test__simulateAccountSafes(secondAddress, [
+      {
+        type: 'prepaid-card',
+        createdAt: Date.now() / 1000,
+
+        address: '0x567800000000000000000000000000000000abcd',
+
+        tokens: [],
+        owners: [layer2AccountAddress],
+
+        issuingToken: '0xTOKEN',
+        spendFaceValue: 4648,
+        prepaidCardOwner: layer2AccountAddress,
+        hasBeenUsed: false,
+        issuer: layer2AccountAddress,
+        reloadable: false,
+        transferrable: false,
+      },
+    ]);
+
+    layer2Service.test__simulateAccountsChanged([secondAddress]);
+
+    await settled();
+
+    assert
+      .dom('[data-test-card-balances]')
+      .containsText('§4648')
+      .containsText('0x5678...abcd');
   });
 });
