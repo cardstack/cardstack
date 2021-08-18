@@ -8,6 +8,7 @@ import { safeFloatConvert } from './utils/general-utils';
 export interface ILayerOneOracle {
   ethToUsd(ethAmount: string): Promise<number>;
   getEthToUsdUpdatedAt(): Promise<Date>;
+  getEthToUsdConverter(): Promise<(ethAmountInWei: string) => number>;
 }
 
 const ethDecimals = new BN('18');
@@ -31,5 +32,18 @@ export default class LayerOneOracle implements ILayerOneOracle {
     let oracle = new this.layer1Web3.eth.Contract(CHAINLINK_PRICEFEED_ABI as AbiItem[], ethToUsdAddress);
     let roundData = await oracle.methods.latestRoundData().call();
     return new Date(roundData.updatedAt * 1000);
+  }
+
+  async getEthToUsdConverter(): Promise<(ethAmountInWei: string) => number> {
+    let ethToUsdAddress = await getAddress('chainlinkEthToUsd', this.layer1Web3);
+    let oracle = new this.layer1Web3.eth.Contract(CHAINLINK_PRICEFEED_ABI as AbiItem[], ethToUsdAddress);
+    let roundData = await oracle.methods.latestRoundData().call();
+    let usdRawRate = new BN(roundData.answer);
+    let oracleDecimals = Number(await oracle.methods.decimals().call());
+
+    return (ethAmountInWei) => {
+      let rawAmount = usdRawRate.mul(new BN(ethAmountInWei)).div(ten.pow(ethDecimals));
+      return safeFloatConvert(rawAmount, oracleDecimals);
+    };
   }
 }

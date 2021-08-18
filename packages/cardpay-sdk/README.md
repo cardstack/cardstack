@@ -45,6 +45,10 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`RewardPool`](#rewardpool)
   - [`RewardPool.rewardTokenBalance`](#rewardpoolrewardtokenbalance)
   - [`RewardPool.claim` (TBD)](#rewardpoolclaim-tbd)
+- [`LayerOneOracle`](#layeroneoracle)
+  - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
+  - [`LayerOneOracle.getEthToUsdConverter`](#layeroneoraclegetusdconverter)
+  - [`LayerOneOracle.getUpdatedAt`](#layeroneoraclegetupdatedat)
 - [`LayerTwoOracle`](#layertwooracle)
   - [`LayerTwoOracle.convertToSpend`](#layertwooracleconverttospend)
   - [`LayerTwoOracle.convertFromSpend`](#layertwooracleconvertfromspend)
@@ -579,6 +583,37 @@ let balanceForAllTokens = await rewardPool.rewardTokenBalances(address)
 
 ### `RewardPool.claim` (TBD)
 
+## `LayerOneOracle`
+The `LayerOneOracle` API is used to get the current exchange rates in USD of ETH. This rate us fed by the Chainlink price feeds. Please supply a layer 1 web3 instance obtaining an `LayerOneOracle` API from `getSDK()`.
+```js
+import { getSDK } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider); // Layer 1 web3 instance
+let layerOneOracle = await getSDK('LayerOneOracle', web3);
+```
+### `LayerOneOracle.ethToUsd`
+This call will return the USD value for the specified amount of ETH. This API requires that the amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a floating point value in units of USD. You can easily convert an ETH value to wei by using the `Web3.utils.toWei()` function.
+
+```js
+let layerOneOracle = await getSDK('LayerOneOracle', web3);
+let usdPrice = await exchangelayerOneOracleRate.ethToUsd(amountInWei);
+console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
+```
+### LayerOneOracle.getEthToUsdConverter
+This returns a function that converts an amount of ETH in wei to USD. The returned function accepts a string that represents an amount in wei and returns a number that represents the USD value of that amount of ETH.
+
+```js
+let layerOneOracle = await getSDK('LayerOneOracle', web3);
+let converter = await layerOneOracle.getEthToUsdConverter();
+console.log(`USD value: $${converter(amountInWei)} USD`);
+```
+### `LayerOneOracle.getUpdatedAt`
+This call will return a `Date` instance that indicates the date the exchange rate was last updated.
+
+```js
+let layerOneOracle = await getSDK('LayerOneOracle', web3);
+let date = await layerOneOracle.getUpdatedAt();
+console.log(`The ETH / USD rate was last updated at ${date.toString()}`);
+```
 ## `LayerTwoOracle`
 The `LayerTwoOracle` API is used to get the current exchange rates in USD and ETH for the various stablecoin that we support. These rates are fed by the Chainlink price feeds for the stablecoin rates and the DIA oracle for the CARD token rates. As we onboard new stablecoin we'll add more exchange rates. The price oracles that we use reside in layer 2, so please supply a layer 2 web3 instance obtaining an `LayerTwoOracle` API from `getSDK()`.
 ```js
@@ -603,7 +638,7 @@ This call will return the USD value for the specified amount of the specified to
 
 ```js
 let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
-let usdPrice = await exchangelayerTwoOracleRate.getUSDPrice("DAI", amountInWei);
+let usdPrice = await layerTwoOracleRate.getUSDPrice("DAI", amountInWei);
 console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
 ```
 ### LayerTwoOracle.getUSDConverter

@@ -42,6 +42,7 @@ import config from '../../config/environment';
 import { TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { TypedChannel } from '../typed-channel';
+import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -281,14 +282,16 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   async updateUsdConverters(
-    symbolsToUpdate: ConvertibleSymbol[]
-  ): Promise<Record<ConvertibleSymbol, ConversionFunction>> {
+    symbolsToUpdate: UsdConvertibleSymbol[]
+  ): Promise<Record<UsdConvertibleSymbol, ConversionFunction>> {
     let promisesHash = {} as Record<
-      ConvertibleSymbol,
+      UsdConvertibleSymbol,
       Promise<ConversionFunction>
     >;
     for (let symbol of symbolsToUpdate) {
-      promisesHash[symbol] = this.#layerTwoOracleApi.getUSDConverter(symbol);
+      promisesHash[symbol] = this.#layerTwoOracleApi.getUSDConverter(
+        symbol.replace(/\.CPXD$/i, '')
+      );
     }
     return hash(promisesHash);
   }

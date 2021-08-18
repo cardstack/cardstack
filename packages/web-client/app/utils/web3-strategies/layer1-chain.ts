@@ -1,5 +1,5 @@
 import { tracked } from '@glimmer/tracking';
-import { defer } from 'rsvp';
+import { defer, hash } from 'rsvp';
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
@@ -7,7 +7,11 @@ import { Contract } from 'web3-eth-contract';
 import * as Sentry from '@sentry/browser';
 
 import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
-import { BridgeableSymbol, TokenContractInfo } from '../token';
+import {
+  BridgeableSymbol,
+  ConversionFunction,
+  TokenContractInfo,
+} from '../token';
 import WalletInfo from '../wallet-info';
 import { WalletProvider, WalletProviderId } from '../wallet-providers';
 import {
@@ -24,6 +28,7 @@ import {
   BridgeValidationResult,
   getConstantByNetwork,
   getSDK,
+  ILayerOneOracle,
   networkIds,
   waitUntilBlock,
 } from '@cardstack/cardpay-sdk';
@@ -34,6 +39,7 @@ import {
 import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { action } from '@ember/object';
+import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
@@ -44,6 +50,7 @@ export default abstract class Layer1ChainWeb3Strategy
   // changes with connection state
   #waitForAccountDeferred = defer<void>();
   web3: Web3 | undefined;
+  #layerOneOracleApi!: ILayerOneOracle;
   connectionManager: ConnectionManager;
   eventListenersToUnbind: {
     [event in ConnectionManagerEvent]?: UnbindEventListener;
@@ -151,6 +158,7 @@ export default abstract class Layer1ChainWeb3Strategy
 
       this.web3 = new Web3();
       await this.connectionManager.reconnect(this.web3, providerId);
+      this.#layerOneOracleApi = await getSDK('LayerOneOracle', this.web3);
     } catch (e) {
       console.error('Failed to initialize connection from local storage');
       console.error(e);
@@ -164,6 +172,7 @@ export default abstract class Layer1ChainWeb3Strategy
     try {
       this.web3 = new Web3();
       await this.connectionManager.connect(this.web3, walletProvider.id);
+      this.#layerOneOracleApi = await getSDK('LayerOneOracle', this.web3);
     } catch (e) {
       console.error(
         `Failed to create connection manager: ${walletProvider.id}`
@@ -336,5 +345,18 @@ export default abstract class Layer1ChainWeb3Strategy
     let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
     let { address } = new TokenContractInfo(symbol, this.networkSymbol);
     return tokenBridge.getEstimatedGasForWithdrawalClaim(address);
+  }
+
+  async updateUsdConverters(
+    symbolsToUpdate: UsdConvertibleSymbol[]
+  ): Promise<Record<UsdConvertibleSymbol, ConversionFunction>> {
+    let promisesHash = {} as Record<
+      UsdConvertibleSymbol,
+      Promise<ConversionFunction>
+    >;
+    for (let symbol of symbolsToUpdate) {
+      promisesHash[symbol] = this.#layerOneOracleApi.getEthToUsdConverter();
+    }
+    return hash(promisesHash);
   }
 }

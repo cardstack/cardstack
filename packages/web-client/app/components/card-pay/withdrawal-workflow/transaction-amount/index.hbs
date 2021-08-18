@@ -27,7 +27,7 @@
             @icon={{this.currentTokenDetails.icon}}
             @balance={{format-token-amount this.amountAsBigNumber}}
             @symbol={{this.currentTokenSymbol}}
-            @text={{concat "$" (token-to-usd this.tokenSymbolForConversion this.amountAsBigNumber) " USD*"}}
+            @text={{concat "$" (token-to-usd this.currentTokenSymbol this.amountAsBigNumber) " USD*"}}
             data-test-amount-entered
           />
         {{else}}
@@ -47,7 +47,7 @@
           @label="Approximate value*"
           data-test-approximate-value-label
         >
-          ${{token-to-usd this.tokenSymbolForConversion this.amountAsBigNumber}} USD
+          ${{token-to-usd this.currentTokenSymbol this.amountAsBigNumber}} USD
         </CardPay::LabeledValue>
       {{/unless}}
     </div>
