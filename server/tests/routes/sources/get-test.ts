@@ -106,6 +106,11 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
         files: postFiles,
         isolated: 'isolated.js',
         schema: 'schema.js',
+        embedded: null,
+        edit: null,
+        deserializer: null,
+        adoptsFrom: null,
+        data: null,
       });
     }
   );
@@ -126,8 +131,13 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
         'attributes',
       ]);
       assert.deepEqual(response.body.data?.attributes, {
-        'adopts-from': '../post', // TODO: Full card URL
         files: {},
+        isolated: null,
+        schema: null,
+        embedded: null,
+        edit: null,
+        deserializer: null,
+        adoptsFrom: '../post',
         data: { title: 'Hello World', body: 'First post.' },
       });
     }
@@ -137,29 +147,67 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
     let response = await getSource('https://my-realm/post0', {
       include: 'compiled-meta',
     }).expect(200);
-    console.log(response);
 
-    assert.deepEqual(Object.keys(response.body.data), [
-      'type',
-      'id',
-      'attributes',
-      'includes',
-    ]);
-    assert.deepEqual(response.body.data?.attributes, {
-      'adopts-from': '../post',
-      files: {},
-      data: { title: 'Hello World', body: 'First post.' },
+    assert.deepEqual(response.body.data.relationships?.compiledMeta, {
+      data: {
+        type: 'compiled-metas',
+        id: 'https://my-realm/post0',
+      },
     });
 
-    assert.deepEqual(
-      response.body.data.included.map((r: any) => r.id),
-      [
-        'https://my-realm/post',
-        'https://cardstack.com/base/datetime',
-        'https://cardstack.com/base/string',
-        'https://cardstack.com/base/base',
-      ],
-      'There should be 4 included resources'
+    let compiledMeta = response.body.included?.find(
+      (ref: any) =>
+        ref.type === 'compiled-metas' && ref.id === 'https://my-realm/post0'
     );
+
+    assert.deepEqual(Object.keys(compiledMeta?.attributes), [
+      'schemaModule',
+      'isolated',
+      'embedded',
+      'edit',
+    ]);
+
+    assert.deepEqual(compiledMeta?.relationships, {
+      adoptsFrom: {
+        data: {
+          type: 'compiled-metas',
+          id: 'https://my-realm/post',
+        },
+      },
+      fields: {
+        data: [
+          {
+            type: 'fields',
+            id: 'https://my-realm/post0/title',
+          },
+          {
+            type: 'fields',
+            id: 'https://my-realm/post0/body',
+          },
+          {
+            type: 'fields',
+            id: 'https://my-realm/post0/createdAt',
+          },
+          {
+            type: 'fields',
+            id: 'https://my-realm/post0/extra',
+          },
+        ],
+      },
+    });
+
+    let post = response.body.included?.find(
+      (ref: any) =>
+        ref.type === 'compiled-metas' && ref.id === 'https://my-realm/post'
+    );
+
+    assert.ok(post, 'found rawCard.compiledMeta.adoptsFrom');
+
+    let title = response.body.included?.find(
+      (ref: any) =>
+        ref.type === 'fields' && ref.id === 'https://my-realm/post0/title'
+    );
+
+    assert.ok(title, 'found title field');
   });
 });
