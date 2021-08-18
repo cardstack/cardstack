@@ -122,12 +122,14 @@ AWS_PROFILE=cardstack terraform output | grep postgres_password
 
 Run the command, open a postgres client, and connect to localhost, port 55432 with username cardstack, password as looked up in previous step.
 
-
-
 ## Provided APIs
+
 APIs conform to the [JSON API specification](https://jsonapi.org/).
 
 ### GET /api/prepaid-card-patterns
 
 ### GET /api/prepaid-card-color-schemes
+
 ### POST /api/prepaid-card-customizations
+
+### POST /api/merchant-infos
