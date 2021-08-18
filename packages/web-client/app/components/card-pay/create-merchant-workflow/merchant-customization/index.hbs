@@ -9,30 +9,27 @@
       @label={{if @isComplete "Merchant Name" "Preview"}}
     >
       <CardPay::Merchant
-        @name={{@name}}
+        class={{unless this.merchantName "merchant-customization__enter-name"}}
+        @name={{or this.merchantName "Enter merchant name"}}
+        @logoBackground={{this.merchantBgColor}}
         @size="large"
         @vertical={{true}}
       />
     </CardPay::LabeledValue>
-    {{#unless @isComplete}}
-      <CardPay::LabeledValue @fieldMode="edit" @label="Merchant Name">
-
-      </CardPay::LabeledValue>
-    {{/unless}}
     {{#if @isComplete}}
       <CardPay::LabeledValue @label="Merchant ID">
-        {{!-- id here --}}
+        {{this.merchantId}}
       </CardPay::LabeledValue>
       <CardPay::LabeledValue @label="Custom Color">
         <div class="merchant-customization__color">
-          <div class="merchant-customization__color-preview" style={{css-var merchant-custom-color=@merchantColor}} />
-          {{!-- color code here --}}
+          <div class="merchant-customization__color-preview" style={{css-var merchant-custom-color=(or this.merchantBgColor "var(--boxel-blue)")}} />
+          {{or this.merchantBgColor "#0069F9"}}
         </div>
       </CardPay::LabeledValue>
-      <CardPay::LabeledValue @label="Manager Address">
+      <CardPay::LabeledValue @label="Manager">
         <CardPay::AccountDisplay
           @wrapped={{true}}
-          @address={{@address}}
+          @address={{this.layer2Network.walletInfo.firstAddress}}
         />
       </CardPay::LabeledValue>
     {{/if}}

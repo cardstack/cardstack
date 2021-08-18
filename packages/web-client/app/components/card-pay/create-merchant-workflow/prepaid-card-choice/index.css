@@ -1,11 +1,15 @@
+.prepaid-card-choice__field-label {
+  --field-label-width: minmax(4rem, 22%);
+}
+
 .prepaid-card-choice__cost {
   --icon-alignment: flex-start;
 
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .prepaid-card-choice__loading-indicator {
-  --icon-color: white;
+  --icon-color: var(--boxel-light);
 
   margin-right: var(--boxel-sp-sm);
   flex-grow: 0;

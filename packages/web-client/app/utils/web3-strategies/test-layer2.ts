@@ -201,6 +201,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return deferred.promise;
   }
 
+  merchantRegistrationFee() {
+    return Promise.resolve(100);
+  }
+
   async registerMerchant(
     prepaidCardAddress: string,
     infoDID: string,

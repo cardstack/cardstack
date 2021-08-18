@@ -111,6 +111,7 @@ module('Acceptance | create merchant', function (hooks) {
     assert.dom(post).containsText('Choose a name and ID for the merchant');
 
     let prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
+    let merchantAddress = '0x1234000000000000000000000000000000004321';
 
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
       {
@@ -151,9 +152,14 @@ module('Acceptance | create merchant', function (hooks) {
 
     layer2Service.test__simulateRegisterMerchantForAddress(
       prepaidCardAddress,
-      'FIXME',
+      merchantAddress,
       {}
     );
+
+    await waitFor('[data-test-prepaid-card-choice-is-complete]');
+    assert
+      .dom('[data-test-prepaid-card-choice-merchant-address]')
+      .containsText(merchantAddress);
 
     await waitFor(milestoneCompletedSel(1));
     assert.dom(milestoneCompletedSel(1)).containsText('Merchant created');

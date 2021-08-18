@@ -76,6 +76,13 @@ module(
       `);
     });
 
+    test('it shows the correct data', async function (assert) {
+      assert
+        .dom('[data-test-prepaid-card-choice-merchant-fee]')
+        .containsText('100 SPEND');
+      // TODO: check other fields
+    });
+
     module('Test the sdk register merchant calls', async function () {
       test('it shows the correct text in the creation button in the beginning and after errors', async function (assert) {
         sinon
