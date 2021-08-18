@@ -8,6 +8,7 @@ import type { CardJSONResponse } from '@cardstack/core/src/interfaces';
 import { Serializer } from 'jsonapi-serializer';
 import _mapKeys from 'lodash/mapKeys';
 import _camelCase from 'lodash/camelCase';
+import { findIncluded } from '@cardstack/core/src/jsonapi';
 
 export async function serializeCard(
   url: string,
@@ -38,24 +39,48 @@ export function deserialize(payload: any): any {
   return data;
 }
 
+function serializeResource(
+  type: string,
+  id: string,
+  attributes: (string | Record<string, string>)[],
+  payload: any
+): any {
+  let resource: any = {
+    id,
+    type,
+    attributes: {},
+    relationships: {},
+  };
+  for (const attr of attributes) {
+    if (typeof attr === 'object') {
+      let [aliasName, name] = Object.entries(attr)[0];
+      resource.attributes[aliasName] = payload[name] ?? null;
+    } else {
+      resource.attributes[attr] = payload[attr] ?? null;
+    }
+  }
+  return resource;
+}
+
 export function serializeRawCard(
   card: RawCard,
   compiled?: CompiledCard
 ): Promise<object> {
-  let resource: any = {
-    type: 'raw-cards',
-    id: card.url,
-    attributes: {
-      schema: card.schema ?? null,
-      isolated: card.isolated ?? null,
-      embedded: card.embedded ?? null,
-      edit: card.edit ?? null,
-      deserializer: card.deserializer ?? null,
-      adoptsFrom: card.adoptsFrom ?? null,
-      files: card.files ?? null,
-      data: card.data ?? null,
-    },
-  };
+  let resource = serializeResource(
+    'raw-cards',
+    card.url,
+    [
+      'schema',
+      'isolated',
+      'embedded',
+      'edit',
+      'deserializer',
+      'adoptsFrom',
+      'files',
+      'data',
+    ],
+    card
+  );
   let doc: any = { data: resource };
 
   if (compiled) {
@@ -68,24 +93,13 @@ export function serializeRawCard(
 }
 
 function includeCompiledMeta(compiled: CompiledCard, doc: any) {
-  if (
-    !doc.included.find(
-      (entry: any) =>
-        entry.type === 'compiled-metas' && entry.id === compiled.url
-    )
-  ) {
-    let resource = {
-      type: 'compiled-metas',
-      id: compiled.url,
-      attributes: {
-        schemaModule: compiled.schemaModule,
-        serializer: compiled.serializer,
-        isolated: compiled.isolated,
-        embedded: compiled.embedded,
-        edit: compiled.edit,
-      },
-      relationships: {} as any,
-    };
+  if (!findIncluded(doc, { type: 'compiled-metas', id: compiled.url })) {
+    let resource = serializeResource(
+      'compiled-metas',
+      compiled.url,
+      ['schemaModule', 'serializer', 'isolated', 'embedded', 'edit'],
+      compiled
+    );
     doc.included.push(resource);
     if (compiled.adoptsFrom) {
       resource.relationships.adoptsFrom = {
@@ -103,20 +117,13 @@ function includeCompiledMeta(compiled: CompiledCard, doc: any) {
 
 function includeField(parent: CompiledCard, field: Field, doc: any) {
   let id = `${parent.url}/${field.name}`;
-  if (
-    !doc.included.find(
-      (entry: any) => entry.type === 'fields' && entry.id === id
-    )
-  ) {
-    let resource = {
-      type: 'fields',
+  if (!findIncluded(doc, { type: 'fields', id })) {
+    let resource = serializeResource(
+      'fields',
       id,
-      attributes: {
-        name: field.name,
-        fieldType: field.type,
-      },
-      relationships: {} as any,
-    };
+      ['name', { fieldType: 'type' }],
+      field
+    );
     doc.included.push(resource);
     resource.relationships.card = {
       data: includeCompiledMeta(field.card, doc),

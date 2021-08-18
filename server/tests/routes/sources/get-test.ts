@@ -98,9 +98,10 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
         'data is the only top level key'
       );
       assert.deepEqual(Object.keys(response.body.data), [
-        'type',
         'id',
+        'type',
         'attributes',
+        'relationships',
       ]);
       assert.deepEqual(response.body.data?.attributes, {
         files: postFiles,
@@ -126,9 +127,10 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
         'data is the only top level key'
       );
       assert.deepEqual(Object.keys(response.body.data), [
-        'type',
         'id',
+        'type',
         'attributes',
+        'relationships',
       ]);
       assert.deepEqual(response.body.data?.attributes, {
         files: {},
@@ -162,6 +164,7 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
 
     assert.deepEqual(Object.keys(compiledMeta?.attributes), [
       'schemaModule',
+      'serializer',
       'isolated',
       'embedded',
       'edit',
