@@ -8,6 +8,8 @@ import MerchantInfoSerializer from '../services/serializers/merchant-info-serial
 import { ensureLoggedIn } from './utils/auth';
 import WorkerClient from '../services/worker-client';
 import MerchantInfoQueries from '../services/queries/merchant-info';
+import Logger from '@cardstack/logger';
+let log = Logger('route:merchant-infos');
 
 export interface MerchantInfo {
   id: string;
@@ -34,6 +36,29 @@ export default class MerchantInfosRoute {
     autoBind(this);
   }
 
+  async get(ctx: Koa.Context) {
+    let db = await this.databaseManager.getClient();
+
+    try {
+      let result = await db.query('SELECT slug FROM merchant_infos');
+      let data = result.rows.map((row) => {
+        return {
+          id: row.id,
+          attributes: {
+            slug: row.slug,
+          },
+        };
+      });
+      ctx.status = 200;
+      ctx.body = {
+        data,
+      };
+      ctx.type = 'application/vnd.api+json';
+    } catch (e) {
+      log.error('Failed to retrieve merchant_infos', e);
+    }
+  }
+
   async post(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;
@@ -43,10 +68,18 @@ export default class MerchantInfosRoute {
       return;
     }
 
+    const slug = ctx.request.body.data.attributes['slug'];
+    const isValidSlug = await this.merchantInfoQueries.validateSlug(slug);
+
+    if (!isValidSlug) {
+      log.error('Merchant slug already exists');
+      return;
+    }
+
     const merchantInfo: MerchantInfo = {
       id: shortUuid.uuid(),
       name: ctx.request.body.data.attributes['name'],
-      slug: ctx.request.body.data.attributes['slug'],
+      slug,
       color: ctx.request.body.data.attributes['color'],
       textColor: ctx.request.body.data.attributes['text-color'],
       ownerAddress: ctx.state.userAddress,
