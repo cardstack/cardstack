@@ -1,4 +1,4 @@
-import { CardModel } from '@cardstack/core/src/card-model';
+import CardModel from '@cardstack/core/src/card-model';
 import type {
   CardJSONResponse,
   CompiledCard,

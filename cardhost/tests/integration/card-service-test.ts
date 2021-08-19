@@ -5,6 +5,7 @@ import { hbs } from 'ember-cli-htmlbars';
 import type Cards from 'cardhost/services/cards';
 import setupBuilder from '../helpers/setup-builder';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+import { LOCAL_REALM } from 'cardhost/lib/builder';
 
 module('Integration | card-service', function (hooks) {
   setupRenderingTest(hooks);
@@ -16,11 +17,11 @@ module('Integration | card-service', function (hooks) {
   });
 
   module('blog post', function (hooks) {
-    let cardID = 'http://mirage/cards/post-1';
+    let cardID = `${LOCAL_REALM}/post-1`;
 
     hooks.beforeEach(function () {
-      this.createCard({
-        url: 'http://mirage/cards/post',
+      this.builder.createRawCard({
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         embedded: 'isolated.js',
@@ -44,9 +45,9 @@ module('Integration | card-service', function (hooks) {
         },
       });
 
-      this.createCard({
+      this.builder.createRawCard({
         url: cardID,
-        adoptsFrom: 'http://mirage/cards/post',
+        adoptsFrom: `${LOCAL_REALM}/post`,
         data: {
           title: 'A blog post title',
           createdAt: '2021-03-02T19:51:32.121Z',
@@ -92,8 +93,8 @@ module('Integration | card-service', function (hooks) {
     });
 
     test('Serialization works on nested cards', async function (assert) {
-      this.createCard({
-        url: 'http://mirage/cards/post-list',
+      this.builder.createRawCard({
+        url: `${LOCAL_REALM}/post-list`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         data: {
@@ -107,7 +108,7 @@ module('Integration | card-service', function (hooks) {
         files: {
           'schema.js': `
             import { containsMany } from "@cardstack/types";
-            import post from "http://mirage/cards/post";
+            import post from "${LOCAL_REALM}/post";
 
             export default class Hello {
               @containsMany(post)
@@ -120,7 +121,7 @@ module('Integration | card-service', function (hooks) {
         },
       });
 
-      let model = await cards.load('http://mirage/cards/post-list', 'isolated');
+      let model = await cards.load(`${LOCAL_REALM}/post-list`, 'isolated');
       this.set('component', model.component);
       await render(hbs`<this.component />`);
       assert.dom('h1').containsText('A blog post title');

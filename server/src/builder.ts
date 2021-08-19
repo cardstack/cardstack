@@ -65,6 +65,7 @@ export default class Builder implements BuilderInterface {
   }
 
   async getRawCard(url: string): Promise<RawCard> {
+    url = url.replace(/\/$/, '');
     return this.realms.getRawCard(url);
   }
 
@@ -80,17 +81,14 @@ export default class Builder implements BuilderInterface {
 
   async buildCard(url: string): Promise<CompiledCard> {
     let rawCard = await this.getRawCard(url);
-    let compiledCard = await this.compileCardFromRaw(url, rawCard);
+    let compiledCard = await this.compileCardFromRaw(rawCard);
 
     return compiledCard;
   }
 
-  async compileCardFromRaw(
-    url: string,
-    rawCard: RawCard
-  ): Promise<CompiledCard> {
+  private async compileCardFromRaw(rawCard: RawCard): Promise<CompiledCard> {
     let compiledCard = await this.compiler.compile(rawCard);
-    this.cache.setCard(url, compiledCard);
+    this.cache.setCard(rawCard.url, compiledCard);
 
     return compiledCard;
   }

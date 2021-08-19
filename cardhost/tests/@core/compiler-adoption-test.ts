@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import setupBuilder from '../helpers/setup-builder';
-import Builder from 'cardhost/lib/builder';
+import { LOCAL_REALM } from 'cardhost/lib/builder';
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
@@ -9,11 +9,10 @@ module('@core | compiler-adoption', function (hooks) {
   setupRenderingTest(hooks);
   setupBuilder(hooks);
 
-  let builder: Builder;
   let parentCard: CompiledCard;
 
   let PERSON_CARD: RawCard = {
-    url: 'http://mirage/cards/person',
+    url: `${LOCAL_REALM}/person`,
     schema: 'schema.js',
     embedded: 'embedded.js',
     files: {
@@ -35,30 +34,28 @@ module('@core | compiler-adoption', function (hooks) {
   };
 
   hooks.beforeEach(async function () {
-    builder = new Builder();
+    this.builder.createRawCard(PERSON_CARD);
 
-    this.createCard(PERSON_CARD);
-
-    parentCard = await builder.getCompiledCard('http://mirage/cards/person');
+    parentCard = await this.builder.getCompiledCard(`${LOCAL_REALM}/person`);
   });
 
   module('fields', function (/*hooks*/) {
     test('a blank card can adopt fields from a card', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/user',
+        url: `${LOCAL_REALM}/user`,
         schema: 'schema.js',
         files: {
           'schema.js': `
             import { adopts } from "@cardstack/types";
-            import Person from "http://mirage/cards/person";
+            import Person from "${LOCAL_REALM}/person";
 
             export default @adopts(Person) class User {}
           `,
         },
       };
-      this.createCard(card);
+      this.builder.createRawCard(card);
 
-      let compiled = await builder.getCompiledCard(card.url);
+      let compiled = await this.builder.getCompiledCard(card.url);
       assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
       assert.deepEqual(compiled.adoptsFrom, parentCard);
       assert.equal(
@@ -70,12 +67,12 @@ module('@core | compiler-adoption', function (hooks) {
 
     test('A child card can add a field', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/user',
+        url: `${LOCAL_REALM}/user`,
         schema: 'schema.js',
         files: {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import Person from "http://mirage/cards/person";
+          import Person from "${LOCAL_REALM}/person";
           import string from "https://cardstack.com/base/string";
 
           export default @adopts(Person) class User {
@@ -85,9 +82,9 @@ module('@core | compiler-adoption', function (hooks) {
       `,
         },
       };
-      this.createCard(card);
+      this.builder.createRawCard(card);
 
-      let compiled = await builder.getCompiledCard(card.url);
+      let compiled = await this.builder.getCompiledCard(card.url);
       assert.deepEqual(Object.keys(compiled.fields), [
         'name',
         'birthdate',
@@ -97,12 +94,12 @@ module('@core | compiler-adoption', function (hooks) {
 
     test('A child card can NOT overwrite an existing field', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/user',
+        url: `${LOCAL_REALM}/user`,
         schema: 'schema.js',
         files: {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import Person from "http://mirage/cards/person";
+          import Person from "${LOCAL_REALM}/person";
           import string from "https://cardstack.com/base/string";
 
           export default @adopts(Person) class User {
@@ -113,26 +110,26 @@ module('@core | compiler-adoption', function (hooks) {
         },
       };
 
-      this.createCard(card);
+      this.builder.createRawCard(card);
       assert.expect(1);
       try {
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.equal(
           err.message,
-          'Field collision on birthdate with parent card http://mirage/cards/person'
+          `Field collision on birthdate with parent card ${LOCAL_REALM}/person`
         );
       }
     });
 
     test('A child card can NOT overwrite an existing field, even from a grandparent', async function (assert) {
-      this.createCard({
-        url: 'http://mirage/cards/user',
+      this.builder.createRawCard({
+        url: `${LOCAL_REALM}/user`,
         schema: 'schema.js',
         files: {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import Person from "http://mirage/cards/person";
+          import Person from "${LOCAL_REALM}/person";
           import string from "https://cardstack.com/base/string";
 
           export default @adopts(Person) class User {
@@ -143,12 +140,12 @@ module('@core | compiler-adoption', function (hooks) {
       });
 
       let card = {
-        url: 'http://mirage/cards/admin',
+        url: `${LOCAL_REALM}/admin`,
         schema: 'schema.js',
         files: {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import User from "http://mirage/cards/user";
+          import User from "${LOCAL_REALM}/user";
           import string from "https://cardstack.com/base/string";
 
           export default @adopts(User) class Admin {
@@ -159,14 +156,14 @@ module('@core | compiler-adoption', function (hooks) {
         },
       };
 
-      this.createCard(card);
+      this.builder.createRawCard(card);
       assert.expect(1);
       try {
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.equal(
           err.message,
-          'Field collision on name with parent card http://mirage/cards/user'
+          `Field collision on name with parent card ${LOCAL_REALM}/user`
         );
       }
     });
@@ -175,36 +172,35 @@ module('@core | compiler-adoption', function (hooks) {
   module('templates', function (/*hooks*/) {
     test('a child card inherits a parent card template', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/user',
+        url: `${LOCAL_REALM}/user`,
         schema: 'schema.js',
         files: {
           'schema.js': `
             import { adopts } from "@cardstack/types";
-            import Person from "http://mirage/cards/person";
+            import Person from "${LOCAL_REALM}/person";
 
             export default @adopts(Person) class User {}
         `,
         },
       };
-      this.createCard(card);
+      this.builder.createRawCard(card);
 
-      let compiledCard = await builder.getCompiledCard(card.url);
+      let compiledCard = await this.builder.getCompiledCard(card.url);
+
       assert.ok(
-        compiledCard.embedded.moduleName.startsWith(
-          `${PERSON_CARD.url}/embedded`
-        ),
+        await this.cardService.loadModule(compiledCard.embedded.moduleName),
         'Has a embedded component'
       );
     });
 
     test('a child card inherits a grandparent card template, when it and parent do not have templates', async function (assert) {
-      this.createCard({
-        url: 'http://mirage/cards/user',
+      this.builder.createRawCard({
+        url: `${LOCAL_REALM}/user`,
         schema: 'schema.js',
         files: {
           'schema.js': `
           import { adopts, contains } from "@cardstack/types";
-          import Person from "http://mirage/cards/person";
+          import Person from "${LOCAL_REALM}/person";
           import string from "https://cardstack.com/base/string";
 
           export default @adopts(Person) class User {
@@ -214,24 +210,22 @@ module('@core | compiler-adoption', function (hooks) {
         },
       });
       let card = {
-        url: 'http://mirage/cards/admin',
+        url: `${LOCAL_REALM}/admin`,
         schema: 'schema.js',
         files: {
           'schema.js': `
             import { adopts } from "@cardstack/types";
-            import User from "http://mirage/cards/user";
+            import User from "${LOCAL_REALM}/user";
 
             export default @adopts(User) class Admin {}
         `,
         },
       };
-      this.createCard(card);
+      this.builder.createRawCard(card);
 
-      let compiledCard = await builder.getCompiledCard(card.url);
+      let compiledCard = await this.builder.getCompiledCard(card.url);
       assert.ok(
-        compiledCard.embedded.moduleName.startsWith(
-          `${PERSON_CARD.url}/embedded`
-        ),
+        await this.cardService.loadModule(compiledCard.embedded.moduleName),
         'Has a embedded component'
       );
     });
@@ -241,12 +235,12 @@ module('@core | compiler-adoption', function (hooks) {
     test('@adopts cannot be used on a class property', async function (assert) {
       assert.expect(1);
       let card = {
-        url: 'http://mirage/cards/admin',
+        url: `${LOCAL_REALM}/admin`,
         schema: 'schema.js',
         files: {
           'schema.js': `
             import { adopts } from "@cardstack/types";
-            import Person from "http://mirage/cards/person";
+            import Person from "${LOCAL_REALM}/person";
 
             export default class Admin {
               @adopts(Person)
@@ -256,9 +250,9 @@ module('@core | compiler-adoption', function (hooks) {
         },
       };
 
-      this.createCard(card);
+      this.builder.createRawCard(card);
       try {
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@adopts decorator can only be used on a class/.test(err.message),
@@ -270,21 +264,21 @@ module('@core | compiler-adoption', function (hooks) {
     test('@adopts only accepts 1 argument', async function (assert) {
       assert.expect(1);
       let card = {
-        url: 'http://mirage/cards/admin',
+        url: `${LOCAL_REALM}/admin`,
         schema: 'schema.js',
         files: {
           'schema.js': `
             import { adopts } from "@cardstack/types";
-            import Person from "http://mirage/cards/person";
+            import Person from "${LOCAL_REALM}/person";
 
             export default @adopts(Person, true) class Admin {}
         `,
         },
       };
-      this.createCard(card);
+      this.builder.createRawCard(card);
 
       try {
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@adopts decorator accepts exactly one argument/.test(err.message),
@@ -296,7 +290,7 @@ module('@core | compiler-adoption', function (hooks) {
     test('@adopts with wrong argument syntax', async function (assert) {
       assert.expect(1);
       let card = {
-        url: 'http://mirage/cards/admin',
+        url: `${LOCAL_REALM}/admin`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -306,10 +300,10 @@ module('@core | compiler-adoption', function (hooks) {
         `,
         },
       };
-      this.createCard(card);
+      this.builder.createRawCard(card);
 
       try {
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@adopts argument must be an identifier/.test(err.message),
@@ -321,7 +315,7 @@ module('@core | compiler-adoption', function (hooks) {
     test('@adopts doesnt accept undefined arguments', async function (assert) {
       assert.expect(1);
       let card = {
-        url: 'http://mirage/cards/admin',
+        url: `${LOCAL_REALM}/admin`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -331,10 +325,10 @@ module('@core | compiler-adoption', function (hooks) {
         `,
         },
       };
-      this.createCard(card);
+      this.builder.createRawCard(card);
 
       try {
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@adopts argument is not defined/.test(err.message),
@@ -346,7 +340,7 @@ module('@core | compiler-adoption', function (hooks) {
     test('@adopts argument must be imported', async function (assert) {
       assert.expect(1);
       let card = {
-        url: 'http://mirage/cards/admin',
+        url: `${LOCAL_REALM}/admin`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -357,10 +351,10 @@ module('@core | compiler-adoption', function (hooks) {
         `,
         },
       };
-      this.createCard(card);
+      this.builder.createRawCard(card);
 
       try {
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@adopts argument must come from a module default export/.test(
