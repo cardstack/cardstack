@@ -147,7 +147,7 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
 
   QUnit.test('can include compiled meta', async function (assert) {
     let response = await getSource('https://my-realm/post0', {
-      include: 'compiled-meta',
+      include: 'compiledMeta',
     }).expect(200);
 
     assert.deepEqual(response.body.data.relationships?.compiledMeta, {
