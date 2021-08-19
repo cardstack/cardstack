@@ -273,7 +273,7 @@ describe('POST /api/wyre-callback', function () {
     server.close();
   });
 
-  it(`returns 400 when the share of the request does not match the expected format`, async function () {
+  it(`returns 400 when the shape of the request does not match the expected format`, async function () {
     await request
       .post(`/callbacks/wyre`)
       .set('Content-Type', 'application/json')
