@@ -1,5 +1,4 @@
 import Service from '@ember/service';
-import { macroCondition, isTesting } from '@embroider/macros';
 
 import {
   Format,
@@ -34,15 +33,15 @@ export default class Cards extends Service {
         this.buildCardURL(url, format)
       );
     }
-    let { component, ModelClass } = await loadCode(cardResponse, url);
-    return ModelClass.fromResponse(this.cardEnv(), cardResponse, component);
+    let { component, Model } = await this.codeForCard(cardResponse);
+    return Model.fromResponse(this.cardEnv(), cardResponse, component);
   }
 
   async loadForRoute(pathname: string): Promise<CardModel> {
     let url = `${cardServer}cardFor${pathname}`;
     let cardResponse = await fetchJSON<CardJSONResponse>(url);
-    let { component, ModelClass } = await loadCode(cardResponse, url);
-    return ModelClass.fromResponse(this.cardEnv(), cardResponse, component);
+    let { component, Model } = await this.codeForCard(cardResponse);
+    return Model.fromResponse(this.cardEnv(), cardResponse, component);
   }
 
   private inLocalRealm(cardURL: string): boolean {
@@ -71,7 +70,7 @@ export default class Cards extends Service {
     });
     try {
       let { default: LocalRealm } = await import('../lib/local-realm');
-      let localRealm = new LocalRealm(this.localRealmURL);
+      let localRealm = new LocalRealm(this.localRealmURL, this);
       resolve(localRealm);
       return localRealm;
     } catch (err) {
@@ -131,45 +130,52 @@ export default class Cards extends Service {
       }
     );
   }
-}
 
-async function loadCode(
-  card: CardJSONResponse,
-  url: string
-): Promise<{ component: unknown; ModelClass: typeof CardModel }> {
-  let { meta } = card.data;
-
-  if (!meta || !meta.componentModule) {
-    throw new Error('No componentModule to load');
+  private async codeForCard(
+    card: CardJSONResponse
+  ): Promise<{ component: unknown; Model: typeof CardModel }> {
+    let componentModule = card.data?.meta?.componentModule;
+    if (!componentModule) {
+      throw new Error('No componentModule to load');
+    }
+    let module = await this.loadModule<{
+      default: unknown;
+      Model: typeof CardModel;
+    }>(componentModule);
+    return {
+      component: module.default,
+      Model: module.Model,
+    };
   }
 
-  let { componentModule } = meta;
-
-  // TODO: base this on the componentModuleName prefix instead of isTesting()
-  if (macroCondition(isTesting())) {
-    // in tests, our fake server inside mirage just defines these modules
-    // dynamically
-    let cardComponentModule = window.require(componentModule);
-    return {
-      component: cardComponentModule['default'],
-      ModelClass: cardComponentModule['Model'],
-    };
-  } else {
-    if (!componentModule.startsWith('@cardstack/compiled/')) {
+  async loadModule<T extends object>(moduleIdentifier: string): Promise<T> {
+    if (moduleIdentifier.startsWith('@cardstack/compiled/')) {
+      // module was built by webpack, use webpack's implementation of `await
+      // import()`
+      moduleIdentifier = moduleIdentifier.replace('@cardstack/compiled/', '');
+      return await import(
+        /* webpackExclude: /schema\.js$/ */
+        `@cardstack/compiled/${moduleIdentifier}`
+      );
+    } else if (moduleIdentifier.startsWith('@cardstack/core/src/')) {
+      // module was built by webpack, use webpack's implementation of `await
+      // import()`
+      moduleIdentifier = moduleIdentifier.replace('@cardstack/core/src/', '');
+      return await import(
+        /* webpackExclude: /schema\.js$/ */
+        `@cardstack/core/src/${moduleIdentifier}`
+      );
+    } else if (
+      moduleIdentifier.startsWith('@cardstack/local-realm-compiled/')
+    ) {
+      // module was built by our LocalRealm, so ask LocalRealm for it
+      let localRealm = await this.localRealm();
+      return await localRealm.loadModule<T>(moduleIdentifier);
+    } else {
       throw new Error(
-        `${url}'s meta.componentModule does not start with '@cardstack/compiled/`
+        `don't know how to load compiled card code for ${moduleIdentifier}`
       );
     }
-    componentModule = componentModule.replace('@cardstack/compiled/', '');
-    let cardComponentModule = await import(
-      /* webpackExclude: /schema\.js$/ */
-      `@cardstack/compiled/${componentModule}`
-    );
-
-    return {
-      component: cardComponentModule.default,
-      ModelClass: cardComponentModule.Model,
-    };
   }
 }
 

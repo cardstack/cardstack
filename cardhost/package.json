@@ -135,7 +135,6 @@
     "@babel/types": "^7.12.13",
     "@embroider/compat": "^0.44.0-alpha.2",
     "@embroider/core": "^0.44.0-alpha.2",
-    "@embroider/macros": "^0.44.0-alpha.2",
     "@embroider/util": "^0.44.0-alpha.2",
     "@embroider/webpack": "^0.44.0-alpha.2",
     "@glimmer/compiler": "0.75.0",

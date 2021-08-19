@@ -14,7 +14,6 @@ import RealmManager from './realm-manager';
 export default class Builder implements BuilderInterface {
   private compiler = new Compiler({
     builder: this,
-    define: (...args) => this.define(...args),
   });
 
   private realms: RealmManager;
@@ -29,7 +28,7 @@ export default class Builder implements BuilderInterface {
     this.cache = new CardCache(params.cardCacheDir, params.pkgName);
   }
 
-  private async define(
+  async define(
     cardURL: string,
     localPath: string,
     type: string,

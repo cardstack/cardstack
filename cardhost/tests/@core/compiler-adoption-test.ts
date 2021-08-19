@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import setupCardMocking from '../helpers/card-mocking';
-import Builder from 'cardhost/lib/builder';
+import Builder from 'cardhost/lib/local-realm';
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 

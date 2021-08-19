@@ -4,7 +4,7 @@ import { render } from '@ember/test-helpers';
 import { compileTemplate } from '../helpers/template-compiler';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import setupCardMocking from '../helpers/card-mocking';
-import Builder from 'cardhost/lib/builder';
+import Builder from 'cardhost/lib/local-realm';
 import { RawCard, CompiledCard } from '@cardstack/core/src/interfaces';
 import { baseCardURL } from '@cardstack/core/src/compiler';
 
