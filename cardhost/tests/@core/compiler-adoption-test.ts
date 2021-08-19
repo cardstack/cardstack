@@ -1,13 +1,13 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import setupCardMocking from '../helpers/card-mocking';
-import Builder from 'cardhost/lib/local-realm';
+import setupBuilder from '../helpers/setup-builder';
+import Builder from 'cardhost/lib/builder';
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 module('@core | compiler-adoption', function (hooks) {
   setupRenderingTest(hooks);
-  setupCardMocking(hooks);
+  setupBuilder(hooks);
 
   let builder: Builder;
   let parentCard: CompiledCard;

@@ -3,12 +3,12 @@ import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
 import type Cards from 'cardhost/services/cards';
-import setupCardMocking from '../helpers/card-mocking';
+import setupBuilder from '../helpers/setup-builder';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 module('Integration | card-service', function (hooks) {
   setupRenderingTest(hooks);
-  setupCardMocking(hooks);
+  setupBuilder(hooks);
 
   let cards: Cards;
   hooks.beforeEach(function () {

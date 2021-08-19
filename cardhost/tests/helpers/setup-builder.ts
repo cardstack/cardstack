@@ -1,12 +1,11 @@
-import type { TestContext } from 'ember-test-helpers';
 import Cards from 'cardhost/services/cards';
-import LocalRealm from 'cardhost/lib/local-realm';
+import Builder from 'cardhost/lib/builder';
 
 declare module 'ember-test-helpers' {
   interface TestContext {
     routingCard?: string;
-    cardService(): Cards;
-    localRealm: LocalRealm;
+    cardService: Cards;
+    builder: Builder;
   }
 }
 
@@ -14,18 +13,18 @@ interface CardMockingOptions {
   routingCard: string;
 }
 
-export default function setupCardMocking(
+export default function setupBuilder(
   hooks: NestedHooks,
   options?: CardMockingOptions
 ): void {
   hooks.beforeEach(async function () {
-    this.cardService = cardService.bind(this);
+    this.cardService = this.owner.lookup('service:cards');
 
     if (options) {
       this.routingCard = options.routingCard;
     }
 
-    this.localRealm = await this.cardService().localRealm();
+    this.builder = await this.cardService.builder();
   });
 
   hooks.afterEach(function () {
@@ -33,8 +32,4 @@ export default function setupCardMocking(
       this.routingCard = undefined;
     }
   });
-}
-
-function cardService(this: TestContext): Cards {
-  return this.owner.lookup('service:cards');
 }

@@ -14,9 +14,9 @@ import { setComponentTemplate } from '@ember/component';
 import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
 import { tracked } from '@glimmer/tracking';
-import type LocalRealm from 'cardhost/lib/local-realm';
+import type Builder from 'cardhost/lib/builder';
 import { fetchJSON } from 'cardhost/lib/jsonapi-fetch';
-import { LOCAL_REALM } from 'cardhost/lib/local-realm';
+import { LOCAL_REALM } from 'cardhost/lib/builder';
 
 const { cardServer } = config as any; // Environment types arent working
 
@@ -26,8 +26,8 @@ export default class Cards extends Service {
   async load(url: string, format: Format): Promise<CardModel> {
     let cardResponse: CardJSONResponse;
     if (this.inLocalRealm(url)) {
-      let localRealm = await this.localRealm();
-      cardResponse = await localRealm.load(url, format);
+      let builder = await this.builder();
+      cardResponse = await builder.load(url, format);
     } else {
       cardResponse = await fetchJSON<CardJSONResponse>(
         this.buildCardURL(url, format)
@@ -57,22 +57,22 @@ export default class Cards extends Service {
     };
   }
 
-  private _localRealmPromise: Promise<LocalRealm> | undefined;
+  private _builderPromise: Promise<Builder> | undefined;
 
-  async localRealm(): Promise<LocalRealm> {
-    if (this._localRealmPromise) {
-      return this._localRealmPromise;
+  async builder(): Promise<Builder> {
+    if (this._builderPromise) {
+      return this._builderPromise;
     }
     let resolve: any, reject: any;
-    this._localRealmPromise = new Promise((r, e) => {
+    this._builderPromise = new Promise((r, e) => {
       resolve = r;
       reject = e;
     });
     try {
-      let { default: LocalRealm } = await import('../lib/local-realm');
-      let localRealm = new LocalRealm(this.localRealmURL, this);
-      resolve(localRealm);
-      return localRealm;
+      let { default: Builder } = await import('../lib/builder');
+      let builder = new Builder(this.localRealmURL, this);
+      resolve(builder);
+      return builder;
     } catch (err) {
       reject(err);
       throw err;
@@ -81,8 +81,8 @@ export default class Cards extends Service {
 
   private async send(op: CardOperation): Promise<CardJSONResponse> {
     if (this.operationIsLocal(op)) {
-      let localRealm = await this.localRealm();
-      return await localRealm.send(op);
+      let builder = await this.builder();
+      return await builder.send(op);
     }
 
     if ('create' in op) {
@@ -176,16 +176,13 @@ export default class Cards extends Service {
       // module was built by webpack, use webpack's implementation of `await
       // import()`
       moduleIdentifier = moduleIdentifier.replace('@cardstack/core/src/', '');
-      return await import(
-        /* webpackExclude: /schema\.js$/ */
-        `@cardstack/core/src/${moduleIdentifier}`
-      );
+      return await import(`@cardstack/core/src/${moduleIdentifier}`);
     } else if (
       moduleIdentifier.startsWith('@cardstack/local-realm-compiled/')
     ) {
-      // module was built by our LocalRealm, so ask LocalRealm for it
-      let localRealm = await this.localRealm();
-      return await localRealm.loadModule<T>(moduleIdentifier);
+      // module was built by our Builder, so ask Builder for it
+      let builder = await this.builder();
+      return await builder.loadModule<T>(moduleIdentifier);
     } else {
       throw new Error(
         `don't know how to load compiled card code for ${moduleIdentifier}`

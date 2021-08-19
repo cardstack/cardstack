@@ -3,7 +3,7 @@ import { inject } from '@ember/service';
 import ModalService from 'cardhost/services/modal';
 import type RouterService from '@ember/routing/router-service';
 import CardModel from '@cardstack/core/src/card-model';
-import { LOCAL_REALM } from 'cardhost/lib/local-realm';
+import { LOCAL_REALM } from 'cardhost/lib/builder';
 
 interface CardContainerArgs {
   card?: CardModel;

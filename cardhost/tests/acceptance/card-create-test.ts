@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
-import setupCardMocking from '../helpers/card-mocking';
+import setupBuilder from '../helpers/setup-builder';
 
 import click from '@ember/test-helpers/dom/click';
 import fillIn from '@ember/test-helpers/dom/fill-in';
@@ -19,12 +19,12 @@ const SAVE = '[data-test-modal-save]';
 
 module('Acceptance | Card Creation', function (hooks) {
   setupApplicationTest(hooks);
-  setupCardMocking(hooks);
+  setupBuilder(hooks);
   let personURL = PERSON_RAW_CARD.url;
 
   hooks.beforeEach(async function () {
-    await this.localRealm.createRawCard(ADDRESS_RAW_CARD);
-    await this.localRealm.createRawCard(
+    await this.builder.createRawCard(ADDRESS_RAW_CARD);
+    await this.builder.createRawCard(
       Object.assign(
         {
           data: {

@@ -1,12 +1,12 @@
 import { module, test } from 'qunit';
 import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
-import setupCardMocking from '../helpers/card-mocking';
+import setupBuilder from '../helpers/setup-builder';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 module('Acceptance | card routing', function (hooks) {
   setupApplicationTest(hooks);
-  setupCardMocking(hooks, { routingCard: 'https://mirage/cards/my-routes' });
+  setupBuilder(hooks, { routingCard: 'https://mirage/cards/my-routes' });
   let personURL = 'https://mirage/cards/person';
 
   hooks.beforeEach(function () {
