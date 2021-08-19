@@ -48,7 +48,19 @@ export default class WyreCallbackRoute {
     log.info(`Received wyre callback: ${JSON.stringify(request, null, 2)}`);
     // it should be ok to throw here since this means something that is not wyre
     // is calling us
-    assertWyreCallbackRequest(request);
+    try {
+      assertWyreCallbackRequest(request);
+    } catch (err) {
+      log.info(
+        `ignoring wyre callback that doesn't match the expected shape of a wyre callback request: ${JSON.stringify(
+          request,
+          null,
+          2
+        )}`
+      );
+      ctx.status = 400;
+      return;
+    }
 
     let [sourceType] = request.source.split(':');
     let [destType] = request.dest.split(':');
