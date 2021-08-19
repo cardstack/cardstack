@@ -46,8 +46,6 @@ export default class WyreCallbackRoute {
   async post(ctx: Koa.Context) {
     let request = ctx.request.body;
     log.info(`Received wyre callback: ${JSON.stringify(request, null, 2)}`);
-    // it should be ok to throw here since this means something that is not wyre
-    // is calling us
     try {
       assertWyreCallbackRequest(request);
     } catch (err) {
@@ -76,6 +74,8 @@ export default class WyreCallbackRoute {
       log.info(`ignoring wyre callback with source ${request.source} and dest ${request.dest}`);
     }
 
+    // we return no content because we don't want to leak any info to the caller
+    // about our wallets/transfers/orders or any internal state.
     ctx.status = 204;
   }
 
