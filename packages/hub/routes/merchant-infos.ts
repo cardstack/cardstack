@@ -38,12 +38,14 @@ export default class MerchantInfosRoute {
 
   async get(ctx: Koa.Context) {
     let db = await this.databaseManager.getClient();
+    let { slug } = ctx.query;
 
     try {
-      let result = await db.query('SELECT slug FROM merchant_infos');
+      let result = await db.query('SELECT slug FROM merchant_infos WHERE slug = $1', [slug]);
       let data = result.rows.map((row) => {
         return {
           id: row.id,
+          type: 'merchant-infos',
           attributes: {
             slug: row.slug,
           },
@@ -72,7 +74,16 @@ export default class MerchantInfosRoute {
     const isValidSlug = await this.merchantInfoQueries.validateSlug(slug);
 
     if (!isValidSlug) {
-      log.error('Merchant slug already exists');
+      ctx.body = {
+        errors: [
+          {
+            status: '409',
+            title: 'Merchant slug already exists',
+          },
+        ],
+      };
+      ctx.status = 409;
+      ctx.type = 'application/vnd.api+json';
       return;
     }
 

@@ -39,7 +39,7 @@ export default class MerchantInfoQueries {
 
   async validateSlug(id: string) {
     let db = await this.databaseManager.getClient();
-    let res = await db.query('SELECT slug from merchant_infos WHERE slug = $1', [id]);
+    let res = await db.query('SELECT slug FROM merchant_infos WHERE slug = $1', [id]);
 
     if (res.rowCount === 0) {
       return true;

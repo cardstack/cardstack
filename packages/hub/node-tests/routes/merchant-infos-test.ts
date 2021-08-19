@@ -128,4 +128,57 @@ describe('POST /api/merchant-infos', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
+
+  it('returns 409 if slug is not unique', async function () {
+    const payload = {
+      data: {
+        type: 'merchant-infos',
+        attributes: {
+          name: 'Satoshi Nakamoto',
+          slug: 'satoshi',
+          color: 'ff0000',
+          'text-color': 'ffffff',
+          'owner-address': '0x00000000000',
+        },
+      },
+    };
+
+    const payload2 = {
+      data: {
+        type: 'merchant-infos',
+        attributes: {
+          name: 'Satoshi Nakamoto 2',
+          slug: 'satoshi',
+          color: 'ff0000',
+          'text-color': 'ffffff',
+          'owner-address': '0x00000000000',
+        },
+      },
+    };
+
+    await request
+      .post('/api/merchant-infos')
+      .send(payload)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(201);
+
+    await request
+      .post('/api/merchant-infos')
+      .send(payload2)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(409)
+      .expect({
+        errors: [
+          {
+            status: '409',
+            title: 'Merchant slug already exists',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
 });

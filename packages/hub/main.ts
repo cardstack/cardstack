@@ -35,7 +35,6 @@ import { Clock } from './services/clock';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import CustodialWalletRoute from './routes/custodial-wallet';
-import MerchantIdsRoute from './routes/merchant-ids';
 
 const log = logger('cardstack/hub');
 
@@ -63,7 +62,6 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info-queries', MerchantInfoQueries);
-  registry.register('merchant-ids-route', MerchantIdsRoute);
   registry.register('worker-client', WorkerClient);
   registry.register('wyre', WyreService);
   if (registryCallback) {
