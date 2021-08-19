@@ -71,10 +71,34 @@ The app uses a Postgresql-based background task queue built on [graphile/worker]
 
 `yarn start:worker` starts the hub background task worker process
 
-
 ## Deploying to staging
 
 Green builds of the main branch deploy hub to staging if the commit contains changes to the hub package or its dependencies. The deploy uses waypoint.
+
+## Application console
+
+To test, debug and call isolated parts of the application within its context.
+
+`yarn console` starts the application console.
+
+Examples:
+
+### Make a DB query (call installed modules)
+
+```js
+Hub > const { Client } = require('pg');
+Hub > const config = require('config');
+Hub > const client = new Client(config.db.url);
+Hub > await client.connect();
+Hub > await client.query('SELECT * FROM merchant_infos');
+```
+
+### Call a service (call application modules)
+
+```js
+Hub > const workerClient = await container.lookup('worker-client');
+Hub > await workerClient.addJob('persist-off-chain-merchant-info', { id: 1 });
+```
 
 ## Connecting to the database
 
@@ -98,12 +122,14 @@ AWS_PROFILE=cardstack terraform output | grep postgres_password
 
 Run the command, open a postgres client, and connect to localhost, port 55432 with username cardstack, password as looked up in previous step.
 
-
-
 ## Provided APIs
+
 APIs conform to the [JSON API specification](https://jsonapi.org/).
 
 ### GET /api/prepaid-card-patterns
 
 ### GET /api/prepaid-card-color-schemes
+
 ### POST /api/prepaid-card-customizations
+
+### POST /api/merchant-infos
