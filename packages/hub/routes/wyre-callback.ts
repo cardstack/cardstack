@@ -107,6 +107,7 @@ export default class WyreCallbackRoute {
         }. request is: ${JSON.stringify(request.source, null, 2)}`,
         err
       );
+      return;
     }
   }
 
@@ -130,6 +131,7 @@ export default class WyreCallbackRoute {
         }. request is: ${JSON.stringify(request.source, null, 2)}`,
         err
       );
+      return;
     }
 
     if (reservationId) {
@@ -197,6 +199,7 @@ export default class WyreCallbackRoute {
         } receive of ${transfer.source}. request is: ${JSON.stringify(request.source, null, 2)}`,
         err
       );
+      return;
     }
 
     let order = await this.wyre.getOrder(orderId);
@@ -268,6 +271,7 @@ export default class WyreCallbackRoute {
         }. request is: ${JSON.stringify(request.source, null, 2)}`,
         err
       );
+      return;
     }
 
     let [order] = orders;
