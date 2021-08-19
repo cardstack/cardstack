@@ -178,8 +178,11 @@ export default class WyreCallbackRoute {
 
     let db = await this.databaseManager.getClient();
     try {
-      let result = await db.query(`SELECT status FROM wallet_orders WHERE order_id = $1`, [orderId]);
-      if (result.rows.length > 0 && result.rows[0].status !== 'waiting-for-order') {
+      let result = await db.query(
+        `SELECT status FROM wallet_orders WHERE order_id = $1 AND status != 'waiting-for-order'`,
+        [orderId]
+      );
+      if (result.rows.length > 0) {
         log.info(
           `while processing ${request.dest} receive, transfer ${request.source}'s order ${orderId} has already been processed. skipping`
         );
