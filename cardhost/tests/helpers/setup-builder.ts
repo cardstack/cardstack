@@ -21,7 +21,7 @@ export default function setupBuilder(
     this.cardService = this.owner.lookup('service:cards');
 
     if (options) {
-      this.routingCard = options.routingCard;
+      this.cardService.overrideRoutingCardWith = options.routingCard;
     }
 
     this.builder = await this.cardService.builder();

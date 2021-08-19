@@ -1,3 +1,4 @@
+import { CardModel } from '@cardstack/core/src/card-model';
 import type {
   CardJSONResponse,
   CompiledCard,
@@ -79,6 +80,21 @@ export default class LocalRealm implements Builder {
         },
       },
     };
+  }
+
+  async loadForRoute(
+    routeCardURL: string,
+    pathname: string
+  ): Promise<CardModel> {
+    let routeCard = await this.getCompiledCard(routeCardURL);
+    let routeCardClass = (
+      await this.cards.loadModule<any>(routeCard.schemaModule)
+    ).default;
+    let routableCardURL = new routeCardClass().routeTo(pathname);
+    if (!routableCardURL) {
+      throw new Error(`Could not find routable card: ${routableCardURL}`);
+    }
+    return await this.cards.load(routableCardURL, 'isolated');
   }
 
   async createRawCard(rawCard: RawCard): Promise<void> {
@@ -163,9 +179,17 @@ export default class LocalRealm implements Builder {
 
       return this.load(url, 'isolated');
     } else if ('update' in op) {
-      throw new Error(
-        `unimplemented localrealm update send ${JSON.stringify(op)}`
-      );
+      let { cardURL: url } = op.update;
+      let data = op.update.payload.data.attributes;
+      let existingRawCard = this.rawCards.get(url);
+      if (!existingRawCard) {
+        throw new Error(
+          `Tried to update a local card that doesnt exist: ${url}`
+        );
+      }
+
+      existingRawCard.data = data;
+      return this.load(url, 'isolated');
     } else {
       throw assertNever(op);
     }

@@ -2,16 +2,22 @@ import { module, test } from 'qunit';
 import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import setupBuilder from '../helpers/setup-builder';
-import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+import {
+  ADDRESS_RAW_CARD,
+  PERSON_RAW_CARD,
+} from '@cardstack/core/tests/helpers/fixtures';
+import { LOCAL_REALM } from 'cardhost/lib/builder';
 
 module('Acceptance | card routing', function (hooks) {
-  setupApplicationTest(hooks);
-  setupBuilder(hooks, { routingCard: 'https://mirage/cards/my-routes' });
-  let personURL = 'https://mirage/cards/person';
+  let personURL = PERSON_RAW_CARD.url;
+  let routeCardURL = `${LOCAL_REALM}/my-routes`;
 
-  hooks.beforeEach(function () {
-    this.createCard({
-      url: 'https://mirage/cards/my-routes',
+  setupApplicationTest(hooks);
+  setupBuilder(hooks, { routingCard: routeCardURL });
+
+  hooks.beforeEach(async function () {
+    await this.builder.createRawCard({
+      url: routeCardURL,
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -25,29 +31,10 @@ module('Acceptance | card routing', function (hooks) {
       },
     });
 
-    this.createCard({
-      url: personURL,
-      schema: 'schema.js',
-      isolated: 'isolated.js',
-      data: {
-        name: 'Arthur',
-      },
-      files: {
-        'schema.js': `
-          import { contains } from "@cardstack/types";
-          import './isolated.css'
-          import string from "https://cardstack.com/base/string";
-          export default class Person {
-            @contains(string)
-            name;
-          }`,
-        'isolated.js': templateOnlyComponentTemplate(
-          `<div class="person-isolated" data-test-person>Hi! I am <@fields.name/></div>`,
-          { IsolatedStyles: './isolated.css' }
-        ),
-        'isolated.css': '.person-isolated { background: red }',
-      },
-    });
+    await this.builder.createRawCard(ADDRESS_RAW_CARD);
+    await this.builder.createRawCard(
+      Object.assign({ data: { name: 'Arthur' } }, PERSON_RAW_CARD)
+    );
   });
 
   test('visiting /card-routing', async function (assert) {
@@ -55,7 +42,7 @@ module('Acceptance | card routing', function (hooks) {
     assert.equal(currentURL(), '/welcome');
     assert.equal(
       document.head.querySelector(
-        `[data-asset-url="https://mirage/cards/person/isolated.css"]`
+        `[data-asset-url="@cardstack/local-realm-compiled/https-cardstack-local-person/isolated.css"]`
       )?.innerHTML,
       '.person-isolated { background: red }'
     );

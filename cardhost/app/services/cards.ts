@@ -22,6 +22,7 @@ const { cardServer } = config as any; // Environment types arent working
 
 export default class Cards extends Service {
   private localRealmURL = LOCAL_REALM;
+  overrideRoutingCardWith: string | undefined;
 
   async load(url: string, format: Format): Promise<CardModel> {
     let cardResponse: CardJSONResponse;
@@ -38,10 +39,15 @@ export default class Cards extends Service {
   }
 
   async loadForRoute(pathname: string): Promise<CardModel> {
-    let url = `${cardServer}cardFor${pathname}`;
-    let cardResponse = await fetchJSON<CardJSONResponse>(url);
-    let { component, Model } = await this.codeForCard(cardResponse);
-    return Model.fromResponse(this.cardEnv(), cardResponse, component);
+    if (this.overrideRoutingCardWith) {
+      let builder = await this.builder();
+      return await builder.loadForRoute(this.overrideRoutingCardWith, pathname);
+    } else {
+      let url = `${cardServer}cardFor${pathname}`;
+      let cardResponse = await fetchJSON<CardJSONResponse>(url);
+      let { component, Model } = await this.codeForCard(cardResponse);
+      return Model.fromResponse(this.cardEnv(), cardResponse, component);
+    }
   }
 
   private inLocalRealm(cardURL: string): boolean {
