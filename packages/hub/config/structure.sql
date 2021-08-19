@@ -835,10 +835,10 @@ CREATE UNIQUE INDEX merchant_infos_slug_unique_index ON public.merchant_infos US
 
 
 --
--- Name: wallet_orders_custodial_transfer_id_index; Type: INDEX; Schema: public; Owner: postgres
+-- Name: wallet_orders_custodial_transfer_id_status_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX wallet_orders_custodial_transfer_id_index ON public.wallet_orders USING btree (custodial_transfer_id);
+CREATE INDEX wallet_orders_custodial_transfer_id_status_index ON public.wallet_orders USING btree (custodial_transfer_id, status);
 
 
 --
@@ -964,7 +964,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 2	20210614080132698_create-prepaid-card-customizations-table	2021-07-29 14:31:17.108453
 3	20210623052200757_create-graphile-worker-schema	2021-07-29 14:31:17.108453
 17	20210809113449561_merchant-infos	2021-08-17 15:07:25.288981
-23	20210817184105100_wallet-orders	2021-08-18 17:06:23.913024
+24	20210817184105100_wallet-orders	2021-08-19 13:32:47.794362
 \.
 
 
@@ -972,7 +972,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 23, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 24, true);
 
 
 --

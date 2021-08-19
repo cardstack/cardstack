@@ -21,7 +21,7 @@ exports.up = (pgm) => {
 
   // index for the query that wyre webhook admin transfer request will need to
   // update record
-  pgm.createIndex(TABLE, ['custodial_transfer_id']);
+  pgm.createIndex(TABLE, ['custodial_transfer_id', 'status']);
 };
 
 exports.down = (pgm) => {
