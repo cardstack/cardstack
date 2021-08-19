@@ -27,7 +27,7 @@
 }
 
 .balance-display__name {
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--name-font-size);
   line-height: var(--name-line-height);
   letter-spacing: var(--boxel-lsp-xs);
@@ -54,7 +54,7 @@
   --balance-line-height: calc(27 / 20);
 
   color: var(--large-text-color);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .balance-display__balance--sm {

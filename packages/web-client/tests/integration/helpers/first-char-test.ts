@@ -18,9 +18,9 @@ module('Integration | Helper | first-char', function (hooks) {
     assert.equal(this.element.textContent?.trim(), '&');
   });
 
-  test('it converts non-string input to string and returns first character', async function (assert) {
+  test('it ignores non-string input', async function (assert) {
     this.set('val', 577);
     await render(hbs`{{first-char this.val}}`);
-    assert.equal(this.element.textContent?.trim(), '5');
+    assert.equal(this.element.textContent?.trim(), '');
   });
 });

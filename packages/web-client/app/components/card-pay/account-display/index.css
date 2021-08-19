@@ -25,7 +25,7 @@
 }
 
 .account-display__name {
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--name-font-size);
   line-height: var(--name-line-height);
   letter-spacing: var(--boxel-lsp-xs);

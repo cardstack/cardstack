@@ -131,6 +131,10 @@ export default class Layer2Network
     return address;
   }
 
+  @task *merchantRegistrationFee(): TaskGenerator<number> {
+    return yield this.strategy.merchantRegistrationFee();
+  }
+
   @task *registerMerchant(
     prepaidCardAddress: string,
     infoDid: string,

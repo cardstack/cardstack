@@ -1,9 +1,46 @@
 <ActionCardContainer
   @header="Prepaid Card Choice"
   @isComplete={{@isComplete}}
-  data-test-layout-customization-is-complete={{@isComplete}}
+  data-test-prepaid-card-choice-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section @title="Choose a prepaid card to fund merchant creation">
+    <CardPay::LabeledValue @label="Merchant Name" class="prepaid-card-choice__field-label">
+      <CardPay::Merchant
+        @name={{@name}}
+        @size="small"
+        @logoBackground={{@logoBackground}}
+        @logoTextColor={{@logoTextColor}}
+      />
+    </CardPay::LabeledValue>
+    <CardPay::LabeledValue @label="Merchant ID" class="prepaid-card-choice__field-label">
+      {{@id}}
+    </CardPay::LabeledValue>
+    <CardPay::LabeledValue @label="Merchant Creation Fee" class="prepaid-card-choice__field-label">
+      <CardPay::BalanceDisplay
+        class="prepaid-card-choice__cost"
+        @icon="spend"
+        @sign="§"
+        @symbol="SPEND"
+        @balance={{this.merchantRegistrationFee}}
+        @usdBalance={{spend-to-usd this.merchantRegistrationFee}}
+        data-test-prepaid-card-choice-merchant-fee
+      />
+    </CardPay::LabeledValue>
+    <CardPay::LabeledValue @label="Pay Using Prepaid Card" class="prepaid-card-choice__field-label">
+      {{!-- TODO: card picker --}}
+    </CardPay::LabeledValue>
+    {{#if @isComplete}}
+      <CardPay::LabeledValue @label="Merchant Address" class="prepaid-card-choice__field-label">
+        <CardPay::Merchant
+          @name={{@name}}
+          @address={{@workflowSession.state.merchantSafe.address}}
+          @size="small"
+          @logoBackground={{@logoBackground}}
+          @logoTextColor={{@logoTextColor}}
+          data-test-prepaid-card-choice-merchant-address
+        />
+      </CardPay::LabeledValue>
+    {{/if}}
     {{#if this.error}}
       <CardPay::ErrorMessage data-test-prepaid-card-choice-error-message as |supportURL|>
         {{#if (eq this.error.message "INSUFFICIENT_FUNDS")}}

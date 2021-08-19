@@ -1,7 +1,17 @@
-.prepaid-card-choice__loading-indicator {
-  --icon-color: white;
+.prepaid-card-choice__field-label {
+  --field-label-width: minmax(4rem, 20%);
+}
 
-  margin-right: var(--boxel-sp-sm);
+.prepaid-card-choice__cost {
+  --icon-alignment: flex-start;
+
+  font-weight: 700;
+}
+
+.prepaid-card-choice__loading-indicator {
+  --icon-color: var(--boxel-light);
+
+  margin-right: var(--boxel-sp-xs);
   flex-grow: 0;
   flex-shrink: 0;
 }

@@ -261,6 +261,11 @@ export default abstract class Layer2ChainWeb3Strategy
     return result.prepaidCards[0];
   }
 
+  async merchantRegistrationFee(): Promise<number> {
+    const RevenuePool = await getSDK('RevenuePool', this.web3);
+    return await RevenuePool.merchantRegistrationFee(); // this is a SPEND amount
+  }
+
   async registerMerchant(
     prepaidCardAddress: string,
     infoDid: string,

@@ -1,0 +1,24 @@
+.merchant-customization__name {
+  --field-label-alignment: center;
+
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0;
+}
+
+.merchant-customization__enter-name {
+  color: var(--boxel-light-600);
+}
+
+.merchant-customization__color {
+  display: flex;
+  align-items: center;
+}
+
+.merchant-customization__color-preview {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: var(--boxel-sp-xxs);
+  border-radius: 3px;
+  background-color: var(--merchant-custom-color);
+}
