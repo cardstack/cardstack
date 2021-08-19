@@ -2,6 +2,7 @@ import { Server } from 'http';
 import supertest, { Test } from 'supertest';
 import { bootServerForTesting } from '../../main';
 import { Registry } from '../../di/dependency-injection';
+import { Job, TaskSpec } from 'graphile-worker';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -23,6 +24,17 @@ class StubAuthenticationUtils {
   }
 }
 
+let lastAddedJobIdentifier: string | undefined;
+let lastAddedJobPayload: any | undefined;
+
+class StubWorkerClient {
+  async addJob(identifier: string, payload?: any, _spec?: TaskSpec): Promise<Job> {
+    lastAddedJobIdentifier = identifier;
+    lastAddedJobPayload = payload;
+    return Promise.resolve({} as Job);
+  }
+}
+
 let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
 function handleValidateAuthToken(encryptedString: string) {
   expect(encryptedString).to.equal('abc123--def456--ghi789');
@@ -38,6 +50,7 @@ describe('POST /api/merchant-infos', function () {
       port: 3001,
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
+        registry.register('worker-client', StubWorkerClient);
       },
     });
 
@@ -46,6 +59,8 @@ describe('POST /api/merchant-infos', function () {
 
   this.afterEach(async function () {
     server.close();
+    lastAddedJobIdentifier = undefined;
+    lastAddedJobPayload = undefined;
   });
 
   it('persists merchant info', async function () {
@@ -62,6 +77,8 @@ describe('POST /api/merchant-infos', function () {
       },
     };
 
+    let resourceId = null;
+
     await request
       .post('/api/merchant-infos')
       .send(payload)
@@ -70,6 +87,7 @@ describe('POST /api/merchant-infos', function () {
       .set('Content-Type', 'application/vnd.api+json')
       .expect(201)
       .expect(function (res) {
+        resourceId = res.body.data.id;
         res.body.data.id = 'the-id';
         res.body.data.attributes.did = 'the-did';
       })
@@ -88,6 +106,9 @@ describe('POST /api/merchant-infos', function () {
         },
       })
       .expect('Content-Type', 'application/vnd.api+json');
+
+    expect(lastAddedJobIdentifier).to.equal('persist-off-chain-merchant-info');
+    expect(lastAddedJobPayload).to.deep.equal({ id: resourceId });
   });
 
   it('returns 401 without bearer token', async function () {

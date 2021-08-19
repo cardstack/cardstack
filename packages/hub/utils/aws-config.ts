@@ -16,7 +16,10 @@ export default async function awsConfig({ roleChain = [] }) {
   let accessKeyId = config.get('aws.config.credentials.AccessKeyId');
   let secretAccessKey = config.get('aws.config.credentials.SecretAccessKey');
   if (accessKeyId || secretAccessKey) {
-    result.credentials = config.get('aws.config.credentials');
+    result.credentials = {
+      accessKeyId,
+      secretAccessKey,
+    };
   }
 
   let region = config.get('aws.config.region');

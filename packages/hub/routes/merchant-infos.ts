@@ -6,12 +6,29 @@ import shortUuid from 'short-uuid';
 import { AuthenticationUtils } from '../utils/authentication';
 import MerchantInfoSerializer from '../services/serializers/merchant-info-serializer';
 import { ensureLoggedIn } from './utils/auth';
+import WorkerClient from '../services/worker-client';
+import MerchantInfoQueries from '../services/queries/merchant-info';
+
+export interface MerchantInfo {
+  id: string;
+  name: string;
+  slug: string;
+  color: string;
+  textColor: string;
+  ownerAddress: string;
+}
+
 export default class MerchantInfosRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
   merchantInfoSerializer: MerchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
   });
+  merchantInfoQueries: MerchantInfoQueries = inject('merchant-info-queries', {
+    as: 'merchantInfoQueries',
+  });
+
+  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);
@@ -22,32 +39,26 @@ export default class MerchantInfosRoute {
       return;
     }
 
-    let db = await this.databaseManager.getClient();
-
     if (!ensureValidPayload(ctx)) {
       return;
     }
 
-    let newId = shortUuid.uuid();
-    let name = ctx.request.body.data.attributes['name'];
-    let slug = ctx.request.body.data.attributes['slug']; // TODO: validate uniqueness
-    let color = ctx.request.body.data.attributes['color'];
-    let textColor = ctx.request.body.data.attributes['text-color'];
-    let ownerAddress = ctx.state.userAddress;
+    const merchantInfo: MerchantInfo = {
+      id: shortUuid.uuid(),
+      name: ctx.request.body.data.attributes['name'],
+      slug: ctx.request.body.data.attributes['slug'],
+      color: ctx.request.body.data.attributes['color'],
+      textColor: ctx.request.body.data.attributes['text-color'],
+      ownerAddress: ctx.state.userAddress,
+    };
 
-    await db.query(
-      'INSERT INTO merchant_infos (id, name, slug, color, text_color, owner_address) VALUES($1, $2, $3, $4, $5, $6)',
-      [newId, name, slug, color, textColor, ownerAddress]
-    );
+    await this.merchantInfoQueries.insert(merchantInfo);
 
-    let serialized = await this.merchantInfoSerializer.serialize({
-      id: newId,
-      name,
-      slug,
-      color,
-      textColor,
-      ownerAddress,
+    await this.workerClient.addJob('persist-off-chain-merchant-info', {
+      id: merchantInfo.id,
     });
+
+    let serialized = await this.merchantInfoSerializer.serialize(merchantInfo);
 
     ctx.status = 201;
     ctx.body = serialized;
