@@ -15,6 +15,7 @@ import PrepaidCardCustomizationsRoute from '../routes/prepaid-card-customization
 import MerchantInfosRoute from '../routes/merchant-infos';
 import { inject } from '../di/dependency-injection';
 import CustodialWalletRoute from '../routes/custodial-wallet';
+import MerchantIdsRoute from '../routes/merchant-ids';
 
 const API_PREFIX = '/api';
 const apiPrefixPattern = new RegExp(`^${API_PREFIX}/(.*)`);
@@ -33,6 +34,9 @@ export default class JSONAPIMiddleware {
   });
   merchantInfosRoute: MerchantInfosRoute = inject('merchant-infos-route', {
     as: 'merchantInfosRoute',
+  });
+  merchantIdsRoute: MerchantIdsRoute = inject('merchant-ids-route', {
+    as: 'merchantIdsRoute',
   });
   custodialWalletRoute: CustodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
   middleware() {
@@ -69,6 +73,7 @@ export default class JSONAPIMiddleware {
       prepaidCardPatternsRoute,
       prepaidCardCustomizationsRoute,
       merchantInfosRoute,
+      merchantIdsRoute,
       custodialWalletRoute,
       sessionRoute,
     } = this;
@@ -83,6 +88,7 @@ export default class JSONAPIMiddleware {
       route.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get),
       route.post('/prepaid-card-customizations', prepaidCardCustomizationsRoute.post),
       route.post('/merchant-infos', merchantInfosRoute.post),
+      route.get('/merchant-ids', merchantIdsRoute.get),
       route.get('/custodial-wallet', custodialWalletRoute.get),
       route.all('/(.*)', notFound),
     ]);
