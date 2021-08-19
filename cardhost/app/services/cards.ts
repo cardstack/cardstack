@@ -80,6 +80,11 @@ export default class Cards extends Service {
   }
 
   private async send(op: CardOperation): Promise<CardJSONResponse> {
+    if (this.operationIsLocal(op)) {
+      let localRealm = await this.localRealm();
+      return await localRealm.send(op);
+    }
+
     if ('create' in op) {
       return await fetchJSON<CardJSONResponse>(
         this.buildNewURL(op.create.targetRealm, op.create.parentCardURL),
@@ -96,6 +101,16 @@ export default class Cards extends Service {
           body: JSON.stringify(op.update.payload),
         }
       );
+    } else {
+      throw assertNever(op);
+    }
+  }
+
+  private operationIsLocal(op: CardOperation): boolean {
+    if ('create' in op) {
+      return this.inLocalRealm(op.create.targetRealm);
+    } else if ('update' in op) {
+      return this.inLocalRealm(op.update.cardURL);
     } else {
       throw assertNever(op);
     }

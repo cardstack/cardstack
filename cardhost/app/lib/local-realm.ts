@@ -5,6 +5,7 @@ import type {
   Format,
   RawCard,
   Builder,
+  CardOperation,
 } from '@cardstack/core/src/interfaces';
 import { findIncluded } from '@cardstack/core/src/jsonapi';
 import { fetchJSON } from './jsonapi-fetch';
@@ -133,6 +134,10 @@ export default class LocalRealm implements Builder {
       }
       return compiled;
     }
+  }
+
+  async send(op: CardOperation): Promise<CardJSONResponse> {
+    throw new Error(`unimplemented localrealm send ${JSON.stringify(op)}`);
   }
 
   private inOwnRealm(cardURL: string): boolean {
