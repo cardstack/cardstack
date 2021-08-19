@@ -16,12 +16,12 @@ import { hbs } from 'ember-cli-htmlbars';
 import { tracked } from '@glimmer/tracking';
 import type LocalRealm from 'cardhost/lib/local-realm';
 import { fetchJSON } from 'cardhost/lib/jsonapi-fetch';
+import { LOCAL_REALM } from 'cardhost/lib/local-realm';
 
 const { cardServer } = config as any; // Environment types arent working
 
-// the methods our service makes available for CardModel's exclusive use
 export default class Cards extends Service {
-  private localRealmURL = 'https://cardstack-local';
+  private localRealmURL = LOCAL_REALM;
 
   async load(url: string, format: Format): Promise<CardModel> {
     let cardResponse: CardJSONResponse;

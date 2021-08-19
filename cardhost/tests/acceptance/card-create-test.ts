@@ -14,7 +14,7 @@ import {
 
 const PERSON = '[data-test-person]';
 const MODAL = '[data-test-modal]';
-const NEW = '[data-test-new-button]';
+const NEW = '[data-test-new-button-local]';
 const SAVE = '[data-test-modal-save]';
 
 module('Acceptance | Card Creation', function (hooks) {

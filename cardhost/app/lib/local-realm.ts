@@ -16,6 +16,8 @@ import dynamicCardTransform from './dynamic-card-transform';
 import { encodeCardURL } from '@cardstack/core/src/utils';
 import Cards from 'cardhost/services/cards';
 
+export const LOCAL_REALM = 'https://cardstack-local';
+
 const { cardServer } = config as any; // Environment types arent working
 
 type RegisteredLocalModule = {
@@ -136,8 +138,37 @@ export default class LocalRealm implements Builder {
     }
   }
 
+  generateId(): string {
+    let url;
+    while (!url) {
+      let possibleURL = this.ownRealmURL + Math.floor(Math.random() * 10000);
+      if (!this.rawCards.has(possibleURL)) {
+        url = possibleURL;
+      }
+    }
+    return url;
+  }
+
   async send(op: CardOperation): Promise<CardJSONResponse> {
-    throw new Error(`unimplemented localrealm send ${JSON.stringify(op)}`);
+    if ('create' in op) {
+      let data = op.create.payload.data.attributes;
+
+      let url = this.generateId();
+
+      this.createRawCard({
+        url,
+        data,
+        adoptsFrom: op.create.parentCardURL,
+      });
+
+      return this.load(url, 'isolated');
+    } else if ('update' in op) {
+      throw new Error(
+        `unimplemented localrealm update send ${JSON.stringify(op)}`
+      );
+    } else {
+      throw assertNever(op);
+    }
   }
 
   private inOwnRealm(cardURL: string): boolean {
