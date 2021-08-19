@@ -272,3 +272,19 @@ export const fromWei = (number: BigNumberish): string => convertRawAmountToDecim
 export const delay = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
+
+export interface FormatUsdOptions {
+  symbol: string | false;
+  suffix: string | false;
+}
+
+export const formatUsd = (value: BigNumberish, options: FormatUsdOptions = { symbol: '$', suffix: ' USD' }): string => {
+  let result = toFixedDecimals(value, 2);
+  if (options.symbol) {
+    result = options.symbol + result;
+  }
+  if (options.suffix) {
+    result = result + options.suffix;
+  }
+  return result;
+};

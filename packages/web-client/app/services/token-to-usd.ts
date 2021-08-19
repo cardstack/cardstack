@@ -88,11 +88,11 @@ export default class TokenToUsd extends Service {
     return this.#registeredHelpers.size > 0;
   }
 
-  toUsdFrom(symbol: UsdConvertibleSymbol, amount: BN): string | undefined {
+  toUsdFrom(symbol: UsdConvertibleSymbol, amount: BN): number | undefined {
     if (amount.isZero()) {
-      return '0.00';
+      return 0;
     }
-    return this.usdConverters[symbol]?.(amount.toString()).toFixed(2);
+    return this.usdConverters[symbol]?.(amount.toString());
   }
 
   // safe to call multiple times -- calls to the `pollTask` are

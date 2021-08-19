@@ -25,7 +25,7 @@
         </div>
         {{#if @usdBalance}}
           <div class="balance-display__text" data-test-balance-display-usd-amount>
-            ${{@usdBalance}} USD
+            {{format-usd @usdBalance}}
           </div>
         {{/if}}
       {{/if}}
