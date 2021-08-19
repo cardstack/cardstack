@@ -273,6 +273,18 @@ export const delay = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
+const SPEND_TO_USD_RATE = 0.01;
+
+export const spendToUsd = (amountInSpend: number): number | undefined => {
+  if ((amountInSpend as unknown) === '') {
+    return 0;
+  }
+  if (typeof (amountInSpend as unknown) !== 'number') {
+    return undefined;
+  }
+  return amountInSpend * SPEND_TO_USD_RATE;
+};
+
 export interface FormatUsdOptions {
   symbol: string | false;
   suffix: string | false;
