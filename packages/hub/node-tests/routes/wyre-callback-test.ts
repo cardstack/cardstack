@@ -273,9 +273,18 @@ describe('POST /api/wyre-callback', function () {
     server.close();
   });
 
-  describe('wallet order callbacks', function () {
-    this.beforeEach(async function () {});
+  it(`returns 400 when the share of the request does not match the expected format`, async function () {
+    await request
+      .post(`/callbacks/wyre`)
+      .set('Content-Type', 'application/json')
+      .set('Content-Type', 'application/json')
+      .send({
+        not: 'a valid callback request',
+      })
+      .expect(400);
+  });
 
+  describe('wallet order callbacks', function () {
     it(`can process callback for wallet order that doesn't yet exist in DB`, async function () {
       await request
         .post(`/callbacks/wyre`)
