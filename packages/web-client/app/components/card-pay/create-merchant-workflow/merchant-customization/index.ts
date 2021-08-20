@@ -20,14 +20,16 @@ export default class CardPayDepositWorkflowTransactionAmountComponent extends Co
   @tracked merchantBgColorValidationMessage = '';
 
   get canSaveDetails() {
+    return this.allFieldsPopulated && this.noValidationErrors;
+  }
+
+  get allFieldsPopulated() {
+    return this.merchantBgColor && this.merchantName && this.merchantId;
+  }
+
+  get noValidationErrors() {
     return (
-      // all fields populated
-      this.merchantBgColor &&
-      this.merchantName &&
-      this.merchantId &&
-      // unique merchant name + valid id characters
       this.merchantIdInputState === 'valid' &&
-      // no other validation errors
       !this.merchantNameValidationMessage &&
       !this.merchantBgColorValidationMessage
     );
@@ -46,6 +48,11 @@ export default class CardPayDepositWorkflowTransactionAmountComponent extends Co
     } else {
       return 'initial';
     }
+  }
+
+  // We might want to do some whitespace collapsing before saving?
+  get trimmedMerchantName() {
+    return this.merchantName.trim();
   }
 
   get merchantTextColor() {
@@ -72,7 +79,7 @@ export default class CardPayDepositWorkflowTransactionAmountComponent extends Co
 
   @action saveDetails() {
     this.args.workflowSession.updateMany({
-      merchantName: this.merchantName.trim(),
+      merchantName: this.trimmedMerchantName,
       merchantId: this.merchantId,
       merchantBgColor: this.merchantBgColor,
       merchantTextColor: this.merchantTextColor,
@@ -81,7 +88,7 @@ export default class CardPayDepositWorkflowTransactionAmountComponent extends Co
   }
 
   @action validateMerchantName() {
-    this.merchantNameValidationMessage = this.merchantName.trim()
+    this.merchantNameValidationMessage = this.trimmedMerchantName
       ? ''
       : 'This field is required';
   }
