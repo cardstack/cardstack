@@ -95,8 +95,8 @@ function makeAccount(address: Address): string {
   return account;
 }
 
-// Take from generated ERC-20 ABI. We are replicating this here to avoid having
-// token specific logic generated templates, since ERC-20's are all the same
+// Taken from generated ERC-20 ABI. We are replicating this here to avoid having
+// token specific data source generated modules, since ERC-20's are all the same
 // regardless of token
 class TransferEvent extends ethereum.Event {
   get params(): Transfer__Params {
