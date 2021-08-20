@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { click, fillIn, render, waitUntil } from '@ember/test-helpers';
+import { click, fillIn, find, render, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
@@ -145,9 +145,8 @@ module(
       await fillIn(merchantIdInput, 'a-valid-id');
       await waitUntil(
         () =>
-          (document.querySelector(
-            '[data-test-validation-state-input]'
-          ) as HTMLElement).dataset.testValidationStateInput === 'valid'
+          (find('[data-test-validation-state-input]') as HTMLElement).dataset
+            .testValidationStateInput === 'valid'
       );
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
 
@@ -185,9 +184,8 @@ module(
       await fillIn(merchantIdInput, 'a-valid-id');
       await waitUntil(
         () =>
-          (document.querySelector(
-            '[data-test-validation-state-input]'
-          ) as HTMLElement).dataset.testValidationStateInput === 'valid'
+          (find('[data-test-validation-state-input]') as HTMLElement).dataset
+            .testValidationStateInput === 'valid'
       );
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
 
@@ -215,9 +213,8 @@ module(
       await fillIn(merchantIdInput, 'a-valid-id');
       await waitUntil(
         () =>
-          (document.querySelector(
-            '[data-test-validation-state-input]'
-          ) as HTMLElement).dataset.testValidationStateInput === 'valid'
+          (find('[data-test-validation-state-input]') as HTMLElement).dataset
+            .testValidationStateInput === 'valid'
       );
 
       await click(SAVE_DETAILS_BUTTON);
@@ -236,9 +233,8 @@ module(
       await fillIn(merchantIdInput, 'a-valid-id');
       await waitUntil(
         () =>
-          (document.querySelector(
-            '[data-test-validation-state-input]'
-          ) as HTMLElement).dataset.testValidationStateInput === 'valid'
+          (find('[data-test-validation-state-input]') as HTMLElement).dataset
+            .testValidationStateInput === 'valid'
       );
 
       await click(SAVE_DETAILS_BUTTON);
