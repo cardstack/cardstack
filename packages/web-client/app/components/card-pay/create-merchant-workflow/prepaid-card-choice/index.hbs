@@ -12,7 +12,7 @@
         @logoTextColor={{@workflowSession.state.merchantTextColor}}
       />
     </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Merchant ID" class="prepaid-card-choice__field-label">
+    <CardPay::LabeledValue @label="Merchant ID" class="prepaid-card-choice__field-label" data-test-prepaid-card-choice-merchant-id>
       {{@workflowSession.state.merchantId}}
     </CardPay::LabeledValue>
     <CardPay::LabeledValue @label="Merchant Creation Fee" class="prepaid-card-choice__field-label">

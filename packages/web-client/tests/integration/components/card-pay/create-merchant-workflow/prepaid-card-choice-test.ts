@@ -57,6 +57,13 @@ module(
       ]);
 
       let workflowSession = new WorkflowSession();
+      workflowSession.updateMany({
+        merchantName: "It's a new merchant",
+        merchantId: 'merchant-id',
+        merchantBgColor: '#ffffff',
+        merchantTextColor: '#000000',
+      });
+
       this.setProperties({
         onComplete: () => {},
         onIncomplete: () => {},
@@ -80,7 +87,14 @@ module(
       assert
         .dom('[data-test-prepaid-card-choice-merchant-fee]')
         .containsText('100 SPEND');
-      // TODO: check other fields
+      assert
+        .dom('[data-test-merchant]')
+        .hasAttribute('data-test-merchant', "It's a new merchant")
+        .hasAttribute('data-test-merchant-logo-background', '#ffffff')
+        .hasAttribute('data-test-merchant-logo-text-color', '#000000');
+      assert
+        .dom('[data-test-prepaid-card-choice-merchant-id]')
+        .containsText('merchant-id');
     });
 
     module('Test the sdk register merchant calls', async function () {
