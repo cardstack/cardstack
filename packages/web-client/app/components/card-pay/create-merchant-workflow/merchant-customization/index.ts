@@ -121,7 +121,7 @@ export default class CardPayDepositWorkflowTransactionAmountComponent extends Co
     this.lastCheckedMerchantId = value;
     if (merchantIdExists) {
       this.merchantIdValidationMessage =
-        'This merchant ID is already taken, please choose another ID.';
+        'This merchant ID is already taken, please choose another ID';
       return false;
     }
 
