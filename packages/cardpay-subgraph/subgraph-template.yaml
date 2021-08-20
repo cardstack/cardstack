@@ -25,6 +25,12 @@ dataSources:
           file: ./abis/generated/PrepaidCardManager.json
         - name: Exchange
           file: ./abis/generated/Exchange.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -54,6 +60,12 @@ dataSources:
       abis:
         - name: MerchantManager
           file: ./abis/generated/MerchantManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -81,6 +93,12 @@ dataSources:
       abis:
         - name: DeprecatedMerchantManager_v0_6_7
           file: ./abis/generated/DeprecatedMerchantManager_v0_6_7.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -112,6 +130,12 @@ dataSources:
           file: ./abis/generated/PrepaidCardManager.json
         - name: Exchange
           file: ./abis/generated/Exchange.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -145,6 +169,12 @@ dataSources:
           file: ./abis/generated/PrepaidCardManager.json
         - name: Exchange
           file: ./abis/generated/Exchange.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -177,6 +207,12 @@ dataSources:
           file: ./abis/generated/PrepaidCardManager.json
         - name: Exchange
           file: ./abis/generated/Exchange.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -205,6 +241,12 @@ dataSources:
       abis:
         - name: RevenuePool
           file: ./abis/generated/RevenuePool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -231,6 +273,12 @@ dataSources:
       abis:
         - name: Spend
           file: ./abis/generated/Spend.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -258,6 +306,12 @@ dataSources:
       abis:
         - name: SupplierManager
           file: ./abis/generated/SupplierManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -289,6 +343,12 @@ dataSources:
       abis:
         - name: HomeMultiAMBErc20ToErc677
           file: ./abis/HomeMultiAMBErc20ToErc677.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -318,6 +378,12 @@ dataSources:
           file: ./abis/GnosisProxyFactory.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -346,6 +412,12 @@ dataSources:
       abis:
         - name: UniswapV2Factory
           file: ./abis/UniswapV2Factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -377,6 +449,10 @@ dataSources:
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -406,6 +482,10 @@ dataSources:
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
@@ -432,6 +512,12 @@ templates:
       abis:
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
       eventHandlers:
         - event: ExecutionSuccess(bytes32,uint256)
           handler: handleExecutionSuccess
@@ -459,6 +545,12 @@ templates:
       abis:
         - name: UniswapV2Pair
           file: ./abis/UniswapV2Pair.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
