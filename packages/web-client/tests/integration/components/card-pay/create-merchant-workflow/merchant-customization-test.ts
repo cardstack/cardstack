@@ -193,12 +193,6 @@ module(
 
       for (let invalidEntry of MERCHANT_ID_INVALID_INPUTS) {
         await fillIn(merchantIdInput, invalidEntry.value);
-        await waitUntil(
-          () =>
-            (document.querySelector(
-              '[data-test-validation-state-input]'
-            ) as HTMLElement).dataset.testValidationStateInput === 'invalid'
-        );
         assert
           .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
           .containsText(invalidEntry.errorMessage);
