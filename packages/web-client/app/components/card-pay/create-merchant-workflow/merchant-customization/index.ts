@@ -7,6 +7,7 @@ import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow
 import { didCancel, restartableTask, timeout } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { mostReadable, random as randomColor } from '@ctrl/tinycolor';
+import config from '@cardstack/web-client/config/environment';
 
 export default class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
@@ -102,7 +103,7 @@ export default class CardPayDepositWorkflowTransactionAmountComponent extends Co
 
   @restartableTask *validateMerchantIdTask() {
     // debounce
-    yield timeout(500);
+    yield timeout(config.environment === 'test' ? 10 : 500);
     let value = this.merchantId;
 
     if (value) {
@@ -142,10 +143,6 @@ function findDomainNameErrors(value: string) {
   return '';
 }
 
-async function checkIfMerchantIdExists(value: string) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(value.endsWith('y'));
-    }, 750);
-  });
+async function checkIfMerchantIdExists(_value: string) {
+  return false;
 }
