@@ -36,68 +36,68 @@
         />
       </CardPay::LabeledValue>
     {{else}}
-    <CardPay::FieldStack>
-      <CardPay::LabeledValue
-        @fieldMode="edit"
-        @label="Merchant name"
-        data-test-merchant-customization-merchant-name-field
-      >
-        <Boxel::Input
-          @value={{this.merchantName}}
-          @onInput={{this.onMerchantNameInput}}
-          @invalid={{this.merchantNameValidationMessage}}
-          @errorMessage={{this.merchantNameValidationMessage}}
-          @required={{true}}
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          {{on "blur" this.validateMerchantName}}
-        />
-      </CardPay::LabeledValue>
-      <CardPay::LabeledValue
-        @fieldMode="edit"
-        @label="Merchant ID"
-        data-test-merchant-customization-merchant-id-field
-      >
-        <CardPay::CreateMerchantWorkflow::MerchantCustomization::ValidationStateInput
-          @state={{this.merchantIdInputState}}
-          @value={{this.merchantId}}
-          @onInput={{this.onMerchantIdInput}}
-          @errorMessage={{this.merchantIdValidationMessage}}
-          @helperText="This will be used to uniquely identify your merchant in Cardstack products and cannot be changed after your merchant is created."
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-          {{on "blur" this.validateMerchantId}}
-        />
-      </CardPay::LabeledValue>
-      <CardPay::LabeledValue
-        @fieldMode="edit"
-        @label="Custom color"
-        data-test-merchant-customization-color-field
-      >
-        {{!-- template-lint-disable require-input-label --}}
-        <div class="merchant-customization__color">
-          <input
-            type="color"
-            value={{this.merchantBgColor}}
-            class="merchant-customization__color-input"
-            {{on "input" this.onMerchantBgColorInput}}
-          >
-          {{this.merchantBgColor}}
-        </div>
-      </CardPay::LabeledValue>
-      <CardPay::LabeledValue @label="Manager">
-        <CardPay::AccountDisplay
-          @wrapped={{true}}
-          @address={{this.layer2Network.walletInfo.firstAddress}}
-          data-test-merchant-customization-manager-address
-        />
-      </CardPay::LabeledValue>
-    </CardPay::FieldStack>
-  {{/if}}
+      <CardPay::FieldStack>
+        <CardPay::LabeledValue
+          @fieldMode="edit"
+          @label="Merchant name"
+          data-test-merchant-customization-merchant-name-field
+        >
+          <Boxel::Input
+            @value={{this.merchantName}}
+            @onInput={{this.onMerchantNameInput}}
+            @invalid={{this.merchantNameValidationMessage}}
+            @errorMessage={{this.merchantNameValidationMessage}}
+            @required={{true}}
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            {{on "blur" this.validateMerchantName}}
+          />
+        </CardPay::LabeledValue>
+        <CardPay::LabeledValue
+          @fieldMode="edit"
+          @label="Merchant ID"
+          data-test-merchant-customization-merchant-id-field
+        >
+          <CardPay::CreateMerchantWorkflow::MerchantCustomization::ValidationStateInput
+            @state={{this.merchantIdInputState}}
+            @value={{this.merchantId}}
+            @onInput={{this.onMerchantIdInput}}
+            @errorMessage={{this.merchantIdValidationMessage}}
+            @helperText="This will be used to uniquely identify your merchant in Cardstack products and cannot be changed after your merchant is created."
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            {{on "blur" this.validateMerchantId}}
+          />
+        </CardPay::LabeledValue>
+        <CardPay::LabeledValue
+          @fieldMode="edit"
+          @label="Custom color"
+          data-test-merchant-customization-color-field
+        >
+          {{!-- template-lint-disable require-input-label --}}
+          <div class="merchant-customization__color">
+            <input
+              type="color"
+              value={{this.merchantBgColor}}
+              class="merchant-customization__color-input"
+              {{on "input" this.onMerchantBgColorInput}}
+            >
+            {{this.merchantBgColor}}
+          </div>
+        </CardPay::LabeledValue>
+        <CardPay::LabeledValue @label="Manager">
+          <CardPay::AccountDisplay
+            @wrapped={{true}}
+            @address={{this.layer2Network.walletInfo.firstAddress}}
+            data-test-merchant-customization-manager-address
+          />
+        </CardPay::LabeledValue>
+      </CardPay::FieldStack>
+    {{/if}}
   </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
