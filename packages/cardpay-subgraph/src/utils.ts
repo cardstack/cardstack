@@ -1,8 +1,8 @@
 import { crypto, Address, ByteArray, ethereum, BigInt } from '@graphprotocol/graph-ts';
 import { log } from '@graphprotocol/graph-ts';
-import { ERC20 } from '../generated/Token/ERC20';
-import { ERC20SymbolBytes } from '../generated/Token/ERC20SymbolBytes';
-import { ERC20NameBytes } from '../generated/Token/ERC20NameBytes';
+import { ERC20 } from './erc-20/ERC20';
+import { ERC20SymbolBytes } from './erc-20/ERC20SymbolBytes';
+import { ERC20NameBytes } from './erc-20/ERC20NameBytes';
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit';
 import { PrepaidCardManager } from '../generated/PrepaidCard/PrepaidCardManager';
 import { Exchange } from '../generated/PrepaidCard/Exchange';
