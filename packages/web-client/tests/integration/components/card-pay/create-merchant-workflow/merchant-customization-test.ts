@@ -59,7 +59,7 @@ const MERCHANT_ID_INVALID_INPUTS = [
   },
   {
     value: 'this-is-exactly-sixty-five-characters-long-but-is-otherwise-valid',
-    errorMessage: 'Merchant ID must be at most 63 characters, currently 65',
+    errorMessage: 'Merchant ID must be at most 50 characters, currently 65',
   },
 ];
 

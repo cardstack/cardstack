@@ -137,8 +137,8 @@ function findDomainNameErrors(value: string) {
     return 'Merchant ID can only contain lowercase alphabets, numbers, and hyphens';
   else if (/^[^a-zA-Z0-9]/.test(value) || /[^a-zA-Z0-9]$/.test(value))
     return 'Merchant ID must start and end with lowercase alphabet or number';
-  else if (value.length > 63)
-    return `Merchant ID must be at most 63 characters, currently ${value.length}`;
+  else if (value.length > 50)
+    return `Merchant ID must be at most 50 characters, currently ${value.length}`;
   return '';
 }
 
