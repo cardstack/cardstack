@@ -1,42 +1,8 @@
-## TODO template-ize start blocks for networks
-
 specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 
 dataSources:
-  - kind: ethereum/contract
-    name: Token
-    network: {NETWORK}
-    source:
-      abi: ERC20
-      startBlock: {TOKEN_START_BLOCK}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      language: wasm/assemblyscript
-      entities:
-        - Token
-        - Account
-        - TokenHolder
-        - TokenTransfer
-        - TokenHistory
-        - Transaction
-        - EOATransaction
-      abis:
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: ERC20SymbolBytes
-          file: ./abis/ERC20SymbolBytes.json
-        - name: ERC20NameBytes
-          file: ./abis/ERC20NameBytes.json
-        - name: GnosisSafe
-          file: ./abis/GnosisSafe.json
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/mappings/token-{NETWORK}.ts
-
   - kind: ethereum/contract
     name: PrepaidCard
     network: {NETWORK}
@@ -457,6 +423,76 @@ dataSources:
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handleNewPair
+
+  ## CPXD TOKENS: perhaps think about a way to script this list being generated
+  ## so we don't need to add a block for each token
+
+  - kind: ethereum/contract
+    name: DaiToken
+    network: {NETWORK}
+    source:
+      address: "{DAI_CPXD_ADDRESS}"
+      abi: ERC20
+      startBlock: {TOKEN_START_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Account
+        - TokenHolder
+        - TokenTransfer
+        - TokenHistory
+        - Transaction
+        - EOATransaction
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/token.ts
+
+  - kind: ethereum/contract
+    name: CardToken
+    network: {NETWORK}
+    source:
+      address: "{CARD_CPXD_ADDRESS}"
+      abi: ERC20
+      startBlock: {TOKEN_START_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Account
+        - TokenHolder
+        - TokenTransfer
+        - TokenHistory
+        - Transaction
+        - EOATransaction
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/token.ts
+
 
 templates:
   - kind: ethereum/contract
