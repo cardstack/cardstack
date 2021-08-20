@@ -12,6 +12,7 @@ import {
   MerchantRevenue,
   PrepaidCard,
   PrepaidCardPayment,
+  RevenueEarningsByDay,
   Token,
   Safe,
   Account,
@@ -20,6 +21,7 @@ import {
 import { GnosisSafe } from '../generated/Gnosis/GnosisSafe';
 import { StaticToken } from './static-tokens';
 import { addresses } from './generated/addresses';
+import { dayMonthYearFromEventTimestamp } from './dates';
 
 export let protocolVersions = new Map<string, i32>();
 
@@ -132,6 +134,27 @@ export function makePrepaidCardPayment(
   paymentEntity.historicPrepaidCardIssuingTokenBalance = prepaidCardEntity.issuingTokenBalance;
   paymentEntity.historicPrepaidCardFaceValue = faceValue;
   paymentEntity.save();
+
+  if (merchantSafe != null) {
+    let revenueEntity = makeMerchantRevenue(merchantSafe, issuingToken);
+
+    let date = dayMonthYearFromEventTimestamp(event);
+    let dateStr = date.year.toString() + '-' + date.month.toString() + '-' + date.day.toString();
+    let earningsByDayId = merchantSafe + issuingToken + dateStr;
+    let earningsByDayEntity = RevenueEarningsByDay.load(earningsByDayId);
+    if (earningsByDayEntity == null) {
+      earningsByDayEntity = new RevenueEarningsByDay(earningsByDayId);
+      earningsByDayEntity.date = dateStr;
+      earningsByDayEntity.merchantRevenue = revenueEntity.id;
+      earningsByDayEntity.spendAccumulation = new BigInt(0);
+      earningsByDayEntity.issuingTokenAccumulation = new BigInt(0);
+    }
+    // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
+    earningsByDayEntity.spendAccumulation = earningsByDayEntity.spendAccumulation + (spendAmount as BigInt);
+    // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
+    earningsByDayEntity.issuingTokenAccumulation = earningsByDayEntity.issuingTokenAccumulation + issuingTokenAmount;
+    earningsByDayEntity.save();
+  }
 }
 
 export function getPrepaidCardFaceValue(prepaidCard: string): BigInt {
