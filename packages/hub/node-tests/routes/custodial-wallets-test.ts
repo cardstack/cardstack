@@ -26,10 +26,10 @@ class StubAuthenticationUtils {
 }
 
 class StubWyreService {
-  createCustodialWallet(address: string) {
+  createWallet(address: string) {
     return Promise.resolve(handleCreateWyreWallet(address));
   }
-  getCustodialWalletByUserAddress(userAddress: string) {
+  getWalletByUserAddress(userAddress: string) {
     return Promise.resolve(handleGetWyreWalletByName(userAddress));
   }
 }
@@ -57,21 +57,12 @@ function handleCreateWyreWallet(address: string) {
   wyreCreateCallCount++;
   expect(address).to.equal(stubUserAddress1);
   return {
-    status: null,
     callbackUrl: null,
-    srn: `wallet:${stubWyreWalletId1}`,
-    pusherChannel: 'blah',
-    notes: null,
-    balances: {},
     depositAddresses: {
       ETH: stubDepositAddress1, // eslint-disable-line @typescript-eslint/naming-convention
     },
-    totalBalances: {},
-    availableBalances: {},
-    savingsReferralSRN: null,
     name: address.toLowerCase(),
     id: stubWyreWalletId1,
-    type: 'DEFAULT',
   };
 }
 
@@ -131,6 +122,7 @@ describe('GET /api/custodial-wallet', function () {
           id: stubUserAddress1,
           attributes: {
             'wyre-wallet-id': stubWyreWalletId1,
+            'user-address': stubUserAddress1,
             'deposit-address': toChecksumAddress(stubDepositAddress1),
           },
         },
@@ -153,6 +145,7 @@ describe('GET /api/custodial-wallet', function () {
           id: stubUserAddress2,
           attributes: {
             'wyre-wallet-id': stubWyreWalletId2,
+            'user-address': stubUserAddress2,
             'deposit-address': toChecksumAddress(stubDepositAddress2),
           },
         },
