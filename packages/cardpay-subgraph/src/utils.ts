@@ -1,4 +1,4 @@
-import { crypto, Address, ByteArray, ethereum, BigInt } from '@graphprotocol/graph-ts';
+import { crypto, Address, ByteArray, ethereum, BigInt, BigDecimal } from '@graphprotocol/graph-ts';
 import { log } from '@graphprotocol/graph-ts';
 import { ERC20 } from './erc-20/ERC20';
 import { ERC20SymbolBytes } from './erc-20/ERC20SymbolBytes';
@@ -130,6 +130,7 @@ export function makePrepaidCardPayment(
   }
   paymentEntity.issuingToken = issuingToken;
   paymentEntity.issuingTokenAmount = issuingTokenAmount;
+  paymentEntity.issuingTokenUSDPrice = usdExchangeRate(Address.fromString(issuingToken));
   paymentEntity.spendAmount = spendAmount as BigInt;
   paymentEntity.historicPrepaidCardIssuingTokenBalance = prepaidCardEntity.issuingTokenBalance;
   paymentEntity.historicPrepaidCardFaceValue = faceValue;
@@ -190,11 +191,23 @@ export function toHex(bytes: string): string {
   return '0x' + bytes;
 }
 
+function usdExchangeRate(issuingToken: Address): BigDecimal {
+  let exchange = getExchange();
+  let exchangeInfo = exchange.exchangeRateOf(issuingToken);
+  let rawRate = BigDecimal.fromString(exchangeInfo.value0.toString());
+  // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
+  return rawRate / BigDecimal.fromString('100000000');
+}
+
 function convertToSpend(issuingToken: Address, issuingTokenAmount: BigInt): BigInt {
+  let exchange = getExchange();
+  return exchange.convertToSpend(issuingToken, issuingTokenAmount);
+}
+
+function getExchange(): Exchange {
   let prepaidCardMgr = PrepaidCardManager.bind(Address.fromString(addresses.get('prepaidCardManager') as string));
   let exchangeAddress = prepaidCardMgr.exchangeAddress();
-  let exchange = Exchange.bind(exchangeAddress);
-  return exchange.convertToSpend(issuingToken, issuingTokenAmount);
+  return Exchange.bind(exchangeAddress);
 }
 
 function toUpper(str: string): string {

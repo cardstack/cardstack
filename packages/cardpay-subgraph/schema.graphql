@@ -93,6 +93,7 @@ type PrepaidCardPayment @entity {
   issuingToken: Token!
   issuingTokenAmount: BigInt!
   spendAmount: BigInt!
+  issuingTokenUSDPrice: BigDecimal!
   historicPrepaidCardFaceValue: BigInt!
   historicPrepaidCardIssuingTokenBalance: BigInt!
   merchantRegistrationPayments: [MerchantRegistrationPayment]! @derivedFrom(field: "prepaidCardPayment")
