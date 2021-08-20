@@ -167,6 +167,8 @@ dataSources:
           file: ./abis/generated/PayMerchantHandler.json
         - name: PrepaidCardManager
           file: ./abis/generated/PrepaidCardManager.json
+        - name: RevenuePool
+          file: ./abis/generated/RevenuePool.json
         - name: Exchange
           file: ./abis/generated/Exchange.json
         - name: ERC20

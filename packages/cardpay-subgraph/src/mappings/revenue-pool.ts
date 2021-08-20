@@ -1,4 +1,4 @@
-import { MerchantClaim as MerchantClaimEvent } from '../../generated/RevenuePool/RevenuePool';
+import { MerchantClaim as MerchantClaimEvent, RevenuePool } from '../../generated/RevenuePool/RevenuePool';
 import { MerchantClaim, MerchantRevenueEvent, MerchantSafe } from '../../generated/schema';
 import { makeMerchantRevenue, makeToken, makeEOATransaction, toChecksumAddress } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
@@ -19,8 +19,8 @@ export function handleMerchantClaim(event: MerchantClaimEvent): void {
 
   let token = makeToken(event.params.payableToken);
   let revenueEntity = makeMerchantRevenue(merchantSafe, token);
-  // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
-  revenueEntity.unclaimedBalance = revenueEntity.unclaimedBalance - event.params.amount;
+  let revenuePool = RevenuePool.bind(event.address);
+  revenueEntity.unclaimedBalance = revenuePool.revenueBalance(event.params.merchantSafe, event.params.payableToken);
   revenueEntity.save();
 
   let claimEntity = new MerchantClaim(txnHash);
