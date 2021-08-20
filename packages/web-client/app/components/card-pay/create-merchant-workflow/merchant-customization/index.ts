@@ -72,7 +72,7 @@ export default class CardPayDepositWorkflowTransactionAmountComponent extends Co
 
   @action saveDetails() {
     this.args.workflowSession.updateMany({
-      merchantName: this.merchantName,
+      merchantName: this.merchantName.trim(),
       merchantId: this.merchantId,
       merchantBgColor: this.merchantBgColor,
       merchantTextColor: this.merchantTextColor,
@@ -81,13 +81,9 @@ export default class CardPayDepositWorkflowTransactionAmountComponent extends Co
   }
 
   @action validateMerchantName() {
-    if (this.merchantName) {
-      this.merchantNameValidationMessage = this.merchantName.trim()
-        ? ''
-        : 'Merchant name cannot contain only spaces';
-    } else {
-      this.merchantNameValidationMessage = 'This field is required';
-    }
+    this.merchantNameValidationMessage = this.merchantName.trim()
+      ? ''
+      : 'This field is required';
   }
 
   @action async validateMerchantId() {

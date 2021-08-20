@@ -24,8 +24,8 @@ const MERCHANT_NAME_INVALID_INPUTS = [
     errorMessage: 'This field is required',
   },
   {
-    value: ' ',
-    errorMessage: 'Merchant name cannot contain only spaces',
+    value: '   ',
+    errorMessage: 'This field is required',
   },
 ];
 const MERCHANT_ID_INVALID_INPUTS = [

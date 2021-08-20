@@ -9,14 +9,16 @@
       @label={{if @isComplete "Merchant Name" "Preview"}}
       data-test-merchant-customization-merchant-preview
     >
-      <CardPay::Merchant
-        class={{unless this.merchantName "merchant-customization__enter-name"}}
-        @name={{or this.merchantName "Enter merchant name"}}
-        @logoBackground={{this.merchantBgColor}}
-        @logoTextColor={{this.merchantTextColor}}
-        @size="large"
-        @vertical={{true}}
-      />
+      {{#let (trim this.merchantName) as |trimmedName|}}
+        <CardPay::Merchant
+          class={{unless trimmedName "merchant-customization__enter-name"}}
+          @name={{or trimmedName "Enter merchant name"}}
+          @logoBackground={{this.merchantBgColor}}
+          @logoTextColor={{this.merchantTextColor}}
+          @size="large"
+          @vertical={{true}}
+        />
+      {{/let}}
     </CardPay::LabeledValue>
     {{#if @isComplete}}
       <CardPay::LabeledValue @label="Merchant ID" data-test-merchant-customization-merchant-id-field>
