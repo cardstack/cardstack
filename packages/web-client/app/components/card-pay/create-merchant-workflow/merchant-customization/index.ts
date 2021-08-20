@@ -6,10 +6,11 @@ import { inject as service } from '@ember/service';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 import { didCancel, restartableTask, timeout } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
+import { mostReadable, random as randomColor } from '@ctrl/tinycolor';
 
 export default class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
-  @tracked merchantBgColor: string = '#ff0000'; // TODO: replace with random color
+  @tracked merchantBgColor: string = randomColor().toHexString();
   @tracked merchantName: string = '';
   @tracked merchantId: string = '';
   @tracked lastCheckedMerchantId = '';
@@ -46,6 +47,13 @@ export default class CardPayDepositWorkflowTransactionAmountComponent extends Co
     }
   }
 
+  get merchantTextColor() {
+    return mostReadable(this.merchantBgColor, [
+      '#ffffff',
+      '#000000',
+    ])!.toHexString();
+  }
+
   @action onMerchantNameInput(value: string) {
     this.merchantName = value;
     this.validateMerchantName();
@@ -66,6 +74,7 @@ export default class CardPayDepositWorkflowTransactionAmountComponent extends Co
       merchantName: this.merchantName,
       merchantId: this.merchantId,
       merchantBgColor: this.merchantBgColor,
+      merchantTextColor: this.merchantTextColor,
     });
     this.args.onComplete?.();
   }

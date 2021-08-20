@@ -13,7 +13,7 @@
         class={{unless this.merchantName "merchant-customization__enter-name"}}
         @name={{or this.merchantName "Enter merchant name"}}
         @logoBackground={{this.merchantBgColor}}
-        @logoTextColor={{@logoTextColor}}
+        @logoTextColor={{this.merchantTextColor}}
         @size="large"
         @vertical={{true}}
       />

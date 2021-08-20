@@ -212,6 +212,7 @@ module(
       assert.notOk(workflowSession.state.merchantName);
       assert.notOk(workflowSession.state.merchantId);
       assert.notOk(workflowSession.state.merchantBgColor);
+      assert.notOk(workflowSession.state.merchantTextColor);
 
       let merchantNameInput = `${MERCHANT_NAME_FIELD} input`;
       await fillIn(merchantNameInput, 'HELLO!');
@@ -230,6 +231,7 @@ module(
       assert.equal(workflowSession.state.merchantName, 'HELLO!');
       assert.equal(workflowSession.state.merchantId, 'a-valid-id');
       assert.ok(workflowSession.state.merchantBgColor);
+      assert.ok(workflowSession.state.merchantTextColor);
     });
 
     test('It displays the memorialized state correctly', async function (assert) {
@@ -248,6 +250,7 @@ module(
       await click(SAVE_DETAILS_BUTTON);
 
       let bgColor = workflowSession.state.merchantBgColor;
+      let textColor = workflowSession.state.merchantTextColor;
 
       assert.dom(COMPLETED_SELECTOR).exists();
       assert.dom(EDIT_BUTTON).exists();
@@ -257,8 +260,10 @@ module(
         .hasAttribute('data-test-merchant-logo-background', bgColor);
       assert
         .dom(`${PREVIEW} ${MERCHANT}`)
+        .hasAttribute('data-test-merchant-logo-text-color', textColor);
+      assert
+        .dom(`${PREVIEW} ${MERCHANT}`)
         .hasAttribute('data-test-merchant', 'HELLO!');
-      // assert has right text color
       assert.dom(MERCHANT_NAME_FIELD).doesNotExist();
       assert.dom(MERCHANT_ID_FIELD).containsText('a-valid-id');
       assert.dom(COLOR_FIELD).containsText(bgColor);
