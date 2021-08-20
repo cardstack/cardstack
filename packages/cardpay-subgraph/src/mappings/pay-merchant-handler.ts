@@ -1,7 +1,9 @@
 import {
   CustomerPayment as MerchantPaymentEvent,
   MerchantFeeCollected as MerchantFeeEvent,
+  PayMerchantHandler,
 } from '../../generated/Payments/PayMerchantHandler';
+import { RevenuePool } from '../../generated/Payments/RevenuePool';
 import { MerchantFeePayment, MerchantRevenueEvent } from '../../generated/schema';
 import { makeMerchantRevenue, makeTransaction, makePrepaidCardPayment, toChecksumAddress, makeToken } from '../utils';
 
@@ -22,11 +24,13 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
     event.params.spendAmount
   );
 
+  let payMerchantHandler = PayMerchantHandler.bind(event.address);
+  let revenuePool = RevenuePool.bind(payMerchantHandler.revenuePoolAddress());
+
   let revenueEntity = makeMerchantRevenue(merchantSafe, issuingToken);
   // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
   revenueEntity.lifetimeAccumulation = revenueEntity.lifetimeAccumulation + event.params.issuingTokenAmount;
-  // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
-  revenueEntity.unclaimedBalance = revenueEntity.unclaimedBalance + event.params.issuingTokenAmount;
+  revenueEntity.unclaimedBalance = revenuePool.revenueBalance(event.params.merchantSafe, event.params.issuingToken);
   revenueEntity.save();
 
   let revenueEventEntity = new MerchantRevenueEvent(txnHash);
