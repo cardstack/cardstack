@@ -125,6 +125,15 @@ type MerchantRevenue @entity {
   lifetimeAccumulation: BigInt!
   unclaimedBalance: BigInt!
   revenueEvents: [MerchantRevenueEvent]! @derivedFrom(field: "merchantRevenue")
+  earningsByDay: [RevenueEarningsByDay]! @derivedFrom(field: "merchantRevenue")
+}
+
+type RevenueEarningsByDay @entity {
+  id: ID!
+  date: String!
+  merchantRevenue: MerchantRevenue!
+  spendAccumulation: BigInt!
+  issuingTokenAccumulation: BigInt!
 }
 
 type MerchantClaim @entity {

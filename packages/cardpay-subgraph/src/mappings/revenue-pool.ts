@@ -34,7 +34,7 @@ export function handleMerchantClaim(event: MerchantClaimEvent): void {
   let revenueEventEntity = new MerchantRevenueEvent(txnHash);
   revenueEventEntity.transaction = txnHash;
   revenueEventEntity.timestamp = event.block.timestamp;
-  revenueEventEntity.merchantRevenue = merchantSafe + '-' + token;
+  revenueEventEntity.merchantRevenue = revenueEntity.id;
   revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
   revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;
   revenueEventEntity.merchantClaim = txnHash;

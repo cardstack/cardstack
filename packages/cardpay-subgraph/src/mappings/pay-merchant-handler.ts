@@ -36,7 +36,7 @@ export function handleMerchantPayment(event: MerchantPaymentEvent): void {
   let revenueEventEntity = new MerchantRevenueEvent(txnHash);
   revenueEventEntity.transaction = txnHash;
   revenueEventEntity.timestamp = event.block.timestamp;
-  revenueEventEntity.merchantRevenue = merchantSafe + '-' + issuingToken;
+  revenueEventEntity.merchantRevenue = revenueEntity.id;
   revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
   revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;
   revenueEventEntity.prepaidCardPayment = txnHash;
