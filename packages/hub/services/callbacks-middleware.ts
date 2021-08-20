@@ -13,7 +13,7 @@ import WyreCallbackRoute from '../routes/wyre-callback';
 const ROUTE_PREFIX = '/callbacks';
 const routePrefixPattern = new RegExp(`^${ROUTE_PREFIX}/(.*)`);
 
-export default class JSONMiddleware {
+export default class CallbacksMiddleWare {
   wyreCallbackRoute: WyreCallbackRoute = inject('wyre-callback-route', { as: 'wyreCallbackRoute' });
   middleware() {
     return (ctxt: Koa.ParameterizedContext<SessionContext, Record<string, unknown>>, next: Koa.Next) => {
@@ -68,6 +68,6 @@ function notFound(ctx: Koa.Context) {
 }
 declare module '@cardstack/hub/di/dependency-injection' {
   interface KnownServices {
-    'json-middleware': JSONMiddleware;
+    'callbacks-middleware': CallbacksMiddleWare;
   }
 }

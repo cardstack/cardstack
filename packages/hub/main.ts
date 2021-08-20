@@ -30,7 +30,7 @@ import WyreCallbackRoute from './routes/wyre-callback';
 import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './services/jsonapi-middleware';
-import JsonMiddleware from './services/json-middleware';
+import CallbacksMiddleware from './services/callbacks-middleware';
 import NonceTracker from './services/nonce-tracker';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
@@ -49,7 +49,7 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('development-config', DevelopmentConfig);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
   registry.register('jsonapi-middleware', JsonapiMiddleware);
-  registry.register('json-middleware', JsonMiddleware);
+  registry.register('callbacks-middleware', CallbacksMiddleware);
   registry.register('nonce-tracker', NonceTracker);
   registry.register('boom-route', BoomRoute);
   registry.register('session-route', SessionRoute);
@@ -88,7 +88,7 @@ export async function makeServer(registryCallback?: RegistryCallback, containerC
   app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
   app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
   app.use(((await container.lookup('jsonapi-middleware')) as JsonapiMiddleware).middleware());
-  app.use(((await container.lookup('json-middleware')) as JsonMiddleware).middleware());
+  app.use(((await container.lookup('callbacks-middleware')) as CallbacksMiddleware).middleware());
 
   app.use(async (ctx: Koa.Context, _next: Koa.Next) => {
     ctx.body = 'Hello World ' + ctx.environment + '... ' + ctx.host.split(':')[0];
