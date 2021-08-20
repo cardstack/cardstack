@@ -129,7 +129,7 @@ describe('POST /api/merchant-infos', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it('returns 409 if slug is not unique', async function () {
+  it('returns 422 if slug is not unique', async function () {
     const payload = {
       data: {
         type: 'merchant-infos',
@@ -170,11 +170,11 @@ describe('POST /api/merchant-infos', function () {
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(409)
+      .expect(422)
       .expect({
         errors: [
           {
-            status: '409',
+            status: '422',
             title: 'Merchant slug already exists',
           },
         ],

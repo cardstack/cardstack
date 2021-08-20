@@ -83,7 +83,7 @@ export default class JSONAPIMiddleware {
       route.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get),
       route.post('/prepaid-card-customizations', prepaidCardCustomizationsRoute.post),
       route.post('/merchant-infos', merchantInfosRoute.post),
-      route.get('/merchant-infos', merchantInfosRoute.get),
+      route.get('/merchant-infos/validate', merchantInfosRoute.getValidation),
       route.get('/custodial-wallet', custodialWalletRoute.get),
       route.all('/(.*)', notFound),
     ]);

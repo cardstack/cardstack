@@ -9,7 +9,7 @@ import { ensureLoggedIn } from './utils/auth';
 import WorkerClient from '../services/worker-client';
 import MerchantInfoQueries from '../services/queries/merchant-info';
 import Logger from '@cardstack/logger';
-let log = Logger('route:merchant-infos');
+let logger = Logger('route:merchant-infos');
 
 export interface MerchantInfo {
   id: string;
@@ -36,28 +36,45 @@ export default class MerchantInfosRoute {
     autoBind(this);
   }
 
-  async get(ctx: Koa.Context) {
+  async getValidation(ctx: Koa.Context) {
+    const charLimit = 50;
     let db = await this.databaseManager.getClient();
     let { slug } = ctx.query;
 
+    if (!slug) {
+      logger.error('Merchant slug cannot be undefined');
+      return;
+    }
+
+    if (typeof slug === 'object') {
+      logger.error('Merchant slug cannot be an array');
+      return;
+    }
+
+    let sanitizedSlug = slug
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^[^a-z0-9]+|[^a-z0-9]+$|/g, '');
+
+    if (!sanitizedSlug) {
+      logger.error('Merchant slug must include alphanumeric characters');
+      return;
+    }
+
+    if (sanitizedSlug.length > charLimit) {
+      logger.log(`Merchant slug will be cropped at ${charLimit} characters`);
+      sanitizedSlug = sanitizedSlug.slice(0, charLimit).replace(/^[^a-z0-9]+|[^a-z0-9]+$|/g, '');
+    }
+
     try {
-      let result = await db.query('SELECT slug FROM merchant_infos WHERE slug = $1', [slug]);
-      let data = result.rows.map((row) => {
-        return {
-          id: row.id,
-          type: 'merchant-infos',
-          attributes: {
-            slug: row.slug,
-          },
-        };
-      });
+      let result = await db.query('SELECT slug FROM merchant_infos WHERE slug = $1', [sanitizedSlug]);
+      let data =
+        result.rowCount === 0 ? { sanitizedSlug, slugAvailable: true } : { sanitizedSlug, slugAvailable: false };
       ctx.status = 200;
-      ctx.body = {
-        data,
-      };
+      ctx.body = { data };
       ctx.type = 'application/vnd.api+json';
     } catch (e) {
-      log.error('Failed to retrieve merchant_infos', e);
+      logger.error('Failed to retrieve merchant_infos', e);
     }
   }
 
@@ -77,12 +94,12 @@ export default class MerchantInfosRoute {
       ctx.body = {
         errors: [
           {
-            status: '409',
+            status: '422',
             title: 'Merchant slug already exists',
           },
         ],
       };
-      ctx.status = 409;
+      ctx.status = 422;
       ctx.type = 'application/vnd.api+json';
       return;
     }
