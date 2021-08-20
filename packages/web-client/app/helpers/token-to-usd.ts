@@ -22,7 +22,7 @@ class TokenToUsdHelper extends Helper {
   symbol: UsdConvertibleSymbol | undefined;
   amount: BN | undefined;
 
-  compute([symbol, amount]: TokenToUsdHelperParams) {
+  compute([symbol, amount]: TokenToUsdHelperParams): number | undefined {
     switch (symbol) {
       case 'CARD':
         symbol = 'CARD.CPXD';
@@ -35,7 +35,7 @@ class TokenToUsdHelper extends Helper {
       throw new Error(`Invalid symbol ${symbol} passed to {{token-to-usd}}`);
     }
     if (amount === null || amount === undefined) {
-      return '';
+      return undefined;
     }
     this.symbol = symbol;
     this.amount = amount;
@@ -43,7 +43,7 @@ class TokenToUsdHelper extends Helper {
       this.tokenToUsdService.register(this);
       return this.tokenToUsdService.toUsdFrom(symbol, amount);
     } else {
-      return '0.00';
+      return 0;
     }
   }
 

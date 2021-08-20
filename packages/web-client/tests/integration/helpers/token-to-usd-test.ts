@@ -38,7 +38,7 @@ module('Integration | Helper | token-to-usd', function (hooks) {
     resetOnerror();
   });
 
-  test('it returns 0.00 without fetching converters if the amount requested is 0', async function (assert) {
+  test('it returns 0 without fetching converters if the amount requested is 0', async function (assert) {
     this.set('inputValue', new BN(0));
     await render(
       hbs`
@@ -49,11 +49,11 @@ module('Integration | Helper | token-to-usd', function (hooks) {
       <div class="eth">{{token-to-usd 'ETH' this.inputValue}}</div>
       `
     );
-    assert.dom('.dai-cpxd').containsText('0.00');
-    assert.dom('.card-cpxd').containsText('0.00');
-    assert.dom('.dai').containsText('0.00');
-    assert.dom('.card').containsText('0.00');
-    assert.dom('.eth').containsText('0.00');
+    assert.dom('.dai-cpxd').containsText('0');
+    assert.dom('.card-cpxd').containsText('0');
+    assert.dom('.dai').containsText('0');
+    assert.dom('.card').containsText('0');
+    assert.dom('.eth').containsText('0');
     assert.deepEqual(
       layer1Strategy.test__lastSymbolsToUpdate,
       [],
@@ -190,33 +190,33 @@ module('Integration | Helper | token-to-usd', function (hooks) {
     this.set('tokenSymbol', 'DAI.CPXD');
     this.set('inputValue', new BN('123000000000000000000'));
     await render(hbs`{{token-to-usd this.tokenSymbol this.inputValue}}`);
-    assert.dom(this.element).hasText('24.60');
+    assert.dom(this.element).hasText('24.6');
 
     this.set('inputValue', new BN('223000000000000000000'));
-    assert.dom(this.element).hasText('44.60');
+    assert.dom(this.element).hasText('44.6');
   });
 
   test('it updates conversion result when DAI exchange rate changes', async function (assert) {
     this.set('tokenSymbol', 'DAI.CPXD');
     this.set('inputValue', new BN('123000000000000000000'));
     await render(hbs`{{token-to-usd this.tokenSymbol this.inputValue}}`);
-    assert.dom(this.element).hasText('24.60'); // based on default exchange rate
+    assert.dom(this.element).hasText('24.6'); // based on default exchange rate
 
     layer2Strategy.test__simulatedExchangeRate = 0.3;
     // allow time for TokenToUsd service interval to expire
-    await waitUntil(() => this.element.textContent?.trim() !== '24.60');
-    assert.dom(this.element).hasText('36.90');
+    await waitUntil(() => this.element.textContent?.trim() !== '24.6');
+    assert.dom(this.element).hasText('36.9');
   });
 
   test('it updates conversion result when ETH exchange rate changes', async function (assert) {
     this.set('tokenSymbol', 'ETH');
     this.set('inputValue', new BN(toWei('2')));
     await render(hbs`{{token-to-usd this.tokenSymbol this.inputValue}}`);
-    assert.dom(this.element).hasText('6000.00'); // based on default exchange rate
+    assert.dom(this.element).hasText('6000'); // based on default exchange rate
 
     layer1Strategy.test__simulatedExchangeRate = 3052.22;
     // allow time for TokenToUsd service interval to expire
-    await waitUntil(() => this.element.textContent?.trim() !== '6000.00');
+    await waitUntil(() => this.element.textContent?.trim() !== '6000');
     assert.dom(this.element).hasText('6104.44');
   });
 
@@ -230,6 +230,6 @@ module('Integration | Helper | token-to-usd', function (hooks) {
 
     layer2Strategy.test__updateUsdConvertersDeferred.resolve();
     await settled();
-    assert.dom(this.element).hasText('24.60');
+    assert.dom(this.element).hasText('24.6');
   });
 });

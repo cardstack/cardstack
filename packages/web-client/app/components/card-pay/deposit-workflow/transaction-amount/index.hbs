@@ -32,7 +32,7 @@
             @icon={{this.currentTokenDetails.icon}}
             @balance={{format-token-amount this.amountAsBigNumber}}
             @symbol={{this.currentTokenSymbol}}
-            @text={{concat "$" (token-to-usd this.currentTokenSymbol this.amountAsBigNumber) " USD*"}}
+            @text={{concat (format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)) "*"}}
             data-test-deposit-amount-entered
           />
         {{else}}
@@ -48,7 +48,7 @@
       </CardPay::LabeledValue>
       {{#unless this.isUnlockingOrUnlocked}}
         <CardPay::LabeledValue @label="Approximate value*" class="transaction-amount__label">
-          ${{token-to-usd this.currentTokenSymbol this.amountAsBigNumber}} USD
+          {{format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)}}
         </CardPay::LabeledValue>
       {{/unless}}
     </div>

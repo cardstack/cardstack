@@ -1,6 +1,4 @@
 import Helper from '@ember/component/helper';
-import { inject as service } from '@ember/service';
-import TextFormattingService from '../services/text-formatting';
 import BN from 'bn.js';
 import { fromWei } from 'web3-utils';
 
@@ -45,7 +43,6 @@ export function formatTokenAmount(
 }
 
 class FormatTokenAmountHelper extends Helper {
-  @service declare textFormatting: TextFormattingService;
   compute(
     [
       amountInSmallestUnit,
