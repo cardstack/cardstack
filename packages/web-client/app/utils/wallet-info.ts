@@ -15,13 +15,12 @@ class WalletAccount {
 
 export default class WalletInfo {
   accounts: WalletAccount[];
-  chainId: number;
 
   get firstAddress(): string | undefined {
     return this.accounts.length ? this.accounts[0].address : undefined;
   }
 
-  constructor(rawAccounts: string[] | any[], chainId: number) {
+  constructor(rawAccounts: string[] | any[]) {
     if (rawAccounts.length > 0 && typeof rawAccounts[0] === 'string') {
       this.accounts = rawAccounts.map(
         (address: string) => new WalletAccount(address, address)
@@ -36,13 +35,9 @@ export default class WalletInfo {
           )
       );
     }
-
-    this.chainId = chainId;
   }
 
   isEqualTo(other: WalletInfo) {
-    return (
-      this.chainId === other.chainId && this.firstAddress === other.firstAddress
-    );
+    return this.firstAddress === other.firstAddress;
   }
 }

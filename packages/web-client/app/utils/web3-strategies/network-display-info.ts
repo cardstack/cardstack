@@ -10,11 +10,13 @@ type Layer1NetworkCopywriting = {
   fullName: string;
   shortName: string;
   conversationalName: string;
+  nativeTokenSymbol: string;
 };
 type Layer2NetworkCopywriting = {
   fullName: string;
   shortName: string;
   conversationalName: string;
+  nativeTokenSymbol: string;
 };
 
 export type NetworkCopywriting =
@@ -29,16 +31,19 @@ let layer1NetworkDisplayInfo: Record<
     fullName: 'Ethereum mainnet',
     shortName: 'Ethereum',
     conversationalName: 'mainnet',
+    nativeTokenSymbol: 'ETH',
   },
   kovan: {
     fullName: 'Kovan testnet',
     shortName: 'Kovan',
     conversationalName: 'Kovan',
+    nativeTokenSymbol: 'ETH',
   },
   'test-layer1': {
     fullName: 'L1 test chain',
     shortName: 'L1',
     conversationalName: 'L1 test chain',
+    nativeTokenSymbol: 'ETH',
   },
 };
 let layer2NetworkDisplayInfo: Record<
@@ -49,16 +54,19 @@ let layer2NetworkDisplayInfo: Record<
     fullName: 'xDai chain',
     shortName: 'xDai',
     conversationalName: 'xDai chain',
+    nativeTokenSymbol: 'DAI',
   },
   sokol: {
     fullName: 'Sokol testnet',
     shortName: 'Sokol',
     conversationalName: 'Sokol',
+    nativeTokenSymbol: 'SPOA',
   },
   'test-layer2': {
     fullName: 'L2 test chain',
     shortName: 'L2',
     conversationalName: 'L2 test chain',
+    nativeTokenSymbol: 'DAI',
   },
 };
 

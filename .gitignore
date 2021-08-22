@@ -94,3 +94,16 @@ packages/cli/node-tests/sample-cards/*/node_modules/**/*
 /packages/**/node_modules/@cardstack/**/*.js
 /packages/**/node_modules/@cardstack/**/*.js.map
 /packages/**/node_modules/@cardstack/**/*.d.ts
+
+# firebase functions 
+/packages/firebase-functions/**/node_modules
+/packages/firebase-functions/**/build
+/packages/firebase-functions/**/*.d.ts
+/packages/firebase-functions/**/*.js
+/packages/firebase-functions/**/*.js.map
+**/.firebase
+**/.firebaserc
+**/.runtimeconfig.json
+service-account.json
+**/ui-debug.log
+**/firebase-debug.log

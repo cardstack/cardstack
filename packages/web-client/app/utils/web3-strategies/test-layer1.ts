@@ -18,6 +18,9 @@ import {
   SimpleEmitter,
   UnbindEventListener,
 } from '@cardstack/web-client/utils/events';
+import { fromWei, toWei } from 'web3-utils';
+import { BridgeableSymbol, ConversionFunction } from '../token';
+import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 
 interface ClaimBridgedTokensRequest {
   deferred: RSVP.Deferred<TransactionReceipt>;
@@ -30,8 +33,9 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   @tracked isInitializing = false;
   @tracked currentProviderId: string | undefined;
   @tracked walletConnectUri: string | undefined;
-  @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
+  @tracked walletInfo: WalletInfo = new WalletInfo([]);
   simpleEmitter = new SimpleEmitter();
+  nativeTokenSymbol = 'ETH';
 
   // property to test whether the refreshBalances method is called
   // to test if balances are refreshed after relaying tokens
@@ -53,6 +57,9 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     ClaimBridgedTokensRequest
   > = new Map();
   blockConfirmationDeferred!: RSVP.Deferred<void>;
+  test__lastSymbolsToUpdate: UsdConvertibleSymbol[] = [];
+  test__simulatedExchangeRate: number = 3000.0;
+  test__updateUsdConvertersDeferred: RSVP.Deferred<void> | undefined;
 
   connect(_walletProvider: WalletProvider): Promise<void> {
     return this.waitForAccount;
@@ -106,13 +113,23 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   }
 
   test__simulateAccountsChanged(accounts: string[], walletProviderId?: string) {
+    let newWalletInfo = new WalletInfo(accounts);
+
+    if (
+      this.walletInfo.firstAddress &&
+      newWalletInfo.firstAddress &&
+      !this.walletInfo.isEqualTo(newWalletInfo)
+    ) {
+      this.simpleEmitter.emit('account-changed');
+    }
+
     if (accounts.length && walletProviderId) {
       this.currentProviderId = walletProviderId;
-      this.walletInfo = new WalletInfo(accounts, this.chainId);
+      this.walletInfo = newWalletInfo;
       this.waitForAccountDeferred.resolve();
     } else {
       this.currentProviderId = '';
-      this.walletInfo = new WalletInfo([], this.chainId);
+      this.walletInfo = new WalletInfo([]);
       this.waitForAccountDeferred.resolve();
     }
   }
@@ -200,7 +217,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   }
 
   getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
-    if (blockNumber > 1 && blockNumber < this.bridgeConfirmationBlockCount) {
+    if (blockNumber > 1 && blockNumber <= this.bridgeConfirmationBlockCount) {
       return Promise.resolve();
     } else {
       this.blockConfirmationDeferred = defer<void>();
@@ -210,5 +227,25 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
 
   test__simulateBlockConfirmation() {
     this.blockConfirmationDeferred.resolve();
+  }
+
+  async getEstimatedGasForWithdrawalClaim(
+    _symbol: BridgeableSymbol
+  ): Promise<BN> {
+    return Promise.resolve(new BN(290000).mul(new BN(toWei('48', 'gwei'))));
+  }
+
+  async updateUsdConverters(symbolsToUpdate: UsdConvertibleSymbol[]) {
+    this.test__lastSymbolsToUpdate = symbolsToUpdate;
+    let result = {} as Record<UsdConvertibleSymbol, ConversionFunction>;
+    for (let symbol of symbolsToUpdate) {
+      result[symbol] = (amountInWei: string) => {
+        return Number(fromWei(amountInWei)) * this.test__simulatedExchangeRate;
+      };
+    }
+    if (this.test__updateUsdConvertersDeferred) {
+      await this.test__updateUsdConvertersDeferred.promise;
+    }
+    return Promise.resolve(result);
   }
 }

@@ -61,8 +61,8 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     else return '';
   }
 
-  get ctaState(): string {
-    if (this.isConnected) {
+  get cardState(): string {
+    if (this.isConnected || this.args.isComplete) {
       return 'memorialized';
     } else if (this.isWaitingForConnection) {
       return 'in-progress';
@@ -70,8 +70,9 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
       return 'default';
     }
   }
-  get ctaDisabled() {
-    return !this.isConnected && !this.radioWalletProviderId;
+
+  get showActions(): boolean {
+    return !this.args.isComplete || this.isConnected;
   }
 
   get balancesToShow() {
@@ -117,11 +118,9 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
 
   @task *connectWalletTask() {
     this.isWaitingForConnection = true;
-    if (this.radioWalletProviderId) {
-      yield this.layer1Network.connect({
-        id: this.radioWalletProviderId,
-      } as WalletProvider);
-    }
+    yield this.layer1Network.connect({
+      id: this.radioWalletProviderId,
+    } as WalletProvider);
     this.isWaitingForConnection = false;
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
     if (this.isConnected) {

@@ -3,7 +3,7 @@ import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 
-const { toWei } = Web3.utils;
+const { toWei, fromWei } = Web3.utils;
 
 export async function viewSafe(network: string, address: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
@@ -94,6 +94,28 @@ export async function transferTokens(
     console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
   );
   console.log('done');
+}
+
+export async function transferTokensGasEstimate(
+  network: string,
+  safe: string,
+  token: string,
+  recipient: string,
+  amount: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let weiAmount = toWei(amount);
+
+  let safes = await getSDK('Safes', web3);
+  let assets = await getSDK('Assets', web3);
+  let { symbol } = await assets.getTokenInfo(token);
+  let estimate = await safes.sendTokensGasEstimate(safe, token, recipient, weiAmount);
+  console.log(
+    `The gas estimate for transferring ${amount} ${symbol} from safe ${safe}  to ${recipient} is ${fromWei(
+      estimate
+    )} ${symbol}`
+  );
 }
 
 export async function setSupplierInfoDID(

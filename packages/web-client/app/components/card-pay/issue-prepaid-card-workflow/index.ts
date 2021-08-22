@@ -18,6 +18,7 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   INSUFFICIENT_FUNDS: 'INSUFFICIENT_FUNDS',
+  ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
 } as const;
 
 class IssuePrepaidCardWorkflow extends Workflow {
@@ -189,7 +190,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
     // if we disconnect from layer 2
     new WorkflowMessage({
       author: cardbot,
-      message: `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to deposit funds, please start again by connecting your wallet.`,
+      message: `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a prepaid card, please start again by connecting your wallet.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
@@ -198,7 +199,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
     }),
     new WorkflowCard({
       author: cardbot,
-      componentName: 'card-pay/issue-prepaid-card-workflow/disconnection-cta',
+      componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
@@ -227,6 +228,26 @@ class IssuePrepaidCardWorkflow extends Workflow {
         );
       },
     }),
+    // cancelation for changing accounts
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'It looks like you changed accounts in the middle of this workflow. If you still want to create a prepaid card, please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
+        );
+      },
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'workflow-thread/default-cancelation-cta',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
+        );
+      },
+    }),
   ]);
 
   constructor(owner: unknown) {
@@ -246,6 +267,10 @@ class IssuePrepaidCardWorkflowComponent extends Component {
 
   @action onDisconnect() {
     this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
+  }
+
+  @action onAccountChanged() {
+    this.workflow.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
   }
 }
 

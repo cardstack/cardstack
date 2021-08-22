@@ -1,7 +1,7 @@
 <WorkflowThread class="issue-prepaid-card-workflow" @workflow={{this.workflow}}>
   <:before-content>
     <Boxel::ExpandableBanner
-      @icon="deposit"
+      @icon="info"
       @summary="Issue a prepaid card"
       open
     >
@@ -29,4 +29,9 @@
   @emitter={{this.layer2Network}}
   @event="disconnect"
   @action={{this.onDisconnect}}
+/>
+<Listener
+  @emitter={{this.layer2Network}}
+  @event="account-changed"
+  @action={{this.onAccountChanged}}
 />

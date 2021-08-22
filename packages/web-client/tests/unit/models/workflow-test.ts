@@ -245,4 +245,49 @@ module('Unit | Workflow model', function (hooks) {
     assert.equal(indicesArray.length, 1);
     assert.ok(indicesArray.includes('epilogue-1'));
   });
+
+  module('with includeIf', async function (hooks) {
+    let workflow: Workflow;
+    let calledIncludeIf: boolean;
+
+    hooks.beforeEach(function () {
+      workflow = new ConcreteWorkflow({});
+      calledIncludeIf = false;
+      let secondMilestone = new Milestone({
+        title: 'Milestone 2',
+        postables: [
+          new WorkflowPostable(
+            {
+              name: 'cardbot',
+            },
+            () => {
+              calledIncludeIf = true;
+              return false;
+            }
+          ),
+        ],
+        completedDetail: 'Second mile-stoned',
+      });
+      workflow.milestones = [exampleMilestone, secondMilestone];
+    });
+
+    test('includeIf called only once a postable is a candidate for display', async function (assert) {
+      // simulate calls made while rendering a workflow
+      workflow.visibleMilestones.map((milestone) => milestone.visiblePostables);
+      workflow.isComplete;
+      workflow.progressStatus;
+      assert.equal(
+        calledIncludeIf,
+        false,
+        'includeIf for the second milestone’s postables was NOT called'
+      );
+      examplePostable.isComplete = true;
+      workflow.visibleMilestones.map((milestone) => milestone.visiblePostables);
+      assert.equal(
+        calledIncludeIf,
+        true,
+        'includeIf for the second milestone’s postables was called'
+      );
+    });
+  });
 });

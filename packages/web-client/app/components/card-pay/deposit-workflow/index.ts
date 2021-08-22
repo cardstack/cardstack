@@ -15,6 +15,7 @@ import { capitalize } from '@ember/string';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
+  ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
 } as const;
 
 class DepositWorkflow extends Workflow {
@@ -158,7 +159,7 @@ class DepositWorkflow extends Workflow {
     }),
   ]);
   cancelationMessages = new PostableCollection([
-    // currently we only cancel because of disconnections from either wallet
+    // cancelation for disconnection
     new WorkflowMessage({
       author: cardbot,
       message:
@@ -171,10 +172,30 @@ class DepositWorkflow extends Workflow {
     }),
     new WorkflowCard({
       author: cardbot,
-      componentName: 'card-pay/deposit-workflow/disconnection-cta',
+      componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
+        );
+      },
+    }),
+    // cancelation for changing accounts
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'It looks like you changed accounts in the middle of this workflow. If you still want to deposit funds, please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
+        );
+      },
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'workflow-thread/default-cancelation-cta',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
         );
       },
     }),
@@ -198,6 +219,10 @@ class DepositWorkflowComponent extends Component {
 
   @action onDisconnect() {
     this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
+  }
+
+  @action onAccountChanged() {
+    this.workflow.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
   }
 }
 

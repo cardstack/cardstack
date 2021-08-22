@@ -73,7 +73,7 @@ app "hub-worker" {
         }
 
         hook {
-            when    = "after"
+            when    = "before"
             command = ["./scripts/purge-services.sh", "hub-worker-prod", "waypoint-hub-worker", "1"] # need this to purge old ecs services
         }
     }

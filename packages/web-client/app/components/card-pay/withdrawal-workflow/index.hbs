@@ -1,7 +1,7 @@
 <WorkflowThread class="withdrawal-workflow" @workflow={{this.workflow}}>
   <:before-content>
     <Boxel::ExpandableBanner
-      @icon="withdrawal"
+      @icon="info"
       @summary="Make a withdrawal"
       open
     >
@@ -23,4 +23,14 @@
   @emitter={{this.layer2Network}}
   @event="disconnect"
   @action={{this.onDisconnect}}
+/>
+<Listener
+  @emitter={{this.layer1Network}}
+  @event="account-changed"
+  @action={{this.onAccountChanged}}
+/>
+<Listener
+  @emitter={{this.layer2Network}}
+  @event="account-changed"
+  @action={{this.onAccountChanged}}
 />

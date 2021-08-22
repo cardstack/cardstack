@@ -3,6 +3,7 @@ import WalletInfo from '../wallet-info';
 import {
   IssuePrepaidCardOptions,
   Layer2Web3Strategy,
+  RegisterMerchantOptions,
   TransactionHash,
 } from './types';
 import {
@@ -17,6 +18,7 @@ import { TransactionReceipt } from 'web3-core';
 import {
   BridgeValidationResult,
   DepotSafe,
+  MerchantSafe,
   PrepaidCardSafe,
   Safe,
 } from '@cardstack/cardpay-sdk';
@@ -25,11 +27,20 @@ import {
   SimpleEmitter,
 } from '@cardstack/web-client/utils/events';
 import { task, TaskGenerator } from 'ember-concurrency';
+import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 
 interface IssuePrepaidCardRequest {
   deferred: RSVP.Deferred<PrepaidCardSafe>;
   onTxHash?: (txHash: TransactionHash) => void;
+  onNonce?: (nonce: string) => void;
+  nonce?: string;
   customizationDID: string;
+}
+
+interface RegisterMerchantRequest {
+  deferred: RSVP.Deferred<MerchantSafe>;
+  onTxHash?: (txHash: TransactionHash) => void;
+  infoDID: string;
 }
 
 interface SimulateBalancesParams {
@@ -41,7 +52,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainId = '-1';
   simpleEmitter = new SimpleEmitter();
   @tracked walletConnectUri: string | undefined;
-  @tracked walletInfo: WalletInfo = new WalletInfo([], -1);
+  @tracked walletInfo: WalletInfo = new WalletInfo([]);
   waitForAccountDeferred = defer();
   bridgingToLayer2Deferred!: RSVP.Deferred<TransactionReceipt>;
   bridgingToLayer1HashDeferred!: RSVP.Deferred<TransactionHash>;
@@ -52,7 +63,9 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked cardBalance: BN | undefined;
   @tracked depotSafe: DepotSafe | null = null;
   @tracked isInitializing = false;
+
   issuePrepaidCardRequests: Map<number, IssuePrepaidCardRequest> = new Map();
+  registerMerchantRequests: Map<string, RegisterMerchantRequest> = new Map();
   accountSafes: Map<string, Safe[]> = new Map();
 
   // property to test whether the refreshBalances method is called
@@ -117,9 +130,9 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       .promise as Promise<BridgeValidationResult>;
   }
 
-  async updateUsdConverters(symbolsToUpdate: ConvertibleSymbol[]) {
+  async updateUsdConverters(symbolsToUpdate: UsdConvertibleSymbol[]) {
     this.test__lastSymbolsToUpdate = symbolsToUpdate;
-    let result = {} as Record<ConvertibleSymbol, ConversionFunction>;
+    let result = {} as Record<UsdConvertibleSymbol, ConversionFunction>;
     for (let symbol of symbolsToUpdate) {
       result[symbol] = (amountInWei: string) => {
         return Number(fromWei(amountInWei)) * this.test__simulatedExchangeRate;
@@ -181,7 +194,27 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.issuePrepaidCardRequests.set(faceValue, {
       deferred,
       onTxHash: options.onTxHash,
+      onNonce: options.onNonce,
+      nonce: options.nonce,
       customizationDID,
+    });
+    return deferred.promise;
+  }
+
+  merchantRegistrationFee() {
+    return Promise.resolve(100);
+  }
+
+  async registerMerchant(
+    prepaidCardAddress: string,
+    infoDID: string,
+    options: RegisterMerchantOptions
+  ): Promise<MerchantSafe> {
+    let deferred: RSVP.Deferred<MerchantSafe> = defer();
+    this.registerMerchantRequests.set(prepaidCardAddress, {
+      deferred,
+      onTxHash: options.onTxHash,
+      infoDID,
     });
     return deferred.promise;
   }
@@ -195,7 +228,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(true);
   }
 
-  test__lastSymbolsToUpdate: ConvertibleSymbol[] = [];
+  test__lastSymbolsToUpdate: UsdConvertibleSymbol[] = [];
   test__simulatedExchangeRate: number = 0.2;
   test__updateUsdConvertersDeferred: RSVP.Deferred<void> | undefined;
   test__deferredHubAuthentication!: RSVP.Deferred<string>;
@@ -205,7 +238,17 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   test__simulateAccountsChanged(accounts: string[]) {
-    this.walletInfo = new WalletInfo(accounts, parseInt(this.chainId, 10));
+    let newWalletInfo = new WalletInfo(accounts);
+
+    if (
+      this.walletInfo.firstAddress &&
+      newWalletInfo.firstAddress &&
+      !this.walletInfo.isEqualTo(newWalletInfo)
+    ) {
+      this.simpleEmitter.emit('account-changed');
+    }
+
+    this.walletInfo = newWalletInfo;
     this.waitForAccountDeferred.resolve();
   }
 
@@ -246,6 +289,21 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     }
   }
 
+  test__getNonceForIssuePrepaidCardRequest(
+    faceValue: number
+  ): string | undefined {
+    let request = this.issuePrepaidCardRequests.get(faceValue);
+    return request?.nonce;
+  }
+
+  test__simulateOnNonceForIssuePrepaidCardRequest(
+    faceValue: number,
+    nonce: string
+  ): void {
+    let request = this.issuePrepaidCardRequests.get(faceValue);
+    request?.onNonce?.(nonce);
+  }
+
   test__simulateIssuePrepaidCardForAmount(
     faceValue: number,
     walletAddress: string,
@@ -275,6 +333,29 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.test__simulateAccountSafes(walletAddress, [prepaidCardSafe]);
 
     return request?.deferred.resolve(prepaidCardSafe);
+  }
+
+  test__simulateRegisterMerchantForAddress(
+    prepaidCardAddress: string,
+    merchantSafeAddress: string,
+    options: Object
+  ) {
+    let request = this.registerMerchantRequests.get(prepaidCardAddress);
+    let merchantSafe: MerchantSafe = {
+      type: 'merchant',
+      createdAt: Date.now() / 1000,
+      address: merchantSafeAddress,
+      merchant: prepaidCardAddress,
+      tokens: [],
+      owners: [],
+      accumulatedSpendValue: 100,
+      infoDID: request?.infoDID,
+
+      ...options,
+    };
+    request?.onTxHash?.('exampleTxHash');
+
+    return request?.deferred.resolve(merchantSafe);
   }
 
   test__simulateHubAuthentication(authToken: string) {

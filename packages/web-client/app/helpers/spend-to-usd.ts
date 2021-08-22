@@ -1,15 +1,6 @@
 import { helper } from '@ember/component/helper';
+import { spendToUsd } from '@cardstack/cardpay-sdk';
 
-const spendToUsdRate = 0.01;
-
-export function spendToUsd([amountInSpend]: [number]) {
-  if (!amountInSpend) {
-    return 0;
-  }
-  if (typeof amountInSpend !== 'number') {
-    return;
-  }
-  return amountInSpend * spendToUsdRate;
-}
-
-export default helper(spendToUsd);
+export default helper(([amountInSpend]: [number]) => {
+  return spendToUsd(amountInSpend);
+});

@@ -1,4 +1,3 @@
-import { A } from '@ember/array';
 import { Milestone } from './workflow/milestone';
 import PostableCollection from './workflow/postable-collection';
 import { WorkflowPostable } from './workflow/workflow-postable';
@@ -34,8 +33,21 @@ export abstract class Workflow {
     this.cancelationMessages.setWorkflow(this);
   }
 
+  get completedMilestones() {
+    let milestones = [];
+    for (let i = 0; i < this.milestones.length; i++) {
+      let milestone = this.milestones[i];
+      if (milestone.isComplete) {
+        milestones.push(milestone);
+      } else {
+        break;
+      }
+    }
+    return milestones;
+  }
+
   get completedMilestoneCount() {
-    return this.milestones.filterBy('isComplete').length;
+    return this.completedMilestones.length;
   }
 
   get visibleMilestones(): Milestone[] {
@@ -51,7 +63,7 @@ export abstract class Workflow {
   }
 
   get isComplete() {
-    return A(this.milestones).isEvery('isComplete');
+    return this.completedMilestoneCount === this.milestones.length;
   }
 
   cancel(reason?: string) {
@@ -64,7 +76,7 @@ export abstract class Workflow {
   }
 
   get progressStatus() {
-    let completedMilestones = this.milestones.filterBy('isComplete');
+    let { completedMilestones } = this;
     let lastMilestone = completedMilestones[completedMilestones.length - 1];
     if (this.isCanceled) return 'Workflow canceled';
     else return lastMilestone?.completedDetail ?? 'Workflow started';

@@ -7,6 +7,7 @@ import {
   IssuePrepaidCardOptions,
   Layer2ChainEvent,
   Layer2Web3Strategy,
+  RegisterMerchantOptions,
   TransactionHash,
 } from '../utils/web3-strategies/types';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
@@ -29,6 +30,7 @@ import {
 import { action } from '@ember/object';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { taskFor } from 'ember-concurrency-ts';
+import { UsdConvertibleSymbol } from './token-to-usd';
 export default class Layer2Network
   extends Service
   implements Emitter<Layer2ChainEvent> {
@@ -64,13 +66,17 @@ export default class Layer2Network
 
     this.strategy.on('disconnect', this.onDisconnect);
     this.strategy.on('incorrect-chain', this.onIncorrectChain);
+    this.strategy.on('account-changed', this.onAccountChanged);
 
     taskFor(this.strategy.initializeTask).perform();
   }
 
   async updateUsdConverters(
-    symbolsToUpdate: ConvertibleSymbol[]
-  ): Promise<Record<ConvertibleSymbol, ConversionFunction>> {
+    symbolsToUpdate: UsdConvertibleSymbol[]
+  ): Promise<Partial<Record<UsdConvertibleSymbol, ConversionFunction>>> {
+    if (symbolsToUpdate.length === 0) {
+      return {};
+    }
     if (!this.walletInfo.firstAddress) {
       throw new Error(
         'Cannot fetch USD conversion without being connected to Layer 2'
@@ -125,6 +131,22 @@ export default class Layer2Network
     return address;
   }
 
+  @task *merchantRegistrationFee(): TaskGenerator<number> {
+    return yield this.strategy.merchantRegistrationFee();
+  }
+
+  @task *registerMerchant(
+    prepaidCardAddress: string,
+    infoDid: string,
+    options: RegisterMerchantOptions
+  ): any {
+    return yield this.strategy.registerMerchant(
+      prepaidCardAddress,
+      infoDid,
+      options
+    );
+  }
+
   disconnect() {
     return this.strategy.disconnect();
   }
@@ -136,6 +158,10 @@ export default class Layer2Network
 
   @action onIncorrectChain() {
     this.simpleEmitter.emit('incorrect-chain');
+  }
+
+  @action onAccountChanged() {
+    this.simpleEmitter.emit('account-changed');
   }
 
   on(event: Layer2ChainEvent, cb: Function): UnbindEventListener {

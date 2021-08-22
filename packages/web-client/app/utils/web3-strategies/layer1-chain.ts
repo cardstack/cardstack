@@ -1,14 +1,19 @@
 import { tracked } from '@glimmer/tracking';
-import { defer } from 'rsvp';
+import { defer, hash } from 'rsvp';
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { Contract } from 'web3-eth-contract';
+import * as Sentry from '@sentry/browser';
 
 import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
-import { BridgeableSymbol, TokenContractInfo } from '../token';
+import {
+  BridgeableSymbol,
+  ConversionFunction,
+  TokenContractInfo,
+} from '../token';
 import WalletInfo from '../wallet-info';
-import { WalletProvider } from '../wallet-providers';
+import { WalletProvider, WalletProviderId } from '../wallet-providers';
 import {
   ApproveOptions,
   Layer1ChainEvent,
@@ -23,6 +28,7 @@ import {
   BridgeValidationResult,
   getConstantByNetwork,
   getSDK,
+  ILayerOneOracle,
   networkIds,
   waitUntilBlock,
 } from '@cardstack/cardpay-sdk';
@@ -32,6 +38,8 @@ import {
 } from './layer-1-connection-manager';
 import { task } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
+import { action } from '@ember/object';
+import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 
 export default abstract class Layer1ChainWeb3Strategy
   implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
@@ -42,7 +50,8 @@ export default abstract class Layer1ChainWeb3Strategy
   // changes with connection state
   #waitForAccountDeferred = defer<void>();
   web3: Web3 | undefined;
-  connectionManager: ConnectionManager | undefined;
+  #layerOneOracleApi!: ILayerOneOracle;
+  connectionManager: ConnectionManager;
   eventListenersToUnbind: {
     [event in ConnectionManagerEvent]?: UnbindEventListener;
   } = {};
@@ -53,13 +62,27 @@ export default abstract class Layer1ChainWeb3Strategy
   @tracked walletInfo: WalletInfo;
   @tracked connectedChainId: number | undefined;
   @tracked bridgeConfirmationBlockCount: number;
+  nativeTokenSymbol: string;
 
   constructor(networkSymbol: Layer1NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
-    this.walletInfo = new WalletInfo([], this.chainId);
+    this.walletInfo = new WalletInfo([]);
     this.networkSymbol = networkSymbol;
     this.bridgeConfirmationBlockCount = Number(
       getConstantByNetwork('ambFinalizationRate', this.networkSymbol)
+    );
+    this.connectionManager = new ConnectionManager(networkSymbol);
+    // may need this for testing?
+    this.connectionManager.on('connected', this.onConnect);
+    this.connectionManager.on('disconnected', this.onDisconnect);
+    this.connectionManager.on('chain-changed', this.onChainChanged);
+    this.connectionManager.on(
+      'cross-tab-connection',
+      this.onCrossTabConnection
+    );
+    this.nativeTokenSymbol = getConstantByNetwork(
+      'nativeTokenSymbol',
+      this.networkSymbol
     );
     taskFor(this.initializeTask).perform();
   }
@@ -69,44 +92,77 @@ export default abstract class Layer1ChainWeb3Strategy
   }
 
   @task *initializeTask() {
+    yield this.reconnect();
+  }
+
+  @action
+  async onCrossTabConnection(payload: {
+    providerId: WalletProviderId;
+    session?: any;
+  }) {
     try {
-      let web3 = new Web3();
+      if (
+        payload.providerId !== 'wallet-connect' &&
+        payload.providerId !== 'metamask'
+      ) {
+        return;
+      }
+
+      this.web3 = new Web3();
+      await this.connectionManager.reconnect(
+        this.web3,
+        payload.providerId,
+        payload.session
+      );
+    } catch (e) {
+      console.error(
+        `Failed to establish connection to ${payload.providerId} from cross-tab communication`
+      );
+      console.error(e);
+      Sentry.captureException(e);
+      this.cleanupConnectionState();
+    }
+  }
+
+  @action
+  async onConnect(accounts: string[]) {
+    await this.updateWalletInfo(accounts);
+    this.currentProviderId = this.connectionManager?.providerId;
+    this.#waitForAccountDeferred.resolve();
+  }
+
+  @action
+  onChainChanged(chainId: number) {
+    this.connectedChainId = chainId;
+    if (this.connectedChainId !== this.chainId) {
+      this.simpleEmitter.emit('incorrect-chain');
+    } else {
+      this.simpleEmitter.emit('correct-chain');
+    }
+  }
+
+  @action
+  private onDisconnect() {
+    if (this.isConnected) {
+      this.simpleEmitter.emit('disconnect');
+    }
+    this.cleanupConnectionState();
+  }
+
+  async reconnect() {
+    try {
       let providerId = ConnectionManager.getProviderIdForChain(this.chainId);
       if (providerId !== 'wallet-connect' && providerId !== 'metamask') {
         return;
       }
 
-      let connectionManager: ConnectionManager = ConnectionManager.create(
-        providerId,
-        {
-          networkSymbol: this.networkSymbol,
-          chainId: this.chainId,
-        }
-      );
-
-      this.eventListenersToUnbind.connected = connectionManager.on(
-        'connected',
-        this.onConnect.bind(this)
-      );
-      this.eventListenersToUnbind.disconnected = connectionManager.on(
-        'disconnected',
-        this.onDisconnect.bind(this)
-      );
-      this.eventListenersToUnbind['chain-changed'] = connectionManager.on(
-        'chain-changed',
-        this.onChainChanged.bind(this)
-      );
-
-      yield connectionManager.setup(web3);
-
-      if (connectionManager) {
-        this.web3 = web3;
-        this.connectionManager = connectionManager;
-        yield connectionManager.reconnect(); // use the reconnect method because of edge cases
-      }
+      this.web3 = new Web3();
+      await this.connectionManager.reconnect(this.web3, providerId);
+      this.#layerOneOracleApi = await getSDK('LayerOneOracle', this.web3);
     } catch (e) {
       console.error('Failed to initialize connection from local storage');
       console.error(e);
+      Sentry.captureException(e);
       this.cleanupConnectionState();
       ConnectionManager.removeProviderFromStorage(this.chainId);
     }
@@ -114,54 +170,17 @@ export default abstract class Layer1ChainWeb3Strategy
 
   async connect(walletProvider: WalletProvider): Promise<void> {
     try {
-      let web3 = new Web3();
-      let connectionManager: ConnectionManager = ConnectionManager.create(
-        walletProvider.id,
-        {
-          networkSymbol: this.networkSymbol,
-          chainId: this.chainId,
-        }
-      );
-      this.eventListenersToUnbind.connected = connectionManager.on(
-        'connected',
-        this.onConnect.bind(this)
-      );
-      this.eventListenersToUnbind.disconnected = connectionManager.on(
-        'disconnected',
-        this.onDisconnect.bind(this)
-      );
-      this.eventListenersToUnbind['chain-changed'] = connectionManager.on(
-        'chain-changed',
-        this.onChainChanged.bind(this)
-      );
-
-      await connectionManager.setup(web3);
-
-      this.web3 = web3;
-      this.connectionManager = connectionManager;
-      await connectionManager.connect();
+      this.web3 = new Web3();
+      await this.connectionManager.connect(this.web3, walletProvider.id);
+      this.#layerOneOracleApi = await getSDK('LayerOneOracle', this.web3);
     } catch (e) {
       console.error(
         `Failed to create connection manager: ${walletProvider.id}`
       );
       console.error(e);
+      Sentry.captureException(e);
       this.cleanupConnectionState();
       ConnectionManager.removeProviderFromStorage(this.chainId);
-    }
-  }
-
-  async onConnect(accounts: string[]) {
-    this.updateWalletInfo(accounts, this.chainId);
-    this.currentProviderId = this.connectionManager?.providerId;
-    this.#waitForAccountDeferred.resolve();
-  }
-
-  onChainChanged(chainId: number) {
-    this.connectedChainId = chainId;
-    if (this.connectedChainId !== this.chainId) {
-      this.simpleEmitter.emit('incorrect-chain');
-    } else {
-      this.simpleEmitter.emit('correct-chain');
     }
   }
 
@@ -177,19 +196,11 @@ export default abstract class Layer1ChainWeb3Strategy
         delete this.eventListenersToUnbind[event];
       }
     );
-    this.connectionManager?.destroy();
-    this.connectionManager = undefined;
+    this.connectionManager?.reset();
     this.web3 = undefined;
     this.currentProviderId = '';
     this.connectedChainId = undefined;
     this.#waitForAccountDeferred = defer();
-  }
-
-  private onDisconnect() {
-    if (this.isConnected) {
-      this.simpleEmitter.emit('disconnect');
-    }
-    this.cleanupConnectionState();
   }
 
   get waitForAccount(): Promise<void> {
@@ -204,10 +215,19 @@ export default abstract class Layer1ChainWeb3Strategy
     return this.simpleEmitter.on(event, cb);
   }
 
-  private updateWalletInfo(accounts: string[], chainId: number) {
-    this.walletInfo = new WalletInfo(accounts, chainId);
+  private async updateWalletInfo(accounts: string[]) {
+    let newWalletInfo = new WalletInfo(accounts);
+    if (this.walletInfo.isEqualTo(newWalletInfo)) {
+      return;
+    }
+
+    if (this.walletInfo.firstAddress && newWalletInfo.firstAddress) {
+      this.simpleEmitter.emit('account-changed');
+    }
+
+    this.walletInfo = newWalletInfo;
     if (accounts.length > 0) {
-      this.refreshBalances();
+      await this.refreshBalances();
     } else {
       this.defaultTokenBalance = undefined;
       this.cardBalance = undefined;
@@ -216,7 +236,7 @@ export default abstract class Layer1ChainWeb3Strategy
   }
 
   private clearWalletInfo() {
-    this.updateWalletInfo([], -1);
+    this.updateWalletInfo([]);
   }
 
   contractForToken(symbol: BridgeableSymbol) {
@@ -314,5 +334,29 @@ export default abstract class Layer1ChainWeb3Strategy
       'bridgeExplorer',
       this.networkSymbol
     )}/${txnHash}`;
+  }
+
+  async getEstimatedGasForWithdrawalClaim(
+    symbol: BridgeableSymbol
+  ): Promise<BN> {
+    if (!this.web3)
+      throw new Error('Cannot getEstimatedGasForWithdrawalClaim without web3');
+
+    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
+    let { address } = new TokenContractInfo(symbol, this.networkSymbol);
+    return tokenBridge.getEstimatedGasForWithdrawalClaim(address);
+  }
+
+  async updateUsdConverters(
+    symbolsToUpdate: UsdConvertibleSymbol[]
+  ): Promise<Record<UsdConvertibleSymbol, ConversionFunction>> {
+    let promisesHash = {} as Record<
+      UsdConvertibleSymbol,
+      Promise<ConversionFunction>
+    >;
+    for (let symbol of symbolsToUpdate) {
+      promisesHash[symbol] = this.#layerOneOracleApi.getEthToUsdConverter();
+    }
+    return hash(promisesHash);
   }
 }

@@ -1,0 +1,42 @@
+{
+  "name": "firebase-walletconnect-push",
+  "version": "0.21.1",
+  "description": "Wallet Connect Push notification service for Firebase Cloud Functions",
+  "author": "",
+  "license": "MIT",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "tsc",
+    "serve": "concurrently --kill-others 'tsc --watch --preserveWatchOutput' 'firebase emulators:start --only functions'",
+    "shell": "firebase functions:shell",
+    "start": "npm run serve",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^1.9.0",
+    "@types/cors": "^2.8.6",
+    "@types/hapi__joi": "^16.0.4",
+    "@types/node": "^16.4.10",
+    "concurrently": "^5.0.0",
+    "eslint": "^5.6.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-node": "^7.0.1",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "firebase-tools": "^9.16.0",
+    "typescript": "^3.9.10"
+  },
+  "dependencies": {
+    "@hapi/joi": "^16.1.8",
+    "axios": "^0.21.1",
+    "cors": "^2.8.5",
+    "firebase-admin": "^9.11.0",
+    "firebase-functions": "^3.14.1"
+  },
+  "engines": {
+    "node": "14"
+  },
+  "private": true
+}

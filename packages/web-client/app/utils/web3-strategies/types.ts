@@ -3,6 +3,7 @@ import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 import {
   DepotSafe,
+  MerchantSafe,
   PrepaidCardSafe,
   Safe,
 } from '@cardstack/cardpay-sdk/sdk/safes';
@@ -14,15 +15,18 @@ import {
 import { Emitter } from '../events';
 import { BridgeValidationResult } from '@cardstack/cardpay-sdk/sdk/token-bridge-home-side';
 import { TaskGenerator } from 'ember-concurrency';
+import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 
 export type Layer1ChainEvent =
   | 'disconnect'
   | 'incorrect-chain'
-  | 'correct-chain';
+  | 'correct-chain'
+  | 'account-changed';
 export type Layer2ChainEvent =
   | 'disconnect'
   | 'incorrect-chain'
-  | 'correct-chain';
+  | 'correct-chain'
+  | 'account-changed';
 
 export interface Web3Strategy {
   isConnected: boolean;
@@ -40,6 +44,12 @@ export interface RelayTokensOptions {
 
 export interface IssuePrepaidCardOptions {
   onTxHash?(txHash: TransactionHash): void;
+  nonce?: string;
+  onNonce?(nonce: string): void;
+}
+
+export interface RegisterMerchantOptions {
+  onTxHash?(txHash: TransactionHash): void;
 }
 
 export interface ClaimBridgedTokensOptions {
@@ -55,6 +65,7 @@ export interface Layer1Web3Strategy
   defaultTokenBalance: BN | undefined;
   daiBalance: BN | undefined;
   cardBalance: BN | undefined;
+  nativeTokenSymbol: string | undefined;
   bridgeConfirmationBlockCount: number;
   refreshBalances(): void;
   connect(walletProvider: WalletProvider): Promise<void>;
@@ -76,6 +87,10 @@ export interface Layer1Web3Strategy
     options?: ClaimBridgedTokensOptions
   ): Promise<TransactionReceipt>;
   getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void>;
+  getEstimatedGasForWithdrawalClaim(symbol: BridgeableSymbol): Promise<BN>;
+  updateUsdConverters(
+    symbolsToUpdate: UsdConvertibleSymbol[]
+  ): Promise<Record<UsdConvertibleSymbol, ConversionFunction>>;
 }
 
 export interface Layer2Web3Strategy
@@ -89,8 +104,8 @@ export interface Layer2Web3Strategy
   walletConnectUri: string | undefined;
   initializeTask(): TaskGenerator<void>;
   updateUsdConverters(
-    symbolsToUpdate: ConvertibleSymbol[]
-  ): Promise<Record<ConvertibleSymbol, ConversionFunction>>;
+    symbolsToUpdate: UsdConvertibleSymbol[]
+  ): Promise<Record<UsdConvertibleSymbol, ConversionFunction>>;
   blockExplorerUrl(txnHash: TransactionHash): string;
   getBlockHeight(): Promise<BN>;
   awaitBridgedToLayer2(
@@ -117,6 +132,12 @@ export interface Layer2Web3Strategy
     customizationDid: string,
     options?: IssuePrepaidCardOptions
   ): Promise<PrepaidCardSafe>;
+  merchantRegistrationFee(): Promise<number>;
+  registerMerchant(
+    prepaidCardAddress: string,
+    infoDid: string,
+    options: RegisterMerchantOptions
+  ): Promise<MerchantSafe>;
   fetchDepotTask(): Promise<DepotSafe | null>;
   refreshBalances(): void;
   convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<any>;

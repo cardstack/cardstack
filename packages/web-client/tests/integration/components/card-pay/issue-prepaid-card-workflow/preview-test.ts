@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { click, render, waitFor } from '@ember/test-helpers';
+import { click, render, waitFor, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
@@ -74,7 +74,7 @@ module(
     });
 
     module('Test the sdk prepaid card creation calls', async function () {
-      test('It shows the correct text in the creation button in the beginning and after errors', async function (assert) {
+      test('it shows the correct text in the creation button in the beginning and after errors', async function (assert) {
         sinon
           .stub(layer2Service, 'issuePrepaidCard')
           .throws(new Error('An arbitrary error'));
@@ -90,7 +90,7 @@ module(
           .dom('[data-test-issue-prepaid-card-button]')
           .containsText('Try Again');
       });
-      test('It shows the correct error message for a user rejection', async function (assert) {
+      test('it shows the correct error message for a user rejection', async function (assert) {
         sinon
           .stub(layer2Service, 'issuePrepaidCard')
           .throws(new Error('User rejected request'));
@@ -104,7 +104,7 @@ module(
           .containsText(USER_REJECTION_ERROR_MESSAGE);
       });
 
-      test('It shows the correct error message for a timeout', async function (assert) {
+      test('it shows the correct error message for a timeout', async function (assert) {
         sinon
           .stub(layer2Service, 'issuePrepaidCard')
           .throws(
@@ -122,7 +122,7 @@ module(
           .containsText(TIMEOUT_ERROR_MESSAGE);
       });
 
-      test('It shows the correct error message for the user not having enough of a token to create the card', async function (assert) {
+      test('it shows the correct error message for the user not having enough of a token to create the card', async function (assert) {
         sinon
           .stub(layer2Service, 'issuePrepaidCard')
           .throws(
@@ -140,7 +140,7 @@ module(
           .containsText(INSUFFICIENT_FUNDS_ERROR_MESSAGE);
       });
 
-      test('It shows a correct fallback error message', async function (assert) {
+      test('it shows a correct fallback error message', async function (assert) {
         sinon
           .stub(layer2Service, 'issuePrepaidCard')
           .throws(new Error('Not any matched error'));
@@ -153,9 +153,38 @@ module(
           .dom('[data-test-issue-prepaid-card-error-message]')
           .containsText(DEFAULT_ERROR_MESSAGE);
       });
+
+      test('it allow canceling and retrying after a while', async function (assert) {
+        assert
+          .dom('[data-test-issue-prepaid-card-button]')
+          .containsText('Create');
+
+        await click('[data-test-issue-prepaid-card-button]');
+        assert
+          .dom('[data-test-issue-prepaid-card-cancel-button]')
+          .doesNotExist();
+        await waitFor('[data-test-issue-prepaid-card-cancel-button]');
+        layer2Service.test__simulateOnNonceForIssuePrepaidCardRequest(
+          100000,
+          '12345'
+        );
+        await click('[data-test-issue-prepaid-card-cancel-button]');
+        assert
+          .dom('[data-test-issue-prepaid-card-button]')
+          .hasText('Try Again');
+        await click('[data-test-issue-prepaid-card-button]');
+        await waitUntil(() =>
+          layer2Service.test__getNonceForIssuePrepaidCardRequest(100000)
+        );
+        assert.equal(
+          layer2Service.test__getNonceForIssuePrepaidCardRequest(100000),
+          '12345',
+          'The same nonce as was used for the first attempt is sent for the second'
+        );
+      });
     });
 
-    test('It shows the fallback error message if the card customization service fails', async function (assert) {
+    test('it shows the fallback error message if the card customization service fails', async function (assert) {
       sinon
         .stub(
           taskFor(cardCustomizationService.createCustomizationTask),

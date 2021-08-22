@@ -24,6 +24,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`Safes`](#safes)
   - [`Safe.viewSafe`](#safeviewsafe)
   - [`Safes.view`](#safesview)
+  - [`Safes.sendTokensGasEstimate`](#safessendtokensgasestimate)
   - [`Safes.sendTokens`](#safessendtokens)
   - [`Safes.setSupplierInfoDID`](#safessetsupplierinfodid)
 - [`PrepaidCard`](#prepaidcard)
@@ -44,13 +45,17 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`RewardPool`](#rewardpool)
   - [`RewardPool.rewardTokenBalance`](#rewardpoolrewardtokenbalance)
   - [`RewardPool.claim` (TBD)](#rewardpoolclaim-tbd)
-- [`ExchangeRate`](#exchangerate)
-  - [`ExchangeRate.convertToSpend`](#exchangerateconverttospend)
-  - [`ExchangeRate.convertFromSpend`](#exchangerateconvertfromspend)
-  - [`ExchangeRate.getUSDPrice`](#exchangerategetusdprice)
-  - [ExchangeRate.getUSDConverter](#exchangerategetusdconverter)
-  - [`ExchangeRate.getETHPrice`](#exchangerategetethprice)
-  - [`ExchangeRate.getUpdatedAt`](#exchangerategetupdatedat)
+- [`LayerOneOracle`](#layeroneoracle)
+  - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
+  - [`LayerOneOracle.getEthToUsdConverter`](#layeroneoraclegetusdconverter)
+  - [`LayerOneOracle.getUpdatedAt`](#layeroneoraclegetupdatedat)
+- [`LayerTwoOracle`](#layertwooracle)
+  - [`LayerTwoOracle.convertToSpend`](#layertwooracleconverttospend)
+  - [`LayerTwoOracle.convertFromSpend`](#layertwooracleconvertfromspend)
+  - [`LayerTwoOracle.getUSDPrice`](#layertwooraclegetusdprice)
+  - [`LayerTwoOracle.getUSDConverter`](#layertwooraclegetusdconverter)
+  - [`LayerTwoOracle.getETHPrice`](#layertwooraclegetethprice)
+  - [`LayerTwoOracle.getUpdatedAt`](#layertwooraclegetupdatedat)
 - [`HubAuth` (TODO)](#hubauth-todo)
 - [`getAddress`](#getaddress)
 - [`getOracle`](#getoracle)
@@ -303,6 +308,22 @@ Which can be called like this:
 ```js
 let safeDetails = await safes.view();
 ```
+
+### `Safes.sendTokensGasEstimate`
+This call will return the gas estimate for sending tokens from a safe.
+
+The parameters to this function are:
+- The safe address to send the tokens from
+- The token address of the tokens being sent
+- The recipient of the tokens
+- The amount of tokens that are being sent string in units of `wei`
+
+```ts
+let result = await safes.sendTokensGasEstimate(depotSafeAddress, daiCpxdAddress, aliceAddress, toWei("10"));
+```
+
+This method returns a promise for the amount of the tokens specified as the token address in the parameters that are estimated to be used to pay for gas as a string in units of `wei`.
+
 
 ### `Safes.sendTokens`
 This call is used to send tokens from a gnosis safe to an arbitrary address in the layer 2 network. Note that the gas will be paid with the token you are transferring so there must be enough token balance in teh safe to cover both the transferred amount of tokens and gas.
@@ -561,55 +582,87 @@ let balanceForAllTokens = await rewardPool.rewardTokenBalances(address)
 ```
 
 ### `RewardPool.claim` (TBD)
-## `ExchangeRate`
-The `ExchangeRate` API is used to get the current exchange rates in USD and ETH for the various stablecoin that we support. These rates are fed by the Chainlink price feeds for the stablecoin rates and the DIA oracle for the CARD token rates. As we onboard new stablecoin we'll add more exchange rates. The price oracles that we use reside in layer 2, so please supply a layer 2 web3 instance obtaining an `ExchangeRate` API from `getSDK()`.
+
+## `LayerOneOracle`
+The `LayerOneOracle` API is used to get the current exchange rates in USD of ETH. This rate us fed by the Chainlink price feeds. Please supply a layer 1 web3 instance obtaining an `LayerOneOracle` API from `getSDK()`.
+```js
+import { getSDK } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider); // Layer 1 web3 instance
+let layerOneOracle = await getSDK('LayerOneOracle', web3);
+```
+### `LayerOneOracle.ethToUsd`
+This call will return the USD value for the specified amount of ETH. This API requires that the amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a floating point value in units of USD. You can easily convert an ETH value to wei by using the `Web3.utils.toWei()` function.
+
+```js
+let layerOneOracle = await getSDK('LayerOneOracle', web3);
+let usdPrice = await exchangelayerOneOracleRate.ethToUsd(amountInWei);
+console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
+```
+### LayerOneOracle.getEthToUsdConverter
+This returns a function that converts an amount of ETH in wei to USD. The returned function accepts a string that represents an amount in wei and returns a number that represents the USD value of that amount of ETH.
+
+```js
+let layerOneOracle = await getSDK('LayerOneOracle', web3);
+let converter = await layerOneOracle.getEthToUsdConverter();
+console.log(`USD value: $${converter(amountInWei)} USD`);
+```
+### `LayerOneOracle.getUpdatedAt`
+This call will return a `Date` instance that indicates the date the exchange rate was last updated.
+
+```js
+let layerOneOracle = await getSDK('LayerOneOracle', web3);
+let date = await layerOneOracle.getUpdatedAt();
+console.log(`The ETH / USD rate was last updated at ${date.toString()}`);
+```
+## `LayerTwoOracle`
+The `LayerTwoOracle` API is used to get the current exchange rates in USD and ETH for the various stablecoin that we support. These rates are fed by the Chainlink price feeds for the stablecoin rates and the DIA oracle for the CARD token rates. As we onboard new stablecoin we'll add more exchange rates. The price oracles that we use reside in layer 2, so please supply a layer 2 web3 instance obtaining an `LayerTwoOracle` API from `getSDK()`.
 ```js
 import { getSDK } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider); // Layer 2 web3 instance
-let exchangeRate = await getSDK('ExchangeRate', web3);
+let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
 ```
-### `ExchangeRate.convertToSpend`
+### `LayerTwoOracle.convertToSpend`
 This call will convert an amount in the specified token to a SPEND amount. This function returns a number representing the SPEND amount. The input to this function is the token amount as a string in units of `wei`.
 ```js
-let spendAmount = await exchangeRate.convertFromSpend(daicpxdAddress, toWei(10)); // convert 10 DAI to SPEND
+let spendAmount = await layerTwoOracle.convertFromSpend(daicpxdAddress, toWei(10)); // convert 10 DAI to SPEND
 console.log(`SPEND value ${spendAmount}`);
 ```
-### `ExchangeRate.convertFromSpend`
+### `LayerTwoOracle.convertFromSpend`
 This call will convert a SPEND amount into the specified token amount, where the result is a string that represents the token in units of `wei`. Since SPEND tokens represent $0.01 USD, it is safe to represent SPEND as a number when providing the input value.
 ```js
-let weiAmount = await exchangeRate.convertFromSpend(daicpxdAddress, 10000); // convert 10000 SPEND into DAI
+let weiAmount = await layerTwoOracle.convertFromSpend(daicpxdAddress, 10000); // convert 10000 SPEND into DAI
 console.log(`DAI value ${fromWei(weiAmount)}`);
 ```
-### `ExchangeRate.getUSDPrice`
+### `LayerTwoOracle.getUSDPrice`
 This call will return the USD value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a floating point value in units of USD. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function.
 
 ```js
-let exchangeRate = await getSDK('ExchangeRate', web3);
-let usdPrice = await exchangeRate.getUSDPrice("DAI", amountInWei);
+let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
+let usdPrice = await layerTwoOracleRate.getUSDPrice("DAI", amountInWei);
 console.log(`USD value: $${usdPrice.toFixed(2)} USD`);
 ```
-### ExchangeRate.getUSDConverter
-This returns a function that converts an amount of a token in wei to USD. Similar to `ExchangeRate.getUSDPrice`, an exception will be thrown if we don't have the exchange rate for the token. The returned function accepts a string that represents an amount in wei and returns a number that represents the USD value of that amount of the token.
+### LayerTwoOracle.getUSDConverter
+This returns a function that converts an amount of a token in wei to USD. Similar to `LayerTwoOracle.getUSDPrice`, an exception will be thrown if we don't have the exchange rate for the token. The returned function accepts a string that represents an amount in wei and returns a number that represents the USD value of that amount of the token.
 
 ```js
-let exchangeRate = await getSDK('ExchangeRate', web3);
-let converter = await exchangeRate.getUSDConverter("DAI");
+let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
+let converter = await layerTwoOracle.getUSDConverter("DAI");
 console.log(`USD value: $${converter(amountInWei)} USD`);
 ```
-### `ExchangeRate.getETHPrice`
+### `LayerTwoOracle.getETHPrice`
 This call will return the ETH value for the specified amount of the specified token. If we do not have an exchange rate for the token, then an exception will be thrown. This API requires that the token amount be specified in `wei` (10<sup>18</sup> `wei` = 1 token) as a string, and will return a string that represents the ETH value in units of `wei` as well. You can easily convert a token value to wei by using the `Web3.utils.toWei()` function. You can also easily convert units of `wei` back into `ethers` by using the `Web3.utils.fromWei()` function.
 
 ```js
-let exchangeRate = await getSDK('ExchangeRate', web3);
-let ethWeiPrice = await exchangeRate.getETHPrice("CARD", amountInWei);
+let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
+let ethWeiPrice = await layerTwoOracle.getETHPrice("CARD", amountInWei);
 console.log(`ETH value: ${fromWei(ethWeiPrice)} ETH`);
 ```
-### `ExchangeRate.getUpdatedAt`
+### `LayerTwoOracle.getUpdatedAt`
 This call will return a `Date` instance that indicates the date the token rate was last updated.
 
 ```js
-let exchangeRate = await getSDK('ExchangeRate', web3);
-let date = await exchangeRate.getUpdatedAt("DAI");
+let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
+let date = await layerTwoOracle.getUpdatedAt("DAI");
 console.log(`The ${token} rate was last updated at ${date.toString()}`);
 ```
 

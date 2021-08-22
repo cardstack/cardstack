@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Build & Lint & Test
+    name: Build & Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,10 +23,6 @@ jobs:
       - name: Install dependencies
         run: |
           yarn --prefer-offline
-      - name: Lint
-        run: |
-          yarn lint:deps
-          yarn lint:js:pkg boxel
       - name: Test
         run: yarn test:boxel
 

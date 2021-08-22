@@ -255,11 +255,11 @@ module('Acceptance | deposit', function (hooks) {
     assert.dom(`${post} [data-test-deposit-transaction-status-card]`).exists();
     const blockCount = layer1Service.bridgeConfirmationBlockCount;
     layer1Service.test__simulateBlockConfirmation();
-    await waitFor(
-      `[data-test-token-bridge-step-block-count="${blockCount - 1}"]`
-    );
-    layer1Service.test__simulateBlockConfirmation();
     await waitFor(`[data-test-token-bridge-step-block-count="${blockCount}"]`);
+    layer1Service.test__simulateBlockConfirmation();
+    await waitFor(
+      `[data-test-token-bridge-step-block-count="${blockCount + 1}"]`
+    );
     layer1Service.test__simulateBlockConfirmation();
     await waitFor(`[data-test-token-bridge-step="1"][data-test-completed]`);
     assert.dom(`${post} [data-test-bridge-explorer-button]`).exists();
@@ -586,7 +586,9 @@ module('Acceptance | deposit', function (hooks) {
         'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).'
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
-    assert.dom('[data-test-deposit-workflow-disconnection-restart]').exists();
+    assert
+      .dom('[data-test-workflow-default-cancelation-restart="deposit"]')
+      .exists();
   });
 
   test('Disconnecting Layer 1 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
@@ -645,7 +647,7 @@ module('Acceptance | deposit', function (hooks) {
 
     layer1Service.test__simulateDisconnectFromWallet();
 
-    await waitFor('[data-test-deposit-workflow-disconnection-cta]');
+    await waitFor('[data-test-workflow-default-cancelation-cta="deposit"]');
 
     // test that all cta buttons are disabled
     let milestoneCtaButtonCount = Array.from(
@@ -668,7 +670,9 @@ module('Acceptance | deposit', function (hooks) {
         'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).'
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
-    assert.dom('[data-test-deposit-workflow-disconnection-restart]').exists();
+    assert
+      .dom('[data-test-workflow-default-cancelation-restart="deposit"]')
+      .exists();
   });
 
   test('Disconnecting Layer 2 from within the workflow', async function (assert) {
@@ -755,7 +759,9 @@ module('Acceptance | deposit', function (hooks) {
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
 
-    assert.dom('[data-test-deposit-workflow-disconnection-restart]').exists();
+    assert
+      .dom('[data-test-workflow-default-cancelation-restart="deposit"]')
+      .exists();
   });
 
   test('Disconnecting Layer 2 from outside the current tab (mobile wallet / other tabs)', async function (assert) {
@@ -820,7 +826,7 @@ module('Acceptance | deposit', function (hooks) {
 
     layer2Service.test__simulateDisconnectFromWallet();
 
-    await waitFor('[data-test-deposit-workflow-disconnection-cta]');
+    await waitFor('[data-test-workflow-default-cancelation-cta="deposit"]');
     // test that all cta buttons are disabled
     let milestoneCtaButtonCount = Array.from(
       document.querySelectorAll(
@@ -841,6 +847,195 @@ module('Acceptance | deposit', function (hooks) {
         'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).'
       );
     assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
-    assert.dom('[data-test-deposit-workflow-disconnection-restart]').exists();
+    assert
+      .dom('[data-test-workflow-default-cancelation-restart="deposit"]')
+      .exists();
+  });
+
+  test('Changing layer 1 account should cancel the workflow', async function (assert) {
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    let secondLayer1AccountAddress =
+      '0x5416C61193C3393B46C2774ac4717C252031c0bE';
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
+    layer1Service.test__simulateBalances({
+      defaultToken: new BN('2141100000000000000'),
+      dai: new BN('250500000000000000000'),
+      card: new BN('10000000000000000000000'),
+    });
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateBalances({
+      defaultToken: new BN('142200000000000000'),
+    });
+
+    await visit('/card-pay/token-suppliers');
+    await click('[data-test-workflow-button="deposit"]');
+
+    let post = postableSel(0, 0);
+    assert.dom(post).containsText('Hi there, we’re happy to see you');
+
+    assert
+      .dom(postableSel(0, 3))
+      .containsText(
+        `Looks like you’ve already connected your ${c.layer1.fullName} wallet`
+      );
+
+    await settled();
+
+    assert
+      .dom(milestoneCompletedSel(0))
+      .containsText(
+        `${capitalize(c.layer1.conversationalName)} wallet connected`
+      );
+
+    assert
+      .dom(postableSel(1, 0))
+      .containsText(
+        `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
+      );
+
+    await settled();
+    assert
+      .dom(milestoneCompletedSel(1))
+      .containsText(`${c.layer2.fullName} wallet connected`);
+
+    assert
+      .dom(postableSel(2, 0))
+      .containsText('choose the asset you would like to deposit');
+    assert
+      .dom(`${postableSel(0, 4)} [data-test-mainnet-disconnect-button]`)
+      .containsText('Disconnect Wallet');
+
+    layer1Service.test__simulateAccountsChanged(
+      [secondLayer1AccountAddress],
+      'metamask'
+    );
+    await settled();
+
+    // test that all cta buttons are disabled
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
+
+    await waitFor('[data-test-cancelation][data-test-postable]');
+
+    assert
+      .dom(cancelationPostableSel(0))
+      .containsText(
+        'It looks like you changed accounts in the middle of this workflow. If you still want to deposit funds, please restart the workflow.'
+      );
+    assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+    assert
+      .dom('[data-test-workflow-default-cancelation-restart="deposit"]')
+      .exists();
+  });
+
+  test('Changing layer 2 account should cancel the workflow', async function (assert) {
+    let layer1Service = this.owner.lookup('service:layer1-network')
+      .strategy as Layer1TestWeb3Strategy;
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer1Service.test__simulateAccountsChanged(
+      [layer1AccountAddress],
+      'metamask'
+    );
+    layer1Service.test__simulateBalances({
+      defaultToken: new BN('2141100000000000000'),
+      dai: new BN('250500000000000000000'),
+      card: new BN('10000000000000000000000'),
+    });
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    let secondLayer2AccountAddress =
+      '0x0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateBalances({
+      defaultToken: new BN('142200000000000000'),
+    });
+
+    await visit('/card-pay/token-suppliers');
+    await click('[data-test-workflow-button="deposit"]');
+
+    let post = postableSel(0, 0);
+    assert.dom(post).containsText('Hi there, we’re happy to see you');
+
+    assert
+      .dom(postableSel(0, 3))
+      .containsText(
+        `Looks like you’ve already connected your ${c.layer1.fullName} wallet`
+      );
+
+    await settled();
+
+    assert
+      .dom(milestoneCompletedSel(0))
+      .containsText(
+        `${capitalize(c.layer1.conversationalName)} wallet connected`
+      );
+
+    assert
+      .dom(postableSel(1, 0))
+      .containsText(
+        `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
+      );
+
+    await settled();
+    assert
+      .dom(milestoneCompletedSel(1))
+      .containsText(`${c.layer2.fullName} wallet connected`);
+
+    assert
+      .dom(postableSel(2, 0))
+      .containsText('choose the asset you would like to deposit');
+    assert
+      .dom(`${postableSel(0, 4)} [data-test-mainnet-disconnect-button]`)
+      .containsText('Disconnect Wallet');
+
+    layer2Service.test__simulateAccountsChanged([secondLayer2AccountAddress]);
+    await settled();
+
+    // test that all cta buttons are disabled
+    let milestoneCtaButtonCount = Array.from(
+      document.querySelectorAll(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
+      )
+    ).length;
+    assert
+      .dom(
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+      )
+      .exists(
+        { count: milestoneCtaButtonCount },
+        'All cta buttons in milestones should be disabled'
+      );
+
+    await waitFor('[data-test-cancelation][data-test-postable]');
+
+    assert
+      .dom(cancelationPostableSel(0))
+      .containsText(
+        'It looks like you changed accounts in the middle of this workflow. If you still want to deposit funds, please restart the workflow.'
+      );
+    assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+    assert
+      .dom('[data-test-workflow-default-cancelation-restart="deposit"]')
+      .exists();
   });
 });

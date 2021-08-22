@@ -9,7 +9,7 @@ import {
   claimLayer1BridgedTokens,
 } from './bridge.js';
 import { viewTokenBalance } from './assets';
-import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe } from './safe.js';
+import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe, transferTokensGasEstimate } from './safe.js';
 import {
   create as createPrepaidCard,
   split as splitPrepaidCard,
@@ -18,7 +18,12 @@ import {
   payMerchant,
   gasFee,
 } from './prepaid-card.js';
-import { usdPrice, ethPrice, priceOracleUpdatedAt } from './exchange-rate';
+import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
+import {
+  usdPrice as layer2UsdPrice,
+  ethPrice as layer2EthPrice,
+  priceOracleUpdatedAt as layer2PriceOracleUpdatedAt,
+} from './layer-two-oracle';
 import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
 import { rewardTokenBalances } from './reward-pool.js';
 import { hubAuth } from './hub-auth';
@@ -35,6 +40,7 @@ type Commands =
   | 'safesView'
   | 'safeView'
   | 'safeTransferTokens'
+  | 'safeTransferTokensGasEstimate'
   | 'prepaidCardCreate'
   | 'prepaidCardSplit'
   | 'prepaidCardTransfer'
@@ -112,7 +118,7 @@ let {
   .command('bridge-to-l2 <amount> <tokenAddress> [receiver]', 'Bridge tokens to the layer 2 network', (yargs) => {
     yargs.positional('amount', {
       type: 'string',
-      description: 'Amount of tokens you would like bridged (*not* in units of wei)',
+      description: 'Amount of tokens you would like bridged (*not* in units of wei, but in eth)',
     });
     yargs.positional('tokenAddress', {
       type: 'string',
@@ -149,7 +155,7 @@ let {
       });
       yargs.positional('amount', {
         type: 'string',
-        description: 'Amount of tokens you would like bridged (*not* in units of wei)',
+        description: 'Amount of tokens you would like bridged (*not* in units of wei, but in eth)',
       });
       yargs.positional('tokenAddress', {
         type: 'string',
@@ -216,6 +222,29 @@ let {
     command = 'safeView';
   })
   .command(
+    'safe-transfer-tokens-gas-estimate [safeAddress] [token] [recipient] [amount]',
+    'Obtain a gas estimate to transfer tokens from a safe to an arbitrary recipient.',
+    (yargs) => {
+      yargs.positional('safeAddress', {
+        type: 'string',
+        description: 'The address of the safe that is sending the tokens',
+      });
+      yargs.positional('token', {
+        type: 'string',
+        description: 'The token address of the tokens to transfer from the safe',
+      });
+      yargs.positional('recipient', {
+        type: 'string',
+        description: "The token recipient's address",
+      });
+      yargs.positional('amount', {
+        type: 'string',
+        description: 'The amount of tokens to transfer (not in units of wei, but in eth)',
+      });
+      command = 'safeTransferTokensGasEstimate';
+    }
+  )
+  .command(
     'safe-transfer-tokens [safeAddress] [token] [recipient] [amount]',
     'Transfer tokens from a safe to an arbitrary recipient.',
     (yargs) => {
@@ -233,7 +262,7 @@ let {
       });
       yargs.positional('amount', {
         type: 'string',
-        description: 'The amount of tokens to transfer (not in units of wei)',
+        description: 'The amount of tokens to transfer (not in units of wei, but in eth)',
       });
       command = 'safeTransferTokens';
     }
@@ -371,7 +400,7 @@ let {
       });
       yargs.positional('amount', {
         type: 'string',
-        description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei)',
+        description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)',
       });
       command = 'claimRevenue';
     }
@@ -390,7 +419,7 @@ let {
       });
       yargs.positional('amount', {
         type: 'string',
-        description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei)',
+        description: 'The amount of tokens that are being claimed as revenue (*not* in units of wei, but in eth)',
       });
       command = 'claimRevenueGasEstimate';
     }
@@ -422,7 +451,7 @@ let {
     }
   )
   .command(
-    'usd-price <token> <amount>',
+    'usd-price <token> [amount]',
     'Get the USD value for the USD value for the specified token in the specified amount',
     (yargs) => {
       yargs.positional('token', {
@@ -431,14 +460,14 @@ let {
       });
       yargs.positional('amount', {
         type: 'string',
-        default: 1,
-        description: 'The amount of the specified token (*not* in units of wei)',
+        default: '1',
+        description: 'The amount of the specified token (*not* in units of wei, but in eth)',
       });
       command = 'usdPrice';
     }
   )
   .command(
-    'eth-price <token> <amount>',
+    'eth-price <token> [amount]',
     'Get the ETH value for the USD value for the specified token in the specified amount',
     (yargs) => {
       yargs.positional('token', {
@@ -447,8 +476,8 @@ let {
       });
       yargs.positional('amount', {
         type: 'string',
-        default: 1,
-        description: 'The amount of the specified token (*not* in units of wei)',
+        default: '1',
+        description: 'The amount of the specified token (*not* in units of wei, but in eth)',
       });
       command = 'ethPrice';
     }
@@ -497,7 +526,7 @@ let {
     network: {
       alias: 'n',
       type: 'string',
-      description: "The Layer 1 network to ruin this script in ('kovan' or 'mainnet')",
+      description: "The Layer 1 network to run this script in ('kovan' or 'mainnet')",
     },
     mnemonic: {
       alias: 'm',
@@ -584,6 +613,13 @@ if (!command) {
       }
       await transferTokens(network, safeAddress, token, recipient, amount, mnemonic);
       break;
+    case 'safeTransferTokensGasEstimate':
+      if (safeAddress == null || recipient == null || token == null || amount == null) {
+        showHelpAndExit('safeAddress, token, recipient, and amount are required values');
+        return;
+      }
+      await transferTokensGasEstimate(network, safeAddress, token, recipient, amount, mnemonic);
+      break;
     case 'setSupplierInfoDID':
       if (safeAddress == null || token == null || infoDID == null) {
         showHelpAndExit('safeAddress, token, and infoDID are required values');
@@ -652,21 +688,29 @@ if (!command) {
         showHelpAndExit('token and amount are required values');
         return;
       }
-      await usdPrice(network, token, amount, mnemonic);
+      if (token.toUpperCase() === 'ETH') {
+        await ethToUsdPrice(network, amount, mnemonic);
+      } else {
+        await layer2UsdPrice(network, token, amount, mnemonic);
+      }
       break;
     case 'ethPrice':
       if (token == null || amount == null) {
         showHelpAndExit('token and amount are required values');
         return;
       }
-      await ethPrice(network, token, amount, mnemonic);
+      await layer2EthPrice(network, token, amount, mnemonic);
       break;
     case 'priceOracleUpdatedAt':
       if (token == null) {
-        showHelpAndExit('tokenAddress is a required value');
+        showHelpAndExit('token is a required value');
         return;
       }
-      await priceOracleUpdatedAt(network, token, mnemonic);
+      if (token.toUpperCase() === 'ETH') {
+        await layer1PriceOracleUpdatedAt(network, mnemonic);
+      } else {
+        await layer2PriceOracleUpdatedAt(network, token, mnemonic);
+      }
       break;
     case 'viewTokenBalance':
       await viewTokenBalance(network, tokenAddress, mnemonic);

@@ -6,7 +6,7 @@
   data-test-mainnnet-connection-action-container
   ...attributes
 >
-  {{#if this.connectedWalletProvider}}
+  {{#if (eq this.cardState 'memorialized')}}
     <Listener
       @emitter={{this.layer1Network}}
       @event="disconnect"
@@ -17,38 +17,47 @@
       @title={{this.connectedWalletProvider.name}}
       @imgUrl={{this.connectedWalletProvider.logo}}
       @dataTestId="layer-one-connect"
+      data-test-layer-1-wallet-summary
     >
       <CardPay::FieldStack>
         <CardPay::LabeledValue
           @label="Network"
           @value={{network-display-info "layer1" "fullName"}}
         />
-        <CardPay::LabeledValue
-          @label="Address"
-          @value={{this.layer1Network.walletInfo.firstAddress}}
-          @isAddress={{true}}
-        />
-        <CardPay::LabeledValue @label="Balance*" data-test-balance-container>
-          {{#if this.balancesToShow.length}}
-          <CardPay::BalancesList as |Balance|>
-            {{#each this.balancesToShow as |b|}}
-            <Balance @symbol={{b.symbol}} @amount={{b.amount}} />
-            {{/each}}
-          </CardPay::BalancesList>
-          {{else}}
-          None
-          {{/if}}
-        </CardPay::LabeledValue>
-        <CardPay::LabeledValue
-          @label="Status"
-          @value="Connected"
-          @icon="success-bordered"
-        />
+
+        {{#if this.isConnected}}
+          <CardPay::LabeledValue
+            @label="Address"
+            @value={{this.layer1Network.walletInfo.firstAddress}}
+            @isAddress={{true}}
+          />
+          <CardPay::LabeledValue @label="Balance*" data-test-balance-container>
+            {{#if this.balancesToShow.length}}
+              <CardPay::BalancesList as |Balance|>
+                {{#each this.balancesToShow as |b|}}
+                  <Balance @symbol={{b.symbol}} @amount={{b.amount}} />
+                {{/each}}
+              </CardPay::BalancesList>
+            {{else}}
+              None
+            {{/if}}
+          </CardPay::LabeledValue>
+        {{/if}}
       </CardPay::FieldStack>
-      <div class="layer-one-connect-card__disclaimer">
-        * This balance reflects some of the tokens that are accepted in the Card Pay network.
-          It may not reflect all the tokens in your wallet.
-      </div>
+
+      <CardPay::LabeledValue
+        @label="Status"
+        @value={{if this.isConnected "Connected" "Disconnected"}}
+        @icon={{if this.isConnected "success-bordered" "failure-bordered"}}
+      />
+
+      {{#if this.isConnected}}
+        <div class="layer-one-connect-card__disclaimer">
+          * This balance reflects some of the tokens that are accepted in the Card Pay network.
+            It may not reflect all the tokens in your wallet.
+        </div>
+      {{/if}}
+
     </ActionCardContainer::Section>
   {{else}}
     <ActionCardContainer::Section
@@ -63,33 +72,34 @@
       />
     </ActionCardContainer::Section>
   {{/if}}
-  <Boxel::ActionChin @state={{this.ctaState}} @disabled={{or @frozen this.ctaDisabled}}>
-    <:default as |a|>
-      <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
-        Connect Wallet
-      </a.ActionButton>
-    </:default>
-    <:in-progress as |i|>
-      <i.ActionStatusArea class="layer-one-connect-card__in-progress-logo" @icon={{concat this.radioWalletProviderId "-logo"}} style={{css-var status-icon-size="2.5rem"}}>
-        <Boxel::LoadingIndicator
-          class="layer-one-connect-card__loading-indicator"
-          @color="var(--boxel-light)"
-        />
-        <div class="layer-one-connect-card__waiting-status">
-          Waiting for you to connect Card Pay with your {{network-display-info "layer1" "conversationalName"}} wallet...
-          <i.CancelButton class="layer-one-connect-card__cancel-button" {{on "click" this.cancelConnection}}>
-            Cancel
-          </i.CancelButton>
-        </div>
-      </i.ActionStatusArea>
-      <i.InfoArea>
-        Only visible to you
-      </i.InfoArea>
-    </:in-progress>
-    <:memorialized as |m|>
-      <m.ActionButton {{on "click" this.disconnect}} data-test-mainnet-disconnect-button>
-        Disconnect Wallet
-      </m.ActionButton>
-    </:memorialized>
-  </Boxel::ActionChin>
+
+  {{#if this.showActions}}
+    <Boxel::ActionChin @state={{this.cardState}} @disabled={{@frozen}}>
+      <:default as |a|>
+        <a.ActionButton {{on "click" this.connect}} data-test-mainnet-connect-button>
+          Connect Wallet
+        </a.ActionButton>
+      </:default>
+      <:in-progress as |i|>
+        <i.ActionStatusArea class="layer-one-connect-card__in-progress-logo" @icon={{concat
+          this.radioWalletProviderId "-logo" }} style={{css-var status-icon-size="2.5rem" }}>
+          <Boxel::LoadingIndicator class="layer-one-connect-card__loading-indicator" @color="var(--boxel-light)" />
+          <div class="layer-one-connect-card__waiting-status">
+            Waiting for you to connect Card Pay with your {{network-display-info "layer1" "conversationalName"}} wallet...
+            <i.CancelButton class="layer-one-connect-card__cancel-button" {{on "click" this.cancelConnection}}>
+              Cancel
+            </i.CancelButton>
+          </div>
+        </i.ActionStatusArea>
+        <i.InfoArea>
+          Only visible to you
+        </i.InfoArea>
+      </:in-progress>
+      <:memorialized as |m|>
+        <m.ActionButton {{on "click" this.disconnect}} data-test-mainnet-disconnect-button>
+          Disconnect Wallet
+        </m.ActionButton>
+      </:memorialized>
+    </Boxel::ActionChin>
+  {{/if}}
 </ActionCardContainer>

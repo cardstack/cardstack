@@ -60,21 +60,19 @@ module(
         .exists({ count: 1 });
       assert
         .dom(`[data-test-token-bridge-step-status="1"]`)
-        .hasText(`Waiting for 1 of ${blockCount} block confirmations`);
-
-      layer1Service.test__simulateBlockConfirmation();
-      await waitFor(
-        `[data-test-token-bridge-step-block-count="${blockCount - 1}"]`
-      );
-      assert
-        .dom(`[data-test-token-bridge-step-status="1"]`)
-        .hasText(
-          `Waiting for ${blockCount} of ${blockCount} block confirmations`
-        );
+        .hasText(`0 of ${blockCount} blocks confirmed`);
 
       layer1Service.test__simulateBlockConfirmation();
       await waitFor(
         `[data-test-token-bridge-step-block-count="${blockCount}"]`
+      );
+      assert
+        .dom(`[data-test-token-bridge-step-status="1"]`)
+        .hasText(`${blockCount} of ${blockCount} blocks confirmed`);
+
+      layer1Service.test__simulateBlockConfirmation();
+      await waitFor(
+        `[data-test-token-bridge-step-block-count="${blockCount + 1}"]`
       );
       assert
         .dom(`[data-test-token-bridge-step-status="1"]`)
@@ -203,11 +201,11 @@ module(
 
       layer1Service.test__simulateBlockConfirmation();
       await waitFor(
-        `[data-test-token-bridge-step-block-count="${blockCount - 1}"]`
+        `[data-test-token-bridge-step-block-count="${blockCount}"]`
       );
       layer1Service.test__simulateBlockConfirmation();
       await waitFor(
-        `[data-test-token-bridge-step-block-count="${blockCount}"]`
+        `[data-test-token-bridge-step-block-count="${blockCount + 1}"]`
       );
       layer1Service.test__simulateBlockConfirmation();
       await waitFor(`[data-test-token-bridge-step="1"][data-test-completed]`);

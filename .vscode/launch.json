@@ -12,6 +12,20 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "node",
+      "request": "launch",
+      "name": "Run server",
+      "program": "${workspaceRoot}/packages/hub/bin/server.ts",
+      "cwd": "${workspaceRoot}/packages/hub",
+      "console": "integratedTerminal",
+      "env": {
+        "SERVER_SECRET":"",
+        "WYRE_ACCOUNT_ID": "",
+        "WYRE_API_KEY": "",
+        "WYRE_SECRET_KEY": ""
+      }
+    },
+    {
       "name": "Ember test browser",
       "type": "chrome",
       "request": "launch",
@@ -21,17 +35,20 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Test Suite",
+      "name": "Node tests",
       "program": "${workspaceRoot}/node_modules/.bin/_mocha",
-      "cwd": "${workspaceRoot}",
+      "cwd": "${workspaceRoot}/packages/hub",
+      "console": "integratedTerminal",
+      "env": {
+        "PACKAGE": "hub",
+        "NODE_ENV": "test"
+      },
       "args": [
         "-r",
         "esm",
-        "packages/test-support/bin/run.js",
+        "../test-support/bin/run.js",
         "--timeout",
-        "600000",
-        "--grep",
-        "can find built-in cards from the index"
+        "600000"
       ]
     },
     {
@@ -196,6 +213,26 @@
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "0x09FBEDDc5f94fA2713CDa75A68457cA8A4527adf", // destination addrress
         "100", // amount (in ether units)
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Gas Estimate for Transfer Tokens from Safe",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "safe-transfer-tokens-gas-estimate",
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // source safe address
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "0x09FBEDDc5f94fA2713CDa75A68457cA8A4527adf", // destination addrress
+        "5", // amount (in ether units)
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own

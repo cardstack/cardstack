@@ -16,5 +16,10 @@
     "dsn": "HUB_SENTRY_DSN",
     "environment": "HUB_ENVIRONMENT"
   },
+  "wyre": {
+    "accountId": "WYRE_ACCOUNT_ID",
+    "apiKey": "WYRE_API_KEY",
+    "secretKey": "WYRE_SECRET_KEY"
+  },
   "serverSecret": "SERVER_SECRET"
 }

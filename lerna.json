@@ -1,8 +1,8 @@
 {
   "packages": [
-    "packages/*"
+    "packages/**"
   ],
-  "version": "0.19.49",
+  "version": "0.21.1",
   "npmClient": "yarn",
   "npmClientArgs": [
     "--ignore-engines"

@@ -93,10 +93,10 @@ export default class PrepaidCard {
     );
 
     let rateChanged = false;
-    let exchange = await getSDK('ExchangeRate', this.layer2Web3);
+    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let gnosisResult: GnosisExecTx | undefined;
     do {
-      let rateLock = await exchange.getRateLock(issuingToken);
+      let rateLock = await layerTwoOracle.getRateLock(issuingToken);
       try {
         let payload = await this.getPayMerchantPayload(prepaidCardAddress, merchantSafe, spendAmount, rateLock);
         if (nonce == null) {
@@ -171,7 +171,7 @@ export default class PrepaidCard {
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let rateChanged = false;
     let prepaidCardMgr = await this.getPrepaidCardMgr();
-    let exchange = await getSDK('ExchangeRate', this.layer2Web3);
+    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let gasToken = await getAddress('cardCpxd', this.layer2Web3);
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     let transferData = await prepaidCardMgr.methods.getTransferCardData(prepaidCardAddress, newOwner).call();
@@ -207,7 +207,7 @@ export default class PrepaidCard {
     );
     let gnosisResult: GnosisExecTx | undefined;
     do {
-      let rateLock = await exchange.getRateLock(issuingToken);
+      let rateLock = await layerTwoOracle.getRateLock(issuingToken);
       try {
         let payload = await this.getTransferPayload(prepaidCardAddress, newOwner, previousOwnerSignature, rateLock);
         if (nonce == null) {
@@ -285,7 +285,7 @@ export default class PrepaidCard {
       throw new Error(`The prepaid card ${prepaidCardAddress} is not allowed to be split`);
     }
     let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let exchange = await getSDK('ExchangeRate', this.layer2Web3);
+    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     let amountCache = new Map<number, string>();
     let amounts: BN[] = [];
@@ -301,7 +301,7 @@ export default class PrepaidCard {
       totalWeiAmount = totalWeiAmount.add(weiAmountBN);
       amounts.push(weiAmountBN);
     }
-    let totalAmountInSpend = await exchange.convertToSpend(issuingToken, totalWeiAmount.toString());
+    let totalAmountInSpend = await layerTwoOracle.convertToSpend(issuingToken, totalWeiAmount.toString());
     // add 1 SPEND to account for rounding errors, unconsumed tokens are
     // refunded back to the prepaid card
     totalAmountInSpend++;
@@ -322,7 +322,7 @@ export default class PrepaidCard {
     let rateChanged = false;
     let gnosisResult: GnosisExecTx | undefined;
     do {
-      let rateLock = await exchange.getRateLock(issuingToken);
+      let rateLock = await layerTwoOracle.getRateLock(issuingToken);
       try {
         let payload = await this.getSplitPayload(
           prepaidCardAddress,
@@ -536,8 +536,8 @@ export default class PrepaidCard {
     onError: (issuingToken: string, balanceAmount: string, requiredTokenAmount: string, symbol: string) => Error
   ): Promise<string> {
     let issuingToken = await this.issuingToken(prepaidCardAddress);
-    let exchangeRate = await getSDK('ExchangeRate', this.layer2Web3);
-    let weiAmount = await exchangeRate.convertFromSpend(issuingToken, minimumSpendBalance);
+    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
+    let weiAmount = await layerTwoOracle.convertFromSpend(issuingToken, minimumSpendBalance);
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], issuingToken);
     let symbol = await token.methods.symbol().call();
     let prepaidCardBalance = new BN(await token.methods.balanceOf(prepaidCardAddress).call());

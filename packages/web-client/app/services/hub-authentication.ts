@@ -6,29 +6,11 @@ import { taskFor } from 'ember-concurrency-ts';
 import { task, waitForProperty, TaskGenerator } from 'ember-concurrency';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
+import { MockLocalStorage } from '../utils/browser-mocks';
 
 declare global {
   interface Window {
     TEST__AUTH_TOKEN?: string;
-  }
-}
-
-class MockLocalStorage {
-  entries = {} as Record<string, string>;
-  setItem(key: string, value: string): void {
-    this.entries[key] = value;
-  }
-  getItem(key: string): string | null {
-    return this.entries[key];
-  }
-  removeItem(key: string): void {
-    delete this.entries[key];
-  }
-  get length(): number {
-    return Object.keys(this.entries).length;
-  }
-  clear() {
-    this.entries = {};
   }
 }
 

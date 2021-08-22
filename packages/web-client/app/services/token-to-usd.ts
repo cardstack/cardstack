@@ -1,24 +1,28 @@
 import { inject as service, default as Service } from '@ember/service';
+import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
-import { rawTimeout, waitForQueue } from 'ember-concurrency';
+import { all, rawTimeout, waitForQueue } from 'ember-concurrency';
 import BN from 'bn.js';
 
 import TokenToUsdHelper from '@cardstack/web-client/helpers/token-to-usd';
 import {
-  ConvertibleSymbol,
-  convertibleSymbols,
   ConversionFunction,
+  isBridgedTokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import config from '@cardstack/web-client/config/environment';
 
 const INTERVAL = config.environment === 'test' ? 1000 : 60 * 1000;
 
+export type UsdConvertibleSymbol = 'CARD.CPXD' | 'DAI.CPXD' | 'ETH';
+const USD_CONVERTIBLE_SYMBOLS = ['CARD.CPXD', 'DAI.CPXD', 'ETH'];
+
 class UsdConverters {
-  @tracked DAI: ConversionFunction | undefined;
-  @tracked CARD: ConversionFunction | undefined;
+  @tracked 'DAI.CPXD': ConversionFunction | undefined;
+  @tracked 'CARD.CPXD': ConversionFunction | undefined;
+  @tracked 'ETH': ConversionFunction | undefined;
 }
 
 /*
@@ -30,6 +34,7 @@ class UsdConverters {
   what tokens need exchange functions fetched.
 */
 export default class TokenToUsd extends Service {
+  @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   usdConverters = new UsdConverters();
   #registeredHelpers: Set<TokenToUsdHelper> = new Set();
@@ -37,11 +42,19 @@ export default class TokenToUsd extends Service {
   @task({ maxConcurrency: 1, drop: true }) *pollTask(): any {
     while (this.shouldPoll) {
       yield waitForQueue('afterRender'); // wait for all current helpers to be registered
-      let updatedConverters = yield this.layer2Network.updateUsdConverters(
-        this.symbolsToUpdate
-      );
-      for (let symbol of convertibleSymbols) {
-        this.usdConverters[symbol] = updatedConverters[symbol];
+      let { symbolsToUpdate } = this;
+      let updatedConverters = yield all([
+        this.layer1Network.updateUsdConverters(
+          symbolsToUpdate.filter((s) => !isBridgedTokenSymbol(s))
+        ),
+        this.layer2Network.updateUsdConverters(
+          symbolsToUpdate.filter(isBridgedTokenSymbol)
+        ),
+      ]);
+      updatedConverters = Object.assign({}, ...updatedConverters);
+      for (let symbol of USD_CONVERTIBLE_SYMBOLS) {
+        this.usdConverters[symbol as UsdConvertibleSymbol] =
+          updatedConverters[symbol];
       }
       yield rawTimeout(INTERVAL); // rawTimeout used to avoid hanging tests
     }
@@ -50,9 +63,9 @@ export default class TokenToUsd extends Service {
   /* Inspects registered helper instances to determine which symbols
      should be updated. Ignores cases where the amount is zero.
    */
-  get symbolsToUpdate(): ConvertibleSymbol[] {
-    let unfoundSymbols: ConvertibleSymbol[] = Array.from(convertibleSymbols);
-    let res: ConvertibleSymbol[] = [];
+  get symbolsToUpdate(): UsdConvertibleSymbol[] {
+    let unfoundSymbols = [...USD_CONVERTIBLE_SYMBOLS];
+    let res: UsdConvertibleSymbol[] = [];
     for (let helper of this.#registeredHelpers.values()) {
       if (
         helper.symbol &&
@@ -75,12 +88,11 @@ export default class TokenToUsd extends Service {
     return this.#registeredHelpers.size > 0;
   }
 
-  toUsdFrom(symbol: ConvertibleSymbol, amount: BN): string | undefined {
+  toUsdFrom(symbol: UsdConvertibleSymbol, amount: BN): number | undefined {
     if (amount.isZero()) {
-      return '0.00';
+      return 0;
     }
-
-    return this.usdConverters[symbol]?.(amount.toString()).toFixed(2);
+    return this.usdConverters[symbol]?.(amount.toString());
   }
 
   // safe to call multiple times -- calls to the `pollTask` are

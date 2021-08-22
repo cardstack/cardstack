@@ -27,6 +27,14 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
     assert.dom(WALLET_SELECTION_SELECTOR).isVisible();
   });
 
+  test('It should show card summary if card is completed and user disconnects the wallet', async function (assert) {
+    await render(hbs`
+        <CardPay::LayerOneConnectCard @isComplete={{true}}/>
+      `);
+
+    assert.dom('[data-test-layer-1-wallet-summary]').exists();
+  });
+
   test("It should render the wallet provider's name if it is connected before rendering", async function (assert) {
     let layer1Service = this.owner.lookup('service:layer1-network')
       .strategy as Layer1TestWeb3Strategy;

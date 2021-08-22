@@ -22,6 +22,7 @@
     "./packages/cardpay-subgraph/**/*.ts",
     "./packages/did-resolver/**/*.ts",
     "./packages/eslint-config/**/*.ts",
+    "./packages/firebase-functions/**/*.ts",
     "./packages/hub/**/*.ts",
     "./packages/test-support/**/*.ts",
     "./scripts/**/*.js",

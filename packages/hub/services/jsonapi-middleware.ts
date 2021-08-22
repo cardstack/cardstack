@@ -12,7 +12,9 @@ import SessionRoute from '../routes/session';
 import PrepaidCardColorSchemesRoute from '../routes/prepaid-card-color-schemes';
 import PrepaidCardPatternsRoute from '../routes/prepaid-card-patterns';
 import PrepaidCardCustomizationsRoute from '../routes/prepaid-card-customizations';
+import MerchantInfosRoute from '../routes/merchant-infos';
 import { inject } from '../di/dependency-injection';
+import CustodialWalletRoute from '../routes/custodial-wallet';
 
 const API_PREFIX = '/api';
 const apiPrefixPattern = new RegExp(`^${API_PREFIX}/(.*)`);
@@ -29,6 +31,10 @@ export default class JSONAPIMiddleware {
   prepaidCardCustomizationsRoute: PrepaidCardCustomizationsRoute = inject('prepaid-card-customizations-route', {
     as: 'prepaidCardCustomizationsRoute',
   });
+  merchantInfosRoute: MerchantInfosRoute = inject('merchant-infos-route', {
+    as: 'merchantInfosRoute',
+  });
+  custodialWalletRoute: CustodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
   middleware() {
     return (ctxt: Koa.ParameterizedContext<SessionContext, Record<string, unknown>>, next: Koa.Next) => {
       let m = apiPrefixPattern.exec(ctxt.request.path);
@@ -62,6 +68,8 @@ export default class JSONAPIMiddleware {
       prepaidCardColorSchemesRoute,
       prepaidCardPatternsRoute,
       prepaidCardCustomizationsRoute,
+      merchantInfosRoute,
+      custodialWalletRoute,
       sessionRoute,
     } = this;
 
@@ -74,6 +82,8 @@ export default class JSONAPIMiddleware {
       route.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get),
       route.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get),
       route.post('/prepaid-card-customizations', prepaidCardCustomizationsRoute.post),
+      route.post('/merchant-infos', merchantInfosRoute.post),
+      route.get('/custodial-wallet', custodialWalletRoute.get),
       route.all('/(.*)', notFound),
     ]);
   }
