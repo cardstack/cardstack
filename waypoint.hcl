@@ -77,3 +77,33 @@ app "hub-worker" {
         }
     }
 }
+
+app "cardie" {
+    path = "./packages/cardie"
+
+    build {
+        use "pack" {
+            process_type = "worker"
+        }
+
+        registry {
+            use "aws-ecr" {
+                region     = "us-east-1"
+                repository = "cardie"
+                tag        = "latest"
+            }
+        }
+    }
+
+    deploy {
+        use "aws-ecs" {
+            region = "us-east-1"
+            memory = "512"
+            count = 1
+            cluster = "default"
+            subnets = ["subnet-89968ba2"]
+            task_role_name = "cardie-ecr-task"
+            disable_alb = true
+        }
+    }
+}
