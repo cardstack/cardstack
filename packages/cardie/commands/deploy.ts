@@ -20,7 +20,7 @@ const init = () => {
 const auth = async (message: Message): Promise<boolean> => {
   const allowedChannels: string[] = config.deploy.allowedChannels;
   if (allowedChannels.length > 0 && !allowedChannels.includes(message.channel.id)) {
-    console.error(`Unauthoirzed channel: ${message.channel.id}`);
+    console.error(`Unauthorized channel: ${message.channel.id}`);
     await message.reply("Command 'deploy' is disallowed in this channel");
     return false;
   }
@@ -30,7 +30,7 @@ const auth = async (message: Message): Promise<boolean> => {
     allowedRoles.length > 0 &&
     !message.member?.roles.cache.find((role) => allowedRoles.includes(role.name.toLowerCase()))
   ) {
-    console.error(`Unauthoirzed user: ${message.author.username}`);
+    console.error(`Unauthorized user: ${message.author.username}`);
     await message.reply(`you do not have any authorized roles to run command 'deploy'`);
     return false;
   }
