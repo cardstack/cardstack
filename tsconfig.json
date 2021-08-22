@@ -16,14 +16,15 @@
     "skipLibCheck": true
   },
   "include": [
+    "./packages/cardie/**/*.ts",
+    "./packages/cardpay-cli/**/*.ts",
+    "./packages/cardpay-sdk/**/*.ts",
+    "./packages/cardpay-subgraph/**/*.ts",
     "./packages/did-resolver/**/*.ts",
     "./packages/eslint-config/**/*.ts",
+    "./packages/firebase-functions/**/*.ts",
     "./packages/hub/**/*.ts",
     "./packages/test-support/**/*.ts",
-    "./packages/cardpay-sdk/**/*.ts",
-    "./packages/cardpay-cli/**/*.ts",
-    "./packages/cardpay-subgraph/**/*.ts",
-    "./packages/firebase-functions/**/*.ts",
     "./scripts/**/*.js",
     "./cards/**/*.ts",
     "**/.eslintrc.ts"
