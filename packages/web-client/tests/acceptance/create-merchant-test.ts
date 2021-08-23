@@ -142,7 +142,7 @@ module('Acceptance | create merchant', function (hooks) {
     );
     await fillIn(
       `[data-test-merchant-customization-merchant-id-field] input`,
-      'a-valid-id'
+      'abc123'
     );
     await waitUntil(
       () =>
