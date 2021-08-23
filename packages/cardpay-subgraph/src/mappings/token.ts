@@ -1,8 +1,8 @@
 import { Address, BigInt } from '@graphprotocol/graph-ts';
 import { makeToken, makeEOATransaction, makeEOATransactionForSafe, toChecksumAddress } from '../utils';
-import { ERC20, Transfer as TransferEvent } from '../../generated/Token/ERC20';
 import { Safe, Account, TokenTransfer, TokenHolder, TokenHistory } from '../../generated/schema';
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit';
+import { Transfer as TransferEvent, ERC20 } from '../erc-20/ERC20';
 
 export function handleTransfer(event: TransferEvent): void {
   let tokenAddress = makeToken(event.address);

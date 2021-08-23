@@ -40,7 +40,7 @@
         class={{cn "prepaid-card__usd-balance" prepaid-card__usd-balance--mock=@mockBalance}}
         data-test-prepaid-card-usd-balance
       >
-        ${{@usdBalance}} USD
+        {{format-usd @usdBalance}}
       </div>
     </div>
     <div class="prepaid-card__content-rs">

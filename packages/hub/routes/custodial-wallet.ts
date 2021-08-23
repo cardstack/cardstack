@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import { inject } from '../di/dependency-injection';
-import Wyre from '../services/wyre';
+import WyreService from '../services/wyre';
 import { AuthenticationUtils } from '../utils/authentication';
 import { ensureLoggedIn } from './utils/auth';
 import Web3 from 'web3';
@@ -9,7 +9,7 @@ import Web3 from 'web3';
 const { toChecksumAddress } = Web3.utils;
 export default class CustodialWalletRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
-  wyre: Wyre = inject('wyre');
+  wyre: WyreService = inject('wyre');
 
   constructor() {
     autoBind(this);
@@ -22,7 +22,7 @@ export default class CustodialWalletRoute {
 
     let userAddress = ctx.state.userAddress;
     let depositAddress: string, wyreWalletId: string;
-    let existingWallet = await this.wyre.getCustodialWalletByUserAddress(userAddress);
+    let existingWallet = await this.wyre.getWalletByUserAddress(userAddress);
     if (existingWallet) {
       ({
         depositAddresses: { ETH: depositAddress },
@@ -33,16 +33,18 @@ export default class CustodialWalletRoute {
       ({
         depositAddresses: { ETH: depositAddress },
         id: wyreWalletId,
-      } = await this.wyre.createCustodialWallet(userAddress));
+      } = await this.wyre.createWallet(userAddress));
     }
 
     // From the outside we use checksum addresses since the relay server prefers
     // those, but when talking to wyre we use lowercase addresses
+    let checksumUserAddress = toChecksumAddress(userAddress);
     let data = {
-      id: toChecksumAddress(userAddress),
+      id: checksumUserAddress,
       type: 'custodial-wallets',
       attributes: {
         'wyre-wallet-id': wyreWalletId,
+        'user-address': checksumUserAddress,
         'deposit-address': toChecksumAddress(depositAddress),
       },
     };

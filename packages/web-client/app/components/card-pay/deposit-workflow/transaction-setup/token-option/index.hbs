@@ -25,7 +25,7 @@
     </div>
     <div class="token-option__usd-balance" data-test-usd-balance={{@token.symbol}}>
       {{#if @balanceInUsd}}
-        ${{@balanceInUsd}} USD
+        {{format-usd @balanceInUsd}}
       {{else}}
         <Boxel::LoadingIndicator class="token-option__loading-indicator"/>
       {{/if}}

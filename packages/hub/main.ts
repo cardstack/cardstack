@@ -22,19 +22,22 @@ import PrepaidCardPatternSerializer from './services/serializers/prepaid-card-pa
 import PrepaidCardPatternsRoute from './routes/prepaid-card-patterns';
 import PrepaidCardCustomizationSerializer from './services/serializers/prepaid-card-customization-serializer';
 import PrepaidCardCustomizationsRoute from './routes/prepaid-card-customizations';
+import PrepaidCardInventory from './services/prepaid-card-inventory';
 import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
 import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
 import MerchantInfosRoute from './routes/merchant-infos';
+import CustodialWalletRoute from './routes/custodial-wallet';
+import WyreCallbackRoute from './routes/wyre-callback';
 import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import MerchantInfoQueries from './services/queries/merchant-info';
 import { AuthenticationUtils } from './utils/authentication';
 import JsonapiMiddleware from './services/jsonapi-middleware';
+import CallbacksMiddleware from './services/callbacks-middleware';
 import NonceTracker from './services/nonce-tracker';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
-import CustodialWalletRoute from './routes/custodial-wallet';
 
 const log = logger('cardstack/hub');
 
@@ -48,6 +51,7 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('development-config', DevelopmentConfig);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
   registry.register('jsonapi-middleware', JsonapiMiddleware);
+  registry.register('callbacks-middleware', CallbacksMiddleware);
   registry.register('nonce-tracker', NonceTracker);
   registry.register('boom-route', BoomRoute);
   registry.register('session-route', SessionRoute);
@@ -59,11 +63,13 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('prepaid-card-color-scheme-serializer', PrepaidCardColorSchemeSerializer);
   registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
   registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
+  registry.register('prepaid-card-inventory', PrepaidCardInventory);
   registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info-queries', MerchantInfoQueries);
   registry.register('worker-client', WorkerClient);
   registry.register('wyre', WyreService);
+  registry.register('wyre-callback-route', WyreCallbackRoute);
   if (registryCallback) {
     registryCallback(registry);
   }
@@ -86,6 +92,7 @@ export async function makeServer(registryCallback?: RegistryCallback, containerC
   app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
   app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
   app.use(((await container.lookup('jsonapi-middleware')) as JsonapiMiddleware).middleware());
+  app.use(((await container.lookup('callbacks-middleware')) as CallbacksMiddleware).middleware());
 
   app.use(async (ctx: Koa.Context, _next: Koa.Next) => {
     ctx.body = 'Hello World ' + ctx.environment + '... ' + ctx.host.split(':')[0];

@@ -313,7 +313,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert
       .dom('[data-test-face-value-option="50000"]')
       .containsText('50000 SPEND');
-    assert.dom('[data-test-face-value-option="50000"]').containsText('500 USD');
+    assert
+      .dom('[data-test-face-value-option="50000"]')
+      .containsText('$500 USD');
     assert
       .dom('[data-test-face-value-option="50000"]')
       .containsText('≈ 500 DAI.CPXD');
@@ -348,7 +350,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     );
 
     assert.dom('[data-test-face-value-display]').containsText('10000 SPEND');
-    assert.dom('[data-test-face-value-display]').containsText('100 USD');
+    assert.dom('[data-test-face-value-display]').containsText('$100.00 USD');
     assert.dom('[data-test-face-value-display]').containsText('≈ 100 DAI.CPXD');
 
     await waitFor(milestoneCompletedSel(2));
@@ -374,7 +376,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         `${postableSel(3, 1)} [data-test-prepaid-card-face-value-labeled-value]`
       )
       .containsText('10000 SPEND')
-      .containsText('100 USD');
+      .containsText('$100.00 USD');
 
     assert
       .dom(`${postableSel(3, 1)} [data-test-prepaid-card-balance]`)

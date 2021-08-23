@@ -32,12 +32,6 @@ type PrepaidCard @entity {
   issuer: Account!
   owner: Account!
   reloadable: Boolean!
-  spendBalance: BigInt!
-  # the faceValue and spendBalance are subtly different. The faceValue
-  # represents the most conservative representation of the SPEND that is
-  # available on a prepaid card given the rate drift percentage (because a rate
-  # lock must be obtained to use a prepaid card). This will be very close to the
-  # spendBalance but may not be exactly the same.
   faceValue: BigInt!
   issuingTokenBalance: BigInt!
   creation: PrepaidCardCreation                    @derivedFrom(field: "prepaidCard")
@@ -99,7 +93,8 @@ type PrepaidCardPayment @entity {
   issuingToken: Token!
   issuingTokenAmount: BigInt!
   spendAmount: BigInt!
-  historicPrepaidCardSpendBalance: BigInt!
+  issuingTokenUSDPrice: BigDecimal!
+  historicPrepaidCardFaceValue: BigInt!
   historicPrepaidCardIssuingTokenBalance: BigInt!
   merchantRegistrationPayments: [MerchantRegistrationPayment]! @derivedFrom(field: "prepaidCardPayment")
 }
@@ -131,6 +126,15 @@ type MerchantRevenue @entity {
   lifetimeAccumulation: BigInt!
   unclaimedBalance: BigInt!
   revenueEvents: [MerchantRevenueEvent]! @derivedFrom(field: "merchantRevenue")
+  earningsByDay: [RevenueEarningsByDay]! @derivedFrom(field: "merchantRevenue")
+}
+
+type RevenueEarningsByDay @entity {
+  id: ID!
+  date: String!
+  merchantRevenue: MerchantRevenue!
+  spendAccumulation: BigInt!
+  issuingTokenAccumulation: BigInt!
 }
 
 type MerchantClaim @entity {

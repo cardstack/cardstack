@@ -23,4 +23,10 @@ module('Integration | Helper | first-char', function (hooks) {
     await render(hbs`{{first-char this.val}}`);
     assert.equal(this.element.textContent?.trim(), '');
   });
+
+  test('it can return the first character which consists of more than one code unit', async function (assert) {
+    this.set('val', '😱 what???');
+    await render(hbs`{{first-char this.val}}`);
+    assert.equal(this.element.textContent?.trim(), '😱');
+  });
 });

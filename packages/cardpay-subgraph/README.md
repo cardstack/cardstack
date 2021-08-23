@@ -29,11 +29,11 @@ In order to develop a subgraph locally you need to run a local graph node. Instr
     ```
 5. The very first time you start a graph node you'll need to create your subgraph. Back in the `@cardstack/cardpay-subgraph` package execute the following:
     ```
-    yarn create-local-sokol
+    yarn create-local
     ```
 6. You can then deploy and re-index to test out your subgraph locally (then can be done as you update your subgraph in order to see your changes locally as well):
     ```
-    yarn deploy-local-sokol
+    yarn deploy-local
     ```
     The URL to try out your subgraph locally will be displayed after running this command.
 

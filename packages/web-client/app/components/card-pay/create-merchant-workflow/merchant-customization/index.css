@@ -15,10 +15,14 @@
   align-items: center;
 }
 
-.merchant-customization__color-preview {
+.merchant-customization__color-preview,
+.merchant-customization__color-input {
   width: 1.5rem;
   height: 1.5rem;
   margin-right: var(--boxel-sp-xxs);
   border-radius: 3px;
+}
+
+.merchant-customization__color-preview {
   background-color: var(--merchant-custom-color);
 }

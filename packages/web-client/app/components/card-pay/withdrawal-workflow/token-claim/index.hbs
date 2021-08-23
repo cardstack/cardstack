@@ -14,7 +14,7 @@
         @icon={{this.tokenDetails.icon}}
         @balance={{format-token-amount this.withdrawalAmount}}
         @symbol={{this.tokenSymbol}}
-        @text={{concat "$" (token-to-usd this.tokenSymbolForConversion this.withdrawalAmount) " USD*"}}
+        @text={{concat (format-usd (token-to-usd this.tokenSymbolForConversion this.withdrawalAmount)) "*"}}
         data-test-withdrawal-token-claim-amount
       />
     </div>
@@ -40,7 +40,11 @@
       <i.ActionStatusArea class="token-claim__in-progress" @icon={{this.walletProvider.iconName}} style={{css-var status-icon-size="2.5rem"}}>
         <Boxel::LoadingIndicator @color="var(--boxel-light)" />
         <div class="token-claim__in-progress-message">
-          Waiting for you to confirm on {{this.walletProvider.name}}...
+          {{#if this.txViewerUrl}}
+            Waiting for transaction to be confirmed on {{network-display-info "layer1" "conversationalName"}}...
+          {{else}}
+            Waiting for you to confirm on {{this.walletProvider.name}}...
+          {{/if}}
         </div>
       </i.ActionStatusArea>
       {{#if this.txViewerUrl}}

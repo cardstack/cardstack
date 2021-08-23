@@ -1,8 +1,8 @@
-import { crypto, Address, ByteArray, ethereum, BigInt } from '@graphprotocol/graph-ts';
+import { crypto, Address, ByteArray, ethereum, BigInt, BigDecimal } from '@graphprotocol/graph-ts';
 import { log } from '@graphprotocol/graph-ts';
-import { ERC20 } from '../generated/Token/ERC20';
-import { ERC20SymbolBytes } from '../generated/Token/ERC20SymbolBytes';
-import { ERC20NameBytes } from '../generated/Token/ERC20NameBytes';
+import { ERC20 } from './erc-20/ERC20';
+import { ERC20SymbolBytes } from './erc-20/ERC20SymbolBytes';
+import { ERC20NameBytes } from './erc-20/ERC20NameBytes';
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit';
 import { PrepaidCardManager } from '../generated/PrepaidCard/PrepaidCardManager';
 import { Exchange } from '../generated/PrepaidCard/Exchange';
@@ -12,6 +12,7 @@ import {
   MerchantRevenue,
   PrepaidCard,
   PrepaidCardPayment,
+  RevenueEarningsByDay,
   Token,
   Safe,
   Account,
@@ -20,6 +21,7 @@ import {
 import { GnosisSafe } from '../generated/Gnosis/GnosisSafe';
 import { StaticToken } from './static-tokens';
 import { addresses } from './generated/addresses';
+import { dayMonthYearFromEventTimestamp } from './dates';
 
 export let protocolVersions = new Map<string, i32>();
 
@@ -89,15 +91,11 @@ export function makePrepaidCardPayment(
   let txnHash = event.transaction.hash.toHex();
   let timestamp = event.block.timestamp;
   let prepaidCardEntity = PrepaidCard.load(prepaidCard);
-  if (spendAmount == null) {
-    spendAmount = convertToSpend(Address.fromString(issuingToken), issuingTokenAmount);
-  }
+  let faceValue = getPrepaidCardFaceValue(prepaidCard);
   if (prepaidCardEntity != null) {
-    prepaidCardEntity.faceValue = getPrepaidCardFaceValue(prepaidCard);
-    // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
-    prepaidCardEntity.spendBalance = prepaidCardEntity.spendBalance - (spendAmount as BigInt);
-    // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
-    prepaidCardEntity.issuingTokenBalance = prepaidCardEntity.issuingTokenBalance - issuingTokenAmount;
+    let token = ERC20.bind(Address.fromString(issuingToken));
+    prepaidCardEntity.faceValue = faceValue;
+    prepaidCardEntity.issuingTokenBalance = token.balanceOf(Address.fromString(prepaidCard));
     prepaidCardEntity.save();
   } else {
     log.warning(
@@ -127,32 +125,47 @@ export function makePrepaidCardPayment(
       return;
     }
   }
+  if (spendAmount == null) {
+    spendAmount = convertToSpend(Address.fromString(issuingToken), issuingTokenAmount);
+  }
   paymentEntity.issuingToken = issuingToken;
   paymentEntity.issuingTokenAmount = issuingTokenAmount;
+  paymentEntity.issuingTokenUSDPrice = usdExchangeRate(Address.fromString(issuingToken));
   paymentEntity.spendAmount = spendAmount as BigInt;
   paymentEntity.historicPrepaidCardIssuingTokenBalance = prepaidCardEntity.issuingTokenBalance;
-  paymentEntity.historicPrepaidCardSpendBalance = prepaidCardEntity.spendBalance;
+  paymentEntity.historicPrepaidCardFaceValue = faceValue;
   paymentEntity.save();
+
+  if (merchantSafe != null) {
+    let revenueEntity = makeMerchantRevenue(merchantSafe, issuingToken);
+
+    let date = dayMonthYearFromEventTimestamp(event);
+    let dateStr = date.year.toString() + '-' + date.month.toString() + '-' + date.day.toString();
+    let earningsByDayId = merchantSafe + issuingToken + dateStr;
+    let earningsByDayEntity = RevenueEarningsByDay.load(earningsByDayId);
+    if (earningsByDayEntity == null) {
+      earningsByDayEntity = new RevenueEarningsByDay(earningsByDayId);
+      earningsByDayEntity.date = dateStr;
+      earningsByDayEntity.merchantRevenue = revenueEntity.id;
+      earningsByDayEntity.spendAccumulation = new BigInt(0);
+      earningsByDayEntity.issuingTokenAccumulation = new BigInt(0);
+    }
+    // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
+    earningsByDayEntity.spendAccumulation = earningsByDayEntity.spendAccumulation + (spendAmount as BigInt);
+    // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
+    earningsByDayEntity.issuingTokenAccumulation = earningsByDayEntity.issuingTokenAccumulation + issuingTokenAmount;
+    earningsByDayEntity.save();
+  }
 }
 
 export function getPrepaidCardFaceValue(prepaidCard: string): BigInt {
   let prepaidCardMgr = PrepaidCardManager.bind(Address.fromString(addresses.get('prepaidCardManager') as string));
-  let protocolVersion = prepaidCardMgr.cardpayVersion();
-
-  // the 'faceValue' function was introduced in 0.6.3, if we are talking to a
-  // contract before that then just get the face value using the current USD
-  // rate.
-  if (compareSemver(protocolVersion, '0.6.3') < 0) {
-    let cardDetails = prepaidCardMgr.cardDetails(Address.fromString(prepaidCard));
-    let issuingToken = cardDetails.value1;
-    let tokenContract = ERC20.bind(issuingToken);
-    let issuingTokenBalance = tokenContract.balanceOf(Address.fromString(prepaidCard));
-    let faceValue = convertToSpend(issuingToken, issuingTokenBalance);
-    return faceValue;
-  } else {
-    let faceValue = prepaidCardMgr.faceValue(Address.fromString(prepaidCard));
-    return faceValue;
-  }
+  let cardDetails = prepaidCardMgr.cardDetails(Address.fromString(prepaidCard));
+  let issuingToken = cardDetails.value1;
+  let tokenContract = ERC20.bind(issuingToken);
+  let issuingTokenBalance = tokenContract.balanceOf(Address.fromString(prepaidCard));
+  let faceValue = convertToSpend(issuingToken, issuingTokenBalance);
+  return faceValue;
 }
 
 export function toChecksumAddress(address: Address): string {
@@ -178,11 +191,23 @@ export function toHex(bytes: string): string {
   return '0x' + bytes;
 }
 
+function usdExchangeRate(issuingToken: Address): BigDecimal {
+  let exchange = getExchange();
+  let exchangeInfo = exchange.exchangeRateOf(issuingToken);
+  let rawRate = BigDecimal.fromString(exchangeInfo.value0.toString());
+  // @ts-ignore this is legit AssemblyScript that tsc doesn't understand
+  return rawRate / BigDecimal.fromString('100000000');
+}
+
 function convertToSpend(issuingToken: Address, issuingTokenAmount: BigInt): BigInt {
+  let exchange = getExchange();
+  return exchange.convertToSpend(issuingToken, issuingTokenAmount);
+}
+
+function getExchange(): Exchange {
   let prepaidCardMgr = PrepaidCardManager.bind(Address.fromString(addresses.get('prepaidCardManager') as string));
   let exchangeAddress = prepaidCardMgr.exchangeAddress();
-  let exchange = Exchange.bind(exchangeAddress);
-  return exchange.convertToSpend(issuingToken, issuingTokenAmount);
+  return Exchange.bind(exchangeAddress);
 }
 
 function toUpper(str: string): string {
@@ -267,14 +292,10 @@ export function fetchTokenDecimals(tokenAddress: Address): BigInt {
   return BigInt.fromI32(decimalValue as i32);
 }
 
-function isNullEthValue(value: string): boolean {
-  return value == ZERO_ADDRESS;
-}
-
 // Return 1 if a > b
 // Return -1 if a < b
 // Return 0 if a == b
-function compareSemver(a: string, b: string): i32 {
+export function compareSemver(a: string, b: string): i32 {
   if (a === b) {
     return 0;
   }
@@ -300,4 +321,8 @@ function compareSemver(a: string, b: string): i32 {
   }
   // Otherwise they are the same.
   return 0;
+}
+
+function isNullEthValue(value: string): boolean {
+  return value == ZERO_ADDRESS;
 }
