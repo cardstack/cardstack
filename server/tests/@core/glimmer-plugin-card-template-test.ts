@@ -26,7 +26,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
   hooks.before(async function () {
     builder = new TestBuilder();
     builder.addRawCard({
-      url: 'https://mirage/card/list',
+      url: 'https://carstack.local/card/list',
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -46,7 +46,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       },
     });
     compiledListCard = await builder.getCompiledCard(
-      'https://mirage/card/list'
+      'https://carstack.local/card/list'
     );
     compiledStringCard = await builder.getCompiledCard(
       'https://cardstack.com/base/string'
@@ -369,7 +369,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
 
   QUnit.test('Tracking deeply nested field usage', async function () {
     builder.addRawCard({
-      url: 'http://mirage/cards/post',
+      url: 'http://carstack.local/cards/post',
       schema: 'schema.js',
       isolated: 'isolated.js',
       files: {
@@ -396,7 +396,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
     let template = `{{#each @fields.posts as |Post|}}<Post />{{/each}}`;
     builder.addRawCard({
-      url: 'http://mirage/cards/post-list',
+      url: 'http://carstack.local/cards/post-list',
       schema: 'schema.js',
       isolated: 'isolated.js',
       data: {
@@ -410,7 +410,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       files: {
         'schema.js': `
         import { containsMany } from "@cardstack/types";
-        import post from "http://mirage/cards/post";
+        import post from "http://carstack.local/cards/post";
 
         export default class Hello {
           @containsMany(post)
@@ -421,7 +421,9 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       },
     });
 
-    let card = await builder.getCompiledCard('http://mirage/cards/post-list');
+    let card = await builder.getCompiledCard(
+      'http://carstack.local/cards/post-list'
+    );
     transform(template, {
       fields: card.fields,
       usageMeta,

@@ -7,7 +7,7 @@ import { baseCardURL } from '@cardstack/core/src/compiler';
 const { module: Qmodule, test } = QUnit;
 
 const PERSON_CARD = {
-  url: 'https://mirage/cards/person',
+  url: 'https://carstack.local/cards/person',
   schema: 'schema.js',
   embedded: 'embedded.js',
   files: {
@@ -55,7 +55,7 @@ Qmodule('Compiler', function (hooks) {
 
   test('deserializer is inherited', async function (assert) {
     builder.addRawCard({
-      url: 'https://mirage/cards/fancy-date',
+      url: 'https://carstack.local/cards/fancy-date',
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -65,7 +65,7 @@ Qmodule('Compiler', function (hooks) {
       },
     });
     let compiled = await builder.getCompiledCard(
-      'https://mirage/cards/fancy-date'
+      'https://carstack.local/cards/fancy-date'
     );
     assert.equal(
       compiled.serializer,
@@ -90,7 +90,9 @@ Qmodule('Compiler', function (hooks) {
     );
 
     containsSource(
-      builder.definedModules.get('https://mirage/cards/person/embedded.css'),
+      builder.definedModules.get(
+        'https://carstack.local/cards/person/embedded.css'
+      ),
       PERSON_CARD.files['embedded.css'],
       'Styles are defined'
     );
@@ -116,7 +118,7 @@ Qmodule('Compiler', function (hooks) {
   test('nested cards', async function (assert) {
     builder.addRawCard(PERSON_CARD);
     builder.addRawCard({
-      url: 'https://mirage/cards/post',
+      url: 'https://carstack.local/cards/post',
       schema: 'schema.js',
       embedded: 'embedded.js',
       isolated: 'isolated.js',
@@ -141,7 +143,9 @@ Qmodule('Compiler', function (hooks) {
       },
     });
 
-    let compiled = await builder.getCompiledCard('https://mirage/cards/post');
+    let compiled = await builder.getCompiledCard(
+      'https://carstack.local/cards/post'
+    );
     assert.deepEqual(Object.keys(compiled.fields), ['title', 'author']);
 
     assert.deepEqual(compiled.embedded.usedFields, [
@@ -160,7 +164,7 @@ Qmodule('Compiler', function (hooks) {
 
   test('deeply nested cards', async function (assert) {
     builder.addRawCard({
-      url: 'http://mirage/cards/post',
+      url: 'http://carstack.local/cards/post',
       schema: 'schema.js',
       isolated: 'isolated.js',
       embedded: 'embedded.js',
@@ -190,7 +194,7 @@ Qmodule('Compiler', function (hooks) {
       },
     });
     builder.addRawCard({
-      url: 'http://mirage/cards/post-list',
+      url: 'http://carstack.local/cards/post-list',
       schema: 'schema.js',
       isolated: 'isolated.js',
       embedded: 'embedded.js',
@@ -205,7 +209,7 @@ Qmodule('Compiler', function (hooks) {
       files: {
         'schema.js': `
         import { containsMany } from "@cardstack/types";
-        import post from "http://mirage/cards/post";
+        import post from "http://carstack.local/cards/post";
 
         export default class Hello {
           @containsMany(post)
@@ -222,7 +226,7 @@ Qmodule('Compiler', function (hooks) {
     });
 
     let compiled = await builder.getCompiledCard(
-      'http://mirage/cards/post-list'
+      'http://carstack.local/cards/post-list'
     );
     assert.deepEqual(Object.keys(compiled.fields), ['posts']);
 
@@ -248,7 +252,7 @@ Qmodule('Compiler', function (hooks) {
 
   Qmodule('@fields iterating', function (hooks) {
     let postCard = {
-      url: 'https://mirage/cards/post',
+      url: 'https://carstack.local/cards/post',
       schema: 'schema.js',
       embedded: 'embedded.js',
       files: {
@@ -270,7 +274,9 @@ Qmodule('Compiler', function (hooks) {
     });
 
     test('iterators of fields and inlines templates', async function () {
-      let compiled = await builder.getCompiledCard('https://mirage/cards/post');
+      let compiled = await builder.getCompiledCard(
+        'https://carstack.local/cards/post'
+      );
       containsSource(
         builder.definedModules.get(compiled.embedded.moduleName),
         '<article><label>{{\\"title\\"}}</label></article>'
@@ -279,7 +285,7 @@ Qmodule('Compiler', function (hooks) {
 
     test('recompiled parent field iterator', async function () {
       let fancyPostCard = {
-        url: 'https://mirage/cards/fancy-post',
+        url: 'https://carstack.local/cards/fancy-post',
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -293,7 +299,7 @@ Qmodule('Compiler', function (hooks) {
         },
       };
       let timelyPostCard = {
-        url: 'https://mirage/cards/timely-post',
+        url: 'https://carstack.local/cards/timely-post',
         schema: 'schema.js',
         files: {
           'schema.js': `
