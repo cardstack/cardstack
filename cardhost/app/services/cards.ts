@@ -1,7 +1,4 @@
 import Service from '@ember/service';
-import { macroCondition, isTesting } from '@embroider/macros';
-import { task } from 'ember-concurrency';
-import { taskFor } from 'ember-concurrency-ts';
 
 import {
   Format,
@@ -10,7 +7,6 @@ import {
   CardOperation,
 } from '@cardstack/core/src/interfaces';
 import CardModel from '@cardstack/core/src/card-model';
-import type { NewCardParams } from '@cardstack/core/src/card-model';
 import config from 'cardhost/config/environment';
 
 // @ts-ignore @ember/component doesn't declare setComponentTemplate...yet!
@@ -18,41 +14,44 @@ import { setComponentTemplate } from '@ember/component';
 import Component from '@glimmer/component';
 import { hbs } from 'ember-cli-htmlbars';
 import { tracked } from '@glimmer/tracking';
+import type Builder from 'cardhost/lib/builder';
+import { fetchJSON } from 'cardhost/lib/jsonapi-fetch';
+import { LOCAL_REALM } from 'cardhost/lib/builder';
 
 const { cardServer } = config as any; // Environment types arent working
 
-// the methods our service makes available for CardModel's exclusive use
 export default class Cards extends Service {
+  private localRealmURL = LOCAL_REALM;
+  overrideRoutingCardWith: string | undefined;
+
   async load(url: string, format: Format): Promise<CardModel> {
-    let fullURL = this.buildCardURL(url, format);
-    let loaded = await taskFor(this.internalLoad).perform(fullURL);
-    return loaded.ModelClass.fromResponse(
-      this.cardEnv(),
-      loaded.cardResponse,
-      loaded.component
-    );
+    let cardResponse: CardJSONResponse;
+    if (this.inLocalRealm(url)) {
+      let builder = await this.builder();
+      cardResponse = await builder.load(url, format);
+    } else {
+      cardResponse = await fetchJSON<CardJSONResponse>(
+        this.buildCardURL(url, format)
+      );
+    }
+    let { component, Model } = await this.codeForCard(cardResponse);
+    return Model.fromResponse(this.cardEnv(), cardResponse, component);
   }
 
   async loadForRoute(pathname: string): Promise<CardModel> {
-    let loaded = await taskFor(this.internalLoad).perform(
-      `${cardServer}cardFor${pathname}`
-    );
-    return loaded.ModelClass.fromResponse(
-      this.cardEnv(),
-      loaded.cardResponse,
-      loaded.component
-    );
+    if (this.overrideRoutingCardWith) {
+      let builder = await this.builder();
+      return await builder.loadForRoute(this.overrideRoutingCardWith, pathname);
+    } else {
+      let url = `${cardServer}cardFor${pathname}`;
+      let cardResponse = await fetchJSON<CardJSONResponse>(url);
+      let { component, Model } = await this.codeForCard(cardResponse);
+      return Model.fromResponse(this.cardEnv(), cardResponse, component);
+    }
   }
 
-  async createNew(params: NewCardParams): Promise<CardModel> {
-    let parent = await this.load(params.parentCardURL, 'edit');
-    return parent.adoptIntoRealm(params.realm);
-  }
-
-  @task private async internalLoad(url: string) {
-    let cardResponse = await this.fetchJSON(url);
-    let { component, ModelClass } = await loadCode(cardResponse, url);
-    return { cardResponse, component, ModelClass };
+  private inLocalRealm(cardURL: string): boolean {
+    return cardURL.startsWith(this.localRealmURL);
   }
 
   private cardEnv(): CardEnv {
@@ -64,9 +63,36 @@ export default class Cards extends Service {
     };
   }
 
+  private _builderPromise: Promise<Builder> | undefined;
+
+  async builder(): Promise<Builder> {
+    if (this._builderPromise) {
+      return this._builderPromise;
+    }
+    let resolve: any, reject: any;
+    this._builderPromise = new Promise((r, e) => {
+      resolve = r;
+      reject = e;
+    });
+    try {
+      let { default: Builder } = await import('../lib/builder');
+      let builder = new Builder(this.localRealmURL, this);
+      resolve(builder);
+      return builder;
+    } catch (err) {
+      reject(err);
+      throw err;
+    }
+  }
+
   private async send(op: CardOperation): Promise<CardJSONResponse> {
+    if (this.operationIsLocal(op)) {
+      let builder = await this.builder();
+      return await builder.send(op);
+    }
+
     if ('create' in op) {
-      return await this.fetchJSON(
+      return await fetchJSON<CardJSONResponse>(
         this.buildNewURL(op.create.targetRealm, op.create.parentCardURL),
         {
           method: 'POST',
@@ -74,12 +100,25 @@ export default class Cards extends Service {
         }
       );
     } else if ('update' in op) {
-      return await this.fetchJSON(this.buildCardURL(op.update.cardURL), {
-        method: 'PATCH',
-        body: JSON.stringify(op.update.payload),
-      });
+      return await fetchJSON<CardJSONResponse>(
+        this.buildCardURL(op.update.cardURL),
+        {
+          method: 'PATCH',
+          body: JSON.stringify(op.update.payload),
+        }
+      );
     } else {
-      throw new Error(`unsupported card operation ${JSON.stringify(op)}`);
+      throw assertNever(op);
+    }
+  }
+
+  private operationIsLocal(op: CardOperation): boolean {
+    if ('create' in op) {
+      return this.inLocalRealm(op.create.targetRealm);
+    } else if ('update' in op) {
+      return this.inLocalRealm(op.update.cardURL);
+    } else {
+      throw assertNever(op);
     }
   }
 
@@ -100,28 +139,6 @@ export default class Cards extends Service {
     return fullURL.join('');
   }
 
-  private async fetchJSON(
-    url: string,
-    options: any = {}
-  ): Promise<CardJSONResponse> {
-    let fullOptions = Object.assign(
-      {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      },
-      options
-    );
-    let response = await fetch(url, fullOptions);
-
-    if (!response.ok) {
-      throw new Error(`unable to fetch card ${url}: status ${response.status}`);
-    }
-
-    return await response.json();
-  }
-
   private prepareComponent(cardModel: CardModel, component: unknown): unknown {
     return setComponentTemplate(
       hbs`<this.component @model={{this.data}} @set={{this.set}} />`,
@@ -134,44 +151,52 @@ export default class Cards extends Service {
       }
     );
   }
-}
 
-async function loadCode(
-  card: CardJSONResponse,
-  url: string
-): Promise<{ component: unknown; ModelClass: typeof CardModel }> {
-  let { meta } = card.data;
-
-  if (!meta || !meta.componentModule) {
-    throw new Error('No componentModule to load');
+  private async codeForCard(
+    card: CardJSONResponse
+  ): Promise<{ component: unknown; Model: typeof CardModel }> {
+    let componentModule = card.data?.meta?.componentModule;
+    if (!componentModule) {
+      throw new Error('No componentModule to load');
+    }
+    let module = await this.loadModule<{
+      default: unknown;
+      Model: typeof CardModel;
+    }>(componentModule);
+    return {
+      component: module.default,
+      Model: module.Model,
+    };
   }
 
-  let { componentModule } = meta;
-
-  // TODO: base this on the componentModuleName prefix instead of isTesting()
-  if (macroCondition(isTesting())) {
-    // in tests, our fake server inside mirage just defines these modules
-    // dynamically
-    let cardComponentModule = window.require(componentModule);
-    return {
-      component: cardComponentModule['default'],
-      ModelClass: cardComponentModule['Model'],
-    };
-  } else {
-    if (!componentModule.startsWith('@cardstack/compiled/')) {
+  async loadModule<T extends object>(moduleIdentifier: string): Promise<T> {
+    if (moduleIdentifier.startsWith('@cardstack/compiled/')) {
+      // module was built by webpack, use webpack's implementation of `await
+      // import()`
+      moduleIdentifier = moduleIdentifier.replace('@cardstack/compiled/', '');
+      return await import(
+        /* webpackExclude: /schema\.js$/ */
+        `@cardstack/compiled/${moduleIdentifier}`
+      );
+    } else if (moduleIdentifier.startsWith('@cardstack/core/src/')) {
+      // module was built by webpack, use webpack's implementation of `await
+      // import()`
+      moduleIdentifier = moduleIdentifier.replace('@cardstack/core/src/', '');
+      return await import(`@cardstack/core/src/${moduleIdentifier}`);
+    } else if (
+      moduleIdentifier.startsWith('@cardstack/local-realm-compiled/')
+    ) {
+      // module was built by our Builder, so ask Builder for it
+      let builder = await this.builder();
+      return await builder.loadModule<T>(moduleIdentifier);
+    } else {
       throw new Error(
-        `${url}'s meta.componentModule does not start with '@cardstack/compiled/`
+        `don't know how to load compiled card code for ${moduleIdentifier}`
       );
     }
-    componentModule = componentModule.replace('@cardstack/compiled/', '');
-    let cardComponentModule = await import(
-      /* webpackExclude: /schema\.js$/ */
-      `@cardstack/compiled/${componentModule}`
-    );
-
-    return {
-      component: cardComponentModule.default,
-      ModelClass: cardComponentModule.Model,
-    };
   }
+}
+
+function assertNever(value: never) {
+  throw new Error(`unsupported operation ${value}`);
 }

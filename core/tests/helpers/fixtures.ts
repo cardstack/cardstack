@@ -1,7 +1,7 @@
 import { templateOnlyComponentTemplate } from './templates';
 
 export const ADDRESS_RAW_CARD = {
-  url: 'https://mirage/cards/address',
+  url: 'https://cardstack-local/address',
   schema: 'schema.js',
   embedded: 'embedded.js',
   files: {
@@ -9,7 +9,7 @@ export const ADDRESS_RAW_CARD = {
 	    import { contains } from "@cardstack/types";
 	    import string from "https://cardstack.com/base/string";
 	    import date from "https://cardstack.com/base/date";
-      
+
 	    export default class Address {
 	      @contains(string) street;
 	      @contains(string) city;
@@ -25,7 +25,7 @@ export const ADDRESS_RAW_CARD = {
 };
 
 export const PERSON_RAW_CARD = {
-  url: 'https://mirage/cards/person',
+  url: 'https://cardstack-local/person',
   schema: 'schema.js',
   isolated: 'isolated.js',
   files: {
@@ -33,8 +33,8 @@ export const PERSON_RAW_CARD = {
 	    import { contains } from "@cardstack/types";
 	    import string from "https://cardstack.com/base/string";
 	    import date from "https://cardstack.com/base/date";
-	    import address from "https://mirage/cards/address";
-      
+	    import address from "https://cardstack-local/address";
+
 	    export default class Person {
 	      @contains(string) name;
 	      @contains(date) birthdate;

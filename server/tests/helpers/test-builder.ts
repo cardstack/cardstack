@@ -30,7 +30,6 @@ export class TestBuilder implements BuilderInterface {
   constructor() {
     this.compiler = new Compiler({
       builder: this,
-      define: this.define.bind(this),
     });
   }
 
@@ -51,7 +50,7 @@ export class TestBuilder implements BuilderInterface {
     }
   }
 
-  private async define(
+  async define(
     cardURL: string,
     localModule: string,
     type: string,

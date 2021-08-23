@@ -29,9 +29,6 @@ module.exports = function (environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
-    ENV['ember-cli-mirage'] = {
-      enabled: false,
-    };
     ENV.cardServer = 'http://localhost:3000/';
   }
 
@@ -45,8 +42,7 @@ module.exports = function (environment) {
 
     ENV.APP.rootElement = '#ember-testing';
     ENV.APP.autoboot = false;
-
-    ENV.cardServer = '/'; // Mirage! 🏝
+    ENV.cardServer = 'http://localhost:3000/';
   }
 
   if (environment === 'production') {

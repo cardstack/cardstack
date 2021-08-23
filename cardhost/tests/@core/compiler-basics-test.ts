@@ -1,50 +1,28 @@
+import {
+  PERSON_RAW_CARD,
+  ADDRESS_RAW_CARD,
+} from '@cardstack/core/tests/helpers/fixtures';
 import { module, test, skip } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import { compileTemplate } from '../helpers/template-compiler';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupMirage } from 'ember-cli-mirage/test-support';
-import setupCardMocking from '../helpers/card-mocking';
-import Builder from 'cardhost/lib/builder';
+import setupBuilder from '../helpers/setup-builder';
 import { RawCard, CompiledCard } from '@cardstack/core/src/interfaces';
 import { baseCardURL } from '@cardstack/core/src/compiler';
+import { LOCAL_REALM } from 'cardhost/lib/builder';
 
 async function evalModule(src: string): Promise<any> {
   //   return import(`data:application/javascript;base64,${btoa(src)}`);
   return src;
 }
 
-const PERSON_CARD = {
-  url: 'https://mirage/cards/person',
-  schema: 'schema.js',
-  embedded: 'embedded.js',
-  files: {
-    'schema.js': `
-      import { contains } from "@cardstack/types";
-      import date from "https://cardstack.com/base/date";
-      import string from "https://cardstack.com/base/string";
-      export default class Person {
-        @contains(string)
-        name;
-
-        @contains(date)
-        birthdate;
-      }`,
-    'embedded.js': templateOnlyComponentTemplate(
-      '<@fields.name/> was born on <@fields.birthdate/>'
-    ),
-  },
-};
-
 module('@core | compiler-basics', function (hooks) {
-  let builder: Builder;
-
   setupRenderingTest(hooks);
-  setupMirage(hooks);
-  setupCardMocking(hooks);
-
-  hooks.beforeEach(async function () {
-    builder = new Builder();
+  setupBuilder(hooks);
+  hooks.beforeEach(function () {
+    this.builder.createRawCard(ADDRESS_RAW_CARD);
+    this.builder.createRawCard(PERSON_RAW_CARD);
   });
 
   skip('it has a working evalModule', async function (assert) {
@@ -64,45 +42,44 @@ module('@core | compiler-basics', function (hooks) {
   });
 
   test('can compile the base card', async function (assert) {
-    let compiled = await builder.getCompiledCard(baseCardURL);
+    let compiled = await this.builder.getCompiledCard(baseCardURL);
 
     assert.equal(compiled.url, baseCardURL, 'Includes basecard URL');
     assert.ok(compiled.schemaModule, 'base card has a model module');
     assert.notOk(compiled.adoptsFrom, 'No parent card listed');
     assert.deepEqual(compiled.fields, {}, 'No fields');
     assert.ok(
-      compiled.isolated.moduleName.startsWith(`${baseCardURL}/isolated-`),
+      await this.cardService.loadModule(compiled.isolated.moduleName),
       'Isolated module exists'
     );
     assert.ok(
-      compiled.embedded.moduleName.startsWith(`${baseCardURL}/embedded-`),
+      await this.cardService.loadModule(compiled.embedded.moduleName),
       'Embedded module exists'
     );
   });
 
   test('Names and defines a module for the model', async function (assert) {
     let card = {
-      url: 'http://mirage/cards/post',
+      url: PERSON_RAW_CARD.url,
       schema: 'schema.js',
       files: {
         'schema.js': `export default class Post {}`,
       },
     };
-    this.createCard(card);
+    this.builder.createRawCard(card);
 
-    let compiled = await builder.getCompiledCard(card.url);
+    let compiled = await this.builder.getCompiledCard(card.url);
+    let source = await this.cardService.loadModule<any>(compiled.schemaModule);
     assert.equal(
-      compiled.schemaModule,
-      `${card.url}/schema.js`,
-      'CompiledCard moduleName is set correctly'
+      source.default.toString(),
+      'class Post {}',
+      'Source code is correct'
     );
-    let source = window.require(compiled.schemaModule).default;
-    assert.equal(source.toString(), 'class Post {}', 'Source code is correct');
   });
 
   test('Generates inlineHBS for templates without', async function (assert) {
     let card = {
-      url: 'http://mirage/cards/string',
+      url: `${LOCAL_REALM}/string`,
       schema: 'schema.js',
       embedded: 'embedded.js',
       files: {
@@ -110,9 +87,9 @@ module('@core | compiler-basics', function (hooks) {
         'embedded.js': templateOnlyComponentTemplate('{{@model}}'),
       },
     };
-    this.createCard(card);
+    this.builder.createRawCard(card);
 
-    let compiled = await builder.getCompiledCard(card.url);
+    let compiled = await this.builder.getCompiledCard(card.url);
     assert.equal(
       compiled.embedded.inlineHBS,
       `{{@model}}`,
@@ -121,16 +98,16 @@ module('@core | compiler-basics', function (hooks) {
   });
 
   test('it discovers three kinds of fields', async function (assert) {
-    await this.createCard(PERSON_CARD);
+    await this.builder.createRawCard(PERSON_RAW_CARD);
     let card = {
-      url: 'http://mirage/cards/post',
+      url: `${LOCAL_REALM}/post`,
       schema: 'schema.js',
       files: {
         'schema.js': `
           import { contains, belongsTo, containsMany, hasMany } from "@cardstack/types";
           import string from "https://cardstack.com/base/string";
           import date from "https://cardstack.com/base/date";
-          import person from "https://mirage/cards/person";
+          import person from "${LOCAL_REALM}/person";
 
           export default class Post {
             @contains(string)
@@ -146,15 +123,15 @@ module('@core | compiler-basics', function (hooks) {
           }`,
       },
     };
-    this.createCard(card);
+    this.builder.createRawCard(card);
 
-    let compiled = await builder.getCompiledCard(card.url);
+    let compiled = await this.builder.getCompiledCard(card.url);
     assert.deepEqual(Object.keys(compiled.fields), ['title', 'author', 'date']);
   });
 
   test('it discovers a string literal field', async function (assert) {
     let card = {
-      url: 'http://mirage/cards/post',
+      url: `${LOCAL_REALM}/post`,
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -168,15 +145,15 @@ module('@core | compiler-basics', function (hooks) {
       },
     };
 
-    this.createCard(card);
+    this.builder.createRawCard(card);
 
-    let compiled = await builder.getCompiledCard(card.url);
+    let compiled = await this.builder.getCompiledCard(card.url);
     assert.deepEqual(Object.keys(compiled.fields), ['title']);
   });
 
   test('it discovers a field whose import comes before the field decorator', async function (assert) {
     let card = {
-      url: 'http://mirage/cards/post',
+      url: `${LOCAL_REALM}/post`,
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -190,15 +167,15 @@ module('@core | compiler-basics', function (hooks) {
       },
     };
 
-    this.createCard(card);
+    this.builder.createRawCard(card);
 
-    let compiled = await builder.getCompiledCard(card.url);
+    let compiled = await this.builder.getCompiledCard(card.url);
     assert.deepEqual(Object.keys(compiled.fields), ['title']);
   });
 
   test('it discovers the field type of contains', async function (assert) {
     let card = {
-      url: 'http://mirage/cards/post',
+      url: `${LOCAL_REALM}/post`,
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -212,9 +189,9 @@ module('@core | compiler-basics', function (hooks) {
       },
     };
 
-    this.createCard(card);
+    this.builder.createRawCard(card);
 
-    let compiled = await builder.getCompiledCard(card.url);
+    let compiled = await this.builder.getCompiledCard(card.url);
     let title = compiled.fields.title;
     assert.equal(title.type, 'contains');
     assert.equal(title.card.url, 'https://cardstack.com/base/string');
@@ -223,7 +200,7 @@ module('@core | compiler-basics', function (hooks) {
   module('data', function () {
     test('it accepts data and returns the values', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/post',
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         data: {
           title: 'Hello World',
@@ -240,9 +217,9 @@ module('@core | compiler-basics', function (hooks) {
         },
       };
 
-      this.createCard(card);
+      this.builder.createRawCard(card);
 
-      let raw = await builder.getRawCard(card.url);
+      let raw = await this.builder.getRawCard(card.url);
       assert.deepEqual(raw.data, { title: 'Hello World' });
     });
   });
@@ -253,7 +230,7 @@ module('@core | compiler-basics', function (hooks) {
 
     hooks.beforeEach(async function () {
       card = {
-        url: 'http://mirage/cards/post',
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -274,34 +251,34 @@ module('@core | compiler-basics', function (hooks) {
         },
       };
 
-      this.createCard(card);
-      compiled = await builder.getCompiledCard(card.url);
+      this.builder.createRawCard(card);
+      compiled = await this.builder.getCompiledCard(card.url);
     });
 
     test('it inlines a simple field template', async function (assert) {
       assert.ok(
-        compiled.isolated.moduleName.startsWith(`${card.url}/isolated`),
+        compiled.isolated.moduleName.includes(`/isolated`),
         'templateModule for "isolated" is full url'
       );
     });
 
     test('it inlines a compound field template', async function (assert) {
-      this.createCard(PERSON_CARD);
+      this.builder.createRawCard(PERSON_RAW_CARD);
 
-      let compiled = await builder.getCompiledCard(PERSON_CARD.url);
-      assert.ok(
-        compiled.embedded.moduleName.startsWith(`${PERSON_CARD.url}/embedded`),
-        'templateModule for "embedded" is full url'
+      let compiled = await this.builder.getCompiledCard(PERSON_RAW_CARD.url);
+
+      let code = await this.cardService.loadModule<any>(
+        compiled.embedded.moduleName
       );
-      let source = window.require(compiled.embedded.moduleName).default;
-      assert.equal(source.moduleName, '@glimmer/component/template-only');
+
+      assert.equal(code.default.moduleName, '@glimmer/component/template-only');
     });
   });
 
   module('errors', function () {
     test('field must be called', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/post',
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -312,10 +289,10 @@ module('@core | compiler-basics', function (hooks) {
           `,
         },
       };
-      this.createCard(card);
+      this.builder.createRawCard(card);
       assert.expect(1);
       try {
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /the @contains decorator must be called/.test(err.message),
@@ -326,7 +303,7 @@ module('@core | compiler-basics', function (hooks) {
 
     test('field must be a decorator', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/post',
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -340,9 +317,9 @@ module('@core | compiler-basics', function (hooks) {
         },
       };
       assert.expect(1);
-      this.createCard(card);
+      this.builder.createRawCard(card);
       try {
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /the @contains decorator must be used as a decorator/.test(
@@ -355,7 +332,7 @@ module('@core | compiler-basics', function (hooks) {
 
     test('field must be on a class property', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/post',
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -369,9 +346,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.createCard(card);
+        this.builder.createRawCard(card);
 
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /the @contains decorator can only go on class properties/.test(
@@ -384,7 +361,7 @@ module('@core | compiler-basics', function (hooks) {
 
     test('field must have static name', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/post',
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -402,9 +379,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.createCard(card);
+        this.builder.createRawCard(card);
 
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /field names must not be dynamically computed/.test(err.message),
@@ -415,7 +392,7 @@ module('@core | compiler-basics', function (hooks) {
 
     test('field cannot be weird type', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/post',
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -433,9 +410,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.createCard(card);
+        this.builder.createRawCard(card);
 
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /field names must be identifiers or string literals/.test(
@@ -448,7 +425,7 @@ module('@core | compiler-basics', function (hooks) {
 
     test('field with wrong number of arguments', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/post',
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -464,9 +441,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.createCard(card);
+        this.builder.createRawCard(card);
 
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /contains decorator accepts exactly one argument/.test(err.message),
@@ -477,7 +454,7 @@ module('@core | compiler-basics', function (hooks) {
 
     test('hasMany with wrong number of arguments', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/post',
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -493,9 +470,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.createCard(card);
+        this.builder.createRawCard(card);
 
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@hasMany decorator accepts exactly one argument/.test(err.message),
@@ -506,7 +483,7 @@ module('@core | compiler-basics', function (hooks) {
 
     test('field with wrong argument syntax', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/post',
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -522,9 +499,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.createCard(card);
+        this.builder.createRawCard(card);
 
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@contains argument must be an identifier/.test(err.message),
@@ -535,7 +512,7 @@ module('@core | compiler-basics', function (hooks) {
 
     test('field with undefined type', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/post',
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -550,9 +527,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.createCard(card);
+        this.builder.createRawCard(card);
 
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@contains argument is not defined/.test(err.message),
@@ -563,7 +540,7 @@ module('@core | compiler-basics', function (hooks) {
 
     test('field with card type that was not imported', async function (assert) {
       let card = {
-        url: 'http://mirage/cards/post',
+        url: `${LOCAL_REALM}/post`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -578,9 +555,9 @@ module('@core | compiler-basics', function (hooks) {
       };
       assert.expect(1);
       try {
-        this.createCard(card);
+        this.builder.createRawCard(card);
 
-        await builder.getCompiledCard(card.url);
+        await this.builder.getCompiledCard(card.url);
       } catch (err) {
         assert.ok(
           /@contains argument must come from a module default export/.test(

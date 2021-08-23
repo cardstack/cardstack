@@ -81,7 +81,6 @@
     "ember-cli-dependency-checker": "^3.2.0",
     "ember-cli-htmlbars": "^5.7.1",
     "ember-cli-inject-live-reload": "^2.0.2",
-    "ember-cli-mirage": "^2.0.1",
     "ember-cli-sri": "^2.1.1",
     "ember-cli-terser": "^4.0.2",
     "ember-cli-typescript-blueprints": "^3.0.0",
@@ -136,7 +135,6 @@
     "@babel/types": "^7.12.13",
     "@embroider/compat": "^0.44.0-alpha.2",
     "@embroider/core": "^0.44.0-alpha.2",
-    "@embroider/macros": "^0.44.0-alpha.2",
     "@embroider/util": "^0.44.0-alpha.2",
     "@embroider/webpack": "^0.44.0-alpha.2",
     "@glimmer/compiler": "0.75.0",
@@ -149,7 +147,6 @@
     "ember-cli-typescript": "^4.1.0",
     "ember-cli-typescript-blueprints": "^3.0.0",
     "ember-href-to": "^4.1.0",
-    "ember-template-compiler": "^1.9.0-alpha",
-    "raw-loader": "^4.0.2"
+    "ember-template-compiler": "^1.9.0-alpha"
   }
 }

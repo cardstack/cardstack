@@ -1,5 +1,4 @@
-import type Builder from '../src/builder';
-import type { RawCard } from '@cardstack/core/src/interfaces';
+import type { RawCard, Builder } from '@cardstack/core/src/interfaces';
 import type RealmManager from './realm-manager';
 
 const ENVIRONMENTS_OBJ = {

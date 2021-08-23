@@ -1,12 +1,10 @@
-import { encodeCardURL } from '@cardstack/core/src/utils';
 import { module, test } from 'qunit';
 import { visit, currentURL } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
-import setupCardMocking from '../helpers/card-mocking';
+import setupBuilder from '../helpers/setup-builder';
 
 import click from '@ember/test-helpers/dom/click';
 import fillIn from '@ember/test-helpers/dom/fill-in';
-import { setupMirage } from 'ember-cli-mirage/test-support';
 import waitFor from '@ember/test-helpers/dom/wait-for';
 
 import {
@@ -21,13 +19,12 @@ const SAVE = '[data-test-modal-save]';
 
 module('Acceptance | Card Editing', function (hooks) {
   setupApplicationTest(hooks);
-  setupMirage(hooks);
-  setupCardMocking(hooks, { routingCard: 'https://mirage/cards/my-routes' });
-  let personURL = 'https://mirage/cards/person';
+  setupBuilder(hooks);
+  let personURL = PERSON_RAW_CARD.url;
 
-  hooks.beforeEach(function () {
-    this.createCard(ADDRESS_RAW_CARD);
-    this.createCard(
+  hooks.beforeEach(async function () {
+    await this.builder.createRawCard(ADDRESS_RAW_CARD);
+    await this.builder.createRawCard(
       Object.assign(
         {
           data: {
@@ -45,8 +42,8 @@ module('Acceptance | Card Editing', function (hooks) {
 
   test('Editing a card', async function (assert) {
     await visit(`/?url=${personURL}`);
-    assert.equal(currentURL(), `/?url=${personURL}`);
-    await waitFor(MODAL);
+    assert.equal(currentURL(), `/?url=${personURL}`, 'URL is Correct');
+    await waitFor(PERSON);
     assert.dom(PERSON).hasText('Hi! I am Arthur');
 
     await click(EDIT);
@@ -65,14 +62,10 @@ module('Acceptance | Card Editing', function (hooks) {
         'The original instance of the card is updated'
       );
 
-    let card = (this.server.schema as any).cards.find(encodeCardURL(personURL));
+    let card = await this.cardService.load(personURL, 'isolated');
+    assert.equal(card.data.name, 'Bob Barker', 'RawCard cache is updated');
     assert.equal(
-      card.attrs.raw.data.name,
-      'Bob Barker',
-      'RawCard cache is updated'
-    );
-    assert.equal(
-      card.attrs.raw.data.address.city,
+      card.data.address.city,
       'San Francisco',
       'RawCard cache is updated'
     );

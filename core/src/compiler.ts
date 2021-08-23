@@ -44,19 +44,8 @@ export class Compiler {
   builder: Builder;
   compiledBaseCard?: CompiledCard;
 
-  // returns the module identifier that can be used to get this module back.
-  // It's exactly meaning depends on the environment. In node it's a path you
-  // can actually `require`.
-  define: (
-    cardURL: string,
-    localModule: string,
-    type: string,
-    source: string
-  ) => Promise<string>;
-
-  constructor(params: { builder: Builder; define: Compiler['define'] }) {
+  constructor(params: { builder: Builder }) {
     this.builder = params.builder;
-    this.define = params.define;
   }
 
   async compile(cardSource: RawCard): Promise<CompiledCard> {
@@ -138,7 +127,7 @@ export class Compiler {
       }
 
       let src = this.getFile(sourceCard, p);
-      this.define(sourceCard.url, p, getFileType(p), src);
+      this.builder.define(sourceCard.url, p, getFileType(p), src);
     }
   }
 
@@ -222,7 +211,7 @@ export class Compiler {
     });
 
     let code = out!.code!;
-    return await this.define(
+    return await this.builder.define(
       cardSource.url,
       schemaLocalFilePath,
       JS_TYPE,
@@ -350,7 +339,7 @@ export class Compiler {
 
     let code = transformCardComponent(templateSource, options);
 
-    let moduleName = await this.define(
+    let moduleName = await this.builder.define(
       cardURL,
       hashFilenameFromFields(localFile, fields),
       JS_TYPE,

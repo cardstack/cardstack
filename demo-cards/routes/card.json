@@ -1,4 +1,3 @@
 {
-  "schema": "schema.js",
-  "containsRoutes": true
+  "schema": "schema.js"
 }
