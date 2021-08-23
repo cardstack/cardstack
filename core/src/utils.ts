@@ -1,6 +1,9 @@
 import { CompiledCard, Field } from './interfaces';
+import { flow, upperFirst, camelCase } from 'lodash';
 
 const SPECIAL_CHAR_REPLACEMENT = '-';
+
+export const classify = flow(camelCase, upperFirst);
 
 export function encodeCardURL(url: string): string {
   return url

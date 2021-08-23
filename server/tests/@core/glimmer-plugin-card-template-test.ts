@@ -26,7 +26,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
   hooks.before(async function () {
     builder = new TestBuilder();
     builder.addRawCard({
-      url: 'https://carstack.local/card/list',
+      url: 'https://cardstack.local/card/list',
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -46,7 +46,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       },
     });
     compiledListCard = await builder.getCompiledCard(
-      'https://carstack.local/card/list'
+      'https://cardstack.local/card/list'
     );
     compiledStringCard = await builder.getCompiledCard(
       'https://cardstack.com/base/string'
@@ -139,6 +139,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
 
     QUnit.test('Embedding with imports', async function (assert) {
+      assert.expect(6);
       let template = transform('<@fields.createdAt />', {
         fields: {
           createdAt: {
@@ -149,12 +150,31 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         },
         usageMeta,
         defaultFieldFormat,
-        importAndChooseName,
+        importAndChooseName(
+          desiredName: string,
+          moduleSpecifier: string,
+          importedName: string
+        ) {
+          assert.equal(
+            desiredName,
+            'HttpsCardstackComBaseDate',
+            'desiredName is based on the type of card'
+          );
+          assert.equal(importedName, 'default', 'Uses the default import');
+          assert.ok(
+            moduleSpecifier.startsWith(
+              '@cardstack/compiled/https-cardstack.com-base-date/embedded'
+            ),
+            'ImporedPath starts with dates embedded'
+          );
+          return 'HttpsCardstackComBaseDateField';
+        },
       });
 
       assert.equal(
         template,
-        '<BestGuess @model={{@model.createdAt}} data-test-field-name="createdAt" />'
+        '<HttpsCardstackComBaseDateField @model={{@model.createdAt}} data-test-field-name="createdAt" />',
+        'Use the desired importname at component invocation site'
       );
       assert_isEqual(usageMeta['model'], new Set());
       assert_isEqual(
@@ -369,7 +389,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
 
   QUnit.test('Tracking deeply nested field usage', async function () {
     builder.addRawCard({
-      url: 'http://carstack.local/cards/post',
+      url: 'http://cardstack.local/cards/post',
       schema: 'schema.js',
       isolated: 'isolated.js',
       files: {
@@ -396,7 +416,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
     let template = `{{#each @fields.posts as |Post|}}<Post />{{/each}}`;
     builder.addRawCard({
-      url: 'http://carstack.local/cards/post-list',
+      url: 'http://cardstack.local/cards/post-list',
       schema: 'schema.js',
       isolated: 'isolated.js',
       data: {
@@ -410,7 +430,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       files: {
         'schema.js': `
         import { containsMany } from "@cardstack/types";
-        import post from "http://carstack.local/cards/post";
+        import post from "http://cardstack.local/cards/post";
 
         export default class Hello {
           @containsMany(post)
@@ -422,7 +442,7 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
 
     let card = await builder.getCompiledCard(
-      'http://carstack.local/cards/post-list'
+      'http://cardstack.local/cards/post-list'
     );
     transform(template, {
       fields: card.fields,

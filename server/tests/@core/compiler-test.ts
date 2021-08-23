@@ -7,7 +7,7 @@ import { baseCardURL } from '@cardstack/core/src/compiler';
 const { module: Qmodule, test } = QUnit;
 
 const PERSON_CARD = {
-  url: 'https://carstack.local/cards/person',
+  url: 'https://cardstack.local/cards/person',
   schema: 'schema.js',
   embedded: 'embedded.js',
   files: {
@@ -55,7 +55,7 @@ Qmodule('Compiler', function (hooks) {
 
   test('deserializer is inherited', async function (assert) {
     builder.addRawCard({
-      url: 'https://carstack.local/cards/fancy-date',
+      url: 'https://cardstack.local/cards/fancy-date',
       schema: 'schema.js',
       files: {
         'schema.js': `
@@ -65,7 +65,7 @@ Qmodule('Compiler', function (hooks) {
       },
     });
     let compiled = await builder.getCompiledCard(
-      'https://carstack.local/cards/fancy-date'
+      'https://cardstack.local/cards/fancy-date'
     );
     assert.equal(
       compiled.serializer,
@@ -86,12 +86,12 @@ Qmodule('Compiler', function (hooks) {
 
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
-      '{{@model.name}} was born on <BirthdateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
+      '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
     );
 
     containsSource(
       builder.definedModules.get(
-        'https://carstack.local/cards/person/embedded.css'
+        'https://cardstack.local/cards/person/embedded.css'
       ),
       PERSON_CARD.files['embedded.css'],
       'Styles are defined'
@@ -105,12 +105,12 @@ Qmodule('Compiler', function (hooks) {
     assert.deepEqual(compiled.edit.usedFields, ['name', 'birthdate']);
     containsSource(
       builder.definedModules.get(compiled.edit.moduleName),
-      '<NameField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />',
+      '<HttpsCardstackComBaseStringField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />',
       'Edit template is rendered for text'
     );
     containsSource(
       builder.definedModules.get(compiled.edit.moduleName),
-      '<BirthdateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />',
+      '<HttpsCardstackComBaseDateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />',
       'Edit template is rendered for date'
     );
   });
@@ -118,7 +118,7 @@ Qmodule('Compiler', function (hooks) {
   test('nested cards', async function (assert) {
     builder.addRawCard(PERSON_CARD);
     builder.addRawCard({
-      url: 'https://carstack.local/cards/post',
+      url: 'https://cardstack.local/cards/post',
       schema: 'schema.js',
       embedded: 'embedded.js',
       isolated: 'isolated.js',
@@ -144,7 +144,7 @@ Qmodule('Compiler', function (hooks) {
     });
 
     let compiled = await builder.getCompiledCard(
-      'https://carstack.local/cards/post'
+      'https://cardstack.local/cards/post'
     );
     assert.deepEqual(Object.keys(compiled.fields), ['title', 'author']);
 
@@ -156,7 +156,7 @@ Qmodule('Compiler', function (hooks) {
 
     containsSource(
       builder.definedModules.get(compiled.embedded.moduleName),
-      `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><BirthdateField @model={{@model.author.birthdate}} data-test-field-name=\\"birthdate\\"  /></p></article>`
+      `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><HttpsCardstackComBaseDateField @model={{@model.author.birthdate}} data-test-field-name=\\"birthdate\\"  /></p></article>`
     );
 
     assert.deepEqual(compiled.isolated.usedFields, ['author']);
@@ -164,7 +164,7 @@ Qmodule('Compiler', function (hooks) {
 
   test('deeply nested cards', async function (assert) {
     builder.addRawCard({
-      url: 'http://carstack.local/cards/post',
+      url: 'http://cardstack.local/cards/post',
       schema: 'schema.js',
       isolated: 'isolated.js',
       embedded: 'embedded.js',
@@ -194,7 +194,7 @@ Qmodule('Compiler', function (hooks) {
       },
     });
     builder.addRawCard({
-      url: 'http://carstack.local/cards/post-list',
+      url: 'http://cardstack.local/cards/post-list',
       schema: 'schema.js',
       isolated: 'isolated.js',
       embedded: 'embedded.js',
@@ -209,7 +209,7 @@ Qmodule('Compiler', function (hooks) {
       files: {
         'schema.js': `
         import { containsMany } from "@cardstack/types";
-        import post from "http://carstack.local/cards/post";
+        import post from "http://cardstack.local/cards/post";
 
         export default class Hello {
           @containsMany(post)
@@ -226,7 +226,7 @@ Qmodule('Compiler', function (hooks) {
     });
 
     let compiled = await builder.getCompiledCard(
-      'http://carstack.local/cards/post-list'
+      'http://cardstack.local/cards/post-list'
     );
     assert.deepEqual(Object.keys(compiled.fields), ['posts']);
 
@@ -237,7 +237,7 @@ Qmodule('Compiler', function (hooks) {
 
     containsSource(
       builder.definedModules.get(compiled.isolated.moduleName),
-      `{{#each @model.posts as |Post|}}<PostsField @model={{Post}} data-test-field-name=\\"posts\\" />{{/each}}`,
+      `{{#each @model.posts as |Post|}}<HttpCardstackLocalCardsPostField @model={{Post}} data-test-field-name=\\"posts\\" />{{/each}}`,
       'Isolated template includes PostField component'
     );
 
@@ -252,7 +252,7 @@ Qmodule('Compiler', function (hooks) {
 
   Qmodule('@fields iterating', function (hooks) {
     let postCard = {
-      url: 'https://carstack.local/cards/post',
+      url: 'https://cardstack.local/cards/post',
       schema: 'schema.js',
       embedded: 'embedded.js',
       files: {
@@ -275,7 +275,7 @@ Qmodule('Compiler', function (hooks) {
 
     test('iterators of fields and inlines templates', async function () {
       let compiled = await builder.getCompiledCard(
-        'https://carstack.local/cards/post'
+        'https://cardstack.local/cards/post'
       );
       containsSource(
         builder.definedModules.get(compiled.embedded.moduleName),
@@ -285,7 +285,7 @@ Qmodule('Compiler', function (hooks) {
 
     test('recompiled parent field iterator', async function () {
       let fancyPostCard = {
-        url: 'https://carstack.local/cards/fancy-post',
+        url: 'https://cardstack.local/cards/fancy-post',
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -299,7 +299,7 @@ Qmodule('Compiler', function (hooks) {
         },
       };
       let timelyPostCard = {
-        url: 'https://carstack.local/cards/timely-post',
+        url: 'https://cardstack.local/cards/timely-post',
         schema: 'schema.js',
         files: {
           'schema.js': `

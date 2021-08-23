@@ -8,8 +8,8 @@ import type {
 } from '@glimmer/syntax/dist/types/lib/v1/api';
 import { CompiledCard, Field, Format } from './interfaces';
 import { singularize } from 'inflection';
-import { capitalize, cloneDeep } from 'lodash';
-import { getFieldForPath } from './utils';
+import { cloneDeep } from 'lodash';
+import { classify, getFieldForPath } from './utils';
 
 const MODEL = '@model';
 const FIELDS = '@fields';
@@ -453,11 +453,8 @@ function rewriteFieldToComponent(
 ): Statement[] {
   let { element, attr, mustache, path, text } = syntax.builders;
 
-  // TODO: What we really want it String or Date, instead of Title
-  // or Birthdate.This will require some additional information
-  // in the field decloration
   let componentName = importAndChooseName(
-    capitalize(field.name),
+    classify(field.card.url),
     field.card[format].moduleName,
     'default'
   );
