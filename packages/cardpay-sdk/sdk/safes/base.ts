@@ -86,7 +86,6 @@ const safeQueryFields = `
       symbol
       id
     }
-    spendBalance
     faceValue
     payments {
       id
@@ -378,7 +377,6 @@ interface GraphQLSafeResult {
     payments: {
       id: string;
     }[];
-    spendBalance: string;
     faceValue: string;
     issuer: { id: string };
     reloadable: boolean;
