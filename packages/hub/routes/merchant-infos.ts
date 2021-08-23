@@ -80,8 +80,10 @@ export default class MerchantInfosRoute {
     if (!slug || typeof slug === 'object' || validateMerchantId(slug)) {
       let detail: string;
 
-      if (!slug || typeof slug === 'object') {
-        detail = `Slug cannot be undefined or an array`;
+      if (!slug) {
+        detail = `Slug cannot be undefined`;
+      } else if (typeof slug === 'object') {
+        detail = `Slug cannot be an array`;
       } else {
         detail = validateMerchantId(slug);
       }
@@ -102,7 +104,7 @@ export default class MerchantInfosRoute {
       ctx.status = 200;
       ctx.body = {
         slugAvailable,
-        detail: slugAvailable ? 'Merchant slug is available' : 'Merchant slug is already taken',
+        title: slugAvailable ? 'Merchant slug is available' : 'Merchant slug already exists',
       };
       ctx.type = 'application/vnd.api+json';
       return slugAvailable;
