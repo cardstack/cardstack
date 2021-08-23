@@ -28,38 +28,34 @@ const MERCHANT_NAME_INVALID_INPUTS = [
     errorMessage: 'This field is required',
   },
 ];
+const VALID_ID = 'abc123';
 const MERCHANT_ID_INVALID_INPUTS = [
   {
     value: '',
     errorMessage: 'This field is required',
   },
   {
-    value: 'xn--',
-    errorMessage: 'Merchant ID cannot start with xn--',
+    value: '  ',
+    errorMessage: 'This field is required',
   },
   {
     value: 'an invalid id because of spaces',
     errorMessage:
-      'Merchant ID can only contain lowercase alphabets, numbers, and hyphens',
+      'Merchant ID can only contain lowercase alphabets and numbers',
   },
   {
     value: 'INVALIDCASING',
     errorMessage:
-      'Merchant ID can only contain lowercase alphabets, numbers, and hyphens',
+      'Merchant ID can only contain lowercase alphabets and numbers',
   },
   {
     value: '😤',
     errorMessage:
-      'Merchant ID can only contain lowercase alphabets, numbers, and hyphens',
+      'Merchant ID can only contain lowercase alphabets and numbers',
   },
   {
-    value: '-an-otherwise-valid-id',
-    errorMessage:
-      'Merchant ID must start and end with lowercase alphabet or number',
-  },
-  {
-    value: 'this-is-exactly-sixty-five-characters-long-but-is-otherwise-valid',
-    errorMessage: 'Merchant ID must be at most 50 characters, currently 65',
+    value: 'thisisexactlyfiftyfivecharacterslongbutisotherwisevalid',
+    errorMessage: 'Merchant ID must be at most 50 characters, currently 55',
   },
 ];
 
@@ -142,7 +138,7 @@ module(
       // enter valid merchant id so we can check that the merchant name being valid will make
       // the save details button enabled
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
-      await fillIn(merchantIdInput, 'a-valid-id');
+      await fillIn(merchantIdInput, VALID_ID);
       await waitUntil(
         () =>
           (find('[data-test-validation-state-input]') as HTMLElement).dataset
@@ -181,7 +177,7 @@ module(
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
 
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
-      await fillIn(merchantIdInput, 'a-valid-id');
+      await fillIn(merchantIdInput, VALID_ID);
       await waitUntil(
         () =>
           (find('[data-test-validation-state-input]') as HTMLElement).dataset
@@ -210,7 +206,7 @@ module(
       await fillIn(merchantNameInput, 'HELLO!');
 
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
-      await fillIn(merchantIdInput, 'a-valid-id');
+      await fillIn(merchantIdInput, VALID_ID);
       await waitUntil(
         () =>
           (find('[data-test-validation-state-input]') as HTMLElement).dataset
@@ -220,7 +216,7 @@ module(
       await click(SAVE_DETAILS_BUTTON);
 
       assert.equal(workflowSession.state.merchantName, 'HELLO!');
-      assert.equal(workflowSession.state.merchantId, 'a-valid-id');
+      assert.equal(workflowSession.state.merchantId, VALID_ID);
       assert.ok(workflowSession.state.merchantBgColor);
       assert.ok(workflowSession.state.merchantTextColor);
     });
@@ -230,7 +226,7 @@ module(
       await fillIn(merchantNameInput, 'HELLO!');
 
       let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
-      await fillIn(merchantIdInput, 'a-valid-id');
+      await fillIn(merchantIdInput, VALID_ID);
       await waitUntil(
         () =>
           (find('[data-test-validation-state-input]') as HTMLElement).dataset
@@ -255,7 +251,7 @@ module(
         .dom(`${PREVIEW} ${MERCHANT}`)
         .hasAttribute('data-test-merchant', 'HELLO!');
       assert.dom(MERCHANT_NAME_FIELD).doesNotExist();
-      assert.dom(MERCHANT_ID_FIELD).containsText('a-valid-id');
+      assert.dom(MERCHANT_ID_FIELD).containsText(VALID_ID);
       assert.dom(COLOR_FIELD).containsText(bgColor);
       assert.dom(MANAGER).containsText(layer2AccountAddress);
     });
