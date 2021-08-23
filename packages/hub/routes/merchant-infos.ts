@@ -8,6 +8,7 @@ import MerchantInfoSerializer from '../services/serializers/merchant-info-serial
 import { ensureLoggedIn } from './utils/auth';
 import WorkerClient from '../services/worker-client';
 import MerchantInfoQueries from '../services/queries/merchant-info';
+import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import Logger from '@cardstack/logger';
 let logger = Logger('route:merchant-infos');
 
@@ -36,54 +37,17 @@ export default class MerchantInfosRoute {
     autoBind(this);
   }
 
-  async getValidation(ctx: Koa.Context) {
-    let db = await this.databaseManager.getClient();
-    let { slug } = ctx.query;
-
-    // TODO: use route param instead of query param
-    // TODO: replace below to use the sdk fn to validate id when it's merged
-    // if (!slug) {
-    //   logger.error('Merchant slug cannot be undefined');
-    //   return;
-    // }
-
-    // if (typeof slug === 'object') {
-    //   logger.error('Merchant slug cannot be an array');
-    //   return;
-    // }
-
-    // let sanitizedSlug = slug
-    //   .toLowerCase()
-    //   .replace(/[^a-z0-9]+/g, '-')
-    //   .replace(/^[^a-z0-9]+|[^a-z0-9]+$|/g, '');
-
-    // if (!sanitizedSlug) {
-    //   logger.error('Merchant slug must include alphanumeric characters');
-    //   return;
-    // }
-
-    // if (sanitizedSlug.length > charLimit) {
-    //   logger.log(`Merchant slug will be cropped at ${charLimit} characters`);
-    //   sanitizedSlug = sanitizedSlug.slice(0, charLimit).replace(/^[^a-z0-9]+|[^a-z0-9]+$|/g, '');
-    // }
-
-    try {
-      let result = await db.query('SELECT slug FROM merchant_infos WHERE slug = $1', [slug]);
-      let data = result.rowCount === 0 ? { slug, slugAvailable: true } : { slug, slugAvailable: false };
-      ctx.status = 200;
-      ctx.body = { data };
-      ctx.type = 'application/vnd.api+json';
-    } catch (e) {
-      logger.error('Failed to retrieve merchant_infos', e);
-    }
-  }
-
   async post(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;
     }
 
     if (!ensureValidPayload(ctx)) {
+      return;
+    }
+
+    let isValid = await this.slugValidation(ctx);
+    if (!isValid) {
       return;
     }
 
@@ -107,6 +71,44 @@ export default class MerchantInfosRoute {
     ctx.status = 201;
     ctx.body = serialized;
     ctx.type = 'application/vnd.api+json';
+  }
+
+  async slugValidation(ctx: Koa.Context) {
+    let db = await this.databaseManager.getClient();
+    let slug = ctx.request.body?.data?.attributes['slug'] || ctx.query?.slug;
+
+    if (!slug || typeof slug === 'object' || validateMerchantId(slug)) {
+      let detail: string;
+
+      if (!slug || typeof slug === 'object') {
+        detail = `Slug cannot be undefined or an array`;
+      } else {
+        detail = validateMerchantId(slug);
+      }
+
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail,
+      };
+      ctx.type = 'application/vnd.api+json';
+      return false;
+    }
+
+    try {
+      let result = await db.query('SELECT slug FROM merchant_infos WHERE slug = $1', [slug]);
+      let slugAvailable = result.rowCount === 0;
+      ctx.status = 200;
+      ctx.body = {
+        slugAvailable,
+        detail: slugAvailable ? 'Merchant slug is available' : 'Merchant slug is already taken',
+      };
+      ctx.type = 'application/vnd.api+json';
+      return slugAvailable;
+    } catch (e) {
+      logger.error('Failed to retrieve merchant_infos', e);
+    }
   }
 }
 
