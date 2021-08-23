@@ -148,6 +148,7 @@
     "extends": "../../package.json"
   },
   "dependencies": {
+    "@ctrl/tinycolor": "^3.4.0",
     "@metamask/safe-event-emitter": "^2.0.0",
     "@walletconnect/client": "^1.6.0",
     "@walletconnect/core": "^1.6.0",
