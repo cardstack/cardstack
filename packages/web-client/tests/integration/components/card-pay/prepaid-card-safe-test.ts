@@ -52,7 +52,6 @@ module(
         id: '0xc9Cdb5EeD1c27fCc64DA096CA3b0bcc02c1d45C2',
       },
       reloadable: false,
-      spendBalance: '500',
       prepaidCardOwner: '0xc9Cdb5EeD1c27fCc64DA096CA3b0bcc02c1d45C2',
       hasBeenUsed: false,
       issuer: '0xc9Cdb5EeD1c27fCc64DA096CA3b0bcc02c1d45C2',
