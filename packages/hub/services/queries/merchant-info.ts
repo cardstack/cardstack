@@ -36,17 +36,6 @@ export default class MerchantInfoQueries {
       [model.id, model.name, model.slug, model.color, model.textColor, model.ownerAddress]
     );
   }
-
-  async validateSlug(id: string) {
-    let db = await this.databaseManager.getClient();
-    let res = await db.query('SELECT slug FROM merchant_infos WHERE slug = $1', [id]);
-
-    if (res.rowCount === 0) {
-      return true;
-    } else {
-      return false;
-    }
-  }
 }
 
 declare module '@cardstack/hub/di/dependency-injection' {

@@ -37,39 +37,39 @@ export default class MerchantInfosRoute {
   }
 
   async getValidation(ctx: Koa.Context) {
-    const charLimit = 50;
     let db = await this.databaseManager.getClient();
     let { slug } = ctx.query;
 
-    if (!slug) {
-      logger.error('Merchant slug cannot be undefined');
-      return;
-    }
+    // TODO: use route param instead of query param
+    // TODO: replace below to use the sdk fn to validate id when it's merged
+    // if (!slug) {
+    //   logger.error('Merchant slug cannot be undefined');
+    //   return;
+    // }
 
-    if (typeof slug === 'object') {
-      logger.error('Merchant slug cannot be an array');
-      return;
-    }
+    // if (typeof slug === 'object') {
+    //   logger.error('Merchant slug cannot be an array');
+    //   return;
+    // }
 
-    let sanitizedSlug = slug
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^[^a-z0-9]+|[^a-z0-9]+$|/g, '');
+    // let sanitizedSlug = slug
+    //   .toLowerCase()
+    //   .replace(/[^a-z0-9]+/g, '-')
+    //   .replace(/^[^a-z0-9]+|[^a-z0-9]+$|/g, '');
 
-    if (!sanitizedSlug) {
-      logger.error('Merchant slug must include alphanumeric characters');
-      return;
-    }
+    // if (!sanitizedSlug) {
+    //   logger.error('Merchant slug must include alphanumeric characters');
+    //   return;
+    // }
 
-    if (sanitizedSlug.length > charLimit) {
-      logger.log(`Merchant slug will be cropped at ${charLimit} characters`);
-      sanitizedSlug = sanitizedSlug.slice(0, charLimit).replace(/^[^a-z0-9]+|[^a-z0-9]+$|/g, '');
-    }
+    // if (sanitizedSlug.length > charLimit) {
+    //   logger.log(`Merchant slug will be cropped at ${charLimit} characters`);
+    //   sanitizedSlug = sanitizedSlug.slice(0, charLimit).replace(/^[^a-z0-9]+|[^a-z0-9]+$|/g, '');
+    // }
 
     try {
-      let result = await db.query('SELECT slug FROM merchant_infos WHERE slug = $1', [sanitizedSlug]);
-      let data =
-        result.rowCount === 0 ? { sanitizedSlug, slugAvailable: true } : { sanitizedSlug, slugAvailable: false };
+      let result = await db.query('SELECT slug FROM merchant_infos WHERE slug = $1', [slug]);
+      let data = result.rowCount === 0 ? { slug, slugAvailable: true } : { slug, slugAvailable: false };
       ctx.status = 200;
       ctx.body = { data };
       ctx.type = 'application/vnd.api+json';
@@ -87,27 +87,10 @@ export default class MerchantInfosRoute {
       return;
     }
 
-    const slug = ctx.request.body.data.attributes['slug'];
-    const isValidSlug = await this.merchantInfoQueries.validateSlug(slug);
-
-    if (!isValidSlug) {
-      ctx.body = {
-        errors: [
-          {
-            status: '422',
-            title: 'Merchant slug already exists',
-          },
-        ],
-      };
-      ctx.status = 422;
-      ctx.type = 'application/vnd.api+json';
-      return;
-    }
-
     const merchantInfo: MerchantInfo = {
       id: shortUuid.uuid(),
       name: ctx.request.body.data.attributes['name'],
-      slug,
+      slug: ctx.request.body.data.attributes['slug'],
       color: ctx.request.body.data.attributes['color'],
       textColor: ctx.request.body.data.attributes['text-color'],
       ownerAddress: ctx.state.userAddress,
