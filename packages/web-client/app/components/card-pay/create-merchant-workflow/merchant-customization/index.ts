@@ -8,6 +8,7 @@ import { didCancel, restartableTask, timeout } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { mostReadable, random as randomColor } from '@ctrl/tinycolor';
 import config from '@cardstack/web-client/config/environment';
+import { validateMerchantId } from '@cardstack/cardpay-sdk';
 
 export default class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
@@ -109,11 +110,7 @@ export default class CardPayDepositWorkflowTransactionAmountComponent extends Co
     yield timeout(config.environment === 'test' ? 10 : 500);
     let value = this.merchantId;
 
-    if (value) {
-      this.merchantIdValidationMessage = findDomainNameErrors(value);
-    } else {
-      this.merchantIdValidationMessage = 'This field is required';
-    }
+    this.merchantIdValidationMessage = validateMerchantId(value);
 
     if (this.merchantIdValidationMessage) {
       return false;
@@ -132,18 +129,6 @@ export default class CardPayDepositWorkflowTransactionAmountComponent extends Co
     this.merchantIdValidationMessage = '';
     return true;
   }
-}
-
-function findDomainNameErrors(value: string) {
-  // international domain names start with xn--
-  if (value.startsWith('xn--')) return 'Merchant ID cannot start with xn--';
-  else if (/[^a-z0-9-]/.test(value))
-    return 'Merchant ID can only contain lowercase alphabets, numbers, and hyphens';
-  else if (/^[^a-zA-Z0-9]/.test(value) || /[^a-zA-Z0-9]$/.test(value))
-    return 'Merchant ID must start and end with lowercase alphabet or number';
-  else if (value.length > 50)
-    return `Merchant ID must be at most 50 characters, currently ${value.length}`;
-  return '';
 }
 
 async function checkIfMerchantIdExists(_value: string) {
