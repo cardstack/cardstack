@@ -5,16 +5,26 @@ import { MerchantInfo } from '../../routes/merchant-infos';
 export default class MerchantInfoQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  async fetch(id: string): Promise<MerchantInfo> {
+  async fetch(id: string, attributeName?: string): Promise<MerchantInfo> {
     let db = await this.databaseManager.getClient();
 
+    if (!attributeName) {
+      attributeName = 'id';
+    }
+
     let queryResult = await db.query(
-      'SELECT id, name, slug, color, text_color, owner_address, created_at from merchant_infos WHERE id = $1',
+      `SELECT id, name, slug, color, text_color, owner_address, created_at from merchant_infos WHERE ${attributeName} = $1`,
       [id]
     );
 
     if (queryResult.rowCount === 0) {
-      return Promise.reject(new Error(`No merchant_infos record found with id ${id}`));
+      if (attributeName === 'slug') {
+        return {
+          id: '',
+          slug: id,
+        } as MerchantInfo;
+      }
+      return Promise.reject(new Error(`No merchant_infos record found with ${attributeName} ${id}`));
     }
 
     let row = queryResult.rows[0];

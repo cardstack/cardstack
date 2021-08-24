@@ -9,8 +9,6 @@ import { ensureLoggedIn } from './utils/auth';
 import WorkerClient from '../services/worker-client';
 import MerchantInfoQueries from '../services/queries/merchant-info';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
-import Logger from '@cardstack/logger';
-let logger = Logger('route:merchant-infos');
 
 export interface MerchantInfo {
   id: string;
@@ -46,15 +44,17 @@ export default class MerchantInfosRoute {
       return;
     }
 
-    let isValid = await this.slugValidation(ctx);
-    if (!isValid) {
+    let slug = ctx.request.body.data.attributes['slug'];
+    let isValidSlug = await ensureValidSlug(ctx, slug, this.merchantInfoQueries);
+
+    if (!isValidSlug) {
       return;
     }
 
     const merchantInfo: MerchantInfo = {
       id: shortUuid.uuid(),
       name: ctx.request.body.data.attributes['name'],
-      slug: ctx.request.body.data.attributes['slug'],
+      slug,
       color: ctx.request.body.data.attributes['color'],
       textColor: ctx.request.body.data.attributes['text-color'],
       ownerAddress: ctx.state.userAddress,
@@ -73,45 +73,49 @@ export default class MerchantInfosRoute {
     ctx.type = 'application/vnd.api+json';
   }
 
-  async slugValidation(ctx: Koa.Context) {
-    let db = await this.databaseManager.getClient();
-    let slug = ctx.request.body?.data?.attributes['slug'] || ctx.query?.slug;
+  async getValidation(ctx: Koa.Context) {
+    let slug = ctx.query?.slug;
+    let isValidSlug = await ensureValidSlug(ctx, slug, this.merchantInfoQueries);
 
-    if (!slug || typeof slug === 'object' || validateMerchantId(slug)) {
-      let detail: string;
-
-      if (!slug) {
-        detail = `Slug cannot be undefined`;
-      } else if (typeof slug === 'object') {
-        detail = `Slug cannot be an array`;
-      } else {
-        detail = validateMerchantId(slug);
-      }
-
-      ctx.status = 422;
-      ctx.body = {
-        status: '422',
-        title: 'Invalid merchant slug',
-        detail,
-      };
-      ctx.type = 'application/vnd.api+json';
-      return false;
+    if (!isValidSlug) {
+      return;
     }
 
-    try {
-      let result = await db.query('SELECT slug FROM merchant_infos WHERE slug = $1', [slug]);
-      let slugAvailable = result.rowCount === 0;
-      ctx.status = 200;
-      ctx.body = {
-        slugAvailable,
-        title: slugAvailable ? 'Merchant slug is available' : 'Merchant slug already exists',
-      };
-      ctx.type = 'application/vnd.api+json';
-      return slugAvailable;
-    } catch (e) {
-      logger.error('Failed to retrieve merchant_infos', e);
-    }
+    ctx.status = 200;
+    ctx.body = {
+      slugAvailable: true,
+      info: 'Merchant slug is available',
+    };
+    ctx.type = 'application/vnd.api+json';
   }
+}
+
+async function ensureValidSlug(ctx: Koa.Context, slug?: string | string[], queries?: MerchantInfoQueries) {
+  let detail = '';
+
+  if (!slug) {
+    detail = `Slug cannot be undefined`;
+  } else if (typeof slug === 'object') {
+    detail = `Slug cannot be an array`;
+  } else if (validateMerchantId(slug)) {
+    detail = validateMerchantId(slug);
+  } else if (queries) {
+    let result = await queries.fetch(slug, 'slug');
+    detail = result.id ? 'Merchant slug already exists' : '';
+  }
+
+  if (detail) {
+    ctx.status = 422;
+    ctx.body = {
+      status: '422',
+      title: 'Invalid merchant slug',
+      detail,
+    };
+    ctx.type = 'application/vnd.api+json';
+    return false;
+  }
+
+  return true;
 }
 
 function ensureValidPayload(ctx: Koa.Context) {
