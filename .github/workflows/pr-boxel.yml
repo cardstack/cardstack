@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        ember-try-scenario: [ember-release, ember-beta]
+        ember-try-scenario: [ember-release]
     steps:
       - uses: actions/checkout@v2
       - uses: volta-cli/action@v1
