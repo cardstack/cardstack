@@ -7,9 +7,10 @@
   color: var(--boxel-purple-500);
 }
 
-.layer-two-connect-card__app-store-links {
+.layer-two-connect-card__link-container {
   align-items: center;
   display: flex;
+  gap: var(--boxel-sp-sm);
   flex-wrap: wrap;
   justify-content: space-around;
   padding-top: var(--boxel-sp);
@@ -22,6 +23,11 @@
   align-items: center;
   gap: var(--boxel-sp-xs);
   font: 600 var(--boxel-font);
+  padding: var(--boxel-sp-sm);
+}
+
+.layer-two-connect-card__testflight-link-icon {
+  flex-shrink: 0;
 }
 
 .layer-two-connect-card__alternate-wallet {
