@@ -100,8 +100,8 @@ describe('POST /api/merchant-infos', function () {
             slug: 'satoshi',
             did: 'the-did',
             color: 'ff0000',
-            textColor: 'ffffff',
-            ownerAddress: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+            'text-color': 'ffffff',
+            'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
           },
         },
       })

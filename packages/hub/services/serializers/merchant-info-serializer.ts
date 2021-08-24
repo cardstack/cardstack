@@ -23,8 +23,8 @@ export default class MerchantInfoSerializer {
           name: model.name,
           slug: model.slug,
           color: model.color,
-          textColor: model.textColor,
-          ownerAddress: model.ownerAddress,
+          'text-color': model.textColor,
+          'owner-address': model.ownerAddress,
         },
       },
     };

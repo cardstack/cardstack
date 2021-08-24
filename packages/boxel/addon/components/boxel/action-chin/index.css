@@ -51,7 +51,7 @@
   --boxel-action-chin-padding-vertical: var(--boxel-sp-xs);
 }
 
-.boxel-action-chin--disabled.boxel-action-chin--has-step {
+.boxel-action-chin--disabled.boxel-action-chin--has-step:not(.boxel-action-chin--memorialized) {
   --boxel-action-chin-background-color: var(--boxel-action-chin-disabled-background);
 }
 
