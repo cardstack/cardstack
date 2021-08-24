@@ -2,8 +2,6 @@
 window.deprecationWorkflow = window.deprecationWorkflow || {};
 window.deprecationWorkflow.config = {
   workflow: [
-    { handler: 'silence', matchId: 'ember-source.deprecation-without-for' },
-    { handler: 'silence', matchId: 'ember-source.deprecation-without-since' },
     { handler: 'silence', matchId: 'ember-keyboard.first-responder-inputs' },
     {
       handler: 'silence',
