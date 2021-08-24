@@ -10,7 +10,7 @@ import { mostReadable, random as randomColor } from '@ctrl/tinycolor';
 import config from '@cardstack/web-client/config/environment';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 
-export default class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
+export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
   @tracked merchantBgColor: string = randomColor().toHexString();
   @tracked merchantName: string = '';
