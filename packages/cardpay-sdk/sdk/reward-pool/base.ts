@@ -16,6 +16,7 @@ interface Proof {
   proof: string;
   timestamp: string;
   blockNumber: number;
+  rewardProgramId: string
 }
 
 const DEFAULT_PAGE_SIZE = 1000000;
@@ -38,10 +39,11 @@ export default class RewardPool {
     return (await this.getRewardPool()).methods.balanceForProofWithAddress(tokenAddress, address, proof).call();
   }
 
-  //tally
-  async rewardTokensAvailable(address: string): Promise<string[]> {
+  async rewardTokensAvailable(address: string, rewardProgramId?: string): Promise<string[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
-    let url = `${tallyServiceURL}/reward-tokens/${address}`;
+    let url =
+      `${tallyServiceURL}/reward-tokens/${address}` + (rewardProgramId ? `?reward_program_id=${rewardProgramId}` : '');
+
     let options = {
       method: 'GET',
       headers: {
@@ -58,8 +60,8 @@ export default class RewardPool {
 
   async getProofs(
     address: string,
+    rewardProgramId?: string,
     tokenAddress?: string,
-    rewardProgramID?: string,
     offset?: number,
     limit?: number
   ): Promise<Proof[]> {
@@ -67,7 +69,7 @@ export default class RewardPool {
     let url =
       `${tallyServiceURL}/merkle-proofs/${address}` +
       (tokenAddress ? `?token_address=${tokenAddress}` : '') +
-      (rewardProgramID ? `?reward_program_id=${rewardProgramID}` : '') +
+      (rewardProgramId ? `?reward_program_id=${rewardProgramId}` : '') +
       (offset ? `?offset=${offset}` : '') +
       (limit ? `?limit=${limit}` : `?limit=${DEFAULT_PAGE_SIZE}`);
     let options = {
@@ -97,7 +99,9 @@ export default class RewardPool {
     let rewardPool = await this.getRewardPool();
     let ungroupedTokenBalance = await Promise.all(
       proofs.map(async (o: Proof) => {
-        const balance = await rewardPool.methods.balanceForProofWithAddress(o.tokenAddress, address, o.proof).call();
+        const balance = await rewardPool.methods
+          .balanceForProofWithAddress(o.rewardProgramId, o.tokenAddress, address, o.proof)
+          .call();
         return {
           tokenAddress: o.tokenAddress,
           tokenSymbol,
