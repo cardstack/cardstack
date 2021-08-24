@@ -153,7 +153,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'Merchant ID can only contain lowercase alphabets and numbers',
+        detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -182,7 +182,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'Merchant ID must be at most 50 characters, currently 51',
+        detail: 'The Merchant ID cannot be more than 50 characters long. It is currently 51 characters long',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -228,10 +228,11 @@ describe('POST /api/merchant-infos', function () {
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(200)
+      .expect(422)
       .expect({
-        slugAvailable: false,
-        title: 'Merchant slug already exists',
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'Merchant slug already exists',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -244,6 +245,10 @@ describe('GET /api/merchant-infos/validate', function () {
   this.beforeEach(async function () {
     server = await bootServerForTesting({
       port: 3001,
+      registryCallback(registry: Registry) {
+        registry.register('authentication-utils', StubAuthenticationUtils);
+        registry.register('worker-client', StubWorkerClient);
+      },
     });
 
     request = supertest(server);
@@ -251,6 +256,8 @@ describe('GET /api/merchant-infos/validate', function () {
 
   this.afterEach(async function () {
     server.close();
+    lastAddedJobIdentifier = undefined;
+    lastAddedJobPayload = undefined;
   });
 
   it('validates slug existence', async function () {
@@ -300,7 +307,7 @@ describe('GET /api/merchant-infos/validate', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'Merchant ID can only contain lowercase alphabets and numbers',
+        detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -312,7 +319,7 @@ describe('GET /api/merchant-infos/validate', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'Merchant ID can only contain lowercase alphabets and numbers',
+        detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -324,7 +331,7 @@ describe('GET /api/merchant-infos/validate', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'Merchant ID can only contain lowercase alphabets and numbers',
+        detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -338,22 +345,12 @@ describe('GET /api/merchant-infos/validate', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'Merchant ID must be at most 50 characters, currently 51',
+        detail: 'The Merchant ID cannot be more than 50 characters long. It is currently 51 characters long',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
   it('validates slug for uniqueness', async function () {
-    server.close();
-    server = await bootServerForTesting({
-      port: 3001,
-      registryCallback(registry: Registry) {
-        registry.register('authentication-utils', StubAuthenticationUtils);
-        registry.register('worker-client', StubWorkerClient);
-      },
-    });
-    request = supertest(server);
-
     const payload = {
       data: {
         type: 'merchant-infos',
@@ -379,10 +376,11 @@ describe('GET /api/merchant-infos/validate', function () {
     await request
       .get(`/api/merchant-infos/validate?slug=${slug1}`)
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(200)
+      .expect(422)
       .expect({
-        slugAvailable: false,
-        title: 'Merchant slug already exists',
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'Merchant slug already exists',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -393,12 +391,8 @@ describe('GET /api/merchant-infos/validate', function () {
       .expect(200)
       .expect({
         slugAvailable: true,
-        title: 'Merchant slug is available',
+        info: 'Merchant slug is available',
       })
       .expect('Content-Type', 'application/vnd.api+json');
-
-    server.close();
-    lastAddedJobIdentifier = undefined;
-    lastAddedJobPayload = undefined;
   });
 });
