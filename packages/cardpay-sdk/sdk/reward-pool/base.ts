@@ -56,11 +56,18 @@ export default class RewardPool {
     return json['tokenAddresses'];
   }
 
-  async getProofs(address: string, tokenAddress?: string, offset?: number, limit?: number): Promise<Proof[]> {
+  async getProofs(
+    address: string,
+    tokenAddress?: string,
+    rewardProgramID?: string,
+    offset?: number,
+    limit?: number
+  ): Promise<Proof[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url =
       `${tallyServiceURL}/merkle-proofs/${address}` +
       (tokenAddress ? `?token_address=${tokenAddress}` : '') +
+      (rewardProgramID ? `?reward_program_id=${rewardProgramID}` : '') +
       (offset ? `?offset=${offset}` : '') +
       (limit ? `?limit=${limit}` : `?limit=${DEFAULT_PAGE_SIZE}`);
     let options = {
@@ -91,7 +98,6 @@ export default class RewardPool {
     let ungroupedTokenBalance = await Promise.all(
       proofs.map(async (o: Proof) => {
         const balance = await rewardPool.methods.balanceForProofWithAddress(o.tokenAddress, address, o.proof).call();
-        // returns a string in wei amount
         return {
           tokenAddress: o.tokenAddress,
           tokenSymbol,
