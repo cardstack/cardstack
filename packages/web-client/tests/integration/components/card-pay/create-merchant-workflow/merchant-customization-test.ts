@@ -41,21 +41,22 @@ const MERCHANT_ID_INVALID_INPUTS = [
   {
     value: 'an invalid id because of spaces',
     errorMessage:
-      'Merchant ID can only contain lowercase alphabets and numbers',
+      'The Merchant ID can only contain lowercase letters or numbers, no special characters',
   },
   {
     value: 'INVALIDCASING',
     errorMessage:
-      'Merchant ID can only contain lowercase alphabets and numbers',
+      'The Merchant ID can only contain lowercase letters or numbers, no special characters',
   },
   {
     value: '😤',
     errorMessage:
-      'Merchant ID can only contain lowercase alphabets and numbers',
+      'The Merchant ID can only contain lowercase letters or numbers, no special characters',
   },
   {
     value: 'thisisexactlyfiftyfivecharacterslongbutisotherwisevalid',
-    errorMessage: 'Merchant ID must be at most 50 characters, currently 55',
+    errorMessage:
+      'The Merchant ID cannot be more than 50 characters long. It is currently 55 characters long',
   },
 ];
 
