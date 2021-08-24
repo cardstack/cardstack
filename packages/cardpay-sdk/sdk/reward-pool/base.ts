@@ -18,6 +18,8 @@ interface Proof {
   blockNumber: number;
 }
 
+const DEFAULT_PAGE_SIZE = 1000000;
+
 export interface RewardTokenBalance {
   tokenAddress: string;
   tokenSymbol: string;
@@ -54,9 +56,13 @@ export default class RewardPool {
     return json['tokenAddresses'];
   }
 
-  async getProofs(address: string, tokenAddress?: string): Promise<Proof[]> {
+  async getProofs(address: string, tokenAddress?: string, offset?: number, limit?: number): Promise<Proof[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
-    let url = `${tallyServiceURL}/merkle-proofs/${address}` + (tokenAddress ? `?token_address=${tokenAddress}` : '');
+    let url =
+      `${tallyServiceURL}/merkle-proofs/${address}` +
+      (tokenAddress ? `?token_address=${tokenAddress}` : '') +
+      (offset ? `?offset=${offset}` : '') +
+      (limit ? `?limit=${limit}` : `?limit=${DEFAULT_PAGE_SIZE}`);
     let options = {
       method: 'GET',
       headers: {
