@@ -16,7 +16,7 @@ interface Proof {
   proof: string;
   timestamp: string;
   blockNumber: number;
-  rewardProgramId: string
+  rewardProgramId: string;
 }
 
 const DEFAULT_PAGE_SIZE = 1000000;
@@ -60,8 +60,8 @@ export default class RewardPool {
 
   async getProofs(
     address: string,
-    rewardProgramId?: string,
     tokenAddress?: string,
+    rewardProgramId?: string,
     offset?: number,
     limit?: number
   ): Promise<Proof[]> {
@@ -69,9 +69,9 @@ export default class RewardPool {
     let url =
       `${tallyServiceURL}/merkle-proofs/${address}` +
       (tokenAddress ? `?token_address=${tokenAddress}` : '') +
-      (rewardProgramId ? `?reward_program_id=${rewardProgramId}` : '') +
-      (offset ? `?offset=${offset}` : '') +
-      (limit ? `?limit=${limit}` : `?limit=${DEFAULT_PAGE_SIZE}`);
+      (rewardProgramId ? `&reward_program_id=${rewardProgramId}` : '') +
+      (offset ? `&offset=${offset}` : '') +
+      (limit ? `&limit=${limit}` : `&limit=${DEFAULT_PAGE_SIZE}`);
     let options = {
       method: 'GET',
       headers: {
