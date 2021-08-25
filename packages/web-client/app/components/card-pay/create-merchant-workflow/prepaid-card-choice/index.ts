@@ -5,11 +5,8 @@ import { tracked } from '@glimmer/tracking';
 
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import MerchantCustomizationService, {
-  MerchantCustomization,
-} from '@cardstack/web-client/services/merchant-customization';
+import MerchantInfoService from '@cardstack/web-client/services/merchant-info';
 import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-rejection-error';
-import Resolved from '@cardstack/web-client/utils/resolved';
 import {
   RegisterMerchantOptions,
   TransactionHash,
@@ -26,7 +23,7 @@ interface CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs {
 }
 
 export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent extends Component<CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs> {
-  @service declare merchantCustomization: MerchantCustomizationService;
+  @service declare merchantInfo: MerchantInfoService;
   @service declare layer2Network: Layer2Network;
 
   @tracked chinInProgressMessage?: string;
@@ -61,11 +58,18 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
     try {
       this.chinInProgressMessage = 'Preparing to create merchant…';
 
-      // yield statements require manual typing
-      // https://github.com/machty/ember-concurrency/pull/357#discussion_r434850096
-      let placeholderCustomization: Resolved<MerchantCustomization> = yield taskFor(
-        this.merchantCustomization.createCustomizationTask
-      ).perform();
+      if (!workflowSession.state.merchantInfo) {
+        let persistedMerchantInfo = yield taskFor(
+          this.merchantInfo.persistMerchantInfoTask
+        ).perform({
+          name: workflowSession.state.merchantName,
+          slug: workflowSession.state.merchantId,
+          color: workflowSession.state.merchantBgColor,
+          textColor: workflowSession.state.merchantTextColor,
+        });
+
+        workflowSession.update('merchantInfo', persistedMerchantInfo);
+      }
 
       let options: RegisterMerchantOptions = {
         onTxHash: (txHash: TransactionHash) => {
@@ -86,7 +90,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         this.layer2Network.registerMerchant
       ).perform(
         placeholderPrepaidCard.address,
-        placeholderCustomization.did,
+        workflowSession.state.merchantInfo.did,
         options
       );
 

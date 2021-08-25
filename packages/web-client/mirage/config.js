@@ -4,6 +4,8 @@ import { Resolver } from 'did-resolver';
 export default function () {
   this.namespace = 'api';
 
+  this.post('/merchant-infos');
+
   this.get('/prepaid-card-color-schemes', (schema) => {
     return schema.prepaidCardColorSchemes.all();
   });

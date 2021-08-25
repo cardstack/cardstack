@@ -5,8 +5,11 @@ import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import sinon from 'sinon';
-import MerchantCustomization from '@cardstack/web-client/services/merchant-customization';
-import { taskFor } from 'ember-concurrency-ts';
+import { setupMirage } from 'ember-cli-mirage/test-support';
+import { MirageTestContext } from 'ember-cli-mirage/test-support';
+import { Response as MirageResponse } from 'ember-cli-mirage';
+
+interface Context extends MirageTestContext {}
 
 const USER_REJECTION_ERROR_MESSAGE =
   'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
@@ -20,16 +23,13 @@ module(
   'Integration | Component | card-pay/create-merchant/prepaid-card-choice',
   function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
-    let merchantCustomizationService: MerchantCustomization;
 
     setupRenderingTest(hooks);
+    setupMirage(hooks);
 
-    hooks.beforeEach(async function () {
+    hooks.beforeEach(async function (this: Context) {
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
-      merchantCustomizationService = this.owner.lookup(
-        'service:merchant-customization'
-      ) as MerchantCustomization;
 
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
       let prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
@@ -145,6 +145,34 @@ module(
           .containsText(TIMEOUT_ERROR_MESSAGE);
       });
 
+      test('it only makes one Hub call to persist when trying again after a timeout', async function (assert) {
+        let stub = sinon
+          .stub(layer2Service, 'registerMerchant')
+          .throws(
+            new Error(
+              'Transaction took too long to complete, waited 30 seconds'
+            )
+          );
+
+        await click('[data-test-create-merchant-button]');
+        await waitFor('[data-test-prepaid-card-choice-error-message]');
+
+        stub.restore();
+
+        await click('[data-test-create-merchant-button]');
+
+        // @ts-ignore
+        let merchantInfoStorageRequests = this.server.pretender.handledRequests.filter(
+          (req: { url: string }) => req.url.includes('merchant-infos')
+        );
+
+        assert.equal(
+          merchantInfoStorageRequests.length,
+          1,
+          'expected only one POST /api/merchant-infos'
+        );
+      });
+
       test('it shows the correct error message for the user not having enough of a token to create the merchant', async function (assert) {
         sinon
           .stub(layer2Service, 'registerMerchant')
@@ -176,20 +204,21 @@ module(
       });
     });
 
-    test('it shows the fallback error message if the merchant customization service fails', async function (assert) {
-      sinon
-        .stub(
-          taskFor(merchantCustomizationService.createCustomizationTask),
-          'perform'
-        )
-        .throws(new Error('Any error will do'));
+    module('when the Hub endpoint fails', async function (hooks) {
+      hooks.beforeEach(async function (this: Context) {
+        this.server.post('/merchant-infos', function () {
+          return new MirageResponse(500, {}, '');
+        });
+      });
 
-      await click('[data-test-create-merchant-button]');
-      await waitFor('[data-test-prepaid-card-choice-error-message]');
+      test('it shows the fallback error message', async function (assert) {
+        await click('[data-test-create-merchant-button]');
+        await waitFor('[data-test-prepaid-card-choice-error-message]');
 
-      assert
-        .dom('[data-test-prepaid-card-choice-error-message]')
-        .containsText(DEFAULT_ERROR_MESSAGE);
+        assert
+          .dom('[data-test-prepaid-card-choice-error-message]')
+          .containsText(DEFAULT_ERROR_MESSAGE);
+      });
     });
   }
 );
