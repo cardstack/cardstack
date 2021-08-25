@@ -45,7 +45,7 @@ export default class MerchantInfosRoute {
     }
 
     let slug = ctx.request.body.data.attributes['slug'];
-    let isValidSlug = await ensureValidSlug(ctx, slug, this.merchantInfoQueries);
+    let isValidSlug = await this.ensureValidSlug(ctx, slug);
 
     if (!isValidSlug) {
       return;
@@ -75,7 +75,7 @@ export default class MerchantInfosRoute {
 
   async getValidation(ctx: Koa.Context) {
     let slug = ctx.query?.slug;
-    let isValidSlug = await ensureValidSlug(ctx, slug, this.merchantInfoQueries);
+    let isValidSlug = await this.ensureValidSlug(ctx, slug);
 
     if (!isValidSlug) {
       return;
@@ -88,34 +88,38 @@ export default class MerchantInfosRoute {
     };
     ctx.type = 'application/vnd.api+json';
   }
-}
 
-async function ensureValidSlug(ctx: Koa.Context, slug?: string | string[], queries?: MerchantInfoQueries) {
-  let detail = '';
+  async ensureValidSlug(ctx: Koa.Context, slug?: string | string[]) {
+    let detail = '';
 
-  if (!slug) {
-    detail = `Slug cannot be undefined`;
-  } else if (typeof slug === 'object') {
-    detail = `Slug cannot be an array`;
-  } else if (validateMerchantId(slug)) {
-    detail = validateMerchantId(slug);
-  } else if (queries) {
-    let merchantInfo = (await queries.fetch({ slug }))[0];
-    detail = merchantInfo ? 'Merchant slug already exists' : '';
+    if (!slug) {
+      detail = `Slug cannot be undefined`;
+    } else if (typeof slug === 'object') {
+      detail = `Slug cannot be an array`;
+    } else {
+      let errorMessage = validateMerchantId(slug);
+
+      if (errorMessage) {
+        detail = errorMessage;
+      } else {
+        let merchantInfo = (await this.merchantInfoQueries.fetch({ slug }))[0];
+        detail = merchantInfo ? 'Merchant slug already exists' : '';
+      }
+    }
+
+    if (detail) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail,
+      };
+      ctx.type = 'application/vnd.api+json';
+      return false;
+    }
+
+    return true;
   }
-
-  if (detail) {
-    ctx.status = 422;
-    ctx.body = {
-      status: '422',
-      title: 'Invalid merchant slug',
-      detail,
-    };
-    ctx.type = 'application/vnd.api+json';
-    return false;
-  }
-
-  return true;
 }
 
 function ensureValidPayload(ctx: Koa.Context) {
