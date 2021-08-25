@@ -1,12 +1,7 @@
 import Component from '@glimmer/component';
-import { inject as service } from '@ember/service';
-import { action } from '@ember/object';
-import { tracked } from '@glimmer/tracking';
-
-import CardCustomization from '@cardstack/web-client/services/card-customization';
+import { CardCustomization } from '@cardstack/web-client/resources/card-customization';
 import { PrepaidCardSafe } from '@cardstack/cardpay-sdk';
-import { taskFor } from 'ember-concurrency-ts';
-import { TaskInstance } from 'ember-concurrency';
+import { useResource } from 'ember-resources';
 
 interface CardPayPrepaidCardSafeComponentArgs {
   safe: PrepaidCardSafe;
@@ -14,22 +9,8 @@ interface CardPayPrepaidCardSafeComponentArgs {
 }
 
 export default class CardPayPrepaidCardSafeComponent extends Component<CardPayPrepaidCardSafeComponentArgs> {
-  @service declare cardCustomization: CardCustomization;
-
-  @tracked fetchTask: TaskInstance<any> | undefined;
-
-  @action fetchCustomization() {
-    if (this.args.safe.customizationDID) {
-      this.fetchTask = taskFor(
-        this.cardCustomization.fetchCardCustomization
-      ).perform(
-        this.args.safe.customizationDID,
-        this.args.waitForCustomization
-      );
-    }
-  }
-
-  get customization() {
-    return this.fetchTask?.value;
-  }
+  customization = useResource(this, CardCustomization, () => ({
+    customizationDID: this.args.safe.customizationDID,
+    waitForCustomization: this.args.waitForCustomization,
+  }));
 }
