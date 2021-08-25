@@ -100,8 +100,8 @@ async function ensureValidSlug(ctx: Koa.Context, slug?: string | string[], queri
   } else if (validateMerchantId(slug)) {
     detail = validateMerchantId(slug);
   } else if (queries) {
-    let result = await queries.fetch(slug, 'slug');
-    detail = result.id ? 'Merchant slug already exists' : '';
+    let merchantInfo = (await queries.fetch({ slug }))[0];
+    detail = merchantInfo ? 'Merchant slug already exists' : '';
   }
 
   if (detail) {
