@@ -88,14 +88,19 @@ export default class RewardPool {
     return json['results'];
   }
 
-  async rewardTokenBalance(address: string, tokenAddress: string): Promise<RewardTokenBalance> {
-    let rewardTokensAvailable = await this.rewardTokensAvailable(address);
+  async rewardTokenBalance(
+    address: string,
+    tokenAddress: string,
+    rewardProgramId?: string
+  ): Promise<RewardTokenBalance> {
+    let rewardTokensAvailable = await this.rewardTokensAvailable(address, rewardProgramId);
     if (!rewardTokensAvailable.includes(tokenAddress)) {
       throw new Error(`Payee does not have any reward token ${tokenAddress}`);
     }
     const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let tokenSymbol = await tokenContract.methods.symbol().call();
-    let proofs = await this.getProofs(address, tokenAddress);
+    let proofs = await this.getProofs(address, tokenAddress, rewardProgramId);
+
     let rewardPool = await this.getRewardPool();
     let ungroupedTokenBalance = await Promise.all(
       proofs.map(async (o: Proof) => {
@@ -112,11 +117,11 @@ export default class RewardPool {
     return aggregateBalance(ungroupedTokenBalance);
   }
 
-  async rewardTokenBalances(address: string): Promise<RewardTokenBalance[]> {
-    let rewardTokensAvailable = await this.rewardTokensAvailable(address);
+  async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<RewardTokenBalance[]> {
+    let rewardTokensAvailable = await this.rewardTokensAvailable(address, rewardProgramId);
     const ungroupedTokenBalance = await Promise.all(
       rewardTokensAvailable.map(async (tokenAddress: string) => {
-        return this.rewardTokenBalance(address, tokenAddress);
+        return this.rewardTokenBalance(address, tokenAddress, rewardProgramId);
       })
     );
     return ungroupedTokenBalance;
