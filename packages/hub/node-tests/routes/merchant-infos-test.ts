@@ -129,7 +129,7 @@ describe('POST /api/merchant-infos', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it('validates slug for alphanumeric characters', async function () {
+  it('validates slug against invalid or lowercase characters', async function () {
     const payload = {
       data: {
         type: 'merchant-infos',
@@ -238,7 +238,7 @@ describe('POST /api/merchant-infos', function () {
   });
 });
 
-describe('GET /api/merchant-infos/validate', function () {
+describe('GET /api/merchant-infos/validate-slug/:slug', function () {
   let server: Server;
   let request: supertest.SuperTest<Test>;
 
@@ -260,77 +260,56 @@ describe('GET /api/merchant-infos/validate', function () {
     lastAddedJobPayload = undefined;
   });
 
-  it('validates slug existence', async function () {
-    const slug = '';
+  it('returns 401 without bearer token', async function () {
+    const slug = 'slug';
     await request
-      .get(`/api/merchant-infos/validate?slug=${slug}`)
+      .get(`/api/merchant-infos/validate-slug/${slug}`)
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(422)
+      .expect(401)
       .expect({
-        status: '422',
-        title: 'Invalid merchant slug',
-        detail: 'Slug cannot be undefined',
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-
-    await request
-      .get(`/api/merchant-infos/validate`)
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(422)
-      .expect({
-        status: '422',
-        title: 'Invalid merchant slug',
-        detail: 'Slug cannot be undefined',
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  it('validates slug query param count', async function () {
-    await request
-      .get(`/api/merchant-infos/validate?slug=slug1&slug=slug2`)
-      .set('Content-Type', 'application/vnd.api+json')
-      .expect(422)
-      .expect({
-        status: '422',
-        title: 'Invalid merchant slug',
-        detail: 'Slug cannot be an array',
-      })
-      .expect('Content-Type', 'application/vnd.api+json');
-  });
-
-  it('validates slug for lowercase alphanumeric characters', async function () {
+  it('validates slug against invalid or lowercase characters', async function () {
     const slug1 = 'sat-oshi';
     await request
-      .get(`/api/merchant-infos/validate?slug=${slug1}`)
+      .get(`/api/merchant-infos/validate-slug/${slug1}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(422)
+      .expect(200)
       .expect({
-        status: '422',
-        title: 'Invalid merchant slug',
+        slugAvailable: false,
         detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
     const slug2 = 'sat oshi';
     await request
-      .get(`/api/merchant-infos/validate?slug=${slug2}`)
+      .get(`/api/merchant-infos/validate-slug/${slug2}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(422)
+      .expect(200)
       .expect({
-        status: '422',
-        title: 'Invalid merchant slug',
+        slugAvailable: false,
         detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
     const slug3 = 'Satoshi';
     await request
-      .get(`/api/merchant-infos/validate?slug=${slug3}`)
+      .get(`/api/merchant-infos/validate-slug/${slug3}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(422)
+      .expect(200)
       .expect({
-        status: '422',
-        title: 'Invalid merchant slug',
+        slugAvailable: false,
         detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
@@ -339,12 +318,12 @@ describe('GET /api/merchant-infos/validate', function () {
   it('validates slug for length', async function () {
     const slug = 'satoshisatoshisatoshisatoshisatoshisatoshisatoshi11';
     await request
-      .get(`/api/merchant-infos/validate?slug=${slug}`)
+      .get(`/api/merchant-infos/validate-slug/${slug}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(422)
+      .expect(200)
       .expect({
-        status: '422',
-        title: 'Invalid merchant slug',
+        slugAvailable: false,
         detail: 'The Merchant ID cannot be more than 50 characters long. It is currently 51 characters long',
       })
       .expect('Content-Type', 'application/vnd.api+json');
@@ -374,24 +353,25 @@ describe('GET /api/merchant-infos/validate', function () {
 
     const slug1 = 'mandello1';
     await request
-      .get(`/api/merchant-infos/validate?slug=${slug1}`)
+      .get(`/api/merchant-infos/validate-slug/${slug1}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
-      .expect(422)
+      .expect(200)
       .expect({
-        status: '422',
-        title: 'Invalid merchant slug',
+        slugAvailable: false,
         detail: 'Merchant slug already exists',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
     const slug2 = 'mandello2';
     await request
-      .get(`/api/merchant-infos/validate?slug=${slug2}`)
+      .get(`/api/merchant-infos/validate-slug/${slug2}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .expect({
         slugAvailable: true,
-        info: 'Merchant slug is available',
+        detail: 'Merchant slug is available',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });

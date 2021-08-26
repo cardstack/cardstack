@@ -45,9 +45,16 @@ export default class MerchantInfosRoute {
     }
 
     let slug = ctx.request.body.data.attributes['slug'];
-    let isValidSlug = await this.ensureValidSlug(ctx, slug);
+    let validationResult = await this.validateSlug(slug);
 
-    if (!isValidSlug) {
+    if (!validationResult.slugAvailable) {
+      ctx.status = 422;
+      ctx.body = {
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: validationResult.detail,
+      };
+      ctx.type = 'application/vnd.api+json';
       return;
     }
 
@@ -74,51 +81,33 @@ export default class MerchantInfosRoute {
   }
 
   async getValidation(ctx: Koa.Context) {
-    let slug = ctx.query?.slug;
-    let isValidSlug = await this.ensureValidSlug(ctx, slug);
-
-    if (!isValidSlug) {
+    if (!ensureLoggedIn(ctx)) {
       return;
     }
 
+    let slug: string = ctx.routeParams.slug;
+    let validationResult = await this.validateSlug(slug);
+
     ctx.status = 200;
-    ctx.body = {
-      slugAvailable: true,
-      info: 'Merchant slug is available',
-    };
+    ctx.body = validationResult;
     ctx.type = 'application/vnd.api+json';
   }
 
-  async ensureValidSlug(ctx: Koa.Context, slug?: string | string[]) {
-    let detail = '';
+  async validateSlug(slug: string) {
+    let errorMessage = validateMerchantId(slug);
 
-    if (!slug) {
-      detail = `Slug cannot be undefined`;
-    } else if (typeof slug === 'object') {
-      detail = `Slug cannot be an array`;
-    } else {
-      let errorMessage = validateMerchantId(slug);
-
-      if (errorMessage) {
-        detail = errorMessage;
-      } else {
-        let merchantInfo = (await this.merchantInfoQueries.fetch({ slug }))[0];
-        detail = merchantInfo ? 'Merchant slug already exists' : '';
-      }
-    }
-
-    if (detail) {
-      ctx.status = 422;
-      ctx.body = {
-        status: '422',
-        title: 'Invalid merchant slug',
-        detail,
+    if (errorMessage) {
+      return {
+        slugAvailable: false,
+        detail: errorMessage,
       };
-      ctx.type = 'application/vnd.api+json';
-      return false;
+    } else {
+      let merchantInfo = (await this.merchantInfoQueries.fetch({ slug }))[0];
+      return {
+        slugAvailable: merchantInfo ? false : true,
+        detail: merchantInfo ? 'Merchant slug already exists' : 'Merchant slug is available',
+      };
     }
-
-    return true;
   }
 }
 
