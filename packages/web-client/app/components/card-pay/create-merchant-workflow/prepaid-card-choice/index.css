@@ -15,3 +15,8 @@
   flex-grow: 0;
   flex-shrink: 0;
 }
+
+.prepaid-card-choice__cancel-button {
+  display: inline;
+  text-decoration: underline;
+}

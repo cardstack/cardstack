@@ -50,6 +50,8 @@ export interface IssuePrepaidCardOptions {
 
 export interface RegisterMerchantOptions {
   onTxHash?(txHash: TransactionHash): void;
+  nonce?: string;
+  onNonce?(nonce: string): void;
 }
 
 export interface ClaimBridgedTokensOptions {

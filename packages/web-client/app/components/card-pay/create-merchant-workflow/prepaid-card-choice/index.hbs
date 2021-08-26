@@ -74,7 +74,12 @@
           class="prepaid-card-choice__loading-indicator"
           @color="var(--boxel-light)"
         />
-        {{this.chinInProgressMessage}}
+        <div>
+          {{this.chinInProgressMessage}}
+          {{#if this.enableCancelation}}
+            <a href="#" class="prepaid-card-choice__cancel-button" data-test-create-merchant-cancel-button {{on 'click' (queue (prevent-default) this.cancel)}}>Cancel</a>
+          {{/if}}
+        </div>
       </i.ActionStatusArea>
       {{#if this.txViewerUrl}}
         <i.InfoArea>
