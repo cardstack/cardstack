@@ -1,0 +1,117 @@
+.payment-request {
+  --explanation-padding: var(--boxel-sp-xl);
+  --explanation-font: var(--boxel-font-lg);
+  --amount-font-size: 2.5rem;
+  --body-padding: var(--boxel-sp-xl);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--boxel-sp-lg);
+}
+
+.payment-request__explanation {
+  max-width: 45ch;
+  font: var(--explanation-font);
+  color: var(--boxel-purple-500);
+  padding: var(--explanation-padding) 0;
+}
+
+.payment-request__body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--boxel-purple-100);
+  padding: var(--body-padding);
+}
+
+@media only screen and (max-width: 360px) {
+  .payment-request {
+    --explanation-padding: 0;
+    --explanation-font: var(--boxel-font);
+    --amount-font-size: var(--boxel-font-size-xl);
+    --body-padding: var(--boxel-sp);
+  }
+}
+
+.payment-request__deep-link {
+  width: 100%;
+  max-width: 40ch;
+  margin: var(--boxel-sp-lg) 0;
+}
+
+.payment-request__qr-container {
+  text-align: center;
+  margin: var(--boxel-sp-lg) auto var(--boxel-sp) auto;
+}
+
+.payment-request__amount {
+  font-weight: 700;
+  font-size: var(--amount-font-size);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.payment-request__usd-amount {
+  color: var(--boxel-purple-400);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.payment-request__url {
+  max-width: 50ch;
+  font: var(--boxel-font-sm);
+  color: var(--boxel-purple-500);
+  letter-spacing: var(--boxel-lsp-xs);
+  word-break: break-all;
+}
+
+.payment-request__merchant {
+  display: flex;
+  flex-flow: column;
+  text-align: center;
+  align-items: center;
+}
+
+.payment-request__merchant-logo {
+  --logo-size: var(--boxel-icon-lg);
+
+  background: var(--merchant-logo-background);
+  color: var(--merchant-logo-text-color);
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--logo-size);
+  height: var(--logo-size);
+  border-radius: 50%;
+  margin-right: auto;
+  margin-left: auto;
+  margin-bottom: var(--boxel-sp-xxxs);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.payment-request__merchant-description {
+  font: 700 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.payment-request__qr-code-toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--boxel-sp-xs);
+  border-radius: 100px; /* same as Boxel button border radius */
+  gap: var(--boxel-sp-xs);
+  border: none;
+  background-color: transparent;
+}
+
+.payment-request__qr-code-toggle:hover,
+.payment-request__qr-code-toggle:active {
+  background-color: rgba(0, 0, 0, 0.1);
+}

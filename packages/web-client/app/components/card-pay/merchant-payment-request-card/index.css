@@ -1,0 +1,49 @@
+.merchant-payment-request-card {
+  --section-padding: var(--boxel-sp-xl);
+
+  max-width: 720px;
+}
+
+@media only screen and (max-width: 360px) {
+  .merchant-payment-request-card {
+    --section-padding: var(--boxel-sp-lg);
+  }
+
+  .merchant-payment-request-card__card-wallet-text {
+    display: none;
+  }
+}
+
+.merchant-payment-request-card__section {
+  padding: var(--section-padding);
+}
+
+.merchant-payment-request-card__get-card-wallet {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--boxel-sp-sm);
+  border-bottom: 1px solid var(--boxel-light-300);
+}
+
+.merchant-payment-request-card__card-wallet {
+  display: flex;
+  align-items: center;
+  font: 600 var(--boxel-font);
+  gap: var(--boxel-sp-sm);
+}
+
+.merchant-payment-request-card__card-wallet-icon {
+  flex-shrink: 0;
+}
+
+.merchant-payment-request-card__testflight-link {
+  --icon-color: currentColor;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--boxel-sp-xs);
+  font: 600 var(--boxel-font);
+  line-height: 1.5;
+}

@@ -1,0 +1,96 @@
+<div
+  class="payment-request"
+  ...attributes
+>
+  <div class="payment-request__explanation">
+    {{#if (and @canDeepLink this.showAsQR)}}
+      Please install the Card Wallet app on your mobile phone, then tap on the link below to complete your payment
+    {{else}}
+      Please install the Card Wallet app on your mobile phone, then scan the QR code below to complete your payment
+    {{/if}}
+  </div>
+
+  <Boxel::CardContainer
+    class="payment-request__body"
+  >
+    <div
+      class="payment-request__merchant"
+      style={{css-var
+        merchant-logo-background=@merchant.logoBackground
+        merchant-logo-text-color=@merchant.logoTextColor
+      }}
+    >
+      <div class="payment-request__merchant-logo">
+        {{first-char @merchant.name}}
+      </div>
+      <div class="payment-request__merchant-description">
+        Pay {{@merchant.name}}
+      </div>
+    </div>
+
+    <div class="payment-request__amount">
+      §{{@amount}}
+    </div>
+    <div class="payment-request__usd-amount">
+      {{format-usd @usdAmount}}
+    </div>
+
+    {{#if @canDeepLink}}
+      {{#if this.showAsQR}}
+        <div class="payment-request__qr-container">
+          <StyledQrCode
+            @data={{@paymentURL}}
+            @image={{@image}}
+            @size={{340}}
+            @margin={{15}}
+            @backgroundColor="#ffffff"
+            @dotType="dots"
+            @dotColor="#000"
+            @cornerDotType="dot"
+            @cornerSquareType="extra-rounded"
+            @imageMargin={{5}}
+          />
+        </div>
+      {{else}}
+        <Boxel::Button
+          class="payment-request__deep-link"
+          @as="anchor"
+          @kind="primary"
+          @size="touch"
+          href={{this.deepLink}}
+        >
+          Pay Merchant
+        </Boxel::Button>
+      {{/if}}
+      <span class="payment-request__url">
+        {{@paymentURL}}
+      </span>
+
+      <button class="payment-request__qr-code-toggle" type="button" {{on "click" (set this "showAsQR" (not this.showAsQR))}}>
+        {{#if this.showAsQR}}
+          Show Payment Link
+        {{else}}
+          Show as QR Code {{svg-jar "qr-code" width="20" height="20"}}
+        {{/if}}
+      </button>
+    {{else}}
+      <div class="payment-request__qr-container">
+        <StyledQrCode
+          @data={{@paymentURL}}
+          @image={{@image}}
+          @size={{340}}
+          @margin={{15}}
+          @backgroundColor="#ffffff"
+          @dotType="dots"
+          @dotColor="#000"
+          @cornerDotType="dot"
+          @cornerSquareType="extra-rounded"
+          @imageMargin={{5}}
+        />
+      </div>
+      <span class="payment-request__url">
+        {{@paymentURL}}
+      </span>
+    {{/if}}
+  </Boxel::CardContainer>
+</div>
