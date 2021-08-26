@@ -12,6 +12,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import BN from 'bn.js';
+import { setupMirage } from 'ember-cli-mirage/test-support';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -27,6 +28,7 @@ function milestoneCompletedSel(milestoneIndex: number): string {
 
 module('Acceptance | create merchant', function (hooks) {
   setupApplicationTest(hooks);
+  setupMirage(hooks);
 
   test('Initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay');
@@ -161,6 +163,10 @@ module('Acceptance | create merchant', function (hooks) {
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
+
+    // need wait for Hub POST /api/merchant-infos
+    // eslint-disable-next-line ember/no-settled-after-test-helper
+    await settled();
 
     layer2Service.test__simulateRegisterMerchantForAddress(
       prepaidCardAddress,
