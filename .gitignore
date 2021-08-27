@@ -9,7 +9,7 @@
 /packages/web-client/deploy/dist
 /packages/cardpay-subgraph/build
 /packages/cardpay-subgraph/generated
-/packages/hub/.env
+/packages/*/.env
 .eslintcache
 .vagrant
 .nvmrc
