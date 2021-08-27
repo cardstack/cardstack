@@ -43,7 +43,7 @@
     "typescript": "4.2.3"
   },
   "scripts": {
-    "clean": "git clean -x -f --exclude=packages/web-client/.env",
+    "clean": "git clean -x -f --exclude=packages/*/.env",
     "compile": "yarn codegen:subgraph-sokol && tsc --build ./tsconfig.json",
     "prepare": "npm run compile",
     "codegen:subgraph-sokol": "cd ./packages/cardpay-subgraph && yarn codegen-sokol",
