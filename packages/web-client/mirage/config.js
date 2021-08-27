@@ -6,6 +6,25 @@ export default function () {
 
   this.post('/merchant-infos');
 
+  this.get(
+    '/merchant-infos/validate-slug/:slug',
+    function ({ merchantInfos }, { params: { slug } }) {
+      let merchantBySlug = merchantInfos.findBy({ slug });
+
+      if (merchantBySlug) {
+        return {
+          slugAvailable: false,
+          detail: 'Merchant slug already exists',
+        };
+      } else {
+        return {
+          slugAvailable: true,
+          detail: 'Merchant slug is available',
+        };
+      }
+    }
+  );
+
   this.get('/prepaid-card-color-schemes', (schema) => {
     return schema.prepaidCardColorSchemes.all();
   });

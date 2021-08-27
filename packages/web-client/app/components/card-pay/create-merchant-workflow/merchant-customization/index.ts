@@ -2,6 +2,7 @@ import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import MerchantInfoService from '@cardstack/web-client/services/merchant-info';
 import { inject as service } from '@ember/service';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 import { didCancel, restartableTask, timeout } from 'ember-concurrency';
@@ -9,9 +10,12 @@ import { taskFor } from 'ember-concurrency-ts';
 import { mostReadable, random as randomColor } from '@ctrl/tinycolor';
 import config from '@cardstack/web-client/config/environment';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
+import * as Sentry from '@sentry/browser';
 
 export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
+  @service declare merchantInfo: MerchantInfoService;
+
   @tracked merchantBgColor: string = randomColor().toHexString();
   @tracked merchantName: string = '';
   @tracked merchantId: string = '';
@@ -116,21 +120,27 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
       return false;
     }
 
-    // replace w call to api
-    let merchantIdExists: boolean = yield checkIfMerchantIdExists(value);
+    try {
+      let merchantSlugIsUnique: boolean = yield taskFor(
+        this.merchantInfo.checkMerchantSlugUniquenessTask
+      ).perform({ slug: value });
 
-    this.lastCheckedMerchantId = value;
-    if (merchantIdExists) {
+      this.lastCheckedMerchantId = value;
+      if (!merchantSlugIsUnique) {
+        this.merchantIdValidationMessage =
+          'This Merchant ID is already taken. Please choose another one';
+        return false;
+      }
+
+      this.merchantIdValidationMessage = '';
+      return true;
+    } catch (e) {
+      console.log('Error validating uniqueness', e);
+      Sentry.captureException(e);
+
       this.merchantIdValidationMessage =
-        'This Merchant ID is already taken. Please choose another one';
+        'There was an error validating merchant ID uniqueness';
       return false;
     }
-
-    this.merchantIdValidationMessage = '';
-    return true;
   }
-}
-
-async function checkIfMerchantIdExists(_value: string) {
-  return false;
 }

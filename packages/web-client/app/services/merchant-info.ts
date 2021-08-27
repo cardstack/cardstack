@@ -15,6 +15,10 @@ interface PersistMerchantInfoTaskParams {
   textColor: string;
 }
 
+interface CheckMerchantSlugUniquenessTaskParams {
+  slug: string;
+}
+
 export default class MerchantInfoService extends Service {
   @service declare hubAuthentication: HubAuthentication;
 
@@ -66,6 +70,30 @@ export default class MerchantInfoService extends Service {
     return {
       did: info.data.attributes.did,
     };
+  }
+
+  @task *checkMerchantSlugUniquenessTask(
+    params: CheckMerchantSlugUniquenessTaskParams
+  ): TaskGenerator<boolean> {
+    let response = yield fetch(
+      `${config.hubURL}/api/merchant-infos/validate-slug/${params.slug}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer: ' + this.hubAuthentication.authToken,
+          Accept: 'application/vnd.api+json',
+          'Content-Type': 'application/vnd.api+json',
+        },
+      }
+    );
+
+    if (response.ok) {
+      let uniqueness = yield response.json();
+
+      return uniqueness.slugAvailable;
+    } else {
+      throw new Error(yield response.text());
+    }
   }
 }
 
