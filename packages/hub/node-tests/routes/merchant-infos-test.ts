@@ -128,4 +128,251 @@ describe('POST /api/merchant-infos', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
+
+  it('validates slug against invalid or lowercase characters', async function () {
+    const payload = {
+      data: {
+        type: 'merchant-infos',
+        attributes: {
+          name: 'Satoshi Nakamoto 2',
+          slug: 'sat-oshi',
+          color: 'ff0000',
+          'text-color': 'ffffff',
+          'owner-address': '0x00000000000',
+        },
+      },
+    };
+
+    await request
+      .post('/api/merchant-infos')
+      .send(payload)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect({
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('validates slug for length', async function () {
+    const payload = {
+      data: {
+        type: 'merchant-infos',
+        attributes: {
+          name: 'Satoshi Nakamoto 2',
+          slug: 'satoshisatoshisatoshisatoshisatoshisatoshisatoshi11',
+          color: 'ff0000',
+          'text-color': 'ffffff',
+          'owner-address': '0x00000000000',
+        },
+      },
+    };
+
+    await request
+      .post('/api/merchant-infos')
+      .send(payload)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect({
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'The Merchant ID cannot be more than 50 characters long. It is currently 51 characters long',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('validates slug for uniqueness', async function () {
+    const payload = {
+      data: {
+        type: 'merchant-infos',
+        attributes: {
+          name: 'Satoshi Nakamoto',
+          slug: 'satoshi',
+          color: 'ff0000',
+          'text-color': 'ffffff',
+          'owner-address': '0x00000000000',
+        },
+      },
+    };
+
+    const payload2 = {
+      data: {
+        type: 'merchant-infos',
+        attributes: {
+          name: 'Satoshi Nakamoto 2',
+          slug: 'satoshi',
+          color: 'ff0000',
+          'text-color': 'ffffff',
+          'owner-address': '0x00000000000',
+        },
+      },
+    };
+
+    await request
+      .post('/api/merchant-infos')
+      .send(payload)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(201);
+
+    await request
+      .post('/api/merchant-infos')
+      .send(payload2)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect({
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'Merchant slug already exists',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+});
+
+describe('GET /api/merchant-infos/validate-slug/:slug', function () {
+  let server: Server;
+  let request: supertest.SuperTest<Test>;
+
+  this.beforeEach(async function () {
+    server = await bootServerForTesting({
+      port: 3001,
+      registryCallback(registry: Registry) {
+        registry.register('authentication-utils', StubAuthenticationUtils);
+        registry.register('worker-client', StubWorkerClient);
+      },
+    });
+
+    request = supertest(server);
+  });
+
+  this.afterEach(async function () {
+    server.close();
+    lastAddedJobIdentifier = undefined;
+    lastAddedJobPayload = undefined;
+  });
+
+  it('returns 401 without bearer token', async function () {
+    const slug = 'slug';
+    await request
+      .get(`/api/merchant-infos/validate-slug/${slug}`)
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(401)
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('validates slug against invalid or lowercase characters', async function () {
+    const slug1 = 'sat-oshi';
+    await request
+      .get(`/api/merchant-infos/validate-slug/${slug1}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        slugAvailable: false,
+        detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    const slug2 = 'sat oshi';
+    await request
+      .get(`/api/merchant-infos/validate-slug/${slug2}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        slugAvailable: false,
+        detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    const slug3 = 'Satoshi';
+    await request
+      .get(`/api/merchant-infos/validate-slug/${slug3}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        slugAvailable: false,
+        detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('validates slug for length', async function () {
+    const slug = 'satoshisatoshisatoshisatoshisatoshisatoshisatoshi11';
+    await request
+      .get(`/api/merchant-infos/validate-slug/${slug}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        slugAvailable: false,
+        detail: 'The Merchant ID cannot be more than 50 characters long. It is currently 51 characters long',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('validates slug for uniqueness', async function () {
+    const payload = {
+      data: {
+        type: 'merchant-infos',
+        attributes: {
+          name: 'Mandello',
+          slug: 'mandello1',
+          color: 'ff5050',
+          'text-color': 'ffffff',
+          'owner-address': '0x00000000000',
+        },
+      },
+    };
+
+    await request
+      .post('/api/merchant-infos')
+      .send(payload)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(201);
+
+    const slug1 = 'mandello1';
+    await request
+      .get(`/api/merchant-infos/validate-slug/${slug1}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        slugAvailable: false,
+        detail: 'Merchant slug already exists',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    const slug2 = 'mandello2';
+    await request
+      .get(`/api/merchant-infos/validate-slug/${slug2}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        slugAvailable: true,
+        detail: 'Merchant slug is available',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
 });

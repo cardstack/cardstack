@@ -2,30 +2,45 @@ import DatabaseManager from '../database-manager';
 import { inject } from '../../di/dependency-injection';
 import { MerchantInfo } from '../../routes/merchant-infos';
 
+interface MerchantInfoQueriesFilter {
+  id?: string;
+  slug?: string;
+}
+
+function buildConditions(params: MerchantInfoQueriesFilter) {
+  let conditions = Object.keys(params).map((key, index) => {
+    return `${key}=$${index + 1}`;
+  });
+
+  let values = Object.values(params);
+
+  return {
+    where: conditions.join(' AND '),
+    values: values,
+  };
+}
+
 export default class MerchantInfoQueries {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
-  async fetch(id: string): Promise<MerchantInfo> {
+  async fetch(filter: MerchantInfoQueriesFilter): Promise<MerchantInfo[]> {
     let db = await this.databaseManager.getClient();
 
-    let queryResult = await db.query(
-      'SELECT id, name, slug, color, text_color, owner_address, created_at from merchant_infos WHERE id = $1',
-      [id]
-    );
+    const conditions = buildConditions(filter);
 
-    if (queryResult.rowCount === 0) {
-      return Promise.reject(new Error(`No merchant_infos record found with id ${id}`));
-    }
+    const query = `SELECT id, name, slug, color, text_color, owner_address, created_at from merchant_infos WHERE ${conditions.where}`;
+    const queryResult = await db.query(query, conditions.values);
 
-    let row = queryResult.rows[0];
-    return {
-      id: row['id'],
-      name: row['name'],
-      slug: row['slug'],
-      color: row['color'],
-      textColor: row['text_color'],
-      ownerAddress: row['owner_address'],
-    };
+    return queryResult.rows.map((row) => {
+      return {
+        id: row['id'],
+        name: row['name'],
+        slug: row['slug'],
+        color: row['color'],
+        textColor: row['text_color'],
+        ownerAddress: row['owner_address'],
+      };
+    });
   }
 
   async insert(model: MerchantInfo) {

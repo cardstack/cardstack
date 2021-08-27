@@ -16,7 +16,7 @@ export default class PersistOffChainMerchantInfo {
   async perform(payload: any, helpers: Helpers) {
     const { id } = payload;
 
-    let merchantInfo = await this.merchantInfoQueries.fetch(id);
+    let merchantInfo = (await this.merchantInfoQueries.fetch({ id }))[0];
     let jsonAPIDoc = await this.merchantInfoSerializer.serialize(merchantInfo);
 
     helpers.addJob('s3-put-json', {
