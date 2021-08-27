@@ -13,6 +13,8 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import BN from 'bn.js';
 import { setupMirage } from 'ember-cli-mirage/test-support';
+import { MERCHANT_CREATION_FEE_IN_SPEND } from '@cardstack/web-client/components/card-pay/create-merchant-workflow/workflow-config';
+import { formatUsd, PrepaidCardSafe, spendToUsd } from '@cardstack/cardpay-sdk';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -24,6 +26,36 @@ function epiloguePostableSel(postableIndex: number): string {
 
 function milestoneCompletedSel(milestoneIndex: number): string {
   return `[data-test-milestone-completed][data-test-milestone="${milestoneIndex}"]`;
+}
+
+let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+let prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
+
+let secondLayer2AccountAddress = '0x5416C61193C3393B46C2774ac4717C252031c0bE';
+let secondPrepaidCardAddress = '0x123400000000000000000000000000000000defa';
+
+function createMockPrepaidCard(
+  eoaAddress: string,
+  prepaidCardAddress: string,
+  amount: number
+) {
+  return {
+    type: 'prepaid-card',
+    createdAt: Date.now() / 1000,
+
+    address: prepaidCardAddress,
+
+    tokens: [],
+    owners: [eoaAddress],
+
+    issuingToken: '0xTOKEN',
+    spendFaceValue: amount,
+    prepaidCardOwner: eoaAddress,
+    hasBeenUsed: false,
+    issuer: eoaAddress,
+    reloadable: false,
+    transferrable: false,
+  } as PrepaidCardSafe;
 }
 
 module('Acceptance | create merchant', function (hooks) {
@@ -65,11 +97,17 @@ module('Acceptance | create merchant', function (hooks) {
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
-    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
       defaultToken: new BN(0),
     });
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      createMockPrepaidCard(
+        layer2AccountAddress,
+        prepaidCardAddress,
+        MERCHANT_CREATION_FEE_IN_SPEND
+      ),
+    ]);
     await waitUntil(
       () => !document.querySelector('[data-test-wallet-connect-qr-code]')
     );
@@ -113,28 +151,7 @@ module('Acceptance | create merchant', function (hooks) {
 
     assert.dom(post).containsText('Choose a name and ID for the merchant');
 
-    let prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
     let merchantAddress = '0x1234000000000000000000000000000000004321';
-
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
-      {
-        type: 'prepaid-card',
-        createdAt: Date.now() / 1000,
-
-        address: prepaidCardAddress,
-
-        tokens: [],
-        owners: [layer2AccountAddress],
-
-        issuingToken: '0xTOKEN',
-        spendFaceValue: 2324,
-        prepaidCardOwner: layer2AccountAddress,
-        hasBeenUsed: false,
-        issuer: layer2AccountAddress,
-        reloadable: false,
-        transferrable: false,
-      },
-    ]);
 
     // // merchant-customization card
     // TODO verify and interact with merchant customization card default state
@@ -198,7 +215,6 @@ module('Acceptance | create merchant', function (hooks) {
 
   module('Tests with the layer 2 wallet already connected', function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
-    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
     hooks.beforeEach(function () {
       layer2Service = this.owner.lookup('service:layer2-network')
@@ -207,6 +223,14 @@ module('Acceptance | create merchant', function (hooks) {
       layer2Service.test__simulateBalances({
         defaultToken: new BN(0),
       });
+
+      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+        createMockPrepaidCard(
+          layer2AccountAddress,
+          prepaidCardAddress,
+          MERCHANT_CREATION_FEE_IN_SPEND
+        ),
+      ]);
     });
 
     test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
@@ -284,8 +308,6 @@ module('Acceptance | create merchant', function (hooks) {
     });
 
     test('Changing Layer 2 account should cancel the workflow', async function (assert) {
-      let secondLayer2AccountAddress =
-        '0x5416C61193C3393B46C2774ac4717C252031c0bE';
       await visit('/card-pay/merchant-services?flow=create-merchant');
       assert.equal(
         currentURL(),
@@ -302,6 +324,14 @@ module('Acceptance | create merchant', function (hooks) {
         .containsText(`${c.layer2.fullName} wallet connected`);
 
       layer2Service.test__simulateAccountsChanged([secondLayer2AccountAddress]);
+
+      layer2Service.test__simulateAccountSafes(secondLayer2AccountAddress, [
+        createMockPrepaidCard(
+          secondLayer2AccountAddress,
+          secondPrepaidCardAddress,
+          MERCHANT_CREATION_FEE_IN_SPEND
+        ),
+      ]);
       await settled();
 
       assert
@@ -321,5 +351,75 @@ module('Acceptance | create merchant', function (hooks) {
         '/card-pay/merchant-services?flow=create-merchant'
       );
     });
+  });
+
+  test('It cancels the workflow if there are no prepaid cards associated with the EOA', async function (assert) {
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateBalances({
+      defaultToken: new BN(0),
+    });
+
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, []);
+
+    await visit('/card-pay/merchant-services?flow=create-merchant');
+    assert
+      .dom(
+        '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
+      )
+      .containsText(layer2AccountAddress)
+      .isVisible();
+
+    await settled();
+
+    assert
+      .dom('[data-test-postable="0"][data-test-cancelation]')
+      .containsText(
+        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${MERCHANT_CREATION_FEE_IN_SPEND} SPEND (${formatUsd(
+          spendToUsd(MERCHANT_CREATION_FEE_IN_SPEND)!
+        )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
+      );
+    assert
+      .dom('[data-test-workflow-default-cancelation-cta="create-merchant"]')
+      .containsText('Workflow canceled');
+  });
+
+  test('It cancels the workflow if prepaid cards associated with the EOA do not have enough balance', async function (assert) {
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateBalances({
+      defaultToken: new BN(0),
+    });
+
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      createMockPrepaidCard(
+        layer2AccountAddress,
+        prepaidCardAddress,
+        MERCHANT_CREATION_FEE_IN_SPEND - 1
+      ),
+    ]);
+
+    await visit('/card-pay/merchant-services?flow=create-merchant');
+    assert
+      .dom(
+        '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
+      )
+      .containsText(layer2AccountAddress)
+      .isVisible();
+
+    await settled();
+
+    assert
+      .dom('[data-test-postable="0"][data-test-cancelation]')
+      .containsText(
+        `It looks like you don’t have enough funds in your prepaid card to pay the ${MERCHANT_CREATION_FEE_IN_SPEND} SPEND (${formatUsd(
+          spendToUsd(MERCHANT_CREATION_FEE_IN_SPEND)!
+        )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
+      );
+    assert
+      .dom('[data-test-workflow-default-cancelation-cta="create-merchant"]')
+      .containsText('Workflow canceled');
   });
 });

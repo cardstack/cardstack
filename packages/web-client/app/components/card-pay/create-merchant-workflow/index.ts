@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import { inject as service } from '@ember/service';
+import { formatUsd, spendToUsd } from '@cardstack/cardpay-sdk';
 import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
 import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
@@ -12,10 +13,13 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import { MERCHANT_CREATION_FEE_IN_SPEND } from './workflow-config';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
+  INSUFFICIENT_PREPAID_CARD_BALANCE: 'INSUFFICIENT_PREPAID_CARD_BALANCE',
+  NO_PREPAID_CARD: 'NO_PREPAID_CARD',
 } as const;
 
 class CreateMerchantWorkflow extends Workflow {
@@ -58,6 +62,42 @@ class CreateMerchantWorkflow extends Workflow {
         new WorkflowCard({
           author: cardbot,
           componentName: 'card-pay/layer-two-connect-card',
+          async check() {
+            let layer2Network = this.workflow?.owner.lookup(
+              'service:layer2-network'
+            ) as Layer2Network;
+
+            await layer2Network.safes.fetch();
+
+            let hasPrepaidCardWithSufficientBalance = false;
+            let hasPrepaidCard = false;
+            for (let safe of layer2Network.safes.value) {
+              hasPrepaidCard = safe.type === 'prepaid-card' || hasPrepaidCard;
+              hasPrepaidCardWithSufficientBalance =
+                safe.type === 'prepaid-card' &&
+                safe.spendFaceValue >= MERCHANT_CREATION_FEE_IN_SPEND;
+
+              if (hasPrepaidCardWithSufficientBalance) {
+                break;
+              }
+            }
+
+            if (hasPrepaidCardWithSufficientBalance) {
+              return {
+                success: true,
+              };
+            } else if (hasPrepaidCard) {
+              return {
+                success: false,
+                reason: FAILURE_REASONS.INSUFFICIENT_PREPAID_CARD_BALANCE,
+              };
+            } else {
+              return {
+                success: false,
+                reason: FAILURE_REASONS.NO_PREPAID_CARD,
+              };
+            }
+          },
         }),
       ],
       completedDetail: `${c.layer2.fullName} wallet connected`,
@@ -145,6 +185,50 @@ class CreateMerchantWorkflow extends Workflow {
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
+        );
+      },
+    }),
+    // cancelation for not having prepaid card
+    new WorkflowMessage({
+      author: cardbot,
+      message: `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${MERCHANT_CREATION_FEE_IN_SPEND} SPEND (${formatUsd(
+        spendToUsd(MERCHANT_CREATION_FEE_IN_SPEND)!
+      )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.NO_PREPAID_CARD
+        );
+      },
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'workflow-thread/default-cancelation-cta',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.NO_PREPAID_CARD
+        );
+      },
+    }),
+    // cancelation for insufficient balance
+    new WorkflowMessage({
+      author: cardbot,
+      message: `It looks like you don’t have enough funds in your prepaid card to pay the ${MERCHANT_CREATION_FEE_IN_SPEND} SPEND (${formatUsd(
+        spendToUsd(MERCHANT_CREATION_FEE_IN_SPEND)!
+      )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.INSUFFICIENT_PREPAID_CARD_BALANCE
+        );
+      },
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'workflow-thread/default-cancelation-cta',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.INSUFFICIENT_PREPAID_CARD_BALANCE
         );
       },
     }),
