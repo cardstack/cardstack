@@ -4,8 +4,11 @@ import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 import { Resource } from 'ember-resources';
 import config from '../config/environment';
+import * as Sentry from '@sentry/browser';
 
 const FIRST_RETRY_DELAY = config.environment === 'test' ? 100 : 1000;
+
+class Storage404 extends Error {}
 
 interface Args {
   named: {
@@ -41,6 +44,11 @@ export class CardCustomization extends Resource<Args> {
     } catch (err) {
       this.errored = err;
       this.loading = false;
+
+      if (!(err instanceof Storage404)) {
+        console.log('Exception fetching card customization', err);
+        Sentry.captureException(err);
+      }
     }
   }
 
@@ -82,8 +90,12 @@ export class CardCustomization extends Resource<Args> {
       try {
         let jsonApiResponse = await fetch(alsoKnownAs);
         if (!jsonApiResponse.ok) {
-          let errorBodyText = await jsonApiResponse.text();
-          throw new Error(errorBodyText);
+          if (jsonApiResponse.status === 403) {
+            throw new Storage404();
+          } else {
+            let errorBodyText = await jsonApiResponse.text();
+            throw new Error(errorBodyText);
+          }
         }
         let jsonApiDocument = await jsonApiResponse.json();
         return jsonApiDocument;

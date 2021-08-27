@@ -18,7 +18,14 @@
     <div>
       <div>Issued by</div>
       {{#let (or @issuerName "Enter name") as |name|}}
-        <div class="prepaid-card__name" title={{name}} data-test-prepaid-card-issuer-name>{{name}}</div>
+        <div class="prepaid-card__name" title={{name}} data-test-prepaid-card-issuer-name>
+          {{name}}
+          {{#if @error}}
+            <span data-test-prepaid-card-load-warning>
+              {{svg-jar "failure-bordered" height="10" width="10" title="Failed to load card customization details"}}
+            </span>
+          {{/if}}
+        </div>
       {{/let}}
     </div>
     <div class="prepaid-card__meta">

@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { find, render, waitUntil } from '@ember/test-helpers';
+import { find, render, waitFor, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 import { PrepaidCardSafe } from '@cardstack/cardpay-sdk/sdk/safes';
@@ -183,6 +183,24 @@ module(
           '[data-test-prepaid-card-background="linear-gradient(139.27deg, #c3fc33 16%, #0069f9 100%)"]'
         )
         .exists();
+    });
+
+    test('it displays a warning icon when encountering a 403 from storage', async function (this: Context, assert) {
+      this.server.get(
+        'https://storage.cardstack.com/prepaid-card-customization/h2NRppy5eeszY4j8H9Tud5.json',
+        () => {
+          return new MirageResponse(403, {}, 'Access denied');
+        }
+      );
+      this.set('prepaidCardSafe', PREPAID_CARD_SAFE);
+      await render(hbs`
+        <CardPay::PrepaidCardSafe
+          @safe={{this.prepaidCardSafe}}
+        />
+      `);
+
+      await waitFor('[data-test-prepaid-card-load-warning]');
+      assert.dom('[data-test-prepaid-card-load-warning]').exists();
     });
   }
 );
