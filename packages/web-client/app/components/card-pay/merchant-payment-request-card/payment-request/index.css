@@ -67,37 +67,6 @@
   word-break: break-all;
 }
 
-.payment-request__merchant {
-  display: flex;
-  flex-flow: column;
-  text-align: center;
-  align-items: center;
-}
-
-.payment-request__merchant-logo {
-  --logo-size: var(--boxel-icon-lg);
-
-  background: var(--merchant-logo-background);
-  color: var(--merchant-logo-text-color);
-  align-self: flex-start;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--logo-size);
-  height: var(--logo-size);
-  border-radius: 50%;
-  margin-right: auto;
-  margin-left: auto;
-  margin-bottom: var(--boxel-sp-xxxs);
-  font-size: 1.5rem;
-  font-weight: 700;
-}
-
-.payment-request__merchant-description {
-  font: 700 var(--boxel-font);
-  letter-spacing: var(--boxel-lsp-xs);
-}
-
 .payment-request__qr-code-toggle {
   appearance: none;
   -webkit-appearance: none;

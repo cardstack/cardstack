@@ -13,20 +13,13 @@
   <Boxel::CardContainer
     class="payment-request__body"
   >
-    <div
-      class="payment-request__merchant"
-      style={{css-var
-        merchant-logo-background=@merchant.logoBackground
-        merchant-logo-text-color=@merchant.logoTextColor
-      }}
-    >
-      <div class="payment-request__merchant-logo">
-        {{first-char @merchant.name}}
-      </div>
-      <div class="payment-request__merchant-description">
-        Pay {{@merchant.name}}
-      </div>
-    </div>
+    <CardPay::Merchant
+      @name={{@merchant.name}}
+      @logoBackground={{@merchant.logoBackground}}
+      @logoTextColor={{@merchant.logoTextColor}}
+      @size="large"
+      @vertical={{true}}
+    />
 
     <div class="payment-request__amount">
       §{{@amount}}
