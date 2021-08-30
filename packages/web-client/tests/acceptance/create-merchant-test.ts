@@ -13,7 +13,6 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import BN from 'bn.js';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import { MERCHANT_CREATION_FEE_IN_SPEND } from '@cardstack/web-client/components/card-pay/create-merchant-workflow/workflow-config';
 import { formatUsd, PrepaidCardSafe, spendToUsd } from '@cardstack/cardpay-sdk';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
@@ -105,7 +104,7 @@ module('Acceptance | create merchant', function (hooks) {
       createMockPrepaidCard(
         layer2AccountAddress,
         prepaidCardAddress,
-        MERCHANT_CREATION_FEE_IN_SPEND
+        await layer2Service.merchantRegistrationFee()
       ),
     ]);
     await waitUntil(
@@ -221,7 +220,7 @@ module('Acceptance | create merchant', function (hooks) {
   module('Tests with the layer 2 wallet already connected', function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
 
-    hooks.beforeEach(function () {
+    hooks.beforeEach(async function () {
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -233,7 +232,7 @@ module('Acceptance | create merchant', function (hooks) {
         createMockPrepaidCard(
           layer2AccountAddress,
           prepaidCardAddress,
-          MERCHANT_CREATION_FEE_IN_SPEND
+          await layer2Service.merchantRegistrationFee()
         ),
       ]);
     });
@@ -334,7 +333,7 @@ module('Acceptance | create merchant', function (hooks) {
         createMockPrepaidCard(
           secondLayer2AccountAddress,
           secondPrepaidCardAddress,
-          MERCHANT_CREATION_FEE_IN_SPEND
+          await layer2Service.merchantRegistrationFee()
         ),
       ]);
       await settled();
@@ -381,8 +380,8 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${MERCHANT_CREATION_FEE_IN_SPEND} SPEND (${formatUsd(
-          spendToUsd(MERCHANT_CREATION_FEE_IN_SPEND)!
+        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${await layer2Service.merchantRegistrationFee()} SPEND (${formatUsd(
+          spendToUsd(await layer2Service.merchantRegistrationFee())!
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert
@@ -402,7 +401,7 @@ module('Acceptance | create merchant', function (hooks) {
       createMockPrepaidCard(
         layer2AccountAddress,
         prepaidCardAddress,
-        MERCHANT_CREATION_FEE_IN_SPEND - 1
+        (await layer2Service.merchantRegistrationFee()) - 1
       ),
     ]);
 
@@ -419,8 +418,8 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have a prepaid card with enough funds to pay the ${MERCHANT_CREATION_FEE_IN_SPEND} SPEND (${formatUsd(
-          spendToUsd(MERCHANT_CREATION_FEE_IN_SPEND)!
+        `It looks like you don’t have a prepaid card with enough funds to pay the ${await layer2Service.merchantRegistrationFee()} SPEND (${formatUsd(
+          spendToUsd(await layer2Service.merchantRegistrationFee())!
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert
