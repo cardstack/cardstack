@@ -2,7 +2,10 @@ import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import { inject as service } from '@ember/service';
 import { formatUsd, spendToUsd } from '@cardstack/cardpay-sdk';
-import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
+import {
+  IWorkflowMessage,
+  WorkflowMessage,
+} from '@cardstack/web-client/models/workflow/workflow-message';
 import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
@@ -32,7 +35,9 @@ interface SessionAwareWorkflowMessageOptions {
   template: (session: any) => string;
 }
 
-class SessionAwareWorkflowMessage extends WorkflowPostable {
+class SessionAwareWorkflowMessage
+  extends WorkflowPostable
+  implements IWorkflowMessage {
   private template: (session: any) => string;
   isComplete = true;
 

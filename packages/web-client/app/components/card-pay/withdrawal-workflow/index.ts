@@ -1,6 +1,9 @@
 import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
-import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
+import {
+  IWorkflowMessage,
+  WorkflowMessage,
+} from '@cardstack/web-client/models/workflow/workflow-message';
 import NetworkAwareWorkflowMessage from '@cardstack/web-client/components/workflow-thread/network-aware-message';
 import NetworkAwareWorkflowCard from '@cardstack/web-client/components/workflow-thread/network-aware-card';
 import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
@@ -31,7 +34,9 @@ const FAILURE_REASONS = {
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
 } as const;
 
-class CheckBalanceWorkflowMessage extends WorkflowPostable {
+class CheckBalanceWorkflowMessage
+  extends WorkflowPostable
+  implements IWorkflowMessage {
   @tracked minimumBalanceForWithdrawalClaim: BN | undefined;
 
   constructor() {
