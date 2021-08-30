@@ -142,3 +142,5 @@ APIs conform to the [JSON API specification](https://jsonapi.org/).
 ### POST /api/prepaid-card-customizations
 
 ### POST /api/merchant-infos
+
+### GET /api/merchant-infos/validate-slug/:slug
