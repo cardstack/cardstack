@@ -40,6 +40,8 @@ interface IssuePrepaidCardRequest {
 interface RegisterMerchantRequest {
   deferred: RSVP.Deferred<MerchantSafe>;
   onTxHash?: (txHash: TransactionHash) => void;
+  onNonce?: (nonce: string) => void;
+  nonce?: string;
   infoDID: string;
 }
 
@@ -214,6 +216,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.registerMerchantRequests.set(prepaidCardAddress, {
       deferred,
       onTxHash: options.onTxHash,
+      onNonce: options.onNonce,
+      nonce: options.nonce,
       infoDID,
     });
     return deferred.promise;
@@ -333,6 +337,21 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.test__simulateAccountSafes(walletAddress, [prepaidCardSafe]);
 
     return request?.deferred.resolve(prepaidCardSafe);
+  }
+
+  test__getNonceForRegisterMerchantRequest(
+    prepaidCardAddress: string
+  ): string | undefined {
+    let request = this.registerMerchantRequests.get(prepaidCardAddress);
+    return request?.nonce;
+  }
+
+  test__simulateOnNonceForRegisterMerchantRequest(
+    prepaidCardAddress: string,
+    nonce: string
+  ): void {
+    let request = this.registerMerchantRequests.get(prepaidCardAddress);
+    request?.onNonce?.(nonce);
   }
 
   test__simulateRegisterMerchantForAddress(

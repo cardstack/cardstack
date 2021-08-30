@@ -3,6 +3,7 @@ import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
+import config from '@cardstack/web-client/config/environment';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import MerchantInfoService from '@cardstack/web-client/services/merchant-info';
@@ -12,7 +13,13 @@ import {
   TransactionHash,
 } from '@cardstack/web-client/utils/web3-strategies/types';
 
-import { task, TaskGenerator } from 'ember-concurrency';
+import {
+  race,
+  rawTimeout,
+  task,
+  TaskGenerator,
+  waitForProperty,
+} from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
 
@@ -21,6 +28,8 @@ interface CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs {
   onComplete: () => void;
   isComplete: boolean;
 }
+
+const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
 
 export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent extends Component<CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs> {
   @service declare merchantInfo: MerchantInfoService;
@@ -31,6 +40,9 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   @tracked merchantRegistrationFee?: number;
 
   @reads('createTask.last.error') declare error: Error | undefined;
+  @tracked createTaskRunningForAWhile = false;
+
+  lastNonce?: string;
 
   constructor(
     owner: unknown,
@@ -50,6 +62,10 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
     taskFor(this.createTask)
       .perform()
       .catch((e) => console.error(e));
+  }
+
+  @action cancel() {
+    taskFor(this.createTask).cancelAll();
   }
 
   @task *createTask(): TaskGenerator<void> {
@@ -79,6 +95,14 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         },
       };
 
+      if (this.lastNonce) {
+        options.nonce = this.lastNonce;
+      } else {
+        options.onNonce = (nonce: string) => {
+          this.lastNonce = nonce;
+        };
+      }
+
       // await this.layer2Network.safes.value doesn’t trigger a fetch
       yield this.layer2Network.safes.fetch();
 
@@ -86,7 +110,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
       let prepaidCards = safes.filterBy('type', 'prepaid-card');
       let placeholderPrepaidCard = prepaidCards[0]!;
 
-      let merchantSafe = yield taskFor(
+      let registerMerchantTaskInstance = taskFor(
         this.layer2Network.registerMerchant
       ).perform(
         placeholderPrepaidCard.address,
@@ -94,7 +118,15 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         options
       );
 
+      let merchantSafe = yield race([
+        registerMerchantTaskInstance,
+        taskFor(this.timerTask).perform(),
+      ]);
+
       workflowSession.update('merchantSafe', merchantSafe);
+
+      this.createTaskRunningForAWhile = false;
+
       this.args.onComplete();
     } catch (e) {
       let insufficientFunds = e.message.startsWith(
@@ -115,6 +147,20 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         throw e;
       }
     }
+  }
+  @task *timerTask(): TaskGenerator<void> {
+    this.createTaskRunningForAWhile = false;
+    yield rawTimeout(A_WHILE);
+    this.createTaskRunningForAWhile = true;
+    yield waitForProperty(this, 'createTaskRunningForAWhile', false);
+  }
+
+  get enableCancelation() {
+    return (
+      taskFor(this.createTask).isRunning &&
+      this.createTaskRunningForAWhile &&
+      !this.txHash
+    );
   }
 
   get creationState() {

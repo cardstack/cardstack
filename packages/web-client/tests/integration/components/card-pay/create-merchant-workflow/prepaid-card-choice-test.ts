@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { click, render, waitFor } from '@ember/test-helpers';
+import { click, render, waitFor, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
@@ -23,6 +23,7 @@ module(
   'Integration | Component | card-pay/create-merchant/prepaid-card-choice',
   function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
+    let prepaidCardAddress: string;
 
     setupRenderingTest(hooks);
     setupMirage(hooks);
@@ -32,7 +33,7 @@ module(
         .strategy as Layer2TestWeb3Strategy;
 
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-      let prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
+      prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
 
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
@@ -95,6 +96,38 @@ module(
       assert
         .dom('[data-test-prepaid-card-choice-merchant-id]')
         .containsText('merchant-id');
+    });
+
+    test('it allows canceling and retrying after a while', async function (assert) {
+      assert
+        .dom('[data-test-create-merchant-button]')
+        .containsText('Create Merchant');
+
+      await click('[data-test-create-merchant-button]');
+      assert.dom('[data-test-create-merchant-cancel-button]').doesNotExist();
+
+      await waitFor('[data-test-create-merchant-cancel-button]');
+      layer2Service.test__simulateOnNonceForRegisterMerchantRequest(
+        prepaidCardAddress,
+        '12345'
+      );
+
+      await click('[data-test-create-merchant-cancel-button]');
+      assert.dom('[data-test-create-merchant-button]').hasText('Try Again');
+
+      await click('[data-test-create-merchant-button]');
+      await waitUntil(() =>
+        layer2Service.test__getNonceForRegisterMerchantRequest(
+          prepaidCardAddress
+        )
+      );
+      assert.equal(
+        layer2Service.test__getNonceForRegisterMerchantRequest(
+          prepaidCardAddress
+        ),
+        '12345',
+        'The same nonce as was used for the first attempt is sent for the second'
+      );
     });
 
     module('Test the sdk register merchant calls', async function () {
