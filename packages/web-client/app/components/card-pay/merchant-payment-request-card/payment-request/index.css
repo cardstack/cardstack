@@ -48,6 +48,7 @@
 }
 
 .payment-request__amount {
+  margin-top: var(--boxel-sp);
   font-weight: 700;
   font-size: var(--amount-font-size);
   letter-spacing: var(--boxel-lsp-xs);
