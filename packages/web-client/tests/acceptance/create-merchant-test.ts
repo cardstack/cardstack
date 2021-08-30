@@ -211,6 +211,11 @@ module('Acceptance | create merchant', function (hooks) {
       )} [data-test-create-merchant-next-step="dashboard"]`
     );
     assert.dom('[data-test-workflow-thread]').doesNotExist();
+
+    await visit('/card-pay/balances');
+    assert
+      .dom('[data-test-card-balances]')
+      .containsText('§0', 'expected card balance to have updated');
   });
 
   module('Tests with the layer 2 wallet already connected', function (hooks) {

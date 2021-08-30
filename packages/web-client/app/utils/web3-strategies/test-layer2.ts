@@ -354,7 +354,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     request?.onNonce?.(nonce);
   }
 
-  test__simulateRegisterMerchantForAddress(
+  async test__simulateRegisterMerchantForAddress(
     prepaidCardAddress: string,
     merchantSafeAddress: string,
     options: Object
@@ -373,6 +373,17 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       ...options,
     };
     request?.onTxHash?.('exampleTxHash');
+
+    let prepaidCard = [...this.accountSafes.values()]
+      .flat()
+      .find((safe) => safe.address === prepaidCardAddress);
+
+    let merchantCreationFee = await this.merchantRegistrationFee();
+
+    if (prepaidCard && prepaidCard.type === 'prepaid-card') {
+      prepaidCard.spendFaceValue =
+        prepaidCard.spendFaceValue - merchantCreationFee;
+    }
 
     return request?.deferred.resolve(merchantSafe);
   }
