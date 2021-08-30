@@ -93,6 +93,8 @@ module('Acceptance | withdrawal', function (hooks) {
     assert
       .dom(postableSel(1, 1))
       .containsText(`Sufficient funds for claiming withdrawn tokens`);
+
+    await waitFor(milestoneCompletedSel(1));
     assert.dom(milestoneCompletedSel(1)).containsText(`ETH balance checked`);
 
     await waitFor(postableSel(2, 0));
@@ -440,7 +442,10 @@ module('Acceptance | withdrawal', function (hooks) {
       assert
         .dom(postableSel(1, 1))
         .containsText(`Sufficient funds for claiming withdrawn tokens`);
+
+      await waitFor(milestoneCompletedSel(1));
       assert.dom(milestoneCompletedSel(1)).containsText(`ETH balance checked`);
+
       await waitFor(postableSel(2, 0));
       assert
         .dom(postableSel(2, 0))
