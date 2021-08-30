@@ -22,6 +22,15 @@ Below is a list of the most common environment variables that the Hub accepts:
 
 Search the mono-repo for `process.env` and check the config directory to see these variables referenced.
 
+To use the variables, create a file named `.env` in the hub's folder, and put in the variables you want to use.
+
+For example:
+
+```
+SERVER_SECRET=7TmgY1xFo/WrYTnAFSvAemZtFB8wQVMd8IkoeQKBboE=
+AWS_PROFILE=cardstack
+```
+
 ## Setting up a local database for the first time
 
 The following command will create a hub_development database on your locally running postgres server, run migrations, and load seed data. It will then create a hub_test database, and clone the structure of the development database to it.
