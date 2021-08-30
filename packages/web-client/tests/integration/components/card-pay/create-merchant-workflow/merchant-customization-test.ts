@@ -5,6 +5,12 @@ import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
 
+import { setupMirage } from 'ember-cli-mirage/test-support';
+import { MirageTestContext } from 'ember-cli-mirage/test-support';
+import { Response as MirageResponse } from 'ember-cli-mirage';
+
+interface Context extends MirageTestContext {}
+
 // selectors
 let PREVIEW = '[data-test-merchant-customization-merchant-preview]';
 let MERCHANT = '[data-test-merchant]';
@@ -69,6 +75,7 @@ module(
     let workflowSession: WorkflowSession;
 
     setupRenderingTest(hooks);
+    setupMirage(hooks);
 
     hooks.beforeEach(async function () {
       layer2Service = this.owner.lookup('service:layer2-network')
@@ -195,7 +202,58 @@ module(
       }
     });
 
-    // test('It validates uniqueness of a given id', async function (assert) {});
+    test('It validates uniqueness of a given id', async function (this: Context, assert) {
+      this.server.create('merchant-info', { slug: 'existing' });
+
+      await fillIn(`${MERCHANT_NAME_FIELD} input`, 'HELLO!');
+
+      let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
+
+      await fillIn(merchantIdInput, 'existing');
+      await waitUntil(
+        () =>
+          (find('[data-test-validation-state-input]') as HTMLElement).dataset
+            .testValidationStateInput === 'invalid'
+      );
+      assert
+        .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
+        .containsText(
+          'This Merchant ID is already taken. Please choose another one'
+        );
+
+      assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
+
+      await fillIn(merchantIdInput, 'unique');
+      await waitUntil(
+        () =>
+          (find('[data-test-validation-state-input]') as HTMLElement).dataset
+            .testValidationStateInput === 'valid'
+      );
+
+      assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
+    });
+
+    test('It shows when there is an error validating id uniqueness', async function (this: Context, assert) {
+      this.server.get('/merchant-infos/validate-slug/:slug', function () {
+        return new MirageResponse(500, {}, '');
+      });
+
+      await fillIn(`${MERCHANT_NAME_FIELD} input`, 'HELLO!');
+
+      let merchantIdInput = `${MERCHANT_ID_FIELD} input`;
+
+      await fillIn(merchantIdInput, 'existing');
+      await waitUntil(
+        () =>
+          (find('[data-test-validation-state-input]') as HTMLElement).dataset
+            .testValidationStateInput === 'invalid'
+      );
+      assert
+        .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
+        .containsText('There was an error validating merchant ID uniqueness');
+
+      assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
+    });
 
     test('It updates the workflow session when saved', async function (assert) {
       assert.notOk(workflowSession.state.merchantName);
