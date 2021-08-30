@@ -212,7 +212,7 @@ class CreateMerchantWorkflow extends Workflow {
     // cancelation for insufficient balance
     new WorkflowMessage({
       author: cardbot,
-      message: `It looks like you don’t have enough funds in your prepaid card to pay the ${MERCHANT_CREATION_FEE_IN_SPEND} SPEND (${formatUsd(
+      message: `It looks like you don’t have a prepaid card with enough funds to pay the ${MERCHANT_CREATION_FEE_IN_SPEND} SPEND (${formatUsd(
         spendToUsd(MERCHANT_CREATION_FEE_IN_SPEND)!
       )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
       includeIf() {

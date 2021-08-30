@@ -62,7 +62,7 @@ module('Acceptance | create merchant', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
-  test('Initiating workflow without wallet connections', async function (assert) {
+  test('initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay');
     await click(
       '[data-test-card-pay-header-tab][href="/card-pay/merchant-services"]'
@@ -233,7 +233,7 @@ module('Acceptance | create merchant', function (hooks) {
       ]);
     });
 
-    test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
+    test('initiating workflow with layer 2 wallet already connected', async function (assert) {
       await visit('/card-pay/merchant-services?flow=create-merchant');
       assert.equal(
         currentURL(),
@@ -259,7 +259,7 @@ module('Acceptance | create merchant', function (hooks) {
         .containsText(`${c.layer2.fullName} wallet connected`);
     });
 
-    test('Disconnecting Layer 2 after proceeding beyond it', async function (assert) {
+    test('disconnecting Layer 2 after proceeding beyond it', async function (assert) {
       await visit('/card-pay/merchant-services?flow=create-merchant');
       assert.equal(
         currentURL(),
@@ -307,7 +307,7 @@ module('Acceptance | create merchant', function (hooks) {
         .doesNotExist();
     });
 
-    test('Changing Layer 2 account should cancel the workflow', async function (assert) {
+    test('changing Layer 2 account should cancel the workflow', async function (assert) {
       await visit('/card-pay/merchant-services?flow=create-merchant');
       assert.equal(
         currentURL(),
@@ -353,7 +353,7 @@ module('Acceptance | create merchant', function (hooks) {
     });
   });
 
-  test('It cancels the workflow if there are no prepaid cards associated with the EOA', async function (assert) {
+  test('it cancels the workflow if there are no prepaid cards associated with the EOA', async function (assert) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -385,7 +385,7 @@ module('Acceptance | create merchant', function (hooks) {
       .containsText('Workflow canceled');
   });
 
-  test('It cancels the workflow if prepaid cards associated with the EOA do not have enough balance', async function (assert) {
+  test('it cancels the workflow if prepaid cards associated with the EOA do not have enough balance', async function (assert) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -414,7 +414,7 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have enough funds in your prepaid card to pay the ${MERCHANT_CREATION_FEE_IN_SPEND} SPEND (${formatUsd(
+        `It looks like you don’t have a prepaid card with enough funds to pay the ${MERCHANT_CREATION_FEE_IN_SPEND} SPEND (${formatUsd(
           spendToUsd(MERCHANT_CREATION_FEE_IN_SPEND)!
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
