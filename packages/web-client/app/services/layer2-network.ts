@@ -143,11 +143,16 @@ export default class Layer2Network
     infoDid: string,
     options: RegisterMerchantOptions
   ): any {
-    return yield this.strategy.registerMerchant(
+    let merchant = yield this.strategy.registerMerchant(
       prepaidCardAddress,
       infoDid,
       options
     );
+
+    // Ensure prepaid card balance is updated
+    yield this.safes.fetch();
+
+    return merchant;
   }
 
   disconnect() {
