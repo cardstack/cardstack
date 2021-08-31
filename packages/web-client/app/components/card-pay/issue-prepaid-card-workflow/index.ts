@@ -9,8 +9,10 @@ import PostableCollection from '@cardstack/web-client/models/workflow/postable-c
 import NetworkAwareWorkflowCard from '@cardstack/web-client/components/workflow-thread/network-aware-card';
 import NetworkAwareWorkflowMessage from '@cardstack/web-client/components/workflow-thread/network-aware-message';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { action } from '@ember/object';
 import BN from 'bn.js';
+import RouterService from '@ember/routing/router-service';
 
 import { faceValueOptions } from './workflow-config';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
@@ -22,6 +24,7 @@ const FAILURE_REASONS = {
 } as const;
 
 class IssuePrepaidCardWorkflow extends Workflow {
+  workflowPersistenceId?: string;
   name = 'Prepaid Card Issuance';
   milestones = [
     new Milestone({
@@ -258,19 +261,51 @@ class IssuePrepaidCardWorkflow extends Workflow {
     }),
   ]);
 
-  constructor(owner: unknown) {
+  constructor(owner: unknown, workflowPersistenceId: string) {
     super(owner);
+    this.workflowPersistenceId = workflowPersistenceId;
+
     this.attachWorkflow();
+  }
+
+  restoreFromPersistedWorkflow() {
+    this.session.restoreFromStorage();
+
+    const lastCompletedCardName = this.session.state.lastCompletedCardName;
+
+    // TODO: Only attempt to restore when both layer 1 and 2 are connected
+    if (lastCompletedCardName) {
+      const postables = this.milestones
+        .flatMap((m: any) => m.postableCollection.postables)
+        .concat(this.epilogue.postables);
+
+      const index = postables.mapBy('cardName').indexOf(lastCompletedCardName);
+
+      postables.slice(0, index + 1).forEach((p: any) => {
+        p.isComplete = true;
+      });
+    }
   }
 }
 
 class IssuePrepaidCardWorkflowComponent extends Component {
   @service declare layer2Network: Layer2Network;
+  @service declare workflowPersistence: WorkflowPersistence;
+  @service declare router: RouterService;
 
   workflow!: IssuePrepaidCardWorkflow;
+
   constructor(owner: unknown, args: {}) {
     super(owner, args);
-    this.workflow = new IssuePrepaidCardWorkflow(getOwner(this));
+
+    const workflow = new IssuePrepaidCardWorkflow(
+      getOwner(this),
+      this.router.currentRoute.queryParams.workflowPersistenceId!
+    );
+
+    workflow.restoreFromPersistedWorkflow();
+
+    this.workflow = workflow;
   }
 
   @action onDisconnect() {
