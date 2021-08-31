@@ -61,20 +61,36 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
 
   lastNonce?: string;
 
+  constructor(
+    owner: unknown,
+    args: CardPayPrepaidCardWorkflowPreviewComponentArgs
+  ) {
+    super(owner, args);
+  }
+
   @task *issueTask(): TaskGenerator<void> {
     let { workflowSession } = this.args;
     try {
-      this.chinInProgressMessage =
-        'Preparing to create your custom prepaid card…';
-      // yield statements require manual typing
-      // https://github.com/machty/ember-concurrency/pull/357#discussion_r434850096
-      let customization: Resolved<PrepaidCardCustomization> = yield taskFor(
-        this.cardCustomization.createCustomizationTask
-      ).perform({
-        issuerName: workflowSession.state.issuerName,
-        colorSchemeId: workflowSession.state.colorScheme.id,
-        patternId: workflowSession.state.pattern.id,
-      });
+      let did;
+
+      if (workflowSession.state.did) {
+        did = workflowSession.state.did;
+      } else {
+        this.chinInProgressMessage =
+          'Preparing to create your custom prepaid card…';
+        // yield statements require manual typing
+        // https://github.com/machty/ember-concurrency/pull/357#discussion_r434850096
+        let customization: Resolved<PrepaidCardCustomization> = yield taskFor(
+          this.cardCustomization.createCustomizationTask
+        ).perform({
+          issuerName: workflowSession.state.issuerName,
+          colorSchemeId: workflowSession.state.colorScheme.id,
+          patternId: workflowSession.state.pattern.id,
+        });
+        did = customization.did;
+
+        this.args.workflowSession.update('did', did);
+      }
 
       this.chinInProgressMessage =
         'You will receive a confirmation request from the Card Wallet app in a few moments…';
@@ -91,9 +107,11 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
           this.lastNonce = nonce;
         };
       }
+
       let prepaidCardSafeTaskInstance = taskFor(
         this.layer2Network.issuePrepaidCardTask
-      ).perform(this.faceValue, customization.did, options);
+      ).perform(this.faceValue, did, options);
+
       let prepaidCardSafe = yield race([
         prepaidCardSafeTaskInstance,
         taskFor(this.timerTask).perform(),
