@@ -19,12 +19,13 @@ export abstract class Workflow {
   cancelationMessages: PostableCollection = new PostableCollection();
   @tracked isCanceled = false;
   @tracked cancelationReason: null | string = null;
-  session: WorkflowSession = new WorkflowSession();
+  session: WorkflowSession;
   owner: any;
   simpleEmitter = new SimpleEmitter();
 
   constructor(owner: any) {
     this.owner = owner;
+    this.session = new WorkflowSession(this);
   }
 
   attachWorkflow() {
