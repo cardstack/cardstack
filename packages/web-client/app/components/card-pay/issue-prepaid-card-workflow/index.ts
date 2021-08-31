@@ -101,6 +101,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
           },
         }),
         new NetworkAwareWorkflowCard({
+          cardName: 'HUB_AUTH',
           author: cardbot,
           componentName: 'card-pay/hub-authentication',
           includeIf(this: NetworkAwareWorkflowCard) {
@@ -113,6 +114,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
             'Let’s get started! First, you can choose the look and feel of your card, so that your customers and other users recognize that this prepaid card came from you.',
         }),
         new WorkflowCard({
+          cardName: 'LAYOUT_CUSTOMIZATION',
           author: cardbot,
           componentName:
             'card-pay/issue-prepaid-card-workflow/layout-customization',
@@ -132,6 +134,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
           message: `On to the next step: How do you want to fund your prepaid card? Please select a depot and balance from your ${c.layer2.fullName} wallet.`,
         }),
         new WorkflowCard({
+          cardName: 'FUNDING_SOURCE',
           author: cardbot,
           componentName: 'card-pay/issue-prepaid-card-workflow/funding-source',
         }),
@@ -142,6 +145,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
             After you have created your card, you can split it up into multiple cards with smaller balances to transfer to your customers.`,
         }),
         new WorkflowCard({
+          cardName: 'FACE_VALUE',
           author: cardbot,
           componentName: 'card-pay/issue-prepaid-card-workflow/face-value',
         }),
@@ -157,6 +161,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
             Now, we just need your confirmation to create the card.`,
         }),
         new WorkflowCard({
+          cardName: 'PREVIEW',
           author: cardbot,
           componentName: 'card-pay/issue-prepaid-card-workflow/preview',
         }),
@@ -170,6 +175,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       message: `Congratulations, you have created a prepaid card! This prepaid card has been added to your ${c.layer2.fullName} wallet.`,
     }),
     new WorkflowCard({
+      cardName: 'CONFIRMATION',
       author: cardbot,
       componentName: 'card-pay/issue-prepaid-card-workflow/confirmation',
     }),
@@ -178,10 +184,12 @@ class IssuePrepaidCardWorkflow extends Workflow {
       message: `This is the remaining balance in your ${c.layer2.fullName} wallet:`,
     }),
     new WorkflowCard({
+      cardName: 'EPILOGUE_LAYER_TWO_CONNECT_CARD',
       author: cardbot,
       componentName: 'card-pay/layer-two-connect-card',
     }),
     new WorkflowCard({
+      cardName: 'EPILOGUE_NEXT_STEPS',
       author: cardbot,
       componentName: 'card-pay/issue-prepaid-card-workflow/next-steps',
     }),
