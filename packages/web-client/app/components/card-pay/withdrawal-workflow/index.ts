@@ -71,9 +71,11 @@ class CheckBalanceWorkflowMessage extends WorkflowPostable {
     ) {
       return `Checking your balance...
 
-It looks like you have enough ${c.layer1.nativeTokenSymbol} in you account on ${
+It looks like you have enough ${
+        c.layer1.nativeTokenSymbol
+      } in your account on ${
         c.layer1.fullName
-      }, to perform the last step of this withrawal workflow, which requires ~${formatTokenAmount(
+      } to perform the last step of this withdrawal workflow, which requires ~${formatTokenAmount(
         minimumBalanceForWithdrawalClaim
       )} ${c.layer1.nativeTokenSymbol}.`;
     } else {
