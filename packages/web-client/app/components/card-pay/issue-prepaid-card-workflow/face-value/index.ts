@@ -32,6 +32,13 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
+
+    this.selectedFaceValue = {
+      spendAmount: this.args.workflowSession.state.spendAmount,
+      approxTokenAmount: 10, // TODO: adjust this according to spendAmount
+      isOptionDisabled: false,
+    };
+
     this.getTokenAmounts('DAI', this.faceValueOptions);
   }
 
