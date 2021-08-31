@@ -22,6 +22,7 @@ export abstract class Workflow {
   session: WorkflowSession;
   owner: any;
   simpleEmitter = new SimpleEmitter();
+  isRestored = false;
 
   constructor(owner: any) {
     this.owner = owner;
