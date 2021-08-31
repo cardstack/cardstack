@@ -83,12 +83,30 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
   }
 
   @action saveDetails() {
-    this.args.workflowSession.updateMany({
+    let valuesToStore = {
       merchantName: this.trimmedMerchantName,
       merchantId: this.merchantId,
       merchantBgColor: this.merchantBgColor,
       merchantTextColor: this.merchantTextColor,
-    });
+    };
+
+    let merchantInfoHasBeenPersisted = this.args.workflowSession.state
+      .merchantInfo;
+
+    if (merchantInfoHasBeenPersisted) {
+      let state = this.args.workflowSession.state;
+      let detailsHaveChangedSincePersistence =
+        state.merchantName !== valuesToStore.merchantName ||
+        state.merchantId !== valuesToStore.merchantId ||
+        state.merchantBgColor !== valuesToStore.merchantBgColor ||
+        state.merchantTextColor !== valuesToStore.merchantTextColor;
+
+      if (detailsHaveChangedSincePersistence) {
+        this.args.workflowSession.delete('merchantInfo');
+      }
+    }
+
+    this.args.workflowSession.updateMany(valuesToStore);
     this.args.onComplete?.();
   }
 

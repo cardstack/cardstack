@@ -18,4 +18,10 @@ export default class WorkflowSession {
     // eslint-disable-next-line no-self-assign
     this.state = this.state; // for reactivity
   }
+
+  delete(key: string) {
+    delete this.state[key];
+    // eslint-disable-next-line no-self-assign
+    this.state = this.state; // for reactivity
+  }
 }

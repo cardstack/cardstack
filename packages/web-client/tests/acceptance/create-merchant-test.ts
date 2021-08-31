@@ -16,6 +16,10 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MERCHANT_CREATION_FEE_IN_SPEND } from '@cardstack/web-client/components/card-pay/create-merchant-workflow/workflow-config';
 import { formatUsd, PrepaidCardSafe, spendToUsd } from '@cardstack/cardpay-sdk';
 
+import { MirageTestContext } from 'ember-cli-mirage/test-support';
+
+interface Context extends MirageTestContext {}
+
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
 }
@@ -33,6 +37,8 @@ let prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
 
 let secondLayer2AccountAddress = '0x5416C61193C3393B46C2774ac4717C252031c0bE';
 let secondPrepaidCardAddress = '0x123400000000000000000000000000000000defa';
+
+let merchantAddress = '0x1234000000000000000000000000000000004321';
 
 function createMockPrepaidCard(
   eoaAddress: string,
@@ -151,8 +157,6 @@ module('Acceptance | create merchant', function (hooks) {
 
     assert.dom(post).containsText('Choose a name and ID for the merchant');
 
-    let merchantAddress = '0x1234000000000000000000000000000000004321';
-
     // // merchant-customization card
     // TODO verify and interact with merchant customization card default state
     await fillIn(
@@ -262,6 +266,79 @@ module('Acceptance | create merchant', function (hooks) {
       assert
         .dom(milestoneCompletedSel(0))
         .containsText(`${c.layer2.fullName} wallet connected`);
+    });
+
+    test('changed merchant details after canceling the merchant creation request are persisted', async function (this: Context, assert) {
+      await visit('/card-pay/merchant-services?flow=create-merchant');
+
+      let hubAuthenticationPost = postableSel(1, 1);
+      await waitFor(hubAuthenticationPost);
+      await click(
+        `${hubAuthenticationPost} [data-test-boxel-action-chin] [data-test-boxel-button]`
+      );
+      layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
+
+      await waitFor('[data-test-merchant-customization-merchant-name-field]');
+      await fillIn(
+        `[data-test-merchant-customization-merchant-name-field] input`,
+        'HELLO!'
+      );
+      await fillIn(
+        `[data-test-merchant-customization-merchant-id-field] input`,
+        'abc123'
+      );
+      await waitUntil(
+        () =>
+          (document.querySelector(
+            '[data-test-validation-state-input]'
+          ) as HTMLElement).dataset.testValidationStateInput === 'valid'
+      );
+      await click(`[data-test-merchant-customization-save-details]`);
+
+      let prepaidCardChoice = postableSel(1, 4);
+      await waitFor(prepaidCardChoice);
+      await click(
+        `${prepaidCardChoice} [data-test-boxel-action-chin] [data-test-boxel-button]`
+      );
+
+      // need wait for Hub POST /api/merchant-infos
+      // eslint-disable-next-line ember/no-settled-after-test-helper
+      await settled();
+
+      layer2Service.test__simulateRegisterMerchantRejectionForAddress(
+        prepaidCardAddress
+      );
+
+      await click('[data-test-merchant-customization-edit]');
+      await fillIn(
+        '[data-test-merchant-customization-merchant-name-field] input',
+        'changed'
+      );
+      await click('[data-test-merchant-customization-save-details]');
+
+      await waitFor(prepaidCardChoice);
+      await click(
+        `${prepaidCardChoice} [data-test-boxel-action-chin] [data-test-boxel-button]`
+      );
+
+      // wait for another Hub POST /api/merchant-infos
+      // eslint-disable-next-line ember/no-settled-after-test-helper
+      await settled();
+
+      layer2Service.test__simulateRegisterMerchantForAddress(
+        prepaidCardAddress,
+        merchantAddress,
+        {}
+      );
+
+      let secondMerchantInfo = this.server.schema.findBy('merchant-info', {
+        name: 'changed',
+      });
+
+      assert.ok(
+        secondMerchantInfo,
+        'expected a second merchant-info to have been persisted'
+      );
     });
 
     test('disconnecting Layer 2 after proceeding beyond it', async function (assert) {
