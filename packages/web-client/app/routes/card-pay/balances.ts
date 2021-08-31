@@ -2,6 +2,7 @@ import Route from '@ember/routing/route';
 import '../../css/card-pay/balances.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/balances-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/balances-summary-hero.svg';
+import { v4 as uuidv4 } from 'uuid';
 
 const BALANCES_PANEL = {
   title: 'Easy Payments',
@@ -43,6 +44,26 @@ const BALANCES_PANEL = {
 };
 
 export default class CardPayBalancesRoute extends Route {
+  queryParams = {
+    flow: {
+      refreshModel: true,
+    },
+  };
+
+  beforeModel(transition: any) {
+    const { flow, workflowPersistenceId } = transition.to.queryParams;
+
+    if (flow && !workflowPersistenceId) {
+      transition.abort(); // https://github.com/emberjs/ember.js/issues/17118
+      this.transitionTo(transition.to.name, {
+        queryParams: {
+          flow: flow,
+          workflowPersistenceId: uuidv4(), // TODO: Something shorter for a prettier URL?
+        },
+      });
+    }
+  }
+
   model() {
     return {
       panel: BALANCES_PANEL,
