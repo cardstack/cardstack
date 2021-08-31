@@ -62,6 +62,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'LAYER2_CONNECT',
           componentName: 'card-pay/layer-two-connect-card',
           async check() {
             let layer2Network = this.workflow?.owner.lookup(
