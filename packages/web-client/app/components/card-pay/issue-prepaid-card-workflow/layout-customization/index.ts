@@ -30,6 +30,17 @@ export default class LayoutCustomizationCard extends Component<WorkflowCardCompo
       .then(() => {
         this.colorScheme = this.colorSchemeOptions[0];
         this.pattern = this.patternOptions[0];
+
+        let {
+          colorScheme,
+          pattern,
+          issuerName,
+        } = this.args.workflowSession.state;
+        if (colorScheme && pattern) {
+          this.colorScheme = colorScheme;
+          this.pattern = pattern;
+          this.issuerName = issuerName;
+        }
       });
   }
 
