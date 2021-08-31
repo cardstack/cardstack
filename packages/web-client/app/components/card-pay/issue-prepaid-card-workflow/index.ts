@@ -276,6 +276,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
 
     // TODO: Only attempt to restore when both layer 1 and 2 are connected
     if (lastCompletedCardName) {
+      this.isRestored = true;
       const postables = this.milestones
         .flatMap((m: any) => m.postableCollection.postables)
         .concat(this.epilogue.postables);

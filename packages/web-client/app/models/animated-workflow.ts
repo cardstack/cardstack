@@ -57,6 +57,11 @@ class AnimatedMilestone {
   get isComplete(): boolean {
     return this.postableCollection.isComplete && this.isCompletionRevealed;
   }
+
+  syncRevealPointerToModel() {
+    this.postableCollection.syncRevealPointerToModel();
+    this.isCompletionRevealed = this.model.isComplete;
+  }
 }
 
 class AnimatedPostableCollection {
@@ -122,6 +127,15 @@ class AnimatedPostableCollection {
       : -1;
     return index === postables.length - 1;
   }
+
+  syncRevealPointerToModel() {
+    let completedPostables = this.model.visiblePostables;
+    if (completedPostables.length) {
+      this.revealPointer = completedPostables[completedPostables.length - 1];
+    } else {
+      this.revealPointer = undefined;
+    }
+  }
 }
 
 export default class AnimatedWorkflow {
@@ -148,6 +162,9 @@ export default class AnimatedWorkflow {
       model.cancelationMessages
     );
     this.milestones = model.milestones.map((m) => new AnimatedMilestone(m));
+    if (model.isRestored) {
+      this.syncRevealPointerToModel();
+    }
     taskFor(this.tickerTask).perform();
   }
   @reads('model.name') declare name: string;
@@ -241,6 +258,14 @@ export default class AnimatedWorkflow {
     let { completedMilestones } = this;
     let lastMilestone = completedMilestones[completedMilestones.length - 1];
     return lastMilestone?.completedDetail ?? 'Workflow started';
+  }
+
+  syncRevealPointerToModel() {
+    for (let animatedMilestone of this.milestones) {
+      animatedMilestone.syncRevealPointerToModel();
+    }
+    this.epilogue.syncRevealPointerToModel();
+    this.cancelationMessages.syncRevealPointerToModel();
   }
 
   resetPointerTo(card: WorkflowPostable) {
