@@ -34,12 +34,12 @@ const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
 export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent extends Component<CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs> {
   @service declare merchantInfo: MerchantInfoService;
   @service declare layer2Network: Layer2Network;
+  @reads('createTask.last.error') declare error: Error | undefined;
+  @reads('args.workflowSession.state.merchantRegistrationFee')
+  declare merchantRegistrationFee: number;
 
   @tracked chinInProgressMessage?: string;
   @tracked txHash?: TransactionHash;
-  @tracked merchantRegistrationFee?: number;
-
-  @reads('createTask.last.error') declare error: Error | undefined;
   @tracked createTaskRunningForAWhile = false;
 
   lastNonce?: string;
@@ -49,13 +49,6 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
     args: CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs
   ) {
     super(owner, args);
-    taskFor(this.merchantRegistrationFeeTask)
-      .perform()
-      .catch((e) => console.error(e));
-  }
-
-  @task *merchantRegistrationFeeTask() {
-    this.merchantRegistrationFee = yield this.layer2Network.strategy.merchantRegistrationFee();
   }
 
   @action createMerchant() {

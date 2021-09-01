@@ -1,1 +1,0 @@
-export const MERCHANT_CREATION_FEE_IN_SPEND = 100;

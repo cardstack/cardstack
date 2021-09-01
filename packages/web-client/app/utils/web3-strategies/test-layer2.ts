@@ -203,7 +203,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return deferred.promise;
   }
 
-  merchantRegistrationFee() {
+  fetchMerchantRegistrationFee() {
     return Promise.resolve(100);
   }
 
@@ -378,7 +378,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       .flat()
       .find((safe) => safe.address === prepaidCardAddress);
 
-    let merchantCreationFee = await this.merchantRegistrationFee();
+    let merchantCreationFee = await this.fetchMerchantRegistrationFee();
 
     if (prepaidCard && prepaidCard.type === 'prepaid-card') {
       prepaidCard.spendFaceValue =

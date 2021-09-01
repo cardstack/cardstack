@@ -1,6 +1,6 @@
 import { tracked } from '@glimmer/tracking';
 
-interface ArbitraryDictionary {
+export interface ArbitraryDictionary {
   [key: string]: any;
 }
 export default class WorkflowSession {

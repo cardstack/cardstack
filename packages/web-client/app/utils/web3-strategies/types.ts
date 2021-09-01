@@ -134,7 +134,7 @@ export interface Layer2Web3Strategy
     customizationDid: string,
     options?: IssuePrepaidCardOptions
   ): Promise<PrepaidCardSafe>;
-  merchantRegistrationFee(): Promise<number>;
+  fetchMerchantRegistrationFee(): Promise<number>;
   registerMerchant(
     prepaidCardAddress: string,
     infoDid: string,

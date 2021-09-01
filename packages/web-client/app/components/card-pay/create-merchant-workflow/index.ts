@@ -2,7 +2,10 @@ import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import { inject as service } from '@ember/service';
 import { formatUsd, spendToUsd } from '@cardstack/cardpay-sdk';
-import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
+import {
+  IWorkflowMessage,
+  WorkflowMessage,
+} from '@cardstack/web-client/models/workflow/workflow-message';
 import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
@@ -13,7 +16,12 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import { MERCHANT_CREATION_FEE_IN_SPEND } from './workflow-config';
+import {
+  Participant,
+  WorkflowPostable,
+} from '@cardstack/web-client/models/workflow/workflow-postable';
+import { taskFor } from 'ember-concurrency-ts';
+import { ArbitraryDictionary } from '@cardstack/web-client/models/workflow/workflow-session';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -21,6 +29,28 @@ const FAILURE_REASONS = {
   INSUFFICIENT_PREPAID_CARD_BALANCE: 'INSUFFICIENT_PREPAID_CARD_BALANCE',
   NO_PREPAID_CARD: 'NO_PREPAID_CARD',
 } as const;
+
+interface SessionAwareWorkflowMessageOptions {
+  author: Participant;
+  includeIf: (this: WorkflowPostable) => boolean;
+  template: (session: ArbitraryDictionary) => string;
+}
+
+class SessionAwareWorkflowMessage
+  extends WorkflowPostable
+  implements IWorkflowMessage {
+  private template: (session: ArbitraryDictionary) => string;
+  isComplete = true;
+
+  constructor(options: SessionAwareWorkflowMessageOptions) {
+    super(options.author, options.includeIf);
+    this.template = options.template;
+  }
+
+  get message() {
+    return this.template(this.workflow?.session.state!);
+  }
+}
 
 class CreateMerchantWorkflow extends Workflow {
   name = 'Merchant Creation';
@@ -67,6 +97,15 @@ class CreateMerchantWorkflow extends Workflow {
               'service:layer2-network'
             ) as Layer2Network;
 
+            let merchantRegistrationFee = await taskFor(
+              layer2Network.fetchMerchantRegistrationFeeTask
+            ).perform();
+
+            this.workflow?.session.update(
+              'merchantRegistrationFee',
+              merchantRegistrationFee
+            );
+
             await layer2Network.safes.fetch();
 
             let hasPrepaidCardWithSufficientBalance = false;
@@ -75,7 +114,7 @@ class CreateMerchantWorkflow extends Workflow {
               hasPrepaidCard = safe.type === 'prepaid-card' || hasPrepaidCard;
               hasPrepaidCardWithSufficientBalance =
                 safe.type === 'prepaid-card' &&
-                safe.spendFaceValue >= MERCHANT_CREATION_FEE_IN_SPEND;
+                safe.spendFaceValue >= merchantRegistrationFee;
 
               if (hasPrepaidCardWithSufficientBalance) {
                 break;
@@ -189,11 +228,14 @@ class CreateMerchantWorkflow extends Workflow {
       },
     }),
     // cancelation for not having prepaid card
-    new WorkflowMessage({
+    new SessionAwareWorkflowMessage({
       author: cardbot,
-      message: `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${MERCHANT_CREATION_FEE_IN_SPEND} SPEND (${formatUsd(
-        spendToUsd(MERCHANT_CREATION_FEE_IN_SPEND)!
-      )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
+      template: (session: ArbitraryDictionary) =>
+        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${
+          session.merchantRegistrationFee
+        } SPEND (${formatUsd(
+          spendToUsd(session.merchantRegistrationFee)!
+        )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.NO_PREPAID_CARD
@@ -210,11 +252,14 @@ class CreateMerchantWorkflow extends Workflow {
       },
     }),
     // cancelation for insufficient balance
-    new WorkflowMessage({
+    new SessionAwareWorkflowMessage({
       author: cardbot,
-      message: `It looks like you don’t have a prepaid card with enough funds to pay the ${MERCHANT_CREATION_FEE_IN_SPEND} SPEND (${formatUsd(
-        spendToUsd(MERCHANT_CREATION_FEE_IN_SPEND)!
-      )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
+      template: (session: ArbitraryDictionary) =>
+        `It looks like you don’t have a prepaid card with enough funds to pay the ${
+          session.merchantRegistrationFee
+        } SPEND (${formatUsd(
+          spendToUsd(session.merchantRegistrationFee)!
+        )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason ===

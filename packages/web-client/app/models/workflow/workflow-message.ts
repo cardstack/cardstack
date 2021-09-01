@@ -6,8 +6,15 @@ interface WorkflowMessageOptions {
   includeIf: (this: WorkflowMessage) => boolean;
 }
 
-export class WorkflowMessage extends WorkflowPostable {
+export interface IWorkflowMessage extends WorkflowPostable {
   message: string;
+}
+
+export class WorkflowMessage
+  extends WorkflowPostable
+  implements IWorkflowMessage {
+  message: string;
+
   constructor(options: Partial<WorkflowMessageOptions>) {
     super(options.author!, options.includeIf);
     this.message = options.message!;
