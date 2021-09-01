@@ -22,6 +22,7 @@ import {
 } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
+import { PrepaidCardSafe } from '@cardstack/cardpay-sdk';
 
 interface CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs {
   workflowSession: WorkflowSession;
@@ -41,6 +42,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   @tracked chinInProgressMessage?: string;
   @tracked txHash?: TransactionHash;
   @tracked createTaskRunningForAWhile = false;
+  @tracked selectedPrepaidCard?: PrepaidCardSafe;
 
   lastNonce?: string;
 
@@ -51,7 +53,21 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
     super(owner, args);
   }
 
+  get prepaidCards() {
+    return this.layer2Network.safes.value.filterBy(
+      'type',
+      'prepaid-card'
+    ) as PrepaidCardSafe[];
+  }
+
+  @action choosePrepaidCard(card: PrepaidCardSafe) {
+    this.selectedPrepaidCard = card;
+  }
+
   @action createMerchant() {
+    if (this.isCtaDisabled) {
+      return;
+    }
     taskFor(this.createTask)
       .perform()
       .catch((e) => console.error(e));
@@ -65,7 +81,8 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
     let { workflowSession } = this.args;
 
     try {
-      this.chinInProgressMessage = 'Preparing to create merchant…';
+      this.chinInProgressMessage =
+        'You will receive a confirmation request from the Card Wallet app in a few moments…';
 
       if (!workflowSession.state.merchantInfo) {
         let persistedMerchantInfo = yield taskFor(
@@ -83,8 +100,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
       let options: RegisterMerchantOptions = {
         onTxHash: (txHash: TransactionHash) => {
           this.txHash = txHash;
-          this.chinInProgressMessage =
-            'Waiting for the transaction to be finalized…';
+          this.chinInProgressMessage = 'Processing transaction…';
         },
       };
 
@@ -96,17 +112,14 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         };
       }
 
-      // await this.layer2Network.safes.value doesn’t trigger a fetch
-      yield this.layer2Network.safes.fetch();
-
-      let safes = this.layer2Network.safes.value;
-      let prepaidCards = safes.filterBy('type', 'prepaid-card');
-      let placeholderPrepaidCard = prepaidCards[0]!;
+      if (!this.selectedPrepaidCard) {
+        return;
+      }
 
       let registerMerchantTaskInstance = taskFor(
         this.layer2Network.registerMerchant
       ).perform(
-        placeholderPrepaidCard.address,
+        this.selectedPrepaidCard.address,
         workflowSession.state.merchantInfo.did,
         options
       );
@@ -172,5 +185,13 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
 
   get txViewerUrl() {
     return this.txHash && this.layer2Network.blockExplorerUrl(this.txHash);
+  }
+
+  get isCtaDisabled() {
+    if (!this.selectedPrepaidCard) {
+      return true;
+    }
+    return false;
+    // TODO: other conditions
   }
 }

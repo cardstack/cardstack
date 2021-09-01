@@ -20,6 +20,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  letter-spacing: -1px;
+  line-height: var(--logo-size);
   width: var(--logo-size);
   height: var(--logo-size);
   margin-right: var(--boxel-sp-xxs);

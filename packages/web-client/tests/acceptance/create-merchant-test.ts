@@ -168,11 +168,11 @@ module('Acceptance | create merchant', function (hooks) {
     // TODO verify and interact with merchant customization card default state
     await fillIn(
       `[data-test-merchant-customization-merchant-name-field] input`,
-      'HELLO!'
+      'Mandello'
     );
     await fillIn(
       `[data-test-merchant-customization-merchant-id-field] input`,
-      'abc123'
+      'mandello1'
     );
     await waitUntil(
       () =>
@@ -182,12 +182,19 @@ module('Acceptance | create merchant', function (hooks) {
     );
     await click(`[data-test-merchant-customization-save-details]`);
 
+    await waitFor(milestoneCompletedSel(1));
+    assert.dom(milestoneCompletedSel(1)).containsText('Merchant details saved');
+
     // prepaid-card-choice card
-    post = postableSel(1, 4);
+    post = postableSel(2, 2);
     await waitFor(post);
-    assert
-      .dom(post)
-      .containsText('Choose a prepaid card to fund merchant creation');
+    await click(`${post} [data-test-card-picker-dropdown] > [role="button"]`);
+    await waitFor(
+      `${post} [data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
+    );
+    await click(
+      `${post} [data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
+    );
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
@@ -203,12 +210,13 @@ module('Acceptance | create merchant', function (hooks) {
     );
 
     await waitFor('[data-test-prepaid-card-choice-is-complete]');
+    assert.dom(`[data-test-card-picker-dropdown]`).doesNotExist();
     assert
       .dom('[data-test-prepaid-card-choice-merchant-address]')
       .containsText(merchantAddress);
 
-    await waitFor(milestoneCompletedSel(1));
-    assert.dom(milestoneCompletedSel(1)).containsText('Merchant created');
+    await waitFor(milestoneCompletedSel(2));
+    assert.dom(milestoneCompletedSel(2)).containsText('Merchant created');
 
     assert
       .dom(epiloguePostableSel(0))

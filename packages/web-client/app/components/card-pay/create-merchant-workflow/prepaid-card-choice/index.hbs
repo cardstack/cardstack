@@ -1,9 +1,10 @@
 <ActionCardContainer
-  @header="Prepaid Card Choice"
+  class="prepaid-card-choice"
+  @header="Merchant Account"
   @isComplete={{@isComplete}}
   data-test-prepaid-card-choice-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Choose a prepaid card to fund merchant creation">
+  <ActionCardContainer::Section @title="Choose a prepaid card to pay the merchant creation fee">
     <CardPay::LabeledValue @label="Merchant Name" class="prepaid-card-choice__field-label">
       <CardPay::Merchant
         @name={{@workflowSession.state.merchantName}}
@@ -27,7 +28,29 @@
       />
     </CardPay::LabeledValue>
     <CardPay::LabeledValue @label="Pay Using Prepaid Card" class="prepaid-card-choice__field-label">
-      {{!-- TODO: card picker --}}
+      {{#if this.selectedPrepaidCard}}
+        <div class="prepaid-card-choice__change-card">
+          <CardPay::CardPicker::CardOption
+            @card={{this.selectedPrepaidCard}}
+            data-test-prepaid-card-choice-selected-card
+          />
+          {{#if (and (not @isComplete) (not-eq this.creationState "in-progress"))}}
+            <CardPay::CardPicker
+              @cards={{this.prepaidCards}}
+              @chooseCard={{this.choosePrepaidCard}}
+              @selectedCard={{this.selectedPrepaidCard}}
+              @selectedCardAddress={{this.selectedPrepaidCard.address}}
+            />
+          {{/if}}
+        </div>
+      {{else}}
+        <CardPay::CardPicker
+          @cards={{this.prepaidCards}}
+          @chooseCard={{this.choosePrepaidCard}}
+          @selectedCard={{this.selectedPrepaidCard}}
+          @selectedCardAddress={{this.selectedPrepaidCard.address}}
+        />
+      {{/if}}
     </CardPay::LabeledValue>
     {{#if @isComplete}}
       <CardPay::LabeledValue @label="Merchant Address" class="prepaid-card-choice__field-label">
@@ -57,8 +80,9 @@
     {{/if}}
   </ActionCardContainer::Section>
   <Boxel::ActionChin
+    class="prepaid-card-choice__footer"
     @state={{this.creationState}}
-    data-test-layout-customization
+    @disabled={{or @frozen this.isCtaDisabled}}
   >
     <:default as |d|>
       <d.ActionButton
@@ -74,7 +98,7 @@
           class="prepaid-card-choice__loading-indicator"
           @color="var(--boxel-light)"
         />
-        <div>
+        <div class="prepaid-card-choice__in-progress-message">
           {{this.chinInProgressMessage}}
           {{#if this.enableCancelation}}
             <a href="#" class="prepaid-card-choice__cancel-button" data-test-create-merchant-cancel-button {{on 'click' (queue (prevent-default) this.cancel)}}>Cancel</a>
