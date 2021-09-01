@@ -35,8 +35,15 @@ export default class RewardPool {
     return await (await this.getRewardPool()).methods.numPaymentCycles().call();
   }
 
-  async getBalanceForProof(tokenAddress: string, address: string, proof: string): Promise<string> {
-    return (await this.getRewardPool()).methods.balanceForProofWithAddress(tokenAddress, address, proof).call();
+  async getBalanceForProof(
+    rewardProgramId: string,
+    tokenAddress: string,
+    address: string,
+    proof: string
+  ): Promise<string> {
+    return (await this.getRewardPool()).methods
+      .balanceForProofWithAddress(rewardProgramId, tokenAddress, address, proof)
+      .call();
   }
 
   async rewardTokensAvailable(address: string, rewardProgramId?: string): Promise<string[]> {
