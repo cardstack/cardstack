@@ -302,7 +302,7 @@ class IssuePrepaidCardWorkflowComponent extends Component {
 
     const workflow = new IssuePrepaidCardWorkflow(
       getOwner(this),
-      this.router.currentRoute.queryParams.workflowPersistenceId!
+      this.router.currentRoute.queryParams['flow-id']!
     );
 
     workflow.restoreFromPersistedWorkflow();
