@@ -21,6 +21,7 @@ import {
   WorkflowPostable,
 } from '@cardstack/web-client/models/workflow/workflow-postable';
 import { taskFor } from 'ember-concurrency-ts';
+import { ArbitraryDictionary } from '@cardstack/web-client/models/workflow/workflow-session';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -32,13 +33,13 @@ const FAILURE_REASONS = {
 interface SessionAwareWorkflowMessageOptions {
   author: Participant;
   includeIf: (this: WorkflowPostable) => boolean;
-  template: (session: any) => string;
+  template: (session: ArbitraryDictionary) => string;
 }
 
 class SessionAwareWorkflowMessage
   extends WorkflowPostable
   implements IWorkflowMessage {
-  private template: (session: any) => string;
+  private template: (session: ArbitraryDictionary) => string;
   isComplete = true;
 
   constructor(options: SessionAwareWorkflowMessageOptions) {
@@ -47,7 +48,7 @@ class SessionAwareWorkflowMessage
   }
 
   get message() {
-    return this.template(this.workflow?.session.state);
+    return this.template(this.workflow?.session.state!);
   }
 }
 
@@ -229,7 +230,7 @@ class CreateMerchantWorkflow extends Workflow {
     // cancelation for not having prepaid card
     new SessionAwareWorkflowMessage({
       author: cardbot,
-      template: (session: any) =>
+      template: (session: ArbitraryDictionary) =>
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${
           session.merchantRegistrationFee
         } SPEND (${formatUsd(
@@ -253,7 +254,7 @@ class CreateMerchantWorkflow extends Workflow {
     // cancelation for insufficient balance
     new SessionAwareWorkflowMessage({
       author: cardbot,
-      template: (session: any) =>
+      template: (session: ArbitraryDictionary) =>
         `It looks like you don’t have a prepaid card with enough funds to pay the ${
           session.merchantRegistrationFee
         } SPEND (${formatUsd(
