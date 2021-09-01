@@ -388,6 +388,15 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return request?.deferred.resolve(merchantSafe);
   }
 
+  async test__simulateRegisterMerchantRejectionForAddress(
+    prepaidCardAddress: string
+  ) {
+    let request = this.registerMerchantRequests.get(prepaidCardAddress);
+    return request?.deferred.reject(
+      new Error('User rejected merchant creation')
+    );
+  }
+
   test__simulateHubAuthentication(authToken: string) {
     return this.test__deferredHubAuthentication.resolve(authToken);
   }
