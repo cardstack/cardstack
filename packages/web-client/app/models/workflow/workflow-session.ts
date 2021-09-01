@@ -38,21 +38,20 @@ export default class WorkflowSession {
   restoreFromStorage(): void {
     if (!this.workflow.workflowPersistenceId) return;
 
-    const persistedState = this.workflowPersistenceStorage.getPersistedState(
+    const persistedData = this.workflowPersistenceStorage.getPersistedData(
       this.workflow.workflowPersistenceId
     );
 
-    if (persistedState) {
-      this.state = persistedState;
+    if (persistedData?.state) {
+      this.state = persistedData.state;
     }
   }
 
   persistToStorage(): void {
     if (!this.workflow.workflowPersistenceId) return;
-
-    this.workflowPersistenceStorage.persistState(
+    this.workflowPersistenceStorage.persistData(
       this.workflow.workflowPersistenceId,
-      this.state
+      { name: this.workflow.name, state: this.state }
     );
   }
 
