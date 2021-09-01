@@ -63,7 +63,7 @@ module(
         merchantId: 'merchant-id',
         merchantBgColor: '#ffffff',
         merchantTextColor: '#000000',
-        merchantRegistrationFee: await layer2Service.merchantRegistrationFee(),
+        merchantRegistrationFee: await layer2Service.fetchMerchantRegistrationFee(),
       });
 
       this.setProperties({

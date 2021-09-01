@@ -97,7 +97,7 @@ class CreateMerchantWorkflow extends Workflow {
             ) as Layer2Network;
 
             let merchantRegistrationFee = await taskFor(
-              layer2Network.merchantRegistrationFee
+              layer2Network.fetchMerchantRegistrationFeeTask
             ).perform();
 
             this.workflow?.session.update(
