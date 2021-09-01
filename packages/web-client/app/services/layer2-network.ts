@@ -17,7 +17,7 @@ import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
 import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
-import { DepotSafe, Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import {
   BridgeableSymbol,
@@ -49,7 +49,6 @@ export default class Layer2Network
   };
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
-  @reads('strategy.depotSafe') depotSafe: DepotSafe | undefined;
   @reads('strategy.isFetchingDepot') declare isFetchingDepot: boolean;
 
   constructor(props: object | undefined) {
@@ -70,7 +69,12 @@ export default class Layer2Network
     this.strategy.on('incorrect-chain', this.onIncorrectChain);
     this.strategy.on('account-changed', this.onAccountChanged);
 
-    taskFor(this.strategy.initializeTask).perform();
+    taskFor(this.strategy.initializeTask)
+      .perform()
+      .then(() => {
+        // FIXME is there a better way
+        return this.safes.fetch();
+      });
   }
 
   async updateUsdConverters(
@@ -115,6 +119,10 @@ export default class Layer2Network
     strategy: this.strategy,
     walletAddress: this.walletInfo.firstAddress!,
   }));
+
+  get depotSafe() {
+    return this.safes.value.findBy('type', 'depot');
+  }
 
   @task *issuePrepaidCard(
     faceValue: number,

@@ -175,7 +175,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   async viewSafes(account: string): Promise<Safe[]> {
-    return Promise.resolve(this.accountSafes.get(account)!);
+    return Promise.resolve(this.accountSafes.get(account) || []);
   }
 
   test__simulateAccountSafes(account: string, safes: Safe[]) {
@@ -278,7 +278,11 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   test__simulateDepot(depot: DepotSafe | null) {
     if (depot) {
-      this.depotSafe = depot;
+      this.depotSafe = { ...depot, type: 'depot' };
+      // FIXME what if one exists? also, add wallet address as parameter?
+      this.test__simulateAccountSafes(this.walletInfo.firstAddress!, [
+        this.depotSafe,
+      ]);
       return;
     }
     this.depotSafe = null;

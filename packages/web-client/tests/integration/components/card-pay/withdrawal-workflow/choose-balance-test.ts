@@ -55,8 +55,9 @@ module(
           },
         ],
       };
-      layer2Service.test__simulateDepot(testDepot as DepotSafe);
+      // TODO can’t call simulateDepot with no address set… require address when setting depot?
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      layer2Service.test__simulateDepot(testDepot as DepotSafe);
       await render(hbs`
         <CardPay::WithdrawalWorkflow::ChooseBalance
           @workflowSession={{this.session}}
