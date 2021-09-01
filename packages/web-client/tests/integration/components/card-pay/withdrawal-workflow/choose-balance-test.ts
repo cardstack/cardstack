@@ -55,8 +55,8 @@ module(
           },
         ],
       };
-      layer2Service.test__simulateDepot(testDepot as DepotSafe);
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      layer2Service.test__simulateDepot(testDepot as DepotSafe);
       await render(hbs`
         <CardPay::WithdrawalWorkflow::ChooseBalance
           @workflowSession={{this.session}}
