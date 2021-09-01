@@ -12,7 +12,7 @@ as |card|>
   <CardPay::CardPicker::CardOption
     class={{cn
       "card-picker-dropdown__option"
-      card-picker-dropdown__option--selected=(eq card.address @selectedCardAddress)
+      card-picker-dropdown__option--selected=(eq card.address @selectedCard.address)
     }}
     @card={{card}}
     data-test-card-picker-dropdown-option={{card.address}}

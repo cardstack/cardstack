@@ -34,12 +34,11 @@
             @card={{this.selectedPrepaidCard}}
             data-test-prepaid-card-choice-selected-card
           />
-          {{#if (and (not @isComplete) (not-eq this.creationState "in-progress"))}}
+          {{#if (eq this.creationState "default")}}
             <CardPay::CardPicker
               @cards={{this.prepaidCards}}
               @chooseCard={{this.choosePrepaidCard}}
               @selectedCard={{this.selectedPrepaidCard}}
-              @selectedCardAddress={{this.selectedPrepaidCard.address}}
             />
           {{/if}}
         </div>
@@ -48,7 +47,6 @@
           @cards={{this.prepaidCards}}
           @chooseCard={{this.choosePrepaidCard}}
           @selectedCard={{this.selectedPrepaidCard}}
-          @selectedCardAddress={{this.selectedPrepaidCard.address}}
         />
       {{/if}}
     </CardPay::LabeledValue>

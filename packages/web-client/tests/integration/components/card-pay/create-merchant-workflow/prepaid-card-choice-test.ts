@@ -243,6 +243,19 @@ module(
     });
 
     module('Test the sdk register merchant calls', async function () {
+      test('it can call register merchant with selected prepaid card address', async function (assert) {
+        let approveSpy = sinon.spy(layer2Service, 'registerMerchant');
+
+        await selectPrepaidCard(prepaidCardAddress2);
+        await click('[data-test-create-merchant-button]');
+        await waitFor('[data-test-create-merchant-cancel-button]');
+
+        assert.ok(
+          approveSpy.calledWith(prepaidCardAddress2),
+          'The address that the approve call is made with matches the prepaid card selected in the UI'
+        );
+      });
+
       test('it shows the correct text in the creation button in the beginning and after errors', async function (assert) {
         sinon
           .stub(layer2Service, 'registerMerchant')
