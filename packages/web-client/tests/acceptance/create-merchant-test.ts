@@ -61,6 +61,14 @@ module('Acceptance | create merchant', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
+  let merchantRegistrationFee: number;
+
+  hooks.beforeEach(async function () {
+    merchantRegistrationFee = await this.owner
+      .lookup('service:layer2-network')
+      .strategy.fetchMerchantRegistrationFee();
+  });
+
   test('initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay');
     await click(
@@ -104,7 +112,7 @@ module('Acceptance | create merchant', function (hooks) {
       createMockPrepaidCard(
         layer2AccountAddress,
         prepaidCardAddress,
-        await layer2Service.fetchMerchantRegistrationFee()
+        merchantRegistrationFee
       ),
     ]);
     await waitUntil(
@@ -232,7 +240,7 @@ module('Acceptance | create merchant', function (hooks) {
         createMockPrepaidCard(
           layer2AccountAddress,
           prepaidCardAddress,
-          await layer2Service.fetchMerchantRegistrationFee()
+          merchantRegistrationFee
         ),
       ]);
     });
@@ -333,7 +341,7 @@ module('Acceptance | create merchant', function (hooks) {
         createMockPrepaidCard(
           secondLayer2AccountAddress,
           secondPrepaidCardAddress,
-          await layer2Service.fetchMerchantRegistrationFee()
+          merchantRegistrationFee
         ),
       ]);
       await settled();
@@ -380,8 +388,8 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${await layer2Service.fetchMerchantRegistrationFee()} SPEND (${formatUsd(
-          spendToUsd(await layer2Service.fetchMerchantRegistrationFee())!
+        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${merchantRegistrationFee} SPEND (${formatUsd(
+          spendToUsd(merchantRegistrationFee)!
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert
@@ -401,7 +409,7 @@ module('Acceptance | create merchant', function (hooks) {
       createMockPrepaidCard(
         layer2AccountAddress,
         prepaidCardAddress,
-        (await layer2Service.fetchMerchantRegistrationFee()) - 1
+        merchantRegistrationFee - 1
       ),
     ]);
 
@@ -418,8 +426,8 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have a prepaid card with enough funds to pay the ${await layer2Service.fetchMerchantRegistrationFee()} SPEND (${formatUsd(
-          spendToUsd(await layer2Service.fetchMerchantRegistrationFee())!
+        `It looks like you don’t have a prepaid card with enough funds to pay the ${merchantRegistrationFee} SPEND (${formatUsd(
+          spendToUsd(merchantRegistrationFee)!
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert
