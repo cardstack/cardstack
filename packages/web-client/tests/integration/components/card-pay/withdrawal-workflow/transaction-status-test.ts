@@ -37,7 +37,7 @@ module(
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
 
-      layer2Service.bridgeToLayer1('0xbridged', 'DAI', '20');
+      layer2Service.bridgeToLayer1('0xsource', '0xdestination', 'DAI', '20');
     });
 
     test('It renders transaction status and links', async function (assert) {

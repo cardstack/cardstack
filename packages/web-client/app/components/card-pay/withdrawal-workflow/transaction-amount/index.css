@@ -6,6 +6,11 @@
   --field-label-width: 15%;
 }
 
+.withdrawal-transaction-amount__balance .balance-display__icon {
+  width: var(--boxel-sp-xxl);
+  margin-right: 0;
+}
+
 .withdrawal-transaction-amount__token {
   display: flex;
   align-items: center;

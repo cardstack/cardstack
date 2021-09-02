@@ -8,6 +8,9 @@ import { toWei } from 'web3-utils';
 import BN from 'bn.js';
 import sinon from 'sinon';
 
+const startDaiAmountString = '100.1111111111111111';
+let startDaiAmount = toWei(startDaiAmountString);
+
 module(
   'Integration | Component | card-pay/withdrawal-workflow/transaction-amount',
   async function (hooks) {
@@ -21,16 +24,16 @@ module(
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
       layer2Strategy.test__simulateAccountsChanged([layer2AccountAddress]);
 
-      const startDaiAmountString = '100.1111111111111111';
-      let startDaiAmount = toWei(startDaiAmountString);
-
-      const session = new WorkflowSession();
-      session.update('withdrawalToken', 'DAI.CPXD');
-
       layer2Strategy.test__simulateBalances({
         defaultToken: new BN(startDaiAmount),
         dai: new BN(startDaiAmount),
         card: new BN('0'),
+      });
+
+      const session = new WorkflowSession();
+      session.updateMany({
+        withdrawalSafe: layer2Strategy.depotSafe,
+        withdrawalToken: 'DAI.CPXD',
       });
 
       this.setProperties({
@@ -46,6 +49,13 @@ module(
       `);
     });
 
+    test('the funding source and balance are shown', async function (assert) {
+      assert.dom('[data-test-withdrawal-source]').containsText('example-depot');
+      assert
+        .dom('[data-test-withdrawal-balance]')
+        .containsText(`${startDaiAmountString} DAI.CPXD`);
+    });
+
     test('the amount is marked invalid when a value is entered and then cleared', async function (assert) {
       await fillIn('input', '50');
       await fillIn('input', '');
@@ -57,7 +67,7 @@ module(
 
     test('the amount is marked invalid when the field loses focus', async function (assert) {
       await click('input');
-      await click('[data-test-balance-view-summary]');
+      await click('[data-test-withdrawal-source]');
       assert.dom('input').hasAria('invalid', 'true');
       assert
         .dom('[data-test-boxel-input-error-message]')
