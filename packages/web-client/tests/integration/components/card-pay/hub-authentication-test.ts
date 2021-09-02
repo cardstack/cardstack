@@ -85,6 +85,8 @@ module(
           .containsText(
             'You will receive a confirmation request from the Card Wallet app in a few moments'
           );
+        hubAuthentication.authToken = 'some-auth-token';
+        hubAuthentication.isAuthenticated = true;
         deferred.resolve();
         await settled();
         assert
