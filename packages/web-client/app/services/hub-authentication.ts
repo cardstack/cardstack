@@ -37,20 +37,19 @@ export default class HubAuthentication extends Service {
 
   @task *initializeTask(): TaskGenerator<void> {
     yield waitForProperty(this.layer2Network, 'isInitializing', false);
-    if (!this.authToken) return;
-    if (!this.layer2Network.isConnected) {
-      this.storage.removeItem('authToken');
-      return;
-    }
-    if (!this.authToken) return;
-    let isAuthValid = yield this.layer2Network.checkHubAuthenticationValid(
-      this.authToken
-    );
-    if (isAuthValid) {
+    if (yield this.hasValidAuthentication()) {
       this.isAuthenticated = true;
     } else {
-      this.storage.removeItem('authToken');
+      this.authToken = null;
     }
+  }
+
+  async hasValidAuthentication() {
+    return Boolean(
+      this.layer2Network.isConnected &&
+        this.authToken &&
+        (await this.layer2Network.checkHubAuthenticationValid(this.authToken))
+    );
   }
 
   get authToken(): string | null {
@@ -59,19 +58,38 @@ export default class HubAuthentication extends Service {
 
   set authToken(val: string | null) {
     if (val) {
+      // we're not setting isAuthenticated to true here because
+      // it is possible to mistakenly set authToken to an arbitrary truthy value
+      // in an external consumer
       this.storage.setItem('authToken', val);
     } else {
+      // we are currently clearing auth tokens externally by doing
+      // HubAuthenticationService.authToken = null
+      // this should also make isAuthenticated false
+      // could consider using a dedicated method instead
+      this.isAuthenticated = false;
       this.storage.removeItem('authToken');
     }
   }
 
-  async ensureAuthenticated(): Promise<string> {
-    let { authToken } = this;
-    if (!authToken) {
-      authToken = await this.layer2Network.authenticate();
-      this.authToken = authToken;
-      this.isAuthenticated = true;
+  async ensureAuthenticated(): Promise<void> {
+    if (await this.hasValidAuthentication()) {
+      return;
     }
-    return authToken;
+
+    try {
+      let newAuthToken = await this.layer2Network.authenticate();
+
+      if (newAuthToken) {
+        this.authToken = newAuthToken;
+        this.isAuthenticated = true;
+      } else {
+        this.authToken = null;
+        throw new Error('Failed to fetch auth token');
+      }
+    } catch (e) {
+      this.authToken = null;
+      throw e;
+    }
   }
 }
