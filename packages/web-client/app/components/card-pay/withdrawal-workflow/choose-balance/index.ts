@@ -17,21 +17,21 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
   tokenOptions = [this.defaultTokenSymbol, this.cardTokenSymbol];
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  get selectedTokenSymbol(): TokenSymbol {
+  get somethingTokenSymbolFIXME(): TokenSymbol {
     return (
       this.args.workflowSession.state.withdrawalToken ?? this.defaultTokenSymbol
     );
   }
 
   @tracked selectedSafe: Safe | undefined;
-  @tracked selectedToken: TokenBalance;
+  @tracked selectedTokenSymbol: TokenSymbol;
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
     this.selectedSafe = this.layer2Network.depotSafe;
-    this.selectedToken =
-      this.tokens.find((t) => t.symbol === this.selectedTokenSymbol) ??
-      this.tokens[0];
+    this.selectedTokenSymbol =
+      this.tokens.find((t) => t.symbol === this.somethingTokenSymbolFIXME)
+        ?.tokenDisplayInfo.symbol ?? this.tokens[0].tokenDisplayInfo.symbol;
   }
 
   get depotAddress() {
@@ -56,12 +56,18 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
     });
   }
 
+  get selectedToken() {
+    return this.tokens.find(
+      (token) => token.symbol === this.selectedTokenSymbol
+    );
+  }
+
   get isDisabled() {
     return (
       !this.depotAddress ||
       !this.tokens.length ||
-      !this.selectedToken.balance ||
-      this.selectedToken.balance.isZero()
+      !this.selectedToken?.balance ||
+      this.selectedToken?.balance.isZero()
     );
   }
 
@@ -70,7 +76,7 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
   }
 
   @action chooseSource(token: TokenBalance) {
-    this.selectedToken = token;
+    this.selectedTokenSymbol = token.symbol;
   }
 
   @action save() {

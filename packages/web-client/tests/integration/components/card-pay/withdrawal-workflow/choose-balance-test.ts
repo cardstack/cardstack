@@ -162,7 +162,12 @@ module(
         .containsText('MERCHANT 0xmerchantbAB0644ffCD32518eBF4924ba8666666');
       await click('.ember-power-select-options li:nth-child(2)');
 
-      // FIXME selected balance lingers from previous safe
+      assert
+        .dom('[data-test-balance-chooser-dropdown]')
+        .containsText(
+          '450.00 CARD.CPXD',
+          'changing the safe updates the balance for the chosen token'
+        );
 
       await click(
         '[data-test-balance-chooser-dropdown] .ember-power-select-trigger'
