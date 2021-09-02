@@ -104,6 +104,9 @@ module(
           transferrable: false,
         },
       ]);
+
+      // FIXME ??? 😞
+      await layer2Service.refreshSafesAndBalances();
       await render(hbs`
         <CardPay::WithdrawalWorkflow::ChooseBalance
           @workflowSession={{this.session}}
@@ -134,13 +137,11 @@ module(
       assert.dom('.ember-power-select-options li').exists({ count: 2 });
       assert
         .dom('.ember-power-select-options li:nth-child(1)')
-        .containsText('DAI.CPXD');
+        .containsText('250.00 DAI.CPXD');
       assert
         .dom('.ember-power-select-options li:nth-child(2)')
-        .containsText('CARD.CPXD');
+        .containsText('500.00 CARD.CPXD');
       await click('.ember-power-select-options li:nth-child(2)');
-
-      // FIXME assert on displayed balances, which should change
 
       assert
         .dom(
@@ -159,6 +160,20 @@ module(
       assert
         .dom('.ember-power-select-options li:nth-child(2)')
         .containsText('MERCHANT 0xmerchantbAB0644ffCD32518eBF4924ba8666666');
+      await click('.ember-power-select-options li:nth-child(2)');
+
+      // FIXME selected balance lingers from previous safe
+
+      await click(
+        '[data-test-balance-chooser-dropdown] .ember-power-select-trigger'
+      );
+      assert.dom('.ember-power-select-options li').exists({ count: 2 });
+      assert
+        .dom('.ember-power-select-options li:nth-child(1)')
+        .containsText('125.00 DAI.CPXD');
+      assert
+        .dom('.ember-power-select-options li:nth-child(2)')
+        .containsText('450.00 CARD.CPXD');
       await click('.ember-power-select-options li:nth-child(2)');
 
       assert

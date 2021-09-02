@@ -46,19 +46,14 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
 
   get tokens() {
     return this.tokenOptions.map((symbol) => {
-      let balance = this.getTokenBalance(symbol);
+      let truncatedSymbol = symbol.split('.')[0];
+      let selectedSafeToken = (this.selectedSafe?.tokens || []).find(
+        // FIXME how to get symbol with no suffix?
+        (token) => token.token.symbol === truncatedSymbol
+      );
+      let balance = new BN(selectedSafeToken?.balance || '0');
       return new TokenBalance(symbol, balance);
     });
-  }
-
-  getTokenBalance(symbol: TokenSymbol) {
-    if (symbol === this.defaultTokenSymbol) {
-      return this.layer2Network.defaultTokenBalance ?? new BN('0');
-    }
-    if (symbol === this.cardTokenSymbol) {
-      return this.layer2Network.cardBalance ?? new BN('0');
-    }
-    return new BN('0');
   }
 
   get isDisabled() {
