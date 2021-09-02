@@ -142,7 +142,7 @@ class CreateMerchantWorkflow extends Workflow {
       completedDetail: `${c.layer2.fullName} wallet connected`,
     }),
     new Milestone({
-      title: 'Create merchant account',
+      title: 'Save merchant details',
       postables: [
         new NetworkAwareWorkflowMessage({
           author: cardbot,
@@ -167,6 +167,21 @@ class CreateMerchantWorkflow extends Workflow {
           author: cardbot,
           componentName:
             'card-pay/create-merchant-workflow/merchant-customization',
+        }),
+      ],
+      completedDetail: 'Merchant details saved',
+    }),
+    new Milestone({
+      title: 'Create merchant',
+      postables: [
+        new WorkflowMessage({
+          author: cardbot,
+          message: 'Looking great!',
+        }),
+        new WorkflowMessage({
+          author: cardbot,
+          message: `On the next step: You need to pay a small protocol fee to create your merchant.
+          Please select a prepaid card and balance from your ${c.layer2.fullName} wallet`,
         }),
         new WorkflowCard({
           author: cardbot,

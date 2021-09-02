@@ -24,6 +24,7 @@ module(
   function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
     let prepaidCardAddress: string;
+    let prepaidCardAddress2: string;
 
     setupRenderingTest(hooks);
     setupMirage(hooks);
@@ -34,6 +35,7 @@ module(
 
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
       prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
+      prepaidCardAddress2 = '0x432100000000000000000000000000000000dbca';
 
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
@@ -55,14 +57,31 @@ module(
           reloadable: false,
           transferrable: false,
         },
+        {
+          type: 'prepaid-card',
+          createdAt: Date.now() / 1000,
+
+          address: prepaidCardAddress2,
+
+          tokens: [],
+          owners: [layer2AccountAddress],
+
+          issuingToken: '0xTOKEN',
+          spendFaceValue: 500,
+          prepaidCardOwner: layer2AccountAddress,
+          hasBeenUsed: false,
+          issuer: layer2AccountAddress,
+          reloadable: false,
+          transferrable: false,
+        },
       ]);
 
       let workflowSession = new WorkflowSession();
       workflowSession.updateMany({
-        merchantName: "It's a new merchant",
-        merchantId: 'merchant-id',
-        merchantBgColor: '#ffffff',
-        merchantTextColor: '#000000',
+        merchantName: 'Mandello',
+        merchantId: 'mandello1',
+        merchantBgColor: '#ff5050',
+        merchantTextColor: '#fff',
         merchantRegistrationFee: await layer2Service.fetchMerchantRegistrationFee(),
       });
 
@@ -85,18 +104,105 @@ module(
       `);
     });
 
-    test('it shows the correct data', async function (assert) {
+    async function selectPrepaidCard(cardAddress: string) {
+      await click(`[data-test-card-picker-dropdown] > [role="button"]`);
+      await waitFor(`[data-test-card-picker-dropdown-option="${cardAddress}"]`);
+      await click(`[data-test-card-picker-dropdown-option="${cardAddress}"]`);
+    }
+
+    test('it shows the correct data in default state', async function (assert) {
+      assert
+        .dom(`[data-test-boxel-card-container]`)
+        .containsText('Choose a prepaid card to pay the merchant creation fee');
       assert
         .dom('[data-test-prepaid-card-choice-merchant-fee]')
         .containsText('100 SPEND');
       assert
         .dom('[data-test-merchant]')
-        .hasAttribute('data-test-merchant', "It's a new merchant")
-        .hasAttribute('data-test-merchant-logo-background', '#ffffff')
-        .hasAttribute('data-test-merchant-logo-text-color', '#000000');
+        .hasAttribute('data-test-merchant', 'Mandello')
+        .hasAttribute('data-test-merchant-logo-background', '#ff5050')
+        .hasAttribute('data-test-merchant-logo-text-color', '#fff');
       assert
         .dom('[data-test-prepaid-card-choice-merchant-id]')
-        .containsText('merchant-id');
+        .containsText('mandello1');
+      assert
+        .dom(`[data-test-boxel-action-chin] [data-test-boxel-button]`)
+        .isDisabled();
+      assert
+        .dom(`[data-test-card-picker-dropdown]`)
+        .containsText('Select card');
+
+      await click(`[data-test-card-picker-dropdown] > [role="button"]`);
+      await waitFor(
+        `[data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
+      );
+
+      assert
+        .dom(`[data-test-card-picker-dropdown-option]`)
+        .exists({ count: 2 });
+
+      await click(
+        `[data-test-card-picker-dropdown-option="${prepaidCardAddress}"]`
+      );
+
+      assert
+        .dom(
+          `[data-test-prepaid-card-choice-selected-card] [data-test-prepaid-card]`
+        )
+        .exists();
+      assert
+        .dom(`[data-test-card-picker-dropdown]`)
+        .containsText('Change card');
+      assert
+        .dom(`[data-test-boxel-action-chin] [data-test-boxel-button]`)
+        .isNotDisabled();
+    });
+
+    test('it allows changing selected prepaid card', async function (assert) {
+      await selectPrepaidCard(prepaidCardAddress);
+
+      assert
+        .dom(
+          `[data-test-prepaid-card-choice-selected-card] [data-test-prepaid-card="${prepaidCardAddress}"]`
+        )
+        .exists();
+      assert
+        .dom(`[data-test-prepaid-card-choice-selected-card]`)
+        .containsText(prepaidCardAddress);
+      assert
+        .dom(`[data-test-prepaid-card-choice-selected-card]`)
+        .containsText('2324 SPEND');
+
+      await selectPrepaidCard(prepaidCardAddress2);
+
+      assert
+        .dom(
+          `[data-test-prepaid-card-choice-selected-card] [data-test-prepaid-card="${prepaidCardAddress2}"]`
+        )
+        .exists();
+      assert
+        .dom(`[data-test-prepaid-card-choice-selected-card]`)
+        .containsText(prepaidCardAddress2);
+      assert
+        .dom(`[data-test-prepaid-card-choice-selected-card]`)
+        .containsText('500 SPEND');
+    });
+
+    test('it displays the correct data in in-progress state', async function (assert) {
+      await selectPrepaidCard(prepaidCardAddress);
+      await click('[data-test-create-merchant-button]');
+      await waitFor('[data-test-create-merchant-cancel-button]');
+
+      assert
+        .dom(`[data-test-boxel-card-container]`)
+        .containsText('Choose a prepaid card to pay the merchant creation fee');
+      assert
+        .dom('[data-test-prepaid-card-choice-merchant-fee]')
+        .containsText('100 SPEND');
+      assert
+        .dom('[data-test-prepaid-card-choice-merchant-id]')
+        .containsText('mandello1');
+      assert.dom(`[data-test-card-picker-dropdown]`).doesNotExist();
     });
 
     test('it allows canceling and retrying after a while', async function (assert) {
@@ -104,7 +210,9 @@ module(
         .dom('[data-test-create-merchant-button]')
         .containsText('Create Merchant');
 
+      await selectPrepaidCard(prepaidCardAddress);
       await click('[data-test-create-merchant-button]');
+
       assert.dom('[data-test-create-merchant-cancel-button]').doesNotExist();
 
       await waitFor('[data-test-create-merchant-cancel-button]');
@@ -114,6 +222,9 @@ module(
       );
 
       await click('[data-test-create-merchant-cancel-button]');
+      assert
+        .dom(`[data-test-card-picker-dropdown]`)
+        .containsText('Change card');
       assert.dom('[data-test-create-merchant-button]').hasText('Try Again');
 
       await click('[data-test-create-merchant-button]');
@@ -132,6 +243,19 @@ module(
     });
 
     module('Test the sdk register merchant calls', async function () {
+      test('it can call register merchant with selected prepaid card address', async function (assert) {
+        let approveSpy = sinon.spy(layer2Service, 'registerMerchant');
+
+        await selectPrepaidCard(prepaidCardAddress2);
+        await click('[data-test-create-merchant-button]');
+        await waitFor('[data-test-create-merchant-cancel-button]');
+
+        assert.ok(
+          approveSpy.calledWith(prepaidCardAddress2),
+          'The address that the approve call is made with matches the prepaid card selected in the UI'
+        );
+      });
+
       test('it shows the correct text in the creation button in the beginning and after errors', async function (assert) {
         sinon
           .stub(layer2Service, 'registerMerchant')
@@ -141,6 +265,7 @@ module(
           .dom('[data-test-create-merchant-button]')
           .containsText('Create Merchant');
 
+        await selectPrepaidCard(prepaidCardAddress);
         await click('[data-test-create-merchant-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
@@ -154,6 +279,7 @@ module(
           .stub(layer2Service, 'registerMerchant')
           .throws(new Error('User rejected request'));
 
+        await selectPrepaidCard(prepaidCardAddress);
         await click('[data-test-create-merchant-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
@@ -171,6 +297,7 @@ module(
             )
           );
 
+        await selectPrepaidCard(prepaidCardAddress);
         await click('[data-test-create-merchant-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
@@ -188,6 +315,7 @@ module(
             )
           );
 
+        await selectPrepaidCard(prepaidCardAddress);
         await click('[data-test-create-merchant-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
@@ -216,6 +344,7 @@ module(
             )
           );
 
+        await selectPrepaidCard(prepaidCardAddress);
         await click('[data-test-create-merchant-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
@@ -229,6 +358,7 @@ module(
           .stub(layer2Service, 'registerMerchant')
           .throws(new Error('Not any matched error'));
 
+        await selectPrepaidCard(prepaidCardAddress);
         await click('[data-test-create-merchant-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
@@ -246,6 +376,7 @@ module(
       });
 
       test('it shows the fallback error message', async function (assert) {
+        await selectPrepaidCard(prepaidCardAddress);
         await click('[data-test-create-merchant-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 

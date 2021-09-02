@@ -1,0 +1,20 @@
+<PowerSelect
+  class={{cn "card-picker-dropdown" card-picker-dropdown--selected=@selectedCard}}
+  @options={{@cards}}
+  @selected={{@selectedCard}}
+  @selectedItemComponent="card-pay/card-picker/selected-item"
+  @placeholder="Select card"
+  @onChange={{@chooseCard}}
+  @renderInPlace={{true}}
+  @verticalPosition="below"
+  data-test-card-picker-dropdown
+as |card|>
+  <CardPay::CardPicker::CardOption
+    class={{cn
+      "card-picker-dropdown__option"
+      card-picker-dropdown__option--selected=(eq card.address @selectedCard.address)
+    }}
+    @card={{card}}
+    data-test-card-picker-dropdown-option={{card.address}}
+  />
+</PowerSelect>
