@@ -81,11 +81,11 @@ export default class CardCustomization extends Service {
 
   async ensureCustomizationOptionsLoaded() {
     if (!this.loaded) {
-      return taskFor(this.fetchCustomizationOptions).perform();
+      return taskFor(this.fetchCustomizationOptionsTask).perform();
     }
   }
 
-  @task *fetchPatternOptions(): any {
+  @task *fetchPatternOptionsTask(): any {
     let response = yield fetch(`${config.hubURL}/api/prepaid-card-patterns`, {
       method: 'GET',
       headers: {
@@ -96,7 +96,7 @@ export default class CardCustomization extends Service {
     return _patternOptions.data.map(convertToPatternCustomizationOption);
   }
 
-  @task *fetchColorSchemeOptions(): any {
+  @task *fetchColorSchemeOptionsTask(): any {
     let response = yield fetch(
       `${config.hubURL}/api/prepaid-card-color-schemes`,
       {
@@ -136,11 +136,11 @@ export default class CardCustomization extends Service {
   }
 
   @task({ drop: true })
-  *fetchCustomizationOptions(): any {
+  *fetchCustomizationOptionsTask(): any {
     try {
       let [_colorSchemeOptions, _patternOptions] = yield all([
-        taskFor(this.fetchColorSchemeOptions).perform(),
-        taskFor(this.fetchPatternOptions).perform(),
+        taskFor(this.fetchColorSchemeOptionsTask).perform(),
+        taskFor(this.fetchPatternOptionsTask).perform(),
       ]);
 
       this.colorSchemeOptions = this.groupColors(_colorSchemeOptions);

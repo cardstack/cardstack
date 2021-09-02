@@ -103,11 +103,11 @@ export default class Layer2Network
     return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
   }
 
-  @task *viewSafe(address: string): TaskGenerator<Safe> {
+  @task *viewSafeTask(address: string): TaskGenerator<Safe> {
     return yield this.strategy.viewSafe(address);
   }
 
-  @task *viewSafes(account: string): TaskGenerator<Safe[]> {
+  @task *viewSafesTask(account: string): TaskGenerator<Safe[]> {
     return yield this.strategy.viewSafes(account);
   }
 
@@ -116,7 +116,7 @@ export default class Layer2Network
     walletAddress: this.walletInfo.firstAddress!,
   }));
 
-  @task *issuePrepaidCard(
+  @task *issuePrepaidCardTask(
     faceValue: number,
     customizationDid: string,
     options: IssuePrepaidCardOptions
@@ -138,7 +138,7 @@ export default class Layer2Network
     return yield this.strategy.fetchMerchantRegistrationFee();
   }
 
-  @task *registerMerchant(
+  @task *registerMerchantTask(
     prepaidCardAddress: string,
     infoDid: string,
     options: RegisterMerchantOptions

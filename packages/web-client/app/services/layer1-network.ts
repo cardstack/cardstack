@@ -99,7 +99,7 @@ export default class Layer1Network
     return this.simpleEmitter.on(event, cb);
   }
 
-  @task *approve(
+  @task *approveTask(
     amount: BN,
     tokenSymbol: string,
     onTxHash: (txHash: TransactionHash) => void
@@ -110,7 +110,7 @@ export default class Layer1Network
     return txnReceipt;
   }
 
-  @task *relayTokens(
+  @task *relayTokensTask(
     tokenSymbol: string,
     destinationAddress: string,
     amount: BN,
@@ -134,7 +134,7 @@ export default class Layer1Network
     return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
   }
 
-  @task *claimBridgedTokens(
+  @task *claimBridgedTokensTask(
     bridgeValidationResult: BridgeValidationResult,
     options?: ClaimBridgedTokensOptions
   ): TaskGenerator<TransactionReceipt> {

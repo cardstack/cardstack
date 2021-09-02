@@ -76,7 +76,7 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
     this.errorMessage = '';
     try {
       this.isConfirming = true;
-      await taskFor(this.layer1Network.claimBridgedTokens).perform(
+      await taskFor(this.layer1Network.claimBridgedTokensTask).perform(
         this.bridgeValidationResult,
         {
           onTxHash: (txHash: string) => (this.txHash = txHash),

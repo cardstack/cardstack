@@ -135,7 +135,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     try {
       this.isUnlocking = true;
       let transactionReceipt = await taskFor(
-        this.layer1Network.approve
+        this.layer1Network.approveTask
       ).perform(this.amountAsBigNumber, this.currentTokenSymbol, (txHash) => {
         this.unlockTokensTxHash = txHash;
       });
@@ -161,7 +161,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
         layer2BlockHeightBeforeBridging
       );
       let transactionReceipt = await taskFor(
-        this.layer1Network.relayTokens
+        this.layer1Network.relayTokensTask
       ).perform(
         this.currentTokenSymbol,
         layer2Address,

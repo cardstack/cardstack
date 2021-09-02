@@ -93,7 +93,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
         };
       }
       let prepaidCardSafeTaskInstance = taskFor(
-        this.layer2Network.issuePrepaidCard
+        this.layer2Network.issuePrepaidCardTask
       ).perform(this.faceValue, customization.did, options);
       let prepaidCardSafe = yield race([
         prepaidCardSafeTaskInstance,
