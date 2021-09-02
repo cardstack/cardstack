@@ -24,12 +24,12 @@ export default class CardPayWithdrawalWorkflowCheckBalanceComponent extends Comp
         this.args.onComplete?.();
       });
     } else {
-      taskFor(this.waitForSufficientBalance).perform();
+      taskFor(this.waitForSufficientBalanceTask).perform();
     }
   }
 
   @task
-  *waitForSufficientBalance() {
+  *waitForSufficientBalanceTask() {
     while (!this.hasSufficientBalance) {
       yield timeout(BALANCE_CHECK_INTERVAL);
       this.layer1Network.refreshBalances();

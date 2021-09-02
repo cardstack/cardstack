@@ -104,7 +104,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
       let placeholderPrepaidCard = prepaidCards[0]!;
 
       let registerMerchantTaskInstance = taskFor(
-        this.layer2Network.registerMerchant
+        this.layer2Network.registerMerchantTask
       ).perform(
         placeholderPrepaidCard.address,
         workflowSession.state.merchantInfo.did,
