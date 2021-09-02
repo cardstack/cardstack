@@ -106,7 +106,7 @@ class CreateMerchantWorkflow extends Workflow {
               merchantRegistrationFee
             );
 
-            await layer2Network.safes.fetch();
+            await layer2Network.refreshSafesAndBalances();
 
             let hasPrepaidCardWithSufficientBalance = false;
             let hasPrepaidCard = false;

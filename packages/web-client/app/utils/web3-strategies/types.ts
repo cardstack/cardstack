@@ -141,7 +141,7 @@ export interface Layer2Web3Strategy
     options: RegisterMerchantOptions
   ): Promise<MerchantSafe>;
   defaultTokenSymbol: ConvertibleSymbol;
-  refreshBalances(): void;
+  refreshSafesAndBalances(): void;
   convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<any>;
 }
 

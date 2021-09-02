@@ -212,7 +212,7 @@ export default abstract class Layer2ChainWeb3Strategy
 
     this.walletInfo = newWalletInfo;
     if (accounts.length) {
-      await this.refreshBalances();
+      await this.refreshSafesAndBalances();
       this.waitForAccountDeferred.resolve();
     } else {
       this.defaultTokenBalance = new BN('0');
@@ -225,7 +225,7 @@ export default abstract class Layer2ChainWeb3Strategy
     this.updateWalletInfo([]);
   }
 
-  async refreshBalances() {
+  async refreshSafesAndBalances() {
     return taskFor(this.viewSafesTask).perform();
   }
 

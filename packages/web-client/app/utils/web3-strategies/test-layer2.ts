@@ -28,6 +28,7 @@ import {
 } from '@cardstack/web-client/utils/events';
 import { task, TaskGenerator } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
+import { taskFor } from 'ember-concurrency-ts';
 
 interface IssuePrepaidCardRequest {
   deferred: RSVP.Deferred<PrepaidCardSafe>;
@@ -69,7 +70,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   registerMerchantRequests: Map<string, RegisterMerchantRequest> = new Map();
   @tracked accountSafes: Map<string, Safe[]> = new Map();
 
-  // property to test whether the refreshBalances method is called
+  // property to test whether the refreshSafesAndBalances method is called
   // to test if balances are refreshed after relaying tokens
   // this is only a mock property
   @tracked balancesRefreshed = false;
@@ -97,8 +98,9 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(new BN('0'));
   }
 
-  refreshBalances() {
+  refreshSafesAndBalances() {
     this.balancesRefreshed = true;
+    return taskFor(this.viewSafesTask).perform();
   }
 
   get depotSafe(): DepotSafe | null {

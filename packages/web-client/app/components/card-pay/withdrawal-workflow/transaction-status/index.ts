@@ -30,7 +30,7 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
         this.args.workflowSession.state.relayTokensTxnHash
       );
       this.args.workflowSession.update('bridgeValidationResult', result);
-      this.layer2Network.refreshBalances();
+      this.layer2Network.refreshSafesAndBalances();
       this.completedCount = 2;
       this.args.onComplete?.();
     } catch (e) {
