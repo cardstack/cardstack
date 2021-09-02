@@ -23,9 +23,7 @@ module(
     setupMirage(hooks);
 
     hooks.beforeEach(async function (this: Context) {
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
 
       this.setProperties({
         onComplete: () => {

@@ -93,3 +93,10 @@ export default class HubAuthentication extends Service {
     }
   }
 }
+
+// DO NOT DELETE: this is how TypeScript knows how to look up your services.
+declare module '@ember/service' {
+  interface Registry {
+    'hub-authentication': HubAuthentication;
+  }
+}
