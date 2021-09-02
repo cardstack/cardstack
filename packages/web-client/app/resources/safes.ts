@@ -1,7 +1,8 @@
 import { Resource } from 'ember-resources';
-import { tracked } from '@glimmer/tracking';
 import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { Layer2Web3Strategy } from '@cardstack/web-client/utils/web3-strategies/types';
+import { taskFor, TaskFunction } from 'ember-concurrency-ts';
+import { reads } from 'macro-decorators';
 
 interface Args {
   named: {
@@ -11,7 +12,10 @@ interface Args {
 }
 
 export class Safes extends Resource<Args> {
-  @tracked value: Safe[] = [];
+  @reads('args.named.strategy.viewSafesTask')
+  declare viewSafesTask: TaskFunction;
+  @reads('viewSafesTask.lastSuccessful.value', []) declare value: Safe[];
+  @reads('viewSafesTask.isRunning') declare isLoading: boolean;
 
   constructor(owner: unknown, args: Args) {
     super(owner, args);
@@ -19,8 +23,6 @@ export class Safes extends Resource<Args> {
   }
 
   async fetch() {
-    this.value = await this.args.named.strategy.viewSafes(
-      this.args.named.walletAddress
-    );
+    await taskFor(this.viewSafesTask).perform(this.args.named.walletAddress);
   }
 }

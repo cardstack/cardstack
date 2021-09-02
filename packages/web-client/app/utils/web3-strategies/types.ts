@@ -125,7 +125,7 @@ export interface Layer2Web3Strategy
     txnHash: TransactionHash
   ): Promise<BridgeValidationResult>;
   viewSafe(address: string): Promise<Safe | undefined>;
-  viewSafes(account: string): Promise<Safe[]>;
+  viewSafesTask(account: string): TaskGenerator<Safe[]>;
   checkHubAuthenticationValid(authToken: string): Promise<boolean>;
   authenticate(): Promise<string>;
   issuePrepaidCard(
@@ -140,8 +140,8 @@ export interface Layer2Web3Strategy
     infoDid: string,
     options: RegisterMerchantOptions
   ): Promise<MerchantSafe>;
-  fetchDepotTask(): Promise<DepotSafe | null>;
-  refreshBalances(): void;
+  defaultTokenSymbol: ConvertibleSymbol;
+  refreshSafesAndBalances(): void;
   convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<any>;
 }
 

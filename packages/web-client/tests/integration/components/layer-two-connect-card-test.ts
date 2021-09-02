@@ -52,8 +52,8 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
 
+    layer2Service.test__autoResolveViewSafes = false;
     layer2Service.test__simulateAccountsChanged(['address']);
-    layer2Service.isFetchingDepot = true;
 
     await render(hbs`
       <CardPay::LayerTwoConnectCard/>
