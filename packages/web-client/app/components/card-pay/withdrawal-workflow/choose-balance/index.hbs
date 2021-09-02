@@ -18,13 +18,21 @@
             />
           </:outer>
           <:inner>
-            <CardPay::AccountDisplay
-              @size={{if @isComplete "small"}}
-              @icon="depot"
-              @name="DEPOT:"
-              @address={{if @isComplete (truncate-middle this.depotAddress) this.depotAddress}}
-              data-test-choose-balance-from-depot
-            />
+            {{#if @isComplete}}
+              <CardPay::AccountDisplay
+                @size="small"
+                @icon={{this.selectedSafe.type}}
+                @name={{uppercase this.selectedSafe.type}}
+                @address={{truncate-middle this.selectedSafe.address}}
+              />
+            {{else}}
+              <CardPay::SafeChooserDropdown
+                @safes={{this.compatibleSafes}}
+                @selectedSafe={{this.selectedSafe}}
+                @onChooseSafe={{this.chooseSafe}}
+                data-test-choose-balance-from-safe
+              />
+            {{/if}}
           </:inner>
           <:innermost>
             {{#if @isComplete}}

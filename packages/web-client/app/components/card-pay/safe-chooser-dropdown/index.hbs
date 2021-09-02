@@ -1,0 +1,17 @@
+<PowerSelect
+  class="safe-chooser-dropdown"
+  @options={{@safes}}
+  @selected={{@selectedSafe}}
+  @onChange={{@onChooseSafe}}
+  @renderInPlace={{true}}
+  @verticalPosition="below"
+  data-test-safe-chooser-dropdown
+  ...attributes
+as |safe|>
+  <CardPay::AccountDisplay
+    @size={{if @isComplete "small"}}
+    @icon={{safe.type}}
+    @name={{uppercase safe.type}}
+    @address={{safe.address}}
+  />
+</PowerSelect>
