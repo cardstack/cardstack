@@ -1,0 +1,10 @@
+{
+  "applinks": {
+    "details": {
+      "appIDs: [
+        "QS5AFH4668.com.cardstack.cardpay"
+      ],
+      "paths": [ "*" ]
+    }
+  }
+}
