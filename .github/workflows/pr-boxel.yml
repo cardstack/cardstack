@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - 'packages/boxel/**'
+      - '.github/workflows/pr-boxel.yml'
+      - 'package.json'
+      - 'yarn.lock'
 
 jobs:
   test:

@@ -11,6 +11,8 @@ on:
       - 'packages/test-support/**'
       - 'packages/eslint-config/**'
       - '.github/workflows/pr-web-client.yml'
+      - 'package.json'
+      - 'yarn.lock'
 
 jobs:
   test:
