@@ -7,6 +7,8 @@ on:
       - 'packages/cardpay-subgraph/**'
       - 'packages/eslint-config/**'
       - '.github/workflows/pr-cardpay-subgraph.yml'
+      - 'package.json'
+      - 'yarn.lock'
 
 jobs:
   test:
