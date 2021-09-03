@@ -10,15 +10,11 @@
   },
   "private": true,
   "scripts": {
-    "rm_node_modules": "rm -rf node_modules cardhost/node_modules server/node_modules cards/*/node_modules"
+    "rm_node_modules": "find . -name node_modules -type d -prune -exec rm -rf {} +"
   },
   "workspaces": {
     "packages": [
-      "base-cards",
-      "cardhost",
-      "server",
-      "core",
-      "compiled"
+      "packages/*"
     ],
     "nohoist": [
       "**/@ember/string",
