@@ -81,8 +81,7 @@
     "axe-core": "4.1.4"
   },
   "workspaces": [
-    "packages/**",
-    "cards/*"
+    "packages/**"
   ],
   "private": true,
   "volta": {
