@@ -1,12 +1,15 @@
 .merchant-payment-request-card {
-  --section-padding: var(--boxel-sp-xl);
+  --horizontal-padding: var(--boxel-sp-xl);
+  --section-vertical-padding: var(--boxel-sp-xl);
 
   max-width: 720px;
+  padding: 0 var(--horizontal-padding);
 }
 
 @media only screen and (max-width: 360px) {
   .merchant-payment-request-card {
-    --section-padding: var(--boxel-sp-lg);
+    --horizontal-padding: var(--boxel-sp-lg);
+    --section-vertical-padding: var(--boxel-sp-lg);
   }
 
   .merchant-payment-request-card__card-wallet-text {
@@ -15,7 +18,7 @@
 }
 
 .merchant-payment-request-card__section {
-  padding: var(--section-padding);
+  padding: var(--section-vertical-padding) 0;
 }
 
 .merchant-payment-request-card__get-card-wallet {
