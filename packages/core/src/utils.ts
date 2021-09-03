@@ -12,10 +12,7 @@ export function encodeCardURL(url: string): string {
     .replace(/([;,/?:@&=+$])/g, SPECIAL_CHAR_REPLACEMENT);
 }
 
-export function getFieldForPath(
-  fields: CompiledCard['fields'],
-  path: string
-): Field | undefined {
+export function getFieldForPath(fields: CompiledCard['fields'], path: string): Field | undefined {
   let paths = path.split('.');
   let [first, ...tail] = paths;
 

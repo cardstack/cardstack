@@ -9,17 +9,11 @@ export function name(node: t.StringLiteral | t.Identifier): string {
   }
 }
 
-export function getObjectKey(
-  obj: NodePath<t.ObjectExpression>,
-  key: string
-): NodePath<t.Expression> | undefined {
+export function getObjectKey(obj: NodePath<t.ObjectExpression>, key: string): NodePath<t.Expression> | undefined {
   for (let prop of obj.get('properties')) {
     if (prop.isObjectProperty() && !prop.node.computed) {
       let propKey = (prop as NodePath<t.ObjectProperty>).get('key');
-      if (
-        (propKey.isStringLiteral() || propKey.isIdentifier()) &&
-        name(propKey.node) === key
-      ) {
+      if ((propKey.isStringLiteral() || propKey.isIdentifier()) && name(propKey.node) === key) {
         return prop.get('value') as NodePath<t.Expression>;
       }
     }

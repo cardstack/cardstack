@@ -19,11 +19,7 @@ class InvalidFieldsUsageError extends Error {
   message = 'Invalid use of @fields API';
 }
 
-type ImportAndChooseName = (
-  desiredName: string,
-  moduleSpecifier: string,
-  importedName: string
-) => string;
+type ImportAndChooseName = (desiredName: string, moduleSpecifier: string, importedName: string) => string;
 
 export interface TemplateUsageMeta {
   model: 'self' | Set<string>;
@@ -78,10 +74,7 @@ interface State {
   handledModelExpressions: WeakSet<PathExpression>;
 }
 
-export default function glimmerCardTemplateTransform(
-  source: string,
-  options: Options
-) {
+export default function glimmerCardTemplateTransform(source: string, options: Options) {
   return syntax.print(
     syntax.preprocess(source, {
       mode: 'codemod',
@@ -93,11 +86,8 @@ export default function glimmerCardTemplateTransform(
 }
 
 export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
-  return function transform(
-    env: syntax.ASTPluginEnvironment
-  ): syntax.ASTPlugin {
-    let { fields, importAndChooseName, usageMeta, defaultFieldFormat } =
-      options;
+  return function transform(env: syntax.ASTPluginEnvironment): syntax.ASTPlugin {
+    let { fields, importAndChooseName, usageMeta, defaultFieldFormat } = options;
     let state: State = {
       scopes: [new Map()],
       nextScope: undefined,
@@ -147,18 +137,12 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
             case 'normal':
               return;
             case 'stringLiteral':
-              throw new Error(
-                `tried to replace a component invocation with a string literal`
-              );
+              throw new Error(`tried to replace a component invocation with a string literal`);
             case 'pathExpression':
-              throw new Error(
-                `tried to replace a component invocation with a path expression`
-              );
+              throw new Error(`tried to replace a component invocation with a path expression`);
             case 'fieldComponent':
               if (val.expandable && val.field.type === 'containsMany') {
-                return expandContainsManyShorthand(
-                  `${FIELDS}.${val.fieldFullPath}`
-                );
+                return expandContainsManyShorthand(`${FIELDS}.${val.fieldFullPath}`);
               }
               usageMeta.fields.set(val.fieldFullPath, fieldFormat);
               return rewriteElementNode({
@@ -177,9 +161,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
           if (state.handledFieldExpressions.has(node)) {
             let pathTail = node.original.slice(`${FIELDS}.`.length);
 
-            let newExpression = env.syntax.builders.path(
-              `${MODEL}.${pathTail}`
-            );
+            let newExpression = env.syntax.builders.path(`${MODEL}.${pathTail}`);
             state.handledModelExpressions.add(newExpression);
             return newExpression;
           }
@@ -190,11 +172,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
               if (isFieldPathExpression(node)) {
                 throw new InvalidFieldsUsageError();
               }
-              trackUsageForModel(
-                usageMeta,
-                node,
-                state.handledModelExpressions
-              );
+              trackUsageForModel(usageMeta, node, state.handledModelExpressions);
 
               return;
             case 'stringLiteral':
@@ -224,8 +202,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
 
         BlockStatement: {
           enter(node) {
-            let handled: { replacement?: unknown } | undefined =
-              handleFieldsIterator(node, fields, state);
+            let handled: { replacement?: unknown } | undefined = handleFieldsIterator(node, fields, state);
 
             if (handled) {
               return handled.replacement;
@@ -250,11 +227,7 @@ export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {
   };
 }
 
-function lookupScopeVal(
-  identifier: string,
-  path: syntax.WalkerPath<Node>,
-  state: State
-): PrimitiveScopeValue {
+function lookupScopeVal(identifier: string, path: syntax.WalkerPath<Node>, state: State): PrimitiveScopeValue {
   let [key, ...tail] = identifier.split('.');
   for (let scope of state.scopes) {
     let scopeVal = scope.get(key);
@@ -354,11 +327,7 @@ function handleFieldsIterator(
   return { replacement };
 }
 
-function handlePluralFieldIterator(
-  node: BlockStatement,
-  fields: CompiledCard['fields'],
-  state: State
-) {
+function handlePluralFieldIterator(node: BlockStatement, fields: CompiledCard['fields'], state: State) {
   if (
     node.path.type !== 'PathExpression' ||
     node.path.original !== 'each' ||
@@ -413,13 +382,7 @@ function rewriteElementNode(options: {
   if (inlineHBS) {
     return inlineTemplateForField(inlineHBS, modelArgument, state);
   } else {
-    return rewriteFieldToComponent(
-      options.importAndChooseName,
-      field,
-      modelArgument,
-      state,
-      format
-    );
+    return rewriteFieldToComponent(options.importAndChooseName, field, modelArgument, state, format);
   }
 }
 
@@ -427,20 +390,10 @@ function expandContainsManyShorthand(fieldName: string): Statement[] {
   let { element, blockItself, block, path } = syntax.builders;
   let segments = fieldName.split('.');
   let singularFieldName = singularize(segments[segments.length - 1]);
-  let componentElement = element(
-    IN_PROCESS_ELEMENT_ESCAPE + singularFieldName,
-    {}
-  );
+  let componentElement = element(IN_PROCESS_ELEMENT_ESCAPE + singularFieldName, {});
   componentElement.selfClosing = true;
 
-  return [
-    block(
-      path('each'),
-      [path(fieldName)],
-      null,
-      blockItself([componentElement], [singularFieldName])
-    ),
-  ];
+  return [block(path('each'), [path(fieldName)], null, blockItself([componentElement], [singularFieldName]))];
 }
 
 // <@fields.createdAt /> -> <DateField @model={{@model.createdAt}} @set={{@set.setters.createdAt}} />
@@ -453,18 +406,11 @@ function rewriteFieldToComponent(
 ): Statement[] {
   let { element, attr, mustache, path, text } = syntax.builders;
 
-  let componentName = importAndChooseName(
-    classify(field.card.url),
-    field.card[format].moduleName,
-    'default'
-  );
+  let componentName = importAndChooseName(classify(field.card.url), field.card[format].moduleName, 'default');
 
   let modelExpression = path(modelArgument);
   state.handledModelExpressions.add(modelExpression);
-  let attrs = [
-    attr('@model', mustache(modelExpression)),
-    attr('data-test-field-name', text(field.name)),
-  ];
+  let attrs = [attr('@model', mustache(modelExpression)), attr('data-test-field-name', text(field.name))];
 
   if (format === 'edit') {
     let setterArg = modelArgument.replace(MODEL + '.', '');
@@ -531,11 +477,7 @@ function assertNever(value: never) {
   throw new Error(`should never happen ${value}`);
 }
 
-function inlineTemplateForField(
-  inlineHBS: string,
-  fieldName: string,
-  state: State
-): syntax.ASTv1.Statement[] {
+function inlineTemplateForField(inlineHBS: string, fieldName: string, state: State): syntax.ASTv1.Statement[] {
   let { body } = syntax.preprocess(inlineHBS, {});
   let nodes: Map<syntax.ASTv1.Statement, PrimitiveScopeValue> = new Map();
   for (let statement of body) {
@@ -551,10 +493,7 @@ function inlineTemplateForField(
   return body;
 }
 
-function getFieldFormat(
-  _node: ElementNode,
-  defaultFieldFormat: Format
-): Format {
+function getFieldFormat(_node: ElementNode, defaultFieldFormat: Format): Format {
   // TODO: look at @format parameter on node to override default
   return defaultFieldFormat;
 }

@@ -1,12 +1,5 @@
 import { TemplateUsageMeta } from '../glimmer-plugin-card-template';
-import {
-  assertValidSerializerMap,
-  CompiledCard,
-  ComponentInfo,
-  Field,
-  Format,
-  SerializerMap,
-} from '../interfaces';
+import { assertValidSerializerMap, CompiledCard, ComponentInfo, Field, Format, SerializerMap } from '../interfaces';
 import { getFieldForPath } from '../utils';
 
 export function buildUsedFieldsListFromUsageMeta(
@@ -22,12 +15,7 @@ export function buildUsedFieldsListFromUsageMeta(
   }
 
   for (const [fieldPath, fieldFormat] of usageMeta.fields.entries()) {
-    buildUsedFieldListFromComponents(
-      usedFields,
-      fieldPath,
-      fields,
-      fieldFormat
-    );
+    buildUsedFieldListFromComponents(usedFields, fieldPath, fields, fieldFormat);
   }
 
   return [...usedFields];
@@ -43,13 +31,7 @@ function buildUsedFieldListFromComponents(
 
   if (field && field.card[format].usedFields.length) {
     for (const nestedFieldPath of field.card[format].usedFields) {
-      buildUsedFieldListFromComponents(
-        usedFields,
-        nestedFieldPath,
-        field.card.fields,
-        'embedded',
-        fieldPath
-      );
+      buildUsedFieldListFromComponents(usedFields, nestedFieldPath, field.card.fields, 'embedded', fieldPath);
     }
   } else {
     if (prefix) {
@@ -81,11 +63,7 @@ export function buildSerializerMapFromUsedFields(
   return map;
 }
 
-function buildDeserializerMapForField(
-  map: any,
-  field: Field,
-  usedPath: string
-): void {
+function buildDeserializerMapForField(map: any, field: Field, usedPath: string): void {
   if (Object.keys(field.card.fields).length) {
     let { fields } = field.card;
     for (const name in fields) {

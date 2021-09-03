@@ -8,11 +8,7 @@ function standardize(src: string) {
     .trim();
 }
 
-export function equalIgnoringWhiteSpace(
-  actual: string,
-  expected: string,
-  message?: string
-): void {
+export function equalIgnoringWhiteSpace(actual: string, expected: string, message?: string): void {
   actual = standardize(actual);
   expected = standardize(expected);
   let result = actual === expected;
@@ -27,11 +23,7 @@ export function equalIgnoringWhiteSpace(
   });
 }
 
-export function containsSource(
-  actual: string | undefined,
-  expected: string,
-  message?: string
-): void {
+export function containsSource(actual: string | undefined, expected: string, message?: string): void {
   actual = standardize(actual ?? '');
   expected = standardize(expected);
   let result = actual.includes(expected) || false;
@@ -44,11 +36,7 @@ export function containsSource(
   });
 }
 
-export function assert_isEqual<T>(
-  actual: T,
-  expected: T,
-  message?: string
-): void {
+export function assert_isEqual<T>(actual: T, expected: T, message?: string): void {
   message ||= 'isEqual';
   let result = isEqual(actual, expected);
 

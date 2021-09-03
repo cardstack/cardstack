@@ -68,10 +68,7 @@ const metas = new WeakMap<
 export default function main() {
   return {
     visitor: {
-      ImportDeclaration(
-        path: NodePath<ImportDeclaration>,
-        state: { opts: object }
-      ) {
+      ImportDeclaration(path: NodePath<ImportDeclaration>, state: { opts: object }) {
         if (path.node.source.value === '@cardstack/types') {
           storeMeta(state.opts, path);
           let specifiers = path.node.specifiers.filter(
@@ -81,14 +78,8 @@ export default function main() {
           path.replaceWith(
             variableDeclaration('const', [
               variableDeclarator(
-                objectPattern(
-                  specifiers.map((s) =>
-                    objectProperty(s.imported, s.local, false, true)
-                  )
-                ),
-                callExpression(identifier('require'), [
-                  stringLiteral('@cardstack/core'),
-                ])
+                objectPattern(specifiers.map((s) => objectProperty(s.imported, s.local, false, true))),
+                callExpression(identifier('require'), [stringLiteral('@cardstack/core')])
               ),
             ])
           );
@@ -113,12 +104,7 @@ function storeMeta(key: object, path: NodePath<ImportDeclaration>) {
     let specifierName = name(specifier.imported);
 
     if ((VALID_FIELD_DECORATORS as any)[specifierName]) {
-      validateUsageAndGetFieldMeta(
-        path,
-        fields,
-        fieldTypeDecorator,
-        specifierName as FieldType
-      );
+      validateUsageAndGetFieldMeta(path, fields, fieldTypeDecorator, specifierName as FieldType);
     }
 
     if (specifierName === 'adopts') {
@@ -135,101 +121,60 @@ function validateUsageAndGetFieldMeta(
   fieldTypeDecorator: string,
   actualName: FieldType
 ) {
-  for (let fieldIdentifier of path.scope.bindings[fieldTypeDecorator]
-    .referencePaths) {
-    if (
-      !isCallExpression(fieldIdentifier.parent) ||
-      fieldIdentifier.parent.callee !== fieldIdentifier.node
-    ) {
-      throw error(
-        fieldIdentifier,
-        `the @${fieldTypeDecorator} decorator must be called`
-      );
+  for (let fieldIdentifier of path.scope.bindings[fieldTypeDecorator].referencePaths) {
+    if (!isCallExpression(fieldIdentifier.parent) || fieldIdentifier.parent.callee !== fieldIdentifier.node) {
+      throw error(fieldIdentifier, `the @${fieldTypeDecorator} decorator must be called`);
     }
 
     if (
       !isDecorator(fieldIdentifier.parentPath.parent) ||
       fieldIdentifier.parentPath.parent.expression !== fieldIdentifier.parent
     ) {
-      throw error(
-        fieldIdentifier,
-        `the @${fieldTypeDecorator} decorator must be used as a decorator`
-      );
+      throw error(fieldIdentifier, `the @${fieldTypeDecorator} decorator must be used as a decorator`);
     }
 
     if (!isClassProperty(fieldIdentifier.parentPath.parentPath.parent)) {
-      throw error(
-        fieldIdentifier,
-        `the @${fieldTypeDecorator} decorator can only go on class properties`
-      );
+      throw error(fieldIdentifier, `the @${fieldTypeDecorator} decorator can only go on class properties`);
     }
 
     if (fieldIdentifier.parentPath.parentPath.parent.computed) {
-      throw error(
-        fieldIdentifier,
-        'field names must not be dynamically computed'
-      );
+      throw error(fieldIdentifier, 'field names must not be dynamically computed');
     }
 
     if (
       !isIdentifier(fieldIdentifier.parentPath.parentPath.parent.key) &&
       !isStringLiteral(fieldIdentifier.parentPath.parentPath.parent.key)
     ) {
-      throw error(
-        fieldIdentifier,
-        'field names must be identifiers or string literals'
-      );
+      throw error(fieldIdentifier, 'field names must be identifiers or string literals');
     }
 
     let fieldName = name(fieldIdentifier.parentPath.parentPath.parent.key);
     fields[fieldName] = {
-      ...extractDecoratorArguments(
-        fieldIdentifier.parentPath as NodePath<CallExpression>,
-        fieldTypeDecorator
-      ),
+      ...extractDecoratorArguments(fieldIdentifier.parentPath as NodePath<CallExpression>, fieldTypeDecorator),
       type: actualName,
     };
   }
 }
 
-function validateUsageAndGetParentMeta(
-  path: NodePath<ImportDeclaration>,
-  fieldTypeDecorator: string
-): ParentMeta {
-  let adoptsIdentifer =
-    path.scope.bindings[fieldTypeDecorator].referencePaths[0];
+function validateUsageAndGetParentMeta(path: NodePath<ImportDeclaration>, fieldTypeDecorator: string): ParentMeta {
+  let adoptsIdentifer = path.scope.bindings[fieldTypeDecorator].referencePaths[0];
 
   if (!isClassDeclaration(adoptsIdentifer.parentPath.parentPath.parent)) {
-    throw error(
-      adoptsIdentifer,
-      '@adopts decorator can only be used on a class'
-    );
+    throw error(adoptsIdentifer, '@adopts decorator can only be used on a class');
   }
 
-  return extractDecoratorArguments(
-    adoptsIdentifer.parentPath as NodePath<CallExpression>,
-    fieldTypeDecorator
-  );
+  return extractDecoratorArguments(adoptsIdentifer.parentPath as NodePath<CallExpression>, fieldTypeDecorator);
 }
 
-function extractDecoratorArguments(
-  callExpression: NodePath<CallExpression>,
-  fieldTypeDecorator: string
-) {
+function extractDecoratorArguments(callExpression: NodePath<CallExpression>, fieldTypeDecorator: string) {
   if (callExpression.node.arguments.length !== 1) {
-    throw error(
-      callExpression,
-      `@${fieldTypeDecorator} decorator accepts exactly one argument`
-    );
+    throw error(callExpression, `@${fieldTypeDecorator} decorator accepts exactly one argument`);
   }
 
   let cardTypePath = callExpression.get('arguments')[0];
   let cardType = cardTypePath.node;
   if (!isIdentifier(cardType)) {
-    throw error(
-      cardTypePath,
-      `@${fieldTypeDecorator} argument must be an identifier`
-    );
+    throw error(cardTypePath, `@${fieldTypeDecorator} argument must be an identifier`);
   }
 
   let definition = cardTypePath.scope.getBinding(cardType.name)?.path;
@@ -237,10 +182,7 @@ function extractDecoratorArguments(
     throw error(cardTypePath, `@${fieldTypeDecorator} argument is not defined`);
   }
   if (!definition.isImportDefaultSpecifier()) {
-    throw error(
-      definition,
-      `@${fieldTypeDecorator} argument must come from a module default export`
-    );
+    throw error(definition, `@${fieldTypeDecorator} argument must come from a module default export`);
   }
 
   return {

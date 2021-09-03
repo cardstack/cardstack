@@ -1,11 +1,4 @@
-import {
-  CardJSONRequest,
-  CardJSONResponse,
-  SerializerMap,
-  SerializerName,
-  Setter,
-  CardEnv,
-} from './interfaces';
+import { CardJSONRequest, CardJSONResponse, SerializerMap, SerializerName, Setter, CardEnv } from './interfaces';
 import serializers, { PrimitiveSerializer } from './serializers';
 // import { tracked } from '@glimmer/tracking';
 import { cloneDeep } from 'lodash';
@@ -34,11 +27,7 @@ export default class CardModel {
   setters: Setter;
   private declare _data: any;
 
-  constructor(
-    private cards: CardEnv,
-    private innerComponent: unknown,
-    private state: CreatedState | LoadedState
-  ) {
+  constructor(private cards: CardEnv, private innerComponent: unknown, private state: CreatedState | LoadedState) {
     this.setters = this.makeSetter();
     Object.defineProperty(
       this,
@@ -51,11 +40,7 @@ export default class CardModel {
     );
   }
 
-  static fromResponse(
-    cards: CardEnv,
-    cardResponse: CardJSONResponse,
-    component: unknown
-  ): CardModel {
+  static fromResponse(cards: CardEnv, cardResponse: CardJSONResponse, component: unknown): CardModel {
     return new this(cards, component, {
       type: 'loaded',
       url: cardResponse.data.id,
@@ -69,9 +54,7 @@ export default class CardModel {
     if (this.state.type === 'loaded') {
       return this.state.url;
     }
-    throw new Error(
-      `bug: card in state ${this.state.type} does not have a url`
-    );
+    throw new Error(`bug: card in state ${this.state.type} does not have a url`);
   }
 
   async editable(): Promise<CardModel> {
@@ -87,15 +70,11 @@ export default class CardModel {
     if (this.state.type !== 'loaded') {
       throw new Error(`tried to adopt from an unsaved card`);
     }
-    return new (this.constructor as typeof CardModel)(
-      this.cards,
-      this.innerComponent,
-      {
-        type: 'created',
-        realm,
-        parentCardURL: this.state.url,
-      }
-    );
+    return new (this.constructor as typeof CardModel)(this.cards, this.innerComponent, {
+      type: 'created',
+      realm,
+      parentCardURL: this.state.url,
+    });
   }
 
   get data(): any {
@@ -117,10 +96,7 @@ export default class CardModel {
 
   get component(): unknown {
     if (!this.wrapperComponent) {
-      this.wrapperComponent = this.cards.prepareComponent(
-        this,
-        this.innerComponent
-      );
+      this.wrapperComponent = this.cards.prepareComponent(this, this.innerComponent);
     }
     return this.wrapperComponent;
   }
@@ -224,10 +200,7 @@ export default class CardModel {
   }
 }
 
-function constructJSONAPIRequest(
-  attributes: any,
-  url: string | undefined
-): CardJSONRequest {
+function constructJSONAPIRequest(attributes: any, url: string | undefined): CardJSONRequest {
   let response: CardJSONRequest = {
     data: {
       type: 'card',
