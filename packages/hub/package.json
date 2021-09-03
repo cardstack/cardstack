@@ -59,11 +59,15 @@
   "devDependencies": {
     "@cardstack/eslint-config": "0.21.5",
     "@cardstack/test-support": "0.21.5",
+    "@types/chai": "^4.2.15",
+    "@types/chai-as-promised": "^7.1.3",
     "@types/config": "^0.0.38",
+    "@types/mocha": "^8.2.1",
     "@types/pg-format": "^1.0.1",
     "@types/supertest": "^2.0.11",
     "dotenv": "^10.0.0",
     "json-stable-stringify": "^1.0.1",
+    "mocha": "^8.3.2",
     "moment-timezone": "^0.5.33",
     "supertest": "^6.1.3"
   },
@@ -81,7 +85,7 @@
     "db:test:prepare": "node ./bin/setup-test-db.js",
     "start:server": "node ./bin/server.ts",
     "start:worker": "node ./bin/worker.ts",
-    "test": "PACKAGE=hub NODE_ENV=test mocha -r esm ../test-support/bin/run.js --timeout 60000",
+    "test": "PACKAGE=hub NODE_ENV=test mocha ../test-support/bin/run.js --timeout 60000",
     "autotest": "PACKAGE=hub NODE_ENV=test mocha -w --reporter=min -r esm ../test-support/bin/run.js --timeout 60000"
   },
   "volta": {
