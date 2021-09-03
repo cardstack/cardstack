@@ -21,11 +21,11 @@
    </div>
   <CardPay::MerchantPaymentRequestCard::PaymentRequest
     class="merchant-payment-request-card__section"
-    @paymentURL={{this.paymentURL}}
+    @paymentURL={{@paymentURL}}
     @image={{this.cardstackLogoForQR}}
-    @merchant={{this.merchant}}
-    @amount={{this.amount}}
-    @usdAmount={{this.usdAmount}}
-    @canDeepLink={{this.canDeepLink}}
+    @merchant={{@merchant}}
+    @amount={{@amount}}
+    @usdAmount={{@usdAmount}}
+    @canDeepLink={{@canDeepLink}}
   />
 </Boxel::CardContainer>
