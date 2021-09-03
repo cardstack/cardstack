@@ -25,13 +25,9 @@
     "./packages/firebase-functions/**/*.ts",
     "./packages/hub/**/*.ts",
     "./packages/test-support/**/*.ts",
-    "./scripts/**/*.js",
-    "./cards/**/*.ts",
     "**/.eslintrc.ts"
   ],
   "exclude": [
-    "./cards/*/tmp",
-    "./cards/*/dist",
     "./packages/*/dist",
     "./packages/*/tmp",
     "./packages/*/node_modules",
