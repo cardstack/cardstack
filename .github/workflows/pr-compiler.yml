@@ -1,6 +1,9 @@
 name: CI [compiler]
 
 on:
+  push:
+    branches:
+      - 'ef4-refactor'
   pull_request:
     # branches: [main]
     paths:
