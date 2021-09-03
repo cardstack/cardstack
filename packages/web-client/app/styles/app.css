@@ -31,3 +31,11 @@ ol {
   margin: 0;
   padding: 0;
 }
+
+/*
+  Fixes a problem where Power Select would auto-choose the first item
+  https://github.com/cibernox/ember-power-select/issues/1408
+*/
+.ember-power-select-dropdown {
+  margin-top: 1px;
+}
