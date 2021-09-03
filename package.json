@@ -50,7 +50,6 @@
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
     "lint:js:pkg": "sh -c 'eslint packages/${0} --cache --ignore-path .gitignore --ext=js,ts'",
     "lint:hbs": "cd packages/web-client && ember-template-lint .",
-    "lint:hbs:web-client": "cd packages/web-client && ember-template-lint .",
     "start": "WAIT_ON_TIMEOUT=600000 start-server-and-test 'yarn start:web-client' http://localhost:4200 'yarn start:hub'",
     "start:hub": "cd ./packages/hub && node ./bin/server.ts",
     "console:hub": "cd packages/hub && node --experimental-repl-await ./bin/console.ts",
