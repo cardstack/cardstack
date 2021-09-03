@@ -1,4 +1,5 @@
 .payment-request {
+  --action-element-margin: var(--boxel-sp-lg) auto var(--boxel-sp-sm) auto;
   --explanation-padding: var(--boxel-sp-xl);
   --explanation-font: var(--boxel-font-lg);
   --amount-font-size: 2.5rem;
@@ -9,6 +10,15 @@
   align-items: center;
   text-align: center;
   gap: var(--boxel-sp-lg);
+}
+
+@media only screen and (max-width: 360px) {
+  .payment-request {
+    --explanation-padding: 0;
+    --explanation-font: var(--boxel-font);
+    --amount-font-size: var(--boxel-font-size-xl);
+    --body-padding: var(--boxel-sp);
+  }
 }
 
 .payment-request__explanation {
@@ -27,24 +37,15 @@
   padding: var(--body-padding);
 }
 
-@media only screen and (max-width: 360px) {
-  .payment-request {
-    --explanation-padding: 0;
-    --explanation-font: var(--boxel-font);
-    --amount-font-size: var(--boxel-font-size-xl);
-    --body-padding: var(--boxel-sp);
-  }
-}
-
 .payment-request__deep-link {
   width: 100%;
   max-width: 40ch;
-  margin: var(--boxel-sp-lg) 0;
+  margin: var(--action-element-margin);
 }
 
 .payment-request__qr-container {
   text-align: center;
-  margin: var(--boxel-sp-lg) auto var(--boxel-sp) auto;
+  margin: var(--action-element-margin);
 }
 
 .payment-request__amount {
@@ -77,6 +78,7 @@
   padding: var(--boxel-sp-xs);
   border-radius: 100px; /* same as Boxel button border radius */
   gap: var(--boxel-sp-xs);
+  font: 600 var(--boxel-font-sm);
   border: none;
   background-color: transparent;
 }
