@@ -20,6 +20,5 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - run: yarn global add lerna
       - run: yarn --prefer-offline
       - run: yarn lint
