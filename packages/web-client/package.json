@@ -67,6 +67,7 @@
     "@types/rsvp": "^4.0.3",
     "@types/web3": "^1.2.2",
     "@types/web3-provider-engine": "^14.0.1",
+    "@types/sinon": "^9.0.11",
     "babel-eslint": "^10.1.0",
     "bn.js": "^5.2.0",
     "broccoli-asset-rev": "^3.0.0",
