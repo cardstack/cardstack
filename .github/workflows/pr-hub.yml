@@ -8,6 +8,7 @@ on:
       - 'packages/did-resolver/**'
       - 'packages/test-support/**'
       - 'packages/eslint-config/**'
+      - '.github/workflows/hub.yml'
 
 jobs:
   test:

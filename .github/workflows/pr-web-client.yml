@@ -10,6 +10,7 @@ on:
       - 'packages/did-resolver/**'
       - 'packages/test-support/**'
       - 'packages/eslint-config/**'
+      - '.github/workflows/pr-web-client.yml'
 
 jobs:
   test:

@@ -6,6 +6,7 @@ on:
       - 'packages/cardpay-sdk/**'
       - 'packages/cardpay-subgraph/**'
       - 'packages/eslint-config/**'
+      - '.github/workflows/pr-cardpay-subgraph.yml'
 
 jobs:
   test:
