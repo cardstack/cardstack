@@ -59,7 +59,11 @@
         {{@paymentURL}}
       </span>
 
-      <button class="payment-request__qr-code-toggle" type="button" {{on "click" (set this "showAsQR" (not this.showAsQR))}}>
+      <button
+        class="payment-request__link-view-toggle"
+        type="button"
+        {{on "click" (set this "showAsQR" (not this.showAsQR))}}
+      >
         {{#if this.showAsQR}}
           Show Payment Link
         {{else}}

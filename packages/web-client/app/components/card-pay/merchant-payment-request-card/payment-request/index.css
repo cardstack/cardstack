@@ -69,7 +69,7 @@
   word-break: break-all;
 }
 
-.payment-request__qr-code-toggle {
+.payment-request__link-view-toggle {
   appearance: none;
   -webkit-appearance: none;
   display: flex;
@@ -83,7 +83,7 @@
   background-color: transparent;
 }
 
-.payment-request__qr-code-toggle:hover,
-.payment-request__qr-code-toggle:active {
+.payment-request__link-view-toggle:hover,
+.payment-request__link-view-toggle:active {
   background-color: rgba(0, 0, 0, 0.1);
 }
