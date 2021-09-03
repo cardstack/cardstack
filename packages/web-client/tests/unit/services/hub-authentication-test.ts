@@ -182,16 +182,10 @@ module('Unit | Service | HubAuthentication', function (hooks) {
     sinon
       .stub(layer2Service, 'checkHubAuthenticationValid')
       .returns(Promise.resolve(false));
-    let error = null;
-    try {
-      await hubAuthentication.ensureAuthenticated();
-    } catch (e) {
-      error = e;
-    }
 
-    assert.equal(
-      error.message,
-      'Failed to fetch auth token',
+    await assert.rejects(
+      hubAuthentication.ensureAuthenticated(),
+      /Failed to fetch auth token/,
       'It fails with the error message for a falsey auth token'
     );
     assert.ok(
@@ -214,16 +208,10 @@ module('Unit | Service | HubAuthentication', function (hooks) {
     sinon
       .stub(layer2Service, 'checkHubAuthenticationValid')
       .returns(Promise.resolve(false));
-    let error = null;
-    try {
-      await hubAuthentication.ensureAuthenticated();
-    } catch (e) {
-      error = e;
-    }
 
-    assert.equal(
-      error.message,
-      'A test error',
+    await assert.rejects(
+      hubAuthentication.ensureAuthenticated(),
+      /A test error/,
       'It fails with the error message from our stubbed function'
     );
     assert.ok(
