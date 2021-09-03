@@ -1,0 +1,13 @@
+<CardPay::MerchantCard
+  @balance={{@safe.accumulatedSpendValue}}
+  @usdBalance={{spend-to-usd @safe.accumulatedSpendValue}}
+  @address={{@safe.address}}
+  @managerCount={{@safe.owners.length}}
+  @network={{network-display-info "layer2" "fullName"}}
+  @id={{this.customization.id}}
+  @name={{this.customization.name}}
+  @logoBackground={{this.customization.backgroundColor}}
+  @logoTextColor={{this.customization.textColor}}
+  @error={{this.customization.errored}}
+  ...attributes
+/>

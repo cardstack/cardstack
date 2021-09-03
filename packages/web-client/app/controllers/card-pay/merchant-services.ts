@@ -8,4 +8,8 @@ export default class CardPayMerchantServicesController extends Controller {
 
   queryParams = ['flow'];
   @tracked flow: 'create-merchant' | null = null;
+
+  get merchantSafes() {
+    return this.layer2Network.safes.value?.filterBy('type', 'merchant');
+  }
 }

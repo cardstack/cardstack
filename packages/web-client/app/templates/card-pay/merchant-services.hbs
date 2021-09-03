@@ -28,9 +28,9 @@
     <section class="card-pay-dashboard__section" data-test-merchants-section>
       <h3 class="card-pay-dashboard__section-title">Merchant Services</h3>
       <div class="card-pay-dashboard__cards">
-        {{!-- {{#each this.prepaidCards as |prepaidCard|}}
-          <CardPay::PrepaidCardSafe @safe={{prepaidCard}} />
-        {{/each}} --}}
+        {{#each this.merchantSafes as |merchantSafe|}}
+          <CardPay::MerchantSafe @safe={{merchantSafe}} @waitForCustomization={{true}} />
+        {{/each}}
       </div>
     </section>
   {{/if}}
