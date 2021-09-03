@@ -7,7 +7,7 @@
       "ref": "main"
     },
     "allowedChannels": ["866667164764471346"],
-    "allowedRoles": ["deploy"]
+    "allowedRoles": ["Engineering Team", "Cardstack Core Team"]
   },
   "github": {
     "owner": "cardstack",
