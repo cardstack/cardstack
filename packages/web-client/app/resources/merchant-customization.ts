@@ -65,7 +65,7 @@ export class MerchantCustomization extends Resource<Args> {
       );
       console.log('json', jsonApiDocument);
 
-      this.id = jsonApiDocument.data.attributes['id'];
+      this.id = jsonApiDocument.data.attributes['slug'];
       this.name = jsonApiDocument.data.attributes['name'];
       this.backgroundColor = jsonApiDocument.data.attributes['color'];
       this.textColor = jsonApiDocument.data.attributes['text-color'];
