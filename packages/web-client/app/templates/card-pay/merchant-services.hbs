@@ -1,6 +1,6 @@
 {{page-title "Merchant Services"}}
 
-<section class="card-pay-dashboard" role="tabpanel" aria-labelledby="card-pay.merchant-services">
+<section class="card-pay-dashboard__merchants" role="tabpanel" aria-labelledby="card-pay.merchant-services">
   <CardPay::DashboardPanel @panel={{@model.panel}}>
     {{#each @model.panel.sections as |section|}}
       <CardPay::DashboardPanel::Section @section={{section}}>
@@ -25,9 +25,9 @@
   </CardPay::DashboardPanel>
 
   {{#if this.layer2Network.isConnected}}
-    <section class="card-pay-dashboard__section" data-test-merchants-section>
-      <h3 class="card-pay-dashboard__section-title">Merchant Services</h3>
-      <div class="card-pay-dashboard__cards">
+    <section data-test-merchants-section>
+      <h3 class="card-pay-dashboard__merchants-title">Merchant Services</h3>
+      <div class="card-pay-dashboard__merchants-cards">
         {{#each this.merchantSafes as |merchantSafe|}}
           <CardPay::MerchantSafe @safe={{merchantSafe}} @waitForCustomization={{true}} />
         {{/each}}
