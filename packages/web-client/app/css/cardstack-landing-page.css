@@ -9,7 +9,7 @@
       var(--card-width) * 2 + var(--horizontal-card-gap) + var(--boxel-sp-lg) * 2
     );
   margin: auto;
-  padding: var(--boxel-sp-lg);
+  padding: var(--boxel-sp);
 }
 
 .cardstack-landing-page-section-header {
@@ -39,7 +39,7 @@
   background-image: url('/images/illustrations/landing-hero-illustration.svg');
   background-repeat: no-repeat;
   background-position: center;
-  background-size: auto 18.75rem;
+  background-size: cover;
   overflow: hidden;
 }
 

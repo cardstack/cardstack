@@ -81,8 +81,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
       let options: IssuePrepaidCardOptions = {
         onTxHash: (txHash: TransactionHash) => {
           this.txHash = txHash;
-          this.chinInProgressMessage =
-            'Waiting for the transaction to be finalized…';
+          this.chinInProgressMessage = 'Processing transaction…';
         },
       };
       if (this.lastNonce) {

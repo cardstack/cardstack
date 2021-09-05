@@ -16,7 +16,7 @@
 }
 
 .layer-one-connect-card__loading-indicator {
-  --icon-color: white;
+  --icon-color: var(--boxel-light);
 
   margin-right: var(--boxel-sp-sm);
   flex-grow: 0;
