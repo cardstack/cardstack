@@ -29,7 +29,11 @@
       <h3 class="card-pay-dashboard__merchants-title">Merchant Services</h3>
       <div class="card-pay-dashboard__merchants-cards">
         {{#each this.merchantSafes as |merchantSafe|}}
-          <CardPay::MerchantSafe @safe={{merchantSafe}} @waitForCustomization={{true}} />
+          <CardPay::MerchantSafe
+            @safe={{merchantSafe}}
+            @waitForCustomization={{true}}
+            data-test-merchant-dashboard-card
+          />
         {{/each}}
       </div>
     </section>
