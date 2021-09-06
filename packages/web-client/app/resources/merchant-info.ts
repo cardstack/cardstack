@@ -13,11 +13,11 @@ class Storage404 extends Error {}
 interface Args {
   named: {
     infoDID: string;
-    waitForCustomization: boolean;
+    waitForInfo: boolean;
   };
 }
 
-export class MerchantCustomization extends Resource<Args> {
+export class MerchantInfo extends Resource<Args> {
   @tracked id: string | undefined;
   @tracked name: string | undefined;
   @tracked backgroundColor: string | undefined;
@@ -35,9 +35,9 @@ export class MerchantCustomization extends Resource<Args> {
 
   private async run() {
     try {
-      await this.fetchCardCustomization(
+      await this.fetchMerchantInfo(
         this.args.named.infoDID,
-        this.args.named.waitForCustomization
+        this.args.named.waitForInfo
       );
       this.loading = false;
     } catch (err) {
@@ -45,24 +45,21 @@ export class MerchantCustomization extends Resource<Args> {
       this.loading = false;
 
       if (!(err instanceof Storage404)) {
-        console.log('Exception fetching merchant customization', err);
+        console.log('Exception fetching merchant info', err);
         Sentry.captureException(err);
       }
     }
   }
 
-  private async fetchCardCustomization(
+  private async fetchMerchantInfo(
     infoDID: string,
-    waitForCustomization = false
+    waitForInfo = false
   ): Promise<void> {
     let did = await this.#didResolver.resolve(infoDID);
     let alsoKnownAs = did?.didDocument?.alsoKnownAs;
 
     if (alsoKnownAs) {
-      let jsonApiDocument = await this.fetchJson(
-        alsoKnownAs[0],
-        waitForCustomization
-      );
+      let jsonApiDocument = await this.fetchJson(alsoKnownAs[0], waitForInfo);
       console.log('json', jsonApiDocument);
 
       this.id = jsonApiDocument.data.attributes['slug'];
@@ -74,9 +71,9 @@ export class MerchantCustomization extends Resource<Args> {
 
   private async fetchJson(
     alsoKnownAs: string,
-    waitForCustomization: boolean
+    waitForInfo: boolean
   ): Promise<any> {
-    let maxAttempts = waitForCustomization ? 10 : 1;
+    let maxAttempts = waitForInfo ? 10 : 1;
     let attemptNum = 1;
     while (attemptNum <= maxAttempts) {
       try {
