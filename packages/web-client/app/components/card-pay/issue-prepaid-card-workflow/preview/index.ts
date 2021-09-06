@@ -68,6 +68,13 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
     super(owner, args);
   }
 
+  @action checkForPendingTransaction() {
+    if (this.args.workflowSession.state.txHash) {
+      taskFor(this.issueTask).perform();
+    }
+  }
+
+  // TODO: Refactor long method
   @task *issueTask(): TaskGenerator<void> {
     let { workflowSession } = this.args;
     try {
@@ -92,40 +99,63 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
         this.args.workflowSession.update('did', did);
       }
 
-      this.chinInProgressMessage =
-        'You will receive a confirmation request from the Card Wallet app in a few moments…';
-      let options: IssuePrepaidCardOptions = {
-        onTxHash: (txHash: TransactionHash) => {
-          this.txHash = txHash;
-          this.chinInProgressMessage = 'Processing transaction…';
-        },
-      };
-      if (this.lastNonce) {
-        options.nonce = this.lastNonce;
+      if (
+        workflowSession.state.txHash &&
+        !workflowSession.state.prepaidCardSafe
+      ) {
+        const txHash = workflowSession.state.txHash;
+        this.chinInProgressMessage =
+          'Waiting for the transaction to be finalized…';
+
+        const safes = yield taskFor(
+          this.layer2Network.getPrepaidCardSafesFromTxHash
+        ).perform(txHash);
+
+        const prepaidCardSafe = safes[0];
+
+        if (prepaidCardSafe) {
+          this.args.workflowSession.update('prepaidCardSafe', prepaidCardSafe);
+        }
+
+        this.args.onComplete();
       } else {
-        options.onNonce = (nonce: string) => {
-          this.lastNonce = nonce;
+        this.chinInProgressMessage =
+          'You will receive a confirmation request from the Card Wallet app in a few moments…';
+        let options: IssuePrepaidCardOptions = {
+          onTxHash: (txHash: TransactionHash) => {
+            this.txHash = txHash;
+            this.args.workflowSession.update('txHash', txHash);
+            this.chinInProgressMessage =
+              'Waiting for the transaction to be finalized…';
+          },
         };
+        if (this.lastNonce) {
+          options.nonce = this.lastNonce;
+        } else {
+          options.onNonce = (nonce: string) => {
+            this.lastNonce = nonce;
+          };
+        }
+
+        let prepaidCardSafeTaskInstance = taskFor(
+          this.layer2Network.issuePrepaidCardTask
+        ).perform(this.faceValue, did, options);
+
+        let prepaidCardSafe = yield race([
+          prepaidCardSafeTaskInstance,
+          taskFor(this.timerTask).perform(),
+        ]);
+        this.issueTaskRunningForAWhile = false;
+
+        this.args.workflowSession.updateMany({
+          prepaidCardAddress: prepaidCardSafe.address,
+          reloadable: prepaidCardSafe.reloadable,
+          transferrable: prepaidCardSafe.transferrable,
+        });
+
+        this.args.workflowSession.update('prepaidCardSafe', prepaidCardSafe);
+        this.args.onComplete();
       }
-
-      let prepaidCardSafeTaskInstance = taskFor(
-        this.layer2Network.issuePrepaidCardTask
-      ).perform(this.faceValue, did, options);
-
-      let prepaidCardSafe = yield race([
-        prepaidCardSafeTaskInstance,
-        taskFor(this.timerTask).perform(),
-      ]);
-      this.issueTaskRunningForAWhile = false;
-
-      this.args.workflowSession.updateMany({
-        prepaidCardAddress: prepaidCardSafe.address,
-        reloadable: prepaidCardSafe.reloadable,
-        transferrable: prepaidCardSafe.transferrable,
-      });
-
-      this.args.workflowSession.update('prepaidCardSafe', prepaidCardSafe);
-      this.args.onComplete();
     } catch (e) {
       let insufficientFunds = e.message.startsWith(
         'Safe does not have enough balance to make prepaid card(s).'
