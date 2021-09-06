@@ -272,7 +272,9 @@ class IssuePrepaidCardWorkflow extends Workflow {
   restoreFromPersistedWorkflow() {
     this.session.restoreFromStorage();
 
-    const lastCompletedCardName = this.session.state.lastCompletedCardName;
+    const [lastCompletedCardName] = (
+      this.session.state.completedCardNames || []
+    ).slice(-1);
 
     // TODO: Only attempt to restore when both layer 1 and 2 are connected
     if (lastCompletedCardName) {

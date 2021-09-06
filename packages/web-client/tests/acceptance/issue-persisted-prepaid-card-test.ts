@@ -27,7 +27,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     await click('[data-test-workflow-button="issue-prepaid-card"]');
 
     assert.equal(
-      // @ts-ignore
+      // @ts-ignore (complains object is possibly null)
       new URL('http://domain.test/' + currentURL()).searchParams.get('flow-id')
         .length,
       22
@@ -37,7 +37,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
   module('Restoring from previously saved state', function () {
     test('it restores the workflow', async function (this: Context, assert) {
       const state = {
-        lastCompletedCardName: 'FACE_VALUE',
+        completedCardNames: [
+          'LAYER2_CONNECT',
+          'LAYOUT_CUSTOMIZATION',
+          'FUNDING_SOURCE',
+          'FACE_VALUE',
+        ],
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
