@@ -55,7 +55,6 @@
 
 .card-picker-dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
   animation: drop-fade-below var(--boxel-transition);
-  pointer-events: none;
 }
 
 .card-picker-dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-out {
