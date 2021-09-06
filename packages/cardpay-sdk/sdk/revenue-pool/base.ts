@@ -97,22 +97,36 @@ export default class RevenuePool {
     return gasInToken;
   }
 
+  async claim(txnHash: string): Promise<TransactionReceipt>;
   async claim(
     merchantSafeAddress: string,
     tokenAddress: string,
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async claim(
+    merchantSafeAddressOrTxnHash: string,
+    tokenAddress?: string,
+    amount?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
+    if (!tokenAddress) {
+      let txnHash = merchantSafeAddressOrTxnHash;
+      return waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    let merchantSafeAddress = merchantSafeAddressOrTxnHash;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let revenuePoolAddress = await getAddress('revenuePool', this.layer2Web3);
     let revenuePool = new this.layer2Web3.eth.Contract(RevenuePoolABI as AbiItem[], revenuePoolAddress);
     let unclaimedBalance = new BN(await revenuePool.methods.revenueBalance(merchantSafeAddress, tokenAddress).call());
-    if (unclaimedBalance.lt(new BN(amount))) {
+    if (unclaimedBalance.lt(new BN(amount!))) {
       throw new Error(
         `Merchant safe does not have enough enough unclaimed revenue balance to make this claim. The merchant safe ${merchantSafeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
           unclaimedBalance
-        )}, amount being claimed is ${fromWei(amount)}`
+        )}, amount being claimed is ${fromWei(amount!)}`
       );
     }
     let payload = revenuePool.methods.claimRevenue(tokenAddress, amount).encodeABI();
@@ -126,14 +140,13 @@ export default class RevenuePool {
       tokenAddress
     );
     let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    if (unclaimedBalance.lt(new BN(amount).add(gasCost))) {
+    if (unclaimedBalance.lt(new BN(amount!).add(gasCost))) {
       throw new Error(
         `Merchant safe does not have enough enough to pay for gas when claiming revenue. The merchant safe ${merchantSafeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
           unclaimedBalance
-        )}, amount being claimed is ${fromWei(amount)}, the gas cost is ${fromWei(gasCost)}`
+        )}, amount being claimed is ${fromWei(amount!)}, the gas cost is ${fromWei(gasCost)}`
       );
     }
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
       if (typeof onNonce === 'function') {
@@ -171,18 +184,36 @@ export default class RevenuePool {
       ZERO_ADDRESS
     );
 
+    let txnHash = gnosisResult.ethereumTx.txHash;
     if (typeof onTxnHash === 'function') {
-      await onTxnHash(gnosisResult.ethereumTx.txHash);
+      await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
+  async registerMerchant(txnHash: string): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }>;
   async registerMerchant(
     prepaidCardAddress: string,
-    infoDID: string | undefined,
+    infoDID?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }>;
+  async registerMerchant(
+    prepaidCardAddressOrTxnHash: string,
+    infoDID?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }> {
+    if (!prepaidCardAddressOrTxnHash.startsWith('0x')) {
+      let txnHash = prepaidCardAddressOrTxnHash;
+      let merchantSafeAddress = await this.getMerchantSafeFromTxn(txnHash);
+      return {
+        merchantSafe: await this.resolveMerchantSafe(merchantSafeAddress),
+        txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+      };
+    }
+    let prepaidCardAddress = prepaidCardAddressOrTxnHash;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let prepaidCard = await getSDK('PrepaidCard', this.layer2Web3);
     let issuingToken = await prepaidCard.issuingToken(prepaidCardAddress);
@@ -202,7 +233,6 @@ export default class RevenuePool {
     let rateChanged = false;
     let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let gnosisResult: GnosisExecTx | undefined;
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     do {
       let rateLock = await layerTwoOracle.getRateLock(issuingToken);
       try {
@@ -237,7 +267,7 @@ export default class RevenuePool {
           nonce
         );
         break;
-      } catch (e) {
+      } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
@@ -250,14 +280,17 @@ export default class RevenuePool {
     if (!gnosisResult) {
       throw new Error(`Unable to register merchant with prepaid card ${prepaidCardAddress}`);
     }
+
+    let txnHash = gnosisResult.ethereumTx.txHash;
+
     if (typeof onTxnHash === 'function') {
-      await onTxnHash(gnosisResult.ethereumTx.txHash);
+      await onTxnHash(txnHash);
     }
 
-    let merchantSafeAddress = await this.getMerchantSafeFromTxn(gnosisResult.ethereumTx.txHash);
+    let merchantSafeAddress = await this.getMerchantSafeFromTxn(txnHash);
     return {
       merchantSafe: await this.resolveMerchantSafe(merchantSafeAddress),
-      txReceipt: await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash),
+      txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
     };
   }
 

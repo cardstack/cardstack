@@ -47,6 +47,7 @@ const bridgedTokensQuery = `
 export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
   constructor(private layer2Web3: Web3) {}
 
+  async relayTokens(txnHash: string): Promise<TransactionReceipt>;
   async relayTokens(
     safeAddress: string,
     tokenAddress: string,
@@ -54,32 +55,45 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async relayTokens(
+    safeAddressOrTxnHash: string,
+    tokenAddress?: string,
+    recipientAddress?: string,
+    amount?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    if (!tokenAddress) {
+      let txnHash = safeAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    let safeAddress = safeAddressOrTxnHash;
+
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let homeBridgeAddress = await getAddress('homeBridge', this.layer2Web3);
     let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], tokenAddress);
     let symbol = await token.methods.symbol().call();
     let safeBalance = toBN(await token.methods.balanceOf(safeAddress).call());
-    if (safeBalance.lt(toBN(amount))) {
+    if (safeBalance.lt(toBN(amount!))) {
       throw new Error(
         `Safe does not have enough balance to transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
           safeBalance.toString()
-        )} ${symbol}, amount to transfer ${fromWei(amount)} ${symbol}`
+        )} ${symbol}, amount to transfer ${fromWei(amount!)} ${symbol}`
       );
     }
 
     let payload = token.methods.transferAndCall(homeBridgeAddress, amount, recipientAddress).encodeABI();
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
     let gasCost = toBN(estimate.dataGas).add(toBN(estimate.baseGas)).mul(toBN(estimate.gasPrice));
-    if (safeBalance.lt(toBN(amount).add(gasCost))) {
+    if (safeBalance.lt(toBN(amount!).add(gasCost))) {
       throw new Error(
         `Safe does not have enough balance to pay for gas when relaying tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
           safeBalance.toString()
-        )} ${symbol}, amount to transfer ${fromWei(amount)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
+        )} ${symbol}, amount to transfer ${fromWei(amount!)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
       );
     }
-
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
       if (typeof onNonce === 'function') {
@@ -116,10 +130,13 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
       estimate.gasToken,
       ZERO_ADDRESS
     );
+
+    let txnHash = result.ethereumTx.txHash;
+
     if (typeof onTxnHash === 'function') {
-      await onTxnHash(result.ethereumTx.txHash);
+      await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, result.ethereumTx.txHash);
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
   async waitForBridgingValidation(fromBlock: string, bridgingTxnHash: string): Promise<BridgeValidationResult> {

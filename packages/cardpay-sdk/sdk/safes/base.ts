@@ -200,6 +200,7 @@ export default class Safes {
     return gasInToken;
   }
 
+  async sendTokens(txnHash: string): Promise<TransactionReceipt>;
   async sendTokens(
     safeAddress: string,
     tokenAddress: string,
@@ -207,29 +208,42 @@ export default class Safes {
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async sendTokens(
+    safeAddressOrTxnHash: string,
+    tokenAddress?: string,
+    recipient?: string,
+    amount?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
+    if (!tokenAddress) {
+      let txnHash = safeAddressOrTxnHash;
+      return waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    let safeAddress = safeAddressOrTxnHash;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let symbol = await token.methods.symbol().call();
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
-    if (safeBalance.lt(new BN(amount))) {
+    if (safeBalance.lt(new BN(amount!))) {
       throw new Error(
         `Safe does not have enough balance to transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
           safeBalance.toString()
-        )}, amount to transfer ${fromWei(amount)}`
+        )}, amount to transfer ${fromWei(amount!)}`
       );
     }
-    let payload = this.transferTokenPayload(tokenAddress, recipient, amount);
+    let payload = this.transferTokenPayload(tokenAddress, recipient!, amount!);
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
     let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    if (safeBalance.lt(new BN(amount).add(gasCost))) {
+    if (safeBalance.lt(new BN(amount!).add(gasCost))) {
       throw new Error(
         `Safe does not have enough balance to pay for gas when transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
           safeBalance.toString()
-        )} ${symbol}, amount to transfer ${fromWei(amount)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
+        )} ${symbol}, amount to transfer ${fromWei(amount!)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
       );
     }
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
       if (typeof onNonce === 'function') {
@@ -267,24 +281,40 @@ export default class Safes {
       estimate.gasToken,
       ZERO_ADDRESS
     );
+
+    let txnHash = result.ethereumTx.txHash;
+
     if (typeof onTxnHash === 'function') {
-      await onTxnHash(result.ethereumTx.txHash);
+      await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, result.ethereumTx.txHash);
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
+  async setSupplierInfoDID(txnHash: string): Promise<TransactionReceipt>;
   async setSupplierInfoDID(
     safeAddress: string,
     infoDID: string,
     gasToken: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async setSupplierInfoDID(
+    safeAddressOrTxnHash: string,
+    infoDID?: string,
+    gasToken?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
+    if (!infoDID) {
+      let txnHash = safeAddressOrTxnHash;
+      return waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    let safeAddress = safeAddressOrTxnHash;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let supplierManager = await getAddress('supplierManager', this.layer2Web3);
-    let payload = await this.setSupplierInfoDIDPayload(infoDID);
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, supplierManager, '0', payload, 0, gasToken);
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let payload = await this.setSupplierInfoDIDPayload(infoDID!);
+    let estimate = await gasEstimate(this.layer2Web3, safeAddress, supplierManager, '0', payload, 0, gasToken!);
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
       if (typeof onNonce === 'function') {
@@ -321,10 +351,13 @@ export default class Safes {
       estimate.gasToken,
       ZERO_ADDRESS
     );
+
+    let txnHash = result.ethereumTx.txHash;
+
     if (typeof onTxnHash === 'function') {
-      await onTxnHash(result.ethereumTx.txHash);
+      await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, result.ethereumTx.txHash);
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
   private transferTokenPayload(tokenAddress: string, recipient: string, amount: string): string {

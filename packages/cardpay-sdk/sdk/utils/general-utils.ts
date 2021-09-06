@@ -7,9 +7,9 @@ import BN from 'bn.js';
 const POLL_INTERVAL = 500;
 
 export interface TransactionOptions {
-  onTxnHash?: (txnHash: string) => unknown;
-  onNonce?: (nonce: BN) => void;
   nonce?: BN;
+  onNonce?: (nonce: BN) => void;
+  onTxnHash?: (txnHash: string) => unknown;
 }
 
 export async function networkName(web3: Web3): Promise<string> {

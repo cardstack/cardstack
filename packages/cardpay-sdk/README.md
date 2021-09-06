@@ -66,7 +66,11 @@ This is a package that provides an SDK to use the Cardpay protocol.
 ## Function Parameters
 ### TransactionOptions
 
-All the API's that mutate the state of the blockchain accept a TransactionOptions arg with options related to nonce and transaction hash handling.
+All the APIs that mutate the state of the blockchain have an overload that accepts a transaction hash
+as a single argument. This overload allows for resuming interrupted calls with a consistent return type.
+
+In addition, the normal overloads of these APIs accept a TransactionOptions arg with options related to
+nonce and the transaction hash.
 
 #### Nonce
 TransactionOptions has 2 optional parameters for nonce:

@@ -14,12 +14,14 @@ import { TransactionOptions, waitUntilTransactionMined } from './utils/general-u
 // The Foreign network can be any chain, but generally refers to the Ethereum mainnet.
 
 export interface ITokenBridgeForeignSide {
+  unlockTokens(txnHash: string): Promise<TransactionReceipt>;
   unlockTokens(
     tokenAddress: string,
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
+  relayTokens(txnHash: string): Promise<TransactionReceipt>;
   relayTokens(
     tokenAddress: string,
     recipientAddress: string,
@@ -27,6 +29,7 @@ export interface ITokenBridgeForeignSide {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
+  claimBridgedTokens(txnHash: string): Promise<TransactionReceipt>;
   claimBridgedTokens(
     messageId: string,
     encodedData: string,
@@ -40,18 +43,33 @@ const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 290000;
 export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   constructor(private layer1Web3: Web3) {}
 
+  async unlockTokens(txnHash: string): Promise<TransactionReceipt>;
   async unlockTokens(
     tokenAddress: string,
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async unlockTokens(
+    tokenAddressOrTxnHash: string,
+    amount?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
+    if (!amount) {
+      let txnHash = tokenAddressOrTxnHash;
+      return waitUntilTransactionMined(this.layer1Web3, txnHash);
+    }
+    let tokenAddress = tokenAddressOrTxnHash;
+
     let from = contractOptions?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let token = new this.layer1Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let foreignBridge = await getAddress('foreignBridge', this.layer1Web3);
     let nextNonce = await this.getNextNonce(from);
 
     return await new Promise((resolve, reject) => {
+      let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+
       let data = token.methods.approve(foreignBridge, amount).encodeABI();
       let tx: TransactionConfig = {
         ...contractOptions,
@@ -59,7 +77,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
         to: tokenAddress,
         data,
       };
-      let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+
       if (nonce != null) {
         tx.nonce = parseInt(nonce.toString()); // the web3 API requires this be a number, it should be ok to downcast this
       } else if (typeof onNonce === 'function') {
@@ -84,19 +102,34 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     });
   }
 
+  async relayTokens(txnHash: string): Promise<TransactionReceipt>;
   async relayTokens(
     tokenAddress: string,
     recipientAddress: string,
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async relayTokens(
+    tokenAddressOrTxnHash: string,
+    recipientAddress?: string,
+    amount?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
+    if (!recipientAddress) {
+      let txnHash = tokenAddressOrTxnHash;
+      return waitUntilTransactionMined(this.layer1Web3, txnHash);
+    }
+    let tokenAddress = tokenAddressOrTxnHash;
     let from = contractOptions?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let foreignBridgeAddress = await getAddress('foreignBridge', this.layer1Web3);
     let foreignBridge = new this.layer1Web3.eth.Contract(ForeignBridgeABI as any, foreignBridgeAddress);
     let nextNonce = await this.getNextNonce(from);
 
     return await new Promise((resolve, reject) => {
+      let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+
       let data = foreignBridge.methods.relayTokens(tokenAddress, recipientAddress, amount).encodeABI();
       let tx: TransactionConfig = {
         ...contractOptions,
@@ -104,8 +137,6 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
         to: foreignBridgeAddress,
         data,
       };
-
-      let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
 
       if (nonce != null) {
         tx.nonce = parseInt(nonce.toString()); // the web3 API requires this be a number, it should be ok to downcast this
@@ -140,27 +171,38 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     return estimatedGasInWei.divRound(rounder).mul(rounder);
   }
 
+  async claimBridgedTokens(txnHash: string): Promise<TransactionReceipt>;
   async claimBridgedTokens(
     messageId: string,
     encodedData: string,
     signatures: string[],
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async claimBridgedTokens(
+    messageIdOrTxnHash: string,
+    encodedData?: string,
+    signatures?: string[],
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
+    if (!encodedData) {
+      return waitUntilTransactionMined(this.layer1Web3, messageIdOrTxnHash);
+    }
     let from = contractOptions?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let foreignAmbAddress = await getAddress('foreignAMB', this.layer1Web3);
     let foreignAmb = new this.layer1Web3.eth.Contract(ForeignAMBABI as AbiItem[], foreignAmbAddress);
     let events = await foreignAmb.getPastEvents('RelayedMessage', {
       fromBlock: 0,
       toBlock: 'latest',
-      filter: { messageId: messageId },
+      filter: { messageId: messageIdOrTxnHash },
     });
     if (events.length === 1) {
       let txnHash = events[0].transactionHash;
       let receipt = await this.layer1Web3.eth.getTransactionReceipt(txnHash);
       return receipt;
     }
-    const packedSignatures = prepSignaturesForExecution(signatures);
+    const packedSignatures = prepSignaturesForExecution(signatures!);
     let nextNonce = await this.getNextNonce(from);
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     return await new Promise((resolve, reject) => {

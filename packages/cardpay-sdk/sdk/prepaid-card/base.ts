@@ -64,14 +64,28 @@ export default class PrepaidCard {
     return !hasBeenUsed && owner === issuer && owner !== ZERO_ADDRESS;
   }
 
+  async payMerchant(txnHash: string): Promise<TransactionReceipt>;
   async payMerchant(
     merchantSafe: string,
     prepaidCardAddress: string,
     spendAmount: number,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async payMerchant(
+    merchantSafeOrTxnHash: string,
+    prepaidCardAddress?: string,
+    spendAmount?: number,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    if (spendAmount < 50) {
+    if (!prepaidCardAddress) {
+      let txnHash = merchantSafeOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    let merchantSafe = merchantSafeOrTxnHash;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    if (spendAmount! < 50) {
       // this is hard coded in the PrepaidCardManager contract
       throw new Error(`The amount to pay merchant §${spendAmount} SPEND is below the minimum allowable amount`);
     }
@@ -79,7 +93,7 @@ export default class PrepaidCard {
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     await this.convertFromSpendForPrepaidCard(
       prepaidCardAddress,
-      spendAmount,
+      spendAmount!,
       (issuingToken, balanceAmount, requiredTokenAmount, symbol) =>
         new Error(
           `Prepaid card does not have enough balance to pay merchant. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
@@ -91,11 +105,10 @@ export default class PrepaidCard {
     let rateChanged = false;
     let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let gnosisResult: GnosisExecTx | undefined;
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     do {
       let rateLock = await layerTwoOracle.getRateLock(issuingToken);
       try {
-        let payload = await this.getPayMerchantPayload(prepaidCardAddress, merchantSafe, spendAmount, rateLock);
+        let payload = await this.getPayMerchantPayload(prepaidCardAddress, merchantSafe, spendAmount!, rateLock);
         if (nonce == null) {
           nonce = getNextNonceFromEstimate(payload);
           if (typeof onNonce === 'function') {
@@ -120,13 +133,13 @@ export default class PrepaidCard {
         gnosisResult = await this.executePayMerchant(
           prepaidCardAddress,
           merchantSafe,
-          spendAmount,
+          spendAmount!,
           rateLock,
           signatures,
           nonce
         );
         break;
-      } catch (e) {
+      } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
@@ -147,19 +160,35 @@ export default class PrepaidCard {
       );
     }
 
+    let txnHash = gnosisResult.ethereumTx.txHash;
+
     if (typeof onTxnHash === 'function') {
-      await onTxnHash(gnosisResult.ethereumTx.txHash);
+      await onTxnHash(txnHash);
     }
 
-    return await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
+  async transfer(txnHash: string): Promise<TransactionReceipt>;
   async transfer(
     prepaidCardAddress: string,
     newOwner: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async transfer(
+    prepaidCardAddressOrTxnHash: string,
+    newOwner?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
+    if (!newOwner) {
+      let txnHash = prepaidCardAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    let prepaidCardAddress = prepaidCardAddressOrTxnHash;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+
     if (!(await this.canTransfer(prepaidCardAddress))) {
       throw new Error(`The prepaid card ${prepaidCardAddress} is not allowed to be transferred`);
     }
@@ -170,8 +199,6 @@ export default class PrepaidCard {
     let gasToken = await getAddress('cardCpxd', this.layer2Web3);
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     let transferData = await prepaidCardMgr.methods.getTransferCardData(prepaidCardAddress, newOwner).call();
-
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
 
     // the quirk here is that we are signing this txn in advance so we need to
     // optimistically advance the nonce by 2 to account for the fact that we are
@@ -237,7 +264,7 @@ export default class PrepaidCard {
           nonce
         );
         break;
-      } catch (e) {
+      } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
@@ -257,20 +284,38 @@ export default class PrepaidCard {
       );
     }
 
+    let txnHash = gnosisResult.ethereumTx.txHash;
     if (typeof onTxnHash === 'function') {
-      await onTxnHash(gnosisResult.ethereumTx.txHash);
+      await onTxnHash(txnHash);
     }
 
-    return await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
+  // TODO: add overload for passing txnHash
+  async split(txnHash: string): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }>;
   async split(
     prepaidCardAddress: string,
     faceValues: number[],
     customizationDID: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }>;
+  async split(
+    prepaidCardAddressOrTxnHash: string,
+    faceValues?: number[],
+    customizationDID?: string | undefined,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }> {
+    if (!faceValues) {
+      let txnHash = prepaidCardAddressOrTxnHash;
+      return {
+        prepaidCards: await this.resolvePrepaidCards(await this.getPrepaidCardsFromTxn(txnHash)),
+        txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+      };
+    }
+    let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
     }
@@ -314,6 +359,7 @@ export default class PrepaidCard {
 
     let rateChanged = false;
     let gnosisResult: GnosisExecTx | undefined;
+
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     do {
       let rateLock = await layerTwoOracle.getRateLock(issuingToken);
@@ -388,6 +434,7 @@ export default class PrepaidCard {
     };
   }
 
+  async create(txnHash: string): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }>;
   async create(
     safeAddress: string,
     tokenAddress: string,
@@ -395,15 +442,31 @@ export default class PrepaidCard {
     customizationDID: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }>;
+  async create(
+    safeAddressOrTxnHash: string,
+    tokenAddress?: string,
+    faceValues?: number[],
+    customizationDID?: string | undefined,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }> {
-    if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
+    if (!tokenAddress) {
+      let txnHash = safeAddressOrTxnHash;
+      return {
+        prepaidCards: await this.resolvePrepaidCards(await this.getPrepaidCardsFromTxn(txnHash)),
+        txnReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+      };
+    }
+    let safeAddress = safeAddressOrTxnHash;
+    if (faceValues!.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
     }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let amountCache = new Map<number, string>();
     let amounts: BN[] = [];
     let totalWeiAmount = new BN('0');
-    for (let faceValue of faceValues) {
+    for (let faceValue of faceValues!) {
       let weiAmount = amountCache.get(faceValue);
       if (weiAmount == null) {
         weiAmount = await this.priceForFaceValue(tokenAddress, faceValue);
@@ -426,7 +489,7 @@ export default class PrepaidCard {
       );
     }
 
-    let payload = await this.getCreateCardPayload(from, tokenAddress, amounts, faceValues, customizationDID);
+    let payload = await this.getCreateCardPayload(from, tokenAddress, amounts, faceValues!, customizationDID);
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
     let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
 
