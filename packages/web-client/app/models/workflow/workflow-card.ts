@@ -52,6 +52,7 @@ export class WorkflowCard extends WorkflowPostable {
   }
 
   @action async onComplete() {
+    if (this.isComplete) return;
     let checkResult = await this.check();
     if (checkResult.success) {
       // visible-postables-will-change starts test waiters in animated-workflow.ts
