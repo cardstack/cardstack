@@ -287,6 +287,10 @@ class IssuePrepaidCardWorkflow extends Workflow {
         p.isComplete = true;
       });
     }
+
+    if (this.session.state.cancelled && this.session.state.cancelationReason) {
+      this.cancel(this.session.state.cancelationReason);
+    }
   }
 }
 
