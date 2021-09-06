@@ -143,6 +143,7 @@ export interface Layer2Web3Strategy
   defaultTokenSymbol: ConvertibleSymbol;
   refreshSafesAndBalances(): void;
   convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<any>;
+  getPrepaidCardSafesFromTxHash(txHash: string): Promise<PrepaidCardSafe[]>;
 }
 
 export type TransactionHash = string;
