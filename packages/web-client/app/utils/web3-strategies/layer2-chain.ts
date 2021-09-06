@@ -193,6 +193,13 @@ export default abstract class Layer2ChainWeb3Strategy
     yield this.provider.enable();
   }
 
+  async getPrepaidCardSafesFromTxHash(
+    txHash: string
+  ): Promise<PrepaidCardSafe[]> {
+    const PrepaidCard = await getSDK('PrepaidCard', this.web3);
+    return await PrepaidCard.getPrepaidCardSafesFromTxHash(txHash);
+  }
+
   private getTokenContractInfo(
     symbol: ConvertibleSymbol,
     network: Layer2NetworkSymbol

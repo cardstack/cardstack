@@ -226,6 +226,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(100);
   }
 
+  getPrepaidCardSafesFromTxHash(_txHash: string): Promise<PrepaidCardSafe[]> {
+    return defer<PrepaidCardSafe[]>().promise;
+  }
+
   async registerMerchant(
     prepaidCardAddress: string,
     infoDID: string,

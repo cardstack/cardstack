@@ -11,6 +11,7 @@ import {
   RegisterMerchantOptions,
   TransactionHash,
 } from '../utils/web3-strategies/types';
+import { PrepaidCardSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
 import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
 import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
@@ -187,6 +188,12 @@ export default class Layer2Network
       fromBlock,
       this.walletInfo.firstAddress!
     );
+  }
+
+  @task *getPrepaidCardSafesFromTxHash(
+    txHash: string
+  ): TaskGenerator<PrepaidCardSafe[]> {
+    return yield this.strategy.getPrepaidCardSafesFromTxHash(txHash);
   }
 
   blockExplorerUrl(txnHash: string | undefined): string | undefined {
