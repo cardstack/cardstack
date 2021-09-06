@@ -69,10 +69,17 @@ export abstract class Workflow {
   }
 
   cancel(reason?: string) {
+    const cancelationReason = reason || 'UNKNOWN';
+
+    this.session.updateMany({
+      isCancelled: true,
+      cancelationReason: cancelationReason,
+    });
+
     if (!this.isComplete && !this.isCanceled) {
       // visible-postables-will-change starts test waiters in animated-workflow.ts
       this.emit('visible-postables-will-change');
-      this.cancelationReason = reason || 'UNKNOWN';
+      this.cancelationReason = cancelationReason;
       this.isCanceled = true;
     }
   }
