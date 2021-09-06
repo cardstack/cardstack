@@ -7,7 +7,7 @@ import ERC20ABI from '../contracts/abi/erc-20';
 import ForeignAMBABI from '../contracts/abi/foreign-amb';
 import ForeignBridgeABI from '../contracts/abi/foreign-bridge-mediator';
 import { getAddress } from '../contracts/addresses';
-import { waitUntilTransactionMined } from './utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined } from './utils/general-utils';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -17,28 +17,22 @@ export interface ITokenBridgeForeignSide {
   unlockTokens(
     tokenAddress: string,
     amount: string,
-    onTxnHash?: (txnHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
   relayTokens(
     tokenAddress: string,
     recipientAddress: string,
     amount: string,
-    onTxnHash?: (txnHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
   claimBridgedTokens(
     messageId: string,
     encodedData: string,
     signatures: string[],
-    onTxnHash?: (txnHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
 }
 
@@ -49,12 +43,10 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   async unlockTokens(
     tokenAddress: string,
     amount: string,
-    onTxnHash?: (txnHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    let from = options?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let token = new this.layer1Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let foreignBridge = await getAddress('foreignBridge', this.layer1Web3);
     let nextNonce = await this.getNextNonce(from);
@@ -62,11 +54,12 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     return await new Promise((resolve, reject) => {
       let data = token.methods.approve(foreignBridge, amount).encodeABI();
       let tx: TransactionConfig = {
-        ...options,
+        ...contractOptions,
         from,
         to: tokenAddress,
         data,
       };
+      let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
       if (nonce != null) {
         tx.nonce = parseInt(nonce.toString()); // the web3 API requires this be a number, it should be ok to downcast this
       } else if (typeof onNonce === 'function') {
@@ -95,12 +88,10 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     tokenAddress: string,
     recipientAddress: string,
     amount: string,
-    onTxnHash?: (txnHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    let from = options?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let foreignBridgeAddress = await getAddress('foreignBridge', this.layer1Web3);
     let foreignBridge = new this.layer1Web3.eth.Contract(ForeignBridgeABI as any, foreignBridgeAddress);
     let nextNonce = await this.getNextNonce(from);
@@ -108,11 +99,14 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     return await new Promise((resolve, reject) => {
       let data = foreignBridge.methods.relayTokens(tokenAddress, recipientAddress, amount).encodeABI();
       let tx: TransactionConfig = {
-        ...options,
+        ...contractOptions,
         from,
         to: foreignBridgeAddress,
         data,
       };
+
+      let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+
       if (nonce != null) {
         tx.nonce = parseInt(nonce.toString()); // the web3 API requires this be a number, it should be ok to downcast this
       } else if (typeof onNonce === 'function') {
@@ -150,12 +144,10 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     messageId: string,
     encodedData: string,
     signatures: string[],
-    onTxnHash?: (txnHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    let from = options?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let foreignAmbAddress = await getAddress('foreignAMB', this.layer1Web3);
     let foreignAmb = new this.layer1Web3.eth.Contract(ForeignAMBABI as AbiItem[], foreignAmbAddress);
     let events = await foreignAmb.getPastEvents('RelayedMessage', {
@@ -170,10 +162,11 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     }
     const packedSignatures = prepSignaturesForExecution(signatures);
     let nextNonce = await this.getNextNonce(from);
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     return await new Promise((resolve, reject) => {
       let data = foreignAmb.methods.executeSignatures(encodedData, packedSignatures).encodeABI();
       let tx: TransactionConfig = {
-        ...options,
+        ...contractOptions,
         from,
         to: foreignAmbAddress,
         data,

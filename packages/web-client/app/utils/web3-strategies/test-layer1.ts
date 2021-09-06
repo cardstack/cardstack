@@ -24,7 +24,7 @@ import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-us
 
 interface ClaimBridgedTokensRequest {
   deferred: RSVP.Deferred<TransactionReceipt>;
-  onTxHash?: (txHash: TransactionHash) => void;
+  onTxnHash?: (txnHash: TransactionHash) => void;
 }
 
 export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
@@ -48,9 +48,9 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   @tracked cardBalance: BN | undefined;
 
   waitForAccountDeferred = defer();
-  #unlockOnTxHash: Function | undefined;
+  #unlockOnTxnHash: Function | undefined;
   #unlockDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
-  #depositOnTxHash: Function | undefined;
+  #depositOnTxnHash: Function | undefined;
   #depositDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
   claimBridgedTokensRequests: Map<
     string,
@@ -79,8 +79,12 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     this.disconnect();
   }
 
-  approve(_amountInWei: BN, _token: string, { onTxHash }: ApproveOptions) {
-    this.#unlockOnTxHash = onTxHash;
+  approve(
+    _amountInWei: BN,
+    _token: string,
+    { onTxnHash: onTxnHash }: ApproveOptions
+  ) {
+    this.#unlockOnTxnHash = onTxnHash;
     this.#unlockDeferred = RSVP.defer();
     return this.#unlockDeferred.promise;
   }
@@ -89,9 +93,9 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     _token: string,
     _destinationAddress: string,
     _amountInWei: BN,
-    { onTxHash }: RelayTokensOptions
+    { onTxnHash }: RelayTokensOptions
   ) {
-    this.#depositOnTxHash = onTxHash;
+    this.#depositOnTxnHash = onTxnHash;
     this.#depositDeferred = RSVP.defer();
     return this.#depositDeferred.promise;
   }
@@ -150,8 +154,8 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     }
   }
 
-  test__simulateUnlockTxHash() {
-    this.#unlockOnTxHash?.('0xABC');
+  test__simulateUnlockTxnHash() {
+    this.#unlockOnTxnHash?.('0xABC');
   }
 
   test__simulateUnlock() {
@@ -172,8 +176,8 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     });
   }
 
-  test__simulateDepositTxHash() {
-    this.#depositOnTxHash?.('0xDEF');
+  test__simulateDepositTxnHash() {
+    this.#depositOnTxnHash?.('0xDEF');
   }
 
   test__simulateDeposit() {
@@ -201,14 +205,14 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     let deferred: RSVP.Deferred<TransactionReceipt> = defer();
     this.claimBridgedTokensRequests.set(bridgeValidationResult.messageId, {
       deferred,
-      onTxHash: options?.onTxHash,
+      onTxnHash: options?.onTxnHash,
     });
     return deferred.promise;
   }
 
   test__simulateBridgedTokensClaimed(messageId: string) {
     let request = this.claimBridgedTokensRequests.get(messageId);
-    request?.onTxHash?.('exampleTxHash');
+    request?.onTxnHash?.('exampleTxnHash');
     return request?.deferred.resolve({} as TransactionReceipt);
   }
 

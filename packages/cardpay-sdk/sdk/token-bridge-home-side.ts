@@ -10,8 +10,7 @@ import { AbiItem, fromWei, toBN } from 'web3-utils';
 import { signSafeTxAsRSV } from './utils/signing-utils';
 import { ZERO_ADDRESS } from './constants';
 import { query } from './utils/graphql';
-import BN from 'bn.js';
-import { waitUntilTransactionMined } from './utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined } from './utils/general-utils';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -53,12 +52,10 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     tokenAddress: string,
     recipientAddress: string,
     amount: string,
-    onTxHash?: (txHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let homeBridgeAddress = await getAddress('homeBridge', this.layer2Web3);
     let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], tokenAddress);
     let symbol = await token.methods.symbol().call();
@@ -82,6 +79,7 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
       );
     }
 
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
       if (typeof onNonce === 'function') {
@@ -118,8 +116,8 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
       estimate.gasToken,
       ZERO_ADDRESS
     );
-    if (typeof onTxHash === 'function') {
-      await onTxHash(result.ethereumTx.txHash);
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(result.ethereumTx.txHash);
     }
     return await waitUntilTransactionMined(this.layer2Web3, result.ethereumTx.txHash);
   }

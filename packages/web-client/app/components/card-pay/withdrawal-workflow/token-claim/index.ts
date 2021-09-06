@@ -27,7 +27,7 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
   declare tokenSymbol: TokenSymbol;
 
   @tracked isConfirming = false;
-  @tracked txHash: string | undefined;
+  @tracked txnHash: string | undefined;
   @tracked errorMessage = '';
 
   get bridgeValidationResult(): BridgeValidationResult {
@@ -58,7 +58,7 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
   }
 
   get txViewerUrl() {
-    return this.txHash && this.layer1Network.blockExplorerUrl(this.txHash);
+    return this.txnHash && this.layer1Network.blockExplorerUrl(this.txnHash);
   }
 
   get ctaState() {
@@ -79,10 +79,10 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
       await taskFor(this.layer1Network.claimBridgedTokensTask).perform(
         this.bridgeValidationResult,
         {
-          onTxHash: (txHash: string) => (this.txHash = txHash),
+          onTxnHash: (txnHash: string) => (this.txnHash = txnHash),
         }
       );
-      this.args.workflowSession.update('claimTokensTxnHash', this.txHash);
+      this.args.workflowSession.update('claimTokensTxnHash', this.txnHash);
       this.args.onComplete?.();
     } catch (e) {
       console.error(e);

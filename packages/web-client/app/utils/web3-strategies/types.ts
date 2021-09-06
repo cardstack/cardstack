@@ -35,27 +35,27 @@ export interface Web3Strategy {
 }
 
 export interface ApproveOptions {
-  onTxHash?(txHash: TransactionHash): void;
+  onTxnHash?(txnHash: TransactionHash): void;
 }
 
 export interface RelayTokensOptions {
-  onTxHash?(txHash: TransactionHash): void;
+  onTxnHash?(txnHash: TransactionHash): void;
 }
 
 export interface IssuePrepaidCardOptions {
-  onTxHash?(txHash: TransactionHash): void;
+  onTxnHash?(txnHash: TransactionHash): void;
   nonce?: string;
   onNonce?(nonce: string): void;
 }
 
 export interface RegisterMerchantOptions {
-  onTxHash?(txHash: TransactionHash): void;
+  onTxnHash?(txnHash: TransactionHash): void;
   nonce?: string;
   onNonce?(nonce: string): void;
 }
 
 export interface ClaimBridgedTokensOptions {
-  onTxHash?(txHash: TransactionHash): void;
+  onTxnHash?(txnHash: TransactionHash): void;
 }
 
 export interface Layer1Web3Strategy

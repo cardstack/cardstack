@@ -16,7 +16,7 @@ import {
   getNextNonceFromEstimate,
 } from '../utils/safe-utils';
 import { ZERO_ADDRESS } from '../constants';
-import { waitUntilTransactionMined } from '../utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
 import { signSafeTxAsRSV, Signature } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
@@ -101,12 +101,10 @@ export default class RevenuePool {
     merchantSafeAddress: string,
     tokenAddress: string,
     amount: string,
-    onTxHash?: (txHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let revenuePoolAddress = await getAddress('revenuePool', this.layer2Web3);
     let revenuePool = new this.layer2Web3.eth.Contract(RevenuePoolABI as AbiItem[], revenuePoolAddress);
     let unclaimedBalance = new BN(await revenuePool.methods.revenueBalance(merchantSafeAddress, tokenAddress).call());
@@ -135,6 +133,7 @@ export default class RevenuePool {
         )}, amount being claimed is ${fromWei(amount)}, the gas cost is ${fromWei(gasCost)}`
       );
     }
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
       if (typeof onNonce === 'function') {
@@ -172,8 +171,8 @@ export default class RevenuePool {
       ZERO_ADDRESS
     );
 
-    if (typeof onTxHash === 'function') {
-      await onTxHash(gnosisResult.ethereumTx.txHash);
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(gnosisResult.ethereumTx.txHash);
     }
     return await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
   }
@@ -181,12 +180,10 @@ export default class RevenuePool {
   async registerMerchant(
     prepaidCardAddress: string,
     infoDID: string | undefined,
-    onTxHash?: (txHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }> {
-    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let prepaidCard = await getSDK('PrepaidCard', this.layer2Web3);
     let issuingToken = await prepaidCard.issuingToken(prepaidCardAddress);
     let registrationFee = await this.merchantRegistrationFee();
@@ -205,6 +202,7 @@ export default class RevenuePool {
     let rateChanged = false;
     let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let gnosisResult: GnosisExecTx | undefined;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     do {
       let rateLock = await layerTwoOracle.getRateLock(issuingToken);
       try {
@@ -252,8 +250,8 @@ export default class RevenuePool {
     if (!gnosisResult) {
       throw new Error(`Unable to register merchant with prepaid card ${prepaidCardAddress}`);
     }
-    if (typeof onTxHash === 'function') {
-      await onTxHash(gnosisResult.ethereumTx.txHash);
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(gnosisResult.ethereumTx.txHash);
     }
 
     let merchantSafeAddress = await this.getMerchantSafeFromTxn(gnosisResult.ethereumTx.txHash);

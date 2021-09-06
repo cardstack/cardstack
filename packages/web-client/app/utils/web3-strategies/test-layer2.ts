@@ -32,7 +32,7 @@ import { taskFor } from 'ember-concurrency-ts';
 
 interface IssuePrepaidCardRequest {
   deferred: RSVP.Deferred<PrepaidCardSafe>;
-  onTxHash?: (txHash: TransactionHash) => void;
+  onTxnHash?: (txnHash: TransactionHash) => void;
   onNonce?: (nonce: string) => void;
   nonce?: string;
   customizationDID: string;
@@ -40,7 +40,7 @@ interface IssuePrepaidCardRequest {
 
 interface RegisterMerchantRequest {
   deferred: RSVP.Deferred<MerchantSafe>;
-  onTxHash?: (txHash: TransactionHash) => void;
+  onTxnHash?: (txnHash: TransactionHash) => void;
   onNonce?: (nonce: string) => void;
   nonce?: string;
   infoDID: string;
@@ -214,7 +214,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     let deferred: RSVP.Deferred<PrepaidCardSafe> = defer();
     this.issuePrepaidCardRequests.set(faceValue, {
       deferred,
-      onTxHash: options.onTxHash,
+      onTxnHash: options.onTxnHash,
       onNonce: options.onNonce,
       nonce: options.nonce,
       customizationDID,
@@ -234,7 +234,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     let deferred: RSVP.Deferred<MerchantSafe> = defer();
     this.registerMerchantRequests.set(prepaidCardAddress, {
       deferred,
-      onTxHash: options.onTxHash,
+      onTxnHash: options.onTxnHash,
       onNonce: options.onNonce,
       nonce: options.nonce,
       infoDID,
@@ -424,7 +424,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
       ...options,
     };
-    request?.onTxHash?.('exampleTxHash');
+    request?.onTxnHash?.('exampleTxHnash');
 
     this.test__simulateAccountSafes(walletAddress, [prepaidCardSafe]);
 
@@ -464,7 +464,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
       ...options,
     };
-    request?.onTxHash?.('exampleTxHash');
+    request?.onTxnHash?.('exampleTxnHash');
 
     let prepaidCard = [...this.accountSafes.values()]
       .flat()

@@ -10,7 +10,7 @@ import { signSafeTxAsRSV } from '../utils/signing-utils';
 import BN from 'bn.js';
 import { query } from '../utils/graphql';
 import { TransactionReceipt } from 'web3-core';
-import { waitUntilTransactionMined } from '../utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
 const { fromWei } = Web3.utils;
 
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
@@ -205,12 +205,10 @@ export default class Safes {
     tokenAddress: string,
     recipient: string,
     amount: string,
-    onTxHash?: (txHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let symbol = await token.methods.symbol().call();
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
@@ -231,7 +229,7 @@ export default class Safes {
         )} ${symbol}, amount to transfer ${fromWei(amount)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
       );
     }
-
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
       if (typeof onNonce === 'function') {
@@ -269,8 +267,8 @@ export default class Safes {
       estimate.gasToken,
       ZERO_ADDRESS
     );
-    if (typeof onTxHash === 'function') {
-      await onTxHash(result.ethereumTx.txHash);
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(result.ethereumTx.txHash);
     }
     return await waitUntilTransactionMined(this.layer2Web3, result.ethereumTx.txHash);
   }
@@ -279,15 +277,14 @@ export default class Safes {
     safeAddress: string,
     infoDID: string,
     gasToken: string,
-    onTxHash?: (txHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let supplierManager = await getAddress('supplierManager', this.layer2Web3);
     let payload = await this.setSupplierInfoDIDPayload(infoDID);
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, supplierManager, '0', payload, 0, gasToken);
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
       if (typeof onNonce === 'function') {
@@ -324,8 +321,8 @@ export default class Safes {
       estimate.gasToken,
       ZERO_ADDRESS
     );
-    if (typeof onTxHash === 'function') {
-      await onTxHash(result.ethereumTx.txHash);
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(result.ethereumTx.txHash);
     }
     return await waitUntilTransactionMined(this.layer2Web3, result.ethereumTx.txHash);
   }
