@@ -1,6 +1,6 @@
 import { module, skip, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { click, render } from '@ember/test-helpers';
+import { click, render, settled } from '@ember/test-helpers';
 import { TestContext } from 'ember-test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
@@ -104,7 +104,27 @@ module(
       assert.equal(chosenSafe, this.safes[1]);
     });
 
-    skip('it renders with the chosen safe chosen');
+    test('it renders with @selectedSafe chosen', async function (this: Context, assert) {
+      this.set('selectedSafe', this.safes[1]);
+      await render(hbs`
+        <CardPay::SafeChooserDropdown
+          @safes={{this.safes}}
+          @selectedSafe={{this.selectedSafe}}
+          @onChooseSafe={{this.chooseSafe}}
+        />
+      `);
+
+      assert
+        .dom('[data-test-safe-chooser-dropdown]')
+        .containsText(this.safes[1].address);
+
+      this.set('selectedSafe', this.safes[0]);
+      await settled();
+
+      assert
+        .dom('[data-test-safe-chooser-dropdown]')
+        .containsText(this.safes[0].address);
+    });
 
     skip('it renders the first safe as chosen by default');
   }
