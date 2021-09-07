@@ -7,16 +7,25 @@ export interface ArbitraryDictionary {
 
 export default class WorkflowSession {
   workflow: any;
-  workflowPersistenceStorage: WorkflowPersistence;
+  workflowPersistenceStorage: WorkflowPersistence | undefined;
 
   constructor(workflow?: any) {
     this.workflow = workflow;
-    this.workflowPersistenceStorage = this.workflow.owner.lookup(
-      'service:workflow-persistence'
-    );
+
+    // Allow WorkflowSession to be instantiated as a POJO (for unit tests)
+    if (this.workflow && typeof this.workflow.owner.lookup === 'function') {
+      this.workflowPersistenceStorage = this.workflow.owner.lookup(
+        'service:workflow-persistence'
+      );
+    }
   }
 
   @tracked state: ArbitraryDictionary = {};
+
+  get isPersisted() {
+    return !!this.workflow?.workflowPersistenceId;
+  }
+
   update(key: string, val: any) {
     this.state[key] = val;
     // eslint-disable-next-line no-self-assign
@@ -36,9 +45,9 @@ export default class WorkflowSession {
   }
 
   restoreFromStorage(): void {
-    if (!this.workflow.workflowPersistenceId) return;
+    if (!this.isPersisted) return;
 
-    const persistedData = this.workflowPersistenceStorage.getPersistedData(
+    const persistedData = this.workflowPersistenceStorage?.getPersistedData(
       this.workflow.workflowPersistenceId
     );
 
@@ -48,8 +57,9 @@ export default class WorkflowSession {
   }
 
   persistToStorage(): void {
-    if (!this.workflow.workflowPersistenceId) return;
-    this.workflowPersistenceStorage.persistData(
+    if (!this.isPersisted) return;
+
+    this.workflowPersistenceStorage?.persistData(
       this.workflow.workflowPersistenceId,
       { name: this.workflow.name, state: this.state }
     );
