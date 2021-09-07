@@ -1,0 +1,48 @@
+.merchant-payment-request-page {
+  --card-pay-logo-size: 2.5rem;
+
+  position: relative;
+  min-height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: minmax(200px, 720px);
+  align-items: center;
+  justify-content: center;
+  background-color: var(--boxel-purple-600);
+  color: var(--boxel-light);
+  font: var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-lg);
+  z-index: 0;
+  padding: var(--boxel-sp);
+}
+
+.merchant-payment-request-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--boxel-sp-lg);
+}
+
+.merchant-payment-request-page__links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--boxel-sp);
+  margin: 0;
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: 0.02em;
+}
+
+.merchant-payment-request-page__hamburger {
+  display: none;
+}
+
+@media only screen and (max-width: 360px) {
+  .merchant-payment-request-page__links {
+    display: none;
+  }
+
+  .merchant-payment-request-page__hamburger {
+    display: initial;
+  }
+}

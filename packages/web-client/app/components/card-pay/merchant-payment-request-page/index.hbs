@@ -1,0 +1,70 @@
+{{!--
+  TODO:
+  - replace hardcoded merchant info with properties of the component class
+  - update media queries of this and merchant-payment-request-card to use 480px (conventional upper limit for smartphone)
+  - update icon/logo size for responsive design, +- updating org title for better control of spacing betweem logo and text
+ --}}
+
+<div class="merchant-payment-request-page">
+  <div class="merchant-payment-request-page__header">
+    <Boxel::OrgTitle
+      @title="Card Pay"
+      @iconURL="/images/icons/card-pay-logo.svg"
+      style={{css-var
+        boxel-org-title-logo-size="var(--card-pay-logo-size)"
+        boxel-org-title-logo-position="left center"
+      }}
+    />
+
+    <div class="merchant-payment-request-page__links-container">
+      <ul class="merchant-payment-request-page__links">
+        <li>
+          <a href="#">
+            About
+          </a>
+        </li>
+        <li>
+          <a href="#">
+            Help
+          </a>
+        </li>
+      </ul>
+      <CardPay::HamburgerMenu
+        class="merchant-payment-request-page__hamburger"
+        @open={{this.hamburgerMenuOpen}}
+        @onOpen={{fn (mut this.hamburgerMenuOpen) true}}
+        @onClose={{fn (mut this.hamburgerMenuOpen) false}}
+      >
+        <:header>
+          <Boxel::OrgTitle
+            @title="Card Pay"
+            @iconURL="/images/icons/card-pay-logo.svg"
+            style={{css-var
+              boxel-org-title-logo-size="var(--card-pay-logo-size)"
+              boxel-org-title-logo-position="left center"
+            }}
+          />
+        </:header>
+        <:body as |MenuItem|>
+          <MenuItem @url="#">
+            About
+          </MenuItem>
+          <MenuItem @url="#">
+            Help
+          </MenuItem>
+        </:body>
+      </CardPay::HamburgerMenu>
+    </div>
+  </div>
+  <CardPay::MerchantPaymentRequestCard
+    @amount="300"
+    @usdAmount="3"
+    @merchant={{hash
+      name="Happii Creations"
+      logoBackground="cornflowerblue"
+      logoTextColor="black"
+    }}
+    @paymentURL="https://pay.cardstack.com/merchat-asdnsadkasd?id=0x1238urfds&amount=73298587423545"
+    @canDeepLink={{false}}
+  />
+</div>
