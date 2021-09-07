@@ -1,0 +1,7 @@
+.authentication__loading-indicator {
+  --icon-color: var(--boxel-light);
+
+  margin-right: var(--boxel-sp-xs);
+  flex-grow: 0;
+  flex-shrink: 0;
+}

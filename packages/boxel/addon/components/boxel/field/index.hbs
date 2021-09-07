@@ -1,0 +1,19 @@
+{{#if (eq @fieldMode "edit")}}
+  <Boxel::Field::Edit
+    @fieldId={{@fieldId}}
+    @label={{@label}}
+    @labelClass={{@labelClass}}
+    ...attributes
+  >
+    {{yield}}
+  </Boxel::Field::Edit>
+{{else}}
+  <Boxel::Field::View
+    @fieldId={{@fieldId}}
+    @label={{@label}}
+    @labelClass={{@labelClass}}
+    ...attributes
+  >
+    {{yield}}
+  </Boxel::Field::View>
+{{/if}}

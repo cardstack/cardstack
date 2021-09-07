@@ -1,0 +1,21 @@
+<nav class="card-pay-header-nav">
+  <div class="card-pay-header-nav__list" role="tablist">
+    {{#each @tabs as |tab i|}}
+      {{#if tab.inactive}}
+        <div class="card-pay-header-nav__list-item card-pay-header-nav__list-item--inactive">
+          <div class="card-pay-header-nav__tab" aria-disabled="true" data-test-card-pay-header-tab-disabled>
+            {{svg-jar tab.icon aria-hidden="true"}}
+            {{tab.title}}
+          </div>
+        </div>
+      {{else}}
+        <div class="card-pay-header-nav__list-item">
+          <LinkTo role="tab" id={{tab.route}} @route={{tab.route}} class="card-pay-header-nav__tab" data-test-card-pay-header-tab={{i}}>
+            {{svg-jar tab.icon aria-hidden="true"}}
+            {{tab.title}}
+          </LinkTo>
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+</nav>

@@ -1,0 +1,62 @@
+.layer-connect-modal {
+  --layer-max-width: 43.75rem; /* 700px */
+  --layer-connected-max-width: 36.25rem; /* 580px */
+  --boxel-modal-max-width: unset;
+  /* stylelint-disable-next-line length-zero-no-unit */
+  --boxel-modal-offset-top: 0px; /* Do not remove the px here. It would break the `calc` calculation for the scroll. */
+}
+
+.layer-connect-modal > div {
+  width: auto;
+  display: flex;
+  align-items: center;
+  margin: 0 var(--boxel-sp-lg);
+}
+
+.layer-connect-modal__scroll-wrapper {
+  width: 100%;
+  max-width: var(--layer-max-width);
+  height: auto;
+  max-height: 100%;
+  margin: auto;
+  padding: var(--boxel-sp-xs) 0;
+  overflow-y: auto;
+  transition: max-width var(--boxel-transition);
+}
+
+.layer-connect-modal--connected .layer-connect-modal__scroll-wrapper {
+  max-width: var(--layer-connected-max-width);
+}
+
+@media screen and (max-width: 40rem) {
+  .layer-connect-modal__scroll-wrapper {
+    min-width: unset;
+  }
+}
+
+.layer-connect-modal__card {
+  position: relative;
+  padding-top: calc(var(--boxel-sp-sm) + 0.75rem);
+  outline-color: transparent;
+  outline-style: solid;
+}
+
+.layer-connect-modal__close-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 1;
+  padding: var(--boxel-sp-sm);
+  height: calc(var(--boxel-sp-sm) * 2 + 0.75rem);
+  width: calc(var(--boxel-sp-sm) * 2 + 0.75rem);
+  line-height: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  --icon-color: var(--boxel-dark);
+}
+
+.layer-connect-modal__wrapped-card {
+  box-shadow: none;
+}

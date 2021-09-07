@@ -1,0 +1,23 @@
+.card-pay-bridge {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  padding: 0 var(--boxel-sp-xs);
+  background-color: var(--boxel-light-300);
+}
+
+.card-pay-bridge__inner {
+  width: 100%;
+  padding: calc(var(--boxel-sp) - 1px) var(--boxel-sp-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font: 700 var(--boxel-font);
+  letter-spacing: 0;
+  background: url('/images/backgrounds/bridge-background.svg');
+}
+
+/* 2 selectors because of specificity */
+.card-pay-bridge__button.boxel-button {
+  --boxel-button-color: var(--boxel-light-300);
+}

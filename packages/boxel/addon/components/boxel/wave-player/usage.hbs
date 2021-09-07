@@ -1,0 +1,15 @@
+<Freestyle::Usage @name="WavePlayer">
+  <:example>
+    <Boxel::WavePlayer @url={{this.url}} />
+  </:example>
+
+  <:api as |Args|>
+    <Args.String
+      @name="url"
+      @required={{true}}
+      @description="A path to an audio asset"
+      @value={{this.url}}
+      @onInput={{fn (mut this.url)}}
+    />
+  </:api>
+</Freestyle::Usage>

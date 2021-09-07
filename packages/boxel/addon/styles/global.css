@@ -1,0 +1,87 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--boxel-dark, #000);
+  font-family: var(--boxel-font-family, 'Open Sans', Helvetica, Arial, sans-serif);
+  background-color: var(--boxel-light-100, #f5f5f5);
+  font-size: 1rem;
+  letter-spacing: 0.025em;
+  line-height: calc(22 / 16);
+  overscroll-behavior: none;
+}
+
+body.has-modal {
+  overflow: hidden;
+}
+
+a {
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  display: inline-block;
+  font: inherit;
+}
+
+img,
+svg {
+  display: inline-block;
+}
+
+a:hover {
+  color: var(--boxel-link-highlight);
+  cursor: pointer;
+}
+
+a:focus {
+  outline: var(--boxel-outline);
+}
+
+a:focus:not(:focus-visible) {
+  outline-color: transparent;
+}
+
+button:hover:not(:disabled),
+[role="button"]:hover:not(:disabled) {
+  cursor: pointer;
+}
+
+button:focus:not(:disabled),
+[role="button"]:focus:not(:disabled) {
+  outline: var(--boxel-outline);
+}
+
+button:focus:not(:focus-visible),
+[role="button"]:focus:not(:focus-visible) {
+  outline-color: transparent;
+}
+
+input:focus,
+select:focus {
+  outline-color: var(--boxel-highlight);
+}
+
+/* Hides content visually only
+  (accessible via screen readers) */
+.boxel-sr-only:not(:focus):not(:active) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}

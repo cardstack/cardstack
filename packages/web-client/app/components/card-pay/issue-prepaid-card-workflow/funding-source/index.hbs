@@ -1,0 +1,41 @@
+<ActionCardContainer
+  @header="Prepaid card funding"
+  @isComplete={{@isComplete}}
+>
+  <ActionCardContainer::Section>
+    <ActionCardContainer::Section @title="Choose a depot and balance to fund your prepaid card">
+      <CardPay::NestedAccountDepotDisplay
+        @accountAddress={{this.layer2Network.walletInfo.firstAddress}}
+        @depotAddress={{this.depotAddress}}
+        @size={{if @isComplete "large"}}
+      />
+    </ActionCardContainer::Section>
+    {{#if this.depotAddress}}
+      <ActionCardContainer::Section>
+        <CardPay::NestedDepotBalanceChooser
+          @isComplete={{@isComplete}}
+          @depotAddress={{this.depotAddress}}
+          @tokens={{this.tokens}}
+          @selectedToken={{this.selectedToken}}
+          @selectedTokenSymbol={{this.selectedTokenSymbol}}
+          @chooseToken={{this.chooseSource}}
+        />
+      </ActionCardContainer::Section>
+    {{/if}}
+  </ActionCardContainer::Section>
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    @disabled={{or @frozen this.isDisabled}}
+  >
+    <:default as |d|>
+      <d.ActionButton {{on "click" this.save}}>
+        Continue
+      </d.ActionButton>
+    </:default>
+    <:memorialized as |m|>
+      <m.ActionButton {{on "click" @onIncomplete}}>
+        Edit
+      </m.ActionButton>
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

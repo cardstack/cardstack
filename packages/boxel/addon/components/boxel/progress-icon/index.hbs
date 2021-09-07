@@ -1,0 +1,15 @@
+<div
+  class={{cn
+    "boxel-progress-icon"
+    boxel-progress-icon--cancelled=@isCancelled
+    boxel-progress-icon--completr=@isComplete
+  }}
+  style={{this.elementStyle}}
+  ...attributes
+>
+  {{#if (not (or @isCancelled @isComplete))}}
+    <div class="boxel-progress-icon__progress-pie" style={{html-safe (concat "stroke-dasharray:" (mult @fractionComplete 60) " " 60)}}>
+      {{svg-jar "progress-circle" width=@size height=@size}}
+    </div>
+  {{/if}}
+</div>

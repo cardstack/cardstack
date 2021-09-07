@@ -1,0 +1,11 @@
+{{#if (or (eq this.target.currentRouteName "media-registry.versions") (eq (truncate this.target.currentRouteName 40 false) "media-registry.discrepancies.discrepancy"))}}
+  {{outlet}}
+{{else}}
+  <MediaRegistry::DashboardCard
+    @currentOrg={{@model.currentOrg}}
+    @orgs={{@model.orgs}}
+    @currentMilestone={{this.latestMilestone}}
+    @transition={{this.transition}}
+    @home={{hash icon="cardstack" action=this.goHome height="35px"}}
+  />
+{{/if}}

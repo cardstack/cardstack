@@ -1,0 +1,16 @@
+/* Org Header */
+.boxel-org-header {
+  --boxel-org-header-background-color: inherit;
+  --boxel-org-header-color: inherit;
+  --boxel-org-header-logo-size: auto 2rem;
+  --boxel-org-header-logo-position: center;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--boxel-sp);
+  padding: var(--boxel-sp-lg);
+  background-color: var(--boxel-org-header-background-color);
+  color: var(--boxel-org-header-color);
+}

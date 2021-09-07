@@ -1,0 +1,34 @@
+.workflow-thread {
+  --inner-max-width: 36.25rem; /* 580px */
+  --outer-max-width: 43.75rem; /* 700px; */
+}
+
+.workflow-thread__status {
+  color: var(--boxel-dark);
+  font: 600 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+  text-align: center;
+}
+
+.workflow-thread:focus {
+  outline-color: transparent;
+  outline-width: 0;
+  outline-offset: -5px;
+  box-shadow: 0 0 0 2px var(--boxel-blue);
+}
+
+.workflow-thread:focus:not(:focus-visible) {
+  box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
+}
+
+.workflow-thread__help-content {
+  font-size: var(--boxel-font-size-sm);
+  font-weight: 300;
+}
+
+.workflow-thread__app-version {
+  text-align: center;
+  font-size: var(--boxel-font-size-sm);
+  font-weight: 300;
+  color: var(--boxel-dark);
+}

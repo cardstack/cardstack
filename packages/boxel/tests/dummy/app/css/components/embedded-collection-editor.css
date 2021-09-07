@@ -1,0 +1,97 @@
+/* Embedded Collection field (edit mode) */
+.collection-field {
+  max-width: 450px;
+  min-height: 60px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: var(--boxel-light-200);
+  border: none;
+  border-radius: var(--boxel-border-radius-sm);
+}
+
+.collection-field__header {
+  padding-top: 10px;
+  padding-bottom: 20px;
+}
+
+.collection-field__header > button {
+  margin: 0 auto;
+}
+
+.collection-field__items {
+  display: grid;
+  gap: 10px;
+}
+
+.collection-field__items--grid {
+  grid-template-columns: repeat(auto-fill, 210px);
+  justify-content: center;
+}
+
+.collection-field__item {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+}
+
+.collection-field__item--list {
+  grid-template-columns: 1fr 45px;
+  padding-left: 10px;
+}
+
+.collection-field__item--list.collection-field__item--multiple {
+  grid-template-columns: 45px 1fr 45px;
+  padding-left: 0;
+}
+
+.collection-field__item--grid {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 45px;
+}
+
+.collection-field__item--grid > .boxel-card {
+  width: auto;
+  grid-column: -1 / 1;
+}
+
+.collection-field__item--grid.collection-field__item--multiple {
+  grid-template: ". select remove .";
+  grid-template-rows: 1fr 45px;
+  gap: 0 30px;
+}
+
+.collection-field__item--grid.collection-field__item--multiple .collection-field__select-button {
+  grid-area: select;
+  grid-row: 2;
+}
+
+.collection-field__item--grid.collection-field__item--multiple .collection-field__remove-btn {
+  grid-area: remove;
+  grid-row: 2;
+}
+
+.collection-field__view-all-btn-container {
+  grid-column: 1 / -1;
+  padding: 0 45px;
+}
+
+.collection-field__items--grid .collection-field__view-all-btn-container {
+  padding: 0;
+}
+
+.collection-field__view-all-btn {
+  width: 100%;
+  margin: 0 auto;
+  padding: 10px 0;
+  background: none;
+  color: var(--boxel-dark);
+  font: var(--boxel-font-sm);
+  border: var(--boxel-border);
+  border-radius: var(--boxel-border-radius);
+  letter-spacing: var(--boxel-lsp-sm);
+  text-align: center;
+}
+
+.collection-field__view-all-btn:hover {
+  cursor: pointer;
+}

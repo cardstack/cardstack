@@ -1,0 +1,59 @@
+<Freestyle::Usage @name="Boxel:OrgTitle">
+  <:description>
+    Shows an organization's title +- logo/icon with some preset styling. See also
+      <LinkTo @query={{hash f=null s="Components" ss="<Boxel::OrgHeader>"}} class="doc-link">
+        Boxel::OrgHeader
+      </LinkTo>
+    which applies some built-in layout concerns.
+  </:description>
+  <:example>
+  <div
+    {{!-- template-lint-disable no-inline-styles --}}
+    style="background-color: var(--boxel-blue)"
+  >
+    <Boxel::OrgTitle
+      @title={{this.title}}
+      @iconURL={{this.iconURL}}
+      style={{css-var
+        boxel-org-title-color=this.color
+        boxel-org-title-logo-size=this.logoSize
+        boxel-org-title-logo-position=this.logoPosition
+      }}
+    />
+  </div>
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="title"
+      @value={{this.title}}
+      @required={{true}}
+      @onInput={{fn (mut this.title)}}
+    />
+    <Args.String
+      @name="iconURL"
+      @value={{this.iconURL}}
+      @onInput={{fn (mut this.iconURL)}}
+    />
+    <Args.String
+      @name="--boxel-org-title-color"
+      @description="color CSS style"
+      @defaultValue="inherit"
+      @value={{this.color}}
+      @onInput={{fn (mut this.color)}}
+    />
+    <Args.String
+      @name="--boxel-org-title-logo-size"
+      @description="background-size CSS style for the icon"
+      @defaultValue="auto 2rem"
+      @value={{this.logoSize}}
+      @onInput={{fn (mut this.logoSize)}}
+    />
+    <Args.String
+      @name="--boxel-org-title-logo-position"
+      @description="background-position CSS style for the icon"
+      @defaultValue="center"
+      @value={{this.logoPosition}}
+      @onInput={{fn (mut this.logoPosition)}}
+    />
+  </:api>
+</Freestyle::Usage>

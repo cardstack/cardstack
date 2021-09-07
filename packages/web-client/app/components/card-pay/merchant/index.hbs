@@ -1,0 +1,28 @@
+<div
+  class={{cn "merchant" merchant--vertical=@vertical}}
+  style={{css-var
+    merchant-logo-background=(or @logoBackground "var(--boxel-blue)")
+    merchant-logo-text-color=(or @logoTextColor "var(--boxel-light)")
+  }}
+  data-test-merchant={{@name}}
+  data-test-merchant-logo-background={{@logoBackground}}
+  data-test-merchant-logo-text-color={{@logoTextColor}}
+  ...attributes
+>
+  {{#if (first-char @name)}}
+    <div class={{cn "merchant__logo" merchant__logo--lg=(eq @size "large")}}>
+      {{first-char @name}}
+    </div>
+  {{/if}}
+  <div>
+    <div class={{cn "merchant__name" merchant__name--lg=(eq @size "large")}}>
+      {{@name}}
+    </div>
+    {{#if @address}}
+      <div class="merchant__address">{{@address}}</div>
+    {{/if}}
+    {{#if @text}}
+      <div class="merchant__text">{{@text}}</div>
+    {{/if}}
+  </div>
+</div>

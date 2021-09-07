@@ -1,0 +1,29 @@
+.action-card__title {
+  font: 700 1.125rem/calc(24 / 18) var(--boxel-font-family);
+  letter-spacing: 0;
+}
+
+.action-card__title--flex {
+  display: flex;
+  align-items: center;
+  flex-flow: row nowrap;
+}
+
+.action-card__title-content {
+  flex-grow: 1;
+}
+
+.action-card__title-icon {
+  margin-right: var(--boxel-sp-sm);
+  flex-shrink: 0;
+}
+
+.action-card__title-img {
+  display: inline-block;
+  width: 3.125rem;
+  height: 3.125rem;
+  margin-left: var(--boxel-sp-sm);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}

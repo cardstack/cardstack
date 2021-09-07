@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "es6",
+    "moduleResolution": "Node",
+    "declaration": true,
+    "typeRoots": ["node_modules/@types", "types"],
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "allowUnreachableCode": false,
+    "strict": true,
+    "noUnusedLocals": true,
+    "resolveJsonModule": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "./packages/cardie/**/*.ts",
+    "./packages/cardpay-cli/**/*.ts",
+    "./packages/cardpay-sdk/**/*.ts",
+    "./packages/cardpay-subgraph/**/*.ts",
+    "./packages/did-resolver/**/*.ts",
+    "./packages/eslint-config/**/*.ts",
+    "./packages/firebase-functions/**/*.ts",
+    "./packages/hub/**/*.ts",
+    "./packages/test-support/**/*.ts",
+    "**/.eslintrc.ts"
+  ],
+  "exclude": [
+    "./packages/*/dist",
+    "./packages/*/tmp",
+    "./packages/*/node_modules",
+    "node_modules",
+    "tmp"
+  ]
+}

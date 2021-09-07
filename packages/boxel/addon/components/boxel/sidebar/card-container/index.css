@@ -1,0 +1,70 @@
+.boxel-sidebar-card-container {
+  --boxel-sidebar-card-container-max-width: 15rem; /* 240px */
+
+  background-color: var(--boxel-light);
+  border-radius: var(--boxel-border-radius);
+  padding: var(--boxel-sp);
+  max-width: var(--boxel-sidebar-card-container-max-width);
+  position: relative;
+  z-index: 0;
+}
+
+.boxel-sidebar-card-container::before {
+  content: "";
+  border-radius: var(--boxel-border-radius);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
+  box-shadow: var(--boxel-box-shadow);
+}
+
+.boxel-sidebar-card-container > * + * {
+  margin-top: var(--boxel-sp);
+}
+
+.boxel-sidebar-card-container__header {
+  color: var(--boxel-purple-400);
+  font: var(--boxel-font-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.boxel-sidebar-card-container__content > * + * {
+  margin-top: var(--boxel-sp-sm);
+}
+
+.boxel-sidebar-card-container + .boxel-sidebar-card-container:last-of-type::after {
+  /* This adds additional padding on the last container of the group.
+     Using the Sidebar Section component can help with the grouping. */
+  display: block;
+  content: "";
+  padding-bottom: var(--boxel-sp-xs);
+}
+
+/* Combining multiple card containers */
+.boxel-sidebar-card-container--attach-next {
+  border-bottom: none;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.boxel-sidebar-card-container--attach-next::before {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.boxel-sidebar-card-container--attach-next + .boxel-sidebar-card-container {
+  border-top: 1px solid var(--boxel-light-400);
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  margin-top: 0;
+}
+
+.boxel-sidebar-card-container--attach-next + .boxel-sidebar-card-container::before {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}

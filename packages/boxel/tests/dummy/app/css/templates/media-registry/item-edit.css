@@ -1,0 +1,46 @@
+/* Sticky header */
+.item-edit__sticky-header {
+  position: sticky;
+  top: 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 5px 20px;
+  padding: 20px 30px 20px 40px;
+  background-color: var(--boxel-light);
+  border-bottom: 1px solid var(--boxel-light-600);
+  border-radius: 10px 10px 0 0;
+  min-width: 415px;
+}
+
+/* Body scroll container */
+.item-edit__scroll-container {
+  height: calc(100vh - 90px - 30px);
+  padding-bottom: 30px;
+  overflow: auto;
+}
+
+/* Body container with bg */
+.item-edit__body-plate {
+  background-color: var(--boxel-light);
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+}
+
+.item-edit__title {
+  color: var(--boxel-purple-700);
+  font: var(--boxel-font-lg);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.item-edit__description {
+  color: var(--boxel-purple-700);
+  font: var(--boxel-font-sm);
+  font-weight: 400;
+  letter-spacing: var(--boxel-lsp);
+}
+
+.item-edit__title + .item-edit__description {
+  margin-top: 5px;
+}

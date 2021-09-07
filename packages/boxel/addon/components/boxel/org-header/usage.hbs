@@ -1,0 +1,67 @@
+<Freestyle::Usage @name="Boxel:OrgHeader">
+  <:description>
+    Usually shown at the top of a dashboard. See also
+      <LinkTo @query={{hash f=null s="Components" ss="<Boxel::OrgTitle>"}} class="doc-link">
+        Boxel::OrgTitle
+      </LinkTo>
+    which allows you to use just the title + an optional icon.
+  </:description>
+  <:example>
+    <Boxel::OrgHeader
+      @title={{this.title}}
+      @iconURL={{this.iconURL}}
+      style={{css-var
+        boxel-org-header-background-color=this.backgroundColor
+        boxel-org-header-color=this.color
+        boxel-org-header-logo-size=this.logoSize
+        boxel-org-header-logo-position=this.logoPosition
+      }}
+    >
+      More Stuff Here
+    </Boxel::OrgHeader>
+  </:example>
+  <:api as |Args|>
+    <Args.String
+      @name="title"
+      @value={{this.title}}
+      @required={{true}}
+      @onInput={{fn (mut this.title)}}
+    />
+    <Args.String
+      @name="iconURL"
+      @value={{this.iconURL}}
+      @onInput={{fn (mut this.iconURL)}}
+    />
+    <Args.String
+      @name="--boxel-org-header-background-color"
+      @description="background-color CSS style"
+      @defaultValue="inherit"
+      @value={{this.backgroundColor}}
+      @onInput={{fn (mut this.backgroundColor)}}
+    />
+    <Args.String
+      @name="--boxel-org-header-color"
+      @description="color CSS style"
+      @defaultValue="inherit"
+      @value={{this.color}}
+      @onInput={{fn (mut this.color)}}
+    />
+    <Args.String
+      @name="--boxel-org-header-logo-size"
+      @description="background-size CSS style for the icon"
+      @defaultValue="auto 2rem"
+      @value={{this.logoSize}}
+      @onInput={{fn (mut this.logoSize)}}
+    />
+    <Args.String
+      @name="--boxel-org-header-logo-position"
+      @description="background-position CSS style for the icon"
+      @defaultValue="center"
+      @value={{this.logoPosition}}
+      @onInput={{fn (mut this.logoPosition)}}
+    />
+    <Args.Yield
+      @description="Other header content"
+    />
+  </:api>
+</Freestyle::Usage>

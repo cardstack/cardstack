@@ -6,31 +6,80 @@
   "author": "Edward Faulkner <edward@eaf4.com>",
   "license": "MIT",
   "engines": {
-    "node": ">= 14"
+    "node": "^14.0.0"
   },
-  "private": true,
+  "dependencies": {
+    "@actions/core": "^1.2.6",
+    "@actions/github": "^4.0.0",
+    "@types/node": "14.14.35",
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/parser": "^4.18.0",
+    "babel-eslint": "^10.1.0",
+    "ember-template-lint": "^3.1.1",
+    "eslint": "^7.22.0",
+    "eslint-plugin-ember": "^10.2.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-mocha": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "glob": "^7.1.6",
+    "lerna": "4.0.0",
+    "prettier": "^2.2.1",
+    "start-server-and-test": "^1.12.0",
+    "typescript": "4.2.3"
+  },
   "scripts": {
-    "rm_node_modules": "find . -name node_modules -type d -prune -exec rm -rf {} +",
-    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
+    "clean": "git clean -x -f --exclude=packages/*/.env",
+    "compile": "yarn codegen:subgraph-sokol && tsc --build ./tsconfig.json",
+    "prepare": "npm run compile",
+    "codegen:subgraph-sokol": "cd ./packages/cardpay-subgraph && yarn codegen-sokol",
+    "codegen:subgraph-xdai": "cd ./packages/cardpay-subgraph && yarn codegen-xdai",
+    "build:subgraph": "cd ./packages/cardpay-subgraph && yarn build",
+    "lint": "yarn compile && npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:cardhost": "cd packages/cardhost && yarn lint",
     "lint:compiler-server": "cd packages/compiler-server && yarn lint",
-    "lint:core": "cd packages/core && yarn lint"
-  },
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ],
-    "nohoist": [
-      "**/@ember/string",
-      "**/@glimmer/util",
-      "wrap-legacy-hbs-plugin-if-needed/@glimmer/reference",
-      "ember-template-recast/@glimmer/reference",
-      "**/@glimmer/runtime"
-    ]
+    "lint:core": "cd packages/core && yarn lint",
+    "lint:css:web-client": "cd packages/web-client && yarn lint:css",
+    "lint:deps": "node scripts/find-bad-deps.js",
+    "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",
+    "lint:js:pkg": "sh -c 'eslint packages/${0} --cache --ignore-path .gitignore --ext=js,ts'",
+    "lint:hbs": "cd packages/web-client && ember-template-lint .",
+    "start": "WAIT_ON_TIMEOUT=600000 start-server-and-test 'yarn start:web-client' http://localhost:4200 'yarn start:hub'",
+    "start:hub": "cd ./packages/hub && node ./bin/server.ts",
+    "console:hub": "cd packages/hub && node --experimental-repl-await ./bin/console.ts",
+    "start:web-client": "cd packages/web-client && ember serve",
+    "test": "npm-run-all --aggregate-output --continue-on-error --parallel test:*",
+    "test:boxel": "cd packages/boxel && ember test",
+    "test:boxel:try": "cd packages/boxel && ember try:one",
+    "test:did-resolver": "cd packages/did-resolver && yarn test",
+    "test:hub": "cd packages/hub && yarn test",
+    "test:hub:preparedb": "cd packages/hub && node ./bin/setup-test-db.js",
+    "test:web-client": "cd packages/web-client && ember test",
+    "test:web-client:serve": "cd packages/web-client && ember test --serve --no-launch",
+    "deploy:boxel": "cd ./packages/boxel && ember deploy production --verbose",
+    "deploy:boxel:preview": "cd ./packages/boxel && ember deploy s3-preview --verbose",
+    "deploy:web-client:staging": "cd ./packages/web-client && ember deploy staging --verbose",
+    "deploy:web-client:production": "cd ./packages/web-client && ember deploy production --verbose",
+    "deploy:subgraph-local": "cd ./packages/cardpay-subgraph && yarn deploy-local",
+    "deploy:subgraph-sokol-green": "cd ./packages/cardpay-subgraph && yarn deploy-sokol-green",
+    "deploy:subgraph-sokol-blue": "cd ./packages/cardpay-subgraph && yarn deploy-sokol-blue",
+    "deploy:subgraph-xdai-green": "cd ./packages/cardpay-subgraph && yarn deploy-xdai-green",
+    "deploy:subgraph-xdai-blue": "cd ./packages/cardpay-subgraph && yarn deploy-xdai-blue",
+    "status:subgraph-sokol-green": "cd ./packages/cardpay-subgraph && yarn sokol-green-status",
+    "status:subgraph-sokol-blue": "cd ./packages/cardpay-subgraph && yarn sokol-blue-status",
+    "status:subgraph-xdai-green": "cd ./packages/cardpay-subgraph && yarn xdai-green-status",
+    "status:subgraph-xdai-blue": "cd ./packages/cardpay-subgraph && yarn xdai-blue-status"
   },
   "resolutions": {
-    "**/@babel/types": "^7.12.13"
+    "ember-test-selectors": "^5.0.0",
+    "ember-a11y-testing": "4.0.3",
+    "axe-core": "4.1.4"
   },
+  "workspaces": [
+    "packages/**"
+  ],
+  "private": true,
   "volta": {
     "node": "14.17.1",
     "yarn": "1.22.10"

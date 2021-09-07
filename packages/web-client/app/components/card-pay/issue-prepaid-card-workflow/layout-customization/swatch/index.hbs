@@ -1,0 +1,14 @@
+<div
+  class={{cn
+    "layout-customization__swatch"
+    (concat "layout-customization__swatch--" (or @type "background"))
+    (if @squeezed "layout-customization__swatch--squeezed")
+  }}
+  style={{css-var swatch-background=@swatchBackground}}
+>
+  {{#if @blank}}
+    {{svg-jar "background-selection-placeholder" class="layout-customization__swatch-image" role="presentation"}}
+  {{else if @swatchImage}}
+    <img class="layout-customization__swatch-image" src={{@swatchImage}} alt="" role="presentation">
+  {{/if}}
+</div>

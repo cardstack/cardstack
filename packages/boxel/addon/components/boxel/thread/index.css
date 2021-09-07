@@ -1,0 +1,52 @@
+.boxel-thread {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  background-color: var(--boxel-light-300);
+  color: var(--boxel-dark);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.boxel-thread__content-wrapper {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  overflow: hidden;
+}
+
+.boxel-thread__scroll-wrapper {
+  padding-bottom: var(--boxel-sp-lg);
+  overflow-y: auto;
+}
+
+.boxel-thread__scroll-wrapper:focus {
+  outline-color: var(--boxel-outline-color);
+  outline-offset: -1px;
+}
+
+.boxel-thread__scroll-wrapper:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.boxel-thread__content {
+  padding: var(--boxel-sp);
+  padding-left: var(--boxel-sp-xl);
+}
+
+.boxel-thread__content > * + * {
+  margin-top: var(--boxel-sp-xl);
+}
+
+.boxel-thread__sidebar {
+  margin: var(--boxel-sp);
+}
+
+.boxel-thread__sticky-container {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-top-right-radius: inherit;
+  border-top-left-radius: inherit;
+}

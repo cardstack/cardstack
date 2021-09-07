@@ -1,17 +1,62 @@
+// Hassan's testing mnemonic for address 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13
+// "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+// Hassan's testing mnemonic for address 0xb21851B00bd13C008f703A21DFDd292b28A736b3
+// "vicious kiwi join thing voice spice library piano panel weird sense extra"
+// Hassan's testing mnemonic for address 0x5ae158659942D346bd788b17B2307972DAEb6dDd
+// "ribbon nerve ordinary they relief device flame resemble faculty car alarm caught"
+
 {
   // Use IntelliSense to learn about possible Node.js debug attributes.
   // Hover to view descriptions of existing attributes.
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-
-
     {
       "type": "node",
       "request": "launch",
-      "name": "Build cardhost",
+      "name": "Run server",
+      "program": "${workspaceRoot}/packages/hub/bin/server.ts",
+      "cwd": "${workspaceRoot}/packages/hub",
+      "console": "integratedTerminal",
+      "env": {
+        "SERVER_SECRET":"",
+        "WYRE_ACCOUNT_ID": "",
+        "WYRE_API_KEY": "",
+        "WYRE_SECRET_KEY": ""
+      }
+    },
+    {
+      "name": "Ember test browser",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:7357",
+      "webRoot": "${workspaceFolder}/packages/data/tests/dummy"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Node tests",
+      "program": "${workspaceRoot}/node_modules/.bin/_mocha",
+      "cwd": "${workspaceRoot}/packages/hub",
+      "console": "integratedTerminal",
+      "env": {
+        "PACKAGE": "hub",
+        "NODE_ENV": "test"
+      },
+      "args": [
+        "-r",
+        "esm",
+        "../test-support/bin/run.js",
+        "--timeout",
+        "600000"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Build web-client",
       "program": "${workspaceFolder}/node_modules/.bin/ember",
-      "cwd": "${workspaceRoot}/cardhost",
+      "cwd": "${workspaceRoot}/packages/web-client",
       "args": ["b"],
       "env": {
         "JOBS": "1"
@@ -19,64 +64,435 @@
       "outputCapture": "std"
     },
     {
-      "command": "yarn test:ember",
-      "name": "Cardhost: yarn test:ember",
-      "request": "launch",
-      "type": "node-terminal",
-      "cwd": "${workspaceRoot}/cardhost",
-    },
-    {
       "type": "node",
       "request": "launch",
-      "name": "Serve cardhost",
-      "program": "${workspaceFolder}/node_modules/.bin/ember",
-      "cwd": "${workspaceRoot}/cardhost",
-      "args": ["s"],
-      "env": {
-        "JOBS": "1"
-      },
-      "outputCapture": "std"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Run server",
-      "runtimeArgs": ["--loader",  "ts-node/esm"],
-      "cwd": "${workspaceRoot}/server",
+      "name": "Cardpay testnet: Bridge to Layer 1",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
       "args": [
-        "src/index.ts"
+        "bridge-to-l1",
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // L2 safe address
+        "10",
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L1 receiver
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Run server tests",
-      "runtimeArgs": ["--loader",  "ts-node/esm"],
-      "cwd": "${workspaceRoot}/server",
+      "name": "Cardpay testnet: Bridge to Layer 2",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
       "args": [
-        "./node_modules/.bin/qunit", "tests/**/*-test.ts"
+        // Kovan CARD Bridge args
+        // "bridge",
+        // "10000",
+        // "0xd6E34821F508e4247Db359CFceE0cb5e8050972a",
+        // "--network", "kovan",
+        // // Hassan's testing mnemonic feel free to use your own
+        // "--mnemonic", "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+
+        // Kovan DAI Bridge args
+        "bridge-to-l2",
+        "10",
+        "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", // Kovan DAI
+        "--network",
+        "kovan",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
       ]
     },
     {
-      "command": "yarn test:node",
-      "name": "Core: yarn run test:node",
+      "type": "node",
       "request": "launch",
-      "type": "node-terminal",
-      "cwd": "${workspaceRoot}/core",
+      "name": "Cardpay testnet: Wait for Bridge to Layer 2",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "await-bridged-to-l2",
+        "21746764", // from block
+        "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // recipient (depot safe owner)
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
     },
     {
-      "command": "yarn test",
-      "name": "Server: yarn test",
+      "type": "node",
       "request": "launch",
-      "type": "node-terminal",
-      "cwd": "${workspaceRoot}/server",
+      "name": "Cardpay testnet: Wait for Bridge Validators",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "await-bridged-to-l1",
+        "22144982", // from block
+        "0x7ccf62e3f83186c695a4a6e54febff97856eef99be8c5a26aaad8bb58f2e99ae", // txn hash
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
     },
     {
-      "command": "yarn start",
-      "name": "Server: yarn start",
+      "type": "node",
       "request": "launch",
-      "type": "node-terminal",
-      "cwd": "${workspaceRoot}/server",
+      "name": "Cardpay testnet: Claim Layer 1 Tokens",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "claim-tokens-bridged-to-l1",
+        "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000abb", // messageId
+        // encodedData
+        "0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000abb16a80598dd2f143cfbf091638ce3fb02c9135528366b4cc64d30849568af65522de3a68ea6cc78ce001e84800101004d2a125e4cfb0000000000000000000000004f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa0000000000000000000000002f58630ca445ab1a6de2bb9892aa2e1d60876c130000000000000000000000000000000000000000000000008ac7230489e80000",
+        // signatures (add each signature as a separate command line arg)
+        "0x6cf76b8f7abc547f6fe6e4eff5cfbc82d9ee90e399a29de5f861c9b46b108a8f3b2da2c4736617d15a424e4ee02c6d5274f94c3c29a170ce6a9a42bcd90482511b",
+        "--network",
+        "kovan",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: View Safes",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "safes-view",
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: View Safe",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "safe-view",
+        "--network",
+        "sokol",
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // safe to view
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Transfer Tokens from Safe",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "safe-transfer-tokens",
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // source safe address
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "0x09FBEDDc5f94fA2713CDa75A68457cA8A4527adf", // destination addrress
+        "100", // amount (in ether units)
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Gas Estimate for Transfer Tokens from Safe",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "safe-transfer-tokens-gas-estimate",
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // source safe address
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "0x09FBEDDc5f94fA2713CDa75A68457cA8A4527adf", // destination addrress
+        "5", // amount (in ether units)
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Create Prepaid Card",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "prepaidcard-create",
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot safe feel free to use your own
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "",
+        "500",
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Split Prepaid Card",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "prepaidcard-split",
+        "0xe732F27E31e8e0A17c5069Af7cDF277bA7E6Eff5", // prepaid card address
+        "", // customization DID
+        "100", // face values
+        "100", // face values
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Transfer Prepaid Card",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "prepaidcard-transfer",
+        "0x494C18D80C822f81129bBdaF0bfa70D7E1387F9F", // prepaid card address
+        "0xb21851B00bd13C008f703A21DFDd292b28A736b3", // new owner
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Register New Merchant",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "register-merchant",
+        "0xb51C321b30a173Fd160Ddc21DEa46f91a75E24a4", // Hassan's prepaid card --feel free to use your own
+        "",
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Pay Merchant",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "pay-merchant",
+        "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "0x673Fd582FED2CD8201d58552B912F0D1DaA37bB2", // Hassan's prepaid card --feel free to use your own
+        "200",
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: View Merchant Revenue",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "revenue-balances",
+        "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Claim Merchant Revenue",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "claim-revenue",
+        "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "5",
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Claim Merchant Revenue Gas Estimate",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "claim-revenue-gas-estimate",
+        "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "1",
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Price for face value",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "price-for-face-value",
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "10000",
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: New prepaid card gas fee",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "new-prepaidcard-gas-fee",
+        "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: USD Price",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "usd-price",
+        "DAI",
+        "5",
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: ETH Price",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "eth-price",
+        "DAI",
+        "100",
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Oracle Update Time",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "price-oracle-updated-at",
+        "DAI",
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: View Reward Balances",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "reward-balances",
+        "0x159ADe032073d930E85f95AbBAB9995110c43C71", // Justin's address
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    }
   ]
 }

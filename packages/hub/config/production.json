@@ -1,0 +1,11 @@
+{
+  "aws": {
+    "accountId": "120317779495"
+  },
+  "sentry": {
+    "enabled": true
+  },
+  "wyre": {
+    "url": "https://api.sendwyre.com"
+  }
+}

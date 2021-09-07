@@ -1,0 +1,31 @@
+.boxel {
+  position: relative;
+}
+
+/* for ember animated */
+.boxel-animated-orphans {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.animated-tools {
+  z-index: 100;
+}
+
+/* for ember-toolbars */
+.ember-toolbars {
+  height: 100%;
+}
+
+.media-registry h1,
+.media-registry h2,
+.media-registry h3,
+.media-registry h4 {
+  margin: 0;
+}
+
+.media-registry ul {
+  list-style-type: none;
+  margin: 0;
+}

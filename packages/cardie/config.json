@@ -1,0 +1,17 @@
+{
+  "prefix": "!",
+  "allowedGuilds": ["584043165066199050"],
+  "deploy": {
+    "default": {
+      "environment": "production",
+      "ref": "main"
+    },
+    "allowedChannels": ["866667164764471346"],
+    "allowedRoles": ["Engineering Team", "Cardstack Core Team"]
+  },
+  "github": {
+    "owner": "cardstack",
+    "repo": "cardstack",
+    "default_branch": "main"
+  }
+}

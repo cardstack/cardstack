@@ -1,0 +1,19 @@
+.action-card-section {
+  --nested-section-padding: 0;
+
+  padding: var(--boxel-sp-xxl) var(--boxel-sp-lg);
+}
+
+.action-card-section > * + * {
+  margin-top: var(--boxel-sp-xxl);
+}
+
+.action-card-section > .action-card-section {
+  padding: var(--nested-section-padding);
+}
+
+.action-card-section + .action-card-section {
+  border-top: 1px solid var(--boxel-light-300);
+  margin-top: var(--boxel-sp-xl);
+  padding-top: var(--boxel-sp-xl);
+}

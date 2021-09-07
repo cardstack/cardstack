@@ -23,3 +23,238 @@ jobs:
             ${{ runner.os }}-yarn-
       - run: yarn --prefer-offline
       - run: yarn lint
+
+  test_all_but_web_client:
+    name: hub, did-resolver Build/Test
+    needs: lint
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          -v /var/run/postgresql/:/var/run/postgresql
+    steps:
+      - name: Create database
+        run: sudo -u postgres createdb hub_test
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn --prefer-offline
+      - run: yarn test:hub:preparedb
+      - run: yarn run npm-run-all --aggregate-output --continue-on-error --parallel test:did-resolver test:hub
+
+  test_boxel_and_web_client:
+    name: web-client Build/Lint/Test
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn --prefer-offline
+      - run: yarn test:boxel
+      - run: yarn test:web-client
+
+  change_check:
+    name: Check which packages changed
+    needs: [test_all_but_web_client, test_boxel_and_web_client]
+    runs-on: ubuntu-latest
+    outputs:
+      hub: ${{ steps.filter.outputs.hub }}
+      web_client: ${{ steps.filter.outputs.web_client }}
+      boxel: ${{ steps.filter.outputs.boxel }}
+      cardie: ${{ steps.filter.outputs.cardie }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            hub:
+              - 'packages/hub/**'
+              - 'packages/did-resolver/**'
+            web_client:
+              - 'packages/web-client/**'
+              - 'packages/boxel/**'
+              - 'packages/cardpay-sdk/**'
+              - 'packages/did-resolver/**'
+            boxel:
+              - 'packages/boxel/**'
+            cardie:
+              - 'packages/cardie/**'
+
+  deploy-hub-staging:
+    name: Deploy hub to staging cluster via waypoint
+    needs: change_check
+    if: ${{ needs.change_check.outputs.hub == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Install apt packages including waypoint
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get install awscli waypoint
+      - name: Configure waypoint client
+        run: waypoint context create -server-addr=${{ secrets.WAYPOINT_SERVER_ADDR }} -server-auth-token=${{ secrets.WAYPOINT_AUTH_TOKEN }} -server-tls=true -server-tls-skip-verify=true -set-default -server-require-auth waypoint-staging
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn --prefer-offline
+      - name: Deploy hub
+        run: waypoint up --app=hub -plain
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.WAYPOINT_AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.WAYPOINT_AWS_SECRET }}
+          AWS_DEFAULT_REGION: us-east-1
+      - name: Deploy hub worker
+        run: waypoint up --app=hub-worker -prune-retain=0 -plain
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.WAYPOINT_AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.WAYPOINT_AWS_SECRET }}
+          AWS_DEFAULT_REGION: us-east-1
+
+  deploy-web-client-staging:
+    name: Deploy web-client to S3 staging bucket
+    needs: change_check
+    if: ${{ needs.change_check.outputs.web_client == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn --prefer-offline
+      - name: Run ember-cli-deploy
+        run: yarn deploy:web-client:staging
+        env:
+          SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
+          EMBER_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}
+          EMBER_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}
+          HUB_URL: https://hub-staging.stack.cards
+      - name: Get current lerna version
+        id: lerna-version
+        uses: saulonunesdev/lerna-get-version-action@v1.0.4
+      - name: Create decompressed copies of assets for Sentry
+        shell: bash
+        run: |
+          cd packages/web-client/tmp
+          mkdir -p deploy-dist-uncompressed/assets
+          cd deploy-dist/assets
+          echo *.js *.map | tr ' ' '\n' | xargs -n1 -I{} cp "{}" "../../deploy-dist-uncompressed/assets/{}.br"
+          cd ../../deploy-dist-uncompressed/assets
+          brotli --rm --decompress *.br
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: cardstack
+          SENTRY_PROJECT: web-client
+        with:
+          environment: staging
+          ignore_empty: true
+          ignore_missing: true
+          sourcemaps: packages/web-client/tmp/deploy-dist-uncompressed
+          version: web-client-${{ github.sha }}@${{ steps.lerna-version.outputs.lerna-version }}
+          url_prefix: https://app-staging.stack.cards
+
+  deploy-boxel:
+    name: Deploy boxel to S3 bucket
+    needs: change_check
+    if: ${{ needs.change_check.outputs.boxel == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn --prefer-offline
+      - name: Deploy preview
+        run: yarn deploy:boxel
+        env:
+          S3_PREVIEW_INDEX_BUCKET_NAME: boxel-preview.cardstack.com
+          S3_PREVIEW_ASSET_BUCKET_NAME: boxel-preview-assets.cardstack.com
+          S3_PREVIEW_ASSET_BUCKET_ENDPOINT: https://s3.us-east-1.amazonaws.com/boxel-preview-assets.cardstack.com
+          S3_PREVIEW_REGION: us-east-1
+          PREVIEW_DEPLOY_AWS_ACCESS_KEY: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_KEY }}
+          PREVIEW_DEPLOY_AWS_ACCESS_SECRET: ${{ secrets.PREVIEW_DEPLOY_AWS_ACCESS_SECRET }}
+
+  deploy-cardie:
+    name: Deploy cardie via waypoint
+    needs: change_check
+    if: ${{ needs.change_check.outputs.cardie == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install apt packages including waypoint
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get install awscli waypoint
+      - name: Configure waypoint client
+        run: waypoint context create -server-addr=${{ secrets.WAYPOINT_SERVER_ADDR }} -server-auth-token=${{ secrets.WAYPOINT_AUTH_TOKEN }} -server-tls=true -server-tls-skip-verify=true -set-default -server-require-auth waypoint-staging
+      - uses: volta-cli/action@v1
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn --prefer-offline
+      - name: Deploy cardie
+        run: waypoint up --app=cardie -prune-retain=0 -plain
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.WAYPOINT_AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.WAYPOINT_AWS_SECRET }}
+          AWS_DEFAULT_REGION: us-east-1

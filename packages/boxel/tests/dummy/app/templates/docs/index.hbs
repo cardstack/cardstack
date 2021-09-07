@@ -1,0 +1,16 @@
+{{page-title "Boxel Components"}}
+
+<h1 class="boxel-sr-only">Boxel Components Documentation</h1>
+
+<FreestyleGuide
+  @title="Boxel Components"
+  @subtitle="Living Component Documentation"
+>
+  <FreestyleSection @name="Components" class="freestyle-components-section" as |Section|>
+    {{#each this.usageComponents as |componentName|}}
+      <Section.subsection @name={{format-component-name componentName}}>
+        {{component (concat componentName "/usage")}}
+      </Section.subsection>
+    {{/each}}
+  </FreestyleSection>
+</FreestyleGuide>

@@ -1,0 +1,14 @@
+<button
+  class={{cn
+    "boxel-select-button"
+    @class
+    (concat "boxel-select-button--" @mode)
+    boxel-select-button--partial=(and @isPartial (not @isSelected))
+    boxel-select-button--selected=@isSelected
+  }}
+  aria-label={{if @isSelected "selected" "select"}}
+  data-test-boxel-select-button
+  ...attributes
+>
+  {{svg-jar "icon-circle-selected" width="16px" height="16px"}}
+</button>

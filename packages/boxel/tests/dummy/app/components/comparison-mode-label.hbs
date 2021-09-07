@@ -1,0 +1,25 @@
+{{#if (eq @comparisonType "comp")}}
+  {{#if @status}}
+    {{#if @statusText}}
+      {{@statusText}}
+    {{else if (eq @status "modified")}}
+      Different data <span>{{@modifiedCount}}</span>
+    {{else if (eq @status "added")}}
+      Additional data
+    {{else if (eq @status "no-change")}}
+      Same data
+    {{else}}
+      {{@status}}
+    {{/if}}
+  {{else}}
+    Same data
+  {{/if}}
+{{else}}
+  {{#if @status}}
+    {{#if (eq @status "modified")}}
+      Modified data <span>{{@modifiedCount}}</span>
+    {{else if (eq @status "added")}}
+      Added data
+    {{/if}}
+  {{/if}}
+{{/if}}

@@ -1,0 +1,201 @@
+<Freestyle::Usage @name="ThreadMessage">
+  <:example>
+    <Boxel::ThreadMessage
+      @name={{this.name}}
+      @imgURL={{this.imgURL}}
+      @datetime={{this.datetime}}
+      @notRound={{this.notRound}}
+      @hideMeta={{this.hideMeta}}
+      @hideName={{this.hideName}}
+      @fullWidth={{this.fullWidth}}
+    >
+      Hi Haley, Here’s your manuscript with all the edits I would recommend. Please review and let me know if you have any questions. I also added a couple tasks for you about things you should think about, as you figure out the rest of your story.
+    </Boxel::ThreadMessage>
+  </:example>
+  <:api as |Args|>
+    <Args.Yield
+      @description="Message content"
+      @required={{true}}
+    />
+    <Args.String
+      @name="name"
+      @description="The name displayed above the message"
+      @value={{this.name}}
+      @onInput={{fn (mut this.name)}}
+      @required={{true}}
+    />
+    <Args.String
+      @name="imgURL"
+      @description="URL for the user avatar"
+      @value={{this.imgURL}}
+      @onInput={{fn (mut this.imgURL)}}
+    />
+    <Args.String
+      @name="datetime"
+      @description="Message timestamp"
+      @defaultValue="(now)"
+      @value={{this.datetime}}
+      @onInput={{fn (mut this.datetime)}}
+    />
+    <Args.Bool
+      @name="notRound"
+      @value={{this.notRound}}
+      @description="Avatar is not circle-shaped. This will only work if an `imgURL` arg is provided"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.notRound)}}
+    />
+    <Args.Bool
+      @name="hideMeta"
+      @value={{this.hideMeta}}
+      @description="Visually hides the user avatar, name, and message timestamp"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.hideMeta)}}
+    />
+    <Args.Bool
+      @name="hideName"
+      @value={{this.hideName}}
+      @description="Visually hides the user name"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.hideName)}}
+    />
+    <Args.Bool
+      @name="fullWidth"
+      @value={{this.fullWidth}}
+      @description="Whether to allocate the full width to the content"
+      @defaultValue={{false}}
+      @onInput={{fn (mut this.fullWidth)}}
+    />
+  </:api>
+</Freestyle::Usage>
+
+<Freestyle::Usage
+  @slug="ThreadMessage-array"
+>
+  <:example>
+    <div role="list">
+      {{#each this.messageArray as |message i|}}
+        <Boxel::ThreadMessage
+          role="listitem"
+          @name="Cardbot"
+          @imgURL={{this.cardbotIcon}}
+          @hideMeta={{gt i 0}}
+          @hideName={{true}}
+        >
+          {{message}}
+        </Boxel::ThreadMessage>
+      {{/each}}
+    </div>
+  </:example>
+</Freestyle::Usage>
+
+<Freestyle::Usage
+  @slug="with-cards"
+>
+  <:description>
+    <p>
+      The examples with embedded cards below are using the <code>@fullWidth</code> argument to
+      have access to the full-width content area. Smaller cards have a left margin the size of
+      <code>var(--boxel-thread-message-margin-left)</code> css variable for alignment.
+    </p>
+    <p>
+      Using the <code>@fullWidth</code> argument:
+      <ul>
+        <li>Allows the content to have access to the full-width content area</li>
+        <li>Adds spacing between the timestamp and the content</li>
+        <li>Vertically centers the timestamp in relation to the avatar</li>
+      </ul>
+    </p>
+    <p>
+      (Note: The messages below also have custom css applied which restricts their max-width. See <code>usage.css</code> file.)
+    </p>
+  </:description>
+  <:example>
+    <div class="thread-message-usage">
+      <Boxel::ThreadMessage
+        @name="Cardbot"
+        @hideName={{true}}
+        @imgURL={{this.cardbotIcon}}
+      >
+        <p class="thread-message-usage__content">
+          Hello, it’s nice to see you!
+        </p>
+      </Boxel::ThreadMessage>
+      <Boxel::ThreadMessage
+        @name="Cardbot"
+        @hideName={{true}}
+        @hideMeta={{true}}
+        @imgURL={{this.cardbotIcon}}
+      >
+        <p class="thread-message-usage__content">
+          Let’s issue a Prepaid Card.
+        </p>
+      </Boxel::ThreadMessage>
+      <Boxel::ThreadMessage
+        @name="Cardbot"
+        @hideName={{true}}
+        @imgURL={{this.cardbotIcon}}
+      >
+        <p class="thread-message-usage__content">
+          Let’s get down to business. Please choose the asset you would like
+          to deposit into the CARD Protocol’s reserve pool.
+        </p>
+      </Boxel::ThreadMessage>
+      <Boxel::ThreadMessage
+        @name="Cardbot"
+        @hideName={{true}}
+        @hideMeta={{true}}
+        @imgURL={{this.cardbotIcon}}
+        @fullWidth={{true}}
+      >
+        <Boxel::CardContainer
+          class={{cn
+            "thread-message-usage__card"
+            thread-message-usage__card--memorialized=this.isComplete
+          }}
+        >
+          <Boxel::Header @header="Card 1" />
+          <p>Card 1 Content...</p>
+          <Boxel::ActionChin
+            @mode={{if this.isComplete "memorialized" "data-entry"}}
+            @buttonText="Click to toggle card width"
+            @onClickButton={{this.toggleIsComplete}}
+          />
+        </Boxel::CardContainer>
+      </Boxel::ThreadMessage>
+      <Boxel::ThreadMessage
+        @name="Cardbot"
+        @hideName={{true}}
+        @imgURL={{this.cardbotIcon}}
+        @fullWidth={{true}}
+      >
+        <Boxel::CardContainer
+          class="thread-message-usage__card thread-message-usage__card--memorialized"
+        >
+          <Boxel::Header @header="Card 2" />
+          <p>Card 2 Content...</p>
+        </Boxel::CardContainer>
+      </Boxel::ThreadMessage>
+      <Boxel::ThreadMessage
+        @name="Cardbot"
+        @hideName={{true}}
+        @imgURL={{this.cardbotIcon}}
+        @fullWidth={{true}}
+      >
+        <Boxel::CardContainer
+          class={{cn
+            "thread-message-usage__card"
+            thread-message-usage__card--memorialized=this.layoutExampleFullWidth
+          }}
+        >
+          <Boxel::Header @header="Card 3" />
+          <p>Card 3 Content...</p>
+          <Boxel::ActionChin
+            @mode={{if this.layoutExampleFullWidth "memorialized" "data-entry"}}
+            @buttonText="Click to toggle card width"
+            @onClickButton={{this.toggleLayoutExampleFullWidth}}
+          />
+        </Boxel::CardContainer>
+      </Boxel::ThreadMessage>
+    </div>
+  </:example>
+</Freestyle::Usage>

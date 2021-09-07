@@ -1,0 +1,7 @@
+{{#if @status}}
+  <div class="boxel-highlight boxel-highlight--{{@status}}" ...attributes />
+{{else if @expandAction}}
+  <button {{on "click" @expandAction}} class="boxel-highlight {{@class}} {{if @on "boxel-highlight--on"}}" ...attributes />
+{{else}}
+  <div class="boxel-highlight {{@class}} {{if @on "boxel-highlight--on"}}" ...attributes />
+{{/if}}

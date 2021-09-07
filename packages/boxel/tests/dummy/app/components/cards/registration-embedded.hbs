@@ -1,0 +1,11 @@
+{{#if this.registrationEmbedded}}
+  <Card
+    @mode="view"
+    @model={{this.registrationEmbedded}}
+    @status={{if @status "no-change"}}
+    @statusText={{if @status "Specific to this version"}}
+    @comparisonType={{@comparisonType}}
+  />
+{{else}}
+  N/A
+{{/if}}

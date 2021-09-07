@@ -1,0 +1,34 @@
+<section class="media-detail-section media-detail-section--{{@mode}}">
+  {{#if @title}}
+    <h3 class="media-detail-section__title">{{@title}}</h3>
+  {{/if}}
+  <div class="media-detail-section__contents">
+    {{#if (is-array @fields)}}
+      {{#each @fields as |field|}}
+        <Boxel::FieldRenderer
+          @mode={{@mode}}
+          @field={{field}}
+          @expandAction={{@expandAction}}
+        />
+      {{/each}}
+    {{else}}
+      {{#each-in @fields as |title field|}}
+        <Boxel::FieldRenderer
+          @mode={{@mode}}
+          @field={{hash title=title value=(or field.value field) type=(if (eq title "album_art") "image" field.type) component=field.component}}
+          @comparisonMode={{@comparisonMode}}
+          @addedFields={{@addedFields}}
+          @addedValues={{@addedValues}}
+          @changedFields={{@changedFields}}
+          @removedFields={{@removedFields}}
+          @removedValues={{@removedValues}}
+          @addedCards={{@addedCards}}
+          @removedCards={{@removedCards}}
+          @changedCards={{@changedCards}}
+          @modifiedCard={{@modifiedCard}}
+          @expandAction={{@expandAction}}
+        />
+      {{/each-in}}
+    {{/if}}
+  </div>
+</section>

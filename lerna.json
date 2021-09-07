@@ -1,0 +1,12 @@
+{
+  "packages": [
+    "packages/**"
+  ],
+  "version": "0.21.5",
+  "npmClient": "yarn",
+  "npmClientArgs": [
+    "--ignore-engines"
+  ],
+  "useWorkspaces": true,
+  "exact": true
+}

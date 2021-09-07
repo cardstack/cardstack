@@ -1,0 +1,561 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+
+dataSources:
+  - kind: ethereum/contract
+    name: PrepaidCard
+    network: {NETWORK}
+    source:
+      address: "{PREPAID_CARD_MANAGER_ADDRESS}"
+      abi: PrepaidCardManager
+      startBlock: {CARDPAY_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - PrepaidCard
+        - PrepaidCardCreation
+        - Transaction
+        - Account
+        - EOATransaction
+      abis:
+        - name: PrepaidCardManager
+          file: ./abis/generated/PrepaidCardManager.json
+        - name: Exchange
+          file: ./abis/generated/Exchange.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: CreatePrepaidCard(address,address,address,address,uint256,uint256,uint256,string)
+          handler: handleCreatePrepaidCard
+        - event: TransferredPrepaidCard(address,address,address)
+          handler: handleTransferPrepaidCard
+      file: ./src/mappings/prepaid-card.ts
+
+  - kind: ethereum/contract
+    name: Merchant
+    network: {NETWORK}
+    source:
+      address: "{MERCHANT_MANAGER_ADDRESS}"
+      abi: MerchantManager
+      startBlock: {v0_7_0_START_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - EOATransaction
+        - Account
+        - MerchantSafe
+        - MerchantCreation
+      abis:
+        - name: MerchantManager
+          file: ./abis/generated/MerchantManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: MerchantCreation(address,address,string)
+          handler: handleMerchantCreation
+      file: ./src/mappings/merchant-manager.ts
+
+  - kind: ethereum/contract
+    name: DeprecatedMerchant
+    network: {NETWORK}
+    source:
+      address: "{DEPRECATED_MERCHANT_MANAGER_v0_6_7_ADDRESS}"
+      abi: DeprecatedMerchantManager_v0_6_7
+      startBlock: {CARDPAY_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - EOATransaction
+        - Account
+        - MerchantSafe
+        - MerchantCreation
+      abis:
+        - name: DeprecatedMerchantManager_v0_6_7
+          file: ./abis/generated/DeprecatedMerchantManager_v0_6_7.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: MerchantCreation(address,address,string)
+          handler: handleMerchantCreation
+      file: ./src/mappings/deprecated/merchant-manager-v0_6_7.ts
+
+  - kind: ethereum/contract
+    name: MerchantRegistration
+    network: {NETWORK}
+    source:
+      address: "{REGISTER_MERCHANT_HANDLER_ADDRESS}"
+      abi: RegisterMerchantHandler
+      startBlock: {CARDPAY_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - EOATransaction
+        - Account
+        - MerchantRegistrationPayment
+        - PrepaidCardPayment
+      abis:
+        - name: RegisterMerchantHandler
+          file: ./abis/generated/RegisterMerchantHandler.json
+        - name: PrepaidCardManager
+          file: ./abis/generated/PrepaidCardManager.json
+        - name: Exchange
+          file: ./abis/generated/Exchange.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: MerchantRegistrationFee(address,address,uint256,uint256)
+          handler: handleMerchantRegistrationFee
+      file: ./src/mappings/merchant-registration.ts
+
+  - kind: ethereum/contract
+    name: Payments
+    network: {NETWORK}
+    source:
+      address: "{PAY_MERCHANT_HANDLER_ADDRESS}"
+      abi: PayMerchantHandler
+      startBlock: {CARDPAY_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - EOATransaction
+        - Account
+        - PrepaidCardPayment
+        - MerchantFeePayment
+        - MerchantRevenue
+        - MerchantRevenueEvent
+      abis:
+        - name: PayMerchantHandler
+          file: ./abis/generated/PayMerchantHandler.json
+        - name: PrepaidCardManager
+          file: ./abis/generated/PrepaidCardManager.json
+        - name: RevenuePool
+          file: ./abis/generated/RevenuePool.json
+        - name: Exchange
+          file: ./abis/generated/Exchange.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: CustomerPayment(address,address,address,uint256,uint256)
+          handler: handleMerchantPayment
+        - event: MerchantFeeCollected(address,address,address,uint256)
+          handler: handleMerchantFee
+      file: ./src/mappings/pay-merchant-handler.ts
+
+  - kind: ethereum/contract
+    name: Splits
+    network: {NETWORK}
+    source:
+      address: "{SPLIT_PREPAID_CARD_HANDLER_ADDRESS}"
+      abi: SplitPrepaidCardHandler
+      startBlock: {CARDPAY_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - EOATransaction
+        - Account
+        - PrepaidCardSplit
+      abis:
+        - name: SplitPrepaidCardHandler
+          file: ./abis/generated/SplitPrepaidCardHandler.json
+        - name: PrepaidCardManager
+          file: ./abis/generated/PrepaidCardManager.json
+        - name: Exchange
+          file: ./abis/generated/Exchange.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: SplitPrepaidCard(address,uint256[],uint256[],address,address,string)
+          handler: handlePrepaidCardSplit
+      file: ./src/mappings/split-prepaid-card-handler.ts
+
+  - kind: ethereum/contract
+    name: RevenuePool
+    network: {NETWORK}
+    source:
+      address: "{REVENUE_POOL_ADDRESS}"
+      abi: RevenuePool
+      startBlock: {CARDPAY_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - EOATransaction
+        - Account
+        - MerchantRevenue
+        - MerchantClaim
+        - MerchantRevenueEvent
+      abis:
+        - name: RevenuePool
+          file: ./abis/generated/RevenuePool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: MerchantClaim(address,address,uint256)
+          handler: handleMerchantClaim
+      file: ./src/mappings/revenue-pool.ts
+
+  - kind: ethereum/contract
+    name: Spend
+    network: {NETWORK}
+    source:
+      address: "{SPEND_ADDRESS}"
+      abi: Spend
+      startBlock: {CARDPAY_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Transaction
+        - EOATransaction
+        - Account
+        - SpendAccumulation
+      abis:
+        - name: Spend
+          file: ./abis/generated/Spend.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: Mint(address,uint256)
+          handler: handleMint
+      file: ./src/mappings/spend.ts
+
+  - kind: ethereum/contract
+    name: Depot
+    network: {NETWORK}
+    source:
+      address: "{SUPPLIER_MANAGER_ADDRESS}"
+      abi: SupplierManager
+      startBlock: {CARDPAY_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Safe
+        - Depot
+        - Transaction
+        - EOATransaction
+        - Account
+      abis:
+        - name: SupplierManager
+          file: ./abis/generated/SupplierManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: SupplierSafeCreated(address,address)
+          handler: handleCreateDepot
+        - event: SupplierInfoDIDUpdated(address,string)
+          handler: handleSetInfoDID
+      file: ./src/mappings/depot.ts
+
+  - kind: ethereum/contract
+    name: TokenBridge
+    network: {NETWORK}
+    source:
+      address: "{HOME_TOKEN_BRIDGE_ADDRESS}"
+      abi: HomeMultiAMBErc20ToErc677
+      startBlock: {CARDPAY_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Account
+        - Depot
+        - Transaction
+        - SupplierInfoDIDUpdate
+        - BridgeEvent
+        - EOATransaction
+        - Account
+      abis:
+        - name: HomeMultiAMBErc20ToErc677
+          file: ./abis/HomeMultiAMBErc20ToErc677.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: TokensBridgedToSafe(indexed address,indexed address,address,uint256,indexed bytes32)
+          handler: handleReceivedBridgedTokens
+        - event: TokensBridgingInitiated(indexed address,indexed address,uint256,indexed bytes32)
+          handler: handleSentBridgedTokens
+      file: ./src/mappings/depot.ts
+
+  - kind: ethereum/contract
+    name: Gnosis
+    network: {NETWORK}
+    source:
+      address: "0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B"
+      abi: GnosisProxyFactory
+      startBlock: {SAFE_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Safe
+        - Account
+        - SafeOwner
+      abis:
+        - name: GnosisProxyFactory
+          file: ./abis/GnosisProxyFactory.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: ProxyCreation(address)
+          handler: handleProxyCreation
+      file: ./src/mappings/gnosis-proxy-factory.ts
+
+  - kind: ethereum/contract
+    name: UniswapFactory
+    network: {NETWORK}
+    source:
+      address: "{UNISWAP_V2_FACTORY_ADDRESS}"
+      abi: UniswapV2Factory
+      startBlock: {UNISWAP_V2_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      file: ./src/mappings/uniswap-factory-{NETWORK}.ts
+      entities:
+        - Token
+        - TokenPair
+        - Transaction
+        - EOATransaction
+        - Account
+      abis:
+        - name: UniswapV2Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handleNewPair
+
+  ## CPXD TOKENS: perhaps think about a way to script this list being generated
+  ## so we don't need to add a block for each token
+
+  - kind: ethereum/contract
+    name: DaiToken
+    network: {NETWORK}
+    source:
+      address: "{DAI_CPXD_ADDRESS}"
+      abi: ERC20
+      startBlock: {TOKEN_START_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Account
+        - TokenHolder
+        - TokenTransfer
+        - TokenHistory
+        - Transaction
+        - EOATransaction
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/token.ts
+
+  - kind: ethereum/contract
+    name: CardToken
+    network: {NETWORK}
+    source:
+      address: "{CARD_CPXD_ADDRESS}"
+      abi: ERC20
+      startBlock: {TOKEN_START_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Account
+        - TokenHolder
+        - TokenTransfer
+        - TokenHistory
+        - Transaction
+        - EOATransaction
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/token.ts
+
+
+templates:
+  - kind: ethereum/contract
+    name: GnosisSafe
+    network: {NETWORK}
+    source:
+      abi: GnosisSafe
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - SafeTransaction
+        - Transaction
+        - EOATransaction
+        - Account
+      abis:
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      eventHandlers:
+        - event: ExecutionSuccess(bytes32,uint256)
+          handler: handleExecutionSuccess
+        - event: AddedOwner(address)
+          handler: handleAddedOwner
+        - event: RemovedOwner(address)
+          handler: handleRemovedOwner
+      file: ./src/mappings/gnosis-safe.ts
+
+  - kind: ethereum/contract
+    name: UniswapV2Pair
+    network: {NETWORK}
+    source:
+      abi: UniswapV2Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Swap
+        - TokenSwap
+        - Transaction
+        - EOATransaction
+        - Account
+      abis:
+        - name: UniswapV2Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+      file: ./src/mappings/token-pair.ts

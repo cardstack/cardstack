@@ -1,64 +1,91 @@
-# Cardstack
+# Cardstack App Suite
 
-## Warning
+This is the main repo for [Cardstack](https://www.cardstack.com/), an open source application architecture for building cohesive experiences, including payments, on open, decentralized infrastructure.
 
-Currently all embroider packages must be linked to the native-v2-addon branch of embroider.
-
-## Installing
-
-1. Install [volta](https://volta.sh/) and `volta install yarn`.
-2. Clone the repo and run `yarn install`.
-3. Install docker (we use it to launch supporting services like postgres).
+Join the discussion around developing on the Cardstack framework on [Discord](https://discord.gg/apepFje), and read our documentation on [docs.cardstack.com](https://docs.cardstack.com). (Note: documentation refers to [Cardstack v2](https://github.com/cardstack/cardstack/tree/cardstack-v2-eol). The main branch of this respository has in-progress work on v3 of Cardstack.)
 
 ## Orientation
 
-`cardhost`: the Ember app
-`server`: the server ("the hub")
-`core`: shared code that is used by both cardhost and server
-`base-cards`: the collection of framework-provided default cards that serve as the foundation for user-created cards
-`demo-cards`: a collection of demo & test cards
+This is a monorepo. Each directory under `packages` and `cards` is distributed as a standalone NPM package under the `@cardstack` NPM namespace.
+More information is available in the `README.md` within each `package`.
 
-## Architecture
+## Developing and Testing within this Repo
 
-By default, the server will use both the `base-cards` and `demo-cards` directories as read/write realms. Any change you make in the app will appear as (uncommitted) changes to these directories.
+### Local host names
 
-The server maintains its own search index over all the realms it knows about. The search index is stored in postgres.
+Set up `app.cardstack.test` and `app-assets.cardstack.test` to resolve to localhost (127.0.0.1). There are a variety of ways to accomplish this, with the most direct being to [edit your /etc/hosts file](https://linuxize.com/post/how-to-edit-your-hosts-file/).
 
-## Open Questions
+### Hub environment variables
 
-1. Are types really agnostic to value vs reference of their fields? If you could bake one or the other into the type, it makes it easier to write code in the card that touches (particularly for edit) all value data no matter how deep.
+See the [README in the hub package](./packages/hub/README.md) for environment variables that you'll need to setup.
 
-  Setting this at instance-creation time seems too late. It really seems like policy at a higher level.
+### Javascript dependencies & Typescript compilation
 
-  Multiple levels possible:
-    - singular value (body)
-    - plural value (string tags could be this)
-    - singular hand-picked reference (author)
-    - singular query-driven reference (spotlight on the homepage)
-    - plural hand-picked references (tags as actual entities)
-    - plural query-driven references (comments)
+We use `volta` to manage our global javascript dependencies. In this case, specifically, we use it to manage node and yarn. To use it simply install it following the instructions here: https://docs.volta.sh/guide/getting-started
 
-  Are these six the six implementations, or are they also the actual types in the schema, or are some of these actually interchangeable types?
-    - singular vs plural must be part of type
-    - probably value vs reference must be part of type
-    - hand-picked vs query may *not* need to be part of type
+In development, we use `lerna` to manage the inter-dependencies of all the packages. To get started:
 
+ 1. Install node and yarn via volta.
+ 2. `yarn global add lerna` (use >= 2.0.0 for yarn workspaces integration)
+ 3. `lerna bootstrap`
+ 4. Launch the typescript compiler with `yarn compile --watch`
+ 5. Start ember-cli and the hub node server with `yarn start` and/or run tests with `yarn test`
 
-# field API naming
+## Understanding the respositories under the Cardstack organization
 
- - `contains`: singular, value
- - `containsMany`: plural, value
- - `belongsTo`: singular, reference
-   - can hold either query or explicit list of ids
- - `hasMany`: plural, reference
-   - can hold either query or explicit list of ids
+The following summary offers an overview of where development is currently ongoing at Cardstack. (Note: any projects linked below that are not currently public will become public soon.)
 
+[cardstack/card-protocol-xdai](https://github.com/cardstack/card-protocol-xdai)
+- The Layer 2 contracts for the card protocol live here including
+  - PrepaidCardManager contract
+  - RevenuePool contract
+  - L2 Token contract
+  - SPEND token contract
+  - BridgeUtilities contract (facilitates token bridge contract)
 
-# Naming things in our Compiler API
+[cardstack/tokenbridge-contracts](https://github.com/cardstack/tokenbridge-contracts)
+  - The home bridge and foreign bridge token contracts
 
-`schema.js`: the card's Schema Definition
-```ts
-async compile(schemaDefinition, templates): Promise<Model, Component[]>
-```
+https://github.com/cardstack/card-protocol-relay-service
+  - our gnosis relay service, forked to provide additional prepaid card manager
+    API's that support gasless interactions with our PrepaidCardManager contract
 
-`Model`: is the runtime module that you can interrogate about the card's schema and data requirements.
+[cardstack/safe-transaction-service](https://github.com/cardstack/safe-transaction-service)
+  - our gnosis transaction service, this was forked to provide transaction
+    service for Sokol (xDai uses the gnosis hosted transaction service)
+
+[cardstack/cardstack](https://github.com/cardstack/cardstack)
+  - this one! It is our monorepo that contains our CardPay Dapp (as well as eventually
+    cardstack hub runtime). Work on the "card compiler" is also occurring in PRs
+    of this repository. A proof-of-concept for the dapp was developed
+    here: https://github.com/cardstack/card-pay/tree/update-UI-depot
+
+[cardstack/cardwallet](https://github.com/cardstack/cardwallet)
+  - our rainbow wallet fork that supplies our mobile client experience.
+    Currently it is focused around interacting with Layer 1 contracts,
+    eventually we see it as interacting with the Layer2 protocol as well.
+    A proof-of-concept was developed here: https://github.com/cardstack/rainbow/branches
+
+[cardstack/infra](https://github.com/cardstack/infra)
+  - Holds our terraform scripts to provision AWS and cloudflare (and
+    eventually GCP) services for our infrastructure.
+
+[cardstack/boxel](https://github.com/cardstack/boxel)
+  - our web UI component library
+
+[cardstack/catalog-experiment](https://github.com/cardstack/catalog-experiment)
+  - our planned Javascript build tooling and CDN that eliminates the need for running
+    npm/yarn and eliminates the need to maintain a node_modules folder in your web projects
+
+[cardstack/animations-experiment](https://github.com/cardstack/animations-experiment)
+  - proof of concept for an animation library that works well with Ember and meets Boxel's
+    motion needs
+
+## Project-wide Policy and Community Governance
+
+Cardstack follows semantic versioning. As a young, pre-1.0 project, this means you can continue to expect breaking changes in minor releases. Each package should endeavor to include a CHANGELOG.md once it begins to have a non-trivial number of external users.
+
+We intend to adopt a community RFC governance process for public API changes, based on the Rust and Ember projects. At this pre-1.0 stage, RFCs are optional and changes may still be fast and furious.
+
+Cardstack follows the [Ember Community Guidelines](https://emberjs.com/guidelines/), both because we are a proper subset of the existing Ember community and because we wholeheartedly endorse the same values.
+

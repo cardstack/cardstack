@@ -1,2 +1,103 @@
-node_modules
+/node_modules
+/packages/*/node_modules
+/packages/*/dist
+/packages/*/tmp
+/packages/*/vendor
+/packages/web-client/deploy/node_modules
+/packages/web-client/deploy/context
+/packages/web-client/deploy/dist
+/packages/cardpay-subgraph/build
+/packages/cardpay-subgraph/generated
+/packages/*/.env
 .eslintcache
+.vagrant
+.nvmrc
+*.log
+lerna-debug.log
+tmp
+.DS_Store
+package-lock.json
+.embroider-app-path
+
+
+# Needed during incremental conversion to typescript
+/packages/hub/**/*.d.ts
+/packages/hub/**/*.js
+/packages/hub/**/*.js.map
+!/packages/hub/db/migrations/*.js
+
+/packages/core/**/*.d.ts
+/packages/core/**/*.js
+/packages/core/**/*.js.map
+
+/packages/test-support/**/*.d.ts
+/packages/test-support/**/*.js
+/packages/test-support/**/*.js.map
+
+/packages/cardpay-sdk/**/*.d.ts
+/packages/cardpay-sdk/**/*.js
+/packages/cardpay-sdk/**/*.js.map
+
+/packages/cardpay-cli/**/*.d.ts
+/packages/cardpay-cli/**/*.js
+/packages/cardpay-cli/**/*.js.map
+
+/packages/did-resolver/**/*.js
+/packages/did-resolver/**/*.d.ts
+/packages/did-resolver/**/*.js.map
+
+/packages/cardie/**/*.js
+/packages/cardie/**/*.d.ts
+/packages/cardie/**/*.js.map
+
+/packages/cardpay-subgraph/**/*.js
+/packages/cardpay-subgraph/**/*.d.ts
+/packages/cardpay-subgraph/**/*.js.map
+# we do want to keep this one
+!/packages/cardpay-subgraph/src/global.d.ts
+!/packages/cardpay-subgraph/pre-tsc-build.js
+!/packages/cardpay-subgraph/pre-codegen.js
+!/packages/cardpay-subgraph/etc/**/*.js
+
+# generated files for the subgraph
+/packages/cardpay-subgraph/subgraph.yaml
+/packages/cardpay-subgraph/abis/generated/
+/packages/cardpay-subgraph/src/generated/
+
+# unconventional js
+/blueprints/*/files/
+/vendor/
+
+# compiled output
+/dist/
+/tmp/
+
+# dependencies
+/bower_components/
+/deploy/node_modules/
+
+# misc
+/coverage/
+
+# ember-try
+/.node_modules.ember-try/
+/bower.json.ember-try
+/package.json.ember-try
+
+# this is for eslint ignore, which is also using this file as a list of things to not lint
+/packages/**/node_modules/@cardstack/**/*.js
+/packages/**/node_modules/@cardstack/**/*.js.map
+/packages/**/node_modules/@cardstack/**/*.d.ts
+
+# firebase functions
+/packages/firebase-functions/**/node_modules
+/packages/firebase-functions/**/build
+/packages/firebase-functions/**/*.d.ts
+/packages/firebase-functions/**/*.js
+/packages/firebase-functions/**/*.js.map
+**/.firebase
+**/.firebaserc
+**/.runtimeconfig.json
+service-account.json
+**/ui-debug.log
+**/firebase-debug.log

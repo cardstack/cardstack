@@ -1,0 +1,18 @@
+<Freestyle::Usage @name="ParticipantsSummary">
+  <:example>
+    <Doc::DarkThemeAndLightTheme>
+      <Boxel::ParticipantsSummary
+        @participants={{this.participants}}
+      />
+    </Doc::DarkThemeAndLightTheme>
+  </:example>
+  <:api as |Args|>
+    <Args.Array
+      @name="participants"
+      @type="Object"
+      @items={{this.participants}}
+      @description="Each Participant object may have `title`, `role`, `imgURL`, and `type` fields."
+      @onChange={{fn (mut this.participants)}}
+    />
+  </:api>
+</Freestyle::Usage>

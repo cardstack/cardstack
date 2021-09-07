@@ -1,0 +1,16 @@
+.boxel-help-box__title {
+  --icon-color: var(--boxel-dark-highlight);
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--boxel-sp-xxs);
+  font: 600 var(--boxel-font);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.boxel-help-box__button {
+  width: 100%;
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp);
+}

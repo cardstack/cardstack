@@ -1,0 +1,2 @@
+web: node ./bin/server.ts
+worker: node ./bin/worker.ts

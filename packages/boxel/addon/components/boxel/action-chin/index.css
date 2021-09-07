@@ -1,0 +1,145 @@
+.boxel-action-chin {
+  --boxel-action-chin-padding-horizontal: var(--boxel-sp-lg);
+  --boxel-action-chin-padding-vertical: var(--boxel-sp-lg);
+  --button-base-height: 2rem; /* The height of the boxel button, used for calculating the min-height to reduce layout shift */
+  --boxel-action-chin-background-color: var(--boxel-purple-750);
+  --boxel-action-chin-emphasis-text-color: var(--boxel-light);
+  --boxel-action-chin-text-color: var(--boxel-purple-300);
+  --icon-color: var(--boxel-action-chin-text-color);
+  --boxel-action-chin-disabled-background: rgba(54, 52, 65, 0.9); /* bg-color at 90% opacity */
+
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto minmax(var(--boxel-sp-sm), 1fr) auto auto;
+  grid-template-rows: auto;
+  grid-template-areas: "main cancel _ info lock-icon";
+  align-items: center;
+  padding: var(--boxel-action-chin-padding-vertical) var(--boxel-action-chin-padding-horizontal);
+  background-color: var(--boxel-action-chin-background-color);
+  color: var(--boxel-action-chin-text-color);
+  font: var(--boxel-font-xs);
+  transition: background-color var(--boxel-transition), padding var(--boxel-transition);
+}
+
+/* minimize layout shift by calculating a min-height for those cta blocks without steps */
+.boxel-action-chin:not(.boxel-action-chin--has-step) {
+  min-height: calc(var(--button-base-height) + var(--boxel-action-chin-padding-vertical) * 2);
+}
+
+.boxel-action-chin--memorialized {
+  --boxel-action-chin-background-color: var(--boxel-purple-100);
+  --boxel-action-chin-emphasis-text-color: var(--boxel-dark);
+  --boxel-action-chin-text-color: var(--boxel-purple-400);
+}
+
+.boxel-action-chin + .boxel-action-chin {
+  border-top: 1px solid var(--boxel-purple-700);
+}
+
+.boxel-action-chin--memorialized + .boxel-action-chin--memorialized {
+  border-top: 1px solid var(--boxel-light-600);
+}
+
+/* paddings are different if there is a step */
+.boxel-action-chin--has-step {
+  --boxel-action-chin-padding-horizontal: var(--boxel-sp-xl);
+  --boxel-action-chin-padding-vertical: var(--boxel-sp-xl);
+}
+
+.boxel-action-chin--memorialized.boxel-action-chin--has-step,
+.boxel-action-chin--disabled.boxel-action-chin--has-step {
+  --boxel-action-chin-padding-vertical: var(--boxel-sp-xs);
+}
+
+.boxel-action-chin--disabled.boxel-action-chin--has-step:not(.boxel-action-chin--memorialized) {
+  --boxel-action-chin-background-color: var(--boxel-action-chin-disabled-background);
+}
+
+/* add the step using a pseudoelement */
+.boxel-action-chin__step {
+  position: absolute;
+  width: var(--boxel-action-chin-padding-horizontal);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.boxel-action-chin__step::before {
+  content: attr(data-step);
+  font: 700 var(--boxel-font-sm);
+  color: var(--boxel-action-chin-emphasis-text-color);
+}
+
+/* grid elements */
+.boxel-action-chin__action-button {
+  grid-area: main;
+}
+
+.boxel-action-chin__cancel-button {
+  grid-area: cancel;
+  margin-left: var(--boxel-sp);
+}
+
+.boxel-action-chin__info-area {
+  grid-area: info;
+
+  /*
+  some defaults so that people can simply enter text
+  if they want to supply more complex content they should be able to overwrite it
+  */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.boxel-action-chin__action-status-area {
+  grid-area: main;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 var(--boxel-font-sm);
+  color: var(--boxel-action-chin-emphasis-text-color);
+}
+
+/*
+  The lock icon and notice is not shown when the cta is disabled
+  and we have a step. This is handled in the template
+ */
+.boxel-action-chin__private-notice {
+  --boxel-action-chin-lock-icon-size: 0.75rem;
+
+  grid-area: info;
+  display: flex;
+  align-items: center;
+  letter-spacing: var(--boxel-lsp-lg);
+  text-align: right;
+}
+
+.boxel-action-chin__lock-icon {
+  grid-area: lock-icon;
+  width: var(--boxel-action-chin-lock-icon-size);
+  height: var(--boxel-action-chin-lock-icon-size);
+  margin-left: var(--boxel-sp-xs);
+}
+
+/*
+  Only visually show the "Actions only visible to you" message if someone hasn't added an info area
+  Since the lock seems to be a visual cue that actions are only visible to the user
+  We keep the text around and visible to screenreaders (tested only on VoiceOver)
+*/
+.boxel-action-chin__info-area ~ .boxel-action-chin__private-notice {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  min-width: 1px;
+  min-height: 1px;
+  padding: 0;
+  margin: -1px;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}

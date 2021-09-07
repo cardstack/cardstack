@@ -1,0 +1,34 @@
+<label class={{cn "token-option" token-option--checked=@checked token-option--disabled=@disabled}} ...attributes>
+  <Input
+    name="deposit-token"
+    class={{cn "token-option__input" token-option__input--checked=@checked}}
+    @type="radio"
+    @checked={{@checked}}
+    disabled={{@disabled}}
+    {{on "input" @onInput}}
+  />
+  <div class="token-option__currency">
+    {{svg-jar @token.icon class="token-option__icon" role="presentation" width="40" height="40"}}
+    <div>
+      <div class="token-option__title" data-test-option={{@token.symbol}}>
+        {{@token.symbol}}
+      </div>
+      <div class="token-option__desc">
+        {{@token.description}}
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="token-option__balance-header">Balance</div>
+    <div class="token-option__balance" data-test-balance={{@token.symbol}}>
+      {{@balance}} {{@token.symbol}}
+    </div>
+    <div class="token-option__usd-balance" data-test-usd-balance={{@token.symbol}}>
+      {{#if @balanceInUsd}}
+        {{format-usd @balanceInUsd}}
+      {{else}}
+        <Boxel::LoadingIndicator class="token-option__loading-indicator"/>
+      {{/if}}
+    </div>
+  </div>
+</label>

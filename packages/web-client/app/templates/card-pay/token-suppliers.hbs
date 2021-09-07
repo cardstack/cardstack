@@ -1,0 +1,36 @@
+{{page-title "Token Suppliers"}}
+
+<section class="card-pay-dashboard__token-suppliers" role="tabpanel" aria-labelledby="card-pay.token-suppliers">
+  <CardPay::DashboardPanel @panel={{@model.panel}}>
+    {{#each @model.panel.sections as |section|}}
+      <CardPay::DashboardPanel::Section @section={{section}}>
+        <:cta>
+          <Boxel::Button
+            {{on "click" (set this "flow" section.workflow)}}
+            @kind="primary"
+            @size="touch"
+            @disabled={{section.isCtaDisabled}}
+            data-test-workflow-button={{section.workflow}}
+          >
+            {{section.cta}}
+          </Boxel::Button>
+        </:cta>
+      </CardPay::DashboardPanel::Section>
+    {{/each}}
+  </CardPay::DashboardPanel>
+</section>
+
+<Boxel::Modal
+  style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
+  @isOpen={{or (eq this.flow 'deposit') (eq this.flow 'withdrawal')}}
+  @onClose={{set this "flow" null}}
+>
+{{#if (is-network-initialized)}}
+  {{#if (eq this.flow 'deposit')}}
+    <CardPay::DepositWorkflow />
+  {{/if}}
+  {{#if (eq this.flow 'withdrawal')}}
+    <CardPay::WithdrawalWorkflow />
+  {{/if}}
+{{/if}}
+</Boxel::Modal>

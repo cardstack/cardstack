@@ -1,0 +1,18 @@
+<Boxel::NextStepsBox>
+  <Boxel::Button 
+    @size="base" 
+    @kind="primary" 
+    {{on "click" this.openNewWithdrawalWorkflow}} 
+    data-test-withdrawal-next-step="new-withdrawal"
+  >
+    Make Another Withdrawal
+  </Boxel::Button>
+  <Boxel::Button 
+    @size="base" 
+    @kind="secondary-dark" 
+    {{on "click" this.returnToDashboard}} 
+    data-test-withdrawal-next-step="dashboard"
+  >
+    Return to Dashboard
+  </Boxel::Button>
+</Boxel::NextStepsBox>

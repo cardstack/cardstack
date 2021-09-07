@@ -1,0 +1,131 @@
+<ActionCardContainer
+  @header="Deposit Amount"
+  @isComplete={{@isComplete}}
+>
+  <ActionCardContainer::Section @title="Choose an amount to deposit into the reserve pool">
+    <div class="transaction-amount__fields">
+      <CardPay::LabeledValue
+        class="transaction-amount__label"
+        @vertical={{this.isUnlockingOrUnlocked}}
+        @label="Funding from"
+      >
+        <CardPay::DepositWorkflow::TransactionAmount::BalanceView
+          @wallet={{network-display-info "layer1" "fullName"}}
+          @tokenSymbol={{this.currentTokenSymbol}}
+          @tokenIcon={{this.currentTokenDetails.icon}}
+          @address={{this.layer1Network.walletInfo.firstAddress}}
+          @balance={{format-token-amount this.currentTokenBalance}}
+          @balanceInUsd={{token-to-usd this.currentTokenSymbol this.currentTokenBalance}}
+          @isComplete={{@isComplete}}
+        />
+      </CardPay::LabeledValue>
+      <CardPay::LabeledValue
+        @fieldMode={{if this.isUnlockingOrUnlocked "view" "edit"}}
+        @vertical={{this.isUnlockingOrUnlocked}}
+        @label="Amount to deposit"
+        class="transaction-amount__label"
+      >
+        {{#if this.isUnlockingOrUnlocked}}
+          <CardPay::BalanceDisplay
+            class="transaction-amount__token"
+            @size="large"
+            @icon={{this.currentTokenDetails.icon}}
+            @balance={{format-token-amount this.amountAsBigNumber}}
+            @symbol={{this.currentTokenSymbol}}
+            @text={{concat (format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)) "*"}}
+            data-test-deposit-amount-entered
+          />
+        {{else}}
+          <CardPay::TokenAmountInput
+            @icon={{this.currentTokenDetails.icon}}
+            @value={{this.amount}}
+            @onInput={{this.onInputAmount}}
+            @symbol={{this.currentTokenSymbol}}
+            @invalid={{this.isInvalid}}
+            @errorMessage={{this.validationMessage}}
+          />
+        {{/if}}
+      </CardPay::LabeledValue>
+      {{#unless this.isUnlockingOrUnlocked}}
+        <CardPay::LabeledValue @label="Approximate value*" class="transaction-amount__label">
+          {{format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)}}
+        </CardPay::LabeledValue>
+      {{/unless}}
+    </div>
+    {{#if this.errorMessage}}
+      <CardPay::ErrorMessage as |supportURL|>
+        {{this.errorMessage}} Please try again if you want to continue with this workflow, or contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+      </CardPay::ErrorMessage>
+    {{/if}}
+    <div class="transaction-amount__footnote">
+      * The actual value depends on the current exchange rate and is determined at the time of authorization.
+    </div>
+  </ActionCardContainer::Section>
+  <Boxel::ActionChin @stepNumber={{1}} @state={{this.unlockCtaState}} @disabled={{or @frozen this.unlockCtaDisabled}}>
+    <:default as |a|>
+      <a.ActionButton data-test-unlock-button {{on "click" this.unlock}}>
+        Unlock
+      </a.ActionButton>
+    </:default>
+    <:in-progress as |i|>
+      <i.ActionButton data-test-unlock-button>
+        Unlocking
+      </i.ActionButton>
+      {{#if this.unlockTxnViewerUrl}}
+        <i.InfoArea>
+          <Boxel::Button @as="anchor" @kind="secondary-dark" @size="extra-small" @href={{this.unlockTxnViewerUrl}} target="_blank" rel="noopener" data-test-unlock-etherscan-button>
+            View on Etherscan
+          </Boxel::Button>
+        </i.InfoArea>
+      {{/if}}
+    </:in-progress>
+    <:memorialized as |m|>
+      <m.ActionStatusArea data-test-unlock-success-message>
+        Unlocked
+      </m.ActionStatusArea>
+      {{#if this.unlockTxnViewerUrl}}
+      <m.InfoArea>
+        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.unlockTxnViewerUrl}} target="_blank" rel="noopener" data-test-unlock-etherscan-button>
+          View on Etherscan
+        </Boxel::Button>
+      </m.InfoArea>
+      {{/if}}
+    </:memorialized>
+  </Boxel::ActionChin>
+  <Boxel::ActionChin @stepNumber={{2}} @state={{this.depositCtaState}} @disabled={{or @frozen this.depositCtaDisabled}}>
+    <:default as |a|>
+      <a.ActionButton  {{on "click" this.deposit}} data-test-deposit-button>
+        Deposit
+      </a.ActionButton>
+    </:default>
+    <:disabled as |d|>
+      <d.ActionButton data-test-deposit-button>
+        Deposit
+      </d.ActionButton>
+    </:disabled>
+    <:in-progress as |i|>
+      <i.ActionButton data-test-deposit-button>
+        Depositing
+      </i.ActionButton>
+      {{#if this.depositTxnViewerUrl}}
+        <i.InfoArea>
+          <Boxel::Button @as="anchor" @kind="secondary-dark" @size="extra-small" @href={{this.depositTxnViewerUrl}} target="_blank" rel="noopener" data-test-deposit-etherscan-button>
+            View on Etherscan
+          </Boxel::Button>
+        </i.InfoArea>
+      {{/if}}
+    </:in-progress>
+    <:memorialized as |m|>
+      <m.ActionStatusArea data-test-deposit-success-message>
+        Deposited
+      </m.ActionStatusArea>
+      {{#if this.depositTxnViewerUrl}}
+      <m.InfoArea>
+        <Boxel::Button @as="anchor" @size="extra-small" @href={{this.depositTxnViewerUrl}} target="_blank" rel="noopener" data-test-deposit-etherscan-button>
+          View on Etherscan
+        </Boxel::Button>
+      </m.InfoArea>
+      {{/if}}
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

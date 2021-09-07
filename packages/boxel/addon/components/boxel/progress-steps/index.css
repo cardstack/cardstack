@@ -1,0 +1,57 @@
+.boxel-progress-steps {
+  --bullet-fill-color: var(--boxel-light-600);
+
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  color: var(--boxel-purple-400);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+}
+
+.boxel-progress-steps__item {
+  position: relative;
+}
+
+.boxel-progress-steps__item + .boxel-progress-steps__item::before {
+  display: block;
+  content: "";
+  width: 1px;
+  height: var(--boxel-sp);
+
+  /* Not using variables because the focus of this is primarily aesthetic effect */
+  margin: 2px 0 3px 7px;
+  background-color: var(--boxel-light-600);
+}
+
+.boxel-progress-steps__item-grid {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  grid-template-rows: 1.125rem;
+  gap: 0 var(--boxel-sp-sm);
+  align-items: center;
+}
+
+.boxel-progress-steps__item-bullet {
+  width: 16px;
+  height: 16px;
+  background-color: var(--bullet-fill-color);
+  border-radius: 100px;
+  text-align: center;
+}
+
+.boxel-progress-steps__item--current {
+  color: var(--boxel-dark);
+  font-weight: 600;
+}
+
+.boxel-progress-steps__item--current .boxel-progress-steps__item-bullet {
+  --bullet-fill-color: var(--boxel-dark);
+
+  border: 6px solid var(--boxel-highlight);
+}
+
+.boxel-progress-steps__item--completed .boxel-progress-steps__item-bullet {
+  --icon-color: var(--boxel-dark);
+  --bullet-fill-color: var(--boxel-highlight);
+}

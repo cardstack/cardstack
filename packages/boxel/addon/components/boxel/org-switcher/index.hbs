@@ -1,0 +1,12 @@
+<ul class="boxel-org-switcher" ...attributes>
+  {{#each @orgs as |org|}}
+    <li>
+      <Boxel::OrgSwitcher::Button
+        @org={{org}}
+        @isSelected={{eq @currentOrg org}}
+        {{on "click" (fn @onChooseOrg org.id)}}
+        aria-label={{concat (or org.title org.id) " organization page"}}
+      />
+    </li>
+  {{/each}}
+</ul>

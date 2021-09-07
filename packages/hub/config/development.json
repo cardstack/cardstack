@@ -1,0 +1,7 @@
+{
+  "aws": {
+    "offchainStorage": {
+      "roleChain": ["hub-local-dev", "prod:storage-bucket-writer-role"]
+    }
+  }
+}
