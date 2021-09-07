@@ -1,7 +1,15 @@
 import { module, skip, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { click, render } from '@ember/test-helpers';
+import { TestContext } from 'ember-test-helpers';
 import hbs from 'htmlbars-inline-precompile';
+import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+
+interface Context extends TestContext {
+  safes: Safe[];
+}
+
+let chosenSafe: Safe | null = null;
 
 module(
   'Integration | Component | card-pay/safe-chooser-dropdown',
@@ -58,7 +66,7 @@ module(
             accumulatedSpendValue: 100,
           },
         ],
-        chooseSafe: () => {},
+        chooseSafe: (safe: Safe) => (chosenSafe = safe),
       });
     });
 
@@ -81,7 +89,20 @@ module(
         .containsText('MERCHANT 0xmerchantbAB0644ffCD32518eBF4924ba8666666');
     });
 
-    skip('it returns the chosen safe to the handler');
+    test('it returns the chosen safe to the handler', async function (this: Context, assert) {
+      await render(hbs`
+        <CardPay::SafeChooserDropdown
+          @safes={{this.safes}}
+          @selectedSafe={{this.selectedSafe}}
+          @onChooseSafe={{this.chooseSafe}}
+        />
+    `);
+
+      await click('.ember-power-select-trigger');
+      await click('.ember-power-select-options li:nth-child(2)');
+
+      assert.equal(chosenSafe, this.safes[1]);
+    });
 
     skip('it renders with the chosen safe chosen');
 
