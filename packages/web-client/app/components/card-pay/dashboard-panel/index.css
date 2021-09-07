@@ -4,7 +4,7 @@
   --border-color: #d3d3d3;
 
   position: relative;
-  max-width: 72rem;
+  max-width: 100%;
   margin: 0 auto;
   color: var(--boxel-dark);
   background-color: var(--boxel-light-400);

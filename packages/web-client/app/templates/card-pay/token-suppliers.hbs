@@ -1,6 +1,6 @@
 {{page-title "Token Suppliers"}}
 
-<section class="card-pay-dashboard__section" role="tabpanel" aria-labelledby="card-pay.token-suppliers">
+<section class="card-pay-dashboard__token-suppliers" role="tabpanel" aria-labelledby="card-pay.token-suppliers">
   <CardPay::DashboardPanel @panel={{@model.panel}}>
     {{#each @model.panel.sections as |section|}}
       <CardPay::DashboardPanel::Section @section={{section}}>

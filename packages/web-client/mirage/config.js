@@ -63,6 +63,14 @@ export default function () {
     }
   );
 
+  this.get(
+    'https://storage.cardstack.com/merchant-info/:idWithExtension',
+    function (schema, { params: { idWithExtension } }) {
+      let [id] = idWithExtension.split('.');
+      return schema.merchantInfos.find(id);
+    }
+  );
+
   this.passthrough((request) => {
     return (
       !request.url.includes('/api/') &&

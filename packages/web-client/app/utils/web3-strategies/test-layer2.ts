@@ -189,7 +189,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return yield this.test__deferredViewSafes.promise;
   }
 
-  async test_simulateViewSafes(
+  async test__simulateViewSafes(
     safes = this.accountSafes.get(this.walletInfo.firstAddress!)!
   ) {
     this.test__deferredViewSafes.resolve(safes);
