@@ -14,12 +14,9 @@ const getTargetValue = helper(([action] /*, hash*/) => {
 });
 
 export default setComponentTemplate(
-  precompileTemplate(
-    '<input type="text" value="{{@model}}" {{on "input" (getTargetValue @set)}} ...attributes />',
-    {
-      strictMode: true,
-      scope: () => ({ on, getTargetValue }),
-    }
-  ),
+  precompileTemplate('<input type="text" value="{{@model}}" {{on "input" (getTargetValue @set)}} ...attributes />', {
+    strictMode: true,
+    scope: () => ({ on, getTargetValue }),
+  }),
   templateOnlyComponent()
 );

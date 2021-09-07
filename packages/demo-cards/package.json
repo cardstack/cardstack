@@ -1,5 +1,5 @@
 {
-  "name": "@cardstack/base-cards",
+  "name": "@cardstack/demo-cards",
   "version": "0.0.0",
   "devDependencies": {
     "@cardstack/eslint-config": "0.21.5"

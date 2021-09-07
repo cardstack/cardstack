@@ -30,7 +30,9 @@ export function createMinimalPackageJSON(cardCacheDir: string): void {
   outputJSONSync(join(cardCacheDir, 'package.json'), MINIMAL_PACKAGE);
 }
 
-export function setupCardCache(hooks: NestedHooks): {
+export function setupCardCache(
+  hooks: NestedHooks
+): {
   resolveCard: (modulePath: string) => string;
   getCardCacheDir: () => string;
 } {

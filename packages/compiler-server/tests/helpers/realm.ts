@@ -22,7 +22,9 @@ export class ProjectTestRealm extends FSRealm {
   }
 }
 
-export function setupRealms(hooks: NestedHooks): {
+export function setupRealms(
+  hooks: NestedHooks
+): {
   createRealm: (name: string) => ProjectTestRealm;
   getRealmManager: () => RealmManager;
 } {

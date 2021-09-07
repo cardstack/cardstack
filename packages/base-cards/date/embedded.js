@@ -21,6 +21,8 @@ const FormatDate = setComponentTemplate(
     get formatted() {
       if (this.args.date) {
         return Format.format(this.args.date);
+      } else {
+        return undefined;
       }
     }
   }
