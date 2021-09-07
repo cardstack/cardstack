@@ -10,7 +10,7 @@ import { AbiItem, fromWei, toBN } from 'web3-utils';
 import { signSafeTxAsRSV } from './utils/signing-utils';
 import { ZERO_ADDRESS } from './constants';
 import { query } from './utils/graphql';
-import { TransactionOptions, waitUntilTransactionMined } from './utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from './utils/general-utils';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -65,33 +65,38 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
-    if (!tokenAddress) {
+    if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
       return await waitUntilTransactionMined(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
-
+    if (!tokenAddress) {
+      throw new Error('tokenAddress must be provided');
+    }
+    if (!amount) {
+      throw new Error('amount must be provided');
+    }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let homeBridgeAddress = await getAddress('homeBridge', this.layer2Web3);
     let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], tokenAddress);
     let symbol = await token.methods.symbol().call();
     let safeBalance = toBN(await token.methods.balanceOf(safeAddress).call());
-    if (safeBalance.lt(toBN(amount!))) {
+    if (safeBalance.lt(toBN(amount))) {
       throw new Error(
         `Safe does not have enough balance to transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
           safeBalance.toString()
-        )} ${symbol}, amount to transfer ${fromWei(amount!)} ${symbol}`
+        )} ${symbol}, amount to transfer ${fromWei(amount)} ${symbol}`
       );
     }
 
     let payload = token.methods.transferAndCall(homeBridgeAddress, amount, recipientAddress).encodeABI();
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
     let gasCost = toBN(estimate.dataGas).add(toBN(estimate.baseGas)).mul(toBN(estimate.gasPrice));
-    if (safeBalance.lt(toBN(amount!).add(gasCost))) {
+    if (safeBalance.lt(toBN(amount).add(gasCost))) {
       throw new Error(
         `Safe does not have enough balance to pay for gas when relaying tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
           safeBalance.toString()
-        )} ${symbol}, amount to transfer ${fromWei(amount!)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
+        )} ${symbol}, amount to transfer ${fromWei(amount)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
       );
     }
     if (nonce == null) {

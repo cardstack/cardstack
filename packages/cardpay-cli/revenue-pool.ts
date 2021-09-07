@@ -5,7 +5,7 @@ import { getWeb3 } from './utils';
 export async function registerMerchant(
   network: string,
   prepaidCardAddress: string,
-  infoDID: string | undefined,
+  infoDID: string,
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);

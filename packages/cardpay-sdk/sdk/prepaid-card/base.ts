@@ -21,7 +21,7 @@ import {
   executeSend,
   getNextNonceFromEstimate,
 } from '../utils/safe-utils';
-import { TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
+import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
 import { signSafeTxAsRSV, Signature, signSafeTxAsBytes } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
 import { TransactionReceipt } from 'web3-core';
@@ -79,13 +79,19 @@ export default class PrepaidCard {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    if (!prepaidCardAddress) {
+    if (isTransactionHash(merchantSafeOrTxnHash)) {
       let txnHash = merchantSafeOrTxnHash;
       return await waitUntilTransactionMined(this.layer2Web3, txnHash);
     }
+    if (!prepaidCardAddress) {
+      throw new Error('prepaidCardAddress is required');
+    }
+    if (!spendAmount) {
+      throw new Error('spendAmount is required');
+    }
     let merchantSafe = merchantSafeOrTxnHash;
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
-    if (spendAmount! < 50) {
+    if (spendAmount < 50) {
       // this is hard coded in the PrepaidCardManager contract
       throw new Error(`The amount to pay merchant §${spendAmount} SPEND is below the minimum allowable amount`);
     }
@@ -93,7 +99,7 @@ export default class PrepaidCard {
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     await this.convertFromSpendForPrepaidCard(
       prepaidCardAddress,
-      spendAmount!,
+      spendAmount,
       (issuingToken, balanceAmount, requiredTokenAmount, symbol) =>
         new Error(
           `Prepaid card does not have enough balance to pay merchant. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
@@ -108,7 +114,7 @@ export default class PrepaidCard {
     do {
       let rateLock = await layerTwoOracle.getRateLock(issuingToken);
       try {
-        let payload = await this.getPayMerchantPayload(prepaidCardAddress, merchantSafe, spendAmount!, rateLock);
+        let payload = await this.getPayMerchantPayload(prepaidCardAddress, merchantSafe, spendAmount, rateLock);
         if (nonce == null) {
           nonce = getNextNonceFromEstimate(payload);
           if (typeof onNonce === 'function') {
@@ -133,7 +139,7 @@ export default class PrepaidCard {
         gnosisResult = await this.executePayMerchant(
           prepaidCardAddress,
           merchantSafe,
-          spendAmount!,
+          spendAmount,
           rateLock,
           signatures,
           nonce
@@ -182,11 +188,14 @@ export default class PrepaidCard {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    if (!newOwner) {
+    if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
       return await waitUntilTransactionMined(this.layer2Web3, txnHash);
     }
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
+    if (!newOwner) {
+      throw new Error('newOwner is required');
+    }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
 
     if (!(await this.canTransfer(prepaidCardAddress))) {
@@ -292,7 +301,6 @@ export default class PrepaidCard {
     return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
-  // TODO: add overload for passing txnHash
   async split(txnHash: string): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }>;
   async split(
     prepaidCardAddress: string,
@@ -308,7 +316,7 @@ export default class PrepaidCard {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }> {
-    if (!faceValues) {
+    if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
       return {
         prepaidCards: await this.resolvePrepaidCards(await this.getPrepaidCardsFromTxn(txnHash)),
@@ -316,6 +324,12 @@ export default class PrepaidCard {
       };
     }
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
+    if (!faceValues) {
+      throw new Error(`faceValues must be provided`);
+    }
+    if (!customizationDID) {
+      throw new Error(`customizationDID must be provided`);
+    }
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
     }
@@ -451,7 +465,7 @@ export default class PrepaidCard {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }> {
-    if (!tokenAddress) {
+    if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
       return {
         prepaidCards: await this.resolvePrepaidCards(await this.getPrepaidCardsFromTxn(txnHash)),
@@ -459,14 +473,20 @@ export default class PrepaidCard {
       };
     }
     let safeAddress = safeAddressOrTxnHash;
-    if (faceValues!.length > MAX_PREPAID_CARD_AMOUNT) {
+    if (!tokenAddress) {
+      throw new Error('tokenAddress must be provided');
+    }
+    if (!faceValues) {
+      throw new Error('faceValues must be provided');
+    }
+    if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
     }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let amountCache = new Map<number, string>();
     let amounts: BN[] = [];
     let totalWeiAmount = new BN('0');
-    for (let faceValue of faceValues!) {
+    for (let faceValue of faceValues) {
       let weiAmount = amountCache.get(faceValue);
       if (weiAmount == null) {
         weiAmount = await this.priceForFaceValue(tokenAddress, faceValue);
@@ -489,7 +509,7 @@ export default class PrepaidCard {
       );
     }
 
-    let payload = await this.getCreateCardPayload(from, tokenAddress, amounts, faceValues!, customizationDID);
+    let payload = await this.getCreateCardPayload(from, tokenAddress, amounts, faceValues, customizationDID);
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
     let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
 

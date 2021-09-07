@@ -16,7 +16,7 @@ import {
   getNextNonceFromEstimate,
 } from '../utils/safe-utils';
 import { ZERO_ADDRESS } from '../constants';
-import { TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from '../utils/general-utils';
 import { signSafeTxAsRSV, Signature } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
@@ -112,21 +112,27 @@ export default class RevenuePool {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    if (!tokenAddress) {
+    if (isTransactionHash(merchantSafeAddressOrTxnHash)) {
       let txnHash = merchantSafeAddressOrTxnHash;
       return waitUntilTransactionMined(this.layer2Web3, txnHash);
     }
     let merchantSafeAddress = merchantSafeAddressOrTxnHash;
+    if (!tokenAddress) {
+      throw new Error('tokenAddress is required');
+    }
+    if (!amount) {
+      throw new Error('amount is required');
+    }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let revenuePoolAddress = await getAddress('revenuePool', this.layer2Web3);
     let revenuePool = new this.layer2Web3.eth.Contract(RevenuePoolABI as AbiItem[], revenuePoolAddress);
     let unclaimedBalance = new BN(await revenuePool.methods.revenueBalance(merchantSafeAddress, tokenAddress).call());
-    if (unclaimedBalance.lt(new BN(amount!))) {
+    if (unclaimedBalance.lt(new BN(amount))) {
       throw new Error(
         `Merchant safe does not have enough enough unclaimed revenue balance to make this claim. The merchant safe ${merchantSafeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
           unclaimedBalance
-        )}, amount being claimed is ${fromWei(amount!)}`
+        )}, amount being claimed is ${fromWei(amount)}`
       );
     }
     let payload = revenuePool.methods.claimRevenue(tokenAddress, amount).encodeABI();
@@ -140,11 +146,11 @@ export default class RevenuePool {
       tokenAddress
     );
     let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    if (unclaimedBalance.lt(new BN(amount!).add(gasCost))) {
+    if (unclaimedBalance.lt(new BN(amount).add(gasCost))) {
       throw new Error(
         `Merchant safe does not have enough enough to pay for gas when claiming revenue. The merchant safe ${merchantSafeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
           unclaimedBalance
-        )}, amount being claimed is ${fromWei(amount!)}, the gas cost is ${fromWei(gasCost)}`
+        )}, amount being claimed is ${fromWei(amount)}, the gas cost is ${fromWei(gasCost)}`
       );
     }
     if (nonce == null) {
@@ -194,7 +200,7 @@ export default class RevenuePool {
   async registerMerchant(txnHash: string): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }>;
   async registerMerchant(
     prepaidCardAddress: string,
-    infoDID?: string,
+    infoDID: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }>;
@@ -204,7 +210,7 @@ export default class RevenuePool {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }> {
-    if (!prepaidCardAddressOrTxnHash.startsWith('0x')) {
+    if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
       let merchantSafeAddress = await this.getMerchantSafeFromTxn(txnHash);
       return {
@@ -213,6 +219,9 @@ export default class RevenuePool {
       };
     }
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
+    if (!infoDID) {
+      throw new Error('infoDID is required');
+    }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let prepaidCard = await getSDK('PrepaidCard', this.layer2Web3);

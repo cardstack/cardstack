@@ -7,7 +7,7 @@ import ERC20ABI from '../contracts/abi/erc-20';
 import ForeignAMBABI from '../contracts/abi/foreign-amb';
 import ForeignBridgeABI from '../contracts/abi/foreign-bridge-mediator';
 import { getAddress } from '../contracts/addresses';
-import { TransactionOptions, waitUntilTransactionMined } from './utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from './utils/general-utils';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -56,11 +56,14 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    if (!amount) {
+    if (isTransactionHash(tokenAddressOrTxnHash)) {
       let txnHash = tokenAddressOrTxnHash;
       return waitUntilTransactionMined(this.layer1Web3, txnHash);
     }
     let tokenAddress = tokenAddressOrTxnHash;
+    if (!amount) {
+      throw new Error('amount is required');
+    }
 
     let from = contractOptions?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let token = new this.layer1Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
@@ -117,11 +120,17 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    if (!recipientAddress) {
+    if (isTransactionHash(tokenAddressOrTxnHash)) {
       let txnHash = tokenAddressOrTxnHash;
       return waitUntilTransactionMined(this.layer1Web3, txnHash);
     }
     let tokenAddress = tokenAddressOrTxnHash;
+    if (!recipientAddress) {
+      throw new Error('recipientAddress is required');
+    }
+    if (!amount) {
+      throw new Error('amount is required');
+    }
     let from = contractOptions?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let foreignBridgeAddress = await getAddress('foreignBridge', this.layer1Web3);
     let foreignBridge = new this.layer1Web3.eth.Contract(ForeignBridgeABI as any, foreignBridgeAddress);
@@ -187,7 +196,12 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
     if (!encodedData) {
-      return waitUntilTransactionMined(this.layer1Web3, messageIdOrTxnHash);
+      let txnHash = messageIdOrTxnHash;
+      return waitUntilTransactionMined(this.layer1Web3, txnHash);
+    }
+    let messageId = messageIdOrTxnHash;
+    if (!signatures) {
+      throw new Error('signatures is required');
     }
     let from = contractOptions?.from ?? (await this.layer1Web3.eth.getAccounts())[0];
     let foreignAmbAddress = await getAddress('foreignAMB', this.layer1Web3);
@@ -195,14 +209,14 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     let events = await foreignAmb.getPastEvents('RelayedMessage', {
       fromBlock: 0,
       toBlock: 'latest',
-      filter: { messageId: messageIdOrTxnHash },
+      filter: { messageId },
     });
     if (events.length === 1) {
       let txnHash = events[0].transactionHash;
       let receipt = await this.layer1Web3.eth.getTransactionReceipt(txnHash);
       return receipt;
     }
-    const packedSignatures = prepSignaturesForExecution(signatures!);
+    const packedSignatures = prepSignaturesForExecution(signatures);
     let nextNonce = await this.getNextNonce(from);
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     return await new Promise((resolve, reject) => {

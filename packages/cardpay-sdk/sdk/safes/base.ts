@@ -10,7 +10,7 @@ import { signSafeTxAsRSV } from '../utils/signing-utils';
 import BN from 'bn.js';
 import { query } from '../utils/graphql';
 import { TransactionReceipt } from 'web3-core';
-import { TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from '../utils/general-utils';
 const { fromWei } = Web3.utils;
 
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
@@ -217,31 +217,40 @@ export default class Safes {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    if (!tokenAddress) {
+    if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
       return waitUntilTransactionMined(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
+    if (!tokenAddress) {
+      throw new Error('tokenAddress must be specified');
+    }
+    if (!recipient) {
+      throw new Error('recipient must be specified');
+    }
+    if (!amount) {
+      throw new Error('amount must be specified');
+    }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let symbol = await token.methods.symbol().call();
     let safeBalance = new BN(await token.methods.balanceOf(safeAddress).call());
-    if (safeBalance.lt(new BN(amount!))) {
+    if (safeBalance.lt(new BN(amount))) {
       throw new Error(
         `Safe does not have enough balance to transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
           safeBalance.toString()
-        )}, amount to transfer ${fromWei(amount!)}`
+        )}, amount to transfer ${fromWei(amount)}`
       );
     }
-    let payload = this.transferTokenPayload(tokenAddress, recipient!, amount!);
+    let payload = this.transferTokenPayload(tokenAddress, recipient, amount);
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
     let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    if (safeBalance.lt(new BN(amount!).add(gasCost))) {
+    if (safeBalance.lt(new BN(amount).add(gasCost))) {
       throw new Error(
         `Safe does not have enough balance to pay for gas when transfer tokens. The token ${tokenAddress} balance of safe ${safeAddress} is ${fromWei(
           safeBalance.toString()
-        )} ${symbol}, amount to transfer ${fromWei(amount!)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
+        )} ${symbol}, amount to transfer ${fromWei(amount)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
       );
     }
     if (nonce == null) {
@@ -305,16 +314,22 @@ export default class Safes {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    if (!infoDID) {
+    if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
       return waitUntilTransactionMined(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
+    if (infoDID == null) {
+      throw new Error('infoDID is required');
+    }
+    if (gasToken == null) {
+      throw new Error('gasToken is required');
+    }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let supplierManager = await getAddress('supplierManager', this.layer2Web3);
-    let payload = await this.setSupplierInfoDIDPayload(infoDID!);
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, supplierManager, '0', payload, 0, gasToken!);
+    let payload = await this.setSupplierInfoDIDPayload(infoDID);
+    let estimate = await gasEstimate(this.layer2Web3, safeAddress, supplierManager, '0', payload, 0, gasToken);
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
       if (typeof onNonce === 'function') {

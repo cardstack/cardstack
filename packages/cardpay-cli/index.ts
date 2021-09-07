@@ -649,11 +649,11 @@ if (!command) {
       await transferPrepaidCard(network, prepaidCard, newOwner, mnemonic);
       break;
     case 'registerMerchant':
-      if (prepaidCard == null) {
-        showHelpAndExit('prepaidCard is a required value');
+      if (prepaidCard == null || infoDID == null) {
+        showHelpAndExit('prepaidCard and infoDID are required values');
         return;
       }
-      await registerMerchant(network, prepaidCard, infoDID || undefined, mnemonic);
+      await registerMerchant(network, prepaidCard, infoDID, mnemonic);
       break;
     case 'payMerchant':
       if (merchantSafe == null || prepaidCard == null || spendAmount == null) {
