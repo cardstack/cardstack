@@ -23,7 +23,7 @@ import {
   executeSend,
   getNextNonceFromEstimate,
 } from '../utils/safe-utils';
-import { waitUntilTransactionMined } from '../utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
 import { signSafeTxAsRSV, Signature, signSafeTxAsBytes } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
 import { TransactionReceipt } from 'web3-core';
@@ -70,16 +70,14 @@ export default class PrepaidCard {
     merchantSafe: string,
     prepaidCardAddress: string,
     spendAmount: number,
-    onTxHash?: (txHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
     if (spendAmount < 50) {
       // this is hard coded in the PrepaidCardManager contract
       throw new Error(`The amount to pay merchant §${spendAmount} SPEND is below the minimum allowable amount`);
     }
-    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     await this.convertFromSpendForPrepaidCard(
       prepaidCardAddress,
@@ -95,6 +93,7 @@ export default class PrepaidCard {
     let rateChanged = false;
     let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let gnosisResult: GnosisExecTx | undefined;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     do {
       let rateLock = await layerTwoOracle.getRateLock(issuingToken);
       try {
@@ -150,8 +149,8 @@ export default class PrepaidCard {
       );
     }
 
-    if (typeof onTxHash === 'function') {
-      await onTxHash(gnosisResult.ethereumTx.txHash);
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(gnosisResult.ethereumTx.txHash);
     }
 
     return await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
@@ -160,21 +159,21 @@ export default class PrepaidCard {
   async transfer(
     prepaidCardAddress: string,
     newOwner: string,
-    onTxHash?: (txHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
     if (!(await this.canTransfer(prepaidCardAddress))) {
       throw new Error(`The prepaid card ${prepaidCardAddress} is not allowed to be transferred`);
     }
-    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let rateChanged = false;
     let prepaidCardMgr = await this.getPrepaidCardMgr();
     let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let gasToken = await getAddress('cardCpxd', this.layer2Web3);
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     let transferData = await prepaidCardMgr.methods.getTransferCardData(prepaidCardAddress, newOwner).call();
+
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
 
     // the quirk here is that we are signing this txn in advance so we need to
     // optimistically advance the nonce by 2 to account for the fact that we are
@@ -260,8 +259,8 @@ export default class PrepaidCard {
       );
     }
 
-    if (typeof onTxHash === 'function') {
-      await onTxHash(gnosisResult.ethereumTx.txHash);
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(gnosisResult.ethereumTx.txHash);
     }
 
     return await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
@@ -272,11 +271,9 @@ export default class PrepaidCard {
     faceValues: number[],
     customizationDID: string | undefined,
     onPrepaidCardsCreated?: (prepaidCards: PrepaidCardSafe[], txnHash: string) => unknown,
-    onTxHash?: (txHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
+    txnOptions?: TransactionOptions,
     onGasLoaded?: (txnHashes: string[]) => unknown,
-    options?: ContractOptions
+    contractOptions?: ContractOptions
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }> {
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
@@ -284,7 +281,7 @@ export default class PrepaidCard {
     if (!(await this.canSplit(prepaidCardAddress))) {
       throw new Error(`The prepaid card ${prepaidCardAddress} is not allowed to be split`);
     }
-    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     let amountCache = new Map<number, string>();
@@ -321,6 +318,7 @@ export default class PrepaidCard {
 
     let rateChanged = false;
     let gnosisResult: GnosisExecTx | undefined;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     do {
       let rateLock = await layerTwoOracle.getRateLock(issuingToken);
       try {
@@ -382,8 +380,8 @@ export default class PrepaidCard {
       throw new Error(`Unable to split prepaid card ${prepaidCardAddress} into face values: ${faceValues.join(', ')}`);
     }
 
-    if (typeof onTxHash === 'function') {
-      await onTxHash(gnosisResult.ethereumTx.txHash);
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(gnosisResult.ethereumTx.txHash);
     }
 
     let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisResult.ethereumTx.txHash);
@@ -415,16 +413,14 @@ export default class PrepaidCard {
     faceValues: number[],
     customizationDID: string | undefined,
     onPrepaidCardsCreated?: (prepaidCards: PrepaidCardSafe[], txnHash: string) => unknown,
-    onTxHash?: (txHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
+    txnOptions?: TransactionOptions,
     onGasLoaded?: (txnHashes: string[]) => unknown,
-    options?: ContractOptions
+    contractOptions?: ContractOptions
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }> {
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
     }
-    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let amountCache = new Map<number, string>();
     let amounts: BN[] = [];
     let totalWeiAmount = new BN('0');
@@ -465,6 +461,8 @@ export default class PrepaidCard {
       );
     }
 
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
       if (typeof onNonce === 'function') {
@@ -502,8 +500,8 @@ export default class PrepaidCard {
       ZERO_ADDRESS
     );
 
-    if (typeof onTxHash === 'function') {
-      await onTxHash(gnosisTxn.ethereumTx.txHash);
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
 
     let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisTxn.ethereumTx.txHash);

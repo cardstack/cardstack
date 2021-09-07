@@ -6,6 +6,12 @@ import BN from 'bn.js';
 
 const POLL_INTERVAL = 500;
 
+export interface TransactionOptions {
+  onTxnHash?: (txnHash: string) => unknown;
+  onNonce?: (nonce: BN) => void;
+  nonce?: BN;
+}
+
 export async function networkName(web3: Web3): Promise<string> {
   let id = await web3.eth.net.getId();
   let name = networks[id];

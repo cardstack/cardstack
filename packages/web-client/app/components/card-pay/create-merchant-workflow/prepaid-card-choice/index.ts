@@ -40,7 +40,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   declare merchantRegistrationFee: number;
 
   @tracked chinInProgressMessage?: string;
-  @tracked txHash?: TransactionHash;
+  @tracked txnHash?: TransactionHash;
   @tracked createTaskRunningForAWhile = false;
   @tracked selectedPrepaidCard?: PrepaidCardSafe;
 
@@ -98,8 +98,8 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
       }
 
       let options: RegisterMerchantOptions = {
-        onTxHash: (txHash: TransactionHash) => {
-          this.txHash = txHash;
+        onTxnHash: (txnHash: TransactionHash) => {
+          this.txnHash = txnHash;
           this.chinInProgressMessage = 'Processing transaction…';
         },
       };
@@ -165,7 +165,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
     return (
       taskFor(this.createTask).isRunning &&
       this.createTaskRunningForAWhile &&
-      !this.txHash
+      !this.txnHash
     );
   }
 
@@ -184,7 +184,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   }
 
   get txViewerUrl() {
-    return this.txHash && this.layer2Network.blockExplorerUrl(this.txHash);
+    return this.txnHash && this.layer2Network.blockExplorerUrl(this.txnHash);
   }
 
   get isCtaDisabled() {

@@ -58,9 +58,9 @@ export async function claimLayer1BridgedTokens(
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(`Claiming layer 1 bridge tokens for message ID ${messageId}...`);
-  await tokenBridge.claimBridgedTokens(messageId, encodedData, signatures, (txnHash) =>
-    console.log(`transaction hash: ${blockExplorer}/tx/${txnHash}`)
-  );
+  await tokenBridge.claimBridgedTokens(messageId, encodedData, signatures, {
+    onTxnHash: (txnHash) => console.log(`transaction hash: ${blockExplorer}/tx/${txnHash}`),
+  });
   console.log('Completed');
 }
 
@@ -83,9 +83,9 @@ export async function bridgeToLayer2(
 
   {
     console.log(`Sending approve transaction request for ${amount} ${symbol}`);
-    await tokenBridge.unlockTokens(tokenAddress, amountInWei, (txnHash) =>
-      console.log(`Approve transaction hash: ${blockExplorer}/tx/${txnHash}`)
-    );
+    await tokenBridge.unlockTokens(tokenAddress, amountInWei, {
+      onTxnHash: (txnHash) => console.log(`Approve transaction hash: ${blockExplorer}/tx/${txnHash}`),
+    });
     console.log('completed approval');
   }
 
@@ -93,9 +93,9 @@ export async function bridgeToLayer2(
     console.log(
       `Sending relay tokens transaction request for ${amount} ${symbol} into layer 2 safe owned by ${receiverAddress}`
     );
-    await tokenBridge.relayTokens(tokenAddress, receiverAddress, amountInWei, (txnHash) =>
-      console.log(`Relay tokens transaction hash: ${blockExplorer}/tx/${txnHash}`)
-    );
+    await tokenBridge.relayTokens(tokenAddress, receiverAddress, amountInWei, {
+      onTxnHash: (txnHash) => console.log(`Relay tokens transaction hash: ${blockExplorer}/tx/${txnHash}`),
+    });
     console.log('completed relay');
   }
 }

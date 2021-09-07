@@ -28,7 +28,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   @service declare layer2Network: Layer2Network;
   @tracked amount = '';
   @tracked amountIsValid = false;
-  @tracked txHash: string | undefined;
+  @tracked txnHash: string | undefined;
   @tracked isConfirmed = false;
   @tracked validationMessage = '';
   @reads('withdrawTask.last.error') declare error: Error | undefined;
@@ -80,10 +80,10 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   }
 
   get txViewerUrl() {
-    if (!this.txHash) {
+    if (!this.txnHash) {
       return '';
     }
-    return this.layer2Network.blockExplorerUrl(this.txHash);
+    return this.layer2Network.blockExplorerUrl(this.txnHash);
   }
 
   @action onInputAmount(amount: string) {
@@ -142,7 +142,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       );
       let layer2BlockHeight = yield this.layer2Network.getBlockHeight();
 
-      this.txHash = transactionHash;
+      this.txnHash = transactionHash;
 
       this.args.workflowSession.updateMany({
         withdrawnAmount,

@@ -253,7 +253,7 @@ export default abstract class Layer2ChainWeb3Strategy
       [amount],
       customizationDid,
       undefined,
-      options.onTxHash
+      { onTxnHash: options.onTxnHash }
     );
 
     return result.prepaidCards[0];
@@ -272,11 +272,9 @@ export default abstract class Layer2ChainWeb3Strategy
     const RevenuePool = await getSDK('RevenuePool', this.web3);
 
     return (
-      await RevenuePool.registerMerchant(
-        prepaidCardAddress,
-        infoDid,
-        options.onTxHash
-      )
+      await RevenuePool.registerMerchant(prepaidCardAddress, infoDid, {
+        onTxnHash: options.onTxnHash,
+      })
     ).merchantSafe;
   }
 
@@ -364,7 +362,7 @@ export default abstract class Layer2ChainWeb3Strategy
         tokenAddress,
         receiverAddress,
         amountInWei,
-        (txnHash) => res(txnHash)
+        { onTxnHash: (txnHash) => res(txnHash) }
       );
     });
     return transactionHash;
