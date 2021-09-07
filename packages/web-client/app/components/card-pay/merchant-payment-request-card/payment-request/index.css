@@ -12,7 +12,7 @@
   gap: var(--boxel-sp-lg);
 }
 
-@media only screen and (max-width: 360px) {
+@media only screen and (max-width: 480px) {
   .payment-request {
     --explanation-padding: 0;
     --explanation-font: var(--boxel-font);
