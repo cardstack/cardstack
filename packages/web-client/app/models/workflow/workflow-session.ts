@@ -44,6 +44,14 @@ export default class WorkflowSession {
     this.persistToStorage();
   }
 
+  delete(key: string) {
+    delete this.state[key];
+    // eslint-disable-next-line no-self-assign
+    this.state = this.state; // for reactivity
+
+    this.persistToStorage();
+  }
+
   restoreFromStorage(): void {
     if (!this.isPersisted) return;
 
@@ -63,11 +71,5 @@ export default class WorkflowSession {
       this.workflow.workflowPersistenceId,
       { name: this.workflow.name, state: this.state }
     );
-  }
-
-  delete(key: string) {
-    delete this.state[key];
-    // eslint-disable-next-line no-self-assign
-    this.state = this.state; // for reactivity
   }
 }
