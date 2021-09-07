@@ -56,7 +56,7 @@ module.exports = function (environment) {
       layer2: process.env.LAYER_2_CHAIN || 'sokol', // set to "xdai" for production,
     },
     features: {
-      createMerchant: process.env.DEPLOY_TARGET !== 'production',
+      createMerchant: true,
     },
     infuraId:
       infuraIdsByTarget[process.env.DEPLOY_TARGET] ?? process.env.INFURA_ID,
