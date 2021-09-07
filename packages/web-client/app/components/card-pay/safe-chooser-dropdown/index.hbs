@@ -1,7 +1,7 @@
 <PowerSelect
   class="safe-chooser-dropdown"
   @options={{@safes}}
-  @selected={{@selectedSafe}}
+  @selected={{or @selectedSafe @safes.firstObject}}
   @onChange={{@onChooseSafe}}
   @renderInPlace={{true}}
   @eventType="click" {{!-- to prevent auto-selection of first item, as discussed at https://github.com/cardstack/cardstack/pull/2051 --}}

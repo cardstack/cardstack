@@ -1,4 +1,4 @@
-import { module, skip, test } from 'qunit';
+import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { click, render, settled } from '@ember/test-helpers';
 import { TestContext } from 'ember-test-helpers';
@@ -126,6 +126,17 @@ module(
         .containsText(this.safes[0].address);
     });
 
-    skip('it renders the first safe as chosen by default');
+    test('it renders the first safe as chosen by default', async function (this: Context, assert) {
+      await render(hbs`
+        <CardPay::SafeChooserDropdown
+          @safes={{this.safes}}
+          @onChooseSafe={{this.chooseSafe}}
+        />
+      `);
+
+      assert
+        .dom('[data-test-safe-chooser-dropdown]')
+        .containsText(this.safes[0].address);
+    });
   }
 );
