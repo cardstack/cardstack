@@ -1,0 +1,12 @@
+<h1
+  class={{cn
+    "boxel-org-title"
+    boxel-org-title--has-logo=@iconURL
+  }}
+  ...attributes
+>
+  {{#if @iconURL}}
+    <span class="boxel-org-title__logo" style={{css-url "background-image" @iconURL}} />
+  {{/if}}
+  {{@title}}
+</h1>
