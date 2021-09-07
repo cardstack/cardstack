@@ -14,34 +14,6 @@ on:
       - 'package.json'
       - 'yarn.lock'
 
-jobs:
-  lint:
-    name: Lint and typecheck
-    runs-on: ubuntu-latest
-    steps:
-      - uses: volta-cli/action@v1
-      - name: Find yarn cache
-        id: yarn-cache-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - name: Set up yarn cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.yarn-cache-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - uses: actions/checkout@v2
-      - run: yarn install
-      - name: Lint cardhost
-        run: yarn lint
-        working-directory: packages/cardhost
-      - name: Lint core
-        run: yarn lint
-        working-directory: packages/core
-      - name: Lint Server
-        run: yarn lint
-        working-directory: packages/compiler-server
-
   cardhost_tests:
     name: 'Cardhost tests'
     runs-on: ubuntu-latest

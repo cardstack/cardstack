@@ -10,7 +10,11 @@
   },
   "private": true,
   "scripts": {
-    "rm_node_modules": "find . -name node_modules -type d -prune -exec rm -rf {} +"
+    "rm_node_modules": "find . -name node_modules -type d -prune -exec rm -rf {} +",
+    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
+    "lint:cardhost": "cd packages/cardhost && yarn lint",
+    "lint:compiler-server": "cd packages/compiler-server && yarn lint",
+    "lint:core": "cd packages/core && yarn lint"
   },
   "workspaces": {
     "packages": [
