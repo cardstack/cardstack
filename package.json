@@ -72,13 +72,24 @@
     "status:subgraph-xdai-blue": "cd ./packages/cardpay-subgraph && yarn xdai-blue-status"
   },
   "resolutions": {
-    "ember-test-selectors": "^5.0.0",
     "ember-a11y-testing": "4.0.3",
     "axe-core": "4.1.4"
   },
-  "workspaces": [
-    "packages/**"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/**"
+    ],
+    "nohoist": [
+      "**/@embroider/webpack",
+      "**/@embroider/webpack/**",
+      "**/@embroider/compat",
+      "**/@embroider/compat/**",
+      "**/@embroider/core",
+      "**/@embroider/core/**",
+      "**/@embroider/util",
+      "**/@embroider/util/**"
+    ]
+  },
   "private": true,
   "volta": {
     "node": "14.17.1",
