@@ -10,6 +10,7 @@ on:
       - 'package.json'
       - 'yarn.lock'
 
+jobs:
   cardhost_tests:
     name: 'Cardhost tests'
     runs-on: ubuntu-latest
