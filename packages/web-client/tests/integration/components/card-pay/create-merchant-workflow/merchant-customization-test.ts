@@ -14,6 +14,7 @@ interface Context extends MirageTestContext {}
 // selectors
 let PREVIEW = '[data-test-merchant-customization-merchant-preview]';
 let MERCHANT = '[data-test-merchant]';
+let MERCHANT_LOGO = '[data-test-merchant-logo]';
 let MERCHANT_NAME_FIELD =
   '[data-test-merchant-customization-merchant-name-field]';
 let MERCHANT_ID_FIELD = '[data-test-merchant-customization-merchant-id-field]';
@@ -301,10 +302,10 @@ module(
       assert.dom(EDIT_BUTTON).exists();
       assert.dom(`${PREVIEW} ${MERCHANT}`).containsText('HELLO!');
       assert
-        .dom(`${PREVIEW} ${MERCHANT}`)
+        .dom(`${PREVIEW} ${MERCHANT_LOGO}`)
         .hasAttribute('data-test-merchant-logo-background', bgColor);
       assert
-        .dom(`${PREVIEW} ${MERCHANT}`)
+        .dom(`${PREVIEW} ${MERCHANT_LOGO}`)
         .hasAttribute('data-test-merchant-logo-text-color', textColor);
       assert
         .dom(`${PREVIEW} ${MERCHANT}`)

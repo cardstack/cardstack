@@ -119,7 +119,9 @@ module(
         .containsText('100 SPEND');
       assert
         .dom('[data-test-merchant]')
-        .hasAttribute('data-test-merchant', 'Mandello')
+        .hasAttribute('data-test-merchant', 'Mandello');
+      assert
+        .dom('[data-test-merchant-logo]')
         .hasAttribute('data-test-merchant-logo-background', '#ff5050')
         .hasAttribute('data-test-merchant-logo-text-color', '#fff');
       assert
