@@ -1,15 +1,11 @@
 name: CI [compiler]
 
 on:
-  push:
-    branches:
-      - 'ef4-refactor'
   pull_request:
-    # branches: [main]
     paths:
-      - 'cardhost/**'
-      - 'core/**'
-      - 'server/**'
+      - 'packages/cardhost/**'
+      - 'packages/core/**'
+      - 'packages/compiler-server/**'
       - '.github/workflows/pr-compiler.yml'
       - 'package.json'
       - 'yarn.lock'
