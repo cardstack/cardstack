@@ -1,5 +1,3 @@
-/*global fetch */
-
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -8,7 +6,7 @@ import ERC677ABI from '../../contracts/abi/erc-677';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.7.0/prepaid-card-manager';
 import { getAddress } from '../../contracts/addresses';
-import { getConstant, ZERO_ADDRESS } from '../constants';
+import { ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
 
 import { ERC20ABI } from '../../index';
@@ -270,9 +268,7 @@ export default class PrepaidCard {
     prepaidCardAddress: string,
     faceValues: number[],
     customizationDID: string | undefined,
-    onPrepaidCardsCreated?: (prepaidCards: PrepaidCardSafe[], txnHash: string) => unknown,
     txnOptions?: TransactionOptions,
-    onGasLoaded?: (txnHashes: string[]) => unknown,
     contractOptions?: ContractOptions
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }> {
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
@@ -362,7 +358,7 @@ export default class PrepaidCard {
           customizationDID
         );
         break;
-      } catch (e) {
+      } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
@@ -385,21 +381,6 @@ export default class PrepaidCard {
     }
 
     let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisResult.ethereumTx.txHash);
-    if (typeof onPrepaidCardsCreated === 'function') {
-      await onPrepaidCardsCreated(await this.resolvePrepaidCards(prepaidCardAddresses), gnosisResult.ethereumTx.txHash);
-    }
-
-    let txnHashes = new Set<string>();
-    await Promise.all(
-      prepaidCardAddresses.map((address) =>
-        this.loadGasIntoPrepaidCard(address, gnosisResult!.ethereumTx.txHash, (txnHash) => {
-          txnHashes.add(txnHash);
-          if (txnHashes.size === prepaidCardAddresses.length && typeof onGasLoaded === 'function') {
-            onGasLoaded([...txnHashes]);
-          }
-        })
-      )
-    );
 
     return {
       prepaidCards: await this.resolvePrepaidCards(prepaidCardAddresses),
@@ -412,9 +393,7 @@ export default class PrepaidCard {
     tokenAddress: string,
     faceValues: number[],
     customizationDID: string | undefined,
-    onPrepaidCardsCreated?: (prepaidCards: PrepaidCardSafe[], txnHash: string) => unknown,
     txnOptions?: TransactionOptions,
-    onGasLoaded?: (txnHashes: string[]) => unknown,
     contractOptions?: ContractOptions
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }> {
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
@@ -506,25 +485,9 @@ export default class PrepaidCard {
 
     let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisTxn.ethereumTx.txHash);
 
-    if (typeof onPrepaidCardsCreated === 'function') {
-      await onPrepaidCardsCreated(await this.resolvePrepaidCards(prepaidCardAddresses), gnosisTxn.ethereumTx.txHash);
-    }
-
-    let txnHashes = new Set<string>();
-    await Promise.all(
-      prepaidCardAddresses.map((address) =>
-        this.loadGasIntoPrepaidCard(address, gnosisTxn.ethereumTx.txHash, (txnHash) => {
-          txnHashes.add(txnHash);
-          if (txnHashes.size === prepaidCardAddresses.length && typeof onGasLoaded === 'function') {
-            onGasLoaded([...txnHashes]);
-          }
-        })
-      )
-    );
-    let txnReceipt = await waitUntilTransactionMined(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
     return {
       prepaidCards: await this.resolvePrepaidCards(prepaidCardAddresses),
-      txnReceipt,
+      txnReceipt: await waitUntilTransactionMined(this.layer2Web3, gnosisTxn.ethereumTx.txHash),
     };
   }
 
@@ -543,33 +506,6 @@ export default class PrepaidCard {
       onError(issuingToken, prepaidCardBalance.toString(), weiAmount, symbol);
     }
     return weiAmount;
-  }
-
-  private async loadGasIntoPrepaidCard(
-    prepaidCardAddress: string,
-    createPrepaidCardTxnHash: string,
-    onTxnHash?: (txnHash: string) => void
-  ): Promise<void> {
-    await waitUntilTransactionMined(this.layer2Web3, createPrepaidCardTxnHash);
-    let relayServiceURL = await getConstant('relayServiceURL', this.layer2Web3);
-    let url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/load-gas/`;
-    let options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
-      },
-    };
-    let response = await fetch(url, options);
-    if (!response?.ok) {
-      throw new Error(await response.text());
-    }
-    let { txnHash } = await response.json();
-    if (txnHash) {
-      if (typeof onTxnHash == 'function') {
-        onTxnHash(txnHash);
-      }
-      await waitUntilTransactionMined(this.layer2Web3, txnHash);
-    }
   }
 
   private async resolvePrepaidCards(prepaidCardAddresses: string[]): Promise<PrepaidCardSafe[]> {

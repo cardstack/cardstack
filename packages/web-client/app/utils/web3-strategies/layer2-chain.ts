@@ -252,7 +252,6 @@ export default abstract class Layer2ChainWeb3Strategy
       this.defaultTokenContractAddress!,
       [amount],
       customizationDid,
-      undefined,
       { onTxnHash: options.onTxnHash }
     );
 
