@@ -66,7 +66,8 @@ module.exports = function (deployTarget) {
 
   if (deployTarget === 'production') {
     ENV.build.environment = 'production';
-    ENV.s3Assets.bucket = ENV.s3Pages.bucket = 'app-assets-cardstack';
+    ENV.s3Assets.bucket = ENV.s3Pages.bucket = ENV.s3WellKnown.bucket =
+      'app-assets-cardstack';
     ENV.cloudfront.region = ENV.s3Assets.region = ENV.s3Pages.region = ENV.s3WellKnown.region =
       'us-east-1';
     ENV.cloudfront.accessKeyId = ENV.s3Assets.accessKeyId = ENV.s3Pages.accessKeyId = ENV.s3WellKnown.accessKeyId =
