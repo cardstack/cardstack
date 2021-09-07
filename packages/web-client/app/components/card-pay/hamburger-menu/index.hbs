@@ -1,4 +1,10 @@
-<button type="button" class="hamburger-menu__trigger" disabled={{@open}} {{on "click" (optional @onOpen)}} >
+<button
+  type="button"
+  class="hamburger-menu__trigger"
+  disabled={{@open}}
+  {{on "click" (optional @onOpen)}}
+  ...attributes
+>
   {{svg-jar "hamburger-menu" width="20" height="14"}}
 </button>
 
