@@ -1,22 +1,46 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { click, render, settled } from '@ember/test-helpers';
-import { TestContext } from 'ember-test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { setupMirage } from 'ember-cli-mirage/test-support';
 
-interface Context extends TestContext {
+import { MirageTestContext } from 'ember-cli-mirage/test-support';
+import { getResolver } from '@cardstack/did-resolver';
+import { Resolver } from 'did-resolver';
+
+interface Context extends MirageTestContext {
   safes: Safe[];
 }
 
 let chosenSafe: Safe | null = null;
 
+const EXAMPLE_DID = 'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
+
 module(
   'Integration | Component | card-pay/safe-chooser-dropdown',
   function (hooks) {
     setupRenderingTest(hooks);
+    setupMirage(hooks);
 
-    hooks.beforeEach(function () {
+    hooks.beforeEach(async function (this: Context) {
+      let resolver = new Resolver({ ...getResolver() });
+      let resolvedDID = await resolver.resolve(EXAMPLE_DID);
+      let didAlsoKnownAs = resolvedDID?.didDocument?.alsoKnownAs![0]!;
+      let customizationJsonFilename = didAlsoKnownAs
+        .split('/')[4]
+        .split('.')[0];
+
+      this.server.create('merchant-info', {
+        id: customizationJsonFilename,
+        name: 'Mandello',
+        slug: 'mandello1',
+        did: EXAMPLE_DID,
+        color: '#00ffcc',
+        'text-color': '#000000',
+        'owner-address': '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+      });
+
       this.setProperties({
         safes: [
           {
@@ -64,6 +88,7 @@ module(
             ],
             owners: [],
             accumulatedSpendValue: 100,
+            infoDID: EXAMPLE_DID,
           },
         ],
         chooseSafe: (safe: Safe) => (chosenSafe = safe),
@@ -81,12 +106,18 @@ module(
 
       await click('.ember-power-select-trigger');
       assert.dom('.ember-power-select-options li').exists({ count: 2 });
+      await settled();
       assert
         .dom('.ember-power-select-options li:nth-child(1)')
         .containsText('DEPOT 0xB236ca8DbAB0644ffCD32518eBF4924ba8666666');
       assert
         .dom('.ember-power-select-options li:nth-child(2)')
         .containsText('MERCHANT 0xmerchantbAB0644ffCD32518eBF4924ba8666666');
+      assert
+        .dom(
+          '.ember-power-select-options li:nth-child(2) [data-test-merchant-logo]'
+        )
+        .containsText('M');
     });
 
     test('it returns the chosen safe to the handler', async function (this: Context, assert) {
