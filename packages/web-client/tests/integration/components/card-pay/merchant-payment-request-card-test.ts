@@ -7,6 +7,7 @@ import config from '@cardstack/web-client/config/environment';
 // selectors
 const BETA_ACCESS_LINK = '[data-test-payment-request-beta-access-link]';
 const MERCHANT = '[data-test-merchant]';
+const MERCHANT_LOGO = '[data-test-merchant-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
 const USD_AMOUNT = '[data-test-payment-request-usd-amount]';
 const QR_CODE = '[data-test-styled-qr-code]';
@@ -55,13 +56,13 @@ module(
         .hasAttribute('href', config.urls.testFlightLink);
       assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchant.name);
       assert
-        .dom(MERCHANT)
+        .dom(MERCHANT_LOGO)
         .hasAttribute(
           'data-test-merchant-logo-background',
           merchant.logoBackground
         );
       assert
-        .dom(MERCHANT)
+        .dom(MERCHANT_LOGO)
         .hasAttribute(
           'data-test-merchant-logo-text-color',
           merchant.logoTextColor
@@ -88,13 +89,13 @@ module(
         .hasAttribute('href', config.urls.testFlightLink);
       assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchant.name);
       assert
-        .dom(MERCHANT)
+        .dom(MERCHANT_LOGO)
         .hasAttribute(
           'data-test-merchant-logo-background',
           merchant.logoBackground
         );
       assert
-        .dom(MERCHANT)
+        .dom(MERCHANT_LOGO)
         .hasAttribute(
           'data-test-merchant-logo-text-color',
           merchant.logoTextColor
