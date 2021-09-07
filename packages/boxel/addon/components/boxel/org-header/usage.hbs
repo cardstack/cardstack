@@ -5,7 +5,7 @@
   <:example>
     <Boxel::OrgHeader
       @title={{this.title}}
-      @logoURL={{this.logoURL}}
+      @iconURL={{this.iconURL}}
       style={{css-var
         boxel-org-header-background-color=this.backgroundColor
         boxel-org-header-color=this.color
@@ -23,9 +23,9 @@
       @onInput={{fn (mut this.title)}}
     />
     <Args.String
-      @name="logoURL"
-      @value={{this.logoURL}}
-      @onInput={{fn (mut this.logoURL)}}
+      @name="iconURL"
+      @value={{this.iconURL}}
+      @onInput={{fn (mut this.iconURL)}}
     />
     <Args.String
       @name="--boxel-org-header-background-color"
