@@ -4,6 +4,7 @@
   @selected={{@selectedSafe}}
   @onChange={{@onChooseSafe}}
   @renderInPlace={{true}}
+  @eventType="click" {{!-- to prevent auto-selection of first item, as discussed at https://github.com/cardstack/cardstack/pull/2051 --}}
   @verticalPosition="below"
   data-test-safe-chooser-dropdown
   ...attributes
