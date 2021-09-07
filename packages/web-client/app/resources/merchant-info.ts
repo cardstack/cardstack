@@ -60,7 +60,6 @@ export class MerchantInfo extends Resource<Args> {
 
     if (alsoKnownAs) {
       let jsonApiDocument = await this.fetchJson(alsoKnownAs[0], waitForInfo);
-      console.log('json', jsonApiDocument);
 
       this.id = jsonApiDocument.data.attributes['slug'];
       this.name = jsonApiDocument.data.attributes['name'];
