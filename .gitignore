@@ -8,6 +8,9 @@
 /packages/web-client/deploy/dist
 /packages/cardpay-subgraph/build
 /packages/cardpay-subgraph/generated
+/packages/compiled/node
+/packages/compiled/browser
+/packages/compiled/assets
 /packages/*/.env
 .eslintcache
 .vagrant
