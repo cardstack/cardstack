@@ -2,8 +2,9 @@
   display: inline-block;
   padding: var(--boxel-sp-xxs);
   border-radius: 2.5rem;
-  border: 1px solid var(--boxel-light-400);
   overflow: hidden;
+  background: var(--boxel-light);
+  border: 1px solid var(--boxel-light-400);
 }
 
 .styled-qr-code > canvas {

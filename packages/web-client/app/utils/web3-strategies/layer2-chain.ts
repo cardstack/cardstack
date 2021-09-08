@@ -58,7 +58,8 @@ interface Layer2ConnectEvent {
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 export default abstract class Layer2ChainWeb3Strategy
-  implements Layer2Web3Strategy, Emitter<Layer2ChainEvent> {
+  implements Layer2Web3Strategy, Emitter<Layer2ChainEvent>
+{
   chainId: number;
   networkSymbol: Layer2NetworkSymbol;
   provider: WalletConnectProvider | undefined;
@@ -79,10 +80,6 @@ export default abstract class Layer2ChainWeb3Strategy
   @tracked isInitializing = true;
 
   @reads('provider.connector') connector!: IConnector;
-
-  get isFetchingDepot() {
-    return taskFor(this.fetchDepotTask).isRunning;
-  }
 
   constructor(networkSymbol: Layer2NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
@@ -216,7 +213,7 @@ export default abstract class Layer2ChainWeb3Strategy
 
     this.walletInfo = newWalletInfo;
     if (accounts.length) {
-      await taskFor(this.fetchDepotTask).perform();
+      await this.refreshSafesAndBalances();
       this.waitForAccountDeferred.resolve();
     } else {
       this.defaultTokenBalance = new BN('0');
@@ -229,16 +226,18 @@ export default abstract class Layer2ChainWeb3Strategy
     this.updateWalletInfo([]);
   }
 
-  async refreshBalances() {
-    return taskFor(this.fetchDepotTask).perform();
+  async refreshSafesAndBalances() {
+    return taskFor(this.viewSafesTask).perform();
   }
 
   async viewSafe(address: string): Promise<Safe | undefined> {
     return await this.#safesApi.viewSafe(address);
   }
 
-  async viewSafes(account: string): Promise<Safe[]> {
-    return await this.#safesApi.view(account);
+  @task *viewSafesTask(
+    account: string = this.walletInfo.firstAddress!
+  ): TaskGenerator<Safe[]> {
+    return yield this.#safesApi.view(account);
   }
 
   async issuePrepaidCard(
@@ -254,8 +253,7 @@ export default abstract class Layer2ChainWeb3Strategy
       this.defaultTokenContractAddress!,
       [amount],
       customizationDid,
-      undefined,
-      options.onTxHash
+      { onTxnHash: options.onTxnHash }
     );
 
     return result.prepaidCards[0];
@@ -274,11 +272,9 @@ export default abstract class Layer2ChainWeb3Strategy
     const RevenuePool = await getSDK('RevenuePool', this.web3);
 
     return (
-      await RevenuePool.registerMerchant(
-        prepaidCardAddress,
-        infoDid,
-        options.onTxHash
-      )
+      await RevenuePool.registerMerchant(prepaidCardAddress, infoDid, {
+        onTxnHash: options.onTxnHash,
+      })
     ).merchantSafe;
   }
 
@@ -366,7 +362,7 @@ export default abstract class Layer2ChainWeb3Strategy
         tokenAddress,
         receiverAddress,
         amountInWei,
-        (txnHash) => res(txnHash)
+        { onTxnHash: (txnHash) => res(txnHash) }
       );
     });
     return transactionHash;
@@ -378,35 +374,6 @@ export default abstract class Layer2ChainWeb3Strategy
   ): Promise<BridgeValidationResult> {
     let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
     return tokenBridge.waitForBridgingValidation(fromBlock.toString(), txnHash);
-  }
-
-  @task *fetchDepotTask(): any {
-    let depot = null;
-
-    if (this.walletInfo.firstAddress) {
-      let safes = yield this.#safesApi.view(this.walletInfo.firstAddress);
-      let depotSafes = safes.filter(
-        (safe: Safe) => safe.type === 'depot'
-      ) as DepotSafe[];
-
-      depot = depotSafes[depotSafes.length - 1] ?? null;
-      if (depot) {
-        let defaultBalance = depot.tokens.find(
-          (tokenInfo) => tokenInfo.token.symbol === this.defaultTokenSymbol
-        )?.balance;
-        let cardBalance = depot.tokens.find(
-          (tokenInfo) => tokenInfo.token.symbol === 'CARD'
-        )?.balance;
-        this.defaultTokenBalance = new BN(defaultBalance ?? '0');
-        this.cardBalance = new BN(cardBalance ?? '0');
-      } else {
-        this.defaultTokenBalance = new BN('0');
-        this.cardBalance = new BN('0');
-      }
-    }
-
-    this.depotSafe = depot;
-    return;
   }
 
   async convertFromSpend(symbol: ConvertibleSymbol, amount: number) {

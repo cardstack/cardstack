@@ -33,7 +33,7 @@ const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
 export default class CardPayPrepaidCardWorkflowPreviewComponent extends Component<CardPayPrepaidCardWorkflowPreviewComponentArgs> {
   @service declare cardCustomization: CardCustomization;
   @service declare layer2Network: Layer2Network;
-  @tracked txHash?: TransactionHash;
+  @tracked txnHash?: TransactionHash;
   @tracked chinInProgressMessage?: string;
 
   @reads('args.workflowSession.state.spendFaceValue')
@@ -55,7 +55,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
     return (
       taskFor(this.issueTask).isRunning &&
       this.issueTaskRunningForAWhile &&
-      !this.txHash
+      !this.txnHash
     );
   }
 
@@ -79,10 +79,9 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
       this.chinInProgressMessage =
         'You will receive a confirmation request from the Card Wallet app in a few moments…';
       let options: IssuePrepaidCardOptions = {
-        onTxHash: (txHash: TransactionHash) => {
-          this.txHash = txHash;
-          this.chinInProgressMessage =
-            'Waiting for the transaction to be finalized…';
+        onTxnHash: (txnHash: TransactionHash) => {
+          this.txnHash = txnHash;
+          this.chinInProgressMessage = 'Processing transaction…';
         },
       };
       if (this.lastNonce) {
@@ -93,7 +92,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
         };
       }
       let prepaidCardSafeTaskInstance = taskFor(
-        this.layer2Network.issuePrepaidCard
+        this.layer2Network.issuePrepaidCardTask
       ).perform(this.faceValue, customization.did, options);
       let prepaidCardSafe = yield race([
         prepaidCardSafeTaskInstance,
@@ -154,6 +153,6 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
   }
 
   get txViewerUrl() {
-    return this.txHash && this.layer2Network.blockExplorerUrl(this.txHash);
+    return this.txnHash && this.layer2Network.blockExplorerUrl(this.txnHash);
   }
 }

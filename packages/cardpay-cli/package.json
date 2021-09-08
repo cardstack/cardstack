@@ -1,7 +1,7 @@
 {
   "name": "@cardstack/cardpay-cli",
   "description": "CLI tool for basic actions in the Cardpay ecosystem",
-  "version": "0.21.5",
+  "version": "0.23.0",
   "author": "Dominic Sherman @DominicSherman",
   "repository": "cardstack/cardstack",
   "scripts": {
@@ -13,7 +13,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@cardstack/cardpay-sdk": "0.21.5",
+    "@cardstack/cardpay-sdk": "0.23.0",
     "@truffle/hdwallet-provider": "^1.2.6",
     "@trufflesuite/web3-provider-engine": "^15.0.13-1",
     "@types/bn.js": "^5.1.0",
@@ -31,5 +31,5 @@
   "config": {
     "access": "public"
   },
-  "gitHead": "bbeee2f2841f3f857ab7a2edfb4ded89973cf969"
+  "gitHead": "a2b3b58abd5207915247301cb9a570bdfc325c10"
 }

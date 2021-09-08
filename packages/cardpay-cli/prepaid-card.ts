@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { getConstant, getSDK, PrepaidCardSafe } from '@cardstack/cardpay-sdk';
+import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 
 const { fromWei } = Web3.utils;
@@ -45,10 +45,8 @@ export async function create(
       ' SPEND, §'
     )} SPEND and issuing token ${symbol} from depot ${safe}...`
   );
-  let onPrepaidCardCreated = (prepaidCards: PrepaidCardSafe[]) =>
-    console.log(`Created new prepaid card(s): ${prepaidCards.map((p) => p.address).join(', ')}`);
-  let onTxHash = (txHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txHash}/token-transfers`);
-  await prepaidCard.create(safe, tokenAddress, faceValues, customizationDID, onPrepaidCardCreated, onTxHash);
+  let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`);
+  await prepaidCard.create(safe, tokenAddress, faceValues, customizationDID, { onTxnHash });
   console.log('done');
 }
 
@@ -65,13 +63,9 @@ export async function split(
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(`Splitting prepaid card ${prepaidCard} into face value(s) §${faceValues.join(' SPEND, §')} SPEND...`);
-  await prepaidCardAPI.split(
-    prepaidCard,
-    faceValues,
-    customizationDID,
-    (prepaidCards) => console.log(`Created new prepaid card(s): ${prepaidCards.map((p) => p.address).join(', ')}`),
-    (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
-  );
+  await prepaidCardAPI.split(prepaidCard, faceValues, customizationDID, {
+    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
   console.log('done');
 }
 
@@ -87,9 +81,9 @@ export async function transfer(
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(`Transferring prepaid card ${prepaidCard} to new owner ${newOwner}...`);
-  await prepaidCardAPI.transfer(prepaidCard, newOwner, (txnHash) =>
-    console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
-  );
+  await prepaidCardAPI.transfer(prepaidCard, newOwner, {
+    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
   console.log('done');
 }
 
@@ -107,8 +101,8 @@ export async function payMerchant(
   console.log(
     `Paying merchant safe address ${merchantSafe} the amount §${spendAmount} SPEND from prepaid card address ${prepaidCardAddress}...`
   );
-  await prepaidCard.payMerchant(merchantSafe, prepaidCardAddress, spendAmount, (txnHash) =>
-    console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
-  );
+  await prepaidCard.payMerchant(merchantSafe, prepaidCardAddress, spendAmount, {
+    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
   console.log('done');
 }

@@ -14,34 +14,3 @@
   background-color: var(--boxel-org-header-background-color);
   color: var(--boxel-org-header-color);
 }
-
-.boxel-org-header__title {
-  display: grid;
-  align-items: center;
-  gap: 0 3px;
-  min-height: 3.125rem; /* 50px */
-  margin: 0;
-  font: var(--boxel-font-sm);
-  font-weight: 700;
-  letter-spacing: var(--boxel-lsp-xxl);
-  text-transform: uppercase;
-}
-
-.boxel-org-header__title--has-logo {
-  grid-template-columns: auto 1fr;
-}
-
-.boxel-org-header__logo {
-  width: 3.125rem; /* 50px */
-  height: 3.125rem;
-  background-position: var(--boxel-org-header-logo-position);
-  background-repeat: no-repeat;
-  background-size: var(--boxel-org-header-logo-size);
-}
-
-.boxel-org-header__logo svg {
-  display: block;
-  margin: auto;
-  max-width: 100%;
-  max-height: 100%;
-}

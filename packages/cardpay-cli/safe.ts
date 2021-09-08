@@ -90,9 +90,9 @@ export async function transferTokens(
 
   console.log(`transferring ${amount} ${symbol} from safe ${safe} to ${recipient}`);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  await safes.sendTokens(safe, token, recipient, weiAmount, (txnHash) =>
-    console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
-  );
+  await safes.sendTokens(safe, token, recipient, weiAmount, {
+    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
   console.log('done');
 }
 
@@ -131,8 +131,8 @@ export async function setSupplierInfoDID(
   let { symbol } = await assets.getTokenInfo(gasToken);
   console.log(`setting the info DID for the supplier safe ${safe} to ${infoDID} using ${symbol} token to pay for gas`);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  await safes.setSupplierInfoDID(safe, infoDID, gasToken, (txnHash) =>
-    console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`)
-  );
+  await safes.setSupplierInfoDID(safe, infoDID, gasToken, {
+    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
   console.log('done');
 }

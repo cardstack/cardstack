@@ -19,8 +19,9 @@ export default class CardPayWorkflowHubAuthComponent extends Component<CardPayWo
     try {
       this.error = undefined;
       yield this.hubAuthentication.ensureAuthenticated();
-      this.args.onComplete();
+      if (this.hubAuthentication.isAuthenticated) this.args.onComplete();
     } catch (e) {
+      console.error(e);
       this.error = e;
     }
   }

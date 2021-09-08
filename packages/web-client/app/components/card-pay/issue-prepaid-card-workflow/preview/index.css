@@ -40,14 +40,19 @@
 }
 
 .preview__loading-indicator {
-  --icon-color: white;
+  --icon-color: var(--boxel-light);
 
-  margin-right: var(--boxel-sp-sm);
+  margin-right: var(--boxel-sp-xs);
   flex-grow: 0;
   flex-shrink: 0;
 }
 
+.preview__in-progress-message {
+  max-width: 20rem;
+}
+
 .preview__cancel-button {
-  display: inline;
-  text-decoration: underline;
+  display: inline-block;
+  margin-left: var(--boxel-sp-xxxs);
+  color: var(--boxel-highlight);
 }

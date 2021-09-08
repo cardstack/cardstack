@@ -58,9 +58,9 @@ class WalletConnectProvider extends ExtendedProviderEngine {
   constructor(opts: ICardstackWalletConnectProviderOptions) {
     super({
       blockTracker: new BlockTracker({
-        provider: (new WebsocketProvider(
+        provider: new WebsocketProvider(
           opts.rpcWss[opts.chainId!]
-        ) as unknown) as Provider,
+        ) as unknown as Provider,
       }),
     });
     let rpcWss: IRPCMap = opts.rpcWss || null;
@@ -73,7 +73,7 @@ class WalletConnectProvider extends ExtendedProviderEngine {
       cb: (err: Error, res: JsonRpcResponse<U>) => void
     ): void {
       this.send(
-        (req as unknown) as JsonRpcPayload,
+        req as unknown as JsonRpcPayload,
         cb as (error: Error | null, result?: unknown) => void
       );
     };

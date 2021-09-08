@@ -36,7 +36,8 @@ const FAILURE_REASONS = {
 
 class CheckBalanceWorkflowMessage
   extends WorkflowPostable
-  implements IWorkflowMessage {
+  implements IWorkflowMessage
+{
   @tracked minimumBalanceForWithdrawalClaim: BN | undefined;
 
   constructor() {
@@ -53,9 +54,8 @@ class CheckBalanceWorkflowMessage
       () => !!this.layer1Network.defaultTokenBalance
     );
     // HACK: We are passing "DAI" in the next line, but the user hasn't actually specified what token they will be withdrawing yet.
-    let minimum: BN = yield this.layer1Network.getEstimatedGasForWithdrawalClaim(
-      'DAI'
-    );
+    let minimum: BN =
+      yield this.layer1Network.getEstimatedGasForWithdrawalClaim('DAI');
     this.minimumBalanceForWithdrawalClaim = minimum;
     this.workflow?.session.update('minimumBalanceForWithdrawalClaim', minimum);
 

@@ -23,9 +23,9 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   @tracked amount = '';
   @tracked isUnlocked = false;
   @tracked isUnlocking = false;
-  @tracked unlockTokensTxHash: string | undefined;
+  @tracked unlockTokensTxnHash: string | undefined;
   @tracked unlockTxnReceipt: TransactionReceipt | undefined;
-  @tracked relayTokensTxHash: string | undefined;
+  @tracked relayTokensTxnHash: string | undefined;
   @tracked relayTokensTxnReceipt: TransactionReceipt | undefined;
   @tracked isDepositing = false;
   @tracked hasDeposited = false;
@@ -93,11 +93,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   }
 
   get unlockTxnViewerUrl() {
-    return this.layer1Network.blockExplorerUrl(this.unlockTokensTxHash);
+    return this.layer1Network.blockExplorerUrl(this.unlockTokensTxnHash);
   }
 
   get depositTxnViewerUrl() {
-    return this.layer1Network.blockExplorerUrl(this.relayTokensTxHash);
+    return this.layer1Network.blockExplorerUrl(this.relayTokensTxnHash);
   }
 
   get isUnlockingOrUnlocked() {
@@ -135,9 +135,9 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     try {
       this.isUnlocking = true;
       let transactionReceipt = await taskFor(
-        this.layer1Network.approve
-      ).perform(this.amountAsBigNumber, this.currentTokenSymbol, (txHash) => {
-        this.unlockTokensTxHash = txHash;
+        this.layer1Network.approveTask
+      ).perform(this.amountAsBigNumber, this.currentTokenSymbol, (txnHash) => {
+        this.unlockTokensTxnHash = txnHash;
       });
       this.isUnlocked = true;
       this.unlockTxnReceipt = transactionReceipt;
@@ -155,19 +155,20 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     try {
       let layer2Address = this.layer2Network.walletInfo.firstAddress!;
       this.isDepositing = true;
-      let layer2BlockHeightBeforeBridging = await this.layer2Network.getBlockHeight();
+      let layer2BlockHeightBeforeBridging =
+        await this.layer2Network.getBlockHeight();
       this.args.workflowSession.update(
         'layer2BlockHeightBeforeBridging',
         layer2BlockHeightBeforeBridging
       );
       let transactionReceipt = await taskFor(
-        this.layer1Network.relayTokens
+        this.layer1Network.relayTokensTask
       ).perform(
         this.currentTokenSymbol,
         layer2Address,
         this.amountAsBigNumber,
-        (txHash) => {
-          this.relayTokensTxHash = txHash;
+        (txnHash) => {
+          this.relayTokensTxnHash = txnHash;
         }
       );
       this.relayTokensTxnReceipt = transactionReceipt;

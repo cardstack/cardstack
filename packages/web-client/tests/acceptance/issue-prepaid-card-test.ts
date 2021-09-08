@@ -101,12 +101,34 @@ module('Acceptance | issue prepaid card', function (hooks) {
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
-      defaultToken: SLIGHTLY_LESS_THAN_MAX_VALUE,
-      card: new BN('250000000000000000000'),
-    });
-
+    let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      {
+        type: 'depot',
+        address: depotAddress,
+        tokens: [
+          {
+            balance: SLIGHTLY_LESS_THAN_MAX_VALUE.toString(),
+            tokenAddress: 'DAI_ADDRESS',
+            token: {
+              symbol: 'DAI',
+              name: 'DAI',
+              decimals: 18,
+            },
+          },
+          {
+            balance: '250000000000000000000',
+            tokenAddress: 'CARD_ADDRESS',
+            token: {
+              symbol: 'CARD',
+              name: 'CARD',
+              decimals: 18,
+            },
+          },
+        ],
+        createdAt: Date.now() / 1000,
+        owners: [layer2AccountAddress],
+      },
       {
         type: 'prepaid-card',
         createdAt: Date.now() / 1000,
@@ -126,25 +148,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
       },
     ]);
 
-    let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-    let testDepot = {
-      address: depotAddress,
-      tokens: [
-        {
-          balance: '250000000000000000000',
-          token: {
-            symbol: 'DAI',
-          },
-        },
-        {
-          balance: '250000000000000000000',
-          token: {
-            symbol: 'CARD',
-          },
-        },
-      ],
-    };
-    layer2Service.test__simulateDepot(testDepot as DepotSafe);
     await waitUntil(
       () => !document.querySelector('[data-test-wallet-connect-qr-code]')
     );
@@ -428,9 +431,10 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     await settled();
 
-    // @ts-ignore
-    let customizationStorageRequest = this.server.pretender.handledRequests.find(
-      (req: { url: string }) => req.url.includes('prepaid-card-customizations')
+    let customizationStorageRequest = (
+      this as any
+    ).server.pretender.handledRequests.find((req: { url: string }) =>
+      req.url.includes('prepaid-card-customizations')
     );
 
     assert.equal(

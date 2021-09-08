@@ -1,4 +1,5 @@
 import Route from '@ember/routing/route';
+import '../../css/card-pay/merchant-services.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/merchants-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/merchants-summary-hero.svg';
 import config from '@cardstack/web-client/config/environment';

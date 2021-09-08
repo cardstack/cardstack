@@ -1,7 +1,7 @@
 <article class="merchant-card" data-test-merchant-card={{@id}} ...attributes>
   <header class="merchant-card__header">
     <div class="merchant-card__header-network">on {{@network}}</div>
-    <div class="merchant-card__header-address">{{truncate-middle @address}}</div>
+    <div class="merchant-card__header-address">{{truncate-middle @safe.address}}</div>
   </header>
   <section class="merchant-card__content">
     <CardPay::Merchant

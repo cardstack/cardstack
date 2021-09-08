@@ -10,7 +10,7 @@ export default class CardPayDepositWorkflowConfirmationComponent extends Compone
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
     next(this, () => {
-      this.layer2Network.refreshBalances();
+      this.layer2Network.refreshSafesAndBalances();
       this.args.onComplete?.();
     });
   }

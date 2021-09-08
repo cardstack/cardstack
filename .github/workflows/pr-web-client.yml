@@ -10,6 +10,9 @@ on:
       - 'packages/did-resolver/**'
       - 'packages/test-support/**'
       - 'packages/eslint-config/**'
+      - '.github/workflows/pr-web-client.yml'
+      - 'package.json'
+      - 'yarn.lock'
 
 jobs:
   test:
@@ -27,6 +30,5 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - run: yarn global add lerna
       - run: yarn --prefer-offline
       - run: yarn test:web-client

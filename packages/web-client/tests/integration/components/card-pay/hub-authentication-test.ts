@@ -23,9 +23,7 @@ module(
     setupMirage(hooks);
 
     hooks.beforeEach(async function (this: Context) {
-      hubAuthentication = this.owner.lookup(
-        'service:hub-authentication'
-      ) as HubAuthentication;
+      hubAuthentication = this.owner.lookup('service:hub-authentication');
 
       this.setProperties({
         onComplete: () => {
@@ -54,7 +52,7 @@ module(
 
     module('Test the sdk hub authentication calls', async function () {
       test('It shows the failure message if the signing request fails or is rejected', async function (assert) {
-        let deferred = RSVP.defer<string>();
+        let deferred = RSVP.defer<void>();
         sinon
           .stub(hubAuthentication, 'ensureAuthenticated')
           .returns(deferred.promise);
@@ -74,7 +72,7 @@ module(
       });
 
       test('It shows the successful state if authentication succeeds', async function (assert) {
-        let deferred = RSVP.defer<string>();
+        let deferred = RSVP.defer<void>();
         sinon
           .stub(hubAuthentication, 'ensureAuthenticated')
           .returns(deferred.promise);
@@ -85,7 +83,9 @@ module(
           .containsText(
             'You will receive a confirmation request from the Card Wallet app in a few moments'
           );
-        deferred.resolve('some-auth-token');
+        hubAuthentication.authToken = 'some-auth-token';
+        hubAuthentication.isAuthenticated = true;
+        deferred.resolve();
         await settled();
         assert
           .dom('[data-test-boxel-action-chin]')

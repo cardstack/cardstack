@@ -29,5 +29,5 @@ export function networkDisplayInfo(
 export default helper(
   // hack to make sure helper stays happy regardless of typing
   // should remove this as templates get more type safety
-  (networkDisplayInfo as unknown) as (params: any[], has: any) => string
+  networkDisplayInfo as unknown as (params: any[], has: any) => string
 );

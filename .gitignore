@@ -1,6 +1,5 @@
 /node_modules
 /packages/*/node_modules
-/cards/*/node_modules
 /packages/*/dist
 /packages/*/tmp
 /packages/*/vendor
@@ -26,9 +25,6 @@ package-lock.json
 /packages/hub/**/*.js
 /packages/hub/**/*.js.map
 !/packages/hub/db/migrations/*.js
-/cards/**/*.d.ts
-/cards/**/*.js
-/cards/**/*.js.map
 
 /packages/core/**/*.d.ts
 /packages/core/**/*.js
@@ -68,9 +64,6 @@ package-lock.json
 /packages/cardpay-subgraph/abis/generated/
 /packages/cardpay-subgraph/src/generated/
 
-# generated files you may end up with if you run the cli blueprint directly
-packages/cli/node-tests/sample-cards/*/node_modules/**/*
-
 # unconventional js
 /blueprints/*/files/
 /vendor/
@@ -96,7 +89,7 @@ packages/cli/node-tests/sample-cards/*/node_modules/**/*
 /packages/**/node_modules/@cardstack/**/*.js.map
 /packages/**/node_modules/@cardstack/**/*.d.ts
 
-# firebase functions 
+# firebase functions
 /packages/firebase-functions/**/node_modules
 /packages/firebase-functions/**/build
 /packages/firebase-functions/**/*.d.ts

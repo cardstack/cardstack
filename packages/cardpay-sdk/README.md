@@ -64,16 +64,24 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [ABI's](#abis)
 
 ## Function Parameters
-### Nonce
-All the API's that mutate the state of the blockchain have 2 optional parameters for nonce:
+### TransactionOptions
+
+All the APIs that mutate the state of the blockchain have an overload that accepts a transaction hash
+as a single argument. This overload allows for resuming interrupted calls with a consistent return type.
+
+In addition, the normal overloads of these APIs accept a TransactionOptions arg with options related to
+nonce and the transaction hash.
+
+#### Nonce
+TransactionOptions has 2 optional parameters for nonce:
 - `onNonce: (nonce: BN) => void`
 - `nonce: BN`
 
 The purpose of these nonce parameters are to allow the client to reattempt sending the transaction. Specifically this can be used to handle re-requesting a wallet to sign a transaction. When the `nonce` parameter is not specified, then the SDK will use the next available nonce for the transaction based on the transaction count for the EOA or safe (as the case may be). The `onNonce` callback will return the next available nonce (which is the nonce included in the signing request for the wallet). If the caller wishes to re-attempt sending the same transaction, the caller can specify the `nonce` to use when re-signing the transaction based on the nonce that was provided from the original `onNonce` callback. This will prevent the scenarios where the nonce will be increased on when the caller wants to force the wallet to resign the transaction. Care should be take though not to reuse a `nonce` value associated with a completed transaction. Such a situation could lead to the transaction being rejected because the nonce value is too low, or because the txn hash is identical to an already mined transaction.
 
-### Transaction Hash
-All the API's that mutate the state of the blockchain have an optional parameters for obtaining the transaction hash:
-- `onTxHash(txHash: string) => unknown`
+#### Transaction Hash
+TransactionOptions has an optional parameter for obtaining the transaction hash:
+- `onTxnHash(txnHash: string) => unknown`
 
 The promise returned by all the API's that mutate the state of the blockchain will resolve after the transaction has been mined with a transaction receipt. In order for callers of the SDK to obtain the transaction hash (for purposes of tracking the transaction) before the transaction has been mined, all API's that mutate the state of the blockchain will also contain a callback `onTxnHash` that callers can use to obtain the transaction hash as soon as it is available.
 
@@ -133,7 +141,8 @@ let tokenBridge = await getSDK('TokenBridgeForeignSide', web3);
 This call will perform an ERC-20 `approve` action on the tokens to grant the Token Bridge contract the ability bridge your tokens. This method is invoked with:
 - The contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
 - The amount of tokens to unlock. This amount should be in units of `wei` and as string.
-- You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a third argument.
+- You can optionally provide an object that specifies the nonce, onNonce callback, and/or onTxnHash callback as a third argument.
+- You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fourth argument.
 
 This method returns a promise that includes a web3 transaction receipt, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
 
@@ -150,7 +159,8 @@ This method is invoked with the following parameters:
 - The layer 1 contract address of the token that you are unlocking. Note that the token address must be a supported stable coin token. Use the `TokenBridgeForeignSide.getSupportedTokens` method to get a list of supported tokens.
 - The address of the layer 2 account that should own the resulting safe
 - The amount of tokens to unlock. This amount should be in units of `wei` and as a string.
-- You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fourth argument.
+- You can optionally provide an object that specifies the nonce, onNonce callback, and/or onTxnHash callback as a fourth argument.
+- You can optionally provide an object that specifies the from address, gas limit, and/or gas price as a fifth argument.
 
 This method returns a promise that includes a web3 transaction receipt, from which you can obtain the transaction hash, ethereum events, and other details about the transaction https://web3js.readthedocs.io/en/v1.3.4/web3-eth-contract.html#id37.
 
@@ -378,7 +388,7 @@ This method is invoked with the following parameters:
 - An array of face values in units of **§** SPEND as numbers. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
 - A DID string that represents the customization for the prepaid card. The customization for a prepaid card can be retrieved using a DID resolver with this DID. If there is no customization an `undefined` value can be specified here.
 - You can optionally provide a callback to obtain the prepaid card addresses before the creation process is complete
-- You can optionally provide a callback to obtain the transaction hash of the  card addresses before the creation process is complete
+- You can optionally provide a TransactionOptions argument, to obtain the nonce or transaction hash of the operation before the creation process is complete
 - You can optionally provide a callback to obtain a hook to know when the gas has been loaded into the prepaid card before the creation process is complete
 - You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
 

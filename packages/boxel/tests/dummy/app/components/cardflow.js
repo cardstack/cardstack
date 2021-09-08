@@ -97,9 +97,8 @@ export default class CardflowComponent extends Component {
       return 'Workflow started';
     }
 
-    let previousMilestone = this.args.model.workflow.milestones[
-      this.progress - 1
-    ];
+    let previousMilestone =
+      this.args.model.workflow.milestones[this.progress - 1];
     return previousMilestone ? previousMilestone.statusOnCompletion : null;
   }
 }

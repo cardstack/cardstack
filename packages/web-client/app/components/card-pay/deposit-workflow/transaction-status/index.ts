@@ -46,7 +46,8 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    this.totalBlockCount = this.layer1Network.strategy.bridgeConfirmationBlockCount;
+    this.totalBlockCount =
+      this.layer1Network.strategy.bridgeConfirmationBlockCount;
     taskFor(this.waitForBlockConfirmationsTask)
       .perform()
       .catch((e) => {
@@ -86,7 +87,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
       let transactionReceipt = await this.layer2Network.awaitBridgedToLayer2(
         this.layer2BlockHeightBeforeBridging!
       );
-      this.layer2Network.refreshBalances();
+      this.layer2Network.refreshSafesAndBalances();
       this.args.workflowSession.update(
         'completedLayer2TransactionReceipt',
         transactionReceipt

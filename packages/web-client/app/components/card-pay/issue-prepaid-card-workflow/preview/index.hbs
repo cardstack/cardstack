@@ -103,10 +103,10 @@
           class="preview__loading-indicator"
           @color="var(--boxel-light)"
         />
-        <div>
+        <div class="preview__in-progress-message">
           {{this.chinInProgressMessage}}
           {{#if this.enableCancelation}}
-            <a href="#" class="preview__cancel-button" data-test-issue-prepaid-card-cancel-button {{on 'click' (queue (prevent-default) this.cancel)}}>Cancel</a>
+            <a href="#" class="preview__cancel-button" data-test-issue-prepaid-card-cancel-button {{on "click" (queue (prevent-default) this.cancel)}}>Cancel</a>
           {{/if}}
         </div>
       </i.ActionStatusArea>

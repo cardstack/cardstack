@@ -28,10 +28,11 @@ import {
 } from '@cardstack/web-client/utils/events';
 import { task, TaskGenerator } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
+import { taskFor } from 'ember-concurrency-ts';
 
 interface IssuePrepaidCardRequest {
   deferred: RSVP.Deferred<PrepaidCardSafe>;
-  onTxHash?: (txHash: TransactionHash) => void;
+  onTxnHash?: (txnHash: TransactionHash) => void;
   onNonce?: (nonce: string) => void;
   nonce?: string;
   customizationDID: string;
@@ -39,7 +40,7 @@ interface IssuePrepaidCardRequest {
 
 interface RegisterMerchantRequest {
   deferred: RSVP.Deferred<MerchantSafe>;
-  onTxHash?: (txHash: TransactionHash) => void;
+  onTxnHash?: (txnHash: TransactionHash) => void;
   onNonce?: (nonce: string) => void;
   nonce?: string;
   infoDID: string;
@@ -53,24 +54,23 @@ interface SimulateBalancesParams {
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainId = '-1';
   simpleEmitter = new SimpleEmitter();
+  defaultTokenSymbol: ConvertibleSymbol = 'DAI';
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo: WalletInfo = new WalletInfo([]);
   waitForAccountDeferred = defer();
   bridgingToLayer2Deferred!: RSVP.Deferred<TransactionReceipt>;
   bridgingToLayer1HashDeferred!: RSVP.Deferred<TransactionHash>;
   bridgingToLayer1Deferred!: RSVP.Deferred<BridgeValidationResult>;
-  @tracked isFetchingDepot = false;
   @tracked daiBalance: BN | undefined;
   @tracked defaultTokenBalance: BN | undefined;
   @tracked cardBalance: BN | undefined;
-  @tracked depotSafe: DepotSafe | null = null;
   @tracked isInitializing = false;
 
   issuePrepaidCardRequests: Map<number, IssuePrepaidCardRequest> = new Map();
   registerMerchantRequests: Map<string, RegisterMerchantRequest> = new Map();
-  accountSafes: Map<string, Safe[]> = new Map();
+  @tracked accountSafes: Map<string, Safe[]> = new Map();
 
-  // property to test whether the refreshBalances method is called
+  // property to test whether the refreshSafesAndBalances method is called
   // to test if balances are refreshed after relaying tokens
   // this is only a mock property
   @tracked balancesRefreshed = false;
@@ -98,12 +98,15 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(new BN('0'));
   }
 
-  refreshBalances() {
+  refreshSafesAndBalances() {
     this.balancesRefreshed = true;
+    return taskFor(this.viewSafesTask).perform();
   }
 
-  fetchDepotTask(): any {
-    return Promise.resolve(this.depotSafe);
+  get depotSafe(): DepotSafe | null {
+    let safes = this.accountSafes.get(this.walletInfo.firstAddress!) || [];
+    let depotSafe = safes.find((safe) => safe.type === 'depot');
+    return (depotSafe as DepotSafe) ?? null;
   }
 
   awaitBridgedToLayer2(
@@ -174,8 +177,22 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     );
   }
 
-  async viewSafes(account: string): Promise<Safe[]> {
-    return Promise.resolve(this.accountSafes.get(account)!);
+  test__autoResolveViewSafes = true;
+
+  @task *viewSafesTask(
+    account: string = this.walletInfo.firstAddress!
+  ): TaskGenerator<Safe[]> {
+    if (this.test__autoResolveViewSafes) {
+      return yield Promise.resolve(this.accountSafes.get(account)!);
+    }
+    this.test__deferredViewSafes = defer();
+    return yield this.test__deferredViewSafes.promise;
+  }
+
+  async test__simulateViewSafes(
+    safes = this.accountSafes.get(this.walletInfo.firstAddress!)!
+  ) {
+    this.test__deferredViewSafes.resolve(safes);
   }
 
   test__simulateAccountSafes(account: string, safes: Safe[]) {
@@ -184,6 +201,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     }
 
     this.accountSafes.get(account)?.push(...safes);
+    // eslint-disable-next-line no-self-assign -- for reactivity
+    this.accountSafes = this.accountSafes;
   }
 
   async issuePrepaidCard(
@@ -195,7 +214,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     let deferred: RSVP.Deferred<PrepaidCardSafe> = defer();
     this.issuePrepaidCardRequests.set(faceValue, {
       deferred,
-      onTxHash: options.onTxHash,
+      onTxnHash: options.onTxnHash,
       onNonce: options.onNonce,
       nonce: options.nonce,
       customizationDID,
@@ -215,7 +234,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     let deferred: RSVP.Deferred<MerchantSafe> = defer();
     this.registerMerchantRequests.set(prepaidCardAddress, {
       deferred,
-      onTxHash: options.onTxHash,
+      onTxnHash: options.onTxnHash,
       onNonce: options.onNonce,
       nonce: options.nonce,
       infoDID,
@@ -236,6 +255,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   test__simulatedExchangeRate: number = 0.2;
   test__updateUsdConvertersDeferred: RSVP.Deferred<void> | undefined;
   test__deferredHubAuthentication!: RSVP.Deferred<string>;
+  test__deferredViewSafes!: RSVP.Deferred<Safe[]>;
 
   test__simulateWalletConnectUri() {
     this.walletConnectUri = 'This is a test of Layer2 Wallet Connect';
@@ -257,17 +277,79 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   test__simulateBalances(balances: SimulateBalancesParams) {
+    let { depotSafe } = this;
+    if (!depotSafe) {
+      this.test__simulateDepot({
+        address: 'example-depot',
+        tokens: [],
+        type: 'depot',
+        createdAt: +new Date(),
+        owners: [],
+      });
+      depotSafe = this.depotSafe!;
+    }
     if (balances.dai) {
-      this.daiBalance = balances.dai;
+      let token = depotSafe.tokens.find(
+        (tokenInfo) => tokenInfo.token.symbol === 'DAI'
+      );
+      if (!token) {
+        token = {
+          tokenAddress: 'DAI_TOKEN_ADDRESS',
+          token: {
+            name: 'DAI',
+            symbol: 'DAI',
+            decimals: 18,
+          },
+          balance: balances.dai.toString(),
+        };
+        depotSafe.tokens.push(token);
+      } else {
+        token.balance = balances.dai.toString();
+      }
     }
 
     if (balances.defaultToken) {
-      this.defaultTokenBalance = balances.defaultToken;
+      let token = depotSafe.tokens.find(
+        (tokenInfo) => tokenInfo.token.symbol === this.defaultTokenSymbol
+      );
+      if (!token) {
+        token = {
+          tokenAddress: `${this.defaultTokenSymbol}_TOKEN_ADDRESS`,
+          token: {
+            name: this.defaultTokenSymbol,
+            symbol: this.defaultTokenSymbol,
+            decimals: 18,
+          },
+          balance: balances.defaultToken.toString(),
+        };
+        depotSafe.tokens.push(token);
+      } else {
+        token.balance = balances.defaultToken.toString();
+      }
     }
 
     if (balances.card) {
-      this.cardBalance = balances.card;
+      let token = depotSafe.tokens.find(
+        (tokenInfo) => tokenInfo.token.symbol === 'CARD'
+      );
+      if (!token) {
+        token = {
+          tokenAddress: 'CARD_TOKEN_ADDRESS',
+          token: {
+            name: 'CARD',
+            symbol: 'CARD',
+            decimals: 18,
+          },
+          balance: balances.card.toString(),
+        };
+        depotSafe.tokens.push(token);
+      } else {
+        token.balance = balances.card.toString();
+      }
     }
+
+    // eslint-disable-next-line no-self-assign -- for reactivity
+    this.accountSafes = this.accountSafes;
   }
 
   test__simulateBridgedToLayer2(txnHash: TransactionHash) {
@@ -277,11 +359,21 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   test__simulateDepot(depot: DepotSafe | null) {
-    if (depot) {
-      this.depotSafe = depot;
-      return;
+    let address = this.walletInfo.firstAddress!;
+    if (!this.accountSafes.has(address)) {
+      this.accountSafes.set(address, []);
     }
-    this.depotSafe = null;
+    let safes = this.accountSafes.get(address)!;
+    let depotSafe = safes.find((safe) => safe.type === 'depot');
+    if (depotSafe) {
+      safes.removeObject(depotSafe);
+    }
+    if (depot) {
+      depot.type = 'depot';
+      safes.pushObject(depot);
+    }
+    // eslint-disable-next-line no-self-assign -- for reactivity
+    this.accountSafes = this.accountSafes;
   }
 
   test__simulateConvertFromSpend(symbol: ConvertibleSymbol, amount: number) {
@@ -332,7 +424,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
       ...options,
     };
-    request?.onTxHash?.('exampleTxHash');
+    request?.onTxnHash?.('exampleTxHnash');
 
     this.test__simulateAccountSafes(walletAddress, [prepaidCardSafe]);
 
@@ -372,7 +464,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
       ...options,
     };
-    request?.onTxHash?.('exampleTxHash');
+    request?.onTxnHash?.('exampleTxnHash');
 
     let prepaidCard = [...this.accountSafes.values()]
       .flat()

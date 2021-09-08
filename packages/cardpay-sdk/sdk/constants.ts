@@ -101,9 +101,9 @@ export const networks: { [networkId: number]: string } = Object.freeze({
 
 // invert the networks object, so { '1': 'mainnet', ... } becomes { mainnet: '1', ... }
 // then map over the values, so that { mainnet: '1', ... } has its values casted as numbers: { mainnet: 1, ... }
-export const networkIds = (Object.freeze(
+export const networkIds = Object.freeze(
   mapValues(invert({ ...networks }), (networkIdString: string) => Number(networkIdString))
-) as unknown) as {
+) as unknown as {
   [networkName: string]: number;
 };
 

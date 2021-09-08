@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/eslint-config",
-  "version": "0.21.5",
+  "version": "0.23.0",
   "description": "Shared eslint config for cardstack packages.",
   "main": "index.js",
   "scripts": {
@@ -23,14 +23,14 @@
   "peerDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
-    "eslint": "^7.22.0",
-    "eslint-config-prettier": "^8.1.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-ember": "^10.2.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-mocha": "^8.1.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.3.1",
-    "prettier": "^2.2.1"
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.3.2"
   },
   "engines": {
     "node": ">= 12"
@@ -41,5 +41,5 @@
   "config": {
     "access": "public"
   },
-  "gitHead": "bbeee2f2841f3f857ab7a2edfb4ded89973cf969"
+  "gitHead": "a2b3b58abd5207915247301cb9a570bdfc325c10"
 }

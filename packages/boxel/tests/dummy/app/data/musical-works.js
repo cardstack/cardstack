@@ -75,8 +75,7 @@ export default [
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id:
-            '0x2b4932f7c27d6ca5d8bd5601ba7c28071221165ac2f1b7928c22c2809d24183ca',
+          id: '0x2b4932f7c27d6ca5d8bd5601ba7c28071221165ac2f1b7928c22c2809d24183ca',
           verifi_id:
             '0x2b4932f7c27d6ca5d8bd5601ba7c28071221165ac2f1b7928c22c2809d24183ca',
           verifi_reg_date: '2020-04-08',
@@ -129,8 +128,7 @@ export default [
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id:
-            '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
+          id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_id:
             '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_reg_date: '2019-11-11',
@@ -209,8 +207,7 @@ export default [
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id:
-            '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
+          id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_id:
             '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_reg_date: '2019-11-11',
@@ -295,8 +292,7 @@ export default [
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id:
-            '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
+          id: '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
           verifi_id:
             '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
           verifi_reg_date: '2020-05-18',
@@ -381,8 +377,7 @@ export default [
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id:
-            '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
+          id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_id:
             '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_reg_date: '2019-11-11',
@@ -462,8 +457,7 @@ export default [
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id:
-            '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
+          id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_id:
             '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_reg_date: '2019-11-11',
@@ -547,8 +541,7 @@ export default [
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id:
-            '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
+          id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_id:
             '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_reg_date: '2019-11-11',
@@ -632,8 +625,7 @@ export default [
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id:
-            '0x7cf232e7c48d6ba5d8bd3101fc7a28071091165de2f1b4542c37e2812d89154be',
+          id: '0x7cf232e7c48d6ba5d8bd3101fc7a28071091165de2f1b4542c37e2812d89154be',
           verifi_id:
             '0x7cf232e7c48d6ba5d8bd3101fc7a28071091165de2f1b4542c37e2812d89154be',
           verifi_reg_date: '2020-06-09',
@@ -762,8 +754,7 @@ export default [
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id:
-            '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
+          id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_id:
             '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
           verifi_reg_date: '2019-11-11',

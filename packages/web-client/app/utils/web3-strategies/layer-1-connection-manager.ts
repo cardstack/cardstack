@@ -233,7 +233,8 @@ class ConcreteStrategyFactory implements ConnectionManagerStrategyFactory {
 }
 
 export abstract class ConnectionStrategy
-  implements Emitter<ConnectionManagerWalletEvent> {
+  implements Emitter<ConnectionManagerWalletEvent>
+{
   private simpleEmitter: SimpleEmitter;
 
   // concrete classes will need to implement these

@@ -31,7 +31,8 @@ import { UsdConvertibleSymbol } from './token-to-usd';
 
 export default class Layer1Network
   extends Service
-  implements Emitter<Layer1ChainEvent> {
+  implements Emitter<Layer1ChainEvent>
+{
   strategy!: Layer1Web3Strategy;
   simpleEmitter = new SimpleEmitter();
   walletProviders = walletProviders;
@@ -99,28 +100,28 @@ export default class Layer1Network
     return this.simpleEmitter.on(event, cb);
   }
 
-  @task *approve(
+  @task *approveTask(
     amount: BN,
     tokenSymbol: string,
-    onTxHash: (txHash: TransactionHash) => void
+    onTxnHash: (txnHash: TransactionHash) => void
   ): TaskGenerator<TransactionReceipt> {
     let txnReceipt = yield this.strategy.approve(amount, tokenSymbol, {
-      onTxHash,
+      onTxnHash,
     });
     return txnReceipt;
   }
 
-  @task *relayTokens(
+  @task *relayTokensTask(
     tokenSymbol: string,
     destinationAddress: string,
     amount: BN,
-    onTxHash: (txHash: TransactionHash) => void
+    onTxnHash: (txnHash: TransactionHash) => void
   ): TaskGenerator<TransactionReceipt> {
     let txnReceipt = yield this.strategy.relayTokens(
       tokenSymbol,
       destinationAddress,
       amount,
-      { onTxHash }
+      { onTxnHash }
     );
     yield this.strategy.refreshBalances();
     return txnReceipt;
@@ -134,7 +135,7 @@ export default class Layer1Network
     return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
   }
 
-  @task *claimBridgedTokens(
+  @task *claimBridgedTokensTask(
     bridgeValidationResult: BridgeValidationResult,
     options?: ClaimBridgedTokensOptions
   ): TaskGenerator<TransactionReceipt> {

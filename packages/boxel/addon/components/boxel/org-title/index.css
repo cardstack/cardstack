@@ -1,0 +1,31 @@
+.boxel-org-title {
+  display: grid;
+  align-items: center;
+  gap: 0 3px;
+  min-height: 3.125rem;
+  margin: 0;
+  font: var(--boxel-font-sm);
+  font-weight: 700;
+  letter-spacing: var(--boxel-lsp-xxl);
+  text-transform: uppercase;
+  color: var(--boxel-org-title-color, inherit);
+}
+
+.boxel-org-title--has-logo {
+  grid-template-columns: auto 1fr;
+}
+
+.boxel-org-title__logo {
+  width: 3.125rem;
+  height: 3.125rem;
+  background-position: var(--boxel-org-title-logo-position, center);
+  background-repeat: no-repeat;
+  background-size: var(--boxel-org-title-logo-size, 3.125rem 3.125rem);
+}
+
+.boxel-org-title__logo svg {
+  display: block;
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
+}

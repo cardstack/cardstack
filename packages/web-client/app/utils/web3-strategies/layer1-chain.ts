@@ -42,7 +42,8 @@ import { action } from '@ember/object';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 
 export default abstract class Layer1ChainWeb3Strategy
-  implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
+  implements Layer1Web3Strategy, Emitter<Layer1ChainEvent>
+{
   chainId: number;
   networkSymbol: Layer1NetworkSymbol;
   simpleEmitter = new SimpleEmitter();
@@ -275,14 +276,14 @@ export default abstract class Layer1ChainWeb3Strategy
   async approve(
     amountInWei: BN,
     tokenSymbol: BridgeableSymbol,
-    { onTxHash }: ApproveOptions
+    { onTxnHash }: ApproveOptions
   ): Promise<TransactionReceipt> {
     if (!this.web3) throw new Error('Cannot unlock tokens without web3');
     let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
     return tokenBridge.unlockTokens(
       new TokenContractInfo(tokenSymbol, this.networkSymbol).address,
       amountInWei.toString(),
-      onTxHash
+      { onTxnHash }
     );
   }
 
@@ -290,7 +291,7 @@ export default abstract class Layer1ChainWeb3Strategy
     tokenSymbol: BridgeableSymbol,
     receiverAddress: string,
     amountInWei: BN,
-    { onTxHash }: RelayTokensOptions
+    { onTxnHash }: RelayTokensOptions
   ): Promise<TransactionReceipt> {
     if (!this.web3) throw new Error('Cannot relay tokens without web3');
     let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
@@ -298,7 +299,7 @@ export default abstract class Layer1ChainWeb3Strategy
       new TokenContractInfo(tokenSymbol, this.networkSymbol).address,
       receiverAddress,
       amountInWei.toString(),
-      onTxHash
+      { onTxnHash }
     );
   }
 
@@ -312,7 +313,7 @@ export default abstract class Layer1ChainWeb3Strategy
       bridgeValidationResult.messageId,
       bridgeValidationResult.encodedData,
       bridgeValidationResult.signatures,
-      options?.onTxHash
+      { onTxnHash: options?.onTxnHash }
     );
   }
 

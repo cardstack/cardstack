@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.21.5",
+  "version": "0.23.0",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },
@@ -12,17 +12,19 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.18.0",
     "@aws-sdk/client-sts": "^3.18.0",
-    "@cardstack/cardpay-sdk": "0.21.5",
-    "@cardstack/did-resolver": "0.21.5",
+    "@cardstack/cardpay-sdk": "0.23.0",
+    "@cardstack/did-resolver": "0.23.0",
     "@cardstack/logger": "^0.2.1",
     "@graphile/logger": "^0.2.0",
     "@sentry/node": "^6.10.0",
     "@types/fs-extra": "^9.0.11",
+    "@types/json-stable-stringify": "^1.0.32",
     "@types/koa": "^2.13.1",
     "@types/koa-route": "^3.2.4",
     "@types/lodash": "^4.14.169",
     "@types/qs": "^6.9.6",
     "@types/semver": "^7.3.6",
+    "@types/tmp": "^0.2.0",
     "@types/web3": "^1.2.2",
     "assert-never": "^1.2.1",
     "auto-bind": "^4.0.0",
@@ -57,13 +59,18 @@
     "web3": "^1.3.5"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.21.5",
-    "@cardstack/test-support": "0.21.5",
+    "@cardstack/eslint-config": "0.23.0",
+    "@cardstack/test-support": "0.23.0",
+    "@types/chai": "^4.2.15",
+    "@types/chai-as-promised": "^7.1.3",
     "@types/config": "^0.0.38",
+    "@types/mocha": "^8.2.1",
+    "@types/moment-timezone": "^0.5.30",
     "@types/pg-format": "^1.0.1",
     "@types/supertest": "^2.0.11",
     "dotenv": "^10.0.0",
     "json-stable-stringify": "^1.0.1",
+    "mocha": "^8.3.2",
     "moment-timezone": "^0.5.33",
     "supertest": "^6.1.3"
   },
@@ -81,7 +88,7 @@
     "db:test:prepare": "node ./bin/setup-test-db.js",
     "start:server": "node ./bin/server.ts",
     "start:worker": "node ./bin/worker.ts",
-    "test": "PACKAGE=hub NODE_ENV=test mocha -r esm ../test-support/bin/run.js --timeout 60000",
+    "test": "PACKAGE=hub NODE_ENV=test mocha ../test-support/bin/run.js --timeout 60000",
     "autotest": "PACKAGE=hub NODE_ENV=test mocha -w --reporter=min -r esm ../test-support/bin/run.js --timeout 60000"
   },
   "volta": {
@@ -90,5 +97,5 @@
   "config": {
     "access": "public"
   },
-  "gitHead": "bbeee2f2841f3f857ab7a2edfb4ded89973cf969"
+  "gitHead": "a2b3b58abd5207915247301cb9a570bdfc325c10"
 }

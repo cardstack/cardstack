@@ -6,8 +6,8 @@
       "environment": "production",
       "ref": "main"
     },
-    "allowedChannels": [],
-    "allowedRoles": []
+    "allowedChannels": ["866667164764471346"],
+    "allowedRoles": ["Engineering Team", "Cardstack Core Team"]
   },
   "github": {
     "owner": "cardstack",
