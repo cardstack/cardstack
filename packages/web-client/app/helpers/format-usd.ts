@@ -9,6 +9,9 @@ let DEFAULT_OPTIONS = {
 export default helper(
   ([usdAmount]: [number], options: Partial<FormatUsdOptions> = {}) => {
     let opts = Object.assign({}, DEFAULT_OPTIONS, options) as FormatUsdOptions;
-    return formatUsd(usdAmount, opts);
+    if (usdAmount || usdAmount === 0) {
+      return formatUsd(usdAmount, opts);
+    }
+    return undefined;
   }
 );
