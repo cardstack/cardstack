@@ -1,4 +1,5 @@
 .merchant-option {
+  margin-right: var(--boxel-sp-xl);
   padding: var(--boxel-sp-xs);
   display: grid;
   grid-template-columns: var(--boxel-sp-xxl) 1fr;
@@ -17,6 +18,9 @@
 
 .merchant-option__name-and-type {
   grid-area: name-and-type;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
 }
 
 .merchant-option__name {
