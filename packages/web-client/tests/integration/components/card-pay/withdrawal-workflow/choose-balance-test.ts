@@ -156,10 +156,9 @@ module(
       assert
         .dom('.ember-power-select-options li:nth-child(1)')
         .containsText('DEPOT 0xB236ca8DbAB0644ffCD32518eBF4924ba8666666');
-      // FIXME is MERCHANT correct?
       assert
         .dom('.ember-power-select-options li:nth-child(2)')
-        .containsText('MERCHANT 0xmerchantbAB0644ffCD32518eBF4924ba8666666');
+        .containsText('0xmerchantbAB0644ffCD32518eBF4924ba8666666');
       await click('.ember-power-select-options li:nth-child(2)');
 
       assert

@@ -112,7 +112,9 @@ module(
         .containsText('DEPOT 0xB236ca8DbAB0644ffCD32518eBF4924ba8666666');
       assert
         .dom('.ember-power-select-options li:nth-child(2)')
-        .containsText('MERCHANT 0xmerchantbAB0644ffCD32518eBF4924ba8666666');
+        .containsText('Mandello')
+        .containsText('Merchant account')
+        .containsText('0xmerchantbAB0644ffCD32518eBF4924ba8666666');
       assert
         .dom(
           '.ember-power-select-options li:nth-child(2) [data-test-merchant-logo]'
