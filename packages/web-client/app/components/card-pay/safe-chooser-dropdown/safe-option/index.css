@@ -1,6 +1,4 @@
 .safe-option {
-  margin-right: var(--boxel-sp-xl);
-  padding: var(--boxel-sp-xs);
   display: grid;
   grid-template-columns: var(--boxel-sp-xxl) 1fr;
   grid-template-rows: 1fr 1fr;

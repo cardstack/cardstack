@@ -151,6 +151,13 @@ module(
         .dom('[data-test-safe-chooser-dropdown]')
         .containsText(this.safes[1].address);
 
+      await click('.ember-power-select-trigger');
+      assert
+        .dom(
+          '.ember-power-select-options li:nth-child(2) .safe-chooser-dropdown__option--selected'
+        )
+        .exists();
+
       this.set('selectedSafe', this.safes[0]);
       await settled();
 
@@ -170,6 +177,13 @@ module(
       assert
         .dom('[data-test-safe-chooser-dropdown]')
         .containsText(this.safes[0].address);
+
+      await click('.ember-power-select-trigger');
+      assert
+        .dom(
+          '.ember-power-select-options li:nth-child(1) .safe-chooser-dropdown__option--selected'
+        )
+        .exists();
     });
   }
 );
