@@ -16,7 +16,7 @@ import {
   getNextNonceFromEstimate,
 } from '../utils/safe-utils';
 import { ZERO_ADDRESS } from '../constants';
-import { waitUntilTransactionMined } from '../utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from '../utils/general-utils';
 import { signSafeTxAsRSV, Signature } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
@@ -97,16 +97,34 @@ export default class RevenuePool {
     return gasInToken;
   }
 
+  async claim(txnHash: string): Promise<TransactionReceipt>;
   async claim(
     merchantSafeAddress: string,
     tokenAddress: string,
     amount: string,
-    onTxHash?: (txHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async claim(
+    merchantSafeAddressOrTxnHash: string,
+    tokenAddress?: string,
+    amount?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    if (isTransactionHash(merchantSafeAddressOrTxnHash)) {
+      let txnHash = merchantSafeAddressOrTxnHash;
+      return waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    let merchantSafeAddress = merchantSafeAddressOrTxnHash;
+    if (!tokenAddress) {
+      throw new Error('tokenAddress is required');
+    }
+    if (!amount) {
+      throw new Error('amount is required');
+    }
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let revenuePoolAddress = await getAddress('revenuePool', this.layer2Web3);
     let revenuePool = new this.layer2Web3.eth.Contract(RevenuePoolABI as AbiItem[], revenuePoolAddress);
     let unclaimedBalance = new BN(await revenuePool.methods.revenueBalance(merchantSafeAddress, tokenAddress).call());
@@ -172,21 +190,40 @@ export default class RevenuePool {
       ZERO_ADDRESS
     );
 
-    if (typeof onTxHash === 'function') {
-      await onTxHash(gnosisResult.ethereumTx.txHash);
+    let txnHash = gnosisResult.ethereumTx.txHash;
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
+  async registerMerchant(txnHash: string): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }>;
   async registerMerchant(
     prepaidCardAddress: string,
-    infoDID: string | undefined,
-    onTxHash?: (txHash: string) => unknown,
-    onNonce?: (nonce: BN) => void,
-    nonce?: BN,
-    options?: ContractOptions
+    infoDID: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }>;
+  async registerMerchant(
+    prepaidCardAddressOrTxnHash: string,
+    infoDID?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<{ merchantSafe: MerchantSafe; txReceipt: TransactionReceipt }> {
-    let from = options?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
+      let txnHash = prepaidCardAddressOrTxnHash;
+      let merchantSafeAddress = await this.getMerchantSafeFromTxn(txnHash);
+      return {
+        merchantSafe: await this.resolveMerchantSafe(merchantSafeAddress),
+        txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+      };
+    }
+    let prepaidCardAddress = prepaidCardAddressOrTxnHash;
+    if (!infoDID) {
+      throw new Error('infoDID is required');
+    }
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let prepaidCard = await getSDK('PrepaidCard', this.layer2Web3);
     let issuingToken = await prepaidCard.issuingToken(prepaidCardAddress);
     let registrationFee = await this.merchantRegistrationFee();
@@ -252,14 +289,17 @@ export default class RevenuePool {
     if (!gnosisResult) {
       throw new Error(`Unable to register merchant with prepaid card ${prepaidCardAddress}`);
     }
-    if (typeof onTxHash === 'function') {
-      await onTxHash(gnosisResult.ethereumTx.txHash);
+
+    let txnHash = gnosisResult.ethereumTx.txHash;
+
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
     }
 
-    let merchantSafeAddress = await this.getMerchantSafeFromTxn(gnosisResult.ethereumTx.txHash);
+    let merchantSafeAddress = await this.getMerchantSafeFromTxn(txnHash);
     return {
       merchantSafe: await this.resolveMerchantSafe(merchantSafeAddress),
-      txReceipt: await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash),
+      txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
     };
   }
 
