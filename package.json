@@ -80,14 +80,7 @@
       "packages/**"
     ],
     "nohoist": [
-      "**/@embroider/webpack",
-      "**/@embroider/webpack/**",
-      "**/@embroider/compat",
-      "**/@embroider/compat/**",
-      "**/@embroider/core",
-      "**/@embroider/core/**",
-      "**/@embroider/util",
-      "**/@embroider/util/**"
+      "**/@types/loader-utils"
     ]
   },
   "private": true,
