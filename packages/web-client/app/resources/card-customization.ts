@@ -1,14 +1,12 @@
-import { timeout } from 'ember-concurrency';
 import { tracked } from '@glimmer/tracking';
 import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 import { Resource } from 'ember-resources';
-import config from '../config/environment';
 import * as Sentry from '@sentry/browser';
-
-const FIRST_RETRY_DELAY = config.environment === 'test' ? 100 : 1000;
-
-class Storage404 extends Error {}
+import {
+  fetchOffChainJson,
+  isStorage404,
+} from '@cardstack/web-client/utils/fetch-off-chain-json';
 
 interface Args {
   named: {
@@ -45,7 +43,7 @@ export class CardCustomization extends Resource<Args> {
       this.errored = err;
       this.loading = false;
 
-      if (!(err instanceof Storage404)) {
+      if (!isStorage404(err)) {
         console.log('Exception fetching card customization', err);
         Sentry.captureException(err);
       }
@@ -61,7 +59,7 @@ export class CardCustomization extends Resource<Args> {
     let alsoKnownAs = did?.didDocument?.alsoKnownAs;
 
     if (alsoKnownAs) {
-      let jsonApiDocument = await this.fetchJson(
+      let jsonApiDocument = await fetchOffChainJson(
         alsoKnownAs[0],
         waitForCustomization
       );
@@ -79,35 +77,6 @@ export class CardCustomization extends Resource<Args> {
       this.patternColor = colorScheme['pattern-color'];
       this.textColor = colorScheme['text-color'];
       this.patternUrl = pattern['pattern-url'];
-    }
-  }
-
-  private async fetchJson(
-    alsoKnownAs: string,
-    waitForCustomization: boolean
-  ): Promise<any> {
-    let maxAttempts = waitForCustomization ? 10 : 1;
-    let attemptNum = 1;
-    while (attemptNum <= maxAttempts) {
-      try {
-        let jsonApiResponse = await fetch(alsoKnownAs);
-        if (!jsonApiResponse.ok) {
-          if (jsonApiResponse.status === 403) {
-            throw new Storage404();
-          } else {
-            let errorBodyText = await jsonApiResponse.text();
-            throw new Error(errorBodyText);
-          }
-        }
-        let jsonApiDocument = await jsonApiResponse.json();
-        return jsonApiDocument;
-      } catch (err) {
-        if (attemptNum === maxAttempts) {
-          throw err;
-        }
-        attemptNum++;
-        await timeout(FIRST_RETRY_DELAY * attemptNum);
-      }
     }
   }
 }
