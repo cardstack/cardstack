@@ -311,6 +311,7 @@ export default class PrepaidCard {
   async split(
     prepaidCardAddress: string,
     faceValues: number[],
+    marketAddress: string | undefined,
     customizationDID: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
@@ -318,6 +319,7 @@ export default class PrepaidCard {
   async split(
     prepaidCardAddressOrTxnHash: string,
     faceValues?: number[],
+    marketAddress?: string | undefined,
     customizationDID?: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
@@ -332,9 +334,6 @@ export default class PrepaidCard {
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     if (!faceValues) {
       throw new Error(`faceValues must be provided`);
-    }
-    if (!customizationDID) {
-      throw new Error(`customizationDID must be provided`);
     }
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
@@ -390,7 +389,8 @@ export default class PrepaidCard {
           amounts,
           faceValues,
           rateLock,
-          customizationDID
+          customizationDID,
+          marketAddress
         );
         if (nonce == null) {
           nonce = getNextNonceFromEstimate(payload);
@@ -462,6 +462,7 @@ export default class PrepaidCard {
     safeAddress: string,
     tokenAddress: string,
     faceValues: number[],
+    marketAddress: string | undefined,
     customizationDID: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
@@ -470,6 +471,7 @@ export default class PrepaidCard {
     safeAddressOrTxnHash: string,
     tokenAddress?: string,
     faceValues?: number[],
+    marketAddress?: string | undefined,
     customizationDID?: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
@@ -518,7 +520,14 @@ export default class PrepaidCard {
       );
     }
 
-    let payload = await this.getCreateCardPayload(from, tokenAddress, amounts, faceValues, customizationDID);
+    let payload = await this.getCreateCardPayload(
+      from,
+      tokenAddress,
+      amounts,
+      faceValues,
+      customizationDID,
+      marketAddress
+    );
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', payload, 0, tokenAddress);
     let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
 
@@ -642,7 +651,8 @@ export default class PrepaidCard {
     tokenAddress: string,
     issuingTokenAmounts: BN[],
     spendAmounts: number[],
-    customizationDID = ''
+    customizationDID = '',
+    marketAddress = ZERO_ADDRESS
   ): Promise<string> {
     let prepaidCardManagerAddress = await getAddress('prepaidCardManager', this.layer2Web3);
     let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], tokenAddress);
@@ -656,8 +666,8 @@ export default class PrepaidCard {
         prepaidCardManagerAddress,
         sum,
         this.layer2Web3.eth.abi.encodeParameters(
-          ['address', 'uint256[]', 'uint256[]', 'string'],
-          [owner, issuingTokenAmounts, spendAmounts.map((i) => i.toString()), customizationDID]
+          ['address', 'uint256[]', 'uint256[]', 'string', 'address'],
+          [owner, issuingTokenAmounts, spendAmounts.map((i) => i.toString()), customizationDID, marketAddress]
         )
       )
       .encodeABI();
@@ -693,7 +703,8 @@ export default class PrepaidCard {
     issuingTokenAmounts: BN[],
     spendAmounts: number[],
     rate: string,
-    customizationDID = ''
+    customizationDID = '',
+    marketAddress = ZERO_ADDRESS
   ): Promise<SendPayload> {
     return getSendPayload(
       this.layer2Web3,
@@ -702,8 +713,8 @@ export default class PrepaidCard {
       rate,
       'split',
       this.layer2Web3.eth.abi.encodeParameters(
-        ['uint256[]', 'uint256[]', 'string'],
-        [issuingTokenAmounts, spendAmounts, customizationDID]
+        ['uint256[]', 'uint256[]', 'string', 'address'],
+        [issuingTokenAmounts, spendAmounts, customizationDID, marketAddress]
       )
     );
   }

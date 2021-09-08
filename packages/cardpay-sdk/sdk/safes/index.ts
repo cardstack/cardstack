@@ -8,7 +8,7 @@ export { Safe, DepotSafe, MerchantSafe, ExternalSafe, PrepaidCardSafe, TokenInfo
 
 // add more versions as we go, but also please do drop version that we don't
 // want to maintain simultaneously
-export type Safes = v0_7_0;
+export type Safes = v0_8_0;
 
 export const safesMeta = {
   apiVersions: { v0_8_0, v0_7_0 },

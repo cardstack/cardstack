@@ -6,7 +6,7 @@ import v0_7_0 from './v0.7.0';
 
 // add more versions as we go, but also please do drop version that we don't
 // want to maintain simultaneously
-export type LayerTwoOracle = v0_7_0;
+export type LayerTwoOracle = v0_8_0;
 
 export const layerTwoOracleMeta = {
   apiVersions: { v0_8_0, v0_7_0 },
