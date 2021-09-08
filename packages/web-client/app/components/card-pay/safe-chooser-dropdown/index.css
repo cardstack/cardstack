@@ -39,7 +39,7 @@
 
 .safe-chooser-dropdown__option {
   min-height: var(--field-height);
-  padding: var(--boxel-sp-xs) var(--boxel-sp-xxl) var(--boxel-sp-xs) var(--boxel-sp);
+  padding: var(--boxel-sp-xs) var(--boxel-sp-xxl) var(--boxel-sp-xs) var(--boxel-sp-xxxs);
 }
 
 .safe-chooser-dropdown__option--selected {
