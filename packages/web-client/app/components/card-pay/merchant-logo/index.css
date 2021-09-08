@@ -1,6 +1,7 @@
 .merchant-logo {
   --merchant-logo-background: var(--boxel-blue);
   --merchant-logo-text-color: var(--boxel-light);
+  --merchant-margin-right: var(--boxel-sp-xxs);
   --logo-size: var(--boxel-icon-sm);
 
   background: var(--merchant-logo-background);
@@ -13,7 +14,7 @@
   line-height: var(--logo-size);
   width: var(--logo-size);
   height: var(--logo-size);
-  margin-right: var(--boxel-sp-xxs);
+  margin-right: var(--merchant-margin-right);
   font-size: var(--boxel-font-size-sm);
   font-weight: 600;
   border-radius: 50%;
