@@ -182,9 +182,11 @@ module('Acceptance | create merchant', function (hooks) {
     );
     await waitUntil(
       () =>
-        (document.querySelector(
-          '[data-test-validation-state-input]'
-        ) as HTMLElement).dataset.testValidationStateInput === 'valid'
+        (
+          document.querySelector(
+            '[data-test-validation-state-input]'
+          ) as HTMLElement
+        ).dataset.testValidationStateInput === 'valid'
     );
     await click(`[data-test-merchant-customization-save-details]`);
 
@@ -310,9 +312,11 @@ module('Acceptance | create merchant', function (hooks) {
       );
       await waitUntil(
         () =>
-          (document.querySelector(
-            '[data-test-validation-state-input]'
-          ) as HTMLElement).dataset.testValidationStateInput === 'valid'
+          (
+            document.querySelector(
+              '[data-test-validation-state-input]'
+            ) as HTMLElement
+          ).dataset.testValidationStateInput === 'valid'
       );
       await click(`[data-test-merchant-customization-save-details]`);
 

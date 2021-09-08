@@ -6,6 +6,12 @@ import BN from 'bn.js';
 
 const POLL_INTERVAL = 500;
 
+export interface TransactionOptions {
+  nonce?: BN;
+  onNonce?: (nonce: BN) => void;
+  onTxnHash?: (txnHash: string) => unknown;
+}
+
 export async function networkName(web3: Web3): Promise<string> {
   let id = await web3.eth.net.getId();
   let name = networks[id];
@@ -110,4 +116,8 @@ export function waitForEvent(contract: Contract, eventName: string, opts: PastEv
 export function safeFloatConvert(rawAmount: BN, decimals: number): number {
   let amountStr = rawAmount.toString().padStart(decimals, '0');
   return Number(`${amountStr.slice(0, -1 * decimals)}.${amountStr.slice(-1 * decimals)}`);
+}
+
+export function isTransactionHash(candidate: string): boolean {
+  return !!candidate.match(/^0x[0-9a-f]{64}$/);
 }

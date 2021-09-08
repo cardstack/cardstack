@@ -58,7 +58,8 @@ interface Layer2ConnectEvent {
 const BRIDGE = 'https://safe-walletconnect.gnosis.io/';
 
 export default abstract class Layer2ChainWeb3Strategy
-  implements Layer2Web3Strategy, Emitter<Layer2ChainEvent> {
+  implements Layer2Web3Strategy, Emitter<Layer2ChainEvent>
+{
   chainId: number;
   networkSymbol: Layer2NetworkSymbol;
   provider: WalletConnectProvider | undefined;
@@ -252,8 +253,7 @@ export default abstract class Layer2ChainWeb3Strategy
       this.defaultTokenContractAddress!,
       [amount],
       customizationDid,
-      undefined,
-      options.onTxHash
+      { onTxnHash: options.onTxnHash }
     );
 
     return result.prepaidCards[0];
@@ -272,11 +272,9 @@ export default abstract class Layer2ChainWeb3Strategy
     const RevenuePool = await getSDK('RevenuePool', this.web3);
 
     return (
-      await RevenuePool.registerMerchant(
-        prepaidCardAddress,
-        infoDid,
-        options.onTxHash
-      )
+      await RevenuePool.registerMerchant(prepaidCardAddress, infoDid, {
+        onTxnHash: options.onTxnHash,
+      })
     ).merchantSafe;
   }
 
@@ -364,7 +362,7 @@ export default abstract class Layer2ChainWeb3Strategy
         tokenAddress,
         receiverAddress,
         amountInWei,
-        (txnHash) => res(txnHash)
+        { onTxnHash: (txnHash) => res(txnHash) }
       );
     });
     return transactionHash;

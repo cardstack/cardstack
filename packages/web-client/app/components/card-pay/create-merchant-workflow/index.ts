@@ -38,7 +38,8 @@ interface SessionAwareWorkflowMessageOptions {
 
 class SessionAwareWorkflowMessage
   extends WorkflowPostable
-  implements IWorkflowMessage {
+  implements IWorkflowMessage
+{
   private template: (session: ArbitraryDictionary) => string;
   isComplete = true;
 

@@ -31,7 +31,8 @@ import { UsdConvertibleSymbol } from './token-to-usd';
 
 export default class Layer1Network
   extends Service
-  implements Emitter<Layer1ChainEvent> {
+  implements Emitter<Layer1ChainEvent>
+{
   strategy!: Layer1Web3Strategy;
   simpleEmitter = new SimpleEmitter();
   walletProviders = walletProviders;
@@ -102,10 +103,10 @@ export default class Layer1Network
   @task *approveTask(
     amount: BN,
     tokenSymbol: string,
-    onTxHash: (txHash: TransactionHash) => void
+    onTxnHash: (txnHash: TransactionHash) => void
   ): TaskGenerator<TransactionReceipt> {
     let txnReceipt = yield this.strategy.approve(amount, tokenSymbol, {
-      onTxHash,
+      onTxnHash,
     });
     return txnReceipt;
   }
@@ -114,13 +115,13 @@ export default class Layer1Network
     tokenSymbol: string,
     destinationAddress: string,
     amount: BN,
-    onTxHash: (txHash: TransactionHash) => void
+    onTxnHash: (txnHash: TransactionHash) => void
   ): TaskGenerator<TransactionReceipt> {
     let txnReceipt = yield this.strategy.relayTokens(
       tokenSymbol,
       destinationAddress,
       amount,
-      { onTxHash }
+      { onTxnHash }
     );
     yield this.strategy.refreshBalances();
     return txnReceipt;

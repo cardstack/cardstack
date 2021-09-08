@@ -189,7 +189,7 @@ module('Acceptance | deposit', function (hooks) {
 
     assert.dom(`${post} [data-test-unlock-etherscan-button]`).doesNotExist();
 
-    layer1Service.test__simulateUnlockTxHash();
+    layer1Service.test__simulateUnlockTxnHash();
     await settled();
 
     assert.dom(`${post} [data-test-unlock-etherscan-button]`).exists();
@@ -217,7 +217,7 @@ module('Acceptance | deposit', function (hooks) {
 
     assert.dom(`${post} [data-test-deposit-etherscan-button]`).doesNotExist();
 
-    layer1Service.test__simulateDepositTxHash();
+    layer1Service.test__simulateDepositTxnHash();
     await settled();
 
     assert.dom(`${post} [data-test-deposit-etherscan-button]`).exists();

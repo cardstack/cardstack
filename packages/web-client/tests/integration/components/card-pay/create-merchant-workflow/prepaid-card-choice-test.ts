@@ -82,7 +82,8 @@ module(
         merchantId: 'mandello1',
         merchantBgColor: '#ff5050',
         merchantTextColor: '#fff',
-        merchantRegistrationFee: await layer2Service.fetchMerchantRegistrationFee(),
+        merchantRegistrationFee:
+          await layer2Service.fetchMerchantRegistrationFee(),
       });
 
       this.setProperties({
@@ -119,7 +120,9 @@ module(
         .containsText('100 SPEND');
       assert
         .dom('[data-test-merchant]')
-        .hasAttribute('data-test-merchant', 'Mandello')
+        .hasAttribute('data-test-merchant', 'Mandello');
+      assert
+        .dom('[data-test-merchant-logo]')
         .hasAttribute('data-test-merchant-logo-background', '#ff5050')
         .hasAttribute('data-test-merchant-logo-text-color', '#fff');
       assert
@@ -323,9 +326,10 @@ module(
 
         await click('[data-test-create-merchant-button]');
 
-        // @ts-ignore
-        let merchantInfoStorageRequests = this.server.pretender.handledRequests.filter(
-          (req: { url: string }) => req.url.includes('merchant-infos')
+        let merchantInfoStorageRequests = (
+          this as any
+        ).server.pretender.handledRequests.filter((req: { url: string }) =>
+          req.url.includes('merchant-infos')
         );
 
         assert.equal(

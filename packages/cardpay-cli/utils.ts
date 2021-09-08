@@ -31,6 +31,6 @@ export async function getWeb3(network: string, mnemonic?: string): Promise<Web3>
       bridge: BRIDGE,
     });
     await provider.enable();
-    return new Web3((provider as unknown) as AbstractProvider);
+    return new Web3(provider as unknown as AbstractProvider);
   }
 }

@@ -53,26 +53,49 @@ module.exports = function (deployTarget) {
 
   if (deployTarget === 'staging') {
     ENV.build.environment = 'production';
-    ENV.s3Assets.bucket = ENV.s3Pages.bucket = ENV.s3WellKnown.bucket =
-      'app-staging-assets-cardstack';
-    ENV.cloudfront.region = ENV.s3Assets.region = ENV.s3Pages.region = ENV.s3WellKnown.region =
-      'us-east-1';
-    ENV.cloudfront.accessKeyId = ENV.s3Assets.accessKeyId = ENV.s3Pages.accessKeyId = ENV.s3WellKnown.accessKeyId =
-      process.env.EMBER_DEPLOY_AWS_ACCESS_KEY;
-    ENV.cloudfront.secretAccessKey = ENV.s3Assets.secretAccessKey = ENV.s3Pages.secretAccessKey = ENV.s3WellKnown.secretAccessKey =
-      process.env.EMBER_DEPLOY_AWS_ACCESS_SECRET;
+    ENV.s3Assets.bucket =
+      ENV.s3Pages.bucket =
+      ENV.s3WellKnown.bucket =
+        'app-staging-assets-cardstack';
+    ENV.cloudfront.region =
+      ENV.s3Assets.region =
+      ENV.s3Pages.region =
+      ENV.s3WellKnown.region =
+        'us-east-1';
+    ENV.cloudfront.accessKeyId =
+      ENV.s3Assets.accessKeyId =
+      ENV.s3Pages.accessKeyId =
+      ENV.s3WellKnown.accessKeyId =
+        process.env.EMBER_DEPLOY_AWS_ACCESS_KEY;
+    ENV.cloudfront.secretAccessKey =
+      ENV.s3Assets.secretAccessKey =
+      ENV.s3Pages.secretAccessKey =
+      ENV.s3WellKnown.secretAccessKey =
+        process.env.EMBER_DEPLOY_AWS_ACCESS_SECRET;
     ENV.cloudfront.distribution = 'E330O30QIWNDYA';
   }
 
   if (deployTarget === 'production') {
     ENV.build.environment = 'production';
-    ENV.s3Assets.bucket = ENV.s3Pages.bucket = 'app-assets-cardstack';
-    ENV.cloudfront.region = ENV.s3Assets.region = ENV.s3Pages.region = ENV.s3WellKnown.region =
-      'us-east-1';
-    ENV.cloudfront.accessKeyId = ENV.s3Assets.accessKeyId = ENV.s3Pages.accessKeyId = ENV.s3WellKnown.accessKeyId =
-      process.env.EMBER_DEPLOY_AWS_ACCESS_KEY;
-    ENV.cloudfront.secretAccessKey = ENV.s3Assets.secretAccessKey = ENV.s3Pages.secretAccessKey = ENV.s3WellKnown.secretAccessKey =
-      process.env.EMBER_DEPLOY_AWS_ACCESS_SECRET;
+    ENV.s3Assets.bucket =
+      ENV.s3Pages.bucket =
+      ENV.s3WellKnown.bucket =
+        'app-assets-cardstack';
+    ENV.cloudfront.region =
+      ENV.s3Assets.region =
+      ENV.s3Pages.region =
+      ENV.s3WellKnown.region =
+        'us-east-1';
+    ENV.cloudfront.accessKeyId =
+      ENV.s3Assets.accessKeyId =
+      ENV.s3Pages.accessKeyId =
+      ENV.s3WellKnown.accessKeyId =
+        process.env.EMBER_DEPLOY_AWS_ACCESS_KEY;
+    ENV.cloudfront.secretAccessKey =
+      ENV.s3Assets.secretAccessKey =
+      ENV.s3Pages.secretAccessKey =
+      ENV.s3WellKnown.secretAccessKey =
+        process.env.EMBER_DEPLOY_AWS_ACCESS_SECRET;
     ENV.cloudfront.distribution = 'E3VPNGI7F1WEW8';
   }
 

@@ -22,9 +22,8 @@ export default class CardCatalogTrayItemUsage extends Component {
   @action onDragStart(e: DragEvent): void {
     // copy the item that is hidden far far away and set it as the drag image
     // note, opacity is an issue that needs a workaround: https://stackoverflow.com/questions/9712535/html5-drag-and-drop-no-transparency
-    let draggedItem: HTMLElement | null = document.querySelector(
-      '.very-far-away'
-    );
+    let draggedItem: HTMLElement | null =
+      document.querySelector('.very-far-away');
     if (draggedItem) {
       e.dataTransfer?.setDragImage(draggedItem, 280, 40);
       this.dragExampleState = 'dragged-in-tray';

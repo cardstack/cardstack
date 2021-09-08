@@ -12,7 +12,8 @@ export interface IWorkflowMessage extends WorkflowPostable {
 
 export class WorkflowMessage
   extends WorkflowPostable
-  implements IWorkflowMessage {
+  implements IWorkflowMessage
+{
   message: string;
 
   constructor(options: Partial<WorkflowMessageOptions>) {

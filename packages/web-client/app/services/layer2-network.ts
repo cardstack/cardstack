@@ -36,7 +36,8 @@ import { taskFor } from 'ember-concurrency-ts';
 import { UsdConvertibleSymbol } from './token-to-usd';
 export default class Layer2Network
   extends Service
-  implements Emitter<Layer2ChainEvent> {
+  implements Emitter<Layer2ChainEvent>
+{
   @service declare hubAuthentication: HubAuthentication;
   strategy!: Layer2Web3Strategy;
   simpleEmitter = new SimpleEmitter();

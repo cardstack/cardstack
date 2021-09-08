@@ -51,7 +51,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
     let web3 = {
       setProvider: Sinon.spy(),
     };
-    await subject.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
+    await subject.connect(web3 as unknown as Web3, 'metamask'); // the test strategy is hardcoded to metamask
 
     assert.ok(subject.providerId, 'There is a providerId after connecting');
 
@@ -65,7 +65,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
     let web3 = {
       setProvider: Sinon.spy(),
     };
-    await subject.reconnect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
+    await subject.reconnect(web3 as unknown as Web3, 'metamask'); // the test strategy is hardcoded to metamask
 
     assert.ok(subject.providerId, 'There is a providerId after reconnecting');
 
@@ -79,7 +79,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
     let web3 = {
       setProvider: () => {},
     };
-    await subject.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
+    await subject.connect(web3 as unknown as Web3, 'metamask'); // the test strategy is hardcoded to metamask
 
     assert.ok(subject.providerId, 'There is a providerId after connecting');
 
@@ -113,7 +113,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
     let onCrossTabConnection = Sinon.spy();
     subject.on('cross-tab-connection', onCrossTabConnection);
 
-    await subject.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
+    await subject.connect(web3 as unknown as Web3, 'metamask'); // the test strategy is hardcoded to metamask
 
     let message = {
       type: 'CONNECTED',
@@ -136,7 +136,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
     let onDisconnect = Sinon.spy();
     subject.on('disconnected', onDisconnect);
 
-    await subject.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
+    await subject.connect(web3 as unknown as Web3, 'metamask'); // the test strategy is hardcoded to metamask
 
     let message = {
       type: 'DISCONNECTED',
@@ -171,7 +171,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
       setProvider: () => {},
     };
 
-    await subject.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
+    await subject.connect(web3 as unknown as Web3, 'metamask'); // the test strategy is hardcoded to metamask
     subject.onConnect(['some-account']);
 
     assert.equal(
@@ -186,7 +186,7 @@ module('Unit | layer 1 connection manager', function (hooks) {
       setProvider: () => {},
     };
 
-    await subject.connect((web3 as unknown) as Web3, 'metamask'); // the test strategy is hardcoded to metamask
+    await subject.connect(web3 as unknown as Web3, 'metamask'); // the test strategy is hardcoded to metamask
     subject.onConnect(['some-account']);
 
     assert.equal(

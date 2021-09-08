@@ -90,8 +90,8 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
       merchantTextColor: this.merchantTextColor,
     };
 
-    let merchantInfoHasBeenPersisted = this.args.workflowSession.state
-      .merchantInfo;
+    let merchantInfoHasBeenPersisted =
+      this.args.workflowSession.state.merchantInfo;
 
     if (merchantInfoHasBeenPersisted) {
       let state = this.args.workflowSession.state;

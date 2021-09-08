@@ -46,7 +46,8 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    this.totalBlockCount = this.layer1Network.strategy.bridgeConfirmationBlockCount;
+    this.totalBlockCount =
+      this.layer1Network.strategy.bridgeConfirmationBlockCount;
     taskFor(this.waitForBlockConfirmationsTask)
       .perform()
       .catch((e) => {
