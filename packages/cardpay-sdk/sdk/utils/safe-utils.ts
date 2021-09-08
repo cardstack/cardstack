@@ -170,7 +170,7 @@ export async function executeTransaction(
 }
 
 // TODO delete this after we upgrade past 0.7.0 in xdai
-export async function executeSend_v0_7_0(
+export async function executeSend_v0_7_0( //eslint-disable-line @typescript-eslint/naming-convention
   web3: Web3,
   prepaidCardAddress: string,
   spendAmount: number,
