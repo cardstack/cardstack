@@ -10,9 +10,8 @@ export default class WorkflowOrgThreadRoute extends Route {
   }
 
   async model({ threadId }) {
-    const { user, currentOrg, userOrgs, orgQueueCards } = this.modelFor(
-      'workflow.org'
-    );
+    const { user, currentOrg, userOrgs, orgQueueCards } =
+      this.modelFor('workflow.org');
     const { users, messages, workflows } = this.modelFor('workflow');
 
     let thread = orgQueueCards.find((el) => el.id === threadId);

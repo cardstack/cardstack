@@ -432,9 +432,10 @@ module('Acceptance | issue prepaid card', function (hooks) {
     await settled();
 
     // @ts-ignore
-    let customizationStorageRequest = this.server.pretender.handledRequests.find(
-      (req: { url: string }) => req.url.includes('prepaid-card-customizations')
-    );
+    let customizationStorageRequest =
+      this.server.pretender.handledRequests.find((req: { url: string }) =>
+        req.url.includes('prepaid-card-customizations')
+      );
 
     assert.equal(
       customizationStorageRequest.requestHeaders['authorization'],

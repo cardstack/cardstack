@@ -42,7 +42,8 @@ import { action } from '@ember/object';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 
 export default abstract class Layer1ChainWeb3Strategy
-  implements Layer1Web3Strategy, Emitter<Layer1ChainEvent> {
+  implements Layer1Web3Strategy, Emitter<Layer1ChainEvent>
+{
   chainId: number;
   networkSymbol: Layer1NetworkSymbol;
   simpleEmitter = new SimpleEmitter();

@@ -34,4 +34,5 @@ export declare class TypedWebsocketProviderWithConstructor extends TypedWebsocke
   constructor(host: string, options?: WebsocketProviderOptions);
 }
 
-export const WebsocketProvider: any = (UntypedWebsocketProvider as unknown) as TypedWebsocketProviderWithConstructor;
+export const WebsocketProvider: any =
+  UntypedWebsocketProvider as unknown as TypedWebsocketProviderWithConstructor;

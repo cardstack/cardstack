@@ -78,8 +78,7 @@ export default {
       },
       {
         title: 'verifi_id',
-        id:
-          '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
+        id: '0xab5332b7a35d6ca5d8bd3781fb7c28071341127dc2f1b6928c38e2809e89179ce',
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
@@ -161,8 +160,7 @@ export default {
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id:
-            '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
+          id: '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
           verifi_id:
             '0x31ef32b4c27f6ca5d6bd6201fa7c14071228965dc2f1b4328c22e5609e8912ab4',
           verifi_reg_date: '2020-05-18',

@@ -31,7 +31,8 @@ import { UsdConvertibleSymbol } from './token-to-usd';
 
 export default class Layer1Network
   extends Service
-  implements Emitter<Layer1ChainEvent> {
+  implements Emitter<Layer1ChainEvent>
+{
   strategy!: Layer1Web3Strategy;
   simpleEmitter = new SimpleEmitter();
   walletProviders = walletProviders;

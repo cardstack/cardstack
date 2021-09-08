@@ -52,10 +52,8 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   #unlockDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
   #depositOnTxnHash: Function | undefined;
   #depositDeferred: RSVP.Deferred<TransactionReceipt> | undefined;
-  claimBridgedTokensRequests: Map<
-    string,
-    ClaimBridgedTokensRequest
-  > = new Map();
+  claimBridgedTokensRequests: Map<string, ClaimBridgedTokensRequest> =
+    new Map();
   blockConfirmationDeferred!: RSVP.Deferred<void>;
   test__lastSymbolsToUpdate: UsdConvertibleSymbol[] = [];
   test__simulatedExchangeRate: number = 3000.0;

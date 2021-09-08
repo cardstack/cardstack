@@ -99,8 +99,7 @@ export default {
         type: 'card',
         component: 'cards/registration-embedded',
         value: {
-          id:
-            '0x2b4932f7c27d6ca5d8bd5601ba7c28071221165ac2f1b7928c22c2809d24183ca',
+          id: '0x2b4932f7c27d6ca5d8bd5601ba7c28071221165ac2f1b7928c22c2809d24183ca',
           verifi_id:
             '0x2b4932f7c27d6ca5d8bd5601ba7c28071221165ac2f1b7928c22c2809d24183ca',
           verifi_reg_date: '2020-04-08',

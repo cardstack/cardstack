@@ -77,9 +77,8 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
 
   get lastMilestonePostable() {
     let milestones = this.args.workflow.visibleMilestones;
-    let postablesInLastMilestone = milestones[
-      milestones.length - 1
-    ].peekAtVisiblePostables();
+    let postablesInLastMilestone =
+      milestones[milestones.length - 1].peekAtVisiblePostables();
 
     return postablesInLastMilestone[postablesInLastMilestone.length - 1];
   }

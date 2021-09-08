@@ -155,7 +155,8 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     try {
       let layer2Address = this.layer2Network.walletInfo.firstAddress!;
       this.isDepositing = true;
-      let layer2BlockHeightBeforeBridging = await this.layer2Network.getBlockHeight();
+      let layer2BlockHeightBeforeBridging =
+        await this.layer2Network.getBlockHeight();
       this.args.workflowSession.update(
         'layer2BlockHeightBeforeBridging',
         layer2BlockHeightBeforeBridging
