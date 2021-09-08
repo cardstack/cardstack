@@ -25,9 +25,7 @@ export function getFieldForPath(fields: CompiledCard['fields'], path: string): F
   return field;
 }
 
-export function getBasenameAndExtension(
-  filename: string
-): {
+export function getBasenameAndExtension(filename: string): {
   basename: string;
   extension: string;
 } {

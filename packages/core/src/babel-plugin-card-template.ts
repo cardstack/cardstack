@@ -160,9 +160,7 @@ function shouldInlineHBS(options: NodePath<t.ObjectExpression>, neededScope: Set
   return !getObjectKey(options, 'scope') && neededScope.size == 0;
 }
 
-function handleArguments(
-  path: NodePath<t.CallExpression>
-): {
+function handleArguments(path: NodePath<t.CallExpression>): {
   options: NodePath<t.ObjectExpression>;
   template: string;
 } {
