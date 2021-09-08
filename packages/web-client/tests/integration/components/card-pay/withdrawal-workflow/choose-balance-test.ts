@@ -115,7 +115,9 @@ module(
           @isComplete={{this.isComplete}}
         />
       `);
-      assert.dom('.action-card__title').containsText('Withdraw tokens');
+      assert
+        .dom('.action-card__title')
+        .containsText('Choose a source and balance to withdraw from');
       assert
         .dom('[data-test-choose-balance-from-wallet]')
         .containsText('L2 test chain');
