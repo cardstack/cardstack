@@ -326,11 +326,11 @@ module(
 
         await click('[data-test-create-merchant-button]');
 
-        // @ts-ignore
-        let merchantInfoStorageRequests =
-          this.server.pretender.handledRequests.filter((req: { url: string }) =>
-            req.url.includes('merchant-infos')
-          );
+        let merchantInfoStorageRequests = (
+          this as any
+        ).server.pretender.handledRequests.filter((req: { url: string }) =>
+          req.url.includes('merchant-infos')
+        );
 
         assert.equal(
           merchantInfoStorageRequests.length,
