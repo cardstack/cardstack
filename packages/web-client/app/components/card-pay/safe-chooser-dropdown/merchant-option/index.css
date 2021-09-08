@@ -1,0 +1,34 @@
+.merchant-option {
+  padding: var(--boxel-sp-xs);
+  display: grid;
+  grid-template-columns: var(--boxel-sp-xxl) 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "logo name-and-type"
+    "logo address";
+  font-size: var(--boxel-font-size-sm);
+}
+
+.merchant-option__logo {
+  grid-area: logo;
+  justify-self: center;
+  align-self: center;
+}
+
+.merchant-option__name-and-type {
+  grid-area: name-and-type;
+}
+
+.merchant-option__name {
+  font-weight: 700;
+}
+
+.merchant-option__type {
+  color: var(--boxel-purple-500);
+}
+
+.merchant-option__address {
+  grid-area: address;
+  font-family: var(--boxel-monospace-font-family);
+  color: var(--boxel-purple-500);
+}
