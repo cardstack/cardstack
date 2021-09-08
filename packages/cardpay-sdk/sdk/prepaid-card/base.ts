@@ -6,7 +6,7 @@ import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.7.0/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.0/prepaid-card-manager';
 import { getAddress } from '../../contracts/addresses';
 import { getConstant, ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
@@ -125,11 +125,14 @@ export default class PrepaidCard {
           merchantSafe,
           spendAmount,
           rateLock,
+          payload.gasPrice,
+          payload.safeTxGas,
+          payload.dataGas,
           signatures,
           nonce
         );
         break;
-      } catch (e) {
+      } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
@@ -236,11 +239,14 @@ export default class PrepaidCard {
           newOwner,
           previousOwnerSignature,
           rateLock,
+          payload.gasPrice,
+          payload.safeTxGas,
+          payload.dataGas,
           signatures,
           nonce
         );
         break;
-      } catch (e) {
+      } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
@@ -359,12 +365,15 @@ export default class PrepaidCard {
           amounts,
           faceValues,
           rateLock,
+          payload.gasPrice,
+          payload.safeTxGas,
+          payload.dataGas,
           signatures,
           nonce,
           customizationDID
         );
         break;
-      } catch (e) {
+      } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
@@ -703,6 +712,9 @@ export default class PrepaidCard {
     merchantSafe: string,
     spendAmount: number,
     rate: string,
+    gasPrice: string,
+    safeTxGas: string,
+    dataGas: string,
     signatures: Signature[],
     nonce: BN
   ): Promise<GnosisExecTx> {
@@ -711,6 +723,9 @@ export default class PrepaidCard {
       prepaidCardAddress,
       spendAmount,
       rate,
+      gasPrice,
+      safeTxGas,
+      dataGas,
       'payMerchant',
       this.layer2Web3.eth.abi.encodeParameters(['address'], [merchantSafe]),
       signatures,
@@ -723,6 +738,9 @@ export default class PrepaidCard {
     issuingTokenAmounts: BN[],
     spendAmounts: number[],
     rate: string,
+    gasPrice: string,
+    safeTxGas: string,
+    dataGas: string,
     signatures: Signature[],
     nonce: BN,
     customizationDID = ''
@@ -732,6 +750,9 @@ export default class PrepaidCard {
       prepaidCardAddress,
       totalSpendAmount,
       rate,
+      gasPrice,
+      safeTxGas,
+      dataGas,
       'split',
       this.layer2Web3.eth.abi.encodeParameters(
         ['uint256[]', 'uint256[]', 'string'],
@@ -747,6 +768,9 @@ export default class PrepaidCard {
     newOwner: string,
     previousOwnerSignature: string,
     rate: string,
+    gasPrice: string,
+    safeTxGas: string,
+    dataGas: string,
     signatures: Signature[],
     nonce: BN
   ): Promise<GnosisExecTx> {
@@ -755,6 +779,9 @@ export default class PrepaidCard {
       prepaidCardAddress,
       0,
       rate,
+      gasPrice,
+      safeTxGas,
+      dataGas,
       'transfer',
       this.layer2Web3.eth.abi.encodeParameters(['address', 'bytes'], [newOwner, previousOwnerSignature]),
       signatures,

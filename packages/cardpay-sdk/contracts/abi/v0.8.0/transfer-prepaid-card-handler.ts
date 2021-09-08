@@ -3,74 +3,6 @@ export default [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
-        internalType: 'address',
-        name: 'card',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'merchantSafe',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'issuingToken',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'issuingTokenAmount',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'spendAmount',
-        type: 'uint256',
-      },
-    ],
-    name: 'CustomerPayment',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'merchantSafe',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'card',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'issuingToken',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'MerchantFeeCollected',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
         indexed: true,
         internalType: 'address',
         name: 'previousOwner',
@@ -153,18 +85,34 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'merchantManager',
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address payable',
+        name: 'from',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
+    ],
+    name: 'onTokenTransfer',
     outputs: [
       {
-        internalType: 'address',
+        internalType: 'bool',
         name: '',
-        type: 'address',
+        type: 'bool',
       },
     ],
     payable: false,
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -185,7 +133,7 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'prepaidCardManager',
+    name: 'prepaidCardManagerAddress',
     outputs: [
       {
         internalType: 'address',
@@ -207,24 +155,40 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'revenuePoolAddress',
-    outputs: [
+    constant: false,
+    inputs: [
       {
         internalType: 'address',
-        name: '',
+        name: '_actionDispatcher',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_prepaidCardManager',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_tokenManagerAddress',
         type: 'address',
       },
     ],
+    name: 'setup',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     payable: false,
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: 'spendTokenAddress',
+    name: 'tokenManagerAddress',
     outputs: [
       {
         internalType: 'address',
@@ -247,78 +211,6 @@ export default [
     ],
     name: 'transferOwnership',
     outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: '_actionDispatcher',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_merchantManager',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_prepaidCardManager',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_revenuePoolAddress',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_spendTokenAddress',
-        type: 'address',
-      },
-    ],
-    name: 'setup',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
-    ],
-    name: 'onTokenTransfer',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function',

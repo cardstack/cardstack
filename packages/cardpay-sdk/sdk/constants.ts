@@ -26,7 +26,7 @@ const SOKOL = {
   // this needs to be an "archive" node
   rpcNode: 'https://sokol-archive.blockscout.com',
   rpcWssNode: 'wss://sokol.poa.network/wss',
-  relayServiceURL: 'https://relay-staging.stack.cards/api',
+  relayServiceURL: 'http://localhost/api',
   subgraphURL: 'https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
   tallyServiceURL: 'https://tally-service-staging.stack.cards/api/v1',
 };

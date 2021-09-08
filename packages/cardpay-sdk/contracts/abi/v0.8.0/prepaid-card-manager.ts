@@ -5,6 +5,19 @@ export default [
       {
         indexed: false,
         internalType: 'address',
+        name: 'signer',
+        type: 'address',
+      },
+    ],
+    name: 'ContractSignerRemoved',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
         name: 'issuer',
         type: 'address',
       },
@@ -66,13 +79,7 @@ export default [
       {
         indexed: false,
         internalType: 'bool',
-        name: 'useIssuingTokenForGas',
-        type: 'bool',
-      },
-      {
-        indexed: false,
-        internalType: 'bool',
-        name: 'payGasRecipient',
+        name: 'useGasPrice',
         type: 'bool',
       },
     ],
@@ -205,6 +212,58 @@ export default [
     type: 'function',
   },
   {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'action',
+        type: 'string',
+      },
+      {
+        internalType: 'bool',
+        name: 'useGasPrice',
+        type: 'bool',
+      },
+    ],
+    name: 'addGasPolicy',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address payable',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+      {
+        internalType: 'bytes',
+        name: 'signature',
+        type: 'bytes',
+      },
+    ],
+    name: 'appendToEIP1271Signature',
+    outputs: [
+      {
+        internalType: 'bytes',
+        name: 'signatures',
+        type: 'bytes',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     constant: true,
     inputs: [
       {
@@ -282,6 +341,48 @@ export default [
   },
   {
     constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+    ],
+    name: 'faceValue',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+    ],
+    name: 'gasFee',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
     inputs: [],
     name: 'gasFeeInCARD',
     outputs: [
@@ -338,6 +439,27 @@ export default [
   },
   {
     constant: true,
+    inputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    name: 'gasPoliciesV2',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: 'useGasPrice',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
     inputs: [],
     name: 'gasToken',
     outputs: [
@@ -345,6 +467,130 @@ export default [
         internalType: 'address',
         name: '',
         type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'getContractSigners',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: '',
+        type: 'address[]',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+    ],
+    name: 'getPrepaidCardIssuer',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address payable',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+    ],
+    name: 'getPrepaidCardOwner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address payable',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'spendAmount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'rateLock',
+        type: 'uint256',
+      },
+      {
+        internalType: 'string',
+        name: 'action',
+        type: 'string',
+      },
+      {
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
+    ],
+    name: 'getSendData',
+    outputs: [
+      {
+        internalType: 'bytes',
+        name: '',
+        type: 'bytes',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address payable',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'getTransferCardData',
+    outputs: [
+      {
+        internalType: 'bytes',
+        name: '',
+        type: 'bytes',
       },
     ],
     payable: false,
@@ -440,8 +686,55 @@ export default [
   },
   {
     constant: true,
+    inputs: [
+      {
+        internalType: 'address payable',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+    ],
+    name: 'isEIP1271Signer',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
     inputs: [],
     name: 'isOwner',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'isValidAmount',
     outputs: [
       {
         internalType: 'bool',
@@ -484,6 +777,37 @@ export default [
     type: 'function',
   },
   {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'from',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
+    ],
+    name: 'onTokenTransfer',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     constant: true,
     inputs: [],
     name: 'owner',
@@ -499,38 +823,25 @@ export default [
     type: 'function',
   },
   {
-    constant: false,
-    inputs: [],
-    name: 'renounceOwnership',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     constant: true,
-    inputs: [],
-    name: 'supplierManager',
-    outputs: [
+    inputs: [
       {
         internalType: 'address',
-        name: '',
+        name: 'token',
         type: 'address',
       },
+      {
+        internalType: 'uint256',
+        name: 'spendFaceValue',
+        type: 'uint256',
+      },
     ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'tokenManager',
+    name: 'priceForFaceValue',
     outputs: [
       {
-        internalType: 'address',
+        internalType: 'uint256',
         name: '',
-        type: 'address',
+        type: 'uint256',
       },
     ],
     payable: false,
@@ -542,12 +853,103 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: 'newOwner',
+        name: 'signer',
         type: 'address',
       },
     ],
-    name: 'transferOwnership',
+    name: 'removeContractSigner',
     outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address payable',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'spendAmount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'rateLock',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'gasPrice',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'safeTxGas',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'baseGas',
+        type: 'uint256',
+      },
+      {
+        internalType: 'string',
+        name: 'action',
+        type: 'string',
+      },
+      {
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
+      {
+        internalType: 'bytes',
+        name: 'ownerSignature',
+        type: 'bytes',
+      },
+    ],
+    name: 'send',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+    ],
+    name: 'setPrepaidCardUsed',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
@@ -596,11 +998,6 @@ export default [
         type: 'uint256',
       },
       {
-        internalType: 'address',
-        name: '_gasToken',
-        type: 'address',
-      },
-      {
         internalType: 'uint256',
         name: '_minAmount',
         type: 'uint256',
@@ -610,6 +1007,11 @@ export default [
         name: '_maxAmount',
         type: 'uint256',
       },
+      {
+        internalType: 'address[]',
+        name: '_contractSigners',
+        type: 'address[]',
+      },
     ],
     name: 'setup',
     outputs: [],
@@ -618,103 +1020,14 @@ export default [
     type: 'function',
   },
   {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'string',
-        name: 'action',
-        type: 'string',
-      },
-      {
-        internalType: 'bool',
-        name: 'useIssuingTokenForGas',
-        type: 'bool',
-      },
-      {
-        internalType: 'bool',
-        name: 'payGasRecipient',
-        type: 'bool',
-      },
-    ],
-    name: 'addGasPolicy',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
-    ],
-    name: 'onTokenTransfer',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'prepaidCard',
-        type: 'address',
-      },
-    ],
-    name: 'setPrepaidCardUsed',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
     constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'prepaidCard',
-        type: 'address',
-      },
-    ],
-    name: 'faceValue',
+    inputs: [],
+    name: 'supplierManager',
     outputs: [
       {
-        internalType: 'uint256',
+        internalType: 'address',
         name: '',
-        type: 'uint256',
+        type: 'address',
       },
     ],
     payable: false,
@@ -723,111 +1036,13 @@ export default [
   },
   {
     constant: true,
-    inputs: [
+    inputs: [],
+    name: 'tokenManager',
+    outputs: [
       {
         internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'spendFaceValue',
-        type: 'uint256',
-      },
-    ],
-    name: 'priceForFaceValue',
-    outputs: [
-      {
-        internalType: 'uint256',
         name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'prepaidCard',
         type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'spendAmount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'rateLock',
-        type: 'uint256',
-      },
-      {
-        internalType: 'string',
-        name: 'action',
-        type: 'string',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
-      {
-        internalType: 'bytes',
-        name: 'ownerSignature',
-        type: 'bytes',
-      },
-    ],
-    name: 'send',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'prepaidCard',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'spendAmount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'rateLock',
-        type: 'uint256',
-      },
-      {
-        internalType: 'string',
-        name: 'action',
-        type: 'string',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
-    ],
-    name: 'getSendData',
-    outputs: [
-      {
-        internalType: 'bytes',
-        name: '',
-        type: 'bytes',
       },
     ],
     payable: false,
@@ -866,118 +1081,18 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
+    constant: false,
     inputs: [
-      {
-        internalType: 'address payable',
-        name: 'prepaidCard',
-        type: 'address',
-      },
       {
         internalType: 'address',
         name: 'newOwner',
         type: 'address',
       },
     ],
-    name: 'getTransferCardData',
-    outputs: [
-      {
-        internalType: 'bytes',
-        name: '',
-        type: 'bytes',
-      },
-    ],
+    name: 'transferOwnership',
+    outputs: [],
     payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'isValidAmount',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-    ],
-    name: 'gasFee',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'prepaidCard',
-        type: 'address',
-      },
-    ],
-    name: 'getPrepaidCardOwner',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'prepaidCard',
-        type: 'address',
-      },
-    ],
-    name: 'getPrepaidCardIssuer',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
 ];

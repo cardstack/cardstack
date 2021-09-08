@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
-import RevenuePoolABI from '../../contracts/abi/v0.7.0/revenue-pool';
+import RevenuePoolABI from '../../contracts/abi/v0.8.0/revenue-pool';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { getAddress } from '../../contracts/addresses';
 import {
@@ -235,11 +235,14 @@ export default class RevenuePool {
           registrationFee,
           rateLock,
           infoDID,
+          payload.gasPrice,
+          payload.safeTxGas,
+          payload.dataGas,
           signature,
           nonce
         );
         break;
-      } catch (e) {
+      } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
@@ -324,6 +327,9 @@ export default class RevenuePool {
     spendAmount: number,
     rate: string,
     infoDID: string,
+    gasPrice: string,
+    safeTxGas: string,
+    dataGas: string,
     signatures: Signature[],
     nonce: BN
   ): Promise<GnosisExecTx> {
@@ -332,6 +338,9 @@ export default class RevenuePool {
       prepaidCardAddress,
       spendAmount,
       rate,
+      gasPrice,
+      safeTxGas,
+      dataGas,
       'registerMerchant',
       this.layer2Web3.eth.abi.encodeParameters(['string'], [infoDID]),
       signatures,
