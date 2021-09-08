@@ -169,7 +169,7 @@ module('Acceptance | withdrawal', function (hooks) {
       .containsText('250.00 DAI.CPXD');
     assert
       .dom(`${post} [data-test-choose-balance-from-safe]`)
-      .hasText(`DEPOT: ${depotAddress}`);
+      .hasText(`DEPOT ${depotAddress}`);
     await click(
       '[data-test-balance-chooser-dropdown] .ember-power-select-trigger'
     );
