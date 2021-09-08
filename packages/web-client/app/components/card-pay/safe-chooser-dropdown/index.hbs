@@ -9,14 +9,5 @@
   data-test-safe-chooser-dropdown
   ...attributes
 as |safe|>
-  {{#if (eq safe.type "merchant")}}
-    <CardPay::SafeChooserDropdown::MerchantOption @safe={{safe}} />
-  {{else}}
-    <CardPay::AccountDisplay
-      @size={{if @isComplete "small"}}
-      @icon={{safe.type}}
-      @name={{uppercase safe.type}}
-      @address={{safe.address}}
-    />
-  {{/if}}
+  <CardPay::SafeChooserDropdown::SafeOption @safe={{safe}} />
 </PowerSelect>

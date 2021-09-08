@@ -1,0 +1,17 @@
+<div class='safe-option'>
+  {{#if this.data.icon}}
+    {{svg-jar this.data.icon width="20" height="20" class='safe-option__logo'}}
+  {{else}}
+    <CardPay::MerchantLogo
+      class='safe-option__logo'
+      @name={{first-char this.data.info.name}}
+    />
+  {{/if}}
+  <div class='safe-option__name-and-type'>
+    <span class='safe-option__name'>{{this.data.info.name}}</span>
+    {{#if this.data.type}}
+      <span class='safe-option__type'>{{this.data.type}}</span>
+    {{/if}}
+  </div>
+  <div class='safe-option__address'>{{@safe.address}}</div>
+</div>

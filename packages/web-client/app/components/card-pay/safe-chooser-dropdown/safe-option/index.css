@@ -1,4 +1,4 @@
-.merchant-option {
+.safe-option {
   margin-right: var(--boxel-sp-xl);
   padding: var(--boxel-sp-xs);
   display: grid;
@@ -10,28 +10,28 @@
   font-size: var(--boxel-font-size-sm);
 }
 
-.merchant-option__logo {
+.safe-option__logo {
   grid-area: logo;
   justify-self: center;
   align-self: center;
 }
 
-.merchant-option__name-and-type {
+.safe-option__name-and-type {
   grid-area: name-and-type;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow-x: hidden;
 }
 
-.merchant-option__name {
+.safe-option__name {
   font-weight: 700;
 }
 
-.merchant-option__type {
+.safe-option__type {
   color: var(--boxel-purple-500);
 }
 
-.merchant-option__address {
+.safe-option__address {
   grid-area: address;
   font-family: var(--boxel-monospace-font-family);
   color: var(--boxel-purple-500);
