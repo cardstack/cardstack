@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/eslint-config",
-  "version": "0.22.1",
+  "version": "0.23.0",
   "description": "Shared eslint config for cardstack packages.",
   "main": "index.js",
   "scripts": {
