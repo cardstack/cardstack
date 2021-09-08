@@ -21,7 +21,7 @@ import {
   executeSend,
   getNextNonceFromEstimate,
 } from '../utils/safe-utils';
-import { TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
+import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
 import { signSafeTxAsRSV, Signature, signSafeTxAsBytes } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
 import { TransactionReceipt } from 'web3-core';
@@ -64,13 +64,33 @@ export default class PrepaidCard {
     return !hasBeenUsed && owner === issuer && owner !== ZERO_ADDRESS;
   }
 
+  async payMerchant(txnHash: string): Promise<TransactionReceipt>;
   async payMerchant(
     merchantSafe: string,
     prepaidCardAddress: string,
     spendAmount: number,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async payMerchant(
+    merchantSafeOrTxnHash: string,
+    prepaidCardAddress?: string,
+    spendAmount?: number,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
+    if (isTransactionHash(merchantSafeOrTxnHash)) {
+      let txnHash = merchantSafeOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    if (!prepaidCardAddress) {
+      throw new Error('prepaidCardAddress is required');
+    }
+    if (!spendAmount) {
+      throw new Error('spendAmount is required');
+    }
+    let merchantSafe = merchantSafeOrTxnHash;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (spendAmount < 50) {
       // this is hard coded in the PrepaidCardManager contract
       throw new Error(`The amount to pay merchant §${spendAmount} SPEND is below the minimum allowable amount`);
@@ -91,7 +111,6 @@ export default class PrepaidCard {
     let rateChanged = false;
     let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let gnosisResult: GnosisExecTx | undefined;
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     do {
       let rateLock = await layerTwoOracle.getRateLock(issuingToken);
       try {
@@ -126,7 +145,7 @@ export default class PrepaidCard {
           nonce
         );
         break;
-      } catch (e) {
+      } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
@@ -147,19 +166,38 @@ export default class PrepaidCard {
       );
     }
 
+    let txnHash = gnosisResult.ethereumTx.txHash;
+
     if (typeof onTxnHash === 'function') {
-      await onTxnHash(gnosisResult.ethereumTx.txHash);
+      await onTxnHash(txnHash);
     }
 
-    return await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
+  async transfer(txnHash: string): Promise<TransactionReceipt>;
   async transfer(
     prepaidCardAddress: string,
     newOwner: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async transfer(
+    prepaidCardAddressOrTxnHash: string,
+    newOwner?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
+    if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
+      let txnHash = prepaidCardAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    let prepaidCardAddress = prepaidCardAddressOrTxnHash;
+    if (!newOwner) {
+      throw new Error('newOwner is required');
+    }
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+
     if (!(await this.canTransfer(prepaidCardAddress))) {
       throw new Error(`The prepaid card ${prepaidCardAddress} is not allowed to be transferred`);
     }
@@ -170,8 +208,6 @@ export default class PrepaidCard {
     let gasToken = await getAddress('cardCpxd', this.layer2Web3);
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     let transferData = await prepaidCardMgr.methods.getTransferCardData(prepaidCardAddress, newOwner).call();
-
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
 
     // the quirk here is that we are signing this txn in advance so we need to
     // optimistically advance the nonce by 2 to account for the fact that we are
@@ -237,7 +273,7 @@ export default class PrepaidCard {
           nonce
         );
         break;
-      } catch (e) {
+      } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
         if (e.message.includes('rate is beyond the allowable bounds')) {
           rateChanged = true;
@@ -257,20 +293,43 @@ export default class PrepaidCard {
       );
     }
 
+    let txnHash = gnosisResult.ethereumTx.txHash;
     if (typeof onTxnHash === 'function') {
-      await onTxnHash(gnosisResult.ethereumTx.txHash);
+      await onTxnHash(txnHash);
     }
 
-    return await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
+  async split(txnHash: string): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }>;
   async split(
     prepaidCardAddress: string,
     faceValues: number[],
     customizationDID: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }>;
+  async split(
+    prepaidCardAddressOrTxnHash: string,
+    faceValues?: number[],
+    customizationDID?: string | undefined,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }> {
+    if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
+      let txnHash = prepaidCardAddressOrTxnHash;
+      return {
+        prepaidCards: await this.resolvePrepaidCards(await this.getPrepaidCardsFromTxn(txnHash)),
+        txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+      };
+    }
+    let prepaidCardAddress = prepaidCardAddressOrTxnHash;
+    if (!faceValues) {
+      throw new Error(`faceValues must be provided`);
+    }
+    if (!customizationDID) {
+      throw new Error(`customizationDID must be provided`);
+    }
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
     }
@@ -314,6 +373,7 @@ export default class PrepaidCard {
 
     let rateChanged = false;
     let gnosisResult: GnosisExecTx | undefined;
+
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     do {
       let rateLock = await layerTwoOracle.getRateLock(issuingToken);
@@ -388,6 +448,7 @@ export default class PrepaidCard {
     };
   }
 
+  async create(txnHash: string): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }>;
   async create(
     safeAddress: string,
     tokenAddress: string,
@@ -395,7 +456,29 @@ export default class PrepaidCard {
     customizationDID: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }>;
+  async create(
+    safeAddressOrTxnHash: string,
+    tokenAddress?: string,
+    faceValues?: number[],
+    customizationDID?: string | undefined,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }> {
+    if (isTransactionHash(safeAddressOrTxnHash)) {
+      let txnHash = safeAddressOrTxnHash;
+      return {
+        prepaidCards: await this.resolvePrepaidCards(await this.getPrepaidCardsFromTxn(txnHash)),
+        txnReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+      };
+    }
+    let safeAddress = safeAddressOrTxnHash;
+    if (!tokenAddress) {
+      throw new Error('tokenAddress must be provided');
+    }
+    if (!faceValues) {
+      throw new Error('faceValues must be provided');
+    }
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
     }

@@ -10,7 +10,7 @@ import { AbiItem, fromWei, toBN } from 'web3-utils';
 import { signSafeTxAsRSV } from './utils/signing-utils';
 import { ZERO_ADDRESS } from './constants';
 import { query } from './utils/graphql';
-import { TransactionOptions, waitUntilTransactionMined } from './utils/general-utils';
+import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from './utils/general-utils';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -47,6 +47,7 @@ const bridgedTokensQuery = `
 export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
   constructor(private layer2Web3: Web3) {}
 
+  async relayTokens(txnHash: string): Promise<TransactionReceipt>;
   async relayTokens(
     safeAddress: string,
     tokenAddress: string,
@@ -54,7 +55,27 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
     amount: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async relayTokens(
+    safeAddressOrTxnHash: string,
+    tokenAddress?: string,
+    recipientAddress?: string,
+    amount?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    if (isTransactionHash(safeAddressOrTxnHash)) {
+      let txnHash = safeAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    let safeAddress = safeAddressOrTxnHash;
+    if (!tokenAddress) {
+      throw new Error('tokenAddress must be provided');
+    }
+    if (!amount) {
+      throw new Error('amount must be provided');
+    }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let homeBridgeAddress = await getAddress('homeBridge', this.layer2Web3);
     let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], tokenAddress);
@@ -78,8 +99,6 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
         )} ${symbol}, amount to transfer ${fromWei(amount)} ${symbol}, the gas cost is ${fromWei(gasCost)} ${symbol}`
       );
     }
-
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     if (nonce == null) {
       nonce = getNextNonceFromEstimate(estimate);
       if (typeof onNonce === 'function') {
@@ -116,10 +135,13 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
       estimate.gasToken,
       ZERO_ADDRESS
     );
+
+    let txnHash = result.ethereumTx.txHash;
+
     if (typeof onTxnHash === 'function') {
-      await onTxnHash(result.ethereumTx.txHash);
+      await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, result.ethereumTx.txHash);
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
   async waitForBridgingValidation(fromBlock: string, bridgingTxnHash: string): Promise<BridgeValidationResult> {
