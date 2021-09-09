@@ -28,6 +28,7 @@ import {
 } from './layer-two-oracle';
 import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
 import { rewardTokenBalances } from './reward-pool.js';
+import { registerRewardProgram } from './reward-manager.js';
 import { hubAuth } from './hub-auth';
 
 //@ts-ignore polyfilling fetch
@@ -62,7 +63,8 @@ type Commands =
   | 'viewTokenBalance'
   | 'hubAuth'
   | 'rewardTokenBalances'
-  | 'withdrawalLimits';
+  | 'withdrawalLimits'
+  | 'registerRewardProgram';
 
 let command: Commands | undefined;
 interface Options {
@@ -91,6 +93,7 @@ interface Options {
   signatures?: string[];
   faceValues?: number[];
   rewardProgramId?: string;
+  admin?: string;
 }
 let {
   network,
@@ -118,6 +121,7 @@ let {
   signatures,
   hubRootUrl,
   rewardProgramId,
+  admin
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -546,6 +550,17 @@ let {
       command = 'rewardTokenBalances';
     }
   )
+  .command('register-reward-program <address>, <address>', 'Register reward program', (yargs) => {
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The address of the prepaid card that is being used to pay the merchant registration fee',
+    });
+    yargs.positional('admin', {
+      type: 'string',
+      description: 'The address of the new admin',
+    });
+    command = 'registerRewardProgram';
+  })
   .options({
     network: {
       alias: 'n',
@@ -776,6 +791,17 @@ if (!command) {
         return;
       }
       await rewardTokenBalances(network, address, rewardProgramId, mnemonic);
+      break;
+    case 'registerRewardProgram':
+      if (prepaidCard == null) {
+        showHelpAndExit('address is a required value');
+        return;
+      }
+      if (admin == null) {
+        showHelpAndExit('admin is a required value');
+        return;
+      }
+      await registerRewardProgram(network, prepaidCard, admin, mnemonic);
       break;
     default:
       assertNever(command);
