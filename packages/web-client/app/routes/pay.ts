@@ -7,6 +7,7 @@ import { Resolver } from 'did-resolver';
 import { inject as service } from '@ember/service';
 import SafeViewer from '@cardstack/web-client/services/safe-viewer';
 import { fetchOffChainJson } from '../utils/fetch-off-chain-json';
+import * as Sentry from '@sentry/browser';
 
 interface PayRouteModel {
   cardPayLogo: string;
@@ -44,8 +45,7 @@ export default class PayRoute extends Route {
       res.errored = false;
     } catch (e) {
       console.error(e);
-      // Need some thoughts about when to capture to Sentry
-      // Sentry.captureException(e);
+      Sentry.captureException(e);
     }
 
     return res;
