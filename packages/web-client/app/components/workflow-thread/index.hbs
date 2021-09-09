@@ -9,7 +9,7 @@
   ...attributes
 >
   <:header>
-    <Boxel::ThreadHeader @title={{this.workflow.name}} />
+    <Boxel::ThreadHeader @title={{this.workflow.displayName}} />
   </:header>
   <:content>
     {{#if (has-block 'before-content')}}
@@ -35,7 +35,7 @@
           data-test-milestone={{i}}
         />
         {{sentry-breadcrumb
-          message=(concat "Milestone completed: " this.workflow.name " → " milestone.title)
+          message=(concat "Milestone completed: " this.workflow.displayName " → " milestone.title)
         }}
       {{/if}}
     {{/each}}
@@ -62,10 +62,11 @@
     {{/if}}
     <div data-thread-end></div>
   </:content>
+
   <:sidebar as |SidebarSection|>
     <SidebarSection>
       <Boxel::Sidebar::CardContainer
-        @header={{html-safe (concat "Workflow:<br>" this.workflow.name)}}
+        @header={{html-safe (concat "Workflow:<br>" this.workflow.displayName)}}
         @attachNext={{true}}
       >
         <div>

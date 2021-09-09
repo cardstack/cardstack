@@ -169,7 +169,8 @@ export default class AnimatedWorkflow {
     }
     taskFor(this.tickerTask).perform();
   }
-  @reads('model.name') declare name: string;
+
+  @reads('model.displayName') declare displayName: string;
 
   @task
   *tickerTask() {

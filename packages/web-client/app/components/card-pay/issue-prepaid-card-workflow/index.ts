@@ -2,7 +2,11 @@ import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import { inject as service } from '@ember/service';
 import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
-import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
+import {
+  Workflow,
+  cardbot,
+  WorkflowName,
+} from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
 import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
@@ -25,7 +29,8 @@ const FAILURE_REASONS = {
 
 class IssuePrepaidCardWorkflow extends Workflow {
   workflowPersistenceId?: string;
-  name = 'Prepaid Card Issuance';
+  name = 'PREPAID_CARD_ISSUANCE' as WorkflowName;
+
   milestones = [
     new Milestone({
       title: `Connect ${c.layer2.fullName} wallet`,
