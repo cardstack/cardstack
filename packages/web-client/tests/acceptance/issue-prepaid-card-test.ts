@@ -584,7 +584,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       reloadable: true,
       spendFaceValue: 10000,
       transferrable: true,
-      txHash: 'exampleTxHash',
+      txnHash: 'exampleTxnHash',
     });
   });
 

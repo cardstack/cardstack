@@ -69,7 +69,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
   }
 
   @action checkForPendingTransaction() {
-    if (this.args.workflowSession.state.txHash) {
+    if (this.args.workflowSession.state.txnHash) {
       taskFor(this.issueTask).perform();
     }
   }
@@ -100,10 +100,10 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
       }
 
       if (
-        workflowSession.state.txHash &&
+        workflowSession.state.txnHash &&
         !workflowSession.state.prepaidCardSafe
       ) {
-        const txHash = workflowSession.state.txHash;
+        const txHash = workflowSession.state.txnHash;
         this.chinInProgressMessage =
           'Waiting for the transaction to be finalized…';
 
@@ -122,9 +122,9 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
         this.chinInProgressMessage =
           'You will receive a confirmation request from the Card Wallet app in a few moments…';
         let options: IssuePrepaidCardOptions = {
-          onTxHash: (txHash: TransactionHash) => {
-            this.txHash = txHash;
-            this.args.workflowSession.update('txHash', txHash);
+          onTxnHash: (txnHash: TransactionHash) => {
+            this.txnHash = txnHash;
+            this.args.workflowSession.update('txnHash', txnHash);
             this.chinInProgressMessage =
               'Waiting for the transaction to be finalized…';
           },
