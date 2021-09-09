@@ -52,8 +52,8 @@
     </div>
   </div>
   <CardPay::MerchantPaymentRequestCard
-    @amount={{this.amount}}
-    @usdAmount={{this.usdAmount}}
+    @amount={{this.displayedAmounts.SPD}}
+    @usdAmount={{this.displayedAmounts.USD}}
     @merchant={{@model.merchant}}
     @paymentURL={{this.paymentURL}}
     @canDeepLink={{this.canDeepLink}}

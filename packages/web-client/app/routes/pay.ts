@@ -8,50 +8,78 @@ import { inject as service } from '@ember/service';
 import SafeViewer from '@cardstack/web-client/services/safe-viewer';
 import { fetchOffChainJson } from '../utils/fetch-off-chain-json';
 
-export default class CardPayTokenSuppliersRoute extends Route {
+interface PayRouteModel {
+  cardPayLogo: string;
+  supportURL: string;
+  aboutURL: string;
+  network: string;
+  merchantSafeID: string;
+  merchant: null | {
+    name: string;
+    logoBackground: string;
+    logoTextColor: string;
+  };
+  errored: boolean;
+}
+
+export default class PayRoute extends Route {
   @service('safe-viewer') declare safeViewer: SafeViewer;
 
   async model(params: { network: string; merchant_safe_id: string }) {
-    let merchantInfo: {
-      name: string;
-      logoBackground: string;
-      logoTextColor: string;
-    } | null = null;
-    let resolver = new Resolver(getResolver());
-    if (params.network !== 'xdai' && params.network !== 'sokol') {
-      throw new Error('Unrecognized network');
-    }
-
-    // move this into a service
-    let data = await this.safeViewer.view(
-      params.network,
-      params.merchant_safe_id
-    );
-
-    if (!data) throw new Error('no safe fetched');
-    if (data.type !== 'merchant')
-      throw new Error('Failed to fetch a merchant safe');
-    if (!data.infoDID) throw new Error('No customization DID found');
-
-    let did = await resolver.resolve(data.infoDID);
-    let alsoKnownAs = did?.didDocument?.alsoKnownAs;
-
-    if (alsoKnownAs) {
-      let jsonApiDocument = await fetchOffChainJson(alsoKnownAs[0], true);
-      merchantInfo = {
-        name: jsonApiDocument.data.attributes['name'],
-        logoBackground: jsonApiDocument.data.attributes['color'],
-        logoTextColor: jsonApiDocument.data.attributes['text-color'],
-      };
-    }
-
-    return {
-      network: params.network,
-      merchantSafeID: params.merchant_safe_id,
-      merchant: merchantInfo,
+    let res: PayRouteModel = {
       cardPayLogo: CardPayLogo,
       supportURL: config.urls.discordBetaChannelLink,
       aboutURL: config.urls.testFlightLink,
+      network: params.network,
+      merchantSafeID: params.merchant_safe_id,
+      merchant: null,
+      errored: true,
+    };
+
+    try {
+      res.merchant = await this.fetchMerchantInfoFromSafeAddress(
+        params.network,
+        params.merchant_safe_id
+      );
+      res.errored = false;
+    } catch (e) {
+      console.error(e);
+      // Need some thoughts about when to capture to Sentry
+      // Sentry.captureException(e);
+    }
+
+    return res;
+  }
+
+  async fetchMerchantInfoFromSafeAddress(network: string, address: string) {
+    if (network !== 'xdai' && network !== 'sokol') {
+      throw new Error(
+        `Failed to fetch information about merchant, network was unrecognized: ${network}`
+      );
+    }
+
+    let data = await this.safeViewer.view(network, address);
+
+    if (!data || data.type !== 'merchant' || !data.infoDID)
+      throw new Error(
+        `Failed to fetch information about merchant, could not find a corresponding merchant safe or details`
+      );
+
+    let resolver = new Resolver(getResolver());
+    let did = await resolver.resolve(data.infoDID);
+    let resourceUrl = did?.didDocument?.alsoKnownAs?.[0];
+
+    if (!resourceUrl)
+      throw new Error(
+        'Failed to fetch information about merchant, could not find a corresponding merchant safe or details'
+      );
+
+    let jsonApiDocument = await fetchOffChainJson(resourceUrl, true);
+
+    return {
+      name: jsonApiDocument.data.attributes['name'],
+      logoBackground: jsonApiDocument.data.attributes['color'],
+      logoTextColor: jsonApiDocument.data.attributes['text-color'],
     };
   }
 }

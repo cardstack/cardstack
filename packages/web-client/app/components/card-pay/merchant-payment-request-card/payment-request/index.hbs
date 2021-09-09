@@ -21,12 +21,14 @@
       @vertical={{true}}
     />
 
-    <div class="payment-request__amount" data-test-payment-request-amount>
-      §{{@amount}}
-    </div>
-    <div class="payment-request__usd-amount" data-test-payment-request-usd-amount>
-      {{format-usd @usdAmount}}
-    </div>
+    {{#if @amount}}
+      <div class="payment-request__amount" data-test-payment-request-amount>
+        §{{@amount}}
+      </div>
+      <div class="payment-request__usd-amount" data-test-payment-request-usd-amount>
+        {{format-usd @usdAmount}}
+      </div>
+    {{/if}}
 
     {{#if @canDeepLink}}
       {{#if this.showAsQR}}
