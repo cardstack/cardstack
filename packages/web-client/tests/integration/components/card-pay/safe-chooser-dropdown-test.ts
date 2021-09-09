@@ -119,7 +119,9 @@ module(
         .dom(
           '.ember-power-select-options li:nth-child(2) [data-test-merchant-logo]'
         )
-        .containsText('M');
+        .containsText('M')
+        .hasAttribute('data-test-merchant-logo-background', '#00ffcc')
+        .hasAttribute('data-test-merchant-logo-text-color', '#000000');
     });
 
     test('it returns the chosen safe to the handler', async function (this: Context, assert) {
