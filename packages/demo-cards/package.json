@@ -1,7 +1,7 @@
 {
   "name": "@cardstack/demo-cards",
-  "version": "0.0.0",
+  "version": "0.24.0",
   "devDependencies": {
-    "@cardstack/eslint-config": "0.23.0"
+    "@cardstack/eslint-config": "0.24.0"
   }
 }
