@@ -128,6 +128,13 @@ const safesQuery = `
   }
 `;
 
+export async function viewSafe(network: 'xdai' | 'sokol', safeAddress: string): Promise<Safe | undefined> {
+  let {
+    data: { safe },
+  } = await query(network, safeQuery, { id: safeAddress });
+  return processSafeResult(safe as GraphQLSafeResult);
+}
+
 export default class Safes {
   constructor(private layer2Web3: Web3) {}
 

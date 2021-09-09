@@ -39,7 +39,7 @@ export default class TokenToUsd extends Service {
   usdConverters = new UsdConverters();
   #registeredHelpers: Set<TokenToUsdHelper> = new Set();
 
-  @task({ maxConcurrency: 1, drop: true }) *pollTask(): any {
+  @task({ maxConcurrency: 1, restartable: true }) *pollTask(): any {
     while (this.shouldPoll) {
       yield waitForQueue('afterRender'); // wait for all current helpers to be registered
       let { symbolsToUpdate } = this;
@@ -98,8 +98,12 @@ export default class TokenToUsd extends Service {
   // safe to call multiple times -- calls to the `pollTask` are
   // dropped if it is already running
   register(helper: TokenToUsdHelper) {
+    let before = this.symbolsToUpdate;
     this.#registeredHelpers.add(helper);
-    taskFor(this.pollTask).perform();
+    let after = this.symbolsToUpdate;
+    if (before.join() !== after.join()) {
+      taskFor(this.pollTask).perform();
+    }
   }
 
   unregister(helper: TokenToUsdHelper) {

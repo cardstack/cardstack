@@ -58,7 +58,7 @@ https://github.com/cardstack/card-protocol-relay-service
   - this one! It is our monorepo that contains our CardPay Dapp (as well as eventually
     cardstack hub runtime). Work on the "card compiler" is also occurring in PRs
     of this repository. A proof-of-concept for the dapp was developed
-    here: https://github.com/cardstack/card-pay/tree/update-UI-depot 
+    here: https://github.com/cardstack/card-pay/tree/update-UI-depot
 
 [cardstack/cardwallet](https://github.com/cardstack/cardwallet)
   - our rainbow wallet fork that supplies our mobile client experience.
@@ -79,7 +79,7 @@ https://github.com/cardstack/card-protocol-relay-service
 
 [cardstack/animations-experiment](https://github.com/cardstack/animations-experiment)
   - proof of concept for an animation library that works well with Ember and meets Boxel's
-    motion needs 
+    motion needs
 
 ## Project-wide Policy and Community Governance
 

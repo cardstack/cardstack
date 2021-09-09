@@ -1,0 +1,30 @@
+{
+  "name": "@cardstack/compiled",
+  "version": "0.0.0",
+  "keywords": [
+    "ember-addon"
+  ],
+  "exports": {
+    ".": {
+      "browser": "./browser",
+      "default": "./node"
+    },
+    "./*": {
+      "browser": "./browser/*",
+      "default": "./node/*"
+    }
+  },
+  "engines": {
+    "node": ">= 14"
+  },
+  "dependencies": {
+    "@glimmer/component": "^1.0.3",
+    "@cardstack/core": "0.0.0",
+    "@embroider/addon-shim": "*"
+  },
+  "ember-addon": {
+    "version": 2,
+    "type": "addon",
+    "main": "addon-main.js"
+  }
+}
