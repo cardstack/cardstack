@@ -15,7 +15,10 @@ interface Args {
 export class Depot extends Resource<Args> {
   @reads('args.named.strategy.viewSafesTask')
   declare viewSafesTask: TaskFunction;
-  @reads('viewSafesTask.isRunning') declare isLoading: boolean;
+  // TODO this prevents errors such as seen here, but is it correct?
+  // https://github.com/cardstack/cardstack/runs/3538128887?check_suite_focus=true#step:6:310
+  @reads('args.named.strategy.viewSafesTask.last.isRunning')
+  declare isLoading: boolean;
 
   constructor(owner: unknown, args: Args) {
     super(owner, args);
