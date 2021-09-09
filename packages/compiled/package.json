@@ -1,6 +1,7 @@
 {
   "name": "@cardstack/compiled",
   "version": "0.24.0",
+  "private": true,
   "keywords": [
     "ember-addon"
   ],
