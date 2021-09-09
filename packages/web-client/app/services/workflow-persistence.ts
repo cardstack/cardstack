@@ -1,4 +1,6 @@
 import { default as Service } from '@ember/service';
+import { MockLocalStorage } from '../utils/browser-mocks';
+import config from '../config/environment';
 
 interface WorkflowPersistencePersistedData {
   name: string;
@@ -6,9 +8,20 @@ interface WorkflowPersistencePersistedData {
 }
 
 export default class WorkflowPersistence extends Service {
+  storage!: Storage | MockLocalStorage;
+
+  constructor() {
+    super(...arguments);
+    if (config.environment === 'test') {
+      this.storage = new MockLocalStorage();
+    } else {
+      this.storage = window.localStorage;
+    }
+  }
+
   getPersistedData(workflowPersistenceId: string) {
     return JSON.parse(
-      localStorage.getItem(`workflowPersistence:${workflowPersistenceId}`) ||
+      this.storage.getItem(`workflowPersistence:${workflowPersistenceId}`) ||
         '{}'
     );
   }
@@ -17,7 +30,7 @@ export default class WorkflowPersistence extends Service {
     workflowPersistenceId: string,
     data: WorkflowPersistencePersistedData
   ) {
-    return localStorage.setItem(
+    return this.storage.setItem(
       `workflowPersistence:${workflowPersistenceId}`,
       JSON.stringify(data)
     );
