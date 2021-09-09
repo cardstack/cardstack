@@ -6,6 +6,7 @@ import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 import { inject as service } from '@ember/service';
 import SafeViewer from '@cardstack/web-client/services/safe-viewer';
+import { fetchOffChainJson } from '../utils/fetch-off-chain-json';
 
 export default class CardPayTokenSuppliersRoute extends Route {
   @service('safe-viewer') declare safeViewer: SafeViewer;
@@ -36,7 +37,7 @@ export default class CardPayTokenSuppliersRoute extends Route {
     let alsoKnownAs = did?.didDocument?.alsoKnownAs;
 
     if (alsoKnownAs) {
-      let jsonApiDocument = await (await fetch(alsoKnownAs[0])).json();
+      let jsonApiDocument = await fetchOffChainJson(alsoKnownAs[0], true);
       merchantInfo = {
         name: jsonApiDocument.data.attributes['name'],
         logoBackground: jsonApiDocument.data.attributes['color'],
