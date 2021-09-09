@@ -2,11 +2,14 @@ import Route from '@ember/routing/route';
 import '../css/pay.css';
 import CardPayLogo from '@cardstack/web-client/images/icons/card-pay-logo.svg';
 import config from '@cardstack/web-client/config/environment';
-import { viewSafe } from '@cardstack/cardpay-sdk';
 import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
+import { inject as service } from '@ember/service';
+import SafeViewer from '@cardstack/web-client/services/safe-viewer';
 
 export default class CardPayTokenSuppliersRoute extends Route {
+  @service('safe-viewer') declare safeViewer: SafeViewer;
+
   async model(params: { network: string; merchant_safe_id: string }) {
     let merchantInfo: {
       name: string;
@@ -18,7 +21,11 @@ export default class CardPayTokenSuppliersRoute extends Route {
       throw new Error('Unrecognized network');
     }
 
-    let data = await viewSafe(params.network, params.merchant_safe_id);
+    // move this into a service
+    let data = await this.safeViewer.view(
+      params.network,
+      params.merchant_safe_id
+    );
 
     if (!data) throw new Error('no safe fetched');
     if (data.type !== 'merchant')
