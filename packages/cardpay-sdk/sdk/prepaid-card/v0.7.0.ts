@@ -305,6 +305,7 @@ export default class PrepaidCard {
   async split(
     prepaidCardAddress: string,
     faceValues: number[],
+    _marketAddress: string | undefined, // this is a new field added in v0.8.0, ignore for now
     customizationDID: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
@@ -312,6 +313,7 @@ export default class PrepaidCard {
   async split(
     prepaidCardAddressOrTxnHash: string,
     faceValues?: number[],
+    _marketAddress?: string, // this is a new field added in v0.8.0, ignore for now
     customizationDID?: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
@@ -453,6 +455,7 @@ export default class PrepaidCard {
     safeAddress: string,
     tokenAddress: string,
     faceValues: number[],
+    _marketAddress: string | undefined, // this is a new field added in v0.8.0, ignore for now
     customizationDID: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
@@ -461,6 +464,7 @@ export default class PrepaidCard {
     safeAddressOrTxnHash: string,
     tokenAddress?: string,
     faceValues?: number[],
+    _marketAddress?: string, // this is a new field added in v0.8.0, ignore for now
     customizationDID?: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
