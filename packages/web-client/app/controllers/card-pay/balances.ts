@@ -3,10 +3,11 @@ import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
-import * as short from 'short-uuid';
+import RouterService from '@ember/routing/router-service';
 
 class CardPayBalancesController extends Controller {
   @service declare layer2Network: Layer2Network;
+  @service declare router: RouterService;
 
   queryParams = ['flow', { workflowPersistenceId: 'flow-id' }];
   @tracked flow: string | null = null;
@@ -17,8 +18,9 @@ class CardPayBalancesController extends Controller {
   }
 
   @action setFlow(flow: string) {
-    this.flow = flow;
-    this.workflowPersistenceId = short.generate();
+    this.router.transitionTo('card-pay.balances', {
+      queryParams: { flow },
+    });
   }
 
   @action resetQueryParams() {

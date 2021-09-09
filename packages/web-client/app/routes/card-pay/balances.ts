@@ -1,4 +1,4 @@
-import Route from '@ember/routing/route';
+import BaseRoute from './base';
 import '../../css/card-pay/balances.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/balances-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/balances-summary-hero.svg';
@@ -42,8 +42,9 @@ const BALANCES_PANEL = {
   ],
 };
 
-export default class CardPayBalancesRoute extends Route {
-  model() {
+export default class CardPayBalancesRoute extends BaseRoute {
+  model(params: any, transition: any) {
+    super.model(params, transition);
     return {
       panel: BALANCES_PANEL,
     };
