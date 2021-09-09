@@ -1,4 +1,3 @@
-// @ts-ignore
 import { module, test, todo } from 'qunit';
 import { visit } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
@@ -11,6 +10,7 @@ import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 
 // selectors
+const MERCHANT = '[data-test-merchant]';
 const MERCHANT_LOGO = '[data-test-merchant-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
 const USD_AMOUNT = '[data-test-payment-request-usd-amount]';
@@ -22,9 +22,9 @@ const PAYMENT_URL = '[data-test-payment-request-url]';
 const exampleDid = 'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
 const merchantSafeId = '0xE73604fC1724a50CEcBC1096d4229b81aF117c94';
 const spendSymbol = 'SPD'; // TODO: fix this if single source of truth for symbols between web and mobile is established
-const malaysianRinggitSymbol = 'MYR';
 const usdSymbol = 'USD';
 const invalidCurrencySymbol = 'WUT';
+const merchantName = 'Mandello';
 const merchantInfoBackground = '#00ffcc';
 const merchantInfoTextColor = '#000000';
 const merchantSafe: MerchantSafe = {
@@ -52,7 +52,7 @@ module('Acceptance | pay', function (hooks) {
 
     this.server.create('merchant-info', {
       id: customizationJsonFilename, // TODO: replace this with a plain string
-      name: 'Mandello',
+      name: merchantName,
       slug: 'mandello1',
       did: exampleDid,
       color: merchantInfoBackground,
@@ -65,6 +65,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/sokol/${merchantSafeId}?amount=${spendAmount}&currency=${spendSymbol}`
     );
+    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
       .dom(MERCHANT_LOGO)
       .hasAttribute(
@@ -95,6 +96,7 @@ module('Acceptance | pay', function (hooks) {
   test('it renders correctly with no currency provided', async function (assert) {
     // this is basically defaulting to SPEND
     await visit(`/pay/sokol/${merchantSafeId}?amount=${spendAmount}`);
+    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
       .dom(MERCHANT_LOGO)
       .hasAttribute(
@@ -126,6 +128,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/sokol/${merchantSafeId}?amount=${usdAmount}&currency=${usdSymbol}`
     );
+    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
       .dom(MERCHANT_LOGO)
       .hasAttribute(
@@ -153,10 +156,11 @@ module('Acceptance | pay', function (hooks) {
     );
   });
 
-  test('it renders correctly if currency is malformed', async function (assert) {
+  test('it renders correctly if currency is unrecognised', async function (assert) {
     await visit(
       `/pay/sokol/${merchantSafeId}?amount=300&currency=${invalidCurrencySymbol}`
     );
+    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
       .dom(MERCHANT_LOGO)
       .hasAttribute(
@@ -190,6 +194,7 @@ module('Acceptance | pay', function (hooks) {
   test('it renders correctly if amount is malformed', async function (assert) {
     await visit(`/pay/sokol/${merchantSafeId}?amount=30a&currency=SPD`);
 
+    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
       .dom(MERCHANT_LOGO)
       .hasAttribute(
@@ -226,6 +231,7 @@ module('Acceptance | pay', function (hooks) {
         `/pay/sokol/${merchantSafeId}?amount=${spendAmount}&currrency=${spendSymbol}`
       );
 
+      assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
       assert
         .dom(MERCHANT_LOGO)
         .hasAttribute(
@@ -260,26 +266,24 @@ module('Acceptance | pay', function (hooks) {
   );
 
   // This will be handled in a follow-up PR
-  todo(
-    'it shows an appropriate error message if merchant details cannot be fetched',
-    async function (assert) {
-      assert.ok(false);
-      // assert that an error message is shown
-    }
-  );
-
-  // This will be handled in a follow-up PR
-  todo(
-    'it renders only the provided currency and not a USD conversion or SPEND amount if the provided currency is not USD or SPEND',
-    async function (assert) {
-      await visit(
-        `/pay/sokol/${merchantSafeId}?amount=${0}&currrency=${malaysianRinggitSymbol}`
-      );
-      assert.ok(false);
-
-      // assert that merchant details are rendered
-      // assert that amount is rendered
-      // assert that the deep link url generated is correct
-    }
-  );
+  // todo(
+  //   'it shows an appropriate error message if merchant details cannot be fetched',
+  //   async function (assert) {
+  //     await visit(
+  //       `/pay/sokol/idontexist?amount=${spendAmount}&currrency=${spendSymbol}`
+  //     );
+  //   }
+  // );
+  // todo(
+  //   'it renders only the provided currency and not a USD conversion or SPEND amount if the provided currency is not USD or SPEND',
+  //   async function (assert) {
+  //     await visit(
+  //       `/pay/sokol/${merchantSafeId}?amount=${0}&currrency=${malaysianRinggitSymbol}`
+  //     );
+  //     assert.ok(false);
+  //     // assert that merchant details are rendered
+  //     // assert that amount is rendered
+  //     // assert that the deep link url generated is correct
+  //   }
+  // );
 });
