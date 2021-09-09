@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, visit, currentURL } from '@ember/test-helpers';
+import { click, visit, currentURL, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -13,18 +13,58 @@ import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issu
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { toWei } from 'web3-utils';
 
+import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
+
 interface Context extends MirageTestContext {}
 
 module('Acceptance | issue prepaid card', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
+  let workflowPersistenceService: WorkflowPersistence;
 
   hooks.beforeEach(function () {
-    // TODO: fix typescript for mirage
     (this as any).server.db.loadData({
       prepaidCardColorSchemes,
       prepaidCardPatterns,
     });
+    window.TEST__AUTH_TOKEN = 'abc123--def456--ghi789';
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    const MIN_AMOUNT_TO_PASS = new BN(
+      toWei(`${Math.ceil(Math.min(...faceValueOptions) / 100)}`)
+    );
+    let layer2Service = this.owner.lookup('service:layer2-network')
+      .strategy as Layer2TestWeb3Strategy;
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateBalances({
+      defaultToken: MIN_AMOUNT_TO_PASS,
+      card: new BN('500000000000000000000'),
+    });
+    let testDepot = {
+      address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
+      tokens: [
+        {
+          balance: '250000000000000000000',
+          token: {
+            symbol: 'DAI',
+          },
+        },
+        {
+          balance: '500000000000000000000',
+          token: {
+            symbol: 'CARD',
+          },
+        },
+      ],
+    };
+    layer2Service.test__simulateDepot(testDepot as DepotSafe);
+    layer2Service.authenticate();
+    layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
+
+    workflowPersistenceService = this.owner.lookup(
+      'service:workflow-persistence'
+    );
+
+    workflowPersistenceService.storage.clear();
   });
 
   test('Generates a flow uuid query parameter used as a persistence identifier', async function (this: Context, assert) {
@@ -39,8 +79,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
     );
   });
 
-  module('Restoring from previously saved state', function () {
-    test('it restores the workflow', async function (this: Context, assert) {
+  module('Restoring from a previously saved state', function () {
+    test('it restores an unfinished workflow', async function (this: Context, assert) {
       const state = {
         completedCardNames: [
           'LAYER2_CONNECT',
@@ -68,16 +108,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
         transferrable: true,
       };
 
-      localStorage.setItem(
-        `workflowPersistence:123`,
-        JSON.stringify({
-          name: 'Prepaid Card Issuance',
-          state,
-        })
-      );
+      workflowPersistenceService.persistData('abc123', {
+        name: 'PREPAID_CARD_ISSUANCE',
+        state,
+      });
 
-      // FIXME: Route never resolves, possibly due to the testwaiter in the animated workflow
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=123');
+      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
@@ -93,38 +129,228 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert
         .dom('[data-test-preview] [data-test-prepaid-card-balance]')
         .hasText('§10000');
+
+      assert.dom('[data-test-issue-prepaid-card-button]').hasText('Create'); // Create prepaid card CTA
+    });
+
+    test('it restores a finished workflow', async function (this: Context, assert) {
+      const state = {
+        completedCardNames: [
+          'LAYER2_CONNECT',
+          'LAYOUT_CUSTOMIZATION',
+          'FUNDING_SOURCE',
+          'FACE_VALUE',
+          'PREVIEW', // Includes all milestone cards
+        ],
+        issuerName: 'Vitalik',
+        pattern: {
+          patternUrl:
+            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+          id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
+        },
+        colorScheme: {
+          patternColor: 'white',
+          textColor: 'black',
+          background: '#37EB77',
+          id: '4f219852-33ee-4e4c-81f7-76318630a423',
+        },
+        prepaidFundingToken: 'DAI.CPXD',
+        spendFaceValue: 10000,
+        did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+        prepaidCardAddress: '0x81c89274Dc7C9BAcE082d2ca00697d2d2857D2eE',
+        reloadable: true,
+        transferrable: true,
+        txHash:
+          '0x8bcc3e419d09a0403d1491b5bb8ac8bee7c67f85cc37e6e17ef8eb77f946497b',
+        prepaidCardSafe: {
+          type: 'prepaid-card',
+          address: '0x81c89274Dc7C9BAcE082d2ca00697d2d2857D2eE',
+          customizationDID:
+            'did:cardstack:1pkYh9uJHdfMJZt4mURGmhps96b157a2d744efd9',
+          reloadable: false,
+          spendFaceValue: 500,
+          transferrable: true,
+        },
+      };
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'Prepaid Card Issuance',
+        state,
+      });
+
+      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+
+      assert.dom('[data-test-milestone="0"]').exists(); // L2
+      assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
+      assert.dom('[data-test-milestone="2"]').exists(); // Choose funding source
+      assert.dom('[data-test-milestone="3"]').exists(); // Prepaid card issues
+      assert
+        .dom('[data-test-epilogue][data-test-postable="1"]')
+        .includesText('Prepaid card issued');
+
+      assert.dom('[data-test-layer-2-wallet-summary]').exists();
+
+      assert
+        .dom('[data-test-issue-prepaid-card-next-step="new-issuance"]') // Issue A New Prepaid Card button
+        .exists();
+    });
+
+    test('it restores a cancelled workflow', async function (this: Context, assert) {
+      const state = {
+        cancelationReason: 'DISCONNECTED',
+        colorScheme: {
+          patternColor: 'black',
+          textColor: 'white',
+          background: '#FF5050',
+          description: 'Sunset Orange',
+        },
+        completedCardNames: [
+          'LAYER2_CONNECT',
+          'HUB_AUTH',
+          'LAYOUT_CUSTOMIZATION',
+          'FUNDING_SOURCE',
+          'FACE_VALUE',
+        ],
+        completedMilestonesCount: 3,
+        isCancelled: true,
+        issuerName: 'Peter',
+
+        milestonesCount: 4,
+        pattern: {
+          patternUrl:
+            'https://app.cardstack.com/images/prepaid-card-customizations/pattern-1.svg',
+        },
+        prepaidFundingToken: 'DAI.CPXD',
+        spendFaceValue: 500,
+      };
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'Prepaid Card Issuance',
+        state,
+      });
+
+      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+
+      assert.dom('[data-test-milestone="0"]').exists(); // L2
+      assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
+      assert.dom('[data-test-milestone="2"]').exists(); // Choose face value
+      assert.dom('[data-test-milestone="3"]').exists(); // Prepaid card preview
+
+      assert
+        .dom('[data-test-cancelation]')
+        .includesText(
+          'It looks like your L2 test chain wallet got disconnected. If you still want to create a prepaid card, please start again by connecting your wallet.'
+        );
+
+      // TODO: reveal cancellation message immediately
+      await waitFor(
+        '[data-test-workflow-default-cancelation-restart="issue-prepaid-card"]'
+      );
+
+      assert
+        .dom(
+          '[data-test-workflow-default-cancelation-restart="issue-prepaid-card"]'
+        )
+        .exists();
+    });
+
+    test('it cancels a persisted flow when trying to restore while unauthenticated', async function (this: Context, assert) {
+      const state = {
+        completedCardNames: [
+          'LAYER2_CONNECT',
+          'LAYOUT_CUSTOMIZATION',
+          'FUNDING_SOURCE',
+          'FACE_VALUE',
+        ],
+        issuerName: 'Vitalik',
+        pattern: {
+          patternUrl:
+            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+          id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
+        },
+        colorScheme: {
+          patternColor: 'white',
+          textColor: 'black',
+          background: '#37EB77',
+          id: '4f219852-33ee-4e4c-81f7-76318630a423',
+        },
+        prepaidFundingToken: 'DAI.CPXD',
+        spendFaceValue: 10000,
+        did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+        prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
+        reloadable: true,
+        transferrable: true,
+      };
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'PREPAID_CARD_ISSUANCE',
+        state,
+      });
+
+      const hubAuthentication = this.owner.lookup('service:hub-authentication');
+      hubAuthentication.authToken = null;
+
+      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+
+      assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
+      assert.dom('[data-test-milestone="1"]').doesNotExist(); // Customize layout
+      assert.dom('[data-test-milestone="2"]').doesNotExist(); // Choose funding source
+
+      assert
+        .dom('[data-test-cancelation]')
+        .includesText(
+          'You attempted to restore an unfinished workflow, but you are no longer authenticated. Please restart the workflow.'
+        );
+    });
+
+    test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
+      const state = {
+        completedCardNames: [
+          'LAYER2_CONNECT',
+          'LAYOUT_CUSTOMIZATION',
+          'FUNDING_SOURCE',
+          'FACE_VALUE',
+        ],
+        issuerName: 'Vitalik',
+        pattern: {
+          patternUrl:
+            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+          id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
+        },
+        colorScheme: {
+          patternColor: 'white',
+          textColor: 'black',
+          background: '#37EB77',
+          id: '4f219852-33ee-4e4c-81f7-76318630a423',
+        },
+        prepaidFundingToken: 'DAI.CPXD',
+        spendFaceValue: 10000,
+        did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+        prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
+        reloadable: true,
+        transferrable: true,
+        layer2WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer2AccountAddress set in beforeEach
+      };
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'PREPAID_CARD_ISSUANCE',
+        state,
+      });
+
+      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+
+      assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
+      assert.dom('[data-test-milestone="1"]').doesNotExist(); // Customize layout
+      assert.dom('[data-test-milestone="2"]').doesNotExist(); // Choose funding source
+
+      assert
+        .dom('[data-test-cancelation]')
+        .includesText(
+          'You attempted to restore an unfinished workflow, but you changed your Card wallet adress. Please restart the workflow.'
+        );
     });
 
     test('it allows interactivity after restoring previously saved state', async function (this: Context, assert) {
-      let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-      const MIN_AMOUNT_TO_PASS = new BN(
-        toWei(`${Math.ceil(Math.min(...faceValueOptions) / 100)}`)
-      );
-      let layer2Service = this.owner.lookup('service:layer2-network')
-        .strategy as Layer2TestWeb3Strategy;
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      layer2Service.test__simulateBalances({
-        defaultToken: MIN_AMOUNT_TO_PASS,
-        card: new BN('500000000000000000000'),
-      });
-      let testDepot = {
-        address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
-        tokens: [
-          {
-            balance: '250000000000000000000',
-            token: {
-              symbol: 'DAI',
-            },
-          },
-          {
-            balance: '500000000000000000000',
-            token: {
-              symbol: 'CARD',
-            },
-          },
-        ],
-      };
-      layer2Service.test__simulateDepot(testDepot as DepotSafe);
       const state = {
         completedCardNames: ['LAYER2_CONNECT', 'LAYOUT_CUSTOMIZATION'],
         issuerName: 'Vitalik',
@@ -141,15 +367,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
         },
       };
 
-      localStorage.setItem(
-        `workflowPersistence:123`,
-        JSON.stringify({
-          name: 'Prepaid Card Issuance',
-          state,
-        })
-      );
+      workflowPersistenceService.persistData('abc123', {
+        name: 'Prepaid Card Issuance',
+        state,
+      });
 
-      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=123');
+      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
