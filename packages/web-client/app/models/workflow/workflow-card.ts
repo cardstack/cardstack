@@ -67,10 +67,11 @@ export class WorkflowCard extends WorkflowPostable {
         this.session?.state.completedCardNames || [];
 
       if (!existingCompletedCardNames.includes(this.cardName)) {
-        this.session?.update('completedCardNames', [
-          ...existingCompletedCardNames,
-          this.cardName,
-        ]);
+        this.session?.updateMany({
+          completedCardNames: [...existingCompletedCardNames, this.cardName],
+          completedMilestonesCount: this.workflow?.completedMilestoneCount,
+          milestonesCount: this.workflow?.milestones.length,
+        });
       }
     }
   }
