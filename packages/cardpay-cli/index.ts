@@ -29,6 +29,7 @@ import {
 } from './layer-two-oracle';
 import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
 import { rewardTokenBalances } from './reward-pool.js';
+import { registerRewardProgram } from './reward-manager.js';
 import { hubAuth } from './hub-auth';
 
 //@ts-ignore polyfilling fetch
@@ -561,6 +562,17 @@ let {
     });
     command = 'registerRewardProgram';
   })
+  .command('register-reward-program <address>, <address>', 'Register reward program', (yargs) => {
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The address of the prepaid card that is being used to pay the merchant registration fee',
+    });
+    yargs.positional('admin', {
+      type: 'string',
+      description: 'The address of the new admin',
+    });
+    command = 'registerRewardProgram';
+  })
   .options({
     network: {
       alias: 'n',
@@ -795,6 +807,17 @@ if (!command) {
     case 'registerRewardProgram':
       if (prepaidCard == null) {
         showHelpAndExit('prepaid card is a required value');
+        return;
+      }
+      if (admin == null) {
+        showHelpAndExit('admin is a required value');
+        return;
+      }
+      await registerRewardProgram(network, prepaidCard, admin, mnemonic);
+      break;
+    case 'registerRewardProgram':
+      if (prepaidCard == null) {
+        showHelpAndExit('address is a required value');
         return;
       }
       if (admin == null) {
