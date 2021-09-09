@@ -46,7 +46,7 @@ export async function create(
     )} SPEND and issuing token ${symbol} from depot ${safe}...`
   );
   let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`);
-  await prepaidCard.create(safe, tokenAddress, faceValues, customizationDID, { onTxnHash });
+  await prepaidCard.create(safe, tokenAddress, faceValues, undefined, customizationDID, { onTxnHash });
   console.log('done');
 }
 
@@ -62,8 +62,12 @@ export async function split(
   let prepaidCardAPI = await getSDK('PrepaidCard', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
 
-  console.log(`Splitting prepaid card ${prepaidCard} into face value(s) §${faceValues.join(' SPEND, §')} SPEND...`);
-  await prepaidCardAPI.split(prepaidCard, faceValues, customizationDID, {
+  console.log(
+    `Splitting prepaid card ${prepaidCard} into face value(s) §${faceValues.join(
+      ' SPEND, §'
+    )} SPEND and placing into the default market...`
+  );
+  await prepaidCardAPI.split(prepaidCard, faceValues, undefined, customizationDID, {
     onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log('done');

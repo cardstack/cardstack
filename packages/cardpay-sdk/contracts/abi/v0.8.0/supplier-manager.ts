@@ -3,37 +3,6 @@ export default [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
-        internalType: 'address',
-        name: 'card',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'issuingToken',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'issuingTokenAmount',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'spendAmount',
-        type: 'uint256',
-      },
-    ],
-    name: 'MerchantRegistrationFee',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
         indexed: true,
         internalType: 'address',
         name: 'previousOwner',
@@ -56,9 +25,47 @@ export default [
     type: 'event',
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'supplier',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
+      },
+    ],
+    name: 'SupplierInfoDIDUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'supplier',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'safe',
+        type: 'address',
+      },
+    ],
+    name: 'SupplierSafeCreated',
+    type: 'event',
+  },
+  {
     constant: true,
     inputs: [],
-    name: 'actionDispatcher',
+    name: 'bridgeUtils',
     outputs: [
       {
         internalType: 'address',
@@ -88,7 +95,22 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'exchangeAddress',
+    name: 'gnosisProxyFactory',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'gnosisSafe',
     outputs: [
       {
         internalType: 'address',
@@ -132,13 +154,19 @@ export default [
   },
   {
     constant: true,
-    inputs: [],
-    name: 'merchantManager',
-    outputs: [
+    inputs: [
       {
         internalType: 'address',
-        name: '',
+        name: 'supplier',
         type: 'address',
+      },
+    ],
+    name: 'isRegistered',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
       },
     ],
     payable: false,
@@ -161,9 +189,15 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'prepaidCardManager',
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'supplier',
+        type: 'address',
+      },
+    ],
+    name: 'registerSupplier',
     outputs: [
       {
         internalType: 'address',
@@ -172,7 +206,7 @@ export default [
       },
     ],
     payable: false,
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -186,13 +220,123 @@ export default [
   },
   {
     constant: true,
-    inputs: [],
-    name: 'revenuePoolAddress',
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'supplier',
+        type: 'address',
+      },
+    ],
+    name: 'safeForSupplier',
     outputs: [
       {
         internalType: 'address',
         name: '',
         type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'safes',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
+      },
+    ],
+    name: 'setSupplierInfoDID',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_bridgeUtils',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_gsMasterCopy',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_gsProxyFactory',
+        type: 'address',
+      },
+    ],
+    name: 'setup',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'suppliers',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: 'registered',
+        type: 'bool',
+      },
+      {
+        internalType: 'address',
+        name: 'safe',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'infoDID',
+        type: 'string',
       },
     ],
     payable: false,
@@ -210,78 +354,6 @@ export default [
     ],
     name: 'transferOwnership',
     outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: '_actionDispatcher',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_merchantManager',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_prepaidCardManager',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_revenuePoolAddress',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_exchangeAddress',
-        type: 'address',
-      },
-    ],
-    name: 'setup',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
-    ],
-    name: 'onTokenTransfer',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function',

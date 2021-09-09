@@ -5,8 +5,9 @@ This is a package that provides an SDK to use the Cardpay protocol.
  One item to note that all token amounts that are provided to the API must strings and be in units of `wei`. All token amounts returned by the API will also be in units of `wei`. You can use `Web3.utils.toWei()` and `Web3.utils.fromWei()` to convert to and from units of `wei`. Because ethereum numbers can be so large, it is unsafe to represent these natively in Javascript, and in fact it is very common for a smart contract to return numbers that are simply too large to be represented natively in Javascript. For this reason, within Javascript the only safe way to natively handle numbers coming from Ethereum is as a `string`. If you need to perform math on a number coming from Ethereum use the `BN` library.
 
 - [Function Parameters](#function-parameters)
-  - [Nonce](#nonce)
-  - [Transaction Hash](#transaction-hash)
+  - [TransactionOptions](#transactionoptions)
+    - [Nonce](#nonce)
+    - [Transaction Hash](#transaction-hash)
 - [`getSDK`](#getsdk)
 - [`Assets`](#assets)
   - [`Assets.getNativeTokenBalance`](#assetsgetnativetokenbalance)
@@ -47,13 +48,13 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RewardPool.claim` (TBD)](#rewardpoolclaim-tbd)
 - [`LayerOneOracle`](#layeroneoracle)
   - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
-  - [`LayerOneOracle.getEthToUsdConverter`](#layeroneoraclegetusdconverter)
+  - [LayerOneOracle.getEthToUsdConverter](#layeroneoraclegetethtousdconverter)
   - [`LayerOneOracle.getUpdatedAt`](#layeroneoraclegetupdatedat)
 - [`LayerTwoOracle`](#layertwooracle)
   - [`LayerTwoOracle.convertToSpend`](#layertwooracleconverttospend)
   - [`LayerTwoOracle.convertFromSpend`](#layertwooracleconvertfromspend)
   - [`LayerTwoOracle.getUSDPrice`](#layertwooraclegetusdprice)
-  - [`LayerTwoOracle.getUSDConverter`](#layertwooraclegetusdconverter)
+  - [LayerTwoOracle.getUSDConverter](#layertwooraclegetusdconverter)
   - [`LayerTwoOracle.getETHPrice`](#layertwooraclegetethprice)
   - [`LayerTwoOracle.getUpdatedAt`](#layertwooraclegetupdatedat)
 - [`HubAuth` (TODO)](#hubauth-todo)
@@ -386,6 +387,7 @@ This method is invoked with the following parameters:
 - The address of the safe that you are using to pay for the prepaid card
 - The contract address of the token that you wish to use to pay for the prepaid card. Note that the face value of the prepaid card will fluctuate based on the exchange rate of this token and the **§** unit.
 - An array of face values in units of **§** SPEND as numbers. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
+- The address of the prepaid card market to create the prepaid card within. Set to `undefined` to not place to newly created prepaid card in the market
 - A DID string that represents the customization for the prepaid card. The customization for a prepaid card can be retrieved using a DID resolver with this DID. If there is no customization an `undefined` value can be specified here.
 - You can optionally provide a callback to obtain the prepaid card addresses before the creation process is complete
 - You can optionally provide a TransactionOptions argument, to obtain the nonce or transaction hash of the operation before the creation process is complete
@@ -398,6 +400,7 @@ let result = await prepaidCard.create(
   safeAddress,
   daicpxd,
   [5000], // §5000 SPEND face value
+  undefined,
   "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49"
 );
 ```
@@ -422,6 +425,7 @@ This call will use a prepaid card as the source of funds when creating more prep
 This method is invoked with the following parameters:
 - The address of the prepaid card that you are using to fund the creation of more prepaid cards
 - An array of face values in units of **§** SPEND as numbers. Note there is a maximum of 15 prepaid cards that can be created in a single transaction and a minimum face value of **§100** is enforced for each card.
+- The address of the prepaid card market to create the prepaid card within. Set to `undefined` to place the newly created prepaid cards in the default market (Cardstack issuer via Wyre). Note that all split cards must go into a market.
 - A DID string that represents the customization for the prepaid card. The customization for a prepaid card can be retrieved using a DID resolver with this DID. If there is no customization an `undefined` value can be specified here.
 - You can optionally provide a callback to obtain the prepaid card addresses before the creation process is complete
 - You can optionally provide a callback to obtain a hook to know when the gas has been loaded into the prepaid card before the creation process is complete
@@ -431,6 +435,7 @@ This method is invoked with the following parameters:
 let result = await prepaidCard.split(
   prepaidCardAddress,
   [5000, 4000], // split into 2 cards: §5000 SPEND face value and §4000 SPEND face value
+  undefined,
   "did:cardstack:56d6fc54-d399-443b-8778-d7e4512d3a49"
 );
 ```

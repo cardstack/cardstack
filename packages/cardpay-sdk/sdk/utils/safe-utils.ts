@@ -169,7 +169,8 @@ export async function executeTransaction(
   return response.json();
 }
 
-export async function executeSend(
+// TODO delete this after we upgrade past 0.7.0 in xdai
+export async function executeSend_v0_7_0( //eslint-disable-line @typescript-eslint/naming-convention
   web3: Web3,
   prepaidCardAddress: string,
   spendAmount: number,
@@ -193,6 +194,46 @@ export async function executeSend(
       rate,
       action,
       data,
+      signatures,
+    }),
+  };
+  let response = await fetch(url, options);
+  if (!response?.ok) {
+    throw new Error(await response.text());
+  }
+  return response.json();
+}
+
+export async function executeSend(
+  web3: Web3,
+  prepaidCardAddress: string,
+  spendAmount: number,
+  rate: string,
+  gasPrice: string,
+  safeTxGas: string,
+  dataGas: string,
+  action: string,
+  data: string,
+  signatures: Signature[],
+  nonce: BN
+): Promise<GnosisExecTx> {
+  let relayServiceURL = await getConstant('relayServiceURL', web3);
+  const url = `${relayServiceURL}/v1/prepaid-card/${prepaidCardAddress}/send/`;
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
+      Accept: 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
+    },
+    body: JSON.stringify({
+      nonce: nonce.toString(),
+      payment: spendAmount,
+      rate,
+      action,
+      data,
+      gasPrice,
+      safeTxGas,
+      dataGas,
       signatures,
     }),
   };

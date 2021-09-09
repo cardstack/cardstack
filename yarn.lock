@@ -1996,11 +1996,6 @@
     "@babel/helper-validator-identifier" "^7.14.9"
     to-fast-properties "^2.0.0"
 
-"@cardstack/eslint-config@0.21.5":
-  version "0.21.5"
-  resolved "https://registry.yarnpkg.com/@cardstack/eslint-config/-/eslint-config-0.21.5.tgz#f37e74facd49dbdbbfc952301065f010355e4b01"
-  integrity sha512-59/TAk9awiETN4DAGEkcUXbNVKqhgNdyIluUoVP8MgkGx3r+a4bUf5LLbePnpiwOSkI0Xhsz4VOYpkK/ML4+dQ==
-
 "@cardstack/logger@^0.2.1":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@cardstack/logger/-/logger-0.2.1.tgz#6af0497c2b741c0a2bfcb8e5510fb75551cb5644"

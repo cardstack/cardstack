@@ -5,13 +5,13 @@ import { networkName } from '../sdk/utils/general-utils';
 // this silly consumption of the ABI's. The ABI's are indeed consumed, however,
 // we consume them outside of ts due to the way the codegen operates for the
 // subgraph assembly script.
-import PayMerchantHandlerABI from './abi/v0.7.0/pay-merchant-handler';
-import RegisterMerchantHandlerABI from './abi/v0.7.0/register-merchant-handler';
-import TransferPrepaidCardHandlerABI from './abi/v0.7.0/transfer-prepaid-card-handler';
-import SplitPrepaidCardHandlerABI from './abi/v0.7.0/split-prepaid-card-handler';
-import SpendABI from './abi/v0.7.0/spend';
-import MerchantManagerABI from './abi/v0.7.0/merchant-manager';
-import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.7.0/deprecated-merchant-manager-0_6_7';
+import PayMerchantHandlerABI from './abi/v0.8.0/pay-merchant-handler';
+import RegisterMerchantHandlerABI from './abi/v0.8.0/register-merchant-handler';
+import TransferPrepaidCardHandlerABI from './abi/v0.8.0/transfer-prepaid-card-handler';
+import SplitPrepaidCardHandlerABI from './abi/v0.8.0/split-prepaid-card-handler';
+import SpendABI from './abi/v0.8.0/spend';
+import MerchantManagerABI from './abi/v0.8.0/merchant-manager';
+import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.0/deprecated-merchant-manager-0_6_7';
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
 consumeModule(RegisterMerchantHandlerABI);
@@ -30,6 +30,7 @@ const KOVAN = {
   chainlinkEthToUsd: '0x9326BFA02ADD2366b30bacB125260Af641031331',
 };
 const SOKOL = {
+  gnosisProxyFactory: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
   homeBridge: '0x16a80598DD2f143CFBf091638CE3fB02c9135528',
   homeAMB: '0xFe446bEF1DbF7AFE24E81e05BC8B271C1BA9a560',
   daiCpxd: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
@@ -64,6 +65,7 @@ const MAINNET = {
   chainlinkEthToUsd: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
 };
 const XDAI = {
+  gnosisProxyFactory: '0x76E2cFc1F5Fa8F6a5b3fC4c8F4788F0116861F9B',
   homeBridge: '0xd1e46b8a371AF04Ce74c993B325b844ef0f48b16',
   homeAMB: '0x75Df5AF045d91108662D8080fD1FEFAd6aA0bb59',
   daiCpxd: '0x26F2319Fbb44772e0ED58fB7c99cf8da59e2b5BE',
