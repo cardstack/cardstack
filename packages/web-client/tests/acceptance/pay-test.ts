@@ -245,8 +245,10 @@ module('Acceptance | pay', function (hooks) {
           merchantInfoTextColor
         );
 
-      assert.dom(AMOUNT).doesNotExist();
-      assert.dom(USD_AMOUNT).doesNotExist();
+      assert.dom(AMOUNT).containsText(`§${spendAmount}`);
+      assert
+        .dom(USD_AMOUNT)
+        .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
 
       // assert that the deep link view is rendered
       assert.dom(QR_CODE).doesNotExist();
