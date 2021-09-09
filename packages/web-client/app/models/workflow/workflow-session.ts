@@ -22,7 +22,7 @@ export default class WorkflowSession {
 
   @tracked state: ArbitraryDictionary = {};
 
-  get isPersisted() {
+  get hasPersistence() {
     return !!this.workflow?.workflowPersistenceId;
   }
 
@@ -53,19 +53,23 @@ export default class WorkflowSession {
   }
 
   restoreFromStorage(): void {
-    if (!this.isPersisted) return;
+    if (!this.hasPersistence) return;
 
-    const persistedData = this.workflowPersistenceStorage?.getPersistedData(
-      this.workflow.workflowPersistenceId
-    );
+    const persistedData = this.getPersistedData();
 
     if (persistedData?.state) {
       this.state = persistedData.state;
     }
   }
 
-  persistToStorage(): void {
-    if (!this.isPersisted) return;
+  getPersistedData(): any {
+    return this.workflowPersistenceStorage?.getPersistedData(
+      this.workflow.workflowPersistenceId
+    );
+  }
+
+  private persistToStorage(): void {
+    if (!this.hasPersistence) return;
 
     this.workflowPersistenceStorage?.persistData(
       this.workflow.workflowPersistenceId,

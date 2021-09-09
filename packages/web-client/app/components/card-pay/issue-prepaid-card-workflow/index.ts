@@ -17,18 +17,21 @@ import WorkflowPersistence from '@cardstack/web-client/services/workflow-persist
 import { action } from '@ember/object';
 import BN from 'bn.js';
 import RouterService from '@ember/routing/router-service';
-
 import { faceValueOptions } from './workflow-config';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   INSUFFICIENT_FUNDS: 'INSUFFICIENT_FUNDS',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
+  RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
+  RESTORATION_L2_ADDRESS_CHANGED: 'RESTORATION_L2_ADDRESS_CHANGED',
+  RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
 } as const;
 
 class IssuePrepaidCardWorkflow extends Workflow {
-  workflowPersistenceId?: string;
+  workflowPersistenceId: string;
   name = 'PREPAID_CARD_ISSUANCE' as WorkflowName;
 
   milestones = [
@@ -265,6 +268,50 @@ class IssuePrepaidCardWorkflow extends Workflow {
         );
       },
     }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but you are no longer authenticated. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_UNAUTHENTICATED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but you changed your Card wallet adress. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but your Card wallet got disconnected. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L2_DISCONNECTED
+        );
+      },
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'workflow-thread/default-cancelation-cta',
+      includeIf() {
+        return ([
+          FAILURE_REASONS.RESTORATION_UNAUTHENTICATED,
+          FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED,
+          FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
+        ] as String[]).includes(String(this.workflow?.cancelationReason));
+      },
+    }),
   ]);
 
   constructor(owner: unknown, workflowPersistenceId: string) {
@@ -274,30 +321,35 @@ class IssuePrepaidCardWorkflow extends Workflow {
     this.attachWorkflow();
   }
 
-  restoreFromPersistedWorkflow() {
-    this.session.restoreFromStorage();
+  restorationErrors(persistedState: any) {
+    let layer2Network = this.owner.lookup(
+      'service:layer2-network'
+    ) as Layer2Network;
 
-    const [lastCompletedCardName] = (
-      this.session.state.completedCardNames || []
-    ).slice(-1);
+    let hubAuthentication = this.owner.lookup(
+      'service:hub-authentication'
+    ) as HubAuthentication;
 
-    // TODO: Only attempt to restore when both layer 1 and 2 are connected
-    if (lastCompletedCardName) {
-      this.isRestored = true;
-      const postables = this.milestones
-        .flatMap((m: any) => m.postableCollection.postables)
-        .concat(this.epilogue.postables);
+    let errors = [];
 
-      const index = postables.mapBy('cardName').indexOf(lastCompletedCardName);
-
-      postables.slice(0, index + 1).forEach((p: any) => {
-        p.isComplete = true;
-      });
+    if (!hubAuthentication.isAuthenticated) {
+      errors.push(FAILURE_REASONS.RESTORATION_UNAUTHENTICATED);
     }
 
-    if (this.session.state.cancelled && this.session.state.cancelationReason) {
-      this.cancel(this.session.state.cancelationReason);
+    if (!layer2Network.isConnected) {
+      errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
     }
+
+    if (
+      layer2Network.isConnected &&
+      persistedState.layer2WalletAddress &&
+      layer2Network.walletInfo.firstAddress !==
+        persistedState.layer2WalletAddress
+    ) {
+      errors.push(FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED);
+    }
+
+    return errors;
   }
 }
 
@@ -316,7 +368,18 @@ class IssuePrepaidCardWorkflowComponent extends Component {
       this.router.currentRoute.queryParams['flow-id']!
     );
 
-    workflow.restoreFromPersistedWorkflow();
+    const persistedState = workflow.session.getPersistedData()?.state ?? {};
+    const willRestore = Object.keys(persistedState).length > 0;
+
+    if (willRestore) {
+      const errors = workflow.restorationErrors(persistedState);
+
+      if (errors.length > 0) {
+        workflow.cancel(errors[0]);
+      } else {
+        workflow.restoreFromPersistedWorkflow();
+      }
+    }
 
     this.workflow = workflow;
   }

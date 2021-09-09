@@ -163,6 +163,34 @@ export abstract class Workflow {
   emit(event: string, ...args: any[]) {
     this.simpleEmitter.emit(event, ...args);
   }
+
+  restoreFromPersistedWorkflow() {
+    this.session.restoreFromStorage();
+
+    const [lastCompletedCardName] = (
+      this.session.state.completedCardNames || []
+    ).slice(-1);
+
+    if (lastCompletedCardName) {
+      this.isRestored = true;
+      const postables = this.milestones
+        .flatMap((m: Milestone) => m.postableCollection.postables)
+        .concat(this.epilogue.postables);
+
+      const index = postables.mapBy('cardName').indexOf(lastCompletedCardName);
+
+      postables.slice(0, index + 1).forEach((postable: WorkflowPostable) => {
+        postable.isComplete = true;
+      });
+    }
+
+    if (
+      this.session.state.isCancelled &&
+      this.session.state.cancelationReason
+    ) {
+      this.cancel(this.session.state.cancelationReason);
+    }
+  }
 }
 
 export let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
