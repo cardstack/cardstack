@@ -8,6 +8,7 @@ import sinon from 'sinon';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { Response as MirageResponse } from 'ember-cli-mirage';
+import BN from 'bn.js';
 
 interface Context extends MirageTestContext {}
 
@@ -82,8 +83,7 @@ module(
         merchantId: 'mandello1',
         merchantBgColor: '#ff5050',
         merchantTextColor: '#fff',
-        merchantRegistrationFee:
-          await layer2Service.fetchMerchantRegistrationFee(),
+        merchantRegistrationFee: await layer2Service.fetchMerchantRegistrationFee(),
       });
 
       this.setProperties({
@@ -221,7 +221,7 @@ module(
       await waitFor('[data-test-create-merchant-cancel-button]');
       layer2Service.test__simulateOnNonceForRegisterMerchantRequest(
         prepaidCardAddress,
-        '12345'
+        new BN('12345')
       );
 
       await click('[data-test-create-merchant-cancel-button]');
@@ -326,10 +326,8 @@ module(
 
         await click('[data-test-create-merchant-button]');
 
-        let merchantInfoStorageRequests = (
-          this as any
-        ).server.pretender.handledRequests.filter((req: { url: string }) =>
-          req.url.includes('merchant-infos')
+        let merchantInfoStorageRequests = (this as any).server.pretender.handledRequests.filter(
+          (req: { url: string }) => req.url.includes('merchant-infos')
         );
 
         assert.equal(

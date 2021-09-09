@@ -1,11 +1,6 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
-import {
-  IssuePrepaidCardOptions,
-  Layer2Web3Strategy,
-  RegisterMerchantOptions,
-  TransactionHash,
-} from './types';
+import { Layer2Web3Strategy, TransactionHash } from './types';
 import {
   BridgeableSymbol,
   ConvertibleSymbol,
@@ -21,6 +16,7 @@ import {
   MerchantSafe,
   PrepaidCardSafe,
   Safe,
+  TransactionOptions,
 } from '@cardstack/cardpay-sdk';
 import {
   UnbindEventListener,
@@ -33,16 +29,16 @@ import { taskFor } from 'ember-concurrency-ts';
 interface IssuePrepaidCardRequest {
   deferred: RSVP.Deferred<PrepaidCardSafe>;
   onTxnHash?: (txnHash: TransactionHash) => void;
-  onNonce?: (nonce: string) => void;
-  nonce?: string;
+  onNonce?: (nonce: BN) => void;
+  nonce?: BN;
   customizationDID: string;
 }
 
 interface RegisterMerchantRequest {
   deferred: RSVP.Deferred<MerchantSafe>;
   onTxnHash?: (txnHash: TransactionHash) => void;
-  onNonce?: (nonce: string) => void;
-  nonce?: string;
+  onNonce?: (nonce: BN) => void;
+  nonce?: BN;
   infoDID: string;
 }
 
@@ -209,7 +205,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     _safeAddress: string,
     faceValue: number,
     customizationDID: string,
-    options: IssuePrepaidCardOptions
+    options: TransactionOptions
   ): Promise<PrepaidCardSafe> {
     let deferred: RSVP.Deferred<PrepaidCardSafe> = defer();
     this.issuePrepaidCardRequests.set(faceValue, {
@@ -226,14 +222,16 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(100);
   }
 
-  getPrepaidCardSafesFromTxHash(_txHash: string): Promise<PrepaidCardSafe[]> {
-    return defer<PrepaidCardSafe[]>().promise;
+  resumeIssuePrepaidCardTransaction(
+    _txnHash: string
+  ): Promise<PrepaidCardSafe> {
+    return defer<PrepaidCardSafe>().promise;
   }
 
   async registerMerchant(
     prepaidCardAddress: string,
     infoDID: string,
-    options: RegisterMerchantOptions
+    options: TransactionOptions
   ): Promise<MerchantSafe> {
     let deferred: RSVP.Deferred<MerchantSafe> = defer();
     this.registerMerchantRequests.set(prepaidCardAddress, {
@@ -389,16 +387,14 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     }
   }
 
-  test__getNonceForIssuePrepaidCardRequest(
-    faceValue: number
-  ): string | undefined {
+  test__getNonceForIssuePrepaidCardRequest(faceValue: number): BN | undefined {
     let request = this.issuePrepaidCardRequests.get(faceValue);
     return request?.nonce;
   }
 
   test__simulateOnNonceForIssuePrepaidCardRequest(
     faceValue: number,
-    nonce: string
+    nonce: BN
   ): void {
     let request = this.issuePrepaidCardRequests.get(faceValue);
     request?.onNonce?.(nonce);
@@ -437,14 +433,14 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   test__getNonceForRegisterMerchantRequest(
     prepaidCardAddress: string
-  ): string | undefined {
+  ): BN | undefined {
     let request = this.registerMerchantRequests.get(prepaidCardAddress);
     return request?.nonce;
   }
 
   test__simulateOnNonceForRegisterMerchantRequest(
     prepaidCardAddress: string,
-    nonce: string
+    nonce: BN
   ): void {
     let request = this.registerMerchantRequests.get(prepaidCardAddress);
     request?.onNonce?.(nonce);

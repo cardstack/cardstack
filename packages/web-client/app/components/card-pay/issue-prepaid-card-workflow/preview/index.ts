@@ -19,8 +19,9 @@ import { tracked } from '@glimmer/tracking';
 import Resolved from '@cardstack/web-client/utils/resolved';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-rejection-error';
-import { IssuePrepaidCardOptions } from '../../../../utils/web3-strategies/types';
 import config from '../../../../config/environment';
+import { TransactionOptions } from '@cardstack/cardpay-sdk';
+import BN from 'bn.js';
 
 interface CardPayPrepaidCardWorkflowPreviewComponentArgs {
   workflowSession: WorkflowSession;
@@ -103,15 +104,13 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
         workflowSession.state.txnHash &&
         !workflowSession.state.prepaidCardSafe
       ) {
-        const txHash = workflowSession.state.txnHash;
+        const txnHash = workflowSession.state.txnHash;
         this.chinInProgressMessage =
           'Waiting for the transaction to be finalized…';
 
-        const safes = yield taskFor(
-          this.layer2Network.getPrepaidCardSafesFromTxHash
-        ).perform(txHash);
-
-        const prepaidCardSafe = safes[0];
+        const prepaidCardSafe = yield taskFor(
+          this.layer2Network.resumeIssuePrepaidCardTransactionTask
+        ).perform(txnHash);
 
         if (prepaidCardSafe) {
           this.args.workflowSession.update('prepaidCardSafe', prepaidCardSafe);
@@ -121,7 +120,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
       } else {
         this.chinInProgressMessage =
           'You will receive a confirmation request from the Card Wallet app in a few moments…';
-        let options: IssuePrepaidCardOptions = {
+        let options: TransactionOptions = {
           onTxnHash: (txnHash: TransactionHash) => {
             this.txnHash = txnHash;
             this.args.workflowSession.update('txnHash', txnHash);
@@ -130,10 +129,10 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
           },
         };
         if (this.lastNonce) {
-          options.nonce = this.lastNonce;
+          options.nonce = new BN(this.lastNonce);
         } else {
-          options.onNonce = (nonce: string) => {
-            this.lastNonce = nonce;
+          options.onNonce = (nonce: BN) => {
+            this.lastNonce = nonce.toString();
           };
         }
 

@@ -12,6 +12,7 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../../../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../../../../mirage/fixture-data/prepaid-card-patterns';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
+import BN from 'bn.js';
 
 const USER_REJECTION_ERROR_MESSAGE =
   'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
@@ -166,7 +167,7 @@ module(
         await waitFor('[data-test-issue-prepaid-card-cancel-button]');
         layer2Service.test__simulateOnNonceForIssuePrepaidCardRequest(
           100000,
-          '12345'
+          new BN('12345')
         );
         await click('[data-test-issue-prepaid-card-cancel-button]');
         assert
