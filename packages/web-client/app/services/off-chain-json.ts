@@ -5,8 +5,25 @@ import { fetchOffChainJson } from '../utils/fetch-off-chain-json';
 
 export default class OffChainJsonService extends Service {
   #didResolver = new Resolver(getResolver());
+  #cache: Map<string, any> = new Map();
 
   async fetch(did: string, waitForResource = false): Promise<any> {
+    if (this.#cache.has(did)) {
+      let jsonApiDocument = this.#cache.get(did);
+      return Promise.resolve(jsonApiDocument);
+    }
+
+    let jsonApiDocument = await this.fetchWithoutCaching(did, waitForResource);
+    if (jsonApiDocument) {
+      this.#cache.set(did, jsonApiDocument);
+      return jsonApiDocument;
+    }
+  }
+
+  async fetchWithoutCaching(
+    did: string,
+    waitForResource = false
+  ): Promise<any> {
     let didResult = await this.#didResolver.resolve(did);
     let alsoKnownAs = didResult?.didDocument?.alsoKnownAs;
 

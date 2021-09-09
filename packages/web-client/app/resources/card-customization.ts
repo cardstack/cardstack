@@ -59,8 +59,10 @@ export class CardCustomization extends Resource<Args> {
     if (jsonApiDocument) {
       let { included } = jsonApiDocument;
 
-      let colorScheme = included.findBy('type', 'prepaid-card-color-schemes')
-        .attributes;
+      let colorScheme = included.findBy(
+        'type',
+        'prepaid-card-color-schemes'
+      ).attributes;
       let pattern = included.findBy('type', 'prepaid-card-patterns').attributes;
 
       this.issuerName = jsonApiDocument.data.attributes['issuer-name'];
