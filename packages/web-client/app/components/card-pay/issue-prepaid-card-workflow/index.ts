@@ -305,11 +305,13 @@ class IssuePrepaidCardWorkflow extends Workflow {
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
-        return ([
-          FAILURE_REASONS.RESTORATION_UNAUTHENTICATED,
-          FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED,
-          FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
-        ] as String[]).includes(String(this.workflow?.cancelationReason));
+        return (
+          [
+            FAILURE_REASONS.RESTORATION_UNAUTHENTICATED,
+            FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED,
+            FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
+          ] as String[]
+        ).includes(String(this.workflow?.cancelationReason));
       },
     }),
   ]);

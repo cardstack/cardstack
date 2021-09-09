@@ -59,7 +59,8 @@ class AnimatedMilestone {
   }
 
   syncRevealPointerToModel() {
-    let revealedLastPostable = this.postableCollection.syncRevealPointerToModel();
+    let revealedLastPostable =
+      this.postableCollection.syncRevealPointerToModel();
     this.isCompletionRevealed = this.model.isComplete;
     return revealedLastPostable;
   }
