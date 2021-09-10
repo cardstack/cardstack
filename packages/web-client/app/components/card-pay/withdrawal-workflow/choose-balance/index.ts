@@ -4,7 +4,12 @@ import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import { TokenBalance, TokenSymbol } from '@cardstack/web-client/utils/token';
+import {
+  BridgedTokenSymbol,
+  TokenBalance,
+  TokenSymbol,
+  getUnbridgedSymbol,
+} from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import BN from 'bn.js';
@@ -12,19 +17,19 @@ import BN from 'bn.js';
 class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<WorkflowCardComponentArgs> {
   compatibleSafeTypes = ['depot', 'merchant'];
 
-  defaultTokenSymbol: TokenSymbol = 'DAI.CPXD';
-  cardTokenSymbol: TokenSymbol = 'CARD.CPXD';
+  defaultTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
+  cardTokenSymbol: BridgedTokenSymbol = 'CARD.CPXD';
   tokenOptions = [this.defaultTokenSymbol, this.cardTokenSymbol];
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  get somethingTokenSymbolFIXME(): TokenSymbol {
+  get somethingTokenSymbolFIXME(): BridgedTokenSymbol {
     return (
       this.args.workflowSession.state.withdrawalToken ?? this.defaultTokenSymbol
     );
   }
 
   @tracked selectedSafe: Safe | undefined;
-  @tracked selectedTokenSymbol: TokenSymbol;
+  @tracked selectedTokenSymbol: TokenSymbol; // FIXME should be BridgedTokenSymbol
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
@@ -46,10 +51,9 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
 
   get tokens() {
     return this.tokenOptions.map((symbol) => {
-      let truncatedSymbol = symbol.split('.')[0];
+      let unbridgedSymbol = getUnbridgedSymbol(symbol);
       let selectedSafeToken = (this.selectedSafe?.tokens || []).find(
-        // FIXME how to get symbol with no suffix?
-        (token) => token.token.symbol === truncatedSymbol
+        (token) => token.token.symbol === unbridgedSymbol
       );
       let balance = new BN(selectedSafeToken?.balance || '0');
       return new TokenBalance(symbol, balance);

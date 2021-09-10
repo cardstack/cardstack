@@ -40,7 +40,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
     return this.args.workflowSession.state.withdrawalSafe;
   }
 
-  get currentTokenSymbol(): TokenSymbol {
+  get currentTokenSymbol(): BridgedTokenSymbol {
     return this.args.workflowSession.state.withdrawalToken;
   }
 
@@ -55,11 +55,11 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   get currentTokenBalance(): BN {
     let safe = this.currentSafe;
     let tokenSymbol = this.currentTokenSymbol;
-    let truncatedSymbol = tokenSymbol.split('.')[0];
-    // FIXME as in choose-balance
+    let unbridgedSymbol = getUnbridgedSymbol(tokenSymbol);
+    // TODO understand why it’s unbridged despite being in layer 2
 
     let balance = safe.tokens.find(
-      (token) => token.token.symbol === truncatedSymbol
+      (token) => token.token.symbol === unbridgedSymbol
     )?.balance;
 
     return balance ? new BN(balance) : new BN(0);
