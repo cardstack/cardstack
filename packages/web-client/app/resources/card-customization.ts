@@ -1,12 +1,9 @@
 import { tracked } from '@glimmer/tracking';
-import { getResolver } from '@cardstack/did-resolver';
-import { Resolver } from 'did-resolver';
 import { Resource } from 'ember-resources';
 import * as Sentry from '@sentry/browser';
-import {
-  fetchOffChainJson,
-  isStorage404,
-} from '@cardstack/web-client/utils/fetch-off-chain-json';
+import { isStorage404 } from '@cardstack/web-client/utils/fetch-off-chain-json';
+import OffChainJsonService from '../services/off-chain-json';
+import { inject as service } from '@ember/service';
 
 interface Args {
   named: {
@@ -25,7 +22,7 @@ export class CardCustomization extends Resource<Args> {
   @tracked loading = true;
   @tracked errored: Error | undefined;
 
-  #didResolver = new Resolver(getResolver());
+  @service declare offChainJson: OffChainJsonService;
 
   constructor(owner: unknown, args: Args) {
     super(owner, args);
@@ -54,17 +51,13 @@ export class CardCustomization extends Resource<Args> {
     customizationDID: string,
     waitForCustomization = false
   ): Promise<void> {
-    let did = await this.#didResolver.resolve(customizationDID);
+    let jsonApiDocument = await this.offChainJson.fetch(
+      customizationDID,
+      waitForCustomization
+    );
 
-    let alsoKnownAs = did?.didDocument?.alsoKnownAs;
-
-    if (alsoKnownAs) {
-      let jsonApiDocument = await fetchOffChainJson(
-        alsoKnownAs[0],
-        waitForCustomization
-      );
-
-      let included = jsonApiDocument.included;
+    if (jsonApiDocument) {
+      let { included } = jsonApiDocument;
 
       let colorScheme = included.findBy(
         'type',
