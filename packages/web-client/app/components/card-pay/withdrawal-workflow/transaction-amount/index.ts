@@ -19,6 +19,7 @@ import {
   validateTokenInput,
 } from '@cardstack/web-client/utils/validation';
 import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-rejection-error';
+import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
 import { reads } from 'macro-decorators';
@@ -33,8 +34,12 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   @tracked validationMessage = '';
   @reads('withdrawTask.last.error') declare error: Error | undefined;
 
-  // assumption is this is always set by cards before it. It should be defined by the time
+  // assumption is these are always set by cards before it. They should be defined by the time
   // it gets to this part of the workflow
+  get currentSafe(): Safe {
+    return this.args.workflowSession.state.withdrawalSafe;
+  }
+
   get currentTokenSymbol(): TokenSymbol {
     return this.args.workflowSession.state.withdrawalToken;
   }
@@ -48,13 +53,16 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   }
 
   get currentTokenBalance(): BN {
-    let balance;
-    if (this.currentTokenSymbol === 'DAI.CPXD') {
-      balance = this.layer2Network.defaultTokenBalance;
-    } else if (this.currentTokenSymbol === 'CARD.CPXD') {
-      balance = this.layer2Network.cardBalance;
-    }
-    return balance || new BN(0);
+    let safe = this.currentSafe;
+    let tokenSymbol = this.currentTokenSymbol;
+    let truncatedSymbol = tokenSymbol.split('.')[0];
+    // FIXME as in choose-balance
+
+    let balance = safe.tokens.find(
+      (token) => token.token.symbol === truncatedSymbol
+    )?.balance;
+
+    return balance ? new BN(balance) : new BN(0);
   }
 
   get amountCtaState() {
@@ -135,7 +143,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       assertBridgedTokenSymbol(currentTokenSymbol);
 
       let transactionHash = yield this.layer2Network.bridgeToLayer1(
-        this.layer2Network.depotSafe?.address!,
+        this.currentSafe.address,
         layer1Address!,
         getUnbridgedSymbol(currentTokenSymbol),
         withdrawnAmount

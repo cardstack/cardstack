@@ -144,6 +144,38 @@ module('Acceptance | withdrawal', function (hooks) {
       ],
     };
     layer2Service.test__simulateDepot(testDepot as DepotSafe);
+
+    let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      {
+        type: 'merchant',
+        createdAt: Date.now() / 1000,
+        address: merchantAddress,
+        merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+        tokens: [
+          {
+            balance: '125000000000000000000',
+            tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
+            token: {
+              name: 'Dai Stablecoin.CPXD',
+              symbol: 'DAI',
+              decimals: 2,
+            },
+          },
+          {
+            balance: '450000000000000000000',
+            tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
+            token: {
+              name: 'CARD Token Kovan.CPXD',
+              symbol: 'CARD',
+              decimals: 2,
+            },
+          },
+        ],
+        owners: [],
+        accumulatedSpendValue: 100,
+      },
+    ]);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitFor(`${postableSel(2, 2)} [data-test-balance-container]`);
     assert
@@ -170,6 +202,19 @@ module('Acceptance | withdrawal', function (hooks) {
     assert
       .dom(`${post} [data-test-choose-balance-from-safe]`)
       .hasText(`DEPOT ${depotAddress}`);
+
+    await click(
+      '[data-test-safe-chooser-dropdown] .ember-power-select-trigger'
+    );
+    assert
+      .dom('[data-test-safe-chooser-dropdown] li:nth-child(1)')
+      .containsText(depotAddress);
+    assert
+      .dom('[data-test-safe-chooser-dropdown] li:nth-child(2)')
+      .containsText(merchantAddress);
+
+    await click('[data-test-safe-chooser-dropdown] li:nth-child(2)');
+
     await click(
       '[data-test-balance-chooser-dropdown] .ember-power-select-trigger'
     );
@@ -179,6 +224,9 @@ module('Acceptance | withdrawal', function (hooks) {
     assert
       .dom(`${post} li:nth-child(2) [data-test-balance-display-name]`)
       .containsText('CARD.CPXD');
+
+    await click('[data-test-balance-chooser-dropdown] li:nth-child(2)');
+
     await click(
       `${post} [data-test-withdrawal-choose-balance] [data-test-boxel-button]`
     );
@@ -190,7 +238,7 @@ module('Acceptance | withdrawal', function (hooks) {
     assert.dom('[data-test-withdrawal-choose-balance-is-complete]').exists();
     assert
       .dom(`${post} [data-test-choose-balance-from-display]`)
-      .containsText('250.00 DAI.CPXD');
+      .containsText('450.00 CARD.CPXD');
     assert.dom('[data-test-choose-balance-footnote]').containsText('gas fee');
 
     // // transaction-amount card
@@ -208,7 +256,7 @@ module('Acceptance | withdrawal', function (hooks) {
 
     assert
       .dom(`${post} [data-test-balance-display-amount]`)
-      .containsText('250.00 DAI.CPXD');
+      .containsText('450.00 CARD.CPXD');
 
     assert
       .dom(
@@ -251,6 +299,7 @@ module('Acceptance | withdrawal', function (hooks) {
         `withdrawn funds from the ${c.layer2.fullName}, your tokens will be bridged to ${c.layer1.fullName}`
       );
     await waitFor(postableSel(4, 1));
+    // FIXME assert on address and amount?
     layer2Service.test__simulateBridgedToLayer1();
     await settled();
     assert
@@ -286,12 +335,12 @@ module('Acceptance | withdrawal', function (hooks) {
       .dom(
         '[data-test-withdrawal-transaction-confirmed-from] [data-test-bridge-item-amount]'
       )
-      .containsText('200.00 DAI.CPXD');
+      .containsText('200.00 CARD.CPXD');
     assert
       .dom(
         '[data-test-withdrawal-transaction-confirmed-to] [data-test-bridge-item-amount]'
       )
-      .containsText('200.00 DAI');
+      .containsText('200.00 CARD');
 
     await waitFor(epiloguePostableSel(2));
     assert

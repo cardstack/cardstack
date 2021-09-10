@@ -84,10 +84,10 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
       return;
     }
     if (this.selectedToken) {
-      this.args.workflowSession.update(
-        'withdrawalToken',
-        this.selectedToken.symbol
-      );
+      this.args.workflowSession.updateMany({
+        withdrawalSafe: this.selectedSafe,
+        withdrawalToken: this.selectedToken.symbol,
+      });
       this.args.onComplete?.();
     }
   }

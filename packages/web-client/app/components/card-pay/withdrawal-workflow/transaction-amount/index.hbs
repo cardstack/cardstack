@@ -8,7 +8,7 @@
       <CardPay::LabeledValue @vertical={{this.isConfirmed}} @label="Funding from" class="withdrawal-transaction-amount__label">
         <CardPay::BalanceViewBanner
           @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
-          @depotAddress={{this.layer2Network.depotSafe.address}}
+          @depotAddress={{this.selectedSafe.address}} {{!-- FIXME rename from depotAddress? --}}
           @token={{this.currentTokenDetails}}
           @balance={{format-token-amount this.currentTokenBalance}}
         />
