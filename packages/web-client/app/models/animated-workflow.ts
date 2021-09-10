@@ -150,7 +150,8 @@ export default class AnimatedWorkflow {
     this.milestones = model.milestones.map((m) => new AnimatedMilestone(m));
     taskFor(this.tickerTask).perform();
   }
-  @reads('model.name') declare name: string;
+
+  @reads('model.displayName') declare displayName: string;
 
   @task
   *tickerTask() {

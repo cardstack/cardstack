@@ -12,8 +12,14 @@ interface PostableIndices {
   collectionIndex: number;
 }
 
+export type WorkflowName =
+  | 'PREPAID_CARD_ISSUANCE'
+  | 'RESERVE_POOL_DEPOSIT'
+  | 'WITHDRAWAL'
+  | 'MERCHANT_CREATION';
+
 export abstract class Workflow {
-  name!: string;
+  name!: WorkflowName;
   milestones: Milestone[] = [];
   epilogue: PostableCollection = new PostableCollection();
   cancelationMessages: PostableCollection = new PostableCollection();
@@ -31,6 +37,10 @@ export abstract class Workflow {
     this.milestones.invoke('setWorkflow', this);
     this.epilogue.setWorkflow(this);
     this.cancelationMessages.setWorkflow(this);
+  }
+
+  get displayName() {
+    return WORKFLOW_NAMES[this.name];
   }
 
   get completedMilestones() {
@@ -146,3 +156,10 @@ export abstract class Workflow {
 }
 
 export let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
+
+export const WORKFLOW_NAMES = {
+  PREPAID_CARD_ISSUANCE: 'Prepaid Card Issuance',
+  MERCHANT_CREATION: 'Merchant Creation',
+  RESERVE_POOL_DEPOSIT: 'Reserve Pool Deposit',
+  WITHDRAWAL: 'Withdrawal',
+};

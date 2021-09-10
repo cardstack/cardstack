@@ -6,7 +6,11 @@ import {
   IWorkflowMessage,
   WorkflowMessage,
 } from '@cardstack/web-client/models/workflow/workflow-message';
-import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
+import {
+  Workflow,
+  cardbot,
+  WorkflowName,
+} from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
 import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
@@ -54,7 +58,7 @@ class SessionAwareWorkflowMessage
 }
 
 class CreateMerchantWorkflow extends Workflow {
-  name = 'Merchant Creation';
+  name = 'MERCHANT_CREATION' as WorkflowName;
   milestones = [
     new Milestone({
       title: `Connect ${c.layer2.fullName} wallet`,
