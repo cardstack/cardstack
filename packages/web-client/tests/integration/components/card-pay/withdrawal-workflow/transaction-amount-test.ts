@@ -24,13 +24,16 @@ module(
       const startDaiAmountString = '100.1111111111111111';
       let startDaiAmount = toWei(startDaiAmountString);
 
-      const session = new WorkflowSession();
-      session.update('withdrawalToken', 'DAI.CPXD');
-
       layer2Strategy.test__simulateBalances({
         defaultToken: new BN(startDaiAmount),
         dai: new BN(startDaiAmount),
         card: new BN('0'),
+      });
+
+      const session = new WorkflowSession();
+      session.updateMany({
+        withdrawalSafe: layer2Strategy.depotSafe,
+        withdrawalToken: 'DAI.CPXD',
       });
 
       this.setProperties({
