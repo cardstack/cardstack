@@ -25,6 +25,7 @@ import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from
 import { signSafeTxAsRSV, Signature, signSafeTxAsBytes } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
 import { TransactionReceipt } from 'web3-core';
+import { MAXIMUM_PAYMENT_AMOUNT } from './base';
 
 const { fromWei } = Web3.utils;
 const POLL_INTERVAL = 500;
@@ -54,6 +55,14 @@ export default class PrepaidCard {
     let owner = await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCard).call();
     let issuer = await prepaidCardMgr.methods.getPrepaidCardIssuer(prepaidCard).call();
     return owner === issuer && owner !== ZERO_ADDRESS;
+  }
+
+  // since the limits are in units of SPEND, it is totally safe to represent as
+  // a number vs a string
+  async getPaymentLimits(): Promise<{ min: number; max: number }> {
+    let prepaidCardMgr = await this.getPrepaidCardMgr();
+    let min = await prepaidCardMgr.methods.MINIMUM_MERCHANT_PAYMENT().call();
+    return { min: parseInt(min.toString()), max: MAXIMUM_PAYMENT_AMOUNT };
   }
 
   async canTransfer(prepaidCard: string): Promise<boolean> {

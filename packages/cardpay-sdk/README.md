@@ -37,6 +37,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`PrepaidCard.transfer`](#prepaidcardtransfer)
   - [`PrepaidCard.priceForFaceValue`](#prepaidcardpriceforfacevalue)
   - [`PrepaidCard.gasFee`](#prepaidcardgasfee)
+  - [`PrepaidCard.getPaymentLimits`](#prepaidcardgetpaymentlimits)
   - [`PrepaidCard.payMerchant`](#prepaidcardpaymerchant)
 - [`RevenuePool`](#revenuepool)
   - [`RevenuePool.merchantRegistrationFee`](#revenuepoolmerchantregistrationfee)
@@ -497,6 +498,17 @@ This call will return the gas fee in terms of the specified token for the creati
 let gasFeeInDai = await prepaidCard.gasFee(daiCpxdAddress);
 ```
 
+### `PrepaidCard.getPaymentLimits`
+This call will return the prepaid card payment limits in units of SPEND (we return a number types since it is safe to represent SPEND as a number in javascript).
+
+```js
+let { min, max } = await prepaidCard.getPaymentLimits();
+```
+
+This method returns:
+```ts
+Promise<{ min: number; max: number; }>
+```
 ### `PrepaidCard.payMerchant`
 This call will pay a merchant from a prepaid card.
 

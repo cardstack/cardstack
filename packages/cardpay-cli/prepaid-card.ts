@@ -25,6 +25,15 @@ export async function gasFee(network: string, tokenAddress: string, mnemonic?: s
   console.log(`The gas fee for a new prepaid card in units of this token is ${fromWei(weiAmount)}`);
 }
 
+export async function getPaymentLimits(network: string, mnemonic?: string): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let prepaidCard = await getSDK('PrepaidCard', web3);
+  let { min, max } = await prepaidCard.getPaymentLimits();
+  console.log(`The prepaid card payments limits are:
+  minimum amount §${min} SPEND
+  maximum amount §${max} SPEND`);
+}
+
 export async function create(
   network: string,
   safe: string,

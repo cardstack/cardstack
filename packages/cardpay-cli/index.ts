@@ -18,6 +18,7 @@ import {
   priceForFaceValue,
   payMerchant,
   gasFee,
+  getPaymentLimits,
 } from './prepaid-card.js';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
@@ -50,6 +51,7 @@ type Commands =
   | 'priceOracleUpdatedAt'
   | 'gasFee'
   | 'priceForFaceValue'
+  | 'paymentLimits'
   | 'payMerchant'
   | 'setSupplierInfoDID'
   | 'registerMerchant'
@@ -365,6 +367,9 @@ let {
       command = 'registerMerchant';
     }
   )
+  .command('payment-limits', 'Get the minimum and maximum prepaid card payment limits in SPEND', () => {
+    command = 'paymentLimits';
+  })
   .command(
     'pay-merchant <merchantSafe> <prepaidCard> <spendAmount>',
     'Pay a merchant from a prepaid card.',
@@ -670,6 +675,9 @@ if (!command) {
         return;
       }
       await registerMerchant(network, prepaidCard, infoDID, mnemonic);
+      break;
+    case 'paymentLimits':
+      await getPaymentLimits(network, mnemonic);
       break;
     case 'payMerchant':
       if (merchantSafe == null || prepaidCard == null || spendAmount == null) {

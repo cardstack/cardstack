@@ -29,6 +29,9 @@ import { TransactionReceipt } from 'web3-core';
 const { fromWei } = Web3.utils;
 const POLL_INTERVAL = 500;
 const TIMEOUT = 1000 * 60 * 5;
+// We don't enforce a maximum payment amount on chain, but generally we want to
+// stay below the AML limit of $10,000 USD.
+export const MAXIMUM_PAYMENT_AMOUNT = 10000 * 100;
 export const MAX_PREPAID_CARD_AMOUNT = 10;
 
 export default class PrepaidCard {
@@ -62,6 +65,14 @@ export default class PrepaidCard {
     let issuer = await prepaidCardMgr.methods.getPrepaidCardIssuer(prepaidCard).call();
     let hasBeenUsed = await prepaidCardMgr.methods.hasBeenUsed(prepaidCard).call();
     return !hasBeenUsed && owner === issuer && owner !== ZERO_ADDRESS;
+  }
+
+  // since the limits are in units of SPEND, it is totally safe to represent as
+  // a number vs a string
+  async getPaymentLimits(): Promise<{ min: number; max: number }> {
+    let prepaidCardMgr = await this.getPrepaidCardMgr();
+    let min = await prepaidCardMgr.methods.MINIMUM_MERCHANT_PAYMENT().call();
+    return { min: parseInt(min.toString()), max: MAXIMUM_PAYMENT_AMOUNT };
   }
 
   async payMerchant(txnHash: string): Promise<TransactionReceipt>;
