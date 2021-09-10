@@ -19,6 +19,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`TokenBridgeForeignSide.claimBridgedTokens`](#tokenbridgeforeignsideclaimbridgedtokens)
   - [`TokenBridgeForeignSide.getSupportedTokens` (TBD)](#tokenbridgeforeignsidegetsupportedtokens-tbd)
 - [`TokenBridgeHomeSide`](#tokenbridgehomeside)
+  - [`TokenBridgeHomeSide.withdrawlLimits`](#tokenbridgehomesidewithdrawllimits)
   - [`TokenBridgeHomeSide.relayTokens`](#tokenbridgehomesiderelaytokens)
   - [`TokenBridgeHomeSide.waitForBridgingValidation`](#tokenbridgehomesidewaitforbridgingvalidation)
   - [`TokenBridgeHomeSide.waitForBridgingToLayer2Completed`](#tokenbridgehomesidewaitforbridgingtolayer2completed)
@@ -195,6 +196,18 @@ The `TokenBridgeHomeSide` API is used to bridge tokens into the layer 2 network 
 import { getSDK } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider); // Layer 2 web3 instance
 let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
+```
+
+### `TokenBridgeHomeSide.withdrawlLimits`
+This call will return the minimum and maximum withdrawal limits as a string in units of `wei` for bridging a token to layer 1. This method is invoked with the layer 2 CPXD token address of the CPXD token being withdrawn.
+
+```js
+let { min, max } = await tokenBridge.getWithdrawalLimits(daiTokenAddress);
+```
+
+This method returns:
+```ts
+Promise<{ min: string; max: string; }>
 ```
 
 ### `TokenBridgeHomeSide.relayTokens`

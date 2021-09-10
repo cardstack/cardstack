@@ -2,7 +2,18 @@ import Web3 from 'web3';
 import { getWeb3 } from './utils';
 import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 
-const { toWei } = Web3.utils;
+const { toWei, fromWei } = Web3.utils;
+
+export async function getWithdrawalLimits(network: string, tokenAddress: string, mnemonic?: string): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
+  let { max, min } = await tokenBridge.getWithdrawalLimits(tokenAddress);
+  let assets = await getSDK('Assets', web3);
+  let { symbol } = await assets.getTokenInfo(tokenAddress);
+  console.log(`The withdrawal limits for bridging ${symbol} to layer 1 are:
+  minimum withdrawal ${fromWei(min)} ${symbol}
+  maximum withdrawal ${fromWei(max)} ${symbol}`);
+}
 
 export async function bridgeToLayer1(
   network: string,

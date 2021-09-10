@@ -10,6 +10,7 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay await-bridged-to-l2 <FROM_BLOCK> [RECIPIENT] --network=_NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-await-bridged-to-l2-from_block-recipient---network_network---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay bridge-to-l1 <SAFE_ADDRESS> <AMOUNT> <TOKEN_ADDRESS> <RECEIVER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-bridge-to-l1-safe_address-amount-token_address-receiver---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay await-bridged-to-l1 <FROM_BLOCK> <TXN_HASH> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-await-bridged-to-l1-from_block-txn_hash---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay withdrawal-limits <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-withdrawal-limits-token---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay claim-tokens-bridged-to-l1 <MESSAGE_ID> <ENCODED_DATA> <SIGNATURES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-claim-tokens-bridged-to-l1-message_id-encoded_data-signatures---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-create-safe_address-token_address-customization_did-face_values---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaidcard-split <PREPAID_CARD> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-split-prepaid_card-customization_did-face_values---networknetwork---mnemonicmnemonic---walletconnect)
@@ -95,6 +96,21 @@ USAGE
 ARGUMENTS
   FROM_BLOCK      Layer 2 block height before bridging was initiated
   TXN_HASH        Layer 2 transaction hash of the bridging transaction
+  NETWORK         The Layer 2 network to use ("sokol" or "xdai")
+  MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+  WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+```
+
+## `yarn cardpay withdrawal-limits <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+
+Get the withdrawal limits for bridging a token to layer 1.
+
+```
+USAGE
+  $ yarn cardpay withdrawal-limits <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+
+ARGUMENTS
+  TOKEN           The layer 2 CPXD token address of the token being withdrawn
   NETWORK         The Layer 2 network to use ("sokol" or "xdai")
   MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
