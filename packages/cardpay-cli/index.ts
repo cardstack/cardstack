@@ -19,6 +19,7 @@ import {
   payMerchant,
   gasFee,
   getPaymentLimits,
+  registerRewardProgram
 } from './prepaid-card.js';
 import { registerRewardProgram } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
@@ -29,7 +30,6 @@ import {
 } from './layer-two-oracle';
 import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
 import { rewardTokenBalances } from './reward-pool.js';
-import { registerRewardProgram } from './reward-manager.js';
 import { hubAuth } from './hub-auth';
 
 //@ts-ignore polyfilling fetch
@@ -562,14 +562,14 @@ let {
     });
     command = 'registerRewardProgram';
   })
-  .command('register-reward-program <address>, <address>', 'Register reward program', (yargs) => {
-    yargs.positional('prepaidCard', {
-      type: 'string',
-      description: 'The address of the prepaid card that is being used to pay the merchant registration fee',
-    });
+  .command('register-reward-program <prepaidCard> <admin>', 'Register reward program', (yargs) => {
     yargs.positional('admin', {
       type: 'string',
-      description: 'The address of the new admin',
+      description: 'The address of the new admin. this is an eoa',
+    });
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The address of the prepaid card that is being used to pay the reward program registration fee',
     });
     command = 'registerRewardProgram';
   })
@@ -817,7 +817,7 @@ if (!command) {
       break;
     case 'registerRewardProgram':
       if (prepaidCard == null) {
-        showHelpAndExit('address is a required value');
+        showHelpAndExit('prepaid card is a required value');
         return;
       }
       if (admin == null) {
