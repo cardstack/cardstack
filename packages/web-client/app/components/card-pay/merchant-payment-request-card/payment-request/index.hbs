@@ -31,6 +31,7 @@
     {{/if}}
 
     {{#if @canDeepLink}}
+      {{!-- this is necessary in case card wallet needs to be used on a separate device --}}
       {{#if this.showAsQR}}
         <div class="payment-request__qr-container">
           <StyledQrCode

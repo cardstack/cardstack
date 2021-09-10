@@ -5,10 +5,14 @@ import { usdToSpend } from '@cardstack/cardpay-sdk';
 
 export default class CardPayMerchantServicesController extends Controller {
   @tracked hamburgerMenuOpen = false;
-  @tracked canDeepLink = false;
+
+  get canDeepLink() {
+    // navigator.platform + user agent sniffing might work for Safari, not sure about Chrome
+    return false;
+  }
 
   queryParams = ['amount', 'currency'];
-  @tracked amount: number = 0;
+  @tracked amount: number = 0; // fix amount being 0 when unspecified
   @tracked currency: string = 'SPD';
 
   get displayedAmounts() {
