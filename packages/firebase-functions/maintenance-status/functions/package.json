@@ -1,6 +1,6 @@
 {
   "name": "maintenance-status",
-  "version": "0.24.2",
+  "version": "0.24.3",
   "scripts": {
     "build": "tsc",
     "serve": "npm run build && firebase emulators:start --only functions",
