@@ -11,6 +11,7 @@ import Layer2Network from '@cardstack/web-client/services/layer1-network';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 
 interface NetworkAwareWorkflowCardOptions {
+  cardName?: string;
   author: Participant;
   componentName: string; // this should eventually become a card reference
   includeIf(this: NetworkAwareWorkflowCard): boolean;
