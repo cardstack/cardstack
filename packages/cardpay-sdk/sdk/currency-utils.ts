@@ -12,6 +12,32 @@ export const isSupportedCurrency = (nativeCurrency: string) => {
   return has(supportedNativeCurrencies, `${nativeCurrency}`);
 };
 
+export const isValidAmountForCurrency = (nativeCurrency = 'USD', amount: BigNumberish) => {
+  let currency = get(supportedNativeCurrencies, nativeCurrency);
+  if (!currency) {
+    return false;
+  }
+
+  if (typeof (amount as unknown) === 'string') {
+    amount = Number(amount);
+  } else if (amount instanceof BigNumber) {
+    amount = amount.toNumber();
+  }
+
+  if (typeof amount !== 'number' || isNaN(amount)) {
+    return false;
+  }
+
+  let maxDecimals = currency.decimals;
+  let numberOfDecimals = `${amount}`.split('.')[1]?.length;
+
+  if (numberOfDecimals > maxDecimals) {
+    return false;
+  }
+
+  return true;
+};
+
 type BigNumberish = number | string | BigNumber;
 
 interface Asset {
