@@ -19,7 +19,7 @@ export { getAddress, getAddressByNetwork, getOracle, getOracleByNetwork, Address
 export { getConstant, getConstantByNetwork, networks, networkIds } from './sdk/constants';
 export { waitUntilBlock } from './sdk/utils/general-utils';
 export * from './sdk/currency-utils';
-export { validateMerchantId, generateMerchantPaymentUrl } from './sdk/utils/merchant';
+export { validateMerchantId, generateMerchantPaymentUrl, isValidMerchantPaymentUrl } from './sdk/utils/merchant';
 export { getSDK } from './sdk/version-resolver';
 
 export { default as ERC20ABI } from './contracts/abi/erc-20';

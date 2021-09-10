@@ -1,3 +1,5 @@
+import { isAddress } from 'web3-utils';
+
 export function validateMerchantId(value: string) {
   if (!value.trim().length) return 'This field is required';
   if (/[^a-z0-9]/.test(value))
@@ -25,4 +27,19 @@ export const generateMerchantPaymentUrl = ({
   const handleAmount = amount ? `amount=${amount}&` : '';
 
   return `${domain}/pay/${network}/${merchantSafeID}?${handleAmount}currency=${currency}`;
+};
+
+export const isValidMerchantPaymentUrl = (merchantPaymentUrl: string) => {
+  let url = new URL(merchantPaymentUrl);
+  if (url.protocol !== 'cardwallet:') {
+    return false;
+  }
+
+  let parts = url.pathname.replace(/^\/*/, '').split('/');
+  if (parts.length !== 3) {
+    return false;
+  }
+
+  let [action, network, merchantSafeID] = parts;
+  return action === 'pay' && ['sokol', 'xdai'].includes(network) && isAddress(merchantSafeID);
 };
