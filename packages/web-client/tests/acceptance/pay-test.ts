@@ -1,4 +1,4 @@
-import { module, test, todo } from 'qunit';
+import { module, test } from 'qunit';
 import { visit } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -222,50 +222,48 @@ module('Acceptance | pay', function (hooks) {
     );
   });
 
-  todo(
-    'it renders the deep link as opposed to QR when {insert-condition-here}',
-    async function (assert) {
-      // TODO: set condition where we show the deep link button thing
+  test('it renders the clickable link by default when in an iOS browser', async function (assert) {
+    let isIOSService = this.owner.lookup('service:is-ios');
+    sinon.stub(isIOSService, 'isIOS').returns(true);
 
-      await visit(
-        `/pay/sokol/${merchantSafeId}?amount=${spendAmount}&currrency=${spendSymbol}`
+    await visit(
+      `/pay/sokol/${merchantSafeId}?amount=${spendAmount}&currrency=${spendSymbol}`
+    );
+
+    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert
+      .dom(MERCHANT_LOGO)
+      .hasAttribute(
+        'data-test-merchant-logo-background',
+        merchantInfoBackground
+      );
+    assert
+      .dom(MERCHANT_LOGO)
+      .hasAttribute(
+        'data-test-merchant-logo-text-color',
+        merchantInfoTextColor
       );
 
-      assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
-      assert
-        .dom(MERCHANT_LOGO)
-        .hasAttribute(
-          'data-test-merchant-logo-background',
-          merchantInfoBackground
-        );
-      assert
-        .dom(MERCHANT_LOGO)
-        .hasAttribute(
-          'data-test-merchant-logo-text-color',
-          merchantInfoTextColor
-        );
+    assert.dom(AMOUNT).containsText(`§${spendAmount}`);
+    assert
+      .dom(USD_AMOUNT)
+      .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
 
-      assert.dom(AMOUNT).containsText(`§${spendAmount}`);
-      assert
-        .dom(USD_AMOUNT)
-        .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
-
-      // assert that the deep link view is rendered
-      assert.dom(QR_CODE).doesNotExist();
-      assert
-        .dom(DEEP_LINK)
-        .containsText('Pay Merchant')
-        .hasAttribute(
-          'href',
-          `cardwallet://pay/sokol/${merchantSafeId}?currency=SPD`
-        );
-
-      assert.dom(PAYMENT_URL).containsText(
-        // TODO: fix this if/when sdk has method to generate this url
-        `cardwallet://pay/sokol/${merchantSafeId}?currency=SPD`
+    // assert that the deep link view is rendered
+    assert.dom(QR_CODE).doesNotExist();
+    assert
+      .dom(DEEP_LINK)
+      .containsText('Pay Merchant')
+      .hasAttribute(
+        'href',
+        `cardwallet://pay/sokol/${merchantSafeId}?amount=${spendAmount}&currency=${spendSymbol}`
       );
-    }
-  );
+
+    assert.dom(PAYMENT_URL).containsText(
+      // TODO: fix this if/when sdk has method to generate this url
+      `cardwallet://pay/sokol/${merchantSafeId}?amount=${spendAmount}&currency=${spendSymbol}`
+    );
+  });
 
   // This will be handled in a follow-up PR
   // todo(

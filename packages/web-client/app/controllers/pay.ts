@@ -2,13 +2,15 @@ import { spendToUsd } from '@cardstack/cardpay-sdk';
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
 import { usdToSpend } from '@cardstack/cardpay-sdk';
+import { inject as service } from '@ember/service';
+import IsIOS from '../services/is-ios';
 
 export default class CardPayMerchantServicesController extends Controller {
   @tracked hamburgerMenuOpen = false;
+  @service('is-ios') declare isIOSService: IsIOS;
 
   get canDeepLink() {
-    // navigator.platform + user agent sniffing might work for Safari, not sure about Chrome
-    return false;
+    return this.isIOSService.isIOS();
   }
 
   queryParams = ['amount', 'currency'];
