@@ -53,9 +53,11 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
       HomeBridgeMediatorABI as AbiItem[],
       await getAddress('homeBridge', this.layer2Web3)
     );
-    let min = (await homeBridge.methods.minPerTx(tokenAddress).call()).toString();
-    let max = (await homeBridge.methods.maxPerTx(tokenAddress).call()).toString();
-    return { min, max };
+    let [min, max] = await Promise.all([
+      homeBridge.methods.minPerTx(tokenAddress).call(),
+      homeBridge.methods.maxPerTx(tokenAddress).call(),
+    ]);
+    return { min: min.toString(), max: max.toString() };
   }
 
   async relayTokens(txnHash: string): Promise<TransactionReceipt>;
