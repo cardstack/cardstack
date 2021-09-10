@@ -7,6 +7,7 @@ import {
   awaitBridgedToLayer1,
   awaitBridgedToLayer2,
   claimLayer1BridgedTokens,
+  getWithdrawalLimits,
 } from './bridge.js';
 import { viewTokenBalance } from './assets';
 import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe, transferTokensGasEstimate } from './safe.js';
@@ -58,7 +59,8 @@ type Commands =
   | 'priceOracleUpdatedAt'
   | 'viewTokenBalance'
   | 'hubAuth'
-  | 'rewardTokenBalances';
+  | 'rewardTokenBalances'
+  | 'withdrawalLimits';
 
 let command: Commands | undefined;
 interface Options {
@@ -183,6 +185,13 @@ let {
       command = 'awaitBridgedToL1';
     }
   )
+  .command('withdrawal-limits <token>', 'Get the withdrawal limits for bridging a token to layer 1.', (yargs) => {
+    yargs.positional('token', {
+      type: 'string',
+      description: 'The layer 2 CPXD token address of the token being withdrawn',
+    });
+    command = 'withdrawalLimits';
+  })
   .command(
     'claim-tokens-bridged-to-l1 <messageId> <encodedData> <signatures..>',
     'Claim tokens that have been bridged from L2 to L1',
@@ -588,6 +597,13 @@ if (!command) {
         return;
       }
       await awaitBridgedToLayer1(network, fromBlock, txnHash, mnemonic);
+      break;
+    case 'withdrawalLimits':
+      if (token == null) {
+        showHelpAndExit('token is a required value');
+        return;
+      }
+      await getWithdrawalLimits(network, token, mnemonic);
       break;
     case 'claimL1BridgedTokens':
       if (messageId == null || encodedData == null || signatures == null || signatures.length === 0) {

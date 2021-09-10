@@ -3,6 +3,7 @@ import { TransactionReceipt } from 'web3-core';
 import { ContractOptions, EventData } from 'web3-eth-contract';
 import ERC677ABI from '../contracts/abi/erc-677';
 import HomeAMBABI from '../contracts/abi/home-amb';
+import HomeBridgeMediatorABI from '../contracts/abi/home-bridge-mediator';
 import BridgeValidatorsABI from '../contracts/abi/bridge-validators';
 import { getAddress } from '../contracts/addresses';
 import { executeTransaction, gasEstimate, getNextNonceFromEstimate } from './utils/safe-utils';
@@ -46,6 +47,16 @@ const bridgedTokensQuery = `
 
 export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
   constructor(private layer2Web3: Web3) {}
+
+  async getWithdrawalLimits(tokenAddress: string): Promise<{ min: string; max: string }> {
+    let homeBridge = new this.layer2Web3.eth.Contract(
+      HomeBridgeMediatorABI as AbiItem[],
+      await getAddress('homeBridge', this.layer2Web3)
+    );
+    let min = (await homeBridge.methods.minPerTx(tokenAddress).call()).toString();
+    let max = (await homeBridge.methods.maxPerTx(tokenAddress).call()).toString();
+    return { min, max };
+  }
 
   async relayTokens(txnHash: string): Promise<TransactionReceipt>;
   async relayTokens(
