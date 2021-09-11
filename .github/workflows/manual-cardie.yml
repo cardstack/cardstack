@@ -1,9 +1,6 @@
 name: Manual Deploy [cardie]
 
 on:
-  push:
-    branches:
-      - pin-waypoint-cli-version
   workflow_dispatch:
     inputs:
       ref:
@@ -19,8 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      #with:
-      #ref: ${{ github.event.inputs.ref }}
+        with:
+          ref: ${{ github.event.inputs.ref }}
 
       - name: Install apt packages including waypoint
         run: |
@@ -30,8 +27,7 @@ jobs:
 
       - name: Set up env
         env:
-          #INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
-          INPUT_ENVIRONMENT: staging
+          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
         run: |
           if [ "$INPUT_ENVIRONMENT" = "staging" ]; then
             echo "AWS_ACCESS_KEY_ID=${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}" >> $GITHUB_ENV

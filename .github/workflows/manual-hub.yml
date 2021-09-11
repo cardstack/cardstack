@@ -1,6 +1,9 @@
 name: Manual Deploy [hub]
 
 on:
+  push:
+    branches:
+      - pin-waypoint-cli-version
   workflow_dispatch:
     inputs:
       ref:
@@ -16,18 +19,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.inputs.ref }}
+      # with:
+      #   ref: ${{ github.event.inputs.ref }}
 
       - name: Install apt packages including waypoint
         run: |
           curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
           sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-          sudo apt-get install awscli waypoint
+          sudo apt-get install awscli waypoint=0.4.0
 
       - name: Set up env
         env:
-          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          # INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          INPUT_ENVIRONMENT: staging
         run: |
           if [ "$INPUT_ENVIRONMENT" = "production" ]; then
             echo "AWS_ACCESS_KEY_ID=${{ secrets.PRODUCTION_WAYPOINT_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
