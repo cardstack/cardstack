@@ -125,7 +125,7 @@ jobs:
         run: |
           curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
           sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-          sudo apt-get install awscli waypoint
+          sudo apt-get install awscli waypoint=0.4.0
       - name: Configure waypoint client
         run: waypoint context create -server-addr=${{ secrets.WAYPOINT_SERVER_ADDR }} -server-auth-token=${{ secrets.WAYPOINT_AUTH_TOKEN }} -server-tls=true -server-tls-skip-verify=true -set-default -server-require-auth waypoint-staging
       - uses: volta-cli/action@v1
@@ -240,7 +240,7 @@ jobs:
         run: |
           curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
           sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-          sudo apt-get install awscli waypoint
+          sudo apt-get install awscli waypoint=0.4.0
       - name: Configure waypoint client
         run: waypoint context create -server-addr=${{ secrets.WAYPOINT_SERVER_ADDR }} -server-auth-token=${{ secrets.WAYPOINT_AUTH_TOKEN }} -server-tls=true -server-tls-skip-verify=true -set-default -server-require-auth waypoint-staging
       - uses: volta-cli/action@v1
