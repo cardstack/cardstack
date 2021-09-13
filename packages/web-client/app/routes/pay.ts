@@ -22,7 +22,6 @@ interface PayRouteModel {
     logoBackground: string;
     logoTextColor: string;
   };
-  errored: boolean;
 }
 
 export default class PayRoute extends Route {
@@ -37,7 +36,6 @@ export default class PayRoute extends Route {
       merchantSafeID: params.merchant_safe_id,
       merchantExists: false,
       merchant: null,
-      errored: true,
     };
 
     try {
@@ -49,7 +47,6 @@ export default class PayRoute extends Route {
         res.merchantExists = true;
       }
       res.merchant = await this.fetchMerchantInfo(merchantSafe);
-      res.errored = false;
     } catch (e) {
       console.error(e);
       Sentry.captureException(e);
