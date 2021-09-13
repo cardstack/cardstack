@@ -26,7 +26,7 @@ const PAYMENT_URL = '[data-test-payment-request-url]';
 // fixed data
 const exampleDid = 'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
 const merchantSafeId = '0xE73604fC1724a50CEcBC1096d4229b81aF117c94';
-const spendSymbol = 'SPD'; // TODO: fix this if single source of truth for symbols between web and mobile is established
+const spendSymbol = 'SPD';
 const usdSymbol = 'USD';
 const invalidCurrencySymbol = 'WUT';
 const network = 'sokol';
@@ -57,7 +57,7 @@ module('Acceptance | pay', function (hooks) {
     let customizationJsonFilename = didAlsoKnownAs.split('/')[4].split('.')[0];
 
     this.server.create('merchant-info', {
-      id: customizationJsonFilename, // TODO: replace this with a plain string
+      id: customizationJsonFilename,
       name: merchantName,
       slug: 'mandello1',
       did: exampleDid,
@@ -267,26 +267,4 @@ module('Acceptance | pay', function (hooks) {
       .hasAttribute('href', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
-
-  // This will be handled in a follow-up PR
-  // todo(
-  //   'it shows an appropriate error message if merchant details cannot be fetched',
-  //   async function (assert) {
-  //     await visit(
-  //       `/pay/${network}/idontexist?amount=${spendAmount}&currrency=${spendSymbol}`
-  //     );
-  //   }
-  // );
-  // todo(
-  //   'it renders only the provided currency and not a USD conversion or SPEND amount if the provided currency is not USD or SPEND',
-  //   async function (assert) {
-  //     await visit(
-  //       `/pay/${network}/${merchantSafeId}?amount=${0}&currrency=${malaysianRinggitSymbol}`
-  //     );
-  //     assert.ok(false);
-  //     // assert that merchant details are rendered
-  //     // assert that amount is rendered
-  //     // assert that the deep link url generated is correct
-  //   }
-  // );
 });
