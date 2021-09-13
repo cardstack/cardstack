@@ -5,13 +5,12 @@
   --boxel-org-header-logo-size: auto 2rem;
   --boxel-org-header-logo-position: center;
   --boxel-org-header-padding: var(--boxel-sp-lg);
-  --boxel-org-header-gap: var(--boxel-sp);
 
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: var(--boxel-org-header-gap);
+  gap: var(--boxel-sp);
   padding: var(--boxel-org-header-padding);
   background-color: var(--boxel-org-header-background-color);
   color: var(--boxel-org-header-color);
