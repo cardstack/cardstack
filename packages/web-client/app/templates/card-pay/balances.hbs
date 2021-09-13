@@ -6,7 +6,7 @@
         <CardPay::DashboardPanel::Section @section={{section}}>
           <:cta>
             <Boxel::Button
-              {{on "click" (fn this.setFlow section.workflow)}}
+              {{on "click" (fn this.transitionToBalances section.workflow)}}
               @kind="primary"
               @size="touch"
               @disabled={{section.isCtaDisabled}}
@@ -38,7 +38,7 @@
 
             {{#let @model.panel.sections.lastObject as |section|}}
               <Boxel::Button
-                {{on "click" (fn this.setFlow section.workflow)}}
+                {{on "click" (fn this.transitionToBalances section.workflow)}}
                 @kind="secondary-dark"
                 @size="small"
                 @disabled={{section.isCtaDisabled}}

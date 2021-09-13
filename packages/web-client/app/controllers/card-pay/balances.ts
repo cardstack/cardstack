@@ -17,7 +17,7 @@ class CardPayBalancesController extends Controller {
     return this.layer2Network.safes.value?.filterBy('type', 'prepaid-card');
   }
 
-  @action setFlow(flow: string) {
+  @action transitionToBalances(flow: string) {
     this.router.transitionTo('card-pay.balances', {
       queryParams: { flow },
     });
