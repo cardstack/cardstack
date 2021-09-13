@@ -1,15 +1,15 @@
 <Boxel::OrgHeader
+  class="merchant-payment-request-header"
   @iconURL={{this.cardPayLogo}}
   @title="Card Pay"
   style={{css-var
     boxel-org-header-logo-size="var(--card-pay-logo-size)"
-    boxel-org-header-logo-position="left center"
-    boxel-org-header-gap=""
-    boxel-org-header-padding=""
+    boxel-org-header-logo-position="var(--card-pay-logo-position)"
+    boxel-org-header-padding="0"
   }}
 >
-  <div class="merchant-payment-request-page__links-container">
-    <ul class="merchant-payment-request-page__links">
+  <div class="merchant-payment-request-header__links-container">
+    <ul class="merchant-payment-request-header__links">
       <li>
         <a href={{this.aboutURL}}>
           About
@@ -22,7 +22,7 @@
       </li>
     </ul>
     <CardPay::HamburgerMenu
-      class="merchant-payment-request-page__hamburger"
+      class="merchant-payment-request-header__hamburger"
       @headerIconURL={{this.cardPayLogo}}
       @headerTitle="Card Pay"
       @open={{this.hamburgerMenuOpen}}
