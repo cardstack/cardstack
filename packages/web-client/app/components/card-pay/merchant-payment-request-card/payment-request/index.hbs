@@ -13,26 +13,31 @@
   <Boxel::CardContainer
     class="payment-request__body"
   >
-  {{#if @merchant}}
-    <CardPay::Merchant
-      @name={{@merchant.name}}
-      @logoBackground={{@merchant.logoBackground}}
-      @logoTextColor={{@merchant.logoTextColor}}
-      @size="large"
-      @vertical={{true}}
-    />
-  {{else if @merchantAddress}}
+  {{#if @merchant.loading}}
+    <Boxel::LoadingIndicator data-test-merchant-loading-indicator/>
+  {{else if @merchant.errored}}
     <div class="payment-request__address-only" data-test-payment-request-merchant-address>
       <span class="payment-request__merchant-address">
         {{@merchantAddress}}
       </span>
       <span class="payment-request__missing-info-message" data-test-payment-request-merchant-info-missing>
-        {{svg-jar "failure-bordered" class="payment-request__missing-info-message-icon" title="We were unable to find merchant details for this address. Use caution when paying."}}
+        {{svg-jar "failure-bordered" class="payment-request__missing-info-message-icon"}}
         Unable to find merchant details for this address. Use caution when paying.
       </span>
     </div>
+  {{else}}
+    <CardPay::Merchant
+      @name={{@merchant.name}}
+      @logoBackground={{@merchant.backgroundColor}}
+      @logoTextColor={{@merchant.textColor}}
+      @size="large"
+      @vertical={{true}}
+    />
   {{/if}}
 
+    {{!-- TODO: modify for currency-only without SPEND --}}
+    {{!-- invert for USD? --}}
+    {{!-- also: consider adding local currency conversion --}}
     {{#if @amount}}
       <div class="payment-request__amount" data-test-payment-request-amount>
         §{{@amount}}
