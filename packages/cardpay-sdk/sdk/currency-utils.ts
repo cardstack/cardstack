@@ -5,8 +5,12 @@
  */
 
 import BigNumber from 'bignumber.js';
-import { get, isNil } from 'lodash';
+import { get, has, isNil } from 'lodash';
 import supportedNativeCurrencies from './native-currencies';
+
+export const isSupportedCurrency = (nativeCurrency: string) => {
+  return has(supportedNativeCurrencies, `${nativeCurrency}`);
+};
 
 type BigNumberish = number | string | BigNumber;
 

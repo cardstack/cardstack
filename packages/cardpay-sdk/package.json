@@ -29,6 +29,9 @@
   },
   "homepage": "https://github.com/cardstack/cardstack",
   "license": "MIT",
+  "engines": {
+    "node": "^14.0.0"
+  },
   "config": {
     "access": "public"
   },
