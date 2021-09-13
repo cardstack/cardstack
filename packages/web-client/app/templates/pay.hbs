@@ -1,4 +1,8 @@
-{{page-title (concat "Pay Merchant: " @model.merchant.name) replace=true}}
+{{#if @model.merchantExists}}
+  {{page-title (concat "Pay Merchant: " (or @model.merchant.name @model.merchantSafeID)) replace=true}}
+{{else}}
+  {{page-title "No merchant found" replace=true}}
+{{/if}}
 
 <div class="merchant-payment-request-page">
   <div class="merchant-payment-request-page__header">
