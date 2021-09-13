@@ -48,7 +48,6 @@ export class MerchantInfo
       );
       this.loading = false;
     } catch (err) {
-      console.error('failed to fetch merchant info', err);
       this.errored = err;
       this.loading = false;
 
