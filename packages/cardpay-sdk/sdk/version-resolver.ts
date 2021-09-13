@@ -104,7 +104,7 @@ export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<Map
       apiClass = TokenBridgeHomeSide;
       break;
     default:
-      assertNever(sdk);
+      assertNever(sdk as never);
   }
   return new apiClass(...args);
 }

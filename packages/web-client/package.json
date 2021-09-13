@@ -66,7 +66,6 @@
     "@types/qunit": "^2.11.1",
     "@types/rsvp": "^4.0.3",
     "@types/sinon": "^9.0.11",
-    "@types/web3": "^1.2.2",
     "@types/web3-provider-engine": "^14.0.1",
     "babel-eslint": "^10.1.0",
     "bn.js": "^5.2.0",
