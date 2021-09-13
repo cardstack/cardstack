@@ -25,6 +25,27 @@ type SDK =
   | 'TokenBridgeHomeSide'
   | 'TokenBridgeForeignSide'
   | 'RewardPool';
+type MapReturnType<T> = T extends 'Assets'
+  ? Assets
+  : T extends 'HubAuth'
+  ? HubAuth
+  : T extends 'LayerOneOracle'
+  ? LayerOneOracle
+  : T extends 'LayerTwoOracle'
+  ? LayerTwoOracle
+  : T extends 'PrepaidCard'
+  ? PrepaidCard
+  : T extends 'RevenuePool'
+  ? RevenuePool
+  : T extends 'RewardPool'
+  ? RewardPool
+  : T extends 'Safes'
+  ? Safes
+  : T extends 'TokenBridgeHomeSide'
+  ? TokenBridgeHomeSide
+  : T extends 'TokenBridgeForeignSide'
+  ? TokenBridgeForeignSide
+  : never;
 export interface ContractMeta {
   apiVersions: Record<string, any>;
   contractName: AddressKeys;
@@ -48,17 +69,7 @@ const cardPayVersionABI: AbiItem[] = [
   },
 ];
 
-export async function getSDK(sdk: 'Assets', web3: Web3): Promise<Assets>;
-export async function getSDK(sdk: 'HubAuth', web3: Web3, hubRootUrl: string): Promise<HubAuth>;
-export async function getSDK(sdk: 'LayerOneOracle', web3: Web3): Promise<LayerOneOracle>;
-export async function getSDK(sdk: 'LayerTwoOracle', web3: Web3): Promise<LayerTwoOracle>;
-export async function getSDK(sdk: 'PrepaidCard', web3: Web3): Promise<PrepaidCard>;
-export async function getSDK(sdk: 'RevenuePool', web3: Web3): Promise<RevenuePool>;
-export async function getSDK(sdk: 'RewardPool', web3: Web3): Promise<RewardPool>;
-export async function getSDK(sdk: 'Safes', web3: Web3): Promise<Safes>;
-export async function getSDK(sdk: 'TokenBridgeHomeSide', web3: Web3): Promise<TokenBridgeHomeSide>;
-export async function getSDK(sdk: 'TokenBridgeForeignSide', web3: Web3): Promise<TokenBridgeForeignSide>;
-export async function getSDK(sdk: SDK, ...args: any[]): Promise<any> {
+export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<MapReturnType<T>> {
   let [web3] = args;
   let apiClass;
   switch (sdk) {
@@ -93,7 +104,7 @@ export async function getSDK(sdk: SDK, ...args: any[]): Promise<any> {
       apiClass = TokenBridgeHomeSide;
       break;
     default:
-      assertNever(sdk);
+      assertNever(sdk as never);
   }
   return new apiClass(...args);
 }
