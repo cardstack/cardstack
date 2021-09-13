@@ -15,7 +15,6 @@ describe('hub/di/dependency-injection', function () {
     registry.register('testCircleThree', CircleThreeService);
     registry.register('testCircleFour', CircleFourService);
     registry.register('testCircleFive', new CircleFiveServiceFactory());
-    registry.register('testCircleSix', new CircleSixAsyncServiceFactory());
   });
 
   beforeEach(function () {
@@ -102,12 +101,6 @@ describe('hub/di/dependency-injection', function () {
     expect(five.iAmFive).equals(true);
     expect(five.testCircleTwo?.iAmTwo).equals(true);
   });
-
-  it('method factory can be async', async function () {
-    let six = await container.lookup('testCircleSix');
-    expect(six.iAmSix).equals(true);
-    expect(six.testCircleTwo?.iAmTwo).equals(true);
-  });
 });
 
 let exampleServiceTornDown = false;
@@ -176,22 +169,8 @@ class CircleFiveService {
   iAmFive = true;
 }
 class CircleFiveServiceFactory {
-  async create() {
+  create() {
     return new CircleFiveService();
-  }
-}
-
-class CircleSixService {
-  testCircleTwo = inject('testCircleTwo');
-  iAmSix = true;
-}
-class CircleSixAsyncServiceFactory {
-  async create() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(new CircleSixService());
-      }, 0);
-    });
   }
 }
 
@@ -206,6 +185,5 @@ declare module '@cardstack/hub/di/dependency-injection' {
     testCircleThree: CircleThreeService;
     testCircleFour: CircleFourService;
     testCircleFive: CircleFiveService;
-    testCircleSix: CircleSixService;
   }
 }
