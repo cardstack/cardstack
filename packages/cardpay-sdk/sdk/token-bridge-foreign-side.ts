@@ -37,6 +37,7 @@ export interface ITokenBridgeForeignSide {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
+  getEstimatedGasForWithdrawalClaim(_tokenAddress: string): Promise<BN>;
 }
 
 const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 290000;

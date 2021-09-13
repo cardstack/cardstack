@@ -28,8 +28,9 @@ import {
   BridgeValidationResult,
   getConstantByNetwork,
   getSDK,
-  ILayerOneOracle,
+  LayerOneOracle,
   networkIds,
+  TokenBridgeForeignSide,
   waitUntilBlock,
 } from '@cardstack/cardpay-sdk';
 import {
@@ -51,7 +52,7 @@ export default abstract class Layer1ChainWeb3Strategy
   // changes with connection state
   #waitForAccountDeferred = defer<void>();
   web3: Web3 | undefined;
-  #layerOneOracleApi!: ILayerOneOracle;
+  #layerOneOracleApi!: LayerOneOracle;
   connectionManager: ConnectionManager;
   eventListenersToUnbind: {
     [event in ConnectionManagerEvent]?: UnbindEventListener;
@@ -159,7 +160,10 @@ export default abstract class Layer1ChainWeb3Strategy
 
       this.web3 = new Web3();
       await this.connectionManager.reconnect(this.web3, providerId);
-      this.#layerOneOracleApi = await getSDK('LayerOneOracle', this.web3);
+      this.#layerOneOracleApi = await getSDK<LayerOneOracle>(
+        'LayerOneOracle',
+        this.web3
+      );
     } catch (e) {
       console.error('Failed to initialize connection from local storage');
       console.error(e);
@@ -173,7 +177,10 @@ export default abstract class Layer1ChainWeb3Strategy
     try {
       this.web3 = new Web3();
       await this.connectionManager.connect(this.web3, walletProvider.id);
-      this.#layerOneOracleApi = await getSDK('LayerOneOracle', this.web3);
+      this.#layerOneOracleApi = await getSDK<LayerOneOracle>(
+        'LayerOneOracle',
+        this.web3
+      );
     } catch (e) {
       console.error(
         `Failed to create connection manager: ${walletProvider.id}`
@@ -279,7 +286,10 @@ export default abstract class Layer1ChainWeb3Strategy
     { onTxnHash }: ApproveOptions
   ): Promise<TransactionReceipt> {
     if (!this.web3) throw new Error('Cannot unlock tokens without web3');
-    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
+    let tokenBridge = await getSDK<TokenBridgeForeignSide>(
+      'TokenBridgeForeignSide',
+      this.web3
+    );
     return tokenBridge.unlockTokens(
       new TokenContractInfo(tokenSymbol, this.networkSymbol).address,
       amountInWei.toString(),
@@ -294,7 +304,10 @@ export default abstract class Layer1ChainWeb3Strategy
     { onTxnHash }: RelayTokensOptions
   ): Promise<TransactionReceipt> {
     if (!this.web3) throw new Error('Cannot relay tokens without web3');
-    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
+    let tokenBridge = await getSDK<TokenBridgeForeignSide>(
+      'TokenBridgeForeignSide',
+      this.web3
+    );
     return tokenBridge.relayTokens(
       new TokenContractInfo(tokenSymbol, this.networkSymbol).address,
       receiverAddress,
@@ -308,7 +321,10 @@ export default abstract class Layer1ChainWeb3Strategy
     options?: ClaimBridgedTokensOptions
   ): Promise<TransactionReceipt> {
     if (!this.web3) throw new Error('Cannot claim bridged tokens without web3');
-    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
+    let tokenBridge = await getSDK<TokenBridgeForeignSide>(
+      'TokenBridgeForeignSide',
+      this.web3
+    );
     return tokenBridge.claimBridgedTokens(
       bridgeValidationResult.messageId,
       bridgeValidationResult.encodedData,
@@ -343,7 +359,10 @@ export default abstract class Layer1ChainWeb3Strategy
     if (!this.web3)
       throw new Error('Cannot getEstimatedGasForWithdrawalClaim without web3');
 
-    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
+    let tokenBridge = await getSDK<TokenBridgeForeignSide>(
+      'TokenBridgeForeignSide',
+      this.web3
+    );
     let { address } = new TokenContractInfo(symbol, this.networkSymbol);
     return tokenBridge.getEstimatedGasForWithdrawalClaim(address);
   }

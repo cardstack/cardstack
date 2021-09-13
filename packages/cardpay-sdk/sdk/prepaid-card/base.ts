@@ -25,6 +25,8 @@ import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from
 import { signSafeTxAsRSV, Signature, signSafeTxAsBytes } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
 import { TransactionReceipt } from 'web3-core';
+import { LayerTwoOracle } from '../layer-two-oracle';
+import { Safes } from '../safes';
 
 const { fromWei } = Web3.utils;
 const POLL_INTERVAL = 500;
@@ -120,7 +122,7 @@ export default class PrepaidCard {
     );
 
     let rateChanged = false;
-    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
+    let layerTwoOracle = await getSDK<LayerTwoOracle>('LayerTwoOracle', this.layer2Web3);
     let gnosisResult: GnosisExecTx | undefined;
     do {
       let rateLock = await layerTwoOracle.getRateLock(issuingToken);
@@ -218,7 +220,7 @@ export default class PrepaidCard {
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let rateChanged = false;
     let prepaidCardMgr = await this.getPrepaidCardMgr();
-    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
+    let layerTwoOracle = await getSDK<LayerTwoOracle>('LayerTwoOracle', this.layer2Web3);
     let gasToken = await getAddress('cardCpxd', this.layer2Web3);
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     let transferData = await prepaidCardMgr.methods.getTransferCardData(prepaidCardAddress, newOwner).call();
@@ -353,7 +355,7 @@ export default class PrepaidCard {
       throw new Error(`The prepaid card ${prepaidCardAddress} is not allowed to be split`);
     }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
+    let layerTwoOracle = await getSDK<LayerTwoOracle>('LayerTwoOracle', this.layer2Web3);
     let issuingToken = await this.issuingToken(prepaidCardAddress);
     let amountCache = new Map<number, string>();
     let amounts: BN[] = [];
@@ -609,7 +611,7 @@ export default class PrepaidCard {
     onError: (issuingToken: string, balanceAmount: string, requiredTokenAmount: string, symbol: string) => Error
   ): Promise<string> {
     let issuingToken = await this.issuingToken(prepaidCardAddress);
-    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
+    let layerTwoOracle = await getSDK<LayerTwoOracle>('LayerTwoOracle', this.layer2Web3);
     let weiAmount = await layerTwoOracle.convertFromSpend(issuingToken, minimumSpendBalance);
     let token = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], issuingToken);
     let symbol = await token.methods.symbol().call();
@@ -621,7 +623,7 @@ export default class PrepaidCard {
   }
 
   private async resolvePrepaidCards(prepaidCardAddresses: string[]): Promise<PrepaidCardSafe[]> {
-    let safes = await getSDK('Safes', this.layer2Web3);
+    let safes = await getSDK<Safes>('Safes', this.layer2Web3);
     let prepaidCards: PrepaidCardSafe[] | undefined;
     let startTime = Date.now();
     do {

@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
+import { getConstant, getSDK, Safes, Assets } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 
@@ -8,7 +8,7 @@ const { toWei, fromWei } = Web3.utils;
 export async function viewSafe(network: string, address: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
 
-  let safesApi = await getSDK('Safes', web3);
+  let safesApi = await getSDK<Safes>('Safes', web3);
   console.log(`Getting safe ${address}`);
   let safe = await safesApi.viewSafe(address);
   console.log();
@@ -24,7 +24,7 @@ export async function viewSafe(network: string, address: string, mnemonic?: stri
 export async function viewSafes(network: string, address: string | undefined, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
 
-  let safesApi = await getSDK('Safes', web3);
+  let safesApi = await getSDK<Safes>('Safes', web3);
   console.log('Getting safes...');
   console.log();
   let safes = (await safesApi.view(address)).filter((safe) => safe.type !== 'external');
@@ -84,8 +84,8 @@ export async function transferTokens(
   let web3 = await getWeb3(network, mnemonic);
   let weiAmount = toWei(amount);
 
-  let safes = await getSDK('Safes', web3);
-  let assets = await getSDK('Assets', web3);
+  let safes = await getSDK<Safes>('Safes', web3);
+  let assets = await getSDK<Assets>('Assets', web3);
   let { symbol } = await assets.getTokenInfo(token);
 
   console.log(`transferring ${amount} ${symbol} from safe ${safe} to ${recipient}`);
@@ -107,8 +107,8 @@ export async function transferTokensGasEstimate(
   let web3 = await getWeb3(network, mnemonic);
   let weiAmount = toWei(amount);
 
-  let safes = await getSDK('Safes', web3);
-  let assets = await getSDK('Assets', web3);
+  let safes = await getSDK<Safes>('Safes', web3);
+  let assets = await getSDK<Assets>('Assets', web3);
   let { symbol } = await assets.getTokenInfo(token);
   let estimate = await safes.sendTokensGasEstimate(safe, token, recipient, weiAmount);
   console.log(
@@ -126,8 +126,8 @@ export async function setSupplierInfoDID(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let safes = await getSDK('Safes', web3);
-  let assets = await getSDK('Assets', web3);
+  let safes = await getSDK<Safes>('Safes', web3);
+  let assets = await getSDK<Assets>('Assets', web3);
   let { symbol } = await assets.getTokenInfo(gasToken);
   console.log(`setting the info DID for the supplier safe ${safe} to ${infoDID} using ${symbol} token to pay for gas`);
   let blockExplorer = await getConstant('blockExplorer', web3);

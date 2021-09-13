@@ -1,4 +1,4 @@
-import { getSDK } from '@cardstack/cardpay-sdk';
+import { getSDK, RewardPool } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 import Web3 from 'web3';
 const { fromWei } = Web3.utils;
@@ -6,7 +6,7 @@ import { RewardTokenBalance } from '@cardstack/cardpay-sdk/sdk/reward-pool';
 
 export async function rewardTokenBalances(network: string, address: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let rewardPool = await getSDK('RewardPool', web3);
+  let rewardPool = await getSDK<RewardPool>('RewardPool', web3);
   const tokenBalances = await rewardPool.rewardTokenBalances(address);
   displayRewardTokenBalance(address, tokenBalances);
 }
@@ -21,6 +21,6 @@ function displayRewardTokenBalance(address: string, tokenBalances: RewardTokenBa
 
 export async function rewardTokensAvailable(network: string, address: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let rewardPool = await getSDK('RewardPool', web3);
+  let rewardPool = await getSDK<RewardPool>('RewardPool', web3);
   await rewardPool.rewardTokensAvailable(address);
 }

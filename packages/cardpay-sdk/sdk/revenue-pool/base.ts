@@ -22,6 +22,9 @@ import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 import { MerchantSafe, Safe } from '../safes';
+import { PrepaidCard } from '../prepaid-card';
+import { LayerTwoOracle } from '../layer-two-oracle';
+import { Safes } from '../safes';
 
 const { fromWei } = Web3.utils;
 const POLL_INTERVAL = 500;
@@ -224,7 +227,7 @@ export default class RevenuePool {
     }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let prepaidCard = await getSDK('PrepaidCard', this.layer2Web3);
+    let prepaidCard = await getSDK<PrepaidCard>('PrepaidCard', this.layer2Web3);
     let issuingToken = await prepaidCard.issuingToken(prepaidCardAddress);
     let registrationFee = await this.merchantRegistrationFee();
     infoDID = infoDID ?? '';
@@ -240,7 +243,7 @@ export default class RevenuePool {
     );
 
     let rateChanged = false;
-    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
+    let layerTwoOracle = await getSDK<LayerTwoOracle>('LayerTwoOracle', this.layer2Web3);
     let gnosisResult: GnosisExecTx | undefined;
     do {
       let rateLock = await layerTwoOracle.getRateLock(issuingToken);
@@ -341,7 +344,7 @@ export default class RevenuePool {
   }
 
   private async resolveMerchantSafe(merchantSafeAddress: string): Promise<MerchantSafe> {
-    let safes = await getSDK('Safes', this.layer2Web3);
+    let safes = await getSDK<Safes>('Safes', this.layer2Web3);
     let startTime = Date.now();
     let merchantSafe: Safe | undefined;
     let isFirstTime = true;

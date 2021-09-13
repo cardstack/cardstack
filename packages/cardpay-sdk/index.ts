@@ -1,19 +1,13 @@
-export { ITokenBridgeForeignSide } from './sdk/token-bridge-foreign-side';
-export { ITokenBridgeHomeSide, BridgeValidationResult } from './sdk/token-bridge-home-side';
-export {
-  Safes as ISafes,
-  Safe,
-  DepotSafe,
-  MerchantSafe,
-  PrepaidCardSafe,
-  ExternalSafe,
-  TokenInfo,
-  viewSafe,
-} from './sdk/safes';
-export { ILayerOneOracle } from './sdk/layer-one-oracle';
-export { LayerTwoOracle as ILayerTwoOracle } from './sdk/layer-two-oracle';
-export { IAssets } from './sdk/assets';
-export { IHubAuth } from './sdk/hub-auth';
+export { ITokenBridgeForeignSide as TokenBridgeForeignSide } from './sdk/token-bridge-foreign-side';
+export { ITokenBridgeHomeSide as TokenBridgeHomeSide, BridgeValidationResult } from './sdk/token-bridge-home-side';
+export { Safes, Safe, DepotSafe, MerchantSafe, PrepaidCardSafe, ExternalSafe, TokenInfo, viewSafe } from './sdk/safes';
+export { ILayerOneOracle as LayerOneOracle } from './sdk/layer-one-oracle';
+export { LayerTwoOracle } from './sdk/layer-two-oracle';
+export { IAssets as Assets } from './sdk/assets';
+export { IHubAuth as HubAuth } from './sdk/hub-auth';
+export { PrepaidCard } from './sdk/prepaid-card';
+export { RevenuePool } from './sdk/revenue-pool';
+export { RewardPool } from './sdk/reward-pool';
 
 export { getAddress, getAddressByNetwork, getOracle, getOracleByNetwork, AddressKeys } from './contracts/addresses';
 export { getConstant, getConstantByNetwork, networks, networkIds } from './sdk/constants';

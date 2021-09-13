@@ -3,15 +3,15 @@ import { AddressKeys, getAddress } from '../contracts/addresses';
 import { AbiItem } from 'web3-utils';
 import { satisfies } from 'semver';
 import mapKeys from 'lodash/mapKeys';
-import { LayerTwoOracle, layerTwoOracleMeta } from './layer-two-oracle';
-import { Safes, safesMeta } from './safes';
-import { PrepaidCard, prepaidCardMeta } from './prepaid-card';
+import { layerTwoOracleMeta } from './layer-two-oracle';
+import { safesMeta } from './safes';
+import { prepaidCardMeta } from './prepaid-card';
 import Assets from './assets';
 import LayerOneOracle from './layer-one-oracle';
 import TokenBridgeHomeSide from './token-bridge-home-side';
 import TokenBridgeForeignSide from './token-bridge-foreign-side';
-import { revenuePoolMeta, RevenuePool } from './revenue-pool';
-import { rewardPoolMeta, RewardPool } from './reward-pool';
+import { revenuePoolMeta } from './revenue-pool';
+import { rewardPoolMeta } from './reward-pool';
 import HubAuth from './hub-auth';
 
 type SDK =
@@ -48,17 +48,7 @@ const cardPayVersionABI: AbiItem[] = [
   },
 ];
 
-export async function getSDK(sdk: 'Assets', web3: Web3): Promise<Assets>;
-export async function getSDK(sdk: 'HubAuth', web3: Web3, hubRootUrl: string): Promise<HubAuth>;
-export async function getSDK(sdk: 'LayerOneOracle', web3: Web3): Promise<LayerOneOracle>;
-export async function getSDK(sdk: 'LayerTwoOracle', web3: Web3): Promise<LayerTwoOracle>;
-export async function getSDK(sdk: 'PrepaidCard', web3: Web3): Promise<PrepaidCard>;
-export async function getSDK(sdk: 'RevenuePool', web3: Web3): Promise<RevenuePool>;
-export async function getSDK(sdk: 'RewardPool', web3: Web3): Promise<RewardPool>;
-export async function getSDK(sdk: 'Safes', web3: Web3): Promise<Safes>;
-export async function getSDK(sdk: 'TokenBridgeHomeSide', web3: Web3): Promise<TokenBridgeHomeSide>;
-export async function getSDK(sdk: 'TokenBridgeForeignSide', web3: Web3): Promise<TokenBridgeForeignSide>;
-export async function getSDK(sdk: SDK, ...args: any[]): Promise<any> {
+export async function getSDK<T>(sdk: SDK, ...args: any[]): Promise<T> {
   let [web3] = args;
   let apiClass;
   switch (sdk) {

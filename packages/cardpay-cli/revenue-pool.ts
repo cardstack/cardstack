@@ -1,4 +1,4 @@
-import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
+import { Assets, getConstant, getSDK, RevenuePool } from '@cardstack/cardpay-sdk';
 import { fromWei, toWei } from 'web3-utils';
 import { getWeb3 } from './utils';
 
@@ -9,7 +9,7 @@ export async function registerMerchant(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let revenuePool = await getSDK('RevenuePool', web3);
+  let revenuePool = await getSDK<RevenuePool>('RevenuePool', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(
@@ -24,7 +24,7 @@ export async function registerMerchant(
 
 export async function revenueBalances(network: string, merchantSafeAddress: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let revenuePool = await getSDK('RevenuePool', web3);
+  let revenuePool = await getSDK<RevenuePool>('RevenuePool', web3);
   let balanceInfo = await revenuePool.balances(merchantSafeAddress);
   console.log(`Merchant revenue balance for merchant safe ${merchantSafeAddress}:`);
   for (let { tokenSymbol, balance } of balanceInfo) {
@@ -40,8 +40,8 @@ export async function claimRevenue(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let revenuePool = await getSDK('RevenuePool', web3);
-  let assets = await getSDK('Assets', web3);
+  let revenuePool = await getSDK<RevenuePool>('RevenuePool', web3);
+  let assets = await getSDK<Assets>('Assets', web3);
   let { symbol } = await assets.getTokenInfo(tokenAddress);
   let weiAmount = toWei(amount);
   console.log(`Claiming ${amount} ${symbol} in revenue for merchant safe ${merchantSafeAddress}`);
@@ -61,8 +61,8 @@ export async function claimRevenueGasEstimate(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let revenuePool = await getSDK('RevenuePool', web3);
-  let assets = await getSDK('Assets', web3);
+  let revenuePool = await getSDK<RevenuePool>('RevenuePool', web3);
+  let assets = await getSDK<Assets>('Assets', web3);
   let { symbol } = await assets.getTokenInfo(tokenAddress);
   let weiAmount = toWei(amount);
   let estimate = await revenuePool.claimGasEstimate(merchantSafeAddress, tokenAddress, weiAmount);

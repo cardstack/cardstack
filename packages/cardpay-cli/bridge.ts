@@ -1,14 +1,14 @@
 import Web3 from 'web3';
 import { getWeb3 } from './utils';
-import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
+import { getConstant, getSDK, TokenBridgeHomeSide, TokenBridgeForeignSide, Assets } from '@cardstack/cardpay-sdk';
 
 const { toWei, fromWei } = Web3.utils;
 
 export async function getWithdrawalLimits(network: string, tokenAddress: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
+  let tokenBridge = await getSDK<TokenBridgeHomeSide>('TokenBridgeHomeSide', web3);
   let { max, min } = await tokenBridge.getWithdrawalLimits(tokenAddress);
-  let assets = await getSDK('Assets', web3);
+  let assets = await getSDK<Assets>('Assets', web3);
   let { symbol } = await assets.getTokenInfo(tokenAddress);
   console.log(`The withdrawal limits for bridging ${symbol} to layer 1 are:
   minimum withdrawal ${fromWei(min)} ${symbol}
@@ -26,8 +26,8 @@ export async function bridgeToLayer1(
   const amountInWei = toWei(amount);
 
   let web3 = await getWeb3(network, mnemonic);
-  let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
-  let assets = await getSDK('Assets', web3);
+  let tokenBridge = await getSDK<TokenBridgeHomeSide>('TokenBridgeHomeSide', web3);
+  let assets = await getSDK<Assets>('Assets', web3);
   let { symbol } = await assets.getTokenInfo(tokenAddress);
   receiverAddress = receiverAddress ?? (await web3.eth.getAccounts())[0];
 
@@ -45,7 +45,7 @@ export async function awaitBridgedToLayer1(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
+  let tokenBridge = await getSDK<TokenBridgeHomeSide>('TokenBridgeHomeSide', web3);
 
   console.log(`Waiting for bridge validation to complete for ${txnHash}...`);
 
@@ -65,7 +65,7 @@ export async function claimLayer1BridgedTokens(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let tokenBridge = await getSDK('TokenBridgeForeignSide', web3);
+  let tokenBridge = await getSDK<TokenBridgeForeignSide>('TokenBridgeForeignSide', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(`Claiming layer 1 bridge tokens for message ID ${messageId}...`);
@@ -85,8 +85,8 @@ export async function bridgeToLayer2(
   const amountInWei = toWei(amount);
 
   let web3 = await getWeb3(network, mnemonic);
-  let tokenBridge = await getSDK('TokenBridgeForeignSide', web3);
-  let assets = await getSDK('Assets', web3);
+  let tokenBridge = await getSDK<TokenBridgeForeignSide>('TokenBridgeForeignSide', web3);
+  let assets = await getSDK<Assets>('Assets', web3);
   let { symbol } = await assets.getTokenInfo(tokenAddress);
   receiverAddress = receiverAddress ?? (await web3.eth.getAccounts())[0];
 
@@ -118,7 +118,7 @@ export async function awaitBridgedToLayer2(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let tokenBridge = await getSDK('TokenBridgeHomeSide', web3);
+  let tokenBridge = await getSDK<TokenBridgeHomeSide>('TokenBridgeHomeSide', web3);
   recipient = recipient ?? (await web3.eth.getAccounts())[0];
 
   let blockExplorer = await getConstant('blockExplorer', web3);

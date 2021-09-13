@@ -19,6 +19,17 @@ import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from
 
 export interface ITokenBridgeHomeSide {
   waitForBridgingToLayer2Completed(recipientAddress: string, fromBlock: string): Promise<TransactionReceipt>;
+  waitForBridgingValidation(fromBlock: string, bridgingTxnHash: string): Promise<BridgeValidationResult>;
+  getWithdrawalLimits(tokenAddress: string): Promise<{ min: string; max: string }>;
+  relayTokens(txnHash: string): Promise<TransactionReceipt>;
+  relayTokens(
+    safeAddress: string,
+    tokenAddress: string,
+    recipientAddress: string,
+    amount: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
 }
 
 export interface BridgeValidationResult {

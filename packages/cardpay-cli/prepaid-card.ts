@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
+import { Assets, getConstant, getSDK, PrepaidCard } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 
 const { fromWei } = Web3.utils;
@@ -11,7 +11,7 @@ export async function priceForFaceValue(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let prepaidCard = await getSDK('PrepaidCard', web3);
+  let prepaidCard = await getSDK<PrepaidCard>('PrepaidCard', web3);
   let weiAmount = await prepaidCard.priceForFaceValue(tokenAddress, spendFaceValue);
   console.log(
     `To achieve a SPEND face value of §${spendFaceValue} you must send ${fromWei(weiAmount)} units of this token`
@@ -20,14 +20,14 @@ export async function priceForFaceValue(
 
 export async function gasFee(network: string, tokenAddress: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let prepaidCard = await getSDK('PrepaidCard', web3);
+  let prepaidCard = await getSDK<PrepaidCard>('PrepaidCard', web3);
   let weiAmount = await prepaidCard.gasFee(tokenAddress);
   console.log(`The gas fee for a new prepaid card in units of this token is ${fromWei(weiAmount)}`);
 }
 
 export async function getPaymentLimits(network: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let prepaidCard = await getSDK('PrepaidCard', web3);
+  let prepaidCard = await getSDK<PrepaidCard>('PrepaidCard', web3);
   let { min, max } = await prepaidCard.getPaymentLimits();
   console.log(`The prepaid card payments limits are:
   minimum amount §${min} SPEND
@@ -44,9 +44,9 @@ export async function create(
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
 
-  let prepaidCard = await getSDK('PrepaidCard', web3);
+  let prepaidCard = await getSDK<PrepaidCard>('PrepaidCard', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  let assets = await getSDK('Assets', web3);
+  let assets = await getSDK<Assets>('Assets', web3);
   let { symbol } = await assets.getTokenInfo(tokenAddress);
 
   console.log(
@@ -71,7 +71,7 @@ export async function split(
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
 
-  let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+  let prepaidCardAPI = await getSDK<PrepaidCard>('PrepaidCard', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(
@@ -94,7 +94,7 @@ export async function transfer(
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
 
-  let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+  let prepaidCardAPI = await getSDK<PrepaidCard>('PrepaidCard', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(`Transferring prepaid card ${prepaidCard} to new owner ${newOwner}...`);
@@ -112,7 +112,7 @@ export async function payMerchant(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let prepaidCard = await getSDK('PrepaidCard', web3);
+  let prepaidCard = await getSDK<PrepaidCard>('PrepaidCard', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
 
   console.log(

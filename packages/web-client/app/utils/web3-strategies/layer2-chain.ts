@@ -34,10 +34,13 @@ import {
   DepotSafe,
   MerchantSafe,
   Safe,
-  IHubAuth,
-  ISafes,
+  Safes,
+  HubAuth,
   PrepaidCardSafe,
-  ILayerTwoOracle,
+  LayerTwoOracle,
+  RevenuePool,
+  PrepaidCard,
+  TokenBridgeHomeSide,
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
@@ -67,9 +70,9 @@ export default abstract class Layer2ChainWeb3Strategy
   defaultTokenSymbol: ConvertibleSymbol = 'DAI';
   defaultTokenContractAddress?: string;
   web3!: Web3;
-  #layerTwoOracleApi!: ILayerTwoOracle;
-  #safesApi!: ISafes;
-  #hubAuthApi!: IHubAuth;
+  #layerTwoOracleApi!: LayerTwoOracle;
+  #safesApi!: Safes;
+  #hubAuthApi!: HubAuth;
   #broadcastChannel: TypedChannel<Layer2ConnectEvent>;
   @tracked depotSafe: DepotSafe | null = null;
   @tracked walletInfo: WalletInfo;
@@ -155,9 +158,16 @@ export default abstract class Layer2ChainWeb3Strategy
       try {
         // try to initialize things safely
         // one expected failure is if we connect to a chain which we don't have an rpc url for
-        this.#layerTwoOracleApi = await getSDK('LayerTwoOracle', this.web3);
-        this.#safesApi = await getSDK('Safes', this.web3);
-        this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
+        this.#layerTwoOracleApi = await getSDK<LayerTwoOracle>(
+          'LayerTwoOracle',
+          this.web3
+        );
+        this.#safesApi = await getSDK<Safes>('Safes', this.web3);
+        this.#hubAuthApi = await getSDK<HubAuth>(
+          'HubAuth',
+          this.web3,
+          config.hubURL
+        );
         await this.updateWalletInfo(accounts);
         this.#broadcastChannel.postMessage({
           type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
@@ -246,7 +256,7 @@ export default abstract class Layer2ChainWeb3Strategy
     customizationDid: string,
     options: IssuePrepaidCardOptions
   ): Promise<PrepaidCardSafe> {
-    const PrepaidCard = await getSDK('PrepaidCard', this.web3);
+    const PrepaidCard = await getSDK<PrepaidCard>('PrepaidCard', this.web3);
 
     const result = await PrepaidCard.create(
       safeAddress,
@@ -261,7 +271,7 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   async fetchMerchantRegistrationFee(): Promise<number> {
-    const RevenuePool = await getSDK('RevenuePool', this.web3);
+    const RevenuePool = await getSDK<RevenuePool>('RevenuePool', this.web3);
     return await RevenuePool.merchantRegistrationFee(); // this is a SPEND amount
   }
 
@@ -270,7 +280,7 @@ export default abstract class Layer2ChainWeb3Strategy
     infoDid: string,
     options: RegisterMerchantOptions
   ): Promise<MerchantSafe> {
-    const RevenuePool = await getSDK('RevenuePool', this.web3);
+    const RevenuePool = await getSDK<RevenuePool>('RevenuePool', this.web3);
 
     return (
       await RevenuePool.registerMerchant(prepaidCardAddress, infoDid, {
@@ -337,7 +347,10 @@ export default abstract class Layer2ChainWeb3Strategy
     fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt> {
-    let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
+    let tokenBridge = await getSDK<TokenBridgeHomeSide>(
+      'TokenBridgeHomeSide',
+      this.web3
+    );
     return tokenBridge.waitForBridgingToLayer2Completed(
       receiver,
       fromBlock.toString()
@@ -350,7 +363,10 @@ export default abstract class Layer2ChainWeb3Strategy
     tokenSymbol: BridgeableSymbol,
     amountInWei: string
   ): Promise<TransactionHash> {
-    let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
+    let tokenBridge = await getSDK<TokenBridgeHomeSide>(
+      'TokenBridgeHomeSide',
+      this.web3
+    );
     let tokenAddress = new TokenContractInfo(tokenSymbol, this.networkSymbol)!
       .address;
 
@@ -373,7 +389,10 @@ export default abstract class Layer2ChainWeb3Strategy
     fromBlock: BN,
     txnHash: TransactionHash
   ): Promise<BridgeValidationResult> {
-    let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
+    let tokenBridge = await getSDK<TokenBridgeHomeSide>(
+      'TokenBridgeHomeSide',
+      this.web3
+    );
     return tokenBridge.waitForBridgingValidation(fromBlock.toString(), txnHash);
   }
 
