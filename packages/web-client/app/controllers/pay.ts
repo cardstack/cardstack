@@ -1,4 +1,4 @@
-import { spendToUsd } from '@cardstack/cardpay-sdk';
+import { generateMerchantPaymentUrl, spendToUsd } from '@cardstack/cardpay-sdk';
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
 import { usdToSpend } from '@cardstack/cardpay-sdk';
@@ -6,18 +6,18 @@ import { inject as service } from '@ember/service';
 import IsIOS from '../services/is-ios';
 
 export default class CardPayMerchantServicesController extends Controller {
-  @tracked hamburgerMenuOpen = false;
   @service('is-ios') declare isIOSService: IsIOS;
+  queryParams = ['amount', 'currency'];
+  @tracked amount: number = 0;
+  @tracked currency: string = 'SPD';
+  @tracked hamburgerMenuOpen = false;
 
   get canDeepLink() {
     return this.isIOSService.isIOS();
   }
 
-  queryParams = ['amount', 'currency'];
-  @tracked amount: number = 0; // fix amount being 0 when unspecified
-  @tracked currency: string = 'SPD';
-
   get displayedAmounts() {
+    // TODO: add rounding based on currency decimal limits
     if (!this.isValidAmount) {
       return {
         SPD: null,
@@ -41,20 +41,14 @@ export default class CardPayMerchantServicesController extends Controller {
     }
   }
   get isValidAmount() {
-    return !(
-      isNaN(this.amount) ||
-      (this.currency === 'SPD' && this.amount % 1 > 0)
-    );
+    return !isNaN(this.amount) && this.amount > 0;
   }
   get paymentURL() {
-    let base = `cardwallet://pay/${this.model.network}/${this.model.merchantSafeID}`;
-    let params = new URLSearchParams();
-    if (this.isValidAmount) {
-      params.append('amount', `${this.amount}`);
-    }
-
-    params.append('currency', `${this.currency}`);
-    let queryString = params.toString();
-    return base + (queryString ? '?' + queryString : '');
+    return generateMerchantPaymentUrl({
+      network: this.model.network,
+      merchantSafeID: this.model.merchantSafeID,
+      currency: this.currency,
+      amount: this.isValidAmount ? this.amount : 0,
+    });
   }
 }

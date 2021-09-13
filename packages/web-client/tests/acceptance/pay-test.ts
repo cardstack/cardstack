@@ -5,7 +5,12 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import sinon from 'sinon';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
-import { formatUsd, MerchantSafe, spendToUsd } from '@cardstack/cardpay-sdk';
+import {
+  formatUsd,
+  generateMerchantPaymentUrl,
+  MerchantSafe,
+  spendToUsd,
+} from '@cardstack/cardpay-sdk';
 import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 
@@ -24,6 +29,7 @@ const merchantSafeId = '0xE73604fC1724a50CEcBC1096d4229b81aF117c94';
 const spendSymbol = 'SPD'; // TODO: fix this if single source of truth for symbols between web and mobile is established
 const usdSymbol = 'USD';
 const invalidCurrencySymbol = 'WUT';
+const network = 'sokol';
 const merchantName = 'Mandello';
 const merchantInfoBackground = '#00ffcc';
 const merchantInfoTextColor = '#000000';
@@ -63,7 +69,7 @@ module('Acceptance | pay', function (hooks) {
 
   test('it renders correctly with SPD as currency', async function (assert) {
     await visit(
-      `/pay/sokol/${merchantSafeId}?amount=${spendAmount}&currency=${spendSymbol}`
+      `/pay/${network}/${merchantSafeId}?amount=${spendAmount}&currency=${spendSymbol}`
     );
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
@@ -82,20 +88,20 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(USD_AMOUNT)
       .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
-    assert.dom(QR_CODE).hasAttribute(
-      'data-test-styled-qr-code',
-      // TODO: fix this if/when sdk has method to generate this url
-      `cardwallet://pay/sokol/${merchantSafeId}?amount=${spendAmount}&currency=${spendSymbol}`
-    );
-    assert.dom(PAYMENT_URL).containsText(
-      // TODO: fix this if/when sdk has method to generate this url
-      `cardwallet://pay/sokol/${merchantSafeId}?amount=${spendAmount}&currency=${spendSymbol}`
-    );
+
+    let expectedUrl = generateMerchantPaymentUrl({
+      network: network,
+      merchantSafeID: merchantSafeId,
+      currency: spendSymbol,
+      amount: spendAmount,
+    });
+    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
   test('it renders correctly with no currency provided', async function (assert) {
     // this is basically defaulting to SPEND
-    await visit(`/pay/sokol/${merchantSafeId}?amount=${spendAmount}`);
+    await visit(`/pay/${network}/${merchantSafeId}?amount=${spendAmount}`);
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
       .dom(MERCHANT_LOGO)
@@ -113,20 +119,19 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(USD_AMOUNT)
       .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
-    assert.dom(QR_CODE).hasAttribute(
-      'data-test-styled-qr-code',
-      // TODO: fix this if/when sdk has method to generate this url
-      `cardwallet://pay/sokol/${merchantSafeId}?amount=${spendAmount}&currency=${spendSymbol}`
-    );
-    assert.dom(PAYMENT_URL).containsText(
-      // TODO: fix this if/when sdk has method to generate this url
-      `cardwallet://pay/sokol/${merchantSafeId}?amount=${spendAmount}&currency=${spendSymbol}`
-    );
+    let expectedUrl = generateMerchantPaymentUrl({
+      network: network,
+      merchantSafeID: merchantSafeId,
+      currency: spendSymbol,
+      amount: spendAmount,
+    });
+    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
-  test('it renders correctly if with USD as currency', async function (assert) {
+  test('it renders correctly with USD as currency', async function (assert) {
     await visit(
-      `/pay/sokol/${merchantSafeId}?amount=${usdAmount}&currency=${usdSymbol}`
+      `/pay/${network}/${merchantSafeId}?amount=${usdAmount}&currency=${usdSymbol}`
     );
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
@@ -145,20 +150,19 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(USD_AMOUNT)
       .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
-    assert.dom(QR_CODE).hasAttribute(
-      'data-test-styled-qr-code',
-      // TODO: fix this if/when sdk has method to generate this url
-      `cardwallet://pay/sokol/${merchantSafeId}?amount=${usdAmount}&currency=${usdSymbol}`
-    );
-    assert.dom(PAYMENT_URL).containsText(
-      // TODO: fix this if/when sdk has method to generate this url
-      `cardwallet://pay/sokol/${merchantSafeId}?amount=${usdAmount}&currency=${usdSymbol}`
-    );
+    let expectedUrl = generateMerchantPaymentUrl({
+      network: network,
+      merchantSafeID: merchantSafeId,
+      currency: usdSymbol,
+      amount: usdAmount,
+    });
+    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
   test('it renders correctly if currency is unrecognised', async function (assert) {
     await visit(
-      `/pay/sokol/${merchantSafeId}?amount=300&currency=${invalidCurrencySymbol}`
+      `/pay/${network}/${merchantSafeId}?amount=300&currency=${invalidCurrencySymbol}`
     );
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
@@ -180,19 +184,20 @@ module('Acceptance | pay', function (hooks) {
     // we just pass this currency to the wallet to handle without
     // displaying the amounts if we don't recognize the currency
     // currently this is anything that is not SPD or USD
-    assert.dom(QR_CODE).hasAttribute(
-      'data-test-styled-qr-code',
-      // TODO: fix this if/when sdk has method to generate this url
-      `cardwallet://pay/sokol/${merchantSafeId}?amount=300&currency=${invalidCurrencySymbol}`
-    );
-    assert.dom(PAYMENT_URL).containsText(
-      // TODO: fix this if/when sdk has method to generate this url
-      `cardwallet://pay/sokol/${merchantSafeId}?amount=300&currency=${invalidCurrencySymbol}`
-    );
+    let expectedUrl = generateMerchantPaymentUrl({
+      network: network,
+      merchantSafeID: merchantSafeId,
+      currency: invalidCurrencySymbol,
+      amount: 300,
+    });
+    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
   test('it renders correctly if amount is malformed', async function (assert) {
-    await visit(`/pay/sokol/${merchantSafeId}?amount=30a&currency=SPD`);
+    await visit(
+      `/pay/${network}/${merchantSafeId}?amount=30a&currency=${spendSymbol}`
+    );
 
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
@@ -211,15 +216,14 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(AMOUNT).doesNotExist();
     assert.dom(USD_AMOUNT).doesNotExist();
 
-    assert.dom(QR_CODE).hasAttribute(
-      'data-test-styled-qr-code',
-      // TODO: fix this if/when sdk has method to generate this url
-      `cardwallet://pay/sokol/${merchantSafeId}?currency=SPD`
-    );
-    assert.dom(PAYMENT_URL).containsText(
-      // TODO: fix this if/when sdk has method to generate this url
-      `cardwallet://pay/sokol/${merchantSafeId}?currency=SPD`
-    );
+    let expectedUrl = generateMerchantPaymentUrl({
+      network: network,
+      merchantSafeID: merchantSafeId,
+      currency: spendSymbol,
+      amount: 0,
+    });
+    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
   test('it renders the clickable link by default when in an iOS browser', async function (assert) {
@@ -227,7 +231,7 @@ module('Acceptance | pay', function (hooks) {
     sinon.stub(isIOSService, 'isIOS').returns(true);
 
     await visit(
-      `/pay/sokol/${merchantSafeId}?amount=${spendAmount}&currrency=${spendSymbol}`
+      `/pay/${network}/${merchantSafeId}?amount=${spendAmount}&currrency=${spendSymbol}`
     );
 
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
@@ -251,18 +255,17 @@ module('Acceptance | pay', function (hooks) {
 
     // assert that the deep link view is rendered
     assert.dom(QR_CODE).doesNotExist();
+    let expectedUrl = generateMerchantPaymentUrl({
+      network: network,
+      merchantSafeID: merchantSafeId,
+      currency: spendSymbol,
+      amount: spendAmount,
+    });
     assert
       .dom(DEEP_LINK)
       .containsText('Pay Merchant')
-      .hasAttribute(
-        'href',
-        `cardwallet://pay/sokol/${merchantSafeId}?amount=${spendAmount}&currency=${spendSymbol}`
-      );
-
-    assert.dom(PAYMENT_URL).containsText(
-      // TODO: fix this if/when sdk has method to generate this url
-      `cardwallet://pay/sokol/${merchantSafeId}?amount=${spendAmount}&currency=${spendSymbol}`
-    );
+      .hasAttribute('href', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
   // This will be handled in a follow-up PR
@@ -270,7 +273,7 @@ module('Acceptance | pay', function (hooks) {
   //   'it shows an appropriate error message if merchant details cannot be fetched',
   //   async function (assert) {
   //     await visit(
-  //       `/pay/sokol/idontexist?amount=${spendAmount}&currrency=${spendSymbol}`
+  //       `/pay/${network}/idontexist?amount=${spendAmount}&currrency=${spendSymbol}`
   //     );
   //   }
   // );
@@ -278,7 +281,7 @@ module('Acceptance | pay', function (hooks) {
   //   'it renders only the provided currency and not a USD conversion or SPEND amount if the provided currency is not USD or SPEND',
   //   async function (assert) {
   //     await visit(
-  //       `/pay/sokol/${merchantSafeId}?amount=${0}&currrency=${malaysianRinggitSymbol}`
+  //       `/pay/${network}/${merchantSafeId}?amount=${0}&currrency=${malaysianRinggitSymbol}`
   //     );
   //     assert.ok(false);
   //     // assert that merchant details are rendered
