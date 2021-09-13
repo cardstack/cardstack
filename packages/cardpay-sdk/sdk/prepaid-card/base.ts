@@ -592,12 +592,6 @@ export default class PrepaidCard {
     };
   }
 
-  async getPrepaidCardSafesFromTxHash(txHash: string): Promise<PrepaidCardSafe[]> {
-    let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(txHash);
-    await waitUntilTransactionMined(this.layer2Web3, txHash);
-    return await this.resolvePrepaidCards(prepaidCardAddresses);
-  }
-
   async convertFromSpendForPrepaidCard(
     prepaidCardAddress: string,
     minimumSpendBalance: number,
