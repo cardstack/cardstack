@@ -7,7 +7,11 @@ export default class OffChainJsonService extends Service {
   #didResolver = new Resolver(getResolver());
   #cache: Map<string, any> = new Map();
 
-  async fetch(did: string, waitForResource = false): Promise<any> {
+  async fetch(did: string | undefined, waitForResource = false): Promise<any> {
+    if (!did) {
+      throw new Error('did is required to fetch off chain json');
+    }
+
     if (this.#cache.has(did)) {
       let jsonApiDocument = this.#cache.get(did);
       return Promise.resolve(jsonApiDocument);
