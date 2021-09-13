@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { visit } from '@ember/test-helpers';
+import { visit, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import sinon from 'sinon';
@@ -90,6 +90,8 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}&currency=${spendSymbol}`
     );
+    await waitFor(MERCHANT);
+
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
       .dom(MERCHANT_LOGO)
@@ -123,6 +125,8 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}`
     );
+    await waitFor(MERCHANT);
+
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
       .dom(MERCHANT_LOGO)
@@ -154,6 +158,8 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${usdAmount}&currency=${usdSymbol}`
     );
+    await waitFor(MERCHANT);
+
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
       .dom(MERCHANT_LOGO)
@@ -185,6 +191,8 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=300&currency=${invalidCurrencySymbol}`
     );
+    await waitFor(MERCHANT);
+
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
       .dom(MERCHANT_LOGO)
@@ -219,6 +227,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=30a&currency=${spendSymbol}`
     );
+    await waitFor(MERCHANT);
 
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
@@ -254,6 +263,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}&currrency=${spendSymbol}`
     );
+    await waitFor(MERCHANT);
 
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
@@ -293,6 +303,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafeWithoutInfo.address}?amount=${spendAmount}&currency=${spendSymbol}`
     );
+    await waitFor(MERCHANT_INFO_ADDRESS_ONLY);
 
     assert.dom(MERCHANT).doesNotExist();
     assert
@@ -322,6 +333,8 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${nonexistentMerchantId}?amount=${spendAmount}&currency=${spendSymbol}`
     );
+
+    await waitFor(MERCHANT_MISSING_MESSAGE);
 
     assert
       .dom(MERCHANT_MISSING_MESSAGE)
