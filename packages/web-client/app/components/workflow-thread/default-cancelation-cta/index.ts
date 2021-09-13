@@ -13,7 +13,11 @@ class WorkflowThreadDisconnectionComponent extends Component {
 
   @action async restartWorkflow() {
     const { queryParams } = this.router.currentRoute;
-    await this.router.transitionTo({ queryParams: { flow: null } });
+    delete queryParams['flow-id']; // Persistence id
+
+    await this.router.transitionTo({
+      queryParams: { flow: null, 'flow-id': null },
+    });
     next(this, () => {
       this.router.transitionTo({
         queryParams,

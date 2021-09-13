@@ -301,6 +301,20 @@ module('Acceptance | issue prepaid card', function (hooks) {
         .includesText(
           'You attempted to restore an unfinished workflow, but you are no longer authenticated. Please restart the workflow.'
         );
+
+      await click('[data-test-workflow-default-cancelation-restart]');
+
+      // Starts over
+      assert.dom('[data-test-milestone="0"]').exists(); // L2
+      assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
+      assert.dom('[data-test-milestone="2"]').doesNotExist(); // Choose funding source
+
+      const workflowPersistenceId = new URL(
+        'http://domain.test/' + currentURL()
+      ).searchParams.get('flow-id');
+
+      assert.notEqual(workflowPersistenceId!, 'abc123'); // flow-id param should be regenerated
+      assert.equal(workflowPersistenceId!.length, 22);
     });
 
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
