@@ -4,18 +4,21 @@ import { tracked } from '@glimmer/tracking';
 import { usdToSpend } from '@cardstack/cardpay-sdk';
 import { inject as service } from '@ember/service';
 import IsIOS from '../services/is-ios';
+import { useResource } from 'ember-resources';
+import { MerchantInfo } from '../resources/merchant-info';
 
 export default class CardPayMerchantServicesController extends Controller {
   @service('is-ios') declare isIOSService: IsIOS;
   queryParams = ['amount', 'currency'];
   @tracked amount: number = 0;
   @tracked currency: string = 'SPD';
-  @tracked hamburgerMenuOpen = false;
+  merchantInfo = useResource(this, MerchantInfo, () => ({
+    infoDID: this.model.merchantSafe.infoDID,
+  }));
 
   get canDeepLink() {
     return this.isIOSService.isIOS();
   }
-
   get displayedAmounts() {
     // TODO: add rounding based on currency decimal limits
     if (!this.isValidAmount) {
@@ -44,9 +47,12 @@ export default class CardPayMerchantServicesController extends Controller {
     return !isNaN(this.amount) && this.amount > 0;
   }
   get paymentURL() {
+    // TODO: add domain to arguments (wallet.cardstack.com)
+    // currently using the default domain which is cardwallet:/
+    // because wallet.cardstack.com does not open up the payment UI
     return generateMerchantPaymentUrl({
       network: this.model.network,
-      merchantSafeID: this.model.merchantSafeID,
+      merchantSafeID: this.model.merchantSafe.address,
       currency: this.currency,
       amount: this.isValidAmount ? this.amount : 0,
     });
