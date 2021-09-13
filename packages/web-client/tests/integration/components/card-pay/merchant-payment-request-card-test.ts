@@ -7,6 +7,10 @@ import config from '@cardstack/web-client/config/environment';
 // selectors
 const BETA_ACCESS_LINK = '[data-test-payment-request-beta-access-link]';
 const MERCHANT = '[data-test-merchant]';
+const MERCHANT_INFO_ADDRESS_ONLY =
+  '[data-test-payment-request-merchant-address]';
+const MERCHANT_INFO_MISSING_MESSAGE =
+  '[data-test-payment-request-merchant-info-missing]';
 const MERCHANT_LOGO = '[data-test-merchant-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
 const USD_AMOUNT = '[data-test-payment-request-usd-amount]';
@@ -25,6 +29,7 @@ const merchant = {
   logoBackground: 'cornflowerblue',
   logoTextColor: 'black',
 };
+const merchantAddress = '0xE73604fC1724a50CEcBC1096d4229b81aF117c94';
 
 module(
   'Integration | Component | card-pay/merchant-payment-request-card',
@@ -37,10 +42,11 @@ module(
         usdAmount,
         paymentURL,
         merchant,
+        merchantAddress,
       });
     });
 
-    test('It renders the non-deep-link view correctly', async function (assert) {
+    test('It renders the non-deep-link view correctly with merchant display info', async function (assert) {
       await render(hbs`
         <CardPay::MerchantPaymentRequestCard
           @amount={{this.amount}}
@@ -115,6 +121,33 @@ module(
       assert.dom(DEEP_LINK).doesNotExist();
       assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', paymentURL);
       assert.dom(LINK_VIEW_TOGGLE).containsText('Show Payment Link');
+    });
+
+    test('It renders the correctly with merchant address and without merchant display info', async function (assert) {
+      await render(hbs`
+        <CardPay::MerchantPaymentRequestCard
+          @amount={{this.amount}}
+          @usdAmount={{this.usdAmount}}
+          @merchantAddress={{this.merchantAddress}}
+          @paymentURL={{this.paymentURL}}
+          @canDeepLink={{false}}
+        />
+      `);
+
+      assert
+        .dom(BETA_ACCESS_LINK)
+        .hasAttribute('href', config.urls.testFlightLink);
+      assert.dom(MERCHANT).doesNotExist();
+      assert.dom(MERCHANT_INFO_ADDRESS_ONLY).containsText(merchantAddress);
+      assert
+        .dom(MERCHANT_INFO_MISSING_MESSAGE)
+        .containsText(
+          'Unable to find merchant details for this address. Use caution when paying.'
+        );
+      assert.dom(AMOUNT).containsText(`§300`);
+      assert.dom(USD_AMOUNT).containsText(`$3.00 USD`);
+      assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', paymentURL);
+      assert.dom(PAYMENT_URL).containsText(paymentURL);
     });
   }
 );

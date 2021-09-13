@@ -13,6 +13,7 @@
   <Boxel::CardContainer
     class="payment-request__body"
   >
+  {{#if @merchant}}
     <CardPay::Merchant
       @name={{@merchant.name}}
       @logoBackground={{@merchant.logoBackground}}
@@ -20,6 +21,17 @@
       @size="large"
       @vertical={{true}}
     />
+  {{else if @merchantAddress}}
+    <div class="payment-request__address-only" data-test-payment-request-merchant-address>
+      <span class="payment-request__merchant-address">
+        {{@merchantAddress}}
+      </span>
+      <span class="payment-request__missing-info-message" data-test-payment-request-merchant-info-missing>
+        {{svg-jar "failure-bordered" class="payment-request__missing-info-message-icon" title="We were unable to find merchant details for this address. Use caution when paying."}}
+        Unable to find merchant details for this address. Use caution when paying.
+      </span>
+    </div>
+  {{/if}}
 
     {{#if @amount}}
       <div class="payment-request__amount" data-test-payment-request-amount>

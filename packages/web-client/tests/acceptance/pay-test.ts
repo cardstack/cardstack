@@ -16,6 +16,11 @@ import { Resolver } from 'did-resolver';
 
 // selectors
 const MERCHANT = '[data-test-merchant]';
+const MERCHANT_INFO_ADDRESS_ONLY =
+  '[data-test-payment-request-merchant-address]';
+const MERCHANT_INFO_MISSING_MESSAGE =
+  '[data-test-payment-request-merchant-info-missing]';
+const MERCHANT_MISSING_MESSAGE = '[data-test-merchant-missing]';
 const MERCHANT_LOGO = '[data-test-merchant-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
 const USD_AMOUNT = '[data-test-payment-request-usd-amount]';
@@ -25,7 +30,9 @@ const PAYMENT_URL = '[data-test-payment-request-url]';
 
 // fixed data
 const exampleDid = 'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
+const nonexistentMerchantId = 'nonexistentmerchant';
 const merchantSafeId = '0xE73604fC1724a50CEcBC1096d4229b81aF117c94';
+const merchantSafeIdWithoutInfo = '0xE73604fC1724a50CEcBC1096d4229b81aF117c85';
 const spendSymbol = 'SPD';
 const usdSymbol = 'USD';
 const invalidCurrencySymbol = 'WUT';
@@ -40,6 +47,13 @@ const merchantSafe: MerchantSafe = {
   owners: ['0xAE061aa45950Bf5b0B05458C3b7eE474C25B36a7'],
   infoDID: exampleDid,
 } as MerchantSafe;
+const merchantSafeWithoutInfo: MerchantSafe = {
+  type: 'merchant',
+  createdAt: Date.now() / 1000,
+  address: merchantSafeIdWithoutInfo,
+  owners: ['0xAE061aa45950Bf5b0B05458C3b7eE474C25B36a7'],
+  infoDID: undefined,
+} as MerchantSafe;
 const spendAmount = 300;
 const usdAmount = spendToUsd(spendAmount);
 
@@ -49,7 +63,14 @@ module('Acceptance | pay', function (hooks) {
 
   hooks.beforeEach(async function (this: MirageTestContext) {
     let safeViewer = this.owner.lookup('service:safe-viewer');
-    sinon.stub(safeViewer, 'view').returns(Promise.resolve(merchantSafe));
+    sinon
+      .stub(safeViewer, 'view')
+      .callsFake(async function (_network: string, address: string) {
+        if (address === merchantSafeId) return merchantSafe;
+        else if (address === merchantSafeIdWithoutInfo)
+          return merchantSafeWithoutInfo;
+        else return undefined;
+      });
 
     let resolver = new Resolver({ ...getResolver() });
     let resolvedDID = await resolver.resolve(exampleDid);
@@ -266,5 +287,46 @@ module('Acceptance | pay', function (hooks) {
       .containsText('Pay Merchant')
       .hasAttribute('href', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
+  });
+
+  test('it renders appropriate UI when merchant info is not fetched', async function (assert) {
+    await visit(
+      `/pay/${network}/${merchantSafeIdWithoutInfo}?amount=${spendAmount}&currency=${spendSymbol}`
+    );
+
+    assert.dom(MERCHANT).doesNotExist();
+    assert
+      .dom(MERCHANT_INFO_ADDRESS_ONLY)
+      .containsText(merchantSafeIdWithoutInfo);
+    assert
+      .dom(MERCHANT_INFO_MISSING_MESSAGE)
+      .containsText(
+        'Unable to find merchant details for this address. Use caution when paying.'
+      );
+    assert.dom(AMOUNT).containsText(`§${spendAmount}`);
+    assert
+      .dom(USD_AMOUNT)
+      .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
+
+    let expectedUrl = generateMerchantPaymentUrl({
+      network: network,
+      merchantSafeID: merchantSafeIdWithoutInfo,
+      currency: spendSymbol,
+      amount: spendAmount,
+    });
+    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
+  });
+
+  test('it renders appropriate UI when merchant safe is not fetched', async function (assert) {
+    await visit(
+      `/pay/${network}/${nonexistentMerchantId}?amount=${spendAmount}&currency=${spendSymbol}`
+    );
+
+    assert
+      .dom(MERCHANT_MISSING_MESSAGE)
+      .containsText(
+        'Oops, no Merchant found - please ask the merchant to confirm the payment link'
+      );
   });
 });

@@ -51,11 +51,18 @@
       </CardPay::HamburgerMenu>
     </div>
   </div>
-  <CardPay::MerchantPaymentRequestCard
-    @amount={{this.displayedAmounts.SPD}}
-    @usdAmount={{this.displayedAmounts.USD}}
-    @merchant={{@model.merchant}}
-    @paymentURL={{this.paymentURL}}
-    @canDeepLink={{this.canDeepLink}}
-  />
+  {{#if @model.merchantExists}}
+    <CardPay::MerchantPaymentRequestCard
+      @amount={{this.displayedAmounts.SPD}}
+      @usdAmount={{this.displayedAmounts.USD}}
+      @merchant={{@model.merchant}}
+      @merchantAddress={{@model.merchantSafeID}}
+      @paymentURL={{this.paymentURL}}
+      @canDeepLink={{this.canDeepLink}}
+    />
+  {{else}}
+    <div class="merchant-payment-request-page__merchant-missing-message" data-test-merchant-missing>
+      Oops, no Merchant found - please ask the merchant to confirm the payment link
+    </div>
+  {{/if}}
 </div>

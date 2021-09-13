@@ -48,6 +48,40 @@
   margin: var(--action-element-margin);
 }
 
+.payment-request__address-only {
+  display: flex;
+  flex-direction: column;
+  padding: var(--boxel-sp-xxs);
+  gap: var(--boxel-sp-xs);
+}
+
+.payment-request__merchant-address {
+  font-family: var(--boxel-monospace-font-family);
+  font-size: var(--boxel-font-size-lg);
+  line-height: calc(22 / 16);
+  letter-spacing: var(--boxel-lsp-sm);
+  max-width: 22ch;
+  word-break: break-all;
+}
+
+.payment-request__missing-info-message {
+  display: flex;
+  align-items: center;
+  gap: var(--boxel-sp-xs);
+  max-width: 40ch;
+  text-align: left;
+  border-top: 1px solid var(--boxel-light-400);
+  padding-top: var(--boxel-sp-xs);
+  font: var(--boxel-font-sm);
+  color: var(--boxel-purple-500);
+}
+
+.payment-request__missing-info-message-icon {
+  flex-shrink: 0;
+  width: var(--boxel-icon-sm);
+  height: var(--boxel-icon-sm);
+}
+
 .payment-request__amount {
   margin-top: var(--boxel-sp);
   font-weight: 700;
