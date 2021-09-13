@@ -120,13 +120,13 @@ const _tokenDisplayInfoMap: Record<TokenSymbol, DisplayInfo> = {
   },
 };
 
-export class TokenDisplayInfo implements DisplayInfo {
+export class TokenDisplayInfo<T extends TokenSymbol> implements DisplayInfo {
   name: string;
-  symbol: TokenSymbol;
+  symbol: T;
   description: string;
   icon: string;
 
-  constructor(symbol: TokenSymbol) {
+  constructor(symbol: T) {
     this.symbol = symbol;
     let displayInfo = _tokenDisplayInfoMap[symbol];
     this.name = displayInfo.name!;
@@ -151,10 +151,10 @@ export class TokenDisplayInfo implements DisplayInfo {
   }
 }
 
-export class TokenBalance implements DisplayInfo {
-  tokenDisplayInfo: TokenDisplayInfo;
+export class TokenBalance<T extends TokenSymbol> implements DisplayInfo {
+  tokenDisplayInfo: TokenDisplayInfo<T>;
   balance: BN;
-  constructor(symbol: TokenSymbol, balance: BN) {
+  constructor(symbol: T, balance: BN) {
     this.tokenDisplayInfo = new TokenDisplayInfo(symbol);
     this.balance = balance;
   }

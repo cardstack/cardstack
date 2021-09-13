@@ -4,8 +4,8 @@ import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import {
+  BridgeableSymbol,
   TokenDisplayInfo,
-  TokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import { reads } from 'macro-decorators';
 import { WalletProvider } from '@cardstack/web-client/utils/wallet-providers';
@@ -55,9 +55,9 @@ export default class CardPayWithdrawalWorkflowCheckBalanceComponent extends Comp
     return `Check ${this.layer1Network.nativeTokenSymbol} balance`;
   }
 
-  get nativeTokenDisplayInfo(): TokenDisplayInfo | undefined {
+  get nativeTokenDisplayInfo(): TokenDisplayInfo<BridgeableSymbol> | undefined {
     return new TokenDisplayInfo(
-      this.layer1Network.nativeTokenSymbol as TokenSymbol
+      this.layer1Network.nativeTokenSymbol as BridgeableSymbol
     );
   }
   get minimumBalanceForWithdrawalClaim() {

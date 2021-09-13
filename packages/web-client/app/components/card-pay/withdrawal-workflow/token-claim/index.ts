@@ -7,9 +7,9 @@ import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import BN from 'bn.js';
 
 import {
+  BridgeableSymbol,
   BridgedTokenSymbol,
   TokenDisplayInfo,
-  TokenSymbol,
   getUnbridgedSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
@@ -24,7 +24,7 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.walletProvider') declare walletProvider: WalletProvider;
   @reads('args.workflowSession.state.withdrawalToken')
-  declare tokenSymbol: TokenSymbol;
+  declare tokenSymbol: BridgeableSymbol;
 
   @tracked isConfirming = false;
   @tracked txnHash: string | undefined;
@@ -45,11 +45,11 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
     return new BN(this.args.workflowSession.state.withdrawnAmount);
   }
 
-  get tokenSymbolForConversion(): TokenSymbol {
+  get tokenSymbolForConversion(): BridgeableSymbol {
     return getUnbridgedSymbol(this.tokenSymbol as BridgedTokenSymbol);
   }
 
-  get tokenDetails(): TokenDisplayInfo | undefined {
+  get tokenDetails(): TokenDisplayInfo<BridgeableSymbol> | undefined {
     if (this.tokenSymbol) {
       return new TokenDisplayInfo(this.tokenSymbol);
     } else {

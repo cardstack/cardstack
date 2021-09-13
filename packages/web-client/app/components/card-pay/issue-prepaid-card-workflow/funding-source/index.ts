@@ -5,17 +5,20 @@ import { inject as service } from '@ember/service';
 import BN from 'bn.js';
 
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import { TokenBalance, TokenSymbol } from '@cardstack/web-client/utils/token';
+import {
+  TokenBalance,
+  BridgedTokenSymbol,
+} from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 
 class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
-  defaultTokenSymbol: TokenSymbol = 'DAI.CPXD';
+  defaultTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
   tokenOptions = [this.defaultTokenSymbol];
   @service declare layer2Network: Layer2Network;
-  @tracked selectedTokenSymbol: TokenSymbol =
+  @tracked selectedTokenSymbol: BridgedTokenSymbol =
     this.args.workflowSession.state.prepaidFundingToken ??
     this.defaultTokenSymbol;
-  @tracked selectedToken: TokenBalance;
+  @tracked selectedToken: TokenBalance<BridgedTokenSymbol>;
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
@@ -35,7 +38,7 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
     });
   }
 
-  getTokenBalance(symbol: TokenSymbol) {
+  getTokenBalance(symbol: BridgedTokenSymbol) {
     if (symbol === this.defaultTokenSymbol) {
       return this.layer2Network.defaultTokenBalance ?? new BN('0');
     }
@@ -51,7 +54,7 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
     );
   }
 
-  @action chooseSource(token: TokenBalance) {
+  @action chooseSource(token: TokenBalance<BridgedTokenSymbol>) {
     this.selectedToken = token;
   }
 

@@ -39,7 +39,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
     return this.args.workflowSession.state.withdrawalToken;
   }
 
-  get currentTokenDetails(): TokenDisplayInfo | undefined {
+  get currentTokenDetails(): TokenDisplayInfo<BridgedTokenSymbol> | undefined {
     if (this.currentTokenSymbol) {
       return new TokenDisplayInfo(this.currentTokenSymbol);
     } else {
