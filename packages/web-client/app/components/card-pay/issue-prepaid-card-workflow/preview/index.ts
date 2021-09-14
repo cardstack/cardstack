@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
-import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
+import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import {
   task,
   TaskGenerator,

@@ -1,7 +1,7 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import { Participant } from '../../../../app/models/workflow/workflow-postable';
 import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
+import { Participant } from '@cardstack/web-client/models/workflow/workflow-postable';
 
 module('Unit | WorkflowMessage model', function (hooks) {
   setupTest(hooks);

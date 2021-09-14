@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import { next } from '@ember/runloop';
 import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';

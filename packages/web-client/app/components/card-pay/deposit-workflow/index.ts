@@ -1,15 +1,15 @@
 import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
-import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
-import NetworkAwareWorkflowMessage from '@cardstack/web-client/components/workflow-thread/network-aware-message';
 import {
-  Workflow,
   cardbot,
+  Workflow,
+  Milestone,
+  NetworkAwareWorkflowMessage,
+  PostableCollection,
   WorkflowName,
+  WorkflowMessage,
+  WorkflowCard,
 } from '@cardstack/web-client/models/workflow';
-import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
-import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
-import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { inject as service } from '@ember/service';

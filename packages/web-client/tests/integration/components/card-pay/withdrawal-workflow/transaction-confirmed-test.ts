@@ -7,7 +7,7 @@ import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import BN from 'bn.js';
 
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
-import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
+import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 
 module(
   'Integration | Component | card-pay/withdrawal-workflow/transaction-confirmed',

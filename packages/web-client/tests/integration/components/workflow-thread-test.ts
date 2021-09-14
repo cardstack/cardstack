@@ -2,12 +2,14 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, settled, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { Workflow } from '@cardstack/web-client/models/workflow';
-import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
-import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
-import { WorkflowPostable } from '@cardstack/web-client/models/workflow/workflow-postable';
-import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
-import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
+import {
+  Milestone,
+  PostableCollection,
+  Workflow,
+  WorkflowMessage,
+  WorkflowPostable,
+  WorkflowCard,
+} from '@cardstack/web-client/models/workflow';
 
 module('Integration | Component | workflow-thread', function (hooks) {
   setupRenderingTest(hooks);

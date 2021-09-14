@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
+import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 import sinon from 'sinon';

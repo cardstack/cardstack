@@ -4,7 +4,7 @@ import { render, fillIn, typeIn, click } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
-import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
+import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import BN from 'bn.js';
 import { toWei } from 'web3-utils';
 import sinon from 'sinon';

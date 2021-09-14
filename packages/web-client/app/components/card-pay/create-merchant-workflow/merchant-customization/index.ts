@@ -4,7 +4,7 @@ import { tracked } from '@glimmer/tracking';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import MerchantInfoService from '@cardstack/web-client/services/merchant-info';
 import { inject as service } from '@ember/service';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import { didCancel, restartableTask, timeout } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { mostReadable, random as randomColor } from '@ctrl/tinycolor';

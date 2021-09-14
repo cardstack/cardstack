@@ -1,5 +1,5 @@
 import { helper } from '@ember/component/helper';
-import { WorkflowPostable } from '../models/workflow/workflow-postable';
+import { WorkflowPostable } from '../models/workflow';
 
 function isPostableOnNewDay([postable]: [WorkflowPostable]) {
   if (!postable) {

@@ -9,7 +9,7 @@ import {
   TokenDisplayInfo,
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 
 class CardPayDepositWorkflowConfirmationComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;

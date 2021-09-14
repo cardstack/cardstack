@@ -1,7 +1,5 @@
-import { Workflow } from './workflow';
+import { Milestone, PostableCollection, Workflow } from './workflow';
 import { reads } from 'macro-decorators';
-import { Milestone } from './workflow/milestone';
-import PostableCollection from './workflow/postable-collection';
 import { WorkflowPostable } from './workflow/workflow-postable';
 import { tracked } from '@glimmer/tracking';
 import { taskFor } from 'ember-concurrency-ts';

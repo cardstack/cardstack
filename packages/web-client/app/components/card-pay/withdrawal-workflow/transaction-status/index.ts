@@ -5,7 +5,7 @@ import BN from 'bn.js';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
 import * as Sentry from '@sentry/browser';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';

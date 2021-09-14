@@ -1,11 +1,9 @@
 import {
   CheckResult,
   WorkflowCard,
-} from '@cardstack/web-client/models/workflow/workflow-card';
-import {
   Participant,
   WorkflowPostable,
-} from '@cardstack/web-client/models/workflow/workflow-postable';
+} from '@cardstack/web-client/models/workflow';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer1-network';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';

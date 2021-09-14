@@ -13,7 +13,7 @@ import {
   getUnbridgedSymbol,
   bridgedSymbols,
 } from '@cardstack/web-client/utils/token';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import {
   shouldUseTokenInput,
   validateTokenInput,

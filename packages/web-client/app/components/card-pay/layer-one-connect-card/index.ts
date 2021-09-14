@@ -13,7 +13,7 @@ import walletProviders from '@cardstack/web-client/utils/wallet-providers';
 import cardstackLogo from '@cardstack/web-client/images/icons/cardstack-logo-navy-rounded.svg';
 import connectionSymbol from '@cardstack/web-client/images/icons/connection-symbol.svg';
 import { WalletProvider } from '@cardstack/web-client/utils/wallet-providers';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 
 interface CardPayDepositWorkflowConnectLayer1ComponentArgs
   extends WorkflowCardComponentArgs {

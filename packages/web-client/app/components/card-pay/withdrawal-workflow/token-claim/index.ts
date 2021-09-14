@@ -12,7 +12,7 @@ import {
   TokenDisplayInfo,
   getUnbridgedSymbol,
 } from '@cardstack/web-client/utils/token';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import { BridgeValidationResult } from '../../../../../../cardpay-sdk/sdk/token-bridge-home-side';
 import { taskFor } from 'ember-concurrency-ts';
 import walletProviders, {

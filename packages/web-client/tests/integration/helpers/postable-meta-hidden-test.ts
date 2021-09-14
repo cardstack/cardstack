@@ -2,8 +2,10 @@ import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
 import { render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
-import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
-import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
+import {
+  WorkflowCard,
+  WorkflowMessage,
+} from '@cardstack/web-client/models/workflow';
 
 module('Integration | Helper | postable-meta-hidden', function (hooks) {
   setupRenderingTest(hooks);
