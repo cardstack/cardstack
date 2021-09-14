@@ -1,4 +1,4 @@
-import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
+import { isPresent } from '@ember/utils';
 import { tracked } from '@glimmer/tracking';
 
 export interface ArbitraryDictionary {
@@ -7,23 +7,15 @@ export interface ArbitraryDictionary {
 
 export default class WorkflowSession {
   workflow: any;
-  workflowPersistenceStorage: WorkflowPersistence | undefined;
 
   constructor(workflow?: any) {
     this.workflow = workflow;
-
-    // Allow WorkflowSession to be instantiated as a POJO (for unit tests)
-    if (this.workflow && typeof this.workflow.owner.lookup === 'function') {
-      this.workflowPersistenceStorage = this.workflow.owner.lookup(
-        'service:workflow-persistence'
-      );
-    }
   }
 
   @tracked state: ArbitraryDictionary = {};
 
   get hasPersistence() {
-    return !!this.workflow?.workflowPersistenceId;
+    return isPresent(this.workflow?.workflowPersistenceId);
   }
 
   update(key: string, val: any) {
@@ -63,7 +55,7 @@ export default class WorkflowSession {
   }
 
   getPersistedData(): any {
-    return this.workflowPersistenceStorage?.getPersistedData(
+    return this.workflow?.workflowPersistence.getPersistedData(
       this.workflow.workflowPersistenceId
     );
   }
@@ -71,7 +63,7 @@ export default class WorkflowSession {
   private persistToStorage(): void {
     if (!this.hasPersistence) return;
 
-    this.workflowPersistenceStorage?.persistData(
+    this.workflow?.workflowPersistence.persistData(
       this.workflow.workflowPersistenceId,
       { name: this.workflow.name, state: this.state }
     );

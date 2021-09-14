@@ -35,7 +35,7 @@ module('Unit | WorkflowPostable model', function (hooks) {
   });
 
   test('setWorkflow does exactly that', function (assert) {
-    let workflow = new ConcreteWorkflow({});
+    let workflow = new ConcreteWorkflow(this.owner);
     let subject = new WorkflowPostable(participant);
     subject.setWorkflow(workflow);
     assert.strictEqual(subject.workflow, workflow);

@@ -5,6 +5,7 @@ import WorkflowSession from './workflow/workflow-session';
 import { tracked } from '@glimmer/tracking';
 import { SimpleEmitter } from '../utils/events';
 import { next } from '@ember/runloop';
+import WorkflowPersistence from '@cardstack/web-client/app/services/workflow-persistence';
 
 interface PostableIndices {
   isInMilestone: boolean;
@@ -31,10 +32,13 @@ export abstract class Workflow {
   simpleEmitter = new SimpleEmitter();
   isRestored = false;
   workflowDisplayNames = WORKFLOW_NAMES;
+  workflowPersistence: WorkflowPersistence;
+  workflowPersistenceId?: string;
 
   constructor(owner: any) {
     this.owner = owner;
     this.session = new WorkflowSession(this);
+    this.workflowPersistence = owner.lookup('service:workflow-persistence');
   }
 
   attachWorkflow() {
