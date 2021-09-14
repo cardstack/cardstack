@@ -4,9 +4,10 @@
 
   max-width: 720px;
   padding: 0 var(--horizontal-padding);
+  color: var(--boxel-dark);
 }
 
-@media only screen and (max-width: 360px) {
+@media only screen and (max-width: 480px) {
   .merchant-payment-request-card {
     --horizontal-padding: var(--boxel-sp-lg);
     --section-vertical-padding: var(--boxel-sp-lg);

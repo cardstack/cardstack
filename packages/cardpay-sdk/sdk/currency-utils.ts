@@ -289,6 +289,17 @@ export const spendToUsd = (amountInSpend: number): number | undefined => {
   return amountInSpend * SPEND_TO_USD_RATE;
 };
 
+export const usdToSpend = (amountInUsd: number): number | undefined => {
+  if ((amountInUsd as unknown) === '') {
+    return 0;
+  }
+  if (typeof (amountInUsd as unknown) !== 'number') {
+    return undefined;
+  }
+
+  return amountInUsd / SPEND_TO_USD_RATE;
+};
+
 export interface FormatUsdOptions {
   symbol: string | false;
   suffix: string | false;

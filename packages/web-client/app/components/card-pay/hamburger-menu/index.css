@@ -1,3 +1,7 @@
+.hamburger-menu {
+  --hamburger-menu-padding: var(--boxel-sp);
+}
+
 .hamburger-menu__wrapping-nav {
   position: fixed;
   top: 0;
@@ -22,14 +26,6 @@
   appearance: none;
   background-color: transparent;
   border: none;
-}
-
-.hamburger-menu__header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-basis: auto;
-  padding: var(--boxel-sp) var(--boxel-sp);
 }
 
 .hamburger-menu__list {

@@ -1,4 +1,4 @@
-<div ...attributes>
+<div class="hamburger-menu" ...attributes>
   <button
     type="button"
     class="hamburger-menu__trigger"
@@ -10,12 +10,19 @@
 
   {{#if @open}}
     <nav class="hamburger-menu__wrapping-nav">
-      <div class="hamburger-menu__header-container">
-        {{yield to="header"}}
+      <Boxel::OrgHeader
+        @iconURL={{@headerIconURL}}
+        @title={{@headerTitle}}
+        style={{css-var
+          boxel-org-header-logo-size="var(--hamburger-menu-logo-size)"
+          boxel-org-header-logo-position="var(--hamburger-menu-logo-position)"
+          boxel-org-header-padding="var(--hamburger-menu-padding)"
+        }}
+      >
         <button type="button" class="hamburger-menu__trigger hamburger-menu__trigger--close" {{on "click" (optional @onClose)}}>
           {{svg-jar "close-thick" width="14" height="14"}}
         </button>
-      </div>
+      </Boxel::OrgHeader>
       <ul class="hamburger-menu__list">
         {{yield (component "card-pay/hamburger-menu/item") to="body"}}
       </ul>

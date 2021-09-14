@@ -12,7 +12,19 @@ interface Args {
   };
 }
 
-export class MerchantInfo extends Resource<Args> {
+export interface MerchantInfoResource {
+  id: string | undefined;
+  name: string | undefined;
+  backgroundColor: string | undefined;
+  textColor: string | undefined;
+  loading: boolean;
+  errored: Error | undefined;
+}
+
+export class MerchantInfo
+  extends Resource<Args>
+  implements MerchantInfoResource
+{
   @tracked id: string | undefined;
   @tracked name: string | undefined;
   @tracked backgroundColor: string | undefined;

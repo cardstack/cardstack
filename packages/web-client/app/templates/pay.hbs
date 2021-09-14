@@ -1,0 +1,13 @@
+{{page-title (concat "Pay Merchant: " (or this.merchantInfo.name @model.merchantSafe.address)) replace=true}}
+
+<div class="merchant-payment-request-page">
+  <CardPay::MerchantPaymentRequestHeader/>
+  <CardPay::MerchantPaymentRequestCard
+    @amount={{this.displayedAmounts.SPD}}
+    @usdAmount={{this.displayedAmounts.USD}}
+    @merchant={{this.merchantInfo}}
+    @merchantAddress={{@model.merchantSafe.address}}
+    @paymentURL={{this.paymentURL}}
+    @canDeepLink={{this.canDeepLink}}
+  />
+</div>
