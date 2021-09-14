@@ -134,18 +134,6 @@ export class TokenDisplayInfo<T extends TokenSymbol> implements DisplayInfo {
     this.icon = displayInfo.icon;
   }
 
-  static isRecognizedSymbol(value: string): value is TokenSymbol {
-    return ['DAI', 'CARD', 'ETH'].includes(value);
-  }
-
-  static nameFor(symbol: TokenSymbol) {
-    return _tokenDisplayInfoMap[symbol].name;
-  }
-
-  static descriptionFor(symbol: TokenSymbol) {
-    return _tokenDisplayInfoMap[symbol].description;
-  }
-
   static iconFor(symbol: TokenSymbol) {
     return _tokenDisplayInfoMap[symbol].icon;
   }
