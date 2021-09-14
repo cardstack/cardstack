@@ -23,8 +23,6 @@ import {
   TransactionHash,
   Layer2NetworkSymbol,
   Layer2ChainEvent,
-  IssuePrepaidCardOptions,
-  RegisterMerchantOptions,
 } from './types';
 import {
   networkIds,
@@ -38,6 +36,7 @@ import {
   ISafes,
   PrepaidCardSafe,
   ILayerTwoOracle,
+  TransactionOptions,
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
@@ -193,7 +192,6 @@ export default abstract class Layer2ChainWeb3Strategy
 
     yield this.provider.enable();
   }
-
   private getTokenContractInfo(
     symbol: ConvertibleSymbol,
     network: Layer2NetworkSymbol
@@ -244,7 +242,7 @@ export default abstract class Layer2ChainWeb3Strategy
     safeAddress: string,
     amount: number,
     customizationDid: string,
-    options: IssuePrepaidCardOptions
+    options: TransactionOptions
   ): Promise<PrepaidCardSafe> {
     const PrepaidCard = await getSDK('PrepaidCard', this.web3);
 
@@ -254,9 +252,17 @@ export default abstract class Layer2ChainWeb3Strategy
       [amount],
       undefined,
       customizationDid,
-      { onTxnHash: options.onTxnHash }
+      options
     );
 
+    return result.prepaidCards[0];
+  }
+
+  async resumeIssuePrepaidCardTransaction(
+    txnHash: string
+  ): Promise<PrepaidCardSafe> {
+    const PrepaidCard = await getSDK('PrepaidCard', this.web3);
+    let result = await PrepaidCard.create(txnHash);
     return result.prepaidCards[0];
   }
 
@@ -268,14 +274,12 @@ export default abstract class Layer2ChainWeb3Strategy
   async registerMerchant(
     prepaidCardAddress: string,
     infoDid: string,
-    options: RegisterMerchantOptions
+    options: TransactionOptions
   ): Promise<MerchantSafe> {
     const RevenuePool = await getSDK('RevenuePool', this.web3);
 
     return (
-      await RevenuePool.registerMerchant(prepaidCardAddress, infoDid, {
-        onTxnHash: options.onTxnHash,
-      })
+      await RevenuePool.registerMerchant(prepaidCardAddress, infoDid, options)
     ).merchantSafe;
   }
 

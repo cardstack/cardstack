@@ -6,7 +6,7 @@
         <CardPay::DashboardPanel::Section @section={{section}}>
           <:cta>
             <Boxel::Button
-              {{on "click" (set this "flow" section.workflow)}}
+              {{on "click" (fn this.transitionToBalances section.workflow)}}
               @kind="primary"
               @size="touch"
               @disabled={{section.isCtaDisabled}}
@@ -38,10 +38,11 @@
 
             {{#let @model.panel.sections.lastObject as |section|}}
               <Boxel::Button
-                {{on "click" (set this "flow" section.workflow)}}
+                {{on "click" (fn this.transitionToBalances section.workflow)}}
                 @kind="secondary-dark"
                 @size="small"
                 @disabled={{section.isCtaDisabled}}
+                @route="card-pay.balances"
                 data-test-workflow-button={{section.workflow}}
               >
                 <span>{{section.cta}}</span>
@@ -66,7 +67,7 @@
 <Boxel::Modal
   style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
   @isOpen={{eq this.flow 'issue-prepaid-card'}}
-  @onClose={{set this "flow" null}}
+  @onClose={{this.resetQueryParams}}
 >
   {{#if (is-network-initialized)}}
     <CardPay::IssuePrepaidCardWorkflow />

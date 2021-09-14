@@ -57,6 +57,13 @@ class AnimatedMilestone {
   get isComplete(): boolean {
     return this.postableCollection.isComplete && this.isCompletionRevealed;
   }
+
+  syncRevealPointerToModel() {
+    let revealedLastPostable =
+      this.postableCollection.syncRevealPointerToModel();
+    this.isCompletionRevealed = this.model.isComplete;
+    return revealedLastPostable;
+  }
 }
 
 class AnimatedPostableCollection {
@@ -122,6 +129,16 @@ class AnimatedPostableCollection {
       : -1;
     return index === postables.length - 1;
   }
+
+  syncRevealPointerToModel() {
+    let completedPostables = this.model.visiblePostables;
+    if (completedPostables.length) {
+      this.revealPointer = completedPostables[completedPostables.length - 1];
+      return !completedPostables[completedPostables.length - 1].isComplete;
+    }
+
+    return true;
+  }
 }
 
 export default class AnimatedWorkflow {
@@ -148,13 +165,17 @@ export default class AnimatedWorkflow {
       model.cancelationMessages
     );
     this.milestones = model.milestones.map((m) => new AnimatedMilestone(m));
+    if (model.isRestored) {
+      this.syncRevealPointerToModel();
+    }
     taskFor(this.tickerTask).perform();
   }
-  @reads('model.name') declare name: string;
+
+  @reads('model.displayName') declare displayName: string;
 
   @task
   *tickerTask() {
-    this.startTestWaiter();
+    if (!this.model.isRestored) this.startTestWaiter();
     // short timeout to prevent moving revealpointer within the same runloop
     yield rawTimeout(10);
 
@@ -241,6 +262,18 @@ export default class AnimatedWorkflow {
     let { completedMilestones } = this;
     let lastMilestone = completedMilestones[completedMilestones.length - 1];
     return lastMilestone?.completedDetail ?? 'Workflow started';
+  }
+
+  syncRevealPointerToModel() {
+    for (let collection of [
+      ...this.milestones,
+      this.epilogue,
+      this.cancelationMessages,
+    ]) {
+      if (collection.syncRevealPointerToModel()) {
+        return;
+      }
+    }
   }
 
   resetPointerTo(card: WorkflowPostable) {

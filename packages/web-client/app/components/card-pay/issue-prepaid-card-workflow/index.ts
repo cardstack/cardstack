@@ -2,27 +2,39 @@ import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import { inject as service } from '@ember/service';
 import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
-import { Workflow, cardbot } from '@cardstack/web-client/models/workflow';
+import {
+  Workflow,
+  cardbot,
+  WorkflowName,
+} from '@cardstack/web-client/models/workflow';
 import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
 import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
 import NetworkAwareWorkflowCard from '@cardstack/web-client/components/workflow-thread/network-aware-card';
 import NetworkAwareWorkflowMessage from '@cardstack/web-client/components/workflow-thread/network-aware-message';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { action } from '@ember/object';
 import BN from 'bn.js';
-
+import RouterService from '@ember/routing/router-service';
 import { faceValueOptions } from './workflow-config';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
+import { next } from '@ember/runloop';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   INSUFFICIENT_FUNDS: 'INSUFFICIENT_FUNDS',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
+  RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
+  RESTORATION_L2_ADDRESS_CHANGED: 'RESTORATION_L2_ADDRESS_CHANGED',
+  RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
 } as const;
 
 class IssuePrepaidCardWorkflow extends Workflow {
-  name = 'Prepaid Card Issuance';
+  workflowPersistenceId: string;
+  name = 'PREPAID_CARD_ISSUANCE' as WorkflowName;
+
   milestones = [
     new Milestone({
       title: `Connect ${c.layer2.fullName} wallet`,
@@ -59,6 +71,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'LAYER2_CONNECT',
           componentName: 'card-pay/layer-two-connect-card',
           async check() {
             let layer2Network = this.workflow?.owner.lookup(
@@ -101,6 +114,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
           },
         }),
         new NetworkAwareWorkflowCard({
+          cardName: 'HUB_AUTH',
           author: cardbot,
           componentName: 'card-pay/hub-authentication',
           includeIf(this: NetworkAwareWorkflowCard) {
@@ -113,6 +127,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
             'Let’s get started! First, you can choose the look and feel of your card, so that your customers and other users recognize that this prepaid card came from you.',
         }),
         new WorkflowCard({
+          cardName: 'LAYOUT_CUSTOMIZATION',
           author: cardbot,
           componentName:
             'card-pay/issue-prepaid-card-workflow/layout-customization',
@@ -132,6 +147,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
           message: `On to the next step: How do you want to fund your prepaid card? Please select a depot and balance from your ${c.layer2.fullName} wallet.`,
         }),
         new WorkflowCard({
+          cardName: 'FUNDING_SOURCE',
           author: cardbot,
           componentName: 'card-pay/issue-prepaid-card-workflow/funding-source',
         }),
@@ -142,6 +158,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
             After you have created your card, you can split it up into multiple cards with smaller balances to transfer to your customers.`,
         }),
         new WorkflowCard({
+          cardName: 'FACE_VALUE',
           author: cardbot,
           componentName: 'card-pay/issue-prepaid-card-workflow/face-value',
         }),
@@ -157,6 +174,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
             Now, we just need your confirmation to create the card.`,
         }),
         new WorkflowCard({
+          cardName: 'PREVIEW',
           author: cardbot,
           componentName: 'card-pay/issue-prepaid-card-workflow/preview',
         }),
@@ -170,6 +188,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       message: `Congratulations, you have created a prepaid card! This prepaid card has been added to your ${c.layer2.fullName} wallet.`,
     }),
     new WorkflowCard({
+      cardName: 'CONFIRMATION',
       author: cardbot,
       componentName: 'card-pay/issue-prepaid-card-workflow/confirmation',
     }),
@@ -178,10 +197,12 @@ class IssuePrepaidCardWorkflow extends Workflow {
       message: `This is the remaining balance in your ${c.layer2.fullName} wallet:`,
     }),
     new WorkflowCard({
+      cardName: 'EPILOGUE_LAYER_TWO_CONNECT_CARD',
       author: cardbot,
       componentName: 'card-pay/layer-two-connect-card',
     }),
     new WorkflowCard({
+      cardName: 'EPILOGUE_NEXT_STEPS',
       author: cardbot,
       componentName: 'card-pay/issue-prepaid-card-workflow/next-steps',
     }),
@@ -248,21 +269,124 @@ class IssuePrepaidCardWorkflow extends Workflow {
         );
       },
     }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but you are no longer authenticated. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_UNAUTHENTICATED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but you changed your Card wallet adress. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but your Card wallet got disconnected. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L2_DISCONNECTED
+        );
+      },
+    }),
+    new WorkflowCard({
+      author: cardbot,
+      componentName: 'workflow-thread/default-cancelation-cta',
+      includeIf() {
+        return (
+          [
+            FAILURE_REASONS.RESTORATION_UNAUTHENTICATED,
+            FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED,
+            FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
+          ] as String[]
+        ).includes(String(this.workflow?.cancelationReason));
+      },
+    }),
   ]);
 
-  constructor(owner: unknown) {
+  constructor(owner: unknown, workflowPersistenceId: string) {
     super(owner);
+    this.workflowPersistenceId = workflowPersistenceId;
+
     this.attachWorkflow();
+  }
+
+  restorationErrors(persistedState: any) {
+    let layer2Network = this.owner.lookup(
+      'service:layer2-network'
+    ) as Layer2Network;
+
+    let hubAuthentication = this.owner.lookup(
+      'service:hub-authentication'
+    ) as HubAuthentication;
+
+    let errors = [];
+
+    if (!hubAuthentication.isAuthenticated) {
+      errors.push(FAILURE_REASONS.RESTORATION_UNAUTHENTICATED);
+    }
+
+    if (!layer2Network.isConnected) {
+      errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
+    }
+
+    if (
+      layer2Network.isConnected &&
+      persistedState.layer2WalletAddress &&
+      layer2Network.walletInfo.firstAddress !==
+        persistedState.layer2WalletAddress
+    ) {
+      errors.push(FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED);
+    }
+
+    return errors;
   }
 }
 
 class IssuePrepaidCardWorkflowComponent extends Component {
   @service declare layer2Network: Layer2Network;
+  @service declare workflowPersistence: WorkflowPersistence;
+  @service declare router: RouterService;
 
   workflow!: IssuePrepaidCardWorkflow;
+
   constructor(owner: unknown, args: {}) {
     super(owner, args);
-    this.workflow = new IssuePrepaidCardWorkflow(getOwner(this));
+
+    const workflow = new IssuePrepaidCardWorkflow(
+      getOwner(this),
+      this.router.currentRoute.queryParams['flow-id']!
+    );
+
+    const persistedState = workflow.session.getPersistedData()?.state ?? {};
+    const willRestore = Object.keys(persistedState).length > 0;
+
+    if (willRestore) {
+      const errors = workflow.restorationErrors(persistedState);
+
+      if (errors.length > 0) {
+        next(this, () => {
+          workflow.cancel(errors[0]);
+        });
+      } else {
+        workflow.restoreFromPersistedWorkflow();
+      }
+    }
+
+    this.workflow = workflow;
   }
 
   @action onDisconnect() {

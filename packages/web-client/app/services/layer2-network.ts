@@ -5,12 +5,11 @@ import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { useResource } from 'ember-resources';
 import {
-  IssuePrepaidCardOptions,
   Layer2ChainEvent,
   Layer2Web3Strategy,
-  RegisterMerchantOptions,
   TransactionHash,
 } from '../utils/web3-strategies/types';
+import { PrepaidCardSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
 import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
 import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
@@ -33,6 +32,7 @@ import { action } from '@ember/object';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { taskFor } from 'ember-concurrency-ts';
 import { UsdConvertibleSymbol } from './token-to-usd';
+import { TransactionOptions } from '@cardstack/cardpay-sdk';
 export default class Layer2Network
   extends Service
   implements Emitter<Layer2ChainEvent>
@@ -117,9 +117,9 @@ export default class Layer2Network
   @task *issuePrepaidCardTask(
     faceValue: number,
     customizationDid: string,
-    options: IssuePrepaidCardOptions
+    options: TransactionOptions
   ): any {
-    let address = yield this.strategy.issuePrepaidCard(
+    let prepaidCardSafe = yield this.strategy.issuePrepaidCard(
       this.depotSafe?.address!,
       faceValue,
       customizationDid,
@@ -129,7 +129,18 @@ export default class Layer2Network
     // Refreshes safes so that external component shows up-to-date list of the user's prepaid cards
     this.refreshSafesAndBalances();
 
-    return address;
+    return prepaidCardSafe;
+  }
+
+  @task *resumeIssuePrepaidCardTransactionTask(
+    txnHash: string
+  ): TaskGenerator<PrepaidCardSafe> {
+    let prepaidCardSafe = yield this.strategy.resumeIssuePrepaidCardTransaction(
+      txnHash
+    );
+    // Refreshes safes so that external component shows up-to-date list of the user's prepaid cards
+    this.refreshSafesAndBalances();
+    return prepaidCardSafe;
   }
 
   @task *fetchMerchantRegistrationFeeTask(): TaskGenerator<number> {
@@ -139,7 +150,7 @@ export default class Layer2Network
   @task *registerMerchantTask(
     prepaidCardAddress: string,
     infoDid: string,
-    options: RegisterMerchantOptions
+    options: TransactionOptions
   ): any {
     let merchant = yield this.strategy.registerMerchant(
       prepaidCardAddress,

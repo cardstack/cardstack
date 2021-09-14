@@ -4,6 +4,8 @@ import { WorkflowPostable } from './workflow/workflow-postable';
 import WorkflowSession from './workflow/workflow-session';
 import { tracked } from '@glimmer/tracking';
 import { SimpleEmitter } from '../utils/events';
+import { next } from '@ember/runloop';
+import WorkflowPersistence from '@cardstack/web-client/app/services/workflow-persistence';
 
 interface PostableIndices {
   isInMilestone: boolean;
@@ -12,25 +14,41 @@ interface PostableIndices {
   collectionIndex: number;
 }
 
+export type WorkflowName =
+  | 'PREPAID_CARD_ISSUANCE'
+  | 'RESERVE_POOL_DEPOSIT'
+  | 'WITHDRAWAL'
+  | 'MERCHANT_CREATION';
+
 export abstract class Workflow {
-  name!: string;
+  name!: WorkflowName;
   milestones: Milestone[] = [];
   epilogue: PostableCollection = new PostableCollection();
   cancelationMessages: PostableCollection = new PostableCollection();
   @tracked isCanceled = false;
   @tracked cancelationReason: null | string = null;
-  session: WorkflowSession = new WorkflowSession();
+  session: WorkflowSession;
   owner: any;
   simpleEmitter = new SimpleEmitter();
+  isRestored = false;
+  workflowDisplayNames = WORKFLOW_NAMES;
+  workflowPersistence: WorkflowPersistence;
+  workflowPersistenceId?: string;
 
   constructor(owner: any) {
     this.owner = owner;
+    this.session = new WorkflowSession(this);
+    this.workflowPersistence = owner.lookup('service:workflow-persistence');
   }
 
   attachWorkflow() {
     this.milestones.invoke('setWorkflow', this);
     this.epilogue.setWorkflow(this);
     this.cancelationMessages.setWorkflow(this);
+  }
+
+  get displayName() {
+    return WORKFLOW_NAMES[this.name];
   }
 
   get completedMilestones() {
@@ -67,10 +85,17 @@ export abstract class Workflow {
   }
 
   cancel(reason?: string) {
+    const cancelationReason = reason || 'UNKNOWN';
+
+    this.session.updateMany({
+      isCancelled: true,
+      cancelationReason: cancelationReason,
+    });
+
     if (!this.isComplete && !this.isCanceled) {
       // visible-postables-will-change starts test waiters in animated-workflow.ts
       this.emit('visible-postables-will-change');
-      this.cancelationReason = reason || 'UNKNOWN';
+      this.cancelationReason = cancelationReason;
       this.isCanceled = true;
     }
   }
@@ -143,6 +168,43 @@ export abstract class Workflow {
   emit(event: string, ...args: any[]) {
     this.simpleEmitter.emit(event, ...args);
   }
+
+  restoreFromPersistedWorkflow() {
+    this.session.restoreFromStorage();
+
+    const [lastCompletedCardName] = (
+      this.session.state.completedCardNames || []
+    ).slice(-1);
+
+    if (lastCompletedCardName) {
+      this.isRestored = true;
+      const postables = this.milestones
+        .flatMap((m: Milestone) => m.postableCollection.postables)
+        .concat(this.epilogue.postables);
+
+      const index = postables.mapBy('cardName').indexOf(lastCompletedCardName);
+
+      postables.slice(0, index + 1).forEach((postable: WorkflowPostable) => {
+        postable.isComplete = true;
+      });
+    }
+
+    if (
+      this.session.state.isCancelled &&
+      this.session.state.cancelationReason
+    ) {
+      next(this, () => {
+        this.cancel(this.session.state.cancelationReason);
+      });
+    }
+  }
 }
 
 export let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
+
+export const WORKFLOW_NAMES = {
+  PREPAID_CARD_ISSUANCE: 'Prepaid Card Issuance',
+  MERCHANT_CREATION: 'Merchant Creation',
+  RESERVE_POOL_DEPOSIT: 'Reserve Pool Deposit',
+  WITHDRAWAL: 'Withdrawal',
+};

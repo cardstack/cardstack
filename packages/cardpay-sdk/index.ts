@@ -17,7 +17,7 @@ export { IHubAuth } from './sdk/hub-auth';
 
 export { getAddress, getAddressByNetwork, getOracle, getOracleByNetwork, AddressKeys } from './contracts/addresses';
 export { getConstant, getConstantByNetwork, networks, networkIds } from './sdk/constants';
-export { waitUntilBlock } from './sdk/utils/general-utils';
+export { waitUntilBlock, TransactionOptions } from './sdk/utils/general-utils';
 export * from './sdk/currency-utils';
 export { validateMerchantId, generateMerchantPaymentUrl, isValidMerchantPaymentUrl } from './sdk/utils/merchant';
 export { getSDK } from './sdk/version-resolver';

@@ -63,6 +63,10 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
     if (this.isConnected) {
       this.args.onConnect?.();
+      this.args.workflowSession.update(
+        'layer2WalletAddress',
+        this.layer2Network.walletInfo.firstAddress
+      );
       this.args.onComplete?.();
     }
   }

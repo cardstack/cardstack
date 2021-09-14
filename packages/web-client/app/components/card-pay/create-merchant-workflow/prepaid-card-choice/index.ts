@@ -8,10 +8,7 @@ import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-sess
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import MerchantInfoService from '@cardstack/web-client/services/merchant-info';
 import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-rejection-error';
-import {
-  RegisterMerchantOptions,
-  TransactionHash,
-} from '@cardstack/web-client/utils/web3-strategies/types';
+import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 
 import {
   race,
@@ -22,7 +19,8 @@ import {
 } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
-import { PrepaidCardSafe } from '@cardstack/cardpay-sdk';
+import { PrepaidCardSafe, TransactionOptions } from '@cardstack/cardpay-sdk';
+import BN from 'bn.js';
 
 interface CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs {
   workflowSession: WorkflowSession;
@@ -97,7 +95,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         workflowSession.update('merchantInfo', persistedMerchantInfo);
       }
 
-      let options: RegisterMerchantOptions = {
+      let options: TransactionOptions = {
         onTxnHash: (txnHash: TransactionHash) => {
           this.txnHash = txnHash;
           this.chinInProgressMessage = 'Processing transaction…';
@@ -105,10 +103,10 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
       };
 
       if (this.lastNonce) {
-        options.nonce = this.lastNonce;
+        options.nonce = new BN(this.lastNonce);
       } else {
-        options.onNonce = (nonce: string) => {
-          this.lastNonce = nonce;
+        options.onNonce = (nonce: BN) => {
+          this.lastNonce = nonce.toString();
         };
       }
 

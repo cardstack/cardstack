@@ -22,6 +22,7 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/workflow-config';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
+import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 
 interface Context extends MirageTestContext {}
 
@@ -519,6 +520,72 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom('[data-test-workflow-thread]').doesNotExist();
 
     assert.dom('[data-test-prepaid-cards-count]').containsText('2');
+
+    let workflowPersistenceService = this.owner.lookup(
+      'service:workflow-persistence'
+    ) as WorkflowPersistence;
+
+    const workflowPersistenceId = new URL(
+      'http://domain.test/' + currentURL()
+    ).searchParams.get('flow-id')!;
+
+    const persistedData = workflowPersistenceService.getPersistedData(
+      workflowPersistenceId
+    );
+
+    assert.equal(persistedData.name, 'PREPAID_CARD_ISSUANCE');
+    let persistedState = persistedData.state;
+    delete persistedState.prepaidCardSafe.createdAt;
+
+    assert.deepEqual(persistedState, {
+      colorScheme: {
+        background: '#37EB77',
+        id: '4f219852-33ee-4e4c-81f7-76318630a423',
+        patternColor: 'white',
+        textColor: 'black',
+      },
+      completedCardNames: [
+        'LAYER2_CONNECT',
+        'HUB_AUTH',
+        'LAYOUT_CUSTOMIZATION',
+        'FUNDING_SOURCE',
+        'FACE_VALUE',
+        'PREVIEW',
+        'CONFIRMATION',
+        'EPILOGUE_LAYER_TWO_CONNECT_CARD',
+      ],
+      completedMilestonesCount: 4,
+      did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+      issuerName: 'JJ',
+      layer2WalletAddress: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+      milestonesCount: 4,
+      pattern: {
+        id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
+        patternUrl:
+          '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+      },
+      prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
+      prepaidCardSafe: {
+        address: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
+        customizationDID:
+          'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+        hasBeenUsed: false,
+        issuer: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+        issuingToken: '0xTOKEN',
+        owners: ['0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44'],
+        prepaidCardOwner: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+        reloadable: true,
+        spendFaceValue: 10000,
+        tokens: [],
+        transferrable: true,
+        type: 'prepaid-card',
+      },
+      prepaidFundingToken: 'DAI.CPXD',
+      reloadable: true,
+      spendFaceValue: 10000,
+      transferrable: true,
+      txnHash: 'exampleTxnHash',
+    });
   });
 
   // test('Initiating workflow with layer 2 wallet already connected', async function (assert) {

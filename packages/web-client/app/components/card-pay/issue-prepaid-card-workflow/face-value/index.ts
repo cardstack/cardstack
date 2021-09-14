@@ -7,7 +7,6 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { fromWei } from 'web3-utils';
 import BN from 'bn.js';
 import {
-  ConvertibleSymbol,
   TokenDisplayInfo,
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
@@ -30,16 +29,11 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
   @tracked selectedFaceValue?: FaceValue;
   @tracked options: FaceValue[] = [];
 
-  constructor(owner: unknown, args: WorkflowCardComponentArgs) {
-    super(owner, args);
-    this.getTokenAmounts('DAI', this.faceValueOptions);
-  }
-
-  async getTokenAmounts(symbol: ConvertibleSymbol, spendArr: number[]) {
+  @action async prepareFaceValueOptions() {
     this.options = await Promise.all(
-      spendArr.map(async (spendAmount) => {
+      this.faceValueOptions.map(async (spendAmount) => {
         let result: string = await this.layer2Network.convertFromSpend(
-          symbol,
+          'DAI',
           spendAmount
         );
         let approxTokenAmount = Math.ceil(parseFloat(fromWei(result))); // for display only
@@ -50,7 +44,14 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
         };
       })
     );
-    return;
+
+    const defaultSpendAmount = this.args.workflowSession.state.spendFaceValue;
+    if (defaultSpendAmount) {
+      this.selectedFaceValue = this.options.findBy(
+        'spendAmount',
+        defaultSpendAmount
+      );
+    }
   }
 
   get fundingTokenBalance(): BN {

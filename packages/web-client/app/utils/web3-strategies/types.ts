@@ -16,6 +16,7 @@ import { Emitter } from '../events';
 import { BridgeValidationResult } from '@cardstack/cardpay-sdk/sdk/token-bridge-home-side';
 import { TaskGenerator } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
+import { TransactionOptions } from '@cardstack/cardpay-sdk';
 
 export type Layer1ChainEvent =
   | 'disconnect'
@@ -40,18 +41,6 @@ export interface ApproveOptions {
 
 export interface RelayTokensOptions {
   onTxnHash?(txnHash: TransactionHash): void;
-}
-
-export interface IssuePrepaidCardOptions {
-  onTxnHash?(txnHash: TransactionHash): void;
-  nonce?: string;
-  onNonce?(nonce: string): void;
-}
-
-export interface RegisterMerchantOptions {
-  onTxnHash?(txnHash: TransactionHash): void;
-  nonce?: string;
-  onNonce?(nonce: string): void;
 }
 
 export interface ClaimBridgedTokensOptions {
@@ -132,13 +121,14 @@ export interface Layer2Web3Strategy
     safeAddress: string,
     amount: number,
     customizationDid: string,
-    options?: IssuePrepaidCardOptions
+    options?: TransactionOptions
   ): Promise<PrepaidCardSafe>;
+  resumeIssuePrepaidCardTransaction(txnHash: string): Promise<PrepaidCardSafe>;
   fetchMerchantRegistrationFee(): Promise<number>;
   registerMerchant(
     prepaidCardAddress: string,
     infoDid: string,
-    options: RegisterMerchantOptions
+    options: TransactionOptions
   ): Promise<MerchantSafe>;
   defaultTokenSymbol: ConvertibleSymbol;
   refreshSafesAndBalances(): void;

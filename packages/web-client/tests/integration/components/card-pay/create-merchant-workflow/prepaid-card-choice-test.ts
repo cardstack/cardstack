@@ -8,6 +8,7 @@ import sinon from 'sinon';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { Response as MirageResponse } from 'ember-cli-mirage';
+import BN from 'bn.js';
 
 interface Context extends MirageTestContext {}
 
@@ -221,7 +222,7 @@ module(
       await waitFor('[data-test-create-merchant-cancel-button]');
       layer2Service.test__simulateOnNonceForRegisterMerchantRequest(
         prepaidCardAddress,
-        '12345'
+        new BN('12345')
       );
 
       await click('[data-test-create-merchant-cancel-button]');

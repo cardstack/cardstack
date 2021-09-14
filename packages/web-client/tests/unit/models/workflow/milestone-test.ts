@@ -82,7 +82,7 @@ module('Unit | Milestone model', function (hooks) {
     class ConcreteWorkflow extends Workflow {}
 
     test('setWorkflow does exactly that', function (assert) {
-      let workflow = new ConcreteWorkflow({});
+      let workflow = new ConcreteWorkflow(this.owner);
       subject.setWorkflow(workflow);
       assert.strictEqual(subject.workflow, workflow);
     });
