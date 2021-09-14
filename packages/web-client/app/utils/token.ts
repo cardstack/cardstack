@@ -6,23 +6,42 @@ import { NetworkSymbol } from './web3-strategies/types';
 import BN from 'bn.js';
 
 // symbols
-export type ConvertibleSymbol = 'DAI' | 'CARD';
-export type BridgeableSymbol = 'DAI' | 'CARD';
-export type Layer1BalanceSymbol = 'DAI' | 'CARD' | 'ETH';
-export type BridgedTokenSymbol = 'DAI.CPXD' | 'CARD.CPXD';
-export type TokenSymbol =
-  | ConvertibleSymbol
-  | BridgeableSymbol
-  | Layer1BalanceSymbol
-  | BridgedTokenSymbol;
+export const tokenSymbols = {
+  DAI: 'DAI',
+  CARD: 'CARD',
+  'DAI.CPXD': 'DAI.CPXD',
+  'CARD.CPXD': 'CARD.CPXD',
+  ETH: 'ETH',
+} as const;
+export type TokenSymbol = keyof typeof tokenSymbols;
 
 // conversion
-export type ConversionFunction = (amountInWei: string) => number;
-export const convertibleSymbols: ConvertibleSymbol[] = ['DAI', 'CARD'];
+export const convertibleSymbols = [
+  tokenSymbols.DAI,
+  tokenSymbols.CARD,
+] as const;
 
 // contract/bridging
-export const bridgeableSymbols: BridgeableSymbol[] = ['DAI', 'CARD'];
-export const bridgedSymbols: BridgedTokenSymbol[] = ['DAI.CPXD', 'CARD.CPXD'];
+export const bridgeableSymbols = [tokenSymbols.DAI, tokenSymbols.CARD] as const;
+export const bridgedSymbols = [
+  tokenSymbols['DAI.CPXD'],
+  tokenSymbols['CARD.CPXD'],
+] as const;
+
+// balances
+export const layer1BalanceSymbols = [
+  tokenSymbols.DAI,
+  tokenSymbols.CARD,
+  tokenSymbols.ETH,
+] as const;
+
+// symbol categories
+export type ConvertibleSymbol = typeof convertibleSymbols[number];
+export type BridgeableSymbol = typeof bridgeableSymbols[number];
+export type Layer1BalanceSymbol = typeof layer1BalanceSymbols[number];
+export type BridgedTokenSymbol = typeof bridgedSymbols[number];
+
+export type ConversionFunction = (amountInWei: string) => number;
 
 const contractNames: Record<NetworkSymbol, Record<BridgeableSymbol, string>> = {
   kovan: {
@@ -47,10 +66,10 @@ const contractNames: Record<NetworkSymbol, Record<BridgeableSymbol, string>> = {
 export function getUnbridgedSymbol(
   bridgedSymbol: BridgedTokenSymbol
 ): BridgeableSymbol {
-  if (bridgedSymbol === 'DAI.CPXD') {
-    return 'DAI';
-  } else if (bridgedSymbol === 'CARD.CPXD') {
-    return 'CARD';
+  if (bridgedSymbol === tokenSymbols['DAI.CPXD']) {
+    return tokenSymbols.DAI;
+  } else if (bridgedSymbol === tokenSymbols['CARD.CPXD']) {
+    return tokenSymbols.CARD;
   } else {
     throw new Error(`Unknown bridgedSymbol ${bridgedSymbol}`);
   }
@@ -120,13 +139,13 @@ const _tokenDisplayInfoMap: Record<TokenSymbol, DisplayInfo> = {
   },
 };
 
-export class TokenDisplayInfo implements DisplayInfo {
+export class TokenDisplayInfo<T extends TokenSymbol> implements DisplayInfo {
   name: string;
-  symbol: TokenSymbol;
+  symbol: T;
   description: string;
   icon: string;
 
-  constructor(symbol: TokenSymbol) {
+  constructor(symbol: T) {
     this.symbol = symbol;
     let displayInfo = _tokenDisplayInfoMap[symbol];
     this.name = displayInfo.name!;
@@ -134,27 +153,15 @@ export class TokenDisplayInfo implements DisplayInfo {
     this.icon = displayInfo.icon;
   }
 
-  static isRecognizedSymbol(value: string): value is TokenSymbol {
-    return ['DAI', 'CARD', 'ETH'].includes(value);
-  }
-
-  static nameFor(symbol: TokenSymbol) {
-    return _tokenDisplayInfoMap[symbol].name;
-  }
-
-  static descriptionFor(symbol: TokenSymbol) {
-    return _tokenDisplayInfoMap[symbol].description;
-  }
-
   static iconFor(symbol: TokenSymbol) {
     return _tokenDisplayInfoMap[symbol].icon;
   }
 }
 
-export class TokenBalance implements DisplayInfo {
-  tokenDisplayInfo: TokenDisplayInfo;
+export class TokenBalance<T extends TokenSymbol> implements DisplayInfo {
+  tokenDisplayInfo: TokenDisplayInfo<T>;
   balance: BN;
-  constructor(symbol: TokenSymbol, balance: BN) {
+  constructor(symbol: T, balance: BN) {
     this.tokenDisplayInfo = new TokenDisplayInfo(symbol);
     this.balance = balance;
   }

@@ -7,6 +7,7 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import BN from 'bn.js';
 
 import {
+  BridgeableSymbol,
   TokenSymbol,
   bridgeableSymbols,
   TokenBalance,
@@ -17,7 +18,7 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<Workflow
   tokenOptions = bridgeableSymbols;
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  @tracked selectedToken: TokenBalance | undefined;
+  @tracked selectedToken: TokenBalance<BridgeableSymbol> | undefined;
 
   get selectedTokenSymbol() {
     if (this.args.workflowSession.state.depositSourceToken) {
@@ -73,7 +74,7 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<Workflow
     return true;
   }
 
-  @action chooseSource(token: TokenBalance) {
+  @action chooseSource(token: TokenBalance<BridgeableSymbol>) {
     this.selectedToken = token;
   }
 

@@ -4,22 +4,25 @@ import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import { TokenBalance, TokenSymbol } from '@cardstack/web-client/utils/token';
+import {
+  TokenBalance,
+  BridgedTokenSymbol,
+} from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 import BN from 'bn.js';
 
 class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<WorkflowCardComponentArgs> {
-  defaultTokenSymbol: TokenSymbol = 'DAI.CPXD';
-  cardTokenSymbol: TokenSymbol = 'CARD.CPXD';
+  defaultTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
+  cardTokenSymbol: BridgedTokenSymbol = 'CARD.CPXD';
   tokenOptions = [this.defaultTokenSymbol, this.cardTokenSymbol];
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  get selectedTokenSymbol(): TokenSymbol {
+  get selectedTokenSymbol(): BridgedTokenSymbol {
     return (
       this.args.workflowSession.state.withdrawalToken ?? this.defaultTokenSymbol
     );
   }
-  @tracked selectedToken: TokenBalance;
+  @tracked selectedToken: TokenBalance<BridgedTokenSymbol>;
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
@@ -39,7 +42,7 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
     });
   }
 
-  getTokenBalance(symbol: TokenSymbol) {
+  getTokenBalance(symbol: BridgedTokenSymbol) {
     if (symbol === this.defaultTokenSymbol) {
       return this.layer2Network.defaultTokenBalance ?? new BN('0');
     }
@@ -58,7 +61,7 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
     );
   }
 
-  @action chooseSource(token: TokenBalance) {
+  @action chooseSource(token: TokenBalance<BridgedTokenSymbol>) {
     this.selectedToken = token;
   }
 

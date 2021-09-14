@@ -9,8 +9,8 @@ import { TransactionReceipt } from 'web3-core';
 import BN from 'bn.js';
 import { toWei } from 'web3-utils';
 import {
+  BridgeableSymbol,
   TokenDisplayInfo,
-  TokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
@@ -36,11 +36,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
 
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
-  get currentTokenSymbol(): TokenSymbol {
+  get currentTokenSymbol(): BridgeableSymbol {
     return this.args.workflowSession.state.depositSourceToken;
   }
 
-  get currentTokenDetails(): TokenDisplayInfo | undefined {
+  get currentTokenDetails(): TokenDisplayInfo<BridgeableSymbol> | undefined {
     if (this.currentTokenSymbol) {
       return new TokenDisplayInfo(this.currentTokenSymbol);
     } else {
