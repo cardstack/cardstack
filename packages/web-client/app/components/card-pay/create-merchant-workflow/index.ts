@@ -5,21 +5,18 @@ import { formatUsd, spendToUsd } from '@cardstack/cardpay-sdk';
 import {
   cardbot,
   ArbitraryDictionary,
-  IWorkflowMessage,
   Milestone,
-  Participant,
   PostableCollection,
   NetworkAwareWorkflowMessage,
   NetworkAwareWorkflowCard,
+  SessionAwareWorkflowMessage,
   Workflow,
   WorkflowCard,
   WorkflowMessage,
   WorkflowName,
-  WorkflowPostable,
 } from '@cardstack/web-client/models/workflow';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
-
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { taskFor } from 'ember-concurrency-ts';
 
@@ -30,31 +27,10 @@ const FAILURE_REASONS = {
   NO_PREPAID_CARD: 'NO_PREPAID_CARD',
 } as const;
 
-interface SessionAwareWorkflowMessageOptions {
-  author: Participant;
-  includeIf: (this: WorkflowPostable) => boolean;
-  template: (session: ArbitraryDictionary) => string;
-}
-
-class SessionAwareWorkflowMessage
-  extends WorkflowPostable
-  implements IWorkflowMessage
-{
-  private template: (session: ArbitraryDictionary) => string;
-  isComplete = true;
-
-  constructor(options: SessionAwareWorkflowMessageOptions) {
-    super(options.author, options.includeIf);
-    this.template = options.template;
-  }
-
-  get message() {
-    return this.template(this.workflow?.session.state!);
-  }
-}
-
 class CreateMerchantWorkflow extends Workflow {
   name = 'MERCHANT_CREATION' as WorkflowName;
+  @service declare layer2Network: Layer2Network;
+
   milestones = [
     new Milestone({
       title: `Connect ${c.layer2.fullName} wallet`,
@@ -94,9 +70,7 @@ class CreateMerchantWorkflow extends Workflow {
           author: cardbot,
           componentName: 'card-pay/layer-two-connect-card',
           async check() {
-            let layer2Network = this.workflow?.owner.lookup(
-              'service:layer2-network'
-            ) as Layer2Network;
+            let { layer2Network } = this.workflow as CreateMerchantWorkflow;
 
             let merchantRegistrationFee = await taskFor(
               layer2Network.fetchMerchantRegistrationFeeTask

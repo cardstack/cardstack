@@ -1,26 +1,30 @@
 import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import { inject as service } from '@ember/service';
+
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
+import { action } from '@ember/object';
+import RouterService from '@ember/routing/router-service';
+import { next } from '@ember/runloop';
+
+import BN from 'bn.js';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import {
   cardbot,
   Milestone,
+  NetworkAwareWorkflowCard,
   NetworkAwareWorkflowMessage,
   PostableCollection,
   Workflow,
   WorkflowCard,
-  WorkflowName,
   WorkflowMessage,
-  NetworkAwareWorkflowCard,
+  WorkflowName,
 } from '@cardstack/web-client/models/workflow';
-import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
-import { action } from '@ember/object';
-import BN from 'bn.js';
-import RouterService from '@ember/routing/router-service';
-import { faceValueOptions } from './workflow-config';
-import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
-import { next } from '@ember/runloop';
+
+export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
+export const spendToUsdRate = 0.01;
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -32,6 +36,10 @@ const FAILURE_REASONS = {
 } as const;
 
 class IssuePrepaidCardWorkflow extends Workflow {
+  @service declare router: RouterService;
+  @service declare layer2Network: Layer2Network;
+  @service declare hubAuthentication: HubAuthentication;
+
   workflowPersistenceId: string;
   name = 'PREPAID_CARD_ISSUANCE' as WorkflowName;
 
@@ -74,9 +82,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
           cardName: 'LAYER2_CONNECT',
           componentName: 'card-pay/layer-two-connect-card',
           async check() {
-            let layer2Network = this.workflow?.owner.lookup(
-              'service:layer2-network'
-            ) as Layer2Network;
+            let { layer2Network } = this.workflow as IssuePrepaidCardWorkflow;
 
             let daiMinValue = await layer2Network.convertFromSpend(
               'DAI',
@@ -317,21 +323,16 @@ class IssuePrepaidCardWorkflow extends Workflow {
     }),
   ]);
 
-  constructor(owner: unknown, workflowPersistenceId: string) {
+  constructor(owner: any) {
     super(owner);
-    this.workflowPersistenceId = workflowPersistenceId;
+    this.workflowPersistenceId =
+      this.router.currentRoute.queryParams['flow-id']!;
 
     this.attachWorkflow();
   }
 
   restorationErrors(persistedState: any) {
-    let layer2Network = this.owner.lookup(
-      'service:layer2-network'
-    ) as Layer2Network;
-
-    let hubAuthentication = this.owner.lookup(
-      'service:hub-authentication'
-    ) as HubAuthentication;
+    let { hubAuthentication, layer2Network } = this;
 
     let errors = [];
 
@@ -366,11 +367,7 @@ class IssuePrepaidCardWorkflowComponent extends Component {
   constructor(owner: unknown, args: {}) {
     super(owner, args);
 
-    const workflow = new IssuePrepaidCardWorkflow(
-      getOwner(this),
-      this.router.currentRoute.queryParams['flow-id']!
-    );
-
+    const workflow = new IssuePrepaidCardWorkflow(getOwner(this));
     const persistedState = workflow.session.getPersistedData()?.state ?? {};
     const willRestore = Object.keys(persistedState).length > 0;
 

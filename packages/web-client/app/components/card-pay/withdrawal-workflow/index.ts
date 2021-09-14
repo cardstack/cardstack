@@ -101,9 +101,8 @@ ${
   }
 
   get layer1Network() {
-    return this.workflow?.owner.lookup(
-      'service:layer1-network'
-    ) as Layer1Network;
+    let workflow = this.workflow as WithdrawalWorkflow;
+    return workflow?.layer1Network;
   }
 
   @task *waitUntilTask(
@@ -117,6 +116,8 @@ ${
 }
 
 class WithdrawalWorkflow extends Workflow {
+  @service declare layer1Network: Layer1Network;
+
   name = 'WITHDRAWAL' as WorkflowName;
   milestones = [
     new Milestone({
