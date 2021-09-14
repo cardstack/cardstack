@@ -1,13 +1,13 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
+import { settled } from '@ember/test-helpers';
 import {
+  Milestone,
+  Workflow,
+  WorkflowCard,
   Participant,
   WorkflowPostable,
-} from '@cardstack/web-client/models/workflow/workflow-postable';
-import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
-import { Workflow } from '@cardstack/web-client/models/workflow';
-import { settled } from '@ember/test-helpers';
-import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
+} from '@cardstack/web-client/models/workflow';
 
 module('Unit | WorkflowCard model', function (hooks) {
   setupTest(hooks);

@@ -7,7 +7,7 @@ import * as Sentry from '@sentry/browser';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { TokenSymbol } from '@cardstack/web-client/utils/token';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { TransactionReceipt } from 'web3-core';
 import { task } from 'ember-concurrency-decorators';

@@ -14,7 +14,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { next } from '@ember/runloop';
 import { timeout } from 'ember-concurrency';
 import { action } from '@ember/object';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 
 interface CardPayLayerTwoConnectCardComponentArgs
   extends WorkflowCardComponentArgs {

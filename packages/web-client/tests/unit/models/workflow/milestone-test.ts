@@ -1,11 +1,11 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import {
+  Milestone,
   Participant,
+  Workflow,
   WorkflowPostable,
-} from '@cardstack/web-client/models/workflow/workflow-postable';
-import { Workflow } from '@cardstack/web-client/models/workflow';
+} from '@cardstack/web-client/models/workflow';
 
 module('Unit | Milestone model', function (hooks) {
   setupTest(hooks);

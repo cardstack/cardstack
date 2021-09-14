@@ -1,5 +1,5 @@
 import { helper } from '@ember/component/helper';
-import { WorkflowPostable } from '../models/workflow/workflow-postable';
+import { WorkflowPostable } from '../models/workflow';
 
 // one minute
 const maxIntervalInMilliseconds = 1000 * 60;

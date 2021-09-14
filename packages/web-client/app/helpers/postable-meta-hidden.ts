@@ -1,7 +1,6 @@
 import { helper } from '@ember/component/helper';
 import { postableMetaIdentical } from './postable-meta-identical';
-import { WorkflowPostable } from '../models/workflow/workflow-postable';
-import { WorkflowCard } from '../models/workflow/workflow-card';
+import { WorkflowCard, WorkflowPostable } from '../models/workflow';
 
 function postableMetaHidden(
   [post]: [WorkflowPostable | WorkflowCard],

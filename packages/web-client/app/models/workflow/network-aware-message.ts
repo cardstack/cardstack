@@ -1,11 +1,8 @@
-import {
-  Participant,
-  WorkflowPostable,
-} from '@cardstack/web-client/models/workflow/workflow-postable';
-import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer1-network';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
+import { Participant, WorkflowPostable } from './workflow-postable';
+import { WorkflowMessage } from './workflow-message';
 
 interface NetworkAwareWorkflowMessageOptions {
   author: Participant;

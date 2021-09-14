@@ -1,6 +1,6 @@
 import { action } from '@ember/object';
 import { Participant, WorkflowPostable } from './workflow-postable';
-import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
+import WorkflowSession from './workflow-session';
 
 export interface WorkflowCardComponentArgs {
   workflowSession: WorkflowSession;
@@ -12,10 +12,12 @@ export interface WorkflowCardComponentArgs {
 type SuccessCheckResult = {
   success: true;
 };
+
 type FailureCheckResult = {
   success: false;
   reason: string;
 };
+
 export type CheckResult = SuccessCheckResult | FailureCheckResult;
 
 interface WorkflowCardOptions {

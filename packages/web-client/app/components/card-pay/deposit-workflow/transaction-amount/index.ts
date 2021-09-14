@@ -12,7 +12,7 @@ import {
   BridgeableSymbol,
   TokenDisplayInfo,
 } from '@cardstack/web-client/utils/token';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import {
   shouldUseTokenInput,

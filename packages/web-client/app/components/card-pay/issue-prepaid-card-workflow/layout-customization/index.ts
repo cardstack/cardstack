@@ -8,7 +8,7 @@ import {
   default as CardCustomizationService,
 } from '@cardstack/web-client/services/card-customization';
 import { reads } from 'macro-decorators';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 
 export default class LayoutCustomizationCard extends Component<WorkflowCardComponentArgs> {
   @service('card-customization')

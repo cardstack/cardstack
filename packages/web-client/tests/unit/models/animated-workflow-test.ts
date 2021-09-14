@@ -1,12 +1,15 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import { WorkflowCard } from '@cardstack/web-client/models/workflow/workflow-card';
-import { Workflow, WorkflowName } from '@cardstack/web-client/models/workflow';
+import {
+  Milestone,
+  PostableCollection,
+  Workflow,
+  WorkflowCard,
+  WorkflowMessage,
+  WorkflowName,
+} from '@cardstack/web-client/models/workflow';
 import AnimatedWorkflow from '@cardstack/web-client/models/animated-workflow';
-import { Milestone } from '@cardstack/web-client/models/workflow/milestone';
 import { settled } from '@ember/test-helpers';
-import PostableCollection from '@cardstack/web-client/models/workflow/postable-collection';
-import { WorkflowMessage } from '@cardstack/web-client/models/workflow/workflow-message';
 
 class MockWorkflow extends Workflow {
   name = 'WITHDRAWAL' as WorkflowName;

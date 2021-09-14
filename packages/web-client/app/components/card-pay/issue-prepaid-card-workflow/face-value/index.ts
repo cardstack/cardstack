@@ -11,7 +11,7 @@ import {
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import { faceValueOptions, spendToUsdRate } from '../workflow-config';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow/workflow-card';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 
 interface FaceValue {
   spendAmount: number;
