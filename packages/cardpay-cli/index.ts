@@ -20,6 +20,7 @@ import {
   gasFee,
   getPaymentLimits,
 } from './prepaid-card.js';
+import { registerRewardProgram } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
   usdPrice as layer2UsdPrice,
@@ -74,7 +75,8 @@ type Commands =
   | 'viewTokenBalance'
   | 'hubAuth'
   | 'rewardTokenBalances'
-  | 'withdrawalLimits';
+  | 'withdrawalLimits'
+  | 'registerRewardProgram';
 
 let command: Commands | undefined;
 interface Options {
@@ -107,6 +109,7 @@ interface Options {
   faceValues?: number[];
   prepaidCards?: string[];
   rewardProgramId?: string;
+  admin?: string;
 }
 let {
   network,
@@ -138,6 +141,7 @@ let {
   signatures,
   hubRootUrl,
   rewardProgramId,
+  admin,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -638,6 +642,17 @@ let {
       command = 'rewardTokenBalances';
     }
   )
+  .command('register-reward-program <prepaidCard> <admin>', 'Register reward program', (yargs) => {
+    yargs.positional('admin', {
+      type: 'string',
+      description: 'The address of the new admin. this is an eoa',
+    });
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The address of the prepaid card that is being used to pay the reward program registration fee',
+    });
+    command = 'registerRewardProgram';
+  })
   .options({
     network: {
       alias: 'n',
@@ -903,6 +918,17 @@ if (!command) {
         return;
       }
       await rewardTokenBalances(network, address, rewardProgramId, mnemonic);
+      break;
+    case 'registerRewardProgram':
+      if (prepaidCard == null) {
+        showHelpAndExit('prepaid card is a required value');
+        return;
+      }
+      if (admin == null) {
+        showHelpAndExit('admin is a required value');
+        return;
+      }
+      await registerRewardProgram(network, prepaidCard, admin, mnemonic);
       break;
     default:
       assertNever(command);

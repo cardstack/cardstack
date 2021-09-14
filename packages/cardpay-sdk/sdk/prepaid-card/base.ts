@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
-import { AbiItem } from 'web3-utils';
+import { AbiItem, randomHex } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
@@ -34,6 +34,7 @@ const TIMEOUT = 1000 * 60 * 5;
 // stay below the AML limit of $10,000 USD.
 export const MAXIMUM_PAYMENT_AMOUNT = 10000 * 100;
 export const MAX_PREPAID_CARD_AMOUNT = 10;
+const REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND = 500;
 
 export default class PrepaidCard {
   private prepaidCardManager: Contract | undefined;
@@ -474,6 +475,123 @@ export default class PrepaidCard {
     };
   }
 
+  async registerRewardProgram(txnHash: string): Promise<TransactionReceipt>;
+  async registerRewardProgram(
+    prepaidCardAddress: string,
+    admin: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async registerRewardProgram(
+    prepaidCardAddressOrTxnHash: string,
+    admin?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt> {
+    if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
+      let txnHash = prepaidCardAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    if (!prepaidCardAddressOrTxnHash) {
+      throw new Error('prepaidCardAddress is required');
+    }
+    let prepaidCard = prepaidCardAddressOrTxnHash;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let issuingToken = await this.issuingToken(prepaidCardAddressOrTxnHash);
+    await this.convertFromSpendForPrepaidCard(
+      prepaidCardAddressOrTxnHash,
+      REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
+      (issuingToken, balanceAmount, requiredTokenAmount, symbol) =>
+        new Error(
+          `Prepaid card does not have enough balance to register reward program. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddressOrTxnHash} is ${fromWei(
+            balanceAmount
+          )} ${symbol}, payment amount in issuing token is ${fromWei(requiredTokenAmount)} ${symbol}`
+        )
+    );
+
+    let rewardProgramID = randomHex(20);
+    let prepaidCardMgr = await this.getPrepaidCardMgr();
+    let owner = await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCard).call();
+
+    let rateChanged = false;
+    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
+    let gnosisResult: GnosisExecTx | undefined;
+    do {
+      let rateLock = await layerTwoOracle.getRateLock(issuingToken);
+      try {
+        let payload = await this.getRegisterRewardProgramPayload(
+          prepaidCardAddressOrTxnHash,
+          admin ?? owner,
+          rewardProgramID,
+          REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
+          rateLock
+        );
+        if (nonce == null) {
+          nonce = getNextNonceFromEstimate(payload);
+          if (typeof onNonce === 'function') {
+            onNonce(nonce);
+          }
+        }
+        let signatures = await signSafeTxAsRSV(
+          this.layer2Web3,
+          issuingToken,
+          0,
+          payload.data,
+          0,
+          payload.safeTxGas,
+          payload.dataGas,
+          payload.gasPrice,
+          payload.gasToken,
+          payload.refundReceiver,
+          nonce,
+          from,
+          prepaidCardAddressOrTxnHash
+        );
+        gnosisResult = await this.executeRegisterRewardProgram(
+          prepaidCardAddressOrTxnHash,
+          admin ?? owner,
+          rewardProgramID,
+          REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
+          rateLock,
+          payload.gasPrice,
+          payload.safeTxGas,
+          payload.dataGas,
+          signatures,
+          nonce
+        );
+        console.log(`Reward program ${rewardProgramID} registered with admin ${admin ?? owner}`);
+        break;
+      } catch (e: any) {
+        // The rate updates about once an hour, so if this is triggered, it should only be once
+        if (e.message.includes('rate is beyond the allowable bounds')) {
+          rateChanged = true;
+          // TODO in this situation we should surface a message to the user that
+          // the rate has changed and that we need to try again with a new rate
+          console.warn(
+            'The USD rate has fluctuated beyond allowable bounds between when the txn was signed and when it was executed, prompting the user to sign the txn again with a new rate'
+          );
+        } else {
+          throw e;
+        }
+      }
+    } while (rateChanged);
+
+    if (!gnosisResult) {
+      throw new Error(
+        `Unable to obtain a gnosis transaction result for merchant payment from prepaid card ${prepaidCardAddressOrTxnHash} to merchant safe ${prepaidCard} for ${REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND} SPEND`
+      );
+    }
+
+    let txnHash = gnosisResult.ethereumTx.txHash;
+
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+  }
+
   async convertFromSpendForPrepaidCard(
     prepaidCardAddress: string,
     minimumSpendBalance: number,
@@ -617,6 +735,23 @@ export default class PrepaidCard {
     );
   }
 
+  private async getRegisterRewardProgramPayload(
+    prepaidCardAddress: string,
+    admin: string,
+    rewardProgramID: string,
+    spendAmount: number,
+    rate: string
+  ): Promise<SendPayload> {
+    return getSendPayload(
+      this.layer2Web3,
+      prepaidCardAddress,
+      spendAmount,
+      rate,
+      'registerRewardProgram',
+      this.layer2Web3.eth.abi.encodeParameters(['address', 'address'], [admin, rewardProgramID])
+    );
+  }
+
   private async executePayMerchant(
     prepaidCardAddress: string,
     merchantSafe: string,
@@ -683,6 +818,33 @@ export default class PrepaidCard {
       payload,
       'transfer',
       this.layer2Web3.eth.abi.encodeParameters(['address', 'bytes'], [newOwner, previousOwnerSignature]),
+      signatures,
+      nonce
+    );
+  }
+
+  private async executeRegisterRewardProgram(
+    prepaidCardAddress: string,
+    admin: string,
+    rewardProgramID: string,
+    spendAmount: number,
+    rate: string,
+    gasPrice: string,
+    safeTxGas: string,
+    dataGas: string,
+    signatures: Signature[],
+    nonce: BN
+  ): Promise<GnosisExecTx> {
+    return await executeSend(
+      this.layer2Web3,
+      prepaidCardAddress,
+      spendAmount,
+      rate,
+      gasPrice,
+      safeTxGas,
+      dataGas,
+      'registerRewardProgram',
+      this.layer2Web3.eth.abi.encodeParameters(['address', 'address'], [admin, rewardProgramID]),
       signatures,
       nonce
     );
