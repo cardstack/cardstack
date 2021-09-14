@@ -190,9 +190,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
       assert.dom('[data-test-layer-2-wallet-summary]').exists();
 
-      assert
-        .dom('[data-test-issue-prepaid-card-next-step="new-issuance"]') // Issue A New Prepaid Card button
-        .exists();
+      await click('[data-test-issue-prepaid-card-next-step="new-issuance"]');
+
+      // Starts over
+      assert.dom('[data-test-milestone="0"]').exists(); // L2
+      assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
+      assert.dom('[data-test-milestone="2"]').doesNotExist(); // Choose funding source
     });
 
     test('it restores a cancelled workflow', async function (this: Context, assert) {

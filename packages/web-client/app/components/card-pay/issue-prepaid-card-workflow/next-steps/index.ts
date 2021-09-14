@@ -10,7 +10,7 @@ class CardPayIssuePrepaidCardWorkflowNextStepsComponent extends Component<Workfl
 
   @action async openNewIssuanceWorkflow() {
     await this.router.transitionTo({
-      queryParams: { flow: null, worklowPersistenceId: null },
+      queryParams: { flow: null, 'flow-id': null },
     });
     next(this, () => {
       this.router.transitionTo({
