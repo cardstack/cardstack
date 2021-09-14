@@ -27,6 +27,7 @@ declare const config: {
   locationType: string;
   rootURL: string;
   hubURL: string;
+  universalLinkDomain: string;
   chains: ChainsOptions;
   features: FeaturesOptions;
   version: string;

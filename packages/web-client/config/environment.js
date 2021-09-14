@@ -1,8 +1,12 @@
 'use strict';
-
 const infuraIdsByTarget = {
   staging: '558ee533522a468e9d421d818e06fadb', // this infura id is specific to https://app-staging.stack.cards/
   production: '5d6efa6b750b45459184cd11dd2c8697', // this infura id is specific to https://app.cardstack.com/
+};
+
+const universalLinkHostnamesByTarget = {
+  staging: 'https://wallet-staging.stack.cards',
+  production: 'https://wallet.cardstack.com',
 };
 
 const pkg = require('../package.json');
@@ -15,6 +19,9 @@ module.exports = function (environment) {
     rootURL: '/',
     locationType: 'auto',
     hubURL: process.env.HUB_URL,
+    universalLinkDomain:
+      universalLinkHostnamesByTarget[process.env.DEPLOY_TARGET] ??
+      'https://wallet-staging.stack.cards',
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,
     '@sentry/ember': {
