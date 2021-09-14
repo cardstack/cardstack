@@ -782,7 +782,8 @@ export default class PrepaidCard {
     dataGas: string,
     signatures: Signature[],
     nonce: BN,
-    customizationDID = ''
+    customizationDID = '',
+    marketAddress = ZERO_ADDRESS
   ): Promise<GnosisExecTx> {
     return await executeSend(
       this.layer2Web3,
@@ -794,8 +795,8 @@ export default class PrepaidCard {
       dataGas,
       'split',
       this.layer2Web3.eth.abi.encodeParameters(
-        ['uint256[]', 'uint256[]', 'string'],
-        [issuingTokenAmounts, spendAmounts, customizationDID]
+        ['uint256[]', 'uint256[]', 'string', 'address'],
+        [issuingTokenAmounts, spendAmounts, customizationDID, marketAddress]
       ),
       signatures,
       nonce
