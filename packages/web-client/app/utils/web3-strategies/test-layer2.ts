@@ -26,6 +26,13 @@ import { task, TaskGenerator } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 import { taskFor } from 'ember-concurrency-ts';
 
+interface BridgeToLayer1Request {
+  safeAddress: string;
+  receiverAddress: string;
+  tokenSymbol: BridgeableSymbol;
+  amountInWei: string;
+}
+
 interface IssuePrepaidCardRequest {
   deferred: RSVP.Deferred<PrepaidCardSafe>;
   onTxnHash?: (txnHash: TransactionHash) => void;
@@ -62,6 +69,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked cardBalance: BN | undefined;
   @tracked isInitializing = false;
 
+  bridgeToLayer1Requests: BridgeToLayer1Request[] = [];
   issuePrepaidCardRequests: Map<number, IssuePrepaidCardRequest> = new Map();
   registerMerchantRequests: Map<string, RegisterMerchantRequest> = new Map();
   @tracked accountSafes: Map<string, Safe[]> = new Map();
@@ -114,10 +122,17 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   bridgeToLayer1(
-    _safeAddress: string,
-    _tokenSymbol: BridgeableSymbol,
-    _amountInWei: string
+    safeAddress: string,
+    receiverAddress: string,
+    tokenSymbol: BridgeableSymbol,
+    amountInWei: string
   ): Promise<TransactionHash> {
+    this.bridgeToLayer1Requests.push({
+      safeAddress,
+      receiverAddress,
+      tokenSymbol,
+      amountInWei,
+    });
     this.bridgingToLayer1HashDeferred = defer<TransactionHash>();
     this.bridgingToLayer1Deferred = defer<BridgeValidationResult>();
     return this.bridgingToLayer1HashDeferred.promise;
@@ -493,7 +508,30 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return this.test__deferredHubAuthentication.resolve(authToken);
   }
 
-  test__simulateBridgedToLayer1() {
+  test__simulateBridgedToLayer1(
+    safeAddress?: string,
+    receiverAddress?: string,
+    tokenSymbol?: BridgeableSymbol,
+    amountInWei?: string
+  ): void {
+    if (safeAddress && receiverAddress && tokenSymbol && amountInWei) {
+      let matchingRequest = this.bridgeToLayer1Requests.find(
+        (request) =>
+          request.safeAddress === safeAddress &&
+          request.receiverAddress === receiverAddress &&
+          request.tokenSymbol === tokenSymbol &&
+          request.amountInWei === amountInWei
+      );
+
+      if (!matchingRequest) {
+        throw new Error(
+          `No matching bridging request found for ${JSON.stringify(
+            arguments
+          )}; requests: ${JSON.stringify(this.bridgeToLayer1Requests)}`
+        );
+      }
+    }
+
     this.bridgingToLayer1Deferred.resolve({
       messageId: 'example-message-id',
       encodedData: 'example-encoded-data',

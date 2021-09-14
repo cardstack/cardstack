@@ -14,7 +14,7 @@ module(
   function (hooks) {
     setupRenderingTest(hooks);
 
-    test('It should allow a layer 2 balance to be chosen', async function (assert) {
+    test('It should allow a layer 2 safe and balance to be chosen', async function (assert) {
       let session = new WorkflowSession();
       this.set('session', session);
 
@@ -57,6 +57,59 @@ module(
       };
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
       layer2Service.test__simulateDepot(testDepot as DepotSafe);
+
+      let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
+
+      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+        {
+          type: 'merchant',
+          createdAt: Date.now() / 1000,
+          address: merchantAddress,
+          merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+          tokens: [
+            {
+              balance: '125000000000000000000',
+              tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
+              token: {
+                name: 'Dai Stablecoin.CPXD',
+                symbol: 'DAI',
+                decimals: 2,
+              },
+            },
+            {
+              balance: '450000000000000000000',
+              tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
+              token: {
+                name: 'CARD Token Kovan.CPXD',
+                symbol: 'CARD',
+                decimals: 2,
+              },
+            },
+          ],
+          owners: [],
+          accumulatedSpendValue: 100,
+        },
+        {
+          type: 'prepaid-card',
+          createdAt: Date.now() / 1000,
+
+          address: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+
+          tokens: [],
+          owners: [layer2AccountAddress],
+
+          issuingToken: '0xTOKEN',
+          spendFaceValue: 2324,
+          prepaidCardOwner: layer2AccountAddress,
+          hasBeenUsed: false,
+          issuer: layer2AccountAddress,
+          reloadable: false,
+          transferrable: false,
+        },
+      ]);
+
+      // Ensure safes have been loaded, as in a workflow context
+      await layer2Service.refreshSafesAndBalances();
       await render(hbs`
         <CardPay::WithdrawalWorkflow::ChooseBalance
           @workflowSession={{this.session}}
@@ -65,7 +118,9 @@ module(
           @isComplete={{this.isComplete}}
         />
       `);
-      assert.dom('.action-card__title').containsText('Withdraw tokens');
+      assert
+        .dom('.action-card__title')
+        .containsText('Choose a source and balance to withdraw from');
       assert
         .dom('[data-test-choose-balance-from-wallet]')
         .containsText('L2 test chain');
@@ -73,8 +128,8 @@ module(
         .dom('[data-test-choose-balance-from-address]')
         .containsText('0x1826...6E44');
       assert
-        .dom('[data-test-choose-balance-from-depot]')
-        .containsText(depotAddress);
+        .dom('[data-test-choose-balance-from-safe]')
+        .containsText(depotAddress, 'defaults to depot safe source');
       assert
         .dom(
           '[data-test-balance-chooser-dropdown] [data-test-balance-display-name]'
@@ -86,16 +141,48 @@ module(
       assert.dom('.ember-power-select-options li').exists({ count: 2 });
       assert
         .dom('.ember-power-select-options li:nth-child(1)')
-        .containsText('DAI.CPXD');
+        .containsText('250.00 DAI.CPXD');
       assert
         .dom('.ember-power-select-options li:nth-child(2)')
-        .containsText('CARD.CPXD');
+        .containsText('500.00 CARD.CPXD');
       await click('.ember-power-select-options li:nth-child(2)');
+
       assert
         .dom(
           '[data-test-balance-chooser-dropdown] [data-test-balance-display-name]'
         )
         .containsText('CARD.CPXD');
+
+      await click(
+        '[data-test-safe-chooser-dropdown] .ember-power-select-trigger'
+      );
+      assert.dom('.ember-power-select-options li').exists({ count: 2 });
+      assert
+        .dom('.ember-power-select-options li:nth-child(1)')
+        .containsText('DEPOT 0xB236ca8DbAB0644ffCD32518eBF4924ba8666666');
+      assert
+        .dom('.ember-power-select-options li:nth-child(2)')
+        .containsText(merchantAddress);
+      await click('.ember-power-select-options li:nth-child(2)');
+
+      assert
+        .dom('[data-test-balance-chooser-dropdown]')
+        .containsText(
+          '450.00 CARD.CPXD',
+          'changing the safe updates the balance for the chosen token'
+        );
+
+      await click(
+        '[data-test-balance-chooser-dropdown] .ember-power-select-trigger'
+      );
+      assert.dom('.ember-power-select-options li').exists({ count: 2 });
+      assert
+        .dom('.ember-power-select-options li:nth-child(1)')
+        .containsText('125.00 DAI.CPXD');
+      assert
+        .dom('.ember-power-select-options li:nth-child(2)')
+        .containsText('450.00 CARD.CPXD');
+      await click('.ember-power-select-options li:nth-child(2)');
 
       assert
         .dom('[data-test-choose-balance-receive] [data-test-account-name]')
@@ -109,7 +196,12 @@ module(
       assert.equal(
         session.state.withdrawalToken,
         'CARD.CPXD',
-        'workflow session state updated'
+        'workflow session withdrawal token updated'
+      );
+      assert.equal(
+        session.state.withdrawalSafe.address,
+        merchantAddress,
+        'workflow session withdrawal safe updated'
       );
     });
   }

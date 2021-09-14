@@ -7,62 +7,79 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import {
   TokenBalance,
   BridgedTokenSymbol,
+  getUnbridgedSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
+import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import BN from 'bn.js';
 
 class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<WorkflowCardComponentArgs> {
+  compatibleSafeTypes = ['depot', 'merchant'];
+
   defaultTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
   cardTokenSymbol: BridgedTokenSymbol = 'CARD.CPXD';
   tokenOptions = [this.defaultTokenSymbol, this.cardTokenSymbol];
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  get selectedTokenSymbol(): BridgedTokenSymbol {
-    return (
-      this.args.workflowSession.state.withdrawalToken ?? this.defaultTokenSymbol
-    );
-  }
-  @tracked selectedToken: TokenBalance<BridgedTokenSymbol>;
+
+  @tracked selectedSafe: Safe | undefined;
+  @tracked selectedTokenSymbol: BridgedTokenSymbol;
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    this.selectedToken =
-      this.tokens.find((t) => t.symbol === this.selectedTokenSymbol) ??
-      this.tokens[0];
+    this.selectedSafe = this.layer2Network.depotSafe;
+    this.selectedTokenSymbol =
+      this.tokens.find((t) => t.symbol === this.withdrawalToken)
+        ?.tokenDisplayInfo.symbol ?? this.tokens[0].tokenDisplayInfo.symbol;
+  }
+
+  get withdrawalToken(): BridgedTokenSymbol {
+    return (
+      this.args.workflowSession.state.withdrawalToken ?? this.defaultTokenSymbol
+    );
   }
 
   get depotAddress() {
     return this.layer2Network.depotSafe?.address || undefined;
   }
 
+  get compatibleSafes() {
+    return this.layer2Network.safes.value.filter((safe) =>
+      this.compatibleSafeTypes.includes(safe.type)
+    );
+  }
+
   get tokens() {
     return this.tokenOptions.map((symbol) => {
-      let balance = this.getTokenBalance(symbol);
+      let unbridgedSymbol = getUnbridgedSymbol(symbol);
+      let selectedSafeToken = (this.selectedSafe?.tokens || []).find(
+        (token) => token.token.symbol === unbridgedSymbol
+      );
+      let balance = new BN(selectedSafeToken?.balance || '0');
       return new TokenBalance(symbol, balance);
     });
   }
-
-  getTokenBalance(symbol: BridgedTokenSymbol) {
-    if (symbol === this.defaultTokenSymbol) {
-      return this.layer2Network.defaultTokenBalance ?? new BN('0');
-    }
-    if (symbol === this.cardTokenSymbol) {
-      return this.layer2Network.cardBalance ?? new BN('0');
-    }
-    return new BN('0');
+  get selectedToken() {
+    return this.tokens.find(
+      (token) => token.symbol === this.selectedTokenSymbol
+    );
   }
 
   get isDisabled() {
     return (
       !this.depotAddress ||
       !this.tokens.length ||
-      !this.selectedToken.balance ||
-      this.selectedToken.balance.isZero()
+      !this.selectedToken?.balance ||
+      this.selectedToken?.balance.isZero()
     );
   }
 
-  @action chooseSource(token: TokenBalance<BridgedTokenSymbol>) {
-    this.selectedToken = token;
+  @action chooseSafe(safe: Safe) {
+    this.selectedSafe = safe;
+  }
+
+  @action chooseBalance(token: TokenBalance<BridgedTokenSymbol>) {
+    this.selectedTokenSymbol = token.symbol;
   }
 
   @action save() {
@@ -70,10 +87,10 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
       return;
     }
     if (this.selectedToken) {
-      this.args.workflowSession.update(
-        'withdrawalToken',
-        this.selectedToken.symbol
-      );
+      this.args.workflowSession.updateMany({
+        withdrawalSafe: this.selectedSafe,
+        withdrawalToken: this.selectedToken.symbol,
+      });
       this.args.onComplete?.();
     }
   }

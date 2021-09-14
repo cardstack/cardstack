@@ -5,8 +5,8 @@
   data-test-withdrawal-choose-balance-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section>
-    <ActionCardContainer::Section @title="Withdraw tokens">
-      <CardPay::LabeledValue @label="From:" class="choose-balance__field">
+    <ActionCardContainer::Section @title="Choose a source and balance to withdraw from">
+      <CardPay::LabeledValue @label="Source:" class="choose-balance__field">
         <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} data-test-choose-balance-from-wallet />
         <CardPay::NestedItems @noInnerBorder={{not @isComplete}} class="choose-balance__nested-items">
           <:outer>
@@ -18,13 +18,21 @@
             />
           </:outer>
           <:inner>
-            <CardPay::AccountDisplay
-              @size={{if @isComplete "small"}}
-              @icon="depot"
-              @name="DEPOT:"
-              @address={{if @isComplete (truncate-middle this.depotAddress) this.depotAddress}}
-              data-test-choose-balance-from-depot
-            />
+            {{#if @isComplete}}
+              <CardPay::AccountDisplay
+                @size="small"
+                @icon={{this.selectedSafe.type}}
+                @name={{uppercase this.selectedSafe.type}}
+                @address={{truncate-middle this.selectedSafe.address}}
+              />
+            {{else}}
+              <CardPay::SafeChooserDropdown
+                @safes={{this.compatibleSafes}}
+                @selectedSafe={{this.selectedSafe}}
+                @onChooseSafe={{this.chooseSafe}}
+                data-test-choose-balance-from-safe
+              />
+            {{/if}}
           </:inner>
           <:innermost>
             {{#if @isComplete}}
@@ -42,7 +50,7 @@
                   @tokens={{this.tokens}}
                   @selectedToken={{this.selectedToken}}
                   @selectedTokenSymbol={{this.selectedTokenSymbol}}
-                  @chooseToken={{this.chooseSource}}
+                  @chooseToken={{this.chooseBalance}}
                 />
               </div>
             {{/if}}

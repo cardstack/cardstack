@@ -5,12 +5,21 @@
 >
   <ActionCardContainer::Section @title="Choose an amount to withdraw" @dataTestId="withdrawal-transaction-amount">
     <div class="withdrawal-transaction-amount__fields">
-      <CardPay::LabeledValue @vertical={{this.isConfirmed}} @label="Funding from" class="withdrawal-transaction-amount__label">
-        <CardPay::BalanceViewBanner
-          @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
-          @depotAddress={{this.layer2Network.depotSafe.address}}
-          @token={{this.currentTokenDetails}}
+      <CardPay::LabeledValue @vertical={{this.isConfirmed}} @label="Withdrawal source" class="withdrawal-transaction-amount__label">
+        <CardPay::SafeChooserDropdown::SafeOption
+          @safe={{this.currentSafe}}
+          data-test-withdrawal-source
+        />
+      </CardPay::LabeledValue>
+      <CardPay::LabeledValue @vertical={{this.isConfirmed}} @label="Source balance" class="withdrawal-transaction-amount__label">
+        <CardPay::BalanceDisplay
+          class="withdrawal-transaction-amount__balance"
+          @size="small"
+          @icon={{this.currentTokenDetails.icon}}
+          @name={{this.currentTokenDetails.symbol}}
           @balance={{format-token-amount this.currentTokenBalance}}
+          @symbol={{this.currentTokenDetails.symbol}}
+          data-test-withdrawal-balance
         />
       </CardPay::LabeledValue>
       <CardPay::LabeledValue
