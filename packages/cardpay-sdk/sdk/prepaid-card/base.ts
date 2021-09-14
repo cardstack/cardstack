@@ -689,7 +689,7 @@ export default class PrepaidCard {
           signatures,
           nonce
         );
-        console.log(`Reward program ${rewardProgramID} registered with admin ${admin ?? owner}`)
+        console.log(`Reward program ${rewardProgramID} registered with admin ${admin ?? owner}`);
         break;
       } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
