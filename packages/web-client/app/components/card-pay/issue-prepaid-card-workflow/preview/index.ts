@@ -75,7 +75,6 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
     }
   }
 
-  // TODO: Refactor long method
   @task *issueTask(): TaskGenerator<void> {
     let { workflowSession } = this.args;
     try {
@@ -112,11 +111,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
           this.layer2Network.resumeIssuePrepaidCardTransactionTask
         ).perform(txnHash);
 
-        if (prepaidCardSafe) {
-          this.args.workflowSession.update('prepaidCardSafe', prepaidCardSafe);
-        }
-
-        this.args.onComplete();
+        this.args.workflowSession.update('prepaidCardSafe', prepaidCardSafe);
       } else {
         this.chinInProgressMessage =
           'You will receive a confirmation request from the Card Wallet app in a few moments…';
@@ -150,11 +145,11 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
           prepaidCardAddress: prepaidCardSafe.address,
           reloadable: prepaidCardSafe.reloadable,
           transferrable: prepaidCardSafe.transferrable,
+          prepaidCardSafe: prepaidCardSafe,
         });
-
-        this.args.workflowSession.update('prepaidCardSafe', prepaidCardSafe);
-        this.args.onComplete();
       }
+
+      this.args.onComplete();
     } catch (e) {
       let insufficientFunds = e.message.startsWith(
         'Safe does not have enough balance to make prepaid card(s).'
