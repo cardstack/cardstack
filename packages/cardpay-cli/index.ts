@@ -121,7 +121,7 @@ let {
   signatures,
   hubRootUrl,
   rewardProgramId,
-  admin
+  admin,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
