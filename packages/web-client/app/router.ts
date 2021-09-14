@@ -16,5 +16,8 @@ Router.map(function () {
   this.route('pay', {
     path: '/pay/:network/:merchant_safe_id',
   });
+  this.route('pay-missing-route', {
+    path: '/pay/:*',
+  });
   this.route('boom');
 });

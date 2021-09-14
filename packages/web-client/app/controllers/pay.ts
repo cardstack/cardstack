@@ -6,6 +6,7 @@ import { inject as service } from '@ember/service';
 import IsIOS from '../services/is-ios';
 import { useResource } from 'ember-resources';
 import { MerchantInfo } from '../resources/merchant-info';
+import config from '@cardstack/web-client/config/environment';
 
 export default class CardPayMerchantServicesController extends Controller {
   @service('is-ios') declare isIOSService: IsIOS;
@@ -47,10 +48,8 @@ export default class CardPayMerchantServicesController extends Controller {
     return !isNaN(this.amount) && this.amount > 0;
   }
   get paymentURL() {
-    // TODO: add domain to arguments (wallet.cardstack.com)
-    // currently using the default domain which is cardwallet:/
-    // because wallet.cardstack.com does not open up the payment UI
     return generateMerchantPaymentUrl({
+      domain: config.universalLinkDomain,
       network: this.model.network,
       merchantSafeID: this.model.merchantSafe.address,
       currency: this.currency,
