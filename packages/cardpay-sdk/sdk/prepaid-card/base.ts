@@ -804,7 +804,8 @@ export default class PrepaidCard {
           signatures,
           nonce
         );
-        console.log(`Rewardee registered for ${rewardProgramID}`);
+        let rewardSafeAddress = await this.getRewardSafeFromTxn(gnosisResult.ethereumTx.txHash);
+        console.log(`Rewardee registered for ${rewardProgramID} with reward safe ${rewardSafeAddress}`);
         break;
       } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
@@ -925,6 +926,12 @@ export default class PrepaidCard {
     );
   }
 
+  private async getRewardSafeFromTxn(txnHash: string): Promise<any> {
+    let rewardMgrAddress = await getAddress('rewardManager', this.layer2Web3);
+    let txnReceipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return getParamsFromEvent(this.layer2Web3, txnReceipt, this.rewardeeRegisteredABI(), rewardMgrAddress)[0]
+      .rewardSafe;
+  }
   private async getPayMerchantPayload(
     prepaidCardAddress: string,
     merchantSafe: string,
@@ -1184,6 +1191,26 @@ export default class PrepaidCard {
         {
           type: 'string',
           name: 'customizationDID',
+        },
+      ],
+    };
+  }
+
+  private rewardeeRegisteredABI(): EventABI {
+    return {
+      topic: this.layer2Web3.eth.abi.encodeEventSignature('RewardeeRegistered(address,address,address)'),
+      abis: [
+        {
+          type: 'address',
+          name: 'rewardProgramID',
+        },
+        {
+          type: 'address',
+          name: 'rewardee',
+        },
+        {
+          type: 'address',
+          name: 'rewardSafe',
         },
       ],
     };
