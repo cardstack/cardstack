@@ -3,7 +3,6 @@
 import { ContractMeta } from '../version-resolver';
 
 import v0_8_0 from './v0.8.0';
-import v0_7_0 from './v0.7.0';
 
 export { RewardTokenBalance } from './base';
 
@@ -12,6 +11,6 @@ export { RewardTokenBalance } from './base';
 export type RewardPool = v0_8_0;
 
 export const rewardPoolMeta = {
-  apiVersions: { v0_8_0, v0_7_0 },
+  apiVersions: { v0_8_0 },
   contractName: 'rewardPool',
 } as ContractMeta;
