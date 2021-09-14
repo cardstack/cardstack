@@ -11,6 +11,7 @@ import {
   ConvertibleSymbol,
   ConversionFunction,
   BridgeableSymbol,
+  BridgedTokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import { Emitter } from '../events';
 import { BridgeValidationResult } from '@cardstack/cardpay-sdk/sdk/token-bridge-home-side';
@@ -45,6 +46,11 @@ export interface RelayTokensOptions {
 
 export interface ClaimBridgedTokensOptions {
   onTxnHash?(txnHash: TransactionHash): void;
+}
+
+export interface WithdrawalLimits {
+  min: BN;
+  max: BN;
 }
 
 export interface Layer1Web3Strategy
@@ -103,6 +109,9 @@ export interface Layer2Web3Strategy
     fromBlock: BN,
     receiver: ChainAddress
   ): Promise<TransactionReceipt>;
+  getWithdrawalLimits(
+    tokenSymbol: BridgedTokenSymbol
+  ): Promise<WithdrawalLimits>;
   bridgeToLayer1(
     safeAddress: string,
     receiverAddress: string,

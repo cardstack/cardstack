@@ -1,5 +1,12 @@
 import BN from 'bn.js';
-import { toWei } from 'web3-utils';
+import { fromWei, toWei } from 'web3-utils';
+import {
+  BridgedTokenSymbol,
+  getUnbridgedSymbol,
+  isBridgedTokenSymbol,
+  TokenSymbol,
+} from '@cardstack/web-client/utils/token';
+import { convertRawAmountToNativeDisplay } from '@cardstack/cardpay-sdk';
 
 // token input validations that assume string inputs are in ether
 function isInvalidAsNumber(amount: string) {
@@ -15,8 +22,34 @@ function failsToCreateBN(amount: string) {
   return false;
 }
 
-interface TokenInputValidationOptions {
-  min: BN;
+function formatAmount(amount: BN, token: TokenSymbol) {
+  let tokenForFormatter = token;
+  let tokenIsBridged = isBridgedTokenSymbol(token);
+
+  // Bridged currencies aren’t recognised
+  if (tokenIsBridged) {
+    tokenForFormatter = getUnbridgedSymbol(token as BridgedTokenSymbol);
+  }
+
+  let formattedString = convertRawAmountToNativeDisplay(
+    fromWei(amount.toString()),
+    0,
+    1,
+    tokenForFormatter
+  ).display;
+
+  // Replace the unbridged symbol with the bridged one
+  if (tokenIsBridged) {
+    formattedString = formattedString.replace(tokenForFormatter, token);
+  }
+
+  return formattedString;
+}
+
+export interface TokenInputValidationOptions {
+  tokenSymbol: TokenSymbol;
+  min?: BN;
+  balance?: BN;
   max?: BN;
 }
 
@@ -40,13 +73,32 @@ let orderedTokenInputValidations: Array<
     return failsToCreateBN(amount) ? 'Amount must be a valid number' : '';
   },
   (amount: string, options: TokenInputValidationOptions) => {
-    if (!options.max) return '';
-    return new BN(toWei(amount)).gt(options.max)
+    if (!options.balance) return '';
+    return new BN(toWei(amount)).gt(options.balance)
       ? 'Insufficient balance in your account'
       : '';
   },
   (amount: string, options: TokenInputValidationOptions) => {
-    return new BN(toWei(amount)).lte(options.min) ? 'Amount is too low' : '';
+    if (!options.max) return '';
+    return new BN(toWei(amount)).gt(options.max)
+      ? `Amount must be below ${formatAmount(options.max, options.tokenSymbol)}`
+      : '';
+  },
+  (amount: string, options: TokenInputValidationOptions) => {
+    if (options.min) return '';
+    let zero = new BN(0);
+    return new BN(toWei(amount)).lte(zero)
+      ? `Amount must be above ${formatAmount(new BN(0), options.tokenSymbol)}`
+      : '';
+  },
+  (amount: string, options: TokenInputValidationOptions) => {
+    if (!options.min) return '';
+    return new BN(toWei(amount)).lt(options.min)
+      ? `Amount must be at least ${formatAmount(
+          options.min,
+          options.tokenSymbol
+        )}`
+      : '';
   },
 ];
 

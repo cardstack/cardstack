@@ -1,8 +1,9 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
-import { Layer2Web3Strategy, TransactionHash } from './types';
+import { Layer2Web3Strategy, TransactionHash, WithdrawalLimits } from './types';
 import {
   BridgeableSymbol,
+  BridgedTokenSymbol,
   ConvertibleSymbol,
   ConversionFunction,
 } from '@cardstack/web-client/utils/token';
@@ -79,6 +80,9 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   // this is only a mock property
   @tracked balancesRefreshed = false;
 
+  test__withdrawalMinimum = new BN('500000000000000000');
+  test__withdrawalMaximum = new BN('1500000000000000000000000');
+
   @task *initializeTask(): TaskGenerator<void> {
     yield '';
     return;
@@ -111,6 +115,15 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     let safes = this.accountSafes.get(this.walletInfo.firstAddress!) || [];
     let depotSafe = safes.find((safe) => safe.type === 'depot');
     return (depotSafe as DepotSafe) ?? null;
+  }
+
+  async getWithdrawalLimits(
+    _tokenSymbol: BridgedTokenSymbol
+  ): Promise<WithdrawalLimits> {
+    return {
+      min: this.test__withdrawalMinimum,
+      max: this.test__withdrawalMaximum,
+    };
   }
 
   awaitBridgedToLayer2(

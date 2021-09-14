@@ -11,6 +11,8 @@ import sinon from 'sinon';
 const startDaiAmountString = '100.1111111111111111';
 let startDaiAmount = toWei(startDaiAmountString);
 
+let layer2Strategy: Layer2TestWeb3Strategy;
+
 module(
   'Integration | Component | card-pay/withdrawal-workflow/transaction-amount',
   async function (hooks) {
@@ -18,7 +20,7 @@ module(
 
     hooks.beforeEach(async function () {
       let layer2Service = this.owner.lookup('service:layer2-network');
-      let layer2Strategy = layer2Service.strategy as Layer2TestWeb3Strategy;
+      layer2Strategy = layer2Service.strategy;
 
       // Simulate being connected on layer 2 -- prereq to converting to USD
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
@@ -91,6 +93,20 @@ module(
       assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
     });
 
+    test('it accepts a value that is equal to the minimum', async function (assert) {
+      await fillIn('input', '0.5');
+      assert.dom('input').doesNotHaveAria('invalid', 'true');
+      assert.dom('[data-test-boxel-input-error-message]').doesNotExist();
+    });
+
+    test('it rejects a well-formatted value that is lower than the minimum', async function (assert) {
+      await fillIn('input', '0.1');
+      assert.dom('input').hasAria('invalid', 'true');
+      assert
+        .dom('[data-test-boxel-input-error-message]')
+        .containsText('Amount must be at least 0.50 DAI.CPXD');
+    });
+
     test('it rejects a well-formatted value this is greater than the balance', async function (assert) {
       await fillIn('input', '150');
       assert.dom('input').hasValue('150');
@@ -105,6 +121,29 @@ module(
       assert
         .dom('[data-test-boxel-input-error-message]')
         .containsText('Insufficient balance in your account');
+    });
+
+    test('it rejects a well-formatted value this is greater than the maximum', async function (assert) {
+      let limit = await layer2Strategy.getWithdrawalLimits('DAI.CPXD');
+      let balanceBiggerThanLimit = limit.max.add(new BN(toWei('2')));
+
+      layer2Strategy.test__simulateBalances({
+        defaultToken: balanceBiggerThanLimit,
+        dai: balanceBiggerThanLimit,
+        card: new BN('0'),
+      });
+
+      await fillIn('input', '1500002');
+      assert.dom('input').hasAria('invalid', 'true');
+      assert
+        .dom('[data-test-boxel-input-error-message]')
+        .containsText('Amount must be below 1,500,000.00 DAI.CPXD');
+
+      await fillIn('input', '1500000.1');
+      assert.dom('input').hasAria('invalid', 'true');
+      assert
+        .dom('[data-test-boxel-input-error-message]')
+        .containsText('Amount must be below 1,500,000.00 DAI.CPXD');
     });
 
     test('it strips whitespace from the beginning and end', async function (assert) {

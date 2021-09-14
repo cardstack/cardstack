@@ -15,6 +15,7 @@ import {
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import {
+  TokenInputValidationOptions,
   shouldUseTokenInput,
   validateTokenInput,
 } from '@cardstack/web-client/utils/validation';
@@ -23,6 +24,7 @@ import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
 import { reads } from 'macro-decorators';
+import * as Sentry from '@sentry/browser';
 
 class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
@@ -42,6 +44,12 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
 
   get currentTokenSymbol(): BridgedTokenSymbol {
     return this.args.workflowSession.state.withdrawalToken;
+  }
+
+  get currentTokenSymbolWithdrawalLimits() {
+    return this.layer2Network.bridgedSymbolToWithdrawalLimits.get(
+      this.currentTokenSymbol
+    );
   }
 
   get currentTokenDetails(): TokenDisplayInfo<BridgedTokenSymbol> | undefined {
@@ -111,10 +119,20 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   }
 
   validate() {
-    this.validationMessage = validateTokenInput(this.amount, {
-      min: new BN(0),
-      max: this.currentTokenBalance,
-    });
+    let limits = this.currentTokenSymbolWithdrawalLimits;
+    let validationOptions: TokenInputValidationOptions = {
+      balance: this.currentTokenBalance,
+      tokenSymbol: this.currentTokenSymbol,
+    };
+
+    if (limits) {
+      validationOptions.min = limits.min;
+      validationOptions.max = limits.max;
+    } else {
+      Sentry.captureException('Unable to validate withdrawal limits');
+    }
+
+    this.validationMessage = validateTokenInput(this.amount, validationOptions);
   }
 
   @action withdraw() {

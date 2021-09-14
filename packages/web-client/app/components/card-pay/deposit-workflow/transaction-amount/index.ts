@@ -124,7 +124,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
 
   validate() {
     this.validationMessage = validateTokenInput(this.amount, {
-      min: new BN(0),
+      tokenSymbol: this.currentTokenSymbol,
       max: this.currentTokenBalance,
     });
   }
