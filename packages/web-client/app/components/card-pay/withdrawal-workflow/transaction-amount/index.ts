@@ -35,7 +35,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
 
   // assumption is this is always set by cards before it. It should be defined by the time
   // it gets to this part of the workflow
-  get currentTokenSymbol(): TokenSymbol {
+  get currentTokenSymbol(): BridgedTokenSymbol {
     return this.args.workflowSession.state.withdrawalToken;
   }
 
