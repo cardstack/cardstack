@@ -50,6 +50,9 @@ export class WorkflowCard extends WorkflowPostable {
   get session(): WorkflowSession | undefined {
     return this.workflow?.session;
   }
+  get completedCardNames(): Array<String> {
+    return this.session?.state.completedCardNames ?? [];
+  }
 
   @action async onComplete() {
     if (this.isComplete) return;
@@ -63,12 +66,9 @@ export class WorkflowCard extends WorkflowPostable {
     }
 
     if (this.isComplete && this.cardName) {
-      const existingCompletedCardNames =
-        this.session?.state.completedCardNames || [];
-
-      if (!existingCompletedCardNames.includes(this.cardName)) {
+      if (!this.completedCardNames.includes(this.cardName)) {
         this.session?.updateMany({
-          completedCardNames: [...existingCompletedCardNames, this.cardName],
+          completedCardNames: [...this.completedCardNames, this.cardName],
           completedMilestonesCount: this.workflow?.completedMilestoneCount,
           milestonesCount: this.workflow?.milestones.length,
         });
@@ -78,5 +78,15 @@ export class WorkflowCard extends WorkflowPostable {
 
   @action onIncomplete() {
     this.workflow?.resetTo(this);
+
+    if (this.cardName && this.completedCardNames.length > 0) {
+      const resetToIndex = this.completedCardNames.indexOf(this.cardName);
+
+      this.session?.updateMany({
+        completedCardNames: this.completedCardNames.slice(0, resetToIndex),
+        completedMilestonesCount: this.workflow?.completedMilestoneCount,
+        milestonesCount: this.workflow?.milestones.length,
+      });
+    }
   }
 }

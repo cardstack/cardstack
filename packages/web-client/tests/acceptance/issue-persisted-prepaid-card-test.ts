@@ -320,6 +320,68 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert.equal(workflowPersistenceId!.length, 22);
     });
 
+    test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {
+      const state = {
+        completedCardNames: [
+          'LAYER2_CONNECT',
+          'LAYOUT_CUSTOMIZATION',
+          'FUNDING_SOURCE',
+          'FACE_VALUE',
+        ],
+        issuerName: 'Vitalik',
+        pattern: {
+          patternUrl:
+            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+          id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
+        },
+        colorScheme: {
+          patternColor: 'white',
+          textColor: 'black',
+          background: '#37EB77',
+          id: '4f219852-33ee-4e4c-81f7-76318630a423',
+        },
+        prepaidFundingToken: 'DAI.CPXD',
+        spendFaceValue: 10000,
+        did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+        prepaidCardAddress: '0x81c89274Dc7C9BAcE082d2ca00697d2d2857D2eE',
+        reloadable: true,
+        transferrable: true,
+        txHash:
+          '0x8bcc3e419d09a0403d1491b5bb8ac8bee7c67f85cc37e6e17ef8eb77f946497b',
+        prepaidCardSafe: {
+          type: 'prepaid-card',
+          address: '0x81c89274Dc7C9BAcE082d2ca00697d2d2857D2eE',
+          customizationDID:
+            'did:cardstack:1pkYh9uJHdfMJZt4mURGmhps96b157a2d744efd9',
+          reloadable: false,
+          spendFaceValue: 500,
+          transferrable: true,
+        },
+      };
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'PREPAID_CARD_ISSUANCE',
+        state,
+      });
+
+      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+      assert.dom('[data-test-milestone="0"]').exists(); // L2
+      assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
+      assert.dom('[data-test-milestone="2"]').exists(); // Choose face value
+      assert.dom('[data-test-milestone="3"]').exists(); // Prepaid card preview
+
+      await waitFor('[data-test-milestone="1"] [data-test-boxel-button]');
+
+      await click('[data-test-milestone="1"] [data-test-boxel-button]');
+
+      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+
+      assert.dom('[data-test-milestone="0"]').exists(); // L2
+      assert.dom('[data-test-milestone="1"]').exists(); // Customize layout
+      assert.dom('[data-test-milestone="2"]').doesNotExist(); // Choose face value
+      assert.dom('[data-test-milestone="3"]').doesNotExist(); // Prepaid card preview
+    });
+
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
       const state = {
         completedCardNames: [
