@@ -828,17 +828,6 @@ if (!command) {
       }
       await registerRewardProgram(network, prepaidCard, admin, mnemonic);
       break;
-    case 'registerRewardProgram':
-      if (prepaidCard == null) {
-        showHelpAndExit('prepaid card is a required value');
-        return;
-      }
-      if (admin == null) {
-        showHelpAndExit('admin is a required value');
-        return;
-      }
-      await registerRewardProgram(network, prepaidCard, admin, mnemonic);
-      break;
     case 'registerRewardee':
       if (rewardProgramID == null) {
         showHelpAndExit('rewardProgramID is a required value');
