@@ -6,6 +6,7 @@ import { tracked } from '@glimmer/tracking';
 import { SimpleEmitter } from '../utils/events';
 import { next } from '@ember/runloop';
 import WorkflowPersistence from '@cardstack/web-client/app/services/workflow-persistence';
+import { setOwner } from '@ember/application';
 export { Milestone } from './workflow/milestone';
 export { default as PostableCollection } from './workflow/postable-collection';
 export { WorkflowMessage, IWorkflowMessage } from './workflow/workflow-message';
@@ -21,6 +22,7 @@ export {
   ArbitraryDictionary,
   default as WorkflowSession,
 } from './workflow/workflow-session';
+export { SessionAwareWorkflowMessage } from './workflow/session-aware-workflow-message';
 interface PostableIndices {
   isInMilestone: boolean;
   isInEpilogue: boolean;
@@ -49,8 +51,8 @@ export abstract class Workflow {
   workflowPersistence: WorkflowPersistence;
   workflowPersistenceId?: string;
 
-  constructor(owner: any) {
-    this.owner = owner;
+  constructor(owner?: any) {
+    setOwner(this, owner);
     this.session = new WorkflowSession(this);
     this.workflowPersistence = owner.lookup('service:workflow-persistence');
   }

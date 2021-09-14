@@ -7,6 +7,7 @@ import {
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer1-network';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
+import { getOwner } from '@ember/application';
 
 interface NetworkAwareWorkflowCardOptions {
   cardName?: string;
@@ -23,7 +24,7 @@ export default class NetworkAwareWorkflowCard extends WorkflowCard {
 
   get layer1Network() {
     let postable = this as WorkflowPostable;
-    let layer1Network = postable.workflow?.owner.lookup(
+    let layer1Network = getOwner(postable.workflow).lookup(
       'service:layer1-network'
     ) as Layer1Network;
     return layer1Network;
@@ -35,7 +36,7 @@ export default class NetworkAwareWorkflowCard extends WorkflowCard {
 
   get hasLayer2Account() {
     let postable = this as WorkflowPostable;
-    let layer2Network = postable.workflow?.owner.lookup(
+    let layer2Network = getOwner(postable.workflow).lookup(
       'service:layer2-network'
     ) as Layer2Network;
     return layer2Network.isConnected;
@@ -43,7 +44,7 @@ export default class NetworkAwareWorkflowCard extends WorkflowCard {
 
   get isHubAuthenticated() {
     let postable = this as WorkflowPostable;
-    let hubAuthentication = postable.workflow?.owner.lookup(
+    let hubAuthentication = getOwner(postable.workflow).lookup(
       'service:hub-authentication'
     ) as HubAuthentication;
     return hubAuthentication.isAuthenticated;
