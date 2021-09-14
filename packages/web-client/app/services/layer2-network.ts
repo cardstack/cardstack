@@ -18,7 +18,6 @@ import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
 import { DepotSafe, Safe } from '@cardstack/cardpay-sdk/sdk/safes';
-import { Depot } from '@cardstack/web-client/resources/depot';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import {
   BridgeableSymbol,
@@ -50,10 +49,10 @@ export default class Layer2Network
     [symbol: string]: (amountInWei: string) => number;
   };
   @reads('stragey.viewSafesTask') declare viewSafesTask: TaskGenerator<Safe[]>;
-  @reads('depot.defaultTokenBalance') defaultTokenBalance: BN | undefined;
-  @reads('depot.cardBalance') cardBalance: BN | undefined;
-  @reads('depot.value') depotSafe: DepotSafe | undefined;
-  @reads('depot.isLoading') declare isFetchingDepot: boolean;
+  @reads('safes.depot.defaultTokenBalance') defaultTokenBalance: BN | undefined;
+  @reads('safes.depot.cardBalance') cardBalance: BN | undefined;
+  @reads('safes.depot.value') depotSafe: DepotSafe | undefined;
+  @reads('safes.isLoading') declare isFetchingDepot: boolean;
 
   constructor(props: object | undefined) {
     super(props);
@@ -111,10 +110,6 @@ export default class Layer2Network
   }
 
   safes = useResource(this, Safes, () => ({
-    strategy: this.strategy,
-    walletAddress: this.walletInfo.firstAddress!,
-  }));
-  depot = useResource(this, Depot, () => ({
     strategy: this.strategy,
     walletAddress: this.walletInfo.firstAddress!,
   }));
