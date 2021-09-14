@@ -20,7 +20,7 @@ import {
   gasFee,
   getPaymentLimits,
 } from './prepaid-card.js';
-import { registerRewardProgram } from './reward-manager';
+import { registerRewardProgram, registerRewardee } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
   usdPrice as layer2UsdPrice,
@@ -76,7 +76,8 @@ type Commands =
   | 'hubAuth'
   | 'rewardTokenBalances'
   | 'withdrawalLimits'
-  | 'registerRewardProgram';
+  | 'registerRewardProgram'
+  | 'registerRewardee';
 
 let command: Commands | undefined;
 interface Options {
@@ -110,6 +111,7 @@ interface Options {
   prepaidCards?: string[];
   rewardProgramId?: string;
   admin?: string;
+  rewardProgramID?: string;
 }
 let {
   network,
@@ -142,6 +144,7 @@ let {
   hubRootUrl,
   rewardProgramId,
   admin,
+  rewardProgramID,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -653,6 +656,17 @@ let {
     });
     command = 'registerRewardProgram';
   })
+  .command('register-rewardee <prepaidCard> <rewardProgramID>', 'Register rewardee', (yargs) => {
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The address of the prepaid card that is being used to pay the merchant',
+    });
+    yargs.positional('rewardProgramID', {
+      type: 'string',
+      description: 'Reward program id',
+    });
+    command = 'registerRewardee';
+  })
   .options({
     network: {
       alias: 'n',
@@ -929,6 +943,17 @@ if (!command) {
         return;
       }
       await registerRewardProgram(network, prepaidCard, admin, mnemonic);
+      break;
+    case 'registerRewardee':
+      if (rewardProgramID == null) {
+        showHelpAndExit('rewardProgramID is a required value');
+        return;
+      }
+      if (prepaidCard == null) {
+        showHelpAndExit('prepaid card is a required value');
+        return;
+      }
+      await registerRewardee(network, prepaidCard, rewardProgramID, mnemonic);
       break;
     default:
       assertNever(command);
