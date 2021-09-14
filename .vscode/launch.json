@@ -521,10 +521,12 @@
       "args": [
         "reward-balances",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", // Justin's address
+        "--rewardProgramId",
+        "0x4767D0D74356433d54880Fcd7f083751d64388aF",
         "--network",
         "sokol",
         "--mnemonic",
-        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
       ]
     }
   ]

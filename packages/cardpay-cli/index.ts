@@ -90,6 +90,7 @@ interface Options {
   encodedData?: string;
   signatures?: string[];
   faceValues?: number[];
+  rewardProgramId?: string;
 }
 let {
   network,
@@ -116,6 +117,7 @@ let {
   encodedData,
   signatures,
   hubRootUrl,
+  rewardProgramId,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -529,13 +531,21 @@ let {
       command = 'hubAuth';
     }
   )
-  .command('reward-balances [address]', 'View token balances of unclaimed rewards in the reward pool.', (yargs) => {
-    yargs.positional('address', {
-      type: 'string',
-      description: 'The address that tally rewarded -- The owner of prepaid card.',
-    });
-    command = 'rewardTokenBalances';
-  })
+  .command(
+    'reward-balances <address> [rewardProgramId]',
+    'View token balances of unclaimed rewards in the reward pool.',
+    (yargs) => {
+      yargs.positional('address', {
+        type: 'string',
+        description: 'The address that tally rewarded -- The owner of prepaid card.',
+      });
+      yargs.positional('rewardProgramId', {
+        type: 'string',
+        description: 'The reward program id.',
+      });
+      command = 'rewardTokenBalances';
+    }
+  )
   .options({
     network: {
       alias: 'n',
@@ -765,7 +775,7 @@ if (!command) {
         showHelpAndExit('address is a required value');
         return;
       }
-      await rewardTokenBalances(network, address, mnemonic);
+      await rewardTokenBalances(network, address, rewardProgramId, mnemonic);
       break;
     default:
       assertNever(command);

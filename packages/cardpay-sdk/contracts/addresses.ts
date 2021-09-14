@@ -50,7 +50,7 @@ const SOKOL = {
   actionDispatcher: '0xaE5AC3685630b33Ed2677438EEaAe0aD5372c795',
   uniswapV2Router: '0xd57B4D7B7FED6b47492A362e113e26F9804DbCc6', // This is the UniswapV2Router02
   uniswapV2Factory: '0x6b67f08F08B715B162aa09239488318A660F24BF',
-  rewardPool: '0x9d8Ea61555Ee7A5d1Ca9422de7Fd7866430710bB',
+  rewardPool: '0x2D23acfEA32492911E8DF12E697AF0013B8D4E7b',
   deprecatedMerchantManager_v0_6_7: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2', // eslint-disable-line @typescript-eslint/naming-convention
   oracles: {
     DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB', // eslint-disable-line @typescript-eslint/naming-convention

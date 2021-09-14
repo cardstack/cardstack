@@ -16,7 +16,10 @@ interface Proof {
   proof: string;
   timestamp: string;
   blockNumber: number;
+  rewardProgramId: string;
 }
+
+const DEFAULT_PAGE_SIZE = 1000000;
 
 export interface RewardTokenBalance {
   tokenAddress: string;
@@ -32,14 +35,22 @@ export default class RewardPool {
     return await (await this.getRewardPool()).methods.numPaymentCycles().call();
   }
 
-  async getBalanceForProof(tokenAddress: string, address: string, proof: string): Promise<string> {
-    return (await this.getRewardPool()).methods.balanceForProofWithAddress(tokenAddress, address, proof).call();
+  async getBalanceForProof(
+    rewardProgramId: string,
+    tokenAddress: string,
+    address: string,
+    proof: string
+  ): Promise<string> {
+    return (await this.getRewardPool()).methods
+      .balanceForProofWithAddress(rewardProgramId, tokenAddress, address, proof)
+      .call();
   }
 
-  //tally
-  async rewardTokensAvailable(address: string): Promise<string[]> {
+  async rewardTokensAvailable(address: string, rewardProgramId?: string): Promise<string[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
-    let url = `${tallyServiceURL}/reward-tokens/${address}`;
+    let url =
+      `${tallyServiceURL}/reward-tokens/${address}` + (rewardProgramId ? `?reward_program_id=${rewardProgramId}` : '');
+
     let options = {
       method: 'GET',
       headers: {
@@ -54,9 +65,20 @@ export default class RewardPool {
     return json['tokenAddresses'];
   }
 
-  async getProofs(address: string, tokenAddress?: string): Promise<Proof[]> {
+  async getProofs(
+    address: string,
+    tokenAddress?: string,
+    rewardProgramId?: string,
+    offset?: number,
+    limit?: number
+  ): Promise<Proof[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
-    let url = `${tallyServiceURL}/merkle-proofs/${address}` + (tokenAddress ? `?token_address=${tokenAddress}` : '');
+    let url =
+      `${tallyServiceURL}/merkle-proofs/${address}` +
+      (tokenAddress ? `?token_address=${tokenAddress}` : '') +
+      (rewardProgramId ? `&reward_program_id=${rewardProgramId}` : '') +
+      (offset ? `&offset=${offset}` : '') +
+      (limit ? `&limit=${limit}` : `&limit=${DEFAULT_PAGE_SIZE}`);
     let options = {
       method: 'GET',
       headers: {
@@ -73,19 +95,25 @@ export default class RewardPool {
     return json['results'];
   }
 
-  async rewardTokenBalance(address: string, tokenAddress: string): Promise<RewardTokenBalance> {
-    let rewardTokensAvailable = await this.rewardTokensAvailable(address);
+  async rewardTokenBalance(
+    address: string,
+    tokenAddress: string,
+    rewardProgramId?: string
+  ): Promise<RewardTokenBalance> {
+    let rewardTokensAvailable = await this.rewardTokensAvailable(address, rewardProgramId);
     if (!rewardTokensAvailable.includes(tokenAddress)) {
       throw new Error(`Payee does not have any reward token ${tokenAddress}`);
     }
     const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let tokenSymbol = await tokenContract.methods.symbol().call();
-    let proofs = await this.getProofs(address, tokenAddress);
+    let proofs = await this.getProofs(address, tokenAddress, rewardProgramId);
+
     let rewardPool = await this.getRewardPool();
     let ungroupedTokenBalance = await Promise.all(
       proofs.map(async (o: Proof) => {
-        const balance = await rewardPool.methods.balanceForProofWithAddress(o.tokenAddress, address, o.proof).call();
-        // returns a string in wei amount
+        const balance = await rewardPool.methods
+          .balanceForProofWithAddress(o.rewardProgramId, o.tokenAddress, address, o.proof)
+          .call();
         return {
           tokenAddress: o.tokenAddress,
           tokenSymbol,
@@ -96,11 +124,11 @@ export default class RewardPool {
     return aggregateBalance(ungroupedTokenBalance);
   }
 
-  async rewardTokenBalances(address: string): Promise<RewardTokenBalance[]> {
-    let rewardTokensAvailable = await this.rewardTokensAvailable(address);
+  async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<RewardTokenBalance[]> {
+    let rewardTokensAvailable = await this.rewardTokensAvailable(address, rewardProgramId);
     const ungroupedTokenBalance = await Promise.all(
       rewardTokensAvailable.map(async (tokenAddress: string) => {
-        return this.rewardTokenBalance(address, tokenAddress);
+        return this.rewardTokenBalance(address, tokenAddress, rewardProgramId);
       })
     );
     return ungroupedTokenBalance;
