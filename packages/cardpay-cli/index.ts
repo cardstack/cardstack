@@ -18,7 +18,7 @@ import {
   priceForFaceValue,
   payMerchant,
   gasFee,
-  getPaymentLimits
+  getPaymentLimits,
 } from './prepaid-card.js';
 import { registerRewardProgram, registerRewardee } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
