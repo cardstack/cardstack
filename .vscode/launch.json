@@ -522,7 +522,7 @@
         "reward-balances",
         "0x159ADe032073d930E85f95AbBAB9995110c43C71", // Justin's address
         "--rewardProgramId",
-        "0x271e381a892A0d2D830268A4D1EFb5144952A6DE", 
+        "0x4767D0D74356433d54880Fcd7f083751d64388aF",
         "--network",
         "sokol",
         "--mnemonic",
