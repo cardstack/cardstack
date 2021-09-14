@@ -564,17 +564,6 @@ let {
     });
     command = 'registerRewardProgram';
   })
-  .command('register-reward-program <prepaidCard> <admin>', 'Register reward program', (yargs) => {
-    yargs.positional('admin', {
-      type: 'string',
-      description: 'The address of the new admin. this is an eoa',
-    });
-    yargs.positional('prepaidCard', {
-      type: 'string',
-      description: 'The address of the prepaid card that is being used to pay the reward program registration fee',
-    });
-    command = 'registerRewardProgram';
-  })
   .command('register-rewardee <prepaidCard> <rewardProgramID>', 'Register rewardee', (yargs) => {
     yargs.positional('prepaidCard', {
       type: 'string',
