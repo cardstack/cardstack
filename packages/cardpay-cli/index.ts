@@ -19,7 +19,6 @@ import {
   payMerchant,
   gasFee,
   getPaymentLimits,
-  registerRewardProgram
 } from './prepaid-card.js';
 import {
   registerRewardProgram
