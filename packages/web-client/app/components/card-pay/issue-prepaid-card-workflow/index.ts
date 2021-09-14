@@ -20,6 +20,7 @@ import RouterService from '@ember/routing/router-service';
 import { faceValueOptions } from './workflow-config';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
+import { next } from '@ember/runloop';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -377,7 +378,9 @@ class IssuePrepaidCardWorkflowComponent extends Component {
       const errors = workflow.restorationErrors(persistedState);
 
       if (errors.length > 0) {
-        workflow.cancel(errors[0]);
+        next(this, () => {
+          workflow.cancel(errors[0]);
+        });
       } else {
         workflow.restoreFromPersistedWorkflow();
       }

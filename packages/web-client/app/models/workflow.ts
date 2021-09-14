@@ -4,6 +4,7 @@ import { WorkflowPostable } from './workflow/workflow-postable';
 import WorkflowSession from './workflow/workflow-session';
 import { tracked } from '@glimmer/tracking';
 import { SimpleEmitter } from '../utils/events';
+import { next } from '@ember/runloop';
 
 interface PostableIndices {
   isInMilestone: boolean;
@@ -188,7 +189,9 @@ export abstract class Workflow {
       this.session.state.isCancelled &&
       this.session.state.cancelationReason
     ) {
-      this.cancel(this.session.state.cancelationReason);
+      next(this, () => {
+        this.cancel(this.session.state.cancelationReason);
+      });
     }
   }
 }
