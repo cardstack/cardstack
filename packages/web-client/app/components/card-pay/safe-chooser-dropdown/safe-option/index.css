@@ -12,6 +12,7 @@
   grid-area: logo;
   justify-self: center;
   align-self: center;
+  margin-right: 0;
 }
 
 .safe-option__name-and-type {

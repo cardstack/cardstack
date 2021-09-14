@@ -9,6 +9,8 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 
+import { TinyColor } from '@ctrl/tinycolor';
+
 interface Context extends MirageTestContext {
   safes: Safe[];
 }
@@ -120,8 +122,10 @@ module(
           '.ember-power-select-options li:nth-child(2) [data-test-merchant-logo]'
         )
         .containsText('M')
-        .hasAttribute('data-test-merchant-logo-background', '#00ffcc')
-        .hasAttribute('data-test-merchant-logo-text-color', '#000000');
+        .hasStyle({
+          'background-color': new TinyColor('#00ffcc').toRgbString(),
+          color: new TinyColor('#000000').toRgbString(),
+        });
     });
 
     test('it returns the chosen safe to the handler', async function (this: Context, assert) {
