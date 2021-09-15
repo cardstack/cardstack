@@ -111,7 +111,6 @@ interface Options {
   prepaidCards?: string[];
   rewardProgramId?: string;
   admin?: string;
-  rewardProgramID?: string;
 }
 let {
   network,
@@ -144,7 +143,6 @@ let {
   hubRootUrl,
   rewardProgramId,
   admin,
-  rewardProgramID,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -656,12 +654,12 @@ let {
     });
     command = 'registerRewardProgram';
   })
-  .command('register-rewardee <prepaidCard> <rewardProgramID>', 'Register rewardee', (yargs) => {
+  .command('register-rewardee <prepaidCard> <rewardProgramId>', 'Register rewardee', (yargs) => {
     yargs.positional('prepaidCard', {
       type: 'string',
       description: 'The address of the prepaid card that is being used to pay the merchant',
     });
-    yargs.positional('rewardProgramID', {
+    yargs.positional('rewardProgramId', {
       type: 'string',
       description: 'Reward program id',
     });
@@ -945,15 +943,15 @@ if (!command) {
       await registerRewardProgram(network, prepaidCard, admin, mnemonic);
       break;
     case 'registerRewardee':
-      if (rewardProgramID == null) {
-        showHelpAndExit('rewardProgramID is a required value');
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
         return;
       }
       if (prepaidCard == null) {
         showHelpAndExit('prepaid card is a required value');
         return;
       }
-      await registerRewardee(network, prepaidCard, rewardProgramID, mnemonic);
+      await registerRewardee(network, prepaidCard, rewardProgramId, mnemonic);
       break;
     default:
       assertNever(command);

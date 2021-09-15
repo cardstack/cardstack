@@ -479,7 +479,7 @@ export default class PrepaidCard {
   async registerRewardProgram(txnHash: string): Promise<TransactionReceipt>;
   async registerRewardProgram(
     prepaidCardAddress: string,
-    rewardProgramID: string,
+    rewardProgramId: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
@@ -511,7 +511,7 @@ export default class PrepaidCard {
         )
     );
 
-    let rewardProgramID = randomHex(20);
+    let rewardProgramId = randomHex(20);
     let prepaidCardMgr = await this.getPrepaidCardMgr();
     let owner = await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCard).call();
 
@@ -524,7 +524,7 @@ export default class PrepaidCard {
         let payload = await this.getRegisterRewardProgramPayload(
           prepaidCardAddressOrTxnHash,
           admin ?? owner,
-          rewardProgramID,
+          rewardProgramId,
           REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
           rateLock
         );
@@ -552,7 +552,7 @@ export default class PrepaidCard {
         gnosisResult = await this.executeRegisterRewardProgram(
           prepaidCardAddressOrTxnHash,
           admin ?? owner,
-          rewardProgramID,
+          rewardProgramId,
           REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
           rateLock,
           payload.gasPrice,
@@ -561,7 +561,7 @@ export default class PrepaidCard {
           signatures,
           nonce
         );
-        console.log(`Reward program ${rewardProgramID} registered with admin ${admin ?? owner}`);
+        console.log(`Reward program ${rewardProgramId} registered with admin ${admin ?? owner}`);
         break;
       } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
@@ -596,13 +596,13 @@ export default class PrepaidCard {
   async registerRewardee(txnHash: string): Promise<TransactionReceipt>;
   async registerRewardee(
     prepaidCardAddress: string,
-    rewardProgramID: string,
+    rewardProgramId: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
   async registerRewardee(
     prepaidCardAddressOrTxnHash: string,
-    rewardProgramID?: string,
+    rewardProgramId?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
@@ -613,8 +613,8 @@ export default class PrepaidCard {
     if (!prepaidCardAddressOrTxnHash) {
       throw new Error('prepaidCardAddress is required');
     }
-    if (!rewardProgramID) {
-      throw new Error('rewardProgramID is required');
+    if (!rewardProgramId) {
+      throw new Error('rewardProgramId is required');
     }
     let prepaidCard = prepaidCardAddressOrTxnHash;
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
@@ -639,7 +639,7 @@ export default class PrepaidCard {
       try {
         let payload = await this.getRegisterRewardeePayload(
           prepaidCardAddressOrTxnHash,
-          rewardProgramID,
+          rewardProgramId,
           REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
           rateLock
         );
@@ -666,7 +666,7 @@ export default class PrepaidCard {
         );
         gnosisResult = await this.executeRegisterRewardee(
           prepaidCardAddressOrTxnHash,
-          rewardProgramID,
+          rewardProgramId,
           REWARDEE_REGISTRATION_FEE_IN_SPEND,
           rateLock,
           payload.gasPrice,
@@ -676,7 +676,7 @@ export default class PrepaidCard {
           nonce
         );
         let rewardSafeAddress = await this.getRewardSafeFromTxn(gnosisResult.ethereumTx.txHash);
-        console.log(`Rewardee registered for ${rewardProgramID} with reward safe ${rewardSafeAddress}`);
+        console.log(`Rewardee registered for ${rewardProgramId} with reward safe ${rewardSafeAddress}`);
         break;
       } catch (e: any) {
         // The rate updates about once an hour, so if this is triggered, it should only be once
@@ -860,7 +860,7 @@ export default class PrepaidCard {
   private async getRegisterRewardProgramPayload(
     prepaidCardAddress: string,
     admin: string,
-    rewardProgramID: string,
+    rewardProgramId: string,
     spendAmount: number,
     rate: string
   ): Promise<SendPayload> {
@@ -870,13 +870,13 @@ export default class PrepaidCard {
       spendAmount,
       rate,
       'registerRewardProgram',
-      this.layer2Web3.eth.abi.encodeParameters(['address', 'address'], [admin, rewardProgramID])
+      this.layer2Web3.eth.abi.encodeParameters(['address', 'address'], [admin, rewardProgramId])
     );
   }
 
   private async getRegisterRewardeePayload(
     prepaidCardAddress: string,
-    rewardProgramID: string,
+    rewardProgramId: string,
     spendAmount: number,
     rate: string
   ): Promise<SendPayload> {
@@ -886,7 +886,7 @@ export default class PrepaidCard {
       spendAmount,
       rate,
       'registerRewardee',
-      this.layer2Web3.eth.abi.encodeParameters(['address'], [rewardProgramID])
+      this.layer2Web3.eth.abi.encodeParameters(['address'], [rewardProgramId])
     );
   }
 
@@ -964,7 +964,7 @@ export default class PrepaidCard {
   private async executeRegisterRewardProgram(
     prepaidCardAddress: string,
     admin: string,
-    rewardProgramID: string,
+    rewardProgramId: string,
     spendAmount: number,
     rate: string,
     gasPrice: string,
@@ -982,7 +982,7 @@ export default class PrepaidCard {
       safeTxGas,
       dataGas,
       'registerRewardProgram',
-      this.layer2Web3.eth.abi.encodeParameters(['address', 'address'], [admin, rewardProgramID]),
+      this.layer2Web3.eth.abi.encodeParameters(['address', 'address'], [admin, rewardProgramId]),
       signatures,
       nonce
     );
@@ -990,7 +990,7 @@ export default class PrepaidCard {
 
   private async executeRegisterRewardee(
     prepaidCardAddress: string,
-    rewardProgramID: string,
+    rewardProgramId: string,
     spendAmount: number,
     rate: string,
     gasPrice: string,
@@ -1008,7 +1008,7 @@ export default class PrepaidCard {
       safeTxGas,
       dataGas,
       'registerRewardee',
-      this.layer2Web3.eth.abi.encodeParameters(['address'], [rewardProgramID]),
+      this.layer2Web3.eth.abi.encodeParameters(['address'], [rewardProgramId]),
       signatures,
       nonce
     );
@@ -1062,7 +1062,7 @@ export default class PrepaidCard {
       abis: [
         {
           type: 'address',
-          name: 'rewardProgramID',
+          name: 'rewardProgramId',
         },
         {
           type: 'address',
