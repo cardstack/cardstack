@@ -16,8 +16,6 @@
 }
 
 .hamburger-menu__trigger {
-  --icon-color: var(--boxel-highlight);
-
   width: 2rem;
   height: 2rem;
   display: flex;
@@ -26,6 +24,12 @@
   appearance: none;
   background-color: transparent;
   border: none;
+}
+
+.hamburger-menu__trigger-icon {
+  --icon-color: var(--boxel-highlight);
+
+  flex-shrink: 0;
 }
 
 .hamburger-menu__list {

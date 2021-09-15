@@ -5,7 +5,7 @@
     disabled={{@open}}
     {{on "click" (optional @onOpen)}}
   >
-    {{svg-jar "hamburger-menu" width="20" height="14"}}
+    {{svg-jar "hamburger-menu" class="hamburger-menu__trigger-icon" width="20" height="14"}}
   </button>
 
   {{#if @open}}
@@ -20,7 +20,7 @@
         }}
       >
         <button type="button" class="hamburger-menu__trigger hamburger-menu__trigger--close" {{on "click" (optional @onClose)}}>
-          {{svg-jar "close-thick" width="14" height="14"}}
+          {{svg-jar "close-thick" class="hamburger-menu__trigger-icon" width="14" height="14"}}
         </button>
       </Boxel::OrgHeader>
       <ul class="hamburger-menu__list">
