@@ -26,6 +26,8 @@ const amount = '300';
 const usdAmount = '3';
 const paymentURL =
   'https://pay.cardstack.com/merchat-asdnsadkasd?id=0x1238urfds&amount=73298587423545';
+const deepLinkPaymentURL =
+  'https://deep-link.cardstack.com/merchat-asdnsadkasd?id=0x1238urfds&amount=73298587423545';
 let merchant: MerchantInfoResource;
 const merchantAddress = '0xE73604fC1724a50CEcBC1096d4229b81aF117c94';
 
@@ -47,6 +49,7 @@ module(
         amount,
         usdAmount,
         paymentURL,
+        deepLinkPaymentURL,
         merchant,
         merchantAddress,
       });
@@ -59,6 +62,7 @@ module(
           @usdAmount={{this.usdAmount}}
           @merchant={{this.merchant}}
           @paymentURL={{this.paymentURL}}
+          @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
           @canDeepLink={{false}}
         />
       `);
@@ -92,6 +96,7 @@ module(
           @usdAmount={{this.usdAmount}}
           @merchant={{this.merchant}}
           @paymentURL={{this.paymentURL}}
+          @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
           @canDeepLink={{true}}
         />
       `);
@@ -118,7 +123,7 @@ module(
       assert
         .dom(DEEP_LINK)
         .containsText('Pay Merchant')
-        .hasAttribute('href', paymentURL);
+        .hasAttribute('href', deepLinkPaymentURL);
       assert.dom(PAYMENT_URL).containsText(paymentURL);
       assert.dom(LINK_VIEW_TOGGLE).containsText('Show as QR Code');
 
@@ -138,6 +143,7 @@ module(
           @merchant={{this.merchant}}
           @merchantAddress={{this.merchantAddress}}
           @paymentURL={{this.paymentURL}}
+          @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
           @canDeepLink={{false}}
         />
       `);
@@ -167,6 +173,7 @@ module(
           @merchant={{this.merchant}}
           @merchantAddress={{this.merchantAddress}}
           @paymentURL={{this.paymentURL}}
+          @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
           @canDeepLink={{false}}
         />
       `);

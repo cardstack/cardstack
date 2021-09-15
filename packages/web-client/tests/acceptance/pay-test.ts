@@ -30,7 +30,7 @@ const DEEP_LINK = '[data-test-payment-request-deep-link]';
 const PAYMENT_URL = '[data-test-payment-request-url]';
 
 // fixed data
-const domain = config.universalLinkDomain;
+const universalLinkDomain = config.universalLinkDomain;
 const exampleDid = 'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
 const spendSymbol = 'SPD';
 const usdSymbol = 'USD';
@@ -113,7 +113,7 @@ module('Acceptance | pay', function (hooks) {
       .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
 
     let expectedUrl = generateMerchantPaymentUrl({
-      domain,
+      domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
       currency: spendSymbol,
@@ -148,7 +148,7 @@ module('Acceptance | pay', function (hooks) {
       .dom(USD_AMOUNT)
       .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
     let expectedUrl = generateMerchantPaymentUrl({
-      domain,
+      domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
       currency: spendSymbol,
@@ -182,7 +182,7 @@ module('Acceptance | pay', function (hooks) {
       .dom(USD_AMOUNT)
       .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
     let expectedUrl = generateMerchantPaymentUrl({
-      domain,
+      domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
       currency: usdSymbol,
@@ -219,7 +219,7 @@ module('Acceptance | pay', function (hooks) {
     // displaying the amounts if we don't recognize the currency
     // currently this is anything that is not SPD or USD
     let expectedUrl = generateMerchantPaymentUrl({
-      domain,
+      domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
       currency: invalidCurrencySymbol,
@@ -253,7 +253,7 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(USD_AMOUNT).doesNotExist();
 
     let expectedUrl = generateMerchantPaymentUrl({
-      domain,
+      domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
       currency: spendSymbol,
@@ -293,18 +293,27 @@ module('Acceptance | pay', function (hooks) {
 
     // assert that the deep link view is rendered
     assert.dom(QR_CODE).doesNotExist();
-    let expectedUrl = generateMerchantPaymentUrl({
-      domain,
-      network,
-      merchantSafeID: merchantSafe.address,
-      currency: spendSymbol,
-      amount: spendAmount,
-    });
     assert
       .dom(DEEP_LINK)
       .containsText('Pay Merchant')
-      .hasAttribute('href', expectedUrl);
-    assert.dom(PAYMENT_URL).containsText(expectedUrl);
+      .hasAttribute(
+        'href',
+        generateMerchantPaymentUrl({
+          network,
+          merchantSafeID: merchantSafe.address,
+          currency: spendSymbol,
+          amount: spendAmount,
+        })
+      );
+    assert.dom(PAYMENT_URL).containsText(
+      generateMerchantPaymentUrl({
+        domain: universalLinkDomain,
+        network,
+        merchantSafeID: merchantSafe.address,
+        currency: spendSymbol,
+        amount: spendAmount,
+      })
+    );
   });
 
   test('it renders appropriate UI when merchant info is not fetched', async function (assert) {
@@ -328,7 +337,7 @@ module('Acceptance | pay', function (hooks) {
       .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
 
     let expectedUrl = generateMerchantPaymentUrl({
-      domain,
+      domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafeWithoutInfo.address,
       currency: spendSymbol,
