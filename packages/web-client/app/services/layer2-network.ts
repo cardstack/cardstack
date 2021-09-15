@@ -3,7 +3,6 @@ import config from '../config/environment';
 import { inject as service } from '@ember/service';
 import { TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
-import { useResource } from 'ember-resources';
 import {
   Layer2ChainEvent,
   Layer2Web3Strategy,
@@ -18,7 +17,6 @@ import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
 import { DepotSafe, Safe } from '@cardstack/cardpay-sdk/sdk/safes';
-import { Safes } from '@cardstack/web-client/resources/safes';
 import {
   BridgeableSymbol,
   ConvertibleSymbol,
@@ -36,6 +34,7 @@ import HubAuthentication from '@cardstack/web-client/services/hub-authentication
 import { taskFor } from 'ember-concurrency-ts';
 import { UsdConvertibleSymbol } from './token-to-usd';
 import { TransactionOptions } from '@cardstack/cardpay-sdk';
+import { Safes } from '../resources/safes';
 export default class Layer2Network
   extends Service
   implements Emitter<Layer2ChainEvent>
@@ -51,11 +50,12 @@ export default class Layer2Network
   @reads('strategy.usdConverters') usdConverters!: {
     [symbol: string]: (amountInWei: string) => number;
   };
-  @reads('stragey.viewSafesTask') declare viewSafesTask: TaskGenerator<Safe[]>;
-  @reads('safes.depot.defaultTokenBalance') defaultTokenBalance: BN | undefined;
-  @reads('safes.depot.cardBalance') cardBalance: BN | undefined;
-  @reads('safes.depot.value') depotSafe: DepotSafe | undefined;
-  @reads('safes.isLoading') declare isFetchingDepot: boolean;
+  @reads('strategy.viewSafesTask') declare viewSafesTask: TaskGenerator<Safe[]>;
+  @reads('strategy.safes') declare safes: Safes;
+  @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
+  @reads('strategy.cardBalance') cardBalance: BN | undefined;
+  @reads('strategy.depotSafe') depotSafe: DepotSafe | undefined;
+  @reads('strategy.safes.isLoading') declare isFetchingDepot: boolean;
 
   bridgedSymbolToWithdrawalLimits: Map<BridgedTokenSymbol, WithdrawalLimits> =
     new Map();
@@ -124,11 +124,6 @@ export default class Layer2Network
   @task *viewSafeTask(address: string): TaskGenerator<Safe> {
     return yield this.strategy.viewSafe(address);
   }
-
-  safes = useResource(this, Safes, () => ({
-    strategy: this.strategy,
-    walletAddress: this.walletInfo.firstAddress!,
-  }));
 
   @task *issuePrepaidCardTask(
     faceValue: number,

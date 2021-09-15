@@ -482,7 +482,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       )} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
     );
 
-    layer2Service.test__simulateBalances({
+    await layer2Service.test__simulateBalances({
       defaultToken: new BN('150000000000000000000'),
       card: new BN('500000000000000000000'),
     });
@@ -595,12 +595,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
-    hooks.beforeEach(function () {
+    hooks.beforeEach(async function () {
       window.TEST__AUTH_TOKEN = 'abc123--def456--ghi789';
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      layer2Service.test__simulateBalances({
+      await layer2Service.test__simulateBalances({
         defaultToken: MIN_AMOUNT_TO_PASS,
         card: new BN('500000000000000000000'),
       });
@@ -621,7 +621,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
           },
         ],
       };
-      layer2Service.test__simulateDepot(testDepot as DepotSafe);
+      await layer2Service.test__simulateDepot(testDepot as DepotSafe);
     });
 
     hooks.afterEach(function () {
@@ -735,7 +735,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       await visit('/card-pay');
       assert.equal(currentURL(), '/card-pay/balances');
 
-      layer2Service.test__simulateBalances({
+      await layer2Service.test__simulateBalances({
         defaultToken: FAILING_AMOUNT,
       });
 

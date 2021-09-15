@@ -22,7 +22,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
   setupMirage(hooks);
   let workflowPersistenceService: WorkflowPersistence;
 
-  hooks.beforeEach(function () {
+  hooks.beforeEach(async function () {
     (this as any).server.db.loadData({
       prepaidCardColorSchemes,
       prepaidCardPatterns,
@@ -35,7 +35,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
+    await layer2Service.test__simulateBalances({
       defaultToken: MIN_AMOUNT_TO_PASS,
       card: new BN('500000000000000000000'),
     });
@@ -56,7 +56,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         },
       ],
     };
-    layer2Service.test__simulateDepot(testDepot as DepotSafe);
+    await layer2Service.test__simulateDepot(testDepot as DepotSafe);
     layer2Service.authenticate();
     layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
 

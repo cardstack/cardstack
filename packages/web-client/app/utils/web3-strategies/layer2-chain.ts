@@ -47,6 +47,8 @@ import { TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { TypedChannel } from '../typed-channel';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
+import { useResource } from 'ember-resources';
+import { Safes } from '@cardstack/web-client/resources/safes';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -73,15 +75,15 @@ export default abstract class Layer2ChainWeb3Strategy
   #safesApi!: ISafes;
   #hubAuthApi!: IHubAuth;
   #broadcastChannel: TypedChannel<Layer2ConnectEvent>;
-  @tracked depotSafe: DepotSafe | null = null;
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
-  @tracked defaultTokenBalance: BN | undefined;
-  @tracked cardBalance: BN | undefined;
   @tracked waitForAccountDeferred = defer();
   @tracked isInitializing = true;
 
   @reads('provider.connector') connector!: IConnector;
+  @reads('safes.depot.defaultTokenBalance') defaultTokenBalance: BN | undefined;
+  @reads('safes.depot.cardBalance') cardBalance: BN | undefined;
+  @reads('safes.depot.value') declare depotSafe: DepotSafe | null;
 
   constructor(networkSymbol: Layer2NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
@@ -217,8 +219,6 @@ export default abstract class Layer2ChainWeb3Strategy
       await this.refreshSafesAndBalances();
       this.waitForAccountDeferred.resolve();
     } else {
-      this.defaultTokenBalance = new BN('0');
-      this.cardBalance = new BN('0');
       this.waitForAccountDeferred = defer();
     }
   }
@@ -289,7 +289,6 @@ export default abstract class Layer2ChainWeb3Strategy
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
   // about disconnecting. WalletConnect's disconnect event tells all tabs that you are disconnected
   onDisconnect() {
-    this.depotSafe = null;
     this.clearWalletInfo();
     this.walletConnectUri = undefined;
 
@@ -444,4 +443,9 @@ export default abstract class Layer2ChainWeb3Strategy
       this.networkSymbol
     )}/${txnHash}`;
   }
+
+  safes = useResource(this, Safes, () => ({
+    strategy: this,
+    walletAddress: this.walletInfo.firstAddress!,
+  }));
 }

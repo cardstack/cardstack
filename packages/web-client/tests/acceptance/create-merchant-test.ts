@@ -117,7 +117,7 @@ module('Acceptance | create merchant', function (hooks) {
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
+    await layer2Service.test__simulateBalances({
       defaultToken: new BN(0),
     });
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
@@ -252,7 +252,7 @@ module('Acceptance | create merchant', function (hooks) {
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      layer2Service.test__simulateBalances({
+      await layer2Service.test__simulateBalances({
         defaultToken: new BN(0),
       });
 
@@ -466,7 +466,7 @@ module('Acceptance | create merchant', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
+    await layer2Service.test__simulateBalances({
       defaultToken: new BN(0),
     });
 
@@ -498,7 +498,7 @@ module('Acceptance | create merchant', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
+    await layer2Service.test__simulateBalances({
       defaultToken: new BN(0),
     });
 

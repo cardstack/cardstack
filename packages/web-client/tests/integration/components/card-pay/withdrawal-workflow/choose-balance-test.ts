@@ -33,7 +33,7 @@ module(
       let layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-      layer2Service.test__simulateBalances({
+      await layer2Service.test__simulateBalances({
         defaultToken: new BN('250000000000000000000'),
         card: new BN('500000000000000000000'),
       });
@@ -56,7 +56,7 @@ module(
         ],
       };
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      layer2Service.test__simulateDepot(testDepot as DepotSafe);
+      await layer2Service.test__simulateDepot(testDepot as DepotSafe);
 
       let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
 

@@ -121,7 +121,7 @@ module('Acceptance | withdrawal', function (hooks) {
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
+    await layer2Service.test__simulateBalances({
       defaultToken: new BN('250000000000000000000'),
       card: new BN('500000000000000000000'),
     });
@@ -143,7 +143,7 @@ module('Acceptance | withdrawal', function (hooks) {
         },
       ],
     };
-    layer2Service.test__simulateDepot(testDepot as DepotSafe);
+    await layer2Service.test__simulateDepot(testDepot as DepotSafe);
 
     let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
@@ -353,7 +353,7 @@ module('Acceptance | withdrawal', function (hooks) {
       .containsText(
         `This is the remaining balance in your ${c.layer2.fullName} wallet`
       );
-    layer2Service.test__simulateBalances({
+    await layer2Service.test__simulateBalances({
       defaultToken: new BN('2141100000000000000'), // TODO: choose numbers that make sense with the scenario
       card: new BN('10000000000000000000000'), // TODO: choose numbers that make sense with the scenario
     });
@@ -562,7 +562,7 @@ module('Acceptance | withdrawal', function (hooks) {
     let secondLayer2AccountAddress =
       '0x0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7';
 
-    hooks.beforeEach(function () {
+    hooks.beforeEach(async function () {
       layer1Service = this.owner.lookup('service:layer1-network')
         .strategy as Layer1TestWeb3Strategy;
       layer1Service.test__simulateAccountsChanged(
@@ -577,7 +577,7 @@ module('Acceptance | withdrawal', function (hooks) {
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      layer2Service.test__simulateBalances({
+      await layer2Service.test__simulateBalances({
         defaultToken: new BN(0),
       });
     });
