@@ -2,11 +2,20 @@
   position: relative;
   background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
-  overflow: hidden;
   transition:
     max-width var(--boxel-transition),
     border-radius var(--boxel-transition),
     box-shadow var(--boxel-transition);
+}
+
+.boxel-card-container > *:first-child {
+  border-top-left-radius: var(--boxel-border-radius);
+  border-top-right-radius: var(--boxel-border-radius);
+}
+
+.boxel-card-container > *:last-child {
+  border-bottom-left-radius: var(--boxel-border-radius);
+  border-bottom-right-radius: var(--boxel-border-radius);
 }
 
 .boxel-card-container--boundaries {
