@@ -1,4 +1,10 @@
 import { isAddress } from 'web3-utils';
+import {
+  CARDWALLET_SCHEME,
+  MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
+  MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
+} from '../constants';
+import Url from 'url-parse';
 
 export function validateMerchantId(value: string) {
   const subdomainFriendlyLength = 50;
@@ -19,7 +25,7 @@ interface MerchantPaymentURLParams {
 }
 
 export const generateMerchantPaymentUrl = ({
-  domain = 'cardwallet:/',
+  domain = `${CARDWALLET_SCHEME}:/`,
   merchantSafeID,
   amount,
   network,
@@ -31,16 +37,33 @@ export const generateMerchantPaymentUrl = ({
 };
 
 export const isValidMerchantPaymentUrl = (merchantPaymentUrl: string) => {
-  let url = new URL(merchantPaymentUrl);
-  if (url.protocol !== 'cardwallet:') {
-    return false;
-  }
+  let url = new Url(merchantPaymentUrl);
 
-  let parts = url.pathname.replace(/^\/*/, '').split('/');
-  if (parts.length !== 3) {
-    return false;
-  }
+  return isValidCustomProtocolMerchantPaymentUrl(url) || isValidUniversalLinkMerchantPaymentUrl(url);
+};
 
-  let [action, network, merchantSafeID] = parts;
-  return action === 'pay' && ['sokol', 'xdai'].includes(network) && isAddress(merchantSafeID);
+export const isValidUniversalLinkMerchantPaymentUrl = (url: Url) => {
+  let usesCorrectProtocol = url.protocol === `https:`;
+  let hasCorrectHostname = [
+    MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
+    MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
+  ].includes(url.hostname);
+  let parts = url.pathname.split('/');
+  // skip the leading slash
+  let [, action, network, merchantSafeID] = parts;
+  let hasCorrectPath =
+    parts.length === 4 && action === 'pay' && ['sokol', 'xdai'].includes(network) && isAddress(merchantSafeID);
+
+  return usesCorrectProtocol && hasCorrectHostname && hasCorrectPath;
+};
+
+export const isValidCustomProtocolMerchantPaymentUrl = (url: Url) => {
+  let usesCorrectProtocol = url.protocol === `${CARDWALLET_SCHEME}:`;
+  let parts = url.pathname.split('/');
+  // skip the leading slash
+  let [, network, merchantSafeID] = parts;
+  let hasCorrectPath =
+    parts.length === 3 && url.hostname === 'pay' && ['sokol', 'xdai'].includes(network) && isAddress(merchantSafeID);
+
+  return usesCorrectProtocol && hasCorrectPath;
 };
