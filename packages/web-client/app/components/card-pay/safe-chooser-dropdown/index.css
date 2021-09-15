@@ -19,13 +19,14 @@
 }
 
 .safe-chooser-dropdown .ember-basic-dropdown-content {
+  max-height: 300px;
+  overflow: auto;
   position: absolute;
   z-index: 1;
   width: 100%;
   background-color: var(--boxel-light);
   border: 1px solid var(--boxel-purple-300);
   border-radius: var(--boxel-border-radius-sm);
-  overflow: hidden;
 }
 
 .safe-chooser-dropdown .ember-basic-dropdown-content.ember-basic-dropdown--transitioning-in {
