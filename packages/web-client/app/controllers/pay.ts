@@ -47,6 +47,20 @@ export default class CardPayMerchantServicesController extends Controller {
   get isValidAmount() {
     return !isNaN(this.amount) && this.amount > 0;
   }
+
+  // This is necessary because iOS respects users' decisions to visit your site
+  // and will stay on the site if the link has the same domain
+  // see https://developer.apple.com/library/archive/documentation/General/Conceptual/AppSearch/UniversalLinks.html
+  // also might be useful for folks on older versions of iOS (~9)
+  get deepLinkPaymentURL() {
+    return generateMerchantPaymentUrl({
+      network: this.model.network,
+      merchantSafeID: this.model.merchantSafe.address,
+      currency: this.currency,
+      amount: this.isValidAmount ? this.amount : 0,
+    });
+  }
+
   get paymentURL() {
     return generateMerchantPaymentUrl({
       domain: config.universalLinkDomain,
