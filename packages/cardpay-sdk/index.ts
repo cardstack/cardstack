@@ -16,7 +16,15 @@ export { IAssets } from './sdk/assets';
 export { IHubAuth } from './sdk/hub-auth';
 
 export { getAddress, getAddressByNetwork, getOracle, getOracleByNetwork, AddressKeys } from './contracts/addresses';
-export { getConstant, getConstantByNetwork, networks, networkIds } from './sdk/constants';
+export {
+  getConstant,
+  getConstantByNetwork,
+  networks,
+  networkIds,
+  CARDWALLET_SCHEME,
+  MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
+  MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
+} from './sdk/constants';
 export { waitUntilBlock, TransactionOptions } from './sdk/utils/general-utils';
 export * from './sdk/currency-utils';
 export { validateMerchantId, generateMerchantPaymentUrl, isValidMerchantPaymentUrl } from './sdk/utils/merchant';

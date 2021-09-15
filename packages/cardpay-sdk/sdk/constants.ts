@@ -11,6 +11,10 @@ const MAINNET_WSS_INFURA_URL = 'wss://mainnet.infura.io/ws/v3';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
+export const MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME = 'wallet.cardstack.com';
+export const MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME = 'wallet-staging.stack.cards';
+export const CARDWALLET_SCHEME = 'cardwallet';
+
 const SOKOL = {
   apiBaseUrl: 'https://blockscout.com/poa/sokol/api/eth-rpc',
   /** deployed instance of this contract: https://github.com/wbobeirne/eth-balance-checker */
