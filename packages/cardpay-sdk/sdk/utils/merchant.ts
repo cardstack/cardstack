@@ -36,6 +36,7 @@ export const generateMerchantPaymentUrl = ({
   return `${domain}/pay/${network}/${merchantSafeID}?${handleAmount}currency=${currency}`;
 };
 
+// see https://github.com/cardstack/cardstack/pull/2095 for test cases used during dev
 export const isValidMerchantPaymentUrl = (merchantPaymentUrl: string) => {
   let url = new Url(merchantPaymentUrl);
 
