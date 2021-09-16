@@ -24,13 +24,13 @@ export default {
   },
   CARD: {
     alignment: 'left',
-    assetLimit: 0.001,
+    assetLimit: 0.1,
     currency: 'CARD',
     decimals: 18,
     label: 'CARD',
     mask: '[09999999999]{.}[999999999999999999]',
     placeholder: '0',
-    smallThreshold: 0.003,
+    smallThreshold: 1,
     symbol: '',
   },
   'DAI.CPXD': {
