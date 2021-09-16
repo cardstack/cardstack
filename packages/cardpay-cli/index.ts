@@ -34,6 +34,7 @@ import {
   setAsk,
   getInventory as prepaidCardInventory,
   removeFromInventory as removePrepaidCardInventory,
+  addToInventory as addPrepaidCardInventory,
 } from './prepaid-card-market.js';
 
 //@ts-ignore polyfilling fetch
@@ -64,6 +65,7 @@ type Commands =
   | 'skuInfo'
   | 'prepaidCardInventory'
   | 'removePrepaidCardInventory'
+  | 'addPrepaidCardInventory'
   | 'registerMerchant'
   | 'revenueBalances'
   | 'claimRevenue'
@@ -392,6 +394,21 @@ let {
         description: 'The SKU to obtain inventory for',
       });
       command = 'prepaidCardInventory';
+    }
+  )
+  .command(
+    'add-prepaid-card-inventory <fundingCard> <prepaidCard>',
+    'Adds a prepaid card to the inventory.',
+    (yargs) => {
+      yargs.positional('fundingCard', {
+        type: 'string',
+        description: 'The prepaid card used to pay for gas for the txn',
+      });
+      yargs.positional('prepaidCard', {
+        type: 'string',
+        description: 'The prepaid card to add to the inventory',
+      });
+      command = 'addPrepaidCardInventory';
     }
   )
   .command(
@@ -767,6 +784,13 @@ if (!command) {
         return;
       }
       await prepaidCardInventory(network, sku, mnemonic);
+      break;
+    case 'addPrepaidCardInventory':
+      if (fundingCard == null || prepaidCard == null) {
+        showHelpAndExit('fundingCard and prepaidCard are required values');
+        return;
+      }
+      await addPrepaidCardInventory(network, fundingCard, prepaidCard, mnemonic);
       break;
     case 'removePrepaidCardInventory':
       if (fundingCard == null || prepaidCards == null || prepaidCards.length === 0) {

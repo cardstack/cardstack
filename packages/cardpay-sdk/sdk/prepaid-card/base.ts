@@ -181,7 +181,6 @@ export default class PrepaidCard {
     }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let prepaidCardMgr = await this.getPrepaidCardMgr();
-    let gasToken = await getAddress('cardCpxd', this.layer2Web3);
     let transferData = await prepaidCardMgr.methods.getTransferCardData(prepaidCardAddress, newOwner).call();
 
     // the quirk here is that we are signing this txn in advance so we need to
@@ -195,7 +194,7 @@ export default class PrepaidCard {
     } else {
       let prepaidCard = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], prepaidCardAddress);
       let currentNonce = new BN(await prepaidCard.methods.nonce().call());
-      transferNonce = currentNonce.toString() === '0' ? new BN('1') : currentNonce.add(new BN('2'));
+      transferNonce = currentNonce.add(new BN('1'));
     }
 
     let [previousOwnerSignature] = await signSafeTxAsBytes(
@@ -207,7 +206,7 @@ export default class PrepaidCard {
       '0',
       '0',
       '0',
-      gasToken,
+      await this.issuingToken(prepaidCardAddress),
       ZERO_ADDRESS,
       transferNonce,
       from,
