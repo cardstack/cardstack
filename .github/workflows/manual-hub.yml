@@ -1,9 +1,6 @@
 name: Manual Deploy [hub]
 
 on:
-  push:
-    branches:
-      - update-workflow-with-composite
   workflow_dispatch:
     inputs:
       ref:
