@@ -15,16 +15,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.inputs.ref }}
-
-      - name: Install apt packages including waypoint
-        run: |
-          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-          sudo apt-get install awscli waypoint=0.4.0
-
       - name: Set up env
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
@@ -45,8 +35,6 @@ jobs:
             exit 1;
           fi
 
-      - uses: volta-cli/action@v1
-
       - name: Set up yarn cache
         uses: actions/cache@v2
         with:
@@ -55,18 +43,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - run: yarn --prefer-offline
-
-      - name: Deploy server
-        run: waypoint up --app=hub -plain
+      - name: Deploy hub
+        uses: ./.github/actions/deploy-hub
         env:
           AWS_DEFAULT_REGION: us-east-1
-          WAYPOINT_SERVER_TLS: 1
-          WAYPOINT_SERVER_TLS_SKIP_VERIFY: 1
-
-      - name: Deploy worker
-        run: waypoint up --app=hub-worker -prune-retain=0 -plain
-        env:
-          AWS_DEFAULT_REGION: us-east-1
-          WAYPOINT_SERVER_TLS: 1
-          WAYPOINT_SERVER_TLS_SKIP_VERIFY: 1
+        with:
+          ref: ${{ github.event.inputs.ref }}

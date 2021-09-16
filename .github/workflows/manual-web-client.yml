@@ -15,12 +15,27 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.inputs.ref }}
-
-      - uses: volta-cli/action@v1
+      - name: Set up env
+        env:
+          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+        run: |
+          if [ "$INPUT_ENVIRONMENT" = "production" ]; then
+            echo "EMBER_DEPLOY_AWS_ACCESS_KEY=${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+            echo "EMBER_DEPLOY_AWS_ACCESS_SECRET=${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_SECRET }}" >> $GITHUB_ENV
+            echo "LAYER_1_CHAIN=keth" >> $GITHUB_ENV # set to "eth" when ready to go to real money
+            echo "LAYER_2_CHAIN=sokol" >> $GITHUB_ENV # set to "xdai" when ready to go to real money
+            echo "HUB_URL=https://hub.cardstack.com" >> $GITHUB_ENV
+            echo "SENTRY_URL_PREFIX=https://app.cardstack.com" >> $GITHUB_ENV
+          elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
+            echo "EMBER_DEPLOY_AWS_ACCESS_KEY=${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+            echo "EMBER_DEPLOY_AWS_ACCESS_SECRET=${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}" >> $GITHUB_ENV
+            echo "HUB_URL=https://hub-staging.stack.cards" >> $GITHUB_ENV
+            echo "SENTRY_URL_PREFIX=https://app-staging.stack.cards" >> $GITHUB_ENV
+          else
+            echo "unrecognized environment"
+            exit 1;
+          fi
+          SENTRY_ORG: cardstack
 
       - name: Set up yarn cache
         uses: actions/cache@v2
@@ -30,52 +45,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - run: yarn --prefer-offline
-
-      - name: Set up env
+      - name: Deploy web-client
+        uses: ./.github/actions/deploy-web-client
         env:
-          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
-        run: |
-          echo "SENTRY_DSN=${{ secrets.WEB_CLIENT_SENTRY_DSN }}" >> $GITHUB_ENV
-          if [ "$INPUT_ENVIRONMENT" = "production" ]; then
-            echo "EMBER_DEPLOY_AWS_ACCESS_KEY=${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
-            echo "EMBER_DEPLOY_AWS_ACCESS_SECRET=${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_SECRET }}" >> $GITHUB_ENV
-            echo "LAYER_1_CHAIN=keth" >> $GITHUB_ENV # set to "eth" when ready to go to real money
-            echo "LAYER_2_CHAIN=sokol" >> $GITHUB_ENV # set to "xdai" when ready to go to real money
-            echo "HUB_URL=https://hub.cardstack.com" >> $GITHUB_ENV
-          elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
-            echo "EMBER_DEPLOY_AWS_ACCESS_KEY=${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
-            echo "EMBER_DEPLOY_AWS_ACCESS_SECRET=${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}" >> $GITHUB_ENV
-            echo "HUB_URL=https://hub-staging.stack.cards" >> $GITHUB_ENV
-          else
-            echo "unrecognized environment"
-            exit 1;
-          fi
-
-      - name: Deploy
-        run: yarn deploy:web-client:${{ github.event.inputs.environment }}
-      - name: Get current lerna version
-        id: lerna-version
-        uses: saulonunesdev/lerna-get-version-action@v1.0.4
-      - name: Create decompressed copies of assets for Sentry
-        shell: bash
-        run: |
-          cd packages/web-client/tmp
-          mkdir -p deploy-dist-uncompressed/assets
-          cd deploy-dist/assets
-          echo *.js *.map | tr ' ' '\n' | xargs -n1 -I{} cp "{}" "../../deploy-dist-uncompressed/assets/{}.br"
-          cd ../../deploy-dist-uncompressed/assets
-          brotli --rm --decompress *.br
-      - name: Create Sentry release
-        uses: getsentry/action-release@v1
-        env:
+          SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: cardstack
-          SENTRY_PROJECT: web-client
         with:
+          ref: ${{ github.event.inputs.ref }}
           environment: ${{ github.event.inputs.environment }}
-          ignore_empty: true
-          ignore_missing: true
-          sourcemaps: packages/web-client/tmp/deploy-dist-uncompressed
-          version: web-client-${{ github.sha }}@${{ steps.lerna-version.outputs.lerna-version }}
-          url_prefix: https://${{ fromJSON('["app-staging.stack.cards", "app.cardstack.com"]')[github.event.inputs.environment != 'staging'] }}
+          sentry_url_prefix: ${{ env.SENTRY_URL_PREFIX }}

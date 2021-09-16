@@ -1,0 +1,46 @@
+name: Deploy cardie
+description: Deploy cardie using waypoint
+
+inputs:
+  ref:
+    description: The branch, tag or SHA to deploy
+    required: false
+    default: main
+  waypoint_version:
+    description: Waypoint version to use
+    required: false
+    default: '0.4.0'
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ inputs.ref }}
+
+    - name: Install apt packages including waypoint
+      shell: bash
+      run: |
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        sudo apt-get install awscli waypoint=${{ inputs.waypoint_version }}
+
+    - uses: volta-cli/action@v1
+
+    - run: yarn --prefer-offline
+      shell: bash
+
+    - name: Deploy cardie
+      run: waypoint up --app=cardie -prune-retain=0 -plain
+      shell: bash
+      env:
+        WAYPOINT_SERVER_TLS: '1'
+        WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'
+
+    - uses: ./.github/actions/discord-message
+      with:
+        token: ${{ inputs.discord_token }}
+        channel: ${{ inputs.discord_channel }}
+        message: |
+          :checkered_flag: **cardie** [${{ inputs.ref }}] has been deployed to *${{ inputs.environment }}*
+          :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
