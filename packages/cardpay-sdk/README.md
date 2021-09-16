@@ -39,6 +39,9 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`PrepaidCard.gasFee`](#prepaidcardgasfee)
   - [`PrepaidCard.getPaymentLimits`](#prepaidcardgetpaymentlimits)
   - [`PrepaidCard.payMerchant`](#prepaidcardpaymerchant)
+- [`PrepaidCardMarket`](#prepaidcardmarket)
+  - [`PrepaidCardMarket.getSKUInfo`](#prepaidcardmarketgetskuinfo)
+  - [`PrepaidCardMarket.setAsk`](#prepaidcardmarketsetask)
 - [`RevenuePool`](#revenuepool)
   - [`RevenuePool.merchantRegistrationFee`](#revenuepoolmerchantregistrationfee)
   - [`RevenuePool.registerMerchant`](#revenuepoolregistermerchant)
@@ -524,6 +527,48 @@ let result = await prepaidCard.payMerchant(
   prepaidCardAddress
   5000 // Pay the merchant §5000 SPEND
 );
+```
+
+This method returns a promise for a web3 transaction receipt.
+
+## `PrepaidCardMarket`
+The `PrepaidCardMarket` API is used to manage the inventory prepaid cards in the market contract, whose purpose is to provision prepaid cards to consumers who buy them. This API is used within the layer 2 network in which the Card Protocol runs. The `PrepaidCardMaket` API can be obtained from `getSDK()` with a `Web3` instance that is configured to operate on a layer 2 network (like xDai or Sokol).
+```js
+import { getSDK } from "@cardstack/cardpay-sdk";
+let web3 = new Web3(myProvider); // Layer 2 web3 instance
+let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
+```
+
+### `PrepaidCardMarket.getSKUInfo`
+This call obtains the details for the prepaid cards associated with a particular SKU.
+The arguments are:
+- The SKU in question
+- Optionally the address of the market contract (the default Cardstack market contract will be used if not provided)
+```js
+let {
+  issuer,
+  issuingToken,
+  faceValue,
+  customizationDID,
+  askPrice // as wei in the units of the issuing token
+} = await prepaidCardMarket.getSKUInfo(sku1000SPENDCards);
+```
+
+### `PrepaidCardMarket.setAsk`
+This call sets the ask price for the prepaid cards the belong to the specified SKU. The ask price is specified as a string in units of `wei` based on the issuing token for the prepaid cards in the specified SKU.
+
+The arguments are:
+- The prepaid card that is used to pay for the gas for issuing the transaction
+- The SKU whose ask price you are setting
+- The ask price as a string in units of `wei` of the SKU's issuing token
+- Optionally the address of the market contract (the default Cardstack market contract will be used if not provided)
+- You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
+
+```js
+let result = await prepaidCardMarket.setAsk(
+  fundingPrepaidCard,
+  sku1000SPENDCards,
+  toWei("10"));
 ```
 
 This method returns a promise for a web3 transaction receipt.

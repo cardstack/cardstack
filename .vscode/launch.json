@@ -371,6 +371,42 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay testnet: SKU Info",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "sku-info",
+        "0x7ac394019c3259d7164796fadfcdca28d48cff380444e581c593d6b15f5f148e", // sku
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Set Prepaid Card Ask",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "set-prepaid-card-ask",
+        "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28", // funding prepaid card
+        "0x7ac394019c3259d7164796fadfcdca28d48cff380444e581c593d6b15f5f148e", // sku
+        "1",
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay testnet: View Merchant Revenue",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
