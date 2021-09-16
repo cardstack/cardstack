@@ -1,9 +1,6 @@
 name: Manual Deploy [cardie]
 
 on:
-  push:
-    branches:
-      - update-workflow-with-composite
   workflow_dispatch:
     inputs:
       ref:
@@ -25,8 +22,7 @@ jobs:
 
       - name: Set up env
         env:
-          #INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
-          INPUT_ENVIRONMENT: staging
+          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
         run: |
           if [ "$INPUT_ENVIRONMENT" != "staging" ]; then
             echo "unrecognized environment"
@@ -49,8 +45,7 @@ jobs:
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
         with:
-          #ref: ${{ github.event.inputs.ref }}
-          ref: main
+          ref: ${{ github.event.inputs.ref }}
 
       - name: Send success notification to Discord
         if: ${{ success() }}
@@ -59,7 +54,7 @@ jobs:
           token: ${{ secrets.DISCORD_TOKEN }}
           channel: ${{ secrets.DISCORD_CHANNEL }}
           message: |
-            :checkered_flag: **cardie** [${{ inputs.ref }}] has been successfully deployed to *${{ inputs.environment }}*
+            :checkered_flag: **cardie** [${{ github.event.inputs.ref }}] has been successfully deployed to *${{ github.event.inputs.environment }}*
             :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Send failure notification to Discord
@@ -69,5 +64,5 @@ jobs:
           token: ${{ secrets.DISCORD_TOKEN }}
           channel: ${{ secrets.DISCORD_CHANNEL }}
           message: |
-            :warning: **cardie** [${{ inputs.ref }}] has failed to deploy to *${{ inputs.environment }}*
+            :warning: **cardie** [${{ github.event.inputs.ref }}] has failed to deploy to *${{ github.event.inputs.environment }}*
             :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

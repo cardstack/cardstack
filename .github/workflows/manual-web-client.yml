@@ -1,9 +1,6 @@
 name: Manual Deploy [web-client]
 
 on:
-  push:
-    branches:
-      - update-workflow-with-composite
   workflow_dispatch:
     inputs:
       ref:
@@ -25,8 +22,7 @@ jobs:
 
       - name: Set up env
         env:
-          #INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
-          INPUT_ENVIRONMENT: staging
+          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
         run: |
           if [ "$INPUT_ENVIRONMENT" = "production" ]; then
             echo "EMBER_DEPLOY_AWS_ACCESS_KEY=${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
@@ -59,10 +55,8 @@ jobs:
           SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
         with:
-          #ref: ${{ github.event.inputs.ref }}
-          #environment: ${{ github.event.inputs.environment }}
-          ref: main
-          environment: staging
+          ref: ${{ github.event.inputs.ref }}
+          environment: ${{ github.event.inputs.environment }}
           sentry_url_prefix: ${{ env.SENTRY_URL_PREFIX }}
 
       - name: Send success notification to Discord
@@ -72,7 +66,7 @@ jobs:
           token: ${{ secrets.DISCORD_TOKEN }}
           channel: ${{ secrets.DISCORD_CHANNEL }}
           message: |
-            :checkered_flag: **web-client** [${{ inputs.ref }}] has been successfully deployed to *${{ inputs.environment }}*
+            :checkered_flag: **web-client** [${{ github.event.inputs.ref }}] has been successfully deployed to *${{ github.event.inputs.environment }}*
             :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Send failure notification to Discord
@@ -82,5 +76,5 @@ jobs:
           token: ${{ secrets.DISCORD_TOKEN }}
           channel: ${{ secrets.DISCORD_CHANNEL }}
           message: |
-            :warning: **web-client** [${{ inputs.ref }}] has failed to deploy to *${{ inputs.environment }}*
+            :warning: **web-client** [${{ github.event.inputs.ref }}] has failed to deploy to *${{ github.event.inputs.environment }}*
             :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
