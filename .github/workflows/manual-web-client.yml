@@ -40,7 +40,6 @@ jobs:
             echo "unrecognized environment"
             exit 1;
           fi
-          SENTRY_ORG: cardstack
 
       - name: Set up yarn cache
         uses: actions/cache@v2
@@ -55,6 +54,7 @@ jobs:
         env:
           SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: cardstack
         with:
           #ref: ${{ github.event.inputs.ref }}
           #environment: ${{ github.event.inputs.environment }}
