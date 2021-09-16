@@ -118,6 +118,7 @@ jobs:
     if: ${{ needs.change_check.outputs.hub == 'true' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Set up yarn cache
         uses: actions/cache@v2
         with:
@@ -140,6 +141,7 @@ jobs:
     if: ${{ needs.change_check.outputs.web_client == 'true' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Set up yarn cache
         uses: actions/cache@v2
         with:
@@ -166,8 +168,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 1
       - uses: volta-cli/action@v1
       - name: Set up yarn cache
         uses: actions/cache@v2
@@ -193,6 +193,7 @@ jobs:
     if: ${{ needs.change_check.outputs.cardie == 'true' }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Set up yarn cache
         uses: actions/cache@v2
         with:

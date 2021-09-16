@@ -19,6 +19,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
       - name: Set up env
         env:
           #INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
@@ -54,7 +58,6 @@ jobs:
         env:
           SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: cardstack
         with:
           #ref: ${{ github.event.inputs.ref }}
           #environment: ${{ github.event.inputs.environment }}

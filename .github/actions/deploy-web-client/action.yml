@@ -16,10 +16,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/checkout@v2
-      with:
-        ref: ${{ inputs.ref }}
-
     - uses: volta-cli/action@v1
 
     - run: yarn --prefer-offline
