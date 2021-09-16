@@ -4,8 +4,12 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
 import { Log } from 'web3-core';
-import { getConstant } from '../constants';
+import { getConstant, ZERO_ADDRESS } from '../constants';
+import { getSDK } from '../version-resolver';
 import { Signature } from './signing-utils';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.0/prepaid-card-manager';
+import { AbiItem } from 'web3-utils';
+import { getAddress } from '../../contracts/addresses';
 
 export interface EventABI {
   topic: string;
@@ -94,6 +98,41 @@ export async function gasEstimate(
   return await response.json();
 }
 
+export async function executeSendWithRateLock(
+  web3: Web3,
+  prepaidCardAddress: string,
+  execute: (rateLock: string) => Promise<GnosisExecTx | undefined>
+) {
+  let layerTwoOracle = await getSDK('LayerTwoOracle', web3);
+  let prepaidCardManager = new web3.eth.Contract(
+    PrepaidCardManagerABI as AbiItem[],
+    await getAddress('prepaidCardManager', web3)
+  );
+  let issuingToken = (await prepaidCardManager.methods.cardDetails(prepaidCardAddress).call()).issueToken;
+  let result: GnosisExecTx | undefined;
+  let rateChanged = false;
+  do {
+    let rateLock = await layerTwoOracle.getRateLock(issuingToken);
+    try {
+      result = await execute(rateLock);
+      break;
+    } catch (e: any) {
+      // The rate updates about once an hour, so if this is triggered, it should only be once
+      if (e.message.includes('rate is beyond the allowable bounds')) {
+        rateChanged = true;
+        // TODO in this situation we should surface a message to the user that
+        // the rate has changed and that we need to try again with a new rate
+        console.warn(
+          'The USD rate has fluctuated beyond allowable bounds between when the txn was signed and when it was executed, prompting the user to sign the txn again with a new rate'
+        );
+      } else {
+        throw e;
+      }
+    }
+  } while (rateChanged);
+  return result;
+}
+
 export async function getSendPayload(
   web3: Web3,
   prepaidCardAddress: string,
@@ -128,16 +167,10 @@ export async function executeTransaction(
   web3: Web3,
   from: string,
   to: string,
-  value: number,
   data: any,
-  operation: number,
-  safeTxGas: string,
-  dataGas: string,
-  gasPrice: string,
+  estimate: Estimate,
   nonce: BN,
-  signatures: any,
-  gasToken: string,
-  refundReceiver: string
+  signatures: any
 ): Promise<GnosisExecTx> {
   let relayServiceURL = await getConstant('relayServiceURL', web3);
   const url = `${relayServiceURL}/v1/safes/${from}/transactions/`;
@@ -149,17 +182,17 @@ export async function executeTransaction(
     },
     body: JSON.stringify({
       to,
-      value,
+      value: 0, // we don't have any safe tx with a value
       data,
-      operation,
-      safeTxGas,
-      baseGas: dataGas,
-      dataGas,
-      gasPrice,
+      operation: 0, // all our safe txs are CALL operations
+      safeTxGas: estimate.safeTxGas,
+      baseGas: estimate.baseGas,
+      dataGas: estimate.dataGas,
+      gasPrice: estimate.gasPrice,
       nonce: nonce.toString(),
       signatures,
-      gasToken,
-      refundReceiver,
+      gasToken: estimate.gasToken,
+      refundReceiver: ZERO_ADDRESS,
     }),
   };
   let response = await fetch(url, options);
@@ -174,9 +207,7 @@ export async function executeSend(
   prepaidCardAddress: string,
   spendAmount: number,
   rate: string,
-  gasPrice: string,
-  safeTxGas: string,
-  dataGas: string,
+  payload: SendPayload,
   action: string,
   data: string,
   signatures: Signature[],
@@ -196,9 +227,9 @@ export async function executeSend(
       rate,
       action,
       data,
-      gasPrice,
-      safeTxGas,
-      dataGas,
+      gasPrice: payload.gasPrice,
+      safeTxGas: payload.safeTxGas,
+      dataGas: payload.dataGas,
       signatures,
     }),
   };

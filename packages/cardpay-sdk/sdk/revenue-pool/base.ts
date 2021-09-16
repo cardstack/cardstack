@@ -14,10 +14,10 @@ import {
   gasEstimate,
   executeTransaction,
   getNextNonceFromEstimate,
+  executeSendWithRateLock,
 } from '../utils/safe-utils';
-import { ZERO_ADDRESS } from '../constants';
 import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from '../utils/general-utils';
-import { signSafeTxAsRSV, Signature } from '../utils/signing-utils';
+import { Signature, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
@@ -159,35 +159,14 @@ export default class RevenuePool {
         onNonce(nonce);
       }
     }
-    let signatures = await signSafeTxAsRSV(
-      this.layer2Web3,
-      revenuePoolAddress,
-      0,
-      payload,
-      0,
-      estimate.safeTxGas,
-      estimate.dataGas,
-      estimate.gasPrice,
-      estimate.gasToken,
-      ZERO_ADDRESS,
-      nonce,
-      from,
-      merchantSafeAddress
-    );
     let gnosisResult = await executeTransaction(
       this.layer2Web3,
       merchantSafeAddress,
       revenuePoolAddress,
-      0,
       payload,
-      0,
-      estimate.safeTxGas,
-      estimate.dataGas,
-      estimate.gasPrice,
+      estimate,
       nonce,
-      signatures,
-      estimate.gasToken,
-      ZERO_ADDRESS
+      await signSafeTx(this.layer2Web3, merchantSafeAddress, tokenAddress, payload, estimate, nonce, from)
     );
 
     let txnHash = gnosisResult.ethereumTx.txHash;
@@ -225,7 +204,6 @@ export default class RevenuePool {
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let prepaidCard = await getSDK('PrepaidCard', this.layer2Web3);
-    let issuingToken = await prepaidCard.issuingToken(prepaidCardAddress);
     let registrationFee = await this.merchantRegistrationFee();
     infoDID = infoDID ?? '';
     await prepaidCard.convertFromSpendForPrepaidCard(
@@ -239,55 +217,24 @@ export default class RevenuePool {
         )
     );
 
-    let rateChanged = false;
-    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
-    let gnosisResult: GnosisExecTx | undefined;
-    do {
-      let rateLock = await layerTwoOracle.getRateLock(issuingToken);
-      try {
-        let payload = await this.getRegisterMerchantPayload(prepaidCardAddress, registrationFee, rateLock, infoDID);
-        if (nonce == null) {
-          nonce = getNextNonceFromEstimate(payload);
-          if (typeof onNonce === 'function') {
-            onNonce(nonce);
-          }
-        }
-        let signature = await signSafeTxAsRSV(
-          this.layer2Web3,
-          issuingToken,
-          0,
-          payload.data,
-          0,
-          payload.safeTxGas,
-          payload.dataGas,
-          payload.gasPrice,
-          payload.gasToken,
-          payload.refundReceiver,
-          nonce,
-          from,
-          prepaidCardAddress
-        );
-        gnosisResult = await this.executeRegisterMerchant(
-          prepaidCardAddress,
-          registrationFee,
-          rateLock,
-          infoDID,
-          payload.gasPrice,
-          payload.safeTxGas,
-          payload.dataGas,
-          signature,
-          nonce
-        );
-        break;
-      } catch (e: any) {
-        // The rate updates about once an hour, so if this is triggered, it should only be once
-        if (e.message.includes('rate is beyond the allowable bounds')) {
-          rateChanged = true;
-        } else {
-          throw e;
+    let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
+      let payload = await this.getRegisterMerchantPayload(prepaidCardAddress, registrationFee, rateLock, infoDID!);
+      if (nonce == null) {
+        nonce = getNextNonceFromEstimate(payload);
+        if (typeof onNonce === 'function') {
+          onNonce(nonce);
         }
       }
-    } while (rateChanged);
+      return await this.executeRegisterMerchant(
+        prepaidCardAddress,
+        registrationFee,
+        rateLock,
+        infoDID!,
+        payload,
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        nonce
+      );
+    });
 
     if (!gnosisResult) {
       throw new Error(`Unable to register merchant with prepaid card ${prepaidCardAddress}`);
@@ -367,9 +314,7 @@ export default class RevenuePool {
     spendAmount: number,
     rate: string,
     infoDID: string,
-    gasPrice: string,
-    safeTxGas: string,
-    dataGas: string,
+    payload: SendPayload,
     signatures: Signature[],
     nonce: BN
   ): Promise<GnosisExecTx> {
@@ -378,9 +323,7 @@ export default class RevenuePool {
       prepaidCardAddress,
       spendAmount,
       rate,
-      gasPrice,
-      safeTxGas,
-      dataGas,
+      payload,
       'registerMerchant',
       this.layer2Web3.eth.abi.encodeParameters(['string'], [infoDID]),
       signatures,
