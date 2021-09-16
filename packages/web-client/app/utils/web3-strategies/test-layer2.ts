@@ -23,10 +23,10 @@ import {
   UnbindEventListener,
   SimpleEmitter,
 } from '@cardstack/web-client/utils/events';
-import { task, TaskGenerator } from 'ember-concurrency';
+import { task, TaskGenerator, timeout } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 import { taskFor } from 'ember-concurrency-ts';
-import { useResource } from 'ember-resources';
+import { useResource, useTask } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { reads } from 'macro-decorators';
 
@@ -82,9 +82,14 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   test__withdrawalMinimum = new BN('500000000000000000');
   test__withdrawalMaximum = new BN('1500000000000000000000000');
-  @reads('safes.depot.defaultTokenBalance') defaultTokenBalance: BN | undefined;
-  @reads('safes.depot.cardBalance') cardBalance: BN | undefined;
-  @reads('safes.depot.value') declare depotSafe: DepotSafe | null;
+
+  @tracked safesAndBalancesRefreshRequestedAt = new Date();
+
+  @reads('safes.depot') declare depotSafe: DepotSafe | null;
+  @reads('depotBalances.value.defaultTokenBalance') defaultTokenBalance:
+    | BN
+    | undefined;
+  @reads('depotBalances.value.cardBalance') cardBalance: BN | undefined;
 
   @task *initializeTask(): TaskGenerator<void> {
     yield '';
@@ -109,9 +114,14 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return Promise.resolve(new BN('0'));
   }
 
-  refreshSafesAndBalances() {
+  async refreshSafesAndBalances() {
     this.balancesRefreshed = true;
-    return taskFor(this.viewSafesTask).perform();
+    this.safesAndBalancesRefreshRequestedAt = new Date();
+    await taskFor(this.viewSafesTask).perform();
+    if (this.depotSafe && !taskFor(this.fetchSafeBalancesTask).last) {
+      await this.depotBalances.value;
+    }
+    await taskFor(this.fetchSafeBalancesTask).last;
   }
 
   async getWithdrawalLimits(
@@ -216,7 +226,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.test__deferredViewSafes.resolve(safes);
   }
 
-  test__simulateAccountSafes(account: string, safes: Safe[]) {
+  async test__simulateAccountSafes(account: string, safes: Safe[]) {
     if (!this.accountSafes.has(account)) {
       this.accountSafes.set(account, []);
     }
@@ -224,6 +234,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.accountSafes.get(account)?.push(...safes);
     // eslint-disable-next-line no-self-assign -- for reactivity
     this.accountSafes = this.accountSafes;
+    this.test__refreshSafesAndBalancesIfAlreadyFetched();
   }
 
   async issuePrepaidCard(
@@ -284,6 +295,31 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     accountSafes: this.accountSafes,
   }));
 
+  depotBalances = useTask(this, taskFor(this.fetchSafeBalancesTask), () => [
+    this.depotSafe as Safe | null,
+    this.safesAndBalancesRefreshRequestedAt,
+  ]);
+
+  @task
+  *fetchSafeBalancesTask(
+    safe: Safe | null,
+    _safesAndBalancesRefreshRequestedAt: Date
+  ): TaskGenerator<any> {
+    let defaultBalance = safe?.tokens.find(
+      (tokenInfo) => tokenInfo.token.symbol === this.defaultTokenSymbol
+    )?.balance;
+
+    let cardBalance = safe?.tokens.find(
+      (tokenInfo) => tokenInfo.token.symbol === 'CARD'
+    )?.balance;
+    yield timeout(0);
+
+    return {
+      defaultTokenBalance: new BN(defaultBalance ?? '0'),
+      cardBalance: new BN(cardBalance ?? '0'),
+    };
+  }
+
   test__lastSymbolsToUpdate: UsdConvertibleSymbol[] = [];
   test__simulatedExchangeRate: number = 0.2;
   test__updateUsdConvertersDeferred: RSVP.Deferred<void> | undefined;
@@ -306,6 +342,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     }
 
     this.walletInfo = newWalletInfo;
+    await this.refreshSafesAndBalances();
     await this.waitForAccountDeferred.resolve();
   }
 
@@ -319,7 +356,11 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
         createdAt: +new Date(),
         owners: [],
       });
-      depotSafe = this.depotSafe!;
+      depotSafe =
+        this.depotSafe! ||
+        [...this.accountSafes.values()]
+          .flat()
+          .find((safe: Safe) => safe.type === 'depot')!;
     }
     if (balances.dai) {
       let token = depotSafe.tokens.find(
@@ -404,7 +445,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     }
     if (depot) {
       depot.type = 'depot';
-      safes.pushObject(depot);
+      safes.unshiftObject(depot);
     }
     // eslint-disable-next-line no-self-assign -- for reactivity
     this.accountSafes = this.accountSafes;

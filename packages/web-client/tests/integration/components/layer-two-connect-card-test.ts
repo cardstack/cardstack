@@ -41,7 +41,10 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     });
 
     await waitUntil(() => {
-      return document.querySelector('[data-test-balance="DAI.CPXD"]') === null;
+      return (
+        document.querySelector('[data-test-balance="DAI.CPXD"]') === null &&
+        document.querySelector('[data-test-balance-container-loading]') === null
+      );
     });
 
     assert.dom('[data-test-balance="DAI.CPXD"]').doesNotExist();
@@ -53,7 +56,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
       .strategy as Layer2TestWeb3Strategy;
 
     layer2Service.test__autoResolveViewSafes = false;
-    await layer2Service.test__simulateAccountsChanged(['address']);
+    layer2Service.test__simulateAccountsChanged(['address']);
 
     await render(hbs`
       <CardPay::LayerTwoConnectCard/>

@@ -125,28 +125,8 @@ module('Acceptance | withdrawal', function (hooks) {
       defaultToken: new BN('250000000000000000000'),
       card: new BN('500000000000000000000'),
     });
-    let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-    let testDepot = {
-      address: depotAddress,
-      tokens: [
-        {
-          balance: '250000000000000000000',
-          token: {
-            symbol: 'DAI',
-          },
-        },
-        {
-          balance: '500000000000000000000',
-          token: {
-            symbol: 'CARD',
-          },
-        },
-      ],
-    };
-    await layer2Service.test__simulateDepot(testDepot as DepotSafe);
-
     let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    await layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
       {
         type: 'merchant',
         createdAt: Date.now() / 1000,
@@ -176,8 +156,27 @@ module('Acceptance | withdrawal', function (hooks) {
         accumulatedSpendValue: 100,
       },
     ]);
+    let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
+    let testDepot = {
+      address: depotAddress,
+      tokens: [
+        {
+          balance: '250000000000000000000',
+          token: {
+            symbol: 'DAI',
+          },
+        },
+        {
+          balance: '500000000000000000000',
+          token: {
+            symbol: 'CARD',
+          },
+        },
+      ],
+    };
+    await layer2Service.test__simulateDepot(testDepot as DepotSafe);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    await waitFor(`${postableSel(2, 2)} [data-test-balance-container]`);
+    await waitFor(`${postableSel(2, 2)} [data-test-balance="DAI.CPXD"]`);
     assert
       .dom(`${postableSel(2, 2)} [data-test-balance="DAI.CPXD"]`)
       .containsText('250.00 DAI.CPXD');
