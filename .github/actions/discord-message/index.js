@@ -18,7 +18,8 @@ async function run() {
     core.info(`Logged in as ${client.user.tag}`);
 
     const channel = await client.channels.fetch(channelID);
-    await channel.send(message);
+    const sentMessage = await channel.send(message);
+    await sentMessage.suppressEmbeds();
   } catch (err) {
     core.setFailed(err.message);
   }
