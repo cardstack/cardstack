@@ -29,6 +29,7 @@ import {
 import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
 import { rewardTokenBalances } from './reward-pool.js';
 import { hubAuth } from './hub-auth';
+import { getSKUInfo, setAsk } from './prepaid-card-market.js';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -54,6 +55,8 @@ type Commands =
   | 'paymentLimits'
   | 'payMerchant'
   | 'setSupplierInfoDID'
+  | 'setPrepaidCardAsk'
+  | 'skuInfo'
   | 'registerMerchant'
   | 'revenueBalances'
   | 'claimRevenue'
@@ -84,6 +87,8 @@ interface Options {
   prepaidCard?: string;
   receiver?: string;
   recipient?: string;
+  sku?: string;
+  askPrice?: number;
   hubRootUrl?: string;
   txnHash?: string;
   messageId?: string;
@@ -108,6 +113,8 @@ let {
   infoDID,
   customizationDID,
   prepaidCard,
+  sku,
+  askPrice,
   fromBlock,
   receiver,
   recipient,
@@ -354,6 +361,37 @@ let {
     });
     command = 'prepaidCardTransfer';
   })
+  .command(
+    'sku-info <sku>',
+    'Get the details for the prepaid cards available in the market contract for the specified SKU.',
+    (yargs) => {
+      yargs.positional('sku', {
+        type: 'string',
+        description: 'The SKU to obtain details for',
+      });
+      command = 'skuInfo';
+    }
+  )
+  .command(
+    'set-prepaid-card-ask <prepaidCard> <sku> <askPrice>',
+    'Set the asking price for prepaid cards associated to a SKU. The ask price is in units of eth in the issuing token for prepaid cards within the SKU',
+    (yargs) => {
+      yargs.positional('prepaidCard', {
+        type: 'string',
+        description: 'The prepaid card used to pay for gas for the txn',
+      });
+      yargs.positional('sku', {
+        type: 'string',
+        description: 'The SKU whose ask price is being set',
+      });
+      yargs.positional('askPrice', {
+        type: 'number',
+        description:
+          'The ask price for the prepaid cards in the SKU in units of eth in the issuing token for the prepaid cards within the SKU',
+      });
+      command = 'setPrepaidCardAsk';
+    }
+  )
   .command(
     'register-merchant <prepaidCard> <infoDID>',
     'Register as a new merchant by paying a merchant registration fee',
@@ -678,6 +716,20 @@ if (!command) {
         return;
       }
       await transferPrepaidCard(network, prepaidCard, newOwner, mnemonic);
+      break;
+    case 'skuInfo':
+      if (sku == null) {
+        showHelpAndExit('sku is a required value');
+        return;
+      }
+      await getSKUInfo(network, sku, mnemonic);
+      break;
+    case 'setPrepaidCardAsk':
+      if (prepaidCard == null || sku == null || askPrice == null) {
+        showHelpAndExit('prepaidCard, sku, and askPrice are required values');
+        return;
+      }
+      await setAsk(network, prepaidCard, sku, askPrice, mnemonic);
       break;
     case 'registerMerchant':
       if (prepaidCard == null || infoDID == null) {

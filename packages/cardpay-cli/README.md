@@ -16,6 +16,8 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay prepaidcard-split <PREPAID_CARD> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-split-prepaid_card-customization_did-face_values---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaidcard-transfer <PREPAID_CARD> <NEW_OWNER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-transfer-prepaid_card-new_owner---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay price-for-face-value <TOKEN_ADDRESS> <SPEND_FACE_VALUE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-price-for-face-value-token_address-spend_face_value---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay sku-info <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-sku-info-sku---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay set-prepaid-card-ask <PREPAID_CARD> <SKU> <ASK_PRICE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-set-prepaid-card-ask-prepaid_card-sku-ask_price---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay register-merchant <PREPAID_CARD> <INFO_DID> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-register-merchant-prepaid_card-info_did---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay payment-limits --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-payment-limits---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay pay-merchant <MERCHANT_SAFE> <PREPAID_CARD> <SPEND_AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-pay-merchant-merchant_safe-prepaid_card-spend_amount---networknetwork---mnemonicmnemonic---walletconnect)
@@ -195,6 +197,36 @@ USAGE
 ARGUMENTS
   TOKEN_ADDRESS      The token address of the token that will be used to pay for the prepaid card
   SPEND_FACE_VALUE   The desired face value in SPEND for the prepaid card
+  NETWORK            The network to use ("sokol" or "xdai")
+  MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+  WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+```
+
+## `yarn cardpay sku-info <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+Get the details for the prepaid cards available in the market contract for the specified SKU.
+
+```
+USAGE
+  $ yarn cardpay sku-info <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+
+ARGUMENTS
+  SKU                The SKU to obtain details for
+  NETWORK            The network to use ("sokol" or "xdai")
+  MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+  WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+```
+
+## `yarn cardpay set-prepaid-card-ask <PREPAID_CARD> <SKU> <ASK_PRICE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+Set the asking price for prepaid cards associated to a SKU. The ask price is in units of eth in the issuing token for prepaid cards within the SKU
+
+```
+USAGE
+  $ yarn cardpay set-prepaid-card-ask <PREPAID_CARD> <SKU> <ASK_PRICE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+
+ARGUMENTS
+  PREPAID_CARD       The prepaid card used to pay for gas for the txn
+  SKU                The SKU whose ask price is being set
+  ASK_PRICE          The ask price for the prepaid cards in the SKU in units of eth in the issuing token for the prepaid cards within the SKU
   NETWORK            The network to use ("sokol" or "xdai")
   MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet

@@ -6,6 +6,7 @@ import mapKeys from 'lodash/mapKeys';
 import { LayerTwoOracle, layerTwoOracleMeta } from './layer-two-oracle';
 import { Safes, safesMeta } from './safes';
 import { PrepaidCard, prepaidCardMeta } from './prepaid-card';
+import { PrepaidCardMarket, prepaidCardMarketMeta } from './prepaid-card-market';
 import Assets from './assets';
 import LayerOneOracle from './layer-one-oracle';
 import TokenBridgeHomeSide from './token-bridge-home-side';
@@ -19,6 +20,7 @@ type SDK =
   | 'LayerOneOracle'
   | 'LayerTwoOracle'
   | 'PrepaidCard'
+  | 'PrepaidCardMarket'
   | 'RevenuePool'
   | 'Safes'
   | 'HubAuth'
@@ -35,6 +37,8 @@ type MapReturnType<T> = T extends 'Assets'
   ? LayerTwoOracle
   : T extends 'PrepaidCard'
   ? PrepaidCard
+  : T extends 'PrepaidCardMarket'
+  ? PrepaidCardMarket
   : T extends 'RevenuePool'
   ? RevenuePool
   : T extends 'RewardPool'
@@ -87,6 +91,9 @@ export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<Map
       break;
     case 'PrepaidCard':
       apiClass = await resolveApiVersion(prepaidCardMeta, web3);
+      break;
+    case 'PrepaidCardMarket':
+      apiClass = await resolveApiVersion(prepaidCardMarketMeta, web3);
       break;
     case 'RevenuePool':
       apiClass = await resolveApiVersion(revenuePoolMeta, web3);
