@@ -10,12 +10,6 @@ inputs:
     description: Waypoint version to use
     required: false
     default: '0.4.0'
-  discord_token:
-    description: Authentication token for Discord bot
-    required: true
-  discord_channel:
-    description: Discord channel to send the notification
-    required: true
 
 runs:
   using: composite
@@ -45,11 +39,3 @@ runs:
       env:
         WAYPOINT_SERVER_TLS: '1'
         WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'
-
-    - uses: ./.github/actions/discord-message
-      with:
-        token: ${{ inputs.discord_token }}
-        channel: ${{ inputs.discord_channel }}
-        message: |
-          :checkered_flag: **hub** [${{ inputs.ref }}] has been deployed to *${{ inputs.environment }}*
-          :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

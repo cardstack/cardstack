@@ -59,5 +59,23 @@ jobs:
         with:
           #ref: ${{ github.event.inputs.ref }}
           ref: main
-          discord_token: ${{ secrets.DISCORD_TOKEN }}
-          discord_channel: ${{ secrets.DISCORD_CHANNEL }}
+
+      - name: Send success notification to Discord
+        if: ${{ success() }}
+        uses: ./.github/actions/discord-message
+        with:
+          token: ${{ secrets.DISCORD_TOKEN }}
+          channel: ${{ secrets.DISCORD_CHANNEL }}
+          message: |
+            :checkered_flag: **hub** [${{ inputs.ref }}] has been successfully deployed to *${{ inputs.environment }}*
+            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Send failure notification to Discord
+        if: ${{ failure() }}
+        uses: ./.github/actions/discord-message
+        with:
+          token: ${{ secrets.DISCORD_TOKEN }}
+          channel: ${{ secrets.DISCORD_CHANNEL }}
+          message: |
+            :warning: **hub** [${{ inputs.ref }}] has failed to deploy to *${{ inputs.environment }}*
+            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
