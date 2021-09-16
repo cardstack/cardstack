@@ -19,7 +19,7 @@
 }
 
 .safe-chooser-dropdown .ember-basic-dropdown-content {
-  max-height: 300px;
+  max-height: calc(var(--field-height) * 4.5);
   overflow: auto;
   position: absolute;
   z-index: 1;
