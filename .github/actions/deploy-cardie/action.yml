@@ -10,6 +10,12 @@ inputs:
     description: Waypoint version to use
     required: false
     default: '0.4.0'
+  discord_token:
+    description: Authentication token for Discord bot
+    required: true
+  discord_channel:
+    description: Discord channel to send the notification
+    required: true
 
 runs:
   using: composite

@@ -134,6 +134,10 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_AUTH_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_AUTH_TOKEN }}
+        with:
+          environment: staging
+          discord_token: ${{ secrets.DISCORD_TOKEN }}
+          discord_channel: ${{ secrets.DISCORD_CHANNEL }}
 
   deploy-web-client-staging:
     name: Deploy web-client to S3 staging bucket
@@ -159,6 +163,8 @@ jobs:
           SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
         with:
           environment: staging
+          discord_token: ${{ secrets.DISCORD_TOKEN }}
+          discord_channel: ${{ secrets.DISCORD_CHANNEL }}
           sentry_url_prefix: https://app-staging.stack.cards
 
   deploy-boxel:
@@ -209,3 +215,7 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
           WAYPOINT_AUTH_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_AUTH_TOKEN }}
+        with:
+          environment: staging
+          discord_token: ${{ secrets.DISCORD_TOKEN }}
+          discord_channel: ${{ secrets.DISCORD_CHANNEL }}

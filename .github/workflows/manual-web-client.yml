@@ -63,4 +63,6 @@ jobs:
           #environment: ${{ github.event.inputs.environment }}
           ref: main
           environment: staging
+          discord_token: ${{ secrets.DISCORD_TOKEN }}
+          discord_channel: ${{ secrets.DISCORD_CHANNEL }}
           sentry_url_prefix: ${{ env.SENTRY_URL_PREFIX }}

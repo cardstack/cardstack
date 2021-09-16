@@ -9,6 +9,12 @@ inputs:
   environment:
     description: Deployment environment
     required: true
+  discord_token:
+    description: Authentication token for Discord bot
+    required: true
+  discord_channel:
+    description: Discord channel to send the notification
+    required: true
   sentry_url_prefix:
     description: Adds a prefix to source map urls after stripping them
     required: true

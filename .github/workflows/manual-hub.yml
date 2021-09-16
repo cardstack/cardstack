@@ -59,3 +59,5 @@ jobs:
         with:
           #ref: ${{ github.event.inputs.ref }}
           ref: main
+          discord_token: ${{ secrets.DISCORD_TOKEN }}
+          discord_channel: ${{ secrets.DISCORD_CHANNEL }}
