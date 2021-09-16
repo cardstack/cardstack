@@ -19,6 +19,7 @@ import { fromWei } from '../currency-utils';
 import { ZERO_ADDRESS } from '../constants';
 import { PrepaidCardSafe } from '../safes';
 import { getSDK } from '../version-resolver';
+import { MAX_PREPAID_CARD_AMOUNT } from '../prepaid-card/base';
 
 export default class PrepaidCardMarket {
   constructor(private layer2Web3: Web3) {}
@@ -61,6 +62,73 @@ export default class PrepaidCardMarket {
       faceValue: parseInt(faceValue.toString()), // This number is in units of SPEND which is safe to handle as a number in js
       askPrice: askPrice.toString(),
     };
+  }
+
+  async removeFromInventory(txnHash: string): Promise<TransactionReceipt>;
+  async removeFromInventory(
+    fundingPrepaidCard: string,
+    prepaidCardAddresses: string[],
+    marketAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async removeFromInventory(
+    fundingPrepaidCardOrTxnHash: string,
+    prepaidCardAddresses?: string[],
+    marketAddress?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt> {
+    if (isTransactionHash(fundingPrepaidCardOrTxnHash)) {
+      let txnHash = fundingPrepaidCardOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    if (!prepaidCardAddresses) {
+      throw new Error('prepaidCardAddresses must be provided');
+    }
+    if (prepaidCardAddresses.length > MAX_PREPAID_CARD_AMOUNT) {
+      throw new Error(`Cannot remove more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
+    }
+    let fundingPrepaidCard = fundingPrepaidCardOrTxnHash;
+    marketAddress = marketAddress ?? (await getAddress('prepaidCardMarket', this.layer2Web3));
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let gnosisResult = await executeSendWithRateLock(this.layer2Web3, fundingPrepaidCard, async (rateLock) => {
+      let payload = await this.getRemoveFromInventoryPayload(
+        fundingPrepaidCard,
+        prepaidCardAddresses,
+        marketAddress!,
+        rateLock
+      );
+      if (nonce == null) {
+        nonce = getNextNonceFromEstimate(payload);
+        if (typeof onNonce === 'function') {
+          onNonce(nonce);
+        }
+      }
+      return await this.executeRemoveFromInventory(
+        fundingPrepaidCard,
+        prepaidCardAddresses,
+        marketAddress!,
+        rateLock,
+        payload,
+        await signPrepaidCardSendTx(this.layer2Web3, fundingPrepaidCard, payload, nonce, from),
+        nonce
+      );
+    });
+
+    if (!gnosisResult) {
+      throw new Error(
+        `Unable to obtain a gnosis transaction result for removeFromPrepaidCardInventory with funding prepaid card ${fundingPrepaidCard} for prepaid cards to be removed ${prepaidCardAddresses.join()}`
+      );
+    }
+
+    let txnHash = gnosisResult.ethereumTx.txHash;
+
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
   async setAsk(txnHash: string): Promise<TransactionReceipt>;
@@ -128,6 +196,44 @@ export default class PrepaidCardMarket {
       await onTxnHash(txnHash);
     }
     return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+  }
+
+  private async getRemoveFromInventoryPayload(
+    fundingPrepaidCard: string,
+    prepaidCardAddresses: string[],
+    marketAddress: string,
+    rate: string
+  ): Promise<SendPayload> {
+    return getSendPayload(
+      this.layer2Web3,
+      fundingPrepaidCard,
+      0,
+      rate,
+      'removePrepaidCardInventory',
+      this.layer2Web3.eth.abi.encodeParameters(['address[]', 'address'], [prepaidCardAddresses, marketAddress])
+    );
+  }
+
+  private async executeRemoveFromInventory(
+    fundingPrepaidCard: string,
+    prepaidCardAddresses: string[],
+    marketAddress: string,
+    rate: string,
+    payload: SendPayload,
+    signatures: Signature[],
+    nonce: BN
+  ): Promise<GnosisExecTx> {
+    return await executeSend(
+      this.layer2Web3,
+      fundingPrepaidCard,
+      0,
+      rate,
+      payload,
+      'removePrepaidCardInventory',
+      this.layer2Web3.eth.abi.encodeParameters(['address[]', 'address'], [prepaidCardAddresses, marketAddress]),
+      signatures,
+      nonce
+    );
   }
 
   private async getSetAskPayload(
