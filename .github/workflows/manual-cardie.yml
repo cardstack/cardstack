@@ -5,7 +5,8 @@ on:
     inputs:
       ref:
         description: Git branch/tag
-        required: true
+        required: false
+        default: main
       environment:
         description: Deployment environment
         required: false
@@ -19,27 +20,14 @@ jobs:
         with:
           ref: ${{ github.event.inputs.ref }}
 
-      - name: Install apt packages including waypoint
-        run: |
-          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-          sudo apt-get install awscli waypoint=0.4.0
-
       - name: Set up env
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
         run: |
-          if [ "$INPUT_ENVIRONMENT" = "staging" ]; then
-            echo "AWS_ACCESS_KEY_ID=${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
-            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}" >> $GITHUB_ENV
-            echo "WAYPOINT_SERVER_TOKEN=${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}" >> $GITHUB_ENV
-            echo "WAYPOINT_SERVER_ADDR=${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}" >> $GITHUB_ENV
-          else
+          if [ "$INPUT_ENVIRONMENT" != "staging" ]; then
             echo "unrecognized environment"
             exit 1;
           fi
-
-      - uses: volta-cli/action@v1
 
       - name: Set up yarn cache
         uses: actions/cache@v2
@@ -49,11 +37,32 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - run: yarn --prefer-offline
-
       - name: Deploy cardie
-        run: waypoint up --app=cardie -prune-retain=0 -plain
+        uses: ./.github/actions/deploy-cardie
         env:
-          AWS_DEFAULT_REGION: us-east-1
-          WAYPOINT_SERVER_TLS: 1
-          WAYPOINT_SERVER_TLS_SKIP_VERIFY: 1
+          AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}
+          WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
+          WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
+        with:
+          ref: ${{ github.event.inputs.ref }}
+
+      - name: Send success notification to Discord
+        if: ${{ success() }}
+        uses: ./.github/actions/discord-message
+        with:
+          token: ${{ secrets.DISCORD_TOKEN }}
+          channel: ${{ secrets.DISCORD_CHANNEL }}
+          message: |
+            :checkered_flag: **cardie** [${{ github.event.inputs.ref }}] has been successfully deployed to *${{ github.event.inputs.environment }}*
+            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: Send failure notification to Discord
+        if: ${{ failure() }}
+        uses: ./.github/actions/discord-message
+        with:
+          token: ${{ secrets.DISCORD_TOKEN }}
+          channel: ${{ secrets.DISCORD_CHANNEL }}
+          message: |
+            :warning: **cardie** [${{ github.event.inputs.ref }}] has failed to deploy to *${{ github.event.inputs.environment }}*
+            :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

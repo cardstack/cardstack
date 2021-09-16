@@ -1,0 +1,53 @@
+name: Deploy web-client
+description: Deploy web-client to S3
+
+inputs:
+  ref:
+    description: The branch, tag or SHA to deploy
+    required: false
+    default: main
+  environment:
+    description: Deployment environment
+    required: true
+  sentry_url_prefix:
+    description: Adds a prefix to source map urls after stripping them
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: volta-cli/action@v1
+
+    - run: yarn --prefer-offline
+      shell: bash
+
+    - name: Deploy
+      shell: bash
+      run: yarn deploy:web-client:${{ inputs.environment }}
+
+    - name: Get current lerna version
+      id: lerna-version
+      uses: saulonunesdev/lerna-get-version-action@v1.0.4
+
+    - name: Create decompressed copies of assets for Sentry
+      shell: bash
+      run: |
+        cd packages/web-client/tmp
+        mkdir -p deploy-dist-uncompressed/assets
+        cd deploy-dist/assets
+        echo *.js *.map | tr ' ' '\n' | xargs -n1 -I{} cp "{}" "../../deploy-dist-uncompressed/assets/{}.br"
+        cd ../../deploy-dist-uncompressed/assets
+        brotli --rm --decompress *.br
+
+    - name: Create Sentry release
+      uses: getsentry/action-release@v1
+      env:
+        SENTRY_ORG: cardstack
+        SENTRY_PROJECT: web-client
+      with:
+        environment: ${{ inputs.environment }}
+        ignore_empty: true
+        ignore_missing: true
+        sourcemaps: packages/web-client/tmp/deploy-dist-uncompressed
+        version: web-client-${{ github.sha }}@${{ steps.lerna-version.outputs.lerna-version }}
+        url_prefix: ${{ inputs.sentry_url_prefix }}
