@@ -1,15 +1,20 @@
 name: Manual Deploy [web-client]
 
 on:
+  push:
+    branches:
+      - update-workflow-with-composite
   workflow_dispatch:
     inputs:
       ref:
         description: Git branch/tag
-        required: true
+        required: false
+        default: main
       environment:
         description: Deployment environment
         required: false
-        default: production
+        #default: production
+        default: staging
 
 jobs:
   deploy:
