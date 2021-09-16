@@ -26,7 +26,6 @@ import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from
 import { Signature, signSafeTxAsBytes, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
 import { TransactionReceipt } from 'web3-core';
-import _ from 'lodash';
 
 const { fromWei } = Web3.utils;
 const POLL_INTERVAL = 500;
