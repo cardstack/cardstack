@@ -3,10 +3,9 @@ import SupplierManagerABI from '../../contracts/abi/v0.8.0/supplier-manager';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
-import { ZERO_ADDRESS } from '../constants';
 import { ContractOptions } from 'web3-eth-contract';
 import { gasEstimate, executeTransaction, getNextNonceFromEstimate } from '../utils/safe-utils';
-import { signSafeTxAsRSV } from '../utils/signing-utils';
+import { signSafeTx } from '../utils/signing-utils';
 import BN from 'bn.js';
 import { query } from '../utils/graphql';
 import { TransactionReceipt } from 'web3-core';
@@ -267,35 +266,14 @@ export default class Safes {
       }
     }
 
-    let signatures = await signSafeTxAsRSV(
-      this.layer2Web3,
-      tokenAddress,
-      0,
-      payload,
-      0,
-      estimate.safeTxGas,
-      estimate.dataGas,
-      estimate.gasPrice,
-      estimate.gasToken,
-      ZERO_ADDRESS,
-      nonce,
-      from,
-      safeAddress
-    );
     let result = await executeTransaction(
       this.layer2Web3,
       safeAddress,
       tokenAddress,
-      0,
       payload,
-      0,
-      estimate.safeTxGas,
-      estimate.dataGas,
-      estimate.gasPrice,
+      estimate,
       nonce,
-      signatures,
-      estimate.gasToken,
-      ZERO_ADDRESS
+      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)
     );
 
     let txnHash = result.ethereumTx.txHash;
@@ -343,35 +321,14 @@ export default class Safes {
         onNonce(nonce);
       }
     }
-    let signatures = await signSafeTxAsRSV(
-      this.layer2Web3,
-      supplierManager,
-      0,
-      payload,
-      0,
-      estimate.safeTxGas,
-      estimate.dataGas,
-      estimate.gasPrice,
-      estimate.gasToken,
-      ZERO_ADDRESS,
-      nonce,
-      from,
-      safeAddress
-    );
     let result = await executeTransaction(
       this.layer2Web3,
       safeAddress,
       supplierManager,
-      0,
       payload,
-      0,
-      estimate.safeTxGas,
-      estimate.dataGas,
-      estimate.gasPrice,
+      estimate,
       nonce,
-      signatures,
-      estimate.gasToken,
-      ZERO_ADDRESS
+      await signSafeTx(this.layer2Web3, safeAddress, estimate.gasToken, payload, estimate, nonce, from)
     );
 
     let txnHash = result.ethereumTx.txHash;

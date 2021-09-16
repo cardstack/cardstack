@@ -1,9 +1,71 @@
+import BN from 'bn.js';
 import Web3 from 'web3';
+import { Estimate, SendPayload } from './safe-utils';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.0/prepaid-card-manager';
+import { AbiItem } from 'web3-utils';
+import { getAddress } from '../../contracts/addresses';
+import { ZERO_ADDRESS } from '../constants';
 
 export interface Signature {
   v: number;
   r: string;
   s: string | 0;
+}
+
+export async function signPrepaidCardSendTx(
+  web3: Web3,
+  prepaidCardAddress: string,
+  payload: SendPayload,
+  nonce: BN,
+  from: string
+): Promise<Signature[]> {
+  let prepaidCardManager = new web3.eth.Contract(
+    PrepaidCardManagerABI as AbiItem[],
+    await getAddress('prepaidCardManager', web3)
+  );
+  let issuingToken = (await prepaidCardManager.methods.cardDetails(prepaidCardAddress).call()).issueToken;
+  let signatures = await signSafeTxAsRSV(
+    web3,
+    issuingToken,
+    0,
+    payload.data,
+    0,
+    payload.safeTxGas,
+    payload.dataGas,
+    payload.gasPrice,
+    payload.gasToken,
+    payload.refundReceiver,
+    nonce,
+    from,
+    prepaidCardAddress
+  );
+  return signatures;
+}
+export async function signSafeTx(
+  web3: Web3,
+  safeAddress: string,
+  to: string,
+  data: string,
+  estimate: Estimate,
+  nonce: BN,
+  from: string
+): Promise<Signature[]> {
+  let signatures = await signSafeTxAsRSV(
+    web3,
+    to,
+    0,
+    data,
+    0,
+    estimate.safeTxGas,
+    estimate.dataGas,
+    estimate.gasPrice,
+    estimate.gasToken,
+    ZERO_ADDRESS,
+    nonce,
+    from,
+    safeAddress
+  );
+  return signatures;
 }
 
 export async function signSafeTxAsRSV(

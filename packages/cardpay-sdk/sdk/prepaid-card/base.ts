@@ -20,11 +20,13 @@ import {
   getSendPayload,
   executeSend,
   getNextNonceFromEstimate,
+  executeSendWithRateLock,
 } from '../utils/safe-utils';
 import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
-import { signSafeTxAsRSV, Signature, signSafeTxAsBytes } from '../utils/signing-utils';
+import { Signature, signSafeTxAsBytes, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
 import { TransactionReceipt } from 'web3-core';
+import _ from 'lodash';
 
 const { fromWei } = Web3.utils;
 const POLL_INTERVAL = 500;
@@ -107,7 +109,6 @@ export default class PrepaidCard {
       throw new Error(`The amount to pay merchant §${spendAmount} SPEND is below the minimum allowable amount`);
     }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let issuingToken = await this.issuingToken(prepaidCardAddress);
     await this.convertFromSpendForPrepaidCard(
       prepaidCardAddress,
       spendAmount,
@@ -119,60 +120,24 @@ export default class PrepaidCard {
         )
     );
 
-    let rateChanged = false;
-    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
-    let gnosisResult: GnosisExecTx | undefined;
-    do {
-      let rateLock = await layerTwoOracle.getRateLock(issuingToken);
-      try {
-        let payload = await this.getPayMerchantPayload(prepaidCardAddress, merchantSafe, spendAmount, rateLock);
-        if (nonce == null) {
-          nonce = getNextNonceFromEstimate(payload);
-          if (typeof onNonce === 'function') {
-            onNonce(nonce);
-          }
-        }
-        let signatures = await signSafeTxAsRSV(
-          this.layer2Web3,
-          issuingToken,
-          0,
-          payload.data,
-          0,
-          payload.safeTxGas,
-          payload.dataGas,
-          payload.gasPrice,
-          payload.gasToken,
-          payload.refundReceiver,
-          nonce,
-          from,
-          prepaidCardAddress
-        );
-        gnosisResult = await this.executePayMerchant(
-          prepaidCardAddress,
-          merchantSafe,
-          spendAmount,
-          rateLock,
-          payload.gasPrice,
-          payload.safeTxGas,
-          payload.dataGas,
-          signatures,
-          nonce
-        );
-        break;
-      } catch (e: any) {
-        // The rate updates about once an hour, so if this is triggered, it should only be once
-        if (e.message.includes('rate is beyond the allowable bounds')) {
-          rateChanged = true;
-          // TODO in this situation we should surface a message to the user that
-          // the rate has changed and that we need to try again with a new rate
-          console.warn(
-            'The USD rate has fluctuated beyond allowable bounds between when the txn was signed and when it was executed, prompting the user to sign the txn again with a new rate'
-          );
-        } else {
-          throw e;
+    let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
+      let payload = await this.getPayMerchantPayload(prepaidCardAddress, merchantSafe, spendAmount, rateLock);
+      if (nonce == null) {
+        nonce = getNextNonceFromEstimate(payload);
+        if (typeof onNonce === 'function') {
+          onNonce(nonce);
         }
       }
-    } while (rateChanged);
+      return await this.executePayMerchant(
+        prepaidCardAddress,
+        merchantSafe,
+        spendAmount,
+        rateLock,
+        payload,
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        nonce
+      );
+    });
 
     if (!gnosisResult) {
       throw new Error(
@@ -216,11 +181,8 @@ export default class PrepaidCard {
       throw new Error(`The prepaid card ${prepaidCardAddress} is not allowed to be transferred`);
     }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let rateChanged = false;
     let prepaidCardMgr = await this.getPrepaidCardMgr();
-    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
     let gasToken = await getAddress('cardCpxd', this.layer2Web3);
-    let issuingToken = await this.issuingToken(prepaidCardAddress);
     let transferData = await prepaidCardMgr.methods.getTransferCardData(prepaidCardAddress, newOwner).call();
 
     // the quirk here is that we are signing this txn in advance so we need to
@@ -252,58 +214,25 @@ export default class PrepaidCard {
       from,
       prepaidCardAddress
     );
-    let gnosisResult: GnosisExecTx | undefined;
-    do {
-      let rateLock = await layerTwoOracle.getRateLock(issuingToken);
-      try {
-        let payload = await this.getTransferPayload(prepaidCardAddress, newOwner, previousOwnerSignature, rateLock);
-        if (nonce == null) {
-          nonce = getNextNonceFromEstimate(payload);
-          if (typeof onNonce === 'function') {
-            onNonce(nonce);
-          }
-        }
-        let signatures = await signSafeTxAsRSV(
-          this.layer2Web3,
-          issuingToken,
-          0,
-          payload.data,
-          0,
-          payload.safeTxGas,
-          payload.dataGas,
-          payload.gasPrice,
-          payload.gasToken,
-          payload.refundReceiver,
-          nonce,
-          from,
-          prepaidCardAddress
-        );
-        gnosisResult = await this.executeTransfer(
-          prepaidCardAddress,
-          newOwner,
-          previousOwnerSignature,
-          rateLock,
-          payload.gasPrice,
-          payload.safeTxGas,
-          payload.dataGas,
-          signatures,
-          nonce
-        );
-        break;
-      } catch (e: any) {
-        // The rate updates about once an hour, so if this is triggered, it should only be once
-        if (e.message.includes('rate is beyond the allowable bounds')) {
-          rateChanged = true;
-          // TODO in this situation we should surface a message to the user that
-          // the rate has changed and that we need to try again with a new rate
-          console.warn(
-            'The USD rate has fluctuated beyond allowable bounds between when the txn was signed and when it was executed, prompting the user to sign the txn again with a new rate'
-          );
-        } else {
-          throw e;
+    let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
+      let payload = await this.getTransferPayload(prepaidCardAddress, newOwner, previousOwnerSignature, rateLock);
+      if (nonce == null) {
+        nonce = getNextNonceFromEstimate(payload);
+        if (typeof onNonce === 'function') {
+          onNonce(nonce);
         }
       }
-    } while (rateChanged);
+      return await this.executeTransfer(
+        prepaidCardAddress,
+        newOwner,
+        previousOwnerSignature,
+        rateLock,
+        payload,
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        nonce
+      );
+    });
+
     if (!gnosisResult) {
       throw new Error(
         `Unable to obtain a gnosis transaction result for prepaid card transfer of prepaid card ${prepaidCardAddress} to new owner ${newOwner}`
@@ -387,71 +316,36 @@ export default class PrepaidCard {
         )
     );
 
-    let rateChanged = false;
-    let gnosisResult: GnosisExecTx | undefined;
-
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
-    do {
-      let rateLock = await layerTwoOracle.getRateLock(issuingToken);
-      try {
-        let payload = await this.getSplitPayload(
-          prepaidCardAddress,
-          totalAmountInSpend,
-          amounts,
-          faceValues,
-          rateLock,
-          customizationDID,
-          marketAddress
-        );
-        if (nonce == null) {
-          nonce = getNextNonceFromEstimate(payload);
-          if (typeof onNonce === 'function') {
-            onNonce(nonce);
-          }
-        }
-        let signatures = await signSafeTxAsRSV(
-          this.layer2Web3,
-          issuingToken,
-          0,
-          payload.data,
-          0,
-          payload.safeTxGas,
-          payload.dataGas,
-          payload.gasPrice,
-          payload.gasToken,
-          payload.refundReceiver,
-          nonce,
-          from,
-          prepaidCardAddress
-        );
-        gnosisResult = await this.executeSplit(
-          prepaidCardAddress,
-          totalAmountInSpend,
-          amounts,
-          faceValues,
-          rateLock,
-          payload.gasPrice,
-          payload.safeTxGas,
-          payload.dataGas,
-          signatures,
-          nonce,
-          customizationDID
-        );
-        break;
-      } catch (e: any) {
-        // The rate updates about once an hour, so if this is triggered, it should only be once
-        if (e.message.includes('rate is beyond the allowable bounds')) {
-          rateChanged = true;
-          // TODO in this situation we should surface a message to the user that
-          // the rate has changed and that we need to try again with a new rate
-          console.warn(
-            'The USD rate has fluctuated beyond allowable bounds between when the txn was signed and when it was executed, prompting the user to sign the txn again with a new rate'
-          );
-        } else {
-          throw e;
+    let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
+      let payload = await this.getSplitPayload(
+        prepaidCardAddress,
+        totalAmountInSpend,
+        amounts,
+        faceValues,
+        rateLock,
+        customizationDID,
+        marketAddress
+      );
+      if (nonce == null) {
+        nonce = getNextNonceFromEstimate(payload);
+        if (typeof onNonce === 'function') {
+          onNonce(nonce);
         }
       }
-    } while (rateChanged);
+      return await this.executeSplit(
+        prepaidCardAddress,
+        totalAmountInSpend,
+        amounts,
+        faceValues,
+        rateLock,
+        payload,
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        nonce,
+        customizationDID
+      );
+    });
+
     if (!gnosisResult) {
       throw new Error(`Unable to split prepaid card ${prepaidCardAddress} into face values: ${faceValues.join(', ')}`);
     }
@@ -560,35 +454,14 @@ export default class PrepaidCard {
         onNonce(nonce);
       }
     }
-    let signatures = await signSafeTxAsRSV(
-      this.layer2Web3,
-      tokenAddress,
-      0,
-      payload,
-      0,
-      estimate.safeTxGas,
-      estimate.dataGas,
-      estimate.gasPrice,
-      estimate.gasToken,
-      ZERO_ADDRESS,
-      nonce,
-      from,
-      safeAddress
-    );
     let gnosisTxn = await executeTransaction(
       this.layer2Web3,
       safeAddress,
       tokenAddress,
-      0,
       payload,
-      0,
-      estimate.safeTxGas,
-      estimate.dataGas,
-      estimate.gasPrice,
+      estimate,
       nonce,
-      signatures,
-      estimate.gasToken,
-      ZERO_ADDRESS
+      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)
     );
 
     if (typeof onTxnHash === 'function') {
@@ -751,9 +624,7 @@ export default class PrepaidCard {
     merchantSafe: string,
     spendAmount: number,
     rate: string,
-    gasPrice: string,
-    safeTxGas: string,
-    dataGas: string,
+    payload: SendPayload,
     signatures: Signature[],
     nonce: BN
   ): Promise<GnosisExecTx> {
@@ -762,9 +633,7 @@ export default class PrepaidCard {
       prepaidCardAddress,
       spendAmount,
       rate,
-      gasPrice,
-      safeTxGas,
-      dataGas,
+      payload,
       'payMerchant',
       this.layer2Web3.eth.abi.encodeParameters(['address'], [merchantSafe]),
       signatures,
@@ -777,9 +646,7 @@ export default class PrepaidCard {
     issuingTokenAmounts: BN[],
     spendAmounts: number[],
     rate: string,
-    gasPrice: string,
-    safeTxGas: string,
-    dataGas: string,
+    payload: SendPayload,
     signatures: Signature[],
     nonce: BN,
     customizationDID = '',
@@ -790,9 +657,7 @@ export default class PrepaidCard {
       prepaidCardAddress,
       totalSpendAmount,
       rate,
-      gasPrice,
-      safeTxGas,
-      dataGas,
+      payload,
       'split',
       this.layer2Web3.eth.abi.encodeParameters(
         ['uint256[]', 'uint256[]', 'string', 'address'],
@@ -808,9 +673,7 @@ export default class PrepaidCard {
     newOwner: string,
     previousOwnerSignature: string,
     rate: string,
-    gasPrice: string,
-    safeTxGas: string,
-    dataGas: string,
+    payload: SendPayload,
     signatures: Signature[],
     nonce: BN
   ): Promise<GnosisExecTx> {
@@ -819,9 +682,7 @@ export default class PrepaidCard {
       prepaidCardAddress,
       0,
       rate,
-      gasPrice,
-      safeTxGas,
-      dataGas,
+      payload,
       'transfer',
       this.layer2Web3.eth.abi.encodeParameters(['address', 'bytes'], [newOwner, previousOwnerSignature]),
       signatures,

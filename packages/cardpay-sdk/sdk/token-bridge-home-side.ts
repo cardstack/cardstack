@@ -8,8 +8,7 @@ import BridgeValidatorsABI from '../contracts/abi/bridge-validators';
 import { getAddress } from '../contracts/addresses';
 import { executeTransaction, gasEstimate, getNextNonceFromEstimate } from './utils/safe-utils';
 import { AbiItem, fromWei, toBN } from 'web3-utils';
-import { signSafeTxAsRSV } from './utils/signing-utils';
-import { ZERO_ADDRESS } from './constants';
+import { signSafeTx } from './utils/signing-utils';
 import { query } from './utils/graphql';
 import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from './utils/general-utils';
 
@@ -118,35 +117,14 @@ export default class TokenBridgeHomeSide implements ITokenBridgeHomeSide {
         onNonce(nonce);
       }
     }
-    let signatures = await signSafeTxAsRSV(
-      this.layer2Web3,
-      tokenAddress,
-      0,
-      payload,
-      0,
-      estimate.safeTxGas,
-      estimate.dataGas,
-      estimate.gasPrice,
-      estimate.gasToken,
-      ZERO_ADDRESS,
-      nonce,
-      from,
-      safeAddress
-    );
     let result = await executeTransaction(
       this.layer2Web3,
       safeAddress,
       tokenAddress,
-      0,
       payload,
-      0,
-      estimate.safeTxGas,
-      estimate.dataGas,
-      estimate.gasPrice,
+      estimate,
       nonce,
-      signatures,
-      estimate.gasToken,
-      ZERO_ADDRESS
+      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)
     );
 
     let txnHash = result.ethereumTx.txHash;
