@@ -41,8 +41,13 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`PrepaidCard.payMerchant`](#prepaidcardpaymerchant)
 - [`PrepaidCardMarket`](#prepaidcardmarket)
   - [`PrepaidCardMarket.getSKUInfo`](#prepaidcardmarketgetskuinfo)
+<<<<<<< HEAD
   - [`PrepaidCardMarket.getInventory`](#prepaidcardmarketgetinventory)
   - [`PrepaidCardMarket.removeFromInventory`](#prepaidcardmarketremovefrominventory)
+||||||| c30d0b8a9
+=======
+  - [`PrepaidCardMarket.getInventory`](#prepaidcardmarketgetinventory)
+>>>>>>> origin/main
   - [`PrepaidCardMarket.setAsk`](#prepaidcardmarketsetask)
 - [`RevenuePool`](#revenuepool)
   - [`RevenuePool.merchantRegistrationFee`](#revenuepoolmerchantregistrationfee)

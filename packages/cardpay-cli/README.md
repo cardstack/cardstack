@@ -17,8 +17,13 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay prepaidcard-transfer <PREPAID_CARD> <NEW_OWNER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-transfer-prepaid_card-new_owner---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay price-for-face-value <TOKEN_ADDRESS> <SPEND_FACE_VALUE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-price-for-face-value-token_address-spend_face_value---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay sku-info <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-sku-info-sku---networknetwork---mnemonicmnemonic---walletconnect)
+<<<<<<< HEAD
   - [`yarn cardpay prepaid-card-inventory <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaid-card-inventory-sku---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay set-prepaid-card-ask <FUNDING_CARD> <PREPAID_CARDS> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-set-prepaid-card-ask-funding_card-prepaid_cards---networknetwork---mnemonicmnemonic---walletconnect)
+||||||| c30d0b8a9
+=======
+  - [`yarn cardpay prepaid-card-inventory <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaid-card-inventory-sku---networknetwork---mnemonicmnemonic---walletconnect)
+>>>>>>> origin/main
   - [`yarn cardpay set-prepaid-card-ask <PREPAID_CARD> <SKU> <ASK_PRICE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-set-prepaid-card-ask-prepaid_card-sku-ask_price---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay register-merchant <PREPAID_CARD> <INFO_DID> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-register-merchant-prepaid_card-info_did---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay payment-limits --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-payment-limits---networknetwork---mnemonicmnemonic---walletconnect)
