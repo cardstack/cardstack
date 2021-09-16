@@ -492,7 +492,7 @@ export default class PrepaidCard {
     return weiAmount;
   }
 
-  private async resolvePrepaidCards(prepaidCardAddresses: string[]): Promise<PrepaidCardSafe[]> {
+  async resolvePrepaidCards(prepaidCardAddresses: string[]): Promise<PrepaidCardSafe[]> {
     let safes = await getSDK('Safes', this.layer2Web3);
     let prepaidCards: PrepaidCardSafe[] | undefined;
     let startTime = Date.now();

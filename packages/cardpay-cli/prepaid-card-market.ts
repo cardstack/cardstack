@@ -23,6 +23,14 @@ export async function getSKUInfo(network: string, sku: string, mnemonic?: string
   }
 }
 
+export async function getInventory(network: string, sku: string, mnemonic?: string): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
+  let inventory = await prepaidCardMarket.getInventory(sku);
+  console.log(`Inventory for SKU ${sku} (${inventory.length} items):
+  ${inventory.map((p) => p.address).join(',\n  ')}`);
+}
+
 export async function setAsk(
   network: string,
   prepaidCardAddress: string,
