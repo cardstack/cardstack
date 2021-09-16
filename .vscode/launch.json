@@ -405,6 +405,25 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay testnet: Remove Prepaid Card Inventory",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "remove-prepaid-card-inventory",
+        "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28", // funding prepaid card
+        "0x56f16a40a00C016bd71bB3144C0Cd9932Fa9D847", // prepaid cards to remove
+        "0xE4A386D9f2Bab2afb010Cb7130798A634757b599", // prepaid cards to remove
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay testnet: Set Prepaid Card Ask",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",

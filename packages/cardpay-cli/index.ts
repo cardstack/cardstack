@@ -29,7 +29,12 @@ import {
 import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
 import { rewardTokenBalances } from './reward-pool.js';
 import { hubAuth } from './hub-auth';
-import { getSKUInfo, setAsk, getInventory as prepaidCardInventory } from './prepaid-card-market.js';
+import {
+  getSKUInfo,
+  setAsk,
+  getInventory as prepaidCardInventory,
+  removeFromInventory as removePrepaidCardInventory,
+} from './prepaid-card-market.js';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -58,6 +63,7 @@ type Commands =
   | 'setPrepaidCardAsk'
   | 'skuInfo'
   | 'prepaidCardInventory'
+  | 'removePrepaidCardInventory'
   | 'registerMerchant'
   | 'revenueBalances'
   | 'claimRevenue'
@@ -84,6 +90,7 @@ interface Options {
   spendFaceValue?: number;
   merchantSafe?: string;
   infoDID?: string;
+  fundingCard?: string;
   customizationDID?: string;
   prepaidCard?: string;
   receiver?: string;
@@ -96,6 +103,7 @@ interface Options {
   encodedData?: string;
   signatures?: string[];
   faceValues?: number[];
+  prepaidCards?: string[];
   rewardProgramId?: string;
 }
 let {
@@ -114,6 +122,8 @@ let {
   infoDID,
   customizationDID,
   prepaidCard,
+  fundingCard,
+  prepaidCards,
   sku,
   askPrice,
   fromBlock,
@@ -382,6 +392,21 @@ let {
         description: 'The SKU to obtain inventory for',
       });
       command = 'prepaidCardInventory';
+    }
+  )
+  .command(
+    'remove-prepaid-card-inventory <fundingCard> <prepaidCards..>',
+    'Removes the specified prepaid cards from the inventory and returns them back to the issuer.',
+    (yargs) => {
+      yargs.positional('fundingCard', {
+        type: 'string',
+        description: 'The prepaid card used to pay for gas for the txn',
+      });
+      yargs.positional('prepaidCards', {
+        type: 'string',
+        description: 'A list of prepaid cards (separated by spaces) to remove from inventory',
+      });
+      command = 'removePrepaidCardInventory';
     }
   )
   .command(
@@ -742,6 +767,13 @@ if (!command) {
         return;
       }
       await prepaidCardInventory(network, sku, mnemonic);
+      break;
+    case 'removePrepaidCardInventory':
+      if (fundingCard == null || prepaidCards == null || prepaidCards.length === 0) {
+        showHelpAndExit('fundingCard and prepaidCards are required values');
+        return;
+      }
+      await removePrepaidCardInventory(network, fundingCard, prepaidCards, mnemonic);
       break;
     case 'setPrepaidCardAsk':
       if (prepaidCard == null || sku == null || askPrice == null) {
