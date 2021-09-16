@@ -17,9 +17,19 @@ import { getAddress } from '../..';
 import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
 import { fromWei } from '../currency-utils';
 import { ZERO_ADDRESS } from '../constants';
+import { PrepaidCardSafe } from '../safes';
+import { getSDK } from '../version-resolver';
 
 export default class PrepaidCardMarket {
   constructor(private layer2Web3: Web3) {}
+
+  async getInventory(sku: string, marketAddress?: string): Promise<PrepaidCardSafe[]> {
+    let prepaidCardAPI = await getSDK('PrepaidCard', this.layer2Web3);
+    marketAddress = marketAddress ?? (await getAddress('prepaidCardMarket', this.layer2Web3));
+    let contract = new this.layer2Web3.eth.Contract(PrepaidCardMarketABI as AbiItem[], marketAddress);
+    let prepaidCardAddresses = await contract.methods.getInventory(sku).call();
+    return await prepaidCardAPI.resolvePrepaidCards(prepaidCardAddresses);
+  }
 
   async getSKUInfo(
     sku: string,

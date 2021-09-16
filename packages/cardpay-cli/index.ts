@@ -29,7 +29,7 @@ import {
 import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
 import { rewardTokenBalances } from './reward-pool.js';
 import { hubAuth } from './hub-auth';
-import { getSKUInfo, setAsk } from './prepaid-card-market.js';
+import { getSKUInfo, setAsk, getInventory as prepaidCardInventory } from './prepaid-card-market.js';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -57,6 +57,7 @@ type Commands =
   | 'setSupplierInfoDID'
   | 'setPrepaidCardAsk'
   | 'skuInfo'
+  | 'prepaidCardInventory'
   | 'registerMerchant'
   | 'revenueBalances'
   | 'claimRevenue'
@@ -370,6 +371,17 @@ let {
         description: 'The SKU to obtain details for',
       });
       command = 'skuInfo';
+    }
+  )
+  .command(
+    'prepaid-card-inventory <sku>',
+    'Get the inventory for a specific SKU from the market contract.',
+    (yargs) => {
+      yargs.positional('sku', {
+        type: 'string',
+        description: 'The SKU to obtain inventory for',
+      });
+      command = 'prepaidCardInventory';
     }
   )
   .command(
@@ -723,6 +735,13 @@ if (!command) {
         return;
       }
       await getSKUInfo(network, sku, mnemonic);
+      break;
+    case 'prepaidCardInventory':
+      if (sku == null) {
+        showHelpAndExit('sku is a required value');
+        return;
+      }
+      await prepaidCardInventory(network, sku, mnemonic);
       break;
     case 'setPrepaidCardAsk':
       if (prepaidCard == null || sku == null || askPrice == null) {

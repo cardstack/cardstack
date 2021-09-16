@@ -41,6 +41,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`PrepaidCard.payMerchant`](#prepaidcardpaymerchant)
 - [`PrepaidCardMarket`](#prepaidcardmarket)
   - [`PrepaidCardMarket.getSKUInfo`](#prepaidcardmarketgetskuinfo)
+  - [`PrepaidCardMarket.getInventory`](#prepaidcardmarketgetinventory)
   - [`PrepaidCardMarket.setAsk`](#prepaidcardmarketsetask)
 - [`RevenuePool`](#revenuepool)
   - [`RevenuePool.merchantRegistrationFee`](#revenuepoolmerchantregistrationfee)
@@ -553,6 +554,17 @@ let {
   askPrice // as wei in the units of the issuing token
 } = await prepaidCardMarket.getSKUInfo(sku1000SPENDCards);
 ```
+
+### `PrepaidCardMarket.getInventory`
+This call returns the prepaid card inventory for a particular SKU.
+The arguments are:
+- The SKU in question
+- Optionally the address of the market contract (the default Cardstack market contract will be used if not provided)
+```js
+let prepaidCards = await prepaidCardMarket.getInventory(sku1000SPENDCards);
+```
+
+This call returns a promise for an array of `PrepaidCardSafe` objects (from `Safes.View`).
 
 ### `PrepaidCardMarket.setAsk`
 This call sets the ask price for the prepaid cards the belong to the specified SKU. The ask price is specified as a string in units of `wei` based on the issuing token for the prepaid cards in the specified SKU.
