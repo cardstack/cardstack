@@ -70,22 +70,23 @@
     "json-stable-stringify": "^1.0.1",
     "mocha": "^8.3.2",
     "moment-timezone": "^0.5.33",
-    "supertest": "^6.1.3"
+    "supertest": "^6.1.3",
+    "npm-run-all": "^4.1.5"
   },
   "engines": {
     "node": "^14.0",
     "yarn": "^1.0"
   },
   "scripts": {
-    "start": "node ./bin/server.ts",
+    "start": "run-p -c start:*",
+    "start:server": "node ./bin/server.ts",
+    "start:worker": "node ./bin/worker.ts",
     "console": "node --experimental-repl-await ./bin/console.ts",
     "db:setup:local": "createdb hub_development && node-pg-migrate up && node ./bin/seed-db.ts && node ./bin/dump-db-structure.js && node ./bin/setup-test-db.js",
     "db:migrate": "node-pg-migrate",
     "db:seed": "node ./bin/seed-db.ts",
     "db:structure:dump": "node ./bin/dump-db-structure.js",
     "db:test:prepare": "node ./bin/setup-test-db.js",
-    "start:server": "node ./bin/server.ts",
-    "start:worker": "node ./bin/worker.ts",
     "test": "NODE_ENV=test mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
     "autotest": "NODE_ENV=test mocha -w --reporter=min mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000"
   },
