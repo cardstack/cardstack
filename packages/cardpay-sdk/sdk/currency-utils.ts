@@ -254,6 +254,11 @@ export const convertBipsToPercentage = (value: BigNumberish, decimals = 2): stri
  */
 export const convertAmountToNativeDisplay = (value: BigNumberish, nativeCurrency: string, buffer?: number) => {
   const nativeSelected = get(supportedNativeCurrencies, `${nativeCurrency}`);
+
+  if (!nativeSelected) {
+    throw new Error(`Unknown currency ${nativeCurrency}`);
+  }
+
   const { decimals } = nativeSelected;
   const display = handleSignificantDecimals(value, decimals, buffer);
   if (nativeSelected.alignment === 'left') {
