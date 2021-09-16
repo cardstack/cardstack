@@ -1,5 +1,4 @@
-import isEqual from 'lodash/isEqual';
-import QUnit from 'qunit';
+import type Chai from 'chai';
 
 function standardize(src: string) {
   return src
@@ -8,61 +7,41 @@ function standardize(src: string) {
     .trim();
 }
 
-export function equalIgnoringWhiteSpace(actual: string, expected: string, message?: string): void {
-  actual = standardize(actual);
-  expected = standardize(expected);
-  let result = actual === expected;
+export default function (chai: typeof Chai) {
+  const { Assertion } = chai;
+  Assertion.addMethod('equalIgnoringWhiteSpace', function (expected: string): void {
+    let actual = standardize(this._obj);
+    expected = standardize(expected);
 
-  message ||= 'Strings are equal';
+    this.assert(
+      actual === expected,
+      `expected strings to be the same`,
+      'expected strings not to be the same',
+      expected,
+      actual
+    );
+  });
 
-  QUnit.assert.pushResult({
-    result,
-    actual,
-    expected,
-    message,
+  Assertion.addMethod('containsSource', function (expected: string): void {
+    let actual = standardize(this._obj ?? '');
+    expected = standardize(expected);
+    let result = actual.includes(expected) || false;
+    this.assert(
+      result,
+      `expected source to contain "${expected}"`,
+      `expected source not to contain "${expected}"`,
+      expected,
+      actual
+    );
   });
 }
 
-export function containsSource(actual: string | undefined, expected: string, message?: string): void {
-  actual = standardize(actual ?? '');
-  expected = standardize(expected);
-  let result = actual.includes(expected) || false;
-  message ||= 'Contains source';
-  QUnit.assert.pushResult({
-    result,
-    actual,
-    expected,
-    message,
-  });
-}
-
-export function assert_isEqual<T>(actual: T, expected: T, message?: string): void {
-  message ||= 'isEqual';
-  let result = isEqual(actual, expected);
-
-  let printActual: any = actual;
-  let printExpected: any = expected;
-
-  if (actual instanceof Map) {
-    printActual = Object.fromEntries(actual);
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  export namespace Chai {
+    interface Assertion {
+      equalIgnoringWhiteSpace(expectedSource: string): void;
+      containsSource(expectedSource: string): void;
+    }
   }
-
-  if (actual instanceof Set) {
-    printActual = [...actual];
-  }
-
-  if (expected instanceof Map) {
-    printExpected = Object.fromEntries(expected);
-  }
-
-  if (expected instanceof Set) {
-    printExpected = [...expected];
-  }
-
-  QUnit.assert.pushResult({
-    result,
-    actual: printActual,
-    expected: printExpected,
-    message,
-  });
 }

@@ -2,14 +2,14 @@ import { join } from 'path';
 import { encodeCardURL } from '@cardstack/core/src/utils';
 import type Koa from 'koa';
 import supertest from 'supertest';
-import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupCardCache } from '@cardstack/compiler-server/tests/helpers/cache';
-import { ProjectTestRealm, setupRealms } from '@cardstack/compiler-server/tests/helpers/realm';
+import { setupCardCache } from '@cardstack/compiler-server/node-tests/helpers/cache';
+import { ProjectTestRealm, setupRealms } from '@cardstack/compiler-server/node-tests/helpers/realm';
 import { Server } from '@cardstack/compiler-server/src/server';
 import { existsSync } from 'fs-extra';
+import { expect } from 'chai';
 
-QUnit.module('DELETE /cards/<card-id>', function (hooks) {
+describe('DELETE /cards/<card-id>', function () {
   let realm: ProjectTestRealm;
   let server: Koa;
 
@@ -21,10 +21,10 @@ QUnit.module('DELETE /cards/<card-id>', function (hooks) {
     return supertest(server.callback()).del(`/cards/${encodeURIComponent(cardURL)}`);
   }
 
-  let { getCardCacheDir } = setupCardCache(hooks);
-  let { createRealm, getRealmManager } = setupRealms(hooks);
+  let { getCardCacheDir } = setupCardCache(this);
+  let { createRealm, getRealmManager } = setupRealms(this);
 
-  hooks.beforeEach(async function () {
+  this.beforeEach(async function () {
     realm = createRealm('https://my-realm');
     realm.addCard('post', {
       'card.json': {
@@ -64,22 +64,22 @@ QUnit.module('DELETE /cards/<card-id>', function (hooks) {
     ).app;
   });
 
-  QUnit.test('returns a 404 when trying to delete from a card that doesnt exist', async function (assert) {
-    assert.expect(0);
+  it('returns a 404 when trying to delete from a card that doesnt exist', async function () {
+    // assert.expect(0);
     await deleteCard('https://my-realm/car0').expect(404);
   });
 
-  QUnit.test('can delete an existing card that has no children', async function (assert) {
-    assert.expect(2);
+  it('can delete an existing card that has no children', async function () {
+    // assert.expect(2);
 
     await deleteCard('https://my-realm/post0').expect(204);
     await getCard('https://my-realm/post0').expect(404);
 
-    assert.notOk(
+    expect(
       existsSync(join(getCardCacheDir(), 'node', encodeCardURL('https://my-realm/post0'))),
       'Cache for card is deleted'
-    );
+    ).to.be.false;
 
-    assert.notOk(existsSync(join(realm.directory, 'post0')), 'card is deleted from realm');
+    expect(existsSync(join(realm.directory, 'post0')), 'card is deleted from realm').to.be.false;
   });
 });

@@ -7,27 +7,17 @@
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "allowJs": true,
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": true,
     "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noEmitOnError": false,
-    "noEmit": true,
     "inlineSourceMap": true,
     "inlineSources": true,
   },
   "include": [
     "src/**/*",
-    "tests/**/*"
+    "node-tests/**/*"
   ],
   "ts-node": {
     "transpileOnly": true

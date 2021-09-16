@@ -1,12 +1,12 @@
 import type Koa from 'koa';
 import supertest from 'supertest';
-import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupCardCache } from '@cardstack/compiler-server/tests/helpers/cache';
-import { ProjectTestRealm, setupRealms } from '@cardstack/compiler-server/tests/helpers/realm';
+import { setupCardCache } from '@cardstack/compiler-server/node-tests/helpers/cache';
+import { ProjectTestRealm, setupRealms } from '@cardstack/compiler-server/node-tests/helpers/realm';
 import { Server } from '@cardstack/compiler-server/src/server';
+import { expect } from 'chai';
 
-QUnit.module('GET /cardFor/<path>', function (hooks) {
+describe('GET /cardFor/<path>', function () {
   let realm: ProjectTestRealm;
   let server: Koa;
 
@@ -14,10 +14,10 @@ QUnit.module('GET /cardFor/<path>', function (hooks) {
     return supertest(server.callback()).get(`/cardFor/${path}`);
   }
 
-  let { resolveCard, getCardCacheDir } = setupCardCache(hooks);
-  let { createRealm, getRealmManager } = setupRealms(hooks);
+  let { resolveCard, getCardCacheDir } = setupCardCache(this);
+  let { createRealm, getRealmManager } = setupRealms(this);
 
-  hooks.beforeEach(async function () {
+  this.beforeEach(async function () {
     realm = createRealm('https://my-realm');
     realm.addCard('routes', {
       'card.json': { schema: 'schema.js' },
@@ -27,7 +27,7 @@ QUnit.module('GET /cardFor/<path>', function (hooks) {
                 if (path === 'homepage') {
                   return 'https://my-realm/welcome';
                 }
-            
+
                 if (path === 'about') {
                   return 'https://my-realm/about';
                 }
@@ -55,16 +55,16 @@ QUnit.module('GET /cardFor/<path>', function (hooks) {
     ).app;
   });
 
-  QUnit.test('404s when you try to load a path that the router doesnt have', async function (assert) {
-    assert.expect(0);
+  it('404s when you try to load a path that the router doesnt have', async function () {
+    // assert.expect(0);
     await getCardForPath('thing').expect(404);
   });
 
-  QUnit.test("can load a simple isolated card's data", async function (assert) {
+  it("can load a simple isolated card's data", async function () {
     let response = await getCardForPath('about').expect(200);
-    assert.equal(response.body.data.id, 'https://my-realm/about');
+    expect(response.body.data.id).to.equal('https://my-realm/about');
     let componentModule = response.body.data?.meta.componentModule;
-    assert.ok(componentModule, 'should have componentModule');
-    assert.ok(resolveCard(componentModule), 'component module is resolvable');
+    expect(componentModule, 'should have componentModule').to.not.be.undefined;
+    expect(resolveCard(componentModule), 'component module is resolvable').to.not.be.undefined;
   });
 });

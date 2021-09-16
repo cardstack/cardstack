@@ -1,14 +1,14 @@
 import type Koa from 'koa';
 import supertest from 'supertest';
-import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupCardCache } from '@cardstack/compiler-server/tests/helpers/cache';
-import { ProjectTestRealm, setupRealms } from '@cardstack/compiler-server/tests/helpers/realm';
+import { setupCardCache } from '@cardstack/compiler-server/node-tests/helpers/cache';
+import { ProjectTestRealm, setupRealms } from '@cardstack/compiler-server/node-tests/helpers/realm';
 import { Server } from '@cardstack/compiler-server/src/server';
+import { expect } from 'chai';
 
 let e = encodeURIComponent;
 
-QUnit.module('POST /cards/<card-id>', function (hooks) {
+describe('POST /cards/<card-id>', function () {
   const REALM_NAME = 'https://super-realm.com';
   let realm: ProjectTestRealm;
   let server: Koa;
@@ -27,8 +27,8 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
       .expect('Content-Type', /json/);
   }
 
-  let { resolveCard, getCardCacheDir } = setupCardCache(hooks);
-  let { createRealm, getRealmManager } = setupRealms(hooks);
+  let { resolveCard, getCardCacheDir } = setupCardCache(this);
+  let { createRealm, getRealmManager } = setupRealms(this);
 
   const PAYLOAD = {
     data: {
@@ -39,7 +39,7 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     },
   };
 
-  hooks.beforeEach(async function () {
+  this.beforeEach(async function () {
     realm = createRealm(REALM_NAME);
 
     realm.addCard('post', {
@@ -68,44 +68,44 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     ).app;
   });
 
-  QUnit.test('can create a new card that adopts off an another card', async function (assert) {
+  it('can create a new card that adopts off an another card', async function () {
     let {
       body: { data },
     } = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
 
-    assert.ok(data.id.match(/https:\/\/super-realm.com\/post-\w{15}/), 'Generates a new ID');
-    assert.deepEqual(data.attributes, {
+    expect(data.id).to.match(/https:\/\/super-realm.com\/post-\w{15}/);
+    expect(data.attributes).to.deep.equal({
       title: 'Blogigidy blog',
       body: 'First post!',
     });
     let componentModule = data.meta.componentModule;
-    assert.ok(componentModule, 'should have componentModule');
-    assert.ok(resolveCard(componentModule), 'component module is resolvable');
+    expect(componentModule, 'should have componentModule').to.not.be.undefined;
+    expect(resolveCard(componentModule), 'component module is resolvable').to.not.be.undefined;
 
     await getCard(data.id).expect(200);
   });
 
-  QUnit.test('Changes the ID every time', async function (assert) {
+  it('Changes the ID every time', async function () {
     let card1 = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
     let card2 = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
     let card3 = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
 
-    assert.notEqual(card1.body.data.id, card2.body.data.id);
-    assert.notEqual(card1.body.data.id, card3.body.data.id);
-    assert.notEqual(card2.body.data.id, card3.body.data.id);
+    expect(card1.body.data.id).to.not.equal(card2.body.data.id);
+    expect(card1.body.data.id).to.not.equal(card3.body.data.id);
+    expect(card2.body.data.id).to.not.equal(card3.body.data.id);
   });
 
-  QUnit.test('can create a new card that provides its own id', async function (assert) {
+  it('can create a new card that provides its own id', async function () {
     let { body } = await postCard(`${REALM_NAME}/post`, {
       data: Object.assign({ id: `${REALM_NAME}/post-it-note` }, PAYLOAD.data),
     }).expect(201);
 
-    assert.equal(body.data.id, 'https://super-realm.com/post-it-note', 'Uses the provided ID');
+    expect(body.data.id).to.be.equal('https://super-realm.com/post-it-note');
 
     await getCard(body.data.id).expect(200);
   });
 
-  QUnit.test('Errors when you provide an ID that alreay exists', async function (assert) {
+  it('Errors when you provide an ID that alreay exists', async function () {
     realm.addCard('post-is-the-most', {
       'card.json': {
         adoptsFrom: '../post',
@@ -119,16 +119,16 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
     let response = await postCard(`${REALM_NAME}/post`, {
       data: Object.assign({ id: `${REALM_NAME}/post-is-the-most` }, PAYLOAD.data),
     });
-    assert.equal(response.body.errors[0].status, 409);
+    expect(response.body.errors[0].status).to.equal(409);
   });
 
-  QUnit.test('404s when you try to post a card that adopts from a non-existent card', async function (assert) {
-    assert.expect(0);
+  it('404s when you try to post a card that adopts from a non-existent card', async function () {
+    // assert.expect(0);
     await postCard('https://not-created.com/post', PAYLOAD).expect(404);
   });
 
-  QUnit.test('Errors when you try to include other fields', async function (assert) {
-    assert.expect(0);
+  it('Errors when you try to include other fields', async function () {
+    // assert.expect(0);
     await postCard(`${REALM_NAME}/post`, Object.assign({ isolated: 'isolated.js' }, PAYLOAD))
       .expect(400)
       .expect({
@@ -141,8 +141,8 @@ QUnit.module('POST /cards/<card-id>', function (hooks) {
       });
   });
 
-  QUnit.test('errors when you try to post attributes that dont exist on parent card', async function (assert) {
-    assert.expect(0);
+  it('errors when you try to post attributes that dont exist on parent card', async function () {
+    // assert.expect(0);
     await postCard(`${REALM_NAME}/post`, {
       data: {
         attributes: {

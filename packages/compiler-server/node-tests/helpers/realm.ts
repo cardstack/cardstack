@@ -22,7 +22,7 @@ export class ProjectTestRealm extends FSRealm {
   }
 }
 
-export function setupRealms(hooks: NestedHooks): {
+export function setupRealms(mochaContext: Mocha.Suite): {
   createRealm: (name: string) => ProjectTestRealm;
   getRealmManager: () => RealmManager;
 } {
@@ -33,7 +33,7 @@ export function setupRealms(hooks: NestedHooks): {
     return realmManager!.createRealm({ url: name }, ProjectTestRealm);
   }
 
-  hooks.beforeEach(function () {
+  mochaContext.beforeEach(function () {
     realmManager = new RealmManager(realmConfigs);
   });
 

@@ -1,20 +1,22 @@
-import QUnit from 'qunit';
 import { TestBuilder } from '../helpers/test-builder';
 import transformCardComponent, {
   CardComponentPluginOptions as CardTemplateOptions,
 } from '@cardstack/core/src/babel-plugin-card-template';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { assert_isEqual, containsSource } from '@cardstack/core/tests/helpers/assertions';
 import { ADDRESS_RAW_CARD, PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 
-QUnit.module('Babel CardTemplatePlugin', function (hooks) {
+import chai, { expect } from 'chai';
+import customAssertions from '@cardstack/core/tests/helpers/assertions';
+chai.use(customAssertions);
+
+describe('Babel CardTemplatePlugin', function () {
   let builder: TestBuilder;
   let options: CardTemplateOptions;
   let personCard: CompiledCard;
   let code: string;
 
-  hooks.before(async function () {
+  this.beforeAll(async function () {
     builder = new TestBuilder();
 
     builder.addRawCard(ADDRESS_RAW_CARD);
@@ -35,27 +37,29 @@ QUnit.module('Babel CardTemplatePlugin', function (hooks) {
     code = transformCardComponent(src, options);
   });
 
-  QUnit.test('updates usedFields on options', async function () {
-    assert_isEqual(
-      options.usedFields,
-      ['name', 'birthdate', 'address.street', 'address.city', 'address.state', 'address.zip', 'address.settlementDate'],
-      'usedFields lists out all the used fields'
-    );
+  it('updates usedFields on options', async function () {
+    expect(options.usedFields, 'usedFields lists out all the used fields').to.deep.equal([
+      'name',
+      'birthdate',
+      'address.street',
+      'address.city',
+      'address.state',
+      'address.zip',
+      'address.settlementDate',
+    ]);
   });
 
-  QUnit.test('modifies the source', async function () {
-    containsSource(
-      code,
+  it('modifies the source', async function () {
+    expect(code).to.containsSource(
       // eslint-disable-next-line no-useless-escape
       `import BaseModel from \"@cardstack/core/src/card-model\";`
     );
-    containsSource(
-      code,
+    expect(code).to.containsSource(
       `export class Model extends BaseModel {
-        static serializerMap = {
-          date: ["birthdate", "address.settlementDate"]
-        };
-      }`
+      static serializerMap = {
+        date: ["birthdate", "address.settlementDate"]
+      };
+    }`
     );
   });
 });

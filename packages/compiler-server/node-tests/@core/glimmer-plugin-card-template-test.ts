@@ -1,22 +1,24 @@
-import QUnit from 'qunit';
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 import transform, { Options } from '@cardstack/core/src/glimmer-plugin-card-template';
-import { assert_isEqual, equalIgnoringWhiteSpace } from '@cardstack/core/tests/helpers/assertions';
 import { TestBuilder } from '../helpers/test-builder';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+
+import chai, { expect } from 'chai';
+import customAssertions from '@cardstack/core/tests/helpers/assertions';
+chai.use(customAssertions);
 
 function importAndChooseName() {
   return 'BestGuess';
 }
 
-QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
+describe('Glimmer CardTemplatePlugin', function () {
   let builder: TestBuilder;
   let options: Options;
   let defaultFieldFormat: Options['defaultFieldFormat'];
   let usageMeta: Options['usageMeta'];
   let compiledStringCard: CompiledCard, compiledDateCard: CompiledCard, compiledListCard: CompiledCard;
 
-  hooks.before(async function () {
+  this.beforeAll(async function () {
     builder = new TestBuilder();
     builder.addRawCard({
       url: 'https://cardstack.local/card/list',
@@ -43,40 +45,40 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     compiledDateCard = await builder.getCompiledCard('https://cardstack.com/base/date');
   });
 
-  hooks.beforeEach(function () {
+  this.beforeEach(function () {
     usageMeta = { model: new Set(), fields: new Map() };
     defaultFieldFormat = 'embedded';
   });
 
-  QUnit.module('Primitive Fields', function () {
-    QUnit.test('string-like', async function (assert) {
+  describe('Primitive Fields', function () {
+    it('string-like', async function () {
       let template = transform('{{@model}}', {
         fields: {},
         usageMeta,
         defaultFieldFormat,
         importAndChooseName,
       });
-      assert.equal(template, '{{@model}}');
+      expect(template).to.equal('{{@model}}');
 
-      assert.equal(usageMeta['model'], 'self');
-      assert_isEqual(usageMeta['fields'], new Map());
+      expect(usageMeta['model']).to.equal('self');
+      expect(usageMeta['fields']).to.deep.equal(new Map());
     });
 
-    QUnit.test('date-like', async function (assert) {
+    it('date-like', async function () {
       let template = transform('<FormatDate @date={{@model}} />', {
         fields: {},
         usageMeta,
         defaultFieldFormat,
         importAndChooseName,
       });
-      assert.equal(template, '<FormatDate @date={{@model}} />');
-      assert.equal(usageMeta['model'], 'self');
-      assert_isEqual(usageMeta['fields'], new Map());
+      expect(template).to.equal('<FormatDate @date={{@model}} />');
+      expect(usageMeta['model']).to.equal('self');
+      expect(usageMeta['fields']).to.deep.equal(new Map());
     });
   });
 
-  QUnit.module('Fields: contains', function () {
-    QUnit.test('Simple embeds', async function (assert) {
+  describe('Fields: contains', function () {
+    it('Simple embeds', async function () {
       let template = transform('<@fields.title />', {
         fields: {
           title: {
@@ -90,12 +92,12 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         importAndChooseName,
       });
 
-      assert.equal(template, '{{@model.title}}', 'Component invocation is converted to handlebars expression');
-      assert_isEqual(usageMeta['model'], new Set());
-      assert_isEqual(usageMeta['fields'], new Map([['title', defaultFieldFormat]]));
+      expect(template, 'Component invocation is converted to handlebars expression').to.deep.equal('{{@model.title}}');
+      expect(usageMeta['model']).to.deep.equal(new Set());
+      expect(usageMeta['fields']).to.deep.equal(new Map([['title', defaultFieldFormat]]));
     });
 
-    QUnit.test('simple model usage', async function (assert) {
+    it('simple model usage', async function () {
       let template = transform('{{helper @model.title}}', {
         fields: {
           title: {
@@ -109,13 +111,15 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         importAndChooseName,
       });
 
-      assert.equal(template, '{{helper @model.title}}', 'Component invocation is converted to handlebars expression');
-      assert_isEqual(usageMeta['model'], new Set(['title']));
-      assert_isEqual(usageMeta['fields'], new Map());
+      expect(template, 'Component invocation is converted to handlebars expression').to.deep.equal(
+        '{{helper @model.title}}'
+      );
+      expect(usageMeta['model']).to.deep.equal(new Set(['title']));
+      expect(usageMeta['fields']).to.deep.equal(new Map());
     });
 
-    QUnit.test('Embedding with imports', async function (assert) {
-      assert.expect(6);
+    it('Embedding with imports', async function () {
+      // assert.expect(6);
       let template = transform('<@fields.createdAt />', {
         fields: {
           createdAt: {
@@ -127,9 +131,9 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         usageMeta,
         defaultFieldFormat,
         importAndChooseName(desiredName: string, moduleSpecifier: string, importedName: string) {
-          assert.equal(desiredName, 'HttpsCardstackComBaseDate', 'desiredName is based on the type of card');
-          assert.equal(importedName, 'default', 'Uses the default import');
-          assert.ok(
+          expect(desiredName, 'desiredName is based on the type of card').to.deep.equal('HttpsCardstackComBaseDate');
+          expect(importedName, 'Uses the default import').to.deep.equal('default');
+          expect(
             moduleSpecifier.startsWith('@cardstack/compiled/https-cardstack.com-base-date/embedded'),
             'ImporedPath starts with dates embedded'
           );
@@ -137,16 +141,14 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         },
       });
 
-      assert.equal(
-        template,
-        '<HttpsCardstackComBaseDateField @model={{@model.createdAt}} data-test-field-name="createdAt" />',
-        'Use the desired importname at component invocation site'
+      expect(template, 'Use the desired importname at component invocation site').to.equal(
+        '<HttpsCardstackComBaseDateField @model={{@model.createdAt}} data-test-field-name="createdAt" />'
       );
-      assert_isEqual(usageMeta['model'], new Set());
-      assert_isEqual(usageMeta['fields'], new Map([['createdAt', defaultFieldFormat]]));
+      expect(usageMeta['model']).to.deep.equal(new Set());
+      expect(usageMeta['fields']).to.deep.equal(new Map([['createdAt', defaultFieldFormat]]));
     });
 
-    QUnit.test('Nested fields', async function (assert) {
+    it('Nested fields', async function () {
       let template = transform('<@fields.title /><@fields.list.name />', {
         fields: {
           title: {
@@ -165,14 +167,11 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
         importAndChooseName,
       });
 
-      assert.equal(
-        template,
-        '{{@model.title}}{{@model.list.name}}',
-        'Component invocation is converted to handlebars expression'
+      expect(template, 'Component invocation is converted to handlebars expression').to.equal(
+        '{{@model.title}}{{@model.list.name}}'
       );
-      assert_isEqual(usageMeta['model'], new Set());
-      assert_isEqual(
-        usageMeta['fields'],
+      expect(usageMeta['model']).to.deep.equal(new Set());
+      expect(usageMeta['fields']).to.deep.equal(
         new Map([
           ['title', defaultFieldFormat],
           ['list.name', defaultFieldFormat],
@@ -181,8 +180,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
   });
 
-  QUnit.module('Fields: inlinable: containsMany', function (hooks) {
-    hooks.beforeEach(function () {
+  describe('Fields: inlinable: containsMany', function () {
+    this.beforeEach(function () {
       options = {
         fields: {
           items: {
@@ -202,43 +201,41 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       };
     });
 
-    QUnit.test('each-as loops for strings', async function (assert) {
-      assert.equal(
-        transform('{{#each @fields.items as |Item|}}{{#if condition}}<Item />{{/if}}<Other />{{/each}}', options),
-        '{{#each @model.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}'
-      );
-      assert_isEqual(usageMeta['model'], new Set(), 'No @model usage meta');
-      assert_isEqual(usageMeta['fields'], new Map([['items', defaultFieldFormat]]), 'items as @field meta');
+    it('each-as loops for strings', async function () {
+      expect(
+        transform('{{#each @fields.items as |Item|}}{{#if condition}}<Item />{{/if}}<Other />{{/each}}', options)
+      ).to.equal('{{#each @model.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}');
+      expect(usageMeta['model']).to.deep.equal(new Set(), 'No @model usage meta');
+      expect(usageMeta['fields']).to.deep.equal(new Map([['items', defaultFieldFormat]]), 'items as @field meta');
     });
 
-    QUnit.test('each-as loops for strings in nested cards', async function (assert) {
-      assert.equal(
-        transform('{{#each @fields.list.items as |Item|}}{{#if condition}}<Item />{{/if}}<Other />{{/each}}', options),
-        '{{#each @model.list.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}'
-      );
-      assert_isEqual(usageMeta['model'], new Set());
-      assert_isEqual(usageMeta['fields'], new Map([['list.items', defaultFieldFormat]]));
+    it('each-as loops for strings in nested cards', async function () {
+      expect(
+        transform('{{#each @fields.list.items as |Item|}}{{#if condition}}<Item />{{/if}}<Other />{{/each}}', options)
+      ).to.equal('{{#each @model.list.items as |Item|}}{{#if condition}}{{Item}}{{/if}}<Other />{{/each}}');
+      expect(usageMeta['model']).to.deep.equal(new Set());
+      expect(usageMeta['fields']).to.deep.equal(new Map([['list.items', defaultFieldFormat]]));
     });
 
-    QUnit.test('Compononet invocation for strings', async function (assert) {
+    it('Compononet invocation for strings', async function () {
       let template = transform('<@fields.items />', options);
 
-      assert.equal(template, '{{#each @model.items as |item|}}{{item}}{{/each}}');
-      assert_isEqual(usageMeta['model'], new Set());
-      assert_isEqual(usageMeta['fields'], new Map([['items', defaultFieldFormat]]));
+      expect(template).to.equal('{{#each @model.items as |item|}}{{item}}{{/each}}');
+      expect(usageMeta['model']).to.deep.equal(new Set());
+      expect(usageMeta['fields']).to.deep.equal(new Map([['items', defaultFieldFormat]]));
     });
 
-    QUnit.test('Compononet invocation for nested fields', async function (assert) {
+    it('Compononet invocation for nested fields', async function () {
       let template = transform('<@fields.list.items />', options);
 
-      assert.equal(template, '{{#each @model.list.items as |item|}}{{item}}{{/each}}');
-      assert_isEqual(usageMeta['model'], new Set());
-      assert_isEqual(usageMeta['fields'], new Map([['list.items', defaultFieldFormat]]));
+      expect(template).to.equal('{{#each @model.list.items as |item|}}{{item}}{{/each}}');
+      expect(usageMeta['model']).to.deep.equal(new Set());
+      expect(usageMeta['fields']).to.deep.equal(new Map([['list.items', defaultFieldFormat]]));
     });
   });
 
-  QUnit.module('Fields: not-inlinable: containsMany', function (hooks) {
-    hooks.beforeEach(function () {
+  describe('Fields: not-inlinable: containsMany', function () {
+    this.beforeEach(function () {
       options = {
         fields: {
           items: {
@@ -258,44 +255,44 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       };
     });
 
-    QUnit.test('each-as loops for dates', async function (assert) {
-      assert.equal(
+    it('each-as loops for dates', async function () {
+      expect(
         transform('{{#each @fields.items as |Item|}}<Item />{{/each}}', options),
         '{{#each @model.items as |Item|}}<BestGuess @model={{Item}} data-test-field-name="items" />{{/each}}'
       );
-      assert_isEqual(usageMeta['model'], new Set());
-      assert_isEqual(usageMeta['fields'], new Map([['items', defaultFieldFormat]]));
+      expect(usageMeta['model']).to.deep.equal(new Set());
+      expect(usageMeta['fields']).to.deep.equal(new Map([['items', defaultFieldFormat]]));
     });
 
-    QUnit.test('each-as loops for dates in nested card', async function (assert) {
-      assert.equal(
+    it('each-as loops for dates in nested card', async function () {
+      expect(
         transform('{{#each @fields.list.dates as |ADate|}}<ADate />{{/each}}', options),
         '{{#each @model.list.dates as |ADate|}}<BestGuess @model={{ADate}} data-test-field-name="dates" />{{/each}}'
       );
-      assert_isEqual(usageMeta['model'], new Set());
-      assert_isEqual(usageMeta['fields'], new Map([['list.dates', defaultFieldFormat]]));
+      expect(usageMeta['model']).to.deep.equal(new Set());
+      expect(usageMeta['fields']).to.deep.equal(new Map([['list.dates', defaultFieldFormat]]));
     });
 
-    QUnit.test('component invocation for dates', async function (assert) {
-      assert.equal(
+    it('component invocation for dates', async function () {
+      expect(
         transform('<@fields.items />', options),
         '{{#each @model.items as |item|}}<BestGuess @model={{item}} data-test-field-name="items" />{{/each}}'
       );
-      assert_isEqual(usageMeta['model'], new Set());
-      assert_isEqual(usageMeta['fields'], new Map([['items', defaultFieldFormat]]));
+      expect(usageMeta['model']).to.deep.equal(new Set());
+      expect(usageMeta['fields']).to.deep.equal(new Map([['items', defaultFieldFormat]]));
     });
 
-    QUnit.test('component invocation for dates in nested card', async function (assert) {
-      assert.equal(
+    it('component invocation for dates in nested card', async function () {
+      expect(
         transform('<@fields.list.dates />', options),
         '{{#each @model.list.dates as |date|}}<BestGuess @model={{date}} data-test-field-name="dates" />{{/each}}'
       );
-      assert_isEqual(usageMeta['model'], new Set());
-      assert_isEqual(usageMeta['fields'], new Map([['list.dates', defaultFieldFormat]]));
+      expect(usageMeta['model']).to.deep.equal(new Set());
+      expect(usageMeta['fields']).to.deep.equal(new Map([['list.dates', defaultFieldFormat]]));
     });
   });
 
-  QUnit.test('Tracking deeply nested field usage', async function () {
+  it('Tracking deeply nested field usage', async function () {
     builder.addRawCard({
       url: 'http://cardstack.local/cards/post',
       schema: 'schema.js',
@@ -352,12 +349,12 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
       defaultFieldFormat,
       importAndChooseName,
     });
-    assert_isEqual(usageMeta['model'], new Set());
-    assert_isEqual(usageMeta['fields'], new Map([['posts', defaultFieldFormat]]));
+    expect(usageMeta['model']).to.deep.equal(new Set());
+    expect(usageMeta['fields']).to.deep.equal(new Map([['posts', defaultFieldFormat]]));
   });
 
-  QUnit.module('@fields API', function (hooks) {
-    hooks.beforeEach(function () {
+  describe('@fields API', function () {
+    this.beforeEach(function () {
       options = {
         fields: {
           title: {
@@ -390,8 +387,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     // Reminder: as we wrote this, we decided that `<@fields.startDate />` can
     // just always replace `<@model.startDate />` for the invocation case, and
     // `{{@model.startDate}}` is *always* only the data.
-    QUnit.test('{{#each-in}} over fields', async function () {
-      equalIgnoringWhiteSpace(
+    it('{{#each-in}} over fields', async function () {
+      expect(
         transform(
           `
             <Whatever @name={{name}} />
@@ -402,7 +399,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
            <Whichever @field={{Field}} />
            `,
           options
-        ),
+        )
+      ).to.equalIgnoringWhiteSpace(
         `
           <Whatever @name={{name}} />
           <label>{{"title"}}</label>
@@ -416,9 +414,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
          <Whichever @field={{Field}} />
          `
       );
-      assert_isEqual(usageMeta['model'], new Set());
-      assert_isEqual(
-        usageMeta['fields'],
+      expect(usageMeta['model']).to.deep.equal(new Set());
+      expect(usageMeta['fields']).to.deep.equal(
         new Map([
           ['title', defaultFieldFormat],
           ['startDate', defaultFieldFormat],
@@ -429,8 +426,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
     });
   });
 
-  QUnit.test('Avoids rewriting shadowed vars', async function () {
-    equalIgnoringWhiteSpace(
+  it('Avoids rewriting shadowed vars', async function () {
+    expect(
       transform(
         `{{#each @fields.birthdays as |Birthday|}}
               <Birthday />
@@ -450,7 +447,8 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
             },
           },
         }
-      ),
+      )
+    ).to.equalIgnoringWhiteSpace(
       `{{#each @model.birthdays as |Birthday|}}
           <BestGuess @model={{Birthday}} data-test-field-name="birthdays" />
           {{#let (whatever) as |Birthday|}}
@@ -458,69 +456,60 @@ QUnit.module('Glimmer CardTemplatePlugin', function (hooks) {
           {{/let}}
         {{/each}}`
     );
-    assert_isEqual(usageMeta['model'], new Set());
-    assert_isEqual(usageMeta['fields'], new Map([['birthdays', defaultFieldFormat]]));
+    expect(usageMeta['model']).to.deep.equal(new Set());
+    expect(usageMeta['fields']).to.deep.equal(new Map([['birthdays', defaultFieldFormat]]));
   });
 
-  QUnit.module('Error Scenarios', function () {
-    QUnit.test('Errors when you wrap a field invocation in a helper', async function (assert) {
-      assert.throws(function () {
-        transform('{{#each (helper @fields.items) as |Item|}}<Item />{{/each}}', options);
-      }, /Invalid use of @fields API/);
+  describe('Error Scenarios', function () {
+    it('Errors when you wrap a field invocation in a helper', async function () {
+      //throws(function
+      expect(transform('{{#each (helper @fields.items) as |Item|}}<Item />{{/each}}', options)).to.throw(
+        /Invalid use of @fields API/
+      );
     });
 
-    QUnit.test('Errors when trying to pass @fields API through helper', async function (assert) {
-      assert.throws(function () {
+    it('Errors when trying to pass @fields API through helper', async function () {
+      expect(
         transform(
           `{{#each-in (some-helper @fields) as |name Field|}}
                 <label>{{name}}</label>
                {{/each-in}}`,
           options
-        );
-      }, /Invalid use of @fields API/);
+        )
+      ).to.throw(/Invalid use of @fields API/);
     });
 
-    QUnit.test('Errors when using @fields as a component argument', async function (assert) {
-      assert.throws(function () {
-        transform(`<SomeCompontent @arrg={{@fields}} />`, options);
-      }, /Invalid use of @fields API/);
+    it('Errors when using @fields as a component argument', async function () {
+      expect(transform(`<SomeCompontent @arrg={{@fields}} />`, options)).to.throw(/Invalid use of @fields API/);
     });
 
-    QUnit.test('Errors when calling @fields as a element node', async function (assert) {
-      assert.throws(function () {
-        transform(`<@fields />`, options);
-      }, /Invalid use of @fields API/);
+    it('Errors when calling @fields as a element node', async function () {
+      expect(transform(`<@fields />`, options)).to.throw(/Invalid use of @fields API/);
     });
 
-    QUnit.test('Errors when using @fields in a each loop', async function (assert) {
-      assert.throws(
-        function () {
-          transform(
-            `{{#each @fields as |Field|}}
+    it('Errors when using @fields in a each loop', async function () {
+      expect(function () {
+        transform(
+          `{{#each @fields as |Field|}}
                 <label>{{name}}</label>
                {{/each}}`,
-            options
-          );
-        },
-        /Invalid use of @fields API/,
-        'Errors when used with an each loops'
-      );
+          options
+        );
+      }, 'Errors when used with an each loops').to.throw(/Invalid use of @fields API/);
     });
 
-    QUnit.test('Errors when using @fields as path expression', async function (assert) {
-      assert.throws(
-        function () {
-          transform(
-            `{{#each-in @fields as |name Field|}}
+    it('Errors when using @fields as path expression', async function () {
+      expect(function () {
+        transform(
+          `{{#each-in @fields as |name Field|}}
                     <label>{{name}}</label>
                     <Field />
                     {{@fields}}
                  {{/each-in}}`,
-            options
-          );
-        },
-        /Invalid use of @fields API/,
-        'Errors when fields is used incorrectly inside of a valid use of fields'
+          options
+        );
+      }, 'Errors when fields is used incorrectly inside of a valid use of fields').to.throw(
+        /Invalid use of @fields API/
       );
     });
   });
