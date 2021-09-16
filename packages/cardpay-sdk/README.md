@@ -42,6 +42,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`PrepaidCardMarket`](#prepaidcardmarket)
   - [`PrepaidCardMarket.getSKUInfo`](#prepaidcardmarketgetskuinfo)
   - [`PrepaidCardMarket.getInventory`](#prepaidcardmarketgetinventory)
+  - [`PrepaidCardMarket.addToInventory`](#prepaidcardmarketaddtoinventory)
   - [`PrepaidCardMarket.removeFromInventory`](#prepaidcardmarketremovefrominventory)
   - [`PrepaidCardMarket.setAsk`](#prepaidcardmarketsetask)
 - [`RevenuePool`](#revenuepool)
@@ -566,6 +567,20 @@ let prepaidCards = await prepaidCardMarket.getInventory(sku1000SPENDCards);
 ```
 
 This call returns a promise for an array of `PrepaidCardSafe` objects (from `Safes.View`).
+
+### `PrepaidCardMarket.addToInventory`
+This call adds the specified prepaid card address to the inventory.
+The arguments are:
+- The prepaid card that is used to pay for the gas for this transaction
+- The prepaid card address to add to inventory
+- Optionally the address of the market contract (the default Cardstack market contract will be used if not provided)
+- You can optionally provide an object that specifies the "from" address. The gas price and gas limit will be calculated by the card protocol and are not configurable.
+
+```js
+let result = await prepaidCardsMarket.addToInventory(fundingPrepaidCard, cardToAdd);
+```
+
+This method returns a promise for a web3 transaction receipt.
 
 ### `PrepaidCardMarket.removeFromInventory`
 This call removes the specified prepaid card addresses from inventory and returns them back to the prepaid card issuer.

@@ -31,6 +31,23 @@ export async function getInventory(network: string, sku: string, mnemonic?: stri
   ${inventory.map((p) => p.address).join(',\n  ')}`);
 }
 
+export async function addToInventory(
+  network: string,
+  fundingPrepaidCard: string,
+  prepaidCardToAdd: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
+
+  console.log(`Adding prepaid card to inventory ${prepaidCardToAdd}...`);
+  await prepaidCardMarket.addToInventory(fundingPrepaidCard, prepaidCardToAdd, undefined, {
+    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
+  console.log('done');
+}
+
 export async function removeFromInventory(
   network: string,
   fundingPrepaidCard: string,
