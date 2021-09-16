@@ -1,0 +1,17 @@
+name: 'Discord message'
+description: 'Send a message via Discord bot'
+
+inputs:
+  token:
+    description: Authentication token for Discord bot
+    required: true
+  channel:
+    description: ID of the channel to send the notification
+    required: true
+  message:
+    description: Content of message
+    required: true
+
+runs:
+  using: 'node12'
+  main: 'index.js'
