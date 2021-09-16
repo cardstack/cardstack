@@ -21,7 +21,8 @@ jobs:
     steps:
       - name: Set up env
         env:
-          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          #INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          INPUT_ENVIRONMENT: staging
         run: |
           if [ "$INPUT_ENVIRONMENT" != "staging" ]; then
             echo "unrecognized environment"
@@ -44,4 +45,5 @@ jobs:
           WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
         with:
-          ref: ${{ github.event.inputs.ref }}
+          #ref: ${{ github.event.inputs.ref }}
+          ref: main

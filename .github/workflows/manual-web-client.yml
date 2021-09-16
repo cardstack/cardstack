@@ -13,8 +13,7 @@ on:
       environment:
         description: Deployment environment
         required: false
-        #default: production
-        default: staging
+        default: production
 
 jobs:
   deploy:
@@ -22,7 +21,8 @@ jobs:
     steps:
       - name: Set up env
         env:
-          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          #INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          INPUT_ENVIRONMENT: staging
         run: |
           if [ "$INPUT_ENVIRONMENT" = "production" ]; then
             echo "EMBER_DEPLOY_AWS_ACCESS_KEY=${{ secrets.PRODUCTION_EMBER_DEPLOY_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
@@ -56,6 +56,8 @@ jobs:
           SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.WEB_CLIENT_SENTRY_AUTH_TOKEN }}
         with:
-          ref: ${{ github.event.inputs.ref }}
-          environment: ${{ github.event.inputs.environment }}
+          #ref: ${{ github.event.inputs.ref }}
+          #environment: ${{ github.event.inputs.environment }}
+          ref: main
+          environment: staging
           sentry_url_prefix: ${{ env.SENTRY_URL_PREFIX }}

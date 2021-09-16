@@ -13,8 +13,7 @@ on:
       environment:
         description: Deployment environment
         required: false
-        #default: production
-        default: staging
+        default: production
 
 jobs:
   deploy:
@@ -22,7 +21,8 @@ jobs:
     steps:
       - name: Set up env
         env:
-          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          #INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
+          INPUT_ENVIRONMENT: staging
         run: |
           if [ "$INPUT_ENVIRONMENT" = "production" ]; then
             echo "AWS_ACCESS_KEY_ID=${{ secrets.PRODUCTION_WAYPOINT_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
@@ -53,4 +53,5 @@ jobs:
         env:
           AWS_DEFAULT_REGION: us-east-1
         with:
-          ref: ${{ github.event.inputs.ref }}
+          #ref: ${{ github.event.inputs.ref }}
+          ref: main
