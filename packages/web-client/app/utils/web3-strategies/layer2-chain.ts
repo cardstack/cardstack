@@ -14,6 +14,8 @@ import {
   ConvertibleSymbol,
   ConversionFunction,
   TokenContractInfo,
+  BridgedTokenSymbol,
+  getUnbridgedSymbol,
 } from '../token';
 import WalletInfo from '../wallet-info';
 import CustomStorageWalletConnect from '../wc-connector';
@@ -23,6 +25,7 @@ import {
   TransactionHash,
   Layer2NetworkSymbol,
   Layer2ChainEvent,
+  WithdrawalLimits,
 } from './types';
 import {
   networkIds,
@@ -335,6 +338,25 @@ export default abstract class Layer2ChainWeb3Strategy
 
   get waitForAccount() {
     return this.waitForAccountDeferred.promise;
+  }
+
+  async getWithdrawalLimits(
+    tokenSymbol: BridgedTokenSymbol
+  ): Promise<WithdrawalLimits> {
+    let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
+    let contractInfo = this.getTokenContractInfo(
+      getUnbridgedSymbol(tokenSymbol),
+      this.networkSymbol
+    );
+
+    let { min, max } = await tokenBridge.getWithdrawalLimits(
+      contractInfo.address
+    );
+
+    return {
+      min: new BN(min),
+      max: new BN(max),
+    };
   }
 
   async awaitBridgedToLayer2(

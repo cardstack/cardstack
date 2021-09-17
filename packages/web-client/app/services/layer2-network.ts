@@ -8,6 +8,7 @@ import {
   Layer2ChainEvent,
   Layer2Web3Strategy,
   TransactionHash,
+  WithdrawalLimits,
 } from '../utils/web3-strategies/types';
 import { PrepaidCardSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
@@ -22,6 +23,8 @@ import {
   BridgeableSymbol,
   ConvertibleSymbol,
   ConversionFunction,
+  BridgedTokenSymbol,
+  bridgedSymbols,
 } from '@cardstack/web-client/utils/token';
 import {
   Emitter,
@@ -54,6 +57,9 @@ export default class Layer2Network
   @reads('safes.depot.value') depotSafe: DepotSafe | undefined;
   @reads('safes.isLoading') declare isFetchingDepot: boolean;
 
+  bridgedSymbolToWithdrawalLimits: Map<BridgedTokenSymbol, WithdrawalLimits> =
+    new Map();
+
   constructor(props: object | undefined) {
     super(props);
     switch (config.chains.layer2) {
@@ -72,7 +78,17 @@ export default class Layer2Network
     this.strategy.on('incorrect-chain', this.onIncorrectChain);
     this.strategy.on('account-changed', this.onAccountChanged);
 
-    taskFor(this.strategy.initializeTask).perform();
+    taskFor(this.strategy.initializeTask)
+      .perform()
+      .then(() => this.storeWithdrawalLimits());
+  }
+
+  async storeWithdrawalLimits() {
+    bridgedSymbols.forEach((bridgedSymbol) => {
+      this.getWithdrawalLimits(bridgedSymbol).then((limits) => {
+        this.bridgedSymbolToWithdrawalLimits.set(bridgedSymbol, limits);
+      });
+    });
   }
 
   async updateUsdConverters(
@@ -187,6 +203,10 @@ export default class Layer2Network
 
   getBlockHeight() {
     return this.strategy.getBlockHeight();
+  }
+
+  async getWithdrawalLimits(tokenSymbol: BridgedTokenSymbol) {
+    return this.strategy.getWithdrawalLimits(tokenSymbol);
   }
 
   async awaitBridgedToLayer2(fromBlock: BN) {
