@@ -57,6 +57,10 @@ module(
       assert.dom('[data-test-unlock-button]').isDisabled();
       await fillIn('[data-test-token-amount-input]', moreDaiThanBalance);
       assert.dom('[data-test-unlock-button]').isDisabled();
+      assert
+        .dom('[data-test-boxel-input-error-message]')
+        .containsText('Insufficient balance in your account');
+
       await fillIn('[data-test-token-amount-input]', daiInBalance);
       assert.dom('[data-test-unlock-button]').isNotDisabled();
     });
