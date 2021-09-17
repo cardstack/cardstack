@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
-import { AbiItem, randomHex } from 'web3-utils';
+import { AbiItem, randomHex, toChecksumAddress } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
@@ -511,7 +511,7 @@ export default class PrepaidCard {
         )
     );
 
-    let rewardProgramId = randomHex(20);
+    let rewardProgramId = toChecksumAddress(randomHex(20));
     let prepaidCardMgr = await this.getPrepaidCardMgr();
     let owner = await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCard).call();
 
