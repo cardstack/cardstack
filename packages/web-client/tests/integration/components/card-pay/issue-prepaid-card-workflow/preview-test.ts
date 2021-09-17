@@ -74,7 +74,7 @@ module(
     `);
     });
 
-    module('Test the sdk prepaid card creation calls', async function () {
+    module('Test the sdk prepaid card creation calls', function () {
       test('it shows the correct text in the creation button in the beginning and after errors', async function (assert) {
         sinon
           .stub(layer2Service, 'issuePrepaidCard')

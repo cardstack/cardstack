@@ -246,7 +246,7 @@ module(
       );
     });
 
-    module('Test the sdk register merchant calls', async function () {
+    module('Test the sdk register merchant calls', function () {
       test('it can call register merchant with selected prepaid card address', async function (assert) {
         let approveSpy = sinon.spy(layer2Service, 'registerMerchant');
 
@@ -373,7 +373,7 @@ module(
       });
     });
 
-    module('when the Hub endpoint fails', async function (hooks) {
+    module('when the Hub endpoint fails', function (hooks) {
       hooks.beforeEach(async function (this: Context) {
         this.server.post('/merchant-infos', function () {
           return new MirageResponse(500, {}, '');

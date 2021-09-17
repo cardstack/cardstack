@@ -50,7 +50,7 @@ module(
       assert.dom('[data-test-authentication-button]').isDisabled();
     });
 
-    module('Test the sdk hub authentication calls', async function () {
+    module('Test the sdk hub authentication calls', function () {
       test('It shows the failure message if the signing request fails or is rejected', async function (assert) {
         let deferred = RSVP.defer<void>();
         sinon
