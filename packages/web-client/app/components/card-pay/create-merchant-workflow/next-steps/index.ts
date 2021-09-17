@@ -9,7 +9,7 @@ class CardPayCreateMerchantWorkflowNextStepsComponent extends Component<Workflow
 
   @action returnToDashboard() {
     this.router.transitionTo({
-      queryParams: { flow: null, worklowPersistenceId: null },
+      queryParams: { flow: null, workflowPersistenceId: null },
     });
   }
 }
