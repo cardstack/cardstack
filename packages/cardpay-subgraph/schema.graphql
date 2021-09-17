@@ -330,6 +330,21 @@ type SafeTransaction @entity {
   signatures: Bytes!
 }
 
+type PrepaidCardSendAction @entity {
+  id: ID!
+  transaction: Transaction!
+  timestamp: BigInt!
+  prepaidCard: PrepaidCard!
+  spendAmount: BigInt!
+  rateLock: BigInt!
+  safeTxGas: BigInt!
+  baseGas: BigInt!
+  gasPrice: BigInt!
+  action: String!
+  data: Bytes!
+  ownerSignature: Bytes!
+}
+
 # this is an EOA based organization of transactions that allows us to view safe
 # txn's and EOA transaction in a consolidated view, where the account is the owner of the safe
 type EOATransaction @entity {
@@ -347,6 +362,7 @@ type Transaction @entity {
   timestamp: BigInt!
   blockNumber: BigInt!
   safeTxns: [SafeTransaction]!                     @derivedFrom(field: "transaction")
+  prepaidCardSendActions: [PrepaidCardSendAction]! @derivedFrom(field: "transaction")
   bridgeToLayer1Events: [BridgeToLayer1Event]!     @derivedFrom(field: "transaction")
   bridgeToLayer2Events: [BridgeToLayer2Event]!     @derivedFrom(field: "transaction")
   supplierInfoDIDUpdates: [SupplierInfoDIDUpdate]! @derivedFrom(field: "transaction")
