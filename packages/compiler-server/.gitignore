@@ -1,7 +1,0 @@
-/node-tests/**/*.d.ts
-/node-tests/**/*.js
-/node-tests/**/*.js.map
-
-/src/**/*.d.ts
-/src/**/*.js
-/src/**/*.js.map

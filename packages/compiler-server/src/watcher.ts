@@ -31,7 +31,7 @@ export async function primeCache(realManager: RealmManager, builder: Builder): P
   console.debug(`--> Cache primed`);
 }
 
-export function setupWatchers(realmManager: RealmManager, builder: Builder) {
+export function setupWatchers(realmManager: RealmManager, builder: Builder): sane.Watcher[] {
   return realmManager.realms.map((realm) => {
     let watcher = sane(realm.directory);
     const handler = (filepath: string /* root: string, stat?: Stats */) => {

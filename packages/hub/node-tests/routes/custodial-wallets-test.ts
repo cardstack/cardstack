@@ -50,6 +50,8 @@ function handleValidateAuthToken(encryptedString: string) {
       return stubUserAddress1;
     case 'mno123--pqr456--stu789':
       return stubUserAddress2;
+    default:
+      return undefined;
   }
 }
 
