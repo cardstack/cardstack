@@ -331,6 +331,13 @@ export default abstract class Layer2ChainWeb3Strategy
     ).merchantSafe;
   }
 
+  async resumeRegisterMerchantTransaction(
+    txnHash: string
+  ): Promise<MerchantSafe> {
+    const RevenuePool = await getSDK('RevenuePool', this.web3);
+    return (await RevenuePool.registerMerchant(txnHash)).merchantSafe;
+  }
+
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
   // about disconnecting. WalletConnect's disconnect event tells all tabs that you are disconnected
   onDisconnect() {

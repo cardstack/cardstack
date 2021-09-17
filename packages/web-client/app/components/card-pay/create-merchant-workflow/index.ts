@@ -36,6 +36,7 @@ const FAILURE_REASONS = {
 
 class CreateMerchantWorkflow extends Workflow {
   name = 'MERCHANT_CREATION' as WorkflowName;
+  workflowPersistenceId: string;
 
   @service declare router: RouterService;
   @service declare layer2Network: Layer2Network;
