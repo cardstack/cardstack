@@ -40,7 +40,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   @tracked chinInProgressMessage?: string;
   @tracked txnHash?: TransactionHash;
   @tracked createTaskRunningForAWhile = false;
-  @tracked selectedPrepaidCard?: PrepaidCardSafe;
+  @tracked selectedPrepaidCard!: PrepaidCardSafe;
 
   lastNonce?: string;
 
@@ -49,6 +49,18 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
     args: CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs
   ) {
     super(owner, args);
+
+    let { prepaidCardChoice } = this.args.workflowSession.state;
+
+    if (prepaidCardChoice) {
+      this.selectedPrepaidCard = prepaidCardChoice;
+    }
+  }
+
+  @action checkForPendingTransaction() {
+    if (this.args.workflowSession.state.txnHash) {
+      taskFor(this.createTask).perform();
+    }
   }
 
   get prepaidCards() {
@@ -98,6 +110,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
       let options: TransactionOptions = {
         onTxnHash: (txnHash: TransactionHash) => {
           this.txnHash = txnHash;
+          this.args.workflowSession.update('txnHash', txnHash);
           this.chinInProgressMessage = 'Processing transaction…';
         },
       };
@@ -108,10 +121,6 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         options.onNonce = (nonce: BN) => {
           this.lastNonce = nonce.toString();
         };
-      }
-
-      if (!this.selectedPrepaidCard) {
-        return;
       }
 
       let registerMerchantTaskInstance = taskFor(
@@ -127,7 +136,10 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         taskFor(this.timerTask).perform(),
       ]);
 
-      workflowSession.update('merchantSafe', merchantSafe);
+      workflowSession.updateMany({
+        merchantSafe: merchantSafe,
+        prepaidCardChoice: this.selectedPrepaidCard,
+      });
 
       this.createTaskRunningForAWhile = false;
 

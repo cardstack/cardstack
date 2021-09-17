@@ -24,12 +24,29 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
   @tracked merchantIdValidationMessage = '';
   @tracked merchantBgColorValidationMessage = '';
 
+  constructor(owner: unknown, args: WorkflowCardComponentArgs) {
+    super(owner, args);
+
+    let { merchantName, merchantId, merchantBgColor } =
+      this.args.workflowSession.state;
+
+    if (merchantName && merchantId && merchantBgColor) {
+      this.merchantName = merchantName;
+      this.merchantBgColor = merchantBgColor;
+      this.merchantId = merchantId;
+      this.validateMerchantId(); // this is necessary for enabling the CTA
+    }
+  }
+
   get canSaveDetails() {
     return this.allFieldsPopulated && this.noValidationErrors;
   }
 
   get allFieldsPopulated() {
-    return this.merchantBgColor && this.merchantName && this.merchantId;
+    if (this.merchantBgColor && this.merchantName && this.merchantId) {
+      return true;
+    }
+    return false;
   }
 
   get noValidationErrors() {
