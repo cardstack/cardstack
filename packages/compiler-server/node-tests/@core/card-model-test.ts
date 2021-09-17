@@ -1,16 +1,13 @@
 import { parse, isSameDay } from 'date-fns';
+import { expect } from 'chai';
+
+import { PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
+import CardModel from '@cardstack/core/src/card-model';
+import { CardJSONResponse, CardOperation, Format } from '@cardstack/core/src/interfaces';
 
 function p(dateString: string): Date {
   return parse(dateString, 'yyyy-MM-dd', new Date());
 }
-
-import { PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
-
-const { module: Qmodule, test } = QUnit;
-
-import CardModel from '@cardstack/core/src/card-model';
-import { CardJSONResponse, CardOperation, Format } from '@cardstack/core/src/interfaces';
-import { expect } from 'chai';
 
 class PersonCardModel extends CardModel {
   static serializerMap = {
@@ -56,8 +53,8 @@ class StubCards {
 }
 const fakeComponent: unknown = {};
 
-Qmodule('CardModel', function () {
-  test('.data', async function () {
+describe('CardModel', function () {
+  it('.data', async function () {
     let stub = new StubCards();
     let model = PersonCardModel.fromResponse(stub, cardJSONResponse, fakeComponent);
     expect(model.data.name).to.equal(attributes.name);
@@ -66,7 +63,7 @@ Qmodule('CardModel', function () {
     expect(isSameDay(model.data.address.settlementDate, p('1990-01-01')), 'Dates are serialized to Dates').to.be.ok;
   });
 
-  test('.serialize', async function () {
+  it('.serialize', async function () {
     let stub = new StubCards();
     let model = PersonCardModel.fromResponse(stub, cardJSONResponse, fakeComponent);
 

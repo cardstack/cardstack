@@ -462,29 +462,32 @@ describe('Glimmer CardTemplatePlugin', function () {
 
   describe('Error Scenarios', function () {
     it('Errors when you wrap a field invocation in a helper', async function () {
-      //throws(function
-      expect(transform('{{#each (helper @fields.items) as |Item|}}<Item />{{/each}}', options)).to.throw(
-        /Invalid use of @fields API/
-      );
+      expect(function () {
+        transform('{{#each (helper @fields.items) as |Item|}}<Item />{{/each}}', options);
+      }).to.throw(/Invalid use of @fields API/);
     });
 
     it('Errors when trying to pass @fields API through helper', async function () {
-      expect(
+      expect(function () {
         transform(
           `{{#each-in (some-helper @fields) as |name Field|}}
                 <label>{{name}}</label>
                {{/each-in}}`,
           options
-        )
-      ).to.throw(/Invalid use of @fields API/);
+        );
+      }).to.throw(/Invalid use of @fields API/);
     });
 
     it('Errors when using @fields as a component argument', async function () {
-      expect(transform(`<SomeCompontent @arrg={{@fields}} />`, options)).to.throw(/Invalid use of @fields API/);
+      expect(function () {
+        transform(`<SomeCompontent @arrg={{@fields}} />`, options);
+      }).to.throw(/Invalid use of @fields API/);
     });
 
     it('Errors when calling @fields as a element node', async function () {
-      expect(transform(`<@fields />`, options)).to.throw(/Invalid use of @fields API/);
+      expect(function () {
+        transform(`<@fields />`, options);
+      }).to.throw(/Invalid use of @fields API/);
     });
 
     it('Errors when using @fields in a each loop', async function () {

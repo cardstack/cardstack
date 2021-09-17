@@ -36,7 +36,7 @@ describe('Compiler', function () {
     builder = new TestBuilder();
   });
 
-  test('string card', async function () {
+  it('string card', async function () {
     let compiled = await builder.getCompiledCard('https://cardstack.com/base/string');
     expect(compiled.adoptsFrom?.url).to.equal(baseCardURL);
     expect(compiled.embedded.inlineHBS).to.equal('{{@model}}');
@@ -44,12 +44,12 @@ describe('Compiler', function () {
     expect(!compiled.serializer, 'String card has no deserializer').to.be.ok;
   });
 
-  test('date card', async function () {
+  it('date card', async function () {
     let compiled = await builder.getCompiledCard('https://cardstack.com/base/date');
     expect(compiled.serializer, 'Date card has date serializer').to.equal('date');
   });
 
-  test('deserializer is inherited', async function () {
+  it('deserializer is inherited', async function () {
     builder.addRawCard({
       url: 'https://cardstack.local/cards/fancy-date',
       schema: 'schema.js',
@@ -64,13 +64,13 @@ describe('Compiler', function () {
     expect(compiled.serializer, 'FancyDate card has date serializer inherited from its parent').to.equal('date');
   });
 
-  test('CompiledCard fields', async function () {
+  it('CompiledCard fields', async function () {
     builder.addRawCard(PERSON_CARD);
     let compiled = await builder.getCompiledCard(PERSON_CARD.url);
     expect(Object.keys(compiled.fields)).to.deep.equal(['name', 'birthdate']);
   });
 
-  test('CompiledCard embedded view', async function () {
+  it('CompiledCard embedded view', async function () {
     builder.addRawCard(PERSON_CARD);
     let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
@@ -84,7 +84,7 @@ describe('Compiler', function () {
     ).to.containsSource(PERSON_CARD.files['embedded.css']);
   });
 
-  test('CompiledCard edit view', async function () {
+  it('CompiledCard edit view', async function () {
     builder.addRawCard(PERSON_CARD);
     let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
@@ -103,7 +103,7 @@ describe('Compiler', function () {
     );
   });
 
-  test('nested cards', async function () {
+  it('nested cards', async function () {
     builder.addRawCard(PERSON_CARD);
     builder.addRawCard({
       url: 'https://cardstack.local/cards/post',
@@ -141,7 +141,7 @@ describe('Compiler', function () {
     expect(compiled.isolated.usedFields).to.deep.equal(['author']);
   });
 
-  test('deeply nested cards', async function () {
+  it('deeply nested cards', async function () {
     builder.addRawCard({
       url: 'http://cardstack.local/cards/post',
       schema: 'schema.js',
@@ -243,14 +243,14 @@ describe('Compiler', function () {
       builder.addRawCard(postCard);
     });
 
-    test('iterators of fields and inlines templates', async function () {
+    it('iterators of fields and inlines templates', async function () {
       let compiled = await builder.getCompiledCard('https://cardstack.local/cards/post');
       expect(builder.definedModules.get(compiled.embedded.moduleName)).to.containsSource(
         '<article><label>{{\\"title\\"}}</label></article>'
       );
     });
 
-    test('recompiled parent field iterator', async function () {
+    it('recompiled parent field iterator', async function () {
       let fancyPostCard = {
         url: 'https://cardstack.local/cards/fancy-post',
         schema: 'schema.js',
