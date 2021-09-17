@@ -248,7 +248,7 @@ module('Unit | Workflow model', function (hooks) {
     assert.ok(indicesArray.includes('epilogue-1'));
   });
 
-  module('with includeIf', async function (hooks) {
+  module('with includeIf', function (hooks) {
     let workflow: Workflow;
     let calledIncludeIf: boolean;
 

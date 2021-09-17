@@ -13,7 +13,7 @@ let startDaiAmount = toWei(startDaiAmountString);
 
 module(
   'Integration | Component | card-pay/withdrawal-workflow/transaction-amount',
-  async function (hooks) {
+  function (hooks) {
     setupRenderingTest(hooks);
 
     hooks.beforeEach(async function () {
