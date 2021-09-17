@@ -53,6 +53,7 @@ let v0_8_0_startBlock = {
 
 let abis = {
   PrepaidCardManager: getAbi(join(sourceAbiDir, 'prepaid-card-manager.ts')),
+  PrepaidCardMarket: getAbi(join(sourceAbiDir, 'prepaid-card-market.ts')),
   RevenuePool: getAbi(join(sourceAbiDir, 'revenue-pool.ts')),
   Spend: getAbi(join(sourceAbiDir, 'spend.ts')),
   PayMerchantHandler: getAbi(join(sourceAbiDir, 'pay-merchant-handler.ts')),
@@ -78,6 +79,7 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{NETWORK}/g, network)
   .replace(/{GNOSIS_SAFE_PROXY_FACTORY}/g, getAddress('gnosisProxyFactory', cleanNetwork))
   .replace(/{PREPAID_CARD_MANAGER_ADDRESS}/g, getAddress('prepaidCardManager', cleanNetwork))
+  .replace(/{PREPAID_CARD_MARKET_ADDRESS}/g, getAddress('prepaidCardMarket', cleanNetwork))
   .replace(/{UNISWAP_V2_FACTORY_ADDRESS}/g, getAddress('uniswapV2Factory', cleanNetwork))
   .replace(/{HOME_TOKEN_BRIDGE_ADDRESS}/g, getAddress('homeBridge', cleanNetwork))
   .replace(/{REVENUE_POOL_ADDRESS}/g, getAddress('revenuePool', cleanNetwork))

@@ -41,6 +41,46 @@ dataSources:
       file: ./src/mappings/prepaid-card.ts
 
   - kind: ethereum/contract
+    name: Market
+    network: {NETWORK}
+    source:
+      address: "{PREPAID_CARD_MARKET_ADDRESS}"
+      abi: PrepaidCardMarket
+      startBlock: {v0_8_0_START_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - PrepaidCard
+        - Transaction
+        - Account
+        - EOATransaction
+      abis:
+        - name: PrepaidCardMarket
+          file: ./abis/generated/PrepaidCardMarket.json
+        - name: Exchange
+          file: ./abis/generated/Exchange.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: ItemSet(address,address,address,uint256,string,bytes32)
+          handler: handleItemSet
+        - event: ItemRemoved(address,address,bytes32)
+          handler: handleItemRemoved
+        - event: AskSet(address,address,bytes32,uint256)
+          handler: handleAskSet
+        - event: ProvisionedPrepaidCard(address,address,bytes32,uint256)
+          handler: handleProvisionedPrepaidCard
+      file: ./src/mappings/prepaid-card-market.ts
+
+  - kind: ethereum/contract
     name: Merchant
     network: {NETWORK}
     source:
