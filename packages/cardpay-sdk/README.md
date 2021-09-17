@@ -54,6 +54,9 @@ This is a package that provides an SDK to use the Cardpay protocol.
 - [`RewardPool`](#rewardpool)
   - [`RewardPool.rewardTokenBalance`](#rewardpoolrewardtokenbalance)
   - [`RewardPool.claim` (TBD)](#rewardpoolclaim-tbd)
+- [`RewardManager`](#rewardpool)
+  - [`RewardManager.registerRewardProgram`](#rewardmanagerregisterrewardprogram)
+  - [`RewardManager.registerRewardee` (TBD)](#rewardmanagerregisterrewardee)
 - [`LayerOneOracle`](#layeroneoracle)
   - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
   - [LayerOneOracle.getEthToUsdConverter](#layeroneoraclegetethtousdconverter)
@@ -710,6 +713,30 @@ let balanceForAllTokens = await rewardPool.rewardTokenBalances(address)
 ```
 
 ### `RewardPool.claim` (TBD)
+
+## `RewardPool.addTokens` (TBD)
+
+## `RewardManager`
+
+The `RewardManager` API is used to interact to manage reward program. Those intending to offer or receive rewards have to register using this sdk. 
+
+## `RewardManager.registerRewardProgram`
+
+The `RegisterRewardProgram` API is used to register a reward program using a prepaid card. The call can specify an EOA admin account -- it defaults to the owner of the prepaid card itself. The reward program admin will then be able to manage the reward program using other api functions like`lockRewardProgram`, `addRewardRule`, etc. A fee of 500 spend is charged when registering a reward program. Currently, tally only gives rewards to a single reward program (sokol: "0x4767D0D74356433d54880Fcd7f083751d64388aF"). 
+
+```js
+let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+await prepaidCardAPI.registerRewardProgram(prepaidCard, admin) 
+```
+
+## `RewardManager.registerRewardee`
+
+The `RegistereRewardee` API is used to register a rewardee for a reward program using a prepaid card. The purpose of registering is not to "be considered to receive rewards" rather to "be able to claim rewards that have been given". By registering, the owner of the prepaid card is given ownership of a reward safe that will be used to retrieve rewards from the reward pool. A rewardee/eoa is eligible to only have one reward safe for each reward program; any attempts to re-register will result in a revert error. A fee of 500 spend is charged when registering a rewardee.
+
+```js
+let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+await prepaidCardAPI.registerRewardee(prepaidCard , rewardProgramId) 
+```
 
 ## `LayerOneOracle`
 The `LayerOneOracle` API is used to get the current exchange rates in USD of ETH. This rate us fed by the Chainlink price feeds. Please supply a layer 1 web3 instance obtaining an `LayerOneOracle` API from `getSDK()`.
