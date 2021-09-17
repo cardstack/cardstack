@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
-import { AbiItem, randomHex, toChecksumAddress } from 'web3-utils';
+import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
@@ -487,7 +487,8 @@ export default class PrepaidCard {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<{ rewardProgramId: string; txReceipt: TransactionReceipt }> {
-    let rewardProgramId = toChecksumAddress(randomHex(20));
+    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
+    let rewardProgramId = await rewardManager.newRewardProgramId();
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
       return {
@@ -501,7 +502,6 @@ export default class PrepaidCard {
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
     let rewardProgramRegistrationFees = await rewardManager.getRewardProgramRegistrationFees();
     await this.convertFromSpendForPrepaidCard(
       prepaidCardAddress,
