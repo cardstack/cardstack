@@ -290,8 +290,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         state,
       });
 
-      const hubAuthentication = this.owner.lookup('service:hub-authentication');
-      hubAuthentication.authToken = null;
+      window.TEST__AUTH_TOKEN = undefined;
 
       await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
 
