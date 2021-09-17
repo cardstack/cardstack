@@ -476,111 +476,77 @@ export default class PrepaidCard {
     };
   }
 
-  async registerRewardProgram(txnHash: string): Promise<TransactionReceipt>;
+  async registerRewardProgram(txnHash: string): Promise<{ rewardProgramId: string; txReceipt: TransactionReceipt }>;
   async registerRewardProgram(
     prepaidCardAddress: string,
-    rewardProgramId: string,
+    admin: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<{ rewardProgramId: string; txReceipt: TransactionReceipt }>;
   async registerRewardProgram(
     prepaidCardAddressOrTxnHash: string,
     admin?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<{ rewardProgramId: string; txReceipt: TransactionReceipt }> {
+    let rewardProgramId = toChecksumAddress(randomHex(20));
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return {
+        rewardProgramId,
+        txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+      };
     }
     if (!prepaidCardAddressOrTxnHash) {
       throw new Error('prepaidCardAddress is required');
     }
-    let prepaidCard = prepaidCardAddressOrTxnHash;
+    let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let issuingToken = await this.issuingToken(prepaidCardAddressOrTxnHash);
     await this.convertFromSpendForPrepaidCard(
-      prepaidCardAddressOrTxnHash,
+      prepaidCardAddress,
       REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
       (issuingToken, balanceAmount, requiredTokenAmount, symbol) =>
         new Error(
-          `Prepaid card does not have enough balance to register reward program. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddressOrTxnHash} is ${fromWei(
+          `Prepaid card does not have enough balance to register reward program. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
             balanceAmount
           )} ${symbol}, payment amount in issuing token is ${fromWei(requiredTokenAmount)} ${symbol}`
         )
     );
 
-    let rewardProgramId = toChecksumAddress(randomHex(20));
     let prepaidCardMgr = await this.getPrepaidCardMgr();
-    let owner = await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCard).call();
+    let rewardProgramAdmin: string =
+      admin ?? (await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCardAddress).call());
 
-    let rateChanged = false;
-    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
-    let gnosisResult: GnosisExecTx | undefined;
-    do {
-      let rateLock = await layerTwoOracle.getRateLock(issuingToken);
-      try {
-        let payload = await this.getRegisterRewardProgramPayload(
-          prepaidCardAddressOrTxnHash,
-          admin ?? owner,
-          rewardProgramId,
-          REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
-          rateLock
-        );
-        if (nonce == null) {
-          nonce = getNextNonceFromEstimate(payload);
-          if (typeof onNonce === 'function') {
-            onNonce(nonce);
-          }
-        }
-        let signatures = await signSafeTxAsRSV(
-          this.layer2Web3,
-          issuingToken,
-          0,
-          payload.data,
-          0,
-          payload.safeTxGas,
-          payload.dataGas,
-          payload.gasPrice,
-          payload.gasToken,
-          payload.refundReceiver,
-          nonce,
-          from,
-          prepaidCardAddressOrTxnHash
-        );
-        gnosisResult = await this.executeRegisterRewardProgram(
-          prepaidCardAddressOrTxnHash,
-          admin ?? owner,
-          rewardProgramId,
-          REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
-          rateLock,
-          payload.gasPrice,
-          payload.safeTxGas,
-          payload.dataGas,
-          signatures,
-          nonce
-        );
-        console.log(`Reward program ${rewardProgramId} registered with admin ${admin ?? owner}`);
-        break;
-      } catch (e: any) {
-        // The rate updates about once an hour, so if this is triggered, it should only be once
-        if (e.message.includes('rate is beyond the allowable bounds')) {
-          rateChanged = true;
-          // TODO in this situation we should surface a message to the user that
-          // the rate has changed and that we need to try again with a new rate
-          console.warn(
-            'The USD rate has fluctuated beyond allowable bounds between when the txn was signed and when it was executed, prompting the user to sign the txn again with a new rate'
-          );
-        } else {
-          throw e;
+    let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
+      let payload = await this.getRegisterRewardProgramPayload(
+        prepaidCardAddress,
+        rewardProgramAdmin,
+        rewardProgramId,
+        REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
+        rateLock
+      );
+      if (nonce == null) {
+        nonce = getNextNonceFromEstimate(payload);
+        if (typeof onNonce === 'function') {
+          onNonce(nonce);
         }
       }
-    } while (rateChanged);
+      return await this.executeRegisterRewardProgram(
+        prepaidCardAddress,
+        rewardProgramAdmin,
+        rewardProgramId,
+        REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
+        rateLock,
+        payload,
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        nonce
+      );
+    });
 
     if (!gnosisResult) {
       throw new Error(
-        `Unable to obtain a gnosis transaction result for register reward program from prepaid card ${prepaidCardAddressOrTxnHash} to merchant safe ${prepaidCard} for ${REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND} SPEND`
+        `Unable to obtain a gnosis transaction result for register reward program from prepaid card ${prepaidCardAddressOrTxnHash} to merchant safe ${prepaidCardAddress} for ${REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND} SPEND`
       );
     }
 
@@ -590,25 +556,31 @@ export default class PrepaidCard {
       await onTxnHash(txnHash);
     }
 
-    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return {
+      rewardProgramId,
+      txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+    };
   }
 
-  async registerRewardee(txnHash: string): Promise<TransactionReceipt>;
+  async registerRewardee(txnHash: string): Promise<{ rewardSafe: string; txReceipt: TransactionReceipt }>;
   async registerRewardee(
     prepaidCardAddress: string,
     rewardProgramId: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt>;
+  ): Promise<{ rewardSafe: string; txReceipt: TransactionReceipt }>;
   async registerRewardee(
     prepaidCardAddressOrTxnHash: string,
     rewardProgramId?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<TransactionReceipt> {
+  ): Promise<{ rewardSafe: string; txReceipt: TransactionReceipt }> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return {
+        rewardSafe: await this.getRewardSafeFromTxn(txnHash),
+        txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+      };
     }
     if (!prepaidCardAddressOrTxnHash) {
       throw new Error('prepaidCardAddress is required');
@@ -616,86 +588,47 @@ export default class PrepaidCard {
     if (!rewardProgramId) {
       throw new Error('rewardProgramId is required');
     }
-    let prepaidCard = prepaidCardAddressOrTxnHash;
+    let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let issuingToken = await this.issuingToken(prepaidCardAddressOrTxnHash);
     await this.convertFromSpendForPrepaidCard(
-      prepaidCardAddressOrTxnHash,
+      prepaidCardAddress,
       REWARDEE_REGISTRATION_FEE_IN_SPEND,
       (issuingToken, balanceAmount, requiredTokenAmount, symbol) =>
         new Error(
-          `Prepaid card does not have enough balance to register rewardee. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddressOrTxnHash} is ${fromWei(
+          `Prepaid card does not have enough balance to register rewardee. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
             balanceAmount
           )} ${symbol}, payment amount in issuing token is ${fromWei(requiredTokenAmount)} ${symbol}`
         )
     );
 
-    let rateChanged = false;
-    let layerTwoOracle = await getSDK('LayerTwoOracle', this.layer2Web3);
-    let gnosisResult: GnosisExecTx | undefined;
-    do {
-      let rateLock = await layerTwoOracle.getRateLock(issuingToken);
-      try {
-        let payload = await this.getRegisterRewardeePayload(
-          prepaidCardAddressOrTxnHash,
-          rewardProgramId,
-          REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
-          rateLock
-        );
-        if (nonce == null) {
-          nonce = getNextNonceFromEstimate(payload);
-          if (typeof onNonce === 'function') {
-            onNonce(nonce);
-          }
-        }
-        let signatures = await signSafeTxAsRSV(
-          this.layer2Web3,
-          issuingToken,
-          0,
-          payload.data,
-          0,
-          payload.safeTxGas,
-          payload.dataGas,
-          payload.gasPrice,
-          payload.gasToken,
-          payload.refundReceiver,
-          nonce,
-          from,
-          prepaidCardAddressOrTxnHash
-        );
-        gnosisResult = await this.executeRegisterRewardee(
-          prepaidCardAddressOrTxnHash,
-          rewardProgramId,
-          REWARDEE_REGISTRATION_FEE_IN_SPEND,
-          rateLock,
-          payload.gasPrice,
-          payload.safeTxGas,
-          payload.dataGas,
-          signatures,
-          nonce
-        );
-        let rewardSafeAddress = await this.getRewardSafeFromTxn(gnosisResult.ethereumTx.txHash);
-        console.log(`Rewardee registered for ${rewardProgramId} with reward safe ${rewardSafeAddress}`);
-        break;
-      } catch (e: any) {
-        // The rate updates about once an hour, so if this is triggered, it should only be once
-        if (e.message.includes('rate is beyond the allowable bounds')) {
-          rateChanged = true;
-          // TODO in this situation we should surface a message to the user that
-          // the rate has changed and that we need to try again with a new rate
-          console.warn(
-            'The USD rate has fluctuated beyond allowable bounds between when the txn was signed and when it was executed, prompting the user to sign the txn again with a new rate'
-          );
-        } else {
-          throw e;
+    let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
+      let payload = await this.getRegisterRewardeePayload(
+        prepaidCardAddress,
+        rewardProgramId,
+        REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
+        rateLock
+      );
+      if (nonce == null) {
+        nonce = getNextNonceFromEstimate(payload);
+        if (typeof onNonce === 'function') {
+          onNonce(nonce);
         }
       }
-    } while (rateChanged);
+      return await this.executeRegisterRewardee(
+        prepaidCardAddress,
+        rewardProgramId,
+        REWARDEE_REGISTRATION_FEE_IN_SPEND,
+        rateLock,
+        payload,
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        nonce
+      );
+    });
 
     if (!gnosisResult) {
       throw new Error(
-        `Unable to obtain a gnosis transaction result for register rewardee payment from prepaid card ${prepaidCardAddressOrTxnHash} to merchant safe ${prepaidCard} for ${REWARDEE_REGISTRATION_FEE_IN_SPEND} SPEND`
+        `Unable to obtain a gnosis transaction result for register rewardee payment from prepaid card ${prepaidCardAddress}for ${REWARDEE_REGISTRATION_FEE_IN_SPEND} SPEND`
       );
     }
 
@@ -705,7 +638,10 @@ export default class PrepaidCard {
       await onTxnHash(txnHash);
     }
 
-    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return {
+      rewardSafe: await this.getRewardSafeFromTxn(gnosisResult.ethereumTx.txHash),
+      txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+    };
   }
 
   async convertFromSpendForPrepaidCard(
@@ -967,9 +903,7 @@ export default class PrepaidCard {
     rewardProgramId: string,
     spendAmount: number,
     rate: string,
-    gasPrice: string,
-    safeTxGas: string,
-    dataGas: string,
+    payload: SendPayload,
     signatures: Signature[],
     nonce: BN
   ): Promise<GnosisExecTx> {
@@ -978,9 +912,7 @@ export default class PrepaidCard {
       prepaidCardAddress,
       spendAmount,
       rate,
-      gasPrice,
-      safeTxGas,
-      dataGas,
+      payload,
       'registerRewardProgram',
       this.layer2Web3.eth.abi.encodeParameters(['address', 'address'], [admin, rewardProgramId]),
       signatures,
@@ -993,9 +925,7 @@ export default class PrepaidCard {
     rewardProgramId: string,
     spendAmount: number,
     rate: string,
-    gasPrice: string,
-    safeTxGas: string,
-    dataGas: string,
+    payload: SendPayload,
     signatures: Signature[],
     nonce: BN
   ): Promise<GnosisExecTx> {
@@ -1004,9 +934,7 @@ export default class PrepaidCard {
       prepaidCardAddress,
       spendAmount,
       rate,
-      gasPrice,
-      safeTxGas,
-      dataGas,
+      payload,
       'registerRewardee',
       this.layer2Web3.eth.abi.encodeParameters(['address'], [rewardProgramId]),
       signatures,

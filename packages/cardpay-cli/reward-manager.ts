@@ -10,10 +10,14 @@ export async function registerRewardProgram(
   let web3 = await getWeb3(network, mnemonic);
   let prepaidCardAPI = await getSDK('PrepaidCard', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  console.log(`Registering reward program`);
   await prepaidCardAPI.registerRewardProgram(prepaidCard, admin, {
     onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
+  let { rewardProgramId } =
+    (await prepaidCardAPI.registerRewardProgram(prepaidCard, admin, {
+      onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+    })) ?? {};
+  console.log(`Registered reward program ${rewardProgramId} with admin ${admin}`);
   console.log('done');
 }
 
@@ -26,8 +30,10 @@ export async function registerRewardee(
   let web3 = await getWeb3(network, mnemonic);
   let prepaidCardAPI = await getSDK('PrepaidCard', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  console.log(`Registering rewardee for reward program ${rewardProgramId}`);
-  await prepaidCardAPI.registerRewardee(prepaidCard, rewardProgramId, {
-    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
-  });
+  let { rewardSafe } =
+    (await prepaidCardAPI.registerRewardee(prepaidCard, rewardProgramId, {
+      onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+    })) ?? {};
+  console.log(`Registered rewardee for reward progrm ${rewardProgramId}. Created reward safe: ${rewardSafe}`);
+  console.log('done');
 }
