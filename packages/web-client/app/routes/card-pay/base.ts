@@ -13,6 +13,10 @@ export default class CardPayTabBaseRoute extends Route {
   };
   model(params: any, transition: any) {
     if (params.flow && !params.workflowPersistenceId) {
+      // TODO: remove me once all flows have persistence support
+      if (params.flow !== 'deposit' && params.flow !== 'issue-prepaid-card')
+        return;
+
       transition.abort();
       this.transitionTo(this.routeName, {
         queryParams: {

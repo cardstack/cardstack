@@ -1,6 +1,7 @@
 <ActionCardContainer
   @header="Deposit Amount"
   @isComplete={{@isComplete}}
+  data-test-transaction-amount-container
 >
   <ActionCardContainer::Section @title="Choose an amount to deposit into the reserve pool">
     <div class="transaction-amount__fields">
@@ -63,7 +64,7 @@
   </ActionCardContainer::Section>
   <Boxel::ActionChin @stepNumber={{1}} @state={{this.unlockCtaState}} @disabled={{or @frozen this.unlockCtaDisabled}}>
     <:default as |a|>
-      <a.ActionButton data-test-unlock-button {{on "click" this.unlock}}>
+      <a.ActionButton data-test-unlock-button {{on "click" (perform this.unlockTask)}}>
         Unlock
       </a.ActionButton>
     </:default>
@@ -94,7 +95,7 @@
   </Boxel::ActionChin>
   <Boxel::ActionChin @stepNumber={{2}} @state={{this.depositCtaState}} @disabled={{or @frozen this.depositCtaDisabled}}>
     <:default as |a|>
-      <a.ActionButton  {{on "click" this.deposit}} data-test-deposit-button>
+      <a.ActionButton  {{on "click" (perform this.depositTask)}} data-test-deposit-button>
         Deposit
       </a.ActionButton>
     </:default>

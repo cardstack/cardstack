@@ -21,15 +21,16 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
   @reads('args.workflowSession.state.depositSourceToken')
   declare selectedTokenSymbol: TokenSymbol;
   @reads('args.workflowSession.state.relayTokensTxnReceipt')
-  declare relayTxnReceipt: TransactionReceipt;
+  declare relayTokensTxnReceipt: TransactionReceipt;
+  @reads('args.workflowSession.state.completedLayer2TxnReceipt')
+  declare completedLayer2TxnReceipt: TransactionReceipt | undefined;
+  @reads('args.workflowSession.state.layer2BlockHeightBeforeBridging')
+  declare layer2BlockHeightBeforeBridging: BN | undefined;
   @tracked completedStepCount = 1;
   @tracked bridgeError = false;
   @tracked blockCountError = false;
   @tracked blockCount = 0;
 
-  get layer2BlockHeightBeforeBridging(): BN | undefined {
-    return this.args.workflowSession.state.layer2BlockHeightBeforeBridging;
-  }
   get progressSteps() {
     return [
       {
@@ -48,14 +49,16 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
     super(owner, args);
     this.totalBlockCount =
       this.layer1Network.strategy.bridgeConfirmationBlockCount;
-    taskFor(this.waitForBlockConfirmationsTask)
-      .perform()
-      .catch((e) => {
-        console.error('Failed to complete block confirmations');
-        console.error(e);
-        Sentry.captureException(e);
-        this.blockCountError = true;
-      });
+    if (!this.completedLayer2TxnReceipt) {
+      taskFor(this.waitForBlockConfirmationsTask)
+        .perform()
+        .catch((e) => {
+          console.error('Failed to complete block confirmations');
+          console.error(e);
+          Sentry.captureException(e);
+          this.blockCountError = true;
+        });
+    }
   }
 
   get displayBridgingSubstate() {
@@ -73,7 +76,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
   }
 
   @task *waitForBlockConfirmationsTask(): TaskGenerator<void> {
-    let blockNumber = this.relayTxnReceipt.blockNumber;
+    let blockNumber = this.relayTokensTxnReceipt.blockNumber;
     while (this.blockCount <= this.totalBlockCount + 1) {
       yield this.layer1Network.getBlockConfirmation(blockNumber++);
       this.blockCount++;
@@ -89,7 +92,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
       );
       this.layer2Network.refreshSafesAndBalances();
       this.args.workflowSession.update(
-        'completedLayer2TransactionReceipt',
+        'completedLayer2TxnReceipt',
         transactionReceipt
       );
       this.completedStepCount++;
@@ -104,20 +107,19 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
 
   get depositTxnViewerUrl() {
     return this.layer1Network.blockExplorerUrl(
-      this.relayTxnReceipt.transactionHash
+      this.relayTokensTxnReceipt.transactionHash
     );
   }
 
   get bridgeExplorerUrl() {
     return this.layer1Network.bridgeExplorerUrl(
-      this.relayTxnReceipt.transactionHash
+      this.relayTokensTxnReceipt.transactionHash
     );
   }
 
   get blockscoutUrl() {
     return this.layer2Network.blockExplorerUrl(
-      this.args.workflowSession.state.completedLayer2TransactionReceipt
-        .transactionHash
+      this.completedLayer2TxnReceipt!.transactionHash
     );
   }
 }

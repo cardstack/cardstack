@@ -72,12 +72,14 @@ export interface Layer1Web3Strategy
     token: string,
     options?: ApproveOptions
   ): Promise<TransactionReceipt>;
+  resumeApprove(txnHash: string): Promise<TransactionReceipt>;
   relayTokens(
     token: ChainAddress,
     destinationAddress: ChainAddress,
     amountInWei: BN,
     options?: RelayTokensOptions
   ): Promise<TransactionReceipt>;
+  resumeRelayTokens(txnHash: string): Promise<TransactionReceipt>;
   blockExplorerUrl(txnHash: TransactionHash): string;
   claimBridgedTokens(
     bridgeValidationResult: BridgeValidationResult,

@@ -54,9 +54,9 @@ class CardPayDepositWorkflowConfirmationComponent extends Component<WorkflowCard
 
   get blockscoutUrl(): string {
     return (
-      this.args.workflowSession.state.completedLayer2TransactionReceipt &&
+      this.args.workflowSession.state.completedLayer2TxnReceipt &&
       this.layer2Network.blockExplorerUrl(
-        this.args.workflowSession.state.completedLayer2TransactionReceipt
+        this.args.workflowSession.state.completedLayer2TxnReceipt
           .transactionHash
       )
     );

@@ -6,7 +6,7 @@
       <CardPay::DashboardPanel::Section @section={{section}}>
         <:cta>
           <Boxel::Button
-            {{on "click" (set this "flow" section.workflow)}}
+            {{on "click" (fn this.transitionToFlow section.workflow)}}
             @kind="primary"
             @size="touch"
             @disabled={{section.isCtaDisabled}}
@@ -23,14 +23,14 @@
 <Boxel::Modal
   style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
   @isOpen={{or (eq this.flow 'deposit') (eq this.flow 'withdrawal')}}
-  @onClose={{set this "flow" null}}
+  @onClose={{this.resetQueryParams}}
 >
-{{#if (is-network-initialized)}}
-  {{#if (eq this.flow 'deposit')}}
-    <CardPay::DepositWorkflow />
+  {{#if (is-network-initialized)}}
+    {{#if (eq this.flow 'deposit')}}
+      <CardPay::DepositWorkflow />
+    {{/if}}
+    {{#if (eq this.flow 'withdrawal')}}
+      <CardPay::WithdrawalWorkflow />
+    {{/if}}
   {{/if}}
-  {{#if (eq this.flow 'withdrawal')}}
-    <CardPay::WithdrawalWorkflow />
-  {{/if}}
-{{/if}}
 </Boxel::Modal>
