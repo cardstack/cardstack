@@ -1,8 +1,8 @@
 {
   "name": "@cardstack/base-cards",
-  "version": "0.25.1",
+  "version": "0.25.2",
   "private": true,
   "devDependencies": {
-    "@cardstack/eslint-config": "0.25.1"
+    "@cardstack/eslint-config": "0.25.2"
   }
 }
