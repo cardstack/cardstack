@@ -34,8 +34,6 @@ const TIMEOUT = 1000 * 60 * 5;
 // stay below the AML limit of $10,000 USD.
 export const MAXIMUM_PAYMENT_AMOUNT = 10000 * 100;
 export const MAX_PREPAID_CARD_AMOUNT = 10;
-const REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND = 500;
-const REWARDEE_REGISTRATION_FEE_IN_SPEND = 500;
 
 export default class PrepaidCard {
   private prepaidCardManager: Contract | undefined;
@@ -503,9 +501,11 @@ export default class PrepaidCard {
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
+    let rewardProgramRegistrationFees = await rewardManager.getRewardProgramRegistrationFees();
     await this.convertFromSpendForPrepaidCard(
       prepaidCardAddress,
-      REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
+      rewardProgramRegistrationFees,
       (issuingToken, balanceAmount, requiredTokenAmount, symbol) =>
         new Error(
           `Prepaid card does not have enough balance to register reward program. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
@@ -517,13 +517,12 @@ export default class PrepaidCard {
     let prepaidCardMgr = await this.getPrepaidCardMgr();
     let rewardProgramAdmin: string =
       admin ?? (await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCardAddress).call());
-
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
       let payload = await this.getRegisterRewardProgramPayload(
         prepaidCardAddress,
         rewardProgramAdmin,
         rewardProgramId,
-        REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
+        rewardProgramRegistrationFees,
         rateLock
       );
       if (nonce == null) {
@@ -536,7 +535,7 @@ export default class PrepaidCard {
         prepaidCardAddress,
         rewardProgramAdmin,
         rewardProgramId,
-        REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
+        rewardProgramRegistrationFees,
         rateLock,
         payload,
         await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
@@ -546,7 +545,7 @@ export default class PrepaidCard {
 
     if (!gnosisResult) {
       throw new Error(
-        `Unable to obtain a gnosis transaction result for register reward program from prepaid card ${prepaidCardAddressOrTxnHash} to merchant safe ${prepaidCardAddress} for ${REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND} SPEND`
+        `Unable to obtain a gnosis transaction result for register reward program from prepaid card ${prepaidCardAddressOrTxnHash} to merchant safe ${prepaidCardAddress} for ${rewardProgramRegistrationFees} SPEND`
       );
     }
 
@@ -591,9 +590,11 @@ export default class PrepaidCard {
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
+    let rewardeeRegistrationFees = await rewardManager.getRewardeeRegistrationFees();
     await this.convertFromSpendForPrepaidCard(
       prepaidCardAddress,
-      REWARDEE_REGISTRATION_FEE_IN_SPEND,
+      rewardeeRegistrationFees,
       (issuingToken, balanceAmount, requiredTokenAmount, symbol) =>
         new Error(
           `Prepaid card does not have enough balance to register rewardee. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
@@ -606,7 +607,7 @@ export default class PrepaidCard {
       let payload = await this.getRegisterRewardeePayload(
         prepaidCardAddress,
         rewardProgramId,
-        REWARD_PROGRAM_REGISTRATION_FEE_IN_SPEND,
+        rewardeeRegistrationFees,
         rateLock
       );
       if (nonce == null) {
@@ -618,7 +619,7 @@ export default class PrepaidCard {
       return await this.executeRegisterRewardee(
         prepaidCardAddress,
         rewardProgramId,
-        REWARDEE_REGISTRATION_FEE_IN_SPEND,
+        rewardeeRegistrationFees,
         rateLock,
         payload,
         await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
@@ -628,7 +629,7 @@ export default class PrepaidCard {
 
     if (!gnosisResult) {
       throw new Error(
-        `Unable to obtain a gnosis transaction result for register rewardee payment from prepaid card ${prepaidCardAddress}for ${REWARDEE_REGISTRATION_FEE_IN_SPEND} SPEND`
+        `Unable to obtain a gnosis transaction result for register rewardee payment from prepaid card ${prepaidCardAddress}for ${rewardeeRegistrationFees} SPEND`
       );
     }
 
