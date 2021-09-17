@@ -13,6 +13,7 @@ import TokenBridgeHomeSide from './token-bridge-home-side';
 import TokenBridgeForeignSide from './token-bridge-foreign-side';
 import { revenuePoolMeta, RevenuePool } from './revenue-pool';
 import { rewardPoolMeta, RewardPool } from './reward-pool';
+import { rewardManagerMeta, RewardManager } from './reward-manager';
 import HubAuth from './hub-auth';
 
 type SDK =
@@ -26,7 +27,9 @@ type SDK =
   | 'HubAuth'
   | 'TokenBridgeHomeSide'
   | 'TokenBridgeForeignSide'
-  | 'RewardPool';
+  | 'RewardPool'
+  | 'RewardManager';
+
 type MapReturnType<T> = T extends 'Assets'
   ? Assets
   : T extends 'HubAuth'
@@ -43,6 +46,8 @@ type MapReturnType<T> = T extends 'Assets'
   ? RevenuePool
   : T extends 'RewardPool'
   ? RewardPool
+  : T extends 'RewardManager'
+  ? RewardManager
   : T extends 'Safes'
   ? Safes
   : T extends 'TokenBridgeHomeSide'
@@ -100,6 +105,9 @@ export async function getSDK<T extends SDK>(sdk: T, ...args: any[]): Promise<Map
       break;
     case 'RewardPool':
       apiClass = await resolveApiVersion(rewardPoolMeta, web3);
+      break;
+    case 'RewardManager':
+      apiClass = await resolveApiVersion(rewardManagerMeta, web3);
       break;
     case 'Safes':
       apiClass = await resolveApiVersion(safesMeta, web3);
