@@ -12,8 +12,8 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
 
-    layer2Service.test__simulateAccountsChanged(['address']);
-    layer2Service.test__simulateBalances({
+    await layer2Service.test__simulateAccountsChanged(['address']);
+    await layer2Service.test__simulateBalances({
       defaultToken: new BN('2141100000000000000'),
       card: new BN('0'),
     });
@@ -25,7 +25,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     assert.dom('[data-test-balance="DAI.CPXD"]').containsText('2.1411');
     assert.dom('[data-test-balance="CARD.CPXD"]').doesNotExist();
 
-    layer2Service.test__simulateBalances({
+    await layer2Service.test__simulateBalances({
       defaultToken: new BN('2141100000000000000'),
       card: new BN('2990000000000000000'),
     });
@@ -35,13 +35,16 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     assert.dom('[data-test-balance="DAI.CPXD"]').containsText('2.1411');
     assert.dom('[data-test-balance="CARD.CPXD"]').containsText('2.99');
 
-    layer2Service.test__simulateBalances({
+    await layer2Service.test__simulateBalances({
       defaultToken: new BN('0'),
       card: new BN('0'),
     });
 
     await waitUntil(() => {
-      return document.querySelector('[data-test-balance="DAI.CPXD"]') === null;
+      return (
+        document.querySelector('[data-test-balance="DAI.CPXD"]') === null &&
+        document.querySelector('[data-test-balance-container-loading]') === null
+      );
     });
 
     assert.dom('[data-test-balance="DAI.CPXD"]').doesNotExist();

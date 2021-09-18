@@ -43,10 +43,13 @@ import {
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
-import { TaskGenerator } from 'ember-concurrency';
+import { all, TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { TypedChannel } from '../typed-channel';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
+import { useResource, useTask } from 'ember-resources';
+import { Safes } from '@cardstack/web-client/resources/safes';
+import { IAssets } from '../../../../cardpay-sdk/sdk/assets';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -70,18 +73,22 @@ export default abstract class Layer2ChainWeb3Strategy
   defaultTokenContractAddress?: string;
   web3!: Web3;
   #layerTwoOracleApi!: ILayerTwoOracle;
+  #assetsApi!: IAssets;
   #safesApi!: ISafes;
   #hubAuthApi!: IHubAuth;
   #broadcastChannel: TypedChannel<Layer2ConnectEvent>;
-  @tracked depotSafe: DepotSafe | null = null;
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
-  @tracked defaultTokenBalance: BN | undefined;
-  @tracked cardBalance: BN | undefined;
   @tracked waitForAccountDeferred = defer();
   @tracked isInitializing = true;
+  @tracked safesAndBalancesRefreshRequestedAt = new Date();
 
   @reads('provider.connector') connector!: IConnector;
+  @reads('depotBalances.value.defaultTokenBalance') defaultTokenBalance:
+    | BN
+    | undefined;
+  @reads('depotBalances.value.cardBalance') cardBalance: BN | undefined;
+  @reads('safes.depot') declare depotSafe: DepotSafe | null;
 
   constructor(networkSymbol: Layer2NetworkSymbol) {
     this.chainId = networkIds[networkSymbol];
@@ -159,6 +166,7 @@ export default abstract class Layer2ChainWeb3Strategy
         // one expected failure is if we connect to a chain which we don't have an rpc url for
         this.#layerTwoOracleApi = await getSDK('LayerTwoOracle', this.web3);
         this.#safesApi = await getSDK('Safes', this.web3);
+        this.#assetsApi = await getSDK('Assets', this.web3);
         this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
         await this.updateWalletInfo(accounts);
         this.#broadcastChannel.postMessage({
@@ -195,6 +203,7 @@ export default abstract class Layer2ChainWeb3Strategy
 
     yield this.provider.enable();
   }
+
   private getTokenContractInfo(
     symbol: ConvertibleSymbol,
     network: Layer2NetworkSymbol
@@ -217,8 +226,6 @@ export default abstract class Layer2ChainWeb3Strategy
       await this.refreshSafesAndBalances();
       this.waitForAccountDeferred.resolve();
     } else {
-      this.defaultTokenBalance = new BN('0');
-      this.cardBalance = new BN('0');
       this.waitForAccountDeferred = defer();
     }
   }
@@ -228,7 +235,12 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   async refreshSafesAndBalances() {
-    return taskFor(this.viewSafesTask).perform();
+    this.safesAndBalancesRefreshRequestedAt = new Date();
+    await taskFor(this.viewSafesTask).perform();
+    if (this.depotSafe && !taskFor(this.fetchSafeBalancesTask).last) {
+      await this.depotBalances.value;
+    }
+    await taskFor(this.fetchSafeBalancesTask).last;
   }
 
   async viewSafe(address: string): Promise<Safe | undefined> {
@@ -239,6 +251,39 @@ export default abstract class Layer2ChainWeb3Strategy
     account: string = this.walletInfo.firstAddress!
   ): TaskGenerator<Safe[]> {
     return yield this.#safesApi.view(account);
+  }
+
+  depotBalances = useTask(this, taskFor(this.fetchSafeBalancesTask), () => [
+    this.depotSafe as Safe | null,
+    this.safesAndBalancesRefreshRequestedAt,
+  ]);
+
+  @task
+  *fetchSafeBalancesTask(
+    safe: Safe | null,
+    _safesAndBalancesRrefreshRequestedAt: Date
+  ): TaskGenerator<any> {
+    if (!safe) {
+      return {
+        defaultTokenBalance: new BN('0'),
+        cardBalance: new BN('0'),
+      };
+    }
+    let defaultTokenAddress = this.defaultTokenContractAddress;
+    let cardTokenAddress = this.getTokenContractInfo(
+      'CARD',
+      this.networkSymbol
+    )!.address;
+
+    let [defaultBalance, cardBalance] = yield all([
+      this.#assetsApi.getBalanceForToken(defaultTokenAddress!, safe.address),
+      this.#assetsApi.getBalanceForToken(cardTokenAddress, safe.address),
+    ]);
+
+    return {
+      defaultTokenBalance: new BN(defaultBalance ?? '0'),
+      cardBalance: new BN(cardBalance ?? '0'),
+    };
   }
 
   async issuePrepaidCard(
@@ -289,7 +334,6 @@ export default abstract class Layer2ChainWeb3Strategy
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
   // about disconnecting. WalletConnect's disconnect event tells all tabs that you are disconnected
   onDisconnect() {
-    this.depotSafe = null;
     this.clearWalletInfo();
     this.walletConnectUri = undefined;
 
@@ -444,4 +488,9 @@ export default abstract class Layer2ChainWeb3Strategy
       this.networkSymbol
     )}/${txnHash}`;
   }
+
+  safes = useResource(this, Safes, () => ({
+    strategy: this,
+    walletAddress: this.walletInfo.firstAddress!,
+  }));
 }

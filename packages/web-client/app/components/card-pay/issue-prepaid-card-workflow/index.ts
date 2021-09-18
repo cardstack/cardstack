@@ -22,6 +22,9 @@ import {
   WorkflowMessage,
   WorkflowName,
 } from '@cardstack/web-client/models/workflow';
+import { task } from 'ember-concurrency-decorators';
+import { taskFor } from 'ember-concurrency-ts';
+import { tracked } from '@glimmer/tracking';
 
 export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
 export const spendToUsdRate = 0.01;
@@ -88,7 +91,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
               'DAI',
               Math.min(...faceValueOptions)
             );
-
+            await layer2Network.waitForAccount;
             let sufficientFunds = !!layer2Network.defaultTokenBalance?.gte(
               new BN(daiMinValue)
             );
@@ -362,36 +365,41 @@ class IssuePrepaidCardWorkflowComponent extends Component {
   @service declare workflowPersistence: WorkflowPersistence;
   @service declare router: RouterService;
 
-  workflow!: IssuePrepaidCardWorkflow;
+  @tracked workflow: IssuePrepaidCardWorkflow | null = null;
 
   constructor(owner: unknown, args: {}) {
     super(owner, args);
 
-    const workflow = new IssuePrepaidCardWorkflow(getOwner(this));
-    const persistedState = workflow.session.getPersistedData()?.state ?? {};
-    const willRestore = Object.keys(persistedState).length > 0;
+    let workflow = new IssuePrepaidCardWorkflow(getOwner(this));
+    let persistedState = workflow.session.getPersistedData()?.state ?? {};
+    let willRestore = Object.keys(persistedState).length > 0;
 
     if (willRestore) {
-      const errors = workflow.restorationErrors(persistedState);
-
-      if (errors.length > 0) {
-        next(this, () => {
-          workflow.cancel(errors[0]);
-        });
-      } else {
-        workflow.restoreFromPersistedWorkflow();
-      }
+      taskFor(this.restoreTask).perform(workflow, persistedState);
+    } else {
+      this.workflow = workflow;
     }
+  }
 
+  @task *restoreTask(workflow: IssuePrepaidCardWorkflow, state: any) {
+    let errors = workflow.restorationErrors(state);
+    if (errors.length > 0) {
+      next(this, () => {
+        workflow.cancel(errors[0]);
+      });
+    } else {
+      yield this.layer2Network.waitForAccount;
+      workflow.restoreFromPersistedWorkflow();
+    }
     this.workflow = workflow;
   }
 
   @action onDisconnect() {
-    this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
+    this.workflow?.cancel(FAILURE_REASONS.DISCONNECTED);
   }
 
   @action onAccountChanged() {
-    this.workflow.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
+    this.workflow?.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
   }
 }
 

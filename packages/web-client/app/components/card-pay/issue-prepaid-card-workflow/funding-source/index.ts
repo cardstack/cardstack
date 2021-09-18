@@ -18,13 +18,12 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
   @tracked selectedTokenSymbol: BridgedTokenSymbol =
     this.args.workflowSession.state.prepaidFundingToken ??
     this.defaultTokenSymbol;
-  @tracked selectedToken: TokenBalance<BridgedTokenSymbol>;
 
-  constructor(owner: unknown, args: WorkflowCardComponentArgs) {
-    super(owner, args);
-    this.selectedToken =
+  get selectedToken(): TokenBalance<BridgedTokenSymbol> {
+    return (
       this.tokens.find((t) => t.symbol === this.selectedTokenSymbol) ??
-      this.tokens[0];
+      this.tokens[0]
+    );
   }
 
   get depotAddress() {
@@ -55,7 +54,7 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
   }
 
   @action chooseSource(token: TokenBalance<BridgedTokenSymbol>) {
-    this.selectedToken = token;
+    this.selectedTokenSymbol = token.symbol;
   }
 
   @action save() {

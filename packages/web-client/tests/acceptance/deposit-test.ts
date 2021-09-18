@@ -121,6 +121,12 @@ module('Acceptance | deposit', function (hooks) {
       defaultToken: new BN(0),
     });
     await waitFor(`${postableSel(1, 2)} [data-test-balance-container]`);
+    await waitUntil(() => {
+      return (
+        document.querySelector('[data-test-balance="DAI.CPXD"]') === null &&
+        document.querySelector('[data-test-balance-container-loading]') === null
+      );
+    });
     assert
       .dom(`${postableSel(1, 2)} [data-test-balance="XDAI"]`)
       .doesNotExist();

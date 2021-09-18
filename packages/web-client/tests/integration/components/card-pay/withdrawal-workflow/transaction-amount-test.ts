@@ -26,7 +26,7 @@ module(
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
       layer2Strategy.test__simulateAccountsChanged([layer2AccountAddress]);
 
-      layer2Strategy.test__simulateBalances({
+      await layer2Strategy.test__simulateBalances({
         defaultToken: new BN(startDaiAmount),
         dai: new BN(startDaiAmount),
         card: new BN('0'),

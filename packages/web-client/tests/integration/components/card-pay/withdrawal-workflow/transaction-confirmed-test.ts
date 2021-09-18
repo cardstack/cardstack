@@ -33,7 +33,7 @@ module(
         .strategy as Layer2TestWeb3Strategy;
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      layer2Service.test__simulateBalances({
+      await layer2Service.test__simulateBalances({
         defaultToken: new BN('250000000000000000000'),
       });
       let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
@@ -48,7 +48,7 @@ module(
           },
         ],
       };
-      layer2Service.test__simulateDepot(testDepot as DepotSafe);
+      await layer2Service.test__simulateDepot(testDepot as DepotSafe);
       this.set('session.state.withdrawalToken', 'DAI.CPXD');
       this.set(
         'session.state.withdrawnAmount',
