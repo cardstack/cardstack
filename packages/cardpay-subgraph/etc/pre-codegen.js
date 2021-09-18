@@ -45,8 +45,15 @@ let v0_7_0_startBlock = {
   xdai: 0,
 };
 
+let v0_8_0_startBlock = {
+  sokol: 22728770,
+  // TODO populate this after the contract deployment for v0.8.0
+  xdai: 0,
+};
+
 let abis = {
   PrepaidCardManager: getAbi(join(sourceAbiDir, 'prepaid-card-manager.ts')),
+  PrepaidCardMarket: getAbi(join(sourceAbiDir, 'prepaid-card-market.ts')),
   RevenuePool: getAbi(join(sourceAbiDir, 'revenue-pool.ts')),
   Spend: getAbi(join(sourceAbiDir, 'spend.ts')),
   PayMerchantHandler: getAbi(join(sourceAbiDir, 'pay-merchant-handler.ts')),
@@ -72,6 +79,7 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{NETWORK}/g, network)
   .replace(/{GNOSIS_SAFE_PROXY_FACTORY}/g, getAddress('gnosisProxyFactory', cleanNetwork))
   .replace(/{PREPAID_CARD_MANAGER_ADDRESS}/g, getAddress('prepaidCardManager', cleanNetwork))
+  .replace(/{PREPAID_CARD_MARKET_ADDRESS}/g, getAddress('prepaidCardMarket', cleanNetwork))
   .replace(/{UNISWAP_V2_FACTORY_ADDRESS}/g, getAddress('uniswapV2Factory', cleanNetwork))
   .replace(/{HOME_TOKEN_BRIDGE_ADDRESS}/g, getAddress('homeBridge', cleanNetwork))
   .replace(/{REVENUE_POOL_ADDRESS}/g, getAddress('revenuePool', cleanNetwork))
@@ -90,6 +98,7 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{UNISWAP_V2_GENESIS_BLOCK}/g, uniswapV2GenesisBlock[cleanNetwork])
   .replace(/{TOKEN_START_BLOCK}/g, tokenStartBlock[cleanNetwork])
   .replace(/{v0_7_0_START_BLOCK}/g, v0_7_0_startBlock[cleanNetwork])
+  .replace(/{v0_8_0_START_BLOCK}/g, v0_8_0_startBlock[cleanNetwork])
   .replace(
     /{DEPRECATED_MERCHANT_MANAGER_v0_6_7_ADDRESS}/g,
     getAddress('deprecatedMerchantManager_v0_6_7', cleanNetwork)
@@ -105,6 +114,7 @@ writeFileSync(
 
 export let addresses = new Map<string, string>();
 addresses.set("prepaidCardManager", "${getAddress('prepaidCardManager', cleanNetwork)}");
+addresses.set("relay", "${getAddress('relay', cleanNetwork)}");
 `
 );
 

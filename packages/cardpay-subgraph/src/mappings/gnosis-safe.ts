@@ -63,6 +63,7 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     safeTxEntity.baseGas = decoded[5].toBigInt();
     safeTxEntity.gasPrice = decoded[6].toBigInt();
     safeTxEntity.gasToken = makeToken(decoded[7].toAddress());
+    safeTxEntity.gasPayment = event.params.payment;
     safeTxEntity.refundReceiver = toChecksumAddress(decoded[8].toAddress());
     safeTxEntity.signatures = decoded[9].toBytes();
 

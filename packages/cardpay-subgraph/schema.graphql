@@ -9,10 +9,13 @@ type Account @entity {
   splitPrepaidCards: [PrepaidCardSplit]!           @derivedFrom(field: "issuer")
   createdMerchants: [MerchantCreation]!            @derivedFrom(field: "merchant")
   receivedPrepaidCards: [PrepaidCardTransfer]!     @derivedFrom(field: "to")
+  provisionedPrepaidCards: [PrepaidCardProvisionedEvent]! @derivedFrom(field: "customer")
   sentPrepaidCards: [PrepaidCardTransfer]!         @derivedFrom(field: "from")
   tokenSwaps: [TokenSwap]!                         @derivedFrom(field: "to")
   tokens: [TokenHolder]!                           @derivedFrom(field: "account")
   transactions: [EOATransaction]!                  @derivedFrom(field: "account")
+  prepaidCardInventory: [SKUInventory]!            @derivedFrom(field: "issuer")
+  skus: [SKU]!                                     @derivedFrom(field: "issuer")
 }
 
 type Depot @entity {
@@ -38,6 +41,7 @@ type PrepaidCard @entity {
   payments: [PrepaidCardPayment]!                  @derivedFrom(field: "prepaidCard")
   splits: [PrepaidCardSplit]!                      @derivedFrom(field: "prepaidCard")
   transfers: [PrepaidCardTransfer]!                @derivedFrom(field: "prepaidCard")
+  usages: [PrepaidCardSendAction]!                 @derivedFrom(field: "prepaidCard")
 }
 
 type MerchantSafe @entity {
@@ -108,6 +112,82 @@ type PrepaidCardSplit @entity {
   faceValues: [BigInt!]!
   issuingTokenAmounts: [BigInt!]!
   customizationDID: String
+}
+
+type SKU @entity {
+  id: ID!
+  issuer: Account!
+  issuingToken: Token!
+  faceValue: BigInt!
+  customizationDID: String
+  askPrice: PrepaidCardAsk                         @derivedFrom(field: "sku")
+}
+
+type PrepaidCardAsk @entity {
+  id: ID!
+  sku: SKU!
+  issuingToken: Token!
+  askPrice: BigInt!
+}
+
+type PrepaidCardAskSetEvent @entity {
+  id: ID!
+  timestamp: BigInt!
+  transaction: Transaction!
+  sku: SKU!
+  issuingToken: Token!
+  askPrice: BigInt!
+}
+
+type PrepaidCardInventoryItem @entity {
+  id: ID!
+  inventory: SKUInventory!
+  prepaidCard: PrepaidCard!
+}
+
+type SKUInventory @entity {
+  id: ID!
+  sku: SKU!
+  issuer: Account!
+  prepaidCards: [PrepaidCardInventoryItem]!         @derivedFrom(field: "inventory")
+  inventoryEvents: [PrepaidCardInventoryEvent]!     @derivedFrom(field: "inventory")
+}
+
+type PrepaidCardInventoryEvent @entity {
+  id: ID!                   # id is 'txHash-prepaidCard'
+  timestamp: BigInt!
+  transaction: Transaction!
+  inventory: SKUInventory!
+  prepaidCard: PrepaidCard!
+  inventoryAdded: PrepaidCardInventoryAddEvent
+  inventoryRemoved: PrepaidCardInventoryRemoveEvent
+  inventoryProvisioned: PrepaidCardProvisionedEvent
+}
+
+type PrepaidCardInventoryAddEvent @entity {
+  id: ID!
+  timestamp: BigInt!
+  transaction: Transaction!
+  prepaidCard: PrepaidCard!
+  inventory: SKUInventory!
+}
+
+type PrepaidCardInventoryRemoveEvent @entity {
+  id: ID!
+  timestamp: BigInt!
+  transaction: Transaction!
+  prepaidCard: PrepaidCard!
+  inventory: SKUInventory!
+}
+
+type PrepaidCardProvisionedEvent @entity {
+  id: ID!
+  timestamp: BigInt!
+  transaction: Transaction!
+  prepaidCard: PrepaidCard!
+  customer: Account!
+  inventory: SKUInventory!
+  askPrice: BigInt!
 }
 
 type PrepaidCardTransfer @entity {
@@ -246,8 +326,24 @@ type SafeTransaction @entity {
   baseGas: BigInt!
   gasPrice: BigInt!
   gasToken: Token
+  gasPayment: BigInt!
   refundReceiver: String!
   signatures: Bytes!
+}
+
+type PrepaidCardSendAction @entity {
+  id: ID!
+  transaction: Transaction!
+  timestamp: BigInt!
+  prepaidCard: PrepaidCard!
+  spendAmount: BigInt!
+  rateLock: BigInt!
+  safeTxGas: BigInt!
+  baseGas: BigInt!
+  gasPrice: BigInt!
+  action: String!
+  data: Bytes!
+  ownerSignature: Bytes!
 }
 
 # this is an EOA based organization of transactions that allows us to view safe
@@ -266,7 +362,9 @@ type Transaction @entity {
   id: ID!    # txn hash
   timestamp: BigInt!
   blockNumber: BigInt!
+  gasUsed: BigInt!
   safeTxns: [SafeTransaction]!                     @derivedFrom(field: "transaction")
+  prepaidCardSendActions: [PrepaidCardSendAction]! @derivedFrom(field: "transaction")
   bridgeToLayer1Events: [BridgeToLayer1Event]!     @derivedFrom(field: "transaction")
   bridgeToLayer2Events: [BridgeToLayer2Event]!     @derivedFrom(field: "transaction")
   supplierInfoDIDUpdates: [SupplierInfoDIDUpdate]! @derivedFrom(field: "transaction")
@@ -282,6 +380,8 @@ type Transaction @entity {
   merchantClaims: [MerchantClaim]!                 @derivedFrom(field: "transaction")
   merchantRevenueEvents: [MerchantRevenueEvent]!   @derivedFrom(field: "transaction")
   tokenSwaps: [TokenSwap]!                         @derivedFrom(field: "transaction")
+  prepaidCardInventoryEvents: [PrepaidCardInventoryEvent]! @derivedFrom(field: "transaction")
+  PrepaidCardAskSetEvents: [PrepaidCardAskSetEvent]! @derivedFrom(field: "transaction")
 }
 
 # A mapping table is the more performant way to represent many-to-many
@@ -303,6 +403,7 @@ type TokenTransfer @entity {
   toTokenHolder: TokenHolder
   from: String
   to: String
+  isGasPayment: Boolean
 }
 
 type Token @entity {

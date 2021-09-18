@@ -3,6 +3,7 @@ import { makeToken, makeEOATransaction, makeEOATransactionForSafe, toChecksumAdd
 import { Safe, Account, TokenTransfer, TokenHolder, TokenHistory } from '../../generated/schema';
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit';
 import { Transfer as TransferEvent, ERC20 } from '../erc-20/ERC20';
+import { addresses } from '../generated/addresses';
 
 export function handleTransfer(event: TransferEvent): void {
   let tokenAddress = makeToken(event.address);
@@ -29,8 +30,9 @@ export function handleTransfer(event: TransferEvent): void {
       makeEOATransaction(event, from);
     }
   }
-
   let txnHash = event.transaction.hash.toHex();
+  let relayFunder = addresses.get('relay') as string;
+
   let transferEntity = new TokenTransfer(tokenAddress + '-' + txnHash + '-' + event.transactionLogIndex.toString());
   transferEntity.transaction = txnHash;
   transferEntity.timestamp = event.block.timestamp;
@@ -40,6 +42,7 @@ export function handleTransfer(event: TransferEvent): void {
   transferEntity.to = to != ZERO_ADDRESS ? to : null;
   transferEntity.fromTokenHolder = sender != null ? sender.id : null;
   transferEntity.toTokenHolder = receiver != null ? receiver.id : null;
+  transferEntity.isGasPayment = to == relayFunder;
   transferEntity.save();
 
   if (sender) {
