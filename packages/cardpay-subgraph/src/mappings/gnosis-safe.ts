@@ -48,7 +48,7 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
   let bytes = event.transaction.input.toHex();
   let methodHash = methodHashFromEncodedHex(bytes);
 
-  if (methodHash === encodeMethodSignature(EXEC_TRANSACTION)) {
+  if (methodHash == encodeMethodSignature(EXEC_TRANSACTION)) {
     let safeTxEntity = new SafeTransaction(txnHash + '-' + event.logIndex.toString());
     safeTxEntity.safe = safeAddress;
     safeTxEntity.transaction = txnHash;
