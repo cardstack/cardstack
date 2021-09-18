@@ -41,6 +41,7 @@ type PrepaidCard @entity {
   payments: [PrepaidCardPayment]!                  @derivedFrom(field: "prepaidCard")
   splits: [PrepaidCardSplit]!                      @derivedFrom(field: "prepaidCard")
   transfers: [PrepaidCardTransfer]!                @derivedFrom(field: "prepaidCard")
+  usages: [PrepaidCardSendAction]!                 @derivedFrom(field: "prepaidCard")
 }
 
 type MerchantSafe @entity {
@@ -361,6 +362,7 @@ type Transaction @entity {
   id: ID!    # txn hash
   timestamp: BigInt!
   blockNumber: BigInt!
+  gasUsed: BigInt!
   safeTxns: [SafeTransaction]!                     @derivedFrom(field: "transaction")
   prepaidCardSendActions: [PrepaidCardSendAction]! @derivedFrom(field: "transaction")
   bridgeToLayer1Events: [BridgeToLayer1Event]!     @derivedFrom(field: "transaction")
@@ -401,6 +403,7 @@ type TokenTransfer @entity {
   toTokenHolder: TokenHolder
   from: String
   to: String
+  isGasPayment: Boolean
 }
 
 type Token @entity {

@@ -107,6 +107,67 @@ export default [
   },
   {
     anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'spendAmount',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'rateLock',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'gasPrice',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'safeTxGas',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'baseGas',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'action',
+        type: 'string',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes',
+        name: 'ownerSignature',
+        type: 'bytes',
+      },
+    ],
+    name: 'PrepaidCardSend',
+    type: 'event',
+  },
+  {
+    anonymous: false,
     inputs: [],
     name: 'Setup',
     type: 'event',

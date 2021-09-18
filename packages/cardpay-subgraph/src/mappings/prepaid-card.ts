@@ -2,8 +2,16 @@ import {
   CreatePrepaidCard,
   PrepaidCardManager,
   TransferredPrepaidCard,
+  PrepaidCardSend,
 } from '../../generated/PrepaidCard/PrepaidCardManager';
-import { Account, Depot, PrepaidCard, PrepaidCardCreation, PrepaidCardTransfer } from '../../generated/schema';
+import {
+  Account,
+  Depot,
+  PrepaidCard,
+  PrepaidCardCreation,
+  PrepaidCardTransfer,
+  PrepaidCardSendAction,
+} from '../../generated/schema';
 import { makeToken, makeEOATransaction, toChecksumAddress, makeTransaction, getPrepaidCardFaceValue } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
@@ -77,4 +85,22 @@ export function handleTransferPrepaidCard(event: TransferredPrepaidCard): void {
   transferEntity.from = from;
   transferEntity.to = to;
   transferEntity.save();
+}
+
+export function handleSendAction(event: PrepaidCardSend): void {
+  makeTransaction(event);
+  let txnHash = event.transaction.hash.toHex();
+  let entity = new PrepaidCardSendAction(txnHash);
+  entity.timestamp = event.block.timestamp;
+  entity.transaction = txnHash;
+  entity.prepaidCard = toChecksumAddress(event.params.prepaidCard);
+  entity.spendAmount = event.params.spendAmount;
+  entity.rateLock = event.params.rateLock;
+  entity.safeTxGas = event.params.safeTxGas;
+  entity.baseGas = event.params.baseGas;
+  entity.gasPrice = event.params.gasPrice;
+  entity.action = event.params.action;
+  entity.data = event.params.data;
+  entity.ownerSignature = event.params.ownerSignature;
+  entity.save();
 }

@@ -38,6 +38,8 @@ dataSources:
           handler: handleCreatePrepaidCard
         - event: TransferredPrepaidCard(address,address,address)
           handler: handleTransferPrepaidCard
+        - event: PrepaidCardSend(address,uint256,uint256,uint256,uint256,uint256,string,bytes,bytes)
+          handler: handleSendAction
       file: ./src/mappings/prepaid-card.ts
 
   - kind: ethereum/contract
@@ -52,10 +54,18 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - PrepaidCard
         - Transaction
         - Account
         - EOATransaction
+        - PrepaidCardAsk
+        - PrepaidCardAskSetEvent
+        - PrepaidCardInventoryAddEvent
+        - PrepaidCardInventoryEvent
+        - PrepaidCardInventoryItem
+        - PrepaidCardInventoryRemoveEvent
+        - PrepaidCardProvisionedEvent
+        - SKU
+        - SKUInventory
       abis:
         - name: PrepaidCardMarket
           file: ./abis/generated/PrepaidCardMarket.json

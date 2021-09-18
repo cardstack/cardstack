@@ -1,6 +1,7 @@
 import { ProvisionedPrepaidCard, ItemSet, ItemRemoved, AskSet } from '../../generated/Market/PrepaidCardMarket';
 import { ethereum, BigInt, store } from '@graphprotocol/graph-ts';
 import {
+  Account,
   PrepaidCardAsk,
   PrepaidCardAskSetEvent,
   PrepaidCardInventoryAddEvent,
@@ -21,6 +22,8 @@ export function handleProvisionedPrepaidCard(event: ProvisionedPrepaidCard): voi
   let customer = toChecksumAddress(event.params.customer);
   let sku = event.params.sku.toHex();
   let askPrice = event.params.askPrice;
+  let accountEntity = new Account(customer);
+  accountEntity.save();
 
   makeEOATransaction(event, customer);
   let itemId = sku + '-' + prepaidCard;
@@ -54,6 +57,8 @@ export function handleItemSet(event: ItemSet): void {
   let prepaidCard = toChecksumAddress(event.params.prepaidCard);
   let issuer = toChecksumAddress(event.params.issuer);
   let sku = event.params.sku.toHex();
+  let accountEntity = new Account(issuer);
+  accountEntity.save();
 
   makeEOATransaction(event, issuer);
   let issuingToken = makeToken(event.params.issuingToken);
@@ -79,6 +84,8 @@ export function handleAskSet(event: AskSet): void {
   let askPrice = event.params.askPrice;
   let sku = event.params.sku.toHex();
   let issuer = toChecksumAddress(event.params.issuer);
+  let accountEntity = new Account(issuer);
+  accountEntity.save();
 
   makeEOATransaction(event, issuer);
   let issuingToken = makeToken(event.params.issuingToken);
@@ -103,6 +110,8 @@ export function handleItemRemoved(event: ItemRemoved): void {
   let prepaidCard = toChecksumAddress(event.params.prepaidCard);
   let issuer = toChecksumAddress(event.params.issuer);
   let sku = event.params.sku.toHex();
+  let accountEntity = new Account(issuer);
+  accountEntity.save();
 
   makeEOATransaction(event, issuer);
   let itemId = sku + '-' + prepaidCard;

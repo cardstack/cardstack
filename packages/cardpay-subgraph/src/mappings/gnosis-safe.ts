@@ -2,11 +2,10 @@ import { Address, store } from '@graphprotocol/graph-ts';
 import { ExecutionSuccess, AddedOwner, RemovedOwner } from '../../generated/templates/GnosisSafe/GnosisSafe';
 import { toChecksumAddress, makeEOATransactionForSafe, makeToken } from '../utils';
 import { decode, encodeMethodSignature, methodHashFromEncodedHex } from '../abi';
-import { PrepaidCardSendAction, Safe, SafeOwner, SafeTransaction } from '../../generated/schema';
+import { Safe, SafeOwner, SafeTransaction } from '../../generated/schema';
 import { log } from '@graphprotocol/graph-ts';
 
 const EXEC_TRANSACTION = 'execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)';
-const PREPAID_CARD_SEND_TRANSACTION = 'send(address,uint256,uint256,uint256,uint256,uint256,string,bytes,bytes)';
 
 export function handleAddedOwner(event: AddedOwner): void {
   let txnHash = event.transaction.hash.toHex();
@@ -89,21 +88,5 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     );
 
     safeTxEntity.save();
-  } else if (methodHash === encodeMethodSignature(PREPAID_CARD_SEND_TRANSACTION)) {
-    let sendEntity = new PrepaidCardSendAction(txnHash);
-    sendEntity.transaction = txnHash;
-    sendEntity.timestamp = event.block.timestamp;
-
-    let decoded = decode(PREPAID_CARD_SEND_TRANSACTION, bytes);
-    sendEntity.prepaidCard = toChecksumAddress(decoded[0].toAddress());
-    sendEntity.spendAmount = decoded[1].toBigInt();
-    sendEntity.rateLock = decoded[2].toBigInt();
-    sendEntity.gasPrice = decoded[3].toBigInt();
-    sendEntity.safeTxGas = decoded[4].toBigInt();
-    sendEntity.baseGas = decoded[5].toBigInt();
-    sendEntity.action = decoded[6].toString();
-    sendEntity.data = decoded[7].toBytes();
-    sendEntity.ownerSignature = decoded[8].toBytes();
-    sendEntity.save();
   }
 }

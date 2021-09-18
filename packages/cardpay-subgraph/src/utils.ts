@@ -41,6 +41,7 @@ export function makeTransaction(event: ethereum.Event): void {
   let txEntity = new Transaction(event.transaction.hash.toHex());
   txEntity.timestamp = event.block.timestamp;
   txEntity.blockNumber = event.block.number;
+  txEntity.gasUsed = event.transaction.gasUsed;
   txEntity.save();
 }
 
