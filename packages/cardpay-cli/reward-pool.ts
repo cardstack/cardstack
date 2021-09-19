@@ -44,6 +44,6 @@ export async function addRewardTokens(
   await rewardPool.addRewardTokens(safe, rewardProgramId, tokenAddress, amount, {
     onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
-  console.log(`Added ${amount} of token ${tokenAddress} to reward program ${rewardProgramId}`)
+  console.log(`Added ${amount} of token ${tokenAddress} to reward program ${rewardProgramId}`);
   console.log('done');
 }
