@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import RewardPoolABI from '../../contracts/abi/v0.8.0/reward-pool';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
-import { AbiItem, fromWei } from 'web3-utils';
+import { AbiItem, fromWei, toWei } from 'web3-utils';
 import { signSafeTx } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import { getConstant } from '../constants';
@@ -214,6 +214,23 @@ export default class RewardPool {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
     return await waitUntilTransactionMined(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+  }
+
+  async balance(rewardProgramId: string, tokenAddress: string): Promise<RewardTokenBalance> {
+    let balance: string = await (await this.getRewardPool()).methods
+      .rewardBalance(rewardProgramId, tokenAddress)
+      .call();
+    let tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+    let tokenSymbol = await tokenContract.methods.symbol().call();
+    return {
+      tokenAddress,
+      tokenSymbol,
+      balance: new BN(toWei(balance)),
+    };
+  }
+
+  async address(): Promise<string> {
+    return await getAddress('rewardPool', this.layer2Web3);
   }
 
   private async getAddRewardTokensPayload(rewardProgramId: string, tokenAddress: string, amount: BN): Promise<string> {
