@@ -34,6 +34,6 @@ export async function registerRewardee(
     (await prepaidCardAPI.registerRewardee(prepaidCard, rewardProgramId, {
       onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
     })) ?? {};
-  console.log(`Registered rewardee for reward progrm ${rewardProgramId}. Created reward safe: ${rewardSafe}`);
+  console.log(`Registered rewardee for reward program ${rewardProgramId}. Created reward safe: ${rewardSafe}`);
   console.log('done');
 }
