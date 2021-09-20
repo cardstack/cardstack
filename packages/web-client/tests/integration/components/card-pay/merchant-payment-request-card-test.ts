@@ -14,7 +14,7 @@ const MERCHANT_INFO_MISSING_MESSAGE =
   '[data-test-payment-request-merchant-info-missing]';
 const MERCHANT_LOGO = '[data-test-merchant-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
-const USD_AMOUNT = '[data-test-payment-request-usd-amount]';
+const SECONDARY_AMOUNT = '[data-test-payment-request-secondary-amount]';
 const QR_CODE = '[data-test-styled-qr-code]';
 const DEEP_LINK = '[data-test-payment-request-deep-link]';
 const LINK_VIEW_TOGGLE = '[data-test-payment-request-link-view-toggle]';
@@ -22,8 +22,8 @@ const PAYMENT_URL = '[data-test-payment-request-url]';
 const LOADING_INDICATOR = '[data-test-merchant-loading-indicator]';
 
 // fixed data
-const amount = '300';
-const usdAmount = '3';
+const amount = `§300`;
+const secondaryAmount = '$3.00 USD';
 const paymentURL =
   'https://pay.cardstack.com/merchat-asdnsadkasd?id=0x1238urfds&amount=73298587423545';
 const deepLinkPaymentURL =
@@ -47,7 +47,7 @@ module(
       };
       this.setProperties({
         amount,
-        usdAmount,
+        secondaryAmount,
         paymentURL,
         deepLinkPaymentURL,
         merchant,
@@ -59,7 +59,7 @@ module(
       await render(hbs`
         <CardPay::MerchantPaymentRequestCard
           @amount={{this.amount}}
-          @usdAmount={{this.usdAmount}}
+          @secondaryAmount={{this.secondaryAmount}}
           @merchant={{this.merchant}}
           @paymentURL={{this.paymentURL}}
           @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
@@ -84,7 +84,7 @@ module(
           merchant.textColor!
         );
       assert.dom(AMOUNT).containsText(`§300`);
-      assert.dom(USD_AMOUNT).containsText(`$3.00 USD`);
+      assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);
       assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', paymentURL);
       assert.dom(PAYMENT_URL).containsText(paymentURL);
     });
@@ -93,7 +93,7 @@ module(
       await render(hbs`
         <CardPay::MerchantPaymentRequestCard
           @amount={{this.amount}}
-          @usdAmount={{this.usdAmount}}
+          @secondaryAmount={{this.secondaryAmount}}
           @merchant={{this.merchant}}
           @paymentURL={{this.paymentURL}}
           @deepLinkPaymentURL={{this.deepLinkPaymentURL}}
@@ -118,7 +118,7 @@ module(
           merchant.textColor!
         );
       assert.dom(AMOUNT).containsText(`§300`);
-      assert.dom(USD_AMOUNT).containsText(`$3.00 USD`);
+      assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);
       assert.dom(QR_CODE).doesNotExist();
       assert
         .dom(DEEP_LINK)
@@ -139,7 +139,7 @@ module(
       await render(hbs`
         <CardPay::MerchantPaymentRequestCard
           @amount={{this.amount}}
-          @usdAmount={{this.usdAmount}}
+          @secondaryAmount={{this.secondaryAmount}}
           @merchant={{this.merchant}}
           @merchantAddress={{this.merchantAddress}}
           @paymentURL={{this.paymentURL}}
@@ -159,7 +159,7 @@ module(
           'Unable to find merchant details for this address. Use caution when paying.'
         );
       assert.dom(AMOUNT).containsText(`§300`);
-      assert.dom(USD_AMOUNT).containsText(`$3.00 USD`);
+      assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);
       assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', paymentURL);
       assert.dom(PAYMENT_URL).containsText(paymentURL);
     });
@@ -169,7 +169,7 @@ module(
       await render(hbs`
         <CardPay::MerchantPaymentRequestCard
           @amount={{this.amount}}
-          @usdAmount={{this.usdAmount}}
+          @secondaryAmount={{this.secondaryAmount}}
           @merchant={{this.merchant}}
           @merchantAddress={{this.merchantAddress}}
           @paymentURL={{this.paymentURL}}
@@ -184,7 +184,7 @@ module(
       assert.dom(MERCHANT).doesNotExist();
       assert.dom(LOADING_INDICATOR).exists();
       assert.dom(AMOUNT).containsText(`§300`);
-      assert.dom(USD_AMOUNT).containsText(`$3.00 USD`);
+      assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);
       assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', paymentURL);
       assert.dom(PAYMENT_URL).containsText(paymentURL);
     });
