@@ -1,23 +1,23 @@
 .payment-request {
   --action-element-margin: var(--boxel-sp-lg) auto var(--boxel-sp-sm) auto;
-  --explanation-padding: var(--boxel-sp-xl);
   --explanation-font: var(--boxel-font-lg);
   --amount-font-size: 2.5rem;
+  --gap: var(--boxel-sp-xl);
   --body-padding: var(--boxel-sp-xl);
 
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: var(--boxel-sp-lg);
+  gap: var(--gap);
 }
 
 @media only screen and (max-width: 480px) {
   .payment-request {
-    --explanation-padding: 0;
     --explanation-font: var(--boxel-font);
     --amount-font-size: var(--boxel-font-size-xl);
     --body-padding: var(--boxel-sp);
+    --gap: var(--boxel-sp-lg);
   }
 }
 
@@ -25,7 +25,6 @@
   max-width: 45ch;
   font: var(--explanation-font);
   color: var(--boxel-purple-500);
-  padding: var(--explanation-padding) 0;
 }
 
 .payment-request__body {
