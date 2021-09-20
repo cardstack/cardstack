@@ -166,7 +166,7 @@ export default class RevenuePool {
       payload,
       estimate,
       nonce,
-      await signSafeTx(this.layer2Web3, merchantSafeAddress, tokenAddress, payload, estimate, nonce, from)
+      await signSafeTx(this.layer2Web3, merchantSafeAddress, revenuePoolAddress, payload, estimate, nonce, from)
     );
 
     let txnHash = gnosisResult.ethereumTx.txHash;
