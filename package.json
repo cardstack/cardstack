@@ -39,8 +39,6 @@
     "build:subgraph": "cd ./packages/cardpay-subgraph && yarn build",
     "lint": "yarn compile && npm-run-all --aggregate-output --continue-on-error --parallel lint:*",
     "lint:cardhost": "cd packages/cardhost && yarn lint",
-    "lint:compiler-server": "cd packages/compiler-server && yarn lint",
-    "lint:core": "cd packages/core && yarn lint",
     "lint:css:web-client": "cd packages/web-client && yarn lint:css",
     "lint:deps": "node scripts/find-bad-deps.js",
     "lint:js": "eslint . --cache --ignore-path .gitignore --ext=js,ts",

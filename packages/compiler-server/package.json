@@ -59,11 +59,6 @@
     "node": ">= 14"
   },
   "scripts": {
-    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel 'lint:!(fix)'",
-    "lint:fix": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*:fix",
-    "lint:js": "eslint . --cache --ext .js,.ts",
-    "lint:js:fix": "eslint . --cache --ext .js,.ts --fix",
-    "lint:types": "tsc",
     "start": "node --loader ts-node/esm src/index.ts",
     "prime": "npm start prime",
     "test": "mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
