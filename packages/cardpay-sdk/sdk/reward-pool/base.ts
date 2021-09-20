@@ -225,7 +225,7 @@ export default class RewardPool {
     return {
       tokenAddress,
       tokenSymbol,
-      balance: new BN(toWei(balance)),
+      balance: new BN(balance),
     };
   }
 
