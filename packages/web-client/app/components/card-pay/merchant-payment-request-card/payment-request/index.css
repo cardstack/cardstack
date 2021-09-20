@@ -52,6 +52,7 @@
 .payment-request__address-only {
   display: flex;
   flex-direction: column;
+  align-items: center;
   padding: var(--boxel-sp-xxs);
   gap: var(--boxel-sp-xs);
 }
@@ -63,6 +64,10 @@
   letter-spacing: var(--boxel-lsp-sm);
   max-width: 22ch;
   word-break: break-all;
+}
+
+.payment-request__merchant-address-segment--bold {
+  font-weight: 700;
 }
 
 .payment-request__missing-info-message {
