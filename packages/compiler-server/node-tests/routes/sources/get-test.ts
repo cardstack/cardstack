@@ -1,10 +1,10 @@
 import type Koa from 'koa';
 import supertest from 'supertest';
-import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupCardCache } from '@cardstack/compiler-server/tests/helpers/cache';
-import { ProjectTestRealm, setupRealms } from '@cardstack/compiler-server/tests/helpers/realm';
+import { setupCardCache } from '@cardstack/compiler-server/node-tests/helpers/cache';
+import { ProjectTestRealm, setupRealms } from '@cardstack/compiler-server/node-tests/helpers/realm';
 import { Server } from '@cardstack/compiler-server/src/server';
+import { expect } from 'chai';
 
 let postFiles = Object.freeze({
   'schema.js': `
@@ -21,7 +21,7 @@ export default class Post {
   'isolated.js': templateOnlyComponentTemplate('<h1><@fields.title/></h1><article><@fields.body/></article>'),
 });
 
-QUnit.module('GET /sources/<card-id>', function (hooks) {
+describe('GET /sources/<card-id>', function () {
   let realm: ProjectTestRealm;
   let server: Koa;
 
@@ -33,10 +33,10 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
     return supertest(server.callback()).get(url);
   }
 
-  let { getCardCacheDir } = setupCardCache(hooks);
-  let { createRealm, getRealmManager } = setupRealms(hooks);
+  let { getCardCacheDir } = setupCardCache(this);
+  let { createRealm, getRealmManager } = setupRealms(this);
 
-  hooks.beforeEach(async function () {
+  this.beforeEach(async function () {
     realm = createRealm('https://my-realm');
     realm.addCard('post', {
       'card.json': {
@@ -66,22 +66,22 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
     ).app;
   });
 
-  QUnit.test('404s when you try to load card from unknown realm', async function (assert) {
-    assert.expect(0);
+  it('404s when you try to load card from unknown realm', async function () {
+    // assert.expect(0);
     await getSource('https://some-other-origin.com/thing').expect(404);
   });
 
-  QUnit.test('404s when you try to load missing from known realm', async function (assert) {
-    assert.expect(0);
+  it('404s when you try to load missing from known realm', async function () {
+    // assert.expect(0);
     await getSource('https://my-realm/thing').expect(404);
   });
 
-  QUnit.test('can get source for a card with code & schema', async function (assert) {
+  it('can get source for a card with code & schema', async function () {
     let response = await getSource('https://my-realm/post').expect(200);
 
-    assert.deepEqual(Object.keys(response.body), ['data'], 'data is the only top level key');
-    assert.deepEqual(Object.keys(response.body.data), ['id', 'type', 'attributes', 'relationships']);
-    assert.deepEqual(response.body.data?.attributes, {
+    expect(response.body, 'data is the only top level key').to.have.all.keys(['data']);
+    expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes', 'relationships']);
+    expect(response.body.data?.attributes).to.deep.equal({
       files: postFiles,
       isolated: 'isolated.js',
       schema: 'schema.js',
@@ -93,12 +93,12 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
     });
   });
 
-  QUnit.test('can get source for a card with only data', async function (assert) {
+  it('can get source for a card with only data', async function () {
     let response = await getSource('https://my-realm/post0').expect(200);
 
-    assert.deepEqual(Object.keys(response.body), ['data'], 'data is the only top level key');
-    assert.deepEqual(Object.keys(response.body.data), ['id', 'type', 'attributes', 'relationships']);
-    assert.deepEqual(response.body.data?.attributes, {
+    expect(response.body, 'data is the only top level key').to.have.all.keys(['data']);
+    expect(response.body.data).to.have.all.keys(['id', 'type', 'attributes', 'relationships']);
+    expect(response.body.data?.attributes).to.deep.equal({
       files: {},
       isolated: null,
       schema: null,
@@ -110,12 +110,12 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
     });
   });
 
-  QUnit.test('can include compiled meta', async function (assert) {
+  it('can include compiled meta', async function () {
     let response = await getSource('https://my-realm/post0', {
       include: 'compiledMeta',
     }).expect(200);
 
-    assert.deepEqual(response.body.data.relationships?.compiledMeta, {
+    expect(response.body.data.relationships?.compiledMeta).to.deep.equal({
       data: {
         type: 'compiled-metas',
         id: 'https://my-realm/post0',
@@ -126,15 +126,9 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
       (ref: any) => ref.type === 'compiled-metas' && ref.id === 'https://my-realm/post0'
     );
 
-    assert.deepEqual(Object.keys(compiledMeta?.attributes), [
-      'schemaModule',
-      'serializer',
-      'isolated',
-      'embedded',
-      'edit',
-    ]);
+    expect(compiledMeta?.attributes).to.have.all.keys(['schemaModule', 'serializer', 'isolated', 'embedded', 'edit']);
 
-    assert.deepEqual(compiledMeta?.relationships, {
+    expect(compiledMeta?.relationships).to.deep.equal({
       adoptsFrom: {
         data: {
           type: 'compiled-metas',
@@ -167,12 +161,12 @@ QUnit.module('GET /sources/<card-id>', function (hooks) {
       (ref: any) => ref.type === 'compiled-metas' && ref.id === 'https://my-realm/post'
     );
 
-    assert.ok(post, 'found rawCard.compiledMeta.adoptsFrom');
+    expect(post, 'found rawCard.compiledMeta.adoptsFrom').to.be.ok;
 
     let title = response.body.included?.find(
       (ref: any) => ref.type === 'fields' && ref.id === 'https://my-realm/post0/title'
     );
 
-    assert.ok(title, 'found title field');
+    expect(title, 'found title field').to.be.ok;
   });
 });

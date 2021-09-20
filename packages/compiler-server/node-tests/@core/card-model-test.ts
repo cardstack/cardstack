@@ -1,16 +1,13 @@
 import { parse, isSameDay } from 'date-fns';
+import { expect } from 'chai';
+
+import { PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
+import CardModel from '@cardstack/core/src/card-model';
+import { CardJSONResponse, CardOperation, Format } from '@cardstack/core/src/interfaces';
 
 function p(dateString: string): Date {
   return parse(dateString, 'yyyy-MM-dd', new Date());
 }
-
-import { PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
-import QUnit from 'qunit';
-
-const { module: Qmodule, test } = QUnit;
-
-import CardModel from '@cardstack/core/src/card-model';
-import { CardJSONResponse, CardOperation, Format } from '@cardstack/core/src/interfaces';
 
 class PersonCardModel extends CardModel {
   static serializerMap = {
@@ -56,17 +53,17 @@ class StubCards {
 }
 const fakeComponent: unknown = {};
 
-Qmodule('CardModel', function () {
-  test('.data', async function (assert) {
+describe('CardModel', function () {
+  it('.data', async function () {
     let stub = new StubCards();
     let model = PersonCardModel.fromResponse(stub, cardJSONResponse, fakeComponent);
-    assert.equal(model.data.name, attributes.name);
-    assert.ok(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates');
-    assert.equal(model.data.address.street, attributes.address.street);
-    assert.ok(isSameDay(model.data.address.settlementDate, p('1990-01-01')), 'Dates are serialized to Dates');
+    expect(model.data.name).to.equal(attributes.name);
+    expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
+    expect(model.data.address.street).to.equal(attributes.address.street);
+    expect(isSameDay(model.data.address.settlementDate, p('1990-01-01')), 'Dates are serialized to Dates').to.be.ok;
   });
 
-  test('.serialize', async function (assert) {
+  it('.serialize', async function () {
     let stub = new StubCards();
     let model = PersonCardModel.fromResponse(stub, cardJSONResponse, fakeComponent);
 
@@ -75,16 +72,12 @@ Qmodule('CardModel', function () {
     if (!op || !('update' in op)) {
       throw new Error(`did not find create operation`);
     }
-    assert.deepEqual(
-      op.update.payload,
-      {
-        data: {
-          id: PERSON_RAW_CARD.url,
-          type: 'card',
-          attributes,
-        },
+    expect(op.update.payload, 'A model can be serialized once instantiated').to.deep.equal({
+      data: {
+        id: PERSON_RAW_CARD.url,
+        type: 'card',
+        attributes,
       },
-      'A model can be serialized once instantiated'
-    );
+    });
   });
 });

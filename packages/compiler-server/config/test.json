@@ -1,0 +1,6 @@
+{
+  "serverSecret": "2Lhrsi7xSDMv1agfW+hghvQkdkTRSqW/JGApSjLT0NA=",
+  "sentry": {
+    "enabled": false
+  }
+}

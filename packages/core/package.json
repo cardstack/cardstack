@@ -55,11 +55,6 @@
     "node": ">= 14"
   },
   "scripts": {
-    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel 'lint:!(fix)'",
-    "lint:fix": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*:fix",
-    "lint:js": "eslint . --cache --ext .js,.ts",
-    "lint:js:fix": "eslint . --cache --ext .js,.ts --fix",
-    "lint:types": "tsc",
     "start": "webpack serve",
     "test": "npm-run-all lint test:*",
     "test:stub": "echo 'test stub'"

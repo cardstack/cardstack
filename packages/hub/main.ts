@@ -39,7 +39,8 @@ import { Clock } from './services/clock';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 
-const log = logger('cardstack/hub');
+const serverLog = logger('hub/server');
+const workerLog = logger('hub/worker');
 
 export function wireItUp(registryCallback?: RegistryCallback): Container {
   let registry = new Registry();
@@ -137,7 +138,7 @@ export function bootServer() {
   } else {
     logger.configure({
       defaultLevel: 'warn',
-      logLevels: [['cardstack/*', 'info']],
+      logLevels: [['hub/*', 'info']],
     });
   }
 
@@ -154,17 +155,17 @@ export function bootServer() {
     //
     // (If we weren't started under IPC, `process.connected` is
     // undefined, so this never happens.)
-    log.info(`Shutting down because connected parent process has already exited.`);
+    serverLog.info(`Shutting down because connected parent process has already exited.`);
     process.exit(0);
   }
   function onDisconnect() {
-    log.info(`Hub shutting down because connected parent process exited.`);
+    serverLog.info(`Hub shutting down because connected parent process exited.`);
     process.exit(0);
   }
   process.on('disconnect', onDisconnect);
 
   return runServer(startupConfig()).catch((err: Error) => {
-    log.error('Server failed to start cleanly: %s', err.stack || err);
+    serverLog.error('Server failed to start cleanly: %s', err.stack || err);
     process.exit(-1);
   });
 }
@@ -181,7 +182,7 @@ export async function bootServerForTesting(config: Partial<StartupConfig>) {
   process.on('warning', onWarning);
 
   let server = await runServer(config).catch((err: Error) => {
-    log.error('Server failed to start cleanly: %s', err.stack || err);
+    serverLog.error('Server failed to start cleanly: %s', err.stack || err);
     process.exit(-1);
   });
 
@@ -205,16 +206,16 @@ export async function bootWorker() {
     return (level: LogLevel, message: any, meta?: LogMeta) => {
       switch (level) {
         case LogLevel.ERROR:
-          log.error(message, scope, meta);
+          workerLog.error(message, scope, meta);
           break;
         case LogLevel.WARNING:
-          log.warn(message, scope, meta);
+          workerLog.warn(message, scope, meta);
           break;
         case LogLevel.INFO:
-          log.info(message, scope, meta);
+          workerLog.info(message, scope, meta);
           break;
         case LogLevel.DEBUG:
-          log.info(message, scope, meta);
+          workerLog.info(message, scope, meta);
       }
     };
   };
@@ -253,7 +254,7 @@ export async function bootWorker() {
 async function runServer(config: Partial<StartupConfig>) {
   let app = await makeServer(config.registryCallback, config.containerCallback);
   let server = app.listen(config.port);
-  log.info('server listening on %s', config.port);
+  serverLog.info('server listening on %s', config.port);
   if (process.connected) {
     process.send!('hub hello');
   }
@@ -282,9 +283,9 @@ function startupConfig(): StartupConfig {
 }
 
 async function httpLogging(ctxt: Koa.Context, next: Koa.Next) {
-  log.info('start %s %s', ctxt.request.method, ctxt.request.originalUrl);
+  serverLog.info('start %s %s', ctxt.request.method, ctxt.request.originalUrl);
   await next();
-  log.info('finish %s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
+  serverLog.info('finish %s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
 }
 
 export async function cors(ctxt: Koa.Context, next: Koa.Next) {

@@ -1,10 +1,6 @@
-import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { containsSource } from '@cardstack/core/tests/helpers/assertions';
 import { TestBuilder } from '../helpers/test-builder';
 import { baseCardURL } from '@cardstack/core/src/compiler';
-
-const { module: Qmodule, test } = QUnit;
 
 const PERSON_CARD = {
   url: 'https://cardstack.local/cards/person',
@@ -29,27 +25,27 @@ const PERSON_CARD = {
   },
 };
 
-Qmodule('Compiler', function (hooks) {
+describe('Compiler', function () {
   let builder: TestBuilder;
 
-  hooks.beforeEach(() => {
+  this.beforeEach(() => {
     builder = new TestBuilder();
   });
 
-  test('string card', async function (assert) {
+  it('string card', async function () {
     let compiled = await builder.getCompiledCard('https://cardstack.com/base/string');
-    assert.equal(compiled.adoptsFrom?.url, baseCardURL);
-    assert.equal(compiled.embedded.inlineHBS, '{{@model}}');
-    assert.deepEqual(compiled.embedded.usedFields, []);
-    assert.ok(!compiled.serializer, 'String card has no deserializer');
+    expect(compiled.adoptsFrom?.url).to.equal(baseCardURL);
+    expect(compiled.embedded.inlineHBS).to.equal('{{@model}}');
+    expect(compiled.embedded.usedFields).to.deep.equal([]);
+    expect(!compiled.serializer, 'String card has no deserializer').to.be.ok;
   });
 
-  test('date card', async function (assert) {
+  it('date card', async function () {
     let compiled = await builder.getCompiledCard('https://cardstack.com/base/date');
-    assert.equal(compiled.serializer, 'date', 'Date card has date serializer');
+    expect(compiled.serializer, 'Date card has date serializer').to.equal('date');
   });
 
-  test('deserializer is inherited', async function (assert) {
+  it('deserializer is inherited', async function () {
     builder.addRawCard({
       url: 'https://cardstack.local/cards/fancy-date',
       schema: 'schema.js',
@@ -61,49 +57,49 @@ Qmodule('Compiler', function (hooks) {
       },
     });
     let compiled = await builder.getCompiledCard('https://cardstack.local/cards/fancy-date');
-    assert.equal(compiled.serializer, 'date', 'FancyDate card has date serializer inherited from its parent');
+    expect(compiled.serializer, 'FancyDate card has date serializer inherited from its parent').to.equal('date');
   });
 
-  test('CompiledCard fields', async function (assert) {
+  it('CompiledCard fields', async function () {
     builder.addRawCard(PERSON_CARD);
     let compiled = await builder.getCompiledCard(PERSON_CARD.url);
-    assert.deepEqual(Object.keys(compiled.fields), ['name', 'birthdate']);
+    expect(Object.keys(compiled.fields)).to.deep.equal(['name', 'birthdate']);
   });
 
-  test('CompiledCard embedded view', async function () {
+  it('CompiledCard embedded view', async function () {
     builder.addRawCard(PERSON_CARD);
     let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
-    containsSource(
-      builder.definedModules.get(compiled.embedded.moduleName),
+    expect(builder.definedModules.get(compiled.embedded.moduleName)).to.containsSource(
       '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
     );
 
-    containsSource(
+    expect(
       builder.definedModules.get('https://cardstack.local/cards/person/embedded.css'),
-      PERSON_CARD.files['embedded.css'],
       'Styles are defined'
-    );
+    ).to.containsSource(PERSON_CARD.files['embedded.css']);
   });
 
-  test('CompiledCard edit view', async function (assert) {
+  it('CompiledCard edit view', async function () {
     builder.addRawCard(PERSON_CARD);
     let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
-    assert.deepEqual(compiled.edit.usedFields, ['name', 'birthdate']);
-    containsSource(
+    expect(compiled.edit.usedFields).to.deep.equal(['name', 'birthdate']);
+    expect(
       builder.definedModules.get(compiled.edit.moduleName),
-      '<HttpsCardstackComBaseStringField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />',
       'Edit template is rendered for text'
+    ).to.containsSource(
+      '<HttpsCardstackComBaseStringField @model={{@model.name}} data-test-field-name=\\"name\\" @set={{@set.setters.name}} />'
     );
-    containsSource(
+    expect(
       builder.definedModules.get(compiled.edit.moduleName),
-      '<HttpsCardstackComBaseDateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />',
       'Edit template is rendered for date'
+    ).to.containsSource(
+      '<HttpsCardstackComBaseDateField @model={{@model.birthdate}}  data-test-field-name=\\"birthdate\\" @set={{@set.setters.birthdate}} />'
     );
   });
 
-  test('nested cards', async function (assert) {
+  it('nested cards', async function () {
     builder.addRawCard(PERSON_CARD);
     builder.addRawCard({
       url: 'https://cardstack.local/cards/post',
@@ -130,19 +126,18 @@ Qmodule('Compiler', function (hooks) {
     });
 
     let compiled = await builder.getCompiledCard('https://cardstack.local/cards/post');
-    assert.deepEqual(Object.keys(compiled.fields), ['title', 'author']);
+    expect(compiled.fields).to.have.all.keys('title', 'author');
 
-    assert.deepEqual(compiled.embedded.usedFields, ['title', 'author.name', 'author.birthdate']);
+    expect(compiled.embedded.usedFields).to.deep.equal(['title', 'author.name', 'author.birthdate']);
 
-    containsSource(
-      builder.definedModules.get(compiled.embedded.moduleName),
+    expect(builder.definedModules.get(compiled.embedded.moduleName)).to.containsSource(
       `<article><h1>{{@model.title}}</h1><p>{{@model.author.name}}</p><p><HttpsCardstackComBaseDateField @model={{@model.author.birthdate}} data-test-field-name=\\"birthdate\\"  /></p></article>`
     );
 
-    assert.deepEqual(compiled.isolated.usedFields, ['author']);
+    expect(compiled.isolated.usedFields).to.deep.equal(['author']);
   });
 
-  test('deeply nested cards', async function (assert) {
+  it('deeply nested cards', async function () {
     builder.addRawCard({
       url: 'http://cardstack.local/cards/post',
       schema: 'schema.js',
@@ -202,26 +197,26 @@ Qmodule('Compiler', function (hooks) {
     });
 
     let compiled = await builder.getCompiledCard('http://cardstack.local/cards/post-list');
-    assert.deepEqual(Object.keys(compiled.fields), ['posts']);
+    expect(compiled.fields).to.have.all.keys('posts');
 
-    assert.deepEqual(compiled.isolated.usedFields, ['posts.title', 'posts.createdAt']);
+    expect(compiled.isolated.usedFields).to.deep.equal(['posts.title', 'posts.createdAt']);
 
-    containsSource(
+    expect(
       builder.definedModules.get(compiled.isolated.moduleName),
-      `{{#each @model.posts as |Post|}}<HttpCardstackLocalCardsPostField @model={{Post}} data-test-field-name=\\"posts\\" />{{/each}}`,
       'Isolated template includes PostField component'
+    ).to.containsSource(
+      `{{#each @model.posts as |Post|}}<HttpCardstackLocalCardsPostField @model={{Post}} data-test-field-name=\\"posts\\" />{{/each}}`
     );
 
-    assert.deepEqual(compiled.embedded.usedFields, ['posts.title']);
+    expect(compiled.embedded.usedFields).to.deep.equal(['posts.title']);
 
-    containsSource(
+    expect(
       builder.definedModules.get(compiled.embedded.moduleName),
-      `<ul>{{#each @model.posts as |Post|}}<li>{{Post.title}}</li>{{/each}}</ul>`,
       'Embedded template inlines post title'
-    );
+    ).to.containsSource(`<ul>{{#each @model.posts as |Post|}}<li>{{Post.title}}</li>{{/each}}</ul>`);
   });
 
-  Qmodule('@fields iterating', function (hooks) {
+  describe('@fields iterating', function () {
     let postCard = {
       url: 'https://cardstack.local/cards/post',
       schema: 'schema.js',
@@ -240,19 +235,18 @@ Qmodule('Compiler', function (hooks) {
       },
     };
 
-    hooks.beforeEach(function () {
+    this.beforeEach(function () {
       builder.addRawCard(postCard);
     });
 
-    test('iterators of fields and inlines templates', async function () {
+    it('iterators of fields and inlines templates', async function () {
       let compiled = await builder.getCompiledCard('https://cardstack.local/cards/post');
-      containsSource(
-        builder.definedModules.get(compiled.embedded.moduleName),
+      expect(builder.definedModules.get(compiled.embedded.moduleName)).to.containsSource(
         '<article><label>{{\\"title\\"}}</label></article>'
       );
     });
 
-    test('recompiled parent field iterator', async function () {
+    it('recompiled parent field iterator', async function () {
       let fancyPostCard = {
         url: 'https://cardstack.local/cards/fancy-post',
         schema: 'schema.js',
@@ -288,12 +282,10 @@ Qmodule('Compiler', function (hooks) {
       let timelyCompiled = await builder.getCompiledCard(timelyPostCard.url);
       let fancyCompiled = await builder.getCompiledCard(fancyPostCard.url);
 
-      containsSource(
-        builder.definedModules.get(timelyCompiled.embedded.moduleName),
+      expect(builder.definedModules.get(timelyCompiled.embedded.moduleName)).to.containsSource(
         '<article><label>{{\\"title\\"}}</label><label>{{\\"createdAt\\"}}</label></article>'
       );
-      containsSource(
-        builder.definedModules.get(fancyCompiled.embedded.moduleName),
+      expect(builder.definedModules.get(fancyCompiled.embedded.moduleName)).to.containsSource(
         '<article><label>{{\\"title\\"}}</label><label>{{\\"body\\"}}</label></article>'
       );
     });

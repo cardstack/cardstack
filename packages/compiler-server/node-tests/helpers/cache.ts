@@ -30,7 +30,7 @@ export function createMinimalPackageJSON(cardCacheDir: string): void {
   outputJSONSync(join(cardCacheDir, 'package.json'), MINIMAL_PACKAGE);
 }
 
-export function setupCardCache(hooks: NestedHooks): {
+export function setupCardCache(mochaContext: Mocha.Suite): {
   resolveCard: (modulePath: string) => string;
   getCardCacheDir: () => string;
 } {
@@ -44,7 +44,7 @@ export function setupCardCache(hooks: NestedHooks): {
     return _cardCacheDir;
   }
 
-  hooks.beforeEach(function () {
+  mochaContext.beforeEach(function () {
     let { tmpDir, cardCacheDir } = createCardCacheDir();
     createMinimalPackageJSON(cardCacheDir);
     _tmpDir = tmpDir;

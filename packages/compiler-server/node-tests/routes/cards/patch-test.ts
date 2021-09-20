@@ -1,12 +1,12 @@
 import type Koa from 'koa';
 import supertest from 'supertest';
-import QUnit from 'qunit';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupCardCache } from '@cardstack/compiler-server/tests/helpers/cache';
-import { ProjectTestRealm, setupRealms } from '@cardstack/compiler-server/tests/helpers/realm';
+import { setupCardCache } from '@cardstack/compiler-server/node-tests/helpers/cache';
+import { ProjectTestRealm, setupRealms } from '@cardstack/compiler-server/node-tests/helpers/realm';
 import { Server } from '@cardstack/compiler-server/src/server';
+import { expect } from 'chai';
 
-QUnit.module('PATCH /cards/<card-id>', function (hooks) {
+describe('PATCH /cards/<card-id>', function () {
   let realm: ProjectTestRealm;
   let server: Koa;
 
@@ -22,10 +22,10 @@ QUnit.module('PATCH /cards/<card-id>', function (hooks) {
       .expect('Content-Type', /json/);
   }
 
-  let { getCardCacheDir } = setupCardCache(hooks);
-  let { createRealm, getRealmManager } = setupRealms(hooks);
+  let { getCardCacheDir } = setupCardCache(this);
+  let { createRealm, getRealmManager } = setupRealms(this);
 
-  hooks.beforeEach(async function () {
+  this.beforeEach(async function () {
     realm = createRealm('https://my-realm');
     realm.addCard('post', {
       'card.json': {
@@ -65,8 +65,8 @@ QUnit.module('PATCH /cards/<card-id>', function (hooks) {
     ).app;
   });
 
-  QUnit.test('returns a 404 when trying to update from a card that doesnt exist', async function (assert) {
-    assert.expect(0);
+  it('returns a 404 when trying to update from a card that doesnt exist', async function () {
+    // assert.expect(0);
     await updateCard('https://my-realm/car0', {
       data: {
         vin: '123',
@@ -74,7 +74,7 @@ QUnit.module('PATCH /cards/<card-id>', function (hooks) {
     }).expect(404);
   });
 
-  QUnit.test('can update an existing card', async function (assert) {
+  it('can update an existing card', async function () {
     let initialResponse = await updateCard('https://my-realm/post0', {
       data: {
         attributes: {
@@ -83,13 +83,13 @@ QUnit.module('PATCH /cards/<card-id>', function (hooks) {
         },
       },
     }).expect(200);
-    assert.deepEqual(initialResponse.body.data.attributes, {
+    expect(initialResponse.body.data.attributes).to.deep.equal({
       title: 'Goodbye World!',
       body: 'First post',
     });
 
     let response = await getCard('https://my-realm/post0').expect(200);
-    assert.deepEqual(response.body.data?.attributes, {
+    expect(response.body.data?.attributes).to.deep.equal({
       title: 'Goodbye World!',
       body: 'First post',
     });

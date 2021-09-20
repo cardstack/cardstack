@@ -12,7 +12,9 @@
     "noUnusedLocals": true,
     "resolveJsonModule": true,
     "noUnusedParameters": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true
   },
   "include": [
     "./packages/cardie/**/*.ts",
@@ -24,6 +26,8 @@
     "./packages/firebase-functions/**/*.ts",
     "./packages/hub/**/*.ts",
     "./packages/test-support/**/*.ts",
+    "./packages/compiler-server/**/*.ts",
+    "./packages/core/**/*.ts",
     "**/.eslintrc.ts"
   ],
   "exclude": ["./packages/*/dist", "./packages/*/tmp", "./packages/*/node_modules", "node_modules", "tmp"]
