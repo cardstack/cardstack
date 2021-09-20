@@ -102,9 +102,7 @@ module('Acceptance | pay', function (hooks) {
       .hasAttribute(
         'data-test-merchant-logo-background',
         merchantInfoBackground
-      );
-    assert
-      .dom(MERCHANT_LOGO)
+      )
       .hasAttribute(
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
@@ -139,9 +137,7 @@ module('Acceptance | pay', function (hooks) {
       .hasAttribute(
         'data-test-merchant-logo-background',
         merchantInfoBackground
-      );
-    assert
-      .dom(MERCHANT_LOGO)
+      )
       .hasAttribute(
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
@@ -175,9 +171,7 @@ module('Acceptance | pay', function (hooks) {
       .hasAttribute(
         'data-test-merchant-logo-background',
         merchantInfoBackground
-      );
-    assert
-      .dom(MERCHANT_LOGO)
+      )
       .hasAttribute(
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
@@ -209,9 +203,7 @@ module('Acceptance | pay', function (hooks) {
       .hasAttribute(
         'data-test-merchant-logo-background',
         merchantInfoBackground
-      );
-    assert
-      .dom(MERCHANT_LOGO)
+      )
       .hasAttribute(
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
@@ -248,9 +240,7 @@ module('Acceptance | pay', function (hooks) {
       .hasAttribute(
         'data-test-merchant-logo-background',
         merchantInfoBackground
-      );
-    assert
-      .dom(MERCHANT_LOGO)
+      )
       .hasAttribute(
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
@@ -284,9 +274,7 @@ module('Acceptance | pay', function (hooks) {
       .hasAttribute(
         'data-test-merchant-logo-background',
         merchantInfoBackground
-      );
-    assert
-      .dom(MERCHANT_LOGO)
+      )
       .hasAttribute(
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
@@ -321,9 +309,7 @@ module('Acceptance | pay', function (hooks) {
       .hasAttribute(
         'data-test-merchant-logo-background',
         merchantInfoBackground
-      );
-    assert
-      .dom(MERCHANT_LOGO)
+      )
       .hasAttribute(
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
@@ -358,9 +344,7 @@ module('Acceptance | pay', function (hooks) {
       .hasAttribute(
         'data-test-merchant-logo-background',
         merchantInfoBackground
-      );
-    assert
-      .dom(MERCHANT_LOGO)
+      )
       .hasAttribute(
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
