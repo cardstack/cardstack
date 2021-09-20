@@ -134,7 +134,7 @@ export default class WyreCallbackRoute {
       let db = await this.databaseManager.getClient();
       await db.query(`UPDATE wallet_orders SET status = $2, updated_at = NOW() WHERE order_id = $1`, [
         orderId,
-        reservationId ? 'complete' : 'waiting-for-reservation',
+        reservationId ? 'provisioning' : 'waiting-for-reservation',
       ]);
     } catch (err) {
       log.error(

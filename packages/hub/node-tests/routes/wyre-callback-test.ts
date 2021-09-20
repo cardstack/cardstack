@@ -352,7 +352,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback with an order ID that already exists and is not in a "waiting-for-order" state`, async function () {
-      for (let status of ['received-order', 'waiting-for-reservation', 'complete']) {
+      for (let status of ['received-order', 'waiting-for-reservation', 'provisioning', 'complete']) {
         await db.query(`DELETE FROM wallet_orders`);
         await db.query(
           `INSERT INTO wallet_orders (order_id, user_address, wallet_id, custodial_transfer_id, reservation_id, status) VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -574,7 +574,7 @@ describe('POST /api/wyre-callback', function () {
       let {
         rows: [row],
       } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
-      expect(row.status).to.equal('complete');
+      expect(row.status).to.equal('provisioning');
     });
 
     it(`can transition to 'waiting-for-reservation' state after receiving custodial transfer callback when a reservation ID has not be received`, async function () {
