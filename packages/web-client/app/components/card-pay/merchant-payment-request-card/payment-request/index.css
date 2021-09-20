@@ -4,6 +4,7 @@
   --amount-font-size: 2.5rem;
   --gap: var(--boxel-sp-xl);
   --body-padding: var(--boxel-sp-xl);
+  --merchant-address-font-size: var(--boxel-font-size-lg);
 
   display: flex;
   flex-direction: column;
@@ -18,6 +19,7 @@
     --amount-font-size: var(--boxel-font-size-xl);
     --body-padding: var(--boxel-sp);
     --gap: var(--boxel-sp-lg);
+    --merchant-address-font-size: 1.125rem;
   }
 }
 
@@ -56,7 +58,7 @@
 
 .payment-request__merchant-address {
   font-family: var(--boxel-monospace-font-family);
-  font-size: var(--boxel-font-size-lg);
+  font-size: var(--merchant-address-font-size);
   line-height: calc(22 / 16);
   letter-spacing: var(--boxel-lsp-sm);
   max-width: 22ch;
