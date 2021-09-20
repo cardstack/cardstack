@@ -66,8 +66,8 @@
     "lint:types": "tsc",
     "start": "node --loader ts-node/esm src/index.ts",
     "prime": "npm start prime",
-    "test": "PACKAGE=compiler-server NODE_ENV=test mocha ../test-support/bin/run.js",
-    "autotest": "PACKAGE=compiler-server NODE_ENV=test mocha -w --reporter=min -r esm ../test-support/bin/run.js"
+    "test": "mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
+    "autotest": "mocha -w --reporter=min mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000"
   },
   "volta": {
     "extends": "../../package.json"
