@@ -30,12 +30,10 @@ jobs:
             echo "LAYER_1_CHAIN=keth" >> $GITHUB_ENV # set to "eth" when ready to go to real money
             echo "LAYER_2_CHAIN=sokol" >> $GITHUB_ENV # set to "xdai" when ready to go to real money
             echo "HUB_URL=https://hub.cardstack.com" >> $GITHUB_ENV
-            echo "SENTRY_URL_PREFIX=https://app.cardstack.com" >> $GITHUB_ENV
           elif [ "$INPUT_ENVIRONMENT" = "staging" ]; then
             echo "EMBER_DEPLOY_AWS_ACCESS_KEY=${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
             echo "EMBER_DEPLOY_AWS_ACCESS_SECRET=${{ secrets.STAGING_EMBER_DEPLOY_AWS_ACCESS_SECRET }}" >> $GITHUB_ENV
             echo "HUB_URL=https://hub-staging.stack.cards" >> $GITHUB_ENV
-            echo "SENTRY_URL_PREFIX=https://app-staging.stack.cards" >> $GITHUB_ENV
           else
             echo "unrecognized environment"
             exit 1;
@@ -57,7 +55,6 @@ jobs:
         with:
           ref: ${{ github.event.inputs.ref }}
           environment: ${{ github.event.inputs.environment }}
-          sentry_url_prefix: ${{ env.SENTRY_URL_PREFIX }}
 
       - name: Send success notification to Discord
         if: ${{ success() }}
