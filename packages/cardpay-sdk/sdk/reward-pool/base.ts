@@ -157,7 +157,6 @@ export default class RewardPool {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    console.log(tokenAddress);
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
       return await waitUntilTransactionMined(this.layer2Web3, txnHash);
