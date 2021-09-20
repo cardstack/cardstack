@@ -651,6 +651,42 @@
         "--mnemonic",
         "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Add Reward Tokens",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "add-reward-tokens",
+        "0x906B5c2877dEad3c5565b042094d182b7575ADdE",
+        "0x63cbD6f839c54635c73235Fd3d0CC8Cb52B7B127",
+        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "5",
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Get Reward Pool Balance",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "reward-pool-balance",
+        "0x63cbD6f839c54635c73235Fd3d0CC8Cb52B7B127",
+        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
     }
   ]
 }
