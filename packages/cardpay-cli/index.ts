@@ -28,7 +28,7 @@ import {
   priceOracleUpdatedAt as layer2PriceOracleUpdatedAt,
 } from './layer-two-oracle';
 import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
-import { rewardTokenBalances, addRewardTokens, rewardPoolBalance } from './reward-pool.js';
+import { rewardTokenBalances, addRewardTokens, rewardPoolBalance, claimRewards } from './reward-pool.js';
 import { hubAuth } from './hub-auth';
 import {
   getSKUInfo,
@@ -79,7 +79,8 @@ type Commands =
   | 'registerRewardProgram'
   | 'registerRewardee'
   | 'addRewardTokens'
-  | 'rewardPoolBalance';
+  | 'rewardPoolBalance'
+  | 'claimRewards';
 
 let command: Commands | undefined;
 interface Options {
@@ -113,6 +114,8 @@ interface Options {
   prepaidCards?: string[];
   rewardProgramId?: string;
   admin?: string;
+  proof?: string;
+  rewardSafe?: string;
 }
 let {
   network,
@@ -145,6 +148,8 @@ let {
   hubRootUrl,
   rewardProgramId,
   admin,
+  proof,
+  rewardSafe,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -701,6 +706,33 @@ let {
     });
     command = 'rewardPoolBalance';
   })
+  .command(
+    'claim-rewards <rewardSafe> <rewardProgramId> <tokenAddress> <proof> <amount>',
+    'Claim rewards using proof',
+    (yargs) => {
+      yargs.positional('rewardSafe', {
+        type: 'string',
+        description: 'The address of the rewardSafe that  which will receive the rewards',
+      });
+      yargs.positional('rewardProgramId', {
+        type: 'string',
+        description: 'Reward program id',
+      });
+      yargs.positional('tokenAddress', {
+        type: 'string',
+        description: 'The address of the tokens that are being filled in the reward pool',
+      });
+      yargs.positional('proof', {
+        type: 'string',
+        description: 'The proof used to claim reward',
+      });
+      yargs.positional('amount', {
+        type: 'string',
+        description: 'The amount of tokens that are being claimed as rewards (*not* in units of wei, but in eth)',
+      });
+      command = 'claimRewards';
+    }
+  )
   .options({
     network: {
       alias: 'n',
@@ -1018,6 +1050,29 @@ if (!command) {
         return;
       }
       await rewardPoolBalance(network, rewardProgramId, tokenAddress, mnemonic);
+      break;
+    case 'claimRewards':
+      if (rewardSafe == null) {
+        showHelpAndExit('rewardSafe is a required value');
+        return;
+      }
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      if (tokenAddress == null) {
+        showHelpAndExit('tokenAddress is a required value');
+        return;
+      }
+      if (proof == null) {
+        showHelpAndExit('proof is a required value');
+        return;
+      }
+      if (amount == null) {
+        showHelpAndExit('amount is a required value');
+        return;
+      }
+      await claimRewards(network, rewardSafe, rewardProgramId, tokenAddress, proof, amount, mnemonic);
       break;
     default:
       assertNever(command);

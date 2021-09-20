@@ -52,6 +52,12 @@ export default class RewardPool {
       .call();
   }
 
+  async getBalanceForPool(tokenAddress: string): Promise<string> {
+    let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
+    const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+    return await tokenContract.methods.balanceOf(rewardPoolAddress).call();
+  }
+
   async rewardTokensAvailable(address: string, rewardProgramId?: string): Promise<string[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url =
@@ -204,6 +210,111 @@ export default class RewardPool {
       this.layer2Web3,
       safeAddress,
       tokenAddress,
+      payload,
+      estimate,
+      nonce,
+      await signSafeTx(this.layer2Web3, safeAddress, tokenAddress, payload, estimate, nonce, from)
+    );
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(gnosisTxn.ethereumTx.txHash);
+    }
+    return await waitUntilTransactionMined(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+  }
+
+  async claimRewards(txnHash: string): Promise<TransactionReceipt>;
+  async claimRewards(
+    safeAddress: string,
+    rewardProgramId: string,
+    tokenAddress: string,
+    proof: string,
+    amount: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async claimRewards(
+    safeAddressOrTxnHash: string,
+    rewardProgramId?: string,
+    tokenAddress?: string,
+    proof?: string,
+    amount?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt> {
+    if (isTransactionHash(safeAddressOrTxnHash)) {
+      let txnHash = safeAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    let safeAddress = safeAddressOrTxnHash;
+    if (!rewardProgramId) {
+      throw new Error('rewardProgramId must be provided');
+    }
+    if (!tokenAddress) {
+      throw new Error('tokenAddress must be provided');
+    }
+    if (!proof) {
+      throw new Error('proof must be provided');
+    }
+    if (!amount) {
+      throw new Error('amount must be provided');
+    }
+
+    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
+
+    if (!(await rewardManager.isRewardProgram(rewardProgramId))) {
+      throw new Error('reward program does not exist');
+    }
+
+    let rewardSafeOwner = await rewardManager.getRewardSafeOwner(safeAddress);
+    let isValidSafe = await rewardManager.isValidSafe(rewardProgramId, safeAddress);
+    let unclaimedRewards = await this.getBalanceForProof(rewardProgramId, tokenAddress, rewardSafeOwner, proof);
+    let rewardPoolBalance = await this.getBalanceForPool(tokenAddress);
+    let rewardPoolBalanceForRewardProgram = await this.balance(rewardProgramId, tokenAddress);
+    let rewardPool = await this.getRewardPool();
+    let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
+
+    console.log('rewardSafeOwner', rewardSafeOwner);
+    console.log('how many tokens in reward pool', rewardPoolBalance);
+    console.log('how many tokens in reward pool for reward program', rewardPoolBalanceForRewardProgram);
+    console.log('unclaimedRewardsForProof', unclaimedRewards);
+    console.log('isValidSafe', isValidSafe);
+
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+    // let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], tokenAddress);
+    // let symbol = await token.methods.symbol().call();
+    // let balance = new BN(toWei(await token.methods.balanceOf(safeAddress).call()));
+    let weiAmount = new BN(toWei(amount));
+    // if (balance.lt(weiAmount)) {
+    //   throw new Error(
+    //     `Safe does not have enough balance add reward tokens. The reward token ${tokenAddress} balance of the safe ${safeAddress} is ${fromWei(
+    //       balance
+    //     )}, the total amount necessary to add reward tokens is ${fromWei(weiAmount)} ${symbol} + a small amount for gas`
+    //   );
+    // }
+    let selector = this.layer2Web3.eth.abi.encodeFunctionSignature('claim(address,address,uint256,bytes)');
+    console.log('selector', selector);
+
+    let payload = rewardPool.methods
+      .claim(
+        rewardProgramId,
+        tokenAddress,
+        weiAmount, //maybe in wei
+        proof
+      )
+      .encodeABI();
+    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, tokenAddress);
+
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+    }
+    let gnosisTxn = await executeTransaction(
+      this.layer2Web3,
+      safeAddress,
+      rewardPoolAddress,
       payload,
       estimate,
       nonce,

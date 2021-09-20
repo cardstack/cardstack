@@ -716,6 +716,29 @@
         "--mnemonic",
         "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Claim Rewards",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "claim-rewards",
+        "0xcea910FDcEceC682006CB0e91e75949284f0D6d5",
+        // "0xcfE8a7eEeFa2182a91a86dB3C08ff6229899A50B",
+        "0x4767D0D74356433d54880Fcd7f083751d64388aF", //default reward program id
+        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "0x00000000000000000000000000000000000000000000000000000000000000070000000000000000000000000000000000000000000000008ac7230489e8000038d8364fd90c6fe4c173c43be4a3af9e6b5dbb5d1bbf274f6fdcbe708d3041a62cb33d9443df563fff4bdfb119441a6ee8698b95edf78603c6b147956583c227fd9220f4b8b859d97be53f95aaf98dd93edfb89fa1a29ac9e058fffb28b81a86a8ea21bbbc450006c0e70452a3ee1e6f53962326dc4f35110fe711a2316d4afccb418ed842883476763fbab5a52be637314eab67d75edebf1f1f6e8c8bc2e7510a29027328e9dc45212d1b7a229db656b5ebe9878243c17e4075f2231706ae2d",
+        // "0x00000000000000000000000000000000000000000000000000000000000000070000000000000000000000000000000000000000000000008ac7230489e80000ded2d0791a20d9d7fa1c9aa2ca7fec46f27cfcea42ce1d151f33e6e9cdd52f8b8ec7fea33ce953aa1933e444f8d4862a2878b08cd14862c9d5f928c5292b4811e04490b4c7bf89e4d50417d8ba6f982f6c7323a550c07e57e38feb0ce08d5d5bcc13be6aef2c87b9ddffe4e5dc827260850a398512deaccb11c0f3515c6ea9c373e766e12b90202a8e6ce04264fb355a8f8a37960eb86c09a8710ffb5e23356c", //proof
+        "2", //amount in eth
+        "--network",
+        "sokol",
+        "--mnemonic",
+        // "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
     }
   ]
 }

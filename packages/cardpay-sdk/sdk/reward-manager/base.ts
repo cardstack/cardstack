@@ -21,6 +21,10 @@ export default class RewardManager {
     return (await this.getRewardManager()).methods.isRewardProgram(rewardProgramId).call();
   }
 
+  async isValidSafe(rewardProgramId: string, rewardSafe: string): Promise<boolean> {
+    return (await this.getRewardManager()).methods.isValidRewardSafe(rewardSafe, rewardProgramId).call();
+  }
+
   async newRewardProgramId(): Promise<string> {
     let rewardProgramIdExists: boolean;
     let rewardProgramId: string;
@@ -29,6 +33,10 @@ export default class RewardManager {
       rewardProgramIdExists = await this.isRewardProgram(rewardProgramId);
     } while (rewardProgramIdExists);
     return rewardProgramId;
+  }
+
+  async getRewardSafeOwner(rewardSafeAddress: string): Promise<string> {
+    return await (await this.getRewardManager()).methods.getRewardSafeOwner(rewardSafeAddress).call();
   }
 
   private async getRewardManager(): Promise<Contract> {
