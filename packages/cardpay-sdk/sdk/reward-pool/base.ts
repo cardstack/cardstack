@@ -175,15 +175,15 @@ export default class RewardPool {
 
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
 
-    if (await rewardManager.isRewardProgram(rewardProgramId)) {
+    if (!(await rewardManager.isRewardProgram(rewardProgramId))) {
       throw new Error('reward program does not exist');
     }
 
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], tokenAddress);
     let symbol = await token.methods.symbol().call();
-    let balance = new BN(await token.methods.balanceOf(safeAddress).call());
-    let weiAmount = new BN(amount);
+    let balance = new BN(toWei(await token.methods.balanceOf(safeAddress).call()));
+    let weiAmount = new BN(toWei(amount));
     if (balance.lt(weiAmount)) {
       throw new Error(
         `Safe does not have enough balance add reward tokens. The reward token ${tokenAddress} balance of the safe ${safeAddress} is ${fromWei(
