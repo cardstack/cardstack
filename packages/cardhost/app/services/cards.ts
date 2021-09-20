@@ -182,7 +182,16 @@ export default class Cards extends Service {
       // module was built by webpack, use webpack's implementation of `await
       // import()`
       moduleIdentifier = moduleIdentifier.replace('@cardstack/core/src/', '');
-      return await import(`@cardstack/core/src/${moduleIdentifier}`);
+
+      // the webpackInclude is necessary because sometimes @cardstack/core has
+      // already been pre-built (for consumption in node) and has .js, .d.ts,
+      // and .js.map files on disk, all of which would potentially match this
+      // wildcard import. We want the .ts only, because that is what embroider
+      // with ember-cli-typescript prioritizes in every other import from core.
+      return await import(
+        /* webpackInclude: /(?<!\.d)\.ts$/ */
+        `@cardstack/core/src/${moduleIdentifier}`
+      );
     } else if (
       moduleIdentifier.startsWith('@cardstack/local-realm-compiled/')
     ) {
