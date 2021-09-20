@@ -6,10 +6,6 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 import { ADDRESS_RAW_CARD, PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 
-import chai, { expect } from 'chai';
-import customAssertions from '@cardstack/core/tests/helpers/assertions';
-chai.use(customAssertions);
-
 describe('Babel CardTemplatePlugin', function () {
   let builder: TestBuilder;
   let options: CardTemplateOptions;

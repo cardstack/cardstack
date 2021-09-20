@@ -3,10 +3,6 @@ import transform, { Options } from '@cardstack/core/src/glimmer-plugin-card-temp
 import { TestBuilder } from '../helpers/test-builder';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
-import chai, { expect } from 'chai';
-import customAssertions from '@cardstack/core/tests/helpers/assertions';
-chai.use(customAssertions);
-
 function importAndChooseName() {
   return 'BestGuess';
 }

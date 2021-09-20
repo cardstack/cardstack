@@ -2,10 +2,6 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 import { TestBuilder } from '../helpers/test-builder';
 import { baseCardURL } from '@cardstack/core/src/compiler';
 
-import chai, { expect } from 'chai';
-import customAssertions from '@cardstack/core/tests/helpers/assertions';
-chai.use(customAssertions);
-
 const PERSON_CARD = {
   url: 'https://cardstack.local/cards/person',
   schema: 'schema.js',

@@ -1,8 +1,8 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import hasStatus from './has-status';
+import customAssertions from './custom-assertions';
 
-chai.use(hasStatus);
+chai.use(customAssertions);
 chai.use(chaiAsPromised);
 
 if (!(process as any).__didSetCardstackWarning) {
