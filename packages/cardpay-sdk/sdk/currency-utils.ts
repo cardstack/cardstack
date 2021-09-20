@@ -164,6 +164,26 @@ export const handleSignificantDecimalsWithThreshold = (
   return lessThan(result, threshold) ? `< ${threshold}` : result;
 };
 
+export const roundAmountToNativeCurrencyDecimals = (
+  value: BigNumberish,
+  currency: string,
+  roundingMode = BigNumber.ROUND_UP
+): string => {
+  if (!isSupportedCurrency(currency)) {
+    throw new Error(`Unknown currency ${currency}`);
+  }
+
+  let bnValue = new BigNumber(value);
+
+  if (bnValue.isNaN()) {
+    throw new Error(`Unable to convert ${value} to BigNumber`);
+  }
+
+  let { decimals } = get(supportedNativeCurrencies, currency);
+
+  return bnValue.dp(decimals, roundingMode).toString();
+};
+
 export const handleSignificantDecimals = (value: BigNumberish, decimals: number, buffer = 3): string => {
   if (lessThan(new BigNumber(value).abs(), 1)) {
     decimals = new BigNumber(value).toFixed().slice(2).search(/[^0]/g) + buffer;
@@ -294,6 +314,9 @@ export const spendToUsd = (amountInSpend: number): number | undefined => {
   return amountInSpend * SPEND_TO_USD_RATE;
 };
 
+/**
+ * Converts USD to SPEND. The amount is rounded up to the nearest integer
+ */
 export const usdToSpend = (amountInUsd: number): number | undefined => {
   if ((amountInUsd as unknown) === '') {
     return 0;
@@ -302,7 +325,7 @@ export const usdToSpend = (amountInUsd: number): number | undefined => {
     return undefined;
   }
 
-  return amountInUsd / SPEND_TO_USD_RATE;
+  return Math.ceil(amountInUsd / SPEND_TO_USD_RATE);
 };
 
 export interface FormatUsdOptions {

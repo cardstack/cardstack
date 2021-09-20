@@ -3,8 +3,8 @@
 <div class="merchant-payment-request-page">
   <CardPay::MerchantPaymentRequestHeader/>
   <CardPay::MerchantPaymentRequestCard
-    @amount={{this.displayedAmounts.SPD}}
-    @usdAmount={{this.displayedAmounts.USD}}
+    @amount={{this.cleanedAmounts.displayed.amount}}
+    @secondaryAmount={{this.cleanedAmounts.displayed.secondaryAmount}}
     @merchant={{this.merchantInfo}}
     @merchantAddress={{@model.merchantSafe.address}}
     @paymentURL={{this.paymentURL}}

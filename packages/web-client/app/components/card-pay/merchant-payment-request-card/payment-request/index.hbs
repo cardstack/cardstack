@@ -37,10 +37,12 @@
 
     {{#if @amount}}
       <div class="payment-request__amount" data-test-payment-request-amount>
-        §{{@amount}}
+        {{@amount}}
       </div>
-      <div class="payment-request__usd-amount" data-test-payment-request-usd-amount>
-        {{format-usd @usdAmount}}
+    {{/if}}
+    {{#if (and @amount @secondaryAmount)}}
+      <div class="payment-request__secondary-amount" data-test-payment-request-secondary-amount>
+        {{@secondaryAmount}}
       </div>
     {{/if}}
 

@@ -89,7 +89,7 @@
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.payment-request__usd-amount {
+.payment-request__secondary-amount {
   color: var(--boxel-purple-400);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-lg);
