@@ -13,7 +13,6 @@
     "@octokit/openapi-types": "^9.4.0",
     "@octokit/rest": "^18.7.1",
     "discord.js": "^12.5.3",
-    "dotenv": "^10.0.0",
-    "esm": "^3.2.25"
+    "dotenv": "^10.0.0"
   }
 }

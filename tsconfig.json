@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "module": "es6",
-    "moduleResolution": "Node",
+    "module": "commonjs",
     "declaration": true,
     "typeRoots": ["node_modules/@types", "types"],
     "esModuleInterop": true,
@@ -27,11 +26,5 @@
     "./packages/test-support/**/*.ts",
     "**/.eslintrc.ts"
   ],
-  "exclude": [
-    "./packages/*/dist",
-    "./packages/*/tmp",
-    "./packages/*/node_modules",
-    "node_modules",
-    "tmp"
-  ]
+  "exclude": ["./packages/*/dist", "./packages/*/tmp", "./packages/*/node_modules", "node_modules", "tmp"]
 }

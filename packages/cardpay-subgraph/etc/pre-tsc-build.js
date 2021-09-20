@@ -1,9 +1,9 @@
-/* global __dirname, process, console */
-/* eslint @typescript-eslint/explicit-module-boundary-types: "off" */
+/* global __dirname, process, console, require, exports */
+/* eslint @typescript-eslint/explicit-module-boundary-types: "off", @typescript-eslint/no-var-requires: "off" */
 
-import { writeFileSync, readFileSync } from 'fs-extra';
-import { join, resolve } from 'path';
-import { sync as glob } from 'glob';
+const { writeFileSync, readFileSync } = require('fs-extra');
+const { join, resolve } = require('path');
+const { sync: glob } = require('glob');
 
 const generatedDir = resolve(join(__dirname, '..', 'generated'));
 const graphProtocolNodeModules = resolve(join(__dirname, '..', 'node_modules', '@graphprotocol'));
@@ -17,7 +17,8 @@ for (let filePath of generatedFiles) {
   addFilePreamble(filePath, noCheck);
 }
 
-export function addFilePreamble(filePath, value) {
+exports.addFilePreamble = addFilePreamble;
+function addFilePreamble(filePath, value) {
   let file = readFileSync(filePath, { encoding: 'utf8' });
   if (!file.startsWith(value)) {
     writeFileSync(
