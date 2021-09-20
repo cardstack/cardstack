@@ -164,6 +164,26 @@ export const handleSignificantDecimalsWithThreshold = (
   return lessThan(result, threshold) ? `< ${threshold}` : result;
 };
 
+export const roundAmountToNativeCurrencyDecimals = (
+  value: BigNumberish,
+  currency: string,
+  roundingMode = BigNumber.ROUND_UP
+): string => {
+  if (!isSupportedCurrency(currency)) {
+    throw new Error(`Unknown currency ${currency}`);
+  }
+
+  let bnValue = new BigNumber(value);
+
+  if (bnValue.isNaN()) {
+    throw new Error(`Unable to convert ${value} to BigNumber`);
+  }
+
+  let { decimals } = get(supportedNativeCurrencies, currency);
+
+  return bnValue.dp(decimals, roundingMode).toString();
+};
+
 export const handleSignificantDecimals = (value: BigNumberish, decimals: number, buffer = 3): string => {
   if (lessThan(new BigNumber(value).abs(), 1)) {
     decimals = new BigNumber(value).toFixed().slice(2).search(/[^0]/g) + buffer;
