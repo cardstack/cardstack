@@ -19,7 +19,11 @@ import {
 } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
-import { PrepaidCardSafe, TransactionOptions } from '@cardstack/cardpay-sdk';
+import {
+  MerchantSafe,
+  PrepaidCardSafe,
+  TransactionOptions,
+} from '@cardstack/cardpay-sdk';
 import BN from 'bn.js';
 
 interface CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs {
@@ -128,7 +132,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         const txnHash = workflowSession.state.txnHash;
         this.chinInProgressMessage = 'Processing transaction…';
 
-        const merchantSafe = yield taskFor(
+        const merchantSafe: MerchantSafe = yield taskFor(
           this.layer2Network.resumeRegisterMerchantTransactionTask
         ).perform(txnHash);
 
