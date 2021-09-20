@@ -294,6 +294,9 @@ export const spendToUsd = (amountInSpend: number): number | undefined => {
   return amountInSpend * SPEND_TO_USD_RATE;
 };
 
+/**
+ * Converts USD to SPEND. The amount is rounded up to the nearest integer
+ */
 export const usdToSpend = (amountInUsd: number): number | undefined => {
   if ((amountInUsd as unknown) === '') {
     return 0;
@@ -302,7 +305,7 @@ export const usdToSpend = (amountInUsd: number): number | undefined => {
     return undefined;
   }
 
-  return amountInUsd / SPEND_TO_USD_RATE;
+  return Math.ceil(amountInUsd / SPEND_TO_USD_RATE);
 };
 
 export interface FormatUsdOptions {
