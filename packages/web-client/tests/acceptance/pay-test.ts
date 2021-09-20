@@ -6,9 +6,11 @@ import sinon from 'sinon';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import {
+  convertAmountToNativeDisplay,
   formatUsd,
   generateMerchantPaymentUrl,
   MerchantSafe,
+  roundAmountToNativeCurrencyDecimals,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
 import { getResolver } from '@cardstack/did-resolver';
@@ -24,7 +26,7 @@ const MERCHANT_INFO_MISSING_MESSAGE =
 const MERCHANT_MISSING_MESSAGE = '[data-test-merchant-missing]';
 const MERCHANT_LOGO = '[data-test-merchant-logo]';
 const AMOUNT = '[data-test-payment-request-amount]';
-const USD_AMOUNT = '[data-test-payment-request-usd-amount]';
+const SECONDARY_AMOUNT = '[data-test-payment-request-secondary-amount]';
 const QR_CODE = '[data-test-styled-qr-code]';
 const DEEP_LINK = '[data-test-payment-request-deep-link]';
 const PAYMENT_URL = '[data-test-payment-request-url]';
@@ -109,7 +111,7 @@ module('Acceptance | pay', function (hooks) {
       );
     assert.dom(AMOUNT).containsText(`§${spendAmount}`);
     assert
-      .dom(USD_AMOUNT)
+      .dom(SECONDARY_AMOUNT)
       .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
 
     let expectedUrl = generateMerchantPaymentUrl({
@@ -118,6 +120,43 @@ module('Acceptance | pay', function (hooks) {
       merchantSafeID: merchantSafe.address,
       currency: spendSymbol,
       amount: spendAmount,
+    });
+    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
+  });
+
+  test('it rounds display but not url with floating point SPD', async function (assert) {
+    const floatingSpendAmount = 279.17;
+    const roundedSpendAmount = Math.ceil(floatingSpendAmount);
+    await visit(
+      `/pay/${network}/${merchantSafe.address}?amount=${floatingSpendAmount}&currency=${spendSymbol}`
+    );
+    await waitFor(MERCHANT);
+
+    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert
+      .dom(MERCHANT_LOGO)
+      .hasAttribute(
+        'data-test-merchant-logo-background',
+        merchantInfoBackground
+      );
+    assert
+      .dom(MERCHANT_LOGO)
+      .hasAttribute(
+        'data-test-merchant-logo-text-color',
+        merchantInfoTextColor
+      );
+    assert.dom(AMOUNT).containsText(`§${roundedSpendAmount}`);
+    assert
+      .dom(SECONDARY_AMOUNT)
+      .containsText(`${formatUsd(spendToUsd(roundedSpendAmount)!)}`);
+
+    let expectedUrl = generateMerchantPaymentUrl({
+      domain: universalLinkDomain,
+      network,
+      merchantSafeID: merchantSafe.address,
+      currency: spendSymbol,
+      amount: roundedSpendAmount,
     });
     assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
@@ -145,7 +184,7 @@ module('Acceptance | pay', function (hooks) {
       );
     assert.dom(AMOUNT).containsText(`§${spendAmount}`);
     assert
-      .dom(USD_AMOUNT)
+      .dom(SECONDARY_AMOUNT)
       .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
@@ -177,16 +216,57 @@ module('Acceptance | pay', function (hooks) {
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
       );
-    assert.dom(AMOUNT).containsText(`§${spendAmount}`);
-    assert
-      .dom(USD_AMOUNT)
-      .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
+    assert.dom(AMOUNT).containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
+    assert.dom(SECONDARY_AMOUNT).containsText(`§${spendAmount}`);
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
       network,
       merchantSafeID: merchantSafe.address,
       currency: usdSymbol,
       amount: usdAmount,
+    });
+    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
+  });
+
+  test('it renders correctly if currency is non-USD and non-SPEND', async function (assert) {
+    const jpyAmount = 300.335;
+    const jpySymbol = 'JPY';
+    const roundedJpyAmount = roundAmountToNativeCurrencyDecimals(
+      jpyAmount,
+      jpySymbol
+    );
+
+    await visit(
+      `/pay/${network}/${merchantSafe.address}?amount=${jpyAmount}&currency=${jpySymbol}`
+    );
+    await waitFor(MERCHANT);
+
+    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert
+      .dom(MERCHANT_LOGO)
+      .hasAttribute(
+        'data-test-merchant-logo-background',
+        merchantInfoBackground
+      );
+    assert
+      .dom(MERCHANT_LOGO)
+      .hasAttribute(
+        'data-test-merchant-logo-text-color',
+        merchantInfoTextColor
+      );
+
+    assert
+      .dom(AMOUNT)
+      .containsText(convertAmountToNativeDisplay(roundedJpyAmount, jpySymbol));
+    assert.dom(SECONDARY_AMOUNT).doesNotExist();
+
+    let expectedUrl = generateMerchantPaymentUrl({
+      domain: universalLinkDomain,
+      network,
+      merchantSafeID: merchantSafe.address,
+      currency: jpySymbol,
+      amount: Number(roundedJpyAmount),
     });
     assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
@@ -213,7 +293,7 @@ module('Acceptance | pay', function (hooks) {
       );
 
     assert.dom(AMOUNT).doesNotExist();
-    assert.dom(USD_AMOUNT).doesNotExist();
+    assert.dom(SECONDARY_AMOUNT).doesNotExist();
 
     // we just pass this currency to the wallet to handle without
     // displaying the amounts if we don't recognize the currency
@@ -250,7 +330,7 @@ module('Acceptance | pay', function (hooks) {
       );
 
     assert.dom(AMOUNT).doesNotExist();
-    assert.dom(USD_AMOUNT).doesNotExist();
+    assert.dom(SECONDARY_AMOUNT).doesNotExist();
 
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
@@ -288,7 +368,7 @@ module('Acceptance | pay', function (hooks) {
 
     assert.dom(AMOUNT).containsText(`§${spendAmount}`);
     assert
-      .dom(USD_AMOUNT)
+      .dom(SECONDARY_AMOUNT)
       .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
 
     // assert that the deep link view is rendered
@@ -333,7 +413,7 @@ module('Acceptance | pay', function (hooks) {
       );
     assert.dom(AMOUNT).containsText(`§${spendAmount}`);
     assert
-      .dom(USD_AMOUNT)
+      .dom(SECONDARY_AMOUNT)
       .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
 
     let expectedUrl = generateMerchantPaymentUrl({

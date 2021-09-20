@@ -1,4 +1,10 @@
-import { generateMerchantPaymentUrl, spendToUsd } from '@cardstack/cardpay-sdk';
+import {
+  convertAmountToNativeDisplay,
+  roundAmountToNativeCurrencyDecimals,
+  generateMerchantPaymentUrl,
+  isSupportedCurrency,
+  spendToUsd,
+} from '@cardstack/cardpay-sdk';
 import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
 import { usdToSpend } from '@cardstack/cardpay-sdk';
@@ -20,32 +26,67 @@ export default class CardPayMerchantServicesController extends Controller {
   get canDeepLink() {
     return this.isIOSService.isIOS();
   }
-  get displayedAmounts() {
-    // TODO: add rounding based on currency decimal limits
+  get cleanedAmounts() {
     if (!this.isValidAmount) {
       return {
-        SPD: null,
-        USD: null,
+        amount: 0,
+        displayed: {
+          amount: '',
+          secondaryAmount: '',
+        },
+      };
+    } else if (
+      !(isSupportedCurrency(this.currency) || this.currency === 'SPD') ||
+      this.currency === 'DAI' ||
+      this.currency === 'CARD' ||
+      this.currency === 'ETH'
+    ) {
+      return {
+        amount: this.amount,
+        displayed: {
+          amount: '',
+          secondaryAmount: '',
+        },
       };
     } else if (this.currency === 'SPD') {
+      let amount = Math.ceil(this.amount);
       return {
-        SPD: this.amount,
-        USD: spendToUsd(this.amount),
+        amount,
+        displayed: {
+          amount: `§${amount}`,
+          secondaryAmount: convertAmountToNativeDisplay(
+            spendToUsd(amount)!,
+            'USD'
+          ),
+        },
       };
     } else if (this.currency === 'USD') {
+      let amount = Number(
+        roundAmountToNativeCurrencyDecimals(this.amount, 'USD')
+      );
       return {
-        SPD: usdToSpend(this.amount),
-        USD: this.amount,
+        amount,
+        displayed: {
+          amount: convertAmountToNativeDisplay(amount, 'USD'),
+          secondaryAmount: `§${usdToSpend(Number(amount))}`,
+        },
       };
     } else {
+      let amount = Number(
+        roundAmountToNativeCurrencyDecimals(this.amount, this.currency)
+      );
       return {
-        SPD: null,
-        USD: null,
+        amount,
+        displayed: {
+          amount: convertAmountToNativeDisplay(amount, this.currency),
+          secondaryAmount: '',
+        },
       };
     }
   }
+
   get isValidAmount() {
-    return !isNaN(this.amount) && this.amount > 0;
+    return !isNaN(this.amount) && this.amount > 0 && this.amount !== Infinity;
   }
 
   // This is necessary because iOS respects users' decisions to visit your site
@@ -57,7 +98,7 @@ export default class CardPayMerchantServicesController extends Controller {
       network: this.model.network,
       merchantSafeID: this.model.merchantSafe.address,
       currency: this.currency,
-      amount: this.isValidAmount ? this.amount : 0,
+      amount: this.cleanedAmounts.amount,
     });
   }
 
@@ -67,7 +108,7 @@ export default class CardPayMerchantServicesController extends Controller {
       network: this.model.network,
       merchantSafeID: this.model.merchantSafe.address,
       currency: this.currency,
-      amount: this.isValidAmount ? this.amount : 0,
+      amount: this.cleanedAmounts.amount,
     });
   }
 }
