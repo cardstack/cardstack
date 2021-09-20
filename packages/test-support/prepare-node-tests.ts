@@ -19,6 +19,4 @@ logger.configure({
   defaultLevel: 'warn',
 });
 
-export default function () {
-  (global as any).expect = chai.expect;
-}
+(global as any).expect = chai.expect;

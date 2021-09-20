@@ -19,7 +19,7 @@
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
       "env": {
-        "SERVER_SECRET":"",
+        "SERVER_SECRET": "",
         "WYRE_ACCOUNT_ID": "",
         "WYRE_API_KEY": "",
         "WYRE_SECRET_KEY": ""
@@ -35,21 +35,14 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Node tests",
+      "name": "Hub Node tests",
       "program": "${workspaceRoot}/node_modules/.bin/_mocha",
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
       "env": {
-        "PACKAGE": "hub",
         "NODE_ENV": "test"
       },
-      "args": [
-        "-r",
-        "esm",
-        "../test-support/bin/run.js",
-        "--timeout",
-        "600000"
-      ]
+      "args": ["-r", "@cardstack/test-support/prepare-node-tests", "node-tests/**/*-test.js", "--timeout", "600000"]
     },
     {
       "type": "node",

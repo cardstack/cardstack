@@ -1,8 +1,9 @@
-/* global __dirname, process, console */
+/* global __dirname, process, console, require, exports */
+/* eslint @typescript-eslint/no-var-requires: "off" */
 
-import { writeJSONSync, writeFileSync, readFileSync, removeSync, existsSync, ensureDirSync } from 'fs-extra';
-import { join, resolve } from 'path';
-import { addFilePreamble } from './pre-tsc-build-entrypoint';
+const { writeJSONSync, writeFileSync, readFileSync, removeSync, existsSync, ensureDirSync } = require('fs-extra');
+const { join, resolve } = require('path');
+const { addFilePreamble } = require('./pre-tsc-build');
 
 // This file runs before tsc compiles the rest of the mono repo so we need to
 // get creative about how we load our data
