@@ -96,7 +96,7 @@
 }
 
 .payment-request__url {
-  max-width: 50ch;
+  max-width: 18.75rem;
   font: var(--boxel-font-sm);
   color: var(--boxel-purple-500);
   letter-spacing: var(--boxel-lsp-xs);
