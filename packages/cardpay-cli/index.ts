@@ -681,7 +681,7 @@ let {
       });
       yargs.positional('tokenAddress', {
         type: 'string',
-        description: 'The address of the tokens that are being claimed as revenue',
+        description: 'The address of the tokens that are being claimed as rewards',
       });
       yargs.positional('amount', {
         type: 'string',
@@ -697,7 +697,7 @@ let {
     });
     yargs.positional('tokenAddress', {
       type: 'string',
-      description: 'The address of the tokens that are being claimed as revenue',
+      description: 'The address of the tokens that are being filled in the reward pool',
     });
     command = 'rewardPoolBalance';
   })
