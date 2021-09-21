@@ -65,7 +65,7 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
 
     assert.dom('[data-test-balance="ETH"]').containsText('2.1411');
     assert.dom('[data-test-balance="DAI"]').containsText('0.50');
-    assert.dom('[data-test-balance="CARD"]').containsText('10000.00');
+    assert.dom('[data-test-balance="CARD"]').containsText('10,000.00');
 
     layer1Service.test__simulateBalances({
       defaultToken: new BN('0'),
@@ -79,7 +79,7 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
 
     assert.dom('[data-test-balance="ETH"]').doesNotExist();
     assert.dom('[data-test-balance="DAI"]').doesNotExist();
-    assert.dom('[data-test-balance="CARD"]').containsText('10000.00');
+    assert.dom('[data-test-balance="CARD"]').containsText('10,000.00');
 
     layer1Service.test__simulateBalances({
       defaultToken: new BN('0'),

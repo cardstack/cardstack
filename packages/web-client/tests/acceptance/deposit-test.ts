@@ -82,7 +82,7 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor(`${post} [data-test-balance="ETH"]`);
     assert.dom(`${post} [data-test-balance="ETH"]`).containsText('2.1411');
     assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.50');
-    assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10000.00');
+    assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10,000.00');
 
     await settled();
 
@@ -320,7 +320,7 @@ module('Acceptance | deposit', function (hooks) {
       .containsText('0.50');
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD"]`)
-      .containsText('10000.00');
+      .containsText('10,000.00');
 
     let milestoneCtaButtonCount = Array.from(
       document.querySelectorAll(
