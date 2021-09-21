@@ -74,38 +74,43 @@ module('Acceptance | persistence view and restore', function () {
     });
 
     test('it lists persisted workflows', async function (this: Context, assert) {
-      for (let i = 0; i < 4; i++) {
-        workflowPersistenceService.persistData(`persisted-${i}`, {
-          name: `Prepaid Card Issuance ${i}`,
+      workflowPersistenceService.persistData('persisted-merchant-creation', {
+        name: 'MERCHANT_CREATION',
+        state: {
+          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+        },
+      });
+
+      workflowPersistenceService.persistData(
+        'persisted-prepaid-card-issuance',
+        {
+          name: `PREPAID_CARD_ISSUANCE`,
           state: {
-            name: 'PREPAID_CARD_ISSUANCE',
-            state: {
-              completedCardNames: [
-                'LAYER2_CONNECT',
-                'HUB_AUTH',
-                'LAYOUT_CUSTOMIZATION',
-                'FUNDING_SOURCE',
-              ].slice(0, i),
-              completedMilestonesCount: 1,
-              milestonesCount: 4,
-            },
+            completedCardNames: [
+              'LAYER2_CONNECT',
+              'HUB_AUTH',
+              'LAYOUT_CUSTOMIZATION',
+              'FUNDING_SOURCE',
+            ],
+            completedMilestonesCount: 1,
+            milestonesCount: 4,
           },
-        });
-      }
+        }
+      );
 
       await visit('/card-pay/');
-      assert.dom('[data-test-workflow-tracker]').containsText('4');
+      assert.dom('[data-test-workflow-tracker]').containsText('2');
 
       await click('[data-test-workflow-tracker-toggle]');
-      assert.dom('[data-test-active-workflow]').exists({ count: 4 });
+      assert.dom('[data-test-active-workflow]').exists({ count: 2 });
 
       assert
         .dom('[data-test-active-workflow]:nth-child(1)')
-        .containsText('Prepaid card issuance');
+        .containsText('Merchant Creation');
 
       assert
         .dom('[data-test-active-workflow]:nth-child(2)')
-        .containsText('Prepaid card issuance');
+        .containsText('Prepaid Card Issuance');
 
       workflowPersistenceService.clear();
       await settled();

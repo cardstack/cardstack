@@ -8,8 +8,10 @@
 
 {{#if this.showing}}
   <ul>
-    {{#each this.activeWorkflows as |workflow|}}
-      <li data-test-active-workflow>Prepaid card issuance</li>
+    {{#each this.activeWorkflows as |workflowId|}}
+      <li data-test-active-workflow>
+        <CardPay::Header::WorkflowTracker::Item @workflowId={{workflowId}} />
+      </li>
     {{/each}}
   </ul>
 {{/if}}
