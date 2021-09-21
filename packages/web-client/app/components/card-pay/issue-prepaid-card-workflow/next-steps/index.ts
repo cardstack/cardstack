@@ -23,7 +23,7 @@ class CardPayIssuePrepaidCardWorkflowNextStepsComponent extends Component<Workfl
 
   @action returnToDashboard() {
     this.router.transitionTo({
-      queryParams: { flow: null, worklowPersistenceId: null },
+      queryParams: { flow: null, 'flow-id': null },
     });
   }
 }

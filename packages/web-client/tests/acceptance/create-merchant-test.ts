@@ -267,9 +267,13 @@ module('Acceptance | create merchant', function (hooks) {
 
     test('initiating workflow with layer 2 wallet already connected', async function (assert) {
       await visit('/card-pay/merchant-services?flow=create-merchant');
+
+      const flowId = new URL(
+        'http://domain.test/' + currentURL()
+      ).searchParams.get('flow-id');
       assert.equal(
         currentURL(),
-        '/card-pay/merchant-services?flow=create-merchant'
+        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
       );
       assert
         .dom(postableSel(0, 2))
@@ -370,9 +374,13 @@ module('Acceptance | create merchant', function (hooks) {
 
     test('disconnecting Layer 2 after proceeding beyond it', async function (assert) {
       await visit('/card-pay/merchant-services?flow=create-merchant');
+
+      let flowId = new URL(
+        'http://domain.test/' + currentURL()
+      ).searchParams.get('flow-id');
       assert.equal(
         currentURL(),
-        '/card-pay/merchant-services?flow=create-merchant'
+        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
       );
       assert
         .dom(
@@ -399,9 +407,13 @@ module('Acceptance | create merchant', function (hooks) {
       await click(
         '[data-test-workflow-default-cancelation-restart="create-merchant"]'
       );
+
+      flowId = new URL('http://domain.test/' + currentURL()).searchParams.get(
+        'flow-id'
+      );
       assert.equal(
         currentURL(),
-        '/card-pay/merchant-services?flow=create-merchant'
+        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
       );
 
       layer2Service.test__simulateWalletConnectUri();
@@ -418,9 +430,13 @@ module('Acceptance | create merchant', function (hooks) {
 
     test('changing Layer 2 account should cancel the workflow', async function (assert) {
       await visit('/card-pay/merchant-services?flow=create-merchant');
+
+      let flowId = new URL(
+        'http://domain.test/' + currentURL()
+      ).searchParams.get('flow-id');
       assert.equal(
         currentURL(),
-        '/card-pay/merchant-services?flow=create-merchant'
+        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
       );
       assert
         .dom(
@@ -455,9 +471,12 @@ module('Acceptance | create merchant', function (hooks) {
       await click(
         '[data-test-workflow-default-cancelation-restart="create-merchant"]'
       );
+      flowId = new URL('http://domain.test/' + currentURL()).searchParams.get(
+        'flow-id'
+      );
       assert.equal(
         currentURL(),
-        '/card-pay/merchant-services?flow=create-merchant'
+        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
       );
     });
   });

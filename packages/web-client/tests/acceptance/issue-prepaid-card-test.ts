@@ -505,6 +505,14 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     await waitFor(epiloguePostableSel(4));
 
+    let workflowPersistenceService = this.owner.lookup(
+      'service:workflow-persistence'
+    ) as WorkflowPersistence;
+
+    const workflowPersistenceId = new URL(
+      'http://domain.test/' + currentURL()
+    ).searchParams.get('flow-id')!;
+
     assert
       .dom(
         `${epiloguePostableSel(
@@ -520,14 +528,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom('[data-test-workflow-thread]').doesNotExist();
 
     assert.dom('[data-test-prepaid-cards-count]').containsText('2');
-
-    let workflowPersistenceService = this.owner.lookup(
-      'service:workflow-persistence'
-    ) as WorkflowPersistence;
-
-    const workflowPersistenceId = new URL(
-      'http://domain.test/' + currentURL()
-    ).searchParams.get('flow-id')!;
 
     const persistedData = workflowPersistenceService.getPersistedData(
       workflowPersistenceId

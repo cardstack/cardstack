@@ -19,7 +19,11 @@ import {
 } from 'ember-concurrency';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
-import { PrepaidCardSafe, TransactionOptions } from '@cardstack/cardpay-sdk';
+import {
+  MerchantSafe,
+  PrepaidCardSafe,
+  TransactionOptions,
+} from '@cardstack/cardpay-sdk';
 import BN from 'bn.js';
 
 interface CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs {
@@ -40,7 +44,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   @tracked chinInProgressMessage?: string;
   @tracked txnHash?: TransactionHash;
   @tracked createTaskRunningForAWhile = false;
-  @tracked selectedPrepaidCard?: PrepaidCardSafe;
+  @tracked selectedPrepaidCard!: PrepaidCardSafe;
 
   lastNonce?: string;
 
@@ -49,6 +53,24 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
     args: CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs
   ) {
     super(owner, args);
+
+    let { txnHash, prepaidCardChoice } = this.args.workflowSession.state;
+
+    if (txnHash) {
+      this.txnHash = txnHash;
+    }
+
+    if (prepaidCardChoice) {
+      this.selectedPrepaidCard = prepaidCardChoice;
+    }
+  }
+
+  @action checkForPendingTransaction() {
+    let { txnHash, merchantSafe } = this.args.workflowSession.state;
+
+    if (txnHash && !merchantSafe) {
+      this.createMerchant();
+    }
   }
 
   get prepaidCards() {
@@ -82,6 +104,10 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
       this.chinInProgressMessage =
         'You will receive a confirmation request from the Card Wallet app in a few moments…';
 
+      if (!workflowSession.state.prepaidCardChoice) {
+        workflowSession.update('prepaidCardChoice', this.selectedPrepaidCard);
+      }
+
       if (!workflowSession.state.merchantInfo) {
         let persistedMerchantInfo = yield taskFor(
           this.merchantInfo.persistMerchantInfoTask
@@ -95,41 +121,52 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         workflowSession.update('merchantInfo', persistedMerchantInfo);
       }
 
-      let options: TransactionOptions = {
-        onTxnHash: (txnHash: TransactionHash) => {
-          this.txnHash = txnHash;
-          this.chinInProgressMessage = 'Processing transaction…';
-        },
-      };
+      if (
+        workflowSession.state.txnHash &&
+        !workflowSession.state.merchantSafe
+      ) {
+        const txnHash = workflowSession.state.txnHash;
+        this.chinInProgressMessage = 'Processing transaction…';
 
-      if (this.lastNonce) {
-        options.nonce = new BN(this.lastNonce);
+        const merchantSafe: MerchantSafe = yield taskFor(
+          this.layer2Network.resumeRegisterMerchantTransactionTask
+        ).perform(txnHash);
+
+        workflowSession.update('merchantSafe', merchantSafe);
       } else {
-        options.onNonce = (nonce: BN) => {
-          this.lastNonce = nonce.toString();
+        let options: TransactionOptions = {
+          onTxnHash: (txnHash: TransactionHash) => {
+            this.txnHash = txnHash;
+            workflowSession.update('txnHash', txnHash);
+            this.chinInProgressMessage = 'Processing transaction…';
+          },
         };
+
+        if (this.lastNonce) {
+          options.nonce = new BN(this.lastNonce);
+        } else {
+          options.onNonce = (nonce: BN) => {
+            this.lastNonce = nonce.toString();
+          };
+        }
+
+        let registerMerchantTaskInstance = taskFor(
+          this.layer2Network.registerMerchantTask
+        ).perform(
+          this.selectedPrepaidCard.address,
+          workflowSession.state.merchantInfo.did,
+          options
+        );
+
+        let merchantSafe = yield race([
+          registerMerchantTaskInstance,
+          taskFor(this.timerTask).perform(),
+        ]);
+
+        workflowSession.update('merchantSafe', merchantSafe);
+
+        this.createTaskRunningForAWhile = false;
       }
-
-      if (!this.selectedPrepaidCard) {
-        return;
-      }
-
-      let registerMerchantTaskInstance = taskFor(
-        this.layer2Network.registerMerchantTask
-      ).perform(
-        this.selectedPrepaidCard.address,
-        workflowSession.state.merchantInfo.did,
-        options
-      );
-
-      let merchantSafe = yield race([
-        registerMerchantTaskInstance,
-        taskFor(this.timerTask).perform(),
-      ]);
-
-      workflowSession.update('merchantSafe', merchantSafe);
-
-      this.createTaskRunningForAWhile = false;
 
       this.args.onComplete();
     } catch (e) {

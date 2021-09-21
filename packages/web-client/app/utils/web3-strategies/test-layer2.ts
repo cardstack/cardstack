@@ -280,6 +280,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return deferred.promise;
   }
 
+  resumeRegisterMerchantTransaction(_txnHash: string): Promise<MerchantSafe> {
+    return defer<MerchantSafe>().promise;
+  }
+
   authenticate(): Promise<string> {
     this.test__deferredHubAuthentication = defer();
     return this.test__deferredHubAuthentication.promise;

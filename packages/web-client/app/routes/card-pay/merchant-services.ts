@@ -1,4 +1,4 @@
-import Route from '@ember/routing/route';
+import BaseRoute from './base';
 import '../../css/card-pay/merchant-services.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/merchants-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/merchants-summary-hero.svg';
@@ -35,8 +35,9 @@ const MERCHANTS_PANEL = {
   ],
 };
 
-export default class CardPayMerchantServicesRoute extends Route {
-  model() {
+export default class CardPayMerchantServicesRoute extends BaseRoute {
+  model(params: any, transition: any) {
+    super.model(params, transition);
     return {
       panel: MERCHANTS_PANEL,
     };

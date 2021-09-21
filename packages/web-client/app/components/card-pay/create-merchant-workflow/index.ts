@@ -19,17 +19,28 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { taskFor } from 'ember-concurrency-ts';
+import { next } from '@ember/runloop';
+import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
+import RouterService from '@ember/routing/router-service';
+import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
   INSUFFICIENT_PREPAID_CARD_BALANCE: 'INSUFFICIENT_PREPAID_CARD_BALANCE',
   NO_PREPAID_CARD: 'NO_PREPAID_CARD',
+  RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
+  RESTORATION_L2_ADDRESS_CHANGED: 'RESTORATION_L2_ADDRESS_CHANGED',
+  RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
 } as const;
 
 class CreateMerchantWorkflow extends Workflow {
   name = 'MERCHANT_CREATION' as WorkflowName;
+  workflowPersistenceId: string;
+
+  @service declare router: RouterService;
   @service declare layer2Network: Layer2Network;
+  @service declare hubAuthentication: HubAuthentication;
 
   milestones = [
     new Milestone({
@@ -67,6 +78,7 @@ class CreateMerchantWorkflow extends Workflow {
           },
         }),
         new WorkflowCard({
+          cardName: 'LAYER2_CONNECT',
           author: cardbot,
           componentName: 'card-pay/layer-two-connect-card',
           async check() {
@@ -128,6 +140,7 @@ class CreateMerchantWorkflow extends Workflow {
           },
         }),
         new NetworkAwareWorkflowCard({
+          cardName: 'HUB_AUTH',
           author: cardbot,
           componentName: 'card-pay/hub-authentication',
           includeIf(this: NetworkAwareWorkflowCard) {
@@ -139,6 +152,7 @@ class CreateMerchantWorkflow extends Workflow {
           message: 'Let’s create a new merchant account.',
         }),
         new WorkflowCard({
+          cardName: 'MERCHANT_CUSTOMIZATION',
           author: cardbot,
           componentName:
             'card-pay/create-merchant-workflow/merchant-customization',
@@ -159,6 +173,7 @@ class CreateMerchantWorkflow extends Workflow {
           Please select a prepaid card and balance from your ${c.layer2.fullName} wallet`,
         }),
         new WorkflowCard({
+          cardName: 'PREPAID_CARD_CHOICE',
           author: cardbot,
           componentName:
             'card-pay/create-merchant-workflow/prepaid-card-choice',
@@ -173,6 +188,7 @@ class CreateMerchantWorkflow extends Workflow {
       message: `Congratulations! You have created a merchant.`,
     }),
     new WorkflowCard({
+      cardName: 'EPILOGUE_NEXT_STEPS',
       author: cardbot,
       componentName: 'card-pay/create-merchant-workflow/next-steps',
     }),
@@ -257,31 +273,116 @@ class CreateMerchantWorkflow extends Workflow {
         );
       },
     }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but you are no longer authenticated. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_UNAUTHENTICATED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but you changed your Card wallet adress. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but your Card wallet got disconnected. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L2_DISCONNECTED
+        );
+      },
+    }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
         return (
-          this.workflow?.cancelationReason ===
-          FAILURE_REASONS.INSUFFICIENT_PREPAID_CARD_BALANCE
-        );
+          [
+            FAILURE_REASONS.INSUFFICIENT_PREPAID_CARD_BALANCE,
+            FAILURE_REASONS.RESTORATION_UNAUTHENTICATED,
+            FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED,
+            FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
+          ] as String[]
+        ).includes(String(this.workflow?.cancelationReason));
       },
     }),
   ]);
 
   constructor(owner: unknown) {
     super(owner);
+    this.workflowPersistenceId =
+      this.router.currentRoute.queryParams['flow-id']!;
+
     this.attachWorkflow();
+  }
+
+  restorationErrors(persistedState: any) {
+    let { hubAuthentication, layer2Network } = this;
+
+    let errors = [];
+
+    if (!hubAuthentication.isAuthenticated) {
+      errors.push(FAILURE_REASONS.RESTORATION_UNAUTHENTICATED);
+    }
+
+    if (!layer2Network.isConnected) {
+      errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
+    }
+
+    if (
+      layer2Network.isConnected &&
+      persistedState.layer2WalletAddress &&
+      layer2Network.walletInfo.firstAddress !==
+        persistedState.layer2WalletAddress
+    ) {
+      errors.push(FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED);
+    }
+
+    return errors;
   }
 }
 
 class CreateMerchantWorkflowComponent extends Component {
   @service declare layer2Network: Layer2Network;
+  @service declare workflowPersistence: WorkflowPersistence;
+  @service declare router: RouterService;
 
   workflow!: CreateMerchantWorkflow;
+
   constructor(owner: unknown, args: {}) {
     super(owner, args);
-    this.workflow = new CreateMerchantWorkflow(getOwner(this));
+
+    const workflow = new CreateMerchantWorkflow(getOwner(this));
+    const persistedState = workflow.session.getPersistedData()?.state ?? {};
+    const willRestore = Object.keys(persistedState).length > 0;
+
+    if (willRestore) {
+      const errors = workflow.restorationErrors(persistedState);
+
+      if (errors.length > 0) {
+        next(this, () => {
+          workflow.cancel(errors[0]);
+        });
+      } else {
+        workflow.restoreFromPersistedWorkflow();
+      }
+    }
+
+    this.workflow = workflow;
   }
 
   @action onDisconnect() {
