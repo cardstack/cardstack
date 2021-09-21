@@ -2,12 +2,13 @@ import util from 'util';
 import childProcess from 'child_process';
 const exec = util.promisify(childProcess.exec);
 import config from 'config';
+import { Argv } from 'yargs';
 
 export let command = 'init-test';
 export let describe = 'Create the test database using the ENVs config';
 export let builder = {};
 
-export async function handler(/*argv*/) {
+export async function handler(_argv: Argv) {
   const dbConfig = config.get<any>('db');
   let dbUrl = dbConfig.url as string;
   let dbName = dbUrl.split('/').reverse()[0];

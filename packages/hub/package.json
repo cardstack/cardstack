@@ -85,7 +85,7 @@
     "start:server": "yarn hub server",
     "start:worker": "yarn hub worker",
     "console": "node --experimental-repl-await ./bin/hub.js console",
-    "db:setup:local": "createdb hub_development && yarn db:migrate up up && yarn hub db seed && yarn hub db dump && yarn hub db init-test",
+    "db:setup:local": "yarn hub db setup",
     "db:migrate": "node-pg-migrate",
     "db:seed": "yarn hub db seed",
     "db:structure:dump": "yarn hub db dump",
