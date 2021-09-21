@@ -22,8 +22,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
   setupMirage(hooks);
   let workflowPersistenceService: WorkflowPersistence;
 
-  hooks.beforeEach(async function () {
-    (this as any).server.db.loadData({
+  hooks.beforeEach(async function (this: Context) {
+    this.server.db.loadData({
       prepaidCardColorSchemes,
       prepaidCardPatterns,
     });
