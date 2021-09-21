@@ -78,6 +78,8 @@ module('Acceptance | persistence view and restore', function () {
         name: 'MERCHANT_CREATION',
         state: {
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+          completedMilestonesCount: 1,
+          milestonesCount: 3,
         },
       });
 
@@ -98,6 +100,24 @@ module('Acceptance | persistence view and restore', function () {
         }
       );
 
+      workflowPersistenceService.persistData('persisted-complete-issuance', {
+        name: 'PREPAID_CARD_ISSUANCE',
+        state: {
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'HUB_AUTH',
+            'LAYOUT_CUSTOMIZATION',
+            'FUNDING_SOURCE',
+            'FACE_VALUE',
+            'PREVIEW',
+            'CONFIRMATION',
+            'EPILOGUE_LAYER_TWO_CONNECT_CARD',
+          ],
+          completedMilestonesCount: 4,
+          milestonesCount: 4,
+        },
+      });
+
       await visit('/card-pay/');
       assert.dom('[data-test-workflow-tracker]').containsText('2');
 
@@ -111,6 +131,8 @@ module('Acceptance | persistence view and restore', function () {
       assert
         .dom('[data-test-active-workflow]:nth-child(2)')
         .containsText('Prepaid Card Issuance');
+
+      assert.dom('[data-test-completed-workflow]').exists({ count: 1 });
 
       workflowPersistenceService.clear();
       await settled();

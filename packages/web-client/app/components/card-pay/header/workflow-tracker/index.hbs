@@ -7,10 +7,19 @@
 </Boxel::Button>
 
 {{#if this.showing}}
+  Active:
   <ul>
-    {{#each this.activeWorkflows as |workflowId|}}
+    {{#each this.activeWorkflows as |workflow|}}
       <li data-test-active-workflow>
-        <CardPay::Header::WorkflowTracker::Item @workflowId={{workflowId}} />
+        <CardPay::Header::WorkflowTracker::Item @workflow={{workflow}} />
+      </li>
+    {{/each}}
+  </ul>
+  Completed:
+  <ul>
+    {{#each this.completedWorkflows as |workflow|}}
+      <li data-test-completed-workflow>
+        <CardPay::Header::WorkflowTracker::Item @workflow={{workflow}} />
       </li>
     {{/each}}
   </ul>
