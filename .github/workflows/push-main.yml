@@ -102,15 +102,27 @@ jobs:
             hub:
               - 'packages/hub/**'
               - 'packages/did-resolver/**'
+              - '.github/workflows/push-main.yml'
+              - '.github/actions/deploy-hub/**'
+              - 'yarn.lock'
+              - 'waypoint.hcl'
             web_client:
               - 'packages/web-client/**'
               - 'packages/boxel/**'
               - 'packages/cardpay-sdk/**'
               - 'packages/did-resolver/**'
+              - '.github/workflows/push-main.yml'
+              - '.github/actions/deploy-web-client/**'
+              - 'yarn.lock'
             boxel:
               - 'packages/boxel/**'
+              - '.github/workflows/push-main.yml'
+              - 'yarn.lock'
             cardie:
               - 'packages/cardie/**'
+              - '.github/workflows/push-main.yml'
+              - 'yarn.lock'
+              - 'waypoint.hcl'
 
   deploy-hub-staging:
     name: Deploy hub to staging cluster via waypoint
