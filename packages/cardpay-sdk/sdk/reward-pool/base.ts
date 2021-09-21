@@ -221,8 +221,8 @@ export default class RewardPool {
     return await waitUntilTransactionMined(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
   }
 
-  async claimRewards(txnHash: string): Promise<TransactionReceipt>;
-  async claimRewards(
+  async claim(txnHash: string): Promise<TransactionReceipt>;
+  async claim(
     safeAddress: string,
     rewardProgramId: string,
     tokenAddress: string,
@@ -231,7 +231,7 @@ export default class RewardPool {
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
-  async claimRewards(
+  async claim(
     safeAddressOrTxnHash: string,
     rewardProgramId?: string,
     tokenAddress?: string,
