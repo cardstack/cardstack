@@ -1,1 +1,7 @@
 {{this.workflowName}}
+
+<Boxel::ProgressIcon
+  @size="10" {{!-- FIXME but what is the true size --}}
+  @isComplete={{this.isComplete}}
+  @fractionComplete={{this.fractionComplete}}
+/>

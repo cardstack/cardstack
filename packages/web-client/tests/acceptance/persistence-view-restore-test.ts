@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { click, settled, visit } from '@ember/test-helpers';
+import { click, find, settled, visit } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -132,7 +132,26 @@ module('Acceptance | persistence view and restore', function () {
         .dom('[data-test-active-workflow]:nth-child(2)')
         .containsText('Prepaid Card Issuance');
 
+      let progressIconElement = find(
+        '[data-test-active-workflow]:nth-child(2) .boxel-progress-icon'
+      );
+      let progressStyle = progressIconElement
+        ?.querySelector('.boxel-progress-icon__progress-pie')
+        ?.getAttribute('style');
+      let [dashFractionNumerator, dashFractionDenominator] = progressStyle!
+        .split(':')[1]
+        .split(' ');
+      let dashFraction =
+        parseFloat(dashFractionNumerator) / parseFloat(dashFractionDenominator);
+
+      // FIXME move various assertions into component tests
+      assert.equal(dashFraction, 0.25);
+
       assert.dom('[data-test-completed-workflow]').exists({ count: 1 });
+
+      assert
+        .dom('[data-test-completed-workflow] .boxel-progress-icon--completr') // FIXME corrected in #2126
+        .exists();
 
       workflowPersistenceService.clear();
       await settled();
