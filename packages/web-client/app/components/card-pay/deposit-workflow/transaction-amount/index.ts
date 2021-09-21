@@ -20,6 +20,7 @@ import {
 } from '@cardstack/web-client/utils/validation';
 import { bool, reads } from 'macro-decorators';
 import { task, TaskGenerator } from 'ember-concurrency';
+import { next } from '@ember/runloop';
 
 class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
@@ -48,15 +49,17 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     super(owner, args);
     let { depositedAmount } = this.args.workflowSession.state;
 
-    if (depositedAmount) {
-      this.onInputAmount(fromWei(depositedAmount));
-    }
+    next(this, () => {
+      if (depositedAmount) {
+        this.onInputAmount(fromWei(depositedAmount));
+      }
 
-    if (this.relayTokensTxnHash && !this.relayTokensTxnReceipt) {
-      taskFor(this.depositTask).perform();
-    } else if (this.unlockTxnHash && !this.unlockTxnReceipt) {
-      taskFor(this.unlockTask).perform();
-    }
+      if (this.relayTokensTxnHash && !this.relayTokensTxnReceipt) {
+        taskFor(this.depositTask).perform();
+      } else if (this.unlockTxnHash && !this.unlockTxnReceipt) {
+        taskFor(this.unlockTask).perform();
+      }
+    });
   }
 
   get currentTokenDetails(): TokenDisplayInfo<BridgeableSymbol> | undefined {

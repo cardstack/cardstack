@@ -15,7 +15,6 @@ import { taskFor } from 'ember-concurrency-ts';
 import { TaskGenerator } from 'ember-concurrency';
 
 class CardPayDepositWorkflowTransactionStatusComponent extends Component<WorkflowCardComponentArgs> {
-  totalBlockCount: number;
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @reads('args.workflowSession.state.depositSourceToken')
@@ -25,11 +24,15 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
   @reads('args.workflowSession.state.completedLayer2TxnReceipt')
   declare completedLayer2TxnReceipt: TransactionReceipt | undefined;
   @reads('args.workflowSession.state.layer2BlockHeightBeforeBridging')
-  declare layer2BlockHeightBeforeBridging: BN | undefined;
+  declare layer2BlockHeightBeforeBridging: BN;
   @tracked completedStepCount = 1;
   @tracked bridgeError = false;
   @tracked blockCountError = false;
   @tracked blockCount = 0;
+
+  get totalBlockCount(): number {
+    return this.layer1Network.strategy.bridgeConfirmationBlockCount;
+  }
 
   get progressSteps() {
     return [
@@ -47,8 +50,6 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    this.totalBlockCount =
-      this.layer1Network.strategy.bridgeConfirmationBlockCount;
     if (!this.completedLayer2TxnReceipt) {
       taskFor(this.waitForBlockConfirmationsTask)
         .perform()
@@ -88,7 +89,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
   async waitForBridgingToComplete() {
     try {
       let transactionReceipt = await this.layer2Network.awaitBridgedToLayer2(
-        this.layer2BlockHeightBeforeBridging!
+        this.layer2BlockHeightBeforeBridging
       );
       this.layer2Network.refreshSafesAndBalances();
       this.args.workflowSession.update(

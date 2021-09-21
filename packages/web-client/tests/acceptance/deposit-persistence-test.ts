@@ -134,6 +134,85 @@ module('Acceptance | deposit persistence', function (hooks) {
       await settled();
     });
 
+    test('it restores a workflow partway through the layer 2 bridging', async function (this: Context, assert) {
+      const state = {
+        completedCardNames: [
+          'LAYER1_CONNECT',
+          'LAYER2_CONNECT',
+          'TXN_SETUP',
+          'TXN_AMOUNT',
+        ],
+        depositSourceToken: 'DAI',
+        depositedAmount: '1000000000000000000',
+        unlockTxnHash: '0xABC',
+        unlockTxnReceipt: {
+          status: true,
+          transactionHash: '0xABC',
+          transactionIndex: 1,
+          blockHash: '',
+          blockNumber: 1,
+          from: '',
+          to: '',
+          contractAddress: '',
+          cumulativeGasUsed: 1,
+          gasUsed: 1,
+          logs: [],
+          logsBloom: '',
+          events: {},
+        },
+        relayTokensTxnHash: '0xDEF',
+        relayTokensTxnReceipt: {
+          status: true,
+          transactionHash: '0xDEF',
+          transactionIndex: 1,
+          blockHash: '',
+          blockNumber: 1,
+          from: '',
+          to: '',
+          contractAddress: '',
+          cumulativeGasUsed: 1,
+          gasUsed: 1,
+          logs: [],
+          logsBloom: '',
+          events: {},
+        },
+        layer2BlockHeightBeforeBridging: '1234',
+      };
+      workflowPersistenceService.persistData('abc123', {
+        name: 'RESERVE_POOL_DEPOSIT',
+        state,
+      });
+      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      assert.dom('[data-test-milestone="0"]').exists(); // L1
+      assert.dom('[data-test-milestone="1"]').exists(); // L2
+      assert.dom('[data-test-milestone="2"]').exists(); // Deposit
+      assert.dom('[data-test-milestone="3"]').exists(); // Receive
+
+      assert
+        .dom(`[data-test-deposit-transaction-status-card]`)
+        .containsText('Bridging tokens to L2 blockchain');
+
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+      let layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
+      await waitFor(`[data-test-token-bridge-step="0"][data-test-completed]`);
+      layer1Service.test__simulateBlockConfirmation();
+      await settled();
+      layer1Service.test__simulateBlockConfirmation();
+      await settled();
+      layer1Service.test__simulateBlockConfirmation();
+      await settled();
+
+      layer2Service.test__simulateBridgedToLayer2(
+        '0xabc123abc123abc123e5984131f6b4cc3ac8af14'
+      );
+      await waitFor(`[data-test-token-bridge-step="1"][data-test-completed]`);
+      await waitFor(`[data-test-token-bridge-step="2"][data-test-completed]`);
+      await settled();
+      assert.dom(`[data-test-bridge-explorer-button]`).exists();
+    });
+
     test('it restores a finished workflow', async function (this: Context, assert) {
       const state = {
         completedCardNames: [
@@ -177,6 +256,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           logsBloom: '',
           events: {},
         },
+        layer2BlockHeightBeforeBridging: '1234',
         completedLayer2TxnReceipt: {
           status: true,
           transactionHash: '0xGHI',
