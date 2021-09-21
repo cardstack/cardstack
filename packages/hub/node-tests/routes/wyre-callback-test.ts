@@ -25,7 +25,7 @@ class StubWyreService {
   }
 }
 
-class StubPrepaidCardInventory {
+class StubRelayService {
   async provisionPrepaidCard(userAddress: string, reservationId: string) {
     return Promise.resolve(handleProvisionPrepaidCard(userAddress, reservationId));
   }
@@ -255,7 +255,7 @@ describe('POST /api/wyre-callback', function () {
       port: 3001,
       registryCallback(registry: Registry) {
         registry.register('wyre', StubWyreService);
-        registry.register('prepaid-card-inventory', StubPrepaidCardInventory);
+        registry.register('relay', StubRelayService);
       },
       containerCallback(serverContainer: Container) {
         container = serverContainer;
@@ -265,6 +265,7 @@ describe('POST /api/wyre-callback', function () {
     let dbManager = await container.lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM wallet_orders`);
+    await db.query(`DELETE FROM reservations`);
 
     request = supertest(server);
   });
@@ -315,6 +316,11 @@ describe('POST /api/wyre-callback', function () {
     // This is the scenario where the reservationId/orderId correlation has been
     // set before the callback has been received
     it(`can process callback for pending wallet order that we already received a prepaid card reservation for`, async function () {
+      await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
+        stubReservationId,
+        stubUserAddress.toLowerCase(),
+        'sku1',
+      ]);
       await db.query(
         `INSERT INTO wallet_orders (order_id, user_address, wallet_id, reservation_id, status) VALUES ($1, $2, $3, $4, $5)`,
         [
@@ -352,6 +358,11 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback with an order ID that already exists and is not in a "waiting-for-order" state`, async function () {
+      await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
+        stubReservationId,
+        stubUserAddress.toLowerCase(),
+        'sku1',
+      ]);
       for (let status of ['received-order', 'waiting-for-reservation', 'provisioning', 'complete']) {
         await db.query(`DELETE FROM wallet_orders`);
         await db.query(
@@ -550,6 +561,11 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`can provision a prepaid card after receiving custodial transfer callback when a reservation ID exists`, async function () {
+      await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
+        stubReservationId,
+        stubUserAddress.toLowerCase(),
+        'sku1',
+      ]);
       await db.query(`UPDATE wallet_orders SET reservation_id = $2 WHERE order_id = $1`, [
         stubWalletOrderId,
         stubReservationId,
@@ -574,7 +590,7 @@ describe('POST /api/wyre-callback', function () {
       let {
         rows: [row],
       } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
-      expect(row.status).to.equal('provisioning');
+      expect(row.status).to.equal('complete');
     });
 
     it(`can transition to 'waiting-for-reservation' state after receiving custodial transfer callback when a reservation ID has not be received`, async function () {
@@ -601,6 +617,11 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback related to an order ID that whose status is not "order-received"`, async function () {
+      await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
+        stubReservationId,
+        stubUserAddress.toLowerCase(),
+        'sku1',
+      ]);
       for (let status of ['waiting-for-order', 'waiting-for-reservation', 'complete']) {
         await db.query(`UPDATE wallet_orders SET reservation_id = $2, status = $3 WHERE order_id = $1`, [
           stubWalletOrderId,

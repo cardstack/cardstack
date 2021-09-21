@@ -15,6 +15,9 @@ import PrepaidCardCustomizationsRoute from '../routes/prepaid-card-customization
 import MerchantInfosRoute from '../routes/merchant-infos';
 import { inject } from '../di/dependency-injection';
 import CustodialWalletRoute from '../routes/custodial-wallet';
+import ReservationsRoute from '../routes/reservations';
+import OrdersRoute from '../routes/orders';
+import InventoryRoute from '../routes/inventory';
 
 const API_PREFIX = '/api';
 const apiPrefixPattern = new RegExp(`^${API_PREFIX}/(.*)`);
@@ -35,6 +38,9 @@ export default class JSONAPIMiddleware {
     as: 'merchantInfosRoute',
   });
   custodialWalletRoute: CustodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
+  ordersRoute: OrdersRoute = inject('orders-route', { as: 'ordersRoute' });
+  reservationsRoute: ReservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
+  inventoryRoute: InventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
   middleware() {
     return (ctxt: Koa.ParameterizedContext<SessionContext, Record<string, unknown>>, next: Koa.Next) => {
       let m = apiPrefixPattern.exec(ctxt.request.path);
@@ -71,20 +77,27 @@ export default class JSONAPIMiddleware {
       merchantInfosRoute,
       custodialWalletRoute,
       sessionRoute,
+      ordersRoute,
+      reservationsRoute,
+      inventoryRoute,
     } = this;
 
     return compose([
       CardstackError.withJsonErrorHandling,
       body,
       route.get('/boom', boomRoute.get),
-      route.get('/session', sessionRoute.get),
-      route.post('/session', sessionRoute.post),
-      route.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get),
-      route.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get),
-      route.post('/prepaid-card-customizations', prepaidCardCustomizationsRoute.post),
+      route.get('/custodial-wallet', custodialWalletRoute.get),
+      route.get('/inventories', inventoryRoute.get),
       route.post('/merchant-infos', merchantInfosRoute.post),
       route.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation),
-      route.get('/custodial-wallet', custodialWalletRoute.get),
+      route.post('/orders', ordersRoute.post),
+      route.get('/orders/:order_id', ordersRoute.get),
+      route.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get),
+      route.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get),
+      route.post('/reservations', reservationsRoute.post),
+      route.post('/prepaid-card-customizations', prepaidCardCustomizationsRoute.post),
+      route.get('/session', sessionRoute.get),
+      route.post('/session', sessionRoute.post),
       route.all('/(.*)', notFound),
     ]);
   }

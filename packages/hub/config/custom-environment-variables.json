@@ -21,5 +21,8 @@
     "apiKey": "WYRE_API_KEY",
     "secretKey": "WYRE_SECRET_KEY"
   },
+  "web3": {
+    "network": "NETWORK"
+  },
   "serverSecret": "SERVER_SECRET"
 }

@@ -1,4 +1,10 @@
-import { ProvisionedPrepaidCard, ItemSet, ItemRemoved, AskSet } from '../../generated/Market/PrepaidCardMarket';
+import {
+  ProvisionedPrepaidCard,
+  ItemSet,
+  ItemRemoved,
+  AskSet,
+  PrepaidCardMarket,
+} from '../../generated/Market/PrepaidCardMarket';
 import { ethereum, BigInt, store } from '@graphprotocol/graph-ts';
 import {
   Account,
@@ -63,7 +69,9 @@ export function handleItemSet(event: ItemSet): void {
   makeEOATransaction(event, issuer);
   let issuingToken = makeToken(event.params.issuingToken);
   makeSkuEntity(sku, issuer, issuingToken, event.params.faceValue, event.params.customizationDID);
-  makeInventory(sku, issuer);
+  let market = PrepaidCardMarket.bind(event.address);
+  let askPrice = market.asks(event.params.sku);
+  makeInventory(sku, issuer, askPrice);
   makeInventoryItem(sku, prepaidCard);
 
   let addEventEntity = new PrepaidCardInventoryAddEvent(txnHash + '-' + prepaidCard);
@@ -153,10 +161,11 @@ function makeSkuEntity(
   return entity;
 }
 
-function makeInventory(sku: string, issuer: string): SKUInventory {
+function makeInventory(sku: string, issuer: string, askPrice: BigInt): SKUInventory {
   let entity = new SKUInventory(sku);
   entity.issuer = issuer;
   entity.sku = sku;
+  entity.askPrice = askPrice;
   entity.save();
   return entity;
 }
@@ -165,6 +174,7 @@ function makeInventoryItem(sku: string, prepaidCard: string): PrepaidCardInvento
   let id = sku + '-' + prepaidCard;
   let entity = new PrepaidCardInventoryItem(id);
   entity.inventory = sku;
+  entity.prepaidCardId = prepaidCard;
   entity.prepaidCard = prepaidCard;
   entity.save();
   return entity;

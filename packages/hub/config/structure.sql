@@ -47,6 +47,7 @@ CREATE TYPE public.wallet_orders_status_enum AS ENUM (
     'waiting-for-order',
     'received-order',
     'waiting-for-reservation',
+    'provisioning',
     'complete'
 );
 
@@ -701,6 +702,23 @@ CREATE TABLE public.prepaid_card_patterns (
 ALTER TABLE public.prepaid_card_patterns OWNER TO postgres;
 
 --
+-- Name: reservations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.reservations (
+    id text NOT NULL,
+    user_address text NOT NULL,
+    sku text NOT NULL,
+    transaction_hash text,
+    prepaid_card_address text,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.reservations OWNER TO postgres;
+
+--
 -- Name: wallet_orders; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -813,6 +831,14 @@ ALTER TABLE ONLY public.prepaid_card_patterns
 
 
 --
+-- Name: reservations reservations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.reservations
+    ADD CONSTRAINT reservations_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: wallet_orders wallet_orders_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -832,6 +858,20 @@ CREATE INDEX jobs_priority_run_at_id_locked_at_without_failures_idx ON graphile_
 --
 
 CREATE UNIQUE INDEX merchant_infos_slug_unique_index ON public.merchant_infos USING btree (slug);
+
+
+--
+-- Name: reservations_updated_at_prepaid_card_address_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX reservations_updated_at_prepaid_card_address_index ON public.reservations USING btree (updated_at, prepaid_card_address);
+
+
+--
+-- Name: reservations_updated_at_prepaid_card_address_sku_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX reservations_updated_at_prepaid_card_address_sku_index ON public.reservations USING btree (updated_at, prepaid_card_address, sku);
 
 
 --
@@ -881,6 +921,14 @@ CREATE TRIGGER _500_increase_job_queue_count_update AFTER UPDATE OF queue_name O
 --
 
 CREATE TRIGGER _900_notify_worker AFTER INSERT ON graphile_worker.jobs FOR EACH STATEMENT EXECUTE FUNCTION graphile_worker.tg_jobs__notify_new_jobs();
+
+
+--
+-- Name: wallet_orders fk_reservation_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.wallet_orders
+    ADD CONSTRAINT fk_reservation_id FOREIGN KEY (reservation_id) REFERENCES public.reservations(id);
 
 
 --
@@ -965,6 +1013,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 3	20210623052200757_create-graphile-worker-schema	2021-07-29 14:31:17.108453
 17	20210809113449561_merchant-infos	2021-08-17 15:07:25.288981
 24	20210817184105100_wallet-orders	2021-08-19 13:32:47.794362
+32	20210920142313915_prepaid-card-reservations	2021-09-21 15:56:37.922156
 \.
 
 
@@ -972,7 +1021,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 24, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 32, true);
 
 
 --

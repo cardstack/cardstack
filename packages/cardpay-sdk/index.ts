@@ -27,6 +27,7 @@ export {
 } from './sdk/constants';
 export { waitUntilBlock, TransactionOptions } from './sdk/utils/general-utils';
 export * from './sdk/currency-utils';
+export { query as gqlQuery } from './sdk/utils/graphql';
 export { validateMerchantId, generateMerchantPaymentUrl, isValidMerchantPaymentUrl } from './sdk/utils/merchant';
 export { getSDK } from './sdk/version-resolver';
 

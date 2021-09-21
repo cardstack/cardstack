@@ -36,7 +36,7 @@ export const adminWalletName = 'admin';
 export default class WyreCallbackRoute {
   adminWalletId: string | undefined;
   wyre: WyreService = inject('wyre');
-  prepaidCardInventory = inject('prepaid-card-inventory', { as: 'prepaidCardInventory' });
+  relay = inject('relay');
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
   constructor() {
@@ -148,7 +148,28 @@ export default class WyreCallbackRoute {
 
     if (reservationId) {
       log.info(`provisioning prepaid card for user ${userAddress} with reservation ID ${reservationId}`);
-      await this.prepaidCardInventory.provisionPrepaidCard(userAddress, reservationId);
+      let txnHash = await this.relay.provisionPrepaidCard(userAddress, reservationId);
+      try {
+        let db = await this.databaseManager.getClient();
+        await db.query(`UPDATE wallet_orders SET status = $2, updated_at = NOW() WHERE order_id = $1`, [
+          orderId,
+          'complete',
+        ]);
+      } catch (err) {
+        log.error(
+          `Error: Failed to update wallet_orders record for ${request.dest} receive of ${
+            transfer.source
+          } to status 'complete' after provisioning prepaid card. request is: ${JSON.stringify(
+            request.source,
+            null,
+            2
+          )}`,
+          err
+        );
+        return;
+      }
+
+      // TODO deal with txnHash and derive prepaid card address from it
     } else {
       log.info(
         `while processing ${request.source} send to admin account for order id ${orderId}, still haven't received a reservation ID for this order from the client. Waiting for reservation`
