@@ -21,10 +21,6 @@ export default class RewardManager {
     return (await this.getRewardManager()).methods.isRewardProgram(rewardProgramId).call();
   }
 
-  async isValidSafe(rewardProgramId: string, rewardSafe: string): Promise<boolean> {
-    return (await this.getRewardManager()).methods.isValidRewardSafe(rewardSafe, rewardProgramId).call();
-  }
-
   async newRewardProgramId(): Promise<string> {
     let rewardProgramIdExists: boolean;
     let rewardProgramId: string;

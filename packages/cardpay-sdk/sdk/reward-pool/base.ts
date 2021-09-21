@@ -293,10 +293,6 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       );
     }
 
-    if (!(await rewardManager.isValidSafe(rewardProgramId, safeAddress))) {
-      throw new Error(`The reward safe is not a valid safe`);
-    }
-
     let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
 
     let payload = (await this.getRewardPool()).methods
