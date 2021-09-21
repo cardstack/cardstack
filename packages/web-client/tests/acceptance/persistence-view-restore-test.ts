@@ -147,8 +147,6 @@ module('Acceptance | persistence view and restore', function () {
         });
 
         test('it lists existing persisted workflows', async function (this: Context, assert) {
-          console.log('constructed?');
-
           await visit('/card-pay/');
           assert.dom('[data-test-workflow-tracker]').containsText('2');
         });
