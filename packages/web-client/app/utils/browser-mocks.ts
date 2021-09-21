@@ -53,8 +53,23 @@ export class MockBroadcastChannel {
   close() {}
 }
 
+declare global {
+  interface Window {
+    TEST__MOCK_LOCAL_STORAGE_INIT?: Record<string, string>;
+  }
+}
+
 export class MockLocalStorage {
   entries = {} as Record<string, string>;
+
+  constructor() {
+    if (window.TEST__MOCK_LOCAL_STORAGE_INIT) {
+      this.entries = {
+        ...window.TEST__MOCK_LOCAL_STORAGE_INIT,
+      };
+    }
+  }
+
   setItem(key: string, value: string): void {
     this.entries[key] = value;
   }
