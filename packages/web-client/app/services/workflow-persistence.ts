@@ -8,7 +8,7 @@ interface WorkflowPersistencePersistedData {
   state: any;
 }
 
-const STORAGE_KEY_PREFIX = 'workflowPersistence';
+export const STORAGE_KEY_PREFIX = 'workflowPersistence';
 
 export default class WorkflowPersistence extends Service {
   #storage!: Storage | MockLocalStorage;
@@ -17,11 +17,21 @@ export default class WorkflowPersistence extends Service {
 
   constructor() {
     super(...arguments);
+
+    let entries;
+
     if (config.environment === 'test') {
       this.#storage = new MockLocalStorage();
+      entries = this.#storage.entries;
     } else {
       this.#storage = window.localStorage;
+      entries = this.#storage;
     }
+
+    // FIXME extract function to construct compound key instead of exporting prefix?
+    this.persistedDataIds = Object.keys(entries).map((key) =>
+      key.replace(`${STORAGE_KEY_PREFIX}:`, '')
+    );
   }
 
   getPersistedData(workflowPersistenceId: string) {
