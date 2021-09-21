@@ -3,7 +3,7 @@ import { tracked } from '@glimmer/tracking';
 import { MockLocalStorage } from '../utils/browser-mocks';
 import config from '../config/environment';
 
-interface WorkflowPersistencePersistedData {
+export interface WorkflowPersistencePersistedData {
   name: string;
   state: any;
 }
@@ -34,7 +34,9 @@ export default class WorkflowPersistence extends Service {
       .map((key) => key.replace(`${STORAGE_KEY_PREFIX}:`, ''));
   }
 
-  getPersistedData(workflowPersistenceId: string) {
+  getPersistedData(
+    workflowPersistenceId: string
+  ): WorkflowPersistencePersistedData {
     return JSON.parse(
       this.#storage.getItem(`${STORAGE_KEY_PREFIX}:${workflowPersistenceId}`) ||
         '{}'
