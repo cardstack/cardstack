@@ -95,6 +95,8 @@ module('Acceptance | persistence view and restore', function () {
       await settled();
       assert.dom('[data-test-workflow-tracker]').containsText('0');
     });
+
+    // FIXME add test for storage event coming from another tab
   });
 
   module(
