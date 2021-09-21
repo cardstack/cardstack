@@ -1,4 +1,5 @@
 import { default as Service } from '@ember/service';
+import { tracked } from '@glimmer/tracking';
 import { MockLocalStorage } from '../utils/browser-mocks';
 import config from '../config/environment';
 
@@ -7,21 +8,25 @@ interface WorkflowPersistencePersistedData {
   state: any;
 }
 
+const STORAGE_KEY_PREFIX = 'workflowPersistence';
+
 export default class WorkflowPersistence extends Service {
-  storage!: Storage | MockLocalStorage;
+  #storage!: Storage | MockLocalStorage;
+
+  @tracked persistedDataIds: string[] = [];
 
   constructor() {
     super(...arguments);
     if (config.environment === 'test') {
-      this.storage = new MockLocalStorage();
+      this.#storage = new MockLocalStorage();
     } else {
-      this.storage = window.localStorage;
+      this.#storage = window.localStorage;
     }
   }
 
   getPersistedData(workflowPersistenceId: string) {
     return JSON.parse(
-      this.storage.getItem(`workflowPersistence:${workflowPersistenceId}`) ||
+      this.#storage.getItem(`${STORAGE_KEY_PREFIX}:${workflowPersistenceId}`) ||
         '{}'
     );
   }
@@ -30,10 +35,17 @@ export default class WorkflowPersistence extends Service {
     workflowPersistenceId: string,
     data: WorkflowPersistencePersistedData
   ) {
-    return this.storage.setItem(
-      `workflowPersistence:${workflowPersistenceId}`,
+    this.persistedDataIds = [...this.persistedDataIds, workflowPersistenceId];
+
+    return this.#storage.setItem(
+      `${STORAGE_KEY_PREFIX}:${workflowPersistenceId}`,
       JSON.stringify(data)
     );
+  }
+
+  clear() {
+    this.persistedDataIds = [];
+    this.#storage.clear();
   }
 }
 
