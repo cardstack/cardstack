@@ -150,7 +150,7 @@ module('Acceptance | persistence view and restore', function () {
       assert.dom('[data-test-completed-workflow]').exists({ count: 1 });
 
       assert
-        .dom('[data-test-completed-workflow] .boxel-progress-icon--completr') // FIXME corrected in #2126
+        .dom('[data-test-completed-workflow] .boxel-progress-icon--complete')
         .exists();
 
       workflowPersistenceService.clear();
