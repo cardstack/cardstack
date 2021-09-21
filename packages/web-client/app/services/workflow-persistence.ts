@@ -29,9 +29,9 @@ export default class WorkflowPersistence extends Service {
     }
 
     // FIXME extract function to construct compound key instead of exporting prefix?
-    this.persistedDataIds = Object.keys(entries).map((key) =>
-      key.replace(`${STORAGE_KEY_PREFIX}:`, '')
-    );
+    this.persistedDataIds = Object.keys(entries)
+      .filter((key) => key.startsWith(`${STORAGE_KEY_PREFIX}:`))
+      .map((key) => key.replace(`${STORAGE_KEY_PREFIX}:`, ''));
   }
 
   getPersistedData(workflowPersistenceId: string) {
