@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { settled, visit } from '@ember/test-helpers';
+import { click, settled, visit } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -80,7 +80,12 @@ module('Acceptance | persistence view and restore', function () {
           state: {
             name: 'PREPAID_CARD_ISSUANCE',
             state: {
-              completedCardNames: ['LAYER2_CONNECT', 'HUB_AUTH'],
+              completedCardNames: [
+                'LAYER2_CONNECT',
+                'HUB_AUTH',
+                'LAYOUT_CUSTOMIZATION',
+                'FUNDING_SOURCE',
+              ].slice(0, i),
               completedMilestonesCount: 1,
               milestonesCount: 4,
             },
@@ -90,6 +95,17 @@ module('Acceptance | persistence view and restore', function () {
 
       await visit('/card-pay/');
       assert.dom('[data-test-workflow-tracker]').containsText('4');
+
+      await click('[data-test-workflow-tracker-toggle]');
+      assert.dom('[data-test-active-workflow]').exists({ count: 4 });
+
+      assert
+        .dom('[data-test-active-workflow]:nth-child(1)')
+        .containsText('Prepaid card issuance');
+
+      assert
+        .dom('[data-test-active-workflow]:nth-child(2)')
+        .containsText('Prepaid card issuance');
 
       workflowPersistenceService.clear();
       await settled();

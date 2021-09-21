@@ -1,1 +1,15 @@
-{{this.activeWorkflows.length}}
+<Boxel::Button
+  @kind='primary'
+  {{on "click" (toggle 'showing' this)}}
+  data-test-workflow-tracker-toggle
+>
+  {{this.activeWorkflows.length}}
+</Boxel::Button>
+
+{{#if this.showing}}
+  <ul>
+    {{#each this.activeWorkflows as |workflow|}}
+      <li data-test-active-workflow>Prepaid card issuance</li>
+    {{/each}}
+  </ul>
+{{/if}}
