@@ -129,14 +129,11 @@ module('Acceptance | persistence view and restore', function () {
         window.TEST__MOCK_LOCAL_STORAGE_INIT[
           `${STORAGE_KEY_PREFIX}:persisted-${i}`
         ] = JSON.stringify({
-          name: `Prepaid Card Issuance ${i}`,
+          name: `PREPAID_CARD_ISSUANCE`,
           state: {
-            name: 'PREPAID_CARD_ISSUANCE',
-            state: {
-              completedCardNames: ['LAYER2_CONNECT', 'HUB_AUTH'],
-              completedMilestonesCount: 1,
-              milestonesCount: 4,
-            },
+            completedCardNames: ['LAYER2_CONNECT', 'HUB_AUTH'],
+            completedMilestonesCount: 1,
+            milestonesCount: 4,
           },
         });
       }
