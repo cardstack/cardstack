@@ -11,7 +11,24 @@ export default class CardPayHeaderWorkflowTracker extends Component<CardPayHeade
 
   @tracked showing = false;
 
+  get allWorkflows() {
+    return this.workflowPersistence.persistedDataIds.map((id) =>
+      this.workflowPersistence.getPersistedData(id)
+    );
+  }
+
   get activeWorkflows() {
-    return this.workflowPersistence.persistedDataIds;
+    return this.allWorkflows.filter(
+      (workflow) =>
+        workflow.state.completedMilestonesCount < workflow.state.milestonesCount
+    );
+  }
+
+  get completedWorkflows() {
+    return this.allWorkflows.filter(
+      (workflow) =>
+        workflow.state.completedMilestonesCount ===
+        workflow.state.milestonesCount
+    );
   }
 }
