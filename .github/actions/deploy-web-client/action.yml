@@ -9,9 +9,6 @@ inputs:
   environment:
     description: Deployment environment
     required: true
-  sentry_url_prefix:
-    description: Adds a prefix to source map urls after stripping them
-    required: true
 
 runs:
   using: composite
@@ -50,4 +47,4 @@ runs:
         ignore_missing: true
         sourcemaps: packages/web-client/tmp/deploy-dist-uncompressed
         version: web-client-${{ github.sha }}@${{ steps.lerna-version.outputs.lerna-version }}
-        url_prefix: ${{ inputs.sentry_url_prefix }}
+        url_prefix: "~"
