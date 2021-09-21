@@ -62,7 +62,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       'service:workflow-persistence'
     );
 
-    workflowPersistenceService.storage.clear();
+    workflowPersistenceService.clear();
   });
 
   test('Generates a flow uuid query parameter used as a persistence identifier', async function (this: Context, assert) {
