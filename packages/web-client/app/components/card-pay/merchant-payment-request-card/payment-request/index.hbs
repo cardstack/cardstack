@@ -2,8 +2,8 @@
   class="payment-request"
   ...attributes
 >
-  <div class="payment-request__explanation">
-    {{#if (and @canDeepLink this.showAsQR)}}
+  <div class="payment-request__explanation" data-test-payment-request-explanation>
+    {{#if (and @canDeepLink (not this.showAsQR))}}
       Please install the Card Wallet app on your mobile phone, then tap on the link below to complete your payment
     {{else}}
       Please install the Card Wallet app on your mobile phone, then scan the QR code below to complete your payment
