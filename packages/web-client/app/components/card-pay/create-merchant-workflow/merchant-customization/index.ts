@@ -11,6 +11,7 @@ import { mostReadable, random as randomColor } from '@ctrl/tinycolor';
 import config from '@cardstack/web-client/config/environment';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import * as Sentry from '@sentry/browser';
+import { isPresent } from '@ember/utils';
 
 export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
@@ -30,7 +31,11 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
     let { merchantName, merchantId, merchantBgColor } =
       this.args.workflowSession.state;
 
-    if (merchantName && merchantId && merchantBgColor) {
+    if (
+      isPresent(merchantName) &&
+      isPresent(merchantId) &&
+      isPresent(merchantBgColor)
+    ) {
       this.merchantName = merchantName;
       this.merchantBgColor = merchantBgColor;
       this.merchantId = merchantId;

@@ -68,10 +68,6 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   @action checkForPendingTransaction() {
     let { txnHash, merchantSafe } = this.args.workflowSession.state;
 
-    /* TODO: cancel confirmation request sent on card wallet app
-      if user has pressed Create but did not complete the task
-      `if (prepaidCardChoice && !txnHash)`
-    */
     if (txnHash && !merchantSafe) {
       this.createMerchant();
     }
