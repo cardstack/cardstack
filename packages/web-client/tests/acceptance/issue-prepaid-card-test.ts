@@ -59,9 +59,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
-  hooks.beforeEach(function () {
-    // TODO: fix typescript for mirage
-    (this as any).server.db.loadData({
+  hooks.beforeEach(function (this: Context) {
+    this.server.db.loadData({
       prepaidCardColorSchemes,
       prepaidCardPatterns,
     });
