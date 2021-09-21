@@ -22,4 +22,22 @@ export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayH
       'Unknown workflow type'
     );
   }
+
+  get workflowState() {
+    return this.args.workflow.state;
+  }
+
+  get isComplete() {
+    return (
+      this.workflowState.completedMilestonesCount ===
+      this.workflowState.milestonesCount
+    );
+  }
+
+  get fractionComplete() {
+    return (
+      this.workflowState.completedMilestonesCount /
+      this.workflowState.milestonesCount
+    );
+  }
 }
