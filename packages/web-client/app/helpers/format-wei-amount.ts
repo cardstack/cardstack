@@ -6,9 +6,9 @@ import Helper from '@ember/component/helper';
 import BN from 'bn.js';
 import { fromWei } from 'web3-utils';
 
-type FormatTokenAmountHelperParams = [BN, number];
+type FormatWeiAmountHelperParams = [BN, number];
 
-export function formatTokenAmount(
+export function formatWeiAmount(
   amountInSmallestUnit: BN,
   minDecimals?: number
 ): string {
@@ -34,15 +34,12 @@ export function formatTokenAmount(
   );
 }
 
-class FormatTokenAmountHelper extends Helper {
+class FormatWeiAmountHelper extends Helper {
   compute(
-    [
-      amountInSmallestUnit,
-      minDecimals,
-    ]: FormatTokenAmountHelperParams /*, hash*/
+    [amountInSmallestUnit, minDecimals]: FormatWeiAmountHelperParams /*, hash*/
   ) {
-    return formatTokenAmount(amountInSmallestUnit, minDecimals);
+    return formatWeiAmount(amountInSmallestUnit, minDecimals);
   }
 }
 
-export default FormatTokenAmountHelper;
+export default FormatWeiAmountHelper;

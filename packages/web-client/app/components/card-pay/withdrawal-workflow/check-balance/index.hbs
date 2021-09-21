@@ -26,7 +26,7 @@
               <CardPay::BalanceDisplay
                 @size="large"
                 @icon={{this.nativeTokenDisplayInfo.icon}}
-                @balance={{format-token-amount this.layer1Network.defaultTokenBalance}}
+                @balance={{format-wei-amount this.layer1Network.defaultTokenBalance}}
                 @symbol={{this.nativeTokenDisplayInfo.symbol}}
                 @usdBalance={{token-to-usd 'ETH' this.layer1Network.defaultTokenBalance}}
                 class="withdrawal-workflow-check-balance__balance"
@@ -51,7 +51,7 @@
         <CardPay::BalanceDisplay
           @size="large"
           @icon={{this.nativeTokenDisplayInfo.icon}}
-          @balance={{format-token-amount this.minimumBalanceForWithdrawalClaim}}
+          @balance={{format-wei-amount this.minimumBalanceForWithdrawalClaim}}
           @symbol={{this.nativeTokenDisplayInfo.symbol}}
           @usdBalance={{token-to-usd 'ETH' this.minimumBalanceForWithdrawalClaim}}
         />
@@ -69,7 +69,7 @@
     <:default as |i|>
       <i.ActionStatusArea class="withdrawal-workflow-check-balance__passed-status" @icon={{this.walletProvider.iconName}} style={{css-var status-icon-size="2.5rem"}}>
         <div class="withdrawal-workflow-check-balance__passed-status-message">
-          Insufficient {{this.nativeTokenDisplayInfo.symbol}} for withdrawal on 
+          Insufficient {{this.nativeTokenDisplayInfo.symbol}} for withdrawal on
           {{network-display-info "layer1" "fullName"}}. Please deposit amount specified above.
         </div>
       </i.ActionStatusArea>

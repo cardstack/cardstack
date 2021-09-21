@@ -19,7 +19,7 @@
           @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
           @depotAddress={{this.layer2Network.depotSafe.address}}
           @token={{this.fundingToken}}
-          @balance={{format-token-amount this.fundingTokenBalance}}
+          @balance={{format-wei-amount this.fundingTokenBalance}}
         />
       </CardPay::LabeledValue>
       {{#if @isComplete}}
