@@ -103,6 +103,7 @@ jobs:
               - 'packages/hub/**'
               - 'packages/did-resolver/**'
               - '.github/workflows/push-main.yml'
+              - '.github/actions/deploy-hub/**'
               - 'yarn.lock'
               - 'waypoint.hcl'
             web_client:
@@ -111,6 +112,7 @@ jobs:
               - 'packages/cardpay-sdk/**'
               - 'packages/did-resolver/**'
               - '.github/workflows/push-main.yml'
+              - '.github/actions/deploy-web-client/**'
               - 'yarn.lock'
             boxel:
               - 'packages/boxel/**'
