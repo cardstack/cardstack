@@ -1,23 +1,25 @@
 .payment-request {
   --action-element-margin: var(--boxel-sp-lg) auto var(--boxel-sp-sm) auto;
-  --explanation-padding: var(--boxel-sp-xl);
   --explanation-font: var(--boxel-font-lg);
   --amount-font-size: 2.5rem;
+  --gap: var(--boxel-sp-xl);
   --body-padding: var(--boxel-sp-xl);
+  --merchant-address-font-size: var(--boxel-font-size-lg);
 
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: var(--boxel-sp-lg);
+  gap: var(--gap);
 }
 
 @media only screen and (max-width: 480px) {
   .payment-request {
-    --explanation-padding: 0;
     --explanation-font: var(--boxel-font);
     --amount-font-size: var(--boxel-font-size-xl);
     --body-padding: var(--boxel-sp);
+    --gap: var(--boxel-sp-lg);
+    --merchant-address-font-size: 1.125rem;
   }
 }
 
@@ -25,7 +27,6 @@
   max-width: 45ch;
   font: var(--explanation-font);
   color: var(--boxel-purple-500);
-  padding: var(--explanation-padding) 0;
 }
 
 .payment-request__body {
@@ -51,17 +52,22 @@
 .payment-request__address-only {
   display: flex;
   flex-direction: column;
+  align-items: center;
   padding: var(--boxel-sp-xxs);
   gap: var(--boxel-sp-xs);
 }
 
 .payment-request__merchant-address {
   font-family: var(--boxel-monospace-font-family);
-  font-size: var(--boxel-font-size-lg);
+  font-size: var(--merchant-address-font-size);
   line-height: calc(22 / 16);
   letter-spacing: var(--boxel-lsp-sm);
   max-width: 22ch;
   word-break: break-all;
+}
+
+.payment-request__merchant-address-segment--bold {
+  font-weight: 700;
 }
 
 .payment-request__missing-info-message {
@@ -96,7 +102,7 @@
 }
 
 .payment-request__url {
-  max-width: 50ch;
+  max-width: 18.75rem;
   font: var(--boxel-font-sm);
   color: var(--boxel-purple-500);
   letter-spacing: var(--boxel-lsp-xs);

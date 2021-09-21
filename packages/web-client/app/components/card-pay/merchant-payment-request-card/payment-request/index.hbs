@@ -18,7 +18,8 @@
   {{else if @merchant.errored}}
     <div class="payment-request__address-only" data-test-payment-request-merchant-address>
       <span class="payment-request__merchant-address">
-        {{@merchantAddress}}
+        {{!-- this is intentional to prevent whitespace between the segments --}}
+        {{#each this.addressSegments as |segment|}}<span class={{cn payment-request__merchant-address-segment--bold=segment.bold}}>{{segment.text}}</span>{{/each}}
       </span>
       <span class="payment-request__missing-info-message" data-test-payment-request-merchant-info-missing>
         {{svg-jar "failure-bordered" class="payment-request__missing-info-message-icon"}}
