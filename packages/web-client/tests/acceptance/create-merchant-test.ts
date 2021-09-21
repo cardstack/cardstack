@@ -13,7 +13,11 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import BN from 'bn.js';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import { formatUsd, PrepaidCardSafe, spendToUsd } from '@cardstack/cardpay-sdk';
+import {
+  convertAmountToNativeDisplay,
+  PrepaidCardSafe,
+  spendToUsd,
+} from '@cardstack/cardpay-sdk';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 
@@ -504,8 +508,9 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${merchantRegistrationFee} SPEND (${formatUsd(
-          spendToUsd(merchantRegistrationFee)!
+        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${merchantRegistrationFee} SPEND (${convertAmountToNativeDisplay(
+          spendToUsd(merchantRegistrationFee)!,
+          'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert
@@ -542,8 +547,9 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have a prepaid card with enough funds to pay the ${merchantRegistrationFee} SPEND (${formatUsd(
-          spendToUsd(merchantRegistrationFee)!
+        `It looks like you don’t have a prepaid card with enough funds to pay the ${merchantRegistrationFee} SPEND (${convertAmountToNativeDisplay(
+          spendToUsd(merchantRegistrationFee)!,
+          'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert

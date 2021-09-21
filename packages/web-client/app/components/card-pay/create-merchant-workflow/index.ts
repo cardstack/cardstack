@@ -1,7 +1,10 @@
 import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import { inject as service } from '@ember/service';
-import { formatUsd, spendToUsd } from '@cardstack/cardpay-sdk';
+import {
+  convertAmountToNativeDisplay,
+  spendToUsd,
+} from '@cardstack/cardpay-sdk';
 import {
   cardbot,
   ArbitraryDictionary,
@@ -239,8 +242,9 @@ class CreateMerchantWorkflow extends Workflow {
       template: (session: ArbitraryDictionary) =>
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${
           session.merchantRegistrationFee
-        } SPEND (${formatUsd(
-          spendToUsd(session.merchantRegistrationFee)!
+        } SPEND (${convertAmountToNativeDisplay(
+          spendToUsd(session.merchantRegistrationFee)!,
+          'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
       includeIf() {
         return (
@@ -263,8 +267,9 @@ class CreateMerchantWorkflow extends Workflow {
       template: (session: ArbitraryDictionary) =>
         `It looks like you don’t have a prepaid card with enough funds to pay the ${
           session.merchantRegistrationFee
-        } SPEND (${formatUsd(
-          spendToUsd(session.merchantRegistrationFee)!
+        } SPEND (${convertAmountToNativeDisplay(
+          spendToUsd(session.merchantRegistrationFee)!,
+          'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
       includeIf() {
         return (

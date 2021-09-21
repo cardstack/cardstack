@@ -7,7 +7,6 @@ import sinon from 'sinon';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import {
   convertAmountToNativeDisplay,
-  formatUsd,
   generateMerchantPaymentUrl,
   MerchantSafe,
   roundAmountToNativeCurrencyDecimals,
@@ -110,7 +109,9 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(AMOUNT).containsText(`§${spendAmount}`);
     assert
       .dom(SECONDARY_AMOUNT)
-      .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
+      .containsText(
+        `${convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')}`
+      );
 
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
@@ -145,7 +146,12 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(AMOUNT).containsText(`§${roundedSpendAmount}`);
     assert
       .dom(SECONDARY_AMOUNT)
-      .containsText(`${formatUsd(spendToUsd(roundedSpendAmount)!)}`);
+      .containsText(
+        `${convertAmountToNativeDisplay(
+          spendToUsd(roundedSpendAmount)!,
+          'USD'
+        )}`
+      );
 
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
@@ -179,7 +185,9 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(AMOUNT).containsText(`§${spendAmount}`);
     assert
       .dom(SECONDARY_AMOUNT)
-      .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
+      .containsText(
+        `${convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')}`
+      );
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
       network,
@@ -208,7 +216,11 @@ module('Acceptance | pay', function (hooks) {
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
       );
-    assert.dom(AMOUNT).containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
+    assert
+      .dom(AMOUNT)
+      .containsText(
+        `${convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')}`
+      );
     assert.dom(SECONDARY_AMOUNT).containsText(`§${spendAmount}`);
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
@@ -353,7 +365,9 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(AMOUNT).containsText(`§${spendAmount}`);
     assert
       .dom(SECONDARY_AMOUNT)
-      .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
+      .containsText(
+        `${convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')}`
+      );
 
     // assert that the deep link view is rendered
     assert.dom(QR_CODE).doesNotExist();
@@ -398,7 +412,9 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(AMOUNT).containsText(`§${spendAmount}`);
     assert
       .dom(SECONDARY_AMOUNT)
-      .containsText(`${formatUsd(spendToUsd(spendAmount)!)}`);
+      .containsText(
+        `${convertAmountToNativeDisplay(spendToUsd(spendAmount)!, 'USD')}`
+      );
 
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
