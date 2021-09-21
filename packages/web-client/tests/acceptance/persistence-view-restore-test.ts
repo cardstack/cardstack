@@ -136,6 +136,8 @@ module('Acceptance | persistence view and restore', function () {
         });
       }
 
+      window.TEST__MOCK_LOCAL_STORAGE_INIT['unrelated'] = 'hello';
+
       module('wha', function (hooks) {
         setupApplicationTest(hooks);
         setupMirage(hooks);
