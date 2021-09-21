@@ -343,3 +343,7 @@ export const formatUsd = (value: BigNumberish, options: FormatUsdOptions = { sym
   }
   return result;
 };
+
+export const formatCurrencyAmount = (amount: BigNumberish, decimalPlaces = 2) => {
+  return new BigNumber(amount).toFormat(decimalPlaces);
+};
