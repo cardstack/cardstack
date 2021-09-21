@@ -30,7 +30,7 @@
             @icon="spend"
             @sign="§"
             @symbol="SPEND"
-            @balance={{this.selectedFaceValue.spendAmount}}
+            @balance={{format-amount this.selectedFaceValue.spendAmount}}
             @usdBalance={{spend-to-usd this.selectedFaceValue.spendAmount}}
             @text={{concat "≈ " this.selectedFaceValue.approxTokenAmount " " this.fundingTokenSymbol "*"}}
             data-test-face-value-display

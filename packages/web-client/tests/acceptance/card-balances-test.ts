@@ -81,7 +81,7 @@ module('Acceptance | card balances', function (hooks) {
 
     assert
       .dom('[data-test-card-balances]')
-      .containsText('§2324')
+      .containsText('§2,324')
       .containsText('0x1234...abcd');
 
     assert
@@ -126,7 +126,7 @@ module('Acceptance | card balances', function (hooks) {
 
     assert
       .dom('[data-test-card-balances]')
-      .containsText('§4648')
+      .containsText('§4,648')
       .containsText('0x5678...abcd');
   });
 });

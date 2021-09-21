@@ -64,7 +64,7 @@
             @icon="spend"
             @sign="§"
             @symbol="SPEND"
-            @balance={{this.faceValue}}
+            @balance={{format-amount this.faceValue}}
             @usdBalance={{spend-to-usd this.faceValue}}
           />
         </CardPay::LabeledValue>

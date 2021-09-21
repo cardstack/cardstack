@@ -20,6 +20,7 @@ import {
 } from '@cardstack/cardpay-sdk';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
+import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
 
 interface Context extends MirageTestContext {}
 
@@ -508,7 +509,9 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${merchantRegistrationFee} SPEND (${convertAmountToNativeDisplay(
+        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${formatAmount(
+          merchantRegistrationFee
+        )} SPEND (${convertAmountToNativeDisplay(
           spendToUsd(merchantRegistrationFee)!,
           'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
@@ -547,7 +550,9 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have a prepaid card with enough funds to pay the ${merchantRegistrationFee} SPEND (${convertAmountToNativeDisplay(
+        `It looks like you don’t have a prepaid card with enough funds to pay the ${formatAmount(
+          merchantRegistrationFee
+        )} SPEND (${convertAmountToNativeDisplay(
           spendToUsd(merchantRegistrationFee)!,
           'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`

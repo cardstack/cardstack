@@ -23,7 +23,7 @@
         @icon="spend"
         @sign="§"
         @symbol="SPEND"
-        @balance={{this.merchantRegistrationFee}}
+        @balance={{format-amount this.merchantRegistrationFee}}
         @usdBalance={{spend-to-usd this.merchantRegistrationFee}}
         data-test-prepaid-card-choice-merchant-fee
       />

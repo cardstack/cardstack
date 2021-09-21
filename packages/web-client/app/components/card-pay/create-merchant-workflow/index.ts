@@ -26,6 +26,7 @@ import { next } from '@ember/runloop';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
+import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -240,9 +241,9 @@ class CreateMerchantWorkflow extends Workflow {
     new SessionAwareWorkflowMessage({
       author: cardbot,
       template: (session: ArbitraryDictionary) =>
-        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${
+        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${formatAmount(
           session.merchantRegistrationFee
-        } SPEND (${convertAmountToNativeDisplay(
+        )} SPEND (${convertAmountToNativeDisplay(
           spendToUsd(session.merchantRegistrationFee)!,
           'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
@@ -265,9 +266,9 @@ class CreateMerchantWorkflow extends Workflow {
     new SessionAwareWorkflowMessage({
       author: cardbot,
       template: (session: ArbitraryDictionary) =>
-        `It looks like you don’t have a prepaid card with enough funds to pay the ${
+        `It looks like you don’t have a prepaid card with enough funds to pay the ${formatAmount(
           session.merchantRegistrationFee
-        } SPEND (${convertAmountToNativeDisplay(
+        )} SPEND (${convertAmountToNativeDisplay(
           spendToUsd(session.merchantRegistrationFee)!,
           'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
