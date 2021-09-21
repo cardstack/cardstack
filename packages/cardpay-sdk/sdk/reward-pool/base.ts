@@ -264,36 +264,42 @@ export default class RewardPool {
       throw new Error('reward program does not exist');
     }
 
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let rewardSafeOwner = await rewardManager.getRewardSafeOwner(safeAddress);
-    let isValidSafe = await rewardManager.isValidSafe(rewardProgramId, safeAddress);
-    let unclaimedRewards = await this.getBalanceForProof(rewardProgramId, tokenAddress, rewardSafeOwner, proof);
-    let rewardPoolBalance = await this.getBalanceForPool(tokenAddress);
-    let rewardPoolBalanceForRewardProgram = await this.balance(rewardProgramId, tokenAddress);
-    let rewardPool = await this.getRewardPool();
+    let unclaimedRewards = new BN(await this.getBalanceForProof(rewardProgramId, tokenAddress, rewardSafeOwner, proof));
+    let rewardPoolBalanceForRewardProgram = (await this.balance(rewardProgramId, tokenAddress)).balance;
+
+    if (!(rewardSafeOwner == from)) {
+      throw new Error(
+        `Reward safe owner is NOT the signer of transaction.
+The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is ${from}`
+      );
+    }
+
+    let weiAmount = new BN(toWei(amount));
+    if (weiAmount.gt(unclaimedRewards)) {
+      throw new Error(
+        `Insufficient rewards for rewardSafeOwner.
+For the proof, the reward safe owner can only redeem ${unclaimedRewards} but user is asking for ${amount}`
+      );
+    }
+
+    if (weiAmount.gt(rewardPoolBalanceForRewardProgram)) {
+      throw new Error(
+        `Insufficient funds inside reward pool for reward program.
+The reward program ${rewardProgramId} has balance equals ${fromWei(
+          rewardPoolBalanceForRewardProgram.toString()
+        )} but user is asking for ${amount}`
+      );
+    }
+
+    if (!(await rewardManager.isValidSafe(rewardProgramId, safeAddress))) {
+      throw new Error(`The reward safe is not a valid safe`);
+    }
+
     let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
 
-    console.log('rewardSafeOwner', rewardSafeOwner);
-    console.log('how many tokens in reward pool', rewardPoolBalance);
-    console.log('how many tokens in reward pool for reward program', rewardPoolBalanceForRewardProgram);
-    console.log('unclaimedRewardsForProof', unclaimedRewards);
-    console.log('isValidSafe', isValidSafe);
-
-    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    // let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], tokenAddress);
-    // let symbol = await token.methods.symbol().call();
-    // let balance = new BN(toWei(await token.methods.balanceOf(safeAddress).call()));
-    let weiAmount = new BN(toWei(amount));
-    // if (balance.lt(weiAmount)) {
-    //   throw new Error(
-    //     `Safe does not have enough balance add reward tokens. The reward token ${tokenAddress} balance of the safe ${safeAddress} is ${fromWei(
-    //       balance
-    //     )}, the total amount necessary to add reward tokens is ${fromWei(weiAmount)} ${symbol} + a small amount for gas`
-    //   );
-    // }
-    let selector = this.layer2Web3.eth.abi.encodeFunctionSignature('claim(address,address,uint256,bytes)');
-    console.log('selector', selector);
-
-    let payload = rewardPool.methods
+    let payload = (await this.getRewardPool()).methods
       .claim(
         rewardProgramId,
         tokenAddress,
@@ -303,6 +309,14 @@ export default class RewardPool {
       .encodeABI();
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, tokenAddress);
 
+    let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    if (unclaimedRewards.lt(weiAmount.add(gasCost))) {
+      throw new Error(
+        `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
+          unclaimedRewards
+        )}, amount being claimed is ${fromWei(amount)}, the gas cost is ${fromWei(gasCost)}`
+      );
+    }
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
 
     if (nonce == null) {
