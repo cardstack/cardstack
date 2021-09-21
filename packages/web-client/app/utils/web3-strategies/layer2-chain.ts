@@ -33,12 +33,12 @@ import {
   getSDK,
   BridgeValidationResult,
   DepotSafe,
-  MerchantSafe,
-  Safe,
   IHubAuth,
-  ISafes,
-  PrepaidCardSafe,
   ILayerTwoOracle,
+  ISafes,
+  MerchantSafe,
+  PrepaidCardSafe,
+  Safe,
   TransactionOptions,
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';

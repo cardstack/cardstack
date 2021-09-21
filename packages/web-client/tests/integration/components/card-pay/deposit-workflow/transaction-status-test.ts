@@ -5,7 +5,6 @@ import hbs from 'htmlbars-inline-precompile';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
-import BN from 'bn.js';
 import sinon from 'sinon';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
@@ -19,7 +18,7 @@ module(
       let workflowSession = new WorkflowSession();
       workflowSession.updateMany({
         depositSourceToken: 'DAI',
-        layer2BlockHeightBeforeBridging: new BN('0'),
+        layer2BlockHeightBeforeBridging: '0',
         relayTokensTxnReceipt: {
           transactionHash: 'RelayTokensTransactionHash',
           blockNumber: 1,
@@ -117,7 +116,7 @@ module(
       let workflowSession = new WorkflowSession();
       workflowSession.updateMany({
         depositSourceToken: 'DAI',
-        layer2BlockHeightBeforeBridging: new BN('0'),
+        layer2BlockHeightBeforeBridging: '0',
         relayTokensTxnReceipt: {
           transactionHash: 'RelayTokensTransactionHash',
           blockNumber: 1,
@@ -170,7 +169,7 @@ module(
       let workflowSession = new WorkflowSession();
       workflowSession.updateMany({
         depositSourceToken: 'DAI',
-        layer2BlockHeightBeforeBridging: new BN('0'),
+        layer2BlockHeightBeforeBridging: '0',
         relayTokensTxnReceipt: {
           transactionHash: 'RelayTokensTransactionHash',
           blockNumber: 1,

@@ -23,8 +23,10 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
   declare relayTokensTxnReceipt: TransactionReceipt;
   @reads('args.workflowSession.state.completedLayer2TxnReceipt')
   declare completedLayer2TxnReceipt: TransactionReceipt | undefined;
-  @reads('args.workflowSession.state.layer2BlockHeightBeforeBridging')
-  declare layer2BlockHeightBeforeBridging: BN;
+  get layer2BlockHeightBeforeBridging(): BN {
+    let s = this.args.workflowSession.state.layer2BlockHeightBeforeBridging;
+    return new BN(s);
+  }
   @tracked completedStepCount = 1;
   @tracked bridgeError = false;
   @tracked blockCountError = false;

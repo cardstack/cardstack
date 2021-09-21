@@ -201,7 +201,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
           yield this.layer2Network.getBlockHeight();
         session.update(
           'layer2BlockHeightBeforeBridging',
-          layer2BlockHeightBeforeBridging
+          layer2BlockHeightBeforeBridging.toString()
         );
         transactionReceipt = yield taskFor(
           this.layer1Network.relayTokensTask
