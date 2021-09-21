@@ -54,7 +54,9 @@
     "short-uuid": "^4.2.0",
     "tmp-promise": "3.0.2",
     "typescript-memoize": "^1.0.1",
-    "web3": "1.5.2"
+    "web3": "1.5.2",
+    "yargs": "^17.0.0",
+    "dotenv": "^10.0.0"
   },
   "devDependencies": {
     "@cardstack/eslint-config": "0.26.0",
@@ -66,7 +68,7 @@
     "@types/moment-timezone": "^0.5.30",
     "@types/pg-format": "^1.0.1",
     "@types/supertest": "^2.0.11",
-    "dotenv": "^10.0.0",
+    "@types/yargs": "^17.0.2",
     "json-stable-stringify": "^1.0.1",
     "mocha": "^8.3.2",
     "moment-timezone": "^0.5.33",
@@ -78,15 +80,16 @@
     "yarn": "^1.0"
   },
   "scripts": {
+    "hub": "node ./bin/hub.js",
     "start": "run-p -c start:*",
-    "start:server": "node ./bin/server.js",
-    "start:worker": "node ./bin/worker.js",
-    "console": "node --experimental-repl-await ./bin/console.js",
-    "db:setup:local": "createdb hub_development && node-pg-migrate up && node ./bin/seed-db.js && node ./bin/dump-db-structure.js && node ./bin/setup-test-db.js",
+    "start:server": "yarn hub server",
+    "start:worker": "yarn hub worker",
+    "console": "node --experimental-repl-await ./bin/hub.js console",
+    "db:setup:local": "createdb hub_development && yarn db:migrate up up && yarn hub db seed && yarn hub db dump && yarn hub db init-test",
     "db:migrate": "node-pg-migrate",
-    "db:seed": "node ./bin/seed-db.js",
-    "db:structure:dump": "node ./bin/dump-db-structure.js",
-    "db:test:prepare": "node ./bin/setup-test-db.js",
+    "db:seed": "yarn hub db seed",
+    "db:structure:dump": "yarn hub db dump",
+    "db:test:prepare": "yarn hub db init-test",
     "test": "NODE_ENV=test mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
     "autotest": "NODE_ENV=test mocha -w --reporter=min mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000"
   },
