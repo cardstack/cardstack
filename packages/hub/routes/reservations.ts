@@ -15,6 +15,12 @@ export default class ReservationsRoute {
   constructor() {
     autoBind(this);
   }
+  async get(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+    let userAddress = ctx.state.userAddress;
+  }
   async post(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;

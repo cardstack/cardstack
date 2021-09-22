@@ -4,7 +4,7 @@ const STATUS_ENUM = `${WALLET_ORDERS}_status_enum`;
 
 exports.up = (pgm) => {
   pgm.createTable(RESERVATIONS, {
-    id: { type: 'string', primaryKey: true },
+    id: { type: 'uuid', primaryKey: true },
     user_address: { type: 'string', notNull: true },
     sku: { type: 'string', notNull: true },
     transaction_hash: { type: 'string', notNull: false },

@@ -95,6 +95,7 @@ export default class JSONAPIMiddleware {
       route.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get),
       route.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get),
       route.post('/reservations', reservationsRoute.post),
+      route.get('/reservations/:reservation_id', reservationsRoute.get),
       route.post('/prepaid-card-customizations', prepaidCardCustomizationsRoute.post),
       route.get('/session', sessionRoute.get),
       route.post('/session', sessionRoute.post),
