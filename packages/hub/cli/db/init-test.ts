@@ -12,6 +12,7 @@ export async function handler(_argv: Argv) {
   const dbConfig = config.get<any>('db');
   let dbUrl = dbConfig.url as string;
   let dbName = dbUrl.split('/').reverse()[0];
+
   if (!process.env.CI) {
     try {
       console.log(`Dropping ${dbName} db...`);
