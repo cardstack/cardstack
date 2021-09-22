@@ -13,6 +13,7 @@ import {
   TokenBalance,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
+import { next } from '@ember/runloop';
 
 class CardPayDepositWorkflowTransactionSetupComponent extends Component<WorkflowCardComponentArgs> {
   tokenOptions = bridgeableSymbols;
@@ -36,6 +37,12 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<Workflow
     this.selectedToken = this.tokens.find(
       (t) => t.symbol === this.selectedTokenSymbol
     );
+    next(this, () => {
+      this.args.workflowSession.update(
+        'depositSourceToken',
+        this.selectedToken?.symbol
+      );
+    });
   }
 
   get noTokenBalance() {
@@ -76,6 +83,10 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<Workflow
 
   @action chooseSource(token: TokenBalance<BridgeableSymbol>) {
     this.selectedToken = token;
+    this.args.workflowSession.update(
+      'depositSourceToken',
+      this.selectedToken.symbol
+    );
   }
 
   @action save() {

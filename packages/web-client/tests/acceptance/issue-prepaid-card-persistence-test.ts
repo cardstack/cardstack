@@ -17,7 +17,7 @@ import WorkflowPersistence from '@cardstack/web-client/services/workflow-persist
 
 interface Context extends MirageTestContext {}
 
-module('Acceptance | issue prepaid card', function (hooks) {
+module('Acceptance | issue prepaid card persistence', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
   let workflowPersistenceService: WorkflowPersistence;

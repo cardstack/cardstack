@@ -1,4 +1,4 @@
-import Route from '@ember/routing/route';
+import BaseRoute from './base';
 import '../../css/card-pay/token-suppliers.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/suppliers-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/suppliers-summary-hero.svg';
@@ -36,8 +36,9 @@ const SUPPLIERS_PANEL = {
   ],
 };
 
-export default class CardPayTokenSuppliersRoute extends Route {
-  model() {
+export default class CardPayTokenSuppliersRoute extends BaseRoute {
+  model(params: any, transition: any) {
+    super.model(params, transition);
     return {
       panel: SUPPLIERS_PANEL,
     };
