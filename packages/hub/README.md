@@ -22,6 +22,7 @@ For more information, see the
     - [POST /api/prepaid-card-customizations](#post-apiprepaid-card-customizations)
     - [POST /api/merchant-infos](#post-apimerchant-infos)
     - [GET /api/merchant-infos/validate-slug/:slug](#get-apimerchant-infosvalidate-slugslug)
+  - [The Hub CLI](#the-hub-cli)
   - [Contributing](#contributing)
 
 ## Architecture
@@ -161,6 +162,15 @@ APIs conform to the [JSON API specification](https://jsonapi.org/).
 ### POST /api/merchant-infos
 
 ### GET /api/merchant-infos/validate-slug/:slug
+
+## The Hub CLI
+The hub CLI can be invoked from within the hub package
+
+    bin/hub
+
+*💡 Tip: Add `export PATH="./bin:$PATH"` to your `.zshenv` or `.bash_profile` to be to invoke `hub` directly (without the `bin/`)*
+
+The files that support the CLI are in the `cli/` directory. You can add your own by [following these instructions](https://github.com/yargs/yargs/blob/master/docs/advanced.md#commanddirdirectory-opts). The full `yargs` api [can be found here](https://github.com/yargs/yargs/blob/master/docs/api.md).
 
 ## Contributing
 
