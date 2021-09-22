@@ -20,10 +20,10 @@ export function handleCreateDepot(event: SupplierSafeCreated): void {
 
 export function handleReceivedBridgedTokens(event: TokensBridgedToSafe): void {
   let supplier = toChecksumAddress(event.params.recipient);
-  makeEOATransaction(event, supplier);
 
   let safe = toChecksumAddress(event.params.safe);
   makeDepot(safe, supplier, event.block.timestamp);
+  makeEOATransactionForSafe(event, safe);
 
   let txnHash = event.transaction.hash.toHex();
   let bridgeEventEntity = new BridgeToLayer2Event(txnHash);
@@ -51,7 +51,7 @@ export function handleSentBridgedTokens(event: TokensBridgingInitiated): void {
   let safe = Safe.load(sender);
   if (safe != null) {
     bridgeEventEntity.safe = safe.id;
-    makeEOATransactionForSafe(event, safe as Safe);
+    makeEOATransactionForSafe(event, safe.id);
     let safeContract = GnosisSafe.bind(Address.fromString(safe.id));
     let owners = safeContract.getOwners();
     if (owners.length > 0) {

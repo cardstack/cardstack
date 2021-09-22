@@ -43,7 +43,7 @@ export function handleExecutionSuccess(event: ExecutionSuccess): void {
     );
     return;
   }
-  makeEOATransactionForSafe(event, safe as Safe);
+  makeEOATransactionForSafe(event, safe.id);
 
   let bytes = event.transaction.input.toHex();
   let methodHash = methodHashFromEncodedHex(bytes);

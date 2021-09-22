@@ -1,6 +1,6 @@
 import { MerchantClaim as MerchantClaimEvent, RevenuePool } from '../../generated/RevenuePool/RevenuePool';
 import { MerchantClaim, MerchantRevenueEvent, MerchantSafe } from '../../generated/schema';
-import { makeMerchantRevenue, makeToken, makeEOATransaction, toChecksumAddress } from '../utils';
+import { makeMerchantRevenue, makeToken, toChecksumAddress, makeEOATransactionForSafe } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
 export function handleMerchantClaim(event: MerchantClaimEvent): void {
@@ -15,7 +15,7 @@ export function handleMerchantClaim(event: MerchantClaimEvent): void {
     return;
   }
 
-  makeEOATransaction(event, merchantSafeEntity.merchant);
+  makeEOATransactionForSafe(event, merchantSafe);
 
   let token = makeToken(event.params.payableToken);
   let revenueEntity = makeMerchantRevenue(merchantSafe, token);

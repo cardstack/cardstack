@@ -6,7 +6,7 @@ export function handleSwap(event: SwapEvent): void {
   let to = toChecksumAddress(event.params.to);
   let toSafe = Safe.load(to);
   if (toSafe != null) {
-    makeEOATransactionForSafe(event, toSafe as Safe);
+    makeEOATransactionForSafe(event, toSafe.id);
   } else {
     makeEOATransaction(event, to);
   }
