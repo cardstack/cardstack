@@ -21,7 +21,7 @@ export default class ReservationsRoute {
       return;
     }
     let userAddress = ctx.state.userAddress.toLowerCase();
-    let reservationId: string = ctx.routeParams.reservation_id;
+    let reservationId: string = ctx.params.reservation_id;
     if (!validateUUID(reservationId)) {
       ctx.status = 404;
       ctx.body = {

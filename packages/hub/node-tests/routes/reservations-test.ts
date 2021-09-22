@@ -53,6 +53,7 @@ function handleValidateAuthToken(encryptedString: string) {
     case 'mno123--pqr456--stu789':
       return stubUserAddress2;
   }
+  return;
 }
 
 describe('/api/reservations', function () {
