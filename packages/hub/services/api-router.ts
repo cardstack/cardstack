@@ -12,6 +12,9 @@ import PrepaidCardCustomizationsRoute from '../routes/prepaid-card-customization
 import MerchantInfosRoute from '../routes/merchant-infos';
 import { inject } from '../di/dependency-injection';
 import CustodialWalletRoute from '../routes/custodial-wallet';
+import ReservationsRoute from '../routes/reservations';
+import OrdersRoute from '../routes/orders';
+import InventoryRoute from '../routes/inventory';
 export default class APIRouter {
   boomRoute: BoomRoute = inject('boom-route', { as: 'boomRoute' });
   sessionRoute: SessionRoute = inject('session-route', { as: 'sessionRoute' });
@@ -28,6 +31,9 @@ export default class APIRouter {
     as: 'merchantInfosRoute',
   });
   custodialWalletRoute: CustodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
+  ordersRoute: OrdersRoute = inject('orders-route', { as: 'ordersRoute' });
+  reservationsRoute: ReservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
+  inventoryRoute: InventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
   routes() {
     let {
       boomRoute,
@@ -37,6 +43,9 @@ export default class APIRouter {
       merchantInfosRoute,
       custodialWalletRoute,
       sessionRoute,
+      ordersRoute,
+      reservationsRoute,
+      inventoryRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
@@ -48,6 +57,11 @@ export default class APIRouter {
     apiSubrouter.post('/merchant-infos', merchantInfosRoute.post);
     apiSubrouter.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
     apiSubrouter.get('/custodial-wallet', custodialWalletRoute.get);
+    apiSubrouter.get('/inventories', inventoryRoute.get),
+    apiSubrouter.post('/orders', ordersRoute.post),
+    apiSubrouter.get('/orders/:order_id', ordersRoute.get),
+    apiSubrouter.post('/reservations', reservationsRoute.post),
+    apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get),
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();
