@@ -144,7 +144,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}
           AWS_DEFAULT_REGION: us-east-1
-          WAYPOINT_AUTH_TOKEN: ${{ secrets.STAGING_WAYPOINT_AUTH_TOKEN }}
+          WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
         with:
           environment: staging
@@ -257,7 +257,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}
           AWS_DEFAULT_REGION: us-east-1
-          WAYPOINT_AUTH_TOKEN: ${{ secrets.STAGING_WAYPOINT_AUTH_TOKEN }}
+          WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
           WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
         with:
           environment: staging
