@@ -124,7 +124,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
       assert
         .dom('[data-test-preview] [data-test-prepaid-card-balance]')
-        .hasText('§10000');
+        .hasText('§10,000');
 
       assert.dom('[data-test-issue-prepaid-card-button]').hasText('Create'); // Create prepaid card CTA
     });

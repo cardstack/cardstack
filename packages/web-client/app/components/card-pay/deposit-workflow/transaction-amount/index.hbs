@@ -14,7 +14,7 @@
           @tokenSymbol={{this.currentTokenSymbol}}
           @tokenIcon={{this.currentTokenDetails.icon}}
           @address={{this.layer1Network.walletInfo.firstAddress}}
-          @balance={{format-token-amount this.currentTokenBalance}}
+          @balance={{format-wei-amount this.currentTokenBalance}}
           @balanceInUsd={{token-to-usd this.currentTokenSymbol this.currentTokenBalance}}
           @isComplete={{@isComplete}}
         />
@@ -30,7 +30,7 @@
             class="transaction-amount__token"
             @size="large"
             @icon={{this.currentTokenDetails.icon}}
-            @balance={{format-token-amount this.amountAsBigNumber}}
+            @balance={{format-wei-amount this.amountAsBigNumber}}
             @symbol={{this.currentTokenSymbol}}
             @text={{concat (format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)) "*"}}
             data-test-deposit-amount-entered

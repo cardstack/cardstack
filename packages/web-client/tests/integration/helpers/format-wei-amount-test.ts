@@ -5,34 +5,30 @@ import hbs from 'htmlbars-inline-precompile';
 import { toWei } from 'web3-utils';
 import BN from 'bn.js';
 
-module('Integration | Helper | format-token-amount', function (hooks) {
+module('Integration | Helper | format-wei-amount', function (hooks) {
   setupRenderingTest(hooks);
 
   test('It should return a precise value up to 18 decimals', async function (assert) {
     this.set('inputValue', new BN('123456789123456789'));
-    await render(hbs`{{format-token-amount this.inputValue}}`);
+    await render(hbs`{{format-wei-amount this.inputValue}}`);
     assert.dom(this.element).hasText('0.123456789123456789');
   });
 
   test('It should add zeros to fulfil the required precision', async function (assert) {
     this.set('inputValue', toWei(new BN('1')));
-    this.set('minPrecision', 1);
-    await render(
-      hbs`{{format-token-amount this.inputValue this.minPrecision}}`
-    );
+    this.set('minDecimals', 1);
+    await render(hbs`{{format-wei-amount this.inputValue this.minDecimals}}`);
     assert.dom(this.element).hasText('1.0');
 
-    this.set('minPrecision', 2);
+    this.set('minDecimals', 2);
     assert.dom(this.element).hasText('1.00');
   });
 
   test('It should respect existing non-zero floating decimals when adding zeros', async function (assert) {
     // 1.1
     this.set('inputValue', toWei(new BN('11')).div(new BN('10')));
-    this.set('minPrecision', 3);
-    await render(
-      hbs`{{format-token-amount this.inputValue this.minPrecision}}`
-    );
+    this.set('minDecimals', 3);
+    await render(hbs`{{format-wei-amount this.inputValue this.minDecimals}}`);
     assert.dom(this.element).hasText('1.100');
 
     // 1.11
@@ -40,32 +36,34 @@ module('Integration | Helper | format-token-amount', function (hooks) {
     assert.dom(this.element).hasText('1.110');
   });
 
-  test('It should have a minPrecision of 2 by default', async function (assert) {
+  test('It should have a minDecimals of 2 by default', async function (assert) {
     this.set('inputValue', toWei(new BN('1')));
-    await render(hbs`{{format-token-amount this.inputValue}}`);
+    await render(hbs`{{format-wei-amount this.inputValue}}`);
 
     assert.dom(this.element).hasText('1.00');
   });
 
-  test('It should have a minPrecision of 2 if an invalid minPrecision is provided', async function (assert) {
+  test('It should have a minDecimals of 2 if an invalid minDecimals is provided', async function (assert) {
     this.set('inputValue', toWei(new BN('1')));
-    this.set('minPrecision', 'beep');
-    await render(
-      hbs`{{format-token-amount this.inputValue this.minPrecision}}`
-    );
+    this.set('minDecimals', 'beep');
+    await render(hbs`{{format-wei-amount this.inputValue this.minDecimals}}`);
 
     assert.dom(this.element).hasText('1.00');
 
-    this.set('minPrecision', -30);
+    this.set('minDecimals', -30);
     assert.dom(this.element).hasText('1.00');
   });
 
-  test('It should not add floating zeros if minPrecision is 0', async function (assert) {
+  test('It should not add floating zeros if minDecimals is 0', async function (assert) {
     this.set('inputValue', toWei(new BN('1')));
-    this.set('minPrecision', 0);
-    await render(
-      hbs`{{format-token-amount this.inputValue this.minPrecision}}`
-    );
+    this.set('minDecimals', 0);
+    await render(hbs`{{format-wei-amount this.inputValue this.minDecimals}}`);
     assert.dom(this.element).hasText('1');
+  });
+
+  test('It should render separator commas if amount is 1000 or greater', async function (assert) {
+    this.set('inputValue', toWei(new BN('1000')));
+    await render(hbs`{{format-wei-amount this.inputValue}}`);
+    assert.dom(this.element).hasText('1,000.00');
   });
 });

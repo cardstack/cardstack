@@ -328,18 +328,6 @@ export const usdToSpend = (amountInUsd: number): number | undefined => {
   return Math.ceil(amountInUsd / SPEND_TO_USD_RATE);
 };
 
-export interface FormatUsdOptions {
-  symbol: string | false;
-  suffix: string | false;
-}
-
-export const formatUsd = (value: BigNumberish, options: FormatUsdOptions = { symbol: '$', suffix: ' USD' }): string => {
-  let result = toFixedDecimals(value, 2);
-  if (options.symbol) {
-    result = options.symbol + result;
-  }
-  if (options.suffix) {
-    result = result + options.suffix;
-  }
-  return result;
+export const formatCurrencyAmount = (amount: BigNumberish, decimalPlaces = 2) => {
+  return new BigNumber(amount).toFormat(decimalPlaces);
 };

@@ -29,7 +29,7 @@ import {
   waitForQueue,
 } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
-import { formatTokenAmount } from '@cardstack/web-client/helpers/format-token-amount';
+import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -82,16 +82,16 @@ It looks like you have enough ${
         c.layer1.nativeTokenSymbol
       } in your account on ${
         c.layer1.fullName
-      } to perform the last step of this withdrawal workflow, which requires ~${formatTokenAmount(
+      } to perform the last step of this withdrawal workflow, which requires ~${formatWeiAmount(
         minimumBalanceForWithdrawalClaim
       )} ${c.layer1.nativeTokenSymbol}.`;
     } else {
       return `Checking your balance...
 
-The last step of this withdrawal requires that you have at least **~${formatTokenAmount(
+The last step of this withdrawal requires that you have at least **~${formatWeiAmount(
         minimumBalanceForWithdrawalClaim
       )} ${c.layer1.nativeTokenSymbol}**.
-You only have **${formatTokenAmount(layer1Network.defaultTokenBalance)} ${
+You only have **${formatWeiAmount(layer1Network.defaultTokenBalance)} ${
         c.layer1.nativeTokenSymbol
       }**. You will need to deposit more
 ${

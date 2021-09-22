@@ -315,7 +315,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom('[data-test-face-value-option="50000"] input').isDisabled();
     assert
       .dom('[data-test-face-value-option="50000"]')
-      .containsText('50000 SPEND');
+      .containsText('50,000 SPEND');
     assert
       .dom('[data-test-face-value-option="50000"]')
       .containsText('$500 USD');
@@ -335,7 +335,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     );
 
     assert.dom('[data-test-face-value-option]').doesNotExist();
-    assert.dom('[data-test-face-value-display]').containsText('5000 SPEND');
+    assert.dom('[data-test-face-value-display]').containsText('5,000 SPEND');
     await click(
       `${postableSel(
         2,
@@ -352,7 +352,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       )} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
 
-    assert.dom('[data-test-face-value-display]').containsText('10000 SPEND');
+    assert.dom('[data-test-face-value-display]').containsText('10,000 SPEND');
     assert.dom('[data-test-face-value-display]').containsText('$100.00 USD');
     assert.dom('[data-test-face-value-display]').containsText('≈ 100 DAI.CPXD');
 
@@ -378,12 +378,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(
         `${postableSel(3, 1)} [data-test-prepaid-card-face-value-labeled-value]`
       )
-      .containsText('10000 SPEND')
+      .containsText('10,000 SPEND')
       .containsText('$100.00 USD');
 
     assert
       .dom(`${postableSel(3, 1)} [data-test-prepaid-card-balance]`)
-      .containsText('10000');
+      .containsText('10,000');
     assert
       .dom(`${postableSel(3, 1)} [data-test-prepaid-card-usd-balance]`)
       .containsText('100');

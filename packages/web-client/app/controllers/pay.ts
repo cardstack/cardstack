@@ -13,6 +13,7 @@ import IsIOS from '../services/is-ios';
 import { useResource } from 'ember-resources';
 import { MerchantInfo } from '../resources/merchant-info';
 import config from '@cardstack/web-client/config/environment';
+import { formatAmount } from '../helpers/format-amount';
 
 export default class CardPayMerchantServicesController extends Controller {
   @service('is-ios') declare isIOSService: IsIOS;
@@ -53,7 +54,7 @@ export default class CardPayMerchantServicesController extends Controller {
       return {
         amount,
         displayed: {
-          amount: `§${amount}`,
+          amount: `§${formatAmount(amount)}`,
           secondaryAmount: convertAmountToNativeDisplay(
             spendToUsd(amount)!,
             'USD'
@@ -68,7 +69,7 @@ export default class CardPayMerchantServicesController extends Controller {
         amount,
         displayed: {
           amount: convertAmountToNativeDisplay(amount, 'USD'),
-          secondaryAmount: `§${usdToSpend(Number(amount))}`,
+          secondaryAmount: `§${formatAmount(usdToSpend(Number(amount))!)}`,
         },
       };
     } else {

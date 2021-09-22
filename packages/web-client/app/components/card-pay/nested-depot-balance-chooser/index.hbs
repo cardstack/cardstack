@@ -18,7 +18,7 @@
         <CardPay::BalanceDisplay
           @size="large"
           @icon={{@selectedToken.icon}}
-          @balance={{format-token-amount @selectedToken.balance}}
+          @balance={{format-wei-amount @selectedToken.balance}}
           @symbol={{@selectedTokenSymbol}}
           data-test-account-balance
         />

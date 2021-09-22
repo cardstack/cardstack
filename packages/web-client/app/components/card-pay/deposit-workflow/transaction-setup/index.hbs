@@ -19,7 +19,7 @@
               <CardPay::BalanceDisplay
                 @size="large"
                 @icon={{this.selectedToken.icon}}
-                @balance={{format-token-amount this.selectedToken.balance}}
+                @balance={{format-wei-amount this.selectedToken.balance}}
                 @symbol={{this.selectedToken.symbol}}
                 @usdBalance={{token-to-usd this.selectedToken.symbol this.selectedToken.balance}}
                 data-test-deposit-transaction-setup-from-balance={{this.selectedToken.symbol}}
@@ -37,10 +37,10 @@
               <CardPay::DepositWorkflow::TransactionSetup::TokenOption
                 @checked={{unless this.noTokenBalance (eq this.selectedToken.symbol token.symbol)}}
                 @onInput={{fn this.chooseSource token}}
-                @balance={{format-token-amount token.balance}}
+                @balance={{format-wei-amount token.balance}}
                 @balanceInUsd={{token-to-usd token.symbol token.balance}}
                 @token={{token}}
-                @disabled={{eq (format-token-amount token.balance) "0.00"}}
+                @disabled={{eq (format-wei-amount token.balance) "0.00"}}
                 data-test-deposit-transaction-setup-from-option={{token.symbol}}
               />
             {{/each}}
