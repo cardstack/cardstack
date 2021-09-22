@@ -12,7 +12,7 @@ import PrepaidCardCustomizationsRoute from '../routes/prepaid-card-customization
 import MerchantInfosRoute from '../routes/merchant-infos';
 import { inject } from '../di/dependency-injection';
 import CustodialWalletRoute from '../routes/custodial-wallet';
-export default class JSONAPIMiddleware {
+export default class APIRouter {
   boomRoute: BoomRoute = inject('boom-route', { as: 'boomRoute' });
   sessionRoute: SessionRoute = inject('session-route', { as: 'sessionRoute' });
   prepaidCardColorSchemesRoute: PrepaidCardColorSchemesRoute = inject('prepaid-card-color-schemes-route', {
@@ -28,7 +28,7 @@ export default class JSONAPIMiddleware {
     as: 'merchantInfosRoute',
   });
   custodialWalletRoute: CustodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
-  middleware() {
+  routes() {
     let {
       boomRoute,
       prepaidCardColorSchemesRoute,
@@ -51,7 +51,7 @@ export default class JSONAPIMiddleware {
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();
-    apiRouter.use('/api', verifyJSONAPI, apiSubrouter.routes());
+    apiRouter.use('/api', verifyJSONAPI, apiSubrouter.routes(), apiSubrouter.allowedMethods());
     return apiRouter.routes();
   }
 }
@@ -75,6 +75,6 @@ function notFound(ctx: Koa.Context) {
 }
 declare module '@cardstack/hub/di/dependency-injection' {
   interface KnownServices {
-    'jsonapi-middleware': JSONAPIMiddleware;
+    'api-router': APIRouter;
   }
 }

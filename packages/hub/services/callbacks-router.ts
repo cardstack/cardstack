@@ -7,16 +7,16 @@ import { CardstackError } from '../utils/error';
 import { inject } from '../di/dependency-injection';
 import WyreCallbackRoute from '../routes/wyre-callback';
 
-export default class CallbacksMiddleWare {
+export default class CallbacksRouter {
   wyreCallbackRoute: WyreCallbackRoute = inject('wyre-callback-route', { as: 'wyreCallbackRoute' });
-  middleware() {
+  routes() {
     let { wyreCallbackRoute } = this;
     let callbacksSubrouter = new Router();
     callbacksSubrouter.post('/wyre', wyreCallbackRoute.post);
     callbacksSubrouter.all('/(.*)', notFound);
 
     let callbacksRouter = new Router();
-    callbacksRouter.use('/callbacks', verifyIsJSON, callbacksSubrouter.routes());
+    callbacksRouter.use('/callbacks', verifyIsJSON, callbacksSubrouter.routes(), callbacksSubrouter.allowedMethods());
     return callbacksRouter.routes();
   }
 }
@@ -41,6 +41,6 @@ function notFound(ctx: Koa.Context) {
 
 declare module '@cardstack/hub/di/dependency-injection' {
   interface KnownServices {
-    'callbacks-middleware': CallbacksMiddleWare;
+    'callbacks-router': CallbacksRouter;
   }
 }
