@@ -1,4 +1,3 @@
-import compose from 'koa-compose';
 import Router from '@koa/router';
 import { RouterContext } from '@koa/router';
 import Koa from 'koa';
@@ -75,7 +74,7 @@ export default class JSONAPIMiddleware {
     router.get('/custodial-wallet', custodialWalletRoute.get);
     router.all('/(.*)', notFound);
 
-    return compose([CardstackError.withJsonErrorHandling, router.routes()]);
+    return router.routes();
   }
 
   isJSONAPI(ctxt: Koa.ParameterizedContext<SessionContext, Record<string, unknown>>) {

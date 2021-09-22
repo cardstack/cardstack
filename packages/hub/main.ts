@@ -86,6 +86,7 @@ export async function makeServer(registryCallback?: RegistryCallback, containerC
   initSentry();
 
   let app = new Koa();
+  app.use(CardstackError.withJsonErrorHandling);
   app.use(async (ctx: Koa.Context, next: Koa.Next) => {
     ctx.environment = process.env.NODE_ENV || 'development';
     return next();

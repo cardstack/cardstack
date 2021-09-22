@@ -1,4 +1,3 @@
-import compose from 'koa-compose';
 import Router from '@koa/router';
 import { RouterContext } from '@koa/router';
 import Koa from 'koa';
@@ -37,7 +36,7 @@ export default class CallbacksMiddleWare {
     let router = new Router();
     router.post('/wyre', wyreCallbackRoute.post);
     router.all('/(.*)', notFound);
-    return compose([CardstackError.withJsonErrorHandling, router.routes()]);
+    return router.routes();
   }
 
   isJSON(ctxt: RouterContext<SessionContext, Record<string, unknown>>) {
