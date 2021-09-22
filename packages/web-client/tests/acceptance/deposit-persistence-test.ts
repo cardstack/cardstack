@@ -48,7 +48,7 @@ module('Acceptance | deposit persistence', function (hooks) {
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    workflowPersistenceService.storage.clear();
+    workflowPersistenceService.clear();
   });
 
   test('Generates a flow uuid query parameter used as a persistence identifier', async function (this: Context, assert) {
