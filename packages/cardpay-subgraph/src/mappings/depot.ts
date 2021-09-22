@@ -63,14 +63,14 @@ export function handleSentBridgedTokens(event: TokensBridgingInitiated): void {
     let account = new Account(sender);
     account.save();
     bridgeEventEntity.account = sender;
-    makeEOATransaction(event, sender, null);
+    makeEOATransaction(event, sender);
   }
   bridgeEventEntity.save();
 }
 
 export function handleSetInfoDID(event: SupplierInfoDIDUpdated): void {
   let supplier = toChecksumAddress(event.params.supplier);
-  makeEOATransaction(event, supplier, null);
+  makeEOATransaction(event, supplier);
 
   let infoDID = event.params.infoDID;
 

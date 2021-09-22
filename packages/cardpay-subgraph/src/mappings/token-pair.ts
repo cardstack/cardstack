@@ -8,7 +8,7 @@ export function handleSwap(event: SwapEvent): void {
   if (toSafe != null) {
     makeEOATransactionForSafe(event, toSafe.id);
   } else {
-    makeEOATransaction(event, to, null);
+    makeEOATransaction(event, to);
   }
 
   let txnHash = event.transaction.hash.toHex();

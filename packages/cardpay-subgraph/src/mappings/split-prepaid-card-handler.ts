@@ -10,7 +10,7 @@ export function handlePrepaidCardSplit(event: SplitPrepaidCardEvent): void {
   let issuer = toChecksumAddress(event.params.issuer);
   let txnHash = event.transaction.hash.toHex();
 
-  makeEOATransaction(event, issuer, null);
+  makeEOATransaction(event, issuer);
 
   let issuingTokenAmount = new BigInt(0);
   let tokenAmounts = event.params.issuingTokenAmounts;

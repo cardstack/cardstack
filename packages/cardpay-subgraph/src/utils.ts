@@ -44,7 +44,7 @@ export function makeTransaction(event: ethereum.Event): void {
   txEntity.save();
 }
 
-export function makeEOATransaction(event: ethereum.Event, address: string, safe: string | null): void {
+export function makeEOATransaction(event: ethereum.Event, address: string, safe: string | null = null): void {
   makeTransaction(event);
   let accountEntity = new Account(address);
   accountEntity.save();
@@ -105,7 +105,7 @@ export function makePrepaidCardPayment(
     );
     return;
   }
-  makeEOATransaction(event, prepaidCardEntity.owner, null);
+  makeEOATransaction(event, prepaidCardEntity.owner);
 
   let paymentEntity = new PrepaidCardPayment(txnHash); // There will only ever be one merchant payment event per txn
   paymentEntity.transaction = txnHash;

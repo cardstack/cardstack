@@ -31,7 +31,7 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   if (isDepot) {
     makeEOATransactionForSafe(event, maybeDepot);
   } else {
-    makeEOATransaction(event, issuer, null);
+    makeEOATransaction(event, issuer);
   }
   let accountEntity = new Account(issuer);
   accountEntity.save();
@@ -77,8 +77,8 @@ export function handleTransferPrepaidCard(event: TransferredPrepaidCard): void {
   let to = toChecksumAddress(event.params.newOwner);
   let txnHash = event.transaction.hash.toHex();
 
-  makeEOATransaction(event, from, null);
-  makeEOATransaction(event, to, null);
+  makeEOATransaction(event, from);
+  makeEOATransaction(event, to);
 
   let prepaidCardEntity = PrepaidCard.load(prepaidCard);
   if (prepaidCardEntity == null) {

@@ -18,7 +18,7 @@ export function handleTransfer(event: TransferEvent): void {
     if (receiverSafe != null) {
       makeEOATransactionForSafe(event, receiverSafe.id);
     } else {
-      makeEOATransaction(event, to, null);
+      makeEOATransaction(event, to);
     }
   }
   if (from != ZERO_ADDRESS) {
@@ -27,7 +27,7 @@ export function handleTransfer(event: TransferEvent): void {
     if (senderSafe != null) {
       makeEOATransactionForSafe(event, senderSafe.id);
     } else {
-      makeEOATransaction(event, from, null);
+      makeEOATransaction(event, from);
     }
   }
   let txnHash = event.transaction.hash.toHex();
