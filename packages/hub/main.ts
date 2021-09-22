@@ -1,6 +1,7 @@
 /* eslint-disable no-process-exit */
 
 import Koa from 'koa';
+import KoaBody from 'koa-body';
 import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
@@ -38,6 +39,7 @@ import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
+import { CardstackError } from './utils/error';
 
 const serverLog = logger('hub/server');
 const workerLog = logger('hub/worker');
@@ -90,6 +92,17 @@ export async function makeServer(registryCallback?: RegistryCallback, containerC
   });
   app.use(cors);
   app.use(httpLogging);
+  app.use(
+    KoaBody({
+      jsonLimit: '16mb',
+      urlencoded: false,
+      text: false,
+      onError(error: Error) {
+        throw new CardstackError(`error while parsing body: ${error.message}`, { status: 400 });
+      },
+    })
+  );
+
   app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
   app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
   app.use(((await container.lookup('jsonapi-middleware')) as JsonapiMiddleware).middleware());

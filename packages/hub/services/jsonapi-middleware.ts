@@ -4,7 +4,6 @@ import { RouterContext } from '@koa/router';
 import Koa from 'koa';
 // @ts-ignore
 import mimeMatch from 'mime-match';
-import KoaBody from 'koa-body';
 import { Memoize } from 'typescript-memoize';
 import { CardstackError } from '../utils/error';
 import { SessionContext } from './authentication-middleware';
@@ -54,16 +53,6 @@ export default class JSONAPIMiddleware {
 
   @Memoize()
   get jsonHandlers() {
-    let body = KoaBody({
-      jsonLimit: '16mb',
-      multipart: false,
-      urlencoded: false,
-      text: false,
-      jsonStrict: true,
-      onError(error: Error) {
-        throw new CardstackError(`error while parsing body: ${error.message}`, { status: 400 });
-      },
-    });
     let {
       boomRoute,
       prepaidCardColorSchemesRoute,
@@ -86,7 +75,7 @@ export default class JSONAPIMiddleware {
     router.get('/custodial-wallet', custodialWalletRoute.get);
     router.all('/(.*)', notFound);
 
-    return compose([CardstackError.withJsonErrorHandling, body, router.routes()]);
+    return compose([CardstackError.withJsonErrorHandling, router.routes()]);
   }
 
   isJSONAPI(ctxt: Koa.ParameterizedContext<SessionContext, Record<string, unknown>>) {
