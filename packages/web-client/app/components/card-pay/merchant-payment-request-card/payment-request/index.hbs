@@ -2,8 +2,8 @@
   class="payment-request"
   ...attributes
 >
-  <div class="payment-request__explanation">
-    {{#if (and @canDeepLink this.showAsQR)}}
+  <div class="payment-request__explanation" data-test-payment-request-explanation>
+    {{#if (and @canDeepLink (not this.showAsQR))}}
       Please install the Card Wallet app on your mobile phone, then tap on the link below to complete your payment
     {{else}}
       Please install the Card Wallet app on your mobile phone, then scan the QR code below to complete your payment
@@ -18,7 +18,8 @@
   {{else if @merchant.errored}}
     <div class="payment-request__address-only" data-test-payment-request-merchant-address>
       <span class="payment-request__merchant-address">
-        {{@merchantAddress}}
+        {{!-- this is intentional to prevent whitespace between the segments --}}
+        {{#each this.addressSegments as |segment|}}<span class={{cn payment-request__merchant-address-segment--bold=segment.bold}}>{{segment.text}}</span>{{/each}}
       </span>
       <span class="payment-request__missing-info-message" data-test-payment-request-merchant-info-missing>
         {{svg-jar "failure-bordered" class="payment-request__missing-info-message-icon"}}
@@ -37,10 +38,12 @@
 
     {{#if @amount}}
       <div class="payment-request__amount" data-test-payment-request-amount>
-        §{{@amount}}
+        {{@amount}}
       </div>
-      <div class="payment-request__usd-amount" data-test-payment-request-usd-amount>
-        {{format-usd @usdAmount}}
+    {{/if}}
+    {{#if (and @amount @secondaryAmount)}}
+      <div class="payment-request__secondary-amount" data-test-payment-request-secondary-amount>
+        {{@secondaryAmount}}
       </div>
     {{/if}}
 

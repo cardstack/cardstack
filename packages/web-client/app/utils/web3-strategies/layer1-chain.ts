@@ -287,6 +287,12 @@ export default abstract class Layer1ChainWeb3Strategy
     );
   }
 
+  async resumeApprove(txnHash: TransactionHash): Promise<TransactionReceipt> {
+    if (!this.web3) throw new Error('Cannot unlock tokens without web3');
+    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
+    return tokenBridge.unlockTokens(txnHash);
+  }
+
   async relayTokens(
     tokenSymbol: BridgeableSymbol,
     receiverAddress: string,
@@ -301,6 +307,14 @@ export default abstract class Layer1ChainWeb3Strategy
       amountInWei.toString(),
       { onTxnHash }
     );
+  }
+
+  async resumeRelayTokens(
+    txnHash: TransactionHash
+  ): Promise<TransactionReceipt> {
+    if (!this.web3) throw new Error('Cannot unlock tokens without web3');
+    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
+    return tokenBridge.relayTokens(txnHash);
   }
 
   async claimBridgedTokens(

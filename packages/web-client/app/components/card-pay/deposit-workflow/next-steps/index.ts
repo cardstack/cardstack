@@ -8,14 +8,18 @@ class CardPayDepositWorkflowNextStepsComponent extends Component<WorkflowCardCom
   @service declare router: RouterService;
 
   @action async openNewDepositWorkflow() {
-    await this.router.transitionTo({ queryParams: { flow: null } });
+    await this.router.transitionTo({
+      queryParams: { flow: null, 'flow-id': null },
+    });
     next(this, () => {
       this.router.transitionTo({ queryParams: { flow: 'deposit' } });
     });
   }
 
   @action returnToDashboard() {
-    this.router.transitionTo({ queryParams: { flow: null } });
+    this.router.transitionTo({
+      queryParams: { flow: null, 'flow-id': null },
+    });
   }
 }
 

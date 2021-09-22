@@ -59,9 +59,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
-  hooks.beforeEach(function () {
-    // TODO: fix typescript for mirage
-    (this as any).server.db.loadData({
+  hooks.beforeEach(function (this: Context) {
+    this.server.db.loadData({
       prepaidCardColorSchemes,
       prepaidCardPatterns,
     });
@@ -316,7 +315,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom('[data-test-face-value-option="50000"] input').isDisabled();
     assert
       .dom('[data-test-face-value-option="50000"]')
-      .containsText('50000 SPEND');
+      .containsText('50,000 SPEND');
     assert
       .dom('[data-test-face-value-option="50000"]')
       .containsText('$500 USD');
@@ -336,7 +335,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     );
 
     assert.dom('[data-test-face-value-option]').doesNotExist();
-    assert.dom('[data-test-face-value-display]').containsText('5000 SPEND');
+    assert.dom('[data-test-face-value-display]').containsText('5,000 SPEND');
     await click(
       `${postableSel(
         2,
@@ -353,7 +352,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       )} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
 
-    assert.dom('[data-test-face-value-display]').containsText('10000 SPEND');
+    assert.dom('[data-test-face-value-display]').containsText('10,000 SPEND');
     assert.dom('[data-test-face-value-display]').containsText('$100.00 USD');
     assert.dom('[data-test-face-value-display]').containsText('≈ 100 DAI.CPXD');
 
@@ -379,12 +378,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(
         `${postableSel(3, 1)} [data-test-prepaid-card-face-value-labeled-value]`
       )
-      .containsText('10000 SPEND')
+      .containsText('10,000 SPEND')
       .containsText('$100.00 USD');
 
     assert
       .dom(`${postableSel(3, 1)} [data-test-prepaid-card-balance]`)
-      .containsText('10000');
+      .containsText('10,000');
     assert
       .dom(`${postableSel(3, 1)} [data-test-prepaid-card-usd-balance]`)
       .containsText('100');
@@ -505,6 +504,14 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     await waitFor(epiloguePostableSel(4));
 
+    let workflowPersistenceService = this.owner.lookup(
+      'service:workflow-persistence'
+    ) as WorkflowPersistence;
+
+    const workflowPersistenceId = new URL(
+      'http://domain.test/' + currentURL()
+    ).searchParams.get('flow-id')!;
+
     assert
       .dom(
         `${epiloguePostableSel(
@@ -520,14 +527,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom('[data-test-workflow-thread]').doesNotExist();
 
     assert.dom('[data-test-prepaid-cards-count]').containsText('2');
-
-    let workflowPersistenceService = this.owner.lookup(
-      'service:workflow-persistence'
-    ) as WorkflowPersistence;
-
-    const workflowPersistenceId = new URL(
-      'http://domain.test/' + currentURL()
-    ).searchParams.get('flow-id')!;
 
     const persistedData = workflowPersistenceService.getPersistedData(
       workflowPersistenceId

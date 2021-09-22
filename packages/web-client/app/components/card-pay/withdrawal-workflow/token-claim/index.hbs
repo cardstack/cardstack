@@ -12,7 +12,7 @@
         class="token-claim__balance-display"
         @size="large"
         @icon={{this.tokenDetails.icon}}
-        @balance={{format-token-amount this.withdrawalAmount}}
+        @balance={{format-wei-amount this.withdrawalAmount}}
         @symbol={{this.tokenSymbol}}
         @text={{concat (format-usd (token-to-usd this.tokenSymbolForConversion this.withdrawalAmount)) "*"}}
         data-test-withdrawal-token-claim-amount

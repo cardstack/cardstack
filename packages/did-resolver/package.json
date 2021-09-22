@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/did-resolver",
-  "version": "0.25.2",
+  "version": "0.26.0",
   "description": "A javascript resolver for the cardstack DID method",
   "main": "./index.js",
   "author": "Cardstack Team",
@@ -15,8 +15,8 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.25.2",
-    "@cardstack/test-support": "0.25.2",
+    "@cardstack/eslint-config": "0.26.0",
+    "@cardstack/test-support": "0.26.0",
     "@types/chai": "^4.2.15",
     "@types/lodash": "^4.14.169",
     "@types/mocha": "^8.2.1",
@@ -28,8 +28,8 @@
     "node": ">= 12"
   },
   "scripts": {
-    "test": "PACKAGE=did-resolver mocha ../test-support/bin/run.js --timeout 60000",
-    "autotest": "PACKAGE=did-resolver mocha -w --reporter=min ../test-support/bin/run.js --timeout 60000"
+    "test": "mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
+    "autotest": "mocha -r @cardstack/test-support/prepare-node-tests -w --reporter=min 'node-tests/**/*-test.js' --timeout 60000"
   },
   "volta": {
     "extends": "../../package.json"

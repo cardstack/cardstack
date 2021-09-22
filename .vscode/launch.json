@@ -19,7 +19,7 @@
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
       "env": {
-        "SERVER_SECRET":"",
+        "SERVER_SECRET": "",
         "WYRE_ACCOUNT_ID": "",
         "WYRE_API_KEY": "",
         "WYRE_SECRET_KEY": ""
@@ -35,21 +35,14 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Node tests",
+      "name": "Hub Node tests",
       "program": "${workspaceRoot}/node_modules/.bin/_mocha",
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
       "env": {
-        "PACKAGE": "hub",
         "NODE_ENV": "test"
       },
-      "args": [
-        "-r",
-        "esm",
-        "../test-support/bin/run.js",
-        "--timeout",
-        "600000"
-      ]
+      "args": ["-r", "@cardstack/test-support/prepare-node-tests", "node-tests/**/*-test.js", "--timeout", "600000"]
     },
     {
       "type": "node",
@@ -646,6 +639,62 @@
         "register-rewardee",
         "0x36731EC6C6c10d99f09580820b8D30607A383288",
         "0x22593fefedddafbf5b0d92ac026138f4da1e707f",
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Add Reward Tokens",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "add-reward-tokens",
+        "0x906B5c2877dEad3c5565b042094d182b7575ADdE",
+        "0x63cbD6f839c54635c73235Fd3d0CC8Cb52B7B127",
+        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "5",
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Get Reward Pool Balance",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "reward-pool-balance",
+        "0x63cbD6f839c54635c73235Fd3d0CC8Cb52B7B127",
+        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Claim Rewards",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "claim-rewards",
+        "0xcfE8a7eEeFa2182a91a86dB3C08ff6229899A50B",
+        "0x4767D0D74356433d54880Fcd7f083751d64388aF", //default reward program id
+        "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "0x00000000000000000000000000000000000000000000000000000000000000070000000000000000000000000000000000000000000000008ac7230489e80000ded2d0791a20d9d7fa1c9aa2ca7fec46f27cfcea42ce1d151f33e6e9cdd52f8b8ec7fea33ce953aa1933e444f8d4862a2878b08cd14862c9d5f928c5292b4811e04490b4c7bf89e4d50417d8ba6f982f6c7323a550c07e57e38feb0ce08d5d5bcc13be6aef2c87b9ddffe4e5dc827260850a398512deaccb11c0f3515c6ea9c373e766e12b90202a8e6ce04264fb355a8f8a37960eb86c09a8710ffb5e23356c", //proof
+        "2", //amount in eth
         "--network",
         "sokol",
         "--mnemonic",

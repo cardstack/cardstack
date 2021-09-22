@@ -1,13 +1,14 @@
 <ActionCardContainer
   @header="Confirmation"
   @isComplete={{@isComplete}}
+  data-test-deposit-confirmation
 >
   <ActionCardContainer::Section @title="You deposited">
     <CardPay::Bridge::Item
       @isLayer1={{true}}
       @link={{this.depositTxnViewerUrl}}
       @token={{this.depositedToken}}
-      @amount={{format-token-amount this.depositedAmount}}
+      @amount={{format-wei-amount this.depositedAmount}}
       @preposition="from"
       @walletAddress={{this.layer1Network.walletInfo.firstAddress}}
       data-test-deposit-confirmation-from
@@ -34,7 +35,7 @@
       @isLayer2={{true}}
       @link={{this.blockscoutUrl}}
       @token={{this.receivedToken}}
-      @amount={{format-token-amount this.depositedAmount}}
+      @amount={{format-wei-amount this.depositedAmount}}
       @preposition="in"
       @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
       @depotAddress={{this.depotAddress}}

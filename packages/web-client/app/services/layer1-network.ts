@@ -111,6 +111,10 @@ export default class Layer1Network
     return txnReceipt;
   }
 
+  async resumeApprove(txnHash: TransactionHash) {
+    return this.strategy.resumeApprove(txnHash);
+  }
+
   @task *relayTokensTask(
     tokenSymbol: string,
     destinationAddress: string,
@@ -125,6 +129,10 @@ export default class Layer1Network
     );
     yield this.strategy.refreshBalances();
     return txnReceipt;
+  }
+
+  async resumeRelayTokens(txnHash: TransactionHash) {
+    return this.strategy.resumeRelayTokens(txnHash);
   }
 
   blockExplorerUrl(txnHash: string | undefined): string | undefined {

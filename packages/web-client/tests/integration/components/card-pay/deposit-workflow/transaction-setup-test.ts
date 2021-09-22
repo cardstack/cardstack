@@ -69,8 +69,8 @@ module(
         .hasText(layer1AccountAddress);
       assert.dom(`[data-test-balance="DAI"]`).hasText('250.50 DAI');
       assert.dom(`[data-test-usd-balance="DAI"]`).hasText('$50.10 USD');
-      assert.dom(`[data-test-balance="CARD"]`).hasText('10000.00 CARD');
-      assert.dom(`[data-test-usd-balance="CARD"]`).hasText('$2000.00 USD');
+      assert.dom(`[data-test-balance="CARD"]`).hasText('10,000.00 CARD');
+      assert.dom(`[data-test-usd-balance="CARD"]`).hasText('$2,000.00 USD');
       assert
         .dom(`[data-test-deposit-transaction-setup-to-wallet]`)
         .hasText(`${c.layer2.fullName} wallet`);
@@ -238,7 +238,7 @@ module(
       );
       assert
         .dom('[data-test-deposit-transaction-setup-from-balance="CARD"]')
-        .containsText('10000.00 CARD');
+        .containsText('10,000.00 CARD');
       assert
         .dom('[data-test-deposit-transaction-setup-from-balance="DAI"]')
         .doesNotExist();

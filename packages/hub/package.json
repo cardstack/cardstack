@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/hub",
-  "version": "0.25.2",
+  "version": "0.26.0",
   "bin": {
     "cardstack-hub": "./bin/cardstack-hub.js"
   },
@@ -12,15 +12,16 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.18.0",
     "@aws-sdk/client-sts": "^3.18.0",
-    "@cardstack/cardpay-sdk": "0.25.2",
-    "@cardstack/did-resolver": "0.25.2",
+    "@cardstack/cardpay-sdk": "0.26.0",
+    "@cardstack/did-resolver": "0.26.0",
     "@cardstack/logger": "^0.2.1",
     "@graphile/logger": "^0.2.0",
+    "@koa/router": "^10.0.0",
     "@sentry/node": "^6.10.0",
     "@types/fs-extra": "^9.0.11",
     "@types/json-stable-stringify": "^1.0.32",
     "@types/koa": "^2.13.1",
-    "@types/koa-route": "^3.2.4",
+    "@types/koa__router": "^8.0.4",
     "@types/lodash": "^4.14.169",
     "@types/qs": "^6.9.6",
     "@types/semver": "^7.3.6",
@@ -29,7 +30,6 @@
     "auto-bind": "^4.0.0",
     "config": "^3.3.6",
     "dag-map": "^2.0.2",
-    "esm": "^3.2.25",
     "eth-sig-util": "^3.0.1",
     "fast-json-stable-stringify": "^2.1.0",
     "fs-extra": "^10.0.0",
@@ -39,7 +39,6 @@
     "json-typescript": "^1.1.2",
     "jsonapi-typescript": "^0.1.3",
     "koa": "^2.13.1",
-    "koa-better-route": "^0.4.0",
     "koa-body": "^4.2.0",
     "koa-compose": "^4.1.0",
     "koa-proxies": "^0.12.1",
@@ -58,8 +57,8 @@
     "web3": "1.5.2"
   },
   "devDependencies": {
-    "@cardstack/eslint-config": "0.25.2",
-    "@cardstack/test-support": "0.25.2",
+    "@cardstack/eslint-config": "0.26.0",
+    "@cardstack/test-support": "0.26.0",
     "@types/chai": "^4.2.15",
     "@types/chai-as-promised": "^7.1.3",
     "@types/config": "^0.0.38",
@@ -71,6 +70,7 @@
     "json-stable-stringify": "^1.0.1",
     "mocha": "^8.3.2",
     "moment-timezone": "^0.5.33",
+    "npm-run-all": "^4.1.5",
     "supertest": "^6.1.3"
   },
   "engines": {
@@ -78,17 +78,17 @@
     "yarn": "^1.0"
   },
   "scripts": {
-    "start": "node ./bin/server.ts",
-    "console": "node --experimental-repl-await ./bin/console.ts",
-    "db:setup:local": "createdb hub_development && node-pg-migrate up && node ./bin/seed-db.ts && node ./bin/dump-db-structure.js && node ./bin/setup-test-db.js",
+    "start": "run-p -c start:*",
+    "start:server": "node ./bin/server.js",
+    "start:worker": "node ./bin/worker.js",
+    "console": "node --experimental-repl-await ./bin/console.js",
+    "db:setup:local": "createdb hub_development && node-pg-migrate up && node ./bin/seed-db.js && node ./bin/dump-db-structure.js && node ./bin/setup-test-db.js",
     "db:migrate": "node-pg-migrate",
-    "db:seed": "node ./bin/seed-db.ts",
+    "db:seed": "node ./bin/seed-db.js",
     "db:structure:dump": "node ./bin/dump-db-structure.js",
     "db:test:prepare": "node ./bin/setup-test-db.js",
-    "start:server": "node ./bin/server.ts",
-    "start:worker": "node ./bin/worker.ts",
-    "test": "PACKAGE=hub NODE_ENV=test mocha ../test-support/bin/run.js --timeout 60000",
-    "autotest": "PACKAGE=hub NODE_ENV=test mocha -w --reporter=min -r esm ../test-support/bin/run.js --timeout 60000"
+    "test": "NODE_ENV=test mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
+    "autotest": "NODE_ENV=test mocha -w --reporter=min mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000"
   },
   "volta": {
     "extends": "../../package.json"

@@ -6,7 +6,7 @@
       <CardPay::DashboardPanel::Section @section={{section}}>
         <:cta>
           <Boxel::Button
-            {{on "click" (set this "flow" section.workflow)}}
+            {{on "click" (fn this.transitionToWorkflow section.workflow)}}
             @kind="primary"
             @size="touch"
             @disabled={{section.isCtaDisabled}}
@@ -16,7 +16,7 @@
           </Boxel::Button>
         </:cta>
         <:disclaimer>
-          {{#if (eq section.workflow 'request-payment')}}
+          {{#if (eq section.workflow "request-payment")}}
             This is possible once you have connected your {{network-display-info "layer2" "fullName"}} wallet and created a merchant.
           {{/if}}
         </:disclaimer>
@@ -43,7 +43,7 @@
 <Boxel::Modal
   style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
   @isOpen={{eq this.flow 'create-merchant'}}
-  @onClose={{set this 'flow' null}}
+  @onClose={{this.resetQueryParams}}
 >
   {{#if (is-network-initialized)}}
     {{#if (eq this.flow 'create-merchant')}}

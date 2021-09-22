@@ -102,15 +102,27 @@ jobs:
             hub:
               - 'packages/hub/**'
               - 'packages/did-resolver/**'
+              - '.github/workflows/push-main.yml'
+              - '.github/actions/deploy-hub/**'
+              - 'yarn.lock'
+              - 'waypoint.hcl'
             web_client:
               - 'packages/web-client/**'
               - 'packages/boxel/**'
               - 'packages/cardpay-sdk/**'
               - 'packages/did-resolver/**'
+              - '.github/workflows/push-main.yml'
+              - '.github/actions/deploy-web-client/**'
+              - 'yarn.lock'
             boxel:
               - 'packages/boxel/**'
+              - '.github/workflows/push-main.yml'
+              - 'yarn.lock'
             cardie:
               - 'packages/cardie/**'
+              - '.github/workflows/push-main.yml'
+              - 'yarn.lock'
+              - 'waypoint.hcl'
 
   deploy-hub-staging:
     name: Deploy hub to staging cluster via waypoint
@@ -132,8 +144,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}
           AWS_DEFAULT_REGION: us-east-1
-          WAYPOINT_AUTH_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
-          WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_AUTH_TOKEN }}
+          WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
+          WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
         with:
           environment: staging
       - name: Send success notification to Discord
@@ -245,8 +257,8 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_WAYPOINT_AWS_ACCESS_KEY }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_WAYPOINT_AWS_SECRET }}
           AWS_DEFAULT_REGION: us-east-1
-          WAYPOINT_AUTH_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
-          WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_AUTH_TOKEN }}
+          WAYPOINT_SERVER_TOKEN: ${{ secrets.STAGING_WAYPOINT_SERVER_TOKEN }}
+          WAYPOINT_SERVER_ADDR: ${{ secrets.STAGING_WAYPOINT_SERVER_ADDR }}
         with:
           environment: staging
       - name: Send success notification to Discord

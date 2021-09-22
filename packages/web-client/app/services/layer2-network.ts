@@ -9,7 +9,10 @@ import {
   TransactionHash,
   WithdrawalLimits,
 } from '../utils/web3-strategies/types';
-import { PrepaidCardSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import {
+  MerchantSafe,
+  PrepaidCardSafe,
+} from '@cardstack/cardpay-sdk/sdk/safes';
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
 import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
 import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
@@ -174,6 +177,17 @@ export default class Layer2Network
     yield this.refreshSafesAndBalances();
 
     return merchant;
+  }
+
+  @task *resumeRegisterMerchantTransactionTask(
+    txnHash: string
+  ): TaskGenerator<MerchantSafe> {
+    let merchantSafe = yield this.strategy.resumeRegisterMerchantTransaction(
+      txnHash
+    );
+    // Refreshes safes so that external component shows up-to-date list of user's safes
+    this.refreshSafesAndBalances();
+    return merchantSafe;
   }
 
   disconnect() {

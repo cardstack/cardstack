@@ -175,7 +175,7 @@ module(
         .containsText(prepaidCardAddress);
       assert
         .dom(`[data-test-prepaid-card-choice-selected-card]`)
-        .containsText('2324 SPEND');
+        .containsText('2,324 SPEND');
 
       await selectPrepaidCard(prepaidCardAddress2);
 

@@ -13,9 +13,14 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import BN from 'bn.js';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import { formatUsd, PrepaidCardSafe, spendToUsd } from '@cardstack/cardpay-sdk';
+import {
+  convertAmountToNativeDisplay,
+  PrepaidCardSafe,
+  spendToUsd,
+} from '@cardstack/cardpay-sdk';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
+import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
 
 interface Context extends MirageTestContext {}
 
@@ -267,9 +272,13 @@ module('Acceptance | create merchant', function (hooks) {
 
     test('initiating workflow with layer 2 wallet already connected', async function (assert) {
       await visit('/card-pay/merchant-services?flow=create-merchant');
+
+      const flowId = new URL(
+        'http://domain.test/' + currentURL()
+      ).searchParams.get('flow-id');
       assert.equal(
         currentURL(),
-        '/card-pay/merchant-services?flow=create-merchant'
+        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
       );
       assert
         .dom(postableSel(0, 2))
@@ -370,9 +379,13 @@ module('Acceptance | create merchant', function (hooks) {
 
     test('disconnecting Layer 2 after proceeding beyond it', async function (assert) {
       await visit('/card-pay/merchant-services?flow=create-merchant');
+
+      let flowId = new URL(
+        'http://domain.test/' + currentURL()
+      ).searchParams.get('flow-id');
       assert.equal(
         currentURL(),
-        '/card-pay/merchant-services?flow=create-merchant'
+        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
       );
       assert
         .dom(
@@ -399,9 +412,13 @@ module('Acceptance | create merchant', function (hooks) {
       await click(
         '[data-test-workflow-default-cancelation-restart="create-merchant"]'
       );
+
+      flowId = new URL('http://domain.test/' + currentURL()).searchParams.get(
+        'flow-id'
+      );
       assert.equal(
         currentURL(),
-        '/card-pay/merchant-services?flow=create-merchant'
+        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
       );
 
       layer2Service.test__simulateWalletConnectUri();
@@ -418,9 +435,13 @@ module('Acceptance | create merchant', function (hooks) {
 
     test('changing Layer 2 account should cancel the workflow', async function (assert) {
       await visit('/card-pay/merchant-services?flow=create-merchant');
+
+      let flowId = new URL(
+        'http://domain.test/' + currentURL()
+      ).searchParams.get('flow-id');
       assert.equal(
         currentURL(),
-        '/card-pay/merchant-services?flow=create-merchant'
+        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
       );
       assert
         .dom(
@@ -455,9 +476,12 @@ module('Acceptance | create merchant', function (hooks) {
       await click(
         '[data-test-workflow-default-cancelation-restart="create-merchant"]'
       );
+      flowId = new URL('http://domain.test/' + currentURL()).searchParams.get(
+        'flow-id'
+      );
       assert.equal(
         currentURL(),
-        '/card-pay/merchant-services?flow=create-merchant'
+        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
       );
     });
   });
@@ -485,8 +509,11 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${merchantRegistrationFee} SPEND (${formatUsd(
-          spendToUsd(merchantRegistrationFee)!
+        `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${formatAmount(
+          merchantRegistrationFee
+        )} SPEND (${convertAmountToNativeDisplay(
+          spendToUsd(merchantRegistrationFee)!,
+          'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert
@@ -523,8 +550,11 @@ module('Acceptance | create merchant', function (hooks) {
     assert
       .dom('[data-test-postable="0"][data-test-cancelation]')
       .containsText(
-        `It looks like you don’t have a prepaid card with enough funds to pay the ${merchantRegistrationFee} SPEND (${formatUsd(
-          spendToUsd(merchantRegistrationFee)!
+        `It looks like you don’t have a prepaid card with enough funds to pay the ${formatAmount(
+          merchantRegistrationFee
+        )} SPEND (${convertAmountToNativeDisplay(
+          spendToUsd(merchantRegistrationFee)!,
+          'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert

@@ -1,6 +1,7 @@
 /* eslint-disable no-process-exit */
 
 import Koa from 'koa';
+import KoaBody from 'koa-body';
 import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
@@ -35,29 +36,31 @@ import WyreCallbackRoute from './routes/wyre-callback';
 import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import MerchantInfoQueries from './services/queries/merchant-info';
 import { AuthenticationUtils } from './utils/authentication';
-import JsonapiMiddleware from './services/jsonapi-middleware';
-import CallbacksMiddleware from './services/callbacks-middleware';
+import ApiRouter from './services/api-router';
+import CallbacksRouter from './services/callbacks-router';
 import NonceTracker from './services/nonce-tracker';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
+import { CardstackError } from './utils/error';
 
-const log = logger('cardstack/hub');
+const serverLog = logger('hub/server');
+const workerLog = logger('hub/worker');
 
 export function wireItUp(registryCallback?: RegistryCallback): Container {
   let registry = new Registry();
+  registry.register('api-router', ApiRouter);
   registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('authentication-utils', AuthenticationUtils);
   registry.register('boom-route', BoomRoute);
-  registry.register('callbacks-middleware', CallbacksMiddleware);
+  registry.register('callbacks-router', CallbacksRouter);
   registry.register('clock', Clock);
   registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
   registry.register('inventory-route', InventoryRoute);
-  registry.register('jsonapi-middleware', JsonapiMiddleware);
   registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info-queries', MerchantInfoQueries);
@@ -91,16 +94,28 @@ export async function makeServer(registryCallback?: RegistryCallback, containerC
   initSentry();
 
   let app = new Koa();
+  app.use(CardstackError.withJsonErrorHandling);
   app.use(async (ctx: Koa.Context, next: Koa.Next) => {
     ctx.environment = process.env.NODE_ENV || 'development';
     return next();
   });
   app.use(cors);
   app.use(httpLogging);
+  app.use(
+    KoaBody({
+      jsonLimit: '16mb',
+      urlencoded: false,
+      text: false,
+      onError(error: Error) {
+        throw new CardstackError(`error while parsing body: ${error.message}`, { status: 400 });
+      },
+    })
+  );
+
   app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
   app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
-  app.use(((await container.lookup('jsonapi-middleware')) as JsonapiMiddleware).middleware());
-  app.use(((await container.lookup('callbacks-middleware')) as CallbacksMiddleware).middleware());
+  app.use(((await container.lookup('api-router')) as ApiRouter).routes());
+  app.use(((await container.lookup('callbacks-router')) as CallbacksRouter).routes());
 
   app.use(async (ctx: Koa.Context, _next: Koa.Next) => {
     ctx.body = 'Hello World ' + ctx.environment + '... ' + ctx.host.split(':')[0];
@@ -145,7 +160,7 @@ export function bootServer() {
   } else {
     logger.configure({
       defaultLevel: 'warn',
-      logLevels: [['cardstack/*', 'info']],
+      logLevels: [['hub/*', 'info']],
     });
   }
 
@@ -162,17 +177,17 @@ export function bootServer() {
     //
     // (If we weren't started under IPC, `process.connected` is
     // undefined, so this never happens.)
-    log.info(`Shutting down because connected parent process has already exited.`);
+    serverLog.info(`Shutting down because connected parent process has already exited.`);
     process.exit(0);
   }
   function onDisconnect() {
-    log.info(`Hub shutting down because connected parent process exited.`);
+    serverLog.info(`Hub shutting down because connected parent process exited.`);
     process.exit(0);
   }
   process.on('disconnect', onDisconnect);
 
   return runServer(startupConfig()).catch((err: Error) => {
-    log.error('Server failed to start cleanly: %s', err.stack || err);
+    serverLog.error('Server failed to start cleanly: %s', err.stack || err);
     process.exit(-1);
   });
 }
@@ -189,7 +204,7 @@ export async function bootServerForTesting(config: Partial<StartupConfig>) {
   process.on('warning', onWarning);
 
   let server = await runServer(config).catch((err: Error) => {
-    log.error('Server failed to start cleanly: %s', err.stack || err);
+    serverLog.error('Server failed to start cleanly: %s', err.stack || err);
     process.exit(-1);
   });
 
@@ -213,16 +228,16 @@ export async function bootWorker() {
     return (level: LogLevel, message: any, meta?: LogMeta) => {
       switch (level) {
         case LogLevel.ERROR:
-          log.error(message, scope, meta);
+          workerLog.error(message, scope, meta);
           break;
         case LogLevel.WARNING:
-          log.warn(message, scope, meta);
+          workerLog.warn(message, scope, meta);
           break;
         case LogLevel.INFO:
-          log.info(message, scope, meta);
+          workerLog.info(message, scope, meta);
           break;
         case LogLevel.DEBUG:
-          log.info(message, scope, meta);
+          workerLog.info(message, scope, meta);
       }
     };
   };
@@ -261,7 +276,7 @@ export async function bootWorker() {
 async function runServer(config: Partial<StartupConfig>) {
   let app = await makeServer(config.registryCallback, config.containerCallback);
   let server = app.listen(config.port);
-  log.info('server listening on %s', config.port);
+  serverLog.info('server listening on %s', config.port);
   if (process.connected) {
     process.send!('hub hello');
   }
@@ -290,9 +305,9 @@ function startupConfig(): StartupConfig {
 }
 
 async function httpLogging(ctxt: Koa.Context, next: Koa.Next) {
-  log.info('start %s %s', ctxt.request.method, ctxt.request.originalUrl);
+  serverLog.info('start %s %s', ctxt.request.method, ctxt.request.originalUrl);
   await next();
-  log.info('finish %s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
+  serverLog.info('finish %s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
 }
 
 export async function cors(ctxt: Koa.Context, next: Koa.Next) {

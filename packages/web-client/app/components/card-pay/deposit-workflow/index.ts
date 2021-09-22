@@ -16,13 +16,28 @@ import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { capitalize } from '@ember/string';
+import RouterService from '@ember/routing/router-service';
+import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
+import { next } from '@ember/runloop';
+import { task } from 'ember-concurrency';
+import { taskFor } from 'ember-concurrency-ts';
+import { tracked } from '@glimmer/tracking';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
+  RESTORATION_L1_ADDRESS_CHANGED: 'RESTORATION_L1_ADDRESS_CHANGED',
+  RESTORATION_L1_DISCONNECTED: 'RESTORATION_L1_DISCONNECTED',
+  RESTORATION_L2_ADDRESS_CHANGED: 'RESTORATION_L2_ADDRESS_CHANGED',
+  RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
 } as const;
 
 class DepositWorkflow extends Workflow {
+  @service declare router: RouterService;
+  @service declare layer1Network: Layer1Network;
+  @service declare layer2Network: Layer2Network;
+
+  workflowPersistenceId: string;
   name = 'RESERVE_POOL_DEPOSIT' as WorkflowName;
   milestones = [
     new Milestone({
@@ -60,6 +75,7 @@ class DepositWorkflow extends Workflow {
         }),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'LAYER1_CONNECT',
           componentName: 'card-pay/layer-one-connect-card',
         }),
       ],
@@ -97,6 +113,7 @@ class DepositWorkflow extends Workflow {
         }),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'LAYER2_CONNECT',
           componentName: 'card-pay/layer-two-connect-card',
         }),
       ],
@@ -112,6 +129,7 @@ class DepositWorkflow extends Workflow {
         }),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'TXN_SETUP',
           componentName: 'card-pay/deposit-workflow/transaction-setup',
         }),
         new WorkflowMessage({
@@ -120,6 +138,7 @@ class DepositWorkflow extends Workflow {
         }),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'TXN_AMOUNT',
           componentName: 'card-pay/deposit-workflow/transaction-amount',
         }),
       ],
@@ -134,6 +153,7 @@ class DepositWorkflow extends Workflow {
         }),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'TXN_STATUS',
           componentName: 'card-pay/deposit-workflow/transaction-status',
         }),
       ],
@@ -147,6 +167,7 @@ class DepositWorkflow extends Workflow {
     }),
     new WorkflowCard({
       author: cardbot,
+      cardName: 'EPILOGUE_CONFIRMATION',
       componentName: 'card-pay/deposit-workflow/confirmation',
     }),
     new WorkflowMessage({
@@ -155,10 +176,12 @@ class DepositWorkflow extends Workflow {
     }),
     new WorkflowCard({
       author: cardbot,
+      cardName: 'EPILOGUE_LAYER1_CONNECT',
       componentName: 'card-pay/layer-one-connect-card',
     }),
     new WorkflowCard({
       author: cardbot,
+      cardName: 'EPILOGUE_NEXT_STEPS',
       componentName: 'card-pay/deposit-workflow/next-steps',
     }),
   ]);
@@ -174,13 +197,39 @@ class DepositWorkflow extends Workflow {
         );
       },
     }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but you changed your Layer 1 wallet adress. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L1_ADDRESS_CHANGED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but you changed your Card wallet adress. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED
+        );
+      },
+    }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
         return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
-        );
+          [
+            FAILURE_REASONS.DISCONNECTED,
+            FAILURE_REASONS.RESTORATION_L1_DISCONNECTED,
+            FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
+          ] as String[]
+        ).includes(String(this.workflow?.cancelationReason));
       },
     }),
     // cancelation for changing accounts
@@ -205,28 +254,87 @@ class DepositWorkflow extends Workflow {
     }),
   ]);
 
-  constructor(owner: unknown) {
+  constructor(owner: any) {
     super(owner);
+    this.workflowPersistenceId =
+      this.router.currentRoute.queryParams['flow-id']!;
+
     this.attachWorkflow();
+  }
+
+  restorationErrors(persistedState: any) {
+    let { layer1Network, layer2Network } = this;
+
+    let errors = [];
+
+    if (!layer1Network.isConnected) {
+      errors.push(FAILURE_REASONS.RESTORATION_L1_DISCONNECTED);
+    }
+
+    if (
+      layer1Network.isConnected &&
+      persistedState.layer1WalletAddress &&
+      layer1Network.walletInfo.firstAddress !==
+        persistedState.layer1WalletAddress
+    ) {
+      errors.push(FAILURE_REASONS.RESTORATION_L1_ADDRESS_CHANGED);
+    }
+
+    if (!layer2Network.isConnected) {
+      errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
+    }
+
+    if (
+      layer2Network.isConnected &&
+      persistedState.layer2WalletAddress &&
+      layer2Network.walletInfo.firstAddress !==
+        persistedState.layer2WalletAddress
+    ) {
+      errors.push(FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED);
+    }
+
+    return errors;
   }
 }
 
 class DepositWorkflowComponent extends Component {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
+  @service declare workflowPersistence: WorkflowPersistence;
 
-  workflow!: DepositWorkflow;
+  @tracked workflow: DepositWorkflow | null = null;
   constructor(owner: unknown, args: {}) {
     super(owner, args);
-    this.workflow = new DepositWorkflow(getOwner(this));
+    let workflow = new DepositWorkflow(getOwner(this));
+    let persistedState = workflow.session.getPersistedData()?.state ?? {};
+    let willRestore = Object.keys(persistedState).length > 0;
+
+    if (willRestore) {
+      taskFor(this.restoreTask).perform(workflow, persistedState);
+    } else {
+      this.workflow = workflow;
+    }
+  }
+
+  @task *restoreTask(workflow: DepositWorkflow, state: any) {
+    let errors = workflow.restorationErrors(state);
+    if (errors.length > 0) {
+      next(this, () => {
+        workflow.cancel(errors[0]);
+      });
+    } else {
+      yield this.layer1Network.waitForAccount;
+      workflow.restoreFromPersistedWorkflow();
+    }
+    this.workflow = workflow;
   }
 
   @action onDisconnect() {
-    this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
+    this.workflow?.cancel(FAILURE_REASONS.DISCONNECTED);
   }
 
   @action onAccountChanged() {
-    this.workflow.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
+    this.workflow?.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
   }
 }
 

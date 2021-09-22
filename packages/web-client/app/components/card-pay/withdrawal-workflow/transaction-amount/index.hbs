@@ -17,7 +17,7 @@
           @size="small"
           @icon={{this.currentTokenDetails.icon}}
           @name={{this.currentTokenDetails.symbol}}
-          @balance={{format-token-amount this.currentTokenBalance}}
+          @balance={{format-wei-amount this.currentTokenBalance}}
           @symbol={{this.currentTokenDetails.symbol}}
           data-test-withdrawal-balance
         />
@@ -34,7 +34,7 @@
             class="withdrawal-transaction-amount__token"
             @size="large"
             @icon={{this.currentTokenDetails.icon}}
-            @balance={{format-token-amount this.amountAsBigNumber}}
+            @balance={{format-wei-amount this.amountAsBigNumber}}
             @symbol={{this.currentTokenSymbol}}
             @text={{concat (format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)) "*"}}
             data-test-amount-entered

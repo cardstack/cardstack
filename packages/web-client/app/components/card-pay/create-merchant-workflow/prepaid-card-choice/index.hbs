@@ -2,6 +2,7 @@
   class="prepaid-card-choice"
   @header="Merchant Account"
   @isComplete={{@isComplete}}
+  {{did-insert this.checkForPendingTransaction}}
   data-test-prepaid-card-choice-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section @title="Choose a prepaid card to pay the merchant creation fee">
@@ -22,7 +23,7 @@
         @icon="spend"
         @sign="§"
         @symbol="SPEND"
-        @balance={{this.merchantRegistrationFee}}
+        @balance={{format-amount this.merchantRegistrationFee}}
         @usdBalance={{spend-to-usd this.merchantRegistrationFee}}
         data-test-prepaid-card-choice-merchant-fee
       />

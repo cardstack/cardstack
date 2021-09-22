@@ -33,12 +33,12 @@ import {
   getSDK,
   BridgeValidationResult,
   DepotSafe,
-  MerchantSafe,
-  Safe,
   IHubAuth,
-  ISafes,
-  PrepaidCardSafe,
   ILayerTwoOracle,
+  ISafes,
+  MerchantSafe,
+  PrepaidCardSafe,
+  Safe,
   TransactionOptions,
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
@@ -329,6 +329,13 @@ export default abstract class Layer2ChainWeb3Strategy
     return (
       await RevenuePool.registerMerchant(prepaidCardAddress, infoDid, options)
     ).merchantSafe;
+  }
+
+  async resumeRegisterMerchantTransaction(
+    txnHash: string
+  ): Promise<MerchantSafe> {
+    const RevenuePool = await getSDK('RevenuePool', this.web3);
+    return (await RevenuePool.registerMerchant(txnHash)).merchantSafe;
   }
 
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication

@@ -1,6 +1,7 @@
 <ActionCardContainer
   @header="Deposit Amount"
   @isComplete={{@isComplete}}
+  data-test-transaction-amount-container
 >
   <ActionCardContainer::Section @title="Choose an amount to deposit into the reserve pool">
     <div class="transaction-amount__fields">
@@ -14,7 +15,7 @@
           @tokenSymbol={{this.currentTokenSymbol}}
           @tokenIcon={{this.currentTokenDetails.icon}}
           @address={{this.layer1Network.walletInfo.firstAddress}}
-          @balance={{format-token-amount this.currentTokenBalance}}
+          @balance={{format-wei-amount this.currentTokenBalance}}
           @balanceInUsd={{token-to-usd this.currentTokenSymbol this.currentTokenBalance}}
           @isComplete={{@isComplete}}
         />
@@ -30,7 +31,7 @@
             class="transaction-amount__token"
             @size="large"
             @icon={{this.currentTokenDetails.icon}}
-            @balance={{format-token-amount this.amountAsBigNumber}}
+            @balance={{format-wei-amount this.amountAsBigNumber}}
             @symbol={{this.currentTokenSymbol}}
             @text={{concat (format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)) "*"}}
             data-test-deposit-amount-entered
@@ -63,7 +64,7 @@
   </ActionCardContainer::Section>
   <Boxel::ActionChin @stepNumber={{1}} @state={{this.unlockCtaState}} @disabled={{or @frozen this.unlockCtaDisabled}}>
     <:default as |a|>
-      <a.ActionButton data-test-unlock-button {{on "click" this.unlock}}>
+      <a.ActionButton data-test-unlock-button {{on "click" (perform this.unlockTask)}}>
         Unlock
       </a.ActionButton>
     </:default>
@@ -94,7 +95,7 @@
   </Boxel::ActionChin>
   <Boxel::ActionChin @stepNumber={{2}} @state={{this.depositCtaState}} @disabled={{or @frozen this.depositCtaDisabled}}>
     <:default as |a|>
-      <a.ActionButton  {{on "click" this.deposit}} data-test-deposit-button>
+      <a.ActionButton  {{on "click" (perform this.depositTask)}} data-test-deposit-button>
         Deposit
       </a.ActionButton>
     </:default>

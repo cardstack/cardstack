@@ -1,7 +1,9 @@
 import chai from 'chai';
-import hasStatus from './has-status';
+import chaiAsPromised from 'chai-as-promised';
+import customAssertions from './custom-assertions';
 
-chai.use(hasStatus);
+chai.use(customAssertions);
+chai.use(chaiAsPromised);
 
 if (!(process as any).__didSetCardstackWarning) {
   (process as any).__didSetCardstackWarning = true;
@@ -19,6 +21,4 @@ logger.configure({
   defaultLevel: 'warn',
 });
 
-export default function () {
-  (global as any).expect = chai.expect;
-}
+(global as any).expect = chai.expect;

@@ -87,6 +87,11 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     return this.#unlockDeferred.promise;
   }
 
+  resumeApprove(_txnHash: TransactionHash): Promise<TransactionReceipt> {
+    this.#unlockDeferred = RSVP.defer();
+    return this.#unlockDeferred.promise;
+  }
+
   relayTokens(
     _token: string,
     _destinationAddress: string,
@@ -94,6 +99,11 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     { onTxnHash }: RelayTokensOptions
   ) {
     this.#depositOnTxnHash = onTxnHash;
+    this.#depositDeferred = RSVP.defer();
+    return this.#depositDeferred.promise;
+  }
+
+  resumeRelayTokens(_txnHash: TransactionHash): Promise<TransactionReceipt> {
     this.#depositDeferred = RSVP.defer();
     return this.#depositDeferred.promise;
   }

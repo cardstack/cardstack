@@ -12,14 +12,27 @@ import {
   PrepaidCardTransfer,
   PrepaidCardSendAction,
 } from '../../generated/schema';
-import { makeToken, makeEOATransaction, toChecksumAddress, makeTransaction, getPrepaidCardFaceValue } from '../utils';
+import {
+  makeToken,
+  makeEOATransaction,
+  toChecksumAddress,
+  makeTransaction,
+  getPrepaidCardFaceValue,
+  makeEOATransactionForSafe,
+} from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
 export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   let prepaidCard = toChecksumAddress(event.params.card);
   let issuer = toChecksumAddress(event.params.issuer);
+  let maybeDepot = toChecksumAddress(event.params.createdFromDepot);
   log.info('indexing new prepaid card {}', [prepaidCard]);
-  makeEOATransaction(event, issuer);
+  let isDepot = Depot.load(maybeDepot) != null;
+  if (isDepot) {
+    makeEOATransactionForSafe(event, maybeDepot);
+  } else {
+    makeEOATransaction(event, issuer);
+  }
   let accountEntity = new Account(issuer);
   accountEntity.save();
 
@@ -46,10 +59,9 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   creationEntity.issuer = issuer;
   creationEntity.issuingToken = issuingToken;
   creationEntity.issuingTokenAmount = event.params.issuingTokenAmount;
-  let createdFrom = toChecksumAddress(event.params.createdFromDepot);
-  creationEntity.createdFromAddress = createdFrom;
-  if (Depot.load(createdFrom) != null) {
-    creationEntity.depot = createdFrom;
+  creationEntity.createdFromAddress = maybeDepot;
+  if (isDepot) {
+    creationEntity.depot = maybeDepot;
   }
   creationEntity.spendAmount = event.params.spendAmount;
   creationEntity.creationGasFeeCollected = event.params.gasFeeCollected;

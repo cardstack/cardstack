@@ -353,6 +353,7 @@ type PrepaidCardSendAction @entity {
 type EOATransaction @entity {
   id: ID!
   account: Account!
+  safe: Safe
   timestamp: BigInt!
   blockNumber: BigInt!
   transaction: Transaction!

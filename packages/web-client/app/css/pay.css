@@ -12,7 +12,7 @@
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
   z-index: 0;
-  padding: var(--boxel-sp);
+  padding: var(--boxel-sp) var(--boxel-sp) var(--boxel-sp-xxxl) var(--boxel-sp);
 }
 
 .merchant-payment-request-page__merchant-missing-message {

@@ -712,9 +712,31 @@ let balanceForSingleToken = await rewardPool.rewardTokenBalance(address, tokenAd
 let balanceForAllTokens = await rewardPool.rewardTokenBalances(address)
 ```
 
-### `RewardPool.claim` (TBD)
+## `RewardPool.addRewardTokens` 
 
-## `RewardPool.addTokens` (TBD)
+The `AddRewardTokens` API is used to refill the reward pool for a particular reward program with any single owner safe. Currently, we are using single-owner safe like depot safe or merchant safe to send funds, but, in the future we will use prepaid cards to pay. If a reward program doesn't have any funds inside of the pool rewardees will be unable to claim. Anyone can call this api not only the rewardProgramAdmin. 
+
+```js
+let rewardPool = await getSDK('RewardPool', web3);
+await rewardPool.addRewardTokens(safe, rewardProgramId, tokenAddress, amount) 
+```
+
+### `RewardPool.claim` 
+
+The `Claim` API is used by the rewardee to claim rewards for a reward program id. 
+
+Pre-requisite for this action:
+- reward program has to be registered 
+- rewardee has to register and create safe for that particular reward program
+- rewardee must get an existing proof from tally api  -- look at `rewardPool.getProofs`
+- reward pool has to be filled with reward token for that reward program 
+
+This claim action is similar to `RevenuePool.claim` in that a pre-flight check is used to check that the rewards claimed will be able to cover that gas for the transaction.
+
+```js
+let rewardPool = await getSDK('RewardPool', web3);
+await rewardPool.claim(safe, rewardProgramId, tokenAddress, proof,amount) 
+```
 
 ## `RewardManager`
 

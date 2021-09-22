@@ -7,7 +7,7 @@ import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { TransactionReceipt } from 'web3-core';
 import BN from 'bn.js';
-import { toWei } from 'web3-utils';
+import { fromWei, toWei } from 'web3-utils';
 import {
   BridgeableSymbol,
   TokenDisplayInfo,
@@ -18,26 +18,48 @@ import {
   shouldUseTokenInput,
   validateTokenInput,
 } from '@cardstack/web-client/utils/validation';
+import { bool, reads } from 'macro-decorators';
+import { task, TaskGenerator } from 'ember-concurrency';
+import { next } from '@ember/runloop';
 
 class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
-  @tracked amount = '';
-  @tracked isUnlocked = false;
-  @tracked isUnlocking = false;
-  @tracked unlockTokensTxnHash: string | undefined;
-  @tracked unlockTxnReceipt: TransactionReceipt | undefined;
-  @tracked relayTokensTxnHash: string | undefined;
-  @tracked relayTokensTxnReceipt: TransactionReceipt | undefined;
-  @tracked isDepositing = false;
-  @tracked hasDeposited = false;
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
+  @reads('args.workflowSession.state')
+  sessionState: any;
+  @reads('sessionState.depositSourceToken')
+  declare currentTokenSymbol: BridgeableSymbol;
+  @reads('sessionState.unlockTxnHash')
+  unlockTxnHash: string | undefined;
+  @reads('sessionState.unlockTxnReceipt')
+  declare unlockTxnReceipt: TransactionReceipt | undefined;
+  @bool('unlockTxnReceipt') declare isUnlocked: boolean;
+  @reads('unlockTask.isRunning') declare isUnlocking: boolean;
+  @reads('sessionState.relayTokensTxnHash')
+  declare relayTokensTxnHash: string | undefined;
+  @reads('sessionState.relayTokensTxnReceipt')
+  declare relayTokensTxnReceipt: TransactionReceipt | undefined;
+  @bool('relayTokensTxnReceipt') declare hasDeposited: boolean;
+  @reads('depositTask.isRunning') declare isDepositing: boolean;
+  @tracked amount = '';
   @tracked errorMessage = '';
   @tracked validationMessage = '';
 
-  // assumption is this is always set by cards before it. It should be defined by the time
-  // it gets to this part of the workflow
-  get currentTokenSymbol(): BridgeableSymbol {
-    return this.args.workflowSession.state.depositSourceToken;
+  constructor(owner: unknown, args: WorkflowCardComponentArgs) {
+    super(owner, args);
+    let { depositedAmount } = this.args.workflowSession.state;
+
+    next(this, () => {
+      if (depositedAmount) {
+        this.onInputAmount(fromWei(depositedAmount));
+      }
+
+      if (this.relayTokensTxnHash && !this.relayTokensTxnReceipt) {
+        taskFor(this.depositTask).perform();
+      } else if (this.unlockTxnHash && !this.unlockTxnReceipt) {
+        taskFor(this.unlockTask).perform();
+      }
+    });
   }
 
   get currentTokenDetails(): TokenDisplayInfo<BridgeableSymbol> | undefined {
@@ -67,6 +89,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       return 'default';
     }
   }
+
   get unlockCtaDisabled() {
     return !this.isUnlocked && (this.isInvalid || this.amount === '');
   }
@@ -93,7 +116,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   }
 
   get unlockTxnViewerUrl() {
-    return this.layer1Network.blockExplorerUrl(this.unlockTokensTxnHash);
+    return this.layer1Network.blockExplorerUrl(this.unlockTxnHash);
   }
 
   get depositTxnViewerUrl() {
@@ -116,6 +139,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     }
 
     this.validate();
+
+    this.args.workflowSession.update(
+      'depositedAmount',
+      this.amountAsBigNumber.toString()
+    );
   }
 
   get isInvalid() {
@@ -129,64 +157,69 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     });
   }
 
-  @action async unlock() {
+  @task *unlockTask(): TaskGenerator<void> {
     this.errorMessage = '';
+    let session = this.args.workflowSession;
 
     try {
-      this.isUnlocking = true;
-      let transactionReceipt = await taskFor(
-        this.layer1Network.approveTask
-      ).perform(this.amountAsBigNumber, this.currentTokenSymbol, (txnHash) => {
-        this.unlockTokensTxnHash = txnHash;
-      });
-      this.isUnlocked = true;
-      this.unlockTxnReceipt = transactionReceipt;
+      let transactionReceipt;
+      if (this.unlockTxnHash) {
+        transactionReceipt = yield this.layer1Network.resumeApprove(
+          this.unlockTxnHash
+        );
+      } else {
+        transactionReceipt = yield taskFor(
+          this.layer1Network.approveTask
+        ).perform(
+          this.amountAsBigNumber,
+          this.currentTokenSymbol,
+          (txnHash) => {
+            session.update('unlockTxnHash', txnHash);
+          }
+        );
+      }
+      session.update('unlockTxnReceipt', transactionReceipt);
     } catch (e) {
       console.error(e);
       this.errorMessage =
         'There was a problem unlocking your tokens for deposit. This may be due to a network issue, or perhaps you canceled the request in your wallet.';
-    } finally {
-      this.isUnlocking = false;
     }
   }
-  @action async deposit() {
-    this.errorMessage = '';
 
+  @task *depositTask(): TaskGenerator<void> {
+    this.errorMessage = '';
+    let session = this.args.workflowSession;
     try {
-      let layer2Address = this.layer2Network.walletInfo.firstAddress!;
-      this.isDepositing = true;
-      let layer2BlockHeightBeforeBridging =
-        await this.layer2Network.getBlockHeight();
-      this.args.workflowSession.update(
-        'layer2BlockHeightBeforeBridging',
-        layer2BlockHeightBeforeBridging
-      );
-      let transactionReceipt = await taskFor(
-        this.layer1Network.relayTokensTask
-      ).perform(
-        this.currentTokenSymbol,
-        layer2Address,
-        this.amountAsBigNumber,
-        (txnHash) => {
-          this.relayTokensTxnHash = txnHash;
-        }
-      );
-      this.relayTokensTxnReceipt = transactionReceipt;
-      this.args.workflowSession.update(
-        'relayTokensTxnReceipt',
-        transactionReceipt
-      );
-      this.args.workflowSession.update(
-        'depositedAmount',
-        this.amountAsBigNumber.toString()
-      );
+      let transactionReceipt;
+      if (this.relayTokensTxnHash) {
+        transactionReceipt = yield this.layer1Network.resumeRelayTokens(
+          this.relayTokensTxnHash
+        );
+      } else {
+        let layer2Address = this.layer2Network.walletInfo.firstAddress!;
+        let layer2BlockHeightBeforeBridging =
+          yield this.layer2Network.getBlockHeight();
+        session.update(
+          'layer2BlockHeightBeforeBridging',
+          layer2BlockHeightBeforeBridging.toString()
+        );
+        transactionReceipt = yield taskFor(
+          this.layer1Network.relayTokensTask
+        ).perform(
+          this.currentTokenSymbol,
+          layer2Address,
+          this.amountAsBigNumber,
+          (txnHash) => {
+            session.update('relayTokensTxnHash', txnHash);
+          }
+        );
+      }
+      session.update('relayTokensTxnReceipt', transactionReceipt);
+      session.update('depositedAmount', this.amountAsBigNumber.toString());
       this.args.onComplete?.();
-      this.hasDeposited = true;
     } catch (e) {
       console.error(e);
       this.errorMessage = `There was a problem initiating the bridging of your tokens to the ${c.layer2.fullName}. This may be due to a network issue, or perhaps you canceled the request in your wallet.`;
-    } finally {
-      this.isDepositing = false;
     }
   }
 }

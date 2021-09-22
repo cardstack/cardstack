@@ -1,4 +1,4 @@
-import { getSDK } from '@cardstack/cardpay-sdk';
+import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 import Web3 from 'web3';
 const { fromWei } = Web3.utils;
@@ -28,4 +28,56 @@ export async function rewardTokensAvailable(network: string, address: string, mn
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
   await rewardPool.rewardTokensAvailable(address);
+}
+
+export async function addRewardTokens(
+  network: string,
+  safe: string,
+  rewardProgramId: string,
+  tokenAddress: string,
+  amount: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardPool = await getSDK('RewardPool', web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  await rewardPool.addRewardTokens(safe, rewardProgramId, tokenAddress, amount, {
+    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
+  console.log(`Added ${amount} of token ${tokenAddress} to reward program ${rewardProgramId}`);
+  console.log('done');
+}
+
+export async function rewardPoolBalance(
+  network: string,
+  rewardProgramId: string,
+  tokenAddress: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardPool = await getSDK('RewardPool', web3);
+  let balance = await rewardPool.balance(rewardProgramId, tokenAddress);
+  let rewardPoolAddress = await rewardPool.address();
+  displayRewardTokenBalance(rewardPoolAddress, [balance]);
+}
+
+export async function claimRewards(
+  network: string,
+  rewardSafeAddress: string,
+  rewardProgramId: string,
+  tokenAddress: string,
+  proof: string,
+  amount: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardPool = await getSDK('RewardPool', web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  await rewardPool.claim(rewardSafeAddress, rewardProgramId, tokenAddress, proof, amount, {
+    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
+  console.log(
+    `Claimed ${amount} of token ${tokenAddress} to reward safe ${rewardSafeAddress} for reward program ${rewardProgramId}`
+  );
+  console.log('done');
 }

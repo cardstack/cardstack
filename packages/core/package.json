@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/core",
-  "version": "0.25.2",
+  "version": "0.26.0",
   "keywords": [],
   "private": true,
   "author": "Edward Faulkner <edward@eaf4.com>",
@@ -55,11 +55,6 @@
     "node": ">= 14"
   },
   "scripts": {
-    "lint": "npm-run-all --aggregate-output --continue-on-error --parallel 'lint:!(fix)'",
-    "lint:fix": "npm-run-all --aggregate-output --continue-on-error --parallel lint:*:fix",
-    "lint:js": "eslint . --cache --ext .js,.ts",
-    "lint:js:fix": "eslint . --cache --ext .js,.ts --fix",
-    "lint:types": "tsc",
     "start": "webpack serve",
     "test": "npm-run-all lint test:*",
     "test:stub": "echo 'test stub'"
