@@ -6,6 +6,7 @@ import { Container } from '../../di/dependency-injection';
 import { Registry } from '../../di/dependency-injection';
 import { WyreOrder, WyreTransfer, WyreWallet } from '../../services/wyre';
 import { adminWalletName } from '../../routes/wyre-callback';
+import { v4 as uuidv4 } from 'uuid';
 
 class StubWyreService {
   async getWalletByUserAddress(userAddress: string): Promise<WyreWallet | undefined> {
@@ -40,7 +41,7 @@ const stubWalletOrderId = 'WO_WALLET_ORDER';
 const stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
 const stubDepositAddress = '0x59faede86fb650d956ca633a5c1a21fa53fe151c'; // wyre always returns lowercase addresses
 const randomAddress = '0xb21851B00bd13C008f703A21DFDd292b28A736b3';
-const stubReservationId = '0x1234565';
+const stubReservationId = uuidv4();
 
 let wyreTransferCallCount = 0;
 let provisionPrepaidCardCallCount = 0;

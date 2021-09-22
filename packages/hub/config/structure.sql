@@ -706,7 +706,7 @@ ALTER TABLE public.prepaid_card_patterns OWNER TO postgres;
 --
 
 CREATE TABLE public.reservations (
-    id text NOT NULL,
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
     user_address text NOT NULL,
     sku text NOT NULL,
     transaction_hash text,
@@ -727,10 +727,10 @@ CREATE TABLE public.wallet_orders (
     user_address text NOT NULL,
     wallet_id text NOT NULL,
     status public.wallet_orders_status_enum NOT NULL,
-    reservation_id text,
     custodial_transfer_id text,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    reservation_id uuid
 );
 
 
@@ -1011,9 +1011,9 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 1	20210527151505645_create-prepaid-card-tables	2021-07-29 14:31:17.108453
 2	20210614080132698_create-prepaid-card-customizations-table	2021-07-29 14:31:17.108453
 3	20210623052200757_create-graphile-worker-schema	2021-07-29 14:31:17.108453
-17	20210809113449561_merchant-infos	2021-08-17 15:07:25.288981
-24	20210817184105100_wallet-orders	2021-08-19 13:32:47.794362
-32	20210920142313915_prepaid-card-reservations	2021-09-21 15:56:37.922156
+34	20210809113449561_merchant-infos	2021-09-22 15:07:25.988954
+37	20210817184105100_wallet-orders	2021-09-22 15:36:07.656094
+38	20210920142313915_prepaid-card-reservations	2021-09-22 15:36:07.656094
 \.
 
 
@@ -1021,7 +1021,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 32, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 38, true);
 
 
 --

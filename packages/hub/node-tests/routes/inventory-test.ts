@@ -141,11 +141,7 @@ describe('GET /api/inventory', function () {
   it(`does not include pending reservations in the inventory count`, async function () {
     let prepaidCard1 = '0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC';
     let prepaidCard2 = '0x04699Ff48CC6531727A12344c30F3eD1062Ff3ad';
-    await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
-      'reservation1',
-      stubUserAddress,
-      'sku1',
-    ]);
+    await db.query(`INSERT INTO reservations (user_address, sku) VALUES ($1, $2)`, [stubUserAddress, 'sku1']);
     stubInventorySubgraph = () => ({
       data: {
         skuinventories: [makeInventoryData('sku1', '100', toWei('1'), [prepaidCard1, prepaidCard2])],
@@ -181,12 +177,12 @@ describe('GET /api/inventory', function () {
     let prepaidCard1 = '0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC';
     let prepaidCard2 = '0x04699Ff48CC6531727A12344c30F3eD1062Ff3ad';
     await db.query(
-      `INSERT INTO reservations (id, user_address, sku, updated_at) VALUES ($1, $2, $3, now() - interval '10 minutes')`,
-      ['reservation1', stubUserAddress, 'sku1']
+      `INSERT INTO reservations (user_address, sku, updated_at) VALUES ($1, $2, now() - interval '10 minutes')`,
+      [stubUserAddress, 'sku1']
     );
     await db.query(
-      `INSERT INTO reservations (id, user_address, sku, updated_at) VALUES ($1, $2, $3, now() - interval '61 minutes')`,
-      ['reservation2', stubUserAddress, 'sku1']
+      `INSERT INTO reservations (user_address, sku, updated_at) VALUES ($1, $2, now() - interval '61 minutes')`,
+      [stubUserAddress, 'sku1']
     );
     stubInventorySubgraph = () => ({
       data: {
@@ -223,8 +219,7 @@ describe('GET /api/inventory', function () {
   it(`does not include recently provisioned prepaid cards in the inventory count when the subgraph has not synced yet`, async function () {
     let prepaidCard1 = '0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC';
     let prepaidCard2 = '0x04699Ff48CC6531727A12344c30F3eD1062Ff3ad';
-    await db.query(`INSERT INTO reservations (id, user_address, sku, prepaid_card_address) VALUES ($1, $2, $3, $4)`, [
-      'reservation1',
+    await db.query(`INSERT INTO reservations (user_address, sku, prepaid_card_address) VALUES ($1, $2, $3)`, [
       stubUserAddress,
       'sku1',
       prepaidCard1,
@@ -239,11 +234,7 @@ describe('GET /api/inventory', function () {
 
   it(`can reflect no inventory available`, async function () {
     let prepaidCard1 = '0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC';
-    await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
-      'reservation1',
-      stubUserAddress,
-      'sku1',
-    ]);
+    await db.query(`INSERT INTO reservations (user_address, sku) VALUES ($1, $2)`, [stubUserAddress, 'sku1']);
     stubInventorySubgraph = () => ({
       data: {
         skuinventories: [
