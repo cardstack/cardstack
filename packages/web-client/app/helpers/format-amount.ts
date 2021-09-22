@@ -7,7 +7,7 @@ import Helper from '@ember/component/helper';
 type FormatAmountHelperParams = [number | string, number];
 
 export function formatAmount(
-  amount: number | string,
+  amount: number | string | null | undefined,
   minDecimals: number = 0
 ): string {
   if (amount == null || amount === undefined) {

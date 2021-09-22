@@ -22,6 +22,10 @@ import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-
 import config from '../../../../config/environment';
 import { TransactionOptions } from '@cardstack/cardpay-sdk';
 import BN from 'bn.js';
+import {
+  ColorCustomizationOption,
+  PatternCustomizationOption,
+} from '../../../../services/card-customization';
 
 interface CardPayPrepaidCardWorkflowPreviewComponentArgs {
   workflowSession: WorkflowSession;
@@ -37,9 +41,11 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
   @tracked txnHash?: TransactionHash;
   @tracked chinInProgressMessage?: string;
 
-  @reads('args.workflowSession.state.spendFaceValue')
-  declare faceValue: number;
   @reads('issueTask.last.error') declare error: Error | undefined;
+
+  get faceValue(): number {
+    return this.args.workflowSession.getValue('spendFaceValue')!;
+  }
 
   @action issuePrepaidCard() {
     taskFor(this.issueTask)
@@ -70,7 +76,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
   }
 
   @action checkForPendingTransaction() {
-    if (this.args.workflowSession.state.txnHash) {
+    if (this.args.workflowSession.getValue('txnHash')) {
       taskFor(this.issueTask).perform();
     }
   }
@@ -78,32 +84,32 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
   @task *issueTask(): TaskGenerator<void> {
     let { workflowSession } = this.args;
     try {
-      let did;
+      let did = workflowSession.getValue<string>('did');
 
-      if (workflowSession.state.did) {
-        did = workflowSession.state.did;
-      } else {
+      if (!did) {
         this.chinInProgressMessage =
           'Preparing to create your custom prepaid card…';
+        let issuerName = workflowSession.getValue<string>('issuerName')!;
+        let colorSchemeId =
+          workflowSession.getValue<ColorCustomizationOption>('colorScheme')!.id;
+        let patternId =
+          workflowSession.getValue<PatternCustomizationOption>('pattern')!.id;
         // yield statements require manual typing
         // https://github.com/machty/ember-concurrency/pull/357#discussion_r434850096
         let customization: Resolved<PrepaidCardCustomization> = yield taskFor(
           this.cardCustomization.createCustomizationTask
         ).perform({
-          issuerName: workflowSession.state.issuerName,
-          colorSchemeId: workflowSession.state.colorScheme.id,
-          patternId: workflowSession.state.pattern.id,
+          issuerName,
+          colorSchemeId,
+          patternId,
         });
         did = customization.did;
 
-        this.args.workflowSession.update('did', did);
+        workflowSession.setValue('did', did);
       }
 
-      if (
-        workflowSession.state.txnHash &&
-        !workflowSession.state.prepaidCardSafe
-      ) {
-        const txnHash = workflowSession.state.txnHash;
+      let txnHash = workflowSession.getValue<TransactionHash>('txnHash');
+      if (txnHash && !workflowSession.getValue('prepaidCardSafe')) {
         this.chinInProgressMessage =
           'Waiting for the transaction to be finalized…';
 
@@ -111,14 +117,14 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
           this.layer2Network.resumeIssuePrepaidCardTransactionTask
         ).perform(txnHash);
 
-        this.args.workflowSession.update('prepaidCardSafe', prepaidCardSafe);
+        this.args.workflowSession.setValue('prepaidCardSafe', prepaidCardSafe);
       } else {
         this.chinInProgressMessage =
           'You will receive a confirmation request from the Card Wallet app in a few moments…';
         let options: TransactionOptions = {
           onTxnHash: (txnHash: TransactionHash) => {
             this.txnHash = txnHash;
-            this.args.workflowSession.update('txnHash', txnHash);
+            this.args.workflowSession.setValue('txnHash', txnHash);
             this.chinInProgressMessage =
               'Waiting for the transaction to be finalized…';
           },
@@ -141,7 +147,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
         ]);
         this.issueTaskRunningForAWhile = false;
 
-        this.args.workflowSession.updateMany({
+        this.args.workflowSession.setValue({
           prepaidCardAddress: prepaidCardSafe.address,
           reloadable: prepaidCardSafe.reloadable,
           transferrable: prepaidCardSafe.transferrable,

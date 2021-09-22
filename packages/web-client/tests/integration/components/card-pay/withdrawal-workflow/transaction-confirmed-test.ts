@@ -49,11 +49,8 @@ module(
         ],
       };
       await layer2Service.test__simulateDepot(testDepot as DepotSafe);
-      this.set('session.state.withdrawalToken', 'DAI.CPXD');
-      this.set(
-        'session.state.withdrawnAmount',
-        new BN('123456000000000000000')
-      );
+      session.setValue('withdrawalToken', 'DAI.CPXD');
+      session.setValue('withdrawnAmount', new BN('123456000000000000000'));
 
       await render(hbs`
         <CardPay::WithdrawalWorkflow::TransactionConfirmed

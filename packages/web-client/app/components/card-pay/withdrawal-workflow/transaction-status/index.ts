@@ -10,6 +10,7 @@ import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { BridgedTokenSymbol } from '@cardstack/web-client/utils/token';
+import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 
 class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
@@ -24,12 +25,16 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
   }
 
   @task *awaitBridgingTask(): TaskGenerator<void> {
+    let relayTokensTxnHash =
+      this.args.workflowSession.getValue<TransactionHash>(
+        'relayTokensTxnHash'
+      )!;
     try {
       let result = yield this.layer2Network.awaitBridgedToLayer1(
         this.layer2BlockHeightBeforeBridging!,
-        this.args.workflowSession.state.relayTokensTxnHash
+        relayTokensTxnHash
       );
-      this.args.workflowSession.update('bridgeValidationResult', result);
+      this.args.workflowSession.setValue('bridgeValidationResult', result);
       this.layer2Network.refreshSafesAndBalances();
       this.completedCount = 2;
       this.args.onComplete?.();
@@ -42,15 +47,17 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
   }
 
   get isInProgress() {
-    return !this.args.workflowSession.state.bridgeValidationResult;
+    return !this.args.workflowSession.getValue('bridgeValidationResult');
   }
 
   get currentTokenSymbol(): BridgedTokenSymbol {
-    return this.args.workflowSession.state.withdrawalToken;
+    return this.args.workflowSession.getValue('withdrawalToken')!;
   }
 
-  get layer2BlockHeightBeforeBridging(): BN | undefined {
-    return this.args.workflowSession.state.layer2BlockHeightBeforeBridging;
+  get layer2BlockHeightBeforeBridging(): BN | null {
+    return this.args.workflowSession.getValue(
+      'layer2BlockHeightBeforeBridging'
+    );
   }
 
   get progressSteps() {
@@ -66,13 +73,13 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
 
   get bridgeExplorerUrl() {
     return this.layer2Network.bridgeExplorerUrl(
-      this.args.workflowSession.state.relayTokensTxnHash
+      this.args.workflowSession.getValue('relayTokensTxnHash')!
     );
   }
 
   get blockscoutUrl() {
     return this.layer2Network.blockExplorerUrl(
-      this.args.workflowSession.state.relayTokensTxnHash
+      this.args.workflowSession.getValue('relayTokensTxnHash')!
     );
   }
 }

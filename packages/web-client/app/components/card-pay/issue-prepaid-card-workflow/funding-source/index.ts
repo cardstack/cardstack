@@ -16,7 +16,7 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
   tokenOptions = [this.defaultTokenSymbol];
   @service declare layer2Network: Layer2Network;
   @tracked selectedTokenSymbol: BridgedTokenSymbol =
-    this.args.workflowSession.state.prepaidFundingToken ??
+    this.args.workflowSession.getValue('prepaidFundingToken') ??
     this.defaultTokenSymbol;
 
   get selectedToken(): TokenBalance<BridgedTokenSymbol> {
@@ -62,7 +62,7 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
       return;
     }
     if (this.selectedTokenSymbol) {
-      this.args.workflowSession.update(
+      this.args.workflowSession.setValue(
         'prepaidFundingToken',
         this.selectedTokenSymbol
       );

@@ -257,10 +257,10 @@ module(
     });
 
     test('It updates the workflow session when saved', async function (assert) {
-      assert.notOk(workflowSession.state.merchantName);
-      assert.notOk(workflowSession.state.merchantId);
-      assert.notOk(workflowSession.state.merchantBgColor);
-      assert.notOk(workflowSession.state.merchantTextColor);
+      assert.notOk(workflowSession.getValue('merchantName'));
+      assert.notOk(workflowSession.getValue('merchantId'));
+      assert.notOk(workflowSession.getValue('merchantBgColor'));
+      assert.notOk(workflowSession.getValue('merchantTextColor'));
 
       let merchantNameInput = `${MERCHANT_NAME_FIELD} input`;
       await fillIn(merchantNameInput, 'HELLO!');
@@ -275,10 +275,10 @@ module(
 
       await click(SAVE_DETAILS_BUTTON);
 
-      assert.equal(workflowSession.state.merchantName, 'HELLO!');
-      assert.equal(workflowSession.state.merchantId, VALID_ID);
-      assert.ok(workflowSession.state.merchantBgColor);
-      assert.ok(workflowSession.state.merchantTextColor);
+      assert.equal(workflowSession.getValue<string>('merchantName'), 'HELLO!');
+      assert.equal(workflowSession.getValue<string>('merchantId'), VALID_ID);
+      assert.ok(workflowSession.getValue<string>('merchantBgColor'));
+      assert.ok(workflowSession.getValue<string>('merchantTextColor'));
     });
 
     test('It displays the memorialized state correctly', async function (assert) {
@@ -295,8 +295,8 @@ module(
 
       await click(SAVE_DETAILS_BUTTON);
 
-      let bgColor = workflowSession.state.merchantBgColor;
-      let textColor = workflowSession.state.merchantTextColor;
+      let bgColor = workflowSession.getValue<string>('merchantBgColor')!;
+      let textColor = workflowSession.getValue<string>('merchantTextColor')!;
 
       assert.dom(COMPLETED_SELECTOR).exists();
       assert.dom(EDIT_BUTTON).exists();

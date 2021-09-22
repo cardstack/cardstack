@@ -8,7 +8,7 @@
       @isLayer2={{true}}
       @link={{this.blockscoutUrl}}
       @token={{this.withdrawToken}}
-      @amount={{format-wei-amount this.withdrawAmount}}
+      @amount={{format-wei-amount this.withdrawnAmount}}
       @preposition="from"
       @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
       @depotAddress={{this.depotAddress}}
@@ -35,7 +35,7 @@
       @isLayer1={{true}}
       @link={{this.withdrawTxnViewerUrl}}
       @token={{this.receivedToken}}
-      @amount={{format-wei-amount this.withdrawAmount}}
+      @amount={{format-wei-amount this.withdrawnAmount}}
       @preposition="in"
       @walletAddress={{this.layer1Network.walletInfo.firstAddress}}
       data-test-withdrawal-transaction-confirmed-to

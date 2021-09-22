@@ -6,6 +6,7 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { MerchantSafe, PrepaidCardSafe } from '@cardstack/cardpay-sdk';
+import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 
 interface Context extends MirageTestContext {}
 
@@ -109,6 +110,10 @@ module('Acceptance | create merchant persistence', function (hooks) {
     workflowPersistenceService.storage.clear();
   });
 
+  hooks.afterEach(async function () {
+    delete window.TEST__AUTH_TOKEN;
+  });
+
   test('Generates a flow uuid query parameter used as a persistence identifier', async function (this: Context, assert) {
     await visit('/card-pay/merchant-services');
     await click('[data-test-workflow-button="create-merchant"]');
@@ -123,14 +128,14 @@ module('Acceptance | create merchant persistence', function (hooks) {
 
   module('Restoring from a previously saved state', function () {
     test('it restores an unfinished workflow', async function (this: Context, assert) {
-      const state = {
+      let state = buildState({
         completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         merchantName,
         merchantId,
         merchantBgColor,
         merchantRegistrationFee,
         prepaidCardChoice: prepaidCard,
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'MERCHANT_CREATION',
@@ -157,7 +162,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
     });
 
     test('it restores a finished workflow', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: [
           'LAYER2_CONNECT',
           'MERCHANT_CUSTOMIZATION',
@@ -174,7 +179,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         txnHash:
           '0x8bcc3e419d09a0403d1491b5bb8ac8bee7c67f85cc37e6e17ef8eb77f946497b',
         merchantSafe,
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'MERCHANT_CREATION',
@@ -207,7 +212,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
     });
 
     test('it restores a cancelled workflow', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         cancelationReason: 'DISCONNECTED',
         completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         merchantName,
@@ -218,7 +223,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         completedMilestonesCount: 2,
         isCancelled: true,
         milestonesCount: 3,
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'MERCHANT_CREATION',
@@ -249,13 +254,13 @@ module('Acceptance | create merchant persistence', function (hooks) {
     });
 
     test('it cancels a persisted flow when trying to restore while unauthenticated', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         merchantName,
         merchantId,
         merchantBgColor,
         merchantRegistrationFee,
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'MERCHANT_CREATION',
@@ -293,7 +298,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
     });
 
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         merchantName,
         merchantId,
@@ -303,7 +308,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         txnHash:
           '0x8bcc3e419d09a0403d1491b5bb8ac8bee7c67f85cc37e6e17ef8eb77f946497b',
         merchantSafe,
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'MERCHANT_CREATION',
@@ -330,14 +335,14 @@ module('Acceptance | create merchant persistence', function (hooks) {
     });
 
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         merchantName,
         merchantId,
         merchantBgColor,
         merchantRegistrationFee,
         layer2WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer2AccountAddress set in beforeEach
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'MERCHANT_CREATION',
@@ -359,13 +364,13 @@ module('Acceptance | create merchant persistence', function (hooks) {
     });
 
     test('it allows interactivity after restoring previously saved state', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: ['LAYER2_CONNECT'],
         merchantName,
         merchantId,
         merchantBgColor,
         merchantRegistrationFee,
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'MERCHANT_CREATION',

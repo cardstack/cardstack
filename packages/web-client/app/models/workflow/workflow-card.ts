@@ -52,8 +52,8 @@ export class WorkflowCard extends WorkflowPostable {
   get session(): WorkflowSession | undefined {
     return this.workflow?.session;
   }
-  get completedCardNames(): Array<String> {
-    return this.session?.state.completedCardNames ?? [];
+  get completedCardNames(): Array<string> {
+    return this.session?.getValue<Array<string>>('completedCardNames') ?? [];
   }
 
   @action async onComplete() {
@@ -69,7 +69,7 @@ export class WorkflowCard extends WorkflowPostable {
 
     if (this.isComplete && this.cardName) {
       if (!this.completedCardNames.includes(this.cardName)) {
-        this.session?.updateMany({
+        this.session?.setValue({
           completedCardNames: [...this.completedCardNames, this.cardName],
           completedMilestonesCount: this.workflow?.completedMilestoneCount,
           milestonesCount: this.workflow?.milestones.length,
@@ -84,7 +84,7 @@ export class WorkflowCard extends WorkflowPostable {
     if (this.cardName && this.completedCardNames.length > 0) {
       const resetToIndex = this.completedCardNames.indexOf(this.cardName);
 
-      this.session?.updateMany({
+      this.session?.setValue({
         completedCardNames: this.completedCardNames.slice(0, resetToIndex),
         completedMilestonesCount: this.workflow?.completedMilestoneCount,
         milestonesCount: this.workflow?.milestones.length,

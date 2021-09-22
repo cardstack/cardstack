@@ -25,7 +25,7 @@ module(
       layer2Strategy.test__simulateAccountsChanged([layer2AccountAddress]);
 
       const session = new WorkflowSession();
-      session.update('depositSourceToken', 'DAI');
+      session.setValue('depositSourceToken', 'DAI');
       layer1Service = this.owner.lookup('service:layer1-network').strategy;
 
       const startDaiAmountString = '5.111111111111111110';

@@ -7,6 +7,7 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import sinon from 'sinon';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import { TransactionReceipt } from 'web3-core';
 
 module(
   'Integration | Component | card-pay/deposit-workflow/transaction-status',
@@ -16,13 +17,13 @@ module(
     test('It shows a blockscout button if bridging succeeds', async function (assert) {
       let onComplete = sinon.spy();
       let workflowSession = new WorkflowSession();
-      workflowSession.updateMany({
+      workflowSession.setValue({
         depositSourceToken: 'DAI',
         layer2BlockHeightBeforeBridging: '0',
         relayTokensTxnReceipt: {
           transactionHash: 'RelayTokensTransactionHash',
           blockNumber: 1,
-        },
+        } as TransactionReceipt,
       });
       const layer1Service = this.owner.lookup('service:layer1-network')
         .strategy as Layer1TestWeb3Strategy;
@@ -114,13 +115,13 @@ module(
 
       let onComplete = sinon.spy();
       let workflowSession = new WorkflowSession();
-      workflowSession.updateMany({
+      workflowSession.setValue({
         depositSourceToken: 'DAI',
         layer2BlockHeightBeforeBridging: '0',
         relayTokensTxnReceipt: {
           transactionHash: 'RelayTokensTransactionHash',
           blockNumber: 1,
-        },
+        } as TransactionReceipt,
       });
 
       sinon
@@ -167,13 +168,13 @@ module(
 
       let onComplete = sinon.spy();
       let workflowSession = new WorkflowSession();
-      workflowSession.updateMany({
+      workflowSession.setValue({
         depositSourceToken: 'DAI',
         layer2BlockHeightBeforeBridging: '0',
         relayTokensTxnReceipt: {
           transactionHash: 'RelayTokensTransactionHash',
           blockNumber: 1,
-        },
+        } as TransactionReceipt,
       });
 
       sinon

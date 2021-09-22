@@ -14,6 +14,7 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { toWei } from 'web3-utils';
 
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
+import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 
 interface Context extends MirageTestContext {}
 
@@ -63,6 +64,10 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     workflowPersistenceService.storage.clear();
   });
 
+  hooks.afterEach(async function () {
+    delete window.TEST__AUTH_TOKEN;
+  });
+
   test('Generates a flow uuid query parameter used as a persistence identifier', async function (this: Context, assert) {
     await visit('/card-pay');
     await click('[data-test-workflow-button="issue-prepaid-card"]');
@@ -77,7 +82,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
 
   module('Restoring from a previously saved state', function () {
     test('it restores an unfinished workflow', async function (this: Context, assert) {
-      const state = {
+      let state = buildState({
         completedCardNames: [
           'LAYER2_CONNECT',
           'LAYOUT_CUSTOMIZATION',
@@ -102,7 +107,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
         reloadable: true,
         transferrable: true,
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'PREPAID_CARD_ISSUANCE',
@@ -130,7 +135,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     });
 
     test('it restores a finished workflow', async function (this: Context, assert) {
-      const state = {
+      let state = buildState({
         completedCardNames: [
           'LAYER2_CONNECT',
           'LAYOUT_CUSTOMIZATION',
@@ -167,7 +172,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           spendFaceValue: 500,
           transferrable: true,
         },
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'Prepaid Card Issuance',
@@ -195,7 +200,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     });
 
     test('it restores a cancelled workflow', async function (this: Context, assert) {
-      const state = {
+      let state = buildState({
         cancelationReason: 'DISCONNECTED',
         colorScheme: {
           patternColor: 'black',
@@ -221,7 +226,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 500,
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'Prepaid Card Issuance',
@@ -254,7 +259,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     });
 
     test('it cancels a persisted flow when trying to restore while unauthenticated', async function (this: Context, assert) {
-      const state = {
+      let state = buildState({
         completedCardNames: [
           'LAYER2_CONNECT',
           'LAYOUT_CUSTOMIZATION',
@@ -279,7 +284,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
         reloadable: true,
         transferrable: true,
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'PREPAID_CARD_ISSUANCE',
@@ -316,7 +321,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     });
 
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {
-      const state = {
+      let state = buildState({
         completedCardNames: [
           'LAYER2_CONNECT',
           'LAYOUT_CUSTOMIZATION',
@@ -352,7 +357,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           spendFaceValue: 500,
           transferrable: true,
         },
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'PREPAID_CARD_ISSUANCE',
@@ -378,7 +383,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     });
 
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
-      const state = {
+      let state = buildState({
         completedCardNames: [
           'LAYER2_CONNECT',
           'LAYOUT_CUSTOMIZATION',
@@ -404,7 +409,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         reloadable: true,
         transferrable: true,
         layer2WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer2AccountAddress set in beforeEach
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'PREPAID_CARD_ISSUANCE',
@@ -425,7 +430,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     });
 
     test('it allows interactivity after restoring previously saved state', async function (this: Context, assert) {
-      const state = {
+      let state = buildState({
         completedCardNames: ['LAYER2_CONNECT', 'LAYOUT_CUSTOMIZATION'],
         issuerName: 'Vitalik',
         pattern: {
@@ -439,7 +444,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'Prepaid Card Issuance',

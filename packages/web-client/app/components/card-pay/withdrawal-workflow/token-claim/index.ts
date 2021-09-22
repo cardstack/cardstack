@@ -23,26 +23,28 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
   walletProviders = walletProviders;
   @service declare layer1Network: Layer1Network;
   @reads('layer1Network.walletProvider') declare walletProvider: WalletProvider;
-  @reads('args.workflowSession.state.withdrawalToken')
-  declare tokenSymbol: BridgeableSymbol;
+
+  get tokenSymbol(): BridgeableSymbol {
+    return this.args.workflowSession.getValue('withdrawalToken')!;
+  }
 
   @tracked isConfirming = false;
   @tracked txnHash: string | undefined;
   @tracked errorMessage = '';
 
   get bridgeValidationResult(): BridgeValidationResult {
-    if (!this.args.workflowSession.state.bridgeValidationResult) {
+    let bridgeValidationResult =
+      this.args.workflowSession.getValue<BridgeValidationResult>(
+        'bridgeValidationResult'
+      );
+    if (!bridgeValidationResult) {
       throw new Error('missing bridgeValidationResult in workflow session');
     }
-    return this.args.workflowSession.state
-      .bridgeValidationResult as BridgeValidationResult;
+    return bridgeValidationResult;
   }
 
   get withdrawalAmount(): BN {
-    if (!this.args.workflowSession.state.withdrawnAmount) {
-      return new BN('0');
-    }
-    return new BN(this.args.workflowSession.state.withdrawnAmount);
+    return this.args.workflowSession.getValue('withdrawnAmount') ?? new BN('0');
   }
 
   get tokenSymbolForConversion(): BridgeableSymbol {
@@ -82,7 +84,7 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
           onTxnHash: (txnHash: string) => (this.txnHash = txnHash),
         }
       );
-      this.args.workflowSession.update('claimTokensTxnHash', this.txnHash);
+      this.args.workflowSession.setValue('claimTokensTxnHash', this.txnHash);
       this.args.onComplete?.();
     } catch (e) {
       console.error(e);

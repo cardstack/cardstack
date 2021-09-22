@@ -8,19 +8,19 @@ import HubAuthentication from './hub-authentication';
 import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 
-export interface ColorCustomizationOption {
+export type ColorCustomizationOption = {
   background: string;
   textColor: string;
   patternColor: string;
   id: string;
   description?: string;
-}
+};
 
-export interface PatternCustomizationOption {
+export type PatternCustomizationOption = {
   patternUrl: string | null;
   id: string;
   description?: string;
-}
+};
 
 export interface PrepaidCardCustomization {
   did: string;

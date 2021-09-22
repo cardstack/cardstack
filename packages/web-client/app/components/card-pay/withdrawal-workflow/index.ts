@@ -59,7 +59,10 @@ class CheckBalanceWorkflowMessage
     let minimum: BN =
       yield this.layer1Network.getEstimatedGasForWithdrawalClaim('DAI');
     this.minimumBalanceForWithdrawalClaim = minimum;
-    this.workflow?.session.update('minimumBalanceForWithdrawalClaim', minimum);
+    this.workflow?.session.setValue(
+      'minimumBalanceForWithdrawalClaim',
+      minimum
+    );
 
     this.workflow!.emit('visible-postables-will-change');
     this.isComplete = true;

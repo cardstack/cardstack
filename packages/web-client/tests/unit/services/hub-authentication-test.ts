@@ -21,6 +21,10 @@ module('Unit | Service | HubAuthentication', function (hooks) {
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
   });
 
+  hooks.afterEach(async function () {
+    delete window.TEST__AUTH_TOKEN;
+  });
+
   // Test initialization
   test('it can initialize with an authenticated state', async function (assert) {
     hubAuthentication = this.owner.lookup('service:hub-authentication');

@@ -1,5 +1,4 @@
 import Component from '@glimmer/component';
-import { reads } from 'macro-decorators';
 import { inject as service } from '@ember/service';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
@@ -10,12 +9,14 @@ import {
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
+import { TransactionReceipt } from 'web3-core';
 
 class CardPayDepositWorkflowConfirmationComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  @reads('args.workflowSession.state.depositSourceToken')
-  declare selectedTokenSymbol: TokenSymbol;
+  get selectedTokenSymbol(): TokenSymbol {
+    return this.args.workflowSession.getValue('depositSourceToken')!;
+  }
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
@@ -29,7 +30,7 @@ class CardPayDepositWorkflowConfirmationComponent extends Component<WorkflowCard
   }
 
   get depositedAmount(): BN {
-    return new BN(this.args.workflowSession.state.depositedAmount);
+    return this.args.workflowSession.getValue('depositedAmount')!;
   }
 
   get receivedToken() {
@@ -42,24 +43,32 @@ class CardPayDepositWorkflowConfirmationComponent extends Component<WorkflowCard
 
   get depositTxnViewerUrl(): string | undefined {
     return this.layer1Network.blockExplorerUrl(
-      this.args.workflowSession.state.relayTokensTxnReceipt.transactionHash
+      this.args.workflowSession.getValue<TransactionReceipt>(
+        'relayTokensTxnReceipt'
+      )?.transactionHash
     );
   }
 
   get bridgeExplorerUrl(): string | undefined {
     return this.layer1Network.bridgeExplorerUrl(
-      this.args.workflowSession.state.relayTokensTxnReceipt.transactionHash
+      this.args.workflowSession.getValue<TransactionReceipt>(
+        'relayTokensTxnReceipt'
+      )!.transactionHash
     );
   }
 
   get blockscoutUrl(): string {
-    return (
-      this.args.workflowSession.state.completedLayer2TxnReceipt &&
-      this.layer2Network.blockExplorerUrl(
-        this.args.workflowSession.state.completedLayer2TxnReceipt
-          .transactionHash
-      )
-    );
+    let completedLayer2TxnReceipt =
+      this.args.workflowSession.getValue<TransactionReceipt>(
+        'completedLayer2TxnReceipt'
+      );
+    if (!completedLayer2TxnReceipt) {
+      return '';
+    }
+
+    return this.layer2Network.blockExplorerUrl(
+      completedLayer2TxnReceipt.transactionHash
+    ) as string;
   }
 
   get depotAddress() {

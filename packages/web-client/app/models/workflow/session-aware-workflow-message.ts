@@ -1,21 +1,21 @@
 import {
-  ArbitraryDictionary,
   IWorkflowMessage,
   Participant,
   WorkflowPostable,
+  WorkflowSession,
 } from '@cardstack/web-client/models/workflow';
 
 interface SessionAwareWorkflowMessageOptions {
   author: Participant;
   includeIf: (this: WorkflowPostable) => boolean;
-  template: (session: ArbitraryDictionary) => string;
+  template: (session: WorkflowSession) => string;
 }
 
 export class SessionAwareWorkflowMessage
   extends WorkflowPostable
   implements IWorkflowMessage
 {
-  private template: (session: ArbitraryDictionary) => string;
+  private template: (session: WorkflowSession) => string;
   isComplete = true;
 
   constructor(options: SessionAwareWorkflowMessageOptions) {
@@ -24,6 +24,9 @@ export class SessionAwareWorkflowMessage
   }
 
   get message() {
-    return this.template(this.workflow?.session.state!);
+    if (!this.workflow) {
+      return '';
+    }
+    return this.template(this.workflow.session);
   }
 }
