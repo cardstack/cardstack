@@ -45,7 +45,7 @@ export const convertBipsToPercentage = (value: BigNumberish, decimals = 2): stri
   new BigNumber(value).shiftedBy(-2).toFixed(decimals);
 
 /**
- * Converts blockchain-friendly values to values conventionally shown to users by dividing by the specified number of `decimals`
+ * Converts blockchain-friendly values to values conventionally shown to users by dividing by 10 to the power of the specified number of `decimals`
  */
 export const convertRawAmountToDecimalFormat = (value: BigNumberish, decimals = 18): string =>
   new BigNumber(value).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
