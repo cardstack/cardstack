@@ -7,6 +7,7 @@ import { MerchantInfoResource } from '@cardstack/web-client/resources/merchant-i
 
 // selectors
 const BETA_ACCESS_LINK = '[data-test-payment-request-beta-access-link]';
+const EXPLANATION = '[data-test-payment-request-explanation]';
 const MERCHANT = '[data-test-merchant]';
 const MERCHANT_INFO_ADDRESS_ONLY =
   '[data-test-payment-request-merchant-address]';
@@ -121,6 +122,11 @@ module(
       assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);
       assert.dom(QR_CODE).doesNotExist();
       assert
+        .dom(EXPLANATION)
+        .containsText(
+          'Please install the Card Wallet app on your mobile phone, then tap on the link below to complete your payment'
+        );
+      assert
         .dom(DEEP_LINK)
         .containsText('Pay Merchant')
         .hasAttribute('href', deepLinkPaymentURL);
@@ -132,6 +138,11 @@ module(
       assert.dom(DEEP_LINK).doesNotExist();
       assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', paymentURL);
       assert.dom(LINK_VIEW_TOGGLE).containsText('Show Payment Link');
+      assert
+        .dom(EXPLANATION)
+        .containsText(
+          'Please install the Card Wallet app on your mobile phone, then scan the QR code below to complete your payment'
+        );
     });
 
     test('It renders correctly with merchant address and failure to fetch merchant info', async function (assert) {
