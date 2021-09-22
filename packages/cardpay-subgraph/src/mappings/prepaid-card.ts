@@ -59,7 +59,6 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   creationEntity.issuer = issuer;
   creationEntity.issuingToken = issuingToken;
   creationEntity.issuingTokenAmount = event.params.issuingTokenAmount;
-  // let createdFrom = maybeDepot;
   creationEntity.createdFromAddress = maybeDepot;
   if (isDepot) {
     creationEntity.depot = maybeDepot;
