@@ -275,7 +275,7 @@ module(
 
         assert
           .dom('[data-test-create-merchant-button]')
-          .containsText('Try Again');
+          .containsText('Restart Workflow');
       });
 
       test('it shows the correct error message for a user rejection', async function (assert) {
@@ -290,6 +290,7 @@ module(
         assert
           .dom('[data-test-prepaid-card-choice-error-message]')
           .containsText(USER_REJECTION_ERROR_MESSAGE);
+        assert.dom('[data-test-create-merchant-button]').hasText('Try Again');
       });
 
       test('it shows the correct error message for a timeout', async function (assert) {
@@ -370,6 +371,9 @@ module(
         assert
           .dom('[data-test-prepaid-card-choice-error-message]')
           .containsText(DEFAULT_ERROR_MESSAGE);
+        assert
+          .dom('[data-test-issue-prepaid-card-button]')
+          .containsText('Restart Workflow');
       });
     });
 

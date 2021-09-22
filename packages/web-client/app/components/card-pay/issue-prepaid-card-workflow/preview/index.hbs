@@ -92,10 +92,16 @@
   >
     <:default as |d|>
       <d.ActionButton
-        {{on "click" this.issuePrepaidCard}}
+        {{on "click" (if this.shouldRestartWorkflow this.restartWorkflow this.issuePrepaidCard)}}
         data-test-issue-prepaid-card-button
       >
-        {{if this.hasTriedCreatingPrepaidCard "Try Again" "Create"}}
+        {{#if this.shouldRestartWorkflow}}
+          Restart Workflow
+        {{else if this.isUserRejection}}
+          Try Again
+        {{else}}
+          Create
+        {{/if}}
       </d.ActionButton>
     </:default>
     <:in-progress as |i|>

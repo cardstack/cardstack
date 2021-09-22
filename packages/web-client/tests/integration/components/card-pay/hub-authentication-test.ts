@@ -4,6 +4,7 @@ import { click, render, settled, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import sinon from 'sinon';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
+import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import RSVP from 'rsvp';
@@ -18,12 +19,14 @@ module(
   'Integration | Component | card-pay/hub-authentication',
   function (hooks) {
     let hubAuthentication: HubAuthentication;
+    let layer2Service: Layer2TestWeb3Strategy;
 
     setupRenderingTest(hooks);
     setupMirage(hooks);
 
     hooks.beforeEach(async function (this: Context) {
       hubAuthentication = this.owner.lookup('service:hub-authentication');
+      layer2Service = this.owner.lookup('service:layer2-network').strategy;
 
       this.setProperties({
         onComplete: () => {
@@ -69,6 +72,36 @@ module(
         await waitFor('[data-test-failed]');
 
         assert.dom('[data-test-failed]').containsText(FAILURE_MESSAGE);
+      });
+
+      test('It attempts to re-authenticate when Try Again button is pressed', async function (assert) {
+        let deferred = RSVP.defer<void>();
+        let stub = sinon
+          .stub(hubAuthentication, 'ensureAuthenticated')
+          .returns(deferred.promise);
+
+        await click('[data-test-authentication-button]');
+
+        deferred.reject(new Error('User rejected request'));
+
+        await waitFor('[data-test-failed]');
+
+        stub.restore();
+
+        await click('[data-test-authentication-retry-button]');
+
+        assert
+          .dom('[data-test-boxel-action-chin]')
+          .containsText(
+            'You will receive a confirmation request from the Card Wallet app in a few moments'
+          );
+
+        layer2Service.test__simulateHubAuthentication('some-auth-token');
+        await settled();
+
+        assert
+          .dom('[data-test-boxel-action-chin]')
+          .containsText('Authenticated with Hub');
       });
 
       test('It shows the successful state if authentication succeeds', async function (assert) {

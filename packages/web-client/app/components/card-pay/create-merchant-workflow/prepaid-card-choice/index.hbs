@@ -85,10 +85,16 @@
   >
     <:default as |d|>
       <d.ActionButton
-        {{on "click" this.createMerchant}}
+        {{on "click" (if this.shouldRestartWorkflow this.restartWorkflow this.createMerchant)}}
         data-test-create-merchant-button
       >
-        {{if this.hasTriedCreatingMerchant "Try Again" "Create Merchant"}}
+        {{#if this.shouldRestartWorkflow}}
+          Restart Workflow
+        {{else if this.isUserRejection}}
+          Try Again
+        {{else}}
+          Create Merchant
+        {{/if}}
       </d.ActionButton>
     </:default>
     <:in-progress as |i|>

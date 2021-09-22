@@ -22,6 +22,8 @@ import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-
 import config from '../../../../config/environment';
 import { TransactionOptions } from '@cardstack/cardpay-sdk';
 import BN from 'bn.js';
+import RouterService from '@ember/routing/router-service';
+import { next } from '@ember/runloop';
 
 interface CardPayPrepaidCardWorkflowPreviewComponentArgs {
   workflowSession: WorkflowSession;
@@ -34,20 +36,21 @@ const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
 export default class CardPayPrepaidCardWorkflowPreviewComponent extends Component<CardPayPrepaidCardWorkflowPreviewComponentArgs> {
   @service declare cardCustomization: CardCustomization;
   @service declare layer2Network: Layer2Network;
+  @service declare router: RouterService;
   @tracked txnHash?: TransactionHash;
   @tracked chinInProgressMessage?: string;
+  @tracked isUserRejection = false;
 
   @reads('args.workflowSession.state.spendFaceValue')
   declare faceValue: number;
   @reads('issueTask.last.error') declare error: Error | undefined;
 
   @action issuePrepaidCard() {
-    taskFor(this.issueTask)
-      .perform()
-      .catch((e) => console.error(e));
+    taskFor(this.issueTask).perform();
   }
 
   @action cancel() {
+    this.isUserRejection = true;
     taskFor(this.issueTask).cancelAll();
   }
 
@@ -71,8 +74,27 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
 
   @action checkForPendingTransaction() {
     if (this.args.workflowSession.state.txnHash) {
-      taskFor(this.issueTask).perform();
+      taskFor(this.issueTask)
+        .perform()
+        .catch((e) => console.error(e));
     }
+  }
+
+  get shouldRestartWorkflow() {
+    return this.hasTriedCreatingPrepaidCard && !this.isUserRejection;
+  }
+
+  @action async restartWorkflow() {
+    await this.router.transitionTo({
+      queryParams: { flow: null, 'flow-id': null },
+    });
+    next(this, () => {
+      this.router.transitionTo({
+        queryParams: {
+          flow: 'issue-prepaid-card',
+        },
+      });
+    });
   }
 
   @task *issueTask(): TaskGenerator<void> {
@@ -151,6 +173,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
 
       this.args.onComplete();
     } catch (e) {
+      this.isUserRejection = false;
       let insufficientFunds = e.message.startsWith(
         'Safe does not have enough balance to make prepaid card(s).'
       );
@@ -164,6 +187,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
       } else if (tookTooLong) {
         throw new Error('TIMEOUT');
       } else if (isLayer2UserRejectionError(e)) {
+        this.isUserRejection = true;
         throw new Error('USER_REJECTION');
       } else {
         // Basically, for pretty much everything we want to make the user retry or seek support
