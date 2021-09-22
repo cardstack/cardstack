@@ -25,7 +25,7 @@ export function handleProvisionedPrepaidCard(event: ProvisionedPrepaidCard): voi
   let accountEntity = new Account(customer);
   accountEntity.save();
 
-  makeEOATransaction(event, customer);
+  makeEOATransaction(event, customer, null);
   let itemId = sku + '-' + prepaidCard;
   let inventoryItemEntity = PrepaidCardInventoryItem.load(itemId);
   if (inventoryItemEntity == null) {
@@ -60,7 +60,7 @@ export function handleItemSet(event: ItemSet): void {
   let accountEntity = new Account(issuer);
   accountEntity.save();
 
-  makeEOATransaction(event, issuer);
+  makeEOATransaction(event, issuer, null);
   let issuingToken = makeToken(event.params.issuingToken);
   makeSkuEntity(sku, issuer, issuingToken, event.params.faceValue, event.params.customizationDID);
   makeInventory(sku, issuer);
@@ -87,7 +87,7 @@ export function handleAskSet(event: AskSet): void {
   let accountEntity = new Account(issuer);
   accountEntity.save();
 
-  makeEOATransaction(event, issuer);
+  makeEOATransaction(event, issuer, null);
   let issuingToken = makeToken(event.params.issuingToken);
   let askEntity = new PrepaidCardAsk(sku);
   askEntity.sku = sku;
@@ -113,7 +113,7 @@ export function handleItemRemoved(event: ItemRemoved): void {
   let accountEntity = new Account(issuer);
   accountEntity.save();
 
-  makeEOATransaction(event, issuer);
+  makeEOATransaction(event, issuer, null);
   let itemId = sku + '-' + prepaidCard;
   let inventoryItemEntity = PrepaidCardInventoryItem.load(itemId);
   if (inventoryItemEntity == null) {

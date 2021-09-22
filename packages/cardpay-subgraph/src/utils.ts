@@ -14,7 +14,6 @@ import {
   PrepaidCardPayment,
   RevenueEarningsByDay,
   Token,
-  Safe,
   Account,
   MerchantSafe,
 } from '../generated/schema';
@@ -45,7 +44,7 @@ export function makeTransaction(event: ethereum.Event): void {
   txEntity.save();
 }
 
-export function makeEOATransaction(event: ethereum.Event, address: string): void {
+export function makeEOATransaction(event: ethereum.Event, address: string, safe: string | null): void {
   makeTransaction(event);
   let accountEntity = new Account(address);
   accountEntity.save();
@@ -54,16 +53,17 @@ export function makeEOATransaction(event: ethereum.Event, address: string): void
   let entity = new EOATransaction(txnHash + '-' + address);
   entity.transaction = txnHash;
   entity.account = address;
+  entity.safe = safe;
   entity.timestamp = event.block.timestamp;
   entity.blockNumber = event.block.number;
   entity.save();
 }
 
-export function makeEOATransactionForSafe(event: ethereum.Event, safe: Safe): void {
-  let safeContract = GnosisSafe.bind(Address.fromString(safe.id));
+export function makeEOATransactionForSafe(event: ethereum.Event, safe: string): void {
+  let safeContract = GnosisSafe.bind(Address.fromString(safe));
   let owners = safeContract.getOwners();
   for (let i = 0; i < owners.length; i++) {
-    makeEOATransaction(event, toChecksumAddress(owners[i]));
+    makeEOATransaction(event, toChecksumAddress(owners[i]), safe);
   }
 }
 
@@ -105,7 +105,7 @@ export function makePrepaidCardPayment(
     );
     return;
   }
-  makeEOATransaction(event, prepaidCardEntity.owner);
+  makeEOATransaction(event, prepaidCardEntity.owner, null);
 
   let paymentEntity = new PrepaidCardPayment(txnHash); // There will only ever be one merchant payment event per txn
   paymentEntity.transaction = txnHash;
@@ -117,7 +117,7 @@ export function makePrepaidCardPayment(
     if (merchantSafeEntity != null) {
       paymentEntity.merchantSafe = merchantSafe;
       paymentEntity.merchant = merchantSafeEntity.merchant;
-      makeEOATransaction(event, merchantSafeEntity.merchant);
+      makeEOATransactionForSafe(event, merchantSafe);
     } else {
       log.warning(
         'Cannot process merchant payment txn {}: MerchantSafe entity does not exist for merchant safe address {}. This is likely due to the subgraph having a startBlock that is higher than the block the merchant safe was created in.',

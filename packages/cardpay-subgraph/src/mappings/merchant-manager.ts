@@ -5,7 +5,7 @@ import { makeEOATransaction, toChecksumAddress } from '../utils';
 
 export function handleMerchantCreation(event: MerchantCreationEvent): void {
   let merchant = toChecksumAddress(event.params.merchant);
-  makeEOATransaction(event, merchant);
+  makeEOATransaction(event, merchant, null);
 
   let merchantSafe = toChecksumAddress(event.params.merchantSafe);
   let infoDID = event.params.infoDID;

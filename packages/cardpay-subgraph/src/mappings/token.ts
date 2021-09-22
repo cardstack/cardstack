@@ -16,18 +16,18 @@ export function handleTransfer(event: TransferEvent): void {
     receiver = makeTokenHolder(event.params.to, event.address);
     let receiverSafe = Safe.load(to);
     if (receiverSafe != null) {
-      makeEOATransactionForSafe(event, receiverSafe as Safe);
+      makeEOATransactionForSafe(event, receiverSafe.id);
     } else {
-      makeEOATransaction(event, to);
+      makeEOATransaction(event, to, null);
     }
   }
   if (from != ZERO_ADDRESS) {
     sender = makeTokenHolder(event.params.from, event.address);
     let senderSafe = Safe.load(from);
     if (senderSafe != null) {
-      makeEOATransactionForSafe(event, senderSafe as Safe);
+      makeEOATransactionForSafe(event, senderSafe.id);
     } else {
-      makeEOATransaction(event, from);
+      makeEOATransaction(event, from, null);
     }
   }
   let txnHash = event.transaction.hash.toHex();
