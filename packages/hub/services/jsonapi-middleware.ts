@@ -1,5 +1,6 @@
 import compose from 'koa-compose';
-import route from 'koa-better-route';
+import Router from '@koa/router';
+import { RouterContext } from '@koa/router';
 import Koa from 'koa';
 // @ts-ignore
 import mimeMatch from 'mime-match';
@@ -36,7 +37,7 @@ export default class JSONAPIMiddleware {
   });
   custodialWalletRoute: CustodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
   middleware() {
-    return (ctxt: Koa.ParameterizedContext<SessionContext, Record<string, unknown>>, next: Koa.Next) => {
+    return (ctxt: RouterContext<SessionContext, Record<string, unknown>>, next: Koa.Next) => {
       let m = apiPrefixPattern.exec(ctxt.request.path);
       if (!m) {
         return next();
@@ -73,20 +74,19 @@ export default class JSONAPIMiddleware {
       sessionRoute,
     } = this;
 
-    return compose([
-      CardstackError.withJsonErrorHandling,
-      body,
-      route.get('/boom', boomRoute.get),
-      route.get('/session', sessionRoute.get),
-      route.post('/session', sessionRoute.post),
-      route.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get),
-      route.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get),
-      route.post('/prepaid-card-customizations', prepaidCardCustomizationsRoute.post),
-      route.post('/merchant-infos', merchantInfosRoute.post),
-      route.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation),
-      route.get('/custodial-wallet', custodialWalletRoute.get),
-      route.all('/(.*)', notFound),
-    ]);
+    let router = new Router();
+    router.get('/boom', boomRoute.get);
+    router.get('/session', sessionRoute.get);
+    router.post('/session', sessionRoute.post);
+    router.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get);
+    router.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get);
+    router.post('/prepaid-card-customizations', prepaidCardCustomizationsRoute.post);
+    router.post('/merchant-infos', merchantInfosRoute.post);
+    router.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
+    router.get('/custodial-wallet', custodialWalletRoute.get);
+    router.all('/(.*)', notFound);
+
+    return compose([CardstackError.withJsonErrorHandling, body, router.routes()]);
   }
 
   isJSONAPI(ctxt: Koa.ParameterizedContext<SessionContext, Record<string, unknown>>) {

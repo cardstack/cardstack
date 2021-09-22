@@ -1,5 +1,6 @@
 import compose from 'koa-compose';
-import route from 'koa-better-route';
+import Router from '@koa/router';
+import { RouterContext } from '@koa/router';
 import Koa from 'koa';
 // @ts-ignore
 import mimeMatch from 'mime-match';
@@ -16,7 +17,7 @@ const routePrefixPattern = new RegExp(`^${ROUTE_PREFIX}/(.*)`);
 export default class CallbacksMiddleWare {
   wyreCallbackRoute: WyreCallbackRoute = inject('wyre-callback-route', { as: 'wyreCallbackRoute' });
   middleware() {
-    return (ctxt: Koa.ParameterizedContext<SessionContext, Record<string, unknown>>, next: Koa.Next) => {
+    return (ctxt: RouterContext<SessionContext, Record<string, unknown>>, next: Koa.Next) => {
       let m = routePrefixPattern.exec(ctxt.request.path);
       if (!m) {
         return next();
@@ -44,16 +45,13 @@ export default class CallbacksMiddleWare {
       },
     });
     let { wyreCallbackRoute } = this;
-
-    return compose([
-      CardstackError.withJsonErrorHandling,
-      body,
-      route.post('/wyre', wyreCallbackRoute.post),
-      route.all('/(.*)', notFound),
-    ]);
+    let router = new Router();
+    router.post('/wyre', wyreCallbackRoute.post);
+    router.all('/(.*)', notFound);
+    return compose([CardstackError.withJsonErrorHandling, body, router.routes()]);
   }
 
-  isJSON(ctxt: Koa.ParameterizedContext<SessionContext, Record<string, unknown>>) {
+  isJSON(ctxt: RouterContext<SessionContext, Record<string, unknown>>) {
     let contentType = ctxt.request.headers['content-type'];
     let isJson = contentType && contentType.includes('application/json');
     let [acceptedTypes]: string[] = (ctxt.request.headers['accept'] || '').split(';');
