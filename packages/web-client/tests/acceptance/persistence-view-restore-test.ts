@@ -161,6 +161,8 @@ module('Acceptance | persistence view and restore', function () {
     // FIXME add test for storage event coming from another tab
 
     // FIXME add test for filtering out unknown and malformed workflows
+
+    // FIXME add test for not appending duplicate persisted workflow ids
   });
 
   module(
