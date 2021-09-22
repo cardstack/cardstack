@@ -85,7 +85,7 @@ export default class MerchantInfosRoute {
       return;
     }
 
-    let slug: string = ctx.routeParams.slug;
+    let slug: string = ctx.params.slug;
     let validationResult = await this.validateSlug(slug);
 
     ctx.status = 200;

@@ -1,6 +1,7 @@
 /* eslint-disable no-process-exit */
 
 import Koa from 'koa';
+import KoaBody from 'koa-body';
 import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
@@ -31,13 +32,14 @@ import WyreCallbackRoute from './routes/wyre-callback';
 import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import MerchantInfoQueries from './services/queries/merchant-info';
 import { AuthenticationUtils } from './utils/authentication';
-import JsonapiMiddleware from './services/jsonapi-middleware';
-import CallbacksMiddleware from './services/callbacks-middleware';
+import ApiRouter from './services/api-router';
+import CallbacksRouter from './services/callbacks-router';
 import NonceTracker from './services/nonce-tracker';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
+import { CardstackError } from './utils/error';
 
 const serverLog = logger('hub/server');
 const workerLog = logger('hub/worker');
@@ -51,8 +53,8 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
-  registry.register('jsonapi-middleware', JsonapiMiddleware);
-  registry.register('callbacks-middleware', CallbacksMiddleware);
+  registry.register('api-router', ApiRouter);
+  registry.register('callbacks-router', CallbacksRouter);
   registry.register('nonce-tracker', NonceTracker);
   registry.register('boom-route', BoomRoute);
   registry.register('session-route', SessionRoute);
@@ -84,16 +86,28 @@ export async function makeServer(registryCallback?: RegistryCallback, containerC
   initSentry();
 
   let app = new Koa();
+  app.use(CardstackError.withJsonErrorHandling);
   app.use(async (ctx: Koa.Context, next: Koa.Next) => {
     ctx.environment = process.env.NODE_ENV || 'development';
     return next();
   });
   app.use(cors);
   app.use(httpLogging);
+  app.use(
+    KoaBody({
+      jsonLimit: '16mb',
+      urlencoded: false,
+      text: false,
+      onError(error: Error) {
+        throw new CardstackError(`error while parsing body: ${error.message}`, { status: 400 });
+      },
+    })
+  );
+
   app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
   app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
-  app.use(((await container.lookup('jsonapi-middleware')) as JsonapiMiddleware).middleware());
-  app.use(((await container.lookup('callbacks-middleware')) as CallbacksMiddleware).middleware());
+  app.use(((await container.lookup('api-router')) as ApiRouter).routes());
+  app.use(((await container.lookup('callbacks-router')) as CallbacksRouter).routes());
 
   app.use(async (ctx: Koa.Context, _next: Koa.Next) => {
     ctx.body = 'Hello World ' + ctx.environment + '... ' + ctx.host.split(':')[0];
