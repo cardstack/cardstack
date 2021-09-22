@@ -3,9 +3,7 @@ import { RouterContext } from '@koa/router';
 import Koa from 'koa';
 // @ts-ignore
 import mimeMatch from 'mime-match';
-import { Memoize } from 'typescript-memoize';
 import { CardstackError } from '../utils/error';
-import { SessionContext } from './authentication-middleware';
 import BoomRoute from '../routes/boom';
 import SessionRoute from '../routes/session';
 import PrepaidCardColorSchemesRoute from '../routes/prepaid-card-color-schemes';
@@ -14,10 +12,6 @@ import PrepaidCardCustomizationsRoute from '../routes/prepaid-card-customization
 import MerchantInfosRoute from '../routes/merchant-infos';
 import { inject } from '../di/dependency-injection';
 import CustodialWalletRoute from '../routes/custodial-wallet';
-
-const API_PREFIX = '/api';
-const apiPrefixPattern = new RegExp(`^${API_PREFIX}/(.*)`);
-
 export default class JSONAPIMiddleware {
   boomRoute: BoomRoute = inject('boom-route', { as: 'boomRoute' });
   sessionRoute: SessionRoute = inject('session-route', { as: 'sessionRoute' });
@@ -35,23 +29,6 @@ export default class JSONAPIMiddleware {
   });
   custodialWalletRoute: CustodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
   middleware() {
-    return (ctxt: RouterContext<SessionContext, Record<string, unknown>>, next: Koa.Next) => {
-      let m = apiPrefixPattern.exec(ctxt.request.path);
-      if (!m) {
-        return next();
-      }
-      ctxt.request.path = `/${m[1]}`;
-
-      if (this.isJSONAPI(ctxt)) {
-        return this.jsonHandlers(ctxt, next);
-      } else {
-        throw new CardstackError(`Only JSON-API requests are supported at this endpoint`);
-      }
-    };
-  }
-
-  @Memoize()
-  get jsonHandlers() {
     let {
       boomRoute,
       prepaidCardColorSchemesRoute,
@@ -61,29 +38,35 @@ export default class JSONAPIMiddleware {
       custodialWalletRoute,
       sessionRoute,
     } = this;
+    let apiSubrouter = new Router();
+    apiSubrouter.get('/boom', boomRoute.get);
+    apiSubrouter.get('/session', sessionRoute.get);
+    apiSubrouter.post('/session', sessionRoute.post);
+    apiSubrouter.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get);
+    apiSubrouter.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get);
+    apiSubrouter.post('/prepaid-card-customizations', prepaidCardCustomizationsRoute.post);
+    apiSubrouter.post('/merchant-infos', merchantInfosRoute.post);
+    apiSubrouter.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
+    apiSubrouter.get('/custodial-wallet', custodialWalletRoute.get);
+    apiSubrouter.all('/(.*)', notFound);
 
-    let router = new Router();
-    router.get('/boom', boomRoute.get);
-    router.get('/session', sessionRoute.get);
-    router.post('/session', sessionRoute.post);
-    router.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get);
-    router.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get);
-    router.post('/prepaid-card-customizations', prepaidCardCustomizationsRoute.post);
-    router.post('/merchant-infos', merchantInfosRoute.post);
-    router.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
-    router.get('/custodial-wallet', custodialWalletRoute.get);
-    router.all('/(.*)', notFound);
-
-    return router.routes();
+    let apiRouter = new Router();
+    apiRouter.use('/api', verifyJSONAPI, apiSubrouter.routes());
+    return apiRouter.routes();
   }
+}
 
-  isJSONAPI(ctxt: Koa.ParameterizedContext<SessionContext, Record<string, unknown>>) {
-    let contentType = ctxt.request.headers['content-type'];
-    let isJsonApi = contentType && contentType.includes('application/vnd.api+json');
-    let [acceptedTypes]: string[] = (ctxt.request.headers['accept'] || '').split(';');
-    let types = acceptedTypes.split(',');
-    let acceptsJsonApi = types.some((t) => mimeMatch(t, 'application/vnd.api+json'));
-    return isJsonApi || acceptsJsonApi;
+// TODO: the type for ctxt should be narrowed!
+function verifyJSONAPI(ctxt: RouterContext<any, any>, next: Koa.Next) {
+  let contentType = ctxt.request.headers['content-type'];
+  let isJsonApi = contentType && contentType.includes('application/vnd.api+json');
+  let [acceptedTypes]: string[] = (ctxt.request.headers['accept'] || '').split(';');
+  let types = acceptedTypes.split(',');
+  let acceptsJsonApi = types.some((t) => mimeMatch(t, 'application/vnd.api+json'));
+  if (isJsonApi || acceptsJsonApi) {
+    return next();
+  } else {
+    throw new CardstackError(`Only JSON-API requests are supported at this endpoint`);
   }
 }
 
