@@ -359,6 +359,20 @@ module('Acceptance | issue prepaid card', function (hooks) {
     await waitFor(milestoneCompletedSel(2));
     assert.dom(milestoneCompletedSel(2)).containsText('Face value chosen');
 
+    let workflowPersistenceService = this.owner.lookup(
+      'service:workflow-persistence'
+    ) as WorkflowPersistence;
+
+    const workflowPersistenceId = new URL(
+      'http://domain.test/' + currentURL()
+    ).searchParams.get('flow-id')!;
+
+    assert.equal(
+      workflowPersistenceService.getPersistedData(workflowPersistenceId).state
+        .currentCardName,
+      'PREVIEW'
+    );
+
     assert
       .dom(postableSel(3, 0))
       .containsText('This is what your prepaid card will look like.');
@@ -504,14 +518,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     await waitFor(epiloguePostableSel(4));
 
-    let workflowPersistenceService = this.owner.lookup(
-      'service:workflow-persistence'
-    ) as WorkflowPersistence;
-
-    const workflowPersistenceId = new URL(
-      'http://domain.test/' + currentURL()
-    ).searchParams.get('flow-id')!;
-
     assert
       .dom(
         `${epiloguePostableSel(
@@ -554,6 +560,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         'EPILOGUE_LAYER_TWO_CONNECT_CARD',
       ],
       completedMilestonesCount: 4,
+      currentCardName: 'EPILOGUE_NEXT_STEPS',
       did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
       issuerName: 'JJ',
       layer2WalletAddress: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',

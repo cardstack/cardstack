@@ -56,6 +56,10 @@ export class WorkflowCard extends WorkflowPostable {
     return this.session?.state.completedCardNames ?? [];
   }
 
+  onRevealed() {
+    this.session?.update('currentCardName', this.cardName);
+  }
+
   @action async onComplete() {
     if (this.isComplete) return;
     let checkResult = await this.check();

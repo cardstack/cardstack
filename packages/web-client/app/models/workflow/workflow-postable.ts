@@ -22,4 +22,5 @@ export class WorkflowPostable {
   includeIf: (() => boolean) | undefined;
   reset: (() => void) | undefined;
   failureReason: string | undefined;
+  onRevealed() {}
 }

@@ -180,6 +180,10 @@ export default class AnimatedWorkflow {
     while (true) {
       let result = this.revealNext();
 
+      if (result.revealed) {
+        result.postable?.onRevealed();
+      }
+
       // the last card in these things is not completed so isComplete will never
       // be true. We check for completion by making sure all the things we need to
       // show are shown
