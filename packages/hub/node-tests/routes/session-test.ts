@@ -1,6 +1,5 @@
-import { Server } from 'http';
 import supertest, { Test } from 'supertest';
-import { bootServerForTesting } from '../../main';
+import { HubServer } from '../../main';
 import { Registry } from '../../di/dependency-injection';
 import packageJson from '../../package.json';
 import { AcceleratableClock } from '../helpers';
@@ -42,20 +41,19 @@ class StubNonceTracker {
 }
 
 describe('GET /api/session', function () {
-  let server: Server;
+  let server: HubServer;
   let request: supertest.SuperTest<Test>;
   this.beforeEach(async function () {
-    server = await bootServerForTesting({
-      port: 3001,
+    server = await HubServer.create({
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
       },
     });
-    request = supertest(server);
+    request = supertest(server.app.callback());
   });
 
   this.afterEach(function () {
-    server.close();
+    server.teardown();
   });
 
   it('without bearer token, responds with 401 and nonce in JSON', async function () {
@@ -120,20 +118,19 @@ describe('GET /api/session', function () {
 });
 
 describe('POST /api/session', function () {
-  let server: Server;
+  let server: HubServer;
   let request: supertest.SuperTest<Test>;
   let bodyWithCorrectSignature: any;
 
   this.beforeEach(async function () {
-    server = await bootServerForTesting({
-      port: 3001,
+    server = await HubServer.create({
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
         registry.register('clock', AcceleratableClock);
         registry.register('nonce-tracker', StubNonceTracker);
       },
     });
-    request = supertest(server);
+    request = supertest(server.app.callback());
     bodyWithCorrectSignature = {
       authData: {
         types: {
@@ -162,7 +159,7 @@ describe('POST /api/session', function () {
   });
 
   this.afterEach(function () {
-    server.close();
+    server.teardown();
     stubTimestamp = process.hrtime.bigint();
   });
 

@@ -1,6 +1,5 @@
-import { Server } from 'http';
 import supertest, { Test } from 'supertest';
-import { bootServerForTesting } from '../../main';
+import { HubServer } from '../../main';
 import { Registry } from '../../di/dependency-injection';
 import Web3 from 'web3';
 
@@ -92,23 +91,22 @@ function handleGetWyreWalletByName(address: string) {
 }
 
 describe('GET /api/custodial-wallet', function () {
-  let server: Server;
+  let server: HubServer;
   let request: supertest.SuperTest<Test>;
 
   this.beforeEach(async function () {
     wyreCreateCallCount = 0;
-    server = await bootServerForTesting({
-      port: 3001,
+    server = await HubServer.create({
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
         registry.register('wyre', StubWyreService);
       },
     });
-    request = supertest(server);
+    request = supertest(server.app.callback());
   });
 
   this.afterEach(async function () {
-    server.close();
+    server.teardown();
   });
 
   it('gets a the custodial wallet for an EOA that is not yet assigned a custodial wallet', async function () {

@@ -7,7 +7,7 @@ import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile
 import { LogLevel, LogMeta } from '@graphile/logger';
 import config from 'config';
 import packageJson from './package.json';
-import { Registry, Container, RegistryCallback, ContainerCallback } from './di/dependency-injection';
+import { Registry, Container, RegistryCallback } from './di/dependency-injection';
 
 import AuthenticationMiddleware from './services/authentication-middleware';
 import DatabaseManager from './services/database-manager';
@@ -42,8 +42,13 @@ import { CardstackError } from './utils/error';
 import { environment, httpLogging } from './middleware';
 import cors from '@koa/cors';
 
-const serverLog = logger('hub/server');
 const workerLog = logger('hub/worker');
+
+export interface ServerConfig {
+  port?: number;
+  registryCallback?: undefined | ((registry: Registry) => void);
+  containerCallback?: undefined | ((container: Container) => void);
+}
 
 export function wireItUp(registryCallback?: RegistryCallback): Container {
   let registry = new Registry();
@@ -80,41 +85,51 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   return new Container(registry);
 }
 
-export async function makeServer(registryCallback?: RegistryCallback, containerCallback?: ContainerCallback) {
-  let container = wireItUp(registryCallback);
-  containerCallback?.(container);
+const LOGGER = logger('hub/server');
+export class HubServer {
+  logger = LOGGER;
+  static logger = LOGGER;
 
-  initSentry();
+  static async create(config?: ServerConfig): Promise<HubServer> {
+    let container = wireItUp(config?.registryCallback);
 
-  let app = new Koa<Koa.DefaultState, Koa.Context>()
-    .use(CardstackError.withJsonErrorHandling)
-    .use(environment)
-    .use(cors({ origin: '*', allowHeaders: 'Authorization, Content-Type, If-Match, X-Requested-With' }))
-    .use(httpLogging);
+    initSentry();
 
-  app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
-  app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
-  app.use(((await container.lookup('api-router')) as ApiRouter).routes());
-  app.use(((await container.lookup('callbacks-router')) as CallbacksRouter).routes());
+    let app = new Koa<Koa.DefaultState, Koa.Context>()
+      .use(CardstackError.withJsonErrorHandling)
+      .use(environment)
+      .use(cors({ origin: '*', allowHeaders: 'Authorization, Content-Type, If-Match, X-Requested-With' }))
+      .use(httpLogging);
 
-  function onError(err: Error, ctx: Koa.Context) {
-    Sentry.withScope(function (scope) {
-      scope.addEventProcessor(function (event) {
-        return Sentry.Handlers.parseRequest(event, ctx.request);
+    app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
+    app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
+    app.use(((await container.lookup('api-router')) as ApiRouter).routes());
+    app.use(((await container.lookup('callbacks-router')) as CallbacksRouter).routes());
+
+    function onError(err: Error, ctx: Koa.Context) {
+      Sentry.withScope(function (scope) {
+        scope.addEventProcessor(function (event) {
+          return Sentry.Handlers.parseRequest(event, ctx.request);
+        });
+        Sentry.captureException(err);
       });
-      Sentry.captureException(err);
-    });
-  }
+    }
 
-  async function onClose() {
-    await container.teardown();
-    app.off('close', onClose);
-    app.off('error', onError);
-  }
-  app.on('close', onClose);
-  app.on('error', onError);
+    async function onClose() {
+      await container.teardown();
+      app.off('close', onClose);
+      app.off('error', onError);
+    }
+    app.on('close', onClose);
+    app.on('error', onError);
 
-  return app;
+    return new this(app, container);
+  }
+  private constructor(public app: Koa<Koa.DefaultState, Koa.Context>, public container: Container) {}
+
+  teardown() {
+    this.container.teardown();
+  }
 }
 
 function initSentry() {
@@ -126,31 +141,6 @@ function initSentry() {
       release: 'hub@' + packageJson.version,
     });
   }
-}
-
-export async function bootServerForTesting(config: StartupConfig) {
-  logger.configure({
-    defaultLevel: 'warn',
-  });
-  function onWarning(warning: Error) {
-    if (warning.stack) {
-      process.stderr.write(warning.stack);
-    }
-  }
-  process.on('warning', onWarning);
-
-  let server = await runServer(config).catch((err: Error) => {
-    serverLog.error('Server failed to start cleanly: %s', err.stack || err);
-    process.exit(-1);
-  });
-
-  function onClose() {
-    process.off('warning', onWarning);
-    server.off('close', onClose);
-  }
-  server.on('close', onClose);
-
-  return server;
 }
 
 export function bootEnvironment() {
@@ -209,10 +199,10 @@ export async function bootWorker() {
   await runner.promise;
 }
 
-export async function runServer(config: StartupConfig) {
-  let app = await makeServer(config.registryCallback, config.containerCallback);
+export async function runServer(config: ServerConfig) {
+  let app = (await HubServer.create(config)).app;
   let server = app.listen(config.port);
-  serverLog.info('server listening on %s', config.port);
+  LOGGER.info('server listening on %s', config.port);
   if (process.connected) {
     process.send!('hub hello');
   }
@@ -221,10 +211,3 @@ export async function runServer(config: StartupConfig) {
   });
   return server;
 }
-
-export interface StartupConfig {
-  port: number;
-  registryCallback?: undefined | ((registry: Registry) => void);
-  containerCallback?: undefined | ((container: Container) => void);
-}
-

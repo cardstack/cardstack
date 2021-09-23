@@ -1,6 +1,5 @@
-import { Server } from 'http';
 import supertest, { Test } from 'supertest';
-import { bootServerForTesting } from '../../main';
+import { HubServer } from '../../main';
 import { Registry } from '../../di/dependency-injection';
 import { Job, TaskSpec } from 'graphile-worker';
 
@@ -42,23 +41,22 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('POST /api/merchant-infos', function () {
-  let server: Server;
+  let server: HubServer;
   let request: supertest.SuperTest<Test>;
 
   this.beforeEach(async function () {
-    server = await bootServerForTesting({
-      port: 3001,
+    server = await HubServer.create({
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
         registry.register('worker-client', StubWorkerClient);
       },
     });
 
-    request = supertest(server);
+    request = supertest(server.app.callback());
   });
 
   this.afterEach(async function () {
-    server.close();
+    server.teardown();
     lastAddedJobIdentifier = undefined;
     lastAddedJobPayload = undefined;
   });
@@ -239,23 +237,22 @@ describe('POST /api/merchant-infos', function () {
 });
 
 describe('GET /api/merchant-infos/validate-slug/:slug', function () {
-  let server: Server;
+  let server: HubServer;
   let request: supertest.SuperTest<Test>;
 
   this.beforeEach(async function () {
-    server = await bootServerForTesting({
-      port: 3001,
+    server = await HubServer.create({
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
         registry.register('worker-client', StubWorkerClient);
       },
     });
 
-    request = supertest(server);
+    request = supertest(server.app.callback());
   });
 
   this.afterEach(async function () {
-    server.close();
+    server.teardown();
     lastAddedJobIdentifier = undefined;
     lastAddedJobPayload = undefined;
   });
