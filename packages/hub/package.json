@@ -10,11 +10,10 @@
   "license": "MIT",
   "description": "Stock API server for the Cardstack tech stack.",
   "scripts": {
-    "hub": "node ./bin/hub.js",
     "start": "run-p -c start:*",
     "start:server": "bin/hub server",
     "start:worker": "bin/hub worker",
-    "console": "node --experimental-repl-await ./bin/hub.js console",
+    "console": "node --experimental-repl-await ./bin/hub console",
     "db:migrate": "node-pg-migrate",
     "test": "NODE_ENV=test mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
     "autotest": "NODE_ENV=test mocha -w --reporter=min mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000"
