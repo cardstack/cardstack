@@ -78,6 +78,7 @@ module('Acceptance | persistence view and restore', function () {
         name: 'MERCHANT_CREATION',
         state: {
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+          currentCardDisplayName: 'Merchant Account',
           completedMilestonesCount: 1,
           milestonesCount: 3,
         },
@@ -94,6 +95,7 @@ module('Acceptance | persistence view and restore', function () {
               'LAYOUT_CUSTOMIZATION',
               'FUNDING_SOURCE',
             ],
+            currentCardDisplayName: 'Prepaid card funding',
             completedMilestonesCount: 1,
             milestonesCount: 4,
           },
@@ -113,6 +115,7 @@ module('Acceptance | persistence view and restore', function () {
             'CONFIRMATION',
             'EPILOGUE_LAYER_TWO_CONNECT_CARD',
           ],
+          currentCardDisplayName: 'Not shown',
           completedMilestonesCount: 4,
           milestonesCount: 4,
         },
@@ -126,11 +129,13 @@ module('Acceptance | persistence view and restore', function () {
 
       assert
         .dom('[data-test-active-workflow]:nth-child(1)')
-        .containsText('Merchant Creation');
+        .containsText('Merchant Creation')
+        .containsText('Merchant Account');
 
       assert
         .dom('[data-test-active-workflow]:nth-child(2)')
-        .containsText('Prepaid Card Issuance');
+        .containsText('Prepaid Card Issuance')
+        .containsText('Prepaid card funding');
 
       let progressIconElement = find(
         '[data-test-active-workflow]:nth-child(2) .boxel-progress-icon'
@@ -148,6 +153,11 @@ module('Acceptance | persistence view and restore', function () {
       assert.equal(dashFraction, 0.25);
 
       assert.dom('[data-test-completed-workflow]').exists({ count: 1 });
+
+      assert
+        .dom('[data-test-completed-workflow]')
+        .containsText('Prepaid Card Issuance')
+        .containsText('Complete');
 
       assert
         .dom('[data-test-completed-workflow] .boxel-progress-icon--complete')
