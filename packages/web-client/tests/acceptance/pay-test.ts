@@ -15,6 +15,7 @@ import {
 import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 import config from '@cardstack/web-client/config/environment';
+import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-use-on-chain-constants';
 
 // selectors
 const MERCHANT = '[data-test-merchant]';
@@ -57,6 +58,10 @@ const merchantSafeWithoutInfo: MerchantSafe = {
 } as MerchantSafe;
 const spendAmount = 300;
 const usdAmount = spendToUsd(spendAmount);
+const minSpendAmount = MIN_PAYMENT_AMOUNT_IN_SPEND;
+const minUsdAmount = spendToUsd(MIN_PAYMENT_AMOUNT_IN_SPEND)!;
+const lessThanMinSpendAmount = 10;
+const lessThanMinUsdAmount = spendToUsd(lessThanMinSpendAmount)!;
 
 module('Acceptance | pay', function (hooks) {
   setupApplicationTest(hooks);
@@ -124,7 +129,7 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
   });
 
-  test('it rounds display but not url with floating point SPD', async function (assert) {
+  test('it rounds floating point SPEND amounts', async function (assert) {
     const floatingSpendAmount = 279.17;
     const roundedSpendAmount = Math.ceil(floatingSpendAmount);
     await visit(
@@ -159,6 +164,38 @@ module('Acceptance | pay', function (hooks) {
       merchantSafeID: merchantSafe.address,
       currency: spendSymbol,
       amount: roundedSpendAmount,
+    });
+    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
+  });
+
+  test('it rounds SPEND up to the min SPEND amount', async function (assert) {
+    await visit(
+      `/pay/${network}/${merchantSafe.address}?amount=${lessThanMinSpendAmount}&currency=${spendSymbol}`
+    );
+    await waitFor(MERCHANT);
+
+    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert
+      .dom(MERCHANT_LOGO)
+      .hasAttribute(
+        'data-test-merchant-logo-background',
+        merchantInfoBackground
+      )
+      .hasAttribute(
+        'data-test-merchant-logo-text-color',
+        merchantInfoTextColor
+      );
+    assert.dom(AMOUNT).containsText(`§${minSpendAmount}`);
+    assert
+      .dom(SECONDARY_AMOUNT)
+      .containsText(convertAmountToNativeDisplay(minUsdAmount, 'USD'));
+    let expectedUrl = generateMerchantPaymentUrl({
+      domain: universalLinkDomain,
+      network,
+      merchantSafeID: merchantSafe.address,
+      currency: spendSymbol,
+      amount: minSpendAmount,
     });
     assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
@@ -228,6 +265,38 @@ module('Acceptance | pay', function (hooks) {
       merchantSafeID: merchantSafe.address,
       currency: usdSymbol,
       amount: usdAmount,
+    });
+    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
+  });
+
+  test('it rounds USD up to the min USD amount', async function (assert) {
+    await visit(
+      `/pay/${network}/${merchantSafe.address}?amount=${lessThanMinUsdAmount}&currency=${usdSymbol}`
+    );
+    await waitFor(MERCHANT);
+
+    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert
+      .dom(MERCHANT_LOGO)
+      .hasAttribute(
+        'data-test-merchant-logo-background',
+        merchantInfoBackground
+      )
+      .hasAttribute(
+        'data-test-merchant-logo-text-color',
+        merchantInfoTextColor
+      );
+    assert
+      .dom(AMOUNT)
+      .containsText(convertAmountToNativeDisplay(minUsdAmount, 'USD'));
+    assert.dom(SECONDARY_AMOUNT).containsText(`§${minSpendAmount}`);
+    let expectedUrl = generateMerchantPaymentUrl({
+      domain: universalLinkDomain,
+      network,
+      merchantSafeID: merchantSafe.address,
+      currency: usdSymbol,
+      amount: minUsdAmount,
     });
     assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);

@@ -14,6 +14,10 @@ import { useResource } from 'ember-resources';
 import { MerchantInfo } from '../resources/merchant-info';
 import config from '@cardstack/web-client/config/environment';
 import { formatAmount } from '../helpers/format-amount';
+import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-use-on-chain-constants';
+
+const minSpendAmount = MIN_PAYMENT_AMOUNT_IN_SPEND;
+const minUsdAmount = spendToUsd(minSpendAmount)!;
 
 export default class CardPayMerchantServicesController extends Controller {
   @service('is-ios') declare isIOSService: IsIOS;
@@ -50,7 +54,7 @@ export default class CardPayMerchantServicesController extends Controller {
         },
       };
     } else if (this.currency === 'SPD') {
-      let amount = Math.ceil(this.amount);
+      let amount = Math.max(Math.ceil(this.amount), minSpendAmount);
       return {
         amount,
         displayed: {
@@ -62,8 +66,9 @@ export default class CardPayMerchantServicesController extends Controller {
         },
       };
     } else if (this.currency === 'USD') {
-      let amount = Number(
-        roundAmountToNativeCurrencyDecimals(this.amount, 'USD')
+      let amount = Math.max(
+        Number(roundAmountToNativeCurrencyDecimals(this.amount, 'USD')),
+        minUsdAmount
       );
       return {
         amount,
