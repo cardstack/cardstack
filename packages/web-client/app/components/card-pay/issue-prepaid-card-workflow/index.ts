@@ -83,6 +83,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         new WorkflowCard({
           author: cardbot,
           cardName: 'LAYER2_CONNECT',
+          cardDisplayName: `Wallet - ${c.layer2.fullName}`,
           componentName: 'card-pay/layer-two-connect-card',
           async check() {
             let { layer2Network } = this.workflow as IssuePrepaidCardWorkflow;
@@ -124,6 +125,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new NetworkAwareWorkflowCard({
           cardName: 'HUB_AUTH',
+          cardDisplayName: 'Authenticate',
           author: cardbot,
           componentName: 'card-pay/hub-authentication',
           includeIf(this: NetworkAwareWorkflowCard) {
@@ -137,6 +139,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new WorkflowCard({
           cardName: 'LAYOUT_CUSTOMIZATION',
+          cardDisplayName: 'Layout Customization',
           author: cardbot,
           componentName:
             'card-pay/issue-prepaid-card-workflow/layout-customization',
@@ -157,6 +160,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new WorkflowCard({
           cardName: 'FUNDING_SOURCE',
+          cardDisplayName: 'Prepaid card funding',
           author: cardbot,
           componentName: 'card-pay/issue-prepaid-card-workflow/funding-source',
         }),
@@ -168,6 +172,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new WorkflowCard({
           cardName: 'FACE_VALUE',
+          cardDisplayName: 'Prepaid card funding',
           author: cardbot,
           componentName: 'card-pay/issue-prepaid-card-workflow/face-value',
         }),
@@ -184,6 +189,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         }),
         new WorkflowCard({
           cardName: 'PREVIEW',
+          cardDisplayName: 'Prepaid card preview',
           author: cardbot,
           componentName: 'card-pay/issue-prepaid-card-workflow/preview',
         }),
@@ -198,6 +204,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
     }),
     new WorkflowCard({
       cardName: 'CONFIRMATION',
+      cardDisplayName: 'Prepaid card',
       author: cardbot,
       componentName: 'card-pay/issue-prepaid-card-workflow/confirmation',
     }),
@@ -207,11 +214,13 @@ class IssuePrepaidCardWorkflow extends Workflow {
     }),
     new WorkflowCard({
       cardName: 'EPILOGUE_LAYER_TWO_CONNECT_CARD',
+      cardDisplayName: `Wallet - ${c.layer2.fullName}`,
       author: cardbot,
       componentName: 'card-pay/layer-two-connect-card',
     }),
     new WorkflowCard({
       cardName: 'EPILOGUE_NEXT_STEPS',
+      cardDisplayName: 'Next steps',
       author: cardbot,
       componentName: 'card-pay/issue-prepaid-card-workflow/next-steps',
     }),

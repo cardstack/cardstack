@@ -1,6 +1,6 @@
 <ActionCardContainer
   class="face-value-card"
-  @header="Prepaid card funding"
+  @header={{@displayName}}
   @isComplete={{@isComplete}}
   {{did-insert this.prepareFaceValueOptions}}
   data-test-face-value-card

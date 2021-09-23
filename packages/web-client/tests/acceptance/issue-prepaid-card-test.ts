@@ -367,11 +367,12 @@ module('Acceptance | issue prepaid card', function (hooks) {
       'http://domain.test/' + currentURL()
     ).searchParams.get('flow-id')!;
 
-    assert.equal(
-      workflowPersistenceService.getPersistedData(workflowPersistenceId).state
-        .currentCardName,
-      'PREVIEW'
-    );
+    let persistedState = workflowPersistenceService.getPersistedData(
+      workflowPersistenceId
+    ).state;
+
+    assert.equal(persistedState.currentCardName, 'PREVIEW');
+    assert.equal(persistedState.currentCardDisplayName, 'Prepaid card preview');
 
     assert
       .dom(postableSel(3, 0))
@@ -539,7 +540,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     );
 
     assert.equal(persistedData.name, 'PREPAID_CARD_ISSUANCE');
-    let persistedState = persistedData.state;
+    persistedState = persistedData.state;
     delete persistedState.prepaidCardSafe.createdAt;
 
     assert.deepEqual(persistedState, {
@@ -561,6 +562,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       ],
       completedMilestonesCount: 4,
       currentCardName: 'EPILOGUE_NEXT_STEPS',
+      currentCardDisplayName: 'Next steps',
       did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
       issuerName: 'JJ',
       layer2WalletAddress: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
