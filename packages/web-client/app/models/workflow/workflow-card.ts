@@ -22,6 +22,7 @@ export type CheckResult = SuccessCheckResult | FailureCheckResult;
 
 interface WorkflowCardOptions {
   cardName?: string;
+  cardDisplayName: string;
   author: Participant;
   componentName: string; // this should eventually become a card reference
   includeIf(this: WorkflowCard): boolean;
@@ -30,6 +31,7 @@ interface WorkflowCardOptions {
 
 export class WorkflowCard extends WorkflowPostable {
   cardName: string;
+  cardDisplayName: string;
   componentName: string;
   check: (this: WorkflowCard) => Promise<CheckResult> = () => {
     return Promise.resolve({ success: true });
@@ -39,6 +41,7 @@ export class WorkflowCard extends WorkflowPostable {
     super(options.author!, options.includeIf);
     this.componentName = options.componentName!;
     this.cardName = options.cardName || '';
+    this.cardDisplayName = options.cardDisplayName || '';
 
     this.reset = () => {
       if (this.isComplete) {
@@ -57,7 +60,10 @@ export class WorkflowCard extends WorkflowPostable {
   }
 
   onRevealed() {
-    this.session?.update('currentCardName', this.cardName);
+    this.session?.updateMany({
+      currentCardName: this.cardName,
+      currentCardDisplayName: this.cardDisplayName,
+    });
   }
 
   @action async onComplete() {

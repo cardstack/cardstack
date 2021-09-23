@@ -38,6 +38,7 @@
     }}>
       {{component
         @postable.componentName
+        displayName=@postable.cardDisplayName
         workflowSession=@postable.session
         frozen=@frozen
         onComplete=(optional @postable.onComplete)

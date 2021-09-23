@@ -11,6 +11,7 @@ import { getOwner } from '@ember/application';
 
 interface NetworkAwareWorkflowCardOptions {
   cardName?: string;
+  cardDisplayName: string;
   author: Participant;
   componentName: string; // this should eventually become a card reference
   includeIf(this: NetworkAwareWorkflowCard): boolean;
