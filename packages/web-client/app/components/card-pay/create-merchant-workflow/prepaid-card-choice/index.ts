@@ -25,8 +25,6 @@ import {
   TransactionOptions,
 } from '@cardstack/cardpay-sdk';
 import BN from 'bn.js';
-import RouterService from '@ember/routing/router-service';
-import { next } from '@ember/runloop';
 
 interface CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs {
   workflowSession: WorkflowSession;
@@ -39,7 +37,6 @@ const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
 export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent extends Component<CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs> {
   @service declare merchantInfo: MerchantInfoService;
   @service declare layer2Network: Layer2Network;
-  @service declare router: RouterService;
   @reads('createTask.last.error') declare error: Error | undefined;
   @reads('args.workflowSession.state.merchantRegistrationFee')
   declare merchantRegistrationFee: number;
@@ -48,7 +45,6 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   @tracked txnHash?: TransactionHash;
   @tracked createTaskRunningForAWhile = false;
   @tracked selectedPrepaidCard!: PrepaidCardSafe;
-  @tracked isUserRejection = false;
 
   lastNonce?: string;
 
@@ -98,25 +94,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   }
 
   @action cancel() {
-    this.isUserRejection = true;
     taskFor(this.createTask).cancelAll();
-  }
-
-  get shouldRestartWorkflow() {
-    return this.hasTriedCreatingMerchant && !this.isUserRejection;
-  }
-
-  @action async restartWorkflow() {
-    await this.router.transitionTo({
-      queryParams: { flow: null, 'flow-id': null },
-    });
-    next(this, () => {
-      this.router.transitionTo({
-        queryParams: {
-          flow: 'create-merchant',
-        },
-      });
-    });
   }
 
   @task *createTask(): TaskGenerator<void> {
@@ -192,21 +170,24 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
 
       this.args.onComplete();
     } catch (e) {
-      this.isUserRejection = false;
       let insufficientFunds = e.message.startsWith(
         'Prepaid card does not have enough balance to register a merchant.'
       );
       let tookTooLong = e.message.startsWith(
         'Transaction took too long to complete'
       );
-      if (insufficientFunds) {
+      let unauthenticated = e.message.startsWith('No valid auth token');
+      if (unauthenticated) {
+        this.args.workflowSession.workflow.cancel('UNAUTHENTICATED');
+        throw new Error('UNAUTHENTICATED');
+      } else if (insufficientFunds) {
         // This should only happen if the chosen prepaid card has been used
         // elsewhere as it should otherwise not be selectable.
+        this.args.workflowSession.workflow.cancel('INSUFFICIENT_FUNDS');
         throw new Error('INSUFFICIENT_FUNDS');
       } else if (tookTooLong) {
         throw new Error('TIMEOUT');
       } else if (isLayer2UserRejectionError(e)) {
-        this.isUserRejection = true;
         throw new Error('USER_REJECTION');
       } else {
         throw e;
@@ -247,10 +228,11 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   }
 
   get isCtaDisabled() {
-    if (!this.selectedPrepaidCard) {
-      return true;
-    }
-    return false;
-    // TODO: other conditions
+    let error = this.error?.message;
+    return (
+      !this.selectedPrepaidCard ||
+      error === 'UNAUTHENTICATED' ||
+      error === 'INSUFFICIENT_FUNDS'
+    );
   }
 }

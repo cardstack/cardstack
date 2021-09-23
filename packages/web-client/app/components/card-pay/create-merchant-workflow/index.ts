@@ -29,12 +29,13 @@ import WorkflowPersistence from '@cardstack/web-client/services/workflow-persist
 import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
 
 const FAILURE_REASONS = {
+  UNAUTHENTICATED: 'UNAUTHENTICATED',
   DISCONNECTED: 'DISCONNECTED',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
   INSUFFICIENT_PREPAID_CARD_BALANCE: 'INSUFFICIENT_PREPAID_CARD_BALANCE',
   NO_PREPAID_CARD: 'NO_PREPAID_CARD',
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
-  RESTORATION_L2_ADDRESS_CHANGED: 'RESTORATION_L2_ADDRESS_CHANGED',
+  RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
 } as const;
 
@@ -208,29 +209,11 @@ class CreateMerchantWorkflow extends Workflow {
         );
       },
     }),
-    new WorkflowCard({
-      author: cardbot,
-      componentName: 'workflow-thread/default-cancelation-cta',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
-        );
-      },
-    }),
     // cancelation for changing accounts
     new WorkflowMessage({
       author: cardbot,
       message:
         'It looks like you changed accounts in the middle of this workflow. If you still want to create a merchant, please restart the workflow.',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
-        );
-      },
-    }),
-    new WorkflowCard({
-      author: cardbot,
-      componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
@@ -247,15 +230,6 @@ class CreateMerchantWorkflow extends Workflow {
           spendToUsd(session.merchantRegistrationFee)!,
           'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.NO_PREPAID_CARD
-        );
-      },
-    }),
-    new WorkflowCard({
-      author: cardbot,
-      componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
         return (
           this.workflow?.cancelationReason === FAILURE_REASONS.NO_PREPAID_CARD
@@ -281,6 +255,15 @@ class CreateMerchantWorkflow extends Workflow {
     }),
     new WorkflowMessage({
       author: cardbot,
+      message: 'You are no longer authenticated. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.UNAUTHENTICATED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
       message:
         'You attempted to restore an unfinished workflow, but you are no longer authenticated. Please restart the workflow.',
       includeIf() {
@@ -297,7 +280,7 @@ class CreateMerchantWorkflow extends Workflow {
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
-          FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED
+          FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED
         );
       },
     }),
@@ -318,9 +301,13 @@ class CreateMerchantWorkflow extends Workflow {
       includeIf() {
         return (
           [
+            FAILURE_REASONS.UNAUTHENTICATED,
+            FAILURE_REASONS.DISCONNECTED,
+            FAILURE_REASONS.ACCOUNT_CHANGED,
+            FAILURE_REASONS.NO_PREPAID_CARD,
             FAILURE_REASONS.INSUFFICIENT_PREPAID_CARD_BALANCE,
             FAILURE_REASONS.RESTORATION_UNAUTHENTICATED,
-            FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED,
+            FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED,
             FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
           ] as String[]
         ).includes(String(this.workflow?.cancelationReason));
@@ -355,7 +342,7 @@ class CreateMerchantWorkflow extends Workflow {
       layer2Network.walletInfo.firstAddress !==
         persistedState.layer2WalletAddress
     ) {
-      errors.push(FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED);
+      errors.push(FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED);
     }
 
     return errors;

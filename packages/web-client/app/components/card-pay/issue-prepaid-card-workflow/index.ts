@@ -30,11 +30,12 @@ export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
 export const spendToUsdRate = 0.01;
 
 const FAILURE_REASONS = {
+  UNAUTHENTICATED: 'UNAUTHENTICATED',
   DISCONNECTED: 'DISCONNECTED',
   INSUFFICIENT_FUNDS: 'INSUFFICIENT_FUNDS',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
-  RESTORATION_L2_ADDRESS_CHANGED: 'RESTORATION_L2_ADDRESS_CHANGED',
+  RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
 } as const;
 
@@ -227,15 +228,6 @@ class IssuePrepaidCardWorkflow extends Workflow {
         );
       },
     }),
-    new WorkflowCard({
-      author: cardbot,
-      componentName: 'workflow-thread/default-cancelation-cta',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
-        );
-      },
-    }),
     // if we don't have enough balance (50 USD equivalent)
     new WorkflowMessage({
       author: cardbot,
@@ -269,12 +261,12 @@ class IssuePrepaidCardWorkflow extends Workflow {
         );
       },
     }),
-    new WorkflowCard({
+    new WorkflowMessage({
       author: cardbot,
-      componentName: 'workflow-thread/default-cancelation-cta',
+      message: 'You are no longer authenticated. Please restart the workflow.',
       includeIf() {
         return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
+          this.workflow?.cancelationReason === FAILURE_REASONS.UNAUTHENTICATED
         );
       },
     }),
@@ -296,7 +288,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
-          FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED
+          FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED
         );
       },
     }),
@@ -317,8 +309,11 @@ class IssuePrepaidCardWorkflow extends Workflow {
       includeIf() {
         return (
           [
+            FAILURE_REASONS.DISCONNECTED,
+            FAILURE_REASONS.ACCOUNT_CHANGED,
+            FAILURE_REASONS.UNAUTHENTICATED,
             FAILURE_REASONS.RESTORATION_UNAUTHENTICATED,
-            FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED,
+            FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED,
             FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
           ] as String[]
         ).includes(String(this.workflow?.cancelationReason));
@@ -353,7 +348,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       layer2Network.walletInfo.firstAddress !==
         persistedState.layer2WalletAddress
     ) {
-      errors.push(FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED);
+      errors.push(FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED);
     }
 
     return errors;

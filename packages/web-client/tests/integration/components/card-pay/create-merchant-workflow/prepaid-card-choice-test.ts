@@ -273,9 +273,7 @@ module(
         await click('[data-test-create-merchant-button]');
         await waitFor('[data-test-prepaid-card-choice-error-message]');
 
-        assert
-          .dom('[data-test-create-merchant-button]')
-          .containsText('Restart Workflow');
+        assert.dom('[data-test-create-merchant-button]');
       });
 
       test('it shows the correct error message for a user rejection', async function (assert) {
@@ -290,7 +288,6 @@ module(
         assert
           .dom('[data-test-prepaid-card-choice-error-message]')
           .containsText(USER_REJECTION_ERROR_MESSAGE);
-        assert.dom('[data-test-create-merchant-button]').hasText('Try Again');
       });
 
       test('it shows the correct error message for a timeout', async function (assert) {
@@ -359,6 +356,21 @@ module(
           .containsText(INSUFFICIENT_FUNDS_ERROR_MESSAGE);
       });
 
+      test('it cancels the workflow if hub authentication fails', async function (assert) {
+        sinon
+          .stub(layer2Service, 'registerMerchant')
+          .throws(new Error('No valid auth token'));
+
+        await selectPrepaidCard(prepaidCardAddress);
+        await click('[data-test-create-merchant-button]');
+        await waitFor('[data-test-prepaid-card-choice-error-message]');
+
+        assert
+          .dom('[data-test-prepaid-card-choice-error-message]')
+          .containsText(DEFAULT_ERROR_MESSAGE);
+        assert.dom('[data-test-create-merchant-button]').isDisabled();
+      });
+
       test('it shows a correct fallback error message', async function (assert) {
         sinon
           .stub(layer2Service, 'registerMerchant')
@@ -371,9 +383,7 @@ module(
         assert
           .dom('[data-test-prepaid-card-choice-error-message]')
           .containsText(DEFAULT_ERROR_MESSAGE);
-        assert
-          .dom('[data-test-issue-prepaid-card-button]')
-          .containsText('Restart Workflow');
+        assert.dom('[data-test-create-merchant-button]').isNotDisabled();
       });
     });
 

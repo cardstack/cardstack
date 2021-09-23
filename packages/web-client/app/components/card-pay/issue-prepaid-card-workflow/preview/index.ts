@@ -22,8 +22,6 @@ import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-
 import config from '../../../../config/environment';
 import { TransactionOptions } from '@cardstack/cardpay-sdk';
 import BN from 'bn.js';
-import RouterService from '@ember/routing/router-service';
-import { next } from '@ember/runloop';
 
 interface CardPayPrepaidCardWorkflowPreviewComponentArgs {
   workflowSession: WorkflowSession;
@@ -36,7 +34,6 @@ const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
 export default class CardPayPrepaidCardWorkflowPreviewComponent extends Component<CardPayPrepaidCardWorkflowPreviewComponentArgs> {
   @service declare cardCustomization: CardCustomization;
   @service declare layer2Network: Layer2Network;
-  @service declare router: RouterService;
   @tracked txnHash?: TransactionHash;
   @tracked chinInProgressMessage?: string;
   @tracked isUserRejection = false;
@@ -78,23 +75,6 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
         .perform()
         .catch((e) => console.error(e));
     }
-  }
-
-  get shouldRestartWorkflow() {
-    return this.hasTriedCreatingPrepaidCard && !this.isUserRejection;
-  }
-
-  @action async restartWorkflow() {
-    await this.router.transitionTo({
-      queryParams: { flow: null, 'flow-id': null },
-    });
-    next(this, () => {
-      this.router.transitionTo({
-        queryParams: {
-          flow: 'issue-prepaid-card',
-        },
-      });
-    });
   }
 
   @task *issueTask(): TaskGenerator<void> {
@@ -180,7 +160,11 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
       let tookTooLong = e.message.startsWith(
         'Transaction took too long to complete'
       );
-      if (insufficientFunds) {
+      let unauthenticated = e.message.startsWith('No valid auth token');
+      if (unauthenticated) {
+        this.args.workflowSession.workflow.cancel('UNAUTHENTICATED');
+        throw new Error('UNAUTHENTICATED');
+      } else if (insufficientFunds) {
         // We probably want to cancel the workflow at this point
         // And tell the user to go deposit funds
         throw new Error('INSUFFICIENT_FUNDS');

@@ -89,7 +89,7 @@ module(
         await waitFor('[data-test-issue-prepaid-card-error-message]');
         assert
           .dom('[data-test-issue-prepaid-card-button]')
-          .containsText('Restart Workflow');
+          .containsText('Try Again');
       });
       test('it shows the correct error message for a user rejection', async function (assert) {
         sinon
@@ -103,9 +103,6 @@ module(
         assert
           .dom('[data-test-issue-prepaid-card-error-message]')
           .containsText(USER_REJECTION_ERROR_MESSAGE);
-        assert
-          .dom('[data-test-issue-prepaid-card-button]')
-          .containsText('Try Again');
       });
 
       test('it shows the correct error message for a timeout', async function (assert) {
@@ -144,6 +141,21 @@ module(
           .containsText(INSUFFICIENT_FUNDS_ERROR_MESSAGE);
       });
 
+      test('it cancels the workflow if hub authentication fails', async function (assert) {
+        sinon
+          .stub(layer2Service, 'issuePrepaidCard')
+          .throws(new Error('No valid auth token'));
+
+        await click('[data-test-issue-prepaid-card-button]');
+
+        await waitFor('[data-test-issue-prepaid-card-error-message]');
+
+        assert
+          .dom('[ata-test-issue-prepaid-card-error-message]')
+          .containsText(DEFAULT_ERROR_MESSAGE);
+        assert.dom('[data-test-issue-prepaid-card-button]').isDisabled();
+      });
+
       test('it shows a correct fallback error message', async function (assert) {
         sinon
           .stub(layer2Service, 'issuePrepaidCard')
@@ -156,6 +168,7 @@ module(
         assert
           .dom('[data-test-issue-prepaid-card-error-message]')
           .containsText(DEFAULT_ERROR_MESSAGE);
+        assert.dom('[data-test-issue-prepaid-card-button]').isNotDisabled();
       });
 
       test('it allow canceling and retrying after a while', async function (assert) {
@@ -203,9 +216,6 @@ module(
       assert
         .dom('[data-test-issue-prepaid-card-error-message]')
         .containsText(DEFAULT_ERROR_MESSAGE);
-      assert
-        .dom('[data-test-issue-prepaid-card-button]')
-        .containsText('Restart Workflow');
     });
   }
 );
