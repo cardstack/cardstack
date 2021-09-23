@@ -27,6 +27,10 @@ export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayH
     return this.args.workflow.state;
   }
 
+  get currentCardDisplayName() {
+    return this.workflowState.currentCardDisplayName;
+  }
+
   get isComplete() {
     return (
       this.workflowState.completedMilestonesCount ===

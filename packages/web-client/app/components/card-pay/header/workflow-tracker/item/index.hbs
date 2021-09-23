@@ -1,4 +1,10 @@
 {{this.workflowName}}
+<br>
+{{#if this.isComplete}}
+  Complete
+{{else}}
+  {{this.currentCardDisplayName}}
+{{/if}}
 
 <Boxel::ProgressIcon
   @size="10" {{!-- FIXME but what is the true size --}}
