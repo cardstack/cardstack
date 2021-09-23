@@ -86,12 +86,16 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
 }
 
 const LOGGER = logger('hub/server');
+
+// Empty for now
+const DEFAULT_CONFIG: ServerConfig = {};
 export class HubServer {
   logger = LOGGER;
   static logger = LOGGER;
 
   static async create(config?: ServerConfig): Promise<HubServer> {
     let container = wireItUp(config?.registryCallback);
+    config = Object.assign({}, DEFAULT_CONFIG, config);
 
     initSentry();
 
@@ -123,12 +127,31 @@ export class HubServer {
     app.on('close', onClose);
     app.on('error', onError);
 
-    return new this(app, container);
+    return new this(app, container, config);
   }
-  private constructor(public app: Koa<Koa.DefaultState, Koa.Context>, public container: Container) {}
+  private constructor(
+    public app: Koa<Koa.DefaultState, Koa.Context>,
+    public container: Container,
+    private config: ServerConfig
+  ) {}
 
   teardown() {
     this.container.teardown();
+  }
+
+  listen() {
+    let instance = this.app.listen(this.config.port);
+    this.logger.info('server listening on %s', this.config.port);
+
+    if (process.connected) {
+      process.send!('hub hello');
+    }
+
+    instance.on('close', () => {
+      this.app.emit('close'); // supports our ShutdownHelper
+    });
+
+    return instance;
   }
 }
 
@@ -197,17 +220,4 @@ export async function bootWorker() {
   });
 
   await runner.promise;
-}
-
-export async function runServer(config: ServerConfig) {
-  let app = (await HubServer.create(config)).app;
-  let server = app.listen(config.port);
-  LOGGER.info('server listening on %s', config.port);
-  if (process.connected) {
-    process.send!('hub hello');
-  }
-  server.on('close', function () {
-    app.emit('close'); // supports our ShutdownHelper
-  });
-  return server;
 }
