@@ -25,7 +25,7 @@ export {
   MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
   MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
 } from './sdk/constants';
-export { waitUntilBlock, TransactionOptions } from './sdk/utils/general-utils';
+export { waitUntilBlock, TransactionOptions, waitUntilTransactionMined } from './sdk/utils/general-utils';
 export * from './sdk/currency-utils';
 export { query as gqlQuery } from './sdk/utils/graphql';
 export { validateMerchantId, generateMerchantPaymentUrl, isValidMerchantPaymentUrl } from './sdk/utils/merchant';

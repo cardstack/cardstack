@@ -23,17 +23,7 @@ export default class ReservationsRoute {
     let userAddress = ctx.state.userAddress.toLowerCase();
     let reservationId: string = ctx.params.reservation_id;
     if (!validateUUID(reservationId)) {
-      ctx.status = 404;
-      ctx.body = {
-        errors: [
-          {
-            status: '404',
-            title: 'Reservation not found',
-            detail: `Could not find the reservation ${reservationId}`,
-          },
-        ],
-      };
-      ctx.type = 'application/vnd.api+json';
+      handleNotFound(ctx);
       return;
     }
 
@@ -43,17 +33,7 @@ export default class ReservationsRoute {
       userAddress,
     ]);
     if (rows.length === 0) {
-      ctx.status = 404;
-      ctx.body = {
-        errors: [
-          {
-            status: '404',
-            title: 'Reservation not found',
-            detail: `Could not find the reservation ${reservationId}`,
-          },
-        ],
-      };
-      ctx.type = 'application/vnd.api+json';
+      handleNotFound(ctx);
       return;
     }
     let [{ sku, transaction_hash: txnHash, prepaid_card_address: prepaidCardAddress }] = rows;
@@ -86,7 +66,7 @@ export default class ReservationsRoute {
     let sku = ctx.request.body.data.attributes.sku;
     let skuSummaries = await getSKUSummaries(await this.databaseManager.getClient(), this.subgraph);
     let skuSummary = skuSummaries.find((summary) => summary.id === sku);
-    if (skuSummary?.attributes.quantity === 0) {
+    if (skuSummary?.attributes?.quantity === 0) {
       ctx.status = 400;
       ctx.body = {
         errors: [
@@ -138,6 +118,20 @@ export default class ReservationsRoute {
     };
     ctx.type = 'application/vnd.api+json';
   }
+}
+
+function handleNotFound(ctx: Koa.Context) {
+  ctx.status = 404;
+  ctx.body = {
+    errors: [
+      {
+        status: '404',
+        title: 'Reservation not found',
+        detail: `Could not find the reservation ${ctx.params.reservation_id}`,
+      },
+    ],
+  };
+  ctx.type = 'application/vnd.api+json';
 }
 
 declare module '@cardstack/hub/di/dependency-injection' {

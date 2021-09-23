@@ -47,6 +47,7 @@ function handleValidateAuthToken(encryptedString: string) {
   if (encryptedString === 'abc123--def456--ghi789') {
     return stubUserAddress;
   }
+  return;
 }
 
 describe('GET /api/inventory', function () {

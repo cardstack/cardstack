@@ -45,6 +45,7 @@ export function handleProvisionedPrepaidCard(event: ProvisionedPrepaidCard): voi
 
   let provisionedEventEntity = new PrepaidCardProvisionedEvent(txnHash + '-' + prepaidCard);
   provisionedEventEntity.timestamp = timestamp;
+  provisionedEventEntity.txnHash = txnHash;
   provisionedEventEntity.transaction = txnHash;
   provisionedEventEntity.prepaidCard = prepaidCard;
   provisionedEventEntity.customer = customer;

@@ -3,5 +3,8 @@
     "url": "postgres://postgres:postgres@localhost:5432/hub_test",
     "useTransactionalRollbacks": true
   },
+  "relay": {
+    "provisionerSecret": "secret"
+  },
   "serverSecret": "2Lhrsi7xSDMv1agfW+hghvQkdkTRSqW/JGApSjLT0NA="
 }

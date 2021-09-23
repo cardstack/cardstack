@@ -57,11 +57,11 @@ export default class APIRouter {
     apiSubrouter.post('/merchant-infos', merchantInfosRoute.post);
     apiSubrouter.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
     apiSubrouter.get('/custodial-wallet', custodialWalletRoute.get);
-    apiSubrouter.get('/inventories', inventoryRoute.get),
-    apiSubrouter.post('/orders', ordersRoute.post),
-    apiSubrouter.get('/orders/:order_id', ordersRoute.get),
-    apiSubrouter.post('/reservations', reservationsRoute.post),
-    apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get),
+    apiSubrouter.get('/inventories', inventoryRoute.get);
+    apiSubrouter.post('/orders', ordersRoute.post);
+    apiSubrouter.get('/orders/:order_id', ordersRoute.get);
+    apiSubrouter.post('/reservations', reservationsRoute.post);
+    apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();

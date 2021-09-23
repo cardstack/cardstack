@@ -185,6 +185,7 @@ type PrepaidCardInventoryRemoveEvent @entity {
 type PrepaidCardProvisionedEvent @entity {
   id: ID!
   timestamp: BigInt!
+  txnHash: String!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
   customer: Account!

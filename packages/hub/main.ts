@@ -1,6 +1,7 @@
 /* eslint-disable no-process-exit */
 
 import Koa from 'koa';
+import fetch from 'node-fetch';
 import KoaBody from 'koa-body';
 import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
@@ -44,6 +45,9 @@ import { Clock } from './services/clock';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import { CardstackError } from './utils/error';
+
+//@ts-ignore polyfilling fetch
+global.fetch = fetch;
 
 const serverLog = logger('hub/server');
 const workerLog = logger('hub/worker');

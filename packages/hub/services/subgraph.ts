@@ -27,10 +27,54 @@ export interface InventorySubgraph {
     skuinventories: SKUInventory[];
   };
 }
+export interface ProvisionedPrepaidCardSubgraph {
+  data: {
+    prepaidCardProvisionedEvents: {
+      prepaidCard: {
+        id: string;
+      };
+    }[];
+  };
+}
 
 const { network } = config.get('web3') as Web3Config;
+const POLL_INTERVAL = 1000;
+const TIMEOUT = 1000 * 60 * 5;
+
+const provisionedPrepaidCardQuery = `
+  query ($txnHash: String!) {
+    prepaidCardProvisionedEvents(where: { txnHash: $txnHash }) {
+      prepaidCard {
+        id
+      }
+    }
+  }
+`;
 
 export default class Subgraph {
+  // we use the subgraph to wait for the prepaid card provisioning to be mined
+  // so that the SDK safe API results are consistent with the new prepaid card
+  async waitForProvisionedPrepaidCard(txnHash: string): Promise<string> {
+    let start = Date.now();
+    let queryResults: ProvisionedPrepaidCardSubgraph | undefined;
+    let prepaidCardAddress: string | undefined;
+    do {
+      if (queryResults) {
+        await new Promise<void>((res) => setTimeout(() => res(), POLL_INTERVAL));
+      }
+      queryResults = await gqlQuery(network, provisionedPrepaidCardQuery, { txnHash });
+      if (queryResults.data.prepaidCardProvisionedEvents.length > 0) {
+        prepaidCardAddress = queryResults.data.prepaidCardProvisionedEvents[0].prepaidCard.id;
+      }
+    } while (!prepaidCardAddress && Date.now() < start + TIMEOUT);
+
+    if (!prepaidCardAddress) {
+      throw new Error(`Timed out waiting for prepaid card to be provisioned with txnHash ${txnHash}`);
+    }
+
+    return prepaidCardAddress;
+  }
+
   // we take an array of already provisioned prepaid cards that the server know
   // about so that we can deal with a subgraph that is not in sync with the
   // latest block.

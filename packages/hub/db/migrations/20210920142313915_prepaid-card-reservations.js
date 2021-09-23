@@ -27,6 +27,7 @@ exports.up = (pgm) => {
   });
 
   pgm.addTypeValue(STATUS_ENUM, 'provisioning', { before: 'complete', ifNotExists: true });
+  pgm.addTypeValue(STATUS_ENUM, 'error-provisioning', { before: 'complete', ifNotExists: true });
 
   // index the query to get all the non-expired reservations
   pgm.createIndex(RESERVATIONS, ['id', 'user_address']);

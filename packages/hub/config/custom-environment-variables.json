@@ -24,5 +24,8 @@
   "web3": {
     "network": "NETWORK"
   },
+  "relay": {
+    "provisionerSecret": "PROVISIONER_SECRET"
+  },
   "serverSecret": "SERVER_SECRET"
 }

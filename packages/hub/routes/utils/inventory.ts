@@ -1,28 +1,15 @@
 import { Client as DBClient } from 'pg';
 import SubgraphService, { SKUInventory } from '../../services/subgraph';
+import * as JSONAPI from 'jsonapi-typescript';
 
 const expirationMins = 60;
 const subgraphSyncGraceMins = 60;
-
-interface InventoryJSONAPI {
-  id: string;
-  type: 'inventories';
-  attributes: {
-    issuer: string;
-    'issuing-token-symbol': string;
-    'issuing-token-address': string;
-    'face-value': number;
-    'ask-price': string;
-    'customization-DID': string | null;
-    quantity: number;
-  };
-}
 
 interface SKUReservations {
   [sku: string]: number;
 }
 
-export async function getSKUSummaries(db: DBClient, subgraph: SubgraphService): Promise<InventoryJSONAPI[]> {
+export async function getSKUSummaries(db: DBClient, subgraph: SubgraphService): Promise<JSONAPI.ResourceObject[]> {
   let { inventories, reservations } = await getInventoriesAndReservations(db, subgraph);
   let data = inventories.map((inventory) => formatInventory(inventory, reservations));
   return data;
@@ -50,7 +37,7 @@ async function getInventoriesAndReservations(
   return { inventories, reservations };
 }
 
-function formatInventory(inventory: SKUInventory, reservations: SKUReservations): InventoryJSONAPI {
+function formatInventory(inventory: SKUInventory, reservations: SKUReservations): JSONAPI.ResourceObject {
   let {
     askPrice,
     sku: {

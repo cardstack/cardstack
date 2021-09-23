@@ -48,6 +48,7 @@ CREATE TYPE public.wallet_orders_status_enum AS ENUM (
     'received-order',
     'waiting-for-reservation',
     'provisioning',
+    'error-provisioning',
     'complete'
 );
 
@@ -861,6 +862,13 @@ CREATE UNIQUE INDEX merchant_infos_slug_unique_index ON public.merchant_infos US
 
 
 --
+-- Name: reservations_id_user_address_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX reservations_id_user_address_index ON public.reservations USING btree (id, user_address);
+
+
+--
 -- Name: reservations_updated_at_prepaid_card_address_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -1013,7 +1021,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 3	20210623052200757_create-graphile-worker-schema	2021-07-29 14:31:17.108453
 34	20210809113449561_merchant-infos	2021-09-22 15:07:25.988954
 37	20210817184105100_wallet-orders	2021-09-22 15:36:07.656094
-38	20210920142313915_prepaid-card-reservations	2021-09-22 15:36:07.656094
+39	20210920142313915_prepaid-card-reservations	2021-09-23 17:10:07.765878
 \.
 
 
@@ -1021,7 +1029,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 38, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 39, true);
 
 
 --
