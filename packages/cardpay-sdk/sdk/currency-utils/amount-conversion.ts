@@ -11,9 +11,9 @@ import { BigNumberish } from './types';
 
 /**
  * Converts a human-readable amount to an amount friendly for specifying on-chain transactions.
+ * Returns `value * 10**decimals`
  *
- * @param value - BigNumberish
- * @param decimals - The number of decimals the asset has
+ * @see {@link convertRawAmountToDecimalFormat}
  */
 export const convertAmountToRawAmount = (value: BigNumberish, decimals: number | string): string =>
   new BigNumber(value).times(new BigNumber(10).pow(decimals)).toFixed();
@@ -33,31 +33,35 @@ export const convertAmountFromNativeValue = (
 
 /**
  * This is basically multiply, but more intent-revealing when used in the wallet?
- * @see multiply
+ * @see {@link multiply}
  */
 export const convertAmountToNativeAmount = (amount: BigNumberish, priceUnit: BigNumberish): string =>
   multiply(amount, priceUnit);
 
 /**
- * Divides `value` by 100 and rounds to specified `decimals`
+ * Returns `value / 100`, rounded to specified `decimals`
  */
 export const convertBipsToPercentage = (value: BigNumberish, decimals = 2): string =>
   new BigNumber(value).shiftedBy(-2).toFixed(decimals);
 
 /**
- * Converts blockchain-friendly values to values conventionally shown to users by dividing by 10 to the power of the specified number of `decimals`
+ * Returns `value / 10**decimals`. See {@link BigNumber.dividedBy} for detailed information on how division is handled.
  */
 export const convertRawAmountToDecimalFormat = (value: BigNumberish, decimals = 18): string =>
   new BigNumber(value).dividedBy(new BigNumber(10).pow(decimals)).toFixed();
 
 /**
- * Converts wei to ether (divide by 10**18)
+ * Converts wei to ether - Returns `number / 10**18`.
  */
 export const fromWei = (number: BigNumberish): string => convertRawAmountToDecimalFormat(number, 18);
 
 const SPEND_TO_USD_RATE = 0.01;
 /**
- * Converts SPEND to USD.
+ * Converts SPEND to USD by multiplying `amountInSpend` by 0.01
+ * Returns `0` if `amountInSpend` is an empty string,
+ * and otherwise `undefined` if amountInSpend is not a number.
+ *
+ * @see {@link usdToSpend}
  */
 export const spendToUsd = (amountInSpend: number): number | undefined => {
   if ((amountInSpend as unknown) === '') {
@@ -70,7 +74,12 @@ export const spendToUsd = (amountInSpend: number): number | undefined => {
 };
 
 /**
- * Converts USD to SPEND. The amount is rounded up to the nearest integer
+ * Converts USD to SPEND by dividing `amountInUsd` by 0.01.
+ * The amount is rounded up to the nearest integer.
+ * Returns `0` if `amountInUsd` is an empty string,
+ * and otherwise `undefined` if amountInUsd is not a number.
+ *
+ * @see {@link spendToUsd}
  */
 export const usdToSpend = (amountInUsd: number): number | undefined => {
   if ((amountInUsd as unknown) === '') {

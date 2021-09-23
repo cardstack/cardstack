@@ -12,8 +12,8 @@ import { lessThan } from './comparison';
 
 /**
  * Rounds a number to the specified set of decimals. If decimals is undefined, the amount will be returned as is
- * @see formatFixedDecimals:
- * this function fulfils a similar purpose but cuts off trailing zeroes in decimals, and also throws
+ * @see {@link formatFixedDecimals}
+ * , this function fulfils a similar purpose but cuts off trailing zeroes in decimals, and also throws
  * when decimals is undefined
  *
  * @param value - BigNumberish
@@ -26,14 +26,9 @@ export const toFixedDecimals = (value: BigNumberish, decimals: number): string =
 
 /**
  * Rounds a number to the specified set of decimals, removing trailing zeroes. If decimals is undefined, this will throw an error
- * @see toFixedDecimals:
- * this function fulfils a similar purpose but does not cut off trailing zeroes
+ * @see {@link toFixedDecimals}
+ * , this function fulfils a similar purpose but does not cut off trailing zeroes
  * in decimals if they are within the decimals specified
- *
- * @param value - BigNumberish
- * @param decimals - number of decimals
- *
- * @returns string representing value rounded to the number of decimals specified
  */
 export const formatFixedDecimals = (value: BigNumberish, decimals: number): string => {
   const _value = convertNumberToString(value);
@@ -62,10 +57,6 @@ export const formatFixedDecimals = (value: BigNumberish, decimals: number): stri
  *
  * updatePrecisionToDisplay(0.000357, 100, true) // '0.00036'
  * ```
- * @param  amount
- * @param  nativePrice
- * @param  roundUp use rounding up mode
- * @return updated amount
  */
 export const updatePrecisionToDisplay = (amount: BigNumberish, nativePrice: BigNumberish, roundUp = false): string => {
   if (!amount) return '0';
@@ -84,9 +75,6 @@ export const updatePrecisionToDisplay = (amount: BigNumberish, nativePrice: BigN
 
 /**
  * Calculates `numberOne * buffer`, rounded to an integer
- *
- * @param numberOne - BigNumberish
- * @param buffer - BigNumberish
  */
 export const addBuffer = (numberOne: BigNumberish, buffer: BigNumberish = '1.2'): string =>
   new BigNumber(numberOne).times(buffer).toFixed(0);

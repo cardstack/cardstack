@@ -1,6 +1,8 @@
 /**
  * This file contains functions that perform composite operations or operations that don't fit in anywhere else.
  * Most of these functions perform some form of formatting.
+ *
+ * Understanding how {@link handleSignificantDecimals} works will be helpful in understanding many of these utilities.
  */
 
 import BigNumber from 'bignumber.js';
@@ -12,7 +14,7 @@ import { handleSignificantDecimals } from './rounding-and-approximation';
 import { BigNumberish } from './types';
 
 /**
- * Checks if we support the specified native currency based on currency code
+ * Checks if we support the specified native currency based on currency code.
  */
 export const isSupportedCurrency = (nativeCurrency: string) => {
   return has(supportedNativeCurrencies, `${nativeCurrency}`);
@@ -30,10 +32,8 @@ interface Asset {
 }
 
 /**
- * Counts the value's number of decimals places
+ * Counts the number of decimals places in `value`
  * Returns null for Infinity or NaN
- *
- * @param  {String} value
  */
 export const countDecimalPlaces = (value: BigNumberish): number => new BigNumber(value).dp();
 
@@ -41,7 +41,7 @@ export const countDecimalPlaces = (value: BigNumberish): number => new BigNumber
  * If `handleSignificantDecimals(value, decimals, buffer)` returns a value greater than the threshold,
  * returns the value. Otherwise returns `< ${threshold}`.
  *
- * @see handleSignificantDecimals
+ * @see {@link handleSignificantDecimals}
  */
 export const handleSignificantDecimalsWithThreshold = (
   value: BigNumberish,
@@ -56,10 +56,11 @@ export const handleSignificantDecimalsWithThreshold = (
 /**
  * Returns a balance object with properties `balanceObject.amount` and `balanceObject.display`
  *
- * `balanceObject.amount` is `amount * priceUnit`.
- * `balanceObject.display` is a formatted version of `balanceObject.amount` based on the native currency specified.
+ * - `balanceObject.amount` is `amount * priceUnit`.
+ * - `balanceObject.display` is a formatted version of `balanceObject.amount` based on the native currency specified.
+ * `buffer` can be used to control the amount of decimal places shown.
+ * For more details on how this property is generated see {@link convertAmountToNativeDisplay}.
  *
- * @see convertAmountToNativeDisplay
  */
 export const convertAmountAndPriceToNativeDisplay = (
   amount: BigNumberish,
@@ -76,7 +77,9 @@ export const convertAmountAndPriceToNativeDisplay = (
 };
 
 /**
- * Divides `rawAmount` by `assetDecimals` and then calls `convertAmountAndPriceToNativeDisplay`
+ * Calculates `rawAmount / 10**assetDecimals` and then returns `convertAmountAndPriceToNativeDisplay(amount, priceUnit, nativeCurrency, buffer)`
+ *
+ * @see {@link convertAmountAndPriceToNativeDisplay}.
  */
 export const convertRawAmountToNativeDisplay = (
   rawAmount: BigNumberish,
@@ -92,8 +95,10 @@ export const convertRawAmountToNativeDisplay = (
 /**
  * Returns a balance object with properties `balanceObject.amount` and `balanceObject.display`
  *
- * `balanceObject.amount` is `value / 10**asset.decimals`
- * `balanceObject.display` is `balanceObject.amount` with `asset.symbol` tacked on, if present
+ * - `balanceObject.amount` is `value / 10**asset.decimals`
+ * - `balanceObject.display` - `convertAmountToBalanceDisplay(balanceObject.amount, asset, buffer)`
+ *
+ * @see {@link convertAmountToBalanceDisplay}
  */
 export const convertRawAmountToBalance = (value: BigNumberish, asset: Asset, buffer?: number) => {
   const decimals = get(asset, 'decimals', 18);
@@ -116,6 +121,8 @@ export const convertAmountToBalanceDisplay = (value: BigNumberish, asset: Asset,
 
 /**
  * Passes its arguments to `handleSignificantDecimals` and then tacks on % at the end of the returned value
+ *
+ * @see {@link handleSignificantDecimals}
  */
 export const convertAmountToPercentageDisplay = (value: BigNumberish, decimals = 2, buffer?: number): string => {
   const display = handleSignificantDecimals(value, decimals, buffer);
@@ -141,7 +148,7 @@ export const convertAmountToPercentageDisplay = (value: BigNumberish, decimals =
  * convertAmountToNativeDisplay(1.112, 'USD', 3) // '$1.11 USD' - USD specifies 2 decimal places
  * ```
  *
- * @see handleSignificantDecimals for more details on calculating amount
+ * @see {@link handleSignificantDecimals} for more details on calculating amount
  */
 export const convertAmountToNativeDisplay = (value: BigNumberish, nativeCurrency: string, buffer?: number) => {
   const nativeSelected = get(supportedNativeCurrencies, `${nativeCurrency}`);
