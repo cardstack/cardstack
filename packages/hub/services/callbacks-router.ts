@@ -6,13 +6,14 @@ import mimeMatch from 'mime-match';
 import { CardstackError } from '../utils/error';
 import { inject } from '../di/dependency-injection';
 import WyreCallbackRoute from '../routes/wyre-callback';
+import { parseBody } from '../middleware';
 
 export default class CallbacksRouter {
   wyreCallbackRoute: WyreCallbackRoute = inject('wyre-callback-route', { as: 'wyreCallbackRoute' });
   routes() {
     let { wyreCallbackRoute } = this;
     let callbacksSubrouter = new Router();
-    callbacksSubrouter.post('/wyre', wyreCallbackRoute.post);
+    callbacksSubrouter.post('/wyre', parseBody, wyreCallbackRoute.post);
     callbacksSubrouter.all('/(.*)', notFound);
 
     let callbacksRouter = new Router();

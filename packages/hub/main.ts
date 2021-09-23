@@ -1,7 +1,6 @@
 /* eslint-disable no-process-exit */
 
 import Koa from 'koa';
-import KoaBody from 'koa-body';
 import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
@@ -40,6 +39,8 @@ import { Clock } from './services/clock';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import { CardstackError } from './utils/error';
+import { environment, httpLogging } from './middleware';
+import cors from '@koa/cors';
 
 const serverLog = logger('hub/server');
 const workerLog = logger('hub/worker');
@@ -85,33 +86,16 @@ export async function makeServer(registryCallback?: RegistryCallback, containerC
 
   initSentry();
 
-  let app = new Koa();
-  app.use(CardstackError.withJsonErrorHandling);
-  app.use(async (ctx: Koa.Context, next: Koa.Next) => {
-    ctx.environment = process.env.NODE_ENV || 'development';
-    return next();
-  });
-  app.use(cors);
-  app.use(httpLogging);
-  app.use(
-    KoaBody({
-      jsonLimit: '16mb',
-      urlencoded: false,
-      text: false,
-      onError(error: Error) {
-        throw new CardstackError(`error while parsing body: ${error.message}`, { status: 400 });
-      },
-    })
-  );
+  let app = new Koa<Koa.DefaultState, Koa.Context>()
+    .use(CardstackError.withJsonErrorHandling)
+    .use(environment)
+    .use(cors({ origin: '*', allowHeaders: 'Authorization, Content-Type, If-Match, X-Requested-With' }))
+    .use(httpLogging);
 
   app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
   app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
   app.use(((await container.lookup('api-router')) as ApiRouter).routes());
   app.use(((await container.lookup('callbacks-router')) as CallbacksRouter).routes());
-
-  app.use(async (ctx: Koa.Context, _next: Koa.Next) => {
-    ctx.body = 'Hello World ' + ctx.environment + '... ' + ctx.host.split(':')[0];
-  });
 
   function onError(err: Error, ctx: Koa.Context) {
     Sentry.withScope(function (scope) {
@@ -244,19 +228,3 @@ export interface StartupConfig {
   containerCallback?: undefined | ((container: Container) => void);
 }
 
-async function httpLogging(ctxt: Koa.Context, next: Koa.Next) {
-  serverLog.info('start %s %s', ctxt.request.method, ctxt.request.originalUrl);
-  await next();
-  serverLog.info('finish %s %s %s', ctxt.request.method, ctxt.request.originalUrl, ctxt.response.status);
-}
-
-export async function cors(ctxt: Koa.Context, next: Koa.Next) {
-  ctxt.response.set('Access-Control-Allow-Origin', '*');
-  if (ctxt.request.method === 'OPTIONS') {
-    ctxt.response.set('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
-    ctxt.response.set('Access-Control-Allow-Headers', 'Authorization, Content-Type, If-Match, X-Requested-With');
-    ctxt.status = 200;
-    return;
-  }
-  await next();
-}
