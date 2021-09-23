@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+/* eslint-disable node/shebang */
+
+const yargs = require('yargs/yargs');
+const { hideBin } = require('yargs/helpers');
+
+require('dotenv').config();
+
+yargs(hideBin(process.argv))
+  .scriptName('hub')
+  .commandDir('../cli', { extensions: ['js'] })
+  .demandCommand()
+  .help().argv;

@@ -156,47 +156,7 @@ function initSentry() {
   }
 }
 
-export function bootServer() {
-  if (process.env.EMBER_ENV === 'test') {
-    logger.configure({
-      defaultLevel: 'warn',
-    });
-  } else {
-    logger.configure({
-      defaultLevel: 'warn',
-      logLevels: [['hub/*', 'info']],
-    });
-  }
-
-  function onWarning(warning: Error) {
-    if (warning.stack) {
-      process.stderr.write(warning.stack);
-    }
-  }
-  process.on('warning', onWarning);
-
-  if (process.connected === false) {
-    // This happens if we were started by another node process with IPC
-    // and that parent has already died by the time we got here.
-    //
-    // (If we weren't started under IPC, `process.connected` is
-    // undefined, so this never happens.)
-    serverLog.info(`Shutting down because connected parent process has already exited.`);
-    process.exit(0);
-  }
-  function onDisconnect() {
-    serverLog.info(`Hub shutting down because connected parent process exited.`);
-    process.exit(0);
-  }
-  process.on('disconnect', onDisconnect);
-
-  return runServer(startupConfig()).catch((err: Error) => {
-    serverLog.error('Server failed to start cleanly: %s', err.stack || err);
-    process.exit(-1);
-  });
-}
-
-export async function bootServerForTesting(config: Partial<StartupConfig>) {
+export async function bootServerForTesting(config: StartupConfig) {
   logger.configure({
     defaultLevel: 'warn',
   });
@@ -277,7 +237,7 @@ export async function bootWorker() {
   await runner.promise;
 }
 
-async function runServer(config: Partial<StartupConfig>) {
+export async function runServer(config: StartupConfig) {
   let app = await makeServer(config.registryCallback, config.containerCallback);
   let server = app.listen(config.port);
   serverLog.info('server listening on %s', config.port);
@@ -290,22 +250,10 @@ async function runServer(config: Partial<StartupConfig>) {
   return server;
 }
 
-interface StartupConfig {
+export interface StartupConfig {
   port: number;
-  registryCallback: undefined | ((registry: Registry) => void);
-  containerCallback: undefined | ((container: Container) => void);
-}
-
-function startupConfig(): StartupConfig {
-  let config: StartupConfig = {
-    port: 3000,
-    registryCallback: undefined,
-    containerCallback: undefined,
-  };
-  if (process.env.PORT) {
-    config.port = parseInt(process.env.PORT, 10);
-  }
-  return config;
+  registryCallback?: undefined | ((registry: Registry) => void);
+  containerCallback?: undefined | ((container: Container) => void);
 }
 
 async function httpLogging(ctxt: Koa.Context, next: Koa.Next) {
