@@ -16,7 +16,8 @@ jobs:
   test:
     name: Build & Test
     runs-on: ubuntu-latest
-
+    env:
+      SERVER_SECRET: ${{ secrets.SERVER_SECRET }}
     services:
       postgres:
         image: postgres:13
@@ -49,5 +50,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: yarn --prefer-offline
-      - run: yarn test:hub:preparedb
-      - run: yarn test:hub
+      - run: NODE_ENV=test bin/hub db init-test
+        working-directory: packages/hub
+      - run: NODE_ENV=test yarn test
+        working-directory: packages/hub

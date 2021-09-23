@@ -4,9 +4,32 @@ The Cardstack Hub is the API server for the Cardstack project.
 For more information, see the
 [project-wide README](https://github.com/cardstack/cardstack/blob/main/README.md).
 
+- [@cardstack/hub](#cardstackhub)
+  - [Architecture](#architecture)
+  - [Configuration](#configuration)
+  - [Getting Started](#getting-started)
+    - [Running the hub](#running-the-hub)
+  - [Database migrations](#database-migrations)
+  - [Deployment](#deployment)
+  - [Application console](#application-console)
+    - [Make a DB query (call installed modules)](#make-a-db-query-call-installed-modules)
+    - [Call a service (call application modules)](#call-a-service-call-application-modules)
+  - [Connecting to the database staging|production database on AWS](#connecting-to-the-database-stagingproduction-database-on-aws)
+    - [Setup AWS Session Manager ssh config](#setup-aws-session-manager-ssh-config)
+  - [Provided APIs](#provided-apis)
+    - [GET /api/prepaid-card-patterns](#get-apiprepaid-card-patterns)
+    - [GET /api/prepaid-card-color-schemes](#get-apiprepaid-card-color-schemes)
+    - [POST /api/prepaid-card-customizations](#post-apiprepaid-card-customizations)
+    - [POST /api/merchant-infos](#post-apimerchant-infos)
+    - [GET /api/merchant-infos/validate-slug/:slug](#get-apimerchant-infosvalidate-slugslug)
+  - [The Hub CLI](#the-hub-cli)
+  - [Contributing](#contributing)
+
 ## Architecture
 
 The Hub consists of API endpoints and a postgres database.
+
+The app uses a Postgresql-based background task queue built on [graphile/worker](https://github.com/graphile/worker)
 
 ## Configuration
 
@@ -30,57 +53,52 @@ For example:
 SERVER_SECRET=7TmgY1xFo/WrYTnAFSvAemZtFB8wQVMd8IkoeQKBboE=
 AWS_PROFILE=cardstack
 ```
-
-## Setting up a local database for the first time
+## Getting Started
 
 The following command will create a hub_development database on your locally running postgres server, run migrations, and load seed data. It will then create a hub_test database, and clone the structure of the development database to it.
 
-`yarn db:setup:local`
+    bin/hub db setup
 
-## Contributing
+Load the database with seed data
 
-Note that this package is written in TypeScript, so be sure to run a TypesScript
-compiler as you work.
-See the [project-wide README](https://github.com/cardstack/cardstack/blob/main/README.md)
-for information about running the Hub and its tests locally.
+    bin/hub db seed
 
+### Running the hub
 
-## Running database migrations
+```sh
+# Starts the server on port 300
+bin/hub server
 
-`yarn db:migrate up`
+# Starts the worker process
+bin/hub worker
 
-To reverse the last migration:
+# If you want to run both in the same terminal you can run
+yarn start
+```
 
-`yarn db:migrate down`
+## Database migrations
 
-To redo the last migration (i.e. down + up):
+```sh
+# Run available migrations
+yarn db:migrate up
 
-`yarn db:migrate redo`
+#To reverse the last migration:
+yarn db:migrate down
+
+#To redo the last migration (i.e. down + up):
+yarn db:migrate redo
 
 ## Creating database migrations
-`yarn db:migrate create <migration-name>`
+yarn db:migrate create <migration-name>`
+```
 
 Documentation on how to create migration scripts is available at https://salsita.github.io/node-pg-migrate/#/migrations
 
 After you have completed running your new DB migration script create a pg_dump of the DB in the `config/structure.sql` file using:
 
-`yarn db:structure:dump`
+    bin/hub db dump
 
-## Loading database seed data
-
-`yarn db:seed`
-
-## Running the server
-
-`yarn start` or `yarn start:server` starts the hub web server on port 3000
-
-## Running the workers
-
-The app uses a Postgresql-based background task queue built on [graphile/worker](https://github.com/graphile/worker)
-
-`yarn start:worker` starts the hub background task worker process
-
-## Deploying to staging
+## Deployment
 
 Green builds of the main branch deploy hub to staging if the commit contains changes to the hub package or its dependencies. The deploy uses waypoint.
 
@@ -88,7 +106,7 @@ Green builds of the main branch deploy hub to staging if the commit contains cha
 
 To test, debug and call isolated parts of the application within its context.
 
-`yarn console` starts the application console.
+`bin/hub console` starts the application console.
 
 Examples:
 
@@ -109,7 +127,7 @@ Hub > const workerClient = await container.lookup('worker-client');
 Hub > await workerClient.addJob('persist-off-chain-merchant-info', { id: 1 });
 ```
 
-## Connecting to the database
+## Connecting to the database staging|production database on AWS
 
 ### Setup AWS Session Manager ssh config
 
@@ -144,3 +162,19 @@ APIs conform to the [JSON API specification](https://jsonapi.org/).
 ### POST /api/merchant-infos
 
 ### GET /api/merchant-infos/validate-slug/:slug
+
+## The Hub CLI
+The hub CLI can be invoked from within the hub package
+
+    bin/hub
+
+*💡 Tip: Add `export PATH="./bin:$PATH"` to your `.zshenv` or `.bash_profile` to be to invoke `hub` directly (without the `bin/`)*
+
+The files that support the CLI are in the `cli/` directory. You can add your own by [following these instructions](https://github.com/yargs/yargs/blob/master/docs/advanced.md#commanddirdirectory-opts). The full `yargs` api [can be found here](https://github.com/yargs/yargs/blob/master/docs/api.md).
+
+## Contributing
+
+Note that this package is written in TypeScript, so be sure to run a TypesScript
+compiler as you work.
+See the [project-wide README](https://github.com/cardstack/cardstack/blob/main/README.md)
+for information about running the Hub and its tests locally.

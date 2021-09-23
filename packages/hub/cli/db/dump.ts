@@ -1,22 +1,20 @@
-#!/usr/bin/env node
+import { Argv } from 'yargs';
+import util from 'util';
+import childProcess from 'child_process';
+const exec = util.promisify(childProcess.exec);
+import config from 'config';
 
-/* eslint-disable node/shebang */
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/no-require-imports */
-//@ts-ignore not actually redefining block-scoped var
-const config = require('config');
-//@ts-ignore not actually redefining block-scoped var
-const util = require('util');
-//@ts-ignore not actually redefining block-scoped var
-const exec = util.promisify(require('child_process').exec);
-
-//@ts-ignore not actually a duplicate function definition
+export let command = 'dump';
+export let describe = 'Dump a structure.sql file to be used to init the test database';
 // This script generates a structure.sql file that can be used to initialize the test database
 // with all tables, indexes, foreign keys etc, as well as the content of the migrations tables
 // The content of migrations tables is important to prevent graphile worker from trying to
 // run migrations for a database that doesn't need them (will cause tests to fail)
-async function performDump() {
-  const dbConfig = config.get('db');
+
+export let builder = {};
+
+export async function handler(_argv?: Argv) {
+  const dbConfig = config.get<any>('db');
   await exec(`pg_dump --schema-only --file=config/structure.sql ${dbConfig.url}`);
   await exec(
     `pg_dump --data-only --table=pgmigrations --table=graphile_worker.migrations ${dbConfig.url} >> config/structure.sql`
@@ -24,4 +22,3 @@ async function performDump() {
 
   console.log('Output to config/structure.sql');
 }
-performDump();
