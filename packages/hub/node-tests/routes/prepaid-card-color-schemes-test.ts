@@ -1,23 +1,14 @@
-import { Server } from 'http';
 import supertest, { Test } from 'supertest';
-import { bootServerForTesting } from '../../main';
+import { HubServer } from '../../main';
 import { Client } from 'pg';
-import { Container } from '../../di/dependency-injection';
 
 describe('GET /api/prepaid-card-color-schemes', function () {
-  let server: Server;
+  let server: HubServer;
   let db: Client;
   let request: supertest.SuperTest<Test>;
   this.beforeEach(async function () {
-    let container!: Container;
-    server = await bootServerForTesting({
-      port: 3001,
-      containerCallback(serverContainer: Container) {
-        container = serverContainer;
-      },
-    });
-
-    let dbManager = await container.lookup('database-manager');
+    server = await HubServer.create();
+    let dbManager = await server.container.lookup('database-manager');
     db = await dbManager.getClient();
 
     let rows = [
@@ -40,11 +31,11 @@ describe('GET /api/prepaid-card-color-schemes', function () {
         console.error(e);
       }
     }
-    request = supertest(server);
+    request = supertest(server.app.callback());
   });
 
   this.afterEach(async function () {
-    server.close();
+    server.teardown();
   });
 
   it('responds with 200 and available color schemes', async function () {

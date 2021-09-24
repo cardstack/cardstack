@@ -1,9 +1,8 @@
-import { Server } from 'http';
 import supertest, { Test } from 'supertest';
-import { bootServerForTesting } from '../../main';
+import { HubServer } from '../../main';
 import { Client } from 'pg';
 import shortUuid from 'short-uuid';
-import { Container, Registry } from '../../di/dependency-injection';
+import { Registry } from '../../di/dependency-injection';
 import { parseIdentifier } from '@cardstack/did-resolver';
 import { Job, TaskSpec } from 'graphile-worker';
 
@@ -45,24 +44,20 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('POST /api/prepaid-card-customizations', function () {
-  let server: Server;
+  let server: HubServer;
   let db: Client;
   let request: supertest.SuperTest<Test>;
   let validPayload: any;
   this.beforeEach(async function () {
-    let container!: Container;
-    server = await bootServerForTesting({
+    server = await HubServer.create({
       port: 3001,
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
         registry.register('worker-client', StubWorkerClient);
       },
-      containerCallback(serverContainer: Container) {
-        container = serverContainer;
-      },
     });
 
-    let dbManager = await container.lookup('database-manager');
+    let dbManager = await server.container.lookup('database-manager');
     db = await dbManager.getClient();
 
     let rows = [
@@ -118,11 +113,11 @@ describe('POST /api/prepaid-card-customizations', function () {
         },
       },
     };
-    request = supertest(server);
+    request = supertest(server.app.callback());
   });
 
   this.afterEach(async function () {
-    server.close();
+    server.teardown();
     lastAddedJobIdentifier = undefined;
     lastAddedJobPayload = undefined;
   });
