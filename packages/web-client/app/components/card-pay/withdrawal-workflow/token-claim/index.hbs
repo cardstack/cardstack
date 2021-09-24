@@ -33,7 +33,7 @@
     @disabled={{@frozen}}
   >
     <:default as |d|>
-      <d.ActionButton {{on "click" this.claim}}>
+      <d.ActionButton {{on "click" this.claim}} data-test-claim-button>
         Claim
       </d.ActionButton>
     </:default>
