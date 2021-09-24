@@ -21,8 +21,8 @@ export default class RelayService {
     let response = await fetch(`${relayUrl}/v1/prepaid-card/provision/${sku}/`, {
       method: 'POST',
       headers: {
-        contentType: 'application/json',
-        authorization: provisionerSecret,
+        'Content-Type': 'application/json',
+        Authorization: provisionerSecret,
       },
       body: JSON.stringify({
         owner: toChecksumAddress(userAddress),
