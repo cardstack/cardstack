@@ -143,6 +143,110 @@ describe('/api/reservations', function () {
       expect(row.transaction_hash).to.equal(null);
     });
 
+    it('when a new reservation is created, existing reservations without an order relationship are removed for a user', async function () {
+      stubInventorySubgraph = () => ({
+        data: {
+          skuinventories: [
+            makeInventoryData('sku1', '100', toWei('1'), [
+              '0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC',
+              '0x04699Ff48CC6531727A12344c30F3eD1062Ff3ad',
+            ]),
+          ],
+        },
+      });
+      let {
+        rows: [{ id: abandonedReservationId }],
+      } = await db.query(`INSERT INTO reservations (user_address, sku) VALUES ($1, $2) RETURNING id`, [
+        stubUserAddress1.toLowerCase(),
+        'sku1',
+      ]);
+
+      const payload = {
+        data: {
+          type: 'reservations',
+          attributes: {
+            sku: 'sku1',
+          },
+        },
+      };
+
+      let reservationId;
+      await request
+        .post(`/api/reservations`)
+        .send(payload)
+        .set('Authorization', 'Bearer: abc123--def456--ghi789')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(201)
+        .expect(function (res) {
+          reservationId = res.body.data.id;
+        });
+
+      expect(reservationId).does.not.equal(abandonedReservationId);
+
+      let { rows } = await db.query(`SELECT * FROM reservations`);
+      expect(rows.length).to.equal(1);
+      expect(rows[0].id).to.equal(reservationId);
+    });
+
+    it('when a new reservation is created, existing reservations with an order relationship are not removed for a user', async function () {
+      stubInventorySubgraph = () => ({
+        data: {
+          skuinventories: [
+            makeInventoryData('sku1', '100', toWei('1'), [
+              '0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC',
+              '0x04699Ff48CC6531727A12344c30F3eD1062Ff3ad',
+            ]),
+          ],
+        },
+      });
+      let {
+        rows: [{ id: initialReservationId }],
+      } = await db.query(`INSERT INTO reservations (user_address, sku) VALUES ($1, $2) RETURNING id`, [
+        stubUserAddress1.toLowerCase(),
+        'sku1',
+      ]);
+      await db.query(
+        `INSERT INTO wallet_orders (order_id, user_address, wallet_id, reservation_id, status) VALUES ($1, $2, $3, $4, $5)`,
+        [
+          'WO_WALLET_ORDER',
+          stubUserAddress1.toLowerCase(),
+          'WA_CUSTODIAL_WALLET',
+          initialReservationId,
+          'waiting-for-order',
+        ]
+      );
+
+      const payload = {
+        data: {
+          type: 'reservations',
+          attributes: {
+            sku: 'sku1',
+          },
+        },
+      };
+
+      let reservationId;
+      await request
+        .post(`/api/reservations`)
+        .send(payload)
+        .set('Authorization', 'Bearer: abc123--def456--ghi789')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(201)
+        .expect(function (res) {
+          reservationId = res.body.data.id;
+        });
+
+      expect(reservationId).does.not.equal(initialReservationId);
+
+      let { rows } = await db.query(`SELECT * FROM reservations`);
+      expect(rows.length).to.equal(2);
+      let ids = rows.map((row) => row.id);
+      expect(ids.includes(initialReservationId)).to.equal(true, 'initial reservation ID is in DB');
+      expect(ids.includes(reservationId)).to.equal(true, 'new reservation ID is in DB');
+    });
+
     it('returns 422 when payload is missing sku', async function () {
       stubInventorySubgraph = () => ({
         data: {

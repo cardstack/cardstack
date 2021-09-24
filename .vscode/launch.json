@@ -59,6 +59,24 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay testnet: Hub Auth",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "hub-auth",
+        "https://hub.cardstack.com",
+        // "http://localhost:3000
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay testnet: Bridge to Layer 1",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",

@@ -883,10 +883,24 @@ CREATE INDEX reservations_updated_at_prepaid_card_address_sku_index ON public.re
 
 
 --
+-- Name: reservations_user_address_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX reservations_user_address_index ON public.reservations USING btree (user_address);
+
+
+--
 -- Name: wallet_orders_custodial_transfer_id_status_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX wallet_orders_custodial_transfer_id_status_index ON public.wallet_orders USING btree (custodial_transfer_id, status);
+
+
+--
+-- Name: wallet_orders_reservation_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX wallet_orders_reservation_id_index ON public.wallet_orders USING btree (reservation_id);
 
 
 --
@@ -1022,6 +1036,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 34	20210809113449561_merchant-infos	2021-09-22 15:07:25.988954
 37	20210817184105100_wallet-orders	2021-09-22 15:36:07.656094
 40	20210920142313915_prepaid-card-reservations	2021-09-23 18:41:06.778934
+41	20210924200122612_order-indicies	2021-09-24 16:22:28.855939
 \.
 
 
@@ -1029,7 +1044,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 40, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 41, true);
 
 
 --
