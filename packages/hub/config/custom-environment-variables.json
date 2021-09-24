@@ -19,7 +19,8 @@
   "wyre": {
     "accountId": "WYRE_ACCOUNT_ID",
     "apiKey": "WYRE_API_KEY",
-    "secretKey": "WYRE_SECRET_KEY"
+    "secretKey": "WYRE_SECRET_KEY",
+    "callbackUrl": "WYRE_CALLBACK_URL"
   },
   "web3": {
     "network": "NETWORK"
