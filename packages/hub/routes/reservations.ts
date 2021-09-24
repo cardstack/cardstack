@@ -96,13 +96,23 @@ export default class ReservationsRoute {
     }
 
     let db = await this.databaseManager.getClient();
-    let result = await db.query(`INSERT INTO reservations (user_address, sku) VALUES ($1, $2) RETURNING id`, [
-      userAddress,
-      sku,
-    ]);
+    // before creating a new reservation for the user, delete all the abandoned
+    // reservations (reservations without orders associated with them). A user
+    // is only allowed one active non-order associated reservation at a time.
+    await db.query(
+      `DELETE FROM reservations WHERE id IN (
+        SELECT id FROM (
+          SELECT r.id, r.user_address, w.reservation_id AS reservation_with_order
+          FROM reservations AS r
+          LEFT JOIN wallet_orders AS w ON r.id = w.reservation_id
+        ) AS j
+        WHERE reservation_with_order IS NULL AND user_address = $1
+      )`,
+      [userAddress]
+    );
     let {
       rows: [{ id }],
-    } = result;
+    } = await db.query(`INSERT INTO reservations (user_address, sku) VALUES ($1, $2) RETURNING id`, [userAddress, sku]);
     ctx.status = 201;
     ctx.body = {
       data: {
