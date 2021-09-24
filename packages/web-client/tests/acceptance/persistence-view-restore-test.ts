@@ -1,5 +1,12 @@
 import { module, test, todo } from 'qunit';
-import { click, fillIn, find, settled, visit } from '@ember/test-helpers';
+import {
+  click,
+  currentURL,
+  fillIn,
+  find,
+  settled,
+  visit,
+} from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -166,6 +173,27 @@ module('Acceptance | persistence view and restore', function () {
       workflowPersistenceService.clear();
       await settled();
       assert.dom('[data-test-workflow-tracker]').containsText('0');
+    });
+
+    test('clicking a persisted workflow restores it', async function (assert) {
+      workflowPersistenceService.persistData('persisted-merchant-creation', {
+        name: 'MERCHANT_CREATION',
+        state: {
+          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+          currentCardDisplayName: 'Merchant Account',
+          completedMilestonesCount: 1,
+          milestonesCount: 3,
+        },
+      });
+
+      await visit('/card-pay/');
+      await click('[data-test-workflow-tracker-toggle]');
+      await click('[data-test-active-workflow] button'); // FIXME should be a link perhaps?
+
+      assert.equal(
+        currentURL(),
+        '/card-pay/merchant-services?flow=create-merchant&flow-id=persisted-merchant-creation'
+      );
     });
 
     // TODO it works for me in development 🤔

@@ -1,7 +1,9 @@
-import { default as Service } from '@ember/service';
+import { default as Service, inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+import RouterService from '@ember/routing/router-service';
 import { MockLocalStorage } from '../utils/browser-mocks';
 import config from '../config/environment';
+import { WorkflowName } from '../models/workflow';
 
 export interface WorkflowPersistencePersistedData {
   name: string;
@@ -11,6 +13,8 @@ export interface WorkflowPersistencePersistedData {
 export const STORAGE_KEY_PREFIX = 'workflowPersistence';
 
 export default class WorkflowPersistence extends Service {
+  @service declare router: RouterService;
+
   #storage!: Storage | MockLocalStorage;
 
   @tracked persistedDataIds: string[] = [];
@@ -55,6 +59,33 @@ export default class WorkflowPersistence extends Service {
       `${STORAGE_KEY_PREFIX}:${workflowPersistenceId}`,
       JSON.stringify(data)
     );
+  }
+
+  visitPersistedWorkflow(workflowPersistenceId: string) {
+    let data = this.getPersistedData(workflowPersistenceId);
+    let workflowName = data.name as WorkflowName;
+    let route, flow;
+
+    if (workflowName === 'PREPAID_CARD_ISSUANCE') {
+      route = 'balances';
+      flow = 'issue-prepaid-card';
+    } else if (workflowName === 'MERCHANT_CREATION') {
+      route = 'merchant-services';
+      flow = 'create-merchant';
+    } else if (workflowName === 'RESERVE_POOL_DEPOSIT') {
+      route = 'token-suppliers';
+      flow = 'deposit';
+    } else if (workflowName === 'WITHDRAWAL') {
+      route = 'token-suppliers';
+      flow = 'withdrawal';
+    }
+
+    this.router.transitionTo(`card-pay.${route}`, {
+      queryParams: {
+        flow,
+        'flow-id': workflowPersistenceId,
+      },
+    });
   }
 
   clear() {
