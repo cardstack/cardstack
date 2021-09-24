@@ -47,7 +47,9 @@ export default class WorkflowPersistence extends Service {
     workflowPersistenceId: string,
     data: WorkflowPersistencePersistedData
   ) {
-    this.persistedDataIds = [...this.persistedDataIds, workflowPersistenceId];
+    if (!this.persistedDataIds.includes(workflowPersistenceId)) {
+      this.persistedDataIds = [...this.persistedDataIds, workflowPersistenceId];
+    }
 
     return this.#storage.setItem(
       `${STORAGE_KEY_PREFIX}:${workflowPersistenceId}`,

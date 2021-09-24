@@ -1,5 +1,5 @@
-import { module, test } from 'qunit';
-import { click, find, settled, visit } from '@ember/test-helpers';
+import { module, test, todo } from 'qunit';
+import { click, fillIn, find, settled, visit } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -168,11 +168,26 @@ module('Acceptance | persistence view and restore', function () {
       assert.dom('[data-test-workflow-tracker]').containsText('0');
     });
 
+    // TODO it works for me in development 🤔
+    todo(
+      'opening a workflow only increments the counter by one',
+      async function (assert) {
+        await visit('/card-pay/balances');
+        await click('[data-test-workflow-button="issue-prepaid-card"]');
+        // eslint-disable-next-line ember/no-settled-after-test-helper
+        await settled();
+        // await this.pauseTest();
+
+        await fillIn('[data-test-layout-customization-name-input]', 'JJ');
+        await click('[data-test-boxel-action-chin] [data-test-boxel-button]');
+
+        assert.dom('[data-test-workflow-tracker]').containsText('1');
+      }
+    );
+
     // FIXME add test for storage event coming from another tab
 
     // FIXME add test for filtering out unknown and malformed workflows
-
-    // FIXME add test for not appending duplicate persisted workflow ids
   });
 
   module(
