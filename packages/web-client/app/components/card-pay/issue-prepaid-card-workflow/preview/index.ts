@@ -36,18 +36,18 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
   @service declare layer2Network: Layer2Network;
   @tracked txnHash?: TransactionHash;
   @tracked chinInProgressMessage?: string;
-  @tracked isUserRejection = false;
 
   @reads('args.workflowSession.state.spendFaceValue')
   declare faceValue: number;
   @reads('issueTask.last.error') declare error: Error | undefined;
 
   @action issuePrepaidCard() {
-    taskFor(this.issueTask).perform();
+    taskFor(this.issueTask)
+      .perform()
+      .catch((e) => console.error(e));
   }
 
   @action cancel() {
-    this.isUserRejection = true;
     taskFor(this.issueTask).cancelAll();
   }
 
@@ -71,9 +71,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
 
   @action checkForPendingTransaction() {
     if (this.args.workflowSession.state.txnHash) {
-      taskFor(this.issueTask)
-        .perform()
-        .catch((e) => console.error(e));
+      taskFor(this.issueTask).perform();
     }
   }
 
@@ -153,7 +151,6 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
 
       this.args.onComplete();
     } catch (e) {
-      this.isUserRejection = false;
       let insufficientFunds = e.message.startsWith(
         'Safe does not have enough balance to make prepaid card(s).'
       );
@@ -171,7 +168,6 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
       } else if (tookTooLong) {
         throw new Error('TIMEOUT');
       } else if (isLayer2UserRejectionError(e)) {
-        this.isUserRejection = true;
         throw new Error('USER_REJECTION');
       } else {
         // Basically, for pretty much everything we want to make the user retry or seek support

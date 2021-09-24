@@ -85,9 +85,6 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   }
 
   @action createMerchant() {
-    if (this.isCtaDisabled) {
-      return;
-    }
     taskFor(this.createTask)
       .perform()
       .catch((e) => console.error(e));
@@ -225,14 +222,5 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
 
   get txViewerUrl() {
     return this.txnHash && this.layer2Network.blockExplorerUrl(this.txnHash);
-  }
-
-  get isCtaDisabled() {
-    let error = this.error?.message;
-    return (
-      !this.selectedPrepaidCard ||
-      error === 'UNAUTHENTICATED' ||
-      error === 'INSUFFICIENT_FUNDS'
-    );
   }
 }

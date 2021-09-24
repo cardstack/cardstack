@@ -81,7 +81,7 @@
   <Boxel::ActionChin
     class="prepaid-card-choice__footer"
     @state={{this.creationState}}
-    @disabled={{or @frozen this.isCtaDisabled}}
+    @disabled={{or @frozen (not this.selectedPrepaidCard)}}
   >
     <:default as |d|>
       <d.ActionButton
