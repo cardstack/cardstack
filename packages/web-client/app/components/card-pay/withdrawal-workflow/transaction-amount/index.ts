@@ -140,15 +140,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       return;
     }
 
-    taskFor(this.withdrawTask)
-      .perform()
-      .catch((e) => {
-        console.error(e);
-        this.isConfirmed = false;
-        if (!this.error) {
-          throw new Error('DEFAULT_ERROR');
-        }
-      });
+    taskFor(this.withdrawTask).perform();
   }
 
   @task *withdrawTask(): TaskGenerator<void> {
@@ -178,7 +170,14 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       this.args.onComplete?.();
     } catch (e) {
       this.isConfirmed = false;
-      if (isLayer2UserRejectionError(e)) {
+
+      if (
+        e.message.includes(
+          'Safe does not have enough balance to transfer tokens'
+        )
+      ) {
+        throw new Error('INSUFFICIENT_FUNDS');
+      } else if (isLayer2UserRejectionError(e)) {
         throw new Error('USER_REJECTION');
       } else {
         throw e;
