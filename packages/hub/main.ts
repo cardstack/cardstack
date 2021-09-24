@@ -1,6 +1,7 @@
 /* eslint-disable no-process-exit */
 
 import Koa from 'koa';
+import fetch from 'node-fetch';
 import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
@@ -45,6 +46,9 @@ import s3PutJson from './tasks/s3-put-json';
 import { CardstackError } from './utils/error';
 import { environment, httpLogging } from './middleware';
 import cors from '@koa/cors';
+
+//@ts-ignore polyfilling fetch
+global.fetch = fetch;
 
 const workerLog = logger('hub/worker');
 
