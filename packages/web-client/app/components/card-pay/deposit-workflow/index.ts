@@ -29,6 +29,13 @@ const FAILURE_REASONS = {
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
 } as const;
 
+export const MILESTONE_TITLES = [
+  `Connect ${c.layer1.conversationalName} wallet`,
+  `Connect ${c.layer2.fullName} wallet`,
+  'Deposit into reserve pool',
+  `Receive tokens on ${c.layer2.shortName}`,
+];
+
 class DepositWorkflow extends Workflow {
   @service declare router: RouterService;
   @service declare layer1Network: Layer1Network;
@@ -37,7 +44,7 @@ class DepositWorkflow extends Workflow {
   name = 'RESERVE_POOL_DEPOSIT' as WorkflowName;
   milestones = [
     new Milestone({
-      title: `Connect ${c.layer1.conversationalName} wallet`,
+      title: MILESTONE_TITLES[0],
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -80,7 +87,7 @@ class DepositWorkflow extends Workflow {
       )} wallet connected`,
     }),
     new Milestone({
-      title: `Connect ${c.layer2.fullName} wallet`,
+      title: MILESTONE_TITLES[1],
       postables: [
         new NetworkAwareWorkflowMessage({
           author: cardbot,
@@ -116,7 +123,7 @@ class DepositWorkflow extends Workflow {
       completedDetail: `${c.layer2.fullName} wallet connected`,
     }),
     new Milestone({
-      title: 'Deposit into reserve pool',
+      title: MILESTONE_TITLES[2],
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -141,7 +148,7 @@ class DepositWorkflow extends Workflow {
       completedDetail: 'Deposited into reserve pool',
     }),
     new Milestone({
-      title: `Receive tokens on ${c.layer2.shortName}`,
+      title: MILESTONE_TITLES[3],
       postables: [
         new WorkflowMessage({
           author: cardbot,

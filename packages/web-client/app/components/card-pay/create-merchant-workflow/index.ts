@@ -39,6 +39,12 @@ const FAILURE_REASONS = {
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
 } as const;
 
+export const MILESTONE_TITLES = [
+  `Connect ${c.layer2.fullName} wallet`,
+  'Save merchant details',
+  'Create merchant',
+];
+
 class CreateMerchantWorkflow extends Workflow {
   name = 'MERCHANT_CREATION' as WorkflowName;
 
@@ -48,7 +54,7 @@ class CreateMerchantWorkflow extends Workflow {
 
   milestones = [
     new Milestone({
-      title: `Connect ${c.layer2.fullName} wallet`,
+      title: MILESTONE_TITLES[0],
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -133,7 +139,7 @@ class CreateMerchantWorkflow extends Workflow {
       completedDetail: `${c.layer2.fullName} wallet connected`,
     }),
     new Milestone({
-      title: 'Save merchant details',
+      title: MILESTONE_TITLES[1],
       postables: [
         new NetworkAwareWorkflowMessage({
           author: cardbot,
@@ -165,7 +171,7 @@ class CreateMerchantWorkflow extends Workflow {
       completedDetail: 'Merchant details saved',
     }),
     new Milestone({
-      title: 'Create merchant',
+      title: MILESTONE_TITLES[2],
       postables: [
         new WorkflowMessage({
           author: cardbot,

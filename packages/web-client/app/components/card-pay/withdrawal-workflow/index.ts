@@ -40,6 +40,15 @@ const FAILURE_REASONS = {
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
 } as const;
 
+export const MILESTONE_TITLES = [
+  `Connect ${c.layer1.conversationalName} wallet`,
+  `Check ${c.layer1.nativeTokenSymbol} balance`,
+  `Connect ${c.layer2.conversationalName} wallet`,
+  `Withdraw from ${c.layer2.conversationalName}`,
+  `Bridge tokens to ${c.layer1.conversationalName}`,
+  `Claim tokens on ${c.layer1.conversationalName}`,
+];
+
 class CheckBalanceWorkflowMessage
   extends WorkflowPostable
   implements IWorkflowMessage
@@ -131,7 +140,7 @@ class WithdrawalWorkflow extends Workflow {
 
   milestones = [
     new Milestone({
-      title: `Connect ${c.layer1.conversationalName} wallet`,
+      title: MILESTONE_TITLES[0],
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -168,7 +177,7 @@ class WithdrawalWorkflow extends Workflow {
       )} wallet connected`,
     }),
     new Milestone({
-      title: `Check ${c.layer1.nativeTokenSymbol} balance`,
+      title: MILESTONE_TITLES[1],
       postables: [
         new CheckBalanceWorkflowMessage(),
         new WorkflowCard({
@@ -180,7 +189,7 @@ class WithdrawalWorkflow extends Workflow {
       completedDetail: `${c.layer1.nativeTokenSymbol} balance checked`,
     }),
     new Milestone({
-      title: `Connect ${c.layer2.conversationalName} wallet`,
+      title: MILESTONE_TITLES[2],
       postables: [
         new NetworkAwareWorkflowMessage({
           author: cardbot,
@@ -216,7 +225,7 @@ with Card Pay.`,
       completedDetail: `${c.layer2.conversationalName} wallet connected`,
     }),
     new Milestone({
-      title: `Withdraw from ${c.layer2.conversationalName}`,
+      title: MILESTONE_TITLES[3],
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -240,7 +249,7 @@ with Card Pay.`,
       completedDetail: `Withdrawn from ${c.layer2.conversationalName}`,
     }),
     new Milestone({
-      title: `Bridge tokens to ${c.layer1.conversationalName}`,
+      title: MILESTONE_TITLES[4],
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -256,7 +265,7 @@ with Card Pay.`,
       completedDetail: `Tokens bridged to ${c.layer1.conversationalName}`,
     }),
     new Milestone({
-      title: `Claim tokens on ${c.layer1.conversationalName}`,
+      title: MILESTONE_TITLES[5],
       postables: [
         new WorkflowMessage({
           author: cardbot,
