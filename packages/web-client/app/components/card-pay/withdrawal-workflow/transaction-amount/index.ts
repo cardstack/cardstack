@@ -5,7 +5,7 @@ import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { inject as service } from '@ember/service';
 import BN from 'bn.js';
-import { toWei } from 'web3-utils';
+import { toWei, fromWei } from 'web3-utils';
 import {
   BridgedTokenSymbol,
   TokenDisplayInfo,
