@@ -94,10 +94,9 @@ module('Acceptance | pay', function (hooks) {
     });
   });
 
-  test('it renders correctly with SPD as currency', async function (assert) {
-    await visit(
-      `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}&currency=${spendSymbol}`
-    );
+  test('It displays merchant info correctly in a non-iOS environment', async function (assert) {
+    await visit(`/pay/${network}/${merchantSafe.address}`);
+
     await waitFor(MERCHANT);
 
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
@@ -111,6 +110,33 @@ module('Acceptance | pay', function (hooks) {
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
       );
+  });
+
+  test('It displays merchant info correctly on iOS', async function (assert) {
+    let isIOSService = this.owner.lookup('service:is-ios');
+    sinon.stub(isIOSService, 'isIOS').returns(true);
+
+    await visit(`/pay/${network}/${merchantSafe.address}`);
+    await waitFor(MERCHANT);
+
+    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
+    assert
+      .dom(MERCHANT_LOGO)
+      .hasAttribute(
+        'data-test-merchant-logo-background',
+        merchantInfoBackground
+      )
+      .hasAttribute(
+        'data-test-merchant-logo-text-color',
+        merchantInfoTextColor
+      );
+  });
+
+  test('it renders correctly with SPD as currency', async function (assert) {
+    await visit(
+      `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}&currency=${spendSymbol}`
+    );
+
     assert.dom(AMOUNT).containsText(`§${spendAmount}`);
     assert
       .dom(SECONDARY_AMOUNT)
@@ -318,19 +344,6 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}&currrency=${spendSymbol}`
     );
-    await waitFor(MERCHANT);
-
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
-    assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
 
     assert.dom(AMOUNT).containsText(`§${spendAmount}`);
     assert
