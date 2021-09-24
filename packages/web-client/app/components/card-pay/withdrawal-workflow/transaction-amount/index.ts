@@ -36,6 +36,14 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   @tracked validationMessage = '';
   @reads('withdrawTask.last.error') declare error: Error | undefined;
 
+  constructor(owner: unknown, args: WorkflowCardComponentArgs) {
+    super(owner, args);
+
+    if (this.args.workflowSession.state.withdrawnAmount) {
+      this.amount = fromWei(this.args.workflowSession.state.withdrawnAmount);
+    }
+  }
+
   // assumption is these are always set by cards before it. They should be defined by the time
   // it gets to this part of the workflow
   get currentSafe(): Safe {
