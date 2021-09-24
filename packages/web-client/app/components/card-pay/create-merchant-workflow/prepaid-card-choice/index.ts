@@ -85,9 +85,6 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   }
 
   @action createMerchant() {
-    if (this.isCtaDisabled) {
-      return;
-    }
     taskFor(this.createTask)
       .perform()
       .catch((e) => console.error(e));
@@ -176,9 +173,14 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
       let tookTooLong = e.message.startsWith(
         'Transaction took too long to complete'
       );
-      if (insufficientFunds) {
+      let unauthenticated = e.message.startsWith('No valid auth token');
+      if (unauthenticated) {
+        workflowSession?.workflow?.cancel('UNAUTHENTICATED');
+        throw new Error('UNAUTHENTICATED');
+      } else if (insufficientFunds) {
         // This should only happen if the chosen prepaid card has been used
         // elsewhere as it should otherwise not be selectable.
+        workflowSession?.workflow?.cancel('INSUFFICIENT_FUNDS');
         throw new Error('INSUFFICIENT_FUNDS');
       } else if (tookTooLong) {
         throw new Error('TIMEOUT');
@@ -220,13 +222,5 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
 
   get txViewerUrl() {
     return this.txnHash && this.layer2Network.blockExplorerUrl(this.txnHash);
-  }
-
-  get isCtaDisabled() {
-    if (!this.selectedPrepaidCard) {
-      return true;
-    }
-    return false;
-    // TODO: other conditions
   }
 }

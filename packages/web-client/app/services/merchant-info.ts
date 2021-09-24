@@ -87,13 +87,22 @@ export default class MerchantInfoService extends Service {
       }
     );
 
-    if (response.ok) {
-      let uniqueness = yield response.json();
+    let info = yield response.json();
 
-      return uniqueness.slugAvailable;
-    } else {
-      throw new Error(yield response.text());
+    if (info?.errors || !response.ok) {
+      if (
+        info?.errors?.length === 1 &&
+        Number(info.errors[0].status) === 401 &&
+        info.errors[0].title === 'No valid auth token'
+      ) {
+        this.hubAuthentication.authToken = null;
+        throw new Error('No valid auth token');
+      } else {
+        throw new Error(yield response.text());
+      }
     }
+
+    return info.slugAvailable;
   }
 }
 

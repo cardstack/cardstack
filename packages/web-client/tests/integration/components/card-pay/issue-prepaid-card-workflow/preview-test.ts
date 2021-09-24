@@ -3,7 +3,10 @@ import { setupRenderingTest } from 'ember-qunit';
 import { click, render, waitFor, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
-import { WorkflowSession } from '@cardstack/web-client/models/workflow';
+import {
+  Workflow,
+  WorkflowSession,
+} from '@cardstack/web-client/models/workflow';
 import sinon from 'sinon';
 import CardCustomization from '@cardstack/web-client/services/card-customization';
 import { taskFor } from 'ember-concurrency-ts';
@@ -91,6 +94,31 @@ module(
           .dom('[data-test-issue-prepaid-card-button]')
           .containsText('Try Again');
       });
+
+      test('it cancels the workflow if hub authentication fails', async function (assert) {
+        class ConcreteWorkflow extends Workflow {}
+        let workflow = new ConcreteWorkflow(this.owner);
+        workflow.attachWorkflow();
+        this.set('workflowSession.workflow', workflow);
+
+        sinon
+          .stub(layer2Service, 'issuePrepaidCard')
+          .throws(new Error('No valid auth token'));
+
+        await click('[data-test-issue-prepaid-card-button]');
+        await waitFor('[data-test-issue-prepaid-card-error-message]');
+
+        assert
+          .dom('[data-test-issue-prepaid-card-error-message]')
+          .containsText(DEFAULT_ERROR_MESSAGE);
+
+        this.set('frozen', true);
+        assert.dom('[data-test-issue-prepaid-card-button]').isDisabled();
+
+        assert.equal(workflow.isCanceled, true);
+        assert.equal(workflow.cancelationReason, 'UNAUTHENTICATED');
+      });
+
       test('it shows the correct error message for a user rejection', async function (assert) {
         sinon
           .stub(layer2Service, 'issuePrepaidCard')
