@@ -30,10 +30,17 @@ import {
 } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
+import RouterService from '@ember/routing/router-service';
+import { next } from '@ember/runloop';
+import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
+  RESTORATION_L1_ADDRESS_CHANGED: 'RESTORATION_L1_ADDRESS_CHANGED',
+  RESTORATION_L1_DISCONNECTED: 'RESTORATION_L1_DISCONNECTED',
+  RESTORATION_L2_ADDRESS_CHANGED: 'RESTORATION_L2_ADDRESS_CHANGED',
+  RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
 } as const;
 
 class CheckBalanceWorkflowMessage
@@ -41,6 +48,8 @@ class CheckBalanceWorkflowMessage
   implements IWorkflowMessage
 {
   @tracked minimumBalanceForWithdrawalClaim: BN | undefined;
+
+  cardName = 'CHECK_BALANCE_MESSAGE';
 
   constructor() {
     super(cardbot);
@@ -81,7 +90,7 @@ class CheckBalanceWorkflowMessage
     ) {
       return `Checking your balance...
 
-It looks like you have enough ${
+      It looks like you have enough ${
         c.layer1.nativeTokenSymbol
       } in your account on ${
         c.layer1.fullName
@@ -97,9 +106,9 @@ The last step of this withdrawal requires that you have at least **~${formatWeiA
 You only have **${formatWeiAmount(layer1Network.defaultTokenBalance)} ${
         c.layer1.nativeTokenSymbol
       }**. You will need to deposit more
-${
-  c.layer1.nativeTokenSymbol
-} to your account shown below to continue the withdrawal.`;
+      ${
+        c.layer1.nativeTokenSymbol
+      } to your account shown below to continue the withdrawal.`;
     }
   }
 
@@ -120,8 +129,11 @@ ${
 
 class WithdrawalWorkflow extends Workflow {
   @service declare layer1Network: Layer1Network;
+  @service declare layer2Network: Layer2Network;
+  @service declare router: RouterService;
 
   name = 'WITHDRAWAL' as WorkflowName;
+
   milestones = [
     new Milestone({
       title: `Connect ${c.layer1.conversationalName} wallet`,
@@ -152,6 +164,7 @@ class WithdrawalWorkflow extends Workflow {
         }),
         new NetworkAwareWorkflowCard({
           author: cardbot,
+          cardName: 'LAYER1_CONNECT',
           componentName: 'card-pay/layer-one-connect-card',
         }),
       ],
@@ -165,6 +178,7 @@ class WithdrawalWorkflow extends Workflow {
         new CheckBalanceWorkflowMessage(),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'CHECK_BALANCE',
           componentName: 'card-pay/withdrawal-workflow/check-balance',
         }),
       ],
@@ -200,6 +214,7 @@ with Card Pay.`,
         }),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'LAYER2_CONNECT',
           componentName: 'card-pay/layer-two-connect-card',
         }),
       ],
@@ -214,6 +229,7 @@ with Card Pay.`,
         }),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'CHOOSE_BALANCE',
           componentName: 'card-pay/withdrawal-workflow/choose-balance',
         }),
         new WorkflowMessage({
@@ -222,6 +238,7 @@ with Card Pay.`,
         }),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'TRANSACTION_AMOUNT',
           componentName: 'card-pay/withdrawal-workflow/transaction-amount',
         }),
       ],
@@ -237,6 +254,7 @@ with Card Pay.`,
         }),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'TRANSACTION_STATUS',
           componentName: 'card-pay/withdrawal-workflow/transaction-status',
         }),
       ],
@@ -252,6 +270,7 @@ with Card Pay.`,
         }),
         new WorkflowCard({
           author: cardbot,
+          cardName: 'TOKEN_CLAIM',
           componentName: 'card-pay/withdrawal-workflow/token-claim',
         }),
       ],
@@ -265,6 +284,7 @@ with Card Pay.`,
     }),
     new WorkflowCard({
       author: cardbot,
+      cardName: 'TRANSACTION_CONFIRMED',
       componentName: 'card-pay/withdrawal-workflow/transaction-confirmed',
     }),
     new WorkflowMessage({
@@ -273,10 +293,12 @@ with Card Pay.`,
     }),
     new WorkflowCard({
       author: cardbot,
+      cardName: 'EPILOGUE_LAYER_TWO_CONNECT_CARD',
       componentName: 'card-pay/layer-two-connect-card',
     }),
     new WorkflowCard({
       author: cardbot,
+      cardName: 'EPILOGUE_NEXT_STEPS',
       componentName: 'card-pay/withdrawal-workflow/next-steps',
     }),
   ]);
@@ -311,19 +333,78 @@ with Card Pay.`,
         );
       },
     }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but you changed your Layer 1 wallet adress. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L1_ADDRESS_CHANGED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but you changed your Card wallet adress. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED
+        );
+      },
+    }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
+        return (Object.values(FAILURE_REASONS) as String[]).includes(
+          String(this.workflow?.cancelationReason)
         );
       },
     }),
   ]);
 
+  restorationErrors(persistedState: any) {
+    let { layer1Network, layer2Network } = this;
+
+    let errors = [];
+
+    if (!layer1Network.isConnected) {
+      errors.push(FAILURE_REASONS.RESTORATION_L1_DISCONNECTED);
+    }
+
+    if (
+      layer1Network.isConnected &&
+      persistedState.layer1WalletAddress &&
+      layer1Network.walletInfo.firstAddress !==
+        persistedState.layer1WalletAddress
+    ) {
+      errors.push(FAILURE_REASONS.RESTORATION_L1_ADDRESS_CHANGED);
+    }
+
+    if (!layer2Network.isConnected) {
+      errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
+    }
+
+    if (
+      layer2Network.isConnected &&
+      persistedState.layer2WalletAddress &&
+      layer2Network.walletInfo.firstAddress !==
+        persistedState.layer2WalletAddress
+    ) {
+      errors.push(FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED);
+    }
+
+    return errors;
+  }
+
   constructor(owner: unknown) {
     super(owner);
+    this.workflowPersistenceId =
+      this.router.currentRoute.queryParams['flow-id']!;
+
     this.attachWorkflow();
   }
 }
@@ -331,18 +412,42 @@ with Card Pay.`,
 export default class WithdrawalWorkflowComponent extends Component {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
+  @service declare workflowPersistence: WorkflowPersistence;
 
-  workflow!: WithdrawalWorkflow;
+  @tracked workflow: WithdrawalWorkflow | null = null;
+
   constructor(owner: unknown, args: {}) {
     super(owner, args);
-    this.workflow = new WithdrawalWorkflow(getOwner(this));
+
+    let workflow = new WithdrawalWorkflow(getOwner(this));
+    let persistedState = workflow.session.getPersistedData()?.state ?? {};
+    let willRestore = Object.keys(persistedState).length > 0;
+
+    if (willRestore) {
+      taskFor(this.restoreTask).perform(workflow, persistedState);
+    } else {
+      this.workflow = workflow;
+    }
+  }
+
+  @task *restoreTask(workflow: WithdrawalWorkflow, state: any) {
+    let errors = workflow.restorationErrors(state);
+    if (errors.length > 0) {
+      next(this, () => {
+        workflow.cancel(errors[0]);
+      });
+    } else {
+      yield this.layer1Network.waitForAccount;
+      workflow.restoreFromPersistedWorkflow();
+    }
+    this.workflow = workflow;
   }
 
   @action onDisconnect() {
-    this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
+    this.workflow?.cancel(FAILURE_REASONS.DISCONNECTED);
   }
 
   @action onAccountChanged() {
-    this.workflow.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
+    this.workflow?.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
   }
 }

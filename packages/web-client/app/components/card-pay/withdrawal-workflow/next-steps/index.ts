@@ -8,7 +8,9 @@ class CardPayWithdrawalWorkflowNextStepsComponent extends Component<WorkflowCard
   @service declare router: RouterService;
 
   @action async openNewWithdrawalWorkflow() {
-    await this.router.transitionTo({ queryParams: { flow: null } });
+    await this.router.transitionTo({
+      queryParams: { flow: null, 'flow-id': null },
+    });
     next(this, () => {
       this.router.transitionTo({ queryParams: { flow: 'withdrawal' } });
     });

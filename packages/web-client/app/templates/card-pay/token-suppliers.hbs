@@ -6,7 +6,8 @@
       <CardPay::DashboardPanel::Section @section={{section}}>
         <:cta>
           <Boxel::Button
-            {{on "click" (fn this.transitionToFlow section.workflow)}}
+            {{on "click" (fn this.transitionToTokenSuppliers section.workflow)}}
+
             @kind="primary"
             @size="touch"
             @disabled={{section.isCtaDisabled}}

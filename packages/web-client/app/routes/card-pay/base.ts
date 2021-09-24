@@ -17,7 +17,8 @@ export default class CardPayTabBaseRoute extends Route {
       if (
         params.flow !== 'deposit' &&
         params.flow !== 'issue-prepaid-card' &&
-        params.flow !== 'create-merchant'
+        params.flow !== 'create-merchant' &&
+        params.flow !== 'withdrawal'
       )
         return;
 
