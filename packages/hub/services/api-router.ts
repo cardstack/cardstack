@@ -10,11 +10,13 @@ import PrepaidCardColorSchemesRoute from '../routes/prepaid-card-color-schemes';
 import PrepaidCardPatternsRoute from '../routes/prepaid-card-patterns';
 import PrepaidCardCustomizationsRoute from '../routes/prepaid-card-customizations';
 import MerchantInfosRoute from '../routes/merchant-infos';
-import { inject } from '../di/dependency-injection';
-import CustodialWalletRoute from '../routes/custodial-wallet';
 import ReservationsRoute from '../routes/reservations';
 import OrdersRoute from '../routes/orders';
 import InventoryRoute from '../routes/inventory';
+import { inject } from '../di/dependency-injection';
+import CustodialWalletRoute from '../routes/custodial-wallet';
+import { parseBody } from '../middleware';
+
 export default class APIRouter {
   boomRoute: BoomRoute = inject('boom-route', { as: 'boomRoute' });
   sessionRoute: SessionRoute = inject('session-route', { as: 'sessionRoute' });
@@ -50,11 +52,11 @@ export default class APIRouter {
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
     apiSubrouter.get('/session', sessionRoute.get);
-    apiSubrouter.post('/session', sessionRoute.post);
+    apiSubrouter.post('/session', parseBody, sessionRoute.post);
     apiSubrouter.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get);
     apiSubrouter.get('/prepaid-card-patterns', prepaidCardPatternsRoute.get);
-    apiSubrouter.post('/prepaid-card-customizations', prepaidCardCustomizationsRoute.post);
-    apiSubrouter.post('/merchant-infos', merchantInfosRoute.post);
+    apiSubrouter.post('/prepaid-card-customizations', parseBody, prepaidCardCustomizationsRoute.post);
+    apiSubrouter.post('/merchant-infos', parseBody, merchantInfosRoute.post);
     apiSubrouter.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
     apiSubrouter.get('/custodial-wallet', custodialWalletRoute.get);
     apiSubrouter.get('/inventories', inventoryRoute.get);

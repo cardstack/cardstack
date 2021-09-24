@@ -2,7 +2,7 @@
 
 import logger from '@cardstack/logger';
 import { Argv } from 'yargs';
-import { runServer } from '../main';
+import { HubServer } from '../main';
 
 const serverLog = logger('hub/server');
 
@@ -24,7 +24,7 @@ export let builder = function (yargs: Argv) {
 
 // Using any right now because I dont know how to get the generated
 // type from the above handler into this handler
-export function handler(argv: any) {
+export async function handler(argv: any) {
   if (process.env.EMBER_ENV === 'test') {
     logger.configure({
       defaultLevel: 'warn',
@@ -57,8 +57,10 @@ export function handler(argv: any) {
     process.exit(0);
   });
 
-  return runServer({ port: argv.port }).catch((err: Error) => {
-    serverLog.error('Server failed to start cleanly: %s', err.stack || err);
-    process.exit(-1);
-  });
+  return (
+    await HubServer.create({ port: argv.port }).catch((err: Error) => {
+      serverLog.error('Server failed to start cleanly: %s', err.stack || err);
+      process.exit(-1);
+    })
+  ).listen();
 }

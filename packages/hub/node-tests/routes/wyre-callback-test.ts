@@ -1,8 +1,7 @@
 import { Client as DBClient } from 'pg';
-import { Server } from 'http';
-import supertest, { Test } from 'supertest';
-import { bootServerForTesting } from '../../main';
-import { Container } from '../../di/dependency-injection';
+// import { Server } from 'http';
+import supertest from 'supertest';
+import { HubServer } from '../../main';
 import { Registry } from '../../di/dependency-injection';
 import { WyreOrder, WyreTransfer, WyreWallet } from '../../services/wyre';
 import { adminWalletName } from '../../routes/wyre-callback';
@@ -264,43 +263,39 @@ function handleProvisionPrepaidCard(userAddress: string, sku: string) {
 }
 
 describe('POST /api/wyre-callback', function () {
-  let server: Server;
+  let server: HubServer;
   let db: DBClient;
-  let request: supertest.SuperTest<Test>;
+
+  function post(url: string) {
+    return supertest(server.app.callback()).post(url);
+  }
 
   this.beforeEach(async function () {
-    let container!: Container;
     wyreTransferCallCount = 0;
     waitForPrepaidCardTxnCallCount = 0;
     provisionPrepaidCardCallCount = 0;
 
-    server = await bootServerForTesting({
+    server = await HubServer.create({
       port: 3001,
       registryCallback(registry: Registry) {
         registry.register('wyre', StubWyreService);
         registry.register('relay', StubRelayService);
         registry.register('subgraph', StubSubgraphService);
       },
-      containerCallback(serverContainer: Container) {
-        container = serverContainer;
-      },
     });
 
-    let dbManager = await container.lookup('database-manager');
+    let dbManager = await server.container.lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM wallet_orders`);
     await db.query(`DELETE FROM reservations`);
-
-    request = supertest(server);
   });
 
   this.afterEach(async function () {
-    server.close();
+    server.teardown();
   });
 
   it(`returns 400 when the shape of the request does not match the expected format`, async function () {
-    await request
-      .post(`/callbacks/wyre`)
+    await post(`/callbacks/wyre`)
       .set('Content-Type', 'application/json')
       .set('Content-Type', 'application/json')
       .send({
@@ -311,8 +306,7 @@ describe('POST /api/wyre-callback', function () {
 
   describe('wallet order callbacks', function () {
     it(`can process callback for wallet order that doesn't yet exist in DB`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -356,8 +350,7 @@ describe('POST /api/wyre-callback', function () {
           'waiting-for-order',
         ]
       );
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -400,8 +393,7 @@ describe('POST /api/wyre-callback', function () {
         ]
       );
 
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -447,8 +439,7 @@ describe('POST /api/wyre-callback', function () {
           ]
         );
 
-        await request
-          .post(`/callbacks/wyre`)
+        await post(`/callbacks/wyre`)
           .set('Content-Type', 'application/json')
           .set('Content-Type', 'application/json')
           .send({
@@ -470,8 +461,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback with non-existent wyre wallet ID`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -492,8 +482,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback with non-existent transfer ID`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -514,8 +503,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback with non-completed transfer status`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -536,8 +524,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback with transfer source that does not derive from a wallet order`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -558,8 +545,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback with transfer source that refers to non-existent wallet order`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -580,8 +566,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback with transfer ID that does not match the transfer ID associated with the wallet order`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -602,8 +587,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback with order dest that does not match the custodial wallet's deposit address`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -649,8 +633,7 @@ describe('POST /api/wyre-callback', function () {
         stubReservationId,
       ]);
 
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -688,8 +671,7 @@ describe('POST /api/wyre-callback', function () {
         stubReservationId,
       ]);
 
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -717,8 +699,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`can transition to 'waiting-for-reservation' state after receiving custodial transfer callback when a reservation ID has not be received`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -752,8 +733,7 @@ describe('POST /api/wyre-callback', function () {
           stubReservationId,
           status,
         ]);
-        await request
-          .post(`/callbacks/wyre`)
+        await post(`/callbacks/wyre`)
           .set('Content-Type', 'application/json')
           .set('Content-Type', 'application/json')
           .send({
@@ -778,8 +758,7 @@ describe('POST /api/wyre-callback', function () {
 
     it(`ignores callback related to an order ID that does not exist in the DB`, async function () {
       await db.query(`DELETE FROM wallet_orders`);
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -800,8 +779,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback with non-existent transfer ID`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -824,8 +802,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback with non-completed transfer status`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -848,8 +825,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback that has a transfer with a non-admin wallet destination`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
@@ -872,8 +848,7 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback that has a transfer source that does not match the callback request's source`, async function () {
-      await request
-        .post(`/callbacks/wyre`)
+      await post(`/callbacks/wyre`)
         .set('Content-Type', 'application/json')
         .set('Content-Type', 'application/json')
         .send({
