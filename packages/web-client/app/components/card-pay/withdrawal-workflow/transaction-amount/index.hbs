@@ -47,6 +47,7 @@
             @symbol={{this.currentTokenSymbol}}
             @invalid={{this.isInvalid}}
             @errorMessage={{this.validationMessage}}
+            @disabled={{or @frozen (eq this.amountCtaState 'memorialized')}}
           />
         {{/if}}
       </CardPay::LabeledValue>

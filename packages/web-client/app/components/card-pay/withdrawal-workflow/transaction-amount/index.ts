@@ -85,7 +85,11 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   }
 
   get isAmountCtaDisabled() {
-    return this.isInvalid || this.amount === '';
+    return (
+      this.isInvalid ||
+      this.amount === '' ||
+      this.amountCtaState === 'memorialized'
+    );
   }
 
   get amountAsBigNumber(): BN {
