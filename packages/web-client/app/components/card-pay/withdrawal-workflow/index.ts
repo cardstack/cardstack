@@ -73,7 +73,6 @@ class CheckBalanceWorkflowMessage
       minimum
     );
 
-    this.workflow!.emit('visible-postables-will-change');
     this.isComplete = true;
   }
 
