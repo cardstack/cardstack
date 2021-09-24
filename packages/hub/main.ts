@@ -111,6 +111,7 @@ export class HubServer {
     app.use(((await container.lookup('callbacks-router')) as CallbacksRouter).routes());
 
     function onError(err: Error, ctx: Koa.Context) {
+      LOGGER.error(`Unhandled error:`, err);
       Sentry.withScope(function (scope) {
         scope.addEventProcessor(function (event) {
           return Sentry.Handlers.parseRequest(event, ctx.request);
