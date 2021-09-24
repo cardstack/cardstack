@@ -9,8 +9,14 @@ import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 
+interface WorkflowMeta {
+  updatedAt: string | undefined;
+  createdAt: string | undefined;
+}
+
 export interface WorkflowSessionDictionary {
   [key: string]: SupportedType;
+  meta: Partial<WorkflowMeta>;
 }
 
 type JSONSerializable =
@@ -28,6 +34,7 @@ export type SupportedType =
   | Record<string, JSONSerializable>
   | Date
   | BN
+  | WorkflowMeta
   | undefined;
 
 function stateProxyHandler(workflowSession: WorkflowSession) {
@@ -129,8 +136,8 @@ export default class WorkflowSession {
     return null;
   }
 
-  getValues(): WorkflowSessionDictionary {
-    let result: WorkflowSessionDictionary = {};
+  getValues(): Record<string, SupportedType> {
+    let result: Record<string, SupportedType> = {};
     for (const key in this._state) {
       const data: string | null = this._state[key];
       if (data !== null && data !== undefined) {
@@ -165,6 +172,20 @@ export default class WorkflowSession {
     this.persistToStorage();
   }
 
+  setMeta(hash: Partial<WorkflowMeta>, persist = true): void {
+    this.setStateProperty('meta', {
+      ...(this.getMeta() || {}),
+      ...hash,
+    });
+    // eslint-disable-next-line no-self-assign
+    this._state = this._state; // for reactivity
+    if (persist) this.persistToStorage();
+  }
+
+  getMeta() {
+    return this.getValue('meta') as WorkflowMeta;
+  }
+
   private setStateProperty(key: string, value: SupportedType) {
     serializeToState(this._state, key, value);
   }
@@ -172,9 +193,19 @@ export default class WorkflowSession {
   private persistToStorage(): void {
     if (!this.hasPersistence) return;
 
+    // first persistence will set both updatedAt and createdAt to the same date
+    let updatedAt = new Date().toISOString();
+    let createdAt = this.getMeta()?.createdAt || updatedAt;
+
+    // persist must be false to avoid infinite recursion
+    this.setMeta({ updatedAt, createdAt }, false);
+
     this.workflow?.workflowPersistence.persistData(
       this.workflow.workflowPersistenceId,
-      { name: this.workflow.name, state: this._state }
+      {
+        name: this.workflow.name,
+        state: this._state,
+      }
     );
   }
 }
