@@ -135,19 +135,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${floatingSpendAmount}&currency=${spendSymbol}`
     );
-    await waitFor(MERCHANT);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
-    assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
     assert.dom(AMOUNT).containsText(`§${roundedSpendAmount}`);
     assert
       .dom(SECONDARY_AMOUNT)
@@ -173,19 +161,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${lessThanMinSpendAmount}&currency=${spendSymbol}`
     );
-    await waitFor(MERCHANT);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
-    assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
     assert.dom(AMOUNT).containsText(`§${minSpendAmount}`);
     assert
       .dom(SECONDARY_AMOUNT)
@@ -206,19 +182,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${spendAmount}`
     );
-    await waitFor(MERCHANT);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
-    assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
     assert.dom(AMOUNT).containsText(`§${spendAmount}`);
     assert
       .dom(SECONDARY_AMOUNT)
@@ -240,19 +204,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${usdAmount}&currency=${usdSymbol}`
     );
-    await waitFor(MERCHANT);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
-    assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
     assert
       .dom(AMOUNT)
       .containsText(
@@ -274,19 +226,7 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${lessThanMinUsdAmount}&currency=${usdSymbol}`
     );
-    await waitFor(MERCHANT);
 
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
-    assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
     assert
       .dom(AMOUNT)
       .containsText(convertAmountToNativeDisplay(minUsdAmount, 'USD'));
@@ -313,19 +253,6 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${jpyAmount}&currency=${jpySymbol}`
     );
-    await waitFor(MERCHANT);
-
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
-    assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
 
     assert
       .dom(AMOUNT)
@@ -347,19 +274,6 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=300&currency=${invalidCurrencySymbol}`
     );
-    await waitFor(MERCHANT);
-
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
-    assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
 
     assert.dom(AMOUNT).doesNotExist();
     assert.dom(SECONDARY_AMOUNT).doesNotExist();
@@ -382,19 +296,6 @@ module('Acceptance | pay', function (hooks) {
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=30a&currency=${spendSymbol}`
     );
-    await waitFor(MERCHANT);
-
-    assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
-    assert
-      .dom(MERCHANT_LOGO)
-      .hasAttribute(
-        'data-test-merchant-logo-background',
-        merchantInfoBackground
-      )
-      .hasAttribute(
-        'data-test-merchant-logo-text-color',
-        merchantInfoTextColor
-      );
 
     assert.dom(AMOUNT).doesNotExist();
     assert.dom(SECONDARY_AMOUNT).doesNotExist();
