@@ -130,12 +130,12 @@ module('Acceptance | persistence view and restore', function () {
       assert
         .dom('[data-test-active-workflow]:nth-child(1)')
         .containsText('Merchant Creation')
-        .containsText('Merchant Account');
+        .containsText('Save merchant details');
 
       assert
         .dom('[data-test-active-workflow]:nth-child(2)')
         .containsText('Prepaid Card Issuance')
-        .containsText('Prepaid card funding');
+        .containsText('Customize layout');
 
       let progressIconElement = find(
         '[data-test-active-workflow]:nth-child(2) .boxel-progress-icon'

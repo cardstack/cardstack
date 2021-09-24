@@ -39,6 +39,13 @@ const FAILURE_REASONS = {
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
 } as const;
 
+export const MILESTONE_TITLES = [
+  `Connect ${c.layer2.fullName} wallet`,
+  'Customize layout',
+  'Choose face value',
+  'Confirm transaction',
+];
+
 class IssuePrepaidCardWorkflow extends Workflow {
   @service declare router: RouterService;
   @service declare layer2Network: Layer2Network;
@@ -49,7 +56,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
 
   milestones = [
     new Milestone({
-      title: `Connect ${c.layer2.fullName} wallet`,
+      title: MILESTONE_TITLES[0],
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -113,7 +120,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       completedDetail: `${c.layer2.fullName} wallet connected`,
     }),
     new Milestone({
-      title: 'Customize layout',
+      title: MILESTONE_TITLES[1],
       postables: [
         new NetworkAwareWorkflowMessage({
           author: cardbot,
@@ -146,7 +153,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       completedDetail: 'Layout customized',
     }),
     new Milestone({
-      title: 'Choose face value',
+      title: MILESTONE_TITLES[2],
       postables: [
         new WorkflowMessage({
           author: cardbot,
@@ -176,7 +183,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       completedDetail: 'Face value chosen',
     }),
     new Milestone({
-      title: 'Confirm transaction',
+      title: MILESTONE_TITLES[3],
       postables: [
         new WorkflowMessage({
           author: cardbot,

@@ -9,6 +9,18 @@ import {
   WORKFLOW_NAMES,
 } from '@cardstack/web-client/models/workflow';
 
+import { MILESTONE_TITLES as MERCHANT_CREATION_MILESTONES } from '@cardstack/web-client/components/card-pay/create-merchant-workflow';
+import { MILESTONE_TITLES as PREPAID_CARD_ISSUANCE_MILESTONES } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
+import { MILESTONE_TITLES as RESERVE_POOL_DEPOSIT_MILESTONES } from '@cardstack/web-client/components/card-pay/deposit-workflow';
+import { MILESTONE_TITLES as WITHDRAWAL_MILESTONES } from '@cardstack/web-client/components/card-pay/withdrawal-workflow';
+
+const WORKFLOW_TITLE_TO_MILESTONES: Record<WorkflowName, string[]> = {
+  'PREPAID_CARD_ISSUANCE': PREPAID_CARD_ISSUANCE_MILESTONES,
+  'MERCHANT_CREATION': MERCHANT_CREATION_MILESTONES,
+  'RESERVE_POOL_DEPOSIT': RESERVE_POOL_DEPOSIT_MILESTONES,
+  'WITHDRAWAL': WITHDRAWAL_MILESTONES,
+};
+
 interface CardPayHeaderWorkflowTrackerItemArgs {
   workflow: WorkflowPersistencePersistedData;
 }
@@ -27,8 +39,14 @@ export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayH
     return this.args.workflow.state;
   }
 
-  get currentCardDisplayName() {
-    return this.workflowState.currentCardDisplayName;
+  get currentMilestoneTitle() {
+    let workflowMilestones = WORKFLOW_TITLE_TO_MILESTONES[this.args.workflow.name as WorkflowName];
+
+    if (workflowMilestones) {
+      return workflowMilestones[this.workflowState.completedMilestonesCount] || '';
+    } else {
+      return '';
+    }
   }
 
   get isComplete() {
