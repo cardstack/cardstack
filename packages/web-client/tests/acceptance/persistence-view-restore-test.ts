@@ -188,6 +188,8 @@ module('Acceptance | persistence view and restore', function () {
     // FIXME add test for storage event coming from another tab
 
     // FIXME add test for filtering out unknown and malformed workflows
+
+    // FIXME add test to ignore canceled workflows AND workflows that haven’t started (no milestone values etc)
   });
 
   module(
