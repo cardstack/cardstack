@@ -143,6 +143,13 @@ export default class Layer1Network
     return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
   }
 
+  @task *resumeClaimBridgedTokensTask(
+    txnHash: string
+  ): TaskGenerator<TransactionReceipt> {
+    let result = yield this.strategy.resumeClaimBridgedTokens(txnHash);
+    return result;
+  }
+
   @task *claimBridgedTokensTask(
     bridgeValidationResult: BridgeValidationResult,
     options?: ClaimBridgedTokensOptions

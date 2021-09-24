@@ -2,6 +2,7 @@
   @header="Token Claim"
   @isComplete={{@isComplete}}
   data-test-withdrawal-token-claim-is-complete={{@isComplete}}
+  {{did-insert this.resumeClaimBridgedTokens}}
 >
   <ActionCardContainer::Section
     @title={{concat "Claim " (network-display-info "layer1" "conversationalName") " tokens"}}
