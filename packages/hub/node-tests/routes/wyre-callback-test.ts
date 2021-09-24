@@ -1,5 +1,4 @@
 import { Client as DBClient } from 'pg';
-// import { Server } from 'http';
 import supertest from 'supertest';
 import { HubServer } from '../../main';
 import { Registry } from '../../di/dependency-injection';

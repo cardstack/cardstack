@@ -1,8 +1,6 @@
 import { Client as DBClient } from 'pg';
-import { Server } from 'http';
 import supertest, { Test } from 'supertest';
-import { bootServerForTesting } from '../../main';
-import { Container } from '../../di/dependency-injection';
+import { HubServer } from '../../main';
 import { Registry } from '../../di/dependency-injection';
 import { InventorySubgraph } from '../../services/subgraph';
 import { v4 as uuidv4 } from 'uuid';
@@ -79,24 +77,19 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('/api/orders', function () {
-  let server: Server;
+  let server: HubServer;
   let db: DBClient;
   let request: supertest.SuperTest<Test>;
   let reservationId: string;
 
   this.beforeEach(async function () {
-    let container!: Container;
-
-    server = await bootServerForTesting({
+    server = await HubServer.create({
       port: 3001,
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
         registry.register('subgraph', StubSubgraph);
         registry.register('relay', StubRelayService);
         registry.register('wyre', StubWyreService);
-      },
-      containerCallback(serverContainer: Container) {
-        container = serverContainer;
       },
     });
     stubInventorySubgraph = () => ({
@@ -123,7 +116,7 @@ describe('/api/orders', function () {
       };
     };
 
-    let dbManager = await container.lookup('database-manager');
+    let dbManager = await server.container.lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM reservations`);
     await db.query(`DELETE FROM wallet_orders`);
@@ -136,11 +129,11 @@ describe('/api/orders', function () {
     ]);
     reservationId = id;
 
-    request = supertest(server);
+    request = supertest(server.app.callback());
   });
 
   this.afterEach(async function () {
-    server.close();
+    server.teardown();
   });
 
   describe('POST /api/orders', function () {

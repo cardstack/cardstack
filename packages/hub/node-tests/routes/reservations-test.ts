@@ -1,8 +1,6 @@
 import { Client as DBClient } from 'pg';
-import { Server } from 'http';
 import supertest, { Test } from 'supertest';
-import { bootServerForTesting } from '../../main';
-import { Container } from '../../di/dependency-injection';
+import { HubServer } from '../../main';
 import { Registry } from '../../di/dependency-injection';
 import { InventorySubgraph } from '../../services/subgraph';
 import { makeInventoryData } from '../helpers';
@@ -57,21 +55,16 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('/api/reservations', function () {
-  let server: Server;
+  let server: HubServer;
   let db: DBClient;
   let request: supertest.SuperTest<Test>;
 
   this.beforeEach(async function () {
-    let container!: Container;
-
-    server = await bootServerForTesting({
+    server = await HubServer.create({
       port: 3001,
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
         registry.register('subgraph', StubSubgraph);
-      },
-      containerCallback(serverContainer: Container) {
-        container = serverContainer;
       },
     });
     stubInventorySubgraph = () => ({
@@ -80,16 +73,16 @@ describe('/api/reservations', function () {
       },
     });
 
-    let dbManager = await container.lookup('database-manager');
+    let dbManager = await server.container.lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM reservations`);
     await db.query(`DELETE FROM wallet_orders`);
 
-    request = supertest(server);
+    request = supertest(server.app.callback());
   });
 
   this.afterEach(async function () {
-    server.close();
+    server.teardown();
   });
 
   describe('POST /api/reservations', function () {
