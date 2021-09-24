@@ -180,6 +180,12 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
 
       this.merchantIdValidationMessage =
         'There was an error validating merchant ID uniqueness';
+
+      if (e.message.startsWith('No valid auth token')) {
+        let { workflowSession } = this.args;
+        workflowSession?.workflow?.cancel('UNAUTHENTICATED');
+        throw new Error('UNAUTHENTICATED');
+      }
       return false;
     }
   }

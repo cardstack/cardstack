@@ -97,7 +97,10 @@ export abstract class Workflow {
   }
 
   get isComplete() {
-    return this.completedMilestoneCount === this.milestones.length;
+    return Boolean(
+      this.milestones.length &&
+        this.completedMilestoneCount === this.milestones.length
+    );
   }
 
   cancel(reason?: string) {
