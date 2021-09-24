@@ -1,0 +1,6 @@
+
+{
+  "wyre": {
+    "callbackUrl": "https://hub-staging.stack.cards/callbacks/wyre"
+  }
+}

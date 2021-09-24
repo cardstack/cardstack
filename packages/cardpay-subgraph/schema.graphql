@@ -142,6 +142,7 @@ type PrepaidCardAskSetEvent @entity {
 type PrepaidCardInventoryItem @entity {
   id: ID!
   inventory: SKUInventory!
+  prepaidCardId: String!
   prepaidCard: PrepaidCard!
 }
 
@@ -149,6 +150,7 @@ type SKUInventory @entity {
   id: ID!
   sku: SKU!
   issuer: Account!
+  askPrice: BigInt!
   prepaidCards: [PrepaidCardInventoryItem]!         @derivedFrom(field: "inventory")
   inventoryEvents: [PrepaidCardInventoryEvent]!     @derivedFrom(field: "inventory")
 }
@@ -183,6 +185,7 @@ type PrepaidCardInventoryRemoveEvent @entity {
 type PrepaidCardProvisionedEvent @entity {
   id: ID!
   timestamp: BigInt!
+  txnHash: String!
   transaction: Transaction!
   prepaidCard: PrepaidCard!
   customer: Account!

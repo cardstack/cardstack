@@ -9,6 +9,7 @@ import { AuthenticationUtils } from '../utils/authentication';
 import WorkerClient from '../services/worker-client';
 import PrepaidCardCustomizationSerializer from '../services/serializers/prepaid-card-customization-serializer';
 import { ensureLoggedIn } from './utils/auth';
+import { validateRequiredFields } from './utils/validation';
 
 export default class PrepaidCardCustomizationsRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
@@ -30,7 +31,12 @@ export default class PrepaidCardCustomizationsRoute {
 
     let db = await this.databaseManager.getClient();
 
-    if (!ensureValidPayload(ctx)) {
+    if (
+      !validateRequiredFields(ctx, {
+        requiredAttributes: ['issuer-name'],
+        requiredRelationships: ['pattern', 'color-scheme'],
+      })
+    ) {
       return;
     }
 
@@ -45,7 +51,7 @@ export default class PrepaidCardCustomizationsRoute {
         'INSERT INTO prepaid_card_customizations (id, owner_address, issuer_name, color_scheme_id, pattern_id) VALUES($1, $2, $3, $4, $5)',
         [newId, ownerAddress, issuerName, colorSchemeId, patternId]
       );
-    } catch (e) {
+    } catch (e: any) {
       if (e.constraint.endsWith('fkey')) {
         return foreignKeyConstraintError(ctx, e.constraint);
       } else {
@@ -70,47 +76,6 @@ export default class PrepaidCardCustomizationsRoute {
     ctx.body = serializedPcc;
     ctx.type = 'application/vnd.api+json';
   }
-}
-
-function ensureValidPayload(ctx: Koa.Context) {
-  let errors = [
-    errorForAttribute(ctx, 'issuer-name'),
-    errorForRelationship(ctx, 'pattern'),
-    errorForRelationship(ctx, 'color-scheme'),
-  ].filter(Boolean);
-  if (errors.length === 0) {
-    return true;
-  }
-  ctx.body = {
-    errors,
-  };
-  ctx.status = 422;
-  ctx.type = 'application/vnd.api+json';
-  return false;
-}
-
-function errorForAttribute(ctx: Koa.Context, attributeName: string) {
-  let attributeValue = ctx.request.body?.data?.attributes?.[attributeName];
-  if (attributeValue && attributeValue.length > 0) {
-    return;
-  }
-  return {
-    status: '422',
-    title: `Missing required attribute: ${attributeName}`,
-    detail: `Required field ${attributeName} was not provided`,
-  };
-}
-
-function errorForRelationship(ctx: Koa.Context, relationshipName: string) {
-  let relationshipValue = ctx.request.body?.data?.relationships?.[relationshipName];
-  if (!relationshipValue?.data?.id) {
-    return {
-      status: '422',
-      title: `Missing required relationship: ${relationshipName}`,
-      detail: `Required relationship ${relationshipName} was not provided`,
-    };
-  }
-  return;
 }
 
 function foreignKeyConstraintError(ctx: Koa.Context, constraintName: string) {

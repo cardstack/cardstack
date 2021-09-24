@@ -9,6 +9,7 @@ import { ensureLoggedIn } from './utils/auth';
 import WorkerClient from '../services/worker-client';
 import MerchantInfoQueries from '../services/queries/merchant-info';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
+import { validateRequiredFields } from './utils/validation';
 
 export interface MerchantInfo {
   id: string;
@@ -40,7 +41,7 @@ export default class MerchantInfosRoute {
       return;
     }
 
-    if (!ensureValidPayload(ctx)) {
+    if (!validateRequiredFields(ctx, { requiredAttributes: ['name', 'slug', 'color'] })) {
       return;
     }
 
@@ -109,35 +110,6 @@ export default class MerchantInfosRoute {
       };
     }
   }
-}
-
-function ensureValidPayload(ctx: Koa.Context) {
-  let errors = [errorForAttribute(ctx, 'name'), errorForAttribute(ctx, 'slug'), errorForAttribute(ctx, 'color')].filter(
-    Boolean
-  );
-
-  if (errors.length === 0) {
-    return true;
-  }
-  ctx.body = {
-    errors,
-  };
-  ctx.status = 422;
-  ctx.type = 'application/vnd.api+json';
-  return false;
-}
-
-function errorForAttribute(ctx: Koa.Context, attributeName: string) {
-  let attributeValue = ctx.request.body?.data?.attributes?.[attributeName];
-  if (attributeValue && attributeValue.length > 0) {
-    return;
-  }
-
-  return {
-    status: '422',
-    title: `Missing required attribute: ${attributeName}`,
-    detail: `Required field ${attributeName} was not provided`,
-  };
 }
 
 declare module '@cardstack/hub/di/dependency-injection' {

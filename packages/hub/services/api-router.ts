@@ -10,6 +10,9 @@ import PrepaidCardColorSchemesRoute from '../routes/prepaid-card-color-schemes';
 import PrepaidCardPatternsRoute from '../routes/prepaid-card-patterns';
 import PrepaidCardCustomizationsRoute from '../routes/prepaid-card-customizations';
 import MerchantInfosRoute from '../routes/merchant-infos';
+import ReservationsRoute from '../routes/reservations';
+import OrdersRoute from '../routes/orders';
+import InventoryRoute from '../routes/inventory';
 import { inject } from '../di/dependency-injection';
 import CustodialWalletRoute from '../routes/custodial-wallet';
 import { parseBody } from '../middleware';
@@ -30,6 +33,9 @@ export default class APIRouter {
     as: 'merchantInfosRoute',
   });
   custodialWalletRoute: CustodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
+  ordersRoute: OrdersRoute = inject('orders-route', { as: 'ordersRoute' });
+  reservationsRoute: ReservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
+  inventoryRoute: InventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
   routes() {
     let {
       boomRoute,
@@ -39,6 +45,9 @@ export default class APIRouter {
       merchantInfosRoute,
       custodialWalletRoute,
       sessionRoute,
+      ordersRoute,
+      reservationsRoute,
+      inventoryRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
@@ -50,6 +59,11 @@ export default class APIRouter {
     apiSubrouter.post('/merchant-infos', parseBody, merchantInfosRoute.post);
     apiSubrouter.get('/merchant-infos/validate-slug/:slug', merchantInfosRoute.getValidation);
     apiSubrouter.get('/custodial-wallet', custodialWalletRoute.get);
+    apiSubrouter.get('/inventories', inventoryRoute.get);
+    apiSubrouter.post('/orders', parseBody, ordersRoute.post);
+    apiSubrouter.get('/orders/:order_id', ordersRoute.get);
+    apiSubrouter.post('/reservations', parseBody, reservationsRoute.post);
+    apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();

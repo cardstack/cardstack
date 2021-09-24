@@ -31,7 +31,13 @@
     "accountId": null,
     "apiKey": null,
     "secretKey": null,
-    "callbackUrl": "https://hookb.in/r1WOE90pYLsqk2XXkEwr",
+    "callbackUrl": null,
     "url": "https://api.testwyre.com"
+  },
+  "relay": {
+    "provisionerSecret": null
+  },
+  "web3": {
+    "network": "sokol"
   }
 }

@@ -5,6 +5,7 @@ import DatabaseManager from '../services/database-manager';
 import { inject } from '../di/dependency-injection';
 import WyreService, { WyreOrder, WyreTransfer, WyreWallet } from '../services/wyre';
 import Web3 from 'web3';
+import { nextOrderStatus, OrderStatus, OrderState, provisionPrepaidCard, updateOrderStatus } from './utils/orders';
 
 const { toChecksumAddress } = Web3.utils;
 let log = Logger('route:wyre-callback');
@@ -36,7 +37,8 @@ export const adminWalletName = 'admin';
 export default class WyreCallbackRoute {
   adminWalletId: string | undefined;
   wyre: WyreService = inject('wyre');
-  prepaidCardInventory = inject('prepaid-card-inventory', { as: 'prepaidCardInventory' });
+  relay = inject('relay');
+  subgraph = inject('subgraph');
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
   constructor() {
@@ -94,11 +96,12 @@ export default class WyreCallbackRoute {
       transfer.destCurrency
     );
 
+    let db = await this.databaseManager.getClient();
+    let { status: nextStatus } = await nextOrderStatus(db, 'wyre-receive-funds', order.id);
     // We use an upsert as there will be no guarantee you'll get the order
     // ID/reservation ID correlation from the card wallet before wyre calls the
     // webhook
     try {
-      let db = await this.databaseManager.getClient();
       await db.query(
         `INSERT INTO wallet_orders (
            order_id, user_address, wallet_id, custodial_transfer_id, status
@@ -109,8 +112,8 @@ export default class WyreCallbackRoute {
            wallet_id = $3,
            custodial_transfer_id = $4,
            status = $5,
-           updated_at = NOW()`,
-        [order.id, userAddress.toLowerCase(), wallet.id, custodialTransferId, 'received-order']
+           updated_at = now()`,
+        [order.id, userAddress.toLowerCase(), wallet.id, custodialTransferId, nextStatus]
       );
     } catch (err) {
       log.error(
@@ -128,14 +131,12 @@ export default class WyreCallbackRoute {
     if (!validatedRequest) {
       return;
     }
-    let { orderId, reservationId, userAddress, transfer } = validatedRequest;
+    let { orderId, transfer } = validatedRequest;
 
+    let db = await this.databaseManager.getClient();
+    let state: OrderState, status: OrderStatus;
     try {
-      let db = await this.databaseManager.getClient();
-      await db.query(`UPDATE wallet_orders SET status = $2, updated_at = NOW() WHERE order_id = $1`, [
-        orderId,
-        reservationId ? 'complete' : 'waiting-for-reservation',
-      ]);
+      ({ state, status } = await updateOrderStatus(db, orderId, 'wyre-send-funds'));
     } catch (err) {
       log.error(
         `Error: Failed to locate wallet_orders record for ${request.dest} receive of ${
@@ -145,14 +146,22 @@ export default class WyreCallbackRoute {
       );
       return;
     }
-
-    if (reservationId) {
-      log.info(`provisioning prepaid card for user ${userAddress} with reservation ID ${reservationId}`);
-      await this.prepaidCardInventory.provisionPrepaidCard(userAddress, reservationId);
-    } else {
-      log.info(
-        `while processing ${request.source} send to admin account for order id ${orderId}, still haven't received a reservation ID for this order from the client. Waiting for reservation`
-      );
+    if (status === 'provisioning') {
+      let { reservationId } = state;
+      if (!reservationId) {
+        log.error(`Encountered order ${orderId} in state provisioning without a reservation ID`);
+        return;
+      }
+      try {
+        await provisionPrepaidCard(db, this.relay, this.subgraph, reservationId);
+      } catch (err) {
+        log.error(
+          `Could not provision prepaid card for reservationId ${reservationId}! Received error from relay server`,
+          err
+        );
+        return;
+      }
+      await updateOrderStatus(db, orderId, 'provision-mined');
     }
   }
 
@@ -201,6 +210,18 @@ export default class WyreCallbackRoute {
           `while processing ${request.dest} receive, transfer ${request.source}'s order ${orderId} has already been processed. skipping`
         );
         return;
+      }
+      result = await db.query(`SELECT user_address FROM wallet_orders WHERE order_id = $1`, [orderId]);
+      if (result.rows.length > 0) {
+        let {
+          rows: [{ user_address: userAddress }],
+        } = result;
+        if (userAddress.toLowerCase() !== wallet.name.toLowerCase()) {
+          log.info(
+            `while processing ${request.dest} receive, transfer ${request.source}'s order ${orderId}, the related wallet ${wallet.id} is associated to a user address ${wallet.name} that is different than the user address the client already informed us about ${userAddress}. skipping`
+          );
+          return;
+        }
       }
     } catch (err) {
       log.error(

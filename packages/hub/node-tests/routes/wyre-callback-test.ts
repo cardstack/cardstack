@@ -1,10 +1,10 @@
 import { Client as DBClient } from 'pg';
-// import { Server } from 'http';
 import supertest from 'supertest';
 import { HubServer } from '../../main';
 import { Registry } from '../../di/dependency-injection';
 import { WyreOrder, WyreTransfer, WyreWallet } from '../../services/wyre';
 import { adminWalletName } from '../../routes/wyre-callback';
+import { v4 as uuidv4 } from 'uuid';
 
 class StubWyreService {
   async getWalletByUserAddress(userAddress: string): Promise<WyreWallet | undefined> {
@@ -24,9 +24,15 @@ class StubWyreService {
   }
 }
 
-class StubPrepaidCardInventory {
-  async provisionPrepaidCard(userAddress: string, reservationId: string) {
+class StubRelayService {
+  async provisionPrepaidCard(userAddress: string, reservationId: string): Promise<string> {
     return Promise.resolve(handleProvisionPrepaidCard(userAddress, reservationId));
+  }
+}
+
+class StubSubgraphService {
+  async waitForProvisionedPrepaidCard(txnHash: string): Promise<string> {
+    return Promise.resolve(handleWaitForPrepaidCardTxn(txnHash));
   }
 }
 
@@ -37,12 +43,23 @@ const stubWalletOrderTransferId = 'TF_WALLET_ORDER';
 const stubCustodialTransferId = 'TF_CUSTODIAL_TRANSFER';
 const stubWalletOrderId = 'WO_WALLET_ORDER';
 const stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
+const stubUserAddress2 = '0xb21851B00bd13C008f703A21DFDd292b28A736b3';
+const stubSKU = 'sku1';
 const stubDepositAddress = '0x59faede86fb650d956ca633a5c1a21fa53fe151c'; // wyre always returns lowercase addresses
 const randomAddress = '0xb21851B00bd13C008f703A21DFDd292b28A736b3';
-const stubReservationId = '0x1234565';
+const stubProvisionTxnHash = '0x1234567890123456789012345678901234567890';
+const stubPrepaidCardAddress = '0xe732F27E31e8e0A17c5069Af7cDF277bA7E6Eff5';
+const stubReservationId = uuidv4();
 
 let wyreTransferCallCount = 0;
 let provisionPrepaidCardCallCount = 0;
+let waitForPrepaidCardTxnCallCount = 0;
+
+function handleWaitForPrepaidCardTxn(txnHash: string) {
+  waitForPrepaidCardTxnCallCount++;
+  expect(txnHash).to.equal(stubProvisionTxnHash);
+  return stubPrepaidCardAddress;
+}
 
 function handleGetWyreWalletByUserAddress(userAddress: string) {
   if (userAddress === adminWalletName) {
@@ -234,10 +251,14 @@ function handleWyreTransfer(source: string, dest: string, amount: number, token:
   };
 }
 
-function handleProvisionPrepaidCard(userAddress: string, reservationId: string) {
+function handleProvisionPrepaidCard(userAddress: string, sku: string) {
   provisionPrepaidCardCallCount++;
+  if (sku === 'boom') {
+    throw new Error('boom');
+  }
   expect(userAddress).to.equal(stubUserAddress);
-  expect(reservationId).to.equal(stubReservationId);
+  expect(sku).to.equal(stubSKU);
+  return stubProvisionTxnHash;
 }
 
 describe('POST /api/wyre-callback', function () {
@@ -250,19 +271,22 @@ describe('POST /api/wyre-callback', function () {
 
   this.beforeEach(async function () {
     wyreTransferCallCount = 0;
+    waitForPrepaidCardTxnCallCount = 0;
     provisionPrepaidCardCallCount = 0;
 
     server = await HubServer.create({
       port: 3001,
       registryCallback(registry: Registry) {
         registry.register('wyre', StubWyreService);
-        registry.register('prepaid-card-inventory', StubPrepaidCardInventory);
+        registry.register('relay', StubRelayService);
+        registry.register('subgraph', StubSubgraphService);
       },
     });
 
     let dbManager = await server.container.lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM wallet_orders`);
+    await db.query(`DELETE FROM reservations`);
   });
 
   this.afterEach(async function () {
@@ -295,6 +319,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(1);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
       expect(rows.length).to.equal(1);
@@ -309,6 +334,11 @@ describe('POST /api/wyre-callback', function () {
     // This is the scenario where the reservationId/orderId correlation has been
     // set before the callback has been received
     it(`can process callback for pending wallet order that we already received a prepaid card reservation for`, async function () {
+      await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
+        stubReservationId,
+        stubUserAddress.toLowerCase(),
+        stubSKU,
+      ]);
       await db.query(
         `INSERT INTO wallet_orders (order_id, user_address, wallet_id, reservation_id, status) VALUES ($1, $2, $3, $4, $5)`,
         [
@@ -333,6 +363,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(1);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
       expect(rows.length).to.equal(1);
@@ -344,8 +375,56 @@ describe('POST /api/wyre-callback', function () {
       expect(row.status).to.equal('received-order');
     });
 
+    it(`ignores callback for pending wallet order we already received reservation for where the user address in the callback does not match the user address in the DB`, async function () {
+      await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
+        stubReservationId,
+        stubUserAddress2.toLowerCase(),
+        stubSKU,
+      ]);
+      await db.query(
+        `INSERT INTO wallet_orders (order_id, user_address, wallet_id, reservation_id, status) VALUES ($1, $2, $3, $4, $5)`,
+        [
+          stubWalletOrderId,
+          stubUserAddress2.toLowerCase(),
+          stubCustodialWalletId,
+          stubReservationId,
+          'waiting-for-order',
+        ]
+      );
+
+      await post(`/callbacks/wyre`)
+        .set('Content-Type', 'application/json')
+        .set('Content-Type', 'application/json')
+        .send({
+          source: `transfer:${stubWalletOrderTransferId}`,
+          dest: `wallet:${stubCustodialWalletId}`,
+          currency: 'DAI',
+          amount: 100,
+          status: 'CONFIRMED',
+        })
+        .expect(204);
+
+      expect(wyreTransferCallCount).to.equal(0);
+      expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
+
+      let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
+      expect(rows.length).to.equal(1);
+
+      let [row] = rows;
+      expect(row.user_address).to.equal(stubUserAddress2.toLowerCase());
+      expect(row.wallet_id).to.equal(stubCustodialWalletId);
+      expect(row.custodial_transfer_id).to.equal(null);
+      expect(row.status).to.equal('waiting-for-order');
+    });
+
     it(`ignores callback with an order ID that already exists and is not in a "waiting-for-order" state`, async function () {
-      for (let status of ['received-order', 'waiting-for-reservation', 'complete']) {
+      await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
+        stubReservationId,
+        stubUserAddress.toLowerCase(),
+        stubSKU,
+      ]);
+      for (let status of ['received-order', 'waiting-for-reservation', 'provisioning', 'complete']) {
         await db.query(`DELETE FROM wallet_orders`);
         await db.query(
           `INSERT INTO wallet_orders (order_id, user_address, wallet_id, custodial_transfer_id, reservation_id, status) VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -373,6 +452,7 @@ describe('POST /api/wyre-callback', function () {
 
         expect(wyreTransferCallCount).to.equal(0);
         expect(provisionPrepaidCardCallCount).to.equal(0);
+        expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
         let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
         expect(rows.length).to.equal(1);
@@ -394,6 +474,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
       expect(rows.length).to.equal(0);
@@ -414,6 +495,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
       expect(rows.length).to.equal(0);
@@ -434,6 +516,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
       expect(rows.length).to.equal(0);
@@ -454,6 +537,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
       expect(rows.length).to.equal(0);
@@ -474,6 +558,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
       expect(rows.length).to.equal(0);
@@ -494,6 +579,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
       expect(rows.length).to.equal(0);
@@ -514,6 +600,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
       expect(rows.length).to.equal(0);
@@ -535,6 +622,11 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`can provision a prepaid card after receiving custodial transfer callback when a reservation ID exists`, async function () {
+      await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
+        stubReservationId,
+        stubUserAddress.toLowerCase(),
+        stubSKU,
+      ]);
       await db.query(`UPDATE wallet_orders SET reservation_id = $2 WHERE order_id = $1`, [
         stubWalletOrderId,
         stubReservationId,
@@ -554,11 +646,55 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(1);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(1);
 
       let {
         rows: [row],
       } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
       expect(row.status).to.equal('complete');
+      let {
+        rows: [{ transaction_hash: txnHash, prepaid_card_address: prepaidCardAddress }],
+      } = await db.query(`SELECT * FROM reservations where id = $1`, [stubReservationId]);
+      expect(txnHash).to.equal(stubProvisionTxnHash);
+      expect(prepaidCardAddress).to.equal(stubPrepaidCardAddress);
+    });
+
+    it('can set an error-provisioning status when an error occurs during provisioning', async function () {
+      await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
+        stubReservationId,
+        stubUserAddress.toLowerCase(),
+        'boom',
+      ]);
+      await db.query(`UPDATE wallet_orders SET reservation_id = $2 WHERE order_id = $1`, [
+        stubWalletOrderId,
+        stubReservationId,
+      ]);
+
+      await post(`/callbacks/wyre`)
+        .set('Content-Type', 'application/json')
+        .set('Content-Type', 'application/json')
+        .send({
+          source: `wallet:${stubCustodialWalletId}`,
+          dest: `transfer:${stubCustodialTransferId}`,
+          currency: 'DAI',
+          amount: 100,
+          status: 'CONFIRMED',
+        })
+        .expect(204);
+
+      expect(wyreTransferCallCount).to.equal(0);
+      expect(provisionPrepaidCardCallCount).to.equal(1);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
+
+      let {
+        rows: [row],
+      } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
+      expect(row.status).to.equal('error-provisioning');
+      let {
+        rows: [{ transaction_hash: txnHash, prepaid_card_address: prepaidCardAddress }],
+      } = await db.query(`SELECT * FROM reservations where id = $1`, [stubReservationId]);
+      expect(txnHash).to.equal(null);
+      expect(prepaidCardAddress).to.equal(null);
     });
 
     it(`can transition to 'waiting-for-reservation' state after receiving custodial transfer callback when a reservation ID has not be received`, async function () {
@@ -576,6 +712,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let {
         rows: [row],
@@ -584,6 +721,11 @@ describe('POST /api/wyre-callback', function () {
     });
 
     it(`ignores callback related to an order ID that whose status is not "order-received"`, async function () {
+      await db.query(`INSERT INTO reservations (id, user_address, sku) VALUES ($1, $2, $3)`, [
+        stubReservationId,
+        stubUserAddress.toLowerCase(),
+        stubSKU,
+      ]);
       for (let status of ['waiting-for-order', 'waiting-for-reservation', 'complete']) {
         await db.query(`UPDATE wallet_orders SET reservation_id = $2, status = $3 WHERE order_id = $1`, [
           stubWalletOrderId,
@@ -604,6 +746,7 @@ describe('POST /api/wyre-callback', function () {
 
         expect(wyreTransferCallCount).to.equal(0);
         expect(provisionPrepaidCardCallCount).to.equal(0);
+        expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
         let {
           rows: [row],
@@ -628,6 +771,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let { rows } = await db.query(`SELECT * FROM wallet_orders where order_id = $1`, [stubWalletOrderId]);
       expect(rows.length).to.equal(0);
@@ -648,6 +792,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let {
         rows: [row],
@@ -670,6 +815,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let {
         rows: [row],
@@ -692,6 +838,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let {
         rows: [row],
@@ -714,6 +861,7 @@ describe('POST /api/wyre-callback', function () {
 
       expect(wyreTransferCallCount).to.equal(0);
       expect(provisionPrepaidCardCallCount).to.equal(0);
+      expect(waitForPrepaidCardTxnCallCount).to.equal(0);
 
       let {
         rows: [row],
