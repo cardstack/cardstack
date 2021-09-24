@@ -34,6 +34,9 @@
     "callbackUrl": "https://hookb.in/r1WOE90pYLsqk2XXkEwr",
     "url": "https://api.testwyre.com"
   },
+  "relay": {
+    "provisionerSecret": null
+  },
   "web3": {
     "network": "sokol"
   }
