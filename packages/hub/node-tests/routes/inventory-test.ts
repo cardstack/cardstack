@@ -113,6 +113,7 @@ describe('GET /api/inventory', function () {
             id: 'sku1',
             attributes: {
               issuer: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              sku: 'sku1',
               'issuing-token-symbol': 'DAI',
               'issuing-token-address': '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
               'face-value': 100,
@@ -126,6 +127,7 @@ describe('GET /api/inventory', function () {
             id: 'sku2',
             attributes: {
               issuer: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              sku: 'sku2',
               'issuing-token-symbol': 'DAI',
               'issuing-token-address': '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
               'face-value': 200,
@@ -161,6 +163,7 @@ describe('GET /api/inventory', function () {
             id: 'sku1',
             attributes: {
               issuer: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              sku: 'sku1',
               'issuing-token-symbol': 'DAI',
               'issuing-token-address': '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
               'face-value': 100,
@@ -204,6 +207,7 @@ describe('GET /api/inventory', function () {
             id: 'sku1',
             attributes: {
               issuer: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              sku: 'sku1',
               'issuing-token-symbol': 'DAI',
               'issuing-token-address': '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
               'face-value': 100,
@@ -257,6 +261,7 @@ describe('GET /api/inventory', function () {
             id: 'sku1',
             attributes: {
               issuer: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              sku: 'sku1',
               'issuing-token-symbol': 'DAI',
               'issuing-token-address': '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
               'face-value': 100,
@@ -270,6 +275,7 @@ describe('GET /api/inventory', function () {
             id: 'sku2',
             attributes: {
               issuer: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              sku: 'sku2',
               'issuing-token-symbol': 'DAI',
               'issuing-token-address': '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
               'face-value': 200,

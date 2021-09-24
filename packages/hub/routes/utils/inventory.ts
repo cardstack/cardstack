@@ -54,6 +54,7 @@ function formatInventory(inventory: SKUInventory, reservations: SKUReservations)
     type: 'inventories',
     attributes: {
       issuer: issuer,
+      sku,
       'issuing-token-symbol': symbol,
       'issuing-token-address': tokenAddress,
       'face-value': parseInt(faceValue), // SPEND is safe to represent as a number in js
