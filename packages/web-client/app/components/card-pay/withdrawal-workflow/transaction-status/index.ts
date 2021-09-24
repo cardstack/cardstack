@@ -25,16 +25,17 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
   }
 
   @task *awaitBridgingTask(): TaskGenerator<void> {
+    let { workflowSession } = this.args;
     let relayTokensTxnHash =
-      this.args.workflowSession.getValue<TransactionHash>(
-        'relayTokensTxnHash'
-      )!;
+      workflowSession.getValue<TransactionHash>('relayTokensTxnHash')!;
     try {
-      let result = yield this.layer2Network.awaitBridgedToLayer1(
-        this.layer2BlockHeightBeforeBridging!,
-        relayTokensTxnHash
-      );
-      this.args.workflowSession.setValue('bridgeValidationResult', result);
+      if (!workflowSession.getValue('bridgeValidationResult')) {
+        let result = yield this.layer2Network.awaitBridgedToLayer1(
+          this.layer2BlockHeightBeforeBridging!,
+          relayTokensTxnHash
+        );
+        workflowSession.setValue('bridgeValidationResult', result);
+      }
       this.layer2Network.refreshSafesAndBalances();
       this.completedCount = 2;
       this.args.onComplete?.();
