@@ -89,9 +89,9 @@ export default class MerchantInfoService extends Service {
 
     let info = yield response.json();
 
-    if (info.errors) {
+    if (info?.errors || !response.ok) {
       if (
-        info.errors.length === 1 &&
+        info?.errors?.length === 1 &&
         Number(info.errors[0].status) === 401 &&
         info.errors[0].title === 'No valid auth token'
       ) {

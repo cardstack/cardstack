@@ -159,11 +159,12 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
       );
       let unauthenticated = e.message.startsWith('No valid auth token');
       if (unauthenticated) {
-        this.args.workflowSession.workflow.cancel('UNAUTHENTICATED');
+        this.args.workflowSession?.workflow?.cancel('UNAUTHENTICATED');
         throw new Error('UNAUTHENTICATED');
       } else if (insufficientFunds) {
         // We probably want to cancel the workflow at this point
         // And tell the user to go deposit funds
+        this.args.workflowSession?.workflow?.cancel('INSUFFICIENT_FUNDS');
         throw new Error('INSUFFICIENT_FUNDS');
       } else if (tookTooLong) {
         throw new Error('TIMEOUT');
