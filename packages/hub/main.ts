@@ -126,6 +126,7 @@ export async function makeServer(registryCallback?: RegistryCallback, containerC
   });
 
   function onError(err: Error, ctx: Koa.Context) {
+    serverLog.error(`Unhandled error:`, err);
     Sentry.withScope(function (scope) {
       scope.addEventProcessor(function (event) {
         return Sentry.Handlers.parseRequest(event, ctx.request);
