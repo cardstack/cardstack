@@ -1,13 +1,15 @@
-{{this.workflowName}}
-<br>
-{{#if this.isComplete}}
-  Complete
-{{else}}
-  {{this.currentMilestoneTitle}}
-{{/if}}
+<button type='button' {{on 'click' this.visit}}>
+  {{this.workflowName}}
+  <br>
+  {{#if this.isComplete}}
+    Complete
+  {{else}}
+    {{this.currentMilestoneTitle}}
+  {{/if}}
 
-<Boxel::ProgressIcon
-  @size="10" {{!-- FIXME but what is the true size --}}
-  @isComplete={{this.isComplete}}
-  @fractionComplete={{this.fractionComplete}}
-/>
+  <Boxel::ProgressIcon
+    @size="10" {{!-- FIXME but what is the true size --}}
+    @isComplete={{this.isComplete}}
+    @fractionComplete={{this.fractionComplete}}
+  />
+</button>

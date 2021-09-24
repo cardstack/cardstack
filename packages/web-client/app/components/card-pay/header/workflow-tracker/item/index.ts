@@ -1,5 +1,6 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
+import { action } from '@ember/object';
 
 import WorkflowPersistence, {
   WorkflowPersistencePersistedData,
@@ -22,25 +23,33 @@ const WORKFLOW_TITLE_TO_MILESTONES: Record<WorkflowName, string[]> = {
 };
 
 interface CardPayHeaderWorkflowTrackerItemArgs {
-  workflow: WorkflowPersistencePersistedData;
+  workflow: { workflow: WorkflowPersistencePersistedData, id: string};
 }
 
 export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayHeaderWorkflowTrackerItemArgs> {
   @service declare workflowPersistence: WorkflowPersistence;
 
+  get workflow() {
+    return this.args.workflow.workflow;
+  }
+
+  get workflowId() {
+    return this.args.workflow.id;
+  }
+
   get workflowName() {
     return (
-      WORKFLOW_NAMES[this.args.workflow.name as WorkflowName] ||
+      WORKFLOW_NAMES[this.workflow.name as WorkflowName] ||
       'Unknown workflow type'
     );
   }
 
   get workflowState() {
-    return this.args.workflow.state;
+    return this.workflow.state;
   }
 
   get currentMilestoneTitle() {
-    let workflowMilestones = WORKFLOW_TITLE_TO_MILESTONES[this.args.workflow.name as WorkflowName];
+    let workflowMilestones = WORKFLOW_TITLE_TO_MILESTONES[this.workflow.name as WorkflowName];
 
     if (workflowMilestones) {
       return workflowMilestones[this.workflowState.completedMilestonesCount] || '';
@@ -61,5 +70,9 @@ export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayH
       this.workflowState.completedMilestonesCount /
       this.workflowState.milestonesCount
     );
+  }
+
+  @action visit() {
+    this.workflowPersistence.visitPersistedWorkflow(this.workflowId);
   }
 }
