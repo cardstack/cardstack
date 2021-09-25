@@ -77,10 +77,10 @@ function stateProxyHandler(workflowSession: WorkflowSession) {
 
 export default class WorkflowSession {
   workflow: any;
-  _stateProxy: any;
+  #stateProxy: any;
   constructor(workflow?: any) {
     this.workflow = workflow;
-    this._stateProxy = new Proxy({}, stateProxyHandler(this));
+    this.#stateProxy = new Proxy({}, stateProxyHandler(this));
   }
 
   @tracked _state: Record<string, string> = {};
@@ -94,7 +94,7 @@ export default class WorkflowSession {
   }
 
   get state(): Record<string, SupportedType> {
-    return this._stateProxy;
+    return this.#stateProxy;
   }
 
   get hasPersistence() {
