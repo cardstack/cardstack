@@ -8,6 +8,7 @@ import { TransactionReceipt } from 'web3-core';
 import { ContractOptions } from 'web3-eth-contract';
 import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
 import {
+  EventABI,
   executeSend,
   executeSendWithRateLock,
   getNextNonceFromEstimate,
@@ -415,4 +416,36 @@ export default class PrepaidCardMarket {
       nonce
     );
   }
+}
+
+export function itemSetEventABI(web3: Web3): EventABI {
+  return {
+    topic: web3.eth.abi.encodeEventSignature('ItemSet(address,address,address,uint256,string,bytes32)'),
+    abis: [
+      {
+        type: 'address',
+        name: 'prepaidCard',
+      },
+      {
+        type: 'address',
+        name: 'issuer',
+      },
+      {
+        type: 'address',
+        name: 'issuingToken',
+      },
+      {
+        type: 'uint256',
+        name: 'faceValue',
+      },
+      {
+        type: 'string',
+        name: 'customizationDID',
+      },
+      {
+        type: 'bytes32',
+        name: 'sku',
+      },
+    ],
+  };
 }

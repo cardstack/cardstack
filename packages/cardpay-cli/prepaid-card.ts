@@ -72,18 +72,40 @@ export async function split(
   let web3 = await getWeb3(network, mnemonic);
 
   let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+  let marketAPI = await getSDK('PrepaidCardMarket', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
+  let assets = await getSDK('Assets', web3);
 
   console.log(
     `Splitting prepaid card ${prepaidCard} into face value(s) §${faceValues.join(
       ' SPEND, §'
     )} SPEND and placing into the default market...`
   );
-  let { prepaidCards } = await prepaidCardAPI.split(prepaidCard, faceValues, undefined, customizationDID, {
+  let { prepaidCards, sku } = await prepaidCardAPI.split(prepaidCard, faceValues, undefined, customizationDID, {
     onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
-  console.log(`created cards: ${prepaidCards.map((p) => p.address).join(', ')}`);
-  console.log('done');
+  let skuInfo = await marketAPI.getSKUInfo(sku);
+  if (!skuInfo) {
+    console.log('Error: no sku info available');
+  } else {
+    let { symbol } = await assets.getTokenInfo(skuInfo.issuingToken);
+    let inventory = await marketAPI.getInventory(sku);
+    console.log(`SKU Info:
+  SKU:               ${sku}
+  Face value:        §${skuInfo.faceValue} SPEND
+  Issuing token      ${symbol}
+  Issuer:            ${skuInfo.issuer}
+  Customization DID: ${skuInfo.customizationDID || '-none-'}
+  Ask Price:         ${fromWei(skuInfo.askPrice)} ${symbol}
+  Inventory size:    ${inventory.length}
+
+Created cards: ${JSON.stringify(
+      prepaidCards.map((p) => p.address),
+      null,
+      2
+    )}`);
+    console.log('done');
+  }
 }
 
 export async function transfer(
