@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import { reads } from 'macro-decorators';
 import { inject as service } from '@ember/service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { fromWei } from 'web3-utils';
@@ -24,8 +23,9 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
   spendToUsdRate = spendToUsdRate;
 
   @service declare layer2Network: Layer2Network;
-  @reads('args.workflowSession.state.prepaidFundingToken')
-  declare fundingTokenSymbol: TokenSymbol;
+  get fundingTokenSymbol(): TokenSymbol {
+    return this.args.workflowSession.getValue('prepaidFundingToken')!;
+  }
   @tracked selectedFaceValue?: FaceValue;
   @tracked options: FaceValue[] = [];
 
@@ -45,7 +45,8 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
       })
     );
 
-    const defaultSpendAmount = this.args.workflowSession.state.spendFaceValue;
+    const defaultSpendAmount =
+      this.args.workflowSession.getValue<number>('spendFaceValue');
     if (defaultSpendAmount) {
       this.selectedFaceValue = this.options.findBy(
         'spendAmount',
@@ -89,7 +90,7 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
     }
     let amount = this.selectedFaceValue?.spendAmount;
     if (amount) {
-      this.args.workflowSession.update('spendFaceValue', amount);
+      this.args.workflowSession.setValue('spendFaceValue', amount);
     }
     this.args.onComplete?.();
   }

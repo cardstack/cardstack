@@ -19,7 +19,7 @@ export {
 export { default as NetworkAwareWorkflowCard } from './workflow/network-aware-card';
 export { Participant, WorkflowPostable } from './workflow/workflow-postable';
 export {
-  ArbitraryDictionary,
+  WorkflowSessionDictionary,
   default as WorkflowSession,
 } from './workflow/workflow-session';
 export { SessionAwareWorkflowMessage } from './workflow/session-aware-workflow-message';
@@ -103,10 +103,10 @@ export abstract class Workflow {
     );
   }
 
-  cancel(reason?: string) {
+  cancel(reason?: string | null) {
     const cancelationReason = reason || 'UNKNOWN';
 
-    this.session.updateMany({
+    this.session.setValue({
       isCancelled: true,
       cancelationReason: cancelationReason,
     });
@@ -192,7 +192,7 @@ export abstract class Workflow {
     this.session.restoreFromStorage();
 
     const [lastCompletedCardName] = (
-      this.session.state.completedCardNames || []
+      this.session.getValue<Array<string>>('completedCardNames') || []
     ).slice(-1);
 
     if (lastCompletedCardName) {
@@ -209,11 +209,11 @@ export abstract class Workflow {
     }
 
     if (
-      this.session.state.isCancelled &&
-      this.session.state.cancelationReason
+      this.session.getValue('isCancelled') &&
+      this.session.getValue('cancelationReason')
     ) {
       next(this, () => {
-        this.cancel(this.session.state.cancelationReason);
+        this.cancel(this.session.getValue('cancelationReason'));
       });
     }
   }

@@ -6,7 +6,7 @@ import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import BN from 'bn.js';
 
-import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { DepotSafe, Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 
 module(
@@ -194,12 +194,12 @@ module(
 
       await click('[data-test-boxel-action-chin] [data-test-boxel-button]');
       assert.equal(
-        session.state.withdrawalToken,
+        session.getValue('withdrawalToken'),
         'CARD.CPXD',
         'workflow session withdrawal token updated'
       );
       assert.equal(
-        session.state.withdrawalSafe.address,
+        session.getValue<Safe>('withdrawalSafe')?.address,
         merchantAddress,
         'workflow session withdrawal safe updated'
       );

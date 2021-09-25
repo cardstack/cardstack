@@ -7,7 +7,6 @@ import {
 } from '@cardstack/cardpay-sdk';
 import {
   cardbot,
-  ArbitraryDictionary,
   Milestone,
   PostableCollection,
   NetworkAwareWorkflowMessage,
@@ -17,6 +16,7 @@ import {
   WorkflowCard,
   WorkflowMessage,
   WorkflowName,
+  WorkflowSession,
 } from '@cardstack/web-client/models/workflow';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
@@ -93,7 +93,7 @@ class CreateMerchantWorkflow extends Workflow {
               layer2Network.fetchMerchantRegistrationFeeTask
             ).perform();
 
-            this.workflow?.session.update(
+            this.workflow?.session.setValue(
               'merchantRegistrationFee',
               merchantRegistrationFee
             );
@@ -223,11 +223,11 @@ class CreateMerchantWorkflow extends Workflow {
     // cancelation for not having prepaid card
     new SessionAwareWorkflowMessage({
       author: cardbot,
-      template: (session: ArbitraryDictionary) =>
+      template: (session: WorkflowSession) =>
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${formatAmount(
-          session.merchantRegistrationFee
+          session.getValue('merchantRegistrationFee')
         )} SPEND (${convertAmountToNativeDisplay(
-          spendToUsd(session.merchantRegistrationFee)!,
+          spendToUsd(session.getValue('merchantRegistrationFee')!)!,
           'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
       includeIf() {
@@ -239,11 +239,11 @@ class CreateMerchantWorkflow extends Workflow {
     // cancelation for insufficient balance
     new SessionAwareWorkflowMessage({
       author: cardbot,
-      template: (session: ArbitraryDictionary) =>
+      template: (session: WorkflowSession) =>
         `It looks like you don’t have a prepaid card with enough funds to pay the ${formatAmount(
-          session.merchantRegistrationFee
+          session.getValue('merchantRegistrationFee')
         )} SPEND (${convertAmountToNativeDisplay(
-          spendToUsd(session.merchantRegistrationFee)!,
+          spendToUsd(session.getValue('merchantRegistrationFee')!)!,
           'USD'
         )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`,
       includeIf() {

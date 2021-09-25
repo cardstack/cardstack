@@ -35,7 +35,8 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
 
   get withdrawalToken(): BridgedTokenSymbol {
     return (
-      this.args.workflowSession.state.withdrawalToken ?? this.defaultTokenSymbol
+      this.args.workflowSession.getValue('withdrawalToken') ??
+      this.defaultTokenSymbol
     );
   }
 
@@ -87,7 +88,7 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
       return;
     }
     if (this.selectedToken) {
-      this.args.workflowSession.updateMany({
+      this.args.workflowSession.setValue({
         withdrawalSafe: this.selectedSafe,
         withdrawalToken: this.selectedToken.symbol,
       });

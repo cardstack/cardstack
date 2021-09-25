@@ -13,6 +13,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { task } from 'ember-concurrency-decorators';
 import { timeout } from 'ember-concurrency';
 import config from '@cardstack/web-client/config/environment';
+import BN from 'bn.js';
 
 const BALANCE_CHECK_INTERVAL = config.environment === 'test' ? 100 : 5000;
 
@@ -60,7 +61,10 @@ export default class CardPayWithdrawalWorkflowCheckBalanceComponent extends Comp
       this.layer1Network.nativeTokenSymbol as BridgeableSymbol
     );
   }
-  get minimumBalanceForWithdrawalClaim() {
-    return this.args.workflowSession.state['minimumBalanceForWithdrawalClaim'];
+
+  get minimumBalanceForWithdrawalClaim(): BN {
+    return this.args.workflowSession.getValue(
+      'minimumBalanceForWithdrawalClaim'
+    )!;
   }
 }

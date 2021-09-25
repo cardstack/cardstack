@@ -22,8 +22,10 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<Workflow
   @tracked selectedToken: TokenBalance<BridgeableSymbol> | undefined;
 
   get selectedTokenSymbol() {
-    if (this.args.workflowSession.state.depositSourceToken) {
-      return this.args.workflowSession.state.depositSourceToken;
+    let depositSourceToken =
+      this.args.workflowSession.getValue<string>('depositSourceToken');
+    if (depositSourceToken) {
+      return depositSourceToken;
     } else if (this.layer1Network.daiBalance?.gt(new BN('0'))) {
       return 'DAI';
     } else if (this.layer1Network.cardBalance?.gt(new BN('0'))) {
@@ -38,7 +40,7 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<Workflow
       (t) => t.symbol === this.selectedTokenSymbol
     );
     next(this, () => {
-      this.args.workflowSession.update(
+      this.args.workflowSession.setValue(
         'depositSourceToken',
         this.selectedToken?.symbol
       );
@@ -83,7 +85,7 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<Workflow
 
   @action chooseSource(token: TokenBalance<BridgeableSymbol>) {
     this.selectedToken = token;
-    this.args.workflowSession.update(
+    this.args.workflowSession.setValue(
       'depositSourceToken',
       this.selectedToken.symbol
     );
@@ -94,7 +96,7 @@ class CardPayDepositWorkflowTransactionSetupComponent extends Component<Workflow
       return;
     }
     if (this.selectedToken) {
-      this.args.workflowSession.update(
+      this.args.workflowSession.setValue(
         'depositSourceToken',
         this.selectedToken.symbol
       );

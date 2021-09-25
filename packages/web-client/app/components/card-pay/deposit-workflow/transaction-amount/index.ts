@@ -21,24 +21,29 @@ import {
 import { bool, reads } from 'macro-decorators';
 import { task, TaskGenerator } from 'ember-concurrency';
 import { next } from '@ember/runloop';
+import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 
 class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  @reads('args.workflowSession.state')
-  sessionState: any;
-  @reads('sessionState.depositSourceToken')
-  declare currentTokenSymbol: BridgeableSymbol;
-  @reads('sessionState.unlockTxnHash')
-  unlockTxnHash: string | undefined;
-  @reads('sessionState.unlockTxnReceipt')
-  declare unlockTxnReceipt: TransactionReceipt | undefined;
+  get currentTokenSymbol(): BridgeableSymbol {
+    return this.args.workflowSession.getValue('depositSourceToken')!;
+  }
+  get unlockTxnHash(): TransactionHash | null {
+    return this.args.workflowSession.getValue('unlockTxnHash')!;
+  }
+  get unlockTxnReceipt(): TransactionReceipt | null {
+    return this.args.workflowSession.getValue('unlockTxnReceipt')!;
+  }
   @bool('unlockTxnReceipt') declare isUnlocked: boolean;
   @reads('unlockTask.isRunning') declare isUnlocking: boolean;
-  @reads('sessionState.relayTokensTxnHash')
-  declare relayTokensTxnHash: string | undefined;
-  @reads('sessionState.relayTokensTxnReceipt')
-  declare relayTokensTxnReceipt: TransactionReceipt | undefined;
+
+  get relayTokensTxnHash(): TransactionHash | null {
+    return this.args.workflowSession.getValue('relayTokensTxnHash')!;
+  }
+  get relayTokensTxnReceipt(): TransactionReceipt | null {
+    return this.args.workflowSession.getValue('relayTokensTxnReceipt')!;
+  }
   @bool('relayTokensTxnReceipt') declare hasDeposited: boolean;
   @reads('depositTask.isRunning') declare isDepositing: boolean;
   @tracked amount = '';
@@ -47,7 +52,8 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    let { depositedAmount } = this.args.workflowSession.state;
+    let depositedAmount =
+      this.args.workflowSession.getValue<BN>('depositedAmount');
 
     next(this, () => {
       if (depositedAmount) {
@@ -116,11 +122,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   }
 
   get unlockTxnViewerUrl() {
-    return this.layer1Network.blockExplorerUrl(this.unlockTxnHash);
+    return this.layer1Network.blockExplorerUrl(this.unlockTxnHash!);
   }
 
   get depositTxnViewerUrl() {
-    return this.layer1Network.blockExplorerUrl(this.relayTokensTxnHash);
+    return this.layer1Network.blockExplorerUrl(this.relayTokensTxnHash!);
   }
 
   get isUnlockingOrUnlocked() {
@@ -140,9 +146,9 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
 
     this.validate();
 
-    this.args.workflowSession.update(
+    this.args.workflowSession.setValue(
       'depositedAmount',
-      this.amountAsBigNumber.toString()
+      this.amountAsBigNumber
     );
   }
 
@@ -174,11 +180,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
           this.amountAsBigNumber,
           this.currentTokenSymbol,
           (txnHash) => {
-            session.update('unlockTxnHash', txnHash);
+            session.setValue('unlockTxnHash', txnHash);
           }
         );
       }
-      session.update('unlockTxnReceipt', transactionReceipt);
+      session.setValue('unlockTxnReceipt', transactionReceipt);
     } catch (e) {
       console.error(e);
       this.errorMessage =
@@ -199,9 +205,9 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
         let layer2Address = this.layer2Network.walletInfo.firstAddress!;
         let layer2BlockHeightBeforeBridging =
           yield this.layer2Network.getBlockHeight();
-        session.update(
+        session.setValue(
           'layer2BlockHeightBeforeBridging',
-          layer2BlockHeightBeforeBridging.toString()
+          layer2BlockHeightBeforeBridging
         );
         transactionReceipt = yield taskFor(
           this.layer1Network.relayTokensTask
@@ -210,12 +216,12 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
           layer2Address,
           this.amountAsBigNumber,
           (txnHash) => {
-            session.update('relayTokensTxnHash', txnHash);
+            session.setValue('relayTokensTxnHash', txnHash);
           }
         );
       }
-      session.update('relayTokensTxnReceipt', transactionReceipt);
-      session.update('depositedAmount', this.amountAsBigNumber.toString());
+      session.setValue('relayTokensTxnReceipt', transactionReceipt);
+      session.setValue('depositedAmount', this.amountAsBigNumber);
       this.args.onComplete?.();
     } catch (e) {
       console.error(e);

@@ -30,13 +30,16 @@ export default class LayoutCustomizationCard extends Component<WorkflowCardCompo
       .then(() => {
         this.colorScheme = this.colorSchemeOptions[0];
         this.pattern = this.patternOptions[0];
-
-        let { colorScheme, pattern, issuerName } =
-          this.args.workflowSession.state;
+        let { workflowSession } = this.args;
+        let colorScheme =
+          workflowSession.getValue<ColorCustomizationOption>('colorScheme');
+        let pattern =
+          workflowSession.getValue<PatternCustomizationOption>('pattern');
+        let issuerName = workflowSession.getValue<string>('issuerName');
         if (colorScheme && pattern) {
           this.colorScheme = colorScheme;
           this.pattern = pattern;
-          this.issuerName = issuerName;
+          this.issuerName = issuerName!;
         }
       });
   }
@@ -81,7 +84,7 @@ export default class LayoutCustomizationCard extends Component<WorkflowCardCompo
 
   @action save() {
     if (this.issuerName && this.colorScheme && this.pattern) {
-      this.args.workflowSession.updateMany({
+      this.args.workflowSession.setValue({
         issuerName: this.issuerName,
         pattern: this.pattern,
         colorScheme: this.colorScheme,
@@ -91,10 +94,10 @@ export default class LayoutCustomizationCard extends Component<WorkflowCardCompo
   }
 
   @action edit() {
-    this.args.workflowSession.updateMany({
+    this.args.workflowSession.setValue({
       issuerName: '',
-      pattern: '',
-      colorScheme: '',
+      pattern: null,
+      colorScheme: null,
     });
     this.args.onIncomplete?.();
   }

@@ -48,7 +48,7 @@ module(
       ) as CardCustomization;
 
       let workflowSession = new WorkflowSession();
-      workflowSession.updateMany({
+      workflowSession.setValue({
         spendFaceValue: 100000,
         issuerName: 'Some name',
         colorScheme: {

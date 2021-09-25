@@ -16,6 +16,7 @@ import {
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import { BN } from 'bn.js';
+import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 
 interface Context extends MirageTestContext {}
 
@@ -62,11 +63,11 @@ module('Acceptance | deposit persistence', function (hooks) {
 
   module('Restoring from a previously saved state', function () {
     test('it restores an unfinished workflow', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
         depositSourceToken: 'DAI',
-        depositedAmount: '10000000000000000000',
-      };
+        depositedAmount: new BN('10000000000000000000'),
+      });
       workflowPersistenceService.persistData('abc123', {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
@@ -85,10 +86,10 @@ module('Acceptance | deposit persistence', function (hooks) {
     });
 
     test('it restores a workflow partway through the deposit/unlock 2-step process', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
         depositSourceToken: 'DAI',
-        depositedAmount: '1000000000000000000',
+        depositedAmount: new BN('10000000000000000000'),
         unlockTxnHash: '0xABC',
         unlockTxnReceipt: {
           status: true,
@@ -106,7 +107,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           events: {},
         },
         relayTokensTxnHash: '0xDEF',
-      };
+      });
       workflowPersistenceService.persistData('abc123', {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
@@ -135,7 +136,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     });
 
     test('it restores a workflow partway through the layer 2 bridging', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: [
           'LAYER1_CONNECT',
           'LAYER2_CONNECT',
@@ -143,7 +144,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           'TXN_AMOUNT',
         ],
         depositSourceToken: 'DAI',
-        depositedAmount: '1000000000000000000',
+        depositedAmount: new BN('10000000000000000000'),
         unlockTxnHash: '0xABC',
         unlockTxnReceipt: {
           status: true,
@@ -177,7 +178,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           events: {},
         },
         layer2BlockHeightBeforeBridging: '1234',
-      };
+      });
       workflowPersistenceService.persistData('abc123', {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
@@ -214,7 +215,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     });
 
     test('it restores a finished workflow', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: [
           'LAYER1_CONNECT',
           'LAYER2_CONNECT',
@@ -223,7 +224,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           'TXN_STATUS',
         ],
         depositSourceToken: 'DAI',
-        depositedAmount: '1000000000000000000',
+        depositedAmount: new BN('10000000000000000000'),
         unlockTxnHash: '0xABC',
         unlockTxnReceipt: {
           status: true,
@@ -272,7 +273,7 @@ module('Acceptance | deposit persistence', function (hooks) {
           logsBloom: '',
           events: {},
         },
-      };
+      });
       workflowPersistenceService.persistData('abc123', {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
@@ -296,13 +297,13 @@ module('Acceptance | deposit persistence', function (hooks) {
     });
 
     test('it restores a cancelled workflow', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         isCancelled: true,
         cancelationReason: 'DISCONNECTED',
         completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
         depositSourceToken: 'DAI',
-        depositedAmount: '10000000000000000000',
-      };
+        depositedAmount: new BN('10000000000000000000'),
+      });
       workflowPersistenceService.persistData('abc123', {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
@@ -326,11 +327,11 @@ module('Acceptance | deposit persistence', function (hooks) {
     });
 
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
         depositSourceToken: 'DAI',
-        depositedAmount: '10000000000000000000',
-      };
+        depositedAmount: new BN('10000000000000000000'),
+      });
       workflowPersistenceService.persistData('abc123', {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
@@ -354,7 +355,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     });
 
     test('it cancels a persisted flow when Layer 1 wallet address is different', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: [
           'LAYER1_CONNECT',
           'LAYER2_CONNECT',
@@ -362,9 +363,9 @@ module('Acceptance | deposit persistence', function (hooks) {
           'TXN_AMOUNT',
         ],
         depositSourceToken: 'DAI',
-        depositedAmount: '1000000000000000000',
+        depositedAmount: new BN('10000000000000000000'),
         layer1WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer1WalletAddress set in beforeEach
-      };
+      });
       workflowPersistenceService.persistData('abc123', {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
@@ -381,7 +382,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     });
 
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: [
           'LAYER1_CONNECT',
           'LAYER2_CONNECT',
@@ -389,9 +390,9 @@ module('Acceptance | deposit persistence', function (hooks) {
           'TXN_AMOUNT',
         ],
         depositSourceToken: 'DAI',
-        depositedAmount: '1000000000000000000',
+        depositedAmount: new BN('10000000000000000000'),
         layer2WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer2WalletAddress set in beforeEach
-      };
+      });
       workflowPersistenceService.persistData('abc123', {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
@@ -408,11 +409,11 @@ module('Acceptance | deposit persistence', function (hooks) {
     });
 
     test('it allows interactivity after restoring previously saved state', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
         depositSourceToken: 'DAI',
-        depositedAmount: '10000000000000000000',
-      };
+        depositedAmount: new BN('10000000000000000000'),
+      });
       workflowPersistenceService.persistData('abc123', {
         name: 'RESERVE_POOL_DEPOSIT',
         state,

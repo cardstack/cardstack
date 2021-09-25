@@ -39,11 +39,12 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   // assumption is these are always set by cards before it. They should be defined by the time
   // it gets to this part of the workflow
   get currentSafe(): Safe {
-    return this.args.workflowSession.state.withdrawalSafe;
+    return this.args.workflowSession.state.withdrawalSafe as Safe;
   }
 
   get currentTokenSymbol(): BridgedTokenSymbol {
-    return this.args.workflowSession.state.withdrawalToken;
+    return this.args.workflowSession.state
+      .withdrawalToken as BridgedTokenSymbol;
   }
 
   get currentTokenSymbolWithdrawalLimits() {
@@ -131,7 +132,6 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
     } else {
       Sentry.captureException('Unable to validate withdrawal limits');
     }
-
     this.validationMessage = validateTokenInput(this.amount, validationOptions);
   }
 
@@ -156,7 +156,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       let layer1Address = this.layer1Network.walletInfo.firstAddress;
       this.isConfirmed = true;
       let { currentTokenSymbol } = this;
-      let withdrawnAmount = this.amountAsBigNumber.toString();
+      let withdrawnAmount = this.amountAsBigNumber;
 
       assertBridgedTokenSymbol(currentTokenSymbol);
 
@@ -164,13 +164,13 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
         this.currentSafe.address,
         layer1Address!,
         getUnbridgedSymbol(currentTokenSymbol),
-        withdrawnAmount
+        withdrawnAmount.toString()
       );
       let layer2BlockHeight = yield this.layer2Network.getBlockHeight();
 
       this.txnHash = transactionHash;
 
-      this.args.workflowSession.updateMany({
+      this.args.workflowSession.setValue({
         withdrawnAmount,
         layer2BlockHeightBeforeBridging: layer2BlockHeight,
         relayTokensTxnHash: transactionHash,

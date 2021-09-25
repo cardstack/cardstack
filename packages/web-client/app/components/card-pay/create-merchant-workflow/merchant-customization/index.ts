@@ -27,18 +27,19 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-
-    let { merchantName, merchantId, merchantBgColor } =
-      this.args.workflowSession.state;
+    let { workflowSession } = this.args;
+    let merchantName = workflowSession.getValue<string>('merchantName');
+    let merchantId = workflowSession.getValue<string>('merchantId');
+    let merchantBgColor = workflowSession.getValue<string>('merchantBgColor');
 
     if (
       isPresent(merchantName) &&
       isPresent(merchantId) &&
       isPresent(merchantBgColor)
     ) {
-      this.merchantName = merchantName;
-      this.merchantBgColor = merchantBgColor;
-      this.merchantId = merchantId;
+      this.merchantName = merchantName!;
+      this.merchantBgColor = merchantBgColor!;
+      this.merchantId = merchantId!;
       this.validateMerchantId(); // this is necessary for enabling the CTA
     }
   }
@@ -111,24 +112,26 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
       merchantBgColor: this.merchantBgColor,
       merchantTextColor: this.merchantTextColor,
     };
-
+    let { workflowSession } = this.args;
     let merchantInfoHasBeenPersisted =
-      this.args.workflowSession.state.merchantInfo;
+      !!workflowSession.getValue('merchantInfo');
 
     if (merchantInfoHasBeenPersisted) {
-      let state = this.args.workflowSession.state;
       let detailsHaveChangedSincePersistence =
-        state.merchantName !== valuesToStore.merchantName ||
-        state.merchantId !== valuesToStore.merchantId ||
-        state.merchantBgColor !== valuesToStore.merchantBgColor ||
-        state.merchantTextColor !== valuesToStore.merchantTextColor;
+        workflowSession.getValue('merchantName') !==
+          valuesToStore.merchantName ||
+        workflowSession.getValue('merchantId') !== valuesToStore.merchantId ||
+        workflowSession.getValue('merchantBgColor') !==
+          valuesToStore.merchantBgColor ||
+        workflowSession.getValue('merchantTextColor') !==
+          valuesToStore.merchantTextColor;
 
       if (detailsHaveChangedSincePersistence) {
-        this.args.workflowSession.delete('merchantInfo');
+        workflowSession.delete('merchantInfo');
       }
     }
 
-    this.args.workflowSession.updateMany(valuesToStore);
+    this.args.workflowSession.setValue(valuesToStore);
     this.args.onComplete?.();
   }
 

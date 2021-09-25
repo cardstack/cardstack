@@ -18,7 +18,7 @@ module(
 
     hooks.beforeEach(async function () {
       let workflowSession = new WorkflowSession();
-      workflowSession.updateMany({
+      workflowSession.setValue({
         layer2BlockHeightBeforeBridging: 1234,
         relayTokensTxnHash: 'relay',
         withdrawalToken: 'CARD.CPXD',

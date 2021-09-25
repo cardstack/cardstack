@@ -81,7 +81,7 @@ module(
       ]);
 
       let workflowSession = new WorkflowSession();
-      workflowSession.updateMany({
+      workflowSession.setValue({
         merchantName: 'Mandello',
         merchantId: 'mandello1',
         merchantBgColor: '#ff5050',

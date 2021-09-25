@@ -2,7 +2,6 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import BN from 'bn.js';
 import { tracked } from '@glimmer/tracking';
-import { reads } from 'macro-decorators';
 import * as Sentry from '@sentry/browser';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
@@ -17,15 +16,20 @@ import { TaskGenerator } from 'ember-concurrency';
 class CardPayDepositWorkflowTransactionStatusComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  @reads('args.workflowSession.state.depositSourceToken')
-  declare selectedTokenSymbol: TokenSymbol;
-  @reads('args.workflowSession.state.relayTokensTxnReceipt')
-  declare relayTokensTxnReceipt: TransactionReceipt;
-  @reads('args.workflowSession.state.completedLayer2TxnReceipt')
-  declare completedLayer2TxnReceipt: TransactionReceipt | undefined;
+  get selectedTokenSymbol(): TokenSymbol {
+    return this.args.workflowSession.getValue('depositSourceToken')!;
+  }
+  get relayTokensTxnReceipt(): TransactionReceipt {
+    return this.args.workflowSession.getValue('relayTokensTxnReceipt')!;
+  }
+  get completedLayer2TxnReceipt(): TransactionReceipt | null {
+    return this.args.workflowSession.getValue('completedLayer2TxnReceipt');
+  }
+
   get layer2BlockHeightBeforeBridging(): BN {
-    let s = this.args.workflowSession.state.layer2BlockHeightBeforeBridging;
-    return new BN(s);
+    return this.args.workflowSession.getValue(
+      'layer2BlockHeightBeforeBridging'
+    )!;
   }
   @tracked completedStepCount = 1;
   @tracked bridgeError = false;
@@ -94,7 +98,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
         this.layer2BlockHeightBeforeBridging
       );
       this.layer2Network.refreshSafesAndBalances();
-      this.args.workflowSession.update(
+      this.args.workflowSession.setValue(
         'completedLayer2TxnReceipt',
         transactionReceipt
       );

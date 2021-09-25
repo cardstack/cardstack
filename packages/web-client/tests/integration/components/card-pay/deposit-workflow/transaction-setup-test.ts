@@ -103,7 +103,7 @@ module(
         card: new BN('10000000000000000000000'),
       });
 
-      session.update('depositSourceToken', 'DAI');
+      session.setValue('depositSourceToken', 'DAI');
 
       this.setProperties({
         session,
