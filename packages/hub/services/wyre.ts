@@ -1,6 +1,8 @@
 import config from 'config';
 import fetch from 'node-fetch';
 
+const env = config.get('hubEnvironment') as string;
+
 interface WyreConfig {
   accountId: string;
   apiKey: string;
@@ -52,7 +54,7 @@ export default class WyreService {
         Authorization: `Bearer ${secretKey}`, // eslint-disable-line @typescript-eslint/naming-convention
       },
       body: JSON.stringify({
-        name: address.toLowerCase(),
+        name: `${env}_${address.toLowerCase()}`,
         callbackUrl,
       }),
     });
@@ -62,7 +64,7 @@ export default class WyreService {
 
   async getWalletByUserAddress(address: string): Promise<WyreWallet | undefined> {
     let { url } = this.config;
-    return this.getWallet(new URL(`${url}/v2/wallet?name=${address.toLowerCase()}`));
+    return this.getWallet(new URL(`${url}/v2/wallet?name=${env}_${address.toLowerCase()}`));
   }
 
   async getWalletById(walletId: string): Promise<WyreWallet | undefined> {

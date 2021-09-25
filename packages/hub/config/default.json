@@ -1,4 +1,5 @@
 {
+  "hubEnvironment": "development",
   "aws": {
     "config": {
       "credentials": {
