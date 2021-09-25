@@ -381,7 +381,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     assert.equal(subject.getValue<BN>('myKey'), null);
   });
 
-  test('set BiugNumber value', function (assert) {
+  test('set BigNumber value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
       name: 'EXAMPLE',
