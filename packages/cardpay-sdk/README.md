@@ -53,10 +53,11 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`RevenuePool.claim`](#revenuepoolclaim)
 - [`RewardPool`](#rewardpool)
   - [`RewardPool.rewardTokenBalance`](#rewardpoolrewardtokenbalance)
-  - [`RewardPool.claim` (TBD)](#rewardpoolclaim-tbd)
-- [`RewardManager`](#rewardpool)
-  - [`RewardManager.registerRewardProgram`](#rewardmanagerregisterrewardprogram)
-  - [`RewardManager.registerRewardee` (TBD)](#rewardmanagerregisterrewardee)
+- [`RewardPool.addRewardTokens`](#rewardpooladdrewardtokens)
+  - [`RewardPool.claim`](#rewardpoolclaim)
+- [`RewardManager`](#rewardmanager)
+- [`RewardManager.registerRewardProgram`](#rewardmanagerregisterrewardprogram)
+- [`RewardManager.registerRewardee`](#rewardmanagerregisterrewardee)
 - [`LayerOneOracle`](#layeroneoracle)
   - [`LayerOneOracle.ethToUsd`](#layeroneoracleethtousd)
   - [LayerOneOracle.getEthToUsdConverter](#layeroneoraclegetethtousdconverter)
@@ -443,7 +444,7 @@ let canSplit = await prepaidCard.canSplit(prepaidCardAddress);
 ```
 
 ### `PrepaidCard.split`
-This call will use a prepaid card as the source of funds when creating more prepaid cards, in effect "splitting" the prepaid card being used to fund the transaction. (Note that use a prepaid card is used to fund the creation of more prepaid cards, the funding prepaid card may not be transferred and is considered the issuer's own personal prepaid card.) The creation mechanisms for prepaid cards created via a `PrepaidCard.split` are identical to `PrepaidCard.create` in terms of the total cost and gas charges.
+This call will use a prepaid card as the source of funds when creating more prepaid cards, in effect "splitting" the prepaid card being used to fund the transaction. Prepaid cards created from the split command are automatically placed in the PrepaidCardInventory. (Note that the prepaid card that is used to fund the creation of more prepaid cards may not be transferred and is considered the issuer's own personal prepaid card.) The creation mechanisms for prepaid cards created via a `PrepaidCard.split` are identical to `PrepaidCard.create` in terms of the total cost and gas charges.
 
 This method is invoked with the following parameters:
 - The address of the prepaid card that you are using to fund the creation of more prepaid cards
@@ -467,7 +468,8 @@ This method returns a promise for an object shaped like:
 ```ts
 {
   prepaidCards: PrepaidCardSafe[]; // from Safes.view
-  txnReceipt: TransactionReceipt;
+  txReceipt: TransactionReceipt;
+  sku: string; // inventory SKU of the created prepaid cards
 }
 ```
 
@@ -712,43 +714,43 @@ let balanceForSingleToken = await rewardPool.rewardTokenBalance(address, tokenAd
 let balanceForAllTokens = await rewardPool.rewardTokenBalances(address)
 ```
 
-## `RewardPool.addRewardTokens` 
+## `RewardPool.addRewardTokens`
 
-The `AddRewardTokens` API is used to refill the reward pool for a particular reward program with any single owner safe. Currently, we are using single-owner safe like depot safe or merchant safe to send funds, but, in the future we will use prepaid cards to pay. If a reward program doesn't have any funds inside of the pool rewardees will be unable to claim. Anyone can call this api not only the rewardProgramAdmin. 
+The `AddRewardTokens` API is used to refill the reward pool for a particular reward program with any single owner safe. Currently, we are using single-owner safe like depot safe or merchant safe to send funds, but, in the future we will use prepaid cards to pay. If a reward program doesn't have any funds inside of the pool rewardees will be unable to claim. Anyone can call this api not only the rewardProgramAdmin.
 
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
-await rewardPool.addRewardTokens(safe, rewardProgramId, tokenAddress, amount) 
+await rewardPool.addRewardTokens(safe, rewardProgramId, tokenAddress, amount)
 ```
 
-### `RewardPool.claim` 
+### `RewardPool.claim`
 
-The `Claim` API is used by the rewardee to claim rewards for a reward program id. 
+The `Claim` API is used by the rewardee to claim rewards for a reward program id.
 
 Pre-requisite for this action:
-- reward program has to be registered 
+- reward program has to be registered
 - rewardee has to register and create safe for that particular reward program
 - rewardee must get an existing proof from tally api  -- look at `rewardPool.getProofs`
-- reward pool has to be filled with reward token for that reward program 
+- reward pool has to be filled with reward token for that reward program
 
 This claim action is similar to `RevenuePool.claim` in that a pre-flight check is used to check that the rewards claimed will be able to cover that gas for the transaction.
 
 ```js
 let rewardPool = await getSDK('RewardPool', web3);
-await rewardPool.claim(safe, rewardProgramId, tokenAddress, proof,amount) 
+await rewardPool.claim(safe, rewardProgramId, tokenAddress, proof,amount)
 ```
 
 ## `RewardManager`
 
-The `RewardManager` API is used to interact to manage reward program. Those intending to offer or receive rewards have to register using this sdk. 
+The `RewardManager` API is used to interact to manage reward program. Those intending to offer or receive rewards have to register using this sdk.
 
 ## `RewardManager.registerRewardProgram`
 
-The `RegisterRewardProgram` API is used to register a reward program using a prepaid card. The call can specify an EOA admin account -- it defaults to the owner of the prepaid card itself. The reward program admin will then be able to manage the reward program using other api functions like`lockRewardProgram`, `addRewardRule`, etc. A fee of 500 spend is charged when registering a reward program. Currently, tally only gives rewards to a single reward program (sokol: "0x4767D0D74356433d54880Fcd7f083751d64388aF"). 
+The `RegisterRewardProgram` API is used to register a reward program using a prepaid card. The call can specify an EOA admin account -- it defaults to the owner of the prepaid card itself. The reward program admin will then be able to manage the reward program using other api functions like`lockRewardProgram`, `addRewardRule`, etc. A fee of 500 spend is charged when registering a reward program. Currently, tally only gives rewards to a single reward program (sokol: "0x4767D0D74356433d54880Fcd7f083751d64388aF").
 
 ```js
 let prepaidCardAPI = await getSDK('PrepaidCard', web3);
-await prepaidCardAPI.registerRewardProgram(prepaidCard, admin) 
+await prepaidCardAPI.registerRewardProgram(prepaidCard, admin)
 ```
 
 ## `RewardManager.registerRewardee`
@@ -757,7 +759,7 @@ The `RegistereRewardee` API is used to register a rewardee for a reward program 
 
 ```js
 let prepaidCardAPI = await getSDK('PrepaidCard', web3);
-await prepaidCardAPI.registerRewardee(prepaidCard , rewardProgramId) 
+await prepaidCardAPI.registerRewardee(prepaidCard , rewardProgramId)
 ```
 
 ## `LayerOneOracle`

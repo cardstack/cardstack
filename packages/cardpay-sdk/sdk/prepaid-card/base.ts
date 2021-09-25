@@ -26,6 +26,7 @@ import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from
 import { Signature, signSafeTxAsBytes, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
 import { PrepaidCardSafe } from '../safes';
 import { TransactionReceipt } from 'web3-core';
+import { itemSetEventABI } from '../prepaid-card-market/base';
 
 const { fromWei } = Web3.utils;
 const POLL_INTERVAL = 500;
@@ -245,7 +246,9 @@ export default class PrepaidCard {
     return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
-  async split(txnHash: string): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }>;
+  async split(
+    txnHash: string
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; sku: string; txReceipt: TransactionReceipt }>;
   async split(
     prepaidCardAddress: string,
     faceValues: number[],
@@ -253,7 +256,7 @@ export default class PrepaidCard {
     customizationDID: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }>;
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; sku: string; txReceipt: TransactionReceipt }>;
   async split(
     prepaidCardAddressOrTxnHash: string,
     faceValues?: number[],
@@ -261,12 +264,14 @@ export default class PrepaidCard {
     customizationDID?: string | undefined,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
-  ): Promise<{ prepaidCards: PrepaidCardSafe[]; txReceipt: TransactionReceipt }> {
+  ): Promise<{ prepaidCards: PrepaidCardSafe[]; sku: string; txReceipt: TransactionReceipt }> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
+      let txReceipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
       return {
+        txReceipt,
         prepaidCards: await this.resolvePrepaidCards(await this.getPrepaidCardsFromTxn(txnHash)),
-        txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+        sku: await this.getSkuFromTxnReceipt(txReceipt),
       };
     }
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
@@ -353,10 +358,12 @@ export default class PrepaidCard {
     }
 
     let prepaidCardAddresses = await this.getPrepaidCardsFromTxn(gnosisResult.ethereumTx.txHash);
+    let txReceipt = await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash);
 
     return {
+      txReceipt,
       prepaidCards: await this.resolvePrepaidCards(prepaidCardAddresses),
-      txReceipt: await waitUntilTransactionMined(this.layer2Web3, gnosisResult.ethereumTx.txHash),
+      sku: await this.getSkuFromTxnReceipt(txReceipt),
     };
   }
 
@@ -732,6 +739,14 @@ export default class PrepaidCard {
     return getParamsFromEvent(this.layer2Web3, txnReceipt, this.createPrepaidCardEventABI(), prepaidCardMgrAddress).map(
       (createCardLog) => createCardLog.card
     );
+  }
+
+  private async getSkuFromTxnReceipt(txnReceipt: TransactionReceipt): Promise<string> {
+    // this assumes the default prepaid card market address, once we have
+    // multiple prepaid card markets we should refactor this
+    let marketAddress = await getAddress('prepaidCardMarket', this.layer2Web3);
+    let [event] = getParamsFromEvent(this.layer2Web3, txnReceipt, itemSetEventABI(this.layer2Web3), marketAddress);
+    return event.sku;
   }
 
   private async getRewardSafeFromTxn(txnHash: string): Promise<any> {
