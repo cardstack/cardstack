@@ -7,12 +7,14 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { MerchantSafe, PrepaidCardSafe } from '@cardstack/cardpay-sdk';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
+import { setupHubAuthenticationToken } from '../helpers/setup';
 
 interface Context extends MirageTestContext {}
 
 module('Acceptance | create merchant persistence', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
+  setupHubAuthenticationToken(hooks);
   let workflowPersistenceService: WorkflowPersistence;
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
   const prepaidCardAddress = '0x81c89274Dc7C9BAcE082d2ca00697d2d2857D2eE';
@@ -49,7 +51,6 @@ module('Acceptance | create merchant persistence', function (hooks) {
   };
 
   hooks.beforeEach(async function () {
-    window.TEST__AUTH_TOKEN = 'abc123--def456--ghi789';
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -108,10 +109,6 @@ module('Acceptance | create merchant persistence', function (hooks) {
     );
 
     workflowPersistenceService.storage.clear();
-  });
-
-  hooks.afterEach(async function () {
-    delete window.TEST__AUTH_TOKEN;
   });
 
   test('Generates a flow uuid query parameter used as a persistence identifier', async function (this: Context, assert) {

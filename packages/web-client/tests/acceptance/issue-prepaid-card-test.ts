@@ -23,6 +23,7 @@ import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issu
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
+import { setupHubAuthenticationToken } from '../helpers/setup';
 
 interface Context extends MirageTestContext {}
 
@@ -570,9 +571,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
   module('Tests with the layer 2 wallet already connected', function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    setupHubAuthenticationToken(hooks);
 
     hooks.beforeEach(async function () {
-      window.TEST__AUTH_TOKEN = 'abc123--def456--ghi789';
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -598,10 +599,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
         ],
       };
       await layer2Service.test__simulateDepot(testDepot as DepotSafe);
-    });
-
-    hooks.afterEach(async function () {
-      delete window.TEST__AUTH_TOKEN;
     });
 
     test('Disconnecting Layer 2 from within the workflow', async function (assert) {

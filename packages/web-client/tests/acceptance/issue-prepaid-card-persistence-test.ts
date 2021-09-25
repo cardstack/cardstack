@@ -15,12 +15,14 @@ import { toWei } from 'web3-utils';
 
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
+import { setupHubAuthenticationToken } from '../helpers/setup';
 
 interface Context extends MirageTestContext {}
 
 module('Acceptance | issue prepaid card persistence', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
+  setupHubAuthenticationToken(hooks);
   let workflowPersistenceService: WorkflowPersistence;
 
   hooks.beforeEach(async function (this: Context) {
@@ -28,7 +30,6 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       prepaidCardColorSchemes,
       prepaidCardPatterns,
     });
-    window.TEST__AUTH_TOKEN = 'abc123--def456--ghi789';
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     const MIN_AMOUNT_TO_PASS = new BN(
       toWei(`${Math.ceil(Math.min(...faceValueOptions) / 100)}`)
@@ -62,10 +63,6 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     );
 
     workflowPersistenceService.storage.clear();
-  });
-
-  hooks.afterEach(async function () {
-    delete window.TEST__AUTH_TOKEN;
   });
 
   test('Generates a flow uuid query parameter used as a persistence identifier', async function (this: Context, assert) {
