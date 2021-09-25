@@ -100,7 +100,7 @@ export function makePrepaidCardPayment(
     prepaidCardEntity.save();
   } else {
     log.warning(
-      'Cannot process merchant payment txn {}: PrepaidCard entity does not exist for prepaid card {}. This is likely due to the subgraph having a startBlock that is higher than the block the prepaid card was created in.',
+      'Cannot process payment txn {}: PrepaidCard entity does not exist for prepaid card {}. This is likely due to the subgraph having a startBlock that is higher than the block the prepaid card was created in.',
       [txnHash, prepaidCard]
     );
     return;
