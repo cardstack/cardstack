@@ -1,4 +1,5 @@
 import Koa from 'koa';
+import config from 'config';
 import autoBind from 'auto-bind';
 import Logger from '@cardstack/logger';
 import DatabaseManager from '../services/database-manager';
@@ -9,6 +10,7 @@ import { nextOrderStatus, OrderStatus, OrderState, provisionPrepaidCard, updateO
 
 const { toChecksumAddress } = Web3.utils;
 let log = Logger('route:wyre-callback');
+const env = config.get('hubEnvironment') as string;
 
 interface WyreCallbackRequest {
   id: string;
@@ -32,7 +34,7 @@ interface ValidatedWalletSendRequest {
   transfer: WyreTransfer;
 }
 
-export const adminWalletName = 'admin';
+export const adminWalletName = `${env}_admin`;
 
 export default class WyreCallbackRoute {
   adminWalletId: string | undefined;
@@ -336,9 +338,9 @@ export default class WyreCallbackRoute {
     }
     if (!this.adminWalletId) {
       log.error(
-        'Error: Wyre admin wallet has not been created! Please create a wyre admin wallet with the name "admin" that has no callback URL.'
+        `Error: Wyre admin wallet has not been created! Please create a wyre admin wallet with the name "${adminWalletName}" that has no callback URL.`
       );
-      throw new Error('Wyre admin wallet has not been created');
+      throw new Error(`Wyre admin wallet, ${adminWalletName}, has not been created`);
     }
     return this.adminWalletId;
   }
