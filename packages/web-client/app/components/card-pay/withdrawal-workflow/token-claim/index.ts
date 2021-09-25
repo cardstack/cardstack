@@ -79,7 +79,10 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
 
   @action
   resumeClaimBridgedTokens() {
-    if (this.txnHash && !this.args.workflowSession.state.didClaimTokens) {
+    if (
+      this.txnHash &&
+      !this.args.workflowSession.getValue<boolean>('didClaimTokens')
+    ) {
       this.claim();
     }
   }

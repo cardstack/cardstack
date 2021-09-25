@@ -10,6 +10,7 @@ import { click, currentURL, visit } from '@ember/test-helpers';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import { BN } from 'bn.js';
+import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 
 interface Context extends MirageTestContext {}
 
@@ -56,13 +57,13 @@ module('Acceptance | withdrawal persistence', function (hooks) {
 
   module('Restoring from a previously saved state', function () {
     test('it restores an unfinished workflow', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         withdrawalToken: 'DAI.CPXD',
-        withdrawnAmount: '1000000000000000000',
+        withdrawnAmount: new BN('1000000000000000000'),
         completedMilestonesCount: 5,
-        layer2BlockHeightBeforeBridging: '22867914',
+        layer2BlockHeightBeforeBridging: new BN('22867914'),
         milestonesCount: 6,
-        minimumBalanceForWithdrawalClaim: '290000000000000',
+        minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
         relayTokensTxnHash:
           '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
         bridgeValidationResult: {
@@ -83,9 +84,6 @@ module('Acceptance | withdrawal persistence', function (hooks) {
                 symbol: 'CARD',
                 decimals: 18,
               },
-              decimals: 18,
-              name: 'CARD Token Kovan.CPXD',
-              symbol: 'CARD',
               tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
             },
             {
@@ -95,9 +93,6 @@ module('Acceptance | withdrawal persistence', function (hooks) {
                 symbol: 'DAI',
                 decimals: 18,
               },
-              decimals: 18,
-              name: 'Dai Stablecoin.CPXD',
-              symbol: 'DAI',
               tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
             },
           ],
@@ -110,7 +105,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           'TRANSACTION_AMOUNT',
           'TRANSACTION_STATUS',
         ],
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'WITHDRAWAL',
@@ -138,13 +133,13 @@ module('Acceptance | withdrawal persistence', function (hooks) {
     });
 
     test('it restores a finished workflow', async function (this: Context, assert) {
-      const state = {
+      const state = buildState({
         withdrawalToken: 'DAI.CPXD',
-        withdrawnAmount: '1000000000000000000',
+        withdrawnAmount: new BN('1000000000000000000'),
         completedMilestonesCount: 6,
-        layer2BlockHeightBeforeBridging: '22867914',
+        layer2BlockHeightBeforeBridging: new BN('22867914'),
         milestonesCount: 6,
-        minimumBalanceForWithdrawalClaim: '290000000000000',
+        minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
         relayTokensTxnHash:
           '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
         bridgeValidationResult: {
@@ -165,9 +160,6 @@ module('Acceptance | withdrawal persistence', function (hooks) {
                 symbol: 'CARD',
                 decimals: 18,
               },
-              decimals: 18,
-              name: 'CARD Token Kovan.CPXD',
-              symbol: 'CARD',
               tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
             },
             {
@@ -177,9 +169,6 @@ module('Acceptance | withdrawal persistence', function (hooks) {
                 symbol: 'DAI',
                 decimals: 18,
               },
-              decimals: 18,
-              name: 'Dai Stablecoin.CPXD',
-              symbol: 'DAI',
               tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
             },
           ],
@@ -196,7 +185,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           'EPILOGUE_LAYER_TWO_CONNECT_CARD',
         ],
         didClaimTokens: true,
-      };
+      });
 
       workflowPersistenceService.persistData('abc123', {
         name: 'WITHDRAWAL',

@@ -39,20 +39,21 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
 
-    if (this.args.workflowSession.state.withdrawnAmount) {
-      this.amount = fromWei(this.args.workflowSession.state.withdrawnAmount);
+    let withdrawnAmount =
+      this.args.workflowSession.getValue<BN>('withdrawnAmount');
+    if (withdrawnAmount) {
+      this.amount = fromWei(withdrawnAmount);
     }
   }
 
   // assumption is these are always set by cards before it. They should be defined by the time
   // it gets to this part of the workflow
   get currentSafe(): Safe {
-    return this.args.workflowSession.state.withdrawalSafe as Safe;
+    return this.args.workflowSession.getValue<Safe>('withdrawalSafe')!;
   }
 
   get currentTokenSymbol(): BridgedTokenSymbol {
-    return this.args.workflowSession.state
-      .withdrawalToken as BridgedTokenSymbol;
+    return this.args.workflowSession.getValue('withdrawalToken')!;
   }
 
   get currentTokenSymbolWithdrawalLimits() {
