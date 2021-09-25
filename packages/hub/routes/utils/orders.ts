@@ -105,9 +105,8 @@ export async function nextOrderStatus(
         return { status: 'error-provisioning', state };
       }
       throw unhandledEvent(event, orderId, currentStatus);
-    case 'error-provisioning':
-      throw unhandledEvent(event, orderId, currentStatus);
     case 'complete':
+    case 'error-provisioning':
       throw unhandledEvent(event, orderId, currentStatus);
     default:
       assertNever(currentStatus);
