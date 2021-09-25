@@ -53,6 +53,8 @@ const SOKOL = {
   uniswapV2Factory: '0x6b67f08F08B715B162aa09239488318A660F24BF',
   rewardPool: '0x2D23acfEA32492911E8DF12E697AF0013B8D4E7b',
   rewardManager: '0x9A89A110238201c12568f3a4a02BE5Ae63284497',
+  registerRewardProgramHandler: '0xaF5B2869Be9Eb9c45cc0501F17B145A3229dD2C0',
+  registerRewardeeHandler: '0x0B793A280F2E47997432a9047073F5e634A9A731',
   deprecatedMerchantManager_v0_6_7: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2', // eslint-disable-line @typescript-eslint/naming-convention
   oracles: {
     DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB', // eslint-disable-line @typescript-eslint/naming-convention
