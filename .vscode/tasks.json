@@ -15,7 +15,10 @@
         "panel": "new"
       },
       "group": "build",
-      "isBackground": true
+      "isBackground": true,
+      "runOptions": {
+        "runOn":"folderOpen"
+      }
     }
   ]
 }
