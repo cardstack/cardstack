@@ -189,7 +189,7 @@ export function serializeToState(
       value: value.toISOString(),
       type: 'Date',
     });
-  } else if (value instanceof BN) {
+  } else if (BN.isBN(value)) {
     state[key] = JSON.stringify({
       value: value.toString(),
       type: 'BN',
