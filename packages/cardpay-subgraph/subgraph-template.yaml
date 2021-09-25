@@ -544,6 +544,38 @@ dataSources:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/mappings/token.ts
+  - kind: ethereum/contract
+    name: RewardProgram
+    network: {NETWORK}
+    source:
+      address: "{REGISTER_REWARD_PROGRAM_HANDLER_ADDRESS}"
+      abi: RegisterRewardProgramHandler
+      startBlock: {CARDPAY_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - RewardProgram
+      abis:
+        - name: RegisterRewardProgramHandler
+          file: ./abis/generated/RegisterRewardProgramHandler.json
+        - name: PrepaidCardManager
+          file: ./abis/generated/PrepaidCardManager.json
+        - name: Exchange
+          file: ./abis/generated/Exchange.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: RewardProgramRegistrationFee(address,address,uint256,uint256,address,address)
+          handler: handleRewardProgramRegistrationFee
+      file: ./src/mappings/register-reward-program-handler.ts
 
 
 templates:

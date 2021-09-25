@@ -101,6 +101,7 @@ type PrepaidCardPayment @entity {
   historicPrepaidCardFaceValue: BigInt!
   historicPrepaidCardIssuingTokenBalance: BigInt!
   merchantRegistrationPayments: [MerchantRegistrationPayment]! @derivedFrom(field: "prepaidCardPayment")
+  rewardProgramRegistrationPayments: [RewardProgramRegistrationPayment]! @derivedFrom(field: "prepaidCardPayment")
 }
 
 type PrepaidCardSplit @entity {
@@ -441,3 +442,13 @@ type TokenPair @entity {
   token1: Token!
   swaps: [TokenSwap]!             @derivedFrom(field: "tokenPair")
 }
+
+type RewardProgramRegistrationPayment @entity {
+  id: ID!
+  admin: Account!
+  transaction: Transaction!
+  createdAt: BigInt!
+  prepaidCardPayment: PrepaidCardPayment
+  paidWith: PrepaidCard
+}
+
