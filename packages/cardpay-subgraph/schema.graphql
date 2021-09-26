@@ -461,9 +461,8 @@ type TokenPair @entity {
 type RewardProgramRegistrationPayment @entity {
   id: ID!
   admin: Account!
+  rewardProgramID: String!
   transaction: Transaction!
   createdAt: BigInt!
-  prepaidCardPayment: PrepaidCardPayment
-  paidWith: PrepaidCard
+  prepaidCardPayment: PrepaidCardPayment #remember to add bang here
 }
-

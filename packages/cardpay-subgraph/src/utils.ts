@@ -159,6 +159,11 @@ export function makePrepaidCardPayment(
   }
 }
 
+export function makeAccount(address: string): void {
+  let accountEntity = new Account(address);
+  accountEntity.save();
+}
+
 export function getPrepaidCardFaceValue(prepaidCard: string): BigInt {
   let prepaidCardMgr = PrepaidCardManager.bind(Address.fromString(addresses.get('prepaidCardManager') as string));
   let cardDetails = prepaidCardMgr.cardDetails(Address.fromString(prepaidCard));
