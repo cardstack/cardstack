@@ -460,3 +460,10 @@ type RewardeeRegistrationPayment @entity {
   createdAt: BigInt!
   prepaidCardPayment: PrepaidCardPayment #remember to add bang here
 }
+
+type RewardSafe @entity {
+  id: ID!
+  rewardProgramID: String!
+  rewardee: Account!
+  safe: Safe!
+}
