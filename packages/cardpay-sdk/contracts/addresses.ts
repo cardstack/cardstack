@@ -95,6 +95,9 @@ const XDAI = {
   uniswapV2Router: '0x1C232F01118CB8B424793ae03F870aa7D0ac7f77', // This is the UniswapV2Router02
   uniswapV2Factory: '0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7',
   rewardPool: '0x42628325845B3e01EfdD6ce4b3665453dC6c9A13',
+  // rewardManager: '',
+  // registerRewardProgramHandler: '',
+  // registerRewardeeHandler: '',
   deprecatedMerchantManager_v0_6_7: '0x3C29B2A563F4bB9D625175bE823c528A4Ddd1107', // eslint-disable-line @typescript-eslint/naming-convention
   oracles: {
     DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2', // eslint-disable-line @typescript-eslint/naming-convention
