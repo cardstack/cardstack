@@ -12,6 +12,8 @@ import SplitPrepaidCardHandlerABI from './abi/v0.8.0/split-prepaid-card-handler'
 import SpendABI from './abi/v0.8.0/spend';
 import MerchantManagerABI from './abi/v0.8.0/merchant-manager';
 import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.0/deprecated-merchant-manager-0_6_7';
+import RegisterRewardProgramHandlerABI from './abi/v0.8.0/register-reward-program-handler';
+import RegisterRewardeeHandlerABI from './abi/v0.8.0/register-rewardee-handler';
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
 consumeModule(RegisterMerchantHandlerABI);
@@ -21,6 +23,8 @@ consumeModule(SpendABI);
 consumeModule(MerchantManagerABI);
 // we include this because we are still interested in indexing events from this contract
 consumeModule(DeprecatedMerchantManagerABI_0_6_7);
+consumeModule(RegisterRewardProgramHandlerABI);
+consumeModule(RegisterRewardeeHandlerABI);
 
 const KOVAN = {
   cardToken: '0xd6E34821F508e4247Db359CFceE0cb5e8050972a',
