@@ -2,7 +2,7 @@ import { RewardProgramRegistrationFee } from '../../generated/RegisterRewardProg
 import { log } from '@graphprotocol/graph-ts';
 
 import { RewardProgramRegistrationPayment } from '../../generated/schema';
-import { toChecksumAddress, makePrepaidCardPayment, makeToken, makeTransaction, makeAccount } from '../utils';
+import { toChecksumAddress, makePrepaidCardPayment, makeToken, makeAccount } from '../utils';
 
 export function handleRewardProgramRegistrationFee(event: RewardProgramRegistrationFee): void {
   let txnHash = event.transaction.hash.toHex();
