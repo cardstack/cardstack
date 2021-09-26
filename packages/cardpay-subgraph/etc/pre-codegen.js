@@ -68,7 +68,7 @@ let abis = {
   RewardPool: getAbi(join(sourceAbiDir, 'reward-pool.ts')),
   RewardManager: getAbi(join(sourceAbiDir, 'reward-manager.ts')),
   RegisterRewardProgramHandler: getAbi(join(sourceAbiDir, 'register-reward-program-handler.ts')),
-  RegisterRewardeeHandler: getAbi(join(sourceAbiDir, 'register-rewardee-handler')),
+  RegisterRewardeeHandler: getAbi(join(sourceAbiDir, 'register-rewardee-handler.ts')),
 };
 
 removeSync(abiDir);
