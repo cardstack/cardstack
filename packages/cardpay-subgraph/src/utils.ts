@@ -174,6 +174,11 @@ export function getPrepaidCardFaceValue(prepaidCard: string): BigInt {
   return faceValue;
 }
 
+export function getPrepaidCardOwner(prepaidCard: string): Address {
+  let prepaidCardMgr = PrepaidCardManager.bind(Address.fromString(addresses.get('prepaidCardManager') as string));
+  return prepaidCardMgr.getPrepaidCardOwner(Address.fromString(prepaidCard));
+}
+
 export function toChecksumAddress(address: Address): string {
   let lowerCaseAddress = address.toHex().slice(2);
   let hash = crypto

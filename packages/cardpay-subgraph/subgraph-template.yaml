@@ -545,7 +545,7 @@ dataSources:
           handler: handleTransfer
       file: ./src/mappings/token.ts
   - kind: ethereum/contract
-    name: RewardProgram
+    name: RegisterRewardProgram
     network: {NETWORK}
     source:
       address: "{REGISTER_REWARD_PROGRAM_HANDLER_ADDRESS}"
@@ -556,7 +556,7 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - RewardProgram
+        - RewardProgramRegistrationPayment
       abis:
         - name: RegisterRewardProgramHandler
           file: ./abis/generated/RegisterRewardProgramHandler.json
@@ -576,6 +576,38 @@ dataSources:
         - event: RewardProgramRegistrationFee(address,address,uint256,uint256,address,address)
           handler: handleRewardProgramRegistrationFee
       file: ./src/mappings/register-reward-program-handler.ts
+  - kind: ethereum/contract
+    name: RegisterRewardee
+    network: {NETWORK}
+    source:
+      address: "{REGISTER_REWARDEE_HANDLER_ADDRESS}"
+      abi: RegisterRewardeeHandler
+      startBlock: {CARDPAY_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - RewardeeRegistrationPayment
+      abis:
+        - name: RegisterRewardeeHandler
+          file: ./abis/generated/RegisterRewardeeHandler.json
+        - name: PrepaidCardManager
+          file: ./abis/generated/PrepaidCardManager.json
+        - name: Exchange
+          file: ./abis/generated/Exchange.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: RewardeeRegistrationFee(address,address,uint256,uint256,address)
+          handler: handleRewardeeRegistrationFee
+      file: ./src/mappings/register-rewardee-handler.ts
 
 
 templates:
