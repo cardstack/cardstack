@@ -1,14 +1,22 @@
-<button type='button' {{on 'click' this.visit}}>
-  {{this.workflowName}}
-  <br>
-  {{#if this.isComplete}}
-    Complete
-  {{else}}
-    {{this.currentMilestoneTitle}}
-  {{/if}}
+<button
+  class='workflow-tracker-item__container'
+  type='button'
+  {{on 'click' this.visit}}
+>
+  <heading class='workflow-tracker-item__heading'>
+    {{this.workflowName}}
+  </heading>
+  <span class='workflow-tracker-item__milestone'>
+    {{#if this.isComplete}}
+      Complete
+    {{else}}
+      {{this.currentMilestoneTitle}}
+    {{/if}}
+  </span>
 
   <Boxel::ProgressIcon
-    @size="10" {{!-- FIXME but what is the true size --}}
+    class='workflow-tracker-item__icon'
+    @size="20"
     @isComplete={{this.isComplete}}
     @fractionComplete={{this.fractionComplete}}
   />
