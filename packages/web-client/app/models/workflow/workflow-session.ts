@@ -161,8 +161,14 @@ export default class WorkflowSession {
     value?: SupportedType
   ): void {
     if (typeof hashOrKey === 'string') {
+      if (hashOrKey === 'meta') {
+        throw new Error('Please use setMeta to set meta values');
+      }
       this.setStateProperty(hashOrKey, value!);
     } else {
+      if (hashOrKey.meta) {
+        throw new Error('Please use setMeta to set meta values');
+      }
       for (const key in hashOrKey) {
         this.setStateProperty(key, hashOrKey[key]);
       }

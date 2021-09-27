@@ -605,6 +605,25 @@ module('Unit | WorkflowSession model', function (hooks) {
   //TODO tests for PrepaidCardSafe type
   //TODO tests for TransactionReceipt type
 
+  test('it throws if meta is updated via the setValues method', async function (assert) {
+    let workflowPersistence = new WorkflowPersistence();
+    workflowPersistence.persistData(ID, {
+      name: 'EXAMPLE',
+      state: {},
+    });
+    let subject = new WorkflowSession({
+      workflowPersistence,
+      workflowPersistenceId: ID,
+    });
+    assert.throws(() => {
+      subject.setValue('meta', 'something');
+    }, 'Please use setMeta to set meta values');
+
+    assert.throws(() => {
+      subject.setValue({ meta: 'something-else' });
+    }, 'Please use setMeta to set meta values');
+  });
+
   test('it can update meta properly, preserving earlier properties', async function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
