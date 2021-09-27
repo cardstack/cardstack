@@ -90,7 +90,7 @@ export default class RewardPool {
       (tokenAddress ? `?token_address=${tokenAddress}` : '') +
       (rewardProgramId ? `&reward_program_id=${rewardProgramId}` : '') +
       (offset ? `&offset=${offset}` : '') +
-      (limit ? `&limit=${limit}` : `&limit=${DEFAULT_PAGE_SIZE}`);
+      (limit ? `?limit=${limit}` : `&limit=${DEFAULT_PAGE_SIZE}`);
     let options = {
       method: 'GET',
       headers: {
@@ -137,13 +137,43 @@ export default class RewardPool {
   }
 
   async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<RewardTokenBalance[]> {
-    let rewardTokensAvailable = await this.rewardTokensAvailable(address, rewardProgramId);
-    const ungroupedTokenBalance = await Promise.all(
-      rewardTokensAvailable.map(async (tokenAddress: string) => {
-        return this.rewardTokenBalance(address, tokenAddress, rewardProgramId);
-      })
-    );
-    return ungroupedTokenBalance;
+    let rewardPool = await this.getRewardPool();
+    if (rewardProgramId) {
+      let rewardTokensAvailable = await this.rewardTokensAvailable(address, rewardProgramId);
+      return await Promise.all(
+        rewardTokensAvailable.map(async (tokenAddress: string) => {
+          return this.rewardTokenBalance(address, tokenAddress, rewardProgramId);
+        })
+      );
+    } else {
+      let proofs = await this.getProofs(address);
+      let ungroupedTokenBalanceWithoutSymbol = await Promise.all(
+        proofs.map(async (o: Proof) => {
+          const balance = await rewardPool.methods
+            .balanceForProofWithAddress(o.rewardProgramId, o.tokenAddress, address, o.proof)
+            .call();
+          return {
+            tokenAddress: o.tokenAddress,
+            balance: new BN(balance),
+          };
+        })
+      );
+      const tokenAddresses = [...new Set(ungroupedTokenBalanceWithoutSymbol.map((item) => item.tokenAddress))];
+      let tokenMapping: any = tokenAddresses.reduce(async (obj, tokenAddress) => {
+        const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+        const tokenSymbol = await tokenContract.methods.symbol().call();
+        return {
+          ...obj,
+          [tokenAddress]: tokenSymbol,
+        };
+      }, {});
+      return ungroupedTokenBalanceWithoutSymbol.map((o) => {
+        return {
+          ...o,
+          tokenSymbol: tokenMapping[o.tokenAddress],
+        };
+      });
+    }
   }
 
   async addRewardTokens(txnHash: string): Promise<TransactionReceipt>;

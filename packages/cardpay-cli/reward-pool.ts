@@ -12,16 +12,26 @@ export async function rewardTokenBalances(
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
-  const tokenBalances = await rewardPool.rewardTokenBalances(address, rewardProgramId);
-  displayRewardTokenBalance(address, tokenBalances);
+  if (rewardProgramId) {
+    const tokenBalances = await rewardPool.rewardTokenBalances(address, rewardProgramId);
+    console.log('\n');
+    console.log(`Reward balances for ${address}`);
+    console.log('---------------------------------------------------------------------');
+    console.log(`  Reward program: ${rewardProgramId}`);
+    console.log('---------------------------------------------------------------------');
+    displayRewardTokenBalance(tokenBalances);
+  } else {
+    const tokenBalances = await rewardPool.rewardTokenBalances(address);
+    console.log(tokenBalances)
+    // find reward programs
+  }
 }
 
-function displayRewardTokenBalance(address: string, tokenBalances: RewardTokenBalance[]): void {
-  console.log(`Reward balance for ${address}`);
-  console.log('-------------------------');
+function displayRewardTokenBalance(tokenBalances: RewardTokenBalance[]): void {
   tokenBalances.map((o: any) => {
-    console.log(`${o.tokenSymbol}: ${fromWei(o.balance)}`);
+    console.log(`    ${o.tokenSymbol}: ${fromWei(o.balance)}`);
   });
+  console.log('---------------------------------------------------------------------');
 }
 
 export async function rewardTokensAvailable(network: string, address: string, mnemonic?: string): Promise<void> {
@@ -57,8 +67,8 @@ export async function rewardPoolBalance(
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
   let balance = await rewardPool.balance(rewardProgramId, tokenAddress);
-  let rewardPoolAddress = await rewardPool.address();
-  displayRewardTokenBalance(rewardPoolAddress, [balance]);
+  // let rewardPoolAddress = await rewardPool.address();
+  displayRewardTokenBalance([balance]);
 }
 
 export async function claimRewards(
