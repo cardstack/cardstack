@@ -307,7 +307,6 @@ type TokenSwap @entity {
 type Safe @entity {
   id: ID!                                   # safe address
   createdAt: BigInt!                        # unix time
-  ownershipChangedAt: BigInt!               # unix time
   owners: [SafeOwner]!                      @derivedFrom(field: "safe")
   safeTxns: [SafeTransaction]!              @derivedFrom(field: "safe")
   depot: Depot                              @derivedFrom(field: "safe")
@@ -407,6 +406,7 @@ type SafeOwner @entity {
   owner: Account!
   safe: Safe!
   createdAt: BigInt!
+  ownershipChangedAt: BigInt!
 }
 
 type TokenTransfer @entity {

@@ -19,13 +19,13 @@ export function handleAddedOwner(event: AddedOwner): void {
     );
     return;
   }
-  safe.ownershipChangedAt = event.block.timestamp;
   safe.save();
 
   let safeOwnerEntity = new SafeOwner(safeAddress + '-' + owner);
   safeOwnerEntity.safe = safeAddress;
   safeOwnerEntity.owner = owner;
   safeOwnerEntity.createdAt = safe.createdAt;
+  safeOwnerEntity.ownershipChangedAt = event.block.timestamp;
   safeOwnerEntity.save();
 
   let ownerChangeEntity = new SafeOwnerChange(safeAddress + '-add-' + owner + '-' + txnHash);
@@ -42,17 +42,6 @@ export function handleRemovedOwner(event: RemovedOwner): void {
   let owner = toChecksumAddress(event.params.owner);
   let id = safeAddress + '-' + owner;
   store.remove('SafeOwner', id);
-
-  let safe = Safe.load(safeAddress);
-  if (safe == null) {
-    log.warning(
-      'Cannot process safe txn {}: Safe entity does not exist for safe address {}. This is likely due to the subgraph having a startBlock that is higher than the block the safe was created in.',
-      [txnHash, safeAddress]
-    );
-    return;
-  }
-  safe.ownershipChangedAt = event.block.timestamp;
-  safe.save();
 
   let ownerChangeEntity = new SafeOwnerChange(safeAddress + '-remove-' + owner + '-' + txnHash);
   ownerChangeEntity.transaction = txnHash;

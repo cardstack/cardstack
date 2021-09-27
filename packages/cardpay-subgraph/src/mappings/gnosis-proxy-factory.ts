@@ -9,7 +9,6 @@ export function handleProxyCreation(event: ProxyCreation): void {
   let safeAddress = toChecksumAddress(event.params.proxy);
   let safeEntity = new Safe(safeAddress);
   safeEntity.createdAt = event.block.timestamp;
-  safeEntity.ownershipChangedAt = event.block.timestamp;
 
   let safe = GnosisSafe.bind(event.params.proxy);
   let owners = safe.getOwners();
@@ -24,6 +23,7 @@ export function handleProxyCreation(event: ProxyCreation): void {
     safeOwnerEntity.owner = ownerAddress;
     safeOwnerEntity.safe = safeAddress;
     safeOwnerEntity.createdAt = event.block.timestamp;
+    safeOwnerEntity.ownershipChangedAt = event.block.timestamp;
     safeOwnerEntity.save();
   }
   safeEntity.save();
