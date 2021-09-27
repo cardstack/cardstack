@@ -306,10 +306,10 @@ module('Acceptance | deposit persistence', function (hooks) {
 
     test('it restores a cancelled workflow', async function (this: Context, assert) {
       const state = buildState({
-        isCancelled: true,
-        cancelationReason: 'DISCONNECTED',
         meta: {
           completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
+          isCancelled: true,
+          cancelationReason: 'DISCONNECTED',
         },
         depositSourceToken: 'DAI',
         depositedAmount: new BN('10000000000000000000'),

@@ -15,6 +15,8 @@ interface WorkflowMeta {
   completedCardNames: string[] | undefined;
   completedMilestonesCount: number | undefined;
   milestonesCount: number | undefined;
+  isCancelled: boolean | undefined;
+  cancelationReason: string | undefined;
 }
 
 export interface WorkflowSessionDictionary {

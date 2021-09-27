@@ -202,7 +202,6 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
 
     test('it restores a cancelled workflow', async function (this: Context, assert) {
       let state = buildState({
-        cancelationReason: 'DISCONNECTED',
         colorScheme: {
           patternColor: 'black',
           textColor: 'white',
@@ -219,8 +218,9 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           ],
           milestonesCount: 4,
           completedMilestonesCount: 3,
+          isCancelled: true,
+          cancelationReason: 'DISCONNECTED',
         },
-        isCancelled: true,
         issuerName: 'Peter',
         pattern: {
           patternUrl:

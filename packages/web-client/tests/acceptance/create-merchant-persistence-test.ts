@@ -214,18 +214,18 @@ module('Acceptance | create merchant persistence', function (hooks) {
 
     test('it restores a cancelled workflow', async function (this: Context, assert) {
       const state = buildState({
-        cancelationReason: 'DISCONNECTED',
         meta: {
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
           milestonesCount: 3,
           completedMilestonesCount: 2,
+          isCancelled: true,
+          cancelationReason: 'DISCONNECTED',
         },
         merchantName,
         merchantId,
         merchantBgColor,
         merchantRegistrationFee,
         prepaidCardChoice: prepaidCard,
-        isCancelled: true,
       });
 
       workflowPersistenceService.persistData('abc123', {
