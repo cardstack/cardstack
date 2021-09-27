@@ -12,7 +12,7 @@ import { TransactionReceipt } from 'web3-core';
 import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from '../utils/general-utils';
 const { fromWei } = Web3.utils;
 
-export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
+export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | RewardSafe | ExternalSafe;
 interface BaseSafe {
   address: string;
   createdAt: number;
@@ -29,6 +29,12 @@ export interface MerchantSafe extends BaseSafe {
   merchant: string;
   infoDID?: string;
 }
+
+export interface RewardSafe extends BaseSafe {
+  type: 'reward';
+  rewardProgramId: string;
+}
+
 export interface ExternalSafe extends BaseSafe {
   type: 'external';
 }
@@ -105,7 +111,16 @@ const safeQueryFields = `
       id
     }
   }
+  rewardee {
+    id
+    rewardProgramID
+    rewardee {
+      id
+    }
+}
 `;
+
+// please rename safe field to reward (not rewardee)
 
 const safeQuery = `
   query ($id: ID!) {
@@ -398,6 +413,13 @@ interface GraphQLSafeResult {
       id: string;
     };
   };
+  rewardee: {
+    id: string;
+    rewardProgramId: string;
+    rewardee: {
+      id: string;
+    };
+  };
 }
 
 function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
@@ -467,6 +489,16 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       owners,
     };
     return prepaidCard;
+  } else if (safe.rewardee) {
+    let reward: RewardSafe = {
+      type: 'reward',
+      address: safe.rewardee.id,
+      rewardProgramId: safe.rewardee.rewardProgramId,
+      tokens,
+      createdAt,
+      owners,
+    };
+    return reward;
   } else {
     let externalSafe: ExternalSafe = {
       type: 'external',
