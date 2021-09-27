@@ -90,8 +90,8 @@ module('Acceptance | persistence view and restore', function () {
             completedMilestonesCount: 1,
             milestonesCount: 3,
           },
-        },
-    )});
+        }),
+      });
 
       workflowPersistenceService.persistData(
         'persisted-prepaid-card-issuance',
@@ -201,18 +201,15 @@ module('Acceptance | persistence view and restore', function () {
       );
     });
 
-    test(
-      'opening a workflow only increments the counter by one',
-      async function (assert) {
-        await visit('/card-pay/balances');
-        await click('[data-test-workflow-button="issue-prepaid-card"]');
+    test('opening a workflow only increments the counter by one', async function (assert) {
+      await visit('/card-pay/balances');
+      await click('[data-test-workflow-button="issue-prepaid-card"]');
 
-        await fillIn('[data-test-layout-customization-name-input]', 'JJ');
-        await click('[data-test-boxel-action-chin] [data-test-boxel-button]');
+      await fillIn('[data-test-layout-customization-name-input]', 'JJ');
+      await click('[data-test-boxel-action-chin] [data-test-boxel-button]');
 
-        assert.dom('[data-test-workflow-tracker]').containsText('1');
-      }
-    );
+      assert.dom('[data-test-workflow-tracker]').containsText('1');
+    });
 
     // FIXME add test for storage event coming from another tab
 
