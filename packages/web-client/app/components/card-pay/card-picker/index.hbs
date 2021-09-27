@@ -1,6 +1,6 @@
 <PowerSelect
   class={{cn "card-picker-dropdown" card-picker-dropdown--selected=@selectedCard}}
-  @options={{@cards}}
+  @options={{@options}}
   @selected={{@selectedCard}}
   @selectedItemComponent="card-pay/card-picker/selected-item"
   @placeholder="Select card"
@@ -9,13 +9,15 @@
   @eventType="click"
   @verticalPosition="below"
   data-test-card-picker-dropdown
-as |card|>
+as |option|>
   <CardPay::CardPicker::CardOption
     class={{cn
       "card-picker-dropdown__option"
-      card-picker-dropdown__option--selected=(eq card.address @selectedCard.address)
+      card-picker-dropdown__option--selected=(eq option.card.address @selectedCard.address)
+      card-picker-dropdown__option--disabled=(eq option.disabled true)
     }}
-    @card={{card}}
-    data-test-card-picker-dropdown-option={{card.address}}
+    @card={{option.card}}
+    data-test-card-picker-dropdown-option={{option.card.address}}
+    data-test-card-picker-dropdown-option-disabled={{option.disabled}}
   />
 </PowerSelect>
