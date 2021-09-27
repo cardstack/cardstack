@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
 
 import WorkflowPersistence, {
   WorkflowPersistencePersistedData,
@@ -47,6 +48,12 @@ export default class CardPayHeaderWorkflowTracker extends Component<CardPayHeade
         workflow.workflow.state.meta.completedMilestonesCount ===
         workflow.workflow.state.meta.milestonesCount
     );
+  }
+
+  @action clearCompletedWorkflows() {
+    this.completedWorkflows.forEach(workflowAndId => {
+      this.workflowPersistence.clearWorkflowWithId(workflowAndId.id);
+    });
   }
 }
 
