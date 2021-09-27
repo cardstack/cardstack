@@ -8,7 +8,15 @@
 
 {{#if this.showing}}
   <aside class='workflow-tracker__list'>
-    <heading class='workflow-tracker__heading'>Active workflows</heading>
+    <heading class='workflow-tracker__heading'>
+      Active workflows
+      <span
+        class='workflow-tracker__count'
+        data-test-active-workflow-count
+      >
+        {{this.activeWorkflows.length}}
+      </span>
+    </heading>
     <ul>
       {{#each this.activeWorkflows as |workflow|}}
         <li data-test-active-workflow>
@@ -16,7 +24,15 @@
         </li>
       {{/each}}
     </ul>
-    <heading class='workflow-tracker__heading'>Completed workflows</heading>
+    <heading class='workflow-tracker__heading'>
+      Completed workflows
+      <span
+        class='workflow-tracker__count'
+        data-test-completed-workflow-count
+      >
+        {{this.completedWorkflows.length}}
+      </span>
+    </heading>
     <ul>
       {{#each this.completedWorkflows as |workflow|}}
         <li data-test-completed-workflow>
