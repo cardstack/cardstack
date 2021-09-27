@@ -1,9 +1,12 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
+import WorkflowSession, {
+  buildState,
+} from '@cardstack/web-client/models/workflow/workflow-session';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import Ember from 'ember';
 import BN from 'bn.js';
+import { default as sinon, SinonFakeTimers } from 'sinon';
 
 const { track, valueForTag, validateTag } =
   // @ts-ignore digging
@@ -12,7 +15,23 @@ const { track, valueForTag, validateTag } =
 module('Unit | WorkflowSession model', function (hooks) {
   setupTest(hooks);
 
+  let clock: SinonFakeTimers;
+  let startDate: Date;
+  let startDateString: string;
+  let meta: string;
   const ID = 'abc123';
+
+  hooks.beforeEach(function () {
+    startDate = new Date();
+    clock = sinon.useFakeTimers(startDate);
+    startDateString = startDate.toISOString();
+    meta = JSON.stringify({
+      value: {
+        updatedAt: startDateString,
+        createdAt: startDateString,
+      },
+    });
+  });
 
   test('state starts off as empty', function (assert) {
     let subject = new WorkflowSession();
@@ -80,6 +99,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
       state: {
+        meta,
         myKey: '{"value":"myValue"}',
       },
     });
@@ -117,6 +137,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
       state: {
+        meta,
         myKey: '{}',
       },
     });
@@ -183,6 +204,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
       state: {
+        meta,
         myKey: '{"value":42}',
       },
     });
@@ -224,6 +246,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
       state: {
+        meta,
         myNumberKey: '{"value":42}',
         myStringKey: '{"value":"myValue"}',
       },
@@ -251,7 +274,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
   });
 
-  test('state is a proxy allowing access to values', function (assert) {
+  test('state is a proxy allowing access to values', async function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
       name: 'EXAMPLE',
@@ -279,7 +302,11 @@ module('Unit | WorkflowSession model', function (hooks) {
     delete subject.state.myNumberKey;
 
     assert.ok(subject.state.myNumberKey === undefined);
-    assert.deepEqual(Object.keys(subject.state), ['myStringKey', 'myBNKey']);
+    assert.deepEqual(Object.keys(subject.state), [
+      'myStringKey',
+      'myBNKey',
+      'meta',
+    ]);
   });
 
   test('get boolean value', function (assert) {
@@ -343,6 +370,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
       state: {
+        meta,
         myKey: '{"value":false}',
       },
     });
@@ -415,6 +443,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
       state: {
+        meta,
         myKey: '{"value":"42","type":"BN"}',
       },
     });
@@ -489,6 +518,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
       state: {
+        meta,
         myKey: '{"value":"2020-09-22T20:50:18.491Z","type":"Date"}',
       },
     });
@@ -525,6 +555,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
       state: {
+        meta,
         myKey: '{"value":["a","b","c"]}',
       },
     });
@@ -565,6 +596,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
       state: {
+        meta,
         myKey: '{"value":{"a":"A","b":"B","c":"C"}}',
       },
     });
@@ -574,4 +606,159 @@ module('Unit | WorkflowSession model', function (hooks) {
   //TODO tests for MerchantSafe type
   //TODO tests for PrepaidCardSafe type
   //TODO tests for TransactionReceipt type
+
+  test('it throws if meta is updated via the setValues method', async function (assert) {
+    let workflowPersistence = new WorkflowPersistence();
+    workflowPersistence.persistData(ID, {
+      name: 'EXAMPLE',
+      state: {},
+    });
+    let subject = new WorkflowSession({
+      workflowPersistence,
+      workflowPersistenceId: ID,
+    });
+    assert.throws(() => {
+      subject.setValue('meta', 'something');
+    }, 'Please use setMeta to set meta values');
+
+    assert.throws(() => {
+      subject.setValue({ meta: 'something-else' });
+    }, 'Please use setMeta to set meta values');
+  });
+
+  test('it can update meta properly, preserving earlier properties', async function (assert) {
+    let workflowPersistence = new WorkflowPersistence();
+    workflowPersistence.persistData(ID, {
+      name: 'EXAMPLE',
+      state: {},
+    });
+    let subject = new WorkflowSession({
+      workflowPersistence,
+      workflowPersistenceId: ID,
+    });
+    let initialMeta = subject.getMeta();
+
+    assert.equal(
+      initialMeta,
+      null,
+      'There is no meta when session is instantiated'
+    );
+
+    subject.setMeta(
+      {
+        completedCardNames: ['mock-card-1'],
+      },
+      false
+    );
+    subject.setMeta(
+      {
+        completedMilestonesCount: 2,
+      },
+      false
+    );
+
+    assert.deepEqual(
+      subject.getMeta().completedCardNames,
+      ['mock-card-1'],
+      'The initially set completedCardNames property was not overwritten'
+    );
+    assert.equal(
+      subject.getMeta().completedMilestonesCount,
+      2,
+      'The completedMilestonesCount property has the correct value'
+    );
+    assert.deepEqual(
+      subject.getPersistedData().state,
+      {},
+      'State is not persisted because setMeta was called with persist=false'
+    );
+
+    subject.setMeta({
+      completedMilestonesCount: 1,
+    });
+
+    assert.deepEqual(
+      subject.getPersistedData().state,
+      buildState({
+        meta: {
+          completedCardNames: ['mock-card-1'],
+          completedMilestonesCount: 1,
+          updatedAt: startDateString,
+          createdAt: startDateString,
+        },
+      }),
+      'State is persisted when persist=false is not specified'
+    );
+  });
+
+  test('it stores information about updated and created date when persisting data for the first time', async function (assert) {
+    let workflowPersistence = new WorkflowPersistence();
+    workflowPersistence.persistData(ID, {
+      name: 'EXAMPLE',
+      state: {},
+    });
+    let subject = new WorkflowSession({
+      workflowPersistence,
+      workflowPersistenceId: ID,
+    });
+    let initialMeta = subject.getMeta();
+    assert.equal(
+      initialMeta?.createdAt,
+      null,
+      'There is no created date when session is instantiated'
+    );
+    assert.equal(
+      initialMeta?.updatedAt,
+      null,
+      'There is no updated date when session is instantiated'
+    );
+
+    // store something so that meta is also updated
+    subject.setValue('arbitrary-key', 'arbitrary-value');
+
+    let updatedMeta = subject.getMeta();
+    assert.equal(
+      updatedMeta.createdAt,
+      startDateString,
+      `Created date has the appropriate ISO date string: ${updatedMeta.createdAt}`
+    );
+    assert.equal(
+      updatedMeta.updatedAt,
+      startDateString,
+      `Updated date has the appropriate ISO date string: ${updatedMeta.updatedAt}`
+    );
+  });
+
+  test('it can update last updated date', async function (assert) {
+    let ID = 'workflow-id-1';
+    let workflowPersistence = new WorkflowPersistence();
+    let startDateString = new Date().toISOString();
+    workflowPersistence.persistData(ID, {
+      name: 'EXAMPLE',
+      state: {},
+    });
+    let subject = new WorkflowSession({
+      workflowPersistence,
+      workflowPersistenceId: ID,
+    });
+
+    subject.setValue('arbitrary-key', 'arbitrary-value');
+
+    await clock.tickAsync(60000);
+    let updatedDateString = new Date().toISOString();
+
+    subject.setValue('arbitrary-key-2', 'arbitrary-value-2');
+
+    let meta = subject.getMeta();
+    assert.equal(
+      meta.createdAt,
+      startDateString,
+      `Created date has the start ISO date string: ${startDateString}`
+    );
+    assert.equal(
+      meta.updatedAt,
+      updatedDateString,
+      `Updated date has an updated ISO date string: ${updatedDateString}`
+    );
+  });
 });

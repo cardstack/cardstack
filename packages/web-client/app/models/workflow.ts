@@ -106,7 +106,7 @@ export abstract class Workflow {
   cancel(reason?: string | null) {
     const cancelationReason = reason || 'UNKNOWN';
 
-    this.session.setValue({
+    this.session.setMeta({
       isCancelled: true,
       cancelationReason: cancelationReason,
     });
@@ -192,7 +192,7 @@ export abstract class Workflow {
     this.session.restoreFromStorage();
 
     const [lastCompletedCardName] = (
-      this.session.getValue<Array<string>>('completedCardNames') || []
+      this.session.getMeta()?.completedCardNames || []
     ).slice(-1);
 
     if (lastCompletedCardName) {
@@ -209,11 +209,11 @@ export abstract class Workflow {
     }
 
     if (
-      this.session.getValue('isCancelled') &&
-      this.session.getValue('cancelationReason')
+      this.session.getMeta().isCancelled &&
+      this.session.getMeta().cancelationReason
     ) {
       next(this, () => {
-        this.cancel(this.session.getValue('cancelationReason'));
+        this.cancel(this.session.getMeta().cancelationReason);
       });
     }
   }

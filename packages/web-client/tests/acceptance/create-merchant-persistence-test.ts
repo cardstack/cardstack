@@ -126,7 +126,9 @@ module('Acceptance | create merchant persistence', function (hooks) {
   module('Restoring from a previously saved state', function () {
     test('it restores an unfinished workflow', async function (this: Context, assert) {
       let state = buildState({
-        completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+        meta: {
+          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+        },
         merchantName,
         merchantId,
         merchantBgColor,
@@ -160,11 +162,13 @@ module('Acceptance | create merchant persistence', function (hooks) {
 
     test('it restores a finished workflow', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: [
-          'LAYER2_CONNECT',
-          'MERCHANT_CUSTOMIZATION',
-          'PREPAID_CARD_CHOICE',
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'MERCHANT_CUSTOMIZATION',
+            'PREPAID_CARD_CHOICE',
+          ],
+        },
         merchantName,
         merchantId,
         merchantBgColor,
@@ -210,16 +214,18 @@ module('Acceptance | create merchant persistence', function (hooks) {
 
     test('it restores a cancelled workflow', async function (this: Context, assert) {
       const state = buildState({
-        cancelationReason: 'DISCONNECTED',
-        completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+        meta: {
+          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+          milestonesCount: 3,
+          completedMilestonesCount: 2,
+          isCancelled: true,
+          cancelationReason: 'DISCONNECTED',
+        },
         merchantName,
         merchantId,
         merchantBgColor,
         merchantRegistrationFee,
         prepaidCardChoice: prepaidCard,
-        completedMilestonesCount: 2,
-        isCancelled: true,
-        milestonesCount: 3,
       });
 
       workflowPersistenceService.persistData('abc123', {
@@ -252,7 +258,9 @@ module('Acceptance | create merchant persistence', function (hooks) {
 
     test('it cancels a persisted flow when trying to restore while unauthenticated', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+        meta: {
+          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+        },
         merchantName,
         merchantId,
         merchantBgColor,
@@ -296,7 +304,9 @@ module('Acceptance | create merchant persistence', function (hooks) {
 
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+        meta: {
+          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+        },
         merchantName,
         merchantId,
         merchantBgColor,
@@ -333,7 +343,9 @@ module('Acceptance | create merchant persistence', function (hooks) {
 
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+        meta: {
+          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+        },
         merchantName,
         merchantId,
         merchantBgColor,
@@ -362,7 +374,9 @@ module('Acceptance | create merchant persistence', function (hooks) {
 
     test('it allows interactivity after restoring previously saved state', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: ['LAYER2_CONNECT'],
+        meta: {
+          completedCardNames: ['LAYER2_CONNECT'],
+        },
         merchantName,
         merchantId,
         merchantBgColor,
