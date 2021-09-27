@@ -4,8 +4,7 @@ import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-sess
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import Ember from 'ember';
 import BN from 'bn.js';
-import sinon from 'sinon';
-import Sinon from 'sinon';
+import { default as sinon, SinonFakeTimers } from 'sinon';
 
 const { track, valueForTag, validateTag } =
   // @ts-ignore digging
@@ -14,7 +13,7 @@ const { track, valueForTag, validateTag } =
 module('Unit | WorkflowSession model', function (hooks) {
   setupTest(hooks);
 
-  let clock: Sinon.SinonFakeTimers;
+  let clock: SinonFakeTimers;
   let startDate: Date;
   let startDateString: string;
   let meta: string;
@@ -606,8 +605,55 @@ module('Unit | WorkflowSession model', function (hooks) {
   //TODO tests for PrepaidCardSafe type
   //TODO tests for TransactionReceipt type
 
+  test('it can update meta properly, preserving earlier properties', async function (assert) {
+    let workflowPersistence = new WorkflowPersistence();
+    workflowPersistence.persistData(ID, {
+      name: 'EXAMPLE',
+      state: {},
+    });
+    let subject = new WorkflowSession({
+      workflowPersistence,
+      workflowPersistenceId: ID,
+    });
+    let initialMeta = subject.getMeta();
+
+    assert.equal(
+      initialMeta,
+      null,
+      'There is no meta when session is instantiated'
+    );
+
+    subject.setMeta(
+      {
+        createdAt: 'created-at-mock',
+      },
+      false
+    );
+    subject.setMeta(
+      {
+        updatedAt: 'updated-at-mock',
+      },
+      false
+    );
+
+    assert.equal(
+      subject.getMeta().createdAt,
+      'created-at-mock',
+      'The initially set createdAt property was not overwritten'
+    );
+    assert.equal(
+      subject.getMeta().updatedAt,
+      'updated-at-mock',
+      'The newly set updatedAt property has the correct value'
+    );
+    assert.deepEqual(
+      subject.getPersistedData().state,
+      {},
+      'State is not persisted because setMeta was called with persist=false'
+    );
+  });
+
   test('it stores information about updated and created date when persisting data for the first time', async function (assert) {
-    let ID = 'workflow-id-1';
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
       name: 'EXAMPLE',
