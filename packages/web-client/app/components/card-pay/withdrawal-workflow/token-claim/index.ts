@@ -18,6 +18,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import walletProviders, {
   WalletProvider,
 } from '@cardstack/web-client/utils/wallet-providers';
+import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 
 class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCardComponentArgs> {
   walletProviders = walletProviders;
@@ -29,7 +30,9 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
   }
 
   @tracked isConfirming = false;
-  @tracked txnHash: string | undefined;
+  get txnHash(): TransactionHash | null {
+    return this.args.workflowSession.getValue('txnHash');
+  }
   @tracked errorMessage = '';
 
   get bridgeValidationResult(): BridgeValidationResult {
@@ -60,7 +63,8 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
   }
 
   get txViewerUrl() {
-    return this.txnHash && this.layer1Network.blockExplorerUrl(this.txnHash);
+    let { txnHash } = this;
+    return txnHash && this.layer1Network.blockExplorerUrl(txnHash);
   }
 
   get ctaState() {
@@ -74,19 +78,40 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
   }
 
   @action
+  resumeClaimBridgedTokens() {
+    if (
+      this.txnHash &&
+      !this.args.workflowSession.getValue<boolean>('didClaimTokens')
+    ) {
+      this.claim();
+    }
+  }
+
+  @action
   async claim() {
     this.errorMessage = '';
+
     try {
       this.isConfirming = true;
-      await taskFor(this.layer1Network.claimBridgedTokensTask).perform(
-        this.bridgeValidationResult,
-        {
-          onTxnHash: (txnHash: string) => (this.txnHash = txnHash),
-        }
-      );
-      this.args.workflowSession.setValue('claimTokensTxnHash', this.txnHash);
+      let { txnHash } = this;
+      if (txnHash) {
+        await taskFor(this.layer1Network.resumeClaimBridgedTokensTask).perform(
+          txnHash
+        );
+      } else {
+        await taskFor(this.layer1Network.claimBridgedTokensTask).perform(
+          this.bridgeValidationResult,
+          {
+            onTxnHash: (txnHash: string) => {
+              this.args.workflowSession.setValue('txnHash', txnHash);
+            },
+          }
+        );
+      }
+
+      this.args.workflowSession.setValue('didClaimTokens', true);
       this.args.onComplete?.();
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
       this.errorMessage = `There was a problem with claiming your tokens. This may be due
       to a network issue, or perhaps you canceled the request in your wallet.`;

@@ -2,6 +2,7 @@
   @header="Token Claim"
   @isComplete={{@isComplete}}
   data-test-withdrawal-token-claim-is-complete={{@isComplete}}
+  {{did-insert this.resumeClaimBridgedTokens}}
 >
   <ActionCardContainer::Section
     @title={{concat "Claim " (network-display-info "layer1" "conversationalName") " tokens"}}
@@ -32,7 +33,7 @@
     @disabled={{@frozen}}
   >
     <:default as |d|>
-      <d.ActionButton {{on "click" this.claim}}>
+      <d.ActionButton {{on "click" this.claim}} data-test-claim-button>
         Claim
       </d.ActionButton>
     </:default>

@@ -218,6 +218,11 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     return deferred.promise;
   }
 
+  resumeClaimBridgedTokens(): Promise<TransactionReceipt> {
+    let deferred: RSVP.Deferred<TransactionReceipt> = defer();
+    return deferred.promise;
+  }
+
   test__simulateBridgedTokensClaimed(messageId: string) {
     let request = this.claimBridgedTokensRequests.get(messageId);
     request?.onTxnHash?.('exampleTxnHash');
