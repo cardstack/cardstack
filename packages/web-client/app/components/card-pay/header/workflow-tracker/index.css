@@ -1,0 +1,8 @@
+.workflow-tracker__list {
+  background-color: var(--boxel-purple-500);
+  font: var(--boxel-font-xs);
+}
+
+.workflow-tracker__heading {
+  text-transform: uppercase;
+}

@@ -1,0 +1,35 @@
+.workflow-tracker-item__container {
+  display: grid;
+  grid-template-columns: 1fr var(--boxel-sp-xxl);
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "heading icon"
+    "milestone icon";
+  background: transparent;
+  color: var(--boxel-light-200);
+  margin: 0 var(--boxel-sp);
+  border-radius: var(--boxel-border-radius-sm);
+  text-align: left;
+  padding: var(--boxel-sp-sm) var(--boxel-sp-xs);
+  border: 0;
+}
+
+.workflow-tracker-item__container:hover {
+  background-color: var(--boxel-purple-300);
+}
+
+.workflow-tracker-item__heading {
+  grid-area: heading;
+  font-weight: 700;
+}
+
+.workflow-tracker-item__milestone {
+  grid-area: milestone;
+}
+
+.workflow-tracker-item__icon {
+  grid-area: icon;
+  justify-self: flex-end;
+  align-self: center;
+  margin-right: 0;
+}
