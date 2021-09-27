@@ -98,6 +98,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
+      name: 'EXAMPLE',
       state: {
         meta,
         myKey: '{"value":"myValue"}',
@@ -136,6 +137,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
+      name: 'EXAMPLE',
       state: {
         meta,
         myKey: '{}',
@@ -203,6 +205,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
+      name: 'EXAMPLE',
       state: {
         meta,
         myKey: '{"value":42}',
@@ -245,6 +248,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
+      name: 'EXAMPLE',
       state: {
         meta,
         myNumberKey: '{"value":42}',
@@ -369,6 +373,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
+      name: 'EXAMPLE',
       state: {
         meta,
         myKey: '{"value":false}',
@@ -442,6 +447,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
+      name: 'EXAMPLE',
       state: {
         meta,
         myKey: '{"value":"42","type":"BN"}',
@@ -517,6 +523,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
+      name: 'EXAMPLE',
       state: {
         meta,
         myKey: '{"value":"2020-09-22T20:50:18.491Z","type":"Date"}',
@@ -554,6 +561,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
+      name: 'EXAMPLE',
       state: {
         meta,
         myKey: '{"value":["a","b","c"]}',
@@ -595,6 +603,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
+      name: 'EXAMPLE',
       state: {
         meta,
         myKey: '{"value":{"a":"A","b":"B","c":"C"}}',
