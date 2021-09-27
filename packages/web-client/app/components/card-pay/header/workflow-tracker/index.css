@@ -6,3 +6,8 @@
 .workflow-tracker__heading {
   text-transform: uppercase;
 }
+
+.workflow-tracker__count {
+  font-weight: 600;
+  color: var(--boxel-teal);
+}

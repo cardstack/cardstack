@@ -147,6 +147,7 @@ module('Acceptance | persistence view and restore', function () {
 
       await click('[data-test-workflow-tracker-toggle]');
       assert.dom('[data-test-active-workflow]').exists({ count: 2 });
+      assert.dom('[data-test-active-workflow-count]').containsText('2');
 
       assert
         .dom('[data-test-active-workflow]:nth-child(1)')
@@ -174,6 +175,7 @@ module('Acceptance | persistence view and restore', function () {
       assert.equal(dashFraction, 0.25);
 
       assert.dom('[data-test-completed-workflow]').exists({ count: 1 });
+      assert.dom('[data-test-completed-workflow-count]').containsText('1');
 
       assert
         .dom('[data-test-completed-workflow]')
