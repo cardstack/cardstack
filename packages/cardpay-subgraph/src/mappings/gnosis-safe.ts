@@ -2,7 +2,7 @@ import { Address, store } from '@graphprotocol/graph-ts';
 import { ExecutionSuccess, AddedOwner, RemovedOwner } from '../../generated/templates/GnosisSafe/GnosisSafe';
 import { toChecksumAddress, makeEOATransactionForSafe, makeToken } from '../utils';
 import { decode, encodeMethodSignature, methodHashFromEncodedHex } from '../abi';
-import { Safe, SafeOwner, SafeTransaction } from '../../generated/schema';
+import { Safe, SafeOwner, SafeTransaction, SafeOwnerChange } from '../../generated/schema';
 import { log } from '@graphprotocol/graph-ts';
 
 const EXEC_TRANSACTION = 'execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)';
@@ -19,15 +19,36 @@ export function handleAddedOwner(event: AddedOwner): void {
     );
     return;
   }
+  safe.save();
+
   let safeOwnerEntity = new SafeOwner(safeAddress + '-' + owner);
   safeOwnerEntity.safe = safeAddress;
   safeOwnerEntity.owner = owner;
   safeOwnerEntity.createdAt = safe.createdAt;
+  safeOwnerEntity.ownershipChangedAt = event.block.timestamp;
   safeOwnerEntity.save();
+
+  let ownerChangeEntity = new SafeOwnerChange(safeAddress + '-add-' + owner + '-' + txnHash);
+  ownerChangeEntity.transaction = txnHash;
+  ownerChangeEntity.timestamp = event.block.timestamp;
+  ownerChangeEntity.safe = safeAddress;
+  ownerChangeEntity.ownerAdded = owner;
+  ownerChangeEntity.save();
 }
+
 export function handleRemovedOwner(event: RemovedOwner): void {
-  let id = toChecksumAddress(event.address) + '-' + toChecksumAddress(event.params.owner);
+  let txnHash = event.transaction.hash.toHex();
+  let safeAddress = toChecksumAddress(event.address);
+  let owner = toChecksumAddress(event.params.owner);
+  let id = safeAddress + '-' + owner;
   store.remove('SafeOwner', id);
+
+  let ownerChangeEntity = new SafeOwnerChange(safeAddress + '-remove-' + owner + '-' + txnHash);
+  ownerChangeEntity.transaction = txnHash;
+  ownerChangeEntity.timestamp = event.block.timestamp;
+  ownerChangeEntity.safe = safeAddress;
+  ownerChangeEntity.ownerRemoved = owner;
+  ownerChangeEntity.save();
 }
 
 export function handleExecutionSuccess(event: ExecutionSuccess): void {

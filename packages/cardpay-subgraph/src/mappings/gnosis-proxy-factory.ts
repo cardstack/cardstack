@@ -23,6 +23,7 @@ export function handleProxyCreation(event: ProxyCreation): void {
     safeOwnerEntity.owner = ownerAddress;
     safeOwnerEntity.safe = safeAddress;
     safeOwnerEntity.createdAt = event.block.timestamp;
+    safeOwnerEntity.ownershipChangedAt = event.block.timestamp;
     safeOwnerEntity.save();
   }
   safeEntity.save();

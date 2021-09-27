@@ -314,6 +314,7 @@ type Safe @entity {
   prepaidCard: PrepaidCard                  @derivedFrom(field: "safe")
   tokens: [TokenHolder]!                    @derivedFrom(field: "safe")
   sentBridgedTokens: [BridgeToLayer1Event]! @derivedFrom(field: "safe")
+  ownerChanges: [SafeOwnerChange]!          @derivedFrom(field: "safe")
 }
 
 type SafeTransaction @entity {
@@ -332,6 +333,16 @@ type SafeTransaction @entity {
   gasPayment: BigInt!
   refundReceiver: String!
   signatures: Bytes!
+}
+
+type SafeOwnerChange @entity {
+  id: ID!
+  timestamp: BigInt!
+  transaction: Transaction!
+  safe: Safe!
+   # these are not Account types because the owner may be a contract address
+  ownerAdded: String
+  ownerRemoved: String
 }
 
 type PrepaidCardSendAction @entity {
@@ -395,6 +406,7 @@ type SafeOwner @entity {
   owner: Account!
   safe: Safe!
   createdAt: BigInt!
+  ownershipChangedAt: BigInt!
 }
 
 type TokenTransfer @entity {

@@ -118,7 +118,7 @@ const safeQuery = `
 const safesQuery = `
   query($account: ID!) {
     account(id: $account) {
-      safes(orderBy:createdAt orderDirection:desc) {
+      safes(orderBy:ownershipChangedAt orderDirection:desc) {
         safe {
           ${safeQueryFields}
         }
