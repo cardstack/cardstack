@@ -61,6 +61,11 @@ function formatInventory(inventory: SKUInventory, reservations: SKUReservations)
       'ask-price': askPrice,
       'customization-DID': customizationDID || null,
       quantity: prepaidCards.length - (reservations[sku] ?? 0),
+
+      // These are not yet supported in the protocol right now. when these
+      // become real things we'll query the subgraph for them
+      reloadable: false,
+      transferrable: false,
     },
   };
 }
