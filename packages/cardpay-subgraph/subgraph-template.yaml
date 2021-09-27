@@ -640,6 +640,34 @@ dataSources:
           handler: handleRewardeeRegistrationFee
       file: ./src/mappings/register-rewardee-handler.ts
 
+  - kind: ethereum/contract
+    name: RewardPool
+    network: {NETWORK}
+    source:
+      address: "{REWARD_POOL_ADDRESS}"
+      abi: RewardPool
+      startBlock: {CARDPAY_GENESIS_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - RewardeeClaim
+      abis:
+        - name: RewardPool
+          file: ./abis/generated/RewardPool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: RewardeeClaim(address,address,address,uint256)
+          handler: handleRewardeeClaim
+      file: ./src/mappings/reward-pool.ts
 
 templates:
   - kind: ethereum/contract
