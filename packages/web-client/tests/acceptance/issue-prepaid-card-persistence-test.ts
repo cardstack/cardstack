@@ -80,12 +80,14 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
   module('Restoring from a previously saved state', function () {
     test('it restores an unfinished workflow', async function (this: Context, assert) {
       let state = buildState({
-        completedCardNames: [
-          'LAYER2_CONNECT',
-          'LAYOUT_CUSTOMIZATION',
-          'FUNDING_SOURCE',
-          'FACE_VALUE',
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'LAYOUT_CUSTOMIZATION',
+            'FUNDING_SOURCE',
+            'FACE_VALUE',
+          ],
+        },
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
@@ -133,13 +135,15 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
 
     test('it restores a finished workflow', async function (this: Context, assert) {
       let state = buildState({
-        completedCardNames: [
-          'LAYER2_CONNECT',
-          'LAYOUT_CUSTOMIZATION',
-          'FUNDING_SOURCE',
-          'FACE_VALUE',
-          'PREVIEW', // Includes all milestone cards
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'LAYOUT_CUSTOMIZATION',
+            'FUNDING_SOURCE',
+            'FACE_VALUE',
+            'PREVIEW', // Includes all milestone cards
+          ],
+        },
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
@@ -205,18 +209,19 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#FF5050',
           description: 'Sunset Orange',
         },
-        completedCardNames: [
-          'LAYER2_CONNECT',
-          'HUB_AUTH',
-          'LAYOUT_CUSTOMIZATION',
-          'FUNDING_SOURCE',
-          'FACE_VALUE',
-        ],
-        completedMilestonesCount: 3,
+        meta: {
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'HUB_AUTH',
+            'LAYOUT_CUSTOMIZATION',
+            'FUNDING_SOURCE',
+            'FACE_VALUE',
+          ],
+          milestonesCount: 4,
+          completedMilestonesCount: 3,
+        },
         isCancelled: true,
         issuerName: 'Peter',
-
-        milestonesCount: 4,
         pattern: {
           patternUrl:
             'https://app.cardstack.com/images/prepaid-card-customizations/pattern-1.svg',
@@ -257,12 +262,14 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
 
     test('it cancels a persisted flow when trying to restore while unauthenticated', async function (this: Context, assert) {
       let state = buildState({
-        completedCardNames: [
-          'LAYER2_CONNECT',
-          'LAYOUT_CUSTOMIZATION',
-          'FUNDING_SOURCE',
-          'FACE_VALUE',
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'LAYOUT_CUSTOMIZATION',
+            'FUNDING_SOURCE',
+            'FACE_VALUE',
+          ],
+        },
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
@@ -319,12 +326,14 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
 
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {
       let state = buildState({
-        completedCardNames: [
-          'LAYER2_CONNECT',
-          'LAYOUT_CUSTOMIZATION',
-          'FUNDING_SOURCE',
-          'FACE_VALUE',
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'LAYOUT_CUSTOMIZATION',
+            'FUNDING_SOURCE',
+            'FACE_VALUE',
+          ],
+        },
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
@@ -381,12 +390,14 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
 
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
       let state = buildState({
-        completedCardNames: [
-          'LAYER2_CONNECT',
-          'LAYOUT_CUSTOMIZATION',
-          'FUNDING_SOURCE',
-          'FACE_VALUE',
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'LAYOUT_CUSTOMIZATION',
+            'FUNDING_SOURCE',
+            'FACE_VALUE',
+          ],
+        },
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
@@ -428,7 +439,9 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
 
     test('it allows interactivity after restoring previously saved state', async function (this: Context, assert) {
       let state = buildState({
-        completedCardNames: ['LAYER2_CONNECT', 'LAYOUT_CUSTOMIZATION'],
+        meta: {
+          completedCardNames: ['LAYER2_CONNECT', 'LAYOUT_CUSTOMIZATION'],
+        },
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:

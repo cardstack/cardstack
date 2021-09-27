@@ -24,6 +24,7 @@ import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issu
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { setupHubAuthenticationToken } from '../helpers/setup';
+import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 
 interface Context extends MirageTestContext {}
 
@@ -543,32 +544,61 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.deepEqual(
       {
         ...persistedState,
-        meta: undefined,
+        meta: persistedState.meta
+          .replace(/"createdAt":".+?",/, '')
+          .replace(/"updatedAt":".+?",/, ''),
       },
-      {
-        colorScheme:
-          '{"value":{"patternColor":"white","textColor":"black","background":"#37EB77","id":"4f219852-33ee-4e4c-81f7-76318630a423"}}',
-        completedCardNames:
-          '{"value":["LAYER2_CONNECT","HUB_AUTH","LAYOUT_CUSTOMIZATION","FUNDING_SOURCE","FACE_VALUE","PREVIEW","CONFIRMATION","EPILOGUE_LAYER_TWO_CONNECT_CARD"]}',
-        completedMilestonesCount: '{"value":4}',
-        did: '{"value":"did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e"}',
-        issuerName: '{"value":"JJ"}',
-        layer2WalletAddress:
-          '{"value":"0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44"}',
-        milestonesCount: '{"value":4}',
-        pattern:
-          '{"value":{"patternUrl":"/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg","id":"80cb8f99-c5f7-419e-9c95-2e87a9d8db32"}}',
-        prepaidCardAddress:
-          '{"value":"0xaeFbA62A2B3e90FD131209CC94480E722704E1F8"}',
-        prepaidCardSafe:
-          '{"value":{"type":"prepaid-card","address":"0xaeFbA62A2B3e90FD131209CC94480E722704E1F8","tokens":[],"owners":["0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44"],"issuingToken":"0xTOKEN","spendFaceValue":10000,"prepaidCardOwner":"0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44","hasBeenUsed":false,"issuer":"0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44","reloadable":true,"transferrable":true,"customizationDID":"did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e"}}',
-        prepaidFundingToken: '{"value":"DAI.CPXD"}',
-        reloadable: '{"value":true}',
-        spendFaceValue: '{"value":10000}',
-        transferrable: '{"value":true}',
-        txnHash: '{"value":"exampleTxnHash"}',
-        meta: undefined,
-      }
+      buildState({
+        colorScheme: {
+          patternColor: 'white',
+          textColor: 'black',
+          background: '#37EB77',
+          id: '4f219852-33ee-4e4c-81f7-76318630a423',
+        },
+        did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+        issuerName: 'JJ',
+        layer2WalletAddress: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+        pattern: {
+          patternUrl:
+            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+          id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
+        },
+        prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
+        prepaidCardSafe: {
+          type: 'prepaid-card',
+          address: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
+          tokens: [],
+          owners: ['0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44'],
+          issuingToken: '0xTOKEN',
+          spendFaceValue: 10000,
+          prepaidCardOwner: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+          hasBeenUsed: false,
+          issuer: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+          reloadable: true,
+          transferrable: true,
+          customizationDID:
+            'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+        },
+        prepaidFundingToken: 'DAI.CPXD',
+        reloadable: true,
+        spendFaceValue: 10000,
+        transferrable: true,
+        txnHash: 'exampleTxnHash',
+        meta: {
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'HUB_AUTH',
+            'LAYOUT_CUSTOMIZATION',
+            'FUNDING_SOURCE',
+            'FACE_VALUE',
+            'PREVIEW',
+            'CONFIRMATION',
+            'EPILOGUE_LAYER_TWO_CONNECT_CARD',
+          ],
+          completedMilestonesCount: 4,
+          milestonesCount: 4,
+        },
+      })
     );
   });
 

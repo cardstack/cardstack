@@ -12,6 +12,9 @@ import { TransactionReceipt } from 'web3-core';
 interface WorkflowMeta {
   updatedAt: string | undefined;
   createdAt: string | undefined;
+  completedCardNames: string[] | undefined;
+  completedMilestonesCount: number | undefined;
+  milestonesCount: number | undefined;
 }
 
 export interface WorkflowSessionDictionary {

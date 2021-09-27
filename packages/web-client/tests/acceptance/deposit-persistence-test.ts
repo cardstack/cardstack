@@ -64,7 +64,9 @@ module('Acceptance | deposit persistence', function (hooks) {
   module('Restoring from a previously saved state', function () {
     test('it restores an unfinished workflow', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
+        meta: {
+          completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
+        },
         depositSourceToken: 'DAI',
         depositedAmount: new BN('10000000000000000000'),
       });
@@ -87,7 +89,9 @@ module('Acceptance | deposit persistence', function (hooks) {
 
     test('it restores a workflow partway through the deposit/unlock 2-step process', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
+        meta: {
+          completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
+        },
         depositSourceToken: 'DAI',
         depositedAmount: new BN('10000000000000000000'),
         unlockTxnHash: '0xABC',
@@ -137,12 +141,14 @@ module('Acceptance | deposit persistence', function (hooks) {
 
     test('it restores a workflow partway through the layer 2 bridging', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: [
-          'LAYER1_CONNECT',
-          'LAYER2_CONNECT',
-          'TXN_SETUP',
-          'TXN_AMOUNT',
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'LAYER2_CONNECT',
+            'TXN_SETUP',
+            'TXN_AMOUNT',
+          ],
+        },
         depositSourceToken: 'DAI',
         depositedAmount: new BN('10000000000000000000'),
         unlockTxnHash: '0xABC',
@@ -216,13 +222,15 @@ module('Acceptance | deposit persistence', function (hooks) {
 
     test('it restores a finished workflow', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: [
-          'LAYER1_CONNECT',
-          'LAYER2_CONNECT',
-          'TXN_SETUP',
-          'TXN_AMOUNT',
-          'TXN_STATUS',
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'LAYER2_CONNECT',
+            'TXN_SETUP',
+            'TXN_AMOUNT',
+            'TXN_STATUS',
+          ],
+        },
         depositSourceToken: 'DAI',
         depositedAmount: new BN('10000000000000000000'),
         unlockTxnHash: '0xABC',
@@ -300,7 +308,9 @@ module('Acceptance | deposit persistence', function (hooks) {
       const state = buildState({
         isCancelled: true,
         cancelationReason: 'DISCONNECTED',
-        completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
+        meta: {
+          completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
+        },
         depositSourceToken: 'DAI',
         depositedAmount: new BN('10000000000000000000'),
       });
@@ -328,7 +338,9 @@ module('Acceptance | deposit persistence', function (hooks) {
 
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
+        meta: {
+          completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
+        },
         depositSourceToken: 'DAI',
         depositedAmount: new BN('10000000000000000000'),
       });
@@ -356,12 +368,14 @@ module('Acceptance | deposit persistence', function (hooks) {
 
     test('it cancels a persisted flow when Layer 1 wallet address is different', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: [
-          'LAYER1_CONNECT',
-          'LAYER2_CONNECT',
-          'TXN_SETUP',
-          'TXN_AMOUNT',
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'LAYER2_CONNECT',
+            'TXN_SETUP',
+            'TXN_AMOUNT',
+          ],
+        },
         depositSourceToken: 'DAI',
         depositedAmount: new BN('10000000000000000000'),
         layer1WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer1WalletAddress set in beforeEach
@@ -383,12 +397,14 @@ module('Acceptance | deposit persistence', function (hooks) {
 
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: [
-          'LAYER1_CONNECT',
-          'LAYER2_CONNECT',
-          'TXN_SETUP',
-          'TXN_AMOUNT',
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'LAYER2_CONNECT',
+            'TXN_SETUP',
+            'TXN_AMOUNT',
+          ],
+        },
         depositSourceToken: 'DAI',
         depositedAmount: new BN('10000000000000000000'),
         layer2WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer2WalletAddress set in beforeEach
@@ -410,7 +426,9 @@ module('Acceptance | deposit persistence', function (hooks) {
 
     test('it allows interactivity after restoring previously saved state', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
+        meta: {
+          completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
+        },
         depositSourceToken: 'DAI',
         depositedAmount: new BN('10000000000000000000'),
       });

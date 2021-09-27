@@ -192,7 +192,7 @@ export abstract class Workflow {
     this.session.restoreFromStorage();
 
     const [lastCompletedCardName] = (
-      this.session.getValue<Array<string>>('completedCardNames') || []
+      this.session.getMeta()?.completedCardNames || []
     ).slice(-1);
 
     if (lastCompletedCardName) {
