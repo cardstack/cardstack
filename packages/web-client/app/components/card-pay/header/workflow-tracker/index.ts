@@ -5,8 +5,16 @@ import { tracked } from '@glimmer/tracking';
 import WorkflowPersistence, {
   WorkflowPersistencePersistedData,
 } from '@cardstack/web-client/services/workflow-persistence';
+import { WORKFLOW_NAMES } from '@cardstack/web-client/models/workflow';
 
 interface CardPayHeaderWorkflowTrackerArgs {}
+
+interface WorkflowPersistencePersistedDataAndId {
+  workflow: WorkflowPersistencePersistedData;
+  id: string;
+}
+
+const WORKFLOW_NAMES_KEYS = Object.keys(WORKFLOW_NAMES);
 
 export default class CardPayHeaderWorkflowTracker extends Component<CardPayHeaderWorkflowTrackerArgs> {
   @service declare workflowPersistence: WorkflowPersistence;
@@ -14,12 +22,15 @@ export default class CardPayHeaderWorkflowTracker extends Component<CardPayHeade
   @tracked showing = false;
 
   get allWorkflows() {
-    return this.workflowPersistence.persistedDataIds.map((id) => ({
-      workflow: persistedDataWithParsedMeta(
-        this.workflowPersistence.getPersistedData(id)
-      ),
-      id,
-    }));
+    return this.workflowPersistence.persistedDataIds.reduce((workflows, id) => {
+      let workflow = this.workflowPersistence.getPersistedData(id);
+
+      if (workflow && WORKFLOW_NAMES_KEYS.includes(workflow.name) && workflow.state && workflow.state.meta) {
+        workflows.push({ workflow: persistedDataWithParsedMeta(workflow), id });
+      }
+
+      return workflows;
+    }, [] as WorkflowPersistencePersistedDataAndId[]);
   }
 
   get activeWorkflows() {
