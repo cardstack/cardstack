@@ -92,6 +92,12 @@ export default class WorkflowPersistence extends Service {
     this.persistedDataIds = [];
     this.#storage.clear();
   }
+
+  clearWorkflowWithId(id: string) {
+    this.persistedDataIds = this.persistedDataIds.without(id);
+    const prefixedId = `${STORAGE_KEY_PREFIX}:${id}`;
+    this.#storage.removeItem(prefixedId);
+  }
 }
 
 declare module '@ember/service' {

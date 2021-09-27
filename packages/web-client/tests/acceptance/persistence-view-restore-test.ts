@@ -211,6 +211,49 @@ module('Acceptance | persistence view and restore', function () {
       );
     });
 
+    test('completed workflows can be cleared', async function (this: Context, assert) {
+      workflowPersistenceService.persistData('persisted-merchant-creation', {
+        name: 'MERCHANT_CREATION',
+        state: buildState({
+          meta: {
+            completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+            completedMilestonesCount: 1,
+            milestonesCount: 3,
+          },
+        }),
+      });
+
+      workflowPersistenceService.persistData('persisted-complete-issuance', {
+        name: 'PREPAID_CARD_ISSUANCE',
+        state: buildState({
+          meta: {
+            completedCardNames: [
+              'LAYER2_CONNECT',
+              'HUB_AUTH',
+              'LAYOUT_CUSTOMIZATION',
+              'FUNDING_SOURCE',
+              'FACE_VALUE',
+              'PREVIEW',
+              'CONFIRMATION',
+              'EPILOGUE_LAYER_TWO_CONNECT_CARD',
+            ],
+            completedMilestonesCount: 4,
+            milestonesCount: 4,
+          },
+        }),
+      });
+
+
+      await visit('/card-pay/');
+
+      await click('[data-test-workflow-tracker-toggle]');
+      assert.dom('[data-test-active-workflow]').exists({ count: 1 });
+      assert.dom('[data-test-completed-workflow]').exists({ count: 1 });
+
+      await click('[data-test-workflow-tracker-clear-completed');
+      assert.dom('[data-test-completed-workflow]').doesNotExist();
+    });
+
     test('opening a workflow only increments the counter by one', async function (assert) {
       await visit('/card-pay/balances');
       await click('[data-test-workflow-button="issue-prepaid-card"]');

@@ -23,4 +23,11 @@
       </li>
     {{/each}}
   </ul>
+
+  <Boxel::Button
+    {{on "click" this.clearCompletedWorkflows}}
+    data-test-workflow-tracker-clear-completed
+  >
+    Clear Completed
+  </Boxel::Button>
 {{/if}}
