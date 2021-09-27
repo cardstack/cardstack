@@ -1,2 +1,2 @@
-web: node ./bin/hub.js server
-worker: node ./bin/hub.js worker
+web: node ./bin/hub server
+worker: node ./bin/hub worker
