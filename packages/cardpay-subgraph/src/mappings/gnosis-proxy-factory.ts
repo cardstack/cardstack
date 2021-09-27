@@ -9,6 +9,7 @@ export function handleProxyCreation(event: ProxyCreation): void {
   let safeAddress = toChecksumAddress(event.params.proxy);
   let safeEntity = new Safe(safeAddress);
   safeEntity.createdAt = event.block.timestamp;
+  safeEntity.ownershipChangedAt = event.block.timestamp;
 
   let safe = GnosisSafe.bind(event.params.proxy);
   let owners = safe.getOwners();
