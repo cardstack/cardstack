@@ -2,7 +2,9 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
-import WorkflowPersistence, { WorkflowPersistencePersistedData } from '@cardstack/web-client/services/workflow-persistence';
+import WorkflowPersistence, {
+  WorkflowPersistencePersistedData,
+} from '@cardstack/web-client/services/workflow-persistence';
 
 interface CardPayHeaderWorkflowTrackerArgs {}
 
@@ -13,7 +15,9 @@ export default class CardPayHeaderWorkflowTracker extends Component<CardPayHeade
 
   get allWorkflows() {
     return this.workflowPersistence.persistedDataIds.map((id) => ({
-      workflow: persistedDataWithParsedMeta(this.workflowPersistence.getPersistedData(id)),
+      workflow: persistedDataWithParsedMeta(
+        this.workflowPersistence.getPersistedData(id)
+      ),
       id,
     }));
   }
