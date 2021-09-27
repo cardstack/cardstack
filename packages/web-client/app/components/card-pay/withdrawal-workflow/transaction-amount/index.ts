@@ -5,7 +5,7 @@ import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { inject as service } from '@ember/service';
 import BN from 'bn.js';
-import { toWei } from 'web3-utils';
+import { toWei, fromWei } from 'web3-utils';
 import {
   BridgedTokenSymbol,
   TokenDisplayInfo,
@@ -36,15 +36,24 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   @tracked validationMessage = '';
   @reads('withdrawTask.last.error') declare error: Error | undefined;
 
+  constructor(owner: unknown, args: WorkflowCardComponentArgs) {
+    super(owner, args);
+
+    let withdrawnAmount =
+      this.args.workflowSession.getValue<BN>('withdrawnAmount');
+    if (withdrawnAmount) {
+      this.amount = fromWei(withdrawnAmount);
+    }
+  }
+
   // assumption is these are always set by cards before it. They should be defined by the time
   // it gets to this part of the workflow
   get currentSafe(): Safe {
-    return this.args.workflowSession.state.withdrawalSafe as Safe;
+    return this.args.workflowSession.getValue<Safe>('withdrawalSafe')!;
   }
 
   get currentTokenSymbol(): BridgedTokenSymbol {
-    return this.args.workflowSession.state
-      .withdrawalToken as BridgedTokenSymbol;
+    return this.args.workflowSession.getValue('withdrawalToken')!;
   }
 
   get currentTokenSymbolWithdrawalLimits() {
@@ -85,7 +94,11 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
   }
 
   get isAmountCtaDisabled() {
-    return this.isInvalid || this.amount === '';
+    return (
+      this.isInvalid ||
+      this.amount === '' ||
+      this.amountCtaState === 'memorialized'
+    );
   }
 
   get amountAsBigNumber(): BN {
@@ -140,15 +153,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       return;
     }
 
-    taskFor(this.withdrawTask)
-      .perform()
-      .catch((e) => {
-        console.error(e);
-        this.isConfirmed = false;
-        if (!this.error) {
-          throw new Error('DEFAULT_ERROR');
-        }
-      });
+    taskFor(this.withdrawTask).perform();
   }
 
   @task *withdrawTask(): TaskGenerator<void> {
@@ -178,7 +183,14 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       this.args.onComplete?.();
     } catch (e) {
       this.isConfirmed = false;
-      if (isLayer2UserRejectionError(e)) {
+
+      if (
+        e.message.includes(
+          'Safe does not have enough balance to transfer tokens'
+        )
+      ) {
+        throw new Error('INSUFFICIENT_FUNDS');
+      } else if (isLayer2UserRejectionError(e)) {
         throw new Error('USER_REJECTION');
       } else {
         throw e;

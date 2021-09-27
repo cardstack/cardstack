@@ -317,6 +317,12 @@ export default abstract class Layer1ChainWeb3Strategy
     return tokenBridge.relayTokens(txnHash);
   }
 
+  async resumeClaimBridgedTokens(txnHash: string): Promise<TransactionReceipt> {
+    if (!this.web3) throw new Error('Cannot claim bridged tokens without web3');
+    let tokenBridge = await getSDK('TokenBridgeForeignSide', this.web3);
+    return tokenBridge.claimBridgedTokens(txnHash);
+  }
+
   async claimBridgedTokens(
     bridgeValidationResult: BridgeValidationResult,
     options?: ClaimBridgedTokensOptions

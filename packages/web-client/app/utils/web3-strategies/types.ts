@@ -85,6 +85,7 @@ export interface Layer1Web3Strategy
     bridgeValidationResult: BridgeValidationResult,
     options?: ClaimBridgedTokensOptions
   ): Promise<TransactionReceipt>;
+  resumeClaimBridgedTokens(txnHash: string): Promise<TransactionReceipt>;
   getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void>;
   getEstimatedGasForWithdrawalClaim(symbol: BridgeableSymbol): Promise<BN>;
   updateUsdConverters(

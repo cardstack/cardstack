@@ -1,6 +1,13 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { click, fillIn, render, typeIn, waitFor } from '@ember/test-helpers';
+import {
+  click,
+  fillIn,
+  render,
+  typeIn,
+  waitFor,
+  setupOnerror,
+} from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
@@ -194,6 +201,9 @@ module(
     });
 
     test('it displays the correct error message if user rejects confirmation', async function (assert) {
+      setupOnerror(function () {
+        // Do nothing - Prevent test from crashing on error
+      });
       let layer2Service = this.owner.lookup('service:layer2-network');
       sinon
         .stub(layer2Service, 'bridgeToLayer1')
@@ -208,6 +218,9 @@ module(
     });
 
     test('it displays the default error message', async function (assert) {
+      setupOnerror(function () {
+        // Do nothing - Prevent test from crashing on error
+      });
       let layer2Service = this.owner.lookup('service:layer2-network');
       sinon.stub(layer2Service, 'bridgeToLayer1').throws(new Error('Huh?'));
       await renderSubject();

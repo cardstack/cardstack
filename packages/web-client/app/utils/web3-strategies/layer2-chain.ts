@@ -434,14 +434,15 @@ export default abstract class Layer2ChainWeb3Strategy
     // in this case we don't want to wait for mining to complete. there is a
     // purpose built await in the SDK for the bridge validators that is
     // performed after this action--we can just rely on that for the timing
-    let transactionHash = await new Promise<TransactionHash>((res) => {
-      tokenBridge.relayTokens(
-        safeAddress,
-        tokenAddress,
-        receiverAddress,
-        amountInWei,
-        { onTxnHash: (txnHash) => res(txnHash) }
-      );
+
+    let transactionHash = await new Promise<TransactionHash>((res, reject) => {
+      tokenBridge
+        .relayTokens(safeAddress, tokenAddress, receiverAddress, amountInWei, {
+          onTxnHash: (txnHash) => res(txnHash),
+        })
+        .catch((e) => {
+          reject(e);
+        });
     });
     return transactionHash;
   }

@@ -1,19 +1,22 @@
-<WorkflowThread class="withdrawal-workflow" @workflow={{this.workflow}}>
-  <:before-content>
-    <Boxel::ExpandableBanner
-      @icon="info"
-      @summary="Make a withdrawal"
-      open
-    >
-      <div class="withdrawal-workflow__banner">
-        <p>
-          The funds you wish to withdraw must be available in your {{network-display-info "layer2" "fullName"}} wallet and will
-          be added to your {{network-display-info "layer1" "fullName"}} wallet.
-        </p>
-      </div>
-    </Boxel::ExpandableBanner>
-  </:before-content>
-</WorkflowThread>
+{{#if this.workflow}}
+  <WorkflowThread class="withdrawal-workflow" @workflow={{this.workflow}}>
+    <:before-content>
+      <Boxel::ExpandableBanner
+        @icon="info"
+        @summary="Make a withdrawal"
+        open
+      >
+        <div class="withdrawal-workflow__banner">
+          <p>
+            The funds you wish to withdraw must be available in your {{network-display-info "layer2" "fullName"}} wallet and will
+            be added to your {{network-display-info "layer1" "fullName"}} wallet.
+          </p>
+        </div>
+      </Boxel::ExpandableBanner>
+    </:before-content>
+  </WorkflowThread>
+{{/if}}
+
 <Listener
   @emitter={{this.layer1Network}}
   @event="disconnect"
