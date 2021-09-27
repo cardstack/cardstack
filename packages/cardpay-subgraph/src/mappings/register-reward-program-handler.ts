@@ -25,10 +25,10 @@ export function handleRewardProgramRegistrationFee(event: RewardProgramRegistrat
     event.params.spendAmount
   );
   let entity = new RewardProgramRegistrationPayment(txnHash);
+  entity.rewardProgramID = rewardProgramID;
   entity.admin = admin;
   entity.transaction = txnHash;
   entity.createdAt = event.block.timestamp;
   entity.prepaidCardPayment = txnHash;
-  entity.rewardProgramID = rewardProgramID;
   entity.save();
 }

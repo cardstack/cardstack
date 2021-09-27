@@ -312,6 +312,7 @@ type Safe @entity {
   safeTxns: [SafeTransaction]!              @derivedFrom(field: "safe")
   depot: Depot                              @derivedFrom(field: "safe")
   merchant: MerchantSafe                    @derivedFrom(field: "safe")
+  rewardee: RewardSafe                      @derivedFrom(field: "safe")
   prepaidCard: PrepaidCard                  @derivedFrom(field: "safe")
   tokens: [TokenHolder]!                    @derivedFrom(field: "safe")
   sentBridgedTokens: [BridgeToLayer1Event]! @derivedFrom(field: "safe")
@@ -464,7 +465,7 @@ type RewardProgramRegistrationPayment @entity {
   admin: Account!
   transaction: Transaction!
   createdAt: BigInt!
-  prepaidCardPayment: PrepaidCardPayment #remember to add bang here
+  prepaidCardPayment: PrepaidCardPayment! #remember to add bang here
 }
 
 type RewardeeRegistrationPayment @entity {
@@ -473,7 +474,7 @@ type RewardeeRegistrationPayment @entity {
   rewardee: Account!
   transaction: Transaction!
   createdAt: BigInt!
-  prepaidCardPayment: PrepaidCardPayment #remember to add bang here
+  prepaidCardPayment: PrepaidCardPayment! #remember to add bang here
 }
 
 type RewardSafe @entity {
@@ -481,4 +482,14 @@ type RewardSafe @entity {
   rewardProgramID: String!
   rewardee: Account!
   safe: Safe!
+}
+
+type RewardeeClaim @entity {
+  id: ID!
+  rewardProgramID: String!
+  rewardee: Account!
+  rewardSafe: RewardSafe! #remember to add bang here
+  amount: BigInt!
+  transaction: Transaction!
+  timestamp: BigInt!
 }
