@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
-import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
+import WorkflowPersistence, { WorkflowPersistencePersistedData } from '@cardstack/web-client/services/workflow-persistence';
 
 interface CardPayHeaderWorkflowTrackerArgs {}
 
@@ -13,7 +13,7 @@ export default class CardPayHeaderWorkflowTracker extends Component<CardPayHeade
 
   get allWorkflows() {
     return this.workflowPersistence.persistedDataIds.map((id) => ({
-      workflow: this.workflowPersistence.getPersistedData(id),
+      workflow: persistedDataWithParsedMeta(this.workflowPersistence.getPersistedData(id)),
       id,
     }));
   }
@@ -21,16 +21,22 @@ export default class CardPayHeaderWorkflowTracker extends Component<CardPayHeade
   get activeWorkflows() {
     return this.allWorkflows.filter(
       (workflow) =>
-        workflow.workflow.state.completedMilestonesCount < // FIXME workflow.workflow lol
-        workflow.workflow.state.milestonesCount
+        workflow.workflow.state.meta.completedMilestonesCount < // FIXME workflow.workflow lol
+        workflow.workflow.state.meta.milestonesCount
     );
   }
 
   get completedWorkflows() {
     return this.allWorkflows.filter(
       (workflow) =>
-        workflow.workflow.state.completedMilestonesCount ===
-        workflow.workflow.state.milestonesCount
+        workflow.workflow.state.meta.completedMilestonesCount ===
+        workflow.workflow.state.meta.milestonesCount
     );
   }
+}
+
+// FIXME mutating, scandalous? And, can this be pushed farther up?
+function persistedDataWithParsedMeta(data: WorkflowPersistencePersistedData) {
+  data.state.meta = JSON.parse(data.state.meta).value;
+  return data;
 }

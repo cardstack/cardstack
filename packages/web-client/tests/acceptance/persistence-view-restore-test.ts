@@ -1,4 +1,4 @@
-import { module, test, todo } from 'qunit';
+import { module, test } from 'qunit';
 import {
   click,
   currentURL,
@@ -15,6 +15,7 @@ import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { DepotSafe } from '@cardstack/cardpay-sdk';
+import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 import { BN } from 'bn.js';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/workflow-config';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
@@ -83,49 +84,52 @@ module('Acceptance | persistence view and restore', function () {
     test('it lists persisted workflows', async function (this: Context, assert) {
       workflowPersistenceService.persistData('persisted-merchant-creation', {
         name: 'MERCHANT_CREATION',
-        state: {
-          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
-          currentCardDisplayName: 'Merchant Account',
-          completedMilestonesCount: 1,
-          milestonesCount: 3,
+        state: buildState({
+          meta: {
+            completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+            completedMilestonesCount: 1,
+            milestonesCount: 3,
+          },
         },
-      });
+    )});
 
       workflowPersistenceService.persistData(
         'persisted-prepaid-card-issuance',
         {
           name: `PREPAID_CARD_ISSUANCE`,
-          state: {
-            completedCardNames: [
-              'LAYER2_CONNECT',
-              'HUB_AUTH',
-              'LAYOUT_CUSTOMIZATION',
-              'FUNDING_SOURCE',
-            ],
-            currentCardDisplayName: 'Prepaid card funding',
-            completedMilestonesCount: 1,
-            milestonesCount: 4,
-          },
+          state: buildState({
+            meta: {
+              completedCardNames: [
+                'LAYER2_CONNECT',
+                'HUB_AUTH',
+                'LAYOUT_CUSTOMIZATION',
+                'FUNDING_SOURCE',
+              ],
+              completedMilestonesCount: 1,
+              milestonesCount: 4,
+            },
+          }),
         }
       );
 
       workflowPersistenceService.persistData('persisted-complete-issuance', {
         name: 'PREPAID_CARD_ISSUANCE',
-        state: {
-          completedCardNames: [
-            'LAYER2_CONNECT',
-            'HUB_AUTH',
-            'LAYOUT_CUSTOMIZATION',
-            'FUNDING_SOURCE',
-            'FACE_VALUE',
-            'PREVIEW',
-            'CONFIRMATION',
-            'EPILOGUE_LAYER_TWO_CONNECT_CARD',
-          ],
-          currentCardDisplayName: 'Not shown',
-          completedMilestonesCount: 4,
-          milestonesCount: 4,
-        },
+        state: buildState({
+          meta: {
+            completedCardNames: [
+              'LAYER2_CONNECT',
+              'HUB_AUTH',
+              'LAYOUT_CUSTOMIZATION',
+              'FUNDING_SOURCE',
+              'FACE_VALUE',
+              'PREVIEW',
+              'CONFIRMATION',
+              'EPILOGUE_LAYER_TWO_CONNECT_CARD',
+            ],
+            completedMilestonesCount: 4,
+            milestonesCount: 4,
+          },
+        }),
       });
 
       await visit('/card-pay/');
@@ -178,12 +182,13 @@ module('Acceptance | persistence view and restore', function () {
     test('clicking a persisted workflow restores it', async function (assert) {
       workflowPersistenceService.persistData('persisted-merchant-creation', {
         name: 'MERCHANT_CREATION',
-        state: {
-          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
-          currentCardDisplayName: 'Merchant Account',
-          completedMilestonesCount: 1,
-          milestonesCount: 3,
-        },
+        state: buildState({
+          meta: {
+            completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+            completedMilestonesCount: 1,
+            milestonesCount: 3,
+          },
+        }),
       });
 
       await visit('/card-pay/');
@@ -196,15 +201,11 @@ module('Acceptance | persistence view and restore', function () {
       );
     });
 
-    // TODO it works for me in development 🤔
-    todo(
+    test(
       'opening a workflow only increments the counter by one',
       async function (assert) {
         await visit('/card-pay/balances');
         await click('[data-test-workflow-button="issue-prepaid-card"]');
-        // eslint-disable-next-line ember/no-settled-after-test-helper
-        await settled();
-        // await this.pauseTest();
 
         await fillIn('[data-test-layout-customization-name-input]', 'JJ');
         await click('[data-test-boxel-action-chin] [data-test-boxel-button]');
@@ -230,11 +231,13 @@ module('Acceptance | persistence view and restore', function () {
           `${STORAGE_KEY_PREFIX}:persisted-${i}`
         ] = JSON.stringify({
           name: `PREPAID_CARD_ISSUANCE`,
-          state: {
-            completedCardNames: ['LAYER2_CONNECT', 'HUB_AUTH'],
-            completedMilestonesCount: 1,
-            milestonesCount: 4,
-          },
+          state: buildState({
+            meta: {
+              completedCardNames: ['LAYER2_CONNECT', 'HUB_AUTH'],
+              completedMilestonesCount: 1,
+              milestonesCount: 4,
+            },
+          }),
         });
       }
 
