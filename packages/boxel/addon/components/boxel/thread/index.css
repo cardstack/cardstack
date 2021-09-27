@@ -19,6 +19,7 @@
 .boxel-thread__scroll-wrapper {
   padding-bottom: var(--boxel-sp-lg);
   overflow-y: auto;
+  z-index: 0;
 }
 
 .boxel-thread__scroll-wrapper:focus {
