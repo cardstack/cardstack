@@ -75,7 +75,6 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         withdrawalSafe: {
           type: 'depot',
           address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          createdAt: 1627908405,
           tokens: [
             {
               balance: '1000000000000000000',
@@ -97,14 +96,17 @@ module('Acceptance | withdrawal persistence', function (hooks) {
             },
           ],
         },
-        completedCardNames: [
-          'LAYER1_CONNECT',
-          'CHECK_BALANCE',
-          'LAYER2_CONNECT',
-          'CHOOSE_BALANCE',
-          'TRANSACTION_AMOUNT',
-          'TRANSACTION_STATUS',
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'CHECK_BALANCE',
+            'LAYER2_CONNECT',
+            'CHOOSE_BALANCE',
+            'TRANSACTION_AMOUNT',
+            'TRANSACTION_STATUS',
+          ],
+          createdAt: 1627908405,
+        },
       });
 
       workflowPersistenceService.persistData('abc123', {
@@ -136,9 +138,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
       const state = buildState({
         withdrawalToken: 'DAI.CPXD',
         withdrawnAmount: new BN('1000000000000000000'),
-        completedMilestonesCount: 6,
         layer2BlockHeightBeforeBridging: new BN('22867914'),
-        milestonesCount: 6,
         minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
         relayTokensTxnHash:
           '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
@@ -173,17 +173,21 @@ module('Acceptance | withdrawal persistence', function (hooks) {
             },
           ],
         },
-        completedCardNames: [
-          'LAYER1_CONNECT',
-          'CHECK_BALANCE',
-          'LAYER2_CONNECT',
-          'CHOOSE_BALANCE',
-          'TRANSACTION_AMOUNT',
-          'TRANSACTION_STATUS',
-          'TOKEN_CLAIM',
-          'TRANSACTION_CONFIRMED',
-          'EPILOGUE_LAYER_TWO_CONNECT_CARD',
-        ],
+        meta: {
+          completedMilestonesCount: 6,
+          milestonesCount: 6,
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'CHECK_BALANCE',
+            'LAYER2_CONNECT',
+            'CHOOSE_BALANCE',
+            'TRANSACTION_AMOUNT',
+            'TRANSACTION_STATUS',
+            'TOKEN_CLAIM',
+            'TRANSACTION_CONFIRMED',
+            'EPILOGUE_LAYER_TWO_CONNECT_CARD',
+          ],
+        },
         didClaimTokens: true,
       });
 
@@ -221,9 +225,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
       const state = buildState({
         withdrawalToken: 'DAI.CPXD',
         withdrawnAmount: new BN('1000000000000000000'),
-        completedMilestonesCount: 5,
         layer2BlockHeightBeforeBridging: new BN('22867914'),
-        milestonesCount: 6,
         minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
         relayTokensTxnHash:
           '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
@@ -258,16 +260,20 @@ module('Acceptance | withdrawal persistence', function (hooks) {
             },
           ],
         },
-        completedCardNames: [
-          'LAYER1_CONNECT',
-          'CHECK_BALANCE',
-          'LAYER2_CONNECT',
-          'CHOOSE_BALANCE',
-          'TRANSACTION_AMOUNT',
-          'TRANSACTION_STATUS',
-        ],
-        isCancelled: true,
-        cancelationReason: 'DISCONNECTED',
+        meta: {
+          completedMilestonesCount: 5,
+          milestonesCount: 6,
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'CHECK_BALANCE',
+            'LAYER2_CONNECT',
+            'CHOOSE_BALANCE',
+            'TRANSACTION_AMOUNT',
+            'TRANSACTION_STATUS',
+          ],
+          isCancelled: true,
+          cancelationReason: 'DISCONNECTED',
+        },
       });
       workflowPersistenceService.persistData('abc123', {
         name: 'WITHDRAWAL',
@@ -296,14 +302,16 @@ module('Acceptance | withdrawal persistence', function (hooks) {
 
     test('it cancels a persisted flow when Layer 1 wallet address is different', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: [
-          'LAYER1_CONNECT',
-          'CHECK_BALANCE',
-          'LAYER2_CONNECT',
-          'CHOOSE_BALANCE',
-          'TRANSACTION_AMOUNT',
-          'TRANSACTION_STATUS',
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'CHECK_BALANCE',
+            'LAYER2_CONNECT',
+            'CHOOSE_BALANCE',
+            'TRANSACTION_AMOUNT',
+            'TRANSACTION_STATUS',
+          ],
+        },
         layer1WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer1WalletAddress set in beforeEach
       });
       workflowPersistenceService.persistData('abc123', {
@@ -325,14 +333,16 @@ module('Acceptance | withdrawal persistence', function (hooks) {
 
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
       const state = buildState({
-        completedCardNames: [
-          'LAYER1_CONNECT',
-          'CHECK_BALANCE',
-          'LAYER2_CONNECT',
-          'CHOOSE_BALANCE',
-          'TRANSACTION_AMOUNT',
-          'TRANSACTION_STATUS',
-        ],
+        meta: {
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'CHECK_BALANCE',
+            'LAYER2_CONNECT',
+            'CHOOSE_BALANCE',
+            'TRANSACTION_AMOUNT',
+            'TRANSACTION_STATUS',
+          ],
+        },
         layer2WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer2WalletAddress set in beforeEach
       });
       workflowPersistenceService.persistData('abc123', {
@@ -356,9 +366,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
       const state = buildState({
         withdrawalToken: 'DAI.CPXD',
         withdrawnAmount: new BN('1000000000000000000'),
-        completedMilestonesCount: 5,
         layer2BlockHeightBeforeBridging: new BN('22867914'),
-        milestonesCount: 6,
         minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
         relayTokensTxnHash:
           '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
@@ -387,13 +395,17 @@ module('Acceptance | withdrawal persistence', function (hooks) {
             },
           ],
         },
-        completedCardNames: [
-          'LAYER1_CONNECT',
-          'CHECK_BALANCE',
-          'LAYER2_CONNECT',
-          'CHOOSE_BALANCE',
-          'TRANSACTION_AMOUNT',
-        ],
+        meta: {
+          completedMilestonesCount: 5,
+          milestonesCount: 6,
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'CHECK_BALANCE',
+            'LAYER2_CONNECT',
+            'CHOOSE_BALANCE',
+            'TRANSACTION_AMOUNT',
+          ],
+        },
       });
 
       workflowPersistenceService.persistData('abc123', {
@@ -418,9 +430,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
       assert.dom('[data-test-claim-button]').exists();
 
       assert.true(
-        workflowPersistenceService
-          .getPersistedData('abc123')
-          .state.completedCardNames.includes('TRANSACTION_STATUS') // Did complete
+        JSON.parse(
+          workflowPersistenceService.getPersistedData('abc123').state.meta
+        ).value.completedCardNames.includes('TRANSACTION_STATUS') // Did complete
       );
     });
   });
