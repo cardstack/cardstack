@@ -1,6 +1,8 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import WorkflowSession from '@cardstack/web-client/models/workflow/workflow-session';
+import WorkflowSession, {
+  buildState,
+} from '@cardstack/web-client/models/workflow/workflow-session';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import Ember from 'ember';
 import BN from 'bn.js';
@@ -644,31 +646,48 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     subject.setMeta(
       {
-        createdAt: 'created-at-mock',
+        completedCardNames: ['mock-card-1'],
       },
       false
     );
     subject.setMeta(
       {
-        updatedAt: 'updated-at-mock',
+        completedMilestonesCount: 2,
       },
       false
     );
 
-    assert.equal(
-      subject.getMeta().createdAt,
-      'created-at-mock',
-      'The initially set createdAt property was not overwritten'
+    assert.deepEqual(
+      subject.getMeta().completedCardNames,
+      ['mock-card-1'],
+      'The initially set completedCardNames property was not overwritten'
     );
     assert.equal(
-      subject.getMeta().updatedAt,
-      'updated-at-mock',
-      'The newly set updatedAt property has the correct value'
+      subject.getMeta().completedMilestonesCount,
+      2,
+      'The completedMilestonesCount property has the correct value'
     );
     assert.deepEqual(
       subject.getPersistedData().state,
       {},
       'State is not persisted because setMeta was called with persist=false'
+    );
+
+    subject.setMeta({
+      completedMilestonesCount: 1,
+    });
+
+    assert.deepEqual(
+      subject.getPersistedData().state,
+      buildState({
+        meta: {
+          completedCardNames: ['mock-card-1'],
+          completedMilestonesCount: 1,
+          updatedAt: startDateString,
+          createdAt: startDateString,
+        },
+      }),
+      'State is persisted when persist=false is not specified'
     );
   });
 
