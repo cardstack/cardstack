@@ -121,7 +121,7 @@ export default class WyreCallbackRoute {
       log.error(
         `Error: Failed to upsert wallet-orders row for the ${request.dest} receive of ${
           transfer.source
-        }. request is: ${JSON.stringify(request.source, null, 2)}`,
+        }. request is: ${JSON.stringify(request, null, 2)}`,
         err
       );
       return;
@@ -143,7 +143,7 @@ export default class WyreCallbackRoute {
       log.error(
         `Error: Failed to locate wallet_orders record for ${request.dest} receive of ${
           transfer.source
-        }. request is: ${JSON.stringify(request.source, null, 2)}`,
+        }. request is: ${JSON.stringify(request, null, 2)}`,
         err
       );
       return;
@@ -231,7 +231,7 @@ export default class WyreCallbackRoute {
           request.dest
         } receive, failed to query for wallet_orders record with an order ID of ${orderId}, for ${
           request.dest
-        } receive of ${transfer.source}. request is: ${JSON.stringify(request.source, null, 2)}`,
+        } receive of ${transfer.source}. request is: ${JSON.stringify(request, null, 2)}`,
         err
       );
       return;
@@ -303,7 +303,7 @@ export default class WyreCallbackRoute {
       log.error(
         `Error: Failed to locate wallet_orders record for ${request.dest} receive of ${
           transfer.source
-        }. request is: ${JSON.stringify(request.source, null, 2)}`,
+        }. request is: ${JSON.stringify(request, null, 2)}`,
         err
       );
       return;
@@ -315,7 +315,7 @@ export default class WyreCallbackRoute {
         `while processing ${
           request.source
         } send to admin account, could not find wallet_orders with a status of "received-order" that correlate to the request with custodial transfer ID of ${transferId}. request is: ${JSON.stringify(
-          request.source,
+          request,
           null,
           2
         )}`
