@@ -18,7 +18,7 @@ import { buildState } from '@cardstack/web-client/models/workflow/workflow-sessi
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 
 import WorkflowPersistence, {
-  STORAGE_KEY_PREFIX,
+  constructStorageKey,
 } from '@cardstack/web-client/services/workflow-persistence';
 
 interface Context extends MirageTestContext {}
@@ -310,7 +310,7 @@ module('Acceptance | persistence view and restore', function () {
 
       for (let i = 0; i < 2; i++) {
         window.TEST__MOCK_LOCAL_STORAGE_INIT[
-          `${STORAGE_KEY_PREFIX}:persisted-${i}`
+          constructStorageKey(`persisted-${i}`)
         ] = JSON.stringify({
           name: `PREPAID_CARD_ISSUANCE`,
           state: buildState({
