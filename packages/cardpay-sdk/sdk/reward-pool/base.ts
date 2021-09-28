@@ -120,7 +120,6 @@ export default class RewardPool {
     return json['results'];
   }
 
-  //get balance of all proofs
   async getProofsWithBalance(
     address: string,
     rewardProgramId?: string,
@@ -157,8 +156,6 @@ export default class RewardPool {
       .sort(compare);
   }
 
-  //get summary of reward tokens
-  //get summary of reward tokens from a certain reward program
   async rewardTokenBalance(
     address: string,
     tokenAddress: string,
@@ -198,8 +195,6 @@ export default class RewardPool {
     );
   }
 
-  //get summary of reward tokens for all reward programs
-  //get summary of reward tokens from a certain reward program
   async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<RewardTokenBalance[]> {
     let rewardPool = await this.getRewardPool();
     if (rewardProgramId) {
@@ -460,7 +455,6 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       };
     }, {});
   }
-  // tokenMapping: any =
   private async getRewardPool(): Promise<Contract> {
     if (this.rewardPool) {
       return this.rewardPool;
