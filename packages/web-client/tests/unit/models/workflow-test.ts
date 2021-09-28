@@ -8,11 +8,10 @@ import {
   WorkflowMessage,
   WorkflowPostable,
 } from '@cardstack/web-client/models/workflow';
+import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
 
 module('Unit | Workflow model', function (hooks) {
   setupTest(hooks);
-
-  class ConcreteWorkflow extends Workflow {}
 
   let exampleMilestone: Milestone;
   let exampleMessage: WorkflowMessage;
@@ -33,7 +32,7 @@ module('Unit | Workflow model', function (hooks) {
   });
 
   test('attachWorkflow sets workflow on milestones', function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
     assert.ok(!exampleMilestone.workflow);
     workflow.attachWorkflow();
@@ -41,7 +40,7 @@ module('Unit | Workflow model', function (hooks) {
   });
 
   test('attachWorkflow sets workflow on epiloguePostables', function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
     workflow.epilogue.postables = [exampleMessage];
     assert.ok(!exampleMessage.workflow);
@@ -50,7 +49,7 @@ module('Unit | Workflow model', function (hooks) {
   });
 
   test('attachWorkflow sets workflow on cancelationMessages', function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
     workflow.cancelationMessages = new PostableCollection([exampleMessage]);
     assert.ok(!exampleMessage.workflow);
@@ -59,7 +58,7 @@ module('Unit | Workflow model', function (hooks) {
   });
 
   test('completedMilestoneCount returns count of milestones with isComplete true', function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     let milestone2Postable = new WorkflowPostable({ name: 'cardbot' });
     milestone2Postable.isComplete = false;
 
@@ -78,7 +77,7 @@ module('Unit | Workflow model', function (hooks) {
   });
 
   test('visibleMilestones returns milestones up to and including first incomplete milestone', function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     let milestone2Postable = new WorkflowPostable({ name: 'cardbot' });
     milestone2Postable.isComplete = false;
 
@@ -105,7 +104,7 @@ module('Unit | Workflow model', function (hooks) {
   });
 
   test('progressStatus returns the "completedDetail" of the last complete milestone', function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     let milestone2Postable = new WorkflowPostable({ name: 'cardbot' });
     milestone2Postable.isComplete = false;
 
@@ -123,20 +122,20 @@ module('Unit | Workflow model', function (hooks) {
   });
 
   test('progressStatus returns "Workflow started" when no milestones are complete', function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
     assert.equal(workflow.progressStatus, 'Workflow started');
   });
 
   test('progressStatus returns "Workflow canceled" when workflow is canceled', function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
     workflow.cancel('TEST');
     assert.equal(workflow.progressStatus, 'Workflow canceled');
   });
 
   test('Incomplete workflow is canceled when workflow.cancel is called', function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
     workflow.cancel('TEST');
     assert.equal(workflow.isCanceled, true);
@@ -144,7 +143,7 @@ module('Unit | Workflow model', function (hooks) {
   });
 
   test('Workflow cannot be canceled twice', function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
     workflow.cancel('FIRST');
     workflow.cancel('SECOND');
@@ -153,7 +152,7 @@ module('Unit | Workflow model', function (hooks) {
   });
 
   test('Completed workflow is not canceled when workflow.cancel is called', function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [exampleMilestone];
     examplePostable.isComplete = true;
 
@@ -163,7 +162,7 @@ module('Unit | Workflow model', function (hooks) {
   });
 
   test('Workflow.resetTo resets each milestone and its epilogue correctly', function (assert) {
-    const testWorkflow = new ConcreteWorkflow(this.owner);
+    const testWorkflow = new WorkflowStub(this.owner);
     let indicesArray: string[] = [];
 
     class DummyResetFromEpilogue extends PostableCollection {
@@ -253,7 +252,7 @@ module('Unit | Workflow model', function (hooks) {
     let calledIncludeIf: boolean;
 
     hooks.beforeEach(function () {
-      workflow = new ConcreteWorkflow(this.owner);
+      workflow = new WorkflowStub(this.owner);
       calledIncludeIf = false;
       let secondMilestone = new Milestone({
         title: 'Milestone 2',

@@ -5,19 +5,17 @@ import hbs from 'htmlbars-inline-precompile';
 import {
   Milestone,
   PostableCollection,
-  Workflow,
   WorkflowMessage,
   WorkflowPostable,
   WorkflowCard,
 } from '@cardstack/web-client/models/workflow';
+import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
 
 module('Integration | Component | workflow-thread', function (hooks) {
   setupRenderingTest(hooks);
 
-  class ConcreteWorkflow extends Workflow {}
-
   test('it renders before-content named block', async function (assert) {
-    this.set('workflow', new ConcreteWorkflow(this.owner));
+    this.set('workflow', new WorkflowStub(this.owner));
     await render(hbs`
       <WorkflowThread @workflow={{this.workflow}}>
         <:before-content>
@@ -31,7 +29,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
   });
 
   test('it renders date divider before first post and when the date changes', async function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     let postable1 = new WorkflowMessage({
       author: { name: 'cardbot' },
       message: 'Hello world',
@@ -79,7 +77,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
   });
 
   test('it uses the appropriate text for milestone statuses', async function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [
       new Milestone({
         title: 'First milestone',
@@ -133,7 +131,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
   });
 
   test('it renders epilogue posts after the workflow is complete', async function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     let postable1 = new WorkflowPostable({ name: 'cardbot' });
     workflow.milestones = [
       new Milestone({
@@ -162,7 +160,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
   });
 
   test('it renders cancelation posts after the workflow is canceled', async function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [
       new Milestone({
         title: 'First milestone',
@@ -206,7 +204,7 @@ module('Integration | Component | workflow-thread', function (hooks) {
         `
     );
 
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     let message = () =>
       new WorkflowMessage({
         author: { name: 'cardbot' },

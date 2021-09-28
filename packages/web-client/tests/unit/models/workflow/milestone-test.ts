@@ -3,9 +3,9 @@ import { setupTest } from 'ember-qunit';
 import {
   Milestone,
   Participant,
-  Workflow,
   WorkflowPostable,
 } from '@cardstack/web-client/models/workflow';
+import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
 
 module('Unit | Milestone model', function (hooks) {
   setupTest(hooks);
@@ -79,10 +79,8 @@ module('Unit | Milestone model', function (hooks) {
       assert.ok(subject.isComplete);
     });
 
-    class ConcreteWorkflow extends Workflow {}
-
     test('setWorkflow does exactly that', function (assert) {
-      let workflow = new ConcreteWorkflow(this.owner);
+      let workflow = new WorkflowStub(this.owner);
       subject.setWorkflow(workflow);
       assert.strictEqual(subject.workflow, workflow);
     });
