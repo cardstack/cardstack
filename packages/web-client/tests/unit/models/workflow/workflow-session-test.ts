@@ -7,6 +7,7 @@ import WorkflowPersistence from '@cardstack/web-client/services/workflow-persist
 import Ember from 'ember';
 import BN from 'bn.js';
 import { default as sinon, SinonFakeTimers } from 'sinon';
+import { Workflow } from '@cardstack/web-client/models/workflow';
 
 const { track, valueForTag, validateTag } =
   // @ts-ignore digging
@@ -49,7 +50,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
     assert.equal(subject.getValue<string>('myKey'), 'myValue');
   });
@@ -63,7 +64,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
     assert.equal(subject.getValue<string>('myKey'), null);
   });
@@ -77,7 +78,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
 
     const tag = track(() => {
@@ -115,7 +116,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
 
     const tag = track(() => {
@@ -156,7 +157,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
     assert.equal(subject.getValue<number>('myKey'), 42);
   });
@@ -170,7 +171,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
     assert.equal(subject.getValue<number>('myKey'), null);
   });
@@ -184,7 +185,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
 
     const tag = track(() => {
@@ -222,7 +223,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
 
     const tag = track(() => {
@@ -269,7 +270,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
 
     assert.deepEqual(subject.getValues(), {
@@ -291,7 +292,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
     assert.equal(subject.state.myNumberKey, 42);
     assert.equal(subject.state.myStringKey, 'myValue');
@@ -324,7 +325,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
     assert.equal(subject.getValue<boolean>('myKey'), false);
   });
@@ -338,7 +339,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
     assert.equal(subject.getValue<boolean>('myKey'), null);
   });
@@ -352,7 +353,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
 
     const tag = track(() => {
@@ -392,7 +393,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
     assert.ok(
       subject.getValue<BN>('myKey')?.eq(new BN('42')),
@@ -409,7 +410,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
     assert.equal(subject.getValue<BN>('myKey'), null);
   });
@@ -423,7 +424,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
 
     const tag = track(() => {
@@ -466,7 +467,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
     assert.equal(
       subject.getValue<Date>('myKey')?.getTime(),
@@ -484,7 +485,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
     assert.equal(subject.getValue<Date>('myKey'), null);
   });
@@ -498,7 +499,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
 
     const tag = track(() => {
@@ -540,7 +541,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
 
     const tag = track(() => {
@@ -578,7 +579,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     subject.restoreFromStorage();
 
     const tag = track(() => {
@@ -625,13 +626,17 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     assert.throws(() => {
       subject.setValue('meta', 'something');
     }, 'Please use setMeta to set meta values');
 
     assert.throws(() => {
-      subject.setValue({ meta: 'something-else' });
+      subject.setValue({
+        meta: {
+          updatedAt: '3',
+        },
+      });
     }, 'Please use setMeta to set meta values');
   });
 
@@ -644,7 +649,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     let initialMeta = subject.getMeta();
 
     assert.equal(
@@ -709,7 +714,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
     let initialMeta = subject.getMeta();
     assert.equal(
       initialMeta?.createdAt,
@@ -749,7 +754,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     let subject = new WorkflowSession({
       workflowPersistence,
       workflowPersistenceId: ID,
-    });
+    } as Workflow);
 
     subject.setValue('arbitrary-key', 'arbitrary-value');
 
