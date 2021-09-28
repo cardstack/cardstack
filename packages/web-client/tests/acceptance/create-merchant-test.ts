@@ -10,6 +10,7 @@ import {
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
+import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import BN from 'bn.js';
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -18,6 +19,7 @@ import {
   PrepaidCardSafe,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
+import { setupHubAuthenticationToken } from '../helpers/setup';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
@@ -251,6 +253,8 @@ module('Acceptance | create merchant', function (hooks) {
   });
 
   module('Tests with the layer 2 wallet already connected', function (hooks) {
+    setupHubAuthenticationToken(hooks);
+
     let layer2Service: Layer2TestWeb3Strategy;
 
     hooks.beforeEach(async function () {
@@ -298,18 +302,27 @@ module('Acceptance | create merchant', function (hooks) {
       assert
         .dom(milestoneCompletedSel(0))
         .containsText(`${c.layer2.fullName} wallet connected`);
+
+      let workflowPersistenceService = this.owner.lookup(
+        'service:workflow-persistence'
+      ) as WorkflowPersistence;
+
+      let workflowPersistenceId = new URL(
+        'http://domain.test/' + currentURL()
+      ).searchParams.get('flow-id')!;
+
+      let persistedData = workflowPersistenceService.getPersistedData(
+        workflowPersistenceId
+      );
+
+      assert.ok(
+        persistedData.state.layer2WalletAddress.includes(layer2AccountAddress),
+        'expected the layer 2 address to have been persisted when the wallet was already connected'
+      );
     });
 
     test('changed merchant details after canceling the merchant creation request are persisted', async function (this: Context, assert) {
       await visit('/card-pay/merchant-services?flow=create-merchant');
-
-      let hubAuthenticationPost = postableSel(1, 1);
-      await waitFor(hubAuthenticationPost);
-      await click(
-        `${hubAuthenticationPost} [data-test-boxel-action-chin] [data-test-boxel-button]`
-      );
-      layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
-
       await waitFor('[data-test-merchant-customization-merchant-name-field]');
       await fillIn(
         `[data-test-merchant-customization-merchant-name-field] input`,
