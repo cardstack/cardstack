@@ -9,18 +9,13 @@ import {
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
-
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
-import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
+import { setupHubAuthenticationToken } from '../helpers/setup';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { DepotSafe, PrepaidCardSafe } from '@cardstack/cardpay-sdk';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
-import { BN } from 'bn.js';
-import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/workflow-config';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
-import { toWei } from 'web3-utils';
 
 import WorkflowPersistence, {
   STORAGE_KEY_PREFIX,
@@ -31,30 +26,14 @@ interface Context extends MirageTestContext {}
 let workflowPersistenceService: WorkflowPersistence;
 
 async function setupEverythingFIXME(context: Context) {
-  context.server.db.loadData({
-    prepaidCardColorSchemes,
-    prepaidCardPatterns,
-  });
-  window.TEST__AUTH_TOKEN = 'abc123--def456--ghi789';
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
-  // FIXME what of the below and above is unnecessary?
-
-  const MIN_AMOUNT_TO_PASS = new BN(
-    toWei(`${Math.ceil(Math.min(...faceValueOptions) / 100)}`)
-  );
   let layer2Service = context.owner.lookup('service:layer2-network')
     .strategy as Layer2TestWeb3Strategy;
   layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
   let testDepot = {
     address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
     tokens: [
-      {
-        balance: MIN_AMOUNT_TO_PASS.toString(),
-        token: {
-          symbol: 'DAI',
-        },
-      },
       {
         balance: '500000000000000000000',
         token: {
@@ -89,9 +68,6 @@ async function setupEverythingFIXME(context: Context) {
     } as PrepaidCardSafe,
   ]);
 
-  layer2Service.authenticate();
-  layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
-
   workflowPersistenceService = context.owner.lookup(
     'service:workflow-persistence'
   );
@@ -101,6 +77,7 @@ module('Acceptance | persistence view and restore', function () {
   module('when things have been constructed FIXME lol', function (hooks) {
     setupApplicationTest(hooks);
     setupMirage(hooks);
+    setupHubAuthenticationToken(hooks)
 
     hooks.beforeEach(async function (this: Context) {
       await setupEverythingFIXME(this);
@@ -359,6 +336,7 @@ module('Acceptance | persistence view and restore', function () {
       module('wha', function (hooks) {
         setupApplicationTest(hooks);
         setupMirage(hooks);
+        setupHubAuthenticationToken(hooks);
 
         hooks.beforeEach(async function (this: Context) {
           await setupEverythingFIXME(this);
