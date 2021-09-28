@@ -26,7 +26,12 @@ export default class CardPayHeaderWorkflowTracker extends Component<CardPayHeade
     return this.workflowPersistence.persistedDataIds.reduce((workflows, id) => {
       let workflow = this.workflowPersistence.getPersistedData(id);
 
-      if (workflow && WORKFLOW_NAMES_KEYS.includes(workflow.name) && workflow.state && workflow.state.meta) {
+      if (
+        workflow &&
+        WORKFLOW_NAMES_KEYS.includes(workflow.name) &&
+        workflow.state &&
+        workflow.state.meta
+      ) {
         workflows.push({ workflow: persistedDataWithParsedMeta(workflow), id });
       }
 
@@ -51,7 +56,7 @@ export default class CardPayHeaderWorkflowTracker extends Component<CardPayHeade
   }
 
   @action clearCompletedWorkflows() {
-    this.completedWorkflows.forEach(workflowAndId => {
+    this.completedWorkflows.forEach((workflowAndId) => {
       this.workflowPersistence.clearWorkflowWithId(workflowAndId.id);
     });
   }
