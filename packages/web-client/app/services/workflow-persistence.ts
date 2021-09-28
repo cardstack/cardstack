@@ -8,8 +8,6 @@ import { WorkflowName } from '../models/workflow';
 import { WORKFLOW_NAMES } from '@cardstack/web-client/models/workflow';
 import { WorkflowMeta } from '@cardstack/web-client/models/workflow/workflow-session';
 
-const WORKFLOW_NAMES_KEYS = Object.keys(WORKFLOW_NAMES);
-
 export interface WorkflowPersistencePersistedData {
   name: string;
   state: any;
@@ -19,7 +17,9 @@ export interface WorkflowPersistenceMeta extends WorkflowMeta {
   name: string;
 }
 
-export const STORAGE_KEY_PREFIX = 'workflowPersistence';
+const WORKFLOW_NAMES_KEYS = Object.keys(WORKFLOW_NAMES);
+
+const STORAGE_KEY_PREFIX = 'workflowPersistence';
 
 export default class WorkflowPersistence extends Service {
   @service declare router: RouterService;
@@ -41,7 +41,6 @@ export default class WorkflowPersistence extends Service {
       entries = this.#storage;
     }
 
-    // FIXME extract function to construct compound key instead of exporting prefix?
     this.persistedDataIds = Object.keys(entries)
       .filter((key) => key.startsWith(`${STORAGE_KEY_PREFIX}:`))
       .map((key) => key.replace(`${STORAGE_KEY_PREFIX}:`, ''));
@@ -51,8 +50,7 @@ export default class WorkflowPersistence extends Service {
     workflowPersistenceId: string
   ): WorkflowPersistencePersistedData {
     return JSON.parse(
-      this.#storage.getItem(`${STORAGE_KEY_PREFIX}:${workflowPersistenceId}`) ||
-        '{}'
+      this.#storage.getItem(constructStorageKey(workflowPersistenceId)) || '{}'
     );
   }
 
@@ -68,7 +66,7 @@ export default class WorkflowPersistence extends Service {
     }
 
     return this.#storage.setItem(
-      `${STORAGE_KEY_PREFIX}:${workflowPersistenceId}`,
+      constructStorageKey(workflowPersistenceId),
       JSON.stringify(data)
     );
   }
@@ -149,11 +147,17 @@ export default class WorkflowPersistence extends Service {
     this.#storage.clear();
   }
 
-  clearWorkflowWithId(id: string) {
-    this.persistedDataIds = this.persistedDataIds.without(id);
-    const prefixedId = `${STORAGE_KEY_PREFIX}:${id}`;
+  clearWorkflowWithId(workflowPersistenceId: string) {
+    this.persistedDataIds = this.persistedDataIds.without(
+      workflowPersistenceId
+    );
+    const prefixedId = constructStorageKey(workflowPersistenceId);
     this.#storage.removeItem(prefixedId);
   }
+}
+
+export function constructStorageKey(workflowPersistenceId: string) {
+  return `${STORAGE_KEY_PREFIX}:${workflowPersistenceId}`;
 }
 
 function parseMeta(data: WorkflowPersistencePersistedData) {
