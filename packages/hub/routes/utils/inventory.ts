@@ -9,15 +9,20 @@ interface SKUReservations {
   [sku: string]: number;
 }
 
-export async function getSKUSummaries(db: DBClient, subgraph: SubgraphService): Promise<JSONAPI.ResourceObject[]> {
-  let { inventories, reservations } = await getInventoriesAndActiveReservations(db, subgraph);
+export async function getSKUSummaries(
+  db: DBClient,
+  subgraph: SubgraphService,
+  issuer?: string
+): Promise<JSONAPI.ResourceObject[]> {
+  let { inventories, reservations } = await getInventoriesAndActiveReservations(db, subgraph, issuer);
   let data = inventories.map((inventory) => formatInventory(inventory, reservations));
   return data;
 }
 
 async function getInventoriesAndActiveReservations(
   db: DBClient,
-  subgraph: SubgraphService
+  subgraph: SubgraphService,
+  issuer?: string
 ): Promise<{ inventories: SKUInventory[]; reservations: SKUReservations }> {
   let provisionResult = await db.query(
     `SELECT prepaid_card_address FROM reservations WHERE prepaid_card_address IS NOT NULL AND updated_at > now() - interval '${subgraphSyncGraceMins} minutes'`
@@ -33,7 +38,7 @@ async function getInventoriesAndActiveReservations(
 
   let {
     data: { skuinventories: inventories },
-  } = await subgraph.getInventory(recentlyProvisionedPrepaidCards);
+  } = await subgraph.getInventory(recentlyProvisionedPrepaidCards, issuer);
   return { inventories, reservations };
 }
 
