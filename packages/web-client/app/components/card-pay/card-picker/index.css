@@ -81,11 +81,16 @@
   border-top: 1px solid var(--boxel-light-400);
 }
 
-.card-picker-dropdown__option:hover {
+.card-picker-dropdown__option:hover:not(.card-picker-dropdown__option--disabled) {
   background-color: var(--boxel-purple-100);
   cursor: pointer;
 }
 
 .ember-power-select-selected-item .card-picker-dropdown__option:hover {
   background-color: initial;
+}
+
+.card-picker-dropdown__option--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
