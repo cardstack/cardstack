@@ -34,7 +34,7 @@ interface ValidatedWalletSendRequest {
   transfer: WyreTransfer;
 }
 
-export const adminWalletName = `${env}_admin`;
+export const adminWalletName = `admin`;
 
 export default class WyreCallbackRoute {
   adminWalletId: string | undefined;
@@ -338,9 +338,9 @@ export default class WyreCallbackRoute {
     }
     if (!this.adminWalletId) {
       log.error(
-        `Error: Wyre admin wallet has not been created! Please create a wyre admin wallet with the name "${adminWalletName}" that has no callback URL.`
+        `Error: Wyre admin wallet has not been created! Please create a wyre admin wallet with the name "${env}_${adminWalletName}" that has no callback URL.`
       );
-      throw new Error(`Wyre admin wallet, ${adminWalletName}, has not been created`);
+      throw new Error(`Wyre admin wallet, ${env}_${adminWalletName}, has not been created`);
     }
     return this.adminWalletId;
   }
