@@ -134,12 +134,12 @@ module('Acceptance | persistence view and restore', function () {
 
       workflowPersistenceService.persistData('unknown', {
         name: 'UNKNOWN',
-        state: buildState({})
+        state: buildState({}),
       });
 
       workflowPersistenceService.persistData('unknown-with-meta', {
         name: 'UNKNOWN',
-        state: buildState({meta: {}})
+        state: buildState({ meta: {} }),
       });
 
       await visit('/card-pay/');
@@ -244,7 +244,6 @@ module('Acceptance | persistence view and restore', function () {
           },
         }),
       });
-
 
       await visit('/card-pay/');
 
