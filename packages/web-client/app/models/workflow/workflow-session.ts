@@ -8,6 +8,7 @@ import { isPresent } from '@ember/utils';
 import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
+import { Workflow } from '../workflow';
 
 interface WorkflowMeta {
   updatedAt: string | undefined;
@@ -86,9 +87,8 @@ function stateProxyHandler(workflowSession: WorkflowSession) {
     },
   };
 }
-
 export default class WorkflowSession {
-  workflow: any;
+  workflow: Workflow;
   #stateProxy: any;
   constructor(workflow?: any) {
     this.workflow = workflow;
@@ -109,18 +109,20 @@ export default class WorkflowSession {
     return this.#stateProxy;
   }
 
-  get hasPersistence() {
+  hasPersistence(): this is { workflow: { workflowPersistenceId: string } } {
     return isPresent(this.workflow?.workflowPersistenceId);
   }
 
   restoreFromStorage(): void {
-    if (!this.hasPersistence) return;
+    if (!this.hasPersistence()) return;
 
     let persistedData = this.getPersistedData();
-    this._state = persistedData?.state || {};
+    this._state = persistedData?.state || ({} as Record<string, string>);
   }
 
-  getPersistedData(): any {
+  getPersistedData(): { state?: Record<string, string> } {
+    if (!this.hasPersistence()) return {};
+
     return this.workflow?.workflowPersistence.getPersistedData(
       this.workflow.workflowPersistenceId
     );
@@ -202,7 +204,7 @@ export default class WorkflowSession {
   }
 
   private persistToStorage(): void {
-    if (!this.hasPersistence) return;
+    if (!this.hasPersistence()) return;
 
     // first persistence will set both updatedAt and createdAt to the same date
     let updatedAt = new Date().toISOString();
@@ -244,7 +246,7 @@ export function serializeToState(
 // A useful util for tests
 export function buildState(
   data: Record<string, SupportedType>
-): Record<string, any> {
+): Record<string, string> {
   let result = {};
   for (let key in data) {
     serializeToState(result, key, data[key]);
