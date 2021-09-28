@@ -16,7 +16,7 @@ import {
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { inject as service } from '@ember/service';
-import { action } from '@ember/object';
+import RouterService from '@ember/routing/router-service';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { capitalize } from '@ember/string';
 import BN from 'bn.js';
@@ -30,10 +30,7 @@ import {
 } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
-import RouterService from '@ember/routing/router-service';
-import { next } from '@ember/runloop';
-import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
-
+import { action } from '@ember/object';
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
@@ -129,7 +126,6 @@ You only have **${formatWeiAmount(layer1Network.defaultTokenBalance)} ${
 class WithdrawalWorkflow extends Workflow {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  @service declare router: RouterService;
 
   name = 'WITHDRAWAL' as WorkflowName;
 
@@ -403,11 +399,12 @@ with Card Pay.`,
     return errors;
   }
 
-  constructor(owner: unknown) {
-    super(owner);
-    this.workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
+  beforeRestorationChecks() {
+    return [this.layer1Network.waitForAccount];
+  }
 
+  constructor(owner: unknown, workflowPersistenceId?: string) {
+    super(owner, workflowPersistenceId);
     this.attachWorkflow();
   }
 }
@@ -415,34 +412,25 @@ with Card Pay.`,
 export default class WithdrawalWorkflowComponent extends Component {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  @service declare workflowPersistence: WorkflowPersistence;
-
   @tracked workflow: WithdrawalWorkflow | null = null;
+  @service declare router: RouterService;
 
   constructor(owner: unknown, args: {}) {
     super(owner, args);
 
-    let workflow = new WithdrawalWorkflow(getOwner(this));
-    let willRestore = workflow.session.hasPersistedState();
+    let workflowPersistenceId =
+      this.router.currentRoute.queryParams['flow-id']!;
 
-    if (willRestore) {
-      workflow.session.restoreFromStorage();
-      taskFor(this.restoreTask).perform(workflow);
-    } else {
-      this.workflow = workflow;
-    }
+    let workflow = new WithdrawalWorkflow(
+      getOwner(this),
+      workflowPersistenceId
+    );
+
+    this.restore(workflow);
   }
 
-  @task *restoreTask(workflow: WithdrawalWorkflow) {
-    let errors = workflow.restorationErrors();
-    if (errors.length > 0) {
-      next(this, () => {
-        workflow.cancel(errors[0]);
-      });
-    } else {
-      yield this.layer1Network.waitForAccount;
-      workflow.restoreFromPersistedWorkflow();
-    }
+  async restore(workflow: any) {
+    await workflow.restore();
     this.workflow = workflow;
   }
 

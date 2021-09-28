@@ -18,9 +18,6 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 import { capitalize } from '@ember/string';
 import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
-import { next } from '@ember/runloop';
-import { task } from 'ember-concurrency';
-import { taskFor } from 'ember-concurrency-ts';
 import { tracked } from '@glimmer/tracking';
 
 const FAILURE_REASONS = {
@@ -37,7 +34,6 @@ class DepositWorkflow extends Workflow {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
 
-  workflowPersistenceId: string;
   name = 'RESERVE_POOL_DEPOSIT' as WorkflowName;
   milestones = [
     new Milestone({
@@ -254,14 +250,6 @@ class DepositWorkflow extends Workflow {
     }),
   ]);
 
-  constructor(owner: any) {
-    super(owner);
-    this.workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
-
-    this.attachWorkflow();
-  }
-
   restorationErrors() {
     let { layer1Network, layer2Network } = this;
 
@@ -299,37 +287,37 @@ class DepositWorkflow extends Workflow {
 
     return errors;
   }
+
+  beforeRestorationChecks() {
+    return [this.layer1Network.waitForAccount];
+  }
+
+  constructor(owner: unknown, workflowPersistenceId?: string) {
+    super(owner, workflowPersistenceId);
+    this.attachWorkflow();
+  }
 }
 
 class DepositWorkflowComponent extends Component {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @service declare workflowPersistence: WorkflowPersistence;
-
+  @service declare router: RouterService;
   @tracked workflow: DepositWorkflow | null = null;
+
   constructor(owner: unknown, args: {}) {
     super(owner, args);
-    let workflow = new DepositWorkflow(getOwner(this));
-    let willRestore = workflow.session.hasPersistedState();
 
-    if (willRestore) {
-      workflow.session.restoreFromStorage();
-      taskFor(this.restoreTask).perform(workflow);
-    } else {
-      this.workflow = workflow;
-    }
+    let workflowPersistenceId =
+      this.router.currentRoute.queryParams['flow-id']!;
+
+    let workflow = new DepositWorkflow(getOwner(this), workflowPersistenceId);
+
+    this.restore(workflow);
   }
 
-  @task *restoreTask(workflow: DepositWorkflow) {
-    let errors = workflow.restorationErrors();
-    if (errors.length > 0) {
-      next(this, () => {
-        workflow.cancel(errors[0]);
-      });
-    } else {
-      yield this.layer1Network.waitForAccount;
-      workflow.restoreFromPersistedWorkflow();
-    }
+  async restore(workflow: any) {
+    await workflow.restore();
     this.workflow = workflow;
   }
 
