@@ -1,5 +1,6 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
+import Logger from '@cardstack/logger';
 import DatabaseManager from '../services/database-manager';
 import { ensureLoggedIn } from './utils/auth';
 import { inject } from '../di/dependency-injection';
@@ -9,6 +10,9 @@ import { nextOrderStatus, provisionPrepaidCard, updateOrderStatus } from './util
 import WyreService from '../services/wyre';
 import { validate as validateUUID } from 'uuid';
 import * as JSONAPI from 'jsonapi-typescript';
+import * as Sentry from '@sentry/node';
+import { captureSentryMessage } from './utils/sentry';
+let log = Logger('route:orders');
 
 export default class OrdersRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
@@ -36,6 +40,9 @@ export default class OrdersRoute {
     let orderId = ctx.request.body.data.attributes['order-id'];
     let walletId = ctx.request.body.data.attributes['wallet-id'];
     let reservationId = ctx.request.body.data.relationships.reservation.data.id;
+    Sentry.addBreadcrumb({
+      message: `received order create: userAddress=${userAddress}, orderId=${orderId}, walletId=${walletId}, reservationId=${reservationId}`,
+    });
 
     let validationError = await this.validateOrder(orderId, userAddress, reservationId, walletId);
     if (validationError) {
@@ -50,6 +57,10 @@ export default class OrdersRoute {
         ],
       };
       ctx.type = 'application/vnd.api+json';
+      captureSentryMessage(
+        `could not validate order creation for orderId=${orderId}. validationError=${validationError}`,
+        ctx
+      );
       return;
     }
 
@@ -69,7 +80,15 @@ export default class OrdersRoute {
     );
 
     if (status === 'provisioning') {
-      await provisionPrepaidCard(db, this.relay, this.subgraph, reservationId);
+      Sentry.addBreadcrumb({ message: `provisioning prepaid card for reservationId=${reservationId}` });
+      try {
+        await provisionPrepaidCard(db, this.relay, this.subgraph, reservationId);
+      } catch (err) {
+        let message = `Could not provision prepaid card for reservationId ${reservationId}! Received error from relay server: ${err.toString()}`;
+        log.error(message, err);
+        captureSentryMessage(message, ctx);
+        throw err;
+      }
       ({ status } = await updateOrderStatus(db, orderId, 'provision-mined'));
     }
 

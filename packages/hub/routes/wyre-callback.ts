@@ -7,6 +7,8 @@ import { inject } from '../di/dependency-injection';
 import WyreService, { WyreOrder, WyreTransfer, WyreWallet } from '../services/wyre';
 import Web3 from 'web3';
 import { nextOrderStatus, OrderStatus, OrderState, provisionPrepaidCard, updateOrderStatus } from './utils/orders';
+import * as Sentry from '@sentry/node';
+import { captureSentryMessage } from './utils/sentry';
 
 const { toChecksumAddress } = Web3.utils;
 let log = Logger('route:wyre-callback');
@@ -53,13 +55,13 @@ export default class WyreCallbackRoute {
     try {
       assertWyreCallbackRequest(request);
     } catch (err) {
-      log.info(
-        `ignoring wyre callback that doesn't match the expected shape of a wyre callback request: ${JSON.stringify(
-          request,
-          null,
-          2
-        )}`
-      );
+      let message = `ignoring wyre callback that doesn't match the expected shape of a wyre callback request: ${JSON.stringify(
+        request,
+        null,
+        2
+      )}`;
+      log.info(message);
+      captureSentryMessage(message, ctx);
       ctx.status = 400;
       return;
     }
@@ -70,11 +72,14 @@ export default class WyreCallbackRoute {
     // keep in mind these are server callbacks so we should be pretty forgiving
     // with erronous data and just log extensively
     if (sourceType === 'transfer' && destType === 'wallet') {
-      await this.processWalletReceive(request);
+      Sentry.addBreadcrumb({ message: `wyre callback - custodial wallet receive: ${JSON.stringify(request)}` });
+      await this.processWalletReceive(request, ctx);
     } else if (sourceType === 'wallet' && destType === 'transfer') {
-      await this.processWalletSend(request);
+      Sentry.addBreadcrumb({ message: `wyre callback - custodial wallet send: ${JSON.stringify(request)}` });
+      await this.processWalletSend(request, ctx);
     } else {
       // this is some other thing we don't care about
+      Sentry.addBreadcrumb({ message: `wyre callback - unknown reason: ${JSON.stringify(request)}` });
       log.info(`ignoring wyre callback with source ${request.source} and dest ${request.dest}`);
     }
 
@@ -83,9 +88,10 @@ export default class WyreCallbackRoute {
     ctx.status = 204;
   }
 
-  private async processWalletReceive(request: WyreCallbackRequest) {
+  private async processWalletReceive(request: WyreCallbackRequest, ctx: Koa.Context) {
     let validatedRequest = await this.validateWalletReceive(request);
     if (!validatedRequest) {
+      captureSentryMessage(`wyre callback request failed validation: ${JSON.stringify(request)}`, ctx);
       return;
     }
     let { wallet, transfer, order } = validatedRequest;
@@ -118,19 +124,19 @@ export default class WyreCallbackRoute {
         [order.id, userAddress.toLowerCase(), wallet.id, custodialTransferId, nextStatus]
       );
     } catch (err) {
-      log.error(
-        `Error: Failed to upsert wallet-orders row for the ${request.dest} receive of ${
-          transfer.source
-        }. request is: ${JSON.stringify(request.source, null, 2)}`,
-        err
-      );
+      let message = `Error: Failed to upsert wallet-orders row for the ${request.dest} receive of ${
+        transfer.source
+      }. Error is ${err.toString()}. request is: ${JSON.stringify(request.source, null, 2)}`;
+      log.error(message, err);
+      captureSentryMessage(message, ctx);
       return;
     }
   }
 
-  private async processWalletSend(request: WyreCallbackRequest) {
+  private async processWalletSend(request: WyreCallbackRequest, ctx: Koa.Context) {
     let validatedRequest = await this.validateWalletSend(request);
     if (!validatedRequest) {
+      captureSentryMessage(`wyre callback request failed validation: ${JSON.stringify(request)}`, ctx);
       return;
     }
     let { orderId, transfer } = validatedRequest;
@@ -140,27 +146,28 @@ export default class WyreCallbackRoute {
     try {
       ({ state, status } = await updateOrderStatus(db, orderId, 'wyre-send-funds'));
     } catch (err) {
-      log.error(
-        `Error: Failed to locate wallet_orders record for ${request.dest} receive of ${
-          transfer.source
-        }. request is: ${JSON.stringify(request.source, null, 2)}`,
-        err
-      );
+      let message = `Error: Failed to locate wallet_orders record for ${request.dest} receive of ${
+        transfer.source
+      }. Error is ${err.toString()}. request is: ${JSON.stringify(request.source, null, 2)}`;
+      log.error(message, err);
+      captureSentryMessage(message, ctx);
       return;
     }
     if (status === 'provisioning') {
       let { reservationId } = state;
       if (!reservationId) {
-        log.error(`Encountered order ${orderId} in state provisioning without a reservation ID`);
+        let message = `Encountered order ${orderId} in state provisioning without a reservation ID`;
+        log.error(message);
+        captureSentryMessage(message, ctx);
         return;
       }
       try {
+        Sentry.addBreadcrumb({ message: `provisioning prepaid card for reservationId=${reservationId}` });
         await provisionPrepaidCard(db, this.relay, this.subgraph, reservationId);
       } catch (err) {
-        log.error(
-          `Could not provision prepaid card for reservationId ${reservationId}! Received error from relay server`,
-          err
-        );
+        let message = `Could not provision prepaid card for reservationId ${reservationId}! Received error from relay server: ${err.toString()}`;
+        log.error(message, err);
+        captureSentryMessage(message, ctx);
         return;
       }
       await updateOrderStatus(db, orderId, 'provision-mined');
@@ -173,31 +180,33 @@ export default class WyreCallbackRoute {
     let walletId = request.dest.split(':')[1];
     let wallet = await this.wyre.getWalletById(walletId);
     if (!wallet) {
-      log.info(
-        `while processing ${request.dest} receive, could not resolve user address for wyre wallet ID ${walletId}`
-      );
+      let message = `while processing ${request.dest} receive, could not resolve user address for wyre wallet ID ${walletId}`;
+      log.info(message);
+      Sentry.addBreadcrumb({ message });
       return;
     }
 
     let transferId = request.source.split(':')[1];
     let transfer = await this.wyre.getTransfer(transferId);
     if (!transfer) {
-      log.info(`while processing ${request.dest} receive, could not find transfer for transferId ${request.source}`);
+      let message = `while processing ${request.dest} receive, could not find transfer for transferId ${request.source}`;
+      log.info(message);
+      Sentry.addBreadcrumb({ message });
       return;
     }
     if (transfer.status !== 'COMPLETED') {
-      log.info(
-        `while processing ${request.dest} receive, transfer status for transferId ${request.source} is not COMPLETED it is ${transfer.status}`
-      );
+      let message = `while processing ${request.dest} receive, transfer status for transferId ${request.source} is not COMPLETED it is ${transfer.status}`;
+      log.info(message);
+      Sentry.addBreadcrumb({ message });
       return;
     }
 
     let orderId = transfer.source.split(':')[1];
     // all wyre wallet order ID's start with "WO_"
     if (!orderId.startsWith('WO_')) {
-      log.trace(
-        `while processing ${request.dest} receive, source for ${transferId} is not a wallet order, ${transfer.source}. skipping`
-      );
+      let message = `while processing ${request.dest} receive, source for ${transferId} is not a wallet order, ${transfer.source}. skipping`;
+      log.trace(message);
+      Sentry.addBreadcrumb({ message });
       return;
     }
 
@@ -208,9 +217,9 @@ export default class WyreCallbackRoute {
         [orderId]
       );
       if (result.rows.length > 0) {
-        log.info(
-          `while processing ${request.dest} receive, transfer ${request.source}'s order ${orderId} has already been processed. skipping`
-        );
+        let message = `while processing ${request.dest} receive, transfer ${request.source}'s order ${orderId} has already been processed. skipping`;
+        log.info(message);
+        Sentry.addBreadcrumb({ message });
         return;
       }
       result = await db.query(`SELECT user_address FROM wallet_orders WHERE order_id = $1`, [orderId]);
@@ -219,44 +228,49 @@ export default class WyreCallbackRoute {
           rows: [{ user_address: userAddress }],
         } = result;
         if (userAddress.toLowerCase() !== wallet.name.toLowerCase()) {
-          log.info(
-            `while processing ${request.dest} receive, transfer ${request.source}'s order ${orderId}, the related wallet ${wallet.id} is associated to a user address ${wallet.name} that is different than the user address the client already informed us about ${userAddress}. skipping`
-          );
+          let message = `while processing ${request.dest} receive, transfer ${request.source}'s order ${orderId}, the related wallet ${wallet.id} is associated to a user address ${wallet.name} that is different than the user address the client already informed us about ${userAddress}. skipping`;
+          log.info(message);
+          Sentry.addBreadcrumb({ message });
           return;
         }
       }
     } catch (err) {
-      log.error(
-        `Error: while processing ${
-          request.dest
-        } receive, failed to query for wallet_orders record with an order ID of ${orderId}, for ${
-          request.dest
-        } receive of ${transfer.source}. request is: ${JSON.stringify(request.source, null, 2)}`,
-        err
-      );
+      let message = `Error: while processing ${
+        request.dest
+      } receive, failed to query for wallet_orders record with an order ID of ${orderId}, for ${
+        request.dest
+      } receive of ${transfer.source}. Error: ${err.toString()}. request is: ${JSON.stringify(
+        request.source,
+        null,
+        2
+      )}`;
+      log.error(message, err);
+      Sentry.addBreadcrumb({ message });
       return;
     }
 
     let order = await this.wyre.getOrder(orderId);
     if (!order) {
-      log.info(`while processing ${request.dest} receive, could not find order for orderId ${transfer.source}`);
+      let message = `while processing ${request.dest} receive, could not find order for orderId ${transfer.source}`;
+      log.info(message);
+      Sentry.addBreadcrumb({ message });
       return;
     }
 
     if (!request.source.endsWith(order.transferId)) {
       // this is could be a spoofed callback from wyre
-      log.info(
-        `while processing ${request.dest} receive, ignoring wallet receive for transfer, transfer ${request.source} does not match ${transfer.source}'s transferId ${order.transferId}`
-      );
+      let message = `while processing ${request.dest} receive, ignoring wallet receive for transfer, transfer ${request.source} does not match ${transfer.source}'s transferId ${order.transferId}`;
+      log.info(message);
+      Sentry.addBreadcrumb({ message });
       return;
     }
 
     let { depositAddresses } = wallet;
     if (!depositAddresses || !order.dest.toLowerCase().endsWith(depositAddresses.ETH.toLowerCase())) {
       // this is could be a spoofed callback from wyre
-      log.info(
-        `while processing ${request.dest} receive, ignoring wallet receive for wallet order whose destination ${order.dest} does not match the custodial wallet deposit address ${depositAddresses?.ETH}`
-      );
+      let message = `while processing ${request.dest} receive, ignoring wallet receive for wallet order whose destination ${order.dest} does not match the custodial wallet deposit address ${depositAddresses?.ETH}`;
+      log.info(message);
+      Sentry.addBreadcrumb({ message });
       return;
     }
 
@@ -271,19 +285,23 @@ export default class WyreCallbackRoute {
     let transferId = request.dest.split(':')[1];
     let transfer = await this.wyre.getTransfer(transferId);
     if (!transfer) {
-      log.info(`while processing ${request.source} send, could not find transfer for transferId ${request.dest}`);
+      let message = `while processing ${request.source} send, could not find transfer for transferId ${request.dest}`;
+      log.info(message);
+      Sentry.addBreadcrumb({ message });
       return;
     }
     if (transfer.status !== 'COMPLETED') {
-      log.info(
-        `while processing ${request.source} send, transfer status for transferId ${request.dest} is not COMPLETED, it is: ${transfer.status}`
-      );
+      let message = `while processing ${request.source} send, transfer status for transferId ${request.dest} is not COMPLETED, it is: ${transfer.status}`;
+      log.info(message);
+      Sentry.addBreadcrumb({ message });
       return;
     }
 
     if (!(transfer.dest.endsWith(await this.getAdminWalletId()) && transfer.source === request.source)) {
       // this is some other thing we don't care about or a spoofed callback
-      log.info(`while processing ${request.source} send, ignoring wallet send for transfer ${request.dest}`);
+      let message = `while processing ${request.source} send, ignoring wallet send for transfer ${request.dest}`;
+      log.info(message);
+      Sentry.addBreadcrumb({ message });
       return;
     }
 
@@ -300,26 +318,26 @@ export default class WyreCallbackRoute {
         userAddress: toChecksumAddress(row.user_address),
       }));
     } catch (err) {
-      log.error(
-        `Error: Failed to locate wallet_orders record for ${request.dest} receive of ${
-          transfer.source
-        }. request is: ${JSON.stringify(request.source, null, 2)}`,
-        err
-      );
+      let message = `Error: Failed to locate wallet_orders record for ${request.dest} receive of ${
+        transfer.source
+      }. Error is ${err.toString()}. request is: ${JSON.stringify(request.source, null, 2)}`;
+      log.error(message, err);
+      Sentry.addBreadcrumb({ message });
       return;
     }
 
     let [order] = orders;
     if (!order) {
-      log.info(
-        `while processing ${
-          request.source
-        } send to admin account, could not find wallet_orders with a status of "received-order" that correlate to the request with custodial transfer ID of ${transferId}. request is: ${JSON.stringify(
-          request.source,
-          null,
-          2
-        )}`
-      );
+      let message = `while processing ${
+        request.source
+      } send to admin account, could not find wallet_orders with a status of "received-order" that correlate to the request with custodial transfer ID of ${transferId}. request is: ${JSON.stringify(
+        request.source,
+        null,
+        2
+      )}`;
+      log.info(message);
+      Sentry.addBreadcrumb({ message });
+
       return;
     }
 
@@ -337,9 +355,9 @@ export default class WyreCallbackRoute {
       this.adminWalletId = adminWallet?.id;
     }
     if (!this.adminWalletId) {
-      log.error(
-        `Error: Wyre admin wallet has not been created! Please create a wyre admin wallet with the name "${adminWalletName}" that has no callback URL.`
-      );
+      let message = `Error: Wyre admin wallet has not been created! Please create a wyre admin wallet with the name "${adminWalletName}" that has no callback URL.`;
+      log.error(message);
+      Sentry.addBreadcrumb({ message });
       throw new Error(`Wyre admin wallet, ${adminWalletName}, has not been created`);
     }
     return this.adminWalletId;
@@ -357,11 +375,11 @@ function assertWyreCallbackRequest(request: any): asserts request is WyreCallbac
     !('amount' in request) ||
     !('status' in request)
   ) {
-    throw new Error(
-      `object is not WyreCallbackRequest, expecting to find properties: "source", "dest", "currency", "amount", "status"  but found: ${Object.keys(
-        request
-      ).join(', ')}`
-    );
+    let message = `object is not WyreCallbackRequest, expecting to find properties: "source", "dest", "currency", "amount", "status"  but found: ${Object.keys(
+      request
+    ).join(', ')}`;
+    Sentry.addBreadcrumb({ message });
+    throw new Error(message);
   }
 }
 
