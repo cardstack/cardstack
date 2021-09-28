@@ -1,5 +1,4 @@
 import { RewardeeRegistrationFee } from '../../generated/RegisterRewardee/RegisterRewardeeHandler';
-import { log } from '@graphprotocol/graph-ts';
 import { RewardeeRegistrationPayment } from '../../generated/schema';
 import { toChecksumAddress, makePrepaidCardPayment, makeToken, makeAccount, getPrepaidCardOwner } from '../utils';
 
@@ -9,12 +8,8 @@ export function handleRewardeeRegistrationFee(event: RewardeeRegistrationFee): v
   let rewardProgramID = toChecksumAddress(event.params.rewardProgramID);
   let issuingToken = makeToken(event.params.issuingToken);
 
-  log.info('====prepaidCard {}', [prepaidCard]);
-  log.info('====rewardProgramID {}', [rewardProgramID]);
-
   let rewardee = toChecksumAddress(getPrepaidCardOwner(prepaidCard));
   makeAccount(rewardee);
-  log.info('====rewardee {}', [rewardee]);
   makePrepaidCardPayment(
     event,
     prepaidCard,

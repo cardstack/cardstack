@@ -1,8 +1,7 @@
 import { RewardeeClaim as RewardeeClaimEvent } from '../../generated/RewardPool/RewardPool';
 import { RewardeeClaim, RewardSafe } from '../../generated/schema';
 import { toChecksumAddress, makeEOATransactionForSafe, makeAccount } from '../utils';
-import { log } from '@graphprotocol/graph-ts';
-// To track creation of reward safe
+
 export function handleRewardeeClaim(event: RewardeeClaimEvent): void {
   let txnHash = event.transaction.hash.toHex();
   let rewardProgramID = toChecksumAddress(event.params.rewardProgramID);
@@ -21,9 +20,6 @@ export function handleRewardeeClaim(event: RewardeeClaimEvent): void {
   makeAccount(rewardee);
   makeEOATransactionForSafe(event, rewardSafe);
 
-  log.info('=====================Tom Cardy {}', [rewardSafe]);
-
-  log.info('====rewardSafe {}', [rewardSafe]);
   let entity = new RewardeeClaim(txnHash);
   entity.rewardProgramID = rewardProgramID;
   entity.rewardee = rewardee;
