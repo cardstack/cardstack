@@ -29,7 +29,13 @@ import {
   priceOracleUpdatedAt as layer2PriceOracleUpdatedAt,
 } from './layer-two-oracle';
 import { claimRevenue, claimRevenueGasEstimate, registerMerchant, revenueBalances } from './revenue-pool.js';
-import { rewardTokenBalances, addRewardTokens, rewardPoolBalance, claimRewards } from './reward-pool.js';
+import {
+  rewardTokenBalances,
+  addRewardTokens,
+  rewardPoolBalance,
+  claimRewards,
+  getClaimableRewardProofs,
+} from './reward-pool.js';
 import { hubAuth } from './hub-auth';
 import {
   getSKUInfo,
@@ -86,7 +92,8 @@ type Commands =
   | 'registerRewardee'
   | 'addRewardTokens'
   | 'rewardPoolBalance'
-  | 'claimRewards';
+  | 'claimRewards'
+  | 'claimableRewardProofs';
 
 let command: Commands | undefined;
 interface Options {
@@ -800,6 +807,25 @@ let {
       command = 'claimRewards';
     }
   )
+  .command(
+    'claimable-reward-proofs <address> [rewardProgramId] [tokenAddress]',
+    'View proofs that are claimable.',
+    (yargs) => {
+      yargs.positional('address', {
+        type: 'string',
+        description: 'The address that tally rewarded -- The owner of prepaid card.',
+      });
+      yargs.positional('rewardProgramId', {
+        type: 'string',
+        description: 'The reward program id.',
+      });
+      yargs.positional('tokenAddress', {
+        type: 'string',
+        description: 'The address of the tokens that are being claimed as rewards',
+      });
+      command = 'claimableRewardProofs';
+    }
+  )
   .options({
     network: {
       alias: 'n',
@@ -1161,6 +1187,13 @@ if (!command) {
         return;
       }
       await claimRewards(network, rewardSafe, rewardProgramId, tokenAddress, proof, amount, mnemonic);
+      break;
+    case 'claimableRewardProofs':
+      if (address == null) {
+        showHelpAndExit('address is a required value');
+        return;
+      }
+      await getClaimableRewardProofs(network, address, rewardProgramId, tokenAddress, mnemonic);
       break;
     default:
       assertNever(command);

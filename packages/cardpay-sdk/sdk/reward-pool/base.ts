@@ -32,6 +32,13 @@ export interface RewardTokenBalance {
   tokenSymbol: string;
   balance: BN;
 }
+
+export interface ProofWithInfo {
+  rewardProgramId: string;
+  tokenAddress: string;
+  proof: string;
+  balance: BN;
+}
 export default class RewardPool {
   private rewardPool: Contract | undefined;
 
@@ -87,30 +94,71 @@ export default class RewardPool {
     limit?: number
   ): Promise<Proof[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
-    let url =
-      `${tallyServiceURL}/merkle-proofs/${address}` +
-      (tokenAddress ? `?token_address=${tokenAddress}` : '') +
-      (rewardProgramId ? `&reward_program_id=${rewardProgramId}` : '') +
-      (offset ? `&offset=${offset}` : '');
-    console.log(DEFAULT_PAGE_SIZE);
-    console.log(limit);
-    // (limit ? `?limit=${limit}` : `&limit=${DEFAULT_PAGE_SIZE}`);
+    let url = new URL(`${tallyServiceURL}/merkle-proofs/${address}`);
+    if (tokenAddress) {
+      url.searchParams.append('tokenAddress', tokenAddress);
+    }
+    if (rewardProgramId) {
+      url.searchParams.append('rewardProgramId', rewardProgramId);
+    }
+    if (offset) {
+      url.searchParams.append('offset', offset.toString());
+    }
+    url.searchParams.append('limit', limit ? limit.toString() : DEFAULT_PAGE_SIZE.toString());
     let options = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
       },
     };
-    let response = await fetch(url, options);
+    let response = await fetch(url.toString(), options);
     let json = await response.json();
     let count = json['count'];
-    console.log(`Total of ${count} proofs retrieved for payee ${address} for token ${tokenAddress}`);
+    console.log(`Total of ${count} proofs retrieved for payee ${address}`);
     if (!response?.ok) {
       throw new Error(await response.text());
     }
     return json['results'];
   }
 
+  //get balance of all proofs
+  async getProofsWithBalance(
+    address: string,
+    rewardProgramId?: string,
+    tokenAddress?: string
+  ): Promise<ProofWithInfo[]> {
+    let rewardPool = await this.getRewardPool();
+    let proofs = await this.getProofs(address, tokenAddress, rewardProgramId);
+    return await Promise.all(
+      proofs.map(async (o: Proof) => {
+        const balance = await rewardPool.methods
+          .balanceForProofWithAddress(o.rewardProgramId, o.tokenAddress, address, o.proof)
+          .call();
+        return {
+          rewardProgramId: o.rewardProgramId,
+          tokenAddress: o.tokenAddress,
+          proof: o.proof,
+          balance: new BN(balance),
+        };
+      })
+    );
+  }
+
+  async getProofsWithNonZeroBalance(
+    address: string,
+    tokenAddress?: string,
+    rewardProgramId?: string
+  ): Promise<ProofWithInfo[]> {
+    const proofsWithBalance = await this.getProofsWithBalance(address, rewardProgramId, tokenAddress);
+    return proofsWithBalance
+      .filter(({ balance }) => {
+        return balance.gt(new BN(0));
+      })
+      .sort(compare);
+  }
+
+  //get summary of reward tokens
+  //get summary of reward tokens from a certain reward program
   async rewardTokenBalance(
     address: string,
     tokenAddress: string,

@@ -76,6 +76,19 @@ export async function rewardPoolBalance(
   displayRewardTokenBalance([balance]);
 }
 
+export async function getClaimableRewardProofs(
+  network: string,
+  address: string,
+  rewardProgramId?: string,
+  tokenAddress?: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardPool = await getSDK('RewardPool', web3);
+  const claimableRewardProofs = await rewardPool.getProofsWithNonZeroBalance(address, rewardProgramId, tokenAddress);
+  console.log(claimableRewardProofs);
+}
+
 export async function claimRewards(
   network: string,
   rewardSafeAddress: string,
