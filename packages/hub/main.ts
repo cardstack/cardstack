@@ -98,7 +98,6 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
 }
 
 const LOGGER = logger('hub/server');
-process.env.NODE_CONFIG_ENV = process.env.HUB_ENVIRONMENT || process.env.NODE_ENV;
 
 // Empty for now
 const DEFAULT_CONFIG: ServerConfig = {};
