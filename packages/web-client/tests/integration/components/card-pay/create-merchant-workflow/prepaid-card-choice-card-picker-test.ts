@@ -29,13 +29,13 @@ module(
           type: 'prepaid-card',
           createdAt: Date.now() / 1000,
 
-          address: prepaidCardAddress,
+          address: prepaidCardAddress2,
 
           tokens: [],
           owners: [layer2AccountAddress],
 
           issuingToken: '0xTOKEN',
-          spendFaceValue: 2324,
+          spendFaceValue: 500,
           prepaidCardOwner: layer2AccountAddress,
           hasBeenUsed: false,
           issuer: layer2AccountAddress,
@@ -46,13 +46,13 @@ module(
           type: 'prepaid-card',
           createdAt: Date.now() / 1000,
 
-          address: prepaidCardAddress2,
+          address: prepaidCardAddress,
 
           tokens: [],
           owners: [layer2AccountAddress],
 
           issuingToken: '0xTOKEN',
-          spendFaceValue: 500,
+          spendFaceValue: 2324,
           prepaidCardOwner: layer2AccountAddress,
           hasBeenUsed: false,
           issuer: layer2AccountAddress,

@@ -100,16 +100,24 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
 
   get prepaidCardsForDropdown() {
     let cards: DropdownOption[] = [];
+    let lowBalCards: DropdownOption[] = [];
+
     if (this.prepaidCards.length) {
       this.prepaidCards.forEach((c) => {
+        let isLowBal = c.spendFaceValue < this.merchantRegistrationFee;
         let option: DropdownOption = {
           card: c,
-          disabled: c.spendFaceValue < this.merchantRegistrationFee,
+          disabled: isLowBal,
         };
-        cards.push(option);
+        if (isLowBal) {
+          lowBalCards.push(option);
+        } else {
+          cards.push(option);
+        }
       });
     }
-    return cards;
+
+    return [...cards, ...lowBalCards];
   }
 
   @action choosePrepaidCard(option: DropdownOption) {
