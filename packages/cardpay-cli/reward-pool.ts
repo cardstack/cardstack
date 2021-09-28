@@ -25,8 +25,6 @@ export async function rewardTokenBalances(
     console.log('\n');
     console.log(`Reward balances for ${address}`);
     console.log('---------------------------------------------------------------------');
-    console.log(`  Reward program: ${rewardProgramId}`);
-    console.log('---------------------------------------------------------------------');
     displayRewardTokenBalance(tokenBalances);
   }
 }
