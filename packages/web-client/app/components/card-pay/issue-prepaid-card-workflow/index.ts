@@ -346,7 +346,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       layer2Network.isConnected &&
       persistedState.layer2WalletAddress &&
       layer2Network.walletInfo.firstAddress !==
-        persistedState.layer2WalletAddress
+        JSON.parse(persistedState.layer2WalletAddress).value
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED);
     }
