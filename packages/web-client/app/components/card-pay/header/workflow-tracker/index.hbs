@@ -4,7 +4,7 @@
   data-test-workflow-tracker-toggle
 >
   {{svg-jar 'task-active' class='workflow-tracker__toggle-icon'}}
-  {{this.activeWorkflows.length}}
+  {{this.workflowPersistence.activeWorkflows.length}}
 </Boxel::Button>
 
 {{#if this.showing}}
@@ -16,17 +16,17 @@
         class='workflow-tracker__count'
         data-test-active-workflow-count
       >
-        {{this.activeWorkflows.length}}
+        {{this.workflowPersistence.activeWorkflows.length}}
       </span>
     </heading>
     <ul>
-      {{#each this.activeWorkflows as |workflow|}}
+      {{#each this.workflowPersistence.activeWorkflows as |workflowMeta|}}
         <li data-test-active-workflow>
-          <CardPay::Header::WorkflowTracker::Item @workflow={{workflow}} />
+          <CardPay::Header::WorkflowTracker::Item @workflowMeta={{workflowMeta}} />
         </li>
       {{/each}}
     </ul>
-    {{#if this.completedWorkflows}}
+    {{#if this.workflowPersistence.completedWorkflows}}
       <heading class='workflow-tracker__heading'>
         {{svg-jar 'task-completed' class='workflow-tracker__heading-icon'}}
         Completed workflows
@@ -34,19 +34,19 @@
           class='workflow-tracker__count'
           data-test-completed-workflow-count
         >
-          {{this.completedWorkflows.length}}
+          {{this.workflowPersistence.completedWorkflows.length}}
         </span>
       </heading>
       <ul>
-        {{#each this.completedWorkflows as |workflow|}}
+        {{#each this.workflowPersistence.completedWorkflows as |workflowMeta|}}
           <li data-test-completed-workflow>
-            <CardPay::Header::WorkflowTracker::Item @workflow={{workflow}} />
+            <CardPay::Header::WorkflowTracker::Item @workflowMeta={{workflowMeta}} />
           </li>
         {{/each}}
       </ul>
       <Boxel::Button
         @kind='secondary-dark'
-        {{on 'click' this.clearCompletedWorkflows}}
+        {{on 'click' this.workflowPersistence.clearCompletedWorkflows}}
         data-test-workflow-tracker-clear-completed
       >
         Clear Completed
