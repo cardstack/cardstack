@@ -166,6 +166,14 @@ module('Acceptance | persistence view and restore', function () {
         state: buildState({ meta: {} }),
       });
 
+      workflowPersistenceService.persistData('canceled', {
+        name: 'PREPAID_CARD_ISSUANCE',
+        state: buildState({ meta: {
+          'isCancelled': true,
+          'cancelationReason': 'RESTORATION_UNAUTHENTICATED',
+        }}),
+      });
+
       await visit('/card-pay/');
       assert.dom('[data-test-workflow-tracker]').containsText('2');
 
@@ -311,8 +319,6 @@ module('Acceptance | persistence view and restore', function () {
     });
 
     // FIXME add test for storage event coming from another tab
-
-    // FIXME add test to ignore canceled workflows AND workflows that haven’t started (no milestone values etc)
   });
 
   module(
