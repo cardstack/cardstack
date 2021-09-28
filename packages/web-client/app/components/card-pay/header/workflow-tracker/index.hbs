@@ -2,6 +2,7 @@
   @kind='primary'
   {{on 'click' (toggle 'showing' this)}}
   data-test-workflow-tracker-toggle
+  data-workflow-tracker-toggle
   class="workflow-tracker__toggle"
 >
   {{svg-jar 'task-active' class='workflow-tracker__toggle-icon'}}
@@ -11,6 +12,6 @@
 {{#if this.showing}}
   <ToElsewhere
     @named="workflow-tracker-dropdown-target"
-    @send={{component "card-pay/header/workflow-tracker/dropdown-list"}}
+    @send={{component "card-pay/header/workflow-tracker/dropdown-list" close=(toggle 'showing' this)}}
   />
 {{/if}}

@@ -24,6 +24,7 @@ const WORKFLOW_TITLE_TO_MILESTONES: Record<WorkflowName, string[]> = {
 
 interface CardPayHeaderWorkflowTrackerItemArgs {
   workflowMeta: WorkflowPersistenceMeta;
+  closeList: () => void;
 }
 
 export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayHeaderWorkflowTrackerItemArgs> {
@@ -75,5 +76,6 @@ export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayH
 
   @action visit() {
     this.workflowPersistence.visitPersistedWorkflow(this.workflowId);
+    this.args.closeList();
   }
 }

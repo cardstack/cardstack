@@ -1,4 +1,4 @@
-<aside class='workflow-tracker__list'>
+<aside class='workflow-tracker__list' {{on-click-outside @close ignoreSelector="[data-workflow-tracker-toggle]"}}>
   <heading class='workflow-tracker__heading'>
     {{svg-jar 'task-active' class='workflow-tracker__heading-icon'}}
     Active workflows
@@ -12,7 +12,10 @@
   <ul>
     {{#each this.workflowPersistence.activeWorkflows as |workflowMeta|}}
       <li data-test-active-workflow>
-        <CardPay::Header::WorkflowTracker::Item @workflowMeta={{workflowMeta}} />
+        <CardPay::Header::WorkflowTracker::Item
+          @workflowMeta={{workflowMeta}}
+          @closeList={{@close}}
+        />
       </li>
     {{/each}}
   </ul>
