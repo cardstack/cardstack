@@ -252,7 +252,7 @@ module('Acceptance | persistence view and restore', function () {
       assert.dom('[data-test-active-workflow]').exists({ count: 1 });
       assert.dom('[data-test-completed-workflow]').exists({ count: 1 });
 
-      await click('[data-test-workflow-tracker-clear-completed');
+      await click('[data-test-workflow-tracker-clear-completed]');
       assert.dom('[data-test-completed-workflow]').doesNotExist();
     });
 
