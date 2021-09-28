@@ -10,7 +10,6 @@ For more information, see the
   - [Getting Started](#getting-started)
     - [Running the hub](#running-the-hub)
   - [Database migrations](#database-migrations)
-  - [Deployment](#deployment)
   - [Application console](#application-console)
     - [Make a DB query (call installed modules)](#make-a-db-query-call-installed-modules)
     - [Call a service (call application modules)](#call-a-service-call-application-modules)
@@ -98,9 +97,6 @@ After you have completed running your new DB migration script create a pg_dump o
 
     bin/hub db dump
 
-## Deployment
-
-Green builds of the main branch deploy hub to staging if the commit contains changes to the hub package or its dependencies. The deploy uses waypoint.
 
 ## Application console
 
@@ -171,6 +167,7 @@ The hub CLI can be invoked from within the hub package
 *💡 Tip: Add `export PATH="./bin:$PATH"` to your `.zshenv` or `.bash_profile` to be to invoke `hub` directly (without the `bin/`)*
 
 The files that support the CLI are in the `cli/` directory. You can add your own by [following these instructions](https://github.com/yargs/yargs/blob/master/docs/advanced.md#commanddirdirectory-opts). The full `yargs` api [can be found here](https://github.com/yargs/yargs/blob/master/docs/api.md).
+
 
 ## Contributing
 
