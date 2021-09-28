@@ -3,6 +3,7 @@ import { getWeb3 } from './utils';
 import Web3 from 'web3';
 const { fromWei } = Web3.utils;
 import { RewardTokenBalance, ProofWithBalance } from '@cardstack/cardpay-sdk/sdk/reward-pool';
+import { groupBy } from 'lodash';
 
 export async function rewardTokenBalances(
   network: string,
@@ -17,7 +18,7 @@ export async function rewardTokenBalances(
     console.log('\n');
     console.log(`Reward balances for ${address}`);
     console.log('---------------------------------------------------------------------');
-    console.log(`  Reward program: ${rewardProgramId}`);
+    console.log(`    RewardProgram: ${rewardProgramId}`);
     console.log('---------------------------------------------------------------------');
     displayRewardTokenBalance(tokenBalances);
   } else {
@@ -30,8 +31,14 @@ export async function rewardTokenBalances(
 }
 
 function displayRewardTokenBalance(tokenBalances: RewardTokenBalance[]): void {
-  tokenBalances.map((o: any) => {
-    console.log(`    ${o.tokenSymbol}: ${fromWei(o.balance)}`);
+  const groupedByRewardProgram = groupBy(tokenBalances, (a) => a.rewardProgramId);
+  Object.keys(groupedByRewardProgram).map((rewardProgramId: string) => {
+    console.log(`    RewardProgram: ${rewardProgramId}`);
+    console.log('---------------------------------------------------------------------');
+    let p = groupedByRewardProgram[rewardProgramId];
+    p.map((o) => {
+      console.log(`      ${o.tokenSymbol}: ${fromWei(o.balance)}`);
+    });
   });
 }
 

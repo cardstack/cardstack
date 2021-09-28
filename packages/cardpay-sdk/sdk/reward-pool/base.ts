@@ -28,6 +28,7 @@ interface Proof {
 const DEFAULT_PAGE_SIZE = 1000000;
 
 export interface RewardTokenBalance {
+  rewardProgramId: string;
   tokenAddress: string;
   tokenSymbol: string;
   balance: BN;
@@ -178,19 +179,23 @@ export default class RewardPool {
           .balanceForProofWithAddress(o.rewardProgramId, o.tokenAddress, address, o.proof)
           .call();
         return {
+          rewardProgramId: o.rewardProgramId,
           tokenAddress: o.tokenAddress,
           tokenSymbol,
           balance: new BN(balance),
         };
       })
     );
-    return ungroupedTokenBalance.reduce((accum, { tokenAddress, tokenSymbol, balance }: RewardTokenBalance) => {
-      return {
-        tokenAddress,
-        tokenSymbol,
-        balance: accum.balance.add(balance),
-      };
-    });
+    return ungroupedTokenBalance.reduce(
+      (accum, { tokenAddress, tokenSymbol, balance, rewardProgramId }: RewardTokenBalance) => {
+        return {
+          rewardProgramId,
+          tokenAddress,
+          tokenSymbol,
+          balance: accum.balance.add(balance),
+        };
+      }
+    );
   }
 
   //get summary of reward tokens for all reward programs
@@ -213,6 +218,7 @@ export default class RewardPool {
             .call();
           return {
             tokenAddress: o.tokenAddress,
+            rewardProgramId: o.rewardProgramId,
             balance: new BN(balance),
           };
         })
@@ -426,6 +432,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     let tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let tokenSymbol = await tokenContract.methods.symbol().call();
     return {
+      rewardProgramId,
       tokenAddress,
       tokenSymbol,
       balance: new BN(balance),
