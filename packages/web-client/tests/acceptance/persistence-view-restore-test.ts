@@ -77,7 +77,7 @@ module('Acceptance | persistence view and restore', function () {
   module('when things have been constructed FIXME lol', function (hooks) {
     setupApplicationTest(hooks);
     setupMirage(hooks);
-    setupHubAuthenticationToken(hooks)
+    setupHubAuthenticationToken(hooks);
 
     hooks.beforeEach(async function (this: Context) {
       await setupEverythingFIXME(this);
@@ -177,20 +177,12 @@ module('Acceptance | persistence view and restore', function () {
         .containsText('Merchant Creation')
         .containsText('Save merchant details');
 
-      let progressIconElement = find(
-        '[data-test-active-workflow]:nth-child(1) .boxel-progress-icon'
+      assert.equal(
+        getProgressIconCompletion(
+          '[data-test-active-workflow]:nth-child(1) .boxel-progress-icon'
+        ),
+        0.25
       );
-      let progressStyle = progressIconElement
-        ?.querySelector('.boxel-progress-icon__progress-pie')
-        ?.getAttribute('style');
-      let [dashFractionNumerator, dashFractionDenominator] = progressStyle!
-        .split(':')[1]
-        .split(' ');
-      let dashFraction =
-        parseFloat(dashFractionNumerator) / parseFloat(dashFractionDenominator);
-
-      // FIXME move various assertions into component tests
-      assert.equal(dashFraction, 0.25);
 
       assert.dom('[data-test-completed-workflow]').exists({ count: 1 });
       assert.dom('[data-test-completed-workflow-count]').containsText('1');
@@ -354,3 +346,17 @@ module('Acceptance | persistence view and restore', function () {
     }
   );
 });
+
+// The progress icon completion proportion can be derived from a style attribute
+function getProgressIconCompletion(selector: string) {
+  let progressIconElement = find(selector);
+  let progressStyle = progressIconElement
+    ?.querySelector('.boxel-progress-icon__progress-pie')
+    ?.getAttribute('style');
+  let [dashFractionNumerator, dashFractionDenominator] = progressStyle!
+    .split(':')[1]
+    .split(' ');
+  return (
+    parseFloat(dashFractionNumerator) / parseFloat(dashFractionDenominator)
+  );
+}
