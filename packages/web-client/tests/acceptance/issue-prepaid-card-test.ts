@@ -602,9 +602,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
     );
   });
 
-  // test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
-  // });
-
   module('Tests with the layer 2 wallet already connected', function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
