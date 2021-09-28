@@ -16,7 +16,7 @@
 }
 
 .workflow-tracker-item__container:hover {
-  background-color: var(--boxel-purple-300);
+  background-color: var(--boxel-purple-400);
 }
 
 .workflow-tracker-item__heading {
