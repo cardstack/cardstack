@@ -52,7 +52,7 @@ export default class CardPayHeaderWorkflowTracker extends Component<CardPayHeade
       (workflow) =>
         workflow.workflow.state.meta.milestonesCount &&
         workflow.workflow.state.meta.completedMilestonesCount ===
-        workflow.workflow.state.meta.milestonesCount
+          workflow.workflow.state.meta.milestonesCount
     );
   }
 
