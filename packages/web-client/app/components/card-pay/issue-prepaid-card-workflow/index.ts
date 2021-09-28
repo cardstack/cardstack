@@ -6,7 +6,6 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { action } from '@ember/object';
 import RouterService from '@ember/routing/router-service';
-import { next } from '@ember/runloop';
 
 import BN from 'bn.js';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
@@ -22,8 +21,7 @@ import {
   WorkflowMessage,
   WorkflowName,
 } from '@cardstack/web-client/models/workflow';
-import { task } from 'ember-concurrency-decorators';
-import { taskFor } from 'ember-concurrency-ts';
+
 import { tracked } from '@glimmer/tracking';
 
 export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
@@ -44,7 +42,6 @@ class IssuePrepaidCardWorkflow extends Workflow {
   @service declare layer2Network: Layer2Network;
   @service declare hubAuthentication: HubAuthentication;
 
-  workflowPersistenceId: string;
   name = 'PREPAID_CARD_ISSUANCE' as WorkflowName;
 
   milestones = [
@@ -321,12 +318,10 @@ class IssuePrepaidCardWorkflow extends Workflow {
     }),
   ]);
 
-  constructor(owner: any) {
-    super(owner);
-    this.workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
-
+  constructor(owner: unknown, workflowPersistenceId?: string) {
+    super(owner, workflowPersistenceId);
     this.attachWorkflow();
+    this.restore();
   }
 
   restorationErrors() {
@@ -355,6 +350,10 @@ class IssuePrepaidCardWorkflow extends Workflow {
 
     return errors;
   }
+
+  beforeRestorationChecks() {
+    return [this.layer2Network.waitForAccount];
+  }
 }
 
 class IssuePrepaidCardWorkflowComponent extends Component {
@@ -367,27 +366,19 @@ class IssuePrepaidCardWorkflowComponent extends Component {
   constructor(owner: unknown, args: {}) {
     super(owner, args);
 
-    let workflow = new IssuePrepaidCardWorkflow(getOwner(this));
-    let willRestore = workflow.session.hasPersistedState();
+    let workflowPersistenceId =
+      this.router.currentRoute.queryParams['flow-id']!;
 
-    if (willRestore) {
-      workflow.session.restoreFromStorage();
-      taskFor(this.restoreTask).perform(workflow);
-    } else {
-      this.workflow = workflow;
-    }
+    let workflow = new IssuePrepaidCardWorkflow(
+      getOwner(this),
+      workflowPersistenceId
+    );
+
+    this.restore(workflow);
   }
 
-  @task *restoreTask(workflow: IssuePrepaidCardWorkflow) {
-    let errors = workflow.restorationErrors();
-    if (errors.length > 0) {
-      next(this, () => {
-        workflow.cancel(errors[0]);
-      });
-    } else {
-      yield this.layer2Network.waitForAccount;
-      workflow.restoreFromPersistedWorkflow();
-    }
+  async restore(workflow: any) {
+    await workflow.restore();
     this.workflow = workflow;
   }
 

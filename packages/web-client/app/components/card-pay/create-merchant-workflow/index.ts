@@ -22,11 +22,11 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { taskFor } from 'ember-concurrency-ts';
-import { next } from '@ember/runloop';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
+import { tracked } from '@glimmer/tracking';
 
 const FAILURE_REASONS = {
   UNAUTHENTICATED: 'UNAUTHENTICATED',
@@ -41,7 +41,6 @@ const FAILURE_REASONS = {
 
 class CreateMerchantWorkflow extends Workflow {
   name = 'MERCHANT_CREATION' as WorkflowName;
-  workflowPersistenceId: string;
 
   @service declare router: RouterService;
   @service declare layer2Network: Layer2Network;
@@ -315,10 +314,8 @@ class CreateMerchantWorkflow extends Workflow {
     }),
   ]);
 
-  constructor(owner: unknown) {
-    super(owner);
-    this.workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
+  constructor(owner: unknown, workflowPersistenceId: string) {
+    super(owner, workflowPersistenceId);
 
     this.attachWorkflow();
   }
@@ -349,44 +346,43 @@ class CreateMerchantWorkflow extends Workflow {
 
     return errors;
   }
+
+  beforeRestorationChecks() {
+    return [];
+  }
 }
 
 class CreateMerchantWorkflowComponent extends Component {
   @service declare layer2Network: Layer2Network;
   @service declare workflowPersistence: WorkflowPersistence;
   @service declare router: RouterService;
-
-  workflow!: CreateMerchantWorkflow;
+  @tracked workflow: CreateMerchantWorkflow | null = null;
 
   constructor(owner: unknown, args: {}) {
     super(owner, args);
 
-    const workflow = new CreateMerchantWorkflow(getOwner(this));
-    workflow.session.restoreFromStorage();
-    let willRestore = workflow.session.hasPersistedState();
+    let workflowPersistenceId =
+      this.router.currentRoute.queryParams['flow-id']!;
 
-    if (willRestore) {
-      workflow.session.restoreFromStorage();
-      const errors = workflow.restorationErrors();
+    let workflow = new CreateMerchantWorkflow(
+      getOwner(this),
+      workflowPersistenceId
+    );
 
-      if (errors.length > 0) {
-        next(this, () => {
-          workflow.cancel(errors[0]);
-        });
-      } else {
-        workflow.restoreFromPersistedWorkflow();
-      }
-    }
+    this.restore(workflow);
+  }
 
+  async restore(workflow: any) {
+    await workflow.restore();
     this.workflow = workflow;
   }
 
   @action onDisconnect() {
-    this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
+    this.workflow?.cancel(FAILURE_REASONS.DISCONNECTED);
   }
 
   @action onAccountChanged() {
-    this.workflow.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
+    this.workflow?.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
   }
 }
 
