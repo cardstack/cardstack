@@ -29,8 +29,19 @@ class StubAuthenticationUtils {
 }
 
 class StubSubgraph {
-  async getInventory(reservedPrepaidCards: string[]): Promise<InventorySubgraph> {
+  async getInventory(reservedPrepaidCards: string[], issuer?: string | undefined): Promise<InventorySubgraph> {
     let result = stubInventorySubgraph();
+    // this replicates the subgraph's where clause for issuer
+    if (issuer) {
+      result = {
+        data: {
+          skuinventories: (result.data.skuinventories = result.data.skuinventories.filter(
+            (i) => i.sku.issuer.id === issuer
+          )),
+        },
+      };
+    }
+
     // this replicates the subgraph's where clause for reserved cards
     for (let inventory of result.data.skuinventories) {
       inventory.prepaidCards = inventory.prepaidCards.filter((p) => !reservedPrepaidCards.includes(p.prepaidCardId));
@@ -40,6 +51,7 @@ class StubSubgraph {
 }
 
 let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
+let stubIssuer = '0xb21851B00bd13C008f703A21DFDd292b28A736b3';
 
 function handleValidateAuthToken(encryptedString: string) {
   if (encryptedString === 'abc123--def456--ghi789') {
@@ -122,6 +134,55 @@ describe('GET /api/inventory', function () {
             id: 'sku2',
             attributes: {
               issuer: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              sku: 'sku2',
+              'issuing-token-symbol': 'DAI',
+              'issuing-token-address': '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
+              'face-value': 200,
+              'ask-price': toWei('2'),
+              'customization-DID': 'did:cardstack:test1',
+              reloadable: false,
+              transferrable: false,
+              quantity: 1,
+            },
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it(`can filter inventory by issuer`, async function () {
+    stubInventorySubgraph = () => ({
+      data: {
+        skuinventories: [
+          makeInventoryData('sku1', '100', toWei('1'), [
+            '0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC',
+            '0x04699Ff48CC6531727A12344c30F3eD1062Ff3ad',
+          ]),
+          makeInventoryData(
+            'sku2',
+            '200',
+            toWei('2'),
+            ['0x483F081bB0C25A5B216D1A4BD9CE0196092A0575'],
+            'did:cardstack:test1',
+            stubIssuer
+          ),
+        ],
+      },
+    });
+
+    await request
+      .get(`/api/inventories?filter[issuer]=${stubIssuer}`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        data: [
+          {
+            type: 'inventories',
+            id: 'sku2',
+            attributes: {
+              issuer: stubIssuer,
               sku: 'sku2',
               'issuing-token-symbol': 'DAI',
               'issuing-token-address': '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',

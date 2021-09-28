@@ -36,7 +36,8 @@ export function makeInventoryData(
   faceValue: string,
   askPrice: string,
   prepaidCards: string[],
-  customizationDID = ''
+  customizationDID = '',
+  issuer = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13'
 ) {
   return {
     askPrice,
@@ -45,7 +46,7 @@ export function makeInventoryData(
       faceValue,
       customizationDID,
       issuer: {
-        id: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+        id: issuer,
       },
       issuingToken: {
         id: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',

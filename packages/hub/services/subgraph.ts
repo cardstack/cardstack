@@ -78,12 +78,16 @@ export default class Subgraph {
   // we take an array of already provisioned prepaid cards that the server know
   // about so that we can deal with a subgraph that is not in sync with the
   // latest block.
-  async getInventory(provisionedPrepaidCards: string[] = []) {
+  async getInventory(provisionedPrepaidCards: string[] = [], issuer?: string | undefined) {
+    let where = `where: {askPrice_gt: 0}`;
+    if (issuer) {
+      where = `where: {askPrice_gt: 0, issuer: "${issuer}"}`;
+    }
     return (await gqlQuery(
       network,
       `
       {
-        skuinventories(where: {askPrice_gt: 0}) {
+        skuinventories(${where}) {
           askPrice
           sku {
             id
