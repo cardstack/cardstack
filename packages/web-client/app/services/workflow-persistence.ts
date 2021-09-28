@@ -8,6 +8,8 @@ import { WorkflowName } from '../models/workflow';
 import { WORKFLOW_NAMES } from '@cardstack/web-client/models/workflow';
 import { WorkflowMeta } from '@cardstack/web-client/models/workflow/workflow-session';
 
+const WORKFLOW_NAMES_KEYS = Object.keys(WORKFLOW_NAMES);
+
 export interface WorkflowPersistencePersistedData {
   name: string;
   state: any;
@@ -16,8 +18,6 @@ export interface WorkflowPersistenceMeta extends WorkflowMeta {
   id: string;
   name: string;
 }
-
-const WORKFLOW_NAMES_KEYS = Object.keys(WORKFLOW_NAMES);
 
 export const STORAGE_KEY_PREFIX = 'workflowPersistence';
 
