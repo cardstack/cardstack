@@ -6,9 +6,13 @@
 .workflow-tracker__list {
   position: absolute;
   top: 80px;
-  right: 0;
+  right: var(--boxel-sp-lg);
   background-color: var(--boxel-purple-500);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: var(--boxel-box-shadow);
+  color: var(--boxel-light-200);
   font: var(--boxel-font-xs);
+  padding: var(--boxel-sp-sm) 0;
 }
 
 .workflow-tracker__toggle-icon {
