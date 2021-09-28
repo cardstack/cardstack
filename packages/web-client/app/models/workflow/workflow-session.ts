@@ -10,7 +10,7 @@ import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 import { Workflow } from '../workflow';
 
-interface WorkflowMeta {
+export interface WorkflowMeta {
   updatedAt: string | undefined;
   createdAt: string | undefined;
   completedCardNames: string[] | undefined;
@@ -129,36 +129,11 @@ export default class WorkflowSession {
   }
 
   getValue<T extends SupportedType>(key: string): T | null {
-    const data: string | null = this._state[key];
-    if (data !== null && data !== undefined) {
-      let json = JSON.parse(data);
-      if (json.type === 'Date') {
-        return new Date(json.value) as T;
-      } else if (json.type === 'BN') {
-        return new BN(json.value) as T;
-      } else {
-        return json.value;
-      }
-    }
-    return null;
+    return deserializeValue<T>(this._state[key]);
   }
 
   getValues(): Record<string, SupportedType> {
-    let result: Record<string, SupportedType> = {};
-    for (const key in this._state) {
-      const data: string | null = this._state[key];
-      if (data !== null && data !== undefined) {
-        let json = JSON.parse(data);
-        if (json.type === 'Date') {
-          result[key] = new Date(json.value);
-        } else if (json.type === 'BN') {
-          result[key] = new BN(json.value);
-        } else {
-          result[key] = json.value;
-        }
-      }
-    }
-    return result;
+    return deserializeState(this._state);
   }
 
   setValue(key: string, value: SupportedType): void;
@@ -221,6 +196,38 @@ export default class WorkflowSession {
       }
     );
   }
+}
+
+function deserializeValue<T extends SupportedType>(
+  data: string | null | undefined
+): T | null {
+  if (data !== null && data !== undefined) {
+    let json = JSON.parse(data);
+    if (json.type === 'Date') {
+      return new Date(json.value) as T;
+    } else if (json.type === 'BN') {
+      return new BN(json.value) as T;
+    } else {
+      return json.value;
+    }
+  }
+
+  return null;
+}
+
+export function deserializeState(
+  state: Record<string, string>
+): Record<string, SupportedType> {
+  let res: Record<string, SupportedType> = {};
+
+  for (let key in state) {
+    let value = deserializeValue(state[key]);
+    if (value !== null) {
+      res[key] = value;
+    }
+  }
+
+  return res;
 }
 
 export function serializeToState(
