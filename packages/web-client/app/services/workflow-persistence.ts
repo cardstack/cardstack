@@ -51,7 +51,10 @@ export default class WorkflowPersistence extends Service {
     workflowPersistenceId: string,
     data: WorkflowPersistencePersistedData
   ) {
-    if (!this.persistedDataIds.includes(workflowPersistenceId)) {
+    if (this.persistedDataIds.includes(workflowPersistenceId)) {
+      // Ensure WorkflowTracker::Item updates as well
+      this.persistedDataIds = [...this.persistedDataIds];
+    } else {
       this.persistedDataIds = [...this.persistedDataIds, workflowPersistenceId];
     }
 
