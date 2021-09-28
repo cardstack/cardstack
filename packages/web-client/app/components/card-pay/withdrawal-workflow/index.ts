@@ -378,7 +378,7 @@ with Card Pay.`,
       layer1Network.isConnected &&
       persistedState.layer1WalletAddress &&
       layer1Network.walletInfo.firstAddress !==
-        persistedState.layer1WalletAddress
+        JSON.parse(persistedState.layer1WalletAddress).value
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L1_ADDRESS_CHANGED);
     }
@@ -391,7 +391,7 @@ with Card Pay.`,
       layer2Network.isConnected &&
       persistedState.layer2WalletAddress &&
       layer2Network.walletInfo.firstAddress !==
-        persistedState.layer2WalletAddress
+        JSON.parse(persistedState.layer2WalletAddress).value
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED);
     }
