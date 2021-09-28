@@ -2,7 +2,7 @@ import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 import Web3 from 'web3';
 const { fromWei } = Web3.utils;
-import { RewardTokenBalance } from '@cardstack/cardpay-sdk/sdk/reward-pool';
+import { RewardTokenBalance, ProofWithBalance } from '@cardstack/cardpay-sdk/sdk/reward-pool';
 
 export async function rewardTokenBalances(
   network: string,
@@ -28,7 +28,6 @@ export async function rewardTokenBalances(
     console.log(`  Reward program: ${rewardProgramId}`);
     console.log('---------------------------------------------------------------------');
     displayRewardTokenBalance(tokenBalances);
-    // find reward programs
   }
 }
 
@@ -36,7 +35,17 @@ function displayRewardTokenBalance(tokenBalances: RewardTokenBalance[]): void {
   tokenBalances.map((o: any) => {
     console.log(`    ${o.tokenSymbol}: ${fromWei(o.balance)}`);
   });
-  console.log('---------------------------------------------------------------------');
+}
+
+function displayProofs(proofs: ProofWithBalance[]): void {
+  proofs.map((o: any) => {
+    console.log(`  rewardProgramId: ${o.rewardProgramId}`);
+    console.log(`  token: ${o.tokenAddress}`);
+    console.log(`  balance: ${fromWei(o.balance)}`);
+    console.log(`  paymentCycle: ${o.paymentCycle}`);
+    console.log(`  proof: ${o.proof}`);
+    console.log(`\n`);
+  });
 }
 
 export async function rewardTokensAvailable(network: string, address: string, mnemonic?: string): Promise<void> {
@@ -72,7 +81,7 @@ export async function rewardPoolBalance(
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
   let balance = await rewardPool.balance(rewardProgramId, tokenAddress);
-  // let rewardPoolAddress = await rewardPool.address();
+  console.log('Balance of reward pool');
   displayRewardTokenBalance([balance]);
 }
 
@@ -86,7 +95,10 @@ export async function getClaimableRewardProofs(
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
   const claimableRewardProofs = await rewardPool.getProofsWithNonZeroBalance(address, rewardProgramId, tokenAddress);
-  console.log(claimableRewardProofs);
+  console.log('\n');
+  console.log(`Proofs balances for ${address}`);
+  console.log('==============================================================');
+  displayProofs(claimableRewardProofs);
 }
 
 export async function claimRewards(

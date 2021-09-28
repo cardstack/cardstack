@@ -33,10 +33,7 @@ export interface RewardTokenBalance {
   balance: BN;
 }
 
-export interface ProofWithInfo {
-  rewardProgramId: string;
-  tokenAddress: string;
-  proof: string;
+export interface ProofWithBalance extends Proof {
   balance: BN;
 }
 export default class RewardPool {
@@ -126,7 +123,7 @@ export default class RewardPool {
     address: string,
     rewardProgramId?: string,
     tokenAddress?: string
-  ): Promise<ProofWithInfo[]> {
+  ): Promise<ProofWithBalance[]> {
     let rewardPool = await this.getRewardPool();
     let proofs = await this.getProofs(address, tokenAddress, rewardProgramId);
     return await Promise.all(
@@ -135,9 +132,7 @@ export default class RewardPool {
           .balanceForProofWithAddress(o.rewardProgramId, o.tokenAddress, address, o.proof)
           .call();
         return {
-          rewardProgramId: o.rewardProgramId,
-          tokenAddress: o.tokenAddress,
-          proof: o.proof,
+          ...o,
           balance: new BN(balance),
         };
       })
@@ -148,7 +143,7 @@ export default class RewardPool {
     address: string,
     tokenAddress?: string,
     rewardProgramId?: string
-  ): Promise<ProofWithInfo[]> {
+  ): Promise<ProofWithBalance[]> {
     const proofsWithBalance = await this.getProofsWithBalance(address, rewardProgramId, tokenAddress);
     return proofsWithBalance
       .filter(({ balance }) => {
@@ -194,6 +189,8 @@ export default class RewardPool {
     });
   }
 
+  //get summary of reward tokens for all reward programs
+  //get summary of reward tokens from a certain reward program
   async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<RewardTokenBalance[]> {
     let rewardPool = await this.getRewardPool();
     if (rewardProgramId) {
@@ -480,3 +477,13 @@ const aggregateBalance = (arr: RewardTokenBalance[]): RewardTokenBalance[] => {
   });
   return output;
 };
+
+function compare(a: ProofWithBalance, b: ProofWithBalance) {
+  if (a.balance.lt(b.balance)) {
+    return 1;
+  }
+  if (a.balance.gt(b.balance)) {
+    return -1;
+  }
+  return 0;
+}
