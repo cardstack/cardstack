@@ -251,6 +251,7 @@ waypoint exec -app=hub bash
 
 Then, add node to the PATH and run the migrations:
 ```sh
+heroku@ip-10-91-1-8:/ cd /workspace
 heroku@ip-10-91-1-8:/workspace$ PATH=$PATH:/layers/heroku_nodejs-engine/nodejs/bin/;
 heroku@ip-10-91-1-8:/workspace$ npm run db:migrate up
 ```
