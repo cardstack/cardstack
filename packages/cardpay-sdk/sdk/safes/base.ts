@@ -111,7 +111,7 @@ const safeQueryFields = `
       id
     }
   }
-  rewardee {
+  reward {
     id
     rewardProgramID
     rewardee {
@@ -119,8 +119,6 @@ const safeQueryFields = `
     }
 }
 `;
-
-// please rename safe field to reward (not rewardee)
 
 const safeQuery = `
   query ($id: ID!) {
@@ -413,7 +411,7 @@ interface GraphQLSafeResult {
       id: string;
     };
   };
-  rewardee: {
+  reward: {
     id: string;
     rewardProgramId: string;
     rewardee: {
@@ -489,11 +487,11 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       owners,
     };
     return prepaidCard;
-  } else if (safe.rewardee) {
+  } else if (safe.reward) {
     let reward: RewardSafe = {
       type: 'reward',
-      address: safe.rewardee.id,
-      rewardProgramId: safe.rewardee.rewardProgramId,
+      address: safe.reward.id,
+      rewardProgramId: safe.reward.rewardProgramId,
       tokens,
       createdAt,
       owners,
