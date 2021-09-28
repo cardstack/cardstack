@@ -50,6 +50,7 @@ export default class CardPayHeaderWorkflowTracker extends Component<CardPayHeade
   get completedWorkflows() {
     return this.allWorkflows.filter(
       (workflow) =>
+        workflow.workflow.state.meta.milestonesCount &&
         workflow.workflow.state.meta.completedMilestonesCount ===
         workflow.workflow.state.meta.milestonesCount
     );
