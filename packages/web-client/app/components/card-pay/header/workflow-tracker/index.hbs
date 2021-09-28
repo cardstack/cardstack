@@ -2,6 +2,7 @@
   @kind='primary'
   {{on 'click' (toggle 'showing' this)}}
   data-test-workflow-tracker-toggle
+  class="workflow-tracker__toggle"
 >
   {{svg-jar 'task-active' class='workflow-tracker__toggle-icon'}}
   {{this.workflowPersistence.activeWorkflows.length}}

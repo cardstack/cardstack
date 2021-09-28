@@ -1,10 +1,11 @@
+.workflow-tracker__toggle {
+  min-width: 60px;
+  padding: var(--boxel-sp-xxxs);
+}
+
 .workflow-tracker__list {
   background-color: var(--boxel-purple-500);
   font: var(--boxel-font-xs);
-}
-
-.workflow-tracker__toggle {
-  gap: var(--boxel-sp-xxs);
 }
 
 .workflow-tracker__toggle-icon {
