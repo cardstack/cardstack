@@ -46,8 +46,7 @@ export function makeTransaction(event: ethereum.Event): void {
 
 export function makeEOATransaction(event: ethereum.Event, address: string, safe: string | null = null): void {
   makeTransaction(event);
-  let accountEntity = new Account(address);
-  accountEntity.save();
+  makeAccount(address);
 
   let txnHash = event.transaction.hash.toHex();
   let entity = new EOATransaction(txnHash + '-' + address);
@@ -159,9 +158,10 @@ export function makePrepaidCardPayment(
   }
 }
 
-export function makeAccount(address: string): void {
+export function makeAccount(address: string): Account {
   let accountEntity = new Account(address);
   accountEntity.save();
+  return accountEntity;
 }
 
 export function getPrepaidCardFaceValue(prepaidCard: string): BigInt {
