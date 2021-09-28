@@ -46,4 +46,5 @@ export function handleRewardTokensAdded(event: RewardTokensAdded): void {
   entity.amount = amount;
   entity.transaction = txnHash;
   entity.timestamp = event.block.timestamp;
+  entity.save();
 }
