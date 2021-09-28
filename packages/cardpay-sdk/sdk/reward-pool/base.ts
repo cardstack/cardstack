@@ -58,6 +58,8 @@ export default class RewardPool {
     return await tokenContract.methods.balanceOf(rewardPoolAddress).call();
   }
 
+  // Utility function
+  // - it is important to use this if there are many reward tokens
   async rewardTokensAvailable(address: string, rewardProgramId?: string): Promise<string[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url =
@@ -89,8 +91,10 @@ export default class RewardPool {
       `${tallyServiceURL}/merkle-proofs/${address}` +
       (tokenAddress ? `?token_address=${tokenAddress}` : '') +
       (rewardProgramId ? `&reward_program_id=${rewardProgramId}` : '') +
-      (offset ? `&offset=${offset}` : '') +
-      (limit ? `?limit=${limit}` : `&limit=${DEFAULT_PAGE_SIZE}`);
+      (offset ? `&offset=${offset}` : '');
+    console.log(DEFAULT_PAGE_SIZE);
+    console.log(limit);
+    // (limit ? `?limit=${limit}` : `&limit=${DEFAULT_PAGE_SIZE}`);
     let options = {
       method: 'GET',
       headers: {
@@ -133,7 +137,13 @@ export default class RewardPool {
         };
       })
     );
-    return aggregateBalance(ungroupedTokenBalance);
+    return ungroupedTokenBalance.reduce((accum, { tokenAddress, tokenSymbol, balance }: RewardTokenBalance) => {
+      return {
+        tokenAddress,
+        tokenSymbol,
+        balance: accum.balance.add(balance),
+      };
+    });
   }
 
   async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<RewardTokenBalance[]> {
@@ -159,20 +169,14 @@ export default class RewardPool {
         })
       );
       const tokenAddresses = [...new Set(ungroupedTokenBalanceWithoutSymbol.map((item) => item.tokenAddress))];
-      let tokenMapping: any = tokenAddresses.reduce(async (obj, tokenAddress) => {
-        const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
-        const tokenSymbol = await tokenContract.methods.symbol().call();
-        return {
-          ...obj,
-          [tokenAddress]: tokenSymbol,
-        };
-      }, {});
-      return ungroupedTokenBalanceWithoutSymbol.map((o) => {
+      let tokenMapping = await this.tokenSymbolMapping(tokenAddresses);
+      let ungroupedTokenBalance = ungroupedTokenBalanceWithoutSymbol.map((o) => {
         return {
           ...o,
           tokenSymbol: tokenMapping[o.tokenAddress],
         };
       });
+      return aggregateBalance(ungroupedTokenBalance);
     }
   }
 
@@ -390,6 +394,17 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     return token.methods.transferAndCall(rewardPoolAddress, amount, data).encodeABI();
   }
 
+  private async tokenSymbolMapping(tokenAddresses: string[]): Promise<any> {
+    return tokenAddresses.reduce(async (obj, tokenAddress: string) => {
+      const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+      const tokenSymbol = await tokenContract.methods.symbol().call();
+      return {
+        ...obj,
+        [tokenAddress]: tokenSymbol,
+      };
+    }, {});
+  }
+  // tokenMapping: any =
   private async getRewardPool(): Promise<Contract> {
     if (this.rewardPool) {
       return this.rewardPool;
@@ -402,12 +417,18 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
   }
 }
 
-const aggregateBalance = (arr: RewardTokenBalance[]): RewardTokenBalance => {
-  return arr.reduce((accum, { tokenAddress, tokenSymbol, balance }: RewardTokenBalance) => {
-    return {
-      tokenAddress,
-      tokenSymbol,
-      balance: accum.balance.add(balance),
-    };
+const aggregateBalance = (arr: RewardTokenBalance[]): RewardTokenBalance[] => {
+  let output: RewardTokenBalance[] = [];
+  arr.forEach(function (item) {
+    let existing = output.filter(function (v) {
+      return v.tokenAddress == item.tokenAddress;
+    });
+    if (existing.length) {
+      var existingIndex = output.indexOf(existing[0]);
+      output[existingIndex].balance = output[existingIndex].balance.add(item.balance);
+    } else {
+      output.push(item);
+    }
   });
+  return output;
 };

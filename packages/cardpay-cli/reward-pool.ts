@@ -22,7 +22,12 @@ export async function rewardTokenBalances(
     displayRewardTokenBalance(tokenBalances);
   } else {
     const tokenBalances = await rewardPool.rewardTokenBalances(address);
-    console.log(tokenBalances)
+    console.log('\n');
+    console.log(`Reward balances for ${address}`);
+    console.log('---------------------------------------------------------------------');
+    console.log(`  Reward program: ${rewardProgramId}`);
+    console.log('---------------------------------------------------------------------');
+    displayRewardTokenBalance(tokenBalances);
     // find reward programs
   }
 }
