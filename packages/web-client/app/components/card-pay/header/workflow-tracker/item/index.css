@@ -6,6 +6,7 @@
     "heading icon"
     "milestone icon";
   background: transparent;
+  width: calc(100% - var(--boxel-sp-sm) * 2);
   color: var(--boxel-light-200);
   margin: 0 var(--boxel-sp);
   border-radius: var(--boxel-border-radius-sm);
