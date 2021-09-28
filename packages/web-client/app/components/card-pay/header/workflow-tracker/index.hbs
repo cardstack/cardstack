@@ -26,29 +26,31 @@
         </li>
       {{/each}}
     </ul>
-    <heading class='workflow-tracker__heading'>
-      {{svg-jar 'task-completed' class='workflow-tracker__heading-icon'}}
-      Completed workflows
-      <span
-        class='workflow-tracker__count'
-        data-test-completed-workflow-count
+    {{#if this.completedWorkflows}}
+      <heading class='workflow-tracker__heading'>
+        {{svg-jar 'task-completed' class='workflow-tracker__heading-icon'}}
+        Completed workflows
+        <span
+          class='workflow-tracker__count'
+          data-test-completed-workflow-count
+        >
+          {{this.completedWorkflows.length}}
+        </span>
+      </heading>
+      <ul>
+        {{#each this.completedWorkflows as |workflow|}}
+          <li data-test-completed-workflow>
+            <CardPay::Header::WorkflowTracker::Item @workflow={{workflow}} />
+          </li>
+        {{/each}}
+      </ul>
+      <Boxel::Button
+        @kind='secondary-dark'
+        {{on 'click' this.clearCompletedWorkflows}}
+        data-test-workflow-tracker-clear-completed
       >
-        {{this.completedWorkflows.length}}
-      </span>
-    </heading>
-    <ul>
-      {{#each this.completedWorkflows as |workflow|}}
-        <li data-test-completed-workflow>
-          <CardPay::Header::WorkflowTracker::Item @workflow={{workflow}} />
-        </li>
-      {{/each}}
-    </ul>
-    <Boxel::Button
-      @kind='secondary-dark'
-      {{on 'click' this.clearCompletedWorkflows}}
-      data-test-workflow-tracker-clear-completed
-    >
-      Clear Completed
-    </Boxel::Button>
+        Clear Completed
+      </Boxel::Button>
+    {{/if}}
   </aside>
 {{/if}}

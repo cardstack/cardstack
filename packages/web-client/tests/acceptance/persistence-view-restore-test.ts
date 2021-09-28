@@ -253,6 +253,7 @@ module('Acceptance | persistence view and restore', function () {
 
       await click('[data-test-workflow-tracker-clear-completed]');
       assert.dom('[data-test-completed-workflow]').doesNotExist();
+      assert.dom('[data-test-workflow-tracker-clear-completed]').doesNotExist();
     });
 
     test('opening a workflow only increments the counter by one', async function (assert) {
