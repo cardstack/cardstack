@@ -6,6 +6,7 @@ import {
   find,
   settled,
   visit,
+  waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 
@@ -14,7 +15,7 @@ import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-colo
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
-import { DepotSafe } from '@cardstack/cardpay-sdk';
+import { DepotSafe, PrepaidCardSafe } from '@cardstack/cardpay-sdk';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 import { BN } from 'bn.js';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/workflow-config';
@@ -63,6 +64,29 @@ async function setupEverythingFIXME(context: Context) {
     ],
   };
   await layer2Service.test__simulateDepot(testDepot as DepotSafe);
+
+  let merchantRegistrationFee = await context.owner
+    .lookup('service:layer2-network')
+    .strategy.fetchMerchantRegistrationFee();
+
+  layer2Service.test__simulateAccountSafes(layer2AccountAddress, [{
+    type: 'prepaid-card',
+    createdAt: Date.now() / 1000,
+
+    address: '0x123400000000000000000000000000000000abcd',
+
+    tokens: [],
+    owners: [layer2AccountAddress],
+
+    issuingToken: '0xTOKEN',
+    spendFaceValue: merchantRegistrationFee,
+    prepaidCardOwner: layer2AccountAddress,
+    hasBeenUsed: false,
+    issuer: layer2AccountAddress,
+    reloadable: false,
+    transferrable: false,
+  } as PrepaidCardSafe]);
+
   layer2Service.authenticate();
   layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
 
@@ -256,14 +280,34 @@ module('Acceptance | persistence view and restore', function () {
       assert.dom('[data-test-workflow-tracker-clear-completed]').doesNotExist();
     });
 
-    test('opening a workflow only increments the counter by one', async function (assert) {
-      await visit('/card-pay/balances');
-      await click('[data-test-workflow-button="issue-prepaid-card"]');
+    test('opening a workflow only increments the counter by one and shows the correct milestone', async function (assert) {
+      await visit('/card-pay/merchant-services');
+      await click('[data-test-workflow-button="create-merchant"]');
 
-      await fillIn('[data-test-layout-customization-name-input]', 'JJ');
-      await click('[data-test-boxel-action-chin] [data-test-boxel-button]');
+      await fillIn(
+        `[data-test-merchant-customization-merchant-name-field] input`,
+        'Mandello'
+      );
+      await fillIn(
+        `[data-test-merchant-customization-merchant-id-field] input`,
+        'mandello1'
+      );
+      await waitUntil(
+        () =>
+          (
+            document.querySelector(
+              '[data-test-validation-state-input]'
+            ) as HTMLElement
+          ).dataset.testValidationStateInput === 'valid'
+      );
+      await click(`[data-test-merchant-customization-save-details]`);
 
       assert.dom('[data-test-workflow-tracker]').containsText('1');
+
+      await click('[data-test-workflow-tracker-toggle]');
+      assert
+        .dom('[data-test-active-workflow]:nth-child(1)')
+        .containsText('Create merchant');
     });
 
     // FIXME add test for storage event coming from another tab
