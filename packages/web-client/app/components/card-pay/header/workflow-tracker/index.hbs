@@ -9,49 +9,8 @@
 </Boxel::Button>
 
 {{#if this.showing}}
-  <aside class='workflow-tracker__list'>
-    <heading class='workflow-tracker__heading'>
-      {{svg-jar 'task-active' class='workflow-tracker__heading-icon'}}
-      Active workflows
-      <span
-        class='workflow-tracker__count'
-        data-test-active-workflow-count
-      >
-        {{this.workflowPersistence.activeWorkflows.length}}
-      </span>
-    </heading>
-    <ul>
-      {{#each this.workflowPersistence.activeWorkflows as |workflowMeta|}}
-        <li data-test-active-workflow>
-          <CardPay::Header::WorkflowTracker::Item @workflowMeta={{workflowMeta}} />
-        </li>
-      {{/each}}
-    </ul>
-    {{#if this.workflowPersistence.completedWorkflows}}
-      <heading class='workflow-tracker__heading'>
-        {{svg-jar 'task-completed' class='workflow-tracker__heading-icon'}}
-        Completed workflows
-        <span
-          class='workflow-tracker__count'
-          data-test-completed-workflow-count
-        >
-          {{this.workflowPersistence.completedWorkflows.length}}
-        </span>
-      </heading>
-      <ul>
-        {{#each this.workflowPersistence.completedWorkflows as |workflowMeta|}}
-          <li data-test-completed-workflow>
-            <CardPay::Header::WorkflowTracker::Item @workflowMeta={{workflowMeta}} />
-          </li>
-        {{/each}}
-      </ul>
-      <Boxel::Button
-        @kind='secondary-dark'
-        {{on 'click' this.workflowPersistence.clearCompletedWorkflows}}
-        data-test-workflow-tracker-clear-completed
-      >
-        Clear Completed
-      </Boxel::Button>
-    {{/if}}
-  </aside>
+  <ToElsewhere
+    @named="workflow-tracker-dropdown-target"
+    @send={{component "card-pay/header/workflow-tracker/dropdown-list"}}
+  />
 {{/if}}

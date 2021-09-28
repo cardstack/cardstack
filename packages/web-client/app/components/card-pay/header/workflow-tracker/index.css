@@ -4,6 +4,9 @@
 }
 
 .workflow-tracker__list {
+  position: absolute;
+  top: 80px;
+  right: 0;
   background-color: var(--boxel-purple-500);
   font: var(--boxel-font-xs);
 }
