@@ -8,8 +8,9 @@ import { isPresent } from '@ember/utils';
 import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
+import { Workflow } from '../workflow';
 
-interface WorkflowMeta {
+export interface WorkflowMeta {
   updatedAt: string | undefined;
   createdAt: string | undefined;
   completedCardNames: string[] | undefined;
@@ -21,8 +22,10 @@ interface WorkflowMeta {
 
 export interface WorkflowSessionDictionary {
   [key: string]: SupportedType;
-  meta: Partial<WorkflowMeta>;
+  meta?: Partial<WorkflowMeta>;
 }
+
+type SerializedWorkflowState = Record<string, string>;
 
 type JSONSerializable =
   | string
@@ -86,16 +89,15 @@ function stateProxyHandler(workflowSession: WorkflowSession) {
     },
   };
 }
-
 export default class WorkflowSession {
-  workflow: any;
+  workflow: Workflow | undefined;
   #stateProxy: any;
-  constructor(workflow?: any) {
+  constructor(workflow?: Workflow) {
     this.workflow = workflow;
     this.#stateProxy = new Proxy({}, stateProxyHandler(this));
   }
 
-  @tracked _state: Record<string, string> = {};
+  @tracked _state: SerializedWorkflowState = {};
 
   delete(key: string) {
     delete this._state[key];
@@ -105,64 +107,41 @@ export default class WorkflowSession {
     this.persistToStorage();
   }
 
-  get state(): Record<string, SupportedType> {
+  get state(): WorkflowSessionDictionary {
     return this.#stateProxy;
   }
 
-  get hasPersistence() {
+  hasPersistence(): this is { workflow: { workflowPersistenceId: string } } {
     return isPresent(this.workflow?.workflowPersistenceId);
   }
 
   restoreFromStorage(): void {
-    if (!this.hasPersistence) return;
+    if (!this.hasPersistence()) return;
 
     let persistedData = this.getPersistedData();
-    this._state = persistedData?.state || {};
+    this._state = persistedData?.state || ({} as SerializedWorkflowState);
   }
 
-  getPersistedData(): any {
-    return this.workflow?.workflowPersistence.getPersistedData(
+  getPersistedData(): { state?: SerializedWorkflowState } {
+    if (!this.hasPersistence()) return {};
+
+    return this.workflow.workflowPersistence.getPersistedData(
       this.workflow.workflowPersistenceId
     );
   }
 
   getValue<T extends SupportedType>(key: string): T | null {
-    const data: string | null = this._state[key];
-    if (data !== null && data !== undefined) {
-      let json = JSON.parse(data);
-      if (json.type === 'Date') {
-        return new Date(json.value) as T;
-      } else if (json.type === 'BN') {
-        return new BN(json.value) as T;
-      } else {
-        return json.value;
-      }
-    }
-    return null;
+    return deserializeValue<T>(this._state[key]);
   }
 
-  getValues(): Record<string, SupportedType> {
-    let result: Record<string, SupportedType> = {};
-    for (const key in this._state) {
-      const data: string | null = this._state[key];
-      if (data !== null && data !== undefined) {
-        let json = JSON.parse(data);
-        if (json.type === 'Date') {
-          result[key] = new Date(json.value);
-        } else if (json.type === 'BN') {
-          result[key] = new BN(json.value);
-        } else {
-          result[key] = json.value;
-        }
-      }
-    }
-    return result;
+  getValues(): WorkflowSessionDictionary {
+    return deserializeState(this._state);
   }
 
   setValue(key: string, value: SupportedType): void;
-  setValue(hash: Record<string, SupportedType>): void;
+  setValue(hash: WorkflowSessionDictionary): void;
   setValue(
-    hashOrKey: Record<string, SupportedType> | string,
+    hashOrKey: WorkflowSessionDictionary | string,
     value?: SupportedType
   ): void {
     if (typeof hashOrKey === 'string') {
@@ -202,7 +181,7 @@ export default class WorkflowSession {
   }
 
   private persistToStorage(): void {
-    if (!this.hasPersistence) return;
+    if (!this.hasPersistence()) return;
 
     // first persistence will set both updatedAt and createdAt to the same date
     let updatedAt = new Date().toISOString();
@@ -211,7 +190,7 @@ export default class WorkflowSession {
     // persist must be false to avoid infinite recursion
     this.setMeta({ updatedAt, createdAt }, false);
 
-    this.workflow?.workflowPersistence.persistData(
+    this.workflow.workflowPersistence.persistData(
       this.workflow.workflowPersistenceId,
       {
         name: this.workflow.name,
@@ -221,8 +200,40 @@ export default class WorkflowSession {
   }
 }
 
+function deserializeValue<T extends SupportedType>(
+  data: string | null | undefined
+): T | null {
+  if (data !== null && data !== undefined) {
+    let json = JSON.parse(data);
+    if (json.type === 'Date') {
+      return new Date(json.value) as T;
+    } else if (json.type === 'BN') {
+      return new BN(json.value) as T;
+    } else {
+      return json.value;
+    }
+  }
+
+  return null;
+}
+
+export function deserializeState(
+  state: SerializedWorkflowState
+): WorkflowSessionDictionary {
+  let res: WorkflowSessionDictionary = {};
+
+  for (let key in state) {
+    let value = deserializeValue(state[key]);
+    if (value !== null) {
+      res[key] = value;
+    }
+  }
+
+  return res;
+}
+
 export function serializeToState(
-  state: Record<string, string>,
+  state: SerializedWorkflowState,
   key: string,
   value: SupportedType
 ) {
@@ -243,8 +254,8 @@ export function serializeToState(
 
 // A useful util for tests
 export function buildState(
-  data: Record<string, SupportedType>
-): Record<string, any> {
+  data: WorkflowSessionDictionary
+): SerializedWorkflowState {
   let result = {};
   for (let key in data) {
     serializeToState(result, key, data[key]);
