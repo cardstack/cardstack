@@ -32,6 +32,11 @@ interface CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs {
   isComplete: boolean;
 }
 
+interface DropdownOption {
+  card: PrepaidCardSafe;
+  disabled: boolean;
+}
+
 const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
 
 export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent extends Component<CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs> {
@@ -66,6 +71,13 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
 
     if (prepaidCardChoice) {
       this.selectedPrepaidCard = prepaidCardChoice;
+    } else {
+      let availableCards = this.prepaidCards.filter(
+        (c) => c.spendFaceValue >= this.merchantRegistrationFee
+      );
+      if (availableCards.length === 1) {
+        this.selectedPrepaidCard = availableCards[0];
+      }
     }
   }
 
@@ -86,8 +98,30 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
     ) as PrepaidCardSafe[];
   }
 
-  @action choosePrepaidCard(card: PrepaidCardSafe) {
-    this.selectedPrepaidCard = card;
+  get prepaidCardsForDropdown() {
+    let cards: DropdownOption[] = [];
+    let lowBalCards: DropdownOption[] = [];
+
+    if (this.prepaidCards.length) {
+      this.prepaidCards.forEach((c) => {
+        let isLowBal = c.spendFaceValue < this.merchantRegistrationFee;
+        let option: DropdownOption = {
+          card: c,
+          disabled: isLowBal,
+        };
+        if (isLowBal) {
+          lowBalCards.push(option);
+        } else {
+          cards.push(option);
+        }
+      });
+    }
+
+    return [...cards, ...lowBalCards];
+  }
+
+  @action choosePrepaidCard(option: DropdownOption) {
+    this.selectedPrepaidCard = option.card;
   }
 
   @action createMerchant() {
