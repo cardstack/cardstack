@@ -1,14 +1,23 @@
 import { default as Service, inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
 import RouterService from '@ember/routing/router-service';
 import { MockLocalStorage } from '../utils/browser-mocks';
 import config from '../config/environment';
 import { WorkflowName } from '../models/workflow';
+import { WORKFLOW_NAMES } from '@cardstack/web-client/models/workflow';
+import { WorkflowMeta } from '@cardstack/web-client/models/workflow/workflow-session';
 
 export interface WorkflowPersistencePersistedData {
   name: string;
   state: any;
 }
+export interface WorkflowPersistenceMeta extends WorkflowMeta {
+  id: string;
+  name: string;
+}
+
+const WORKFLOW_NAMES_KEYS = Object.keys(WORKFLOW_NAMES);
 
 export const STORAGE_KEY_PREFIX = 'workflowPersistence';
 
@@ -64,6 +73,50 @@ export default class WorkflowPersistence extends Service {
     );
   }
 
+  get allValidWorkflows() {
+    return this.persistedDataIds
+      .reduce((workflows, id) => {
+        let workflow = this.getPersistedData(id);
+
+        if (
+          workflow &&
+          WORKFLOW_NAMES_KEYS.includes(workflow.name) &&
+          workflow.state &&
+          workflow.state.meta
+        ) {
+          let meta = parseMeta(workflow);
+
+          if (meta.milestonesCount && meta.completedMilestonesCount) {
+            workflows.push({ ...meta, id, name: workflow.name });
+          }
+        }
+
+        return workflows;
+      }, [] as WorkflowPersistenceMeta[])
+      .sortBy('updatedAt')
+      .reverse();
+  }
+
+  get activeWorkflows() {
+    return this.allValidWorkflows.filter(
+      (meta) => meta.completedMilestonesCount! < meta.milestonesCount!
+    );
+  }
+
+  get completedWorkflows() {
+    return this.allValidWorkflows.filter(
+      (meta) =>
+        meta.milestonesCount &&
+        meta.completedMilestonesCount === meta.milestonesCount
+    );
+  }
+
+  @action clearCompletedWorkflows() {
+    this.completedWorkflows.forEach((workflowAndId) => {
+      this.clearWorkflowWithId(workflowAndId.id);
+    });
+  }
+
   visitPersistedWorkflow(workflowPersistenceId: string) {
     let data = this.getPersistedData(workflowPersistenceId);
     let workflowName = data.name as WorkflowName;
@@ -101,6 +154,10 @@ export default class WorkflowPersistence extends Service {
     const prefixedId = `${STORAGE_KEY_PREFIX}:${id}`;
     this.#storage.removeItem(prefixedId);
   }
+}
+
+function parseMeta(data: WorkflowPersistencePersistedData) {
+  return JSON.parse(data.state.meta).value;
 }
 
 declare module '@ember/service' {

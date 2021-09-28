@@ -3,7 +3,7 @@ import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
 
 import WorkflowPersistence, {
-  WorkflowPersistencePersistedData,
+  WorkflowPersistenceMeta,
 } from '@cardstack/web-client/services/workflow-persistence';
 import {
   WorkflowName,
@@ -23,38 +23,36 @@ const WORKFLOW_TITLE_TO_MILESTONES: Record<WorkflowName, string[]> = {
 };
 
 interface CardPayHeaderWorkflowTrackerItemArgs {
-  workflow: { workflow: WorkflowPersistencePersistedData; id: string };
+  workflowMeta: WorkflowPersistenceMeta;
 }
 
 export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayHeaderWorkflowTrackerItemArgs> {
   @service declare workflowPersistence: WorkflowPersistence;
 
-  get workflow() {
-    return this.args.workflow.workflow;
-  }
-
   get workflowId() {
-    return this.args.workflow.id;
+    return this.args.workflowMeta.id;
   }
 
   get workflowName() {
+    return this.args.workflowMeta.name;
+  }
+
+  get workflowDisplayName() {
     return (
-      WORKFLOW_NAMES[this.workflow.name as WorkflowName] ||
+      WORKFLOW_NAMES[this.workflowName as WorkflowName] ||
       'Unknown workflow type'
     );
   }
 
-  get workflowMeta() {
-    return this.workflow.state.meta;
-  }
-
   get currentMilestoneTitle() {
     let workflowMilestones =
-      WORKFLOW_TITLE_TO_MILESTONES[this.workflow.name as WorkflowName];
+      WORKFLOW_TITLE_TO_MILESTONES[this.workflowName as WorkflowName];
 
     if (workflowMilestones) {
       return (
-        workflowMilestones[this.workflowMeta.completedMilestonesCount] || ''
+        workflowMilestones[
+          this.args.workflowMeta.completedMilestonesCount || -1
+        ] || ''
       );
     } else {
       return '';
@@ -63,15 +61,15 @@ export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayH
 
   get isComplete() {
     return (
-      this.workflowMeta.completedMilestonesCount ===
-      this.workflowMeta.milestonesCount
+      this.args.workflowMeta.completedMilestonesCount ===
+      this.args.workflowMeta.milestonesCount
     );
   }
 
   get fractionComplete() {
     return (
-      this.workflowMeta.completedMilestonesCount /
-      this.workflowMeta.milestonesCount
+      this.args.workflowMeta.completedMilestonesCount! /
+      this.args.workflowMeta.milestonesCount!
     );
   }
 

@@ -9,7 +9,7 @@ import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 
-interface WorkflowMeta {
+export interface WorkflowMeta {
   updatedAt: string | undefined;
   createdAt: string | undefined;
   completedCardNames: string[] | undefined;
