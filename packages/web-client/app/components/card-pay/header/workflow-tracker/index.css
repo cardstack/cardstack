@@ -26,6 +26,7 @@
   align-items: center;
   column-gap: var(--boxel-sp-xxs);
   padding-left: var(--boxel-sp-xs);
+  margin-bottom: var(--boxel-sp-xs);
   text-transform: uppercase;
 }
 
