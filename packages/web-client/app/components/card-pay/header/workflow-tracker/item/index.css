@@ -15,7 +15,7 @@
   border: 0;
 }
 
-.workflow-tracker-item__container:hover {
+.workflow-tracker-item__container:hover:not(:disabled) {
   background-color: var(--boxel-purple-400);
 }
 
