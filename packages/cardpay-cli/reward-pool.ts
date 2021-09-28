@@ -40,7 +40,7 @@ function displayRewardTokenBalance(tokenBalances: RewardTokenBalance[]): void {
 function displayProofs(proofs: ProofWithBalance[]): void {
   proofs.map((o: any) => {
     console.log(`  rewardProgramId: ${o.rewardProgramId}`);
-    console.log(`  token: ${o.tokenAddress}`);
+    console.log(`  token: ${o.tokenSymbol}`);
     console.log(`  balance: ${fromWei(o.balance)}`);
     console.log(`  paymentCycle: ${o.paymentCycle}`);
     console.log(`  proof: ${o.proof}`);

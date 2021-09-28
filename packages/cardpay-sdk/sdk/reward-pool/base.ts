@@ -34,6 +34,7 @@ export interface RewardTokenBalance {
 }
 
 export interface ProofWithBalance extends Proof {
+  tokenSymbol: string;
   balance: BN;
 }
 export default class RewardPool {
@@ -126,6 +127,8 @@ export default class RewardPool {
   ): Promise<ProofWithBalance[]> {
     let rewardPool = await this.getRewardPool();
     let proofs = await this.getProofs(address, tokenAddress, rewardProgramId);
+    const tokenAddresses = [...new Set(proofs.map((item) => item.tokenAddress))];
+    let tokenMapping = await this.tokenSymbolMapping(tokenAddresses);
     return await Promise.all(
       proofs.map(async (o: Proof) => {
         const balance = await rewardPool.methods
@@ -134,6 +137,7 @@ export default class RewardPool {
         return {
           ...o,
           balance: new BN(balance),
+          tokenSymbol: tokenMapping[o.tokenAddress],
         };
       })
     );
