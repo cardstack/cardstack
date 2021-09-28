@@ -92,7 +92,7 @@ module('Acceptance | persistence view and restore', function () {
             completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
-            updatedAt: Date.UTC(2020, 8, 22, 20, 50, 18, 491),
+            updatedAt: Date.UTC(2020, 8, 22, 20, 50, 18, 491).toString(),
           },
         }),
       });
@@ -111,7 +111,7 @@ module('Acceptance | persistence view and restore', function () {
               ],
               completedMilestonesCount: 1,
               milestonesCount: 4,
-              updatedAt: Date.UTC(2020, 10, 22, 20, 50, 18, 491),
+              updatedAt: Date.UTC(2020, 10, 22, 20, 50, 18, 491).toString(),
             },
           }),
         }
