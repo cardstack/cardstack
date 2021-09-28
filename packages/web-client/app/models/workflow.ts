@@ -232,9 +232,7 @@ export abstract class Workflow {
       this.session.getMeta().isCancelled &&
       this.session.getMeta().cancelationReason
     ) {
-      next(this, () => {
-        this.cancel(this.session.getMeta().cancelationReason);
-      });
+      this.cancel(this.session.getMeta().cancelationReason);
     }
   }
 }
