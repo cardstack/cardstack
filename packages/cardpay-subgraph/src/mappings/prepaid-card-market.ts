@@ -96,6 +96,17 @@ export function handleAskSet(event: AskSet): void {
   let accountEntity = new Account(issuer);
   accountEntity.save();
 
+  let inventoryEntity = SKUInventory.load(sku);
+  if (inventoryEntity == null) {
+    log.warning(
+      'Cannot process AskSet txn {}: SKUInventory entity does not exist for sku {}. This is likely due to the subgraph having a startBlock that is higher than the block the ask was set in.',
+      [txnHash, sku]
+    );
+    return;
+  }
+  inventoryEntity.askPrice = askPrice;
+  inventoryEntity.save();
+
   makeEOATransaction(event, issuer);
   let issuingToken = makeToken(event.params.issuingToken);
   let askEntity = new PrepaidCardAsk(sku);
