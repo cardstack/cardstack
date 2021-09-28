@@ -15,7 +15,7 @@
       "type": "node",
       "request": "launch",
       "name": "Run server",
-      "program": "${workspaceRoot}/packages/hub/bin/server.ts",
+      "program": "${workspaceRoot}/packages/hub/bin/hub",
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
       "env": {
@@ -23,7 +23,8 @@
         "WYRE_ACCOUNT_ID": "",
         "WYRE_API_KEY": "",
         "WYRE_SECRET_KEY": ""
-      }
+      },
+      "args": ["serve"]
     },
     {
       "name": "Ember test browser",
