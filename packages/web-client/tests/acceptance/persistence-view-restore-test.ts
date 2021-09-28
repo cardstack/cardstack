@@ -69,23 +69,25 @@ async function setupEverythingFIXME(context: Context) {
     .lookup('service:layer2-network')
     .strategy.fetchMerchantRegistrationFee();
 
-  layer2Service.test__simulateAccountSafes(layer2AccountAddress, [{
-    type: 'prepaid-card',
-    createdAt: Date.now() / 1000,
+  layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    {
+      type: 'prepaid-card',
+      createdAt: Date.now() / 1000,
 
-    address: '0x123400000000000000000000000000000000abcd',
+      address: '0x123400000000000000000000000000000000abcd',
 
-    tokens: [],
-    owners: [layer2AccountAddress],
+      tokens: [],
+      owners: [layer2AccountAddress],
 
-    issuingToken: '0xTOKEN',
-    spendFaceValue: merchantRegistrationFee,
-    prepaidCardOwner: layer2AccountAddress,
-    hasBeenUsed: false,
-    issuer: layer2AccountAddress,
-    reloadable: false,
-    transferrable: false,
-  } as PrepaidCardSafe]);
+      issuingToken: '0xTOKEN',
+      spendFaceValue: merchantRegistrationFee,
+      prepaidCardOwner: layer2AccountAddress,
+      hasBeenUsed: false,
+      issuer: layer2AccountAddress,
+      reloadable: false,
+      transferrable: false,
+    } as PrepaidCardSafe,
+  ]);
 
   layer2Service.authenticate();
   layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
@@ -168,10 +170,12 @@ module('Acceptance | persistence view and restore', function () {
 
       workflowPersistenceService.persistData('canceled', {
         name: 'PREPAID_CARD_ISSUANCE',
-        state: buildState({ meta: {
-          'isCancelled': true,
-          'cancelationReason': 'RESTORATION_UNAUTHENTICATED',
-        }}),
+        state: buildState({
+          meta: {
+            isCancelled: true,
+            cancelationReason: 'RESTORATION_UNAUTHENTICATED',
+          },
+        }),
       });
 
       await visit('/card-pay/');
