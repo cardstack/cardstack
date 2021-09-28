@@ -115,6 +115,7 @@ module('Acceptance | persistence view and restore', function () {
             completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
+            updatedAt: Date.UTC(2020, 8, 22, 20, 50, 18, 491),
           },
         }),
       });
@@ -133,6 +134,7 @@ module('Acceptance | persistence view and restore', function () {
               ],
               completedMilestonesCount: 1,
               milestonesCount: 4,
+              updatedAt: Date.UTC(2020, 10, 22, 20, 50, 18, 491)
             },
           }),
         }
@@ -187,16 +189,16 @@ module('Acceptance | persistence view and restore', function () {
 
       assert
         .dom('[data-test-active-workflow]:nth-child(1)')
-        .containsText('Merchant Creation')
-        .containsText('Save merchant details');
+        .containsText('Prepaid Card Issuance', 'expected the most-recently-updated workflow to show first')
+        .containsText('Customize layout');
 
       assert
         .dom('[data-test-active-workflow]:nth-child(2)')
-        .containsText('Prepaid Card Issuance')
-        .containsText('Customize layout');
+        .containsText('Merchant Creation')
+        .containsText('Save merchant details');
 
       let progressIconElement = find(
-        '[data-test-active-workflow]:nth-child(2) .boxel-progress-icon'
+        '[data-test-active-workflow]:nth-child(1) .boxel-progress-icon'
       );
       let progressStyle = progressIconElement
         ?.querySelector('.boxel-progress-icon__progress-pie')

@@ -36,7 +36,7 @@ export default class CardPayHeaderWorkflowTracker extends Component<CardPayHeade
       }
 
       return workflows;
-    }, [] as WorkflowPersistencePersistedDataAndId[]);
+    }, [] as WorkflowPersistencePersistedDataAndId[]).sortBy('workflow.state.meta.updatedAt').reverse();
   }
 
   get activeWorkflows() {
