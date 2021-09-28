@@ -134,7 +134,7 @@ module('Acceptance | persistence view and restore', function () {
               ],
               completedMilestonesCount: 1,
               milestonesCount: 4,
-              updatedAt: Date.UTC(2020, 10, 22, 20, 50, 18, 491)
+              updatedAt: Date.UTC(2020, 10, 22, 20, 50, 18, 491),
             },
           }),
         }
@@ -189,7 +189,10 @@ module('Acceptance | persistence view and restore', function () {
 
       assert
         .dom('[data-test-active-workflow]:nth-child(1)')
-        .containsText('Prepaid Card Issuance', 'expected the most-recently-updated workflow to show first')
+        .containsText(
+          'Prepaid Card Issuance',
+          'expected the most-recently-updated workflow to show first'
+        )
         .containsText('Customize layout');
 
       assert
@@ -220,7 +223,8 @@ module('Acceptance | persistence view and restore', function () {
         .containsText('Prepaid Card Issuance')
         .containsText('Complete');
 
-      assert.dom('[data-test-completed-workflow] button')
+      assert
+        .dom('[data-test-completed-workflow] button')
         .isDisabled('expected a completed workflow button to be disabled');
 
       assert
