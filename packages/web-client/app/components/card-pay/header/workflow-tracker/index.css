@@ -3,11 +3,29 @@
   font: var(--boxel-font-xs);
 }
 
+.workflow-tracker__toggle {
+  gap: var(--boxel-sp-xxs);
+}
+
+.workflow-tracker__toggle-icon {
+  --icon-color: var(--boxel-dark);
+
+  margin-right: var(--boxel-sp-xxxs);
+}
+
 .workflow-tracker__heading {
+  display: flex;
+  align-items: center;
+  column-gap: var(--boxel-sp-xxs);
+  padding-left: var(--boxel-sp-xs);
   text-transform: uppercase;
 }
 
+.workflow-tracker__heading-icon {
+  --icon-color: var(--boxel-light);
+}
+
 .workflow-tracker__count {
-  font-weight: 600;
+  font-weight: 700;
   color: var(--boxel-teal);
 }

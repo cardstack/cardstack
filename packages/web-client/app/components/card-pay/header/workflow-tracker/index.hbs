@@ -1,14 +1,16 @@
 <Boxel::Button
   @kind='primary'
-  {{on "click" (toggle 'showing' this)}}
+  {{on 'click' (toggle 'showing' this)}}
   data-test-workflow-tracker-toggle
 >
+  {{svg-jar 'task-active' class='workflow-tracker__toggle-icon'}}
   {{this.activeWorkflows.length}}
 </Boxel::Button>
 
 {{#if this.showing}}
   <aside class='workflow-tracker__list'>
     <heading class='workflow-tracker__heading'>
+      {{svg-jar 'task-active' class='workflow-tracker__heading-icon'}}
       Active workflows
       <span
         class='workflow-tracker__count'
@@ -25,6 +27,7 @@
       {{/each}}
     </ul>
     <heading class='workflow-tracker__heading'>
+      {{svg-jar 'task-completed' class='workflow-tracker__heading-icon'}}
       Completed workflows
       <span
         class='workflow-tracker__count'
@@ -42,7 +45,7 @@
     </ul>
     <Boxel::Button
       @kind='secondary-dark'
-      {{on "click" this.clearCompletedWorkflows}}
+      {{on 'click' this.clearCompletedWorkflows}}
       data-test-workflow-tracker-clear-completed
     >
       Clear Completed
