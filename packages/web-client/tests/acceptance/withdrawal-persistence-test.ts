@@ -105,7 +105,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
             'TRANSACTION_AMOUNT',
             'TRANSACTION_STATUS',
           ],
-          createdAt: 1627908405,
+          createdAt: '1627908405',
         },
       });
 

@@ -22,8 +22,10 @@ export interface WorkflowMeta {
 
 export interface WorkflowSessionDictionary {
   [key: string]: SupportedType;
-  meta: Partial<WorkflowMeta>;
+  meta?: Partial<WorkflowMeta>;
 }
+
+type SerializedWorkflowState = Record<string, string>;
 
 type JSONSerializable =
   | string
@@ -88,14 +90,14 @@ function stateProxyHandler(workflowSession: WorkflowSession) {
   };
 }
 export default class WorkflowSession {
-  workflow: Workflow;
+  workflow: Workflow | undefined;
   #stateProxy: any;
-  constructor(workflow?: any) {
+  constructor(workflow?: Workflow) {
     this.workflow = workflow;
     this.#stateProxy = new Proxy({}, stateProxyHandler(this));
   }
 
-  @tracked _state: Record<string, string> = {};
+  @tracked _state: SerializedWorkflowState = {};
 
   delete(key: string) {
     delete this._state[key];
@@ -105,7 +107,7 @@ export default class WorkflowSession {
     this.persistToStorage();
   }
 
-  get state(): Record<string, SupportedType> {
+  get state(): WorkflowSessionDictionary {
     return this.#stateProxy;
   }
 
@@ -117,13 +119,13 @@ export default class WorkflowSession {
     if (!this.hasPersistence()) return;
 
     let persistedData = this.getPersistedData();
-    this._state = persistedData?.state || ({} as Record<string, string>);
+    this._state = persistedData?.state || ({} as SerializedWorkflowState);
   }
 
-  getPersistedData(): { state?: Record<string, string> } {
+  getPersistedData(): { state?: SerializedWorkflowState } {
     if (!this.hasPersistence()) return {};
 
-    return this.workflow?.workflowPersistence.getPersistedData(
+    return this.workflow.workflowPersistence.getPersistedData(
       this.workflow.workflowPersistenceId
     );
   }
@@ -132,14 +134,14 @@ export default class WorkflowSession {
     return deserializeValue<T>(this._state[key]);
   }
 
-  getValues(): Record<string, SupportedType> {
+  getValues(): WorkflowSessionDictionary {
     return deserializeState(this._state);
   }
 
   setValue(key: string, value: SupportedType): void;
-  setValue(hash: Record<string, SupportedType>): void;
+  setValue(hash: WorkflowSessionDictionary): void;
   setValue(
-    hashOrKey: Record<string, SupportedType> | string,
+    hashOrKey: WorkflowSessionDictionary | string,
     value?: SupportedType
   ): void {
     if (typeof hashOrKey === 'string') {
@@ -188,7 +190,7 @@ export default class WorkflowSession {
     // persist must be false to avoid infinite recursion
     this.setMeta({ updatedAt, createdAt }, false);
 
-    this.workflow?.workflowPersistence.persistData(
+    this.workflow.workflowPersistence.persistData(
       this.workflow.workflowPersistenceId,
       {
         name: this.workflow.name,
@@ -216,9 +218,9 @@ function deserializeValue<T extends SupportedType>(
 }
 
 export function deserializeState(
-  state: Record<string, string>
-): Record<string, SupportedType> {
-  let res: Record<string, SupportedType> = {};
+  state: SerializedWorkflowState
+): WorkflowSessionDictionary {
+  let res: WorkflowSessionDictionary = {};
 
   for (let key in state) {
     let value = deserializeValue(state[key]);
@@ -231,7 +233,7 @@ export function deserializeState(
 }
 
 export function serializeToState(
-  state: Record<string, string>,
+  state: SerializedWorkflowState,
   key: string,
   value: SupportedType
 ) {
@@ -252,8 +254,8 @@ export function serializeToState(
 
 // A useful util for tests
 export function buildState(
-  data: Record<string, SupportedType>
-): Record<string, string> {
+  data: WorkflowSessionDictionary
+): SerializedWorkflowState {
   let result = {};
   for (let key in data) {
     serializeToState(result, key, data[key]);
