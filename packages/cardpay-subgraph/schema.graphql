@@ -493,3 +493,13 @@ type RewardeeClaim @entity {
   transaction: Transaction!
   timestamp: BigInt!
 }
+
+type RewardTokensAdd @entity {
+  id: ID!
+  rewardProgramID: String!
+  safe: Safe!
+  token: Token!
+  amount: BigInt!
+  transaction: Transaction!
+  timestamp: BigInt!
+}

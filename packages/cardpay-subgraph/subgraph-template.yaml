@@ -667,6 +667,8 @@ dataSources:
       eventHandlers:
         - event: RewardeeClaim(address,address,address,uint256)
           handler: handleRewardeeClaim
+        - event: RewardTokensAdded(address,address,address,uint256)
+          handler: handleRewardTokensAdded
       file: ./src/mappings/reward-pool.ts
 
 templates:

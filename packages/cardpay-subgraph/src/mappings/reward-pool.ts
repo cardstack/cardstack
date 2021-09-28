@@ -1,6 +1,7 @@
-import { RewardeeClaim as RewardeeClaimEvent } from '../../generated/RewardPool/RewardPool';
-import { RewardeeClaim, RewardSafe } from '../../generated/schema';
-import { toChecksumAddress, makeEOATransactionForSafe, makeAccount } from '../utils';
+import { RewardeeClaim as RewardeeClaimEvent, RewardTokensAdded } from '../../generated/RewardPool/RewardPool';
+import { RewardeeClaim, RewardSafe, RewardTokensAdd } from '../../generated/schema';
+import { toChecksumAddress, makeEOATransactionForSafe, makeAccount, makeToken } from '../utils';
+import { log } from '@graphprotocol/graph-ts';
 
 export function handleRewardeeClaim(event: RewardeeClaimEvent): void {
   let txnHash = event.transaction.hash.toHex();
@@ -28,4 +29,21 @@ export function handleRewardeeClaim(event: RewardeeClaimEvent): void {
   entity.transaction = txnHash;
   entity.timestamp = event.block.timestamp;
   entity.save();
+}
+
+export function handleRewardTokensAdded(event: RewardTokensAdded): void {
+  let txnHash = event.transaction.hash.toHex();
+  let rewardProgramID = toChecksumAddress(event.params.rewardProgramID);
+  let safe = toChecksumAddress(event.params.sender);
+  let token = makeToken(event.params.tokenAddress);
+  let amount = event.params.amount;
+
+  makeEOATransactionForSafe(event, safe);
+  let entity = new RewardTokensAdd(txnHash);
+  entity.rewardProgramID = rewardProgramID;
+  entity.safe = safe;
+  entity.token = token;
+  entity.amount = amount;
+  entity.transaction = txnHash;
+  entity.timestamp = event.block.timestamp;
 }
