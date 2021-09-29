@@ -18,8 +18,6 @@ export async function rewardTokenBalances(
     console.log('\n');
     console.log(`Reward balances for ${address}`);
     console.log('---------------------------------------------------------------------');
-    console.log(`    RewardProgram: ${rewardProgramId}`);
-    console.log('---------------------------------------------------------------------');
     displayRewardTokenBalance(tokenBalances);
   } else {
     const tokenBalances = await rewardPool.rewardTokenBalances(address);
@@ -102,7 +100,7 @@ export async function getClaimableRewardProofs(
   const claimableRewardProofs = await rewardPool.getProofsWithNonZeroBalance(address, rewardProgramId, tokenAddress);
   console.log('\n');
   console.log(`Proofs balances for ${address}`);
-  console.log('==============================================================');
+  console.log('--------------------------------------------------------------');
   displayProofs(claimableRewardProofs);
 }
 
