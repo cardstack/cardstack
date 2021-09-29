@@ -62,6 +62,63 @@ export async function create(
   console.log('done');
 }
 
+export async function bulkSplit(
+  network: string,
+  prepaidCard: string,
+  faceValue: number,
+  quantity: number,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+
+  let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  let customizationDID = await prepaidCardAPI.customizationDID(prepaidCard);
+  console.log(
+    `Splitting prepaid card ${prepaidCard} into ${quantity} new prepaid cards with a face value §${faceValue} SPEND and customization DID ${
+      customizationDID || '-none-'
+    } and placing into the default market...`
+  );
+  let cardsLeft = quantity;
+  let sku: string | undefined;
+  let allCards: string[] = [];
+  try {
+    do {
+      console.log(
+        `  Progress: ${quantity - cardsLeft} of ${quantity} (${Math.round(((quantity - cardsLeft) / quantity) * 100)}%)`
+      );
+      let currentNumberOfCards = Math.min(cardsLeft, 10);
+      let faceValues = Array(currentNumberOfCards).fill(faceValue);
+      let prepaidCards;
+      ({ prepaidCards, sku } = await prepaidCardAPI.split(prepaidCard, faceValues, undefined, customizationDID, {
+        onTxnHash: (txnHash) => console.log(`  Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+      }));
+      allCards.push(...prepaidCards.map((p) => p.address));
+
+      cardsLeft -= currentNumberOfCards;
+    } while (cardsLeft > 0);
+    console.log(
+      `  Progress: ${quantity - cardsLeft} of ${quantity} (${Math.round(((quantity - cardsLeft) / quantity) * 100)}%)`
+    );
+  } catch (err) {
+    console.log(`Encountered error while performing split.`);
+    if (allCards.length > 0 && sku) {
+      console.log(
+        `Successfully created the following prepaid cards before error was encountered: ${formatPrepaidCards(allCards)}`
+      );
+      await inventoryInfo(web3, sku);
+    } else {
+      console.log(`No cards were created`);
+    }
+    throw err;
+  }
+  console.log(`
+Created ${allCards.length} new prepaid cards
+Balance of ${prepaidCard}: §${await prepaidCardAPI.faceValue(prepaidCard)} SPEND
+`);
+  await inventoryInfo(web3, sku);
+}
+
 export async function split(
   network: string,
   prepaidCard: string,
@@ -70,42 +127,25 @@ export async function split(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-
   let prepaidCardAPI = await getSDK('PrepaidCard', web3);
-  let marketAPI = await getSDK('PrepaidCardMarket', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  let assets = await getSDK('Assets', web3);
-
+  customizationDID = customizationDID ?? (await prepaidCardAPI.customizationDID(prepaidCard));
   console.log(
     `Splitting prepaid card ${prepaidCard} into face value(s) §${faceValues.join(
       ' SPEND, §'
-    )} SPEND and placing into the default market...`
+    )} SPEND with customizationDID ${customizationDID || '-none-'} and placing into the default market...`
   );
   let { prepaidCards, sku } = await prepaidCardAPI.split(prepaidCard, faceValues, undefined, customizationDID, {
     onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
-  let skuInfo = await marketAPI.getSKUInfo(sku);
-  if (!skuInfo) {
-    console.log('Error: no sku info available');
-  } else {
-    let { symbol } = await assets.getTokenInfo(skuInfo.issuingToken);
-    let inventory = await marketAPI.getInventory(sku);
-    console.log(`SKU Info:
-  SKU:               ${sku}
-  Face value:        §${skuInfo.faceValue} SPEND
-  Issuing token      ${symbol}
-  Issuer:            ${skuInfo.issuer}
-  Customization DID: ${skuInfo.customizationDID || '-none-'}
-  Ask Price:         ${fromWei(skuInfo.askPrice)} ${symbol}
-  Inventory size:    ${inventory.length}
 
-Created cards: ${JSON.stringify(
-      prepaidCards.map((p) => p.address),
-      null,
-      2
-    )}`);
-    console.log('done');
-  }
+  await inventoryInfo(web3, sku);
+
+  console.log(`
+Created cards: ${formatPrepaidCards(prepaidCards.map((p) => p.address))}
+
+done
+`);
 }
 
 export async function transfer(
@@ -144,4 +184,28 @@ export async function payMerchant(
     onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log('done');
+}
+
+async function inventoryInfo(web3: Web3, sku: string): Promise<void> {
+  let marketAPI = await getSDK('PrepaidCardMarket', web3);
+  let assets = await getSDK('Assets', web3);
+  let skuInfo = await marketAPI.getSKUInfo(sku);
+  if (!skuInfo) {
+    console.log('Error: no sku info available');
+  } else {
+    let { symbol } = await assets.getTokenInfo(skuInfo.issuingToken);
+    let inventory = await marketAPI.getInventory(sku);
+    console.log(`SKU Info:
+  SKU:               ${sku}
+  Face value:        §${skuInfo.faceValue} SPEND
+  Issuing token      ${symbol}
+  Issuer:            ${skuInfo.issuer}
+  Customization DID: ${skuInfo.customizationDID || '-none-'}
+  Ask Price:         ${fromWei(skuInfo.askPrice)} ${symbol}
+  Inventory size:    ${inventory.length}`);
+  }
+}
+
+function formatPrepaidCards(prepaidCards: string[]): string {
+  return JSON.stringify(prepaidCards, null, 2).replace('"', '').replace('[', '').replace(']', '');
 }
