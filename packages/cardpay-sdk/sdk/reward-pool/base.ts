@@ -475,7 +475,7 @@ const aggregateBalance = (arr: RewardTokenBalance[]): RewardTokenBalance[] => {
   let output: RewardTokenBalance[] = [];
   arr.forEach(function (item) {
     let existing = output.filter(function (v) {
-      return v.tokenAddress == item.tokenAddress;
+      return v.rewardProgramId == item.rewardProgramId && v.tokenAddress == item.tokenAddress;
     });
     if (existing.length) {
       var existingIndex = output.indexOf(existing[0]);
