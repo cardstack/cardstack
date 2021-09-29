@@ -6,7 +6,7 @@
   class="workflow-tracker__toggle"
 >
   {{svg-jar 'task-active' class='workflow-tracker__toggle-icon'}}
-  {{this.workflowPersistence.activeWorkflows.length}}
+  <span data-test-workflow-tracker-count>{{this.workflowPersistence.activeWorkflows.length}}</span>
 </Boxel::Button>
 
 {{#if this.showing}}

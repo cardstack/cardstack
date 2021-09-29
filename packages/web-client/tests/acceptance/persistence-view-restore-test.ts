@@ -158,7 +158,7 @@ module('Acceptance | persistence view and restore', function () {
       });
 
       await visit('/card-pay/');
-      assert.dom('[data-test-workflow-tracker]').containsText('2');
+      assert.dom('[data-test-workflow-tracker-count]').containsText('2');
 
       await click('[data-test-workflow-tracker-toggle]');
       assert.dom('[data-test-active-workflow]').exists({ count: 2 });
@@ -202,7 +202,7 @@ module('Acceptance | persistence view and restore', function () {
 
       workflowPersistenceService.clear();
       await settled();
-      assert.dom('[data-test-workflow-tracker]').containsText('0');
+      assert.dom('[data-test-workflow-tracker-count]').containsText('0');
     });
 
     test('clicking a persisted workflow restores it', async function (assert) {
@@ -292,7 +292,7 @@ module('Acceptance | persistence view and restore', function () {
       );
       await click(`[data-test-merchant-customization-save-details]`);
 
-      assert.dom('[data-test-workflow-tracker]').containsText('1');
+      assert.dom('[data-test-workflow-tracker-count]').containsText('1');
 
       await click('[data-test-workflow-tracker-toggle]');
       assert
@@ -336,7 +336,7 @@ module('Acceptance | persistence view and restore', function () {
 
         test('it lists existing persisted workflows', async function (this: Context, assert) {
           await visit('/card-pay/');
-          assert.dom('[data-test-workflow-tracker]').containsText('2');
+          assert.dom('[data-test-workflow-tracker-count]').containsText('2');
         });
 
         hooks.afterEach(function () {
