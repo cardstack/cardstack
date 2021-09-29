@@ -436,6 +436,23 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay testnet: Prepaid Card Inventories",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "prepaid-card-inventories",
+        "staging", // environment
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay testnet: Add Prepaid Card Inventory",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
