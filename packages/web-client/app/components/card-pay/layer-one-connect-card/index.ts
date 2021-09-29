@@ -63,7 +63,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   }
 
   persistWalletAddress() {
-    this.args.workflowSession.setValue(
+    this.args?.workflowSession?.setValue(
       'layer1WalletAddress',
       this.layer1Network.walletInfo.firstAddress
     );
