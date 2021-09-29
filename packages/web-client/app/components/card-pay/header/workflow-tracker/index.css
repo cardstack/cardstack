@@ -3,31 +3,26 @@
   padding: var(--boxel-sp-xxxs);
 }
 
-.workflow-tracker__list {
+.workflow-tracker {
   position: absolute;
   top: 80px;
   right: var(--boxel-sp-lg);
   background-color: var(--boxel-purple-500);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: var(--boxel-border-radius);
-  box-shadow: var(--boxel-box-shadow);
-  color: var(--boxel-light-200);
-  font: var(--boxel-font-xs);
-  padding: var(--boxel-sp-sm) 0;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35);
+  color: var(--boxel-light);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
 }
 
-.workflow-tracker__heading {
-  display: flex;
-  align-items: center;
-  column-gap: var(--boxel-sp-xxs);
-  padding-left: var(--boxel-sp-xs);
-  margin-bottom: var(--boxel-sp-xs);
-  text-transform: uppercase;
+.workflow-tracker > * + * {
+  margin-top: var(--boxel-sp-sm);
+  border-top: 2px solid var(--boxel-purple-700);
 }
 
-ul + .workflow-tracker__heading {
-  border-top: 2px solid var(--boxel-purple-800);
-  margin-top: var(--boxel-sp);
-  padding-top: var(--boxel-sp-sm);
+.workflow-tracker__list {
+  padding: 0 var(--boxel-sp);
 }
 
 .workflow-tracker__li .workflow-tracker__li-content {
@@ -46,11 +41,34 @@ ul + .workflow-tracker__heading {
   margin-right: var(--boxel-sp-xxxs);
 }
 
+.workflow-tracker__heading {
+  display: flex;
+  align-items: center;
+  column-gap: var(--boxel-sp-xs);
+  padding: var(--boxel-sp-sm) var(--boxel-sp-xs);
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
 .workflow-tracker__heading-icon {
   --icon-color: var(--boxel-light);
 }
 
 .workflow-tracker__count {
+  color: var(--boxel-highlight);
   font-weight: 700;
-  color: var(--boxel-teal);
+  font-size: var(--boxel-font-size-sm);
+}
+
+.workflow-tracker__footer {
+  padding: var(--boxel-sp-sm) var(--boxel-sp-xs);
+  text-align: center;
+}
+
+.workflow-tracker__footer-cta {
+  --boxel-button-border: 1px solid var(--boxel-purple-300);
+
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
 }
