@@ -238,10 +238,10 @@
       "env": {},
       "args": [
         "safe-transfer-tokens",
-        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // source safe address
+        "0xD669AC924eb6812C48afA984B5efFd776d035001", // source safe address
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
-        "0x09FBEDDc5f94fA2713CDa75A68457cA8A4527adf", // destination addrress
-        "100", // amount (in ether units)
+        "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // destination addrress
+        "500", // amount (in ether units)
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own
@@ -281,7 +281,26 @@
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot safe feel free to use your own
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "",
-        "1000",
+        "50000",
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Bulk Split Prepaid Card",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "split",
+        "0xE1C3D39e2377F20325f0Fdf40b835c768E257C66", // prepaid card address
+        "2000", // face value
+        "21", // quantity
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own
@@ -460,8 +479,8 @@
       "args": [
         "set-prepaid-card-ask",
         "0xcd9B5f73cebF760E7113A71B5f47C4430F42AA28", // funding prepaid card
-        "0x7ac394019c3259d7164796fadfcdca28d48cff380444e581c593d6b15f5f148e", // sku
-        "1",
+        "0x9df6e66eaa9809a86c87711637f857050ed2fbb7b79bb1a38560f383c3df4358", // sku
+        "20",
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own

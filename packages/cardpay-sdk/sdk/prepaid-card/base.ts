@@ -54,6 +54,15 @@ export default class PrepaidCard {
     return (await (await this.getPrepaidCardMgr()).methods.cardDetails(prepaidCardAddress).call()).issueToken;
   }
 
+  async customizationDID(prepaidCardAddress: string): Promise<string> {
+    return (await (await this.getPrepaidCardMgr()).methods.cardDetails(prepaidCardAddress).call()).customizationDID;
+  }
+
+  async faceValue(prepaidCardAddress: string): Promise<number> {
+    let faceValue = await (await this.getPrepaidCardMgr()).methods.faceValue(prepaidCardAddress).call();
+    return parseInt(faceValue.toString());
+  }
+
   async canSplit(prepaidCard: string): Promise<boolean> {
     let prepaidCardMgr = await this.getPrepaidCardMgr();
     let owner = await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCard).call();

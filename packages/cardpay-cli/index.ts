@@ -14,6 +14,7 @@ import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe, transferTokens
 import {
   create as createPrepaidCard,
   split as splitPrepaidCard,
+  bulkSplit as bulkSplitPrepaidCard,
   transfer as transferPrepaidCard,
   priceForFaceValue,
   payMerchant,
@@ -53,6 +54,7 @@ type Commands =
   | 'safeTransferTokensGasEstimate'
   | 'prepaidCardCreate'
   | 'prepaidCardSplit'
+  | 'split'
   | 'prepaidCardTransfer'
   | 'usdPrice'
   | 'ethPrice'
@@ -111,8 +113,10 @@ interface Options {
   encodedData?: string;
   signatures?: string[];
   faceValues?: number[];
+  faceValue?: number;
   prepaidCards?: string[];
   rewardProgramId?: string;
+  quantity?: number;
   admin?: string;
   proof?: string;
   rewardSafe?: string;
@@ -141,6 +145,7 @@ let {
   receiver,
   recipient,
   faceValues,
+  faceValue,
   txnHash,
   messageId,
   encodedData,
@@ -149,6 +154,7 @@ let {
   rewardProgramId,
   admin,
   proof,
+  quantity,
   rewardSafe,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
@@ -357,8 +363,27 @@ let {
     }
   )
   .command(
+    'split <prepaidCard> <faceValue> <quantity>',
+    "Split a prepaid card into more prepaid cards with identical face values inheriting the funding card's customization",
+    (yargs) => {
+      yargs.positional('prepaidCard', {
+        type: 'string',
+        description: 'The address of the prepaid card to split',
+      });
+      yargs.positional('faceValue', {
+        type: 'number',
+        description: 'The face value for the new prepaid cards',
+      });
+      yargs.positional('quantity', {
+        type: 'number',
+        description: 'The amount of prepaid cards to create',
+      });
+      command = 'split';
+    }
+  )
+  .command(
     'prepaidcard-split <prepaidCard> <customizationDID> <faceValues..>',
-    'Split a prepaid card into more prepaid cards',
+    'Split a prepaid card into more prepaid cards (max 10)',
     (yargs) => {
       yargs.positional('prepaidCard', {
         type: 'string',
@@ -851,6 +876,13 @@ if (!command) {
         return;
       }
       await createPrepaidCard(network, safeAddress, faceValues, tokenAddress, customizationDID || undefined, mnemonic);
+      break;
+    case 'split':
+      if (prepaidCard == null || faceValue == null || quantity == null) {
+        showHelpAndExit('prepaidCard, faceValue, and quantity are required values');
+        return;
+      }
+      await bulkSplitPrepaidCard(network, prepaidCard, faceValue, quantity, mnemonic);
       break;
     case 'prepaidCardSplit':
       if (prepaidCard == null || faceValues == null) {
