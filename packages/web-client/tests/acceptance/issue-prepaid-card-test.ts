@@ -28,6 +28,11 @@ import {
   deserializeState,
   WorkflowMeta,
 } from '@cardstack/web-client/models/workflow/workflow-session';
+import {
+  createDepotSafe,
+  createPrepaidCardSafe,
+  createSafeToken,
+} from '../helpers/data';
 
 interface Context extends MirageTestContext {}
 
@@ -108,49 +113,21 @@ module('Acceptance | issue prepaid card', function (hooks) {
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
-      {
-        type: 'depot',
+      createDepotSafe({
         address: depotAddress,
+        owners: [layer2AccountAddress],
         tokens: [
-          {
-            balance: SLIGHTLY_LESS_THAN_MAX_VALUE.toString(),
-            tokenAddress: 'DAI_ADDRESS',
-            token: {
-              symbol: 'DAI',
-              name: 'DAI',
-              decimals: 18,
-            },
-          },
-          {
-            balance: '250000000000000000000',
-            tokenAddress: 'CARD_ADDRESS',
-            token: {
-              symbol: 'CARD',
-              name: 'CARD',
-              decimals: 18,
-            },
-          },
+          createSafeToken('DAI', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
+          createSafeToken('CARD', '250000000000000000000'),
         ],
-        createdAt: Date.now() / 1000,
-        owners: [layer2AccountAddress],
-      },
-      {
-        type: 'prepaid-card',
-        createdAt: Date.now() / 1000,
-
+      }),
+      createPrepaidCardSafe({
         address: '0x123400000000000000000000000000000000abcd',
-
-        tokens: [],
         owners: [layer2AccountAddress],
-
-        issuingToken: '0xTOKEN',
         spendFaceValue: 2324,
         prepaidCardOwner: layer2AccountAddress,
-        hasBeenUsed: false,
         issuer: layer2AccountAddress,
-        reloadable: false,
-        transferrable: false,
-      },
+      }),
     ]);
 
     await waitUntil(
@@ -544,6 +521,18 @@ module('Acceptance | issue prepaid card', function (hooks) {
       ''
     );
 
+    let prepaidCardSafe = createPrepaidCardSafe({
+      address: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
+      owners: ['0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44'],
+      spendFaceValue: 10000,
+      prepaidCardOwner: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+      issuer: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+      customizationDID:
+        'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+    });
+    // @ts-ignore
+    delete prepaidCardSafe.createdAt;
+
     let deserializedState = deserializeState({
       ...persistedState,
     });
@@ -570,21 +559,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
       },
       prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
-      prepaidCardSafe: {
-        type: 'prepaid-card',
-        address: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
-        tokens: [],
-        owners: ['0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44'],
-        issuingToken: '0xTOKEN',
-        spendFaceValue: 10000,
-        prepaidCardOwner: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
-        hasBeenUsed: false,
-        issuer: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
-        reloadable: true,
-        transferrable: true,
-        customizationDID:
-          'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
-      },
+      prepaidCardSafe,
       prepaidFundingToken: 'DAI.CPXD',
       reloadable: true,
       spendFaceValue: 10000,

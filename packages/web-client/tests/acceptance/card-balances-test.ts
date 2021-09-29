@@ -9,6 +9,7 @@ import { encodeDID, getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
+import { createPrepaidCardSafe } from '../helpers/data';
 
 interface Context extends MirageTestContext {}
 
@@ -43,24 +44,16 @@ module('Acceptance | card balances', function (hooks) {
     });
 
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
-      {
-        type: 'prepaid-card',
-        createdAt: Date.now() / 1000,
-
+      createPrepaidCardSafe({
         address: '0x123400000000000000000000000000000000abcd',
-
-        tokens: [],
         owners: [layer2AccountAddress],
-
-        issuingToken: '0xTOKEN',
         spendFaceValue: 2324,
         prepaidCardOwner: layer2AccountAddress,
-        hasBeenUsed: false,
         issuer: layer2AccountAddress,
+        customizationDID,
         reloadable: false,
         transferrable: false,
-        customizationDID,
-      },
+      }),
     ]);
 
     let resolver = new Resolver({ ...getResolver() });
@@ -101,23 +94,13 @@ module('Acceptance | card balances', function (hooks) {
     let secondAddress = '0x1826000000000000000000000000000000000000';
 
     layer2Service.test__simulateAccountSafes(secondAddress, [
-      {
-        type: 'prepaid-card',
-        createdAt: Date.now() / 1000,
-
+      createPrepaidCardSafe({
         address: '0x567800000000000000000000000000000000abcd',
-
-        tokens: [],
         owners: [layer2AccountAddress],
-
-        issuingToken: '0xTOKEN',
         spendFaceValue: 4648,
         prepaidCardOwner: layer2AccountAddress,
-        hasBeenUsed: false,
         issuer: layer2AccountAddress,
-        reloadable: false,
-        transferrable: false,
-      },
+      }),
     ]);
 
     layer2Service.test__simulateAccountsChanged([secondAddress]);

@@ -5,9 +5,14 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
-import { MerchantSafe, PrepaidCardSafe } from '@cardstack/cardpay-sdk';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 import { setupHubAuthenticationToken } from '../helpers/setup';
+import {
+  createDepotSafe,
+  createMerchantSafe,
+  createPrepaidCardSafe,
+  createSafeToken,
+} from '../helpers/data';
 
 interface Context extends MirageTestContext {}
 
@@ -18,37 +23,25 @@ module('Acceptance | create merchant persistence', function (hooks) {
   let workflowPersistenceService: WorkflowPersistence;
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
   const prepaidCardAddress = '0x81c89274Dc7C9BAcE082d2ca00697d2d2857D2eE';
-  const prepaidCard: PrepaidCardSafe = {
-    type: 'prepaid-card',
+  const prepaidCard = createPrepaidCardSafe({
     address: prepaidCardAddress,
-    customizationDID: 'did:cardstack:1pkYh9uJHdfMJZt4mURGmhps96b157a2d744efd9',
-    reloadable: false,
     spendFaceValue: 500,
-    transferrable: true,
-    createdAt: Date.now() / 1000,
-    tokens: [],
     owners: [layer2AccountAddress],
-    issuingToken: '0xTOKEN',
     prepaidCardOwner: layer2AccountAddress,
-    hasBeenUsed: false,
     issuer: layer2AccountAddress,
-  };
+  });
   const merchantName = 'Mandello';
   const merchantId = 'mandello1';
   const merchantBgColor = '#FF5050';
   const merchantDID = 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b5fff';
   const merchantAddress = '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8';
   const merchantRegistrationFee = 150;
-  const merchantSafe: MerchantSafe = {
-    type: 'merchant',
+  const merchantSafe = createMerchantSafe({
     address: merchantAddress,
     merchant: merchantName,
     infoDID: merchantDID,
-    accumulatedSpendValue: 0,
-    createdAt: Date.now(),
-    tokens: [],
     owners: [layer2AccountAddress],
-  };
+  });
 
   hooks.beforeEach(async function () {
     let layer2Service = this.owner.lookup('service:layer2-network')
@@ -57,49 +50,21 @@ module('Acceptance | create merchant persistence', function (hooks) {
 
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
-      {
-        type: 'depot',
+      createDepotSafe({
         address: depotAddress,
+        owners: [layer2AccountAddress],
         tokens: [
-          {
-            balance: '250000000000000000000',
-            tokenAddress: 'DAI_ADDRESS',
-            token: {
-              symbol: 'DAI',
-              name: 'DAI',
-              decimals: 18,
-            },
-          },
-          {
-            balance: '250000000000000000000',
-            tokenAddress: 'CARD_ADDRESS',
-            token: {
-              symbol: 'CARD',
-              name: 'CARD',
-              decimals: 18,
-            },
-          },
+          createSafeToken('DAI', '250000000000000000000'),
+          createSafeToken('CARD', '250000000000000000000'),
         ],
-        createdAt: Date.now() / 1000,
-        owners: [layer2AccountAddress],
-      },
-      {
-        type: 'prepaid-card',
-        createdAt: Date.now() / 1000,
-
+      }),
+      createPrepaidCardSafe({
         address: '0x123400000000000000000000000000000000abcd',
-
-        tokens: [],
         owners: [layer2AccountAddress],
-
-        issuingToken: '0xTOKEN',
         spendFaceValue: 2324,
         prepaidCardOwner: layer2AccountAddress,
-        hasBeenUsed: false,
         issuer: layer2AccountAddress,
-        reloadable: false,
-        transferrable: false,
-      },
+      }),
     ]);
     layer2Service.authenticate();
     layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');

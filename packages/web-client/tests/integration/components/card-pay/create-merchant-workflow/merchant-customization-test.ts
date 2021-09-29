@@ -8,6 +8,7 @@ import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { Response as MirageResponse } from 'ember-cli-mirage';
+import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/data';
 
 interface Context extends MirageTestContext {}
 
@@ -88,23 +89,15 @@ module(
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
       layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
-        {
-          type: 'prepaid-card',
-          createdAt: Date.now() / 1000,
-
+        createPrepaidCardSafe({
           address: prepaidCardAddress,
-
-          tokens: [],
           owners: [layer2AccountAddress],
-
-          issuingToken: '0xTOKEN',
-          spendFaceValue: 2324,
           prepaidCardOwner: layer2AccountAddress,
-          hasBeenUsed: false,
           issuer: layer2AccountAddress,
+          spendFaceValue: 2324,
           reloadable: false,
           transferrable: false,
-        },
+        }),
       ]);
 
       this.setProperties({

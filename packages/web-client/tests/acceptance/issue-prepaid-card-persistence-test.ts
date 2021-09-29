@@ -16,6 +16,7 @@ import { toWei } from 'web3-utils';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 import { setupHubAuthenticationToken } from '../helpers/setup';
+import { createPrepaidCardSafe } from '../helpers/data';
 
 interface Context extends MirageTestContext {}
 
@@ -164,15 +165,12 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         transferrable: true,
         txHash:
           '0x8bcc3e419d09a0403d1491b5bb8ac8bee7c67f85cc37e6e17ef8eb77f946497b',
-        prepaidCardSafe: {
-          type: 'prepaid-card',
+        prepaidCardSafe: createPrepaidCardSafe({
           address: '0x81c89274Dc7C9BAcE082d2ca00697d2d2857D2eE',
           customizationDID:
             'did:cardstack:1pkYh9uJHdfMJZt4mURGmhps96b157a2d744efd9',
-          reloadable: false,
           spendFaceValue: 500,
-          transferrable: true,
-        },
+        }),
       });
 
       workflowPersistenceService.persistData('abc123', {
@@ -354,15 +352,12 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         transferrable: true,
         txHash:
           '0x8bcc3e419d09a0403d1491b5bb8ac8bee7c67f85cc37e6e17ef8eb77f946497b',
-        prepaidCardSafe: {
-          type: 'prepaid-card',
+        prepaidCardSafe: createPrepaidCardSafe({
           address: '0x81c89274Dc7C9BAcE082d2ca00697d2d2857D2eE',
           customizationDID:
             'did:cardstack:1pkYh9uJHdfMJZt4mURGmhps96b157a2d744efd9',
-          reloadable: false,
           spendFaceValue: 500,
-          transferrable: true,
-        },
+        }),
       });
 
       workflowPersistenceService.persistData('abc123', {

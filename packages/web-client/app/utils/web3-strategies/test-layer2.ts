@@ -29,6 +29,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { useResource, useTask } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { reads } from 'macro-decorators';
+import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/data';
 
 interface BridgeToLayer1Request {
   safeAddress: string;
@@ -482,26 +483,18 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     faceValue: number,
     walletAddress: string,
     cardAddress: string,
-    options: Object
+    options: Partial<PrepaidCardSafe>
   ) {
     let request = this.issuePrepaidCardRequests.get(faceValue);
-    let prepaidCardSafe: PrepaidCardSafe = {
-      type: 'prepaid-card',
-      createdAt: Date.now() / 1000,
+    let prepaidCardSafe = createPrepaidCardSafe({
       address: cardAddress,
-      tokens: [],
       owners: [walletAddress],
-      issuingToken: '0xTOKEN',
       spendFaceValue: faceValue,
       prepaidCardOwner: walletAddress,
-      hasBeenUsed: false,
       issuer: walletAddress,
-      reloadable: true,
-      transferrable: false,
       customizationDID: request?.customizationDID,
-
       ...options,
-    };
+    });
     request?.onTxnHash?.('exampleTxnHash');
 
     this.test__simulateAccountSafes(walletAddress, [prepaidCardSafe]);

@@ -11,6 +11,7 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import { BN } from 'bn.js';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
+import { createDepotSafe, createSafeToken } from '../helpers/data';
 
 interface Context extends MirageTestContext {}
 
@@ -72,30 +73,13 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
-        withdrawalSafe: {
-          type: 'depot',
+        withdrawalSafe: createDepotSafe({
           address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
           tokens: [
-            {
-              balance: '1000000000000000000',
-              token: {
-                name: 'CARD Token Kovan.CPXD',
-                symbol: 'CARD',
-                decimals: 18,
-              },
-              tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
-            },
-            {
-              balance: '4215997042758579167',
-              token: {
-                name: 'Dai Stablecoin.CPXD',
-                symbol: 'DAI',
-                decimals: 18,
-              },
-              tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
-            },
+            createSafeToken('CARD', '1000000000000000000'),
+            createSafeToken('DAI', '4215997042758579167'),
           ],
-        },
+        }),
         meta: {
           completedCardNames: [
             'LAYER1_CONNECT',
@@ -148,31 +132,13 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
-        withdrawalSafe: {
-          type: 'depot',
+        withdrawalSafe: createDepotSafe({
           address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          createdAt: 1627908405,
           tokens: [
-            {
-              balance: '1000000000000000000',
-              token: {
-                name: 'CARD Token Kovan.CPXD',
-                symbol: 'CARD',
-                decimals: 18,
-              },
-              tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
-            },
-            {
-              balance: '4215997042758579167',
-              token: {
-                name: 'Dai Stablecoin.CPXD',
-                symbol: 'DAI',
-                decimals: 18,
-              },
-              tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
-            },
+            createSafeToken('CARD', '1000000000000000000'),
+            createSafeToken('DAI', '4215997042758579167'),
           ],
-        },
+        }),
         meta: {
           completedMilestonesCount: 6,
           milestonesCount: 6,
@@ -235,31 +201,13 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
-        withdrawalSafe: {
-          type: 'depot',
+        withdrawalSafe: createDepotSafe({
           address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          createdAt: 1627908405,
           tokens: [
-            {
-              balance: '1000000000000000000',
-              token: {
-                name: 'CARD Token Kovan.CPXD',
-                symbol: 'CARD',
-                decimals: 18,
-              },
-              tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
-            },
-            {
-              balance: '4215997042758579167',
-              token: {
-                name: 'Dai Stablecoin.CPXD',
-                symbol: 'DAI',
-                decimals: 18,
-              },
-              tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
-            },
+            createSafeToken('CARD', '1000000000000000000'),
+            createSafeToken('DAI', '4215997042758579167'),
           ],
-        },
+        }),
         meta: {
           completedMilestonesCount: 5,
           milestonesCount: 6,
@@ -370,31 +318,13 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
         relayTokensTxnHash:
           '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
-        withdrawalSafe: {
-          type: 'depot',
+        withdrawalSafe: createDepotSafe({
           address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          createdAt: 1627908405,
           tokens: [
-            {
-              balance: '1000000000000000000',
-              token: {
-                name: 'CARD Token Kovan.CPXD',
-                symbol: 'CARD',
-                decimals: 18,
-              },
-              tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
-            },
-            {
-              balance: '4215997042758579167',
-              token: {
-                name: 'Dai Stablecoin.CPXD',
-                symbol: 'DAI',
-                decimals: 18,
-              },
-              tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
-            },
+            createSafeToken('CARD', '1000000000000000000'),
+            createSafeToken('DAI', '4215997042758579167'),
           ],
-        },
+        }),
         meta: {
           completedMilestonesCount: 5,
           milestonesCount: 6,

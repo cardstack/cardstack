@@ -10,6 +10,11 @@ import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
 
 import { TinyColor } from '@ctrl/tinycolor';
+import {
+  createDepotSafe,
+  createMerchantSafe,
+  createSafeToken,
+} from '@cardstack/web-client/tests/helpers/data';
 
 interface Context extends MirageTestContext {
   safes: Safe[];
@@ -45,53 +50,23 @@ module(
 
       this.setProperties({
         safes: [
-          {
-            type: 'depot',
+          createDepotSafe({
             address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
             tokens: [
-              {
-                balance: '250000000000000000000',
-                token: {
-                  symbol: 'DAI',
-                },
-              },
-              {
-                balance: '500000000000000000000',
-                token: {
-                  symbol: 'CARD',
-                },
-              },
+              createSafeToken('CARD', '500000000000000000000'),
+              createSafeToken('DAI', '250000000000000000000'),
             ],
-          },
-          {
-            type: 'merchant',
-            createdAt: Date.now() / 1000,
+          }),
+          createMerchantSafe({
             address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
             merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
             tokens: [
-              {
-                balance: '125000000000000000000',
-                tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
-                token: {
-                  name: 'Dai Stablecoin.CPXD',
-                  symbol: 'DAI',
-                  decimals: 2,
-                },
-              },
-              {
-                balance: '450000000000000000000',
-                tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
-                token: {
-                  name: 'CARD Token Kovan.CPXD',
-                  symbol: 'CARD',
-                  decimals: 2,
-                },
-              },
+              createSafeToken('DAI', '125000000000000000000'),
+              createSafeToken('CARD', '450000000000000000000'),
             ],
-            owners: [],
             accumulatedSpendValue: 100,
             infoDID: EXAMPLE_DID,
-          },
+          }),
         ],
         chooseSafe: (safe: Safe) => (chosenSafe = safe),
       });

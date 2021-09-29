@@ -5,9 +5,9 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { setupMirage } from 'ember-cli-mirage/test-support';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
-import { MerchantSafe } from '@cardstack/cardpay-sdk';
 import { getResolver } from '@cardstack/did-resolver';
 import { Resolver } from 'did-resolver';
+import { createMerchantSafe } from '../helpers/data';
 
 interface Context extends MirageTestContext {}
 
@@ -17,13 +17,11 @@ function createMockMerchantSafe(
   eoaAddress: string,
   merchantSafeAddress: string
 ) {
-  return {
-    type: 'merchant',
-    createdAt: Date.now() / 1000,
+  return createMerchantSafe({
     address: merchantSafeAddress,
     owners: [eoaAddress],
     infoDID: EXAMPLE_DID,
-  } as MerchantSafe;
+  });
 }
 
 module('Acceptance | merchant services dashboard', function (hooks) {
