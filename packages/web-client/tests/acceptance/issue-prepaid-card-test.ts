@@ -398,10 +398,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       10000,
       layer2AccountAddress,
       prepaidCardAddress,
-      {
-        reloadable: true,
-        transferrable: true,
-      }
+      {}
     );
 
     await waitFor(milestoneCompletedSel(3));
@@ -456,7 +453,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText('JJ');
     assert
       .dom(`${epiloguePostableSel(1)} [data-test-prepaid-card-attributes]`)
-      .containsText('Reloadable Transferrable');
+      .containsText('Non-reloadable Transferrable');
     assert.dom(
       `${epiloguePostableSel(
         1
@@ -561,7 +558,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
       prepaidCardSafe,
       prepaidFundingToken: 'DAI.CPXD',
-      reloadable: true,
+      reloadable: false,
       spendFaceValue: 10000,
       transferrable: true,
       txnHash: 'exampleTxnHash',
