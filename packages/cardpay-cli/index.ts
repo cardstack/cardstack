@@ -35,6 +35,7 @@ import {
   getSKUInfo,
   setAsk,
   getInventory as prepaidCardInventory,
+  getInventories as prepaidCardInventories,
   removeFromInventory as removePrepaidCardInventory,
   addToInventory as addPrepaidCardInventory,
 } from './prepaid-card-market.js';
@@ -67,6 +68,7 @@ type Commands =
   | 'setPrepaidCardAsk'
   | 'skuInfo'
   | 'prepaidCardInventory'
+  | 'prepaidCardInventories'
   | 'removePrepaidCardInventory'
   | 'addPrepaidCardInventory'
   | 'registerMerchant'
@@ -103,6 +105,7 @@ interface Options {
   fundingCard?: string;
   customizationDID?: string;
   prepaidCard?: string;
+  environment?: string;
   receiver?: string;
   recipient?: string;
   sku?: string;
@@ -140,6 +143,7 @@ let {
   fundingCard,
   prepaidCards,
   sku,
+  environment,
   askPrice,
   fromBlock,
   receiver,
@@ -420,6 +424,17 @@ let {
         description: 'The SKU to obtain details for',
       });
       command = 'skuInfo';
+    }
+  )
+  .command(
+    'prepaid-card-inventories <environment>',
+    'Get all the inventories available in the market contract',
+    (yargs) => {
+      yargs.positional('environment', {
+        type: 'string',
+        description: 'The environment (staging or production)',
+      });
+      command = 'prepaidCardInventories';
     }
   )
   .command(
@@ -911,6 +926,13 @@ if (!command) {
         return;
       }
       await prepaidCardInventory(network, sku, mnemonic);
+      break;
+    case 'prepaidCardInventories':
+      if (environment == null) {
+        showHelpAndExit('environment is a required value');
+        return;
+      }
+      await prepaidCardInventories(network, environment, mnemonic);
       break;
     case 'addPrepaidCardInventory':
       if (fundingCard == null || prepaidCard == null) {

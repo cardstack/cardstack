@@ -19,6 +19,7 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay price-for-face-value <TOKEN_ADDRESS> <SPEND_FACE_VALUE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-price-for-face-value-token_address-spend_face_value---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay sku-info <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-sku-info-sku---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaid-card-inventory <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaid-card-inventory-sku---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay prepaid-card-inventories <ENVIRONMENT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaid-card-inventories-environment---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay add-prepaid-card-inventory <FUNDING_CARD> <PREPAID_CARD> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-add-prepaid-card-inventory-funding_card-prepaid_card---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay remove-prepaid-card-inventory <FUNDING_CARD> <PREPAID_CARDS..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-remove-prepaid-card-inventory-funding_card-prepaid_cards---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay set-prepaid-card-ask <PREPAID_CARD> <SKU> <ASK_PRICE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-set-prepaid-card-ask-prepaid_card-sku-ask_price---networknetwork---mnemonicmnemonic---walletconnect)
@@ -246,6 +247,20 @@ USAGE
 
 ARGUMENTS
   SKU                The SKU to obtain inventory for
+  NETWORK            The network to use ("sokol" or "xdai")
+  MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+  WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+```
+
+## `yarn cardpay prepaid-card-inventories <ENVIRONMENT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+Get all the inventories available in the market contract.
+
+```
+USAGE
+  $ yarn cardpay prepaid-card-inventories <ENVIRONMENT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+
+ARGUMENTS
+  ENVIRONMENT        Either "staging" or "production" (this field will go away after environment/network alignment has completed)
   NETWORK            The network to use ("sokol" or "xdai")
   MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
