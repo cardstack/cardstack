@@ -37,7 +37,7 @@ export type WorkflowName =
   | 'MERCHANT_CREATION';
 
 export abstract class Workflow {
-  name!: WorkflowName;
+  abstract name: WorkflowName;
   milestones: Milestone[] = [];
   epilogue: PostableCollection = new PostableCollection();
   cancelationMessages: PostableCollection = new PostableCollection();

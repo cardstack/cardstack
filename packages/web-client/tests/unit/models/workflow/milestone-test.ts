@@ -4,6 +4,7 @@ import {
   Milestone,
   Participant,
   Workflow,
+  WorkflowName,
   WorkflowPostable,
 } from '@cardstack/web-client/models/workflow';
 
@@ -79,7 +80,9 @@ module('Unit | Milestone model', function (hooks) {
       assert.ok(subject.isComplete);
     });
 
-    class ConcreteWorkflow extends Workflow {}
+    class ConcreteWorkflow extends Workflow {
+      name = 'WITHDRAWAL' as WorkflowName;
+    }
 
     test('setWorkflow does exactly that', function (assert) {
       let workflow = new ConcreteWorkflow(this.owner);

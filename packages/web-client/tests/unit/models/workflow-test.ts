@@ -6,13 +6,16 @@ import {
   Workflow,
   WorkflowCard,
   WorkflowMessage,
+  WorkflowName,
   WorkflowPostable,
 } from '@cardstack/web-client/models/workflow';
 
 module('Unit | Workflow model', function (hooks) {
   setupTest(hooks);
 
-  class ConcreteWorkflow extends Workflow {}
+  class ConcreteWorkflow extends Workflow {
+    name = 'WITHDRAWAL' as WorkflowName;
+  }
 
   let exampleMilestone: Milestone;
   let exampleMessage: WorkflowMessage;

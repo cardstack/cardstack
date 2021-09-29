@@ -7,6 +7,7 @@ import {
   WorkflowCard,
   Participant,
   WorkflowPostable,
+  WorkflowName,
 } from '@cardstack/web-client/models/workflow';
 
 module('Unit | WorkflowCard model', function (hooks) {
@@ -22,7 +23,9 @@ module('Unit | WorkflowCard model', function (hooks) {
       author: participant,
       componentName: 'foo/bar',
     });
-    class StubWorkflow extends Workflow {}
+    class StubWorkflow extends Workflow {
+      name = 'WITHDRAWAL' as WorkflowName;
+    }
     let wf = new StubWorkflow(this.owner);
     subject.setWorkflow(wf);
     assert.equal(subject.session, wf.session);
@@ -59,6 +62,7 @@ module('Unit | WorkflowCard model', function (hooks) {
     });
 
     class StubWorkflow extends Workflow {
+      name = 'WITHDRAWAL' as WorkflowName;
       milestones = [
         new Milestone({
           title: 'mock. should not be completed',
@@ -83,6 +87,7 @@ module('Unit | WorkflowCard model', function (hooks) {
       componentName: 'foo/bar',
     });
     class StubWorkflow extends Workflow {
+      name = 'WITHDRAWAL' as WorkflowName;
       resetTo(postable: WorkflowPostable) {
         postable.isComplete = false; // simplified version of actual implementation
       }

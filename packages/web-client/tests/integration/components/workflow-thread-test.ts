@@ -9,12 +9,15 @@ import {
   WorkflowMessage,
   WorkflowPostable,
   WorkflowCard,
+  WorkflowName,
 } from '@cardstack/web-client/models/workflow';
 
 module('Integration | Component | workflow-thread', function (hooks) {
   setupRenderingTest(hooks);
 
-  class ConcreteWorkflow extends Workflow {}
+  class ConcreteWorkflow extends Workflow {
+    name = 'WITHDRAWAL' as WorkflowName;
+  }
 
   test('it renders before-content named block', async function (assert) {
     this.set('workflow', new ConcreteWorkflow(this.owner));

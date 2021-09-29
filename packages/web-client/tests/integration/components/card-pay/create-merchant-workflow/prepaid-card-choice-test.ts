@@ -5,6 +5,7 @@ import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import {
   Workflow,
+  WorkflowName,
   WorkflowSession,
 } from '@cardstack/web-client/models/workflow';
 import sinon from 'sinon';
@@ -282,7 +283,9 @@ module(
       });
 
       test('it cancels the workflow if hub authentication fails', async function (assert) {
-        class ConcreteWorkflow extends Workflow {}
+        class ConcreteWorkflow extends Workflow {
+          name = 'WITHDRAWAL' as WorkflowName;
+        }
         let workflow = new ConcreteWorkflow(this.owner);
         workflow.attachWorkflow();
         this.set('workflowSession.workflow', workflow);

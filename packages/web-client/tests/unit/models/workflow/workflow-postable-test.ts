@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import { Workflow } from '@cardstack/web-client/models/workflow';
+import { Workflow, WorkflowName } from '@cardstack/web-client/models/workflow';
 import {
   Participant,
   WorkflowPostable,
@@ -9,7 +9,9 @@ import {
 module('Unit | WorkflowPostable model', function (hooks) {
   setupTest(hooks);
 
-  class ConcreteWorkflow extends Workflow {}
+  class ConcreteWorkflow extends Workflow {
+    name = 'WITHDRAWAL' as WorkflowName;
+  }
 
   let participant: Participant;
   hooks.beforeEach(function () {
