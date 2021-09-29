@@ -37,7 +37,7 @@
           />
           {{#if (eq this.creationState "default")}}
             <CardPay::CardPicker
-              @cards={{this.prepaidCards}}
+              @options={{this.prepaidCardsForDropdown}}
               @chooseCard={{this.choosePrepaidCard}}
               @selectedCard={{this.selectedPrepaidCard}}
             />
@@ -45,7 +45,7 @@
         </div>
       {{else}}
         <CardPay::CardPicker
-          @cards={{this.prepaidCards}}
+          @options={{this.prepaidCardsForDropdown}}
           @chooseCard={{this.choosePrepaidCard}}
           @selectedCard={{this.selectedPrepaidCard}}
         />

@@ -36,7 +36,7 @@ interface ValidatedWalletSendRequest {
   transfer: WyreTransfer;
 }
 
-export const adminWalletName = `${env}_admin`;
+export const adminWalletName = `admin`;
 
 export default class WyreCallbackRoute {
   adminWalletId: string | undefined;
@@ -126,7 +126,7 @@ export default class WyreCallbackRoute {
     } catch (err) {
       let message = `Error: Failed to upsert wallet-orders row for the ${request.dest} receive of ${
         transfer.source
-      }. Error is ${err.toString()}. request is: ${JSON.stringify(request.source, null, 2)}`;
+      }. Error is ${err.toString()}. request is: ${JSON.stringify(request, null, 2)}`;
       log.error(message, err);
       captureSentryMessage(message, ctx);
       return;
@@ -148,7 +148,7 @@ export default class WyreCallbackRoute {
     } catch (err) {
       let message = `Error: Failed to locate wallet_orders record for ${request.dest} receive of ${
         transfer.source
-      }. Error is ${err.toString()}. request is: ${JSON.stringify(request.source, null, 2)}`;
+      }. Error is ${err.toString()}. request is: ${JSON.stringify(request, null, 2)}`;
       log.error(message, err);
       captureSentryMessage(message, ctx);
       return;
@@ -239,11 +239,7 @@ export default class WyreCallbackRoute {
         request.dest
       } receive, failed to query for wallet_orders record with an order ID of ${orderId}, for ${
         request.dest
-      } receive of ${transfer.source}. Error: ${err.toString()}. request is: ${JSON.stringify(
-        request.source,
-        null,
-        2
-      )}`;
+      } receive of ${transfer.source}. Error: ${err.toString()}. request is: ${JSON.stringify(request, null, 2)}`;
       log.error(message, err);
       Sentry.addBreadcrumb({ message });
       return;
@@ -331,7 +327,7 @@ export default class WyreCallbackRoute {
       let message = `while processing ${
         request.source
       } send to admin account, could not find wallet_orders with a status of "received-order" that correlate to the request with custodial transfer ID of ${transferId}. request is: ${JSON.stringify(
-        request.source,
+        request,
         null,
         2
       )}`;
@@ -355,10 +351,10 @@ export default class WyreCallbackRoute {
       this.adminWalletId = adminWallet?.id;
     }
     if (!this.adminWalletId) {
-      let message = `Error: Wyre admin wallet has not been created! Please create a wyre admin wallet with the name "${adminWalletName}" that has no callback URL.`;
+      let message = `Error: Wyre admin wallet has not been created! Please create a wyre admin wallet with the name "${env}_${adminWalletName}" that has no callback URL.`;
       log.error(message);
       Sentry.addBreadcrumb({ message });
-      throw new Error(`Wyre admin wallet, ${adminWalletName}, has not been created`);
+      throw new Error(`Wyre admin wallet, ${env}_${adminWalletName}, has not been created`);
     }
     return this.adminWalletId;
   }

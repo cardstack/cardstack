@@ -64,12 +64,20 @@ export default class WyreService {
 
   async getWalletByUserAddress(address: string): Promise<WyreWallet | undefined> {
     let { url } = this.config;
-    return this.getWallet(new URL(`${url}/v2/wallet?name=${env}_${address.toLowerCase()}`));
+    let wallet = await this.getWallet(new URL(`${url}/v2/wallet?name=${env}_${address.toLowerCase()}`));
+    if (wallet) {
+      wallet.name = wallet.name.replace(`${env}_`, '');
+    }
+    return wallet;
   }
 
   async getWalletById(walletId: string): Promise<WyreWallet | undefined> {
     let { url } = this.config;
-    return this.getWallet(new URL(`${url}/v2/wallet/${walletId}`));
+    let wallet = await this.getWallet(new URL(`${url}/v2/wallet/${walletId}`));
+    if (wallet) {
+      wallet.name = wallet.name.replace(`${env}_`, '');
+    }
+    return wallet;
   }
 
   async getTransfer(transferId: string): Promise<WyreTransfer | undefined> {
