@@ -13,24 +13,16 @@ export async function rewardTokenBalances(
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardPool = await getSDK('RewardPool', web3);
-  if (rewardProgramId) {
-    const tokenBalances = await rewardPool.rewardTokenBalances(address, rewardProgramId);
-    console.log('\n');
-    console.log(`Reward balances for ${address}`);
-    console.log('---------------------------------------------------------------------');
-    displayRewardTokenBalance(tokenBalances);
-  } else {
-    const tokenBalances = await rewardPool.rewardTokenBalances(address);
-    console.log('\n');
-    console.log(`Reward balances for ${address}`);
-    console.log('---------------------------------------------------------------------');
-    displayRewardTokenBalance(tokenBalances);
-  }
+  const tokenBalances = await rewardPool.rewardTokenBalances(address, rewardProgramId);
+  console.log('\n');
+  console.log(`Reward balances for ${address}`);
+  displayRewardTokenBalance(tokenBalances);
 }
 
 function displayRewardTokenBalance(tokenBalances: RewardTokenBalance[]): void {
   const groupedByRewardProgram = groupBy(tokenBalances, (a) => a.rewardProgramId);
   Object.keys(groupedByRewardProgram).map((rewardProgramId: string) => {
+    console.log('---------------------------------------------------------------------');
     console.log(`    RewardProgram: ${rewardProgramId}`);
     console.log('---------------------------------------------------------------------');
     let p = groupedByRewardProgram[rewardProgramId];
@@ -41,13 +33,19 @@ function displayRewardTokenBalance(tokenBalances: RewardTokenBalance[]): void {
 }
 
 function displayProofs(proofs: ProofWithBalance[]): void {
-  proofs.map((o: any) => {
-    console.log(`  rewardProgramId: ${o.rewardProgramId}`);
-    console.log(`  token: ${o.tokenAddress} (${o.tokenSymbol})`);
-    console.log(`  balance: ${fromWei(o.balance)}`);
-    console.log(`  paymentCycle: ${o.paymentCycle}`);
-    console.log(`  proof: ${o.proof}`);
-    console.log(`\n`);
+  const groupedByRewardProgram = groupBy(proofs, (a) => a.rewardProgramId);
+  Object.keys(groupedByRewardProgram).map((rewardProgramId: string) => {
+    console.log('---------------------------------------------------------------------');
+    console.log(`    RewardProgram: ${rewardProgramId}`);
+    console.log('---------------------------------------------------------------------');
+    let p = groupedByRewardProgram[rewardProgramId];
+    p.map((o) => {
+      console.log(`  rewardProgramId: ${o.rewardProgramId}`);
+      console.log(`  token: ${o.tokenAddress} (${o.tokenSymbol})`);
+      console.log(`  balance: ${fromWei(o.balance)}`);
+      console.log(`  paymentCycle: ${o.paymentCycle}`);
+      console.log(`  proof: ${o.proof}`);
+    });
   });
 }
 
@@ -99,8 +97,7 @@ export async function getClaimableRewardProofs(
   let rewardPool = await getSDK('RewardPool', web3);
   const claimableRewardProofs = await rewardPool.getProofsWithNonZeroBalance(address, rewardProgramId, tokenAddress);
   console.log('\n');
-  console.log(`Proofs balances for ${address}`);
-  console.log('--------------------------------------------------------------');
+  console.log(`Reward Proofs for ${address}`);
   displayProofs(claimableRewardProofs);
 }
 
