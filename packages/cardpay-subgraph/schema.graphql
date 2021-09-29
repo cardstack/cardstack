@@ -103,6 +103,7 @@ type PrepaidCardPayment @entity {
   historicPrepaidCardIssuingTokenBalance: BigInt!
   merchantRegistrationPayments: [MerchantRegistrationPayment]! @derivedFrom(field: "prepaidCardPayment")
   rewardProgramRegistrationPayments: [RewardProgramRegistrationPayment]! @derivedFrom(field: "prepaidCardPayment")
+  rewardeeRegistrationPayments: [RewardeeRegistrationPayment]! @derivedFrom(field: "prepaidCardPayment")
 }
 
 type PrepaidCardSplit @entity {
