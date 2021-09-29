@@ -1,11 +1,11 @@
 <svg id="icon_Tasks" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="17.475" height="19.21" viewBox="0 0 17.475 19.21">
   <defs>
-    <clipPath id="clip-path">
+    <clipPath id="task-completed">
       <path id="Mask" d="M12.807,19.21H0V0H14.029V5.123H12.807v8.964h3.842V19.21Z" transform="translate(0)" fill="none"/>
     </clipPath>
   </defs>
   <g id="completed" transform="translate(0)">
-    <g id="Mask_Group_7094" data-name="Mask Group 7094" clip-path="url(#clip-path)">
+    <g id="Mask_Group_7094" data-name="Mask Group 7094" clip-path="url(#task-completed)">
       <path id="Path_7716" data-name="Path 7716" d="M13.221,4h1.537a1.537,1.537,0,0,1,1.537,1.537V16.294a1.537,1.537,0,0,1-1.537,1.537H5.537A1.537,1.537,0,0,1,4,16.294V5.537A1.537,1.537,0,0,1,5.537,4H7.074" transform="translate(-1.439 0.097)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" stroke="var(--icon-color, --boxel-light)" fill="none" />
       <rect id="Rectangle_2256" data-name="Rectangle 2256" width="6.147" height="3.074" rx="1" transform="translate(5.636 2.561)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" stroke="var(--icon-color, --boxel-light)" fill="none"/>
     </g>
