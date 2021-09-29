@@ -1,3 +1,5 @@
+/*global fetch */
+
 import Web3 from 'web3';
 import { getConstant, getSDK, gqlQuery } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
@@ -78,8 +80,8 @@ export async function getInventories(network: string, environment: string, mnemo
   let rawInventories = (await gqlQuery(network, query)) as InventorySubgraph;
   let response = await fetch(`${hubRootURL}/api/inventories`, {
     headers: {
-      Authorization: `Bearer: ${authToken}`,
-      'Content-Type': 'application/vnd.api+json',
+      Authorization: `Bearer: ${authToken}`, // eslint-disable-line @typescript-eslint/naming-convention
+      'Content-Type': 'application/vnd.api+json', // eslint-disable-line @typescript-eslint/naming-convention
     },
   });
   if (!response.ok) {
