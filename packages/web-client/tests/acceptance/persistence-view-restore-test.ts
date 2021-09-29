@@ -25,62 +25,59 @@ interface Context extends MirageTestContext {}
 
 let workflowPersistenceService: WorkflowPersistence;
 
-async function setupEverythingFIXME(context: Context) {
-  let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-
-  let layer2Service = context.owner.lookup('service:layer2-network')
-    .strategy as Layer2TestWeb3Strategy;
-  layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-  let testDepot = {
-    address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
-    tokens: [
-      {
-        balance: '500000000000000000000',
-        token: {
-          symbol: 'CARD',
-        },
-      },
-    ],
-  };
-  await layer2Service.test__simulateDepot(testDepot as DepotSafe);
-
-  let merchantRegistrationFee = await context.owner
-    .lookup('service:layer2-network')
-    .strategy.fetchMerchantRegistrationFee();
-
-  layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
-    {
-      type: 'prepaid-card',
-      createdAt: Date.now() / 1000,
-
-      address: '0x123400000000000000000000000000000000abcd',
-
-      tokens: [],
-      owners: [layer2AccountAddress],
-
-      issuingToken: '0xTOKEN',
-      spendFaceValue: merchantRegistrationFee,
-      prepaidCardOwner: layer2AccountAddress,
-      hasBeenUsed: false,
-      issuer: layer2AccountAddress,
-      reloadable: false,
-      transferrable: false,
-    } as PrepaidCardSafe,
-  ]);
-
-  workflowPersistenceService = context.owner.lookup(
-    'service:workflow-persistence'
-  );
-}
-
 module('Acceptance | persistence view and restore', function () {
-  module('when things have been constructed FIXME lol', function (hooks) {
+  module('when the application has started', function (hooks) {
     setupApplicationTest(hooks);
     setupMirage(hooks);
     setupHubAuthenticationToken(hooks);
 
     hooks.beforeEach(async function (this: Context) {
-      await setupEverythingFIXME(this);
+      let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+
+      let layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
+      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      let testDepot = {
+        address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
+        tokens: [
+          {
+            balance: '500000000000000000000',
+            token: {
+              symbol: 'CARD',
+            },
+          },
+        ],
+      };
+      await layer2Service.test__simulateDepot(testDepot as DepotSafe);
+
+      let merchantRegistrationFee = await this.owner
+        .lookup('service:layer2-network')
+        .strategy.fetchMerchantRegistrationFee();
+
+      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+        {
+          type: 'prepaid-card',
+          createdAt: Date.now() / 1000,
+
+          address: '0x123400000000000000000000000000000000abcd',
+
+          tokens: [],
+          owners: [layer2AccountAddress],
+
+          issuingToken: '0xTOKEN',
+          spendFaceValue: merchantRegistrationFee,
+          prepaidCardOwner: layer2AccountAddress,
+          hasBeenUsed: false,
+          issuer: layer2AccountAddress,
+          reloadable: false,
+          transferrable: false,
+        } as PrepaidCardSafe,
+      ]);
+
+      workflowPersistenceService = this.owner.lookup(
+        'service:workflow-persistence'
+      );
+
       workflowPersistenceService.clear();
     });
 
@@ -305,7 +302,7 @@ module('Acceptance | persistence view and restore', function () {
 
   module(
     'when workflows have been persisted before the application loads',
-    function () {
+    function (hooks) {
       window.TEST__MOCK_LOCAL_STORAGE_INIT = {};
 
       for (let i = 0; i < 2; i++) {
@@ -325,23 +322,17 @@ module('Acceptance | persistence view and restore', function () {
 
       window.TEST__MOCK_LOCAL_STORAGE_INIT['unrelated'] = 'hello';
 
-      module('wha', function (hooks) {
-        setupApplicationTest(hooks);
-        setupMirage(hooks);
-        setupHubAuthenticationToken(hooks);
+      setupApplicationTest(hooks);
+      setupMirage(hooks);
+      setupHubAuthenticationToken(hooks);
 
-        hooks.beforeEach(async function (this: Context) {
-          await setupEverythingFIXME(this);
-        });
+      test('it lists existing persisted workflows', async function (this: Context, assert) {
+        await visit('/card-pay/');
+        assert.dom('[data-test-workflow-tracker-count]').containsText('2');
+      });
 
-        test('it lists existing persisted workflows', async function (this: Context, assert) {
-          await visit('/card-pay/');
-          assert.dom('[data-test-workflow-tracker-count]').containsText('2');
-        });
-
-        hooks.afterEach(function () {
-          delete window.TEST__MOCK_LOCAL_STORAGE_INIT;
-        });
+      hooks.afterEach(function () {
+        delete window.TEST__MOCK_LOCAL_STORAGE_INIT;
       });
     }
   );
