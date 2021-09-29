@@ -7,6 +7,7 @@ import {
 } from '@cardstack/cardpay-sdk';
 import {
   cardbot,
+  IWorkflowSession,
   Milestone,
   PostableCollection,
   NetworkAwareWorkflowMessage,
@@ -16,17 +17,16 @@ import {
   WorkflowCard,
   WorkflowMessage,
   WorkflowName,
-  WorkflowSession,
 } from '@cardstack/web-client/models/workflow';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { taskFor } from 'ember-concurrency-ts';
-import { next } from '@ember/runloop';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
+import { tracked } from '@glimmer/tracking';
 
 const FAILURE_REASONS = {
   UNAUTHENTICATED: 'UNAUTHENTICATED',
@@ -47,7 +47,6 @@ export const MILESTONE_TITLES = [
 
 class CreateMerchantWorkflow extends Workflow {
   name = 'MERCHANT_CREATION' as WorkflowName;
-  workflowPersistenceId: string;
 
   @service declare router: RouterService;
   @service declare layer2Network: Layer2Network;
@@ -229,7 +228,7 @@ class CreateMerchantWorkflow extends Workflow {
     // cancelation for not having prepaid card
     new SessionAwareWorkflowMessage({
       author: cardbot,
-      template: (session: WorkflowSession) =>
+      template: (session: IWorkflowSession) =>
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${formatAmount(
           session.getValue('merchantRegistrationFee')
         )} SPEND (${convertAmountToNativeDisplay(
@@ -245,7 +244,7 @@ class CreateMerchantWorkflow extends Workflow {
     // cancelation for insufficient balance
     new SessionAwareWorkflowMessage({
       author: cardbot,
-      template: (session: WorkflowSession) =>
+      template: (session: IWorkflowSession) =>
         `It looks like you don’t have a prepaid card with enough funds to pay the ${formatAmount(
           session.getValue('merchantRegistrationFee')
         )} SPEND (${convertAmountToNativeDisplay(
@@ -282,7 +281,7 @@ class CreateMerchantWorkflow extends Workflow {
     new WorkflowMessage({
       author: cardbot,
       message:
-        'You attempted to restore an unfinished workflow, but you changed your Card wallet adress. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but you changed your Card wallet address. Please restart the workflow.',
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
@@ -321,15 +320,13 @@ class CreateMerchantWorkflow extends Workflow {
     }),
   ]);
 
-  constructor(owner: unknown) {
-    super(owner);
-    this.workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
+  constructor(owner: unknown, workflowPersistenceId: string) {
+    super(owner, workflowPersistenceId);
 
     this.attachWorkflow();
   }
 
-  restorationErrors(persistedState: any) {
+  restorationErrors() {
     let { hubAuthentication, layer2Network } = this;
 
     let errors = [];
@@ -342,16 +339,22 @@ class CreateMerchantWorkflow extends Workflow {
       errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
     }
 
+    let persistedLayer2Address = this.session.getValue<string>(
+      'layer2WalletAddress'
+    );
     if (
       layer2Network.isConnected &&
-      persistedState.layer2WalletAddress &&
-      layer2Network.walletInfo.firstAddress !==
-        persistedState.layer2WalletAddress
+      persistedLayer2Address &&
+      layer2Network.walletInfo.firstAddress !== persistedLayer2Address
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED);
     }
 
     return errors;
+  }
+
+  beforeRestorationChecks() {
+    return [];
   }
 }
 
@@ -359,37 +362,33 @@ class CreateMerchantWorkflowComponent extends Component {
   @service declare layer2Network: Layer2Network;
   @service declare workflowPersistence: WorkflowPersistence;
   @service declare router: RouterService;
-
-  workflow!: CreateMerchantWorkflow;
+  @tracked workflow: CreateMerchantWorkflow | null = null;
 
   constructor(owner: unknown, args: {}) {
     super(owner, args);
 
-    const workflow = new CreateMerchantWorkflow(getOwner(this));
-    const persistedState = workflow.session.getPersistedData()?.state ?? {};
-    const willRestore = Object.keys(persistedState).length > 0;
+    let workflowPersistenceId =
+      this.router.currentRoute.queryParams['flow-id']!;
 
-    if (willRestore) {
-      const errors = workflow.restorationErrors(persistedState);
+    let workflow = new CreateMerchantWorkflow(
+      getOwner(this),
+      workflowPersistenceId
+    );
 
-      if (errors.length > 0) {
-        next(this, () => {
-          workflow.cancel(errors[0]);
-        });
-      } else {
-        workflow.restoreFromPersistedWorkflow();
-      }
-    }
+    this.restore(workflow);
+  }
 
+  async restore(workflow: any) {
+    await workflow.restore();
     this.workflow = workflow;
   }
 
   @action onDisconnect() {
-    this.workflow.cancel(FAILURE_REASONS.DISCONNECTED);
+    this.workflow?.cancel(FAILURE_REASONS.DISCONNECTED);
   }
 
   @action onAccountChanged() {
-    this.workflow.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
+    this.workflow?.cancel(FAILURE_REASONS.ACCOUNT_CHANGED);
   }
 }
 

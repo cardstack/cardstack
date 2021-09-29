@@ -18,9 +18,6 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 import { capitalize } from '@ember/string';
 import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
-import { next } from '@ember/runloop';
-import { task } from 'ember-concurrency';
-import { taskFor } from 'ember-concurrency-ts';
 import { tracked } from '@glimmer/tracking';
 
 const FAILURE_REASONS = {
@@ -44,7 +41,6 @@ class DepositWorkflow extends Workflow {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
 
-  workflowPersistenceId: string;
   name = 'RESERVE_POOL_DEPOSIT' as WorkflowName;
   milestones = [
     new Milestone({
@@ -207,7 +203,7 @@ class DepositWorkflow extends Workflow {
     new WorkflowMessage({
       author: cardbot,
       message:
-        'You attempted to restore an unfinished workflow, but you changed your Layer 1 wallet adress. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but you changed your Layer 1 wallet address. Please restart the workflow.',
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
@@ -218,7 +214,7 @@ class DepositWorkflow extends Workflow {
     new WorkflowMessage({
       author: cardbot,
       message:
-        'You attempted to restore an unfinished workflow, but you changed your Card wallet adress. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but you changed your Card wallet address. Please restart the workflow.',
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
@@ -261,15 +257,7 @@ class DepositWorkflow extends Workflow {
     }),
   ]);
 
-  constructor(owner: any) {
-    super(owner);
-    this.workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
-
-    this.attachWorkflow();
-  }
-
-  restorationErrors(persistedState: any) {
+  restorationErrors() {
     let { layer1Network, layer2Network } = this;
 
     let errors = [];
@@ -278,11 +266,13 @@ class DepositWorkflow extends Workflow {
       errors.push(FAILURE_REASONS.RESTORATION_L1_DISCONNECTED);
     }
 
+    let persistedLayer1Address = this.session.getValue<string>(
+      'layer1WalletAddress'
+    );
     if (
       layer1Network.isConnected &&
-      persistedState.layer1WalletAddress &&
-      layer1Network.walletInfo.firstAddress !==
-        persistedState.layer1WalletAddress
+      persistedLayer1Address &&
+      layer1Network.walletInfo.firstAddress !== persistedLayer1Address
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L1_ADDRESS_CHANGED);
     }
@@ -291,16 +281,27 @@ class DepositWorkflow extends Workflow {
       errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
     }
 
+    let persistedLayer2Address = this.session.getValue<string>(
+      'layer2WalletAddress'
+    );
     if (
       layer2Network.isConnected &&
-      persistedState.layer2WalletAddress &&
-      layer2Network.walletInfo.firstAddress !==
-        persistedState.layer2WalletAddress
+      persistedLayer2Address &&
+      layer2Network.walletInfo.firstAddress !== persistedLayer2Address
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED);
     }
 
     return errors;
+  }
+
+  beforeRestorationChecks() {
+    return [this.layer1Network.waitForAccount];
+  }
+
+  constructor(owner: unknown, workflowPersistenceId?: string) {
+    super(owner, workflowPersistenceId);
+    this.attachWorkflow();
   }
 }
 
@@ -308,31 +309,22 @@ class DepositWorkflowComponent extends Component {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @service declare workflowPersistence: WorkflowPersistence;
-
+  @service declare router: RouterService;
   @tracked workflow: DepositWorkflow | null = null;
+
   constructor(owner: unknown, args: {}) {
     super(owner, args);
-    let workflow = new DepositWorkflow(getOwner(this));
-    let persistedState = workflow.session.getPersistedData()?.state ?? {};
-    let willRestore = Object.keys(persistedState).length > 0;
 
-    if (willRestore) {
-      taskFor(this.restoreTask).perform(workflow, persistedState);
-    } else {
-      this.workflow = workflow;
-    }
+    let workflowPersistenceId =
+      this.router.currentRoute.queryParams['flow-id']!;
+
+    let workflow = new DepositWorkflow(getOwner(this), workflowPersistenceId);
+
+    this.restore(workflow);
   }
 
-  @task *restoreTask(workflow: DepositWorkflow, state: any) {
-    let errors = workflow.restorationErrors(state);
-    if (errors.length > 0) {
-      next(this, () => {
-        workflow.cancel(errors[0]);
-      });
-    } else {
-      yield this.layer1Network.waitForAccount;
-      workflow.restoreFromPersistedWorkflow();
-    }
+  async restore(workflow: any) {
+    await workflow.restore();
     this.workflow = workflow;
   }
 

@@ -1,10 +1,9 @@
 import { Milestone } from './workflow/milestone';
 import PostableCollection from './workflow/postable-collection';
 import { WorkflowPostable } from './workflow/workflow-postable';
-import WorkflowSession from './workflow/workflow-session';
+import WorkflowSession, { IWorkflowSession } from './workflow/workflow-session';
 import { tracked } from '@glimmer/tracking';
 import { SimpleEmitter } from '../utils/events';
-import { next } from '@ember/runloop';
 import WorkflowPersistence from '@cardstack/web-client/app/services/workflow-persistence';
 import { setOwner } from '@ember/application';
 export { Milestone } from './workflow/milestone';
@@ -20,6 +19,7 @@ export { default as NetworkAwareWorkflowCard } from './workflow/network-aware-ca
 export { Participant, WorkflowPostable } from './workflow/workflow-postable';
 export {
   WorkflowSessionDictionary,
+  IWorkflowSession,
   default as WorkflowSession,
 } from './workflow/workflow-session';
 export { SessionAwareWorkflowMessage } from './workflow/session-aware-workflow-message';
@@ -43,7 +43,7 @@ export abstract class Workflow {
   cancelationMessages: PostableCollection = new PostableCollection();
   @tracked isCanceled = false;
   @tracked cancelationReason: null | string = null;
-  session: WorkflowSession;
+  session: IWorkflowSession;
   owner: any;
   simpleEmitter = new SimpleEmitter();
   isRestored = false;
@@ -51,10 +51,29 @@ export abstract class Workflow {
   workflowPersistence: WorkflowPersistence;
   workflowPersistenceId?: string;
 
-  constructor(owner?: any) {
+  abstract restorationErrors(): string[];
+  abstract beforeRestorationChecks(): Promise<void>[];
+
+  constructor(owner?: any, workflowPersistenceId?: string) {
     setOwner(this, owner);
     this.session = new WorkflowSession(this);
     this.workflowPersistence = owner.lookup('service:workflow-persistence');
+    this.workflowPersistenceId = workflowPersistenceId;
+  }
+
+  async restore() {
+    if (!this.session.hasPersistedState()) {
+      return;
+    }
+    this.session.restoreFromStorage();
+    await Promise.all(this.beforeRestorationChecks());
+    let errors = this.restorationErrors();
+
+    if (errors.length > 0) {
+      this.cancel(errors[0]);
+    } else {
+      this.restoreFromPersistedWorkflow();
+    }
   }
 
   attachWorkflow() {
@@ -212,9 +231,7 @@ export abstract class Workflow {
       this.session.getMeta().isCancelled &&
       this.session.getMeta().cancelationReason
     ) {
-      next(this, () => {
-        this.cancel(this.session.getMeta().cancelationReason);
-      });
+      this.cancel(this.session.getMeta().cancelationReason);
     }
   }
 }

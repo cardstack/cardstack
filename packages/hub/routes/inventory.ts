@@ -5,6 +5,7 @@ import { ensureLoggedIn } from './utils/auth';
 import { inject } from '../di/dependency-injection';
 import { AuthenticationUtils } from '../utils/authentication';
 import { getSKUSummaries } from './utils/inventory';
+import qs from 'qs';
 
 export default class InventoryRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
@@ -19,8 +20,14 @@ export default class InventoryRoute {
     if (!ensureLoggedIn(ctx)) {
       return;
     }
+    let query = qs.parse(ctx.querystring);
+    let filter = query?.filter;
+    let issuer: string | undefined;
+    if (typeof filter === 'object' && 'issuer' in filter && typeof filter.issuer === 'string') {
+      issuer = filter.issuer;
+    }
 
-    let data = await getSKUSummaries(await this.databaseManager.getClient(), this.subgraph);
+    let data = await getSKUSummaries(await this.databaseManager.getClient(), this.subgraph, issuer);
 
     ctx.status = 200;
     ctx.body = {

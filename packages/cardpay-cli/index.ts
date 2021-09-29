@@ -14,6 +14,7 @@ import { viewSafes, transferTokens, setSupplierInfoDID, viewSafe, transferTokens
 import {
   create as createPrepaidCard,
   split as splitPrepaidCard,
+  bulkSplit as bulkSplitPrepaidCard,
   transfer as transferPrepaidCard,
   priceForFaceValue,
   payMerchant,
@@ -34,6 +35,7 @@ import {
   getSKUInfo,
   setAsk,
   getInventory as prepaidCardInventory,
+  getInventories as prepaidCardInventories,
   removeFromInventory as removePrepaidCardInventory,
   addToInventory as addPrepaidCardInventory,
 } from './prepaid-card-market.js';
@@ -53,6 +55,7 @@ type Commands =
   | 'safeTransferTokensGasEstimate'
   | 'prepaidCardCreate'
   | 'prepaidCardSplit'
+  | 'split'
   | 'prepaidCardTransfer'
   | 'usdPrice'
   | 'ethPrice'
@@ -65,6 +68,7 @@ type Commands =
   | 'setPrepaidCardAsk'
   | 'skuInfo'
   | 'prepaidCardInventory'
+  | 'prepaidCardInventories'
   | 'removePrepaidCardInventory'
   | 'addPrepaidCardInventory'
   | 'registerMerchant'
@@ -101,6 +105,7 @@ interface Options {
   fundingCard?: string;
   customizationDID?: string;
   prepaidCard?: string;
+  environment?: string;
   receiver?: string;
   recipient?: string;
   sku?: string;
@@ -111,8 +116,10 @@ interface Options {
   encodedData?: string;
   signatures?: string[];
   faceValues?: number[];
+  faceValue?: number;
   prepaidCards?: string[];
   rewardProgramId?: string;
+  quantity?: number;
   admin?: string;
   proof?: string;
   rewardSafe?: string;
@@ -136,11 +143,13 @@ let {
   fundingCard,
   prepaidCards,
   sku,
+  environment,
   askPrice,
   fromBlock,
   receiver,
   recipient,
   faceValues,
+  faceValue,
   txnHash,
   messageId,
   encodedData,
@@ -149,6 +158,7 @@ let {
   rewardProgramId,
   admin,
   proof,
+  quantity,
   rewardSafe,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
@@ -357,8 +367,27 @@ let {
     }
   )
   .command(
+    'split <prepaidCard> <faceValue> <quantity>',
+    "Split a prepaid card into more prepaid cards with identical face values inheriting the funding card's customization",
+    (yargs) => {
+      yargs.positional('prepaidCard', {
+        type: 'string',
+        description: 'The address of the prepaid card to split',
+      });
+      yargs.positional('faceValue', {
+        type: 'number',
+        description: 'The face value for the new prepaid cards',
+      });
+      yargs.positional('quantity', {
+        type: 'number',
+        description: 'The amount of prepaid cards to create',
+      });
+      command = 'split';
+    }
+  )
+  .command(
     'prepaidcard-split <prepaidCard> <customizationDID> <faceValues..>',
-    'Split a prepaid card into more prepaid cards',
+    'Split a prepaid card into more prepaid cards (max 10)',
     (yargs) => {
       yargs.positional('prepaidCard', {
         type: 'string',
@@ -395,6 +424,17 @@ let {
         description: 'The SKU to obtain details for',
       });
       command = 'skuInfo';
+    }
+  )
+  .command(
+    'prepaid-card-inventories <environment>',
+    'Get all the inventories available in the market contract',
+    (yargs) => {
+      yargs.positional('environment', {
+        type: 'string',
+        description: 'The environment (staging or production)',
+      });
+      command = 'prepaidCardInventories';
     }
   )
   .command(
@@ -852,6 +892,13 @@ if (!command) {
       }
       await createPrepaidCard(network, safeAddress, faceValues, tokenAddress, customizationDID || undefined, mnemonic);
       break;
+    case 'split':
+      if (prepaidCard == null || faceValue == null || quantity == null) {
+        showHelpAndExit('prepaidCard, faceValue, and quantity are required values');
+        return;
+      }
+      await bulkSplitPrepaidCard(network, prepaidCard, faceValue, quantity, mnemonic);
+      break;
     case 'prepaidCardSplit':
       if (prepaidCard == null || faceValues == null) {
         showHelpAndExit('prepaidCard and faceValues are required values');
@@ -879,6 +926,13 @@ if (!command) {
         return;
       }
       await prepaidCardInventory(network, sku, mnemonic);
+      break;
+    case 'prepaidCardInventories':
+      if (environment == null) {
+        showHelpAndExit('environment is a required value');
+        return;
+      }
+      await prepaidCardInventories(network, environment, mnemonic);
       break;
     case 'addPrepaidCardInventory':
       if (fundingCard == null || prepaidCard == null) {

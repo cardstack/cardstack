@@ -16,7 +16,7 @@ import {
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { inject as service } from '@ember/service';
-import { action } from '@ember/object';
+import RouterService from '@ember/routing/router-service';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { capitalize } from '@ember/string';
 import BN from 'bn.js';
@@ -30,10 +30,7 @@ import {
 } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
-import RouterService from '@ember/routing/router-service';
-import { next } from '@ember/runloop';
-import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
-
+import { action } from '@ember/object';
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
@@ -138,7 +135,6 @@ You only have **${formatWeiAmount(layer1Network.defaultTokenBalance)} ${
 class WithdrawalWorkflow extends Workflow {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  @service declare router: RouterService;
 
   name = 'WITHDRAWAL' as WorkflowName;
 
@@ -344,7 +340,7 @@ with Card Pay.`,
     new WorkflowMessage({
       author: cardbot,
       message:
-        'You attempted to restore an unfinished workflow, but you changed your Layer 1 wallet adress. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but you changed your Layer 1 wallet address. Please restart the workflow.',
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
@@ -355,7 +351,7 @@ with Card Pay.`,
     new WorkflowMessage({
       author: cardbot,
       message:
-        'You attempted to restore an unfinished workflow, but you changed your Card wallet adress. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but you changed your Card wallet address. Please restart the workflow.',
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
@@ -374,7 +370,7 @@ with Card Pay.`,
     }),
   ]);
 
-  restorationErrors(persistedState: any) {
+  restorationErrors() {
     let { layer1Network, layer2Network } = this;
 
     let errors = [];
@@ -383,11 +379,13 @@ with Card Pay.`,
       errors.push(FAILURE_REASONS.RESTORATION_L1_DISCONNECTED);
     }
 
+    let persistedLayer1Address = this.session.getValue<string>(
+      'layer1WalletAddress'
+    );
     if (
       layer1Network.isConnected &&
-      persistedState.layer1WalletAddress &&
-      layer1Network.walletInfo.firstAddress !==
-        persistedState.layer1WalletAddress
+      persistedLayer1Address &&
+      layer1Network.walletInfo.firstAddress !== persistedLayer1Address
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L1_ADDRESS_CHANGED);
     }
@@ -396,11 +394,13 @@ with Card Pay.`,
       errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
     }
 
+    let persistedLayer2Address = this.session.getValue<string>(
+      'layer2WalletAddress'
+    );
     if (
       layer2Network.isConnected &&
-      persistedState.layer2WalletAddress &&
-      layer2Network.walletInfo.firstAddress !==
-        persistedState.layer2WalletAddress
+      persistedLayer2Address &&
+      layer2Network.walletInfo.firstAddress !== persistedLayer2Address
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED);
     }
@@ -408,11 +408,12 @@ with Card Pay.`,
     return errors;
   }
 
-  constructor(owner: unknown) {
-    super(owner);
-    this.workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
+  beforeRestorationChecks() {
+    return [this.layer1Network.waitForAccount];
+  }
 
+  constructor(owner: unknown, workflowPersistenceId?: string) {
+    super(owner, workflowPersistenceId);
     this.attachWorkflow();
   }
 }
@@ -420,34 +421,25 @@ with Card Pay.`,
 export default class WithdrawalWorkflowComponent extends Component {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
-  @service declare workflowPersistence: WorkflowPersistence;
-
   @tracked workflow: WithdrawalWorkflow | null = null;
+  @service declare router: RouterService;
 
   constructor(owner: unknown, args: {}) {
     super(owner, args);
 
-    let workflow = new WithdrawalWorkflow(getOwner(this));
-    let persistedState = workflow.session.getPersistedData()?.state ?? {};
-    let willRestore = Object.keys(persistedState).length > 0;
+    let workflowPersistenceId =
+      this.router.currentRoute.queryParams['flow-id']!;
 
-    if (willRestore) {
-      taskFor(this.restoreTask).perform(workflow, persistedState);
-    } else {
-      this.workflow = workflow;
-    }
+    let workflow = new WithdrawalWorkflow(
+      getOwner(this),
+      workflowPersistenceId
+    );
+
+    this.restore(workflow);
   }
 
-  @task *restoreTask(workflow: WithdrawalWorkflow, state: any) {
-    let errors = workflow.restorationErrors(state);
-    if (errors.length > 0) {
-      next(this, () => {
-        workflow.cancel(errors[0]);
-      });
-    } else {
-      yield this.layer1Network.waitForAccount;
-      workflow.restoreFromPersistedWorkflow();
-    }
+  async restore(workflow: any) {
+    await workflow.restore();
     this.workflow = workflow;
   }
 

@@ -368,7 +368,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       assert
         .dom('[data-test-cancelation]')
         .includesText(
-          'You attempted to restore an unfinished workflow, but you changed your Card wallet adress. Please restart the workflow.'
+          'You attempted to restore an unfinished workflow, but you changed your Card wallet address. Please restart the workflow.'
         );
     });
 

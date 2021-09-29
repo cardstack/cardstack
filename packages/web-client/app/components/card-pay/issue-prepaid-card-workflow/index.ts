@@ -6,7 +6,6 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { action } from '@ember/object';
 import RouterService from '@ember/routing/router-service';
-import { next } from '@ember/runloop';
 
 import BN from 'bn.js';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
@@ -22,8 +21,7 @@ import {
   WorkflowMessage,
   WorkflowName,
 } from '@cardstack/web-client/models/workflow';
-import { task } from 'ember-concurrency-decorators';
-import { taskFor } from 'ember-concurrency-ts';
+
 import { tracked } from '@glimmer/tracking';
 
 export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
@@ -51,7 +49,6 @@ class IssuePrepaidCardWorkflow extends Workflow {
   @service declare layer2Network: Layer2Network;
   @service declare hubAuthentication: HubAuthentication;
 
-  workflowPersistenceId: string;
   name = 'PREPAID_CARD_ISSUANCE' as WorkflowName;
 
   milestones = [
@@ -291,7 +288,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
     new WorkflowMessage({
       author: cardbot,
       message:
-        'You attempted to restore an unfinished workflow, but you changed your Card wallet adress. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but you changed your Card wallet address. Please restart the workflow.',
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
@@ -328,15 +325,13 @@ class IssuePrepaidCardWorkflow extends Workflow {
     }),
   ]);
 
-  constructor(owner: any) {
-    super(owner);
-    this.workflowPersistenceId =
-      this.router.currentRoute.queryParams['flow-id']!;
-
+  constructor(owner: unknown, workflowPersistenceId?: string) {
+    super(owner, workflowPersistenceId);
     this.attachWorkflow();
+    this.restore();
   }
 
-  restorationErrors(persistedState: any) {
+  restorationErrors() {
     let { hubAuthentication, layer2Network } = this;
 
     let errors = [];
@@ -349,16 +344,22 @@ class IssuePrepaidCardWorkflow extends Workflow {
       errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
     }
 
+    let persistedLayer2Address = this.session.getValue<string>(
+      'layer2WalletAddress'
+    );
     if (
       layer2Network.isConnected &&
-      persistedState.layer2WalletAddress &&
-      layer2Network.walletInfo.firstAddress !==
-        persistedState.layer2WalletAddress
+      persistedLayer2Address &&
+      layer2Network.walletInfo.firstAddress !== persistedLayer2Address
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED);
     }
 
     return errors;
+  }
+
+  beforeRestorationChecks() {
+    return [this.layer2Network.waitForAccount];
   }
 }
 
@@ -372,27 +373,19 @@ class IssuePrepaidCardWorkflowComponent extends Component {
   constructor(owner: unknown, args: {}) {
     super(owner, args);
 
-    let workflow = new IssuePrepaidCardWorkflow(getOwner(this));
-    let persistedState = workflow.session.getPersistedData()?.state ?? {};
-    let willRestore = Object.keys(persistedState).length > 0;
+    let workflowPersistenceId =
+      this.router.currentRoute.queryParams['flow-id']!;
 
-    if (willRestore) {
-      taskFor(this.restoreTask).perform(workflow, persistedState);
-    } else {
-      this.workflow = workflow;
-    }
+    let workflow = new IssuePrepaidCardWorkflow(
+      getOwner(this),
+      workflowPersistenceId
+    );
+
+    this.restore(workflow);
   }
 
-  @task *restoreTask(workflow: IssuePrepaidCardWorkflow, state: any) {
-    let errors = workflow.restorationErrors(state);
-    if (errors.length > 0) {
-      next(this, () => {
-        workflow.cancel(errors[0]);
-      });
-    } else {
-      yield this.layer2Network.waitForAccount;
-      workflow.restoreFromPersistedWorkflow();
-    }
+  async restore(workflow: any) {
+    await workflow.restore();
     this.workflow = workflow;
   }
 

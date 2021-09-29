@@ -3,17 +3,12 @@ import { setupTest } from 'ember-qunit';
 import {
   Milestone,
   PostableCollection,
-  Workflow,
   WorkflowCard,
   WorkflowMessage,
-  WorkflowName,
 } from '@cardstack/web-client/models/workflow';
 import AnimatedWorkflow from '@cardstack/web-client/models/animated-workflow';
 import { settled } from '@ember/test-helpers';
-
-class MockWorkflow extends Workflow {
-  name = 'WITHDRAWAL' as WorkflowName;
-}
+import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
 
 let message = (message: string = 'Default message') =>
   new WorkflowMessage({
@@ -42,7 +37,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
   });
 
   test("It uses the wrapped workflow's milestones to model its milestones", async function (assert) {
-    let workflow = new MockWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [
       new Milestone({
         title: 'Milestone 1',
@@ -83,7 +78,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
   });
 
   test("It reflects the wrapped workflow's isCanceled property", async function (assert) {
-    let workflow = new MockWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     workflow.milestones = [
       new Milestone({
         title: 'Unfinished milestone',
@@ -112,7 +107,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
   });
 
   test('It can progress as the underlying workflow progresses through milestones', async function (assert) {
-    let workflow = new MockWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     let target1 = card();
     let target2 = card();
     let target3 = card();
@@ -176,7 +171,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
   });
 
   test('It can show an appropriate workflow progress status (milestone, canceled, started)', async function (assert) {
-    let workflow = new MockWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     let target1 = card();
     let target2 = card();
 
@@ -215,7 +210,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
   });
 
   test('It makes cancelationMessages visible after the workflow is canceled', async function (assert) {
-    let workflow = new MockWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
 
     workflow.milestones = [
       new Milestone({
@@ -244,7 +239,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
   });
 
   test('It makes the epilogue visible after the workflow is completed', async function (assert) {
-    let workflow = new MockWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     let target1 = card();
 
     workflow.milestones = [
@@ -271,7 +266,7 @@ module('Unit | AnimatedWorkflow model', function (hooks) {
   });
 
   test('It can roll back a workflow when the wrapped workflow is rolled back', async function (assert) {
-    let workflow = new MockWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     let target1 = card(true);
 
     workflow.milestones = [

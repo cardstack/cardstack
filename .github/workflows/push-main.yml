@@ -192,7 +192,6 @@ jobs:
           SENTRY_DSN: ${{ secrets.WEB_CLIENT_SENTRY_DSN }}
         with:
           environment: staging
-          sentry_url_prefix: https://app-staging.stack.cards
       - name: Send success notification to Discord
         if: ${{ success() }}
         uses: ./.github/actions/discord-message
