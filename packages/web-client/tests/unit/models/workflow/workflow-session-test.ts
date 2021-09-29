@@ -43,12 +43,13 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('get string value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         myKey: '{ "value": "myValue" }',
       },
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -59,10 +60,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('get un-set string value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -73,10 +75,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('set string value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -100,7 +103,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         meta,
         myKey: '{"value":"myValue"}',
@@ -111,10 +114,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('set optional string value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -139,7 +143,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         meta,
         myKey: '{}',
@@ -150,12 +154,13 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('get number value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         myKey: '{ "value": 42 }',
       },
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -166,10 +171,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('get un-set number value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -180,10 +186,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('set number value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -207,7 +214,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         meta,
         myKey: '{"value":42}',
@@ -218,10 +225,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('set multiple keys at once with a hash', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -250,7 +258,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         meta,
         myNumberKey: '{"value":42}',
@@ -262,13 +270,14 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('get all keys at once as a hash', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         myNumberKey: '{ "value": 42 }',
         myStringKey: '{ "value": "myValue" }',
       },
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -283,7 +292,7 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('state is a proxy allowing access to values', async function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         myNumberKey: '{ "value": 42 }',
         myStringKey: '{ "value": "myValue" }',
@@ -291,6 +300,7 @@ module('Unit | WorkflowSession model', function (hooks) {
       },
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -318,12 +328,13 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('get boolean value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         myKey: '{ "value": false }',
       },
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -334,10 +345,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('get un-set boolean value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -348,10 +360,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('set boolean value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -375,7 +388,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         meta,
         myKey: '{"value":false}',
@@ -386,12 +399,13 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('get BigNumber value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         myKey: '{ "value": "42", "type": "BN" }',
       },
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -405,10 +419,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('get un-set BigNumber value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -419,10 +434,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('set BigNumber value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -449,7 +465,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         meta,
         myKey: '{"value":"42","type":"BN"}',
@@ -460,12 +476,13 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('get Date value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         myKey: '{ "value": "2020-09-22T20:50:18.491Z", "type": "Date" }',
       },
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -480,10 +497,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('get un-set Date value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -494,10 +512,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('set Date value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -525,7 +544,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         meta,
         myKey: '{"value":"2020-09-22T20:50:18.491Z","type":"Date"}',
@@ -536,10 +555,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('set string array value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -563,7 +583,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         meta,
         myKey: '{"value":["a","b","c"]}',
@@ -574,10 +594,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('set string record value', function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -605,7 +626,7 @@ module('Unit | WorkflowSession model', function (hooks) {
 
     let data = workflowPersistence.getPersistedData(ID);
     assert.deepEqual(data, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {
         meta,
         myKey: '{"value":{"a":"A","b":"B","c":"C"}}',
@@ -621,10 +642,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('it throws if meta is updated via the setValues method', async function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -644,10 +666,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('it can update meta properly, preserving earlier properties', async function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -709,10 +732,11 @@ module('Unit | WorkflowSession model', function (hooks) {
   test('it stores information about updated and created date when persisting data for the first time', async function (assert) {
     let workflowPersistence = new WorkflowPersistence();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -749,10 +773,11 @@ module('Unit | WorkflowSession model', function (hooks) {
     let workflowPersistence = new WorkflowPersistence();
     let startDateString = new Date().toISOString();
     workflowPersistence.persistData(ID, {
-      name: 'EXAMPLE',
+      name: 'PREPAID_CARD_ISSUANCE',
       state: {},
     });
     let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
