@@ -1,6 +1,7 @@
 import Web3 from 'web3';
-import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
+import { getConstant, getSDK, gqlQuery } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
+import * as JSONAPI from 'jsonapi-typescript';
 
 const { fromWei, toWei } = Web3.utils;
 
@@ -21,6 +22,103 @@ export async function getSKUInfo(network: string, sku: string, mnemonic?: string
   Customization DID: ${customizationDID || '-none-'}
   Ask price: ${fromWei(askPrice)} ${symbol}`);
   }
+}
+
+interface InventorySubgraph {
+  data: {
+    skuinventories: {
+      askPrice: string; // in terms of the issuing token (wei)
+      sku: {
+        id: string;
+        faceValue: string; // saved in the subgraph as a BigInt, but this is actually a safe js integer
+        customizationDID: string;
+        issuer: { id: string };
+        issuingToken: {
+          id: string;
+          symbol: string;
+        };
+      };
+      prepaidCards: {
+        prepaidCardId: string;
+      }[];
+    }[];
+  };
+}
+// TODO once the environments become aligned with the network, we can remove the
+// environment parameter
+export async function getInventories(network: string, environment: string, mnemonic?: string): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  if (environment !== 'production' && environment !== 'staging') {
+    throw new Error(`Environment must be either 'production' or 'staging'`);
+  }
+  let hubRootURL = environment === 'production' ? 'https://hub.cardstack.com' : 'https://hub-staging.stack.cards';
+  let authToken = await (await getSDK('HubAuth', web3, hubRootURL)).authenticate();
+  let query = `
+  {
+    skuinventories {
+      askPrice
+      sku {
+        id
+        customizationDID
+        faceValue
+        issuer {
+          id
+        }
+        issuingToken {
+          id
+          symbol
+        }
+      }
+      prepaidCards {
+        prepaidCardId
+      }
+    }
+  }
+  `;
+  let rawInventories = (await gqlQuery(network, query)) as InventorySubgraph;
+  let response = await fetch(`${hubRootURL}/api/inventories`, {
+    headers: {
+      Authorization: `Bearer: ${authToken}`,
+      'Content-Type': 'application/vnd.api+json',
+    },
+  });
+  if (!response.ok) {
+    let errMsg = await response.json();
+    throw new Error(
+      `Failed to fetch inventories from ${hubRootURL}, HTTP status ${response.status} ${JSON.stringify(errMsg)}`
+    );
+  }
+  let jsonApiDoc = (await response.json()) as JSONAPI.CollectionResourceDoc;
+  let inventories = jsonApiDoc.data;
+
+  let inventoryOutput = '';
+  for (let rawInventory of rawInventories.data.skuinventories) {
+    let sku = rawInventory.sku.id;
+    let inventorySize = rawInventory.prepaidCards.length;
+    let inventory = inventories.find((inventory) => inventory.id === sku);
+    let availableInventory = (inventory?.attributes?.quantity ?? 0) as number;
+    inventoryOutput += `
+SKU ${sku}
+======================================================================`;
+    inventoryOutput += `
+  Issuer: ${rawInventory.sku.issuer.id}
+  Issuing token: ${rawInventory.sku.issuingToken.id} (${rawInventory.sku.issuingToken.symbol})
+  Face value: §${rawInventory.sku.faceValue} SPEND
+  Customization DID: ${rawInventory.sku.customizationDID || '-none-'}
+  Ask price: ${fromWei(rawInventory.askPrice)} ${rawInventory.sku.issuingToken.symbol}
+  Inventory size: ${inventorySize}
+`;
+    if (!inventory && rawInventory.askPrice === '0') {
+      inventoryOutput += `  ** WARNING: This item is not available--ask price is not set **
+`;
+    } else {
+      inventoryOutput += `  Inventory reserved ${inventorySize - availableInventory}
+  Inventory available: ${availableInventory}
+`;
+    }
+  }
+
+  console.log(inventoryOutput);
 }
 
 export async function getInventory(network: string, sku: string, mnemonic?: string): Promise<void> {
