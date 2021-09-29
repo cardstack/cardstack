@@ -40,11 +40,10 @@ function displayProofs(proofs: ProofWithBalance[]): void {
     let p = groupedByRewardProgram[rewardProgramId];
     p.map((o) => {
       console.log(`
-    rewardProgramId: ${o.rewardProgramId}
-    token: ${o.tokenAddress} (${o.tokenSymbol})
-    balance: ${fromWei(o.balance)}
     paymentCycle: ${o.paymentCycle}
+    token: ${o.tokenAddress} (${o.tokenSymbol})
     proof: ${o.proof}
+    balance: ${fromWei(o.balance)}
       `);
     });
   });
