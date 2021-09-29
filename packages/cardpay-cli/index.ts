@@ -34,6 +34,7 @@ import { hubAuth } from './hub-auth';
 import {
   getSKUInfo,
   setAsk,
+  provisionPrepaidCard,
   getInventory as prepaidCardInventory,
   getInventories as prepaidCardInventories,
   removeFromInventory as removePrepaidCardInventory,
@@ -57,6 +58,7 @@ type Commands =
   | 'prepaidCardSplit'
   | 'split'
   | 'prepaidCardTransfer'
+  | 'provisionPrepaidCard'
   | 'usdPrice'
   | 'ethPrice'
   | 'priceOracleUpdatedAt'
@@ -119,6 +121,7 @@ interface Options {
   faceValue?: number;
   prepaidCards?: string[];
   rewardProgramId?: string;
+  secret?: string;
   quantity?: number;
   admin?: string;
   proof?: string;
@@ -148,6 +151,7 @@ let {
   fromBlock,
   receiver,
   recipient,
+  secret,
   faceValues,
   faceValue,
   txnHash,
@@ -415,6 +419,29 @@ let {
     });
     command = 'prepaidCardTransfer';
   })
+  .command(
+    'prepaidcard-provision <sku> <recipient> <environment> <secret>',
+    'Provision a prepaid card to an EOA',
+    (yargs) => {
+      yargs.positional('sku', {
+        type: 'string',
+        description: 'The sku of the prepaid card to provision',
+      });
+      yargs.positional('recipient', {
+        type: 'string',
+        description: 'The address of the recipient of the prepaid card',
+      });
+      yargs.positional('environment', {
+        type: 'string',
+        description: 'The environment in which to provision the prepaid card (staging or production)',
+      });
+      yargs.positional('secret', {
+        type: 'string',
+        description: 'The "provisioner secret" phrase to enable provisioning',
+      });
+      command = 'provisionPrepaidCard';
+    }
+  )
   .command(
     'sku-info <sku>',
     'Get the details for the prepaid cards available in the market contract for the specified SKU.',
@@ -912,6 +939,13 @@ if (!command) {
         return;
       }
       await transferPrepaidCard(network, prepaidCard, newOwner, mnemonic);
+      break;
+    case 'provisionPrepaidCard':
+      if (sku == null || recipient == null || environment == null || secret == null) {
+        showHelpAndExit('sku, recipient, environment, and secret are required values');
+        return;
+      }
+      await provisionPrepaidCard(network, sku, recipient, environment, secret, mnemonic);
       break;
     case 'skuInfo':
       if (sku == null) {

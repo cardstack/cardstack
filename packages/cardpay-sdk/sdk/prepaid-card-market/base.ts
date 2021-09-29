@@ -12,6 +12,7 @@ import {
   executeSend,
   executeSendWithRateLock,
   getNextNonceFromEstimate,
+  getParamsFromEvent,
   getSendPayload,
   GnosisExecTx,
   SendPayload,
@@ -293,6 +294,21 @@ export default class PrepaidCardMarket {
     return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
+  async getPrepaidCardFromProvisionTxnHash(txnHash: string, marketAddress?: string): Promise<PrepaidCardSafe> {
+    let prepaidCardAPI = await getSDK('PrepaidCard', this.layer2Web3);
+    let txnReceipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    marketAddress = marketAddress ?? (await getAddress('prepaidCardMarket', this.layer2Web3));
+    let [event] = getParamsFromEvent(
+      this.layer2Web3,
+      txnReceipt,
+      provisionPrepaidCardABI(this.layer2Web3),
+      marketAddress
+    );
+    let { prepaidCard: prepaidCardAddress } = event;
+    let [prepaidCard] = await prepaidCardAPI.resolvePrepaidCards([prepaidCardAddress]);
+    return prepaidCard;
+  }
+
   private async getAddToInventoryPayload(
     fundingPrepaidCard: string,
     prepaidCardToAdd: string,
@@ -445,6 +461,30 @@ export function itemSetEventABI(web3: Web3): EventABI {
       {
         type: 'bytes32',
         name: 'sku',
+      },
+    ],
+  };
+}
+
+export function provisionPrepaidCardABI(web3: Web3): EventABI {
+  return {
+    topic: web3.eth.abi.encodeEventSignature('ProvisionedPrepaidCard(address,address,bytes32,uint256)'),
+    abis: [
+      {
+        type: 'address',
+        name: 'prepaidCard',
+      },
+      {
+        type: 'address',
+        name: 'customer',
+      },
+      {
+        type: 'bytes32',
+        name: 'sku',
+      },
+      {
+        type: 'uint256',
+        name: 'askPrice',
       },
     ],
   };
