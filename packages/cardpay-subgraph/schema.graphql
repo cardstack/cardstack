@@ -483,7 +483,7 @@ type RewardeeRegistrationPayment @entity {
 type RewardProgram @entity {
   id: ID!
   admin: Account!
-  rewardSafe: [RewardSafe]! @derivedFrom(field: "rewardProgram")
+  rewardSafes: [RewardSafe]! @derivedFrom(field: "rewardProgram")
   tokenAddEvents: [RewardTokensAdd]! @derivedFrom(field: "rewardProgram")
   rewardClaimEvents: [RewardeeClaim]! @derivedFrom(field: "rewardProgram")
 }
