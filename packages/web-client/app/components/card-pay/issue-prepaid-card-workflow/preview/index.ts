@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
-import { WorkflowSession } from '@cardstack/web-client/models/workflow';
+import { IWorkflowSession } from '@cardstack/web-client/models/workflow';
 import {
   task,
   TaskGenerator,
@@ -28,7 +28,7 @@ import {
 } from '../../../../services/card-customization';
 
 interface CardPayPrepaidCardWorkflowPreviewComponentArgs {
-  workflowSession: WorkflowSession;
+  workflowSession: IWorkflowSession;
   onComplete: () => void;
   isComplete: boolean;
 }

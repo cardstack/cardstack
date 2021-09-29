@@ -6,6 +6,7 @@ import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import BN from 'bn.js';
 
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 
 const HEADER_SELECTOR = '[data-test-action-card-title="layer-one-connect"]';
 const CONNECT_BUTTON_SELECTOR = '[data-test-mainnet-connect-button]';
@@ -130,5 +131,34 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
       .dom(HEADER_SELECTOR)
       .containsText(`Connect your ${c.layer1.fullName} wallet`);
     assert.dom(CONNECT_BUTTON_SELECTOR).isVisible();
+  });
+
+  test('It should persist L1 address in workflow session if the wallet is already connected', async function (assert) {
+    let layer1Service = this.owner.lookup('service:layer1-network').strategy;
+    layer1Service.test__simulateAccountsChanged(['address'], 'metamask');
+    let session = new WorkflowSession();
+    this.setProperties({ session });
+
+    await render(hbs`
+      <CardPay::LayerOneConnectCard @workflowSession={{this.session}} />
+    `);
+
+    assert.equal(session.getValue<string>('layer1WalletAddress'), 'address');
+  });
+
+  test('It should persist L1 address in workflow session after the wallet is connected', async function (assert) {
+    let layer1Service = this.owner.lookup('service:layer1-network').strategy;
+    let session = new WorkflowSession();
+    this.setProperties({ session });
+
+    await render(hbs`
+      <CardPay::LayerOneConnectCard @workflowSession={{this.session}} />
+    `);
+
+    await click(CONNECT_BUTTON_SELECTOR);
+    layer1Service.test__simulateAccountsChanged(['address'], 'metamask');
+    await settled();
+
+    assert.equal(session.getValue<string>('layer1WalletAddress'), 'address');
   });
 });

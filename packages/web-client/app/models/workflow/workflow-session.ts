@@ -10,6 +10,19 @@ import BN from 'bn.js';
 import { TransactionReceipt } from 'web3-core';
 import { Workflow } from '../workflow';
 
+export interface IWorkflowSession {
+  delete(key: string): void;
+  getMeta(): WorkflowMeta;
+  getValue<T extends SupportedType>(key: string): T | null;
+  hasPersistedState(): boolean;
+  restoreFromStorage(): void;
+  setMeta(hash: Partial<WorkflowMeta>): void;
+  setMeta(hash: Partial<WorkflowMeta>, persist: boolean): void;
+  setValue(key: string, value: SupportedType): void;
+  setValue(hash: WorkflowSessionDictionary): void;
+  workflow: Workflow | undefined;
+}
+
 export interface WorkflowMeta {
   updatedAt: string | undefined;
   createdAt: string | undefined;
@@ -89,7 +102,8 @@ function stateProxyHandler(workflowSession: WorkflowSession) {
     },
   };
 }
-export default class WorkflowSession {
+
+export default class WorkflowSession implements IWorkflowSession {
   workflow: Workflow | undefined;
   #stateProxy: any;
   constructor(workflow?: Workflow) {
@@ -113,6 +127,13 @@ export default class WorkflowSession {
 
   hasPersistence(): this is { workflow: { workflowPersistenceId: string } } {
     return isPresent(this.workflow?.workflowPersistenceId);
+  }
+
+  hasPersistedState() {
+    return (
+      this.hasPersistence() &&
+      Object.keys(this.getPersistedData()?.state || {}).length > 0
+    );
   }
 
   restoreFromStorage(): void {
@@ -172,8 +193,8 @@ export default class WorkflowSession {
     if (persist) this.persistToStorage();
   }
 
-  getMeta() {
-    return this.getValue('meta') as WorkflowMeta;
+  getMeta(): WorkflowMeta {
+    return this.getValue('meta') || ({} as WorkflowMeta);
   }
 
   private setStateProperty(key: string, value: SupportedType) {

@@ -329,7 +329,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
     this.attachWorkflow();
   }
 
-  restorationErrors(persistedState: any) {
+  restorationErrors() {
     let { hubAuthentication, layer2Network } = this;
 
     let errors = [];
@@ -342,11 +342,13 @@ class IssuePrepaidCardWorkflow extends Workflow {
       errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
     }
 
+    let persistedLayer2Address = this.session.getValue<string>(
+      'layer2WalletAddress'
+    );
     if (
       layer2Network.isConnected &&
-      persistedState.layer2WalletAddress &&
-      layer2Network.walletInfo.firstAddress !==
-        persistedState.layer2WalletAddress
+      persistedLayer2Address &&
+      layer2Network.walletInfo.firstAddress !== persistedLayer2Address
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED);
     }
@@ -366,18 +368,18 @@ class IssuePrepaidCardWorkflowComponent extends Component {
     super(owner, args);
 
     let workflow = new IssuePrepaidCardWorkflow(getOwner(this));
-    let persistedState = workflow.session.getPersistedData()?.state ?? {};
-    let willRestore = Object.keys(persistedState).length > 0;
+    let willRestore = workflow.session.hasPersistedState();
 
     if (willRestore) {
-      taskFor(this.restoreTask).perform(workflow, persistedState);
+      workflow.session.restoreFromStorage();
+      taskFor(this.restoreTask).perform(workflow);
     } else {
       this.workflow = workflow;
     }
   }
 
-  @task *restoreTask(workflow: IssuePrepaidCardWorkflow, state: any) {
-    let errors = workflow.restorationErrors(state);
+  @task *restoreTask(workflow: IssuePrepaidCardWorkflow) {
+    let errors = workflow.restorationErrors();
     if (errors.length > 0) {
       next(this, () => {
         workflow.cancel(errors[0]);

@@ -37,7 +37,7 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
     super(owner, args);
     if (this.isConnected) {
       next(this, () => {
-        this.persistWalletAddress();
+        this.persistWalletAddressIfInWorkflow();
         this.args.onComplete?.();
       });
     }
@@ -64,13 +64,13 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
     if (this.isConnected) {
       this.args.onConnect?.();
-      this.persistWalletAddress();
+      this.persistWalletAddressIfInWorkflow();
       this.args.onComplete?.();
     }
   }
 
-  persistWalletAddress() {
-    this.args.workflowSession.setValue(
+  persistWalletAddressIfInWorkflow() {
+    this.args.workflowSession?.setValue(
       'layer2WalletAddress',
       this.layer2Network.walletInfo.firstAddress
     );

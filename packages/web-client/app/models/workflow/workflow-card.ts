@@ -1,9 +1,9 @@
 import { action } from '@ember/object';
 import { Participant, WorkflowPostable } from './workflow-postable';
-import WorkflowSession from './workflow-session';
+import { IWorkflowSession } from './workflow-session';
 
 export interface WorkflowCardComponentArgs {
-  workflowSession: WorkflowSession;
+  workflowSession: IWorkflowSession;
   onComplete: (() => void) | undefined;
   onIncomplete: (() => void) | undefined;
   isComplete: boolean;
@@ -49,9 +49,10 @@ export class WorkflowCard extends WorkflowPostable {
       this.check = options.check;
     }
   }
-  get session(): WorkflowSession | undefined {
+  get session(): IWorkflowSession | undefined {
     return this.workflow?.session;
   }
+
   get completedCardNames(): Array<string> {
     return this.session?.getMeta()?.completedCardNames ?? [];
   }

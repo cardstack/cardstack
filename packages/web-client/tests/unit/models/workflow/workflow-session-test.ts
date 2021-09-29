@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
 import WorkflowSession, {
   buildState,
+  WorkflowMeta,
 } from '@cardstack/web-client/models/workflow/workflow-session';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import Ember from 'ember';
@@ -643,10 +644,10 @@ module('Unit | WorkflowSession model', function (hooks) {
     } as Workflow);
     let initialMeta = subject.getMeta();
 
-    assert.equal(
+    assert.deepEqual(
       initialMeta,
-      null,
-      'There is no meta when session is instantiated'
+      {} as WorkflowMeta,
+      'There is an empty meta when session is instantiated'
     );
 
     subject.setMeta(
