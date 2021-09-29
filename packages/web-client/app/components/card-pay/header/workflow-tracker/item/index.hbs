@@ -3,6 +3,7 @@
   type='button'
   disabled={{if this.isComplete 'disabled'}}
   {{on 'click' this.visit}}
+  ...attributes
 >
   <heading class='workflow-tracker-item__heading'>
     {{this.workflowDisplayName}}
