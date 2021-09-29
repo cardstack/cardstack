@@ -216,7 +216,7 @@ module('Acceptance | persistence view and restore', function () {
 
       await visit('/card-pay/');
       await click('[data-test-workflow-tracker-toggle]');
-      await click('[data-test-active-workflow] button'); // FIXME should be a link perhaps?
+      await click('[data-test-active-workflow] button');
 
       assert.equal(
         currentURL(),
