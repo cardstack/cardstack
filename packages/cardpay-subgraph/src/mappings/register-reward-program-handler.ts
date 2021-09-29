@@ -1,6 +1,6 @@
 import { RewardProgramRegistrationFee } from '../../generated/RegisterRewardProgram/RegisterRewardProgramHandler';
 
-import { RewardProgramRegistrationPayment } from '../../generated/schema';
+import { RewardProgramRegistrationPayment, RewardProgram } from '../../generated/schema';
 import { toChecksumAddress, makePrepaidCardPayment, makeToken, makeAccount } from '../utils';
 
 export function handleRewardProgramRegistrationFee(event: RewardProgramRegistrationFee): void {
@@ -19,8 +19,13 @@ export function handleRewardProgramRegistrationFee(event: RewardProgramRegistrat
     event.params.issuingTokenAmount,
     event.params.spendAmount
   );
+
+  let rewardProgramEntity = new RewardProgram(rewardProgramID);
+  rewardProgramEntity.admin = admin;
+  rewardProgramEntity.save();
+
   let entity = new RewardProgramRegistrationPayment(txnHash);
-  entity.rewardProgramID = rewardProgramID;
+  entity.rewardProgram = rewardProgramID;
   entity.admin = admin;
   entity.transaction = txnHash;
   entity.createdAt = event.block.timestamp;

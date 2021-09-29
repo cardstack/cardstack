@@ -1,5 +1,5 @@
 import { RewardeeClaim as RewardeeClaimEvent, RewardTokensAdded } from '../../generated/RewardPool/RewardPool';
-import { RewardeeClaim, RewardSafe, RewardTokensAdd } from '../../generated/schema';
+import { RewardeeClaim, RewardSafe, RewardTokensAdd, RewardProgram } from '../../generated/schema';
 import { toChecksumAddress, makeEOATransactionForSafe, makeAccount, makeToken } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
@@ -9,6 +9,15 @@ export function handleRewardeeClaim(event: RewardeeClaimEvent): void {
   let rewardee = toChecksumAddress(event.params.rewardee);
   let rewardSafe = toChecksumAddress(event.params.rewardSafe);
   let amount = event.params.amount;
+
+  let rewardProgramEntity = RewardProgram.load(rewardProgramID);
+  if (rewardProgramEntity == null) {
+    log.warning(
+      'Cannot process tokens added txn {}: Reward program entity does not exist for safe address {}. This is likely due to the subgraph having a startBlock that is higher than the block the safe was created in.',
+      [txnHash, rewardProgramID]
+    );
+    return;
+  }
 
   let rewardSafeEntity = RewardSafe.load(rewardSafe);
   if (rewardSafeEntity == null) {
@@ -22,7 +31,7 @@ export function handleRewardeeClaim(event: RewardeeClaimEvent): void {
   makeEOATransactionForSafe(event, rewardSafe);
 
   let entity = new RewardeeClaim(txnHash);
-  entity.rewardProgramID = rewardProgramID;
+  entity.rewardProgram = rewardProgramID;
   entity.rewardee = rewardee;
   entity.amount = amount;
   entity.rewardSafe = rewardSafe;
@@ -38,9 +47,18 @@ export function handleRewardTokensAdded(event: RewardTokensAdded): void {
   let token = makeToken(event.params.tokenAddress);
   let amount = event.params.amount;
 
+  let rewardProgramEntity = RewardProgram.load(rewardProgramID);
+  if (rewardProgramEntity == null) {
+    log.warning(
+      'Cannot process tokens added txn {}: Reward program entity does not exist for safe address {}. This is likely due to the subgraph having a startBlock that is higher than the block the safe was created in.',
+      [txnHash, rewardProgramID]
+    );
+    return;
+  }
+
   makeEOATransactionForSafe(event, safe);
   let entity = new RewardTokensAdd(txnHash);
-  entity.rewardProgramID = rewardProgramID;
+  entity.rewardProgram = rewardProgramID;
   entity.safe = safe;
   entity.token = token;
   entity.amount = amount;
