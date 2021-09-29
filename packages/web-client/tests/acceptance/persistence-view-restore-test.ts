@@ -297,7 +297,42 @@ module('Acceptance | persistence view and restore', function () {
         .containsText('Create merchant');
     });
 
-    // FIXME add test for storage event coming from another tab
+    test('a storage event causes the count to update', async function (assert) {
+      await visit('/card-pay');
+      assert.dom('[data-test-workflow-tracker-count]').containsText('0');
+
+      workflowPersistenceService.__storage!.setItem(
+        constructStorageKey('from-elsewhere'),
+        JSON.stringify({
+          name: `PREPAID_CARD_ISSUANCE`,
+          state: buildState({
+            meta: {
+              completedCardNames: ['LAYER2_CONNECT', 'HUB_AUTH'],
+              completedMilestonesCount: 1,
+              milestonesCount: 4,
+            },
+          }),
+        })
+      );
+
+      // Trigger a storage event as if from another tab
+      // https://stackoverflow.com/a/60156181
+      let iframe = document.createElement('iframe');
+      iframe.src = 'about:blank';
+      document.body.appendChild(iframe);
+      iframe.contentWindow!.localStorage.setItem(
+        'test-storage-event',
+        new Date().getTime().toString()
+      );
+
+      await waitUntil(() => {
+        return find('[data-test-workflow-tracker-count]')?.innerHTML.includes(
+          '1'
+        );
+      });
+
+      assert.dom('[data-test-workflow-tracker-count]').containsText('1');
+    });
   });
 
   module(

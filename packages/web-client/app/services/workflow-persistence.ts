@@ -24,22 +24,40 @@ export default class WorkflowPersistence extends Service {
   @service declare router: RouterService;
 
   #storage!: Storage | MockLocalStorage;
+  __storage: MockLocalStorage | undefined;
+
+  #handleStorageEvent: () => void;
 
   @tracked persistedDataIds: string[] = [];
 
   constructor() {
     super(...arguments);
 
-    let entries;
+    let entries: Record<string, string>;
 
     if (config.environment === 'test') {
       this.#storage = new MockLocalStorage();
+      this.__storage = this.#storage;
       entries = this.#storage.entries;
     } else {
       this.#storage = window.localStorage;
       entries = this.#storage;
     }
 
+    this.updatePersistedIds(entries);
+
+    this.#handleStorageEvent = () => {
+      this.updatePersistedIds(entries);
+    };
+
+    window.addEventListener('storage', this.#handleStorageEvent);
+  }
+
+  willDestroy() {
+    window.removeEventListener('storage', this.#handleStorageEvent);
+  }
+
+  updatePersistedIds(entries: Record<string, string>) {
     this.persistedDataIds = Object.keys(entries)
       .filter((key) => key.startsWith(`${STORAGE_KEY_PREFIX}:`))
       .map((key) => key.replace(`${STORAGE_KEY_PREFIX}:`, ''));
