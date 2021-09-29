@@ -3,6 +3,7 @@ import { inject } from '../di/dependency-injection';
 import { Session } from './session';
 import { AuthenticationUtils } from '../utils/authentication';
 import Logger from '@cardstack/logger';
+import * as Sentry from '@sentry/node';
 
 let log = Logger('middleware:authentication');
 
@@ -20,6 +21,11 @@ export default class AuthenticationMiddleware {
         try {
           let userAddress = this.authenticationUtils.validateAuthToken(authToken);
           ctxt.state.userAddress = userAddress;
+          Sentry.configureScope(function (scope) {
+            scope.setUser({
+              userAddress,
+            });
+          });
         } catch (e) {
           log.debug('Invalid auth token seen', e);
         }
