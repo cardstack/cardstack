@@ -7,6 +7,7 @@ import {
 } from '@cardstack/cardpay-sdk';
 import {
   cardbot,
+  IWorkflowSession,
   Milestone,
   PostableCollection,
   NetworkAwareWorkflowMessage,
@@ -16,7 +17,6 @@ import {
   WorkflowCard,
   WorkflowMessage,
   WorkflowName,
-  WorkflowSession,
 } from '@cardstack/web-client/models/workflow';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
@@ -223,7 +223,7 @@ class CreateMerchantWorkflow extends Workflow {
     // cancelation for not having prepaid card
     new SessionAwareWorkflowMessage({
       author: cardbot,
-      template: (session: WorkflowSession) =>
+      template: (session: IWorkflowSession) =>
         `It looks like you don’t have a prepaid card in your wallet. You will need one to pay the ${formatAmount(
           session.getValue('merchantRegistrationFee')
         )} SPEND (${convertAmountToNativeDisplay(
@@ -239,7 +239,7 @@ class CreateMerchantWorkflow extends Workflow {
     // cancelation for insufficient balance
     new SessionAwareWorkflowMessage({
       author: cardbot,
-      template: (session: WorkflowSession) =>
+      template: (session: IWorkflowSession) =>
         `It looks like you don’t have a prepaid card with enough funds to pay the ${formatAmount(
           session.getValue('merchantRegistrationFee')
         )} SPEND (${convertAmountToNativeDisplay(
@@ -323,7 +323,7 @@ class CreateMerchantWorkflow extends Workflow {
     this.attachWorkflow();
   }
 
-  restorationErrors(persistedState: any) {
+  restorationErrors() {
     let { hubAuthentication, layer2Network } = this;
 
     let errors = [];
@@ -336,11 +336,13 @@ class CreateMerchantWorkflow extends Workflow {
       errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
     }
 
+    let persistedLayer2Address = this.session.getValue<string>(
+      'layer2WalletAddress'
+    );
     if (
       layer2Network.isConnected &&
-      persistedState.layer2WalletAddress &&
-      layer2Network.walletInfo.firstAddress !==
-        JSON.parse(persistedState.layer2WalletAddress).value
+      persistedLayer2Address &&
+      layer2Network.walletInfo.firstAddress !== persistedLayer2Address
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED);
     }
@@ -360,11 +362,12 @@ class CreateMerchantWorkflowComponent extends Component {
     super(owner, args);
 
     const workflow = new CreateMerchantWorkflow(getOwner(this));
-    const persistedState = workflow.session.getPersistedData()?.state ?? {};
-    const willRestore = Object.keys(persistedState).length > 0;
+    workflow.session.restoreFromStorage();
+    let willRestore = workflow.session.hasPersistedState();
 
     if (willRestore) {
-      const errors = workflow.restorationErrors(persistedState);
+      workflow.session.restoreFromStorage();
+      const errors = workflow.restorationErrors();
 
       if (errors.length > 0) {
         next(this, () => {

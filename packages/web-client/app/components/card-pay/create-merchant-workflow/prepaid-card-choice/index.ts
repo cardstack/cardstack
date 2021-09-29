@@ -4,7 +4,7 @@ import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 
 import config from '@cardstack/web-client/config/environment';
-import { WorkflowSession } from '@cardstack/web-client/models/workflow';
+import { IWorkflowSession } from '@cardstack/web-client/models/workflow';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import MerchantInfoService from '@cardstack/web-client/services/merchant-info';
 import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-rejection-error';
@@ -27,7 +27,7 @@ import {
 import BN from 'bn.js';
 
 interface CardPayCreateMerchantWorkflowPrepaidCardChoiceComponentArgs {
-  workflowSession: WorkflowSession;
+  workflowSession: IWorkflowSession;
   onComplete: () => void;
   isComplete: boolean;
 }
