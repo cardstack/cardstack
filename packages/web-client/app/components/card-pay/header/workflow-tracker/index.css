@@ -15,6 +15,22 @@
   padding: var(--boxel-sp-sm) 0;
 }
 
+ul + .workflow-tracker__heading {
+  border-top: 2px solid var(--boxel-purple-800);
+  margin-top: var(--boxel-sp);
+  padding-top: var(--boxel-sp-sm);
+}
+
+.workflow-tracker__li .workflow-tracker__li-content {
+  border-top: 1px solid var(--boxel-purple-600);
+}
+
+.workflow-tracker__li:first-child .workflow-tracker__li-content,
+.workflow-tracker__li:hover .workflow-tracker__li-content:enabled,
+.workflow-tracker__li:hover + .workflow-tracker__li .workflow-tracker__li-content:enabled {
+  border-top-color: transparent;
+}
+
 .workflow-tracker__toggle-icon {
   --icon-color: var(--boxel-dark);
 

@@ -11,10 +11,11 @@
   </heading>
   <ul>
     {{#each this.workflowPersistence.activeWorkflows as |workflowMeta|}}
-      <li data-test-active-workflow>
+      <li data-test-active-workflow class="workflow-tracker__li">
         <CardPay::Header::WorkflowTracker::Item
           @workflowMeta={{workflowMeta}}
           @closeList={{@close}}
+          class="workflow-tracker__li-content"
         />
       </li>
     {{/each}}
@@ -32,8 +33,12 @@
     </heading>
     <ul>
       {{#each this.workflowPersistence.completedWorkflows as |workflowMeta|}}
-        <li data-test-completed-workflow>
-          <CardPay::Header::WorkflowTracker::Item @workflowMeta={{workflowMeta}} />
+        <li data-test-completed-workflow class="workflow-tracker__li">
+          <CardPay::Header::WorkflowTracker::Item
+            @workflowMeta={{workflowMeta}}
+            @closeList={{@close}}
+            class="workflow-tracker__li-content"
+          />
         </li>
       {{/each}}
     </ul>
