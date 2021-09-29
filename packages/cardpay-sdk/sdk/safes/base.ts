@@ -117,7 +117,7 @@ const safeQueryFields = `
     rewardee {
       id
     }
-}
+  }
 `;
 
 const safeQuery = `
@@ -185,7 +185,7 @@ export default class Safes {
           result.push(safeResult);
         } else if (safeResult.type === 'prepaid-card' && safeResult.spendFaceValue > 0) {
           result.push(safeResult);
-        } else if (safeResult.type === 'merchant' || safeResult.type === 'depot') {
+        } else if (safeResult.type === 'merchant' || safeResult.type === 'depot' || safeResult.type === 'reward') {
           result.push(safeResult);
         }
       }
