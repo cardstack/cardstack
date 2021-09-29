@@ -1,6 +1,5 @@
 import { default as Service, inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
 import RouterService from '@ember/routing/router-service';
 import { MockLocalStorage } from '../utils/browser-mocks';
 import config from '../config/environment';
@@ -107,12 +106,6 @@ export default class WorkflowPersistence extends Service {
         meta.milestonesCount &&
         meta.completedMilestonesCount === meta.milestonesCount
     );
-  }
-
-  @action clearCompletedWorkflows() {
-    this.completedWorkflows.forEach((workflowAndId) => {
-      this.clearWorkflowWithId(workflowAndId.id);
-    });
   }
 
   visitPersistedWorkflow(workflowPersistenceId: string) {
