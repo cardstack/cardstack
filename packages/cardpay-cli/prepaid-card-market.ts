@@ -1,11 +1,11 @@
 /*global fetch */
 
 import Web3 from 'web3';
-import { getConstant, getSDK, gqlQuery } from '@cardstack/cardpay-sdk';
+import { getConstant, getConstantByNetwork, getSDK, gqlQuery } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
 import * as JSONAPI from 'jsonapi-typescript';
 
-const { fromWei, toWei } = Web3.utils;
+const { fromWei, toWei, toChecksumAddress } = Web3.utils;
 
 export async function getSKUInfo(network: string, sku: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
@@ -46,15 +46,11 @@ interface InventorySubgraph {
     }[];
   };
 }
+
 // TODO once the environments become aligned with the network, we can remove the
 // environment parameter
 export async function getInventories(network: string, environment: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  if (environment !== 'production' && environment !== 'staging') {
-    throw new Error(`Environment must be either 'production' or 'staging'`);
-  }
-  let hubRootURL = environment === 'production' ? 'https://hub.cardstack.com' : 'https://hub-staging.stack.cards';
-  let authToken = await (await getSDK('HubAuth', web3, hubRootURL)).authenticate();
   let query = `
   {
     skuinventories {
@@ -78,20 +74,7 @@ export async function getInventories(network: string, environment: string, mnemo
   }
   `;
   let rawInventories = (await gqlQuery(network, query)) as InventorySubgraph;
-  let response = await fetch(`${hubRootURL}/api/inventories`, {
-    headers: {
-      Authorization: `Bearer: ${authToken}`, // eslint-disable-line @typescript-eslint/naming-convention
-      'Content-Type': 'application/vnd.api+json', // eslint-disable-line @typescript-eslint/naming-convention
-    },
-  });
-  if (!response.ok) {
-    let errMsg = await response.json();
-    throw new Error(
-      `Failed to fetch inventories from ${hubRootURL}, HTTP status ${response.status} ${JSON.stringify(errMsg)}`
-    );
-  }
-  let jsonApiDoc = (await response.json()) as JSONAPI.CollectionResourceDoc;
-  let inventories = jsonApiDoc.data;
+  let inventories = await getInventoriesFromAPI(web3, environment);
 
   let inventoryOutput = '';
   for (let rawInventory of rawInventories.data.skuinventories) {
@@ -121,6 +104,53 @@ SKU ${sku}
   }
 
   console.log(inventoryOutput);
+}
+
+export async function provisionPrepaidCard(
+  network: string,
+  sku: string,
+  userAddress: string,
+  environment: string,
+  provisionerSecret: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
+  let inventories = await getInventoriesFromAPI(web3, environment);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  let inventory = inventories.find((inventory) => inventory.id === sku);
+  console.log(
+    `Provisioning a prepaid card from the SKU ${sku} to the EOA ${userAddress} in the ${environment} environment...`
+  );
+  if (!inventory || inventory.attributes?.quantity === 0) {
+    console.log(`The SKU ${sku} has no available inventory`);
+    return;
+  }
+
+  let relayUrl = getConstantByNetwork('relayServiceURL', network);
+  let response = await fetch(`${relayUrl}/v1/prepaid-card/provision/${sku}/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
+      Authorization: provisionerSecret, // eslint-disable-line @typescript-eslint/naming-convention
+    },
+    body: JSON.stringify({
+      owner: toChecksumAddress(userAddress),
+    }),
+  });
+  let body = await response.json();
+  if (!response.ok) {
+    console.log(
+      `Could not provision prepaid card for customer ${userAddress}, sku ${sku}, received ${
+        response.status
+      } from relay server: ${JSON.stringify(body)}`
+    );
+    return;
+  }
+  let { txHash } = body;
+  console.log(`Transaction hash: ${blockExplorer}/tx/${txHash}/token-transfers`);
+  let prepaidCard = await prepaidCardMarket.getPrepaidCardFromProvisionTxnHash(txHash);
+  console.log(`Provisioned the EOA ${userAddress} the prepaid card ${prepaidCard.address}`);
 }
 
 export async function getInventory(network: string, sku: string, mnemonic?: string): Promise<void> {
@@ -188,4 +218,26 @@ export async function setAsk(
     });
     console.log('done');
   }
+}
+
+async function getInventoriesFromAPI(web3: Web3, environment: string): Promise<JSONAPI.ResourceObject[]> {
+  if (environment !== 'production' && environment !== 'staging') {
+    throw new Error(`Environment must be either 'production' or 'staging'`);
+  }
+  let hubRootURL = environment === 'production' ? 'https://hub.cardstack.com' : 'https://hub-staging.stack.cards';
+  let authToken = await (await getSDK('HubAuth', web3, hubRootURL)).authenticate();
+  let response = await fetch(`${hubRootURL}/api/inventories`, {
+    headers: {
+      Authorization: `Bearer: ${authToken}`, // eslint-disable-line @typescript-eslint/naming-convention
+      'Content-Type': 'application/vnd.api+json', // eslint-disable-line @typescript-eslint/naming-convention
+    },
+  });
+  if (!response.ok) {
+    let errMsg = await response.json();
+    throw new Error(
+      `Failed to fetch inventories from ${hubRootURL}, HTTP status ${response.status} ${JSON.stringify(errMsg)}`
+    );
+  }
+  let jsonApiDoc = (await response.json()) as JSONAPI.CollectionResourceDoc;
+  return jsonApiDoc.data;
 }

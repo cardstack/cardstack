@@ -349,6 +349,26 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Cardpay testnet: Provision Prepaid Card",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "prepaidcard-provision",
+        "0xc8b04fee58da85eab44879150cd06aafedbfa70705c9f7c1eb517aaad8f786ae", // sku
+        "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // recipient
+        "staging", // environment
+        "", // secret
+        "--network",
+        "sokol",
+        // Hassan's testing mnemonic feel free to use your own
+        "--mnemonic",
+        "pizza monitor radio able holiday boil beyond kingdom throw evil limb dream"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Cardpay testnet: Register New Merchant",
       "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
       "console": "integratedTerminal",
