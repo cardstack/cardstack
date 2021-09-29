@@ -7,6 +7,8 @@ import { AuthenticationUtils } from '../utils/authentication';
 import { validateRequiredFields } from './utils/validation';
 import { getSKUSummaries } from './utils/inventory';
 import { validate as validateUUID } from 'uuid';
+import * as Sentry from '@sentry/node';
+import { captureSentryMessage } from './utils/sentry';
 
 export default class ReservationsRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
@@ -64,6 +66,8 @@ export default class ReservationsRoute {
     }
     let userAddress = ctx.state.userAddress.toLowerCase();
     let sku = ctx.request.body.data.attributes.sku;
+    Sentry.addBreadcrumb({ message: `received reservation create: userAddress=${userAddress}, sku=${sku}` });
+
     let skuSummaries = await getSKUSummaries(await this.databaseManager.getClient(), this.subgraph);
     let skuSummary = skuSummaries.find((summary) => summary.id === sku);
     if (skuSummary?.attributes?.quantity === 0) {
@@ -78,6 +82,7 @@ export default class ReservationsRoute {
         ],
       };
       ctx.type = 'application/vnd.api+json';
+      captureSentryMessage(`Cannot create reservation for ${userAddress}. No inventory available for SKU ${sku}`, ctx);
       return;
     }
     if (!skuSummary) {
@@ -92,6 +97,7 @@ export default class ReservationsRoute {
         ],
       };
       ctx.type = 'application/vnd.api+json';
+      captureSentryMessage(`Cannot create reservation for ${userAddress}. SKU ${sku} does not exist`, ctx);
       return;
     }
 
