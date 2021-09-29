@@ -112,8 +112,6 @@ export default class RewardPool {
     };
     let response = await fetch(url.toString(), options);
     let json = await response.json();
-    let count = json['count'];
-    console.log(`Total of ${count} proofs retrieved for payee ${address}`);
     if (!response?.ok) {
       throw new Error(await response.text());
     }
