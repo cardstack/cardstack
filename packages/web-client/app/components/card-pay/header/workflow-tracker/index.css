@@ -15,6 +15,15 @@
   padding: var(--boxel-sp-sm) 0;
 }
 
+.workflow-tracker__heading {
+  display: flex;
+  align-items: center;
+  column-gap: var(--boxel-sp-xxs);
+  padding-left: var(--boxel-sp-xs);
+  margin-bottom: var(--boxel-sp-xs);
+  text-transform: uppercase;
+}
+
 ul + .workflow-tracker__heading {
   border-top: 2px solid var(--boxel-purple-800);
   margin-top: var(--boxel-sp);
@@ -35,15 +44,6 @@ ul + .workflow-tracker__heading {
   --icon-color: var(--boxel-dark);
 
   margin-right: var(--boxel-sp-xxxs);
-}
-
-.workflow-tracker__heading {
-  display: flex;
-  align-items: center;
-  column-gap: var(--boxel-sp-xxs);
-  padding-left: var(--boxel-sp-xs);
-  margin-bottom: var(--boxel-sp-xs);
-  text-transform: uppercase;
 }
 
 .workflow-tracker__heading-icon {
