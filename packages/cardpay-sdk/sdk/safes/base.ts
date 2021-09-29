@@ -113,7 +113,6 @@ const safeQueryFields = `
   }
   reward {
     id
-    rewardProgramID
     rewardee {
       id
     }
