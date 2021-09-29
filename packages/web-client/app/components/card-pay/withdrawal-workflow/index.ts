@@ -365,7 +365,7 @@ with Card Pay.`,
     }),
   ]);
 
-  restorationErrors(persistedState: any) {
+  restorationErrors() {
     let { layer1Network, layer2Network } = this;
 
     let errors = [];
@@ -374,11 +374,13 @@ with Card Pay.`,
       errors.push(FAILURE_REASONS.RESTORATION_L1_DISCONNECTED);
     }
 
+    let persistedLayer1Address = this.session.getValue<string>(
+      'layer1WalletAddress'
+    );
     if (
       layer1Network.isConnected &&
-      persistedState.layer1WalletAddress &&
-      layer1Network.walletInfo.firstAddress !==
-        JSON.parse(persistedState.layer1WalletAddress).value
+      persistedLayer1Address &&
+      layer1Network.walletInfo.firstAddress !== persistedLayer1Address
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L1_ADDRESS_CHANGED);
     }
@@ -387,11 +389,13 @@ with Card Pay.`,
       errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
     }
 
+    let persistedLayer2Address = this.session.getValue<string>(
+      'layer2WalletAddress'
+    );
     if (
       layer2Network.isConnected &&
-      persistedState.layer2WalletAddress &&
-      layer2Network.walletInfo.firstAddress !==
-        JSON.parse(persistedState.layer2WalletAddress).value
+      persistedLayer2Address &&
+      layer2Network.walletInfo.firstAddress !== persistedLayer2Address
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED);
     }
@@ -419,18 +423,18 @@ export default class WithdrawalWorkflowComponent extends Component {
     super(owner, args);
 
     let workflow = new WithdrawalWorkflow(getOwner(this));
-    let persistedState = workflow.session.getPersistedData()?.state ?? {};
-    let willRestore = Object.keys(persistedState).length > 0;
+    let willRestore = workflow.session.hasPersistedState();
 
     if (willRestore) {
-      taskFor(this.restoreTask).perform(workflow, persistedState);
+      workflow.session.restoreFromStorage();
+      taskFor(this.restoreTask).perform(workflow);
     } else {
       this.workflow = workflow;
     }
   }
 
-  @task *restoreTask(workflow: WithdrawalWorkflow, state: any) {
-    let errors = workflow.restorationErrors(state);
+  @task *restoreTask(workflow: WithdrawalWorkflow) {
+    let errors = workflow.restorationErrors();
     if (errors.length > 0) {
       next(this, () => {
         workflow.cancel(errors[0]);

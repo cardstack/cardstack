@@ -1,7 +1,7 @@
 import { Milestone } from './workflow/milestone';
 import PostableCollection from './workflow/postable-collection';
 import { WorkflowPostable } from './workflow/workflow-postable';
-import WorkflowSession from './workflow/workflow-session';
+import WorkflowSession, { IWorkflowSession } from './workflow/workflow-session';
 import { tracked } from '@glimmer/tracking';
 import { SimpleEmitter } from '../utils/events';
 import { next } from '@ember/runloop';
@@ -20,6 +20,7 @@ export { default as NetworkAwareWorkflowCard } from './workflow/network-aware-ca
 export { Participant, WorkflowPostable } from './workflow/workflow-postable';
 export {
   WorkflowSessionDictionary,
+  IWorkflowSession,
   default as WorkflowSession,
 } from './workflow/workflow-session';
 export { SessionAwareWorkflowMessage } from './workflow/session-aware-workflow-message';
@@ -43,7 +44,7 @@ export abstract class Workflow {
   cancelationMessages: PostableCollection = new PostableCollection();
   @tracked isCanceled = false;
   @tracked cancelationReason: null | string = null;
-  session: WorkflowSession;
+  session: IWorkflowSession;
   owner: any;
   simpleEmitter = new SimpleEmitter();
   isRestored = false;

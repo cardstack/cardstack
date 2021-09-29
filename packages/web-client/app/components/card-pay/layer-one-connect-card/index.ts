@@ -44,11 +44,12 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     super(owner, args);
     if (this.isConnected) {
       next(this, () => {
-        this.persistWalletAddress();
+        this.persistWalletAddressIfInWorkflow();
         this.args.onComplete?.();
       });
     }
   }
+
   get connectedWalletProvider(): WalletProvider | undefined {
     if (!this.isConnected) return undefined;
     else
@@ -62,8 +63,8 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     else return '';
   }
 
-  persistWalletAddress() {
-    this.args?.workflowSession?.setValue(
+  persistWalletAddressIfInWorkflow() {
+    this.args.workflowSession?.setValue(
       'layer1WalletAddress',
       this.layer1Network.walletInfo.firstAddress
     );
@@ -133,7 +134,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     yield timeout(500); // allow time for strategy to verify connected chain -- it might not accept the connection
     if (this.isConnected) {
       this.args.onConnect?.();
-      this.persistWalletAddress();
+      this.persistWalletAddressIfInWorkflow();
       this.args.onComplete?.();
     }
   }
