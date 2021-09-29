@@ -95,10 +95,10 @@ export default class RewardPool {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url = new URL(`${tallyServiceURL}/merkle-proofs/${address}`);
     if (tokenAddress) {
-      url.searchParams.append('tokenAddress', tokenAddress);
+      url.searchParams.append('token_address', tokenAddress);
     }
     if (rewardProgramId) {
-      url.searchParams.append('rewardProgramId', rewardProgramId);
+      url.searchParams.append('reward_program_id', rewardProgramId);
     }
     if (offset) {
       url.searchParams.append('offset', offset.toString());
@@ -446,14 +446,18 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
   }
 
   private async tokenSymbolMapping(tokenAddresses: string[]): Promise<any> {
-    return tokenAddresses.reduce(async (obj, tokenAddress: string) => {
-      const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
-      const tokenSymbol = await tokenContract.methods.symbol().call();
-      return {
-        ...obj,
-        [tokenAddress]: tokenSymbol,
-      };
-    }, {});
+    let o = {};
+    await Promise.all(
+      tokenAddresses.map(async (tokenAddress: string) => {
+        const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+        const tokenSymbol = await tokenContract.methods.symbol().call();
+        o = {
+          ...o,
+          [tokenAddress]: tokenSymbol,
+        };
+      })
+    );
+    return o;
   }
   private async getRewardPool(): Promise<Contract> {
     if (this.rewardPool) {
