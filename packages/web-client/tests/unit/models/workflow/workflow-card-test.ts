@@ -2,12 +2,12 @@ import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
 import { settled } from '@ember/test-helpers';
 import {
-  Milestone,
-  Workflow,
   WorkflowCard,
   Participant,
   WorkflowPostable,
+  Milestone,
 } from '@cardstack/web-client/models/workflow';
+import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
 
 module('Unit | WorkflowCard model', function (hooks) {
   setupTest(hooks);
@@ -22,8 +22,8 @@ module('Unit | WorkflowCard model', function (hooks) {
       author: participant,
       componentName: 'foo/bar',
     });
-    class StubWorkflow extends Workflow {}
-    let wf = new StubWorkflow(this.owner);
+
+    let wf = new WorkflowStub(this.owner);
     subject.setWorkflow(wf);
     assert.equal(subject.session, wf.session);
   });
@@ -58,7 +58,7 @@ module('Unit | WorkflowCard model', function (hooks) {
       },
     });
 
-    class StubWorkflow extends Workflow {
+    class CustomWorkflowStub extends WorkflowStub {
       milestones = [
         new Milestone({
           title: 'mock. should not be completed',
@@ -67,7 +67,7 @@ module('Unit | WorkflowCard model', function (hooks) {
         }),
       ];
     }
-    let wf = new StubWorkflow(this.owner);
+    let wf = new CustomWorkflowStub(this.owner);
     subject.setWorkflow(wf);
 
     subject.onComplete();
@@ -82,12 +82,12 @@ module('Unit | WorkflowCard model', function (hooks) {
       author: participant,
       componentName: 'foo/bar',
     });
-    class StubWorkflow extends Workflow {
+    class CustomWorkflowStub extends WorkflowStub {
       resetTo(postable: WorkflowPostable) {
         postable.isComplete = false; // simplified version of actual implementation
       }
     }
-    let wf = new StubWorkflow(this.owner);
+    let wf = new CustomWorkflowStub(this.owner);
     subject.setWorkflow(wf);
     subject.onIncomplete();
     assert.equal(subject.isComplete, false);

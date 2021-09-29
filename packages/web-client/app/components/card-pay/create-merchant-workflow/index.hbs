@@ -1,7 +1,9 @@
-<WorkflowThread
-  class="create-merchant-workflow"
-  @workflow={{this.workflow}}
-/>
+{{#if this.workflow}}
+  <WorkflowThread
+    class="create-merchant-workflow"
+    @workflow={{this.workflow}}
+  />
+{{/if}}
 <Listener
   @emitter={{this.layer2Network}}
   @event="disconnect"

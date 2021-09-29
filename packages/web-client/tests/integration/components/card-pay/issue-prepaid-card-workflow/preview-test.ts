@@ -3,10 +3,7 @@ import { setupRenderingTest } from 'ember-qunit';
 import { click, render, waitFor, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
-import {
-  Workflow,
-  WorkflowSession,
-} from '@cardstack/web-client/models/workflow';
+import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import sinon from 'sinon';
 import CardCustomization from '@cardstack/web-client/services/card-customization';
 import { taskFor } from 'ember-concurrency-ts';
@@ -16,6 +13,7 @@ import prepaidCardColorSchemes from '../../../../../mirage/fixture-data/prepaid-
 import prepaidCardPatterns from '../../../../../mirage/fixture-data/prepaid-card-patterns';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import BN from 'bn.js';
+import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
 
 const USER_REJECTION_ERROR_MESSAGE =
   'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
@@ -96,8 +94,7 @@ module(
       });
 
       test('it cancels the workflow if hub authentication fails', async function (assert) {
-        class ConcreteWorkflow extends Workflow {}
-        let workflow = new ConcreteWorkflow(this.owner);
+        let workflow = new WorkflowStub(this.owner);
         workflow.attachWorkflow();
         this.set('workflowSession.workflow', workflow);
 

@@ -1,15 +1,13 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'ember-qunit';
-import { Workflow } from '@cardstack/web-client/models/workflow';
 import {
   Participant,
   WorkflowPostable,
 } from '@cardstack/web-client/models/workflow/workflow-postable';
+import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
 
 module('Unit | WorkflowPostable model', function (hooks) {
   setupTest(hooks);
-
-  class ConcreteWorkflow extends Workflow {}
 
   let participant: Participant;
   hooks.beforeEach(function () {
@@ -37,7 +35,7 @@ module('Unit | WorkflowPostable model', function (hooks) {
   });
 
   test('setWorkflow does exactly that', function (assert) {
-    let workflow = new ConcreteWorkflow(this.owner);
+    let workflow = new WorkflowStub(this.owner);
     let subject = new WorkflowPostable(participant);
     subject.setWorkflow(workflow);
     assert.strictEqual(subject.workflow, workflow);
