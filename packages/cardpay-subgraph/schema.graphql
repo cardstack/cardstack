@@ -397,6 +397,7 @@ type Transaction @entity {
   spendAccumulations: [SpendAccumulation]!         @derivedFrom(field: "transaction")
   merchantFeePayments: [MerchantFeePayment]!       @derivedFrom(field: "transaction")
   merchantClaims: [MerchantClaim]!                 @derivedFrom(field: "transaction")
+  rewardClaims: [RewardeeClaim]!                   @derivedFrom(field: "transaction")
   merchantRevenueEvents: [MerchantRevenueEvent]!   @derivedFrom(field: "transaction")
   tokenSwaps: [TokenSwap]!                         @derivedFrom(field: "transaction")
   prepaidCardInventoryEvents: [PrepaidCardInventoryEvent]! @derivedFrom(field: "transaction")
