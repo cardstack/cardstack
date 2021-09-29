@@ -6,7 +6,6 @@ import { tracked } from '@glimmer/tracking';
 import { SimpleEmitter } from '../utils/events';
 import WorkflowPersistence from '@cardstack/web-client/app/services/workflow-persistence';
 import { setOwner } from '@ember/application';
-import { next } from '@ember/runloop';
 export { Milestone } from './workflow/milestone';
 export { default as PostableCollection } from './workflow/postable-collection';
 export { WorkflowMessage, IWorkflowMessage } from './workflow/workflow-message';
