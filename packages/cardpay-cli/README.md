@@ -16,6 +16,7 @@ CLI tool for basic actions in Cardpay
   - [`yarn cardpay split <PREPAID_CARD> <FACE_VALUE> <QUANTITY> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-split-prepaid_card-face_value-quantity---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaidcard-split <PREPAID_CARD> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-split-prepaid_card-customization_did-face_values---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaidcard-transfer <PREPAID_CARD> <NEW_OWNER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-transfer-prepaid_card-new_owner---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`yarn cardpay prepaidcard-provision <SKU> <RECIPIENT> <ENVIRONMENT> <SECRET> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaidcard-provision-sku-recipient-environment-secret---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay price-for-face-value <TOKEN_ADDRESS> <SPEND_FACE_VALUE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-price-for-face-value-token_address-spend_face_value---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay sku-info <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-sku-info-sku---networknetwork---mnemonicmnemonic---walletconnect)
   - [`yarn cardpay prepaid-card-inventory <SKU> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#yarn-cardpay-prepaid-card-inventory-sku---networknetwork---mnemonicmnemonic---walletconnect)
@@ -208,6 +209,25 @@ ARGUMENTS
   MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
 ```
+
+## `yarn cardpay prepaidcard-provision <SKU> <RECIPIENT> <ENVIRONMENT> <SECRET> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+
+Provision a prepaid card to an EOA
+
+```
+USAGE
+  $ yarn cardpay prepaidcard-provision <SKU> <RECIPIENT> <ENVIRONMENT> <SECRET> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+
+ARGUMENTS
+  SKU               The SKU of the prepaid card to provision
+  RECIPIENT         The EOA address of the recipient of the prepaid card
+  ENVIRONMENT       The environment to use (staging or production)
+  SECRET            The "provisioner secret" phrase to enable provisioning
+  NETWORK           The network to use ("sokol" or "xdai")
+  MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
+  WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
+```
+
 
 ## `yarn cardpay price-for-face-value <TOKEN_ADDRESS> <SPEND_FACE_VALUE> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
 Get the price in the units of the specified token to achieve a prepaid card with the specified face value in SPEND. This takes into account the exchange rate for the specified token as well as the gas fee that is charged for creating a new prepaid card.
