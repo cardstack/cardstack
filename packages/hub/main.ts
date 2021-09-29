@@ -38,6 +38,7 @@ import MerchantInfoQueries from './services/queries/merchant-info';
 import { AuthenticationUtils } from './utils/authentication';
 import ApiRouter from './services/api-router';
 import CallbacksRouter from './services/callbacks-router';
+import HealthCheck from './services/health-check';
 import NonceTracker from './services/nonce-tracker';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
@@ -70,6 +71,7 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
+  registry.register('health-check', HealthCheck);
   registry.register('inventory-route', InventoryRoute);
   registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
@@ -121,6 +123,7 @@ export class HubServer {
     app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
     app.use(((await container.lookup('api-router')) as ApiRouter).routes());
     app.use(((await container.lookup('callbacks-router')) as CallbacksRouter).routes());
+    app.use(((await container.lookup('health-check')) as HealthCheck).routes()); // Setup health-check at "/"
 
     function onError(err: Error, ctx: Koa.Context) {
       LOGGER.error(`Unhandled error:`, err);
