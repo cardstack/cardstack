@@ -1,4 +1,8 @@
-.workflow-tracker-item__container {
+.workflow-tracker-item {
+  --workflow-tracker-item-color: var(--boxel-light);
+  --workflow-tracker-item-milestone-color: var(--boxel-highlight);
+  --workflow-tracker-item-disabled-color: var(--boxel-purple-200);
+
   display: grid;
   grid-template-columns: 1fr var(--boxel-sp-xxl);
   grid-template-rows: 1fr 1fr;
@@ -6,33 +10,34 @@
     "heading icon"
     "milestone icon";
   background: transparent;
-  width: calc(100% - var(--boxel-sp-sm) * 2);
-  color: var(--boxel-light-200);
-  margin: 0 var(--boxel-sp);
+  width: 100%;
+  color: var(--workflow-tracker-item-color);
   border-radius: var(--boxel-border-radius-sm);
   text-align: left;
-  padding: var(--boxel-sp-sm) var(--boxel-sp-xs);
+  padding: var(--boxel-sp-sm);
   border: 0;
 }
 
-.workflow-tracker-item__container:hover:not(:disabled) {
+.workflow-tracker-item:hover:not(:disabled) {
   background-color: var(--boxel-purple-400);
+}
+
+.workflow-tracker-item:disabled {
+  --workflow-tracker-item-color: var(--workflow-tracker-item-disabled-color);
+  --workflow-tracker-item-milestone-color: var(--workflow-tracker-item-disabled-color);
 }
 
 .workflow-tracker-item__heading {
   grid-area: heading;
-  font-weight: 700;
-  font-size: var(--boxel-font-size-xs);
+  font: 700 var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
 }
 
 .workflow-tracker-item__milestone {
   grid-area: milestone;
-  font-size: var(--boxel-font-size-xxs);
-}
-
-.workflow-tracker-item__container:enabled .workflow-tracker-item__milestone {
-  color: var(--boxel-dark-highlight);
-  font-weight: 600;
+  color: var(--workflow-tracker-item-milestone-color);
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-lg);
 }
 
 .workflow-tracker-item__icon {
