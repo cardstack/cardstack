@@ -5,6 +5,7 @@ import {
   PrepaidCardSend,
 } from '../../generated/PrepaidCard/PrepaidCardManager';
 import {
+  Account,
   Depot,
   PrepaidCard,
   PrepaidCardCreation,
@@ -18,7 +19,6 @@ import {
   makeTransaction,
   getPrepaidCardFaceValue,
   makeEOATransactionForSafe,
-  makeAccount,
 } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
@@ -33,7 +33,8 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   } else {
     makeEOATransaction(event, issuer);
   }
-  makeAccount(issuer);
+  let accountEntity = new Account(issuer);
+  accountEntity.save();
 
   let prepaidCardMgr = PrepaidCardManager.bind(event.address);
   let cardInfo = prepaidCardMgr.cardDetails(event.params.card);

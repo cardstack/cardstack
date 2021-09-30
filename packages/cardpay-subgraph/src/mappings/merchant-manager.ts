@@ -1,7 +1,7 @@
 import { BigInt } from '@graphprotocol/graph-ts';
 import { MerchantCreation as MerchantCreationEvent } from '../../generated/Merchant/MerchantManager';
-import { MerchantSafe, MerchantCreation } from '../../generated/schema';
-import { makeEOATransaction, toChecksumAddress, makeAccount } from '../utils';
+import { Account, MerchantSafe, MerchantCreation } from '../../generated/schema';
+import { makeEOATransaction, toChecksumAddress } from '../utils';
 
 export function handleMerchantCreation(event: MerchantCreationEvent): void {
   let merchant = toChecksumAddress(event.params.merchant);
@@ -10,7 +10,8 @@ export function handleMerchantCreation(event: MerchantCreationEvent): void {
   let merchantSafe = toChecksumAddress(event.params.merchantSafe);
   let infoDID = event.params.infoDID;
 
-  makeAccount(merchant);
+  let accountEntity = new Account(merchant);
+  accountEntity.save();
 
   let merchantSafeEntity = new MerchantSafe(merchantSafe);
   merchantSafeEntity.safe = merchantSafe;

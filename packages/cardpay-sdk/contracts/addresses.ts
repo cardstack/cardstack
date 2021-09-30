@@ -12,8 +12,6 @@ import SplitPrepaidCardHandlerABI from './abi/v0.8.0/split-prepaid-card-handler'
 import SpendABI from './abi/v0.8.0/spend';
 import MerchantManagerABI from './abi/v0.8.0/merchant-manager';
 import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.0/deprecated-merchant-manager-0_6_7';
-import RegisterRewardProgramHandlerABI from './abi/v0.8.0/register-reward-program-handler';
-import RegisterRewardeeHandlerABI from './abi/v0.8.0/register-rewardee-handler';
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
 consumeModule(RegisterMerchantHandlerABI);
@@ -23,8 +21,6 @@ consumeModule(SpendABI);
 consumeModule(MerchantManagerABI);
 // we include this because we are still interested in indexing events from this contract
 consumeModule(DeprecatedMerchantManagerABI_0_6_7);
-consumeModule(RegisterRewardProgramHandlerABI);
-consumeModule(RegisterRewardeeHandlerABI);
 
 const KOVAN = {
   cardToken: '0xd6E34821F508e4247Db359CFceE0cb5e8050972a',
@@ -57,8 +53,6 @@ const SOKOL = {
   uniswapV2Factory: '0x6b67f08F08B715B162aa09239488318A660F24BF',
   rewardPool: '0x2D23acfEA32492911E8DF12E697AF0013B8D4E7b',
   rewardManager: '0x9A89A110238201c12568f3a4a02BE5Ae63284497',
-  registerRewardProgramHandler: '0xaF5B2869Be9Eb9c45cc0501F17B145A3229dD2C0',
-  registerRewardeeHandler: '0x0B793A280F2E47997432a9047073F5e634A9A731',
   deprecatedMerchantManager_v0_6_7: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2', // eslint-disable-line @typescript-eslint/naming-convention
   oracles: {
     DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB', // eslint-disable-line @typescript-eslint/naming-convention
@@ -95,9 +89,6 @@ const XDAI = {
   uniswapV2Router: '0x1C232F01118CB8B424793ae03F870aa7D0ac7f77', // This is the UniswapV2Router02
   uniswapV2Factory: '0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7',
   rewardPool: '0x42628325845B3e01EfdD6ce4b3665453dC6c9A13',
-  rewardManager: '',
-  registerRewardProgramHandler: '',
-  registerRewardeeHandler: '',
   deprecatedMerchantManager_v0_6_7: '0x3C29B2A563F4bB9D625175bE823c528A4Ddd1107', // eslint-disable-line @typescript-eslint/naming-convention
   oracles: {
     DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2', // eslint-disable-line @typescript-eslint/naming-convention

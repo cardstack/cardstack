@@ -1,7 +1,14 @@
 import { SupplierSafeCreated, SupplierInfoDIDUpdated } from '../../generated/Depot/SupplierManager';
 import { TokensBridgedToSafe, TokensBridgingInitiated } from '../../generated/TokenBridge/HomeMultiAMBErc20ToErc677';
-import { Depot, BridgeToLayer1Event, BridgeToLayer2Event, SupplierInfoDIDUpdate, Safe } from '../../generated/schema';
-import { makeToken, makeEOATransaction, toChecksumAddress, makeEOATransactionForSafe, makeAccount } from '../utils';
+import {
+  Depot,
+  Account,
+  BridgeToLayer1Event,
+  BridgeToLayer2Event,
+  SupplierInfoDIDUpdate,
+  Safe,
+} from '../../generated/schema';
+import { makeToken, makeEOATransaction, toChecksumAddress, makeEOATransactionForSafe } from '../utils';
 import { log, BigInt, Address } from '@graphprotocol/graph-ts';
 import { GnosisSafe } from '../../generated/Gnosis/GnosisSafe';
 
@@ -48,11 +55,13 @@ export function handleSentBridgedTokens(event: TokensBridgingInitiated): void {
     let safeContract = GnosisSafe.bind(Address.fromString(safe.id));
     let owners = safeContract.getOwners();
     if (owners.length > 0) {
-      let account = makeAccount(toChecksumAddress(owners[0]));
+      let account = new Account(toChecksumAddress(owners[0]));
+      account.save();
       bridgeEventEntity.account = account.id;
     }
   } else {
-    makeAccount(sender);
+    let account = new Account(sender);
+    account.save();
     bridgeEventEntity.account = sender;
     makeEOATransaction(event, sender);
   }
@@ -65,7 +74,8 @@ export function handleSetInfoDID(event: SupplierInfoDIDUpdated): void {
 
   let infoDID = event.params.infoDID;
 
-  makeAccount(supplier);
+  let accountEntity = new Account(supplier);
+  accountEntity.save();
 
   let updateEntity = new SupplierInfoDIDUpdate(event.transaction.hash.toHex());
   updateEntity.timestamp = event.block.timestamp;
@@ -76,7 +86,8 @@ export function handleSetInfoDID(event: SupplierInfoDIDUpdated): void {
 }
 
 function makeDepot(safe: string, supplier: string, timestamp: BigInt): void {
-  makeAccount(supplier);
+  let accountEntity = new Account(supplier);
+  accountEntity.save();
 
   let depotEntity = new Depot(safe);
   depotEntity.safe = safe;

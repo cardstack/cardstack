@@ -65,10 +65,6 @@ let abis = {
   SupplierManager: getAbi(join(sourceAbiDir, 'supplier-manager.ts')),
   Exchange: getAbi(join(sourceAbiDir, 'exchange.ts')),
   DeprecatedMerchantManager_v0_6_7: getAbi(join(sourceAbiDir, 'deprecated-merchant-manager-0_6_7.ts')),
-  RewardPool: getAbi(join(sourceAbiDir, 'reward-pool.ts')),
-  RewardManager: getAbi(join(sourceAbiDir, 'reward-manager.ts')),
-  RegisterRewardProgramHandler: getAbi(join(sourceAbiDir, 'register-reward-program-handler.ts')),
-  RegisterRewardeeHandler: getAbi(join(sourceAbiDir, 'register-rewardee-handler.ts')),
 };
 
 removeSync(abiDir);
@@ -107,11 +103,7 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(
     /{DEPRECATED_MERCHANT_MANAGER_v0_6_7_ADDRESS}/g,
     getAddress('deprecatedMerchantManager_v0_6_7', cleanNetwork)
-  )
-  .replace(/{REWARD_POOL_ADDRESS}/g, getAddress('rewardPool', cleanNetwork))
-  .replace(/{REWARD_MANAGER_ADDRESS}/g, getAddress('rewardManager', cleanNetwork))
-  .replace(/{REGISTER_REWARD_PROGRAM_HANDLER_ADDRESS}/g, getAddress('registerRewardProgramHandler', cleanNetwork))
-  .replace(/{REGISTER_REWARDEE_HANDLER_ADDRESS}/g, getAddress('registerRewardeeHandler', cleanNetwork));
+  );
 
 removeSync(subgraphFile);
 writeFileSync(subgraphFile, subgraph);
