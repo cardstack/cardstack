@@ -1,4 +1,4 @@
-<aside {{did-insert this.getScrollPosition}} class='workflow-tracker' {{on-click-outside @close ignoreSelector="[data-workflow-tracker-toggle]"}}>
+<aside tabindex="0" {{did-insert this.getScrollPosition}} class='workflow-tracker' {{on-click-outside @close ignoreSelector="[data-workflow-tracker-toggle]"}}>
   <header class={{cn "workflow-tracker__heading" workflow-tracker__heading--scrolled=this.isScrolled}} aria-label="Active workflows"> {{!-- label is because of linter --}}
     {{svg-jar 'task-active' class='workflow-tracker__heading-icon'}}
     Active workflows
@@ -9,7 +9,7 @@
       {{this.workflowPersistence.activeWorkflows.length}}
     </span>
   </header>
-  <ul id="active-list" class="workflow-tracker__list">
+  <ul id="workflow-tracker-active-list" class="workflow-tracker__list">
     {{#each this.workflowPersistence.activeWorkflows as |workflowMeta|}}
       <li data-test-active-workflow class="workflow-tracker__li">
         <CardPay::Header::WorkflowTracker::Item
@@ -31,7 +31,7 @@
         {{this.workflowPersistence.completedWorkflows.length}}
       </span>
     </header>
-    <ul class="workflow-tracker__list">
+    <ul id="workflow-tracker-completed-list" class="workflow-tracker__list">
       {{#each this.workflowPersistence.completedWorkflows as |workflowMeta|}}
         <li data-test-completed-workflow class="workflow-tracker__li">
           <CardPay::Header::WorkflowTracker::Item
