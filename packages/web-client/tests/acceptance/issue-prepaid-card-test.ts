@@ -33,7 +33,7 @@ import {
   createPrepaidCardSafe,
   createSafeToken,
   defaultCreatedPrepaidCardDID,
-} from '../helpers/data';
+} from '../helpers/mocks';
 
 interface Context extends MirageTestContext {}
 

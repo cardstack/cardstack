@@ -11,7 +11,7 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import { BN } from 'bn.js';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
-import { createDepotSafe, createSafeToken } from '../helpers/data';
+import { createDepotSafe, createSafeToken } from '../helpers/mocks';
 
 interface Context extends MirageTestContext {}
 

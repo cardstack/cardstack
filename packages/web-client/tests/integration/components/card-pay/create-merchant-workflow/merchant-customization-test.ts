@@ -8,7 +8,7 @@ import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { Response as MirageResponse } from 'ember-cli-mirage';
-import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/data';
+import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/mocks';
 
 interface Context extends MirageTestContext {}
 

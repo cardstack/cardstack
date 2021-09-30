@@ -12,7 +12,7 @@ import {
   createMerchantSafe,
   createPrepaidCardSafe,
   createSafeToken,
-} from '../helpers/data';
+} from '../helpers/mocks';
 
 interface Context extends MirageTestContext {}
 

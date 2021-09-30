@@ -12,7 +12,7 @@ import {
   createMerchantSafe,
   createPrepaidCardSafe,
   createSafeToken,
-} from '@cardstack/web-client/tests/helpers/data';
+} from '@cardstack/web-client/tests/helpers/mocks';
 
 module(
   'Integration | Component | card-pay/withdrawal-workflow/choose-balance',

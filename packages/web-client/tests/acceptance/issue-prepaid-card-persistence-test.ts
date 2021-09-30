@@ -16,7 +16,7 @@ import { toWei } from 'web3-utils';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 import { setupHubAuthenticationToken } from '../helpers/setup';
-import { createPrepaidCardSafe } from '../helpers/data';
+import { createPrepaidCardSafe } from '../helpers/mocks';
 
 interface Context extends MirageTestContext {}
 

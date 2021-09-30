@@ -4,7 +4,7 @@ import { click, render, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
-import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/data';
+import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/mocks';
 
 module(
   'Integration | Component | card-pay/create-merchant/prepaid-card-choice-card-picker edge cases',

@@ -1,7 +1,7 @@
 import {
   getFilenameFromDid,
   defaultCreatedPrepaidCardDID,
-} from '../tests/helpers/data';
+} from '../tests/helpers/mocks';
 
 export default function () {
   this.namespace = 'api';
