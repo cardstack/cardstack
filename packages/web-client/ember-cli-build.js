@@ -10,6 +10,15 @@ process.env.EMBROIDER_REBUILD_ADDONS = '@cardstack/boxel';
 module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
     'ember-power-select': { theme: false },
+    svgJar: {
+      optimizer: {
+        plugins: [
+          {
+            cleanupIDs: false,
+          },
+        ],
+      },
+    },
   });
 
   app.import('node_modules/broadcastchannel-polyfill/index.js');
