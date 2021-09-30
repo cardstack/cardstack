@@ -1,5 +1,5 @@
-<aside class='workflow-tracker' {{on-click-outside @close ignoreSelector="[data-workflow-tracker-toggle]"}}>
-  <header class='workflow-tracker__heading' aria-label="Active workflows"> {{!-- label is because of linter --}}
+<aside {{did-insert this.getScrollPosition}} class='workflow-tracker' {{on-click-outside @close ignoreSelector="[data-workflow-tracker-toggle]"}}>
+  <header class={{cn "workflow-tracker__heading" workflow-tracker__heading--scrolled=this.isScrolled}} aria-label="Active workflows"> {{!-- label is because of linter --}}
     {{svg-jar 'task-active' class='workflow-tracker__heading-icon'}}
     Active workflows
     <span
@@ -9,7 +9,7 @@
       {{this.workflowPersistence.activeWorkflows.length}}
     </span>
   </header>
-  <ul class="workflow-tracker__list">
+  <ul id="active-list" class="workflow-tracker__list">
     {{#each this.workflowPersistence.activeWorkflows as |workflowMeta|}}
       <li data-test-active-workflow class="workflow-tracker__li">
         <CardPay::Header::WorkflowTracker::Item
