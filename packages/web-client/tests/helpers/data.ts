@@ -54,6 +54,15 @@ export const createPrepaidCardCustomization = async (options: {
 };
 
 /**
+ * This is a hardcoded DID for prepaid cards that are newly created via a POST /prepaid-card-customizations request intercepted by mirage
+ */
+export const defaultCreatedPrepaidCardDID = encodeDID({
+  type: 'PrepaidCardCustomization',
+  version: 1,
+  uniqueId: '75218c05-3899-46d6-b431-e7237ba293ca',
+});
+
+/**
  * Note that this function is only assuming use with DAI and CARD
  * and is used mostly for `token.symbol` and `balance`
  */
@@ -119,7 +128,7 @@ const defaultPrepaidCardSafe: PrepaidCardSafe = {
   transferrable: true,
 };
 /**
- * Defaults create a freshly created prepaid card with a default customization and 1000 SPEND:
+ * Defaults create a freshly created prepaid card without customization and 1000 SPEND:
  * ```
  * {
  *   address: 'DEFAULT_PREPAID_CARD_ADDRESS', // should be overwritten in factory

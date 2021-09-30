@@ -32,6 +32,7 @@ import {
   createDepotSafe,
   createPrepaidCardSafe,
   createSafeToken,
+  defaultCreatedPrepaidCardDID,
 } from '../helpers/data';
 
 interface Context extends MirageTestContext {}
@@ -524,8 +525,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       spendFaceValue: 10000,
       prepaidCardOwner: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
       issuer: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
-      customizationDID:
-        'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+      customizationDID: defaultCreatedPrepaidCardDID,
     });
     // @ts-ignore
     delete prepaidCardSafe.createdAt;
@@ -547,7 +547,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         background: '#37EB77',
         id: '4f219852-33ee-4e4c-81f7-76318630a423',
       },
-      did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+      did: defaultCreatedPrepaidCardDID,
       issuerName: 'JJ',
       layer2WalletAddress: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
       pattern: {

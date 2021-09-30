@@ -1,5 +1,7 @@
-import { encodeDID } from '@cardstack/did-resolver';
-import { getFilenameFromDid } from '../tests/helpers/data';
+import {
+  getFilenameFromDid,
+  defaultCreatedPrepaidCardDID,
+} from '../tests/helpers/data';
 
 export default function () {
   this.namespace = 'api';
@@ -33,17 +35,13 @@ export default function () {
     return schema.prepaidCardPatterns.all();
   });
 
+  /**
+   * This is hardcoded to create a fixed id.
+   */
   this.post('/prepaid-card-customizations', async function (schema) {
-    let prepaidCardCustomizationId = '75218c05-3899-46d6-b431-e7237ba293ca';
-    let did = encodeDID({
-      type: 'PrepaidCardCustomization',
-      uniqueId: prepaidCardCustomizationId,
-      version: 1,
-    });
-
     let customization = schema.create('prepaid-card-customization', {
-      id: await getFilenameFromDid(did),
-      did,
+      id: await getFilenameFromDid(defaultCreatedPrepaidCardDID),
+      did: defaultCreatedPrepaidCardDID,
       ...this.normalizedRequestAttrs(),
     });
 
