@@ -1,28 +1,55 @@
-import { default as Service } from '@ember/service';
+import { default as Service, inject as service } from '@ember/service';
+import { tracked } from '@glimmer/tracking';
+import RouterService from '@ember/routing/router-service';
 import { MockLocalStorage } from '../utils/browser-mocks';
 import config from '../config/environment';
+import { WorkflowName } from '../models/workflow';
+import { WORKFLOW_NAMES } from '@cardstack/web-client/models/workflow';
+import { WorkflowMeta } from '@cardstack/web-client/models/workflow/workflow-session';
 
-interface WorkflowPersistencePersistedData {
+export interface WorkflowPersistencePersistedData {
   name: string;
   state: any;
 }
+export interface WorkflowPersistenceMeta extends WorkflowMeta {
+  id: string;
+  name: string;
+}
+
+const WORKFLOW_NAMES_KEYS = Object.keys(WORKFLOW_NAMES);
+
+const STORAGE_KEY_PREFIX = 'workflowPersistence';
 
 export default class WorkflowPersistence extends Service {
-  storage!: Storage | MockLocalStorage;
+  @service declare router: RouterService;
+
+  #storage!: Storage | MockLocalStorage;
+
+  @tracked persistedDataIds: string[] = [];
 
   constructor() {
     super(...arguments);
+
+    let entries;
+
     if (config.environment === 'test') {
-      this.storage = new MockLocalStorage();
+      this.#storage = new MockLocalStorage();
+      entries = this.#storage.entries;
     } else {
-      this.storage = window.localStorage;
+      this.#storage = window.localStorage;
+      entries = this.#storage;
     }
+
+    this.persistedDataIds = Object.keys(entries)
+      .filter((key) => key.startsWith(`${STORAGE_KEY_PREFIX}:`))
+      .map((key) => key.replace(`${STORAGE_KEY_PREFIX}:`, ''));
   }
 
-  getPersistedData(workflowPersistenceId: string) {
+  getPersistedData(
+    workflowPersistenceId: string
+  ): WorkflowPersistencePersistedData {
     return JSON.parse(
-      this.storage.getItem(`workflowPersistence:${workflowPersistenceId}`) ||
-        '{}'
+      this.#storage.getItem(constructStorageKey(workflowPersistenceId)) || '{}'
     );
   }
 
@@ -30,11 +57,104 @@ export default class WorkflowPersistence extends Service {
     workflowPersistenceId: string,
     data: WorkflowPersistencePersistedData
   ) {
-    return this.storage.setItem(
-      `workflowPersistence:${workflowPersistenceId}`,
+    if (this.persistedDataIds.includes(workflowPersistenceId)) {
+      // Ensure WorkflowTracker::Item updates as well
+      this.persistedDataIds = [...this.persistedDataIds];
+    } else {
+      this.persistedDataIds = [...this.persistedDataIds, workflowPersistenceId];
+    }
+
+    return this.#storage.setItem(
+      constructStorageKey(workflowPersistenceId),
       JSON.stringify(data)
     );
   }
+
+  get allValidWorkflows() {
+    return this.persistedDataIds
+      .reduce((workflows, id) => {
+        let workflow = this.getPersistedData(id);
+
+        if (
+          workflow &&
+          WORKFLOW_NAMES_KEYS.includes(workflow.name) &&
+          workflow.state &&
+          workflow.state.meta
+        ) {
+          let meta = parseMeta(workflow);
+
+          if (meta.milestonesCount && meta.completedMilestonesCount) {
+            workflows.push({ ...meta, id, name: workflow.name });
+          }
+        }
+
+        return workflows;
+      }, [] as WorkflowPersistenceMeta[])
+      .sortBy('updatedAt')
+      .reverse();
+  }
+
+  get activeWorkflows() {
+    return this.allValidWorkflows.filter(
+      (meta) => meta.completedMilestonesCount! < meta.milestonesCount!
+    );
+  }
+
+  get completedWorkflows() {
+    return this.allValidWorkflows.filter(
+      (meta) =>
+        meta.milestonesCount &&
+        meta.completedMilestonesCount === meta.milestonesCount
+    );
+  }
+
+  visitPersistedWorkflow(workflowPersistenceId: string) {
+    let data = this.getPersistedData(workflowPersistenceId);
+    let workflowName = data.name as WorkflowName;
+    let route, flow;
+
+    if (workflowName === 'PREPAID_CARD_ISSUANCE') {
+      route = 'balances';
+      flow = 'issue-prepaid-card';
+    } else if (workflowName === 'MERCHANT_CREATION') {
+      route = 'merchant-services';
+      flow = 'create-merchant';
+    } else if (workflowName === 'RESERVE_POOL_DEPOSIT') {
+      route = 'token-suppliers';
+      flow = 'deposit';
+    } else if (workflowName === 'WITHDRAWAL') {
+      route = 'token-suppliers';
+      flow = 'withdrawal';
+    }
+
+    this.router.transitionTo(`card-pay.${route}`, {
+      queryParams: {
+        flow,
+        'flow-id': workflowPersistenceId,
+      },
+    });
+  }
+
+  clear() {
+    this.persistedDataIds = [];
+    this.#storage.clear();
+  }
+
+  clearWorkflowWithId(workflowPersistenceId: string) {
+    this.persistedDataIds = this.persistedDataIds.without(
+      workflowPersistenceId
+    );
+    const prefixedId = constructStorageKey(workflowPersistenceId);
+    this.#storage.removeItem(prefixedId);
+  }
+}
+
+export function constructStorageKey(workflowPersistenceId: string) {
+  return `${STORAGE_KEY_PREFIX}:${workflowPersistenceId}`;
+}
+
+function parseMeta(data: WorkflowPersistencePersistedData) {
+  return JSON.parse(data.state.meta).value;
 }
 
 declare module '@ember/service' {

@@ -1,0 +1,56 @@
+<aside class='workflow-tracker' {{on-click-outside @close ignoreSelector="[data-workflow-tracker-toggle]"}}>
+  <header class='workflow-tracker__heading' aria-label="Active workflows"> {{!-- label is because of linter --}}
+    {{svg-jar 'task-active' class='workflow-tracker__heading-icon'}}
+    Active workflows
+    <span
+      class='workflow-tracker__count'
+      data-test-active-workflow-count
+    >
+      {{this.workflowPersistence.activeWorkflows.length}}
+    </span>
+  </header>
+  <ul class="workflow-tracker__list">
+    {{#each this.workflowPersistence.activeWorkflows as |workflowMeta|}}
+      <li data-test-active-workflow class="workflow-tracker__li">
+        <CardPay::Header::WorkflowTracker::Item
+          @workflowMeta={{workflowMeta}}
+          @closeList={{@close}}
+          class="workflow-tracker__li-content"
+        />
+      </li>
+    {{/each}}
+  </ul>
+  {{#if this.workflowPersistence.completedWorkflows}}
+    <header class='workflow-tracker__heading' aria-label="Completed workflows">
+      {{svg-jar 'task-completed' class='workflow-tracker__heading-icon'}}
+      Completed workflows
+      <span
+        class='workflow-tracker__count'
+        data-test-completed-workflow-count
+      >
+        {{this.workflowPersistence.completedWorkflows.length}}
+      </span>
+    </header>
+    <ul class="workflow-tracker__list">
+      {{#each this.workflowPersistence.completedWorkflows as |workflowMeta|}}
+        <li data-test-completed-workflow class="workflow-tracker__li">
+          <CardPay::Header::WorkflowTracker::Item
+            @workflowMeta={{workflowMeta}}
+            @closeList={{@close}}
+            class="workflow-tracker__li-content"
+          />
+        </li>
+      {{/each}}
+    </ul>
+    <footer class="workflow-tracker__footer">
+      <Boxel::Button
+        class="workflow-tracker__footer-cta"
+        @kind='secondary-dark'
+        {{on 'click' this.clearCompletedWorkflows}}
+        data-test-workflow-tracker-clear-completed
+      >
+        Clear Completed
+      </Boxel::Button>
+    </footer>
+  {{/if}}
+</aside>
