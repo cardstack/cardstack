@@ -1,33 +1,57 @@
 .workflow-tracker__toggle {
-  min-width: 60px;
+  min-width: 3.75rem;
   padding: var(--boxel-sp-xxxs);
 }
 
 .workflow-tracker {
   --workflow-tracker-max-width: 18.125rem;
+  --workflow-tracker-max-height: 75vh;
+  --workflow-tracker-header-height: 3rem;
+  --workflow-tracker-footer-height: 4rem;
+  --workflow-tracker-background: var(--boxel-purple-500);
 
   width: 100%;
   max-width: var(--workflow-tracker-max-width);
   min-height: var(--workflow-tracker-max-width);
-  position: absolute;
+  max-height: var(--workflow-tracker-max-height);
+  position: fixed;
   top: 6rem;
   right: var(--boxel-sp-lg);
-  background-color: var(--boxel-purple-500);
+  background-color: var(--workflow-tracker-background);
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: var(--boxel-border-radius);
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.35);
   color: var(--boxel-light);
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp);
+  overflow-y: auto;
 }
 
-.workflow-tracker > * + * {
-  margin-top: var(--boxel-sp-sm);
-  border-top: 2px solid var(--boxel-purple-700);
+.workflow-tracker__heading {
+  height: var(--workflow-tracker-header-height);
+  position: sticky;
+  top: 0;
+  background-color: var(--workflow-tracker-background);
+  display: flex;
+  align-items: center;
+  column-gap: var(--boxel-sp-xs);
+  padding: var(--boxel-sp-sm) var(--boxel-sp-xs);
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+  z-index: 1;
 }
 
 .workflow-tracker__list {
   padding: 0 var(--boxel-sp);
+  min-height: calc(var(--workflow-tracker-max-height) - var(--workflow-tracker-header-height) - var(--workflow-tracker-footer-height));
+}
+
+.workflow-tracker__list:not(:last-of-type) {
+  /* placing the border here and not on the header,
+  so that it's not visible when header is sticky */
+  padding-bottom: var(--boxel-sp-sm);
+  border-bottom: 2px solid var(--boxel-purple-700);
 }
 
 .workflow-tracker__li + .workflow-tracker__li .workflow-tracker__li-content {
@@ -47,16 +71,6 @@
   margin-right: var(--boxel-sp-xxxs);
 }
 
-.workflow-tracker__heading {
-  display: flex;
-  align-items: center;
-  column-gap: var(--boxel-sp-xs);
-  padding: var(--boxel-sp-sm) var(--boxel-sp-xs);
-  font: 600 var(--boxel-font-xs);
-  letter-spacing: var(--boxel-lsp-xl);
-  text-transform: uppercase;
-}
-
 .workflow-tracker__heading-icon {
   --icon-color: var(--boxel-light);
 }
@@ -68,6 +82,7 @@
 }
 
 .workflow-tracker__footer {
+  height: var(--workflow-tracker-footer-height);
   padding: var(--boxel-sp-sm) var(--boxel-sp-xs);
   text-align: center;
 }
