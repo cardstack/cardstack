@@ -46,8 +46,7 @@ export function makeTransaction(event: ethereum.Event): void {
 
 export function makeEOATransaction(event: ethereum.Event, address: string, safe: string | null = null): void {
   makeTransaction(event);
-  let accountEntity = new Account(address);
-  accountEntity.save();
+  makeAccount(address);
 
   let txnHash = event.transaction.hash.toHex();
   let entity = new EOATransaction(txnHash + '-' + address);
@@ -100,7 +99,7 @@ export function makePrepaidCardPayment(
     prepaidCardEntity.save();
   } else {
     log.warning(
-      'Cannot process merchant payment txn {}: PrepaidCard entity does not exist for prepaid card {}. This is likely due to the subgraph having a startBlock that is higher than the block the prepaid card was created in.',
+      'Cannot process payment txn {}: PrepaidCard entity does not exist for prepaid card {}. This is likely due to the subgraph having a startBlock that is higher than the block the prepaid card was created in.',
       [txnHash, prepaidCard]
     );
     return;
@@ -159,6 +158,12 @@ export function makePrepaidCardPayment(
   }
 }
 
+export function makeAccount(address: string): Account {
+  let accountEntity = new Account(address);
+  accountEntity.save();
+  return accountEntity;
+}
+
 export function getPrepaidCardFaceValue(prepaidCard: string): BigInt {
   let prepaidCardMgr = PrepaidCardManager.bind(Address.fromString(addresses.get('prepaidCardManager') as string));
   let cardDetails = prepaidCardMgr.cardDetails(Address.fromString(prepaidCard));
@@ -167,6 +172,11 @@ export function getPrepaidCardFaceValue(prepaidCard: string): BigInt {
   let issuingTokenBalance = tokenContract.balanceOf(Address.fromString(prepaidCard));
   let faceValue = convertToSpend(issuingToken, issuingTokenBalance);
   return faceValue;
+}
+
+export function getPrepaidCardOwner(prepaidCard: string): Address {
+  let prepaidCardMgr = PrepaidCardManager.bind(Address.fromString(addresses.get('prepaidCardManager') as string));
+  return prepaidCardMgr.getPrepaidCardOwner(Address.fromString(prepaidCard));
 }
 
 export function toChecksumAddress(address: Address): string {
