@@ -111,6 +111,12 @@ const safeQueryFields = `
       id
     }
   }
+  reward {
+    id
+    rewardee {
+      id
+    }
+  }
 `;
 
 const safeQuery = `
