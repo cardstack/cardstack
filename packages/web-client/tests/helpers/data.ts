@@ -4,6 +4,8 @@ import {
   DepotSafe,
 } from '@cardstack/cardpay-sdk/sdk/safes';
 import { BridgeableSymbol } from '@cardstack/web-client/utils/token';
+import { Resolver } from 'did-resolver';
+import { encodeDID, getResolver } from '@cardstack/did-resolver';
 import Web3 from 'web3';
 
 // The address generation is not for production use. web3 notes the following:
@@ -11,6 +13,45 @@ import Web3 from 'web3';
 // Take precautions to clear memory properly, store the private keys safely, and test transaction receiving and sending functionality properly before using in production!
 let web3Instance = new Web3();
 let generateAddress = () => web3Instance.eth.accounts.create().address;
+
+export const getFilenameFromDid = async (did: string) => {
+  let resolver = new Resolver({ ...getResolver() });
+  let resolvedDID = await resolver.resolve(did);
+  if (!resolvedDID?.didDocument?.alsoKnownAs) {
+    throw new Error('Could not resolve DID to filename');
+  }
+  let didAlsoKnownAs = resolvedDID.didDocument.alsoKnownAs[0];
+  return didAlsoKnownAs.split('/')[4].split('.')[0];
+};
+
+interface MirageIdentifiableCardCustomization {
+  id: string;
+  issuerName: string;
+  colorScheme: any;
+  pattern: any;
+}
+
+export const createPrepaidCardCustomization = async (options: {
+  issuerName: MirageIdentifiableCardCustomization['issuerName'];
+  colorScheme: MirageIdentifiableCardCustomization['colorScheme'];
+  pattern: MirageIdentifiableCardCustomization['pattern'];
+}): Promise<{
+  did: string;
+  customization: MirageIdentifiableCardCustomization;
+}> => {
+  let did = encodeDID({
+    type: 'PrepaidCardCustomization',
+    version: 10,
+  });
+
+  return {
+    did,
+    customization: {
+      ...options,
+      id: await getFilenameFromDid(did),
+    },
+  };
+};
 
 /**
  * Note that this function is only assuming use with DAI and CARD
@@ -78,7 +119,7 @@ const defaultPrepaidCardSafe: PrepaidCardSafe = {
   transferrable: true,
 };
 /**
- * Defaults create a freshly created prepaid card without customization and 1000 SPEND:
+ * Defaults create a freshly created prepaid card with a default customization and 1000 SPEND:
  * ```
  * {
  *   address: 'DEFAULT_PREPAID_CARD_ADDRESS', // should be overwritten in factory

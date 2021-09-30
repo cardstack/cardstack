@@ -5,11 +5,12 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
-import { encodeDID, getResolver } from '@cardstack/did-resolver';
-import { Resolver } from 'did-resolver';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
-import { createPrepaidCardSafe } from '../helpers/data';
+import {
+  createPrepaidCardCustomization,
+  createPrepaidCardSafe,
+} from '../helpers/data';
 
 interface Context extends MirageTestContext {}
 
@@ -37,10 +38,10 @@ module('Acceptance | card balances', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    let customizationDID = encodeDID({
-      type: 'PrepaidCardCustomization',
-      version: 10,
-      uniqueId: 'BA44CC48-E0CB-463C-919F-0A78A64EDCC4',
+    let { did, customization } = await createPrepaidCardCustomization({
+      issuerName: 'jortleby',
+      colorScheme: this.server.schema.first('prepaid-card-color-scheme'),
+      pattern: this.server.schema.all('prepaid-card-pattern').models[4],
     });
 
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
@@ -50,23 +51,13 @@ module('Acceptance | card balances', function (hooks) {
         spendFaceValue: 2324,
         prepaidCardOwner: layer2AccountAddress,
         issuer: layer2AccountAddress,
-        customizationDID,
+        customizationDID: did,
         reloadable: false,
         transferrable: false,
       }),
     ]);
 
-    let resolver = new Resolver({ ...getResolver() });
-    let resolvedDID = await resolver.resolve(customizationDID);
-    let didAlsoKnownAs = resolvedDID?.didDocument?.alsoKnownAs![0]!;
-    let customizationJsonFilename = didAlsoKnownAs.split('/')[4].split('.')[0];
-
-    this.server.create('prepaid-card-customization', {
-      id: customizationJsonFilename,
-      issuerName: 'jortleby',
-      colorScheme: this.server.schema.first('prepaid-card-color-scheme'),
-      pattern: this.server.schema.all('prepaid-card-pattern').models[4],
-    });
+    this.server.create('prepaid-card-customization', customization);
 
     await visit('/card-pay/balances');
 

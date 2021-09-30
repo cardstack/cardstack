@@ -1,5 +1,5 @@
-import { encodeDID, getResolver } from '@cardstack/did-resolver';
-import { Resolver } from 'did-resolver';
+import { encodeDID } from '@cardstack/did-resolver';
+import { getFilenameFromDid } from '../tests/helpers/data';
 
 export default function () {
   this.namespace = 'api';
@@ -41,13 +41,8 @@ export default function () {
       version: 1,
     });
 
-    let resolver = new Resolver({ ...getResolver() });
-    let resolvedDID = await resolver.resolve(did);
-    let didAlsoKnownAs = resolvedDID.didDocument.alsoKnownAs[0];
-    let customizationJsonFilename = didAlsoKnownAs.split('/')[4].split('.')[0];
-
     let customization = schema.create('prepaid-card-customization', {
-      id: customizationJsonFilename,
+      id: await getFilenameFromDid(did),
       did,
       ...this.normalizedRequestAttrs(),
     });
