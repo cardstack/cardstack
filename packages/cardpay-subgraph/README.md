@@ -60,7 +60,10 @@ If you have never performed a deploy then you will need to perform a first time 
 
 Once you have located your access token, from the `packages/cardpay-subgraph` directory execute:
 ```sh
-$ graph auth https://graph-admin.stack.cards <Cardstack access token>
+$ graph auth https://graph-admin-green.stack.cards <Cardstack access token>
+$ graph auth https://graph-admin-blue.stack.cards <Cardstack access token>
+$ graph auth https://graph-admin-green.cardstack.com <Cardstack access token>
+$ graph auth https://graph-admin-blue.cardstack.com <Cardstack access token>
 $ graph auth https://api.thegraph.com/deploy/ <The Graph access token>
 ```
 
