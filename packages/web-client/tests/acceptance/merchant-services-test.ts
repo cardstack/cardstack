@@ -5,9 +5,7 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { setupMirage } from 'ember-cli-mirage/test-support';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
-import { getResolver } from '@cardstack/did-resolver';
-import { Resolver } from 'did-resolver';
-import { createMerchantSafe } from '../helpers/data';
+import { createMerchantSafe, getFilenameFromDid } from '../helpers/data';
 
 interface Context extends MirageTestContext {}
 
@@ -46,13 +44,9 @@ module('Acceptance | merchant services dashboard', function (hooks) {
         '0x212619c6Ea074C053eF3f1e1eF81Ec8De6Eb6F33'
       ),
     ]);
-    let resolver = new Resolver({ ...getResolver() });
-    let resolvedDID = await resolver.resolve(EXAMPLE_DID);
-    let didAlsoKnownAs = resolvedDID?.didDocument?.alsoKnownAs![0]!;
-    let customizationJsonFilename = didAlsoKnownAs.split('/')[4].split('.')[0];
 
     this.server.create('merchant-info', {
-      id: customizationJsonFilename,
+      id: await getFilenameFromDid(EXAMPLE_DID),
       name: 'Mandello',
       slug: 'mandello1',
       did: EXAMPLE_DID,

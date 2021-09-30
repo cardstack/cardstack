@@ -11,11 +11,9 @@ import {
   roundAmountToNativeCurrencyDecimals,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
-import { getResolver } from '@cardstack/did-resolver';
-import { Resolver } from 'did-resolver';
 import config from '@cardstack/web-client/config/environment';
 import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-use-on-chain-constants';
-import { createMerchantSafe } from '../helpers/data';
+import { createMerchantSafe, getFilenameFromDid } from '../helpers/data';
 
 // selectors
 const MERCHANT = '[data-test-merchant]';
@@ -73,13 +71,8 @@ module('Acceptance | pay', function (hooks) {
         else return undefined;
       });
 
-    let resolver = new Resolver({ ...getResolver() });
-    let resolvedDID = await resolver.resolve(exampleDid);
-    let didAlsoKnownAs = resolvedDID?.didDocument?.alsoKnownAs![0]!;
-    let customizationJsonFilename = didAlsoKnownAs.split('/')[4].split('.')[0];
-
     this.server.create('merchant-info', {
-      id: customizationJsonFilename,
+      id: await getFilenameFromDid(exampleDid),
       name: merchantName,
       slug: 'mandello1',
       did: exampleDid,
