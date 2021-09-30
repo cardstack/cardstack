@@ -163,7 +163,7 @@ export default {
     mask: '[099999999999]{.}[00]',
     placeholder: '0.00',
     smallThreshold: 1,
-    symbol: 'CA$',
+    symbol: 'CAN$',
   },
   NZD: {
     alignment: 'left',
