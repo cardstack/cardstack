@@ -18,13 +18,13 @@
   border: 0;
 }
 
-.workflow-tracker-item:hover:not(:disabled) {
-  background-color: var(--boxel-purple-400);
-}
-
 .workflow-tracker-item:disabled {
   --workflow-tracker-item-color: var(--workflow-tracker-item-disabled-color);
   --workflow-tracker-item-milestone-color: var(--workflow-tracker-item-disabled-color);
+}
+
+.workflow-tracker-item:hover:not(:disabled) {
+  background-color: var(--boxel-purple-400);
 }
 
 .workflow-tracker-item__heading {
