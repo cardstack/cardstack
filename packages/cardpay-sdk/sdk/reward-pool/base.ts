@@ -187,7 +187,7 @@ export default class RewardPool {
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], tokenAddress);
     let symbol = await token.methods.symbol().call();
-    let balance = new BN(toWei(await token.methods.balanceOf(safeAddress).call()));
+    let balance = new BN(await token.methods.balanceOf(safeAddress).call());
     let weiAmount = new BN(toWei(amount));
     if (balance.lt(weiAmount)) {
       throw new Error(

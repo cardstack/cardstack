@@ -8,6 +8,7 @@ type Account @entity {
   createdPrepaidCards: [PrepaidCardCreation]!      @derivedFrom(field: "issuer")
   splitPrepaidCards: [PrepaidCardSplit]!           @derivedFrom(field: "issuer")
   createdMerchants: [MerchantCreation]!            @derivedFrom(field: "merchant")
+  createdRewardSafes: [RewardSafe]!                @derivedFrom(field: "rewardee")
   receivedPrepaidCards: [PrepaidCardTransfer]!     @derivedFrom(field: "to")
   provisionedPrepaidCards: [PrepaidCardProvisionedEvent]! @derivedFrom(field: "customer")
   sentPrepaidCards: [PrepaidCardTransfer]!         @derivedFrom(field: "from")
@@ -101,6 +102,8 @@ type PrepaidCardPayment @entity {
   historicPrepaidCardFaceValue: BigInt!
   historicPrepaidCardIssuingTokenBalance: BigInt!
   merchantRegistrationPayments: [MerchantRegistrationPayment]! @derivedFrom(field: "prepaidCardPayment")
+  rewardProgramRegistrationPayments: [RewardProgramRegistrationPayment]! @derivedFrom(field: "prepaidCardPayment")
+  rewardeeRegistrationPayments: [RewardeeRegistrationPayment]! @derivedFrom(field: "prepaidCardPayment")
 }
 
 type PrepaidCardSplit @entity {
@@ -311,6 +314,7 @@ type Safe @entity {
   safeTxns: [SafeTransaction]!              @derivedFrom(field: "safe")
   depot: Depot                              @derivedFrom(field: "safe")
   merchant: MerchantSafe                    @derivedFrom(field: "safe")
+  reward: RewardSafe                      @derivedFrom(field: "safe")
   prepaidCard: PrepaidCard                  @derivedFrom(field: "safe")
   tokens: [TokenHolder]!                    @derivedFrom(field: "safe")
   sentBridgedTokens: [BridgeToLayer1Event]! @derivedFrom(field: "safe")
@@ -393,6 +397,7 @@ type Transaction @entity {
   spendAccumulations: [SpendAccumulation]!         @derivedFrom(field: "transaction")
   merchantFeePayments: [MerchantFeePayment]!       @derivedFrom(field: "transaction")
   merchantClaims: [MerchantClaim]!                 @derivedFrom(field: "transaction")
+  rewardClaims: [RewardeeClaim]!                   @derivedFrom(field: "transaction")
   merchantRevenueEvents: [MerchantRevenueEvent]!   @derivedFrom(field: "transaction")
   tokenSwaps: [TokenSwap]!                         @derivedFrom(field: "transaction")
   prepaidCardInventoryEvents: [PrepaidCardInventoryEvent]! @derivedFrom(field: "transaction")
@@ -455,4 +460,58 @@ type TokenPair @entity {
   token0: Token!
   token1: Token!
   swaps: [TokenSwap]!             @derivedFrom(field: "tokenPair")
+}
+
+type RewardProgramRegistrationPayment @entity {
+  id: ID!
+  rewardProgram: RewardProgram!
+  admin: Account!
+  transaction: Transaction!
+  createdAt: BigInt!
+  prepaidCardPayment: PrepaidCardPayment!
+}
+
+type RewardeeRegistrationPayment @entity {
+  id: ID!
+  rewardProgram: RewardProgram!
+  rewardee: Account!
+  transaction: Transaction!
+  createdAt: BigInt!
+  prepaidCardPayment: PrepaidCardPayment!
+}
+
+type RewardProgram @entity {
+  id: ID!
+  admin: Account!
+  rewardSafes: [RewardSafe]! @derivedFrom(field: "rewardProgram")
+  tokenAddEvents: [RewardTokensAdd]! @derivedFrom(field: "rewardProgram")
+  rewardClaimEvents: [RewardeeClaim]! @derivedFrom(field: "rewardProgram")
+}
+
+type RewardSafe @entity {
+  id: ID!
+  rewardProgram: RewardProgram!
+  rewardee: Account!
+  safe: Safe!
+  claims: [RewardeeClaim]! @derivedFrom(field: "rewardSafe")
+}
+
+type RewardeeClaim @entity {
+  id: ID!
+  rewardProgram: RewardProgram!
+  rewardee: Account!
+  rewardSafe: RewardSafe!
+  amount: BigInt!
+  transaction: Transaction!
+  timestamp: BigInt!
+}
+
+type RewardTokensAdd @entity {
+  id: ID!
+  rewardProgram: RewardProgram!
+  safe: Safe!
+  token: Token!
+  amount: BigInt!
+  transaction: Transaction!
+  timestamp: BigInt!
 }

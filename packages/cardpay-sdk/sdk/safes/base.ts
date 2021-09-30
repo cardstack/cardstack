@@ -12,7 +12,7 @@ import { TransactionReceipt } from 'web3-core';
 import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from '../utils/general-utils';
 const { fromWei } = Web3.utils;
 
-export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
+export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | RewardSafe | ExternalSafe;
 interface BaseSafe {
   address: string;
   createdAt: number;
@@ -29,6 +29,12 @@ export interface MerchantSafe extends BaseSafe {
   merchant: string;
   infoDID?: string;
 }
+
+export interface RewardSafe extends BaseSafe {
+  type: 'reward';
+  rewardProgramId: string;
+}
+
 export interface ExternalSafe extends BaseSafe {
   type: 'external';
 }
@@ -105,6 +111,12 @@ const safeQueryFields = `
       id
     }
   }
+  reward {
+    id
+    rewardee {
+      id
+    }
+  }
 `;
 
 const safeQuery = `
@@ -172,7 +184,7 @@ export default class Safes {
           result.push(safeResult);
         } else if (safeResult.type === 'prepaid-card' && safeResult.spendFaceValue > 0) {
           result.push(safeResult);
-        } else if (safeResult.type === 'merchant' || safeResult.type === 'depot') {
+        } else if (safeResult.type === 'merchant' || safeResult.type === 'depot' || safeResult.type === 'reward') {
           result.push(safeResult);
         }
       }
@@ -398,6 +410,13 @@ interface GraphQLSafeResult {
       id: string;
     };
   };
+  reward: {
+    id: string;
+    rewardProgramId: string;
+    rewardee: {
+      id: string;
+    };
+  };
 }
 
 function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
@@ -467,6 +486,16 @@ function processSafeResult(safe: GraphQLSafeResult): Safe | undefined {
       owners,
     };
     return prepaidCard;
+  } else if (safe.reward) {
+    let reward: RewardSafe = {
+      type: 'reward',
+      address: safe.reward.id,
+      rewardProgramId: safe.reward.rewardProgramId,
+      tokens,
+      createdAt,
+      owners,
+    };
+    return reward;
   } else {
     let externalSafe: ExternalSafe = {
       type: 'external',
