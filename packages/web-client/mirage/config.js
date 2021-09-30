@@ -2,9 +2,24 @@ import {
   getFilenameFromDid,
   defaultCreatedPrepaidCardDID,
 } from '@cardstack/web-client/utils/test-factories';
+import supportedNativeCurrencies from '@cardstack/cardpay-sdk/sdk/native-currencies';
 
 export default function () {
   this.namespace = 'api';
+
+  this.get('/exchange-rates', function () {
+    return {
+      data: {
+        type: 'exchange-rates',
+        attributes: {
+          base: 'USD',
+          rates: Object.fromEntries(
+            Object.keys(supportedNativeCurrencies).map((k) => [k, 2])
+          ),
+        },
+      },
+    };
+  });
 
   this.post('/merchant-infos');
 

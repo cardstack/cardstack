@@ -26,6 +26,10 @@
   "web3": {
     "network": "NETWORK"
   },
+  "exchangeRates": {
+    "allowedDomains": "EXCHANGE_RATES_ALLOWED_DOMAINS",
+    "apiKey": "FIXER_API_KEY"
+  },
   "relay": {
     "provisionerSecret": "PROVISIONER_SECRET"
   },
