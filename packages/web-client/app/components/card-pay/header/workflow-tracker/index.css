@@ -8,6 +8,7 @@
 
   width: 100%;
   max-width: var(--workflow-tracker-max-width);
+  min-height: var(--workflow-tracker-max-width);
   position: absolute;
   top: 6rem;
   right: var(--boxel-sp-lg);
