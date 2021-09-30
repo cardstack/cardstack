@@ -29,14 +29,15 @@
   padding: 0 var(--boxel-sp);
 }
 
-.workflow-tracker__li .workflow-tracker__li-content {
+.workflow-tracker__li + .workflow-tracker__li .workflow-tracker__li-content {
   border-top: 1px solid var(--boxel-purple-600);
+  border-radius: 0;
 }
 
-.workflow-tracker__li:first-child .workflow-tracker__li-content,
 .workflow-tracker__li:hover .workflow-tracker__li-content:enabled,
 .workflow-tracker__li:hover + .workflow-tracker__li .workflow-tracker__li-content:enabled {
   border-top-color: transparent;
+  border-radius: var(--boxel-border-radius);
 }
 
 .workflow-tracker__toggle-icon {
