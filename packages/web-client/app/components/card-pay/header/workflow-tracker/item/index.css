@@ -40,6 +40,13 @@
   letter-spacing: var(--boxel-lsp-lg);
 }
 
+.workflow-tracker-item__heading,
+.workflow-tracker-item__milestone {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .workflow-tracker-item__icon {
   grid-area: icon;
   justify-self: flex-end;

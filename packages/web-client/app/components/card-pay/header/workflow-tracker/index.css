@@ -4,8 +4,12 @@
 }
 
 .workflow-tracker {
+  --workflow-tracker-max-width: 18.125rem;
+
+  width: 100%;
+  max-width: var(--workflow-tracker-max-width);
   position: absolute;
-  top: 80px;
+  top: 6rem;
   right: var(--boxel-sp-lg);
   background-color: var(--boxel-purple-500);
   border: 1px solid rgba(255, 255, 255, 0.25);
