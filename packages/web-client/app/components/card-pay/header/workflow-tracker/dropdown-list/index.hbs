@@ -1,4 +1,4 @@
-<aside tabindex="0" {{did-insert this.getScrollPosition}} class='workflow-tracker' {{on-click-outside @close ignoreSelector="[data-workflow-tracker-toggle]"}}>
+<aside tabindex="0" {{did-insert this.setEventListeners}} class='workflow-tracker' {{on-click-outside @close ignoreSelector="[data-workflow-tracker-toggle]"}}>
   <header class={{cn "workflow-tracker__heading" workflow-tracker__heading--scrolled=this.isScrolled}} aria-label="Active workflows"> {{!-- label is because of linter --}}
     {{svg-jar 'task-active' class='workflow-tracker__heading-icon'}}
     Active workflows
