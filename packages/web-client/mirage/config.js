@@ -1,7 +1,7 @@
 import {
   getFilenameFromDid,
   defaultCreatedPrepaidCardDID,
-} from '../tests/helpers/mocks';
+} from '@cardstack/web-client/tests/helpers/factories';
 
 export default function () {
   this.namespace = 'api';

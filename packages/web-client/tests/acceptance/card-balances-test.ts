@@ -10,7 +10,7 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import {
   createPrepaidCardCustomization,
   createPrepaidCardSafe,
-} from '../helpers/mocks';
+} from '@cardstack/web-client/tests/helpers/factories';
 
 interface Context extends MirageTestContext {}
 

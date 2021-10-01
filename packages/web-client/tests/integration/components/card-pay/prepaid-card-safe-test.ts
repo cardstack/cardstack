@@ -6,7 +6,7 @@ import hbs from 'htmlbars-inline-precompile';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { Response as MirageResponse } from 'ember-cli-mirage';
-import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/mocks';
+import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/factories';
 
 interface Context extends MirageTestContext {}
 

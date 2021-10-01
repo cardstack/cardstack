@@ -13,7 +13,7 @@ import {
   createMerchantSafe,
   createSafeToken,
   getFilenameFromDid,
-} from '@cardstack/web-client/tests/helpers/mocks';
+} from '@cardstack/web-client/tests/helpers/factories';
 
 interface Context extends MirageTestContext {
   safes: Safe[];

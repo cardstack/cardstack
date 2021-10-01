@@ -33,7 +33,7 @@ import {
   createPrepaidCardSafe,
   createSafeToken,
   defaultCreatedPrepaidCardDID,
-} from '../helpers/mocks';
+} from '@cardstack/web-client/tests/helpers/factories';
 
 interface Context extends MirageTestContext {}
 

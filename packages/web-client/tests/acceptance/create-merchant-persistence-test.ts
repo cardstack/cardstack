@@ -12,7 +12,7 @@ import {
   createMerchantSafe,
   createPrepaidCardSafe,
   createSafeToken,
-} from '../helpers/mocks';
+} from '@cardstack/web-client/tests/helpers/factories';
 
 interface Context extends MirageTestContext {}
 

@@ -5,7 +5,10 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { setupMirage } from 'ember-cli-mirage/test-support';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
-import { createMerchantSafe, getFilenameFromDid } from '../helpers/mocks';
+import {
+  createMerchantSafe,
+  getFilenameFromDid,
+} from '@cardstack/web-client/tests/helpers/factories';
 
 interface Context extends MirageTestContext {}
 

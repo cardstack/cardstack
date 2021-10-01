@@ -22,7 +22,7 @@ import {
   createDepotSafe,
   createMerchantSafe,
   createSafeToken,
-} from '../helpers/mocks';
+} from '@cardstack/web-client/tests/helpers/factories';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;

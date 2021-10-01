@@ -22,7 +22,7 @@ import { setupHubAuthenticationToken } from '../helpers/setup';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
-import { createPrepaidCardSafe } from '../helpers/mocks';
+import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/factories';
 
 interface Context extends MirageTestContext {}
 

@@ -13,7 +13,10 @@ import {
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/web-client/config/environment';
 import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-use-on-chain-constants';
-import { createMerchantSafe, getFilenameFromDid } from '../helpers/mocks';
+import {
+  createMerchantSafe,
+  getFilenameFromDid,
+} from '@cardstack/web-client/tests/helpers/factories';
 
 // selectors
 const MERCHANT = '[data-test-merchant]';
