@@ -138,6 +138,9 @@ interface APIVersionMap<T> {
 
 function getAPIVersion<T>(apiVersionMap: APIVersionMap<T>, protocolVersion: string): T {
   let availableApiVersions = Object.keys(apiVersionMap).sort().reverse();
+  if (protocolVersion === 'any') {
+    return apiVersionMap[availableApiVersions[0]];
+  }
   let satisfyingApiVersion: string | undefined;
   for (let possibleApiVersion of availableApiVersions) {
     // we'll use the ~ Tilde Range comparator which will permit patch version

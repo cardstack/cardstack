@@ -42,6 +42,7 @@ import HealthCheck from './services/health-check';
 import NonceTracker from './services/nonce-tracker';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
+import Web3Service from './services/web3';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import { CardstackError } from './utils/error';
@@ -91,6 +92,7 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('session-route', SessionRoute);
   registry.register('subgraph', SubgraphService);
   registry.register('worker-client', WorkerClient);
+  registry.register('web3', Web3Service);
   registry.register('wyre', WyreService);
   registry.register('wyre-callback-route', WyreCallbackRoute);
   if (registryCallback) {

@@ -13,6 +13,25 @@ const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
 let stubTimestamp = process.hrtime.bigint();
 let stubInventorySubgraph: () => InventorySubgraph;
+let defaultContractMethods = {
+  cardpayVersion() {
+    return {
+      async call() {
+        return Promise.resolve('any');
+      },
+    };
+  },
+};
+let contractPauseMethod = (isPaused: boolean) => ({
+  paused() {
+    return {
+      async call() {
+        return Promise.resolve(isPaused);
+      },
+    };
+  },
+});
+let stubMarketContract: () => any;
 
 class StubAuthenticationUtils {
   generateNonce() {
@@ -41,6 +60,26 @@ class StubSubgraph {
   }
 }
 
+class StubWeb3 {
+  getInstance() {
+    return {
+      eth: {
+        net: {
+          getId() {
+            return 77; // sokol network id
+          },
+        },
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Contract: class {
+          get methods() {
+            return stubMarketContract();
+          }
+        },
+      },
+    };
+  }
+}
+
 let stubUserAddress1 = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
 let stubUserAddress2 = '0xb21851B00bd13C008f703A21DFDd292b28A736b3';
 
@@ -65,6 +104,7 @@ describe('/api/reservations', function () {
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
         registry.register('subgraph', StubSubgraph);
+        registry.register('web3', StubWeb3);
       },
     });
     stubInventorySubgraph = () => ({
@@ -77,6 +117,11 @@ describe('/api/reservations', function () {
     db = await dbManager.getClient();
     await db.query(`DELETE FROM reservations`);
     await db.query(`DELETE FROM wallet_orders`);
+
+    stubMarketContract = () => ({
+      ...defaultContractMethods,
+      ...contractPauseMethod(false),
+    });
 
     request = supertest(server.app.callback());
   });
@@ -322,6 +367,54 @@ describe('/api/reservations', function () {
             },
           ],
         });
+
+      let { rows } = await db.query(`SELECT * FROM reservations`);
+      expect(rows.length).to.equal(0);
+    });
+
+    it(`returns 400 when contract is paused`, async function () {
+      stubMarketContract = () => ({
+        ...defaultContractMethods,
+        ...contractPauseMethod(true),
+      });
+
+      stubInventorySubgraph = () => ({
+        data: {
+          skuinventories: [
+            makeInventoryData('sku1', '100', toWei('1'), [
+              '0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC',
+              '0x04699Ff48CC6531727A12344c30F3eD1062Ff3ad',
+            ]),
+          ],
+        },
+      });
+
+      const payload = {
+        data: {
+          type: 'reservations',
+          attributes: {
+            sku: 'sku1',
+          },
+        },
+      };
+
+      await request
+        .post(`/api/reservations`)
+        .send(payload)
+        .set('Authorization', 'Bearer: abc123--def456--ghi789')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(400)
+        .expect({
+          errors: [
+            {
+              status: '400',
+              title: 'Contract paused',
+              detail: 'The market contract is paused',
+            },
+          ],
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
 
       let { rows } = await db.query(`SELECT * FROM reservations`);
       expect(rows.length).to.equal(0);

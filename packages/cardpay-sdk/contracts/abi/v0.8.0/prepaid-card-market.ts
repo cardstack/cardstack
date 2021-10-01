@@ -122,6 +122,19 @@ export default [
     inputs: [
       {
         indexed: false,
+        internalType: 'bool',
+        name: 'paused',
+        type: 'bool',
+      },
+    ],
+    name: 'PausedToggled',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
         internalType: 'address',
         name: 'prepaidCard',
         type: 'address',
@@ -372,6 +385,21 @@ export default [
   {
     constant: true,
     inputs: [],
+    name: 'paused',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'prepaidCardManagerAddress',
     outputs: [
       {
@@ -534,6 +562,21 @@ export default [
         type: 'bool',
       },
     ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'bool',
+        name: '_paused',
+        type: 'bool',
+      },
+    ],
+    name: 'setPaused',
+    outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
