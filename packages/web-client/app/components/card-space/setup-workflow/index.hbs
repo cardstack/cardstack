@@ -1,0 +1,25 @@
+{{#if this.workflow}}
+  <WorkflowThread class="card-space-setup-workflow" @workflow={{this.workflow}}>
+    <:before-content>
+      <Boxel::ExpandableBanner
+        @icon="info"
+        @summary=""
+        open
+      >
+        <div class="card-space-setup-workflow__banner">
+
+        </div>
+      </Boxel::ExpandableBanner>
+    </:before-content>
+  </WorkflowThread>
+{{/if}}
+<Listener
+  @emitter={{this.layer2Network}}
+  @event="disconnect"
+  @action={{this.onDisconnect}}
+/>
+<Listener
+  @emitter={{this.layer2Network}}
+  @event="account-changed"
+  @action={{this.onAccountChanged}}
+/>
