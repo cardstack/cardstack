@@ -36,6 +36,12 @@ export default class PrepaidCardMarket {
     return await prepaidCardAPI.resolvePrepaidCards(prepaidCardAddresses);
   }
 
+  async isPaused(marketAddress?: string): Promise<boolean> {
+    marketAddress = marketAddress ?? (await getAddress('prepaidCardMarket', this.layer2Web3));
+    let contract = new this.layer2Web3.eth.Contract(PrepaidCardMarketABI as AbiItem[], marketAddress);
+    return await contract.methods.paused().call();
+  }
+
   async getSKUInfo(
     sku: string,
     marketAddress?: string
