@@ -698,10 +698,11 @@ This method returns a promise for a web3 transaction receipt.
 The `RewardPool` API is used to interact with tally (an offchain service similar to relayer) and the reward pool contract. As customers use their prepaid card they will be given rewards based the amount of spend they use and a reward-based algorithm.
 
 ### `RewardPool.rewardTokenBalance`
-This call returns the balance of a token in the RewardPool for prepaid card owners address. This function takes in a parameter of the prepaid card owner address and the reward token address. This balance also accounts for the claims of a prepaid card owner in the past. The tokens that are part of the rewards are CARDPXD and DAICPXD -- federated tokens of the card protocol.
+This call returns the balance of a token in the RewardPool for prepaid card owners address. This function takes in a parameter of the prepaid card owner address and , reward token address, and reward program id. This balance also accounts for the claims of a prepaid card owner in the past. The tokens that are part of the rewards are CARDPXD and DAICPXD -- federated tokens of the card protocol.
 
 ```ts
 interface RewardTokenBalance {
+  rewardProgramId: string,
   tokenSymbol: string;
   tokenAddress: string;
   balance: BN;
@@ -709,9 +710,9 @@ interface RewardTokenBalance {
 ```
 
 ```js
-let balanceForSingleToken = await rewardPool.rewardTokenBalance(address, tokenAddress);
+let balanceForSingleToken = await rewardPool.rewardTokenBalance(address, tokenAddress, rewardProgramId);
 //You can also use rewardTokenBalances()
-let balanceForAllTokens = await rewardPool.rewardTokenBalances(address)
+let balanceForAllTokens = await rewardPool.rewardTokenBalances(address, rewardProgramId)
 ```
 
 ## `RewardPool.addRewardTokens`
