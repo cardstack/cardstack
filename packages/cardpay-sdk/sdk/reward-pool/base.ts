@@ -28,7 +28,13 @@ interface Proof {
 const DEFAULT_PAGE_SIZE = 1000000;
 
 export interface RewardTokenBalance {
+  rewardProgramId: string;
   tokenAddress: string;
+  tokenSymbol: string;
+  balance: BN;
+}
+
+export interface ProofWithBalance extends Proof {
   tokenSymbol: string;
   balance: BN;
 }
@@ -58,6 +64,8 @@ export default class RewardPool {
     return await tokenContract.methods.balanceOf(rewardPoolAddress).call();
   }
 
+  // Utility function
+  // - it is important to use this if there are many reward tokens
   async rewardTokensAvailable(address: string, rewardProgramId?: string): Promise<string[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
     let url =
@@ -85,26 +93,65 @@ export default class RewardPool {
     limit?: number
   ): Promise<Proof[]> {
     let tallyServiceURL = await getConstant('tallyServiceURL', this.layer2Web3);
-    let url =
-      `${tallyServiceURL}/merkle-proofs/${address}` +
-      (tokenAddress ? `?token_address=${tokenAddress}` : '') +
-      (rewardProgramId ? `&reward_program_id=${rewardProgramId}` : '') +
-      (offset ? `&offset=${offset}` : '') +
-      (limit ? `&limit=${limit}` : `&limit=${DEFAULT_PAGE_SIZE}`);
+    let url = new URL(`${tallyServiceURL}/merkle-proofs/${address}`);
+    if (tokenAddress) {
+      url.searchParams.append('token_address', tokenAddress);
+    }
+    if (rewardProgramId) {
+      url.searchParams.append('reward_program_id', rewardProgramId);
+    }
+    if (offset) {
+      url.searchParams.append('offset', offset.toString());
+    }
+    url.searchParams.append('limit', limit ? limit.toString() : DEFAULT_PAGE_SIZE.toString());
     let options = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
       },
     };
-    let response = await fetch(url, options);
+    let response = await fetch(url.toString(), options);
     let json = await response.json();
-    let count = json['count'];
-    console.log(`Total of ${count} proofs retrieved for payee ${address} for token ${tokenAddress}`);
     if (!response?.ok) {
       throw new Error(await response.text());
     }
     return json['results'];
+  }
+
+  async getProofsWithBalance(
+    address: string,
+    rewardProgramId?: string,
+    tokenAddress?: string
+  ): Promise<ProofWithBalance[]> {
+    let rewardPool = await this.getRewardPool();
+    let proofs = await this.getProofs(address, tokenAddress, rewardProgramId);
+    const tokenAddresses = [...new Set(proofs.map((item) => item.tokenAddress))];
+    let tokenMapping = await this.tokenSymbolMapping(tokenAddresses);
+    return await Promise.all(
+      proofs.map(async (o: Proof) => {
+        const balance = await rewardPool.methods
+          .balanceForProofWithAddress(o.rewardProgramId, o.tokenAddress, address, o.proof)
+          .call();
+        return {
+          ...o,
+          balance: new BN(balance),
+          tokenSymbol: tokenMapping[o.tokenAddress],
+        };
+      })
+    );
+  }
+
+  async getProofsWithNonZeroBalance(
+    address: string,
+    tokenAddress?: string,
+    rewardProgramId?: string
+  ): Promise<ProofWithBalance[]> {
+    const proofsWithBalance = await this.getProofsWithBalance(address, rewardProgramId, tokenAddress);
+    return proofsWithBalance
+      .filter(({ balance }) => {
+        return balance.gt(new BN(0));
+      })
+      .sort(compare);
   }
 
   async rewardTokenBalance(
@@ -127,23 +174,58 @@ export default class RewardPool {
           .balanceForProofWithAddress(o.rewardProgramId, o.tokenAddress, address, o.proof)
           .call();
         return {
+          rewardProgramId: o.rewardProgramId,
           tokenAddress: o.tokenAddress,
           tokenSymbol,
           balance: new BN(balance),
         };
       })
     );
-    return aggregateBalance(ungroupedTokenBalance);
+    return ungroupedTokenBalance.reduce(
+      (accum, { tokenAddress, tokenSymbol, balance, rewardProgramId }: RewardTokenBalance) => {
+        return {
+          rewardProgramId,
+          tokenAddress,
+          tokenSymbol,
+          balance: accum.balance.add(balance),
+        };
+      }
+    );
   }
 
   async rewardTokenBalances(address: string, rewardProgramId?: string): Promise<RewardTokenBalance[]> {
-    let rewardTokensAvailable = await this.rewardTokensAvailable(address, rewardProgramId);
-    const ungroupedTokenBalance = await Promise.all(
-      rewardTokensAvailable.map(async (tokenAddress: string) => {
-        return this.rewardTokenBalance(address, tokenAddress, rewardProgramId);
-      })
-    );
-    return ungroupedTokenBalance;
+    let rewardPool = await this.getRewardPool();
+    if (rewardProgramId) {
+      let rewardTokensAvailable = await this.rewardTokensAvailable(address, rewardProgramId);
+      return await Promise.all(
+        rewardTokensAvailable.map(async (tokenAddress: string) => {
+          return this.rewardTokenBalance(address, tokenAddress, rewardProgramId);
+        })
+      );
+    } else {
+      let proofs = await this.getProofs(address);
+      let ungroupedTokenBalanceWithoutSymbol = await Promise.all(
+        proofs.map(async (o: Proof) => {
+          const balance = await rewardPool.methods
+            .balanceForProofWithAddress(o.rewardProgramId, o.tokenAddress, address, o.proof)
+            .call();
+          return {
+            tokenAddress: o.tokenAddress,
+            rewardProgramId: o.rewardProgramId,
+            balance: new BN(balance),
+          };
+        })
+      );
+      const tokenAddresses = [...new Set(ungroupedTokenBalanceWithoutSymbol.map((item) => item.tokenAddress))];
+      let tokenMapping = await this.tokenSymbolMapping(tokenAddresses);
+      let ungroupedTokenBalance = ungroupedTokenBalanceWithoutSymbol.map((o) => {
+        return {
+          ...o,
+          tokenSymbol: tokenMapping[o.tokenAddress],
+        };
+      });
+      return aggregateBalance(ungroupedTokenBalance);
+    }
   }
 
   async addRewardTokens(txnHash: string): Promise<TransactionReceipt>;
@@ -343,6 +425,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     let tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let tokenSymbol = await tokenContract.methods.symbol().call();
     return {
+      rewardProgramId,
       tokenAddress,
       tokenSymbol,
       balance: new BN(balance),
@@ -360,6 +443,20 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     return token.methods.transferAndCall(rewardPoolAddress, amount, data).encodeABI();
   }
 
+  private async tokenSymbolMapping(tokenAddresses: string[]): Promise<any> {
+    let o = {};
+    await Promise.all(
+      tokenAddresses.map(async (tokenAddress: string) => {
+        const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+        const tokenSymbol = await tokenContract.methods.symbol().call();
+        o = {
+          ...o,
+          [tokenAddress]: tokenSymbol,
+        };
+      })
+    );
+    return o;
+  }
   private async getRewardPool(): Promise<Contract> {
     if (this.rewardPool) {
       return this.rewardPool;
@@ -372,12 +469,28 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
   }
 }
 
-const aggregateBalance = (arr: RewardTokenBalance[]): RewardTokenBalance => {
-  return arr.reduce((accum, { tokenAddress, tokenSymbol, balance }: RewardTokenBalance) => {
-    return {
-      tokenAddress,
-      tokenSymbol,
-      balance: accum.balance.add(balance),
-    };
+const aggregateBalance = (arr: RewardTokenBalance[]): RewardTokenBalance[] => {
+  let output: RewardTokenBalance[] = [];
+  arr.forEach(function (item) {
+    let existing = output.filter(function (v) {
+      return v.rewardProgramId == item.rewardProgramId && v.tokenAddress == item.tokenAddress;
+    });
+    if (existing.length) {
+      var existingIndex = output.indexOf(existing[0]);
+      output[existingIndex].balance = output[existingIndex].balance.add(item.balance);
+    } else {
+      output.push(item);
+    }
   });
+  return output;
 };
+
+function compare(a: ProofWithBalance, b: ProofWithBalance) {
+  if (a.balance.lt(b.balance)) {
+    return 1;
+  }
+  if (a.balance.gt(b.balance)) {
+    return -1;
+  }
+  return 0;
+}

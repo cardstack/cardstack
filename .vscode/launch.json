@@ -775,6 +775,26 @@
         "--mnemonic",
         "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
       ]
-    }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Get Claimable Reward Proofs",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "claimable-reward-proofs",
+        "0x159ADe032073d930E85f95AbBAB9995110c43C71", // Justin's address
+        // "--rewardProgramId",
+        // "0x4767D0D74356433d54880Fcd7f083751d64388aF",
+        // "--tokenAddress",
+        // "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },
   ]
 }
