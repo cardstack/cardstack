@@ -9,10 +9,12 @@ import { getSKUSummaries } from './utils/inventory';
 import { validate as validateUUID } from 'uuid';
 import * as Sentry from '@sentry/node';
 import { captureSentryMessage } from './utils/sentry';
+import { getSDK } from '@cardstack/cardpay-sdk';
 
 export default class ReservationsRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   subgraph = inject('subgraph');
+  web3 = inject('web3');
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
   constructor() {
@@ -64,11 +66,32 @@ export default class ReservationsRoute {
     if (!validateRequiredFields(ctx, { requiredAttributes: ['sku'] })) {
       return;
     }
+
     let userAddress = ctx.state.userAddress.toLowerCase();
     let sku = ctx.request.body.data.attributes.sku;
     Sentry.addBreadcrumb({ message: `received reservation create: userAddress=${userAddress}, sku=${sku}` });
 
-    let skuSummaries = await getSKUSummaries(await this.databaseManager.getClient(), this.subgraph);
+    let prepaidCardMarket = await getSDK('PrepaidCardMarket', this.web3.getInstance());
+    if (await prepaidCardMarket.isPaused()) {
+      ctx.status = 400;
+      ctx.body = {
+        errors: [
+          {
+            status: '400',
+            title: 'Contract paused',
+            detail: `The market contract is paused`,
+          },
+        ],
+      };
+      ctx.type = 'application/vnd.api+json';
+      captureSentryMessage(
+        `Cannot create reservation for ${userAddress} with sku ${sku}, the market contract is paused`,
+        ctx
+      );
+      return;
+    }
+
+    let skuSummaries = await getSKUSummaries(await this.databaseManager.getClient(), this.subgraph, this.web3);
     let skuSummary = skuSummaries.find((summary) => summary.id === sku);
     if (skuSummary?.attributes?.quantity === 0) {
       ctx.status = 400;

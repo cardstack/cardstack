@@ -83,7 +83,7 @@ export default class OrdersRoute {
       Sentry.addBreadcrumb({ message: `provisioning prepaid card for reservationId=${reservationId}` });
       try {
         await provisionPrepaidCard(db, this.relay, this.subgraph, reservationId);
-      } catch (err) {
+      } catch (err: any) {
         let message = `Could not provision prepaid card for reservationId ${reservationId}! Received error from relay server: ${err.toString()}`;
         log.error(message, err);
         captureSentryMessage(message, ctx);

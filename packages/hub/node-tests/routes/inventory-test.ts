@@ -11,6 +11,25 @@ const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
 let stubTimestamp = process.hrtime.bigint();
 let stubInventorySubgraph: () => InventorySubgraph;
+let defaultContractMethods = {
+  cardpayVersion() {
+    return {
+      async call() {
+        return Promise.resolve('any');
+      },
+    };
+  },
+};
+let contractPauseMethod = (isPaused: boolean) => ({
+  paused() {
+    return {
+      async call() {
+        return Promise.resolve(isPaused);
+      },
+    };
+  },
+});
+let stubMarketContract: () => any;
 
 class StubAuthenticationUtils {
   generateNonce() {
@@ -50,6 +69,26 @@ class StubSubgraph {
   }
 }
 
+class StubWeb3 {
+  getInstance() {
+    return {
+      eth: {
+        net: {
+          getId() {
+            return 77; // sokol network id
+          },
+        },
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Contract: class {
+          get methods() {
+            return stubMarketContract();
+          }
+        },
+      },
+    };
+  }
+}
+
 let stubUserAddress = '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13';
 let stubIssuer = '0xb21851B00bd13C008f703A21DFDd292b28A736b3';
 
@@ -71,6 +110,7 @@ describe('GET /api/inventory', function () {
       registryCallback(registry: Registry) {
         registry.register('authentication-utils', StubAuthenticationUtils);
         registry.register('subgraph', StubSubgraph);
+        registry.register('web3', StubWeb3);
       },
     });
 
@@ -78,6 +118,11 @@ describe('GET /api/inventory', function () {
     db = await dbManager.getClient();
     await db.query(`DELETE FROM reservations`);
     await db.query(`DELETE FROM wallet_orders`);
+
+    stubMarketContract = () => ({
+      ...defaultContractMethods,
+      ...contractPauseMethod(false),
+    });
 
     request = supertest(server.app.callback());
   });
@@ -143,6 +188,75 @@ describe('GET /api/inventory', function () {
               reloadable: false,
               transferrable: false,
               quantity: 1,
+            },
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it(`does not return inventory when contract paused`, async function () {
+    stubMarketContract = () => ({
+      ...defaultContractMethods,
+      ...contractPauseMethod(true),
+    });
+
+    stubInventorySubgraph = () => ({
+      data: {
+        skuinventories: [
+          makeInventoryData('sku1', '100', toWei('1'), [
+            '0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC',
+            '0x04699Ff48CC6531727A12344c30F3eD1062Ff3ad',
+          ]),
+          makeInventoryData(
+            'sku2',
+            '200',
+            toWei('2'),
+            ['0x483F081bB0C25A5B216D1A4BD9CE0196092A0575'],
+            'did:cardstack:test1'
+          ),
+        ],
+      },
+    });
+
+    await request
+      .get(`/api/inventories`)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        data: [
+          {
+            type: 'inventories',
+            id: 'sku1',
+            attributes: {
+              issuer: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              sku: 'sku1',
+              'issuing-token-symbol': 'DAI',
+              'issuing-token-address': '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
+              'face-value': 100,
+              'ask-price': toWei('1'),
+              'customization-DID': null,
+              reloadable: false,
+              transferrable: false,
+              quantity: 0,
+            },
+          },
+          {
+            type: 'inventories',
+            id: 'sku2',
+            attributes: {
+              issuer: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
+              sku: 'sku2',
+              'issuing-token-symbol': 'DAI',
+              'issuing-token-address': '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
+              'face-value': 200,
+              'ask-price': toWei('2'),
+              'customization-DID': 'did:cardstack:test1',
+              reloadable: false,
+              transferrable: false,
+              quantity: 0,
             },
           },
         ],

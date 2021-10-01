@@ -1,6 +1,8 @@
 import { Client as DBClient } from 'pg';
 import SubgraphService, { SKUInventory } from '../../services/subgraph';
 import * as JSONAPI from 'jsonapi-typescript';
+import Web3Service from '../../services/web3';
+import { getSDK } from '@cardstack/cardpay-sdk';
 
 const expirationMins = 60;
 const subgraphSyncGraceMins = 60;
@@ -12,10 +14,13 @@ interface SKUReservations {
 export async function getSKUSummaries(
   db: DBClient,
   subgraph: SubgraphService,
+  web3: Web3Service,
   issuer?: string
 ): Promise<JSONAPI.ResourceObject[]> {
   let { inventories, reservations } = await getInventoriesAndActiveReservations(db, subgraph, issuer);
-  let data = inventories.map((inventory) => formatInventory(inventory, reservations));
+  let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3.getInstance());
+  let isPaused = await prepaidCardMarket.isPaused();
+  let data = inventories.map((inventory) => formatInventory(inventory, reservations, isPaused));
   return data;
 }
 
@@ -42,7 +47,11 @@ async function getInventoriesAndActiveReservations(
   return { inventories, reservations };
 }
 
-function formatInventory(inventory: SKUInventory, reservations: SKUReservations): JSONAPI.ResourceObject {
+function formatInventory(
+  inventory: SKUInventory,
+  reservations: SKUReservations,
+  isPaused: boolean
+): JSONAPI.ResourceObject {
   let {
     askPrice,
     sku: {
@@ -65,7 +74,7 @@ function formatInventory(inventory: SKUInventory, reservations: SKUReservations)
       'face-value': parseInt(faceValue), // SPEND is safe to represent as a number in js
       'ask-price': askPrice,
       'customization-DID': customizationDID || null,
-      quantity: prepaidCards.length - (reservations[sku] ?? 0),
+      quantity: isPaused ? 0 : prepaidCards.length - (reservations[sku] ?? 0),
 
       // These are not yet supported in the protocol right now. when these
       // become real things we'll query the subgraph for them

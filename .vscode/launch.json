@@ -66,8 +66,9 @@
       "env": {},
       "args": [
         "hub-auth",
-        "https://hub.cardstack.com",
+        // "https://hub.cardstack.com",
         // "https://hub-staging.stack.cards",
+        "http://localhost:3000",
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own

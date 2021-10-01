@@ -40,6 +40,7 @@ This is a package that provides an SDK to use the Cardpay protocol.
   - [`PrepaidCard.getPaymentLimits`](#prepaidcardgetpaymentlimits)
   - [`PrepaidCard.payMerchant`](#prepaidcardpaymerchant)
 - [`PrepaidCardMarket`](#prepaidcardmarket)
+  - [`PrepaidCardMarket.isPaused`](#prepaidcardmarketispaused)
   - [`PrepaidCardMarket.getSKUInfo`](#prepaidcardmarketgetskuinfo)
   - [`PrepaidCardMarket.getInventory`](#prepaidcardmarketgetinventory)
   - [`PrepaidCardMarket.addToInventory`](#prepaidcardmarketaddtoinventory)
@@ -545,6 +546,12 @@ The `PrepaidCardMarket` API is used to manage the inventory prepaid cards in the
 import { getSDK } from "@cardstack/cardpay-sdk";
 let web3 = new Web3(myProvider); // Layer 2 web3 instance
 let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
+```
+
+### `PrepaidCardMarket.isPaused`
+This call returns whether or not the PrepaidCardMarket contract is currently paused.
+```js
+let isPaused = await prepaidCardMarket.isPaused();
 ```
 
 ### `PrepaidCardMarket.getSKUInfo`
