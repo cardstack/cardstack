@@ -2,24 +2,25 @@ import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
 import { click, settled, visit, waitFor } from '@ember/test-helpers';
 import BN from 'bn.js';
-
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import { setupHubAuthenticationToken } from '../helpers/setup';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
 }
-
 function milestoneCompletedSel(milestoneIndex: number): string {
   return `[data-test-milestone-completed][data-test-milestone="${milestoneIndex}"]`;
 }
-
 function epiloguePostableSel(postableIndex: number): string {
   return `[data-test-epilogue][data-test-postable="${postableIndex}"]`;
 }
 
 module('Acceptance | create card space', function (hooks) {
   setupApplicationTest(hooks);
+
+  let layer2Service: Layer2TestWeb3Strategy;
+  let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
   test('initiating workflow without wallet connections', async function (assert) {
     await visit('/card-space');
@@ -37,13 +38,12 @@ module('Acceptance | create card space', function (hooks) {
       .dom(postableSel(0, 2))
       .containsText(`Once you have installed the app`);
 
-    let layer2Service = this.owner.lookup('service:layer2-network')
+    layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateWalletConnectUri();
 
     await waitFor('[data-test-wallet-connect-qr-code]');
 
-    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.test__simulateBalances({
       defaultToken: new BN(0),
@@ -145,5 +145,132 @@ module('Acceptance | create card space', function (hooks) {
     await waitFor(epiloguePostableSel(2));
     // TODO
     // await click('[data-test-card-space-next-step="visit-space"]');
+  });
+
+  module('tests with layer 2 already connected', function (hooks) {
+    setupHubAuthenticationToken(hooks);
+
+    hooks.beforeEach(async function () {
+      layer2Service = this.owner.lookup('service:layer2-network')
+        .strategy as Layer2TestWeb3Strategy;
+      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      await layer2Service.test__simulateBalances({
+        defaultToken: new BN(0),
+      });
+    });
+
+    test('initiating workflow with L2 wallet already connected', async function (assert) {
+      await visit('/card-space');
+      await click('[data-test-workflow-button="create-space"]');
+
+      assert
+        .dom(postableSel(0, 1))
+        .containsText(
+          `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
+        );
+      assert
+        .dom(
+          '[data-test-layer-2-wallet-card] [data-test-layer-2-wallet-connected-status]'
+        )
+        .containsText('Connected');
+      assert
+        .dom(
+          '[data-test-layer-2-wallet-card] [data-test-wallet-connect-qr-code]'
+        )
+        .doesNotExist();
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer2.fullName} wallet connected`);
+
+      await waitFor(postableSel(1, 1));
+      assert.dom(postableSel(1, 0)).containsText(`Please pick a username`);
+      assert.dom(postableSel(1, 1)).containsText(`Pick a username`);
+    });
+
+    test('disconnecting L2 should cancel the workflow', async function (assert) {
+      await visit('/card-space');
+      await click('[data-test-workflow-button="create-space"]');
+
+      assert
+        .dom('[data-test-layer-2-wallet-card] [data-test-address-field]')
+        .containsText(layer2AccountAddress)
+        .isVisible();
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer2.fullName} wallet connected`);
+
+      layer2Service.test__simulateDisconnectFromWallet();
+      await settled();
+
+      assert
+        .dom('[data-test-postable="0"][data-test-cancelation]')
+        .containsText(
+          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a Card Space, please start again by connecting your wallet.`
+        );
+      assert
+        .dom('[data-test-workflow-default-cancelation-cta="create-space"]')
+        .containsText('Workflow canceled');
+
+      // restart workflow
+      await click(
+        '[data-test-workflow-default-cancelation-restart="create-space"]'
+      );
+
+      layer2Service.test__simulateWalletConnectUri();
+      await waitFor('[data-test-wallet-connect-qr-code]');
+
+      assert
+        .dom(
+          '[data-test-layer-2-wallet-card] [data-test-wallet-connect-qr-code]'
+        )
+        .exists();
+      assert
+        .dom('[data-test-workflow-default-cancelation-cta="create-space"]')
+        .doesNotExist();
+    });
+
+    test('changing L2 account should cancel the workflow', async function (assert) {
+      let differentL2Address = '0x5416C61193C3393B46C2774ac4717C252031c0bE';
+
+      await visit('/card-space');
+      await click('[data-test-workflow-button="create-space"]');
+
+      assert
+        .dom('[data-test-layer-2-wallet-card] [data-test-address-field]')
+        .containsText(layer2AccountAddress)
+        .isVisible();
+      assert
+        .dom(milestoneCompletedSel(0))
+        .containsText(`${c.layer2.fullName} wallet connected`);
+
+      layer2Service.test__simulateAccountsChanged([differentL2Address]);
+      await settled();
+
+      assert
+        .dom('[data-test-postable="0"][data-test-cancelation]')
+        .containsText(
+          'It looks like you changed accounts in the middle of this workflow. If you still want to create a Card Space, please restart the workflow.'
+        );
+      assert
+        .dom('[data-test-workflow-default-cancelation-cta="create-space"]')
+        .containsText('Workflow canceled');
+
+      // restart workflow
+      await click(
+        '[data-test-workflow-default-cancelation-restart="create-space"]'
+      );
+      assert
+        .dom(postableSel(0, 1))
+        .containsText(
+          `Looks like you’ve already connected your ${c.layer2.fullName} wallet`
+        );
+      assert
+        .dom('[data-test-layer-2-wallet-card] [data-test-address-field]')
+        .containsText(differentL2Address)
+        .isVisible();
+      assert
+        .dom('[data-test-workflow-default-cancelation-cta="create-space"]')
+        .doesNotExist();
+    });
   });
 });
