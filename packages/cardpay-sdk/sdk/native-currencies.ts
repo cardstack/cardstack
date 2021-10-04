@@ -33,6 +33,17 @@ export default {
     smallThreshold: 1,
     symbol: '',
   },
+  SPD: {
+    alignment: 'left',
+    assetLimit: 1,
+    currency: 'SPD',
+    decimals: 0,
+    label: 'SPEND',
+    mask: '[099999999999]',
+    placeholder: '0',
+    smallThreshold: 1,
+    symbol: '§',
+  },
   USD: {
     alignment: 'left',
     assetLimit: 1,
