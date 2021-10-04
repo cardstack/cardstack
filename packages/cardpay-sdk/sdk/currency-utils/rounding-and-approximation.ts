@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js';
 import { get } from 'lodash';
 import { countDecimalPlaces, isSupportedCurrency } from './formatting-plus-plus';
 import { BigNumberish } from './types';
-import supportedNativeCurrencies from '../native-currencies';
+import { currencies } from '../native-currencies';
 import { convertNumberToString, convertStringToNumber } from './type-conversion';
 import { lessThan } from './comparison';
 
@@ -97,7 +97,7 @@ export const roundAmountToNativeCurrencyDecimals = (
     throw new Error(`Unable to convert ${value} to BigNumber`);
   }
 
-  let { decimals } = get(supportedNativeCurrencies, currency);
+  let { decimals } = get(currencies, currency);
 
   return bnValue.dp(decimals, roundingMode).toString();
 };
