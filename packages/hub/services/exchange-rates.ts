@@ -1,9 +1,9 @@
 /* global fetch */
 import config from 'config';
-import supportedNativeCurrencies from '@cardstack/cardpay-sdk/sdk/native-currencies';
+import { nativeCurrencies, NativeCurrency } from '@cardstack/cardpay-sdk/sdk/currencies';
 import * as Sentry from '@sentry/node';
 
-const currencySymbols = Object.keys(supportedNativeCurrencies);
+const currencySymbols = Object.keys(nativeCurrencies) as NativeCurrency[];
 const INTERVAL = 1000 * 60 * 60;
 
 // these results are from fixer.

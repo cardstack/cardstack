@@ -41,7 +41,7 @@ export default class CardPayMerchantServicesController extends Controller {
         },
       };
     } else if (
-      !(isSupportedCurrency(this.currency) || this.currency === 'SPD') ||
+      !isSupportedCurrency(this.currency) ||
       this.currency === 'DAI' ||
       this.currency === 'CARD' ||
       this.currency === 'ETH'
