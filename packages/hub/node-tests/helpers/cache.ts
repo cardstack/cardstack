@@ -1,6 +1,7 @@
 import tmp from 'tmp';
 import { join } from 'path';
 import { ensureDirSync, outputJSONSync } from 'fs-extra';
+import Mocha from 'mocha';
 
 tmp.setGracefulCleanup();
 

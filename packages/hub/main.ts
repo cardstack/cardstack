@@ -54,6 +54,8 @@ import RealmManager from './services/realm-manager';
 import CardBuilder from './services/card-builder';
 import { serverLog, workerLog } from './utils/logger';
 import CardRouter from './routes/card-routes';
+import { CardCacheConfig } from './services/card-cache-config';
+import CardCache from './services/card-cache';
 import ExchangeRatesService from './services/exchange-rates';
 
 //@ts-ignore polyfilling fetch
@@ -98,6 +100,9 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('wyre-callback-route', WyreCallbackRoute);
 
   if (process.env.COMPILER) {
+    registry.register('card-cache-config', CardCacheConfig);
+    registry.register('card-cache', CardCache);
+    registry.register('card-router', CardRouter);
     registry.register('realm-manager', RealmManager);
     registry.register('card-builder', CardBuilder);
   }
@@ -117,6 +122,13 @@ export class HubServer {
 
     let fullConfig = Object.assign({}, config) as HubServerConfig;
 
+    let builder: CardBuilder;
+    if (process.env.COMPILER) {
+      builder = await container.lookup('card-builder');
+    } else {
+      builder = {} as CardBuilder;
+    }
+
     initSentry();
 
     let app = new Koa<Koa.DefaultState, Koa.Context>()
@@ -129,14 +141,10 @@ export class HubServer {
     app.use((await container.lookup('development-proxy-middleware')).middleware());
     app.use((await container.lookup('api-router')).routes());
     app.use((await container.lookup('callbacks-router')).routes());
-    app.use((await container.lookup('health-check')).routes()); // Setup health-check at "/"
-
-    let builder: CardBuilder;
     if (process.env.COMPILER) {
-      builder = await container.lookup('card-builder');
-    } else {
-      builder = {} as CardBuilder;
+      app.use((await container.lookup('card-router')).routes());
     }
+    app.use((await container.lookup('health-check')).routes()); // Setup health-check at "/"
 
     let onError = (err: Error, ctx: Koa.Context) => {
       this.logger.error(`Unhandled error:`, err);

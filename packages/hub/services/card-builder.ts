@@ -3,23 +3,20 @@ import { Compiler } from '@cardstack/core/src/compiler';
 
 import { transformSync } from '@babel/core';
 import { NODE, BROWSER } from '../interfaces';
-import CardCache from '../lib/card-cache';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
-import RealmManager from './realm-manager';
 import { inject } from '../di/dependency-injection';
-import config from 'config';
 import walkSync from 'walk-sync';
 import { serverLog as logger } from '../utils/logger';
 
 export default class CardBuilder implements BuilderInterface {
-  realmManager: RealmManager = inject('realm-manager', { as: 'realmManager' });
+  realmManager = inject('realm-manager', { as: 'realmManager' });
+  cache = inject('card-cache', { as: 'cache' });
+
   logger = logger;
 
   private compiler = new Compiler({
     builder: this,
   });
-
-  private cache = new CardCache(config.get('compiler.cardCache.directory'), config.get('compiler.cardCache.pkgName'));
 
   async primeCache(): Promise<void> {
     let promises = [];

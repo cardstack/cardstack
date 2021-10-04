@@ -1,7 +1,8 @@
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 import transform, { Options } from '@cardstack/core/src/glimmer-plugin-card-template';
-import { TestBuilder } from '../helpers/test-builder';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+import CardBuilder from '../../services/card-builder';
+import { ProjectTestRealm, setupCardBuilding, TEST_REALM } from '../helpers/cards';
 
 function importAndChooseName() {
   return 'BestGuess';
@@ -9,16 +10,20 @@ function importAndChooseName() {
 
 if (process.env.COMPILER) {
   describe('Glimmer CardTemplatePlugin', function () {
-    let builder: TestBuilder;
+    let builder: CardBuilder;
+    let realm: ProjectTestRealm;
     let options: Options;
     let defaultFieldFormat: Options['defaultFieldFormat'];
     let usageMeta: Options['usageMeta'];
     let compiledStringCard: CompiledCard, compiledDateCard: CompiledCard, compiledListCard: CompiledCard;
 
-    this.beforeAll(async function () {
-      builder = new TestBuilder();
-      builder.addRawCard({
-        url: 'https://cardstack.local/card/list',
+    let { createRealm, getCardBuilder } = setupCardBuilding(this);
+
+    this.beforeEach(async () => {
+      realm = createRealm(TEST_REALM);
+      builder = getCardBuilder();
+      realm.addRawCard({
+        url: 'https://cardstack.local/list',
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -37,7 +42,7 @@ if (process.env.COMPILER) {
           }`,
         },
       });
-      compiledListCard = await builder.getCompiledCard('https://cardstack.local/card/list');
+      compiledListCard = await builder.getCompiledCard('https://cardstack.local/list');
       compiledStringCard = await builder.getCompiledCard('https://cardstack.com/base/string');
       compiledDateCard = await builder.getCompiledCard('https://cardstack.com/base/date');
     });
@@ -292,8 +297,8 @@ if (process.env.COMPILER) {
     });
 
     it('Tracking deeply nested field usage', async function () {
-      builder.addRawCard({
-        url: 'http://cardstack.local/cards/post',
+      realm.addRawCard({
+        url: 'https://cardstack.local/post',
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -315,8 +320,8 @@ if (process.env.COMPILER) {
         },
       });
       let template = `{{#each @fields.posts as |Post|}}<Post />{{/each}}`;
-      builder.addRawCard({
-        url: 'http://cardstack.local/cards/post-list',
+      realm.addRawCard({
+        url: 'https://cardstack.local/post-list',
         schema: 'schema.js',
         isolated: 'isolated.js',
         data: {
@@ -330,7 +335,7 @@ if (process.env.COMPILER) {
         files: {
           'schema.js': `
         import { containsMany } from "@cardstack/types";
-        import post from "http://cardstack.local/cards/post";
+        import post from "https://cardstack.local/post";
 
         export default class Hello {
           @containsMany(post)
@@ -341,7 +346,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      let card = await builder.getCompiledCard('http://cardstack.local/cards/post-list');
+      let card = await builder.getCompiledCard('https://cardstack.local/post-list');
       transform(template, {
         fields: card.fields,
         usageMeta,
