@@ -1,7 +1,7 @@
 {
   "name": "@cardstack/cardpay-sdk",
   "description": "An SDK for using the cardpay protocol",
-  "version": "0.26.3",
+  "version": "0.26.4",
   "author": "Hassan Abdel-Rahman @habdelra",
   "main": "./index.js",
   "dependencies": {
