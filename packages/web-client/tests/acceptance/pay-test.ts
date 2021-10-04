@@ -8,14 +8,15 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import {
   convertAmountToNativeDisplay,
   generateMerchantPaymentUrl,
-  MerchantSafe,
   roundAmountToNativeCurrencyDecimals,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
-import { getResolver } from '@cardstack/did-resolver';
-import { Resolver } from 'did-resolver';
 import config from '@cardstack/web-client/config/environment';
 import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-use-on-chain-constants';
+import {
+  createMerchantSafe,
+  getFilenameFromDid,
+} from '@cardstack/web-client/tests/helpers/factories';
 
 // selectors
 const MERCHANT = '[data-test-merchant]';
@@ -42,20 +43,15 @@ const merchantName = 'Mandello';
 const merchantInfoBackground = '#00ffcc';
 const merchantInfoTextColor = '#000000';
 const nonexistentMerchantId = 'nonexistentmerchant';
-const merchantSafe: MerchantSafe = {
-  type: 'merchant',
-  createdAt: Date.now() / 1000,
+const merchantSafe = createMerchantSafe({
   address: '0xE73604fC1724a50CEcBC1096d4229b81aF117c94',
   owners: ['0xAE061aa45950Bf5b0B05458C3b7eE474C25B36a7'],
   infoDID: exampleDid,
-} as MerchantSafe;
-const merchantSafeWithoutInfo: MerchantSafe = {
-  type: 'merchant',
-  createdAt: Date.now() / 1000,
+});
+const merchantSafeWithoutInfo = createMerchantSafe({
   address: '0xE73604fC1724a50CEcBC1096d4229b81aF117c85',
   owners: ['0xAE061aa45950Bf5b0B05458C3b7eE474C25B36a7'],
-  infoDID: undefined,
-} as MerchantSafe;
+});
 const spendAmount = 300;
 const usdAmount = spendToUsd(spendAmount);
 const minSpendAmount = MIN_PAYMENT_AMOUNT_IN_SPEND;
@@ -78,13 +74,8 @@ module('Acceptance | pay', function (hooks) {
         else return undefined;
       });
 
-    let resolver = new Resolver({ ...getResolver() });
-    let resolvedDID = await resolver.resolve(exampleDid);
-    let didAlsoKnownAs = resolvedDID?.didDocument?.alsoKnownAs![0]!;
-    let customizationJsonFilename = didAlsoKnownAs.split('/')[4].split('.')[0];
-
     this.server.create('merchant-info', {
-      id: customizationJsonFilename,
+      id: await getFilenameFromDid(exampleDid),
       name: merchantName,
       slug: 'mandello1',
       did: exampleDid,

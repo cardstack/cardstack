@@ -6,8 +6,14 @@ import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import BN from 'bn.js';
 
-import { DepotSafe, Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
+import {
+  createDepotSafe,
+  createMerchantSafe,
+  createPrepaidCardSafe,
+  createSafeToken,
+} from '@cardstack/web-client/tests/helpers/factories';
 
 module(
   'Integration | Component | card-pay/withdrawal-workflow/choose-balance',
@@ -38,74 +44,37 @@ module(
         card: new BN('500000000000000000000'),
       });
       let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-      let testDepot = {
+      let testDepot = createDepotSafe({
         address: depotAddress,
         tokens: [
-          {
-            balance: '250000000000000000000',
-            token: {
-              symbol: 'DAI',
-            },
-          },
-          {
-            balance: '500000000000000000000',
-            token: {
-              symbol: 'CARD',
-            },
-          },
+          createSafeToken('DAI', '250000000000000000000'),
+          createSafeToken('CARD', '500000000000000000000'),
         ],
-      };
+      });
+
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      await layer2Service.test__simulateDepot(testDepot as DepotSafe);
+      await layer2Service.test__simulateDepot(testDepot);
 
       let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
 
       layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
-        {
-          type: 'merchant',
-          createdAt: Date.now() / 1000,
+        createMerchantSafe({
           address: merchantAddress,
           merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
           tokens: [
-            {
-              balance: '125000000000000000000',
-              tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
-              token: {
-                name: 'Dai Stablecoin.CPXD',
-                symbol: 'DAI',
-                decimals: 2,
-              },
-            },
-            {
-              balance: '450000000000000000000',
-              tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
-              token: {
-                name: 'CARD Token Kovan.CPXD',
-                symbol: 'CARD',
-                decimals: 2,
-              },
-            },
+            createSafeToken('DAI', '125000000000000000000'),
+            createSafeToken('CARD', '450000000000000000000'),
           ],
-          owners: [],
           accumulatedSpendValue: 100,
-        },
-        {
-          type: 'prepaid-card',
-          createdAt: Date.now() / 1000,
-
+        }),
+        createPrepaidCardSafe({
           address: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
-
-          tokens: [],
           owners: [layer2AccountAddress],
-
-          issuingToken: '0xTOKEN',
           spendFaceValue: 2324,
           prepaidCardOwner: layer2AccountAddress,
-          hasBeenUsed: false,
           issuer: layer2AccountAddress,
-          reloadable: false,
           transferrable: false,
-        },
+        }),
       ]);
 
       // Ensure safes have been loaded, as in a workflow context

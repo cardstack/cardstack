@@ -4,6 +4,7 @@ import { click, render, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
+import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/factories';
 
 module(
   'Integration | Component | card-pay/create-merchant/prepaid-card-choice-card-picker edge cases',
@@ -25,40 +26,20 @@ module(
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
       layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
-        {
-          type: 'prepaid-card',
-          createdAt: Date.now() / 1000,
-
+        createPrepaidCardSafe({
           address: prepaidCardAddress2,
-
-          tokens: [],
           owners: [layer2AccountAddress],
-
-          issuingToken: '0xTOKEN',
           spendFaceValue: 500,
           prepaidCardOwner: layer2AccountAddress,
-          hasBeenUsed: false,
           issuer: layer2AccountAddress,
-          reloadable: false,
-          transferrable: false,
-        },
-        {
-          type: 'prepaid-card',
-          createdAt: Date.now() / 1000,
-
+        }),
+        createPrepaidCardSafe({
           address: prepaidCardAddress,
-
-          tokens: [],
           owners: [layer2AccountAddress],
-
-          issuingToken: '0xTOKEN',
           spendFaceValue: 2324,
           prepaidCardOwner: layer2AccountAddress,
-          hasBeenUsed: false,
           issuer: layer2AccountAddress,
-          reloadable: false,
-          transferrable: false,
-        },
+        }),
       ]);
 
       let workflowSession = new WorkflowSession();

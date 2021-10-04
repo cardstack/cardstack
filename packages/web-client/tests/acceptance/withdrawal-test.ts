@@ -16,8 +16,12 @@ import BN from 'bn.js';
 
 import { capitalize } from '@ember/string';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import { DepotSafe } from '@cardstack/cardpay-sdk';
 import { toWei } from 'web3-utils';
+import {
+  createDepotSafe,
+  createMerchantSafe,
+  createSafeToken,
+} from '@cardstack/web-client/tests/helpers/factories';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -127,54 +131,27 @@ module('Acceptance | withdrawal', function (hooks) {
     });
     let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
     await layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
-      {
-        type: 'merchant',
-        createdAt: Date.now() / 1000,
+      createMerchantSafe({
         address: merchantAddress,
         merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
-        tokens: [
-          {
-            balance: '125000000000000000000',
-            tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
-            token: {
-              name: 'Dai Stablecoin.CPXD',
-              symbol: 'DAI',
-              decimals: 2,
-            },
-          },
-          {
-            balance: '450000000000000000000',
-            tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
-            token: {
-              name: 'CARD Token Kovan.CPXD',
-              symbol: 'CARD',
-              decimals: 2,
-            },
-          },
-        ],
-        owners: [],
         accumulatedSpendValue: 100,
-      },
+        tokens: [
+          createSafeToken('DAI', '125000000000000000000'),
+          createSafeToken('CARD', '450000000000000000000'),
+        ],
+      }),
     ]);
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-    let testDepot = {
+    let testDepot = createDepotSafe({
       address: depotAddress,
+      owners: [],
       tokens: [
-        {
-          balance: '250000000000000000000',
-          token: {
-            symbol: 'DAI',
-          },
-        },
-        {
-          balance: '500000000000000000000',
-          token: {
-            symbol: 'CARD',
-          },
-        },
+        createSafeToken('DAI', '250000000000000000000'),
+        createSafeToken('CARD', '500000000000000000000'),
       ],
-    };
-    await layer2Service.test__simulateDepot(testDepot as DepotSafe);
+    });
+
+    await layer2Service.test__simulateDepot(testDepot);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitFor(`${postableSel(2, 2)} [data-test-balance="DAI.CPXD"]`);
     assert
