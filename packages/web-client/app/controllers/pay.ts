@@ -41,7 +41,7 @@ export default class CardPayMerchantServicesController extends Controller {
         },
       };
     } else if (
-      !(isSupportedCurrency(this.currency) || this.currency === 'SPD') ||
+      !isSupportedCurrency(this.currency) ||
       this.currency === 'DAI' ||
       this.currency === 'CARD' ||
       this.currency === 'ETH'
@@ -78,14 +78,30 @@ export default class CardPayMerchantServicesController extends Controller {
         },
       };
     } else {
-      let amount = Number(
-        roundAmountToNativeCurrencyDecimals(this.amount, this.currency)
-      );
+      let rate = this.model.exchangeRates?.[this.currency];
+      let amount: number;
+      let formattedSpendAmount: string | undefined;
+      if (rate) {
+        let minAmount = minUsdAmount * rate;
+        amount = Number(
+          roundAmountToNativeCurrencyDecimals(
+            Math.max(this.amount, minAmount),
+            this.currency
+          )
+        );
+        formattedSpendAmount = `§${formatAmount(usdToSpend(amount / rate))}`;
+      } else {
+        amount = Number(
+          roundAmountToNativeCurrencyDecimals(this.amount, this.currency)
+        );
+        formattedSpendAmount = undefined;
+      }
+
       return {
         amount,
         displayed: {
           amount: convertAmountToNativeDisplay(amount, this.currency),
-          secondaryAmount: '',
+          secondaryAmount: formattedSpendAmount,
         },
       };
     }

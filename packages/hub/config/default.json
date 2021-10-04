@@ -35,6 +35,10 @@
     "callbackUrl": null,
     "url": "https://api.testwyre.com"
   },
+  "exchangeRates": {
+    "allowedDomains": ["https://wallet-staging.stack.cards", "https://wallet.cardstack.com"],
+    "apiKey": null
+  },
   "relay": {
     "provisionerSecret": null
   },

@@ -4,10 +4,13 @@ import { inject as service } from '@ember/service';
 import SafeViewer from '@cardstack/web-client/services/safe-viewer';
 import * as Sentry from '@sentry/browser';
 import { MerchantSafe } from '@cardstack/cardpay-sdk';
+import config from '../config/environment';
+import { Layer2NetworkSymbol } from '../utils/web3-strategies/types';
 
 interface PayRouteModel {
   network: string;
   merchantSafe: MerchantSafe;
+  exchangeRates: any;
 }
 
 export default class PayRoute extends Route {
@@ -20,10 +23,13 @@ export default class PayRoute extends Route {
     try {
       return {
         network: params.network,
-        merchantSafe: await this.fetchMerchantSafe(
+        merchantSafe: (await this.fetchMerchantSafe(
           params.network,
           params.merchant_safe_id
-        ),
+        )) as MerchantSafe,
+        exchangeRates: this.shouldFetchExchangeRates
+          ? await this.fetchExchangeRates()
+          : undefined,
       };
     } catch (e) {
       Sentry.captureException(e);
@@ -31,8 +37,34 @@ export default class PayRoute extends Route {
     }
   }
 
+  get shouldFetchExchangeRates() {
+    let params = this.paramsFor('pay') as { currency?: string };
+    return (
+      params && params.currency && !['USD', 'SPD'].includes(params.currency)
+    );
+  }
+
+  async fetchExchangeRates() {
+    try {
+      return (
+        await (
+          await fetch(`${config.hubURL}/api/exchange-rates`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/vnd.api+json',
+            },
+          })
+        ).json()
+      ).data.attributes.rates;
+    } catch (e) {
+      console.error('Failed to fetch exchange rates');
+      Sentry.captureException(e);
+      return {};
+    }
+  }
+
   async fetchMerchantSafe(network: string, address: string) {
-    if (network !== 'xdai' && network !== 'sokol') {
+    if (!isLayer2Network(network)) {
       throw new Error(
         `Failed to fetch information about merchant, network was unrecognized: ${network}`
       );
@@ -47,4 +79,10 @@ export default class PayRoute extends Route {
 
     return data;
   }
+}
+
+function isLayer2Network(
+  maybeNetwork: string
+): maybeNetwork is Layer2NetworkSymbol {
+  return maybeNetwork === 'xdai' || maybeNetwork === 'sokol';
 }

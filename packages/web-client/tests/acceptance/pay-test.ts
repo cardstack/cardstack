@@ -7,9 +7,11 @@ import sinon from 'sinon';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import {
   convertAmountToNativeDisplay,
+  formatCurrencyAmount,
   generateMerchantPaymentUrl,
   roundAmountToNativeCurrencyDecimals,
   spendToUsd,
+  usdToSpend,
 } from '@cardstack/cardpay-sdk';
 import config from '@cardstack/web-client/config/environment';
 import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-use-on-chain-constants';
@@ -17,6 +19,7 @@ import {
   createMerchantSafe,
   getFilenameFromDid,
 } from '@cardstack/web-client/utils/test-factories';
+import { Response as MirageResponse } from 'ember-cli-mirage';
 
 // selectors
 const MERCHANT = '[data-test-merchant]';
@@ -33,10 +36,12 @@ const DEEP_LINK = '[data-test-payment-request-deep-link]';
 const PAYMENT_URL = '[data-test-payment-request-url]';
 
 // fixed data
+const mirageConversionRate = 2; // mirage is hardcoded to provide 1:2 conversion from USD to any other currency
 const universalLinkDomain = config.universalLinkDomain;
 const exampleDid = 'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
 const spendSymbol = 'SPD';
 const usdSymbol = 'USD';
+const jpySymbol = 'JPY';
 const invalidCurrencySymbol = 'WUT';
 const network = 'sokol';
 const merchantName = 'Mandello';
@@ -261,11 +266,12 @@ module('Acceptance | pay', function (hooks) {
 
   test('it renders correctly if currency is non-USD and non-SPEND', async function (assert) {
     const jpyAmount = 300.335;
-    const jpySymbol = 'JPY';
     const roundedJpyAmount = roundAmountToNativeCurrencyDecimals(
       jpyAmount,
       jpySymbol
     );
+    const roundedJpyAmountInUsd =
+      Number(roundedJpyAmount) / mirageConversionRate;
 
     await visit(
       `/pay/${network}/${merchantSafe.address}?amount=${jpyAmount}&currency=${jpySymbol}`
@@ -274,7 +280,11 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(AMOUNT)
       .containsText(convertAmountToNativeDisplay(roundedJpyAmount, jpySymbol));
-    assert.dom(SECONDARY_AMOUNT).doesNotExist();
+    assert
+      .dom(SECONDARY_AMOUNT)
+      .containsText(
+        `§${formatCurrencyAmount(usdToSpend(roundedJpyAmountInUsd)!, 0)}`
+      );
 
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
@@ -282,6 +292,60 @@ module('Acceptance | pay', function (hooks) {
       merchantSafeID: merchantSafe.address,
       currency: jpySymbol,
       amount: Number(roundedJpyAmount),
+    });
+    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
+  });
+
+  test('it rounds amount up to min spend amount if currency is non-USD and non-SPEND', async function (assert) {
+    const minJpyAmount = minUsdAmount * mirageConversionRate;
+    const jpyAmount = minJpyAmount - 0.1;
+    const convertedMinSpendAmount = usdToSpend(
+      minJpyAmount / mirageConversionRate
+    );
+
+    await visit(
+      `/pay/${network}/${merchantSafe.address}?amount=${jpyAmount}&currency=${jpySymbol}`
+    );
+
+    assert
+      .dom(AMOUNT)
+      .containsText(convertAmountToNativeDisplay(minJpyAmount, jpySymbol));
+    assert.dom(SECONDARY_AMOUNT).containsText(`§${convertedMinSpendAmount}`);
+
+    let expectedUrl = generateMerchantPaymentUrl({
+      domain: universalLinkDomain,
+      network,
+      merchantSafeID: merchantSafe.address,
+      currency: jpySymbol,
+      amount: minJpyAmount,
+    });
+    assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
+    assert.dom(PAYMENT_URL).containsText(expectedUrl);
+  });
+
+  test('it handles errors in fetching exchange rates gracefully', async function (this: MirageTestContext, assert) {
+    this.server.get('/exchange-rates', function () {
+      return new MirageResponse(502, {}, '');
+    });
+
+    const jpyAmount = 300;
+
+    await visit(
+      `/pay/${network}/${merchantSafe.address}?amount=${jpyAmount}&currency=${jpySymbol}`
+    );
+
+    assert
+      .dom(AMOUNT)
+      .containsText(convertAmountToNativeDisplay(jpyAmount, jpySymbol));
+    assert.dom(SECONDARY_AMOUNT).doesNotExist();
+
+    let expectedUrl = generateMerchantPaymentUrl({
+      domain: universalLinkDomain,
+      network,
+      merchantSafeID: merchantSafe.address,
+      currency: jpySymbol,
+      amount: jpyAmount,
     });
     assert.dom(QR_CODE).hasAttribute('data-test-styled-qr-code', expectedUrl);
     assert.dom(PAYMENT_URL).containsText(expectedUrl);
