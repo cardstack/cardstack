@@ -1,3 +1,5 @@
+/*global fetch */
+
 import Web3 from 'web3';
 import config from 'config';
 import Logger from '@cardstack/logger';
