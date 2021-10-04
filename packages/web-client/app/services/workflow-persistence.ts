@@ -96,7 +96,9 @@ export default class WorkflowPersistence extends Service {
 
   get activeWorkflows() {
     return this.allValidWorkflows.filter(
-      (meta) => meta.completedMilestonesCount! < meta.milestonesCount!
+      (meta) =>
+        meta.completedMilestonesCount! < meta.milestonesCount! &&
+        !meta.isCanceled
     );
   }
 

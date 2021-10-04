@@ -134,10 +134,19 @@ module('Acceptance | persistence view and restore', function () {
       });
 
       workflowPersistenceService.persistData('canceled', {
-        name: 'PREPAID_CARD_ISSUANCE',
+        name: `PREPAID_CARD_ISSUANCE`,
         state: buildState({
           meta: {
-            isCancelled: true,
+            completedCardNames: [
+              'LAYER2_CONNECT',
+              'HUB_AUTH',
+              'LAYOUT_CUSTOMIZATION',
+              'FUNDING_SOURCE',
+            ],
+            completedMilestonesCount: 1,
+            milestonesCount: 4,
+            updatedAt: Date.UTC(2020, 10, 22, 20, 50, 18, 491).toString(),
+            isCanceled: true,
             cancelationReason: 'RESTORATION_UNAUTHENTICATED',
           },
         }),
