@@ -35,7 +35,7 @@ export default class ExchangeRatesService {
   }
 
   /**
-   * Sample response
+   * Example of a successful request
    * ```
    * {
    *   success: true,
@@ -43,18 +43,19 @@ export default class ExchangeRatesService {
    *   base: 'USD',
    *   date: '2021-09-30',
    *   rates: {
-   *     EUR: 1,
-   *     GBP: 0.860246,
-   *     AUD: 1.602961,
-   *     CNY: 7.463258,
-   *     KRW: 1370.453432,
-   *     RUB: 84.171385,
-   *     INR: 85.915208,
-   *     JPY: 129.027569,
-   *     TRY: 10.291685,
-   *     CAD: 1.468866,
-   *     NZD: 1.679484,
-   *     ZAR: 17.450637
+   *     USD: 1,
+   *     EUR: 0.859735,
+   *     GBP: 0.734635,
+   *     AUD: 1.370802,
+   *     CNY: 6.4467,
+   *     KRW: 1179.593505,
+   *     RUB: 72.672501,
+   *     INR: 74.264596,
+   *     JPY: 111.124504,
+   *     TRY: 8.855645,
+   *     CAD: 1.2588,
+   *     NZD: 1.433345,
+   *     ZAR: 14.94734
    *   }
    * }
    * ```
@@ -87,7 +88,7 @@ export default class ExchangeRatesService {
         }
         return result;
       } catch (e) {
-        Sentry.captureException(e ?? 'Fetching exchange rates returned a falsey value');
+        Sentry.captureException(e);
         this.invalidateCache();
         throw e;
       }
