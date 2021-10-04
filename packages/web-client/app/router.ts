@@ -13,6 +13,7 @@ Router.map(function () {
     this.route('reward-programs');
     this.route('token-suppliers');
   });
+  this.route('card-space');
   this.route('pay', {
     path: '/pay/:network/:merchant_safe_id',
   });

@@ -1,0 +1,19 @@
+<article
+  data-test-profile-card
+  ...attributes
+>
+  {{#if @isPreview}}
+    <aside>Profile preview</aside>
+  {{/if}}
+
+  <div data-test-profile-card-name>{{or @name 'Name'}}</div>
+  <div data-test-profile-card-host>{{or @host 'blank.card.space'}}</div>
+  <div data-test-profile-card-category>{{or @category 'Category'}}</div>
+  <div data-test-profile-card-description>{{or @description 'Description'}}</div>
+  <Boxel::Button
+    @kind='secondary-light'
+    data-test-profile-card-button-text
+  >
+    {{or @buttonText 'Button Text'}}
+  </Boxel::Button>
+</article>
