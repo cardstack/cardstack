@@ -19,6 +19,7 @@ import { capitalize } from '@ember/string';
 import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { tracked } from '@glimmer/tracking';
+import { isPresent } from '@ember/utils';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -203,6 +204,16 @@ class DepositWorkflow extends Workflow {
     new WorkflowMessage({
       author: cardbot,
       message:
+        'It looks like you changed accounts in the middle of this workflow. If you still want to deposit funds, please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
         'You attempted to restore an unfinished workflow, but you changed your Layer 1 wallet address. Please restart the workflow.',
       includeIf() {
         return (
@@ -222,27 +233,25 @@ class DepositWorkflow extends Workflow {
         );
       },
     }),
-    new WorkflowCard({
-      author: cardbot,
-      componentName: 'workflow-thread/default-cancelation-cta',
-      includeIf() {
-        return (
-          [
-            FAILURE_REASONS.DISCONNECTED,
-            FAILURE_REASONS.RESTORATION_L1_DISCONNECTED,
-            FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
-          ] as String[]
-        ).includes(String(this.workflow?.cancelationReason));
-      },
-    }),
-    // cancelation for changing accounts
     new WorkflowMessage({
       author: cardbot,
       message:
-        'It looks like you changed accounts in the middle of this workflow. If you still want to deposit funds, please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but your Card wallet got disconnected. Please restart the workflow.',
       includeIf() {
         return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L2_DISCONNECTED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but your Layer 1 wallet got disconnected. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L1_DISCONNECTED
         );
       },
     }),
@@ -250,9 +259,7 @@ class DepositWorkflow extends Workflow {
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
-        );
+        return isPresent(this.workflow?.cancelationReason);
       },
     }),
   ]);
