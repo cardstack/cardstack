@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js';
 import { get } from 'lodash';
 import { countDecimalPlaces, isSupportedCurrency } from './formatting-plus-plus';
 import { BigNumberish } from './types';
-import { currencies } from '../native-currencies';
+import { currencies } from '../currencies';
 import { convertNumberToString, convertStringToNumber } from './type-conversion';
 import { lessThan } from './comparison';
 
@@ -80,7 +80,7 @@ export const addBuffer = (numberOne: BigNumberish, buffer: BigNumberish = '1.2')
   new BigNumber(numberOne).times(buffer).toFixed(0);
 
 /**
- * Rounds `value` down to the number of decimals specified by the native currency (see `native-currencies.ts`)
+ * Rounds `value` down to the number of decimals specified by the native currency (see `currencies.ts`)
  */
 export const roundAmountToNativeCurrencyDecimals = (
   value: BigNumberish,

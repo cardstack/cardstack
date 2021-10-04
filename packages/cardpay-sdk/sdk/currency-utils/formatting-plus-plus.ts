@@ -9,7 +9,7 @@ import BigNumber from 'bignumber.js';
 import { get, has } from 'lodash';
 import { convertAmountToNativeAmount, convertRawAmountToDecimalFormat } from './amount-conversion';
 import { lessThan } from './comparison';
-import { currencies } from '../native-currencies';
+import { currencies } from '../currencies';
 import { handleSignificantDecimals } from './rounding-and-approximation';
 import { BigNumberish } from './types';
 
