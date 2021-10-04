@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/compiler-server",
-  "version": "0.26.4",
+  "version": "0.26.5",
   "keywords": [],
   "private": true,
   "author": "Edward Faulkner <edward@eaf4.com>",
@@ -16,8 +16,8 @@
     "@babel/core": "^7.12.13",
     "@babel/plugin-transform-modules-commonjs": "^7.13.8",
     "@babel/types": "^7.12.13",
-    "@cardstack/compiled": "0.26.4",
-    "@cardstack/core": "0.26.4",
+    "@cardstack/compiled": "0.26.5",
+    "@cardstack/core": "0.26.5",
     "@koa/cors": "^3.1.0",
     "@koa/router": "^10.0.0",
     "@types/yargs": "^17.0.2",
