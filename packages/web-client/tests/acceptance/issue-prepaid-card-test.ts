@@ -13,7 +13,6 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { toWei } from 'web3-utils';
 import BN from 'bn.js';
 
-import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
@@ -28,6 +27,12 @@ import {
   deserializeState,
   WorkflowMeta,
 } from '@cardstack/web-client/models/workflow/workflow-session';
+import {
+  createDepotSafe,
+  createPrepaidCardSafe,
+  createSafeToken,
+  defaultCreatedPrepaidCardDID,
+} from '@cardstack/web-client/tests/helpers/factories';
 
 interface Context extends MirageTestContext {}
 
@@ -108,49 +113,21 @@ module('Acceptance | issue prepaid card', function (hooks) {
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
-      {
-        type: 'depot',
+      createDepotSafe({
         address: depotAddress,
+        owners: [layer2AccountAddress],
         tokens: [
-          {
-            balance: SLIGHTLY_LESS_THAN_MAX_VALUE.toString(),
-            tokenAddress: 'DAI_ADDRESS',
-            token: {
-              symbol: 'DAI',
-              name: 'DAI',
-              decimals: 18,
-            },
-          },
-          {
-            balance: '250000000000000000000',
-            tokenAddress: 'CARD_ADDRESS',
-            token: {
-              symbol: 'CARD',
-              name: 'CARD',
-              decimals: 18,
-            },
-          },
+          createSafeToken('DAI', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
+          createSafeToken('CARD', '250000000000000000000'),
         ],
-        createdAt: Date.now() / 1000,
-        owners: [layer2AccountAddress],
-      },
-      {
-        type: 'prepaid-card',
-        createdAt: Date.now() / 1000,
-
+      }),
+      createPrepaidCardSafe({
         address: '0x123400000000000000000000000000000000abcd',
-
-        tokens: [],
         owners: [layer2AccountAddress],
-
-        issuingToken: '0xTOKEN',
         spendFaceValue: 2324,
         prepaidCardOwner: layer2AccountAddress,
-        hasBeenUsed: false,
         issuer: layer2AccountAddress,
-        reloadable: false,
-        transferrable: false,
-      },
+      }),
     ]);
 
     await waitUntil(
@@ -421,10 +398,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       10000,
       layer2AccountAddress,
       prepaidCardAddress,
-      {
-        reloadable: true,
-        transferrable: true,
-      }
+      {}
     );
 
     await waitFor(milestoneCompletedSel(3));
@@ -479,7 +453,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText('JJ');
     assert
       .dom(`${epiloguePostableSel(1)} [data-test-prepaid-card-attributes]`)
-      .containsText('Reloadable Transferrable');
+      .containsText('Non-reloadable Transferrable');
     assert.dom(
       `${epiloguePostableSel(
         1
@@ -544,6 +518,17 @@ module('Acceptance | issue prepaid card', function (hooks) {
       ''
     );
 
+    let prepaidCardSafe = createPrepaidCardSafe({
+      address: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
+      owners: ['0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44'],
+      spendFaceValue: 10000,
+      prepaidCardOwner: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+      issuer: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+      customizationDID: defaultCreatedPrepaidCardDID,
+    });
+    // @ts-ignore
+    delete prepaidCardSafe.createdAt;
+
     let deserializedState = deserializeState({
       ...persistedState,
     });
@@ -561,7 +546,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         background: '#37EB77',
         id: '4f219852-33ee-4e4c-81f7-76318630a423',
       },
-      did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+      did: defaultCreatedPrepaidCardDID,
       issuerName: 'JJ',
       layer2WalletAddress: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
       pattern: {
@@ -570,23 +555,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
         id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
       },
       prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
-      prepaidCardSafe: {
-        type: 'prepaid-card',
-        address: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
-        tokens: [],
-        owners: ['0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44'],
-        issuingToken: '0xTOKEN',
-        spendFaceValue: 10000,
-        prepaidCardOwner: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
-        hasBeenUsed: false,
-        issuer: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
-        reloadable: true,
-        transferrable: true,
-        customizationDID:
-          'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
-      },
+      prepaidCardSafe,
       prepaidFundingToken: 'DAI.CPXD',
-      reloadable: true,
+      reloadable: false,
       spendFaceValue: 10000,
       transferrable: true,
       txnHash: 'exampleTxnHash',
@@ -620,24 +591,14 @@ module('Acceptance | issue prepaid card', function (hooks) {
         defaultToken: MIN_AMOUNT_TO_PASS,
         card: new BN('500000000000000000000'),
       });
-      let testDepot = {
+      let testDepot = createDepotSafe({
         address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
         tokens: [
-          {
-            balance: '250000000000000000000',
-            token: {
-              symbol: 'DAI',
-            },
-          },
-          {
-            balance: '500000000000000000000',
-            token: {
-              symbol: 'CARD',
-            },
-          },
+          createSafeToken('DAI', '250000000000000000000'),
+          createSafeToken('CARD', '500000000000000000000'),
         ],
-      };
-      await layer2Service.test__simulateDepot(testDepot as DepotSafe);
+      });
+      await layer2Service.test__simulateDepot(testDepot);
     });
 
     test('Disconnecting Layer 2 from within the workflow', async function (assert) {

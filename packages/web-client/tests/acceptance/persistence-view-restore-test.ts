@@ -13,13 +13,17 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import { setupHubAuthenticationToken } from '../helpers/setup';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
-import { DepotSafe, PrepaidCardSafe } from '@cardstack/cardpay-sdk';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 
 import WorkflowPersistence, {
   constructStorageKey,
 } from '@cardstack/web-client/services/workflow-persistence';
+import {
+  createDepotSafe,
+  createPrepaidCardSafe,
+  createSafeToken,
+} from '../helpers/factories';
 
 interface Context extends MirageTestContext {}
 
@@ -37,41 +41,26 @@ module('Acceptance | persistence view and restore', function () {
       let layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      let testDepot = {
+      let testDepot = createDepotSafe({
         address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
-        tokens: [
-          {
-            balance: '500000000000000000000',
-            token: {
-              symbol: 'CARD',
-            },
-          },
-        ],
-      };
-      await layer2Service.test__simulateDepot(testDepot as DepotSafe);
+        tokens: [createSafeToken('CARD', '500000000000000000000')],
+      });
+
+      await layer2Service.test__simulateDepot(testDepot);
 
       let merchantRegistrationFee = await this.owner
         .lookup('service:layer2-network')
         .strategy.fetchMerchantRegistrationFee();
 
       layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
-        {
-          type: 'prepaid-card',
-          createdAt: Date.now() / 1000,
-
+        createPrepaidCardSafe({
           address: '0x123400000000000000000000000000000000abcd',
-
-          tokens: [],
           owners: [layer2AccountAddress],
-
-          issuingToken: '0xTOKEN',
           spendFaceValue: merchantRegistrationFee,
           prepaidCardOwner: layer2AccountAddress,
-          hasBeenUsed: false,
           issuer: layer2AccountAddress,
-          reloadable: false,
           transferrable: false,
-        } as PrepaidCardSafe,
+        }),
       ]);
 
       workflowPersistenceService = this.owner.lookup(

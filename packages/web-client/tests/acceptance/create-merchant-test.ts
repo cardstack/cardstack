@@ -16,13 +16,13 @@ import BN from 'bn.js';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import {
   convertAmountToNativeDisplay,
-  PrepaidCardSafe,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
 import { setupHubAuthenticationToken } from '../helpers/setup';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
+import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/factories';
 
 interface Context extends MirageTestContext {}
 
@@ -57,23 +57,13 @@ function createMockPrepaidCard(
   prepaidCardAddress: string,
   amount: number
 ) {
-  return {
-    type: 'prepaid-card',
-    createdAt: Date.now() / 1000,
-
+  return createPrepaidCardSafe({
     address: prepaidCardAddress,
-
-    tokens: [],
     owners: [eoaAddress],
-
-    issuingToken: '0xTOKEN',
     spendFaceValue: amount,
     prepaidCardOwner: eoaAddress,
-    hasBeenUsed: false,
     issuer: eoaAddress,
-    reloadable: false,
-    transferrable: false,
-  } as PrepaidCardSafe;
+  });
 }
 
 module('Acceptance | create merchant', function (hooks) {

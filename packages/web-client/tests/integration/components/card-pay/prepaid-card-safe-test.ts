@@ -3,10 +3,10 @@ import { setupRenderingTest } from 'ember-qunit';
 import { find, render, waitFor, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
-import { PrepaidCardSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { Response as MirageResponse } from 'ember-cli-mirage';
+import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/factories';
 
 interface Context extends MirageTestContext {}
 
@@ -16,47 +16,19 @@ module(
     setupRenderingTest(hooks);
     setupMirage(hooks);
 
-    const PREPAID_CARD_SAFE = {
+    const PREPAID_CARD_SAFE = createPrepaidCardSafe({
       address: '0xF848D5873Df8FFaedae778f9F090140B667A2aD7',
       createdAt: 1627981520,
-      tokens: [
-        {
-          balance: '1000000000000000000',
-          tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
-          token: {
-            name: 'CARD Token Kovan.CPXD',
-            symbol: 'CARD',
-            decimals: 2,
-          },
-        },
-        {
-          balance: '4990019960079840419',
-          tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
-          token: {
-            name: 'Dai Stablecoin.CPXD',
-            symbol: 'DAI',
-            decimals: 2,
-          },
-        },
-      ],
       owners: [
         '0xc9Cdb5EeD1c27fCc64DA096CA3b0bcc02c1d45C2',
         '0xEba6d63dDf30174B87272D5cF566D63547e60119',
       ],
-      type: 'prepaid-card',
       customizationDID:
         'did:cardstack:1ph2NRppy5eeszY4j8H9Tud520052ce6211bd3a9',
       spendFaceValue: 500,
-      issuingToken: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
-      owner: {
-        id: '0xc9Cdb5EeD1c27fCc64DA096CA3b0bcc02c1d45C2',
-      },
-      reloadable: false,
       prepaidCardOwner: '0xc9Cdb5EeD1c27fCc64DA096CA3b0bcc02c1d45C2',
-      hasBeenUsed: false,
       issuer: '0xc9Cdb5EeD1c27fCc64DA096CA3b0bcc02c1d45C2',
-      transferrable: true,
-    } as PrepaidCardSafe;
+    });
 
     const JSON_API = {
       data: {

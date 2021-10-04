@@ -6,10 +6,14 @@ import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
-import { getResolver } from '@cardstack/did-resolver';
-import { Resolver } from 'did-resolver';
 
 import { TinyColor } from '@ctrl/tinycolor';
+import {
+  createDepotSafe,
+  createMerchantSafe,
+  createSafeToken,
+  getFilenameFromDid,
+} from '@cardstack/web-client/tests/helpers/factories';
 
 interface Context extends MirageTestContext {
   safes: Safe[];
@@ -26,15 +30,8 @@ module(
     setupMirage(hooks);
 
     hooks.beforeEach(async function (this: Context) {
-      let resolver = new Resolver({ ...getResolver() });
-      let resolvedDID = await resolver.resolve(EXAMPLE_DID);
-      let didAlsoKnownAs = resolvedDID?.didDocument?.alsoKnownAs![0]!;
-      let customizationJsonFilename = didAlsoKnownAs
-        .split('/')[4]
-        .split('.')[0];
-
       this.server.create('merchant-info', {
-        id: customizationJsonFilename,
+        id: await getFilenameFromDid(EXAMPLE_DID),
         name: 'Mandello',
         slug: 'mandello1',
         did: EXAMPLE_DID,
@@ -45,53 +42,23 @@ module(
 
       this.setProperties({
         safes: [
-          {
-            type: 'depot',
+          createDepotSafe({
             address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
             tokens: [
-              {
-                balance: '250000000000000000000',
-                token: {
-                  symbol: 'DAI',
-                },
-              },
-              {
-                balance: '500000000000000000000',
-                token: {
-                  symbol: 'CARD',
-                },
-              },
+              createSafeToken('CARD', '500000000000000000000'),
+              createSafeToken('DAI', '250000000000000000000'),
             ],
-          },
-          {
-            type: 'merchant',
-            createdAt: Date.now() / 1000,
+          }),
+          createMerchantSafe({
             address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
             merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
             tokens: [
-              {
-                balance: '125000000000000000000',
-                tokenAddress: '0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1',
-                token: {
-                  name: 'Dai Stablecoin.CPXD',
-                  symbol: 'DAI',
-                  decimals: 2,
-                },
-              },
-              {
-                balance: '450000000000000000000',
-                tokenAddress: '0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee',
-                token: {
-                  name: 'CARD Token Kovan.CPXD',
-                  symbol: 'CARD',
-                  decimals: 2,
-                },
-              },
+              createSafeToken('DAI', '125000000000000000000'),
+              createSafeToken('CARD', '450000000000000000000'),
             ],
-            owners: [],
             accumulatedSpendValue: 100,
             infoDID: EXAMPLE_DID,
-          },
+          }),
         ],
         chooseSafe: (safe: Safe) => (chosenSafe = safe),
       });
