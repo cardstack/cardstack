@@ -34,7 +34,8 @@ export type WorkflowName =
   | 'PREPAID_CARD_ISSUANCE'
   | 'RESERVE_POOL_DEPOSIT'
   | 'WITHDRAWAL'
-  | 'MERCHANT_CREATION';
+  | 'MERCHANT_CREATION'
+  | 'CARD_SPACE_CREATION';
 
 export abstract class Workflow {
   name!: WorkflowName;
@@ -243,4 +244,5 @@ export const WORKFLOW_NAMES = {
   MERCHANT_CREATION: 'Merchant Creation',
   RESERVE_POOL_DEPOSIT: 'Reserve Pool Deposit',
   WITHDRAWAL: 'Withdrawal',
+  CARD_SPACE_CREATION: 'Card Space Creation',
 };
