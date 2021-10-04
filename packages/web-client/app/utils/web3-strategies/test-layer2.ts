@@ -29,7 +29,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { useResource, useTask } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { reads } from 'macro-decorators';
-import { createPrepaidCardSafe } from '@cardstack/web-client/tests/helpers/factories';
+import { createPrepaidCardSafe } from '@cardstack/web-client/utils/test-factories';
 
 interface BridgeToLayer1Request {
   safeAddress: string;

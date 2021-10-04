@@ -14,7 +14,7 @@ import { buildState } from '@cardstack/web-client/models/workflow/workflow-sessi
 import {
   createDepotSafe,
   createSafeToken,
-} from '@cardstack/web-client/tests/helpers/factories';
+} from '@cardstack/web-client/utils/test-factories';
 
 interface Context extends MirageTestContext {}
 
