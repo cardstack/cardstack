@@ -1,10 +1,10 @@
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 import { encodeCardURL } from '@cardstack/core/src/utils';
-import { Environment, NODE, ENVIRONMENTS } from './interfaces';
+import { Environment, NODE, ENVIRONMENTS } from '../interfaces';
 import { writeFileSync, readJSONSync, existsSync, mkdirpSync, ensureSymlinkSync, removeSync } from 'fs-extra';
 import { join, dirname } from 'path';
 
-export class CardCache {
+export default class CardCache {
   constructor(private dir: string, private pkgName: string) {}
 
   private getCardLocation(env: Environment | 'assets', cardURL: string): string {

@@ -2,22 +2,39 @@ import { Builder as BuilderInterface, RawCard, CompiledCard } from '@cardstack/c
 import { Compiler } from '@cardstack/core/src/compiler';
 
 import { transformSync } from '@babel/core';
-import { NODE, BROWSER } from './interfaces';
-import { CardCache } from './cache';
+import { NODE, BROWSER } from '../interfaces';
+import CardCache from '../lib/card-cache';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
 import RealmManager from './realm-manager';
+import { inject } from '../di/dependency-injection';
+import config from 'config';
+import walkSync from 'walk-sync';
+import { serverLog as logger } from '../utils/logger';
 
-export default class Builder implements BuilderInterface {
+export default class CardBuilder implements BuilderInterface {
+  realmManager: RealmManager = inject('realm-manager', { as: 'realmManager' });
+  logger = logger;
+
   private compiler = new Compiler({
     builder: this,
   });
 
-  private realms: RealmManager;
-  private cache: CardCache;
+  private cache = new CardCache(config.get('compiler.cardCache.directory'), config.get('compiler.cardCache.pkgName'));
 
-  constructor(params: { realms: RealmManager; cardCacheDir: string; pkgName: string }) {
-    this.realms = params.realms;
-    this.cache = new CardCache(params.cardCacheDir, params.pkgName);
+  async primeCache(): Promise<void> {
+    let promises = [];
+
+    for (let realm of this.realmManager.realms) {
+      let cards = walkSync(realm.directory, { globs: ['**/card.json'] });
+      for (let cardPath of cards) {
+        let fullCardUrl = new URL(cardPath.replace('card.json', ''), realm.url).href;
+        this.logger.log(`--> Priming cache for ${fullCardUrl}`);
+        promises.push(this.buildCard(fullCardUrl));
+      }
+    }
+
+    await Promise.all(promises);
+    this.logger.log(`--> Cache primed`);
   }
 
   async define(cardURL: string, localPath: string, type: string, source: string): Promise<string> {
@@ -45,7 +62,7 @@ export default class Builder implements BuilderInterface {
 
   async getRawCard(url: string): Promise<RawCard> {
     url = url.replace(/\/$/, '');
-    return this.realms.getRawCard(url);
+    return this.realmManager.getRawCard(url);
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
@@ -74,6 +91,12 @@ export default class Builder implements BuilderInterface {
 
   async deleteCard(cardURL: string) {
     await this.cache.deleteCard(cardURL);
-    await this.realms.deleteCard(cardURL);
+    await this.realmManager.deleteCard(cardURL);
+  }
+}
+
+declare module '@cardstack/hub/di/dependency-injection' {
+  interface KnownServices {
+    'card-builder': CardBuilder;
   }
 }

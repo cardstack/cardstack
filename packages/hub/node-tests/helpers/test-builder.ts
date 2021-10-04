@@ -1,22 +1,18 @@
 import { CompiledCard, Builder as BuilderInterface, RawCard } from '@cardstack/core/src/interfaces';
 import { Compiler } from '@cardstack/core/src/compiler';
-import { createCardCacheDir } from './cache';
+// import { createCardCacheDir } from './cache';
 import { CSS_TYPE, JS_TYPE } from '@cardstack/core/src/utils/content';
-import { ensureTrailingSlash } from '../../src/utils/path';
-import Builder from '@cardstack/compiler-server/src/builder';
-import RealmManager from '../../src/realm-manager';
-import { BASE_CARD_REALM_CONFIG } from './fixtures';
+import { ensureTrailingSlash } from '../../utils/path';
+import type CardBuilder from '../../services/card-builder';
 
-const baseBuilder = (() => {
-  let { cardCacheDir } = createCardCacheDir();
-  let realms = new RealmManager([BASE_CARD_REALM_CONFIG]);
+// const baseBuilder = (() => {
+//   // TODO: How does this work now?
+//   // let { cardCacheDir } = createCardCacheDir();
 
-  return new Builder({
-    realms,
-    cardCacheDir,
-    pkgName: '@cardstack/compiled',
-  });
-})();
+//   return new CardBuilder();
+// })();
+
+const baseBuilder = {} as CardBuilder;
 
 export class TestBuilder implements BuilderInterface {
   compiler: Compiler;

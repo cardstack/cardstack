@@ -1,15 +1,14 @@
 import { RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
-import Realm from './realms/fs-realm';
-import { NotFound } from './middleware/errors';
-import { RealmInterface } from './interfaces';
-import { ensureTrailingSlash } from './utils/path';
+import Realm from '../realms/fs-realm';
+import { NotFound } from '../utils/error';
+import { RealmInterface } from '../interfaces';
+import { ensureTrailingSlash } from '../utils/path';
+import config from 'config';
+
+const realmsConfig = config.get('compiler.realmsConfig') as RealmConfig[];
 
 export default class RealmManager implements RealmInterface {
-  realms: Realm[];
-
-  constructor(realmConfigs: RealmConfig[]) {
-    this.realms = realmConfigs.map((realm) => new Realm(realm, this));
-  }
+  realms: Realm[] = realmsConfig.map((realm) => new Realm(realm, this));
 
   createRealm(config: RealmConfig, klass?: any) {
     let realm = klass ? new klass(config, this) : new Realm(config, this);
@@ -50,5 +49,11 @@ export default class RealmManager implements RealmInterface {
 
   async deleteCard(cardURL: string) {
     return this.getRealm(cardURL).deleteCard(cardURL);
+  }
+}
+
+declare module '@cardstack/hub/di/dependency-injection' {
+  interface KnownServices {
+    'realm-manager': RealmManager;
   }
 }

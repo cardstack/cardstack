@@ -1,8 +1,8 @@
 import { RealmConfig } from '@cardstack/core/src/interfaces';
 import { Project } from 'scenario-tester';
-import { BASE_CARD_REALM_CONFIG } from './fixtures';
-import RealmManager from '../../src/realm-manager';
-import FSRealm from '../../src/realms/fs-realm';
+// import { BASE_CARD_REALM_CONFIG } from './fixtures';
+import RealmManager from '@cardstack/hub/services/realm-manager';
+import FSRealm from '@cardstack/hub/realms/fs-realm';
 
 export class ProjectTestRealm extends FSRealm {
   project: Project;
@@ -26,7 +26,7 @@ export function setupRealms(mochaContext: Mocha.Suite): {
   createRealm: (name: string) => ProjectTestRealm;
   getRealmManager: () => RealmManager;
 } {
-  let realmConfigs: RealmConfig[] = [BASE_CARD_REALM_CONFIG];
+  // let realmConfigs: RealmConfig[] = [BASE_CARD_REALM_CONFIG];
   let realmManager: RealmManager;
 
   function createRealm(name: string): ProjectTestRealm {
@@ -34,7 +34,8 @@ export function setupRealms(mochaContext: Mocha.Suite): {
   }
 
   mochaContext.beforeEach(function () {
-    realmManager = new RealmManager(realmConfigs);
+    // TODO: How?
+    // realmManager = new RealmManager(realmConfigs);
   });
 
   return {

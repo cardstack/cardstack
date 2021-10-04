@@ -6,7 +6,8 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 import { ADDRESS_RAW_CARD, PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
 import { CompiledCard } from '@cardstack/core/src/interfaces';
 
-describe('Babel CardTemplatePlugin', function () {
+if (process.env.COMPILER) {
+  describe('Babel CardTemplatePlugin', function () {
   let builder: TestBuilder;
   let options: CardTemplateOptions;
   let personCard: CompiledCard;

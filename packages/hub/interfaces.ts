@@ -1,5 +1,6 @@
 import type { RawCard, Builder } from '@cardstack/core/src/interfaces';
-import type RealmManager from './realm-manager';
+import type RealmManager from './services/realm-manager';
+import type { Registry } from './di/dependency-injection';
 
 const ENVIRONMENTS_OBJ = {
   browser: '',
@@ -10,9 +11,11 @@ export const ENVIRONMENTS = Object.keys(ENVIRONMENTS_OBJ) as Environment[];
 export const BROWSER = ENVIRONMENTS[0];
 export const NODE = ENVIRONMENTS[1];
 
-export interface ServerOptions {
-  realms: RealmManager;
-  cardCacheDir: string;
+export interface HubServerConfig {
+  port?: number;
+  registryCallback?: undefined | ((registry: Registry) => void);
+  realms?: RealmManager; //TODO: Should this be moved to server creation and avoid having it part of the config thats passed around?
+  cardCacheDir?: string; // TODO: Moved to config
   routeCard?: string;
 }
 

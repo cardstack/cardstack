@@ -1,5 +1,4 @@
 import difference from 'lodash/difference';
-import { BadRequest } from '@cardstack/compiler-server/src/middleware/errors';
 import type CardModel from './card-model';
 
 const componentFormats = {
@@ -185,7 +184,7 @@ export function assertValidKeys(actualKeys: string[], expectedKeys: string[], er
   let unexpectedFields = difference(actualKeys, expectedKeys);
 
   if (unexpectedFields.length) {
-    throw new BadRequest(errorMessage.replace('%list%', '"' + unexpectedFields.join(', ') + '"'));
+    throw new Error(errorMessage.replace('%list%', '"' + unexpectedFields.join(', ') + '"'));
   }
 }
 

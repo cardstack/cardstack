@@ -1,14 +1,18 @@
 /* eslint-disable no-process-exit */
 
+import config from 'config';
 import Koa from 'koa';
+import { environment, httpLogging, errorMiddleware } from './middleware';
+import cors from '@koa/cors';
 import fetch from 'node-fetch';
 import * as Sentry from '@sentry/node';
-import logger from '@cardstack/logger';
+
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
-import config from 'config';
 import packageJson from './package.json';
 import { Registry, Container, RegistryCallback } from './di/dependency-injection';
+
+import { HubServerConfig } from './interfaces';
 
 import AuthenticationMiddleware from './services/authentication-middleware';
 import DatabaseManager from './services/database-manager';
@@ -46,21 +50,14 @@ import { Clock } from './services/clock';
 import Web3Service from './services/web3';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
-import { CardstackError } from './utils/error';
-import { environment, httpLogging } from './middleware';
-import cors from '@koa/cors';
+import RealmManager from './services/realm-manager';
+import CardBuilder from './services/card-builder';
+import { serverLog, workerLog } from './utils/logger';
+import CardRouter from './routes/card-routes';
 import ExchangeRatesService from './services/exchange-rates';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
-
-const workerLog = logger('hub/worker');
-
-export interface ServerConfig {
-  port?: number;
-  registryCallback?: undefined | ((registry: Registry) => void);
-  containerCallback?: undefined | ((container: Container) => void);
-}
 
 export function wireItUp(registryCallback?: RegistryCallback): Container {
   let registry = new Registry();
@@ -99,47 +96,57 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('web3', Web3Service);
   registry.register('wyre', WyreService);
   registry.register('wyre-callback-route', WyreCallbackRoute);
+
+  if (process.env.COMPILER) {
+    registry.register('realm-manager', RealmManager);
+    registry.register('card-builder', CardBuilder);
+  }
+
   if (registryCallback) {
     registryCallback(registry);
   }
   return new Container(registry);
 }
 
-const LOGGER = logger('hub/server');
-
-// Empty for now
-const DEFAULT_CONFIG: ServerConfig = {};
 export class HubServer {
-  logger = LOGGER;
-  static logger = LOGGER;
+  logger = serverLog;
+  static logger = serverLog;
 
-  static async create(config?: ServerConfig): Promise<HubServer> {
+  static async create(config?: Partial<HubServerConfig>): Promise<HubServer> {
     let container = wireItUp(config?.registryCallback);
-    config = Object.assign({}, DEFAULT_CONFIG, config);
+
+    let fullConfig = Object.assign({}, config) as HubServerConfig;
 
     initSentry();
 
     let app = new Koa<Koa.DefaultState, Koa.Context>()
-      .use(CardstackError.withJsonErrorHandling)
+      .use(errorMiddleware)
       .use(environment)
       .use(cors({ origin: '*', allowHeaders: 'Authorization, Content-Type, If-Match, X-Requested-With' }))
       .use(httpLogging);
 
-    app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
-    app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
-    app.use(((await container.lookup('api-router')) as ApiRouter).routes());
-    app.use(((await container.lookup('callbacks-router')) as CallbacksRouter).routes());
-    app.use(((await container.lookup('health-check')) as HealthCheck).routes()); // Setup health-check at "/"
+    app.use((await container.lookup('authentication-middleware')).middleware());
+    app.use((await container.lookup('development-proxy-middleware')).middleware());
+    app.use((await container.lookup('api-router')).routes());
+    app.use((await container.lookup('callbacks-router')).routes());
+    app.use((await container.lookup('health-check')).routes()); // Setup health-check at "/"
 
-    function onError(err: Error, ctx: Koa.Context) {
-      LOGGER.error(`Unhandled error:`, err);
+    let builder: CardBuilder;
+    if (process.env.COMPILER) {
+      builder = await container.lookup('card-builder');
+    } else {
+      builder = {} as CardBuilder;
+    }
+
+    let onError = (err: Error, ctx: Koa.Context) => {
+      this.logger.error(`Unhandled error:`, err);
       Sentry.withScope(function (scope) {
         scope.addEventProcessor(function (event) {
           return Sentry.Handlers.parseRequest(event, ctx.request);
         });
         Sentry.captureException(err);
       });
-    }
+    };
 
     async function onClose() {
       await container.teardown();
@@ -149,12 +156,14 @@ export class HubServer {
     app.on('close', onClose);
     app.on('error', onError);
 
-    return new this(app, container, config);
+    return new this(app, container, builder, fullConfig);
   }
+
   private constructor(
     public app: Koa<Koa.DefaultState, Koa.Context>,
     public container: Container,
-    private config: ServerConfig
+    public builder: CardBuilder,
+    private config: HubServerConfig
   ) {}
 
   teardown() {
@@ -175,6 +184,14 @@ export class HubServer {
 
     return instance;
   }
+
+  async primeCache() {
+    if (!process.env.COMPILER) {
+      throw new Error('COMPILER feature flag is not enabled');
+    }
+
+    await this.builder.primeCache();
+  }
 }
 
 function initSentry() {
@@ -188,8 +205,8 @@ function initSentry() {
   }
 }
 
-export function bootEnvironment() {
-  return wireItUp();
+export function bootEnvironment(callback?: HubServerConfig['registryCallback']) {
+  return wireItUp(callback);
 }
 
 export async function bootWorker() {

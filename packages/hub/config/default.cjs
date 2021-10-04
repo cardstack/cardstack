@@ -1,3 +1,6 @@
+const defer = require('config/defer').deferConfig;
+const { join } = require('path');
+
 module.exports = {
   hubEnvironment: 'development',
   aws: {
@@ -44,5 +47,25 @@ module.exports = {
   },
   web3: {
     network: 'sokol',
+  },
+  compiler: {
+    cardCache: {
+      directory: defer(function () {
+        return join(__dirname, '..', '..', 'compiled');
+      }),
+      pkgName: '@cardstack/compiled',
+    },
+    realmsConfig: defer(function () {
+      return [
+        {
+          url: 'https://cardstack.com/base/',
+          directory: join(__dirname, '..', '..', 'base-cards'),
+        },
+        {
+          url: 'https://demo.com/',
+          directory: join(__dirname, '..', '..', 'demo-cards'),
+        },
+      ];
+    }),
   },
 };

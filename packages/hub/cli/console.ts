@@ -3,7 +3,7 @@ import repl from 'repl';
 import { bootEnvironment } from '../main';
 
 exports.command = 'console';
-exports.describe = 'Load up a REPL';
+exports.describe = 'Load up a REPL! 📖 🤔 🖨 🔁';
 exports.builder = {};
 
 exports.handler = function (/* argv: Argv */) {

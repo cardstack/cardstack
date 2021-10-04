@@ -1,3 +1,4 @@
+// eslint-disable-next-line node/no-extraneous-import
 import { parse, isSameDay } from 'date-fns';
 import { expect } from 'chai';
 
@@ -47,37 +48,39 @@ class StubCards {
     return { data: { type: 'cards', id: 'x' } };
   }
   prepareComponent() {}
-  tracked(_target: object, _prop: string, desc: PropertyDescriptor) {
+  tracked(_target: Record<string, unknown>, _prop: string, desc: PropertyDescriptor) {
     return desc;
   }
 }
 const fakeComponent: unknown = {};
 
-describe('CardModel', function () {
-  it('.data', async function () {
-    let stub = new StubCards();
-    let model = PersonCardModel.fromResponse(stub, cardJSONResponse, fakeComponent);
-    expect(model.data.name).to.equal(attributes.name);
-    expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
-    expect(model.data.address.street).to.equal(attributes.address.street);
-    expect(isSameDay(model.data.address.settlementDate, p('1990-01-01')), 'Dates are serialized to Dates').to.be.ok;
-  });
+if (process.env.COMPILER) {
+  describe('CardModel', function () {
+    it('.data', async function () {
+      let stub = new StubCards();
+      let model = PersonCardModel.fromResponse(stub, cardJSONResponse, fakeComponent);
+      expect(model.data.name).to.equal(attributes.name);
+      expect(isSameDay(model.data.birthdate, p('1923-12-12')), 'Dates are serialized to Dates').to.be.ok;
+      expect(model.data.address.street).to.equal(attributes.address.street);
+      expect(isSameDay(model.data.address.settlementDate, p('1990-01-01')), 'Dates are serialized to Dates').to.be.ok;
+    });
 
-  it('.serialize', async function () {
-    let stub = new StubCards();
-    let model = PersonCardModel.fromResponse(stub, cardJSONResponse, fakeComponent);
+    it('.serialize', async function () {
+      let stub = new StubCards();
+      let model = PersonCardModel.fromResponse(stub, cardJSONResponse, fakeComponent);
 
-    await model.save();
-    let op = stub.lastOp;
-    if (!op || !('update' in op)) {
-      throw new Error(`did not find create operation`);
-    }
-    expect(op.update.payload, 'A model can be serialized once instantiated').to.deep.equal({
-      data: {
-        id: PERSON_RAW_CARD.url,
-        type: 'card',
-        attributes,
-      },
+      await model.save();
+      let op = stub.lastOp;
+      if (!op || !('update' in op)) {
+        throw new Error(`did not find create operation`);
+      }
+      expect(op.update.payload, 'A model can be serialized once instantiated').to.deep.equal({
+        data: {
+          id: PERSON_RAW_CARD.url,
+          type: 'card',
+          attributes,
+        },
+      });
     });
   });
-});
+}

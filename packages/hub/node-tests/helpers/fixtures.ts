@@ -1,5 +1,5 @@
 import { join } from 'path';
-import FSRealm from '../../src/realms/fs-realm';
+import FSRealm from '@cardstack/hub/realms/fs-realm';
 
 export const BASE_CARD_REALM_CONFIG = {
   url: 'https://cardstack.com/base',

@@ -1,10 +1,10 @@
-import { Environment } from '../../src/interfaces';
+import { Environment } from '../../interfaces';
 import tmp from 'tmp';
-import { CardCache } from '../../src/cache';
 import { join } from 'path';
 import { pathExistsSync } from 'fs-extra';
 import { encodeCardURL } from '@cardstack/core/src/utils';
 import { expect } from 'chai';
+import CardCache from '../../lib/card-cache';
 
 describe('CardCache', function () {
   let cache: CardCache;

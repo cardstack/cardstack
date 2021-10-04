@@ -9,7 +9,6 @@
 
 // using npm pkg instead of node built-in module since this needs to work on the browser too.
 import { getStatusText } from 'http-status-codes';
-import Koa from 'koa';
 
 interface ErrorDetails {
   status?: number;
@@ -44,23 +43,15 @@ export class CardstackError extends Error {
       source: this.source,
     };
   }
+}
 
-  static async withJsonErrorHandling(ctxt: Koa.Context, fn: Koa.Next) {
-    try {
-      return await fn();
-    } catch (err) {
-      if (!err.isCardstackError) {
-        throw err;
-      }
-      if (err.status === 500) {
-        console.error(`Unexpected error: ${err.status} - ${err.message}\n${err.stack}`); // eslint-disable-line no-console
-      }
-      let errors = [err];
-      if (err.additionalErrors) {
-        errors = errors.concat(err.additionalErrors);
-      }
-      ctxt.body = { errors };
-      ctxt.status = errors[0].status;
-    }
-  }
+export class NotFound extends Error {
+  status = 404;
+}
+export class BadRequest extends Error {
+  status = 400;
+}
+
+export class Conflict extends Error {
+  status = 409;
 }

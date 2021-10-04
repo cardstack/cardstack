@@ -1,13 +1,12 @@
-import { Conflict } from '../middleware/errors';
+import { Conflict, NotFound } from '../utils/error';
 import { assertValidRawCard, RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
 import { ensureDirSync, existsSync, readFileSync, readJsonSync, removeSync, writeJsonSync } from 'fs-extra';
 import { join } from 'path';
 import walkSync from 'walk-sync';
 import { RealmInterface } from '../interfaces';
-import { NotFound } from '../middleware/errors';
 import { ensureTrailingSlash } from '../utils/path';
-import RealmManager from '../realm-manager';
 import { nanoid } from '../utils/ids';
+import RealmManager from '../services/realm-manager';
 
 export default class FSRealm implements RealmInterface {
   url: string;
