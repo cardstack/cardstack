@@ -6,8 +6,11 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import BN from 'bn.js';
 
-import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
+import {
+  createDepotSafe,
+  createSafeToken,
+} from '@cardstack/web-client/tests/helpers/factories';
 
 module(
   'Integration | Component | card-pay/withdrawal-workflow/transaction-confirmed',
@@ -37,18 +40,11 @@ module(
         defaultToken: new BN('250000000000000000000'),
       });
       let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-      let testDepot = {
+      let testDepot = createDepotSafe({
         address: depotAddress,
-        tokens: [
-          {
-            balance: '250000000000000000000',
-            token: {
-              symbol: 'DAI',
-            },
-          },
-        ],
-      };
-      await layer2Service.test__simulateDepot(testDepot as DepotSafe);
+        tokens: [createSafeToken('DAI', '250000000000000000000')],
+      });
+      await layer2Service.test__simulateDepot(testDepot);
       session.setValue('withdrawalToken', 'DAI.CPXD');
       session.setValue('withdrawnAmount', new BN('123456000000000000000'));
 

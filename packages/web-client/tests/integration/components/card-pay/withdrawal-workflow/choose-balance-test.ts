@@ -6,9 +6,10 @@ import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import BN from 'bn.js';
 
-import { DepotSafe, Safe } from '@cardstack/cardpay-sdk/sdk/safes';
+import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import {
+  createDepotSafe,
   createMerchantSafe,
   createPrepaidCardSafe,
   createSafeToken,
@@ -43,25 +44,16 @@ module(
         card: new BN('500000000000000000000'),
       });
       let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-      let testDepot = {
+      let testDepot = createDepotSafe({
         address: depotAddress,
         tokens: [
-          {
-            balance: '250000000000000000000',
-            token: {
-              symbol: 'DAI',
-            },
-          },
-          {
-            balance: '500000000000000000000',
-            token: {
-              symbol: 'CARD',
-            },
-          },
+          createSafeToken('DAI', '250000000000000000000'),
+          createSafeToken('CARD', '500000000000000000000'),
         ],
-      };
+      });
+
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      await layer2Service.test__simulateDepot(testDepot as DepotSafe);
+      await layer2Service.test__simulateDepot(testDepot);
 
       let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
 

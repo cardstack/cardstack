@@ -16,7 +16,6 @@ import BN from 'bn.js';
 
 import { capitalize } from '@ember/string';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import { DepotSafe } from '@cardstack/cardpay-sdk';
 import { toWei } from 'web3-utils';
 import {
   createDepotSafe,
@@ -152,7 +151,7 @@ module('Acceptance | withdrawal', function (hooks) {
       ],
     });
 
-    await layer2Service.test__simulateDepot(testDepot as DepotSafe);
+    await layer2Service.test__simulateDepot(testDepot);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitFor(`${postableSel(2, 2)} [data-test-balance="DAI.CPXD"]`);
     assert

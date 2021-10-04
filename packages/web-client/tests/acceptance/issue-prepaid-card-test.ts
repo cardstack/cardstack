@@ -13,7 +13,6 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import { toWei } from 'web3-utils';
 import BN from 'bn.js';
 
-import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
@@ -592,24 +591,14 @@ module('Acceptance | issue prepaid card', function (hooks) {
         defaultToken: MIN_AMOUNT_TO_PASS,
         card: new BN('500000000000000000000'),
       });
-      let testDepot = {
+      let testDepot = createDepotSafe({
         address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
         tokens: [
-          {
-            balance: '250000000000000000000',
-            token: {
-              symbol: 'DAI',
-            },
-          },
-          {
-            balance: '500000000000000000000',
-            token: {
-              symbol: 'CARD',
-            },
-          },
+          createSafeToken('DAI', '250000000000000000000'),
+          createSafeToken('CARD', '500000000000000000000'),
         ],
-      };
-      await layer2Service.test__simulateDepot(testDepot as DepotSafe);
+      });
+      await layer2Service.test__simulateDepot(testDepot);
     });
 
     test('Disconnecting Layer 2 from within the workflow', async function (assert) {
