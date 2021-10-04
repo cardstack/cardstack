@@ -1,15 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 177 390">
   <defs>
-    <linearGradient id="b" x1=".149" y1=".296" x2=".73" y2=".801" gradientUnits="objectBoundingBox">
+    <linearGradient id="card-pay-illus-b" x1=".149" y1=".296" x2=".73" y2=".801" gradientUnits="objectBoundingBox">
       <stop offset="0" stop-color="#0ffff9"/>
       <stop offset="1" stop-color="#37eb77"/>
     </linearGradient>
-    <clipPath id="a">
+    <clipPath id="card-pay-illus-a">
       <path d="M10,0H177a0,0,0,0,1,0,0V390a0,0,0,0,1,0,0H10A10,10,0,0,1,0,380V10A10,10,0,0,1,10,0Z" transform="translate(321 460)" fill="#dbdbdb"/>
     </clipPath>
   </defs>
-  <g transform="translate(-321 -460)" clip-path="url(#a)">
-    <rect width="177" height="390" transform="translate(321 460)" fill="url(#b)"/>
+  <g transform="translate(-321 -460)" clip-path="url(#card-pay-illus-a)">
+    <rect width="177" height="390" transform="translate(321 460)" fill="url(#card-pay-illus-b)"/>
     <g opacity=".9">
       <g fill="#c3fc33">
         <path d="M458.1,2241.5a5.119,5.119,0,0,0-1.781,3.405c-.118.75-.8.853-1.318.985a2.2,2.2,0,0,0-1.218.5.854.854,0,0,1-.81.066,12.23,12.23,0,0,1-1.872-1.168,26.838,26.838,0,0,1-4.916-6.256,57.105,57.105,0,0,1-4-7.077c-.339-.777-.353-.771.5-1.375.694,1.319,1.34,2.658,2.089,3.938.594,1.014,1.312,1.956,2.035,3.017a.983.983,0,0,0-.1-1.082,40.648,40.648,0,0,1-3.888-6.637l.59-.386.339.293v-.866l1.586-.315c.473.221.7,1.058,1.476,1.162-.025.847.715,1.268,1.087,1.887a19.969,19.969,0,0,0,1.529,2c.5-.067.873-.136,1.251-.163,1.324-.094,1.292-.052,2.117.676.916.808,1.544,1.938,2.725,2.452a.323.323,0,0,1,.165.229c.037.85.514,1.159,1.312,1.366.67.173.86.88.892,1.575C457.917,2240.26,458.015,2240.789,458.1,2241.5Z" transform="translate(-6 22) translate(91.998 -1417.016) translate(-99.233 -75.276)"/>

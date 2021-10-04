@@ -1,1 +1,41 @@
-<svg height="62" viewBox="0 0 62 62" width="62" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><clipPath id="a"><path clip-rule="evenodd" d="m20.721-450a20.646 20.646 0 0 1 14 5.441l-3.391 3.4a15.864 15.864 0 0 0 -10.6-4.045 15.923 15.923 0 0 0 -15.93 15.925 15.923 15.923 0 0 0 15.923 15.924 15.924 15.924 0 0 0 15.923-15.924 15.848 15.848 0 0 0 -2.355-8.338l3.46-3.471a20.625 20.625 0 0 1 3.692 11.809 20.721 20.721 0 0 1 -20.721 20.721 20.721 20.721 0 0 1 -20.722-20.721 20.721 20.721 0 0 1 20.721-20.721z" transform="translate(0 450)"/></clipPath><clipPath id="b"><path d="m-25-428.954h46.046v-46.046h-46.046z" transform="translate(25 475)"/></clipPath><clipPath id="c"><path clip-rule="evenodd" d="m121.058-281.019a11.472 11.472 0 0 1 1.149 5.019 11.581 11.581 0 0 1 -11.6 11.558 11.581 11.581 0 0 1 -11.607-11.558 11.475 11.475 0 0 1 1.128-4.976l10.443 10.456z" transform="translate(-99 281.019)"/></clipPath><clipPath id="d"><path clip-rule="evenodd" d="m149.633-352a11.54 11.54 0 0 1 7.592 2.832l-7.689 7.675-7.6-7.584a11.541 11.541 0 0 1 7.697-2.923z" transform="translate(-141.938 352)"/></clipPath><clipPath id="e"><path d="m-25-428.954h46.046v-46.046h-46.046z" transform="translate(25 475)"/></clipPath><g transform="translate(1 1)"><g fill="#34019d" stroke="#fff"><rect height="60" rx="30" stroke="none" width="60"/><rect fill="none" height="61" rx="30.5" width="61" x="-.5" y="-.5"/></g><circle cx="30" cy="30" fill="none" r="30"/><g clip-path="url(#a)" transform="translate(9.279 9.279)"><g clip-path="url(#b)" transform="translate(-2.302 -2.302)"><path d="m-5-455h42.362v42.362h-42.362z" fill="#fff" transform="translate(6.842 456.842)"/></g></g><g clip-path="url(#c)" transform="translate(18.396 24.841)"><g clip-path="url(#b)" transform="translate(-11.419 -17.864)"><path d="m94-286.019h24.128v17.5h-24.128z" fill="#fff" transform="translate(-83.041 303.423)"/></g></g><g clip-path="url(#d)" transform="translate(22.351 18.304)"><g clip-path="url(#e)" transform="translate(-15.374 -11.327)"><path d="m136.938-357h16.208v11.427h-16.208z" fill="#54c3c9" transform="translate(-122.025 367.867)"/></g></g></g></svg>
+<svg height="62" viewBox="0 0 62 62" width="62"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <clipPath id="verifi-logo-a">
+    <path clip-rule="evenodd" d="m20.721-450a20.646 20.646 0 0 1 14 5.441l-3.391 3.4a15.864 15.864 0 0 0 -10.6-4.045 15.923 15.923 0 0 0 -15.93 15.925 15.923 15.923 0 0 0 15.923 15.924 15.924 15.924 0 0 0 15.923-15.924 15.848 15.848 0 0 0 -2.355-8.338l3.46-3.471a20.625 20.625 0 0 1 3.692 11.809 20.721 20.721 0 0 1 -20.721 20.721 20.721 20.721 0 0 1 -20.722-20.721 20.721 20.721 0 0 1 20.721-20.721z" transform="translate(0 450)"/>
+  </clipPath>
+  <clipPath id="verifi-logo-b">
+    <path d="m-25-428.954h46.046v-46.046h-46.046z" transform="translate(25 475)"/>
+  </clipPath>
+  <clipPath id="verifi-logo-c">
+    <path clip-rule="evenodd" d="m121.058-281.019a11.472 11.472 0 0 1 1.149 5.019 11.581 11.581 0 0 1 -11.6 11.558 11.581 11.581 0 0 1 -11.607-11.558 11.475 11.475 0 0 1 1.128-4.976l10.443 10.456z" transform="translate(-99 281.019)"/>
+  </clipPath>
+  <clipPath id="verifi-logo-d">
+    <path clip-rule="evenodd" d="m149.633-352a11.54 11.54 0 0 1 7.592 2.832l-7.689 7.675-7.6-7.584a11.541 11.541 0 0 1 7.697-2.923z" transform="translate(-141.938 352)"/>
+  </clipPath>
+  <clipPath id="verifi-logo-e">
+    <path d="m-25-428.954h46.046v-46.046h-46.046z" transform="translate(25 475)"/>
+  </clipPath>
+  <g transform="translate(1 1)">
+    <g fill="#34019d" stroke="#fff">
+      <rect height="60" rx="30" stroke="none" width="60"/>
+      <rect fill="none" height="61" rx="30.5" width="61" x="-.5" y="-.5"/>
+    </g>
+    <circle cx="30" cy="30" fill="none" r="30"/>
+    <g clip-path="url(#verifi-logo-a)" transform="translate(9.279 9.279)">
+      <g clip-path="url(#verifi-logo-b)" transform="translate(-2.302 -2.302)">
+        <path d="m-5-455h42.362v42.362h-42.362z" fill="#fff" transform="translate(6.842 456.842)"/>
+      </g>
+    </g>
+    <g clip-path="url(#verifi-logo-c)" transform="translate(18.396 24.841)">
+      <g clip-path="url(#verifi-logo-b)" transform="translate(-11.419 -17.864)">
+        <path d="m94-286.019h24.128v17.5h-24.128z" fill="#fff" transform="translate(-83.041 303.423)"/>
+      </g>
+    </g>
+    <g clip-path="url(#verifi-logo-d)" transform="translate(22.351 18.304)">
+      <g clip-path="url(#verifi-logo-e)" transform="translate(-15.374 -11.327)">
+        <path d="m136.938-357h16.208v11.427h-16.208z" fill="#54c3c9" transform="translate(-122.025 367.867)"/>
+      </g>
+    </g>
+  </g>
+</svg>

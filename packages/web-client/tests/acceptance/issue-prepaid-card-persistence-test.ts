@@ -86,7 +86,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
-            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
           id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
         },
         colorScheme: {
@@ -142,7 +142,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
-            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
           id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
         },
         colorScheme: {
@@ -265,7 +265,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
-            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
           id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
         },
         colorScheme: {
@@ -329,7 +329,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
-            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
           id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
         },
         colorScheme: {
@@ -390,7 +390,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
-            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
           id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
         },
         colorScheme: {
@@ -434,7 +434,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
-            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
           id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
         },
         colorScheme: {

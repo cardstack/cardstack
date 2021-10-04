@@ -1,1 +1,14 @@
-<svg height="17.5" viewBox="0 0 17.5 17.5" width="17.5" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><clipPath id="a"><path d="m0 0h17.5v17.5h-17.5z"/></clipPath><g clip-path="url(#a)" stroke="#000" stroke-width="1.5"><circle cx="8" cy="8" fill="#fff" r="8" transform="translate(.75 .75)"/><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="m12 6-6 6" transform="translate(-.25 -.25)"/><path d="m6 6 6 6" transform="translate(-.25 -.25)"/></g></g></svg>
+<svg height="17.5" viewBox="0 0 17.5 17.5" width="17.5"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <clipPath id="icon-x-circle-a">
+    <path d="m0 0h17.5v17.5h-17.5z"/>
+  </clipPath>
+  <g clip-path="url(#icon-x-circle-a)" stroke="#000" stroke-width="1.5">
+    <circle cx="8" cy="8" fill="#fff" r="8" transform="translate(.75 .75)"/>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m12 6-6 6" transform="translate(-.25 -.25)"/>
+      <path d="m6 6 6 6" transform="translate(-.25 -.25)"/>
+    </g>
+  </g>
+</svg>
