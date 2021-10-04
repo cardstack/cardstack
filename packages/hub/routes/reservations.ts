@@ -6,15 +6,20 @@ import { inject } from '../di/dependency-injection';
 import { AuthenticationUtils } from '../utils/authentication';
 import { validateRequiredFields } from './utils/validation';
 import { getSKUSummaries } from './utils/inventory';
+import { handleError } from './utils/error';
 import { validate as validateUUID } from 'uuid';
 import * as Sentry from '@sentry/node';
 import { captureSentryMessage } from './utils/sentry';
 import { getSDK } from '@cardstack/cardpay-sdk';
+import Logger from '@cardstack/logger';
+
+let log = Logger('routes:reservations');
 
 export default class ReservationsRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   subgraph = inject('subgraph');
   web3 = inject('web3');
+  relay = inject('relay');
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
   constructor() {
@@ -71,19 +76,25 @@ export default class ReservationsRoute {
     let sku = ctx.request.body.data.attributes.sku;
     Sentry.addBreadcrumb({ message: `received reservation create: userAddress=${userAddress}, sku=${sku}` });
 
+    let [relayIsAvailable, rpcIsAvailable] = await Promise.all([this.relay.isAvailable(), this.web3.isAvailable()]);
+    if (!relayIsAvailable) {
+      handleError(ctx, 503, 'Relay Server Unavailable', `The relay server is unavailable`);
+      let msg = `Relay server is not available, cannot create reservation: userAddress=${userAddress}, sku=${sku}`;
+      log.error(msg);
+      captureSentryMessage(msg, ctx);
+      return;
+    }
+    if (!rpcIsAvailable) {
+      handleError(ctx, 503, 'RPC Node Unavailable', `The RPC node is unavailable`);
+      let msg = `RPC node is not available, cannot create reservation: userAddress=${userAddress}, sku=${sku}`;
+      log.error(msg);
+      captureSentryMessage(msg, ctx);
+      return;
+    }
+
     let prepaidCardMarket = await getSDK('PrepaidCardMarket', this.web3.getInstance());
     if (await prepaidCardMarket.isPaused()) {
-      ctx.status = 400;
-      ctx.body = {
-        errors: [
-          {
-            status: '400',
-            title: 'Contract paused',
-            detail: `The market contract is paused`,
-          },
-        ],
-      };
-      ctx.type = 'application/vnd.api+json';
+      handleError(ctx, 503, 'Contract paused', `The market contract is paused`);
       captureSentryMessage(
         `Cannot create reservation for ${userAddress} with sku ${sku}, the market contract is paused`,
         ctx
@@ -91,35 +102,20 @@ export default class ReservationsRoute {
       return;
     }
 
-    let skuSummaries = await getSKUSummaries(await this.databaseManager.getClient(), this.subgraph, this.web3);
+    let skuSummaries = await getSKUSummaries(
+      await this.databaseManager.getClient(),
+      this.subgraph,
+      this.web3,
+      this.relay
+    );
     let skuSummary = skuSummaries.find((summary) => summary.id === sku);
     if (skuSummary?.attributes?.quantity === 0) {
-      ctx.status = 400;
-      ctx.body = {
-        errors: [
-          {
-            status: '400',
-            title: 'No inventory available',
-            detail: `There are no more prepaid cards available for the SKU ${sku}`,
-          },
-        ],
-      };
-      ctx.type = 'application/vnd.api+json';
+      handleError(ctx, 400, 'No inventory available', `There are no more prepaid cards available for the SKU ${sku}`);
       captureSentryMessage(`Cannot create reservation for ${userAddress}. No inventory available for SKU ${sku}`, ctx);
       return;
     }
     if (!skuSummary) {
-      ctx.status = 400;
-      ctx.body = {
-        errors: [
-          {
-            status: '400',
-            title: 'SKU does not exist',
-            detail: `The SKU ${sku} does not exist`,
-          },
-        ],
-      };
-      ctx.type = 'application/vnd.api+json';
+      handleError(ctx, 400, 'SKU does not exist', `The SKU ${sku} does not exist`);
       captureSentryMessage(`Cannot create reservation for ${userAddress}. SKU ${sku} does not exist`, ctx);
       return;
     }
@@ -160,17 +156,7 @@ export default class ReservationsRoute {
 }
 
 function handleNotFound(ctx: Koa.Context) {
-  ctx.status = 404;
-  ctx.body = {
-    errors: [
-      {
-        status: '404',
-        title: 'Reservation not found',
-        detail: `Could not find the reservation ${ctx.params.reservation_id}`,
-      },
-    ],
-  };
-  ctx.type = 'application/vnd.api+json';
+  handleError(ctx, 404, 'Reservation not found', `Could not find the reservation ${ctx.params.reservation_id}`);
 }
 
 declare module '@cardstack/hub/di/dependency-injection' {

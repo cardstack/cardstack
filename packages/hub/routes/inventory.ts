@@ -11,6 +11,7 @@ export default class InventoryRoute {
   authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   subgraph = inject('subgraph');
   web3 = inject('web3');
+  relay = inject('relay');
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
 
   constructor() {
@@ -28,7 +29,13 @@ export default class InventoryRoute {
       issuer = filter.issuer;
     }
 
-    let data = await getSKUSummaries(await this.databaseManager.getClient(), this.subgraph, this.web3, issuer);
+    let data = await getSKUSummaries(
+      await this.databaseManager.getClient(),
+      this.subgraph,
+      this.web3,
+      this.relay,
+      issuer
+    );
 
     ctx.status = 200;
     ctx.body = {

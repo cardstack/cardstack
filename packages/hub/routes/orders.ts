@@ -12,6 +12,7 @@ import { validate as validateUUID } from 'uuid';
 import * as JSONAPI from 'jsonapi-typescript';
 import * as Sentry from '@sentry/node';
 import { captureSentryMessage } from './utils/sentry';
+import { handleError } from './utils/error';
 let log = Logger('route:orders');
 
 export default class OrdersRoute {
@@ -46,17 +47,7 @@ export default class OrdersRoute {
 
     let validationError = await this.validateOrder(orderId, userAddress, reservationId, walletId);
     if (validationError) {
-      ctx.status = 422;
-      ctx.body = {
-        errors: [
-          {
-            status: '422',
-            title: 'Cannot create order',
-            detail: validationError,
-          },
-        ],
-      };
-      ctx.type = 'application/vnd.api+json';
+      handleError(ctx, 422, 'Cannot create order', validationError);
       captureSentryMessage(
         `could not validate order creation for orderId=${orderId}. validationError=${validationError}`,
         ctx
@@ -227,17 +218,7 @@ export default class OrdersRoute {
 }
 
 function handleNotFound(ctx: Koa.Context) {
-  ctx.status = 404;
-  ctx.body = {
-    errors: [
-      {
-        status: '404',
-        title: 'Order not found',
-        detail: `Order ${ctx.params.order_id} not found`,
-      },
-    ],
-  };
-  ctx.type = 'application/vnd.api+json';
+  handleError(ctx, 404, 'Order not found', `Order ${ctx.params.order_id} not found`);
 }
 
 declare module '@cardstack/hub/di/dependency-injection' {

@@ -3,6 +3,10 @@ import SubgraphService, { SKUInventory } from '../../services/subgraph';
 import * as JSONAPI from 'jsonapi-typescript';
 import Web3Service from '../../services/web3';
 import { getSDK } from '@cardstack/cardpay-sdk';
+import RelayService from '../../services/relay';
+import Logger from '@cardstack/logger';
+
+let log = Logger('routes/utils:inventory');
 
 const expirationMins = 60;
 const subgraphSyncGraceMins = 60;
@@ -15,12 +19,24 @@ export async function getSKUSummaries(
   db: DBClient,
   subgraph: SubgraphService,
   web3: Web3Service,
+  relay: RelayService,
   issuer?: string
 ): Promise<JSONAPI.ResourceObject[]> {
   let { inventories, reservations } = await getInventoriesAndActiveReservations(db, subgraph, issuer);
   let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3.getInstance());
-  let isPaused = await prepaidCardMarket.isPaused();
-  let data = inventories.map((inventory) => formatInventory(inventory, reservations, isPaused));
+  let [isPaused, relayIsAvailable, rpcIsAvailable] = await Promise.all([
+    prepaidCardMarket.isPaused(),
+    relay.isAvailable(),
+    web3.isAvailable(),
+  ]);
+  if (!relayIsAvailable) {
+    log.error(`Relay server is not available, suppressing inventory results`);
+  }
+  if (!rpcIsAvailable) {
+    log.error(`RPC node is not available, suppressing inventory results`);
+  }
+  let inventoryNotAvailableOverride = isPaused || !rpcIsAvailable || !relayIsAvailable;
+  let data = inventories.map((inventory) => formatInventory(inventory, reservations, inventoryNotAvailableOverride));
   return data;
 }
 
@@ -50,7 +66,7 @@ async function getInventoriesAndActiveReservations(
 function formatInventory(
   inventory: SKUInventory,
   reservations: SKUReservations,
-  isPaused: boolean
+  inventoryNotAvailableOverride: boolean
 ): JSONAPI.ResourceObject {
   let {
     askPrice,
@@ -74,7 +90,7 @@ function formatInventory(
       'face-value': parseInt(faceValue), // SPEND is safe to represent as a number in js
       'ask-price': askPrice,
       'customization-DID': customizationDID || null,
-      quantity: isPaused ? 0 : prepaidCards.length - (reservations[sku] ?? 0),
+      quantity: inventoryNotAvailableOverride ? 0 : prepaidCards.length - (reservations[sku] ?? 0),
 
       // These are not yet supported in the protocol right now. when these
       // become real things we'll query the subgraph for them
