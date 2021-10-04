@@ -60,9 +60,9 @@ const ORGS = [
       'personal profile',
       'etc.',
     ],
-    cta: 'Launching soon',
-    launched: false,
-    route: 'index',
+    cta: 'Open',
+    launched: true,
+    route: 'card-space',
   },
   {
     sideImage: {

@@ -1,0 +1,20 @@
+{{page-title "Card Space" replace=true}}
+
+<Boxel::Button
+  {{on "click" (fn this.transitionToWorkflow "create-space")}}
+  @kind="primary"
+  @size="touch"
+  data-test-workflow-button="create-space"
+>
+  Create Space
+</Boxel::Button>
+
+<Boxel::Modal
+  style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
+  @isOpen={{eq this.flow "create-space"}}
+  @onClose={{this.resetQueryParams}}
+>
+  {{#if (is-network-initialized)}}
+    <CardSpace::CreateSpaceWorkflow />
+  {{/if}}
+</Boxel::Modal>
