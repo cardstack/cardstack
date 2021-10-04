@@ -338,6 +338,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(AMOUNT)
       .containsText(convertAmountToNativeDisplay(jpyAmount, jpySymbol));
+    assert.dom(SECONDARY_AMOUNT).doesNotExist();
 
     let expectedUrl = generateMerchantPaymentUrl({
       domain: universalLinkDomain,
