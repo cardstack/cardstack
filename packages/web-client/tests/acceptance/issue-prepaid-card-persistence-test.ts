@@ -192,7 +192,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       assert.dom('[data-test-milestone="2"]').doesNotExist(); // Choose funding source
     });
 
-    test('it restores a cancelled workflow', async function (this: Context, assert) {
+    test('it restores a canceled workflow', async function (this: Context, assert) {
       let state = buildState({
         colorScheme: {
           patternColor: 'black',
@@ -210,7 +210,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           ],
           milestonesCount: 4,
           completedMilestonesCount: 3,
-          isCancelled: true,
+          isCanceled: true,
           cancelationReason: 'DISCONNECTED',
         },
         issuerName: 'Peter',

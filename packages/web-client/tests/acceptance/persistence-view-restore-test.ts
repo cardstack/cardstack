@@ -137,7 +137,7 @@ module('Acceptance | persistence view and restore', function () {
         name: 'PREPAID_CARD_ISSUANCE',
         state: buildState({
           meta: {
-            isCancelled: true,
+            isCanceled: true,
             cancelationReason: 'RESTORATION_UNAUTHENTICATED',
           },
         }),

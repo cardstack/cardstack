@@ -126,7 +126,7 @@ export abstract class Workflow {
     const cancelationReason = reason || 'UNKNOWN';
 
     this.session.setMeta({
-      isCancelled: true,
+      isCanceled: true,
       cancelationReason: cancelationReason,
     });
 
@@ -228,7 +228,7 @@ export abstract class Workflow {
     }
 
     if (
-      this.session.getMeta().isCancelled &&
+      this.session.getMeta().isCanceled &&
       this.session.getMeta().cancelationReason
     ) {
       this.cancel(this.session.getMeta().cancelationReason);

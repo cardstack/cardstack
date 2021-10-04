@@ -190,7 +190,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
       assert.dom('[data-test-withdrawal-next-step="new-withdrawal"]').exists();
     });
 
-    test('it restores a cancelled workflow', async function (this: Context, assert) {
+    test('it restores a canceled workflow', async function (this: Context, assert) {
       const state = buildState({
         withdrawalToken: 'DAI.CPXD',
         withdrawnAmount: new BN('1000000000000000000'),
@@ -222,7 +222,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
             'TRANSACTION_AMOUNT',
             'TRANSACTION_STATUS',
           ],
-          isCancelled: true,
+          isCanceled: true,
           cancelationReason: 'DISCONNECTED',
         },
       });
