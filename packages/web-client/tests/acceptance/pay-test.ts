@@ -16,7 +16,7 @@ import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-u
 import {
   createMerchantSafe,
   getFilenameFromDid,
-} from '@cardstack/web-client/tests/helpers/factories';
+} from '@cardstack/web-client/utils/test-factories';
 
 // selectors
 const MERCHANT = '[data-test-merchant]';

@@ -8,7 +8,7 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import {
   createMerchantSafe,
   getFilenameFromDid,
-} from '@cardstack/web-client/tests/helpers/factories';
+} from '@cardstack/web-client/utils/test-factories';
 
 interface Context extends MirageTestContext {}
 

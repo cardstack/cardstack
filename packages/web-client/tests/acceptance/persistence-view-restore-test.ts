@@ -23,7 +23,7 @@ import {
   createDepotSafe,
   createPrepaidCardSafe,
   createSafeToken,
-} from '../helpers/factories';
+} from '@cardstack/web-client/utils/test-factories';
 
 interface Context extends MirageTestContext {}
 
