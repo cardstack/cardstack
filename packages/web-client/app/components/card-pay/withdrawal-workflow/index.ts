@@ -94,9 +94,11 @@ class CheckBalanceWorkflowMessage
     if (
       layer1Network.defaultTokenBalance!.gte(minimumBalanceForWithdrawalClaim)!
     ) {
+      // The awkward positioning is a temporary hack to prevent commonmark from parsing this as a code block
+      // https://spec.commonmark.org/0.30/#indented-code-blocks
       return `Checking your balance...
 
-      It looks like you have enough ${
+It looks like you have enough ${
         c.layer1.nativeTokenSymbol
       } in your account on ${
         c.layer1.fullName
