@@ -1,19 +1,46 @@
 <article
+  class='card-space-profile-card__container'
   data-test-profile-card
   ...attributes
 >
   {{#if @isPreview}}
-    <aside>Profile preview</aside>
+    <aside class='card-space-profile-card__preview'>Profile preview</aside>
   {{/if}}
 
-  <div data-test-profile-card-name>{{or @name 'Name'}}</div>
-  <div data-test-profile-card-host>{{or @host 'blank.card.space'}}</div>
-  <div data-test-profile-card-category>{{or @category 'Category'}}</div>
-  <div data-test-profile-card-description>{{or @description 'Description'}}</div>
-  <Boxel::Button
-    @kind='secondary-light'
-    data-test-profile-card-button-text
-  >
-    {{or @buttonText 'Button Text'}}
-  </Boxel::Button>
+  <section class='card-space-profile-card__card'>
+    <heading
+      class='card-space-profile-card__heading'
+      data-test-profile-card-name
+    >
+      {{or @name 'Name'}}
+    </heading>
+
+    <div
+      class='card-space-profile-card__host'
+      data-test-profile-card-host
+    >
+      {{or @host 'blank.card.space'}}
+    </div>
+
+    <div
+      class='card-space-profile-card__category'
+      data-test-profile-card-category
+    >
+      {{or @category 'Category'}}
+    </div>
+
+    <p
+      class='card-space-profile-card__description'
+      data-test-profile-card-description
+    >
+      {{or @description 'Description'}}
+    </p>
+
+    <Boxel::Button
+      @kind='secondary-light'
+      data-test-profile-card-button-text
+    >
+      {{or @buttonText 'Button Text'}}
+    </Boxel::Button>
+  </section>
 </article>

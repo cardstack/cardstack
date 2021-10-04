@@ -1,0 +1,47 @@
+.card-space-profile-card__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-space-profile-card__preview {
+  margin-bottom: var(--boxel-sp-xxs);
+  color: var(--boxel-purple-400);
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.card-space-profile-card__card {
+  width: 17.5rem; /* FIXME hmm */
+  padding: var(--boxel-sp);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* FIXME correct? extract? */
+}
+
+.card-space-profile-card__heading {
+  font: 700 var(--boxel-font);
+}
+
+.card-space-profile-card__host {
+  font: 600 var(--boxel-font-sm);
+  color: var(--boxel-purple-500);
+}
+
+.card-space-profile-card__category {
+  display: inline-block;
+  margin-top: var(--boxel-sp-xxxs);
+  padding: 1px var(--boxel-sp-xs) 2px var(--boxel-sp-xs);
+  color: var(--boxel-purple-300);
+  font: 600 var(--boxel-font-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--boxel-lsp-xl);
+  background: var(--boxel-light-300);
+  border-radius: calc(var(--boxel-border-radius-sm) / 2); /* FIXME extract? */
+}
+
+.card-space-profile-card__description {
+  margin:
+    var(--boxel-sp-sm) 0
+    var(--boxel-sp-lg) 0;
+}
