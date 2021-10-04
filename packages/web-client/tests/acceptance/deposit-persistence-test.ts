@@ -304,11 +304,11 @@ module('Acceptance | deposit persistence', function (hooks) {
       assert.dom('[data-test-milestone="3"]').doesNotExist(); // Receive
     });
 
-    test('it restores a cancelled workflow', async function (this: Context, assert) {
+    test('it restores a canceled workflow', async function (this: Context, assert) {
       const state = buildState({
         meta: {
           completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
-          isCancelled: true,
+          isCanceled: true,
           cancelationReason: 'DISCONNECTED',
         },
         depositSourceToken: 'DAI',

@@ -29,7 +29,7 @@ export interface WorkflowMeta {
   completedCardNames: string[] | undefined;
   completedMilestonesCount: number | undefined;
   milestonesCount: number | undefined;
-  isCancelled: boolean | undefined;
+  isCanceled: boolean | undefined;
   cancelationReason: string | undefined;
 }
 
