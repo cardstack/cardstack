@@ -31,6 +31,7 @@ import {
 import { task } from 'ember-concurrency-decorators';
 import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
 import { action } from '@ember/object';
+import { isPresent } from '@ember/utils';
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
@@ -326,7 +327,6 @@ with Card Pay.`,
         );
       },
     }),
-    // cancelation for changing accounts
     new WorkflowMessage({
       author: cardbot,
       message:
@@ -359,13 +359,33 @@ with Card Pay.`,
         );
       },
     }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but your Card wallet got disconnected. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L2_DISCONNECTED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but your Layer 1 wallet got disconnected. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L1_DISCONNECTED
+        );
+      },
+    }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
-        return (Object.values(FAILURE_REASONS) as String[]).includes(
-          String(this.workflow?.cancelationReason)
-        );
+        return isPresent(this.workflow?.cancelationReason);
       },
     }),
   ]);

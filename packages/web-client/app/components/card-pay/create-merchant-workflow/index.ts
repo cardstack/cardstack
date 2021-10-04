@@ -27,6 +27,7 @@ import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
 import { tracked } from '@glimmer/tracking';
+import { isPresent } from '@ember/utils';
 
 const FAILURE_REASONS = {
   UNAUTHENTICATED: 'UNAUTHENTICATED',
@@ -300,22 +301,12 @@ class CreateMerchantWorkflow extends Workflow {
         );
       },
     }),
+
     new WorkflowCard({
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
-        return (
-          [
-            FAILURE_REASONS.UNAUTHENTICATED,
-            FAILURE_REASONS.DISCONNECTED,
-            FAILURE_REASONS.ACCOUNT_CHANGED,
-            FAILURE_REASONS.NO_PREPAID_CARD,
-            FAILURE_REASONS.INSUFFICIENT_PREPAID_CARD_BALANCE,
-            FAILURE_REASONS.RESTORATION_UNAUTHENTICATED,
-            FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED,
-            FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
-          ] as String[]
-        ).includes(String(this.workflow?.cancelationReason));
+        return isPresent(this.workflow?.cancelationReason);
       },
     }),
   ]);
