@@ -12,6 +12,9 @@ module('Integration | Component | card-space/profile-card', function (hooks) {
       />
     `);
 
+    assert.dom('[data-test-profile-card-placeholder-cover-photo]').exists();
+    assert.dom('[data-test-profile-card-placeholder-profile-photo]').exists();
+
     assert.dom('[data-test-profile-card-name]').containsText('Name');
     assert
       .dom('[data-test-profile-card-host]')
@@ -39,9 +42,25 @@ module('Integration | Component | card-space/profile-card', function (hooks) {
         @category='Health'
         @description='Welcome to a healthy & happy life!'
         @buttonText='Visit this Creator'
+        @coverPhoto='/images/prepaid-card-customizations/pattern-4.svg'
+        @profilePhoto='/images/logos/metamask-logo.svg'
         @isPreview={{true}}
       />
     `);
+
+    assert
+      .dom('[data-test-profile-card-placeholder-cover-photo]')
+      .doesNotExist();
+    assert
+      .dom('[data-test-profile-card-cover-photo] img')
+      .hasAttribute('src', '/images/prepaid-card-customizations/pattern-4.svg');
+
+    assert
+      .dom('[data-test-profile-card-placeholder-profile-photo]')
+      .doesNotExist();
+    assert
+      .dom('[data-test-profile-card-profile-photo] img')
+      .hasAttribute('src', '/images/logos/metamask-logo.svg');
 
     assert.dom('[data-test-profile-card-name]').containsText('Amazing Emily');
     assert

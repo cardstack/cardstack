@@ -8,6 +8,28 @@
   {{/if}}
 
   <section class='card-space-profile-card__card'>
+    <div
+      class='card-space-profile-card__profile-photo'
+      data-test-profile-card-profile-photo
+    >
+      {{#if @profilePhoto}}
+        <img src={{@profilePhoto}} alt='Profile' /> {{!-- FIXME are they presentational, since we can’t describe? --}}
+      {{else}}
+        {{svg-jar 'user' data-test-profile-card-placeholder-profile-photo=true}}
+      {{/if}}
+    </div>
+
+    <div
+      class='card-space-profile-card__cover-photo'
+      data-test-profile-card-cover-photo
+    >
+      {{#if @coverPhoto}}
+        <img src={{@coverPhoto}} alt='Cover' /> {{!-- FIXME are they presentational, since we can’t describe? --}}
+      {{else}}
+        {{svg-jar 'image' data-test-profile-card-placeholder-cover-photo=true}}
+      {{/if}}
+    </div>
+
     <heading
       class='card-space-profile-card__heading'
       data-test-profile-card-name
