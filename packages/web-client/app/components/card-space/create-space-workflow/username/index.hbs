@@ -1,0 +1,30 @@
+<ActionCardContainer
+  @header="User Profile"
+  @isComplete={{@isComplete}}
+  data-test-card-space-username-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section @title="Pick a username">
+  </ActionCardContainer::Section>
+
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    @disabled={{@frozen}}
+  >
+    <:default as |d|>
+      <d.ActionButton
+        {{on "click" @onComplete}}
+        data-test-card-space-username-save-button
+      >
+        Continue
+      </d.ActionButton>
+    </:default>
+    <:memorialized as |m|>
+      <m.ActionButton
+        data-test-card-space-username-edit-button
+        {{on "click" @onIncomplete}}
+      >
+        Edit
+      </m.ActionButton>
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

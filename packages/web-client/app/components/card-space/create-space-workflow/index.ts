@@ -115,12 +115,11 @@ class CreateSpaceWorkflow extends Workflow {
           author: cardbot,
           message: `Please pick a username for your account. This is the name that will be shown to others when you communicate with them. If you like, you can upload a profile picture too.`,
         }),
-        // TODO
-        // new WorkflowCard({
-        //   author: cardbot,
-        //   cardName: 'CARD_SPACE_USERNAME',
-        //   componentName: 'card-space/create-space-workflow/username',
-        // }),
+        new WorkflowCard({
+          author: cardbot,
+          cardName: 'CARD_SPACE_USERNAME',
+          componentName: 'card-space/create-space-workflow/username',
+        }),
       ],
       completedDetail: `Username picked`,
     }),
@@ -135,12 +134,11 @@ class CreateSpaceWorkflow extends Workflow {
           author: cardbot,
           message: `Now it's time to set up your space. The preview shows you how your space will be displayed to users who visit the Card Space org.`,
         }),
-        // TODO
-        // new WorkflowCard({
-        //   author: cardbot,
-        //   cardName: 'CARD_SPACE_DETAILS',
-        //   componentName: 'card-space/create-space-workflow/details',
-        // }),
+        new WorkflowCard({
+          author: cardbot,
+          cardName: 'CARD_SPACE_DETAILS',
+          componentName: 'card-space/create-space-workflow/details',
+        }),
       ],
       completedDetail: `Card Space details saved`,
     }),
@@ -151,22 +149,20 @@ class CreateSpaceWorkflow extends Workflow {
           author: cardbot,
           message: `We have sent your URL reservation badge to your connected account (just check your Card Wallet mobile app).`,
         }),
-        // TODO
-        // new WorkflowCard({
-        //   author: cardbot,
-        //   cardName: 'CARD_SPACE_BADGE',
-        //   componentName: 'card-space/create-space-workflow/badge',
-        // }),
+        new WorkflowCard({
+          author: cardbot,
+          cardName: 'CARD_SPACE_BADGE',
+          componentName: 'card-space/create-space-workflow/badge',
+        }),
         new WorkflowMessage({
           author: cardbot,
           message: `On to the next step: You need to pay a small protocol fee to create your Card Space. Please select a prepaid card with a spendable balance from your ${c.layer2.fullName} wallet.`,
         }),
-        // TODO
-        // new WorkflowCard({
-        //   author: cardbot,
-        //   cardName: 'CARD_SPACE_CONFIRM',
-        //   componentName: 'card-space/create-space-workflow/confirm',
-        // }),
+        new WorkflowCard({
+          author: cardbot,
+          cardName: 'CARD_SPACE_CONFIRM',
+          componentName: 'card-space/create-space-workflow/confirm',
+        }),
         new WorkflowMessage({
           author: cardbot,
           message: `Thank you for your payment.`,
@@ -183,7 +179,7 @@ class CreateSpaceWorkflow extends Workflow {
     // TODO
     // new WorkflowCard({
     //   author: cardbot,
-    //   cardName: 'EPILOGUE_PREPAID_CARD',
+    //   cardName: 'EPILOGUE_PREPAID_CARD_BALANCE',
     //   componentName: 'card-pay/prepaid-card-balance',
     // }),
     new WorkflowMessage({
