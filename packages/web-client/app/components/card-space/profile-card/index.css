@@ -81,9 +81,9 @@
 .card-space-profile-card__category {
   display: inline-block;
   margin-top: var(--boxel-sp-xxxs);
-  padding: 1px var(--boxel-sp-xs) 2px var(--boxel-sp-xs);
+  padding: 2px var(--boxel-sp-xxxs) 2px var(--boxel-sp-xxxs);
   color: var(--boxel-purple-300);
-  font: 600 var(--boxel-font-xs);
+  font: 600 0.55rem var(--boxel-font-family); /* FIXME??? */
   text-transform: uppercase;
   letter-spacing: var(--boxel-lsp-xl);
   background: var(--boxel-light-300);
