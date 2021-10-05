@@ -6,6 +6,7 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
 
+import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { BN } from 'bn.js';
 import {
@@ -44,6 +45,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
   setupMirage(hooks);
   setupHubAuthenticationToken(hooks);
   let workflowPersistenceService: WorkflowPersistence;
+  let testDepot: DepotSafe | undefined;
 
   hooks.beforeEach(async function (this: Context) {
     this.server.db.loadData({
@@ -113,6 +115,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
+        prepaidFundingSafe: testDepot,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -172,6 +175,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
+        prepaidFundingSafe: testDepot,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -242,6 +246,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
+        prepaidFundingSafe: testDepot,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 500,
       });
@@ -301,6 +306,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
+        prepaidFundingSafe: testDepot,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -368,6 +374,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
+        prepaidFundingSafe: testDepot,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
