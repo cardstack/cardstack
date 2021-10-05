@@ -46,6 +46,7 @@
   --boxel-border-color: var(--boxel-light-500);
   --boxel-border: 1px solid var(--boxel-border-color);
   --boxel-border-dark: 1px solid var(--boxel-dark);
+  --boxel-border-radius-xs: 2px;
   --boxel-border-radius-sm: 5px;
   --boxel-border-radius: 10px;
   --boxel-transition: 0.2s ease;

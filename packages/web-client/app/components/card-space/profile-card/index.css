@@ -98,7 +98,7 @@
   text-transform: uppercase;
   letter-spacing: var(--boxel-lsp-xl);
   background: var(--boxel-light-300);
-  border-radius: calc(var(--boxel-border-radius-sm) / 2); /* FIXME extract? */
+  border-radius: var(--boxel-border-radius-xs);
 }
 
 .card-space-profile-card__description {
