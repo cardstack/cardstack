@@ -20,10 +20,13 @@ const { provisionerSecret } = config.get('relay') as RelayServiceConfig;
 
 export default class RelayService {
   async isAvailable(): Promise<boolean> {
-    let relayUrl = getConstantByNetwork('relayServiceURL', network);
+    let relayUrl = `${getConstantByNetwork('relayServiceURL', network)}/api/v1/about/`;
     try {
-      let response = await fetch(`${relayUrl}/api/v1/about/`);
-      return response.status === 200;
+      let response = await fetch(relayUrl);
+      if (!response.ok) {
+        log.warn(`Relay service, ${relayUrl}, is not available: ${response.status}`);
+      }
+      return response.ok;
     } catch (e) {
       log.error(`Error encountered while checking if relay server ${relayUrl} is available`, e);
       return false;
