@@ -1,4 +1,7 @@
 .card-space-profile-card__container {
+  --profile-card-cover-photo-width: 17.5rem;
+  --profile-card-cover-photo-height: calc(var(--profile-card-cover-photo-width) * 50 / 125);
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,7 +17,7 @@
 
 .card-space-profile-card__card {
   position: relative;
-  width: 17.5rem; /* FIXME hmm */
+  width: var(--profile-card-cover-photo-width);
   border-radius: var(--boxel-border-radius);
   overflow: hidden;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* FIXME correct? extract? */
@@ -25,7 +28,7 @@
 }
 
 .card-space-profile-card__cover-photo {
-  height: calc(17.5rem * 50 / 125); /* ?! prop from design */
+  height: var(--profile-card-cover-photo-height);
   width: 100%;
   object-fit: cover;
 }
@@ -48,7 +51,7 @@
   --image-height: 3rem;
 
   position: absolute;
-  top: calc((17.5rem * 50 / 125) - var(--image-height) / 2);
+  top: calc(var(--profile-card-cover-photo-height) - var(--image-height) / 2);
   height: var(--image-height);
   width: var(--image-height);
   border-radius: var(--image-height);
