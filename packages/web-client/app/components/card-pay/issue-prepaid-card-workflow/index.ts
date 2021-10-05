@@ -28,7 +28,6 @@ import { tracked } from '@glimmer/tracking';
 import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
 
 export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
-export const spendToUsdRate = 0.01;
 
 const FAILURE_REASONS = {
   UNAUTHENTICATED: 'UNAUTHENTICATED',

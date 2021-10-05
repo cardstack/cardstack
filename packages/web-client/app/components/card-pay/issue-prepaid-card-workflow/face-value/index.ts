@@ -9,7 +9,7 @@ import {
   TokenDisplayInfo,
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
-import { faceValueOptions, spendToUsdRate } from '../index';
+import { faceValueOptions } from '../index';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 
 interface FaceValue {
@@ -20,7 +20,6 @@ interface FaceValue {
 
 class FaceValueCard extends Component<WorkflowCardComponentArgs> {
   faceValueOptions = faceValueOptions;
-  spendToUsdRate = spendToUsdRate;
 
   @service declare layer2Network: Layer2Network;
   get fundingTokenSymbol(): TokenSymbol {
