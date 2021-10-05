@@ -94,7 +94,7 @@
   margin-top: var(--boxel-sp-xxxs);
   padding: 2px var(--boxel-sp-xxxs) 2px var(--boxel-sp-xxxs);
   color: var(--boxel-purple-300);
-  font: 600 0.55rem var(--boxel-font-family); /* FIXME??? */
+  font: 600 0.55rem var(--boxel-font-family);
   text-transform: uppercase;
   letter-spacing: var(--boxel-lsp-xl);
   background: var(--boxel-light-300);
