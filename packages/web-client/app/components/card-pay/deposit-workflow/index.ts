@@ -49,7 +49,7 @@ class DepositWorkflow extends Workflow {
       postables: [
         new WorkflowMessage({
           author: cardbot,
-          message: "Hi there, we're happy to see you!",
+          message: 'Hi there, we’re happy to see you!',
         }),
         new WorkflowMessage({
           author: cardbot,
@@ -100,8 +100,8 @@ class DepositWorkflow extends Workflow {
         }),
         new NetworkAwareWorkflowMessage({
           author: cardbot,
-          message: `You have connected your ${c.layer1.fullName} wallet. Now it's time to connect your ${c.layer2.fullName}
-          wallet via your Card Wallet mobile app. If you don't have the app installed, please do so now.`,
+          message: `You have connected your ${c.layer1.fullName} wallet. Now it’s time to connect your ${c.layer2.fullName}
+          wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
           includeIf() {
             return !this.hasLayer2Account;
           },
@@ -129,7 +129,7 @@ class DepositWorkflow extends Workflow {
         new WorkflowMessage({
           author: cardbot,
           message:
-            "Let's get down to business. Please choose the asset you would like to deposit into the CARD Protocol's reserve pool.",
+            'Let’s get down to business. Please choose the asset you would like to deposit into the CARD Protocol’s reserve pool.',
         }),
         new WorkflowCard({
           author: cardbot,
@@ -153,7 +153,7 @@ class DepositWorkflow extends Workflow {
       postables: [
         new WorkflowMessage({
           author: cardbot,
-          message: `Congrats! Now that you have deposited funds into the CARD Protocol's reserve pool, your token will be bridged to the ${c.layer2.shortName} blockchain. You can check the status below.`,
+          message: `Congrats! Now that you have deposited funds into the CARD Protocol’s reserve pool, your token will be bridged to the ${c.layer2.shortName} blockchain. You can check the status below.`,
         }),
         new WorkflowCard({
           author: cardbot,

@@ -18,11 +18,11 @@ interface ChainChangeModalOptions {
 const networkCorrectionMessages = {
   layer1: {
     title: `Please connect to ${c.layer1.fullName}`,
-    body: `Card Pay uses ${c.layer1.fullName} as its Layer 1 network. To ensure the safety of your assets and transactions, this page will reload as soon as you change your wallet's network to ${c.layer1.fullName} or disconnect your wallet.`,
+    body: `Card Pay uses ${c.layer1.fullName} as its Layer 1 network. To ensure the safety of your assets and transactions, this page will reload as soon as you change your wallet’s network to ${c.layer1.fullName} or disconnect your wallet.`,
   },
   layer2: {
     title: `Please connect to ${c.layer2.fullName}`,
-    body: `Card Pay uses ${c.layer2.fullName} as its Layer 2 network. To ensure the safety of your assets and transactions, we've disconnected your wallet. You can restart any incomplete workflows after reconnecting with ${c.layer2.fullName}.`,
+    body: `Card Pay uses ${c.layer2.fullName} as its Layer 2 network. To ensure the safety of your assets and transactions, we’ve disconnected your wallet. You can restart any incomplete workflows after reconnecting with ${c.layer2.fullName}.`,
   },
 };
 

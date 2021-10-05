@@ -56,7 +56,11 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    if (!this.completedLayer2TxnReceipt) {
+    if (this.completedLayer2TxnReceipt) {
+      this.completedStepCount = 3;
+      this.blockCount = this.totalBlockCount;
+      this.args.onComplete?.();
+    } else {
       taskFor(this.waitForBlockConfirmationsTask)
         .perform()
         .catch((e) => {
