@@ -20,7 +20,7 @@
   width: var(--profile-card-cover-photo-width);
   border-radius: var(--boxel-border-radius);
   overflow: hidden;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* FIXME correct? extract? */
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
 }
 
 .card-space-profile-card__cover-photo-container {
