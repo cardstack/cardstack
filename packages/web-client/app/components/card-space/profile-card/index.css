@@ -13,13 +13,63 @@
 }
 
 .card-space-profile-card__card {
+  position: relative;
   width: 17.5rem; /* FIXME hmm */
-  padding: var(--boxel-sp);
   border-radius: var(--boxel-border-radius);
+  overflow: hidden;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* FIXME correct? extract? */
 }
 
+.card-space-profile-card__cover-photo img,
+.card-space-profile-card__cover-photo svg {
+  height: calc(17.5rem * 50 / 125); /* ?! prop from design */
+  width: 100%;
+  object-fit: cover;
+}
+
+.card-space-profile-card__placeholder-cover-photo {
+  --icon-color: var(--boxel-purple-300);
+
+  background-color: var(--boxel-light-400);
+}
+
+.card-space-profile-card__placeholder-cover-photo > circle {
+  display: none;
+}
+
+.card-space-profile-card__placeholder-profile-photo path {
+  --icon-color: var(--boxel-purple-300);
+
+  transform: scale(0.5) translateX(50%) translateY(50%);
+}
+
+.card-space-profile-card__profile-photo img {
+  background: var(--boxel-light);
+}
+
+.card-space-profile-card__profile-photo svg {
+  background: var(--boxel-light-400);
+}
+
+.card-space-profile-card__profile-photo img,
+.card-space-profile-card__profile-photo svg {
+  --image-height: 3rem;
+
+  position: absolute;
+  top: calc((17.5rem * 50 / 125) - var(--image-height) / 2);
+  height: var(--image-height);
+  width: var(--image-height);
+  border-radius: var(--image-height);
+  border: 1px solid var(--boxel-purple-300);
+  left: var(--boxel-sp);
+}
+
+.card-space-profile-card__body {
+  padding: var(--boxel-sp-lg) var(--boxel-sp) var(--boxel-sp);
+}
+
 .card-space-profile-card__heading {
+  margin-top: var(--boxel-sp);
   font: 700 var(--boxel-font);
 }
 

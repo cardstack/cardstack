@@ -15,7 +15,11 @@
       {{#if @profilePhoto}}
         <img src={{@profilePhoto}} alt='Profile' /> {{!-- FIXME are they presentational, since we can’t describe? --}}
       {{else}}
-        {{svg-jar 'user' data-test-profile-card-placeholder-profile-photo=true}}
+        {{svg-jar
+          'user'
+          class='card-space-profile-card__placeholder-profile-photo'
+          data-test-profile-card-placeholder-profile-photo=true
+        }}
       {{/if}}
     </div>
 
@@ -26,43 +30,49 @@
       {{#if @coverPhoto}}
         <img src={{@coverPhoto}} alt='Cover' /> {{!-- FIXME are they presentational, since we can’t describe? --}}
       {{else}}
-        {{svg-jar 'image' data-test-profile-card-placeholder-cover-photo=true}}
+        {{svg-jar
+          'image'
+          class='card-space-profile-card__placeholder-cover-photo'
+          data-test-profile-card-placeholder-cover-photo=true
+        }}
       {{/if}}
     </div>
 
-    <heading
-      class='card-space-profile-card__heading'
-      data-test-profile-card-name
-    >
-      {{or @name 'Name'}}
-    </heading>
+    <main class='card-space-profile-card__body'>
+      <heading
+        class='card-space-profile-card__heading'
+        data-test-profile-card-name
+      >
+        {{or @name 'Name'}}
+      </heading>
 
-    <div
-      class='card-space-profile-card__host'
-      data-test-profile-card-host
-    >
-      {{or @host 'blank.card.space'}}
-    </div>
+      <div
+        class='card-space-profile-card__host'
+        data-test-profile-card-host
+      >
+        {{or @host 'blank.card.space'}}
+      </div>
 
-    <div
-      class='card-space-profile-card__category'
-      data-test-profile-card-category
-    >
-      {{or @category 'Category'}}
-    </div>
+      <div
+        class='card-space-profile-card__category'
+        data-test-profile-card-category
+      >
+        {{or @category 'Category'}}
+      </div>
 
-    <p
-      class='card-space-profile-card__description'
-      data-test-profile-card-description
-    >
-      {{or @description 'Description'}}
-    </p>
+      <p
+        class='card-space-profile-card__description'
+        data-test-profile-card-description
+      >
+        {{or @description 'Description'}}
+      </p>
 
-    <Boxel::Button
-      @kind='secondary-light'
-      data-test-profile-card-button-text
-    >
-      {{or @buttonText 'Button Text'}}
-    </Boxel::Button>
+      <Boxel::Button
+        @kind='secondary-light'
+        data-test-profile-card-button-text
+      >
+        {{or @buttonText 'Button Text'}}
+      </Boxel::Button>
+    </main>
   </section>
 </article>
