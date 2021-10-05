@@ -188,10 +188,6 @@ module('Acceptance | persistence view and restore', function () {
         .containsText('Complete');
 
       assert
-        .dom('[data-test-completed-workflow] button')
-        .isDisabled('expected a completed workflow button to be disabled');
-
-      assert
         .dom('[data-test-completed-workflow] .boxel-progress-icon--complete')
         .exists();
 
