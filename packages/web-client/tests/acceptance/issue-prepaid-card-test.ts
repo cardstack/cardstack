@@ -32,6 +32,7 @@ import {
 } from '@cardstack/web-client/models/workflow/workflow-session';
 import {
   createDepotSafe,
+  createMerchantSafe,
   createPrepaidCardSafe,
   createSafeToken,
   defaultCreatedPrepaidCardDID,
@@ -120,6 +121,19 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
+    let merchantSafe = createMerchantSafe({
+      address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
+      merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+      tokens: [
+        createSafeToken('DAI', '125000000000000000000'),
+        createSafeToken('CARD', '450000000000000000000'),
+      ],
+      accumulatedSpendValue: 100,
+    });
+
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         address: depotAddress,
@@ -136,6 +150,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         prepaidCardOwner: layer2AccountAddress,
         issuer: layer2AccountAddress,
       }),
+      merchantSafe,
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
@@ -261,16 +276,24 @@ module('Acceptance | issue prepaid card', function (hooks) {
     post = postableSel(2, 2);
     // // funding-source card
     assert
-      .dom('[data-test-account-outer] [data-test-account-address]')
-      .hasText('0x1826...6E44');
-    assert
-      .dom(
-        `${post} [data-test-account-depot-outer] [data-test-account-address]`
-      )
-      .hasText(depotAddress);
+      .dom(`${post} [data-test-choose-balance-from-safe]`)
+      .hasText(`DEPOT ${depotAddress}`);
+
     assert
       .dom(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`)
       .containsText(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER.toFixed(2)} DAI`);
+
+    await click(
+      '[data-test-safe-chooser-dropdown] .ember-power-select-trigger'
+    );
+    assert
+      .dom('[data-test-safe-chooser-dropdown] li:nth-child(1)')
+      .containsText(depotAddress);
+    assert
+      .dom('[data-test-safe-chooser-dropdown] li:nth-child(2)')
+      .containsText(merchantSafe.address);
+
+    await click('[data-test-safe-chooser-dropdown] li:nth-child(2)');
     await click(
       `${post} [data-test-boxel-action-chin] [data-test-boxel-button]`
     );
@@ -278,16 +301,14 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`)
       .doesNotExist();
     assert
-      .dom(`${post} [data-test-account-balance]`)
-      .containsText(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER.toFixed(2)} DAI`);
+      .dom(`${post} [data-test-balance-display-amount]`)
+      .containsText('125.00 DAI');
 
     assert
       .dom(postableSel(2, 3))
       .containsText('choose the face value of your prepaid card');
     // // face-value card
-    assert
-      .dom('[data-test-balance-view-summary]')
-      .containsText(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER.toFixed(2)} DAI`);
+    assert.dom('[data-test-balance-view-summary]').containsText('125.00 DAI');
     await click('[data-test-balance-view-summary]');
     assert
       .dom('[data-test-balance-view-account-address]')
@@ -542,7 +563,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
           '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
         id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
       },
-      prepaidCardAddress,
+      prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
+      prepaidFundingSafe: merchantSafe,
       prepaidFundingToken: 'DAI.CPXD',
       reloadable: false,
       spendFaceValue: 10000,
