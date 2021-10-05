@@ -27,7 +27,10 @@ export default class Web3Service {
     let rpcURL = getConstantByNetwork('rpcNode', network);
     try {
       let response = await fetch(rpcURL);
-      return response.status === 200;
+      if (!response.ok) {
+        log.error(`RPC node, ${rpcURL}, is not available: ${response.status}`);
+      }
+      return response.ok;
     } catch (e) {
       log.error(`Error encountered while checking if rpc node ${rpcURL} is available`, e);
       return false;
