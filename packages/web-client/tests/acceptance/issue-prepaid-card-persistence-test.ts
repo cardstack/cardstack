@@ -8,7 +8,7 @@ import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { BN } from 'bn.js';
-import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/workflow-config';
+import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { toWei } from 'web3-utils';
 

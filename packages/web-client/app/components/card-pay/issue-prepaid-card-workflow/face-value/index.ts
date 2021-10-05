@@ -9,7 +9,7 @@ import {
   TokenDisplayInfo,
   TokenSymbol,
 } from '@cardstack/web-client/utils/token';
-import { faceValueOptions, spendToUsdRate } from '../workflow-config';
+import { faceValueOptions, spendToUsdRate } from '../index';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 
 interface FaceValue {
