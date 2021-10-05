@@ -33,6 +33,7 @@ import {
   createSafeToken,
   defaultCreatedPrepaidCardDID,
 } from '@cardstack/web-client/utils/test-factories';
+import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
 
 interface Context extends MirageTestContext {}
 
@@ -546,6 +547,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         background: '#37EB77',
         id: '4f219852-33ee-4e4c-81f7-76318630a423',
       },
+      daiMinValue: MIN_AMOUNT_TO_PASS,
       did: defaultCreatedPrepaidCardDID,
       issuerName: 'JJ',
       layer2WalletAddress: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
@@ -726,7 +728,15 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert
         .dom(cancelationPostableSel(0))
         .containsText(
-          `Looks like there’s no balance in your ${c.layer2.fullName} wallet to fund a prepaid card. Before you can continue, please add funds to your ${c.layer2.fullName} wallet by bridging some tokens from your ${c.layer1.fullName} wallet.`
+          `Looks like there’s not enough balance in your ${
+            c.layer2.fullName
+          } wallet to fund a prepaid card. Before you can continue, please add funds to your ${
+            c.layer2.fullName
+          } wallet by bridging some tokens from your ${
+            c.layer1.fullName
+          } wallet. The minimum balance needed to issue a prepaid card is ${formatWeiAmount(
+            MIN_AMOUNT_TO_PASS
+          )} DAI.CPXD.`
         );
       assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
 

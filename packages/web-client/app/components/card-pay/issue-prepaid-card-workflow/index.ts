@@ -12,10 +12,12 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import {
   cardbot,
+  IWorkflowSession,
   Milestone,
   NetworkAwareWorkflowCard,
   NetworkAwareWorkflowMessage,
   PostableCollection,
+  SessionAwareWorkflowMessage,
   Workflow,
   WorkflowCard,
   WorkflowMessage,
@@ -23,6 +25,7 @@ import {
 } from '@cardstack/web-client/models/workflow';
 
 import { tracked } from '@glimmer/tracking';
+import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
 
 export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
 export const spendToUsdRate = 0.01;
@@ -92,10 +95,13 @@ class IssuePrepaidCardWorkflow extends Workflow {
           async check() {
             let { layer2Network } = this.workflow as IssuePrepaidCardWorkflow;
 
-            let daiMinValue = await layer2Network.convertFromSpend(
-              'DAI',
-              Math.min(...faceValueOptions)
+            let daiMinValue = new BN(
+              await layer2Network.convertFromSpend(
+                'DAI',
+                Math.min(...faceValueOptions)
+              )
             );
+            this.workflow?.session.setValue('daiMinValue', daiMinValue);
             await layer2Network.waitForAccount;
             let sufficientFunds = !!layer2Network.defaultTokenBalance?.gte(
               new BN(daiMinValue)
@@ -233,9 +239,18 @@ class IssuePrepaidCardWorkflow extends Workflow {
       },
     }),
     // if we don't have enough balance (50 USD equivalent)
-    new WorkflowMessage({
+    new SessionAwareWorkflowMessage({
       author: cardbot,
-      message: `Looks like there’s no balance in your ${c.layer2.fullName} wallet to fund a prepaid card. Before you can continue, please add funds to your ${c.layer2.fullName} wallet by bridging some tokens from your ${c.layer1.fullName} wallet.`,
+      template: (session: IWorkflowSession) =>
+        `Looks like there’s not enough balance in your ${
+          c.layer2.fullName
+        } wallet to fund a prepaid card. Before you can continue, please add funds to your ${
+          c.layer2.fullName
+        } wallet by bridging some tokens from your ${
+          c.layer1.fullName
+        } wallet. The minimum balance needed to issue a prepaid card is **${formatWeiAmount(
+          session.getValue<BN>('daiMinValue')!
+        )} DAI.CPXD**.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason ===

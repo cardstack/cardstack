@@ -21,6 +21,9 @@ import {
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
 
+const MIN_AMOUNT_TO_PASS = new BN(
+  toWei(`${Math.ceil(Math.min(...faceValueOptions) / 100)}`)
+);
 interface Context extends MirageTestContext {}
 
 module('Acceptance | issue prepaid card persistence', function (hooks) {
@@ -35,9 +38,6 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       prepaidCardPatterns,
     });
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    const MIN_AMOUNT_TO_PASS = new BN(
-      toWei(`${Math.ceil(Math.min(...faceValueOptions) / 100)}`)
-    );
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -95,6 +95,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -151,6 +152,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -218,6 +220,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           patternUrl:
             'https://app.cardstack.com/images/prepaid-card-customizations/pattern-1.svg',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 500,
       });
@@ -274,6 +277,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -338,6 +342,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -399,6 +404,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -443,6 +449,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
       });
 
       workflowPersistenceService.persistData('abc123', {
