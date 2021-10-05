@@ -6,6 +6,7 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
 
+import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { BN } from 'bn.js';
 import { FAILURE_REASONS as ISSUE_PREPAID_CARD_WORKFLOW_FAILURE_REASONS } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
@@ -41,6 +42,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
   setupMirage(hooks);
   setupHubAuthenticationToken(hooks);
   let workflowPersistenceService: WorkflowPersistence;
+  let testDepot: DepotSafe | undefined;
 
   hooks.beforeEach(async function (this: Context) {
     this.server.db.loadData({
@@ -51,7 +53,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    let testDepot = createDepotSafe({
+    testDepot = createDepotSafe({
       address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
         createSafeToken('DAI', MIN_AMOUNT_TO_PASS.toString()),
@@ -108,6 +110,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
+        prepaidFundingSafe: testDepot,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -167,6 +170,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
+        prepaidFundingSafe: testDepot,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -237,6 +241,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
+        prepaidFundingSafe: testDepot,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 500,
       });
@@ -296,6 +301,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
+        prepaidFundingSafe: testDepot,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -363,6 +369,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
+        prepaidFundingSafe: testDepot,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
