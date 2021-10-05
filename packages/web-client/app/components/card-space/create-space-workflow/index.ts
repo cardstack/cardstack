@@ -89,7 +89,6 @@ class CreateSpaceWorkflow extends Workflow {
         //   author: cardbot,
         //   message: `It looks like you don’t have a prepaid card in your account. You will need one to pay the **100 SPEND ($1 USD)** Card Space creation fee. Please buy a prepaid card before you continue with this workflow.`,
         // }),
-        // TODO
         // new WorkflowCard({
         //   author: cardbot,
         //   cardName: 'PREPAID_CARD_PURCHASE_INSTRUCTIONS',

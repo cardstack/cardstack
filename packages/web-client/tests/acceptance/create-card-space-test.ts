@@ -1,10 +1,17 @@
 import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
-import { click, settled, visit, waitFor } from '@ember/test-helpers';
+import {
+  click,
+  currentURL,
+  settled,
+  visit,
+  waitFor,
+} from '@ember/test-helpers';
 import BN from 'bn.js';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { setupHubAuthenticationToken } from '../helpers/setup';
+import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -25,6 +32,10 @@ module('Acceptance | create card space', function (hooks) {
   test('initiating workflow without wallet connections', async function (assert) {
     await visit('/card-space');
     await click('[data-test-workflow-button="create-space"]');
+
+    assert
+      .dom('[data-test-boxel-thread-header]')
+      .containsText('Card Space Creation');
 
     // // Milestone 1
     assert.dom(`${postableSel(0, 0)} img`).exists();
@@ -117,19 +128,11 @@ module('Acceptance | create card space', function (hooks) {
     assert.dom(postableSel(3, 4)).containsText(`Thank you for your payment`);
     assert.dom(milestoneCompletedSel(3)).containsText(`Card Space created`);
 
-    let milestoneCtaButtonCount = Array.from(
-      document.querySelectorAll(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-      )
-    ).length;
     assert
       .dom(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
       )
-      .exists(
-        { count: milestoneCtaButtonCount },
-        'All cta buttons in milestones should be disabled'
-      );
+      .doesNotExist();
 
     // // Epilogue
     await waitFor(epiloguePostableSel(0));
@@ -160,8 +163,15 @@ module('Acceptance | create card space', function (hooks) {
     });
 
     test('initiating workflow with L2 wallet already connected', async function (assert) {
-      await visit('/card-space');
-      await click('[data-test-workflow-button="create-space"]');
+      await visit('/card-space?flow=create-space');
+
+      const flowId = new URL(
+        'http://domain.test/' + currentURL()
+      ).searchParams.get('flow-id');
+      assert.equal(
+        currentURL(),
+        `/card-space?flow=create-space&flow-id=${flowId}`
+      );
 
       assert
         .dom(postableSel(0, 1))
@@ -185,6 +195,23 @@ module('Acceptance | create card space', function (hooks) {
       await waitFor(postableSel(1, 1));
       assert.dom(postableSel(1, 0)).containsText(`Please pick a username`);
       assert.dom(postableSel(1, 1)).containsText(`Pick a username`);
+
+      let workflowPersistenceService = this.owner.lookup(
+        'service:workflow-persistence'
+      ) as WorkflowPersistence;
+
+      let workflowPersistenceId = new URL(
+        'http://domain.test/' + currentURL()
+      ).searchParams.get('flow-id')!;
+
+      let persistedData = workflowPersistenceService.getPersistedData(
+        workflowPersistenceId
+      );
+
+      assert.ok(
+        persistedData.state.layer2WalletAddress.includes(layer2AccountAddress),
+        'expected the layer 2 address to have been persisted when the wallet was already connected'
+      );
     });
 
     test('disconnecting L2 should cancel the workflow', async function (assert) {

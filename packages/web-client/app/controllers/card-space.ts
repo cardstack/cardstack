@@ -1,7 +1,6 @@
 import Controller from '@ember/controller';
 import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
-import * as short from 'short-uuid';
 import '../css/card-space.css';
 
 export default class CardSpaceController extends Controller {
@@ -16,7 +15,7 @@ export default class CardSpaceController extends Controller {
 
   @action transitionToWorkflow(flow: string) {
     this.transitionToRoute('card-space', {
-      queryParams: { flow, workflowPersistenceId: short.generate() },
+      queryParams: { flow },
     });
   }
 

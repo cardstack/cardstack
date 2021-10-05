@@ -161,13 +161,12 @@ module('Acceptance | create card space persistence', function (hooks) {
       assert.dom(milestoneCompletedSel(1)).doesNotExist(); // Username
       assert.dom(`[data-test-authentication-button]`).exists();
 
-      // TODO
-      // const workflowPersistenceId = new URL(
-      //   'http://domain.test/' + currentURL()
-      // ).searchParams.get('flow-id');
+      const workflowPersistenceId = new URL(
+        'http://domain.test/' + currentURL()
+      ).searchParams.get('flow-id');
 
-      // assert.notEqual(workflowPersistenceId!, 'abc123'); // flow-id param should be regenerated
-      // assert.equal(workflowPersistenceId!.length, 22);
+      assert.notEqual(workflowPersistenceId!, 'abc123'); // flow-id param should be regenerated
+      assert.equal(workflowPersistenceId!.length, 22);
     });
 
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {
@@ -194,8 +193,52 @@ module('Acceptance | create card space persistence', function (hooks) {
       assert.dom(milestoneCompletedSel(1)).doesNotExist(); // Username
     });
 
-    // TODO
-    // test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {});
-    // test('it allows interactivity after restoring previously saved state', async function (this: Context, assert) {});
+    test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
+      const state = buildState({
+        meta: {
+          completedCardNames: ['LAYER2_CONNECT', 'CARD_SPACE_USERNAME'],
+        },
+        layer2WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer2AccountAddress set in beforeEach
+      });
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'CARD_SPACE_CREATION',
+        state,
+      });
+
+      await visit('/card-space?flow=create-space&flow-id=abc123');
+
+      assert.dom(milestoneCompletedSel(0)).doesNotExist();
+      assert.dom(milestoneCompletedSel(1)).doesNotExist();
+      assert
+        .dom('[data-test-cancelation]')
+        .includesText(
+          'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.'
+        );
+    });
+
+    test('it allows interactivity after restoring previously saved state', async function (this: Context, assert) {
+      const state = buildState({
+        meta: {
+          completedCardNames: ['LAYER2_CONNECT'],
+        },
+      });
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'CARD_SPACE_CREATION',
+        state,
+      });
+
+      await visit('/card-space?flow=create-space&flow-id=abc123');
+
+      assert.dom(milestoneCompletedSel(0)).exists();
+      assert.dom(milestoneCompletedSel(1)).doesNotExist();
+
+      await waitFor('[data-test-postable="1"][data-test-milestone="1"]');
+      assert.dom('[data-test-card-space-username-save-button]').isEnabled();
+
+      await click('[data-test-card-space-username-save-button]');
+      assert.dom(milestoneCompletedSel(1)).exists();
+    });
   });
 });
