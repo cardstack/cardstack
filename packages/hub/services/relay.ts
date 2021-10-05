@@ -20,7 +20,7 @@ const { provisionerSecret } = config.get('relay') as RelayServiceConfig;
 
 export default class RelayService {
   async isAvailable(): Promise<boolean> {
-    let relayUrl = `${getConstantByNetwork('relayServiceURL', network)}/api/v1/about/`;
+    let relayUrl = `${getConstantByNetwork('relayServiceURL', network)}/v1/about/`;
     try {
       let response = await fetch(relayUrl);
       if (!response.ok) {
