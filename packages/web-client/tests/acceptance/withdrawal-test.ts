@@ -389,7 +389,6 @@ module('Acceptance | withdrawal', function (hooks) {
     });
     await waitFor(`${post} [data-test-balance="ETH"]`);
     await waitFor(milestoneCompletedSel(0));
-    assert.dom(milestoneCompletedSel(0));
 
     await waitUntil(() => {
       return document
