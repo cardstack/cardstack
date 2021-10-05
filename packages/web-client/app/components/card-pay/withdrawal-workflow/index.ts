@@ -94,11 +94,9 @@ class CheckBalanceWorkflowMessage
     if (
       layer1Network.defaultTokenBalance!.gte(minimumBalanceForWithdrawalClaim)!
     ) {
-      // The awkward positioning is a temporary hack to prevent commonmark from parsing this as a code block
-      // https://spec.commonmark.org/0.30/#indented-code-blocks
       return `Checking your balance...
 
-It looks like you have enough ${
+      It looks like you have enough ${
         c.layer1.nativeTokenSymbol
       } in your account on ${
         c.layer1.fullName
@@ -108,10 +106,10 @@ It looks like you have enough ${
     } else {
       return `Checking your balance...
 
-The last step of this withdrawal requires that you have at least **~${formatWeiAmount(
+      The last step of this withdrawal requires that you have at least **~${formatWeiAmount(
         minimumBalanceForWithdrawalClaim
       )} ${c.layer1.nativeTokenSymbol}**.
-You only have **${formatWeiAmount(layer1Network.defaultTokenBalance)} ${
+      You only have **${formatWeiAmount(layer1Network.defaultTokenBalance)} ${
         c.layer1.nativeTokenSymbol
       }**. You will need to deposit more
       ${
@@ -204,8 +202,8 @@ Please continue with the next step of this workflow.`,
         }),
         new NetworkAwareWorkflowMessage({
           author: cardbot,
-          message: `You have connected your ${c.layer1.fullName} wallet. Now it's time to connect your ${c.layer2.fullName}
-wallet via your Card Wallet mobile app. If you don't have the app installed, please do so now.`,
+          message: `You have connected your ${c.layer1.fullName} wallet. Now it’s time to connect your ${c.layer2.fullName}
+wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
           includeIf() {
             return !this.hasLayer2Account;
           },
