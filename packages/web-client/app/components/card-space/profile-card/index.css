@@ -70,7 +70,7 @@
 
 .card-space-profile-card__heading {
   margin-top: var(--boxel-sp);
-  font: 700 var(--boxel-font);
+  font: 700 var(--boxel-font-lg);
 }
 
 .card-space-profile-card__host {
