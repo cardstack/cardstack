@@ -1,12 +1,10 @@
 import Service from '@ember/service';
-import { Parser, HtmlRenderer } from 'commonmark';
+import MarkdownIt from 'markdown-it';
 
 export default class TextFormattingService extends Service {
-  commonmarkParser = new Parser({ smart: true });
-  commonmarkRenderer = new HtmlRenderer({ safe: true });
+  renderer = new MarkdownIt({ typographer: true }).disable(['code']);
 
   formatWorkflowMessage(message) {
-    let parsed = this.commonmarkParser.parse(message);
-    return this.commonmarkRenderer.render(parsed);
+    return this.renderer.render(message);
   }
 }
