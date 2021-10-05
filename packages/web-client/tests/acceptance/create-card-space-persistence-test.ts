@@ -102,7 +102,7 @@ module('Acceptance | create card space persistence', function (hooks) {
       const state = buildState({
         meta: {
           completedCardNames: ['LAYER2_CONNECT', 'CARD_SPACE_USERNAME'],
-          isCancelled: true,
+          isCanceled: true,
           cancelationReason: 'L2_DISCONNECTED',
         },
       });
