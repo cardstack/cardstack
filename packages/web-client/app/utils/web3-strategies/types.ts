@@ -145,7 +145,7 @@ export interface Layer2Web3Strategy
   resumeRegisterMerchantTransaction(txnHash: string): Promise<MerchantSafe>;
   defaultTokenSymbol: ConvertibleSymbol;
   refreshSafesAndBalances(): void;
-  convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<any>;
+  convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<string>;
 }
 
 export type TransactionHash = string;
