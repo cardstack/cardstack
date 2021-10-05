@@ -6,22 +6,20 @@ import WorkflowPersistence, {
   WorkflowPersistenceMeta,
 } from '@cardstack/web-client/services/workflow-persistence';
 import {
-  WorkflowName,
-  WORKFLOW_NAMES,
+  CardPayWorkflowName,
+  CARD_PAY_WORKFLOW_NAMES,
 } from '@cardstack/web-client/models/workflow';
 
 import { MILESTONE_TITLES as MERCHANT_CREATION_MILESTONES } from '@cardstack/web-client/components/card-pay/create-merchant-workflow';
 import { MILESTONE_TITLES as PREPAID_CARD_ISSUANCE_MILESTONES } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
 import { MILESTONE_TITLES as RESERVE_POOL_DEPOSIT_MILESTONES } from '@cardstack/web-client/components/card-pay/deposit-workflow';
 import { MILESTONE_TITLES as WITHDRAWAL_MILESTONES } from '@cardstack/web-client/components/card-pay/withdrawal-workflow';
-import { MILESTONE_TITLES as CARD_SPACE_CREATION_MILESTONES } from '@cardstack/web-client/components/card-space/create-space-workflow';
 
-const WORKFLOW_TITLE_TO_MILESTONES: Record<WorkflowName, string[]> = {
+const WORKFLOW_TITLE_TO_MILESTONES: Record<CardPayWorkflowName, string[]> = {
   PREPAID_CARD_ISSUANCE: PREPAID_CARD_ISSUANCE_MILESTONES,
   MERCHANT_CREATION: MERCHANT_CREATION_MILESTONES,
   RESERVE_POOL_DEPOSIT: RESERVE_POOL_DEPOSIT_MILESTONES,
   WITHDRAWAL: WITHDRAWAL_MILESTONES,
-  CARD_SPACE_CREATION: CARD_SPACE_CREATION_MILESTONES,
 };
 
 interface CardPayHeaderWorkflowTrackerItemArgs {
@@ -42,14 +40,14 @@ export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayH
 
   get workflowDisplayName() {
     return (
-      WORKFLOW_NAMES[this.workflowName as WorkflowName] ||
+      CARD_PAY_WORKFLOW_NAMES[this.workflowName as CardPayWorkflowName] ||
       'Unknown workflow type'
     );
   }
 
   get currentMilestoneTitle() {
     let workflowMilestones =
-      WORKFLOW_TITLE_TO_MILESTONES[this.workflowName as WorkflowName];
+      WORKFLOW_TITLE_TO_MILESTONES[this.workflowName as CardPayWorkflowName];
 
     if (workflowMilestones) {
       return (

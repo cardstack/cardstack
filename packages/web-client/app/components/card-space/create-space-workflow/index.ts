@@ -41,7 +41,7 @@ class CreateSpaceWorkflow extends Workflow {
   @service declare layer2Network: Layer2Network;
   @service declare hubAuthentication: HubAuthentication;
 
-  name = 'CARD_SPACE_CREATION' as WorkflowName;
+  name: WorkflowName = 'CARD_SPACE_CREATION';
 
   milestones = [
     new Milestone({
