@@ -9,6 +9,13 @@ import sinon from 'sinon';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { TransactionReceipt } from 'web3-core';
 
+const depositSourceToken = 'DAI';
+const stepTitles = {
+  deposit: `Deposit tokens into reserve pool on ${c.layer1.fullName}`,
+  bridge: `Bridge tokens from ${c.layer1.fullName} to ${c.layer2.fullName}`,
+  mint: `Mint tokens on ${c.layer2.shortName}: ${depositSourceToken}.CPXD`,
+};
+
 module(
   'Integration | Component | card-pay/deposit-workflow/transaction-status',
   function (hooks) {
@@ -18,7 +25,7 @@ module(
       let onComplete = sinon.spy();
       let workflowSession = new WorkflowSession();
       workflowSession.setValue({
-        depositSourceToken: 'DAI',
+        depositSourceToken,
         layer2BlockHeightBeforeBridging: '0',
         relayTokensTxnReceipt: {
           transactionHash: 'RelayTokensTransactionHash',
@@ -53,11 +60,14 @@ module(
 
       assert
         .dom(`[data-test-token-bridge-step="0"][data-test-completed]`)
-        .exists();
+        .containsText(stepTitles.deposit);
       assert.dom(`[data-test-etherscan-button]`).exists();
       assert
         .dom(`[data-test-token-bridge-step][data-test-completed]`)
         .exists({ count: 1 });
+      assert
+        .dom(`[data-test-token-bridge-step="1"]`)
+        .containsText(stepTitles.bridge);
       assert
         .dom(`[data-test-token-bridge-step-status="1"]`)
         .hasText(`0 of ${blockCount} blocks confirmed`);
@@ -101,7 +111,7 @@ module(
       );
       assert
         .dom(`[data-test-token-bridge-step="2"][data-test-completed]`)
-        .exists();
+        .containsText(stepTitles.mint);
       assert.dom('[data-test-blockscout-button]').exists();
       assert.dom('[data-test-deposit-minting-step-failed]').doesNotExist();
       assert.dom('[data-test-deposit-transaction-status-error]').doesNotExist();
@@ -113,7 +123,7 @@ module(
       let onComplete = sinon.spy();
       let workflowSession = new WorkflowSession();
       workflowSession.setValue({
-        depositSourceToken: 'DAI',
+        depositSourceToken,
         layer2BlockHeightBeforeBridging: '0',
         relayTokensTxnReceipt: {
           transactionHash: 'RelayTokensTransactionHash',
@@ -145,15 +155,15 @@ module(
 
       assert
         .dom(`[data-test-token-bridge-step="0"][data-test-completed]`)
-        .exists();
+        .containsText(stepTitles.deposit);
       assert.dom(`[data-test-etherscan-button]`).exists();
       assert
         .dom(`[data-test-token-bridge-step="1"][data-test-completed]`)
-        .exists();
+        .containsText(stepTitles.bridge);
       assert.dom(`[data-test-bridge-explorer-button]`).exists();
       assert
         .dom(`[data-test-token-bridge-step="2"][data-test-completed]`)
-        .exists();
+        .containsText(stepTitles.mint);
       assert.dom('[data-test-blockscout-button]').exists();
 
       assert.ok(onComplete.called);
@@ -166,7 +176,7 @@ module(
       let onComplete = sinon.spy();
       let workflowSession = new WorkflowSession();
       workflowSession.setValue({
-        depositSourceToken: 'DAI',
+        depositSourceToken,
         layer2BlockHeightBeforeBridging: '0',
         relayTokensTxnReceipt: {
           transactionHash: 'RelayTokensTransactionHash',
@@ -219,7 +229,7 @@ module(
       let onComplete = sinon.spy();
       let workflowSession = new WorkflowSession();
       workflowSession.setValue({
-        depositSourceToken: 'DAI',
+        depositSourceToken,
         layer2BlockHeightBeforeBridging: '0',
         relayTokensTxnReceipt: {
           transactionHash: 'RelayTokensTransactionHash',
