@@ -15,6 +15,9 @@ import CardMembershipImage from '@cardstack/web-client/images/illustrations/card
 
 import '../css/cardstack-landing-page.css';
 
+import ENV from '../config/environment';
+const { enableCardSpace } = ENV.features;
+
 const ORGS = [
   {
     sideImage: {
@@ -60,9 +63,9 @@ const ORGS = [
       'personal profile',
       'etc.',
     ],
-    cta: 'Open',
-    launched: true,
-    route: 'card-space',
+    cta: enableCardSpace ? 'Open' : 'Launching soon',
+    launched: enableCardSpace,
+    route: enableCardSpace ? 'card-space' : 'index',
   },
   {
     sideImage: {
