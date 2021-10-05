@@ -4,25 +4,58 @@
   data-test-funding-source-card
 >
   <ActionCardContainer::Section>
-    <ActionCardContainer::Section @title="Choose a depot and balance to fund your prepaid card">
-      <CardPay::NestedAccountDepotDisplay
-        @accountAddress={{this.layer2Network.walletInfo.firstAddress}}
-        @depotAddress={{this.depotAddress}}
-        @size={{if @isComplete "large"}}
-      />
+    <ActionCardContainer::Section @title="Choose a source and balance to fund your prepaid card">
+      <CardPay::LabeledValue @label="Source:" class="choose-balance__field"> {{!-- FIXME these classes are all copied… have to clone the CSS with different names? ugh --}}
+        <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} data-test-choose-balance-from-wallet />
+        <CardPay::NestedItems @noInnerBorder={{not @isComplete}} class="choose-balance__nested-items">
+          <:outer>
+            <CardPay::AccountDisplay
+              @size="small"
+              @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
+              data-test-choose-balance-from-address
+            />
+          </:outer>
+          <:inner>
+            {{#if @isComplete}}
+              <CardPay::AccountDisplay
+                @size="small"
+                @icon={{this.selectedSafe.type}}
+                @name={{uppercase this.selectedSafe.type}}
+                @address={{truncate-middle this.selectedSafe.address}}
+              />
+            {{else}}
+              <CardPay::SafeChooserDropdown
+                @safes={{this.compatibleSafes}}
+                @selectedSafe={{this.selectedSafe}}
+                @onChooseSafe={{this.chooseSafe}}
+                data-test-choose-balance-from-safe
+              />
+            {{/if}}
+          </:inner>
+          <:innermost>
+            {{#if @isComplete}}
+              <CardPay::BalanceDisplay
+                @label="Available Balance"
+                @size="large"
+                @icon={{this.selectedToken.icon}}
+                @balance={{format-wei-amount this.selectedToken.balance}}
+                @symbol={{this.selectedToken.symbol}}
+                data-test-choose-balance-from-display
+              />
+            {{else}}
+              <div class="choose-balance__dropdown-container">
+                <CardPay::BalanceChooserDropdown
+                  @tokens={{this.tokens}}
+                  @selectedToken={{this.selectedToken}}
+                  @selectedTokenSymbol={{this.selectedTokenSymbol}}
+                  @chooseToken={{this.chooseBalance}}
+                />
+              </div>
+            {{/if}}
+          </:innermost>
+        </CardPay::NestedItems>
+      </CardPay::LabeledValue>
     </ActionCardContainer::Section>
-    {{#if this.depotAddress}}
-      <ActionCardContainer::Section>
-        <CardPay::NestedDepotBalanceChooser
-          @isComplete={{@isComplete}}
-          @depotAddress={{this.depotAddress}}
-          @tokens={{this.tokens}}
-          @selectedToken={{this.selectedToken}}
-          @selectedTokenSymbol={{this.selectedTokenSymbol}}
-          @chooseToken={{this.chooseSource}}
-        />
-      </ActionCardContainer::Section>
-    {{/if}}
   </ActionCardContainer::Section>
   <Boxel::ActionChin
     @state={{if @isComplete "memorialized" "default"}}
