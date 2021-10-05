@@ -20,39 +20,31 @@
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* FIXME correct? extract? */
 }
 
-.card-space-profile-card__cover-photo img,
-.card-space-profile-card__cover-photo svg {
+.card-space-profile-card__cover-photo-container {
+  margin: 0;
+}
+
+.card-space-profile-card__cover-photo {
   height: calc(17.5rem * 50 / 125); /* ?! prop from design */
   width: 100%;
   object-fit: cover;
 }
 
-.card-space-profile-card__placeholder-cover-photo {
-  --icon-color: var(--boxel-purple-300);
-
+.card-space-profile-card__cover-photo-container--placeholder {
   background-color: var(--boxel-light-400);
 }
 
-.card-space-profile-card__placeholder-cover-photo > circle {
+.card-space-profile-card__cover-photo--placeholder {
+  --icon-color: var(--boxel-purple-300);
+
+  transform: scale(0.7);
+}
+
+.card-space-profile-card__cover-photo--placeholder > circle {
   display: none;
 }
 
-.card-space-profile-card__placeholder-profile-photo path {
-  --icon-color: var(--boxel-purple-300);
-
-  transform: scale(0.5) translateX(50%) translateY(50%);
-}
-
-.card-space-profile-card__profile-photo img {
-  background: var(--boxel-light);
-}
-
-.card-space-profile-card__profile-photo svg {
-  background: var(--boxel-light-400);
-}
-
-.card-space-profile-card__profile-photo img,
-.card-space-profile-card__profile-photo svg {
+.card-space-profile-card__profile-photo-container {
   --image-height: 3rem;
 
   position: absolute;
@@ -62,6 +54,22 @@
   border-radius: var(--image-height);
   border: 1px solid var(--boxel-purple-300);
   left: var(--boxel-sp);
+  background: var(--boxel-light);
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-space-profile-card__profile-photo-container--placeholder {
+  background: var(--boxel-light-400);
+}
+
+.card-space-profile-card__profile-photo--placeholder {
+  --icon-color: var(--boxel-purple-300);
+
+  transform: scale(0.5);
 }
 
 .card-space-profile-card__body {
