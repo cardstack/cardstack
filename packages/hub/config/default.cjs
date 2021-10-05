@@ -49,12 +49,6 @@ module.exports = {
     network: 'sokol',
   },
   compiler: {
-    cardCache: {
-      directory: defer(function () {
-        return join(__dirname, '..', '..', 'compiled');
-      }),
-      pkgName: '@cardstack/compiled',
-    },
     realmsConfig: defer(function () {
       return [
         {

@@ -1,5 +1,6 @@
 import difference from 'lodash/difference';
 import type CardModel from './card-model';
+import { InvalidKeysError } from './errors';
 
 const componentFormats = {
   isolated: '',
@@ -180,11 +181,18 @@ export function assertValidRawCard(obj: any): asserts obj is RawCard {
   }
 }
 
-export function assertValidKeys(actualKeys: string[], expectedKeys: string[], errorMessage: string) {
+type Newable<T> = { new (...args: any[]): T };
+
+export function assertValidKeys(
+  actualKeys: string[],
+  expectedKeys: string[],
+  errorMessage: string,
+  ErrorClass: Newable<Error> = InvalidKeysError
+) {
   let unexpectedFields = difference(actualKeys, expectedKeys);
 
   if (unexpectedFields.length) {
-    throw new Error(errorMessage.replace('%list%', '"' + unexpectedFields.join(', ') + '"'));
+    throw new ErrorClass(errorMessage.replace('%list%', '"' + unexpectedFields.join(', ') + '"'));
   }
 }
 

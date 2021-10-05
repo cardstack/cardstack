@@ -45,13 +45,16 @@ export class CardstackError extends Error {
   }
 }
 
-export class NotFound extends Error {
+export class NotFound extends CardstackError {
   status = 404;
+  title = 'Not Found';
 }
-export class BadRequest extends Error {
+export class BadRequest extends CardstackError {
   status = 400;
+  title = 'Bad Request';
 }
 
-export class Conflict extends Error {
+export class Conflict extends CardstackError {
   status = 409;
+  title = 'Conflict';
 }

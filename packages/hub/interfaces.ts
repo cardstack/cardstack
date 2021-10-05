@@ -14,8 +14,6 @@ export const NODE = ENVIRONMENTS[1];
 export interface HubServerConfig {
   port?: number;
   registryCallback?: undefined | ((registry: Registry) => void);
-  realms?: RealmManager; //TODO: Should this be moved to server creation and avoid having it part of the config thats passed around?
-  cardCacheDir?: string; // TODO: Moved to config
   routeCard?: string;
 }
 

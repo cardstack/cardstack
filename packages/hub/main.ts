@@ -53,7 +53,7 @@ import s3PutJson from './tasks/s3-put-json';
 import RealmManager from './services/realm-manager';
 import CardBuilder from './services/card-builder';
 import { serverLog, workerLog } from './utils/logger';
-import CardRouter from './routes/card-routes';
+import CardRoutes from './routes/card-routes';
 import { CardCacheConfig } from './services/card-cache-config';
 import CardCache from './services/card-cache';
 import ExchangeRatesService from './services/exchange-rates';
@@ -102,7 +102,7 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   if (process.env.COMPILER) {
     registry.register('card-cache-config', CardCacheConfig);
     registry.register('card-cache', CardCache);
-    registry.register('card-router', CardRouter);
+    registry.register('card-routes', CardRoutes);
     registry.register('realm-manager', RealmManager);
     registry.register('card-builder', CardBuilder);
   }
@@ -117,10 +117,10 @@ export class HubServer {
   logger = serverLog;
   static logger = serverLog;
 
-  static async create(config?: Partial<HubServerConfig>): Promise<HubServer> {
-    let container = wireItUp(config?.registryCallback);
+  static async create(serverConfig?: Partial<HubServerConfig>): Promise<HubServer> {
+    let container = wireItUp(serverConfig?.registryCallback);
 
-    let fullConfig = Object.assign({}, config) as HubServerConfig;
+    let fullConfig = Object.assign({}, serverConfig) as HubServerConfig;
 
     let builder: CardBuilder;
     if (process.env.COMPILER) {
@@ -141,9 +141,15 @@ export class HubServer {
     app.use((await container.lookup('development-proxy-middleware')).middleware());
     app.use((await container.lookup('api-router')).routes());
     app.use((await container.lookup('callbacks-router')).routes());
+
     if (process.env.COMPILER) {
-      app.use((await container.lookup('card-router')).routes());
+      let cardRoutes = await container.lookup('card-routes');
+      app.use(cardRoutes.routes());
+      if (config.has('compiler.routeCard')) {
+        cardRoutes.setRoutingCard(config.get('compiler.routerCard'));
+      }
     }
+
     app.use((await container.lookup('health-check')).routes()); // Setup health-check at "/"
 
     let onError = (err: Error, ctx: Koa.Context) => {

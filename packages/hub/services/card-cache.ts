@@ -10,10 +10,54 @@ import {
   ensureSymlinkSync,
   removeSync,
   pathExistsSync,
+  ensureDirSync,
+  outputJSONSync,
 } from 'fs-extra';
 import { join, dirname } from 'path';
-import { inject } from '../di/dependency-injection';
+import { inject, injectionReady } from '../di/dependency-injection';
+import isEqual from 'lodash/isEqual';
 
+export const MINIMAL_PACKAGE = {
+  name: '@cardstack/compiled',
+  exports: {
+    '.': {
+      browser: './browser',
+      default: './node',
+    },
+    './*': {
+      browser: './browser/*',
+      default: './node/*',
+    },
+  },
+};
+
+export function createMinimalPackageJSON(cardCacheDir: string): void {
+  outputJSONSync(join(cardCacheDir, 'package.json'), MINIMAL_PACKAGE);
+}
+const EXPORTS_PATHS = ['.', './*'];
+const EXPORTS_ENVIRONMENTS = ['browser', 'default'];
+function hasValidExports(pkg: any): boolean {
+  return EXPORTS_PATHS.every((key) => {
+    return pkg[key] && isEqual(Object.keys(pkg[key]), EXPORTS_ENVIRONMENTS);
+  });
+}
+
+function setupCacheDir(cardCacheDir: string): void {
+  ensureDirSync(cardCacheDir);
+
+  let pkg;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    pkg = require(`${cardCacheDir}/package.json`);
+  } catch (error) {
+    createMinimalPackageJSON(cardCacheDir);
+    pkg = MINIMAL_PACKAGE;
+  }
+
+  if (!hasValidExports(pkg.exports)) {
+    throw new Error('package.json of cardCacheDir does not have properly configured exports');
+  }
+}
 export default class CardCache {
   config = inject('card-cache-config', { as: 'config' });
 
@@ -23,6 +67,11 @@ export default class CardCache {
 
   get pkgName() {
     return this.config.packageName;
+  }
+
+  async ready() {
+    await injectionReady(this, 'card-cache-config');
+    setupCacheDir(this.dir);
   }
 
   private getCardLocation(env: Environment | 'assets', cardURL: string): string {
