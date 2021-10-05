@@ -29,7 +29,7 @@ import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount
 
 export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
 
-const FAILURE_REASONS = {
+export const FAILURE_REASONS = {
   UNAUTHENTICATED: 'UNAUTHENTICATED',
   DISCONNECTED: 'DISCONNECTED',
   INSUFFICIENT_FUNDS: 'INSUFFICIENT_FUNDS',
@@ -92,6 +92,19 @@ class IssuePrepaidCardWorkflow extends Workflow {
           cardName: 'LAYER2_CONNECT',
           componentName: 'card-pay/layer-two-connect-card',
           async check() {
+            let previouslyCanceledForInsufficientFunds =
+              this.workflow?.isCanceled &&
+              this.workflow.cancelationReason ===
+                FAILURE_REASONS.INSUFFICIENT_FUNDS;
+            /**
+             * Use the previous cancelation's daiMinValue
+             */
+            if (previouslyCanceledForInsufficientFunds)
+              return {
+                success: false,
+                reason: FAILURE_REASONS.INSUFFICIENT_FUNDS,
+              };
+
             let { layer2Network } = this.workflow as IssuePrepaidCardWorkflow;
 
             let daiMinValue = new BN(

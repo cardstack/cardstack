@@ -8,6 +8,7 @@ import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { BN } from 'bn.js';
+import { FAILURE_REASONS as ISSUE_PREPAID_CARD_WORKFLOW_FAILURE_REASONS } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { toWei } from 'web3-utils';
@@ -20,6 +21,8 @@ import {
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
 
 const MIN_AMOUNT_TO_PASS = new BN(
   toWei(`${Math.ceil(Math.min(...faceValueOptions) / 100)}`)
@@ -429,6 +432,40 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         .dom('[data-test-cancelation]')
         .includesText(
           'You attempted to restore an unfinished workflow, but you changed your Card wallet address. Please restart the workflow.'
+        );
+    });
+
+    test('it displays a persisted workflow canceled earlier with the minimum amount at the time of cancelation', async function (this: Context, assert) {
+      let previousAmount = MIN_AMOUNT_TO_PASS.sub(new BN('100'));
+      let state = buildState({
+        meta: {
+          completedCardNames: ['LAYER2_CONNECT'],
+          isCanceled: true,
+          cancelationReason:
+            ISSUE_PREPAID_CARD_WORKFLOW_FAILURE_REASONS.INSUFFICIENT_FUNDS,
+        },
+        daiMinValue: previousAmount,
+      });
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'Prepaid Card Issuance',
+        state,
+      });
+
+      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+
+      assert
+        .dom('[data-test-cancelation][data-test-postable="0"]')
+        .containsText(
+          `Looks like there’s not enough balance in your ${
+            c.layer2.fullName
+          } wallet to fund a prepaid card. Before you can continue, please add funds to your ${
+            c.layer2.fullName
+          } wallet by bridging some tokens from your ${
+            c.layer1.fullName
+          } wallet. The minimum balance needed to issue a prepaid card is ${formatWeiAmount(
+            previousAmount
+          )} DAI.CPXD.`
         );
     });
 
