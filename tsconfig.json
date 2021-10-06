@@ -29,6 +29,6 @@
     "./packages/compiler-server/**/*.ts",
     "./packages/core/**/*.ts",
     "**/.eslintrc.ts"
-  ],
+, "packages/cardpay-subgraph/src/mappings/reward-pool.ts.bak"  ],
   "exclude": ["./packages/*/dist", "./packages/*/tmp", "./packages/*/node_modules", "node_modules", "tmp"]
 }
