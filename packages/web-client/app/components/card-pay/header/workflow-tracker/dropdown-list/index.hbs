@@ -1,5 +1,5 @@
-<aside tabindex="0" class='workflow-tracker' {{on-click-outside @close ignoreSelector="[data-workflow-tracker-toggle]"}}>
-  <header class="workflow-tracker__heading" aria-label="Active workflows">
+<aside tabindex="0" class='workflow-tracker' {{on-click-outside @close ignoreSelector="[data-workflow-tracker-toggle]"}} {{on "scroll" this.checkIfScrolled}}>
+  <header class={{cn "workflow-tracker__heading" workflow-tracker__heading--scrolled=this.isScrolled}} aria-label="Active workflows">
     {{svg-jar 'task-active' class='workflow-tracker__heading-icon'}}
     Active workflows
     <span
