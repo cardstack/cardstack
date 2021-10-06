@@ -479,7 +479,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           } wallet. The minimum balance needed to issue a prepaid card is approximately ${handleSignificantDecimals(
             fromWei(previousMinDaiAmount),
             18,
-            5
+            2
           )} DAI.CPXD (${convertAmountToNativeDisplay(
             spendToUsd(previousSpendAmount)!,
             'USD'

@@ -268,7 +268,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         } wallet. The minimum balance needed to issue a prepaid card is approximately **${handleSignificantDecimals(
           fromWei(session.getValue<string>('daiMinValue')!),
           18,
-          5
+          2
         )} DAI.CPXD (${convertAmountToNativeDisplay(
           spendToUsd(session.getValue<number>('spendMinValue')!)!,
           'USD'
