@@ -128,8 +128,8 @@ export default class Layer2Network
     return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
   }
 
-  @task *viewSafeTask(address: string): TaskGenerator<Safe> {
-    return yield this.strategy.viewSafe(address);
+  @task *viewSafeTask(address: string, latest = false): TaskGenerator<Safe> {
+    return yield this.strategy.viewSafe(address, latest);
   }
 
   @task *issuePrepaidCardTask(

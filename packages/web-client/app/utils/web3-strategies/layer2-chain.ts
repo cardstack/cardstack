@@ -243,8 +243,39 @@ export default abstract class Layer2ChainWeb3Strategy
     await taskFor(this.fetchSafeBalancesTask).last;
   }
 
-  async viewSafe(address: string): Promise<Safe | undefined> {
-    return await this.#safesApi.viewSafe(address);
+  async viewSafe(address: string, latest = false): Promise<Safe | undefined> {
+    let safe = await this.#safesApi.viewSafe(address);
+    if (latest && safe) {
+      if (safe.type === 'prepaid-card') {
+        const PrepaidCard = await getSDK('PrepaidCard', this.web3);
+        const latestFaceValue = await PrepaidCard.faceValue(address);
+        safe.spendFaceValue = latestFaceValue;
+      } else if (safe.type === 'merchant') {
+        let defaultTokenAddress = this.defaultTokenContractAddress;
+        let cardTokenAddress = this.getTokenContractInfo(
+          'CARD',
+          this.networkSymbol
+        )!.address;
+
+        let [defaultBalance, cardBalance] = await Promise.all([
+          this.#assetsApi.getBalanceForToken(
+            defaultTokenAddress!,
+            safe.address
+          ),
+          this.#assetsApi.getBalanceForToken(cardTokenAddress, safe.address),
+        ]);
+
+        safe.tokens.forEach((token) => {
+          if (token.token.symbol === 'DAI') {
+            token.balance = defaultBalance;
+          } else if (token.token.symbol === 'CARD') {
+            token.balance = cardBalance;
+          }
+        });
+      }
+    }
+
+    return safe;
   }
 
   @task *viewSafesTask(

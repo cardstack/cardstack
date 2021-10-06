@@ -125,7 +125,7 @@ export interface Layer2Web3Strategy
     fromBlock: BN,
     txnHash: TransactionHash
   ): Promise<BridgeValidationResult>;
-  viewSafe(address: string): Promise<Safe | undefined>;
+  viewSafe(address: string, latest?: boolean): Promise<Safe | undefined>;
   viewSafesTask(account: string): TaskGenerator<Safe[]>;
   checkHubAuthenticationValid(authToken: string): Promise<boolean>;
   authenticate(): Promise<string>;

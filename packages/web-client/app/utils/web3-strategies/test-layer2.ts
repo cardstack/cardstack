@@ -201,7 +201,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return await this.test__simulateConvertFromSpend(symbol, amount);
   }
 
-  async viewSafe(address: string): Promise<Safe | undefined> {
+  async viewSafe(address: string, _latest = false): Promise<Safe | undefined> {
     return Promise.resolve(
       [...this.accountSafes.values()]
         .flat()
