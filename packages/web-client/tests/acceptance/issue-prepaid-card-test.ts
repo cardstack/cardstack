@@ -423,8 +423,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     let prepaidCardAddress = '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8';
 
-    layer2Service.test__simulateIssuePrepaidCardForAmount(
+    layer2Service.test__simulateIssuePrepaidCardForAmountFromSource(
       10000,
+      merchantSafe.address,
       layer2AccountAddress,
       prepaidCardAddress,
       {}

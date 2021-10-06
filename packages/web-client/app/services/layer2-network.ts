@@ -130,11 +130,12 @@ export default class Layer2Network
 
   @task *issuePrepaidCardTask(
     faceValue: number,
+    sourceAddress: string,
     customizationDid: string,
     options: TransactionOptions
   ): any {
     let prepaidCardSafe = yield this.strategy.issuePrepaidCard(
-      this.depotSafe?.address!,
+      sourceAddress,
       faceValue,
       customizationDid,
       options
