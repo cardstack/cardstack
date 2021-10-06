@@ -318,15 +318,6 @@ with Card Pay.`,
         );
       },
     }),
-    new WorkflowCard({
-      author: cardbot,
-      componentName: 'workflow-thread/default-cancelation-cta',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
-        );
-      },
-    }),
     new WorkflowMessage({
       author: cardbot,
       message:
