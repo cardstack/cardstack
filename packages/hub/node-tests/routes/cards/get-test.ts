@@ -1,4 +1,3 @@
-import supertest from 'supertest';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { ProjectTestRealm } from '../../helpers/cards';
 import { setupServer } from '../../helpers/server';
@@ -8,10 +7,10 @@ if (process.env.COMPILER) {
     let realm: ProjectTestRealm;
 
     function getCard(cardURL: string) {
-      return supertest(getServer().app.callback()).get(`/cards/${encodeURIComponent(cardURL)}`);
+      return request().get(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { createRealm, resolveCard, getServer } = setupServer(this);
+    let { createRealm, resolveCard, request } = setupServer(this);
 
     this.beforeEach(async function () {
       realm = createRealm('https://my-realm');

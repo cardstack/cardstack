@@ -1,4 +1,3 @@
-import supertest from 'supertest';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
 import { ProjectTestRealm } from '../../helpers/cards';
@@ -28,10 +27,10 @@ if (process.env.COMPILER) {
       if (params) {
         url += '?' + new URLSearchParams(params).toString();
       }
-      return supertest(getServer().app.callback()).get(url);
+      return request().get(url);
     }
 
-    let { createRealm, getServer } = setupServer(this);
+    let { createRealm, request } = setupServer(this);
 
     this.beforeEach(async function () {
       realm = createRealm('https://my-realm');

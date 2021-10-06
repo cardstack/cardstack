@@ -1,6 +1,5 @@
 import { join } from 'path';
 import { encodeCardURL } from '@cardstack/core/src/utils';
-import supertest from 'supertest';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { existsSync } from 'fs-extra';
 import { expect } from 'chai';
@@ -12,14 +11,14 @@ if (process.env.COMPILER) {
     let realm: ProjectTestRealm;
 
     function getCard(cardURL: string) {
-      return supertest(getServer().app.callback()).get(`/cards/${encodeURIComponent(cardURL)}`);
+      return request().get(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
     function deleteCard(cardURL: string) {
-      return supertest(getServer().app.callback()).del(`/cards/${encodeURIComponent(cardURL)}`);
+      return request().del(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { createRealm, getCardCache, getServer } = setupServer(this);
+    let { createRealm, getCardCache, request } = setupServer(this);
 
     this.beforeEach(async function () {
       realm = createRealm('https://my-realm');

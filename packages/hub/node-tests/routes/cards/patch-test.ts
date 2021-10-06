@@ -1,4 +1,3 @@
-import supertest from 'supertest';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
 import { ProjectTestRealm } from '../../helpers/cards';
@@ -9,18 +8,18 @@ if (process.env.COMPILER) {
     let realm: ProjectTestRealm;
 
     function getCard(cardURL: string) {
-      return supertest(getServer().app.callback()).get(`/cards/${encodeURIComponent(cardURL)}`);
+      return request().get(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
     function updateCard(cardURL: string, payload: any) {
-      return supertest(getServer().app.callback())
+      return request()
         .patch(`/cards/${encodeURIComponent(cardURL)}`)
         .set('Accept', 'application/json')
         .send(payload)
         .expect('Content-Type', /json/);
     }
 
-    let { createRealm, getServer } = setupServer(this);
+    let { createRealm, request } = setupServer(this);
 
     this.beforeEach(async function () {
       realm = createRealm('https://my-realm');

@@ -1,11 +1,10 @@
 import { Client as DBClient } from 'pg';
-import supertest, { Test } from 'supertest';
-import { HubServer } from '../../main';
 import { Registry } from '../../di/dependency-injection';
 import { InventorySubgraph } from '../../services/subgraph';
 import { v4 as uuidv4 } from 'uuid';
 import { WyreWallet } from '../../services/wyre';
 import * as JSONAPI from 'jsonapi-typescript';
+import { setupServer } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -77,21 +76,19 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('/api/orders', function () {
-  let server: HubServer;
   let db: DBClient;
-  let request: supertest.SuperTest<Test>;
   let reservationId: string;
 
+  let { getServer, request } = setupServer(this, {
+    registryCallback(registry: Registry) {
+      registry.register('authentication-utils', StubAuthenticationUtils);
+      registry.register('subgraph', StubSubgraph);
+      registry.register('relay', StubRelayService);
+      registry.register('wyre', StubWyreService);
+    },
+  });
+
   this.beforeEach(async function () {
-    server = await HubServer.create({
-      port: 3001,
-      registryCallback(registry: Registry) {
-        registry.register('authentication-utils', StubAuthenticationUtils);
-        registry.register('subgraph', StubSubgraph);
-        registry.register('relay', StubRelayService);
-        registry.register('wyre', StubWyreService);
-      },
-    });
     stubInventorySubgraph = () => ({
       data: {
         skuinventories: [],
@@ -116,7 +113,7 @@ describe('/api/orders', function () {
       };
     };
 
-    let dbManager = await server.container.lookup('database-manager');
+    let dbManager = await getServer().container.lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM reservations`);
     await db.query(`DELETE FROM wallet_orders`);
@@ -128,12 +125,6 @@ describe('/api/orders', function () {
       stubSKU,
     ]);
     reservationId = id;
-
-    request = supertest(server.app.callback());
-  });
-
-  this.afterEach(async function () {
-    server.teardown();
   });
 
   describe('POST /api/orders', function () {
@@ -145,7 +136,7 @@ describe('/api/orders', function () {
         throw new Error('should not wait for prepaid card txn');
       };
 
-      await request
+      await request()
         .post(`/api/orders`)
         .send(makeOrderPayload(stubWalletOrderId, stubCustodialWalletId, reservationId))
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -192,7 +183,7 @@ describe('/api/orders', function () {
         ]
       );
 
-      await request
+      await request()
         .post(`/api/orders`)
         .send(makeOrderPayload(stubWalletOrderId, stubCustodialWalletId, reservationId))
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -247,7 +238,7 @@ describe('/api/orders', function () {
         ]
       );
 
-      await request
+      await request()
         .post(`/api/orders`)
         .send(makeOrderPayload(stubWalletOrderId, stubCustodialWalletId, reservationId))
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -295,7 +286,7 @@ describe('/api/orders', function () {
         throw new Error('should not wait for prepaid card txn');
       };
 
-      await request
+      await request()
         .post(`/api/orders`)
         .send(makeOrderPayload(stubWalletOrderId, stubCustodialWalletId, reservationId))
         .set('Accept', 'application/vnd.api+json')
@@ -319,7 +310,7 @@ describe('/api/orders', function () {
       stubWaitForPrepaidCardTxn = (_txnHash) => {
         throw new Error('should not wait for prepaid card txn');
       };
-      await request
+      await request()
         .post(`/api/orders`)
         .send(makeOrderPayload(stubWalletOrderId, stubCustodialWalletId, reservationId))
         .set('Authorization', 'Bearer: mno123--pqr456--stu789')
@@ -346,7 +337,7 @@ describe('/api/orders', function () {
         throw new Error('should not wait for prepaid card txn');
       };
       let doesNotExist = uuidv4();
-      await request
+      await request()
         .post(`/api/orders`)
         .send(makeOrderPayload(stubWalletOrderId, stubCustodialWalletId, doesNotExist))
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -372,7 +363,7 @@ describe('/api/orders', function () {
       stubWaitForPrepaidCardTxn = (_txnHash) => {
         throw new Error('should not wait for prepaid card txn');
       };
-      await request
+      await request()
         .post(`/api/orders`)
         .send(makeOrderPayload(stubWalletOrderId, stubCustodialWalletId, 'DOES_NOT_EXIST'))
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -398,7 +389,7 @@ describe('/api/orders', function () {
       stubWaitForPrepaidCardTxn = (_txnHash) => {
         throw new Error('should not wait for prepaid card txn');
       };
-      await request
+      await request()
         .post(`/api/orders`)
         .send(makeOrderPayload(stubWalletOrderId, 'WA_SOME_OTHER_WALLET', reservationId))
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -436,7 +427,7 @@ describe('/api/orders', function () {
       stubWaitForPrepaidCardTxn = (_txnHash) => {
         throw new Error('should not wait for prepaid card txn');
       };
-      await request
+      await request()
         .post(`/api/orders`)
         .send(makeOrderPayload(badOrderId, stubCustodialWalletId, reservationId))
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -473,7 +464,7 @@ describe('/api/orders', function () {
       stubWaitForPrepaidCardTxn = (_txnHash) => {
         throw new Error('should not wait for prepaid card txn');
       };
-      await request
+      await request()
         .post(`/api/orders`)
         .send(makeOrderPayload(badOrderId, stubCustodialWalletId, reservationId))
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -501,7 +492,7 @@ describe('/api/orders', function () {
       };
       let payload: any = makeOrderPayload(stubWalletOrderId, stubCustodialWalletId, reservationId);
       delete payload.data.attributes['order-id'];
-      await request
+      await request()
         .post(`/api/orders`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -529,7 +520,7 @@ describe('/api/orders', function () {
       };
       let payload: any = makeOrderPayload(stubWalletOrderId, stubCustodialWalletId, reservationId);
       delete payload.data.attributes['wallet-id'];
-      await request
+      await request()
         .post(`/api/orders`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -557,7 +548,7 @@ describe('/api/orders', function () {
       };
       let payload: any = makeOrderPayload(stubWalletOrderId, stubCustodialWalletId, reservationId);
       delete payload.data.relationships.reservation;
-      await request
+      await request()
         .post(`/api/orders`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -592,7 +583,7 @@ describe('/api/orders', function () {
     });
 
     it('can get an order', async function () {
-      await request
+      await request()
         .get(`/api/orders/${stubWalletOrderId}`)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
         .set('Accept', 'application/vnd.api+json')
@@ -615,7 +606,7 @@ describe('/api/orders', function () {
         'complete',
         stubWalletOrderId,
       ]);
-      await request
+      await request()
         .get(`/api/orders/${stubWalletOrderId}`)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
         .set('Accept', 'application/vnd.api+json')
@@ -636,7 +627,7 @@ describe('/api/orders', function () {
     });
 
     it('returns 401 when client is not authenticated', async function () {
-      await request
+      await request()
         .get(`/api/orders/${stubWalletOrderId}`)
         .set('Accept', 'application/vnd.api+json')
         .set('Content-Type', 'application/vnd.api+json')
@@ -654,7 +645,7 @@ describe('/api/orders', function () {
 
     // we return a 404 so we don't leak the existence of orders
     it('returns a 404 when client asks for an order that is not their own', async function () {
-      await request
+      await request()
         .get(`/api/orders/${stubWalletOrderId}`)
         .set('Authorization', 'Bearer: mno123--pqr456--stu789')
         .set('Accept', 'application/vnd.api+json')
@@ -673,7 +664,7 @@ describe('/api/orders', function () {
     });
 
     it('returns a 404 when client asks for a non existent order', async function () {
-      await request
+      await request()
         .get(`/api/orders/DOES_NOT_EXIST`)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
         .set('Accept', 'application/vnd.api+json')

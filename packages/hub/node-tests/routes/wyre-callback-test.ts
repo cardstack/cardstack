@@ -1,10 +1,8 @@
 import { Client as DBClient } from 'pg';
-import supertest from 'supertest';
-import { HubServer } from '../../main';
-import { Registry } from '../../di/dependency-injection';
 import { WyreOrder, WyreTransfer, WyreWallet } from '../../services/wyre';
 import { adminWalletName } from '../../routes/wyre-callback';
 import { v4 as uuidv4 } from 'uuid';
+import { setupServer } from '../helpers/server';
 
 class StubWyreService {
   async getWalletByUserAddress(userAddress: string): Promise<WyreWallet | undefined> {
@@ -262,35 +260,29 @@ function handleProvisionPrepaidCard(userAddress: string, sku: string) {
 }
 
 describe('POST /api/wyre-callback', function () {
-  let server: HubServer;
   let db: DBClient;
 
   function post(url: string) {
-    return supertest(server.app.callback()).post(url);
+    return request().post(url);
   }
+
+  let { getServer, request } = setupServer(this, {
+    registryCallback(registry) {
+      registry.register('wyre', StubWyreService);
+      registry.register('relay', StubRelayService);
+      registry.register('subgraph', StubSubgraphService);
+    },
+  });
 
   this.beforeEach(async function () {
     wyreTransferCallCount = 0;
     waitForPrepaidCardTxnCallCount = 0;
     provisionPrepaidCardCallCount = 0;
 
-    server = await HubServer.create({
-      port: 3001,
-      registryCallback(registry: Registry) {
-        registry.register('wyre', StubWyreService);
-        registry.register('relay', StubRelayService);
-        registry.register('subgraph', StubSubgraphService);
-      },
-    });
-
-    let dbManager = await server.container.lookup('database-manager');
+    let dbManager = await getServer().container.lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM wallet_orders`);
     await db.query(`DELETE FROM reservations`);
-  });
-
-  this.afterEach(async function () {
-    server.teardown();
   });
 
   it(`returns 400 when the shape of the request does not match the expected format`, async function () {

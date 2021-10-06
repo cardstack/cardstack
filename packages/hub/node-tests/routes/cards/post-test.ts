@@ -1,4 +1,3 @@
-import supertest from 'supertest';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
 import { ProjectTestRealm } from '../../helpers/cards';
@@ -11,12 +10,12 @@ if (process.env.COMPILER) {
     let realm: ProjectTestRealm;
 
     function getCard(cardURL: string) {
-      return supertest(getServer().app.callback()).get(`/cards/${e(cardURL)}`);
+      return request().get(`/cards/${e(cardURL)}`);
     }
 
     function postCard(parentCardURL: string, payload: any) {
       // localhost/cards/https%3A%2F%2Fdemo.com%2F/https%3A%2F%2Fbase%2Fbase
-      return supertest(getServer().app.callback())
+      return request()
         .post(`/cards/${e(REALM_NAME)}/${e(parentCardURL)}`)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
@@ -24,7 +23,7 @@ if (process.env.COMPILER) {
         .expect('Content-Type', /json/);
     }
 
-    let { createRealm, resolveCard, getServer } = setupServer(this);
+    let { createRealm, resolveCard, request } = setupServer(this);
 
     const PAYLOAD = {
       data: {

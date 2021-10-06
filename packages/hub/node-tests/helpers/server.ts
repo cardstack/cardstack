@@ -4,6 +4,7 @@ import { HubServer } from '../../main';
 import CardCache from '../../services/card-cache';
 import { Registry } from './../../di/dependency-injection';
 import { TestCardCacheConfig, ProjectTestRealm, resolveCard } from './cards';
+import supertest from 'supertest';
 
 export function setupServer(mochaContext: Mocha.Suite, serverConfig: HubServerConfig = {}) {
   let server: HubServer, cardCache: CardCache, cardCacheConfig: TestCardCacheConfig;
@@ -39,8 +40,8 @@ export function setupServer(mochaContext: Mocha.Suite, serverConfig: HubServerCo
     getServer(): HubServer {
       return server;
     },
-    supertestCallback() {
-      return server.app.callback();
+    request() {
+      return supertest(server.app.callback());
     },
     createRealm,
     getCardCache(): CardCache {
