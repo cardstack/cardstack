@@ -73,6 +73,6 @@ module('Integration | Component | card-space/profile-card', function (hooks) {
     assert
       .dom('[data-test-profile-card-button-text]')
       .containsText('Visit this Creator');
-    assert.dom('[data-test-profile-card]').containsText('Profile preview');
+    assert.dom('[data-test-profile-card]').containsText('Preview');
   });
 });
