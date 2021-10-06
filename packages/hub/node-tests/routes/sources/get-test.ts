@@ -1,7 +1,8 @@
 import supertest from 'supertest';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { setupCardServer, ProjectTestRealm } from '../../helpers/cards';
+import { ProjectTestRealm } from '../../helpers/cards';
+import { setupServer } from '../../helpers/server';
 
 let postFiles = Object.freeze({
   'schema.js': `
@@ -30,7 +31,7 @@ if (process.env.COMPILER) {
       return supertest(getServer().app.callback()).get(url);
     }
 
-    let { createRealm, getServer } = setupCardServer(this);
+    let { createRealm, getServer } = setupServer(this);
 
     this.beforeEach(async function () {
       realm = createRealm('https://my-realm');

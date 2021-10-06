@@ -4,7 +4,8 @@ import supertest from 'supertest';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { existsSync } from 'fs-extra';
 import { expect } from 'chai';
-import { ProjectTestRealm, setupCardServer } from '../../helpers/cards';
+import { ProjectTestRealm } from '../../helpers/cards';
+import { setupServer } from '../../helpers/server';
 
 if (process.env.COMPILER) {
   describe('DELETE /cards/<card-id>', function () {
@@ -18,7 +19,7 @@ if (process.env.COMPILER) {
       return supertest(getServer().app.callback()).del(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { createRealm, getCardCache, getServer } = setupCardServer(this);
+    let { createRealm, getCardCache, getServer } = setupServer(this);
 
     this.beforeEach(async function () {
       realm = createRealm('https://my-realm');

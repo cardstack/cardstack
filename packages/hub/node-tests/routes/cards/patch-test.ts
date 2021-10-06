@@ -1,7 +1,8 @@
 import supertest from 'supertest';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { ProjectTestRealm, setupCardServer } from '../../helpers/cards';
+import { ProjectTestRealm } from '../../helpers/cards';
+import { setupServer } from '../../helpers/server';
 
 if (process.env.COMPILER) {
   describe('PATCH /cards/<card-id>', function () {
@@ -19,7 +20,7 @@ if (process.env.COMPILER) {
         .expect('Content-Type', /json/);
     }
 
-    let { createRealm, getServer } = setupCardServer(this);
+    let { createRealm, getServer } = setupServer(this);
 
     this.beforeEach(async function () {
       realm = createRealm('https://my-realm');

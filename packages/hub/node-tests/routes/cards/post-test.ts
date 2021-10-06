@@ -1,7 +1,8 @@
 import supertest from 'supertest';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { setupCardServer, ProjectTestRealm } from '../../helpers/cards';
+import { ProjectTestRealm } from '../../helpers/cards';
+import { setupServer } from '../../helpers/server';
 
 let e = encodeURIComponent;
 if (process.env.COMPILER) {
@@ -23,7 +24,7 @@ if (process.env.COMPILER) {
         .expect('Content-Type', /json/);
     }
 
-    let { createRealm, resolveCard, getServer } = setupCardServer(this);
+    let { createRealm, resolveCard, getServer } = setupServer(this);
 
     const PAYLOAD = {
       data: {

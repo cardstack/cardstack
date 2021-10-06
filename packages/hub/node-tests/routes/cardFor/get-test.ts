@@ -1,17 +1,18 @@
 import supertest from 'supertest';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { ProjectTestRealm, setupCardServer } from '../../helpers/cards';
+import { ProjectTestRealm } from '../../helpers/cards';
+import { setupServer } from '../../helpers/server';
 
 if (process.env.COMPILER) {
   describe('GET /cardFor/<path>', function () {
     let realm: ProjectTestRealm;
 
     function getCardForPath(path: string) {
-      return supertest(getServer().app.callback()).get(`/cardFor/${path}`);
+      return supertest(supertestCallback()).get(`/cardFor/${path}`);
     }
 
-    let { createRealm, resolveCard, getServer, setRoutingCard } = setupCardServer(this);
+    let { createRealm, resolveCard, getServer, supertestCallback } = setupServer(this);
 
     this.beforeEach(async function () {
       realm = createRealm('https://my-realm');
@@ -31,7 +32,8 @@ if (process.env.COMPILER) {
             }
           `,
       });
-      await setRoutingCard('https://my-realm/routes');
+      let cardRoutes = await getServer().container.lookup('card-routes');
+      cardRoutes.setRoutingCard('https://my-realm/routes');
       realm.addCard('homepage', {
         'card.json': { isolated: 'isolated.js' },
         'isolated.js': templateOnlyComponentTemplate('<h1>Welcome to my homepage</h1>'),

@@ -145,9 +145,8 @@ export class HubServer {
     if (process.env.COMPILER) {
       let cardRoutes = await container.lookup('card-routes');
       app.use(cardRoutes.routes());
-      if (config.has('compiler.routeCard')) {
-        cardRoutes.setRoutingCard(config.get('compiler.routerCard'));
-      }
+
+      setupCardRouting(cardRoutes, serverConfig);
     }
 
     app.use((await container.lookup('health-check')).routes()); // Setup health-check at "/"
@@ -180,8 +179,11 @@ export class HubServer {
     private config: HubServerConfig
   ) {}
 
-  teardown() {
-    this.container.teardown();
+  async teardown() {
+    if (process.env.COMPILER) {
+      (await this.container.lookup('card-cache')).cleanup();
+    }
+    await this.container.teardown();
   }
 
   listen() {
@@ -205,6 +207,18 @@ export class HubServer {
     }
 
     await this.builder.primeCache();
+  }
+}
+
+/**
+ * If the command line or the environment config provides a route card url,
+ * setup the card router to use it to resolve path requests
+ */
+function setupCardRouting(cardRoutes: CardRoutes, serverConfig?: Partial<HubServerConfig>) {
+  if (serverConfig && serverConfig.routeCard) {
+    cardRoutes.setRoutingCard(serverConfig.routeCard);
+  } else if (config.has('compiler.routeCard')) {
+    cardRoutes.setRoutingCard(config.get('compiler.routeCard'));
   }
 }
 
