@@ -24,7 +24,6 @@ import {
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import {
   convertAmountToNativeDisplay,
-  handleSignificantDecimals,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
 
@@ -476,10 +475,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
             c.layer2.fullName
           } wallet by bridging some tokens from your ${
             c.layer1.fullName
-          } wallet. The minimum balance needed to issue a prepaid card is approximately ${handleSignificantDecimals(
-            fromWei(previousMinDaiAmount),
-            18,
-            2
+          } wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
+            Number(fromWei(previousMinDaiAmount))
           )} DAI.CPXD (${convertAmountToNativeDisplay(
             spendToUsd(previousSpendAmount)!,
             'USD'

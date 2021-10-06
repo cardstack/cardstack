@@ -35,7 +35,6 @@ import {
 } from '@cardstack/web-client/utils/test-factories';
 import {
   convertAmountToNativeDisplay,
-  handleSignificantDecimals,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
 
@@ -740,10 +739,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
             c.layer2.fullName
           } wallet by bridging some tokens from your ${
             c.layer1.fullName
-          } wallet. The minimum balance needed to issue a prepaid card is approximately ${handleSignificantDecimals(
-            fromWei(MIN_AMOUNT_TO_PASS.toString()),
-            18,
-            2
+          } wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
+            Number(fromWei(MIN_AMOUNT_TO_PASS.toString()))
           )} DAI.CPXD (${convertAmountToNativeDisplay(
             spendToUsd(MIN_SPEND_AMOUNT)!,
             'USD'

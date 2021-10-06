@@ -28,7 +28,6 @@ import { tracked } from '@glimmer/tracking';
 import {
   convertAmountToNativeDisplay,
   fromWei,
-  handleSignificantDecimals,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
 
@@ -265,10 +264,8 @@ class IssuePrepaidCardWorkflow extends Workflow {
           c.layer2.fullName
         } wallet by bridging some tokens from your ${
           c.layer1.fullName
-        } wallet. The minimum balance needed to issue a prepaid card is approximately **${handleSignificantDecimals(
-          fromWei(session.getValue<string>('daiMinValue')!),
-          18,
-          2
+        } wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
+          Number(fromWei(session.getValue<string>('daiMinValue')!))
         )} DAI.CPXD (${convertAmountToNativeDisplay(
           spendToUsd(session.getValue<number>('spendMinValue')!)!,
           'USD'
