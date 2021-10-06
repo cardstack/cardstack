@@ -631,19 +631,11 @@ module('Acceptance | issue prepaid card', function (hooks) {
       );
 
       // test that all cta buttons are disabled
-      let milestoneCtaButtonCount = Array.from(
-        document.querySelectorAll(
-          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-        )
-      ).length;
       assert
         .dom(
-          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
         )
-        .exists(
-          { count: milestoneCtaButtonCount },
-          'All cta buttons in milestones should be disabled'
-        );
+        .doesNotExist();
 
       assert
         .dom(cancelationPostableSel(0))
@@ -685,19 +677,11 @@ module('Acceptance | issue prepaid card', function (hooks) {
         '[data-test-workflow-default-cancelation-cta="issue-prepaid-card"]'
       );
       // test that all cta buttons are disabled
-      let milestoneCtaButtonCount = Array.from(
-        document.querySelectorAll(
-          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-        )
-      ).length;
       assert
         .dom(
-          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
         )
-        .exists(
-          { count: milestoneCtaButtonCount },
-          'All cta buttons in milestones should be disabled'
-        );
+        .doesNotExist();
       assert
         .dom(cancelationPostableSel(0))
         .containsText(
@@ -780,19 +764,11 @@ module('Acceptance | issue prepaid card', function (hooks) {
       await settled();
 
       // test that all cta buttons are disabled
-      let milestoneCtaButtonCount = Array.from(
-        document.querySelectorAll(
-          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-        )
-      ).length;
       assert
         .dom(
-          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
         )
-        .exists(
-          { count: milestoneCtaButtonCount },
-          'All cta buttons in milestones should be disabled'
-        );
+        .doesNotExist();
 
       assert
         .dom(cancelationPostableSel(0))

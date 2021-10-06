@@ -322,19 +322,11 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD"]`)
       .containsText('10,000.00');
 
-    let milestoneCtaButtonCount = Array.from(
-      document.querySelectorAll(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-      )
-    ).length;
     assert
       .dom(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
       )
-      .exists(
-        { count: milestoneCtaButtonCount },
-        'All cta buttons in milestones should be disabled'
-      );
+      .doesNotExist();
 
     assert
       .dom(
@@ -570,19 +562,11 @@ module('Acceptance | deposit', function (hooks) {
     await click(`${postableSel(0, 4)} [data-test-mainnet-disconnect-button]`);
 
     // test that all cta buttons are disabled
-    let milestoneCtaButtonCount = Array.from(
-      document.querySelectorAll(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-      )
-    ).length;
     assert
       .dom(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
       )
-      .exists(
-        { count: milestoneCtaButtonCount },
-        'All cta buttons in milestones should be disabled'
-      );
+      .doesNotExist();
 
     await waitFor('[data-test-cancelation][data-test-postable]');
 
@@ -656,19 +640,11 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor('[data-test-workflow-default-cancelation-cta="deposit"]');
 
     // test that all cta buttons are disabled
-    let milestoneCtaButtonCount = Array.from(
-      document.querySelectorAll(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-      )
-    ).length;
     assert
       .dom(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
       )
-      .exists(
-        { count: milestoneCtaButtonCount },
-        'All cta buttons in milestones should be disabled'
-      );
+      .doesNotExist();
 
     assert
       .dom(cancelationPostableSel(0))
@@ -745,19 +721,12 @@ module('Acceptance | deposit', function (hooks) {
     );
 
     // test that all cta buttons are disabled
-    let milestoneCtaButtonCount = Array.from(
-      document.querySelectorAll(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-      )
-    ).length;
     assert
       .dom(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
       )
-      .exists(
-        { count: milestoneCtaButtonCount },
-        'All cta buttons in milestones should be disabled'
-      );
+      .doesNotExist();
+
     assert
       .dom(cancelationPostableSel(0))
       .containsText(
@@ -834,19 +803,11 @@ module('Acceptance | deposit', function (hooks) {
 
     await waitFor('[data-test-workflow-default-cancelation-cta="deposit"]');
     // test that all cta buttons are disabled
-    let milestoneCtaButtonCount = Array.from(
-      document.querySelectorAll(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-      )
-    ).length;
     assert
       .dom(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
       )
-      .exists(
-        { count: milestoneCtaButtonCount },
-        'All cta buttons in milestones should be disabled'
-      );
+      .doesNotExist();
     assert
       .dom(cancelationPostableSel(0))
       .containsText(
@@ -926,19 +887,11 @@ module('Acceptance | deposit', function (hooks) {
     await settled();
 
     // test that all cta buttons are disabled
-    let milestoneCtaButtonCount = Array.from(
-      document.querySelectorAll(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-      )
-    ).length;
     assert
       .dom(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
       )
-      .exists(
-        { count: milestoneCtaButtonCount },
-        'All cta buttons in milestones should be disabled'
-      );
+      .doesNotExist();
 
     await waitFor('[data-test-cancelation][data-test-postable]');
 
@@ -1018,19 +971,11 @@ module('Acceptance | deposit', function (hooks) {
     await settled();
 
     // test that all cta buttons are disabled
-    let milestoneCtaButtonCount = Array.from(
-      document.querySelectorAll(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-      )
-    ).length;
     assert
       .dom(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
       )
-      .exists(
-        { count: milestoneCtaButtonCount },
-        'All cta buttons in milestones should be disabled'
-      );
+      .doesNotExist();
 
     await waitFor('[data-test-cancelation][data-test-postable]');
 
