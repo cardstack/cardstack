@@ -12,7 +12,7 @@
   max-width: var(--workflow-tracker-max-width);
   min-height: var(--workflow-tracker-max-width);
   max-height: var(--workflow-tracker-max-height);
-  position: fixed;
+  position: absolute;
   top: 6rem;
   right: var(--boxel-sp-lg);
   background-color: var(--workflow-tracker-background);
