@@ -1,0 +1,27 @@
+<ActionCardContainer
+  @header="Card Space Creation"
+  @isComplete={{@isComplete}}
+  data-test-card-space-creation-is-complete={{@isComplete}}
+>
+  <ActionCardContainer::Section @title="Select a payment method">
+  </ActionCardContainer::Section>
+
+  <Boxel::ActionChin
+    @state={{if @isComplete "memorialized" "default"}}
+    @disabled={{@frozen}}
+  >
+    <:default as |d|>
+      <d.ActionButton
+        {{on "click" @onComplete}}
+        data-test-card-space-creation-button
+      >
+        Create Card Space
+      </d.ActionButton>
+    </:default>
+    <:memorialized as |m|>
+      <m.ActionStatusArea>
+        Confirmed
+      </m.ActionStatusArea>
+    </:memorialized>
+  </Boxel::ActionChin>
+</ActionCardContainer>

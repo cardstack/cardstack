@@ -1,0 +1,32 @@
+{{page-title "Card Space" replace=true}}
+
+<main class="card-space">
+  <Boxel::LeftEdgeNav
+    class="card-space-left-edge"
+    @home={{hash icon="cardstack-logo" action=this.transitionHome width="33px" height="35px"}}
+  />
+  <div class="card-space-category-nav">
+    <h1 class="card-space-category-nav__title">Card Space</h1>
+  </div>
+  <section class="card-space-gallery">
+    <div class="card-space-create-panel">
+      <Boxel::Button
+        {{on "click" (fn this.transitionToWorkflow "create-space")}}
+        @kind="primary"
+        data-test-workflow-button="create-space"
+      >
+        Create Space
+      </Boxel::Button>
+    </div>
+  </section>
+
+  <Boxel::Modal
+    style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
+    @isOpen={{eq this.flow "create-space"}}
+    @onClose={{this.resetQueryParams}}
+  >
+    {{#if (is-network-initialized)}}
+      <CardSpace::CreateSpaceWorkflow />
+    {{/if}}
+  </Boxel::Modal>
+</main>

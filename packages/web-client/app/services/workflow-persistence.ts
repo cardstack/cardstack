@@ -3,8 +3,8 @@ import { tracked } from '@glimmer/tracking';
 import RouterService from '@ember/routing/router-service';
 import { MockLocalStorage } from '../utils/browser-mocks';
 import config from '../config/environment';
-import { WorkflowName } from '../models/workflow';
-import { WORKFLOW_NAMES } from '@cardstack/web-client/models/workflow';
+import { CardPayWorkflowName } from '../models/workflow';
+import { CARD_PAY_WORKFLOW_NAMES } from '@cardstack/web-client/models/workflow';
 import { WorkflowMeta } from '@cardstack/web-client/models/workflow/workflow-session';
 
 export interface WorkflowPersistencePersistedData {
@@ -16,7 +16,7 @@ export interface WorkflowPersistenceMeta extends WorkflowMeta {
   name: string;
 }
 
-const WORKFLOW_NAMES_KEYS = Object.keys(WORKFLOW_NAMES);
+const WORKFLOW_NAMES_KEYS = Object.keys(CARD_PAY_WORKFLOW_NAMES);
 
 const STORAGE_KEY_PREFIX = 'workflowPersistence';
 
@@ -130,7 +130,7 @@ export default class WorkflowPersistence extends Service {
 
   visitPersistedWorkflow(workflowPersistenceId: string) {
     let data = this.getPersistedData(workflowPersistenceId);
-    let workflowName = data.name as WorkflowName;
+    let workflowName = data.name as CardPayWorkflowName;
     let route, flow;
 
     if (workflowName === 'PREPAID_CARD_ISSUANCE') {

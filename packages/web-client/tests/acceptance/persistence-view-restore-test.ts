@@ -70,7 +70,7 @@ module('Acceptance | persistence view and restore', function () {
       workflowPersistenceService.clear();
     });
 
-    test('it lists persisted workflows', async function (this: Context, assert) {
+    test('it lists persisted Card Pay workflows', async function (this: Context, assert) {
       workflowPersistenceService.persistData('persisted-merchant-creation', {
         name: 'MERCHANT_CREATION',
         state: buildState({
@@ -151,6 +151,55 @@ module('Acceptance | persistence view and restore', function () {
           },
         }),
       });
+
+      workflowPersistenceService.persistData('persisted-card-space-creation', {
+        name: 'CARD_SPACE_CREATION',
+        state: buildState({
+          meta: {
+            completedCardNames: ['LAYER2_CONNECT'],
+            completedMilestonesCount: 1,
+            milestonesCount: 4,
+            updatedAt: Date.UTC(2021, 8, 22, 20, 50, 18, 491).toString(),
+          },
+        }),
+      });
+
+      workflowPersistenceService.persistData(
+        'persisted-completed-card-space-creation',
+        {
+          name: 'CARD_SPACE_CREATION',
+          state: buildState({
+            meta: {
+              completedCardNames: [
+                'LAYER2_CONNECT',
+                'CARD_SPACE_USERNAME',
+                'CARD_SPACE_DETAILS',
+                'CARD_SPACE_CONFIRM',
+              ],
+              completedMilestonesCount: 4,
+              milestonesCount: 4,
+              updatedAt: Date.UTC(2021, 9, 22, 20, 50, 18, 491).toString(),
+            },
+          }),
+        }
+      );
+
+      workflowPersistenceService.persistData(
+        'persisted-canceled-card-space-creation',
+        {
+          name: 'CARD_SPACE_CREATION',
+          state: buildState({
+            meta: {
+              completedCardNames: ['LAYER2_CONNECT'],
+              completedMilestonesCount: 1,
+              milestonesCount: 4,
+              updatedAt: Date.UTC(2021, 7, 22, 20, 50, 18, 491).toString(),
+              isCanceled: true,
+              cancelationReason: 'RESTORATION_UNAUTHENTICATED',
+            },
+          }),
+        }
+      );
 
       await visit('/card-pay/');
       assert.dom('[data-test-workflow-tracker-count]').containsText('2');
@@ -349,13 +398,26 @@ module('Acceptance | persistence view and restore', function () {
         });
       }
 
+      window.TEST__MOCK_LOCAL_STORAGE_INIT[
+        constructStorageKey(`persisted-card-space-wf`)
+      ] = JSON.stringify({
+        name: `CARD_SPACE_CREATION`,
+        state: buildState({
+          meta: {
+            completedCardNames: ['LAYER2_CONNECT'],
+            completedMilestonesCount: 1,
+            milestonesCount: 4,
+          },
+        }),
+      });
+
       window.TEST__MOCK_LOCAL_STORAGE_INIT['unrelated'] = 'hello';
 
       setupApplicationTest(hooks);
       setupMirage(hooks);
       setupHubAuthenticationToken(hooks);
 
-      test('it lists existing persisted workflows', async function (this: Context, assert) {
+      test('it lists existing persisted Card Pay workflows', async function (this: Context, assert) {
         await visit('/card-pay/');
         assert.dom('[data-test-workflow-tracker-count]').containsText('2');
       });

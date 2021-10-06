@@ -64,6 +64,7 @@ module.exports = function (environment) {
     },
     features: {
       createMerchant: true,
+      enableCardSpace: process.env.DEPLOY_TARGET !== 'production',
     },
     infuraId:
       infuraIdsByTarget[process.env.DEPLOY_TARGET] ?? process.env.INFURA_ID,

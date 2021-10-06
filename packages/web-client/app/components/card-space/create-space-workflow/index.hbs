@@ -1,0 +1,16 @@
+{{#if this.workflow}}
+  <WorkflowThread
+    class="create-space-workflow"
+    @workflow={{this.workflow}}
+  />
+{{/if}}
+<Listener
+  @emitter={{this.layer2Network}}
+  @event="disconnect"
+  @action={{this.onDisconnect}}
+/>
+<Listener
+  @emitter={{this.layer2Network}}
+  @event="account-changed"
+  @action={{this.onAccountChanged}}
+/>
