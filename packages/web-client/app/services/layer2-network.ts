@@ -109,7 +109,10 @@ export default class Layer2Network
     return this.strategy.updateUsdConverters(symbolsToUpdate);
   }
 
-  async convertFromSpend(symbol: ConvertibleSymbol, amount: number) {
+  async convertFromSpend(
+    symbol: ConvertibleSymbol,
+    amount: number
+  ): Promise<string> {
     return await this.strategy.convertFromSpend(symbol, amount);
   }
 

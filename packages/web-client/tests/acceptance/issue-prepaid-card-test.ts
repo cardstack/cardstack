@@ -10,7 +10,7 @@ import {
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
-import { toWei } from 'web3-utils';
+import { fromWei, toWei } from 'web3-utils';
 import BN from 'bn.js';
 
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -18,7 +18,7 @@ import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-colo
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
 import { timeout } from 'ember-concurrency';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/workflow-config';
+import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
@@ -33,15 +33,20 @@ import {
   createSafeToken,
   defaultCreatedPrepaidCardDID,
 } from '@cardstack/web-client/utils/test-factories';
+import {
+  convertAmountToNativeDisplay,
+  spendToUsd,
+} from '@cardstack/cardpay-sdk';
 
 interface Context extends MirageTestContext {}
 
 // Dai amounts based on available prepaid card options
+const MIN_SPEND_AMOUNT = Math.min(...faceValueOptions);
 const MIN_AMOUNT_TO_PASS = new BN(
-  toWei(`${Math.ceil(Math.min(...faceValueOptions) / 100)}`)
+  toWei(`${Math.ceil(MIN_SPEND_AMOUNT / 100)}`)
 );
 const FAILING_AMOUNT = new BN(
-  toWei(`${Math.floor(Math.min(...faceValueOptions) / 100) - 1}`)
+  toWei(`${Math.floor(MIN_SPEND_AMOUNT / 100) - 1}`)
 );
 const SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER =
   Math.floor(Math.max(...faceValueOptions) / 100) - 1;
@@ -539,13 +544,15 @@ module('Acceptance | issue prepaid card', function (hooks) {
       delete (deserializedState.meta as WorkflowMeta)?.updatedAt;
     }
 
-    assert.deepEqual(deserializedState, {
+    assert.propEqual(deserializedState, {
       colorScheme: {
         patternColor: 'white',
         textColor: 'black',
         background: '#37EB77',
         id: '4f219852-33ee-4e4c-81f7-76318630a423',
       },
+      daiMinValue: MIN_AMOUNT_TO_PASS.toString(),
+      spendMinValue: MIN_SPEND_AMOUNT,
       did: defaultCreatedPrepaidCardDID,
       issuerName: 'JJ',
       layer2WalletAddress: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
@@ -726,7 +733,18 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert
         .dom(cancelationPostableSel(0))
         .containsText(
-          `Looks like there’s no balance in your ${c.layer2.fullName} wallet to fund a prepaid card. Before you can continue, please add funds to your ${c.layer2.fullName} wallet by bridging some tokens from your ${c.layer1.fullName} wallet.`
+          `Looks like there’s not enough balance in your ${
+            c.layer2.fullName
+          } wallet to fund a prepaid card. Before you can continue, please add funds to your ${
+            c.layer2.fullName
+          } wallet by bridging some tokens from your ${
+            c.layer1.fullName
+          } wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
+            Number(fromWei(MIN_AMOUNT_TO_PASS.toString()))
+          )} DAI.CPXD (${convertAmountToNativeDisplay(
+            spendToUsd(MIN_SPEND_AMOUNT)!,
+            'USD'
+          )}).`
         );
       assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
 

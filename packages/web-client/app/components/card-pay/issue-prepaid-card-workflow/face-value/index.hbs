@@ -11,7 +11,7 @@
         <span>Prepaid cards are denominated in SPEND:</span>
         <span class="face-value-card__exchange-rate">
           {{svg-jar "spend" width="20" height="20" role="presentation"}}
-          §1 SPEND = {{format-usd this.spendToUsdRate}}
+          §1 SPEND = {{format-usd (spend-to-usd 1)}}
         </span>
       </p>
       <CardPay::LabeledValue @vertical={{true}} @label="Funding From:">
