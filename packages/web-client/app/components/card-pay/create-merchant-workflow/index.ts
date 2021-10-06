@@ -322,10 +322,6 @@ class CreateMerchantWorkflow extends Workflow {
 
     let errors = [];
 
-    if (!hubAuthentication.isAuthenticated) {
-      errors.push(FAILURE_REASONS.RESTORATION_UNAUTHENTICATED);
-    }
-
     if (!layer2Network.isConnected) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);
     }
@@ -339,6 +335,10 @@ class CreateMerchantWorkflow extends Workflow {
       layer2Network.walletInfo.firstAddress !== persistedLayer2Address
     ) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_ACCOUNT_CHANGED);
+    }
+
+    if (!hubAuthentication.isAuthenticated) {
+      errors.push(FAILURE_REASONS.RESTORATION_UNAUTHENTICATED);
     }
 
     return errors;
