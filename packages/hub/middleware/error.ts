@@ -11,14 +11,9 @@ export default async function error(ctxt: Koa.Context, next: Koa.Next) {
       console.error(`Unexpected error: ${err.status} - ${err.message}\n${err.stack}`); // eslint-disable-line no-console
     }
     if (err.isCompilerError) {
-      // switch (instanceof err) {
-      //   case 'InvalidKeysError':
+      // TODO: This probably needs to be expanded
       err.status = 400;
       err.title = 'Bad Request';
-      //   break;
-
-      // default:
-      //   break;
     }
     let errors = [err];
     if (err.additionalErrors) {
