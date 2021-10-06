@@ -420,7 +420,7 @@ module('Acceptance | deposit persistence', function (hooks) {
       assert
         .dom('[data-test-cancelation]')
         .includesText(
-          'You attempted to restore an unfinished workflow, but you changed your Card wallet address. Please restart the workflow.'
+          'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.'
         );
     });
 
