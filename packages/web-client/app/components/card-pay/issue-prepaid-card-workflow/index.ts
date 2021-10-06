@@ -25,7 +25,12 @@ import {
 } from '@cardstack/web-client/models/workflow';
 
 import { tracked } from '@glimmer/tracking';
-import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
+import {
+  convertAmountToNativeDisplay,
+  fromWei,
+  handleSignificantDecimals,
+  spendToUsd,
+} from '@cardstack/cardpay-sdk';
 
 export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
 
@@ -107,12 +112,12 @@ class IssuePrepaidCardWorkflow extends Workflow {
 
             let { layer2Network } = this.workflow as IssuePrepaidCardWorkflow;
 
-            let daiMinValue = new BN(
-              await layer2Network.convertFromSpend(
-                'DAI',
-                Math.min(...faceValueOptions)
-              )
+            let spendMinValue = Math.min(...faceValueOptions);
+            let daiMinValue = await layer2Network.convertFromSpend(
+              'DAI',
+              spendMinValue
             );
+            this.workflow?.session.setValue('spendMinValue', spendMinValue);
             this.workflow?.session.setValue('daiMinValue', daiMinValue);
             await layer2Network.waitForAccount;
             let sufficientFunds = !!layer2Network.defaultTokenBalance?.gte(
@@ -260,9 +265,14 @@ class IssuePrepaidCardWorkflow extends Workflow {
           c.layer2.fullName
         } wallet by bridging some tokens from your ${
           c.layer1.fullName
-        } wallet. The minimum balance needed to issue a prepaid card is **${formatWeiAmount(
-          session.getValue<BN>('daiMinValue')!
-        )} DAI.CPXD**.`,
+        } wallet. The minimum balance needed to issue a prepaid card is approximately **${handleSignificantDecimals(
+          fromWei(session.getValue<string>('daiMinValue')!),
+          18,
+          5
+        )} DAI.CPXD (${convertAmountToNativeDisplay(
+          spendToUsd(session.getValue<number>('spendMinValue')!)!,
+          'USD'
+        )})**.`,
       includeIf() {
         return (
           this.workflow?.cancelationReason ===

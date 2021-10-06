@@ -11,7 +11,7 @@ import { BN } from 'bn.js';
 import { FAILURE_REASONS as ISSUE_PREPAID_CARD_WORKFLOW_FAILURE_REASONS } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
 import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
-import { toWei } from 'web3-utils';
+import { fromWei, toWei } from 'web3-utils';
 
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
@@ -22,10 +22,15 @@ import {
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
+import {
+  convertAmountToNativeDisplay,
+  handleSignificantDecimals,
+  spendToUsd,
+} from '@cardstack/cardpay-sdk';
 
+const MIN_SPEND_AMOUNT = Math.min(...faceValueOptions);
 const MIN_AMOUNT_TO_PASS = new BN(
-  toWei(`${Math.ceil(Math.min(...faceValueOptions) / 100)}`)
+  toWei(`${Math.ceil(MIN_SPEND_AMOUNT / 100)}`)
 );
 interface Context extends MirageTestContext {}
 
@@ -99,6 +104,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -156,6 +162,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -224,6 +231,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
             'https://app.cardstack.com/images/prepaid-card-customizations/pattern-1.svg',
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 500,
       });
@@ -281,6 +289,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -346,6 +355,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -408,6 +418,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -436,7 +447,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     });
 
     test('it displays a persisted workflow canceled earlier with the minimum amount at the time of cancelation', async function (this: Context, assert) {
-      let previousAmount = MIN_AMOUNT_TO_PASS.sub(new BN('100'));
+      let previousSpendAmount = MIN_SPEND_AMOUNT - 100;
+      let previousMinDaiAmount = MIN_AMOUNT_TO_PASS.sub(new BN(toWei('1')));
       let state = buildState({
         meta: {
           completedCardNames: ['LAYER2_CONNECT'],
@@ -444,7 +456,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           cancelationReason:
             ISSUE_PREPAID_CARD_WORKFLOW_FAILURE_REASONS.INSUFFICIENT_FUNDS,
         },
-        daiMinValue: previousAmount,
+        spendMinValue: previousSpendAmount,
+        daiMinValue: previousMinDaiAmount,
       });
 
       workflowPersistenceService.persistData('abc123', {
@@ -463,9 +476,14 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
             c.layer2.fullName
           } wallet by bridging some tokens from your ${
             c.layer1.fullName
-          } wallet. The minimum balance needed to issue a prepaid card is ${formatWeiAmount(
-            previousAmount
-          )} DAI.CPXD.`
+          } wallet. The minimum balance needed to issue a prepaid card is approximately ${handleSignificantDecimals(
+            fromWei(previousMinDaiAmount),
+            18,
+            5
+          )} DAI.CPXD (${convertAmountToNativeDisplay(
+            spendToUsd(previousSpendAmount)!,
+            'USD'
+          )}).`
         );
     });
 
@@ -487,6 +505,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
       });
 
       workflowPersistenceService.persistData('abc123', {
