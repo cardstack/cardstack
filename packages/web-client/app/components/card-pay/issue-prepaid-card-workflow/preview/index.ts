@@ -20,6 +20,7 @@ import Resolved from '@cardstack/web-client/utils/resolved';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 import { isLayer2UserRejectionError } from '@cardstack/web-client/utils/is-user-rejection-error';
 import config from '../../../../config/environment';
+import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { TransactionOptions } from '@cardstack/cardpay-sdk';
 import BN from 'bn.js';
 import {
@@ -73,6 +74,10 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
     args: CardPayPrepaidCardWorkflowPreviewComponentArgs
   ) {
     super(owner, args);
+  }
+
+  get prepaidFundingSafe() {
+    return this.args.workflowSession.getValue<Safe>('prepaidFundingSafe')!;
   }
 
   @action checkForPendingTransaction() {
@@ -139,7 +144,12 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
 
         let prepaidCardSafeTaskInstance = taskFor(
           this.layer2Network.issuePrepaidCardTask
-        ).perform(this.faceValue, did, options);
+        ).perform(
+          this.faceValue,
+          this.prepaidFundingSafe.address,
+          did,
+          options
+        );
 
         let prepaidCardSafe = yield race([
           prepaidCardSafeTaskInstance,
