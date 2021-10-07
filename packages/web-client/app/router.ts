@@ -22,6 +22,5 @@ Router.map(function () {
   this.route('pay-missing-route', {
     path: '/pay/:*',
   });
-  this.route('card-space');
   this.route('boom');
 });
