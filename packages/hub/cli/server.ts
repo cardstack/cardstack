@@ -2,32 +2,34 @@
 
 import logger from '@cardstack/logger';
 import nodeCleanup from 'node-cleanup';
-import { Argv } from 'yargs';
-import { HubServer, SERVER_CONFIG_DEFAULTS } from '../main';
-
-const serverLog = logger('hub/server');
+import { Argv, Options } from 'yargs';
+import { HubServer } from '../main';
+import { serverLog } from '../utils/logger';
 
 export let command = 'serve';
 export let aliases = 'server';
 export let describe = 'Boot the server';
 
 export let builder = function (yargs: Argv) {
-  return yargs.options({
+  let options: { [key: string]: Options } = {
     port: {
       alias: 'p',
       describe: 'The port to server should listen on',
       type: 'number',
       nargs: 1,
-      default: SERVER_CONFIG_DEFAULTS.port,
+      default: 3000,
     },
-    noWatch: {
+  };
+  if (process.env.COMPILER) {
+    options['noWatch'] = {
       alias: 'nw',
       describe: 'Disable watching for changes to cards',
       type: 'boolean',
-      default: SERVER_CONFIG_DEFAULTS.noWatch,
+      default: false,
       nargs: 1,
-    },
-  });
+    };
+  }
+  return yargs.options(options);
 };
 
 // Using any right now because I dont know how to get the generated
@@ -79,7 +81,11 @@ export async function handler(argv: any) {
 
   if (process.env.COMPILER) {
     await server.primeCache();
+
+    if (!argv.noWatch) {
+      await server.watchCards();
+    }
   }
 
-  return server.listen();
+  return server.listen(argv.port);
 }

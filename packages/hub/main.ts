@@ -116,10 +116,6 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   return new Container(registry);
 }
 
-export const SERVER_CONFIG_DEFAULTS: HubServerConfig = {
-  port: 3000,
-  noWatch: false,
-};
 export class HubServer {
   logger = serverLog;
   static logger = serverLog;
@@ -127,7 +123,7 @@ export class HubServer {
   static async create(serverConfig?: Partial<HubServerConfig>): Promise<HubServer> {
     let container = wireItUp(serverConfig?.registryCallback);
 
-    let fullConfig = Object.assign({}, SERVER_CONFIG_DEFAULTS, serverConfig) as HubServerConfig;
+    let fullConfig = Object.assign({}, serverConfig) as HubServerConfig;
 
     let builder: CardBuilder;
     if (process.env.COMPILER) {
@@ -153,7 +149,7 @@ export class HubServer {
       let cardRoutes = await container.lookup('card-routes');
       app.use(cardRoutes.routes());
 
-      setupCardRouting(cardRoutes, serverConfig);
+      setupCardRouting(cardRoutes, fullConfig);
     }
 
     app.use((await container.lookup('health-check')).routes()); // Setup health-check at "/"
@@ -176,24 +172,22 @@ export class HubServer {
     app.on('close', onClose);
     app.on('error', onError);
 
-    return new this(app, container, builder, fullConfig);
+    return new this(app, container, builder);
   }
 
   private constructor(
     public app: Koa<Koa.DefaultState, Koa.Context>,
     public container: Container,
-    public builder: CardBuilder,
-    private config: HubServerConfig
+    public builder: CardBuilder
   ) {}
 
   async teardown() {
     await this.container.teardown();
   }
 
-  // TODO: Setup watcher service, start watchers in listen, add an option to start without watchers
-  async listen() {
-    let instance = this.app.listen(this.config.port);
-    this.logger.info('server listening on %s', this.config.port);
+  async listen(port = 3000) {
+    let instance = this.app.listen(port);
+    this.logger.info('server listening on %s', port);
 
     if (process.connected) {
       process.send!('hub hello');
@@ -203,19 +197,23 @@ export class HubServer {
       this.app.emit('close'); // supports our ShutdownHelper
     });
 
-    if (process.env.COMPILER && !this.config.noWatch) {
-      (await this.container.lookup('card-watcher')).watch();
-    }
-
     return instance;
   }
 
   async primeCache() {
     if (!process.env.COMPILER) {
-      throw new Error('COMPILER feature flag is not enabled');
+      throw new Error('COMPILER feature flag is not present');
     }
 
     await this.builder.primeCache();
+  }
+
+  async watchCards() {
+    if (!process.env.COMPILER) {
+      throw new Error('COMPILER feature flag is not present');
+    }
+
+    (await this.container.lookup('card-watcher')).watch();
   }
 }
 

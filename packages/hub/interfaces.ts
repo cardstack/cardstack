@@ -12,8 +12,6 @@ export const BROWSER = ENVIRONMENTS[0];
 export const NODE = ENVIRONMENTS[1];
 
 export interface HubServerConfig {
-  port?: number;
-  noWatch?: boolean;
   registryCallback?: undefined | ((registry: Registry) => void);
   routeCard?: string;
 }
