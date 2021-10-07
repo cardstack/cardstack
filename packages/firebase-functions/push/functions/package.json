@@ -1,6 +1,6 @@
 {
   "name": "firebase-walletconnect-push",
-  "version": "0.26.7",
+  "version": "0.26.8",
   "description": "Wallet Connect Push notification service for Firebase Cloud Functions",
   "author": "",
   "license": "MIT",
