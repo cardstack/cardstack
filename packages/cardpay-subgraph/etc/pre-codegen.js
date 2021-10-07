@@ -42,14 +42,17 @@ let uniswapV2GenesisBlock = {
 
 let v0_7_0_startBlock = {
   sokol: 22189483,
-  // TODO populate this after the contract deployment for v0.7.0
-  xdai: 0,
+  xdai: 18457665,
 };
 
 let v0_8_0_startBlock = {
   sokol: 22728770,
-  // TODO populate this after the contract deployment for v0.8.0
-  xdai: 0,
+  xdai: 18457665,
+};
+
+let v0_8_3_startBlock = {
+  sokol: 23046211,
+  xdai: 18457665,
 };
 
 let abis = {
@@ -104,6 +107,7 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{TOKEN_START_BLOCK}/g, tokenStartBlock[cleanNetwork])
   .replace(/{v0_7_0_START_BLOCK}/g, v0_7_0_startBlock[cleanNetwork])
   .replace(/{v0_8_0_START_BLOCK}/g, v0_8_0_startBlock[cleanNetwork])
+  .replace(/{v0_8_3_START_BLOCK}/g, v0_8_3_startBlock[cleanNetwork])
   .replace(
     /{DEPRECATED_MERCHANT_MANAGER_v0_6_7_ADDRESS}/g,
     getAddress('deprecatedMerchantManager_v0_6_7', cleanNetwork)
