@@ -16,6 +16,9 @@ export function validateMerchantId(value: string) {
   return '';
 }
 
+const isUniversalDomain = (domain: string) =>
+  [MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME, MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME].includes(domain);
+
 interface MerchantPaymentURLParams {
   domain?: string;
   merchantSafeID: string;
@@ -32,8 +35,9 @@ export const generateMerchantPaymentUrl = ({
   currency = 'SPD',
 }: MerchantPaymentURLParams) => {
   const handleAmount = amount ? `amount=${amount}&` : '';
+  const https = isUniversalDomain(domain) ? 'https://' : '';
 
-  return `${domain}/pay/${network}/${merchantSafeID}?${handleAmount}currency=${currency}`;
+  return `${https}${domain}/pay/${network}/${merchantSafeID}?${handleAmount}currency=${currency}`;
 };
 
 // see https://github.com/cardstack/cardstack/pull/2095 for test cases used during dev
@@ -44,12 +48,9 @@ export const isValidMerchantPaymentUrl = (merchantPaymentUrl: string) => {
 };
 
 export const isValidUniversalLinkMerchantPaymentUrl = (url: Url) => {
-  let usesCorrectProtocol = url.protocol === `https:`;
-  let hasCorrectHostname = [
-    MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
-    MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
-  ].includes(url.hostname);
-  let parts = url.pathname.split('/');
+  const usesCorrectProtocol = url.protocol === `https:`;
+  const hasCorrectHostname = isUniversalDomain(url.hostname);
+  const parts = url.pathname.split('/');
   // skip the leading slash
   let [, action, network, merchantSafeID] = parts;
   let hasCorrectPath =
