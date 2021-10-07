@@ -50,6 +50,7 @@ import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-us
 import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { IAssets } from '../../../../cardpay-sdk/sdk/assets';
+import PrepaidCard from '@cardstack/cardpay-sdk/sdk/prepaid-card/base';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -76,6 +77,7 @@ export default abstract class Layer2ChainWeb3Strategy
   #assetsApi!: IAssets;
   #safesApi!: ISafes;
   #hubAuthApi!: IHubAuth;
+  #prepaidCardApi!: PrepaidCard;
   #broadcastChannel: TypedChannel<Layer2ConnectEvent>;
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
@@ -162,6 +164,7 @@ export default abstract class Layer2ChainWeb3Strategy
         // one expected failure is if we connect to a chain which we don't have an rpc url for
         this.#layerTwoOracleApi = await getSDK('LayerTwoOracle', this.web3);
         this.#safesApi = await getSDK('Safes', this.web3);
+        this.#prepaidCardApi = await getSDK('PrepaidCard', this.web3);
         this.#assetsApi = await getSDK('Assets', this.web3);
         this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
         await this.updateWalletInfo(accounts);
@@ -246,8 +249,7 @@ export default abstract class Layer2ChainWeb3Strategy
   private async updatePrepaidCardWithLatestValues(
     safe: PrepaidCardSafe
   ): Promise<PrepaidCardSafe> {
-    const PrepaidCard = await getSDK('PrepaidCard', this.web3);
-    let latestFaceValue = await PrepaidCard.faceValue(safe.address);
+    let latestFaceValue = await this.#prepaidCardApi.faceValue(safe.address);
     safe.spendFaceValue = latestFaceValue;
     return safe;
   }
@@ -325,9 +327,7 @@ export default abstract class Layer2ChainWeb3Strategy
     customizationDid: string,
     options: TransactionOptions
   ): Promise<PrepaidCardSafe> {
-    const PrepaidCard = await getSDK('PrepaidCard', this.web3);
-
-    const result = await PrepaidCard.create(
+    const result = await this.#prepaidCardApi.create(
       safeAddress,
       this.defaultTokenContractAddress!,
       [amount],
@@ -342,8 +342,7 @@ export default abstract class Layer2ChainWeb3Strategy
   async resumeIssuePrepaidCardTransaction(
     txnHash: string
   ): Promise<PrepaidCardSafe> {
-    const PrepaidCard = await getSDK('PrepaidCard', this.web3);
-    let result = await PrepaidCard.create(txnHash);
+    let result = await this.#prepaidCardApi.create(txnHash);
     return result.prepaidCards[0];
   }
 
