@@ -26,7 +26,6 @@
     "./packages/firebase-functions/**/*.ts",
     "./packages/hub/**/*.ts",
     "./packages/test-support/**/*.ts",
-    "./packages/compiler-server/**/*.ts",
     "./packages/core/**/*.ts",
     "**/.eslintrc.ts"
   ],
