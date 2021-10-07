@@ -51,9 +51,9 @@ let v0_8_0_startBlock = {
 };
 
 let v0_8_3_startBlock = {
-  sokol: ,
+  sokol: 23046211,
   xdai: 18457665,
-}
+};
 
 let abis = {
   PrepaidCardManager: getAbi(join(sourceAbiDir, 'prepaid-card-manager.ts')),
@@ -107,6 +107,7 @@ let subgraph = readFileSync(subgraphTemplateFile, { encoding: 'utf8' })
   .replace(/{TOKEN_START_BLOCK}/g, tokenStartBlock[cleanNetwork])
   .replace(/{v0_7_0_START_BLOCK}/g, v0_7_0_startBlock[cleanNetwork])
   .replace(/{v0_8_0_START_BLOCK}/g, v0_8_0_startBlock[cleanNetwork])
+  .replace(/{v0_8_3_START_BLOCK}/g, v0_8_3_startBlock[cleanNetwork])
   .replace(
     /{DEPRECATED_MERCHANT_MANAGER_v0_6_7_ADDRESS}/g,
     getAddress('deprecatedMerchantManager_v0_6_7', cleanNetwork)
