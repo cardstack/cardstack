@@ -58,8 +58,7 @@ export default class Layer2Network
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
   @reads('strategy.depotSafe') depotSafe: DepotSafe | undefined;
-  @or('strategy.safes.isLoading', 'strategy.depotBalances.isRunning')
-  declare isFetchingDepot: boolean;
+  @or('strategy.safes.isLoading') declare isFetchingDepot: boolean;
 
   bridgedSymbolToWithdrawalLimits: Map<BridgedTokenSymbol, WithdrawalLimits> =
     new Map();

@@ -47,7 +47,7 @@ import { all, TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { TypedChannel } from '../typed-channel';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
-import { useResource, useTask } from 'ember-resources';
+import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { IAssets } from '../../../../cardpay-sdk/sdk/assets';
 
@@ -84,10 +84,6 @@ export default abstract class Layer2ChainWeb3Strategy
   @tracked safesAndBalancesRefreshRequestedAt = new Date();
 
   @reads('provider.connector') connector!: IConnector;
-  @reads('depotBalances.value.defaultTokenBalance') defaultTokenBalance:
-    | BN
-    | undefined;
-  @reads('depotBalances.value.cardBalance') cardBalance: BN | undefined;
   @reads('safes.depot') declare depotSafe: DepotSafe | null;
 
   constructor(networkSymbol: Layer2NetworkSymbol) {
@@ -237,10 +233,6 @@ export default abstract class Layer2ChainWeb3Strategy
   async refreshSafesAndBalances() {
     this.safesAndBalancesRefreshRequestedAt = new Date();
     await taskFor(this.viewSafesTask).perform();
-    if (this.depotSafe && !taskFor(this.fetchSafeBalancesTask).last) {
-      await this.depotBalances.value;
-    }
-    await taskFor(this.fetchSafeBalancesTask).last;
   }
 
   async viewSafe(address: string): Promise<Safe | undefined> {
@@ -251,7 +243,7 @@ export default abstract class Layer2ChainWeb3Strategy
     return await this.#safesApi.view(account);
   }
 
-  async updatePrepaidCardWithLatestValues(
+  private async updatePrepaidCardWithLatestValues(
     safe: PrepaidCardSafe
   ): Promise<PrepaidCardSafe> {
     const PrepaidCard = await getSDK('PrepaidCard', this.web3);
@@ -260,9 +252,32 @@ export default abstract class Layer2ChainWeb3Strategy
     return safe;
   }
 
-  async updateMerchantWithLatestValues(
+  private async updateMerchantWithLatestValues(
     safe: MerchantSafe
   ): Promise<MerchantSafe> {
+    let defaultTokenAddress = this.defaultTokenContractAddress;
+    let cardTokenAddress = this.getTokenContractInfo(
+      'CARD',
+      this.networkSymbol
+    )!.address;
+
+    let [defaultBalance, cardBalance] = await Promise.all([
+      this.#assetsApi.getBalanceForToken(defaultTokenAddress!, safe.address),
+      this.#assetsApi.getBalanceForToken(cardTokenAddress, safe.address),
+    ]);
+
+    safe.tokens.forEach((token) => {
+      if (token.token.symbol === 'DAI') {
+        token.balance = defaultBalance;
+      } else if (token.token.symbol === 'CARD') {
+        token.balance = cardBalance;
+      }
+    });
+
+    return safe;
+  }
+
+  private async updateDepotWithLatestValues(safe: DepotSafe) {
     let defaultTokenAddress = this.defaultTokenContractAddress;
     let cardTokenAddress = this.getTokenContractInfo(
       'CARD',
@@ -295,44 +310,13 @@ export default abstract class Layer2ChainWeb3Strategy
           return await this.updateMerchantWithLatestValues(safe);
         } else if (safe.type === 'prepaid-card') {
           return await this.updatePrepaidCardWithLatestValues(safe);
+        } else if (safe.type === 'depot') {
+          return await this.updateDepotWithLatestValues(safe);
         } else {
           return safe;
         }
       })
     );
-  }
-
-  depotBalances = useTask(this, taskFor(this.fetchSafeBalancesTask), () => [
-    this.depotSafe as Safe | null,
-    this.safesAndBalancesRefreshRequestedAt,
-  ]);
-
-  @task
-  *fetchSafeBalancesTask(
-    safe: Safe | null,
-    _safesAndBalancesRrefreshRequestedAt: Date
-  ): TaskGenerator<any> {
-    if (!safe) {
-      return {
-        defaultTokenBalance: new BN('0'),
-        cardBalance: new BN('0'),
-      };
-    }
-    let defaultTokenAddress = this.defaultTokenContractAddress;
-    let cardTokenAddress = this.getTokenContractInfo(
-      'CARD',
-      this.networkSymbol
-    )!.address;
-
-    let [defaultBalance, cardBalance] = yield all([
-      this.#assetsApi.getBalanceForToken(defaultTokenAddress!, safe.address),
-      this.#assetsApi.getBalanceForToken(cardTokenAddress, safe.address),
-    ]);
-
-    return {
-      defaultTokenBalance: new BN(defaultBalance ?? '0'),
-      cardBalance: new BN(cardBalance ?? '0'),
-    };
   }
 
   async issuePrepaidCard(
@@ -407,6 +391,20 @@ export default abstract class Layer2ChainWeb3Strategy
 
   get isConnected(): boolean {
     return this.walletInfo.accounts.length > 0;
+  }
+
+  get defaultTokenBalance() {
+    return new BN(
+      this.safes.depot?.tokens.find((v) => v.token.symbol === 'DAI')?.balance ??
+        0
+    );
+  }
+
+  get cardBalance() {
+    return new BN(
+      this.safes.depot?.tokens.find((v) => v.token.symbol === 'CARD')
+        ?.balance ?? 0
+    );
   }
 
   async updateUsdConverters(

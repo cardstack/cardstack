@@ -23,10 +23,10 @@ import {
   UnbindEventListener,
   SimpleEmitter,
 } from '@cardstack/web-client/utils/events';
-import { task, TaskGenerator, timeout } from 'ember-concurrency';
+import { task, TaskGenerator } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 import { taskFor } from 'ember-concurrency-ts';
-import { useResource, useTask } from 'ember-resources';
+import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { reads } from 'macro-decorators';
 import { createPrepaidCardSafe } from '@cardstack/web-client/utils/test-factories';
@@ -87,10 +87,6 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   @tracked safesAndBalancesRefreshRequestedAt = new Date();
 
   @reads('safes.depot') declare depotSafe: DepotSafe | null;
-  @reads('depotBalances.value.defaultTokenBalance') defaultTokenBalance:
-    | BN
-    | undefined;
-  @reads('depotBalances.value.cardBalance') cardBalance: BN | undefined;
 
   @task *initializeTask(): TaskGenerator<void> {
     yield '';
@@ -119,10 +115,6 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     this.balancesRefreshed = true;
     this.safesAndBalancesRefreshRequestedAt = new Date();
     await taskFor(this.viewSafesTask).perform();
-    if (this.depotSafe && !taskFor(this.fetchSafeBalancesTask).last) {
-      await this.depotBalances.value;
-    }
-    await taskFor(this.fetchSafeBalancesTask).last;
   }
 
   async getWithdrawalLimits(
@@ -195,6 +187,20 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   get waitForAccount() {
     return this.waitForAccountDeferred.promise;
+  }
+
+  get defaultTokenBalance() {
+    return new BN(
+      this.safes.depot?.tokens.find((v) => v.token.symbol === 'DAI')?.balance ??
+        0
+    );
+  }
+
+  get cardBalance() {
+    return new BN(
+      this.safes.depot?.tokens.find((v) => v.token.symbol === 'CARD')
+        ?.balance ?? 0
+    );
   }
 
   async convertFromSpend(symbol: ConvertibleSymbol, amount: number) {
@@ -299,31 +305,6 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     walletAddress: this.walletInfo.firstAddress!,
     accountSafes: this.accountSafes,
   }));
-
-  depotBalances = useTask(this, taskFor(this.fetchSafeBalancesTask), () => [
-    this.depotSafe as Safe | null,
-    this.safesAndBalancesRefreshRequestedAt,
-  ]);
-
-  @task
-  *fetchSafeBalancesTask(
-    safe: Safe | null,
-    _safesAndBalancesRefreshRequestedAt: Date
-  ): TaskGenerator<any> {
-    let defaultBalance = safe?.tokens.find(
-      (tokenInfo) => tokenInfo.token.symbol === this.defaultTokenSymbol
-    )?.balance;
-
-    let cardBalance = safe?.tokens.find(
-      (tokenInfo) => tokenInfo.token.symbol === 'CARD'
-    )?.balance;
-    yield timeout(0);
-
-    return {
-      defaultTokenBalance: new BN(defaultBalance ?? '0'),
-      cardBalance: new BN(cardBalance ?? '0'),
-    };
-  }
 
   test__lastSymbolsToUpdate: UsdConvertibleSymbol[] = [];
   test__simulatedExchangeRate: number = 0.2;
