@@ -402,7 +402,7 @@ describe('/api/reservations', function () {
         },
       };
 
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -447,7 +447,7 @@ describe('/api/reservations', function () {
         },
       };
 
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -492,7 +492,7 @@ describe('/api/reservations', function () {
         },
       };
 
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
