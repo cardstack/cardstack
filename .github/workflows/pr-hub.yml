@@ -52,5 +52,9 @@ jobs:
       - run: yarn --prefer-offline
       - run: NODE_ENV=test bin/hub db init-test
         working-directory: packages/hub
-      - run: NODE_ENV=test yarn test
+      - name: Hub Tests
+        run: yarn test
+        working-directory: packages/hub
+      - name: Hub Tests (w/ Card Compler)
+        run: COMPILER=true yarn test
         working-directory: packages/hub
