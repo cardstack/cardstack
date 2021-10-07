@@ -14,7 +14,8 @@
     "pub": "yarn pkg && npm-run-all pub:*",
     "pub:tarball": "aws s3 cp ./dist/cardpay.tgz s3://cardpay-install",
     "pub:installer": "aws s3 cp ./bin/install-cardpay.sh s3://cardpay-install",
-    "pub:invalidate": "aws cloudfront create-invalidation --distribution-id ETWZIWCWU250B --paths \"/cardpay.tgz\" \"/install-cardpay.sh\" > /dev/null"
+    "pub:invalidate": "aws cloudfront create-invalidation --distribution-id ETWZIWCWU250B --paths \"/cardpay.tgz\" \"/install-cardpay.sh\" > /dev/null",
+    "pub:clean":"rm -rf ./dist"
   },
   "bin": {
     "cardpay": "./cardpay.js"
