@@ -247,10 +247,59 @@ export default abstract class Layer2ChainWeb3Strategy
     return await this.#safesApi.viewSafe(address);
   }
 
+  async fetchSafesForAccount(account: string = this.walletInfo.firstAddress!) {
+    return await this.#safesApi.view(account);
+  }
+
+  async updatePrepaidCardWithLatestValues(
+    safe: PrepaidCardSafe
+  ): Promise<PrepaidCardSafe> {
+    const PrepaidCard = await getSDK('PrepaidCard', this.web3);
+    let latestFaceValue = await PrepaidCard.faceValue(safe.address);
+    safe.spendFaceValue = latestFaceValue;
+    return safe;
+  }
+
+  async updateMerchantWithLatestValues(
+    safe: MerchantSafe
+  ): Promise<MerchantSafe> {
+    let defaultTokenAddress = this.defaultTokenContractAddress;
+    let cardTokenAddress = this.getTokenContractInfo(
+      'CARD',
+      this.networkSymbol
+    )!.address;
+
+    let [defaultBalance, cardBalance] = await Promise.all([
+      this.#assetsApi.getBalanceForToken(defaultTokenAddress!, safe.address),
+      this.#assetsApi.getBalanceForToken(cardTokenAddress, safe.address),
+    ]);
+
+    safe.tokens.forEach((token) => {
+      if (token.token.symbol === 'DAI') {
+        token.balance = defaultBalance;
+      } else if (token.token.symbol === 'CARD') {
+        token.balance = cardBalance;
+      }
+    });
+
+    return safe;
+  }
+
   @task *viewSafesTask(
     account: string = this.walletInfo.firstAddress!
   ): TaskGenerator<Safe[]> {
-    return yield this.#safesApi.view(account);
+    let safes = yield this.fetchSafesForAccount(account);
+    return yield all(
+      safes.map(async (safe: Safe) => {
+        if (safe.type === 'merchant') {
+          return await this.updateMerchantWithLatestValues(safe);
+        } else if (safe.type === 'prepaid-card') {
+          return await this.updatePrepaidCardWithLatestValues(safe);
+        } else {
+          return safe;
+        }
+      })
+    );
   }
 
   depotBalances = useTask(this, taskFor(this.fetchSafeBalancesTask), () => [
