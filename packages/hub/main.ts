@@ -187,10 +187,6 @@ export class HubServer {
   ) {}
 
   async teardown() {
-    if (process.env.COMPILER) {
-      (await this.container.lookup('card-cache')).cleanup();
-      (await this.container.lookup('card-watcher')).teardown();
-    }
     await this.container.teardown();
   }
 

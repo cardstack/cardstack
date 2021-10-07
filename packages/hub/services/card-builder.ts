@@ -35,12 +35,10 @@ export default class CardBuilder implements BuilderInterface {
   }
 
   async define(cardURL: string, localPath: string, type: string, source: string): Promise<string> {
-    let url = this.cache.setModule(BROWSER, cardURL, localPath, source);
-
     switch (type) {
       case JS_TYPE:
-        this.cache.setModule(NODE, cardURL, localPath, this.transformToCommonJS(localPath, source));
-        return url;
+        this.cache.setModule(BROWSER, cardURL, localPath, source);
+        return this.cache.setModule(NODE, cardURL, localPath, this.transformToCommonJS(localPath, source));
       default:
         return this.cache.writeAsset(cardURL, localPath, source);
     }

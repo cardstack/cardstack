@@ -11,7 +11,7 @@ import RealmManager from '../../services/realm-manager';
 import FSRealm from '../../realms/fs-realm';
 
 import type CardCache from '../../services/card-cache';
-import type { Registry } from './../../di/dependency-injection';
+import type { Registry, Container } from './../../di/dependency-injection';
 
 tmp.setGracefulCleanup();
 
@@ -71,7 +71,7 @@ export function resolveCard(root: string, modulePath: string): string {
 }
 
 export function setupCardBuilding(mochaContext: Mocha.Suite) {
-  let realms: RealmManager, builder: CardBuilder;
+  let realms: RealmManager, builder: CardBuilder, container: Container;
   let cardCache: CardCache, cardCacheConfig: TestCardCacheConfig;
 
   function createRealm(name: string): ProjectTestRealm {
@@ -79,7 +79,7 @@ export function setupCardBuilding(mochaContext: Mocha.Suite) {
   }
 
   mochaContext.beforeEach(async function () {
-    let container = wireItUp((registry: Registry) => {
+    container = wireItUp((registry: Registry) => {
       registry.register('card-cache-config', TestCardCacheConfig);
     });
 
@@ -88,8 +88,8 @@ export function setupCardBuilding(mochaContext: Mocha.Suite) {
     builder = await container.lookup('card-builder');
   });
 
-  mochaContext.afterEach(function () {
-    cardCache.cleanup();
+  mochaContext.afterEach(async () => {
+    await container.teardown();
   });
 
   return {

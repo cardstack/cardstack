@@ -16,6 +16,7 @@ import {
 import { join, dirname } from 'path';
 import { inject, injectionReady } from '../di/dependency-injection';
 import isEqual from 'lodash/isEqual';
+import { serverLog } from '../utils/logger';
 
 export const MINIMAL_PACKAGE = {
   name: '@cardstack/compiled',
@@ -155,8 +156,12 @@ export default class CardCache {
     }
   }
 
-  cleanup(): void {
-    removeSync(this.dir);
+  teardown(): void {
+    serverLog.info('Cleaning cardCache dir: ' + this.dir);
+    for (let subDir of ENVIRONMENTS) {
+      removeSync(join(this.dir, subDir));
+    }
+    removeSync(join(this.dir, 'assets'));
   }
 }
 
