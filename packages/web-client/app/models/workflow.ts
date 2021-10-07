@@ -39,9 +39,11 @@ export type CardPayWorkflowName =
 export type CardSpaceWorkflowName = 'CARD_SPACE_CREATION';
 
 export type WorkflowName = CardPayWorkflowName | CardSpaceWorkflowName;
-
+export const UNSUPPORTED_WORKFLOW_STATE_VERSION =
+  'UNSUPPORTED_WORKFLOW_STATE_VERSION';
 export abstract class Workflow {
   name!: WorkflowName;
+  abstract version: number;
   milestones: Milestone[] = [];
   epilogue: PostableCollection = new PostableCollection();
   cancelationMessages: PostableCollection = new PostableCollection();
@@ -55,7 +57,15 @@ export abstract class Workflow {
   workflowPersistence: WorkflowPersistence;
   workflowPersistenceId?: string;
 
-  abstract restorationErrors(): string[];
+  restorationErrors(): string[] {
+    let errors = [];
+    let persistedVersion = this.session.getMeta().version;
+    if (this.version > persistedVersion) {
+      errors.push(UNSUPPORTED_WORKFLOW_STATE_VERSION);
+    }
+    return errors;
+  }
+
   abstract beforeRestorationChecks(): Promise<void>[];
 
   constructor(owner?: any, workflowPersistenceId?: string) {

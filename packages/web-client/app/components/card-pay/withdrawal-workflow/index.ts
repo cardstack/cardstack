@@ -12,6 +12,7 @@ import {
   WorkflowMessage,
   WorkflowName,
   WorkflowPostable,
+  UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } from '@cardstack/web-client/models/workflow';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
@@ -32,6 +33,7 @@ import { task } from 'ember-concurrency-decorators';
 import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
 import { action } from '@ember/object';
 import { isPresent } from '@ember/utils';
+
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
@@ -39,6 +41,7 @@ const FAILURE_REASONS = {
   RESTORATION_L1_DISCONNECTED: 'RESTORATION_L1_DISCONNECTED',
   RESTORATION_L2_ADDRESS_CHANGED: 'RESTORATION_L2_ADDRESS_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
+  UNSUPPORTED_WORKFLOW_STATE_VERSION: UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } as const;
 
 export const MILESTONE_TITLES = [
@@ -49,6 +52,8 @@ export const MILESTONE_TITLES = [
   `Bridge tokens to ${c.layer1.conversationalName}`,
   `Claim tokens on ${c.layer1.conversationalName}`,
 ];
+
+export const WORKFLOW_VERSION = 1;
 
 class CheckBalanceWorkflowMessage
   extends WorkflowPostable
@@ -133,11 +138,12 @@ class CheckBalanceWorkflowMessage
   }
 }
 
-class WithdrawalWorkflow extends Workflow {
+export class WithdrawalWorkflow extends Workflow {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
 
   name = 'WITHDRAWAL' as WorkflowName;
+  version = WORKFLOW_VERSION;
 
   milestones = [
     new Milestone({
@@ -372,6 +378,17 @@ with Card Pay.`,
         );
       },
     }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION
+        );
+      },
+    }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
@@ -384,7 +401,7 @@ with Card Pay.`,
   restorationErrors() {
     let { layer1Network, layer2Network } = this;
 
-    let errors = [];
+    let errors = super.restorationErrors();
 
     if (!layer1Network.isConnected) {
       errors.push(FAILURE_REASONS.RESTORATION_L1_DISCONNECTED);

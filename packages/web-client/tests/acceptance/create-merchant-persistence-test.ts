@@ -13,6 +13,7 @@ import {
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
+import { WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/create-merchant-workflow';
 
 interface Context extends MirageTestContext {}
 
@@ -92,6 +93,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
     test('it restores an unfinished workflow', async function (this: Context, assert) {
       let state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         },
         merchantName,
@@ -128,6 +130,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
     test('it restores a finished workflow', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: [
             'LAYER2_CONNECT',
             'MERCHANT_CUSTOMIZATION',
@@ -180,6 +183,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
     test('it restores a canceled workflow', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
           milestonesCount: 3,
           completedMilestonesCount: 2,
@@ -224,6 +228,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
     test('it cancels a persisted flow when trying to restore while unauthenticated', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         },
         merchantName,
@@ -270,6 +275,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         },
         merchantName,
@@ -309,6 +315,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         },
         merchantName,
@@ -340,6 +347,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
     test('it allows interactivity after restoring previously saved state', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT'],
         },
         merchantName,
@@ -366,6 +374,38 @@ module('Acceptance | create merchant persistence', function (hooks) {
       assert
         .dom('[data-test-milestone="2"] [data-test-boxel-card-container]')
         .exists();
+    });
+
+    test('it cancels a persisted flow when version is old', async function (this: Context, assert) {
+      const state = buildState({
+        meta: {
+          version: WORKFLOW_VERSION - 1,
+          completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+        },
+        merchantName,
+        merchantId,
+        merchantBgColor,
+        merchantRegistrationFee,
+        prepaidCardChoice: prepaidCard,
+      });
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'MERCHANT_CREATION',
+        state,
+      });
+
+      await visit(
+        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
+      );
+      assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
+      assert.dom('[data-test-milestone="1"]').doesNotExist(); // Merchant info
+      assert.dom('[data-test-milestone="2"]').doesNotExist(); // Prepaid card choice
+
+      assert
+        .dom('[data-test-cancelation]')
+        .includesText(
+          'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!'
+        );
     });
   });
 });

@@ -18,7 +18,10 @@ import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-colo
 import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns';
 import { timeout } from 'ember-concurrency';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
+import {
+  faceValueOptions,
+  WORKFLOW_VERSION,
+} from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
@@ -569,6 +572,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       transferrable: true,
       txnHash: 'exampleTxnHash',
       meta: {
+        version: WORKFLOW_VERSION,
         completedCardNames: [
           'LAYER2_CONNECT',
           'HUB_AUTH',
