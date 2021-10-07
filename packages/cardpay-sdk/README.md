@@ -438,6 +438,12 @@ This method returns a promise for an object shaped like:
 }
 ```
 
+### `PrepaidCard.faceValue`
+This call will return a promise for the most current face value of a prepaid card.
+```js
+let faceValue = await prepaidCard.faceValue(prepaidCardAddress);
+```
+
 ### `PrepaidCard.canSplit`
 This call will return a promise for a boolean indicating if the prepaid card can be split.
 ```js

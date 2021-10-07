@@ -340,19 +340,11 @@ module('Acceptance | withdrawal', function (hooks) {
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD.CPXD"]`)
       .containsText('10,000.00');
-    let milestoneCtaButtonCount = Array.from(
-      document.querySelectorAll(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-      )
-    ).length;
     assert
       .dom(
-        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+        '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
       )
-      .exists(
-        { count: milestoneCtaButtonCount },
-        'All cta buttons in milestones should be disabled'
-      );
+      .doesNotExist();
     await waitFor(epiloguePostableSel(4));
     assert
       .dom(
@@ -389,7 +381,6 @@ module('Acceptance | withdrawal', function (hooks) {
     });
     await waitFor(`${post} [data-test-balance="ETH"]`);
     await waitFor(milestoneCompletedSel(0));
-    assert.dom(milestoneCompletedSel(0));
 
     await waitUntil(() => {
       return document
@@ -625,19 +616,11 @@ module('Acceptance | withdrawal', function (hooks) {
       await settled();
 
       // test that all cta buttons are disabled
-      let milestoneCtaButtonCount = Array.from(
-        document.querySelectorAll(
-          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-        )
-      ).length;
       assert
         .dom(
-          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
         )
-        .exists(
-          { count: milestoneCtaButtonCount },
-          'All cta buttons in milestones should be disabled'
-        );
+        .doesNotExist();
 
       await waitFor('[data-test-cancelation][data-test-postable]');
 
@@ -666,19 +649,11 @@ module('Acceptance | withdrawal', function (hooks) {
       await settled();
 
       // test that all cta buttons are disabled
-      let milestoneCtaButtonCount = Array.from(
-        document.querySelectorAll(
-          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]'
-        )
-      ).length;
       assert
         .dom(
-          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:disabled'
+          '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
         )
-        .exists(
-          { count: milestoneCtaButtonCount },
-          'All cta buttons in milestones should be disabled'
-        );
+        .doesNotExist();
 
       await waitFor('[data-test-cancelation][data-test-postable]');
 

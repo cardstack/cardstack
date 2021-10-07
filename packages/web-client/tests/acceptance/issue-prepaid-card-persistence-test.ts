@@ -8,9 +8,10 @@ import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { BN } from 'bn.js';
-import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/workflow-config';
+import { FAILURE_REASONS as ISSUE_PREPAID_CARD_WORKFLOW_FAILURE_REASONS } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
+import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
-import { toWei } from 'web3-utils';
+import { fromWei, toWei } from 'web3-utils';
 
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
@@ -20,7 +21,16 @@ import {
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import {
+  convertAmountToNativeDisplay,
+  spendToUsd,
+} from '@cardstack/cardpay-sdk';
 
+const MIN_SPEND_AMOUNT = Math.min(...faceValueOptions);
+const MIN_AMOUNT_TO_PASS = new BN(
+  toWei(`${Math.ceil(MIN_SPEND_AMOUNT / 100)}`)
+);
 interface Context extends MirageTestContext {}
 
 module('Acceptance | issue prepaid card persistence', function (hooks) {
@@ -35,9 +45,6 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       prepaidCardPatterns,
     });
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    const MIN_AMOUNT_TO_PASS = new BN(
-      toWei(`${Math.ceil(Math.min(...faceValueOptions) / 100)}`)
-    );
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -86,7 +93,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
-            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
           id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
         },
         colorScheme: {
@@ -95,6 +102,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -142,7 +151,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
-            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
           id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
         },
         colorScheme: {
@@ -151,6 +160,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -192,7 +203,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       assert.dom('[data-test-milestone="2"]').doesNotExist(); // Choose funding source
     });
 
-    test('it restores a cancelled workflow', async function (this: Context, assert) {
+    test('it restores a canceled workflow', async function (this: Context, assert) {
       let state = buildState({
         colorScheme: {
           patternColor: 'black',
@@ -210,7 +221,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           ],
           milestonesCount: 4,
           completedMilestonesCount: 3,
-          isCancelled: true,
+          isCanceled: true,
           cancelationReason: 'DISCONNECTED',
         },
         issuerName: 'Peter',
@@ -218,6 +229,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           patternUrl:
             'https://app.cardstack.com/images/prepaid-card-customizations/pattern-1.svg',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 500,
       });
@@ -265,7 +278,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
-            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
           id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
         },
         colorScheme: {
@@ -274,6 +287,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -329,7 +344,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
-            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
           id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
         },
         colorScheme: {
@@ -338,6 +353,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -390,7 +407,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
-            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
           id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
         },
         colorScheme: {
@@ -399,6 +416,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -422,7 +441,46 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       assert
         .dom('[data-test-cancelation]')
         .includesText(
-          'You attempted to restore an unfinished workflow, but you changed your Card wallet address. Please restart the workflow.'
+          'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.'
+        );
+    });
+
+    test('it displays a persisted workflow canceled earlier with the minimum amount at the time of cancelation', async function (this: Context, assert) {
+      let previousSpendAmount = MIN_SPEND_AMOUNT - 100;
+      let previousMinDaiAmount = MIN_AMOUNT_TO_PASS.sub(new BN(toWei('1')));
+      let state = buildState({
+        meta: {
+          completedCardNames: ['LAYER2_CONNECT'],
+          isCanceled: true,
+          cancelationReason:
+            ISSUE_PREPAID_CARD_WORKFLOW_FAILURE_REASONS.INSUFFICIENT_FUNDS,
+        },
+        spendMinValue: previousSpendAmount,
+        daiMinValue: previousMinDaiAmount,
+      });
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'Prepaid Card Issuance',
+        state,
+      });
+
+      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+
+      assert
+        .dom('[data-test-cancelation][data-test-postable="0"]')
+        .containsText(
+          `Looks like there’s not enough balance in your ${
+            c.layer2.fullName
+          } wallet to fund a prepaid card. Before you can continue, please add funds to your ${
+            c.layer2.fullName
+          } wallet by bridging some tokens from your ${
+            c.layer1.fullName
+          } wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
+            Number(fromWei(previousMinDaiAmount))
+          )} DAI.CPXD (${convertAmountToNativeDisplay(
+            spendToUsd(previousSpendAmount)!,
+            'USD'
+          )}).`
         );
     });
 
@@ -434,7 +492,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         issuerName: 'Vitalik',
         pattern: {
           patternUrl:
-            '/assets/images/prepaid-card-customizations/pattern-3-be5bfc96d028c4ed55a5aafca645d213.svg',
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
           id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
         },
         colorScheme: {
@@ -443,6 +501,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
           background: '#37EB77',
           id: '4f219852-33ee-4e4c-81f7-76318630a423',
         },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
       });
 
       workflowPersistenceService.persistData('abc123', {

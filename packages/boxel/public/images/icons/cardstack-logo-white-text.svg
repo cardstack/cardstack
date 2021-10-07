@@ -1,46 +1,46 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 99.162 109.874">
   <defs>
-    <clipPath id="a">
+    <clipPath id="cs-logo-wt-a">
       <path d="M-679.284 389.71l38.529 19.313 16.884-8.416-38.629-19.258-16.78 8.361z"
         transform="translate(679.284 -381.349)" fill="none" clip-rule="evenodd" />
     </clipPath>
-    <clipPath id="b">
+    <clipPath id="cs-logo-wt-b">
       <path d="M-679.558 283.708l60.394 30.109 16.823-8.386-60.394-30.11-16.823 8.386z"
         transform="translate(679.558 -275.322)" fill="none" clip-rule="evenodd" />
     </clipPath>
-    <clipPath id="c">
+    <clipPath id="cs-logo-wt-c">
       <path d="M-450.1 292.1l16.836-8.395-16.823-8.386-16.836 8.4 16.823 8.381z" transform="translate(466.918 -275.323)"
         fill="none" clip-rule="evenodd" />
     </clipPath>
-    <clipPath id="d">
+    <clipPath id="cs-logo-wt-d">
       <path d="M-679.888 177.558l38.649 19.268 16.835-8.4-38.652-19.263-16.833 8.39z"
         transform="translate(679.888 -169.168)" fill="none" clip-rule="evenodd" />
     </clipPath>
-    <clipPath id="e">
+    <clipPath id="cs-logo-wt-e">
       <path d="M-450.08 185.976l16.89-8.417-16.833-8.39-16.892 8.416 16.835 8.391z"
         transform="translate(466.915 -169.168)" fill="none" clip-rule="evenodd" />
     </clipPath>
-    <clipPath id="f">
+    <clipPath id="cs-logo-wt-f">
       <path d="M-556.65 116l-16.89 8.422 16.892 8.417 16.89-8.417L-556.65 116z" transform="translate(573.541 -116)"
         fill="none" clip-rule="evenodd" />
     </clipPath>
   </defs>
-  <g clip-path="url(#a)" transform="translate(11.001 54.291)">
+  <g clip-path="url(#cs-logo-wt-a)" transform="translate(11.001 54.291)">
     <path fill="#00ebe5" d="M-1.023-1.023h57.459v29.721H-1.023z" />
   </g>
-  <g transform="translate(10.945 32.598)" clip-path="url(#b)">
+  <g transform="translate(10.945 32.598)" clip-path="url(#cs-logo-wt-b)">
     <path fill="#00ebe5" d="M-1.023-1.023H78.24v40.542H-1.023z" />
   </g>
-  <g transform="translate(54.451 32.598)" clip-path="url(#c)">
+  <g transform="translate(54.451 32.598)" clip-path="url(#cs-logo-wt-c)">
     <path fill="#00ebe5" d="M-1.023-1.023h35.704v18.827H-1.023z" />
   </g>
-  <g clip-path="url(#d)" transform="translate(10.877 10.878)">
+  <g clip-path="url(#cs-logo-wt-d)" transform="translate(10.877 10.878)">
     <path fill="#37eb77" d="M-1.023-1.023h57.53v29.705h-57.53z" />
   </g>
-  <g transform="translate(54.452 10.878)" clip-path="url(#e)">
+  <g transform="translate(54.452 10.878)" clip-path="url(#cs-logo-wt-e)">
     <path fill="#37eb77" d="M-1.023-1.023h35.771V17.83H-1.023z" />
   </g>
-  <g transform="translate(32.636)" clip-path="url(#f)">
+  <g transform="translate(32.636)" clip-path="url(#cs-logo-wt-f)">
     <path fill="#37eb77" d="M-1.023-1.023h35.828v18.885H-1.023z" />
   </g>
   <path

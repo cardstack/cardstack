@@ -3,6 +3,9 @@
 import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
 import Web3 from 'web3';
 import config from 'config';
+import Logger from '@cardstack/logger';
+
+let log = Logger('service:relay');
 
 interface Web3Config {
   network: string;
@@ -16,6 +19,20 @@ const { network } = config.get('web3') as Web3Config;
 const { provisionerSecret } = config.get('relay') as RelayServiceConfig;
 
 export default class RelayService {
+  async isAvailable(): Promise<boolean> {
+    let relayUrl = `${getConstantByNetwork('relayServiceURL', network)}/v1/about/`;
+    try {
+      let response = await fetch(relayUrl);
+      if (!response.ok) {
+        log.warn(`Relay service, ${relayUrl}, is not available: ${response.status}`);
+      }
+      return response.ok;
+    } catch (e) {
+      log.error(`Error encountered while checking if relay server ${relayUrl} is available`, e);
+      return false;
+    }
+  }
+
   async provisionPrepaidCard(userAddress: string, sku: string): Promise<string> {
     let relayUrl = getConstantByNetwork('relayServiceURL', network);
     let response = await fetch(`${relayUrl}/v1/prepaid-card/provision/${sku}/`, {

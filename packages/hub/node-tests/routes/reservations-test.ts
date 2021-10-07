@@ -12,6 +12,8 @@ const { toWei } = Web3.utils;
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
 let stubTimestamp = process.hrtime.bigint();
+let stubWeb3Available = true;
+let stubRelayAvailable = true;
 let stubInventorySubgraph: () => InventorySubgraph;
 let defaultContractMethods = {
   cardpayVersion() {
@@ -61,6 +63,9 @@ class StubSubgraph {
 }
 
 class StubWeb3 {
+  isAvailable() {
+    return Promise.resolve(stubWeb3Available);
+  }
   getInstance() {
     return {
       eth: {
@@ -77,6 +82,11 @@ class StubWeb3 {
         },
       },
     };
+  }
+}
+class StubRelay {
+  isAvailable() {
+    return Promise.resolve(stubRelayAvailable);
   }
 }
 
@@ -105,6 +115,7 @@ describe('/api/reservations', function () {
         registry.register('authentication-utils', StubAuthenticationUtils);
         registry.register('subgraph', StubSubgraph);
         registry.register('web3', StubWeb3);
+        registry.register('relay', StubRelay);
       },
     });
     stubInventorySubgraph = () => ({
@@ -122,6 +133,8 @@ describe('/api/reservations', function () {
       ...defaultContractMethods,
       ...contractPauseMethod(false),
     });
+    stubRelayAvailable = true;
+    stubWeb3Available = true;
 
     request = supertest(server.app.callback());
   });
@@ -372,7 +385,7 @@ describe('/api/reservations', function () {
       expect(rows.length).to.equal(0);
     });
 
-    it(`returns 400 when contract is paused`, async function () {
+    it(`returns 503 when contract is paused`, async function () {
       stubMarketContract = () => ({
         ...defaultContractMethods,
         ...contractPauseMethod(true),
@@ -404,13 +417,103 @@ describe('/api/reservations', function () {
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
         .set('Accept', 'application/vnd.api+json')
         .set('Content-Type', 'application/vnd.api+json')
-        .expect(400)
+        .expect(503)
         .expect({
           errors: [
             {
-              status: '400',
+              status: '503',
               title: 'Contract paused',
               detail: 'The market contract is paused',
+            },
+          ],
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
+
+      let { rows } = await db.query(`SELECT * FROM reservations`);
+      expect(rows.length).to.equal(0);
+    });
+
+    it(`returns 503 when RPC node is unavailable`, async function () {
+      stubWeb3Available = false;
+
+      stubInventorySubgraph = () => ({
+        data: {
+          skuinventories: [
+            makeInventoryData('sku1', '100', toWei('1'), [
+              '0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC',
+              '0x04699Ff48CC6531727A12344c30F3eD1062Ff3ad',
+            ]),
+          ],
+        },
+      });
+
+      const payload = {
+        data: {
+          type: 'reservations',
+          attributes: {
+            sku: 'sku1',
+          },
+        },
+      };
+
+      await request
+        .post(`/api/reservations`)
+        .send(payload)
+        .set('Authorization', 'Bearer: abc123--def456--ghi789')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(503)
+        .expect({
+          errors: [
+            {
+              status: '503',
+              title: 'RPC Node Unavailable',
+              detail: 'The RPC node is unavailable',
+            },
+          ],
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
+
+      let { rows } = await db.query(`SELECT * FROM reservations`);
+      expect(rows.length).to.equal(0);
+    });
+
+    it(`returns 503 when relay server is unavailable`, async function () {
+      stubRelayAvailable = false;
+
+      stubInventorySubgraph = () => ({
+        data: {
+          skuinventories: [
+            makeInventoryData('sku1', '100', toWei('1'), [
+              '0x024db5796C3CaAB34e9c0995A1DF17A91EECA6cC',
+              '0x04699Ff48CC6531727A12344c30F3eD1062Ff3ad',
+            ]),
+          ],
+        },
+      });
+
+      const payload = {
+        data: {
+          type: 'reservations',
+          attributes: {
+            sku: 'sku1',
+          },
+        },
+      };
+
+      await request
+        .post(`/api/reservations`)
+        .send(payload)
+        .set('Authorization', 'Bearer: abc123--def456--ghi789')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(503)
+        .expect({
+          errors: [
+            {
+              status: '503',
+              title: 'Relay Server Unavailable',
+              detail: 'The relay server is unavailable',
             },
           ],
         })

@@ -9,7 +9,7 @@ import BigNumber from 'bignumber.js';
 import { get, has } from 'lodash';
 import { convertAmountToNativeAmount, convertRawAmountToDecimalFormat } from './amount-conversion';
 import { lessThan } from './comparison';
-import supportedNativeCurrencies from '../native-currencies';
+import { currencies } from '../currencies';
 import { handleSignificantDecimals } from './rounding-and-approximation';
 import { BigNumberish } from './types';
 
@@ -17,7 +17,7 @@ import { BigNumberish } from './types';
  * Checks if we support the specified native currency based on currency code.
  */
 export const isSupportedCurrency = (nativeCurrency: string) => {
-  return has(supportedNativeCurrencies, `${nativeCurrency}`);
+  return has(currencies, `${nativeCurrency}`);
 };
 
 /**
@@ -151,7 +151,7 @@ export const convertAmountToPercentageDisplay = (value: BigNumberish, decimals =
  * @see {@link handleSignificantDecimals} for more details on calculating amount
  */
 export const convertAmountToNativeDisplay = (value: BigNumberish, nativeCurrency: string, buffer?: number) => {
-  const nativeSelected = get(supportedNativeCurrencies, `${nativeCurrency}`);
+  const nativeSelected = get(currencies, `${nativeCurrency}`);
 
   if (!nativeSelected) {
     throw new Error(`Unknown currency ${nativeCurrency}`);

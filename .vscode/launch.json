@@ -67,8 +67,8 @@
       "args": [
         "hub-auth",
         // "https://hub.cardstack.com",
-        // "https://hub-staging.stack.cards",
-        "http://localhost:3000",
+        "https://hub-staging.stack.cards",
+        // "http://localhost:3000",
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own
@@ -411,8 +411,8 @@
       "args": [
         "pay-merchant",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0x46EaC630d4A314156FfBaF5A95d87b8860986661", // Hassan's prepaid card --feel free to use your own
-        "200",
+        "0x483F081bB0C25A5B216D1A4BD9CE0196092A0575", // Hassan's prepaid card --feel free to use your own
+        "100",
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own

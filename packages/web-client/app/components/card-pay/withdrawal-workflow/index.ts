@@ -31,6 +31,7 @@ import {
 import { task } from 'ember-concurrency-decorators';
 import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
 import { action } from '@ember/object';
+import { isPresent } from '@ember/utils';
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
@@ -105,10 +106,10 @@ class CheckBalanceWorkflowMessage
     } else {
       return `Checking your balance...
 
-The last step of this withdrawal requires that you have at least **~${formatWeiAmount(
+      The last step of this withdrawal requires that you have at least **~${formatWeiAmount(
         minimumBalanceForWithdrawalClaim
       )} ${c.layer1.nativeTokenSymbol}**.
-You only have **${formatWeiAmount(layer1Network.defaultTokenBalance)} ${
+      You only have **${formatWeiAmount(layer1Network.defaultTokenBalance)} ${
         c.layer1.nativeTokenSymbol
       }**. You will need to deposit more
       ${
@@ -201,8 +202,8 @@ Please continue with the next step of this workflow.`,
         }),
         new NetworkAwareWorkflowMessage({
           author: cardbot,
-          message: `You have connected your ${c.layer1.fullName} wallet. Now it's time to connect your ${c.layer2.fullName}
-wallet via your Card Wallet mobile app. If you don't have the app installed, please do so now.`,
+          message: `You have connected your ${c.layer1.fullName} wallet. Now it’s time to connect your ${c.layer2.fullName}
+wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
           includeIf() {
             return !this.hasLayer2Account;
           },
@@ -317,16 +318,6 @@ with Card Pay.`,
         );
       },
     }),
-    new WorkflowCard({
-      author: cardbot,
-      componentName: 'workflow-thread/default-cancelation-cta',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
-        );
-      },
-    }),
-    // cancelation for changing accounts
     new WorkflowMessage({
       author: cardbot,
       message:
@@ -351,7 +342,7 @@ with Card Pay.`,
     new WorkflowMessage({
       author: cardbot,
       message:
-        'You attempted to restore an unfinished workflow, but you changed your Card wallet address. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.',
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
@@ -359,13 +350,33 @@ with Card Pay.`,
         );
       },
     }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L2_DISCONNECTED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but your Layer 1 wallet got disconnected. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L1_DISCONNECTED
+        );
+      },
+    }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
-        return (Object.values(FAILURE_REASONS) as String[]).includes(
-          String(this.workflow?.cancelationReason)
-        );
+        return isPresent(this.workflow?.cancelationReason);
       },
     }),
   ]);

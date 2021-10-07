@@ -1,5 +1,46 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-export default {
+
+enum CryptoCurrency {
+  ETH = 'ETH',
+  DAI = 'DAI',
+  CARD = 'CARD',
+}
+
+enum NativeCurrency {
+  SPD = 'SPD',
+  USD = 'USD',
+  EUR = 'EUR',
+  GBP = 'GBP',
+  AUD = 'AUD',
+  CNY = 'CNY',
+  KRW = 'KRW',
+  RUB = 'RUB',
+  INR = 'INR',
+  JPY = 'JPY',
+  TRY = 'TRY',
+  CAD = 'CAD',
+  NZD = 'NZD',
+  ZAR = 'ZAR',
+}
+
+type Currency = CryptoCurrency | NativeCurrency;
+
+export { CryptoCurrency, NativeCurrency, Currency };
+
+interface CurrencyInfo {
+  alignment: string;
+  assetLimit: number;
+  currency: string;
+  decimals: number;
+  label: string;
+  mask: string;
+  placeholder: string;
+  smallThreshold: number;
+  symbol: string;
+  emojiName?: string;
+}
+
+const cryptoCurrencies: Record<CryptoCurrency, CurrencyInfo> = {
   ETH: {
     alignment: 'left',
     assetLimit: 0.001,
@@ -33,6 +74,9 @@ export default {
     smallThreshold: 1,
     symbol: '',
   },
+};
+
+const nativeCurrencies: Record<NativeCurrency, CurrencyInfo> = {
   SPD: {
     alignment: 'left',
     assetLimit: 1,
@@ -201,3 +245,10 @@ export default {
     symbol: 'R',
   },
 };
+
+const currencies: Record<Currency, CurrencyInfo> = {
+  ...cryptoCurrencies,
+  ...nativeCurrencies,
+};
+
+export { nativeCurrencies, cryptoCurrencies, currencies };

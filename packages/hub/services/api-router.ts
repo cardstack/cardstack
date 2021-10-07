@@ -5,6 +5,7 @@ import Koa from 'koa';
 import mimeMatch from 'mime-match';
 import { CardstackError } from '../utils/error';
 import BoomRoute from '../routes/boom';
+import ExchangeRatesRoute from '../routes/exchange-rates';
 import SessionRoute from '../routes/session';
 import PrepaidCardColorSchemesRoute from '../routes/prepaid-card-color-schemes';
 import PrepaidCardPatternsRoute from '../routes/prepaid-card-patterns';
@@ -19,6 +20,7 @@ import { parseBody } from '../middleware';
 
 export default class APIRouter {
   boomRoute: BoomRoute = inject('boom-route', { as: 'boomRoute' });
+  exchangeRatesRoute: ExchangeRatesRoute = inject('exchange-rates-route', { as: 'exchangeRatesRoute' });
   sessionRoute: SessionRoute = inject('session-route', { as: 'sessionRoute' });
   prepaidCardColorSchemesRoute: PrepaidCardColorSchemesRoute = inject('prepaid-card-color-schemes-route', {
     as: 'prepaidCardColorSchemesRoute',
@@ -39,6 +41,7 @@ export default class APIRouter {
   routes() {
     let {
       boomRoute,
+      exchangeRatesRoute,
       prepaidCardColorSchemesRoute,
       prepaidCardPatternsRoute,
       prepaidCardCustomizationsRoute,
@@ -51,6 +54,7 @@ export default class APIRouter {
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
+    apiSubrouter.get('/exchange-rates', exchangeRatesRoute.get);
     apiSubrouter.get('/session', sessionRoute.get);
     apiSubrouter.post('/session', parseBody, sessionRoute.post);
     apiSubrouter.get('/prepaid-card-color-schemes', prepaidCardColorSchemesRoute.get);

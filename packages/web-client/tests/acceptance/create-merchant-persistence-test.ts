@@ -177,13 +177,13 @@ module('Acceptance | create merchant persistence', function (hooks) {
       assert.dom('[data-test-workflow-thread]').doesNotExist();
     });
 
-    test('it restores a cancelled workflow', async function (this: Context, assert) {
+    test('it restores a canceled workflow', async function (this: Context, assert) {
       const state = buildState({
         meta: {
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
           milestonesCount: 3,
           completedMilestonesCount: 2,
-          isCancelled: true,
+          isCanceled: true,
           cancelationReason: 'DISCONNECTED',
         },
         merchantName,
@@ -333,7 +333,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       assert
         .dom('[data-test-cancelation]')
         .includesText(
-          'You attempted to restore an unfinished workflow, but you changed your Card wallet address. Please restart the workflow.'
+          'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.'
         );
     });
 

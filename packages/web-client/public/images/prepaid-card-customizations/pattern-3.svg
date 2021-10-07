@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 364 285.613">
   <defs>
-    <clipPath id="a">
+    <clipPath id="pattern-3-a">
       <rect width="363.999" height="285.613" fill="none"/>
     </clipPath>
   </defs>
   <g >
-    <g clip-path="url(#a)"  transform="translate(-79.755 -75.507) translate(79.755 75.507)">
+    <g clip-path="url(#pattern-3-a)"  transform="translate(-79.755 -75.507) translate(79.755 75.507)">
       <g >
         <g >
           <g >

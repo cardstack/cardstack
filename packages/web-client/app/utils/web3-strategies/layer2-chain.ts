@@ -455,7 +455,10 @@ export default abstract class Layer2ChainWeb3Strategy
     return tokenBridge.waitForBridgingValidation(fromBlock.toString(), txnHash);
   }
 
-  async convertFromSpend(symbol: ConvertibleSymbol, amount: number) {
+  async convertFromSpend(
+    symbol: ConvertibleSymbol,
+    amount: number
+  ): Promise<string> {
     let address: string | undefined;
     if (symbol === this.defaultTokenSymbol) {
       address = this.defaultTokenContractAddress;

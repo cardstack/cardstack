@@ -1,22 +1,31 @@
 {
   "name": "@cardstack/cardpay-cli",
   "description": "CLI tool for basic actions in the Cardpay ecosystem",
-  "version": "0.26.3",
+  "version": "0.26.7",
   "author": "Dominic Sherman @DominicSherman",
   "repository": "cardstack/cardstack",
   "scripts": {
     "build": "tsc && chmod +x ./index.js",
-    "cardpay": "node ./cardpay.js"
+    "cardpay": "node ./cardpay.js",
+    "pkg": "npm-run-all pkg:*",
+    "pkg:build": "rm -rf ./dist && rm -rf ~/.cardpay-cli-dist && mkdir ~/.cardpay-cli-dist && find . -name '*.js' | cpio -pdm ~/.cardpay-cli-dist && cp ./package.json ~/.cardpay-cli-dist && cp ../../yarn.lock ~/.cardpay-cli-dist && cd ~/.cardpay-cli-dist && yarn install",
+    "pkg:assemble": "mkdir -p ./dist/bin && cp -r ~/.cardpay-cli-dist/* ./dist && cp ./bin/cardpay ./dist/bin && rm -rf ~/.cardpay-cli-dist",
+    "pkg:tar": "cd ./dist && tar -czf cardpay.tgz --exclude=cardpay.tgz .",
+    "pub": "yarn pkg && npm-run-all pub:*",
+    "pub:tarball": "aws s3 cp ./dist/cardpay.tgz s3://cardpay-install",
+    "pub:installer": "aws s3 cp ./bin/install-cardpay.sh s3://cardpay-install",
+    "pub:invalidate": "aws cloudfront create-invalidation --distribution-id ETWZIWCWU250B --paths \"/cardpay.tgz\" \"/install-cardpay.sh\" > /dev/null"
   },
   "bin": {
     "cardpay": "./cardpay.js"
   },
   "license": "MIT",
   "devDependencies": {
-    "@types/yargs": "^16.0.0"
+    "@types/yargs": "^16.0.0",
+    "npm-run-all": "^4.1.5"
   },
   "dependencies": {
-    "@cardstack/cardpay-sdk": "0.26.3",
+    "@cardstack/cardpay-sdk": "0.26.7",
     "@truffle/hdwallet-provider": "^1.5.0",
     "@trufflesuite/web3-provider-engine": "^15.0.13-1",
     "@types/bn.js": "^5.1.0",

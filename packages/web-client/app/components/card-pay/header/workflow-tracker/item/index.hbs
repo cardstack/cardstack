@@ -1,7 +1,6 @@
 <button
-  class='workflow-tracker-item'
+  class={{cn "workflow-tracker-item" workflow-tracker-item--completed=this.isComplete}}
   type='button'
-  disabled={{if this.isComplete 'disabled'}}
   {{on 'click' this.visit}}
   ...attributes
 >

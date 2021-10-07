@@ -30,11 +30,15 @@ interface PostableIndices {
   collectionIndex: number;
 }
 
-export type WorkflowName =
+export type CardPayWorkflowName =
   | 'PREPAID_CARD_ISSUANCE'
   | 'RESERVE_POOL_DEPOSIT'
   | 'WITHDRAWAL'
   | 'MERCHANT_CREATION';
+
+export type CardSpaceWorkflowName = 'CARD_SPACE_CREATION';
+
+export type WorkflowName = CardPayWorkflowName | CardSpaceWorkflowName;
 
 export abstract class Workflow {
   name!: WorkflowName;
@@ -126,7 +130,7 @@ export abstract class Workflow {
     const cancelationReason = reason || 'UNKNOWN';
 
     this.session.setMeta({
-      isCancelled: true,
+      isCanceled: true,
       cancelationReason: cancelationReason,
     });
 
@@ -228,7 +232,7 @@ export abstract class Workflow {
     }
 
     if (
-      this.session.getMeta().isCancelled &&
+      this.session.getMeta().isCanceled &&
       this.session.getMeta().cancelationReason
     ) {
       this.cancel(this.session.getMeta().cancelationReason);
@@ -238,9 +242,18 @@ export abstract class Workflow {
 
 export let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
 
-export const WORKFLOW_NAMES = {
+export const CARD_PAY_WORKFLOW_NAMES = {
   PREPAID_CARD_ISSUANCE: 'Prepaid Card Issuance',
   MERCHANT_CREATION: 'Merchant Creation',
   RESERVE_POOL_DEPOSIT: 'Reserve Pool Deposit',
   WITHDRAWAL: 'Withdrawal',
+};
+
+export const CARD_SPACE_WORKFLOW_NAMES = {
+  CARD_SPACE_CREATION: 'Card Space Creation',
+};
+
+export const WORKFLOW_NAMES = {
+  ...CARD_PAY_WORKFLOW_NAMES,
+  ...CARD_SPACE_WORKFLOW_NAMES,
 };

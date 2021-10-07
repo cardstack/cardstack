@@ -54,6 +54,7 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
         with:
           ref: ${{ github.event.inputs.ref }}
+          environment: ${{ github.event.inputs.environment }}
 
       - name: Send success notification to Discord
         if: ${{ success() }}

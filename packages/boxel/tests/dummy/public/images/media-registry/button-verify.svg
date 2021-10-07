@@ -1,1 +1,42 @@
-<svg height="42" viewBox="0 0 42 42" width="42" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><clipPath id="a"><path clip-rule="evenodd" d="m13.814-450a13.764 13.764 0 0 1 9.331 3.627l-2.261 2.268a10.576 10.576 0 0 0 -7.07-2.7 10.615 10.615 0 0 0 -10.614 10.619 10.616 10.616 0 0 0 10.616 10.616 10.616 10.616 0 0 0 10.616-10.616 10.566 10.566 0 0 0 -1.57-5.558l2.307-2.314a13.75 13.75 0 0 1 2.461 7.872 13.814 13.814 0 0 1 -13.814 13.814 13.814 13.814 0 0 1 -13.816-13.814 13.814 13.814 0 0 1 13.814-13.814z" transform="translate(0 450)"/></clipPath><clipPath id="b"><path d="m-25-444.3h30.7v-30.7h-30.7z" transform="translate(25 475)"/></clipPath><clipPath id="c"><path clip-rule="evenodd" d="m113.705-281.019a7.649 7.649 0 0 1 .766 3.347 7.72 7.72 0 0 1 -7.736 7.705 7.72 7.72 0 0 1 -7.735-7.705 7.65 7.65 0 0 1 .752-3.317l6.962 6.97z" transform="translate(-99 281.019)"/></clipPath><clipPath id="d"><path clip-rule="evenodd" d="m147.068-352a7.693 7.693 0 0 1 5.061 1.888l-5.129 5.112-5.065-5.056a7.694 7.694 0 0 1 5.133-1.944z" transform="translate(-141.938 352)"/></clipPath><clipPath id="e"><path d="m-25-444.3h30.7v-30.7h-30.7z" transform="translate(25 475)"/></clipPath><g stroke="#000"><rect height="40" rx="10" stroke="none" width="40" x="1" y="1"/><rect fill="none" height="41" rx="10.5" width="41" x=".5" y=".5"/></g><rect fill="#34019d" height="40" rx="10" width="40" x="1" y="1"/><g transform="translate(1 1)"><circle cx="20" cy="20" fill="none" r="20"/><g clip-path="url(#a)" transform="translate(6.186 6.186)"><g clip-path="url(#b)" transform="translate(-1.535 -1.535)"><path d="m-5-455h28.242v28.242h-28.242z" fill="#fff" transform="translate(6.228 456.228)"/></g></g><g clip-path="url(#c)" transform="translate(12.264 16.561)"><g clip-path="url(#b)" transform="translate(-7.613 -11.909)"><path d="m94-286.019h16.085v11.666h-16.085z" fill="#fff" transform="translate(-86.694 297.622)"/></g></g><g clip-path="url(#d)" transform="translate(14.9 12.203)"><g clip-path="url(#e)" transform="translate(-10.249 -7.552)"><path d="m136.938-357h10.806v7.618h-10.806z" fill="#54c3c9" transform="translate(-126.996 364.245)"/></g></g></g></svg>
+<svg height="42" viewBox="0 0 42 42" width="42"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink">
+  <clipPath id="button-verify-a">
+    <path clip-rule="evenodd" d="m13.814-450a13.764 13.764 0 0 1 9.331 3.627l-2.261 2.268a10.576 10.576 0 0 0 -7.07-2.7 10.615 10.615 0 0 0 -10.614 10.619 10.616 10.616 0 0 0 10.616 10.616 10.616 10.616 0 0 0 10.616-10.616 10.566 10.566 0 0 0 -1.57-5.558l2.307-2.314a13.75 13.75 0 0 1 2.461 7.872 13.814 13.814 0 0 1 -13.814 13.814 13.814 13.814 0 0 1 -13.816-13.814 13.814 13.814 0 0 1 13.814-13.814z" transform="translate(0 450)"/>
+  </clipPath>
+  <clipPath id="button-verify-b">
+    <path d="m-25-444.3h30.7v-30.7h-30.7z" transform="translate(25 475)"/>
+  </clipPath>
+  <clipPath id="button-verify-c">
+    <path clip-rule="evenodd" d="m113.705-281.019a7.649 7.649 0 0 1 .766 3.347 7.72 7.72 0 0 1 -7.736 7.705 7.72 7.72 0 0 1 -7.735-7.705 7.65 7.65 0 0 1 .752-3.317l6.962 6.97z" transform="translate(-99 281.019)"/>
+  </clipPath>
+  <clipPath id="button-verify-d">
+    <path clip-rule="evenodd" d="m147.068-352a7.693 7.693 0 0 1 5.061 1.888l-5.129 5.112-5.065-5.056a7.694 7.694 0 0 1 5.133-1.944z" transform="translate(-141.938 352)"/>
+  </clipPath>
+  <clipPath id="button-verify-e">
+    <path d="m-25-444.3h30.7v-30.7h-30.7z" transform="translate(25 475)"/>
+  </clipPath>
+  <g stroke="#000">
+    <rect height="40" rx="10" stroke="none" width="40" x="1" y="1"/>
+    <rect fill="none" height="41" rx="10.5" width="41" x=".5" y=".5"/>
+  </g>
+  <rect fill="#34019d" height="40" rx="10" width="40" x="1" y="1"/>
+  <g transform="translate(1 1)">
+    <circle cx="20" cy="20" fill="none" r="20"/>
+    <g clip-path="url(#button-verify-a)" transform="translate(6.186 6.186)">
+      <g clip-path="url(#button-verify-b)" transform="translate(-1.535 -1.535)">
+        <path d="m-5-455h28.242v28.242h-28.242z" fill="#fff" transform="translate(6.228 456.228)"/>
+      </g>
+    </g>
+    <g clip-path="url(#button-verify-c)" transform="translate(12.264 16.561)">
+      <g clip-path="url(#button-verify-b)" transform="translate(-7.613 -11.909)">
+        <path d="m94-286.019h16.085v11.666h-16.085z" fill="#fff" transform="translate(-86.694 297.622)"/>
+      </g>
+    </g>
+    <g clip-path="url(#button-verify-d)" transform="translate(14.9 12.203)">
+      <g clip-path="url(#button-verify-e)" transform="translate(-10.249 -7.552)">
+        <path d="m136.938-357h10.806v7.618h-10.806z" fill="#54c3c9" transform="translate(-126.996 364.245)"/>
+      </g>
+    </g>
+  </g>
+</svg>

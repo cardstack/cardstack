@@ -19,6 +19,7 @@ import { capitalize } from '@ember/string';
 import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { tracked } from '@glimmer/tracking';
+import { isPresent } from '@ember/utils';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -48,7 +49,7 @@ class DepositWorkflow extends Workflow {
       postables: [
         new WorkflowMessage({
           author: cardbot,
-          message: "Hi there, we're happy to see you!",
+          message: 'Hi there, we’re happy to see you!',
         }),
         new WorkflowMessage({
           author: cardbot,
@@ -99,8 +100,8 @@ class DepositWorkflow extends Workflow {
         }),
         new NetworkAwareWorkflowMessage({
           author: cardbot,
-          message: `You have connected your ${c.layer1.fullName} wallet. Now it's time to connect your ${c.layer2.fullName}
-          wallet via your Card Wallet mobile app. If you don't have the app installed, please do so now.`,
+          message: `You have connected your ${c.layer1.fullName} wallet. Now it’s time to connect your ${c.layer2.fullName}
+          wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
           includeIf() {
             return !this.hasLayer2Account;
           },
@@ -128,7 +129,7 @@ class DepositWorkflow extends Workflow {
         new WorkflowMessage({
           author: cardbot,
           message:
-            "Let's get down to business. Please choose the asset you would like to deposit into the CARD Protocol's reserve pool.",
+            'Let’s get down to business. Please choose the asset you would like to deposit into the CARD Protocol’s reserve pool.',
         }),
         new WorkflowCard({
           author: cardbot,
@@ -152,7 +153,7 @@ class DepositWorkflow extends Workflow {
       postables: [
         new WorkflowMessage({
           author: cardbot,
-          message: `Congrats! Now that you have deposited funds into the CARD Protocol's reserve pool, your token will be bridged to the ${c.layer2.shortName} blockchain. You can check the status below.`,
+          message: `Congrats! Now that you have deposited funds into the CARD Protocol’s reserve pool, your token will be bridged to the ${c.layer2.shortName} blockchain. You can check the status below.`,
         }),
         new WorkflowCard({
           author: cardbot,
@@ -203,6 +204,16 @@ class DepositWorkflow extends Workflow {
     new WorkflowMessage({
       author: cardbot,
       message:
+        'It looks like you changed accounts in the middle of this workflow. If you still want to deposit funds, please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
         'You attempted to restore an unfinished workflow, but you changed your Layer 1 wallet address. Please restart the workflow.',
       includeIf() {
         return (
@@ -214,7 +225,7 @@ class DepositWorkflow extends Workflow {
     new WorkflowMessage({
       author: cardbot,
       message:
-        'You attempted to restore an unfinished workflow, but you changed your Card wallet address. Please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.',
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
@@ -222,27 +233,25 @@ class DepositWorkflow extends Workflow {
         );
       },
     }),
-    new WorkflowCard({
-      author: cardbot,
-      componentName: 'workflow-thread/default-cancelation-cta',
-      includeIf() {
-        return (
-          [
-            FAILURE_REASONS.DISCONNECTED,
-            FAILURE_REASONS.RESTORATION_L1_DISCONNECTED,
-            FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
-          ] as String[]
-        ).includes(String(this.workflow?.cancelationReason));
-      },
-    }),
-    // cancelation for changing accounts
     new WorkflowMessage({
       author: cardbot,
       message:
-        'It looks like you changed accounts in the middle of this workflow. If you still want to deposit funds, please restart the workflow.',
+        'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
       includeIf() {
         return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L2_DISCONNECTED
+        );
+      },
+    }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but your Layer 1 wallet got disconnected. Please restart the workflow.',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_L1_DISCONNECTED
         );
       },
     }),
@@ -250,9 +259,7 @@ class DepositWorkflow extends Workflow {
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
       includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
-        );
+        return isPresent(this.workflow?.cancelationReason);
       },
     }),
   ]);

@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/web-client",
-  "version": "0.26.3",
+  "version": "0.26.7",
   "description": "The cardstack web front-end app",
   "repository": "",
   "license": "MIT",
@@ -25,9 +25,9 @@
     "test:ember": "ember test"
   },
   "devDependencies": {
-    "@cardstack/boxel": "0.26.3",
-    "@cardstack/cardpay-sdk": "0.26.3",
-    "@cardstack/did-resolver": "0.26.3",
+    "@cardstack/boxel": "0.26.7",
+    "@cardstack/cardpay-sdk": "0.26.7",
+    "@cardstack/did-resolver": "0.26.7",
     "@ember/optional-features": "^2.0.0",
     "@ember/test-helpers": "^2.4.0",
     "@ember/test-waiters": "^2.4.5",
@@ -73,7 +73,6 @@
     "broccoli-asset-rev": "^3.0.0",
     "broccoli-concat": "^4.2.4",
     "buffer": "^6.0.3",
-    "commonmark": "^0.29.3",
     "did-resolver": "^3.1.0",
     "ember-a11y-testing": "^4.0.3",
     "ember-auto-import": "^2.0.0",
@@ -166,6 +165,7 @@
     "eth-block-tracker": "^5.0.1",
     "json-rpc-random-id": "^1.0.1",
     "macro-decorators": "^0.1.2",
+    "markdown-it": "^12.2.0",
     "short-uuid": "^4.2.0",
     "typescript": "^4.2.3",
     "ua-parser-js": "^0.7.28",

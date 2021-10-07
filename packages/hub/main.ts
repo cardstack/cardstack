@@ -16,6 +16,7 @@ import DevelopmentConfig from './services/development-config';
 import DevelopmentProxyMiddleware from './services/development-proxy-middleware';
 import WyreService from './services/wyre';
 import BoomRoute from './routes/boom';
+import ExchangeRatesRoute from './routes/exchange-rates';
 import SessionRoute from './routes/session';
 import PrepaidCardColorSchemesRoute from './routes/prepaid-card-color-schemes';
 import PrepaidCardColorSchemeSerializer from './services/serializers/prepaid-card-color-scheme-serializer';
@@ -48,6 +49,7 @@ import s3PutJson from './tasks/s3-put-json';
 import { CardstackError } from './utils/error';
 import { environment, httpLogging } from './middleware';
 import cors from '@koa/cors';
+import ExchangeRatesService from './services/exchange-rates';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -72,6 +74,8 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('database-manager', DatabaseManager);
   registry.register('development-config', DevelopmentConfig);
   registry.register('development-proxy-middleware', DevelopmentProxyMiddleware);
+  registry.register('exchange-rates', ExchangeRatesService);
+  registry.register('exchange-rates-route', ExchangeRatesRoute);
   registry.register('health-check', HealthCheck);
   registry.register('inventory-route', InventoryRoute);
   registry.register('merchant-infos-route', MerchantInfosRoute);
