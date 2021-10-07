@@ -2,7 +2,7 @@
 
 import logger from '@cardstack/logger';
 import { Argv } from 'yargs';
-import { HubServer } from '../main';
+import { HubServer, SERVER_CONFIG_DEFAULTS } from '../main';
 
 const serverLog = logger('hub/server');
 
@@ -17,7 +17,14 @@ export let builder = function (yargs: Argv) {
       describe: 'The port to server should listen on',
       type: 'number',
       nargs: 1,
-      default: 3000,
+      default: SERVER_CONFIG_DEFAULTS.port,
+    },
+    noWatch: {
+      alias: 'nw',
+      describe: 'Disable watching for changes to cards',
+      type: 'boolean',
+      default: SERVER_CONFIG_DEFAULTS.noWatch,
+      nargs: 1,
     },
   });
 };

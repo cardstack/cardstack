@@ -51,11 +51,13 @@ import Web3Service from './services/web3';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import RealmManager from './services/realm-manager';
-import CardBuilder from './services/card-builder';
 import { serverLog, workerLog } from './utils/logger';
+
+import CardBuilder from './services/card-builder';
 import CardRoutes from './routes/card-routes';
 import { CardCacheConfig } from './services/card-cache-config';
 import CardCache from './services/card-cache';
+import CardWatcher from './services/card-watcher';
 import ExchangeRatesService from './services/exchange-rates';
 
 //@ts-ignore polyfilling fetch
@@ -100,11 +102,12 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('wyre-callback-route', WyreCallbackRoute);
 
   if (process.env.COMPILER) {
+    registry.register('realm-manager', RealmManager);
     registry.register('card-cache-config', CardCacheConfig);
     registry.register('card-cache', CardCache);
     registry.register('card-routes', CardRoutes);
-    registry.register('realm-manager', RealmManager);
     registry.register('card-builder', CardBuilder);
+    registry.register('card-watcher', CardWatcher);
   }
 
   if (registryCallback) {
@@ -113,6 +116,10 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   return new Container(registry);
 }
 
+export const SERVER_CONFIG_DEFAULTS: HubServerConfig = {
+  port: 3000,
+  noWatch: false,
+};
 export class HubServer {
   logger = serverLog;
   static logger = serverLog;
@@ -120,7 +127,7 @@ export class HubServer {
   static async create(serverConfig?: Partial<HubServerConfig>): Promise<HubServer> {
     let container = wireItUp(serverConfig?.registryCallback);
 
-    let fullConfig = Object.assign({}, serverConfig) as HubServerConfig;
+    let fullConfig = Object.assign({}, SERVER_CONFIG_DEFAULTS, serverConfig) as HubServerConfig;
 
     let builder: CardBuilder;
     if (process.env.COMPILER) {
@@ -182,11 +189,13 @@ export class HubServer {
   async teardown() {
     if (process.env.COMPILER) {
       (await this.container.lookup('card-cache')).cleanup();
+      (await this.container.lookup('card-watcher')).teardown();
     }
     await this.container.teardown();
   }
 
-  listen() {
+  // TODO: Setup watcher service, start watchers in listen, add an option to start without watchers
+  async listen() {
     let instance = this.app.listen(this.config.port);
     this.logger.info('server listening on %s', this.config.port);
 
@@ -197,6 +206,10 @@ export class HubServer {
     instance.on('close', () => {
       this.app.emit('close'); // supports our ShutdownHelper
     });
+
+    if (process.env.COMPILER && !this.config.noWatch) {
+      (await this.container.lookup('card-watcher')).watch();
+    }
 
     return instance;
   }
