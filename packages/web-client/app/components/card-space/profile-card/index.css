@@ -75,6 +75,7 @@
 .card-space-profile-card__profile-photo--placeholder {
   --icon-color: var(--boxel-purple-300);
 
+  width: 100%;
   transform: scale(0.5);
 }
 
