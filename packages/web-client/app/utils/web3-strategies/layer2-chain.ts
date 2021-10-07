@@ -254,9 +254,9 @@ export default abstract class Layer2ChainWeb3Strategy
     return safe;
   }
 
-  private async updateMerchantWithLatestValues(
-    safe: MerchantSafe
-  ): Promise<MerchantSafe> {
+  private async updateSafeDaiAndCardBalances<T extends Safe>(
+    safe: T
+  ): Promise<T> {
     let defaultTokenAddress = this.defaultTokenContractAddress;
     let cardTokenAddress = this.getTokenContractInfo(
       'CARD',
@@ -279,27 +279,14 @@ export default abstract class Layer2ChainWeb3Strategy
     return safe;
   }
 
+  private async updateMerchantWithLatestValues(
+    safe: MerchantSafe
+  ): Promise<MerchantSafe> {
+    return this.updateSafeDaiAndCardBalances(safe);
+  }
+
   private async updateDepotWithLatestValues(safe: DepotSafe) {
-    let defaultTokenAddress = this.defaultTokenContractAddress;
-    let cardTokenAddress = this.getTokenContractInfo(
-      'CARD',
-      this.networkSymbol
-    )!.address;
-
-    let [defaultBalance, cardBalance] = await Promise.all([
-      this.#assetsApi.getBalanceForToken(defaultTokenAddress!, safe.address),
-      this.#assetsApi.getBalanceForToken(cardTokenAddress, safe.address),
-    ]);
-
-    safe.tokens.forEach((token) => {
-      if (token.token.symbol === 'DAI') {
-        token.balance = defaultBalance;
-      } else if (token.token.symbol === 'CARD') {
-        token.balance = cardBalance;
-      }
-    });
-
-    return safe;
+    return this.updateSafeDaiAndCardBalances(safe);
   }
 
   @task *viewSafesTask(
