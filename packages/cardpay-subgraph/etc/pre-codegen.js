@@ -42,15 +42,18 @@ let uniswapV2GenesisBlock = {
 
 let v0_7_0_startBlock = {
   sokol: 22189483,
-  // TODO populate this after the contract deployment for v0.7.0
-  xdai: 0,
+  xdai: 18457665,
 };
 
 let v0_8_0_startBlock = {
   sokol: 22728770,
-  // TODO populate this after the contract deployment for v0.8.0
-  xdai: 0,
+  xdai: 18457665,
 };
+
+let v0_8_3_startBlock = {
+  sokol: ,
+  xdai: 18457665,
+}
 
 let abis = {
   PrepaidCardManager: getAbi(join(sourceAbiDir, 'prepaid-card-manager.ts')),
