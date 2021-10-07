@@ -1,6 +1,7 @@
 .card-space-profile-card__container {
   --profile-card-cover-photo-width: 17.5rem;
   --profile-card-cover-photo-height: calc(var(--profile-card-cover-photo-width) * 50 / 125);
+  --profile-card-height: calc(var(--profile-card-cover-photo-width) * 160 / 125);
 
   display: flex;
   flex-direction: column;
@@ -18,6 +19,7 @@
 .card-space-profile-card__card {
   position: relative;
   width: var(--profile-card-cover-photo-width);
+  height: calc(var(--profile-card-height));
   border-radius: var(--boxel-border-radius);
   overflow: hidden;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
@@ -76,11 +78,14 @@
 }
 
 .card-space-profile-card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: calc(var(--profile-card-height) - var(--profile-card-cover-photo-height));
   padding: var(--boxel-sp-lg) var(--boxel-sp) var(--boxel-sp);
 }
 
 .card-space-profile-card__heading {
-  margin-top: var(--boxel-sp);
   font: 700 var(--boxel-font-lg);
 }
 
@@ -102,7 +107,10 @@
 }
 
 .card-space-profile-card__description {
-  margin:
-    var(--boxel-sp-sm) 0
-    var(--boxel-sp-lg) 0;
+  margin-top: var(--boxel-sp-sm);
+  margin-bottom: auto;
+}
+
+.card-space-profile-card__button {
+  margin-top: auto;
 }
