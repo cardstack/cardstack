@@ -31,7 +31,7 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
 
   @tracked isConfirming = false;
   get txnHash(): TransactionHash | null {
-    return this.args.workflowSession.getValue('txnHash');
+    return this.args.workflowSession.getValue('claimTokensTxnHash');
   }
   @tracked errorMessage = '';
 
@@ -103,7 +103,7 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
           this.bridgeValidationResult,
           {
             onTxnHash: (txnHash: string) => {
-              this.args.workflowSession.setValue('txnHash', txnHash);
+              this.args.workflowSession.setValue('claimTokensTxnHash', txnHash);
             },
           }
         );
