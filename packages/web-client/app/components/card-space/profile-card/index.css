@@ -28,7 +28,7 @@
 
 .card-space-profile-card__cover-photo-container {
   margin: 0;
-  line-height: 12px; /* Without this the container is 5px too tall, pushing body too far down. */
+  line-height: 0; /* Without this the container is 5px too tall, pushing body too far down. */
 }
 
 .card-space-profile-card__cover-photo {
