@@ -23,6 +23,7 @@
     "@aws-sdk/client-sts": "^3.18.0",
     "@babel/core": "^7.12.13",
     "@cardstack/cardpay-sdk": "0.26.9",
+    "@cardstack/core": "0.26.9",
     "@cardstack/did-resolver": "0.26.9",
     "@cardstack/logger": "^0.2.1",
     "@graphile/logger": "^0.2.0",
