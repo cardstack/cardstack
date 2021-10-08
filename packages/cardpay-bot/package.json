@@ -1,0 +1,20 @@
+{
+  "name": "@cardstack/cardpay-bot",
+  "version": "0.26.9",
+  "description": "Discord bot for Cardpay",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "author": "Hassan Abdel-Rahman @habdelra",
+  "license": "MIT",
+  "devDependencies": {
+    "@cardstack/logger": "^0.2.1",
+    "@types/fs-extra": "^9.0.11",
+    "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0",
+    "fs-extra": "^10.0.0",
+    "glob-promise": "^4.2.0"
+  }
+}

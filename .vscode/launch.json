@@ -48,6 +48,14 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Run cardpay bot",
+      "program": "${workspaceRoot}/packages/cardpay-bot/index.js",
+      "cwd": "${workspaceRoot}/packages/cardpay-bot",
+      "console": "integratedTerminal",
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Build web-client",
       "program": "${workspaceFolder}/node_modules/.bin/ember",
       "cwd": "${workspaceRoot}/packages/web-client",
