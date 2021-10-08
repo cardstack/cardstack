@@ -49,7 +49,7 @@ jobs:
       - run: NODE_ENV=test bin/hub db init-test
         working-directory: packages/hub
       - name: Start the card server
-        run: COMPILER=true yarn start serve &
+        run: NODE_ENV=test COMPILER=true yarn start &
         working-directory: packages/hub
       - name: Cardhost test suite
         run: yarn test:ember
