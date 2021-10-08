@@ -24,21 +24,22 @@ export class Bot extends Client {
 
   async start(): Promise<void> {
     const commandFiles: string[] = await glob(`${__dirname}/commands/**/*.js`);
-    let commands = await Promise.all(
-      commandFiles.map(async (file) => {
-        const { name, run, aliases = [], description } = (await import(file)) as Command;
-        return [
-          name,
-          {
+    this.commands = new Map(
+      await Promise.all(
+        commandFiles.map(async (file) => {
+          const { name, run, aliases = [], description } = (await import(file)) as Command;
+          return [
             name,
-            run,
-            aliases,
-            description,
-          },
-        ] as [string, Command];
-      })
+            {
+              name,
+              run,
+              aliases,
+              description,
+            },
+          ] as [string, Command];
+        })
+      )
     );
-    this.commands = new Map(commands);
 
     const eventFiles: string[] = await glob(`${__dirname}/events/**/*.js`);
     const _this = this;
