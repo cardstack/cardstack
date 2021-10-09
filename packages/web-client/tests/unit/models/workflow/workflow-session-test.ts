@@ -9,6 +9,7 @@ import Ember from 'ember';
 import BN from 'bn.js';
 import { default as sinon, SinonFakeTimers } from 'sinon';
 import { Workflow } from '@cardstack/web-client/models/workflow';
+import { WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
 
 const { track, valueForTag, validateTag } =
   // @ts-ignore digging
@@ -31,6 +32,7 @@ module('Unit | WorkflowSession model', function (hooks) {
       value: {
         updatedAt: startDateString,
         createdAt: startDateString,
+        version: WORKFLOW_VERSION,
       },
     });
   });
@@ -50,6 +52,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -65,6 +68,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -80,6 +84,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -119,6 +124,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -161,6 +167,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -176,6 +183,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -191,6 +199,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -230,6 +239,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -278,6 +288,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -301,6 +312,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -335,6 +347,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -350,6 +363,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -365,6 +379,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -406,6 +421,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -424,6 +440,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -439,6 +456,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -483,6 +501,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -502,6 +521,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -517,6 +537,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -560,6 +581,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -599,6 +621,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -647,6 +670,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -671,6 +695,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -723,6 +748,7 @@ module('Unit | WorkflowSession model', function (hooks) {
           completedMilestonesCount: 1,
           updatedAt: startDateString,
           createdAt: startDateString,
+          version: WORKFLOW_VERSION,
         },
       }),
       'State is persisted when persist=false is not specified'
@@ -737,6 +763,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -778,6 +805,7 @@ module('Unit | WorkflowSession model', function (hooks) {
     });
     let subject = new WorkflowSession({
       name: 'PREPAID_CARD_ISSUANCE',
+      version: WORKFLOW_VERSION,
       workflowPersistence,
       workflowPersistenceId: ID,
     } as Workflow);
@@ -800,5 +828,22 @@ module('Unit | WorkflowSession model', function (hooks) {
       updatedDateString,
       `Updated date has an updated ISO date string: ${updatedDateString}`
     );
+  });
+
+  test('it can return worklow version', function (assert) {
+    let workflowPersistence = new WorkflowPersistence();
+    workflowPersistence.persistData('workflow-id-1', {
+      name: 'PREPAID_CARD_ISSUANCE',
+      state: {},
+    });
+    let subject = new WorkflowSession({
+      name: 'PREPAID_CARD_ISSUANCE',
+      version: 2,
+      workflowPersistence,
+      workflowPersistenceId: ID,
+    } as Workflow);
+    subject.setMeta({});
+
+    assert.equal(subject.getMeta().version, 2);
   });
 });

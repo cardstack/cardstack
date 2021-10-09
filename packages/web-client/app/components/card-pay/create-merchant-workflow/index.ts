@@ -17,6 +17,7 @@ import {
   WorkflowCard,
   WorkflowMessage,
   WorkflowName,
+  UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } from '@cardstack/web-client/models/workflow';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
@@ -38,6 +39,7 @@ const FAILURE_REASONS = {
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
   RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
+  UNSUPPORTED_WORKFLOW_STATE_VERSION: UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } as const;
 
 export const MILESTONE_TITLES = [
@@ -45,9 +47,11 @@ export const MILESTONE_TITLES = [
   'Save merchant details',
   'Create merchant',
 ];
+export const WORKFLOW_VERSION = 1;
 
 class CreateMerchantWorkflow extends Workflow {
   name = 'MERCHANT_CREATION' as WorkflowName;
+  version = WORKFLOW_VERSION;
 
   @service declare router: RouterService;
   @service declare layer2Network: Layer2Network;
@@ -301,7 +305,17 @@ class CreateMerchantWorkflow extends Workflow {
         );
       },
     }),
-
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION
+        );
+      },
+    }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
@@ -320,7 +334,7 @@ class CreateMerchantWorkflow extends Workflow {
   restorationErrors() {
     let { hubAuthentication, layer2Network } = this;
 
-    let errors = [];
+    let errors = super.restorationErrors();
 
     if (!layer2Network.isConnected) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);

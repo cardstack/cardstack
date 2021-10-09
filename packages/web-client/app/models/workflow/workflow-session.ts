@@ -26,6 +26,7 @@ export interface IWorkflowSession {
 export interface WorkflowMeta {
   updatedAt: string | undefined;
   createdAt: string | undefined;
+  version: number;
   completedCardNames: string[] | undefined;
   completedMilestonesCount: number | undefined;
   milestonesCount: number | undefined;
@@ -209,7 +210,10 @@ export default class WorkflowSession implements IWorkflowSession {
     let createdAt = this.getMeta()?.createdAt || updatedAt;
 
     // persist must be false to avoid infinite recursion
-    this.setMeta({ updatedAt, createdAt }, false);
+    this.setMeta(
+      { updatedAt, createdAt, version: this.workflow.version },
+      false
+    );
 
     this.workflow.workflowPersistence.persistData(
       this.workflow.workflowPersistenceId,
