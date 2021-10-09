@@ -42,6 +42,13 @@ module('Acceptance | persistence view and restore', function () {
     setupHubAuthenticationToken(hooks);
 
     hooks.beforeEach(async function (this: Context) {
+      let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+      layer1Service.test__simulateAccountsChanged(
+        [layer1AccountAddress],
+        'metamask'
+      );
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
       let layer2Service = this.owner.lookup('service:layer2-network')
@@ -74,6 +81,26 @@ module('Acceptance | persistence view and restore', function () {
       );
 
       workflowPersistenceService.clear();
+    });
+
+    test('it is hidden when layer1 wallet is not connected', async function (this: Context, assert) {
+      await visit('/card-pay/');
+      assert.dom('[data-test-workflow-tracker-toggle]').exists();
+
+      await click('[data-test-card-pay-layer-1-connect] button');
+      await click('[data-test-mainnet-disconnect-button]');
+
+      assert.dom('[data-test-workflow-tracker-toggle]').doesNotExist();
+    });
+
+    test('it is hidden when layer2 wallet is not connected', async function (this: Context, assert) {
+      await visit('/card-pay/');
+      assert.dom('[data-test-workflow-tracker-toggle]').exists();
+
+      await click('[data-test-card-pay-layer-2-connect] button');
+      await click('[data-test-layer-2-wallet-disconnect-button]');
+
+      assert.dom('[data-test-workflow-tracker-toggle]').doesNotExist();
     });
 
     test('it lists persisted Card Pay workflows', async function (this: Context, assert) {
@@ -439,7 +466,26 @@ module('Acceptance | persistence view and restore', function () {
       setupMirage(hooks);
       setupHubAuthenticationToken(hooks);
 
+      test('it is hidden before wallets are connected', async function (this: Context, assert) {
+        await visit('/card-pay/');
+        assert.dom('[data-test-workflow-tracker]').doesNotExist();
+      });
+
       test('it lists existing persisted Card Pay workflows', async function (this: Context, assert) {
+        let layer1AccountAddress =
+          '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+        let layer1Service = this.owner.lookup('service:layer1-network')
+          .strategy as Layer1TestWeb3Strategy;
+        layer1Service.test__simulateAccountsChanged(
+          [layer1AccountAddress],
+          'metamask'
+        );
+        let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+
+        let layer2Service = this.owner.lookup('service:layer2-network')
+          .strategy as Layer2TestWeb3Strategy;
+        layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+
         await visit('/card-pay/');
         assert.dom('[data-test-workflow-tracker-count]').containsText('2');
       });
