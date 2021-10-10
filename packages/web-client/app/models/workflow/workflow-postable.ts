@@ -1,5 +1,5 @@
 import { tracked } from '@glimmer/tracking';
-import { Workflow } from '../workflow';
+import { cardbot, Workflow } from '../workflow';
 
 export interface Participant {
   name: string;
@@ -13,10 +13,10 @@ export class WorkflowPostable {
   }
   @tracked isComplete: boolean = false;
   constructor(
-    author: Participant,
+    author?: Participant,
     includeIf: ((this: WorkflowPostable) => boolean) | undefined = undefined
   ) {
-    this.author = author;
+    this.author = author || cardbot;
     this.includeIf = includeIf;
   }
   includeIf: (() => boolean) | undefined;
