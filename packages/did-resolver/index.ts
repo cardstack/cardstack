@@ -7,7 +7,7 @@ import * as uuidv4 from 'uuid';
 
 const CURRENT_VERSION = 1;
 
-type CardstackIdentifierType = 'PrepaidCardCustomization' | 'MerchantInfo' | 'SupplierInfo';
+type CardstackIdentifierType = 'PrepaidCardCustomization' | 'MerchantInfo' | 'SupplierInfo' | 'CardSpace';
 
 const DID_TYPE_TO_SHORT_TYPE = {
   PrepaidCardCustomization: 'p',

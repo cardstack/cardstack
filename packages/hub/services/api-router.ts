@@ -11,6 +11,7 @@ import PrepaidCardColorSchemesRoute from '../routes/prepaid-card-color-schemes';
 import PrepaidCardPatternsRoute from '../routes/prepaid-card-patterns';
 import PrepaidCardCustomizationsRoute from '../routes/prepaid-card-customizations';
 import MerchantInfosRoute from '../routes/merchant-infos';
+import CardSpacesRoute from '../routes/card-spaces';
 import ReservationsRoute from '../routes/reservations';
 import OrdersRoute from '../routes/orders';
 import InventoryRoute from '../routes/inventory';
@@ -34,6 +35,9 @@ export default class APIRouter {
   merchantInfosRoute: MerchantInfosRoute = inject('merchant-infos-route', {
     as: 'merchantInfosRoute',
   });
+  cardSpacesRoute: CardSpacesRoute = inject('card-spaces-route', {
+    as: 'cardSpacesRoute',
+  });
   custodialWalletRoute: CustodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
   ordersRoute: OrdersRoute = inject('orders-route', { as: 'ordersRoute' });
   reservationsRoute: ReservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
@@ -51,6 +55,7 @@ export default class APIRouter {
       ordersRoute,
       reservationsRoute,
       inventoryRoute,
+      cardSpacesRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
@@ -68,6 +73,7 @@ export default class APIRouter {
     apiSubrouter.get('/orders/:order_id', ordersRoute.get);
     apiSubrouter.post('/reservations', parseBody, reservationsRoute.post);
     apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get);
+    apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();
