@@ -1,6 +1,7 @@
 import { CardSpace } from '../../routes/card-spaces';
 import CardSpaceQueries from '../queries/card-space';
 import { inject } from '../../di/dependency-injection';
+import { URL } from 'url';
 
 export interface CardSpaceErrors {
   name?: string;
@@ -44,16 +45,19 @@ export default class CardSpaceValidator {
       errors['category'] = `Max length is ${MAX_SHORT_FIELD_LENGTH}`;
     }
 
-    let cardSpaceWithExistingUrl = (await this.cardSpaceQueries.query({ url: cardSpace.url }))[0];
-
-    if (cardSpaceWithExistingUrl) {
-      errors['url'] = 'Already exists';
+    try {
+      new URL(`https://${cardSpace.url}`);
+    } catch (error) {
+      errors['url'] = 'Invalid URL';
     }
 
-    // TODO:
-    // 1. URL validation for url
-    // 2. URL validation for profileImageUrl, coverImageUrl
-    // 3. validate name (prevent non alphanumeric characters?)
+    if (!errors['url']) {
+      let cardSpaceWithExistingUrl = (await this.cardSpaceQueries.query({ url: cardSpace.url }))[0];
+
+      if (cardSpaceWithExistingUrl) {
+        errors['url'] = 'Already exists';
+      }
+    }
 
     return errors;
   }
