@@ -1,23 +1,11 @@
 import DatabaseManager from '../database-manager';
 import { inject } from '../../di/dependency-injection';
 import { CardSpace } from '../../routes/card-spaces';
+import { buildConditions } from '../../utils/queries';
 
 interface CardSpaceQueriesFilter {
   id?: string;
   url?: string;
-}
-
-function buildConditions(params: CardSpaceQueriesFilter) {
-  let conditions = Object.keys(params).map((key, index) => {
-    return `${key}=$${index + 1}`;
-  });
-
-  let values = Object.values(params);
-
-  return {
-    where: conditions.join(' AND '),
-    values: values,
-  };
 }
 
 export default class CardSpaceQueries {

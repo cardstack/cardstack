@@ -1,23 +1,11 @@
 import DatabaseManager from '../database-manager';
 import { inject } from '../../di/dependency-injection';
 import { MerchantInfo } from '../../routes/merchant-infos';
+import { buildConditions } from '../../utils/queries';
 
 interface MerchantInfoQueriesFilter {
   id?: string;
   slug?: string;
-}
-
-function buildConditions(params: MerchantInfoQueriesFilter) {
-  let conditions = Object.keys(params).map((key, index) => {
-    return `${key}=$${index + 1}`;
-  });
-
-  let values = Object.values(params);
-
-  return {
-    where: conditions.join(' AND '),
-    values: values,
-  };
 }
 
 export default class MerchantInfoQueries {
