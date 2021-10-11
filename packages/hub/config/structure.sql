@@ -607,6 +607,26 @@ CREATE TABLE graphile_worker.migrations (
 ALTER TABLE graphile_worker.migrations OWNER TO postgres;
 
 --
+-- Name: card_spaces; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.card_spaces (
+    id uuid NOT NULL,
+    url text NOT NULL,
+    name text NOT NULL,
+    profile_image_url text,
+    cover_image_url text,
+    description text NOT NULL,
+    button_text text NOT NULL,
+    category text NOT NULL,
+    owner_address text NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.card_spaces OWNER TO postgres;
+
+--
 -- Name: merchant_infos; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -792,6 +812,14 @@ ALTER TABLE ONLY graphile_worker.migrations
 
 
 --
+-- Name: card_spaces card_spaces_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.card_spaces
+    ADD CONSTRAINT card_spaces_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: merchant_infos merchant_infos_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -852,6 +880,13 @@ ALTER TABLE ONLY public.wallet_orders
 --
 
 CREATE INDEX jobs_priority_run_at_id_locked_at_without_failures_idx ON graphile_worker.jobs USING btree (priority, run_at, id, locked_at) WHERE (attempts < max_attempts);
+
+
+--
+-- Name: card_spaces_url_unique_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX card_spaces_url_unique_index ON public.card_spaces USING btree (url);
 
 
 --
