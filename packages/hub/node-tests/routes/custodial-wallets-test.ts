@@ -59,7 +59,7 @@ function handleCreateWyreWallet(address: string) {
   return {
     callbackUrl: null,
     depositAddresses: {
-      ETH: stubDepositAddress1, // eslint-disable-line @typescript-eslint/naming-convention
+      ETH: stubDepositAddress1,
     },
     name: address.toLowerCase(),
     id: stubWyreWalletId1,
@@ -76,7 +76,7 @@ function handleGetWyreWalletByName(address: string) {
       notes: null,
       balances: {},
       depositAddresses: {
-        ETH: stubDepositAddress2, // eslint-disable-line @typescript-eslint/naming-convention
+        ETH: stubDepositAddress2,
       },
       totalBalances: {},
       availableBalances: {},

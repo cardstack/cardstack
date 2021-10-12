@@ -82,7 +82,6 @@ class StubWeb3 {
             return 77; // sokol network id
           },
         },
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         Contract: class {
           get methods() {
             return stubMarketContract();

@@ -19,8 +19,8 @@ const mockExchangeRatesResponse = {
   date: '2021-09-30',
   base: 'USD',
   rates: {
-    GBP: 1, // eslint-disable-line @typescript-eslint/naming-convention
-    CAD: 3, // eslint-disable-line @typescript-eslint/naming-convention
+    GBP: 1,
+    CAD: 3,
   },
 } as FixerSuccessResponse;
 
