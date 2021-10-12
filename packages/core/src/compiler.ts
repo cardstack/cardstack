@@ -7,6 +7,7 @@ import classPropertiesPlugin from '@babel/plugin-proposal-class-properties';
 import difference from 'lodash/difference';
 import intersection from 'lodash/intersection';
 import reduce from 'lodash/reduce';
+import md5 from 'md5';
 
 import cardSchemaPlugin, { FieldsMeta, getMeta, PluginMeta } from './babel-plugin-card-schema';
 import transformCardComponent, {
@@ -16,7 +17,6 @@ import { Builder, CompiledCard, ComponentInfo, FEATURE_NAMES, Format, FORMATS, R
 import { getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
 import { assertValidKeys } from './utils/errors';
-import md5 from './utils/md5';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
