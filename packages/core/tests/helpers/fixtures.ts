@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { templateOnlyComponentTemplate } from './templates';
 
 export const ADDRESS_RAW_CARD = {
