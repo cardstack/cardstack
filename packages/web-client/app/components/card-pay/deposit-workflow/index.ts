@@ -9,6 +9,7 @@ import {
   WorkflowName,
   WorkflowMessage,
   WorkflowCard,
+  UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } from '@cardstack/web-client/models/workflow';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
@@ -28,6 +29,7 @@ const FAILURE_REASONS = {
   RESTORATION_L1_DISCONNECTED: 'RESTORATION_L1_DISCONNECTED',
   RESTORATION_L2_ADDRESS_CHANGED: 'RESTORATION_L2_ADDRESS_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
+  UNSUPPORTED_WORKFLOW_STATE_VERSION: UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } as const;
 
 export const MILESTONE_TITLES = [
@@ -37,12 +39,16 @@ export const MILESTONE_TITLES = [
   `Receive tokens on ${c.layer2.shortName}`,
 ];
 
+export const WORKFLOW_VERSION = 1;
+
 class DepositWorkflow extends Workflow {
   @service declare router: RouterService;
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
 
   name = 'RESERVE_POOL_DEPOSIT' as WorkflowName;
+  version = WORKFLOW_VERSION;
+
   milestones = [
     new Milestone({
       title: MILESTONE_TITLES[0],
@@ -255,6 +261,17 @@ class DepositWorkflow extends Workflow {
         );
       },
     }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION
+        );
+      },
+    }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
@@ -267,7 +284,7 @@ class DepositWorkflow extends Workflow {
   restorationErrors() {
     let { layer1Network, layer2Network } = this;
 
-    let errors = [];
+    let errors = super.restorationErrors();
 
     if (!layer1Network.isConnected) {
       errors.push(FAILURE_REASONS.RESTORATION_L1_DISCONNECTED);

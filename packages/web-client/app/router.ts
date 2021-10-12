@@ -13,12 +13,14 @@ Router.map(function () {
     this.route('reward-programs');
     this.route('token-suppliers');
   });
+  this.route('card-space', function () {
+    this.route('profile-card-temp');
+  });
   this.route('pay', {
     path: '/pay/:network/:merchant_safe_id',
   });
   this.route('pay-missing-route', {
     path: '/pay/:*',
   });
-  this.route('card-space');
   this.route('boom');
 });

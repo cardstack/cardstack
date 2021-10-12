@@ -18,6 +18,7 @@ import {
   WorkflowCard,
   WorkflowMessage,
   WorkflowName,
+  UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } from '@cardstack/web-client/models/workflow';
 
 const FAILURE_REASONS = {
@@ -27,6 +28,7 @@ const FAILURE_REASONS = {
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
   RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
+  UNSUPPORTED_WORKFLOW_STATE_VERSION: UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } as const;
 
 export const MILESTONE_TITLES = [
@@ -36,12 +38,15 @@ export const MILESTONE_TITLES = [
   `Create Card Space`,
 ];
 
+export const WORKFLOW_VERSION = 1;
+
 class CreateSpaceWorkflow extends Workflow {
   @service declare router: RouterService;
   @service declare layer2Network: Layer2Network;
   @service declare hubAuthentication: HubAuthentication;
 
   name: WorkflowName = 'CARD_SPACE_CREATION';
+  version = WORKFLOW_VERSION;
 
   milestones = [
     new Milestone({
@@ -256,6 +261,17 @@ class CreateSpaceWorkflow extends Workflow {
         );
       },
     }),
+    new WorkflowMessage({
+      author: cardbot,
+      message:
+        'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!',
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION
+        );
+      },
+    }),
     new WorkflowCard({
       author: cardbot,
       componentName: 'workflow-thread/default-cancelation-cta',
@@ -282,7 +298,7 @@ class CreateSpaceWorkflow extends Workflow {
   restorationErrors() {
     let { hubAuthentication, layer2Network } = this;
 
-    let errors = [];
+    let errors = super.restorationErrors();
 
     if (!layer2Network.isConnected) {
       errors.push(FAILURE_REASONS.RESTORATION_L2_DISCONNECTED);

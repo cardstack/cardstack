@@ -17,6 +17,7 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import { BN } from 'bn.js';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
+import { WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/deposit-workflow';
 
 interface Context extends MirageTestContext {}
 
@@ -65,6 +66,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     test('it restores an unfinished workflow', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
         },
         depositSourceToken: 'DAI',
@@ -90,6 +92,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     test('it restores a workflow partway through the deposit/unlock 2-step process', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
         },
         depositSourceToken: 'DAI',
@@ -142,6 +145,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     test('it restores a workflow partway through the layer 2 bridging', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: [
             'LAYER1_CONNECT',
             'LAYER2_CONNECT',
@@ -223,6 +227,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     test('it restores a finished workflow', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: [
             'LAYER1_CONNECT',
             'LAYER2_CONNECT',
@@ -307,6 +312,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     test('it restores a canceled workflow', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
           isCanceled: true,
           cancelationReason: 'DISCONNECTED',
@@ -339,6 +345,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
         },
         depositSourceToken: 'DAI',
@@ -369,6 +376,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     test('it cancels a persisted flow when Layer 1 wallet address is different', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: [
             'LAYER1_CONNECT',
             'LAYER2_CONNECT',
@@ -398,6 +406,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: [
             'LAYER1_CONNECT',
             'LAYER2_CONNECT',
@@ -427,6 +436,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     test('it allows interactivity after restoring previously saved state', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER1_CONNECT', 'LAYER2_CONNECT', 'TXN_SETUP'],
         },
         depositSourceToken: 'DAI',
@@ -462,6 +472,84 @@ module('Acceptance | deposit persistence', function (hooks) {
 
       layer1Service.test__simulateUnlock();
       await settled();
+    });
+
+    test('it cancels a persisted flow when version is old', async function (this: Context, assert) {
+      const state = buildState({
+        meta: {
+          version: WORKFLOW_VERSION - 1,
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'LAYER2_CONNECT',
+            'TXN_SETUP',
+            'TXN_AMOUNT',
+            'TXN_STATUS',
+          ],
+        },
+        depositSourceToken: 'DAI',
+        depositedAmount: new BN('10000000000000000000'),
+        unlockTxnHash: '0xABC',
+        unlockTxnReceipt: {
+          status: true,
+          transactionHash: '0xABC',
+          transactionIndex: 1,
+          blockHash: '',
+          blockNumber: 1,
+          from: '',
+          to: '',
+          contractAddress: '',
+          cumulativeGasUsed: 1,
+          gasUsed: 1,
+          logs: [],
+          logsBloom: '',
+          events: {},
+        },
+        relayTokensTxnHash: '0xDEF',
+        relayTokensTxnReceipt: {
+          status: true,
+          transactionHash: '0xDEF',
+          transactionIndex: 1,
+          blockHash: '',
+          blockNumber: 1,
+          from: '',
+          to: '',
+          contractAddress: '',
+          cumulativeGasUsed: 1,
+          gasUsed: 1,
+          logs: [],
+          logsBloom: '',
+          events: {},
+        },
+        layer2BlockHeightBeforeBridging: '1234',
+        completedLayer2TxnReceipt: {
+          status: true,
+          transactionHash: '0xGHI',
+          transactionIndex: 1,
+          blockHash: '',
+          blockNumber: 1,
+          from: '',
+          to: '',
+          contractAddress: '',
+          cumulativeGasUsed: 1,
+          gasUsed: 1,
+          logs: [],
+          logsBloom: '',
+          events: {},
+        },
+      });
+      workflowPersistenceService.persistData('abc123', {
+        name: 'RESERVE_POOL_DEPOSIT',
+        state,
+      });
+      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      assert.dom('[data-test-milestone="0"]').doesNotExist(); // L1
+      assert.dom('[data-test-milestone="1"]').doesNotExist(); // L2
+      assert.dom('[data-test-milestone="2"]').doesNotExist(); // Deposit
+      assert
+        .dom('[data-test-cancelation]')
+        .includesText(
+          'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!'
+        );
     });
   });
 });
