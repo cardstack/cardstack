@@ -1,14 +1,18 @@
 /* eslint-disable no-process-exit */
 
+import config from 'config';
 import Koa from 'koa';
+import { environment, httpLogging, errorMiddleware } from './middleware';
+import cors from '@koa/cors';
 import fetch from 'node-fetch';
 import * as Sentry from '@sentry/node';
-import logger from '@cardstack/logger';
+
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
-import config from 'config';
 import packageJson from './package.json';
 import { Registry, Container, RegistryCallback } from './di/dependency-injection';
+
+import { HubServerConfig } from './interfaces';
 
 import AuthenticationMiddleware from './services/authentication-middleware';
 import DatabaseManager from './services/database-manager';
@@ -46,23 +50,20 @@ import { Clock } from './services/clock';
 import Web3Service from './services/web3';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
-import { CardstackError } from './utils/error';
-import { environment, httpLogging } from './middleware';
-import cors from '@koa/cors';
+import RealmManager from './services/realm-manager';
+import { serverLog, workerLog } from './utils/logger';
+
+import CardBuilder from './services/card-builder';
+import CardRoutes from './routes/card-routes';
+import { CardCacheConfig } from './services/card-cache-config';
+import CardCache from './services/card-cache';
+import CardWatcher from './services/card-watcher';
 import ExchangeRatesService from './services/exchange-rates';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
 
-const workerLog = logger('hub/worker');
-
-export interface ServerConfig {
-  port?: number;
-  registryCallback?: undefined | ((registry: Registry) => void);
-  containerCallback?: undefined | ((container: Container) => void);
-}
-
-export function wireItUp(registryCallback?: RegistryCallback): Container {
+export function createContainer(registryCallback?: RegistryCallback): Container {
   let registry = new Registry();
   registry.register('api-router', ApiRouter);
   registry.register('authentication-middleware', AuthenticationMiddleware);
@@ -99,47 +100,62 @@ export function wireItUp(registryCallback?: RegistryCallback): Container {
   registry.register('web3', Web3Service);
   registry.register('wyre', WyreService);
   registry.register('wyre-callback-route', WyreCallbackRoute);
+
+  if (process.env.COMPILER) {
+    registry.register('realm-manager', RealmManager);
+    registry.register('card-cache-config', CardCacheConfig);
+    registry.register('card-cache', CardCache);
+    registry.register('card-routes', CardRoutes);
+    registry.register('card-builder', CardBuilder);
+    registry.register('card-watcher', CardWatcher);
+  }
+
   if (registryCallback) {
     registryCallback(registry);
   }
   return new Container(registry);
 }
 
-const LOGGER = logger('hub/server');
-
-// Empty for now
-const DEFAULT_CONFIG: ServerConfig = {};
 export class HubServer {
-  logger = LOGGER;
-  static logger = LOGGER;
+  logger = serverLog;
+  static logger = serverLog;
 
-  static async create(config?: ServerConfig): Promise<HubServer> {
-    let container = wireItUp(config?.registryCallback);
-    config = Object.assign({}, DEFAULT_CONFIG, config);
+  static async create(serverConfig?: Partial<HubServerConfig>): Promise<HubServer> {
+    let container = createContainer(serverConfig?.registryCallback);
+
+    let fullConfig = Object.assign({}, serverConfig) as HubServerConfig;
 
     initSentry();
 
     let app = new Koa<Koa.DefaultState, Koa.Context>()
-      .use(CardstackError.withJsonErrorHandling)
+      .use(errorMiddleware)
       .use(environment)
       .use(cors({ origin: '*', allowHeaders: 'Authorization, Content-Type, If-Match, X-Requested-With' }))
       .use(httpLogging);
 
-    app.use(((await container.lookup('authentication-middleware')) as AuthenticationMiddleware).middleware());
-    app.use(((await container.lookup('development-proxy-middleware')) as DevelopmentProxyMiddleware).middleware());
-    app.use(((await container.lookup('api-router')) as ApiRouter).routes());
-    app.use(((await container.lookup('callbacks-router')) as CallbacksRouter).routes());
-    app.use(((await container.lookup('health-check')) as HealthCheck).routes()); // Setup health-check at "/"
+    app.use((await container.lookup('authentication-middleware')).middleware());
+    app.use((await container.lookup('development-proxy-middleware')).middleware());
+    app.use((await container.lookup('api-router')).routes());
+    app.use((await container.lookup('callbacks-router')).routes());
 
-    function onError(err: Error, ctx: Koa.Context) {
-      LOGGER.error(`Unhandled error:`, err);
+    if (process.env.COMPILER) {
+      let cardRoutes = await container.lookup('card-routes');
+      app.use(cardRoutes.routes());
+
+      setupCardRouting(cardRoutes, fullConfig);
+    }
+
+    app.use((await container.lookup('health-check')).routes()); // Setup health-check at "/"
+
+    let onError = (err: Error, ctx: Koa.Context) => {
+      this.logger.error(`Unhandled error:`, err);
       Sentry.withScope(function (scope) {
         scope.addEventProcessor(function (event) {
           return Sentry.Handlers.parseRequest(event, ctx.request);
         });
         Sentry.captureException(err);
       });
-    }
+    };
 
     async function onClose() {
       await container.teardown();
@@ -149,21 +165,18 @@ export class HubServer {
     app.on('close', onClose);
     app.on('error', onError);
 
-    return new this(app, container, config);
-  }
-  private constructor(
-    public app: Koa<Koa.DefaultState, Koa.Context>,
-    public container: Container,
-    private config: ServerConfig
-  ) {}
-
-  teardown() {
-    this.container.teardown();
+    return new this(app, container);
   }
 
-  listen() {
-    let instance = this.app.listen(this.config.port);
-    this.logger.info('server listening on %s', this.config.port);
+  private constructor(public app: Koa<Koa.DefaultState, Koa.Context>, public container: Container) {}
+
+  async teardown() {
+    await this.container.teardown();
+  }
+
+  async listen(port = 3000) {
+    let instance = this.app.listen(port);
+    this.logger.info('server listening on %s', port);
 
     if (process.connected) {
       process.send!('hub hello');
@@ -174,6 +187,34 @@ export class HubServer {
     });
 
     return instance;
+  }
+
+  async primeCache() {
+    if (!process.env.COMPILER) {
+      throw new Error('COMPILER feature flag is not present');
+    }
+
+    (await this.container.lookup('card-builder')).primeCache();
+  }
+
+  async watchCards() {
+    if (!process.env.COMPILER) {
+      throw new Error('COMPILER feature flag is not present');
+    }
+
+    (await this.container.lookup('card-watcher')).watch();
+  }
+}
+
+/**
+ * If the command line or the environment config provides a route card url,
+ * setup the card router to use it to resolve path requests
+ */
+function setupCardRouting(cardRoutes: CardRoutes, serverConfig?: Partial<HubServerConfig>) {
+  if (serverConfig && serverConfig.routeCard) {
+    cardRoutes.setRoutingCard(serverConfig.routeCard);
+  } else if (config.has('compiler.routeCard')) {
+    cardRoutes.setRoutingCard(config.get('compiler.routeCard'));
   }
 }
 
@@ -186,10 +227,6 @@ function initSentry() {
       release: 'hub@' + packageJson.version,
     });
   }
-}
-
-export function bootEnvironment() {
-  return wireItUp();
 }
 
 export async function bootWorker() {
@@ -213,7 +250,7 @@ export async function bootWorker() {
     };
   };
   let dbConfig = config.get('db') as Record<string, any>;
-  let container = wireItUp();
+  let container = createContainer();
   let runner = await runWorkers({
     logger: new Logger(workerLogFactory),
     connectionString: dbConfig.url,

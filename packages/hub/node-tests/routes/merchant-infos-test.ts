@@ -1,7 +1,6 @@
-import supertest, { Test } from 'supertest';
-import { HubServer } from '../../main';
 import { Registry } from '../../di/dependency-injection';
 import { Job, TaskSpec } from 'graphile-worker';
+import { setupServer } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -41,22 +40,14 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('POST /api/merchant-infos', function () {
-  let server: HubServer;
-  let request: supertest.SuperTest<Test>;
-
-  this.beforeEach(async function () {
-    server = await HubServer.create({
-      registryCallback(registry: Registry) {
-        registry.register('authentication-utils', StubAuthenticationUtils);
-        registry.register('worker-client', StubWorkerClient);
-      },
-    });
-
-    request = supertest(server.app.callback());
+  let { request } = setupServer(this, {
+    registryCallback(registry: Registry) {
+      registry.register('authentication-utils', StubAuthenticationUtils);
+      registry.register('worker-client', StubWorkerClient);
+    },
   });
 
   this.afterEach(async function () {
-    server.teardown();
     lastAddedJobIdentifier = undefined;
     lastAddedJobPayload = undefined;
   });
@@ -77,7 +68,7 @@ describe('POST /api/merchant-infos', function () {
 
     let resourceId = null;
 
-    await request
+    await request()
       .post('/api/merchant-infos')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -110,7 +101,7 @@ describe('POST /api/merchant-infos', function () {
   });
 
   it('returns 401 without bearer token', async function () {
-    await request
+    await request()
       .post('/api/merchant-infos')
       .send({})
       .set('Accept', 'application/vnd.api+json')
@@ -141,7 +132,7 @@ describe('POST /api/merchant-infos', function () {
       },
     };
 
-    await request
+    await request()
       .post('/api/merchant-infos')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -170,7 +161,7 @@ describe('POST /api/merchant-infos', function () {
       },
     };
 
-    await request
+    await request()
       .post('/api/merchant-infos')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -212,7 +203,7 @@ describe('POST /api/merchant-infos', function () {
       },
     };
 
-    await request
+    await request()
       .post('/api/merchant-infos')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -220,7 +211,7 @@ describe('POST /api/merchant-infos', function () {
       .set('Content-Type', 'application/vnd.api+json')
       .expect(201);
 
-    await request
+    await request()
       .post('/api/merchant-infos')
       .send(payload2)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -237,29 +228,21 @@ describe('POST /api/merchant-infos', function () {
 });
 
 describe('GET /api/merchant-infos/validate-slug/:slug', function () {
-  let server: HubServer;
-  let request: supertest.SuperTest<Test>;
-
-  this.beforeEach(async function () {
-    server = await HubServer.create({
-      registryCallback(registry: Registry) {
-        registry.register('authentication-utils', StubAuthenticationUtils);
-        registry.register('worker-client', StubWorkerClient);
-      },
-    });
-
-    request = supertest(server.app.callback());
+  let { request } = setupServer(this, {
+    registryCallback(registry: Registry) {
+      registry.register('authentication-utils', StubAuthenticationUtils);
+      registry.register('worker-client', StubWorkerClient);
+    },
   });
 
   this.afterEach(async function () {
-    server.teardown();
     lastAddedJobIdentifier = undefined;
     lastAddedJobPayload = undefined;
   });
 
   it('returns 401 without bearer token', async function () {
     const slug = 'slug';
-    await request
+    await request()
       .get(`/api/merchant-infos/validate-slug/${slug}`)
       .set('Content-Type', 'application/vnd.api+json')
       .expect(401)
@@ -276,7 +259,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
 
   it('validates slug against invalid or lowercase characters', async function () {
     const slug1 = 'sat-oshi';
-    await request
+    await request()
       .get(`/api/merchant-infos/validate-slug/${slug1}`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
@@ -288,7 +271,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect('Content-Type', 'application/vnd.api+json');
 
     const slug2 = 'sat oshi';
-    await request
+    await request()
       .get(`/api/merchant-infos/validate-slug/${slug2}`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
@@ -300,7 +283,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect('Content-Type', 'application/vnd.api+json');
 
     const slug3 = 'Satoshi';
-    await request
+    await request()
       .get(`/api/merchant-infos/validate-slug/${slug3}`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
@@ -314,7 +297,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
 
   it('validates slug for length', async function () {
     const slug = 'satoshisatoshisatoshisatoshisatoshisatoshisatoshi11';
-    await request
+    await request()
       .get(`/api/merchant-infos/validate-slug/${slug}`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
@@ -340,7 +323,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       },
     };
 
-    await request
+    await request()
       .post('/api/merchant-infos')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -349,7 +332,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(201);
 
     const slug1 = 'mandello1';
-    await request
+    await request()
       .get(`/api/merchant-infos/validate-slug/${slug1}`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
@@ -361,7 +344,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect('Content-Type', 'application/vnd.api+json');
 
     const slug2 = 'mandello2';
-    await request
+    await request()
       .get(`/api/merchant-infos/validate-slug/${slug2}`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')

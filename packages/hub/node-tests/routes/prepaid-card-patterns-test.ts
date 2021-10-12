@@ -1,15 +1,12 @@
-import supertest, { Test } from 'supertest';
-import { HubServer } from '../../main';
 import { Client } from 'pg';
+import { setupServer } from '../helpers/server';
 
 describe('GET /api/prepaid-card-patterns', function () {
-  let server: HubServer;
   let db: Client;
-  let request: supertest.SuperTest<Test>;
-  this.beforeEach(async function () {
-    server = await HubServer.create();
+  let { getServer, request } = setupServer(this);
 
-    let dbManager = await server.container.lookup('database-manager');
+  this.beforeEach(async function () {
+    let dbManager = await getServer().container.lookup('database-manager');
     db = await dbManager.getClient();
 
     let rows = [
@@ -23,15 +20,10 @@ describe('GET /api/prepaid-card-patterns', function () {
         console.error(e);
       }
     }
-    request = supertest(server.app.callback());
-  });
-
-  this.afterEach(async function () {
-    server.teardown();
   });
 
   it('responds with 200 and available header patterns', async function () {
-    await request
+    await request()
       .get('/api/prepaid-card-patterns')
       .set('Accept', 'application/vnd.api+json')
       .expect(200)

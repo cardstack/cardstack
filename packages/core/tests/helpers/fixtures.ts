@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { templateOnlyComponentTemplate } from './templates';
 
 export const ADDRESS_RAW_CARD = {
-  url: 'https://cardstack-local/address',
+  url: 'https://cardstack.local/address',
   schema: 'schema.js',
   embedded: 'embedded.js',
   files: {
@@ -25,7 +26,7 @@ export const ADDRESS_RAW_CARD = {
 };
 
 export const PERSON_RAW_CARD = {
-  url: 'https://cardstack-local/person',
+  url: 'https://cardstack.local/person',
   schema: 'schema.js',
   isolated: 'isolated.js',
   files: {
@@ -33,7 +34,7 @@ export const PERSON_RAW_CARD = {
 	    import { contains } from "@cardstack/types";
 	    import string from "https://cardstack.com/base/string";
 	    import date from "https://cardstack.com/base/date";
-	    import address from "https://cardstack-local/address";
+	    import address from "https://cardstack.local/address";
 
 	    export default class Person {
 	      @contains(string) name;

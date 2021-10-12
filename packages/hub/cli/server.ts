@@ -1,17 +1,17 @@
 /* eslint-disable no-process-exit */
 
 import logger from '@cardstack/logger';
-import { Argv } from 'yargs';
+import nodeCleanup from 'node-cleanup';
+import { Argv, Options } from 'yargs';
 import { HubServer } from '../main';
-
-const serverLog = logger('hub/server');
+import { serverLog } from '../utils/logger';
 
 export let command = 'serve';
 export let aliases = 'server';
 export let describe = 'Boot the server';
 
 export let builder = function (yargs: Argv) {
-  return yargs.options({
+  let options: { [key: string]: Options } = {
     port: {
       alias: 'p',
       describe: 'The port to server should listen on',
@@ -19,7 +19,17 @@ export let builder = function (yargs: Argv) {
       nargs: 1,
       default: 3000,
     },
-  });
+  };
+  if (process.env.COMPILER) {
+    options['noWatch'] = {
+      alias: 'nw',
+      describe: 'Disable watching for changes to cards',
+      type: 'boolean',
+      default: false,
+      nargs: 1,
+    };
+  }
+  return yargs.options(options);
 };
 
 // Using any right now because I dont know how to get the generated
@@ -35,6 +45,10 @@ export async function handler(argv: any) {
       logLevels: [['hub/*', 'info']],
     });
   }
+  let server = await HubServer.create(argv).catch((err: Error) => {
+    serverLog.error('Server failed to start cleanly: %s', err.stack || err);
+    process.exit(-1);
+  });
 
   process.on('warning', (warning: Error) => {
     if (warning.stack) {
@@ -57,10 +71,21 @@ export async function handler(argv: any) {
     process.exit(0);
   });
 
-  return (
-    await HubServer.create({ port: argv.port }).catch((err: Error) => {
-      serverLog.error('Server failed to start cleanly: %s', err.stack || err);
-      process.exit(-1);
-    })
-  ).listen();
+  nodeCleanup((_exitCode, signal) => {
+    server.teardown().then(() => {
+      process.kill(process.pid, signal as string);
+    });
+    nodeCleanup.uninstall(); // don't call cleanup handler again
+    return false;
+  });
+
+  if (process.env.COMPILER) {
+    await server.primeCache();
+
+    if (!argv.noWatch) {
+      await server.watchCards();
+    }
+  }
+
+  return server.listen(argv.port);
 }

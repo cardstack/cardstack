@@ -1,4 +1,4 @@
-import { JS_TYPE } from '@cardstack/core/src/utils/content';
+import { JS_TYPE } from './utils/content';
 import { transformSync } from '@babel/core';
 // @ts-ignore
 import decoratorsPlugin from '@babel/plugin-proposal-decorators';
@@ -13,18 +13,10 @@ import cardSchemaPlugin, { FieldsMeta, getMeta, PluginMeta } from './babel-plugi
 import transformCardComponent, {
   CardComponentPluginOptions as CardComponentPluginOptions,
 } from './babel-plugin-card-template';
-import {
-  assertValidKeys,
-  Builder,
-  CompiledCard,
-  ComponentInfo,
-  FEATURE_NAMES,
-  Format,
-  FORMATS,
-  RawCard,
-} from './interfaces';
+import { Builder, CompiledCard, ComponentInfo, FEATURE_NAMES, Format, FORMATS, RawCard } from './interfaces';
 import { getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
+import { assertValidKeys } from './utils/errors';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -162,7 +154,7 @@ export class Compiler {
   // returns the module name of our own compiled schema, if we have one. Does
   // not recurse into parent, because we don't necessarily know our parent until
   // after we've tried to compile our own
-  private async prepareSchema(cardSource: RawCard, options: Object): Promise<string | undefined> {
+  private async prepareSchema(cardSource: RawCard, options: any): Promise<string | undefined> {
     let schemaLocalFilePath = cardSource.schema;
     if (!schemaLocalFilePath) {
       if (cardSource.files && cardSource.files['schema.js']) {

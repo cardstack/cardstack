@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { parseISO, parse, format } from 'date-fns';
 
 export interface PrimitiveSerializer {
@@ -5,7 +6,7 @@ export interface PrimitiveSerializer {
   deserialize(val: any): any;
 }
 
-let DateTimeSerializer: PrimitiveSerializer = {
+const DateTimeSerializer: PrimitiveSerializer = {
   serialize(d: Date): string {
     return d.toISOString();
   },
@@ -14,7 +15,7 @@ let DateTimeSerializer: PrimitiveSerializer = {
   },
 };
 
-let DateSerializer: PrimitiveSerializer = {
+const DateSerializer: PrimitiveSerializer = {
   serialize(d: Date): string {
     // If the model hasn't been deserialized yet it will still be a string
     if (typeof d === 'string') {

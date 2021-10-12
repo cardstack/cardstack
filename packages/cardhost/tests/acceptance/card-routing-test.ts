@@ -42,7 +42,7 @@ module('Acceptance | card routing', function (hooks) {
     assert.equal(currentURL(), '/welcome');
     assert.equal(
       document.head.querySelector(
-        `[data-asset-url="@cardstack/local-realm-compiled/https-cardstack-local-person/isolated.css"]`
+        `[data-asset-url="@cardstack/local-realm-compiled/https-cardstack.local-person/isolated.css"]`
       )?.innerHTML,
       '.person-isolated { background: red }'
     );

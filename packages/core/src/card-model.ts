@@ -152,7 +152,7 @@ export default class CardModel {
     (s as any).setters = new Proxy(
       {},
       {
-        get: (target: object, prop: string, receiver: unknown) => {
+        get: (target: any, prop: string, receiver: unknown) => {
           if (typeof prop === 'string') {
             return this.makeSetter([...segments, prop]);
           } else {

@@ -1,8 +1,7 @@
-import supertest, { Test } from 'supertest';
-import { HubServer } from '../../main';
 import { Registry } from '../../di/dependency-injection';
 import packageJson from '../../package.json';
 import { AcceleratableClock } from '../helpers';
+import { setupServer } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -41,23 +40,14 @@ class StubNonceTracker {
 }
 
 describe('GET /api/session', function () {
-  let server: HubServer;
-  let request: supertest.SuperTest<Test>;
-  this.beforeEach(async function () {
-    server = await HubServer.create({
-      registryCallback(registry: Registry) {
-        registry.register('authentication-utils', StubAuthenticationUtils);
-      },
-    });
-    request = supertest(server.app.callback());
-  });
-
-  this.afterEach(function () {
-    server.teardown();
+  let { request } = setupServer(this, {
+    registryCallback(registry: Registry) {
+      registry.register('authentication-utils', StubAuthenticationUtils);
+    },
   });
 
   it('without bearer token, responds with 401 and nonce in JSON', async function () {
-    await request
+    await request()
       .get('/api/session')
       .set('Accept', 'application/vnd.api+json')
       .expect(401)
@@ -82,7 +72,7 @@ describe('GET /api/session', function () {
       expect(encryptedString).to.equal('abc123--def456--ghi789');
       return stubUserAddress;
     };
-    await request
+    await request()
       .get('/api/session')
       .set('Accept', 'application/vnd.api+json')
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -96,7 +86,7 @@ describe('GET /api/session', function () {
       expect(encryptedString).to.equal('abc123--def456--ghi789');
       throw new Error('Invalid auth token');
     };
-    await request
+    await request()
       .get('/api/session')
       .set('Accept', 'application/vnd.api+json')
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -118,19 +108,17 @@ describe('GET /api/session', function () {
 });
 
 describe('POST /api/session', function () {
-  let server: HubServer;
-  let request: supertest.SuperTest<Test>;
   let bodyWithCorrectSignature: any;
 
+  let { request } = setupServer(this, {
+    registryCallback(registry: Registry) {
+      registry.register('authentication-utils', StubAuthenticationUtils);
+      registry.register('clock', AcceleratableClock);
+      registry.register('nonce-tracker', StubNonceTracker);
+    },
+  });
+
   this.beforeEach(async function () {
-    server = await HubServer.create({
-      registryCallback(registry: Registry) {
-        registry.register('authentication-utils', StubAuthenticationUtils);
-        registry.register('clock', AcceleratableClock);
-        registry.register('nonce-tracker', StubNonceTracker);
-      },
-    });
-    request = supertest(server.app.callback());
     bodyWithCorrectSignature = {
       authData: {
         types: {
@@ -157,12 +145,11 @@ describe('POST /api/session', function () {
   });
 
   this.afterEach(function () {
-    server.teardown();
     stubTimestamp = process.hrtime.bigint();
   });
 
   it('responds with auth token when signature is correct, and retires nonce', async function () {
-    await request
+    await request()
       .post('/api/session')
       .send({
         data: {
@@ -186,7 +173,7 @@ describe('POST /api/session', function () {
   it('responds with 401 when signature invalid', async function () {
     let bodyWithIncorrectSignature = bodyWithCorrectSignature;
     bodyWithIncorrectSignature.signature = bodyWithCorrectSignature.signature.replace('a', '1').replace('b', '2');
-    await request
+    await request()
       .post('/api/session')
       .send({
         data: {
@@ -210,7 +197,7 @@ describe('POST /api/session', function () {
 
   it('responds with 401 when nonce is more than 5 minutes old', async function () {
     stubTimestamp = process.hrtime.bigint() - BigInt(1000000 * 1000 * 60 * 6); // 6 minutes ago
-    await request
+    await request()
       .post('/api/session')
       .send({
         data: {
@@ -234,7 +221,7 @@ describe('POST /api/session', function () {
 
   it('responds with 401 when nonce has already been used', async function () {
     stubNonceUsed = true;
-    await request
+    await request()
       .post('/api/session')
       .send({
         data: {

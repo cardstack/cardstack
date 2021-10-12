@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { TemplateUsageMeta } from './glimmer-plugin-card-template';
 // import ETC from 'ember-source/dist/ember-template-compiler';
 // const { preprocess, print } = ETC._GlimmerSyntax;

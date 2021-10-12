@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import * as syntax from '@glimmer/syntax';
 import type {
   PathExpression,

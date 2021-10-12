@@ -17,7 +17,7 @@ import dynamicCardTransform from './dynamic-card-transform';
 import { encodeCardURL } from '@cardstack/core/src/utils';
 import Cards from 'cardhost/services/cards';
 
-export const LOCAL_REALM = 'https://cardstack-local';
+export const LOCAL_REALM = 'https://cardstack.local';
 export const DEMO_REALM = 'https://demo.com';
 
 const { cardServer } = config as any; // Environment types arent working
