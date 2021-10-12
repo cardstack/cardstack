@@ -8,6 +8,11 @@ module.exports = {
     // this doesn't need to be replaced.
     'no-dupe-class-members': 'off',
 
+    // typescript handles this direclty, and the eslint rule doesn't understand
+    // how to resolve type-only imports when there is only a d.ts file and not a
+    // .js file.
+    'node/no-missing-import': 'off',
+
     semi: 'off',
     '@typescript-eslint/semi': ['error'],
     '@typescript-eslint/adjacent-overload-signatures': 'error',
