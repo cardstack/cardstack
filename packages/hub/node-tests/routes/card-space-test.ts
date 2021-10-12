@@ -200,6 +200,53 @@ describe('POST /api/card-spaces', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
+  it('returns errors when card space url is not first level card.space subdomain', async function () {
+    let payload = {
+      data: {
+        type: 'card-spaces',
+        attributes: {
+          url: 'satoshi.nakamoto.card.race',
+          name: 'Satoshi Nakamoto',
+          description: "Satoshi's place",
+          category: 'entertainment',
+          'profile-image-url': 'https://test.com/test1.png',
+          'cover-image-url': 'https://test.com/test2.png',
+          'button-text': 'Visit this Space',
+          'owner-address': '0x00000000000',
+        },
+      },
+    };
+
+    await request
+      .post('/api/card-spaces')
+      .send(payload)
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(422)
+      .expect({
+        errors: [
+          {
+            status: '422',
+            source: {
+              pointer: '/data/attributes/url',
+            },
+            title: 'Invalid attribute',
+            detail: 'Only card.space subdomains are allowed',
+          },
+          {
+            status: '422',
+            source: {
+              pointer: '/data/attributes/url',
+            },
+            title: 'Invalid attribute',
+            detail: 'Only first level subdomains are allowed',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
   it('returns 401 without bearer token', async function () {
     await request
       .post('/api/card-spaces')

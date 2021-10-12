@@ -54,9 +54,16 @@ export default class CardSpaceValidator {
     }
 
     try {
-      new URL(`https://${cardSpace.url}`);
+      let urlObject = new URL(`https://${cardSpace.url}`);
+      if (!urlObject.hostname.endsWith('card.space')) {
+        addToErrors(errors, 'url', 'Only card.space subdomains are allowed');
+      }
     } catch (error) {
       addToErrors(errors, 'url', `Invalid URL`);
+    }
+
+    if (cardSpace.url.split('.').length - 1 !== 2) {
+      addToErrors(errors, 'url', `Only first level subdomains are allowed`);
     }
 
     let cardSpaceWithExistingUrl = (await this.cardSpaceQueries.query({ url: cardSpace.url }))[0];
