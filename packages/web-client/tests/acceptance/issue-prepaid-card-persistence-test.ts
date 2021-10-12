@@ -61,7 +61,9 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       ],
     });
 
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [testDepot]);
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      testDepot,
+    ]);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.authenticate();
     layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');

@@ -45,7 +45,7 @@ module(
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
 
-      layer2Service.test__simulateAccountSafes(eoaAddress, [
+      layer2Service.test__simulateRemoteAccountSafes(eoaAddress, [
         createDepotSafe({
           address: safeAddress,
           owners: [eoaAddress],

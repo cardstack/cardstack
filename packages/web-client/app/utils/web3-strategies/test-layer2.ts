@@ -68,7 +68,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   bridgeToLayer1Requests: BridgeToLayer1Request[] = [];
   issuePrepaidCardRequests: Map<number, IssuePrepaidCardRequest> = new Map();
   registerMerchantRequests: Map<string, RegisterMerchantRequest> = new Map();
-  @tracked accountSafes: Map<string, Safe[]> = new Map();
+  @tracked remoteAccountSafes: Map<string, Safe[]> = new Map();
 
   // property to test whether the refreshSafesAndBalances method is called
   // to test if balances are refreshed after relaying tokens
@@ -200,8 +200,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   async getLatestSafe(address: string): Promise<Safe> {
-    return [...this.accountSafes.values()]
-      .flat()
+    return this.remoteAccountSafes
+      .get(this.walletInfo.firstAddress!)!
       .find((safe) => safe.address === address)!;
   }
 
@@ -212,7 +212,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   ): TaskGenerator<{ result: Safe[]; blockNumber: number }> {
     if (this.test__autoResolveViewSafes) {
       return {
-        result: this.accountSafes.get(account)!,
+        result: this.remoteAccountSafes.get(account)!,
         blockNumber: this.test__blockNumber++,
       };
     }
@@ -221,7 +221,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   async test__simulateViewSafes(
-    safes = this.accountSafes.get(this.walletInfo.firstAddress!)!
+    safes = this.remoteAccountSafes.get(this.walletInfo.firstAddress!)!
   ) {
     this.test__deferredViewSafes.resolve({
       result: safes,
@@ -229,12 +229,12 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     });
   }
 
-  test__simulateAccountSafes(account: string, safes: Safe[]) {
-    if (!this.accountSafes.has(account)) {
-      this.accountSafes.set(account, []);
+  test__simulateRemoteAccountSafes(account: string, safes: Safe[]) {
+    if (!this.remoteAccountSafes.has(account)) {
+      this.remoteAccountSafes.set(account, []);
     }
 
-    this.accountSafes.get(account)?.push(...safes);
+    this.remoteAccountSafes.get(account)?.push(...safes);
   }
 
   async issuePrepaidCard(
@@ -373,8 +373,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     });
     request?.onTxnHash?.('exampleTxnHash');
 
-    this.test__simulateAccountSafes(walletAddress, [prepaidCardSafe]);
-    let unfetchedDepot = this.accountSafes
+    this.test__simulateRemoteAccountSafes(walletAddress, [prepaidCardSafe]);
+    let unfetchedDepot = this.remoteAccountSafes
       .get(this.walletInfo.firstAddress!)!
       .find((v: Safe) => v.address === this.depotSafe?.address);
 
@@ -424,8 +424,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     };
     request?.onTxnHash?.('exampleTxnHash');
 
-    let prepaidCard = [...this.accountSafes.values()]
-      .flat()
+    let prepaidCard = this.remoteAccountSafes
+      .get(this.walletInfo.firstAddress!)!
       .find((safe) => safe.address === prepaidCardAddress);
 
     let merchantCreationFee = await this.fetchMerchantRegistrationFee();
@@ -435,7 +435,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
         prepaidCard.spendFaceValue - merchantCreationFee;
     }
 
-    this.test__simulateAccountSafes(this.walletInfo.firstAddress!, [
+    this.test__simulateRemoteAccountSafes(this.walletInfo.firstAddress!, [
       merchantSafe,
     ]);
     return request?.deferred.resolve(merchantSafe);

@@ -60,7 +60,7 @@ module('Acceptance | create card space', function (hooks) {
 
     await waitFor('[data-test-wallet-connect-qr-code]');
 
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI', '0')],
@@ -168,7 +168,7 @@ module('Acceptance | create card space', function (hooks) {
     hooks.beforeEach(async function () {
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
-      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           owners: [layer2AccountAddress],
           tokens: [createSafeToken('DAI', '0')],

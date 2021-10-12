@@ -51,7 +51,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         address: withdrawalSafeAddress,
         owners: [layer2AccountAddress],

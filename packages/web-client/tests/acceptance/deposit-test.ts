@@ -120,7 +120,7 @@ module('Acceptance | deposit', function (hooks) {
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI', '0')],
@@ -525,7 +525,7 @@ module('Acceptance | deposit', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI', '142200000000000000')],
@@ -609,7 +609,7 @@ module('Acceptance | deposit', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI', '142200000000000000')],
@@ -689,7 +689,7 @@ module('Acceptance | deposit', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI', '142200000000000000')],
@@ -775,7 +775,7 @@ module('Acceptance | deposit', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI', '142200000000000000')],
@@ -860,7 +860,7 @@ module('Acceptance | deposit', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI', '142200000000000000')],
@@ -950,7 +950,7 @@ module('Acceptance | deposit', function (hooks) {
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let secondLayer2AccountAddress =
       '0x0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7';
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI', '142200000000000000')],

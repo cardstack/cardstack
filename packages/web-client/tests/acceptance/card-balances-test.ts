@@ -43,7 +43,7 @@ module('Acceptance | card balances', function (hooks) {
       pattern: this.server.schema.all('prepaid-card-pattern').models[4],
     });
 
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createPrepaidCardSafe({
         address: '0x123400000000000000000000000000000000abcd',
         owners: [layer2AccountAddress],
@@ -85,7 +85,7 @@ module('Acceptance | card balances', function (hooks) {
 
     let secondAddress = '0x1826000000000000000000000000000000000000';
 
-    layer2Service.test__simulateAccountSafes(secondAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(secondAddress, [
       createPrepaidCardSafe({
         address: '0x567800000000000000000000000000000000abcd',
         owners: [layer2AccountAddress],

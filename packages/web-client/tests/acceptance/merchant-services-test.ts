@@ -40,7 +40,7 @@ module('Acceptance | merchant services dashboard', function (hooks) {
       .strategy as Layer2TestWeb3Strategy;
 
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createMockMerchantSafe(
         layer2AccountAddress,
         '0x212619c6Ea074C053eF3f1e1eF81Ec8De6Eb6F33'

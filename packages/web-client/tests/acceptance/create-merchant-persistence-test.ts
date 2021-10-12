@@ -45,7 +45,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       .strategy as Layer2TestWeb3Strategy;
 
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         address: depotAddress,
         owners: [layer2AccountAddress],

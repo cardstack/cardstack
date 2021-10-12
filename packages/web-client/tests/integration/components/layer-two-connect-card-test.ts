@@ -27,7 +27,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
   test('It should show nonzero token balances, and an appropriate message if there are none', async function (assert) {
     let depotAddress = generateMockAddress();
     layer2Service = this.owner.lookup('service:layer2-network').strategy;
-    layer2Service.test__simulateAccountSafes('address', [
+    layer2Service.test__simulateRemoteAccountSafes('address', [
       createDepotSafe({
         address: depotAddress,
         tokens: [
@@ -45,7 +45,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     assert.dom('[data-test-balance="DAI.CPXD"]').containsText('2.1411');
     assert.dom('[data-test-balance="CARD.CPXD"]').doesNotExist();
 
-    layer2Service.test__simulateAccountSafes('address', [
+    layer2Service.test__simulateRemoteAccountSafes('address', [
       createDepotSafe({
         address: depotAddress,
         tokens: [
@@ -61,7 +61,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     assert.dom('[data-test-balance="DAI.CPXD"]').containsText('2.1411');
     assert.dom('[data-test-balance="CARD.CPXD"]').containsText('2.99');
 
-    layer2Service.test__simulateAccountSafes('address', [
+    layer2Service.test__simulateRemoteAccountSafes('address', [
       createDepotSafe({
         address: depotAddress,
         tokens: [createSafeToken('DAI', '0'), createSafeToken('CARD', '0')],
@@ -82,7 +82,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
 
   test('the layer 2 wallet address is persisted if the wallet is already connected', async function (assert) {
     layer2Service = this.owner.lookup('service:layer2-network').strategy;
-    layer2Service.test__simulateAccountSafes('address', [
+    layer2Service.test__simulateRemoteAccountSafes('address', [
       createDepotSafe({
         tokens: [
           createSafeToken('DAI', '2141100000000000000'),

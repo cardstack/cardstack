@@ -116,7 +116,7 @@ module('Acceptance | create merchant', function (hooks) {
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI', '0')],
@@ -254,7 +254,7 @@ module('Acceptance | create merchant', function (hooks) {
     hooks.beforeEach(async function () {
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
-      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           owners: [layer2AccountAddress],
           tokens: [createSafeToken('DAI', '0')],
@@ -462,13 +462,16 @@ module('Acceptance | create merchant', function (hooks) {
 
       layer2Service.test__simulateAccountsChanged([secondLayer2AccountAddress]);
 
-      layer2Service.test__simulateAccountSafes(secondLayer2AccountAddress, [
-        createMockPrepaidCard(
-          secondLayer2AccountAddress,
-          secondPrepaidCardAddress,
-          merchantRegistrationFee
-        ),
-      ]);
+      layer2Service.test__simulateRemoteAccountSafes(
+        secondLayer2AccountAddress,
+        [
+          createMockPrepaidCard(
+            secondLayer2AccountAddress,
+            secondPrepaidCardAddress,
+            merchantRegistrationFee
+          ),
+        ]
+      );
       await settled();
 
       assert
@@ -496,7 +499,7 @@ module('Acceptance | create merchant', function (hooks) {
   test('it cancels the workflow if there are no prepaid cards associated with the EOA', async function (assert) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI', '0')],
@@ -504,7 +507,7 @@ module('Acceptance | create merchant', function (hooks) {
     ]);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, []);
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, []);
 
     await visit('/card-pay/merchant-services?flow=create-merchant');
     assert
@@ -535,7 +538,7 @@ module('Acceptance | create merchant', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
 
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI', '0')],

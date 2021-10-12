@@ -40,9 +40,10 @@ module(
         address: depotAddress,
         tokens: [createSafeToken('DAI', '250000000000000000000')],
       });
-      await layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
-        testDepot,
-      ]);
+      await layer2Service.test__simulateRemoteAccountSafes(
+        layer2AccountAddress,
+        [testDepot]
+      );
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
       session.setValue('withdrawalSafe', depotAddress);
       session.setValue('withdrawalToken', 'DAI.CPXD');

@@ -40,7 +40,7 @@ module(
       prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
       prepaidCardAddress2 = '0x432100000000000000000000000000000000dbca';
 
-      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createPrepaidCardSafe({
           address: prepaidCardAddress,
           owners: [layer2AccountAddress],

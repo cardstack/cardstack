@@ -120,7 +120,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         address: depotAddress,
         owners: [layer2AccountAddress],
@@ -581,7 +581,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
           createSafeToken('CARD', '500000000000000000000'),
         ],
       });
-      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         testDepot,
       ]);
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -678,7 +678,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       await visit('/card-pay');
       assert.equal(currentURL(), '/card-pay/balances');
 
-      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           address: depotAddress,
           owners: [layer2AccountAddress],

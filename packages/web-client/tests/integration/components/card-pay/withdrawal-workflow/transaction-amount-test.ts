@@ -39,7 +39,7 @@ module(
       layer2Strategy = layer2Service.strategy;
 
       // Simulate being connected on layer 2 -- prereq to converting to USD
-      layer2Strategy.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Strategy.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           address: depotAddress,
           tokens: [
@@ -156,7 +156,7 @@ module(
       let limit = await layer2Strategy.getWithdrawalLimits('DAI.CPXD');
       let balanceBiggerThanLimit = limit.max.add(new BN(toWei('2')));
 
-      layer2Strategy.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Strategy.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           address: depotAddress,
           tokens: [
