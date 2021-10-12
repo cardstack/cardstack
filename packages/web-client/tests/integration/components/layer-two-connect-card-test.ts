@@ -28,6 +28,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
       defaultToken: new BN('2141100000000000000'),
       card: new BN('0'),
     });
+    await layer2Service.safes.fetch();
 
     await render(hbs`
       <CardPay::LayerTwoConnectCard @workflowSession={{this.session}} />
@@ -40,6 +41,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
       defaultToken: new BN('2141100000000000000'),
       card: new BN('2990000000000000000'),
     });
+    await layer2Service.safes.fetch();
 
     await waitFor('[data-test-balance="CARD.CPXD"]');
 
@@ -50,6 +52,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
       defaultToken: new BN('0'),
       card: new BN('0'),
     });
+    await layer2Service.safes.fetch();
 
     await waitUntil(() => {
       return (
@@ -70,6 +73,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
       defaultToken: new BN('2141100000000000000'),
       card: new BN('0'),
     });
+    await layer2Service.safes.fetch();
 
     await render(hbs`
       <CardPay::LayerTwoConnectCard @workflowSession={{this.session}} />

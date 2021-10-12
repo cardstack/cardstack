@@ -34,15 +34,15 @@ module(
       // Simulate being connected on layer 2 -- prereq to converting to USD
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
       layer2Strategy.test__simulateAccountsChanged([layer2AccountAddress]);
-
       await layer2Strategy.test__simulateBalances({
         dai: new BN(startDaiAmount),
         card: new BN('0'),
       });
+      await layer2Strategy.safes.fetch();
 
       session = new WorkflowSession();
       session.setValue({
-        withdrawalSafe: layer2Strategy.depotSafe!,
+        withdrawalSafe: layer2Strategy.depotSafe!.address,
         withdrawalToken: 'DAI.CPXD',
       });
 
@@ -148,9 +148,7 @@ module(
         dai: balanceBiggerThanLimit,
         card: new BN('0'),
       });
-      session.setValue({
-        withdrawalSafe: layer2Strategy.depotSafe!,
-      });
+      await layer2Strategy.safes.fetch();
 
       await renderSubject();
       await fillIn('input', '1500002');

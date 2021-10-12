@@ -120,6 +120,8 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateBalances({
       defaultToken: new BN(0),
     });
+    await layer2Service.safes.fetch();
+
     await waitFor(`${postableSel(1, 2)} [data-test-balance-container]`);
     await waitUntil(() => {
       return (
@@ -521,6 +523,7 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateBalances({
       defaultToken: new BN('142200000000000000'),
     });
+    await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
     await click('[data-test-workflow-button="deposit"]');
@@ -601,6 +604,7 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateBalances({
       defaultToken: new BN('142200000000000000'),
     });
+    await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
     await click('[data-test-workflow-button="deposit"]');
@@ -677,6 +681,7 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateBalances({
       defaultToken: new BN('142200000000000000'),
     });
+    await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
     await click('[data-test-workflow-button="deposit"]');
@@ -759,6 +764,7 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateBalances({
       defaultToken: new BN('142200000000000000'),
     });
+    await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
     await click('[data-test-workflow-button="deposit"]');
@@ -928,6 +934,7 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateBalances({
       defaultToken: new BN('142200000000000000'),
     });
+    await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
     await click('[data-test-workflow-button="deposit"]');

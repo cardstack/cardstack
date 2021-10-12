@@ -525,12 +525,6 @@ module('Acceptance | persistence view and restore', function () {
         let layer2Service = this.owner.lookup('service:layer2-network')
           .strategy as Layer2TestWeb3Strategy;
         layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-        let testDepot = createDepotSafe({
-          address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
-          tokens: [createSafeToken('CARD', '500000000000000000000')],
-        });
-
-        await layer2Service.test__simulateDepot(testDepot);
 
         let merchantRegistrationFee = await this.owner
           .lookup('service:layer2-network')

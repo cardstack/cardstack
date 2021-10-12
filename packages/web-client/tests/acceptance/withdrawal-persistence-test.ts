@@ -22,12 +22,14 @@ import {
 
 interface Context extends MirageTestContext {}
 
+const withdrawalSafeAddress = '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08';
+
 module('Acceptance | withdrawal persistence', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
   let workflowPersistenceService: WorkflowPersistence;
 
-  hooks.beforeEach(function () {
+  hooks.beforeEach(async function () {
     workflowPersistenceService = this.owner.lookup(
       'service:workflow-persistence'
     );
@@ -49,6 +51,17 @@ module('Acceptance | withdrawal persistence', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        address: withdrawalSafeAddress,
+        owners: [layer2AccountAddress],
+        tokens: [
+          createSafeToken('CARD', '1000000000000000000'),
+          createSafeToken('DAI', '4215997042758579167'),
+        ],
+      }),
+    ]);
+    await layer2Service.safes.fetch();
 
     workflowPersistenceService.clear();
   });
@@ -80,13 +93,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
-        withdrawalSafe: createDepotSafe({
-          address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          tokens: [
-            createSafeToken('CARD', '1000000000000000000'),
-            createSafeToken('DAI', '4215997042758579167'),
-          ],
-        }),
+        withdrawalSafe: withdrawalSafeAddress,
         meta: {
           version: WORKFLOW_VERSION,
           completedCardNames: [
@@ -140,13 +147,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
-        withdrawalSafe: createDepotSafe({
-          address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          tokens: [
-            createSafeToken('CARD', '1000000000000000000'),
-            createSafeToken('DAI', '4215997042758579167'),
-          ],
-        }),
+        withdrawalSafe: withdrawalSafeAddress,
         meta: {
           version: WORKFLOW_VERSION,
           completedMilestonesCount: 6,
@@ -210,13 +211,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
-        withdrawalSafe: createDepotSafe({
-          address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          tokens: [
-            createSafeToken('CARD', '1000000000000000000'),
-            createSafeToken('DAI', '4215997042758579167'),
-          ],
-        }),
+        withdrawalSafe: withdrawalSafeAddress,
         meta: {
           version: WORKFLOW_VERSION,
           completedMilestonesCount: 5,
@@ -330,13 +325,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
         relayTokensTxnHash:
           '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
-        withdrawalSafe: createDepotSafe({
-          address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          tokens: [
-            createSafeToken('CARD', '1000000000000000000'),
-            createSafeToken('DAI', '4215997042758579167'),
-          ],
-        }),
+        withdrawalSafe: withdrawalSafeAddress,
         meta: {
           version: WORKFLOW_VERSION,
           completedMilestonesCount: 5,
@@ -393,13 +382,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
-        withdrawalSafe: createDepotSafe({
-          address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          tokens: [
-            createSafeToken('CARD', '1000000000000000000'),
-            createSafeToken('DAI', '4215997042758579167'),
-          ],
-        }),
+        withdrawalSafe: withdrawalSafeAddress,
         meta: {
           version: WORKFLOW_VERSION - 1,
           completedMilestonesCount: 5,

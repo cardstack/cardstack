@@ -168,7 +168,7 @@ module(
         'workflow session withdrawal token updated'
       );
       assert.equal(
-        session.getValue<Safe>('withdrawalSafe')?.address,
+        session.getValue<Safe>('withdrawalSafe'),
         merchantAddress,
         'workflow session withdrawal safe updated'
       );

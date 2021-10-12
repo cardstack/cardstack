@@ -118,7 +118,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
       createDepotSafe({
@@ -137,7 +136,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         issuer: layer2AccountAddress,
       }),
     ]);
-
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
       () => !document.querySelector('[data-test-wallet-connect-qr-code]')
     );
@@ -468,11 +467,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
       )} [data-test-prepaid-card-background="${backgroundChoice}"][data-test-prepaid-card-pattern="${patternChoice}"]`
     );
 
-    await layer2Service.test__simulateBalances({
-      defaultToken: new BN('150000000000000000000'),
-      card: new BN('500000000000000000000'),
-    });
-
     await waitFor(epiloguePostableSel(2));
 
     assert
@@ -485,9 +479,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
-      .containsText('150.0');
-
-    assert.ok(layer2Service.balancesRefreshed);
+      .containsText((SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER - 100).toString());
 
     await waitFor(epiloguePostableSel(4));
 
@@ -521,21 +513,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert.equal(persistedData.name, 'PREPAID_CARD_ISSUANCE');
     let persistedState = persistedData.state;
-    persistedState.prepaidCardSafe = persistedState.prepaidCardSafe.replace(
-      /"createdAt":[\d.]+,/,
-      ''
-    );
-
-    let prepaidCardSafe = createPrepaidCardSafe({
-      address: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
-      owners: ['0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44'],
-      spendFaceValue: 10000,
-      prepaidCardOwner: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
-      issuer: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
-      customizationDID: defaultCreatedPrepaidCardDID,
-    });
-    // @ts-ignore
-    delete prepaidCardSafe.createdAt;
 
     let deserializedState = deserializeState({
       ...persistedState,
@@ -564,8 +541,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
           '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
         id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
       },
-      prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
-      prepaidCardSafe,
+      prepaidCardAddress,
       prepaidFundingToken: 'DAI.CPXD',
       reloadable: false,
       spendFaceValue: 10000,
@@ -597,19 +573,17 @@ module('Acceptance | issue prepaid card', function (hooks) {
     hooks.beforeEach(async function () {
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      await layer2Service.test__simulateBalances({
-        defaultToken: MIN_AMOUNT_TO_PASS,
-        card: new BN('500000000000000000000'),
-      });
       let testDepot = createDepotSafe({
         address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
         tokens: [
-          createSafeToken('DAI', '250000000000000000000'),
+          createSafeToken('DAI', MIN_AMOUNT_TO_PASS.toString()),
           createSafeToken('CARD', '500000000000000000000'),
         ],
       });
-      await layer2Service.test__simulateDepot(testDepot);
+      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+        testDepot,
+      ]);
+      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     });
 
     test('Disconnecting Layer 2 from within the workflow', async function (assert) {
@@ -706,6 +680,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       await layer2Service.test__simulateBalances({
         defaultToken: FAILING_AMOUNT,
       });
+      await layer2Service.safes.fetch();
 
       await click('[data-test-workflow-button="issue-prepaid-card"]');
 

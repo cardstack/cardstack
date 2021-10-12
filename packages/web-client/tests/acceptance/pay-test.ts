@@ -73,10 +73,10 @@ module('Acceptance | pay', function (hooks) {
     sinon
       .stub(safeViewer, 'view')
       .callsFake(async function (_network: string, address: string) {
-        if (address === merchantSafe.address) return merchantSafe;
+        if (address === merchantSafe.address) return { result: merchantSafe };
         else if (address === merchantSafeWithoutInfo.address)
-          return merchantSafeWithoutInfo;
-        else return undefined;
+          return { result: merchantSafeWithoutInfo };
+        else return { result: undefined };
       });
 
     this.server.create('merchant-info', {

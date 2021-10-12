@@ -36,7 +36,6 @@ module('Acceptance | card balances', function (hooks) {
       .strategy as Layer2TestWeb3Strategy;
 
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     let { did, customization } = await createPrepaidCardCustomization({
       issuerName: 'jortleby',
@@ -56,6 +55,8 @@ module('Acceptance | card balances', function (hooks) {
         transferrable: false,
       }),
     ]);
+
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     this.server.create('prepaid-card-customization', customization);
 

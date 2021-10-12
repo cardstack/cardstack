@@ -27,13 +27,6 @@ module('Acceptance | create merchant persistence', function (hooks) {
   let workflowPersistenceService: WorkflowPersistence;
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
   const prepaidCardAddress = '0x81c89274Dc7C9BAcE082d2ca00697d2d2857D2eE';
-  const prepaidCard = createPrepaidCardSafe({
-    address: prepaidCardAddress,
-    spendFaceValue: 500,
-    owners: [layer2AccountAddress],
-    prepaidCardOwner: layer2AccountAddress,
-    issuer: layer2AccountAddress,
-  });
   const merchantName = 'Mandello';
   const merchantId = 'mandello1';
   const merchantBgColor = '#FF5050';
@@ -50,7 +43,6 @@ module('Acceptance | create merchant persistence', function (hooks) {
   hooks.beforeEach(async function () {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
@@ -63,13 +55,14 @@ module('Acceptance | create merchant persistence', function (hooks) {
         ],
       }),
       createPrepaidCardSafe({
-        address: '0x123400000000000000000000000000000000abcd',
+        address: prepaidCardAddress,
         owners: [layer2AccountAddress],
         spendFaceValue: 2324,
         prepaidCardOwner: layer2AccountAddress,
         issuer: layer2AccountAddress,
       }),
     ]);
+    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.authenticate();
     layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
 
@@ -103,7 +96,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         merchantId,
         merchantBgColor,
         merchantRegistrationFee,
-        prepaidCardChoice: prepaidCard,
+        prepaidCardAddress,
       });
 
       workflowPersistenceService.persistData('abc123', {
@@ -147,7 +140,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
           did: merchantDID,
         },
         merchantRegistrationFee,
-        prepaidCardChoice: prepaidCard,
+        prepaidCardAddress,
         txnHash:
           '0x8bcc3e419d09a0403d1491b5bb8ac8bee7c67f85cc37e6e17ef8eb77f946497b',
         merchantSafe,
@@ -197,7 +190,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         merchantId,
         merchantBgColor,
         merchantRegistrationFee,
-        prepaidCardChoice: prepaidCard,
+        prepaidCardAddress,
       });
 
       workflowPersistenceService.persistData('abc123', {
@@ -285,7 +278,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         merchantId,
         merchantBgColor,
         merchantRegistrationFee,
-        prepaidCardChoice: prepaidCard,
+        prepaidCardAddress,
         txnHash:
           '0x8bcc3e419d09a0403d1491b5bb8ac8bee7c67f85cc37e6e17ef8eb77f946497b',
         merchantSafe,
@@ -391,7 +384,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         merchantId,
         merchantBgColor,
         merchantRegistrationFee,
-        prepaidCardChoice: prepaidCard,
+        prepaidCardAddress,
       });
 
       workflowPersistenceService.persistData('abc123', {
