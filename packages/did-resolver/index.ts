@@ -9,11 +9,14 @@ const CURRENT_VERSION = 1;
 
 type CardstackIdentifierType = 'PrepaidCardCustomization' | 'MerchantInfo' | 'SupplierInfo' | 'CardSpace';
 
-const DID_TYPE_TO_SHORT_TYPE = {
+/* eslint-disable @typescript-eslint/naming-convention */
+const DID_TYPE_TO_SHORT_TYPE: Record<CardstackIdentifierType, string> = {
   PrepaidCardCustomization: 'p',
   MerchantInfo: 'm',
   SupplierInfo: 's',
-} as Record<CardstackIdentifierType, string>;
+  CardSpace: 'cs',
+};
+/* eslint-enable @typescript-eslint/naming-convention */
 
 const SHORT_TYPE_TO_DID_TYPE = invert({ ...DID_TYPE_TO_SHORT_TYPE }) as Record<string, CardstackIdentifierType>;
 
