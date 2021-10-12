@@ -60,12 +60,16 @@ export default class CardSpacesRoute {
     if (Object.keys(errors).length > 0) {
       ctx.status = 422;
       ctx.body = {
-        errors: Object.keys(errors).map((attribute) => {
-          return {
-            status: '422',
-            source: { pointer: `/data/attributes/${attribute}` },
-            detail: errors[attribute as keyof CardSpaceErrors],
-          };
+        errors: Object.keys(errors).flatMap((attribute) => {
+          let errorsForAttribute = errors[attribute as keyof CardSpaceErrors];
+          return errorsForAttribute.map((errorMessage) => {
+            return {
+              status: '422',
+              title: 'Invalid attribute',
+              source: { pointer: `/data/attributes/${attribute}` },
+              detail: errorMessage,
+            };
+          });
         }),
       };
     } else {

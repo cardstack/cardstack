@@ -4,11 +4,11 @@ import { inject } from '../../di/dependency-injection';
 import { URL } from 'url';
 
 export interface CardSpaceErrors {
-  name?: string;
-  url?: string;
-  description?: string;
-  buttonText?: string;
-  category?: string;
+  name: string[];
+  url: string[];
+  description: string[];
+  buttonText: string[];
+  category: string[];
 }
 
 const MAX_LONG_FIELD_LENGTH = 300;
@@ -23,40 +23,46 @@ export default class CardSpaceValidator {
   async validate(cardSpace: CardSpace): Promise<CardSpaceErrors> {
     let errors = {} as CardSpaceErrors;
 
+    let addToErrors = (errors: any, attribute: string, message: string) => {
+      if (!errors[attribute]) {
+        errors[attribute] = [];
+      }
+
+      errors[attribute].push(message);
+    };
+
     ['name', 'url', 'description', 'buttonText', 'category'].forEach((attribute) => {
       if (!cardSpace[attribute as keyof CardSpaceErrors]) {
-        errors[attribute as keyof CardSpaceErrors] = 'Must be present';
+        addToErrors(errors, attribute, 'Must be present');
       }
     });
 
     if (!ALLOWED_BUTTON_TEXTS.includes(cardSpace.buttonText)) {
-      errors['buttonText'] = `Needs to be one of the ${ALLOWED_BUTTON_TEXTS}`;
+      addToErrors(errors, 'buttonText', `Needs to be one of the ${ALLOWED_BUTTON_TEXTS}`);
     }
 
     if (cardSpace.description?.length > MAX_LONG_FIELD_LENGTH) {
-      errors['description'] = `Max length is ${MAX_LONG_FIELD_LENGTH}`;
+      addToErrors(errors, 'description', `Max length is ${MAX_LONG_FIELD_LENGTH}`);
     }
 
     if (cardSpace.name?.length > MAX_SHORT_FIELD_LENGTH) {
-      errors['name'] = `Max length is ${MAX_SHORT_FIELD_LENGTH}`;
+      addToErrors(errors, 'name', `Max length is ${MAX_SHORT_FIELD_LENGTH}`);
     }
 
     if (cardSpace.category?.length > MAX_SHORT_FIELD_LENGTH) {
-      errors['category'] = `Max length is ${MAX_SHORT_FIELD_LENGTH}`;
+      addToErrors(errors, 'category', `Max length is ${MAX_SHORT_FIELD_LENGTH}`);
     }
 
     try {
       new URL(`https://${cardSpace.url}`);
     } catch (error) {
-      errors['url'] = 'Invalid URL';
+      addToErrors(errors, 'url', `Invalid URL`);
     }
 
-    if (!errors['url']) {
-      let cardSpaceWithExistingUrl = (await this.cardSpaceQueries.query({ url: cardSpace.url }))[0];
+    let cardSpaceWithExistingUrl = (await this.cardSpaceQueries.query({ url: cardSpace.url }))[0];
 
-      if (cardSpaceWithExistingUrl) {
-        errors['url'] = 'Already exists';
-      }
+    if (cardSpaceWithExistingUrl) {
+      addToErrors(errors, 'url', `Already exists`);
     }
 
     return errors;

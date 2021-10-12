@@ -153,6 +153,7 @@ describe('POST /api/card-spaces', function () {
             source: {
               pointer: '/data/attributes/url',
             },
+            title: 'Invalid attribute',
             detail: 'Already exists',
           },
         ],
@@ -191,6 +192,7 @@ describe('POST /api/card-spaces', function () {
             source: {
               pointer: '/data/attributes/url',
             },
+            title: 'Invalid attribute',
             detail: 'Invalid URL',
           },
         ],
