@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   ImportDeclaration,
   isImportSpecifier,
@@ -28,24 +29,28 @@ const VALID_FIELD_DECORATORS = {
 };
 type FieldType = keyof typeof VALID_FIELD_DECORATORS;
 
-export type FieldMeta = {
+export interface FieldMeta {
   cardURL: string;
   type: FieldType;
   typeDecoratorLocalName: string;
-};
-export type FieldsMeta = {
+}
+export interface FieldsMeta {
   [name: string]: FieldMeta;
-};
-export type ParentMeta = {
+}
+export interface ParentMeta {
   cardURL: string;
-};
+}
 
-export type PluginMeta = {
+export interface PluginMeta {
   fields: FieldsMeta;
   parent?: ParentMeta;
-};
+}
 
-export function getMeta(obj: Object): PluginMeta {
+interface State {
+  opts: any;
+}
+
+export function getMeta(obj: State['opts']): PluginMeta {
   let meta = metas.get(obj);
   if (!meta) {
     // throw new Error(
@@ -58,7 +63,7 @@ export function getMeta(obj: Object): PluginMeta {
 }
 
 const metas = new WeakMap<
-  object,
+  State['opts'],
   {
     parent?: ParentMeta;
     fields: FieldsMeta;
@@ -68,7 +73,7 @@ const metas = new WeakMap<
 export default function main() {
   return {
     visitor: {
-      ImportDeclaration(path: NodePath<ImportDeclaration>, state: { opts: object }) {
+      ImportDeclaration(path: NodePath<ImportDeclaration>, state: State) {
         if (path.node.source.value === '@cardstack/types') {
           storeMeta(state.opts, path);
           let specifiers = path.node.specifiers.filter(
@@ -90,7 +95,7 @@ export default function main() {
   };
 }
 
-function storeMeta(key: object, path: NodePath<ImportDeclaration>) {
+function storeMeta(key: State['opts'], path: NodePath<ImportDeclaration>) {
   let fields: FieldsMeta = {};
   let parent: ParentMeta | undefined;
   for (let specifier of path.node.specifiers) {

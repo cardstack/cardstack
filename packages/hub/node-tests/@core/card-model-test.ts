@@ -48,7 +48,7 @@ class StubCards {
     return { data: { type: 'cards', id: 'x' } };
   }
   prepareComponent() {}
-  tracked(_target: Record<string, unknown>, _prop: string, desc: PropertyDescriptor) {
+  tracked(_target: CardModel, _prop: string, desc: PropertyDescriptor) {
     return desc;
   }
 }
