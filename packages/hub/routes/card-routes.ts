@@ -1,9 +1,7 @@
-// import { CardStackContext } from '../interfaces';
-import { BadRequest, NotFound } from '../utils/error';
+import { assertValidKeys, NotFound } from '../utils/error';
 import { RouterContext } from '@koa/router';
 import { deserialize, serializeCard, serializeRawCard } from '../utils/serialization';
 import { getCardFormatFromRequest } from '../utils/routes';
-import { assertValidKeys } from '@cardstack/core/src/interfaces';
 import Router from '@koa/router';
 import { inject } from '../di/dependency-injection';
 import autoBind from 'auto-bind';
@@ -53,8 +51,7 @@ export default class CardRoutes {
     assertValidKeys(
       Object.keys(body),
       ['adoptsFrom', 'data', 'url'],
-      'Payload contains keys that we do not allow: %list%',
-      BadRequest
+      'Payload contains keys that we do not allow: %list%'
     );
 
     let data = body.data as any;

@@ -1,6 +1,5 @@
 import difference from 'lodash/difference';
 import type CardModel from './card-model';
-import { InvalidKeysError } from './errors';
 
 const componentFormats = {
   isolated: '',
@@ -28,6 +27,14 @@ export type SerializerName = keyof typeof serializerTypes;
 export const SERIALIZER_NAMES = Object.keys(serializerTypes) as SerializerName[];
 export type SerializerMap = { [key in SerializerName]?: string[] };
 
+export function assertValidSerializerMap(map: any): asserts map is SerializerMap {
+  let keys = Object.keys(map);
+  let diff = difference(keys, SERIALIZER_NAMES);
+  if (diff.length > 0) {
+    throw new Error(`Unexpected serializer: ${diff.join(',')}`);
+  }
+}
+
 export type CardData = Record<string, any>;
 
 export type Setter = (value: any) => void;
@@ -43,7 +50,7 @@ export type Setter = (value: any) => void;
     A card that likely adopts from a composite card, but only provides new data for it
 */
 
-export type RawCard = {
+export interface RawCard {
   url: string;
 
   // Feature Files. Value is path inside the files list
@@ -62,7 +69,39 @@ export type RawCard = {
 
   // if this card contains data (as opposed to just schema & code), it goes here
   data?: Record<string, any> | undefined;
-};
+}
+
+export function assertValidRawCard(obj: any): asserts obj is RawCard {
+  if (obj == null) {
+    throw new Error(`not a valid card`);
+  }
+  if (typeof obj.url !== 'string') {
+    throw new Error(`card missing URL`);
+  }
+  for (let featureFile of FEATURE_NAMES) {
+    if (featureFile in obj) {
+      let filePath = obj[featureFile];
+      if (typeof filePath !== 'string') {
+        throw new Error(`card.json in ${obj.url} has an invalid value for "${featureFile}"`);
+      }
+      filePath = filePath.replace(/^\.\//, '');
+      if (!obj.files?.[filePath]) {
+        throw new Error(`card.json in ${obj.url} refers to non-existent module ${obj[featureFile]}`);
+      }
+    }
+  }
+  if ('adoptsFrom' in obj) {
+    if (typeof obj.adoptsFrom !== 'string') {
+      throw new Error(`invalid adoptsFrom property in ${obj.url}`);
+    }
+  }
+
+  if ('data' in obj) {
+    if (typeof obj.data !== 'object' || obj.data == null) {
+      throw new Error(`invalid data property in ${obj.url}`);
+    }
+  }
+}
 export interface Field {
   type: 'hasMany' | 'belongsTo' | 'contains' | 'containsMany';
   card: CompiledCard;
@@ -106,7 +145,7 @@ export interface RealmConfig {
   directory?: string;
 }
 
-export type CardJSONResponse = {
+export interface CardJSONResponse {
   data: {
     id: string;
     type: string;
@@ -115,15 +154,15 @@ export type CardJSONResponse = {
       componentModule: string;
     };
   };
-};
+}
 
-export type CardJSONRequest = {
+export interface CardJSONRequest {
   data: {
     id?: string;
     type: string;
     attributes?: { [name: string]: any };
   };
-};
+}
 
 export type CardOperation =
   | {
@@ -146,60 +185,5 @@ export interface CardEnv {
   load(url: string, format: Format): Promise<CardModel>;
   send(operation: CardOperation): Promise<CardJSONResponse>;
   prepareComponent(cardModel: CardModel, component: unknown): unknown;
-  tracked(taret: object, prop: string, desc: PropertyDescriptor): PropertyDescriptor;
-}
-
-export function assertValidRawCard(obj: any): asserts obj is RawCard {
-  if (obj == null) {
-    throw new Error(`not a valid card`);
-  }
-  if (typeof obj.url !== 'string') {
-    throw new Error(`card missing URL`);
-  }
-  for (let featureFile of FEATURE_NAMES) {
-    if (featureFile in obj) {
-      let filePath = obj[featureFile];
-      if (typeof filePath !== 'string') {
-        throw new Error(`card.json in ${obj.url} has an invalid value for "${featureFile}"`);
-      }
-      filePath = filePath.replace(/^\.\//, '');
-      if (!obj.files?.[filePath]) {
-        throw new Error(`card.json in ${obj.url} refers to non-existent module ${obj[featureFile]}`);
-      }
-    }
-  }
-  if ('adoptsFrom' in obj) {
-    if (typeof obj.adoptsFrom !== 'string') {
-      throw new Error(`invalid adoptsFrom property in ${obj.url}`);
-    }
-  }
-
-  if ('data' in obj) {
-    if (typeof obj.data !== 'object' || obj.data == null) {
-      throw new Error(`invalid data property in ${obj.url}`);
-    }
-  }
-}
-
-type Newable<T> = { new (...args: any[]): T };
-
-export function assertValidKeys(
-  actualKeys: string[],
-  expectedKeys: string[],
-  errorMessage: string,
-  ErrorClass: Newable<Error> = InvalidKeysError
-) {
-  let unexpectedFields = difference(actualKeys, expectedKeys);
-
-  if (unexpectedFields.length) {
-    throw new ErrorClass(errorMessage.replace('%list%', '"' + unexpectedFields.join(', ') + '"'));
-  }
-}
-
-export function assertValidSerializerMap(map: any): asserts map is SerializerMap {
-  let keys = Object.keys(map);
-  let diff = difference(keys, SERIALIZER_NAMES);
-  if (diff.length > 0) {
-    throw new Error(`Unexpected serializer: ${diff.join(',')}`);
-  }
+  tracked(target: CardModel, prop: string, desc: PropertyDescriptor): PropertyDescriptor;
 }
