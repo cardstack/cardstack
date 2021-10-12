@@ -6,7 +6,7 @@ import type {
   BlockStatement,
   Statement,
   Node,
-} from '@glimmer/syntax/dist/types/lib/v1/api';
+} from '@glimmer/syntax/dist/types/lib/v1/api'; // eslint-disable-line node/no-missing-import
 import { CompiledCard, Field, Format } from './interfaces';
 import { singularize } from 'inflection';
 import { cloneDeep } from 'lodash';
