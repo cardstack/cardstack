@@ -1,7 +1,13 @@
 {{page-title "Token Suppliers"}}
 
 <section class="card-pay-dashboard__token-suppliers" role="tabpanel" aria-labelledby="card-pay.token-suppliers">
+<<<<<<< HEAD
   <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{true}}>
+||||||| merged common ancestors
+  <CardPay::DashboardPanel @panel={{@model.panel}}>
+=======
+  <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{not this.layer2Network.isConnected}} open={{not this.layer2Network.isConnected}}>
+>>>>>>> Add content on token-suppliers dashboard
     {{#each @model.panel.sections as |section|}}
       <CardPay::DashboardPanel::Section @section={{section}}>
         <:cta>
@@ -19,6 +25,39 @@
       </CardPay::DashboardPanel::Section>
     {{/each}}
   </CardPay::DashboardPanel>
+
+  {{#if this.layer2Network.isConnected}}
+    <section data-test-suppliers-section>
+      <h2 class="card-pay-dashboard__suppliers-title">Token Suppliers</h2>
+      <section class="card-pay-dashboard__depot">
+        <header class="card-pay-dashboard__depot-header">
+          <div>On {{network-display-info "layer2" "fullName"}}</div>
+          {{this.layer2Network.depotSafe.address}}
+        </header>
+        <section class="card-pay-dashboard__depot-body">
+          <h3 class="card-pay-dashboard__depot-title">Depot</h3>
+          <h4 class="card-pay-dashboard__depot-balances-title">
+            Layer 2 Balances
+            {{this.tokens.length}}
+          </h4>
+          <div class="card-pay-dashboard__depot-balances-grid">
+            {{#each this.tokensWithDisplayInfo as |t|}}
+              <div class="card-pay-dashboard__token">
+                <CardPay::BalanceDisplay
+                  @size="large"
+                  @icon={{t.icon}}
+                  @balance={{format-wei-amount t.balance}}
+                  @symbol={{t.symbol}}
+                  @usdBalance={{token-to-usd t.symbol t.balance}}
+                />
+              </div>
+            {{/each}}
+          </div>
+
+        </section>
+      </section>
+    </section>
+  {{/if}}
 </section>
 
 <Boxel::Modal

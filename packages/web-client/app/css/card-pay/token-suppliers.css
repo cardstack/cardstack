@@ -11,3 +11,60 @@
 .card-pay-dashboard__token-suppliers > * + * {
   margin-top: var(--boxel-sp-xxl);
 }
+
+.card-pay-dashboard__suppliers-title {
+  margin-bottom: var(--boxel-sp-xxl);
+  font: 600 var(--boxel-font-lg);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.card-pay-dashboard__depot {
+  background-color: var(--boxel-light);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.card-pay-dashboard__depot-body {
+  color: var(--boxel-dark);
+  padding: var(--boxel-sp-xxl) var(--boxel-sp-lg);
+}
+
+.card-pay-dashboard__depot-header {
+  padding: var(--boxel-sp-xs) var(--boxel-sp);
+  display: flex;
+  align-items: center;
+  background-color: var(--boxel-dark);
+  color: var(--boxel-light);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+.card-pay-dashboard__depot-title {
+  font-size: 1.625rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: calc(36 / 26);
+  margin-bottom: var(--boxel-sp-xl);
+}
+
+.card-pay-dashboard__depot-balances-title {
+  border-top: 1px solid var(--boxel-light-400);
+  padding-top: var(--boxel-sp-xl);
+  margin-bottom: var(--boxel-sp-lg);
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: calc(27 / 20);
+}
+
+.card-pay-dashboard__depot-balances-grid {
+  display: grid;
+  gap: var(--boxel-sp-xl) var(--boxel-sp);
+  grid-template-columns: repeat(auto-fill, 22.75rem);
+}
+
+.card-pay-dashboard__token {
+  padding: var(--boxel-sp-xxl) var(--boxel-sp);
+  border: 1px solid var(--boxel-light-400);
+  border-radius: var(--boxel-border-radius);
+}
