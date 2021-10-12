@@ -11,14 +11,12 @@ export default async (payload: any, helpers: Helpers) => {
   helpers.logger.info(`Writing JSON to S3 bucket ${bucket} at ${path}...`);
   let s3Client = new S3Client(s3Config);
 
-  /* eslint-disable @typescript-eslint/naming-convention */
   const command = new PutObjectCommand({
     Bucket: bucket,
     Body: JSON.stringify(json),
     ContentType: 'application/json',
     Key: path,
   });
-  /* eslint-enable @typescript-eslint/naming-convention */
 
   const response = await s3Client.send(command);
   helpers.logger.info(`S3 PUT completed ${bucket}:${path} [${response.$metadata.httpStatusCode}]`);

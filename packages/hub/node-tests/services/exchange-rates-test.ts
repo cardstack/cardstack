@@ -8,7 +8,6 @@ describe('ExchangeRatesService', function () {
       base: 'USD',
       date: '2021-10-05',
       rates: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         JPY: 4,
       },
     };
@@ -24,7 +23,6 @@ describe('ExchangeRatesService', function () {
           base: 'USD',
           date: '2021-10-02',
           rates: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             GBP: 4,
           },
         };
@@ -49,7 +47,6 @@ describe('ExchangeRatesService', function () {
       base: 'USD',
       date: '2021-10-05',
       rates: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         JPY: 4,
       },
     };
@@ -59,7 +56,6 @@ describe('ExchangeRatesService', function () {
       base: 'USD',
       date: '2021-10-02',
       rates: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         GBP: 4,
       },
     };
@@ -93,7 +89,6 @@ describe('ExchangeRatesService', function () {
       base: 'USD',
       date: '2021-10-05',
       rates: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         JPY: 4,
       },
     };
@@ -109,7 +104,6 @@ describe('ExchangeRatesService', function () {
           base: 'USD',
           date: '2021-10-02',
           rates: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
             GBP: 4,
           },
         };
@@ -129,7 +123,6 @@ describe('ExchangeRatesService', function () {
       base: 'USD',
       date: '2021-10-05',
       rates: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         JPY: 4,
       },
     };

@@ -38,13 +38,11 @@ export default class HubAuth implements IHubAuth {
     let chainId = networkIds[name];
     const typedData = {
       types: {
-        //eslint-disable-next-line @typescript-eslint/naming-convention
         EIP712Domain: [
           { name: 'name', type: 'string' },
           { name: 'version', type: 'string' },
           { name: 'chainId', type: 'uint256' },
         ],
-        //eslint-disable-next-line @typescript-eslint/naming-convention
         HubAuthentication: [
           { name: 'user', type: 'address' },
           { name: 'nonce', type: 'string' },
@@ -73,7 +71,6 @@ export default class HubAuth implements IHubAuth {
     let response = await global.fetch(`${this.hubRootUrl}/api/session`, {
       method: 'POST',
       headers: {
-        //eslint-disable-next-line @typescript-eslint/naming-convention
         'Content-Type': 'application/vnd.api+json',
       },
       body: postBody,
@@ -92,7 +89,6 @@ export default class HubAuth implements IHubAuth {
   private async httpGetSession(authToken?: string): Promise<Response> {
     let url = `${this.hubRootUrl}/api/session`;
     let headers = {
-      //eslint-disable-next-line @typescript-eslint/naming-convention
       'Content-Type': 'application/vnd.api+json',
     } as Record<string, string>;
     if (authToken) {

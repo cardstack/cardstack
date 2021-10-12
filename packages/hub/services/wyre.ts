@@ -50,8 +50,8 @@ export default class WyreService {
     let result = await fetch(`${url}/v2/wallets`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
-        Authorization: `Bearer ${secretKey}`, // eslint-disable-line @typescript-eslint/naming-convention
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${secretKey}`,
       },
       body: JSON.stringify({
         name: `${env}_${address.toLowerCase()}`,
@@ -85,8 +85,8 @@ export default class WyreService {
     let result = await fetch(`${url}/v3/transfers/${transferId}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
-        Authorization: `Bearer ${secretKey}`, // eslint-disable-line @typescript-eslint/naming-convention
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${secretKey}`,
       },
     });
     // when no transfer exists for the name specified wyre returns a 204 no-content
@@ -102,8 +102,8 @@ export default class WyreService {
     let result = await fetch(`${url}/v3/orders/${orderId}/full`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
-        Authorization: `Bearer ${secretKey}`, // eslint-disable-line @typescript-eslint/naming-convention
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${secretKey}`,
       },
     });
     // when no transfer exists for the name specified wyre returns a 204 no-content
@@ -119,8 +119,8 @@ export default class WyreService {
     let result = await fetch(`${url}/v3/transfers`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
-        Authorization: `Bearer ${secretKey}`, // eslint-disable-line @typescript-eslint/naming-convention
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${secretKey}`,
       },
       body: JSON.stringify({
         source: `wallet:${source}`,
@@ -140,8 +140,8 @@ export default class WyreService {
     let result = await fetch(url.href, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
-        Authorization: `Bearer ${secretKey}`, // eslint-disable-line @typescript-eslint/naming-convention
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${secretKey}`,
       },
     });
     // when no wallet exists for the name specified wyre returns a 204 no-content

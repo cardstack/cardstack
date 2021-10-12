@@ -79,8 +79,8 @@ export async function gasEstimate(
   let options = {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
-      Accept: 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
     body: JSON.stringify({
       to,
@@ -145,8 +145,8 @@ export async function getSendPayload(
   let options = {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
-      Accept: 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
     body: JSON.stringify({
       payment: spendAmount,
@@ -176,8 +176,8 @@ export async function executeTransaction(
   const options = {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
-      Accept: 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
     body: JSON.stringify({
       to,
@@ -217,8 +217,8 @@ export async function executeSend(
   const options = {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
-      Accept: 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
     },
     body: JSON.stringify({
       nonce: nonce.toString(),

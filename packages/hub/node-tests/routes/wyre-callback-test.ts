@@ -85,7 +85,7 @@ function handleGetWyreWalletById(walletId: string) {
       name: stubUserAddress.toLowerCase(),
       callbackUrl: null,
       depositAddresses: {
-        ETH: stubDepositAddress, // eslint-disable-line @typescript-eslint/naming-convention
+        ETH: stubDepositAddress,
       } as { [network: string]: string },
     };
   } else if (walletId === 'WA_DOES_NOT_EXIST') {
