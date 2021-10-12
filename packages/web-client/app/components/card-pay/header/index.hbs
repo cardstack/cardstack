@@ -25,8 +25,10 @@
         @onConnect={{@layer2Connect}}
       />
     </li>
-    <li class="card-pay-header__item">
-      <CardPay::Header::WorkflowTracker />
-    </li>
+    {{#if (and @isLayer1Connected @isLayer2Connected)}}
+      <li class="card-pay-header__item">
+        <CardPay::Header::WorkflowTracker />
+      </li>
+    {{/if}}
   </ul>
 </Boxel::OrgHeader>
