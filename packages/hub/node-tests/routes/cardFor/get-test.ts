@@ -14,7 +14,7 @@ if (process.env.COMPILER) {
     let { createRealm, resolveCard, getServer, request } = setupServer(this);
 
     this.beforeEach(async function () {
-      realm = createRealm('https://my-realm');
+      realm = await createRealm('https://my-realm');
       realm.addCard('routes', {
         'card.json': { schema: 'schema.js' },
         'schema.js': `

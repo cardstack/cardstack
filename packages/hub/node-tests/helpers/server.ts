@@ -9,8 +9,8 @@ import supertest from 'supertest';
 export function setupServer(mochaContext: Mocha.Suite, serverConfig: HubServerConfig = {}) {
   let server: HubServer, cardCache: CardCache, cardCacheConfig: TestCardCacheConfig;
 
-  function createRealm(name: string): ProjectTestRealm {
-    return server.builder.realmManager.createRealm({ url: name }, ProjectTestRealm);
+  async function createRealm(name: string): Promise<ProjectTestRealm> {
+    return (await server.container.lookup('realm-manager')).createRealm({ url: name }, ProjectTestRealm);
   }
 
   mochaContext.beforeEach(async function () {

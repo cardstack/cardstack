@@ -22,7 +22,7 @@ if (process.env.COMPILER) {
     let { createRealm, request } = setupServer(this);
 
     this.beforeEach(async function () {
-      realm = createRealm('https://my-realm');
+      realm = await createRealm('https://my-realm');
       realm.addCard('post', {
         'card.json': {
           schema: 'schema.js',

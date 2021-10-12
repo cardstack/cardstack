@@ -35,7 +35,7 @@ if (process.env.COMPILER) {
     };
 
     this.beforeEach(async function () {
-      realm = createRealm(REALM_NAME);
+      realm = await createRealm(REALM_NAME);
 
       realm.addCard('post', {
         'card.json': {

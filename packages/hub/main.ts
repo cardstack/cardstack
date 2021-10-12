@@ -125,13 +125,6 @@ export class HubServer {
 
     let fullConfig = Object.assign({}, serverConfig) as HubServerConfig;
 
-    let builder: CardBuilder;
-    if (process.env.COMPILER) {
-      builder = await container.lookup('card-builder');
-    } else {
-      builder = {} as CardBuilder;
-    }
-
     initSentry();
 
     let app = new Koa<Koa.DefaultState, Koa.Context>()
@@ -172,14 +165,10 @@ export class HubServer {
     app.on('close', onClose);
     app.on('error', onError);
 
-    return new this(app, container, builder);
+    return new this(app, container);
   }
 
-  private constructor(
-    public app: Koa<Koa.DefaultState, Koa.Context>,
-    public container: Container,
-    public builder: CardBuilder
-  ) {}
+  private constructor(public app: Koa<Koa.DefaultState, Koa.Context>, public container: Container) {}
 
   async teardown() {
     await this.container.teardown();
@@ -205,7 +194,7 @@ export class HubServer {
       throw new Error('COMPILER feature flag is not present');
     }
 
-    await this.builder.primeCache();
+    (await this.container.lookup('card-builder')).primeCache();
   }
 
   async watchCards() {
