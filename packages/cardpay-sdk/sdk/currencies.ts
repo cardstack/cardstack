@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-
 enum CryptoCurrency {
   ETH = 'ETH',
   DAI = 'DAI',

@@ -74,7 +74,7 @@ export default class RewardPool {
     let options = {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
+        'Content-Type': 'application/json',
       },
     };
     let response = await fetch(url, options);
@@ -107,7 +107,7 @@ export default class RewardPool {
     let options = {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json', //eslint-disable-line @typescript-eslint/naming-convention
+        'Content-Type': 'application/json',
       },
     };
     let response = await fetch(url.toString(), options);

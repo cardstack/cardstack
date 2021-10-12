@@ -42,12 +42,10 @@ export default async function awsConfig({ roleChain = [] }) {
 async function assumeRole(roleName: string, config: any) {
   const stsClient = new STSClient(config);
 
-  /* eslint-disable @typescript-eslint/naming-convention */
   const stsParams = {
     RoleArn: roleArn(roleName),
     RoleSessionName: roleSessionName(roleName),
   };
-  /* eslint-enable @typescript-eslint/naming-convention */
 
   const stsCommand = new AssumeRoleCommand(stsParams);
   try {

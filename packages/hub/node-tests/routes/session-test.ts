@@ -134,7 +134,6 @@ describe('POST /api/session', function () {
     bodyWithCorrectSignature = {
       authData: {
         types: {
-          /* eslint-disable @typescript-eslint/naming-convention */
           EIP712Domain: [
             { name: 'name', type: 'string' },
             { name: 'version', type: 'string' },
@@ -144,7 +143,6 @@ describe('POST /api/session', function () {
             { name: 'user', type: 'address' },
             { name: 'nonce', type: 'string' },
           ],
-          /* eslint-enable @typescript-eslint/naming-convention */
         },
         domain: { name: '0.0.0.0:3000', version: '0.0.1', chainId: '77' },
         primaryType: 'Authentication',

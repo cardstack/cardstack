@@ -13,7 +13,7 @@ module.exports = {
     '@typescript-eslint/adjacent-overload-signatures': 'error',
     '@typescript-eslint/array-type': 'error',
     '@typescript-eslint/ban-types': 'error',
-    '@typescript-eslint/naming-convention': 'error',
+    '@typescript-eslint/naming-convention': 'off',
     indent: 'off',
     '@typescript-eslint/indent': 'off',
     '@typescript-eslint/member-delimiter-style': 'error',

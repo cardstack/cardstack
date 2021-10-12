@@ -59,10 +59,10 @@ const SOKOL = {
   rewardManager: '0x9A89A110238201c12568f3a4a02BE5Ae63284497',
   registerRewardProgramHandler: '0xaF5B2869Be9Eb9c45cc0501F17B145A3229dD2C0',
   registerRewardeeHandler: '0x0B793A280F2E47997432a9047073F5e634A9A731',
-  deprecatedMerchantManager_v0_6_7: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2', // eslint-disable-line @typescript-eslint/naming-convention
+  deprecatedMerchantManager_v0_6_7: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2',
   oracles: {
-    DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB', // eslint-disable-line @typescript-eslint/naming-convention
-    CARD: '0xb4Fcc975c2b6A57dd5B3d9a3B6b144499f707c7d', // eslint-disable-line @typescript-eslint/naming-convention
+    DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB',
+    CARD: '0xb4Fcc975c2b6A57dd5B3d9a3B6b144499f707c7d',
   },
 };
 const MAINNET = {
@@ -98,10 +98,10 @@ const XDAI = {
   rewardManager: '0x44aB7b82F18694cF4431F41E67C0f05AAaCAC74D',
   registerRewardProgramHandler: '0x8e0A60912C56F4436396C636f0ED500ef27af4e0',
   registerRewardeeHandler: '0x198ea3D257715Fb2e9025c061BE96e56AE611A9f',
-  deprecatedMerchantManager_v0_6_7: '0x3C29B2A563F4bB9D625175bE823c528A4Ddd1107', // eslint-disable-line @typescript-eslint/naming-convention
+  deprecatedMerchantManager_v0_6_7: '0x3C29B2A563F4bB9D625175bE823c528A4Ddd1107',
   oracles: {
-    DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2', // eslint-disable-line @typescript-eslint/naming-convention
-    CARD: '0xd570Ed8b313Fe6aEEA4064bd1713b5Cc6d41D3C5', // eslint-disable-line @typescript-eslint/naming-convention
+    DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2',
+    CARD: '0xd570Ed8b313Fe6aEEA4064bd1713b5Cc6d41D3C5',
   },
 };
 const addresses: {
