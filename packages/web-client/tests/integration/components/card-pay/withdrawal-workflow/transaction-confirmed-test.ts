@@ -35,9 +35,6 @@ module(
       let layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-      await layer2Service.test__simulateBalances({
-        defaultToken: new BN('250000000000000000000'),
-      });
       let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
       let testDepot = createDepotSafe({
         address: depotAddress,

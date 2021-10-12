@@ -4,7 +4,11 @@ import { render, waitFor, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
-import BN from 'bn.js';
+import {
+  createDepotSafe,
+  createSafeToken,
+  generateMockAddress,
+} from '@cardstack/web-client/utils/test-factories';
 
 let layer2Service: Layer2TestWeb3Strategy;
 let session: WorkflowSession;
@@ -21,14 +25,18 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
   });
 
   test('It should show nonzero token balances, and an appropriate message if there are none', async function (assert) {
+    let depotAddress = generateMockAddress();
     layer2Service = this.owner.lookup('service:layer2-network').strategy;
-
+    layer2Service.test__simulateAccountSafes('address', [
+      createDepotSafe({
+        address: depotAddress,
+        tokens: [
+          createSafeToken('DAI', '2141100000000000000'),
+          createSafeToken('CARD', '0'),
+        ],
+      }),
+    ]);
     await layer2Service.test__simulateAccountsChanged(['address']);
-    await layer2Service.test__simulateBalances({
-      defaultToken: new BN('2141100000000000000'),
-      card: new BN('0'),
-    });
-    await layer2Service.safes.fetch();
 
     await render(hbs`
       <CardPay::LayerTwoConnectCard @workflowSession={{this.session}} />
@@ -37,10 +45,15 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     assert.dom('[data-test-balance="DAI.CPXD"]').containsText('2.1411');
     assert.dom('[data-test-balance="CARD.CPXD"]').doesNotExist();
 
-    await layer2Service.test__simulateBalances({
-      defaultToken: new BN('2141100000000000000'),
-      card: new BN('2990000000000000000'),
-    });
+    layer2Service.test__simulateAccountSafes('address', [
+      createDepotSafe({
+        address: depotAddress,
+        tokens: [
+          createSafeToken('DAI', '2141100000000000000'),
+          createSafeToken('CARD', '2990000000000000000'),
+        ],
+      }),
+    ]);
     await layer2Service.safes.fetch();
 
     await waitFor('[data-test-balance="CARD.CPXD"]');
@@ -48,10 +61,12 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     assert.dom('[data-test-balance="DAI.CPXD"]').containsText('2.1411');
     assert.dom('[data-test-balance="CARD.CPXD"]').containsText('2.99');
 
-    await layer2Service.test__simulateBalances({
-      defaultToken: new BN('0'),
-      card: new BN('0'),
-    });
+    layer2Service.test__simulateAccountSafes('address', [
+      createDepotSafe({
+        address: depotAddress,
+        tokens: [createSafeToken('DAI', '0'), createSafeToken('CARD', '0')],
+      }),
+    ]);
     await layer2Service.safes.fetch();
 
     await waitUntil(() => {
@@ -67,13 +82,15 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
 
   test('the layer 2 wallet address is persisted if the wallet is already connected', async function (assert) {
     layer2Service = this.owner.lookup('service:layer2-network').strategy;
-
+    layer2Service.test__simulateAccountSafes('address', [
+      createDepotSafe({
+        tokens: [
+          createSafeToken('DAI', '2141100000000000000'),
+          createSafeToken('CARD', '2990000000000000000'),
+        ],
+      }),
+    ]);
     await layer2Service.test__simulateAccountsChanged(['address']);
-    await layer2Service.test__simulateBalances({
-      defaultToken: new BN('2141100000000000000'),
-      card: new BN('0'),
-    });
-    await layer2Service.safes.fetch();
 
     await render(hbs`
       <CardPay::LayerTwoConnectCard @workflowSession={{this.session}} />
@@ -103,11 +120,6 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     await render(hbs`
       <CardPay::LayerTwoConnectCard @workflowSession={{this.session}} />
     `);
-
-    layer2Service.test__simulateBalances({
-      defaultToken: new BN('2141100000000000000'),
-      card: new BN('0'),
-    });
 
     assert.equal(
       session.getValue<string>('layer2WalletAddress'),

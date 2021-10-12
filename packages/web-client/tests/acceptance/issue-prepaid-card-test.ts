@@ -77,6 +77,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
+  let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+  let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
+
   hooks.beforeEach(function (this: Context) {
     this.server.db.loadData({
       prepaidCardColorSchemes,
@@ -117,8 +120,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
-    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         address: depotAddress,
@@ -535,7 +536,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       spendMinValue: MIN_SPEND_AMOUNT,
       did: defaultCreatedPrepaidCardDID,
       issuerName: 'JJ',
-      layer2WalletAddress: '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+      layer2WalletAddress: layer2AccountAddress,
       pattern: {
         patternUrl:
           '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
@@ -567,14 +568,14 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
   module('Tests with the layer 2 wallet already connected', function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
-    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     setupHubAuthenticationToken(hooks);
 
     hooks.beforeEach(async function () {
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       let testDepot = createDepotSafe({
-        address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
+        address: depotAddress,
+        owners: [layer2AccountAddress],
         tokens: [
           createSafeToken('DAI', MIN_AMOUNT_TO_PASS.toString()),
           createSafeToken('CARD', '500000000000000000000'),
@@ -677,9 +678,13 @@ module('Acceptance | issue prepaid card', function (hooks) {
       await visit('/card-pay');
       assert.equal(currentURL(), '/card-pay/balances');
 
-      await layer2Service.test__simulateBalances({
-        defaultToken: FAILING_AMOUNT,
-      });
+      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+        createDepotSafe({
+          address: depotAddress,
+          owners: [layer2AccountAddress],
+          tokens: [createSafeToken('DAI', FAILING_AMOUNT.toString())],
+        }),
+      ]);
       await layer2Service.safes.fetch();
 
       await click('[data-test-workflow-button="issue-prepaid-card"]');

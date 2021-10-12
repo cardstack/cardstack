@@ -16,6 +16,10 @@ import BN from 'bn.js';
 
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { capitalize } from '@ember/string';
+import {
+  createDepotSafe,
+  createSafeToken,
+} from '@cardstack/web-client/utils/test-factories';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -116,11 +120,13 @@ module('Acceptance | deposit', function (hooks) {
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI', '0')],
+      }),
+    ]);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
-      defaultToken: new BN(0),
-    });
-    await layer2Service.safes.fetch();
 
     await waitFor(`${postableSel(1, 2)} [data-test-balance-container]`);
     await waitUntil(() => {
@@ -519,10 +525,13 @@ module('Acceptance | deposit', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI', '142200000000000000')],
+      }),
+    ]);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
-      defaultToken: new BN('142200000000000000'),
-    });
     await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
@@ -600,10 +609,13 @@ module('Acceptance | deposit', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI', '142200000000000000')],
+      }),
+    ]);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
-      defaultToken: new BN('142200000000000000'),
-    });
     await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
@@ -677,10 +689,13 @@ module('Acceptance | deposit', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI', '142200000000000000')],
+      }),
+    ]);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
-      defaultToken: new BN('142200000000000000'),
-    });
     await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
@@ -760,11 +775,13 @@ module('Acceptance | deposit', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI', '142200000000000000')],
+      }),
+    ]);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
-      defaultToken: new BN('142200000000000000'),
-    });
-    await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
     await click('[data-test-workflow-button="deposit"]');
@@ -843,10 +860,13 @@ module('Acceptance | deposit', function (hooks) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI', '142200000000000000')],
+      }),
+    ]);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
-      defaultToken: new BN('142200000000000000'),
-    });
 
     await visit('/card-pay/token-suppliers');
     await click('[data-test-workflow-button="deposit"]');
@@ -930,11 +950,13 @@ module('Acceptance | deposit', function (hooks) {
     let layer2AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
     let secondLayer2AccountAddress =
       '0x0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7';
+    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI', '142200000000000000')],
+      }),
+    ]);
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
-      defaultToken: new BN('142200000000000000'),
-    });
-    await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
     await click('[data-test-workflow-button="deposit"]');

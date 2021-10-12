@@ -53,12 +53,6 @@ interface RegisterMerchantRequest {
   nonce?: BN;
   infoDID: string;
 }
-
-interface SimulateBalancesParams {
-  defaultToken?: BN;
-  dai?: BN;
-  card?: BN;
-}
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainId = '-1';
   simpleEmitter = new SimpleEmitter();
@@ -333,103 +327,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     await this.waitForAccountDeferred.resolve();
   }
 
-  async test__simulateBalances(balances: SimulateBalancesParams) {
-    let { depotSafe } = this;
-    if (!depotSafe) {
-      await this.test__simulateDepot({
-        address: 'example-depot',
-        tokens: [],
-        type: 'depot',
-        createdAt: +new Date(),
-        owners: [],
-      });
-      depotSafe =
-        this.depotSafe! ||
-        [...this.accountSafes.values()]
-          .flat()
-          .find((safe: Safe) => safe.type === 'depot')!;
-    }
-    if (balances.dai) {
-      let token = depotSafe.tokens.find(
-        (tokenInfo) => tokenInfo.token.symbol === 'DAI'
-      );
-      if (!token) {
-        token = {
-          tokenAddress: 'DAI_TOKEN_ADDRESS',
-          token: {
-            name: 'DAI',
-            symbol: 'DAI',
-            decimals: 18,
-          },
-          balance: balances.dai.toString(),
-        };
-        depotSafe.tokens.push(token);
-      } else {
-        token.balance = balances.dai.toString();
-      }
-    }
-
-    if (balances.defaultToken) {
-      let token = depotSafe.tokens.find(
-        (tokenInfo) => tokenInfo.token.symbol === this.defaultTokenSymbol
-      );
-      if (!token) {
-        token = {
-          tokenAddress: `${this.defaultTokenSymbol}_TOKEN_ADDRESS`,
-          token: {
-            name: this.defaultTokenSymbol,
-            symbol: this.defaultTokenSymbol,
-            decimals: 18,
-          },
-          balance: balances.defaultToken.toString(),
-        };
-        depotSafe.tokens.push(token);
-      } else {
-        token.balance = balances.defaultToken.toString();
-      }
-    }
-
-    if (balances.card) {
-      let token = depotSafe.tokens.find(
-        (tokenInfo) => tokenInfo.token.symbol === 'CARD'
-      );
-      if (!token) {
-        token = {
-          tokenAddress: 'CARD_TOKEN_ADDRESS',
-          token: {
-            name: 'CARD',
-            symbol: 'CARD',
-            decimals: 18,
-          },
-          balance: balances.card.toString(),
-        };
-        depotSafe.tokens.push(token);
-      } else {
-        token.balance = balances.card.toString();
-      }
-    }
-  }
-
   test__simulateBridgedToLayer2(txnHash: TransactionHash) {
     this.bridgingToLayer2Deferred.resolve({
       transactionHash: txnHash,
     } as TransactionReceipt);
-  }
-
-  async test__simulateDepot(depot: DepotSafe | null) {
-    let address = this.walletInfo.firstAddress!;
-    if (!this.accountSafes.has(address)) {
-      this.accountSafes.set(address, []);
-    }
-    let safes = this.accountSafes.get(address)!;
-    let depotSafe = safes.find((safe) => safe.type === 'depot');
-    if (depotSafe) {
-      safes.removeObject(depotSafe);
-    }
-    if (depot) {
-      depot.type = 'depot';
-      safes.unshiftObject(depot);
-    }
   }
 
   test__simulateConvertFromSpend(symbol: ConvertibleSymbol, amount: number) {
