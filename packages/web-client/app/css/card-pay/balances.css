@@ -30,13 +30,13 @@
 }
 
 .card-pay-dashboard__balances-section-header-button-icon {
-  margin-left: var(--boxel-sp-xs);
+  --icon-color: var(--boxel-highlight);
 
-  --icon-color: var(--boxel-cyan);
+  margin-left: var(--boxel-sp-xs);
 }
 
 .card-pay-dashboard__balances-section-title {
-  font-weight: normal;
+  font-weight: 400;
 }
 
 .card-pay-dashboard__balances-count {
