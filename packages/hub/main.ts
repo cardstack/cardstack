@@ -63,7 +63,7 @@ import ExchangeRatesService from './services/exchange-rates';
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
 
-export function wireItUp(registryCallback?: RegistryCallback): Container {
+export function createContainer(registryCallback?: RegistryCallback): Container {
   let registry = new Registry();
   registry.register('api-router', ApiRouter);
   registry.register('authentication-middleware', AuthenticationMiddleware);
@@ -121,7 +121,7 @@ export class HubServer {
   static logger = serverLog;
 
   static async create(serverConfig?: Partial<HubServerConfig>): Promise<HubServer> {
-    let container = wireItUp(serverConfig?.registryCallback);
+    let container = createContainer(serverConfig?.registryCallback);
 
     let fullConfig = Object.assign({}, serverConfig) as HubServerConfig;
 
@@ -229,10 +229,6 @@ function initSentry() {
   }
 }
 
-export function bootEnvironment(callback?: HubServerConfig['registryCallback']) {
-  return wireItUp(callback);
-}
-
 export async function bootWorker() {
   initSentry();
 
@@ -254,7 +250,7 @@ export async function bootWorker() {
     };
   };
   let dbConfig = config.get('db') as Record<string, any>;
-  let container = wireItUp();
+  let container = createContainer();
   let runner = await runWorkers({
     logger: new Logger(workerLogFactory),
     connectionString: dbConfig.url,

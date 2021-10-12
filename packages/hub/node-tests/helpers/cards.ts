@@ -4,7 +4,7 @@ import tmp from 'tmp';
 import { join } from 'path';
 
 import { RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
-import { wireItUp } from '../../main';
+import { createContainer } from '../../main';
 import { CardCacheConfig } from '../../services/card-cache-config';
 import CardBuilder from '../../services/card-builder';
 import RealmManager from '../../services/realm-manager';
@@ -79,7 +79,7 @@ export function setupCardBuilding(mochaContext: Mocha.Suite) {
   }
 
   mochaContext.beforeEach(async function () {
-    container = wireItUp((registry: Registry) => {
+    container = createContainer((registry: Registry) => {
       registry.register('card-cache-config', TestCardCacheConfig);
     });
 

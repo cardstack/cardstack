@@ -1,4 +1,4 @@
-import { wireItUp } from '../../main';
+import { createContainer } from '../../main';
 import { Container, RegistryCallback } from '../../di/dependency-injection';
 
 export interface TestEnv {
@@ -7,7 +7,7 @@ export interface TestEnv {
 }
 
 export async function createTestEnv(registryCallBack?: RegistryCallback): Promise<TestEnv> {
-  let container = wireItUp(registryCallBack);
+  let container = createContainer(registryCallBack);
   async function destroy() {
     await container.teardown();
   }
