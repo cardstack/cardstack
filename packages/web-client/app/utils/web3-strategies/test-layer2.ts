@@ -200,9 +200,11 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   async getLatestSafe(address: string): Promise<Safe> {
-    return this.remoteAccountSafes
+    let result = this.remoteAccountSafes
       .get(this.walletInfo.firstAddress!)!
       .find((safe) => safe.address === address)!;
+    if (!result) return result;
+    else return JSON.parse(JSON.stringify(result));
   }
 
   test__autoResolveViewSafes = true;
@@ -212,21 +214,14 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   ): TaskGenerator<{ result: Safe[]; blockNumber: number }> {
     if (this.test__autoResolveViewSafes) {
       return {
-        result: this.remoteAccountSafes.get(account)!,
+        result: JSON.parse(
+          JSON.stringify(this.remoteAccountSafes.get(account) ?? [])
+        ),
         blockNumber: this.test__blockNumber++,
       };
     }
     this.test__deferredViewSafes = defer();
     return yield this.test__deferredViewSafes.promise;
-  }
-
-  async test__simulateViewSafes(
-    safes = this.remoteAccountSafes.get(this.walletInfo.firstAddress!)!
-  ) {
-    this.test__deferredViewSafes.resolve({
-      result: safes,
-      blockNumber: this.test__blockNumber++,
-    });
   }
 
   test__simulateRemoteAccountSafes(account: string, safes: Safe[]) {
