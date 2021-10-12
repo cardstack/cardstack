@@ -124,6 +124,11 @@ const safeQuery = `
     safe(id: $id) {
       ${safeQueryFields}
     }
+    _meta {
+      block {
+        number
+      }
+    }
   }
 `;
 
@@ -136,30 +141,55 @@ const safesQuery = `
         }
       }
     }
+
+    _meta {
+      block {
+        number
+      }
+    }
   }
 `;
 
-export async function viewSafe(network: 'xdai' | 'sokol', safeAddress: string): Promise<Safe | undefined> {
+export async function viewSafe(
+  network: 'xdai' | 'sokol',
+  safeAddress: string
+): Promise<{
+  result: Safe | undefined;
+  blockNumber: number;
+}> {
   let {
-    data: { safe },
+    data: { safe, _meta },
   } = await query(network, safeQuery, { id: safeAddress });
-  return processSafeResult(safe as GraphQLSafeResult);
+  return {
+    result: processSafeResult(safe as GraphQLSafeResult),
+    blockNumber: _meta.block.number,
+  };
 }
 
 export default class Safes {
   constructor(private layer2Web3: Web3) {}
 
-  async viewSafe(safeAddress: string): Promise<Safe | undefined> {
+  async viewSafe(safeAddress: string): Promise<{
+    result: Safe | undefined;
+    blockNumber: number | undefined;
+  }> {
     let {
-      data: { safe },
+      data: { safe, _meta },
     } = await query(this.layer2Web3, safeQuery, { id: safeAddress });
-    return processSafeResult(safe as GraphQLSafeResult);
+
+    return {
+      result: processSafeResult(safe as GraphQLSafeResult),
+      blockNumber: _meta.block.number,
+    };
   }
 
-  async view(options?: Partial<Options>): Promise<Safe[]>;
-  async view(owner?: string): Promise<Safe[]>;
-  async view(owner?: string, options?: Partial<Options>): Promise<Safe[]>;
-  async view(ownerOrOptions?: string | Partial<Options>, options?: Partial<Options>): Promise<Safe[]> {
+  async view(options?: Partial<Options>): Promise<{ result: Safe[]; blockNumber: number | undefined }>;
+  async view(owner?: string): Promise<{ result: Safe[]; blockNumber: number | undefined }>;
+  async view(owner?: string, options?: Partial<Options>): Promise<{ result: Safe[]; blockNumber: number | undefined }>;
+  async view(
+    ownerOrOptions?: string | Partial<Options>,
+    options?: Partial<Options>
+  ): Promise<{ result: Safe[]; blockNumber: number | undefined }> {
     let owner: string;
     let _options: Options | undefined;
     if (typeof ownerOrOptions === 'string') {
@@ -170,10 +200,13 @@ export default class Safes {
     }
     _options = { ...defaultOptions, ...(options ?? _options ?? {}) };
     let {
-      data: { account },
+      data: { account, _meta },
     } = await query(this.layer2Web3, safesQuery, { account: owner });
     if (account == null) {
-      return [];
+      return {
+        result: [],
+        blockNumber: _meta.block.number,
+      };
     }
     let { safes } = account;
     let result: Safe[] = [];
@@ -189,7 +222,10 @@ export default class Safes {
         }
       }
     }
-    return result;
+    return {
+      result,
+      blockNumber: _meta.block.number,
+    };
   }
 
   // Note that the returned amount is in units of the token specified in the

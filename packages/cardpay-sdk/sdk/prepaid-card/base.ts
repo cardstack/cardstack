@@ -692,7 +692,7 @@ export default class PrepaidCard {
         if (prepaidCards.find((p) => p.address === prepaidCardAddress)) {
           continue;
         }
-        let prepaidCard = await safes.viewSafe(prepaidCardAddress);
+        let prepaidCard = (await safes.viewSafe(prepaidCardAddress)).result;
         if (prepaidCard?.type === 'prepaid-card') {
           prepaidCards.push(prepaidCard);
         }

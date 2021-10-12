@@ -244,13 +244,13 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   async viewSafe(address: string): Promise<Safe | undefined> {
-    return await this.#safesApi.viewSafe(address);
+    return (await this.#safesApi.viewSafe(address)).result;
   }
 
   @task *viewSafesTask(
     account: string = this.walletInfo.firstAddress!
   ): TaskGenerator<Safe[]> {
-    return yield this.#safesApi.view(account);
+    return (yield this.#safesApi.view(account)).result;
   }
 
   depotBalances = useTask(this, taskFor(this.fetchSafeBalancesTask), () => [
