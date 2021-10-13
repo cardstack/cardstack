@@ -2,7 +2,7 @@ import logger from '@cardstack/logger';
 import { Event } from '../bot';
 import config from '../config.json';
 
-const log = logger('events:message');
+const log = logger('events:guild-message');
 const prefix = config.prefix || '!';
 
 export const name: Event['name'] = 'message';

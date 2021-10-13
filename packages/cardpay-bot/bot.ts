@@ -3,18 +3,21 @@ import glob from 'glob-promise';
 import dotenv from 'dotenv';
 import logger from '@cardstack/logger';
 
-export interface RunFunction {
+export interface CommandCallback {
+  (client: Bot, message: Message, args?: string[]): Promise<void>;
+}
+export interface EventCallback {
   (client: Bot, message?: Message, args?: string[]): Promise<void>;
 }
 export interface Command {
   name: string;
-  run: RunFunction;
+  run: CommandCallback;
   aliases: string[];
   description: string;
 }
 export interface Event {
   name: string;
-  run: RunFunction;
+  run: EventCallback;
 }
 
 dotenv.config();
