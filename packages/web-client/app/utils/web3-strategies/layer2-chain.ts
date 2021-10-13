@@ -43,13 +43,14 @@ import {
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
-import { all, TaskGenerator } from 'ember-concurrency';
+import { TaskGenerator } from 'ember-concurrency';
 import { action } from '@ember/object';
 import { TypedChannel } from '../typed-channel';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
-import { useResource, useTask } from 'ember-resources';
+import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { IAssets } from '../../../../cardpay-sdk/sdk/assets';
+import PrepaidCard from '@cardstack/cardpay-sdk/sdk/prepaid-card/base';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -76,18 +77,14 @@ export default abstract class Layer2ChainWeb3Strategy
   #assetsApi!: IAssets;
   #safesApi!: ISafes;
   #hubAuthApi!: IHubAuth;
+  #prepaidCardApi!: PrepaidCard;
   #broadcastChannel: TypedChannel<Layer2ConnectEvent>;
   @tracked walletInfo: WalletInfo;
   @tracked walletConnectUri: string | undefined;
   @tracked waitForAccountDeferred = defer();
   @tracked isInitializing = true;
-  @tracked safesAndBalancesRefreshRequestedAt = new Date();
 
   @reads('provider.connector') connector!: IConnector;
-  @reads('depotBalances.value.defaultTokenBalance') defaultTokenBalance:
-    | BN
-    | undefined;
-  @reads('depotBalances.value.cardBalance') cardBalance: BN | undefined;
   @reads('safes.depot') declare depotSafe: DepotSafe | null;
 
   constructor(networkSymbol: Layer2NetworkSymbol) {
@@ -167,6 +164,7 @@ export default abstract class Layer2ChainWeb3Strategy
         this.#layerTwoOracleApi = await getSDK('LayerTwoOracle', this.web3);
         this.#safesApi = await getSDK('Safes', this.web3);
         this.#assetsApi = await getSDK('Assets', this.web3);
+        this.#prepaidCardApi = await getSDK('PrepaidCard', this.web3);
         this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
         await this.updateWalletInfo(accounts);
         this.#broadcastChannel.postMessage({
@@ -235,55 +233,79 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   async refreshSafesAndBalances() {
-    this.safesAndBalancesRefreshRequestedAt = new Date();
-    await taskFor(this.viewSafesTask).perform();
-    if (this.depotSafe && !taskFor(this.fetchSafeBalancesTask).last) {
-      await this.depotBalances.value;
+    await this.safes.fetch();
+    await this.safes.updateDepot();
+  }
+
+  async fetchSafesForAccount(account: string = this.walletInfo.firstAddress!) {
+    return await this.#safesApi.view(account);
+  }
+
+  private async updateSafeWithLatestValues(safe: Safe) {
+    if (safe.type === 'prepaid-card') {
+      return await this.updatePrepaidCardWithLatestValues(safe);
+    } else if (safe.type === 'depot') {
+      return await this.updateDepotWithLatestValues(safe);
+    } else if (safe.type === 'merchant') {
+      return await this.updateMerchantWithLatestValues(safe);
+    } else {
+      return safe;
     }
-    await taskFor(this.fetchSafeBalancesTask).last;
   }
 
-  async viewSafe(address: string): Promise<Safe | undefined> {
-    return (await this.#safesApi.viewSafe(address)).result;
+  private async updatePrepaidCardWithLatestValues(
+    safe: PrepaidCardSafe
+  ): Promise<PrepaidCardSafe> {
+    let latestFaceValue = await this.#prepaidCardApi.faceValue(safe.address);
+    safe.spendFaceValue = latestFaceValue;
+    return safe;
   }
 
-  @task *viewSafesTask(
-    account: string = this.walletInfo.firstAddress!
-  ): TaskGenerator<Safe[]> {
-    return (yield this.#safesApi.view(account)).result;
-  }
-
-  depotBalances = useTask(this, taskFor(this.fetchSafeBalancesTask), () => [
-    this.depotSafe as Safe | null,
-    this.safesAndBalancesRefreshRequestedAt,
-  ]);
-
-  @task
-  *fetchSafeBalancesTask(
-    safe: Safe | null,
-    _safesAndBalancesRrefreshRequestedAt: Date
-  ): TaskGenerator<any> {
-    if (!safe) {
-      return {
-        defaultTokenBalance: new BN('0'),
-        cardBalance: new BN('0'),
-      };
-    }
+  private async updateSafeDaiAndCardBalances<T extends Safe>(
+    safe: T
+  ): Promise<T> {
     let defaultTokenAddress = this.defaultTokenContractAddress;
     let cardTokenAddress = this.getTokenContractInfo(
       'CARD',
       this.networkSymbol
     )!.address;
 
-    let [defaultBalance, cardBalance] = yield all([
+    let [defaultBalance, cardBalance] = await Promise.all([
       this.#assetsApi.getBalanceForToken(defaultTokenAddress!, safe.address),
       this.#assetsApi.getBalanceForToken(cardTokenAddress, safe.address),
     ]);
 
-    return {
-      defaultTokenBalance: new BN(defaultBalance ?? '0'),
-      cardBalance: new BN(cardBalance ?? '0'),
-    };
+    safe.tokens.forEach((token) => {
+      if (token.token.symbol === 'DAI') {
+        token.balance = defaultBalance;
+      } else if (token.token.symbol === 'CARD') {
+        token.balance = cardBalance;
+      }
+    });
+
+    return safe;
+  }
+
+  private async updateMerchantWithLatestValues(
+    safe: MerchantSafe
+  ): Promise<MerchantSafe> {
+    return this.updateSafeDaiAndCardBalances(safe);
+  }
+
+  private async updateDepotWithLatestValues(safe: DepotSafe) {
+    return this.updateSafeDaiAndCardBalances(safe);
+  }
+
+  async getLatestSafe(address: string): Promise<Safe> {
+    let safe = (await this.#safesApi.viewSafe(address))?.result;
+    if (!safe) throw new Error(`Could not find safe at: ${address}`);
+    return await this.updateSafeWithLatestValues(safe);
+  }
+
+  @task *viewSafesTask(
+    account: string = this.walletInfo.firstAddress!
+  ): TaskGenerator<{ result: Safe[]; blockNumber: number }> {
+    return yield this.#safesApi.view(account);
   }
 
   async issuePrepaidCard(
@@ -311,6 +333,7 @@ export default abstract class Layer2ChainWeb3Strategy
   ): Promise<PrepaidCardSafe> {
     const PrepaidCard = await getSDK('PrepaidCard', this.web3);
     let result = await PrepaidCard.create(txnHash);
+
     return result.prepaidCards[0];
   }
 
@@ -323,25 +346,32 @@ export default abstract class Layer2ChainWeb3Strategy
     prepaidCardAddress: string,
     infoDid: string,
     options: TransactionOptions
-  ): Promise<MerchantSafe> {
+  ) {
     const RevenuePool = await getSDK('RevenuePool', this.web3);
 
-    return (
-      await RevenuePool.registerMerchant(prepaidCardAddress, infoDid, options)
-    ).merchantSafe;
+    let { merchantSafe } = await RevenuePool.registerMerchant(
+      prepaidCardAddress,
+      infoDid,
+      options
+    );
+
+    return merchantSafe;
   }
 
   async resumeRegisterMerchantTransaction(
     txnHash: string
   ): Promise<MerchantSafe> {
     const RevenuePool = await getSDK('RevenuePool', this.web3);
-    return (await RevenuePool.registerMerchant(txnHash)).merchantSafe;
+    let { merchantSafe } = await RevenuePool.registerMerchant(txnHash);
+
+    return merchantSafe;
   }
 
   // unlike layer 1 with metamask, there is no necessity for cross-tab communication
   // about disconnecting. WalletConnect's disconnect event tells all tabs that you are disconnected
   onDisconnect() {
     this.clearWalletInfo();
+    this.safes.clear();
     this.walletConnectUri = undefined;
 
     this.simpleEmitter.emit('disconnect');
@@ -358,6 +388,19 @@ export default abstract class Layer2ChainWeb3Strategy
 
   get isConnected(): boolean {
     return this.walletInfo.accounts.length > 0;
+  }
+  get defaultTokenBalance() {
+    return new BN(
+      this.safes.depot?.tokens.find((v) => v.token.symbol === 'DAI')?.balance ??
+        0
+    );
+  }
+
+  get cardBalance() {
+    return new BN(
+      this.safes.depot?.tokens.find((v) => v.token.symbol === 'CARD')
+        ?.balance ?? 0
+    );
   }
 
   async updateUsdConverters(

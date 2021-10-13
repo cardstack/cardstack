@@ -10,8 +10,13 @@ export default class CardPayIssuePrepaidCardWorkflowConfirmationComponent extend
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
     next(this, () => {
-      this.layer2Network.refreshSafesAndBalances();
       this.args.onComplete?.();
     });
+  }
+
+  get prepaidCardSafe() {
+    return this.layer2Network.safes.getByAddress(
+      this.args.workflowSession.getValue('prepaidCardAddress')!
+    );
   }
 }

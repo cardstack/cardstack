@@ -201,21 +201,22 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return await this.test__simulateConvertFromSpend(symbol, amount);
   }
 
-  async viewSafe(address: string): Promise<Safe | undefined> {
-    return Promise.resolve(
-      [...this.accountSafes.values()]
-        .flat()
-        .find((safe) => safe.address === address)
-    );
+  async getLatestSafe(address: string): Promise<Safe> {
+    return [...this.accountSafes.values()]
+      .flat()
+      .find((safe) => safe.address === address)!;
   }
 
   test__autoResolveViewSafes = true;
 
   @task *viewSafesTask(
     account: string = this.walletInfo.firstAddress!
-  ): TaskGenerator<Safe[]> {
+  ): TaskGenerator<{ result: Safe[]; blockNumber: number }> {
     if (this.test__autoResolveViewSafes) {
-      return yield Promise.resolve(this.accountSafes.get(account)!);
+      return {
+        result: this.accountSafes.get(account)!,
+        blockNumber: 0,
+      };
     }
     this.test__deferredViewSafes = defer();
     return yield this.test__deferredViewSafes.promise;
@@ -224,7 +225,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   async test__simulateViewSafes(
     safes = this.accountSafes.get(this.walletInfo.firstAddress!)!
   ) {
-    this.test__deferredViewSafes.resolve(safes);
+    this.test__deferredViewSafes.resolve({
+      result: safes,
+      blockNumber: 0,
+    });
   }
 
   async test__simulateAccountSafes(account: string, safes: Safe[]) {
@@ -329,7 +333,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   test__simulatedExchangeRate: number = 0.2;
   test__updateUsdConvertersDeferred: RSVP.Deferred<void> | undefined;
   test__deferredHubAuthentication!: RSVP.Deferred<string>;
-  test__deferredViewSafes!: RSVP.Deferred<Safe[]>;
+  test__deferredViewSafes!: RSVP.Deferred<{
+    result: Safe[];
+    blockNumber: number;
+  }>;
 
   test__simulateWalletConnectUri() {
     this.walletConnectUri = 'This is a test of Layer2 Wallet Connect';

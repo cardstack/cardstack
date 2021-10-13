@@ -16,7 +16,7 @@ import {
 import Layer2TestWeb3Strategy from '../utils/web3-strategies/test-layer2';
 import XDaiWeb3Strategy from '../utils/web3-strategies/x-dai';
 import SokolWeb3Strategy from '../utils/web3-strategies/sokol';
-import { or, reads } from 'macro-decorators';
+import { reads } from 'macro-decorators';
 import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
 import { DepotSafe, Safe } from '@cardstack/cardpay-sdk/sdk/safes';
@@ -58,7 +58,7 @@ export default class Layer2Network
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
   @reads('strategy.depotSafe') depotSafe: DepotSafe | undefined;
-  @or('strategy.safes.isLoading', 'strategy.depotBalances.isRunning')
+  @reads('strategy.safes.isLoading')
   declare isFetchingDepot: boolean;
 
   bridgedSymbolToWithdrawalLimits: Map<BridgedTokenSymbol, WithdrawalLimits> =
@@ -128,10 +128,6 @@ export default class Layer2Network
     return txnHash ? this.strategy.bridgeExplorerUrl(txnHash) : undefined;
   }
 
-  @task *viewSafeTask(address: string): TaskGenerator<Safe> {
-    return yield this.strategy.viewSafe(address);
-  }
-
   @task *issuePrepaidCardTask(
     faceValue: number,
     customizationDid: string,
@@ -144,8 +140,8 @@ export default class Layer2Network
       options
     );
 
-    // Refreshes safes so that external component shows up-to-date list of the user's prepaid cards
-    this.refreshSafesAndBalances();
+    yield this.safes.updateOne(prepaidCardSafe.address);
+    yield this.safes.updateDepot();
 
     return prepaidCardSafe;
   }
@@ -156,8 +152,10 @@ export default class Layer2Network
     let prepaidCardSafe = yield this.strategy.resumeIssuePrepaidCardTransaction(
       txnHash
     );
-    // Refreshes safes so that external component shows up-to-date list of the user's prepaid cards
-    this.refreshSafesAndBalances();
+
+    yield this.safes.updateOne(prepaidCardSafe.address);
+    yield this.safes.updateDepot();
+
     return prepaidCardSafe;
   }
 
@@ -176,21 +174,24 @@ export default class Layer2Network
       options
     );
 
-    // Ensure prepaid card balance is updated
-    yield this.refreshSafesAndBalances();
+    yield this.safes.updateOne(prepaidCardAddress);
+    yield this.safes.updateOne(merchant.address);
 
     return merchant;
   }
 
   @task *resumeRegisterMerchantTransactionTask(
+    prepaidCardAddress: string,
     txnHash: string
   ): TaskGenerator<MerchantSafe> {
-    let merchantSafe = yield this.strategy.resumeRegisterMerchantTransaction(
+    let merchant = yield this.strategy.resumeRegisterMerchantTransaction(
       txnHash
     );
-    // Refreshes safes so that external component shows up-to-date list of user's safes
-    this.refreshSafesAndBalances();
-    return merchantSafe;
+
+    yield this.safes.updateOne(prepaidCardAddress);
+    yield this.safes.updateOne(merchant.address);
+
+    return merchant;
   }
 
   disconnect() {

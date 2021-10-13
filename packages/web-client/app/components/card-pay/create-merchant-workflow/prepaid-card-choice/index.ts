@@ -50,7 +50,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   @tracked chinInProgressMessage?: string;
   @tracked txnHash?: TransactionHash;
   @tracked createTaskRunningForAWhile = false;
-  @tracked selectedPrepaidCard!: PrepaidCardSafe;
+  @tracked selectedPrepaidCardAddress: string = '';
 
   lastNonce?: string;
 
@@ -62,21 +62,21 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
     let { workflowSession } = this.args;
 
     let txnHash = workflowSession.getValue<TransactionHash>('txnHash');
-    let prepaidCardChoice =
-      workflowSession.getValue<PrepaidCardSafe>('prepaidCardChoice');
+    let prepaidCardAddress =
+      workflowSession.getValue<string>('prepaidCardAddress');
 
     if (txnHash) {
       this.txnHash = txnHash;
     }
 
-    if (prepaidCardChoice) {
-      this.selectedPrepaidCard = prepaidCardChoice;
+    if (prepaidCardAddress) {
+      this.selectedPrepaidCardAddress = prepaidCardAddress;
     } else {
       let availableCards = this.prepaidCards.filter(
         (c) => c.spendFaceValue >= this.merchantRegistrationFee
       );
       if (availableCards.length === 1) {
-        this.selectedPrepaidCard = availableCards[0];
+        this.selectedPrepaidCardAddress = availableCards[0].address;
       }
     }
   }
@@ -121,7 +121,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
   }
 
   @action choosePrepaidCard(option: DropdownOption) {
-    this.selectedPrepaidCard = option.card;
+    this.selectedPrepaidCardAddress = option.card.address;
   }
 
   @action createMerchant() {
@@ -141,8 +141,11 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
       this.chinInProgressMessage =
         'You will receive a confirmation request from the Card Wallet app in a few moments…';
 
-      if (!workflowSession.getValue('prepaidCardChoice')) {
-        workflowSession.setValue('prepaidCardChoice', this.selectedPrepaidCard);
+      if (!workflowSession.getValue('prepaidCardAddress')) {
+        workflowSession.setValue(
+          'prepaidCardAddress',
+          this.selectedPrepaidCardAddress
+        );
       }
 
       if (!workflowSession.getValue('merchantInfo')) {
@@ -167,7 +170,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
 
         const merchantSafe: MerchantSafe = yield taskFor(
           this.layer2Network.resumeRegisterMerchantTransactionTask
-        ).perform(txnHash);
+        ).perform(this.selectedPrepaidCardAddress, txnHash);
 
         workflowSession.setValue('merchantSafe', merchantSafe);
       } else {
@@ -190,7 +193,7 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
         let registerMerchantTaskInstance = taskFor(
           this.layer2Network.registerMerchantTask
         ).perform(
-          this.selectedPrepaidCard.address,
+          this.selectedPrepaidCardAddress,
           workflowSession.getValue<Record<string, string>>('merchantInfo')!.did,
           options
         );
@@ -236,6 +239,12 @@ export default class CardPayCreateMerchantWorkflowPrepaidCardChoiceComponent ext
     yield rawTimeout(A_WHILE);
     this.createTaskRunningForAWhile = true;
     yield waitForProperty(this, 'createTaskRunningForAWhile', false);
+  }
+
+  get selectedPrepaidCard() {
+    return this.layer2Network.safes.getByAddress(
+      this.selectedPrepaidCardAddress
+    );
   }
 
   get enableCancelation() {
