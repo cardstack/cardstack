@@ -51,7 +51,7 @@ module(
           owners: [eoaAddress],
         }),
       ]);
-      layer2Service.test__simulateAccountsChanged([eoaAddress]);
+      await layer2Service.test__simulateAccountsChanged([eoaAddress]);
       layer2Service.bridgeToLayer1('0xsource', '0xdestination', 'DAI', '20');
     });
 

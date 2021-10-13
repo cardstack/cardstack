@@ -56,7 +56,7 @@ module('Acceptance | card balances', function (hooks) {
       }),
     ]);
 
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     this.server.create('prepaid-card-customization', customization);
 
@@ -95,7 +95,7 @@ module('Acceptance | card balances', function (hooks) {
       }),
     ]);
 
-    layer2Service.test__simulateAccountsChanged([secondAddress]);
+    await layer2Service.test__simulateAccountsChanged([secondAddress]);
 
     await settled();
 

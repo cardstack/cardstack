@@ -44,7 +44,7 @@ module(
         layer2AccountAddress,
         [testDepot]
       );
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
       session.setValue('withdrawalSafe', depotAddress);
       session.setValue('withdrawalToken', 'DAI.CPXD');
       session.setValue('withdrawnAmount', new BN('123456000000000000000'));

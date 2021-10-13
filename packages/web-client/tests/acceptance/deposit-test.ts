@@ -126,7 +126,7 @@ module('Acceptance | deposit', function (hooks) {
         tokens: [createSafeToken('DAI', '0')],
       }),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     await waitFor(`${postableSel(1, 2)} [data-test-balance-container]`);
     await waitUntil(() => {
@@ -424,7 +424,7 @@ module('Acceptance | deposit', function (hooks) {
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
       () => !document.querySelector('[data-test-wallet-connect-qr-code]')
     );
@@ -458,7 +458,7 @@ module('Acceptance | deposit', function (hooks) {
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
       () => !document.querySelector('[data-test-layer-connect-modal="layer2"]')
     );
@@ -531,7 +531,7 @@ module('Acceptance | deposit', function (hooks) {
         tokens: [createSafeToken('DAI', '142200000000000000')],
       }),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
@@ -615,7 +615,7 @@ module('Acceptance | deposit', function (hooks) {
         tokens: [createSafeToken('DAI', '142200000000000000')],
       }),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
@@ -695,7 +695,7 @@ module('Acceptance | deposit', function (hooks) {
         tokens: [createSafeToken('DAI', '142200000000000000')],
       }),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await layer2Service.safes.fetch();
 
     await visit('/card-pay/token-suppliers');
@@ -781,7 +781,7 @@ module('Acceptance | deposit', function (hooks) {
         tokens: [createSafeToken('DAI', '142200000000000000')],
       }),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     await visit('/card-pay/token-suppliers');
     await click('[data-test-workflow-button="deposit"]');
@@ -866,7 +866,7 @@ module('Acceptance | deposit', function (hooks) {
         tokens: [createSafeToken('DAI', '142200000000000000')],
       }),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     await visit('/card-pay/token-suppliers');
     await click('[data-test-workflow-button="deposit"]');
@@ -956,7 +956,7 @@ module('Acceptance | deposit', function (hooks) {
         tokens: [createSafeToken('DAI', '142200000000000000')],
       }),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     await visit('/card-pay/token-suppliers');
     await click('[data-test-workflow-button="deposit"]');
@@ -996,7 +996,9 @@ module('Acceptance | deposit', function (hooks) {
       .dom(`${postableSel(0, 4)} [data-test-mainnet-disconnect-button]`)
       .containsText('Disconnect Wallet');
 
-    layer2Service.test__simulateAccountsChanged([secondLayer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([
+      secondLayer2AccountAddress,
+    ]);
     await settled();
 
     // test that all cta buttons are disabled

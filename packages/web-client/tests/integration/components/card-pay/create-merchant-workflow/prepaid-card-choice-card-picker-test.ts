@@ -40,7 +40,7 @@ module(
         }),
       ]);
 
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
       let workflowSession = new WorkflowSession();
       workflowSession.setValue({

@@ -102,7 +102,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     layer2Service = this.owner.lookup('service:layer2-network').strategy;
 
     layer2Service.test__autoResolveViewSafes = false;
-    layer2Service.test__simulateAccountsChanged(['address']);
+    await layer2Service.test__simulateAccountsChanged(['address']);
 
     await render(hbs`
       <CardPay::LayerTwoConnectCard @workflowSession={{this.session}} />
@@ -115,7 +115,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     layer2Service = this.owner.lookup('service:layer2-network').strategy;
 
     layer2Service.test__autoResolveViewSafes = false;
-    layer2Service.test__simulateAccountsChanged(['address-connected']);
+    await layer2Service.test__simulateAccountsChanged(['address-connected']);
 
     await render(hbs`
       <CardPay::LayerTwoConnectCard @workflowSession={{this.session}} />

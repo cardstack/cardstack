@@ -61,7 +61,7 @@ module('Acceptance | persistence view and restore', function () {
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         testDepot,
       ]);
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
       let merchantRegistrationFee = await this.owner
         .lookup('service:layer2-network')
@@ -526,7 +526,9 @@ module('Acceptance | persistence view and restore', function () {
 
         let layer2Service = this.owner.lookup('service:layer2-network')
           .strategy as Layer2TestWeb3Strategy;
-        layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+        await layer2Service.test__simulateAccountsChanged([
+          layer2AccountAddress,
+        ]);
 
         let merchantRegistrationFee = await this.owner
           .lookup('service:layer2-network')

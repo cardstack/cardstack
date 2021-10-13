@@ -127,7 +127,7 @@ module('Acceptance | create merchant', function (hooks) {
         merchantRegistrationFee
       ),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
       () => !document.querySelector('[data-test-wallet-connect-qr-code]')
     );
@@ -265,7 +265,7 @@ module('Acceptance | create merchant', function (hooks) {
           merchantRegistrationFee
         ),
       ]);
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     });
 
     test('initiating workflow with layer 2 wallet already connected', async function (assert) {
@@ -460,7 +460,9 @@ module('Acceptance | create merchant', function (hooks) {
         .dom(milestoneCompletedSel(0))
         .containsText(`${c.layer2.fullName} wallet connected`);
 
-      layer2Service.test__simulateAccountsChanged([secondLayer2AccountAddress]);
+      await layer2Service.test__simulateAccountsChanged([
+        secondLayer2AccountAddress,
+      ]);
 
       layer2Service.test__simulateRemoteAccountSafes(
         secondLayer2AccountAddress,
@@ -505,9 +507,7 @@ module('Acceptance | create merchant', function (hooks) {
         tokens: [createSafeToken('DAI', '0')],
       }),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-
-    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, []);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     await visit('/card-pay/merchant-services?flow=create-merchant');
     assert
@@ -549,7 +549,7 @@ module('Acceptance | create merchant', function (hooks) {
         merchantRegistrationFee - 1
       ),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     await visit('/card-pay/merchant-services?flow=create-merchant');
     assert

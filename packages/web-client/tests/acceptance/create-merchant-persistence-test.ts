@@ -62,7 +62,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         issuer: layer2AccountAddress,
       }),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.authenticate();
     layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
 

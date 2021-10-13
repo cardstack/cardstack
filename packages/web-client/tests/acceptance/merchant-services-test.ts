@@ -46,7 +46,7 @@ module('Acceptance | merchant services dashboard', function (hooks) {
         '0x212619c6Ea074C053eF3f1e1eF81Ec8De6Eb6F33'
       ),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     this.server.create('merchant-info', {
       id: await getFilenameFromDid(EXAMPLE_DID),

@@ -137,7 +137,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         issuer: layer2AccountAddress,
       }),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
       () => !document.querySelector('[data-test-wallet-connect-qr-code]')
     );
@@ -584,7 +584,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         testDepot,
       ]);
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     });
 
     test('Disconnecting Layer 2 from within the workflow', async function (assert) {
@@ -743,7 +743,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
         .dom(milestoneCompletedSel(0))
         .containsText(`${c.layer2.fullName} wallet connected`);
 
-      layer2Service.test__simulateAccountsChanged([secondLayer2AccountAddress]);
+      await layer2Service.test__simulateAccountsChanged([
+        secondLayer2AccountAddress,
+      ]);
 
       await settled();
 

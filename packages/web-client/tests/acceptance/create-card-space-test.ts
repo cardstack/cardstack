@@ -67,7 +67,7 @@ module('Acceptance | create card space', function (hooks) {
       }),
     ]);
 
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     await settled();
     assert
@@ -174,7 +174,7 @@ module('Acceptance | create card space', function (hooks) {
           tokens: [createSafeToken('DAI', '0')],
         }),
       ]);
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     });
 
     test('initiating workflow with L2 wallet already connected', async function (assert) {
@@ -285,7 +285,7 @@ module('Acceptance | create card space', function (hooks) {
         .dom(milestoneCompletedSel(0))
         .containsText(`${c.layer2.fullName} wallet connected`);
 
-      layer2Service.test__simulateAccountsChanged([differentL2Address]);
+      await layer2Service.test__simulateAccountsChanged([differentL2Address]);
       await settled();
 
       assert

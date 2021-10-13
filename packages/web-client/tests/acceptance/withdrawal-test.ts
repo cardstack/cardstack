@@ -145,7 +145,7 @@ module('Acceptance | withdrawal', function (hooks) {
         ],
       }),
     ]);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     await waitFor(`${postableSel(2, 2)} [data-test-balance="DAI.CPXD"]`);
     assert
@@ -537,7 +537,7 @@ module('Acceptance | withdrawal', function (hooks) {
           tokens: [createSafeToken('DAI', '0')],
         }),
       ]);
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     });
 
     test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
@@ -639,7 +639,9 @@ module('Acceptance | withdrawal', function (hooks) {
         .dom(milestoneCompletedSel(2))
         .containsText(`${c.layer2.fullName} wallet connected`);
 
-      layer2Service.test__simulateAccountsChanged([secondLayer2AccountAddress]);
+      await layer2Service.test__simulateAccountsChanged([
+        secondLayer2AccountAddress,
+      ]);
       await settled();
 
       // test that all cta buttons are disabled
