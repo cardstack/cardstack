@@ -1,7 +1,7 @@
 import Router from '@koa/router';
 import Koa from 'koa';
-import { inject } from '../di/dependency-injection';
-import DatabaseManager from './database-manager';
+import { inject } from '@cardstack/di';
+import DatabaseManager from '@cardstack/db';
 
 export default class HealthCheck {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
@@ -18,7 +18,7 @@ export default class HealthCheck {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'health-check': HealthCheck;
   }

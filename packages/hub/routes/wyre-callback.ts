@@ -2,8 +2,8 @@ import Koa from 'koa';
 import config from 'config';
 import autoBind from 'auto-bind';
 import Logger from '@cardstack/logger';
-import DatabaseManager from '../services/database-manager';
-import { inject } from '../di/dependency-injection';
+import DatabaseManager from '@cardstack/db';
+import { inject } from '@cardstack/di';
 import WyreService, { WyreOrder, WyreTransfer, WyreWallet } from '../services/wyre';
 import Web3 from 'web3';
 import { nextOrderStatus, OrderStatus, OrderState, provisionPrepaidCard, updateOrderStatus } from './utils/orders';
@@ -379,7 +379,7 @@ function assertWyreCallbackRequest(request: any): asserts request is WyreCallbac
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'wyre-callback-route': WyreCallbackRoute;
   }

@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import DatabaseManager from '../services/database-manager';
-import { inject } from '../di/dependency-injection';
+import DatabaseManager from '@cardstack/db';
+import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
 import { AuthenticationUtils } from '../utils/authentication';
 import MerchantInfoSerializer from '../services/serializers/merchant-info-serializer';
@@ -112,7 +112,7 @@ export default class MerchantInfosRoute {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'merchant-infos-route': MerchantInfosRoute;
   }

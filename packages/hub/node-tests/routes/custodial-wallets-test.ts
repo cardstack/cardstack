@@ -1,6 +1,6 @@
 import supertest, { Test } from 'supertest';
 import { HubServer } from '../../main';
-import { Registry } from '../../di/dependency-injection';
+import { Registry } from '@cardstack/di';
 import Web3 from 'web3';
 
 const { toChecksumAddress } = Web3.utils;

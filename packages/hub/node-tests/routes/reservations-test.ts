@@ -1,7 +1,7 @@
 import { Client as DBClient } from 'pg';
 import supertest, { Test } from 'supertest';
 import { HubServer } from '../../main';
-import { Registry } from '../../di/dependency-injection';
+import { Registry } from '@cardstack/di';
 import { InventorySubgraph } from '../../services/subgraph';
 import { makeInventoryData } from '../helpers';
 import Web3 from 'web3';

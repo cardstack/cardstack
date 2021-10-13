@@ -57,7 +57,7 @@ export default class RelayService {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     relay: RelayService;
   }

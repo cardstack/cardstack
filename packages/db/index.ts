@@ -27,7 +27,7 @@ export default class DatabaseManager {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'database-manager': DatabaseManager;
   }

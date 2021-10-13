@@ -1,5 +1,5 @@
-import DatabaseManager from '../database-manager';
-import { inject } from '../../di/dependency-injection';
+import DatabaseManager from '@cardstack/db';
+import { inject } from '@cardstack/di';
 import { MerchantInfo } from '../../routes/merchant-infos';
 
 interface MerchantInfoQueriesFilter {
@@ -53,7 +53,7 @@ export default class MerchantInfoQueries {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'merchant-info-queries': MerchantInfoQueries;
   }

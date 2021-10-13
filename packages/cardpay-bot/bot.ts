@@ -1,7 +1,8 @@
 import { Client, Message } from 'discord.js';
 import glob from 'glob-promise';
-import dotenv from 'dotenv';
-import logger from '@cardstack/logger';
+import config from 'config';
+import DatabaseManager from '@cardstack/db';
+import { inject } from '@cardstack/di';
 
 export interface CommandCallback {
   (client: Bot, message: Message, args?: string[]): Promise<void>;
@@ -19,11 +20,15 @@ export interface Event {
   name: string;
   run: EventCallback;
 }
+interface DiscordConfig {
+  botToken: string;
+}
 
-dotenv.config();
-const log = logger('bot');
+const { botToken } = config.get('discord') as DiscordConfig;
+
 export class Bot extends Client {
-  public commands = new Map<string, Command>();
+  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
+  commands = new Map<string, Command>();
 
   async start(): Promise<void> {
     const commandFiles: string[] = await glob(`${__dirname}/commands/**/*.js`);
@@ -53,11 +58,6 @@ export class Bot extends Client {
       })
     );
 
-    await this.login(process.env.CARDPAY_BOT_TOKEN);
+    await this.login(botToken);
   }
 }
-
-(async () => {
-  const bot = new Bot();
-  await bot.start();
-})().catch((e) => log.error('Uncaught error', e));

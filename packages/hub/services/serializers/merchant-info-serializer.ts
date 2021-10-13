@@ -1,6 +1,6 @@
 import { encodeDID } from '@cardstack/did-resolver';
-import { inject } from '../../di/dependency-injection';
-import DatabaseManager from '../database-manager';
+import { inject } from '@cardstack/di';
+import DatabaseManager from '@cardstack/db';
 import { MerchantInfo } from '../../routes/merchant-infos';
 
 interface JSONAPIDocument {
@@ -33,7 +33,7 @@ export default class MerchantInfoSerializer {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'merchant-info-serializer': MerchantInfoSerializer;
   }

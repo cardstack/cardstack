@@ -607,6 +607,37 @@ CREATE TABLE graphile_worker.migrations (
 ALTER TABLE graphile_worker.migrations OWNER TO postgres;
 
 --
+-- Name: beta_testers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.beta_testers (
+    user_id text NOT NULL,
+    eoa text,
+    airdrop_txn_hash text,
+    airdrop_prepaid_card text,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.beta_testers OWNER TO postgres;
+
+--
+-- Name: discord_dm_channels; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.discord_dm_channels (
+    channel_id text NOT NULL,
+    user_id text NOT NULL,
+    conversation_active boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.discord_dm_channels OWNER TO postgres;
+
+--
 -- Name: merchant_infos; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -789,6 +820,22 @@ ALTER TABLE ONLY graphile_worker.known_crontabs
 
 ALTER TABLE ONLY graphile_worker.migrations
     ADD CONSTRAINT migrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: beta_testers beta_testers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.beta_testers
+    ADD CONSTRAINT beta_testers_pkey PRIMARY KEY (user_id);
+
+
+--
+-- Name: discord_dm_channels discord_dm_channels_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.discord_dm_channels
+    ADD CONSTRAINT discord_dm_channels_pkey PRIMARY KEY (channel_id);
 
 
 --
@@ -1037,6 +1084,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 37	20210817184105100_wallet-orders	2021-09-22 15:36:07.656094
 40	20210920142313915_prepaid-card-reservations	2021-09-23 18:41:06.778934
 41	20210924200122612_order-indicies	2021-09-24 16:22:28.855939
+42	20211013173917696_beta-testers	2021-10-13 13:56:56.974806
 \.
 
 
@@ -1044,7 +1092,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 41, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 42, true);
 
 
 --

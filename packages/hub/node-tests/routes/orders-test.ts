@@ -1,7 +1,7 @@
 import { Client as DBClient } from 'pg';
 import supertest, { Test } from 'supertest';
 import { HubServer } from '../../main';
-import { Registry } from '../../di/dependency-injection';
+import { Registry } from '@cardstack/di';
 import { InventorySubgraph } from '../../services/subgraph';
 import { v4 as uuidv4 } from 'uuid';
 import { WyreWallet } from '../../services/wyre';

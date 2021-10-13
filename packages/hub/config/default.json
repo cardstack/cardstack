@@ -22,6 +22,9 @@
     "migration-filename-format": "utc",
     "ignore-pattern": "README.md|.*\\.ts|.*\\.js\\.map"
   },
+  "discord": {
+    "botToken": null
+  },
   "serverSecret": null,
   "sentry": {
     "dsn": null,

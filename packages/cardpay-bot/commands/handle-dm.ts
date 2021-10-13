@@ -1,7 +1,7 @@
 import { Command } from '../bot';
-import logger from '@cardstack/logger';
+// import logger from '@cardstack/logger';
 
-const log = logger('commands:handle-dm');
+// const log = logger('commands:handle-dm');
 
 export const name: Command['name'] = 'handle-dm';
 export const description: Command['description'] = 'Hand cardpay bot DMs';

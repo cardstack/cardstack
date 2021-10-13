@@ -6,12 +6,13 @@ import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
+import Bot from '@cardstack/cardpay-bot';
 import config from 'config';
 import packageJson from './package.json';
-import { Registry, Container, RegistryCallback } from './di/dependency-injection';
+import { Registry, Container, RegistryCallback } from '@cardstack/di';
 
+import DatabaseManager from '@cardstack/db';
 import AuthenticationMiddleware from './services/authentication-middleware';
-import DatabaseManager from './services/database-manager';
 import DevelopmentConfig from './services/development-config';
 import DevelopmentProxyMiddleware from './services/development-proxy-middleware';
 import WyreService from './services/wyre';
@@ -55,6 +56,7 @@ import ExchangeRatesService from './services/exchange-rates';
 global.fetch = fetch;
 
 const workerLog = logger('hub/worker');
+const botLog = logger('hub/bot');
 
 export interface ServerConfig {
   port?: number;
@@ -242,4 +244,20 @@ export async function bootWorker() {
   });
 
   await runner.promise;
+}
+
+export async function bootBot() {
+  botLog.info('Booting bot');
+  initSentry();
+
+  let container = wireItUp();
+  try {
+    let bot = await container.instantiate(Bot);
+    await bot.start();
+  } catch (e) {
+    botLog.error('Unexpected error', e);
+    Sentry.withScope(function () {
+      Sentry.captureException(e);
+    });
+  }
 }

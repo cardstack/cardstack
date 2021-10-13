@@ -1,6 +1,6 @@
 import { Helpers } from 'graphile-worker';
 import MerchantInfoSerializer from '../services/serializers/merchant-info-serializer';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import config from 'config';
 import shortUuid from 'short-uuid';
 import MerchantInfoQueries from '../services/queries/merchant-info';

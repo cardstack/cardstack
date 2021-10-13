@@ -1,7 +1,7 @@
 import { Client as DBClient } from 'pg';
 import supertest from 'supertest';
 import { HubServer } from '../../main';
-import { Registry } from '../../di/dependency-injection';
+import { Registry } from '@cardstack/di';
 import { WyreOrder, WyreTransfer, WyreWallet } from '../../services/wyre';
 import { adminWalletName } from '../../routes/wyre-callback';
 import { v4 as uuidv4 } from 'uuid';

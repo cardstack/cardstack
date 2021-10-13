@@ -1,9 +1,9 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
 import Logger from '@cardstack/logger';
-import DatabaseManager from '../services/database-manager';
+import DatabaseManager from '@cardstack/db';
 import { ensureLoggedIn } from './utils/auth';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import { AuthenticationUtils } from '../utils/authentication';
 import { validateRequiredFields } from './utils/validation';
 import { nextOrderStatus, provisionPrepaidCard, updateOrderStatus } from './utils/orders';
@@ -221,7 +221,7 @@ function handleNotFound(ctx: Koa.Context) {
   handleError(ctx, 404, 'Order not found', `Order ${ctx.params.order_id} not found`);
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'orders-route': OrdersRoute;
   }

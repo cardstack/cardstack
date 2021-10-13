@@ -1,8 +1,8 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import DatabaseManager from '../services/database-manager';
+import DatabaseManager from '@cardstack/db';
 import { ensureLoggedIn } from './utils/auth';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import { AuthenticationUtils } from '../utils/authentication';
 import { getSKUSummaries } from './utils/inventory';
 import qs from 'qs';
@@ -45,7 +45,7 @@ export default class InventoryRoute {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'inventory-route': InventoryRoute;
   }

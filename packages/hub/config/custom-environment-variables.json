@@ -13,6 +13,9 @@
   "db": {
     "url": "DATABASE_URL"
   },
+  "discord": {
+    "botToken": "CARDPAY_BOT_TOKEN"
+  },
   "sentry": {
     "dsn": "HUB_SENTRY_DSN",
     "environment": "HUB_ENVIRONMENT"

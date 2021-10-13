@@ -18,12 +18,6 @@
       "program": "${workspaceRoot}/packages/hub/bin/hub",
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
-      "env": {
-        "SERVER_SECRET": "",
-        "WYRE_ACCOUNT_ID": "",
-        "WYRE_API_KEY": "",
-        "WYRE_SECRET_KEY": ""
-      },
       "args": ["serve"]
     },
     {
@@ -49,9 +43,10 @@
       "type": "node",
       "request": "launch",
       "name": "Run cardpay bot",
-      "program": "${workspaceRoot}/packages/cardpay-bot/index.js",
-      "cwd": "${workspaceRoot}/packages/cardpay-bot",
+      "program": "${workspaceRoot}/packages/hub/bin/hub",
+      "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
+      "args": ["bot"]
     },
     {
       "type": "node",

@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import WyreService from '../services/wyre';
 import { AuthenticationUtils } from '../utils/authentication';
 import { ensureLoggedIn } from './utils/auth';
@@ -56,7 +56,7 @@ export default class CustodialWalletRoute {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'custodial-wallet-route': CustodialWalletRoute;
   }

@@ -4,7 +4,7 @@ import Koa from 'koa';
 // @ts-ignore
 import mimeMatch from 'mime-match';
 import { CardstackError } from '../utils/error';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import WyreCallbackRoute from '../routes/wyre-callback';
 import { parseBody } from '../middleware';
 
@@ -40,7 +40,7 @@ function notFound(ctx: Koa.Context) {
   ctx.status = 404;
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'callbacks-router': CallbacksRouter;
   }

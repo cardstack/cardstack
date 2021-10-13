@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import ExchangeRatesService from '../services/exchange-rates';
 import config from 'config';
 
@@ -68,7 +68,7 @@ export default class ExchangeRatesRoute {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'exchange-rates-route': ExchangeRatesRoute;
   }

@@ -1,8 +1,8 @@
 import Koa from 'koa';
 // import Logger from '@cardstack/logger';
 import autoBind from 'auto-bind';
-import DatabaseManager from '../services/database-manager';
-import { inject } from '../di/dependency-injection';
+import DatabaseManager from '@cardstack/db';
+import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
 // let log = Logger('route:prepaid-card-customizations');
 import { AuthenticationUtils } from '../utils/authentication';
@@ -111,7 +111,7 @@ function foreignKeyConstraintError(ctx: Koa.Context, constraintName: string) {
   ctx.type = 'application/vnd.api+json';
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'prepaid-card-customizations-route': PrepaidCardCustomizationsRoute;
   }

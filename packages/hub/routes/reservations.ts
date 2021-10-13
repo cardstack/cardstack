@@ -1,8 +1,8 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import DatabaseManager from '../services/database-manager';
+import DatabaseManager from '@cardstack/db';
 import { ensureLoggedIn } from './utils/auth';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import { AuthenticationUtils } from '../utils/authentication';
 import { validateRequiredFields } from './utils/validation';
 import { getSKUSummaries } from './utils/inventory';
@@ -159,7 +159,7 @@ function handleNotFound(ctx: Koa.Context) {
   handleError(ctx, 404, 'Reservation not found', `Could not find the reservation ${ctx.params.reservation_id}`);
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'reservations-route': ReservationsRoute;
   }

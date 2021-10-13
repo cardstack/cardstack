@@ -37,6 +37,14 @@ package-lock.json
 /packages/core/**/*.js
 /packages/core/**/*.js.map
 
+/packages/db/**/*.d.ts
+/packages/db/**/*.js
+/packages/db/**/*.js.map
+
+/packages/di/**/*.d.ts
+/packages/di/**/*.js
+/packages/di/**/*.js.map
+
 /packages/test-support/**/*.d.ts
 /packages/test-support/**/*.js
 /packages/test-support/**/*.js.map

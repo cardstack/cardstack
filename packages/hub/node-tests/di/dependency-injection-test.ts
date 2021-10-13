@@ -1,4 +1,4 @@
-import { Registry, Container, inject, getOwner, injectionReady } from '../../di/dependency-injection';
+import { Registry, Container, inject, getOwner, injectionReady } from '@cardstack/di';
 
 describe('hub/di/dependency-injection', function () {
   let registry: Registry;
@@ -174,7 +174,7 @@ class CircleFiveServiceFactory {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     testExample: ExampleService;
     testConsumer: ConsumingService;

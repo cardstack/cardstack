@@ -1,5 +1,5 @@
 import Koa from 'koa';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import { AuthenticationUtils } from '../utils/authentication';
 import packageJson from '../package.json';
 import autoBind from 'auto-bind';
@@ -38,7 +38,7 @@ export default class BoomRoute {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'boom-route': BoomRoute;
   }

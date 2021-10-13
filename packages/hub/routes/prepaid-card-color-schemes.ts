@@ -1,8 +1,8 @@
 import Koa from 'koa';
 import Logger from '@cardstack/logger';
 import autoBind from 'auto-bind';
-import DatabaseManager from '../services/database-manager';
-import { inject } from '../di/dependency-injection';
+import DatabaseManager from '@cardstack/db';
+import { inject } from '@cardstack/di';
 let log = Logger('route:prepaid-card-color-schemes');
 
 export default class PrepaidCardColorSchemesRoute {
@@ -41,7 +41,7 @@ export default class PrepaidCardColorSchemesRoute {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'prepaid-card-color-schemes-route': PrepaidCardColorSchemesRoute;
   }

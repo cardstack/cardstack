@@ -26,6 +26,8 @@
     "./packages/eslint-config/**/*.ts",
     "./packages/firebase-functions/**/*.ts",
     "./packages/hub/**/*.ts",
+    "./packages/di/**/*.ts",
+    "./packages/db/**/*.ts",
     "./packages/test-support/**/*.ts",
     "./packages/compiler-server/**/*.ts",
     "./packages/core/**/*.ts",
