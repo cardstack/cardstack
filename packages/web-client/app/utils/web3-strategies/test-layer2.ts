@@ -224,12 +224,16 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return yield this.test__deferredViewSafes.promise;
   }
 
-  test__simulateRemoteAccountSafes(account: string, safes: Safe[]) {
+  test__simulateRemoteAccountSafes(account: string, newSafes: Safe[]) {
     if (!this.remoteAccountSafes.has(account)) {
       this.remoteAccountSafes.set(account, []);
     }
-
-    this.remoteAccountSafes.get(account)?.push(...safes);
+    let newRemoteAccountSafes = newSafes
+      .concat(this.remoteAccountSafes.get(account)!)
+      .filter(
+        (v, i, a) => a.findIndex((safe) => safe.address === v.address) === i
+      );
+    this.remoteAccountSafes.set(account, newRemoteAccountSafes);
   }
 
   async issuePrepaidCard(
