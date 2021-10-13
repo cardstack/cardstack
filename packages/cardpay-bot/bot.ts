@@ -28,14 +28,32 @@ const { botToken } = config.get('discord') as DiscordConfig;
 
 export class Bot extends Client {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
-  commands = new Map<string, Command>();
+  guildCommands = new Map<string, Command>();
+  dmCommands = new Map<string, Command>();
 
   async start(): Promise<void> {
-    const commandFiles: string[] = await glob(`${__dirname}/commands/**/*.js`);
-    this.commands = new Map(
+    const guildCommandModules: string[] = await glob(`${__dirname}/guild-commands/**/*.js`);
+    this.guildCommands = new Map(
       await Promise.all(
-        commandFiles.map(async (file) => {
-          const { name, run, aliases = [], description } = (await import(file)) as Command;
+        guildCommandModules.map(async (module) => {
+          const { name, run, aliases = [], description } = (await import(module)) as Command;
+          return [
+            name,
+            {
+              name,
+              run,
+              aliases,
+              description,
+            },
+          ] as [string, Command];
+        })
+      )
+    );
+    const dmCommandModules: string[] = await glob(`${__dirname}/dm-commands/**/*.js`);
+    this.dmCommands = new Map(
+      await Promise.all(
+        dmCommandModules.map(async (module) => {
+          const { name, run, aliases = [], description } = (await import(module)) as Command;
           return [
             name,
             {
@@ -49,11 +67,11 @@ export class Bot extends Client {
       )
     );
 
-    const eventFiles: string[] = await glob(`${__dirname}/events/**/*.js`);
+    const eventModules: string[] = await glob(`${__dirname}/events/**/*.js`);
     const _this = this;
     await Promise.all(
-      eventFiles.map(async (file) => {
-        const { name, run } = (await import(file)) as Event;
+      eventModules.map(async (module) => {
+        const { name, run } = (await import(module)) as Event;
         _this.on(name, run.bind(undefined, _this));
       })
     );

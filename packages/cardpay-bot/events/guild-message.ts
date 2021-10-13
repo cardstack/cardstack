@@ -1,4 +1,5 @@
 import logger from '@cardstack/logger';
+import * as Sentry from '@sentry/node';
 import { Event } from '../bot';
 import config from '../config.json';
 
@@ -20,7 +21,7 @@ export const run: Event['run'] = async (bot, message) => {
   if (!commandName) {
     return;
   }
-  let command = bot.commands.get(commandName);
+  let command = bot.guildCommands.get(commandName);
   if (!command) {
     return;
   }
@@ -30,5 +31,8 @@ export const run: Event['run'] = async (bot, message) => {
     await command.run(bot, message, args);
   } catch (err) {
     log.error(`failed to run command '${commandName}' with args: ${args.join(', ')}`, err);
+    Sentry.withScope(function () {
+      Sentry.captureException(err);
+    });
   }
 };
