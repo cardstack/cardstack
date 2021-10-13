@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import {
-  cardbot,
   Workflow,
   Milestone,
   NetworkAwareWorkflowMessage,
@@ -10,6 +9,8 @@ import {
   WorkflowMessage,
   WorkflowCard,
   UNSUPPORTED_WORKFLOW_STATE_VERSION,
+  conditionalCancelationMessage,
+  defaultCancelationCard,
 } from '@cardstack/web-client/models/workflow';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
@@ -20,7 +21,6 @@ import { capitalize } from '@ember/string';
 import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { tracked } from '@glimmer/tracking';
-import { isPresent } from '@ember/utils';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -54,11 +54,9 @@ class DepositWorkflow extends Workflow {
       title: MILESTONE_TITLES[0],
       postables: [
         new WorkflowMessage({
-          author: cardbot,
           message: 'Hi there, we’re happy to see you!',
         }),
         new WorkflowMessage({
-          author: cardbot,
           message: `In order to make a deposit, you need to connect two wallets:
 
   * **${c.layer1.fullName} wallet:**
@@ -70,13 +68,11 @@ class DepositWorkflow extends Workflow {
 `,
         }),
         new WorkflowMessage({
-          author: cardbot,
           message: `The funds you wish to deposit must be available in your ${c.layer1.conversationalName} wallet, so that you can add
         them to the reserve pool on ${c.layer1.conversationalName}. Once you have made your deposit, an equivalent amount of
         tokens will be minted and added to your ${c.layer2.fullName} wallet.`,
         }),
         new NetworkAwareWorkflowMessage({
-          author: cardbot,
           message: `Looks like you’ve already connected your ${c.layer1.fullName} wallet, which you can see below.
           Please continue with the next step of this workflow.`,
           includeIf() {
@@ -84,7 +80,6 @@ class DepositWorkflow extends Workflow {
           },
         }),
         new WorkflowCard({
-          author: cardbot,
           cardName: 'LAYER1_CONNECT',
           componentName: 'card-pay/layer-one-connect-card',
         }),
@@ -97,7 +92,6 @@ class DepositWorkflow extends Workflow {
       title: MILESTONE_TITLES[1],
       postables: [
         new NetworkAwareWorkflowMessage({
-          author: cardbot,
           message: `Looks like you’ve already connected your ${c.layer2.fullName} wallet, which you can see below.
           Please continue with the next step of this workflow.`,
           includeIf() {
@@ -105,7 +99,6 @@ class DepositWorkflow extends Workflow {
           },
         }),
         new NetworkAwareWorkflowMessage({
-          author: cardbot,
           message: `You have connected your ${c.layer1.fullName} wallet. Now it’s time to connect your ${c.layer2.fullName}
           wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
           includeIf() {
@@ -113,7 +106,6 @@ class DepositWorkflow extends Workflow {
           },
         }),
         new NetworkAwareWorkflowMessage({
-          author: cardbot,
           message: `Once you have installed the app, open the app and add an existing wallet/account or create a
           new wallet/account. Use your account to scan this QR code, which will connect your account
           with Card Pay.`,
@@ -122,7 +114,6 @@ class DepositWorkflow extends Workflow {
           },
         }),
         new WorkflowCard({
-          author: cardbot,
           cardName: 'LAYER2_CONNECT',
           componentName: 'card-pay/layer-two-connect-card',
         }),
@@ -133,21 +124,17 @@ class DepositWorkflow extends Workflow {
       title: MILESTONE_TITLES[2],
       postables: [
         new WorkflowMessage({
-          author: cardbot,
           message:
             'Let’s get down to business. Please choose the asset you would like to deposit into the CARD Protocol’s reserve pool.',
         }),
         new WorkflowCard({
-          author: cardbot,
           cardName: 'TXN_SETUP',
           componentName: 'card-pay/deposit-workflow/transaction-setup',
         }),
         new WorkflowMessage({
-          author: cardbot,
           message: 'How many tokens would you like to deposit?',
         }),
         new WorkflowCard({
-          author: cardbot,
           cardName: 'TXN_AMOUNT',
           componentName: 'card-pay/deposit-workflow/transaction-amount',
         }),
@@ -158,11 +145,9 @@ class DepositWorkflow extends Workflow {
       title: MILESTONE_TITLES[3],
       postables: [
         new WorkflowMessage({
-          author: cardbot,
           message: `Congrats! Now that you have deposited funds into the CARD Protocol’s reserve pool, your token will be bridged to the ${c.layer2.shortName} blockchain. You can check the status below.`,
         }),
         new WorkflowCard({
-          author: cardbot,
           cardName: 'TXN_STATUS',
           componentName: 'card-pay/deposit-workflow/transaction-status',
         }),
@@ -172,113 +157,62 @@ class DepositWorkflow extends Workflow {
   ];
   epilogue = new PostableCollection([
     new WorkflowMessage({
-      author: cardbot,
       message: 'Thank you for your contribution!',
     }),
     new WorkflowCard({
-      author: cardbot,
       cardName: 'EPILOGUE_CONFIRMATION',
       componentName: 'card-pay/deposit-workflow/confirmation',
     }),
     new WorkflowMessage({
-      author: cardbot,
       message: `This is the remaining balance in your ${c.layer1.fullName} wallet:`,
     }),
     new WorkflowCard({
-      author: cardbot,
       cardName: 'EPILOGUE_LAYER1_CONNECT',
       componentName: 'card-pay/layer-one-connect-card',
     }),
     new WorkflowCard({
-      author: cardbot,
       cardName: 'EPILOGUE_NEXT_STEPS',
       componentName: 'card-pay/deposit-workflow/next-steps',
     }),
   ]);
   cancelationMessages = new PostableCollection([
     // cancelation for disconnection
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.DISCONNECTED,
       message:
         'It looks like your wallet(s) got disconnected. If you still want to deposit funds, please start again by connecting your wallet(s).',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
-        );
-      },
     }),
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.ACCOUNT_CHANGED,
       message:
         'It looks like you changed accounts in the middle of this workflow. If you still want to deposit funds, please restart the workflow.',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
-        );
-      },
     }),
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.RESTORATION_L1_ADDRESS_CHANGED,
       message:
         'You attempted to restore an unfinished workflow, but you changed your Layer 1 wallet address. Please restart the workflow.',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason ===
-          FAILURE_REASONS.RESTORATION_L1_ADDRESS_CHANGED
-        );
-      },
     }),
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED,
       message:
         'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason ===
-          FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED
-        );
-      },
     }),
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
       message:
         'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason ===
-          FAILURE_REASONS.RESTORATION_L2_DISCONNECTED
-        );
-      },
     }),
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.RESTORATION_L1_DISCONNECTED,
       message:
         'You attempted to restore an unfinished workflow, but your Layer 1 wallet got disconnected. Please restart the workflow.',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason ===
-          FAILURE_REASONS.RESTORATION_L1_DISCONNECTED
-        );
-      },
     }),
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION,
       message:
         'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason ===
-          FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION
-        );
-      },
     }),
-    new WorkflowCard({
-      author: cardbot,
-      componentName: 'workflow-thread/default-cancelation-cta',
-      includeIf() {
-        return isPresent(this.workflow?.cancelationReason);
-      },
-    }),
+    defaultCancelationCard(),
   ]);
 
   restorationErrors() {

@@ -1,7 +1,6 @@
 import Component from '@glimmer/component';
 import { getOwner } from '@ember/application';
 import {
-  cardbot,
   IWorkflowMessage,
   Milestone,
   NetworkAwareWorkflowCard,
@@ -13,6 +12,8 @@ import {
   WorkflowName,
   WorkflowPostable,
   UNSUPPORTED_WORKFLOW_STATE_VERSION,
+  conditionalCancelationMessage as conditionalCancelationMessage,
+  defaultCancelationCard,
 } from '@cardstack/web-client/models/workflow';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
@@ -32,7 +33,6 @@ import {
 import { task } from 'ember-concurrency-decorators';
 import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
 import { action } from '@ember/object';
-import { isPresent } from '@ember/utils';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -64,7 +64,7 @@ class CheckBalanceWorkflowMessage
   cardName = 'CHECK_BALANCE_MESSAGE';
 
   constructor() {
-    super(cardbot);
+    super();
     taskFor(this.fetchMininumBalanceForWithdrawalClaimTask).perform();
   }
 
@@ -150,11 +150,9 @@ export class WithdrawalWorkflow extends Workflow {
       title: MILESTONE_TITLES[0],
       postables: [
         new WorkflowMessage({
-          author: cardbot,
           message: 'Hi there, it’s good to see you!',
         }),
         new WorkflowMessage({
-          author: cardbot,
           message: `In order to make a withdrawal, you need to connect two wallets:
 
   * **${c.layer1.fullName} wallet:**
@@ -166,7 +164,6 @@ export class WithdrawalWorkflow extends Workflow {
 `,
         }),
         new NetworkAwareWorkflowMessage({
-          author: cardbot,
           message: `Looks like you’ve already connected your ${c.layer1.fullName} wallet, which you can see below.
           Please continue with the next step of this workflow.`,
           includeIf() {
@@ -174,7 +171,6 @@ export class WithdrawalWorkflow extends Workflow {
           },
         }),
         new NetworkAwareWorkflowCard({
-          author: cardbot,
           cardName: 'LAYER1_CONNECT',
           componentName: 'card-pay/layer-one-connect-card',
         }),
@@ -188,7 +184,6 @@ export class WithdrawalWorkflow extends Workflow {
       postables: [
         new CheckBalanceWorkflowMessage(),
         new WorkflowCard({
-          author: cardbot,
           cardName: 'CHECK_BALANCE',
           componentName: 'card-pay/withdrawal-workflow/check-balance',
         }),
@@ -199,7 +194,6 @@ export class WithdrawalWorkflow extends Workflow {
       title: MILESTONE_TITLES[2],
       postables: [
         new NetworkAwareWorkflowMessage({
-          author: cardbot,
           message: `Looks like you’ve already connected your ${c.layer2.fullName} wallet, which you can see below.
 Please continue with the next step of this workflow.`,
           includeIf() {
@@ -207,7 +201,6 @@ Please continue with the next step of this workflow.`,
           },
         }),
         new NetworkAwareWorkflowMessage({
-          author: cardbot,
           message: `You have connected your ${c.layer1.fullName} wallet. Now it’s time to connect your ${c.layer2.fullName}
 wallet via your Card Wallet mobile app. If you don’t have the app installed, please do so now.`,
           includeIf() {
@@ -215,7 +208,6 @@ wallet via your Card Wallet mobile app. If you don’t have the app installed, p
           },
         }),
         new NetworkAwareWorkflowMessage({
-          author: cardbot,
           message: `Once you have installed the app, open the app and add an existing wallet/account or create a
 new wallet/account. Use your account to scan this QR code, which will connect your account
 with Card Pay.`,
@@ -224,7 +216,6 @@ with Card Pay.`,
           },
         }),
         new WorkflowCard({
-          author: cardbot,
           cardName: 'LAYER2_CONNECT',
           componentName: 'card-pay/layer-two-connect-card',
         }),
@@ -235,20 +226,16 @@ with Card Pay.`,
       title: MILESTONE_TITLES[3],
       postables: [
         new WorkflowMessage({
-          author: cardbot,
           message: `Please choose the asset you would like to withdraw.`,
         }),
         new WorkflowCard({
-          author: cardbot,
           cardName: 'CHOOSE_BALANCE',
           componentName: 'card-pay/withdrawal-workflow/choose-balance',
         }),
         new WorkflowMessage({
-          author: cardbot,
           message: 'How much would you like to withdraw from your balance?',
         }),
         new WorkflowCard({
-          author: cardbot,
           cardName: 'TRANSACTION_AMOUNT',
           componentName: 'card-pay/withdrawal-workflow/transaction-amount',
         }),
@@ -259,12 +246,10 @@ with Card Pay.`,
       title: MILESTONE_TITLES[4],
       postables: [
         new WorkflowMessage({
-          author: cardbot,
           message: `Now that you have withdrawn funds from the ${c.layer2.fullName},
           your tokens will be bridged to ${c.layer1.fullName}. You can check the status below.`,
         }),
         new WorkflowCard({
-          author: cardbot,
           cardName: 'TRANSACTION_STATUS',
           componentName: 'card-pay/withdrawal-workflow/transaction-status',
         }),
@@ -275,12 +260,10 @@ with Card Pay.`,
       title: MILESTONE_TITLES[5],
       postables: [
         new WorkflowMessage({
-          author: cardbot,
           message: `As a final step, please sign this transaction to claim the bridged tokens into your
           ${c.layer1.fullName} wallet. You will have to pay ${c.layer1.conversationalName} gas fee for this operation.`,
         }),
         new WorkflowCard({
-          author: cardbot,
           cardName: 'TOKEN_CLAIM',
           componentName: 'card-pay/withdrawal-workflow/token-claim',
         }),
@@ -290,112 +273,61 @@ with Card Pay.`,
   ];
   epilogue = new PostableCollection([
     new WorkflowMessage({
-      author: cardbot,
       message: `Congrats! Your withdrawal is complete.`,
     }),
     new WorkflowCard({
-      author: cardbot,
       cardName: 'TRANSACTION_CONFIRMED',
       componentName: 'card-pay/withdrawal-workflow/transaction-confirmed',
     }),
     new WorkflowMessage({
-      author: cardbot,
       message: `This is the remaining balance in your ${c.layer2.fullName} wallet:`,
     }),
     new WorkflowCard({
-      author: cardbot,
       cardName: 'EPILOGUE_LAYER_TWO_CONNECT_CARD',
       componentName: 'card-pay/layer-two-connect-card',
     }),
     new WorkflowCard({
-      author: cardbot,
       cardName: 'EPILOGUE_NEXT_STEPS',
       componentName: 'card-pay/withdrawal-workflow/next-steps',
     }),
   ]);
   cancelationMessages = new PostableCollection([
-    new NetworkAwareWorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.DISCONNECTED,
       message:
         'It looks like your wallet(s) got disconnected. If you still want to withdraw tokens, please start again by connecting your wallet(s).',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.DISCONNECTED
-        );
-      },
     }),
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.ACCOUNT_CHANGED,
       message:
         'It looks like you changed accounts in the middle of this workflow. If you still want to withdraw funds, please restart the workflow.',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason === FAILURE_REASONS.ACCOUNT_CHANGED
-        );
-      },
     }),
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.RESTORATION_L1_ADDRESS_CHANGED,
       message:
         'You attempted to restore an unfinished workflow, but you changed your Layer 1 wallet address. Please restart the workflow.',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason ===
-          FAILURE_REASONS.RESTORATION_L1_ADDRESS_CHANGED
-        );
-      },
     }),
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED,
       message:
         'You attempted to restore an unfinished workflow, but you changed your Card Wallet address. Please restart the workflow.',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason ===
-          FAILURE_REASONS.RESTORATION_L2_ADDRESS_CHANGED
-        );
-      },
     }),
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.RESTORATION_L2_DISCONNECTED,
       message:
         'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason ===
-          FAILURE_REASONS.RESTORATION_L2_DISCONNECTED
-        );
-      },
     }),
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.RESTORATION_L1_DISCONNECTED,
       message:
         'You attempted to restore an unfinished workflow, but your Layer 1 wallet got disconnected. Please restart the workflow.',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason ===
-          FAILURE_REASONS.RESTORATION_L1_DISCONNECTED
-        );
-      },
     }),
-    new WorkflowMessage({
-      author: cardbot,
+    conditionalCancelationMessage({
+      forReason: FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION,
       message:
         'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!',
-      includeIf() {
-        return (
-          this.workflow?.cancelationReason ===
-          FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION
-        );
-      },
     }),
-    new WorkflowCard({
-      author: cardbot,
-      componentName: 'workflow-thread/default-cancelation-cta',
-      includeIf() {
-        return isPresent(this.workflow?.cancelationReason);
-      },
-    }),
+    defaultCancelationCard(),
   ]);
 
   restorationErrors() {

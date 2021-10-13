@@ -17,7 +17,7 @@ export class WorkflowMessage
   message: string;
 
   constructor(options: Partial<WorkflowMessageOptions>) {
-    super(options.author!, options.includeIf);
+    super(options.author, options.includeIf);
     this.message = options.message!;
     this.isComplete = true;
   }

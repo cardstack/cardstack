@@ -23,6 +23,11 @@ export {
   default as WorkflowSession,
 } from './workflow/workflow-session';
 export { SessionAwareWorkflowMessage } from './workflow/session-aware-workflow-message';
+export {
+  conditionalCancelationMessage,
+  defaultCancelationCard,
+} from './workflow/cancelation-helpers';
+
 interface PostableIndices {
   isInMilestone: boolean;
   isInEpilogue: boolean;
