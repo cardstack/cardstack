@@ -17,16 +17,16 @@ import {
   MerchantSafe,
   PrepaidCardSafe,
   Safe,
+  TokenInfo,
   TransactionOptions,
 } from '@cardstack/cardpay-sdk';
 import {
   UnbindEventListener,
   SimpleEmitter,
 } from '@cardstack/web-client/utils/events';
-import { task, TaskGenerator, timeout } from 'ember-concurrency';
+import { task, TaskGenerator } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
-import { taskFor } from 'ember-concurrency-ts';
-import { useResource, useTask } from 'ember-resources';
+import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { reads } from 'macro-decorators';
 import { createPrepaidCardSafe } from '@cardstack/web-client/utils/test-factories';
@@ -81,16 +81,11 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   // this is only a mock property
   @tracked balancesRefreshed = false;
 
+  test__blockNumber = 0;
   test__withdrawalMinimum = new BN('500000000000000000');
   test__withdrawalMaximum = new BN('1500000000000000000000000');
 
-  @tracked safesAndBalancesRefreshRequestedAt = new Date();
-
   @reads('safes.depot') declare depotSafe: DepotSafe | null;
-  @reads('depotBalances.value.defaultTokenBalance') defaultTokenBalance:
-    | BN
-    | undefined;
-  @reads('depotBalances.value.cardBalance') cardBalance: BN | undefined;
 
   @task *initializeTask(): TaskGenerator<void> {
     yield '';
@@ -112,17 +107,12 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   getBlockHeight(): Promise<BN> {
-    return Promise.resolve(new BN('0'));
+    return Promise.resolve(new BN(this.test__blockNumber++));
   }
 
   async refreshSafesAndBalances() {
     this.balancesRefreshed = true;
-    this.safesAndBalancesRefreshRequestedAt = new Date();
-    await taskFor(this.viewSafesTask).perform();
-    if (this.depotSafe && !taskFor(this.fetchSafeBalancesTask).last) {
-      await this.depotBalances.value;
-    }
-    await taskFor(this.fetchSafeBalancesTask).last;
+    await this.safes.fetch();
   }
 
   async getWithdrawalLimits(
@@ -197,6 +187,20 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return this.waitForAccountDeferred.promise;
   }
 
+  get defaultTokenBalance() {
+    return new BN(
+      this.safes.depot?.tokens.find((v) => v.token.symbol === 'DAI')?.balance ??
+        0
+    );
+  }
+
+  get cardBalance() {
+    return new BN(
+      this.safes.depot?.tokens.find((v) => v.token.symbol === 'CARD')
+        ?.balance ?? 0
+    );
+  }
+
   async convertFromSpend(symbol: ConvertibleSymbol, amount: number) {
     return await this.test__simulateConvertFromSpend(symbol, amount);
   }
@@ -215,7 +219,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     if (this.test__autoResolveViewSafes) {
       return {
         result: this.accountSafes.get(account)!,
-        blockNumber: 0,
+        blockNumber: this.test__blockNumber++,
       };
     }
     this.test__deferredViewSafes = defer();
@@ -227,19 +231,16 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   ) {
     this.test__deferredViewSafes.resolve({
       result: safes,
-      blockNumber: 0,
+      blockNumber: this.test__blockNumber++,
     });
   }
 
-  async test__simulateAccountSafes(account: string, safes: Safe[]) {
+  test__simulateAccountSafes(account: string, safes: Safe[]) {
     if (!this.accountSafes.has(account)) {
       this.accountSafes.set(account, []);
     }
 
     this.accountSafes.get(account)?.push(...safes);
-    // eslint-disable-next-line no-self-assign -- for reactivity
-    this.accountSafes = this.accountSafes;
-    this.test__refreshSafesAndBalancesIfAlreadyFetched();
   }
 
   async issuePrepaidCard(
@@ -301,33 +302,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   safes = useResource(this, Safes, () => ({
     strategy: this,
     walletAddress: this.walletInfo.firstAddress!,
-    accountSafes: this.accountSafes,
   }));
-
-  depotBalances = useTask(this, taskFor(this.fetchSafeBalancesTask), () => [
-    this.depotSafe as Safe | null,
-    this.safesAndBalancesRefreshRequestedAt,
-  ]);
-
-  @task
-  *fetchSafeBalancesTask(
-    safe: Safe | null,
-    _safesAndBalancesRefreshRequestedAt: Date
-  ): TaskGenerator<any> {
-    let defaultBalance = safe?.tokens.find(
-      (tokenInfo) => tokenInfo.token.symbol === this.defaultTokenSymbol
-    )?.balance;
-
-    let cardBalance = safe?.tokens.find(
-      (tokenInfo) => tokenInfo.token.symbol === 'CARD'
-    )?.balance;
-    yield timeout(0);
-
-    return {
-      defaultTokenBalance: new BN(defaultBalance ?? '0'),
-      cardBalance: new BN(cardBalance ?? '0'),
-    };
-  }
 
   test__lastSymbolsToUpdate: UsdConvertibleSymbol[] = [];
   test__simulatedExchangeRate: number = 0.2;
@@ -433,10 +408,6 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
         token.balance = balances.card.toString();
       }
     }
-
-    // eslint-disable-next-line no-self-assign -- for reactivity
-    this.accountSafes = this.accountSafes;
-    await this.test__refreshSafesAndBalancesIfAlreadyFetched();
   }
 
   test__simulateBridgedToLayer2(txnHash: TransactionHash) {
@@ -459,9 +430,6 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       depot.type = 'depot';
       safes.unshiftObject(depot);
     }
-    // eslint-disable-next-line no-self-assign -- for reactivity
-    this.accountSafes = this.accountSafes;
-    await this.test__refreshSafesAndBalancesIfAlreadyFetched();
   }
 
   test__simulateConvertFromSpend(symbol: ConvertibleSymbol, amount: number) {
@@ -505,6 +473,17 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     request?.onTxnHash?.('exampleTxnHash');
 
     this.test__simulateAccountSafes(walletAddress, [prepaidCardSafe]);
+    let unfetchedDepot = this.accountSafes
+      .get(this.walletInfo.firstAddress!)!
+      .find((v: Safe) => v.address === this.depotSafe?.address);
+
+    unfetchedDepot!.tokens.forEach((t: TokenInfo) => {
+      if (t.token.symbol === 'DAI') {
+        t.balance = new BN(t.balance)
+          .sub(new BN(toWei((faceValue / 100).toString())))
+          .toString();
+      }
+    });
 
     return request?.deferred.resolve(prepaidCardSafe);
   }
@@ -555,6 +534,9 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
         prepaidCard.spendFaceValue - merchantCreationFee;
     }
 
+    this.test__simulateAccountSafes(this.walletInfo.firstAddress!, [
+      merchantSafe,
+    ]);
     return request?.deferred.resolve(merchantSafe);
   }
 
@@ -600,12 +582,5 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       encodedData: 'example-encoded-data',
       signatures: ['example-sig'],
     });
-  }
-
-  test__refreshSafesAndBalancesIfAlreadyFetched() {
-    if (taskFor(this.viewSafesTask).performCount > 0) {
-      return this.refreshSafesAndBalances();
-    }
-    return;
   }
 }
