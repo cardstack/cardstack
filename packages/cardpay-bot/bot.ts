@@ -32,8 +32,8 @@ export class Bot extends Client {
   dmCommands = new Map<string, Command>();
 
   async start(): Promise<void> {
-    this.guildCommands = await gatherCommands(`${__dirname}/guild-commands/**/*.js`);
-    this.dmCommands = await gatherCommands(`${__dirname}/dm-commands/**/*.js`);
+    this.guildCommands = await gatherCommands(`${__dirname}/commands/guild/**/*.js`);
+    this.dmCommands = await gatherCommands(`${__dirname}/commands/dm/**/*.js`);
 
     const eventModules: string[] = await glob(`${__dirname}/events/**/*.js`);
     const _this = this;

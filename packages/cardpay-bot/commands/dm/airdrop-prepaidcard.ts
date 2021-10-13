@@ -1,4 +1,4 @@
-import { Command } from '../bot';
+import { Command } from '../../bot';
 
 export const name: Command['name'] = 'airdrop-prepaidcard';
 export const description: Command['description'] = 'Collect wallet information to airdrop a prepaid card';

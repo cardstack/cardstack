@@ -1,4 +1,4 @@
-import { Command } from '../bot';
+import { Command } from '../../bot';
 
 export const name: Command['name'] = 'ping';
 export const description: Command['description'] = 'Ping command';

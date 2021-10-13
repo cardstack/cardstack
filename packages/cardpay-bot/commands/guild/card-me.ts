@@ -1,7 +1,7 @@
-import { Command } from '../bot';
-import { sendDM, activateDMConversation } from '../utils/dm';
-import { isBetaTester } from '../utils/guild';
-import { getBetaTester, setBetaTester } from '../utils/beta-tester';
+import { Command } from '../../bot';
+import { sendDM, activateDMConversation } from '../../utils/dm';
+import { isBetaTester } from '../../utils/guild';
+import { getBetaTester, setBetaTester } from '../../utils/beta-tester';
 
 export const name: Command['name'] = 'card-me';
 export const description: Command['description'] = 'Airdrop Cardstack prepaid cards';
