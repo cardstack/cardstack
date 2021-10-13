@@ -32,40 +32,8 @@ export class Bot extends Client {
   dmCommands = new Map<string, Command>();
 
   async start(): Promise<void> {
-    const guildCommandModules: string[] = await glob(`${__dirname}/guild-commands/**/*.js`);
-    this.guildCommands = new Map(
-      await Promise.all(
-        guildCommandModules.map(async (module) => {
-          const { name, run, aliases = [], description } = (await import(module)) as Command;
-          return [
-            name,
-            {
-              name,
-              run,
-              aliases,
-              description,
-            },
-          ] as [string, Command];
-        })
-      )
-    );
-    const dmCommandModules: string[] = await glob(`${__dirname}/dm-commands/**/*.js`);
-    this.dmCommands = new Map(
-      await Promise.all(
-        dmCommandModules.map(async (module) => {
-          const { name, run, aliases = [], description } = (await import(module)) as Command;
-          return [
-            name,
-            {
-              name,
-              run,
-              aliases,
-              description,
-            },
-          ] as [string, Command];
-        })
-      )
-    );
+    this.guildCommands = await gatherCommands(`${__dirname}/guild-commands/**/*.js`);
+    this.dmCommands = await gatherCommands(`${__dirname}/dm-commands/**/*.js`);
 
     const eventModules: string[] = await glob(`${__dirname}/events/**/*.js`);
     const _this = this;
@@ -78,4 +46,24 @@ export class Bot extends Client {
 
     await this.login(botToken);
   }
+}
+
+async function gatherCommands(path: string): Promise<Map<string, Command>> {
+  const commandModules: string[] = await glob(path);
+  return new Map(
+    await Promise.all(
+      commandModules.map(async (module) => {
+        const { name, run, aliases = [], description } = (await import(module)) as Command;
+        return [
+          name,
+          {
+            name,
+            run,
+            aliases,
+            description,
+          },
+        ] as [string, Command];
+      })
+    )
+  );
 }
