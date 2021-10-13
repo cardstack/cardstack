@@ -2,7 +2,6 @@
   "name": "@cardstack/core",
   "version": "0.26.10",
   "keywords": [],
-  "private": true,
   "author": "Edward Faulkner <edward@eaf4.com>",
   "repository": {
     "type": "git",
