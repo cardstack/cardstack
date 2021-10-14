@@ -59,13 +59,20 @@ AWS_PROFILE=cardstack
 
 ## Getting Started
 
-The following command will create a hub_development database on your locally running postgres server, run migrations, and load seed data. It will then create a hub_test database, and clone the structure of the development database to it.
-
+The following command will create a hub_development database on your locally running postgres server, run migrations, and load seed data.
+```sh
     bin/hub db setup
+```
 
 Load the database with seed data
-
+```sh
     bin/hub db seed
+```
+
+To initialize your test db
+```sh
+    NODE_ENV=test bin/hub db init-test
+```
 
 ### Running the hub
 
