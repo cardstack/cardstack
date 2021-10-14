@@ -4,6 +4,9 @@ import RouterService from '@ember/routing/router-service';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import TokenToUsd, {
+  UsdConvertibleSymbol,
+} from '@cardstack/web-client/services/token-to-usd';
 import {
   TokenDisplayInfo,
   TokenSymbol,
@@ -16,6 +19,7 @@ export default class CardPayTokenSuppliersController extends Controller {
   @tracked workflowPersistenceId: string | null = null;
   @service declare router: RouterService;
   @service declare layer2Network: Layer2Network;
+  @service declare tokenToUsd: TokenToUsd;
 
   @action transitionToTokenSuppliers(flow: string) {
     this.router.transitionTo('card-pay.token-suppliers', {
@@ -49,5 +53,19 @@ export default class CardPayTokenSuppliersController extends Controller {
         icon: displayInfo.icon,
       };
     });
+  }
+
+  get usdBalanceTotal() {
+    return this.tokensWithDisplayInfo?.reduce((sum, item) => {
+      let usdBalance = this.tokenToUsd.toUsdFrom(
+        item.symbol as UsdConvertibleSymbol,
+        item.balance
+      );
+      if (usdBalance) {
+        return (sum += usdBalance);
+      } else {
+        return;
+      }
+    }, 0);
   }
 }

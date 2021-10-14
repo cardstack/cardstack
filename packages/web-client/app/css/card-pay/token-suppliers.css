@@ -39,6 +39,28 @@
   border-top-right-radius: inherit;
 }
 
+.card-pay-dashboard__depot-network {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: var(--boxel-sp-xxs);
+  padding-left: var(--boxel-sp-xxs);
+  color: var(--boxel-dark);
+  background-color: var(--boxel-light-400);
+  border-radius: 50px;
+  font: 600 var(--boxel-font-xs);
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.card-pay-dashboard__depot-address {
+  margin-left: var(--boxel-sp-xs);
+  font-family: var(--boxel-monospace-font-family);
+  font-size: var(--boxel-font-size-sm);
+  line-height: 1;
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
 .card-pay-dashboard__depot-title {
   font-size: 1.625rem;
   font-weight: 600;
@@ -48,6 +70,9 @@
 }
 
 .card-pay-dashboard__depot-balances-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   border-top: 1px solid var(--boxel-light-400);
   padding-top: var(--boxel-sp-xl);
   margin-bottom: var(--boxel-sp-lg);
@@ -57,6 +82,13 @@
   line-height: calc(27 / 20);
 }
 
+.card-pay-dashboard__depot-balances-num {
+  display: inline-block;
+  margin-left: var(--boxel-sp-xxxs);
+  color: var(--boxel-dark-highlight);
+  font-weight: 600;
+}
+
 .card-pay-dashboard__depot-balances-grid {
   display: grid;
   gap: var(--boxel-sp-xl) var(--boxel-sp);
@@ -64,7 +96,15 @@
 }
 
 .card-pay-dashboard__token {
-  padding: var(--boxel-sp-xxl) var(--boxel-sp);
+  height: 13.5rem;
+  padding: var(--boxel-sp-xxl) var(--boxel-sp) var(--boxel-sp);
   border: 1px solid var(--boxel-light-400);
   border-radius: var(--boxel-border-radius);
+}
+
+.card-pay-dashboard__token-balance-display {
+  --icon-size: var(--boxel-icon-lg);
+  --balance-line-height: 1.2;
+
+  font-weight: 700;
 }
