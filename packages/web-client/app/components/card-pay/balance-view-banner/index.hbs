@@ -26,7 +26,7 @@
     <:inner>
       <CardPay::AccountDisplay
         @size="small"
-        @icon={{@safe.type}}
+        @icon={{this.safeIcon}}
         @name="{{this.summaryBalanceLabel}}:"
         @address={{@safe.address}}
         data-test-balance-view-depot-address

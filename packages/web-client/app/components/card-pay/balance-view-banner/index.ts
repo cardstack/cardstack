@@ -17,6 +17,8 @@ interface BalanceViewBannerComponentArgs {
 }
 
 class BalanceViewBannerComponent extends Component<BalanceViewBannerComponentArgs> {
+  supportedSafeTypes = ['depot', 'merchant'];
+
   get tokenBalance(): BN {
     let safe = this.args.safe;
     let tokenSymbol = this.args.token;
@@ -30,7 +32,15 @@ class BalanceViewBannerComponent extends Component<BalanceViewBannerComponentArg
     return balance ? new BN(balance) : new BN(0);
   }
 
-  get icon() {
+  get safeIcon() {
+    if (this.supportedSafeTypes.includes(this.args.safe.type)) {
+      return this.args.safe.type;
+    } else {
+      return null;
+    }
+  }
+
+  get tokenIcon() {
     return TokenDisplayInfo.iconForBridgedOrUnbridged(this.args.token);
   }
 
