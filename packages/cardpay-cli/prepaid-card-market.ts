@@ -12,6 +12,7 @@ export async function getSKUInfo(network: string, sku: string, mnemonic?: string
   let prepaidCardMarket = await getSDK('PrepaidCardMarket', web3);
   let assets = await getSDK('Assets', web3);
   let skuInfo = await prepaidCardMarket.getSKUInfo(sku);
+  let inventory = await prepaidCardMarket.getInventory(sku);
   if (!skuInfo) {
     console.log(`The SKU ${sku} does not exist in the market contract`);
   } else {
@@ -22,7 +23,8 @@ export async function getSKUInfo(network: string, sku: string, mnemonic?: string
   Issuing token: ${issuingToken} (${symbol})
   Face value: §${faceValue} SPEND
   Customization DID: ${customizationDID || '-none-'}
-  Ask price: ${fromWei(askPrice)} ${symbol}`);
+  Ask price: ${fromWei(askPrice)} ${symbol}
+  Quantity: ${inventory.length}`);
   }
 }
 

@@ -10,14 +10,24 @@
   "author": "Hassan Abdel-Rahman @habdelra",
   "license": "MIT",
   "devDependencies": {
+    "@cardstack/cardpay-sdk": "0.26.9",
     "@cardstack/db": "0.26.9",
     "@cardstack/di": "0.26.9",
     "@cardstack/logger": "^0.2.1",
     "@sentry/node": "^6.10.0",
     "@types/fs-extra": "^9.0.11",
+    "@types/qrcode": "^1.4.1",
+    "@walletconnect/web3-provider": "^1.6.0",
     "discord.js": "^12.5.3",
     "dotenv": "^10.0.0",
     "fs-extra": "^10.0.0",
-    "glob-promise": "^4.2.0"
+    "glob-promise": "^4.2.0",
+    "tmp": "^0.2.1",
+    "web3": "1.5.2",
+    "web3-core": "1.5.2",
+    "web3-utils": "1.5.2"
+  },
+  "dependencies": {
+    "qrcode": "^1.4.4"
   }
 }

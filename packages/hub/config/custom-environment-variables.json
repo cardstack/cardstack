@@ -14,7 +14,11 @@
     "url": "DATABASE_URL"
   },
   "discord": {
-    "botToken": "CARDPAY_BOT_TOKEN"
+    "botToken": "CARDPAY_BOT_TOKEN",
+    "commandPrefix": "CARDPAY_BOT_COMMAND_PREFIX",
+    "betaTesterRole": "CARDPAY_BOT_BETA_TESTER_ROLE",
+    "allowedGuilds": "CARDPAY_BOT_ALLOWED_GUILDS",
+    "allowedChannels": "CARDPAY_BOT_ALLOWED_CHANNELS"
   },
   "sentry": {
     "dsn": "HUB_SENTRY_DSN",
@@ -29,12 +33,20 @@
   "web3": {
     "network": "NETWORK"
   },
+  "walletConnect": {
+    "bridge": "WALLET_CONNECT_BRIDGE",
+    "clientURL": "WALLET_CONNECT_CLIENT_URL",
+    "clientName": "WALLET_CONNECT_CLIENT_NAME"
+  },
   "exchangeRates": {
     "allowedDomains": "EXCHANGE_RATES_ALLOWED_DOMAINS",
     "apiKey": "FIXER_API_KEY"
   },
   "relay": {
     "provisionerSecret": "PROVISIONER_SECRET"
+  },
+  "betaTesting": {
+    "sku": "BETA_TEST_SKU"
   },
   "serverSecret": "SERVER_SECRET"
 }

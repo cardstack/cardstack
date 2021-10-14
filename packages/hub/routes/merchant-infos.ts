@@ -1,13 +1,8 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
-import { AuthenticationUtils } from '../utils/authentication';
-import MerchantInfoSerializer from '../services/serializers/merchant-info-serializer';
 import { ensureLoggedIn } from './utils/auth';
-import WorkerClient from '../services/worker-client';
-import MerchantInfoQueries from '../services/queries/merchant-info';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
 
@@ -21,16 +16,16 @@ export interface MerchantInfo {
 }
 
 export default class MerchantInfosRoute {
-  authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
-  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
-  merchantInfoSerializer: MerchantInfoSerializer = inject('merchant-info-serializer', {
+  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
+  databaseManager = inject('database-manager', { as: 'databaseManager' });
+  merchantInfoSerializer = inject('merchant-info-serializer', {
     as: 'merchantInfoSerializer',
   });
-  merchantInfoQueries: MerchantInfoQueries = inject('merchant-info-queries', {
+  merchantInfoQueries = inject('merchant-info-queries', {
     as: 'merchantInfoQueries',
   });
 
-  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
+  workerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);

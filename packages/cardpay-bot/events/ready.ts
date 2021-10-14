@@ -14,4 +14,5 @@ export const run: Event['run'] = async (client) => {
     return;
   }
   log.info(`Logged in as ${client.user.tag}`);
+  Sentry.addBreadcrumb({ message: `logged in bot ${client.user.tag}` });
 };

@@ -2,11 +2,10 @@ import Koa from 'koa';
 import config from 'config';
 import autoBind from 'auto-bind';
 import Logger from '@cardstack/logger';
-import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
-import WyreService, { WyreOrder, WyreTransfer, WyreWallet } from '../services/wyre';
+import { OrderStatus, OrderState } from '../services/order';
+import { WyreOrder, WyreTransfer, WyreWallet } from '../services/wyre';
 import Web3 from 'web3';
-import { nextOrderStatus, OrderStatus, OrderState, provisionPrepaidCard, updateOrderStatus } from './utils/orders';
 import * as Sentry from '@sentry/node';
 import { captureSentryMessage } from './utils/sentry';
 
@@ -40,10 +39,9 @@ export const adminWalletName = `admin`;
 
 export default class WyreCallbackRoute {
   adminWalletId: string | undefined;
-  wyre: WyreService = inject('wyre');
-  relay = inject('relay');
-  subgraph = inject('subgraph');
-  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
+  wyre = inject('wyre');
+  order = inject('order');
+  databaseManager = inject('database-manager', { as: 'databaseManager' });
 
   constructor() {
     autoBind(this);
@@ -105,7 +103,7 @@ export default class WyreCallbackRoute {
     );
 
     let db = await this.databaseManager.getClient();
-    let { status: nextStatus } = await nextOrderStatus(db, 'wyre-receive-funds', order.id);
+    let { status: nextStatus } = await this.order.nextOrderStatus('wyre-receive-funds', order.id);
     // We use an upsert as there will be no guarantee you'll get the order
     // ID/reservation ID correlation from the card wallet before wyre calls the
     // webhook
@@ -141,10 +139,9 @@ export default class WyreCallbackRoute {
     }
     let { orderId, transfer } = validatedRequest;
 
-    let db = await this.databaseManager.getClient();
     let state: OrderState, status: OrderStatus;
     try {
-      ({ state, status } = await updateOrderStatus(db, orderId, 'wyre-send-funds'));
+      ({ state, status } = await this.order.updateOrderStatus(orderId, 'wyre-send-funds'));
     } catch (err) {
       let message = `Error: Failed to locate wallet_orders record for ${request.dest} receive of ${
         transfer.source
@@ -163,14 +160,14 @@ export default class WyreCallbackRoute {
       }
       try {
         Sentry.addBreadcrumb({ message: `provisioning prepaid card for reservationId=${reservationId}` });
-        await provisionPrepaidCard(db, this.relay, this.subgraph, reservationId);
+        await this.order.provisionPrepaidCard(reservationId);
       } catch (err) {
         let message = `Could not provision prepaid card for reservationId ${reservationId}! Received error from relay server: ${err.toString()}`;
         log.error(message, err);
         captureSentryMessage(message, ctx);
         return;
       }
-      await updateOrderStatus(db, orderId, 'provision-mined');
+      await this.order.updateOrderStatus(orderId, 'provision-mined');
     }
   }
 

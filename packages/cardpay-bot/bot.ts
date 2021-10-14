@@ -1,8 +1,10 @@
 import { Client, Message } from 'discord.js';
 import glob from 'glob-promise';
 import config from 'config';
-import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
+import { DiscordConfig } from './types';
+
+const { botToken } = config.get('discord') as DiscordConfig;
 
 export interface CommandCallback {
   (client: Bot, message: Message, args?: string[]): Promise<void>;
@@ -20,14 +22,11 @@ export interface Event {
   name: string;
   run: EventCallback;
 }
-interface DiscordConfig {
-  botToken: string;
-}
-
-const { botToken } = config.get('discord') as DiscordConfig;
-
 export class Bot extends Client {
-  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
+  databaseManager = inject('database-manager', { as: 'databaseManager' });
+  relay = inject('relay');
+  web3 = inject('web3');
+  inventory = inject('inventory');
   guildCommands = new Map<string, Command>();
   dmCommands = new Map<string, Command>();
 

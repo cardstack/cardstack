@@ -1,12 +1,11 @@
 import Koa from 'koa';
 import Logger from '@cardstack/logger';
 import autoBind from 'auto-bind';
-import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
 let log = Logger('route:prepaid-card-patterns');
 
 export default class PrepaidCardPatternsRoute {
-  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
+  databaseManager = inject('database-manager', { as: 'databaseManager' });
 
   constructor() {
     autoBind(this);

@@ -1,17 +1,25 @@
 import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
 import { Event } from '../bot';
-import config from '../config.json';
+import config from 'config';
+import { DiscordConfig } from '../types';
 
 const log = logger('events:guild-message');
-const prefix = config.prefix || '!';
+const {
+  allowedGuilds: guildsRaw,
+  allowedChannels: channelsRaw,
+  commandPrefix: prefix,
+} = config.get('discord') as DiscordConfig;
+let allowedGuilds = guildsRaw.split(',');
+let allowedChannels = channelsRaw.split(',');
 
 export const name: Event['name'] = 'message';
 export const run: Event['run'] = async (bot, message) => {
   if (
     message?.author.bot ||
     !message?.guild ||
-    !config.allowedGuilds.includes(message.guild.id) ||
+    !allowedGuilds.includes(message.guild.id) ||
+    !allowedChannels.includes(message.channel.id) ||
     !message.content.startsWith(prefix)
   )
     return;
@@ -27,6 +35,7 @@ export const run: Event['run'] = async (bot, message) => {
   }
 
   log.trace(`detected command '${commandName}'`);
+  Sentry.addBreadcrumb({ message: `guild command: ${commandName}` });
   try {
     await command.run(bot, message, args);
   } catch (err) {

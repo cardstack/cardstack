@@ -1,24 +1,17 @@
 import Koa from 'koa';
-// import Logger from '@cardstack/logger';
 import autoBind from 'auto-bind';
-import DatabaseManager from '@cardstack/db';
 import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
-// let log = Logger('route:prepaid-card-customizations');
-import { AuthenticationUtils } from '../utils/authentication';
-import WorkerClient from '../services/worker-client';
-import PrepaidCardCustomizationSerializer from '../services/serializers/prepaid-card-customization-serializer';
 import { ensureLoggedIn } from './utils/auth';
 import { validateRequiredFields } from './utils/validation';
 
 export default class PrepaidCardCustomizationsRoute {
-  authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
-  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
-  prepaidCardCustomizationSerializer: PrepaidCardCustomizationSerializer = inject(
-    'prepaid-card-customization-serializer',
-    { as: 'prepaidCardCustomizationSerializer' }
-  );
-  workerClient: WorkerClient = inject('worker-client', { as: 'workerClient' });
+  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
+  databaseManager = inject('database-manager', { as: 'databaseManager' });
+  prepaidCardCustomizationSerializer = inject('prepaid-card-customization-serializer', {
+    as: 'prepaidCardCustomizationSerializer',
+  });
+  workerClient = inject('worker-client', { as: 'workerClient' });
 
   constructor() {
     autoBind(this);

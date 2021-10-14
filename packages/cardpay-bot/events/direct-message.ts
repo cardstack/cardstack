@@ -1,7 +1,7 @@
 import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
 import { Event } from '../bot';
-import { conversationCommand, deactivateDMConversation } from '../utils/dm';
+import { conversationCommand } from '../utils/dm';
 
 const log = logger('events:direct-message');
 
@@ -24,6 +24,7 @@ export const run: Event['run'] = async (bot, message) => {
     return;
   }
   let args = [channelId];
+  Sentry.addBreadcrumb({ message: `dm command: ${commandName}` });
   try {
     await command.run(bot, message, args);
   } catch (err) {
@@ -31,7 +32,5 @@ export const run: Event['run'] = async (bot, message) => {
     Sentry.withScope(function () {
       Sentry.captureException(err);
     });
-  } finally {
-    await deactivateDMConversation(db, channelId, message.author.id);
   }
 };
