@@ -22,6 +22,7 @@
     "@aws-sdk/client-s3": "^3.18.0",
     "@aws-sdk/client-sts": "^3.18.0",
     "@cardstack/cardpay-sdk": "0.26.9",
+    "@cardstack/cardpay-bot": "0.26.9",
     "@cardstack/db": "0.26.9",
     "@cardstack/di": "0.26.9",
     "@cardstack/did-resolver": "0.26.9",

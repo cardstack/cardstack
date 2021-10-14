@@ -7,6 +7,6 @@
   "repository": "cardstack/cardstack",
   "license": "MIT",
   "dependencies": {
-
+    "typescript-memoize": "^1.0.1"
   }
 }
