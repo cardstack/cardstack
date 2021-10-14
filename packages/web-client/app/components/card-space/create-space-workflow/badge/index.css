@@ -1,0 +1,54 @@
+.badge-card__content {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.badge-card__badge {
+  width: 16.75rem;
+  height: 17.75rem;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 2.5rem;
+  background-color: var(--boxel-navy);
+  background-image: url('/images/illustrations/card-space-reservation.svg');
+  border-radius: var(--boxel-border-radius);
+  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.35));
+}
+
+.badge-card__badge-icon {
+  width: 8.75rem;
+  height: 8.75rem;
+  padding: 0.625rem;
+}
+
+.badge-card__subdomain {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--boxel-light);
+  letter-spacing: 0;
+}
+
+.badge-card__domain {
+  font-weight: 700;
+  font-size: var(--boxel-font-size);
+  color: var(--boxel-cyan);
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.badge-card__purpose {
+  margin-top: var(--boxel-sp);
+  font-weight: 400;
+  font-size: var(--boxel-font-size-sm);
+  color: var(--boxel-purple-400);
+  letter-spacing: var(--boxel-lsp-sm);
+}
+
+.badge-card__full-domain {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--boxel-dark);
+  letter-spacing: 0;
+}

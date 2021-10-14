@@ -30,6 +30,8 @@ module('Acceptance | create card space', function (hooks) {
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
   test('initiating workflow without wallet connections', async function (assert) {
+    let subdomain = ''; // TODO: replace this when other parts of the form are filled out
+
     await visit('/card-space');
     await click('[data-test-workflow-button="create-space"]');
 
@@ -113,6 +115,9 @@ module('Acceptance | create card space', function (hooks) {
       .containsText(`We have sent your URL reservation badge`);
     // // Badge
     assert.dom(postableSel(3, 1)).containsText(`URL reservation`);
+    assert
+      .dom(`${postableSel(3, 1)} [data-test-full-card-space-domain]`)
+      .containsText(`${subdomain}.card.space`);
 
     // // Confirm step
     await waitFor(postableSel(3, 3));
