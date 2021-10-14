@@ -35,11 +35,16 @@ import RelayService from './services/relay';
 import SubgraphService from './services/subgraph';
 import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
 import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
+import PersistOffChainCardSpaceTask from './tasks/persist-off-chain-card-space';
 import MerchantInfosRoute from './routes/merchant-infos';
 import CustodialWalletRoute from './routes/custodial-wallet';
 import WyreCallbackRoute from './routes/wyre-callback';
+import CardSpacesRoute from './routes/card-spaces';
 import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import MerchantInfoQueries from './services/queries/merchant-info';
+import CardSpaceQueries from './services/queries/card-space';
+import CardSpaceSerializer from './services/serializers/card-space-serializer';
+import CardSpaceValidator from './services/validators/card-space';
 import { AuthenticationUtils } from './utils/authentication';
 import ApiRouter from './services/api-router';
 import CallbacksRouter from './services/callbacks-router';
@@ -86,12 +91,17 @@ export function createContainer(registryCallback?: RegistryCallback): Container 
   registry.register('orders-route', OrdersRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
   registry.register('persist-off-chain-merchant-info', PersistOffChainMerchantInfoTask);
+  registry.register('persist-off-chain-card-space', PersistOffChainCardSpaceTask);
   registry.register('prepaid-card-customizations-route', PrepaidCardCustomizationsRoute);
   registry.register('prepaid-card-customization-serializer', PrepaidCardCustomizationSerializer);
   registry.register('prepaid-card-color-schemes-route', PrepaidCardColorSchemesRoute);
   registry.register('prepaid-card-color-scheme-serializer', PrepaidCardColorSchemeSerializer);
   registry.register('prepaid-card-patterns-route', PrepaidCardPatternsRoute);
   registry.register('prepaid-card-pattern-serializer', PrepaidCardPatternSerializer);
+  registry.register('card-space-serializer', CardSpaceSerializer);
+  registry.register('card-space-validator', CardSpaceValidator);
+  registry.register('card-space-queries', CardSpaceQueries);
+  registry.register('card-spaces-route', CardSpacesRoute);
   registry.register('relay', RelayService);
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
@@ -262,6 +272,10 @@ export async function bootWorker() {
       },
       'persist-off-chain-merchant-info': async (payload: any, helpers: Helpers) => {
         let task = await container.instantiate(PersistOffChainMerchantInfoTask);
+        return task.perform(payload, helpers);
+      },
+      'persist-off-chain-card-space': async (payload: any, helpers: Helpers) => {
+        let task = await container.instantiate(PersistOffChainCardSpaceTask);
         return task.perform(payload, helpers);
       },
       's3-put-json': s3PutJson,
