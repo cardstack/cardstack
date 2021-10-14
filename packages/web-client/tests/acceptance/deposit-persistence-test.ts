@@ -17,7 +17,10 @@ import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import { BN } from 'bn.js';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
-import { WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/deposit-workflow';
+import {
+  MILESTONE_TITLES,
+  WORKFLOW_VERSION,
+} from '@cardstack/web-client/components/card-pay/deposit-workflow';
 
 interface Context extends MirageTestContext {}
 
@@ -478,12 +481,13 @@ module('Acceptance | deposit persistence', function (hooks) {
       const state = buildState({
         meta: {
           version: WORKFLOW_VERSION - 1,
+          completedMilestonesCount: 0,
+          milestonesCount: MILESTONE_TITLES.length,
           completedCardNames: [
             'LAYER1_CONNECT',
             'LAYER2_CONNECT',
             'TXN_SETUP',
             'TXN_AMOUNT',
-            'TXN_STATUS',
           ],
         },
         depositSourceToken: 'DAI',
@@ -521,21 +525,6 @@ module('Acceptance | deposit persistence', function (hooks) {
           events: {},
         },
         layer2BlockHeightBeforeBridging: '1234',
-        completedLayer2TxnReceipt: {
-          status: true,
-          transactionHash: '0xGHI',
-          transactionIndex: 1,
-          blockHash: '',
-          blockNumber: 1,
-          from: '',
-          to: '',
-          contractAddress: '',
-          cumulativeGasUsed: 1,
-          gasUsed: 1,
-          logs: [],
-          logsBloom: '',
-          events: {},
-        },
       });
       workflowPersistenceService.persistData('abc123', {
         name: 'RESERVE_POOL_DEPOSIT',

@@ -15,7 +15,10 @@ import {
   createDepotSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
-import { WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/withdrawal-workflow';
+import {
+  MILESTONE_TITLES,
+  WORKFLOW_VERSION,
+} from '@cardstack/web-client/components/card-pay/withdrawal-workflow';
 
 interface Context extends MirageTestContext {}
 
@@ -380,9 +383,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
       const state = buildState({
         withdrawalToken: 'DAI.CPXD',
         withdrawnAmount: new BN('1000000000000000000'),
-        completedMilestonesCount: 5,
         layer2BlockHeightBeforeBridging: new BN('22867914'),
-        milestonesCount: 6,
         minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
         relayTokensTxnHash:
           '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
@@ -401,6 +402,8 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         }),
         meta: {
           version: WORKFLOW_VERSION - 1,
+          completedMilestonesCount: 5,
+          milestonesCount: MILESTONE_TITLES.length,
           completedCardNames: [
             'LAYER1_CONNECT',
             'CHECK_BALANCE',

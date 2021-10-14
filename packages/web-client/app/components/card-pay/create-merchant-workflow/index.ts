@@ -17,8 +17,6 @@ import {
   WorkflowCard,
   WorkflowMessage,
   WorkflowName,
-  UNSUPPORTED_WORKFLOW_STATE_VERSION,
-  defaultCancelationCard,
 } from '@cardstack/web-client/models/workflow';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
@@ -29,6 +27,7 @@ import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
 import { tracked } from '@glimmer/tracking';
+import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
 
 const FAILURE_REASONS = {
   UNAUTHENTICATED: 'UNAUTHENTICATED',
@@ -39,7 +38,6 @@ const FAILURE_REASONS = {
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
   RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
-  UNSUPPORTED_WORKFLOW_STATE_VERSION: UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } as const;
 
 export const MILESTONE_TITLES = [
@@ -255,12 +253,7 @@ class CreateMerchantWorkflow extends Workflow {
       message:
         'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
     }),
-    conditionalCancelationMessage({
-      forReason: FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION,
-      message:
-        'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!',
-    }),
-    defaultCancelationCard(),
+    ...standardCancelationPostables(),
   ]);
 
   constructor(owner: unknown, workflowPersistenceId: string) {

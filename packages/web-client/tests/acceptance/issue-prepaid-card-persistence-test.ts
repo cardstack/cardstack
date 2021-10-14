@@ -8,7 +8,10 @@ import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { BN } from 'bn.js';
-import { FAILURE_REASONS as ISSUE_PREPAID_CARD_WORKFLOW_FAILURE_REASONS } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
+import {
+  FAILURE_REASONS as ISSUE_PREPAID_CARD_WORKFLOW_FAILURE_REASONS,
+  MILESTONE_TITLES,
+} from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
 import {
   faceValueOptions,
   WORKFLOW_VERSION,
@@ -541,7 +544,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       let state = buildState({
         meta: {
           version: WORKFLOW_VERSION - 1,
-
+          completedMilestonesCount: 2,
+          milestonesCount: MILESTONE_TITLES.length,
           completedCardNames: [
             'LAYER2_CONNECT',
             'LAYOUT_CUSTOMIZATION',

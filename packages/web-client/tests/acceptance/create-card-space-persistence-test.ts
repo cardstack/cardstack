@@ -6,7 +6,10 @@ import WorkflowPersistence from '@cardstack/web-client/services/workflow-persist
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 import { setupHubAuthenticationToken } from '../helpers/setup';
-import { WORKFLOW_VERSION } from '@cardstack/web-client/components/card-space/create-space-workflow';
+import {
+  MILESTONE_TITLES,
+  WORKFLOW_VERSION,
+} from '@cardstack/web-client/components/card-space/create-space-workflow';
 
 interface Context extends MirageTestContext {}
 
@@ -253,6 +256,8 @@ module('Acceptance | create card space persistence', function (hooks) {
       const state = buildState({
         meta: {
           version: WORKFLOW_VERSION - 1,
+          completedMilestonesCount: 0,
+          milestonesCount: MILESTONE_TITLES.length,
           completedCardNames: ['LAYER2_CONNECT', 'CARD_SPACE_USERNAME'],
         },
         layer2WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer2AccountAddress set in beforeEach
