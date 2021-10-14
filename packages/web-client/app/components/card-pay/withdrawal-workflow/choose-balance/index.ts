@@ -27,6 +27,7 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
+    // FIXME this is a bug during restoration if another safe was chosen
     this.selectedSafe = this.layer2Network.depotSafe;
     this.selectedTokenSymbol =
       this.tokens.find((t) => t.symbol === this.withdrawalToken)
