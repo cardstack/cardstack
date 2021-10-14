@@ -18,6 +18,7 @@ import { BridgeValidationResult } from '@cardstack/cardpay-sdk/sdk/token-bridge-
 import { TaskGenerator } from 'ember-concurrency';
 import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-usd';
 import { TransactionOptions } from '@cardstack/cardpay-sdk';
+import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 
 export type Layer1ChainEvent =
   | 'disconnect'
@@ -126,9 +127,7 @@ export interface Layer2Web3Strategy
     txnHash: TransactionHash
   ): Promise<BridgeValidationResult>;
   getLatestSafe(address: string): Promise<Safe>;
-  viewSafesTask(
-    account: string
-  ): TaskGenerator<{ result: Safe[]; blockNumber: number }>;
+  viewSafesTask(account: string): TaskGenerator<ViewSafesResult>;
   checkHubAuthenticationValid(authToken: string): Promise<boolean>;
   authenticate(): Promise<string>;
   issuePrepaidCard(

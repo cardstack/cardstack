@@ -10,6 +10,7 @@ import { taskFor, TaskFunction } from 'ember-concurrency-ts';
 import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
+import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 
 export interface SafesResourceStrategy {
   viewSafesTask: TaskFunction;
@@ -25,7 +26,7 @@ interface Args {
 }
 
 interface IndividualSafeState {
-  result: Safe;
+  safe: Safe;
   blockNumber: number;
 }
 
@@ -139,11 +140,8 @@ export class Safes extends Resource<Args> {
   @reads('args.named.strategy.viewSafesTask')
   declare viewSafesTask: TaskFunction;
   @reads('viewSafesTask.isRunning') declare isLoading: boolean;
-  graphData: {
-    result: Safe[];
-    blockNumber: number;
-  } = {
-    result: [],
+  graphData: ViewSafesResult = {
+    safes: [],
     blockNumber: 0,
   };
   individualSafeUpdateData: Record<string, IndividualSafeState> = {};
@@ -200,10 +198,10 @@ export class Safes extends Resource<Args> {
       if (graphDataSafe && individualUpdate) {
         selectedSafe =
           individualUpdate.blockNumber > this.graphData.blockNumber
-            ? individualUpdate.result
+            ? individualUpdate.safe
             : graphDataSafe;
       } else {
-        selectedSafe = graphDataSafe ?? individualUpdate.result;
+        selectedSafe = graphDataSafe ?? individualUpdate.safe;
       }
 
       if (isTrackedPrepaidCardSafe(this.safeReferences[address])) {
@@ -233,7 +231,7 @@ export class Safes extends Resource<Args> {
       this.args.named.walletAddress
     );
 
-    this.updateReferences(this.graphData.result);
+    this.updateReferences(this.graphData.safes);
   }
 
   async updateOne(address: string) {
@@ -247,7 +245,7 @@ export class Safes extends Resource<Args> {
     }
 
     this.individualSafeUpdateData[address] = {
-      result: safe,
+      safe,
       blockNumber,
     };
 
@@ -263,7 +261,7 @@ export class Safes extends Resource<Args> {
 
   clear() {
     this.graphData = {
-      result: [],
+      safes: [],
       blockNumber: 0,
     };
     this.individualSafeUpdateData = {};
@@ -278,7 +276,7 @@ export class Safes extends Resource<Args> {
   get graphDataByAddress() {
     const res: Record<string, Safe> = {};
 
-    for (let safe of this.graphData.result) {
+    for (let safe of this.graphData.safes) {
       res[safe.address] = safe;
     }
 

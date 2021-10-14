@@ -30,6 +30,7 @@ import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { reads } from 'macro-decorators';
 import { createPrepaidCardSafe } from '@cardstack/web-client/utils/test-factories';
+import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 
 interface BridgeToLayer1Request {
   safeAddress: string;
@@ -211,10 +212,10 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   @task *viewSafesTask(
     account: string = this.walletInfo.firstAddress!
-  ): TaskGenerator<{ result: Safe[]; blockNumber: number }> {
+  ): TaskGenerator<ViewSafesResult> {
     if (this.test__autoResolveViewSafes) {
       return {
-        result: JSON.parse(
+        safes: JSON.parse(
           JSON.stringify(this.remoteAccountSafes.get(account) ?? [])
         ),
         blockNumber: this.test__blockNumber++,
@@ -301,10 +302,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   test__simulatedExchangeRate: number = 0.2;
   test__updateUsdConvertersDeferred: RSVP.Deferred<void> | undefined;
   test__deferredHubAuthentication!: RSVP.Deferred<string>;
-  test__deferredViewSafes!: RSVP.Deferred<{
-    result: Safe[];
-    blockNumber: number;
-  }>;
+  test__deferredViewSafes!: RSVP.Deferred<ViewSafesResult>;
 
   test__simulateWalletConnectUri() {
     this.walletConnectUri = 'This is a test of Layer2 Wallet Connect';

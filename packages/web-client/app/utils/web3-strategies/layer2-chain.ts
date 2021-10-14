@@ -51,6 +51,7 @@ import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { IAssets } from '../../../../cardpay-sdk/sdk/assets';
 import PrepaidCard from '@cardstack/cardpay-sdk/sdk/prepaid-card/base';
+import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -237,10 +238,6 @@ export default abstract class Layer2ChainWeb3Strategy
     await this.safes.updateDepot();
   }
 
-  async fetchSafesForAccount(account: string = this.walletInfo.firstAddress!) {
-    return await this.#safesApi.view(account);
-  }
-
   private async updateSafeWithLatestValues(safe: Safe) {
     if (safe.type === 'prepaid-card') {
       return await this.updatePrepaidCardWithLatestValues(safe);
@@ -297,14 +294,14 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   async getLatestSafe(address: string): Promise<Safe> {
-    let safe = (await this.#safesApi.viewSafe(address))?.result;
+    let safe = (await this.#safesApi.viewSafe(address))?.safe;
     if (!safe) throw new Error(`Could not find safe at: ${address}`);
     return await this.updateSafeWithLatestValues(safe);
   }
 
   @task *viewSafesTask(
     account: string = this.walletInfo.firstAddress!
-  ): TaskGenerator<{ result: Safe[]; blockNumber: number }> {
+  ): TaskGenerator<ViewSafesResult> {
     return yield this.#safesApi.view(account);
   }
 

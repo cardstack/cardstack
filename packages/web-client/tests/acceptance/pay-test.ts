@@ -20,6 +20,7 @@ import {
   getFilenameFromDid,
 } from '@cardstack/web-client/utils/test-factories';
 import { Response as MirageResponse } from 'ember-cli-mirage';
+import { ViewSafeResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 
 // selectors
 const MERCHANT = '[data-test-merchant]';
@@ -72,11 +73,15 @@ module('Acceptance | pay', function (hooks) {
     let safeViewer = this.owner.lookup('service:safe-viewer');
     sinon
       .stub(safeViewer, 'view')
-      .callsFake(async function (_network: string, address: string) {
-        if (address === merchantSafe.address) return { result: merchantSafe };
+      .callsFake(async function (
+        _network: string,
+        address: string
+      ): Promise<ViewSafeResult> {
+        if (address === merchantSafe.address)
+          return { safe: merchantSafe, blockNumber: 0 };
         else if (address === merchantSafeWithoutInfo.address)
-          return { result: merchantSafeWithoutInfo };
-        else return { result: undefined };
+          return { safe: merchantSafeWithoutInfo, blockNumber: 0 };
+        else return { safe: undefined, blockNumber: 0 };
       });
 
     this.server.create('merchant-info', {

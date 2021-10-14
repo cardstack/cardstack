@@ -17,6 +17,7 @@ import {
 import { render, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import BN from 'bn.js';
+import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 
 const defaultBlockNumber = 5;
 const address = generateMockAddress();
@@ -28,25 +29,19 @@ const createDefaultDepotSafe = (daiBalance?: string, infoDID?: string) =>
   });
 
 interface MockSafesResourceStrategy extends SafesResourceStrategy {
-  _graphData: {
-    result: Safe[];
-    blockNumber: number;
-  };
+  _graphData: ViewSafesResult;
   _blockNumber: number;
   _latestSafe: Safe;
 }
 
 class PartialLayer2Strategy implements MockSafesResourceStrategy {
-  _graphData: {
-    result: Safe[];
-    blockNumber: number;
-  }; // the next data to be fetched by viewSafesTask
+  _graphData: ViewSafesResult; // the next data to be fetched by viewSafesTask
   _blockNumber = defaultBlockNumber; // the next block number to be assigned to an individual update
   _latestSafe = createDefaultDepotSafe(); // the next safe fetched by an individual update
 
-  constructor(initialData?: { result: Safe[]; blockNumber: number }) {
+  constructor(initialData?: ViewSafesResult) {
     this._graphData = initialData ?? {
-      result: [],
+      safes: [],
       blockNumber: defaultBlockNumber,
     };
   }
@@ -55,10 +50,7 @@ class PartialLayer2Strategy implements MockSafesResourceStrategy {
     return new BN(this._blockNumber);
   }
 
-  @task *viewSafesTask(): TaskGenerator<{
-    result: Safe[];
-    blockNumber: number;
-  }> {
+  @task *viewSafesTask(): TaskGenerator<ViewSafesResult> {
     return yield JSON.parse(JSON.stringify(this._graphData));
   }
 
@@ -79,7 +71,7 @@ module('Unit | Resource | Safes', function (hooks) {
   hooks.beforeEach(async function () {
     defaultDepotSafe = createDefaultDepotSafe();
     strategy = new PartialLayer2Strategy({
-      result: [defaultDepotSafe],
+      safes: [defaultDepotSafe],
       blockNumber: defaultBlockNumber,
     });
     safes = new Safes(this.owner, {
@@ -148,7 +140,7 @@ module('Unit | Resource | Safes', function (hooks) {
     );
 
     strategy._graphData = {
-      result: [createDefaultDepotSafe()],
+      safes: [createDefaultDepotSafe()],
       blockNumber: defaultBlockNumber + 10,
     };
     await safes.fetch();
@@ -192,7 +184,7 @@ module('Unit | Resource | Safes', function (hooks) {
     assert.dom('[data-test-token="DAI"]').doesNotExist();
 
     strategy._graphData = {
-      result: [createDefaultDepotSafe('30', 'mock-infoDID')],
+      safes: [createDefaultDepotSafe('30', 'mock-infoDID')],
       blockNumber: defaultBlockNumber + 1,
     };
     await safes.fetch();
@@ -259,14 +251,14 @@ module('Unit | Resource | Safes', function (hooks) {
   test('it can clear graphData, individual update data, safe references, and value', async function (assert) {
     await safes.updateOne(defaultDepotSafe.address);
 
-    assert.equal(safes.graphData.result.length, 1);
+    assert.equal(safes.graphData.safes.length, 1);
     assert.equal(Object.keys(safes.individualSafeUpdateData).length, 1);
     assert.equal(Object.keys(safes.safeReferences).length, 1);
     assert.equal(safes.value.length, 1);
 
     safes.clear();
 
-    assert.equal(safes.graphData.result.length, 0);
+    assert.equal(safes.graphData.safes.length, 0);
     assert.equal(Object.keys(safes.individualSafeUpdateData).length, 0);
     assert.equal(Object.keys(safes.safeReferences).length, 0);
     assert.equal(safes.value.length, 0);
