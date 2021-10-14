@@ -174,7 +174,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
           message: 'Nice choice!',
         }),
         new WorkflowMessage({
-          message: `On to the next step: How do you want to fund your prepaid card? Please select a depot and balance from your ${c.layer2.fullName} wallet.`,
+          message: `On to the next step: How do you want to fund your prepaid card? Please select a source and balance from your ${c.layer2.fullName} wallet.`,
         }),
         new WorkflowCard({
           cardName: 'FUNDING_SOURCE',
