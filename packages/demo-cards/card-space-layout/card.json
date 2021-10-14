@@ -1,0 +1,15 @@
+{
+  "schema": "schema.js",
+  "isolated": "isolated.js",
+  "data": {
+    "title": "bob",
+    "links": {
+      "links": [
+        {
+          "name": "Twitter",
+          "url": "twitter.com"
+        }
+      ]
+    }
+  }
+}

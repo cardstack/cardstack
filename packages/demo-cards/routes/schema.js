@@ -7,5 +7,9 @@ export default class Routes {
     if (path === 'about') {
       return 'https://demo.com/about';
     }
+
+    if (path === 'card-space') {
+      return 'https://demo.com/card-space-layout';
+    }
   }
 }
