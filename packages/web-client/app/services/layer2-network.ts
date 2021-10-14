@@ -1,7 +1,7 @@
 import Service from '@ember/service';
 import config from '../config/environment';
 import { inject as service } from '@ember/service';
-import { TaskGenerator } from 'ember-concurrency';
+import { all, TaskGenerator } from 'ember-concurrency';
 import { task } from 'ember-concurrency-decorators';
 import {
   Layer2ChainEvent,
@@ -140,8 +140,10 @@ export default class Layer2Network
       options
     );
 
-    yield this.safes.updateOne(prepaidCardSafe.address);
-    yield this.safes.updateDepot();
+    yield all([
+      this.safes.updateOne(prepaidCardSafe.address),
+      this.safes.updateDepot(),
+    ]);
 
     return prepaidCardSafe;
   }
@@ -153,8 +155,10 @@ export default class Layer2Network
       txnHash
     );
 
-    yield this.safes.updateOne(prepaidCardSafe.address);
-    yield this.safes.updateDepot();
+    yield all([
+      this.safes.updateOne(prepaidCardSafe.address),
+      this.safes.updateDepot(),
+    ]);
 
     return prepaidCardSafe;
   }
@@ -174,8 +178,10 @@ export default class Layer2Network
       options
     );
 
-    yield this.safes.updateOne(prepaidCardAddress);
-    yield this.safes.updateOne(merchant.address);
+    yield all([
+      this.safes.updateOne(prepaidCardAddress),
+      this.safes.updateOne(merchant.address),
+    ]);
 
     return merchant;
   }
@@ -188,8 +194,10 @@ export default class Layer2Network
       txnHash
     );
 
-    yield this.safes.updateOne(prepaidCardAddress);
-    yield this.safes.updateOne(merchant.address);
+    yield all([
+      this.safes.updateOne(prepaidCardAddress),
+      this.safes.updateOne(merchant.address),
+    ]);
 
     return merchant;
   }
