@@ -25,7 +25,9 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    this.selectedSafe = this.layer2Network.depotSafe;
+    this.selectedSafe =
+      this.args.workflowSession.getValue('prepaidFundingSafe') ??
+      this.layer2Network.depotSafe;
     this.selectedTokenSymbol =
       this.tokens.find((t) => t.symbol === this.prepaidFundingToken)
         ?.tokenDisplayInfo.symbol ?? this.tokens[0].tokenDisplayInfo.symbol;
