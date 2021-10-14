@@ -7,7 +7,6 @@
         <:cta>
           <Boxel::Button
             {{on "click" (fn this.transitionToTokenSuppliers section.workflow)}}
-
             @kind="primary"
             @size="touch"
             @disabled={{section.isCtaDisabled}}
@@ -22,17 +21,35 @@
 
   {{#if this.layer2Network.isConnected}}
     <section data-test-suppliers-section>
-      <h2 class="card-pay-dashboard__suppliers-title">Token Suppliers</h2>
+      <header class="card-pay-dashboard__suppliers-header">
+        <h2 class="card-pay-dashboard__suppliers-title">Token Suppliers</h2>
+        {{#let @model.panel.sections.[0] as |section|}}
+          <Boxel::Button
+            {{on "click" (fn this.transitionToTokenSuppliers section.workflow)}}
+            @kind="secondary-dark"
+            @size="small"
+            @disabled={{section.isCtaDisabled}}
+            data-test-workflow-button={{section.workflow}}
+          >
+            <span>{{section.cta}}</span>
+            {{svg-jar "plus"
+              class="card-pay-dashboard__merchants-section-header-button-icon"
+              role="presentation"
+            }}
+          </Boxel::Button>
+        {{/let}}
+      </header>
+
       {{#if this.layer2Network.depotSafe}}
         <section class="card-pay-dashboard__depot">
-          <header class="card-pay-dashboard__depot-header">
+          <div class="card-pay-dashboard__depot-header">
             <div class="card-pay-dashboard__depot-network">
               On {{network-display-info "layer2" "fullName"}}
             </div>
             <div class="card-pay-dashboard__depot-address">
               {{truncate-middle this.layer2Network.depotSafe.address}}
             </div>
-          </header>
+          </div>
           <section class="card-pay-dashboard__depot-body">
             <h3 class="card-pay-dashboard__depot-title">Depot</h3>
             <h4 class="card-pay-dashboard__depot-balances-title">
@@ -54,13 +71,21 @@
                     @symbol={{t.symbol}}
                     @usdBalance={{token-to-usd t.symbol t.balance}}
                   />
+                  <div>
+                    <Boxel::Button
+                      {{on "click" (fn this.transitionToTokenSuppliers "withdrawal")}}
+                      @kind="primary"
+                      @size="small"
+                      data-test-workflow-button="withdrawal"
+                    >
+                      <span>Withdraw</span>
+                    </Boxel::Button>
+                  </div>
                 </div>
               {{/each}}
             </div>
           </section>
         </section>
-      {{else}}
-        N/A
       {{/if}}
     </section>
   {{/if}}

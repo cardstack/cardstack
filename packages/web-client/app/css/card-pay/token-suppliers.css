@@ -12,8 +12,14 @@
   margin-top: var(--boxel-sp-xxl);
 }
 
-.card-pay-dashboard__suppliers-title {
+.card-pay-dashboard__suppliers-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: var(--boxel-sp-xxl);
+}
+
+.card-pay-dashboard__suppliers-title {
   font: 600 var(--boxel-font-lg);
   letter-spacing: var(--boxel-lsp-xs);
 }
@@ -96,6 +102,9 @@
 }
 
 .card-pay-dashboard__token {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-items: flex-start;
   height: 13.5rem;
   padding: var(--boxel-sp-xxl) var(--boxel-sp) var(--boxel-sp);
   border: 1px solid var(--boxel-light-400);
