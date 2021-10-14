@@ -3,13 +3,8 @@ import CardSpaceQueries from '../queries/card-space';
 import { inject } from '../../di/dependency-injection';
 import { URL } from 'url';
 
-export interface CardSpaceErrors {
-  name: string[];
-  url: string[];
-  description: string[];
-  buttonText: string[];
-  category: string[];
-}
+export type CardSpaceAttribute = 'url' | 'profileName' | 'profileDescription' | 'profileButtonText' | 'profileCategory';
+export type CardSpaceErrors = Record<CardSpaceAttribute, string[]>;
 
 const MAX_LONG_FIELD_LENGTH = 300;
 const MAX_SHORT_FIELD_LENGTH = 50;
@@ -21,55 +16,61 @@ export default class CardSpaceValidator {
   });
 
   async validate(cardSpace: CardSpace): Promise<CardSpaceErrors> {
-    let errors = {} as CardSpaceErrors;
-
-    let addToErrors = (errors: any, attribute: string, message: string) => {
-      if (!errors[attribute]) {
-        errors[attribute] = [];
-      }
-
-      errors[attribute].push(message);
+    let errors: CardSpaceErrors = {
+      url: [],
+      profileName: [],
+      profileDescription: [],
+      profileButtonText: [],
+      profileCategory: [],
     };
 
-    ['name', 'url', 'description', 'buttonText', 'category'].forEach((attribute) => {
-      if (!cardSpace[attribute as keyof CardSpaceErrors]) {
-        addToErrors(errors, attribute, 'Must be present');
+    let attributes: CardSpaceAttribute[] = [
+      'url',
+      'profileName',
+      'profileDescription',
+      'profileButtonText',
+      'profileCategory',
+    ];
+
+    attributes.forEach((attribute) => {
+      if (!cardSpace[attribute]) {
+        errors[attribute].push('Must be present');
       }
     });
 
-    if (!ALLOWED_BUTTON_TEXTS.includes(cardSpace.buttonText)) {
-      addToErrors(errors, 'buttonText', `Needs to be one of the ${ALLOWED_BUTTON_TEXTS}`);
+    if (!ALLOWED_BUTTON_TEXTS.includes(cardSpace.profileButtonText)) {
+      errors.profileButtonText.push(`Needs to be one of the ${ALLOWED_BUTTON_TEXTS}`);
     }
 
-    if (cardSpace.description?.length > MAX_LONG_FIELD_LENGTH) {
-      addToErrors(errors, 'description', `Max length is ${MAX_LONG_FIELD_LENGTH}`);
+    if (cardSpace.profileDescription?.length > MAX_LONG_FIELD_LENGTH) {
+      errors.profileDescription.push(`Max length is ${MAX_LONG_FIELD_LENGTH}`);
     }
 
-    if (cardSpace.name?.length > MAX_SHORT_FIELD_LENGTH) {
-      addToErrors(errors, 'name', `Max length is ${MAX_SHORT_FIELD_LENGTH}`);
+    if (cardSpace.profileName?.length > MAX_SHORT_FIELD_LENGTH) {
+      errors.profileName.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
     }
 
-    if (cardSpace.category?.length > MAX_SHORT_FIELD_LENGTH) {
-      addToErrors(errors, 'category', `Max length is ${MAX_SHORT_FIELD_LENGTH}`);
+    if (cardSpace.profileCategory?.length > MAX_SHORT_FIELD_LENGTH) {
+      errors.profileCategory.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
     }
 
     try {
       let urlObject = new URL(`https://${cardSpace.url}`);
       if (!urlObject.hostname.endsWith('card.space')) {
-        addToErrors(errors, 'url', 'Only card.space subdomains are allowed');
+        errors.url.push('Only card.space subdomains are allowed');
       }
     } catch (error) {
-      addToErrors(errors, 'url', `Invalid URL`);
+      errors.url.push('Invalid URL');
     }
 
     if (cardSpace.url.split('.').length - 1 !== 2) {
-      addToErrors(errors, 'url', `Only first level subdomains are allowed`);
+      errors.url.push('Only first level subdomains are allowed');
     }
 
     let cardSpaceWithExistingUrl = (await this.cardSpaceQueries.query({ url: cardSpace.url }))[0];
 
     if (cardSpaceWithExistingUrl) {
-      addToErrors(errors, 'url', `Already exists`);
+      errors.url.push('Already exists');
     }
 
     return errors;

@@ -15,16 +15,16 @@ export default class CardSpaceQueries {
     let db = await this.databaseManager.getClient();
 
     await db.query(
-      'INSERT INTO card_spaces (id, url, name, profile_image_url, cover_image_url, description, button_text, category, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+      'INSERT INTO card_spaces (id, url, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
       [
         model.id,
         model.url,
-        model.name,
+        model.profileName,
         model.profileImageUrl,
-        model.coverImageUrl,
-        model.description,
-        model.buttonText,
-        model.category,
+        model.profileCoverImageUrl,
+        model.profileDescription,
+        model.profileButtonText,
+        model.profileCategory,
         model.ownerAddress,
       ]
     );
@@ -35,19 +35,19 @@ export default class CardSpaceQueries {
 
     const conditions = buildConditions(filter);
 
-    const query = `SELECT id, url, name, profile_image_url, cover_image_url, description, button_text, category, owner_address FROM card_spaces WHERE ${conditions.where}`;
+    const query = `SELECT id, url, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, owner_address FROM card_spaces WHERE ${conditions.where}`;
     const queryResult = await db.query(query, conditions.values);
 
     return queryResult.rows.map((row) => {
       return {
         id: row['id'],
-        url: row['name'],
-        name: row['name'],
-        profileImageUrl: row['profile_image_url'],
-        coverImageUrl: row['cover_image_url'],
-        description: row['description'],
-        buttonText: row['button_text'],
-        category: row['category'],
+        url: row['url'],
+        profileName: row['profile_name'],
+        profileImageUrl: row['profile_profile_image_url'],
+        profileCoverImageUrl: row['profile_cover_image_url'],
+        profileDescription: row['profile_description'],
+        profileButtonText: row['profile_button_text'],
+        profileCategory: row['profile_category'],
         ownerAddress: row['owner_address'],
       };
     });

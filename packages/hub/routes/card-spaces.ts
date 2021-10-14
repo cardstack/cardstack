@@ -11,13 +11,13 @@ import CardSpaceValidator, { CardSpaceErrors } from '../services/validators/card
 
 export interface CardSpace {
   id: string;
-  name: string;
   url: string;
-  description: string;
-  category: string;
-  buttonText: string;
+  profileName: string;
+  profileDescription: string;
+  profileCategory: string;
+  profileButtonText: string;
   profileImageUrl: string;
-  coverImageUrl: string;
+  profileCoverImageUrl: string;
   ownerAddress: string;
 }
 
@@ -45,19 +45,19 @@ export default class CardSpacesRoute {
 
     const cardSpace: CardSpace = {
       id: shortUuid.uuid(),
-      name: this.sanitizeText(ctx.request.body.data.attributes['name']),
       url: this.sanitizeText(ctx.request.body.data.attributes['url']),
-      description: this.sanitizeText(ctx.request.body.data.attributes['description']),
-      category: this.sanitizeText(ctx.request.body.data.attributes['category']),
-      buttonText: this.sanitizeText(ctx.request.body.data.attributes['button-text']),
+      profileName: this.sanitizeText(ctx.request.body.data.attributes['profile-name']),
+      profileDescription: this.sanitizeText(ctx.request.body.data.attributes['profile-description']),
+      profileCategory: this.sanitizeText(ctx.request.body.data.attributes['profile-category']),
+      profileButtonText: this.sanitizeText(ctx.request.body.data.attributes['profile-button-text']),
       profileImageUrl: this.sanitizeText(ctx.request.body.data.attributes['profile-image-url']),
-      coverImageUrl: this.sanitizeText(ctx.request.body.data.attributes['cover-image-url']),
+      profileCoverImageUrl: this.sanitizeText(ctx.request.body.data.attributes['profile-cover-image-url']),
       ownerAddress: ctx.state.userAddress,
     };
 
     let errors = await this.cardSpaceValidator.validate(cardSpace);
 
-    if (Object.keys(errors).length > 0) {
+    if (Object.values(errors).flatMap((i) => i).length > 0) {
       ctx.status = 422;
       ctx.body = {
         errors: Object.keys(errors).flatMap((attribute) => {

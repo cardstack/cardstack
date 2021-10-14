@@ -613,12 +613,12 @@ ALTER TABLE graphile_worker.migrations OWNER TO postgres;
 CREATE TABLE public.card_spaces (
     id uuid NOT NULL,
     url text NOT NULL,
-    name text NOT NULL,
+    profile_cover_image_url text,
+    profile_name text NOT NULL,
     profile_image_url text,
-    cover_image_url text,
-    description text NOT NULL,
-    button_text text NOT NULL,
-    category text NOT NULL,
+    profile_description text NOT NULL,
+    profile_button_text text NOT NULL,
+    profile_category text NOT NULL,
     owner_address text NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
@@ -1065,13 +1065,14 @@ COPY graphile_worker.migrations (id, ts) FROM stdin;
 --
 
 COPY public.pgmigrations (id, name, run_on) FROM stdin;
-1	20210527151505645_create-prepaid-card-tables	2021-09-15 17:07:25.385732
-2	20210614080132698_create-prepaid-card-customizations-table	2021-09-15 17:07:25.385732
-3	20210623052200757_create-graphile-worker-schema	2021-09-15 17:07:25.385732
-4	20210809113449561_merchant-infos	2021-09-15 17:07:25.385732
-5	20210817184105100_wallet-orders	2021-09-15 17:07:25.385732
-6	20210920142313915_prepaid-card-reservations	2021-09-30 11:46:38.940546
-7	20210924200122612_order-indicies	2021-09-30 11:46:38.940546
+1	20210527151505645_create-prepaid-card-tables	2021-08-02 16:26:07.752752
+2	20210614080132698_create-prepaid-card-customizations-table	2021-08-02 16:26:07.752752
+3	20210623052200757_create-graphile-worker-schema	2021-08-02 16:26:07.752752
+5	20210809113449561_merchant-infos	2021-08-12 09:52:27.790806
+6	20210817184105100_wallet-orders	2021-08-25 08:15:41.07505
+7	20210920142313915_prepaid-card-reservations	2021-10-06 14:32:47.039161
+8	20210924200122612_order-indicies	2021-10-06 14:32:47.039161
+13	20211006090701108_create-card-spaces	2021-10-14 10:38:51.140793
 \.
 
 
@@ -1079,7 +1080,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 7, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 13, true);
 
 
 --

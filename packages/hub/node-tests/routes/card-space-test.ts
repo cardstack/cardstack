@@ -67,12 +67,12 @@ describe('POST /api/card-spaces', function () {
         type: 'card-spaces',
         attributes: {
           url: 'satoshi.card.space',
-          name: 'Satoshi Nakamoto',
-          description: "Satoshi's place",
-          category: 'entertainment',
+          'profile-name': 'Satoshi Nakamoto',
+          'profile-description': "Satoshi's place",
+          'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
-          'cover-image-url': 'https://test.com/test2.png',
-          'button-text': 'Visit this Space',
+          'profile-cover-image-url': 'https://test.com/test2.png',
+          'profile-button-text': 'Visit this Space',
           'owner-address': '0x00000000000',
         },
       },
@@ -98,13 +98,13 @@ describe('POST /api/card-spaces', function () {
           id: 'the-id',
           attributes: {
             did: 'the-did',
-            name: 'Satoshi Nakamoto',
+            'profile-name': 'Satoshi Nakamoto',
             url: 'satoshi.card.space',
-            description: "Satoshi's place",
-            category: 'entertainment',
+            'profile-description': "Satoshi's place",
+            'profile-category': 'entertainment',
             'profile-image-url': 'https://test.com/test1.png',
-            'cover-image-url': 'https://test.com/test2.png',
-            'button-text': 'Visit this Space',
+            'profile-cover-image-url': 'https://test.com/test2.png',
+            'profile-button-text': 'Visit this Space',
             'owner-address': '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
           },
         },
@@ -119,8 +119,8 @@ describe('POST /api/card-spaces', function () {
     let dbManager = await server.container.lookup('database-manager');
     let db = await dbManager.getClient();
     await db.query(
-      'INSERT INTO card_spaces(id, name, url, description, category, button_text, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7)',
-      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'Test', 'satoshi.card.space', 'Test', 'Test', 'Test', '0x0']
+      'INSERT INTO card_spaces(id, url, profile_name, profile_description, profile_category, profile_button_text, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7)',
+      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'satoshi.card.space', 'Test', 'Test', 'Test', 'Test', '0x0']
     );
 
     let payload = {
@@ -128,12 +128,12 @@ describe('POST /api/card-spaces', function () {
         type: 'card-spaces',
         attributes: {
           url: 'satoshi.card.space', // Already inserted above
-          name: 'Satoshi Nakamoto',
-          description: "Satoshi's place",
-          category: 'entertainment',
+          'profile-name': 'Satoshi Nakamoto',
+          'profile-description': "Satoshi's place",
+          'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
-          'cover-image-url': 'https://test.com/test2.png',
-          'button-text': 'Visit this Space',
+          'profile-cover-image-url': 'https://test.com/test2.png',
+          'profile-button-text': 'Visit this Space',
           'owner-address': '0x00000000000',
         },
       },
@@ -167,12 +167,12 @@ describe('POST /api/card-spaces', function () {
         type: 'card-spaces',
         attributes: {
           url: 'sato shi.card.space',
-          name: 'Satoshi Nakamoto',
-          description: "Satoshi's place",
-          category: 'entertainment',
+          'profile-name': 'Satoshi Nakamoto',
+          'profile-description': "Satoshi's place",
+          'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
-          'cover-image-url': 'https://test.com/test2.png',
-          'button-text': 'Visit this Space',
+          'profile-cover-image-url': 'https://test.com/test2.png',
+          'profile-button-text': 'Visit this Space',
           'owner-address': '0x00000000000',
         },
       },
@@ -206,12 +206,12 @@ describe('POST /api/card-spaces', function () {
         type: 'card-spaces',
         attributes: {
           url: 'satoshi.nakamoto.card.race',
-          name: 'Satoshi Nakamoto',
-          description: "Satoshi's place",
-          category: 'entertainment',
+          'profile-name': 'Satoshi Nakamoto',
+          'profile-description': "Satoshi's place",
+          'profile-category': 'entertainment',
           'profile-image-url': 'https://test.com/test1.png',
-          'cover-image-url': 'https://test.com/test2.png',
-          'button-text': 'Visit this Space',
+          'profile-cover-image-url': 'https://test.com/test2.png',
+          'profile-button-text': 'Visit this Space',
           'owner-address': '0x00000000000',
         },
       },
