@@ -31,6 +31,18 @@ interface IndividualSafeState {
 }
 
 abstract class TrackedSafe {
+  @tracked address!: Safe['address'];
+  @tracked createdAt!: Safe['createdAt'];
+  @tracked tokens!: Safe['tokens'];
+  @tracked owners!: Safe['owners'];
+
+  update(safe: Safe) {
+    this.tokens = safe.tokens;
+    this.owners = safe.owners;
+    this.address = safe.address;
+    this.createdAt = safe.createdAt;
+  }
+
   toJSON() {
     throw new Error('Tracked safes do not support conversion to JSON');
   }
@@ -48,10 +60,6 @@ export class TrackedPrepaidCardSafe
   implements RequiredKeepUndefined<PrepaidCardSafe>
 {
   type = 'prepaid-card' as PrepaidCardSafe['type'];
-  @tracked address!: PrepaidCardSafe['address'];
-  @tracked createdAt!: PrepaidCardSafe['createdAt'];
-  @tracked tokens!: PrepaidCardSafe['tokens'];
-  @tracked owners!: PrepaidCardSafe['owners'];
   @tracked issuingToken!: PrepaidCardSafe['issuingToken'];
   @tracked spendFaceValue!: PrepaidCardSafe['spendFaceValue'];
   @tracked prepaidCardOwner!: PrepaidCardSafe['prepaidCardOwner'];
@@ -67,10 +75,7 @@ export class TrackedPrepaidCardSafe
   }
 
   update(safe: PrepaidCardSafe) {
-    this.address = safe.address;
-    this.createdAt = safe.createdAt;
-    this.tokens = safe.tokens;
-    this.owners = safe.owners;
+    super.update(safe);
     this.issuingToken = safe.issuingToken;
     this.spendFaceValue = safe.spendFaceValue;
     this.prepaidCardOwner = safe.prepaidCardOwner;
@@ -87,10 +92,6 @@ export class TrackedMerchantSafe
   implements RequiredKeepUndefined<MerchantSafe>
 {
   type = 'merchant' as MerchantSafe['type'];
-  @tracked address!: MerchantSafe['address'];
-  @tracked createdAt!: MerchantSafe['createdAt'];
-  @tracked tokens!: MerchantSafe['tokens'];
-  @tracked owners!: MerchantSafe['owners'];
   @tracked accumulatedSpendValue!: MerchantSafe['accumulatedSpendValue'];
   @tracked merchant!: MerchantSafe['merchant'];
   @tracked infoDID: MerchantSafe['infoDID'];
@@ -101,10 +102,7 @@ export class TrackedMerchantSafe
   }
 
   update(safe: MerchantSafe) {
-    this.address = safe.address;
-    this.createdAt = safe.createdAt;
-    this.tokens = safe.tokens;
-    this.owners = safe.owners;
+    super.update(safe);
     this.accumulatedSpendValue = safe.accumulatedSpendValue;
     this.merchant = safe.merchant;
     this.infoDID = safe.infoDID;
@@ -116,10 +114,6 @@ export class TrackedDepotSafe
   implements RequiredKeepUndefined<DepotSafe>
 {
   type = 'depot' as DepotSafe['type'];
-  @tracked address!: DepotSafe['address'];
-  @tracked createdAt!: DepotSafe['createdAt'];
-  @tracked tokens!: DepotSafe['tokens'];
-  @tracked owners!: DepotSafe['owners'];
   @tracked infoDID: DepotSafe['infoDID'];
 
   constructor(safe: DepotSafe) {
@@ -128,10 +122,7 @@ export class TrackedDepotSafe
   }
 
   update(safe: DepotSafe) {
-    this.address = safe.address;
-    this.createdAt = safe.createdAt;
-    this.tokens = safe.tokens;
-    this.owners = safe.owners;
+    super.update(safe);
     this.infoDID = safe.infoDID;
   }
 }
