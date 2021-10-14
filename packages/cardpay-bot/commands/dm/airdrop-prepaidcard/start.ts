@@ -23,6 +23,14 @@ const { sku } = config.get('betaTesting') as BetaTestConfig;
 const { network } = config.get('web3') as Web3Config;
 const continueCommands = ['ok', 'yes', 'y', 'sure', 'okay', 'fine', 'ready', "i'm ready"]; // some helpful suggestions from github co-pilot
 
+// For DM conversations that includes multiple user inputs we can break
+// conversation apart into a state machine where each command module is a state,
+// and you can transition to the next state based on user input via the
+// `activateDMConversation`. In this case we just ended up with a single state
+// so it's a bit hard to illustrate the intended approach. would imagine that
+// all the commands modules for a conversation can be grouped within the
+// conversation folder (like this one).
+
 export const run: Command['run'] = async (bot, message, [channelId] = []) => {
   if (!channelId || !message) {
     return;
