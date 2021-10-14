@@ -19,6 +19,7 @@
     "node": ">= 14"
   },
   "dependencies": {
+    "@cardstack/boxel": "0.26.10",
     "@cardstack/core": "0.26.10",
     "@embroider/addon-shim": "*",
     "@glimmer/component": "^1.0.3"

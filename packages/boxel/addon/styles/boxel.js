@@ -1,0 +1,13 @@
+import './variables.css';
+import './global.css';
+import '../components/boxel/action-chin/index.css';
+import '../components/boxel/action-chin/action-status-area/index.css';
+import '../components/boxel/action-container/index.css';
+import '../components/boxel/button/index.css';
+import '../components/boxel/button/kind-variants.css';
+import '../components/boxel/button/size-variants.css';
+import '../components/boxel/card-container/index.css';
+import '../components/boxel/field/view/index.css';
+import '../components/boxel/field/edit/index.css';
+import '../components/boxel/input/index.css';
+import '../components/boxel/select-button/index.css';
