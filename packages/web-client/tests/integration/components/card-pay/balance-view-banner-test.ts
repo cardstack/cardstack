@@ -8,6 +8,7 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import {
   createDepotSafe,
   createMerchantSafe,
+  createPrepaidCardSafe,
   createSafeToken,
   getFilenameFromDid,
 } from '@cardstack/web-client/utils/test-factories';
@@ -136,6 +137,35 @@ module(
       assert
         .dom('[data-test-balance-view-token-amount')
         .containsText('450.11 CARD.CPXD');
+    });
+
+    test('it uses placeholders for an unhandled safe type', async function (assert) {
+      let safeAddress = '0x123400000000000000000000000000000000abcd';
+      this.set(
+        'safe',
+        createPrepaidCardSafe({
+          address: safeAddress,
+        })
+      );
+
+      await render(hbs`
+        <CardPay::BalanceViewBanner
+          @walletAddress={{this.walletAddress}}
+          @safe={{this.safe}}
+          @token="CARD.CPXD"
+        />`);
+
+      assert.dom('[data-test-balance-view-summary]').containsText('Unknown');
+
+      // FIXME
+      assert
+        .dom('[data-test-balance-view-depot-address]')
+        .containsText('Unknown:')
+        .containsText(safeAddress);
+
+      assert
+        .dom('[data-test-balance-view-depot-address] [data-test-icon]')
+        .doesNotExist();
     });
   }
 );
