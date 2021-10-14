@@ -55,14 +55,13 @@ module(
         .containsText('Account:')
         .containsText(walletAddress);
 
-      // FIXME
       assert
-        .dom('[data-test-balance-view-depot-address')
+        .dom('[data-test-balance-view-safe-address')
         .containsText('DEPOT:')
         .containsText(depotAddress);
 
       assert
-        .dom('[data-test-balance-view-depot-address] [data-test-icon=depot]')
+        .dom('[data-test-balance-view-safe-address] [data-test-icon=depot]')
         .exists();
 
       assert
@@ -124,14 +123,13 @@ module(
         .containsText('Account:')
         .containsText(walletAddress);
 
-      // FIXME
       assert
-        .dom('[data-test-balance-view-depot-address')
+        .dom('[data-test-balance-view-safe-address')
         .containsText('Merchant Mandello:')
         .containsText(merchantAddress);
 
       assert
-        .dom('[data-test-balance-view-depot-address] [data-test-icon=merchant]')
+        .dom('[data-test-balance-view-safe-address] [data-test-icon=merchant]')
         .exists();
 
       assert
@@ -157,14 +155,13 @@ module(
 
       assert.dom('[data-test-balance-view-summary]').containsText('Unknown');
 
-      // FIXME
       assert
-        .dom('[data-test-balance-view-depot-address]')
+        .dom('[data-test-balance-view-safe-address]')
         .containsText('Unknown:')
         .containsText(safeAddress);
 
       assert
-        .dom('[data-test-balance-view-depot-address] [data-test-icon]')
+        .dom('[data-test-balance-view-safe-address] [data-test-icon]')
         .doesNotExist();
     });
   }
