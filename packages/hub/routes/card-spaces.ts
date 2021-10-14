@@ -86,6 +86,20 @@ export default class CardSpacesRoute {
     ctx.type = 'application/vnd.api+json';
   }
 
+  async getUrlValidation(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+
+    let url: string = ctx.params.url;
+    let errors = await this.cardSpaceValidator.validate({ url } as CardSpace);
+    let urlAvailable = !errors.url.includes('Already exists');
+
+    ctx.status = 200;
+    ctx.body = { urlAvailable, detail: errors.url.join(', ') };
+    ctx.type = 'application/vnd.api+json';
+  }
+
   sanitizeText(value: string | unknown): string {
     if (typeof value === 'string') {
       return value.trim().replace(/ +/g, ' ');

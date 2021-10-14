@@ -264,4 +264,75 @@ describe('POST /api/card-spaces', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
+
+  describe('GET /api/card-spaces/url-validation/:url', async function () {
+    let server: HubServer;
+    let request: supertest.SuperTest<Test>;
+
+    this.beforeEach(async function () {
+      server = await HubServer.create({
+        registryCallback(registry: Registry) {
+          registry.register('authentication-utils', StubAuthenticationUtils);
+          registry.register('worker-client', StubWorkerClient);
+        },
+      });
+
+      request = supertest(server.app.callback());
+    });
+
+    this.afterEach(async function () {
+      server.teardown();
+    });
+
+    it('returns urlAvailable = true when url available', async function () {
+      await request
+        .get(`/api/card-spaces/validate-url/satoshi.card.space`)
+        .set('Authorization', 'Bearer: abc123--def456--ghi789')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(200)
+        .expect({
+          urlAvailable: true,
+          detail: '',
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
+    });
+
+    it('returns urlAvailable = false when url already used', async function () {
+      let dbManager = await server.container.lookup('database-manager');
+      let db = await dbManager.getClient();
+      await db.query(
+        'INSERT INTO card_spaces(id, profile_name, url, profile_description, profile_category, profile_button_text, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7)',
+        ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'Test', 'satoshi.card.space', 'Test', 'Test', 'Test', '0x0']
+      );
+
+      await request
+        .get(`/api/card-spaces/validate-url/satoshi.card.space`)
+        .set('Authorization', 'Bearer: abc123--def456--ghi789')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(200)
+        .expect({
+          urlAvailable: false,
+          detail: 'Already exists',
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
+    });
+
+    it('returns 401 without bearer token', async function () {
+      await request
+        .post('/api/card-spaces')
+        .send({})
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json')
+        .expect(401)
+        .expect({
+          errors: [
+            {
+              status: '401',
+              title: 'No valid auth token',
+            },
+          ],
+        })
+        .expect('Content-Type', 'application/vnd.api+json');
+    });
+  });
 });

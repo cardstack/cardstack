@@ -74,6 +74,7 @@ export default class APIRouter {
     apiSubrouter.post('/reservations', parseBody, reservationsRoute.post);
     apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get);
     apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);
+    apiSubrouter.get('/card-spaces/validate-url/:url', cardSpacesRoute.getUrlValidation);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();
