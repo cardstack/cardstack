@@ -299,10 +299,10 @@ This call is used to view a specific safe in the layer 2 network in which the Ca
 This method is invoked with the following parameters:
   - safe address
 
-This method returns a promise for an object that is a `Safe` type:
+This method returns a promise for an object that contains a `Safe` and the block number at which the subgraph was last indexed:
 Which can be called like this:
 ```js
-let safeDetails = await safes.viewSafe(safeAddress);
+let safeDetails = await safes.viewSafe(safeAddress); // returns { safe: Safe | undefined; blockNumber: number; }
 ```
 
 ### `Safes.view`
@@ -311,7 +311,7 @@ This call is used to view all the gnosis safes owned by a particular address in 
 This method is invoked with the following parameters:
 - Optionally the address of a safe owner. If no address is supplied, then the default account in your web3 provider's wallet will be used.
 
-This method returns a promise that includes an array of all the gnosis safes owned by the specified address. The result is an object that is a `Safe[]` type which conforms to the `Safe` shape below:
+This method returns a promise that includes an array of all the gnosis safes owned by the specified address. The result is an object contains a `Safe[]` type which conforms to the `Safe` shape below, and the block number at which the subgraph was last indexed:
 
 ```ts
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | ExternalSafe;
@@ -342,7 +342,7 @@ interface PrepaidCardSafe extends BaseSafe {
 
 Which can be called like this:
 ```js
-let safeDetails = await safes.view();
+let safeDetails = await safes.view(); // returns { safes: Safe[]; blockNumber: number; }
 ```
 
 ### `Safes.sendTokensGasEstimate`
