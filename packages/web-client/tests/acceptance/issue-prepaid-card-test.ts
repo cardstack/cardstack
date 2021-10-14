@@ -329,7 +329,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom('[data-test-balance-view-account-address]')
       .containsText(layer2AccountAddress);
     assert
-      .dom('[data-test-balance-view-depot-address]')
+      .dom('[data-test-balance-view-safe-address]')
       .containsText(merchantSafe.address);
     assert
       .dom('[data-test-balance-view-token-amount]')
