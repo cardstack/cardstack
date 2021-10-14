@@ -51,7 +51,7 @@ export const MILESTONE_TITLES = [
   'Confirm transaction',
 ];
 
-export const WORKFLOW_VERSION = 1;
+export const WORKFLOW_VERSION = 1.1;
 
 class IssuePrepaidCardWorkflow extends Workflow {
   @service declare router: RouterService;

@@ -29,7 +29,7 @@ module('Acceptance | deposit persistence', function (hooks) {
   setupMirage(hooks);
   let workflowPersistenceService: WorkflowPersistence;
 
-  hooks.beforeEach(function () {
+  hooks.beforeEach(async function () {
     workflowPersistenceService = this.owner.lookup(
       'service:workflow-persistence'
     );
@@ -50,7 +50,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     workflowPersistenceService.clear();
   });

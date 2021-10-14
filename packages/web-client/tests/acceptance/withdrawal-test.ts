@@ -124,13 +124,17 @@ module('Acceptance | withdrawal', function (hooks) {
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    await layer2Service.test__simulateBalances({
-      defaultToken: new BN('250000000000000000000'),
-      card: new BN('500000000000000000000'),
-    });
     let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
-    await layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        address: depotAddress,
+        owners: [layer2AccountAddress],
+        tokens: [
+          createSafeToken('DAI', '250000000000000000000'),
+          createSafeToken('CARD', '500000000000000000000'),
+        ],
+      }),
       createMerchantSafe({
         address: merchantAddress,
         merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
@@ -141,18 +145,8 @@ module('Acceptance | withdrawal', function (hooks) {
         ],
       }),
     ]);
-    let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-    let testDepot = createDepotSafe({
-      address: depotAddress,
-      owners: [],
-      tokens: [
-        createSafeToken('DAI', '250000000000000000000'),
-        createSafeToken('CARD', '500000000000000000000'),
-      ],
-    });
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    await layer2Service.test__simulateDepot(testDepot);
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitFor(`${postableSel(2, 2)} [data-test-balance="DAI.CPXD"]`);
     assert
       .dom(`${postableSel(2, 2)} [data-test-balance="DAI.CPXD"]`)
@@ -329,17 +323,15 @@ module('Acceptance | withdrawal', function (hooks) {
       .containsText(
         `This is the remaining balance in your ${c.layer2.fullName} wallet`
       );
-    await layer2Service.test__simulateBalances({
-      defaultToken: new BN('2141100000000000000'), // TODO: choose numbers that make sense with the scenario
-      card: new BN('10000000000000000000000'), // TODO: choose numbers that make sense with the scenario
-    });
+
     await waitFor(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`);
+
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
-      .containsText('2.1411');
+      .containsText('250.00');
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD.CPXD"]`)
-      .containsText('10,000.00');
+      .containsText('500.00');
     assert
       .dom(
         '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
@@ -540,10 +532,12 @@ module('Acceptance | withdrawal', function (hooks) {
       });
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      await layer2Service.test__simulateBalances({
-        defaultToken: new BN(0),
-      });
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+        createDepotSafe({
+          tokens: [createSafeToken('DAI', '0')],
+        }),
+      ]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     });
 
     test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
@@ -645,7 +639,9 @@ module('Acceptance | withdrawal', function (hooks) {
         .dom(milestoneCompletedSel(2))
         .containsText(`${c.layer2.fullName} wallet connected`);
 
-      layer2Service.test__simulateAccountsChanged([secondLayer2AccountAddress]);
+      await layer2Service.test__simulateAccountsChanged([
+        secondLayer2AccountAddress,
+      ]);
       await settled();
 
       // test that all cta buttons are disabled

@@ -46,10 +46,10 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
     }
   }
 
-  // assumption is these are always set by cards before it. They should be defined by the time
-  // it gets to this part of the workflow
   get currentSafe(): Safe {
-    return this.args.workflowSession.getValue<Safe>('withdrawalSafe')!;
+    return this.layer2Network.safes.getByAddress(
+      this.args.workflowSession.getValue<string>('withdrawalSafe')!
+    )!;
   }
 
   get currentTokenSymbol(): BridgedTokenSymbol {

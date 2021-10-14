@@ -53,7 +53,6 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     let testDepot = createDepotSafe({
       address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
@@ -62,7 +61,10 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       ],
     });
 
-    await layer2Service.test__simulateDepot(testDepot);
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      testDepot,
+    ]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.authenticate();
     layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
 

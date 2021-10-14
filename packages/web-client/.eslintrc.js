@@ -16,6 +16,32 @@ module.exports = {
     'plugin:ember/recommended',
     'plugin:prettier/recommended',
   ],
+  rules: {
+    'no-restricted-imports': [
+      'warn',
+      {
+        paths: [
+          {
+            name: '@cardstack/cardpay-sdk',
+            importNames: [
+              'Safe',
+              'DepotSafe',
+              'MerchantSafe',
+              'PrepaidCardSafe',
+              'ExternalSafe',
+            ],
+            message:
+              'Do not use SDK safes directly, instead use the Safes resource identity map',
+          },
+          {
+            name: '@cardstack/cardpay-sdk/sdk/safes',
+            message:
+              'Do not use SDK safes directly, instead use the Safes resource identity map',
+          },
+        ],
+      },
+    ],
+  },
   env: {
     browser: true,
   },

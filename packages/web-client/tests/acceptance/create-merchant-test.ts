@@ -12,7 +12,6 @@ import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import BN from 'bn.js';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import {
   convertAmountToNativeDisplay,
@@ -22,7 +21,11 @@ import { setupHubAuthenticationToken } from '../helpers/setup';
 
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
-import { createPrepaidCardSafe } from '@cardstack/web-client/utils/test-factories';
+import {
+  createDepotSafe,
+  createPrepaidCardSafe,
+  createSafeToken,
+} from '@cardstack/web-client/utils/test-factories';
 
 interface Context extends MirageTestContext {}
 
@@ -113,17 +116,18 @@ module('Acceptance | create merchant', function (hooks) {
     assert.dom('[data-test-wallet-connect-qr-code]').exists();
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    await layer2Service.test__simulateBalances({
-      defaultToken: new BN(0),
-    });
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI', '0')],
+      }),
       createMockPrepaidCard(
         layer2AccountAddress,
         prepaidCardAddress,
         merchantRegistrationFee
       ),
     ]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
       () => !document.querySelector('[data-test-wallet-connect-qr-code]')
     );
@@ -250,18 +254,18 @@ module('Acceptance | create merchant', function (hooks) {
     hooks.beforeEach(async function () {
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      await layer2Service.test__simulateBalances({
-        defaultToken: new BN(0),
-      });
-
-      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+        createDepotSafe({
+          owners: [layer2AccountAddress],
+          tokens: [createSafeToken('DAI', '0')],
+        }),
         createMockPrepaidCard(
           layer2AccountAddress,
           prepaidCardAddress,
           merchantRegistrationFee
         ),
       ]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     });
 
     test('initiating workflow with layer 2 wallet already connected', async function (assert) {
@@ -456,15 +460,20 @@ module('Acceptance | create merchant', function (hooks) {
         .dom(milestoneCompletedSel(0))
         .containsText(`${c.layer2.fullName} wallet connected`);
 
-      layer2Service.test__simulateAccountsChanged([secondLayer2AccountAddress]);
-
-      layer2Service.test__simulateAccountSafes(secondLayer2AccountAddress, [
-        createMockPrepaidCard(
-          secondLayer2AccountAddress,
-          secondPrepaidCardAddress,
-          merchantRegistrationFee
-        ),
+      await layer2Service.test__simulateAccountsChanged([
+        secondLayer2AccountAddress,
       ]);
+
+      layer2Service.test__simulateRemoteAccountSafes(
+        secondLayer2AccountAddress,
+        [
+          createMockPrepaidCard(
+            secondLayer2AccountAddress,
+            secondPrepaidCardAddress,
+            merchantRegistrationFee
+          ),
+        ]
+      );
       await settled();
 
       assert
@@ -492,12 +501,13 @@ module('Acceptance | create merchant', function (hooks) {
   test('it cancels the workflow if there are no prepaid cards associated with the EOA', async function (assert) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    await layer2Service.test__simulateBalances({
-      defaultToken: new BN(0),
-    });
-
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, []);
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI', '0')],
+      }),
+    ]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     await visit('/card-pay/merchant-services?flow=create-merchant');
     assert
@@ -527,18 +537,19 @@ module('Acceptance | create merchant', function (hooks) {
   test('it cancels the workflow if prepaid cards associated with the EOA do not have enough balance', async function (assert) {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    await layer2Service.test__simulateBalances({
-      defaultToken: new BN(0),
-    });
 
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI', '0')],
+      }),
       createMockPrepaidCard(
         layer2AccountAddress,
         prepaidCardAddress,
         merchantRegistrationFee - 1
       ),
     ]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     await visit('/card-pay/merchant-services?flow=create-merchant');
     assert

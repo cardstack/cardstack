@@ -109,7 +109,7 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
       }
 
       let txnHash = workflowSession.getValue<TransactionHash>('txnHash');
-      if (txnHash && !workflowSession.getValue('prepaidCardSafe')) {
+      if (txnHash && !workflowSession.getValue('prepaidCardAddress')) {
         this.chinInProgressMessage =
           'Waiting for the transaction to be finalized…';
 
@@ -117,7 +117,11 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
           this.layer2Network.resumeIssuePrepaidCardTransactionTask
         ).perform(txnHash);
 
-        this.args.workflowSession.setValue('prepaidCardSafe', prepaidCardSafe);
+        this.args.workflowSession.setValue({
+          prepaidCardAddress: prepaidCardSafe.address,
+          reloadable: prepaidCardSafe.reloadable,
+          transferrable: prepaidCardSafe.transferrable,
+        });
       } else {
         this.chinInProgressMessage =
           'You will receive a confirmation request from the Card Wallet app in a few moments…';
@@ -151,7 +155,6 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
           prepaidCardAddress: prepaidCardSafe.address,
           reloadable: prepaidCardSafe.reloadable,
           transferrable: prepaidCardSafe.transferrable,
-          prepaidCardSafe: prepaidCardSafe,
         });
       }
 

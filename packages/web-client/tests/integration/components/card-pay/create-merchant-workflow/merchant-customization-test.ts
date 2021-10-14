@@ -86,9 +86,7 @@ module(
 
       let prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
 
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-
-      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createPrepaidCardSafe({
           address: prepaidCardAddress,
           owners: [layer2AccountAddress],
@@ -99,6 +97,7 @@ module(
           transferrable: false,
         }),
       ]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
       this.setProperties({
         onComplete: () => {
