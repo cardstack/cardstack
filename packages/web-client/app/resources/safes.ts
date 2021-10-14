@@ -223,6 +223,10 @@ export class Safes extends Resource<Args> {
       safesWithLatestValues.push(this.safeReferences[address]);
     }
 
+    safesWithLatestValues.sort(
+      (safe1, safe2) => safe2.createdAt - safe1.createdAt
+    );
+
     this.value = safesWithLatestValues;
   }
 
