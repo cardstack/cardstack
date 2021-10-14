@@ -8,9 +8,7 @@ import {
   WorkflowName,
   WorkflowMessage,
   WorkflowCard,
-  UNSUPPORTED_WORKFLOW_STATE_VERSION,
   conditionalCancelationMessage,
-  defaultCancelationCard,
 } from '@cardstack/web-client/models/workflow';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
@@ -21,6 +19,7 @@ import { capitalize } from '@ember/string';
 import RouterService from '@ember/routing/router-service';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { tracked } from '@glimmer/tracking';
+import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -29,7 +28,6 @@ const FAILURE_REASONS = {
   RESTORATION_L1_DISCONNECTED: 'RESTORATION_L1_DISCONNECTED',
   RESTORATION_L2_ADDRESS_CHANGED: 'RESTORATION_L2_ADDRESS_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
-  UNSUPPORTED_WORKFLOW_STATE_VERSION: UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } as const;
 
 export const MILESTONE_TITLES = [
@@ -207,12 +205,7 @@ class DepositWorkflow extends Workflow {
       message:
         'You attempted to restore an unfinished workflow, but your Layer 1 wallet got disconnected. Please restart the workflow.',
     }),
-    conditionalCancelationMessage({
-      forReason: FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION,
-      message:
-        'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!',
-    }),
-    defaultCancelationCard(),
+    ...standardCancelationPostables(),
   ]);
 
   restorationErrors() {

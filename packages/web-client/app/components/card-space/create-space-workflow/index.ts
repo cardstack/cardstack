@@ -17,10 +17,9 @@ import {
   WorkflowCard,
   WorkflowMessage,
   WorkflowName,
-  UNSUPPORTED_WORKFLOW_STATE_VERSION,
   conditionalCancelationMessage,
-  defaultCancelationCard,
 } from '@cardstack/web-client/models/workflow';
+import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
 
 const FAILURE_REASONS = {
   L2_DISCONNECTED: 'L2_DISCONNECTED',
@@ -29,7 +28,6 @@ const FAILURE_REASONS = {
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
   RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
-  UNSUPPORTED_WORKFLOW_STATE_VERSION: UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } as const;
 
 export const MILESTONE_TITLES = [
@@ -205,12 +203,7 @@ class CreateSpaceWorkflow extends Workflow {
       message:
         'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
     }),
-    conditionalCancelationMessage({
-      forReason: FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION,
-      message:
-        'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!',
-    }),
-    defaultCancelationCard(),
+    ...standardCancelationPostables(),
   ]);
 
   constructor(owner: unknown, workflowPersistenceId?: string) {

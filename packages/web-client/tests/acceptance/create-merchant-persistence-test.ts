@@ -13,7 +13,10 @@ import {
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
-import { WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/create-merchant-workflow';
+import {
+  MILESTONE_TITLES,
+  WORKFLOW_VERSION,
+} from '@cardstack/web-client/components/card-pay/create-merchant-workflow';
 
 interface Context extends MirageTestContext {}
 
@@ -380,6 +383,8 @@ module('Acceptance | create merchant persistence', function (hooks) {
       const state = buildState({
         meta: {
           version: WORKFLOW_VERSION - 1,
+          completedMilestonesCount: 2,
+          milestonesCount: MILESTONE_TITLES.length,
           completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
         },
         merchantName,
