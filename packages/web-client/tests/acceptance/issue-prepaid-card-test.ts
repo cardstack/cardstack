@@ -36,6 +36,7 @@ import {
   createPrepaidCardSafe,
   createSafeToken,
   defaultCreatedPrepaidCardDID,
+  getFilenameFromDid,
 } from '@cardstack/web-client/utils/test-factories';
 import {
   convertAmountToNativeDisplay,
@@ -57,6 +58,8 @@ const SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER =
 const SLIGHTLY_LESS_THAN_MAX_VALUE = new BN(
   toWei(`${SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER}`)
 );
+
+const MERCHANT_DID = 'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -129,6 +132,15 @@ module('Acceptance | issue prepaid card', function (hooks) {
         createSafeToken('CARD', '450000000000000000000'),
       ],
       accumulatedSpendValue: 100,
+      infoDID: MERCHANT_DID,
+    });
+
+    this.server.create('merchant-info', {
+      id: await getFilenameFromDid(MERCHANT_DID),
+      name: 'Mandello',
+      slug: 'mandello1',
+      did: MERCHANT_DID,
+      'owner-address': '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
     });
 
     layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
@@ -305,7 +317,10 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .dom(postableSel(2, 3))
       .containsText('choose the face value of your prepaid card');
     // // face-value card
-    assert.dom('[data-test-balance-view-summary]').containsText('125.00 DAI');
+    assert
+      .dom('[data-test-balance-view-summary]')
+      .containsText('125.00 DAI')
+      .containsText('Merchant Mandello');
     await click('[data-test-balance-view-summary]');
     assert
       .dom('[data-test-balance-view-account-address]')
