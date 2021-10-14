@@ -1,7 +1,7 @@
 {{#let (eq @size "small") (eq @size "large") as |isSmall isLarge|}}
   <div class="account-display" ...attributes>
     {{#if @icon}}
-      {{svg-jar @icon class=(cn "account-display__icon" account-display__icon--sm=isSmall) role="presentation"}}
+      {{svg-jar @icon class=(cn "account-display__icon" account-display__icon--sm=isSmall) role="presentation" data-test-icon=@icon}}
     {{/if}}
     <div>
       {{#if @name}}
