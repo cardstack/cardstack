@@ -1,7 +1,6 @@
-import supertest, { Test } from 'supertest';
-import { HubServer } from '../../main';
 import { Registry } from '@cardstack/di';
 import Web3 from 'web3';
+import { setupServer } from '../helpers/server';
 
 const { toChecksumAddress } = Web3.utils;
 const stubNonce = 'abc:123';
@@ -60,7 +59,7 @@ function handleCreateWyreWallet(address: string) {
   return {
     callbackUrl: null,
     depositAddresses: {
-      ETH: stubDepositAddress1, // eslint-disable-line @typescript-eslint/naming-convention
+      ETH: stubDepositAddress1,
     },
     name: address.toLowerCase(),
     id: stubWyreWalletId1,
@@ -77,7 +76,7 @@ function handleGetWyreWalletByName(address: string) {
       notes: null,
       balances: {},
       depositAddresses: {
-        ETH: stubDepositAddress2, // eslint-disable-line @typescript-eslint/naming-convention
+        ETH: stubDepositAddress2,
       },
       totalBalances: {},
       availableBalances: {},
@@ -91,26 +90,19 @@ function handleGetWyreWalletByName(address: string) {
 }
 
 describe('GET /api/custodial-wallet', function () {
-  let server: HubServer;
-  let request: supertest.SuperTest<Test>;
+  let { request } = setupServer(this, {
+    registryCallback(registry: Registry) {
+      registry.register('authentication-utils', StubAuthenticationUtils);
+      registry.register('wyre', StubWyreService);
+    },
+  });
 
   this.beforeEach(async function () {
     wyreCreateCallCount = 0;
-    server = await HubServer.create({
-      registryCallback(registry: Registry) {
-        registry.register('authentication-utils', StubAuthenticationUtils);
-        registry.register('wyre', StubWyreService);
-      },
-    });
-    request = supertest(server.app.callback());
-  });
-
-  this.afterEach(async function () {
-    server.teardown();
   });
 
   it('gets a the custodial wallet for an EOA that is not yet assigned a custodial wallet', async function () {
-    await request
+    await request()
       .get(`/api/custodial-wallet`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -133,7 +125,7 @@ describe('GET /api/custodial-wallet', function () {
   });
 
   it('gets the custodial wallet for an EOA that has already been assigned a custodial wallet', async function () {
-    await request
+    await request()
       .get(`/api/custodial-wallet`)
       .set('Authorization', 'Bearer: mno123--pqr456--stu789')
       .set('Accept', 'application/vnd.api+json')
@@ -156,7 +148,7 @@ describe('GET /api/custodial-wallet', function () {
   });
 
   it('returns 401 without bearer token', async function () {
-    await request
+    await request()
       .get('/api/custodial-wallet')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')

@@ -6,7 +6,7 @@ import {
 } from '@cardstack/web-client/models/workflow';
 
 interface SessionAwareWorkflowMessageOptions {
-  author: Participant;
+  author?: Participant;
   includeIf: (this: WorkflowPostable) => boolean;
   template: (session: IWorkflowSession) => string;
 }

@@ -1,14 +1,12 @@
-import supertest, { Test } from 'supertest';
-import { HubServer } from '../../main';
 import { Client } from 'pg';
+import { setupServer } from '../helpers/server';
 
 describe('GET /api/prepaid-card-color-schemes', function () {
-  let server: HubServer;
   let db: Client;
-  let request: supertest.SuperTest<Test>;
+  let { getServer, request } = setupServer(this);
+
   this.beforeEach(async function () {
-    server = await HubServer.create();
-    let dbManager = await server.container.lookup('database-manager');
+    let dbManager = await getServer().container.lookup('database-manager');
     db = await dbManager.getClient();
 
     let rows = [
@@ -31,15 +29,10 @@ describe('GET /api/prepaid-card-color-schemes', function () {
         console.error(e);
       }
     }
-    request = supertest(server.app.callback());
-  });
-
-  this.afterEach(async function () {
-    server.teardown();
   });
 
   it('responds with 200 and available color schemes', async function () {
-    await request
+    await request()
       .get('/api/prepaid-card-color-schemes')
       .set('Accept', 'application/vnd.api+json')
       .expect(200)

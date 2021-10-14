@@ -8,12 +8,19 @@ module.exports = {
     // this doesn't need to be replaced.
     'no-dupe-class-members': 'off',
 
+    // typescript handles this direclty, and the eslint rule doesn't understand
+    // how to resolve type-only imports when there is only a d.ts file and not a
+    // .js file.
+    'node/no-missing-import': 'off',
+
     semi: 'off',
     '@typescript-eslint/semi': ['error'],
     '@typescript-eslint/adjacent-overload-signatures': 'error',
     '@typescript-eslint/array-type': 'error',
     '@typescript-eslint/ban-types': 'error',
-    '@typescript-eslint/naming-convention': 'error',
+    // The defaults for the naming-convention rule are rather nuanced and helpful
+    // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/naming-convention.md
+    // '@typescript-eslint/naming-convention': 'error',
     indent: 'off',
     '@typescript-eslint/indent': 'off',
     '@typescript-eslint/member-delimiter-style': 'error',

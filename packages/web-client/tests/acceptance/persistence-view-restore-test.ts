@@ -24,6 +24,12 @@ import {
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
+import { WORKFLOW_VERSION as WITHDRAWAL_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/withdrawal-workflow';
+import { WORKFLOW_VERSION as MERCHANT_CREATION_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/create-merchant-workflow';
+import { WORKFLOW_VERSION as PREPAID_CARD_ISSUANCE_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
+import { WORKFLOW_VERSION as CARD_SPACE_CREATION_WORKFLOW_VERSION } from '@cardstack/web-client/components/card-space/create-space-workflow';
+import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
+import BN from 'bn.js';
 
 interface Context extends MirageTestContext {}
 
@@ -36,23 +42,32 @@ module('Acceptance | persistence view and restore', function () {
     setupHubAuthenticationToken(hooks);
 
     hooks.beforeEach(async function (this: Context) {
+      let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+      layer1Service.test__simulateAccountsChanged(
+        [layer1AccountAddress],
+        'metamask'
+      );
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
       let layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
       let testDepot = createDepotSafe({
         address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
         tokens: [createSafeToken('CARD', '500000000000000000000')],
       });
 
-      await layer2Service.test__simulateDepot(testDepot);
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+        testDepot,
+      ]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
       let merchantRegistrationFee = await this.owner
         .lookup('service:layer2-network')
         .strategy.fetchMerchantRegistrationFee();
 
-      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createPrepaidCardSafe({
           address: '0x123400000000000000000000000000000000abcd',
           owners: [layer2AccountAddress],
@@ -70,11 +85,32 @@ module('Acceptance | persistence view and restore', function () {
       workflowPersistenceService.clear();
     });
 
+    test('it is hidden when layer1 wallet is not connected', async function (this: Context, assert) {
+      await visit('/card-pay/');
+      assert.dom('[data-test-workflow-tracker-toggle]').exists();
+
+      await click('[data-test-card-pay-layer-1-connect] button');
+      await click('[data-test-mainnet-disconnect-button]');
+
+      assert.dom('[data-test-workflow-tracker-toggle]').doesNotExist();
+    });
+
+    test('it is hidden when layer2 wallet is not connected', async function (this: Context, assert) {
+      await visit('/card-pay/');
+      assert.dom('[data-test-workflow-tracker-toggle]').exists();
+
+      await click('[data-test-card-pay-layer-2-connect] button');
+      await click('[data-test-layer-2-wallet-disconnect-button]');
+
+      assert.dom('[data-test-workflow-tracker-toggle]').doesNotExist();
+    });
+
     test('it lists persisted Card Pay workflows', async function (this: Context, assert) {
       workflowPersistenceService.persistData('persisted-merchant-creation', {
         name: 'MERCHANT_CREATION',
         state: buildState({
           meta: {
+            version: MERCHANT_CREATION_WORKFLOW_VERSION,
             completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
@@ -89,6 +125,7 @@ module('Acceptance | persistence view and restore', function () {
           name: `PREPAID_CARD_ISSUANCE`,
           state: buildState({
             meta: {
+              version: PREPAID_CARD_ISSUANCE_WORKFLOW_VERSION,
               completedCardNames: [
                 'LAYER2_CONNECT',
                 'HUB_AUTH',
@@ -107,6 +144,7 @@ module('Acceptance | persistence view and restore', function () {
         name: 'PREPAID_CARD_ISSUANCE',
         state: buildState({
           meta: {
+            version: PREPAID_CARD_ISSUANCE_WORKFLOW_VERSION,
             completedCardNames: [
               'LAYER2_CONNECT',
               'HUB_AUTH',
@@ -137,6 +175,7 @@ module('Acceptance | persistence view and restore', function () {
         name: `PREPAID_CARD_ISSUANCE`,
         state: buildState({
           meta: {
+            version: PREPAID_CARD_ISSUANCE_WORKFLOW_VERSION,
             completedCardNames: [
               'LAYER2_CONNECT',
               'HUB_AUTH',
@@ -156,6 +195,7 @@ module('Acceptance | persistence view and restore', function () {
         name: 'CARD_SPACE_CREATION',
         state: buildState({
           meta: {
+            version: CARD_SPACE_CREATION_WORKFLOW_VERSION,
             completedCardNames: ['LAYER2_CONNECT'],
             completedMilestonesCount: 1,
             milestonesCount: 4,
@@ -170,6 +210,7 @@ module('Acceptance | persistence view and restore', function () {
           name: 'CARD_SPACE_CREATION',
           state: buildState({
             meta: {
+              version: CARD_SPACE_CREATION_WORKFLOW_VERSION,
               completedCardNames: [
                 'LAYER2_CONNECT',
                 'CARD_SPACE_USERNAME',
@@ -190,6 +231,7 @@ module('Acceptance | persistence view and restore', function () {
           name: 'CARD_SPACE_CREATION',
           state: buildState({
             meta: {
+              version: CARD_SPACE_CREATION_WORKFLOW_VERSION,
               completedCardNames: ['LAYER2_CONNECT'],
               completedMilestonesCount: 1,
               milestonesCount: 4,
@@ -250,6 +292,7 @@ module('Acceptance | persistence view and restore', function () {
         name: 'MERCHANT_CREATION',
         state: buildState({
           meta: {
+            version: MERCHANT_CREATION_WORKFLOW_VERSION,
             completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
@@ -272,6 +315,7 @@ module('Acceptance | persistence view and restore', function () {
         name: 'MERCHANT_CREATION',
         state: buildState({
           meta: {
+            version: MERCHANT_CREATION_WORKFLOW_VERSION,
             completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
             completedMilestonesCount: 1,
             milestonesCount: 3,
@@ -283,6 +327,7 @@ module('Acceptance | persistence view and restore', function () {
         name: 'PREPAID_CARD_ISSUANCE',
         state: buildState({
           meta: {
+            version: PREPAID_CARD_ISSUANCE_WORKFLOW_VERSION,
             completedCardNames: [
               'LAYER2_CONNECT',
               'HUB_AUTH',
@@ -381,49 +426,230 @@ module('Acceptance | persistence view and restore', function () {
   module(
     'when workflows have been persisted before the application loads',
     function (hooks) {
-      window.TEST__MOCK_LOCAL_STORAGE_INIT = {};
+      hooks.beforeEach(function () {
+        window.TEST__MOCK_LOCAL_STORAGE_INIT = {};
 
-      for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < 2; i++) {
+          window.TEST__MOCK_LOCAL_STORAGE_INIT[
+            constructStorageKey(`persisted-${i}`)
+          ] = JSON.stringify({
+            name: `PREPAID_CARD_ISSUANCE`,
+            state: buildState({
+              meta: {
+                completedCardNames: ['LAYER2_CONNECT', 'HUB_AUTH'],
+                completedMilestonesCount: 1,
+                milestonesCount: 4,
+              },
+            }),
+          });
+        }
+
         window.TEST__MOCK_LOCAL_STORAGE_INIT[
-          constructStorageKey(`persisted-${i}`)
+          constructStorageKey(`persisted-card-space-wf`)
         ] = JSON.stringify({
-          name: `PREPAID_CARD_ISSUANCE`,
+          name: `CARD_SPACE_CREATION`,
           state: buildState({
             meta: {
-              completedCardNames: ['LAYER2_CONNECT', 'HUB_AUTH'],
+              completedCardNames: ['LAYER2_CONNECT'],
               completedMilestonesCount: 1,
               milestonesCount: 4,
             },
           }),
         });
-      }
 
-      window.TEST__MOCK_LOCAL_STORAGE_INIT[
-        constructStorageKey(`persisted-card-space-wf`)
-      ] = JSON.stringify({
-        name: `CARD_SPACE_CREATION`,
-        state: buildState({
-          meta: {
-            completedCardNames: ['LAYER2_CONNECT'],
-            completedMilestonesCount: 1,
-            milestonesCount: 4,
-          },
-        }),
+        window.TEST__MOCK_LOCAL_STORAGE_INIT['unrelated'] = 'hello';
       });
 
-      window.TEST__MOCK_LOCAL_STORAGE_INIT['unrelated'] = 'hello';
+      hooks.afterEach(function () {
+        delete window.TEST__MOCK_LOCAL_STORAGE_INIT;
+      });
 
       setupApplicationTest(hooks);
       setupMirage(hooks);
       setupHubAuthenticationToken(hooks);
 
+      test('it is hidden before wallets are connected', async function (this: Context, assert) {
+        await visit('/card-pay/');
+        assert.dom('[data-test-workflow-tracker]').doesNotExist();
+      });
+
       test('it lists existing persisted Card Pay workflows', async function (this: Context, assert) {
+        let layer1AccountAddress =
+          '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+        let layer1Service = this.owner.lookup('service:layer1-network')
+          .strategy as Layer1TestWeb3Strategy;
+        layer1Service.test__simulateAccountsChanged(
+          [layer1AccountAddress],
+          'metamask'
+        );
+        let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+
+        let layer2Service = this.owner.lookup('service:layer2-network')
+          .strategy as Layer2TestWeb3Strategy;
+        layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+
         await visit('/card-pay/');
         assert.dom('[data-test-workflow-tracker-count]').containsText('2');
       });
 
-      hooks.afterEach(function () {
-        delete window.TEST__MOCK_LOCAL_STORAGE_INIT;
+      test('clicking an incomplete workflow persisted with an old version opens the flow and cancels immediately', async function (this: Context, assert) {
+        // @ts-ignore - defined in beforeEach
+        window.TEST__MOCK_LOCAL_STORAGE_INIT[
+          constructStorageKey(`persisted-old`)
+        ] = JSON.stringify({
+          name: `WITHDRAWAL`,
+          state: buildState({
+            meta: {
+              version: WITHDRAWAL_WORKFLOW_VERSION - 1,
+              completedCardNames: ['LAYER1_CONNECT', 'CHECK_BALANCE'],
+              completedMilestonesCount: 2,
+              milestonesCount: 6,
+            },
+          }),
+        });
+
+        let layer1AccountAddress =
+          '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+        let layer1Service = this.owner.lookup('service:layer1-network')
+          .strategy as Layer1TestWeb3Strategy;
+        layer1Service.test__simulateAccountsChanged(
+          [layer1AccountAddress],
+          'metamask'
+        );
+        layer1Service.test__simulateBalances({
+          defaultToken: new BN('2141100000000000000'),
+          dai: new BN('250500000000000000000'),
+          card: new BN('10000000000000000000000'),
+        });
+
+        let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+
+        let layer2Service = this.owner.lookup('service:layer2-network')
+          .strategy as Layer2TestWeb3Strategy;
+        await layer2Service.test__simulateAccountsChanged([
+          layer2AccountAddress,
+        ]);
+
+        let merchantRegistrationFee = await this.owner
+          .lookup('service:layer2-network')
+          .strategy.fetchMerchantRegistrationFee();
+
+        layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+          createPrepaidCardSafe({
+            address: '0x123400000000000000000000000000000000abcd',
+            owners: [layer2AccountAddress],
+            spendFaceValue: merchantRegistrationFee,
+            prepaidCardOwner: layer2AccountAddress,
+            issuer: layer2AccountAddress,
+            transferrable: false,
+          }),
+        ]);
+
+        await visit('/card-pay/');
+        assert.dom('[data-test-workflow-tracker-count]').containsText('3');
+        await click('[data-test-workflow-tracker-toggle]');
+        await click('[data-test-workflow-tracker-item]');
+
+        assert
+          .dom('[data-test-cancelation]')
+          .includesText(
+            'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!'
+          );
+        assert.dom('[data-test-workflow-tracker-count]').containsText('2');
+      });
+
+      test('clicking a completed workflow persisted with an old version opens the flow and cancels immediately', async function (this: Context, assert) {
+        // @ts-ignore - defined in beforeEach
+        window.TEST__MOCK_LOCAL_STORAGE_INIT[
+          constructStorageKey(`persisted-old-complete`)
+        ] = JSON.stringify({
+          name: `WITHDRAWAL`,
+          state: buildState({
+            withdrawalToken: 'DAI.CPXD',
+            withdrawnAmount: new BN('1000000000000000000'),
+            layer2BlockHeightBeforeBridging: new BN('22867914'),
+            minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
+            relayTokensTxnHash:
+              '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
+            bridgeValidationResult: {
+              encodedData:
+                '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b0816a80598dd2f143cfbf091638ce3fb02c9135528366b4cc64d30849568af65522de3a68ea6cc78ce000249f00101004d2a125e4cfb0000000000000000000000004f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa000000000000000000000000511ec1515cdc483d57bc1f38e1325c221debd1e40000000000000000000000000000000000000000000000000de0b6b3a7640000',
+              messageId:
+                '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
+            },
+            meta: {
+              version: WITHDRAWAL_WORKFLOW_VERSION - 1,
+              completedMilestonesCount: 6,
+              milestonesCount: 6,
+              completedCardNames: [
+                'LAYER1_CONNECT',
+                'CHECK_BALANCE',
+                'LAYER2_CONNECT',
+                'CHOOSE_BALANCE',
+                'TRANSACTION_AMOUNT',
+                'TRANSACTION_STATUS',
+                'TOKEN_CLAIM',
+                'TRANSACTION_CONFIRMED',
+                'EPILOGUE_LAYER_TWO_CONNECT_CARD',
+              ],
+            },
+            didClaimTokens: true,
+            withdrawalSafe: createDepotSafe({}),
+          }),
+        });
+
+        let layer1AccountAddress =
+          '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+        let layer1Service = this.owner.lookup('service:layer1-network')
+          .strategy as Layer1TestWeb3Strategy;
+        layer1Service.test__simulateAccountsChanged(
+          [layer1AccountAddress],
+          'metamask'
+        );
+        layer1Service.test__simulateBalances({
+          defaultToken: new BN('2141100000000000000'),
+          dai: new BN('250500000000000000000'),
+          card: new BN('10000000000000000000000'),
+        });
+
+        let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+
+        let layer2Service = this.owner.lookup('service:layer2-network')
+          .strategy as Layer2TestWeb3Strategy;
+        layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+
+        let merchantRegistrationFee = await this.owner
+          .lookup('service:layer2-network')
+          .strategy.fetchMerchantRegistrationFee();
+
+        layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+          createDepotSafe({
+            address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
+            tokens: [createSafeToken('CARD', '500000000000000000000')],
+          }),
+          createPrepaidCardSafe({
+            address: '0x123400000000000000000000000000000000abcd',
+            owners: [layer2AccountAddress],
+            spendFaceValue: merchantRegistrationFee,
+            prepaidCardOwner: layer2AccountAddress,
+            issuer: layer2AccountAddress,
+            transferrable: false,
+          }),
+        ]);
+
+        await visit('/card-pay/');
+        assert.dom('[data-test-workflow-tracker-count]').containsText('2');
+        await click('[data-test-workflow-tracker-toggle]');
+        await click(
+          `[data-test-workflow-tracker-item="persisted-old-complete"]`
+        );
+
+        assert
+          .dom('[data-test-cancelation]')
+          .includesText(
+            `This workflow has been upgraded by the Cardstack development team since then, so we’re not able to display it. Sorry about that!`
+          );
+        assert.dom('[data-test-workflow-tracker-count]').containsText('2');
       });
     }
   );

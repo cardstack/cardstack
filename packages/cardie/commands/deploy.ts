@@ -58,7 +58,7 @@ const triggerWorkflowRun = async (workflowID: number, environment: string, ref: 
   await octokit.rest.actions.createWorkflowDispatch({
     owner: config.github.owner,
     repo: config.github.repo,
-    workflow_id: workflowID, // eslint-disable-line @typescript-eslint/naming-convention
+    workflow_id: workflowID,
     ref: config.github.default_branch,
     inputs: {
       ref,
@@ -72,7 +72,7 @@ const listWorkflowRuns = async (workflowID: number, status: ListWorkflowRunsStat
   const respond = await octokit.rest.actions.listWorkflowRuns({
     owner: config.github.owner,
     repo: config.github.repo,
-    workflow_id: workflowID, // eslint-disable-line @typescript-eslint/naming-convention
+    workflow_id: workflowID,
     status,
   });
   return respond.data.workflow_runs;

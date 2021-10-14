@@ -23,9 +23,7 @@ module(
       prepaidCardAddress = '0x123400000000000000000000000000000000abcd';
       prepaidCardAddress2 = '0x432100000000000000000000000000000000dbca';
 
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-
-      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createPrepaidCardSafe({
           address: prepaidCardAddress2,
           owners: [layer2AccountAddress],
@@ -41,6 +39,8 @@ module(
           issuer: layer2AccountAddress,
         }),
       ]);
+
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
       let workflowSession = new WorkflowSession();
       workflowSession.setValue({

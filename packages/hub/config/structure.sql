@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.3
--- Dumped by pg_dump version 13.1
+-- Dumped from database version 13.4
+-- Dumped by pg_dump version 13.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -33,7 +33,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
@@ -607,35 +607,24 @@ CREATE TABLE graphile_worker.migrations (
 ALTER TABLE graphile_worker.migrations OWNER TO postgres;
 
 --
--- Name: beta_testers; Type: TABLE; Schema: public; Owner: postgres
+-- Name: card_spaces; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.beta_testers (
-    user_id text NOT NULL,
-    eoa text,
-    airdrop_txn_hash text,
-    airdrop_prepaid_card text,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+CREATE TABLE public.card_spaces (
+    id uuid NOT NULL,
+    url text NOT NULL,
+    profile_cover_image_url text,
+    profile_name text NOT NULL,
+    profile_image_url text,
+    profile_description text NOT NULL,
+    profile_button_text text NOT NULL,
+    profile_category text NOT NULL,
+    owner_address text NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
-ALTER TABLE public.beta_testers OWNER TO postgres;
-
---
--- Name: discord_dm_channels; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE public.discord_dm_channels (
-    channel_id text NOT NULL,
-    user_id text NOT NULL,
-    conversation_active boolean DEFAULT true NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-
-ALTER TABLE public.discord_dm_channels OWNER TO postgres;
+ALTER TABLE public.card_spaces OWNER TO postgres;
 
 --
 -- Name: merchant_infos; Type: TABLE; Schema: public; Owner: postgres
@@ -823,19 +812,11 @@ ALTER TABLE ONLY graphile_worker.migrations
 
 
 --
--- Name: beta_testers beta_testers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: card_spaces card_spaces_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.beta_testers
-    ADD CONSTRAINT beta_testers_pkey PRIMARY KEY (user_id);
-
-
---
--- Name: discord_dm_channels discord_dm_channels_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.discord_dm_channels
-    ADD CONSTRAINT discord_dm_channels_pkey PRIMARY KEY (channel_id);
+ALTER TABLE ONLY public.card_spaces
+    ADD CONSTRAINT card_spaces_pkey PRIMARY KEY (id);
 
 
 --
@@ -899,6 +880,13 @@ ALTER TABLE ONLY public.wallet_orders
 --
 
 CREATE INDEX jobs_priority_run_at_id_locked_at_without_failures_idx ON graphile_worker.jobs USING btree (priority, run_at, id, locked_at) WHERE (attempts < max_attempts);
+
+
+--
+-- Name: card_spaces_url_unique_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX card_spaces_url_unique_index ON public.card_spaces USING btree (url);
 
 
 --
@@ -1042,8 +1030,8 @@ ALTER TABLE graphile_worker.known_crontabs ENABLE ROW LEVEL SECURITY;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.3
--- Dumped by pg_dump version 13.1
+-- Dumped from database version 13.4
+-- Dumped by pg_dump version 13.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1061,14 +1049,14 @@ SET row_security = off;
 --
 
 COPY graphile_worker.migrations (id, ts) FROM stdin;
-1	2021-07-29 14:31:17.108453-04
-2	2021-07-29 14:31:17.108453-04
-3	2021-07-29 14:31:17.108453-04
-4	2021-07-29 14:31:17.108453-04
-5	2021-07-29 14:31:17.108453-04
-6	2021-07-29 14:31:17.108453-04
-7	2021-07-29 14:31:17.108453-04
-8	2021-07-29 14:31:17.108453-04
+1	2021-09-15 17:07:25.385732-04
+2	2021-09-15 17:07:25.385732-04
+3	2021-09-15 17:07:25.385732-04
+4	2021-09-15 17:07:25.385732-04
+5	2021-09-15 17:07:25.385732-04
+6	2021-09-15 17:07:25.385732-04
+7	2021-09-15 17:07:25.385732-04
+8	2021-09-15 17:07:25.385732-04
 \.
 
 
@@ -1077,14 +1065,14 @@ COPY graphile_worker.migrations (id, ts) FROM stdin;
 --
 
 COPY public.pgmigrations (id, name, run_on) FROM stdin;
-1	20210527151505645_create-prepaid-card-tables	2021-07-29 14:31:17.108453
-2	20210614080132698_create-prepaid-card-customizations-table	2021-07-29 14:31:17.108453
-3	20210623052200757_create-graphile-worker-schema	2021-07-29 14:31:17.108453
-34	20210809113449561_merchant-infos	2021-09-22 15:07:25.988954
-37	20210817184105100_wallet-orders	2021-09-22 15:36:07.656094
-40	20210920142313915_prepaid-card-reservations	2021-09-23 18:41:06.778934
-41	20210924200122612_order-indicies	2021-09-24 16:22:28.855939
-42	20211013173917696_beta-testers	2021-10-13 13:56:56.974806
+1	20210527151505645_create-prepaid-card-tables	2021-08-02 16:26:07.752752
+2	20210614080132698_create-prepaid-card-customizations-table	2021-08-02 16:26:07.752752
+3	20210623052200757_create-graphile-worker-schema	2021-08-02 16:26:07.752752
+5	20210809113449561_merchant-infos	2021-08-12 09:52:27.790806
+6	20210817184105100_wallet-orders	2021-08-25 08:15:41.07505
+7	20210920142313915_prepaid-card-reservations	2021-10-06 14:32:47.039161
+8	20210924200122612_order-indicies	2021-10-06 14:32:47.039161
+13	20211006090701108_create-card-spaces	2021-10-14 10:38:51.140793
 \.
 
 
@@ -1092,7 +1080,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 42, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 13, true);
 
 
 --

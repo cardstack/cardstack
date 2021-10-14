@@ -9,7 +9,7 @@
 
 // using npm pkg instead of node built-in module since this needs to work on the browser too.
 import { getStatusText } from 'http-status-codes';
-import Koa from 'koa';
+import { difference } from 'lodash';
 
 interface ErrorDetails {
   status?: number;
@@ -44,23 +44,26 @@ export class CardstackError extends Error {
       source: this.source,
     };
   }
+}
 
-  static async withJsonErrorHandling(ctxt: Koa.Context, fn: Koa.Next) {
-    try {
-      return await fn();
-    } catch (err) {
-      if (!err.isCardstackError) {
-        throw err;
-      }
-      if (err.status === 500) {
-        console.error(`Unexpected error: ${err.status} - ${err.message}\n${err.stack}`); // eslint-disable-line no-console
-      }
-      let errors = [err];
-      if (err.additionalErrors) {
-        errors = errors.concat(err.additionalErrors);
-      }
-      ctxt.body = { errors };
-      ctxt.status = errors[0].status;
-    }
+export class NotFound extends CardstackError {
+  status = 404;
+  title = 'Not Found';
+}
+export class BadRequest extends CardstackError {
+  status = 400;
+  title = 'Bad Request';
+}
+
+export class Conflict extends CardstackError {
+  status = 409;
+  title = 'Conflict';
+}
+
+export function assertValidKeys(actualKeys: string[], expectedKeys: string[], errorMessage: string) {
+  let unexpectedFields = difference(actualKeys, expectedKeys);
+
+  if (unexpectedFields.length) {
+    throw new BadRequest(errorMessage.replace('%list%', '"' + unexpectedFields.join(', ') + '"'));
   }
 }

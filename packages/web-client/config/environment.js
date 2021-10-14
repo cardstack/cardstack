@@ -1,12 +1,17 @@
 'use strict';
+const {
+  MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
+  MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
+} = require('@cardstack/cardpay-sdk/index');
+
 const infuraIdsByTarget = {
   staging: '558ee533522a468e9d421d818e06fadb', // this infura id is specific to https://app-staging.stack.cards/
   production: '5d6efa6b750b45459184cd11dd2c8697', // this infura id is specific to https://app.cardstack.com/
 };
 
 const universalLinkHostnamesByTarget = {
-  staging: 'https://wallet-staging.stack.cards',
-  production: 'https://wallet.cardstack.com',
+  staging: MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
+  production: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
 
 const pkg = require('../package.json');
@@ -21,7 +26,7 @@ module.exports = function (environment) {
     hubURL: process.env.HUB_URL,
     universalLinkDomain:
       universalLinkHostnamesByTarget[process.env.DEPLOY_TARGET] ??
-      'https://wallet-staging.stack.cards',
+      MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
     version: pkg.version,
     sentryDsn: process.env.SENTRY_DSN,
     '@sentry/ember': {

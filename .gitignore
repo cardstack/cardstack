@@ -73,10 +73,6 @@ package-lock.json
 /packages/core/**/*.d.ts
 /packages/core/**/*.js.map
 
-/packages/compiler-server/**/*.js
-/packages/compiler-server/**/*.d.ts
-/packages/compiler-server/**/*.js.map
-
 /packages/cardpay-subgraph/**/*.js
 /packages/cardpay-subgraph/**/*.d.ts
 /packages/cardpay-subgraph/**/*.js.map

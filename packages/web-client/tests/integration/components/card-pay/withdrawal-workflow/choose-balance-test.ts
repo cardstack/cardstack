@@ -39,25 +39,16 @@ module(
       let layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-      await layer2Service.test__simulateBalances({
-        defaultToken: new BN('250000000000000000000'),
-        card: new BN('500000000000000000000'),
-      });
       let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-      let testDepot = createDepotSafe({
-        address: depotAddress,
-        tokens: [
-          createSafeToken('DAI', '250000000000000000000'),
-          createSafeToken('CARD', '500000000000000000000'),
-        ],
-      });
-
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      await layer2Service.test__simulateDepot(testDepot);
-
       let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
-
-      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+        createDepotSafe({
+          address: depotAddress,
+          tokens: [
+            createSafeToken('DAI', '250000000000000000000'),
+            createSafeToken('CARD', '500000000000000000000'),
+          ],
+        }),
         createMerchantSafe({
           address: merchantAddress,
           merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
@@ -78,7 +69,7 @@ module(
       ]);
 
       // Ensure safes have been loaded, as in a workflow context
-      await layer2Service.refreshSafesAndBalances();
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
       await render(hbs`
         <CardPay::WithdrawalWorkflow::ChooseBalance
           @workflowSession={{this.session}}
@@ -168,7 +159,7 @@ module(
         'workflow session withdrawal token updated'
       );
       assert.equal(
-        session.getValue<Safe>('withdrawalSafe')?.address,
+        session.getValue<Safe>('withdrawalSafe'),
         merchantAddress,
         'workflow session withdrawal safe updated'
       );

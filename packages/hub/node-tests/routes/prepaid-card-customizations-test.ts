@@ -1,10 +1,9 @@
-import supertest, { Test } from 'supertest';
-import { HubServer } from '../../main';
 import { Client } from 'pg';
 import shortUuid from 'short-uuid';
 import { Registry } from '@cardstack/di';
 import { parseIdentifier } from '@cardstack/did-resolver';
 import { Job, TaskSpec } from 'graphile-worker';
+import { setupServer } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -44,20 +43,18 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('POST /api/prepaid-card-customizations', function () {
-  let server: HubServer;
   let db: Client;
-  let request: supertest.SuperTest<Test>;
   let validPayload: any;
-  this.beforeEach(async function () {
-    server = await HubServer.create({
-      port: 3001,
-      registryCallback(registry: Registry) {
-        registry.register('authentication-utils', StubAuthenticationUtils);
-        registry.register('worker-client', StubWorkerClient);
-      },
-    });
 
-    let dbManager = await server.container.lookup('database-manager');
+  let { getServer, request } = setupServer(this, {
+    registryCallback(registry: Registry) {
+      registry.register('authentication-utils', StubAuthenticationUtils);
+      registry.register('worker-client', StubWorkerClient);
+    },
+  });
+
+  this.beforeEach(async function () {
+    let dbManager = await getServer().container.lookup('database-manager');
     db = await dbManager.getClient();
 
     let rows = [
@@ -113,17 +110,15 @@ describe('POST /api/prepaid-card-customizations', function () {
         },
       },
     };
-    request = supertest(server.app.callback());
   });
 
   this.afterEach(async function () {
-    server.teardown();
     lastAddedJobIdentifier = undefined;
     lastAddedJobPayload = undefined;
   });
 
   it('without bearer token, in returns a 401', async function () {
-    await request
+    await request()
       .post('/api/prepaid-card-customizations')
       .send(validPayload)
       .set('Accept', 'application/vnd.api+json')
@@ -144,7 +139,7 @@ describe('POST /api/prepaid-card-customizations', function () {
     let payload = validPayload;
     delete payload.data.attributes['issuer-name'];
     delete payload.data.relationships['color-scheme'];
-    await request
+    await request()
       .post('/api/prepaid-card-customizations')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -172,7 +167,7 @@ describe('POST /api/prepaid-card-customizations', function () {
     let payload = validPayload;
     payload.data.attributes['issuer-name'] = '';
     payload.data.relationships['pattern'].data = null;
-    await request
+    await request()
       .post('/api/prepaid-card-customizations')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -199,7 +194,7 @@ describe('POST /api/prepaid-card-customizations', function () {
   it('with invalid relationship, in returns a 422', async function () {
     let payload = validPayload;
     payload.data.relationships['color-scheme'].data.id = 'EE1DF59B-1B1F-48C4-876B-CD62BF690A76';
-    await request
+    await request()
       .post('/api/prepaid-card-customizations')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -221,7 +216,7 @@ describe('POST /api/prepaid-card-customizations', function () {
   it('responds with 200 and new resource', async function () {
     let resourceId: string;
     let actualDid: string;
-    await request
+    await request()
       .post('/api/prepaid-card-customizations')
       .send(validPayload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')

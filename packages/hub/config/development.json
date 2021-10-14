@@ -3,5 +3,8 @@
     "offchainStorage": {
       "roleChain": ["hub-local-dev", "prod:storage-bucket-writer-role"]
     }
+  },
+  "compiler": {
+    "routeCard": "https://demo.com/routes"
   }
 }

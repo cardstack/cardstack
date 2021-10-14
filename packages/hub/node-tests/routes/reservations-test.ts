@@ -1,11 +1,10 @@
 import { Client as DBClient } from 'pg';
-import supertest, { Test } from 'supertest';
-import { HubServer } from '../../main';
 import { Registry } from '@cardstack/di';
 import { InventorySubgraph } from '../../services/subgraph';
 import { makeInventoryData } from '../helpers';
 import Web3 from 'web3';
 import { v4 as uuidv4 } from 'uuid';
+import { setupServer } from '../helpers/server';
 
 const { toWei } = Web3.utils;
 
@@ -74,7 +73,6 @@ class StubWeb3 {
             return 77; // sokol network id
           },
         },
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         Contract: class {
           get methods() {
             return stubMarketContract();
@@ -104,27 +102,25 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('/api/reservations', function () {
-  let server: HubServer;
   let db: DBClient;
-  let request: supertest.SuperTest<Test>;
+
+  let { getServer, request } = setupServer(this, {
+    registryCallback(registry: Registry) {
+      registry.register('authentication-utils', StubAuthenticationUtils);
+      registry.register('subgraph', StubSubgraph);
+      registry.register('web3', StubWeb3);
+      registry.register('relay', StubRelay);
+    },
+  });
 
   this.beforeEach(async function () {
-    server = await HubServer.create({
-      port: 3001,
-      registryCallback(registry: Registry) {
-        registry.register('authentication-utils', StubAuthenticationUtils);
-        registry.register('subgraph', StubSubgraph);
-        registry.register('web3', StubWeb3);
-        registry.register('relay', StubRelay);
-      },
-    });
     stubInventorySubgraph = () => ({
       data: {
         skuinventories: [],
       },
     });
 
-    let dbManager = await server.container.lookup('database-manager');
+    let dbManager = await getServer().container.lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM reservations`);
     await db.query(`DELETE FROM wallet_orders`);
@@ -135,12 +131,6 @@ describe('/api/reservations', function () {
     });
     stubRelayAvailable = true;
     stubWeb3Available = true;
-
-    request = supertest(server.app.callback());
-  });
-
-  this.afterEach(async function () {
-    server.teardown();
   });
 
   describe('POST /api/reservations', function () {
@@ -167,7 +157,7 @@ describe('/api/reservations', function () {
 
       let reservationId;
 
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -229,7 +219,7 @@ describe('/api/reservations', function () {
       };
 
       let reservationId;
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -285,7 +275,7 @@ describe('/api/reservations', function () {
       };
 
       let reservationId;
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -324,7 +314,7 @@ describe('/api/reservations', function () {
         },
       };
 
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -366,7 +356,7 @@ describe('/api/reservations', function () {
         },
       };
 
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Accept', 'application/vnd.api+json')
@@ -411,7 +401,7 @@ describe('/api/reservations', function () {
         },
       };
 
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -456,7 +446,7 @@ describe('/api/reservations', function () {
         },
       };
 
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -501,7 +491,7 @@ describe('/api/reservations', function () {
         },
       };
 
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -538,7 +528,7 @@ describe('/api/reservations', function () {
         },
       };
 
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -569,7 +559,7 @@ describe('/api/reservations', function () {
         },
       };
 
-      await request
+      await request()
         .post(`/api/reservations`)
         .send(payload)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -604,7 +594,7 @@ describe('/api/reservations', function () {
     });
 
     it(`returns an authenticated client's reservation`, async function () {
-      await request
+      await request()
         .get(`/api/reservations/${reservationId}`)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
         .set('Accept', 'application/vnd.api+json')
@@ -626,7 +616,7 @@ describe('/api/reservations', function () {
     });
 
     it(`returns 401 when client is not authenticated`, async function () {
-      await request
+      await request()
         .get(`/api/reservations/${reservationId}`)
         .set('Accept', 'application/vnd.api+json')
         .set('Content-Type', 'application/vnd.api+json')
@@ -644,7 +634,7 @@ describe('/api/reservations', function () {
 
     // we return 404 so we don't leak the existence of reservations that aren't yours
     it(`returns 404 when authenticated client gets a different user's record`, async function () {
-      await request
+      await request()
         .get(`/api/reservations/${reservationId}`)
         .set('Authorization', 'Bearer: mno123--pqr456--stu789')
         .set('Accept', 'application/vnd.api+json')
@@ -663,7 +653,7 @@ describe('/api/reservations', function () {
     });
 
     it(`returns 404 when authenticated client gets a non-uuid reservation ID`, async function () {
-      await request
+      await request()
         .get(`/api/reservations/DOES_NOT_EXIST`)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
         .set('Accept', 'application/vnd.api+json')
@@ -683,7 +673,7 @@ describe('/api/reservations', function () {
 
     it(`returns 404 when authenticated client gets a reservation ID that does not exist`, async function () {
       let doesNotExist = uuidv4();
-      await request
+      await request()
         .get(`/api/reservations/${doesNotExist}`)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
         .set('Accept', 'application/vnd.api+json')

@@ -1,10 +1,9 @@
 import { Client as DBClient } from 'pg';
-import supertest, { Test } from 'supertest';
-import { HubServer } from '../../main';
 import { Registry } from '@cardstack/di';
 import { InventorySubgraph } from '../../services/subgraph';
 import { makeInventoryData } from '../helpers';
 import Web3 from 'web3';
+import { setupServer } from '../helpers/server';
 
 const { toWei } = Web3.utils;
 const stubNonce = 'abc:123';
@@ -83,7 +82,6 @@ class StubWeb3 {
             return 77; // sokol network id
           },
         },
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         Contract: class {
           get methods() {
             return stubMarketContract();
@@ -111,22 +109,18 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('GET /api/inventory', function () {
-  let server: HubServer;
   let db: DBClient;
-  let request: supertest.SuperTest<Test>;
+  let { getServer, request } = setupServer(this, {
+    registryCallback(registry: Registry) {
+      registry.register('authentication-utils', StubAuthenticationUtils);
+      registry.register('subgraph', StubSubgraph);
+      registry.register('web3', StubWeb3);
+      registry.register('relay', StubRelay);
+    },
+  });
 
   this.beforeEach(async function () {
-    server = await HubServer.create({
-      port: 3001,
-      registryCallback(registry: Registry) {
-        registry.register('authentication-utils', StubAuthenticationUtils);
-        registry.register('subgraph', StubSubgraph);
-        registry.register('web3', StubWeb3);
-        registry.register('relay', StubRelay);
-      },
-    });
-
-    let dbManager = await server.container.lookup('database-manager');
+    let dbManager = await getServer().container.lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM reservations`);
     await db.query(`DELETE FROM wallet_orders`);
@@ -137,12 +131,6 @@ describe('GET /api/inventory', function () {
     });
     stubRelayAvailable = true;
     stubWeb3Available = true;
-
-    request = supertest(server.app.callback());
-  });
-
-  this.afterEach(async function () {
-    server.teardown();
   });
 
   it(`retrieves inventory for an authenticated client for all SKUs`, async function () {
@@ -164,7 +152,7 @@ describe('GET /api/inventory', function () {
       },
     });
 
-    await request
+    await request()
       .get(`/api/inventories`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -226,7 +214,7 @@ describe('GET /api/inventory', function () {
       },
     });
 
-    await request
+    await request()
       .get(`/api/inventories`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -268,7 +256,7 @@ describe('GET /api/inventory', function () {
       },
     });
 
-    await request
+    await request()
       .get(`/api/inventories`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -310,7 +298,7 @@ describe('GET /api/inventory', function () {
       },
     });
 
-    await request
+    await request()
       .get(`/api/inventories`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -359,7 +347,7 @@ describe('GET /api/inventory', function () {
       },
     });
 
-    await request
+    await request()
       .get(`/api/inventories?filter[issuer]=${stubIssuer}`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -397,7 +385,7 @@ describe('GET /api/inventory', function () {
         skuinventories: [makeInventoryData('sku1', '100', toWei('1'), [prepaidCard1, prepaidCard2])],
       },
     });
-    await request
+    await request()
       .get(`/api/inventories`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -443,7 +431,7 @@ describe('GET /api/inventory', function () {
       },
     });
 
-    await request
+    await request()
       .get(`/api/inventories`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -499,7 +487,7 @@ describe('GET /api/inventory', function () {
         ],
       },
     });
-    await request
+    await request()
       .get(`/api/inventories`)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
@@ -555,7 +543,7 @@ describe('GET /api/inventory', function () {
         ],
       },
     });
-    await request
+    await request()
       .get('/api/custodial-wallet')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')

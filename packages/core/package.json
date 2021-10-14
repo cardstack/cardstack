@@ -1,8 +1,7 @@
 {
   "name": "@cardstack/core",
-  "version": "0.26.9",
+  "version": "0.26.10",
   "keywords": [],
-  "private": true,
   "author": "Edward Faulkner <edward@eaf4.com>",
   "repository": {
     "type": "git",
@@ -16,6 +15,8 @@
     "@babel/core": "^7.12.13",
     "@babel/plugin-proposal-class-properties": "^7.12.13",
     "@babel/plugin-proposal-decorators": "^7.12.13",
+    "@babel/traverse": "^7.12.13",
+    "@babel/types": "^7.12.13",
     "@glimmer/syntax": "0.75.0",
     "@types/babel__core": "^7.1.12",
     "@types/inflection": "^1.5.28",
@@ -24,6 +25,7 @@
     "ember-cli-htmlbars": "^5.7.1",
     "inflection": "^1.12.0",
     "lodash": "^4.17.21",
+    "md5": "^2.3.0",
     "mime-types": "^2.1.31"
   },
   "devDependencies": {

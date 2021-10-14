@@ -15,15 +15,21 @@ import {
   createDepotSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
+import {
+  MILESTONE_TITLES,
+  WORKFLOW_VERSION,
+} from '@cardstack/web-client/components/card-pay/withdrawal-workflow';
 
 interface Context extends MirageTestContext {}
+
+const withdrawalSafeAddress = '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08';
 
 module('Acceptance | withdrawal persistence', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
   let workflowPersistenceService: WorkflowPersistence;
 
-  hooks.beforeEach(function () {
+  hooks.beforeEach(async function () {
     workflowPersistenceService = this.owner.lookup(
       'service:workflow-persistence'
     );
@@ -44,7 +50,17 @@ module('Acceptance | withdrawal persistence', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        address: withdrawalSafeAddress,
+        owners: [layer2AccountAddress],
+        tokens: [
+          createSafeToken('CARD', '1000000000000000000'),
+          createSafeToken('DAI', '4215997042758579167'),
+        ],
+      }),
+    ]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     workflowPersistenceService.clear();
   });
@@ -76,14 +92,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
-        withdrawalSafe: createDepotSafe({
-          address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          tokens: [
-            createSafeToken('CARD', '1000000000000000000'),
-            createSafeToken('DAI', '4215997042758579167'),
-          ],
-        }),
+        withdrawalSafe: withdrawalSafeAddress,
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: [
             'LAYER1_CONNECT',
             'CHECK_BALANCE',
@@ -135,14 +146,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
-        withdrawalSafe: createDepotSafe({
-          address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          tokens: [
-            createSafeToken('CARD', '1000000000000000000'),
-            createSafeToken('DAI', '4215997042758579167'),
-          ],
-        }),
+        withdrawalSafe: withdrawalSafeAddress,
         meta: {
+          version: WORKFLOW_VERSION,
           completedMilestonesCount: 6,
           milestonesCount: 6,
           completedCardNames: [
@@ -204,14 +210,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
-        withdrawalSafe: createDepotSafe({
-          address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          tokens: [
-            createSafeToken('CARD', '1000000000000000000'),
-            createSafeToken('DAI', '4215997042758579167'),
-          ],
-        }),
+        withdrawalSafe: withdrawalSafeAddress,
         meta: {
+          version: WORKFLOW_VERSION,
           completedMilestonesCount: 5,
           milestonesCount: 6,
           completedCardNames: [
@@ -254,6 +255,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
     test('it cancels a persisted flow when Layer 1 wallet address is different', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: [
             'LAYER1_CONNECT',
             'CHECK_BALANCE',
@@ -285,6 +287,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: [
             'LAYER1_CONNECT',
             'CHECK_BALANCE',
@@ -321,14 +324,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
         relayTokensTxnHash:
           '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
-        withdrawalSafe: createDepotSafe({
-          address: '0x2Fe77303eBc9F6375852bBEe1bd43FC0fa1e7B08',
-          tokens: [
-            createSafeToken('CARD', '1000000000000000000'),
-            createSafeToken('DAI', '4215997042758579167'),
-          ],
-        }),
+        withdrawalSafe: withdrawalSafeAddress,
         meta: {
+          version: WORKFLOW_VERSION,
           completedMilestonesCount: 5,
           milestonesCount: 6,
           completedCardNames: [
@@ -367,6 +365,52 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           workflowPersistenceService.getPersistedData('abc123').state.meta
         ).value.completedCardNames.includes('TRANSACTION_STATUS') // Did complete
       );
+    });
+
+    test('it cancels a persisted flow when state version is old', async function (this: Context, assert) {
+      const state = buildState({
+        withdrawalToken: 'DAI.CPXD',
+        withdrawnAmount: new BN('1000000000000000000'),
+        layer2BlockHeightBeforeBridging: new BN('22867914'),
+        minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
+        relayTokensTxnHash:
+          '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
+        bridgeValidationResult: {
+          encodedData:
+            '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b0816a80598dd2f143cfbf091638ce3fb02c9135528366b4cc64d30849568af65522de3a68ea6cc78ce000249f00101004d2a125e4cfb0000000000000000000000004f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa000000000000000000000000511ec1515cdc483d57bc1f38e1325c221debd1e40000000000000000000000000000000000000000000000000de0b6b3a7640000',
+          messageId:
+            '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
+        },
+        withdrawalSafe: withdrawalSafeAddress,
+        meta: {
+          version: WORKFLOW_VERSION - 1,
+          completedMilestonesCount: 5,
+          milestonesCount: MILESTONE_TITLES.length,
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'CHECK_BALANCE',
+            'LAYER2_CONNECT',
+            'CHOOSE_BALANCE',
+            'TRANSACTION_AMOUNT',
+            'TRANSACTION_STATUS',
+          ],
+        },
+      });
+      workflowPersistenceService.persistData('abc123', {
+        name: 'WITHDRAWAL',
+        state,
+      });
+      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      assert.dom('[data-test-milestone="0"]').doesNotExist();
+      assert.dom('[data-test-milestone="1"]').doesNotExist();
+      assert.dom('[data-test-milestone="2"]').doesNotExist();
+      assert.dom('[data-test-milestone="3"]').doesNotExist();
+      assert.dom('[data-test-milestone="4"]').doesNotExist();
+      assert
+        .dom('[data-test-cancelation]')
+        .includesText(
+          'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!'
+        );
     });
   });
 });

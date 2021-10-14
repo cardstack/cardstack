@@ -1,7 +1,6 @@
 import type Chai from 'chai';
 
 export default function (chai: typeof Chai, utils: any) {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const { Assertion } = chai;
 
   function detail(response: any) {

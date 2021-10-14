@@ -5,7 +5,7 @@ on:
     paths:
       - 'packages/cardhost/**'
       - 'packages/core/**'
-      - 'packages/compiler-server/**'
+      - 'packages/hub/**'
       - '.github/workflows/pr-compiler.yml'
       - 'package.json'
       - 'yarn.lock'
@@ -14,8 +14,26 @@ jobs:
   cardhost_tests:
     name: 'Cardhost tests'
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          -v /var/run/postgresql/:/var/run/postgresql
     steps:
       - uses: volta-cli/action@v1
+      - name: Create database
+        run: sudo -u postgres createdb hub_test
       - name: Find yarn cache
         id: yarn-cache-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -28,30 +46,11 @@ jobs:
             ${{ runner.os }}-yarn-
       - uses: actions/checkout@v2
       - run: yarn install
+      - run: NODE_ENV=test bin/hub db init-test
+        working-directory: packages/hub
       - name: Start the card server
-        run: yarn start serve &
-        working-directory: packages/compiler-server
+        run: NODE_ENV=test COMPILER=true yarn start &
+        working-directory: packages/hub
       - name: Cardhost test suite
         run: yarn test:ember
         working-directory: packages/cardhost
-
-  server_tests:
-    name: 'Server tests'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: volta-cli/action@v1
-      - name: Find yarn cache
-        id: yarn-cache-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - name: Set up yarn cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.yarn-cache-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - uses: actions/checkout@v2
-      - run: yarn install
-      - run: yarn tsc
-      - run: yarn test
-        working-directory: packages/compiler-server

@@ -133,8 +133,8 @@ export async function provisionPrepaidCard(
   let response = await fetch(`${relayUrl}/v1/prepaid-card/provision/${sku}/`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json', // eslint-disable-line @typescript-eslint/naming-convention
-      Authorization: provisionerSecret, // eslint-disable-line @typescript-eslint/naming-convention
+      'Content-Type': 'application/json',
+      Authorization: provisionerSecret,
     },
     body: JSON.stringify({
       owner: toChecksumAddress(userAddress),
@@ -230,8 +230,8 @@ async function getInventoriesFromAPI(web3: Web3, environment: string): Promise<J
   let authToken = await (await getSDK('HubAuth', web3, hubRootURL)).authenticate();
   let response = await fetch(`${hubRootURL}/api/inventories`, {
     headers: {
-      Authorization: `Bearer: ${authToken}`, // eslint-disable-line @typescript-eslint/naming-convention
-      'Content-Type': 'application/vnd.api+json', // eslint-disable-line @typescript-eslint/naming-convention
+      Authorization: `Bearer: ${authToken}`,
+      'Content-Type': 'application/vnd.api+json',
     },
   });
   if (!response.ok) {

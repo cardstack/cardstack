@@ -36,7 +36,7 @@ export class WorkflowCard extends WorkflowPostable {
   };
 
   constructor(options: Partial<WorkflowCardOptions>) {
-    super(options.author!, options.includeIf);
+    super(options.author, options.includeIf);
     this.componentName = options.componentName!;
     this.cardName = options.cardName || '';
 

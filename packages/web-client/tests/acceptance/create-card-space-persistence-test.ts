@@ -6,6 +6,10 @@ import WorkflowPersistence from '@cardstack/web-client/services/workflow-persist
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { buildState } from '@cardstack/web-client/models/workflow/workflow-session';
 import { setupHubAuthenticationToken } from '../helpers/setup';
+import {
+  MILESTONE_TITLES,
+  WORKFLOW_VERSION,
+} from '@cardstack/web-client/components/card-space/create-space-workflow';
 
 interface Context extends MirageTestContext {}
 
@@ -24,7 +28,7 @@ module('Acceptance | create card space persistence', function (hooks) {
   hooks.beforeEach(async function () {
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     layer2Service.authenticate();
     layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
@@ -52,6 +56,7 @@ module('Acceptance | create card space persistence', function (hooks) {
     test('it restores an unfinished workflow', async function (this: Context, assert) {
       let state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'CARD_SPACE_USERNAME'],
         },
       });
@@ -73,6 +78,7 @@ module('Acceptance | create card space persistence', function (hooks) {
     test('it restores a finished workflow', async function (this: Context, assert) {
       let state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: [
             'LAYER2_CONNECT',
             'CARD_SPACE_USERNAME',
@@ -101,6 +107,7 @@ module('Acceptance | create card space persistence', function (hooks) {
     test('it restores a cancelled workflow', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'CARD_SPACE_USERNAME'],
           isCanceled: true,
           cancelationReason: 'L2_DISCONNECTED',
@@ -134,6 +141,7 @@ module('Acceptance | create card space persistence', function (hooks) {
     test('it cancels a persisted flow when trying to restore while unauthenticated', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'CARD_SPACE_USERNAME'],
         },
       });
@@ -172,6 +180,7 @@ module('Acceptance | create card space persistence', function (hooks) {
     test('it should reset the persisted card names when editing one of the previous steps', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'CARD_SPACE_USERNAME'],
         },
       });
@@ -196,6 +205,7 @@ module('Acceptance | create card space persistence', function (hooks) {
     test('it cancels a persisted flow when card wallet address is different', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT', 'CARD_SPACE_USERNAME'],
         },
         layer2WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer2AccountAddress set in beforeEach
@@ -220,6 +230,7 @@ module('Acceptance | create card space persistence', function (hooks) {
     test('it allows interactivity after restoring previously saved state', async function (this: Context, assert) {
       const state = buildState({
         meta: {
+          version: WORKFLOW_VERSION,
           completedCardNames: ['LAYER2_CONNECT'],
         },
       });
@@ -239,6 +250,33 @@ module('Acceptance | create card space persistence', function (hooks) {
 
       await click('[data-test-card-space-username-save-button]');
       assert.dom(milestoneCompletedSel(1)).exists();
+    });
+
+    test('it cancels a persisted flow when state version is old', async function (this: Context, assert) {
+      const state = buildState({
+        meta: {
+          version: WORKFLOW_VERSION - 1,
+          completedMilestonesCount: 0,
+          milestonesCount: MILESTONE_TITLES.length,
+          completedCardNames: ['LAYER2_CONNECT', 'CARD_SPACE_USERNAME'],
+        },
+        layer2WalletAddress: '0xaaaaaaaaaaaaaaa', // Differs from layer2AccountAddress set in beforeEach
+      });
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'CARD_SPACE_CREATION',
+        state,
+      });
+
+      await visit('/card-space?flow=create-space&flow-id=abc123');
+
+      assert.dom(milestoneCompletedSel(0)).doesNotExist();
+      assert.dom(milestoneCompletedSel(1)).doesNotExist();
+      assert
+        .dom('[data-test-cancelation]')
+        .includesText(
+          'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!'
+        );
     });
   });
 });

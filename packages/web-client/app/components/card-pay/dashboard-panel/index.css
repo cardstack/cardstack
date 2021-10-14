@@ -14,7 +14,6 @@
 }
 
 .dashboard-details-container__summary {
-  display: none; /* when there's no other on the dashboard */
   position: relative;
   min-height: 5rem;
 }
@@ -23,6 +22,10 @@
 .dashboard-details-container__summary::-webkit-details-marker {
   display: none;
   content: '';
+}
+
+.dashboard-details-container--no-collapse .dashboard-details-container__summary {
+  display: none;
 }
 
 .dashboard-details-container__marker::before {

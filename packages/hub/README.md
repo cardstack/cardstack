@@ -23,6 +23,7 @@ For more information, see the
     - [POST /api/merchant-infos](#post-apimerchant-infos)
     - [GET /api/merchant-infos/validate-slug/:slug](#get-apimerchant-infosvalidate-slugslug)
   - [The Hub CLI](#the-hub-cli)
+  - [The Card Compiler](#the-card-compiler)
   - [Contributing](#contributing)
 
 ## Architecture
@@ -55,6 +56,7 @@ For example:
 SERVER_SECRET=7TmgY1xFo/WrYTnAFSvAemZtFB8wQVMd8IkoeQKBboE=
 AWS_PROFILE=cardstack
 ```
+
 ## Getting Started
 
 The following command will create a hub_development database on your locally running postgres server, run migrations, and load seed data. It will then create a hub_test database, and clone the structure of the development database to it.
@@ -68,7 +70,7 @@ Load the database with seed data
 ### Running the hub
 
 ```sh
-# Starts the server on port 300
+# Starts the server on port 3000
 bin/hub server
 
 # Starts the worker process
@@ -102,7 +104,6 @@ Documentation on how to create migration scripts is available at https://salsita
 After you have completed running your new DB migration script create a pg_dump of the DB in the `config/structure.sql` file using:
 
     bin/hub db dump
-
 
 ## Application console
 
@@ -168,14 +169,22 @@ APIs conform to the [JSON API specification](https://jsonapi.org/).
 ### GET /api/merchant-infos/validate-slug/:slug
 
 ## The Hub CLI
+
 The hub CLI can be invoked from within the hub package
 
     bin/hub
 
-*💡 Tip: Add `export PATH="./bin:$PATH"` to your `.zshenv` or `.bash_profile` to be to invoke `hub` directly (without the `bin/`)*
+_💡 Tip: Add `export PATH="./bin:$PATH"` to your `.zshenv` or `.bash_profile` to be to invoke `hub` directly (without the `bin/`)_
 
 The files that support the CLI are in the `cli/` directory. You can add your own by [following these instructions](https://github.com/yargs/yargs/blob/master/docs/advanced.md#commanddirdirectory-opts). The full `yargs` api [can be found here](https://github.com/yargs/yargs/blob/master/docs/api.md).
 
+## The Card Compiler
+
+All compiler functionality is currently hidden behind the COMPILER feature flag. So to start the server with card compiling and related routes, use that flag.
+
+```
+COMPILER=true bin/hub server
+```
 
 ## Contributing
 

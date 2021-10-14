@@ -13,12 +13,12 @@ let hubAuthentication: HubAuthentication;
 module('Unit | Service | HubAuthentication', function (hooks) {
   setupTest(hooks);
 
-  hooks.beforeEach(function () {
+  hooks.beforeEach(async function () {
     // this is the condition for initializing with an authenticated state
     // assumption made that layer2Service.checkHubAuthenticationValid returns Promise<true>
     window.TEST__AUTH_TOKEN = HUB_AUTH_TOKEN;
     layer2Service = this.owner.lookup('service:layer2-network').strategy;
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
   });
 
   hooks.afterEach(async function () {
@@ -38,7 +38,7 @@ module('Unit | Service | HubAuthentication', function (hooks) {
   });
 
   test('it can initialize with a non-authenticated state when layer 2 is not connected', async function (assert) {
-    layer2Service.test__simulateAccountsChanged([]);
+    await layer2Service.test__simulateAccountsChanged([]);
 
     assert.ok(!layer2Service.isConnected, 'Layer 2 is not connected');
 

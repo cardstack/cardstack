@@ -4,6 +4,8 @@ import { CardstackError } from '../utils/error';
 import logger from '@cardstack/logger';
 const serverLog = logger('hub/server');
 
+export { default as errorMiddleware } from './error';
+
 export async function environment(ctx: Koa.Context, next: Koa.Next) {
   ctx.environment = process.env.NODE_ENV || 'development';
   return next();

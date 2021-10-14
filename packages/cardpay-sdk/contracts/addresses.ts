@@ -45,6 +45,7 @@ const SOKOL = {
   bridgeUtils: '0x34e286a943E017b105C48fd78f4A61424b0cc8f7',
   exchange: '0x95C13a7CFf0c12bAD1AAD2e7C962103988bD4444',
   relay: '0xD7182E380b7dFa33C186358De7E1E5d0950fCAE7',
+  cardstackIssuer: '0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13',
   payMerchantHandler: '0xB2Dc4A31bAdaF8962B882b67958033DCF1FbEE6c',
   registerMerchantHandler: '0xc267d67cDbb5aCC6f477D4eAb173Dcc54F00e762',
   splitPrepaidCardHandler: '0x938533e9533f5F9E67DDC693ffE78710A5C096c2',
@@ -59,10 +60,10 @@ const SOKOL = {
   rewardManager: '0x9A89A110238201c12568f3a4a02BE5Ae63284497',
   registerRewardProgramHandler: '0xaF5B2869Be9Eb9c45cc0501F17B145A3229dD2C0',
   registerRewardeeHandler: '0x0B793A280F2E47997432a9047073F5e634A9A731',
-  deprecatedMerchantManager_v0_6_7: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2', // eslint-disable-line @typescript-eslint/naming-convention
+  deprecatedMerchantManager_v0_6_7: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2',
   oracles: {
-    DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB', // eslint-disable-line @typescript-eslint/naming-convention
-    CARD: '0xb4Fcc975c2b6A57dd5B3d9a3B6b144499f707c7d', // eslint-disable-line @typescript-eslint/naming-convention
+    DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB',
+    CARD: '0xb4Fcc975c2b6A57dd5B3d9a3B6b144499f707c7d',
   },
 };
 const MAINNET = {
@@ -84,6 +85,7 @@ const XDAI = {
   bridgeUtils: '0xa79206F956461e053DbCF33ADDFa77553Df58D7F',
   exchange: '0x1c5B87A6905327D2370fA57C80667D432926ABA1',
   relay: '0x846fcb74913277AF31FF535cC88bfcC62f64346A',
+  cardstackIssuer: '',
   payMerchantHandler: '0xdDc6709482ee4072D562C4a9f04Fc6E3249b785e',
   registerMerchantHandler: '0x4101A6C673cBA6afDB2Ef082Cb578b64f81aB3D1',
   splitPrepaidCardHandler: '0x0672c77D9a9C8D81D8082a1fB925fE44f475e600',
@@ -98,10 +100,10 @@ const XDAI = {
   rewardManager: '0x44aB7b82F18694cF4431F41E67C0f05AAaCAC74D',
   registerRewardProgramHandler: '0x8e0A60912C56F4436396C636f0ED500ef27af4e0',
   registerRewardeeHandler: '0x198ea3D257715Fb2e9025c061BE96e56AE611A9f',
-  deprecatedMerchantManager_v0_6_7: '0x3C29B2A563F4bB9D625175bE823c528A4Ddd1107', // eslint-disable-line @typescript-eslint/naming-convention
+  deprecatedMerchantManager_v0_6_7: '0x3C29B2A563F4bB9D625175bE823c528A4Ddd1107',
   oracles: {
-    DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2', // eslint-disable-line @typescript-eslint/naming-convention
-    CARD: '0xd570Ed8b313Fe6aEEA4064bd1713b5Cc6d41D3C5', // eslint-disable-line @typescript-eslint/naming-convention
+    DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2',
+    CARD: '0xd570Ed8b313Fe6aEEA4064bd1713b5Cc6d41D3C5',
   },
 };
 const addresses: {

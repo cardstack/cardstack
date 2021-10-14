@@ -36,7 +36,6 @@ module('Acceptance | card balances', function (hooks) {
       .strategy as Layer2TestWeb3Strategy;
 
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     let { did, customization } = await createPrepaidCardCustomization({
       issuerName: 'jortleby',
@@ -44,7 +43,7 @@ module('Acceptance | card balances', function (hooks) {
       pattern: this.server.schema.all('prepaid-card-pattern').models[4],
     });
 
-    layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createPrepaidCardSafe({
         address: '0x123400000000000000000000000000000000abcd',
         owners: [layer2AccountAddress],
@@ -56,6 +55,8 @@ module('Acceptance | card balances', function (hooks) {
         transferrable: false,
       }),
     ]);
+
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     this.server.create('prepaid-card-customization', customization);
 
@@ -84,7 +85,7 @@ module('Acceptance | card balances', function (hooks) {
 
     let secondAddress = '0x1826000000000000000000000000000000000000';
 
-    layer2Service.test__simulateAccountSafes(secondAddress, [
+    layer2Service.test__simulateRemoteAccountSafes(secondAddress, [
       createPrepaidCardSafe({
         address: '0x567800000000000000000000000000000000abcd',
         owners: [layer2AccountAddress],
@@ -94,7 +95,7 @@ module('Acceptance | card balances', function (hooks) {
       }),
     ]);
 
-    layer2Service.test__simulateAccountsChanged([secondAddress]);
+    await layer2Service.test__simulateAccountsChanged([secondAddress]);
 
     await settled();
 

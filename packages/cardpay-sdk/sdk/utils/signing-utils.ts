@@ -149,10 +149,8 @@ function safeTransactionTypedData(
 ) {
   return {
     types: {
-      //eslint-disable-next-line @typescript-eslint/naming-convention
       EIP712Domain: [{ type: 'address', name: 'verifyingContract' }],
       // "SafeTx(address to,uint256 value,bytes data,uint8 operation,uint256 safeTxGas,uint256 baseGas,uint256 gasPrice,address gasToken,address refundReceiver,uint256 nonce)"
-      //eslint-disable-next-line @typescript-eslint/naming-convention
       SafeTx: [
         { type: 'address', name: 'to' },
         { type: 'uint256', name: 'value' },

@@ -23,6 +23,15 @@ export {
   default as WorkflowSession,
 } from './workflow/workflow-session';
 export { SessionAwareWorkflowMessage } from './workflow/session-aware-workflow-message';
+export {
+  conditionalCancelationMessage,
+  defaultCancelationCard,
+} from './workflow/cancelation-helpers';
+import {
+  COMPLETED_WORKFLOW_WITH_UNSUPPORTED_VERSION,
+  INCOMPLETE_WORKFLOW_WITH_UNSUPPORTED_VERSION,
+} from './workflow/standard-cancelation-reasons';
+
 interface PostableIndices {
   isInMilestone: boolean;
   isInEpilogue: boolean;
@@ -39,9 +48,9 @@ export type CardPayWorkflowName =
 export type CardSpaceWorkflowName = 'CARD_SPACE_CREATION';
 
 export type WorkflowName = CardPayWorkflowName | CardSpaceWorkflowName;
-
 export abstract class Workflow {
   name!: WorkflowName;
+  abstract version: number;
   milestones: Milestone[] = [];
   epilogue: PostableCollection = new PostableCollection();
   cancelationMessages: PostableCollection = new PostableCollection();
@@ -55,7 +64,21 @@ export abstract class Workflow {
   workflowPersistence: WorkflowPersistence;
   workflowPersistenceId?: string;
 
-  abstract restorationErrors(): string[];
+  restorationErrors(): string[] {
+    let errors = [];
+    let meta = this.session.getMeta();
+    let persistedVersion = meta.version;
+    let isComplete = meta.completedMilestonesCount === meta.milestonesCount;
+    if (this.version > (persistedVersion ?? 0)) {
+      if (isComplete) {
+        errors.push(COMPLETED_WORKFLOW_WITH_UNSUPPORTED_VERSION);
+      } else {
+        errors.push(INCOMPLETE_WORKFLOW_WITH_UNSUPPORTED_VERSION);
+      }
+    }
+    return errors;
+  }
+
   abstract beforeRestorationChecks(): Promise<void>[];
 
   constructor(owner?: any, workflowPersistenceId?: string) {
@@ -129,12 +152,14 @@ export abstract class Workflow {
   cancel(reason?: string | null) {
     const cancelationReason = reason || 'UNKNOWN';
 
-    this.session.setMeta({
-      isCanceled: true,
-      cancelationReason: cancelationReason,
-    });
-
-    if (!this.isComplete && !this.isCanceled) {
+    if (
+      (!this.isComplete && !this.isCanceled) ||
+      cancelationReason === COMPLETED_WORKFLOW_WITH_UNSUPPORTED_VERSION
+    ) {
+      this.session.setMeta({
+        isCanceled: true,
+        cancelationReason: cancelationReason,
+      });
       // visible-postables-will-change starts test waiters in animated-workflow.ts
       this.emit('visible-postables-will-change');
       this.cancelationReason = cancelationReason;

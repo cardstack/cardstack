@@ -1,7 +1,7 @@
 {{page-title "Merchant Services"}}
 
 <section class="card-pay-dashboard__merchants" role="tabpanel" aria-labelledby="card-pay.merchant-services">
-  <CardPay::DashboardPanel @panel={{@model.panel}}>
+  <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{not this.layer2Network.isConnected}}>
     {{#each @model.panel.sections as |section|}}
       <CardPay::DashboardPanel::Section @section={{section}}>
         <:cta>
@@ -26,8 +26,26 @@
 
   {{#if this.layer2Network.isConnected}}
     <section data-test-merchants-section>
-      <h3 class="card-pay-dashboard__merchants-title">Merchant Services</h3>
-      <div class="card-pay-dashboard__merchants-cards">
+      <header class="card-pay-dashboard__merchants-section-header">
+        <h3 class="card-pay-dashboard__merchants-title">Merchant Services</h3>
+        {{#let @model.panel.sections.[0] as |section|}}
+          <Boxel::Button
+            {{on "click" (fn this.transitionToWorkflow section.workflow)}}
+            @kind="secondary-dark"
+            @size="small"
+            @disabled={{section.isCtaDisabled}}
+            @route="card-pay.balances"
+            data-test-workflow-button={{section.workflow}}
+          >
+            <span>{{section.cta}}</span>
+            {{svg-jar "plus"
+              class="card-pay-dashboard__merchants-section-header-button-icon"
+              role="presentation"
+            }}
+          </Boxel::Button>
+        {{/let}}
+      </header>
+      <section class="card-pay-dashboard__merchants-cards">
         {{#each this.merchantSafes as |merchantSafe|}}
           <CardPay::MerchantSafe
             @safe={{merchantSafe}}
@@ -35,7 +53,7 @@
             data-test-merchant-dashboard-card
           />
         {{/each}}
-      </div>
+      </section>
     </section>
   {{/if}}
 </section>
