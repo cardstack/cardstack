@@ -5,9 +5,9 @@
 >
   <ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Choose a source and balance to fund your prepaid card">
-      <CardPay::LabeledValue @label="Source:" class="choose-balance__field"> {{!-- FIXME these classes are all copied… have to clone the CSS with different names? ugh --}}
+      <CardPay::LabeledValue @label="Source:" class="funding-source__field">
         <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} data-test-choose-balance-from-wallet />
-        <CardPay::NestedItems @noInnerBorder={{not @isComplete}} class="choose-balance__nested-items">
+        <CardPay::NestedItems @noInnerBorder={{not @isComplete}} class="funding-source__nested-items">
           <:outer>
             <CardPay::AccountDisplay
               @size="small"
@@ -43,7 +43,7 @@
                 data-test-choose-balance-from-display
               />
             {{else}}
-              <div class="choose-balance__dropdown-container">
+              <div class="funding-source__dropdown-container">
                 <CardPay::BalanceChooserDropdown
                   @tokens={{this.tokens}}
                   @selectedToken={{this.selectedToken}}
