@@ -51,6 +51,15 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "Bot tests",
+      "program": "${workspaceRoot}/node_modules/.bin/corde",
+      "cwd": "${workspaceRoot}/packages/hub",
+      "console": "integratedTerminal",
+      "args": ["--files", "./bot-tests/**"],
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "Build web-client",
       "program": "${workspaceFolder}/node_modules/.bin/ember",
       "cwd": "${workspaceRoot}/packages/web-client",

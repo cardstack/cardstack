@@ -300,18 +300,38 @@ export async function bootWorker() {
   await runner.promise;
 }
 
-export async function bootBot() {
-  botLog.info('Booting bot');
-  initSentry();
+export class HubBot {
+  logger = botLog;
+  static logger = botLog;
 
-  let container = createContainer();
-  try {
-    let bot = await container.instantiate(Bot);
-    await bot.start();
-  } catch (e) {
-    botLog.error('Unexpected error', e);
-    Sentry.withScope(function () {
-      Sentry.captureException(e);
-    });
+  static async create(serverConfig?: Partial<HubServerConfig>): Promise<HubBot> {
+    this.logger.info('Booting bot');
+    initSentry();
+
+    let container = createContainer(serverConfig?.registryCallback);
+    let bot: Bot | undefined;
+
+    try {
+      bot = await container.instantiate(Bot);
+      await bot.start();
+    } catch (e) {
+      this.logger.error('Unexpected error', e);
+      Sentry.withScope(function () {
+        Sentry.captureException(e);
+      });
+    }
+
+    if (!bot) {
+      throw new Error('Bot could not be created');
+    }
+
+    return new this(bot, container);
+  }
+
+  private constructor(public bot: Bot, public container: Container) {}
+
+  async teardown() {
+    await this.bot.destroy();
+    await this.container.teardown();
   }
 }

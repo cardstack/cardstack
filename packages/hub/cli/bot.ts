@@ -1,8 +1,8 @@
-import { bootBot } from '../main';
+import { HubBot } from '../main';
 
 exports.command = 'bot';
 exports.describe = 'Boot the discord bot';
 exports.builder = {};
-exports.handler = function (/* argv: Argv */) {
-  bootBot();
+exports.handler = async function (/* argv: Argv */) {
+  await HubBot.create();
 };

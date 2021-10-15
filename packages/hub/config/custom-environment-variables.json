@@ -14,7 +14,10 @@
     "url": "DATABASE_URL"
   },
   "discord": {
+    "botId": "CARDPAY_BOT_ID",
     "botToken": "CARDPAY_BOT_TOKEN",
+    "cordeBotId": "CORDE_BOT_ID",
+    "cordeBotToken": "CORDE_BOT_TOKEN",
     "commandPrefix": "CARDPAY_BOT_COMMAND_PREFIX",
     "betaTesterRole": "CARDPAY_BOT_BETA_TESTER_ROLE",
     "allowedGuilds": "CARDPAY_BOT_ALLOWED_GUILDS",

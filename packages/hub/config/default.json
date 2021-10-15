@@ -23,7 +23,10 @@
     "ignore-pattern": "README.md|.*\\.ts|.*\\.js\\.map"
   },
   "discord": {
+    "botId": null,
     "botToken": null,
+    "cordeBotId": null,
+    "cordeBotToken": null,
     "commandPrefix": "!",
     "betaTesterRole": "Beta Tester",
     "allowedGuilds": null,

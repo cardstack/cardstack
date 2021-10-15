@@ -1,5 +1,8 @@
 export interface DiscordConfig {
+  botId: string;
   botToken: string;
+  cordeBotId: string;
+  cordeBotToken: string;
   commandPrefix: string;
   betaTesterRole: string;
   allowedGuilds: string;

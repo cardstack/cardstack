@@ -6,6 +6,7 @@ import { DiscordConfig } from '../types';
 
 const log = logger('events:guild-message');
 const {
+  cordeBotId,
   allowedGuilds: guildsRaw,
   allowedChannels: channelsRaw,
   commandPrefix: prefix,
@@ -16,7 +17,7 @@ let allowedChannels = channelsRaw.split(',');
 export const name: Event['name'] = 'message';
 export const run: Event['run'] = async (bot, message) => {
   if (
-    message?.author.bot ||
+    (message?.author.bot && message.author.id !== cordeBotId) ||
     !message?.guild ||
     !allowedGuilds.includes(message.guild.id) ||
     !allowedChannels.includes(message.channel.id) ||
