@@ -271,7 +271,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         name: 'WITHDRAWAL',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/token-suppliers?flow=withdrawal&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').doesNotExist();
       assert.dom('[data-test-milestone="1"]').doesNotExist();
       assert.dom('[data-test-milestone="2"]').doesNotExist();
@@ -303,7 +303,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         name: 'WITHDRAWAL',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/token-suppliers?flow=withdrawal&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').doesNotExist();
       assert.dom('[data-test-milestone="1"]').doesNotExist();
       assert.dom('[data-test-milestone="2"]').doesNotExist();
@@ -400,7 +400,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         name: 'WITHDRAWAL',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/token-suppliers?flow=withdrawal&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').doesNotExist();
       assert.dom('[data-test-milestone="1"]').doesNotExist();
       assert.dom('[data-test-milestone="2"]').doesNotExist();
