@@ -2,11 +2,12 @@ import { setComponentTemplate } from '@ember/component';
 import { precompileTemplate } from '@ember/template-compilation';
 import templateOnlyComponent from '@ember/component/template-only';
 import BoxelCardContainer from '@cardstack/boxel/components/boxel/card-container';
+import BoxelHeader from '@cardstack/boxel/components/boxel/header';
 
 export default setComponentTemplate(
-  precompileTemplate('<BoxelCardContainer><h1>Donations</h1></BoxelCardContainer>', {
+  precompileTemplate('<BoxelCardContainer><BoxelHeader @header="Donations" @editable={{true}}/></BoxelCardContainer>', {
     strictMode: true,
-    scope: () => ({ BoxelCardContainer }),
+    scope: () => ({ BoxelCardContainer, BoxelHeader }),
   }),
   templateOnlyComponent()
 );

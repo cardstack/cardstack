@@ -1,14 +1,14 @@
 import { setComponentTemplate } from '@ember/component';
 import { precompileTemplate } from '@ember/template-compilation';
 import templateOnlyComponent from '@ember/component/template-only';
-import BoxelCardContainer from '@cardstack/boxel/components/boxel/card-container';
+import './isolated.css';
 
 export default setComponentTemplate(
   precompileTemplate(
-    '<BoxelCardContainer><h1>Card Space Layout</h1><@fields.title/><@fields.profile/><@fields.bio/><@fields.links/><@fields.donations/></BoxelCardContainer>',
+    '<article class="card-space-layout"><section class="card-space-layout__module"><@fields.profile/></section><section class="card-space-layout__optional-modules"><@fields.bio/><@fields.links/><@fields.donations/></section></article>',
     {
       strictMode: true,
-      scope: () => ({ BoxelCardContainer }),
+      scope: () => ({}),
     }
   ),
   templateOnlyComponent()

@@ -9,8 +9,8 @@ import BoxelInput from '@cardstack/boxel/components/boxel/input';
 let on = realOn;
 
 const getTargetValue = helper(([action] /*, hash*/) => {
-  return function (event) {
-    action(event.target.value);
+  return function (value) {
+    action(value);
   };
 });
 

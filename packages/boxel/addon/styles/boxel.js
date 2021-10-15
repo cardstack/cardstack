@@ -9,5 +9,6 @@ import '../components/boxel/button/size-variants.css';
 import '../components/boxel/card-container/index.css';
 import '../components/boxel/field/view/index.css';
 import '../components/boxel/field/edit/index.css';
+import '../components/boxel/header/index.css';
 import '../components/boxel/input/index.css';
 import '../components/boxel/select-button/index.css';

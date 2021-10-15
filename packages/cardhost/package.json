@@ -35,6 +35,7 @@
     "@cardstack/base-cards": "0.26.10",
     "@cardstack/compiled": "0.26.10",
     "@cardstack/core": "0.26.10",
+    "@cardstack/boxel": "0.26.10",
     "@ember/optional-features": "^2.0.0",
     "@ember/render-modifiers": "^1.0.2",
     "@ember/test-helpers": "^2.2.8",

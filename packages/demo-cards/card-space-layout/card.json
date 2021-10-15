@@ -2,7 +2,9 @@
   "schema": "schema.js",
   "isolated": "isolated.js",
   "data": {
-    "title": "bob",
+    "profile": {
+      "username": "Amazing Emily"
+    },
     "links": {
       "links": [
         {
