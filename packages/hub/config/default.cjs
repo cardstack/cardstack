@@ -26,14 +26,14 @@ module.exports = {
     'ignore-pattern': 'README.md|.*\\.ts|.*\\.js\\.map',
   },
   discord: {
-    botId: null,
+    botId: '896093538297708564',
     botToken: null,
-    cordeBotId: null,
+    cordeBotId: '898595095195029595',
     cordeBotToken: null,
     commandPrefix: '!',
     betaTesterRole: 'Beta Tester',
-    allowedGuilds: null,
-    allowedChannels: null,
+    allowedGuilds: '896093062562983986',
+    allowedChannels: '896093062562983989',
   },
   serverSecret: null,
   sentry: {
