@@ -1,0 +1,20 @@
+.funding-source__field {
+  grid-template-columns: 2.5rem 1fr;
+  row-gap: 0;
+}
+
+.funding-source__nested-items {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.funding-source__dropdown-container {
+  --arrow-space: 4rem;
+
+  margin-top: var(--boxel-sp-sm);
+  padding-left: var(--arrow-space);
+  background-image: url('/images/icons/curve-arrow.svg');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: var(--arrow-space) 14px;
+}
