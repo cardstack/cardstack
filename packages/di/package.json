@@ -2,7 +2,7 @@
 {
   "name": "@cardstack/di",
   "description": "dependency injection support for cardstack hub",
-  "version": "0.26.9",
+  "version": "0.26.10",
   "author": "Hassan Abdel-Rahman @habdelra",
   "repository": "cardstack/cardstack",
   "license": "MIT",

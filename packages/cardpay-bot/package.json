@@ -1,13 +1,13 @@
 {
   "name": "@cardstack/cardpay-bot",
-  "version": "0.26.9",
+  "version": "0.26.10",
   "description": "Discord bot for Cardpay",
   "author": "Hassan Abdel-Rahman @habdelra",
   "license": "MIT",
   "dependencies": {
-    "@cardstack/cardpay-sdk": "0.26.9",
-    "@cardstack/db": "0.26.9",
-    "@cardstack/di": "0.26.9",
+    "@cardstack/cardpay-sdk": "0.26.10",
+    "@cardstack/db": "0.26.10",
+    "@cardstack/di": "0.26.10",
     "@cardstack/logger": "^0.2.1",
     "@sentry/node": "^6.10.0",
     "@types/fs-extra": "^9.0.11",
