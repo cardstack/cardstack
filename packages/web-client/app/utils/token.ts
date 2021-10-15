@@ -159,22 +159,17 @@ export class TokenDisplayInfo<T extends TokenSymbol> implements DisplayInfo {
     this.icon = displayInfo.icon;
   }
 
-  static iconFor(symbol: TokenSymbol) {
-    return _tokenDisplayInfoMap[symbol].icon;
-  }
-
-  // FIXME what’s a good name?
-  static iconForBridgedOrUnbridged(symbol: string) {
+  static iconFor(symbol: string) {
     switch (symbol) {
       case 'ETH':
-        return TokenDisplayInfo.iconFor('ETH');
+        return _tokenDisplayInfoMap['ETH'].icon;
       case 'DAI':
       case 'DAI.CPXD':
       case 'XDAI':
-        return TokenDisplayInfo.iconFor('DAI');
+        return _tokenDisplayInfoMap['DAI'].icon;
       case 'CARD':
       case 'CARD.CPXD':
-        return TokenDisplayInfo.iconFor('CARD');
+        return _tokenDisplayInfoMap['CARD'].icon;
       default:
         return undefined;
     }
