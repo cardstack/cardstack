@@ -288,7 +288,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     post = postableSel(2, 2);
     // // funding-source card
     assert
-      .dom(`${post} [data-test-choose-balance-from-safe]`)
+      .dom(`${post} [data-test-funding-source-safe]`)
       .hasText(`DEPOT ${depotAddress}`);
 
     assert

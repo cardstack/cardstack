@@ -68,7 +68,7 @@ module(
         />
       `);
 
-      assert.dom('[data-test-choose-balance-from-safe]').containsText('DEPOT');
+      assert.dom('[data-test-funding-source-safe]').containsText('DEPOT');
     });
 
     test('it uses the safe from the workflow when it exists', async function (this: Context, assert) {
@@ -88,7 +88,7 @@ module(
       `);
 
       assert
-        .dom('[data-test-choose-balance-from-safe]')
+        .dom('[data-test-funding-source-safe]')
         .containsText('Merchant account');
     });
   }
