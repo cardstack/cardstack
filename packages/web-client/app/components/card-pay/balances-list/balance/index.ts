@@ -9,6 +9,6 @@ interface CardPayBalancesListBalanceComponentArgs {
 
 export default class CardPayBalancesListBalanceComponent extends Component<CardPayBalancesListBalanceComponentArgs> {
   get icon() {
-    return TokenDisplayInfo.iconForBridgedOrUnbridged(this.args.symbol);
+    return TokenDisplayInfo.iconFor(this.args.symbol);
   }
 }

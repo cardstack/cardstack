@@ -41,7 +41,7 @@ class BalanceViewBannerComponent extends Component<BalanceViewBannerComponentArg
   }
 
   get tokenIcon() {
-    return TokenDisplayInfo.iconForBridgedOrUnbridged(this.args.token);
+    return TokenDisplayInfo.iconFor(this.args.token);
   }
 
   get summaryBalanceLabel() {
