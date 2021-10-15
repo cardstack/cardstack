@@ -20,11 +20,16 @@ module(
   function (hooks) {
     setupRenderingTest(hooks);
 
-    test('It should allow a layer 2 safe and balance to be chosen', async function (assert) {
-      let session = new WorkflowSession();
+    let session: WorkflowSession;
+    let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
+    let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
+
+    hooks.beforeEach(async function () {
+      session = new WorkflowSession();
       this.set('session', session);
 
-      let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
       let layer1Service = this.owner.lookup('service:layer1-network')
         .strategy as Layer1TestWeb3Strategy;
       layer1Service.test__simulateAccountsChanged(
@@ -38,9 +43,6 @@ module(
 
       let layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
-      let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-      let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
-      let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           address: depotAddress,
@@ -70,6 +72,9 @@ module(
 
       // Ensure safes have been loaded, as in a workflow context
       await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    });
+
+    test('It should allow a layer 2 safe and balance to be chosen', async function (assert) {
       await render(hbs`
         <CardPay::WithdrawalWorkflow::ChooseBalance
           @workflowSession={{this.session}}
@@ -163,6 +168,23 @@ module(
         merchantAddress,
         'workflow session withdrawal safe updated'
       );
+    });
+
+    test('it uses the withdrawal safe from the workflow when it exists', async function (assert) {
+      session.setValue('withdrawalSafe', merchantAddress);
+
+      await render(hbs`
+        <CardPay::WithdrawalWorkflow::ChooseBalance
+          @workflowSession={{this.session}}
+          @onComplete={{this.onComplete}}
+          @onIncomplete={{this.onIncomplete}}
+          @isComplete={{this.isComplete}}
+        />
+      `);
+
+      assert
+        .dom('[data-test-choose-balance-from-safe]')
+        .containsText(merchantAddress);
     });
   }
 );
