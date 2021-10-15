@@ -55,6 +55,14 @@ module(
         accumulatedSpendValue: 100,
       });
 
+      let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+        merchantSafe,
+      ]);
+
+      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+
       let workflowSession = new WorkflowSession();
       workflowSession.setValue({
         spendFaceValue: 100000,
