@@ -21,9 +21,7 @@ import {
   WorkflowCard,
   WorkflowMessage,
   WorkflowName,
-  UNSUPPORTED_WORKFLOW_STATE_VERSION,
   conditionalCancelationMessage,
-  defaultCancelationCard,
 } from '@cardstack/web-client/models/workflow';
 
 import { tracked } from '@glimmer/tracking';
@@ -32,6 +30,7 @@ import {
   fromWei,
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
+import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
 
 export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
 
@@ -43,7 +42,6 @@ export const FAILURE_REASONS = {
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
   RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
-  UNSUPPORTED_WORKFLOW_STATE_VERSION: UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } as const;
 
 export const MILESTONE_TITLES = [
@@ -53,7 +51,7 @@ export const MILESTONE_TITLES = [
   'Confirm transaction',
 ];
 
-export const WORKFLOW_VERSION = 1;
+export const WORKFLOW_VERSION = 2;
 
 class IssuePrepaidCardWorkflow extends Workflow {
   @service declare router: RouterService;
@@ -290,12 +288,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
       message:
         'You attempted to restore an unfinished workflow, but your Card Wallet got disconnected. Please restart the workflow.',
     }),
-    conditionalCancelationMessage({
-      forReason: FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION,
-      message:
-        'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!',
-    }),
-    defaultCancelationCard(),
+    ...standardCancelationPostables(),
   ]);
 
   constructor(owner: unknown, workflowPersistenceId?: string) {

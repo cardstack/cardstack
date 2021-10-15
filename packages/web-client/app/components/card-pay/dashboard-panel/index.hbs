@@ -1,4 +1,8 @@
-<details open class="dashboard-details-container" ...attributes>
+<details
+  class={{cn "dashboard-details-container" dashboard-details-container--no-collapse=@noCollapse}}
+  ...attributes
+  open={{if @noCollapse true @open}}
+>
   <summary class="dashboard-details-container__summary">
     <div class="dashboard-panel__summary-hero" style={{css-url "background-image" @panel.summaryHeroImageUrl}} />
     <div class="dashboard-details-container__summary-content">

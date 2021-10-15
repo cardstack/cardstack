@@ -12,7 +12,8 @@ import Web3 from 'web3';
 // This package has NOT been audited and might potentially be unsafe.
 // Take precautions to clear memory properly, store the private keys safely, and test transaction receiving and sending functionality properly before using in production!
 let web3Instance = new Web3();
-let generateAddress = () => web3Instance.eth.accounts.create().address;
+export const generateMockAddress = () =>
+  web3Instance.eth.accounts.create().address;
 
 export const getFilenameFromDid = async (did: string) => {
   let resolver = new Resolver({ ...getResolver() });
@@ -108,9 +109,9 @@ export const createMerchantSafe = (
   ...defaultMerchantSafe,
   createdAt: Date.now() / 1000,
   ...opts,
-  address: opts.address || generateAddress(),
-  owners: opts.owners || [generateAddress()],
-  merchant: opts.merchant || generateAddress(),
+  address: opts.address || generateMockAddress(),
+  owners: opts.owners || [generateMockAddress()],
+  merchant: opts.merchant || generateMockAddress(),
 });
 
 const defaultPrepaidCardSafe: PrepaidCardSafe = {
@@ -149,15 +150,15 @@ const defaultPrepaidCardSafe: PrepaidCardSafe = {
 export const createPrepaidCardSafe = (
   opts: Partial<PrepaidCardSafe>
 ): PrepaidCardSafe => {
-  let owners = opts.owners || [generateAddress()];
+  let owners = opts.owners || [generateMockAddress()];
   return {
     ...defaultPrepaidCardSafe,
     createdAt: Date.now() / 1000,
     ...opts,
-    address: opts.address || generateAddress(),
+    address: opts.address || generateMockAddress(),
     owners: owners,
     prepaidCardOwner: owners[0],
-    issuer: opts.issuer || generateAddress(),
+    issuer: opts.issuer || generateMockAddress(),
     // Generate addresses here
   };
 };
@@ -171,6 +172,7 @@ const defaultDepotSafe: DepotSafe = {
 };
 /**
  * Defaults create a freshly created depot:
+ * ```
  * {
  *   address: 'DEFAULT_DEPOT_ADDRESS', // should be overwritten in factory
  *   createdAt: Date.now() / 1000,
@@ -178,10 +180,11 @@ const defaultDepotSafe: DepotSafe = {
  *   owners: ['DEFAULT_DEPOT_OWNER_ADDRESS'], // should be overwritten in factory
  *   type: 'depot',
  * };
+ * ```
  */
 export const createDepotSafe = (opts: Partial<DepotSafe>): DepotSafe => {
-  let address = opts.address || generateAddress();
-  let owners = opts.owners || [generateAddress()];
+  let address = opts.address || generateMockAddress();
+  let owners = opts.owners || [generateMockAddress()];
   return {
     ...defaultDepotSafe,
     createdAt: Date.now() / 1000,

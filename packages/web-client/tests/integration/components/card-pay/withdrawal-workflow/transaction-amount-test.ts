@@ -14,6 +14,11 @@ import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { toWei } from 'web3-utils';
 import BN from 'bn.js';
 import sinon from 'sinon';
+import {
+  createDepotSafe,
+  createSafeToken,
+  generateMockAddress,
+} from '@cardstack/web-client/utils/test-factories';
 
 const startDaiAmountString = '100.1111111111111111';
 let startDaiAmount = toWei(startDaiAmountString);
@@ -26,23 +31,30 @@ module(
     setupRenderingTest(hooks);
     let renderSubject!: () => Promise<void>;
     let session!: WorkflowSession;
+    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+    let depotAddress = generateMockAddress();
 
     hooks.beforeEach(async function () {
       let layer2Service = this.owner.lookup('service:layer2-network');
       layer2Strategy = layer2Service.strategy;
 
       // Simulate being connected on layer 2 -- prereq to converting to USD
-      let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-      layer2Strategy.test__simulateAccountsChanged([layer2AccountAddress]);
-
-      await layer2Strategy.test__simulateBalances({
-        dai: new BN(startDaiAmount),
-        card: new BN('0'),
-      });
+      layer2Strategy.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+        createDepotSafe({
+          address: depotAddress,
+          tokens: [
+            createSafeToken('DAI', startDaiAmount),
+            createSafeToken('CARD', '0'),
+          ],
+        }),
+      ]);
+      await layer2Strategy.test__simulateAccountsChanged([
+        layer2AccountAddress,
+      ]);
 
       session = new WorkflowSession();
       session.setValue({
-        withdrawalSafe: layer2Strategy.depotSafe!,
+        withdrawalSafe: depotAddress,
         withdrawalToken: 'DAI.CPXD',
       });
 
@@ -63,7 +75,7 @@ module(
 
     test('the funding source and balance are shown', async function (assert) {
       await renderSubject();
-      assert.dom('[data-test-withdrawal-source]').containsText('example-depot');
+      assert.dom('[data-test-withdrawal-source]').containsText(depotAddress);
       assert
         .dom('[data-test-withdrawal-balance]')
         .containsText(`${startDaiAmountString} DAI.CPXD`);
@@ -144,13 +156,16 @@ module(
       let limit = await layer2Strategy.getWithdrawalLimits('DAI.CPXD');
       let balanceBiggerThanLimit = limit.max.add(new BN(toWei('2')));
 
-      await layer2Strategy.test__simulateBalances({
-        dai: balanceBiggerThanLimit,
-        card: new BN('0'),
-      });
-      session.setValue({
-        withdrawalSafe: layer2Strategy.depotSafe!,
-      });
+      layer2Strategy.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+        createDepotSafe({
+          address: depotAddress,
+          tokens: [
+            createSafeToken('DAI', balanceBiggerThanLimit.toString()),
+            createSafeToken('CARD', '0'),
+          ],
+        }),
+      ]);
+      await layer2Strategy.safes.fetch();
 
       await renderSubject();
       await fillIn('input', '1500002');

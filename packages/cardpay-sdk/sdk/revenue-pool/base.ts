@@ -298,7 +298,7 @@ export default class RevenuePool {
         await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL));
       }
       isFirstTime = false;
-      merchantSafe = await safes.viewSafe(merchantSafeAddress);
+      merchantSafe = (await safes.viewSafe(merchantSafeAddress)).safe;
     } while (merchantSafe?.type !== 'merchant' && Date.now() - startTime < TIMEOUT);
     if (!merchantSafe) {
       throw new Error(`Timeout while waiting for the merchant safe to be created.`);

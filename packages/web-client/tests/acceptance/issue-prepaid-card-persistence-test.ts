@@ -9,7 +9,10 @@ import prepaidCardPatterns from '../../mirage/fixture-data/prepaid-card-patterns
 import { DepotSafe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { BN } from 'bn.js';
-import { FAILURE_REASONS as ISSUE_PREPAID_CARD_WORKFLOW_FAILURE_REASONS } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
+import {
+  FAILURE_REASONS as ISSUE_PREPAID_CARD_WORKFLOW_FAILURE_REASONS,
+  MILESTONE_TITLES,
+} from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow/index';
 import {
   faceValueOptions,
   WORKFLOW_VERSION,
@@ -52,7 +55,6 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     testDepot = createDepotSafe({
       address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
@@ -61,7 +63,10 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       ],
     });
 
-    await layer2Service.test__simulateDepot(testDepot);
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      testDepot,
+    ]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     layer2Service.authenticate();
     layer2Service.test__simulateHubAuthentication('abc123--def456--ghi789');
 
@@ -548,7 +553,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       let state = buildState({
         meta: {
           version: WORKFLOW_VERSION - 1,
-
+          completedMilestonesCount: 2,
+          milestonesCount: MILESTONE_TITLES.length,
           completedCardNames: [
             'LAYER2_CONNECT',
             'LAYOUT_CUSTOMIZATION',

@@ -7,11 +7,14 @@ import {
   visit,
   waitFor,
 } from '@ember/test-helpers';
-import BN from 'bn.js';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { setupHubAuthenticationToken } from '../helpers/setup';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
+import {
+  createDepotSafe,
+  createSafeToken,
+} from '@cardstack/web-client/utils/test-factories';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -30,6 +33,8 @@ module('Acceptance | create card space', function (hooks) {
   let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
   test('initiating workflow without wallet connections', async function (assert) {
+    let subdomain = ''; // TODO: replace this when other parts of the form are filled out
+
     await visit('/card-space');
     await click('[data-test-workflow-button="create-space"]');
 
@@ -55,10 +60,14 @@ module('Acceptance | create card space', function (hooks) {
 
     await waitFor('[data-test-wallet-connect-qr-code]');
 
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    layer2Service.test__simulateBalances({
-      defaultToken: new BN(0),
-    });
+    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      createDepotSafe({
+        owners: [layer2AccountAddress],
+        tokens: [createSafeToken('DAI', '0')],
+      }),
+    ]);
+
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     await settled();
     assert
@@ -113,6 +122,9 @@ module('Acceptance | create card space', function (hooks) {
       .containsText(`We have sent your URL reservation badge`);
     // // Badge
     assert.dom(postableSel(3, 1)).containsText(`URL reservation`);
+    assert
+      .dom(`${postableSel(3, 1)} [data-test-full-card-space-domain]`)
+      .containsText(`${subdomain}.card.space`);
 
     // // Confirm step
     await waitFor(postableSel(3, 3));
@@ -156,10 +168,13 @@ module('Acceptance | create card space', function (hooks) {
     hooks.beforeEach(async function () {
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-      await layer2Service.test__simulateBalances({
-        defaultToken: new BN(0),
-      });
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+        createDepotSafe({
+          owners: [layer2AccountAddress],
+          tokens: [createSafeToken('DAI', '0')],
+        }),
+      ]);
+      await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     });
 
     test('initiating workflow with L2 wallet already connected', async function (assert) {
@@ -270,7 +285,7 @@ module('Acceptance | create card space', function (hooks) {
         .dom(milestoneCompletedSel(0))
         .containsText(`${c.layer2.fullName} wallet connected`);
 
-      layer2Service.test__simulateAccountsChanged([differentL2Address]);
+      await layer2Service.test__simulateAccountsChanged([differentL2Address]);
       await settled();
 
       assert

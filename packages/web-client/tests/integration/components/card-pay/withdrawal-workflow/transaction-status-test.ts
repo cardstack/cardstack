@@ -7,6 +7,13 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 
 import sinon from 'sinon';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
+import {
+  createDepotSafe,
+  generateMockAddress,
+} from '@cardstack/web-client/utils/test-factories';
+
+const eoaAddress = generateMockAddress();
+const safeAddress = generateMockAddress();
 
 module(
   'Integration | Component | card-pay/withdrawal-workflow/transaction-status',
@@ -22,6 +29,7 @@ module(
         layer2BlockHeightBeforeBridging: 1234,
         relayTokensTxnHash: 'relay',
         withdrawalToken: 'CARD.CPXD',
+        withdrawalSafe: safeAddress,
       });
 
       onComplete = sinon.spy();
@@ -37,6 +45,13 @@ module(
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
 
+      layer2Service.test__simulateRemoteAccountSafes(eoaAddress, [
+        createDepotSafe({
+          address: safeAddress,
+          owners: [eoaAddress],
+        }),
+      ]);
+      await layer2Service.test__simulateAccountsChanged([eoaAddress]);
       layer2Service.bridgeToLayer1('0xsource', '0xdestination', 'DAI', '20');
     });
 

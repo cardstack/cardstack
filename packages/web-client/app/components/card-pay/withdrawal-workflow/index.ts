@@ -11,9 +11,7 @@ import {
   WorkflowMessage,
   WorkflowName,
   WorkflowPostable,
-  UNSUPPORTED_WORKFLOW_STATE_VERSION,
-  conditionalCancelationMessage as conditionalCancelationMessage,
-  defaultCancelationCard,
+  conditionalCancelationMessage,
 } from '@cardstack/web-client/models/workflow';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
@@ -33,6 +31,7 @@ import {
 import { task } from 'ember-concurrency-decorators';
 import { formatWeiAmount } from '@cardstack/web-client/helpers/format-wei-amount';
 import { action } from '@ember/object';
+import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
 
 const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
@@ -41,7 +40,6 @@ const FAILURE_REASONS = {
   RESTORATION_L1_DISCONNECTED: 'RESTORATION_L1_DISCONNECTED',
   RESTORATION_L2_ADDRESS_CHANGED: 'RESTORATION_L2_ADDRESS_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
-  UNSUPPORTED_WORKFLOW_STATE_VERSION: UNSUPPORTED_WORKFLOW_STATE_VERSION,
 } as const;
 
 export const MILESTONE_TITLES = [
@@ -53,7 +51,7 @@ export const MILESTONE_TITLES = [
   `Claim tokens on ${c.layer1.conversationalName}`,
 ];
 
-export const WORKFLOW_VERSION = 1;
+export const WORKFLOW_VERSION = 2;
 
 class CheckBalanceWorkflowMessage
   extends WorkflowPostable
@@ -322,12 +320,7 @@ with Card Pay.`,
       message:
         'You attempted to restore an unfinished workflow, but your Layer 1 wallet got disconnected. Please restart the workflow.',
     }),
-    conditionalCancelationMessage({
-      forReason: FAILURE_REASONS.UNSUPPORTED_WORKFLOW_STATE_VERSION,
-      message:
-        'You attempted to restore an unfinished workflow, but the workflow has been upgraded by the Cardstack development team since then, so you will need to start again. Sorry about that!',
-    }),
-    defaultCancelationCard(),
+    ...standardCancelationPostables(),
   ]);
 
   restorationErrors() {

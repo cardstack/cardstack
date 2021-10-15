@@ -10,7 +10,7 @@ export async function viewSafe(network: string, address: string, mnemonic?: stri
 
   let safesApi = await getSDK('Safes', web3);
   console.log(`Getting safe ${address}`);
-  let safe = await safesApi.viewSafe(address);
+  let safe = (await safesApi.viewSafe(address)).safe;
   console.log();
   if (!safe) {
     console.log(`The address ${address} is not a safe`);
@@ -27,7 +27,7 @@ export async function viewSafes(network: string, address: string | undefined, mn
   let safesApi = await getSDK('Safes', web3);
   console.log('Getting safes...');
   console.log();
-  let safes = (await safesApi.view(address)).filter((safe) => safe.type !== 'external');
+  let safes = (await safesApi.view(address)).safes.filter((safe) => safe.type !== 'external');
   if (safes.length === 0) {
     console.log('You have no safes (not counting safes external to the cardpay protocol)');
   }

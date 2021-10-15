@@ -36,7 +36,9 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
         );
         workflowSession.setValue('bridgeValidationResult', result);
       }
-      this.layer2Network.refreshSafesAndBalances();
+      this.layer2Network.safes.updateOne(
+        this.args.workflowSession.getValue<string>('withdrawalSafe')!
+      );
       this.completedCount = 2;
       this.args.onComplete?.();
     } catch (e) {

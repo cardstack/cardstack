@@ -69,7 +69,7 @@ module('Acceptance | Connect Wallet', function (hooks) {
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
       () => !document.querySelector('[data-test-layer-connect-modal="layer2"]')
     );
