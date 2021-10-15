@@ -4,6 +4,7 @@ import { Event } from '../bot';
 import { conversationCommand } from '../utils/dm';
 import config from 'config';
 import { DiscordConfig } from '../types';
+import { isTestEnv } from '../utils/environment';
 
 const log = logger('events:direct-message');
 
@@ -11,7 +12,11 @@ const { cordeBotId } = config.get('discord') as DiscordConfig;
 
 export const name: Event['name'] = 'message';
 export const run: Event['run'] = async (bot, message) => {
-  if ((message?.author.bot && message.author.id !== cordeBotId) || message?.guild || message?.channel.type !== 'dm')
+  if (
+    !message ||
+    (message?.author.bot && message.author.id !== cordeBotId) ||
+    (!isTestEnv && (message?.guild || message?.channel.type !== 'dm'))
+  )
     return;
   let channelId = message.channel.id;
 

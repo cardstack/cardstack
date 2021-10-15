@@ -1,7 +1,7 @@
 import { Command } from '../../bot';
 import config from 'config';
 import { BetaTestConfig } from '../../types';
-import { sendDM, activateDMConversation } from '../../utils/dm';
+import { sendDM, activateDMConversation, createDM } from '../../utils/dm';
 import { isBetaTester } from '../../utils/guild';
 import { getBetaTester, setBetaTester } from '../../utils/beta-tester';
 import * as Sentry from '@sentry/node';
@@ -18,7 +18,7 @@ export const run: Command['run'] = async (bot, message) => {
   if (!member || !guild) {
     return;
   }
-  let dm = await member.createDM();
+  let dm = await createDM(message);
 
   if (!isBetaTester(guild, member)) {
     await sendDM(message, member, dm, `Sorry, I can only give prepaid cards to beta testers.`);
@@ -61,7 +61,7 @@ export const run: Command['run'] = async (bot, message) => {
   Sentry.addBreadcrumb({ message: `sku quantity for sku ${sku} is ${quantity}` });
 
   await setBetaTester(db, member.id, member.user.username);
-  await activateDMConversation(db, dm, 'airdrop-prepaidcard:start');
+  await activateDMConversation(db, dm.id, member.id, 'airdrop-prepaidcard:start');
   await sendDM(
     message,
     member,

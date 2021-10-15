@@ -1,12 +1,28 @@
 import logger from '@cardstack/logger';
-import { DMChannel, GuildMember, Message } from 'discord.js';
+import { GuildMember, Message } from 'discord.js';
 import { Client as DBClient } from 'pg';
+import { isTestEnv } from './environment';
 
 const log = logger('utils:dm');
 
-export async function sendDM(message: Message, member: GuildMember, dm: DMChannel, messageStr: string): Promise<void> {
+export async function createDM(message: Message): Promise<Message['channel']> {
+  if (isTestEnv) {
+    return message.channel;
+  }
+  if (!message.member) {
+    throw new Error('Message must have a member');
+  }
+  return await message.member.createDM();
+}
+
+export async function sendDM(
+  message: Message,
+  member: GuildMember,
+  channel: Message['channel'],
+  messageStr: string
+): Promise<void> {
   try {
-    await dm.send(messageStr);
+    await channel.send(messageStr);
   } catch (e: any) {
     if (e.code === 50007) {
       await message.reply(
@@ -20,40 +36,19 @@ export async function sendDM(message: Message, member: GuildMember, dm: DMChanne
   }
 }
 
-export async function activateDMConversation(db: DBClient, dm: DMChannel, context: string): Promise<void>;
 export async function activateDMConversation(
   db: DBClient,
   channelId: string,
   userId: string,
   command: string
-): Promise<void>;
-export async function activateDMConversation(
-  db: DBClient,
-  dmOrChannelId: DMChannel | string,
-  userIdOrCommand: string,
-  command?: string
 ): Promise<void> {
-  if (typeof dmOrChannelId === 'string' && userIdOrCommand && command) {
-    return await updateDMConversationActivity(db, dmOrChannelId, userIdOrCommand, command);
-  } else if (typeof dmOrChannelId !== 'string') {
-    return await updateDMConversationActivity(db, dmOrChannelId.id, dmOrChannelId.recipient.id, userIdOrCommand);
-  }
-  throw new Error(`Should never get here`);
+  return await updateDMConversationActivity(db, channelId, userId, command);
 }
 
-export async function deactivateDMConversation(db: DBClient, dm: DMChannel): Promise<void>;
-export async function deactivateDMConversation(db: DBClient, channelId: string, userId: string): Promise<void>;
-export async function deactivateDMConversation(
-  db: DBClient,
-  dmOrChannelId: DMChannel | string,
-  userId?: string
-): Promise<void> {
-  if (typeof dmOrChannelId === 'string' && userId) {
-    return await updateDMConversationActivity(db, dmOrChannelId, userId, null);
-  } else if (typeof dmOrChannelId !== 'string') {
-    return await updateDMConversationActivity(db, dmOrChannelId.id, dmOrChannelId.recipient.id, null);
-  }
-  throw new Error(`Should never get here`);
+export const continueDMConversation = activateDMConversation;
+
+export async function deactivateDMConversation(db: DBClient, channelId: string, userId: string): Promise<void> {
+  return await updateDMConversationActivity(db, channelId, userId, null);
 }
 
 export async function conversationCommand(db: DBClient, channelId: string): Promise<string | undefined> {
