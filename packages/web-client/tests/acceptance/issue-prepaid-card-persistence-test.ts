@@ -45,7 +45,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
   setupMirage(hooks);
   setupHubAuthenticationToken(hooks);
   let workflowPersistenceService: WorkflowPersistence;
-  let testDepot: DepotSafe | undefined;
+  let testDepot: DepotSafe;
 
   hooks.beforeEach(async function (this: Context) {
     this.server.db.loadData({
@@ -115,7 +115,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
-        prepaidFundingSafe: testDepot,
+        prepaidFundingSafeAddress: testDepot.address,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -175,7 +175,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
-        prepaidFundingSafe: testDepot,
+        prepaidFundingSafeAddress: testDepot.address,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -246,7 +246,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
-        prepaidFundingSafe: testDepot,
+        prepaidFundingSafeAddress: testDepot.address,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 500,
       });
@@ -306,7 +306,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
-        prepaidFundingSafe: testDepot,
+        prepaidFundingSafeAddress: testDepot.address,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
@@ -374,7 +374,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
         },
         daiMinValue: MIN_AMOUNT_TO_PASS,
         spendMinValue: MIN_SPEND_AMOUNT,
-        prepaidFundingSafe: testDepot,
+        prepaidFundingSafeAddress: testDepot.address,
         prepaidFundingToken: 'DAI.CPXD',
         spendFaceValue: 10000,
         did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',

@@ -57,7 +57,9 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
   }
 
   get fundingSafe(): Safe {
-    return this.args.workflowSession.getValue('prepaidFundingSafe')!;
+    return this.layer2Network.safes.getByAddress(
+      this.args.workflowSession.getValue<string>('prepaidFundingSafeAddress')!
+    )!;
   }
 
   get fundingTokenBalance(): BN {
