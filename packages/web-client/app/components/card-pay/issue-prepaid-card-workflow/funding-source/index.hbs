@@ -6,7 +6,7 @@
   <ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Choose a source and balance to fund your prepaid card">
       <CardPay::LabeledValue @label="Source:" class="funding-source__field">
-        <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} data-test-choose-balance-from-wallet />
+        <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} />
         <CardPay::NestedItems @noInnerBorder={{not @isComplete}} class="funding-source__nested-items">
           <:outer>
             <CardPay::AccountDisplay
