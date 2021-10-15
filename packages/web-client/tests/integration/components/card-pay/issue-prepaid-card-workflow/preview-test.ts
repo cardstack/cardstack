@@ -58,7 +58,7 @@ module(
       let workflowSession = new WorkflowSession();
       workflowSession.setValue({
         spendFaceValue: 100000,
-        prepaidFundingSafe: merchantSafe,
+        prepaidFundingSafeAddress: merchantSafe.address,
         issuerName: 'Some name',
         colorScheme: {
           id: prepaidCardColorSchemes[0].id,

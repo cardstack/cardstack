@@ -36,15 +36,16 @@ module(
       });
 
       let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-      layer2Service.test__simulateAccountSafes(layer2AccountAddress, [
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           owners: [layer2AccountAddress],
           tokens: [],
         }),
         merchantSafe,
       ]);
+
+      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
       workflowSession = new WorkflowSession();
       this.setProperties({
@@ -71,7 +72,10 @@ module(
     });
 
     test('it uses the safe from the workflow when it exists', async function (this: Context, assert) {
-      workflowSession.setValue('prepaidFundingSafe', merchantSafe);
+      workflowSession.setValue(
+        'prepaidFundingSafeAddress',
+        merchantSafe.address
+      );
 
       await render(hbs`
         <CardPay::IssuePrepaidCardWorkflow::FundingSource

@@ -25,9 +25,12 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    this.selectedSafe =
-      this.args.workflowSession.getValue('prepaidFundingSafe') ??
-      this.layer2Network.depotSafe;
+    let prepaidFundingSafeAddress = this.args.workflowSession.getValue<string>(
+      'prepaidFundingSafeAddress'
+    );
+    this.selectedSafe = prepaidFundingSafeAddress
+      ? this.layer2Network.safes.getByAddress(prepaidFundingSafeAddress)
+      : this.layer2Network.depotSafe;
     this.selectedTokenSymbol =
       this.tokens.find((t) => t.symbol === this.prepaidFundingToken)
         ?.tokenDisplayInfo.symbol ?? this.tokens[0].tokenDisplayInfo.symbol;
@@ -91,7 +94,7 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
     if (this.selectedTokenSymbol) {
       this.args.workflowSession.setValue({
         prepaidFundingToken: this.selectedTokenSymbol,
-        prepaidFundingSafe: this.selectedSafe,
+        prepaidFundingSafeAddress: this.selectedSafe!.address,
       });
     }
     this.args.onComplete?.();
