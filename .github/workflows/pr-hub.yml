@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERVER_SECRET: ${{ secrets.SERVER_SECRET }}
+      CARDPAY_BOT_TOKEN: ${{ secrets.CARDPAY_BOT_TOKEN }}
+      CORDE_BOT_TOKEN: ${{ secrets.CORDE_BOT_TOKEN }}
     services:
       postgres:
         image: postgres:13

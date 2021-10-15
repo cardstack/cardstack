@@ -28,6 +28,9 @@ jobs:
     name: hub, did-resolver Build/Test
     needs: lint
     runs-on: ubuntu-latest
+    env:
+      CARDPAY_BOT_TOKEN: ${{ secrets.CARDPAY_BOT_TOKEN }}
+      CORDE_BOT_TOKEN: ${{ secrets.CORDE_BOT_TOKEN }}
     services:
       postgres:
         image: postgres:13
