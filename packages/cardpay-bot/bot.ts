@@ -27,6 +27,7 @@ export class Bot extends Client {
   relay = inject('relay');
   web3 = inject('web3');
   inventory = inject('inventory');
+  walletConnect = inject('wallet-connect', { as: 'walletConnect' });
   guildCommands = new Map<string, Command>();
   dmCommands = new Map<string, Command>();
 

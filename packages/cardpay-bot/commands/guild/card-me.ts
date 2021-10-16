@@ -66,6 +66,14 @@ export const run: Command['run'] = async (bot, message) => {
     message,
     member,
     dm,
-    `Hi! I'll be sending a prepaid card to you. First you'll need to download the Card Wallet app from the app store and launch it. If you are viewing this message on the same device that you downloaded your Card Wallet to, then switch devices so that you can use your Card Wallet to scan a QR code in this chat. Type "ok" if you are ready to continue.`
+    `Hi,
+
+Connect your Card Wallet app to receive your prepaid card.
+
+If you do not have the Card Wallet app download Card Wallet at cardstack.com/cardpay
+
+If you are viewing this message on the same device that you downloaded your Card Wallet to, then switch devices so that you can use your Card Wallet to scan a QR code in this chat.
+
+Type "ok" if you are ready to continue.`
   );
 };

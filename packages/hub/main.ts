@@ -14,6 +14,7 @@ import packageJson from './package.json';
 import { Registry, Container, RegistryCallback } from '@cardstack/di';
 
 import DatabaseManager from '@cardstack/db';
+import WalletConnectService from '@cardstack/cardpay-bot/services/wallet-connect';
 import { HubServerConfig } from './interfaces';
 
 import AuthenticationMiddleware from './services/authentication-middleware';
@@ -111,6 +112,7 @@ export function createContainer(registryCallback?: RegistryCallback): Container 
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
   registry.register('subgraph', SubgraphService);
+  registry.register('wallet-connect', WalletConnectService);
   registry.register('worker-client', WorkerClient);
   registry.register('web3', Web3Service);
   registry.register('wyre', WyreService);

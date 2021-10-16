@@ -2,7 +2,6 @@ import { getConstantByNetwork, getSDK } from '@cardstack/cardpay-sdk';
 import config from 'config';
 import { Message, MessageEmbed } from 'discord.js';
 import { Command, Bot } from '../../../bot';
-import { getWeb3 } from '../../../utils/wallet-connect';
 import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
 import { basename, join } from 'path';
@@ -22,6 +21,7 @@ export const description: Command['description'] = 'Collect wallet information t
 const { sku } = config.get('betaTesting') as BetaTestConfig;
 const { network } = config.get('web3') as Web3Config;
 const continueCommands = ['ok', 'yes', 'y', 'sure', 'okay', 'fine', 'ready', "i'm ready"]; // some helpful suggestions from github co-pilot
+const quitCommands = ['quit', 'cancel', 'no', 'nope', 'nah', 'nevermind', 'nvm', 'stop', 'exit'];
 
 // For DM conversations that includes multiple user inputs we can break
 // conversation apart into a state machine where each command module is a state,
@@ -35,18 +35,24 @@ export const run: Command['run'] = async (bot, message, [channelId] = []) => {
   if (!channelId || !message) {
     return;
   }
+  let db = await bot.databaseManager.getClient();
+  if (quitCommands.includes(message.content.toLowerCase())) {
+    deactivateDMConversation(db, channelId, message.author.id);
+    await message.reply(`OK, if your change your mind let me know.`);
+    return;
+  }
+
   if (!continueCommands.includes(message.content.toLowerCase())) {
     await message.reply(`I didn't catch that--are you ready to continue?`);
     return;
   }
 
-  let db = await bot.databaseManager.getClient();
   let userId = message.author.id;
   try {
     let betaTester = await getBetaTester(db, userId);
     let address: string;
     if (!betaTester?.address) {
-      let web3 = await getWeb3(message);
+      let web3 = await bot.walletConnect.getWeb3(message);
 
       if (!web3) {
         await message.reply(
