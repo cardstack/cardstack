@@ -33,7 +33,7 @@ module.exports = {
     commandPrefix: '!',
     betaTesterRole: 'Beta Tester',
     allowedGuilds: '896093062562983986',
-    allowedChannels: '896093062562983989',
+    allowedChannels: '896093062562983989,898891181575000074',
   },
   serverSecret: null,
   sentry: {
