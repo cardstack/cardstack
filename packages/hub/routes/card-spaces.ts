@@ -21,6 +21,20 @@ export interface CardSpace {
   ownerAddress: string;
 }
 
+function serializeErrors(errors: any) {
+  return Object.keys(errors).flatMap((attribute) => {
+    let errorsForAttribute = errors[attribute as keyof CardSpaceErrors];
+    return errorsForAttribute.map((errorMessage: string) => {
+      return {
+        status: '422',
+        title: 'Invalid attribute',
+        source: { pointer: `/data/attributes/${attribute}` },
+        detail: errorMessage,
+      };
+    });
+  });
+}
+
 export default class CardSpacesRoute {
   databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
   cardSpaceSerializer: CardSpaceSerializer = inject('card-space-serializer', {
@@ -56,21 +70,12 @@ export default class CardSpacesRoute {
     };
 
     let errors = await this.cardSpaceValidator.validate(cardSpace);
+    let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
 
-    if (Object.values(errors).flatMap((i) => i).length > 0) {
+    if (hasErrors) {
       ctx.status = 422;
       ctx.body = {
-        errors: Object.keys(errors).flatMap((attribute) => {
-          let errorsForAttribute = errors[attribute as keyof CardSpaceErrors];
-          return errorsForAttribute.map((errorMessage) => {
-            return {
-              status: '422',
-              title: 'Invalid attribute',
-              source: { pointer: `/data/attributes/${attribute}` },
-              detail: errorMessage,
-            };
-          });
-        }),
+        errors: serializeErrors(errors),
       };
     } else {
       await this.cardSpaceQueries.insert(cardSpace);
@@ -93,10 +98,11 @@ export default class CardSpacesRoute {
 
     let url: string = ctx.params.url;
     let errors = await this.cardSpaceValidator.validate({ url } as CardSpace);
-    let urlAvailable = !errors.url.includes('Already exists');
 
     ctx.status = 200;
-    ctx.body = { urlAvailable, detail: errors.url.join(', ') };
+    ctx.body = {
+      errors: serializeErrors(errors).filter((e) => e.source.pointer === '/data/attributes/url'),
+    };
     ctx.type = 'application/vnd.api+json';
   }
 

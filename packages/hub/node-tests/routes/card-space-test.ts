@@ -284,20 +284,19 @@ describe('POST /api/card-spaces', function () {
       server.teardown();
     });
 
-    it('returns urlAvailable = true when url available', async function () {
+    it('returns no url errors when url is available', async function () {
       await request
         .get(`/api/card-spaces/validate-url/satoshi.card.space`)
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
         .set('Content-Type', 'application/vnd.api+json')
         .expect(200)
         .expect({
-          urlAvailable: true,
-          detail: '',
+          errors: [],
         })
         .expect('Content-Type', 'application/vnd.api+json');
     });
 
-    it('returns urlAvailable = false when url already used', async function () {
+    it('returns url errors when url is already used', async function () {
       let dbManager = await server.container.lookup('database-manager');
       let db = await dbManager.getClient();
       await db.query(
@@ -311,8 +310,14 @@ describe('POST /api/card-spaces', function () {
         .set('Content-Type', 'application/vnd.api+json')
         .expect(200)
         .expect({
-          urlAvailable: false,
-          detail: 'Already exists',
+          errors: [
+            {
+              status: '422',
+              title: 'Invalid attribute',
+              source: { pointer: `/data/attributes/url` },
+              detail: 'Already exists',
+            },
+          ],
         })
         .expect('Content-Type', 'application/vnd.api+json');
     });
