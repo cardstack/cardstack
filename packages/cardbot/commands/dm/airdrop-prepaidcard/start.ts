@@ -13,6 +13,7 @@ import {
   setBetaTesterAirdropTxnHash,
 } from '../../../utils/beta-tester';
 import { BetaTestConfig, Web3Config } from '../../../types';
+import { name as cardmeName } from '../../guild/card-me';
 
 const log = logger('command:airdrop-prepaidcard');
 export const name: Command['name'] = 'airdrop-prepaidcard:start';
@@ -38,7 +39,7 @@ export const run: Command['run'] = async (bot, message, [channelId] = []) => {
   let db = await bot.databaseManager.getClient();
   if (quitCommands.includes(message.content.toLowerCase())) {
     deactivateDMConversation(db, channelId, message.author.id);
-    await message.reply(`ok, if you change your mind type \`!card-me\` in the public channel.`);
+    await message.reply(`ok, if you change your mind type \`!${cardmeName}\` in the public channel.`);
     return;
   }
 

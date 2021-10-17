@@ -66,14 +66,6 @@ it(`can respond to a guild command`, async function () {
   expect('ping').toReturn('pong');
 });
 
-it(`can participate in a conversation`, async function () {
-  await setupTest();
-  expect('dm-ping').toReturn('Hi');
-  expect('blah').toMessageContentContains('pong');
-  // the bot stops responding after the conversation is over
-  expect('blah').not.toMessageContentContains('pong');
-});
-
 it(`does not respond in a non-allowed channel`, async function () {
   await setupTest();
   expect('ping', '898897116913623050').not.toReturn('pong');
