@@ -75,6 +75,7 @@ it(`can participate in DM conversation`, async function () {
 });
 
 it(`does not respond in a non-allowed channel`, async function () {
+  await setupTest();
   expect('ping', '898897116913623050').not.toReturn('pong');
 });
 
