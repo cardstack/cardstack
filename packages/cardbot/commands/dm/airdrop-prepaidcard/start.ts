@@ -50,7 +50,7 @@ export const run: Command['run'] = async (bot, message, [channelId] = []) => {
   let db = await bot.databaseManager.getClient();
   if (quitCommands.includes(message.content.toLowerCase())) {
     deactivateDMConversation(db, channelId, message.author.id);
-    await message.reply(`OK, if your change your mind let me know.`);
+    await message.reply(`OK, if you change your mind let me know.`);
     return;
   }
 

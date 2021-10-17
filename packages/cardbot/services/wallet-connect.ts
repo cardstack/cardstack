@@ -40,7 +40,7 @@ export default class WalletConnectService {
         return;
       }
       const [uri] = payload.params;
-      let qrCodeFile = `${tmp.tmpNameSync()}.png`;
+      let qrCodeFile = tmp.tmpNameSync({ postfix: '.png' });
       QRCode.toFile(qrCodeFile, uri, (err) => {
         if (err) {
           hasError = true;
