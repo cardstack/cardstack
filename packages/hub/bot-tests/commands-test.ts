@@ -66,7 +66,7 @@ it(`can respond to a guild command`, async function () {
   expect('ping').toReturn('pong');
 });
 
-it(`can participate in DM conversation`, async function () {
+it(`can participate in a conversation`, async function () {
   await setupTest();
   expect('dm-ping').toReturn('Hi');
   expect('blah').toMessageContentContains('pong');
