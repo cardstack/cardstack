@@ -18,7 +18,7 @@
   },
   "include": [
     "./packages/cardie/**/*.ts",
-    "./packages/cardpay-bot/**/*.ts",
+    "packages/cardbot/**/*.ts",
     "./packages/cardpay-cli/**/*.ts",
     "./packages/cardpay-sdk/**/*.ts",
     "./packages/cardpay-subgraph/**/*.ts",

@@ -58,9 +58,9 @@ package-lock.json
 /packages/cardpay-cli/**/*.js
 /packages/cardpay-cli/**/*.js.map
 
-/packages/cardpay-bot/**/*.d.ts
-/packages/cardpay-bot/**/*.js
-/packages/cardpay-bot/**/*.js.map
+/packages/cardbot/**/*.d.ts
+/packages/cardbot/**/*.js
+/packages/cardbot/**/*.js.map
 
 /packages/did-resolver/**/*.js
 /packages/did-resolver/**/*.d.ts

@@ -2,7 +2,7 @@ import { Client as DBClient } from 'pg';
 import { it, beforeStart, afterAll, expect, bot as cordeBot } from 'corde';
 import { HubBot } from '../main';
 import config from 'config';
-import { BetaTestConfig, DiscordConfig } from '@cardstack/cardpay-bot/types';
+import { BetaTestConfig, DiscordConfig } from '@cardstack/cardbot/types';
 import { Registry } from '@cardstack/di';
 
 let { cordeBotId, betaTesterRole: betaTesterRoleName } = config.get('discord') as DiscordConfig;

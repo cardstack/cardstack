@@ -9,12 +9,12 @@ import * as Sentry from '@sentry/node';
 
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
-import Bot from '@cardstack/cardpay-bot';
+import Bot from '@cardstack/cardbot';
 import packageJson from './package.json';
 import { Registry, Container, RegistryCallback } from '@cardstack/di';
 
 import DatabaseManager from '@cardstack/db';
-import WalletConnectService from '@cardstack/cardpay-bot/services/wallet-connect';
+import WalletConnectService from '@cardstack/cardbot/services/wallet-connect';
 import { HubServerConfig } from './interfaces';
 
 import AuthenticationMiddleware from './services/authentication-middleware';
