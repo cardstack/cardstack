@@ -29,7 +29,7 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
     env:
-      CARDPAY_BOT_TOKEN: ${{ secrets.CARDPAY_BOT_TOKEN }}
+      CARDBOT_TOKEN: ${{ secrets.CARDBOT_TOKEN }}
       CORDE_BOT_TOKEN: ${{ secrets.CORDE_BOT_TOKEN }}
     services:
       postgres:

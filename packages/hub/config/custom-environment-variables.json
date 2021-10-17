@@ -14,14 +14,14 @@
     "url": "DATABASE_URL"
   },
   "discord": {
-    "botId": "CARDPAY_BOT_ID",
-    "botToken": "CARDPAY_BOT_TOKEN",
+    "botId": "CARDBOT_ID",
+    "botToken": "CARDBOT_TOKEN",
     "cordeBotId": "CORDE_BOT_ID",
     "cordeBotToken": "CORDE_BOT_TOKEN",
-    "commandPrefix": "CARDPAY_BOT_COMMAND_PREFIX",
-    "betaTesterRole": "CARDPAY_BOT_BETA_TESTER_ROLE",
-    "allowedGuilds": "CARDPAY_BOT_ALLOWED_GUILDS",
-    "allowedChannels": "CARDPAY_BOT_ALLOWED_CHANNELS"
+    "commandPrefix": "CARDBOT_COMMAND_PREFIX",
+    "betaTesterRole": "CARDBOT_BETA_TESTER_ROLE",
+    "allowedGuilds": "CARDBOT_ALLOWED_GUILDS",
+    "allowedChannels": "CARDBOT_ALLOWED_CHANNELS"
   },
   "sentry": {
     "dsn": "HUB_SENTRY_DSN",
