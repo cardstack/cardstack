@@ -20,19 +20,7 @@ export const description: Command['description'] = 'Collect wallet information t
 
 const { sku } = config.get('betaTesting') as BetaTestConfig;
 const { network } = config.get('web3') as Web3Config;
-const continueCommands = [
-  `ok`,
-  `yes`,
-  `y`,
-  `sure`,
-  `okay`,
-  `fine`,
-  `ready`,
-  `i'm ready`,
-  `i am ready`,
-  `i've changed my mind`,
-  `i have changed my mind`,
-]; // some helpful suggestions from github co-pilot
+const continueCommands = [`ok`, `yes`, `y`, `sure`, `okay`, `fine`, `ready`, `i'm ready`, `i am ready`]; // some helpful suggestions from github co-pilot
 const quitCommands = ['quit', 'cancel', 'no', 'nope', 'nah', 'nevermind', 'nvm', 'stop', 'exit'];
 
 // For DM conversations that includes multiple user inputs we can break
