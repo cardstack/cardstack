@@ -139,7 +139,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       name: 'Mandello',
       slug: 'mandello1',
       did: MERCHANT_DID,
-      'owner-address': '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44',
+      'owner-address': layer2AccountAddress,
     });
 
     // Simulate the user scanning the QR code and connecting their mobile wallet
