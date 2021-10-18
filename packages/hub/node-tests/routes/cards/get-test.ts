@@ -14,6 +14,35 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       realm = await createRealm('https://my-realm');
+
+      realm.addCard('pet', {
+        'card.json': {
+          schema: 'schema.js',
+        },
+        'schema.js': `
+        import { contains } from "@cardstack/types";
+        import string from "https://cardstack.com/base/string";
+        export default class Pet {
+          @contains(string) species;
+        }
+        `,
+      });
+
+      realm.addCard('person', {
+        'card.json': {
+          schema: 'schema.js',
+        },
+        'schema.js': `
+        import { contains } from "@cardstack/types";
+        import string from "https://cardstack.com/base/string";
+        import pet from "https://my-realm/pet";
+        export default class Person {
+          @contains(string) name;
+          @contains(pet) bestFriend;
+        }
+        `,
+      });
+
       realm.addCard('post', {
         'card.json': {
           schema: 'schema.js',
@@ -23,14 +52,18 @@ if (process.env.COMPILER) {
         import { contains } from "@cardstack/types";
         import string from "https://cardstack.com/base/string";
         import datetime from "https://cardstack.com/base/datetime";
+        import person from 'https://my-realm/person';
         export default class Post {
           @contains(string) title;
           @contains(string) body;
           @contains(datetime) createdAt;
           @contains(string) extra;
+          @contains(person) author;
         }
       `,
-        'isolated.js': templateOnlyComponentTemplate('<h1><@fields.title/></h1><article><@fields.body/></article>'),
+        'isolated.js': templateOnlyComponentTemplate(
+          '<h1><@fields.title/></h1><article><@fields.body/><@fields.author.name/><@fields.author.bestFriend.species/>/</article>'
+        ),
       });
 
       realm.addCard('post0', {
@@ -39,6 +72,12 @@ if (process.env.COMPILER) {
           data: {
             title: 'Hello World',
             body: 'First post.',
+            author: {
+              name: 'Emily',
+              bestFriend: {
+                species: 'dog',
+              },
+            },
           },
         },
       });
@@ -57,6 +96,12 @@ if (process.env.COMPILER) {
       expect(response.body.data?.attributes).to.deep.equal({
         title: 'Hello World',
         body: 'First post.',
+        author: {
+          name: 'Emily',
+          bestFriend: {
+            species: 'dog',
+          },
+        },
       });
       expect(response.body.data?.meta.componentModule).to.not.be.undefined;
 
