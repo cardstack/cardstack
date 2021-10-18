@@ -66,8 +66,7 @@
     {{#if this.error}}
       <CardPay::ErrorMessage data-test-prepaid-card-choice-error-message as |supportURL|>
         {{#if (eq this.error.message "INSUFFICIENT_FUNDS")}}
-          {{!-- TODO: This should be accompanied by canceling the workflow CS-1620 --}}
-          TODO insufficient funds message
+          It looks like your prepaid card doesn't have enough funds to pay the {{format-amount this.merchantRegistrationFee 0}} SPEND ({{format-usd (spend-to-usd this.merchantRegistrationFee)}}) merchant creation fee. Please try another prepaid card, or buy one in Card Wallet.
         {{else if (eq this.error.message "TIMEOUT")}}
           There was a problem creating your merchant. Please contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
         {{else if (eq this.error.message "USER_REJECTION")}}
