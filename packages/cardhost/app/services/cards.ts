@@ -192,6 +192,14 @@ export default class Cards extends Service {
         /* webpackInclude: /(?<!\.d)\.ts$/ */
         `@cardstack/core/src/${moduleIdentifier}`
       );
+    } else if (moduleIdentifier.startsWith('@cardstack/boxel/')) {
+      // module was built by webpack, use webpack's implementation of `await
+      // import()`
+      moduleIdentifier = moduleIdentifier.replace('@cardstack/boxel/', '');
+      return await import(
+        /* webpackInclude: /\.(js|hbs)$/ */
+        `@cardstack/boxel/${moduleIdentifier}`
+      );
     } else if (
       moduleIdentifier.startsWith('@cardstack/local-realm-compiled/')
     ) {

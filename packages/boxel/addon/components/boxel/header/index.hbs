@@ -22,6 +22,7 @@
 
   {{#if (or @editable @hasContextMenu @expandable)}}
     <div class="boxel-header__button-group" data-test-boxel-header-button-group>
+      {{yield}}
       {{#if @editable}}
         <button
           class="boxel-header__button boxel-header__text-button"

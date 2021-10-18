@@ -7,7 +7,6 @@
     border-radius var(--boxel-transition),
     box-shadow var(--boxel-transition);
 }
-}
 
 .boxel-card-container--boundaries {
   box-shadow: 0 0 0 1px var(--boxel-light-500);

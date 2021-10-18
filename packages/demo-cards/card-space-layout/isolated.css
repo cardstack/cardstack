@@ -1,0 +1,22 @@
+.card-space-layout {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: var(--boxel-sp);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--boxel-sp);
+}
+
+.card-space-layout__module {
+  flex: 1;
+  min-width: 20rem;
+}
+
+.card-space-layout__optional-modules {
+  flex: 2;
+}
+
+.card-space-layout__optional-modules > * + * {
+  margin-top: var(--boxel-sp);
+}
+
