@@ -14,6 +14,20 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       realm = await createRealm('https://my-realm');
+
+      realm.addCard('person', {
+        'card.json': {
+          schema: 'schema.js',
+        },
+        'schema.js': `
+        import { contains } from "@cardstack/types";
+        import string from "https://cardstack.com/base/string";
+        export default class Post {
+          @contains(string) name;
+        }
+        `,
+      });
+
       realm.addCard('post', {
         'card.json': {
           schema: 'schema.js',
@@ -23,11 +37,13 @@ if (process.env.COMPILER) {
         import { contains } from "@cardstack/types";
         import string from "https://cardstack.com/base/string";
         import datetime from "https://cardstack.com/base/datetime";
+        import person from 'https://my-realm/person';
         export default class Post {
           @contains(string) title;
           @contains(string) body;
           @contains(datetime) createdAt;
           @contains(string) extra;
+          @contains(person) author;
         }
       `,
         'isolated.js': templateOnlyComponentTemplate('<h1><@fields.title/></h1><article><@fields.body/></article>'),
@@ -39,6 +55,9 @@ if (process.env.COMPILER) {
           data: {
             title: 'Hello World',
             body: 'First post.',
+            author: {
+              name: 'Emily',
+            },
           },
         },
       });
@@ -49,7 +68,7 @@ if (process.env.COMPILER) {
       await getCard('https://some-other-origin.com/thing').expect(404);
     });
 
-    it("can load a simple isolated card's data", async function () {
+    it.only("can load a simple isolated card's data", async function () {
       let response = await getCard('https://my-realm/post0').expect(200);
 
       expect(response.body).to.have.all.keys('data');
@@ -57,6 +76,9 @@ if (process.env.COMPILER) {
       expect(response.body.data?.attributes).to.deep.equal({
         title: 'Hello World',
         body: 'First post.',
+        author: {
+          name: 'Emily',
+        },
       });
       expect(response.body.data?.meta.componentModule).to.not.be.undefined;
 
