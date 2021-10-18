@@ -1,8 +1,13 @@
 import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
+import config from 'config';
 import { Event } from '../bot';
+import { DiscordConfig } from '../types';
 
 const log = logger('events:ready');
+const { allowedGuilds: guildsRaw, allowedChannels: channelsRaw } = config.get('discord') as DiscordConfig;
+let allowedGuilds = guildsRaw.split(',');
+let allowedChannels = channelsRaw.split(',');
 
 export const name: Event['name'] = 'ready';
 export const run: Event['run'] = async (client) => {
@@ -13,6 +18,9 @@ export const run: Event['run'] = async (client) => {
     });
     return;
   }
-  log.info(`Logged in as ${client.user.tag}`);
-  Sentry.addBreadcrumb({ message: `logged in bot ${client.user.tag}` });
+  let message = `logged in bot ${client.user.tag}. Responding to guilds ${allowedGuilds.join(
+    ', '
+  )} in channels ${allowedChannels.join(', ')}`;
+  log.info(message);
+  Sentry.addBreadcrumb({ message });
 };
