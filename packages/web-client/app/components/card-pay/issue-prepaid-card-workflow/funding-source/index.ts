@@ -28,18 +28,29 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
+
+    this.minimumFaceValue = new BN(
+      this.args.workflowSession.getValue<string>('daiMinValue')!
+    );
+
     let prepaidFundingSafeAddress = this.args.workflowSession.getValue<string>(
       'prepaidFundingSafeAddress'
     );
     this.selectedSafe = prepaidFundingSafeAddress
       ? this.layer2Network.safes.getByAddress(prepaidFundingSafeAddress)
       : this.layer2Network.depotSafe;
+
+    // FIXME this could change the selected safe if the stored one is now underfunded…
+    if (
+      this.selectedSafe &&
+      !this.sufficientBalanceSafes.includes(this.selectedSafe)
+    ) {
+      this.selectedSafe = this.sufficientBalanceSafes[0];
+    }
+
     this.selectedTokenSymbol =
       this.tokens.find((t) => t.symbol === this.prepaidFundingToken)
         ?.tokenDisplayInfo.symbol ?? this.tokens[0].tokenDisplayInfo.symbol;
-    this.minimumFaceValue = new BN(
-      this.args.workflowSession.getValue<string>('daiMinValue')!
-    );
   }
 
   get prepaidFundingToken(): BridgedTokenSymbol {
