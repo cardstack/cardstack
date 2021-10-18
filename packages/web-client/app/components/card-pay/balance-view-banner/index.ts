@@ -54,7 +54,7 @@ class BalanceViewBannerComponent extends Component<BalanceViewBannerComponentArg
     } else if (this.args.safe.type === 'depot') {
       return 'DEPOT';
     } else {
-      return 'Unknown';
+      return 'Safe';
     }
   }
 

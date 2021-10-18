@@ -153,11 +153,11 @@ module(
           @token="CARD.CPXD"
         />`);
 
-      assert.dom('[data-test-balance-view-summary]').containsText('Unknown');
+      assert.dom('[data-test-balance-view-summary]').containsText('Safe');
 
       assert
         .dom('[data-test-balance-view-safe-address]')
-        .containsText('Unknown:')
+        .containsText('Safe:')
         .containsText(safeAddress);
 
       assert
