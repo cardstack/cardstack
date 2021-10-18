@@ -223,3 +223,19 @@ export function ethSignSignatureToRSVForSafe(ethSignSignature: string) {
     s: sigS,
   };
 }
+
+export async function createContractSignature(
+  gnosisSafeAddress: string,
+  verifyingContractAddress: string
+): Promise<any> {
+  console.log(gnosisSafeAddress);
+  console.log(verifyingContractAddress);
+  const tokenContract = new web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
+  // const threshold = (await gnosisSafe.getThreshold()).toNumber();
+  // const address = Web3.utils.padLeft(verifyingContractAddress, 64).replace('0x', '');
+  // const dynamicPosition = Web3.utils.padLeft(Web3.utils.toHex(threshold * 65), 64).replace('0x', '');
+  // const signatureType = '00';
+  // return address + dynamicPosition + signatureType;
+  return null
+}
+
