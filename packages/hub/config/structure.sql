@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 14.0
--- Dumped by pg_dump version 14.0
+-- Dumped from database version 13.3
+-- Dumped by pg_dump version 13.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -33,7 +33,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
@@ -1078,16 +1078,8 @@ ALTER TABLE graphile_worker.known_crontabs ENABLE ROW LEVEL SECURITY;
 -- PostgreSQL database dump
 --
 
-<<<<<<< HEAD
 -- Dumped from database version 13.3
 -- Dumped by pg_dump version 13.1
-||||||| e519cae89
--- Dumped from database version 13.4
--- Dumped by pg_dump version 13.4
-=======
--- Dumped from database version 14.0
--- Dumped by pg_dump version 14.0
->>>>>>> origin/main
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1105,7 +1097,6 @@ SET row_security = off;
 --
 
 COPY graphile_worker.migrations (id, ts) FROM stdin;
-<<<<<<< HEAD
 1	2021-10-14 19:15:58.376963-04
 2	2021-10-14 19:15:58.376963-04
 3	2021-10-14 19:15:58.376963-04
@@ -1114,25 +1105,6 @@ COPY graphile_worker.migrations (id, ts) FROM stdin;
 6	2021-10-14 19:15:58.376963-04
 7	2021-10-14 19:15:58.376963-04
 8	2021-10-14 19:15:58.376963-04
-||||||| e519cae89
-1	2021-09-15 17:07:25.385732-04
-2	2021-09-15 17:07:25.385732-04
-3	2021-09-15 17:07:25.385732-04
-4	2021-09-15 17:07:25.385732-04
-5	2021-09-15 17:07:25.385732-04
-6	2021-09-15 17:07:25.385732-04
-7	2021-09-15 17:07:25.385732-04
-8	2021-09-15 17:07:25.385732-04
-=======
-1	2021-10-14 17:28:34.905069-04
-2	2021-10-14 17:28:34.905069-04
-3	2021-10-14 17:28:34.905069-04
-4	2021-10-14 17:28:34.905069-04
-5	2021-10-14 17:28:34.905069-04
-6	2021-10-14 17:28:34.905069-04
-7	2021-10-14 17:28:34.905069-04
-8	2021-10-14 17:28:34.905069-04
->>>>>>> origin/main
 \.
 
 
