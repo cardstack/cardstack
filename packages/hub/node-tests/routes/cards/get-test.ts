@@ -88,7 +88,7 @@ if (process.env.COMPILER) {
       await getCard('https://some-other-origin.com/thing').expect(404);
     });
 
-    it.only("can load a simple isolated card's data", async function () {
+    it("can load a simple isolated card's data", async function () {
       let response = await getCard('https://my-realm/post0').expect(200);
 
       expect(response.body).to.have.all.keys('data');
