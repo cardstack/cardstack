@@ -1,7 +1,9 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render } from '@ember/test-helpers';
+import { click, render } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
+import { toWei } from 'web3-utils';
+import BN from 'bn.js';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -9,10 +11,18 @@ import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import {
   createDepotSafe,
   createMerchantSafe,
+  createPrepaidCardSafe,
+  createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
 import { MerchantSafe } from '@cardstack/cardpay-sdk';
+import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
 
 interface Context extends MirageTestContext {}
+
+const MIN_SPEND_AMOUNT = Math.min(...faceValueOptions);
+const MIN_AMOUNT_TO_PASS = new BN(
+  toWei(`${Math.ceil(MIN_SPEND_AMOUNT / 100)}`)
+);
 
 module(
   'Integration | Component | card-pay/issue-prepaid-card-workflow/funding-source',
@@ -31,7 +41,10 @@ module(
       merchantSafe = createMerchantSafe({
         address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
         merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
-        tokens: [],
+        tokens: [
+          createSafeToken('DAI', MIN_AMOUNT_TO_PASS.toString()),
+          createSafeToken('CARD', '450000000000000000000'),
+        ],
         accumulatedSpendValue: 100,
       });
 
@@ -40,9 +53,30 @@ module(
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           owners: [layer2AccountAddress],
-          tokens: [],
+          tokens: [
+            createSafeToken('DAI', '125000000000000000000'),
+            createSafeToken('CARD', '450000000000000000000'),
+          ],
         }),
         merchantSafe,
+        createMerchantSafe({
+          address: 'low-balance-safe',
+          merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+          tokens: [createSafeToken('DAI', '1')],
+          accumulatedSpendValue: 100,
+        }),
+        createPrepaidCardSafe({
+          address: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+          owners: [layer2AccountAddress],
+          tokens: [
+            createSafeToken('DAI', '125000000000000000000'),
+            createSafeToken('CARD', '450000000000000000000'),
+          ],
+          spendFaceValue: 2324,
+          prepaidCardOwner: layer2AccountAddress,
+          issuer: layer2AccountAddress,
+          transferrable: false,
+        }),
       ]);
 
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -90,6 +124,24 @@ module(
       assert
         .dom('[data-test-funding-source-safe]')
         .containsText('Merchant account');
+    });
+
+    test('it only lists compatible safes with balances of compatible tokens that exceed the minimum in the workflow', async function (this: Context, assert) {
+      workflowSession.setValue('daiMinValue', MIN_AMOUNT_TO_PASS);
+
+      await render(hbs`
+        <CardPay::IssuePrepaidCardWorkflow::FundingSource
+          @onComplete={{this.onComplete}}
+          @isComplete={{this.isComplete}}
+          @onIncomplete={{this.onIncomplete}}
+          @workflowSession={{this.workflowSession}}
+          @frozen={{this.frozen}}
+        />
+      `);
+      await click(
+        '[data-test-safe-chooser-dropdown] .ember-power-select-trigger'
+      );
+      assert.dom('.ember-power-select-options li').exists({ count: 2 });
     });
   }
 );
