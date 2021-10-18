@@ -32,8 +32,8 @@ module.exports = {
     cordeBotToken: null,
     commandPrefix: '!',
     betaTesterRole: 'Beta Tester',
-    allowedGuilds: '584043165066199050,896093062562983986',
-    allowedChannels: '898941895525425172,896093062562983989,898891181575000074',
+    allowedGuilds: '896093062562983986',
+    allowedChannels: '896093062562983989,898891181575000074',
   },
   serverSecret: null,
   sentry: {

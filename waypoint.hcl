@@ -83,7 +83,7 @@ app "hub-bot" {
 
     build {
         use "pack" {
-            process_type = "worker"
+            process_type = "bot"
         }
 
         registry {
