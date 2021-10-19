@@ -42,8 +42,9 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
 
     // FIXME this could change the selected safe if the stored one is now underfunded…
     if (
-      this.selectedSafe &&
-      !this.sufficientBalanceSafes.includes(this.selectedSafe)
+      (this.selectedSafe &&
+        !this.sufficientBalanceSafes.includes(this.selectedSafe)) ||
+      !this.selectedSafe
     ) {
       this.selectedSafe = this.sufficientBalanceSafes[0];
     }

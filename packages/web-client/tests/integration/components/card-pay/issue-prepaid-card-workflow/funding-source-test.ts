@@ -36,17 +36,140 @@ module(
     setupRenderingTest(hooks);
     setupMirage(hooks);
 
-    hooks.beforeEach(async function (this: Context) {
+    module('when there is a depot safe', function (hooks) {
+      hooks.beforeEach(async function (this: Context) {
+        layer2Service = this.owner.lookup('service:layer2-network')
+          .strategy as Layer2TestWeb3Strategy;
+
+        depotSafe = createDepotSafe({
+          owners: [layer2AccountAddress],
+          tokens: [
+            createSafeToken('DAI', '125000000000000000000'),
+            createSafeToken('CARD', '450000000000000000000'),
+          ],
+        });
+
+        merchantSafe = createMerchantSafe({
+          address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
+          merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+          tokens: [
+            createSafeToken('DAI', MIN_AMOUNT_TO_PASS.toString()),
+            createSafeToken('CARD', '450000000000000000000'),
+          ],
+          accumulatedSpendValue: 100,
+        });
+
+        layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+          depotSafe,
+          merchantSafe,
+          createMerchantSafe({
+            address: 'low-balance-safe',
+            merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+            tokens: [createSafeToken('DAI', '1')],
+            accumulatedSpendValue: 100,
+          }),
+          createPrepaidCardSafe({
+            address: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+            owners: [layer2AccountAddress],
+            tokens: [
+              createSafeToken('DAI', '125000000000000000000'),
+              createSafeToken('CARD', '450000000000000000000'),
+            ],
+            spendFaceValue: 2324,
+            prepaidCardOwner: layer2AccountAddress,
+            issuer: layer2AccountAddress,
+            transferrable: false,
+          }),
+        ]);
+
+        layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+
+        workflowSession = new WorkflowSession();
+        workflowSession.setValue('daiMinValue', MIN_AMOUNT_TO_PASS);
+
+        this.setProperties({
+          onComplete: () => {},
+          onIncomplete: () => {},
+          isComplete: false,
+          frozen: false,
+          workflowSession,
+        });
+      });
+
+      test('it defaults to the depot safe when one has not been set in the workflow', async function (assert) {
+        await render(hbs`
+          <CardPay::IssuePrepaidCardWorkflow::FundingSource
+            @onComplete={{this.onComplete}}
+            @isComplete={{this.isComplete}}
+            @onIncomplete={{this.onIncomplete}}
+            @workflowSession={{this.workflowSession}}
+            @frozen={{this.frozen}}
+          />
+        `);
+
+        assert.dom('[data-test-funding-source-safe]').containsText('DEPOT');
+      });
+
+      test('it falls back to the first safe with a sufficient balance if the depot safe has insufficient balance', async function (assert) {
+        depotSafe.tokens = [createSafeToken('DAI', '1')];
+        layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+
+        await render(hbs`
+          <CardPay::IssuePrepaidCardWorkflow::FundingSource
+            @onComplete={{this.onComplete}}
+            @isComplete={{this.isComplete}}
+            @onIncomplete={{this.onIncomplete}}
+            @workflowSession={{this.workflowSession}}
+            @frozen={{this.frozen}}
+          />
+        `);
+
+        assert
+          .dom('[data-test-funding-source-safe]')
+          .containsText('Merchant account');
+      });
+
+      test('it uses the safe from the workflow when it exists', async function (this: Context, assert) {
+        workflowSession.setValue(
+          'prepaidFundingSafeAddress',
+          merchantSafe.address
+        );
+
+        await render(hbs`
+          <CardPay::IssuePrepaidCardWorkflow::FundingSource
+            @onComplete={{this.onComplete}}
+            @isComplete={{this.isComplete}}
+            @onIncomplete={{this.onIncomplete}}
+            @workflowSession={{this.workflowSession}}
+            @frozen={{this.frozen}}
+          />
+        `);
+
+        assert
+          .dom('[data-test-funding-source-safe]')
+          .containsText('Merchant account');
+      });
+
+      test('it only lists compatible safes with balances of compatible tokens that exceed the minimum in the workflow', async function (this: Context, assert) {
+        await render(hbs`
+          <CardPay::IssuePrepaidCardWorkflow::FundingSource
+            @onComplete={{this.onComplete}}
+            @isComplete={{this.isComplete}}
+            @onIncomplete={{this.onIncomplete}}
+            @workflowSession={{this.workflowSession}}
+            @frozen={{this.frozen}}
+          />
+        `);
+        await click(
+          '[data-test-safe-chooser-dropdown] .ember-power-select-trigger'
+        );
+        assert.dom('.ember-power-select-options li').exists({ count: 2 });
+      });
+    });
+
+    test('it renders the proper fallback balance when there is no depot safe', async function (assert) {
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
-
-      depotSafe = createDepotSafe({
-        owners: [layer2AccountAddress],
-        tokens: [
-          createSafeToken('DAI', '125000000000000000000'),
-          createSafeToken('CARD', '450000000000000000000'),
-        ],
-      });
 
       merchantSafe = createMerchantSafe({
         address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
@@ -59,26 +182,7 @@ module(
       });
 
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
-        depotSafe,
         merchantSafe,
-        createMerchantSafe({
-          address: 'low-balance-safe',
-          merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
-          tokens: [createSafeToken('DAI', '1')],
-          accumulatedSpendValue: 100,
-        }),
-        createPrepaidCardSafe({
-          address: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
-          owners: [layer2AccountAddress],
-          tokens: [
-            createSafeToken('DAI', '125000000000000000000'),
-            createSafeToken('CARD', '450000000000000000000'),
-          ],
-          spendFaceValue: 2324,
-          prepaidCardOwner: layer2AccountAddress,
-          issuer: layer2AccountAddress,
-          transferrable: false,
-        }),
       ]);
 
       layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -93,25 +197,6 @@ module(
         frozen: false,
         workflowSession,
       });
-    });
-
-    test('it defaults to the depot safe when one has not been set in the workflow', async function (assert) {
-      await render(hbs`
-        <CardPay::IssuePrepaidCardWorkflow::FundingSource
-          @onComplete={{this.onComplete}}
-          @isComplete={{this.isComplete}}
-          @onIncomplete={{this.onIncomplete}}
-          @workflowSession={{this.workflowSession}}
-          @frozen={{this.frozen}}
-        />
-      `);
-
-      assert.dom('[data-test-funding-source-safe]').containsText('DEPOT');
-    });
-
-    test('it falls back to the first safe with a sufficient balance if the depot safe has insufficient balance', async function (assert) {
-      depotSafe.tokens = [createSafeToken('DAI', '1')];
-      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
       await render(hbs`
         <CardPay::IssuePrepaidCardWorkflow::FundingSource
@@ -124,45 +209,8 @@ module(
       `);
 
       assert
-        .dom('[data-test-funding-source-safe]')
-        .containsText('Merchant account');
-    });
-
-    test('it uses the safe from the workflow when it exists', async function (this: Context, assert) {
-      workflowSession.setValue(
-        'prepaidFundingSafeAddress',
-        merchantSafe.address
-      );
-
-      await render(hbs`
-        <CardPay::IssuePrepaidCardWorkflow::FundingSource
-          @onComplete={{this.onComplete}}
-          @isComplete={{this.isComplete}}
-          @onIncomplete={{this.onIncomplete}}
-          @workflowSession={{this.workflowSession}}
-          @frozen={{this.frozen}}
-        />
-      `);
-
-      assert
-        .dom('[data-test-funding-source-safe]')
-        .containsText('Merchant account');
-    });
-
-    test('it only lists compatible safes with balances of compatible tokens that exceed the minimum in the workflow', async function (this: Context, assert) {
-      await render(hbs`
-        <CardPay::IssuePrepaidCardWorkflow::FundingSource
-          @onComplete={{this.onComplete}}
-          @isComplete={{this.isComplete}}
-          @onIncomplete={{this.onIncomplete}}
-          @workflowSession={{this.workflowSession}}
-          @frozen={{this.frozen}}
-        />
-      `);
-      await click(
-        '[data-test-safe-chooser-dropdown] .ember-power-select-trigger'
-      );
-      assert.dom('.ember-power-select-options li').exists({ count: 2 });
+        .dom('[data-test-balance-chooser-dropdown]')
+        .containsText('5.00 DAI.CPXD');
     });
   }
 );
