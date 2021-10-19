@@ -2,6 +2,7 @@ import { encodeDID } from '@cardstack/did-resolver';
 import { inject } from '@cardstack/di';
 import DatabaseManager from '@cardstack/db';
 import { MerchantInfo } from '../../routes/merchant-infos';
+import config from 'config';
 
 interface JSONAPIDocument {
   data: any;
@@ -15,6 +16,9 @@ export default class MerchantInfoSerializer {
     let did = encodeDID({ type: 'MerchantInfo', uniqueId: model.id });
 
     const result = {
+      meta: {
+        network: config.get('web3.network'),
+      },
       data: {
         id: model.id,
         type: 'merchant-infos',
