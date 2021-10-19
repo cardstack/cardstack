@@ -1,5 +1,5 @@
 import Koa from 'koa';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import proxy from 'koa-proxies';
 import DevelopmentConfig from './development-config';
 
@@ -22,7 +22,7 @@ export default class DevelopmentProxyMiddleware {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'development-proxy-middleware': DevelopmentProxyMiddleware;
   }

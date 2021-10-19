@@ -3,7 +3,7 @@ import { RouterContext } from '@koa/router';
 import { deserialize, serializeCard, serializeRawCard } from '../utils/serialization';
 import { getCardFormatFromRequest } from '../utils/routes';
 import Router from '@koa/router';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import autoBind from 'auto-bind';
 import { parseBody } from '../middleware';
 
@@ -183,7 +183,7 @@ function unimpl() {
   throw new Error('unimplemented');
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'card-routes': CardRoutes;
   }

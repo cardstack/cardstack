@@ -207,5 +207,5 @@ async function inventoryInfo(web3: Web3, sku: string): Promise<void> {
 }
 
 function formatPrepaidCards(prepaidCards: string[]): string {
-  return JSON.stringify(prepaidCards, null, 2).replace('"', '').replace('[', '').replace(']', '');
+  return JSON.stringify(prepaidCards, null, 2).replace(/"/g, '').replace('[', '').replace(']', '');
 }

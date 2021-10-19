@@ -111,7 +111,7 @@ export default class ExchangeRatesService {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'exchange-rates': ExchangeRatesService;
   }

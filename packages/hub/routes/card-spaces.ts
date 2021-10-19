@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import DatabaseManager from '../services/database-manager';
-import { inject } from '../di/dependency-injection';
+import DatabaseManager from '@cardstack/db';
+import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
 import CardSpaceSerializer from '../services/serializers/card-space-serializer';
 import { ensureLoggedIn } from './utils/auth';
@@ -115,7 +115,7 @@ export default class CardSpacesRoute {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'card-spaces-route': CardSpacesRoute;
   }

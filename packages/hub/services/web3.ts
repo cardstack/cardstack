@@ -38,7 +38,7 @@ export default class Web3Service {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     web3: Web3Service;
   }

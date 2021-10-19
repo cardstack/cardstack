@@ -3,6 +3,7 @@ import { networks } from '../constants';
 import { Contract, EventData, PastEventOptions } from 'web3-eth-contract';
 import { TransactionReceipt } from 'web3-core';
 import BN from 'bn.js';
+import { query as gqlQuery } from './graphql';
 
 const POLL_INTERVAL = 500;
 
@@ -107,6 +108,51 @@ export function waitForEvent(contract: Contract, eventName: string, opts: PastEv
   return new Promise(function (resolve, reject) {
     eventDataAsync(resolve, reject);
   });
+}
+
+const transactionQuery = `
+  query ($txnHash: ID!) {
+    transaction(id:$txnHash) {
+    id
+    }
+  }
+`;
+interface TransactionQuerySubgraph {
+  data: {
+    transaction: {
+      id: string;
+    } | null;
+  };
+}
+
+export async function waitForSubgraphIndex(txnHash: string, network: string, duration?: number): Promise<void>;
+export async function waitForSubgraphIndex(txnHash: string, web3: Web3, duration?: number): Promise<void>;
+export async function waitForSubgraphIndex(
+  txnHash: string,
+  networkOrWeb3: string | Web3,
+  duration = 60 * 10 * 1000
+): Promise<void> {
+  let network: string;
+  if (typeof networkOrWeb3 === 'string') {
+    network = networkOrWeb3;
+  } else {
+    network = await networkName(networkOrWeb3);
+  }
+
+  let start = Date.now();
+  let queryResults: TransactionQuerySubgraph | undefined;
+  do {
+    if (queryResults) {
+      await new Promise<void>((res) => setTimeout(() => res(), POLL_INTERVAL));
+    }
+    queryResults = await gqlQuery(network, transactionQuery, { txnHash });
+  } while (!queryResults.data.transaction == null && Date.now() < start + duration);
+
+  if (!queryResults.data.transaction) {
+    throw new Error(`Timed out waiting for txnHash to be indexed ${txnHash}`);
+  }
+
+  return;
 }
 
 // because BN does not handle floating point, and the numbers from ethereum

@@ -1,6 +1,6 @@
 import { CardSpace } from '../../routes/card-spaces';
 import CardSpaceQueries from '../queries/card-space';
-import { inject } from '../../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import { URL } from 'url';
 
 export type CardSpaceAttribute = 'url' | 'profileName' | 'profileDescription' | 'profileButtonText' | 'profileCategory';
@@ -77,7 +77,7 @@ export default class CardSpaceValidator {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'card-space-validator': CardSpaceValidator;
   }

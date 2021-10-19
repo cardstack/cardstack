@@ -1,6 +1,6 @@
 import { Client } from 'pg';
 import shortUuid from 'short-uuid';
-import { Registry } from '../../di/dependency-injection';
+import { Registry } from '@cardstack/di';
 import { parseIdentifier } from '@cardstack/did-resolver';
 import { Job, TaskSpec } from 'graphile-worker';
 import { setupServer } from '../helpers/server';

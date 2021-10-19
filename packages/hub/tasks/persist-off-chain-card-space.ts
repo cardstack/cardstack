@@ -1,6 +1,6 @@
 import { Helpers } from 'graphile-worker';
 import CardSpaceSerializer from '../services/serializers/card-space-serializer';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import config from 'config';
 import shortUuid from 'short-uuid';
 import CardSpaceQueries from '../services/queries/card-space';

@@ -1,5 +1,5 @@
 import { Client as DBClient } from 'pg';
-import { Registry } from '../../di/dependency-injection';
+import { Registry } from '@cardstack/di';
 import { InventorySubgraph } from '../../services/subgraph';
 import { v4 as uuidv4 } from 'uuid';
 import { WyreWallet } from '../../services/wyre';

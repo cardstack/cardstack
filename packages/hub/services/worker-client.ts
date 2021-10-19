@@ -27,7 +27,7 @@ export default class WorkerClient {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'worker-client': WorkerClient;
   }

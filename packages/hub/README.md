@@ -16,6 +16,7 @@ For more information, see the
   - [Connecting to the database staging|production database on AWS](#connecting-to-the-database-stagingproduction-database-on-aws)
     - [Setup AWS Session Manager ssh config](#setup-aws-session-manager-ssh-config)
   - [Provided APIs](#provided-apis)
+    - [GET /api/exchange-rates](#get-apiexchange-rates)
     - [GET /api/prepaid-card-patterns](#get-apiprepaid-card-patterns)
     - [GET /api/prepaid-card-color-schemes](#get-apiprepaid-card-color-schemes)
     - [POST /api/prepaid-card-customizations](#post-apiprepaid-card-customizations)
@@ -58,13 +59,20 @@ AWS_PROFILE=cardstack
 
 ## Getting Started
 
-The following command will create a hub_development database on your locally running postgres server, run migrations, and load seed data. It will then create a hub_test database, and clone the structure of the development database to it.
-
+The following command will create a hub_development database on your locally running postgres server, run migrations, and load seed data.
+```sh
     bin/hub db setup
+```
 
 Load the database with seed data
-
+```sh
     bin/hub db seed
+```
+
+To initialize your test db
+```sh
+    NODE_ENV=test bin/hub db init-test
+```
 
 ### Running the hub
 
@@ -74,6 +82,9 @@ bin/hub server
 
 # Starts the worker process
 bin/hub worker
+
+# Starts the discord bot
+bin/hub bot
 
 # If you want to run both in the same terminal you can run
 yarn start

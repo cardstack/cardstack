@@ -1,6 +1,6 @@
 import { Helpers } from 'graphile-worker';
 import PrepaidCardCustomizationSerializer from '../services/serializers/prepaid-card-customization-serializer';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import config from 'config';
 import shortUuid from 'short-uuid';
 

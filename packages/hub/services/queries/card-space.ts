@@ -1,5 +1,5 @@
-import DatabaseManager from '../database-manager';
-import { inject } from '../../di/dependency-injection';
+import DatabaseManager from '@cardstack/db';
+import { inject } from '@cardstack/di';
 import { CardSpace } from '../../routes/card-spaces';
 import { buildConditions } from '../../utils/queries';
 
@@ -54,7 +54,7 @@ export default class CardSpaceQueries {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'card-space-queries': CardSpaceQueries;
   }

@@ -14,7 +14,7 @@ import {
   outputJSONSync,
 } from 'fs-extra';
 import { join, dirname } from 'path';
-import { inject, injectionReady } from '../di/dependency-injection';
+import { inject, injectionReady } from '@cardstack/di';
 import isEqual from 'lodash/isEqual';
 import { serverLog } from '../utils/logger';
 
@@ -165,7 +165,7 @@ export default class CardCache {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'card-cache': CardCache;
   }

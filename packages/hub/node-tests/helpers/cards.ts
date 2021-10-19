@@ -11,7 +11,7 @@ import RealmManager from '../../services/realm-manager';
 import FSRealm from '../../realms/fs-realm';
 
 import type CardCache from '../../services/card-cache';
-import type { Registry, Container } from './../../di/dependency-injection';
+import type { Registry, Container } from '@cardstack/di';
 
 tmp.setGracefulCleanup();
 

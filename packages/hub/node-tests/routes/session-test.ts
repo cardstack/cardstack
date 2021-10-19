@@ -1,4 +1,4 @@
-import { Registry } from '../../di/dependency-injection';
+import { Registry } from '@cardstack/di';
 import packageJson from '../../package.json';
 import { AcceleratableClock } from '../helpers';
 import { setupServer } from '../helpers/server';

@@ -1,5 +1,5 @@
-import { inject } from '../../di/dependency-injection';
-import DatabaseManager from '../database-manager';
+import { inject } from '@cardstack/di';
+import DatabaseManager from '@cardstack/db';
 
 interface PrepaidCardColorScheme {
   id: string;
@@ -58,7 +58,7 @@ export default class PrepaidCardColorSchemeSerializer {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'prepaid-card-color-scheme-serializer': PrepaidCardColorSchemeSerializer;
   }

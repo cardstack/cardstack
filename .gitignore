@@ -32,10 +32,19 @@ package-lock.json
 /packages/hub/**/*.js
 /packages/hub/**/*.js.map
 !/packages/hub/db/migrations/*.js
+!/packages/hub/corde.config.js
 
 /packages/core/**/*.d.ts
 /packages/core/**/*.js
 /packages/core/**/*.js.map
+
+/packages/db/**/*.d.ts
+/packages/db/**/*.js
+/packages/db/**/*.js.map
+
+/packages/di/**/*.d.ts
+/packages/di/**/*.js
+/packages/di/**/*.js.map
 
 /packages/test-support/**/*.d.ts
 /packages/test-support/**/*.js
@@ -48,6 +57,10 @@ package-lock.json
 /packages/cardpay-cli/**/*.d.ts
 /packages/cardpay-cli/**/*.js
 /packages/cardpay-cli/**/*.js.map
+
+/packages/cardbot/**/*.d.ts
+/packages/cardbot/**/*.js
+/packages/cardbot/**/*.js.map
 
 /packages/did-resolver/**/*.js
 /packages/did-resolver/**/*.d.ts

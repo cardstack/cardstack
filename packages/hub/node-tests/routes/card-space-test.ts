@@ -1,6 +1,6 @@
 import supertest, { Test } from 'supertest';
 import { HubServer } from '../../main';
-import { Registry } from '../../di/dependency-injection';
+import { Registry } from '@cardstack/di';
 import { Job, TaskSpec } from 'graphile-worker';
 
 const stubNonce = 'abc:123';

@@ -9,13 +9,15 @@ import * as Sentry from '@sentry/node';
 
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
+import Bot from '@cardstack/cardbot';
 import packageJson from './package.json';
-import { Registry, Container, RegistryCallback } from './di/dependency-injection';
+import { Registry, Container, RegistryCallback } from '@cardstack/di';
 
+import DatabaseManager from '@cardstack/db';
+import WalletConnectService from '@cardstack/cardbot/services/wallet-connect';
 import { HubServerConfig } from './interfaces';
 
 import AuthenticationMiddleware from './services/authentication-middleware';
-import DatabaseManager from './services/database-manager';
 import DevelopmentConfig from './services/development-config';
 import DevelopmentProxyMiddleware from './services/development-proxy-middleware';
 import WyreService from './services/wyre';
@@ -33,6 +35,8 @@ import ReservationsRoute from './routes/reservations';
 import InventoryRoute from './routes/inventory';
 import RelayService from './services/relay';
 import SubgraphService from './services/subgraph';
+import OrderService from './services/order';
+import InventoryService from './services/inventory';
 import PersistOffChainPrepaidCardCustomizationTask from './tasks/persist-off-chain-prepaid-card-customization';
 import PersistOffChainMerchantInfoTask from './tasks/persist-off-chain-merchant-info';
 import PersistOffChainCardSpaceTask from './tasks/persist-off-chain-card-space';
@@ -56,7 +60,7 @@ import Web3Service from './services/web3';
 import boom from './tasks/boom';
 import s3PutJson from './tasks/s3-put-json';
 import RealmManager from './services/realm-manager';
-import { serverLog, workerLog } from './utils/logger';
+import { serverLog, workerLog, botLog } from './utils/logger';
 
 import CardBuilder from './services/card-builder';
 import CardRoutes from './routes/card-routes';
@@ -83,11 +87,13 @@ export function createContainer(registryCallback?: RegistryCallback): Container 
   registry.register('exchange-rates', ExchangeRatesService);
   registry.register('exchange-rates-route', ExchangeRatesRoute);
   registry.register('health-check', HealthCheck);
+  registry.register('inventory', InventoryService);
   registry.register('inventory-route', InventoryRoute);
   registry.register('merchant-infos-route', MerchantInfosRoute);
   registry.register('merchant-info-serializer', MerchantInfoSerializer);
   registry.register('merchant-info-queries', MerchantInfoQueries);
   registry.register('nonce-tracker', NonceTracker);
+  registry.register('order', OrderService);
   registry.register('orders-route', OrdersRoute);
   registry.register('persist-off-chain-prepaid-card-customization', PersistOffChainPrepaidCardCustomizationTask);
   registry.register('persist-off-chain-merchant-info', PersistOffChainMerchantInfoTask);
@@ -106,6 +112,7 @@ export function createContainer(registryCallback?: RegistryCallback): Container 
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
   registry.register('subgraph', SubgraphService);
+  registry.register('wallet-connect', WalletConnectService);
   registry.register('worker-client', WorkerClient);
   registry.register('web3', Web3Service);
   registry.register('wyre', WyreService);
@@ -293,4 +300,40 @@ export async function bootWorker() {
   });
 
   await runner.promise;
+}
+
+export class HubBot {
+  logger = botLog;
+  static logger = botLog;
+
+  static async create(serverConfig?: Partial<HubServerConfig>): Promise<HubBot> {
+    this.logger.info('Booting bot');
+    initSentry();
+
+    let container = createContainer(serverConfig?.registryCallback);
+    let bot: Bot | undefined;
+
+    try {
+      bot = await container.instantiate(Bot);
+      await bot.start();
+    } catch (e) {
+      this.logger.error('Unexpected error', e);
+      Sentry.withScope(function () {
+        Sentry.captureException(e);
+      });
+    }
+
+    if (!bot) {
+      throw new Error('Bot could not be created');
+    }
+
+    return new this(bot, container);
+  }
+
+  private constructor(public bot: Bot, public container: Container) {}
+
+  async teardown() {
+    await this.bot.destroy();
+    await this.container.teardown();
+  }
 }
