@@ -637,7 +637,17 @@ CREATE TABLE public.card_spaces (
     profile_button_text text NOT NULL,
     profile_category text NOT NULL,
     owner_address text NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    bio_title text,
+    bio_description text,
+    links json[] DEFAULT '{}'::json[] NOT NULL,
+    donation_title text,
+    donation_description text,
+    merchant_id uuid,
+    donation_suggestion_amount_1 integer,
+    donation_suggestion_amount_2 integer,
+    donation_suggestion_amount_3 integer,
+    donation_suggestion_amount_4 integer
 );
 
 
@@ -1026,6 +1036,14 @@ CREATE TRIGGER _500_increase_job_queue_count_update AFTER UPDATE OF queue_name O
 --
 
 CREATE TRIGGER _900_notify_worker AFTER INSERT ON graphile_worker.jobs FOR EACH STATEMENT EXECUTE FUNCTION graphile_worker.tg_jobs__notify_new_jobs();
+
+
+--
+-- Name: card_spaces card_spaces_merchant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.card_spaces
+    ADD CONSTRAINT card_spaces_merchant_id_fkey FOREIGN KEY (merchant_id) REFERENCES public.merchant_infos(id);
 
 
 --

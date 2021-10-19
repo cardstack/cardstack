@@ -11,14 +11,24 @@ import CardSpaceValidator, { CardSpaceErrors } from '../services/validators/card
 
 export interface CardSpace {
   id: string;
-  url: string;
-  profileName: string;
-  profileDescription: string;
-  profileCategory: string;
-  profileButtonText: string;
-  profileImageUrl: string;
-  profileCoverImageUrl: string;
-  ownerAddress: string;
+  url?: string;
+  profileName?: string;
+  profileDescription?: string;
+  profileCategory?: string;
+  profileButtonText?: string;
+  profileImageUrl?: string;
+  profileCoverImageUrl?: string;
+  bioTitle?: string;
+  bioDescription?: string;
+  links?: any[];
+  donationTitle?: string;
+  donationDescription?: string;
+  donationSuggestionAmount1?: number;
+  donationSuggestionAmount2?: number;
+  donationSuggestionAmount3?: number;
+  donationSuggestionAmount4?: number;
+  ownerAddress?: string;
+  merchantId?: string;
 }
 
 function serializeErrors(errors: any) {

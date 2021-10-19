@@ -35,7 +35,7 @@ export default class CardSpaceQueries {
 
     const conditions = buildConditions(filter);
 
-    const query = `SELECT id, url, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, owner_address FROM card_spaces WHERE ${conditions.where}`;
+    const query = `SELECT id, url, profile_name, profile_image_url, profile_cover_image_url, profile_description, profile_button_text, profile_category, bio_title, bio_description, donation_title, donation_description, links, donation_suggestion_amount_1, donation_suggestion_amount_2, donation_suggestion_amount_3, donation_suggestion_amount_4, owner_address FROM card_spaces WHERE ${conditions.where}`;
     const queryResult = await db.query(query, conditions.values);
 
     return queryResult.rows.map((row) => {
@@ -48,6 +48,15 @@ export default class CardSpaceQueries {
         profileDescription: row['profile_description'],
         profileButtonText: row['profile_button_text'],
         profileCategory: row['profile_category'],
+        bioTitle: row['bio_title'],
+        bioDescription: row['bio_description'],
+        donationTitle: row['donation_title'],
+        donationDescription: row['donation_description'],
+        links: row['links'],
+        donationSuggestionAmount1: row['donation_suggestion_amount_1'],
+        donationSuggestionAmount2: row['donation_suggestion_amount_2'],
+        donationSuggestionAmount3: row['donation_suggestion_amount_3'],
+        donationSuggestionAmount4: row['donation_suggestion_amount_4'],
         ownerAddress: row['owner_address'],
       };
     });
