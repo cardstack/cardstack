@@ -81,7 +81,7 @@ export const run: Command['run'] = async (bot, message, [channelId] = []) => {
 
       let explorer = getConstantByNetwork('blockExplorer', network);
       await message.reply(
-        `You're prepaid card is on the way, here is the transaction that includes your prepaid card ${explorer}tx/${txnHash}/token-transfers`
+        `Your prepaid card is on the way, here is the transaction that includes your prepaid card ${explorer}tx/${txnHash}/token-transfers`
       );
 
       let web3 = await bot.web3.getInstance();
