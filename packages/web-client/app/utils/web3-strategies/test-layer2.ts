@@ -401,11 +401,11 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     request?.onTxnHash?.('exampleTxnHash');
 
     this.test__simulateRemoteAccountSafes(walletAddress, [prepaidCardSafe]);
-    let unfetchedDepot = this.remoteAccountSafes
+    let unfetchedSource = this.remoteAccountSafes
       .get(this.walletInfo.firstAddress!)!
-      .find((v: Safe) => v.address === this.depotSafe?.address);
+      .find((v: Safe) => v.address === fundingSourceAddress);
 
-    unfetchedDepot!.tokens.forEach((t: TokenInfo) => {
+    unfetchedSource!.tokens.forEach((t: TokenInfo) => {
       if (t.token.symbol === 'DAI') {
         t.balance = new BN(t.balance)
           .sub(new BN(toWei((faceValue / 100).toString())))

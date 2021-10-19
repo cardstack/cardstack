@@ -50,9 +50,10 @@ const MIN_SPEND_AMOUNT = Math.min(...faceValueOptions);
 const MIN_AMOUNT_TO_PASS = new BN(
   toWei(`${Math.ceil(MIN_SPEND_AMOUNT / 100)}`)
 );
-const FAILING_AMOUNT = new BN(
-  toWei(`${Math.floor(MIN_SPEND_AMOUNT / 100) - 1}`)
+const FAILING_AMOUNT_IN_ETHER = new BN(
+  `${Math.floor(MIN_SPEND_AMOUNT / 100) - 1}`
 );
+const FAILING_AMOUNT = new BN(toWei(`${FAILING_AMOUNT_IN_ETHER}`));
 const SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER =
   Math.floor(Math.max(...faceValueOptions) / 100) - 1;
 const SLIGHTLY_LESS_THAN_MAX_VALUE = new BN(
@@ -538,7 +539,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
-      .containsText((SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER - 100).toString()); // FIXME hmm is it hardcoded somewhere to subtract from depot?
+      .containsText(FAILING_AMOUNT_IN_ETHER.toString());
 
     await waitFor(epiloguePostableSel(4));
 
