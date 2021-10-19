@@ -4,13 +4,14 @@ import logger from '@cardstack/logger';
 import nodeCleanup from 'node-cleanup';
 import { Argv, Options } from 'yargs';
 import { HubServer } from '../main';
+import { errorCatcher } from '../utils/cli';
 import { serverLog } from '../utils/logger';
 
 export let command = 'serve';
 export let aliases = 'server';
 export let describe = 'Boot the server';
 
-export let builder = function (yargs: Argv) {
+export let builder = (yargs: Argv) => {
   let options: { [key: string]: Options } = {
     port: {
       alias: 'p',
@@ -80,7 +81,7 @@ export async function handler(argv: any) {
   });
 
   if (process.env.COMPILER) {
-    await server.primeCache();
+    await server.primeCache().catch(errorCatcher);
 
     if (!argv.noWatch) {
       await server.watchCards();

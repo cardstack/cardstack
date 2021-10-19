@@ -210,8 +210,8 @@ export class HubServer {
     if (!process.env.COMPILER) {
       throw new Error('COMPILER feature flag is not present');
     }
-
-    (await this.container.lookup('card-builder')).primeCache();
+    let builder = await this.container.lookup('card-builder');
+    await builder.primeCache();
   }
 
   async watchCards() {
@@ -219,7 +219,8 @@ export class HubServer {
       throw new Error('COMPILER feature flag is not present');
     }
 
-    (await this.container.lookup('card-watcher')).watch();
+    let watcher = await this.container.lookup('card-watcher');
+    await watcher.watch();
   }
 }
 
