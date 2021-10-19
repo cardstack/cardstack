@@ -60,6 +60,8 @@ const SLIGHTLY_LESS_THAN_MAX_VALUE = new BN(
 );
 
 const MERCHANT_DID = 'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
+const OTHER_MERCHANT_DID =
+  'did:cardstack:1mwMdyaSSE13eHk4Dtbk75GE58960e58910b5a66';
 
 function postableSel(milestoneIndex: number, postableIndex: number): string {
   return `[data-test-milestone="${milestoneIndex}"][data-test-postable="${postableIndex}"]`;
@@ -128,14 +130,23 @@ module('Acceptance | issue prepaid card', function (hooks) {
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     let merchantSafe = createMerchantSafe({
-      address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
       merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
-        createSafeToken('DAI', '125000000000000000000'),
+        createSafeToken('DAI', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
         createSafeToken('CARD', '450000000000000000000'),
       ],
       accumulatedSpendValue: 100,
       infoDID: MERCHANT_DID,
+    });
+
+    let otherMerchantSafe = createMerchantSafe({
+      merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+      tokens: [
+        createSafeToken('DAI', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
+        createSafeToken('CARD', '450000000000000000000'),
+      ],
+      accumulatedSpendValue: 100,
+      infoDID: OTHER_MERCHANT_DID,
     });
 
     this.server.create('merchant-info', {
@@ -146,12 +157,21 @@ module('Acceptance | issue prepaid card', function (hooks) {
       'owner-address': layer2AccountAddress,
     });
 
+    this.server.create('merchant-info', {
+      id: await getFilenameFromDid(OTHER_MERCHANT_DID),
+      name: 'Ollednam',
+      slug: 'ollednam1',
+      did: OTHER_MERCHANT_DID,
+      'owner-address': layer2AccountAddress,
+    });
+
+    // Simulate the user scanning the QR code and connecting their mobile wallet
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         address: depotAddress,
         owners: [layer2AccountAddress],
         tokens: [
-          createSafeToken('DAI', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
+          createSafeToken('DAI', FAILING_AMOUNT.toString()),
           createSafeToken('CARD', '250000000000000000000'),
         ],
       }),
@@ -163,6 +183,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         issuer: layer2AccountAddress,
       }),
       merchantSafe,
+      otherMerchantSafe, // FIXME what controls sorting? otherMerchantSafe is seemingly always first
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
@@ -289,7 +310,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     // // funding-source card
     assert
       .dom(`${post} [data-test-funding-source-safe]`)
-      .hasText(`DEPOT ${depotAddress}`);
+      .containsText(`Ollednam Merchant account ${otherMerchantSafe.address}`);
 
     assert
       .dom(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`)
@@ -300,7 +321,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     );
     assert
       .dom('[data-test-safe-chooser-dropdown] li:nth-child(1)')
-      .containsText(depotAddress);
+      .containsText(otherMerchantSafe.address);
     assert
       .dom('[data-test-safe-chooser-dropdown] li:nth-child(2)')
       .containsText(merchantSafe.address);
@@ -314,7 +335,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .doesNotExist();
     assert
       .dom(`${post} [data-test-balance-display-amount]`)
-      .containsText('125.00 DAI');
+      .containsText('499.00 DAI');
 
     assert
       .dom(postableSel(2, 3))
@@ -322,7 +343,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     // // face-value card
     assert
       .dom('[data-test-balance-view-summary]')
-      .containsText('125.00 DAI')
+      .containsText('499.00 DAI')
       .containsText('Merchant Mandello');
     await click('[data-test-balance-view-summary]');
     assert
@@ -333,7 +354,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText(merchantSafe.address);
     assert
       .dom('[data-test-balance-view-token-amount]')
-      .containsText('125.00 DAI');
+      .containsText('499.00 DAI');
     assert.dom('[data-test-face-value-display]').doesNotExist();
     assert.dom('[data-test-face-value-option]').exists({ count: 6 });
     assert.dom('[data-test-face-value-option-checked]').doesNotExist();
@@ -517,7 +538,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
-      .containsText((SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER - 100).toString());
+      .containsText((SLIGHTLY_LESS_THAN_MAX_VALUE_IN_ETHER - 100).toString()); // FIXME hmm is it hardcoded somewhere to subtract from depot?
 
     await waitFor(epiloguePostableSel(4));
 
@@ -712,7 +733,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
         .exists();
     });
 
-    test('Workflow is canceled after showing wallet connection card if balance insufficient to create prepaid card', async function (assert) {
+    test('Workflow is canceled after showing wallet connection card if balances insufficient to create prepaid card', async function (assert) {
       await visit('/card-pay');
       assert.equal(currentURL(), '/card-pay/balances');
 
@@ -721,6 +742,11 @@ module('Acceptance | issue prepaid card', function (hooks) {
           address: depotAddress,
           owners: [layer2AccountAddress],
           tokens: [createSafeToken('DAI', FAILING_AMOUNT.toString())],
+        }),
+        createMerchantSafe({
+          merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+          tokens: [createSafeToken('DAI', FAILING_AMOUNT.toString())],
+          accumulatedSpendValue: 100,
         }),
       ]);
       await layer2Service.safes.fetch();
