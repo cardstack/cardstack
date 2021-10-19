@@ -30,6 +30,52 @@ export default class CardSpaceQueries {
     );
   }
 
+  async update(model: CardSpace) {
+    let db = await this.databaseManager.getClient();
+
+    await db.query(
+      `UPDATE card_spaces SET
+        url = $2,
+        profile_name = $3,
+        profile_image_url = $4,
+        profile_cover_image_url = $5,
+        profile_description = $6,
+        profile_button_text = $7,
+        profile_category = $8,
+        bio_title = $9,
+        bio_description = $10,
+        links = $11,
+        donation_title = $12,
+        donation_description = $13,
+        donation_suggestion_amount_1 = $14,
+        donation_suggestion_amount_2 = $15,
+        donation_suggestion_amount_3 = $16,
+        donation_suggestion_amount_4 = $17,
+        merchant_id = $18
+      WHERE ID = $1`,
+      [
+        model.id,
+        model.url,
+        model.profileName,
+        model.profileImageUrl,
+        model.profileCoverImageUrl,
+        model.profileDescription,
+        model.profileButtonText,
+        model.profileCategory,
+        model.bioTitle,
+        model.bioDescription,
+        model.links,
+        model.donationTitle,
+        model.donationDescription,
+        model.donationSuggestionAmount1,
+        model.donationSuggestionAmount2,
+        model.donationSuggestionAmount3,
+        model.donationSuggestionAmount4,
+        model.merchantId,
+      ]
+    );
+  }
+
   async query(filter: CardSpaceQueriesFilter): Promise<CardSpace[]> {
     let db = await this.databaseManager.getClient();
 
