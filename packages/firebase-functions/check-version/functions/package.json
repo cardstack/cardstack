@@ -1,6 +1,6 @@
 {
   "name": "check-version",
-  "version": "0.27.5",
+  "version": "0.27.6",
   "scripts": {
     "build": "tsc",
     "serve": "npm run build && firebase emulators:start --only functions",
