@@ -766,13 +766,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert
         .dom(cancelationPostableSel(0))
         .containsText(
-          `Looks like there’s not enough balance in your ${
+          `Looks like you don’t have a merchant or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
             c.layer2.fullName
-          } wallet to fund a prepaid card. Before you can continue, please add funds to your ${
-            c.layer2.fullName
-          } wallet by bridging some tokens from your ${
-            c.layer1.fullName
-          } wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
+          } wallet, or by claiming merchant revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
             Number(fromWei(MIN_AMOUNT_TO_PASS.toString()))
           )} DAI.CPXD (${convertAmountToNativeDisplay(
             spendToUsd(MIN_SPEND_AMOUNT)!,
