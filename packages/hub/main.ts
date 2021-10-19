@@ -193,7 +193,7 @@ export class HubServer {
 
   async listen(port = 3000) {
     let instance = this.app.listen(port);
-    this.logger.info('server listening on %s', port);
+    this.logger.info(`\n👂 Hub listening on %s\n`, port);
 
     if (process.connected) {
       process.send!('hub hello');

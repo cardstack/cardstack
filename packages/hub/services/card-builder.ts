@@ -21,17 +21,18 @@ export default class CardBuilder implements BuilderInterface {
   async primeCache(): Promise<void> {
     let promises = [];
 
+    this.logger.log('Priming card cache');
     for (let realm of this.realmManager.realms) {
       let cards = walkSync(realm.directory, { globs: ['**/card.json'] });
       for (let cardPath of cards) {
         let fullCardUrl = new URL(cardPath.replace('card.json', ''), realm.url).href;
-        this.logger.log(`--> Priming cache for ${fullCardUrl}`);
+        this.logger.info(`--> ${fullCardUrl}`);
         promises.push(this.buildCard(fullCardUrl));
       }
     }
 
     await Promise.all(promises);
-    this.logger.log(`--> Cache primed`);
+    this.logger.log(`✅ Cache primed`);
   }
 
   async define(cardURL: string, localPath: string, type: string, source: string): Promise<string> {
