@@ -11,5 +11,5 @@ export default setComponentTemplate(
       scope: () => ({}),
     }
   ),
-  templateOnlyComponent(
+  templateOnlyComponent()
 );

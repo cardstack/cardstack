@@ -7,7 +7,7 @@ import { JS_TYPE } from '@cardstack/core/src/utils/content';
 import { inject } from '@cardstack/di';
 import walkSync from 'walk-sync';
 import { serverLog as logger } from '../utils/logger';
-import { printCompilerError } from '@cardstack/core/src/error';
+import { printCompilerError } from '@cardstack/core/src/utils/errors';
 
 export default class CardBuilder implements BuilderInterface {
   realmManager = inject('realm-manager', { as: 'realmManager' });
@@ -70,7 +70,7 @@ export default class CardBuilder implements BuilderInterface {
 
   async getRawCard(url: string): Promise<RawCard> {
     url = url.replace(/\/$/, '');
-    return this.realmManager.getRawCard(url);
+    return await this.realmManager.getRawCard(url);
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {

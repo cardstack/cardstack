@@ -3,7 +3,7 @@
 
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
-const { printCompilerError } = require('@cardstack/core/src/error');
+const { printCompilerError } = require('@cardstack/core/src/utils/errors');
 
 require('dotenv').config();
 

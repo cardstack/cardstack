@@ -220,7 +220,7 @@ export class HubServer {
     }
 
     let watcher = await this.container.lookup('card-watcher');
-    await watcher.watch();
+    watcher.watch();
   }
 }
 

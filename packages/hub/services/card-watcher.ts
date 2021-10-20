@@ -4,7 +4,7 @@ import sane from 'sane';
 import Realm from '../realms/fs-realm';
 import { inject } from '@cardstack/di';
 import { serverLog } from '../utils/logger';
-import { printCompilerError } from '@cardstack/core/src/error';
+import { printCompilerError } from '@cardstack/core/src/utils/errors';
 
 export default class CardWatcher {
   realmManager = inject('realm-manager', { as: 'realmManager' });

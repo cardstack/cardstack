@@ -4,13 +4,13 @@ export default async function error(ctxt: Koa.Context, next: Koa.Next) {
   try {
     return await next();
   } catch (err: any) {
-    if (!err.isCardstackError && !err.isCompilerError) {
+    if (!err.isCardstackError && !err.isCardError) {
       throw err;
     }
     if (err.status === 500) {
       console.error(`Unexpected error: ${err.status} - ${err.message}\n${err.stack}`); // eslint-disable-line no-console
     }
-    if (err.isCompilerError) {
+    if (err.isCardError) {
       // TODO: This probably needs to be expanded
       err.status = 400;
       err.title = 'Bad Request';
