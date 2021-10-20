@@ -85,19 +85,6 @@ if (process.env.COMPILER) {
       ).to.containsSource(PERSON_CARD.files['embedded.css']);
     });
 
-    it('template errors are caught and sent down in the module', async function () {
-      let card = Object.assign({}, PERSON_CARD);
-      card.files['embedded.js'] = templateOnlyComponentTemplate('<h><@fields.title /></div>');
-      realm.addRawCard(card);
-
-      let compiled = await builder.getCompiledCard(PERSON_CARD.url);
-
-      expect(
-        builder.cache.getModule(compiled.embedded.moduleName),
-        'Embedded template has an error in it'
-      ).to.containsSource('Failed to compile');
-    });
-
     it('CompiledCard edit view', async function () {
       realm.addRawCard(PERSON_CARD);
       let compiled = await builder.getCompiledCard(PERSON_CARD.url);
