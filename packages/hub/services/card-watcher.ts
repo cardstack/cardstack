@@ -4,6 +4,7 @@ import sane from 'sane';
 import Realm from '../realms/fs-realm';
 import { inject } from '@cardstack/di';
 import { serverLog } from '../utils/logger';
+import { printCompilerError } from '@cardstack/core/src/error';
 
 export default class CardWatcher {
   realmManager = inject('realm-manager', { as: 'realmManager' });
@@ -50,7 +51,7 @@ export default class CardWatcher {
         await this.builder.buildCard(url);
         serverLog.log(`Rebuilding::END   ${url}`);
       } catch (err) {
-        console.error(err);
+        serverLog.error(printCompilerError(err));
       }
     })();
   }

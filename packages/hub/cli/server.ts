@@ -4,14 +4,13 @@ import logger from '@cardstack/logger';
 import nodeCleanup from 'node-cleanup';
 import { Argv, Options } from 'yargs';
 import { HubServer } from '../main';
-import { errorCatcher } from '../utils/cli';
 import { serverLog } from '../utils/logger';
 
 export let command = 'serve';
 export let aliases = 'server';
 export let describe = 'Boot the server';
 
-export let builder = (yargs: Argv) => {
+export function builder(yargs: Argv) {
   let options: { [key: string]: Options } = {
     port: {
       alias: 'p',
@@ -31,7 +30,7 @@ export let builder = (yargs: Argv) => {
     };
   }
   return yargs.options(options);
-};
+}
 
 // Using any right now because I dont know how to get the generated
 // type from the above handler into this handler
@@ -81,7 +80,7 @@ export async function handler(argv: any) {
   });
 
   if (process.env.COMPILER) {
-    await server.primeCache().catch(errorCatcher);
+    await server.primeCache();
 
     if (!argv.noWatch) {
       await server.watchCards();

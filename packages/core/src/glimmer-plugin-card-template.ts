@@ -82,6 +82,10 @@ export default function glimmerCardTemplateTransform(source: string, options: Op
       plugins: {
         ast: [cardTransformPlugin(options)],
       },
+      meta: {
+        // TODO: thread the real card & filename through to hear
+        moduleName: 'http://demo.com/card-space-layout/isolated.js',
+      },
     })
   );
 }

@@ -267,15 +267,7 @@ export class Compiler {
     };
 
     let code: string;
-    try {
-      code = transformCardComponent(templateSource, options);
-    } catch (error: any) {
-      let errorMessage = `Failed to compile \`${localFile}\` in \`${cardURL}\``;
-      console.error(`----------------------\n${errorMessage}\n----------------------`);
-      console.error(error);
-      code = `throw new Error('${errorMessage}. Check your hub log')`;
-    }
-
+    code = transformCardComponent(templateSource, options);
     let moduleName = await this.builder.define(cardURL, hashFilenameFromFields(localFile, fields), JS_TYPE, code);
 
     let componentInfo: ComponentInfo = {
