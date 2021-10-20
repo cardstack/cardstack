@@ -1,21 +1,16 @@
 import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
 import { Event } from '../bot';
-import config from 'config';
-import { DiscordConfig } from '../types';
 
 const log = logger('events:guild-message');
-const {
-  cordeBotId,
-  allowedGuilds: guildsRaw,
-  allowedChannels: channelsRaw,
-  commandPrefix: prefix,
-} = config.get('discord') as DiscordConfig;
-let allowedGuilds = guildsRaw.split(',');
-let allowedChannels = channelsRaw.split(',');
 
 export const name: Event['name'] = 'message';
 export const run: Event['run'] = async (bot, message) => {
+  log.trace(`received '${message?.content}'`);
+  const { cordeBotId, allowedGuilds: guildsRaw, allowedChannels: channelsRaw, commandPrefix: prefix } = bot.config;
+  let allowedGuilds = guildsRaw.split(',');
+  let allowedChannels = channelsRaw.split(',');
+
   if (
     (message?.author.bot && message.author.id !== cordeBotId) ||
     !message?.guild ||

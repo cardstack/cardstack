@@ -9,12 +9,11 @@ import * as Sentry from '@sentry/node';
 
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
-import Bot from '@cardstack/cardbot';
 import packageJson from './package.json';
 import { Registry, Container, RegistryCallback } from '@cardstack/di';
 
 import DatabaseManager from '@cardstack/db';
-import WalletConnectService from '@cardstack/cardbot/services/wallet-connect';
+import WalletConnectService from './services/discord-bots/hub-bot/services/wallet-connect';
 import { HubServerConfig } from './interfaces';
 
 import AuthenticationMiddleware from './services/authentication-middleware';
@@ -68,6 +67,7 @@ import { CardCacheConfig } from './services/card-cache-config';
 import CardCache from './services/card-cache';
 import CardWatcher from './services/card-watcher';
 import ExchangeRatesService from './services/exchange-rates';
+import HubBot from './services/discord-bots/hub-bot';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -302,22 +302,22 @@ export async function bootWorker() {
   await runner.promise;
 }
 
-export class HubBot {
+export class HubBotController {
   logger = botLog;
   static logger = botLog;
 
-  static async create(serverConfig?: Partial<HubServerConfig>): Promise<HubBot> {
+  static async create(serverConfig?: Partial<HubServerConfig>): Promise<HubBotController> {
     this.logger.info('Booting bot');
     initSentry();
 
     let container = createContainer(serverConfig?.registryCallback);
-    let bot: Bot | undefined;
+    let bot: HubBot | undefined;
 
     try {
-      bot = await container.instantiate(Bot);
+      bot = await container.instantiate(HubBot);
       await bot.start();
-    } catch (e) {
-      this.logger.error('Unexpected error', e);
+    } catch (e: any) {
+      this.logger.error(`Unexpected error ${e.message}`, e);
       Sentry.withScope(function () {
         Sentry.captureException(e);
       });
@@ -330,7 +330,7 @@ export class HubBot {
     return new this(bot, container);
   }
 
-  private constructor(public bot: Bot, public container: Container) {}
+  private constructor(public bot: HubBot, public container: Container) {}
 
   async teardown() {
     await this.bot.destroy();

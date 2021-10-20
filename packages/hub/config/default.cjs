@@ -31,7 +31,6 @@ module.exports = {
     cordeBotId: '898595095195029595',
     cordeBotToken: null,
     commandPrefix: '!',
-    betaTesterRole: 'Beta Tester',
     allowedGuilds: '896093062562983986',
     allowedChannels: '896093062562983989,898891181575000074',
   },
@@ -59,6 +58,7 @@ module.exports = {
     network: 'sokol',
   },
   betaTesting: {
+    discordRole: 'Beta Tester',
     sku: '0x5e0d8bbe3c8e4d9013509b469dabfa029270b38a5c55c9c94c095ec6199d7fda',
   },
   walletConnect: {

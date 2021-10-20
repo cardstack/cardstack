@@ -19,7 +19,6 @@
     "cordeBotId": "CORDE_BOT_ID",
     "cordeBotToken": "CORDE_BOT_TOKEN",
     "commandPrefix": "CARDBOT_COMMAND_PREFIX",
-    "betaTesterRole": "CARDBOT_BETA_TESTER_ROLE",
     "allowedGuilds": "CARDBOT_ALLOWED_GUILDS",
     "allowedChannels": "CARDBOT_ALLOWED_CHANNELS"
   },
@@ -49,7 +48,8 @@
     "provisionerSecret": "PROVISIONER_SECRET"
   },
   "betaTesting": {
-    "sku": "BETA_TEST_SKU"
+    "sku": "BETA_TEST_SKU",
+    "discordRole": "CARDBOT_BETA_TESTER_ROLE"
   },
   "serverSecret": "SERVER_SECRET"
 }

@@ -1,11 +1,12 @@
 import { Client as DBClient } from 'pg';
 import { it, beforeStart, afterAll, expect, bot as cordeBot } from 'corde';
-import { HubBot } from '../main';
 import config from 'config';
-import { BetaTestConfig, DiscordConfig } from '@cardstack/cardbot/types';
 import { Registry } from '@cardstack/di';
+import { BetaTestConfig } from '../../../../services/discord-bots/hub-bot/types';
+import { HubBotController } from '../../../../main';
 
-let { cordeBotId, betaTesterRole: betaTesterRoleName } = config.get('discord') as DiscordConfig;
+let cordeBotId = config.get('discord.cordeBotId') as string;
+let betaTesterRoleName = config.get('betaTesting.discordRole') as string;
 let { sku } = config.get('betaTesting') as BetaTestConfig;
 
 // The discord test driver lib, corde, is still pretty new so its a bit rough
@@ -32,10 +33,10 @@ class StubInventory {
   }
 }
 
-let bot: HubBot;
+let bot: HubBotController;
 let db: DBClient;
 beforeStart(async () => {
-  bot = await HubBot.create({
+  bot = await HubBotController.create({
     registryCallback(registry: Registry) {
       registry.register('inventory', StubInventory);
     },

@@ -2,14 +2,11 @@ import Web3 from 'web3';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { networkIds, getConstantByNetwork } from '@cardstack/cardpay-sdk';
 import { AbstractProvider } from 'web3-core';
-import QRCode from 'qrcode';
 import config from 'config';
-import { WalletConnectConfig, Web3Config } from '../types';
 import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
-import tmp from 'tmp';
-import { Message, MessageEmbed } from 'discord.js';
-import { basename } from 'path';
+import { Message, buildMessageWithQRCode } from '@cardstack/discord-bot';
+import { WalletConnectConfig, Web3Config } from '../types';
 
 const log = logger('services:wallet-connect');
 
@@ -33,30 +30,25 @@ export default class WalletConnectService {
 
     let replyPromise: Promise<Message> | undefined;
     let hasError = false;
-    provider.connector.on('display_uri', (err, payload) => {
+    provider.connector.on('display_uri', async (err, payload) => {
       if (err) {
         hasError = true;
         handleError('Error obtaining wallet connect URI', err);
         return;
       }
       const [uri] = payload.params;
-      let qrCodeFile = tmp.tmpNameSync({ postfix: '.png' });
-      QRCode.toFile(qrCodeFile, uri, (err) => {
-        if (err) {
-          hasError = true;
-          handleError('Error rendering QR code image', err);
-          return;
-        }
-        let embed = new MessageEmbed()
+      try {
+        let embed = (await buildMessageWithQRCode(uri))
           .setTitle('Scan This QR Code to Connect')
           .setDescription(
             `From your Card Wallet app, click on the "QR Code" button, scan this the code, and then tap on the "Connect" button to connect your Card Wallet so that I can give you a prepaid card.`
-          )
-          .attachFiles([qrCodeFile])
-          .setImage(`attachment://${basename(qrCodeFile)}`);
+          );
         // capture this to make sure we don't leak async
         replyPromise = message.reply(embed);
-      });
+      } catch (e: any) {
+        hasError = true;
+        handleError('Error building or sending QR Code MessageEmbed', e);
+      }
     });
 
     if (hasError) {

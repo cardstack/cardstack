@@ -1,11 +1,10 @@
 import { getConstantByNetwork, getSDK } from '@cardstack/cardpay-sdk';
 import config from 'config';
-import { Message, MessageEmbed } from 'discord.js';
-import { Command, Bot } from '../../../bot';
+import Bot, { Command, Message, MessageEmbed } from '@cardstack/discord-bot';
 import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
 import { basename, join } from 'path';
-import { deactivateDMConversation } from '../../../utils/dm';
+import { deactivateDMConversation } from '@cardstack/discord-bot/utils/dm';
 import {
   getBetaTester,
   setBetaTesterAddress,
@@ -14,6 +13,8 @@ import {
 } from '../../../utils/beta-tester';
 import { BetaTestConfig, Web3Config } from '../../../types';
 import { name as cardmeName } from '../../guild/card-me';
+import HubBot from '../../..';
+import { assertHubBot } from '../../../utils';
 
 const log = logger('command:airdrop-prepaidcard');
 export const name: Command['name'] = 'airdrop-prepaidcard:start';
@@ -53,7 +54,7 @@ export const run: Command['run'] = async (bot, message, [channelId] = []) => {
     let betaTester = await getBetaTester(db, userId);
     let address: string;
     if (!betaTester?.address) {
-      let web3 = await bot.walletConnect.getWeb3(message);
+      let web3 = await (bot as HubBot).walletConnect.getWeb3(message);
 
       if (!web3) {
         await message.reply(
@@ -75,6 +76,7 @@ export const run: Command['run'] = async (bot, message, [channelId] = []) => {
     await message.reply(`Great! I see your wallet address is ${address}. I'm sending you a prepaid card, hang on...`);
     let txnHash: string | undefined;
     try {
+      assertHubBot(bot);
       txnHash = await bot.relay.provisionPrepaidCard(address, sku);
       Sentry.addBreadcrumb({ message: `obtained txnHash for prepaid card airdrop to ${address}: ${txnHash}` });
       await setBetaTesterAirdropTxnHash(db, userId, txnHash);
@@ -119,6 +121,7 @@ export const run: Command['run'] = async (bot, message, [channelId] = []) => {
 };
 
 async function checkInventory(message: Message, bot: Bot): Promise<boolean> {
+  assertHubBot(bot);
   let skuSummaries = await bot.inventory.getSKUSummaries();
   let skuSummary = skuSummaries.find((summary) => summary.id === sku);
   let quantity = skuSummary?.attributes?.quantity;

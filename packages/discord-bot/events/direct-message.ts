@@ -7,6 +7,7 @@ const log = logger('events:direct-message');
 
 export const name: Event['name'] = 'message';
 export const run: Event['run'] = async (bot, message) => {
+  log.trace(`received '${message?.content}'`);
   if (!message || message?.author.bot || message?.guild || message?.channel.type !== 'dm') {
     return;
   }

@@ -16,7 +16,7 @@ module.exports = {
   channelId: allowedChannels.split(',').pop(),
   cordeBotToken,
   guildId: allowedGuilds.split(',').pop(),
-  testMatches: ['**/bot-tests/**'],
+  testMatches: ['**/bot-tests/**/*.ts'],
   botToken,
   project: '<rootDir>/../../tsconfig.json',
   timeout: 5000,

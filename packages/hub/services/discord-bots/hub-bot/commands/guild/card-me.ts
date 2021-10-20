@@ -1,11 +1,12 @@
-import { Command } from '../../bot';
+import { Command } from '@cardstack/discord-bot/bot';
 import config from 'config';
-import { BetaTestConfig } from '../../types';
-import { sendDM, activateDMConversation, createDM } from '../../utils/dm';
-import { isBetaTester } from '../../utils/guild';
+import { sendDM, activateDMConversation, createDM } from '@cardstack/discord-bot/utils/dm';
 import { getBetaTester, setBetaTester } from '../../utils/beta-tester';
+
 import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
+import { BetaTestConfig } from '../../types';
+import { assertHubBot, isBetaTester } from '../../utils';
 
 const log = logger('command:card-me');
 const { sku } = config.get('betaTesting') as BetaTestConfig;
@@ -13,6 +14,7 @@ const { sku } = config.get('betaTesting') as BetaTestConfig;
 export const name: Command['name'] = 'card-me';
 export const description: Command['description'] = 'Airdrop Cardstack prepaid cards';
 export const run: Command['run'] = async (bot, message) => {
+  assertHubBot(bot);
   let member = message.member;
   let guild = message.guild;
   if (!member || !guild) {
@@ -70,7 +72,7 @@ export const run: Command['run'] = async (bot, message) => {
 
 Connect your Card Wallet app to receive your prepaid card.
 
-If you do not have the Card Wallet app download Card Wallet at cardstack.com/cardpay
+If you do not have the Card Wallet app, download Card Wallet at cardstack.com/cardpay
 
 If you are viewing this message on the same device that you downloaded your Card Wallet to, then switch devices so that you can use your Card Wallet to scan a QR code in this chat.
 
