@@ -1,10 +1,18 @@
 .card-space-layout {
-  max-width: 60rem;
+  position: relative;
+  max-width: 65rem;
   margin: 0 auto;
   padding: var(--boxel-sp);
   display: flex;
   flex-wrap: wrap;
   gap: var(--boxel-sp);
+}
+
+.card-space-layout__cover-photo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
 .card-space-layout__module {

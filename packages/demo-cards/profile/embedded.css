@@ -1,0 +1,7 @@
+.profile {
+  padding: var(--boxel-sp-lg);
+}
+
+.profile__title {
+  margin-top: 0;
+}

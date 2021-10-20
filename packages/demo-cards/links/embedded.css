@@ -1,0 +1,12 @@
+.links {
+  padding: var(--boxel-sp-lg);
+}
+
+.links__title {
+  margin-top: 0;
+}
+
+.links__list {
+  display: grid;
+  gap: var(--boxel-sp);
+}

@@ -1,0 +1,7 @@
+.bio {
+  padding: var(--boxel-sp-lg);
+}
+
+.bio__title {
+  margin-top: 0;
+}

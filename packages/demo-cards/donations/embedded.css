@@ -1,0 +1,7 @@
+.donations {
+  padding: var(--boxel-sp-lg);
+}
+
+.donations__title {
+  margin-top: 0;
+}

@@ -1,11 +1,11 @@
-<Boxel::CardContainer @displayBoundaries={{true}} style="margin:1vw 2vw;overflow:hidden;">
-  <Boxel::Header @editable={{@editable}} @editAction={{perform this.modal.editCardTask @card}}>
-    {{#if @editable}}
+<Boxel::CardContainer @displayBoundaries={{true}} style="margin:1vw 2vw;">
+  {{#if @editable}}
+    <Boxel::Header @header="[LABEL]">
       <button data-test-edit-button {{on 'click' (perform this.modal.editCardTask @card)}}>Edit</button>
       <button data-test-new-button-server {{on 'click' (perform this.modal.newCardTask @card this.REALM)}}>New (Server)</button>
       <button data-test-new-button-local {{on 'click' (perform this.modal.newCardTask @card this.LOCAL_REALM)}}>New (Local)</button>
-    {{/if}}
-  </Boxel::Header>
+    </Boxel::Header>
+  {{/if}}
 
   {{yield}}
 

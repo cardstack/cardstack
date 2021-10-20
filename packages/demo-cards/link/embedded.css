@@ -1,0 +1,6 @@
+.link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--boxel-sp);
+}
