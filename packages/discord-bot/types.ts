@@ -4,6 +4,7 @@ import {
   GuildMember as DiscordGuildMember,
   Collection,
 } from 'discord.js';
+import { Client as PgClient } from 'pg';
 export interface DiscordBotConfig {
   botId: string;
   botToken: string;
@@ -58,4 +59,7 @@ export interface MockGuildMember {
   roles: {
     cache: Collection<string, MockRole>;
   };
+}
+export interface BotDatabaseDelegate {
+  getDatabaseClient(): Promise<PgClient>;
 }

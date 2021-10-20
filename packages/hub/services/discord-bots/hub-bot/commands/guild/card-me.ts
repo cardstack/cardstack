@@ -27,7 +27,7 @@ export const run: Command['run'] = async (bot, message) => {
     return;
   }
 
-  let db = await bot.databaseManager.getClient();
+  let db = await bot.getDatabaseClient();
   let betaTester = await getBetaTester(db, member.id);
   if (betaTester?.airdropTxnHash) {
     await sendDM(

@@ -69,6 +69,7 @@ import CardCache from './services/card-cache';
 import CardWatcher from './services/card-watcher';
 import ExchangeRatesService from './services/exchange-rates';
 import HubBot from './services/discord-bots/hub-bot';
+import { BotDatabaseDelegateImpl } from './services/discord-bots/hub-bot/services/bot-database-delegate';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -78,6 +79,7 @@ export function createContainer(registryCallback?: RegistryCallback): Container 
   registry.register('api-router', ApiRouter);
   registry.register('authentication-middleware', AuthenticationMiddleware);
   registry.register('authentication-utils', AuthenticationUtils);
+  registry.register('bot-database-delegate', BotDatabaseDelegateImpl);
   registry.register('boom-route', BoomRoute);
   registry.register('callbacks-router', CallbacksRouter);
   registry.register('clock', Clock);

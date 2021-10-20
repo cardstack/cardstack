@@ -1,6 +1,6 @@
 import { Client, MessageEmbed } from 'discord.js';
 import glob from 'glob-promise';
-import { DiscordBotConfig } from './types';
+import { BotDatabaseDelegate, DiscordBotConfig } from './types';
 import tmp from 'tmp';
 import QRCode from 'qrcode';
 import { basename } from 'path';
@@ -31,19 +31,19 @@ export interface Event {
 }
 
 export class Bot extends Client {
-  databaseManager!: DatabaseManager;
+  config!: DiscordBotConfig;
+  databaseDelegate!: BotDatabaseDelegate;
   guildCommands = new Map<string, Command>();
   dmCommands = new Map<string, Command>();
   isConfigured = false;
-  config!: DiscordBotConfig;
   type = 'generic';
 
   async start(): Promise<void> {
     if (!this.config) {
       throw new Error('config property must be set before starting the bot');
     }
-    if (!this.databaseManager) {
-      throw new Error('databaseManager property must be set before starting the bot');
+    if (!this.databaseDelegate) {
+      throw new Error('databaseDelegate property must be set before starting the bot');
     }
 
     this.guildCommands = await gatherCommands(`${this.config.commandsDir}/guild/**/*.js`);
@@ -65,6 +65,10 @@ export class Bot extends Client {
     } else {
       log.info('No bot token found. Bot will not login to discord.');
     }
+  }
+
+  getDatabaseClient() {
+    return this.databaseDelegate.getDatabaseClient();
   }
 }
 

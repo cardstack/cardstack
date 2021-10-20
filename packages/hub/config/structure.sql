@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.3
--- Dumped by pg_dump version 13.1
+-- Dumped from database version 13.4
+-- Dumped by pg_dump version 13.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -38,6 +38,21 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
 
+
+--
+-- Name: discord_bots_status_enum; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.discord_bots_status_enum AS ENUM (
+    'connecting',
+    'connected',
+    'listening',
+    'disconnected',
+    'unresponsive'
+);
+
+
+ALTER TYPE public.discord_bots_status_enum OWNER TO postgres;
 
 --
 -- Name: wallet_orders_status_enum; Type: TYPE; Schema: public; Owner: postgres
@@ -547,6 +562,31 @@ $$;
 ALTER FUNCTION graphile_worker.tg_jobs__notify_new_jobs() OWNER TO postgres;
 
 --
+-- Name: discord_bots_updated_trigger(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION public.discord_bots_updated_trigger() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+    DECLARE
+      payload TEXT;
+    BEGIN
+    IF NEW."last_message_id" IS NOT NULL THEN
+      payload := '{ id: "' || NEW."last_message_id" || '", bot_type: "' || NEW."bot_type" || '" }';
+      PERFORM pg_notify('discord_bot_message_processing', payload);
+    END IF;
+    IF OLD."status" = 'listening' AND NEW."status" = 'disconnected' THEN
+      payload := '{ bot_type: "' || NEW."bot_type" || '", status: "' || NEW."status"   ||'" }';
+      PERFORM pg_notify('discord_bot_status', payload);
+    END IF;
+    RETURN NEW;
+  END
+  $$;
+
+
+ALTER FUNCTION public.discord_bots_updated_trigger() OWNER TO postgres;
+
+--
 -- Name: job_queues; Type: TABLE; Schema: graphile_worker; Owner: postgres
 --
 
@@ -652,6 +692,21 @@ CREATE TABLE public.card_spaces (
 
 
 ALTER TABLE public.card_spaces OWNER TO postgres;
+
+--
+-- Name: discord_bots; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.discord_bots (
+    bot_id text NOT NULL,
+    bot_type text NOT NULL,
+    status public.discord_bots_status_enum NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    last_message_id text
+);
+
+
+ALTER TABLE public.discord_bots OWNER TO postgres;
 
 --
 -- Name: dm_channels; Type: TABLE; Schema: public; Owner: postgres
@@ -870,6 +925,14 @@ ALTER TABLE ONLY public.card_spaces
 
 
 --
+-- Name: discord_bots discord_bots_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.discord_bots
+    ADD CONSTRAINT discord_bots_pkey PRIMARY KEY (bot_id);
+
+
+--
 -- Name: dm_channels dm_channels_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -945,6 +1008,13 @@ CREATE INDEX jobs_priority_run_at_id_locked_at_without_failures_idx ON graphile_
 --
 
 CREATE UNIQUE INDEX card_spaces_url_unique_index ON public.card_spaces USING btree (url);
+
+
+--
+-- Name: discord_bots_bot_type_status_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX discord_bots_bot_type_status_index ON public.discord_bots USING btree (bot_type, status);
 
 
 --
@@ -1039,6 +1109,13 @@ CREATE TRIGGER _900_notify_worker AFTER INSERT ON graphile_worker.jobs FOR EACH 
 
 
 --
+-- Name: discord_bots discord_bots_updated_trigger; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER discord_bots_updated_trigger AFTER UPDATE ON public.discord_bots FOR EACH ROW EXECUTE FUNCTION public.discord_bots_updated_trigger();
+
+
+--
 -- Name: card_spaces card_spaces_merchant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1096,8 +1173,8 @@ ALTER TABLE graphile_worker.known_crontabs ENABLE ROW LEVEL SECURITY;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.3
--- Dumped by pg_dump version 13.1
+-- Dumped from database version 13.4
+-- Dumped by pg_dump version 13.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1115,14 +1192,14 @@ SET row_security = off;
 --
 
 COPY graphile_worker.migrations (id, ts) FROM stdin;
-1	2021-10-14 19:15:58.376963-04
-2	2021-10-14 19:15:58.376963-04
-3	2021-10-14 19:15:58.376963-04
-4	2021-10-14 19:15:58.376963-04
-5	2021-10-14 19:15:58.376963-04
-6	2021-10-14 19:15:58.376963-04
-7	2021-10-14 19:15:58.376963-04
-8	2021-10-14 19:15:58.376963-04
+1	2021-10-15 07:15:58.376963+08
+2	2021-10-15 07:15:58.376963+08
+3	2021-10-15 07:15:58.376963+08
+4	2021-10-15 07:15:58.376963+08
+5	2021-10-15 07:15:58.376963+08
+6	2021-10-15 07:15:58.376963+08
+7	2021-10-15 07:15:58.376963+08
+8	2021-10-15 07:15:58.376963+08
 \.
 
 
@@ -1138,8 +1215,10 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 5	20210817184105100_wallet-orders	2021-10-14 19:15:58.376963
 6	20210920142313915_prepaid-card-reservations	2021-10-14 19:15:58.376963
 7	20210924200122612_order-indicies	2021-10-14 19:15:58.376963
-8	20211006090701108_create-card-spaces	2021-10-14 19:15:58.376963
-9	20211013173917696_beta-testers	2021-10-14 19:15:58.376963
+47	20211006090701108_create-card-spaces	2021-10-22 11:31:31.004948
+48	20211013173917696_beta-testers	2021-10-22 11:31:31.004948
+49	20211014131843187_add-fields-to-card-spaces	2021-10-22 11:31:31.004948
+53	20211020231214235_discord-bots	2021-10-26 01:43:03.978314
 \.
 
 
@@ -1147,7 +1226,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 9, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 53, true);
 
 
 --

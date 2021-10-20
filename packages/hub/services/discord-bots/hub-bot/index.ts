@@ -16,9 +16,9 @@ export default class HubBot extends DiscordBot {
     allowedChannels: config.get('discord.allowedChannels'),
   };
 
-  databaseManager = inject('database-manager', { as: 'databaseManager' });
   inventory = inject('inventory');
   relay = inject('relay');
   walletConnect = inject('wallet-connect', { as: 'walletConnect' });
   web3 = inject('web3');
+  databaseDelegate = inject('bot-database-delegate', { as: 'databaseDelegate' });
 }

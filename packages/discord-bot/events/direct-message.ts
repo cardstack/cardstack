@@ -13,7 +13,7 @@ export const run: Event['run'] = async (bot, message) => {
   }
   let channelId = message.channel.id;
 
-  let db = await bot.databaseManager.getClient();
+  let db = await bot.getDatabaseClient();
   let commandName = await conversationCommand(db, channelId);
   if (commandName == null) {
     log.trace(`Ignoring message from ${message.author.username} in ${channelId}`);
