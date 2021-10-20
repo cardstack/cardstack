@@ -249,6 +249,7 @@ class CreateSpaceWorkflowComponent extends Component {
   @service declare router: RouterService;
 
   @tracked workflow: CreateSpaceWorkflow | null = null;
+  @tracked detailsEditFormShown: boolean = true;
 
   constructor(owner: unknown, args: {}) {
     super(owner, args);

@@ -12,7 +12,7 @@
   >
     <:default as |d|>
       <d.ActionButton
-        {{on "click" @onComplete}}
+        {{on "click" this.toggleDetailsForm}}
         data-test-card-space-details-start-button
       >
         Get Started
@@ -21,10 +21,23 @@
     <:memorialized as |m|>
       <m.ActionButton
         data-test-card-space-details-edit-button
-        {{on "click" @onIncomplete}}
+        {{on "click" this.toggleDetailsForm}}
       >
         Edit
       </m.ActionButton>
     </:memorialized>
   </Boxel::ActionChin>
+
+  {{#in-element this.detailsModalElement}}
+    <Boxel::Modal
+      style={{css-var boxel-modal-max-width="60rem"}}
+      @isOpen={{this.detailsModalShown}}
+      @onClose={{this.toggleDetailsForm}}
+    >
+      <CardSpace::EditDetails
+        @workflowSession={{this.workflow.session}}
+        @onSave={{this.onSave}}
+      />
+    </Boxel::Modal>
+  {{/in-element}}
 </ActionCardContainer>
