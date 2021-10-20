@@ -44,7 +44,7 @@ module('Integration | Component | Header', function (hooks) {
     await render(hbs`
       <Boxel::Header
         @header="Card Header"
-        @isHighlighted={{this.isHighlighted}}
+        @isHighlighted={{true}}
       />
     `);
 
