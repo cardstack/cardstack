@@ -533,20 +533,20 @@ describe('PUT /api/card-spaces', function () {
           {
             status: '422',
             title: 'Invalid attribute',
-            source: { pointer: `/data/attributes/links` },
-            detail: 'Max title length is 50. Link index: 0',
+            source: { pointer: `/data/attributes/links/0/title` },
+            detail: 'Max length is 50',
           },
           {
             status: '422',
             title: 'Invalid attribute',
-            source: { pointer: `/data/attributes/links` },
-            detail: 'Title must be present. Link index: 1',
+            source: { pointer: `/data/attributes/links/1/title` },
+            detail: 'Must be present',
           },
           {
             status: '422',
             title: 'Invalid attribute',
-            source: { pointer: `/data/attributes/links` },
-            detail: 'Invalid URL. Link index: 1',
+            source: { pointer: `/data/attributes/links/1/url` },
+            detail: 'Invalid URL',
           },
           {
             status: '422',

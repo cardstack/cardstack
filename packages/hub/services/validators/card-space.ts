@@ -21,7 +21,12 @@ export type CardSpaceAttribute =
   | 'donationSuggestionAmount3'
   | 'donationSuggestionAmount4';
 
-export type CardSpaceErrors = Record<CardSpaceAttribute, string[]>;
+export interface NestedAttributeError {
+  index: number;
+  attribute: string;
+  detail: string;
+}
+export type CardSpaceErrors = Record<CardSpaceAttribute, (string | NestedAttributeError)[]>;
 type UrlValidationResult = Record<'valid', boolean>;
 
 const MAX_LONG_FIELD_LENGTH = 300;
@@ -154,15 +159,31 @@ export default class CardSpaceValidator {
         let { title, url } = linkItem;
 
         if (!title) {
-          errors.links.push(`Title must be present. Link index: ${index}`);
+          errors.links.push({
+            index,
+            attribute: 'title',
+            detail: 'Must be present',
+          });
         } else if (title.length > MAX_SHORT_FIELD_LENGTH) {
-          errors.links.push(`Max title length is ${MAX_SHORT_FIELD_LENGTH}. Link index: ${index}`);
+          errors.links.push({
+            index,
+            attribute: 'title',
+            detail: `Max length is ${MAX_SHORT_FIELD_LENGTH}`,
+          });
         }
 
         if (!url) {
-          errors.links.push(`Link must be present. Link index: ${index}`);
+          errors.links.push({
+            index,
+            attribute: 'url',
+            detail: 'Must be present',
+          });
         } else if (!validateUrl(url!).valid) {
-          errors.links.push(`Invalid URL. Link index: ${index}`);
+          errors.links.push({
+            index,
+            attribute: 'url',
+            detail: 'Invalid URL',
+          });
         }
       });
     }

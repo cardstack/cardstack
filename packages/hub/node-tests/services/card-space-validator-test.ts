@@ -78,10 +78,26 @@ describe('CardSpaceValidator', function () {
 
     let errors = await subject.validate(cardSpace);
     expect(errors.links).deep.equal([
-      'Title must be present. Link index: 0',
-      'Invalid URL. Link index: 0',
-      'Max title length is 50. Link index: 2',
-      'Link must be present. Link index: 2',
+      {
+        index: 0,
+        attribute: 'title',
+        detail: 'Must be present',
+      },
+      {
+        index: 0,
+        attribute: 'url',
+        detail: 'Invalid URL',
+      },
+      {
+        index: 2,
+        attribute: 'title',
+        detail: 'Max length is 50',
+      },
+      {
+        index: 2,
+        attribute: 'url',
+        detail: 'Must be present',
+      },
     ]);
   });
 
