@@ -270,7 +270,7 @@ module('Acceptance | withdrawal', function (hooks) {
       );
     await waitFor(postableSel(4, 1));
 
-    layer2Service.test__simulateBridgedToLayer1(
+    await layer2Service.test__simulateBridgedToLayer1(
       merchantAddress,
       layer1AccountAddress,
       'CARD',
@@ -327,11 +327,14 @@ module('Acceptance | withdrawal', function (hooks) {
     await waitFor(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`);
 
     assert
+      .dom(`${epiloguePostableSel(3)} [data-test-safe-address]`)
+      .containsText(merchantAddress);
+    assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
-      .containsText('250.00');
+      .containsText('125.00');
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD.CPXD"]`)
-      .containsText('500.00');
+      .containsText('250.00');
     assert
       .dom(
         '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'

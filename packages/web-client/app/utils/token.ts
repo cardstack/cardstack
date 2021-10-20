@@ -75,6 +75,18 @@ export function getUnbridgedSymbol(
   }
 }
 
+export function getBridgedSymbol(
+  unbridgedSymbol: BridgeableSymbol
+): BridgedTokenSymbol {
+  if (unbridgedSymbol === tokenSymbols['DAI']) {
+    return tokenSymbols['DAI.CPXD'];
+  } else if (unbridgedSymbol === tokenSymbols['CARD']) {
+    return tokenSymbols['CARD.CPXD'];
+  } else {
+    throw new Error(`Unknown unbridgedSymbol ${unbridgedSymbol}`);
+  }
+}
+
 export function isBridgedTokenSymbol(
   symbol: TokenSymbol
 ): symbol is BridgedTokenSymbol {
