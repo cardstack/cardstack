@@ -259,8 +259,9 @@ export class Compiler {
     format: Format
   ): Promise<ComponentInfo> {
     let options: CardComponentPluginOptions = {
-      fields,
       cardURL,
+      componentFile: localFile,
+      fields,
       inlineHBS: undefined,
       defaultFieldFormat: defaultFieldFormat(format),
       usedFields: [],

@@ -15,8 +15,9 @@ import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildSerializerMapFromUsedFields, buildUsedFieldsListFromUsageMeta } from './utils/fields';
 export interface CardComponentPluginOptions {
-  fields: CompiledCard['fields'];
   cardURL: string;
+  componentFile?: string;
+  fields: CompiledCard['fields'];
   defaultFieldFormat: Format;
   // these are for gathering output
   usedFields: string[];
@@ -36,6 +37,9 @@ const BASE_MODEL_VAR_NAME = 'BaseModel';
 export default function (templateSource: string, options: CardComponentPluginOptions): string {
   let out = transformSync(templateSource, {
     plugins: [[babelPluginCardTemplate, options], classPropertiesPlugin],
+    // HACK: The / resets the relative path setup, removing the cwd of the hub.
+    // This allows the error module to look a lot more like the card URL.
+    filename: `/${options.cardURL}/${options.componentFile}`,
   });
 
   return out!.code!;
@@ -223,6 +227,7 @@ function transformTemplate(
     fields: opts.fields,
     usageMeta,
     defaultFieldFormat: opts.defaultFieldFormat,
+    moduleName: `${opts.cardURL}/${opts.componentFile}`,
     importAndChooseName,
   });
 
