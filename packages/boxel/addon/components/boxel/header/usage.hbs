@@ -5,73 +5,46 @@
   <:example>
     <Boxel::Header
       @header={{this.header}}
-      @selectionHeader={{this.selectionHeader}}
-      @isSelected={{this.isSelected}}
-      @editable={{this.editable}}
-      @editAction={{@editAction}}
-      @hasContextMenu={{this.hasContextMenu}}
-      @expandable={{this.expandable}}
-      @expandAction={{@expandAction}}
       @noBackground={{this.noBackground}}
-    />
+      @isHighlighted={{this.isHighlighted}}
+    >
+      <button>Edit</button>
+      {{!-- Usage with Boxel::IconButton component --}}
+      <Boxel::IconButton
+        @icon="more-actions"
+        @height="30px"
+        aria-label="More Actions"
+      />
+      <Boxel::IconButton
+        @icon="expand"
+        @height="30px"
+        aria-label="Isolate"
+      />
+    </Boxel::Header>
   </:example>
   <:api as |Args|>
     <Args.String
       @name="header"
-      @description="header label text"
-      @required={{true}}
+      @description="Header label text"
       @value={{this.header}}
       @onInput={{fn (mut this.header)}}
     />
     <Args.Bool
       @name="noBackground"
-      @description="(styling) header does not have background color"
+      @description="(styling) Removes background color"
       @defaultValue={{false}}
       @value={{this.noBackground}}
       @onInput={{fn (mut this.noBackground)}}
     />
     <Args.Bool
-      @name="selectionHeader"
-      @description="header label is a button"
+      @name="isHighlighted"
+      @description="(styling) Highlights header"
       @defaultValue={{false}}
-      @value={{this.selectionHeader}}
-      @onInput={{fn (mut this.selectionHeader)}}
+      @value={{this.isHighlighted}}
+      @onInput={{fn (mut this.isHighlighted)}}
     />
-    <Args.Bool
-      @name="isSelected"
-      @description="header is selected (use with `selectionHeader` arg for semantic ui)"
-      @defaultValue={{false}}
-      @value={{this.isSelected}}
-      @onInput={{fn (mut this.isSelected)}}
-    />
-    <Args.Bool
-      @name="editable"
-      @description="display 'edit' button on the header"
-      @defaultValue={{false}}
-      @value={{this.editable}}
-      @onInput={{fn (mut this.editable)}}
-    />
-    <Args.Action
-      @name="editAction"
-      @description="action for the `edit` button"
-    />
-    <Args.Bool
-      @name="hasContextMenu"
-      @description="header has 'more actions' dropdown menu"
-      @defaultValue={{false}}
-      @value={{this.hasContextMenu}}
-      @onInput={{fn (mut this.hasContextMenu)}}
-    />
-    <Args.Bool
-      @name="expandable"
-      @description="display expand button on the header"
-      @defaultValue={{false}}
-      @value={{this.expandable}}
-      @onInput={{fn (mut this.expandable)}}
-    />
-    <Args.Action
-      @name="expandAction"
-      @description="action for the `expand` button"
+    <Args.Yield
+      @description="Content"
     />
   </:api>
 </Freestyle::Usage>

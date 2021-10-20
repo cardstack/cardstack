@@ -1,57 +1,18 @@
 <header class={{cn
     "boxel-header"
     boxel-header--no-background=@noBackground
-    boxel-header--selected=@isSelected
+    boxel-header--highlighted=@isHighlighted
   }}
   data-test-boxel-header
   ...attributes
 >
-  {{#if @selectionHeader}}
-    <button
-      class="boxel-header__button boxel-header__label-text-button"
-      {{on "click" (optional @selectAction)}}
-      data-test-boxel-header-label-button
-    >
-      {{@header}}
-    </button>
-  {{else}}
-    <span class="boxel-header__label" data-test-boxel-header-label>
+  {{#if @header}}
+    <span data-test-boxel-header-label>
       {{@header}}
     </span>
   {{/if}}
 
-  {{#if (or @editable @hasContextMenu @expandable)}}
-    <div class="boxel-header__button-group" data-test-boxel-header-button-group>
-      {{yield}}
-      {{#if @editable}}
-        <button
-          class="boxel-header__button boxel-header__text-button"
-          {{on "click" (optional @editAction)}}
-          data-test-boxel-header-button
-          data-test-boxel-header-edit-button
-        >
-          Edit
-        </button>
-      {{/if}}
-      {{#if @hasContextMenu}}
-        <Boxel::IconButton
-          class="boxel-header__button"
-          @icon="more-actions"
-          aria-label="More Actions"
-          data-test-boxel-header-button
-          data-test-boxel-header-menu-button
-        />
-      {{/if}}
-      {{#if @expandable}}
-        <Boxel::IconButton
-          class="boxel-header__button"
-          @icon="expand"
-          aria-label="Isolate"
-          {{on "click" (optional @expandAction)}}
-          data-test-boxel-header-button
-          data-test-boxel-header-expand-button
-        />
-      {{/if}}
-    </div>
-  {{/if}}
+  <div class="boxel-header__content" data-test-boxel-header-content>
+    {{yield}}
+  </div>
 </header>

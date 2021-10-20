@@ -1,37 +1,35 @@
 {{!-- template-lint-disable no-inline-styles --}}
 <Freestyle::Usage @name="CardContainer">
   <:description>
-    A wrapper container for a card. 
+    A wrapper container for a card.
   </:description>
   <:example>
     <Boxel::CardContainer
       @displayBoundaries={{this.displayBoundaries}}
-      @isSelected={{this.isSelected}}
+      @isHighlighted={{this.isHighlighted}}
     >
-      {{!-- Sample block yield --}}
+      {{!-- Usage with Boxel::Header component --}}
         <Boxel::Header
           @header="Card"
-          @isSelected={{this.isSelected}}
-          @selectionHeader={{true}}
+          @isHighlighted={{this.isHighlighted}}
         />
         <div>Card Here</div>
-      {{!-- End of sample block yield --}}
     </Boxel::CardContainer>
   </:example>
   <:api as |Args|>
     <Args.Bool
       @name="displayBoundaries"
-      @description="Displays card borders"
+      @description="(styling) Displays card boundary"
       @defaultValue={{false}}
       @value={{this.displayBoundaries}}
       @onInput={{fn (mut this.displayBoundaries)}}
     />
     <Args.Bool
-      @name="isSelected"
-      @description="Highlights card borders"
+      @name="isHighlighted"
+      @description="(styling) Highlights card boundary"
       @defaultValue={{false}}
-      @value={{this.isSelected}}
-      @onInput={{fn (mut this.isSelected)}}
+      @value={{this.isHighlighted}}
+      @onInput={{fn (mut this.isHighlighted)}}
     />
     <Args.Yield
       @description="Unstyled area for custom card content and fields"
@@ -44,7 +42,7 @@
     <Boxel::CardContainer @displayBoundaries={{true}}>
       <div style="display:grid; grid-template-rows: 5rem;">
         <div style="margin: auto">
-          One strategy to consider is using a root element with `display: grid` to layout the contents of your card.  
+          One strategy to consider is using a root element with `display: grid` to layout the contents of your card.
         </div>
       </div>
     </Boxel::CardContainer>
