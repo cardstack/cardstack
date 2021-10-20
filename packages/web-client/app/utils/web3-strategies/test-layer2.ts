@@ -477,12 +477,12 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return this.test__deferredHubAuthentication.resolve(authToken);
   }
 
-  test__simulateBridgedToLayer1(
+  async test__simulateBridgedToLayer1(
     safeAddress?: string,
     receiverAddress?: string,
     tokenSymbol?: BridgeableSymbol,
     amountInWei?: string
-  ): void {
+  ): Promise<void> {
     if (safeAddress && receiverAddress && tokenSymbol && amountInWei) {
       let matchingRequest = this.bridgeToLayer1Requests.find(
         (request) =>
@@ -519,5 +519,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       encodedData: 'example-encoded-data',
       signatures: ['example-sig'],
     });
+
+    return this.test__simulateAccountsChanged([this.walletInfo.firstAddress!]);
   }
 }

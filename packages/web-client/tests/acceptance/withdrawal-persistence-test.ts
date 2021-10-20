@@ -92,6 +92,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
+        safeBalanceCardKey: 'withdrawalSafe',
         withdrawalSafe: withdrawalSafeAddress,
         meta: {
           version: WORKFLOW_VERSION,
@@ -146,6 +147,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
+        safeBalanceCardKey: 'withdrawalSafe',
         withdrawalSafe: withdrawalSafeAddress,
         meta: {
           version: WORKFLOW_VERSION,
@@ -210,6 +212,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
+        safeBalanceCardKey: 'withdrawalSafe',
         withdrawalSafe: withdrawalSafeAddress,
         meta: {
           version: WORKFLOW_VERSION,
@@ -324,6 +327,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
         relayTokensTxnHash:
           '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
+        safeBalanceCardKey: 'withdrawalSafe',
         withdrawalSafe: withdrawalSafeAddress,
         meta: {
           version: WORKFLOW_VERSION,
@@ -381,6 +385,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
           messageId:
             '0x00050000249bfc2f3cc8d68f6b6bf7230ea0a8ed853de7310000000000000b08',
         },
+        safeBalanceCardKey: 'withdrawalSafe',
         withdrawalSafe: withdrawalSafeAddress,
         meta: {
           version: WORKFLOW_VERSION - 1,
