@@ -160,7 +160,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
             'TRANSACTION_STATUS',
             'TOKEN_CLAIM',
             'TRANSACTION_CONFIRMED',
-            'EPILOGUE_LAYER_TWO_CONNECT_CARD',
+            'EPILOGUE_SAFE_BALANCE_CARD',
           ],
         },
         didClaimTokens: true,
