@@ -18,10 +18,10 @@
   },
   "include": [
     "./packages/cardie/**/*.ts",
-    "packages/cardbot/**/*.ts",
     "./packages/cardpay-cli/**/*.ts",
     "./packages/cardpay-sdk/**/*.ts",
     "./packages/cardpay-subgraph/**/*.ts",
+    "./packages/discord-bot/**/*.ts",
     "./packages/did-resolver/**/*.ts",
     "./packages/eslint-config/**/*.ts",
     "./packages/firebase-functions/**/*.ts",

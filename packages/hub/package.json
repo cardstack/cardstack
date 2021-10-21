@@ -17,18 +17,19 @@
     "db:migrate": "node-pg-migrate",
     "test": "npm-run-all test:*",
     "test:node": "NODE_ENV=test mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
-    "test:bot": "rm -f ./bot-tests/*.d.ts && rm -f ./bot-tests/*.js* && corde",
+    "test:remove-ts-artifacts-for-corde": "find ./bot-tests \\( -name \"*.d.ts\" -or -name \"*.js\" -or -name \"*.js.map\" \\) -exec rm -f {} \\;",
+    "test:bot": "yarn test:remove-ts-artifacts-for-corde && corde",
     "autotest": "NODE_ENV=test mocha -w --reporter=min mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.18.0",
     "@aws-sdk/client-sts": "^3.18.0",
     "@babel/core": "^7.12.13",
-    "@cardstack/cardbot": "0.27.6",
     "@cardstack/cardpay-sdk": "0.27.6",
     "@cardstack/core": "0.27.6",
     "@cardstack/db": "0.27.6",
     "@cardstack/di": "0.27.6",
+    "@cardstack/discord-bot": "0.27.6",
     "@cardstack/did-resolver": "0.27.6",
     "@cardstack/logger": "^0.2.1",
     "@graphile/logger": "^0.2.0",
@@ -44,6 +45,7 @@
     "@types/semver": "^7.3.6",
     "@types/tmp": "^0.2.0",
     "@types/uuid": "^8.3.0",
+    "@walletconnect/web3-provider": "^1.6.0",
     "assert-never": "^1.2.1",
     "auto-bind": "^4.0.0",
     "config": "^3.3.6",
@@ -83,6 +85,7 @@
     "uuid": "^8.3.2",
     "walk-sync": "^2.2.0",
     "web3": "1.5.2",
+    "web3-core": "1.5.2",
     "yargs": "^17.0.0"
   },
   "devDependencies": {

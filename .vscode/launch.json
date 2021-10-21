@@ -55,7 +55,7 @@
       "program": "${workspaceRoot}/node_modules/.bin/corde",
       "cwd": "${workspaceRoot}/packages/hub",
       "console": "integratedTerminal",
-      "args": ["--files", "./bot-tests/**"],
+      "args": ["--files", "./bot-tests/services/discord-bots/hub-bot/**/*.ts"],
     },
     {
       "type": "node",
