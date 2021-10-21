@@ -457,6 +457,9 @@ describe('PUT /api/card-spaces', function () {
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .expect({
+        meta: {
+          network: 'sokol',
+        },
         data: {
           type: 'card-spaces',
           id: 'ab70b8d5-95f5-4c20-997c-4db9013b347c',
