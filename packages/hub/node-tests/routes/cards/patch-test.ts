@@ -61,7 +61,7 @@ if (process.env.COMPILER) {
       }).expect(404);
     });
 
-    it('can update an existing card', async function () {
+    it('can update an existing data only card', async function () {
       let initialResponse = await updateCard('https://my-realm/post0', {
         data: {
           attributes: {
@@ -80,6 +80,22 @@ if (process.env.COMPILER) {
         title: 'Goodbye World!',
         body: 'First post',
       });
+    });
+
+    it('can update a card that has a schema file', async function () {
+      let attributes = {
+        title: 'Placeholder Title',
+        body: 'Placeholder Body',
+      };
+      let initialResponse = await updateCard('https://my-realm/post', {
+        data: {
+          attributes,
+        },
+      }).expect(200);
+      expect(initialResponse.body.data.attributes).to.deep.equal(attributes);
+
+      let response = await getCard('https://my-realm/post').expect(200);
+      expect(response.body.data?.attributes).to.deep.equal(attributes);
     });
   });
 }
