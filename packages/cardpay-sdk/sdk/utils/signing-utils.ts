@@ -259,29 +259,10 @@ export async function signMultiOwnerSafe(
   );
 
   let contractSignature = createContractSignatureRSV(verifyingContractAddress);
-  rsvSignatures.push(ownerSignature)
-  rsvSignatures.push(contractSignature)
-  return rsvSignatures
-
-
-  // let sortedSignatures = sortSignatures(ownerSignature.replace("0x",""), contractSignature, owner, verifyingContractAddress)
-  // let verifyingSignature = createVerifyingSignature(
-  //   web3,
-  //   to,
-  //   value.toString(),
-  //   data,
-  //   operation.toString(),
-  //   txGasEstimate,
-  //   baseGasEstimate,
-  //   gasPrice,
-  //   txGasToken,
-  //   refundReceiver,
-  //   nonce
-  // )
-  // console.log(ownerSignature)
-  // console.log(contractSignature)
-  // console.log(verifyingSignature)
-  // return "0x"+ sortedSignatures[0]+ sortedSignatures[1] + verifyingSignature
+  rsvSignatures.push(ownerSignature);
+  rsvSignatures.push(contractSignature);
+  let sortedRSVSignatures = sortSignatures(ownerSignature, contractSignature, owner, verifyingContractAddress);
+  return sortedRSVSignatures;
 }
 
 // TODO: incorporate pre-validated signatures (that is a type of contract signature too)
@@ -320,15 +301,15 @@ export function createVerifyingSignature(
   return verifyingDataLength + verifyingData;
 }
 
-// function sortSignatures(
-//   ownerSignature: string,
-//   contractSignature: string,
-//   safeOwnerAddress: string,
-//   contractAddress: string
-// ) {
-//   if (safeOwnerAddress.toLowerCase() < contractAddress.toLowerCase()) {
-//     return [ownerSignature, contractSignature];
-//   } else {
-//     return [contractSignature, ownerSignature];
-//   }
-// }
+function sortSignatures(
+  ownerSignature: Signature,
+  contractSignature: Signature,
+  safeOwnerAddress: string,
+  contractAddress: string
+) {
+  if (safeOwnerAddress.toLowerCase() < contractAddress.toLowerCase()) {
+    return [ownerSignature, contractSignature];
+  } else {
+    return [contractSignature, ownerSignature];
+  }
+}
