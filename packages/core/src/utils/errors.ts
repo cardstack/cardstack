@@ -1,19 +1,24 @@
 import { difference } from 'lodash';
 
+interface CardErrorOptions {
+  cause?: unknown;
+}
 export class CardError extends Error {
   isCardError = true;
   cause?: unknown;
 
-  constructor(message: string, options: { cause?: unknown } = {}) {
+  constructor(message: string, options: CardErrorOptions = {}) {
     super(message);
     if (options.cause) {
       this.cause = options.cause;
     }
   }
+
+  static fromError(error: any, options?: CardErrorOptions): CardError {
+    return new CardError(error.message, Object.assign({ cause: error }, options));
+  }
 }
 export class InvalidKeysError extends CardError {}
-
-const BLESSED_ERRORS = ['SyntaxError'];
 
 export function assertValidKeys(actualKeys: string[], expectedKeys: string[], errorMessage: string) {
   let unexpectedFields = difference(actualKeys, expectedKeys);
@@ -28,9 +33,9 @@ export function printCompilerError(err: any) {
     return String(err);
   }
 
-  return err.stack;
+  return `${err.message}\n\n${err.stack}`;
 }
 
 function isAcceptableError(err: any) {
-  return err.isCardError || BLESSED_ERRORS.includes(err.name);
+  return err.isCardError || err.code === 'BABEL_PARSE_ERROR';
 }

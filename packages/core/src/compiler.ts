@@ -1,5 +1,5 @@
 import { JS_TYPE } from './utils/content';
-import { transformSync } from '@babel/core';
+import { BabelFileResult, transformSync } from '@babel/core';
 // @ts-ignore
 import decoratorsPlugin from '@babel/plugin-proposal-decorators';
 // @ts-ignore
@@ -16,7 +16,7 @@ import transformCardComponent, {
 import { Builder, CompiledCard, ComponentInfo, FEATURE_NAMES, Format, FORMATS, RawCard } from './interfaces';
 import { getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
-import { assertValidKeys } from './utils/errors';
+import { assertValidKeys, CardError } from './utils/errors';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -54,7 +54,7 @@ export class Compiler {
       parentCard = await this.getParentCard(cardSource, meta);
 
       if (!parentCard) {
-        throw new Error(`${cardSource.url} does not have a parent card. This is wrong and should not happen.`);
+        throw new CardError(`${cardSource.url} does not have a parent card. This is wrong and should not happen.`);
       }
 
       if (!schemaModule) {
@@ -65,7 +65,7 @@ export class Compiler {
 
       if (parentCard.serializer) {
         if (serializer && parentCard.serializer !== serializer) {
-          throw new Error(
+          throw new CardError(
             `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${cardSource.url}:${serializer} Parent: ${parentCard.url}:${parentCard.serializer}`
           );
         }
@@ -146,7 +146,7 @@ export class Compiler {
   private getFile(cardSource: RawCard, path: string): string {
     let fileSrc = cardSource.files && cardSource.files[path];
     if (!fileSrc) {
-      throw new Error(`${cardSource.url} refers to ${path} in its card.json but that file does not exist`);
+      throw new CardError(`${cardSource.url} refers to ${path} in its card.json but that file does not exist`);
     }
     return fileSrc;
   }
@@ -166,13 +166,18 @@ export class Compiler {
       return undefined;
     }
     let schemaSrc = this.getFile(cardSource, schemaLocalFilePath);
-    let out = transformSync(schemaSrc, {
-      plugins: [
-        [cardSchemaPlugin, options],
-        [decoratorsPlugin, { decoratorsBeforeExport: false }],
-        classPropertiesPlugin,
-      ],
-    });
+    let out: BabelFileResult;
+    try {
+      out = transformSync(schemaSrc, {
+        plugins: [
+          [cardSchemaPlugin, options],
+          [decoratorsPlugin, { decoratorsBeforeExport: false }],
+          classPropertiesPlugin,
+        ],
+      })!;
+    } catch (error) {
+      throw CardError.fromError(error);
+    }
 
     let code = out!.code!;
     return await this.builder.define(cardSource.url, schemaLocalFilePath, JS_TYPE, code);
@@ -197,7 +202,7 @@ export class Compiler {
     let fieldNameCollisions = intersection(cardFieldNames, parentFieldNames);
 
     if (fieldNameCollisions.length) {
-      throw Error(`Field collision on ${fieldNameCollisions.join()} with parent card ${parentCard.url}`);
+      throw new CardError(`Field collision on ${fieldNameCollisions.join()} with parent card ${parentCard.url}`);
     }
 
     return Object.assign({}, parentCard.fields, fields);
@@ -226,7 +231,7 @@ export class Compiler {
     if (!localFilePath) {
       // we don't have an implementation of our own
       if (!parentCard) {
-        throw new Error(`${cardSource.url} doesn't have a ${which} component OR a parent card. This is not right.`);
+        throw new CardError(`${cardSource.url} doesn't have a ${which} component OR a parent card. This is not right.`);
       }
 
       if (cardSource.schema) {
@@ -234,7 +239,7 @@ export class Compiler {
         let originalRawCard = await this.builder.getRawCard(parentCard[which].sourceCardURL);
         let srcLocalPath = originalRawCard[which];
         if (!srcLocalPath) {
-          throw new Error(
+          throw new CardError(
             `bug: ${parentCard.url} says it got ${which} from ${parentCard[which].sourceCardURL}, but that card does not have a ${which} component`
           );
         }
