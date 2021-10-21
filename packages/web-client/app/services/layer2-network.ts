@@ -143,7 +143,7 @@ export default class Layer2Network
 
     yield all([
       this.safes.updateOne(prepaidCardSafe.address),
-      this.safes.updateDepot(),
+      this.safes.updateOne(sourceAddress),
     ]);
 
     return prepaidCardSafe;

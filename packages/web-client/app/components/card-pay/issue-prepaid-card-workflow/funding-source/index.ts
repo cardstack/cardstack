@@ -127,6 +127,7 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
       this.args.workflowSession.setValue({
         prepaidFundingToken: this.selectedTokenSymbol,
         prepaidFundingSafeAddress: this.selectedSafe!.address,
+        safeBalanceCardKey: 'prepaidFundingSafeAddress',
       });
     }
     this.args.onComplete?.();
