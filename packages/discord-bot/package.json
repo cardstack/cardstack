@@ -20,7 +20,12 @@
     "qrcode": "^1.4.4",
     "tmp": "^0.2.1"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "config": {
     "access": "public"
-  }
+  },
+  "gitHead": "b17d8fbb592bcb823dd23179767fdaba0d46a74e"
 }
