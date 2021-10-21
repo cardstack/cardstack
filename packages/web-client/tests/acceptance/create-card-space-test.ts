@@ -108,6 +108,8 @@ module('Acceptance | create card space', function (hooks) {
       .containsText(`Fill out the Card Space details`);
 
     await click('[data-test-card-space-details-start-button]');
+    await click('[data-test-card-space-edit-details-save-button]');
+
     assert.dom('[data-test-card-space-details-is-complete]').exists();
 
     await waitFor(milestoneCompletedSel(2));

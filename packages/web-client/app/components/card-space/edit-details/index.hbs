@@ -1,0 +1,18 @@
+<ActionCardContainer
+  @header="Card Space Setup"
+>
+  <ActionCardContainer::Section @title="Edit your Card Space details">
+  </ActionCardContainer::Section>
+
+  <Boxel::ActionChin
+  >
+    <:default as |d|>
+      <d.ActionButton
+        {{on "click" @onSave}}
+        data-test-card-space-edit-details-save-button
+      >
+        Save Choices
+      </d.ActionButton>
+    </:default>
+  </Boxel::ActionChin>
+</ActionCardContainer>
