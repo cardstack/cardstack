@@ -115,7 +115,7 @@ export default class Subgraph {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     subgraph: Subgraph;
   }

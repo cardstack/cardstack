@@ -21,9 +21,9 @@ export async function getWeb3(network: string, mnemonic?: string): Promise<Web3>
     let provider = new WalletConnectProvider({
       clientMeta: {
         description: '',
-        url: 'http://localhost:3000',
+        url: 'https://app.cardstack.com',
         icons: [],
-        name: 'Cardstack',
+        name: 'Cardstack - Cardpay CLI',
       },
       rpc: {
         [networkIds[network]]: getConstantByNetwork('rpcNode', network),

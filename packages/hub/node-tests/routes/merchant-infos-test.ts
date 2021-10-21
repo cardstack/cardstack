@@ -1,4 +1,4 @@
-import { Registry } from '../../di/dependency-injection';
+import { Registry } from '@cardstack/di';
 import { Job, TaskSpec } from 'graphile-worker';
 import { setupServer } from '../helpers/server';
 

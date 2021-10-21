@@ -1,4 +1,4 @@
-import { Registry } from '../../di/dependency-injection';
+import { Registry } from '@cardstack/di';
 import Web3 from 'web3';
 import { setupServer } from '../helpers/server';
 

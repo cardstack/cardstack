@@ -15,7 +15,7 @@ import CardSpacesRoute from '../routes/card-spaces';
 import ReservationsRoute from '../routes/reservations';
 import OrdersRoute from '../routes/orders';
 import InventoryRoute from '../routes/inventory';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import CustodialWalletRoute from '../routes/custodial-wallet';
 import { parseBody } from '../middleware';
 
@@ -74,6 +74,7 @@ export default class APIRouter {
     apiSubrouter.post('/reservations', parseBody, reservationsRoute.post);
     apiSubrouter.get('/reservations/:reservation_id', reservationsRoute.get);
     apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);
+    apiSubrouter.get('/card-spaces/validate-url/:url', cardSpacesRoute.getUrlValidation);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();
@@ -99,7 +100,7 @@ function verifyJSONAPI(ctxt: RouterContext<any, any>, next: Koa.Next) {
 function notFound(ctx: Koa.Context) {
   ctx.status = 404;
 }
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'api-router': APIRouter;
   }

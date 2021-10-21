@@ -1,8 +1,10 @@
 import { ComponentInfo, RawCard, CompiledCard, Field } from '@cardstack/core/src/interfaces';
 import type { CardJSONResponse } from '@cardstack/core/src/interfaces';
-import { Serializer } from 'jsonapi-serializer';
+import { Serializer, SerializerOptions } from 'jsonapi-serializer';
 import _mapKeys from 'lodash/mapKeys';
 import _camelCase from 'lodash/camelCase';
+import mergeWith from 'lodash/mergeWith';
+import uniq from 'lodash/uniq';
 import { findIncluded } from '@cardstack/core/src/jsonapi';
 
 export async function serializeCard(
@@ -11,13 +13,38 @@ export async function serializeCard(
   component: ComponentInfo
 ): Promise<CardJSONResponse> {
   let cardSerializer = new Serializer('card', {
-    attributes: component.usedFields,
+    ...convertUsedFields(component.usedFields),
     keyForAttribute: 'camelCase',
     dataMeta: {
       componentModule: component.moduleName,
     },
   });
   return cardSerializer.serialize(Object.assign({ id: url }, data));
+}
+
+function mergeWithUniq(dest: Record<string, unknown>, ...srcs: Record<string, unknown>[]) {
+  return mergeWith(dest, ...srcs, appendArraysUniq);
+}
+
+function appendArraysUniq(objValue: any, srcValue: any) {
+  if (Array.isArray(objValue)) {
+    return uniq(objValue.concat(srcValue));
+  }
+  return undefined;
+}
+
+function convertUsedFields(usedFields: string[]): SerializerOptions {
+  let result: SerializerOptions = {
+    attributes: [],
+  };
+  for (let fieldName of usedFields) {
+    let [first, ...rest] = fieldName.split('.');
+    result.attributes!.push(first);
+    if (rest.length > 0) {
+      result[first] = mergeWithUniq({}, result[first], convertUsedFields([rest.join('.')]));
+    }
+  }
+  return result;
 }
 
 export function deserialize(payload: any): any {

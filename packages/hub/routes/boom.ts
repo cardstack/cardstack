@@ -1,12 +1,11 @@
 import Koa from 'koa';
-import { inject } from '../di/dependency-injection';
-import { AuthenticationUtils } from '../utils/authentication';
+import { inject } from '@cardstack/di';
 import packageJson from '../package.json';
 import autoBind from 'auto-bind';
 import * as Sentry from '@sentry/node';
 
 export default class BoomRoute {
-  authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
+  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   constructor() {
     autoBind(this);
   }
@@ -38,7 +37,7 @@ export default class BoomRoute {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'boom-route': BoomRoute;
   }

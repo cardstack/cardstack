@@ -1,11 +1,8 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import DatabaseManager from '../services/database-manager';
 import { ensureLoggedIn } from './utils/auth';
-import { inject } from '../di/dependency-injection';
-import { AuthenticationUtils } from '../utils/authentication';
+import { inject } from '@cardstack/di';
 import { validateRequiredFields } from './utils/validation';
-import { getSKUSummaries } from './utils/inventory';
 import { handleError } from './utils/error';
 import { validate as validateUUID } from 'uuid';
 import * as Sentry from '@sentry/node';
@@ -16,11 +13,11 @@ import Logger from '@cardstack/logger';
 let log = Logger('routes:reservations');
 
 export default class ReservationsRoute {
-  authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
-  subgraph = inject('subgraph');
+  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
   web3 = inject('web3');
   relay = inject('relay');
-  databaseManager: DatabaseManager = inject('database-manager', { as: 'databaseManager' });
+  inventory = inject('inventory');
+  databaseManager = inject('database-manager', { as: 'databaseManager' });
 
   constructor() {
     autoBind(this);
@@ -102,12 +99,7 @@ export default class ReservationsRoute {
       return;
     }
 
-    let skuSummaries = await getSKUSummaries(
-      await this.databaseManager.getClient(),
-      this.subgraph,
-      this.web3,
-      this.relay
-    );
+    let skuSummaries = await this.inventory.getSKUSummaries();
     let skuSummary = skuSummaries.find((summary) => summary.id === sku);
     if (skuSummary?.attributes?.quantity === 0) {
       handleError(ctx, 400, 'No inventory available', `There are no more prepaid cards available for the SKU ${sku}`);
@@ -159,7 +151,7 @@ function handleNotFound(ctx: Koa.Context) {
   handleError(ctx, 404, 'Reservation not found', `Could not find the reservation ${ctx.params.reservation_id}`);
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'reservations-route': ReservationsRoute;
   }

@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'packages/hub/**'
+      - 'packages/cardbot/**'
       - 'packages/did-resolver/**'
       - 'packages/test-support/**'
       - 'packages/core/**'
@@ -19,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERVER_SECRET: ${{ secrets.SERVER_SECRET }}
+      CARDBOT_TOKEN: ${{ secrets.CARDBOT_TOKEN }}
+      CORDE_BOT_TOKEN: ${{ secrets.CORDE_BOT_TOKEN }}
     services:
       postgres:
         image: postgres:13

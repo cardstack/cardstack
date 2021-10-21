@@ -4,7 +4,7 @@ import { Compiler } from '@cardstack/core/src/compiler';
 import { transformSync } from '@babel/core';
 import { NODE, BROWSER } from '../interfaces';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import walkSync from 'walk-sync';
 import { serverLog as logger } from '../utils/logger';
 
@@ -90,7 +90,7 @@ export default class CardBuilder implements BuilderInterface {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'card-builder': CardBuilder;
   }

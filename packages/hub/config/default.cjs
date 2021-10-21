@@ -25,6 +25,16 @@ module.exports = {
     'migration-filename-format': 'utc',
     'ignore-pattern': 'README.md|.*\\.ts|.*\\.js\\.map',
   },
+  discord: {
+    botId: '896093538297708564',
+    botToken: null,
+    cordeBotId: '898595095195029595',
+    cordeBotToken: null,
+    commandPrefix: '!',
+    betaTesterRole: 'Beta Tester',
+    allowedGuilds: '896093062562983986',
+    allowedChannels: '896093062562983989,898891181575000074',
+  },
   serverSecret: null,
   sentry: {
     dsn: null,
@@ -47,6 +57,14 @@ module.exports = {
   },
   web3: {
     network: 'sokol',
+  },
+  betaTesting: {
+    sku: '0x5e0d8bbe3c8e4d9013509b469dabfa029270b38a5c55c9c94c095ec6199d7fda',
+  },
+  walletConnect: {
+    bridge: 'https://safe-walletconnect.gnosis.io/',
+    clientURL: 'https://app.cardstack.com',
+    clientName: 'Cardstack',
   },
   compiler: {
     realmsConfig: defer(function () {

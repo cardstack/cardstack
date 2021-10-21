@@ -1,2 +1,3 @@
 web: node ./bin/hub server
 worker: node ./bin/hub worker
+bot: node ./bin/hub bot

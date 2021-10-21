@@ -52,7 +52,7 @@ export default class RealmManager implements RealmInterface {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'realm-manager': RealmManager;
   }

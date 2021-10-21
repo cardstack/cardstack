@@ -1,7 +1,6 @@
 import Koa from 'koa';
-import { inject } from '../di/dependency-injection';
-import { AuthenticationUtils } from '../utils/authentication';
-import NonceTracker, { MAX_NONCE_AGE_NS } from '../services/nonce-tracker';
+import { inject } from '@cardstack/di';
+import { MAX_NONCE_AGE_NS } from '../services/nonce-tracker';
 import { recoverTypedSignature } from 'eth-sig-util';
 import Logger from '@cardstack/logger';
 import packageJson from '../package.json';
@@ -10,8 +9,8 @@ import autoBind from 'auto-bind';
 let log = Logger('route:session');
 
 export default class SessionRoute {
-  authenticationUtils: AuthenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
-  nonceTracker: NonceTracker = inject('nonce-tracker', { as: 'nonceTracker' });
+  authenticationUtils = inject('authentication-utils', { as: 'authenticationUtils' });
+  nonceTracker = inject('nonce-tracker', { as: 'nonceTracker' });
   constructor() {
     autoBind(this);
   }
@@ -100,7 +99,7 @@ export default class SessionRoute {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'session-route': SessionRoute;
   }

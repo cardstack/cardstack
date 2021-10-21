@@ -13,6 +13,16 @@
   "db": {
     "url": "DATABASE_URL"
   },
+  "discord": {
+    "botId": "CARDBOT_ID",
+    "botToken": "CARDBOT_TOKEN",
+    "cordeBotId": "CORDE_BOT_ID",
+    "cordeBotToken": "CORDE_BOT_TOKEN",
+    "commandPrefix": "CARDBOT_COMMAND_PREFIX",
+    "betaTesterRole": "CARDBOT_BETA_TESTER_ROLE",
+    "allowedGuilds": "CARDBOT_ALLOWED_GUILDS",
+    "allowedChannels": "CARDBOT_ALLOWED_CHANNELS"
+  },
   "sentry": {
     "dsn": "HUB_SENTRY_DSN",
     "environment": "HUB_ENVIRONMENT"
@@ -26,12 +36,20 @@
   "web3": {
     "network": "NETWORK"
   },
+  "walletConnect": {
+    "bridge": "WALLET_CONNECT_BRIDGE",
+    "clientURL": "WALLET_CONNECT_CLIENT_URL",
+    "clientName": "WALLET_CONNECT_CLIENT_NAME"
+  },
   "exchangeRates": {
     "allowedDomains": "EXCHANGE_RATES_ALLOWED_DOMAINS",
     "apiKey": "FIXER_API_KEY"
   },
   "relay": {
     "provisionerSecret": "PROVISIONER_SECRET"
+  },
+  "betaTesting": {
+    "sku": "BETA_TEST_SKU"
   },
   "serverSecret": "SERVER_SECRET"
 }

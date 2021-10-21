@@ -1,7 +1,7 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import DatabaseManager from '../services/database-manager';
-import { inject } from '../di/dependency-injection';
+import DatabaseManager from '@cardstack/db';
+import { inject } from '@cardstack/di';
 import shortUuid from 'short-uuid';
 import CardSpaceSerializer from '../services/serializers/card-space-serializer';
 import { ensureLoggedIn } from './utils/auth';
@@ -19,6 +19,20 @@ export interface CardSpace {
   profileImageUrl: string;
   profileCoverImageUrl: string;
   ownerAddress: string;
+}
+
+function serializeErrors(errors: any) {
+  return Object.keys(errors).flatMap((attribute) => {
+    let errorsForAttribute = errors[attribute as keyof CardSpaceErrors];
+    return errorsForAttribute.map((errorMessage: string) => {
+      return {
+        status: '422',
+        title: 'Invalid attribute',
+        source: { pointer: `/data/attributes/${attribute}` },
+        detail: errorMessage,
+      };
+    });
+  });
 }
 
 export default class CardSpacesRoute {
@@ -56,21 +70,12 @@ export default class CardSpacesRoute {
     };
 
     let errors = await this.cardSpaceValidator.validate(cardSpace);
+    let hasErrors = Object.values(errors).flatMap((i) => i).length > 0;
 
-    if (Object.values(errors).flatMap((i) => i).length > 0) {
+    if (hasErrors) {
       ctx.status = 422;
       ctx.body = {
-        errors: Object.keys(errors).flatMap((attribute) => {
-          let errorsForAttribute = errors[attribute as keyof CardSpaceErrors];
-          return errorsForAttribute.map((errorMessage) => {
-            return {
-              status: '422',
-              title: 'Invalid attribute',
-              source: { pointer: `/data/attributes/${attribute}` },
-              detail: errorMessage,
-            };
-          });
-        }),
+        errors: serializeErrors(errors),
       };
     } else {
       await this.cardSpaceQueries.insert(cardSpace);
@@ -86,6 +91,21 @@ export default class CardSpacesRoute {
     ctx.type = 'application/vnd.api+json';
   }
 
+  async getUrlValidation(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+
+    let url: string = ctx.params.url;
+    let errors = await this.cardSpaceValidator.validate({ url } as CardSpace);
+
+    ctx.status = 200;
+    ctx.body = {
+      errors: serializeErrors(errors).filter((e) => e.source.pointer === '/data/attributes/url'),
+    };
+    ctx.type = 'application/vnd.api+json';
+  }
+
   sanitizeText(value: string | unknown): string {
     if (typeof value === 'string') {
       return value.trim().replace(/ +/g, ' ');
@@ -95,7 +115,7 @@ export default class CardSpacesRoute {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'card-spaces-route': CardSpacesRoute;
   }

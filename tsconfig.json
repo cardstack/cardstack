@@ -18,6 +18,7 @@
   },
   "include": [
     "./packages/cardie/**/*.ts",
+    "packages/cardbot/**/*.ts",
     "./packages/cardpay-cli/**/*.ts",
     "./packages/cardpay-sdk/**/*.ts",
     "./packages/cardpay-subgraph/**/*.ts",
@@ -25,6 +26,8 @@
     "./packages/eslint-config/**/*.ts",
     "./packages/firebase-functions/**/*.ts",
     "./packages/hub/**/*.ts",
+    "./packages/di/**/*.ts",
+    "./packages/db/**/*.ts",
     "./packages/test-support/**/*.ts",
     "./packages/core/**/*.ts",
     "**/.eslintrc.ts"

@@ -1,6 +1,6 @@
 import type { RawCard, Builder } from '@cardstack/core/src/interfaces';
 import type RealmManager from './services/realm-manager';
-import type { Registry } from './di/dependency-injection';
+import type { Registry } from '@cardstack/di';
 
 const ENVIRONMENTS_OBJ = {
   browser: '',

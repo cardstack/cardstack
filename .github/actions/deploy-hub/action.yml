@@ -39,3 +39,10 @@ runs:
       env:
         WAYPOINT_SERVER_TLS: '1'
         WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'
+
+    - name: Deploy bot
+      run: waypoint up --app=hub-bot -prune-retain=0 -plain
+      shell: bash
+      env:
+        WAYPOINT_SERVER_TLS: '1'
+        WAYPOINT_SERVER_TLS_SKIP_VERIFY: '1'

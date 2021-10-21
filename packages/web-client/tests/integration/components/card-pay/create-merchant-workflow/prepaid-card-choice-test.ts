@@ -18,7 +18,7 @@ const USER_REJECTION_ERROR_MESSAGE =
   'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
 const TIMEOUT_ERROR_MESSAGE =
   'There was a problem creating your merchant. Please contact Cardstack support to find out the status of your transaction.';
-const INSUFFICIENT_FUNDS_ERROR_MESSAGE = 'TODO insufficient funds message';
+const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `It looks like your prepaid card doesn't have enough funds to pay the 100 SPEND ($1.00 USD) merchant creation fee. Please try another prepaid card, or buy one in Card Wallet.`;
 const DEFAULT_ERROR_MESSAGE =
   'There was a problem creating your merchant. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact Cardstack support.';
 

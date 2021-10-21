@@ -7,7 +7,7 @@ export class Clock {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     clock: Clock;
   }

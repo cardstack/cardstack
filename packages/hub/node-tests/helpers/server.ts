@@ -2,7 +2,7 @@ import { HubServerConfig } from '../../interfaces';
 import Mocha from 'mocha';
 import { HubServer } from '../../main';
 import CardCache from '../../services/card-cache';
-import { Registry } from './../../di/dependency-injection';
+import { Registry } from '@cardstack/di';
 import { TestCardCacheConfig, ProjectTestRealm, resolveCard } from './cards';
 import supertest from 'supertest';
 

@@ -4,15 +4,13 @@
   border-radius: var(--boxel-border-radius);
   transition:
     max-width var(--boxel-transition),
-    border-radius var(--boxel-transition),
     box-shadow var(--boxel-transition);
-}
 }
 
 .boxel-card-container--boundaries {
   box-shadow: 0 0 0 1px var(--boxel-light-500);
 }
 
-.boxel-card-container--selected {
+.boxel-card-container--highlighted {
   box-shadow: 0 0 0 2px var(--boxel-highlight);
 }

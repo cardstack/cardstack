@@ -1,7 +1,6 @@
 import Koa from 'koa';
 import autoBind from 'auto-bind';
-import { inject } from '../di/dependency-injection';
-import ExchangeRatesService from '../services/exchange-rates';
+import { inject } from '@cardstack/di';
 import config from 'config';
 
 const allowedDomains: string[] = config.get('exchangeRates.allowedDomains');
@@ -16,7 +15,7 @@ if (!isValidAllowedDomainConfig(allowedDomains)) {
  * Provides exchange rate information for converting from USD to other currencies
  */
 export default class ExchangeRatesRoute {
-  exchangeRatesService: ExchangeRatesService = inject('exchange-rates', { as: 'exchangeRatesService' });
+  exchangeRatesService = inject('exchange-rates', { as: 'exchangeRatesService' });
 
   constructor() {
     autoBind(this);
@@ -68,7 +67,7 @@ export default class ExchangeRatesRoute {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'exchange-rates-route': ExchangeRatesRoute;
   }

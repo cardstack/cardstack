@@ -1,6 +1,6 @@
 import { encodeDID } from '@cardstack/did-resolver';
-import { inject } from '../../di/dependency-injection';
-import DatabaseManager from '../database-manager';
+import { inject } from '@cardstack/di';
+import DatabaseManager from '@cardstack/db';
 import PrepaidCardColorSchemeSerializer from './prepaid-card-color-scheme-serializer';
 import PrepaidCardPatternSerializer from './prepaid-card-pattern-serializer';
 
@@ -99,7 +99,7 @@ export default class PrepaidCardCustomizationSerializer {
   }
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'prepaid-card-customization-serializer': PrepaidCardCustomizationSerializer;
   }

@@ -2,7 +2,7 @@ import { sep } from 'path';
 import sane from 'sane';
 
 import Realm from '../realms/fs-realm';
-import { inject } from '../di/dependency-injection';
+import { inject } from '@cardstack/di';
 import { serverLog } from '../utils/logger';
 
 export default class CardWatcher {
@@ -60,7 +60,7 @@ function shouldIgnoreChange(segments: string[]): boolean {
   return segments.length < 2;
 }
 
-declare module '@cardstack/hub/di/dependency-injection' {
+declare module '@cardstack/di' {
   interface KnownServices {
     'card-watcher': CardWatcher;
   }
