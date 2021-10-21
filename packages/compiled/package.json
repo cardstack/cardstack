@@ -1,6 +1,6 @@
 {
   "name": "@cardstack/compiled",
-  "version": "0.27.7",
+  "version": "0.27.8",
   "private": true,
   "keywords": [
     "ember-addon"
@@ -19,8 +19,8 @@
     "node": ">= 14"
   },
   "dependencies": {
-    "@cardstack/boxel": "0.27.7",
-    "@cardstack/core": "0.27.7",
+    "@cardstack/boxel": "0.27.8",
+    "@cardstack/core": "0.27.8",
     "@embroider/addon-shim": "*",
     "@glimmer/component": "^1.0.3"
   },
