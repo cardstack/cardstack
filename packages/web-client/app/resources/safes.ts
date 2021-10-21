@@ -265,7 +265,7 @@ export class Safes extends Resource<Args> {
   }
 
   getByAddress(address: string): Safe | undefined {
-    return this.value.find((s) => s.address === address);
+    return this.safeReferences[address];
   }
 
   get graphDataByAddress() {
