@@ -5,9 +5,9 @@ import RewardPoolABI from '../../contracts/abi/v0.8.0/reward-pool';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, fromWei, toWei } from 'web3-utils';
-import { signSafeTx } from '../utils/signing-utils';
+import { signMultiOwnerSafe, signSafeTx, createVerifyingSignature } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
-import { getConstant } from '../constants';
+import { getConstant, ZERO_ADDRESS } from '../constants';
 import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import ERC677ABI from '../../contracts/abi/erc-677';
@@ -378,12 +378,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
 
     let payload = (await this.getRewardPool()).methods
-      .claim(
-        rewardProgramId,
-        tokenAddress,
-        weiAmount, //maybe in wei
-        proof
-      )
+      .claim(rewardProgramId, tokenAddress, weiAmount, proof)
       .encodeABI();
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, tokenAddress);
 
@@ -403,6 +398,36 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
         onNonce(nonce);
       }
     }
+    let fullSignature = await signMultiOwnerSafe(
+      this.layer2Web3,
+      rewardPoolAddress,
+      0,
+      payload,
+      0,
+      estimate.safeTxGas,
+      estimate.baseGas,
+      estimate.gasPrice,
+      tokenAddress,
+      ZERO_ADDRESS,
+      nonce,
+      rewardSafeOwner,
+      safeAddress,
+      await getAddress('rewardManager', this.layer2Web3)
+    );
+
+    let eip1271Data = createVerifyingSignature(
+      this.layer2Web3,
+      rewardPoolAddress,
+      '0',
+      payload,
+      '0',
+      estimate.safeTxGas,
+      estimate.baseGas,
+      estimate.gasPrice,
+      tokenAddress,
+      ZERO_ADDRESS,
+      nonce.toString()
+    );
     let gnosisTxn = await executeTransaction(
       this.layer2Web3,
       safeAddress,
@@ -410,7 +435,8 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       payload,
       estimate,
       nonce,
-      await signSafeTx(this.layer2Web3, safeAddress, rewardPoolAddress, payload, estimate, nonce, from)
+      fullSignature,
+      eip1271Data
     );
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);

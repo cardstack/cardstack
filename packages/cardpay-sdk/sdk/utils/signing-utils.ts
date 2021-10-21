@@ -2,7 +2,8 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { Estimate, SendPayload } from './safe-utils';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.8.0/prepaid-card-manager';
-import { AbiItem } from 'web3-utils';
+import { AbiItem, padLeft, toHex, numberToHex, hexToBytes } from 'web3-utils';
+
 import { getAddress } from '../../contracts/addresses';
 import { ZERO_ADDRESS } from '../constants';
 
@@ -224,18 +225,110 @@ export function ethSignSignatureToRSVForSafe(ethSignSignature: string) {
   };
 }
 
-export async function createContractSignature(
+export async function signMultiOwnerSafe(
+  web3: Web3,
+  to: string,
+  value: number,
+  data: any,
+  operation: number,
+  txGasEstimate: string,
+  baseGasEstimate: string,
+  gasPrice: string,
+  txGasToken: string,
+  refundReceiver: string,
+  nonce: any,
+  owner: string,
   gnosisSafeAddress: string,
   verifyingContractAddress: string
 ): Promise<any> {
-  console.log(gnosisSafeAddress);
-  console.log(verifyingContractAddress);
-  const tokenContract = new web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
-  // const threshold = (await gnosisSafe.getThreshold()).toNumber();
-  // const address = Web3.utils.padLeft(verifyingContractAddress, 64).replace('0x', '');
-  // const dynamicPosition = Web3.utils.padLeft(Web3.utils.toHex(threshold * 65), 64).replace('0x', '');
-  // const signatureType = '00';
-  // return address + dynamicPosition + signatureType;
-  return null
+  let rsvSignatures = [];
+  let [ownerSignature] = await signSafeTxAsRSV(
+    web3,
+    to,
+    value,
+    data,
+    operation,
+    txGasEstimate,
+    baseGasEstimate,
+    gasPrice,
+    txGasToken,
+    refundReceiver,
+    nonce,
+    owner,
+    gnosisSafeAddress
+  );
+
+  let contractSignature = createContractSignatureRSV(verifyingContractAddress);
+  rsvSignatures.push(ownerSignature)
+  rsvSignatures.push(contractSignature)
+  return rsvSignatures
+
+
+  // let sortedSignatures = sortSignatures(ownerSignature.replace("0x",""), contractSignature, owner, verifyingContractAddress)
+  // let verifyingSignature = createVerifyingSignature(
+  //   web3,
+  //   to,
+  //   value.toString(),
+  //   data,
+  //   operation.toString(),
+  //   txGasEstimate,
+  //   baseGasEstimate,
+  //   gasPrice,
+  //   txGasToken,
+  //   refundReceiver,
+  //   nonce
+  // )
+  // console.log(ownerSignature)
+  // console.log(contractSignature)
+  // console.log(verifyingSignature)
+  // return "0x"+ sortedSignatures[0]+ sortedSignatures[1] + verifyingSignature
 }
 
+// TODO: incorporate pre-validated signatures (that is a type of contract signature too)
+function createContractSignature(verifyingContractAddress: string): string {
+  const threshold = 2; //multi-owner in our protocol means two owners: eoa + contract
+  const address = padLeft(verifyingContractAddress, 64).replace('0x', '');
+  const dynamicPosition = padLeft(toHex(threshold * 65), 64).replace('0x', '');
+  const signatureType = '00';
+  return '0x' + address + dynamicPosition + signatureType;
+}
+
+function createContractSignatureRSV(verifyingContractAddress: string): Signature {
+  let contractSignature = createContractSignature(verifyingContractAddress);
+  return ethSignSignatureToRSVForSafe(contractSignature);
+}
+
+export function createVerifyingSignature(
+  web3: Web3,
+  to: string,
+  value: string,
+  data: string,
+  operation: string,
+  safeTxGas: string,
+  baseGas: string,
+  gasPrice: string,
+  gasToken: string,
+  refundReceiver: string,
+  nonce: string
+): string {
+  const signData = web3.eth.abi.encodeParameters(
+    ['address', 'uint256', 'bytes', 'uint8', 'uint256', 'uint256', 'uint256', 'address', 'address', 'uint256'],
+    [to, value, data, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, nonce]
+  );
+  const verifyingData = padLeft(signData.replace('0x', ''), 64);
+  const verifyingDataLength = padLeft(numberToHex(hexToBytes(signData).length).replace('0x', ''), 64);
+  return verifyingDataLength + verifyingData;
+}
+
+// function sortSignatures(
+//   ownerSignature: string,
+//   contractSignature: string,
+//   safeOwnerAddress: string,
+//   contractAddress: string
+// ) {
+//   if (safeOwnerAddress.toLowerCase() < contractAddress.toLowerCase()) {
+//     return [ownerSignature, contractSignature];
+//   } else {
+//     return [contractSignature, ownerSignature];
+//   }
+// }
