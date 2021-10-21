@@ -93,6 +93,9 @@ describe('POST /api/card-spaces', function () {
         res.body.data.attributes.did = 'the-did';
       })
       .expect({
+        meta: {
+          network: 'sokol',
+        },
         data: {
           type: 'card-spaces',
           id: 'the-id',

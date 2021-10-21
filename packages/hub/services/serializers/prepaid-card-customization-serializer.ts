@@ -3,6 +3,7 @@ import { inject } from '@cardstack/di';
 import DatabaseManager from '@cardstack/db';
 import PrepaidCardColorSchemeSerializer from './prepaid-card-color-scheme-serializer';
 import PrepaidCardPatternSerializer from './prepaid-card-pattern-serializer';
+import config from 'config';
 
 interface PrepaidCardCustomization {
   id: string;
@@ -66,6 +67,9 @@ export default class PrepaidCardCustomizationSerializer {
       },
     };
     let result = {
+      meta: {
+        network: config.get('web3.network'),
+      },
       data,
     } as JSONAPIDocument;
     if (options.include?.includes('colorScheme')) {

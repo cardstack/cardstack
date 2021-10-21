@@ -230,6 +230,9 @@ describe('POST /api/prepaid-card-customizations', function () {
         res.body.data.attributes.did = 'the-did';
       })
       .expect({
+        meta: {
+          network: 'sokol',
+        },
         data: {
           type: 'prepaid-card-customizations',
           id: 'the-id',

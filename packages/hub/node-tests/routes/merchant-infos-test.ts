@@ -81,6 +81,9 @@ describe('POST /api/merchant-infos', function () {
         res.body.data.attributes.did = 'the-did';
       })
       .expect({
+        meta: {
+          network: 'sokol',
+        },
         data: {
           type: 'merchant-infos',
           id: 'the-id',
