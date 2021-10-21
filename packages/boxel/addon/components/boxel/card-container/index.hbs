@@ -6,5 +6,17 @@
   data-test-boxel-card-container
   ...attributes
 >
+  {{#if (has-block "header")}}
+    <Boxel::Header @header={{@header}} @isHighlighted={{@isHighlighted}}>
+      {{yield to="header"}}
+    </Boxel::Header>
+  {{/if}}
+
   {{yield}}
+
+  {{#if (has-block "footer")}}
+    <Boxel::ActionChin @state={{@state}}>
+      {{yield to="footer"}}
+    </Boxel::ActionChin>
+  {{/if}}
 </article>

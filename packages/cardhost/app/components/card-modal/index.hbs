@@ -16,8 +16,8 @@
           </:default>
 
           <:action-chin>
-            <button data-test-modal-save {{on 'click' this.modal.save}}>Save</button>
-            <button data-test-modal-cancel {{on 'click' this.modal.close}}>Cancel</button>
+            <Boxel::Button @kind="primary" data-test-modal-save {{on 'click' this.modal.save}}>Save</Boxel::Button>
+            <Boxel::Button @kind="secondary" data-test-modal-cancel {{on 'click' this.modal.close}}>Cancel</Boxel::Button>
           </:action-chin>
         </CardContainer>
       {{else}}

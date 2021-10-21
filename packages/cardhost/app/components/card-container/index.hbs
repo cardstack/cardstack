@@ -1,15 +1,21 @@
 <Boxel::CardContainer @displayBoundaries={{true}} style="margin:1vw 2vw;">
   {{#if @editable}}
-    <Boxel::Header @header="[LABEL]">
-      <button data-test-edit-button {{on 'click' (perform this.modal.editCardTask @card)}}>Edit</button>
-      <button data-test-new-button-server {{on 'click' (perform this.modal.newCardTask @card this.REALM)}}>New (Server)</button>
-      <button data-test-new-button-local {{on 'click' (perform this.modal.newCardTask @card this.LOCAL_REALM)}}>New (Local)</button>
+    <Boxel::Header @header="Layout">
+      <:actions>
+        <button data-test-edit-button {{on 'click' (perform this.modal.editCardTask @card)}}>Edit</button>
+        <button data-test-new-button-server {{on 'click' (perform this.modal.newCardTask @card this.REALM)}}>New (Server)</button>
+        <button data-test-new-button-local {{on 'click' (perform this.modal.newCardTask @card this.LOCAL_REALM)}}>New (Local)</button>
+      </:actions>
     </Boxel::Header>
   {{/if}}
 
   {{yield}}
 
-  <div style="background-color: lightgray">
-    {{yield to="action-chin"}}
-  </div>
+  {{#if (has-block "action-chin")}}
+    <Boxel::ActionChin @state="memorialized">
+      <:memorialized>
+        {{yield to="action-chin"}}
+      </:memorialized>
+    </Boxel::ActionChin>
+  {{/if}}
 </Boxel::CardContainer>

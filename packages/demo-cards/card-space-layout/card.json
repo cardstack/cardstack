@@ -1,1 +1,1 @@
-{"schema":"schema.js","isolated":"isolated.js"}
+{ "schema": "schema.js", "isolated": "isolated.js", "edit": "edit.js" }
