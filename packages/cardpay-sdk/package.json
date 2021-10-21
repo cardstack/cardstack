@@ -32,6 +32,9 @@
   "engines": {
     "node": "^14.0.0"
   },
+  "volta": {
+    "extends": "../../package.json"
+  },
   "config": {
     "access": "public"
   },
