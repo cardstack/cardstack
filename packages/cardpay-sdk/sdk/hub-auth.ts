@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import { signTypedData } from './utils/signing-utils';
 import { networkName } from './utils/general-utils';
 import { networkIds } from './constants';
+import { ContractOptions } from 'web3-eth-contract';
 
 export interface IHubAuth {
   getNonce(): Promise<NonceResponse>;
@@ -31,8 +32,8 @@ export default class HubAuth implements IHubAuth {
     return responseJson.errors[0].meta;
   }
 
-  async authenticate(): Promise<string> {
-    let ownerAddress = (await this.layer2Web3.eth.getAccounts())[0];
+  async authenticate(contractOptions?: ContractOptions): Promise<string> {
+    let ownerAddress = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let { nonce, version } = await this.getNonce();
     let name = await networkName(this.layer2Web3);
     let chainId = networkIds[name];
