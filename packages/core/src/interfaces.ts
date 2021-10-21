@@ -1,5 +1,6 @@
 import difference from 'lodash/difference';
 import type CardModel from './card-model';
+import { CardError } from './utils/errors';
 
 const componentFormats = {
   isolated: '',
@@ -31,7 +32,7 @@ export function assertValidSerializerMap(map: any): asserts map is SerializerMap
   let keys = Object.keys(map);
   let diff = difference(keys, SERIALIZER_NAMES);
   if (diff.length > 0) {
-    throw new Error(`Unexpected serializer: ${diff.join(',')}`);
+    throw new CardError(`Unexpected serializer: ${diff.join(',')}`);
   }
 }
 
@@ -73,32 +74,32 @@ export interface RawCard {
 
 export function assertValidRawCard(obj: any): asserts obj is RawCard {
   if (obj == null) {
-    throw new Error(`not a valid card`);
+    throw new CardError('A raw card that is empty is not valid');
   }
   if (typeof obj.url !== 'string') {
-    throw new Error(`card missing URL`);
+    throw new CardError('A card requires a URL');
   }
   for (let featureFile of FEATURE_NAMES) {
     if (featureFile in obj) {
       let filePath = obj[featureFile];
       if (typeof filePath !== 'string') {
-        throw new Error(`card.json in ${obj.url} has an invalid value for "${featureFile}"`);
+        throw new CardError(`card.json for ${obj.url} has an invalid value for "${featureFile}"`);
       }
       filePath = filePath.replace(/^\.\//, '');
       if (!obj.files?.[filePath]) {
-        throw new Error(`card.json in ${obj.url} refers to non-existent module ${obj[featureFile]}`);
+        throw new CardError(`card.json for ${obj.url} refers to non-existent module ${obj[featureFile]}`);
       }
     }
   }
   if ('adoptsFrom' in obj) {
     if (typeof obj.adoptsFrom !== 'string') {
-      throw new Error(`invalid adoptsFrom property in ${obj.url}`);
+      throw new CardError(`invalid adoptsFrom property in ${obj.url}`);
     }
   }
 
   if ('data' in obj) {
     if (typeof obj.data !== 'object' || obj.data == null) {
-      throw new Error(`invalid data property in ${obj.url}`);
+      throw new CardError(`invalid data property in ${obj.url}`);
     }
   }
 }

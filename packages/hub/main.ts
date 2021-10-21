@@ -193,7 +193,7 @@ export class HubServer {
 
   async listen(port = 3000) {
     let instance = this.app.listen(port);
-    this.logger.info('server listening on %s', port);
+    this.logger.info(`\n👂 Hub listening on %s\n`, port);
 
     if (process.connected) {
       process.send!('hub hello');
@@ -210,8 +210,8 @@ export class HubServer {
     if (!process.env.COMPILER) {
       throw new Error('COMPILER feature flag is not present');
     }
-
-    (await this.container.lookup('card-builder')).primeCache();
+    let builder = await this.container.lookup('card-builder');
+    await builder.primeCache();
   }
 
   async watchCards() {
@@ -219,7 +219,8 @@ export class HubServer {
       throw new Error('COMPILER feature flag is not present');
     }
 
-    (await this.container.lookup('card-watcher')).watch();
+    let watcher = await this.container.lookup('card-watcher');
+    watcher.watch();
   }
 }
 

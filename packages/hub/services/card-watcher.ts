@@ -4,6 +4,7 @@ import sane from 'sane';
 import Realm from '../realms/fs-realm';
 import { inject } from '@cardstack/di';
 import { serverLog } from '../utils/logger';
+import { printCompilerError } from '@cardstack/core/src/utils/errors';
 
 export default class CardWatcher {
   realmManager = inject('realm-manager', { as: 'realmManager' });
@@ -12,8 +13,9 @@ export default class CardWatcher {
   watchers: sane.Watcher[] = [];
 
   watch(): void {
-    serverLog.log(`CardWatcher: watching for changes in ${this.realmManager.realms.length} realms`);
+    serverLog.log(`\n👀 CardWatcher: watching for changes in ${this.realmManager.realms.length} realms`);
     return this.realmManager.realms.forEach((realm: Realm) => {
+      serverLog.info(`--> ${realm.url}`);
       let watcher = sane(realm.directory);
       watcher.on('add', (filepath: string) => {
         this.rebuildHandler(filepath, realm);
@@ -42,13 +44,14 @@ export default class CardWatcher {
     }
     let url = new URL(segments[0] + '/', realm.url).href;
 
-    serverLog.debug(`!-> rebuilding card ${url}`);
+    serverLog.log(`Rebuilding::START ${url}`);
 
     (async () => {
       try {
         await this.builder.buildCard(url);
+        serverLog.log(`Rebuilding::END   ${url}`);
       } catch (err) {
-        console.error(err);
+        serverLog.error(printCompilerError(err));
       }
     })();
   }

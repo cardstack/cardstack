@@ -84,6 +84,7 @@ export default class CardCache {
   }
 
   private writeFile(fsLocation: string, source: string): void {
+    serverLog.debug(`card-cache writing`, fsLocation);
     mkdirpSync(dirname(fsLocation));
     writeFileSync(fsLocation, source);
   }
@@ -151,7 +152,7 @@ export default class CardCache {
       if (!existsSync(loc)) {
         continue;
       }
-
+      serverLog.debug(`card-cache deleting`, loc);
       removeSync(loc);
     }
   }

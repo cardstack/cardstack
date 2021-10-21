@@ -10,7 +10,7 @@ export let command = 'serve';
 export let aliases = 'server';
 export let describe = 'Boot the server';
 
-export let builder = function (yargs: Argv) {
+export function builder(yargs: Argv) {
   let options: { [key: string]: Options } = {
     port: {
       alias: 'p',
@@ -30,7 +30,7 @@ export let builder = function (yargs: Argv) {
     };
   }
   return yargs.options(options);
-};
+}
 
 // Using any right now because I dont know how to get the generated
 // type from the above handler into this handler

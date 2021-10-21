@@ -11,6 +11,7 @@ import { CompiledCard, Field, Format } from './interfaces';
 import { singularize } from 'inflection';
 import { cloneDeep } from 'lodash';
 import { classify, getFieldForPath } from './utils';
+import { CardError } from './utils/errors';
 
 const MODEL = '@model';
 const FIELDS = '@fields';
@@ -31,6 +32,7 @@ export interface Options {
   fields: CompiledCard['fields'];
   usageMeta: TemplateUsageMeta;
   defaultFieldFormat: Format;
+  moduleName?: string;
   importAndChooseName: ImportAndChooseName;
 }
 
@@ -76,14 +78,21 @@ interface State {
 }
 
 export default function glimmerCardTemplateTransform(source: string, options: Options) {
-  return syntax.print(
-    syntax.preprocess(source, {
-      mode: 'codemod',
-      plugins: {
-        ast: [cardTransformPlugin(options)],
-      },
-    })
-  );
+  try {
+    return syntax.print(
+      syntax.preprocess(source, {
+        mode: 'codemod',
+        plugins: {
+          ast: [cardTransformPlugin(options)],
+        },
+        meta: {
+          moduleName: options.moduleName,
+        },
+      })
+    );
+  } catch (error) {
+    throw CardError.fromError(error);
+  }
 }
 
 export function cardTransformPlugin(options: Options): syntax.ASTPluginBuilder {

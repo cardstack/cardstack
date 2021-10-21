@@ -7,6 +7,7 @@ import { JS_TYPE } from '@cardstack/core/src/utils/content';
 import { inject } from '@cardstack/di';
 import walkSync from 'walk-sync';
 import { serverLog as logger } from '../utils/logger';
+import { printCompilerError } from '@cardstack/core/src/utils/errors';
 
 export default class CardBuilder implements BuilderInterface {
   realmManager = inject('realm-manager', { as: 'realmManager' });
@@ -18,20 +19,32 @@ export default class CardBuilder implements BuilderInterface {
     builder: this,
   });
 
-  async primeCache(): Promise<void> {
+  async primeCache(stopOnError = false): Promise<void> {
     let promises = [];
 
+    this.logger.log('Priming card cache');
     for (let realm of this.realmManager.realms) {
       let cards = walkSync(realm.directory, { globs: ['**/card.json'] });
       for (let cardPath of cards) {
         let fullCardUrl = new URL(cardPath.replace('card.json', ''), realm.url).href;
-        this.logger.log(`--> Priming cache for ${fullCardUrl}`);
-        promises.push(this.buildCard(fullCardUrl));
+        this.logger.info(`--> ${fullCardUrl}`);
+        promises.push(
+          (async () => {
+            try {
+              await this.buildCard(fullCardUrl);
+            } catch (err) {
+              if (stopOnError) {
+                throw err;
+              }
+              this.logger.error(printCompilerError(err));
+            }
+          })()
+        );
       }
     }
 
     await Promise.all(promises);
-    this.logger.log(`--> Cache primed`);
+    this.logger.log(`✅ Cache primed`);
   }
 
   async define(cardURL: string, localPath: string, type: string, source: string): Promise<string> {
@@ -57,7 +70,7 @@ export default class CardBuilder implements BuilderInterface {
 
   async getRawCard(url: string): Promise<RawCard> {
     url = url.replace(/\/$/, '');
-    return this.realmManager.getRawCard(url);
+    return await this.realmManager.getRawCard(url);
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
@@ -78,10 +91,20 @@ export default class CardBuilder implements BuilderInterface {
   }
 
   private async compileCardFromRaw(rawCard: RawCard): Promise<CompiledCard> {
-    let compiledCard = await this.compiler.compile(rawCard);
-    this.cache.setCard(rawCard.url, compiledCard);
-
-    return compiledCard;
+    let compiledCard: CompiledCard | undefined;
+    let err: unknown;
+    try {
+      compiledCard = await this.compiler.compile(rawCard);
+    } catch (e) {
+      err = e;
+    }
+    if (compiledCard) {
+      this.cache.setCard(rawCard.url, compiledCard);
+      return compiledCard;
+    } else {
+      this.cache.deleteCard(rawCard.url);
+      throw err;
+    }
   }
 
   async deleteCard(cardURL: string) {

@@ -1,5 +1,5 @@
 // import { Argv } from 'yargs';
-import { HubServer } from '../../main';
+import { createContainer } from '../../main';
 
 exports.command = 'prime';
 exports.desc = 'Prime the card cache';
@@ -7,6 +7,7 @@ exports.desc = 'Prime the card cache';
 exports.builder = {};
 
 exports.handler = async function (/* argv: Argv */) {
-  let server = await HubServer.create();
-  await server.primeCache();
+  let container = createContainer();
+  let builder = await container.lookup('card-builder');
+  await builder.primeCache(true);
 };
