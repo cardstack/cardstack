@@ -29,7 +29,10 @@ import { UsdConvertibleSymbol } from '@cardstack/web-client/services/token-to-us
 import { useResource } from 'ember-resources';
 import { Safes } from '@cardstack/web-client/resources/safes';
 import { reads } from 'macro-decorators';
-import { createPrepaidCardSafe } from '@cardstack/web-client/utils/test-factories';
+import {
+  createPrepaidCardSafe,
+  createMerchantSafe,
+} from '@cardstack/web-client/utils/test-factories';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 
 interface BridgeToLayer1Request {
@@ -229,12 +232,27 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     if (!this.remoteAccountSafes.has(account)) {
       this.remoteAccountSafes.set(account, []);
     }
-    let newRemoteAccountSafes = newSafes
-      .concat(this.remoteAccountSafes.get(account)!)
-      .filter(
-        (v, i, a) => a.findIndex((safe) => safe.address === v.address) === i
+
+    /**
+     * keep order of existing safes the same, put new safes at the front
+     * this maintains a "stable" order of safes assuming that their createdAt dates
+     * stay the same, which they should if using factories
+     */
+    let result = this.remoteAccountSafes.get(account)!;
+    let actuallyNewSafes: Safe[] = [];
+    for (let newSafe of newSafes) {
+      let indexOfExistingSafe = result.findIndex(
+        (existingSafe) => existingSafe.address === newSafe.address
       );
-    this.remoteAccountSafes.set(account, newRemoteAccountSafes);
+      if (indexOfExistingSafe !== -1) {
+        result[indexOfExistingSafe] = newSafe;
+      } else {
+        actuallyNewSafes.push(newSafe);
+      }
+    }
+    result = actuallyNewSafes.concat(result);
+
+    this.remoteAccountSafes.set(account, result);
   }
 
   async issuePrepaidCard(
@@ -361,6 +379,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     let request = this.issuePrepaidCardRequests.get(faceValue);
     let prepaidCardSafe = createPrepaidCardSafe({
       address: cardAddress,
+      createdAt: Math.floor(Date.now() / 1000),
       owners: [walletAddress],
       spendFaceValue: faceValue,
       prepaidCardOwner: walletAddress,
@@ -407,18 +426,14 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     options: Object
   ) {
     let request = this.registerMerchantRequests.get(prepaidCardAddress);
-    let merchantSafe: MerchantSafe = {
-      type: 'merchant',
-      createdAt: Date.now() / 1000,
+    let merchantSafe: MerchantSafe = createMerchantSafe({
+      createdAt: Math.floor(Date.now() / 1000),
       address: merchantSafeAddress,
       merchant: prepaidCardAddress,
-      tokens: [],
-      owners: [],
       accumulatedSpendValue: 100,
       infoDID: request?.infoDID,
-
       ...options,
-    };
+    });
     request?.onTxnHash?.('exampleTxnHash');
 
     let prepaidCard = this.remoteAccountSafes

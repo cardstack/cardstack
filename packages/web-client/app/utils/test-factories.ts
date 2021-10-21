@@ -8,6 +8,9 @@ import { Resolver } from 'did-resolver';
 import { encodeDID, getResolver } from '@cardstack/did-resolver';
 import Web3 from 'web3';
 
+// created at date affects sorting of safes, making it a constant makes it so safes are by default ordered by the order they're provided
+export const DEFAULT_CREATED_AT_DATE = 0;
+
 // The address generation is not for production use. web3 notes the following:
 // This package has NOT been audited and might potentially be unsafe.
 // Take precautions to clear memory properly, store the private keys safely, and test transaction receiving and sending functionality properly before using in production!
@@ -84,7 +87,7 @@ export const createSafeToken = <T extends BridgeableSymbol>(
 
 const defaultMerchantSafe: MerchantSafe = {
   address: 'DEFAULT_MERCHANT_ADDRESS', // should be overwritten in factory
-  createdAt: Date.now() / 1000,
+  createdAt: DEFAULT_CREATED_AT_DATE,
   tokens: [],
   owners: ['DEFAULT_MERCHANT_OWNER_ADDRESS'], // should be overwritten in factory
   type: 'merchant',
@@ -95,7 +98,7 @@ const defaultMerchantSafe: MerchantSafe = {
  * Defaults create a freshly created merchant without customization:
  * {
  *   address: 'DEFAULT_MERCHANT_ADDRESS', // should be overwritten in factory
- *   createdAt: Date.now() / 1000,
+ *   createdAt: DEFAULT_CREATED_AT_DATE,
  *   tokens: [],
  *   owners: ['DEFAULT_MERCHANT_OWNER_ADDRESS'], // should be overwritten in factory
  *   type: 'merchant',
@@ -107,7 +110,7 @@ export const createMerchantSafe = (
   opts: Partial<MerchantSafe>
 ): MerchantSafe => ({
   ...defaultMerchantSafe,
-  createdAt: Date.now() / 1000,
+  createdAt: DEFAULT_CREATED_AT_DATE,
   ...opts,
   address: opts.address || generateMockAddress(),
   owners: opts.owners || [generateMockAddress()],
@@ -119,7 +122,7 @@ const defaultPrepaidCardSafe: PrepaidCardSafe = {
   owners: ['DEFAULT_PREPAID_CARD_OWNER_ADDRESS'], // should be overwritten in factory
   issuer: 'DEFAULT_PREPAID_CARD_ISSUER_ADDRESS', // should be overwritten in factory
   prepaidCardOwner: 'DEFAULT_PREPAID_CARD_OWNER_ADDRESS', // should be overwritten in factory
-  createdAt: Date.now() / 1000,
+  createdAt: DEFAULT_CREATED_AT_DATE,
   tokens: [],
   issuingToken: '0xTOKEN',
   spendFaceValue: 1000,
@@ -136,7 +139,7 @@ const defaultPrepaidCardSafe: PrepaidCardSafe = {
  *   owners: ['DEFAULT_PREPAID_CARD_OWNER_ADDRESS'], // should be overwritten in factory
  *   issuer: 'DEFAULT_PREPAID_CARD_ISSUER_ADDRESS', // should be overwritten in factory
  *   prepaidCardOwner: 'DEFAULT_PREPAID_CARD_OWNER_ADDRESS', // should be overwritten in factory
- *   createdAt: Date.now() / 1000,
+ *   createdAt: DEFAULT_CREATED_AT_DATE,
  *   tokens: [],
  *   issuingToken: '0xTOKEN',
  *   spendFaceValue: 1000,
@@ -153,7 +156,7 @@ export const createPrepaidCardSafe = (
   let owners = opts.owners || [generateMockAddress()];
   return {
     ...defaultPrepaidCardSafe,
-    createdAt: Date.now() / 1000,
+    createdAt: DEFAULT_CREATED_AT_DATE,
     ...opts,
     address: opts.address || generateMockAddress(),
     owners: owners,
@@ -165,7 +168,7 @@ export const createPrepaidCardSafe = (
 
 const defaultDepotSafe: DepotSafe = {
   address: 'DEFAULT_DEPOT_ADDRESS', // should be overwritten in factory
-  createdAt: Date.now() / 1000,
+  createdAt: DEFAULT_CREATED_AT_DATE,
   tokens: [],
   owners: ['DEFAULT_DEPOT_OWNER_ADDRESS'], // should be overwritten in factory
   type: 'depot',
@@ -175,7 +178,7 @@ const defaultDepotSafe: DepotSafe = {
  * ```
  * {
  *   address: 'DEFAULT_DEPOT_ADDRESS', // should be overwritten in factory
- *   createdAt: Date.now() / 1000,
+ *   createdAt: DEFAULT_CREATED_AT_DATE,
  *   tokens: [],
  *   owners: ['DEFAULT_DEPOT_OWNER_ADDRESS'], // should be overwritten in factory
  *   type: 'depot',
@@ -187,7 +190,7 @@ export const createDepotSafe = (opts: Partial<DepotSafe>): DepotSafe => {
   let owners = opts.owners || [generateMockAddress()];
   return {
     ...defaultDepotSafe,
-    createdAt: Date.now() / 1000,
+    createdAt: DEFAULT_CREATED_AT_DATE,
     ...opts,
     address,
     owners,
