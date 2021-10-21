@@ -19,5 +19,8 @@
     "pg": "^8.6.0",
     "qrcode": "^1.4.4",
     "tmp": "^0.2.1"
+  },
+  "config": {
+    "access": "public"
   }
 }
