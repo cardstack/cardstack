@@ -1,2 +1,13 @@
 export { Bot as default, buildMessageWithQRCode, Command } from './bot';
-export { Guild, GuildMember, Message, MessageEmbed } from 'discord.js';
+export {
+  Message,
+  Guild,
+  GuildMember,
+  MockChannel,
+  MockGuild,
+  MockGuildMember,
+  MockRole,
+  MockUser,
+  MockMessage,
+} from './types';
+export { MessageEmbed, Collection } from 'discord.js';
