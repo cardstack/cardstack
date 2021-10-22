@@ -10,7 +10,7 @@ const noSend = (msg: any) => {
   expect.fail(`Received unexpected send ${JSON.stringify(msg)}`);
 };
 const noDM = () => {
-  expect.fail(`DM was unexpectedly created`);
+  expect.fail(`DM channel was unexpectedly created`);
 };
 
 export function makeTestMessage({
