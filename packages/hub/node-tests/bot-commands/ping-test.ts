@@ -11,12 +11,12 @@ describe('bot command: ping', function () {
     username: 'Akiko',
   };
 
-  this.beforeEach(async function () {
+  this.beforeAll(async function () {
     botController = await HubBotController.create();
     bot = botController.bot;
   });
 
-  this.afterEach(async function () {
+  this.afterAll(async function () {
     await botController.teardown();
   });
 
