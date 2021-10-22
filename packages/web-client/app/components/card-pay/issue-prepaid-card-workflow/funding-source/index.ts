@@ -62,11 +62,6 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
     );
   }
 
-  // FIXME remove this? or something
-  get depotAddress() {
-    return this.layer2Network.depotSafe?.address || undefined;
-  }
-
   get sufficientBalanceSafes() {
     return this.layer2Network.safes.issuePrepaidCardSourceSafes;
   }
@@ -90,7 +85,6 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
 
   get isDisabled() {
     return (
-      !this.depotAddress ||
       !this.tokens.length ||
       !this.selectedToken?.balance ||
       this.selectedToken?.balance.isZero()
