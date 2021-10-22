@@ -165,6 +165,27 @@ module(
         );
         assert.dom('.ember-power-select-options li').exists({ count: 2 });
       });
+
+      test('it renders an error message when no safe with sufficient balances exists', async function (assert) {
+        depotSafe.tokens = [createSafeToken('DAI', '1')];
+        merchantSafe.tokens = [createSafeToken('DAI', '1')];
+        layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+
+        await render(hbs`
+          <CardPay::IssuePrepaidCardWorkflow::FundingSource
+            @onComplete={{this.onComplete}}
+            @isComplete={{this.isComplete}}
+            @onIncomplete={{this.onIncomplete}}
+            @workflowSession={{this.workflowSession}}
+            @frozen={{this.frozen}}
+          />
+        `);
+
+        assert
+          .dom('[data-test-insufficient-balance-message]')
+          .containsText('5 DAI.CPXD');
+        assert.dom('[data-test-boxel-button]').isDisabled();
+      });
     });
 
     test('it renders the proper fallback balance when there is no depot safe', async function (assert) {

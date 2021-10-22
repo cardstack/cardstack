@@ -3,6 +3,7 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import BN from 'bn.js';
+import { fromWei } from 'web3-utils';
 
 import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
@@ -94,6 +95,10 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
       !this.selectedToken?.balance ||
       this.selectedToken?.balance.isZero()
     );
+  }
+
+  get formattedMinimumFaceValue() {
+    return Math.ceil(Number(fromWei(this.minimumFaceValue)));
   }
 
   @action chooseSafe(safe: Safe) {

@@ -5,56 +5,65 @@
 >
   <ActionCardContainer::Section>
     <ActionCardContainer::Section @title="Choose a source and balance to fund your prepaid card">
-      <CardPay::LabeledValue @label="Source:" class="funding-source__field">
-        <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} />
-        <CardPay::NestedItems @noInnerBorder={{not @isComplete}} class="funding-source__nested-items">
-          <:outer>
-            <CardPay::AccountDisplay
-              @size="small"
-              @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
-              data-test-funding-source-address
-            />
-          </:outer>
-          <:inner>
-            {{#if @isComplete}}
+      {{#if this.sufficientBalanceSafes}}
+        <CardPay::LabeledValue @label="Source:" class="funding-source__field">
+          <CardPay::AccountDisplay @name={{concat (network-display-info "layer2" "fullName") " wallet"}} />
+          <CardPay::NestedItems @noInnerBorder={{not @isComplete}} class="funding-source__nested-items">
+            <:outer>
               <CardPay::AccountDisplay
                 @size="small"
-                @icon={{this.selectedSafe.type}}
-                @name={{uppercase this.selectedSafe.type}}
-                @address={{truncate-middle this.selectedSafe.address}}
+                @address={{truncate-middle this.layer2Network.walletInfo.firstAddress}}
+                data-test-funding-source-address
               />
-            {{else}}
-              <CardPay::SafeChooserDropdown
-                @safes={{this.sufficientBalanceSafes}}
-                @selectedSafe={{this.selectedSafe}}
-                @onChooseSafe={{this.chooseSafe}}
-                data-test-funding-source-safe
-              />
-            {{/if}}
-          </:inner>
-          <:innermost>
-            {{#if @isComplete}}
-              <CardPay::BalanceDisplay
-                @label="Available Balance"
-                @size="large"
-                @icon={{this.selectedToken.icon}}
-                @balance={{format-wei-amount this.selectedToken.balance}}
-                @symbol={{this.selectedToken.symbol}}
-                data-test-funding-source-display
-              />
-            {{else}}
-              <div class="funding-source__dropdown-container">
-                <CardPay::BalanceChooserDropdown
-                  @tokens={{this.tokens}}
-                  @selectedToken={{this.selectedToken}}
-                  @selectedTokenSymbol={{this.selectedTokenSymbol}}
-                  @chooseToken={{this.chooseBalance}}
+            </:outer>
+            <:inner>
+              {{#if @isComplete}}
+                <CardPay::AccountDisplay
+                  @size="small"
+                  @icon={{this.selectedSafe.type}}
+                  @name={{uppercase this.selectedSafe.type}}
+                  @address={{truncate-middle this.selectedSafe.address}}
                 />
-              </div>
-            {{/if}}
-          </:innermost>
-        </CardPay::NestedItems>
-      </CardPay::LabeledValue>
+              {{else}}
+                <CardPay::SafeChooserDropdown
+                  @safes={{this.sufficientBalanceSafes}}
+                  @selectedSafe={{this.selectedSafe}}
+                  @onChooseSafe={{this.chooseSafe}}
+                  data-test-funding-source-safe
+                />
+              {{/if}}
+            </:inner>
+            <:innermost>
+              {{#if @isComplete}}
+                <CardPay::BalanceDisplay
+                  @label="Available Balance"
+                  @size="large"
+                  @icon={{this.selectedToken.icon}}
+                  @balance={{format-wei-amount this.selectedToken.balance}}
+                  @symbol={{this.selectedToken.symbol}}
+                  data-test-funding-source-display
+                />
+              {{else}}
+                <div class="funding-source__dropdown-container">
+                  <CardPay::BalanceChooserDropdown
+                    @tokens={{this.tokens}}
+                    @selectedToken={{this.selectedToken}}
+                    @selectedTokenSymbol={{this.selectedTokenSymbol}}
+                    @chooseToken={{this.chooseBalance}}
+                  />
+                </div>
+              {{/if}}
+            </:innermost>
+          </CardPay::NestedItems>
+        </CardPay::LabeledValue>
+      {{else}}
+        <p data-test-insufficient-balance-message>
+          You don’t have a merchant or depot with enough balance to fund a prepaid card.
+          Before you continue, add funds by bridging some tokens or claiming merchant revenue in Card Wallet.
+          The minimum balance needed to issue a prepaid card is approximately
+          {{this.formattedMinimumFaceValue}} DAI.CPXD.
+        </p>
+      {{/if}}
     </ActionCardContainer::Section>
   </ActionCardContainer::Section>
   <Boxel::ActionChin
