@@ -11,9 +11,17 @@ import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
+import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
+import {
+  BridgedTokenSymbol,
+  ConvertibleSymbol,
+  getBridgedSymbol,
+  BridgeableSymbol,
+} from '@cardstack/web-client/utils/token';
 
 export interface SafesResourceStrategy {
   viewSafesTask: TaskFunction;
+  convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<string>;
   getLatestSafe(address: string): Promise<Safe>;
   getBlockHeight(): Promise<BN>;
 }
@@ -138,10 +146,12 @@ export class Safes extends Resource<Args> {
   individualSafeUpdateData: Record<string, IndividualSafeState> = {};
   @tracked safeReferences: Record<string, Safe> = {};
   @tracked value: Safe[] = [];
+  @tracked daiMinValue: BN | undefined;
 
   constructor(owner: unknown, args: Args) {
     super(owner, args);
     this.fetch();
+    this.fetchIssuePrepaidCardDaiMinValue();
   }
 
   updateReferences(safes: Safe[]) {
@@ -227,6 +237,40 @@ export class Safes extends Resource<Args> {
     );
 
     this.updateReferences(this.graphData.safes);
+  }
+
+  async fetchIssuePrepaidCardDaiMinValue() {
+    let spendMinValue = Math.min(...faceValueOptions);
+    let daiMinValue = await this.args.named.strategy.convertFromSpend(
+      'DAI',
+      spendMinValue
+    );
+
+    this.daiMinValue = new BN(daiMinValue);
+  }
+
+  get issuePrepaidCardSourceSafes() {
+    if (!this.daiMinValue) {
+      return [];
+    }
+
+    let tokenOptions = ['DAI.CPXD' as BridgedTokenSymbol];
+    let minimumFaceValue = new BN(this.daiMinValue);
+    let compatibleSafeTypes = ['depot', 'merchant'];
+    let compatibleSafes = this.value.filter((safe) =>
+      compatibleSafeTypes.includes(safe.type)
+    );
+    return compatibleSafes.filter((safe) => {
+      let compatibleTokens = safe.tokens.filter((token) =>
+        tokenOptions.includes(
+          getBridgedSymbol(token.token.symbol as BridgeableSymbol)
+        )
+      );
+
+      return compatibleTokens.any((token) =>
+        minimumFaceValue.lte(new BN(token.balance))
+      );
+    });
   }
 
   async updateOne(address: string) {

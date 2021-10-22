@@ -9,9 +9,7 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import {
   TokenBalance,
   BridgedTokenSymbol,
-  getBridgedSymbol,
   getUnbridgedSymbol,
-  BridgeableSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 
@@ -61,28 +59,13 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
     );
   }
 
+  // FIXME remove this? or something
   get depotAddress() {
     return this.layer2Network.depotSafe?.address || undefined;
   }
 
-  get compatibleSafes() {
-    return this.layer2Network.safes.value.filter((safe) =>
-      this.compatibleSafeTypes.includes(safe.type)
-    );
-  }
-
   get sufficientBalanceSafes() {
-    return this.compatibleSafes.filter((safe) => {
-      let compatibleTokens = safe.tokens.filter((token) =>
-        this.tokenOptions.includes(
-          getBridgedSymbol(token.token.symbol as BridgeableSymbol)
-        )
-      );
-
-      return compatibleTokens.any((token) =>
-        this.minimumFaceValue.lte(new BN(token.balance))
-      );
-    });
+    return this.layer2Network.safes.issuePrepaidCardSourceSafes;
   }
 
   get tokens() {

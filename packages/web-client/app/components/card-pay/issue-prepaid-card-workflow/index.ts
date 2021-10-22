@@ -7,12 +7,6 @@ import WorkflowPersistence from '@cardstack/web-client/services/workflow-persist
 import { action } from '@ember/object';
 import RouterService from '@ember/routing/router-service';
 
-import BN from 'bn.js';
-import {
-  BridgedTokenSymbol,
-  getBridgedSymbol,
-  BridgeableSymbol,
-} from '@cardstack/web-client/utils/token';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import {
@@ -124,25 +118,9 @@ class IssuePrepaidCardWorkflow extends Workflow {
             this.workflow?.session.setValue('daiMinValue', daiMinValue);
             await layer2Network.waitForAccount;
 
-            // FIXME how to share with funding-source card?
-            let tokenOptions = ['DAI.CPXD' as BridgedTokenSymbol];
-            let minimumFaceValue = new BN(daiMinValue);
-            let compatibleSafeTypes = ['depot', 'merchant'];
-            let compatibleSafes = layer2Network.safes.value.filter((safe) =>
-              compatibleSafeTypes.includes(safe.type)
-            );
-            let sufficientBalanceSafes = compatibleSafes.filter((safe) => {
-              let compatibleTokens = safe.tokens.filter((token) =>
-                tokenOptions.includes(
-                  getBridgedSymbol(token.token.symbol as BridgeableSymbol)
-                )
-              );
-
-              return compatibleTokens.any((token) =>
-                minimumFaceValue.lte(new BN(token.balance))
-              );
-            });
-
+            // FIXME need to ensure issuePrepaidCardDaiMinValue is present
+            let sufficientBalanceSafes =
+              layer2Network.safes.issuePrepaidCardSourceSafes;
             let sufficientFunds = sufficientBalanceSafes.length > 0;
 
             if (sufficientFunds) {

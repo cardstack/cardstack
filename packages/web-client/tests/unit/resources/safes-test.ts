@@ -46,6 +46,10 @@ class PartialLayer2Strategy implements MockSafesResourceStrategy {
     };
   }
 
+  convertFromSpend(_symbol: 'DAI' | 'CARD', amount: number): Promise<string> {
+    return Promise.resolve(amount.toString());
+  }
+
   async getBlockHeight() {
     return new BN(this._blockNumber);
   }
@@ -82,6 +86,8 @@ module('Unit | Resource | Safes', function (hooks) {
     });
     await settled();
   });
+
+  // FIXME add tests for issuePrepaidCardSourceSafes
 
   test('it can return a TrackedSafe defined in graphData but not in individual update data', async function (assert) {
     assert.deepEqual(
