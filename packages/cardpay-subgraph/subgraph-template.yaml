@@ -640,10 +640,6 @@ dataSources:
           handler: handleRewardeeRegistrationFee
       file: ./src/mappings/register-rewardee-handler.ts
 
-  # The shape of Rewardee claim changed in 0.8.2
-  # (https://github.com/cardstack/card-pay-protocol/pull/103) commenting this
-  # out to prevent breaking index
-
   - kind: ethereum/contract
     name: RewardPool
     network: {NETWORK}
