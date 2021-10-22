@@ -169,7 +169,8 @@ export async function executeTransaction(
   data: any,
   estimate: Estimate,
   nonce: BN,
-  signatures: any
+  signatures: any,
+  eip1271Data?: string
 ): Promise<GnosisExecTx> {
   let relayServiceURL = await getConstant('relayServiceURL', web3);
   const url = `${relayServiceURL}/v1/safes/${from}/transactions/`;
@@ -192,6 +193,7 @@ export async function executeTransaction(
       signatures,
       gasToken: estimate.gasToken,
       refundReceiver: ZERO_ADDRESS,
+      eip1271Data,
     }),
   };
   let response = await fetch(url, options);

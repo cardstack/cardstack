@@ -106,7 +106,7 @@ export async function claimRewards(
   rewardProgramId: string,
   tokenAddress: string,
   proof: string,
-  amount: string,
+  amount?: string,
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
@@ -116,7 +116,7 @@ export async function claimRewards(
     onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log(
-    `Claimed ${amount} of token ${tokenAddress} to reward safe ${rewardSafeAddress} for reward program ${rewardProgramId}`
+    `Claimed token ${tokenAddress} to reward safe ${rewardSafeAddress} for reward program ${rewardProgramId}`
   );
   console.log('done');
 }

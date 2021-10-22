@@ -2,7 +2,8 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { Estimate, SendPayload } from './safe-utils';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.8.0/prepaid-card-manager';
-import { AbiItem } from 'web3-utils';
+import { AbiItem, padLeft, toHex, numberToHex, hexToBytes } from 'web3-utils';
+
 import { getAddress } from '../../contracts/addresses';
 import { ZERO_ADDRESS } from '../constants';
 
@@ -222,4 +223,86 @@ export function ethSignSignatureToRSVForSafe(ethSignSignature: string) {
     r: sigR,
     s: sigS,
   };
+}
+
+export async function signRewardSafe(
+  web3: Web3,
+  to: string,
+  value: number,
+  data: any,
+  operation: number,
+  estimate: Estimate,
+  txGasToken: string,
+  refundReceiver: string,
+  nonce: any,
+  owner: string,
+  gnosisSafeAddress: string,
+  verifyingContractAddress: string
+): Promise<any> {
+  let [ownerSignature] = await signSafeTxAsRSV(
+    web3,
+    to,
+    value,
+    data,
+    operation,
+    estimate.safeTxGas,
+    estimate.baseGas,
+    estimate.gasPrice,
+    txGasToken,
+    refundReceiver,
+    nonce,
+    owner,
+    gnosisSafeAddress
+  );
+
+  let contractSignature = createEIP1271ContractSignatureRSV(verifyingContractAddress);
+  let sortedRSVSignatures = sortSignatures(ownerSignature, contractSignature, owner, verifyingContractAddress);
+  return sortedRSVSignatures;
+}
+
+function createEIP1271ContractSignature(verifyingContractAddress: string): string {
+  const threshold = 2; //multi-owner in our protocol means two owners: eoa + contract
+  const address = padLeft(verifyingContractAddress, 64).replace('0x', '');
+  const dynamicPosition = padLeft(toHex(threshold * 65), 64).replace('0x', '');
+  const signatureType = '00';
+  return '0x' + address + dynamicPosition + signatureType;
+}
+
+function createEIP1271ContractSignatureRSV(verifyingContractAddress: string): Signature {
+  return ethSignSignatureToRSVForSafe(createEIP1271ContractSignature(verifyingContractAddress));
+}
+
+export function createEIP1271VerifyingData(
+  web3: Web3,
+  to: string,
+  value: string,
+  data: string,
+  operation: string,
+  safeTxGas: string,
+  baseGas: string,
+  gasPrice: string,
+  gasToken: string,
+  refundReceiver: string,
+  nonce: string
+): string {
+  const signData = web3.eth.abi.encodeParameters(
+    ['address', 'uint256', 'bytes', 'uint8', 'uint256', 'uint256', 'uint256', 'address', 'address', 'uint256'],
+    [to, value, data, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, nonce]
+  );
+  const verifyingData = padLeft(signData.replace('0x', ''), 64);
+  const verifyingDataLength = padLeft(numberToHex(hexToBytes(signData).length).replace('0x', ''), 64);
+  return verifyingDataLength + verifyingData;
+}
+
+function sortSignatures(
+  ownerSignature: Signature,
+  contractSignature: Signature,
+  safeOwnerAddress: string,
+  contractAddress: string
+) {
+  if (safeOwnerAddress.toLowerCase() < contractAddress.toLowerCase()) {
+    return [ownerSignature, contractSignature];
+  } else {
+    return [contractSignature, ownerSignature];
+  }
 }

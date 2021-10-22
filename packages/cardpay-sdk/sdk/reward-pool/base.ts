@@ -5,9 +5,9 @@ import RewardPoolABI from '../../contracts/abi/v0.8.0/reward-pool';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, fromWei, toWei } from 'web3-utils';
-import { signSafeTx } from '../utils/signing-utils';
+import { signRewardSafe, signSafeTx, createEIP1271VerifyingData } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
-import { getConstant } from '../constants';
+import { getConstant, ZERO_ADDRESS } from '../constants';
 import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import ERC677ABI from '../../contracts/abi/erc-677';
@@ -309,7 +309,7 @@ export default class RewardPool {
     rewardProgramId: string,
     tokenAddress: string,
     proof: string,
-    amount: string,
+    amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
@@ -336,9 +336,6 @@ export default class RewardPool {
     if (!proof) {
       throw new Error('proof must be provided');
     }
-    if (!amount) {
-      throw new Error('amount must be provided');
-    }
 
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
 
@@ -357,8 +354,7 @@ export default class RewardPool {
 The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is ${from}`
       );
     }
-
-    let weiAmount = new BN(toWei(amount));
+    let weiAmount = amount ? new BN(toWei(amount)) : unclaimedRewards;
     if (weiAmount.gt(unclaimedRewards)) {
       throw new Error(
         `Insufficient rewards for rewardSafeOwner.
@@ -374,21 +370,15 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
         )} but user is asking for ${amount}`
       );
     }
-
     let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
 
     let payload = (await this.getRewardPool()).methods
-      .claim(
-        rewardProgramId,
-        tokenAddress,
-        weiAmount, //maybe in wei
-        proof
-      )
+      .claim(rewardProgramId, tokenAddress, weiAmount, proof)
       .encodeABI();
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, tokenAddress);
 
     let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    if (unclaimedRewards.lt(weiAmount.add(gasCost))) {
+    if (weiAmount.lt(gasCost)) {
       throw new Error(
         `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
           unclaimedRewards
@@ -403,6 +393,34 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
         onNonce(nonce);
       }
     }
+    let fullSignature = await signRewardSafe(
+      this.layer2Web3,
+      rewardPoolAddress,
+      0,
+      payload,
+      0,
+      estimate,
+      tokenAddress,
+      ZERO_ADDRESS,
+      nonce,
+      rewardSafeOwner,
+      safeAddress,
+      await getAddress('rewardManager', this.layer2Web3)
+    );
+
+    let eip1271Data = createEIP1271VerifyingData(
+      this.layer2Web3,
+      rewardPoolAddress,
+      '0',
+      payload,
+      '0',
+      estimate.safeTxGas,
+      estimate.baseGas,
+      estimate.gasPrice,
+      tokenAddress,
+      ZERO_ADDRESS,
+      nonce.toString()
+    );
     let gnosisTxn = await executeTransaction(
       this.layer2Web3,
       safeAddress,
@@ -410,7 +428,8 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       payload,
       estimate,
       nonce,
-      await signSafeTx(this.layer2Web3, safeAddress, rewardPoolAddress, payload, estimate, nonce, from)
+      fullSignature,
+      eip1271Data
     );
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
