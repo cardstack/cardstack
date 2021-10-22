@@ -193,7 +193,7 @@ export async function executeTransaction(
       signatures,
       gasToken: estimate.gasToken,
       refundReceiver: ZERO_ADDRESS,
-      eipData: eip1271Data,
+      eip1271Data,
     }),
   };
   let response = await fetch(url, options);
