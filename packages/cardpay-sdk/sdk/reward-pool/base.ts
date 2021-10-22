@@ -5,7 +5,7 @@ import RewardPoolABI from '../../contracts/abi/v0.8.0/reward-pool';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, fromWei, toWei } from 'web3-utils';
-import { signMultiOwnerSafe, signSafeTx, createVerifyingSignature } from '../utils/signing-utils';
+import { signRewardSafe, signSafeTx, createVerifyingSignature } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import { getConstant, ZERO_ADDRESS } from '../constants';
 import BN from 'bn.js';
@@ -398,15 +398,13 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
         onNonce(nonce);
       }
     }
-    let fullSignature = await signMultiOwnerSafe(
+    let fullSignature = await signRewardSafe(
       this.layer2Web3,
       rewardPoolAddress,
       0,
       payload,
       0,
-      estimate.safeTxGas,
-      estimate.baseGas,
-      estimate.gasPrice,
+      estimate,
       tokenAddress,
       ZERO_ADDRESS,
       nonce,

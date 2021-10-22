@@ -225,15 +225,13 @@ export function ethSignSignatureToRSVForSafe(ethSignSignature: string) {
   };
 }
 
-export async function signMultiOwnerSafe(
+export async function signRewardSafe(
   web3: Web3,
   to: string,
   value: number,
   data: any,
   operation: number,
-  txGasEstimate: string,
-  baseGasEstimate: string,
-  gasPrice: string,
+  estimate: Estimate,
   txGasToken: string,
   refundReceiver: string,
   nonce: any,
@@ -248,9 +246,9 @@ export async function signMultiOwnerSafe(
     value,
     data,
     operation,
-    txGasEstimate,
-    baseGasEstimate,
-    gasPrice,
+    estimate.safeTxGas,
+    estimate.baseGas,
+    estimate.gasPrice,
     txGasToken,
     refundReceiver,
     nonce,
