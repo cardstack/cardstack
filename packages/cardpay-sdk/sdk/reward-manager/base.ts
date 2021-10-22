@@ -2,7 +2,7 @@ import Web3 from 'web3';
 import RewardManagerABI from '../../contracts/abi/v0.8.0/reward-manager';
 import { Contract } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
-import { AbiItem, randomHex, toChecksumAddress, padLeft, numberToHex, hexToBytes } from 'web3-utils';
+import { AbiItem, randomHex, toChecksumAddress } from 'web3-utils';
 
 export default class RewardManager {
   private rewardManager: Contract | undefined;
@@ -33,27 +33,6 @@ export default class RewardManager {
 
   async getRewardSafeOwner(rewardSafeAddress: string): Promise<string> {
     return await (await this.getRewardManager()).methods.getRewardSafeOwner(rewardSafeAddress).call();
-  }
-
-  async createVerifyingSignature(
-    to: string,
-    value: string,
-    data: string,
-    operation: string,
-    safeTxGas: string,
-    baseGas: string,
-    gasPrice: string,
-    gasToken: string,
-    refundReceiver: string,
-    nonce: string
-  ): Promise<string> {
-    const signData = this.layer2Web3.eth.abi.encodeParameters(
-      ['address', 'uint256', 'bytes', 'uint8', 'uint256', 'uint256', 'uint256', 'address', 'address', 'uint256'],
-      [to, value, data, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, nonce]
-    );
-    const verifyingData = padLeft(signData.replace('0x', ''), 64);
-    const verifyingDataLength = padLeft(numberToHex(hexToBytes(signData).length).replace('0x', ''), 64);
-    return verifyingDataLength + verifyingData;
   }
 
   private async getRewardManager(): Promise<Contract> {
