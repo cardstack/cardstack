@@ -1,36 +1,41 @@
-{{#if this.modal.isShowing}}
-  <div class={{cn "modal" this.modal.state.format}} style="border:5px red dashed; margin: 5vw;padding:1vw" data-test-modal>
-    <div>
-      <button data-test-modal-close {{on 'click' this.close}}>Close Modal</button>
-    </div>
-
-    {{#if this.modal.isLoading}}
-      <h1>LOADING!!!</h1>
-    {{else}}
-      {{#if (eq this.modal.state.format 'edit')}}
-        <CardContainer
-          @selected={{true}}
-        >
-          <:default>
-            <this.modal.cardComponent />
-          </:default>
-
-          <:action-chin>
-            <Boxel::Button @kind="primary" data-test-modal-save {{on 'click' this.modal.save}}>Save</Boxel::Button>
-            <Boxel::Button @kind="secondary" data-test-modal-cancel {{on 'click' this.modal.close}}>Cancel</Boxel::Button>
-          </:action-chin>
-        </CardContainer>
-      {{else}}
-        <CardContainer
-          @card={{this.modal.card}}
-          @editable={{true}}
-        >
+<Boxel::Modal @isOpen={{this.modal.isShowing}} @onClose={{this.close}} data-test-modal>
+  {{#if this.modal.isLoading}}
+    <CardContainer class={{cn "modal" this.modal.state.format}}>
+      <:default>
+        <h1>LOADING!!!</h1>
+      </:default>
+    </CardContainer>
+  {{else}}
+    {{#if (eq this.modal.state.format 'edit')}}
+      <CardContainer
+        @selected={{true}}
+        class={{cn "modal" this.modal.state.format}}
+      >
+        <:header>
+          [EDIT MODE HEADER]
+          <Boxel::Button @kind="secondary" data-test-modal-close {{on 'click' this.close}}>Close Modal</Boxel::Button>
+        </:header>
+        <:default>
           <this.modal.cardComponent />
-        </CardContainer>
-      {{/if}}
+        </:default>
+        <:action-chin>
+          <Boxel::Button @kind="primary" data-test-modal-save {{on 'click' this.modal.save}}>Save</Boxel::Button>
+          <Boxel::Button @kind="secondary" data-test-modal-cancel {{on 'click' this.modal.close}}>Cancel</Boxel::Button>
+        </:action-chin>
+      </CardContainer>
+    {{else}}
+      <CardContainer
+        @card={{this.modal.card}}
+        @editable={{true}}
+        class={{cn "modal" this.modal.state.format}}
+      >
+        <:default>
+          <this.modal.cardComponent />
+        </:default>
+      </CardContainer>
     {{/if}}
-  </div>
-{{/if}}
+  {{/if}}
+</Boxel::Modal>
 
 <div
   class="CardModal-urlWatcher"

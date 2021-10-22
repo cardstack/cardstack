@@ -11,4 +11,5 @@ import '../components/boxel/field/view/index.css';
 import '../components/boxel/field/edit/index.css';
 import '../components/boxel/header/index.css';
 import '../components/boxel/input/index.css';
+import '../components/boxel/modal/index.css';
 import '../components/boxel/select-button/index.css';

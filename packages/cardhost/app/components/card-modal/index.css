@@ -1,3 +1,8 @@
+.modal {
+  height: 100%;
+  overflow-y: auto;
+}
+
 .modal.edit .field ~ .field {
   margin-top: 0.5em;
 }
