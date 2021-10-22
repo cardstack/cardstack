@@ -20,6 +20,7 @@ export type GuildMember = DiscordGuildMember | MockGuildMember;
 export type Guild = DiscordGuild | MockGuild;
 
 export interface MockMessage {
+  id: string;
   content: string;
   author: MockUser;
   member?: MockGuildMember;
@@ -57,5 +58,5 @@ export interface MockGuildMember {
 export interface MockChannel {
   type: string;
   id: string;
-  send: (msg: string) => Promise<unknown>;
+  send: (msg: any) => Promise<unknown>;
 }

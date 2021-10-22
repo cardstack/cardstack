@@ -11,3 +11,4 @@ export {
   MockMessage,
 } from './types';
 export { MessageEmbed, Collection } from 'discord.js';
+export { makeTestMessage, makeTestChannel, makeTestGuild } from './utils/mocks';
