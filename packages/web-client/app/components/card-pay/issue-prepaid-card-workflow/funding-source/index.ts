@@ -34,18 +34,20 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
     let prepaidFundingSafeAddress = this.args.workflowSession.getValue<string>(
       'prepaidFundingSafeAddress'
     );
-    this.selectedSafe = prepaidFundingSafeAddress
+
+    let safeToSelect = prepaidFundingSafeAddress
       ? this.layer2Network.safes.getByAddress(prepaidFundingSafeAddress)
       : this.layer2Network.depotSafe;
 
     // FIXME this could change the selected safe if the stored one is now underfunded…
     if (
-      (this.selectedSafe &&
-        !this.sufficientBalanceSafes.includes(this.selectedSafe)) ||
-      !this.selectedSafe
+      (safeToSelect && !this.sufficientBalanceSafes.includes(safeToSelect)) ||
+      !safeToSelect
     ) {
-      this.selectedSafe = this.sufficientBalanceSafes[0];
+      safeToSelect = this.sufficientBalanceSafes[0];
     }
+
+    this.selectedSafe = safeToSelect;
 
     this.selectedTokenSymbol =
       this.tokens.find((t) => t.symbol === this.prepaidFundingToken)
