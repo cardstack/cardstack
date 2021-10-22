@@ -781,7 +781,7 @@ let {
     command = 'rewardPoolBalance';
   })
   .command(
-    'claim-rewards <rewardSafe> <rewardProgramId> <tokenAddress> <proof> <amount>',
+    'claim-rewards <rewardSafe> <rewardProgramId> <tokenAddress> <proof> [amount]',
     'Claim rewards using proof',
     (yargs) => {
       yargs.positional('rewardSafe', {
@@ -1180,10 +1180,6 @@ if (!command) {
       }
       if (proof == null) {
         showHelpAndExit('proof is a required value');
-        return;
-      }
-      if (amount == null) {
-        showHelpAndExit('amount is a required value');
         return;
       }
       await claimRewards(network, rewardSafe, rewardProgramId, tokenAddress, proof, amount, mnemonic);

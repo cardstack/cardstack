@@ -309,7 +309,7 @@ export default class RewardPool {
     rewardProgramId: string,
     tokenAddress: string,
     proof: string,
-    amount: string,
+    amount?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
@@ -336,9 +336,6 @@ export default class RewardPool {
     if (!proof) {
       throw new Error('proof must be provided');
     }
-    if (!amount) {
-      throw new Error('amount must be provided');
-    }
 
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
 
@@ -357,8 +354,7 @@ export default class RewardPool {
 The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is ${from}`
       );
     }
-
-    let weiAmount = new BN(toWei(amount));
+    let weiAmount = amount ? new BN(toWei(amount)) : unclaimedRewards;
     if (weiAmount.gt(unclaimedRewards)) {
       throw new Error(
         `Insufficient rewards for rewardSafeOwner.
@@ -374,7 +370,6 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
         )} but user is asking for ${amount}`
       );
     }
-
     let rewardPoolAddress = await getAddress('rewardPool', this.layer2Web3);
 
     let payload = (await this.getRewardPool()).methods
@@ -383,7 +378,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, tokenAddress);
 
     let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
-    if (unclaimedRewards.lt(weiAmount.add(gasCost))) {
+    if (weiAmount.lt(gasCost)) {
       throw new Error(
         `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
           unclaimedRewards
