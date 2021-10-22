@@ -239,7 +239,6 @@ export async function signRewardSafe(
   gnosisSafeAddress: string,
   verifyingContractAddress: string
 ): Promise<any> {
-  let rsvSignatures = [];
   let [ownerSignature] = await signSafeTxAsRSV(
     web3,
     to,
@@ -256,15 +255,12 @@ export async function signRewardSafe(
     gnosisSafeAddress
   );
 
-  let contractSignature = createContractSignatureRSV(verifyingContractAddress);
-  rsvSignatures.push(ownerSignature);
-  rsvSignatures.push(contractSignature);
+  let contractSignature = createEIP1271ContractSignatureRSV(verifyingContractAddress);
   let sortedRSVSignatures = sortSignatures(ownerSignature, contractSignature, owner, verifyingContractAddress);
   return sortedRSVSignatures;
 }
 
-// TODO: incorporate pre-validated signatures (that is a type of contract signature too)
-function createContractSignature(verifyingContractAddress: string): string {
+function createEIP1271ContractSignature(verifyingContractAddress: string): string {
   const threshold = 2; //multi-owner in our protocol means two owners: eoa + contract
   const address = padLeft(verifyingContractAddress, 64).replace('0x', '');
   const dynamicPosition = padLeft(toHex(threshold * 65), 64).replace('0x', '');
@@ -272,9 +268,8 @@ function createContractSignature(verifyingContractAddress: string): string {
   return '0x' + address + dynamicPosition + signatureType;
 }
 
-function createContractSignatureRSV(verifyingContractAddress: string): Signature {
-  let contractSignature = createContractSignature(verifyingContractAddress);
-  return ethSignSignatureToRSVForSafe(contractSignature);
+function createEIP1271ContractSignatureRSV(verifyingContractAddress: string): Signature {
+  return ethSignSignatureToRSVForSafe(createEIP1271ContractSignature(verifyingContractAddress));
 }
 
 export function createVerifyingSignature(
