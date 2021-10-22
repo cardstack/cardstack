@@ -11,6 +11,9 @@ describe('bot command: ping', function () {
     username: 'Akiko',
   };
 
+  // Based on how your bot command deals with state it may be more desireable to
+  // create and teardown the DI container in between each test. Because the
+  // !ping command is not stateful, it's not really necessary.
   this.beforeAll(async function () {
     botController = await HubBotController.create();
     bot = botController.bot;
