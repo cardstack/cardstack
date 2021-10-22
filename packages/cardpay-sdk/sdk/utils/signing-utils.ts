@@ -272,7 +272,7 @@ function createEIP1271ContractSignatureRSV(verifyingContractAddress: string): Si
   return ethSignSignatureToRSVForSafe(createEIP1271ContractSignature(verifyingContractAddress));
 }
 
-export function createVerifyingSignature(
+export function createEIP1271VerifyingData(
   web3: Web3,
   to: string,
   value: string,
