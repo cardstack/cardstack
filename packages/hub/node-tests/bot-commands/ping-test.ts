@@ -2,7 +2,7 @@ import { HubBotController } from '../../main';
 import { name as pingName, run as pingCommand } from '../../services/discord-bots/hub-bot/commands/guild/ping';
 import Bot, { MockUser, makeTestMessage, makeTestChannel } from '@cardstack/discord-bot';
 
-describe.only('bot command: ping', function () {
+describe('bot command: ping', function () {
   let botController: HubBotController;
   let bot: Bot;
   let user: MockUser = {

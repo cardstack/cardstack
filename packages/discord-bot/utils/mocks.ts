@@ -1,3 +1,5 @@
+/* global expect */
+
 import { Collection, MockChannel, MockGuildMember, MockRole, MockUser } from '..';
 import { MockGuild, MockMessage } from '../types';
 
