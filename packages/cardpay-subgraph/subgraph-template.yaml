@@ -551,7 +551,7 @@ dataSources:
     source:
       address: "{REWARD_MANAGER_ADDRESS}"
       abi: RewardManager
-      startBlock: {CARDPAY_GENESIS_BLOCK}
+      startBlock: {v0_8_3_START_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -580,7 +580,7 @@ dataSources:
     source:
       address: "{REGISTER_REWARD_PROGRAM_HANDLER_ADDRESS}"
       abi: RegisterRewardProgramHandler
-      startBlock: {CARDPAY_GENESIS_BLOCK}
+      startBlock: {v0_8_3_START_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -613,7 +613,7 @@ dataSources:
     source:
       address: "{REGISTER_REWARDEE_HANDLER_ADDRESS}"
       abi: RegisterRewardeeHandler
-      startBlock: {CARDPAY_GENESIS_BLOCK}
+      startBlock: {v0_8_3_START_BLOCK}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -644,36 +644,36 @@ dataSources:
   # (https://github.com/cardstack/card-pay-protocol/pull/103) commenting this
   # out to prevent breaking index
 
-  # - kind: ethereum/contract
-  #   name: RewardPool
-  #   network: {NETWORK}
-  #   source:
-  #     address: "{REWARD_POOL_ADDRESS}"
-  #     abi: RewardPool
-  #     startBlock: {CARDPAY_GENESIS_BLOCK}
-  #   mapping:
-  #     kind: ethereum/events
-  #     apiVersion: 0.0.4
-  #     language: wasm/assemblyscript
-  #     entities:
-  #       - RewardeeClaim
-  #     abis:
-  #       - name: RewardPool
-  #         file: ./abis/generated/RewardPool.json
-  #       - name: ERC20
-  #         file: ./abis/ERC20.json
-  #       - name: ERC20SymbolBytes
-  #         file: ./abis/ERC20SymbolBytes.json
-  #       - name: ERC20NameBytes
-  #         file: ./abis/ERC20NameBytes.json
-  #       - name: GnosisSafe
-  #         file: ./abis/GnosisSafe.json
-  #     eventHandlers:
-  #       - event: RewardeeClaim(address,address,address,uint256)
-  #         handler: handleRewardeeClaim
-  #       - event: RewardTokensAdded(address,address,address,uint256)
-  #         handler: handleRewardTokensAdded
-  #     file: ./src/mappings/reward-pool.ts
+  - kind: ethereum/contract
+    name: RewardPool
+    network: {NETWORK}
+    source:
+      address: "{REWARD_POOL_ADDRESS}"
+      abi: RewardPool
+      startBlock: {v0_8_3_START_BLOCK}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - RewardeeClaim
+      abis:
+        - name: RewardPool
+          file: ./abis/generated/RewardPool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: GnosisSafe
+          file: ./abis/GnosisSafe.json
+      eventHandlers:
+        - event: RewardeeClaim(address,address,address,uint256)
+          handler: handleRewardeeClaim
+        - event: RewardTokensAdded(address,address,address,uint256)
+          handler: handleRewardTokensAdded
+      file: ./src/mappings/reward-pool.ts
 
 templates:
   - kind: ethereum/contract
