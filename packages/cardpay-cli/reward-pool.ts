@@ -113,7 +113,7 @@ export async function claimRewards(
   let rewardPool = await getSDK('RewardPool', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
   await rewardPool.claim(rewardSafeAddress, rewardProgramId, tokenAddress, proof, amount, {
-    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+    onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log(
     `Claimed token ${tokenAddress} to reward safe ${rewardSafeAddress} for reward program ${rewardProgramId}`

@@ -14,6 +14,8 @@ import MerchantManagerABI from './abi/v0.8.0/merchant-manager';
 import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.0/deprecated-merchant-manager-0_6_7';
 import RegisterRewardProgramHandlerABI from './abi/v0.8.0/register-reward-program-handler';
 import RegisterRewardeeHandlerABI from './abi/v0.8.0/register-rewardee-handler';
+import RewardPoolABI from './abi/v0.8.3/reward-pool';
+
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
 consumeModule(RegisterMerchantHandlerABI);
@@ -21,6 +23,7 @@ consumeModule(TransferPrepaidCardHandlerABI);
 consumeModule(SplitPrepaidCardHandlerABI);
 consumeModule(SpendABI);
 consumeModule(MerchantManagerABI);
+consumeModule(RewardPoolABI);
 // we include this because we are still interested in indexing events from this contract
 consumeModule(DeprecatedMerchantManagerABI_0_6_7);
 consumeModule(RegisterRewardProgramHandlerABI);

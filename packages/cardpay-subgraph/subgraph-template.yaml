@@ -665,7 +665,7 @@ dataSources:
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
       eventHandlers:
-        - event: RewardeeClaim(address,address,address,uint256)
+        - event: RewardeeClaim(address,address,address,address,uint256)
           handler: handleRewardeeClaim
         - event: RewardTokensAdded(address,address,address,uint256)
           handler: handleRewardTokensAdded
