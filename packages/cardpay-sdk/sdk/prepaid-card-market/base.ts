@@ -1,8 +1,8 @@
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
-import PrepaidCardMarketABI from '../../contracts/abi/v0.8.0/prepaid-card-market';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.0/prepaid-card-manager';
+import PrepaidCardMarketABI from '../../contracts/abi/v0.8.3/prepaid-card-market';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.3/prepaid-card-manager';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import { TransactionReceipt } from 'web3-core';
 import { ContractOptions } from 'web3-eth-contract';

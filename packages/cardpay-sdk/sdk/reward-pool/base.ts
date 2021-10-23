@@ -1,7 +1,7 @@
 /*global fetch */
 
 import Web3 from 'web3';
-import RewardPoolABI from '../../contracts/abi/v0.8.0/reward-pool';
+import RewardPoolABI from '../../contracts/abi/v0.8.3/reward-pool';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, fromWei, toWei } from 'web3-utils';
