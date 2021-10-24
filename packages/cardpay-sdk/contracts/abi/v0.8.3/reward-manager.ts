@@ -186,6 +186,36 @@ export default [
     type: 'function',
   },
   {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'ruleDID',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'tallyRuleDID',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'benefitDID',
+        type: 'string',
+      },
+    ],
+    name: 'addRewardRule',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     constant: true,
     inputs: [],
     name: 'cardpayVersion',
@@ -198,6 +228,27 @@ export default [
     ],
     payable: false,
     stateMutability: 'pure',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address payable',
+        name: 'rewardSafe',
+        type: 'address',
+      },
+    ],
+    name: 'getRewardSafeOwner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -224,6 +275,58 @@ export default [
         internalType: 'address',
         name: '',
         type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'prepaidCardOwner',
+        type: 'address',
+      },
+    ],
+    name: 'hasRewardSafe',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'ruleDID',
+        type: 'string',
+      },
+    ],
+    name: 'hasRule',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
       },
     ],
     payable: false,
@@ -262,6 +365,68 @@ export default [
   },
   {
     constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+    ],
+    name: 'isRewardProgram',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address payable',
+        name: 'rewardSafe',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+    ],
+    name: 'isValidRewardSafe',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+    ],
+    name: 'lockRewardProgram',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
     inputs: [],
     name: 'owner',
     outputs: [
@@ -273,6 +438,87 @@ export default [
     ],
     payable: false,
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'admin',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+    ],
+    name: 'registerRewardProgram',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'prepaidCardOwner',
+        type: 'address',
+      },
+    ],
+    name: 'registerRewardee',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+    ],
+    name: 'removeRewardProgram',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+      {
+        internalType: 'string',
+        name: 'ruleDID',
+        type: 'string',
+      },
+    ],
+    name: 'removeRewardRule',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -459,21 +705,6 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
-      },
-    ],
-    name: 'transferOwnership',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
         name: '_actionDispatcher',
         type: 'address',
       },
@@ -514,31 +745,11 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: 'admin',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
+        name: 'newOwner',
         type: 'address',
       },
     ],
-    name: 'registerRewardProgram',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-    ],
-    name: 'removeRewardProgram',
+    name: 'transferOwnership',
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
@@ -562,217 +773,6 @@ export default [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-      {
-        internalType: 'string',
-        name: 'ruleDID',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'tallyRuleDID',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'benefitDID',
-        type: 'string',
-      },
-    ],
-    name: 'addRewardRule',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-      {
-        internalType: 'string',
-        name: 'ruleDID',
-        type: 'string',
-      },
-    ],
-    name: 'removeRewardRule',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-    ],
-    name: 'lockRewardProgram',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'prepaidCardOwner',
-        type: 'address',
-      },
-    ],
-    name: 'registerRewardee',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'rewardSafe',
-        type: 'address',
-      },
-    ],
-    name: 'getRewardSafeOwner',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-    ],
-    name: 'isRewardProgram',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'rewardSafe',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-    ],
-    name: 'isValidRewardSafe',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-      {
-        internalType: 'string',
-        name: 'ruleDID',
-        type: 'string',
-      },
-    ],
-    name: 'hasRule',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'prepaidCardOwner',
-        type: 'address',
-      },
-    ],
-    name: 'hasRewardSafe',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
     type: 'function',
   },
 ];
