@@ -16,7 +16,7 @@ import CardMembershipImage from '@cardstack/web-client/images/illustrations/card
 import '../css/cardstack-landing-page.css';
 
 import ENV from '../config/environment';
-const { enableCardSpace } = ENV.features;
+const { enableCardSpace, enableCardPay } = ENV.features;
 
 const ORGS = [
   {
@@ -39,8 +39,8 @@ const ORGS = [
       'earn or distribute rewards',
       'etc.',
     ],
-    cta: 'Open',
-    launched: true,
+    cta: enableCardPay ? 'Open' : 'Launching soon',
+    launched: enableCardPay,
     route: 'card-pay',
   },
   {
