@@ -8,6 +8,7 @@ interface ChainsOptions {
 interface FeaturesOptions {
   createMerchant: boolean;
   enableCardSpace: boolean;
+  enableCardPay: boolean;
 }
 
 interface UrlsOptions {
