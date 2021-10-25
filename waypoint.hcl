@@ -23,7 +23,7 @@ app "hub" {
             region = "us-east-1"
             memory = "512"
             cluster = "hub-staging"
-            count = 0
+            count = 2
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
             task_role_name = "hub-staging-hub_ecr_task"
             alb {
@@ -65,7 +65,7 @@ app "hub-worker" {
             region = "us-east-1"
             memory = "512"
             cluster = "hub-worker-staging"
-            count = 0
+            count = 2
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
             task_role_name = "hub-staging-hub_ecr_task"
             disable_alb = true
@@ -100,7 +100,7 @@ app "hub-bot" {
             region = "us-east-1"
             memory = "512"
             cluster = "hub-bot-staging"
-            count = 0
+            count = 1
             subnets = ["subnet-09af2ce7fb316890b", "subnet-08c7d485ed397ca69"]
             task_role_name = "hub-staging-hub_ecr_task"
             disable_alb = true
