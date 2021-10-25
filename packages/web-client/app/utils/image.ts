@@ -22,8 +22,8 @@ const defaultImageRequirements: Required<ImageRequirements> = {
   maxWidth: Infinity,
   minHeight: 50,
   maxHeight: Infinity,
-  minFileSize: 50 * 1024,
-  maxFileSize: 200 * 1024,
+  minFileSize: 0,
+  maxFileSize: 2 * 1024 * 1024, // 2MB
   fileType: ['image/png', 'image/jpeg'],
 };
 
