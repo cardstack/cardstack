@@ -24,6 +24,7 @@ runs:
     - uses: volta-cli/action@v1
 
     - name: Docker build common image
+      shell: bash
       run: docker build -f Dockerfile . -t locally-built-monorepo
 
     - name: Deploy server
