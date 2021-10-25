@@ -77,8 +77,6 @@ app "hub-worker" {
 }
 
 app "hub-bot" {
-    path = "./packages/hub"
-
     build {
         use "docker" {
           dockerfile = "Dockerfile.bot"
