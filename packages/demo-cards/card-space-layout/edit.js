@@ -10,7 +10,7 @@ export default setComponentTemplate(
       <BoxelCardContainer class="card-space-layout-edit" @displayBoundaries={{true}}>
         <:header>{{name}}</:header>
         <:default>
-          <Field />
+          <div class="card-space-layout-edit__inner"><Field /></div>
         </:default>
       </BoxelCardContainer>
     {{/each-in}}`,

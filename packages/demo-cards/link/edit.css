@@ -1,0 +1,7 @@
+.link-edit + .link-edit {
+  margin-top: var(--boxel-sp-xl);
+}
+
+.link-edit > * + * {
+  margin-top: var(--boxel-sp-sm);
+}

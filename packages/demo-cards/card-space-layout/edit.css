@@ -1,3 +1,11 @@
 .card-space-layout-edit {
   margin: var(--boxel-sp-lg);
 }
+
+.card-space-layout-edit__inner {
+  padding: var(--boxel-sp);
+}
+
+.card-space-layout-edit__inner > * + * {
+  margin-top: var(--boxel-sp-lg);
+}
