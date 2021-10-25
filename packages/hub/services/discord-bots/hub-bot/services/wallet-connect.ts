@@ -28,7 +28,7 @@ export default class WalletConnectService {
       bridge,
     });
 
-    let replyPromise: Promise<Message> | undefined;
+    let replyPromise: Promise<unknown> | undefined;
     let hasError = false;
     provider.connector.on('display_uri', async (err, payload) => {
       if (err) {
