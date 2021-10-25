@@ -28,14 +28,14 @@ describe('bot command: ping', function () {
   });
 
   it(`can respond to a !ping command`, async function () {
-    let channelResponse: string | undefined;
+    let channel = makeTestChannel();
     let message = makeTestMessage({
       user,
       content: '!ping',
-      channel: makeTestChannel({ onSend: (msg) => (channelResponse = msg) }),
+      channel,
     });
 
     await pingCommand(bot, message);
-    expect(channelResponse).to.equal('pong');
+    expect(channel.lastResponse).to.equal('pong');
   });
 });

@@ -14,6 +14,8 @@ export interface DiscordBotConfig {
   allowedGuilds: string;
   allowedChannels: string;
 }
+import { MockChannel } from './utils/mocks';
+export { MockChannel };
 
 export type Message = DiscordMessage | MockMessage;
 export type GuildMember = DiscordGuildMember | MockGuildMember;
@@ -26,6 +28,9 @@ export interface MockMessage {
   member?: MockGuildMember;
   channel: MockChannel;
   guild?: MockGuild;
+  // I'm being really loose with what a message item is, if we want to nail it
+  // down there is a large pile of stuff this could be, but I didn't want to
+  // make the mock too heavyweight
   reply: (msg: any) => Promise<unknown>;
 }
 export interface MockUser {
@@ -53,10 +58,4 @@ export interface MockGuildMember {
   roles: {
     cache: Collection<string, MockRole>;
   };
-}
-
-export interface MockChannel {
-  type: string;
-  id: string;
-  send: (msg: any) => Promise<unknown>;
 }
