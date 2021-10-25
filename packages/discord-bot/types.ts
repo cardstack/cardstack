@@ -3,8 +3,10 @@ import {
   Guild as DiscordGuild,
   GuildMember as DiscordGuildMember,
   Collection,
+  Snowflake,
 } from 'discord.js';
 import { Client as PgClient } from 'pg';
+
 export interface DiscordBotConfig {
   botId: string;
   botToken: string;
@@ -14,9 +16,12 @@ export interface DiscordBotConfig {
   commandsDir: string;
   allowedGuilds: string;
   allowedChannels: string;
+  messageVerificationDelayMs: number;
 }
 import { MockChannel } from './utils/mocks';
-export { MockChannel };
+import { SUUID } from 'short-uuid';
+export { SUUID } from 'short-uuid';
+export { MockChannel, Snowflake };
 
 export type Message = DiscordMessage | MockMessage;
 export type GuildMember = DiscordGuildMember | MockGuildMember;
@@ -60,6 +65,31 @@ export interface MockGuildMember {
     cache: Collection<string, MockRole>;
   };
 }
-export interface BotDatabaseDelegate {
+
+export type NotificationCallback = (msg: any) => void;
+
+export interface DiscordBotsDbGateway {
   getDatabaseClient(): Promise<PgClient>;
+  getCurrentListenerId(type: string): Promise<SUUID | null>;
+  getLastMessageIdProcessed(type: string): Promise<Snowflake | null>;
+  becomeListener(botInstanceId: SUUID, type: string, previousListenerId?: SUUID | null): Promise<boolean>;
+  updateStatus(status: DiscordBotStatus, botType: string, botInstanceId: SUUID): Promise<void>;
+  updateLastMessageProcessed(messageId: Snowflake, botInstanceId: SUUID): Promise<void>;
+  subscribe(channel: string, botType: string, callback: NotificationCallback): Promise<void>;
+  unsubscribe(channel: string, botType: string): Promise<void>;
+}
+
+export interface DmChannelsDbGateway {
+  conversationCommand(channelId: string): Promise<string | undefined>;
+  activateDMConversation(channelId: string, userId: string, commandName: string): Promise<void>;
+  deactivateDMConversation(channelId: string, userId: string): Promise<void>;
+}
+
+export type DiscordBotStatus = 'connecting' | 'connected' | 'listening' | 'disconnected' | 'unresponsive';
+
+export interface MessageVerificationScheduler {
+  destroy(): void;
+  cancelScheduledVerification(messageId: Snowflake): Message | undefined;
+  scheduledVerificationsCount: number;
+  scheduleVerification(message: Message): Promise<void>;
 }

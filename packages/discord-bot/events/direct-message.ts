@@ -1,7 +1,6 @@
 import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
 import { Event } from '../bot';
-import { conversationCommand } from '../utils/dm';
 
 const log = logger('events:direct-message');
 
@@ -11,10 +10,14 @@ export const run: Event['run'] = async (bot, message) => {
   if (!message || message?.author.bot || message?.guild || message?.channel.type !== 'dm') {
     return;
   }
+  if (bot.status !== 'listening') {
+    bot.messageProcessingVerifier.scheduleVerification(message);
+    return;
+  }
+
   let channelId = message.channel.id;
 
-  let db = await bot.getDatabaseClient();
-  let commandName = await conversationCommand(db, channelId);
+  let commandName = await bot.dmChannelsDbGateway.conversationCommand(channelId);
   if (commandName == null) {
     log.trace(`Ignoring message from ${message.author.username} in ${channelId}`);
     return;
@@ -35,5 +38,7 @@ export const run: Event['run'] = async (bot, message) => {
     Sentry.withScope(function () {
       Sentry.captureException(err);
     });
+  } finally {
+    bot.notifyMessageProcessed(message);
   }
 };

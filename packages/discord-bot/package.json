@@ -18,7 +18,17 @@
     "glob-promise": "^4.2.0",
     "pg": "^8.6.0",
     "qrcode": "^1.4.4",
+    "short-uuid": "^4.2.0",
+    "sinon": "^11.1.2",
     "tmp": "^0.2.1"
+  },
+  "devDependencies": {
+    "@cardstack/eslint-config": "0.27.22",
+    "@cardstack/test-support": "0.27.22",
+    "@types/chai": "^4.2.15",
+    "@types/mocha": "^8.2.1",
+    "chai": "^4.3.4",
+    "mocha": "^8.3.2"
   },
   "publishConfig": {
     "access": "public",
@@ -26,6 +36,17 @@
   },
   "config": {
     "access": "public"
+  },
+  "scripts": {
+    "test": "mocha -r @cardstack/test-support/prepare-node-tests 'node-tests/**/*-test.js' --timeout 60000",
+    "autotest": "mocha -r @cardstack/test-support/prepare-node-tests -w --reporter=min 'node-tests/**/*-test.js' --timeout 60000"
+  },
+  "engines": {
+    "node": "^14.0",
+    "yarn": "^1.0"
+  },
+  "volta": {
+    "extends": "../../package.json"
   },
   "gitHead": "b17d8fbb592bcb823dd23179767fdaba0d46a74e"
 }

@@ -8,22 +8,7 @@
 | status                 | enum: CONNECTING,CONNECTED,LISTENING,DISCONNECTED,UNRESPONSIVE | NOT NULL |
 | last_message_id        | string    | NULL        |
 
-- [x] Migration to add discord_bots table
-- [x] Migration to add discord_bot_status
-- [x] Migration to add trigger to notify channel on update of discord_bots table
-- [x] Manually verify trigger
-- [x] Introduce BotDatabaseDelegate interface to abstract database interactions from Bot class
-- [ ] On start, bot tells database it is connecting
-- [ ] Track state and update database from Bot class
-- [ ] Update last_message_timestamp after processing a message
-- [ ] Add guard for message processing to only process if state === LISTENING
-- [ ] Queue message if state !== LISTENING
-- [ ] Listen on discord_bot_status when subscribing to events
-- [ ] Handle timestamp changed notification when state !== LISTENING
-- [ ] Handle disconnected notification when state !== LISTENING
-- [ ] Add timeout to catch unprocessed messages to become LISTENING and process them
-- [ ] Mention in bot library docs that commands should load/store state in DB not in memory
-- [ ] Make sure we are calling "UNLISTEN" correctly
+## Handling multiple bot instances
 
 Single bot
 

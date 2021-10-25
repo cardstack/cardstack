@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 13.4
--- Dumped by pg_dump version 13.4
+-- Dumped by pg_dump version 14.0
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -572,11 +572,11 @@ CREATE FUNCTION public.discord_bots_updated_trigger() RETURNS trigger
       payload TEXT;
     BEGIN
     IF NEW."last_message_id" IS NOT NULL THEN
-      payload := '{ id: "' || NEW."last_message_id" || '", bot_type: "' || NEW."bot_type" || '" }';
+      payload := '{ "id": "' || NEW."last_message_id" || '", "bot_type": "' || NEW."bot_type" || '" }';
       PERFORM pg_notify('discord_bot_message_processing', payload);
     END IF;
     IF OLD."status" = 'listening' AND NEW."status" = 'disconnected' THEN
-      payload := '{ bot_type: "' || NEW."bot_type" || '", status: "' || NEW."status"   ||'" }';
+      payload := '{ "bot_type": "' || NEW."bot_type" || '", "status": "' || NEW."status"   ||'" }';
       PERFORM pg_notify('discord_bot_status', payload);
     END IF;
     RETURN NEW;
@@ -1112,7 +1112,7 @@ CREATE TRIGGER _900_notify_worker AFTER INSERT ON graphile_worker.jobs FOR EACH 
 -- Name: discord_bots discord_bots_updated_trigger; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
-CREATE TRIGGER discord_bots_updated_trigger AFTER UPDATE ON public.discord_bots FOR EACH ROW EXECUTE FUNCTION public.discord_bots_updated_trigger();
+CREATE TRIGGER discord_bots_updated_trigger AFTER INSERT OR UPDATE ON public.discord_bots FOR EACH ROW EXECUTE FUNCTION public.discord_bots_updated_trigger();
 
 
 --
@@ -1174,7 +1174,7 @@ ALTER TABLE graphile_worker.known_crontabs ENABLE ROW LEVEL SECURITY;
 --
 
 -- Dumped from database version 13.4
--- Dumped by pg_dump version 13.4
+-- Dumped by pg_dump version 14.0
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1218,7 +1218,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 47	20211006090701108_create-card-spaces	2021-10-22 11:31:31.004948
 48	20211013173917696_beta-testers	2021-10-22 11:31:31.004948
 49	20211014131843187_add-fields-to-card-spaces	2021-10-22 11:31:31.004948
-53	20211020231214235_discord-bots	2021-10-26 01:43:03.978314
+56	20211020231214235_discord-bots	2021-11-04 00:40:42.174568
 \.
 
 
@@ -1226,7 +1226,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 53, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 56, true);
 
 
 --

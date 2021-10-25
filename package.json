@@ -53,6 +53,7 @@
     "test:boxel:try": "cd packages/boxel && ember try:one",
     "test:hub": "NODE_ENV=test cd packages/hub && yarn test",
     "test:did-resolver": "cd packages/did-resolver && yarn test",
+    "test:discord-bot": "cd packages/discord-bot && yarn test",
     "test:web-client": "cd packages/web-client && ember test",
     "test:web-client:serve": "cd packages/web-client && ember test --serve --no-launch",
     "deploy:boxel": "cd ./packages/boxel && ember deploy production --verbose",

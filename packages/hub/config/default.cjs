@@ -33,6 +33,7 @@ module.exports = {
     commandPrefix: '!',
     allowedGuilds: '896093062562983986',
     allowedChannels: '896093062562983989,898891181575000074',
+    messageVerificationDelayMs: 1000 * 15,
   },
   serverSecret: null,
   sentry: {

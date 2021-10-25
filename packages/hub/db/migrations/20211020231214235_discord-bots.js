@@ -21,7 +21,7 @@ exports.up = (pgm) => {
     {
       when: 'AFTER',
       level: 'ROW',
-      operation: 'UPDATE',
+      operation: 'INSERT OR UPDATE',
       language: 'plpgsql',
       replace: true,
     },
@@ -30,11 +30,11 @@ exports.up = (pgm) => {
       payload TEXT;
     BEGIN
     IF NEW."last_message_id" IS NOT NULL THEN
-      payload := '{ id: "' || NEW."last_message_id" || '", bot_type: "' || NEW."bot_type" || '" }';
+      payload := '{ "id": "' || NEW."last_message_id" || '", "bot_type": "' || NEW."bot_type" || '" }';
       PERFORM pg_notify('discord_bot_message_processing', payload);
     END IF;
     IF OLD."status" = 'listening' AND NEW."status" = 'disconnected' THEN
-      payload := '{ bot_type: "' || NEW."bot_type" || '", status: "' || NEW."status"   ||'" }';
+      payload := '{ "bot_type": "' || NEW."bot_type" || '", "status": "' || NEW."status"   ||'" }';
       PERFORM pg_notify('discord_bot_status', payload);
     END IF;
     RETURN NEW;
