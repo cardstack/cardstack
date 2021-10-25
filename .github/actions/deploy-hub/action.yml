@@ -23,8 +23,8 @@ runs:
 
     - uses: volta-cli/action@v1
 
-    - run: yarn --prefer-offline
-      shell: bash
+    - name: Docker build common image
+      run: docker build -f Dockerfile . -t locally-built-monorepo
 
     - name: Deploy server
       run: waypoint up --app=hub -plain

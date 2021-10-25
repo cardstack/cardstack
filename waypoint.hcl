@@ -4,10 +4,10 @@ project = "cardstack"
 # labels = { "foo" = "bar" }
 
 app "hub" {
-    path = "./packages/hub"
-
     build {
-        use "pack" {}
+        use "docker" {
+          dockerfile = "Dockerfile.hub"
+        }
 
         registry {
             use "aws-ecr" {
@@ -44,11 +44,9 @@ app "hub" {
 }
 
 app "hub-worker" {
-    path = "./packages/hub"
-
     build {
-        use "pack" {
-            process_type = "worker"
+        use "docker" {
+          dockerfile = "Dockerfile.worker"
         }
 
         registry {
@@ -82,10 +80,9 @@ app "hub-bot" {
     path = "./packages/hub"
 
     build {
-        use "pack" {
-            process_type = "bot"
+        use "docker" {
+          dockerfile = "Dockerfile.bot"
         }
-
         registry {
             use "aws-ecr" {
                 region     = "us-east-1"

@@ -1,0 +1,3 @@
+FROM locally-built-monorepo
+WORKDIR /workspace/packages/hub
+CMD node ./bin/hub serve
