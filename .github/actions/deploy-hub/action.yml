@@ -23,6 +23,9 @@ runs:
 
     - uses: volta-cli/action@v1
 
+    - run: yarn --prefer-offline
+      shell: bash
+
     - name: Docker build common image
       shell: bash
       run: docker build -f Dockerfile . -t locally-built-monorepo
