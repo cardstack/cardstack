@@ -161,6 +161,7 @@
     "@walletconnect/utils": "^1.6.0",
     "@walletconnect/web3-provider": "^1.6.0",
     "broadcastchannel-polyfill": "^1.0.1",
+    "cropperjs": "^1.5.12",
     "ember-elsewhere": "^1.2.1",
     "eth-block-tracker": "^5.0.1",
     "json-rpc-random-id": "^1.0.1",
