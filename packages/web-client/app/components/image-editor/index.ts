@@ -5,7 +5,7 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 
 interface ImageEditorComponentArguments {
-  aspectRatio: number; // width in px
+  aspectRatio: number; // in px
   image: string;
   rounded: false;
   saveImageEditData(data: { image: string }): void;
