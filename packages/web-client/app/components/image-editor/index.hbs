@@ -19,6 +19,7 @@
         <div class="image-editor__controls">
           <Boxel::Button
             @size="base"
+            @disabled={{this.loading}}
             class="image-editor__rotation-button"
             aria-label="Rotate 90 degrees anticlockwise"
             {{on "click" (fn this.rotate -90)}}
@@ -27,6 +28,7 @@
           </Boxel::Button>
           <Boxel::Button
             @size="base"
+            @disabled={{this.loading}}
             class="image-editor__rotation-button"
             aria-label="Rotate 90 degrees clockwise"
             {{on "click" (fn this.rotate 90)}}
