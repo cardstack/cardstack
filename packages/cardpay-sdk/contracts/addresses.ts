@@ -14,7 +14,6 @@ import MerchantManagerABI from './abi/v0.8.4/merchant-manager';
 import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.4/deprecated-merchant-manager-0_6_7';
 import RegisterRewardProgramHandlerABI from './abi/v0.8.4/register-reward-program-handler';
 import RegisterRewardeeHandlerABI from './abi/v0.8.4/register-rewardee-handler';
-import RewardPoolABI from './abi/v0.8.4/reward-pool';
 
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
