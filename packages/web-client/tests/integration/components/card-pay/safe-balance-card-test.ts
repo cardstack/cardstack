@@ -24,9 +24,13 @@ module(
     let merchantAddress = '0xmerchantbAB0644ffCD32518eBF4924ba8666666';
     let prepaidCardAddress = '0xprepaidDbAB0644ffCD32518eBF4924ba8666666';
 
+    let options: Record<string, any> = {};
+
     hooks.beforeEach(async function () {
       session = new WorkflowSession();
       this.set('session', session);
+
+      this.set('options', options);
 
       layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
@@ -66,12 +70,14 @@ module(
     });
 
     test('it renders the safe type and balances for the safe address specified in the workflow', async function (assert) {
-      session.setValue('safeBalanceCardKey', 'prepaidFundingSafeAddress');
+      // session.setValue('safeBalanceCardKey', 'prepaidFundingSafeAddress');
+      options.safeBalanceKey = 'prepaidFundingSafeAddress';
       session.setValue('prepaidFundingSafeAddress', merchantAddress);
 
       await render(hbs`
         <CardPay::SafeBalanceCard
           @workflowSession={{this.session}}
+          @options={{this.options}}
           @onComplete={{this.onComplete}}
           @onIncomplete={{this.onIncomplete}}
           @isComplete={{this.isComplete}}
@@ -89,12 +95,13 @@ module(
     });
 
     test('it can render balances for a prepaid card safe and filters out zero-balance tokens', async function (assert) {
-      session.setValue('safeBalanceCardKey', 'withdrawalSafeAddress');
+      options.safeBalanceKey = 'withdrawalSafeAddress';
       session.setValue('withdrawalSafeAddress', prepaidCardAddress);
 
       await render(hbs`
         <CardPay::SafeBalanceCard
           @workflowSession={{this.session}}
+          @options={{this.options}}
           @onComplete={{this.onComplete}}
           @onIncomplete={{this.onIncomplete}}
           @isComplete={{this.isComplete}}
@@ -122,6 +129,7 @@ module(
       await render(hbs`
         <CardPay::SafeBalanceCard
           @workflowSession={{this.session}}
+          @options={{this.options}}
           @onComplete={{this.onComplete}}
           @onIncomplete={{this.onIncomplete}}
           @isComplete={{this.isComplete}}
@@ -130,7 +138,7 @@ module(
     });
 
     test('it throws an error when the key referenced by safeBalanceCardKey is not present in the workflow', async function (assert) {
-      session.setValue('safeBalanceCardKey', 'aSafeAddress');
+      options.safeBalanceKey = 'aSafeAddress';
 
       setupOnerror(function (err: Error) {
         assert.equal(
@@ -142,6 +150,7 @@ module(
       await render(hbs`
         <CardPay::SafeBalanceCard
           @workflowSession={{this.session}}
+          @options={{this.options}}
           @onComplete={{this.onComplete}}
           @onIncomplete={{this.onIncomplete}}
           @isComplete={{this.isComplete}}
@@ -150,13 +159,14 @@ module(
     });
 
     test('it shows a message when the wallet is disconnected', async function (assert) {
-      session.setValue('safeBalanceCardKey', 'withdrawalSafeAddress');
+      options.safeBalanceKey = 'withdrawalSafeAddress';
       session.setValue('withdrawalSafeAddress', prepaidCardAddress);
       layer2Service.test__simulateDisconnectFromWallet();
 
       await render(hbs`
         <CardPay::SafeBalanceCard
           @workflowSession={{this.session}}
+          @options={{this.options}}
           @onComplete={{this.onComplete}}
           @onIncomplete={{this.onIncomplete}}
           @isComplete={{this.isComplete}}
@@ -167,12 +177,13 @@ module(
     });
 
     test('it shows a message when the safe is not found', async function (assert) {
-      session.setValue('safeBalanceCardKey', 'withdrawalSafeAddress');
+      options.safeBalanceKey = 'withdrawalSafeAddress';
       session.setValue('withdrawalSafeAddress', '0x000');
 
       await render(hbs`
         <CardPay::SafeBalanceCard
           @workflowSession={{this.session}}
+          @options={{this.options}}
           @onComplete={{this.onComplete}}
           @onIncomplete={{this.onIncomplete}}
           @isComplete={{this.isComplete}}

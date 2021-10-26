@@ -19,6 +19,10 @@ interface CardPaySafeBalanceCardComponentArgs
   onDisconnect: (() => void) | undefined;
 }
 
+interface CardPaySafeBalanceCardComponentOptions {
+  safeAddressKey: string;
+}
+
 class CardPaySafeBalanceCardComponent extends Component<CardPaySafeBalanceCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
   @reads('layer2Network.isConnected') declare isConnected: boolean;
@@ -46,7 +50,7 @@ class CardPaySafeBalanceCardComponent extends Component<CardPaySafeBalanceCardCo
   }
 
   get safeAddressKey() {
-    return this.args.workflowSession.getValue<string>('safeBalanceCardKey');
+    return this.args.options!.safeAddressKey;
   }
 
   get safeAddress() {
@@ -88,3 +92,9 @@ class CardPaySafeBalanceCardComponent extends Component<CardPaySafeBalanceCardCo
 }
 
 export default CardPaySafeBalanceCardComponent;
+
+declare module '@cardstack/web-client/models/workflow/workflow-card' {
+  interface ComponentRegistry {
+    'card-pay/safe-balance-card': CardPaySafeBalanceCardComponentOptions;
+  }
+}

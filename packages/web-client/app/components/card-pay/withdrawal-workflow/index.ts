@@ -276,6 +276,7 @@ with Card Pay.`,
     new WorkflowCard({
       cardName: 'TRANSACTION_CONFIRMED',
       componentName: 'card-pay/withdrawal-workflow/transaction-confirmed',
+      componentOptions: { safeAddressKey: '33' },
     }),
     new WorkflowMessage({
       message: `This is the remaining balance in your ${c.layer2.fullName} wallet:`,
@@ -283,6 +284,9 @@ with Card Pay.`,
     new WorkflowCard({
       cardName: 'EPILOGUE_SAFE_BALANCE_CARD',
       componentName: 'card-pay/safe-balance-card',
+      componentOptions: {
+        safeAddressKey: 'withdrawalSafe',
+      },
     }),
     new WorkflowCard({
       cardName: 'EPILOGUE_NEXT_STEPS',

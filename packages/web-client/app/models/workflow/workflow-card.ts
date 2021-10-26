@@ -4,6 +4,7 @@ import { IWorkflowSession } from './workflow-session';
 
 export interface WorkflowCardComponentArgs {
   workflowSession: IWorkflowSession;
+  options?: Record<string, any>;
   onComplete: (() => void) | undefined;
   onIncomplete: (() => void) | undefined;
   isComplete: boolean;
@@ -20,12 +21,15 @@ type FailureCheckResult = {
 
 export type CheckResult = SuccessCheckResult | FailureCheckResult;
 
-interface WorkflowCardOptions {
-  cardName?: string;
-  author: Participant;
-  componentName: string; // this should eventually become a card reference
-  includeIf(this: WorkflowCard): boolean;
-  check(this: WorkflowCard): Promise<CheckResult>;
+interface WorkflowCardOptions<K extends keyof ComponentRegistry | string> {
+  cardName: string;
+  author?: Participant;
+  componentName: K; // this should eventually become a card reference
+  componentOptions: K extends keyof ComponentRegistry
+    ? ComponentRegistry[K]
+    : never;
+  includeIf?(this: WorkflowCard): boolean;
+  check?(this: WorkflowCard): Promise<CheckResult>;
 }
 
 export class WorkflowCard extends WorkflowPostable {
@@ -35,9 +39,10 @@ export class WorkflowCard extends WorkflowPostable {
     return Promise.resolve({ success: true });
   };
 
-  constructor(options: Partial<WorkflowCardOptions>) {
+  constructor(options: WorkflowCardOptions<keyof ComponentRegistry>) {
     super(options.author, options.includeIf);
-    this.componentName = options.componentName!;
+    this.componentName = options.componentName;
+
     this.cardName = options.cardName || '';
 
     this.reset = () => {
@@ -93,3 +98,5 @@ export class WorkflowCard extends WorkflowPostable {
     }
   }
 }
+
+export interface ComponentRegistry {}

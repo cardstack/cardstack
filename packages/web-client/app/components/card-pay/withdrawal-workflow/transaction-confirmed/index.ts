@@ -11,6 +11,10 @@ import {
 } from '@cardstack/web-client/utils/token';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 
+interface CardPayWithdrawalWorkflowTransactionConfirmedComponentOptions {
+  jortle: string;
+}
+
 class CardPayWithdrawalWorkflowTransactionConfirmedComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
@@ -68,3 +72,9 @@ class CardPayWithdrawalWorkflowTransactionConfirmedComponent extends Component<W
 }
 
 export default CardPayWithdrawalWorkflowTransactionConfirmedComponent;
+
+declare module '@cardstack/web-client/models/workflow/workflow-card' {
+  interface ComponentRegistry {
+    'card-pay/withdrawal-workflow/transaction-confirmed': CardPayWithdrawalWorkflowTransactionConfirmedComponentOptions;
+  }
+}
