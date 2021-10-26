@@ -1,0 +1,54 @@
+{{!-- known issue. image which is a single pixel might produce invalid cropped output --}}
+<Boxel::Modal
+  @isOpen={{@isOpen}}
+  @onClose={{@onClose}}
+  data-test-image-editor
+  ...attributes
+>
+  <ActionCardContainer @header="Edit image" class="image-editor__card">
+    <div class="image-editor__layout">
+      <div class="image-editor__editing-section">
+        <div class="image-editor__cropper-container">
+          <img class="image-editor__cropper-target" src={{@image}} alt="" role="presentation" {{did-insert this.initializeCropper}}>
+          <div
+            class={{cn "image-editor__loading-indicator-container" image-editor__loading-indicator-container--done=(not this.loading)}}
+          >
+            <Boxel::LoadingIndicator class="image-editor__loading-indicator" />
+          </div>
+        </div>
+        <div class="image-editor__controls">
+          <Boxel::Button
+            @size="base"
+            class="image-editor__rotation-button"
+            aria-label="Rotate 90 degrees anticlockwise"
+            {{on "click" (fn this.rotate -90)}}
+          >
+            {{svg-jar "rotate-ccw" data-test-image-editor-rotate-ccw-button=true width="20px" height="20px"}}
+          </Boxel::Button>
+          <Boxel::Button
+            @size="base"
+            class="image-editor__rotation-button"
+            aria-label="Rotate 90 degrees clockwise"
+            {{on "click" (fn this.rotate 90)}}
+          >
+            {{svg-jar "rotate-cw" width="20px" height="20px"}}
+          </Boxel::Button>
+        </div>
+      </div>
+      <div class="image-editor__preview-section">
+        {{yield this.output}}
+      </div>
+    </div>
+    <Boxel::ActionChin @disabled={{this.loading}}>
+      <:default as |d|>
+        <d.ActionButton {{on "click" this.save}} data-test-image-editor-save-button>
+          Save
+        </d.ActionButton>
+        {{!-- this breaks out of the action chin api, maybe we need a cancel button for the default state?? --}}
+        <Boxel::Button data-test-image-editor-cancel-button @size="base" @kind="secondary-dark" class="image-editor__cancel-button" {{on "click" this.close}}>
+          Cancel
+        </Boxel::Button>
+      </:default>
+    </Boxel::ActionChin>
+  </ActionCardContainer>
+</Boxel::Modal>
