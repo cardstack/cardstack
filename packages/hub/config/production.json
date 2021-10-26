@@ -5,7 +5,19 @@
   "sentry": {
     "enabled": true
   },
+  "discord": {
+    "botId": "900458820826968065",
+    "allowedGuilds": "584043165066199050",
+    "allowedChannels": "898954606242054185"
+  },
+  "web3": {
+    "url":"https://api.sendwyre.com",
+    "network": "xdai"
+  },
   "wyre": {
     "callbackUrl": "https://hub.cardstack.com/callbacks/wyre"
+  },
+  "betaTesting": {
+    "sku": ""
   }
 }
