@@ -88,11 +88,6 @@ export class TokenContractInfo {
 
   constructor(symbol: BridgeableSymbol, network: NetworkSymbol) {
     this.symbol = symbol;
-    if (network === 'xdai') {
-      throw new Error(
-        "XDAI addresses may not be available yet. Please check the sdk's getAddressByNetwork method to see if this has changed"
-      );
-    }
     this.address = getAddressByNetwork(
       contractNames[network][this.symbol] as AddressKeys,
       network
