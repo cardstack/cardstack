@@ -2,6 +2,7 @@ import { CardSpace } from '../../routes/card-spaces';
 import CardSpaceQueries from '../queries/card-space';
 import { inject } from '@cardstack/di';
 import { URL } from 'url';
+import isValidDomain from 'is-valid-domain';
 
 export type CardSpaceAttribute =
   | 'url'
@@ -27,24 +28,17 @@ export interface NestedAttributeError {
   detail: string;
 }
 export type CardSpaceErrors = Record<CardSpaceAttribute, (string | NestedAttributeError)[]>;
-type UrlValidationResult = Record<'valid', boolean>;
-
 const MAX_LONG_FIELD_LENGTH = 300;
 const MAX_SHORT_FIELD_LENGTH = 50;
 const ALLOWED_BUTTON_TEXTS = ['Visit this Space', 'Visit this Business', 'Visit this Creator', 'Visit this Person'];
 
-function validateUrl(url: string): UrlValidationResult {
+function isValidUrl(url: string): boolean {
   try {
     new URL(url);
+    return true;
   } catch (_) {
-    return {
-      valid: false,
-    };
+    return false;
   }
-
-  return {
-    valid: true,
-  };
 }
 
 export default class CardSpaceValidator {
@@ -104,20 +98,31 @@ export default class CardSpaceValidator {
 
     // Validate URLs
 
-    let cardSpaceUrl = `https://${cardSpace.url}`;
-    let urlValid = validateUrl(cardSpaceUrl!).valid;
+    let urlValid = isValidDomain(cardSpace.url!);
 
     if (!urlValid) {
       errors.url.push('Invalid URL');
     } else {
-      let urlObject = new URL(cardSpaceUrl);
+      let urlObject = new URL(`https://${cardSpace.url}`);
       if (!urlObject.hostname.endsWith('card.space')) {
-        errors.url.push('Only card.space subdomains are allowed');
+        errors.url.push('Only valid card.space subdomains are allowed');
       }
     }
 
-    if (cardSpace.url && cardSpace.url.split('.').length - 1 !== 2) {
-      errors.url.push('Only first level subdomains are allowed');
+    if (cardSpace.url) {
+      let urlParts = cardSpace.url.split('.');
+      if (urlParts.length > 3) {
+        errors.url.push('Only first level subdomains are allowed');
+      }
+
+      if (urlParts[0] === 'www') {
+        // Could check more "reserved" subdomains here
+        errors.url.push('Not allowed');
+      }
+
+      if (urlParts[0].length > MAX_SHORT_FIELD_LENGTH) {
+        errors.url.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
+      }
     }
 
     let cardSpaceWithExistingUrl = (await this.cardSpaceQueries.query({ url: cardSpace.url }))[0];
@@ -126,11 +131,11 @@ export default class CardSpaceValidator {
       errors.url.push('Already exists');
     }
 
-    if (!validateUrl(cardSpace.profileImageUrl!).valid) {
+    if (cardSpace.profileImageUrl && !isValidUrl(cardSpace.profileImageUrl!)) {
       errors.profileImageUrl.push('Invalid URL');
     }
 
-    if (!validateUrl(cardSpace.profileCoverImageUrl!).valid) {
+    if (cardSpace.profileImageUrl && !isValidUrl(cardSpace.profileCoverImageUrl!)) {
       errors.profileCoverImageUrl.push('Invalid URL');
     }
 
@@ -178,7 +183,7 @@ export default class CardSpaceValidator {
             attribute: 'url',
             detail: 'Must be present',
           });
-        } else if (!validateUrl(url!).valid) {
+        } else if (!isValidUrl(url!)) {
           errors.links.push({
             index,
             attribute: 'url',

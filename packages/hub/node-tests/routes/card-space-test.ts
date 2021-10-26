@@ -235,7 +235,7 @@ describe('POST /api/card-spaces', function () {
               pointer: '/data/attributes/url',
             },
             title: 'Invalid attribute',
-            detail: 'Only card.space subdomains are allowed',
+            detail: 'Only valid card.space subdomains are allowed',
           },
           {
             status: '422',
