@@ -1,0 +1,58 @@
+.image-uploader__container {
+  --horizontal-gap: var(--boxel-sp-lg);
+  --image-size: 5.625rem;
+
+  display: grid;
+  gap: 0 var(--horizontal-gap);
+  width: max-content;
+  grid-template-columns: var(--image-size) auto;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'preview controls'
+    'preview requirements';
+}
+
+.image-uploader__preview {
+  grid-area: preview;
+  width: var(--image-size);
+  height: var(--image-size);
+  object-fit: cover;
+}
+
+.image-uploader__preview--rounded {
+  border-radius: 9999px;
+}
+
+.image-uploader__preview--placeholder {
+  --icon-color: var(--boxel-purple-200);
+
+  overflow: visible;
+  padding: var(--boxel-sp);
+  background-color: var(--boxel-light-400);
+}
+
+.image-uploader__controls {
+  grid-area: controls;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--boxel-sp-xxs);
+}
+
+.image-uploader__button {
+  flex-shrink: 0;
+  width: min-content;
+  min-width: 0;
+  margin: var(--boxel-sp-xs) 0;
+}
+
+.image-uploader__button--icon {
+  padding: var(--boxel-sp-xxxs);
+}
+
+.image-uploader__requirements {
+  grid-area: requirements;
+  font: var(--boxel-font-xs);
+  max-width: 14rem;
+  color: var(--boxel-purple-400);
+  letter-spacing: var(--boxel-lsp-lg);
+}

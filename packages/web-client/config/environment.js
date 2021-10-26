@@ -64,12 +64,13 @@ module.exports = function (environment) {
       // when it is created
     },
     chains: {
-      layer1: process.env.LAYER_1_CHAIN || 'keth', // set to "eth" for production
-      layer2: process.env.LAYER_2_CHAIN || 'sokol', // set to "xdai" for production,
+      layer1: process.env.DEPLOY_TARGET === 'production' ? 'eth' : 'keth',
+      layer2: process.env.DEPLOY_TARGET === 'production' ? 'xdai' : 'sokol',
     },
     features: {
       createMerchant: true,
       enableCardSpace: process.env.DEPLOY_TARGET !== 'production',
+      enableCardPay: process.env.DEPLOY_TARGET !== 'production',
     },
     infuraId:
       infuraIdsByTarget[process.env.DEPLOY_TARGET] ?? process.env.INFURA_ID,

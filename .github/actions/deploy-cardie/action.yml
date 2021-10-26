@@ -2,10 +2,6 @@ name: Deploy cardie
 description: Deploy cardie using waypoint
 
 inputs:
-  ref:
-    description: The branch, tag or SHA to deploy
-    required: false
-    default: main
   waypoint_version:
     description: Waypoint version to use
     required: false

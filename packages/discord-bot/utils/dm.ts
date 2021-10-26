@@ -1,11 +1,11 @@
 import logger from '@cardstack/logger';
-import { GuildMember, Message } from 'discord.js';
+import { Message, MockChannel, GuildMember } from '../types';
 import { Client as DBClient } from 'pg';
 import { isTestEnv } from './environment';
 
 const log = logger('utils:dm');
 
-export async function createDM(message: Message): Promise<Message['channel']> {
+export async function createDM(message: Message): Promise<Message['channel'] | MockChannel> {
   if (isTestEnv) {
     return message.channel;
   }

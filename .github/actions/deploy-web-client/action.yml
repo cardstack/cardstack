@@ -2,10 +2,6 @@ name: Deploy web-client
 description: Deploy web-client to S3
 
 inputs:
-  ref:
-    description: The branch, tag or SHA to deploy
-    required: false
-    default: main
   environment:
     description: Deployment environment
     required: true
@@ -47,4 +43,4 @@ runs:
         ignore_missing: true
         sourcemaps: packages/web-client/tmp/deploy-dist-uncompressed
         version: web-client-${{ github.sha }}@${{ steps.lerna-version.outputs.lerna-version }}
-        url_prefix: "~"
+        url_prefix: '~'

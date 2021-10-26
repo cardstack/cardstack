@@ -1,10 +1,14 @@
-import { Client, Message, MessageEmbed } from 'discord.js';
+import { Client, MessageEmbed } from 'discord.js';
 import glob from 'glob-promise';
 import { DiscordBotConfig } from './types';
 import tmp from 'tmp';
 import QRCode from 'qrcode';
 import { basename } from 'path';
 import DatabaseManager from '@cardstack/db';
+import { Message } from './types';
+import logger from '@cardstack/logger';
+
+const log = logger('bot:main');
 
 export interface CommandCallback {
   (client: Bot, message: Message, args?: string[]): Promise<void>;
@@ -56,7 +60,11 @@ export class Bot extends Client {
       })
     );
 
-    await this.login(this.config.botToken);
+    if (this.config.botToken) {
+      await this.login(this.config.botToken);
+    } else {
+      log.info('No bot token found. Bot will not login to discord.');
+    }
   }
 }
 
