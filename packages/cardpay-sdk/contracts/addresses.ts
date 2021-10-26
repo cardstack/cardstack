@@ -5,16 +5,16 @@ import { networkName } from '../sdk/utils/general-utils';
 // this silly consumption of the ABI's. The ABI's are indeed consumed, however,
 // we consume them outside of ts due to the way the codegen operates for the
 // subgraph assembly script.
-import PayMerchantHandlerABI from './abi/v0.8.3/pay-merchant-handler';
-import RegisterMerchantHandlerABI from './abi/v0.8.3/register-merchant-handler';
-import TransferPrepaidCardHandlerABI from './abi/v0.8.3/transfer-prepaid-card-handler';
-import SplitPrepaidCardHandlerABI from './abi/v0.8.3/split-prepaid-card-handler';
-import SpendABI from './abi/v0.8.3/spend';
-import MerchantManagerABI from './abi/v0.8.3/merchant-manager';
-import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.3/deprecated-merchant-manager-0_6_7';
-import RegisterRewardProgramHandlerABI from './abi/v0.8.3/register-reward-program-handler';
-import RegisterRewardeeHandlerABI from './abi/v0.8.3/register-rewardee-handler';
-import RewardPoolABI from './abi/v0.8.3/reward-pool';
+import PayMerchantHandlerABI from './abi/v0.8.4/pay-merchant-handler';
+import RegisterMerchantHandlerABI from './abi/v0.8.4/register-merchant-handler';
+import TransferPrepaidCardHandlerABI from './abi/v0.8.4/transfer-prepaid-card-handler';
+import SplitPrepaidCardHandlerABI from './abi/v0.8.4/split-prepaid-card-handler';
+import SpendABI from './abi/v0.8.4/spend';
+import MerchantManagerABI from './abi/v0.8.4/merchant-manager';
+import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.4/deprecated-merchant-manager-0_6_7';
+import RegisterRewardProgramHandlerABI from './abi/v0.8.4/register-reward-program-handler';
+import RegisterRewardeeHandlerABI from './abi/v0.8.4/register-rewardee-handler';
+import RewardPoolABI from './abi/v0.8.4/reward-pool';
 
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
@@ -23,7 +23,6 @@ consumeModule(TransferPrepaidCardHandlerABI);
 consumeModule(SplitPrepaidCardHandlerABI);
 consumeModule(SpendABI);
 consumeModule(MerchantManagerABI);
-consumeModule(RewardPoolABI);
 // we include this because we are still interested in indexing events from this contract
 consumeModule(DeprecatedMerchantManagerABI_0_6_7);
 consumeModule(RegisterRewardProgramHandlerABI);

@@ -4,7 +4,7 @@ import { AbiItem } from 'web3-utils';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.3/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.4/prepaid-card-manager';
 import { getAddress } from '../../contracts/addresses';
 import { ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';

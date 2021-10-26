@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import SupplierManagerABI from '../../contracts/abi/v0.8.3/supplier-manager';
+import SupplierManagerABI from '../../contracts/abi/v0.8.4/supplier-manager';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
