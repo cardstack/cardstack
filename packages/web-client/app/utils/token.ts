@@ -56,10 +56,9 @@ const contractNames: Record<NetworkSymbol, Record<BridgeableSymbol, string>> = {
     DAI: 'daiCpxd',
     CARD: 'cardCpxd',
   },
-  // xdai does not have any addresses as of yet.
   xdai: {
-    DAI: '',
-    CARD: '',
+    DAI: 'daiCpxd',
+    CARD: 'cardCpxd',
   },
 };
 
