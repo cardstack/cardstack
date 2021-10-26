@@ -1,4 +1,5 @@
 import { ContractMeta } from '../version-resolver';
+import v0_8_0 from './v0.8.0';
 import v0_8_4 from './v0.8.4';
 
 // add more versions as we go, but also please do drop version that we don't
@@ -6,6 +7,6 @@ import v0_8_4 from './v0.8.4';
 export type LayerTwoOracle = v0_8_4;
 
 export const layerTwoOracleMeta = {
-  apiVersions: { v0_8_4 },
+  apiVersions: { v0_8_0, v0_8_4 },
   contractName: 'revenuePool',
 } as ContractMeta;
