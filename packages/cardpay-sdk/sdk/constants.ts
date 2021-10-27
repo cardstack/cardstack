@@ -55,7 +55,7 @@ const MAINNET = {
   /** deployed instance of this contract: https://github.com/wbobeirne/eth-balance-checker */
   balanceCheckerContractAddress: '0x4dcf4562268dd384fe814c00fad239f06c2a0c2b',
   blockExplorer: 'https://etherscan.io',
-  bridgeExplorer: 'https://alm-xdai.herokuapp.com',
+  bridgeExplorer: 'https://alm-xdai.herokuapp.com/1',
   nativeTokenAddress: 'eth',
   nativeTokenCoingeckoId: 'ethereum',
   nativeTokenSymbol: 'ETH',
@@ -70,7 +70,7 @@ const XDAI = {
   /** deployed instance of this contract: https://github.com/wbobeirne/eth-balance-checker */
   balanceCheckerContractAddress: '0x6B78C121bBd10D8ef0dd3623CC1abB077b186F65',
   blockExplorer: 'https://blockscout.com/xdai/mainnet',
-  bridgeExplorer: 'https://alm-xdai.herokuapp.com',
+  bridgeExplorer: 'https://alm-xdai.herokuapp.com/100',
   nativeTokenAddress: 'dai',
   nativeTokenCoingeckoId: 'dai',
   nativeTokenSymbol: 'DAI',
