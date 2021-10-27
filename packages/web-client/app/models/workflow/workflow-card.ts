@@ -20,22 +20,54 @@ type FailureCheckResult = {
 
 export type CheckResult = SuccessCheckResult | FailureCheckResult;
 
-interface WorkflowCardOptions {
+export interface WorkflowCardOptions {
   cardName?: string;
-  author: Participant;
+  author?: Participant;
   componentName: string; // this should eventually become a card reference
-  includeIf(this: WorkflowCard): boolean;
-  check(this: WorkflowCard): Promise<CheckResult>;
+  includeIf?(this: WorkflowCard<WorkflowCardOptions>): boolean;
+  check?(this: WorkflowCard<WorkflowCardOptions>): Promise<CheckResult>;
 }
 
-export class WorkflowCard extends WorkflowPostable {
+export interface ConfigurableWorkflowCardOptions extends WorkflowCardOptions {
+  componentName: keyof CardConfiguration; // this should eventually become a card reference
+  includeIf?(this: WorkflowCard<ConfigurableWorkflowCardOptions>): boolean;
+  check?(
+    this: WorkflowCard<ConfigurableWorkflowCardOptions>
+  ): Promise<CheckResult>;
+}
+
+export class WorkflowCard<
+  T extends ConfigurableWorkflowCardOptions | WorkflowCardOptions
+> extends WorkflowPostable {
   cardName: string;
   componentName: string;
-  check: (this: WorkflowCard) => Promise<CheckResult> = () => {
+  check: (this: WorkflowCard<T>) => Promise<CheckResult> = () => {
     return Promise.resolve({ success: true });
   };
 
-  constructor(options: Partial<WorkflowCardOptions>) {
+  /**
+   * ConfigurableWorkflowCardOptions is a set of options with componentName registered in the CardConfiguration interface
+   * WorkflowCardOptions is a set of options without the componentName registered in the CardConfiguration interface
+   *
+   * This constructor checks if the componentName is registered in the CardConfiguration interface, and if so, whether the componentName's
+   * corresponding type in that interface is optional or not.
+   *
+   * If the componentName is not registered, this class is not allowed to be instantiated with a config property.
+   * If the componentName is registered, then this class must either:
+   *
+   * 1. Be instantiated with a mandatory config property (If the componentName was not specified as optional)
+   * 2. Be instantiated with an optional config property
+   */
+  constructor(
+    options: T extends ConfigurableWorkflowCardOptions
+      ? T &
+          (undefined extends CardConfiguration[T['componentName']]
+            ? {
+                config?: CardConfiguration[T['componentName']];
+              }
+            : { config: CardConfiguration[T['componentName']] })
+      : never | WorkflowCardOptions
+  ) {
     super(options.author, options.includeIf);
     this.componentName = options.componentName!;
     this.cardName = options.cardName || '';
@@ -93,3 +125,5 @@ export class WorkflowCard extends WorkflowPostable {
     }
   }
 }
+
+export interface CardConfiguration {}
