@@ -183,8 +183,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
         prepaidCardOwner: layer2AccountAddress,
         issuer: layer2AccountAddress,
       }),
+      otherMerchantSafe,
       merchantSafe,
-      otherMerchantSafe, // FIXME what controls sorting? otherMerchantSafe is seemingly always first
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await waitUntil(
