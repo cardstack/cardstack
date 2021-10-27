@@ -55,7 +55,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     let layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
-    let testDepot = createDepotSafe({
+    testDepot = createDepotSafe({
       address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
         createSafeToken('DAI', MIN_AMOUNT_TO_PASS.toString()),
