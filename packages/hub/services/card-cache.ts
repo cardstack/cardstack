@@ -17,6 +17,7 @@ import { join, dirname } from 'path';
 import { inject, injectionReady } from '@cardstack/di';
 import isEqual from 'lodash/isEqual';
 import { serverLog } from '../utils/logger';
+import { Client } from 'pg';
 
 export const MINIMAL_PACKAGE = {
   name: '@cardstack/compiled',
@@ -61,6 +62,8 @@ function setupCacheDir(cardCacheDir: string): void {
 }
 export default class CardCache {
   config = inject('card-cache-config', { as: 'config' });
+  databaseManager = inject('database-manager', { as: 'databaseManager' });
+  client!: Client;
 
   get dir() {
     return this.config.cacheDirectory;
@@ -73,6 +76,8 @@ export default class CardCache {
   async ready() {
     await injectionReady(this, 'card-cache-config');
     setupCacheDir(this.dir);
+    await injectionReady(this, 'database-manager');
+    this.client = await this.databaseManager.getClient();
   }
 
   private getCardLocation(env: Environment | 'assets', cardURL: string): string {
@@ -113,6 +118,23 @@ export default class CardCache {
 
   setCard(cardURL: string, source: CompiledCard) {
     this.setModule(NODE, cardURL, 'compiled.json', JSON.stringify(source, null, 2));
+    this.indexCard(cardURL, source);
+  }
+
+  indexCard(cardURL: string, source: CompiledCard): void {
+    let query = `
+      INSERT INTO card_index (id, name, data, adoptsFrom, schemaModule, fields, views)
+      VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (id) DO UPDATE
+    `;
+
+    this.client.query(query, [
+      cardURL,
+      'name TODO',
+      'adoptsFrom TODO',
+      source.schemaModule,
+      source.fields,
+      { isolated: source.isolated, embedded: source.embedded, edit: source.edit },
+    ]);
   }
 
   entryExists(env: Environment | 'assets', cardURL: string, localFile: string): boolean {

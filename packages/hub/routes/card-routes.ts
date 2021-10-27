@@ -1,11 +1,12 @@
 import { assertValidKeys, NotFound } from '../utils/error';
 import { RouterContext } from '@koa/router';
-import { deserialize, serializeCard, serializeRawCard } from '../utils/serialization';
+import { deserialize, serializeCard, serializeCards, serializeRawCard } from '../utils/serialization';
 import { getCardFormatFromRequest } from '../utils/routes';
 import Router from '@koa/router';
 import { inject } from '@cardstack/di';
 import autoBind from 'auto-bind';
 import { parseBody } from '../middleware';
+import { queryParamsToCardQuery } from '../utils/queries';
 
 const requireCard = function (path: string, root: string): any {
   const module = require.resolve(path, {
@@ -15,10 +16,13 @@ const requireCard = function (path: string, root: string): any {
   return require(module);
 };
 
+interface CardQueryParams {}
+
 export default class CardRoutes {
   realmManager = inject('realm-manager', { as: 'realmManager' });
   cache = inject('card-cache', { as: 'cache' });
   builder = inject('card-builder', { as: 'builder' });
+  cards = inject('card-service', { as: 'cards' });
 
   routingCard?: any;
 
@@ -35,6 +39,17 @@ export default class CardRoutes {
     let rawCard = await this.realmManager.getRawCard(url);
     let card = await this.builder.getCompiledCard(url);
     ctx.body = await serializeCard(url, rawCard.data, card[format]);
+    ctx.status = 200;
+  }
+
+  async searchCards(ctx: RouterContext) {
+    let { query } = ctx;
+    let cardQuery = queryParamsToCardQuery(query);
+    // Query the index
+    let results = await this.cards.query(cardQuery);
+
+    // Serialize index
+    ctx.body = await serializeCards(results);
     ctx.status = 200;
   }
 
@@ -150,6 +165,7 @@ export default class CardRoutes {
     // the 'cards' section of the API deals in card data. The shape of the data
     // on these endpoints is determined by each card's own schema.
     koaRouter.post(`/cards/:realmURL/:parentCardURL`, parseBody, this.createDataCard);
+    koaRouter.get(`/cards/`, this.searchCards);
     koaRouter.get(`/cards/:encodedCardURL`, this.getCard);
     koaRouter.patch(`/cards/:encodedCardURL`, parseBody, this.updateCard);
     koaRouter.delete(`/cards/:encodedCardURL`, this.deleteCard);

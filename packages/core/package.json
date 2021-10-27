@@ -24,6 +24,7 @@
     "date-fns": "^2.22.1",
     "ember-cli-htmlbars": "^5.7.1",
     "inflection": "^1.12.0",
+    "json-typescript": "^1.1.2",
     "lodash": "^4.17.21",
     "md5": "^2.3.0",
     "mime-types": "^2.1.31"

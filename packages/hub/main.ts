@@ -68,6 +68,7 @@ import CardCache from './services/card-cache';
 import CardWatcher from './services/card-watcher';
 import ExchangeRatesService from './services/exchange-rates';
 import HubBot from './services/discord-bots/hub-bot';
+import CardService from './services/card-service';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -119,6 +120,7 @@ export function createContainer(registryCallback?: RegistryCallback): Container 
   registry.register('wyre-callback-route', WyreCallbackRoute);
 
   if (process.env.COMPILER) {
+    registry.register('card-service', CardService);
     registry.register('realm-manager', RealmManager);
     registry.register('card-cache-config', CardCacheConfig);
     registry.register('card-cache', CardCache);
