@@ -28,6 +28,7 @@ import WorkflowPersistence from '@cardstack/web-client/services/workflow-persist
 import { formatAmount } from '@cardstack/web-client/helpers/format-amount';
 import { tracked } from '@glimmer/tracking';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
+import { WorkflowCardOptions } from '@cardstack/web-client/models/workflow/workflow-card';
 
 const FAILURE_REASONS = {
   UNAUTHENTICATED: 'UNAUTHENTICATED',
@@ -148,7 +149,7 @@ class CreateMerchantWorkflow extends Workflow {
         new NetworkAwareWorkflowCard({
           cardName: 'HUB_AUTH',
           componentName: 'card-pay/hub-authentication',
-          includeIf(this: NetworkAwareWorkflowCard) {
+          includeIf(this: NetworkAwareWorkflowCard<WorkflowCardOptions>) {
             return !this.isHubAuthenticated;
           },
         }),

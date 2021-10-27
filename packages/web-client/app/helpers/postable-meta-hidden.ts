@@ -1,10 +1,23 @@
 import { helper } from '@ember/component/helper';
 import { postableMetaIdentical } from './postable-meta-identical';
 import { WorkflowCard, WorkflowPostable } from '../models/workflow';
+import {
+  ConfigurableWorkflowCardOptions,
+  WorkflowCardOptions,
+} from '@cardstack/web-client/models/workflow/workflow-card';
 
 function postableMetaHidden(
-  [post]: [WorkflowPostable | WorkflowCard],
-  { previous }: { previous: WorkflowPostable | WorkflowCard }
+  [post]: [
+    | WorkflowPostable
+    | WorkflowCard<WorkflowCardOptions | ConfigurableWorkflowCardOptions>
+  ],
+  {
+    previous,
+  }: {
+    previous:
+      | WorkflowPostable
+      | WorkflowCard<WorkflowCardOptions | ConfigurableWorkflowCardOptions>;
+  }
 ) {
   let isSameGroup = postableMetaIdentical([post, previous]);
 
