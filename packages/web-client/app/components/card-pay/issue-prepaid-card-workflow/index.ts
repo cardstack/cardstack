@@ -221,6 +221,9 @@ class IssuePrepaidCardWorkflow extends Workflow {
     new WorkflowCard({
       cardName: 'EPILOGUE_SAFE_BALANCE_CARD',
       componentName: 'card-pay/safe-balance-card',
+      config: {
+        safeAddressKey: 'prepaidFundingSafeAddress',
+      },
     }),
     new WorkflowCard({
       cardName: 'EPILOGUE_NEXT_STEPS',

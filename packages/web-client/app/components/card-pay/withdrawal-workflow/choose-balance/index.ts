@@ -93,7 +93,6 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
     }
     if (this.selectedToken) {
       this.args.workflowSession.setValue({
-        safeBalanceCardKey: 'withdrawalSafe',
         withdrawalSafe: this.selectedSafe!.address,
         withdrawalToken: this.selectedToken.symbol,
       });

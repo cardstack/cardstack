@@ -607,7 +607,6 @@ module('Acceptance | issue prepaid card', function (hooks) {
       prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
       prepaidFundingSafeAddress: merchantSafe.address,
       prepaidFundingToken: 'DAI.CPXD',
-      safeBalanceCardKey: 'prepaidFundingSafeAddress',
       reloadable: false,
       spendFaceValue: 10000,
       transferrable: true,
