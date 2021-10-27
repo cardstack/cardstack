@@ -1,27 +1,35 @@
 import {
-  CheckResult,
   WorkflowCard,
-  Participant,
   WorkflowPostable,
 } from '@cardstack/web-client/models/workflow';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer1-network';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { getOwner } from '@ember/application';
+import {
+  CardConfiguration,
+  ConfigurableWorkflowCardOptions,
+  WorkflowCardOptions,
+} from '@cardstack/web-client/models/workflow/workflow-card';
 
-interface NetworkAwareWorkflowCardOptions {
-  cardName?: string;
-  author: Participant;
-  componentName: string; // this should eventually become a card reference
-  includeIf(this: NetworkAwareWorkflowCard): boolean;
-  check(this: NetworkAwareWorkflowCard): Promise<CheckResult>;
-}
-
-export default class NetworkAwareWorkflowCard extends WorkflowCard {
-  constructor(options: Partial<NetworkAwareWorkflowCardOptions>) {
+/**
+ * Documentation on the Typescript stuff is in {@see {@link WorkflowCard}}
+ */
+export default class NetworkAwareWorkflowCard<
+  T extends ConfigurableWorkflowCardOptions | WorkflowCardOptions
+> extends WorkflowCard<T> {
+  constructor(
+    options: T extends ConfigurableWorkflowCardOptions
+      ? T &
+          (undefined extends CardConfiguration[T['componentName']]
+            ? {
+                config?: CardConfiguration[T['componentName']];
+              }
+            : { config: CardConfiguration[T['componentName']] })
+      : never | WorkflowCardOptions
+  ) {
     super(options);
   }
-
   get layer1Network() {
     let postable = this as WorkflowPostable;
     let layer1Network = getOwner(postable.workflow).lookup(

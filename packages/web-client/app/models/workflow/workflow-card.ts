@@ -20,25 +20,82 @@ type FailureCheckResult = {
 
 export type CheckResult = SuccessCheckResult | FailureCheckResult;
 
-interface WorkflowCardOptions {
+export interface WorkflowCardOptions {
   cardName?: string;
-  author: Participant;
+  author?: Participant;
   componentName: string; // this should eventually become a card reference
-  includeIf(this: WorkflowCard): boolean;
-  check(this: WorkflowCard): Promise<CheckResult>;
+  includeIf?(this: WorkflowCard<WorkflowCardOptions>): boolean;
+  check?(this: WorkflowCard<WorkflowCardOptions>): Promise<CheckResult>;
 }
 
-export class WorkflowCard extends WorkflowPostable {
+export interface ConfigurableWorkflowCardOptions extends WorkflowCardOptions {
+  componentName: keyof CardConfiguration; // this should eventually become a card reference
+  includeIf?(this: WorkflowCard<ConfigurableWorkflowCardOptions>): boolean;
+  check?(
+    this: WorkflowCard<ConfigurableWorkflowCardOptions>
+  ): Promise<CheckResult>;
+}
+
+export class WorkflowCard<
+  T extends ConfigurableWorkflowCardOptions | WorkflowCardOptions
+> extends WorkflowPostable {
   cardName: string;
   componentName: string;
-  check: (this: WorkflowCard) => Promise<CheckResult> = () => {
+  config?: any;
+  check: (this: WorkflowCard<T>) => Promise<CheckResult> = () => {
     return Promise.resolve({ success: true });
   };
 
-  constructor(options: Partial<WorkflowCardOptions>) {
+  /**
+   * ConfigurableWorkflowCardOptions is a set of options with componentName registered in the CardConfiguration interface
+   * WorkflowCardOptions is a set of options without the componentName registered in the CardConfiguration interface
+   *
+   * This constructor checks if the componentName is registered in the CardConfiguration interface, and if so, whether the componentName's
+   * corresponding type in that interface is optional or not.
+   *
+   * If the componentName is not registered, this class is not allowed to be instantiated with a config property.
+   * If the componentName is registered, then this class must either:
+   *
+   * 1. Be instantiated with a mandatory config property (If the componentName was not specified as optional)
+   * 2. Be instantiated with an optional config property
+   *
+   * To add config to a card, you should add:
+   *
+   * ```
+   * declare module '@cardstack/web-client/models/workflow/workflow-card' {
+   *   interface CardConfiguration {
+   *     '<what you would pass to the component helper>': {
+   *       // ...whatever config you need
+   *     };
+   *   }
+   * }
+   * ```
+   *
+   * If you want config to be optional, just specify a ? in the definition of the property:
+   * ```
+   * declare module '@cardstack/web-client/models/workflow/workflow-card' {
+   *   interface CardConfiguration {
+   *     '<what you would pass to the component helper>'?: {
+   *       // ...whatever config you need
+   *     };
+   *   }
+   * }
+   * ```
+   */
+  constructor(
+    options: T extends ConfigurableWorkflowCardOptions
+      ? T &
+          (undefined extends CardConfiguration[T['componentName']]
+            ? {
+                config?: CardConfiguration[T['componentName']];
+              }
+            : { config: CardConfiguration[T['componentName']] })
+      : never | WorkflowCardOptions
+  ) {
     super(options.author, options.includeIf);
     this.componentName = options.componentName!;
     this.cardName = options.cardName || '';
+    if (this.hasConfig(options)) this.config = options.config;
 
     this.reset = () => {
       if (this.isComplete) {
@@ -46,7 +103,7 @@ export class WorkflowCard extends WorkflowPostable {
       }
     };
     if (options.check) {
-      this.check = options.check;
+      this.check = options.check as this['check'];
     }
   }
   get session(): IWorkflowSession | undefined {
@@ -55,6 +112,12 @@ export class WorkflowCard extends WorkflowPostable {
 
   get completedCardNames(): Array<string> {
     return this.session?.getMeta()?.completedCardNames ?? [];
+  }
+
+  hasConfig(
+    options: any
+  ): options is { config: CardConfiguration[keyof CardConfiguration] } {
+    return Object.keys(options).includes('config');
   }
 
   @action async onComplete() {
@@ -93,3 +156,5 @@ export class WorkflowCard extends WorkflowPostable {
     }
   }
 }
+
+export interface CardConfiguration {}

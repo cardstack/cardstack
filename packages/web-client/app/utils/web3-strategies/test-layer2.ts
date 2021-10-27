@@ -481,7 +481,20 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
           request.amountInWei === amountInWei
       );
 
-      if (!matchingRequest) {
+      if (matchingRequest) {
+        // Update the safe token balance if it exists
+        let safe = this.remoteAccountSafes
+          .get(this.walletInfo.firstAddress!)!
+          .findBy('address', safeAddress);
+
+        if (safe) {
+          safe.tokens.forEach((t: TokenInfo) => {
+            if (t.token.symbol === tokenSymbol) {
+              t.balance = new BN(t.balance).sub(new BN(amountInWei)).toString();
+            }
+          });
+        }
+      } else {
         throw new Error(
           `No matching bridging request found for ${JSON.stringify(
             arguments
