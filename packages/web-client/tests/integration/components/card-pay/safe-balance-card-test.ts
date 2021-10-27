@@ -79,7 +79,8 @@ module(
         />
       `);
 
-      assert.dom('[data-test-safe-address]')
+      assert
+        .dom('[data-test-safe-address]')
         .containsText('Merchant address')
         .containsText(merchantAddress);
       assert.dom('[data-test-balance-label]').containsText('Merchant balance');
@@ -105,7 +106,8 @@ module(
         />
       `);
 
-      assert.dom('[data-test-safe-address]')
+      assert
+        .dom('[data-test-safe-address]')
         .containsText('Prepaid card address')
         .containsText(prepaidCardAddress);
       assert
