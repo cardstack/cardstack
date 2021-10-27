@@ -26,7 +26,8 @@ export async function getWeb3(network: string, mnemonic?: string): Promise<Web3>
         name: 'Cardstack - Cardpay CLI',
       },
       rpc: {
-        [networkIds[network]]: getConstantByNetwork('rpcNode', network),
+        // we can't use OpenEthereum nodes as it was issues with modern web3 providers
+        [networkIds[network]]: getConstantByNetwork('rpcNodeNethermind', network),
       },
       bridge: BRIDGE,
     });
