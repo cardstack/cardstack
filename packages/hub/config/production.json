@@ -11,10 +11,10 @@
     "allowedChannels": "898954606242054185"
   },
   "web3": {
-    "url":"https://api.sendwyre.com",
     "network": "xdai"
   },
   "wyre": {
+    "url":"https://api.sendwyre.com",
     "callbackUrl": "https://hub.cardstack.com/callbacks/wyre"
   },
   "betaTesting": {
