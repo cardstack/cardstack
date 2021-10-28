@@ -5,6 +5,7 @@ import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
+import forbiddenIds from '../assets/forbidden-ids.json';
 
 export interface MerchantInfo {
   id: string;
@@ -40,7 +41,7 @@ export default class MerchantInfosRoute {
       return;
     }
 
-    let slug = ctx.request.body.data.attributes['slug'];
+    let slug = ctx.request.body.data.attributes['slug'].toLowerCase();
     let validationResult = await this.validateSlug(slug);
 
     if (!validationResult.slugAvailable) {
@@ -98,11 +99,22 @@ export default class MerchantInfosRoute {
         detail: errorMessage,
       };
     } else {
-      let merchantInfo = (await this.merchantInfoQueries.fetch({ slug }))[0];
-      return {
-        slugAvailable: merchantInfo ? false : true,
-        detail: merchantInfo ? 'Merchant slug already exists' : 'Merchant slug is available',
-      };
+      let allForbiddenWords = Object.values(forbiddenIds)
+        .flat()
+        .map((id) => id.replace(/[^0-9a-zA-Z]/g, '').toLowerCase());
+
+      if (allForbiddenWords.includes(slug)) {
+        return {
+          slugAvailable: false,
+          detail: 'This Merchant ID is not allowed',
+        };
+      } else {
+        let merchantInfo = (await this.merchantInfoQueries.fetch({ slug }))[0];
+        return {
+          slugAvailable: merchantInfo ? false : true,
+          detail: merchantInfo ? 'Merchant slug already exists' : 'Merchant slug is available',
+        };
+      }
     }
   }
 }
