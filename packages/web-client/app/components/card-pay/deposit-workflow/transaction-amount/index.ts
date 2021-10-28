@@ -19,9 +19,18 @@ import {
   validateTokenInput,
 } from '@cardstack/web-client/utils/validation';
 import { bool, reads } from 'macro-decorators';
-import { task, TaskGenerator } from 'ember-concurrency';
+import {
+  forever,
+  race,
+  rawTimeout,
+  task,
+  TaskGenerator,
+} from 'ember-concurrency';
 import { next } from '@ember/runloop';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
+import config from '@cardstack/web-client/config/environment';
+
+const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
 
 class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
@@ -49,6 +58,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   @tracked amount = '';
   @tracked errorMessage = '';
   @tracked validationMessage = '';
+  @tracked depositTaskRunningForAWhile = false;
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
@@ -66,6 +76,10 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
         taskFor(this.unlockTask).perform();
       }
     });
+  }
+
+  get depositTaskCancelable() {
+    return !this.relayTokensTxnHash && this.depositTaskRunningForAWhile;
   }
 
   get currentTokenDetails(): TokenDisplayInfo<BridgeableSymbol> | undefined {
@@ -163,6 +177,13 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     });
   }
 
+  @task *depositTimerTask(): TaskGenerator<void> {
+    this.depositTaskRunningForAWhile = false;
+    yield rawTimeout(A_WHILE);
+    this.depositTaskRunningForAWhile = true;
+    yield forever;
+  }
+
   @task *unlockTask(): TaskGenerator<void> {
     this.errorMessage = '';
     let session = this.args.workflowSession;
@@ -192,6 +213,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     }
   }
 
+  @action cancelDeposit() {
+    taskFor(this.depositTask).cancelAll();
+    this.depositTaskRunningForAWhile = false;
+  }
+
   @task *depositTask(): TaskGenerator<void> {
     this.errorMessage = '';
     let session = this.args.workflowSession;
@@ -209,16 +235,17 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
           'layer2BlockHeightBeforeBridging',
           layer2BlockHeightBeforeBridging
         );
-        transactionReceipt = yield taskFor(
-          this.layer1Network.relayTokensTask
-        ).perform(
-          this.currentTokenSymbol,
-          layer2Address,
-          this.amountAsBigNumber,
-          (txnHash) => {
-            session.setValue('relayTokensTxnHash', txnHash);
-          }
-        );
+        transactionReceipt = yield race([
+          taskFor(this.depositTimerTask).perform(),
+          taskFor(this.layer1Network.relayTokensTask).perform(
+            this.currentTokenSymbol,
+            layer2Address,
+            this.amountAsBigNumber,
+            (txnHash) => {
+              session.setValue('relayTokensTxnHash', txnHash);
+            }
+          ),
+        ]);
       }
       session.setValue('relayTokensTxnReceipt', transactionReceipt);
       session.setValue('depositedAmount', this.amountAsBigNumber);
