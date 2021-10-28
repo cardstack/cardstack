@@ -111,8 +111,9 @@ module('Acceptance | token suppliers', function (hooks) {
 
     assert.dom('[data-test-suppliers-section]').exists();
     assert.dom('[data-test-card-pay-depot]').doesNotExist();
-
-    await click('[data-test-workflow-button="deposit"]');
+    await click(
+      '[data-test-suppliers-section] [data-test-workflow-button="deposit"]'
+    );
     assert.dom('[data-test-boxel-thread-header] h2').containsText('Deposit');
   });
 
