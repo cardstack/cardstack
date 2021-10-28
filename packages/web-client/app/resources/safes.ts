@@ -259,7 +259,9 @@ export class Safes extends Resource<Args> {
 
   get issuePrepaidCardSourceSafes() {
     if (!this.issuePrepaidCardDaiMinValue) {
-      return [];
+      throw new Error(
+        'Cannot get issuance source safes before DAI minimum has loaded; await issuePrepaidCardMinValuesLoaded'
+      );
     }
 
     let tokenOptions = ['DAI.CPXD' as BridgedTokenSymbol];
