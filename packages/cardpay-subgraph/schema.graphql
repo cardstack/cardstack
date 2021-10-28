@@ -501,6 +501,7 @@ type RewardeeClaim @entity {
   rewardProgram: RewardProgram!
   rewardee: Account!
   rewardSafe: RewardSafe!
+  token: Token!
   amount: BigInt!
   transaction: Transaction!
   timestamp: BigInt!

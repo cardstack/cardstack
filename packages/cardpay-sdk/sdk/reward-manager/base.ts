@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import RewardManagerABI from '../../contracts/abi/v0.8.0/reward-manager';
+import RewardManagerABI from '../../contracts/abi/v0.8.4/reward-manager';
 import { Contract } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, randomHex, toChecksumAddress } from 'web3-utils';

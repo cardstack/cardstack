@@ -6,7 +6,7 @@ import { TransactionReceipt, Log } from 'web3-core';
 import { getConstant, ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
 import { Signature } from './signing-utils';
-import PrepaidCardManagerABI from '../../contracts/abi/v0.8.0/prepaid-card-manager';
+import PrepaidCardManagerABI from '../../contracts/abi/v0.8.4/prepaid-card-manager';
 import { AbiItem } from 'web3-utils';
 import { getAddress } from '../../contracts/addresses';
 
