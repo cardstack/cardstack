@@ -15,7 +15,7 @@ interface UrlsOptions {
   appStoreLink: string | undefined;
   googlePlayLink: string | undefined;
   testFlightLink: string;
-  discordBetaChannelLink: string;
+  discordSupportChannelUrl: string;
 }
 
 /**
