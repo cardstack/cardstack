@@ -195,7 +195,7 @@ module(
       }
     });
 
-    test('It validates uniqueness of a given id', async function (this: Context, assert) {
+    test('It validates a given id and displays the error message returned from the hub', async function (this: Context, assert) {
       this.server.create('merchant-info', { slug: 'existing' });
 
       await fillIn(`${MERCHANT_NAME_FIELD} input`, 'HELLO!');
@@ -224,6 +224,19 @@ module(
       );
 
       assert.dom(SAVE_DETAILS_BUTTON).isEnabled();
+
+      // www is hardcoded to be forbidden in mirage
+      await fillIn(merchantIdInput, 'www');
+      await waitUntil(
+        () =>
+          (find('[data-test-validation-state-input]') as HTMLElement).dataset
+            .testValidationStateInput === 'invalid'
+      );
+      assert
+        .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
+        .containsText('This Merchant ID is not allowed');
+
+      assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
     });
 
     test('It shows when there is an error validating id uniqueness', async function (this: Context, assert) {
