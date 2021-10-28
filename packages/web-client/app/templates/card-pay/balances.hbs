@@ -1,7 +1,7 @@
 {{page-title "Card Balances"}}
 
 <section class="card-pay-dashboard__balances" role="tabpanel" aria-labelledby="card-pay.balances">
-  <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{not this.layer2Network.isConnected}}>
+  <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{or (not this.layer2Network.isConnected) (is-empty this.prepaidCards)}}>
     {{#each @model.panel.sections as |section|}}
       <CardPay::DashboardPanel::Section @section={{section}}>
         <:cta>
