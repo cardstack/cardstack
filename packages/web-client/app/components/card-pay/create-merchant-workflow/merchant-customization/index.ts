@@ -164,14 +164,13 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
     }
 
     try {
-      let merchantSlugIsUnique: boolean = yield taskFor(
+      let { slugAvailable, detail } = yield taskFor(
         this.merchantInfo.checkMerchantSlugUniquenessTask
       ).perform({ slug: value });
 
       this.lastCheckedMerchantId = value;
-      if (!merchantSlugIsUnique) {
-        this.merchantIdValidationMessage =
-          'This Merchant ID is already taken. Please choose another one';
+      if (!slugAvailable) {
+        this.merchantIdValidationMessage = detail;
         return false;
       }
 

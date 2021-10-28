@@ -28,10 +28,16 @@ export default function () {
     function ({ merchantInfos }, { params: { slug } }) {
       let merchantBySlug = merchantInfos.findBy({ slug });
 
-      if (merchantBySlug) {
+      if (slug === 'www') {
         return {
           slugAvailable: false,
-          detail: 'Merchant slug already exists',
+          detail: 'This Merchant ID is not allowed',
+        };
+      } else if (merchantBySlug) {
+        return {
+          slugAvailable: false,
+          detail:
+            'This Merchant ID is already taken. Please choose another one',
         };
       } else {
         return {

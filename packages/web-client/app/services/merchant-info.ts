@@ -74,7 +74,10 @@ export default class MerchantInfoService extends Service {
 
   @task *checkMerchantSlugUniquenessTask(
     params: CheckMerchantSlugUniquenessTaskParams
-  ): TaskGenerator<boolean> {
+  ): TaskGenerator<{
+    slugAvailable: boolean;
+    detail: string;
+  }> {
     let response = yield fetch(
       `${config.hubURL}/api/merchant-infos/validate-slug/${params.slug}`,
       {
@@ -102,7 +105,7 @@ export default class MerchantInfoService extends Service {
       }
     }
 
-    return info.slugAvailable;
+    return info;
   }
 }
 
