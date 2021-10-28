@@ -39,6 +39,7 @@ export const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   INSUFFICIENT_FUNDS: 'INSUFFICIENT_FUNDS',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
+  RESTORATION_INSUFFICIENT_FUNDS: 'RESTORATION_INSUFFICIENT_FUNDS',
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
   RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
@@ -258,13 +259,32 @@ class IssuePrepaidCardWorkflow extends Workflow {
         );
       },
     }),
+    new SessionAwareWorkflowMessage({
+      template: (session: IWorkflowSession) =>
+        `You attempted to restore an unfinished workflow, but the chosen source does not have enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
+          c.layer2.fullName
+        } wallet, or by claiming merchant revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
+          Number(fromWei(session.getValue<string>('daiMinValue')!))
+        )} DAI.CPXD (${convertAmountToNativeDisplay(
+          spendToUsd(session.getValue<number>('spendMinValue')!)!,
+          'USD'
+        )})**.`,
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_INSUFFICIENT_FUNDS
+        );
+      },
+    }),
     new WorkflowCard({
       componentName:
         'card-pay/issue-prepaid-card-workflow/insufficient-funds-cta',
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
-          FAILURE_REASONS.INSUFFICIENT_FUNDS
+            FAILURE_REASONS.INSUFFICIENT_FUNDS ||
+          this.workflow?.cancelationReason ===
+            FAILURE_REASONS.RESTORATION_INSUFFICIENT_FUNDS
         );
       },
     }),
@@ -322,6 +342,21 @@ class IssuePrepaidCardWorkflow extends Workflow {
 
     if (!hubAuthentication.isAuthenticated) {
       errors.push(FAILURE_REASONS.RESTORATION_UNAUTHENTICATED);
+    }
+
+    let prepaidFundingSafeAddress = this.session.getValue<string>(
+      'prepaidFundingSafeAddress'
+    );
+
+    if (prepaidFundingSafeAddress) {
+      // FIXME how to wait for minima to load?
+      if (
+        !this.layer2Network.safes.issuePrepaidCardSourceSafes
+          .mapBy('address')
+          .includes(prepaidFundingSafeAddress)
+      ) {
+        errors.push(FAILURE_REASONS.RESTORATION_INSUFFICIENT_FUNDS);
+      }
     }
 
     return errors;

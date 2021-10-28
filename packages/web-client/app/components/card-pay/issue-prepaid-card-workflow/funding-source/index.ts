@@ -40,7 +40,6 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
       ? this.layer2Network.safes.getByAddress(prepaidFundingSafeAddress)
       : this.layer2Network.depotSafe;
 
-    // FIXME this could change the selected safe if the stored one is now underfunded…
     if (
       (safeToSelect && !this.sufficientBalanceSafes.includes(safeToSelect)) ||
       !safeToSelect
