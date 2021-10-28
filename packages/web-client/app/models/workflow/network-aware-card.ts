@@ -7,29 +7,20 @@ import Layer2Network from '@cardstack/web-client/services/layer1-network';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { getOwner } from '@ember/application';
 import {
-  CardConfiguration,
+  ConfigurableIfRegistered,
   ConfigurableWorkflowCardOptions,
   WorkflowCardOptions,
 } from '@cardstack/web-client/models/workflow/workflow-card';
 
 /**
- * Documentation on the Typescript stuff is in {@see {@link WorkflowCard}}
+ * Documentation on the Typescript stuff is in {@link WorkflowCard}
  */
 export default class NetworkAwareWorkflowCard<
   T extends
     | ConfigurableWorkflowCardOptions
     | WorkflowCardOptions = WorkflowCardOptions
 > extends WorkflowCard<T> {
-  constructor(
-    options: T extends ConfigurableWorkflowCardOptions
-      ? T &
-          (undefined extends CardConfiguration[T['componentName']]
-            ? {
-                config?: CardConfiguration[T['componentName']];
-              }
-            : { config: CardConfiguration[T['componentName']] })
-      : never | WorkflowCardOptions
-  ) {
+  constructor(options: ConfigurableIfRegistered<T>) {
     super(options);
   }
   get layer1Network() {

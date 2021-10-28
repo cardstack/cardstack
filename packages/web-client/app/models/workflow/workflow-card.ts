@@ -28,6 +28,9 @@ export interface WorkflowCardOptions {
   check?(this: WorkflowCard<WorkflowCardOptions>): Promise<CheckResult>;
 }
 
+/**
+ * This type is used to check if a card's configuration is registered or not
+ */
 export interface ConfigurableWorkflowCardOptions extends WorkflowCardOptions {
   componentName: keyof CardConfiguration; // this should eventually become a card reference
   includeIf?(this: WorkflowCard<ConfigurableWorkflowCardOptions>): boolean;
@@ -35,6 +38,28 @@ export interface ConfigurableWorkflowCardOptions extends WorkflowCardOptions {
     this: WorkflowCard<ConfigurableWorkflowCardOptions>
   ): Promise<CheckResult>;
 }
+
+/**
+ * This will create an object type with all keys in `Keys`,
+ * which require a type equal to `Value`.
+ *
+ * The properties are optional if it is possible for Value to be undefined (eg. "a" | "b" | undefined)
+ */
+type ObjectInheritingValueOptionality<
+  Keys extends string,
+  Value
+> = undefined extends Value
+  ? { [key in Keys]?: Value }
+  : { [key in Keys]: Value };
+
+export type ConfigurableIfRegistered<T extends WorkflowCardOptions> =
+  T extends ConfigurableWorkflowCardOptions
+    ? T &
+        ObjectInheritingValueOptionality<
+          'config',
+          CardConfiguration[T['componentName']]
+        >
+    : never | T;
 
 export class WorkflowCard<
   T extends
@@ -49,9 +74,6 @@ export class WorkflowCard<
   };
 
   /**
-   * ConfigurableWorkflowCardOptions is a set of options with componentName registered in the CardConfiguration interface
-   * WorkflowCardOptions is a set of options without the componentName registered in the CardConfiguration interface
-   *
    * This constructor checks if the componentName is registered in the CardConfiguration interface, and if so, whether the componentName's
    * corresponding type in that interface is optional or not.
    *
@@ -84,16 +106,7 @@ export class WorkflowCard<
    * }
    * ```
    */
-  constructor(
-    options: T extends ConfigurableWorkflowCardOptions
-      ? T &
-          (undefined extends CardConfiguration[T['componentName']]
-            ? {
-                config?: CardConfiguration[T['componentName']];
-              }
-            : { config: CardConfiguration[T['componentName']] })
-      : never | WorkflowCardOptions
-  ) {
+  constructor(options: ConfigurableIfRegistered<T>) {
     super(options.author, options.includeIf);
     this.componentName = options.componentName!;
     this.cardName = options.cardName || '';
