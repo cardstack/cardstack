@@ -68,6 +68,10 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     });
   }
 
+  get cancelable() {
+    return !this.relayTokensTxnHash;
+  }
+
   get currentTokenDetails(): TokenDisplayInfo<BridgeableSymbol> | undefined {
     if (this.currentTokenSymbol) {
       return new TokenDisplayInfo(this.currentTokenSymbol);
@@ -190,6 +194,10 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
       this.errorMessage =
         'There was a problem unlocking your tokens for deposit. This may be due to a network issue, or perhaps you canceled the request in your wallet.';
     }
+  }
+
+  @action cancelDeposit() {
+    taskFor(this.depositTask).cancelAll();
   }
 
   @task *depositTask(): TaskGenerator<void> {
