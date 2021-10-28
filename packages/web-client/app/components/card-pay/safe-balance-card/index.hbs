@@ -12,16 +12,16 @@
     {{#if this.isConnected}}
       {{#if this.safe}}
         <ActionCardContainer::Section
-          @title="Safe Balances"
+          @title="Remaining Balance"
         >
           <CardPay::FieldStack>
             <CardPay::LabeledValue
-              @label="Safe address"
+              @label={{this.safeAddressLabel}}
               @value={{this.safe.address}}
               @isAddress={{true}}
               data-test-safe-address
             />
-            <CardPay::LabeledValue @label={{this.safeLabel}} data-test-balance-label>
+            <CardPay::LabeledValue @label={{this.safeBalanceLabel}} data-test-balance-label>
               {{#if this.balancesToShow.length}}
                 <CardPay::BalancesList as |Balance|>
                   {{#each this.balancesToShow as |b|}}

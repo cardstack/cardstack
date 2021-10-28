@@ -31,7 +31,7 @@ class CardPaySafeBalanceCardComponent extends Component<CardPaySafeBalanceCardCo
 
     if (!this.safeAddress) {
       throw new Error(
-        `CardPay::SafeBalanceCard requires the "${this.args.config.safeAddressKey}" referenced by safeBalanceCardKey in the workflow session`
+        `CardPay::SafeBalanceCard requires the configured safeAddressKey of "${this.args.config.safeAddressKey}" to be present in the workflow session`
       );
     }
 
@@ -54,7 +54,15 @@ class CardPaySafeBalanceCardComponent extends Component<CardPaySafeBalanceCardCo
 
   get safeLabel() {
     let safeType = this.safe.type;
-    return `${capitalize(safeType).replace(/-/g, ' ')} balance`;
+    return capitalize(safeType).replace(/-/g, ' ');
+  }
+
+  get safeAddressLabel() {
+    return `${this.safeLabel} address`;
+  }
+
+  get safeBalanceLabel() {
+    return `${this.safeLabel} balance`;
   }
 
   get balancesToShow() {

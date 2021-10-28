@@ -79,7 +79,10 @@ module(
         />
       `);
 
-      assert.dom('[data-test-safe-address]').containsText(merchantAddress);
+      assert
+        .dom('[data-test-safe-address]')
+        .containsText('Merchant address')
+        .containsText(merchantAddress);
       assert.dom('[data-test-balance-label]').containsText('Merchant balance');
       assert
         .dom('[data-test-balance="DAI.CPXD"]')
@@ -103,7 +106,10 @@ module(
         />
       `);
 
-      assert.dom('[data-test-safe-address]').containsText(prepaidCardAddress);
+      assert
+        .dom('[data-test-safe-address]')
+        .containsText('Prepaid card address')
+        .containsText(prepaidCardAddress);
       assert
         .dom('[data-test-balance-label]')
         .containsText('Prepaid card balance');
