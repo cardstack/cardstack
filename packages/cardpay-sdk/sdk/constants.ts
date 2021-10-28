@@ -27,9 +27,8 @@ const SOKOL = {
   nativeTokenSymbol: 'SPOA',
   nativeTokenName: 'SPOA',
   name: 'Sokol',
-  // this needs to be an "archive" node
-  rpcNode: 'https://sokol-archive.blockscout.com',
-  rpcNodeNethermind: 'https://sokol-archive.blockscout.com',
+  rpcNode: 'https://sokol.poa.network',
+  rpcArchiveNode: 'https://sokol-archive.blockscout.com',
   rpcWssNode: 'wss://sokol.poa.network/wss',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
   subgraphURL: 'https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
@@ -78,9 +77,8 @@ const XDAI = {
   nativeTokenSymbol: 'DAI',
   nativeTokenName: 'xDai',
   name: 'xDai Chain',
-  // this needs to be an "archive" node
-  rpcNode: 'https://xdai-archive.blockscout.com',
-  rpcNodeNethermind: 'https://rpc.xdaichain.com',
+  rpcNode: 'https://rpc.xdaichain.com',
+  rpcArchiveNode: 'https://xdai-archive.blockscout.com', // warning this is an OpenEthereum node which has issues with modern web3 providers
   rpcWssNode: 'wss://rpc.xdaichain.com/wss',
   relayServiceURL: 'https://relay.cardstack.com/api',
   subgraphURL: 'https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai',
