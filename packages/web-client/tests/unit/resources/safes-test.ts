@@ -11,6 +11,7 @@ import { DepotSafe, Safe } from '@cardstack/cardpay-sdk';
 import {
   createDepotSafe,
   createMerchantSafe,
+  createPrepaidCardSafe,
   createSafeToken,
   generateMockAddress,
 } from '@cardstack/web-client/utils/test-factories';
@@ -86,8 +87,6 @@ module('Unit | Resource | Safes', function (hooks) {
     });
     await settled();
   });
-
-  // FIXME add tests for issuePrepaidCardSourceSafes
 
   test('it can return a TrackedSafe defined in graphData but not in individual update data', async function (assert) {
     assert.deepEqual(
@@ -268,5 +267,50 @@ module('Unit | Resource | Safes', function (hooks) {
     assert.equal(Object.keys(safes.individualSafeUpdateData).length, 0);
     assert.equal(Object.keys(safes.safeReferences).length, 0);
     assert.equal(safes.value.length, 0);
+  });
+
+  test('it returns safes that are compatible with and have sufficient balance for issuing a prepaid card', async function (assert) {
+    defaultDepotSafe = createDefaultDepotSafe(
+      '100000000000000000000000000000000'
+    );
+
+    let sufficientTokens = [
+      createSafeToken('DAI', '250000000000000000000'),
+      createSafeToken('CARD', '250000000000000000000'),
+    ];
+
+    let insufficientTokens = [
+      createSafeToken('DAI', '1'),
+      createSafeToken('CARD', '250000000000000000000'),
+    ];
+
+    let sufficientMerchantSafe = createMerchantSafe({
+      tokens: sufficientTokens,
+    });
+
+    strategy = new PartialLayer2Strategy({
+      safes: [
+        defaultDepotSafe,
+        sufficientMerchantSafe,
+        createMerchantSafe({ tokens: insufficientTokens }),
+        createPrepaidCardSafe({ tokens: sufficientTokens }),
+      ],
+      blockNumber: defaultBlockNumber,
+    });
+
+    safes = new Safes(this.owner, {
+      named: {
+        strategy,
+        walletAddress: 'some-address',
+      },
+    });
+    await settled();
+
+    safes.daiMinValue = new BN(100);
+
+    assert.deepEqual(
+      safes.issuePrepaidCardSourceSafes.mapBy('address'),
+      [defaultDepotSafe, sufficientMerchantSafe].mapBy('address')
+    );
   });
 });
