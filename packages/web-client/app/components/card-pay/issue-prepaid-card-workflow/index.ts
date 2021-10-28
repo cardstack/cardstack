@@ -108,17 +108,21 @@ class IssuePrepaidCardWorkflow extends Workflow {
               };
 
             let { layer2Network } = this.workflow as IssuePrepaidCardWorkflow;
+            let safes = layer2Network.safes;
 
-            let spendMinValue = Math.min(...faceValueOptions);
-            let daiMinValue = await layer2Network.convertFromSpend(
-              'DAI',
-              spendMinValue
+            await safes.issuePrepaidCardMinValuesLoaded;
+
+            this.workflow?.session.setValue(
+              'spendMinValue',
+              safes.issuePrepaidCardSpendMinValue
             );
-            this.workflow?.session.setValue('spendMinValue', spendMinValue);
-            this.workflow?.session.setValue('daiMinValue', daiMinValue);
+            this.workflow?.session.setValue(
+              'daiMinValue',
+              safes.issuePrepaidCardDaiMinValue?.toString()
+            );
+
             await layer2Network.waitForAccount;
 
-            // FIXME need to ensure issuePrepaidCardDaiMinValue is present
             let sufficientBalanceSafes =
               layer2Network.safes.issuePrepaidCardSourceSafes;
             let sufficientFunds = sufficientBalanceSafes.length > 0;

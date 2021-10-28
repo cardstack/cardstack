@@ -146,12 +146,18 @@ export class Safes extends Resource<Args> {
   individualSafeUpdateData: Record<string, IndividualSafeState> = {};
   @tracked safeReferences: Record<string, Safe> = {};
   @tracked value: Safe[] = [];
+
+  issuePrepaidCardMinValuesLoaded: Promise<void>;
   @tracked issuePrepaidCardDaiMinValue: BN | undefined;
+  @tracked issuePrepaidCardSpendMinValue: number | undefined;
 
   constructor(owner: unknown, args: Args) {
     super(owner, args);
     this.fetch();
-    this.fetchIssuePrepaidCardDaiMinValue();
+
+    this.issuePrepaidCardMinValuesLoaded = new Promise((resolve) => {
+      this.fetchIssuePrepaidCardMinValues().then(resolve);
+    });
   }
 
   updateReferences(safes: Safe[]) {
@@ -239,8 +245,10 @@ export class Safes extends Resource<Args> {
     this.updateReferences(this.graphData.safes);
   }
 
-  async fetchIssuePrepaidCardDaiMinValue() {
+  async fetchIssuePrepaidCardMinValues() {
     let spendMinValue = Math.min(...faceValueOptions);
+    this.issuePrepaidCardSpendMinValue = spendMinValue;
+
     let daiMinValue = await this.args.named.strategy.convertFromSpend(
       'DAI',
       spendMinValue
