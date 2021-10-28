@@ -284,7 +284,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'Merchant slug already exists',
+        detail: 'This Merchant ID is already taken. Please choose another one',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -402,7 +402,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(200)
       .expect({
         slugAvailable: false,
-        detail: 'Merchant slug already exists',
+        detail: 'This Merchant ID is already taken. Please choose another one',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 

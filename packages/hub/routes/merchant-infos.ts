@@ -112,7 +112,9 @@ export default class MerchantInfosRoute {
         let merchantInfo = (await this.merchantInfoQueries.fetch({ slug }))[0];
         return {
           slugAvailable: merchantInfo ? false : true,
-          detail: merchantInfo ? 'Merchant slug already exists' : 'Merchant slug is available',
+          detail: merchantInfo
+            ? 'This Merchant ID is already taken. Please choose another one'
+            : 'Merchant slug is available',
         };
       }
     }
