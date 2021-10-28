@@ -423,7 +423,7 @@
       "args": [
         "pay-merchant",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0x483F081bB0C25A5B216D1A4BD9CE0196092A0575", // Hassan's prepaid card --feel free to use your own
+        "0xF9b61C39C0c74C9BE637a0298244d2ca3f3cd509", // Hassan's prepaid card --feel free to use your own
         "100",
         "--network",
         "sokol",
