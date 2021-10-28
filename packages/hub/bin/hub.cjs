@@ -1,15 +1,12 @@
-#!/usr/bin/env node
-/* eslint-disable node/shebang */
-
-const yargs = require('yargs/yargs');
+const yargs = require('yargs');
 const { hideBin } = require('yargs/helpers');
 const { printCompilerError } = require('@cardstack/core/src/utils/errors');
-
+const { commands } = require('../cli');
 require('dotenv').config();
 
 yargs(hideBin(process.argv))
   .scriptName('hub')
-  .commandDir('../cli', { extensions: ['js'] })
+  .command(commands)
   .demandCommand()
   .help()
   .fail((msg, err, yargs) => {
