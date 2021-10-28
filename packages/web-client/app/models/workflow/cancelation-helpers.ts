@@ -1,5 +1,5 @@
 import { WorkflowMessage } from './workflow-message';
-import { WorkflowCard, WorkflowCardOptions } from './workflow-card';
+import { WorkflowCard } from './workflow-card';
 import { isPresent } from '@ember/utils';
 import {
   COMPLETED_WORKFLOW_WITH_UNSUPPORTED_VERSION,
@@ -23,7 +23,7 @@ export function conditionalCancelationMessage({
   });
 }
 
-export function defaultCancelationCard(): WorkflowCard<WorkflowCardOptions> {
+export function defaultCancelationCard(): WorkflowCard {
   return new WorkflowCard({
     componentName: 'workflow-thread/default-cancelation-cta',
     includeIf() {

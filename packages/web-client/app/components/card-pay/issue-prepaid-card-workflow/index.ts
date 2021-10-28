@@ -31,7 +31,6 @@ import {
   spendToUsd,
 } from '@cardstack/cardpay-sdk';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
-import { WorkflowCardOptions } from '@cardstack/web-client/models/workflow/workflow-card';
 
 export const faceValueOptions = [500, 1000, 2500, 5000, 10000, 50000];
 
@@ -150,7 +149,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
         new NetworkAwareWorkflowCard({
           cardName: 'HUB_AUTH',
           componentName: 'card-pay/hub-authentication',
-          includeIf(this: NetworkAwareWorkflowCard<WorkflowCardOptions>) {
+          includeIf(this: NetworkAwareWorkflowCard) {
             return !this.isHubAuthenticated;
           },
         }),
