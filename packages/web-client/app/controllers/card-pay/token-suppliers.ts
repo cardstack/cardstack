@@ -7,10 +7,7 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import TokenToUsd, {
   UsdConvertibleSymbol,
 } from '@cardstack/web-client/services/token-to-usd';
-import {
-  TokenDisplayInfo,
-  TokenSymbol,
-} from '@cardstack/web-client/utils/token';
+import { TokenBalance } from '@cardstack/web-client/utils/token';
 import BN from 'bn.js';
 
 export default class CardPayTokenSuppliersController extends Controller {
@@ -32,40 +29,32 @@ export default class CardPayTokenSuppliersController extends Controller {
     this.workflowPersistenceId = null;
   }
 
-  get tokens() {
+  get tokensToDisplay() {
     if (!this.layer2Network.isConnected) {
-      return undefined;
+      return [];
     }
-    return this.layer2Network.depotSafe?.tokens;
-  }
-
-  get tokensWithDisplayInfo() {
-    return this.tokens?.map((item) => {
-      let symbol =
-        item.token.symbol === 'DAI' || item.token.symbol === 'CARD'
-          ? `${item.token.symbol}.CPXD`
-          : item.token.symbol;
-      let displayInfo = new TokenDisplayInfo(symbol as TokenSymbol);
-
-      return {
-        balance: new BN(item.balance),
-        symbol,
-        icon: displayInfo.icon,
-      };
-    });
+    return [
+      new TokenBalance(
+        'DAI.CPXD',
+        this.layer2Network.defaultTokenBalance ?? new BN('0')
+      ),
+      new TokenBalance(
+        'CARD.CPXD',
+        this.layer2Network.cardBalance ?? new BN('0')
+      ),
+    ].filter((el) => el.balance && !el.balance?.isZero());
   }
 
   get usdBalanceTotal() {
-    return this.tokensWithDisplayInfo?.reduce((sum, item) => {
+    return this.tokensToDisplay.reduce((sum, item) => {
       let usdBalance = this.tokenToUsd.toUsdFrom(
         item.symbol as UsdConvertibleSymbol,
         item.balance
       );
       if (usdBalance) {
         return (sum += usdBalance);
-      } else {
-        return;
       }
+      return 0;
     }, 0);
   }
 }

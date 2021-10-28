@@ -41,51 +41,12 @@
       </header>
 
       {{#if this.layer2Network.depotSafe}}
-        <section class="card-pay-dashboard__depot">
-          <div class="card-pay-dashboard__depot-header">
-            <div class="card-pay-dashboard__depot-network">
-              On {{network-display-info "layer2" "fullName"}}
-            </div>
-            <div class="card-pay-dashboard__depot-address">
-              {{truncate-middle this.layer2Network.depotSafe.address}}
-            </div>
-          </div>
-          <section class="card-pay-dashboard__depot-body">
-            <h3 class="card-pay-dashboard__depot-title">Depot</h3>
-            <h4 class="card-pay-dashboard__depot-balances-title">
-              <div>
-                Layer 2 Balances
-                <span class="card-pay-dashboard__depot-balances-num">{{this.tokens.length}}</span>
-              </div>
-              <div class="card-pay-dashboard__depot-balances-num">
-                {{format-usd this.usdBalanceTotal}}
-              </div>
-            </h4>
-            <div class="card-pay-dashboard__depot-balances-grid">
-              {{#each this.tokensWithDisplayInfo as |t|}}
-                <div class="card-pay-dashboard__token">
-                  <CardPay::BalanceDisplay
-                    class="card-pay-dashboard__token-balance-display"
-                    @icon={{t.icon}}
-                    @balance={{format-wei-amount t.balance}}
-                    @symbol={{t.symbol}}
-                    @usdBalance={{token-to-usd t.symbol t.balance}}
-                  />
-                  <div>
-                    <Boxel::Button
-                      {{on "click" (fn this.transitionToTokenSuppliers "withdrawal")}}
-                      @kind="primary"
-                      @size="small"
-                      data-test-workflow-button="withdrawal"
-                    >
-                      <span>Withdraw</span>
-                    </Boxel::Button>
-                  </div>
-                </div>
-              {{/each}}
-            </div>
-          </section>
-        </section>
+        <CardPay::Depot
+          @address={{this.layer2Network.depotSafe.address}}
+          @tokens={{this.tokensToDisplay}}
+          @usdBalanceTotal={{this.usdBalanceTotal}}
+          @withdraw={{fn this.transitionToTokenSuppliers "withdrawal"}}
+        />
       {{/if}}
     </section>
   {{/if}}
