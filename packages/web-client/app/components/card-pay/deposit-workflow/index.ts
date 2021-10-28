@@ -37,7 +37,7 @@ export const MILESTONE_TITLES = [
   `Receive tokens on ${c.layer2.shortName}`,
 ];
 
-export const WORKFLOW_VERSION = 1;
+export const WORKFLOW_VERSION = 2;
 
 class DepositWorkflow extends Workflow {
   @service declare router: RouterService;
