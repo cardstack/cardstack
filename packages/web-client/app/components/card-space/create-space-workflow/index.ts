@@ -20,7 +20,6 @@ import {
   conditionalCancelationMessage,
 } from '@cardstack/web-client/models/workflow';
 import { standardCancelationPostables } from '@cardstack/web-client/models/workflow/cancelation-helpers';
-import { WorkflowCardOptions } from '@cardstack/web-client/models/workflow/workflow-card';
 
 const FAILURE_REASONS = {
   L2_DISCONNECTED: 'L2_DISCONNECTED',
@@ -102,7 +101,7 @@ class CreateSpaceWorkflow extends Workflow {
         new NetworkAwareWorkflowCard({
           cardName: 'HUB_AUTH',
           componentName: 'card-pay/hub-authentication',
-          includeIf(this: NetworkAwareWorkflowCard<WorkflowCardOptions>) {
+          includeIf(this: NetworkAwareWorkflowCard) {
             return !this.isHubAuthenticated;
           },
         }),

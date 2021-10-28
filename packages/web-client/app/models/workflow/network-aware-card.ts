@@ -16,7 +16,9 @@ import {
  * Documentation on the Typescript stuff is in {@see {@link WorkflowCard}}
  */
 export default class NetworkAwareWorkflowCard<
-  T extends ConfigurableWorkflowCardOptions | WorkflowCardOptions
+  T extends
+    | ConfigurableWorkflowCardOptions
+    | WorkflowCardOptions = WorkflowCardOptions
 > extends WorkflowCard<T> {
   constructor(
     options: T extends ConfigurableWorkflowCardOptions

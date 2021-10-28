@@ -37,7 +37,9 @@ export interface ConfigurableWorkflowCardOptions extends WorkflowCardOptions {
 }
 
 export class WorkflowCard<
-  T extends ConfigurableWorkflowCardOptions | WorkflowCardOptions
+  T extends
+    | ConfigurableWorkflowCardOptions
+    | WorkflowCardOptions = WorkflowCardOptions
 > extends WorkflowPostable {
   cardName: string;
   componentName: string;
