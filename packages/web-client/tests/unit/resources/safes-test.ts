@@ -306,7 +306,7 @@ module('Unit | Resource | Safes', function (hooks) {
     });
     await settled();
 
-    safes.daiMinValue = new BN(100);
+    safes.issuePrepaidCardDaiMinValue = new BN(100);
 
     assert.deepEqual(
       safes.issuePrepaidCardSourceSafes.mapBy('address'),

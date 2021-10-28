@@ -146,7 +146,7 @@ export class Safes extends Resource<Args> {
   individualSafeUpdateData: Record<string, IndividualSafeState> = {};
   @tracked safeReferences: Record<string, Safe> = {};
   @tracked value: Safe[] = [];
-  @tracked daiMinValue: BN | undefined;
+  @tracked issuePrepaidCardDaiMinValue: BN | undefined;
 
   constructor(owner: unknown, args: Args) {
     super(owner, args);
@@ -246,16 +246,16 @@ export class Safes extends Resource<Args> {
       spendMinValue
     );
 
-    this.daiMinValue = new BN(daiMinValue);
+    this.issuePrepaidCardDaiMinValue = new BN(daiMinValue);
   }
 
   get issuePrepaidCardSourceSafes() {
-    if (!this.daiMinValue) {
+    if (!this.issuePrepaidCardDaiMinValue) {
       return [];
     }
 
     let tokenOptions = ['DAI.CPXD' as BridgedTokenSymbol];
-    let minimumFaceValue = new BN(this.daiMinValue);
+    let minimumFaceValue = new BN(this.issuePrepaidCardDaiMinValue);
     let compatibleSafeTypes = ['depot', 'merchant'];
     let compatibleSafes = this.value.filter((safe) =>
       compatibleSafeTypes.includes(safe.type)
