@@ -242,6 +242,7 @@ export default class Layer2Network
     return txnHash ? this.strategy.blockExplorerUrl(txnHash) : undefined;
   }
 
+  @action
   async refreshSafesAndBalances() {
     return this.strategy.refreshSafesAndBalances();
   }
