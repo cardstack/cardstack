@@ -72,6 +72,8 @@ module(
         .dom(`[data-test-token-bridge-step-status="1"]`)
         .hasText(`0 of ${blockCount} blocks confirmed`);
 
+      assert.dom('[data-test-deposit-transaction-status-delay]').doesNotExist();
+
       layer1Service.test__simulateBlockConfirmation();
       await waitFor(
         `[data-test-token-bridge-step-block-count="${blockCount}"]`
@@ -95,6 +97,12 @@ module(
         .dom(`[data-test-token-bridge-step="2"][data-test-completed]`)
         .doesNotExist();
       assert.dom(`[data-test-blockscout-button]`).doesNotExist();
+
+      assert
+        .dom('[data-test-deposit-transaction-status-delay]')
+        .containsText(
+          'Due to network conditions this transaction is taking longer to confirm'
+        );
 
       // bridging should also refresh layer 2 balances so we want to ensure that here
       layer2Service.balancesRefreshed = false;
