@@ -119,6 +119,7 @@ module(
         .containsText(
           'Due to network conditions this transaction is taking longer to confirm'
         );
+      await this.pauseTest();
 
       // bridging should also refresh layer 2 balances so we want to ensure that here
       layer2Service.balancesRefreshed = false;
