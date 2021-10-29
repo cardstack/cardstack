@@ -19,7 +19,7 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
 
   defaultTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
   tokenOptions = [this.defaultTokenSymbol];
-  minimumFaceValue: BN;
+  minimumDaiValue: BN;
   @service declare layer2Network: Layer2Network;
 
   @tracked selectedSafe: Safe | undefined;
@@ -28,7 +28,7 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
 
-    this.minimumFaceValue = new BN(
+    this.minimumDaiValue = new BN(
       this.args.workflowSession.getValue<string>('daiMinValue')!
     );
 
@@ -90,8 +90,8 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
     );
   }
 
-  get formattedMinimumFaceValue() {
-    return Math.ceil(Number(fromWei(this.minimumFaceValue)));
+  get formattedMinimumDaiValue() {
+    return Math.ceil(Number(fromWei(this.minimumDaiValue)));
   }
 
   @action chooseSafe(safe: Safe) {
