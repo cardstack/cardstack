@@ -11,19 +11,18 @@ import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
-import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
 import {
   BridgedTokenSymbol,
-  ConvertibleSymbol,
   getBridgedSymbol,
   BridgeableSymbol,
 } from '@cardstack/web-client/utils/token';
 
 export interface SafesResourceStrategy {
   viewSafesTask: TaskFunction;
-  convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<string>;
   getLatestSafe(address: string): Promise<Safe>;
   getBlockHeight(): Promise<BN>;
+  issuePrepaidCardDaiMinValue: BN;
+  issuePrepaidCardSpendMinValue: number;
 }
 
 interface Args {
@@ -147,17 +146,9 @@ export class Safes extends Resource<Args> {
   @tracked safeReferences: Record<string, Safe> = {};
   @tracked value: Safe[] = [];
 
-  issuePrepaidCardMinValuesLoaded: Promise<void>;
-  @tracked issuePrepaidCardDaiMinValue: BN | undefined;
-  @tracked issuePrepaidCardSpendMinValue: number | undefined;
-
   constructor(owner: unknown, args: Args) {
     super(owner, args);
     this.fetch();
-
-    this.issuePrepaidCardMinValuesLoaded = new Promise((resolve) => {
-      this.fetchIssuePrepaidCardMinValues().then(resolve);
-    });
   }
 
   updateReferences(safes: Safe[]) {
@@ -245,27 +236,11 @@ export class Safes extends Resource<Args> {
     this.updateReferences(this.graphData.safes);
   }
 
-  async fetchIssuePrepaidCardMinValues() {
-    let spendMinValue = Math.min(...faceValueOptions);
-    this.issuePrepaidCardSpendMinValue = spendMinValue;
-
-    let daiMinValue = await this.args.named.strategy.convertFromSpend(
-      'DAI',
-      spendMinValue
-    );
-
-    this.issuePrepaidCardDaiMinValue = new BN(daiMinValue);
-  }
-
   get issuePrepaidCardSourceSafes() {
-    if (!this.issuePrepaidCardDaiMinValue) {
-      throw new Error(
-        'Cannot get issuance source safes before DAI minimum has loaded; await issuePrepaidCardMinValuesLoaded'
-      );
-    }
-
     let tokenOptions = ['DAI.CPXD' as BridgedTokenSymbol];
-    let minimumFaceValue = new BN(this.issuePrepaidCardDaiMinValue);
+    let minimumFaceValue = new BN(
+      this.args.named.strategy.issuePrepaidCardDaiMinValue
+    );
     let compatibleSafeTypes = ['depot', 'merchant'];
     let compatibleSafes = this.value.filter((safe) =>
       compatibleSafeTypes.includes(safe.type)

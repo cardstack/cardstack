@@ -68,6 +68,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   bridgingToLayer1HashDeferred!: RSVP.Deferred<TransactionHash>;
   bridgingToLayer1Deferred!: RSVP.Deferred<BridgeValidationResult>;
   @tracked isInitializing = false;
+  @tracked issuePrepaidCardSpendMinValue: number = 500;
+  @tracked issuePrepaidCardDaiMinValue: BN = new BN(toWei('5'));
 
   bridgeToLayer1Requests: BridgeToLayer1Request[] = [];
   issuePrepaidCardRequests: Map<string, IssuePrepaidCardRequest> = new Map();
