@@ -19,6 +19,7 @@ import { render, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import BN from 'bn.js';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
+import { toWei } from 'web3-utils';
 
 const defaultBlockNumber = 5;
 const address = generateMockAddress();
@@ -39,16 +40,14 @@ class PartialLayer2Strategy implements MockSafesResourceStrategy {
   _graphData: ViewSafesResult; // the next data to be fetched by viewSafesTask
   _blockNumber = defaultBlockNumber; // the next block number to be assigned to an individual update
   _latestSafe = createDefaultDepotSafe(); // the next safe fetched by an individual update
+  issuePrepaidCardSpendMinValue = 1;
+  issuePrepaidCardDaiMinValue = new BN(toWei('1'));
 
   constructor(initialData?: ViewSafesResult) {
     this._graphData = initialData ?? {
       safes: [],
       blockNumber: defaultBlockNumber,
     };
-  }
-
-  convertFromSpend(_symbol: 'DAI' | 'CARD', amount: number): Promise<string> {
-    return Promise.resolve(amount.toString());
   }
 
   async getBlockHeight() {
@@ -270,18 +269,16 @@ module('Unit | Resource | Safes', function (hooks) {
   });
 
   test('it returns safes that are compatible with and have sufficient balance for issuing a prepaid card', async function (assert) {
-    defaultDepotSafe = createDefaultDepotSafe(
-      '100000000000000000000000000000000'
-    );
+    defaultDepotSafe = createDefaultDepotSafe(toWei('100'));
 
     let sufficientTokens = [
-      createSafeToken('DAI', '250000000000000000000'),
-      createSafeToken('CARD', '250000000000000000000'),
+      createSafeToken('DAI', toWei('25')),
+      createSafeToken('CARD', toWei('25')),
     ];
 
     let insufficientTokens = [
       createSafeToken('DAI', '1'),
-      createSafeToken('CARD', '250000000000000000000'),
+      createSafeToken('CARD', toWei('25')),
     ];
 
     let sufficientMerchantSafe = createMerchantSafe({
@@ -305,8 +302,6 @@ module('Unit | Resource | Safes', function (hooks) {
       },
     });
     await settled();
-
-    safes.issuePrepaidCardDaiMinValue = new BN(100);
 
     assert.deepEqual(
       safes.issuePrepaidCardSourceSafes.mapBy('address'),

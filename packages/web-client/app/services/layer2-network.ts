@@ -60,6 +60,10 @@ export default class Layer2Network
   @reads('strategy.depotSafe') depotSafe: DepotSafe | undefined;
   @reads('strategy.safes.isLoading')
   declare isFetchingDepot: boolean;
+  @reads('strategy.issuePrepaidCardSpendMinValue')
+  declare issuePrepaidCardSpendMinValue: number;
+  @reads('strategy.issuePrepaidCardDaiMinValue')
+  declare issuePrepaidCardDaiMinValue: BN;
 
   bridgedSymbolToWithdrawalLimits: Map<BridgedTokenSymbol, WithdrawalLimits> =
     new Map();

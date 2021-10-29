@@ -102,6 +102,11 @@ export interface Layer2Web3Strategy
   defaultTokenBalance: BN | undefined;
   cardBalance: BN | undefined;
   depotSafe: DepotSafe | null;
+  issuePrepaidCardSpendMinValue: number;
+  /**
+   * This property should only be accessed after layer 2 has been connected
+   */
+  issuePrepaidCardDaiMinValue: BN;
   walletConnectUri: string | undefined;
   initializeTask(): TaskGenerator<void>;
   updateUsdConverters(
