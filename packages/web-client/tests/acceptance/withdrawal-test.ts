@@ -270,7 +270,7 @@ module('Acceptance | withdrawal', function (hooks) {
       );
     await waitFor(postableSel(4, 1));
 
-    layer2Service.test__simulateBridgedToLayer1(
+    await layer2Service.test__simulateBridgedToLayer1(
       merchantAddress,
       layer1AccountAddress,
       'CARD',

@@ -60,6 +60,10 @@ export default class Layer2Network
   @reads('strategy.depotSafe') depotSafe: DepotSafe | undefined;
   @reads('strategy.safes.isLoading')
   declare isFetchingDepot: boolean;
+  @reads('strategy.issuePrepaidCardSpendMinValue')
+  declare issuePrepaidCardSpendMinValue: number;
+  @reads('strategy.issuePrepaidCardDaiMinValue')
+  declare issuePrepaidCardDaiMinValue: BN;
 
   bridgedSymbolToWithdrawalLimits: Map<BridgedTokenSymbol, WithdrawalLimits> =
     new Map();
@@ -130,11 +134,12 @@ export default class Layer2Network
 
   @task *issuePrepaidCardTask(
     faceValue: number,
+    sourceAddress: string,
     customizationDid: string,
     options: TransactionOptions
   ): any {
     let prepaidCardSafe = yield this.strategy.issuePrepaidCard(
-      this.depotSafe?.address!,
+      sourceAddress,
       faceValue,
       customizationDid,
       options
@@ -142,7 +147,7 @@ export default class Layer2Network
 
     yield all([
       this.safes.updateOne(prepaidCardSafe.address),
-      this.safes.updateDepot(),
+      this.safes.updateOne(sourceAddress),
     ]);
 
     return prepaidCardSafe;

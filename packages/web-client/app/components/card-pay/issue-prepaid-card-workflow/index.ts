@@ -7,7 +7,6 @@ import WorkflowPersistence from '@cardstack/web-client/services/workflow-persist
 import { action } from '@ember/object';
 import RouterService from '@ember/routing/router-service';
 
-import BN from 'bn.js';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import {
@@ -39,6 +38,7 @@ export const FAILURE_REASONS = {
   DISCONNECTED: 'DISCONNECTED',
   INSUFFICIENT_FUNDS: 'INSUFFICIENT_FUNDS',
   ACCOUNT_CHANGED: 'ACCOUNT_CHANGED',
+  RESTORATION_INSUFFICIENT_FUNDS: 'RESTORATION_INSUFFICIENT_FUNDS',
   RESTORATION_UNAUTHENTICATED: 'RESTORATION_UNAUTHENTICATED',
   RESTORATION_L2_ACCOUNT_CHANGED: 'RESTORATION_L2_ACCOUNT_CHANGED',
   RESTORATION_L2_DISCONNECTED: 'RESTORATION_L2_DISCONNECTED',
@@ -109,17 +109,20 @@ class IssuePrepaidCardWorkflow extends Workflow {
 
             let { layer2Network } = this.workflow as IssuePrepaidCardWorkflow;
 
-            let spendMinValue = Math.min(...faceValueOptions);
-            let daiMinValue = await layer2Network.convertFromSpend(
-              'DAI',
-              spendMinValue
+            this.workflow?.session.setValue(
+              'spendMinValue',
+              layer2Network.issuePrepaidCardSpendMinValue
             );
-            this.workflow?.session.setValue('spendMinValue', spendMinValue);
-            this.workflow?.session.setValue('daiMinValue', daiMinValue);
+            this.workflow?.session.setValue(
+              'daiMinValue',
+              layer2Network.issuePrepaidCardDaiMinValue?.toString()
+            );
+
             await layer2Network.waitForAccount;
-            let sufficientFunds = !!layer2Network.defaultTokenBalance?.gte(
-              new BN(daiMinValue)
-            );
+
+            let sufficientBalanceSafes =
+              layer2Network.safes.issuePrepaidCardSourceSafes;
+            let sufficientFunds = sufficientBalanceSafes.length > 0;
 
             if (sufficientFunds) {
               return {
@@ -172,7 +175,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
           message: 'Nice choice!',
         }),
         new WorkflowMessage({
-          message: `On to the next step: How do you want to fund your prepaid card? Please select a depot and balance from your ${c.layer2.fullName} wallet.`,
+          message: `On to the next step: How do you want to fund your prepaid card? Please select a source and balance from your ${c.layer2.fullName} wallet.`,
         }),
         new WorkflowCard({
           cardName: 'FUNDING_SOURCE',
@@ -217,8 +220,11 @@ class IssuePrepaidCardWorkflow extends Workflow {
       message: `This is the remaining balance in your ${c.layer2.fullName} wallet:`,
     }),
     new WorkflowCard({
-      cardName: 'EPILOGUE_LAYER_TWO_CONNECT_CARD',
-      componentName: 'card-pay/layer-two-connect-card',
+      cardName: 'EPILOGUE_SAFE_BALANCE_CARD',
+      componentName: 'card-pay/safe-balance-card',
+      config: {
+        safeAddressKey: 'prepaidFundingSafeAddress',
+      },
     }),
     new WorkflowCard({
       cardName: 'EPILOGUE_NEXT_STEPS',
@@ -234,13 +240,9 @@ class IssuePrepaidCardWorkflow extends Workflow {
     // if we don't have enough balance (50 USD equivalent)
     new SessionAwareWorkflowMessage({
       template: (session: IWorkflowSession) =>
-        `Looks like there’s not enough balance in your ${
+        `Looks like you don’t have a merchant or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
           c.layer2.fullName
-        } wallet to fund a prepaid card. Before you can continue, please add funds to your ${
-          c.layer2.fullName
-        } wallet by bridging some tokens from your ${
-          c.layer1.fullName
-        } wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
+        } wallet, or by claiming merchant revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
           Number(fromWei(session.getValue<string>('daiMinValue')!))
         )} DAI.CPXD (${convertAmountToNativeDisplay(
           spendToUsd(session.getValue<number>('spendMinValue')!)!,
@@ -253,13 +255,32 @@ class IssuePrepaidCardWorkflow extends Workflow {
         );
       },
     }),
+    new SessionAwareWorkflowMessage({
+      template: (session: IWorkflowSession) =>
+        `You attempted to restore an unfinished workflow, but the chosen source does not have enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
+          c.layer2.fullName
+        } wallet, or by claiming merchant revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
+          Number(fromWei(session.getValue<string>('daiMinValue')!))
+        )} DAI.CPXD (${convertAmountToNativeDisplay(
+          spendToUsd(session.getValue<number>('spendMinValue')!)!,
+          'USD'
+        )})**.`,
+      includeIf() {
+        return (
+          this.workflow?.cancelationReason ===
+          FAILURE_REASONS.RESTORATION_INSUFFICIENT_FUNDS
+        );
+      },
+    }),
     new WorkflowCard({
       componentName:
         'card-pay/issue-prepaid-card-workflow/insufficient-funds-cta',
       includeIf() {
         return (
           this.workflow?.cancelationReason ===
-          FAILURE_REASONS.INSUFFICIENT_FUNDS
+            FAILURE_REASONS.INSUFFICIENT_FUNDS ||
+          this.workflow?.cancelationReason ===
+            FAILURE_REASONS.RESTORATION_INSUFFICIENT_FUNDS
         );
       },
     }),
@@ -317,6 +338,20 @@ class IssuePrepaidCardWorkflow extends Workflow {
 
     if (!hubAuthentication.isAuthenticated) {
       errors.push(FAILURE_REASONS.RESTORATION_UNAUTHENTICATED);
+    }
+
+    let prepaidFundingSafeAddress = this.session.getValue<string>(
+      'prepaidFundingSafeAddress'
+    );
+
+    if (prepaidFundingSafeAddress) {
+      if (
+        !this.layer2Network.safes.issuePrepaidCardSourceSafes
+          .mapBy('address')
+          .includes(prepaidFundingSafeAddress)
+      ) {
+        errors.push(FAILURE_REASONS.RESTORATION_INSUFFICIENT_FUNDS);
+      }
     }
 
     return errors;

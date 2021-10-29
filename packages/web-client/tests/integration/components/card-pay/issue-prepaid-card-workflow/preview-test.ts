@@ -12,8 +12,10 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../../../../mirage/fixture-data/prepaid-card-color-schemes';
 import prepaidCardPatterns from '../../../../../mirage/fixture-data/prepaid-card-patterns';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
+import { createMerchantSafe } from '@cardstack/web-client/utils/test-factories';
 import BN from 'bn.js';
 import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
+import { MerchantSafe } from '@cardstack/cardpay-sdk';
 
 const USER_REJECTION_ERROR_MESSAGE =
   'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
@@ -30,6 +32,7 @@ module(
   function (hooks) {
     let layer2Service: Layer2TestWeb3Strategy;
     let cardCustomizationService: CardCustomization;
+    let merchantSafe: MerchantSafe;
 
     setupRenderingTest(hooks);
     setupMirage(hooks);
@@ -45,9 +48,25 @@ module(
         'service:card-customization'
       ) as CardCustomization;
 
+      merchantSafe = createMerchantSafe({
+        address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
+        merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
+        tokens: [],
+        accumulatedSpendValue: 100,
+      });
+
+      let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+        merchantSafe,
+      ]);
+
+      layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
+
       let workflowSession = new WorkflowSession();
       workflowSession.setValue({
         spendFaceValue: 100000,
+        prepaidFundingSafeAddress: merchantSafe.address,
         issuerName: 'Some name',
         colorScheme: {
           id: prepaidCardColorSchemes[0].id,
@@ -192,6 +211,7 @@ module(
         await waitFor('[data-test-issue-prepaid-card-cancel-button]');
         layer2Service.test__simulateOnNonceForIssuePrepaidCardRequest(
           100000,
+          merchantSafe.address,
           new BN('12345')
         );
         await click('[data-test-issue-prepaid-card-cancel-button]');
@@ -200,10 +220,16 @@ module(
           .hasText('Try Again');
         await click('[data-test-issue-prepaid-card-button]');
         await waitUntil(() =>
-          layer2Service.test__getNonceForIssuePrepaidCardRequest(100000)
+          layer2Service.test__getNonceForIssuePrepaidCardRequest(
+            100000,
+            merchantSafe.address
+          )
         );
         assert.equal(
-          layer2Service.test__getNonceForIssuePrepaidCardRequest(100000),
+          layer2Service.test__getNonceForIssuePrepaidCardRequest(
+            100000,
+            merchantSafe.address
+          ),
           '12345',
           'The same nonce as was used for the first attempt is sent for the second'
         );

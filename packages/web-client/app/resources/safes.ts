@@ -11,11 +11,18 @@ import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
+import {
+  BridgedTokenSymbol,
+  getBridgedSymbol,
+  BridgeableSymbol,
+} from '@cardstack/web-client/utils/token';
 
 export interface SafesResourceStrategy {
   viewSafesTask: TaskFunction;
   getLatestSafe(address: string): Promise<Safe>;
   getBlockHeight(): Promise<BN>;
+  issuePrepaidCardDaiMinValue: BN;
+  issuePrepaidCardSpendMinValue: number;
 }
 
 interface Args {
@@ -227,6 +234,28 @@ export class Safes extends Resource<Args> {
     );
 
     this.updateReferences(this.graphData.safes);
+  }
+
+  get issuePrepaidCardSourceSafes() {
+    let tokenOptions = ['DAI.CPXD' as BridgedTokenSymbol];
+    let minimumFaceValue = new BN(
+      this.args.named.strategy.issuePrepaidCardDaiMinValue
+    );
+    let compatibleSafeTypes = ['depot', 'merchant'];
+    let compatibleSafes = this.value.filter((safe) =>
+      compatibleSafeTypes.includes(safe.type)
+    );
+    return compatibleSafes.filter((safe) => {
+      let compatibleTokens = safe.tokens.filter((token) =>
+        tokenOptions.includes(
+          getBridgedSymbol(token.token.symbol as BridgeableSymbol)
+        )
+      );
+
+      return compatibleTokens.any((token) =>
+        minimumFaceValue.lte(new BN(token.balance))
+      );
+    });
   }
 
   async updateOne(address: string) {

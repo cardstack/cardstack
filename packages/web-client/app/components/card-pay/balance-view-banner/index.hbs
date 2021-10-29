@@ -5,7 +5,10 @@
         <span class="balance-view-banner__summary-name">Account </span>
         <span class="balance-view-banner__summary-address">({{truncate-middle @walletAddress}})</span>
       </div>
-      <div class="balance-view-banner__summary-depot-balance">DEPOT: {{@balance}} {{@token.symbol}}</div>
+      <div class="balance-view-banner__summary-depot-balance">
+        {{this.summaryBalanceLabel}}:
+        {{format-wei-amount this.tokenBalance}} {{@token}}
+      </div>
     </div>
     <div class="balance-view-banner__marker">
       {{svg-jar "caret-right" class="balance-view-banner__marker-icon" role="presentation"}}
@@ -23,19 +26,19 @@
     <:inner>
       <CardPay::AccountDisplay
         @size="small"
-        @icon="depot"
-        @name="DEPOT:"
-        @address={{@depotAddress}}
-        data-test-balance-view-depot-address
+        @icon={{this.safeIcon}}
+        @name="{{this.summaryBalanceLabel}}:"
+        @address={{@safe.address}}
+        data-test-balance-view-safe-address
       />
     </:inner>
     <:innermost>
       <CardPay::BalanceDisplay
         @label="Available Balance"
         @size="large"
-        @icon={{@token.icon}}
-        @balance={{@balance}}
-        @symbol={{@token.symbol}}
+        @icon={{this.tokenIcon}}
+        @balance={{format-wei-amount this.tokenBalance}}
+        @symbol={{@token}}
         data-test-balance-view-token-amount
       />
     </:innermost>

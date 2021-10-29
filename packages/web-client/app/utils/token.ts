@@ -159,8 +159,20 @@ export class TokenDisplayInfo<T extends TokenSymbol> implements DisplayInfo {
     this.icon = displayInfo.icon;
   }
 
-  static iconFor(symbol: TokenSymbol) {
-    return _tokenDisplayInfoMap[symbol].icon;
+  static iconFor(symbol: string) {
+    switch (symbol) {
+      case 'ETH':
+        return _tokenDisplayInfoMap['ETH'].icon;
+      case 'DAI':
+      case 'DAI.CPXD':
+      case 'XDAI':
+        return _tokenDisplayInfoMap['DAI'].icon;
+      case 'CARD':
+      case 'CARD.CPXD':
+        return _tokenDisplayInfoMap['CARD'].icon;
+      default:
+        return undefined;
+    }
   }
 }
 

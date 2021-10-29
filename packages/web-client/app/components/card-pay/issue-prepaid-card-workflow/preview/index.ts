@@ -75,6 +75,12 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
     super(owner, args);
   }
 
+  get prepaidFundingSafe() {
+    return this.layer2Network.safes.getByAddress(
+      this.args.workflowSession.getValue<string>('prepaidFundingSafeAddress')!
+    )!;
+  }
+
   @action checkForPendingTransaction() {
     if (this.args.workflowSession.getValue('txnHash')) {
       taskFor(this.issueTask).perform();
@@ -143,7 +149,12 @@ export default class CardPayPrepaidCardWorkflowPreviewComponent extends Componen
 
         let prepaidCardSafeTaskInstance = taskFor(
           this.layer2Network.issuePrepaidCardTask
-        ).perform(this.faceValue, did, options);
+        ).perform(
+          this.faceValue,
+          this.prepaidFundingSafe.address,
+          did,
+          options
+        );
 
         let prepaidCardSafe = yield race([
           prepaidCardSafeTaskInstance,
