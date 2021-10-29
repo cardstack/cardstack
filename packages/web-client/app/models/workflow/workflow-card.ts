@@ -20,23 +20,12 @@ type FailureCheckResult = {
 
 export type CheckResult = SuccessCheckResult | FailureCheckResult;
 
-export interface WorkflowCardOptions {
+interface WorkflowCardOptions<T extends string> {
   cardName?: string;
   author?: Participant;
-  componentName: string; // this should eventually become a card reference
-  includeIf?(this: WorkflowCard<WorkflowCardOptions>): boolean;
-  check?(this: WorkflowCard<WorkflowCardOptions>): Promise<CheckResult>;
-}
-
-/**
- * This type is used to check if a card's configuration is registered or not
- */
-export interface ConfigurableWorkflowCardOptions extends WorkflowCardOptions {
-  componentName: keyof CardConfiguration; // this should eventually become a card reference
-  includeIf?(this: WorkflowCard<ConfigurableWorkflowCardOptions>): boolean;
-  check?(
-    this: WorkflowCard<ConfigurableWorkflowCardOptions>
-  ): Promise<CheckResult>;
+  componentName: T; // this should eventually become a card reference
+  includeIf?(this: WorkflowCard<T>): boolean;
+  check?(this: WorkflowCard<T>): Promise<CheckResult>;
 }
 
 /**
@@ -52,22 +41,9 @@ type ObjectInheritingValueOptionality<
   ? { [key in Keys]?: Value }
   : { [key in Keys]: Value };
 
-export type ConfigurableIfRegistered<T extends WorkflowCardOptions> =
-  T extends ConfigurableWorkflowCardOptions
-    ? T &
-        ObjectInheritingValueOptionality<
-          'config',
-          CardConfiguration[T['componentName']]
-        >
-    : never | T;
-
-export class WorkflowCard<
-  T extends
-    | ConfigurableWorkflowCardOptions
-    | WorkflowCardOptions = WorkflowCardOptions
-> extends WorkflowPostable {
+export class WorkflowCard<T extends string = string> extends WorkflowPostable {
   cardName: string;
-  componentName: string;
+  componentName: T;
   config?: any;
   check: (this: WorkflowCard<T>) => Promise<CheckResult> = () => {
     return Promise.resolve({ success: true });
@@ -106,7 +82,27 @@ export class WorkflowCard<
    * }
    * ```
    */
-  constructor(options: ConfigurableIfRegistered<T>) {
+  constructor(
+    options: WorkflowCardOptions<
+      T &
+        (T extends keyof CardConfiguration
+          ? // note that this string here is an exception to detection for being in the card configuration registry
+            // so if you do 'card-pay/layer-one-connect-card' as the string, we won't be able to detect whether it's in the registry
+            'You need config for this item'
+          : {})
+    >
+  );
+  constructor(
+    options: T extends keyof CardConfiguration
+      ? WorkflowCardOptions<T> &
+          ObjectInheritingValueOptionality<'config', CardConfiguration[T]>
+      : never
+  );
+  constructor(
+    options: WorkflowCardOptions<T> & {
+      config?: T extends keyof CardConfiguration ? CardConfiguration[T] : never;
+    }
+  ) {
     super(options.author, options.includeIf);
     this.componentName = options.componentName!;
     this.cardName = options.cardName || '';
