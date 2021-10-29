@@ -349,7 +349,6 @@ class IssuePrepaidCardWorkflow extends Workflow {
     );
 
     if (prepaidFundingSafeAddress) {
-      // FIXME how to wait for minima to load?
       if (
         !this.layer2Network.safes.issuePrepaidCardSourceSafes
           .mapBy('address')
