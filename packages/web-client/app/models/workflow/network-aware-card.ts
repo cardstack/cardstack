@@ -6,23 +6,13 @@ import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer1-network';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { getOwner } from '@ember/application';
-import {
-  ConfigurableIfRegistered,
-  ConfigurableWorkflowCardOptions,
-  WorkflowCardOptions,
-} from '@cardstack/web-client/models/workflow/workflow-card';
 
 /**
  * Documentation on the Typescript stuff is in {@link WorkflowCard}
  */
 export default class NetworkAwareWorkflowCard<
-  T extends
-    | ConfigurableWorkflowCardOptions
-    | WorkflowCardOptions = WorkflowCardOptions
+  T extends string = string
 > extends WorkflowCard<T> {
-  constructor(options: ConfigurableIfRegistered<T>) {
-    super(options);
-  }
   get layer1Network() {
     let postable = this as WorkflowPostable;
     let layer1Network = getOwner(postable.workflow).lookup(
