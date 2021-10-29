@@ -5,4 +5,8 @@ import * as db from './db';
 import * as server from './server';
 import * as worker from './worker';
 
-export const commands = [bot, compiler, console, db, server, worker];
+export const commands: any[] = [bot, console, db, server, worker];
+
+if (process.env.COMPILER) {
+  commands.push(compiler);
+}

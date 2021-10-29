@@ -1,9 +1,9 @@
 import type { Argv } from 'yargs';
-exports.command = 'db <command>';
-exports.desc = 'Commands to manage the local database';
+export const command = 'db <command>';
+export const desc = 'Commands to manage the local database';
 
-exports.builder = function (yargs: Argv) {
+export function builder(yargs: Argv) {
   return yargs.commandDir('./db');
-};
+}
 
-exports.handler = function (/* argv: Argv */) {};
+export function handler(/* argv: Argv */) {}

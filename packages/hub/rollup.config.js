@@ -5,8 +5,6 @@ import commonjs from '@rollup/plugin-commonjs';
 import babel from '@rollup/plugin-babel';
 import json from '@rollup/plugin-json';
 import replace from '@rollup/plugin-replace';
-import graph from 'rollup-plugin-graph';
-import nativePlugin from 'rollup-plugin-natives';
 import path from 'path';
 
 export default {
@@ -17,17 +15,26 @@ export default {
     sourcemap: true,
     exports: 'default',
   },
-  external: ['config', 'readable-stream', 'parse-asn1', 'discord.js', 'glob'],
-  onwarn(warning, rollupWarn) {
-    console.log(warning);
-  },
+  external: [
+    // these are here because they contain cycles *and* actually try to invoke
+    // each other during module evaluation, such that they actually fail if you
+    // convert them to ES modules.
+    'readable-stream',
+    'parse-asn1',
+    'discord.js',
+    'glob',
+
+    // this one tries to load some sql relative to its own source at runtime
+    'graphile-worker',
+
+    // this one does a dynamic require() of an absolute path that's not
+    // compatible with @rollup/plugin-commonjs
+    'config',
+  ],
   plugins: [
     replace({
-      // the dependency "formidable" includes code for hijacking require that it
-      // doesn't need that generates build warnings. This silences them.
-      'require = GENTLY.hijack(require)': 'true',
-
-      // these are optional dependencies.
+      // these are optional dependencies of our dependencies. We don't want
+      // rollup to try to process them eagerly.
       "require('electron')": "(function(){ var e = new Error(); e.code='MODULE_NOT_FOUND'; throw e })",
       "require('ffmpeg-static')": "(function(){ var e = new Error(); e.code='MODULE_NOT_FOUND'; throw e })",
 
@@ -37,70 +44,38 @@ export default {
       // /\b/ won't match. But we can't actually keep the default leading
       // delimter due to the bug.
       delimiters: ['', ''],
+      preventAssignment: true,
     }),
     replace({
+      // pg expects this module to fail to load if the optional pg-native
+      // implementation is not present. We don't want it rolled up to the top
+      // level because that would escape the try/catch
       "require('./native')": "(function(){ var e = new Error(); e.code='MODULE_NOT_FOUND'; throw e })",
       delimiters: ['', ''],
       include: [path.relative(process.cwd(), require.resolve('pg/lib/index.js'))],
+      preventAssignment: true,
     }),
-    replace({
-      delimiters: ['', ''],
-    }),
-    //customPatches(),
     nodeResolve({ preferBuiltins: true, extensions: ['.mjs', '.js', '.json', '.node', '.ts'] }),
-    commonjs({
-      //dynamicRequireTargets: ['./config/*.cjs', '../../node_modules/split2/node_modules/readable-stream/lib/*.js'],
-    }),
+    commonjs(),
     babel({
       plugins: ['@babel/plugin-transform-typescript', ['@babel/plugin-proposal-decorators', { legacy: true }]],
       babelHelpers: 'bundled',
       extensions: ['.ts'],
     }),
-    // graph(),
     json(),
-
-    // TODO: this is unused so far, if it remains so we should remove it
-    nativePlugin({
-      copyTo: 'dist/libs',
-      destDir: './libs',
-    }),
   ],
+  onwarn(warning, rollupWarn) {
+    if (
+      ['EVAL', 'THIS_IS_UNDEFINED', 'ILLEGAL_NAMESPACE_REASSIGNMENT'].includes(warning.code) &&
+      /\/node_modules\//.test(warning.loc.file)
+    ) {
+      // these warnings aren't fatal and they're talking about problems in
+      // third-party code that we don't control
+    } else if (warning.code === 'CIRCULAR_DEPENDENCY') {
+      // Circular dependencies are intentionally allowed by the ES module spec.
+      // https://github.com/rollup/rollup/issues/2271
+    } else {
+      rollupWarn(warning);
+    }
+  },
 };
-
-function customPatches() {
-  function runtimeFailure(importee) {
-    return `\0custom_patches_runtime_failure?i=${importee}`;
-  }
-  function runtimeFailureCode(name) {
-    return `
-    let err = new Error("${name} does not exist and we did not expect it to actually get used");
-    err.code = 'MODULE_NOT_FOUND';
-    throw err;
-    export default {};
-  `;
-  }
-
-  return {
-    name: 'custom-patches',
-    resolveId(importee, requester) {
-      if (/pg\/lib\/index/.test(requester)) {
-        console.log(
-          `${requester} ${requester?.endsWith('node_modules/pg/lib/index.js')} ${importee} ${/^\0?\.\/native/.test(
-            importee
-          )}`
-        );
-      }
-      if (requester?.endsWith('node_modules/pg/lib/index.js') && /^\0?\.\/native/.test(importee)) {
-        return runtimeFailure(importee);
-      }
-
-      // if (['pg-native', 'electron', 'ffmpeg-static'].includes(importee)) {
-      //   return runtimeFailure(importee);
-      // }
-      return null;
-    },
-    load(id) {
-      return id.startsWith(`\0custom_patches_runtime_failure`) ? runtimeFailureCode(id) : null;
-    },
-  };
-}

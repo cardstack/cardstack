@@ -1,11 +1,10 @@
 import type { Argv } from 'yargs';
-if (process.env.COMPILER) {
-  exports.command = 'compiler <command>';
-  exports.desc = 'Commands related to the compiling of cards';
 
-  exports.builder = function (yargs: Argv) {
-    return yargs.commandDir('./compiler');
-  };
+export const command = 'compiler <command>';
+export const desc = 'Commands related to the compiling of cards';
 
-  exports.handler = function (/* argv: Argv */) {};
+export function builder(yargs: Argv) {
+  return yargs.commandDir('./compiler');
 }
+
+export function handler(/* argv: Argv */) {}
