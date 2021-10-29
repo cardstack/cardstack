@@ -109,17 +109,14 @@ class IssuePrepaidCardWorkflow extends Workflow {
               };
 
             let { layer2Network } = this.workflow as IssuePrepaidCardWorkflow;
-            let safes = layer2Network.safes;
-
-            await safes.issuePrepaidCardMinValuesLoaded;
 
             this.workflow?.session.setValue(
               'spendMinValue',
-              safes.issuePrepaidCardSpendMinValue
+              layer2Network.issuePrepaidCardSpendMinValue
             );
             this.workflow?.session.setValue(
               'daiMinValue',
-              safes.issuePrepaidCardDaiMinValue?.toString()
+              layer2Network.issuePrepaidCardDaiMinValue?.toString()
             );
 
             await layer2Network.waitForAccount;

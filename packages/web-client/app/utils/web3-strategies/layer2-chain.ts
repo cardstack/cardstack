@@ -52,6 +52,7 @@ import { Safes } from '@cardstack/web-client/resources/safes';
 import { IAssets } from '../../../../cardpay-sdk/sdk/assets';
 import PrepaidCard from '@cardstack/cardpay-sdk/sdk/prepaid-card/base';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
+import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -84,6 +85,8 @@ export default abstract class Layer2ChainWeb3Strategy
   @tracked walletConnectUri: string | undefined;
   @tracked waitForAccountDeferred = defer();
   @tracked isInitializing = true;
+  @tracked issuePrepaidCardSpendMinValue: number = 0;
+  @tracked issuePrepaidCardDaiMinValue = new BN('0');
 
   @reads('provider.connector') connector!: IConnector;
   @reads('safes.depot') declare depotSafe: DepotSafe | null;
@@ -103,6 +106,13 @@ export default abstract class Layer2ChainWeb3Strategy
     this.#broadcastChannel.addEventListener(
       'message',
       this.onBroadcastChannelMessage
+    );
+  }
+
+  async fetchIssuePrepaidCardMinValues() {
+    this.issuePrepaidCardSpendMinValue = Math.min(...faceValueOptions);
+    this.issuePrepaidCardDaiMinValue = new BN(
+      await this.convertFromSpend('DAI', this.issuePrepaidCardSpendMinValue)
     );
   }
 
@@ -167,6 +177,7 @@ export default abstract class Layer2ChainWeb3Strategy
         this.#assetsApi = await getSDK('Assets', this.web3);
         this.#prepaidCardApi = await getSDK('PrepaidCard', this.web3);
         this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
+        await this.fetchIssuePrepaidCardMinValues();
         await this.updateWalletInfo(accounts);
         this.#broadcastChannel.postMessage({
           type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
