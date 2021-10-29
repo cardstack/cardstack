@@ -11,6 +11,7 @@ import { DepotSafe, Safe } from '@cardstack/cardpay-sdk';
 import {
   createDepotSafe,
   createMerchantSafe,
+  createPrepaidCardSafe,
   createSafeToken,
   generateMockAddress,
 } from '@cardstack/web-client/utils/test-factories';
@@ -18,6 +19,7 @@ import { render, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import BN from 'bn.js';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
+import { toWei } from 'web3-utils';
 
 const defaultBlockNumber = 5;
 const address = generateMockAddress();
@@ -38,6 +40,8 @@ class PartialLayer2Strategy implements MockSafesResourceStrategy {
   _graphData: ViewSafesResult; // the next data to be fetched by viewSafesTask
   _blockNumber = defaultBlockNumber; // the next block number to be assigned to an individual update
   _latestSafe = createDefaultDepotSafe(); // the next safe fetched by an individual update
+  issuePrepaidCardSpendMinValue = 1;
+  issuePrepaidCardDaiMinValue = new BN(toWei('1'));
 
   constructor(initialData?: ViewSafesResult) {
     this._graphData = initialData ?? {
@@ -262,5 +266,46 @@ module('Unit | Resource | Safes', function (hooks) {
     assert.equal(Object.keys(safes.individualSafeUpdateData).length, 0);
     assert.equal(Object.keys(safes.safeReferences).length, 0);
     assert.equal(safes.value.length, 0);
+  });
+
+  test('it returns safes that are compatible with and have sufficient balance for issuing a prepaid card', async function (assert) {
+    defaultDepotSafe = createDefaultDepotSafe(toWei('100'));
+
+    let sufficientTokens = [
+      createSafeToken('DAI', toWei('25')),
+      createSafeToken('CARD', toWei('25')),
+    ];
+
+    let insufficientTokens = [
+      createSafeToken('DAI', '1'),
+      createSafeToken('CARD', toWei('25')),
+    ];
+
+    let sufficientMerchantSafe = createMerchantSafe({
+      tokens: sufficientTokens,
+    });
+
+    strategy = new PartialLayer2Strategy({
+      safes: [
+        defaultDepotSafe,
+        sufficientMerchantSafe,
+        createMerchantSafe({ tokens: insufficientTokens }),
+        createPrepaidCardSafe({ tokens: sufficientTokens }),
+      ],
+      blockNumber: defaultBlockNumber,
+    });
+
+    safes = new Safes(this.owner, {
+      named: {
+        strategy,
+        walletAddress: 'some-address',
+      },
+    });
+    await settled();
+
+    assert.deepEqual(
+      safes.issuePrepaidCardSourceSafes.mapBy('address'),
+      [defaultDepotSafe, sufficientMerchantSafe].mapBy('address')
+    );
   });
 });

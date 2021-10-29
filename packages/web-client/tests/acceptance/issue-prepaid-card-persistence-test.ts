@@ -46,14 +46,15 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
   setupHubAuthenticationToken(hooks);
   let workflowPersistenceService: WorkflowPersistence;
   let testDepot: DepotSafe;
+  let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
+  let layer2Service: Layer2TestWeb3Strategy;
 
   hooks.beforeEach(async function (this: Context) {
     this.server.db.loadData({
       prepaidCardColorSchemes,
       prepaidCardPatterns,
     });
-    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    let layer2Service = this.owner.lookup('service:layer2-network')
+    layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     testDepot = createDepotSafe({
       address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
@@ -491,13 +492,9 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       assert
         .dom('[data-test-cancelation][data-test-postable="0"]')
         .containsText(
-          `Looks like there’s not enough balance in your ${
+          `Looks like you don’t have a merchant or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
             c.layer2.fullName
-          } wallet to fund a prepaid card. Before you can continue, please add funds to your ${
-            c.layer2.fullName
-          } wallet by bridging some tokens from your ${
-            c.layer1.fullName
-          } wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
+          } wallet, or by claiming merchant revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
             Number(fromWei(previousMinDaiAmount))
           )} DAI.CPXD (${convertAmountToNativeDisplay(
             spendToUsd(previousSpendAmount)!,
@@ -547,6 +544,70 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
       );
 
       assert.dom('[data-test-face-value-card]').exists();
+    });
+
+    test('it cancels a persisted workflow when the chosen funding safe has an insufficient balance', async function (assert) {
+      testDepot.tokens = [createSafeToken('DAI', '1')];
+
+      let state = buildState({
+        meta: {
+          version: WORKFLOW_VERSION,
+          completedMilestonesCount: 2,
+          milestonesCount: MILESTONE_TITLES.length,
+          completedCardNames: [
+            'LAYER2_CONNECT',
+            'LAYOUT_CUSTOMIZATION',
+            'FUNDING_SOURCE',
+            'FACE_VALUE',
+          ],
+        },
+        issuerName: 'Vitalik',
+        pattern: {
+          patternUrl:
+            '/assets/images/prepaid-card-customizations/pattern-3-89f3b92e275536a92558d500a3dc9e4d.svg',
+          id: '80cb8f99-c5f7-419e-9c95-2e87a9d8db32',
+        },
+        colorScheme: {
+          patternColor: 'white',
+          textColor: 'black',
+          background: '#37EB77',
+          id: '4f219852-33ee-4e4c-81f7-76318630a423',
+        },
+        daiMinValue: MIN_AMOUNT_TO_PASS,
+        spendMinValue: MIN_SPEND_AMOUNT,
+        prepaidFundingToken: 'DAI.CPXD',
+        prepaidFundingSafeAddress: testDepot.address,
+        spendFaceValue: 10000,
+        did: 'did:cardstack:1pfsUmRoNRYTersTVPYgkhWE62b2cd7ce12b578e',
+        prepaidCardAddress: '0xaeFbA62A2B3e90FD131209CC94480E722704E1F8',
+        reloadable: true,
+        transferrable: true,
+      });
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'PREPAID_CARD_ISSUANCE',
+        state,
+      });
+
+      layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+        testDepot,
+      ]);
+      await layer2Service.safes.fetch();
+
+      await visit('/card-pay/balances?flow=issue-prepaid-card&flow-id=abc123');
+
+      assert
+        .dom(cancelationPostableSel(0))
+        .containsText(
+          'the chosen source does not have enough balance to fund a prepaid card'
+        );
+      assert.dom(cancelationPostableSel(1)).containsText('Workflow canceled');
+
+      assert
+        .dom(
+          '[data-test-issue-prepaid-card-workflow-insufficient-funds-deposit]'
+        )
+        .exists();
     });
 
     test('it cancels a persisted flow when state version is old', async function (this: Context, assert) {
@@ -603,3 +664,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     });
   });
 });
+
+function cancelationPostableSel(postableIndex: number) {
+  return `[data-test-cancelation][data-test-postable="${postableIndex}"]`;
+}

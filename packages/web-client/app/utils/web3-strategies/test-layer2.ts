@@ -68,6 +68,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   bridgingToLayer1HashDeferred!: RSVP.Deferred<TransactionHash>;
   bridgingToLayer1Deferred!: RSVP.Deferred<BridgeValidationResult>;
   @tracked isInitializing = false;
+  @tracked issuePrepaidCardSpendMinValue: number = 500;
+  @tracked issuePrepaidCardDaiMinValue: BN = new BN(toWei('5'));
 
   bridgeToLayer1Requests: BridgeToLayer1Request[] = [];
   issuePrepaidCardRequests: Map<string, IssuePrepaidCardRequest> = new Map();
@@ -401,11 +403,11 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     request?.onTxnHash?.('exampleTxnHash');
 
     this.test__simulateRemoteAccountSafes(walletAddress, [prepaidCardSafe]);
-    let unfetchedDepot = this.remoteAccountSafes
+    let unfetchedSource = this.remoteAccountSafes
       .get(this.walletInfo.firstAddress!)!
-      .find((v: Safe) => v.address === this.depotSafe?.address);
+      .find((v: Safe) => v.address === fundingSourceAddress);
 
-    unfetchedDepot!.tokens.forEach((t: TokenInfo) => {
+    unfetchedSource!.tokens.forEach((t: TokenInfo) => {
       if (t.token.symbol === 'DAI') {
         t.balance = new BN(t.balance)
           .sub(new BN(toWei((faceValue / 100).toString())))
@@ -477,12 +479,12 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return this.test__deferredHubAuthentication.resolve(authToken);
   }
 
-  test__simulateBridgedToLayer1(
+  async test__simulateBridgedToLayer1(
     safeAddress?: string,
     receiverAddress?: string,
     tokenSymbol?: BridgeableSymbol,
     amountInWei?: string
-  ): void {
+  ): Promise<void> {
     if (safeAddress && receiverAddress && tokenSymbol && amountInWei) {
       let matchingRequest = this.bridgeToLayer1Requests.find(
         (request) =>
@@ -519,5 +521,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       encodedData: 'example-encoded-data',
       signatures: ['example-sig'],
     });
+
+    return this.test__simulateAccountsChanged([this.walletInfo.firstAddress!]);
   }
 }
