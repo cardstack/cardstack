@@ -36,6 +36,7 @@ module.exports = {
     {
       files: [
         '.eslintrc.js',
+        '.percy.js',
         '.prettierrc.js',
         '.template-lintrc.js',
         'ember-cli-build.js',
