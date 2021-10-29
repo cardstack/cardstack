@@ -72,7 +72,7 @@ export default class WorkflowThread extends Component<WorkflowThreadArgs> {
   }
 
   @action openDiscord() {
-    window.open(config.urls.discordBetaChannelLink, '_blank');
+    window.open(config.urls.discordSupportChannelUrl, '_blank');
   }
 
   get lastMilestonePostable() {
