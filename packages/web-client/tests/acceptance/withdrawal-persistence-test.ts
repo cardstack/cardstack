@@ -55,8 +55,8 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         address: withdrawalSafeAddress,
         owners: [layer2AccountAddress],
         tokens: [
-          createSafeToken('CARD', '1000000000000000000'),
-          createSafeToken('DAI', '4215997042758579167'),
+          createSafeToken('CARD.CPXD', '1000000000000000000'),
+          createSafeToken('DAI.CPXD', '4215997042758579167'),
         ],
       }),
     ]);
@@ -347,7 +347,12 @@ module('Acceptance | withdrawal persistence', function (hooks) {
       let layer2Service = this.owner.lookup('service:layer2-network')
         .strategy as Layer2TestWeb3Strategy;
 
-      layer2Service.bridgeToLayer1('0xsource', '0xdestination', 'DAI', '20');
+      layer2Service.bridgeToLayer1(
+        '0xsource',
+        '0xdestination',
+        'DAI.CPXD',
+        '20'
+      );
       layer2Service.test__simulateBridgedToLayer1();
       await visit('/card-pay/token-suppliers?flow=withdrawal&flow-id=abc123');
 

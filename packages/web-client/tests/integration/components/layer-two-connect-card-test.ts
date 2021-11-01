@@ -31,8 +31,8 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
       createDepotSafe({
         address: depotAddress,
         tokens: [
-          createSafeToken('DAI', '2141100000000000000'),
-          createSafeToken('CARD', '0'),
+          createSafeToken('DAI.CPXD', '2141100000000000000'),
+          createSafeToken('CARD.CPXD', '0'),
         ],
       }),
     ]);
@@ -49,13 +49,12 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
       createDepotSafe({
         address: depotAddress,
         tokens: [
-          createSafeToken('DAI', '2141100000000000000'),
-          createSafeToken('CARD', '2990000000000000000'),
+          createSafeToken('DAI.CPXD', '2141100000000000000'),
+          createSafeToken('CARD.CPXD', '2990000000000000000'),
         ],
       }),
     ]);
     await layer2Service.safes.fetch();
-
     await waitFor('[data-test-balance="CARD.CPXD"]');
 
     assert.dom('[data-test-balance="DAI.CPXD"]').containsText('2.1411');
@@ -64,7 +63,10 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes('address', [
       createDepotSafe({
         address: depotAddress,
-        tokens: [createSafeToken('DAI', '0'), createSafeToken('CARD', '0')],
+        tokens: [
+          createSafeToken('DAI.CPXD', '0'),
+          createSafeToken('CARD.CPXD', '0'),
+        ],
       }),
     ]);
     await layer2Service.safes.fetch();
@@ -85,8 +87,8 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes('address', [
       createDepotSafe({
         tokens: [
-          createSafeToken('DAI', '2141100000000000000'),
-          createSafeToken('CARD', '2990000000000000000'),
+          createSafeToken('DAI.CPXD', '2141100000000000000'),
+          createSafeToken('CARD.CPXD', '2990000000000000000'),
         ],
       }),
     ]);

@@ -7,7 +7,6 @@ import { useResource } from 'ember-resources';
 import {
   BridgedTokenSymbol,
   TokenDisplayInfo,
-  getUnbridgedSymbol,
 } from '@cardstack/web-client/utils/token';
 
 interface BalanceViewBannerComponentArgs {
@@ -22,11 +21,9 @@ class BalanceViewBannerComponent extends Component<BalanceViewBannerComponentArg
   get tokenBalance(): BN {
     let safe = this.args.safe;
     let tokenSymbol = this.args.token;
-    let unbridgedSymbol = getUnbridgedSymbol(tokenSymbol);
-    // SDK returns bridged token symbols without the CPXD suffix
 
     let balance = safe.tokens.find(
-      (token) => token.token.symbol === unbridgedSymbol
+      (token) => token.token.symbol === tokenSymbol
     )?.balance;
 
     return balance ? new BN(balance) : new BN(0);

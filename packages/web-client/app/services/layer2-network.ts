@@ -21,11 +21,9 @@ import WalletInfo from '../utils/wallet-info';
 import BN from 'bn.js';
 import { DepotSafe, Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import {
-  BridgeableSymbol,
   ConvertibleSymbol,
   ConversionFunction,
   BridgedTokenSymbol,
-  bridgedSymbols,
 } from '@cardstack/web-client/utils/token';
 import {
   Emitter,
@@ -56,6 +54,11 @@ export default class Layer2Network
   @reads('strategy.viewSafesTask') declare viewSafesTask: TaskGenerator<Safe[]>;
   @reads('strategy.safes') declare safes: Safes;
   @reads('strategy.defaultTokenBalance') defaultTokenBalance: BN | undefined;
+  @reads('strategy.defaultTokenSymbol') defaultTokenSymbol!: BridgedTokenSymbol;
+  @reads('strategy.bridgedDaiTokenSymbol')
+  bridgedDaiTokenSymbol!: BridgedTokenSymbol;
+  @reads('strategy.bridgedCardTokenSymbol')
+  bridgedCardTokenSymbol!: BridgedTokenSymbol;
   @reads('strategy.cardBalance') cardBalance: BN | undefined;
   @reads('strategy.depotSafe') depotSafe: DepotSafe | undefined;
   @reads('strategy.safes.isLoading')
@@ -92,11 +95,13 @@ export default class Layer2Network
   }
 
   async storeWithdrawalLimits() {
-    bridgedSymbols.forEach((bridgedSymbol) => {
-      this.getWithdrawalLimits(bridgedSymbol).then((limits) => {
-        this.bridgedSymbolToWithdrawalLimits.set(bridgedSymbol, limits);
-      });
-    });
+    [this.bridgedDaiTokenSymbol, this.bridgedCardTokenSymbol].forEach(
+      (bridgedSymbol) => {
+        this.getWithdrawalLimits(bridgedSymbol).then((limits) => {
+          this.bridgedSymbolToWithdrawalLimits.set(bridgedSymbol, limits);
+        });
+      }
+    );
   }
 
   async updateUsdConverters(
@@ -255,7 +260,7 @@ export default class Layer2Network
   async bridgeToLayer1(
     safeAddress: string,
     receiverAddress: string,
-    tokenSymbol: BridgeableSymbol,
+    tokenSymbol: BridgedTokenSymbol,
     amount: string
   ): Promise<TransactionHash> {
     return this.strategy.bridgeToLayer1(

@@ -131,8 +131,8 @@ module('Acceptance | withdrawal', function (hooks) {
         address: depotAddress,
         owners: [layer2AccountAddress],
         tokens: [
-          createSafeToken('DAI', '250000000000000000000'),
-          createSafeToken('CARD', '500000000000000000000'),
+          createSafeToken('DAI.CPXD', '250000000000000000000'),
+          createSafeToken('CARD.CPXD', '500000000000000000000'),
         ],
       }),
       createMerchantSafe({
@@ -140,8 +140,8 @@ module('Acceptance | withdrawal', function (hooks) {
         merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
         accumulatedSpendValue: 100,
         tokens: [
-          createSafeToken('DAI', '125000000000000000000'),
-          createSafeToken('CARD', '450000000000000000000'),
+          createSafeToken('DAI.CPXD', '125000000000000000000'),
+          createSafeToken('CARD.CPXD', '450000000000000000000'),
         ],
       }),
     ]);
@@ -273,7 +273,7 @@ module('Acceptance | withdrawal', function (hooks) {
     await layer2Service.test__simulateBridgedToLayer1(
       merchantAddress,
       layer1AccountAddress,
-      'CARD',
+      'CARD.CPXD',
       toWei('200')
     );
     await settled();
@@ -537,7 +537,7 @@ module('Acceptance | withdrawal', function (hooks) {
         .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
-          tokens: [createSafeToken('DAI', '0')],
+          tokens: [createSafeToken('DAI.CPXD', '0')],
         }),
       ]);
       await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);

@@ -133,8 +133,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
     let merchantSafe = createMerchantSafe({
       merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
-        createSafeToken('DAI', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
-        createSafeToken('CARD', '450000000000000000000'),
+        createSafeToken('DAI.CPXD', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
+        createSafeToken('CARD.CPXD', '450000000000000000000'),
       ],
       accumulatedSpendValue: 100,
       infoDID: MERCHANT_DID,
@@ -143,8 +143,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
     let otherMerchantSafe = createMerchantSafe({
       merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
-        createSafeToken('DAI', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
-        createSafeToken('CARD', '450000000000000000000'),
+        createSafeToken('DAI.CPXD', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
+        createSafeToken('CARD.CPXD', '450000000000000000000'),
       ],
       accumulatedSpendValue: 100,
       infoDID: OTHER_MERCHANT_DID,
@@ -172,8 +172,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
         address: depotAddress,
         owners: [layer2AccountAddress],
         tokens: [
-          createSafeToken('DAI', FAILING_AMOUNT.toString()),
-          createSafeToken('CARD', '250000000000000000000'),
+          createSafeToken('DAI.CPXD', FAILING_AMOUNT.toString()),
+          createSafeToken('CARD.CPXD', '250000000000000000000'),
         ],
       }),
       createPrepaidCardSafe({
@@ -640,8 +640,8 @@ module('Acceptance | issue prepaid card', function (hooks) {
         address: depotAddress,
         owners: [layer2AccountAddress],
         tokens: [
-          createSafeToken('DAI', MIN_AMOUNT_TO_PASS.toString()),
-          createSafeToken('CARD', '500000000000000000000'),
+          createSafeToken('DAI.CPXD', MIN_AMOUNT_TO_PASS.toString()),
+          createSafeToken('CARD.CPXD', '500000000000000000000'),
         ],
       });
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
@@ -745,11 +745,11 @@ module('Acceptance | issue prepaid card', function (hooks) {
         createDepotSafe({
           address: depotAddress,
           owners: [layer2AccountAddress],
-          tokens: [createSafeToken('DAI', FAILING_AMOUNT.toString())],
+          tokens: [createSafeToken('DAI.CPXD', FAILING_AMOUNT.toString())],
         }),
         createMerchantSafe({
           merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
-          tokens: [createSafeToken('DAI', FAILING_AMOUNT.toString())],
+          tokens: [createSafeToken('DAI.CPXD', FAILING_AMOUNT.toString())],
           accumulatedSpendValue: 100,
         }),
       ]);

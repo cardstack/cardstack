@@ -59,8 +59,8 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     testDepot = createDepotSafe({
       address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
-        createSafeToken('DAI', MIN_AMOUNT_TO_PASS.toString()),
-        createSafeToken('CARD', '500000000000000000000'),
+        createSafeToken('DAI.CPXD', MIN_AMOUNT_TO_PASS.toString()),
+        createSafeToken('CARD.CPXD', '500000000000000000000'),
       ],
     });
 
@@ -547,7 +547,7 @@ module('Acceptance | issue prepaid card persistence', function (hooks) {
     });
 
     test('it cancels a persisted workflow when the chosen funding safe has an insufficient balance', async function (assert) {
-      testDepot.tokens = [createSafeToken('DAI', '1')];
+      testDepot.tokens = [createSafeToken('DAI.CPXD', '1')];
 
       let state = buildState({
         meta: {

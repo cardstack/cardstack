@@ -7,9 +7,8 @@ import { next } from '@ember/runloop';
 import { action } from '@ember/object';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import {
-  BridgeableSymbol,
   TokenBalance,
-  getBridgedSymbol,
+  BridgedTokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import BN from 'bn.js';
 
@@ -68,9 +67,7 @@ class CardPaySafeBalanceCardComponent extends Component<CardPaySafeBalanceCardCo
   get balancesToShow() {
     return this.safe.tokens
       .map((token) => {
-        let bridgedSymbol = getBridgedSymbol(
-          token.token.symbol as BridgeableSymbol
-        );
+        let bridgedSymbol = token.token.symbol as BridgedTokenSymbol;
         let balance = new BN(token.balance || '0');
         return new TokenBalance(bridgedSymbol, balance);
       })

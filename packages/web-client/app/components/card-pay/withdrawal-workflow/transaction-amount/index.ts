@@ -10,7 +10,6 @@ import {
   BridgedTokenSymbol,
   TokenDisplayInfo,
   TokenSymbol,
-  getUnbridgedSymbol,
   bridgedSymbols,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
@@ -72,12 +71,8 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
 
   get currentTokenBalance(): BN {
     let safe = this.currentSafe;
-    let tokenSymbol = this.currentTokenSymbol;
-    let unbridgedSymbol = getUnbridgedSymbol(tokenSymbol);
-    // SDK returns bridged token symbols without the CPXD suffix
-
     let balance = safe.tokens.find(
-      (token) => token.token.symbol === unbridgedSymbol
+      (token) => token.token.symbol === this.currentTokenSymbol
     )?.balance;
 
     return balance ? new BN(balance) : new BN(0);
@@ -168,7 +163,7 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       let transactionHash = yield this.layer2Network.bridgeToLayer1(
         this.currentSafe.address,
         layer1Address!,
-        getUnbridgedSymbol(currentTokenSymbol),
+        currentTokenSymbol,
         withdrawnAmount.toString()
       );
       let layer2BlockHeight = yield this.layer2Network.getBlockHeight();

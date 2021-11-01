@@ -9,7 +9,6 @@ import BN from 'bn.js';
 import {
   BridgedTokenSymbol,
   TokenDisplayInfo,
-  getUnbridgedSymbol,
 } from '@cardstack/web-client/utils/token';
 import { faceValueOptions } from '../index';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
@@ -65,11 +64,9 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
   get fundingTokenBalance(): BN {
     let safe = this.fundingSafe;
     let tokenSymbol = this.fundingTokenSymbol;
-    let unbridgedSymbol = getUnbridgedSymbol(tokenSymbol);
-    // SDK returns bridged token symbols without the CPXD suffix
 
     let balance = safe.tokens.find(
-      (token) => token.token.symbol === unbridgedSymbol
+      (token) => token.token.symbol === tokenSymbol
     )?.balance;
 
     return balance ? new BN(balance) : new BN(0);

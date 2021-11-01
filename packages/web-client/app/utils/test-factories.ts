@@ -3,7 +3,7 @@ import {
   PrepaidCardSafe,
   DepotSafe,
 } from '@cardstack/cardpay-sdk/sdk/safes';
-import { BridgeableSymbol } from '@cardstack/web-client/utils/token';
+import { BridgedTokenSymbol } from '@cardstack/web-client/utils/token';
 import { Resolver } from 'did-resolver';
 import { encodeDID, getResolver } from '@cardstack/did-resolver';
 import Web3 from 'web3';
@@ -67,10 +67,10 @@ export const defaultCreatedPrepaidCardDID = encodeDID({
 });
 
 /**
- * Note that this function is only assuming use with DAI and CARD
+ * Note that this function is only assuming use with DAI.CPXD and CARD.CPXD
  * and is used mostly for `token.symbol` and `balance`
  */
-export const createSafeToken = <T extends BridgeableSymbol>(
+export const createSafeToken = <T extends BridgedTokenSymbol>(
   symbol: T,
   balance: string
 ) => {

@@ -44,8 +44,8 @@ module(
         depotSafe = createDepotSafe({
           owners: [layer2AccountAddress],
           tokens: [
-            createSafeToken('DAI', '125000000000000000000'),
-            createSafeToken('CARD', '450000000000000000000'),
+            createSafeToken('DAI.CPXD', '125000000000000000000'),
+            createSafeToken('CARD.CPXD', '450000000000000000000'),
           ],
         });
 
@@ -53,8 +53,8 @@ module(
           address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
           merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
           tokens: [
-            createSafeToken('DAI', MIN_AMOUNT_TO_PASS.toString()),
-            createSafeToken('CARD', '450000000000000000000'),
+            createSafeToken('DAI.CPXD', MIN_AMOUNT_TO_PASS.toString()),
+            createSafeToken('CARD.CPXD', '450000000000000000000'),
           ],
           accumulatedSpendValue: 100,
         });
@@ -65,15 +65,15 @@ module(
           createMerchantSafe({
             address: 'low-balance-safe',
             merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
-            tokens: [createSafeToken('DAI', '1')],
+            tokens: [createSafeToken('DAI.CPXD', '1')],
             accumulatedSpendValue: 100,
           }),
           createPrepaidCardSafe({
             address: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
             owners: [layer2AccountAddress],
             tokens: [
-              createSafeToken('DAI', '125000000000000000000'),
-              createSafeToken('CARD', '450000000000000000000'),
+              createSafeToken('DAI.CPXD', '125000000000000000000'),
+              createSafeToken('CARD.CPXD', '450000000000000000000'),
             ],
             spendFaceValue: 2324,
             prepaidCardOwner: layer2AccountAddress,
@@ -111,7 +111,7 @@ module(
       });
 
       test('it falls back to the first safe with a sufficient balance if the depot safe has insufficient balance', async function (assert) {
-        depotSafe.tokens = [createSafeToken('DAI', '1')];
+        depotSafe.tokens = [createSafeToken('DAI.CPXD', '1')];
         layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
         await render(hbs`
@@ -167,8 +167,8 @@ module(
       });
 
       test('it renders an error message when no safe with sufficient balances exists', async function (assert) {
-        depotSafe.tokens = [createSafeToken('DAI', '1')];
-        merchantSafe.tokens = [createSafeToken('DAI', '1')];
+        depotSafe.tokens = [createSafeToken('DAI.CPXD', '1')];
+        merchantSafe.tokens = [createSafeToken('DAI.CPXD', '1')];
         layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
         await render(hbs`
@@ -196,8 +196,8 @@ module(
         address: '0xmerchantbAB0644ffCD32518eBF4924ba8666666',
         merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
         tokens: [
-          createSafeToken('DAI', MIN_AMOUNT_TO_PASS.toString()),
-          createSafeToken('CARD', '450000000000000000000'),
+          createSafeToken('DAI.CPXD', MIN_AMOUNT_TO_PASS.toString()),
+          createSafeToken('CARD.CPXD', '450000000000000000000'),
         ],
         accumulatedSpendValue: 100,
       });
