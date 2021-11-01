@@ -100,7 +100,7 @@ const XDAI = {
   uniswapV2Router: '0x1C232F01118CB8B424793ae03F870aa7D0ac7f77', // This is the UniswapV2Router02
   uniswapV2Factory: '0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7',
   rewardPool: '0x86648EbB0de02B9815Bfc5001cEa1Dd35a5A4552',
-  rewardManager: '0x44aB7b82F18694cF4431F41E67C0f05AAaCAC74D',
+  rewardManager: '0x3B6bedcA6EC78fCd33aFeB385B192056de639403',
   registerRewardProgramHandler: '0x8e0A60912C56F4436396C636f0ED500ef27af4e0',
   registerRewardeeHandler: '0x198ea3D257715Fb2e9025c061BE96e56AE611A9f',
   deprecatedMerchantManager_v0_6_7: '0x3C29B2A563F4bB9D625175bE823c528A4Ddd1107',
