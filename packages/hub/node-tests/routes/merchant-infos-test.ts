@@ -220,7 +220,7 @@ describe('POST /api/merchant-infos', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
-    await requestWithSlug('butt')
+    await requestWithSlug('fuck')
       .expect(422)
       .expect({
         status: '422',
