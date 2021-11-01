@@ -32,3 +32,6 @@ jobs:
       - run: yarn --prefer-offline
       - run: yarn global add @percy/cli
       - run: yarn test:web-client
+        with:
+          env:
+            PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
