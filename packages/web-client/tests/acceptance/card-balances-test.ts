@@ -1,6 +1,7 @@
 import { module, test } from 'qunit';
 import { settled, visit } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import percySnapshot from '@percy/ember';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
@@ -103,5 +104,7 @@ module('Acceptance | card balances', function (hooks) {
       .dom('[data-test-card-balances]')
       .containsText('§4,648')
       .containsText('0x5678...abcd');
+
+    await percySnapshot(assert);
   });
 });

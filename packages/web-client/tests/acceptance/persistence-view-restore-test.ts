@@ -9,6 +9,7 @@ import {
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import percySnapshot from '@percy/ember';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { setupHubAuthenticationToken } from '../helpers/setup';
 
@@ -281,6 +282,8 @@ module('Acceptance | persistence view and restore', function () {
       assert
         .dom('[data-test-completed-workflow] .boxel-progress-icon--complete')
         .exists();
+
+      await percySnapshot(assert);
 
       workflowPersistenceService.clear();
       await settled();
