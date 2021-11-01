@@ -11,7 +11,6 @@ import { Response as MirageResponse } from 'ember-cli-mirage';
 import BN from 'bn.js';
 import { WorkflowStub } from '@cardstack/web-client/tests/stubs/workflow';
 import { createPrepaidCardSafe } from '@cardstack/web-client/utils/test-factories';
-import percySnapshot from '@percy/ember';
 
 interface Context extends MirageTestContext {}
 
@@ -118,8 +117,6 @@ module(
       assert
         .dom(`[data-test-card-picker-dropdown]`)
         .containsText('Select card');
-
-      await percySnapshot(assert);
 
       await click(`[data-test-card-picker-dropdown] > [role="button"]`);
       await waitFor(

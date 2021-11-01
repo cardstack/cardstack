@@ -8,7 +8,6 @@ import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { Response as MirageResponse } from 'ember-cli-mirage';
-import percySnapshot from '@percy/ember';
 import { createPrepaidCardSafe } from '@cardstack/web-client/utils/test-factories';
 
 interface Context extends MirageTestContext {}
@@ -166,8 +165,6 @@ module(
           .containsText(invalidEntry.errorMessage);
         assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
       }
-
-      await percySnapshot(assert);
     });
 
     test('It validates the merchant ID field', async function (assert) {
