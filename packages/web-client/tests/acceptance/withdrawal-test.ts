@@ -9,6 +9,7 @@ import {
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import percySnapshot from '@percy/ember';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
@@ -346,6 +347,9 @@ module('Acceptance | withdrawal', function (hooks) {
         `${epiloguePostableSel(4)} [data-test-withdrawal-next-step="dashboard"]`
       )
       .exists();
+
+    await percySnapshot(assert);
+
     await click(
       `${epiloguePostableSel(4)} [data-test-withdrawal-next-step="dashboard"]`
     );

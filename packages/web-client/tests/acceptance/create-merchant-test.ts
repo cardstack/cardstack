@@ -9,6 +9,7 @@ import {
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import percySnapshot from '@percy/ember';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
@@ -232,6 +233,8 @@ module('Acceptance | create merchant', function (hooks) {
       .containsText('You have created a merchant.');
 
     await waitFor(epiloguePostableSel(1));
+
+    await percySnapshot(assert);
 
     await click(
       `${epiloguePostableSel(

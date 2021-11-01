@@ -1,6 +1,7 @@
 import { module, test } from 'qunit';
 import { visit, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import percySnapshot from '@percy/ember';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import sinon from 'sinon';
 
@@ -112,6 +113,8 @@ module('Acceptance | pay', function (hooks) {
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
       );
+
+    await percySnapshot(assert);
   });
 
   test('It displays merchant info correctly on iOS', async function (assert) {
@@ -132,6 +135,8 @@ module('Acceptance | pay', function (hooks) {
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
       );
+
+    await percySnapshot(assert);
   });
 
   test('it renders correctly with SPD as currency', async function (assert) {

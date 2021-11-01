@@ -7,6 +7,7 @@ import {
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import percySnapshot from '@percy/ember';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
@@ -80,6 +81,8 @@ module('Acceptance | Connect Wallet', function (hooks) {
       .hasText('0x1826...6E44');
     assert.dom('[data-test-wallet-connect-qr-code]').doesNotExist();
     assert.dom('[data-test-layer-connect-modal="layer2"]').doesNotExist();
+
+    await percySnapshot(assert);
   });
 
   // TODO: Connecting a layer 2 wallet via alternate wallet

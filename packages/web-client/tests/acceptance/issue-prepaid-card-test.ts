@@ -12,6 +12,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { fromWei, toWei } from 'web3-utils';
 import BN from 'bn.js';
+import percySnapshot from '@percy/ember';
 
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
@@ -561,6 +562,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
         )} [data-test-issue-prepaid-card-next-step="dashboard"]`
       )
       .exists();
+
+    await percySnapshot(assert);
+
     await click(
       `${epiloguePostableSel(
         4
