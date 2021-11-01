@@ -122,6 +122,15 @@ if (process.env.COMPILER) {
       });
     });
 
+    /* Query Params
+      - adoptsFrom
+      - realm
+      - q (full text search)
+    */
+
+    // TODO: query on title field
+    // TODO: query on author first name field
+
     it('can query for cards that are valid versions of another card', async function () {
       let response = await get(`/cards/?adoptsFrom=${REALM}/person`).expect(200);
 
@@ -132,6 +141,8 @@ if (process.env.COMPILER) {
       // expect(response.body.data?.meta.componentModule).to.not.be.undefined;
     });
 
+    // TODO: Use JSONAPI filter query param for fields, but not neccessarily "system" fields like adoptsFrom
+    // TODO: Data isn't the right boundary. Consider using realm instead.
     it('can query for cards that are valid versions of another card and that include data ', async function () {
       let response = await get(`/cards/?adoptsFrom=${REALM}/person&hasData=true`).expect(200);
 
@@ -139,6 +150,8 @@ if (process.env.COMPILER) {
       expect(map(response.body.data, 'id')).to.deep.equal([`${REALM}/bob`, `${REALM}/sue`]);
     });
 
+    // TODO: Rather than primitives, we will have something a "collection" in the base realm called "Default Fields"
+    // On approach could be a "Default Fields" card that has a has many. Would use a jsonapi endpoint for the particular relationship
     it('can query for cards that are primitives', async function () {
       let response = await get(`/cards/?primitive=true`).expect(200);
 
