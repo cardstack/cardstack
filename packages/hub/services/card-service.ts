@@ -52,6 +52,7 @@ export class CardService {
       realmURL = realm.url;
     }
 
+    // TODO: Now that there is a save that handles everything, we need to update the realm to do the same
     let rawCard = await this.realmManager.getRealm(realmURL).createDataCard(raw.data, raw.adoptsFrom, raw.url);
     let compiled = await this.builder.getCompiledCard(rawCard.url);
     return { data: rawCard.data, compiled };

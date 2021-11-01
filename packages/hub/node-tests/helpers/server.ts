@@ -5,30 +5,35 @@ import CardCache from '../../services/card-cache';
 import { Registry } from '@cardstack/di';
 import { TestCardCacheConfig, ProjectTestRealm, resolveCard } from './cards';
 import supertest from 'supertest';
+import { INSECURE_CONTEXT } from '../../services/card-service';
 
-export function setupServer(mochaContext: Mocha.Suite, serverConfig: HubServerConfig = {}) {
+export function setupServer(
+  mochaContext: Mocha.Suite,
+  config: {
+    registyCallback?: HubServerConfig['registryCallback'];
+    testRealm?: string;
+  } = {}
+) {
   let server: HubServer, cardCache: CardCache, cardCacheConfig: TestCardCacheConfig;
 
-  async function createRealm(name: string): Promise<ProjectTestRealm> {
-    return (await server.container.lookup('realm-manager')).createRealm({ url: name }, ProjectTestRealm);
-  }
-
   mochaContext.beforeEach(async function () {
-    let originalCallback = serverConfig.registryCallback;
     let registryCallback = function (registry: Registry) {
       if (process.env.COMPILER) {
         registry.register('card-cache-config', TestCardCacheConfig);
       }
 
-      originalCallback && originalCallback(registry);
+      config.registyCallback && config.registyCallback(registry);
     };
-    serverConfig.registryCallback = registryCallback;
 
-    server = await HubServer.create(serverConfig);
+    server = await HubServer.create({ registryCallback });
 
     if (process.env.COMPILER) {
       cardCache = await server.container.lookup('card-cache');
       cardCacheConfig = (await server.container.lookup('card-cache-config')) as TestCardCacheConfig;
+    }
+
+    if (config.testRealm) {
+      return (await server.container.lookup('realm-manager')).createRealm({ url: config.testRealm }, ProjectTestRealm);
     }
   });
 
@@ -37,13 +42,18 @@ export function setupServer(mochaContext: Mocha.Suite, serverConfig: HubServerCo
   });
 
   return {
+    async lookup(key: string) {
+      return await server.container.lookup(key);
+    },
+    async getCardService() {
+      return (await server.container.lookup('card-service')).as(INSECURE_CONTEXT);
+    },
     getServer(): HubServer {
       return server;
     },
     request() {
       return supertest(server.app.callback());
     },
-    createRealm,
     getCardCache(): CardCache {
       return cardCache;
     },

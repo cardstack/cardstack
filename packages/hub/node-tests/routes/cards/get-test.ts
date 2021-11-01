@@ -1,82 +1,83 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { ProjectTestRealm } from '../../helpers/cards';
 import { setupServer } from '../../helpers/server';
+
+const REALM = 'https://my-realm';
 
 if (process.env.COMPILER) {
   describe('GET /cards/<card-id>', function () {
-    let realm: ProjectTestRealm;
-
     function getCard(cardURL: string) {
       return request().get(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { createRealm, resolveCard, request } = setupServer(this);
+    let { getCardService, resolveCard, request } = setupServer(this, { testRealm: REALM });
 
     this.beforeEach(async function () {
-      realm = await createRealm('https://my-realm');
+      let cards = await getCardService();
 
-      realm.addCard('pet', {
-        'card.json': {
-          schema: 'schema.js',
+      cards.save({
+        url: `${REALM}/pet`,
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            export default class Pet {
+              @contains(string) species;
+            }
+          `,
         },
-        'schema.js': `
-        import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/string";
-        export default class Pet {
-          @contains(string) species;
-        }
-        `,
       });
 
-      realm.addCard('person', {
-        'card.json': {
-          schema: 'schema.js',
+      cards.save({
+        url: `${REALM}/person`,
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import pet from "${REALM}/pet";
+            export default class Person {
+              @contains(string) name;
+              @contains(pet) bestFriend;
+            }
+          `,
         },
-        'schema.js': `
-        import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/string";
-        import pet from "https://my-realm/pet";
-        export default class Person {
-          @contains(string) name;
-          @contains(pet) bestFriend;
-        }
-        `,
       });
 
-      realm.addCard('post', {
-        'card.json': {
-          schema: 'schema.js',
-          isolated: 'isolated.js',
+      cards.save({
+        url: `${REALM}/post`,
+        schema: 'schema.js',
+        isolated: 'isolated.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import datetime from "https://cardstack.com/base/datetime";
+            import person from '${REALM}/person';
+            export default class Post {
+              @contains(string) title;
+              @contains(string) body;
+              @contains(datetime) createdAt;
+              @contains(string) extra;
+              @contains(person) author;
+            }
+          `,
+          'isolated.js': templateOnlyComponentTemplate(
+            '<h1><@fields.title/></h1><article><@fields.body/><@fields.author.name/><@fields.author.bestFriend.species/>/</article>'
+          ),
         },
-        'schema.js': `
-        import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/string";
-        import datetime from "https://cardstack.com/base/datetime";
-        import person from 'https://my-realm/person';
-        export default class Post {
-          @contains(string) title;
-          @contains(string) body;
-          @contains(datetime) createdAt;
-          @contains(string) extra;
-          @contains(person) author;
-        }
-      `,
-        'isolated.js': templateOnlyComponentTemplate(
-          '<h1><@fields.title/></h1><article><@fields.body/><@fields.author.name/><@fields.author.bestFriend.species/>/</article>'
-        ),
       });
 
-      realm.addCard('post0', {
-        'card.json': {
-          adoptsFrom: '../post',
-          data: {
-            title: 'Hello World',
-            body: 'First post.',
-            author: {
-              name: 'Emily',
-              bestFriend: {
-                species: 'dog',
-              },
+      cards.save({
+        url: `${REALM}/post0`,
+        adoptsFrom: '../post',
+        data: {
+          title: 'Hello World',
+          body: 'First post.',
+          author: {
+            name: 'Emily',
+            bestFriend: {
+              species: 'dog',
             },
           },
         },
@@ -88,7 +89,7 @@ if (process.env.COMPILER) {
       await getCard('https://some-other-origin.com/thing').expect(404);
     });
 
-    it("can load a simple isolated card's data", async function () {
+    it.only("can load a simple isolated card's data", async function () {
       let response = await getCard('https://my-realm/post0').expect(200);
 
       expect(response.body).to.have.all.keys('data');
