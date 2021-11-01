@@ -19,8 +19,7 @@ if (process.env.COMPILER) {
         .post(`/cards/${e(REALM_NAME)}/${e(parentCardURL)}`)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
-        .send(payload)
-        .expect('Content-Type', /json/);
+        .send(payload);
     }
 
     let { createRealm, resolveCard, request } = setupServer(this);
@@ -57,7 +56,7 @@ if (process.env.COMPILER) {
     it('can create a new card that adopts off an another card', async function () {
       let {
         body: { data },
-      } = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
+      } = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201).expect('Content-Type', /json/);
 
       expect(data.id).to.match(/https:\/\/super-realm.com\/post-\w{15}/);
       expect(data.attributes).to.deep.equal({

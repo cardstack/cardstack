@@ -67,10 +67,10 @@ export default class CardRoutes {
       'Payload contains keys that we do not allow: %list%'
     );
 
-    let inputData = body.data as any;
+    let inputData = body.data;
     let format = getCardFormatFromRequest(ctx.query.format);
 
-    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).create(
+    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).save(
       {
         url: inputData.id,
         adoptsFrom: parentCardURL,

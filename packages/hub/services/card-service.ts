@@ -9,7 +9,7 @@ export default class CardServiceFactory {
   realmManager = inject('realm-manager', { as: 'realmManager' });
   builder = inject('card-builder', { as: 'builder' });
 
-  as(requestContext: unknown) {
+  as(requestContext: unknown): CardService {
     return new CardService(requestContext, this.realmManager, this.builder);
   }
 }
@@ -37,7 +37,7 @@ export class CardService {
   async save(raw: RawCard | Omit<RawCard, 'url'>, params?: { realmURL: string }): Promise<Card> {
     let realmURL: string;
     if (params && 'url' in raw) {
-      if (!raw.url.startsWith(params.realmURL)) {
+      if (raw.url && !raw.url.startsWith(params.realmURL)) {
         throw new Error(`realm mismatch. You tried to create card ${raw.url} in realm ${params.realmURL}`);
       }
       realmURL = params.realmURL;
