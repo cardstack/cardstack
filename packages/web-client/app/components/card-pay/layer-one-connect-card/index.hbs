@@ -4,6 +4,7 @@
   @isComplete={{@isComplete}}
   class="layer-one-connect-card"
   data-test-mainnnet-connection-action-container
+  {{did-insert this.layer1Network.refreshBalances}}
   ...attributes
 >
   {{#if (eq this.cardState 'memorialized')}}

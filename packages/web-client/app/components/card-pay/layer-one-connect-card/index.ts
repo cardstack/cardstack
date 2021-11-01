@@ -104,11 +104,13 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
   @action changeWalletProvider(id: string): void {
     this.radioWalletProviderId = id;
   }
+
   @action connect() {
     if (!this.isConnected) {
       taskFor(this.connectWalletTask).perform();
     }
   }
+
   @action cancelConnection() {
     // given the way users connect, I don't think we need to do anything else here
     // since most of the other actions are delegated to the user + browser plugins
@@ -117,6 +119,7 @@ class CardPayDepositWorkflowConnectLayer1Component extends Component<CardPayDepo
     // prompt ui without taking action.
     this.isWaitingForConnection = false;
   }
+
   @action disconnect() {
     this.layer1Network.disconnect();
   }
