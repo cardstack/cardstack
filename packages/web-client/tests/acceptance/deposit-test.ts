@@ -123,6 +123,7 @@ module('Acceptance | deposit', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
+        address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
         owners: [layer2AccountAddress],
         tokens: [createSafeToken('DAI', '0')],
       }),
