@@ -1,0 +1,8 @@
+.card-container__content {
+  padding: var(--boxel-sp-lg);
+}
+
+.card-container__action-chin {
+  display: flex;
+  padding: var(--boxel-sp-lg);
+}
