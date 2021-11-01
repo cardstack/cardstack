@@ -162,6 +162,16 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
       this.completedLayer2TxnReceipt!.transactionHash
     );
   }
+
+  get slowBridgingUrl() {
+    if (this.completedStepCount === 1) {
+      return this.depositTxnViewerUrl;
+    } else if (this.completedStepCount === 2) {
+      return this.bridgeExplorerUrl;
+    } else {
+      return this.blockscoutUrl;
+    }
+  }
 }
 
 export default CardPayDepositWorkflowTransactionStatusComponent;

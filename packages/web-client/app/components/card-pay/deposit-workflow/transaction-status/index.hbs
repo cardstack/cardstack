@@ -55,7 +55,7 @@
       <p class='transaction-status__delay' data-test-deposit-transaction-status-delay>
         Due to network conditions this transaction is taking longer to confirm,
         you can check the status of the transaction
-        <a href={{this.bridgeExplorerUrl}} target="_blank" rel="noopener noreferrer">here</a>.
+        <a href={{this.slowBridgingUrl}} target="_blank" rel="noopener noreferrer">here</a>.
       </p>
     {{/if}}
     {{#if (or this.bridgeError this.blockCountError)}}
