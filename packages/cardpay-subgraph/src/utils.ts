@@ -26,13 +26,11 @@ export let protocolVersions = new Map<string, i32>();
 
 export function makeToken(address: Address): string {
   let token = toChecksumAddress(address);
-  if (Token.load(token) == null) {
-    let tokenEntity = new Token(token);
-    tokenEntity.symbol = fetchTokenSymbol(address);
-    tokenEntity.name = fetchTokenName(address);
-    tokenEntity.decimals = fetchTokenDecimals(address);
-    tokenEntity.save();
-  }
+  let tokenEntity = new Token(token);
+  tokenEntity.decimals = fetchTokenDecimals(address);
+  tokenEntity.symbol = fetchTokenSymbol(address);
+  tokenEntity.name = fetchTokenName(address);
+  tokenEntity.save();
   return token;
 }
 
