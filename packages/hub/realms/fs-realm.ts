@@ -1,6 +1,6 @@
 import { BadRequest, Conflict, NotFound } from '../utils/error';
 import { assertValidRawCard, RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
-import { ensureDirSync, existsSync, readFileSync, readJsonSync, removeSync, writeJsonSync } from 'fs-extra';
+import { ensureDirSync, existsSync, readFileSync, removeSync, writeJsonSync } from 'fs-extra';
 import { join } from 'path';
 import walkSync from 'walk-sync';
 import { RealmInterface } from '../interfaces';
@@ -8,6 +8,7 @@ import { ensureTrailingSlash } from '../utils/path';
 import { nanoid } from '../utils/ids';
 import RealmManager from '../services/realm-manager';
 import { CardError } from '@cardstack/core/src/utils/errors';
+import { chain, merge } from 'lodash';
 
 export default class FSRealm implements RealmInterface {
   url: string;
@@ -79,6 +80,12 @@ export default class FSRealm implements RealmInterface {
     return card;
   }
 
+  writeCardJSON(cardURL: string, card: RawCard): void {
+    let cardDir = this.getRawCardLocation(cardURL);
+    let clonedCard = chain(card).cloneDeep().omit('files').value();
+    writeJsonSync(join(cardDir, 'card.json'), clonedCard);
+  }
+
   async createDataCard(data: any, adoptsFrom: string, cardURL?: string): Promise<RawCard> {
     if (!adoptsFrom) {
       throw new BadRequest('Card needs to adopt from a parent. Please provide an `adoptsFrom` key');
@@ -104,7 +111,7 @@ export default class FSRealm implements RealmInterface {
     };
 
     assertValidRawCard(card);
-    writeJsonSync(join(cardDir, 'card.json'), card);
+    this.writeCardJSON(cardURL, card);
 
     return card;
   }
@@ -116,13 +123,11 @@ export default class FSRealm implements RealmInterface {
   }
 
   async updateCardData(cardURL: string, attributes: any): Promise<RawCard> {
-    let cardJSONPath = join(this.getRawCardLocation(cardURL), 'card.json');
-
-    let card = readJsonSync(cardJSONPath);
-    card.data = Object.assign(card.data, attributes);
-    writeJsonSync(cardJSONPath, card);
-    Object.assign(card, { url: cardURL });
+    let card = await this.getRawCard(cardURL);
+    card.data = merge(card.data, attributes);
     assertValidRawCard(card);
+    this.writeCardJSON(cardURL, card);
+
     return card;
   }
 
