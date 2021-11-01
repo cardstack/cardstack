@@ -30,4 +30,5 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: yarn --prefer-offline
+      - run: yarn install -g @percy/cli
       - run: yarn test:web-client
