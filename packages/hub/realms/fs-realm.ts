@@ -79,17 +79,12 @@ export default class FSRealm implements RealmInterface {
     return card;
   }
 
-  async createDataCard(data: any, adoptsFrom: string, cardURL?: string): Promise<RawCard> {
-    if (!adoptsFrom) {
-      throw new BadRequest('Card needs to adopt from a parent. Please provide an `adoptsFrom` key');
-    }
-
-    if (!this.manager.doesCardExist(adoptsFrom)) {
-      throw new NotFound(`Parent card does not exist: ${adoptsFrom}`);
-    }
-
+  async createDataCard(data: any, adoptsFrom: string | undefined, cardURL?: string): Promise<RawCard> {
     if (!cardURL) {
-      cardURL = await this.generateIdFromParent(adoptsFrom);
+      if (!adoptsFrom) {
+        throw new BadRequest(`fs-realm createDataCard needs eitehr cardURL or adoptsFrom`);
+      }
+      cardURL = this.generateIdFromParent(adoptsFrom);
     } else {
       this.ensureIDIsUnique(cardURL);
     }

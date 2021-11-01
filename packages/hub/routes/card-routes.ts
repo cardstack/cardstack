@@ -7,6 +7,7 @@ import { inject } from '@cardstack/di';
 import autoBind from 'auto-bind';
 import { parseBody } from '../middleware';
 import { queryParamsToCardQuery } from '../utils/queries';
+import { INSECURE_CONTEXT } from '../services/card-service';
 
 const requireCard = function (path: string, root: string): any {
   const module = require.resolve(path, {
@@ -15,8 +16,6 @@ const requireCard = function (path: string, root: string): any {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   return require(module);
 };
-
-interface CardQueryParams {}
 
 export default class CardRoutes {
   realmManager = inject('realm-manager', { as: 'realmManager' });
@@ -30,30 +29,29 @@ export default class CardRoutes {
     autoBind(this);
   }
 
-  async getCard(ctx: RouterContext) {
+  private async getCard(ctx: RouterContext) {
     let {
       params: { encodedCardURL: url },
     } = ctx;
 
     let format = getCardFormatFromRequest(ctx.query.format);
-    let rawCard = await this.realmManager.getRawCard(url);
-    let card = await this.builder.getCompiledCard(url);
-    ctx.body = await serializeCard(url, rawCard.data, card[format]);
+    let { data, compiled } = await this.cards.as(INSECURE_CONTEXT).load(url);
+    ctx.body = await serializeCard(url, data, compiled[format]);
     ctx.status = 200;
   }
 
-  async searchCards(ctx: RouterContext) {
+  private async searchCards(ctx: RouterContext) {
     let { query } = ctx;
     let cardQuery = queryParamsToCardQuery(query);
     // Query the index
-    let results = await this.cards.query(cardQuery);
+    let results = await this.cards.as(INSECURE_CONTEXT).query(cardQuery);
 
     // Serialize index
     ctx.body = await serializeCards(results);
     ctx.status = 200;
   }
 
-  async createDataCard(ctx: RouterContext) {
+  private async createDataCard(ctx: RouterContext) {
     let {
       request: { body },
       params: { parentCardURL, realmURL },
@@ -69,15 +67,23 @@ export default class CardRoutes {
       'Payload contains keys that we do not allow: %list%'
     );
 
-    let data = body.data as any;
-    let rawCard = await this.realmManager.getRealm(realmURL).createDataCard(data.attributes, parentCardURL, data.id);
-    let compiledCard = await this.builder.getCompiledCard(rawCard.url);
+    let inputData = body.data as any;
     let format = getCardFormatFromRequest(ctx.query.format);
-    ctx.body = await serializeCard(compiledCard.url, rawCard.data, compiledCard[format]);
+
+    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).create(
+      {
+        url: inputData.id,
+        adoptsFrom: parentCardURL,
+        data: inputData.attributes,
+      },
+      { realmURL }
+    );
+
+    ctx.body = await serializeCard(compiled.url, outputData, compiled[format]);
     ctx.status = 201;
   }
 
-  async updateCard(ctx: RouterContext) {
+  private async updateCard(ctx: RouterContext) {
     let {
       request: { body },
       params: { encodedCardURL: url },
@@ -93,7 +99,7 @@ export default class CardRoutes {
     ctx.status = 200;
   }
 
-  async deleteCard(ctx: RouterContext) {
+  private async deleteCard(ctx: RouterContext) {
     let {
       params: { encodedCardURL: url },
     } = ctx;
@@ -109,7 +115,7 @@ export default class CardRoutes {
     ctx.body = null;
   }
 
-  async respondWithCardForPath(ctx: RouterContext) {
+  private async respondWithCardForPath(ctx: RouterContext) {
     let { routingCard } = this;
     let {
       params: { pathname },
@@ -131,7 +137,7 @@ export default class CardRoutes {
     ctx.status = 200;
   }
 
-  async getSource(ctx: RouterContext) {
+  private async getSource(ctx: RouterContext) {
     let {
       params: { encodedCardURL: url },
       query,

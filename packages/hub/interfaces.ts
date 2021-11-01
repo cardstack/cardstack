@@ -28,7 +28,7 @@ export interface RealmInterface {
   updateCardData(cardURL: string, attributes: any): Promise<RawCard>;
   deleteCard(cardURL: string): void;
   doesCardExist(cardURL: string): boolean;
-  createDataCard(data: any, adoptsFrom: string, cardURL?: string): Promise<RawCard>;
+  createDataCard(data: any, adoptsFrom: string | undefined, cardURL?: string): Promise<RawCard>;
 }
 
 export interface Cache<CardType> {

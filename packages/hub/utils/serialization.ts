@@ -7,7 +7,7 @@ import mergeWith from 'lodash/mergeWith';
 import uniq from 'lodash/uniq';
 import { findIncluded } from '@cardstack/core/src/jsonapi';
 
-export async function serializeCards() {
+export async function serializeCards(..._args: any[]) {
   throw new Error('Method not implemented.');
 }
 

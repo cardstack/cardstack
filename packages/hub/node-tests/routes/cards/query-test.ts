@@ -8,7 +8,7 @@ const CS_REALM = 'https://cardstack.com/base';
 const REALM = 'https://my-realm';
 
 if (process.env.COMPILER) {
-  describe('GET /cards/<QUERY>', function () {
+  describe.skip('GET /cards/<QUERY>', function () {
     let realm: ProjectTestRealm;
 
     function get(url: string) {

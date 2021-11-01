@@ -1,9 +1,61 @@
-import { CardQuery } from '@cardstack/core/src/interfaces';
+import { CardQuery, CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { inject } from '@cardstack/di';
 
-export default class CardService {
-  db = inject('database-manager', { as: 'db' });
-  // builder = inject('card-builder', { as: 'builder' });
+// This is a placeholder because we haven't built out different per-user
+// authorization contexts.
+export const INSECURE_CONTEXT = {};
+
+export default class CardServiceFactory {
+  realmManager = inject('realm-manager', { as: 'realmManager' });
+  builder = inject('card-builder', { as: 'builder' });
+
+  as(requestContext: unknown) {
+    return new CardService(requestContext, this.realmManager, this.builder);
+  }
+}
+
+interface Card {
+  data: RawCard['data'];
+  compiled: CompiledCard;
+}
+
+export class CardService {
+  constructor(
+    _requestContext: unknown,
+    private realmManager: CardServiceFactory['realmManager'],
+    private builder: CardServiceFactory['builder']
+  ) {}
+
+  async load(url: string): Promise<Card> {
+    let rawCard = await this.realmManager.getRawCard(url);
+    let card = await this.builder.getCompiledCard(url);
+    return { data: rawCard.data, compiled: card };
+  }
+
+  async save(raw: RawCard): Promise<Card>;
+  async save(raw: RawCard | Omit<RawCard, 'url'>, params: { realmURL: string }): Promise<Card>;
+  async save(raw: RawCard | Omit<RawCard, 'url'>, params?: { realmURL: string }): Promise<Card> {
+    let realmURL: string;
+    if (params && 'url' in raw) {
+      if (!raw.url.startsWith(params.realmURL)) {
+        throw new Error(`realm mismatch. You tried to create card ${raw.url} in realm ${params.realmURL}`);
+      }
+      realmURL = params.realmURL;
+    } else {
+      if (!('url' in raw)) {
+        throw new Error(`you must either choose the card's URL or choose which realmURL it will go into`);
+      }
+      let realm = this.realmManager.realms.find((r) => raw.url.startsWith(r.url));
+      if (!realm) {
+        throw new Error(`tried to create card ${raw.url} but we don't have a realm configured that matches that URL`);
+      }
+      realmURL = realm.url;
+    }
+
+    let rawCard = await this.realmManager.getRealm(realmURL).createDataCard(raw.data, raw.adoptsFrom, raw.url);
+    let compiled = await this.builder.getCompiledCard(rawCard.url);
+    return { data: rawCard.data, compiled };
+  }
 
   query(_query: CardQuery) {
     // Query to sql
@@ -15,6 +67,6 @@ export default class CardService {
 
 declare module '@cardstack/di' {
   interface KnownServices {
-    'card-service': CardService;
+    'card-service': CardServiceFactory;
   }
 }

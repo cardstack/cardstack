@@ -40,9 +40,11 @@ export function cardQueryToSQL(query: CardQuery): string {
   let sql = ['SELECT * FROM card_index'];
 
   let where = [];
-  let { in: inFilter } = query.filter;
-  for (const key in inFilter) {
-    where.push(`'${inFilter[key]}' = ANY ${key}`);
+  if (query.filter && 'in' in query.filter) {
+    let { in: inFilter } = query.filter;
+    for (const key in inFilter) {
+      where.push(`'${inFilter[key]}' = ANY ${key}`);
+    }
   }
   if (where.length) {
     sql.push(`WHERE ${where.join(' AND ')}`);
