@@ -6,3 +6,11 @@
   display: block;
   text-transform: capitalize;
 }
+
+.card-modal__action-chin-button {
+  margin-left: auto;
+}
+
+.card-modal__action-chin-button + .card-modal__action-chin-button {
+  margin-left: var(--boxel-sp-sm);
+}
