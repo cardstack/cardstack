@@ -8,13 +8,13 @@ import { taskFor } from 'ember-concurrency-ts';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { inject as service } from '@ember/service';
 import * as Sentry from '@sentry/browser';
+import { InputValidationState } from '@cardstack/web-client/components/common/validation-state-input';
 
 class CreateSpaceWorkflowEditDetailsUrlComponent extends Component<WorkflowCardComponentArgs> {
   @service declare hubAuthentication: HubAuthentication;
   @tracked subdomain: string = '';
   @tracked url: string = '';
-  @tracked urlValidationState: 'valid' | 'invalid' | 'initial' | 'loading' =
-    'initial';
+  @tracked urlValidationState: InputValidationState = 'initial';
   @tracked urlValidationMessage: string = '';
 
   @action restoreFromSession() {
