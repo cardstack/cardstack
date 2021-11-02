@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, waitFor } from '@ember/test-helpers';
+import { find, render, settled, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
@@ -58,6 +58,8 @@ module(
           />
         `);
 
+      assert.dom('[data-test-deposit-transaction-status-delay]').doesNotExist();
+
       assert
         .dom(`[data-test-token-bridge-step="0"][data-test-completed]`)
         .containsText(stepTitles.deposit);
@@ -71,6 +73,15 @@ module(
       assert
         .dom(`[data-test-token-bridge-step-status="1"]`)
         .hasText(`0 of ${blockCount} blocks confirmed`);
+
+      await settled();
+
+      let etherscanHref = find('[data-test-etherscan-button]')?.getAttribute(
+        'href'
+      )!;
+      assert
+        .dom('[data-test-deposit-transaction-status-delay] a')
+        .hasAttribute('href', etherscanHref);
 
       layer1Service.test__simulateBlockConfirmation();
       await waitFor(
@@ -96,6 +107,19 @@ module(
         .doesNotExist();
       assert.dom(`[data-test-blockscout-button]`).doesNotExist();
 
+      let bridgeExplorerHerf = find(
+        '[data-test-bridge-explorer-button]'
+      )?.getAttribute('href')!;
+      assert
+        .dom('[data-test-deposit-transaction-status-delay] a')
+        .hasAttribute('href', bridgeExplorerHerf);
+
+      assert
+        .dom('[data-test-deposit-transaction-status-delay]')
+        .containsText(
+          'Due to network conditions this transaction is taking longer to confirm'
+        );
+
       // bridging should also refresh layer 2 balances so we want to ensure that here
       layer2Service.balancesRefreshed = false;
 
@@ -115,6 +139,7 @@ module(
       assert.dom('[data-test-blockscout-button]').exists();
       assert.dom('[data-test-deposit-minting-step-failed]').doesNotExist();
       assert.dom('[data-test-deposit-transaction-status-error]').doesNotExist();
+      assert.dom('[data-test-deposit-transaction-status-delay]').doesNotExist();
 
       assert.ok(onComplete.called);
     });

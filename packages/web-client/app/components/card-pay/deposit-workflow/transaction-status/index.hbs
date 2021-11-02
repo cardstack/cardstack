@@ -51,6 +51,13 @@
         {{/if}}
       </div>
     </Boxel::ProgressSteps>
+    {{#if this.showSlowBridgingMessage}}
+      <p class='transaction-status__delay' data-test-deposit-transaction-status-delay>
+        Due to network conditions this transaction is taking longer to confirm,
+        you can check the status of the transaction
+        <a href={{this.slowBridgingUrl}} target="_blank" rel="noopener noreferrer">here</a>.
+      </p>
+    {{/if}}
     {{#if (or this.bridgeError this.blockCountError)}}
       <CardPay::ErrorMessage data-test-deposit-transaction-status-error as |supportURL|>
         There was a problem completing the bridging of your tokens to {{network-display-info "layer2" "fullName"}}. Please contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a> so that we can investigate and resolve this issue for you.

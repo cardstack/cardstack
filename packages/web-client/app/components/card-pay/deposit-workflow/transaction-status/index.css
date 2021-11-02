@@ -36,3 +36,11 @@
   align-items: center;
   justify-content: center;
 }
+
+.transaction-status__delay {
+  color: #707070;
+}
+
+.transaction-status__delay a {
+  text-decoration: underline;
+}

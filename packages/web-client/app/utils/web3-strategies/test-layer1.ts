@@ -113,11 +113,11 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
   }
 
   blockExplorerUrl(txnHash: TransactionHash): string {
-    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
+    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&q=BlockExplorer&txnHash=${txnHash}`;
   }
 
   bridgeExplorerUrl(txnHash: TransactionHash): string {
-    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
+    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&q=BridgeExplorer&txnHash=${txnHash}`;
   }
 
   test__simulateWalletConnectUri() {
