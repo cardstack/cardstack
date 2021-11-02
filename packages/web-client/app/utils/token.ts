@@ -19,6 +19,8 @@ export type TokenSymbol = keyof typeof tokenSymbols;
 export const convertibleSymbols = [
   tokenSymbols.DAI,
   tokenSymbols.CARD,
+  tokenSymbols['DAI.CPXD'],
+  tokenSymbols['CARD.CPXD'],
 ] as const;
 
 // contract/bridging
@@ -67,18 +69,6 @@ const contractNames: Record<
   },
 };
 
-export function getBridgedSymbol(
-  unbridgedSymbol: BridgeableSymbol
-): BridgedTokenSymbol {
-  if (unbridgedSymbol === tokenSymbols['DAI']) {
-    return tokenSymbols['DAI.CPXD'];
-  } else if (unbridgedSymbol === tokenSymbols['CARD']) {
-    return tokenSymbols['CARD.CPXD'];
-  } else {
-    throw new Error(`Unknown unbridgedSymbol ${unbridgedSymbol}`);
-  }
-}
-
 export function isBridgedTokenSymbol(
   symbol: TokenSymbol
 ): symbol is BridgedTokenSymbol {
@@ -126,7 +116,7 @@ const _tokenDisplayInfoMap: Record<TokenSymbol, DisplayInfo> = {
   },
   'CARD.CPXD': {
     name: 'Card',
-    symbol: 'CARD',
+    symbol: 'CARD.CPXD',
     description: '',
     icon: 'card-token',
   },

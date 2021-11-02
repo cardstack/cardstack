@@ -123,7 +123,10 @@ export default abstract class Layer2ChainWeb3Strategy
   async fetchIssuePrepaidCardMinValues() {
     this.issuePrepaidCardSpendMinValue = Math.min(...faceValueOptions);
     this.issuePrepaidCardDaiMinValue = new BN(
-      await this.convertFromSpend('DAI', this.issuePrepaidCardSpendMinValue)
+      await this.convertFromSpend(
+        this.bridgedDaiTokenSymbol,
+        this.issuePrepaidCardSpendMinValue
+      )
     );
   }
 

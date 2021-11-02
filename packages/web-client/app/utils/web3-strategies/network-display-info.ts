@@ -17,6 +17,7 @@ type Layer2NetworkCopywriting = {
   shortName: string;
   conversationalName: string;
   nativeTokenSymbol: string;
+  daiToken: 'DAI' | 'DAI.CPXD';
 };
 
 export type NetworkCopywriting =
@@ -55,18 +56,21 @@ let layer2NetworkDisplayInfo: Record<
     shortName: 'xDai',
     conversationalName: 'xDai chain',
     nativeTokenSymbol: 'DAI',
+    daiToken: 'DAI.CPXD',
   },
   sokol: {
     fullName: 'Sokol testnet',
     shortName: 'Sokol',
     conversationalName: 'Sokol',
     nativeTokenSymbol: 'SPOA',
+    daiToken: 'DAI',
   },
   'test-layer2': {
     fullName: 'L2 test chain',
     shortName: 'L2',
     conversationalName: 'L2 test chain',
     nativeTokenSymbol: 'DAI',
+    daiToken: 'DAI.CPXD',
   },
 };
 

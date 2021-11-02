@@ -12,7 +12,6 @@ import {
   ConversionFunction,
   BridgeableSymbol,
   BridgedTokenSymbol,
-  TokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import { Emitter } from '../events';
 import { BridgeValidationResult } from '@cardstack/cardpay-sdk/sdk/token-bridge-home-side';
@@ -150,7 +149,7 @@ export interface Layer2Web3Strategy
     options: TransactionOptions
   ): Promise<MerchantSafe>;
   resumeRegisterMerchantTransaction(txnHash: string): Promise<MerchantSafe>;
-  defaultTokenSymbol: TokenSymbol;
+  defaultTokenSymbol: BridgedTokenSymbol;
   refreshSafesAndBalances(): void;
   convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<string>;
 }

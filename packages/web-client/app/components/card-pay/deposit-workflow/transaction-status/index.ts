@@ -40,6 +40,18 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
     return this.layer1Network.strategy.bridgeConfirmationBlockCount;
   }
 
+  get bridgedTokenSymbol() {
+    if (this.selectedTokenSymbol === 'CARD') {
+      return this.layer2Network.bridgedCardTokenSymbol;
+    } else if (this.selectedTokenSymbol === 'DAI') {
+      return this.layer2Network.bridgedDaiTokenSymbol;
+    } else {
+      throw new Error(
+        `Could not get bridged token symbol for "${this.selectedTokenSymbol}"`
+      );
+    }
+  }
+
   get progressSteps() {
     return [
       {
@@ -49,7 +61,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
         title: `Bridge tokens from ${c.layer1.fullName} to ${c.layer2.fullName}`,
       },
       {
-        title: `Mint tokens on ${c.layer2.shortName}: ${this.selectedTokenSymbol}.CPXD`,
+        title: `Mint tokens on ${c.layer2.shortName}: ${this.bridgedTokenSymbol}`,
       },
     ];
   }

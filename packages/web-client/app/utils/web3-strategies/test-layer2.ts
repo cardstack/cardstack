@@ -354,7 +354,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   test__simulateConvertFromSpend(symbol: ConvertibleSymbol, amount: number) {
     let spendToDaiSimRate = 0.01;
-    if (symbol === 'DAI') {
+    if (symbol === 'DAI.CPXD') {
       return toWei(`${amount * spendToDaiSimRate}`);
     } else {
       return '0';
