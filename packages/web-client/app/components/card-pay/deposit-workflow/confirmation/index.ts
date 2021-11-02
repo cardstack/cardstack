@@ -35,9 +35,9 @@ class CardPayDepositWorkflowConfirmationComponent extends Component<WorkflowCard
 
   get receivedToken() {
     if (this.selectedTokenSymbol === 'CARD') {
-      return new TokenDisplayInfo('CARD.CPXD');
+      return new TokenDisplayInfo(this.layer2Network.bridgedCardTokenSymbol);
     } else {
-      return new TokenDisplayInfo('DAI.CPXD');
+      return new TokenDisplayInfo(this.layer2Network.bridgedDaiTokenSymbol);
     }
   }
 

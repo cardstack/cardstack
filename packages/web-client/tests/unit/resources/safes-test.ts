@@ -20,13 +20,14 @@ import hbs from 'htmlbars-inline-precompile';
 import BN from 'bn.js';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 import { toWei } from 'web3-utils';
+import { BridgedTokenSymbol } from '../../../app/utils/token';
 
 const defaultBlockNumber = 5;
 const address = generateMockAddress();
 const createDefaultDepotSafe = (daiBalance?: string, infoDID?: string) =>
   createDepotSafe({
     address,
-    tokens: daiBalance ? [createSafeToken('DAI', daiBalance)] : [],
+    tokens: daiBalance ? [createSafeToken('DAI.CPXD', daiBalance)] : [],
     infoDID,
   });
 
@@ -49,6 +50,7 @@ class PartialLayer2Strategy implements MockSafesResourceStrategy {
       blockNumber: defaultBlockNumber,
     };
   }
+  bridgedDaiTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
 
   async getBlockHeight() {
     return new BN(this._blockNumber);
@@ -185,7 +187,7 @@ module('Unit | Resource | Safes', function (hooks) {
     );
 
     assert.dom('#safe-did').containsText('No DID found');
-    assert.dom('[data-test-token="DAI"]').doesNotExist();
+    assert.dom('[data-test-token="DAI.CPXD"]').doesNotExist();
 
     strategy._graphData = {
       safes: [createDefaultDepotSafe('30', 'mock-infoDID')],
@@ -196,7 +198,7 @@ module('Unit | Resource | Safes', function (hooks) {
     await settled();
 
     assert.dom('#safe-did').containsText('mock-infoDID');
-    assert.dom('[data-test-token="DAI"]').containsText('DAI: 30');
+    assert.dom('[data-test-token="DAI.CPXD"]').containsText('DAI.CPXD: 30');
   });
 
   test('updating a safe using updateOne updates a rendered view that uses both nested or direct property', async function (assert) {
@@ -224,7 +226,7 @@ module('Unit | Resource | Safes', function (hooks) {
     );
 
     assert.dom('#safe-did').containsText('No DID found');
-    assert.dom('[data-test-token="DAI"]').doesNotExist();
+    assert.dom('[data-test-token="DAI.CPXD"]').doesNotExist();
 
     strategy._blockNumber = defaultBlockNumber + 1;
     strategy._latestSafe = createDefaultDepotSafe('30', 'mock-infoDID');
@@ -233,7 +235,7 @@ module('Unit | Resource | Safes', function (hooks) {
     await settled();
 
     assert.dom('#safe-did').containsText('mock-infoDID');
-    assert.dom('[data-test-token="DAI"]').containsText('DAI: 30');
+    assert.dom('[data-test-token="DAI.CPXD"]').containsText('DAI.CPXD: 30');
   });
 
   test('it aliases the first depot it finds to depot', async function (assert) {
@@ -272,13 +274,13 @@ module('Unit | Resource | Safes', function (hooks) {
     defaultDepotSafe = createDefaultDepotSafe(toWei('100'));
 
     let sufficientTokens = [
-      createSafeToken('DAI', toWei('25')),
-      createSafeToken('CARD', toWei('25')),
+      createSafeToken('DAI.CPXD', toWei('25')),
+      createSafeToken('CARD.CPXD', toWei('25')),
     ];
 
     let insufficientTokens = [
-      createSafeToken('DAI', '1'),
-      createSafeToken('CARD', toWei('25')),
+      createSafeToken('DAI.CPXD', '1'),
+      createSafeToken('CARD.CPXD', toWei('25')),
     ];
 
     let sufficientMerchantSafe = createMerchantSafe({

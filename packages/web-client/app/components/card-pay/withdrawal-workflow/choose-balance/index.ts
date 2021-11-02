@@ -7,18 +7,20 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import {
   TokenBalance,
   BridgedTokenSymbol,
-  getUnbridgedSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import BN from 'bn.js';
+import { reads } from 'macro-decorators';
 
 class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<WorkflowCardComponentArgs> {
   compatibleSafeTypes = ['depot', 'merchant'];
 
-  defaultTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
-  cardTokenSymbol: BridgedTokenSymbol = 'CARD.CPXD';
-  tokenOptions = [this.defaultTokenSymbol, this.cardTokenSymbol];
+  @reads('layer2Network.defaultTokenSymbol')
+  defaultTokenSymbol!: BridgedTokenSymbol;
+  @reads('layer2Network.bridgedCardTokenSymbol')
+  bridgedCardTokenSymbol!: BridgedTokenSymbol;
+  tokenOptions = [this.defaultTokenSymbol, this.bridgedCardTokenSymbol];
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
 
@@ -56,9 +58,8 @@ class CardPayWithdrawalWorkflowChooseBalanceComponent extends Component<Workflow
 
   get tokens() {
     return this.tokenOptions.map((symbol) => {
-      let unbridgedSymbol = getUnbridgedSymbol(symbol);
       let selectedSafeToken = (this.selectedSafe?.tokens || []).find(
-        (token) => token.token.symbol === unbridgedSymbol
+        (token) => token.token.symbol === symbol
       );
       let balance = new BN(selectedSafeToken?.balance || '0');
       return new TokenBalance(symbol, balance);

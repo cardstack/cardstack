@@ -63,7 +63,7 @@ module('Acceptance | create card space', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '0')],
+        tokens: [createSafeToken('DAI.CPXD', '0')],
       }),
     ]);
 
@@ -173,7 +173,7 @@ module('Acceptance | create card space', function (hooks) {
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           owners: [layer2AccountAddress],
-          tokens: [createSafeToken('DAI', '0')],
+          tokens: [createSafeToken('DAI.CPXD', '0')],
         }),
       ]);
       await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);

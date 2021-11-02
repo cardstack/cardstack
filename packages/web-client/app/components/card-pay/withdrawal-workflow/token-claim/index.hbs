@@ -15,7 +15,7 @@
         @icon={{this.tokenDetails.icon}}
         @balance={{format-wei-amount this.withdrawalAmount}}
         @symbol={{this.tokenSymbol}}
-        @text={{concat (format-usd (token-to-usd this.tokenSymbolForConversion this.withdrawalAmount)) "*"}}
+        @text={{concat (format-usd (token-to-usd this.tokenSymbol this.withdrawalAmount)) "*"}}
         data-test-withdrawal-token-claim-amount
       />
     </div>

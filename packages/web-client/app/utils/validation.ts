@@ -1,11 +1,6 @@
 import BN from 'bn.js';
 import { fromWei, toWei } from 'web3-utils';
-import {
-  BridgedTokenSymbol,
-  getUnbridgedSymbol,
-  isBridgedTokenSymbol,
-  TokenSymbol,
-} from '@cardstack/web-client/utils/token';
+import { TokenSymbol } from '@cardstack/web-client/utils/token';
 import { convertRawAmountToNativeDisplay } from '@cardstack/cardpay-sdk';
 
 // token input validations that assume string inputs are in ether
@@ -24,11 +19,11 @@ function failsToCreateBN(amount: string) {
 
 function formatAmount(amount: BN, token: TokenSymbol) {
   let tokenForFormatter = token;
-  let tokenIsBridged = isBridgedTokenSymbol(token);
+  let tokenIsBridged = token.endsWith('.CPXD');
 
   // Bridged currencies aren’t recognised
   if (tokenIsBridged) {
-    tokenForFormatter = getUnbridgedSymbol(token as BridgedTokenSymbol);
+    tokenForFormatter = token.replace(/\.CPXD$/, '') as TokenSymbol;
   }
 
   let formattedString = convertRawAmountToNativeDisplay(

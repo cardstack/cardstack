@@ -2,7 +2,6 @@ import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
 import { Layer2Web3Strategy, TransactionHash, WithdrawalLimits } from './types';
 import {
-  BridgeableSymbol,
   BridgedTokenSymbol,
   ConvertibleSymbol,
   ConversionFunction,
@@ -38,7 +37,7 @@ import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 interface BridgeToLayer1Request {
   safeAddress: string;
   receiverAddress: string;
-  tokenSymbol: BridgeableSymbol;
+  tokenSymbol: BridgedTokenSymbol;
   amountInWei: string;
 }
 
@@ -60,7 +59,9 @@ interface RegisterMerchantRequest {
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainId = '-1';
   simpleEmitter = new SimpleEmitter();
-  defaultTokenSymbol: ConvertibleSymbol = 'DAI';
+  defaultTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
+  bridgedDaiTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
+  bridgedCardTokenSymbol: BridgedTokenSymbol = 'CARD.CPXD';
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo: WalletInfo = new WalletInfo([]);
   waitForAccountDeferred = defer();
@@ -135,7 +136,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   bridgeToLayer1(
     safeAddress: string,
     receiverAddress: string,
-    tokenSymbol: BridgeableSymbol,
+    tokenSymbol: BridgedTokenSymbol,
     amountInWei: string
   ): Promise<TransactionHash> {
     this.bridgeToLayer1Requests.push({
@@ -189,14 +190,15 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   get defaultTokenBalance() {
     return new BN(
-      this.safes.depot?.tokens.find((v) => v.token.symbol === 'DAI')?.balance ??
-        0
+      this.safes.depot?.tokens.find(
+        (v) => v.token.symbol === this.defaultTokenSymbol
+      )?.balance ?? 0
     );
   }
 
   get cardBalance() {
     return new BN(
-      this.safes.depot?.tokens.find((v) => v.token.symbol === 'CARD')
+      this.safes.depot?.tokens.find((v) => v.token.symbol === 'CARD.CPXD')
         ?.balance ?? 0
     );
   }
@@ -352,7 +354,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   test__simulateConvertFromSpend(symbol: ConvertibleSymbol, amount: number) {
     let spendToDaiSimRate = 0.01;
-    if (symbol === 'DAI') {
+    if (symbol === 'DAI.CPXD') {
       return toWei(`${amount * spendToDaiSimRate}`);
     } else {
       return '0';
@@ -408,7 +410,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       .find((v: Safe) => v.address === fundingSourceAddress);
 
     unfetchedSource!.tokens.forEach((t: TokenInfo) => {
-      if (t.token.symbol === 'DAI') {
+      if (t.token.symbol === 'DAI.CPXD') {
         t.balance = new BN(t.balance)
           .sub(new BN(toWei((faceValue / 100).toString())))
           .toString();
@@ -482,7 +484,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   async test__simulateBridgedToLayer1(
     safeAddress?: string,
     receiverAddress?: string,
-    tokenSymbol?: BridgeableSymbol,
+    tokenSymbol?: BridgedTokenSymbol,
     amountInWei?: string
   ): Promise<void> {
     if (safeAddress && receiverAddress && tokenSymbol && amountInWei) {

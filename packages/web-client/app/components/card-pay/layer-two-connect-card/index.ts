@@ -49,11 +49,11 @@ class CardPayLayerTwoConnectCardComponent extends Component<CardPayLayerTwoConne
   get balancesToShow() {
     return [
       {
-        symbol: 'DAI.CPXD',
+        symbol: this.layer2Network.bridgedDaiTokenSymbol,
         amount: this.layer2Network.defaultTokenBalance,
       },
       {
-        symbol: 'CARD.CPXD',
+        symbol: this.layer2Network.bridgedCardTokenSymbol,
         amount: this.layer2Network.cardBalance,
       },
     ].filter((o) => o.amount && !o.amount?.isZero());

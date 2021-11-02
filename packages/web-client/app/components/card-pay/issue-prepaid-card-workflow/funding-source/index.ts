@@ -10,15 +10,14 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import {
   TokenBalance,
   BridgedTokenSymbol,
-  getUnbridgedSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 
 class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
   compatibleSafeTypes = ['depot', 'merchant'];
 
-  defaultTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
-  tokenOptions = [this.defaultTokenSymbol];
+  defaultTokenSymbol: BridgedTokenSymbol;
+  tokenOptions: BridgedTokenSymbol[];
   minimumDaiValue: BN;
   @service declare layer2Network: Layer2Network;
 
@@ -27,6 +26,8 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
 
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
+    this.defaultTokenSymbol = this.layer2Network.defaultTokenSymbol;
+    this.tokenOptions = [this.defaultTokenSymbol];
 
     this.minimumDaiValue = new BN(
       this.args.workflowSession.getValue<string>('daiMinValue')!
@@ -67,9 +68,8 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
 
   get tokens() {
     return this.tokenOptions.map((symbol) => {
-      let unbridgedSymbol = getUnbridgedSymbol(symbol);
       let selectedSafeToken = (this.selectedSafe?.tokens || []).find(
-        (token) => token.token.symbol === unbridgedSymbol
+        (token) => token.token.symbol === symbol
       );
       let balance = new BN(selectedSafeToken?.balance || '0');
       return new TokenBalance(symbol, balance);

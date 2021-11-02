@@ -36,7 +36,7 @@ class CardPayWithdrawalWorkflowTransactionConfirmedComponent extends Component<W
   }
 
   get receivedToken() {
-    if (this.tokenSymbol === 'CARD.CPXD') {
+    if (this.tokenSymbol === this.layer2Network.bridgedCardTokenSymbol) {
       return new TokenDisplayInfo('CARD');
     } else {
       return new TokenDisplayInfo('DAI');

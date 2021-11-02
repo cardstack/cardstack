@@ -248,6 +248,7 @@ export default abstract class Layer1ChainWeb3Strategy
   }
 
   async refreshBalances() {
+    if (!this.web3) return;
     let balances = await Promise.all<string>([
       this.getDefaultTokenBalance(),
       this.getErc20Balance(this.contractForToken('DAI')),

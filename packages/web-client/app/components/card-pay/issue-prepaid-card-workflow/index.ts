@@ -51,7 +51,7 @@ export const MILESTONE_TITLES = [
   'Confirm transaction',
 ];
 
-export const WORKFLOW_VERSION = 3;
+export const WORKFLOW_VERSION = 4;
 
 class IssuePrepaidCardWorkflow extends Workflow {
   @service declare router: RouterService;
@@ -244,7 +244,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
           c.layer2.fullName
         } wallet, or by claiming merchant revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
           Number(fromWei(session.getValue<string>('daiMinValue')!))
-        )} DAI.CPXD (${convertAmountToNativeDisplay(
+        )} ${c.layer2.daiToken} (${convertAmountToNativeDisplay(
           spendToUsd(session.getValue<number>('spendMinValue')!)!,
           'USD'
         )})**.`,
@@ -261,7 +261,7 @@ class IssuePrepaidCardWorkflow extends Workflow {
           c.layer2.fullName
         } wallet, or by claiming merchant revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately **${Math.ceil(
           Number(fromWei(session.getValue<string>('daiMinValue')!))
-        )} DAI.CPXD (${convertAmountToNativeDisplay(
+        )} ${c.layer2.daiToken} (${convertAmountToNativeDisplay(
           spendToUsd(session.getValue<number>('spendMinValue')!)!,
           'USD'
         )})**.`,

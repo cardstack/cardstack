@@ -26,6 +26,8 @@ const SOKOL = {
   nativeTokenCoingeckoId: 'ethereum',
   nativeTokenSymbol: 'SPOA',
   nativeTokenName: 'SPOA',
+  bridgedDaiTokenSymbol: 'DAI',
+  bridgedCardTokenSymbol: 'CARD',
   name: 'Sokol',
   rpcNode: 'https://sokol.poa.network',
   rpcArchiveNode: 'https://sokol-archive.blockscout.com',
@@ -76,6 +78,8 @@ const XDAI = {
   nativeTokenCoingeckoId: 'xdai',
   nativeTokenSymbol: 'XDAI',
   nativeTokenName: 'xDai',
+  bridgedDaiTokenSymbol: 'DAI.CPXD',
+  bridgedCardTokenSymbol: 'CARD.CPXD',
   name: 'xDai Chain',
   rpcNode: 'https://rpc.xdaichain.com',
   rpcArchiveNode: 'https://xdai-archive.blockscout.com', // warning this is an OpenEthereum node which has issues with modern web3 providers

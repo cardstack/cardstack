@@ -11,13 +11,10 @@ import { reads } from 'macro-decorators';
 import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
-import {
-  BridgedTokenSymbol,
-  getBridgedSymbol,
-  BridgeableSymbol,
-} from '@cardstack/web-client/utils/token';
+import { BridgedTokenSymbol } from '@cardstack/web-client/utils/token';
 
 export interface SafesResourceStrategy {
+  bridgedDaiTokenSymbol: BridgedTokenSymbol;
   viewSafesTask: TaskFunction;
   getLatestSafe(address: string): Promise<Safe>;
   getBlockHeight(): Promise<BN>;
@@ -237,19 +234,16 @@ export class Safes extends Resource<Args> {
   }
 
   get issuePrepaidCardSourceSafes() {
-    let tokenOptions = ['DAI.CPXD' as BridgedTokenSymbol];
-    let minimumFaceValue = new BN(
-      this.args.named.strategy.issuePrepaidCardDaiMinValue
-    );
+    let strategy = this.args.named.strategy;
+    let tokenOptions = [strategy.bridgedDaiTokenSymbol];
+    let minimumFaceValue = new BN(strategy.issuePrepaidCardDaiMinValue);
     let compatibleSafeTypes = ['depot', 'merchant'];
     let compatibleSafes = this.value.filter((safe) =>
       compatibleSafeTypes.includes(safe.type)
     );
     return compatibleSafes.filter((safe) => {
       let compatibleTokens = safe.tokens.filter((token) =>
-        tokenOptions.includes(
-          getBridgedSymbol(token.token.symbol as BridgeableSymbol)
-        )
+        tokenOptions.includes(token.token.symbol as BridgedTokenSymbol)
       );
 
       return compatibleTokens.any((token) =>

@@ -52,7 +52,12 @@ module(
         }),
       ]);
       await layer2Service.test__simulateAccountsChanged([eoaAddress]);
-      layer2Service.bridgeToLayer1('0xsource', '0xdestination', 'DAI', '20');
+      layer2Service.bridgeToLayer1(
+        '0xsource',
+        '0xdestination',
+        'DAI.CPXD',
+        '20'
+      );
     });
 
     test('It renders transaction status and links', async function (assert) {

@@ -119,7 +119,7 @@ module('Acceptance | create merchant', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '0')],
+        tokens: [createSafeToken('DAI.CPXD', '0')],
       }),
       createMockPrepaidCard(
         layer2AccountAddress,
@@ -257,7 +257,7 @@ module('Acceptance | create merchant', function (hooks) {
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           owners: [layer2AccountAddress],
-          tokens: [createSafeToken('DAI', '0')],
+          tokens: [createSafeToken('DAI.CPXD', '0')],
         }),
         createMockPrepaidCard(
           layer2AccountAddress,
@@ -504,7 +504,7 @@ module('Acceptance | create merchant', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '0')],
+        tokens: [createSafeToken('DAI.CPXD', '0')],
       }),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -541,7 +541,7 @@ module('Acceptance | create merchant', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '0')],
+        tokens: [createSafeToken('DAI.CPXD', '0')],
       }),
       createMockPrepaidCard(
         layer2AccountAddress,

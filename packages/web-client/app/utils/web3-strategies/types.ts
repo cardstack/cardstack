@@ -124,7 +124,7 @@ export interface Layer2Web3Strategy
   bridgeToLayer1(
     safeAddress: string,
     receiverAddress: string,
-    tokenSymbol: BridgeableSymbol,
+    tokenSymbol: BridgedTokenSymbol,
     amountInWei: string
   ): Promise<TransactionHash>;
   awaitBridgedToLayer1(
@@ -149,7 +149,7 @@ export interface Layer2Web3Strategy
     options: TransactionOptions
   ): Promise<MerchantSafe>;
   resumeRegisterMerchantTransaction(txnHash: string): Promise<MerchantSafe>;
-  defaultTokenSymbol: ConvertibleSymbol;
+  defaultTokenSymbol: BridgedTokenSymbol;
   refreshSafesAndBalances(): void;
   convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<string>;
 }
