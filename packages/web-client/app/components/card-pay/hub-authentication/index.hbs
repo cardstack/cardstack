@@ -12,7 +12,13 @@
           style={{css-var status-icon-size="2.5rem"}}
           data-test-failed
         >
-          Authentication failed or was canceled.
+          {{#if (eq this.error.message "AUTH_TIMEOUT")}}
+            <span>
+              Authentication with Card Wallet timed out. If you didn't receive a confirmation request on your device, try again, or contact <a href={{this.supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+            </span>
+          {{else}}
+            Authentication failed or was canceled.
+          {{/if}}
         </d.ActionStatusArea>
         <d.InfoArea>
           <Boxel::Button

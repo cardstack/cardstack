@@ -125,5 +125,22 @@ module(
           .containsText('Authenticated with Hub');
       });
     });
+
+    test('It shows a message on timeout', async function (assert) {
+      let deferred = RSVP.defer<void>();
+      sinon
+        .stub(hubAuthentication, 'ensureAuthenticated')
+        .returns(deferred.promise);
+
+      await click('[data-test-authentication-button]');
+
+      await waitFor('[data-test-failed]');
+
+      assert
+        .dom('[data-test-failed]')
+        .containsText(
+          "Authentication with Card Wallet timed out. If you didn't receive a confirmation request on your device, try again, or contact Cardstack support"
+        );
+    });
   }
 );
