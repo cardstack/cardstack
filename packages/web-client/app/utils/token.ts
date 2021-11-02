@@ -114,7 +114,7 @@ const _tokenDisplayInfoMap: Record<TokenSymbol, DisplayInfo> = {
   },
   'CARD.CPXD': {
     name: 'Card',
-    symbol: 'CARD',
+    symbol: 'CARD.CPXD',
     description: '',
     icon: 'card-token',
   },
