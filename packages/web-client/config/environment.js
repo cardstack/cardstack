@@ -79,7 +79,7 @@ module.exports = function (environment) {
       googlePlayStoreLink: undefined,
       testFlightLink: 'https://cardstack.com/cardpay',
       discordSupportChannelUrl:
-        'https://discord.com/channels/584043165066199050/898955884477157417',
+        'https://discord.com/channels/584043165066199050/899645340746141806',
     },
     threadAnimationInterval: 1000,
     'ember-cli-mirage': {
