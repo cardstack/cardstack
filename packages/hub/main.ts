@@ -53,6 +53,7 @@ import ApiRouter from './services/api-router';
 import CallbacksRouter from './services/callbacks-router';
 import HealthCheck from './services/health-check';
 import NonceTracker from './services/nonce-tracker';
+import ReservedWords from './services/reserved-words';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import Web3Service from './services/web3';
@@ -109,6 +110,7 @@ export function createContainer(registryCallback?: RegistryCallback): Container 
   registry.register('card-space-queries', CardSpaceQueries);
   registry.register('card-spaces-route', CardSpacesRoute);
   registry.register('relay', RelayService);
+  registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
   registry.register('subgraph', SubgraphService);

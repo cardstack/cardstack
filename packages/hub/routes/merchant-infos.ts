@@ -5,7 +5,6 @@ import shortUuid from 'short-uuid';
 import { ensureLoggedIn } from './utils/auth';
 import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import { validateRequiredFields } from './utils/validation';
-import forbiddenIds from '../assets/forbidden-ids.json';
 
 export interface MerchantInfo {
   id: string;
@@ -24,6 +23,9 @@ export default class MerchantInfosRoute {
   });
   merchantInfoQueries = inject('merchant-info-queries', {
     as: 'merchantInfoQueries',
+  });
+  reservedWords = inject('reserved-words', {
+    as: 'reservedWords',
   });
 
   workerClient = inject('worker-client', { as: 'workerClient' });
@@ -99,11 +101,9 @@ export default class MerchantInfosRoute {
         detail: errorMessage,
       };
     } else {
-      let allForbiddenWords = Object.values(forbiddenIds)
-        .flat()
-        .map((id) => id.replace(/[^0-9a-zA-Z]/g, '').toLowerCase());
-
-      if (allForbiddenWords.includes(slug)) {
+      if (
+        this.reservedWords.isReserved(slug, (reservedWord) => reservedWord.replace(/[^0-9a-zA-Z]/g, '').toLowerCase())
+      ) {
         return {
           slugAvailable: false,
           detail: 'This Merchant ID is not allowed',
