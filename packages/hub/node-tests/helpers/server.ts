@@ -10,7 +10,7 @@ import { INSECURE_CONTEXT } from '../../services/card-service';
 export function setupServer(
   mochaContext: Mocha.Suite,
   config: {
-    registyCallback?: HubServerConfig['registryCallback'];
+    registryCallback?: HubServerConfig['registryCallback'];
     testRealm?: string;
   } = {}
 ) {
@@ -22,7 +22,7 @@ export function setupServer(
         registry.register('card-cache-config', TestCardCacheConfig);
       }
 
-      config.registyCallback && config.registyCallback(registry);
+      config.registryCallback && config.registryCallback(registry);
     };
 
     server = await HubServer.create({ registryCallback });
@@ -42,6 +42,9 @@ export function setupServer(
   });
 
   return {
+    createRealm(_name: string) {
+      throw new Error('DO NOT USE: Refactor away');
+    },
     async lookup(key: string) {
       return await server.container.lookup(key);
     },
