@@ -112,10 +112,9 @@ export default class CardSpaceValidator {
     }
 
     if (!urlValid) {
-      errors.url.push('Invalid URL');
+      errors.url.push('Can only contain latin letters, numbers, hyphens and underscores');
     } else {
-      let urlObject = new URL(`https://${cardSpace.url}`);
-      if (!urlObject.hostname.endsWith('card.space')) {
+      if (!urlObject!.hostname.endsWith('card.space')) {
         errors.url.push('Only valid card.space subdomains are allowed');
       }
     }
@@ -126,12 +125,12 @@ export default class CardSpaceValidator {
         errors.url.push('Only first level subdomains are allowed');
       }
 
-      if (this.reservedWords.isReserved(urlParts[0], this.reservedWords.lowerCaseAlphaNumericTransform)) {
-        // Could check more "reserved" subdomains here
-        errors.url.push('Not allowed');
+      let subdomain = urlParts[0];
+      if (this.reservedWords.isReserved(subdomain, this.reservedWords.lowerCaseAlphaNumericTransform)) {
+        errors.url.push('URL unavailable');
       }
 
-      if (urlParts[0].length > MAX_SHORT_FIELD_LENGTH) {
+      if (subdomain.length > MAX_SHORT_FIELD_LENGTH) {
         errors.url.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
       }
     }

@@ -196,7 +196,7 @@ describe('POST /api/card-spaces', function () {
               pointer: '/data/attributes/url',
             },
             title: 'Invalid attribute',
-            detail: 'Invalid URL',
+            detail: 'Can only contain latin letters, numbers, hyphens and underscores',
           },
         ],
       })
