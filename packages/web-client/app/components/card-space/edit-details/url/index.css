@@ -3,11 +3,11 @@
 }
 
 .card-space-url-form__subdomain {
-  width: 150px;
+  width: 10rem;
 }
 
 .card-space-url-form__domain {
-  margin-left: 5px;
-  margin-top: 10px;
+  margin-left: var(--boxel-sp-xxs);
+  margin-top: var(--boxel-sp-xs);
   font-weight: 700;
 }
