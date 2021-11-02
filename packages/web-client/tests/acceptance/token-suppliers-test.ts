@@ -32,8 +32,8 @@ module('Acceptance | token suppliers', function (hooks) {
         address: '0x123400000000000000000000000000000000abcd',
         owners: [layer2AccountAddress],
         tokens: [
-          createSafeToken('DAI', '14142298700000000000'),
-          createSafeToken('CARD', '567899100000000000000'),
+          createSafeToken('DAI.CPXD', '14142298700000000000'),
+          createSafeToken('CARD.CPXD', '567899100000000000000'),
         ],
       }),
     ]);
@@ -50,6 +50,7 @@ module('Acceptance | token suppliers', function (hooks) {
     assert
       .dom('[data-test-card-pay-depot-header]')
       .containsText(`On ${c.layer2.fullName}`);
+
     assert
       .dom('[data-test-card-pay-depot-header]')
       .containsText('0x1234...abcd');
@@ -76,8 +77,8 @@ module('Acceptance | token suppliers', function (hooks) {
         address: '0x123400000000000000000000000000000000dcba',
         owners: [secondAddress],
         tokens: [
-          createSafeToken('DAI', '0'),
-          createSafeToken('CARD', '238000000000000000000'),
+          createSafeToken('DAI.CPXD', '0'),
+          createSafeToken('CARD.CPXD', '238000000000000000000'),
         ],
       }),
     ]);

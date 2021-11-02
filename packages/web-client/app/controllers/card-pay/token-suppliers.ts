@@ -4,9 +4,7 @@ import RouterService from '@ember/routing/router-service';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
-import TokenToUsd, {
-  UsdConvertibleSymbol,
-} from '@cardstack/web-client/services/token-to-usd';
+import TokenToUsd from '@cardstack/web-client/services/token-to-usd';
 import { TokenBalance } from '@cardstack/web-client/utils/token';
 import BN from 'bn.js';
 
@@ -35,11 +33,11 @@ export default class CardPayTokenSuppliersController extends Controller {
     }
     return [
       new TokenBalance(
-        'DAI.CPXD',
+        this.layer2Network.bridgedDaiTokenSymbol,
         this.layer2Network.defaultTokenBalance ?? new BN('0')
       ),
       new TokenBalance(
-        'CARD.CPXD',
+        this.layer2Network.bridgedCardTokenSymbol,
         this.layer2Network.cardBalance ?? new BN('0')
       ),
     ].filter((el) => el.balance && !el.balance?.isZero());
@@ -47,10 +45,7 @@ export default class CardPayTokenSuppliersController extends Controller {
 
   get usdBalanceTotal() {
     return this.tokensToDisplay.reduce((sum, item) => {
-      let usdBalance = this.tokenToUsd.toUsdFrom(
-        item.symbol as UsdConvertibleSymbol,
-        item.balance
-      );
+      let usdBalance = this.tokenToUsd.toUsdFrom(item.symbol, item.balance);
       if (usdBalance) {
         return (sum += usdBalance);
       }
