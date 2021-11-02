@@ -1,4 +1,3 @@
-import { BadRequest, Conflict, NotFound } from '../utils/error';
 import { assertValidRawCard, RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
 import { ensureDirSync, existsSync, readFileSync, readJsonSync, removeSync, writeJsonSync } from 'fs-extra';
 import { join } from 'path';
@@ -7,7 +6,7 @@ import { RealmInterface } from '../interfaces';
 import { ensureTrailingSlash } from '../utils/path';
 import { nanoid } from '../utils/ids';
 import RealmManager from '../services/realm-manager';
-import { CardError } from '@cardstack/core/src/utils/errors';
+import { CardstackError, BadRequest, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
 
 export default class FSRealm implements RealmInterface {
   url: string;
@@ -59,19 +58,15 @@ export default class FSRealm implements RealmInterface {
 
     let cardJSON = files['card.json'];
     if (!cardJSON) {
-      throw new CardError(`${cardURL} is missing card.json`);
+      throw new CardstackError(`${cardURL} is missing card.json`);
     }
 
     delete files['card.json'];
     let card;
     try {
       card = JSON.parse(cardJSON);
-    } catch (e) {
-      if (e instanceof SyntaxError) {
-        throw new CardError(`${cardURL} has invalid JSON in card.json`, { cause: e });
-      } else {
-        throw e;
-      }
+    } catch (e: any) {
+      throw augmentBadRequest(e);
     }
     Object.assign(card, { files, url: cardURL });
     assertValidRawCard(card);

@@ -1,6 +1,6 @@
 import { ParsedUrlQuery } from 'querystring';
 import { CardQuery } from '@cardstack/core/src/interfaces';
-import { BadRequest } from './error';
+import { BadRequest } from '@cardstack/core/src/utils/errors';
 
 // Takes an object with keys and values for querying and transforms them into parts
 // suitable for passing into `db.query()` (DatabaseManager).

@@ -3,7 +3,7 @@ import { RouterContext } from '@koa/router';
 import Koa from 'koa';
 // @ts-ignore
 import mimeMatch from 'mime-match';
-import { CardstackError } from '../utils/error';
+import { CardstackError } from '@cardstack/core/src/utils/errors';
 import BoomRoute from '../routes/boom';
 import ExchangeRatesRoute from '../routes/exchange-rates';
 import SessionRoute from '../routes/session';

@@ -16,8 +16,7 @@ import transformCardComponent, {
 import { Builder, CompiledCard, ComponentInfo, FEATURE_NAMES, Format, FORMATS, RawCard } from './interfaces';
 import { getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
-import { CardError } from './utils/errors';
-import { BadRequest } from '../../hub/utils/error';
+import { CardstackError, BadRequest, augmentBadRequest } from './utils/errors';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -55,7 +54,7 @@ export class Compiler {
       parentCard = await this.getParentCard(cardSource, meta);
 
       if (!parentCard) {
-        throw new CardError(`${cardSource.url} does not have a parent card. This is wrong and should not happen.`);
+        throw new CardstackError(`${cardSource.url} does not have a parent card. This is wrong and should not happen.`);
       }
 
       if (!schemaModule) {
@@ -66,7 +65,7 @@ export class Compiler {
 
       if (parentCard.serializer) {
         if (serializer && parentCard.serializer !== serializer) {
-          throw new CardError(
+          throw new CardstackError(
             `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${cardSource.url}:${serializer} Parent: ${parentCard.url}:${parentCard.serializer}`
           );
         }
@@ -146,7 +145,7 @@ export class Compiler {
   private getFile(cardSource: RawCard, path: string): string {
     let fileSrc = cardSource.files && cardSource.files[path];
     if (!fileSrc) {
-      throw new CardError(`${cardSource.url} refers to ${path} in its card.json but that file does not exist`);
+      throw new CardstackError(`${cardSource.url} refers to ${path} in its card.json but that file does not exist`);
     }
     return fileSrc;
   }
@@ -175,8 +174,8 @@ export class Compiler {
           classPropertiesPlugin,
         ],
       })!;
-    } catch (error) {
-      throw CardError.fromError(error);
+    } catch (error: any) {
+      throw augmentBadRequest(error);
     }
 
     let code = out!.code!;
@@ -202,7 +201,7 @@ export class Compiler {
     let fieldNameCollisions = intersection(cardFieldNames, parentFieldNames);
 
     if (fieldNameCollisions.length) {
-      throw new CardError(`Field collision on ${fieldNameCollisions.join()} with parent card ${parentCard.url}`);
+      throw new CardstackError(`Field collision on ${fieldNameCollisions.join()} with parent card ${parentCard.url}`);
     }
 
     return Object.assign({}, parentCard.fields, fields);
@@ -231,7 +230,9 @@ export class Compiler {
     if (!localFilePath) {
       // we don't have an implementation of our own
       if (!parentCard) {
-        throw new CardError(`${cardSource.url} doesn't have a ${which} component OR a parent card. This is not right.`);
+        throw new CardstackError(
+          `${cardSource.url} doesn't have a ${which} component OR a parent card. This is not right.`
+        );
       }
 
       if (cardSource.schema) {
@@ -239,7 +240,7 @@ export class Compiler {
         let originalRawCard = await this.builder.getRawCard(parentCard[which].sourceCardURL);
         let srcLocalPath = originalRawCard[which];
         if (!srcLocalPath) {
-          throw new CardError(
+          throw new CardstackError(
             `bug: ${parentCard.url} says it got ${which} from ${parentCard[which].sourceCardURL}, but that card does not have a ${which} component`
           );
         }

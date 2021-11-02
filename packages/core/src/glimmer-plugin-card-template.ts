@@ -11,7 +11,7 @@ import { CompiledCard, Field, Format } from './interfaces';
 import { singularize } from 'inflection';
 import { cloneDeep } from 'lodash';
 import { classify, getFieldForPath } from './utils';
-import { CardError } from './utils/errors';
+import { augmentBadRequest } from './utils/errors';
 
 const MODEL = '@model';
 const FIELDS = '@fields';
@@ -90,8 +90,8 @@ export default function glimmerCardTemplateTransform(source: string, options: Op
         },
       })
     );
-  } catch (error) {
-    throw CardError.fromError(error);
+  } catch (error: any) {
+    throw augmentBadRequest(error);
   }
 }
 

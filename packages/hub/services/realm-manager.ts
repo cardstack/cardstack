@@ -1,6 +1,6 @@
 import { RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
 import Realm from '../realms/fs-realm';
-import { NotFound } from '../utils/error';
+import { NotFound } from '@cardstack/core/src/utils/errors';
 import { RealmInterface } from '../interfaces';
 import { ensureTrailingSlash } from '../utils/path';
 import config from 'config';
