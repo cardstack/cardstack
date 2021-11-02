@@ -46,6 +46,10 @@ export default class CardSpaceValidator {
     as: 'cardSpaceQueries',
   });
 
+  reservedWords = inject('reserved-words', {
+    as: 'reservedWords',
+  });
+
   async validate(cardSpace: CardSpace): Promise<CardSpaceErrors> {
     let errors: CardSpaceErrors = {
       url: [],
@@ -115,7 +119,7 @@ export default class CardSpaceValidator {
         errors.url.push('Only first level subdomains are allowed');
       }
 
-      if (urlParts[0] === 'www') {
+      if (this.reservedWords.isReserved(urlParts[0], this.reservedWords.lowerCaseAlphaNumericTransform)) {
         // Could check more "reserved" subdomains here
         errors.url.push('Not allowed');
       }

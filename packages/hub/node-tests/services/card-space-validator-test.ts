@@ -16,22 +16,25 @@ describe('CardSpaceValidator', function () {
     await destroy();
   });
 
-  it('validates url', async function () {
-    let subject = await createSubject();
+  let invalidUrls = [
+    'www.card.space',
+    'ščž.card.space',
+    '😂.card.space',
+    'satoshi.card.race',
+    'test',
+    'satoshi.nakamoto.card.space',
+    '.card.space',
+    'ftp.card.space',
+    'cardstack.card.space',
+    'christse.card.space',
+    'fuck.card.space',
+  ];
 
-    let invalidUrls = [
-      'www.card.space',
-      'ščž.card.space',
-      '😂.card.space',
-      'satoshi.card.race',
-      'test',
-      'satoshi.nakamoto.card.space',
-      '.card.space',
-    ];
-
-    invalidUrls.forEach(async (url) => {
+  invalidUrls.forEach(async (url) => {
+    it(`should validate ${url}`, async function () {
+      let subject = await createSubject();
       let errors = await subject.validate({ url } as CardSpace);
-      expect(errors.url.length).to.have.length.above(0);
+      expect(errors.url).to.have.length.above(0);
     });
   });
 
