@@ -103,6 +103,13 @@ export default class CardSpaceValidator {
     // Validate URLs
 
     let urlValid = isValidDomain(cardSpace.url!);
+    let urlObject: URL;
+
+    try {
+      urlObject = new URL(`https://${cardSpace.url}`);
+    } catch (_) {
+      urlValid = false;
+    }
 
     if (!urlValid) {
       errors.url.push('Invalid URL');
