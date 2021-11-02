@@ -259,7 +259,7 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   async refreshSafesAndBalances() {
-    if (!this.web3) return;
+    if (!this.isConnected) return;
     await this.safes.fetch();
     await this.safes.updateDepot();
   }
