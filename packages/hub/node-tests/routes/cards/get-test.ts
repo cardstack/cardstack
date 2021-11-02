@@ -90,7 +90,8 @@ if (process.env.COMPILER) {
     });
 
     it.only("can load a simple isolated card's data", async function () {
-      let response = await getCard('https://my-realm/post0').expect(200);
+      let response = await getCard('https://my-realm/post0'); // .expect(200);
+      console.log(JSON.stringify(response.body, null, 2));
 
       expect(response.body).to.have.all.keys('data');
       expect(response.body.data).to.have.all.keys('type', 'id', 'meta', 'attributes');

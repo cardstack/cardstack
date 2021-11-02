@@ -1,4 +1,4 @@
-import { assertValidKeys, NotFound } from '../utils/error';
+import { NotFound, BadRequest } from '../utils/error';
 import { RouterContext } from '@koa/router';
 import { deserialize, serializeCard, serializeCards, serializeRawCard } from '../utils/serialization';
 import { getCardFormatFromRequest } from '../utils/routes';
@@ -8,6 +8,7 @@ import autoBind from 'auto-bind';
 import { parseBody } from '../middleware';
 import { queryParamsToCardQuery } from '../utils/queries';
 import { INSECURE_CONTEXT } from '../services/card-service';
+import { difference } from 'lodash';
 
 const requireCard = function (path: string, root: string): any {
   const module = require.resolve(path, {
@@ -61,11 +62,10 @@ export default class CardRoutes {
       throw new Error('Request body is a string and it shouldnt be');
     }
 
-    assertValidKeys(
-      Object.keys(body),
-      ['adoptsFrom', 'data', 'url'],
-      'Payload contains keys that we do not allow: %list%'
-    );
+    let unexpectedFields = difference(Object.keys(body), ['adoptsFrom', 'data', 'url']);
+    if (unexpectedFields.length) {
+      throw new BadRequest(`Payload contains keys that we do not allow: ${unexpectedFields.join(',')}`);
+    }
 
     let inputData = body.data;
     let format = getCardFormatFromRequest(ctx.query.format);

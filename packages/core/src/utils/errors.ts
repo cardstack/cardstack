@@ -1,5 +1,3 @@
-import { difference } from 'lodash';
-
 interface CardErrorOptions {
   cause?: unknown;
 }
@@ -16,15 +14,6 @@ export class CardError extends Error {
 
   static fromError(error: any, options?: CardErrorOptions): CardError {
     return new CardError(error.message, Object.assign({ cause: error }, options));
-  }
-}
-export class InvalidKeysError extends CardError {}
-
-export function assertValidKeys(actualKeys: string[], expectedKeys: string[], errorMessage: string) {
-  let unexpectedFields = difference(actualKeys, expectedKeys);
-
-  if (unexpectedFields.length) {
-    throw new InvalidKeysError(errorMessage.replace('%list%', '"' + unexpectedFields.join(', ') + '"'));
   }
 }
 

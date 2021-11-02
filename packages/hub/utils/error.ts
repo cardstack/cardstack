@@ -9,7 +9,6 @@
 
 // using npm pkg instead of node built-in module since this needs to work on the browser too.
 import { getStatusText } from 'http-status-codes';
-import { difference } from 'lodash';
 
 interface ErrorDetails {
   status?: number;
@@ -58,12 +57,4 @@ export class BadRequest extends CardstackError {
 export class Conflict extends CardstackError {
   status = 409;
   title = 'Conflict';
-}
-
-export function assertValidKeys(actualKeys: string[], expectedKeys: string[], errorMessage: string) {
-  let unexpectedFields = difference(actualKeys, expectedKeys);
-
-  if (unexpectedFields.length) {
-    throw new BadRequest(errorMessage.replace('%list%', '"' + unexpectedFields.join(', ') + '"'));
-  }
 }

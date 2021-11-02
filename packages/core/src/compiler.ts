@@ -16,7 +16,8 @@ import transformCardComponent, {
 import { Builder, CompiledCard, ComponentInfo, FEATURE_NAMES, Format, FORMATS, RawCard } from './interfaces';
 import { getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
-import { assertValidKeys, CardError } from './utils/errors';
+import { CardError } from './utils/errors';
+import { BadRequest } from '../../hub/utils/error';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -76,11 +77,10 @@ export class Compiler {
     let components = await this.prepareComponents(cardSource, fields, parentCard);
 
     if (cardSource.data) {
-      assertValidKeys(
-        Object.keys(cardSource.data),
-        Object.keys(fields),
-        `Field(s) %list% does not exist on card "${cardSource.url}"`
-      );
+      let unexpectedFields = difference(Object.keys(cardSource.data), Object.keys(fields));
+      if (unexpectedFields.length) {
+        throw new BadRequest(`Fields() ${unexpectedFields.join(',')} does not exist on card "${cardSource.url}"`);
+      }
     }
 
     return {
