@@ -24,11 +24,10 @@ export interface CardStackContext {
 }
 
 export interface RealmInterface {
-  getRawCard(cardURL: string): Promise<RawCard>;
-  updateCardData(cardURL: string, attributes: any): Promise<RawCard>;
-  deleteCard(cardURL: string): void;
-  doesCardExist(cardURL: string): boolean;
-  createDataCard(data: any, adoptsFrom: string | undefined, cardURL?: string): Promise<RawCard>;
+  read(cardURL: string): Promise<RawCard>;
+  create(raw: RawCard | Omit<RawCard, 'url'>): Promise<RawCard>;
+  update(raw: RawCard): Promise<RawCard>;
+  delete(cardURL: string): Promise<void>;
 }
 
 export interface Cache<CardType> {

@@ -4,7 +4,7 @@ export default async function error(ctxt: Koa.Context, next: Koa.Next) {
   try {
     return await next();
   } catch (err: any) {
-    if (!err.isCardstackError) {
+    if (!err.isCardstackError || err.status === 500) {
       throw err;
     }
 

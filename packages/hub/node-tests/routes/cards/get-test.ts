@@ -14,7 +14,7 @@ if (process.env.COMPILER) {
     this.beforeEach(async function () {
       let cards = await getCardService();
 
-      cards.save({
+      await cards.save({
         url: `${REALM}/pet`,
         schema: 'schema.js',
         files: {
@@ -28,7 +28,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      cards.save({
+      await cards.save({
         url: `${REALM}/person`,
         schema: 'schema.js',
         files: {
@@ -44,7 +44,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      cards.save({
+      await cards.save({
         url: `${REALM}/post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
@@ -68,7 +68,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      cards.save({
+      await cards.save({
         url: `${REALM}/post0`,
         adoptsFrom: '../post',
         data: {
