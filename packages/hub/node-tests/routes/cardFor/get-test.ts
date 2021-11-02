@@ -1,23 +1,25 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { ProjectTestRealm } from '../../helpers/cards';
 import { setupServer } from '../../helpers/server';
+
+const REALM = 'https://my-realm';
 
 if (process.env.COMPILER) {
   describe('GET /cardFor/<path>', function () {
-    let realm: ProjectTestRealm;
-
     function getCardForPath(path: string) {
       return request().get(`/cardFor/${path}`);
     }
 
-    let { createRealm, resolveCard, getServer, request } = setupServer(this);
+    let { getCardService, resolveCard, getContainer, request } = setupServer(this, { testRealm: REALM });
 
     this.beforeEach(async function () {
-      realm = await createRealm('https://my-realm');
-      realm.addCard('routes', {
-        'card.json': { schema: 'schema.js' },
-        'schema.js': `
+      let cards = await getCardService();
+
+      await cards.create({
+        url: `${REALM}/routes`,
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
             export default class Routes {
               routeTo(path) {
                 if (path === 'homepage') {
@@ -30,16 +32,24 @@ if (process.env.COMPILER) {
               }
             }
           `,
+        },
       });
-      let cardRoutes = await getServer().container.lookup('card-routes');
+      let cardRoutes = await getContainer().lookup('card-routes');
       cardRoutes.setRoutingCard('https://my-realm/routes');
-      realm.addCard('homepage', {
-        'card.json': { isolated: 'isolated.js' },
-        'isolated.js': templateOnlyComponentTemplate('<h1>Welcome to my homepage</h1>'),
+
+      await cards.create({
+        url: `${REALM}/homepage`,
+        isolated: 'isolated.js',
+        files: {
+          'isolated.js': templateOnlyComponentTemplate('<h1>Welcome to my homepage</h1>'),
+        },
       });
-      realm.addCard('about', {
-        'card.json': { isolated: 'isolated.js' },
-        'isolated.js': templateOnlyComponentTemplate('<div>I like trains</div>'),
+      await cards.create({
+        url: `${REALM}/about`,
+        isolated: 'isolated.js',
+        files: {
+          'isolated.js': templateOnlyComponentTemplate('<div>I like trains</div>'),
+        },
       });
     });
 

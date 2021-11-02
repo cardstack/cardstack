@@ -1,6 +1,5 @@
 /* eslint-disable mocha/no-exclusive-tests */
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { ProjectTestRealm } from '../../helpers/cards';
 import { setupServer } from '../../helpers/server';
 import { map } from 'lodash';
 
@@ -9,115 +8,112 @@ const REALM = 'https://my-realm';
 
 if (process.env.COMPILER) {
   describe.skip('GET /cards/<QUERY>', function () {
-    let realm: ProjectTestRealm;
-
     function get(url: string) {
       return request().get(url);
     }
 
-    let { createRealm, request } = setupServer(this);
+    let { getCardService, request } = setupServer(this, { testRealm: REALM });
 
     this.beforeEach(async function () {
-      realm = await createRealm(REALM);
-
-      realm.addCard('pet', {
-        'card.json': {
-          schema: 'schema.js',
-        },
-        'schema.js': `
-        import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/string";
-        export default class Pet {
-          @contains(string) species;
-        }
-        `,
-      });
-
-      realm.addCard('person', {
-        'card.json': {
-          schema: 'schema.js',
-        },
-        'schema.js': `
-          import { contains } from "@cardstack/types";
-          import string from "https://cardstack.com/base/string";
-          import pet from "https://my-realm/pet";
-          export default class Person {
-            @contains(string) name;
-            @contains(pet) bestFriend;
-          }
-        `,
-      });
-
-      realm.addCard('sue', {
-        'card.json': {
-          adoptsFrom: '../person',
-          data: { name: 'Sue' },
+      let cards = await getCardService();
+      await cards.create({
+        url: `${REALM}/pet`,
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            export default class Pet {
+              @contains(string) species;
+            }
+          `,
         },
       });
 
-      realm.addCard('fancy-person', {
-        'card.json': {
-          adoptsFrom: '../person',
-          isolated: 'isolated.js',
+      await cards.create({
+        url: `${REALM}/person`,
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import pet from "https://my-realm/pet";
+            export default class Person {
+              @contains(string) name;
+              @contains(pet) bestFriend;
+            }
+          `,
         },
-        'isolated.js': templateOnlyComponentTemplate('<h1><@fields.name/></h1>'),
       });
 
-      realm.addCard('bob', {
-        'card.json': {
-          adoptsFrom: '../fancy-person',
-          data: { name: 'Bob' },
+      await cards.create({
+        url: `${REALM}/sue`,
+        adoptsFrom: '../person',
+        data: { name: 'Sue' },
+      });
+
+      await cards.create({
+        url: `${REALM}/fancy-person`,
+        adoptsFrom: '../person',
+        isolated: 'isolated.js',
+        files: {
+          'isolated.js': templateOnlyComponentTemplate('<h1><@fields.name/></h1>'),
         },
       });
 
-      realm.addCard('post', {
-        'card.json': {
-          schema: 'schema.js',
-          isolated: 'isolated.js',
-        },
-        'schema.js': `
-        import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/string";
-        import date from "https://cardstack.com/base/date";
-        import person from 'https://my-realm/person';
-        export default class Post {
-          @contains(string) title;
-          @contains(string) body;
-          @contains(date) createdAt;
-          @contains(string) extra;
-          @contains(person) author;
-        }
-      `,
-        'isolated.js': templateOnlyComponentTemplate(
-          '<h1><@fields.title/></h1><article><@fields.body/><@fields.author.name/><@fields.author.bestFriend.species/>/</article>'
-        ),
+      await cards.create({
+        url: `${REALM}/bob`,
+        adoptsFrom: '../fancy-person',
+        data: { name: 'Bob' },
       });
 
-      realm.addCard('post0', {
-        'card.json': {
-          adoptsFrom: '../post',
-          data: {
-            title: 'Hello World',
-            body: 'First post.',
-            createdAt: '2018-01-01',
-            author: {
-              name: 'Emily',
-              bestFriend: {
-                species: 'dog',
-              },
+      await cards.create({
+        url: `${REALM}/post`,
+        schema: 'schema.js',
+        isolated: 'isolated.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            import date from "https://cardstack.com/base/date";
+            import person from 'https://my-realm/person';
+            export default class Post {
+              @contains(string) title;
+              @contains(string) body;
+              @contains(date) createdAt;
+              @contains(string) extra;
+              @contains(person) author;
+            }
+          `,
+          'isolated.js': templateOnlyComponentTemplate(
+            '<h1><@fields.title/></h1><article><@fields.body/><@fields.author.name/><@fields.author.bestFriend.species/>/</article>'
+          ),
+        },
+      });
+
+      await cards.create({
+        url: `${REALM}/post0`,
+        adoptsFrom: '../post',
+        data: {
+          title: 'Hello World',
+          body: 'First post.',
+          createdAt: '2018-01-01',
+          author: {
+            name: 'Emily',
+            bestFriend: {
+              species: 'dog',
             },
           },
         },
       });
 
-      realm.addCard('post1', {
-        'card.json': {
-          adoptsFrom: '../post',
-          data: {
-            title: 'Hello again',
-            body: 'second post.',
-            createdAt: '2020-01-01',
-          },
+      await cards.create({
+        url: `${REALM}/post1`,
+        adoptsFrom: '../post',
+        data: {
+          title: 'Hello again',
+          body: 'second post.',
+          createdAt: '2020-01-01',
         },
       });
     });

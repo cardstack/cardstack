@@ -42,11 +42,8 @@ export function setupServer(
   });
 
   return {
-    createRealm(_name: string) {
-      throw new Error('DO NOT USE: Refactor away');
-    },
-    async lookup(key: string) {
-      return await server.container.lookup(key);
+    getContainer() {
+      return server.container;
     },
     async getCardService() {
       return (await server.container.lookup('card-service')).as(INSECURE_CONTEXT);

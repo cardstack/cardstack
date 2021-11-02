@@ -1,6 +1,5 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { ProjectTestRealm } from '../../helpers/cards';
 import { setupServer } from '../../helpers/server';
 
 let postFiles = Object.freeze({
@@ -18,10 +17,10 @@ export default class Post {
   'isolated.js': templateOnlyComponentTemplate('<h1><@fields.title/></h1><article><@fields.body/></article>'),
 });
 
+const REALM = 'https://my-realm';
+
 if (process.env.COMPILER) {
   describe('GET /sources/<card-id>', function () {
-    let realm: ProjectTestRealm;
-
     function getSource(cardURL: string, params?: any) {
       let url = `/sources/${encodeURIComponent(cardURL)}`;
       if (params) {
@@ -30,25 +29,23 @@ if (process.env.COMPILER) {
       return request().get(url);
     }
 
-    let { createRealm, request } = setupServer(this);
+    let { getCardService, request } = setupServer(this);
 
     this.beforeEach(async function () {
-      realm = await createRealm('https://my-realm');
-      realm.addCard('post', {
-        'card.json': {
-          schema: 'schema.js',
-          isolated: 'isolated.js',
-        },
-        ...postFiles,
+      let cards = await getCardService();
+      await cards.create({
+        url: `${REALM}/post`,
+        schema: 'schema.js',
+        isolated: 'isolated.js',
+        files: postFiles,
       });
 
-      realm.addCard('post0', {
-        'card.json': {
-          adoptsFrom: '../post',
-          data: {
-            title: 'Hello World',
-            body: 'First post.',
-          },
+      await cards.create({
+        url: `${REALM}/post0`,
+        adoptsFrom: '../post',
+        data: {
+          title: 'Hello World',
+          body: 'First post.',
         },
       });
     });

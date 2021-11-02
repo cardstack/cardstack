@@ -27,14 +27,14 @@ export class CardService {
   ) {}
 
   async load(url: string): Promise<Card> {
-    let rawCard = await this.realmManager.getRawCard(url);
+    let rawCard = await this.realmManager.read(url);
     let card = await this.builder.getCompiledCard(url);
     return { data: rawCard.data, compiled: card };
   }
 
-  async save(raw: RawCard): Promise<Card>;
-  async save(raw: RawCard | Omit<RawCard, 'url'>, params: { realmURL: string }): Promise<Card>;
-  async save(raw: RawCard | Omit<RawCard, 'url'>, params?: { realmURL: string }): Promise<Card> {
+  async create(raw: RawCard): Promise<Card>;
+  async create(raw: RawCard | Omit<RawCard, 'url'>, params: { realmURL: string }): Promise<Card>;
+  async create(raw: RawCard | Omit<RawCard, 'url'>, params?: { realmURL: string }): Promise<Card> {
     let realmURL: string;
     if (params && 'url' in raw) {
       if (!raw.url.startsWith(params.realmURL)) {
@@ -52,10 +52,16 @@ export class CardService {
       realmURL = realm.url;
     }
 
-    // TODO: Now that there is a save that handles everything, we need to update the realm to do the same
-    let rawCard = await this.realmManager.getRealm(realmURL).createDataCard(raw.data, raw.adoptsFrom, raw.url);
+    let rawCard = await this.realmManager.getRealm(realmURL).create(raw);
     let compiled = await this.builder.getCompiledCard(rawCard.url);
+
     return { data: rawCard.data, compiled };
+  }
+
+  async update(raw: RawCard): Promise<Card> {
+    await this.realmManager.update(Object.assign({}, raw, raw));
+    let compiled = await this.builder.getCompiledCard(raw.url);
+    return { data: raw.data, compiled };
   }
 
   query(_query: CardQuery) {

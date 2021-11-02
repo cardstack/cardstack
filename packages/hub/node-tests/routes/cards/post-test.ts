@@ -1,13 +1,13 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { ProjectTestRealm } from '../../helpers/cards';
+import { CardService } from '../../../services/card-service';
 import { setupServer } from '../../helpers/server';
 
 let e = encodeURIComponent;
 if (process.env.COMPILER) {
   describe('POST /cards/<card-id>', function () {
+    let cards: CardService;
     const REALM_NAME = 'https://super-realm.com';
-    let realm: ProjectTestRealm;
 
     function getCard(cardURL: string) {
       return request().get(`/cards/${e(cardURL)}`);
@@ -22,7 +22,7 @@ if (process.env.COMPILER) {
         .send(payload);
     }
 
-    let { createRealm, resolveCard, request } = setupServer(this);
+    let { getCardService, resolveCard, request } = setupServer(this, { testRealm: REALM_NAME });
 
     const PAYLOAD = {
       data: {
@@ -34,22 +34,23 @@ if (process.env.COMPILER) {
     };
 
     this.beforeEach(async function () {
-      realm = await createRealm(REALM_NAME);
+      cards = await getCardService();
 
-      realm.addCard('post', {
-        'card.json': {
-          schema: 'schema.js',
-          isolated: 'isolated.js',
+      await cards.create({
+        url: `${REALM_NAME}/post`,
+        schema: 'schema.js',
+        isolated: 'isolated.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            export default class Post {
+              @contains(string) title;
+              @contains(string) body;
+            }
+          `,
+          'isolated.js': templateOnlyComponentTemplate('<h1><@fields.title/></h1><article><@fields.body/></article>'),
         },
-        'schema.js': `
-        import { contains } from "@cardstack/types";
-        import string from "https://cardstack.com/base/string";
-        export default class Post {
-          @contains(string) title;
-          @contains(string) body;
-        }
-      `,
-        'isolated.js': templateOnlyComponentTemplate('<h1><@fields.title/></h1><article><@fields.body/></article>'),
       });
     });
 
@@ -91,13 +92,12 @@ if (process.env.COMPILER) {
     });
 
     it('Errors when you provide an ID that alreay exists', async function () {
-      realm.addCard('post-is-the-most', {
-        'card.json': {
-          adoptsFrom: '../post',
-          data: {
-            title: 'Hello World',
-            body: 'First post.',
-          },
+      await cards.create({
+        url: `${REALM_NAME}/post-is-the-most`,
+        adoptsFrom: '../post',
+        data: {
+          title: 'Hello World',
+          body: 'First post.',
         },
       });
 

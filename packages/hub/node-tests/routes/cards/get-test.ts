@@ -14,7 +14,7 @@ if (process.env.COMPILER) {
     this.beforeEach(async function () {
       let cards = await getCardService();
 
-      await cards.save({
+      await cards.create({
         url: `${REALM}/pet`,
         schema: 'schema.js',
         files: {
@@ -28,7 +28,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      await cards.save({
+      await cards.create({
         url: `${REALM}/person`,
         schema: 'schema.js',
         files: {
@@ -44,7 +44,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      await cards.save({
+      await cards.create({
         url: `${REALM}/post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
@@ -68,7 +68,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      await cards.save({
+      await cards.create({
         url: `${REALM}/post0`,
         adoptsFrom: '../post',
         data: {
@@ -89,9 +89,9 @@ if (process.env.COMPILER) {
       await getCard('https://some-other-origin.com/thing').expect(404);
     });
 
-    it.only("can load a simple isolated card's data", async function () {
+    it("can load a simple isolated card's data", async function () {
       let response = await getCard('https://my-realm/post0'); // .expect(200);
-      console.log(JSON.stringify(response.body, null, 2));
+      // console.log(JSON.stringify(response.body, null, 2));
 
       expect(response.body).to.have.all.keys('data');
       expect(response.body.data).to.have.all.keys('type', 'id', 'meta', 'attributes');

@@ -70,7 +70,7 @@ export default class CardRoutes {
     let inputData = body.data;
     let format = getCardFormatFromRequest(ctx.query.format);
 
-    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).save(
+    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).create(
       {
         url: inputData.id,
         adoptsFrom: parentCardURL,
@@ -90,12 +90,10 @@ export default class CardRoutes {
     } = ctx;
 
     let data = await deserialize(body);
-    let rawCard = await this.realmManager.updateCardData(url, data.attributes);
-
-    let card = await this.builder.getCompiledCard(url);
+    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).update({ url, data });
 
     // Question: Is it safe to assume the response should be isolated?
-    ctx.body = await serializeCard(url, rawCard.data, card['isolated']);
+    ctx.body = await serializeCard(url, outputData, compiled['isolated']);
     ctx.status = 200;
   }
 
@@ -104,11 +102,7 @@ export default class CardRoutes {
       params: { encodedCardURL: url },
     } = ctx;
 
-    if (!this.realmManager.doesCardExist(url)) {
-      throw new NotFound(`Card ${url} does not exist`);
-    }
-
-    this.realmManager.deleteCard(url);
+    this.realmManager.delete(url);
     this.cache.deleteCard(url);
 
     ctx.status = 204;
@@ -131,7 +125,7 @@ export default class CardRoutes {
       throw new NotFound(`No card defined for route ${pathname}`);
     }
 
-    let rawCard = await this.realmManager.getRawCard(url);
+    let rawCard = await this.realmManager.read(url);
     let card = await this.builder.getCompiledCard(url);
     ctx.body = await serializeCard(url, rawCard.data, card['isolated']);
     ctx.status = 200;
@@ -144,7 +138,7 @@ export default class CardRoutes {
     } = ctx;
 
     let compiledCard;
-    let rawCard = await this.realmManager.getRawCard(url);
+    let rawCard = await this.realmManager.read(url);
 
     if (query.include === 'compiledMeta') {
       compiledCard = await this.builder.getCompiledCard(url);

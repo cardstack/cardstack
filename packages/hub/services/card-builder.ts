@@ -69,8 +69,7 @@ export default class CardBuilder implements BuilderInterface {
   }
 
   async getRawCard(url: string): Promise<RawCard> {
-    url = url.replace(/\/$/, '');
-    return await this.realmManager.getRawCard(url);
+    return await this.realmManager.read(url.replace(/\/$/, ''));
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
@@ -109,7 +108,7 @@ export default class CardBuilder implements BuilderInterface {
 
   async deleteCard(cardURL: string) {
     await this.cache.deleteCard(cardURL);
-    await this.realmManager.deleteCard(cardURL);
+    await this.realmManager.delete(cardURL);
   }
 }
 
