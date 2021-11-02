@@ -11,3 +11,15 @@
 .card-pay-dashboard__token-suppliers > * + * {
   margin-top: var(--boxel-sp-xxl);
 }
+
+.card-pay-dashboard__suppliers-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--boxel-sp-xxl);
+}
+
+.card-pay-dashboard__suppliers-title {
+  font: 600 var(--boxel-font-lg);
+  letter-spacing: var(--boxel-lsp-xs);
+}
