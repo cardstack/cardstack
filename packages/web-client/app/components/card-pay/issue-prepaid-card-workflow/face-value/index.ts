@@ -33,7 +33,7 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
     this.options = await Promise.all(
       this.faceValueOptions.map(async (spendAmount) => {
         let result: string = await this.layer2Network.convertFromSpend(
-          'DAI',
+          this.layer2Network.bridgedDaiTokenSymbol,
           spendAmount
         );
         let approxTokenAmount = Math.ceil(parseFloat(fromWei(result))); // for display only

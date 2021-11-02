@@ -19,6 +19,8 @@ export type TokenSymbol = keyof typeof tokenSymbols;
 export const convertibleSymbols = [
   tokenSymbols.DAI,
   tokenSymbols.CARD,
+  tokenSymbols['DAI.CPXD'],
+  tokenSymbols['CARD.CPXD'],
 ] as const;
 
 // contract/bridging
