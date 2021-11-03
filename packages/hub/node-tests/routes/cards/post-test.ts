@@ -53,7 +53,6 @@ if (process.env.COMPILER) {
         body: { data },
       } = await postCard(`${realm}/post`, PAYLOAD).expect(201).expect('Content-Type', /json/);
 
-      expect(data.id).to.match(/https:\/\/super-realm.com\/\w{15}/);
       expect(data.attributes).to.deep.equal({
         title: 'Blogigidy blog',
         body: 'First post!',
@@ -77,10 +76,10 @@ if (process.env.COMPILER) {
 
     it('can create a new card that provides its own id', async function () {
       let { body } = await postCard(`${realm}/post`, {
-        data: Object.assign({ id: `${realm}/post-it-note` }, PAYLOAD.data),
+        data: Object.assign({ id: `${realm}post-it-note` }, PAYLOAD.data),
       }).expect(201);
 
-      expect(body.data.id).to.be.equal('https://super-realm.com/post-it-note');
+      expect(body.data.id).to.be.equal(`${realm}post-it-note`);
 
       await getCard(body.data.id).expect(200);
     });

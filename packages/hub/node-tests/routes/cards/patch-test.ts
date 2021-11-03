@@ -20,7 +20,7 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realm}/post`,
+        url: `${realm}post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -39,7 +39,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}/post0`,
+        url: `${realm}post0`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -50,7 +50,7 @@ if (process.env.COMPILER) {
 
     it('returns a 404 when trying to update from a card that doesnt exist', async function () {
       // assert.expect(0);
-      await updateCard('https://my-realm/car0', {
+      await updateCard(`${realm}car0`, {
         data: {
           vin: '123',
         },
@@ -58,7 +58,7 @@ if (process.env.COMPILER) {
     });
 
     it('can update an existing card', async function () {
-      let initialResponse = await updateCard('https://my-realm/post0', {
+      let initialResponse = await updateCard(`${realm}post0`, {
         data: {
           attributes: {
             title: 'Goodbye World!',
@@ -71,7 +71,7 @@ if (process.env.COMPILER) {
         body: 'First post',
       });
 
-      let response = await getCard('https://my-realm/post0').expect(200);
+      let response = await getCard(`${realm}post0`).expect(200);
       expect(response.body.data?.attributes).to.deep.equal({
         title: 'Goodbye World!',
         body: 'First post',

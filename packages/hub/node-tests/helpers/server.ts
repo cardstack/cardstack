@@ -10,7 +10,7 @@ import { default as CardServiceFactory, CardService, INSECURE_CONTEXT } from '..
 import tmp from 'tmp';
 tmp.setGracefulCleanup();
 
-const REALM = 'https://my-realm';
+const REALM = 'https://my-realm/';
 
 export function setupServer(
   mochaContext: Mocha.Suite,
