@@ -59,7 +59,7 @@ if (process.env.COMPILER) {
         body: { data },
       } = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201).expect('Content-Type', /json/);
 
-      expect(data.id).to.match(/https:\/\/super-realm.com\/post-\w{15}/);
+      expect(data.id).to.match(/https:\/\/super-realm.com\/\w{15}/);
       expect(data.attributes).to.deep.equal({
         title: 'Blogigidy blog',
         body: 'First post!',
@@ -120,7 +120,7 @@ if (process.env.COMPILER) {
           errors: [
             {
               code: 400,
-              detail: 'Payload contains keys that we do not allow: "isolated"',
+              detail: 'Payload contains keys that we do not allow: isolated',
               title: 'Bad Request',
             },
           ],
