@@ -54,6 +54,9 @@ export function setupServer(
       directory: tmp.dirSync().name,
     });
     currentCardService = await server.container.lookup('card-service');
+
+    // TODO: by the time we return, the cards in all the configured realms (base, have been indexed
+    // await initialIndexing();
   });
 
   mochaContext.afterEach(async function () {

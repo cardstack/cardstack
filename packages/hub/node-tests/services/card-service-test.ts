@@ -3,10 +3,30 @@ import { setupServer } from '../helpers/server';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 if (process.env.COMPILER) {
-  describe.skip('CardService', function () {
+  describe('CardService', function () {
     let { cards, realm } = setupServer(this);
 
     this.beforeEach(async function () {
+      await cards.create({
+        url: `${realm}/person`,
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import string from "https://cardstack.com/base/string";
+            export default class Person {
+              @contains(string) name;
+            }
+          `,
+        },
+      });
+
+      await cards.create({
+        url: `${realm}/sue`,
+        adoptsFrom: '../person',
+        data: { name: 'Sue' },
+      });
+
       await cards.create({
         url: `${realm}post`,
         schema: 'schema.js',
@@ -16,14 +36,16 @@ if (process.env.COMPILER) {
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
             import date from "https://cardstack.com/base/date";
+            import person from "./person";
             export default class Post {
               @contains(string) title;
               @contains(string) body;
               @contains(date) createdAt;
+              @contains(person) author;
             }
           `,
           'isolated.js': templateOnlyComponentTemplate(
-            '<h1><@fields.title/></h1><h2><@fields.createdAt/></h2><article><@fields.body/></article>'
+            '<h1><@fields.title/></h1><h2><@fields.createdAt/> <@field.author.name /> </h2><article><@fields.body/></article>'
           ),
         },
       });
@@ -34,6 +56,9 @@ if (process.env.COMPILER) {
         data: {
           title: 'Hello World',
           body: 'First post.',
+          author: {
+            name: 'Sue',
+          },
           createdAt: new Date(2018, 0, 1),
         },
       });
@@ -49,11 +74,18 @@ if (process.env.COMPILER) {
       });
     });
 
-    it(`can filter on a card's own fields using eq`, async function () {
+    it(`can filter on a card's own fields using gt`, async function () {
       let matching = await cards.query({
         filter: { type: `${realm}post`, range: { createdAt: { gt: '2019-01-01' } } },
       });
       expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`]);
+    });
+
+    it(`can filter on a nested field using eq`, async function () {
+      let matching = await cards.query({
+        filter: { type: `${realm}post`, eq: { 'author.name': 'Sue' } },
+      });
+      expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`]);
     });
   });
 }

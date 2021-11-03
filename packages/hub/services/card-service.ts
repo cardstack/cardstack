@@ -56,12 +56,19 @@ export class CardService {
     let rawCard = await this.realmManager.getRealm(realmURL).create(raw);
     let compiled = await this.builder.getCompiledCard(rawCard.url);
 
+    // TODO:
+    // await updateIndexForThisCardAndEverybodyWhoDependsOnHim()
+
     return { data: rawCard.data, compiled };
   }
 
   async update(raw: RawCard): Promise<Card> {
     await this.realmManager.update(Object.assign({}, raw, raw));
     let compiled = await this.builder.getCompiledCard(raw.url);
+
+    // TODO:
+    // await updateIndexForThisCardAndEverybodyWhoDependsOnHim()
+
     return { data: raw.data, compiled };
   }
 
