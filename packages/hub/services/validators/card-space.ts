@@ -100,38 +100,28 @@ export default class CardSpaceValidator {
       errors.profileCategory.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
     }
 
-    // Validate URLs
-
-    let urlValid = isValidDomain(cardSpace.url!);
-    let urlObject: URL;
-
-    try {
-      urlObject = new URL(`https://${cardSpace.url}`);
-    } catch (_) {
-      urlValid = false;
-    }
-
-    if (!urlValid) {
-      errors.url.push('Can only contain latin letters, numbers, hyphens and underscores');
-    } else {
-      if (!urlObject!.hostname.endsWith('card.space')) {
-        errors.url.push('Only valid card.space subdomains are allowed');
-      }
-    }
-
     if (cardSpace.url) {
       let urlParts = cardSpace.url.split('.');
-      if (urlParts.length > 3) {
-        errors.url.push('Only first level subdomains are allowed');
-      }
-
       let subdomain = urlParts[0];
-      if (this.reservedWords.isReserved(subdomain, this.reservedWords.lowerCaseAlphaNumericTransform)) {
-        errors.url.push('URL unavailable');
-      }
 
-      if (subdomain.length > MAX_SHORT_FIELD_LENGTH) {
+      // do basic string and length checks first before falling back to validity test
+      // to catch other vaguer invalid things
+      if (cardSpace.url === '.card.space') {
+        errors.url.push('Please provide a subdomain');
+      } else if (urlParts.length > 3) {
+        errors.url.push('Can only contain latin letters, numbers, hyphens and underscores');
+      } else if (/[^a-zA-Z0-9-_]/.test(subdomain)) {
+        errors.url.push('Can only contain latin letters, numbers, hyphens and underscores');
+      } else if (cardSpace.url.startsWith('xn--')) {
+        errors.url.push(`Internationalised domain names are not supported`);
+      } else if (subdomain.length > MAX_SHORT_FIELD_LENGTH) {
         errors.url.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
+      } else if (!isValidUrl(`https://${cardSpace.url}`) || !isValidDomain(cardSpace.url)) {
+        errors.url.push('URL is not valid');
+      } else if (!new URL(`https://${cardSpace.url}`).hostname.endsWith('card.space')) {
+        errors.url.push('Only valid card.space subdomains are allowed');
+      } else if (this.reservedWords.isReserved(subdomain, this.reservedWords.lowerCaseAlphaNumericTransform)) {
+        errors.url.push('URL unavailable');
       }
     }
 

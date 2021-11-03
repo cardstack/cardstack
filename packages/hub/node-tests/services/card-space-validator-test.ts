@@ -49,7 +49,7 @@ describe('CardSpaceValidator', function () {
     };
 
     let errors = await subject.validate(cardSpace);
-    expect(errors.url).deep.equal(['Can only contain latin letters, numbers, hyphens and underscores']);
+    expect(errors.url).deep.equal(['URL is not valid']);
     expect(errors.profileImageUrl).deep.equal(['Invalid URL']);
     expect(errors.profileCoverImageUrl).deep.equal(['Invalid URL']);
   });
