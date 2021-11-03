@@ -2,6 +2,7 @@ import { module, test } from 'qunit';
 import { visit } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
 import { a11yAudit } from 'ember-a11y-testing/test-support';
+import percySnapshot from '@percy/ember';
 
 module('Acceptance | accessibility', function (hooks) {
   setupApplicationTest(hooks);
@@ -18,5 +19,7 @@ module('Acceptance | accessibility', function (hooks) {
       },
     });
     assert.ok(true, 'no a11y errors found!');
+
+    await percySnapshot(assert);
   });
 });

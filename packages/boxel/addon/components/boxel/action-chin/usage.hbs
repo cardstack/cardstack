@@ -1,7 +1,9 @@
 <Freestyle::Usage @name="ActionChin">
   <:description>
-  <p>Bottom action area for an action card, a.k.a the "Chin".</p>
-  <p>Use the API controls below to change <code>state</code> and <code>stepNumber</code>.</p>
+    <div class="remove-from-percy">
+      <p>Bottom action area for an action card, a.k.a the "Chin".</p>
+      <p>Use the API controls below to change <code>state</code> and <code>stepNumber</code>.</p>
+    </div>
   </:description>
   <:example>
     <Boxel::ActionChin
@@ -98,12 +100,14 @@
 
 <Freestyle::Usage @name="Usage with customized ActionStatusArea and InfoArea">
   <:description>
-    <p>
-      <code>ActionStatusArea</code> displays custom content in the action chin.
-      It accepts an <code>@icon</code> argument.
-      In the <code>:memorialized</code> block, the icon is a checkmark by default.
-    </p>
-    <p><code>InfoArea</code> replaces the small text area. It can be used with any named block.</p>
+    <div class="remove-from-percy">
+      <p>
+        <code>ActionStatusArea</code> displays custom content in the action chin.
+        It accepts an <code>@icon</code> argument.
+        In the <code>:memorialized</code> block, the icon is a checkmark by default.
+      </p>
+      <p><code>InfoArea</code> replaces the small text area. It can be used with any named block.</p>
+    </div>
   </:description>
   <:example>
     <Boxel::ActionChin @state="in-progress" as |chin|>
@@ -177,7 +181,7 @@
 
 <Freestyle::Usage @name="ActionChin Explanation">
   <:description>
-    <div class="usage-cta-block-explanation">
+    <div class="usage-cta-block-explanation remove-from-percy">
       CTAs are meant to guide users to take a single action.
       There are a few different states for this component:
       <table class="usage-cta-block-explanation-table">

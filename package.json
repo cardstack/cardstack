@@ -49,7 +49,7 @@
     "console:hub": "cd packages/hub && yarn console",
     "start:web-client": "cd packages/web-client && ember serve",
     "test": "npm-run-all --aggregate-output --continue-on-error --parallel test:*",
-    "test:boxel": "cd packages/boxel && ember test",
+    "test:boxel": "cd packages/boxel && percy exec -- ember test",
     "test:boxel:try": "cd packages/boxel && ember try:one",
     "test:hub": "NODE_ENV=test cd packages/hub && yarn test",
     "test:did-resolver": "cd packages/did-resolver && yarn test",

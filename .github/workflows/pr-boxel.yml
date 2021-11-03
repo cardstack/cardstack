@@ -27,6 +27,8 @@ jobs:
         run: |
           yarn --prefer-offline
       - name: Test
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_BOXEL }}
         run: yarn test:boxel
 
   try-scenarios:
