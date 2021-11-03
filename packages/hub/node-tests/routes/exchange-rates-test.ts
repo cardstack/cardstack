@@ -156,7 +156,9 @@ describe('GET /api/exchange-rates', function () {
   it('Allows errors from the exchange rate service through', async function () {
     class CrashingExchangeRatesService extends ExchangeRatesService {
       async fetchExchangeRates(): Promise<FixerFailureResponse> {
-        throw new Error('An error that might occur in caching or fetching');
+        let err = new Error('An error that might occur in caching or fetching');
+        (err as any).intentionalTestError = true;
+        throw err;
       }
     }
     server = await HubServer.create({

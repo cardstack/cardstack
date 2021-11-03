@@ -167,6 +167,9 @@ export class HubServer {
     app.use((await container.lookup('health-check')).routes()); // Setup health-check at "/"
 
     let onError = (err: Error, ctx: Koa.Context) => {
+      if ((err as any).intentionalTestError) {
+        return;
+      }
       this.logger.error(`Unhandled error:`, err);
       Sentry.withScope(function (scope) {
         scope.addEventProcessor(function (event) {
