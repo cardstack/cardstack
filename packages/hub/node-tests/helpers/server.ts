@@ -3,9 +3,12 @@ import Mocha from 'mocha';
 import { HubServer } from '../../main';
 import CardCache from '../../services/card-cache';
 import { Registry } from '@cardstack/di';
-import { TestCardCacheConfig, ProjectTestRealm, resolveCard } from './cards';
+import { TestCardCacheConfig, resolveCard } from './cards';
 import supertest from 'supertest';
 import { INSECURE_CONTEXT } from '../../services/card-service';
+
+import tmp from 'tmp';
+tmp.setGracefulCleanup();
 
 export function setupServer(
   mochaContext: Mocha.Suite,
@@ -33,7 +36,10 @@ export function setupServer(
     }
 
     if (config.testRealm) {
-      return (await server.container.lookup('realm-manager')).createRealm({ url: config.testRealm }, ProjectTestRealm);
+      return (await server.container.lookup('realm-manager')).createRealm({
+        url: config.testRealm,
+        directory: tmp.dirSync().name,
+      });
     }
   });
 
