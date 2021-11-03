@@ -27,9 +27,17 @@ export default class FSRealm implements RealmInterface {
     let dir = this.buildCardPath(cardURL);
     let files: any = {};
 
-    for (let file of walkSync(dir, {
-      directories: false,
-    })) {
+    let entries: string[];
+    try {
+      entries = walkSync(dir, { directories: false });
+    } catch (err: any) {
+      if (err.code !== 'ENOENT') {
+        throw err;
+      }
+      throw new NotFound(`card ${cardURL} not found`);
+    }
+
+    for (let file of entries) {
       let fullPath = join(dir, file);
       files[file] = readFileSync(fullPath, 'utf8');
     }
