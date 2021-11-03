@@ -70,14 +70,15 @@ export default class CardRoutes {
     let inputData = body.data;
     let format = getCardFormatFromRequest(ctx.query.format);
 
-    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).create(
-      {
-        url: inputData.id,
-        adoptsFrom: parentCardURL,
-        data: inputData.attributes,
-      },
-      { realmURL }
-    );
+    let card: any = {
+      adoptsFrom: parentCardURL,
+      data: inputData.attributes,
+    };
+    if (inputData.id) {
+      card.url = inputData.id;
+    }
+
+    let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).create(card, { realmURL });
 
     ctx.body = await serializeCard(compiled.url, outputData, compiled[format]);
     ctx.status = 201;
@@ -89,7 +90,7 @@ export default class CardRoutes {
       params: { encodedCardURL: url },
     } = ctx;
 
-    let data = await deserialize(body);
+    let data = await deserialize(body).attributes;
     let { data: outputData, compiled } = await this.cards.as(INSECURE_CONTEXT).update({ url, data });
 
     // Question: Is it safe to assume the response should be isolated?
@@ -102,7 +103,7 @@ export default class CardRoutes {
       params: { encodedCardURL: url },
     } = ctx;
 
-    this.realmManager.delete(url);
+    await this.realmManager.getRealm(url).delete(url);
     this.cache.deleteCard(url);
 
     ctx.status = 204;
