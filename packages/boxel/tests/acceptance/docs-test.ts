@@ -4,7 +4,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import { a11yAudit } from 'ember-a11y-testing/test-support';
 import percySnapshot from '@percy/ember';
 
-module('Acceptance | accessibility', function (hooks) {
+module('Acceptance | Docs', function (hooks) {
   setupApplicationTest(hooks);
 
   test('accessibility check', async function (assert) {
@@ -19,7 +19,11 @@ module('Acceptance | accessibility', function (hooks) {
       },
     });
     assert.ok(true, 'no a11y errors found!');
+  });
 
-    await percySnapshot(assert);
+  test('percy visual diffs testing', async function (assert) {
+    await visit('/docs');
+    await percySnapshot('Boxel Docs');
+    assert.ok(true, 'percy snapshot taken');
   });
 });
