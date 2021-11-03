@@ -29,7 +29,7 @@ if (process.env.COMPILER) {
       return request().get(url);
     }
 
-    let { getCardService, request } = setupServer(this);
+    let { getCardService, request } = setupServer(this, { testRealm: REALM });
 
     this.beforeEach(async function () {
       let cards = await getCardService();
