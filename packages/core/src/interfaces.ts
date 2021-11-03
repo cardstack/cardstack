@@ -1,7 +1,6 @@
 import difference from 'lodash/difference';
 import type CardModel from './card-model';
 import { CardstackError } from './utils/errors';
-import * as JSON from 'json-typescript';
 
 const componentFormats = {
   isolated: '',
@@ -188,18 +187,4 @@ export interface CardEnv {
   send(operation: CardOperation): Promise<CardJSONResponse>;
   prepareComponent(cardModel: CardModel, component: unknown): unknown;
   tracked(target: CardModel, prop: string, desc: PropertyDescriptor): PropertyDescriptor;
-}
-
-// Taken from previous hub work:
-// https://github.com/cardstack/cardstack/blob/7e7b4d19eec2ea5e727f6f3ea169e523b1c7d06a/packages/hub/query.ts#L8
-export interface CardQuery {
-  filter?: Filter;
-}
-export type Filter = EqFilter | InFilter;
-export interface EqFilter {
-  eq: { [fieldName: string]: JSON.Value };
-}
-
-export interface InFilter {
-  in: { [fieldName: string]: JSON.Value };
 }

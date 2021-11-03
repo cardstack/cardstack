@@ -1,4 +1,5 @@
-import { CardQuery, CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
+import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
+import { Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
 
 // This is a placeholder because we haven't built out different per-user
@@ -64,7 +65,7 @@ export class CardService {
     return { data: raw.data, compiled };
   }
 
-  query(_query: CardQuery) {
+  query(_query: Query): Promise<Card[]> {
     // Query to sql
     throw new Error('Method not implemented.');
   }
