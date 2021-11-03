@@ -8,11 +8,9 @@ if (process.env.COMPILER) {
       return request().get(`/cardFor/${path}`);
     }
 
-    let { getCardService, resolveCard, getContainer, request, realm } = setupServer(this);
+    let { cards, resolveCard, getContainer, request, realm } = setupServer(this);
 
     this.beforeEach(async function () {
-      let cards = await getCardService();
-
       await cards.create({
         url: `${realm}/routes`,
         schema: 'schema.js',

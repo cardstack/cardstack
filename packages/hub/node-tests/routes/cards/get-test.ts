@@ -7,11 +7,9 @@ if (process.env.COMPILER) {
       return request().get(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { getCardService, resolveCard, request, realm } = setupServer(this);
+    let { cards, resolveCard, request, realm } = setupServer(this);
 
     this.beforeEach(async function () {
-      let cards = await getCardService();
-
       await cards.create({
         url: `${realm}/pet`,
         schema: 'schema.js',

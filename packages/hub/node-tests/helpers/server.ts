@@ -5,7 +5,7 @@ import CardCache from '../../services/card-cache';
 import { Registry } from '@cardstack/di';
 import { TestCardCacheConfig, resolveCard } from './cards';
 import supertest from 'supertest';
-import { INSECURE_CONTEXT } from '../../services/card-service';
+import { default as CardServiceFactory, CardService, INSECURE_CONTEXT } from '../../services/card-service';
 
 import tmp from 'tmp';
 tmp.setGracefulCleanup();
@@ -19,6 +19,19 @@ export function setupServer(
   } = {}
 ) {
   let server: HubServer, cardCache: CardCache, cardCacheConfig: TestCardCacheConfig;
+
+  let currentCardService: CardServiceFactory | undefined;
+  let cardServiceProxy = new Proxy(
+    {},
+    {
+      get(_target, propertyName) {
+        if (!currentCardService) {
+          throw new Error(`tried to use cardService outside of an active test`);
+        }
+        return (currentCardService.as(INSECURE_CONTEXT) as any)[propertyName];
+      },
+    }
+  );
 
   mochaContext.beforeEach(async function () {
     let registryCallback = function (registry: Registry) {
@@ -40,19 +53,19 @@ export function setupServer(
       url: REALM,
       directory: tmp.dirSync().name,
     });
+    currentCardService = await server.container.lookup('card-service');
   });
 
   mochaContext.afterEach(async function () {
     await server.teardown();
+    currentCardService = undefined;
   });
 
   return {
     getContainer() {
       return server.container;
     },
-    async getCardService() {
-      return (await server.container.lookup('card-service')).as(INSECURE_CONTEXT);
-    },
+    cards: cardServiceProxy as CardService,
     getServer(): HubServer {
       return server;
     },

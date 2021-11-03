@@ -1,12 +1,10 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { CardService } from '../../../services/card-service';
 import { setupServer } from '../../helpers/server';
 
 let e = encodeURIComponent;
 if (process.env.COMPILER) {
   describe('POST /cards/<card-id>', function () {
-    let cards: CardService;
     function getCard(cardURL: string) {
       return request().get(`/cards/${e(cardURL)}`);
     }
@@ -20,7 +18,7 @@ if (process.env.COMPILER) {
         .send(payload);
     }
 
-    let { getCardService, resolveCard, request, realm } = setupServer(this);
+    let { cards, resolveCard, request, realm } = setupServer(this);
 
     const PAYLOAD = {
       data: {
@@ -32,8 +30,6 @@ if (process.env.COMPILER) {
     };
 
     this.beforeEach(async function () {
-      cards = await getCardService();
-
       await cards.create({
         url: `${realm}/post`,
         schema: 'schema.js',

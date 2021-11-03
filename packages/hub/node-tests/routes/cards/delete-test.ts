@@ -15,10 +15,9 @@ if (process.env.COMPILER) {
       return request().del(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { getContainer, getCardService, getCardCache, request, realm } = setupServer(this);
+    let { getContainer, cards, getCardCache, request, realm } = setupServer(this);
 
     this.beforeEach(async function () {
-      let cards = await getCardService();
       await cards.create({
         url: `${realm}/post`,
         schema: 'schema.js',

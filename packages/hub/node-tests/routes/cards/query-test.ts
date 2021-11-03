@@ -11,60 +11,59 @@ if (process.env.COMPILER) {
       return request().get(url);
     }
 
-    let { getCardService, request, realm } = setupServer(this);
+    let { cards, request, realm } = setupServer(this);
 
     this.beforeEach(async function () {
-      let cards = await getCardService();
-      await cards.create({
-        url: `${realm}/pet`,
-        schema: 'schema.js',
-        files: {
-          'schema.js': `
-            import { contains } from "@cardstack/types";
-            import string from "https://cardstack.com/base/string";
-            export default class Pet {
-              @contains(string) species;
-            }
-          `,
-        },
-      });
+      // await cards.create({
+      //   url: `${realm}/pet`,
+      //   schema: 'schema.js',
+      //   files: {
+      //     'schema.js': `
+      //       import { contains } from "@cardstack/types";
+      //       import string from "https://cardstack.com/base/string";
+      //       export default class Pet {
+      //         @contains(string) species;
+      //       }
+      //     `,
+      //   },
+      // });
 
-      await cards.create({
-        url: `${realm}/person`,
-        schema: 'schema.js',
-        files: {
-          'schema.js': `
-            import { contains } from "@cardstack/types";
-            import string from "https://cardstack.com/base/string";
-            import pet from "https://my-realm/pet";
-            export default class Person {
-              @contains(string) name;
-              @contains(pet) bestFriend;
-            }
-          `,
-        },
-      });
+      // await cards.create({
+      //   url: `${realm}/person`,
+      //   schema: 'schema.js',
+      //   files: {
+      //     'schema.js': `
+      //       import { contains } from "@cardstack/types";
+      //       import string from "https://cardstack.com/base/string";
+      //       import pet from "https://my-realm/pet";
+      //       export default class Person {
+      //         @contains(string) name;
+      //         @contains(pet) bestFriend;
+      //       }
+      //     `,
+      //   },
+      // });
 
-      await cards.create({
-        url: `${realm}/sue`,
-        adoptsFrom: '../person',
-        data: { name: 'Sue' },
-      });
+      // await cards.create({
+      //   url: `${realm}/sue`,
+      //   adoptsFrom: '../person',
+      //   data: { name: 'Sue' },
+      // });
 
-      await cards.create({
-        url: `${realm}/fancy-person`,
-        adoptsFrom: '../person',
-        isolated: 'isolated.js',
-        files: {
-          'isolated.js': templateOnlyComponentTemplate('<h1><@fields.name/></h1>'),
-        },
-      });
+      // await cards.create({
+      //   url: `${realm}/fancy-person`,
+      //   adoptsFrom: '../person',
+      //   isolated: 'isolated.js',
+      //   files: {
+      //     'isolated.js': templateOnlyComponentTemplate('<h1><@fields.name/></h1>'),
+      //   },
+      // });
 
-      await cards.create({
-        url: `${realm}/bob`,
-        adoptsFrom: '../fancy-person',
-        data: { name: 'Bob' },
-      });
+      // await cards.create({
+      //   url: `${realm}/bob`,
+      //   adoptsFrom: '../fancy-person',
+      //   data: { name: 'Bob' },
+      // });
 
       await cards.create({
         url: `${realm}/post`,
@@ -157,7 +156,7 @@ if (process.env.COMPILER) {
       ]);
     });
 
-    it.skip('can query for cards after a certain date', async function () {
+    it('can query for cards after a certain date', async function () {
       // TODO: What would the query look like?
       let response = await get(`/cards/?=true`).expect(200);
 

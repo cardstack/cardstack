@@ -27,10 +27,9 @@ if (process.env.COMPILER) {
       return request().get(url);
     }
 
-    let { getCardService, request, realm } = setupServer(this);
+    let { cards, request, realm } = setupServer(this);
 
     this.beforeEach(async function () {
-      let cards = await getCardService();
       await cards.create({
         url: `${realm}/post`,
         schema: 'schema.js',
