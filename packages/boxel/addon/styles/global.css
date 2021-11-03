@@ -91,11 +91,12 @@ select:focus {
     visibility: hidden;
   }
 
+  .remove-from-percy {
+    display: none;
+  }
+
   .FreestyleGuide .FreestyleGuide-header,
   .FreestyleUsage-description,
-  .FreestyleUsage-description p,
-  .FreestyleUsage-description div,
-  .FreestyleUsage-description table,
   .FreestyleSection-name,
   .FreestyleUsage-api,
   .FreestyleUsage-sourceContainer,
