@@ -37,7 +37,7 @@ export class ProjectTestRealm extends FSRealm {
   project: Project;
 
   constructor(config: RealmConfig, manager: RealmManager) {
-    let project = new Project(config.url);
+    let project = new Project(config.url.replace(/\/$/, ''));
     project.writeSync();
     config.directory = project.baseDir;
     super(config, manager);
@@ -53,7 +53,7 @@ export class ProjectTestRealm extends FSRealm {
   addRawCard(card: RawCard) {
     let c: any = Object.assign({}, card);
     let files = c.files || {};
-    let url = c.url.replace(this.url + '/', '');
+    let url = c.url.replace(this.url, '');
     delete c.files;
     delete c.url;
     files['card.json'] = c;

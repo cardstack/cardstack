@@ -11,6 +11,7 @@ export default class RealmManager implements Omit<RealmInterface, 'create'> {
   realms: FSRealm[] = realmsConfig.map((realm) => new FSRealm(realm, this));
 
   createRealm(config: RealmConfig, klass?: any) {
+    config.url = ensureTrailingSlash(config.url);
     let realm = klass ? new klass(config, this) : new FSRealm(config, this);
     this.realms.push(realm);
     return realm;
