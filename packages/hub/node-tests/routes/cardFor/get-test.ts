@@ -2,21 +2,19 @@ import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/tem
 import { expect } from 'chai';
 import { setupServer } from '../../helpers/server';
 
-const REALM = 'https://my-realm';
-
 if (process.env.COMPILER) {
   describe('GET /cardFor/<path>', function () {
     function getCardForPath(path: string) {
       return request().get(`/cardFor/${path}`);
     }
 
-    let { getCardService, resolveCard, getContainer, request } = setupServer(this, { testRealm: REALM });
+    let { getCardService, resolveCard, getContainer, request, realm } = setupServer(this);
 
     this.beforeEach(async function () {
       let cards = await getCardService();
 
       await cards.create({
-        url: `${REALM}/routes`,
+        url: `${realm}/routes`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -38,14 +36,14 @@ if (process.env.COMPILER) {
       cardRoutes.setRoutingCard('https://my-realm/routes');
 
       await cards.create({
-        url: `${REALM}/homepage`,
+        url: `${realm}/homepage`,
         isolated: 'isolated.js',
         files: {
           'isolated.js': templateOnlyComponentTemplate('<h1>Welcome to my homepage</h1>'),
         },
       });
       await cards.create({
-        url: `${REALM}/about`,
+        url: `${realm}/about`,
         isolated: 'isolated.js',
         files: {
           'isolated.js': templateOnlyComponentTemplate('<div>I like trains</div>'),

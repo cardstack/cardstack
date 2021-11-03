@@ -7,8 +7,6 @@ let e = encodeURIComponent;
 if (process.env.COMPILER) {
   describe('POST /cards/<card-id>', function () {
     let cards: CardService;
-    const REALM_NAME = 'https://super-realm.com';
-
     function getCard(cardURL: string) {
       return request().get(`/cards/${e(cardURL)}`);
     }
@@ -16,13 +14,13 @@ if (process.env.COMPILER) {
     function postCard(parentCardURL: string, payload: any) {
       // localhost/cards/https%3A%2F%2Fdemo.com%2F/https%3A%2F%2Fbase%2Fbase
       return request()
-        .post(`/cards/${e(REALM_NAME)}/${e(parentCardURL)}`)
+        .post(`/cards/${e(realm)}/${e(parentCardURL)}`)
         .set('Content-Type', 'application/json')
         .set('Accept', 'application/json')
         .send(payload);
     }
 
-    let { getCardService, resolveCard, request } = setupServer(this, { testRealm: REALM_NAME });
+    let { getCardService, resolveCard, request, realm } = setupServer(this);
 
     const PAYLOAD = {
       data: {
@@ -37,7 +35,7 @@ if (process.env.COMPILER) {
       cards = await getCardService();
 
       await cards.create({
-        url: `${REALM_NAME}/post`,
+        url: `${realm}/post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -57,7 +55,7 @@ if (process.env.COMPILER) {
     it('can create a new card that adopts off an another card', async function () {
       let {
         body: { data },
-      } = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201).expect('Content-Type', /json/);
+      } = await postCard(`${realm}/post`, PAYLOAD).expect(201).expect('Content-Type', /json/);
 
       expect(data.id).to.match(/https:\/\/super-realm.com\/\w{15}/);
       expect(data.attributes).to.deep.equal({
@@ -72,9 +70,9 @@ if (process.env.COMPILER) {
     });
 
     it('Changes the ID every time', async function () {
-      let card1 = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
-      let card2 = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
-      let card3 = await postCard(`${REALM_NAME}/post`, PAYLOAD).expect(201);
+      let card1 = await postCard(`${realm}/post`, PAYLOAD).expect(201);
+      let card2 = await postCard(`${realm}/post`, PAYLOAD).expect(201);
+      let card3 = await postCard(`${realm}/post`, PAYLOAD).expect(201);
 
       expect(card1.body.data.id).to.not.equal(card2.body.data.id);
       expect(card1.body.data.id).to.not.equal(card3.body.data.id);
@@ -82,8 +80,8 @@ if (process.env.COMPILER) {
     });
 
     it('can create a new card that provides its own id', async function () {
-      let { body } = await postCard(`${REALM_NAME}/post`, {
-        data: Object.assign({ id: `${REALM_NAME}/post-it-note` }, PAYLOAD.data),
+      let { body } = await postCard(`${realm}/post`, {
+        data: Object.assign({ id: `${realm}/post-it-note` }, PAYLOAD.data),
       }).expect(201);
 
       expect(body.data.id).to.be.equal('https://super-realm.com/post-it-note');
@@ -93,7 +91,7 @@ if (process.env.COMPILER) {
 
     it('Errors when you provide an ID that alreay exists', async function () {
       await cards.create({
-        url: `${REALM_NAME}/post-is-the-most`,
+        url: `${realm}/post-is-the-most`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -101,8 +99,8 @@ if (process.env.COMPILER) {
         },
       });
 
-      let response = await postCard(`${REALM_NAME}/post`, {
-        data: Object.assign({ id: `${REALM_NAME}/post-is-the-most` }, PAYLOAD.data),
+      let response = await postCard(`${realm}/post`, {
+        data: Object.assign({ id: `${realm}/post-is-the-most` }, PAYLOAD.data),
       });
       expect(response.status).to.equal(409);
     });
@@ -114,7 +112,7 @@ if (process.env.COMPILER) {
 
     it('Errors when you try to include other fields', async function () {
       // assert.expect(0);
-      await postCard(`${REALM_NAME}/post`, Object.assign({ isolated: 'isolated.js' }, PAYLOAD))
+      await postCard(`${realm}/post`, Object.assign({ isolated: 'isolated.js' }, PAYLOAD))
         .expect(400)
         .expect({
           errors: [
@@ -129,7 +127,7 @@ if (process.env.COMPILER) {
 
     it('errors when you try to post attributes that dont exist on parent card', async function () {
       // assert.expect(0);
-      await postCard(`${REALM_NAME}/post`, {
+      await postCard(`${realm}/post`, {
         data: {
           attributes: {
             pizza: 'Hello World',

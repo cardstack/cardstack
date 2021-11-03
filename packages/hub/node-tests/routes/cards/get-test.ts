@@ -1,21 +1,19 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { setupServer } from '../../helpers/server';
 
-const REALM = 'https://my-realm';
-
 if (process.env.COMPILER) {
   describe('GET /cards/<card-id>', function () {
     function getCard(cardURL: string) {
       return request().get(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { getCardService, resolveCard, request } = setupServer(this, { testRealm: REALM });
+    let { getCardService, resolveCard, request, realm } = setupServer(this);
 
     this.beforeEach(async function () {
       let cards = await getCardService();
 
       await cards.create({
-        url: `${REALM}/pet`,
+        url: `${realm}/pet`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -29,13 +27,13 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${REALM}/person`,
+        url: `${realm}/person`,
         schema: 'schema.js',
         files: {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
-            import pet from "${REALM}/pet";
+            import pet from "${realm}/pet";
             export default class Person {
               @contains(string) name;
               @contains(pet) bestFriend;
@@ -45,7 +43,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${REALM}/post`,
+        url: `${realm}/post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -53,7 +51,7 @@ if (process.env.COMPILER) {
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
             import datetime from "https://cardstack.com/base/datetime";
-            import person from '${REALM}/person';
+            import person from '${realm}/person';
             export default class Post {
               @contains(string) title;
               @contains(string) body;
@@ -69,7 +67,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${REALM}/post0`,
+        url: `${realm}/post0`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',

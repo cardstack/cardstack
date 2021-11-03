@@ -17,8 +17,6 @@ export default class Post {
   'isolated.js': templateOnlyComponentTemplate('<h1><@fields.title/></h1><article><@fields.body/></article>'),
 });
 
-const REALM = 'https://my-realm';
-
 if (process.env.COMPILER) {
   describe('GET /sources/<card-id>', function () {
     function getSource(cardURL: string, params?: any) {
@@ -29,19 +27,19 @@ if (process.env.COMPILER) {
       return request().get(url);
     }
 
-    let { getCardService, request } = setupServer(this, { testRealm: REALM });
+    let { getCardService, request, realm } = setupServer(this);
 
     this.beforeEach(async function () {
       let cards = await getCardService();
       await cards.create({
-        url: `${REALM}/post`,
+        url: `${realm}/post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: postFiles,
       });
 
       await cards.create({
-        url: `${REALM}/post0`,
+        url: `${realm}/post0`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',

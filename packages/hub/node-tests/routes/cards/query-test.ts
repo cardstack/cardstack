@@ -4,7 +4,6 @@ import { setupServer } from '../../helpers/server';
 import { map } from 'lodash';
 
 const CS_REALM = 'https://cardstack.com/base';
-const REALM = 'https://my-realm';
 
 if (process.env.COMPILER) {
   describe.skip('GET /cards/<QUERY>', function () {
@@ -12,12 +11,12 @@ if (process.env.COMPILER) {
       return request().get(url);
     }
 
-    let { getCardService, request } = setupServer(this, { testRealm: REALM });
+    let { getCardService, request, realm } = setupServer(this);
 
     this.beforeEach(async function () {
       let cards = await getCardService();
       await cards.create({
-        url: `${REALM}/pet`,
+        url: `${realm}/pet`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -31,7 +30,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${REALM}/person`,
+        url: `${realm}/person`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -47,13 +46,13 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${REALM}/sue`,
+        url: `${realm}/sue`,
         adoptsFrom: '../person',
         data: { name: 'Sue' },
       });
 
       await cards.create({
-        url: `${REALM}/fancy-person`,
+        url: `${realm}/fancy-person`,
         adoptsFrom: '../person',
         isolated: 'isolated.js',
         files: {
@@ -62,13 +61,13 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${REALM}/bob`,
+        url: `${realm}/bob`,
         adoptsFrom: '../fancy-person',
         data: { name: 'Bob' },
       });
 
       await cards.create({
-        url: `${REALM}/post`,
+        url: `${realm}/post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -92,7 +91,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${REALM}/post0`,
+        url: `${realm}/post0`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -108,7 +107,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${REALM}/post1`,
+        url: `${realm}/post1`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello again',
@@ -128,11 +127,11 @@ if (process.env.COMPILER) {
     // TODO: query on author first name field
 
     it('can query for cards that are valid versions of another card', async function () {
-      let response = await get(`/cards/?adoptsFrom=${REALM}/person`).expect(200);
+      let response = await get(`/cards/?adoptsFrom=${realm}/person`).expect(200);
 
       expect(response.body).to.have.all.keys('data');
       expect(response.body.data).to.be.an('array').and.have.lengthOf(3);
-      expect(map(response.body.data, 'id')).to.deep.equal([`${REALM}/sue`, `${REALM}/bob`, `${REALM}/fancy-person`]);
+      expect(map(response.body.data, 'id')).to.deep.equal([`${realm}/sue`, `${realm}/bob`, `${realm}/fancy-person`]);
       expect(response.body.data[0]).to.have.all.keys('type', 'id', 'meta', 'attributes');
       // expect(response.body.data?.meta.componentModule).to.not.be.undefined;
     });
@@ -140,10 +139,10 @@ if (process.env.COMPILER) {
     // TODO: Use JSONAPI filter query param for fields, but not neccessarily "system" fields like adoptsFrom
     // TODO: Data isn't the right boundary. Consider using realm instead.
     it('can query for cards that are valid versions of another card and that include data ', async function () {
-      let response = await get(`/cards/?adoptsFrom=${REALM}/person&hasData=true`).expect(200);
+      let response = await get(`/cards/?adoptsFrom=${realm}/person&hasData=true`).expect(200);
 
       expect(response.body.data).to.be.an('array').and.have.lengthOf(1);
-      expect(map(response.body.data, 'id')).to.deep.equal([`${REALM}/bob`, `${REALM}/sue`]);
+      expect(map(response.body.data, 'id')).to.deep.equal([`${realm}/bob`, `${realm}/sue`]);
     });
 
     // TODO: Rather than primitives, we will have something a "collection" in the base realm called "Default Fields"
@@ -162,7 +161,7 @@ if (process.env.COMPILER) {
       // TODO: What would the query look like?
       let response = await get(`/cards/?=true`).expect(200);
 
-      expect(map(response.body.data, 'id')).to.deep.equal([`${REALM}/post1`]);
+      expect(map(response.body.data, 'id')).to.deep.equal([`${realm}/post1`]);
     });
   });
 }

@@ -5,8 +5,6 @@ import { existsSync } from 'fs-extra';
 import { expect } from 'chai';
 import { setupServer } from '../../helpers/server';
 
-const REALM = 'https://my-realm';
-
 if (process.env.COMPILER) {
   describe('DELETE /cards/<card-id>', function () {
     function getCard(cardURL: string) {
@@ -17,12 +15,12 @@ if (process.env.COMPILER) {
       return request().del(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { getContainer, getCardService, getCardCache, request } = setupServer(this, { testRealm: REALM });
+    let { getContainer, getCardService, getCardCache, request, realm } = setupServer(this);
 
     this.beforeEach(async function () {
       let cards = await getCardService();
       await cards.create({
-        url: `${REALM}/post`,
+        url: `${realm}/post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -41,7 +39,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${REALM}/post0`,
+        url: `${realm}/post0`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -66,9 +64,9 @@ if (process.env.COMPILER) {
       ).to.be.false;
 
       // TODO: Can we make getRealm return the corrent realm type?
-      let realm = (await getContainer().lookup('realm-manager')).getRealm(REALM);
+      let fsrealm = (await getContainer().lookup('realm-manager')).getRealm(realm);
 
-      expect(existsSync(join(realm.directory, 'post0')), 'card is deleted from realm').to.be.false;
+      expect(existsSync(join(fsrealm.directory, 'post0')), 'card is deleted from realm').to.be.false;
     });
   });
 }

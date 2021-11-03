@@ -10,11 +10,12 @@ import { INSECURE_CONTEXT } from '../../services/card-service';
 import tmp from 'tmp';
 tmp.setGracefulCleanup();
 
+const REALM = 'https://my-realm';
+
 export function setupServer(
   mochaContext: Mocha.Suite,
   config: {
     registryCallback?: HubServerConfig['registryCallback'];
-    testRealm?: string;
   } = {}
 ) {
   let server: HubServer, cardCache: CardCache, cardCacheConfig: TestCardCacheConfig;
@@ -35,12 +36,10 @@ export function setupServer(
       cardCacheConfig = (await server.container.lookup('card-cache-config')) as TestCardCacheConfig;
     }
 
-    if (config.testRealm) {
-      return (await server.container.lookup('realm-manager')).createRealm({
-        url: config.testRealm,
-        directory: tmp.dirSync().name,
-      });
-    }
+    (await server.container.lookup('realm-manager')).createRealm({
+      url: REALM,
+      directory: tmp.dirSync().name,
+    });
   });
 
   mochaContext.afterEach(async function () {
@@ -65,6 +64,9 @@ export function setupServer(
     },
     resolveCard(module: string): string {
       return resolveCard(cardCacheConfig.root, module);
+    },
+    get realm() {
+      return REALM;
     },
   };
 }
