@@ -1,7 +1,9 @@
 import Component from '@glimmer/component';
 
+export type InputValidationState = 'valid' | 'invalid' | 'loading' | 'initial';
+
 interface ValidationStateInputArgs {
-  state: 'valid' | 'invalid' | 'loading' | 'initial';
+  state: InputValidationState;
 }
 
 export default class ValidationStateInput extends Component<ValidationStateInputArgs> {

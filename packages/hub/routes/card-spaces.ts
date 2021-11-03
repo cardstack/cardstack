@@ -170,12 +170,12 @@ export default class CardSpacesRoute {
     ctx.type = 'application/vnd.api+json';
   }
 
-  async getUrlValidation(ctx: Koa.Context) {
+  async postUrlValidation(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;
     }
 
-    let url: string = ctx.params.url;
+    let url: string = ctx.request.body.data.attributes.url;
     let errors = await this.cardSpaceValidator.validate({ url } as CardSpace);
 
     ctx.status = 200;

@@ -2,6 +2,8 @@ import autoBind from 'auto-bind';
 import forbiddenIds from '../assets/forbidden-ids.json';
 
 export default class ReservedWords {
+  lowerCaseAlphaNumericTransform = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+
   constructor() {
     autoBind(this);
   }
