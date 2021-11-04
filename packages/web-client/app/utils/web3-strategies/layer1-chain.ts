@@ -260,8 +260,15 @@ export default abstract class Layer1ChainWeb3Strategy
     this.cardBalance = new BN(cardBalance);
   }
 
-  private getErc20Balance(contract: Contract) {
-    return contract.methods.balanceOf(this.walletInfo.firstAddress).call();
+  private async previousBlockNumber(): Promise<number> {
+    // Used to prevent block mismatch errors in infura  https://github.com/88mphapp/ng88mph-frontend/issues/55#issuecomment-940414832
+    return (await this.web3!.eth.getBlockNumber()) - 1;
+  }
+
+  private async getErc20Balance(contract: Contract) {
+    return contract.methods
+      .balanceOf(this.walletInfo.firstAddress)
+      .call({}, await this.previousBlockNumber());
   }
 
   private async getDefaultTokenBalance() {
@@ -269,7 +276,7 @@ export default abstract class Layer1ChainWeb3Strategy
     if (this.walletInfo.firstAddress)
       return await this.web3.eth.getBalance(
         this.walletInfo.firstAddress,
-        'latest'
+        await this.previousBlockNumber()
       );
     else return 0;
   }
