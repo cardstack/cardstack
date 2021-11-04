@@ -28,7 +28,7 @@ export function makeTestMessage({
   user: MockUser;
   channel?: MockChannel;
   guild?: MockGuild;
-  userRoles?: Collection<NamedCurve, MockRole>;
+  userRoles?: Collection<string, MockRole>;
   onReply?: MockMessage['reply'];
   onCreateDM?: MockGuildMember['createDM'];
 }): MockMessage {

@@ -54,6 +54,7 @@ import CallbacksRouter from './services/callbacks-router';
 import HealthCheck from './services/health-check';
 import NonceTracker from './services/nonce-tracker';
 import ReservedWords from './services/reserved-words';
+import CardpaySDKService from './services/cardpay-sdk';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import Web3Service from './services/web3';
@@ -82,6 +83,7 @@ export function createContainer(registryCallback?: RegistryCallback): Container 
   registry.register('authentication-utils', AuthenticationUtils);
   registry.register('boom-route', BoomRoute);
   registry.register('callbacks-router', CallbacksRouter);
+  registry.register('cardpay', CardpaySDKService);
   registry.register('clock', Clock);
   registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);

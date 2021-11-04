@@ -1,4 +1,4 @@
-import { getConstantByNetwork, getSDK } from '@cardstack/cardpay-sdk';
+import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
 import config from 'config';
 import Bot, { Command, Message, MessageEmbed } from '@cardstack/discord-bot';
 import logger from '@cardstack/logger';
@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/node';
 import { basename, join } from 'path';
 import {
   getBetaTester,
+  setBetaTester,
   setBetaTesterAddress,
   setBetaTesterAirdropPrepaidCard,
   setBetaTesterAirdropTxnHash,
@@ -67,6 +68,7 @@ export const run: Command['run'] = async (bot: Bot, message: Message, args: stri
       address = betaTester.address;
     }
 
+    await setBetaTester(db, userId, message.author.username);
     Sentry.addBreadcrumb({ message: `captured user address for prepaid card airdrop ${address} of sku ${sku}` });
     await setBetaTesterAddress(db, userId, address);
     if (!(await checkInventory(message, bot))) {
@@ -87,7 +89,7 @@ export const run: Command['run'] = async (bot: Bot, message: Message, args: stri
       );
 
       let web3 = await bot.web3.getInstance();
-      let marketAPI = await getSDK('PrepaidCardMarket', web3);
+      let marketAPI = await bot.cardpay.getSDK('PrepaidCardMarket', web3);
       let prepaidCard = await marketAPI.getPrepaidCardFromProvisionTxnHash(txnHash);
       Sentry.addBreadcrumb({
         message: `obtained prepaid card address for prepaid card airdrop to ${address}: ${prepaidCard.address}`,
