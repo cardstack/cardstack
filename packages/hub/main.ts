@@ -6,6 +6,7 @@ import { environment, httpLogging, errorMiddleware } from './middleware';
 import cors from '@koa/cors';
 import fetch from 'node-fetch';
 import * as Sentry from '@sentry/node';
+import { Memoize } from 'typescript-memoize';
 
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
@@ -72,7 +73,7 @@ import CardService from './services/card-service';
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
 
-export function createContainer(additionalRegistrations?: Record<string, any>): Container {
+export function createRegistry(): Registry {
   let registry = new Registry();
   registry.register('api-router', ApiRouter);
   registry.register('authentication-middleware', AuthenticationMiddleware);
@@ -125,14 +126,24 @@ export function createContainer(additionalRegistrations?: Record<string, any>): 
     registry.register('card-cache-config', CardCacheConfig);
     registry.register('card-cache', CardCache);
     registry.register('card-routes', CardRoutes);
+    registry.register(
+      'card-routes-config',
+      class {
+        routeCard = config.has('compiler.routeCard') ? config.get('compiler.routeCard') : undefined;
+      }
+    );
     registry.register('card-builder', CardBuilder);
     registry.register('card-watcher', CardWatcher);
   }
 
+  return registry;
+}
+
+export function createContainer(additionalRegistrations?: Record<string, any>): Container {
+  let registry = createRegistry();
   for (const key in additionalRegistrations) {
     registry.register(key, additionalRegistrations[key]);
   }
-
   return new Container(registry);
 }
 
@@ -144,13 +155,15 @@ export class HubServer {
   private devProxy = inject('development-proxy-middleware', { as: 'devProxy' });
   private apiRouter = inject('api-router', { as: 'apiRouter' });
   private callbacksRouter = inject('callbacks-router', { as: 'callbacksRouter' });
-  private cardRoutes = inject('card-routes', { as: 'card-routes' });
-  private healthCheck = inject('health-check', { as: 'health-check' });
-  private app: Koa<Koa.DefaultState, Koa.Context>;
+  private cardRoutes = inject('card-routes', { as: 'cardRoutes' });
+  private healthCheck = inject('health-check', { as: 'healthCheck' });
 
   constructor() {
     initSentry();
+  }
 
+  @Memoize()
+  get app(): Koa<Koa.DefaultState, Koa.Context> {
     let app = new Koa<Koa.DefaultState, Koa.Context>()
       .use(errorMiddleware)
       .use(environment)
@@ -168,7 +181,7 @@ export class HubServer {
 
     app.use(this.healthCheck.routes()); // Setup health-check at "/"
     app.on('error', this.onError.bind(this));
-    this.app = app;
+    return app;
   }
 
   private onError(err: Error, ctx: Koa.Context) {
@@ -197,10 +210,6 @@ export class HubServer {
     });
 
     return instance;
-  }
-
-  get testCallback() {
-    return this.app.callback;
   }
 
   async primeCache() {

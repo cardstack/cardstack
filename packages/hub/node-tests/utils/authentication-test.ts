@@ -1,5 +1,5 @@
 import { AcceleratableClock } from '../helpers';
-import { setupHub } from '../helpers/server';
+import { setupHub, registry } from '../helpers/server';
 
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -87,11 +87,15 @@ describe('AuthenticationUtils', function () {
         subject.validateAuthToken(authTagTamperedAuthToken);
       }).to.throw('Invalid authentication tag length: 0');
     });
+  });
 
+  describe('AuthenticationUtils expired', function () {
+    this.beforeEach(function () {
+      registry(this).register('clock', AcceleratableClock);
+    });
+    let { getContainer } = setupHub(this);
     it('validateAuthToken with expired token throws', async function () {
-      getContainer().register('clock', AcceleratableClock);
       let subject = await getContainer().lookup('authentication-utils');
-
       let authToken = subject.buildAuthToken('0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13');
       (subject.clock as AcceleratableClock).acceleratedByMs = 1000 * 60 * 60 * 25; // 25 hours
       expect(function () {

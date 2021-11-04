@@ -2,7 +2,7 @@ import { Client as DBClient } from 'pg';
 import { InventorySubgraph } from '../../services/subgraph';
 import { makeInventoryData } from '../helpers';
 import Web3 from 'web3';
-import { setupHub } from '../helpers/server';
+import { registry, setupHub } from '../helpers/server';
 
 const { toWei } = Web3.utils;
 const stubNonce = 'abc:123';
@@ -109,14 +109,15 @@ function handleValidateAuthToken(encryptedString: string) {
 
 describe('GET /api/inventory', function () {
   let db: DBClient;
-  let { getContainer, request } = setupHub(this, {
-    additionalRegistrations: {
-      'authentication-utils': StubAuthenticationUtils,
-      subgraph: StubSubgraph,
-      web3: StubWeb3,
-      relay: StubRelay,
-    },
+
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('subgraph', StubSubgraph);
+    registry(this).register('web3', StubWeb3);
+    registry(this).register('relay', StubRelay);
   });
+
+  let { getContainer, request } = setupHub(this);
 
   this.beforeEach(async function () {
     let dbManager = await getContainer().lookup('database-manager');

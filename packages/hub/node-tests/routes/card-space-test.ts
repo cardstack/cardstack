@@ -1,5 +1,5 @@
 import { Job, TaskSpec } from 'graphile-worker';
-import { setupHub } from '../helpers/server';
+import { registry, setupHub } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -39,12 +39,11 @@ class StubWorkerClient {
 }
 
 describe('POST /api/card-spaces', function () {
-  let { request, getContainer } = setupHub(this, {
-    additionalRegistrations: {
-      'authentication-utils': StubAuthenticationUtils,
-      'worker-client': StubWorkerClient,
-    },
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
   });
+  let { request, getContainer } = setupHub(this);
 
   this.afterEach(async function () {
     lastAddedJobIdentifier = undefined;
@@ -318,12 +317,12 @@ describe('POST /api/card-spaces', function () {
 });
 
 describe('PUT /api/card-spaces', function () {
-  let { request, getContainer } = setupHub(this, {
-    additionalRegistrations: {
-      'authentication-utils': StubAuthenticationUtils,
-      'worker-client': StubWorkerClient,
-    },
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
   });
+
+  let { request, getContainer } = setupHub(this);
 
   this.afterEach(async function () {
     lastAddedJobIdentifier = undefined;

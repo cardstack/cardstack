@@ -2,7 +2,7 @@ import { Client as DBClient } from 'pg';
 import { WyreOrder, WyreTransfer, WyreWallet } from '../../services/wyre';
 import { adminWalletName } from '../../routes/wyre-callback';
 import { v4 as uuidv4 } from 'uuid';
-import { setupHub } from '../helpers/server';
+import { registry, setupHub } from '../helpers/server';
 
 class StubWyreService {
   async getWalletByUserAddress(userAddress: string): Promise<WyreWallet | undefined> {
@@ -266,13 +266,13 @@ describe('POST /api/wyre-callback', function () {
     return request().post(url);
   }
 
-  let { getContainer, request } = setupHub(this, {
-    additionalRegistrations: {
-      wyre: StubWyreService,
-      relay: StubRelayService,
-      subgraph: StubSubgraphService,
-    },
+  this.beforeEach(function () {
+    registry(this).register('wyre', StubWyreService);
+    registry(this).register('relay', StubRelayService);
+    registry(this).register('subgraph', StubSubgraphService);
   });
+
+  let { getContainer, request } = setupHub(this);
 
   this.beforeEach(async function () {
     wyreTransferCallCount = 0;

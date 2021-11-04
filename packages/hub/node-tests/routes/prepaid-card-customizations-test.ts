@@ -2,7 +2,7 @@ import { Client } from 'pg';
 import shortUuid from 'short-uuid';
 import { parseIdentifier } from '@cardstack/did-resolver';
 import { Job, TaskSpec } from 'graphile-worker';
-import { setupHub } from '../helpers/server';
+import { registry, setupHub } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -45,12 +45,12 @@ describe('POST /api/prepaid-card-customizations', function () {
   let db: Client;
   let validPayload: any;
 
-  let { getContainer, request } = setupHub(this, {
-    additionalRegistrations: {
-      'authentication-utils': StubAuthenticationUtils,
-      'worker-client': StubWorkerClient,
-    },
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
   });
+
+  let { getContainer, request } = setupHub(this);
 
   this.beforeEach(async function () {
     let dbManager = await getContainer().lookup('database-manager');

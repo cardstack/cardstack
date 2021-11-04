@@ -1,7 +1,7 @@
 import Mocha from 'mocha';
-import { createContainer, HubServer } from '../../main';
+import { createRegistry, HubServer } from '../../main';
 import CardCache from '../../services/card-cache';
-import { Container } from '@cardstack/di';
+import { Container, Registry } from '@cardstack/di';
 import { TestCardCacheConfig, resolveCard } from './cards';
 import supertest from 'supertest';
 import { default as CardServiceFactory, CardService, INSECURE_CONTEXT } from '../../services/card-service';
@@ -11,7 +11,29 @@ tmp.setGracefulCleanup();
 
 const REALM = 'https://my-realm/';
 
-export function setupHub(mochaContext: Mocha.Suite, config?: { additionalRegistrations?: Record<string, any> }) {
+interface InternalContext {
+  registry?: Registry;
+}
+let contextMap = new WeakMap<object, InternalContext>();
+function contextFor(mocha: object): InternalContext {
+  let internal = contextMap.get(mocha);
+  if (!internal) {
+    internal = {};
+    contextMap.set(mocha, internal);
+  }
+  return internal;
+}
+
+export function registry(context: object): Registry {
+  let internal = contextFor(context);
+  if (!internal.registry) {
+    internal.registry = createRegistry();
+    internal.registry.register('card-cache-config', TestCardCacheConfig);
+  }
+  return internal.registry;
+}
+
+export function setupHub(mochaContext: Mocha.Suite) {
   let container: Container, server: HubServer, cardCache: CardCache, cardCacheConfig: TestCardCacheConfig;
 
   let currentCardService: CardServiceFactory | undefined;
@@ -31,10 +53,7 @@ export function setupHub(mochaContext: Mocha.Suite, config?: { additionalRegistr
   );
 
   mochaContext.beforeEach(async function () {
-    container = createContainer({
-      ...(config?.additionalRegistrations || {}),
-      'card-cache-config': TestCardCacheConfig,
-    });
+    container = new Container(registry(this));
 
     if (process.env.COMPILER) {
       cardCache = await container.lookup('card-cache');
@@ -62,7 +81,7 @@ export function setupHub(mochaContext: Mocha.Suite, config?: { additionalRegistr
     },
     cards: cardServiceProxy as CardService,
     request() {
-      return supertest(server.testCallback());
+      return supertest(server.app.callback());
     },
     getCardCache(): CardCache {
       return cardCache;

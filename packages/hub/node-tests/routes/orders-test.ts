@@ -3,7 +3,7 @@ import { InventorySubgraph } from '../../services/subgraph';
 import { v4 as uuidv4 } from 'uuid';
 import { WyreWallet } from '../../services/wyre';
 import * as JSONAPI from 'jsonapi-typescript';
-import { setupHub } from '../helpers/server';
+import { registry, setupHub } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -78,14 +78,14 @@ describe('/api/orders', function () {
   let db: DBClient;
   let reservationId: string;
 
-  let { getContainer, request } = setupHub(this, {
-    additionalRegistrations: {
-      'authentication-utils': StubAuthenticationUtils,
-      subgraph: StubSubgraph,
-      relay: StubRelayService,
-      wyre: StubWyreService,
-    },
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('subgraph', StubSubgraph);
+    registry(this).register('relay', StubRelayService);
+    registry(this).register('wyre', StubWyreService);
   });
+
+  let { getContainer, request } = setupHub(this);
 
   this.beforeEach(async function () {
     stubInventorySubgraph = () => ({

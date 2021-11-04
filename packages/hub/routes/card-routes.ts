@@ -18,12 +18,13 @@ const requireCard = function (path: string, root: string): any {
 };
 
 export default class CardRoutes {
-  realmManager = inject('realm-manager', { as: 'realmManager' });
-  cache = inject('card-cache', { as: 'cache' });
-  builder = inject('card-builder', { as: 'builder' });
-  cards = inject('card-service', { as: 'cards' });
+  private realmManager = inject('realm-manager', { as: 'realmManager' });
+  private cache = inject('card-cache', { as: 'cache' });
+  private builder = inject('card-builder', { as: 'builder' });
+  private cards = inject('card-service', { as: 'cards' });
+  private config = inject('card-routes-config', { as: 'config' });
 
-  routingCard?: any;
+  private routerInstance: undefined | RouterInstance;
 
   constructor() {
     autoBind(this);
@@ -99,16 +100,13 @@ export default class CardRoutes {
   }
 
   private async respondWithCardForPath(ctx: RouterContext) {
-    let { routingCard } = this;
+    let routerInstance = await this.ensureRouterInstance();
+
     let {
       params: { pathname },
     } = ctx;
 
-    if (!routingCard) {
-      throw Error('Card routing not configured for this server');
-    }
-
-    let url = routingCard.routeTo(pathname);
+    let url = routerInstance.routeTo(pathname);
 
     if (!url) {
       throw new NotFound(`No card defined for route ${pathname}`);
@@ -136,16 +134,20 @@ export default class CardRoutes {
     ctx.body = serializeRawCard(rawCard, compiledCard);
   }
 
-  // TODO: How will we do this NOW?
-  async setRoutingCard(routeCard: string) {
-    let card = await this.builder.getCompiledCard(routeCard);
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const CardRouterClass = requireCard(card.schemaModule, this.cache.dir).default;
-    const cardRouterInstance = new CardRouterClass();
-
-    assertValidRouterInstance(cardRouterInstance, routeCard);
-
-    this.routingCard = cardRouterInstance;
+  private async ensureRouterInstance(): Promise<RouterInstance> {
+    if (!this.routerInstance) {
+      if (!this.config.routeCard) {
+        this.routerInstance = defaultRouterInstance;
+      } else {
+        let card = await this.builder.getCompiledCard(this.config.routeCard);
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        const CardRouterClass = requireCard(card.schemaModule, this.cache.dir).default;
+        const cardRouterInstance = new CardRouterClass();
+        assertValidRouterInstance(cardRouterInstance, this.config.routeCard);
+        this.routerInstance = cardRouterInstance;
+      }
+    }
+    return this.routerInstance;
   }
 
   routes(): Router.Middleware {
@@ -175,7 +177,11 @@ export default class CardRoutes {
   }
 }
 
-function assertValidRouterInstance(router: any, routeCard: string): void {
+interface RouterInstance {
+  routeTo(path: string): string;
+}
+
+function assertValidRouterInstance(router: any, routeCard: string): asserts router is RouterInstance {
   const ROUTER_METHOD_NAME = 'routeTo';
   if (typeof router[ROUTER_METHOD_NAME] !== 'function') {
     throw new Error(
@@ -189,8 +195,19 @@ function unimpl() {
   throw new Error('unimplemented');
 }
 
+const defaultRouterInstance = {
+  routeTo(_path: string) {
+    throw new NotFound('Card routing not configured for this server');
+  },
+};
+
 declare module '@cardstack/di' {
   interface KnownServices {
     'card-routes': CardRoutes;
+    'card-routes-config': CardRoutesConfig;
   }
+}
+
+class CardRoutesConfig {
+  routeCard?: string;
 }

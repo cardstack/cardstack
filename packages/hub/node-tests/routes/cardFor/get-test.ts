@@ -1,6 +1,6 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { setupHub } from '../../helpers/server';
+import { registry, setupHub } from '../../helpers/server';
 
 if (process.env.COMPILER) {
   describe('GET /cardFor/<path>', function () {
@@ -8,7 +8,16 @@ if (process.env.COMPILER) {
       return request().get(`/cardFor/${path}`);
     }
 
-    let { cards, resolveCard, getContainer, request, realm } = setupHub(this);
+    this.beforeEach(function () {
+      registry(this).register(
+        'card-routes-config',
+        class {
+          routeCard = 'https://my-realm/routes';
+        }
+      );
+    });
+
+    let { cards, resolveCard, request, realm } = setupHub(this);
 
     this.beforeEach(async function () {
       await cards.create({
@@ -30,9 +39,6 @@ if (process.env.COMPILER) {
           `,
         },
       });
-      let cardRoutes = await getContainer().lookup('card-routes');
-      cardRoutes.setRoutingCard('https://my-realm/routes');
-
       await cards.create({
         url: `${realm}/homepage`,
         isolated: 'isolated.js',
