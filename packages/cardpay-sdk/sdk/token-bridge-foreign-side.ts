@@ -230,7 +230,8 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     });
     if (events.length === 1) {
       let txnHash = events[0].transactionHash;
-      let receipt = await this.layer1Web3.eth.getTransactionReceipt(txnHash);
+      let receipt = await waitUntilTransactionMined(this.layer1Web3, txnHash);
+      await waitUntilBlock(this.layer1Web3, receipt.blockNumber + 1);
       return receipt;
     }
     const packedSignatures = prepSignaturesForExecution(signatures);
