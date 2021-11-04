@@ -1,6 +1,7 @@
 import { module, test } from 'qunit';
 import { visit, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import percySnapshot from '@percy/ember';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 
@@ -67,5 +68,7 @@ module('Acceptance | merchant services dashboard', function (hooks) {
     assert.dom('[data-test-merchant="Mandello"]').exists();
     assert.dom('[data-test-merchant-logo-background="#00ffcc"]').exists();
     assert.dom('[data-test-merchant-logo-text-color="#000000"]').exists();
+
+    await percySnapshot(assert);
   });
 });

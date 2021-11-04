@@ -38,6 +38,8 @@
     "@glimmer/component": "^1.0.3",
     "@glimmer/tracking": "^1.0.3",
     "@metamask/detect-provider": "^1.2.0",
+    "@percy/cli": "^1.0.0-beta.70",
+    "@percy/ember": "^3.0.0",
     "@sentry/browser": "^6.10.0",
     "@sentry/ember": "^6.10.0",
     "@types/bn.js": "^5.1.0",

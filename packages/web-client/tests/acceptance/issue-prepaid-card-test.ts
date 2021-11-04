@@ -12,6 +12,7 @@ import { setupApplicationTest } from 'ember-qunit';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { fromWei, toWei } from 'web3-utils';
 import BN from 'bn.js';
+import percySnapshot from '@percy/ember';
 
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import prepaidCardColorSchemes from '../../mirage/fixture-data/prepaid-card-color-schemes';
@@ -131,6 +132,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
     let merchantSafe = createMerchantSafe({
+      address: '0xE73604fC1724a50CEcBC1096d4229b81aF117c94',
       merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
       tokens: [
         createSafeToken('DAI.CPXD', SLIGHTLY_LESS_THAN_MAX_VALUE.toString()),
@@ -561,6 +563,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
         )} [data-test-issue-prepaid-card-next-step="dashboard"]`
       )
       .exists();
+
+    await percySnapshot(assert);
+
     await click(
       `${epiloguePostableSel(
         4
