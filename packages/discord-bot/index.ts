@@ -10,5 +10,5 @@ export {
   MockUser,
   MockMessage,
 } from './types';
-export { MessageEmbed, Collection } from 'discord.js';
+export { MessageEmbed, Collection, SnowflakeUtil } from 'discord.js';
 export { makeTestMessage, makeTestChannel, makeTestGuild, noSend, noDM, noReply } from './utils/mocks';

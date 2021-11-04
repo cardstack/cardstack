@@ -19,7 +19,7 @@ export const run: Event['run'] = async (client) => {
   }
   let message = `logged in bot ${client.user.tag} in environment ${
     process.env.NODE_CONFIG_ENV || process.env.NODE_ENV || 'development'
-  }. Responding to guilds ${allowedGuilds.join(', ')} in channels ${allowedChannels.join(', ')}`;
+  }. Monitoring guilds ${allowedGuilds.join(', ')} in channels ${allowedChannels.join(', ')}`;
   log.info(message);
   Sentry.addBreadcrumb({ message });
 };

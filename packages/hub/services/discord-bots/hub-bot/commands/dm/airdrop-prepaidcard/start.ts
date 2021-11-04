@@ -4,7 +4,6 @@ import Bot, { Command, Message, MessageEmbed } from '@cardstack/discord-bot';
 import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
 import { basename, join } from 'path';
-import { deactivateDMConversation } from '@cardstack/discord-bot/utils/dm';
 import {
   getBetaTester,
   setBetaTesterAddress,
@@ -33,13 +32,14 @@ const quitCommands = ['quit', 'cancel', 'no', 'nope', 'nah', 'nevermind', 'nvm',
 // all the commands modules for a conversation can be grouped within the
 // conversation folder (like this one).
 
-export const run: Command['run'] = async (bot, message, [channelId] = []) => {
+export const run: Command['run'] = async (bot: Bot, message: Message, args: string[] = []) => {
+  let [channelId] = args;
   if (!channelId || !message) {
     return;
   }
-  let db = await bot.databaseManager.getClient();
+  let db = await bot.getDatabaseClient();
   if (quitCommands.includes(message.content.toLowerCase())) {
-    deactivateDMConversation(db, channelId, message.author.id);
+    bot.dmChannelsDbGateway.deactivateDMConversation(channelId, message.author.id);
     await message.reply(`ok, if you change your mind type \`!${cardmeName}\` in the public channel.`);
     return;
   }
@@ -116,7 +116,7 @@ export const run: Command['run'] = async (bot, message, [channelId] = []) => {
       await message.reply('Uh Oh! Something went wrong. Please contact an admin to get help is getting a prepaid card');
     }
   } finally {
-    await deactivateDMConversation(db, channelId, message.author.id);
+    await bot.dmChannelsDbGateway.deactivateDMConversation(channelId, message.author.id);
   }
 };
 

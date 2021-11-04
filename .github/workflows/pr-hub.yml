@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'packages/hub/**'
-      - 'packages/cardbot/**'
+      - 'packages/discord-bot/**'
       - 'packages/did-resolver/**'
       - 'packages/test-support/**'
       - 'packages/core/**'

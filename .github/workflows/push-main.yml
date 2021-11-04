@@ -106,6 +106,7 @@ jobs:
             hub:
               - 'packages/hub/**'
               - 'packages/did-resolver/**'
+              - 'packages/discord-bot/**'
               - '.github/workflows/push-main.yml'
               - '.github/actions/deploy-hub/**'
               - 'yarn.lock'

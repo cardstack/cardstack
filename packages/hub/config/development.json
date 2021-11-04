@@ -6,5 +6,8 @@
   },
   "compiler": {
     "routeCard": "https://demo.com/routes"
+  },
+  "discord": {
+    "allowedChannels": "896093062562983989"
   }
 }

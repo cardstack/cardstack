@@ -1,19 +1,20 @@
 import { Command } from '@cardstack/discord-bot/bot';
 import config from 'config';
-import { sendDM, activateDMConversation, createDM } from '@cardstack/discord-bot/utils/dm';
+import { sendDM, createDM } from '@cardstack/discord-bot/utils/dm';
 import { getBetaTester, setBetaTester } from '../../utils/beta-tester';
 
 import * as Sentry from '@sentry/node';
 import logger from '@cardstack/logger';
 import { BetaTestConfig } from '../../types';
 import { assertHubBot, isBetaTester } from '../../utils';
+import Client, { Message } from '@cardstack/discord-bot';
 
 const log = logger('command:card-me');
 const { sku } = config.get('betaTesting') as BetaTestConfig;
 
 export const name: Command['name'] = 'card-me';
 export const description: Command['description'] = 'Airdrop Cardstack prepaid cards';
-export const run: Command['run'] = async (bot, message) => {
+export const run: Command['run'] = async (bot: Client, message: Message) => {
   assertHubBot(bot);
   let member = message.member;
   let guild = message.guild;
@@ -27,7 +28,7 @@ export const run: Command['run'] = async (bot, message) => {
     return;
   }
 
-  let db = await bot.databaseManager.getClient();
+  let db = await bot.getDatabaseClient();
   let betaTester = await getBetaTester(db, member.id);
   if (betaTester?.airdropTxnHash) {
     await sendDM(
@@ -63,7 +64,7 @@ export const run: Command['run'] = async (bot, message) => {
   Sentry.addBreadcrumb({ message: `sku quantity for sku ${sku} is ${quantity}` });
 
   await setBetaTester(db, member.id, member.user.username);
-  await activateDMConversation(db, dm.id, member.id, 'airdrop-prepaidcard:start');
+  await bot.discordBotsDbGateway.activateDMConversation(dm.id, member.id, 'airdrop-prepaidcard:start');
   await sendDM(
     message,
     member,
