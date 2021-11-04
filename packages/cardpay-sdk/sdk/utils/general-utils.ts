@@ -22,6 +22,21 @@ export async function networkName(web3: Web3): Promise<string> {
   return name;
 }
 
+// Used to prevent block mismatch errors in infura (layer 1)
+// https://github.com/88mphapp/ng88mph-frontend/issues/55#issuecomment-940414832
+export async function safeContractCall(
+  web3: Web3,
+  contract: Contract,
+  method: string,
+  ...args: any[]
+): Promise<unknown> {
+  if ((await networkName(web3)) === 'mainnet') {
+    let previousBlockNumber = (await web3.eth.getBlockNumber()) - 1;
+    return await contract.methods[method](...args).call({}, await previousBlockNumber);
+  }
+  return await contract.methods[method](...args).call();
+}
+
 export function waitUntilTransactionMined(
   web3: Web3,
   txnHash: string,
