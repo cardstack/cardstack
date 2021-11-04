@@ -1,0 +1,67 @@
+.card-pay-dashboard__payments {
+  padding: var(--boxel-sp-xxl) var(--boxel-sp-xl);
+}
+
+.card-pay-dashboard__payments > * {
+  max-width: 70.75rem;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.card-pay-dashboard__payments > * + * {
+  margin-top: var(--boxel-sp-xxl);
+}
+
+.card-pay-dashboard__payments-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--boxel-sp-xxl);
+}
+
+.card-pay-dashboard__payments-title {
+  font: 600 var(--boxel-font-lg);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.card-pay-dashboard__payments-section-header-button-icon {
+  --icon-color: var(--boxel-highlight);
+
+  margin-left: var(--boxel-sp-xs);
+}
+
+.card-pay-dashboard__payments-cards {
+  display: grid;
+  gap: var(--boxel-sp-xl) var(--boxel-sp);
+  grid-template-columns: repeat(auto-fill, 22.75rem);
+}
+
+.card-pay-dashboard__payments-fee {
+  white-space: nowrap;
+}
+
+.card-pay-dashboard__payments-column-1 {
+  min-width: 380px;
+}
+
+.card-pay-dashboard__payments-column-2-desc {
+  margin: 127px 0 0;
+  font-weight: 600;
+  text-align: left;
+  color: var(--boxel-text-color-dark);
+}
+
+.card-pay-dashboard__payments-networks-img {
+  display: block;
+  width: 147.6px;
+  height: 18.5px;
+  margin: var(--boxel-sp-lg) 0 var(--boxel-sp-xs) 0;
+  object-fit: contain;
+}
+
+.card-pay-dashboard__payments-screens-img {
+  display: block;
+  width: 476px;
+  margin: var(--boxel-sp-xs) -35px 0;
+  max-width: none;
+}

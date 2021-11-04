@@ -5,7 +5,7 @@ import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import RouterService from '@ember/routing/router-service';
 
-export default class CardPayMerchantServicesController extends Controller {
+export default class CardPayPaymentsController extends Controller {
   @service declare layer2Network: Layer2Network;
   @service declare router: RouterService;
 
@@ -19,7 +19,7 @@ export default class CardPayMerchantServicesController extends Controller {
   }
 
   @action transitionToWorkflow(flow: string) {
-    this.router.transitionTo('card-pay.merchant-services', {
+    this.router.transitionTo('card-pay.payments', {
       queryParams: { flow },
     });
   }
