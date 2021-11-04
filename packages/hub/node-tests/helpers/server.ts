@@ -1,4 +1,3 @@
-import { HubServerConfig } from '../../interfaces';
 import Mocha from 'mocha';
 import { HubServer } from '../../main';
 import CardCache from '../../services/card-cache';

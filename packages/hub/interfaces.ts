@@ -1,6 +1,5 @@
 import type { RawCard, Builder } from '@cardstack/core/src/interfaces';
 import type RealmManager from './services/realm-manager';
-import type { Registry } from '@cardstack/di';
 
 const ENVIRONMENTS_OBJ = {
   browser: '',
@@ -10,11 +9,6 @@ export type Environment = keyof typeof ENVIRONMENTS_OBJ;
 export const ENVIRONMENTS = Object.keys(ENVIRONMENTS_OBJ) as Environment[];
 export const BROWSER = ENVIRONMENTS[0];
 export const NODE = ENVIRONMENTS[1];
-
-export interface HubServerConfig {
-  registryCallback?: undefined | ((registry: Registry) => void);
-  routeCard?: string;
-}
 
 export interface CardStackContext {
   builder: Builder;
