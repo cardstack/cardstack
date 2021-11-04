@@ -66,7 +66,7 @@ module('Acceptance | withdrawal persistence', function (hooks) {
   });
 
   test('Generates a flow uuid query parameter used as a persistence identifier', async function (this: Context, assert) {
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="withdrawal"]');
     assert.equal(
       new URL('http://domain.test/' + currentURL()).searchParams.get('flow-id')
@@ -112,7 +112,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         state,
       });
 
-      await visit('/card-pay/token-suppliers?flow=withdrawal&flow-id=abc123');
+      await visit(
+        '/card-pay/deposit-withdrawal?flow=withdrawal&flow-id=abc123'
+      );
 
       assert.dom('[data-test-milestone="0"]').exists(); // L1
       assert.dom('[data-test-milestone="1"]').exists(); // Check ETH balance
@@ -171,7 +173,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         state,
       });
 
-      await visit('/card-pay/token-suppliers?flow=withdrawal&flow-id=abc123');
+      await visit(
+        '/card-pay/deposit-withdrawal?flow=withdrawal&flow-id=abc123'
+      );
 
       assert.dom('[data-test-milestone="0"]').exists(); // L1
       assert.dom('[data-test-milestone="1"]').exists(); // Check ETH balance
@@ -231,7 +235,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         name: 'WITHDRAWAL',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=withdrawal&flow-id=abc123');
+      await visit(
+        '/card-pay/deposit-withdrawal?flow=withdrawal&flow-id=abc123'
+      );
       assert.dom('[data-test-milestone="0"]').exists(); // L1
       assert.dom('[data-test-milestone="1"]').exists(); // Check ETH balance
       assert.dom('[data-test-milestone="2"]').exists(); // Connect L2 wallet
@@ -271,7 +277,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         name: 'WITHDRAWAL',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=withdrawal&flow-id=abc123');
+      await visit(
+        '/card-pay/deposit-withdrawal?flow=withdrawal&flow-id=abc123'
+      );
       assert.dom('[data-test-milestone="0"]').doesNotExist();
       assert.dom('[data-test-milestone="1"]').doesNotExist();
       assert.dom('[data-test-milestone="2"]').doesNotExist();
@@ -303,7 +311,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         name: 'WITHDRAWAL',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=withdrawal&flow-id=abc123');
+      await visit(
+        '/card-pay/deposit-withdrawal?flow=withdrawal&flow-id=abc123'
+      );
       assert.dom('[data-test-milestone="0"]').doesNotExist();
       assert.dom('[data-test-milestone="1"]').doesNotExist();
       assert.dom('[data-test-milestone="2"]').doesNotExist();
@@ -354,7 +364,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         '20'
       );
       layer2Service.test__simulateBridgedToLayer1();
-      await visit('/card-pay/token-suppliers?flow=withdrawal&flow-id=abc123');
+      await visit(
+        '/card-pay/deposit-withdrawal?flow=withdrawal&flow-id=abc123'
+      );
 
       assert.dom('[data-test-milestone="0"]').exists(); // L1
       assert.dom('[data-test-milestone="1"]').exists(); // Check ETH balance
@@ -405,7 +417,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         name: 'WITHDRAWAL',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=withdrawal&flow-id=abc123');
+      await visit(
+        '/card-pay/deposit-withdrawal?flow=withdrawal&flow-id=abc123'
+      );
       assert.dom('[data-test-milestone="0"]').doesNotExist();
       assert.dom('[data-test-milestone="1"]').doesNotExist();
       assert.dom('[data-test-milestone="2"]').doesNotExist();

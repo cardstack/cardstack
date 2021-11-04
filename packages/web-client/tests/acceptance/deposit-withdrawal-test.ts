@@ -12,12 +12,12 @@ import {
 
 interface Context extends MirageTestContext {}
 
-module('Acceptance | token suppliers', function (hooks) {
+module('Acceptance | deposit and withdrawal', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
   test('Depot balance is hidden when wallet is not connected', async function (assert) {
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
 
     assert.dom('[data-test-suppliers-section]').doesNotExist();
   });
@@ -39,7 +39,7 @@ module('Acceptance | token suppliers', function (hooks) {
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
 
     assert.dom('[data-test-suppliers-section] h2').hasText('Token Suppliers');
     assert
@@ -108,7 +108,7 @@ module('Acceptance | token suppliers', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
 
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
 
     assert.dom('[data-test-suppliers-section]').exists();
     assert.dom('[data-test-card-pay-depot]').doesNotExist();
@@ -130,7 +130,7 @@ module('Acceptance | token suppliers', function (hooks) {
       }),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
 
     assert.dom('[data-test-card-pay-depot]').exists();
     assert.dom('[data-test-card-pay-depot-token-count]').containsText('0');

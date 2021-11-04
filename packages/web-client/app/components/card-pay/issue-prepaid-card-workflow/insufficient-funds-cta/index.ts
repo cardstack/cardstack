@@ -7,7 +7,7 @@ class CardPayIssuePrepaidCardWorkflowInsufficientFundsComponent extends Componen
   @service declare router: RouterService;
 
   @action async openDepositWorkflow() {
-    this.router.transitionTo('card-pay.token-suppliers', {
+    this.router.transitionTo('card-pay.deposit-withdrawal', {
       queryParams: { flow: 'deposit' },
     });
   }

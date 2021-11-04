@@ -140,10 +140,10 @@ export default class WorkflowPersistence extends Service {
       route = 'merchant-services';
       flow = 'create-merchant';
     } else if (workflowName === 'RESERVE_POOL_DEPOSIT') {
-      route = 'token-suppliers';
+      route = 'deposit-withdrawal';
       flow = 'deposit';
     } else if (workflowName === 'WITHDRAWAL') {
-      route = 'token-suppliers';
+      route = 'deposit-withdrawal';
       flow = 'withdrawal';
     }
 
