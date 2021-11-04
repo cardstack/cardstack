@@ -1,7 +1,7 @@
 import ERC20ABI from '../contracts/abi/erc-20';
 import { AbiItem } from 'web3-utils';
 import Web3 from 'web3';
-import { safeContractCall } from './utils/general-utils';
+import { networkName, safeContractCall } from './utils/general-utils';
 
 export interface IAssets {
   getNativeTokenBalance(userAddress?: string): Promise<string>;
@@ -15,6 +15,10 @@ export default class Assets implements IAssets {
   async getNativeTokenBalance(userAddress?: string): Promise<string> {
     let address = userAddress ?? (await this.web3.eth.getAccounts())[0];
 
+    if (['kovan', 'mainnet'].includes(await networkName(this.web3))) {
+      let previousBlockNumber = (await this.web3.eth.getBlockNumber()) - 1;
+      return this.web3.eth.getBalance(address, previousBlockNumber);
+    }
     return this.web3.eth.getBalance(address);
   }
 
