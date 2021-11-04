@@ -8,7 +8,7 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realm}/person`,
+        url: `${realm}person`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -22,7 +22,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}/sue`,
+        url: `${realm}sue`,
         adoptsFrom: '../person',
         data: { name: 'Sue' },
       });
