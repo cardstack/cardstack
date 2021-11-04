@@ -1,5 +1,5 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupServer } from '../../helpers/server';
+import { setupHub } from '../../helpers/server';
 
 if (process.env.COMPILER) {
   describe('GET /cards/<card-id>', function () {
@@ -7,7 +7,7 @@ if (process.env.COMPILER) {
       return request().get(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { cards, resolveCard, request, realm } = setupServer(this);
+    let { cards, resolveCard, request, realm } = setupHub(this);
 
     this.beforeEach(async function () {
       await cards.create({

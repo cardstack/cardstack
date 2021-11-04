@@ -1,6 +1,6 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { setupServer } from '../../helpers/server';
+import { setupHub } from '../../helpers/server';
 
 let e = encodeURIComponent;
 if (process.env.COMPILER) {
@@ -18,7 +18,7 @@ if (process.env.COMPILER) {
         .send(payload);
     }
 
-    let { cards, resolveCard, request, realm } = setupServer(this);
+    let { cards, resolveCard, request, realm } = setupHub(this);
 
     const PAYLOAD = {
       data: {

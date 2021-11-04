@@ -1,10 +1,10 @@
 import { expect } from 'chai';
-import { setupServer } from '../helpers/server';
+import { setupHub } from '../helpers/server';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 if (process.env.COMPILER) {
   describe.skip('CardService', function () {
-    let { cards, realm } = setupServer(this);
+    let { cards, realm } = setupHub(this);
 
     this.beforeEach(async function () {
       await cards.create({

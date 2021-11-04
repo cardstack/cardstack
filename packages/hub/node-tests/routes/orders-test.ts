@@ -1,10 +1,9 @@
 import { Client as DBClient } from 'pg';
-import { Registry } from '@cardstack/di';
 import { InventorySubgraph } from '../../services/subgraph';
 import { v4 as uuidv4 } from 'uuid';
 import { WyreWallet } from '../../services/wyre';
 import * as JSONAPI from 'jsonapi-typescript';
-import { setupServer } from '../helpers/server';
+import { setupHub } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -79,12 +78,12 @@ describe('/api/orders', function () {
   let db: DBClient;
   let reservationId: string;
 
-  let { getServer, request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
-      registry.register('subgraph', StubSubgraph);
-      registry.register('relay', StubRelayService);
-      registry.register('wyre', StubWyreService);
+  let { getContainer, request } = setupHub(this, {
+    additionalRegistrations: {
+      'authentication-utils': StubAuthenticationUtils,
+      subgraph: StubSubgraph,
+      relay: StubRelayService,
+      wyre: StubWyreService,
     },
   });
 
@@ -113,7 +112,7 @@ describe('/api/orders', function () {
       };
     };
 
-    let dbManager = await getServer().container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM reservations`);
     await db.query(`DELETE FROM wallet_orders`);

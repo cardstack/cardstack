@@ -136,6 +136,7 @@ export default class CardRoutes {
     ctx.body = serializeRawCard(rawCard, compiledCard);
   }
 
+  // TODO: How will we do this NOW?
   async setRoutingCard(routeCard: string) {
     let card = await this.builder.getCompiledCard(routeCard);
     // eslint-disable-next-line @typescript-eslint/naming-convention

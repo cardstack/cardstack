@@ -1,6 +1,6 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { setupServer } from '../../helpers/server';
+import { setupHub } from '../../helpers/server';
 
 if (process.env.COMPILER) {
   describe('GET /cardFor/<path>', function () {
@@ -8,7 +8,7 @@ if (process.env.COMPILER) {
       return request().get(`/cardFor/${path}`);
     }
 
-    let { cards, resolveCard, getContainer, request, realm } = setupServer(this);
+    let { cards, resolveCard, getContainer, request, realm } = setupHub(this);
 
     this.beforeEach(async function () {
       await cards.create({

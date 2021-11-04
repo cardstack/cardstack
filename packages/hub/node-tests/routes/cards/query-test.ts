@@ -1,6 +1,6 @@
 /* eslint-disable mocha/no-exclusive-tests */
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
-import { setupServer } from '../../helpers/server';
+import { setupHub } from '../../helpers/server';
 import { map } from 'lodash';
 
 if (process.env.COMPILER) {
@@ -9,7 +9,7 @@ if (process.env.COMPILER) {
       return request().get(url);
     }
 
-    let { cards, request, realm } = setupServer(this);
+    let { cards, request, realm } = setupHub(this);
 
     this.beforeEach(async function () {
       // await cards.create({

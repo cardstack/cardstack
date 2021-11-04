@@ -1,6 +1,6 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { setupServer } from '../../helpers/server';
+import { setupHub } from '../../helpers/server';
 
 let postFiles = Object.freeze({
   'schema.js': `
@@ -27,7 +27,7 @@ if (process.env.COMPILER) {
       return request().get(url);
     }
 
-    let { cards, request, realm } = setupServer(this);
+    let { cards, request, realm } = setupHub(this);
 
     this.beforeEach(async function () {
       await cards.create({

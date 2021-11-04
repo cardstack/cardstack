@@ -1,6 +1,5 @@
-import { Registry } from '@cardstack/di';
 import { Job, TaskSpec } from 'graphile-worker';
-import { setupServer } from '../helpers/server';
+import { setupHub } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -40,10 +39,10 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('POST /api/merchant-infos', function () {
-  let { request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
-      registry.register('worker-client', StubWorkerClient);
+  let { request } = setupHub(this, {
+    additionalRegistrations: {
+      'authentication-utils': StubAuthenticationUtils,
+      'worker-client': StubWorkerClient,
     },
   });
 
@@ -231,10 +230,10 @@ describe('POST /api/merchant-infos', function () {
 });
 
 describe('GET /api/merchant-infos/validate-slug/:slug', function () {
-  let { request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
-      registry.register('worker-client', StubWorkerClient);
+  let { request } = setupHub(this, {
+    additionalRegistrations: {
+      'authentication-utils': StubAuthenticationUtils,
+      'worker-client': StubWorkerClient,
     },
   });
 

@@ -72,7 +72,7 @@ import CardService from './services/card-service';
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
 
-export function createContainer(registryCallback?: (registry: Registry) => void): Container {
+export function createContainer(additionalRegistrations?: Record<string, any>): Container {
   let registry = new Registry();
   registry.register('api-router', ApiRouter);
   registry.register('authentication-middleware', AuthenticationMiddleware);
@@ -129,9 +129,10 @@ export function createContainer(registryCallback?: (registry: Registry) => void)
     registry.register('card-watcher', CardWatcher);
   }
 
-  if (registryCallback) {
-    registryCallback(registry);
+  for (const key in additionalRegistrations) {
+    registry.register(key, additionalRegistrations[key]);
   }
+
   return new Container(registry);
 }
 
@@ -196,6 +197,10 @@ export class HubServer {
     });
 
     return instance;
+  }
+
+  get testCallback() {
+    return this.app.callback;
   }
 
   async primeCache() {

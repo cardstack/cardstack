@@ -3,7 +3,7 @@ import { encodeCardURL } from '@cardstack/core/src/utils';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { existsSync } from 'fs-extra';
 import { expect } from 'chai';
-import { setupServer } from '../../helpers/server';
+import { setupHub } from '../../helpers/server';
 
 if (process.env.COMPILER) {
   describe('DELETE /cards/<card-id>', function () {
@@ -15,7 +15,7 @@ if (process.env.COMPILER) {
       return request().del(`/cards/${encodeURIComponent(cardURL)}`);
     }
 
-    let { getContainer, cards, getCardCache, request, realm } = setupServer(this);
+    let { getContainer, cards, getCardCache, request, realm } = setupHub(this);
 
     this.beforeEach(async function () {
       await cards.create({

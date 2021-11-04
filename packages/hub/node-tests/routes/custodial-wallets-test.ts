@@ -1,6 +1,5 @@
-import { Registry } from '@cardstack/di';
 import Web3 from 'web3';
-import { setupServer } from '../helpers/server';
+import { setupHub } from '../helpers/server';
 
 const { toChecksumAddress } = Web3.utils;
 const stubNonce = 'abc:123';
@@ -90,10 +89,10 @@ function handleGetWyreWalletByName(address: string) {
 }
 
 describe('GET /api/custodial-wallet', function () {
-  let { request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
-      registry.register('wyre', StubWyreService);
+  let { request } = setupHub(this, {
+    additionalRegistrations: {
+      'authentication-utils': StubAuthenticationUtils,
+      wyre: StubWyreService,
     },
   });
 

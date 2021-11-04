@@ -1,8 +1,6 @@
-import supertest, { Test } from 'supertest';
-import { HubServer } from '../../main';
-import { Registry } from '@cardstack/di';
 import ExchangeRatesService, { FixerFailureResponse, FixerSuccessResponse } from '../../services/exchange-rates';
 import config from 'config';
+import { setupHub } from '../helpers/server';
 
 const allowedDomains = config.get('exchangeRates.allowedDomains');
 function isValidAllowedDomainConfig(object: unknown): object is string[] {
@@ -31,21 +29,14 @@ class StubExchangeRatesService {
 }
 
 describe('GET /api/exchange-rates', function () {
-  let server: HubServer;
-  let request: supertest.SuperTest<Test>;
-
-  this.afterEach(async function () {
-    server?.teardown();
+  let { request, getContainer } = setupHub(this, {
+    additionalRegistrations: {
+      'exchange-rates': StubExchangeRatesService,
+    },
   });
 
   it('does not fetch exchange rates for an incorrect origin', async function () {
-    server = await HubServer.create({
-      registryCallback(registry: Registry) {
-        registry.register('exchange-rates', StubExchangeRatesService);
-      },
-    });
-    request = supertest(server.app.callback());
-    await request
+    await request()
       .get(`/api/exchange-rates`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -63,13 +54,7 @@ describe('GET /api/exchange-rates', function () {
   });
 
   it('fetches exchange rates for an accepted origin', async function () {
-    server = await HubServer.create({
-      registryCallback(registry: Registry) {
-        registry.register('exchange-rates', StubExchangeRatesService);
-      },
-    });
-    request = supertest(server.app.callback());
-    await request
+    await request()
       .get(`/api/exchange-rates`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -88,18 +73,16 @@ describe('GET /api/exchange-rates', function () {
   });
 
   it('Returns 502 for falsey result being fetched', async function () {
-    class FalseyReturnExchangeRatesService extends ExchangeRatesService {
-      async fetchExchangeRates() {
-        return undefined;
+    getContainer().register(
+      'exchange-rates',
+      class FalseyReturnExchangeRatesService extends ExchangeRatesService {
+        async fetchExchangeRates() {
+          return undefined;
+        }
       }
-    }
-    server = await HubServer.create({
-      registryCallback(registry: Registry) {
-        registry.register('exchange-rates', FalseyReturnExchangeRatesService);
-      },
-    });
-    request = supertest(server.app.callback());
-    await request
+    );
+
+    await request()
       .get(`/api/exchange-rates`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -118,24 +101,21 @@ describe('GET /api/exchange-rates', function () {
   });
 
   it('Returns 502 for failure result from Fixer', async function () {
-    class FailingExchangeRatesService extends ExchangeRatesService {
-      async fetchExchangeRates(): Promise<FixerFailureResponse> {
-        return {
-          success: false,
-          error: {
-            code: -1,
-            info: 'readable info about the error',
-          },
-        };
+    await getContainer().register(
+      'exchange-rates',
+      class FailingExchangeRatesService extends ExchangeRatesService {
+        async fetchExchangeRates(): Promise<FixerFailureResponse> {
+          return {
+            success: false,
+            error: {
+              code: -1,
+              info: 'readable info about the error',
+            },
+          };
+        }
       }
-    }
-    server = await HubServer.create({
-      registryCallback(registry: Registry) {
-        registry.register('exchange-rates', FailingExchangeRatesService);
-      },
-    });
-    request = supertest(server.app.callback());
-    await request
+    );
+    await request()
       .get(`/api/exchange-rates`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
@@ -154,18 +134,15 @@ describe('GET /api/exchange-rates', function () {
   });
 
   it('Allows errors from the exchange rate service through', async function () {
-    class CrashingExchangeRatesService extends ExchangeRatesService {
-      async fetchExchangeRates(): Promise<FixerFailureResponse> {
-        throw new Error('An error that might occur in caching or fetching');
+    await getContainer().register(
+      'exchange-rates',
+      class CrashingExchangeRatesService extends ExchangeRatesService {
+        async fetchExchangeRates(): Promise<FixerFailureResponse> {
+          throw new Error('An error that might occur in caching or fetching');
+        }
       }
-    }
-    server = await HubServer.create({
-      registryCallback(registry: Registry) {
-        registry.register('exchange-rates', CrashingExchangeRatesService);
-      },
-    });
-    request = supertest(server.app.callback());
-    await request
+    );
+    await request()
       .get(`/api/exchange-rates`)
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')

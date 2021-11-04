@@ -2,7 +2,7 @@ import { Client as DBClient } from 'pg';
 import { WyreOrder, WyreTransfer, WyreWallet } from '../../services/wyre';
 import { adminWalletName } from '../../routes/wyre-callback';
 import { v4 as uuidv4 } from 'uuid';
-import { setupServer } from '../helpers/server';
+import { setupHub } from '../helpers/server';
 
 class StubWyreService {
   async getWalletByUserAddress(userAddress: string): Promise<WyreWallet | undefined> {
@@ -266,11 +266,11 @@ describe('POST /api/wyre-callback', function () {
     return request().post(url);
   }
 
-  let { getServer, request } = setupServer(this, {
-    registryCallback(registry) {
-      registry.register('wyre', StubWyreService);
-      registry.register('relay', StubRelayService);
-      registry.register('subgraph', StubSubgraphService);
+  let { getContainer, request } = setupHub(this, {
+    additionalRegistrations: {
+      wyre: StubWyreService,
+      relay: StubRelayService,
+      subgraph: StubSubgraphService,
     },
   });
 
@@ -279,7 +279,7 @@ describe('POST /api/wyre-callback', function () {
     waitForPrepaidCardTxnCallCount = 0;
     provisionPrepaidCardCallCount = 0;
 
-    let dbManager = await getServer().container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM wallet_orders`);
     await db.query(`DELETE FROM reservations`);

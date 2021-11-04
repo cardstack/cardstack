@@ -1,6 +1,6 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { expect } from 'chai';
-import { setupServer } from '../../helpers/server';
+import { setupHub } from '../../helpers/server';
 
 if (process.env.COMPILER) {
   describe('PATCH /cards/<card-id>', function () {
@@ -16,7 +16,7 @@ if (process.env.COMPILER) {
         .expect('Content-Type', /json/);
     }
 
-    let { cards, request, realm } = setupServer(this);
+    let { cards, request, realm } = setupHub(this);
 
     this.beforeEach(async function () {
       await cards.create({

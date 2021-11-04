@@ -1,7 +1,6 @@
-import { Registry } from '@cardstack/di';
 import packageJson from '../../package.json';
 import { AcceleratableClock } from '../helpers';
-import { setupServer } from '../helpers/server';
+import { setupHub } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -40,9 +39,9 @@ class StubNonceTracker {
 }
 
 describe('GET /api/session', function () {
-  let { request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
+  let { request } = setupHub(this, {
+    additionalRegistrations: {
+      'authentication-utils': StubAuthenticationUtils,
     },
   });
 
@@ -110,11 +109,11 @@ describe('GET /api/session', function () {
 describe('POST /api/session', function () {
   let bodyWithCorrectSignature: any;
 
-  let { request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
-      registry.register('clock', AcceleratableClock);
-      registry.register('nonce-tracker', StubNonceTracker);
+  let { request } = setupHub(this, {
+    additionalRegistrations: {
+      'authentication-utils': StubAuthenticationUtils,
+      clock: AcceleratableClock,
+      'nonce-tracker': StubNonceTracker,
     },
   });
 
