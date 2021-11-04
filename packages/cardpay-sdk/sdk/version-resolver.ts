@@ -16,7 +16,7 @@ import { rewardPoolMeta, RewardPool } from './reward-pool';
 import { rewardManagerMeta, RewardManager } from './reward-manager';
 import HubAuth from './hub-auth';
 
-type SDK =
+export type SDK =
   | 'Assets'
   | 'LayerOneOracle'
   | 'LayerTwoOracle'
@@ -30,7 +30,7 @@ type SDK =
   | 'RewardPool'
   | 'RewardManager';
 
-type MapReturnType<T> = T extends 'Assets'
+export type MapReturnType<T> = T extends 'Assets'
   ? Assets
   : T extends 'HubAuth'
   ? HubAuth

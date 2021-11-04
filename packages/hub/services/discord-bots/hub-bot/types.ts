@@ -1,5 +1,6 @@
 export interface BetaTestConfig {
   sku: string;
+  discordRole: string;
 }
 
 export interface Web3Config {
