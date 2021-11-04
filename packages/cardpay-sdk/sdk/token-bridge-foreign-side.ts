@@ -7,7 +7,12 @@ import ERC20ABI from '../contracts/abi/erc-20';
 import ForeignAMBABI from '../contracts/abi/foreign-amb';
 import ForeignBridgeABI from '../contracts/abi/foreign-bridge-mediator';
 import { getAddress } from '../contracts/addresses';
-import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from './utils/general-utils';
+import {
+  TransactionOptions,
+  waitUntilTransactionMined,
+  isTransactionHash,
+  waitUntilBlock,
+} from './utils/general-utils';
 
 // The TokenBridge is created between 2 networks, referred to as a Native (or Home) Network and a Foreign network.
 // The Native or Home network has fast and inexpensive operations. All bridge operations to collect validator confirmations are performed on this side of the bridge.
@@ -39,6 +44,8 @@ export interface ITokenBridgeForeignSide {
   ): Promise<TransactionReceipt>;
 }
 
+// Note:  To accommodate the fix for infura block mismatch errors (made in
+// CS-2391), we are waiting one extra block for all layer 1 transactions.
 const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 290000;
 export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   constructor(private layer1Web3: Web3) {}
@@ -58,7 +65,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(tokenAddressOrTxnHash)) {
       let txnHash = tokenAddressOrTxnHash;
-      return waitUntilTransactionMined(this.layer1Web3, txnHash);
+      return await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash);
     }
     let tokenAddress = tokenAddressOrTxnHash;
     if (!amount) {
@@ -94,7 +101,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
             onTxnHash(txnHash);
           }
           try {
-            resolve(await waitUntilTransactionMined(this.layer1Web3, txnHash));
+            resolve(await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash));
           } catch (e) {
             reject(e);
           }
@@ -122,7 +129,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(tokenAddressOrTxnHash)) {
       let txnHash = tokenAddressOrTxnHash;
-      return waitUntilTransactionMined(this.layer1Web3, txnHash);
+      return await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash);
     }
     let tokenAddress = tokenAddressOrTxnHash;
     if (!recipientAddress) {
@@ -160,7 +167,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
             onTxnHash(txnHash);
           }
           try {
-            resolve(await waitUntilTransactionMined(this.layer1Web3, txnHash));
+            resolve(await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash));
           } catch (e) {
             reject(e);
           }
@@ -197,7 +204,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   ): Promise<TransactionReceipt> {
     if (!encodedData) {
       let txnHash = messageIdOrTxnHash;
-      return waitUntilTransactionMined(this.layer1Web3, txnHash);
+      return await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash);
     }
     let messageId = messageIdOrTxnHash;
     if (!signatures) {
@@ -213,8 +220,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     });
     if (events.length === 1) {
       let txnHash = events[0].transactionHash;
-      let receipt = await this.layer1Web3.eth.getTransactionReceipt(txnHash);
-      return receipt;
+      return await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash);
     }
     const packedSignatures = prepSignaturesForExecution(signatures);
     let nextNonce = await this.getNextNonce(from);
@@ -240,7 +246,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
             onTxnHash(txnHash);
           }
           try {
-            resolve(await waitUntilTransactionMined(this.layer1Web3, txnHash));
+            resolve(await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash));
           } catch (e) {
             reject(e);
           }
@@ -279,4 +285,10 @@ function packSignatures(array: { v: string; r: string; s: string }[]) {
 
 function strip0x(s: string) {
   return Web3.utils.isHexStrict(s) ? s.substr(2) : s;
+}
+
+async function waitUntilOneBlockAfterTxnMined(web3: Web3, txnHash: string) {
+  let receipt = await waitUntilTransactionMined(web3, txnHash);
+  await waitUntilBlock(web3, receipt.blockNumber + 1);
+  return receipt;
 }
