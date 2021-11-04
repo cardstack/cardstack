@@ -110,6 +110,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
 
   refreshBalances() {
     this.balancesRefreshed = true;
+    return Promise.resolve();
   }
 
   blockExplorerUrl(txnHash: TransactionHash): string {

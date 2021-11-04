@@ -32,17 +32,13 @@ export const bridgedSymbols = [
   'CARD', // Remove once Sokol is fixed to use CARD.CPXD
 ] as const;
 
-// balances
-export const layer1BalanceSymbols = [
-  tokenSymbols.DAI,
-  tokenSymbols.CARD,
-  tokenSymbols.ETH,
-] as const;
+// layer 1 token symbols
+export const layer1TokenSymbols = [tokenSymbols.DAI, tokenSymbols.CARD];
+export type Layer1TokenSymbol = typeof layer1TokenSymbols[number];
 
 // symbol categories
 export type ConvertibleSymbol = typeof convertibleSymbols[number];
 export type BridgeableSymbol = typeof bridgeableSymbols[number];
-export type Layer1BalanceSymbol = typeof layer1BalanceSymbols[number];
 export type BridgedTokenSymbol = typeof bridgedSymbols[number];
 
 export type ConversionFunction = (amountInWei: string) => number;

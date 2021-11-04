@@ -65,7 +65,7 @@ export interface Layer1Web3Strategy
   cardBalance: BN | undefined;
   nativeTokenSymbol: string | undefined;
   bridgeConfirmationBlockCount: number;
-  refreshBalances(): void;
+  refreshBalances(): Promise<void>;
   connect(walletProvider: WalletProvider): Promise<void>;
   waitForAccount: Promise<void>;
   approve(
