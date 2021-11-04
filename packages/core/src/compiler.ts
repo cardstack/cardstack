@@ -41,7 +41,7 @@ export class Compiler {
     let schemaModule = await this.prepareSchema(cardSource, options);
     let meta = getMeta(options);
 
-    let fields = await this.lookupFieldsForCard(meta.fields);
+    let fields = await this.lookupFieldsForCard(meta.fields, cardSource.url);
 
     this.defineAssets(cardSource);
 
@@ -182,11 +182,12 @@ export class Compiler {
     return await this.builder.define(cardSource.url, schemaLocalFilePath, JS_TYPE, code);
   }
 
-  private async lookupFieldsForCard(metaFields: FieldsMeta): Promise<CompiledCard['fields']> {
+  private async lookupFieldsForCard(metaFields: FieldsMeta, ownURL: string): Promise<CompiledCard['fields']> {
     let fields: CompiledCard['fields'] = {};
     for (let [name, { cardURL, type }] of Object.entries(metaFields)) {
+      let fieldURL = new URL(cardURL, ownURL).href;
       fields[name] = {
-        card: await this.builder.getCompiledCard(cardURL),
+        card: await this.builder.getCompiledCard(fieldURL),
         type,
         name,
       };
