@@ -65,9 +65,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(tokenAddressOrTxnHash)) {
       let txnHash = tokenAddressOrTxnHash;
-      let receipt = await waitUntilTransactionMined(this.layer1Web3, txnHash);
-      await waitUntilBlock(this.layer1Web3, receipt.blockNumber + 1);
-      return receipt;
+      return await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash);
     }
     let tokenAddress = tokenAddressOrTxnHash;
     if (!amount) {
@@ -103,9 +101,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
             onTxnHash(txnHash);
           }
           try {
-            let receipt = await waitUntilTransactionMined(this.layer1Web3, txnHash);
-            await waitUntilBlock(this.layer1Web3, receipt.blockNumber + 1);
-            resolve(receipt);
+            resolve(await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash));
           } catch (e) {
             reject(e);
           }
@@ -133,9 +129,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(tokenAddressOrTxnHash)) {
       let txnHash = tokenAddressOrTxnHash;
-      let receipt = await waitUntilTransactionMined(this.layer1Web3, txnHash);
-      await waitUntilBlock(this.layer1Web3, receipt.blockNumber + 1);
-      return receipt;
+      return await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash);
     }
     let tokenAddress = tokenAddressOrTxnHash;
     if (!recipientAddress) {
@@ -173,9 +167,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
             onTxnHash(txnHash);
           }
           try {
-            let receipt = await waitUntilTransactionMined(this.layer1Web3, txnHash);
-            await waitUntilBlock(this.layer1Web3, receipt.blockNumber + 1);
-            resolve(receipt);
+            resolve(await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash));
           } catch (e) {
             reject(e);
           }
@@ -212,9 +204,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   ): Promise<TransactionReceipt> {
     if (!encodedData) {
       let txnHash = messageIdOrTxnHash;
-      let receipt = await waitUntilTransactionMined(this.layer1Web3, txnHash);
-      await waitUntilBlock(this.layer1Web3, receipt.blockNumber + 1);
-      return receipt;
+      return await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash);
     }
     let messageId = messageIdOrTxnHash;
     if (!signatures) {
@@ -230,9 +220,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
     });
     if (events.length === 1) {
       let txnHash = events[0].transactionHash;
-      let receipt = await waitUntilTransactionMined(this.layer1Web3, txnHash);
-      await waitUntilBlock(this.layer1Web3, receipt.blockNumber + 1);
-      return receipt;
+      return await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash);
     }
     const packedSignatures = prepSignaturesForExecution(signatures);
     let nextNonce = await this.getNextNonce(from);
@@ -258,9 +246,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
             onTxnHash(txnHash);
           }
           try {
-            let receipt = await waitUntilTransactionMined(this.layer1Web3, txnHash);
-            await waitUntilBlock(this.layer1Web3, receipt.blockNumber + 1);
-            resolve(receipt);
+            resolve(await waitUntilOneBlockAfterTxnMined(this.layer1Web3, txnHash));
           } catch (e) {
             reject(e);
           }
@@ -299,4 +285,10 @@ function packSignatures(array: { v: string; r: string; s: string }[]) {
 
 function strip0x(s: string) {
   return Web3.utils.isHexStrict(s) ? s.substr(2) : s;
+}
+
+async function waitUntilOneBlockAfterTxnMined(web3: Web3, txnHash: string) {
+  let receipt = await waitUntilTransactionMined(web3, txnHash);
+  await waitUntilBlock(web3, receipt.blockNumber + 1);
+  return receipt;
 }
