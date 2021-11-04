@@ -15,6 +15,8 @@ export default class Assets implements IAssets {
   async getNativeTokenBalance(userAddress?: string): Promise<string> {
     let address = userAddress ?? (await this.web3.eth.getAccounts())[0];
 
+    // Used to prevent block mismatch errors in infura (layer 1)
+    // https://github.com/88mphapp/ng88mph-frontend/issues/55#issuecomment-940414832
     if (['kovan', 'mainnet'].includes(await networkName(this.web3))) {
       let previousBlockNumber = (await this.web3.eth.getBlockNumber()) - 1;
       return this.web3.eth.getBalance(address, previousBlockNumber);
