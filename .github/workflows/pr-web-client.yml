@@ -34,4 +34,4 @@ jobs:
       - name: Run tests
         env:
           PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_WEB_CLIENT }}
-        run: yarn test:web-client
+        run: yarn test:web-client:percy

@@ -56,6 +56,7 @@
     "test:did-resolver": "cd packages/did-resolver && yarn test",
     "test:discord-bot": "cd packages/discord-bot && yarn test",
     "test:web-client": "cd packages/web-client && percy exec -- ember test",
+    "test:web-client:percy": "cd packages/web-client && ember test",
     "test:web-client:serve": "cd packages/web-client && ember test --serve --no-launch",
     "deploy:boxel": "cd ./packages/boxel && ember deploy production --verbose",
     "deploy:boxel:preview": "cd ./packages/boxel && ember deploy s3-preview --verbose",
