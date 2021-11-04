@@ -42,8 +42,8 @@ module('Acceptance | deposit', function (hooks) {
   setupApplicationTest(hooks);
 
   test('Initiating workflow without wallet connections', async function (assert) {
-    await visit('/card-pay/token-suppliers');
-    assert.equal(currentURL(), '/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
+    assert.equal(currentURL(), '/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);
@@ -353,7 +353,7 @@ module('Acceptance | deposit', function (hooks) {
   });
 
   test('Initiating workflow with layer 1 wallet already connected', async function (assert) {
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
     await click(
       '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
     );
@@ -449,7 +449,7 @@ module('Acceptance | deposit', function (hooks) {
   });
 
   test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
     await click(
       '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'
     );
@@ -539,7 +539,7 @@ module('Acceptance | deposit', function (hooks) {
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await layer2Service.safes.fetch();
 
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);
@@ -623,7 +623,7 @@ module('Acceptance | deposit', function (hooks) {
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await layer2Service.safes.fetch();
 
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);
@@ -703,7 +703,7 @@ module('Acceptance | deposit', function (hooks) {
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await layer2Service.safes.fetch();
 
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);
@@ -788,7 +788,7 @@ module('Acceptance | deposit', function (hooks) {
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);
@@ -873,7 +873,7 @@ module('Acceptance | deposit', function (hooks) {
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);
@@ -963,7 +963,7 @@ module('Acceptance | deposit', function (hooks) {
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="deposit"]');
 
     let post = postableSel(0, 0);

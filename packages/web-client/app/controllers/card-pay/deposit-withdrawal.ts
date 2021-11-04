@@ -8,7 +8,7 @@ import TokenToUsd from '@cardstack/web-client/services/token-to-usd';
 import { TokenBalance } from '@cardstack/web-client/utils/token';
 import BN from 'bn.js';
 
-export default class CardPayTokenSuppliersController extends Controller {
+export default class CardPayDepositAndWithdrawalController extends Controller {
   queryParams = ['flow', { workflowPersistenceId: 'flow-id' }];
   @tracked flow: string | null = null;
   @tracked workflowPersistenceId: string | null = null;
@@ -16,8 +16,8 @@ export default class CardPayTokenSuppliersController extends Controller {
   @service declare layer2Network: Layer2Network;
   @service declare tokenToUsd: TokenToUsd;
 
-  @action transitionToTokenSuppliers(flow: string) {
-    this.router.transitionTo('card-pay.token-suppliers', {
+  @action transitionToDepositWithdrawal(flow: string) {
+    this.router.transitionTo('card-pay.deposit-withdrawal', {
       queryParams: { flow },
     });
   }

@@ -56,7 +56,7 @@ module('Acceptance | deposit persistence', function (hooks) {
   });
 
   test('Generates a flow uuid query parameter used as a persistence identifier', async function (this: Context, assert) {
-    await visit('/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="deposit"]');
     assert.equal(
       new URL('http://domain.test/' + currentURL()).searchParams.get('flow-id')
@@ -79,7 +79,7 @@ module('Acceptance | deposit persistence', function (hooks) {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/deposit-withdrawal?flow=deposit&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L1
       assert.dom('[data-test-milestone="1"]').exists(); // L2
       assert.dom('[data-test-milestone="2"]').exists(); // Deposit
@@ -122,7 +122,7 @@ module('Acceptance | deposit persistence', function (hooks) {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/deposit-withdrawal?flow=deposit&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L1
       assert.dom('[data-test-milestone="1"]').exists(); // L2
       assert.dom('[data-test-milestone="2"]').exists(); // Deposit
@@ -196,7 +196,7 @@ module('Acceptance | deposit persistence', function (hooks) {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/deposit-withdrawal?flow=deposit&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L1
       assert.dom('[data-test-milestone="1"]').exists(); // L2
       assert.dom('[data-test-milestone="2"]').exists(); // Deposit
@@ -294,7 +294,7 @@ module('Acceptance | deposit persistence', function (hooks) {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/deposit-withdrawal?flow=deposit&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L1
       assert.dom('[data-test-milestone="1"]').exists(); // L2
       assert.dom('[data-test-milestone="2"]').exists(); // Deposit
@@ -327,7 +327,7 @@ module('Acceptance | deposit persistence', function (hooks) {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/deposit-withdrawal?flow=deposit&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L1
       assert.dom('[data-test-milestone="1"]').exists(); // L2
       assert.dom('[data-test-milestone="2"]').exists(); // Deposit
@@ -358,7 +358,7 @@ module('Acceptance | deposit persistence', function (hooks) {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/deposit-withdrawal?flow=deposit&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L1
       assert.dom('[data-test-milestone="1"]').exists(); // L2
       assert.dom('[data-test-deposit-transaction-setup-container]').exists();
@@ -369,7 +369,7 @@ module('Acceptance | deposit persistence', function (hooks) {
       await click(
         '[data-test-deposit-transaction-setup-is-complete] [data-test-boxel-action-chin] [data-test-boxel-button]'
       );
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/deposit-withdrawal?flow=deposit&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L1
       assert.dom('[data-test-milestone="1"]').exists(); // L2
       assert.dom('[data-test-deposit-transaction-setup-container]').exists();
@@ -395,7 +395,7 @@ module('Acceptance | deposit persistence', function (hooks) {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/deposit-withdrawal?flow=deposit&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L1
       assert.dom('[data-test-milestone="1"]').doesNotExist(); // L2
       assert.dom('[data-test-milestone="2"]').doesNotExist(); // Deposit
@@ -425,7 +425,7 @@ module('Acceptance | deposit persistence', function (hooks) {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/deposit-withdrawal?flow=deposit&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L1
       assert.dom('[data-test-milestone="1"]').doesNotExist(); // L2
       assert.dom('[data-test-milestone="2"]').doesNotExist(); // Deposit
@@ -449,7 +449,7 @@ module('Acceptance | deposit persistence', function (hooks) {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/deposit-withdrawal?flow=deposit&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L1
       assert.dom('[data-test-milestone="1"]').exists(); // L2
       assert.dom('[data-test-deposit-transaction-setup-container]').exists();
@@ -530,7 +530,7 @@ module('Acceptance | deposit persistence', function (hooks) {
         name: 'RESERVE_POOL_DEPOSIT',
         state,
       });
-      await visit('/card-pay/token-suppliers?flow=deposit&flow-id=abc123');
+      await visit('/card-pay/deposit-withdrawal?flow=deposit&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L1
       assert.dom('[data-test-milestone="1"]').doesNotExist(); // L2
       assert.dom('[data-test-milestone="2"]').doesNotExist(); // Deposit

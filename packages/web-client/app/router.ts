@@ -11,7 +11,7 @@ Router.map(function () {
     this.route('balances');
     this.route('merchant-services');
     this.route('reward-programs');
-    this.route('token-suppliers');
+    this.route('deposit-withdrawal');
   });
   this.route('card-space', function () {
     this.route('profile-card-temp');

@@ -1,7 +1,7 @@
 <section class={{cn "dashboard-panel-section" dashboard-panel-section--bottom-aligned=(not @section.title) dashboard-panel-section--has-disclaimer=(has-block "disclaimer")}} ...attributes>
   <div class="dashboard-panel-section__body">
     {{#if @section.icon}}
-      {{svg-jar @section.icon alt="" role="presentation"}}
+      {{svg-jar @section.icon alt="" role="presentation" width="72"}}
     {{/if}}
     <h3 class="dashboard-panel-section__title">{{@section.title}}</h3>
     <p class="dashboard-panel-section__desc">{{@section.description}}</p>

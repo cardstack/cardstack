@@ -44,8 +44,8 @@ module('Acceptance | withdrawal', function (hooks) {
   setupApplicationTest(hooks);
 
   test('Initiating workflow without wallet connections', async function (assert) {
-    await visit('/card-pay/token-suppliers');
-    assert.equal(currentURL(), '/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
+    assert.equal(currentURL(), '/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="withdrawal"]');
     let post = postableSel(0, 0);
     assert.dom(`${post} img`).exists();
@@ -357,8 +357,8 @@ module('Acceptance | withdrawal', function (hooks) {
   });
 
   test('Initiating workflow without enough ETH to claim', async function (assert) {
-    await visit('/card-pay/token-suppliers');
-    assert.equal(currentURL(), '/card-pay/token-suppliers');
+    await visit('/card-pay/deposit-withdrawal');
+    assert.equal(currentURL(), '/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="withdrawal"]');
     let post = postableSel(0, 2);
     await click(`${post} [data-test-wallet-option="metamask"]`);
@@ -435,7 +435,7 @@ module('Acceptance | withdrawal', function (hooks) {
     });
 
     test('Initiating workflow with layer 1 wallet already connected', async function (assert) {
-      await visit('/card-pay/token-suppliers?flow=withdrawal');
+      await visit('/card-pay/deposit-withdrawal?flow=withdrawal');
 
       assert
         .dom(postableSel(0, 2))
@@ -476,7 +476,7 @@ module('Acceptance | withdrawal', function (hooks) {
     });
 
     test('Disconnecting Layer 1 after proceeding beyond it', async function (assert) {
-      await visit('/card-pay/token-suppliers?flow=withdrawal');
+      await visit('/card-pay/deposit-withdrawal?flow=withdrawal');
 
       assert
         .dom(postableSel(0, 2))
@@ -548,7 +548,7 @@ module('Acceptance | withdrawal', function (hooks) {
     });
 
     test('Initiating workflow with layer 2 wallet already connected', async function (assert) {
-      await visit('/card-pay/token-suppliers?flow=withdrawal');
+      await visit('/card-pay/deposit-withdrawal?flow=withdrawal');
 
       assert
         .dom(milestoneCompletedSel(0))
@@ -565,7 +565,7 @@ module('Acceptance | withdrawal', function (hooks) {
     });
 
     test('Disconnecting Layer 2 after proceeding beyond it', async function (assert) {
-      await visit('/card-pay/token-suppliers?flow=withdrawal');
+      await visit('/card-pay/deposit-withdrawal?flow=withdrawal');
 
       assert
         .dom(milestoneCompletedSel(0))
@@ -601,7 +601,7 @@ module('Acceptance | withdrawal', function (hooks) {
     });
 
     test('Changing layer 1 account should cancel the workflow', async function (assert) {
-      await visit('/card-pay/token-suppliers?flow=withdrawal');
+      await visit('/card-pay/deposit-withdrawal?flow=withdrawal');
 
       assert
         .dom(milestoneCompletedSel(0))
@@ -637,7 +637,7 @@ module('Acceptance | withdrawal', function (hooks) {
     });
 
     test('Changing layer 2 account should cancel the workflow', async function (assert) {
-      await visit('/card-pay/token-suppliers?flow=withdrawal');
+      await visit('/card-pay/deposit-withdrawal?flow=withdrawal');
 
       assert
         .dom(milestoneCompletedSel(0))
