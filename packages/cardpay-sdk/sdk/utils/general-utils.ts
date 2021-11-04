@@ -30,7 +30,7 @@ export async function safeContractCall(
   method: string,
   ...args: any[]
 ): Promise<unknown> {
-  if ((await networkName(web3)) === 'mainnet') {
+  if (['kovan', 'mainnet'].includes(await networkName(web3))) {
     let previousBlockNumber = (await web3.eth.getBlockNumber()) - 1;
     return await contract.methods[method](...args).call({}, await previousBlockNumber);
   }
