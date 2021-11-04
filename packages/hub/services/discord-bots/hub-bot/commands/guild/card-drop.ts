@@ -12,7 +12,7 @@ import Client, { Message } from '@cardstack/discord-bot';
 const log = logger('command:card-me');
 const { sku } = config.get('betaTesting') as BetaTestConfig;
 
-export const name: Command['name'] = 'card-me';
+export const name: Command['name'] = 'card-drop';
 export const description: Command['description'] = 'Airdrop Cardstack prepaid cards';
 export const run: Command['run'] = async (bot: Client, message: Message) => {
   assertHubBot(bot);

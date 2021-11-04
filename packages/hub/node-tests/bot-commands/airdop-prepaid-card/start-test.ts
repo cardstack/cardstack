@@ -135,7 +135,7 @@ describe('bot command: airdrop-prepaidcard:start', function () {
     });
 
     await command(bot, message, [dm.id]);
-    expect(dm.lastResponse).to.equal(`ok, if you change your mind type \`!card-me\` in the public channel.`);
+    expect(dm.lastResponse).to.equal(`ok, if you change your mind type \`!card-drop\` in the public channel.`);
   });
 
   it(`can tell the user it doesn't understand`, async function () {

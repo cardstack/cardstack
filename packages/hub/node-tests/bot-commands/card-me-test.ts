@@ -1,7 +1,7 @@
 import { Client as DBClient } from 'pg';
 import { HubBotController } from '../../main';
 import config from 'config';
-import { name as commandName, run as command } from '../../services/discord-bots/hub-bot/commands/guild/card-me';
+import { name as commandName, run as command } from '../../services/discord-bots/hub-bot/commands/guild/card-drop';
 import * as JSONAPI from 'jsonapi-typescript';
 import Bot, {
   MockUser,
@@ -15,7 +15,7 @@ import { BetaTestConfig } from '../../services/discord-bots/hub-bot/types';
 
 const { sku, discordRole: betaTesterRoleName } = config.get('betaTesting') as BetaTestConfig;
 
-describe('bot command: card-me', function () {
+describe('bot command: card-drop', function () {
   let botController: HubBotController;
   let db: DBClient;
   let bot: Bot;
@@ -73,7 +73,7 @@ describe('bot command: card-me', function () {
   });
 
   it(`has a command name`, async function () {
-    expect(commandName).to.equal('card-me');
+    expect(commandName).to.equal('card-drop');
   });
 
   it(`starts a conversation with a beta tester that has not yet received an airdrop`, async function () {
@@ -82,7 +82,7 @@ describe('bot command: card-me', function () {
     let message = makeTestMessage({
       user,
       guild,
-      content: '!card-me',
+      content: '!card-drop',
       userRoles: roles,
       onCreateDM: () => Promise.resolve(dm),
       channel,
@@ -99,7 +99,7 @@ describe('bot command: card-me', function () {
     let message = makeTestMessage({
       user,
       guild,
-      content: '!card-me',
+      content: '!card-drop',
       onCreateDM: () => Promise.resolve(dm),
       channel,
     });
@@ -121,7 +121,7 @@ describe('bot command: card-me', function () {
     let message = makeTestMessage({
       user,
       guild,
-      content: '!card-me',
+      content: '!card-drop',
       userRoles: roles,
       onCreateDM: () => Promise.resolve(dm),
       channel,
@@ -150,7 +150,7 @@ describe('bot command: card-me', function () {
     let message = makeTestMessage({
       user,
       guild,
-      content: '!card-me',
+      content: '!card-drop',
       userRoles: roles,
       onCreateDM: () => Promise.resolve(dm),
       channel,
@@ -171,7 +171,7 @@ describe('bot command: card-me', function () {
     let message = makeTestMessage({
       user,
       guild,
-      content: '!card-me',
+      content: '!card-drop',
       userRoles: roles,
       onCreateDM: () => Promise.resolve(dm),
       channel,
