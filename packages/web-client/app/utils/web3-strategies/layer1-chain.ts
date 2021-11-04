@@ -3,13 +3,13 @@ import { defer, hash } from 'rsvp';
 import BN from 'bn.js';
 import Web3 from 'web3';
 import { TransactionReceipt } from 'web3-core';
-import { Contract } from 'web3-eth-contract';
 import * as Sentry from '@sentry/browser';
 
 import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
 import {
   BridgeableSymbol,
   ConversionFunction,
+  Layer1TokenSymbol,
   TokenContractInfo,
 } from '../token';
 import WalletInfo from '../wallet-info';
@@ -28,6 +28,7 @@ import {
   BridgeValidationResult,
   getConstantByNetwork,
   getSDK,
+  IAssets,
   ILayerOneOracle,
   networkIds,
   waitUntilBlock,
@@ -51,7 +52,8 @@ export default abstract class Layer1ChainWeb3Strategy
   // changes with connection state
   #waitForAccountDeferred = defer<void>();
   web3: Web3 | undefined;
-  #layerOneOracleApi!: ILayerOneOracle;
+  #layerOneOracleApi?: ILayerOneOracle;
+  #assetsApi?: IAssets;
   connectionManager: ConnectionManager;
   eventListenersToUnbind: {
     [event in ConnectionManagerEvent]?: UnbindEventListener;
@@ -160,6 +162,7 @@ export default abstract class Layer1ChainWeb3Strategy
       this.web3 = new Web3();
       await this.connectionManager.reconnect(this.web3, providerId);
       this.#layerOneOracleApi = await getSDK('LayerOneOracle', this.web3);
+      this.#assetsApi = await getSDK('Assets', this.web3);
     } catch (e) {
       console.error('Failed to initialize connection from local storage');
       console.error(e);
@@ -174,6 +177,7 @@ export default abstract class Layer1ChainWeb3Strategy
       this.web3 = new Web3();
       await this.connectionManager.connect(this.web3, walletProvider.id);
       this.#layerOneOracleApi = await getSDK('LayerOneOracle', this.web3);
+      this.#assetsApi = await getSDK('Assets', this.web3);
     } catch (e) {
       console.error(
         `Failed to create connection manager: ${walletProvider.id}`
@@ -201,6 +205,8 @@ export default abstract class Layer1ChainWeb3Strategy
     this.web3 = undefined;
     this.currentProviderId = '';
     this.connectedChainId = undefined;
+    this.#layerOneOracleApi = undefined;
+    this.#assetsApi = undefined;
     this.#waitForAccountDeferred = defer();
   }
 
@@ -251,8 +257,8 @@ export default abstract class Layer1ChainWeb3Strategy
     if (!this.isConnected) return;
     let balances = await Promise.all<string>([
       this.getDefaultTokenBalance(),
-      this.getErc20Balance(this.contractForToken('DAI')),
-      this.getErc20Balance(this.contractForToken('CARD')),
+      this.getErc20Balance('DAI'),
+      this.getErc20Balance('CARD'),
     ]);
     let [defaultTokenBalance, daiBalance, cardBalance] = balances;
     this.defaultTokenBalance = new BN(defaultTokenBalance);
@@ -260,18 +266,31 @@ export default abstract class Layer1ChainWeb3Strategy
     this.cardBalance = new BN(cardBalance);
   }
 
-  private getErc20Balance(contract: Contract) {
-    return contract.methods.balanceOf(this.walletInfo.firstAddress).call();
+  private async getErc20Balance(
+    tokenSymbol: Layer1TokenSymbol
+  ): Promise<string> {
+    if (!this.#assetsApi) {
+      throw new Error('Cannot get token balances without a web3 connection');
+    }
+    if (!this.walletInfo.firstAddress) {
+      return '0';
+    }
+    let { address } = new TokenContractInfo(tokenSymbol, this.networkSymbol);
+
+    return this.#assetsApi.getBalanceForToken(
+      address,
+      this.walletInfo.firstAddress
+    );
   }
 
-  private async getDefaultTokenBalance() {
-    if (!this.web3) throw new Error('Cannot get token balances without web3');
-    if (this.walletInfo.firstAddress)
-      return await this.web3.eth.getBalance(
-        this.walletInfo.firstAddress,
-        'latest'
-      );
-    else return 0;
+  private async getDefaultTokenBalance(): Promise<string> {
+    if (!this.#assetsApi) {
+      throw new Error('Cannot get token balances without a web3 connection');
+    }
+    if (!this.walletInfo.firstAddress) {
+      return '0';
+    }
+    return this.#assetsApi.getNativeTokenBalance(this.walletInfo.firstAddress);
   }
 
   async approve(
@@ -372,12 +391,15 @@ export default abstract class Layer1ChainWeb3Strategy
   async updateUsdConverters(
     symbolsToUpdate: UsdConvertibleSymbol[]
   ): Promise<Record<UsdConvertibleSymbol, ConversionFunction>> {
+    let layerOneOracleApi = this.#layerOneOracleApi;
+    if (!layerOneOracleApi)
+      throw new Error('Cannot updateUsdConverters without a web3 connection');
     let promisesHash = {} as Record<
       UsdConvertibleSymbol,
       Promise<ConversionFunction>
     >;
     for (let symbol of symbolsToUpdate) {
-      promisesHash[symbol] = this.#layerOneOracleApi.getEthToUsdConverter();
+      promisesHash[symbol] = layerOneOracleApi.getEthToUsdConverter();
     }
     return hash(promisesHash);
   }
