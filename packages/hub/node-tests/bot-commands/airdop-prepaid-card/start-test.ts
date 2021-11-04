@@ -178,15 +178,15 @@ describe('bot command: airdrop-prepaidcard:start', function () {
     expect(dm.responses.length).to.equal(4);
     expect(dm.responses[0]).to.equal(`<qr code image>`);
     expect(dm.responses[1]).to.equal(
-      `Great! I see your wallet address is 0x123. I'm sending you a prepaid card, hang on...`
+      `Great! I see your wallet address is ${mockEOA}. I'm sending you a prepaid card, hang on...`
     );
     expect(dm.responses[2]).to.equal(
-      `Your prepaid card is on the way, here is the transaction that includes your prepaid card https://blockscout.com/poa/sokoltx/0x456/token-transfers`
+      `Your prepaid card is on the way, here is the transaction that includes your prepaid card https://blockscout.com/poa/sokoltx/${mockTxnHash}/token-transfers`
     );
     expect(dm.responses[3].type).to.equal('rich');
     expect(dm.responses[3].title).to.equal('Your Prepaid Card is Ready!');
     expect(dm.responses[3].description).to.equal(
-      'Your prepaid card address is 0x789. You can refresh your Card Wallet app to see your new prepaid card.'
+      `Your prepaid card address is ${mockPrepaidCardAddress}. You can refresh your Card Wallet app to see your new prepaid card.`
     );
     expect(dm.responses[3].image.url).to.equal(`attachment://${sku}.png`);
 
@@ -218,13 +218,13 @@ describe('bot command: airdrop-prepaidcard:start', function () {
     await command(bot, message, [dm.id]);
     expect(dm.responses.length).to.equal(3);
     expect(dm.responses[0]).to.equal(
-      `Great! I see your wallet address is 0x123. I'm sending you a prepaid card, hang on...`
+      `Great! I see your wallet address is ${mockEOA}. I'm sending you a prepaid card, hang on...`
     );
     expect(dm.responses[1]).to.equal(
-      `Your prepaid card is on the way, here is the transaction that includes your prepaid card https://blockscout.com/poa/sokoltx/0x456/token-transfers`
+      `Your prepaid card is on the way, here is the transaction that includes your prepaid card https://blockscout.com/poa/sokoltx/${mockTxnHash}/token-transfers`
     );
     expect(dm.responses[2].description).to.equal(
-      'Your prepaid card address is 0x789. You can refresh your Card Wallet app to see your new prepaid card.'
+      `Your prepaid card address is ${mockPrepaidCardAddress}. You can refresh your Card Wallet app to see your new prepaid card.`
     );
   });
 });
