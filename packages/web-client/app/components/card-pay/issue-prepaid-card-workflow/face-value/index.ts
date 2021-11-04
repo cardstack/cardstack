@@ -3,11 +3,12 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
+import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import { fromWei } from 'web3-utils';
 import BN from 'bn.js';
 import {
+  BridgedTokenSymbol,
   TokenDisplayInfo,
-  TokenSymbol,
 } from '@cardstack/web-client/utils/token';
 import { faceValueOptions } from '../index';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
@@ -22,7 +23,7 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
   faceValueOptions = faceValueOptions;
 
   @service declare layer2Network: Layer2Network;
-  get fundingTokenSymbol(): TokenSymbol {
+  get fundingTokenSymbol(): BridgedTokenSymbol {
     return this.args.workflowSession.getValue('prepaidFundingToken')!;
   }
   @tracked selectedFaceValue?: FaceValue;
@@ -32,7 +33,7 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
     this.options = await Promise.all(
       this.faceValueOptions.map(async (spendAmount) => {
         let result: string = await this.layer2Network.convertFromSpend(
-          'DAI',
+          this.layer2Network.bridgedDaiTokenSymbol,
           spendAmount
         );
         let approxTokenAmount = Math.ceil(parseFloat(fromWei(result))); // for display only
@@ -54,11 +55,21 @@ class FaceValueCard extends Component<WorkflowCardComponentArgs> {
     }
   }
 
+  get fundingSafe(): Safe {
+    return this.layer2Network.safes.getByAddress(
+      this.args.workflowSession.getValue<string>('prepaidFundingSafeAddress')!
+    )!;
+  }
+
   get fundingTokenBalance(): BN {
-    if (this.fundingTokenSymbol === 'DAI.CPXD') {
-      return this.layer2Network.defaultTokenBalance ?? new BN('0');
-    }
-    return new BN('0');
+    let safe = this.fundingSafe;
+    let tokenSymbol = this.fundingTokenSymbol;
+
+    let balance = safe.tokens.find(
+      (token) => token.token.symbol === tokenSymbol
+    )?.balance;
+
+    return balance ? new BN(balance) : new BN(0);
   }
 
   get fundingToken() {

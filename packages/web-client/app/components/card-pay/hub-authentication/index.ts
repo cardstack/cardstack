@@ -1,9 +1,10 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { taskFor } from 'ember-concurrency-ts';
-import { task, TaskGenerator } from 'ember-concurrency';
+import { race, rawTimeout, task, TaskGenerator } from 'ember-concurrency';
 import HubAuthentication from '@cardstack/web-client/services/hub-authentication';
 import { tracked } from '@glimmer/tracking';
+import config from '@cardstack/web-client/config/environment';
 
 interface CardPayWorkflowHubAuthComponentArgs {
   onComplete: () => void;
@@ -11,19 +12,36 @@ interface CardPayWorkflowHubAuthComponentArgs {
   frozen: boolean;
 }
 
+const A_WHILE = config.environment === 'test' ? 100 : 1000 * 60;
+
 export default class CardPayWorkflowHubAuthComponent extends Component<CardPayWorkflowHubAuthComponentArgs> {
   @service declare hubAuthentication: HubAuthentication;
   @tracked error?: Error;
+  @tracked authTaskRunningForAWhile = false;
+  supportURL = config.urls.discordSupportChannelUrl;
 
   @task *authenticationTask(): TaskGenerator<void> {
     try {
       this.error = undefined;
-      yield this.hubAuthentication.ensureAuthenticated();
-      if (this.hubAuthentication.isAuthenticated) this.args.onComplete();
+      yield race([
+        taskFor(this.timerTask).perform(),
+        this.hubAuthentication.ensureAuthenticated(),
+      ]);
+      if (this.hubAuthentication.isAuthenticated) {
+        this.args.onComplete();
+      } else if (this.authTaskRunningForAWhile) {
+        this.error = new Error('AUTH_TIMEOUT');
+      }
     } catch (e) {
       console.error(e);
       this.error = e;
     }
+  }
+
+  @task *timerTask(): TaskGenerator<void> {
+    this.authTaskRunningForAWhile = false;
+    yield rawTimeout(A_WHILE);
+    this.authTaskRunningForAWhile = true;
   }
 
   get authState() {

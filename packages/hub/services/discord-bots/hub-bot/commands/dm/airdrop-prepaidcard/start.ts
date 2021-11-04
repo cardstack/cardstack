@@ -1,18 +1,18 @@
-import { getConstantByNetwork, getSDK } from '@cardstack/cardpay-sdk';
+import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
 import config from 'config';
 import Bot, { Command, Message, MessageEmbed } from '@cardstack/discord-bot';
 import logger from '@cardstack/logger';
 import * as Sentry from '@sentry/node';
 import { basename, join } from 'path';
-import { deactivateDMConversation } from '@cardstack/discord-bot/utils/dm';
 import {
   getBetaTester,
+  setBetaTester,
   setBetaTesterAddress,
   setBetaTesterAirdropPrepaidCard,
   setBetaTesterAirdropTxnHash,
 } from '../../../utils/beta-tester';
 import { BetaTestConfig, Web3Config } from '../../../types';
-import { name as cardmeName } from '../../guild/card-me';
+import { name as cardmeName } from '../../guild/card-drop';
 import HubBot from '../../..';
 import { assertHubBot } from '../../../utils';
 
@@ -33,13 +33,14 @@ const quitCommands = ['quit', 'cancel', 'no', 'nope', 'nah', 'nevermind', 'nvm',
 // all the commands modules for a conversation can be grouped within the
 // conversation folder (like this one).
 
-export const run: Command['run'] = async (bot, message, [channelId] = []) => {
+export const run: Command['run'] = async (bot: Bot, message: Message, args: string[] = []) => {
+  let [channelId] = args;
   if (!channelId || !message) {
     return;
   }
-  let db = await bot.databaseManager.getClient();
+  let db = await bot.getDatabaseClient();
   if (quitCommands.includes(message.content.toLowerCase())) {
-    deactivateDMConversation(db, channelId, message.author.id);
+    bot.dmChannelsDbGateway.deactivateDMConversation(channelId, message.author.id);
     await message.reply(`ok, if you change your mind type \`!${cardmeName}\` in the public channel.`);
     return;
   }
@@ -67,6 +68,7 @@ export const run: Command['run'] = async (bot, message, [channelId] = []) => {
       address = betaTester.address;
     }
 
+    await setBetaTester(db, userId, message.author.username);
     Sentry.addBreadcrumb({ message: `captured user address for prepaid card airdrop ${address} of sku ${sku}` });
     await setBetaTesterAddress(db, userId, address);
     if (!(await checkInventory(message, bot))) {
@@ -87,7 +89,7 @@ export const run: Command['run'] = async (bot, message, [channelId] = []) => {
       );
 
       let web3 = await bot.web3.getInstance();
-      let marketAPI = await getSDK('PrepaidCardMarket', web3);
+      let marketAPI = await bot.cardpay.getSDK('PrepaidCardMarket', web3);
       let prepaidCard = await marketAPI.getPrepaidCardFromProvisionTxnHash(txnHash);
       Sentry.addBreadcrumb({
         message: `obtained prepaid card address for prepaid card airdrop to ${address}: ${prepaidCard.address}`,
@@ -116,7 +118,7 @@ export const run: Command['run'] = async (bot, message, [channelId] = []) => {
       await message.reply('Uh Oh! Something went wrong. Please contact an admin to get help is getting a prepaid card');
     }
   } finally {
-    await deactivateDMConversation(db, channelId, message.author.id);
+    await bot.dmChannelsDbGateway.deactivateDMConversation(channelId, message.author.id);
   }
 };
 

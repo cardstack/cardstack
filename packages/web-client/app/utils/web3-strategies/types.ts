@@ -65,7 +65,7 @@ export interface Layer1Web3Strategy
   cardBalance: BN | undefined;
   nativeTokenSymbol: string | undefined;
   bridgeConfirmationBlockCount: number;
-  refreshBalances(): void;
+  refreshBalances(): Promise<void>;
   connect(walletProvider: WalletProvider): Promise<void>;
   waitForAccount: Promise<void>;
   approve(
@@ -102,6 +102,11 @@ export interface Layer2Web3Strategy
   defaultTokenBalance: BN | undefined;
   cardBalance: BN | undefined;
   depotSafe: DepotSafe | null;
+  issuePrepaidCardSpendMinValue: number;
+  /**
+   * This property should only be accessed after layer 2 has been connected
+   */
+  issuePrepaidCardDaiMinValue: BN;
   walletConnectUri: string | undefined;
   initializeTask(): TaskGenerator<void>;
   updateUsdConverters(
@@ -119,7 +124,7 @@ export interface Layer2Web3Strategy
   bridgeToLayer1(
     safeAddress: string,
     receiverAddress: string,
-    tokenSymbol: BridgeableSymbol,
+    tokenSymbol: BridgedTokenSymbol,
     amountInWei: string
   ): Promise<TransactionHash>;
   awaitBridgedToLayer1(
@@ -144,7 +149,7 @@ export interface Layer2Web3Strategy
     options: TransactionOptions
   ): Promise<MerchantSafe>;
   resumeRegisterMerchantTransaction(txnHash: string): Promise<MerchantSafe>;
-  defaultTokenSymbol: ConvertibleSymbol;
+  defaultTokenSymbol: BridgedTokenSymbol;
   refreshSafesAndBalances(): void;
   convertFromSpend(symbol: ConvertibleSymbol, amount: number): Promise<string>;
 }

@@ -19,31 +19,34 @@ export type TokenSymbol = keyof typeof tokenSymbols;
 export const convertibleSymbols = [
   tokenSymbols.DAI,
   tokenSymbols.CARD,
+  tokenSymbols['DAI.CPXD'],
+  tokenSymbols['CARD.CPXD'],
 ] as const;
 
 // contract/bridging
 export const bridgeableSymbols = [tokenSymbols.DAI, tokenSymbols.CARD] as const;
 export const bridgedSymbols = [
-  tokenSymbols['DAI.CPXD'],
-  tokenSymbols['CARD.CPXD'],
+  'DAI.CPXD',
+  'CARD.CPXD',
+  'DAI', // Remove once Sokol is fixed to use DAI.CPXD
+  'CARD', // Remove once Sokol is fixed to use CARD.CPXD
 ] as const;
 
-// balances
-export const layer1BalanceSymbols = [
-  tokenSymbols.DAI,
-  tokenSymbols.CARD,
-  tokenSymbols.ETH,
-] as const;
+// layer 1 token symbols
+export const layer1TokenSymbols = [tokenSymbols.DAI, tokenSymbols.CARD];
+export type Layer1TokenSymbol = typeof layer1TokenSymbols[number];
 
 // symbol categories
 export type ConvertibleSymbol = typeof convertibleSymbols[number];
 export type BridgeableSymbol = typeof bridgeableSymbols[number];
-export type Layer1BalanceSymbol = typeof layer1BalanceSymbols[number];
 export type BridgedTokenSymbol = typeof bridgedSymbols[number];
 
 export type ConversionFunction = (amountInWei: string) => number;
 
-const contractNames: Record<NetworkSymbol, Record<BridgeableSymbol, string>> = {
+const contractNames: Record<
+  NetworkSymbol,
+  Partial<Record<TokenSymbol, string>>
+> = {
   kovan: {
     DAI: 'daiToken',
     CARD: 'cardToken',
@@ -56,24 +59,11 @@ const contractNames: Record<NetworkSymbol, Record<BridgeableSymbol, string>> = {
     DAI: 'daiCpxd',
     CARD: 'cardCpxd',
   },
-  // xdai does not have any addresses as of yet.
   xdai: {
-    DAI: '',
-    CARD: '',
+    'DAI.CPXD': 'daiCpxd',
+    'CARD.CPXD': 'cardCpxd',
   },
 };
-
-export function getUnbridgedSymbol(
-  bridgedSymbol: BridgedTokenSymbol
-): BridgeableSymbol {
-  if (bridgedSymbol === tokenSymbols['DAI.CPXD']) {
-    return tokenSymbols.DAI;
-  } else if (bridgedSymbol === tokenSymbols['CARD.CPXD']) {
-    return tokenSymbols.CARD;
-  } else {
-    throw new Error(`Unknown bridgedSymbol ${bridgedSymbol}`);
-  }
-}
 
 export function isBridgedTokenSymbol(
   symbol: TokenSymbol
@@ -82,17 +72,12 @@ export function isBridgedTokenSymbol(
 }
 
 export class TokenContractInfo {
-  symbol: BridgeableSymbol;
+  symbol: TokenSymbol;
   address: ChainAddress;
   abi = ERC20ABI as AbiItem[];
 
-  constructor(symbol: BridgeableSymbol, network: NetworkSymbol) {
+  constructor(symbol: TokenSymbol, network: NetworkSymbol) {
     this.symbol = symbol;
-    if (network === 'xdai') {
-      throw new Error(
-        "XDAI addresses may not be available yet. Please check the sdk's getAddressByNetwork method to see if this has changed"
-      );
-    }
     this.address = getAddressByNetwork(
       contractNames[network][this.symbol] as AddressKeys,
       network
@@ -127,7 +112,7 @@ const _tokenDisplayInfoMap: Record<TokenSymbol, DisplayInfo> = {
   },
   'CARD.CPXD': {
     name: 'Card',
-    symbol: 'CARD',
+    symbol: 'CARD.CPXD',
     description: '',
     icon: 'card-token',
   },
@@ -153,8 +138,20 @@ export class TokenDisplayInfo<T extends TokenSymbol> implements DisplayInfo {
     this.icon = displayInfo.icon;
   }
 
-  static iconFor(symbol: TokenSymbol) {
-    return _tokenDisplayInfoMap[symbol].icon;
+  static iconFor(symbol: string) {
+    switch (symbol) {
+      case 'ETH':
+        return _tokenDisplayInfoMap['ETH'].icon;
+      case 'DAI':
+      case 'DAI.CPXD':
+      case 'XDAI':
+        return _tokenDisplayInfoMap['DAI'].icon;
+      case 'CARD':
+      case 'CARD.CPXD':
+        return _tokenDisplayInfoMap['CARD'].icon;
+      default:
+        return undefined;
+    }
   }
 }
 

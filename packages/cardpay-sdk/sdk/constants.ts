@@ -26,13 +26,16 @@ const SOKOL = {
   nativeTokenCoingeckoId: 'ethereum',
   nativeTokenSymbol: 'SPOA',
   nativeTokenName: 'SPOA',
+  bridgedDaiTokenSymbol: 'DAI',
+  bridgedCardTokenSymbol: 'CARD',
   name: 'Sokol',
-  // this needs to be an "archive" node
-  rpcNode: 'https://sokol-archive.blockscout.com',
+  rpcNode: 'https://sokol.poa.network',
+  rpcArchiveNode: 'https://sokol-archive.blockscout.com',
   rpcWssNode: 'wss://sokol.poa.network/wss',
   relayServiceURL: 'https://relay-staging.stack.cards/api',
   subgraphURL: 'https://graph-staging.stack.cards/subgraphs/name/habdelra/cardpay-sokol',
   tallyServiceURL: 'https://tally-service-staging.stack.cards/api/v1',
+  merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_STAGING_HOSTNAME,
 };
 const KOVAN = {
   apiBaseUrl: 'https://api-kovan.etherscan.io/api',
@@ -55,7 +58,7 @@ const MAINNET = {
   /** deployed instance of this contract: https://github.com/wbobeirne/eth-balance-checker */
   balanceCheckerContractAddress: '0x4dcf4562268dd384fe814c00fad239f06c2a0c2b',
   blockExplorer: 'https://etherscan.io',
-  bridgeExplorer: 'https://alm-xdai.herokuapp.com',
+  bridgeExplorer: 'https://alm-xdai.herokuapp.com/1',
   nativeTokenAddress: 'eth',
   nativeTokenCoingeckoId: 'ethereum',
   nativeTokenSymbol: 'ETH',
@@ -70,17 +73,20 @@ const XDAI = {
   /** deployed instance of this contract: https://github.com/wbobeirne/eth-balance-checker */
   balanceCheckerContractAddress: '0x6B78C121bBd10D8ef0dd3623CC1abB077b186F65',
   blockExplorer: 'https://blockscout.com/xdai/mainnet',
-  bridgeExplorer: 'https://alm-xdai.herokuapp.com',
-  nativeTokenAddress: 'dai',
-  nativeTokenCoingeckoId: 'dai',
-  nativeTokenSymbol: 'DAI',
+  bridgeExplorer: 'https://alm-xdai.herokuapp.com/100',
+  nativeTokenAddress: 'xdai',
+  nativeTokenCoingeckoId: 'xdai',
+  nativeTokenSymbol: 'XDAI',
   nativeTokenName: 'xDai',
+  bridgedDaiTokenSymbol: 'DAI.CPXD',
+  bridgedCardTokenSymbol: 'CARD.CPXD',
   name: 'xDai Chain',
-  // this needs to be an "archive" node
-  rpcNode: 'https://xdai-archive.blockscout.com',
+  rpcNode: 'https://rpc.xdaichain.com',
+  rpcArchiveNode: 'https://xdai-archive.blockscout.com', // warning this is an OpenEthereum node which has issues with modern web3 providers
   rpcWssNode: 'wss://rpc.xdaichain.com/wss',
   relayServiceURL: 'https://relay.cardstack.com/api',
   subgraphURL: 'https://graph.cardstack.com/subgraphs/name/habdelra/cardpay-xdai',
+  merchantUniLinkDomain: MERCHANT_PAYMENT_UNIVERSAL_LINK_HOSTNAME,
 };
 
 type ConstantKeys = keyof typeof SOKOL | keyof typeof KOVAN | keyof typeof MAINNET | keyof typeof XDAI;

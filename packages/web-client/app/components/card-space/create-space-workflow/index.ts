@@ -37,7 +37,7 @@ export const MILESTONE_TITLES = [
   `Create Card Space`,
 ];
 
-export const WORKFLOW_VERSION = 1;
+export const WORKFLOW_VERSION = 2;
 
 class CreateSpaceWorkflow extends Workflow {
   @service declare router: RouterService;

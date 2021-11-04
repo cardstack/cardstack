@@ -9,6 +9,7 @@ import {
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import percySnapshot from '@percy/ember';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
@@ -119,7 +120,7 @@ module('Acceptance | create merchant', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '0')],
+        tokens: [createSafeToken('DAI.CPXD', '0')],
       }),
       createMockPrepaidCard(
         layer2AccountAddress,
@@ -233,6 +234,8 @@ module('Acceptance | create merchant', function (hooks) {
 
     await waitFor(epiloguePostableSel(1));
 
+    await percySnapshot(assert);
+
     await click(
       `${epiloguePostableSel(
         1
@@ -257,7 +260,7 @@ module('Acceptance | create merchant', function (hooks) {
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           owners: [layer2AccountAddress],
-          tokens: [createSafeToken('DAI', '0')],
+          tokens: [createSafeToken('DAI.CPXD', '0')],
         }),
         createMockPrepaidCard(
           layer2AccountAddress,
@@ -504,7 +507,7 @@ module('Acceptance | create merchant', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '0')],
+        tokens: [createSafeToken('DAI.CPXD', '0')],
       }),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -541,7 +544,7 @@ module('Acceptance | create merchant', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '0')],
+        tokens: [createSafeToken('DAI.CPXD', '0')],
       }),
       createMockPrepaidCard(
         layer2AccountAddress,

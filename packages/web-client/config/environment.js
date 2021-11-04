@@ -64,8 +64,8 @@ module.exports = function (environment) {
       // when it is created
     },
     chains: {
-      layer1: process.env.LAYER_1_CHAIN || 'keth', // set to "eth" for production
-      layer2: process.env.LAYER_2_CHAIN || 'sokol', // set to "xdai" for production,
+      layer1: process.env.DEPLOY_TARGET === 'production' ? 'eth' : 'keth',
+      layer2: process.env.DEPLOY_TARGET === 'production' ? 'xdai' : 'sokol',
     },
     features: {
       createMerchant: true,
@@ -78,8 +78,8 @@ module.exports = function (environment) {
       appStoreLink: undefined,
       googlePlayStoreLink: undefined,
       testFlightLink: 'https://cardstack.com/cardpay',
-      discordBetaChannelLink:
-        'https://discord.com/channels/584043165066199050/867588838524190762',
+      discordSupportChannelUrl:
+        'https://discord.com/channels/584043165066199050/899645340746141806',
     },
     threadAnimationInterval: 1000,
     'ember-cli-mirage': {

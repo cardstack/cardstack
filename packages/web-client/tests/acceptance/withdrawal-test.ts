@@ -9,6 +9,7 @@ import {
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import percySnapshot from '@percy/ember';
 import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
@@ -131,8 +132,8 @@ module('Acceptance | withdrawal', function (hooks) {
         address: depotAddress,
         owners: [layer2AccountAddress],
         tokens: [
-          createSafeToken('DAI', '250000000000000000000'),
-          createSafeToken('CARD', '500000000000000000000'),
+          createSafeToken('DAI.CPXD', '250000000000000000000'),
+          createSafeToken('CARD.CPXD', '500000000000000000000'),
         ],
       }),
       createMerchantSafe({
@@ -140,8 +141,8 @@ module('Acceptance | withdrawal', function (hooks) {
         merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
         accumulatedSpendValue: 100,
         tokens: [
-          createSafeToken('DAI', '125000000000000000000'),
-          createSafeToken('CARD', '450000000000000000000'),
+          createSafeToken('DAI.CPXD', '125000000000000000000'),
+          createSafeToken('CARD.CPXD', '450000000000000000000'),
         ],
       }),
     ]);
@@ -270,10 +271,10 @@ module('Acceptance | withdrawal', function (hooks) {
       );
     await waitFor(postableSel(4, 1));
 
-    layer2Service.test__simulateBridgedToLayer1(
+    await layer2Service.test__simulateBridgedToLayer1(
       merchantAddress,
       layer1AccountAddress,
-      'CARD',
+      'CARD.CPXD',
       toWei('200')
     );
     await settled();
@@ -327,11 +328,14 @@ module('Acceptance | withdrawal', function (hooks) {
     await waitFor(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`);
 
     assert
+      .dom(`${epiloguePostableSel(3)} [data-test-safe-address]`)
+      .containsText(merchantAddress);
+    assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI.CPXD"]`)
-      .containsText('250.00');
+      .containsText('125.00');
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="CARD.CPXD"]`)
-      .containsText('500.00');
+      .containsText('250.00');
     assert
       .dom(
         '[data-test-milestone] [data-test-boxel-action-chin] button[data-test-boxel-button]:not([disabled])'
@@ -343,6 +347,9 @@ module('Acceptance | withdrawal', function (hooks) {
         `${epiloguePostableSel(4)} [data-test-withdrawal-next-step="dashboard"]`
       )
       .exists();
+
+    await percySnapshot(assert);
+
     await click(
       `${epiloguePostableSel(4)} [data-test-withdrawal-next-step="dashboard"]`
     );
@@ -534,7 +541,7 @@ module('Acceptance | withdrawal', function (hooks) {
         .strategy as Layer2TestWeb3Strategy;
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
-          tokens: [createSafeToken('DAI', '0')],
+          tokens: [createSafeToken('DAI.CPXD', '0')],
         }),
       ]);
       await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);

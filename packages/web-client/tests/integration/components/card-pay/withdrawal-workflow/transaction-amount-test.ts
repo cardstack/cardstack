@@ -43,8 +43,8 @@ module(
         createDepotSafe({
           address: depotAddress,
           tokens: [
-            createSafeToken('DAI', startDaiAmount),
-            createSafeToken('CARD', '0'),
+            createSafeToken('DAI.CPXD', startDaiAmount),
+            createSafeToken('CARD.CPXD', '0'),
           ],
         }),
       ]);
@@ -160,8 +160,8 @@ module(
         createDepotSafe({
           address: depotAddress,
           tokens: [
-            createSafeToken('DAI', balanceBiggerThanLimit.toString()),
-            createSafeToken('CARD', '0'),
+            createSafeToken('DAI.CPXD', balanceBiggerThanLimit.toString()),
+            createSafeToken('CARD.CPXD', '0'),
           ],
         }),
       ]);

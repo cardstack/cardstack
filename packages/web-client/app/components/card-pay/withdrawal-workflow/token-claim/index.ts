@@ -8,9 +8,7 @@ import BN from 'bn.js';
 
 import {
   BridgeableSymbol,
-  BridgedTokenSymbol,
   TokenDisplayInfo,
-  getUnbridgedSymbol,
 } from '@cardstack/web-client/utils/token';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import { BridgeValidationResult } from '../../../../../../cardpay-sdk/sdk/token-bridge-home-side';
@@ -48,10 +46,6 @@ class CardPayWithdrawalWorkflowTokenClaimComponent extends Component<WorkflowCar
 
   get withdrawalAmount(): BN {
     return this.args.workflowSession.getValue('withdrawnAmount') ?? new BN('0');
-  }
-
-  get tokenSymbolForConversion(): BridgeableSymbol {
-    return getUnbridgedSymbol(this.tokenSymbol as BridgedTokenSymbol);
   }
 
   get tokenDetails(): TokenDisplayInfo<BridgeableSymbol> | undefined {

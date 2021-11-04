@@ -53,6 +53,8 @@ import ApiRouter from './services/api-router';
 import CallbacksRouter from './services/callbacks-router';
 import HealthCheck from './services/health-check';
 import NonceTracker from './services/nonce-tracker';
+import ReservedWords from './services/reserved-words';
+import CardpaySDKService from './services/cardpay-sdk';
 import WorkerClient from './services/worker-client';
 import { Clock } from './services/clock';
 import Web3Service from './services/web3';
@@ -69,6 +71,8 @@ import CardWatcher from './services/card-watcher';
 import ExchangeRatesService from './services/exchange-rates';
 import HubBot from './services/discord-bots/hub-bot';
 import CardService from './services/card-service';
+import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
+import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -80,6 +84,7 @@ export function createRegistry(): Registry {
   registry.register('authentication-utils', AuthenticationUtils);
   registry.register('boom-route', BoomRoute);
   registry.register('callbacks-router', CallbacksRouter);
+  registry.register('cardpay', CardpaySDKService);
   registry.register('clock', Clock);
   registry.register('custodial-wallet-route', CustodialWalletRoute);
   registry.register('database-manager', DatabaseManager);
@@ -89,6 +94,8 @@ export function createRegistry(): Registry {
   registry.register('exchange-rates-route', ExchangeRatesRoute);
   registry.register('health-check', HealthCheck);
   registry.register('hubServer', HubServer);
+  registry.register('hub-discord-bots-db-gateway', HubDiscordBotsDbGateway);
+  registry.register('hub-dm-channels-db-gateway', HubDmChannelsDbGateway);
   registry.register('inventory', InventoryService);
   registry.register('inventory-route', InventoryRoute);
   registry.register('merchant-infos-route', MerchantInfosRoute);
@@ -111,6 +118,7 @@ export function createRegistry(): Registry {
   registry.register('card-space-queries', CardSpaceQueries);
   registry.register('card-spaces-route', CardSpacesRoute);
   registry.register('relay', RelayService);
+  registry.register('reserved-words', ReservedWords);
   registry.register('reservations-route', ReservationsRoute);
   registry.register('session-route', SessionRoute);
   registry.register('subgraph', SubgraphService);
@@ -308,7 +316,7 @@ export class HubBotController {
   static logger = botLog;
 
   static async create(serverConfig?: { registryCallback?: (r: Registry) => void }): Promise<HubBotController> {
-    this.logger.info('Booting bot');
+    this.logger.info(`booting pid:${process.pid}`);
     initSentry();
 
     let container = createContainer(serverConfig?.registryCallback);
@@ -327,6 +335,7 @@ export class HubBotController {
     if (!bot) {
       throw new Error('Bot could not be created');
     }
+    this.logger.info(`started (${bot.type}:${bot.botInstanceId})`);
 
     return new this(bot, container);
   }
@@ -334,6 +343,7 @@ export class HubBotController {
   private constructor(public bot: HubBot, public container: Container) {}
 
   async teardown() {
+    this.logger.info('shutting down');
     await this.bot.destroy();
     await this.container.teardown();
   }

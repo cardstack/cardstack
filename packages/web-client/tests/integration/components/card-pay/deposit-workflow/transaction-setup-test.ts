@@ -86,6 +86,47 @@ module(
         .hasText('New Depot');
     });
 
+    test('zero balance tokens should not show loading indicator for USD balance', async function (assert) {
+      const session = new WorkflowSession();
+      const layer1AccountAddress =
+        '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+      const layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+
+      layer1Service.test__simulateAccountsChanged(
+        [layer1AccountAddress],
+        'metamask'
+      );
+      layer1Service.test__simulateBalances({
+        defaultToken: new BN('2141100000000000000'),
+        dai: new BN('0'),
+        card: new BN('0'),
+      });
+
+      this.setProperties({
+        session,
+      });
+
+      await render(hbs`
+          <CardPay::DepositWorkflow::TransactionSetup
+            @workflowSession={{this.session}}
+            @onComplete={{noop}}
+            @onIncomplete={{noop}}
+          />
+        `);
+
+      assert.dom(`[data-test-balance="DAI"]`).hasText('0.00 DAI');
+      assert
+        .dom(`[data-test-usd-balance="DAI"] [data-test-usd-balance-loading]`)
+        .doesNotExist();
+      assert.dom(`[data-test-usd-balance="DAI"]`).containsText('$0.00 USD');
+      assert.dom(`[data-test-balance="CARD"]`).hasText('0.00 CARD');
+      assert
+        .dom(`[data-test-usd-balance="CARD"] [data-test-usd-balance-loading]`)
+        .doesNotExist();
+      assert.dom(`[data-test-usd-balance="CARD"]`).containsText('$0.00 USD');
+    });
+
     test('completed card displays the correct data', async function (assert) {
       const session = new WorkflowSession();
       const layer1AccountAddress =

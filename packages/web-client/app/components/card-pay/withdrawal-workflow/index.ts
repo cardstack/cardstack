@@ -51,7 +51,7 @@ export const MILESTONE_TITLES = [
   `Claim tokens on ${c.layer1.conversationalName}`,
 ];
 
-export const WORKFLOW_VERSION = 2;
+export const WORKFLOW_VERSION = 4;
 
 class CheckBalanceWorkflowMessage
   extends WorkflowPostable
@@ -281,8 +281,11 @@ with Card Pay.`,
       message: `This is the remaining balance in your ${c.layer2.fullName} wallet:`,
     }),
     new WorkflowCard({
-      cardName: 'EPILOGUE_LAYER_TWO_CONNECT_CARD',
-      componentName: 'card-pay/layer-two-connect-card',
+      cardName: 'EPILOGUE_SAFE_BALANCE_CARD',
+      componentName: 'card-pay/safe-balance-card',
+      config: {
+        safeAddressKey: 'withdrawalSafe',
+      },
     }),
     new WorkflowCard({
       cardName: 'EPILOGUE_NEXT_STEPS',

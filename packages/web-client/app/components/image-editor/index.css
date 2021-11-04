@@ -1,0 +1,94 @@
+.image-editor__card {
+  max-width: 1000px;
+  width: max-content;
+  margin: auto;
+}
+
+.image-editor__layout {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+  padding: var(--boxel-sp);
+}
+
+.image-editor__editing-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.image-editor__preview-section {
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--boxel-sp);
+}
+
+@media screen and (max-width: 960px) {
+  .image-editor__preview-section {
+    display: none;
+  }
+}
+
+.image-editor__controls {
+  display: flex;
+  justify-content: center;
+  gap: var(--boxel-sp-sm);
+}
+
+.image-editor__rotation-button {
+  flex-shrink: 0;
+  width: min-content;
+  min-width: 0;
+  margin: var(--boxel-sp-xs) 0;
+  padding: var(--boxel-sp-sm);
+}
+
+.image-editor__cancel-button {
+  margin-left: var(--boxel-sp);
+}
+
+/* this styling is important for the image cropping library cropper to initialize correctly */
+.image-editor__cropper-container {
+  position: relative;
+  width: 500px;
+  height: 500px;
+}
+
+.image-editor__cropper-target {
+  display: block;
+  width: 500px;
+  height: 500px;
+  max-width: 100%;
+}
+
+/* prevent fouc when cropper is initializing */
+.image-editor__loading-indicator-container {
+  --fade-out-time: 0.5s;
+  --fade-out-delay: 0.2s;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 1;
+  background: var(--boxel-light-400);
+  width: 500px;
+  height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.3s ease-out var(--fade-out-delay), height 0s ease-out var(--fade-out-time), width 0s ease-out var(--fade-out-time);
+}
+
+.image-editor__loading-indicator-container--done {
+  opacity: 0;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.image-editor__loading-indicator {
+  width: 90px;
+  height: 90px;
+}

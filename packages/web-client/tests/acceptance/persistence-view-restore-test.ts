@@ -9,6 +9,7 @@ import {
   waitUntil,
 } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import percySnapshot from '@percy/ember';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { setupHubAuthenticationToken } from '../helpers/setup';
 
@@ -55,7 +56,7 @@ module('Acceptance | persistence view and restore', function () {
         .strategy as Layer2TestWeb3Strategy;
       let testDepot = createDepotSafe({
         address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
-        tokens: [createSafeToken('CARD', '500000000000000000000')],
+        tokens: [createSafeToken('CARD.CPXD', '500000000000000000000')],
       });
 
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
@@ -281,6 +282,8 @@ module('Acceptance | persistence view and restore', function () {
       assert
         .dom('[data-test-completed-workflow] .boxel-progress-icon--complete')
         .exists();
+
+      await percySnapshot(assert);
 
       workflowPersistenceService.clear();
       await settled();
@@ -625,7 +628,7 @@ module('Acceptance | persistence view and restore', function () {
         layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
           createDepotSafe({
             address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
-            tokens: [createSafeToken('CARD', '500000000000000000000')],
+            tokens: [createSafeToken('CARD.CPXD', '500000000000000000000')],
           }),
           createPrepaidCardSafe({
             address: '0x123400000000000000000000000000000000abcd',

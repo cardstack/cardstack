@@ -1,6 +1,7 @@
 import { module, test } from 'qunit';
 import { visit, waitFor } from '@ember/test-helpers';
 import { setupApplicationTest } from 'ember-qunit';
+import percySnapshot from '@percy/ember';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import sinon from 'sinon';
 
@@ -45,7 +46,7 @@ const usdSymbol = 'USD';
 const jpySymbol = 'JPY';
 const invalidCurrencySymbol = 'WUT';
 const network = 'sokol';
-const merchantName = 'Mandello';
+const merchantName = 'mandello';
 const merchantInfoBackground = '#00ffcc';
 const merchantInfoTextColor = '#000000';
 const nonexistentMerchantId = 'nonexistentmerchant';
@@ -103,6 +104,7 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(MERCHANT).hasAttribute('data-test-merchant', merchantName);
     assert
       .dom(MERCHANT_LOGO)
+      .containsText(merchantName.substr(0, 1).toUpperCase())
       .hasAttribute(
         'data-test-merchant-logo-background',
         merchantInfoBackground
@@ -111,6 +113,8 @@ module('Acceptance | pay', function (hooks) {
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
       );
+
+    await percySnapshot(assert);
   });
 
   test('It displays merchant info correctly on iOS', async function (assert) {
@@ -131,6 +135,8 @@ module('Acceptance | pay', function (hooks) {
         'data-test-merchant-logo-text-color',
         merchantInfoTextColor
       );
+
+    await percySnapshot(assert);
   });
 
   test('it renders correctly with SPD as currency', async function (assert) {

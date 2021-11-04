@@ -2,7 +2,6 @@ import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
 import { Layer2Web3Strategy, TransactionHash, WithdrawalLimits } from './types';
 import {
-  BridgeableSymbol,
   BridgedTokenSymbol,
   ConvertibleSymbol,
   ConversionFunction,
@@ -38,7 +37,7 @@ import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
 interface BridgeToLayer1Request {
   safeAddress: string;
   receiverAddress: string;
-  tokenSymbol: BridgeableSymbol;
+  tokenSymbol: BridgedTokenSymbol;
   amountInWei: string;
 }
 
@@ -60,7 +59,9 @@ interface RegisterMerchantRequest {
 export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   chainId = '-1';
   simpleEmitter = new SimpleEmitter();
-  defaultTokenSymbol: ConvertibleSymbol = 'DAI';
+  defaultTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
+  bridgedDaiTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
+  bridgedCardTokenSymbol: BridgedTokenSymbol = 'CARD.CPXD';
   @tracked walletConnectUri: string | undefined;
   @tracked walletInfo: WalletInfo = new WalletInfo([]);
   waitForAccountDeferred = defer();
@@ -68,9 +69,11 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   bridgingToLayer1HashDeferred!: RSVP.Deferred<TransactionHash>;
   bridgingToLayer1Deferred!: RSVP.Deferred<BridgeValidationResult>;
   @tracked isInitializing = false;
+  @tracked issuePrepaidCardSpendMinValue: number = 500;
+  @tracked issuePrepaidCardDaiMinValue: BN = new BN(toWei('5'));
 
   bridgeToLayer1Requests: BridgeToLayer1Request[] = [];
-  issuePrepaidCardRequests: Map<number, IssuePrepaidCardRequest> = new Map();
+  issuePrepaidCardRequests: Map<string, IssuePrepaidCardRequest> = new Map();
   registerMerchantRequests: Map<string, RegisterMerchantRequest> = new Map();
   @tracked remoteAccountSafes: Map<string, Safe[]> = new Map();
 
@@ -133,7 +136,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   bridgeToLayer1(
     safeAddress: string,
     receiverAddress: string,
-    tokenSymbol: BridgeableSymbol,
+    tokenSymbol: BridgedTokenSymbol,
     amountInWei: string
   ): Promise<TransactionHash> {
     this.bridgeToLayer1Requests.push({
@@ -170,11 +173,11 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   blockExplorerUrl(txnHash: TransactionHash): string {
-    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
+    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&q=BlockExplorer&txnHash=${txnHash}`;
   }
 
   bridgeExplorerUrl(txnHash: TransactionHash): string {
-    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&txnHash=${txnHash}`;
+    return `https://www.youtube.com/watch?v=xvFZjo5PgG0&q=BridgeExplorer&txnHash=${txnHash}`;
   }
 
   get isConnected() {
@@ -187,14 +190,15 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   get defaultTokenBalance() {
     return new BN(
-      this.safes.depot?.tokens.find((v) => v.token.symbol === 'DAI')?.balance ??
-        0
+      this.safes.depot?.tokens.find(
+        (v) => v.token.symbol === this.defaultTokenSymbol
+      )?.balance ?? 0
     );
   }
 
   get cardBalance() {
     return new BN(
-      this.safes.depot?.tokens.find((v) => v.token.symbol === 'CARD')
+      this.safes.depot?.tokens.find((v) => v.token.symbol === 'CARD.CPXD')
         ?.balance ?? 0
     );
   }
@@ -256,13 +260,13 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   }
 
   async issuePrepaidCard(
-    _safeAddress: string,
+    safeAddress: string,
     faceValue: number,
     customizationDID: string,
     options: TransactionOptions
   ): Promise<PrepaidCardSafe> {
     let deferred: RSVP.Deferred<PrepaidCardSafe> = defer();
-    this.issuePrepaidCardRequests.set(faceValue, {
+    this.issuePrepaidCardRequests.set(`${faceValue}:${safeAddress}`, {
       deferred,
       onTxnHash: options.onTxnHash,
       onNonce: options.onNonce,
@@ -350,33 +354,44 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
 
   test__simulateConvertFromSpend(symbol: ConvertibleSymbol, amount: number) {
     let spendToDaiSimRate = 0.01;
-    if (symbol === 'DAI') {
+    if (symbol === 'DAI.CPXD') {
       return toWei(`${amount * spendToDaiSimRate}`);
     } else {
       return '0';
     }
   }
 
-  test__getNonceForIssuePrepaidCardRequest(faceValue: number): BN | undefined {
-    let request = this.issuePrepaidCardRequests.get(faceValue);
+  test__getNonceForIssuePrepaidCardRequest(
+    faceValue: number,
+    fundingSourceAddress: string
+  ): BN | undefined {
+    let request = this.issuePrepaidCardRequests.get(
+      `${faceValue}:${fundingSourceAddress}`
+    );
     return request?.nonce;
   }
 
   test__simulateOnNonceForIssuePrepaidCardRequest(
     faceValue: number,
+    fundingSourceAddress: string,
     nonce: BN
   ): void {
-    let request = this.issuePrepaidCardRequests.get(faceValue);
+    let request = this.issuePrepaidCardRequests.get(
+      `${faceValue}:${fundingSourceAddress}`
+    );
     request?.onNonce?.(nonce);
   }
 
-  test__simulateIssuePrepaidCardForAmount(
+  test__simulateIssuePrepaidCardForAmountFromSource(
     faceValue: number,
+    fundingSourceAddress: string,
     walletAddress: string,
     cardAddress: string,
     options: Partial<PrepaidCardSafe>
   ) {
-    let request = this.issuePrepaidCardRequests.get(faceValue);
+    let request = this.issuePrepaidCardRequests.get(
+      `${faceValue}:${fundingSourceAddress}`
+    );
     let prepaidCardSafe = createPrepaidCardSafe({
       address: cardAddress,
       createdAt: Math.floor(Date.now() / 1000),
@@ -390,12 +405,12 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     request?.onTxnHash?.('exampleTxnHash');
 
     this.test__simulateRemoteAccountSafes(walletAddress, [prepaidCardSafe]);
-    let unfetchedDepot = this.remoteAccountSafes
+    let unfetchedSource = this.remoteAccountSafes
       .get(this.walletInfo.firstAddress!)!
-      .find((v: Safe) => v.address === this.depotSafe?.address);
+      .find((v: Safe) => v.address === fundingSourceAddress);
 
-    unfetchedDepot!.tokens.forEach((t: TokenInfo) => {
-      if (t.token.symbol === 'DAI') {
+    unfetchedSource!.tokens.forEach((t: TokenInfo) => {
+      if (t.token.symbol === 'DAI.CPXD') {
         t.balance = new BN(t.balance)
           .sub(new BN(toWei((faceValue / 100).toString())))
           .toString();
@@ -466,12 +481,12 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return this.test__deferredHubAuthentication.resolve(authToken);
   }
 
-  test__simulateBridgedToLayer1(
+  async test__simulateBridgedToLayer1(
     safeAddress?: string,
     receiverAddress?: string,
-    tokenSymbol?: BridgeableSymbol,
+    tokenSymbol?: BridgedTokenSymbol,
     amountInWei?: string
-  ): void {
+  ): Promise<void> {
     if (safeAddress && receiverAddress && tokenSymbol && amountInWei) {
       let matchingRequest = this.bridgeToLayer1Requests.find(
         (request) =>
@@ -481,7 +496,20 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
           request.amountInWei === amountInWei
       );
 
-      if (!matchingRequest) {
+      if (matchingRequest) {
+        // Update the safe token balance if it exists
+        let safe = this.remoteAccountSafes
+          .get(this.walletInfo.firstAddress!)!
+          .findBy('address', safeAddress);
+
+        if (safe) {
+          safe.tokens.forEach((t: TokenInfo) => {
+            if (t.token.symbol === tokenSymbol) {
+              t.balance = new BN(t.balance).sub(new BN(amountInWei)).toString();
+            }
+          });
+        }
+      } else {
         throw new Error(
           `No matching bridging request found for ${JSON.stringify(
             arguments
@@ -495,5 +523,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       encodedData: 'example-encoded-data',
       signatures: ['example-sig'],
     });
+
+    return this.test__simulateAccountsChanged([this.walletInfo.firstAddress!]);
   }
 }

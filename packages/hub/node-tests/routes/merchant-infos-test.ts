@@ -178,6 +178,66 @@ describe('POST /api/merchant-infos', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
+  it('validates slug for forbidden words', async function () {
+    let requestWithSlug: any = (slug: string) => {
+      let payload = {
+        data: {
+          type: 'merchant-infos',
+          attributes: {
+            name: 'Satoshi Nakamoto',
+            slug: slug,
+            color: 'ff0000',
+            'text-color': 'ffffff',
+            'owner-address': '0x00000000000',
+          },
+        },
+      };
+
+      return request()
+        .post('/api/merchant-infos')
+        .send(payload)
+        .set('Authorization', 'Bearer: abc123--def456--ghi789')
+        .set('Accept', 'application/vnd.api+json')
+        .set('Content-Type', 'application/vnd.api+json');
+    };
+
+    await requestWithSlug('cardstack')
+      .expect(422)
+      .expect({
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'This Merchant ID is not allowed',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    await requestWithSlug('ethereum')
+      .expect(422)
+      .expect({
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'This Merchant ID is not allowed',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    await requestWithSlug('fuck')
+      .expect(422)
+      .expect({
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'This Merchant ID is not allowed',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+
+    await requestWithSlug('urbanoutfitters')
+      .expect(422)
+      .expect({
+        status: '422',
+        title: 'Invalid merchant slug',
+        detail: 'This Merchant ID is not allowed',
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
   it('validates slug for uniqueness', async function () {
     const payload = {
       data: {
@@ -223,7 +283,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'Merchant slug already exists',
+        detail: 'This Merchant ID is already taken. Please choose another one',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -341,7 +401,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(200)
       .expect({
         slugAvailable: false,
-        detail: 'Merchant slug already exists',
+        detail: 'This Merchant ID is already taken. Please choose another one',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 

@@ -11,6 +11,7 @@ import { DepotSafe, Safe } from '@cardstack/cardpay-sdk';
 import {
   createDepotSafe,
   createMerchantSafe,
+  createPrepaidCardSafe,
   createSafeToken,
   generateMockAddress,
 } from '@cardstack/web-client/utils/test-factories';
@@ -18,13 +19,15 @@ import { render, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import BN from 'bn.js';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
+import { toWei } from 'web3-utils';
+import { BridgedTokenSymbol } from '../../../app/utils/token';
 
 const defaultBlockNumber = 5;
 const address = generateMockAddress();
 const createDefaultDepotSafe = (daiBalance?: string, infoDID?: string) =>
   createDepotSafe({
     address,
-    tokens: daiBalance ? [createSafeToken('DAI', daiBalance)] : [],
+    tokens: daiBalance ? [createSafeToken('DAI.CPXD', daiBalance)] : [],
     infoDID,
   });
 
@@ -38,6 +41,8 @@ class PartialLayer2Strategy implements MockSafesResourceStrategy {
   _graphData: ViewSafesResult; // the next data to be fetched by viewSafesTask
   _blockNumber = defaultBlockNumber; // the next block number to be assigned to an individual update
   _latestSafe = createDefaultDepotSafe(); // the next safe fetched by an individual update
+  issuePrepaidCardSpendMinValue = 1;
+  issuePrepaidCardDaiMinValue = new BN(toWei('1'));
 
   constructor(initialData?: ViewSafesResult) {
     this._graphData = initialData ?? {
@@ -45,6 +50,7 @@ class PartialLayer2Strategy implements MockSafesResourceStrategy {
       blockNumber: defaultBlockNumber,
     };
   }
+  bridgedDaiTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
 
   async getBlockHeight() {
     return new BN(this._blockNumber);
@@ -181,7 +187,7 @@ module('Unit | Resource | Safes', function (hooks) {
     );
 
     assert.dom('#safe-did').containsText('No DID found');
-    assert.dom('[data-test-token="DAI"]').doesNotExist();
+    assert.dom('[data-test-token="DAI.CPXD"]').doesNotExist();
 
     strategy._graphData = {
       safes: [createDefaultDepotSafe('30', 'mock-infoDID')],
@@ -192,7 +198,7 @@ module('Unit | Resource | Safes', function (hooks) {
     await settled();
 
     assert.dom('#safe-did').containsText('mock-infoDID');
-    assert.dom('[data-test-token="DAI"]').containsText('DAI: 30');
+    assert.dom('[data-test-token="DAI.CPXD"]').containsText('DAI.CPXD: 30');
   });
 
   test('updating a safe using updateOne updates a rendered view that uses both nested or direct property', async function (assert) {
@@ -220,7 +226,7 @@ module('Unit | Resource | Safes', function (hooks) {
     );
 
     assert.dom('#safe-did').containsText('No DID found');
-    assert.dom('[data-test-token="DAI"]').doesNotExist();
+    assert.dom('[data-test-token="DAI.CPXD"]').doesNotExist();
 
     strategy._blockNumber = defaultBlockNumber + 1;
     strategy._latestSafe = createDefaultDepotSafe('30', 'mock-infoDID');
@@ -229,7 +235,7 @@ module('Unit | Resource | Safes', function (hooks) {
     await settled();
 
     assert.dom('#safe-did').containsText('mock-infoDID');
-    assert.dom('[data-test-token="DAI"]').containsText('DAI: 30');
+    assert.dom('[data-test-token="DAI.CPXD"]').containsText('DAI.CPXD: 30');
   });
 
   test('it aliases the first depot it finds to depot', async function (assert) {
@@ -262,5 +268,46 @@ module('Unit | Resource | Safes', function (hooks) {
     assert.equal(Object.keys(safes.individualSafeUpdateData).length, 0);
     assert.equal(Object.keys(safes.safeReferences).length, 0);
     assert.equal(safes.value.length, 0);
+  });
+
+  test('it returns safes that are compatible with and have sufficient balance for issuing a prepaid card', async function (assert) {
+    defaultDepotSafe = createDefaultDepotSafe(toWei('100'));
+
+    let sufficientTokens = [
+      createSafeToken('DAI.CPXD', toWei('25')),
+      createSafeToken('CARD.CPXD', toWei('25')),
+    ];
+
+    let insufficientTokens = [
+      createSafeToken('DAI.CPXD', '1'),
+      createSafeToken('CARD.CPXD', toWei('25')),
+    ];
+
+    let sufficientMerchantSafe = createMerchantSafe({
+      tokens: sufficientTokens,
+    });
+
+    strategy = new PartialLayer2Strategy({
+      safes: [
+        defaultDepotSafe,
+        sufficientMerchantSafe,
+        createMerchantSafe({ tokens: insufficientTokens }),
+        createPrepaidCardSafe({ tokens: sufficientTokens }),
+      ],
+      blockNumber: defaultBlockNumber,
+    });
+
+    safes = new Safes(this.owner, {
+      named: {
+        strategy,
+        walletAddress: 'some-address',
+      },
+    });
+    await settled();
+
+    assert.deepEqual(
+      safes.issuePrepaidCardSourceSafes.mapBy('address'),
+      [defaultDepotSafe, sufficientMerchantSafe].mapBy('address')
+    );
   });
 });

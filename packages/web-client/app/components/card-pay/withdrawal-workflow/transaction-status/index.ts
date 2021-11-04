@@ -9,7 +9,6 @@ import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
-import { BridgedTokenSymbol } from '@cardstack/web-client/utils/token';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 
 class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<WorkflowCardComponentArgs> {
@@ -51,10 +50,6 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
 
   get isInProgress() {
     return !this.args.workflowSession.getValue('bridgeValidationResult');
-  }
-
-  get currentTokenSymbol(): BridgedTokenSymbol {
-    return this.args.workflowSession.getValue('withdrawalToken')!;
   }
 
   get layer2BlockHeightBeforeBridging(): BN | null {

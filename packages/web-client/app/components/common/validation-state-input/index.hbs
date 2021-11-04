@@ -1,0 +1,16 @@
+<div class="validation-state-input-group" ...attributes>
+  <Boxel::Input
+    class="validation-state-input-group__input"
+    @value={{@value}}
+    @required={{true}}
+    @onInput={{@onInput}}
+    @invalid={{this.isInvalid}}
+    @errorMessage={{@errorMessage}}
+    @helperText={{@helperText}}
+    data-test-validation-state-input={{@state}}
+    autocomplete="off"
+  />
+  {{#if this.icon}}
+    {{svg-jar this.icon class="validation-state-input-group__icon" role="presentation"}}
+  {{/if}}
+</div>

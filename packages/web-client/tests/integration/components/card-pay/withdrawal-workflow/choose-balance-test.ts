@@ -47,16 +47,16 @@ module(
         createDepotSafe({
           address: depotAddress,
           tokens: [
-            createSafeToken('DAI', '250000000000000000000'),
-            createSafeToken('CARD', '500000000000000000000'),
+            createSafeToken('DAI.CPXD', '250000000000000000000'),
+            createSafeToken('CARD.CPXD', '500000000000000000000'),
           ],
         }),
         createMerchantSafe({
           address: merchantAddress,
           merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
           tokens: [
-            createSafeToken('DAI', '125000000000000000000'),
-            createSafeToken('CARD', '450000000000000000000'),
+            createSafeToken('DAI.CPXD', '125000000000000000000'),
+            createSafeToken('CARD.CPXD', '450000000000000000000'),
           ],
           accumulatedSpendValue: 100,
         }),

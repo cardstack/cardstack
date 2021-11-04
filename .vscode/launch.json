@@ -294,7 +294,7 @@
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot safe feel free to use your own
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "",
-        "50000",
+        "200",
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own
@@ -423,7 +423,7 @@
       "args": [
         "pay-merchant",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0x483F081bB0C25A5B216D1A4BD9CE0196092A0575", // Hassan's prepaid card --feel free to use your own
+        "0x9972D7972130E1Ba9E87d39C7e7229F56dC82e4e", // Hassan's prepaid card --feel free to use your own
         "100",
         "--network",
         "sokol",

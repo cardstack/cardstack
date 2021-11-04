@@ -4,6 +4,28 @@ import { setupHub } from '../helpers/server';
 describe('CardSpaceValidator', function () {
   let { getContainer } = setupHub(this);
 
+  let invalidUrls = [
+    'www.card.space',
+    'ščž.card.space',
+    '😂.card.space',
+    'satoshi.card.race',
+    'test',
+    'satoshi.nakamoto.card.space',
+    '.card.space',
+    'ftp.card.space',
+    'cardstack.card.space',
+    'christse.card.space',
+    'fuck.card.space',
+  ];
+
+  invalidUrls.forEach(async (url) => {
+    it(`should validate ${url}`, async function () {
+      let subject = await getContainer().lookup('card-space-validator');
+      let errors = await subject.validate({ url } as CardSpace);
+      expect(errors.url).to.have.length.above(0);
+    });
+  });
+
   it('validates urls', async function () {
     let subject = await getContainer().lookup('card-space-validator');
 
@@ -15,10 +37,7 @@ describe('CardSpaceValidator', function () {
     };
 
     let errors = await subject.validate(cardSpace);
-    expect(errors.url).deep.equal([
-      'Only card.space subdomains are allowed',
-      'Only first level subdomains are allowed',
-    ]);
+    expect(errors.url).deep.equal(['URL is not valid']);
     expect(errors.profileImageUrl).deep.equal(['Invalid URL']);
     expect(errors.profileCoverImageUrl).deep.equal(['Invalid URL']);
   });

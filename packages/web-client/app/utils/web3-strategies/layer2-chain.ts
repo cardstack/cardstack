@@ -10,12 +10,11 @@ import { task } from 'ember-concurrency-decorators';
 
 import { Emitter, SimpleEmitter, UnbindEventListener } from '../events';
 import {
-  BridgeableSymbol,
   ConvertibleSymbol,
   ConversionFunction,
   TokenContractInfo,
   BridgedTokenSymbol,
-  getUnbridgedSymbol,
+  TokenSymbol,
 } from '../token';
 import WalletInfo from '../wallet-info';
 import CustomStorageWalletConnect from '../wc-connector';
@@ -52,6 +51,7 @@ import { Safes } from '@cardstack/web-client/resources/safes';
 import { IAssets } from '../../../../cardpay-sdk/sdk/assets';
 import PrepaidCard from '@cardstack/cardpay-sdk/sdk/prepaid-card/base';
 import { ViewSafesResult } from '@cardstack/cardpay-sdk/sdk/safes/base';
+import { faceValueOptions } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
 
 const BROADCAST_CHANNEL_MESSAGES = {
   CONNECTED: 'CONNECTED',
@@ -71,7 +71,11 @@ export default abstract class Layer2ChainWeb3Strategy
   networkSymbol: Layer2NetworkSymbol;
   provider: WalletConnectProvider | undefined;
   simpleEmitter = new SimpleEmitter();
-  defaultTokenSymbol: ConvertibleSymbol = 'DAI';
+
+  defaultTokenSymbol: BridgedTokenSymbol;
+  bridgedDaiTokenSymbol: BridgedTokenSymbol;
+  bridgedCardTokenSymbol: BridgedTokenSymbol;
+
   defaultTokenContractAddress?: string;
   web3!: Web3;
   #layerTwoOracleApi!: ILayerTwoOracle;
@@ -84,6 +88,8 @@ export default abstract class Layer2ChainWeb3Strategy
   @tracked walletConnectUri: string | undefined;
   @tracked waitForAccountDeferred = defer();
   @tracked isInitializing = true;
+  @tracked issuePrepaidCardSpendMinValue: number = 0;
+  @tracked issuePrepaidCardDaiMinValue = new BN('0');
 
   @reads('provider.connector') connector!: IConnector;
   @reads('safes.depot') declare depotSafe: DepotSafe | null;
@@ -92,6 +98,14 @@ export default abstract class Layer2ChainWeb3Strategy
     this.chainId = networkIds[networkSymbol];
     this.networkSymbol = networkSymbol;
     this.walletInfo = new WalletInfo([]);
+    this.bridgedDaiTokenSymbol = this.defaultTokenSymbol = getConstantByNetwork(
+      'bridgedDaiTokenSymbol',
+      networkSymbol
+    ) as BridgedTokenSymbol;
+    this.bridgedCardTokenSymbol = getConstantByNetwork(
+      'bridgedCardTokenSymbol',
+      networkSymbol
+    ) as BridgedTokenSymbol;
     let defaultTokenContractInfo = this.getTokenContractInfo(
       this.defaultTokenSymbol,
       networkSymbol
@@ -103,6 +117,16 @@ export default abstract class Layer2ChainWeb3Strategy
     this.#broadcastChannel.addEventListener(
       'message',
       this.onBroadcastChannelMessage
+    );
+  }
+
+  async fetchIssuePrepaidCardMinValues() {
+    this.issuePrepaidCardSpendMinValue = Math.min(...faceValueOptions);
+    this.issuePrepaidCardDaiMinValue = new BN(
+      await this.convertFromSpend(
+        this.bridgedDaiTokenSymbol,
+        this.issuePrepaidCardSpendMinValue
+      )
     );
   }
 
@@ -167,6 +191,7 @@ export default abstract class Layer2ChainWeb3Strategy
         this.#assetsApi = await getSDK('Assets', this.web3);
         this.#prepaidCardApi = await getSDK('PrepaidCard', this.web3);
         this.#hubAuthApi = await getSDK('HubAuth', this.web3, config.hubURL);
+        await this.fetchIssuePrepaidCardMinValues();
         await this.updateWalletInfo(accounts);
         this.#broadcastChannel.postMessage({
           type: BROADCAST_CHANNEL_MESSAGES.CONNECTED,
@@ -204,7 +229,7 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   private getTokenContractInfo(
-    symbol: ConvertibleSymbol,
+    symbol: TokenSymbol,
     network: Layer2NetworkSymbol
   ): TokenContractInfo {
     return new TokenContractInfo(symbol, network);
@@ -234,6 +259,7 @@ export default abstract class Layer2ChainWeb3Strategy
   }
 
   async refreshSafesAndBalances() {
+    if (!this.isConnected) return;
     await this.safes.fetch();
     await this.safes.updateDepot();
   }
@@ -263,7 +289,7 @@ export default abstract class Layer2ChainWeb3Strategy
   ): Promise<T> {
     let defaultTokenAddress = this.defaultTokenContractAddress;
     let cardTokenAddress = this.getTokenContractInfo(
-      'CARD',
+      this.bridgedCardTokenSymbol,
       this.networkSymbol
     )!.address;
 
@@ -273,9 +299,9 @@ export default abstract class Layer2ChainWeb3Strategy
     ]);
 
     safe.tokens.forEach((token) => {
-      if (token.token.symbol === 'DAI') {
+      if (token.token.symbol === this.bridgedDaiTokenSymbol) {
         token.balance = defaultBalance;
-      } else if (token.token.symbol === 'CARD') {
+      } else if (token.token.symbol === this.bridgedCardTokenSymbol) {
         token.balance = cardBalance;
       }
     });
@@ -388,15 +414,17 @@ export default abstract class Layer2ChainWeb3Strategy
   }
   get defaultTokenBalance() {
     return new BN(
-      this.safes.depot?.tokens.find((v) => v.token.symbol === 'DAI')?.balance ??
-        0
+      this.safes.depot?.tokens.find(
+        (v) => v.token.symbol === this.defaultTokenSymbol
+      )?.balance ?? 0
     );
   }
 
   get cardBalance() {
     return new BN(
-      this.safes.depot?.tokens.find((v) => v.token.symbol === 'CARD')
-        ?.balance ?? 0
+      this.safes.depot?.tokens.find(
+        (v) => v.token.symbol === this.bridgedCardTokenSymbol
+      )?.balance ?? 0
     );
   }
 
@@ -436,7 +464,7 @@ export default abstract class Layer2ChainWeb3Strategy
   ): Promise<WithdrawalLimits> {
     let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
     let contractInfo = this.getTokenContractInfo(
-      getUnbridgedSymbol(tokenSymbol),
+      tokenSymbol,
       this.networkSymbol
     );
 
@@ -464,7 +492,7 @@ export default abstract class Layer2ChainWeb3Strategy
   async bridgeToLayer1(
     safeAddress: string,
     receiverAddress: string,
-    tokenSymbol: BridgeableSymbol,
+    tokenSymbol: BridgedTokenSymbol,
     amountInWei: string
   ): Promise<TransactionHash> {
     let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);

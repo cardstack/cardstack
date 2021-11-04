@@ -13,11 +13,14 @@ import { validateMerchantId } from '@cardstack/cardpay-sdk';
 import * as Sentry from '@sentry/browser';
 import { isPresent } from '@ember/utils';
 
+const randomColorOptions = config.environment === 'test' ? { seed: 1 } : {};
+
 export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer2Network: Layer2Network;
   @service declare merchantInfo: MerchantInfoService;
 
-  @tracked merchantBgColor: string = randomColor().toHexString();
+  @tracked merchantBgColor: string =
+    randomColor(randomColorOptions).toHexString();
   @tracked merchantName: string = '';
   @tracked merchantId: string = '';
   @tracked lastCheckedMerchantId = '';
@@ -164,14 +167,13 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
     }
 
     try {
-      let merchantSlugIsUnique: boolean = yield taskFor(
+      let { slugAvailable, detail } = yield taskFor(
         this.merchantInfo.checkMerchantSlugUniquenessTask
       ).perform({ slug: value });
 
       this.lastCheckedMerchantId = value;
-      if (!merchantSlugIsUnique) {
-        this.merchantIdValidationMessage =
-          'This Merchant ID is already taken. Please choose another one';
+      if (!slugAvailable) {
+        this.merchantIdValidationMessage = detail;
         return false;
       }
 

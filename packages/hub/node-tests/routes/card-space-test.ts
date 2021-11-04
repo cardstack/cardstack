@@ -185,7 +185,7 @@ describe('POST /api/card-spaces', function () {
               pointer: '/data/attributes/url',
             },
             title: 'Invalid attribute',
-            detail: 'Invalid URL',
+            detail: 'Can only contain latin letters, numbers, hyphens and underscores',
           },
         ],
       })
@@ -224,15 +224,7 @@ describe('POST /api/card-spaces', function () {
               pointer: '/data/attributes/url',
             },
             title: 'Invalid attribute',
-            detail: 'Only card.space subdomains are allowed',
-          },
-          {
-            status: '422',
-            source: {
-              pointer: '/data/attributes/url',
-            },
-            title: 'Invalid attribute',
-            detail: 'Only first level subdomains are allowed',
+            detail: 'Can only contain latin letters, numbers, hyphens and underscores',
           },
         ],
       })
@@ -256,63 +248,71 @@ describe('POST /api/card-spaces', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
+});
 
-  describe('GET /api/card-spaces/url-validation/:url', async function () {
-    it('returns no url errors when url is available', async function () {
-      await request()
-        .get(`/api/card-spaces/validate-url/satoshi.card.space`)
-        .set('Authorization', 'Bearer: abc123--def456--ghi789')
-        .set('Content-Type', 'application/vnd.api+json')
-        .expect(200)
-        .expect({
-          errors: [],
-        })
-        .expect('Content-Type', 'application/vnd.api+json');
-    });
+describe('POST /api/card-spaces/validate-url', async function () {
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
+  });
+  let { request, getContainer } = setupHub(this);
 
-    it('returns url errors when url is already used', async function () {
-      let dbManager = await getContainer().lookup('database-manager');
-      let db = await dbManager.getClient();
-      await db.query(
-        'INSERT INTO card_spaces(id, profile_name, url, profile_description, profile_category, profile_button_text, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7)',
-        ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'Test', 'satoshi.card.space', 'Test', 'Test', 'Test', '0x0']
-      );
+  it('returns no url errors when url is available', async function () {
+    await request()
+      .post(`/api/card-spaces/validate-url`)
+      .send({ data: { attributes: { url: 'satoshi.card.space' } } })
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
 
-      await request()
-        .get(`/api/card-spaces/validate-url/satoshi.card.space`)
-        .set('Authorization', 'Bearer: abc123--def456--ghi789')
-        .set('Content-Type', 'application/vnd.api+json')
-        .expect(200)
-        .expect({
-          errors: [
-            {
-              status: '422',
-              title: 'Invalid attribute',
-              source: { pointer: `/data/attributes/url` },
-              detail: 'Already exists',
-            },
-          ],
-        })
-        .expect('Content-Type', 'application/vnd.api+json');
-    });
+  it('returns url errors when url is already used', async function () {
+    let dbManager = await getContainer().lookup('database-manager');
+    let db = await dbManager.getClient();
+    await db.query(
+      'INSERT INTO card_spaces(id, profile_name, url, profile_description, profile_category, profile_button_text, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7)',
+      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'Test', 'satoshi.card.space', 'Test', 'Test', 'Test', '0x0']
+    );
 
-    it('returns 401 without bearer token', async function () {
-      await request()
-        .post('/api/card-spaces')
-        .send({})
-        .set('Accept', 'application/vnd.api+json')
-        .set('Content-Type', 'application/vnd.api+json')
-        .expect(401)
-        .expect({
-          errors: [
-            {
-              status: '401',
-              title: 'No valid auth token',
-            },
-          ],
-        })
-        .expect('Content-Type', 'application/vnd.api+json');
-    });
+    await request()
+      .post(`/api/card-spaces/validate-url`)
+      .send({ data: { attributes: { url: 'satoshi.card.space' } } })
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid attribute',
+            source: { pointer: `/data/attributes/url` },
+            detail: 'Already exists',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('returns 401 without bearer token', async function () {
+    await request()
+      .post('/api/card-spaces')
+      .send({})
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(401)
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
   });
 });
 

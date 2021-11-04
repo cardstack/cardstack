@@ -99,6 +99,10 @@ jobs:
         run: yarn --prefer-offline
       - name: Set PR branch name
         run: echo "PR_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
+      - name: Test with percy
+        run: yarn test:boxel:percy
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_BOXEL }}
       - name: Deploy preview
         run: yarn deploy:boxel:preview
         env:

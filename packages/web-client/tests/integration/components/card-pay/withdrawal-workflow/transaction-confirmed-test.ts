@@ -38,7 +38,7 @@ module(
       let depotAddress = '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666';
       let testDepot = createDepotSafe({
         address: depotAddress,
-        tokens: [createSafeToken('DAI', '250000000000000000000')],
+        tokens: [createSafeToken('DAI.CPXD', '250000000000000000000')],
       });
       await layer2Service.test__simulateRemoteAccountSafes(
         layer2AccountAddress,

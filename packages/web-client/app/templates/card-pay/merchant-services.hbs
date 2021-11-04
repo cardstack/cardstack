@@ -1,7 +1,7 @@
 {{page-title "Merchant Services"}}
 
 <section class="card-pay-dashboard__merchants" role="tabpanel" aria-labelledby="card-pay.merchant-services">
-  <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{not this.layer2Network.isConnected}}>
+  <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{or (not this.layer2Network.isConnected) (is-empty this.merchantSafes)}}>
     {{#each @model.panel.sections as |section|}}
       <CardPay::DashboardPanel::Section @section={{section}}>
         <:cta>
@@ -34,7 +34,6 @@
             @kind="secondary-dark"
             @size="small"
             @disabled={{section.isCtaDisabled}}
-            @route="card-pay.balances"
             data-test-workflow-button={{section.workflow}}
           >
             <span>{{section.cta}}</span>

@@ -50,8 +50,8 @@ module('Acceptance | create merchant persistence', function (hooks) {
         address: depotAddress,
         owners: [layer2AccountAddress],
         tokens: [
-          createSafeToken('DAI', '250000000000000000000'),
-          createSafeToken('CARD', '250000000000000000000'),
+          createSafeToken('DAI.CPXD', '250000000000000000000'),
+          createSafeToken('CARD.CPXD', '250000000000000000000'),
         ],
       }),
       createPrepaidCardSafe({

@@ -186,6 +186,7 @@ export default class Layer1Network
     );
   }
 
+  @action
   refreshBalances() {
     return this.strategy.refreshBalances();
   }

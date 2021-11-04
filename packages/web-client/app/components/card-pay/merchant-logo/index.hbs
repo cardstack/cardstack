@@ -10,6 +10,6 @@
     data-test-merchant-logo-text-color={{@logoTextColor}}
     ...attributes
   >
-    {{first-char @name}}
+    {{capitalize (first-char @name)}}
   </div>
 {{/if}}

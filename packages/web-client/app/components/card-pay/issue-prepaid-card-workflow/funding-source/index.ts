@@ -3,7 +3,9 @@ import { action } from '@ember/object';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import BN from 'bn.js';
+import { fromWei } from 'web3-utils';
 
+import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import {
   TokenBalance,
@@ -12,48 +14,91 @@ import {
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 
 class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
-  defaultTokenSymbol: BridgedTokenSymbol = 'DAI.CPXD';
-  tokenOptions = [this.defaultTokenSymbol];
-  @service declare layer2Network: Layer2Network;
-  @tracked selectedTokenSymbol: BridgedTokenSymbol =
-    this.args.workflowSession.getValue('prepaidFundingToken') ??
-    this.defaultTokenSymbol;
+  compatibleSafeTypes = ['depot', 'merchant'];
 
-  get selectedToken(): TokenBalance<BridgedTokenSymbol> {
+  defaultTokenSymbol: BridgedTokenSymbol;
+  tokenOptions: BridgedTokenSymbol[];
+  minimumDaiValue: BN;
+  @service declare layer2Network: Layer2Network;
+
+  @tracked selectedSafe: Safe | undefined;
+  @tracked selectedTokenSymbol: BridgedTokenSymbol;
+
+  constructor(owner: unknown, args: WorkflowCardComponentArgs) {
+    super(owner, args);
+    this.defaultTokenSymbol = this.layer2Network.defaultTokenSymbol;
+    this.tokenOptions = [this.defaultTokenSymbol];
+
+    this.minimumDaiValue = new BN(
+      this.args.workflowSession.getValue<string>('daiMinValue')!
+    );
+
+    let prepaidFundingSafeAddress = this.args.workflowSession.getValue<string>(
+      'prepaidFundingSafeAddress'
+    );
+
+    let safeToSelect = prepaidFundingSafeAddress
+      ? this.layer2Network.safes.getByAddress(prepaidFundingSafeAddress)
+      : this.layer2Network.depotSafe;
+
+    if (
+      (safeToSelect && !this.sufficientBalanceSafes.includes(safeToSelect)) ||
+      !safeToSelect
+    ) {
+      safeToSelect = this.sufficientBalanceSafes[0];
+    }
+
+    this.selectedSafe = safeToSelect;
+
+    this.selectedTokenSymbol =
+      this.tokens.find((t) => t.symbol === this.prepaidFundingToken)
+        ?.tokenDisplayInfo.symbol ?? this.tokens[0].tokenDisplayInfo.symbol;
+  }
+
+  get prepaidFundingToken(): BridgedTokenSymbol {
     return (
-      this.tokens.find((t) => t.symbol === this.selectedTokenSymbol) ??
-      this.tokens[0]
+      this.args.workflowSession.getValue('prepaidFundingToken') ??
+      this.defaultTokenSymbol
     );
   }
 
-  get depotAddress() {
-    return this.layer2Network.depotSafe?.address || undefined;
+  get sufficientBalanceSafes() {
+    return this.layer2Network.safes.issuePrepaidCardSourceSafes;
   }
 
   get tokens() {
     return this.tokenOptions.map((symbol) => {
-      let balance = this.getTokenBalance(symbol);
+      let selectedSafeToken = (this.selectedSafe?.tokens || []).find(
+        (token) => token.token.symbol === symbol
+      );
+      let balance = new BN(selectedSafeToken?.balance || '0');
       return new TokenBalance(symbol, balance);
     });
   }
 
-  getTokenBalance(symbol: BridgedTokenSymbol) {
-    if (symbol === this.defaultTokenSymbol) {
-      return this.layer2Network.defaultTokenBalance ?? new BN('0');
-    }
-    return new BN('0');
+  get selectedToken() {
+    return this.tokens.find(
+      (token) => token.symbol === this.selectedTokenSymbol
+    );
   }
 
   get isDisabled() {
     return (
-      !this.depotAddress ||
       !this.tokens.length ||
-      !this.selectedToken.balance ||
-      this.selectedToken.balance.isZero()
+      !this.selectedToken?.balance ||
+      this.selectedToken?.balance.isZero()
     );
   }
 
-  @action chooseSource(token: TokenBalance<BridgedTokenSymbol>) {
+  get formattedMinimumDaiValue() {
+    return Math.ceil(Number(fromWei(this.minimumDaiValue)));
+  }
+
+  @action chooseSafe(safe: Safe) {
+    this.selectedSafe = safe;
+  }
+
+  @action chooseBalance(token: TokenBalance<BridgedTokenSymbol>) {
     this.selectedTokenSymbol = token.symbol;
   }
 
@@ -62,10 +107,10 @@ class FundingSourceCard extends Component<WorkflowCardComponentArgs> {
       return;
     }
     if (this.selectedTokenSymbol) {
-      this.args.workflowSession.setValue(
-        'prepaidFundingToken',
-        this.selectedTokenSymbol
-      );
+      this.args.workflowSession.setValue({
+        prepaidFundingToken: this.selectedTokenSymbol,
+        prepaidFundingSafeAddress: this.selectedSafe!.address,
+      });
     }
     this.args.onComplete?.();
   }

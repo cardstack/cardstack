@@ -5,15 +5,16 @@ import { networkName } from '../sdk/utils/general-utils';
 // this silly consumption of the ABI's. The ABI's are indeed consumed, however,
 // we consume them outside of ts due to the way the codegen operates for the
 // subgraph assembly script.
-import PayMerchantHandlerABI from './abi/v0.8.0/pay-merchant-handler';
-import RegisterMerchantHandlerABI from './abi/v0.8.0/register-merchant-handler';
-import TransferPrepaidCardHandlerABI from './abi/v0.8.0/transfer-prepaid-card-handler';
-import SplitPrepaidCardHandlerABI from './abi/v0.8.0/split-prepaid-card-handler';
-import SpendABI from './abi/v0.8.0/spend';
-import MerchantManagerABI from './abi/v0.8.0/merchant-manager';
-import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.0/deprecated-merchant-manager-0_6_7';
-import RegisterRewardProgramHandlerABI from './abi/v0.8.0/register-reward-program-handler';
-import RegisterRewardeeHandlerABI from './abi/v0.8.0/register-rewardee-handler';
+import PayMerchantHandlerABI from './abi/v0.8.4/pay-merchant-handler';
+import RegisterMerchantHandlerABI from './abi/v0.8.4/register-merchant-handler';
+import TransferPrepaidCardHandlerABI from './abi/v0.8.4/transfer-prepaid-card-handler';
+import SplitPrepaidCardHandlerABI from './abi/v0.8.4/split-prepaid-card-handler';
+import SpendABI from './abi/v0.8.4/spend';
+import MerchantManagerABI from './abi/v0.8.4/merchant-manager';
+import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.4/deprecated-merchant-manager-0_6_7';
+import RegisterRewardProgramHandlerABI from './abi/v0.8.4/register-reward-program-handler';
+import RegisterRewardeeHandlerABI from './abi/v0.8.4/register-rewardee-handler';
+
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
 consumeModule(RegisterMerchantHandlerABI);
@@ -58,11 +59,13 @@ const SOKOL = {
   uniswapV2Router: '0xd57B4D7B7FED6b47492A362e113e26F9804DbCc6', // This is the UniswapV2Router02
   uniswapV2Factory: '0x6b67f08F08B715B162aa09239488318A660F24BF',
   rewardPool: '0x2D23acfEA32492911E8DF12E697AF0013B8D4E7b',
-  rewardManager: '0x9A89A110238201c12568f3a4a02BE5Ae63284497',
+  rewardManager: '0xC42a0E9Df2445D5b6918D44091524cDA4c13BbFd',
   registerRewardProgramHandler: '0xaF5B2869Be9Eb9c45cc0501F17B145A3229dD2C0',
   registerRewardeeHandler: '0x0B793A280F2E47997432a9047073F5e634A9A731',
   deprecatedMerchantManager_v0_6_7: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2',
   oracles: {
+    'DAI.CPXD': '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB',
+    'CARD.CPXD': '0xb4Fcc975c2b6A57dd5B3d9a3B6b144499f707c7d',
     DAI: '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB',
     CARD: '0xb4Fcc975c2b6A57dd5B3d9a3B6b144499f707c7d',
   },
@@ -86,8 +89,8 @@ const XDAI = {
   bridgeUtils: '0xa79206F956461e053DbCF33ADDFa77553Df58D7F',
   exchange: '0x1c5B87A6905327D2370fA57C80667D432926ABA1',
   relay: '0x846fcb74913277AF31FF535cC88bfcC62f64346A',
-  cardstackIssuer: '',
-  wyreIssuer: '',
+  cardstackIssuer: '0x3af4fF276c3236Aa5d8EBf98f56a3C64C47d9743',
+  wyreIssuer: '0x60DE57A12Ccc6b8712ea8aBbC29Fe03E0718F885',
   payMerchantHandler: '0xdDc6709482ee4072D562C4a9f04Fc6E3249b785e',
   registerMerchantHandler: '0x4101A6C673cBA6afDB2Ef082Cb578b64f81aB3D1',
   splitPrepaidCardHandler: '0x0672c77D9a9C8D81D8082a1fB925fE44f475e600',
@@ -99,11 +102,13 @@ const XDAI = {
   uniswapV2Router: '0x1C232F01118CB8B424793ae03F870aa7D0ac7f77', // This is the UniswapV2Router02
   uniswapV2Factory: '0xA818b4F111Ccac7AA31D0BCc0806d64F2E0737D7',
   rewardPool: '0x86648EbB0de02B9815Bfc5001cEa1Dd35a5A4552',
-  rewardManager: '0x44aB7b82F18694cF4431F41E67C0f05AAaCAC74D',
+  rewardManager: '0x3B6bedcA6EC78fCd33aFeB385B192056de639403',
   registerRewardProgramHandler: '0x8e0A60912C56F4436396C636f0ED500ef27af4e0',
   registerRewardeeHandler: '0x198ea3D257715Fb2e9025c061BE96e56AE611A9f',
   deprecatedMerchantManager_v0_6_7: '0x3C29B2A563F4bB9D625175bE823c528A4Ddd1107',
   oracles: {
+    'DAI.CPXD': '0x36698BF676c40be119b0Fe4f964f4527943258F2',
+    'CARD.CPXD': '0xd570Ed8b313Fe6aEEA4064bd1713b5Cc6d41D3C5',
     DAI: '0x36698BF676c40be119b0Fe4f964f4527943258F2',
     CARD: '0xd570Ed8b313Fe6aEEA4064bd1713b5Cc6d41D3C5',
   },

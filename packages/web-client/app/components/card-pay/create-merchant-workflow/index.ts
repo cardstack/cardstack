@@ -45,7 +45,7 @@ export const MILESTONE_TITLES = [
   'Save merchant details',
   'Create merchant',
 ];
-export const WORKFLOW_VERSION = 2;
+export const WORKFLOW_VERSION = 3;
 
 class CreateMerchantWorkflow extends Workflow {
   name = 'MERCHANT_CREATION' as WorkflowName;

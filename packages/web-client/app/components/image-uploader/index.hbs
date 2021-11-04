@@ -6,14 +6,10 @@
       {{svg-jar icon class=(cn "image-uploader__preview" "image-uploader__preview--placeholder" image-uploader__preview--rounded=@rounded) role="presentation" data-test-image-uploader-placeholder=icon}}
     {{/let}}
   {{/if}}
-  {{!-- TODO: --}}
-  {{!-- add triggers to ui to open up editing (placeholder), after editing is added --}}
-  {{!-- add loading state + argument --}}
   <input {{did-insert this.setUploader}} type="file" accept={{or @acceptedFileTypes "image/jpeg, image/png"}} id={{concat "hidden-file-input-" (unique-id)}} hidden {{on "change" this.onFileChanged}} data-test-image-uploader-file-input>
   <div class="image-uploader__controls">
     <Boxel::Button @kind="secondary-light" @size="small" class="image-uploader__button" aria-label="Upload an image" data-test-image-uploader-upload-button {{on "click" this.upload}}>{{@cta}}</Boxel::Button>
     {{#if @image}}
-      {{!-- <Boxel::Button @kind="secondary-light" @size="small" class="image-uploader__button image-uploader__button--icon" aria-label="Crop or rotate current image">{{svg-jar "edit-box"}}</Boxel::Button> --}}
       <Boxel::Button @kind="secondary-light" @size="small" class="image-uploader__button image-uploader__button--icon" aria-label="Remove current image" {{on "click" @onRemoveImage}} data-test-image-uploader-delete-button>{{svg-jar "trash"}}</Boxel::Button>
     {{/if}}
   </div>

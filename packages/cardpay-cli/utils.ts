@@ -26,6 +26,9 @@ export async function getWeb3(network: string, mnemonic?: string): Promise<Web3>
         name: 'Cardstack - Cardpay CLI',
       },
       rpc: {
+        // we can't use OpenEthereum nodes as it was issues with modern web3
+        // providers (specifically the xdai archive node that POA hosts falls
+        // into this category)
         [networkIds[network]]: getConstantByNetwork('rpcNode', network),
       },
       bridge: BRIDGE,

@@ -59,9 +59,8 @@ const triggerWorkflowRun = async (workflowID: number, environment: string, ref: 
     owner: config.github.owner,
     repo: config.github.repo,
     workflow_id: workflowID,
-    ref: config.github.default_branch,
+    ref,
     inputs: {
-      ref,
       environment,
     },
   });

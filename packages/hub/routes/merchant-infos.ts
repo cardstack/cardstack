@@ -24,6 +24,9 @@ export default class MerchantInfosRoute {
   merchantInfoQueries = inject('merchant-info-queries', {
     as: 'merchantInfoQueries',
   });
+  reservedWords = inject('reserved-words', {
+    as: 'reservedWords',
+  });
 
   workerClient = inject('worker-client', { as: 'workerClient' });
 
@@ -40,7 +43,7 @@ export default class MerchantInfosRoute {
       return;
     }
 
-    let slug = ctx.request.body.data.attributes['slug'];
+    let slug = ctx.request.body.data.attributes['slug'].toLowerCase();
     let validationResult = await this.validateSlug(slug);
 
     if (!validationResult.slugAvailable) {
@@ -98,11 +101,22 @@ export default class MerchantInfosRoute {
         detail: errorMessage,
       };
     } else {
-      let merchantInfo = (await this.merchantInfoQueries.fetch({ slug }))[0];
-      return {
-        slugAvailable: merchantInfo ? false : true,
-        detail: merchantInfo ? 'Merchant slug already exists' : 'Merchant slug is available',
-      };
+      if (
+        this.reservedWords.isReserved(slug, (reservedWord) => reservedWord.replace(/[^0-9a-zA-Z]/g, '').toLowerCase())
+      ) {
+        return {
+          slugAvailable: false,
+          detail: 'This Merchant ID is not allowed',
+        };
+      } else {
+        let merchantInfo = (await this.merchantInfoQueries.fetch({ slug }))[0];
+        return {
+          slugAvailable: merchantInfo ? false : true,
+          detail: merchantInfo
+            ? 'This Merchant ID is already taken. Please choose another one'
+            : 'Merchant slug is available',
+        };
+      }
     }
   }
 }

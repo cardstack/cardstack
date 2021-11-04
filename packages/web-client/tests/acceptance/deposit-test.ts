@@ -13,6 +13,7 @@ import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import a11yAudit from 'ember-a11y-testing/test-support/audit';
 import BN from 'bn.js';
+import percySnapshot from '@percy/ember';
 
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { capitalize } from '@ember/string';
@@ -122,8 +123,9 @@ module('Acceptance | deposit', function (hooks) {
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
+        address: '0xB236ca8DbAB0644ffCD32518eBF4924ba8666666',
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '0')],
+        tokens: [createSafeToken('DAI.CPXD', '0')],
       }),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -341,6 +343,9 @@ module('Acceptance | deposit', function (hooks) {
         `${epiloguePostableSel(4)} [data-test-deposit-next-step="dashboard"]`
       )
       .exists();
+
+    await percySnapshot(assert);
+
     await click(
       `${epiloguePostableSel(4)} [data-test-deposit-next-step="dashboard"]`
     );
@@ -528,7 +533,7 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '142200000000000000')],
+        tokens: [createSafeToken('DAI.CPXD', '142200000000000000')],
       }),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -612,7 +617,7 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '142200000000000000')],
+        tokens: [createSafeToken('DAI.CPXD', '142200000000000000')],
       }),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -692,7 +697,7 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '142200000000000000')],
+        tokens: [createSafeToken('DAI.CPXD', '142200000000000000')],
       }),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -778,7 +783,7 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '142200000000000000')],
+        tokens: [createSafeToken('DAI.CPXD', '142200000000000000')],
       }),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -863,7 +868,7 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '142200000000000000')],
+        tokens: [createSafeToken('DAI.CPXD', '142200000000000000')],
       }),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
@@ -953,7 +958,7 @@ module('Acceptance | deposit', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '142200000000000000')],
+        tokens: [createSafeToken('DAI.CPXD', '142200000000000000')],
       }),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);

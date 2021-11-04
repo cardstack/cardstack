@@ -16,7 +16,7 @@
   grid-area: preview;
   width: var(--image-size);
   height: var(--image-size);
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .image-uploader__preview--rounded {

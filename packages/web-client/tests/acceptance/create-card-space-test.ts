@@ -7,6 +7,7 @@ import {
   visit,
   waitFor,
 } from '@ember/test-helpers';
+import percySnapshot from '@percy/ember';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { setupHubAuthenticationToken } from '../helpers/setup';
@@ -63,7 +64,7 @@ module('Acceptance | create card space', function (hooks) {
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         owners: [layer2AccountAddress],
-        tokens: [createSafeToken('DAI', '0')],
+        tokens: [createSafeToken('DAI.CPXD', '0')],
       }),
     ]);
 
@@ -160,6 +161,8 @@ module('Acceptance | create card space', function (hooks) {
       .containsText(`Congrats, you have created your Card Space!`);
 
     await waitFor(epiloguePostableSel(2));
+
+    await percySnapshot(assert);
     // TODO
     // await click('[data-test-card-space-next-step="visit-space"]');
   });
@@ -173,7 +176,7 @@ module('Acceptance | create card space', function (hooks) {
       layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
         createDepotSafe({
           owners: [layer2AccountAddress],
-          tokens: [createSafeToken('DAI', '0')],
+          tokens: [createSafeToken('DAI.CPXD', '0')],
         }),
       ]);
       await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);

@@ -108,6 +108,11 @@
       <i.ActionButton data-test-deposit-button>
         Depositing
       </i.ActionButton>
+      {{#if this.depositTaskCancelable}}
+        <i.CancelButton {{on "click" this.cancelDeposit}} data-test-deposit-cancel-button>
+          Cancel
+        </i.CancelButton>
+      {{/if}}
       {{#if this.depositTxnViewerUrl}}
         <i.InfoArea>
           <Boxel::Button @as="anchor" @kind="secondary-dark" @size="extra-small" @href={{this.depositTxnViewerUrl}} target="_blank" rel="noopener" data-test-deposit-etherscan-button>

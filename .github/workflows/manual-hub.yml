@@ -3,10 +3,6 @@ name: Manual Deploy [hub]
 on:
   workflow_dispatch:
     inputs:
-      ref:
-        description: Git branch/tag
-        required: false
-        default: main
       environment:
         description: Deployment environment
         required: false
@@ -17,9 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.inputs.ref }}
-
       - name: Set up env
         env:
           INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
@@ -52,9 +45,6 @@ jobs:
         uses: ./.github/actions/deploy-hub
         env:
           AWS_DEFAULT_REGION: us-east-1
-        with:
-          ref: ${{ github.event.inputs.ref }}
-          environment: ${{ github.event.inputs.environment }}
 
       - name: Send success notification to Discord
         if: ${{ success() }}
@@ -63,7 +53,7 @@ jobs:
           token: ${{ secrets.DISCORD_TOKEN }}
           channel: ${{ secrets.DISCORD_CHANNEL }}
           message: |
-            :checkered_flag: **hub** [${{ github.event.inputs.ref }}] has been successfully deployed to *${{ github.event.inputs.environment }}*
+            :checkered_flag: **hub** [${{ github.ref }}] has been successfully deployed to *${{ github.event.inputs.environment }}*
             :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Send failure notification to Discord
@@ -73,5 +63,5 @@ jobs:
           token: ${{ secrets.DISCORD_TOKEN }}
           channel: ${{ secrets.DISCORD_CHANNEL }}
           message: |
-            :warning: **hub** [${{ github.event.inputs.ref }}] has failed to deploy to *${{ github.event.inputs.environment }}*
+            :warning: **hub** [${{ github.ref }}] has failed to deploy to *${{ github.event.inputs.environment }}*
             :arrow_forward: Workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}

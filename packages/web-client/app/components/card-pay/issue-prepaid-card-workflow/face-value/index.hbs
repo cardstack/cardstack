@@ -17,9 +17,8 @@
       <CardPay::LabeledValue @vertical={{true}} @label="Funding From:">
         <CardPay::BalanceViewBanner
           @walletAddress={{this.layer2Network.walletInfo.firstAddress}}
-          @depotAddress={{this.layer2Network.depotSafe.address}}
-          @token={{this.fundingToken}}
-          @balance={{format-wei-amount this.fundingTokenBalance}}
+          @safe={{this.fundingSafe}}
+          @token={{this.fundingToken.symbol}}
         />
       </CardPay::LabeledValue>
       {{#if @isComplete}}

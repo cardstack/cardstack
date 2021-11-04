@@ -21,7 +21,7 @@ export const run: Event['run'] = async (bot, message) => {
     return;
 
   const args: string[] = message.content.slice(prefix.length).trim().split(/ +/);
-  let commandName = args.shift();
+  let commandName = args.shift()!.toLowerCase();
   if (!commandName) {
     return;
   }
@@ -29,7 +29,10 @@ export const run: Event['run'] = async (bot, message) => {
   if (!command) {
     return;
   }
-
+  if (bot.status !== 'listening') {
+    bot.messageProcessingVerifier.scheduleVerification(message);
+    return;
+  }
   log.trace(`detected command '${commandName}'`);
   Sentry.addBreadcrumb({ message: `guild command: ${commandName}` });
   try {
@@ -39,5 +42,7 @@ export const run: Event['run'] = async (bot, message) => {
     Sentry.withScope(function () {
       Sentry.captureException(err);
     });
+  } finally {
+    bot.notifyMessageProcessed(message);
   }
 };

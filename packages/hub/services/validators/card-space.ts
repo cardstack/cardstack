@@ -2,6 +2,7 @@ import { CardSpace } from '../../routes/card-spaces';
 import CardSpaceQueries from '../queries/card-space';
 import { inject } from '@cardstack/di';
 import { URL } from 'url';
+import isValidDomain from 'is-valid-domain';
 
 export type CardSpaceAttribute =
   | 'url'
@@ -27,29 +28,26 @@ export interface NestedAttributeError {
   detail: string;
 }
 export type CardSpaceErrors = Record<CardSpaceAttribute, (string | NestedAttributeError)[]>;
-type UrlValidationResult = Record<'valid', boolean>;
-
 const MAX_LONG_FIELD_LENGTH = 300;
 const MAX_SHORT_FIELD_LENGTH = 50;
 const ALLOWED_BUTTON_TEXTS = ['Visit this Space', 'Visit this Business', 'Visit this Creator', 'Visit this Person'];
 
-function validateUrl(url: string): UrlValidationResult {
+function isValidUrl(url: string): boolean {
   try {
     new URL(url);
+    return true;
   } catch (_) {
-    return {
-      valid: false,
-    };
+    return false;
   }
-
-  return {
-    valid: true,
-  };
 }
 
 export default class CardSpaceValidator {
   cardSpaceQueries: CardSpaceQueries = inject('card-space-queries', {
     as: 'cardSpaceQueries',
+  });
+
+  reservedWords = inject('reserved-words', {
+    as: 'reservedWords',
   });
 
   async validate(cardSpace: CardSpace): Promise<CardSpaceErrors> {
@@ -102,22 +100,29 @@ export default class CardSpaceValidator {
       errors.profileCategory.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
     }
 
-    // Validate URLs
+    if (cardSpace.url) {
+      let urlParts = cardSpace.url.split('.');
+      let subdomain = urlParts[0];
 
-    let cardSpaceUrl = `https://${cardSpace.url}`;
-    let urlValid = validateUrl(cardSpaceUrl!).valid;
-
-    if (!urlValid) {
-      errors.url.push('Invalid URL');
-    } else {
-      let urlObject = new URL(cardSpaceUrl);
-      if (!urlObject.hostname.endsWith('card.space')) {
-        errors.url.push('Only card.space subdomains are allowed');
+      // do basic string and length checks first before falling back to validity test
+      // to catch other vaguer invalid things
+      if (cardSpace.url === '.card.space') {
+        errors.url.push('Please provide a subdomain');
+      } else if (urlParts.length > 3) {
+        errors.url.push('Can only contain latin letters, numbers, hyphens and underscores');
+      } else if (/[^a-zA-Z0-9-_]/.test(subdomain)) {
+        errors.url.push('Can only contain latin letters, numbers, hyphens and underscores');
+      } else if (cardSpace.url.startsWith('xn--')) {
+        errors.url.push(`Internationalised domain names are not supported`);
+      } else if (subdomain.length > MAX_SHORT_FIELD_LENGTH) {
+        errors.url.push(`Max length is ${MAX_SHORT_FIELD_LENGTH}`);
+      } else if (!isValidUrl(`https://${cardSpace.url}`) || !isValidDomain(cardSpace.url)) {
+        errors.url.push('URL is not valid');
+      } else if (!new URL(`https://${cardSpace.url}`).hostname.endsWith('card.space')) {
+        errors.url.push('Only valid card.space subdomains are allowed');
+      } else if (this.reservedWords.isReserved(subdomain, this.reservedWords.lowerCaseAlphaNumericTransform)) {
+        errors.url.push('URL unavailable');
       }
-    }
-
-    if (cardSpace.url && cardSpace.url.split('.').length - 1 !== 2) {
-      errors.url.push('Only first level subdomains are allowed');
     }
 
     let cardSpaceWithExistingUrl = (await this.cardSpaceQueries.query({ url: cardSpace.url }))[0];
@@ -126,11 +131,11 @@ export default class CardSpaceValidator {
       errors.url.push('Already exists');
     }
 
-    if (!validateUrl(cardSpace.profileImageUrl!).valid) {
+    if (cardSpace.profileImageUrl && !isValidUrl(cardSpace.profileImageUrl!)) {
       errors.profileImageUrl.push('Invalid URL');
     }
 
-    if (!validateUrl(cardSpace.profileCoverImageUrl!).valid) {
+    if (cardSpace.profileImageUrl && !isValidUrl(cardSpace.profileCoverImageUrl!)) {
       errors.profileCoverImageUrl.push('Invalid URL');
     }
 
@@ -178,7 +183,7 @@ export default class CardSpaceValidator {
             attribute: 'url',
             detail: 'Must be present',
           });
-        } else if (!validateUrl(url!).valid) {
+        } else if (!isValidUrl(url!)) {
           errors.links.push({
             index,
             attribute: 'url',

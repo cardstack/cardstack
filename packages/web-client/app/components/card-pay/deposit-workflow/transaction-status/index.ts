@@ -3,6 +3,7 @@ import { inject as service } from '@ember/service';
 import BN from 'bn.js';
 import { tracked } from '@glimmer/tracking';
 import * as Sentry from '@sentry/browser';
+import config from '@cardstack/web-client/config/environment';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { TokenSymbol } from '@cardstack/web-client/utils/token';
@@ -11,7 +12,15 @@ import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3
 import { TransactionReceipt } from 'web3-core';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
-import { TaskGenerator } from 'ember-concurrency';
+import {
+  didCancel,
+  race,
+  rawTimeout,
+  TaskGenerator,
+  waitForProperty,
+} from 'ember-concurrency';
+
+const A_WHILE = config.environment === 'test' ? 1 : 1000 * 60 * 2;
 
 class CardPayDepositWorkflowTransactionStatusComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
@@ -36,8 +45,22 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
   @tracked blockCountError = false;
   @tracked blockCount = 0;
 
+  @tracked showSlowBridgingMessage = false;
+
   get totalBlockCount(): number {
     return this.layer1Network.strategy.bridgeConfirmationBlockCount;
+  }
+
+  get bridgedTokenSymbol() {
+    if (this.selectedTokenSymbol === 'CARD') {
+      return this.layer2Network.bridgedCardTokenSymbol;
+    } else if (this.selectedTokenSymbol === 'DAI') {
+      return this.layer2Network.bridgedDaiTokenSymbol;
+    } else {
+      throw new Error(
+        `Could not get bridged token symbol for "${this.selectedTokenSymbol}"`
+      );
+    }
   }
 
   get progressSteps() {
@@ -49,7 +72,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
         title: `Bridge tokens from ${c.layer1.fullName} to ${c.layer2.fullName}`,
       },
       {
-        title: `Mint tokens on ${c.layer2.shortName}: ${this.selectedTokenSymbol}.CPXD`,
+        title: `Mint tokens on ${c.layer2.shortName}: ${this.bridgedTokenSymbol}`,
       },
     ];
   }
@@ -61,14 +84,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
       this.blockCount = this.totalBlockCount;
       this.args.onComplete?.();
     } else {
-      taskFor(this.waitForBlockConfirmationsTask)
-        .perform()
-        .catch((e) => {
-          console.error('Failed to complete block confirmations');
-          console.error(e);
-          Sentry.captureException(e);
-          this.blockCountError = true;
-        });
+      taskFor(this.awaitTimerTask).perform();
     }
   }
 
@@ -86,6 +102,22 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
     }
   }
 
+  @task *awaitTimerTask(): TaskGenerator<void> {
+    yield race([
+      taskFor(this.waitForBlockConfirmationsTask)
+        .perform()
+        .catch((e) => {
+          if (!didCancel(e)) {
+            console.error('Failed to complete block confirmations');
+            console.error(e);
+            Sentry.captureException(e);
+            this.blockCountError = true;
+          }
+        }),
+      taskFor(this.timerTask).perform(),
+    ]);
+  }
+
   @task *waitForBlockConfirmationsTask(): TaskGenerator<void> {
     let blockNumber = this.relayTokensTxnReceipt.blockNumber;
     while (this.blockCount <= this.totalBlockCount + 1) {
@@ -94,6 +126,13 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
     }
     this.completedStepCount++;
     this.waitForBridgingToComplete();
+  }
+
+  @task *timerTask(): TaskGenerator<void> {
+    this.showSlowBridgingMessage = false;
+    yield rawTimeout(A_WHILE);
+    this.showSlowBridgingMessage = true;
+    yield waitForProperty(this, 'showSlowBridgingMessage', false);
   }
 
   async waitForBridgingToComplete() {
@@ -111,6 +150,7 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
         transactionReceipt
       );
       this.completedStepCount++;
+      this.showSlowBridgingMessage = false;
       this.args.onComplete?.();
     } catch (e) {
       console.error('Failed to complete bridging to layer 2');
@@ -136,6 +176,16 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
     return this.layer2Network.blockExplorerUrl(
       this.completedLayer2TxnReceipt!.transactionHash
     );
+  }
+
+  get slowBridgingUrl() {
+    if (this.completedStepCount === 1) {
+      return this.depositTxnViewerUrl;
+    } else if (this.completedStepCount === 2) {
+      return this.bridgeExplorerUrl;
+    } else {
+      return this.blockscoutUrl;
+    }
   }
 }
 
