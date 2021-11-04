@@ -39,7 +39,7 @@ export interface ITokenBridgeForeignSide {
   ): Promise<TransactionReceipt>;
 }
 
-const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 290000;
+const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 350000;
 export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   constructor(private layer1Web3: Web3) {}
 
