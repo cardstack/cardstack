@@ -25,6 +25,9 @@ export function setupServer(
     {},
     {
       get(_target, propertyName) {
+        if (!process.env.COMPILER) {
+          throw new Error(`compiler flag not active`);
+        }
         if (!currentCardService) {
           throw new Error(`tried to use cardService outside of an active test`);
         }
@@ -47,13 +50,12 @@ export function setupServer(
     if (process.env.COMPILER) {
       cardCache = await server.container.lookup('card-cache');
       cardCacheConfig = (await server.container.lookup('card-cache-config')) as TestCardCacheConfig;
+      (await server.container.lookup('realm-manager')).createRealm({
+        url: REALM,
+        directory: tmp.dirSync().name,
+      });
+      currentCardService = await server.container.lookup('card-service');
     }
-
-    (await server.container.lookup('realm-manager')).createRealm({
-      url: REALM,
-      directory: tmp.dirSync().name,
-    });
-    currentCardService = await server.container.lookup('card-service');
 
     // TODO: by the time we return, the cards in all the configured realms (base, have been indexed
     // await initialIndexing();

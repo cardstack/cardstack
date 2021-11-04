@@ -3,7 +3,7 @@ import { setupServer } from '../helpers/server';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 if (process.env.COMPILER) {
-  describe('CardService', function () {
+  describe.skip('CardService', function () {
     let { cards, realm } = setupServer(this);
 
     this.beforeEach(async function () {
