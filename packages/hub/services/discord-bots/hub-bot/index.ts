@@ -14,11 +14,13 @@ export default class HubBot extends DiscordBot {
     commandPrefix: config.get('discord.commandPrefix'),
     allowedGuilds: config.get('discord.allowedGuilds'),
     allowedChannels: config.get('discord.allowedChannels'),
+    messageVerificationDelayMs: config.get('discord.messageVerificationDelayMs'),
   };
 
-  databaseManager = inject('database-manager', { as: 'databaseManager' });
   inventory = inject('inventory');
   relay = inject('relay');
   walletConnect = inject('wallet-connect', { as: 'walletConnect' });
   web3 = inject('web3');
+  discordBotsDbGateway = inject('hub-discord-bots-db-gateway', { as: 'discordBotsDbGateway' });
+  dmChannelsDbGateway = inject('hub-dm-channels-db-gateway', { as: 'dmChannelsDbGateway' });
 }

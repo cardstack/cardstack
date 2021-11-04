@@ -88,7 +88,18 @@ export default class TokenToUsd extends Service {
     return this.#registeredHelpers.size > 0;
   }
 
-  toUsdFrom(symbol: UsdConvertibleSymbol, amount: BN): number | undefined {
+  toUsdFrom(
+    symbol: UsdConvertibleSymbol | 'DAI' | 'CARD',
+    amount: BN
+  ): number | undefined {
+    if (symbol === 'DAI') {
+      symbol = 'DAI.CPXD';
+    }
+
+    if (symbol === 'CARD') {
+      symbol = 'CARD.CPXD';
+    }
+
     if (amount.isZero()) {
       return 0;
     }

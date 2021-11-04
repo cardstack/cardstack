@@ -196,7 +196,7 @@ describe('POST /api/card-spaces', function () {
               pointer: '/data/attributes/url',
             },
             title: 'Invalid attribute',
-            detail: 'Invalid URL',
+            detail: 'Can only contain latin letters, numbers, hyphens and underscores',
           },
         ],
       })
@@ -235,15 +235,7 @@ describe('POST /api/card-spaces', function () {
               pointer: '/data/attributes/url',
             },
             title: 'Invalid attribute',
-            detail: 'Only card.space subdomains are allowed',
-          },
-          {
-            status: '422',
-            source: {
-              pointer: '/data/attributes/url',
-            },
-            title: 'Invalid attribute',
-            detail: 'Only first level subdomains are allowed',
+            detail: 'Can only contain latin letters, numbers, hyphens and underscores',
           },
         ],
       })
@@ -268,7 +260,7 @@ describe('POST /api/card-spaces', function () {
       .expect('Content-Type', 'application/vnd.api+json');
   });
 
-  describe('GET /api/card-spaces/url-validation/:url', async function () {
+  describe('POST /api/card-spaces/validate-url', async function () {
     let server: HubServer;
     let request: supertest.SuperTest<Test>;
 
@@ -289,7 +281,8 @@ describe('POST /api/card-spaces', function () {
 
     it('returns no url errors when url is available', async function () {
       await request
-        .get(`/api/card-spaces/validate-url/satoshi.card.space`)
+        .post(`/api/card-spaces/validate-url`)
+        .send({ data: { attributes: { url: 'satoshi.card.space' } } })
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
         .set('Content-Type', 'application/vnd.api+json')
         .expect(200)
@@ -308,7 +301,8 @@ describe('POST /api/card-spaces', function () {
       );
 
       await request
-        .get(`/api/card-spaces/validate-url/satoshi.card.space`)
+        .post(`/api/card-spaces/validate-url`)
+        .send({ data: { attributes: { url: 'satoshi.card.space' } } })
         .set('Authorization', 'Bearer: abc123--def456--ghi789')
         .set('Content-Type', 'application/vnd.api+json')
         .expect(200)

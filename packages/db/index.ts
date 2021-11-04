@@ -4,9 +4,7 @@ import { Client } from 'pg';
 export default class DatabaseManager {
   private client: Client | undefined;
 
-  get dbConfig() {
-    return config.get('db') as Record<string, any>;
-  }
+  dbConfig: Record<string, any> = config.get('db');
 
   async getClient() {
     if (!this.client) {

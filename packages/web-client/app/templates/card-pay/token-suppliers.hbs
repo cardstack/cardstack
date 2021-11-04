@@ -1,13 +1,12 @@
 {{page-title "Token Suppliers"}}
 
 <section class="card-pay-dashboard__token-suppliers" role="tabpanel" aria-labelledby="card-pay.token-suppliers">
-  <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{true}}>
+  <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{or (not this.layer2Network.isConnected) (is-empty this.layer2Network.depotSafe)}}>
     {{#each @model.panel.sections as |section|}}
       <CardPay::DashboardPanel::Section @section={{section}}>
         <:cta>
           <Boxel::Button
             {{on "click" (fn this.transitionToTokenSuppliers section.workflow)}}
-
             @kind="primary"
             @size="touch"
             @disabled={{section.isCtaDisabled}}
@@ -19,6 +18,38 @@
       </CardPay::DashboardPanel::Section>
     {{/each}}
   </CardPay::DashboardPanel>
+
+  {{#if this.layer2Network.isConnected}}
+    <section data-test-suppliers-section>
+      <header class="card-pay-dashboard__suppliers-header">
+        <h2 class="card-pay-dashboard__suppliers-title">Token Suppliers</h2>
+        {{#let @model.panel.sections.[0] as |section|}}
+          <Boxel::Button
+            {{on "click" (fn this.transitionToTokenSuppliers section.workflow)}}
+            @kind="secondary-dark"
+            @size="small"
+            @disabled={{section.isCtaDisabled}}
+            data-test-workflow-button={{section.workflow}}
+          >
+            <span>{{section.cta}}</span>
+            {{svg-jar "plus"
+              class="card-pay-dashboard__merchants-section-header-button-icon"
+              role="presentation"
+            }}
+          </Boxel::Button>
+        {{/let}}
+      </header>
+
+      {{#if this.layer2Network.depotSafe}}
+        <CardPay::Depot
+          @address={{this.layer2Network.depotSafe.address}}
+          @tokens={{this.tokensToDisplay}}
+          @usdBalanceTotal={{this.usdBalanceTotal}}
+          @withdraw={{fn this.transitionToTokenSuppliers "withdrawal"}}
+        />
+      {{/if}}
+    </section>
+  {{/if}}
 </section>
 
 <Boxel::Modal
