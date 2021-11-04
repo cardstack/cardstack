@@ -160,9 +160,9 @@ export default abstract class Layer1ChainWeb3Strategy
       }
 
       this.web3 = new Web3();
-      await this.connectionManager.reconnect(this.web3, providerId);
       this.#layerOneOracleApi = await getSDK('LayerOneOracle', this.web3);
       this.#assetsApi = await getSDK('Assets', this.web3);
+      await this.connectionManager.reconnect(this.web3, providerId);
     } catch (e) {
       console.error('Failed to initialize connection from local storage');
       console.error(e);
@@ -175,9 +175,9 @@ export default abstract class Layer1ChainWeb3Strategy
   async connect(walletProvider: WalletProvider): Promise<void> {
     try {
       this.web3 = new Web3();
-      await this.connectionManager.connect(this.web3, walletProvider.id);
       this.#layerOneOracleApi = await getSDK('LayerOneOracle', this.web3);
       this.#assetsApi = await getSDK('Assets', this.web3);
+      await this.connectionManager.connect(this.web3, walletProvider.id);
     } catch (e) {
       console.error(
         `Failed to create connection manager: ${walletProvider.id}`
