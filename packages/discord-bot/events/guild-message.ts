@@ -21,7 +21,7 @@ export const run: Event['run'] = async (bot, message) => {
     return;
 
   const args: string[] = message.content.slice(prefix.length).trim().split(/ +/);
-  let commandName = args.shift();
+  let commandName = args.shift()!.toLowerCase();
   if (!commandName) {
     return;
   }

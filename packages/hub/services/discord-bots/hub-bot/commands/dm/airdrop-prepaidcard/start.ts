@@ -12,7 +12,7 @@ import {
   setBetaTesterAirdropTxnHash,
 } from '../../../utils/beta-tester';
 import { BetaTestConfig, Web3Config } from '../../../types';
-import { name as cardmeName } from '../../guild/card-me';
+import { name as cardmeName } from '../../guild/card-drop';
 import HubBot from '../../..';
 import { assertHubBot } from '../../../utils';
 

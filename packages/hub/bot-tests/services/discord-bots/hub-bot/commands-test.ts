@@ -74,7 +74,7 @@ it(`does not respond in a non-allowed channel`, async function () {
 
 it(`can start a conversation for a beta tester that has not received an airdrop`, async function () {
   await setupTest();
-  expect('card-me').toMessageContentContains(`Connect your Card Wallet app to receive your prepaid card`);
+  expect('card-drop').toMessageContentContains(`Connect your Card Wallet app to receive your prepaid card`);
   // arg, corde asserts need to start with a command, since we have entered a DM
   // there there is no way to make any more assertions since the following
   // responses are just text and not commands (since bots can't DM each other
