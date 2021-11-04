@@ -13,6 +13,7 @@ import { TransactionReceipt } from 'web3-core';
 import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
 import {
+  didCancel,
   race,
   rawTimeout,
   TaskGenerator,
@@ -106,10 +107,12 @@ class CardPayDepositWorkflowTransactionStatusComponent extends Component<Workflo
       taskFor(this.waitForBlockConfirmationsTask)
         .perform()
         .catch((e) => {
-          console.error('Failed to complete block confirmations');
-          console.error(e);
-          Sentry.captureException(e);
-          this.blockCountError = true;
+          if (!didCancel(e)) {
+            console.error('Failed to complete block confirmations');
+            console.error(e);
+            Sentry.captureException(e);
+            this.blockCountError = true;
+          }
         }),
       taskFor(this.timerTask).perform(),
     ]);
