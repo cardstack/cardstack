@@ -46,7 +46,7 @@ export interface ITokenBridgeForeignSide {
 
 // Note:  To accommodate the fix for infura block mismatch errors (made in
 // CS-2391), we are waiting one extra block for all layer 1 transactions.
-const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 290000;
+const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 350000;
 export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   constructor(private layer1Web3: Web3) {}
 
