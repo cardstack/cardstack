@@ -170,7 +170,7 @@ class CreateMerchantWorkflow extends Workflow {
           message: 'Looking great!',
         }),
         new WorkflowMessage({
-          message: `On the next step: You need to pay a small protocol fee to create your business.
+          message: `On the next step: You need to pay a small protocol fee to create your business account.
           Please select a prepaid card and balance from your ${c.layer2.fullName} wallet`,
         }),
         new WorkflowCard({
