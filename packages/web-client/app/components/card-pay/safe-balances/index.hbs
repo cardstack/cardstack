@@ -1,0 +1,18 @@
+<section data-test-safe-balances>
+  Safe balances
+  <div class="card-pay-depot__address">
+    {{truncate-middle @safe.address}}
+  </div>
+  {{#each this.tokenBalances as |b|}}
+    <div class="card-pay-depot__token" data-test-safe-balances-token={{b.symbol}}>
+      <CardPay::BalanceDisplay
+        class="card-pay-depot__token-balance-display"
+        @icon={{b.icon}}
+        @balance={{format-wei-amount b.balance}}
+        @symbol={{b.symbol}}
+        @usdBalance={{token-to-usd b.symbol b.balance}}
+      />
+      <br/>
+    </div>
+  {{/each}}
+</section>
