@@ -4,14 +4,14 @@ import tmp from 'tmp';
 import { join } from 'path';
 
 import { RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
-import { createContainer } from '../../main';
+import { createRegistry } from '../../main';
 import { CardCacheConfig } from '../../services/card-cache-config';
 import CardBuilder from '../../services/card-builder';
 import RealmManager from '../../services/realm-manager';
 import FSRealm from '../../realms/fs-realm';
 
 import type CardCache from '../../services/card-cache';
-import type { Registry, Container } from '@cardstack/di';
+import { Container } from '@cardstack/di';
 
 tmp.setGracefulCleanup();
 
@@ -79,10 +79,9 @@ export function setupCardBuilding(mochaContext: Mocha.Suite) {
   }
 
   mochaContext.beforeEach(async function () {
-    container = createContainer((registry: Registry) => {
-      registry.register('card-cache-config', TestCardCacheConfig);
-    });
-
+    let registry = createRegistry();
+    registry.register('card-cache-config', TestCardCacheConfig);
+    let container = new Container(registry);
     cardCache = await container.lookup('card-cache');
     realms = await container.lookup('realm-manager');
     builder = await container.lookup('card-builder');

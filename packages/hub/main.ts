@@ -147,11 +147,8 @@ export function createRegistry(): Registry {
   return registry;
 }
 
-export function createContainer(additionalRegistrations?: Record<string, any>): Container {
+export function createContainer(): Container {
   let registry = createRegistry();
-  for (const key in additionalRegistrations) {
-    registry.register(key, additionalRegistrations[key]);
-  }
   return new Container(registry);
 }
 
@@ -319,7 +316,11 @@ export class HubBotController {
     this.logger.info(`booting pid:${process.pid}`);
     initSentry();
 
-    let container = createContainer(serverConfig?.registryCallback);
+    let registry = createRegistry();
+    if (serverConfig?.registryCallback) {
+      serverConfig.registryCallback(registry);
+    }
+    let container = new Container(registry);
     let bot: HubBot | undefined;
 
     try {
