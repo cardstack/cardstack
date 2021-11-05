@@ -26,12 +26,12 @@ function createMockMerchantSafe(
   });
 }
 
-module('Acceptance | merchant services dashboard', function (hooks) {
+module('Acceptance | payments dashboard', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
   test('Merchant cards are hidden when wallet is not connected', async function (assert) {
-    await visit('/card-pay/business-services');
+    await visit('/card-pay/payments');
 
     assert.dom('[data-test-merchants-section]').doesNotExist();
   });
@@ -59,7 +59,7 @@ module('Acceptance | merchant services dashboard', function (hooks) {
       'owner-address': layer2AccountAddress,
     });
 
-    await visit('/card-pay/business-services');
+    await visit('/card-pay/payments');
     assert.dom('[data-test-merchants-section]').exists();
     await waitFor('[data-test-merchant-dashboard-card]');
     assert

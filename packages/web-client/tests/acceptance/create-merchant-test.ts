@@ -84,10 +84,8 @@ module('Acceptance | create merchant', function (hooks) {
 
   test('initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay');
-    await click(
-      '[data-test-card-pay-header-tab][href="/card-pay/business-services"]'
-    );
-    assert.equal(currentURL(), '/card-pay/business-services');
+    await click('[data-test-card-pay-header-tab][href="/card-pay/payments"]');
+    assert.equal(currentURL(), '/card-pay/payments');
 
     await click('[data-test-workflow-button="create-business"]');
 
@@ -274,14 +272,14 @@ module('Acceptance | create merchant', function (hooks) {
     });
 
     test('initiating workflow with layer 2 wallet already connected', async function (assert) {
-      await visit('/card-pay/business-services?flow=create-business');
+      await visit('/card-pay/payments?flow=create-business');
 
       const flowId = new URL(
         'http://domain.test/' + currentURL()
       ).searchParams.get('flow-id');
       assert.equal(
         currentURL(),
-        `/card-pay/business-services?flow=create-business&flow-id=${flowId}`
+        `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
       assert
         .dom(postableSel(0, 2))
@@ -321,7 +319,7 @@ module('Acceptance | create merchant', function (hooks) {
     });
 
     test('changed merchant details after canceling the merchant creation request are persisted', async function (this: Context, assert) {
-      await visit('/card-pay/business-services?flow=create-business');
+      await visit('/card-pay/payments?flow=create-business');
       await waitFor('[data-test-merchant-customization-merchant-name-field]');
       await fillIn(
         `[data-test-merchant-customization-merchant-name-field] input`,
@@ -390,14 +388,14 @@ module('Acceptance | create merchant', function (hooks) {
     });
 
     test('disconnecting Layer 2 after proceeding beyond it', async function (assert) {
-      await visit('/card-pay/business-services?flow=create-business');
+      await visit('/card-pay/payments?flow=create-business');
 
       let flowId = new URL(
         'http://domain.test/' + currentURL()
       ).searchParams.get('flow-id');
       assert.equal(
         currentURL(),
-        `/card-pay/business-services?flow=create-business&flow-id=${flowId}`
+        `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
       assert
         .dom(
@@ -430,7 +428,7 @@ module('Acceptance | create merchant', function (hooks) {
       );
       assert.equal(
         currentURL(),
-        `/card-pay/business-services?flow=create-business&flow-id=${flowId}`
+        `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
 
       layer2Service.test__simulateWalletConnectUri();
@@ -446,14 +444,14 @@ module('Acceptance | create merchant', function (hooks) {
     });
 
     test('changing Layer 2 account should cancel the workflow', async function (assert) {
-      await visit('/card-pay/business-services?flow=create-business');
+      await visit('/card-pay/payments?flow=create-business');
 
       let flowId = new URL(
         'http://domain.test/' + currentURL()
       ).searchParams.get('flow-id');
       assert.equal(
         currentURL(),
-        `/card-pay/business-services?flow=create-business&flow-id=${flowId}`
+        `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
       assert
         .dom(
@@ -498,7 +496,7 @@ module('Acceptance | create merchant', function (hooks) {
       );
       assert.equal(
         currentURL(),
-        `/card-pay/business-services?flow=create-business&flow-id=${flowId}`
+        `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
     });
   });
@@ -514,7 +512,7 @@ module('Acceptance | create merchant', function (hooks) {
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    await visit('/card-pay/business-services?flow=create-business');
+    await visit('/card-pay/payments?flow=create-business');
     assert
       .dom(
         '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
@@ -556,7 +554,7 @@ module('Acceptance | create merchant', function (hooks) {
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    await visit('/card-pay/business-services?flow=create-business');
+    await visit('/card-pay/payments?flow=create-business');
     assert
       .dom(
         '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'

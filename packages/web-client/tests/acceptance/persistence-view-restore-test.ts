@@ -309,7 +309,7 @@ module('Acceptance | persistence view and restore', function () {
 
       assert.equal(
         currentURL(),
-        '/card-pay/business-services?flow=create-business&flow-id=persisted-merchant-creation'
+        '/card-pay/payments?flow=create-business&flow-id=persisted-merchant-creation'
       );
     });
 
@@ -359,7 +359,7 @@ module('Acceptance | persistence view and restore', function () {
     });
 
     test('opening a workflow only increments the counter by one and shows the correct milestone', async function (assert) {
-      await visit('/card-pay/business-services');
+      await visit('/card-pay/payments');
       await click('[data-test-workflow-button="create-business"]');
 
       await fillIn(
