@@ -57,3 +57,7 @@
   font: 400 var(--boxel-font-size-sm)/calc(18 / 13) var(--boxel-monospace-font-family);
   letter-spacing: var(--boxel-lsp-sm);
 }
+
+.doc-link {
+  text-decoration: underline;
+}
