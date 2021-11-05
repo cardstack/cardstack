@@ -232,6 +232,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
         from,
         to: foreignAmbAddress,
         data,
+        gas: CLAIM_BRIDGED_TOKENS_GAS_LIMIT,
       };
       if (nonce != null) {
         tx.nonce = parseInt(nonce.toString()); // the web3 API requires this be a number, it should be ok to downcast this
