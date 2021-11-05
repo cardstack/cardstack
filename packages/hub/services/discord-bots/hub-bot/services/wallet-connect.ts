@@ -41,7 +41,7 @@ export default class WalletConnectService {
         let embed = (await buildMessageWithQRCode(uri))
           .setTitle('Scan This QR Code to Connect')
           .setDescription(
-            `From your Card Wallet app, tap on the "Scan QR" button, scan this the code, and then tap on the "Connect" button to connect your Card Wallet so that I can give you a prepaid card.`
+            `From your Card Wallet app, tap on the "Scan QR" button, scan the QR code displayed here, and then tap on the "Connect" button to connect your Card Wallet so that I can give you a prepaid card.`
           );
         // capture this to make sure we don't leak async
         replyPromise = message.reply(embed);
