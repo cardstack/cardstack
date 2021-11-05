@@ -20,9 +20,9 @@
   </CardPay::DashboardPanel>
 
   {{#if this.layer2Network.isConnected}}
-    <section data-test-suppliers-section>
+    <section data-test-available-balances-section>
       <header class="card-pay-dashboard__deposit-withdrawal-header">
-        <h2 class="card-pay-dashboard__deposit-withdrawal-title">Token Suppliers</h2>
+        <h2 class="card-pay-dashboard__deposit-withdrawal-title">Available Balances</h2>
         {{#let @model.panel.sections.[0] as |section|}}
           <Boxel::Button
             {{on "click" (fn this.transitionToDepositWithdrawal section.workflow)}}

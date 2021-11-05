@@ -19,7 +19,7 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
   test('Depot balance is hidden when wallet is not connected', async function (assert) {
     await visit('/card-pay/deposit-withdrawal');
 
-    assert.dom('[data-test-suppliers-section]').doesNotExist();
+    assert.dom('[data-test-available-balances-section]').doesNotExist();
   });
 
   test('Depot balance is listed when wallet is connected and update when the account changes', async function (this: Context, assert) {
@@ -41,10 +41,12 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
 
     await visit('/card-pay/deposit-withdrawal');
 
-    assert.dom('[data-test-suppliers-section] h2').hasText('Token Suppliers');
+    assert
+      .dom('[data-test-available-balances-section] h2')
+      .hasText('Available Balances');
     assert
       .dom(
-        '[data-test-suppliers-section] [data-test-workflow-button="deposit"]'
+        '[data-test-available-balances-section] [data-test-workflow-button="deposit"]'
       )
       .exists();
     assert
@@ -110,10 +112,10 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
     await visit('/card-pay/deposit-withdrawal');
 
-    assert.dom('[data-test-suppliers-section]').exists();
+    assert.dom('[data-test-available-balances-section]').exists();
     assert.dom('[data-test-card-pay-depot]').doesNotExist();
     await click(
-      '[data-test-suppliers-section] [data-test-workflow-button="deposit"]'
+      '[data-test-available-balances-section] [data-test-workflow-button="deposit"]'
     );
     assert.dom('[data-test-boxel-thread-header] h2').containsText('Deposit');
   });
