@@ -15,11 +15,11 @@ describe('/api/wyre-prices', function () {
     it(`gets the wyre prices`, async function () {
       await db.query(
         `INSERT INTO wyre_prices (sku, source_currency, dest_currency, source_currency_price ) VALUES ($1, $2, $3, $4)`,
-        ['sku1', 'USD', 'DAI', 50.5]
+        ['sku2', 'USD', 'DAI', 50.5]
       );
       await db.query(
         `INSERT INTO wyre_prices (sku, source_currency, dest_currency, source_currency_price ) VALUES ($1, $2, $3, $4)`,
-        ['sku2', 'USD', 'DAI', 100]
+        ['sku1', 'USD', 'DAI', 100]
       );
 
       await request()
@@ -30,7 +30,7 @@ describe('/api/wyre-prices', function () {
         .expect({
           data: [
             {
-              id: 'sku1',
+              id: 'sku2',
               type: 'wyre-prices',
               attributes: {
                 'source-currency': 'USD',
@@ -40,7 +40,7 @@ describe('/api/wyre-prices', function () {
               },
             },
             {
-              id: 'sku2',
+              id: 'sku1',
               type: 'wyre-prices',
               attributes: {
                 'source-currency': 'USD',

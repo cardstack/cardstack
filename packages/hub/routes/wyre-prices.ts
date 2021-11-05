@@ -11,7 +11,7 @@ export default class WyrePricesRoute {
 
   async get(ctx: Koa.Context) {
     let db = await this.databaseManager.getClient();
-    let { rows } = await db.query(`SELECT * FROM wyre_prices WHERE disabled = false ORDER BY sku`);
+    let { rows } = await db.query(`SELECT * FROM wyre_prices WHERE disabled = false ORDER BY source_currency_price`);
     let data = rows.map(
       ({
         sku,
