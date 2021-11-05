@@ -42,7 +42,7 @@ export default function () {
       } else {
         return {
           slugAvailable: true,
-          detail: 'Merchant slug is available',
+          detail: 'Business slug is available',
         };
       }
     }
