@@ -45,7 +45,6 @@ Router.map(function () {
           });
         });
         this.route('agreements', { path: '/agreements/:agreementId' });
-        this.route('cardflow');
       }
     );
     this.route('workflow', { resetNamespace: true }, function () {

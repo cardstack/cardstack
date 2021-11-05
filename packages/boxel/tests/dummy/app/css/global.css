@@ -30,6 +30,10 @@
   margin: 0;
 }
 
+.toc {
+  padding: 2em;
+}
+
 @media only percy {
   .hide-in-percy {
     visibility: hidden;

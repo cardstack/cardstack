@@ -23,7 +23,7 @@
             aria-label="Toggle fix cardflow queue"
             {{on "click" (fn (mut this.isQueueFixed) (not this.isQueueFixed))}}
           />
-          <CardflowQueue
+          <Queue
             @class="media-registry__queue {{if (and (not this.isQueueFixed) (not-eq this.router.currentRouteName "media-registry.cardflow")) "with-box-shadow"}}"
             @model={{@model}}
             @currentMilestone={{@currentMilestone}}

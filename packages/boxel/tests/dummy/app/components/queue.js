@@ -2,7 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 
-export default class CardflowQueueComponent extends Component {
+export default class QueueComponent extends Component {
   viewOptions = [
     { id: 'shared', name: 'Shared Queue' },
     { id: 'my-queue', name: 'My Queue' },
