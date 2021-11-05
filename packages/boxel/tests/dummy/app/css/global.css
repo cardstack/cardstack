@@ -29,3 +29,13 @@
   list-style-type: none;
   margin: 0;
 }
+
+@media only percy {
+  .hide-in-percy {
+    visibility: hidden;
+  }
+
+  .remove-in-percy {
+    display: none;
+  }
+}
