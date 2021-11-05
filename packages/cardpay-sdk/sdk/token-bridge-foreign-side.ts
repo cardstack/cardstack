@@ -45,9 +45,9 @@ export interface ITokenBridgeForeignSide {
 }
 
 // Note that as we support new CPXD tokens, we'll need to measure the gas limit
-// the new tokens require for transfer that that will effect this value.
-// Ultimately this value reflects the gas limit that the token bridge is
-// configured with for performing withdrawals.
+// the new tokens require for transfer which will effect this value. Ultimately
+// this value reflects the gas limit that the token bridge is configured with
+// for performing withdrawals.
 const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 300000;
 
 // Note:  To accommodate the fix for infura block mismatch errors (made in
