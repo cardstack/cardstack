@@ -260,7 +260,10 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
 
   private async getNextNonce(from?: string): Promise<BN> {
     from = from ?? (await this.layer1Web3.eth.getAccounts())[0];
-    let nonce = await this.layer1Web3.eth.getTransactionCount(from);
+    // To accommodate the fix for infura block mismatch errors (made in CS-2391), we
+    // are waiting one extra block for all layer 1 transactions.
+    let previousBlockNumber = (await this.layer1Web3.eth.getBlockNumber()) - 1;
+    let nonce = await this.layer1Web3.eth.getTransactionCount(from, previousBlockNumber);
     return new BN(String(nonce)); // EOA nonces are zero based
   }
 }
