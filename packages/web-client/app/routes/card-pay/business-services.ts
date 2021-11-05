@@ -1,5 +1,5 @@
 import BaseRoute from './base';
-import '../../css/card-pay/merchant-services.css';
+import '../../css/card-pay/business-services.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/merchants-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/merchants-summary-hero.svg';
 import config from '@cardstack/web-client/config/environment';
@@ -12,17 +12,17 @@ const MERCHANTS_PANEL = {
   summaryHeroImageUrl,
   sections: [
     {
-      workflow: 'create-merchant',
+      workflow: 'create-business',
       icon: 'merchants',
-      title: 'Merchants',
-      description: `Set up your merchant account and start receiving payments via Card Pay in just a few minutes!`,
+      title: 'Business Accounts',
+      description: `Set up your business account and start receiving payments via Card Pay in just a few minutes!`,
       bullets: [
-        'Create a merchant account',
+        'Create a business account',
         'Request and receive payments from customers via QR code scanning',
         'Inspect your earnings and transaction history',
         'Confirm transactions with Touch ID or Face ID in the Card Wallet mobile app',
       ],
-      cta: 'Create Merchant',
+      cta: 'Create Business Account',
       isCtaDisabled: !config.features.createMerchant,
     },
     {
@@ -35,7 +35,7 @@ const MERCHANTS_PANEL = {
   ],
 };
 
-export default class CardPayMerchantServicesRoute extends BaseRoute {
+export default class CardPayBusinessServicesRoute extends BaseRoute {
   model(params: any, transition: any) {
     super.model(params, transition);
     return {

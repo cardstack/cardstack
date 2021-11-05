@@ -74,8 +74,8 @@ module('Acceptance | create merchant persistence', function (hooks) {
   });
 
   test('Generates a flow uuid query parameter used as a persistence identifier', async function (this: Context, assert) {
-    await visit('/card-pay/merchant-services');
-    await click('[data-test-workflow-button="create-merchant"]');
+    await visit('/card-pay/business-services');
+    await click('[data-test-workflow-button="create-business"]');
 
     assert.equal(
       // @ts-ignore (complains object is possibly null)
@@ -105,7 +105,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       });
 
       await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
+        '/card-pay/business-services?flow=create-business&flow-id=abc123'
       );
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
@@ -152,7 +152,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       });
 
       await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
+        '/card-pay/business-services?flow=create-business&flow-id=abc123'
       );
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
@@ -170,7 +170,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         .hasText('View on Blockscout');
       assert
         .dom('[data-test-epilogue][data-test-postable="0"]')
-        .includesText('Congratulations! You have created a merchant.');
+        .includesText('Congratulations! You have created a business account.');
 
       await click('[data-test-create-merchant-next-step="dashboard"]');
       assert.dom('[data-test-workflow-thread]').doesNotExist();
@@ -199,7 +199,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       });
 
       await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
+        '/card-pay/business-services?flow=create-business&flow-id=abc123'
       );
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
@@ -207,16 +207,16 @@ module('Acceptance | create merchant persistence', function (hooks) {
       assert
         .dom('[data-test-cancelation]')
         .includesText(
-          'It looks like your L2 test chain wallet got disconnected. If you still want to create a merchant, please start again by connecting your wallet.'
+          'It looks like your L2 test chain wallet got disconnected. If you still want to create a business account, please start again by connecting your wallet.'
         );
 
       await waitFor(
-        '[data-test-workflow-default-cancelation-restart="create-merchant"]'
+        '[data-test-workflow-default-cancelation-restart="create-business"]'
       );
 
       assert
         .dom(
-          '[data-test-workflow-default-cancelation-restart="create-merchant"]'
+          '[data-test-workflow-default-cancelation-restart="create-business"]'
         )
         .exists();
     });
@@ -241,7 +241,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       window.TEST__AUTH_TOKEN = undefined;
 
       await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
+        '/card-pay/business-services?flow=create-business&flow-id=abc123'
       );
 
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
@@ -290,7 +290,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       });
 
       await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
+        '/card-pay/business-services?flow=create-business&flow-id=abc123'
       );
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
@@ -301,7 +301,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       await click('[data-test-milestone="1"] [data-test-boxel-button]');
 
       await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
+        '/card-pay/business-services?flow=create-business&flow-id=abc123'
       );
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
@@ -327,7 +327,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       });
 
       await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
+        '/card-pay/business-services?flow=create-business&flow-id=abc123'
       );
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
       assert.dom('[data-test-milestone="1"]').doesNotExist(); // Merchant info
@@ -358,7 +358,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       });
 
       await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
+        '/card-pay/business-services?flow=create-business&flow-id=abc123'
       );
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
@@ -393,7 +393,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
       });
 
       await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
+        '/card-pay/business-services?flow=create-business&flow-id=abc123'
       );
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
       assert.dom('[data-test-milestone="1"]').doesNotExist(); // Merchant info

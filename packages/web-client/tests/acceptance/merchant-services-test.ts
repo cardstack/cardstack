@@ -31,7 +31,7 @@ module('Acceptance | merchant services dashboard', function (hooks) {
   setupMirage(hooks);
 
   test('Merchant cards are hidden when wallet is not connected', async function (assert) {
-    await visit('/card-pay/merchant-services');
+    await visit('/card-pay/business-services');
 
     assert.dom('[data-test-merchants-section]').doesNotExist();
   });
@@ -59,7 +59,7 @@ module('Acceptance | merchant services dashboard', function (hooks) {
       'owner-address': layer2AccountAddress,
     });
 
-    await visit('/card-pay/merchant-services');
+    await visit('/card-pay/business-services');
     assert.dom('[data-test-merchants-section]').exists();
     await waitFor('[data-test-merchant-dashboard-card]');
     assert

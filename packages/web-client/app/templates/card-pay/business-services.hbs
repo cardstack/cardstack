@@ -1,6 +1,6 @@
-{{page-title "Merchant Services"}}
+{{page-title "Business Services"}}
 
-<section class="card-pay-dashboard__merchants" role="tabpanel" aria-labelledby="card-pay.merchant-services">
+<section class="card-pay-dashboard__merchants" role="tabpanel" aria-labelledby="card-pay.business-services">
   <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{or (not this.layer2Network.isConnected) (is-empty this.merchantSafes)}}>
     {{#each @model.panel.sections as |section|}}
       <CardPay::DashboardPanel::Section @section={{section}}>
@@ -17,7 +17,7 @@
         </:cta>
         <:disclaimer>
           {{#if (eq section.workflow "request-payment")}}
-            This is possible once you have connected your {{network-display-info "layer2" "fullName"}} wallet and created a merchant.
+            This is possible once you have connected your {{network-display-info "layer2" "fullName"}} wallet and created a business account.
           {{/if}}
         </:disclaimer>
       </CardPay::DashboardPanel::Section>
@@ -27,7 +27,7 @@
   {{#if this.layer2Network.isConnected}}
     <section data-test-merchants-section>
       <header class="card-pay-dashboard__merchants-section-header">
-        <h3 class="card-pay-dashboard__merchants-title">Merchant Services</h3>
+        <h3 class="card-pay-dashboard__merchants-title">Business Services</h3>
         {{#let @model.panel.sections.[0] as |section|}}
           <Boxel::Button
             {{on "click" (fn this.transitionToWorkflow section.workflow)}}
@@ -59,11 +59,11 @@
 
 <Boxel::Modal
   style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
-  @isOpen={{eq this.flow 'create-merchant'}}
+  @isOpen={{eq this.flow 'create-business'}}
   @onClose={{this.resetQueryParams}}
 >
   {{#if (is-network-initialized)}}
-    {{#if (eq this.flow 'create-merchant')}}
+    {{#if (eq this.flow 'create-business')}}
       <CardPay::CreateMerchantWorkflow />
     {{/if}}
   {{/if}}

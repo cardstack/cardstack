@@ -1,17 +1,17 @@
 <ActionCardContainer
-  @header="Merchant Account"
+  @header="Business Account"
   @isComplete={{@isComplete}}
   data-test-merchant-customization-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Choose a name and ID for the merchant">
+  <ActionCardContainer::Section @title="Choose a name and ID for the business">
     <CardPay::LabeledValue
       class="merchant-customization__name"
-      @label={{if @isComplete "Merchant Name" "Preview"}}
+      @label={{if @isComplete "Business Name" "Preview"}}
       data-test-merchant-customization-merchant-preview
     >
       <CardPay::Merchant
         class={{unless this.trimmedMerchantName "merchant-customization__enter-name"}}
-        @name={{or this.trimmedMerchantName "Enter merchant name"}}
+        @name={{or this.trimmedMerchantName "Enter business name"}}
         @logoBackground={{this.merchantBgColor}}
         @logoTextColor={{this.merchantTextColor}}
         @size="large"
@@ -19,7 +19,7 @@
       />
     </CardPay::LabeledValue>
     {{#if @isComplete}}
-      <CardPay::LabeledValue @label="Merchant ID" data-test-merchant-customization-merchant-id-field>
+      <CardPay::LabeledValue @label="Business ID" data-test-merchant-customization-merchant-id-field>
         {{this.merchantId}}
       </CardPay::LabeledValue>
       <CardPay::LabeledValue @label="Custom Color" data-test-merchant-customization-color-field>
@@ -39,7 +39,7 @@
       <CardPay::FieldStack>
         <CardPay::LabeledValue
           @fieldMode="edit"
-          @label="Merchant name"
+          @label="Business name"
           data-test-merchant-customization-merchant-name-field
         >
           <Boxel::Input
@@ -57,7 +57,7 @@
         </CardPay::LabeledValue>
         <CardPay::LabeledValue
           @fieldMode="edit"
-          @label="Merchant ID"
+          @label="Business ID"
           data-test-merchant-customization-merchant-id-field
         >
           <Common::ValidationStateInput
@@ -65,7 +65,7 @@
             @value={{this.merchantId}}
             @onInput={{this.onMerchantIdInput}}
             @errorMessage={{this.merchantIdValidationMessage}}
-            @helperText="This is a unique ID that will be used to identify your merchant in the Cardstack network. Please note that this ID cannot be changed once the merchant has been created."
+            @helperText="This is a unique ID that will be used to identify your business in the Cardstack network. Please note that this ID cannot be changed once the business has been created."
             autocomplete="off"
             autocorrect="off"
             autocapitalize="off"
