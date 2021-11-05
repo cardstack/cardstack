@@ -29,7 +29,7 @@
   padding-left: 35px;
   padding-right: 20px;
   color: var(--boxel-light);
-  background: url('../../../../../public/@cardstack/boxel/images/icons/file-icon.svg') center left 5px/16px 20px no-repeat;
+  background: url('../../../../public/@cardstack/boxel/images/icons/file-icon.svg') center left 5px/16px 20px no-repeat;
   font: var(--boxel-font);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-sm);
@@ -82,7 +82,7 @@
 .discrepancy__nested-level-back-btn {
   padding: 10px 20px;
   border: none;
-  background: url('../../../../../public/@cardstack/boxel/images/icons/curved-arrow.svg') left center/12px 12px no-repeat;
+  background: url('../../../../public/@cardstack/boxel/images/icons/curved-arrow.svg') left center/12px 12px no-repeat;
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-lg);
 }
@@ -205,13 +205,13 @@
   font: var(--boxel-font-xs);
 }
 
-.discrepancy-card__header-btn {
+button.discrepancy-card__header-btn {
   width: 100%;
   max-width: 225px;
   height: 40px;
   padding: 10px 40px;
   font-weight: 400;
-  background: url('../../../../../public/@cardstack/boxel/images/icons/select-empty.svg') left 12px top 10px/16px 16px no-repeat;
+  background: url('../../../../public/@cardstack/boxel/images/icons/select-empty.svg') left 12px top 10px/16px 16px no-repeat;
   background-color: transparent;
   border-color: var(--boxel-purple-400);
   color: inherit;
@@ -220,22 +220,22 @@
   transition: border-color var(--boxel-transition);
 }
 
-.discrepancy-card__header-btn:hover {
+button.discrepancy-card__header-btn:hover {
   border-color: var(--boxel-light);
 }
 
-.discrepancy-card__header-btn.checked {
-  background-image: url('../../../../../public/@cardstack/boxel/images/icons/select-checked.svg');
+button.discrepancy-card__header-btn.checked {
+  background-image: url('../../../../public/@cardstack/boxel/images/icons/select-checked.svg');
   border-color: var(--boxel-dark);
   font-weight: 600;
   cursor: initial;
 }
 
-.discrepancy-card__header-btn--toggle.checked {
+button.discrepancy-card__header-btn--toggle.checked {
   border-color: var(--boxel-success-200);
 }
 
-.discrepancy-card__header-btn--toggle.checked:hover {
+button.discrepancy-card__header-btn--toggle.checked:hover {
   border-color: var(--boxel-dark);
   cursor: pointer;
 }
@@ -278,13 +278,13 @@
 .discrepancy__count-btn__link-copy {
   display: inline-block;
   color: var(--boxel-light);
-  background: url('../../../../../public/@cardstack/boxel/images/icons/warning.svg') bottom left/25px 20px no-repeat;
+  background: url('../../../../public/@cardstack/boxel/images/icons/warning.svg') bottom left/25px 20px no-repeat;
   font: var(--boxel-font-sm);
   padding-top: 25px;
   padding-left: 35px;
 }
 
-.discrepancy__count-btn {
+a.discrepancy__count-btn {
   height: 50px;
   width: 100%;
   max-width: 500px;
@@ -292,7 +292,7 @@
   line-height: 3;
 }
 
-.discrepancy__count-btn:hover {
+a.discrepancy__count-btn:hover {
   color: initial;
 }
 

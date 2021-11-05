@@ -1,13 +1,13 @@
 {{#if this.isAdding}}
   <div class="collection-add__blank-card-container">
     <div class="collection-field__item collection-field__item--new">
-      <Boxel @class="collection-add__blank-card">
+      <div class="boxel collection-add__blank-card">
         <BoxelHighlight @on={{true}} />
         {{component @newItemComponent type="blank-card" format=@format}}
-      </Boxel>
+      </div>
     </div>
 
-    <Boxel @class="cs-card-select__container" {{did-insert this.focusSearch}}>
+    <div class="boxel cs-card-select__container" {{did-insert this.focusSearch}}>
       <button class="collection-field__cancel-btn" {{on "click" (fn (mut this.isAdding) false)}}>
         {{svg-jar "close-thick" width="25px" height="25px"}}
       </button>
@@ -19,7 +19,7 @@
         @dataSource={{this.dataSource}}
         @component={{@component}}
         @onChange={{this.addItem}} />
-    </Boxel>
+    </div>
   </div>
 {{else}}
   {{yield}}

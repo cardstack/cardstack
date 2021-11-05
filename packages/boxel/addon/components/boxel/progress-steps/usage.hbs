@@ -28,7 +28,7 @@
       @name="onClickStep"
       @required={{false}}
       @description="Action to trigger when a step is clicked, the step index is passed"
-    />      
+    />
     <Args.Yield
       @description="Render custom progress steps.Yields an object with keys { title, data, index, completed, current }."
     />
@@ -43,9 +43,9 @@
       @completedCount={{this.completedCount}}
       as |progressStep|
     >
-    <div class={{cn 
-      "progress-steps-usage-item" 
-      progress-steps-usage-item--current=progressStep.current 
+    <div class={{cn
+      "progress-steps-usage-item"
+      progress-steps-usage-item--current=progressStep.current
       progress-steps-usage-item--completed=progressStep.completed
       }}
     >
@@ -58,7 +58,7 @@
   </:example>
 </Freestyle::Usage>
 
-<Freestyle::Usage @name="ProgressSteps with onClickStep">
+<Freestyle::Usage class="remove-in-percy" @name="ProgressSteps with onClickStep">
   <:description>Anchor element is used, preventDefault is called for you, action called with step index</:description>
   <:example>
     <Boxel::ProgressSteps

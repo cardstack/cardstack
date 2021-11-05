@@ -1,4 +1,4 @@
-<Boxel class="media-collection media-collection--{{@model.type}} media-collection--{{@mode}} {{@class}}" {{did-update this.updateCollections @model}}>
+<div class="boxel media-collection media-collection--{{@model.type}} media-collection--{{@mode}} {{@class}}" {{did-update this.updateCollections @model}}>
   <header class="media-collection__sticky-header">
     <div class="media-collection__title-row media-collection__title-row--{{@mode}}">
       <h2 class="media-collection__title">{{humanize @model.title}}</h2>
@@ -143,4 +143,4 @@
       </div>
     </div>
   {{/if}}
-</Boxel>
+</div>

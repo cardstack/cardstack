@@ -85,31 +85,3 @@ select:focus {
   overflow: hidden;
   white-space: nowrap;
 }
-
-@media only percy {
-  .hide-in-percy {
-    visibility: hidden;
-  }
-
-  .remove-from-percy {
-    display: none;
-  }
-
-  .FreestyleGuide .FreestyleGuide-header,
-  .FreestyleUsage-description,
-  .FreestyleSection-name,
-  .FreestyleUsage-api,
-  .FreestyleUsage-sourceContainer,
-  .FreestyleGuide-nav {
-    display: none;
-  }
-
-  .FreestyleUsage-focusCta,
-  .FreestyleUsage-preview::after {
-    visibility: hidden;
-  }
-
-  .FreestyleGuide-content {
-    max-width: 960px;
-  }
-}

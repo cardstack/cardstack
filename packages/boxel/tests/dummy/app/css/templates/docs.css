@@ -1,5 +1,5 @@
-.freestyle-list {
-  padding: 0 1em;
+.freestyle-components-section {
+  max-width: 75rem;
 }
 
 .FreestyleMenu-item,
@@ -56,4 +56,22 @@
   color: var(--boxel-dark);
   font: 400 var(--boxel-font-size-sm)/calc(18 / 13) var(--boxel-monospace-font-family);
   letter-spacing: var(--boxel-lsp-sm);
+}
+
+.doc-link {
+  text-decoration: underline;
+}
+
+@media only percy {
+  .FreestyleGuide .FreestyleGuide-header,
+  .FreestyleUsage-description,
+  .FreestyleSection-name,
+  .FreestyleUsage-api,
+  .FreestyleUsage-sourceContainer,
+  .FreestyleGuide-nav,
+  .FreestyleAnnotation,
+  .FreestyleUsage-focusCta,
+  .FreestyleUsage-preview::after {
+    display: none;
+  }
 }

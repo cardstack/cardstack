@@ -26,7 +26,7 @@
 
     <b.row class={{cn is-selected=b.rowValue.selected}} as |r|>
       <r.cell as |cell column row cellMeta columnMeta|>
-        <Boxel class="media-collection-table__boxel-cell">
+        <div class="boxel media-collection-table__boxel-cell">
           <BoxelHighlight @expandAction={{fn @expandAction row}} @on={{row.selected}} @class="media-collection-table__highlight" />
           {{#if (and (eq (add columnMeta.index 1) b.cells.length) (eq @mode "edit"))}}
             <BoxelActions
@@ -81,7 +81,7 @@
               {{/if}}
             </div>
           </div>
-        </Boxel>
+        </div>
       </r.cell>
     </b.row>
   </t.body>
