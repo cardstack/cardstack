@@ -38,7 +38,7 @@
 }
 
 .transaction-status__delay {
-  color: #707070;
+  color: var(--boxel-purple-500);
 }
 
 .transaction-status__delay a {
