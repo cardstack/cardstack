@@ -74,7 +74,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
   });
 
   test('Generates a flow uuid query parameter used as a persistence identifier', async function (this: Context, assert) {
-    await visit('/card-pay/merchant-services');
+    await visit('/card-pay/payments');
     await click('[data-test-workflow-button="create-merchant"]');
 
     assert.equal(
@@ -104,9 +104,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         state,
       });
 
-      await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
-      );
+      await visit('/card-pay/payments?flow=create-merchant&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
@@ -151,9 +149,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         state,
       });
 
-      await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
-      );
+      await visit('/card-pay/payments?flow=create-merchant&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
@@ -198,9 +194,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         state,
       });
 
-      await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
-      );
+      await visit('/card-pay/payments?flow=create-merchant&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
@@ -240,9 +234,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
 
       window.TEST__AUTH_TOKEN = undefined;
 
-      await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
-      );
+      await visit('/card-pay/payments?flow=create-merchant&flow-id=abc123');
 
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
       assert.dom('[data-test-milestone="1"]').doesNotExist(); // Merchant info
@@ -289,9 +281,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         state,
       });
 
-      await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
-      );
+      await visit('/card-pay/payments?flow=create-merchant&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
       assert.dom('[data-test-milestone="2"]').exists(); // Prepaid card choice
@@ -300,9 +290,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
 
       await click('[data-test-milestone="1"] [data-test-boxel-button]');
 
-      await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
-      );
+      await visit('/card-pay/payments?flow=create-merchant&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
       assert.dom('[data-test-milestone="2"]').doesNotExist(); // Prepaid card choice
@@ -326,9 +314,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         state,
       });
 
-      await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
-      );
+      await visit('/card-pay/payments?flow=create-merchant&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
       assert.dom('[data-test-milestone="1"]').doesNotExist(); // Merchant info
       assert.dom('[data-test-milestone="2"]').doesNotExist(); // Prepaid card choice
@@ -357,9 +343,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         state,
       });
 
-      await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
-      );
+      await visit('/card-pay/payments?flow=create-merchant&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').exists(); // L2
       assert.dom('[data-test-milestone="1"]').exists(); // Merchant info
       assert.dom('[data-test-milestone="2"]').doesNotExist();
@@ -392,9 +376,7 @@ module('Acceptance | create merchant persistence', function (hooks) {
         state,
       });
 
-      await visit(
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=abc123'
-      );
+      await visit('/card-pay/payments?flow=create-merchant&flow-id=abc123');
       assert.dom('[data-test-milestone="0"]').doesNotExist(); // L2
       assert.dom('[data-test-milestone="1"]').doesNotExist(); // Merchant info
       assert.dom('[data-test-milestone="2"]').doesNotExist(); // Prepaid card choice

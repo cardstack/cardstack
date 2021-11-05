@@ -19,7 +19,7 @@ import { MIN_PAYMENT_AMOUNT_IN_SPEND } from '@cardstack/cardpay-sdk/sdk/do-not-u
 const minSpendAmount = MIN_PAYMENT_AMOUNT_IN_SPEND;
 const minUsdAmount = spendToUsd(minSpendAmount)!;
 
-export default class CardPayMerchantServicesController extends Controller {
+export default class PayController extends Controller {
   @service('is-ios') declare isIOSService: IsIOS;
   queryParams = ['amount', 'currency'];
   @tracked amount: number = 0;
