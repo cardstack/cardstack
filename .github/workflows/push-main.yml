@@ -83,7 +83,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: yarn --prefer-offline
-      - run: yarn test:boxel
+      - name: Run boxel tests
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_BOXEL }}
+        run: yarn test:boxel:percy
       - run: yarn global add @percy/cli
       - name: Run web client tests
         env:
