@@ -328,6 +328,10 @@ export default abstract class Layer2ChainWeb3Strategy
   @task *viewSafesTask(
     account: string = this.walletInfo.firstAddress!
   ): TaskGenerator<ViewSafesResult> {
+    if (!account) {
+      return { blockNumber: 0, safes: [] };
+    }
+
     return yield this.#safesApi.view(account);
   }
 
