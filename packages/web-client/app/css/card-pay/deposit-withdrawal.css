@@ -23,3 +23,7 @@
   font: 600 var(--boxel-font-lg);
   letter-spacing: var(--boxel-lsp-xs);
 }
+
+.card-pay-dashboard__deposit-withdrawal-nav button {
+  margin-left: var(--boxel-sp-sm);
+}

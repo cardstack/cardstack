@@ -14,6 +14,7 @@ const SUPPLIERS_PANEL = {
     {
       workflow: 'deposit',
       icon: 'deposit-route',
+      buttonIcon: 'plus',
       title: 'Deposits',
       description: `Deposit tokens from your ${c.layer1.conversationalName} wallet into the CARD Protocol’s reserve pool to receive an equivalent amount of CPXD tokens in your ${c.layer2.fullName} wallet.`,
       bullets: [
@@ -25,6 +26,7 @@ const SUPPLIERS_PANEL = {
     {
       workflow: 'withdrawal',
       icon: 'withdrawal-route',
+      buttonIcon: 'minus',
       title: 'Withdrawals',
       description: `Withdraw tokens from your Card Wallet to receive an equivalent amount of tokens in your ${c.layer1.conversationalName} wallet.`,
       bullets: [
