@@ -4,6 +4,7 @@ process.env.EMBROIDER_REBUILD_ADDONS = [
   process.env.EMBROIDER_REBUILD_ADDONS,
   '@cardstack/compiled',
   '@cardstack/base-cards',
+  '@cardstack/boxel',
 ]
   .filter(Boolean)
   .join(',');
@@ -25,6 +26,17 @@ module.exports = function (defaults) {
     staticAppPaths: ['lib'],
     packagerOptions: {
       webpackConfig: {
+        module: {
+          rules: [
+            {
+              test: /\.(png|jpg|gif|svg|woff|woff2|eot|ttf|otf|flac)$/i,
+              loader: 'file-loader',
+              options: {
+                name: '[path][name]-[contenthash].[ext]',
+              },
+            },
+          ],
+        },
         plugins: [
           new ProvidePlugin({
             Buffer: 'buffer',

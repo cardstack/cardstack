@@ -4,6 +4,8 @@ import { tracked } from '@glimmer/tracking';
 import { dropTask } from 'ember-concurrency-decorators';
 import fetch from 'fetch';
 import { assert } from '@ember/debug';
+import '@cardstack/boxel/styles/global.css';
+import './index.css';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 

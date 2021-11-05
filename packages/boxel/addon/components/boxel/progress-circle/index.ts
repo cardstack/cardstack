@@ -2,6 +2,8 @@ import Component from '@glimmer/component';
 import { or } from 'macro-decorators';
 import { htmlSafe } from '@ember/template';
 import { SafeString } from '@ember/template/-private/handlebars';
+import '@cardstack/boxel/styles/global.css';
+import './index.css';
 
 interface ProgressCircleArgs {
   percentComplete: number;

@@ -3,7 +3,6 @@
 const mergeTrees = require('broccoli-merge-trees');
 const stew = require('broccoli-stew');
 const path = require('path');
-const concat = require('broccoli-concat');
 
 const DEFAULT_OPTIONS = {
   preserveAddonUsageFiles: false,
@@ -36,30 +35,6 @@ module.exports = {
     return tree;
   },
 
-  treeForAddonStyles(tree) {
-    let { preserveAddonUsageFiles } = this.getBoxelOptions();
-    let trees = tree ? [tree] : [];
-
-    let addonStyles = stew.find(
-      this.treeGenerator(path.join(__dirname, 'addon')),
-      'components/**/*.css'
-    );
-
-    if (!preserveAddonUsageFiles) {
-      addonStyles = stew.rm(addonStyles, 'components/**/usage.css');
-    }
-    trees.push(addonStyles);
-    tree = new mergeTrees(trees);
-    tree = concat(tree, {
-      headerFiles: ['variables.css'], // css variables need to be defined before boxel component css
-      inputFiles: ['**/*.css'],
-      outputFile: 'addon.css',
-      sourceMapConfig: { enabled: true },
-    });
-
-    return tree;
-  },
-
   treeForApp() {
     let tree = this._super.treeForApp.apply(this, arguments);
     let trees = [this.automaticReexports()];
@@ -69,6 +44,15 @@ module.exports = {
     return mergeTrees(trees, {
       overwrite: true,
     });
+  },
+
+  treeForAddonStyles() {
+    return undefined;
+  },
+
+  treeForStyles() {
+    // all our styles are directly imported into the components
+    return undefined;
   },
 
   automaticReexports() {

@@ -1,3 +1,4 @@
+import '@cardstack/boxel/styles/global.css';
 import './global.css';
 
 import './components/card-select/before-options.css';
