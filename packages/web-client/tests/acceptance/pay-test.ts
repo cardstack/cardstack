@@ -422,7 +422,7 @@ module('Acceptance | pay', function (hooks) {
     assert.dom(QR_CODE).doesNotExist();
     assert
       .dom(DEEP_LINK)
-      .containsText('Pay Merchant')
+      .containsText('Pay Business')
       .hasAttribute(
         'href',
         generateMerchantPaymentUrl({
@@ -456,7 +456,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(MERCHANT_INFO_MISSING_MESSAGE)
       .containsText(
-        'Unable to find merchant details for this address. Use caution when paying.'
+        'Unable to find business details for this address. Use caution when paying.'
       );
     assert.dom(AMOUNT).containsText(`§${spendAmount}`);
     assert
@@ -486,7 +486,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(MERCHANT_MISSING_MESSAGE)
       .containsText(
-        'Oops, no Merchant found - please ask the merchant to confirm the payment link'
+        'Oops, no business found - please ask the business to confirm the payment link'
       );
   });
 
@@ -498,7 +498,7 @@ module('Acceptance | pay', function (hooks) {
     assert
       .dom(MERCHANT_MISSING_MESSAGE)
       .containsText(
-        'Oops, no Merchant found - please ask the merchant to confirm the payment link'
+        'Oops, no business found - please ask the business to confirm the payment link'
       );
   });
 });

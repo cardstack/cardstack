@@ -145,7 +145,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
+        detail: 'The Business ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -174,7 +174,7 @@ describe('POST /api/merchant-infos', function () {
       .expect({
         status: '422',
         title: 'Invalid merchant slug',
-        detail: 'The Merchant ID cannot be more than 50 characters long. It is currently 51 characters long',
+        detail: 'The Business ID cannot be more than 50 characters long. It is currently 51 characters long',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -329,7 +329,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(200)
       .expect({
         slugAvailable: false,
-        detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
+        detail: 'The Business ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -341,7 +341,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(200)
       .expect({
         slugAvailable: false,
-        detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
+        detail: 'The Business ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
 
@@ -353,7 +353,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(200)
       .expect({
         slugAvailable: false,
-        detail: 'The Merchant ID can only contain lowercase letters or numbers, no special characters',
+        detail: 'The Business ID can only contain lowercase letters or numbers, no special characters',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
@@ -367,7 +367,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
       .expect(200)
       .expect({
         slugAvailable: false,
-        detail: 'The Merchant ID cannot be more than 50 characters long. It is currently 51 characters long',
+        detail: 'The Business ID cannot be more than 50 characters long. It is currently 51 characters long',
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });

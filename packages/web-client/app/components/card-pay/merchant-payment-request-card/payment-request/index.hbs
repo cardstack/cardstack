@@ -23,7 +23,7 @@
       </span>
       <span class="payment-request__missing-info-message" data-test-payment-request-merchant-info-missing>
         {{svg-jar "failure-bordered" class="payment-request__missing-info-message-icon"}}
-        Unable to find merchant details for this address. Use caution when paying.
+        Unable to find business details for this address. Use caution when paying.
       </span>
     </div>
   {{else}}
@@ -73,7 +73,7 @@
           href={{@deepLinkPaymentURL}}
           data-test-payment-request-deep-link
         >
-          Pay Merchant
+          Pay Business
         </Boxel::Button>
       {{/if}}
       <span class="payment-request__url" data-test-payment-request-url>

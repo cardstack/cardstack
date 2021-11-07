@@ -269,7 +269,7 @@ export let cardbot = { name: 'Cardbot', imgURL: '/images/icons/cardbot.svg' };
 
 export const CARD_PAY_WORKFLOW_NAMES = {
   PREPAID_CARD_ISSUANCE: 'Prepaid Card Issuance',
-  MERCHANT_CREATION: 'Merchant Creation',
+  MERCHANT_CREATION: 'Business Account Creation',
   RESERVE_POOL_DEPOSIT: 'Reserve Pool Deposit',
   WITHDRAWAL: 'Withdrawal',
 };

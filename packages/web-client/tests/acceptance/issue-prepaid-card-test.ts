@@ -313,7 +313,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
     // // funding-source card
     assert
       .dom(`${post} [data-test-funding-source-safe]`)
-      .containsText(`Ollednam Merchant account ${otherMerchantSafe.address}`);
+      .containsText(`Ollednam Business account ${otherMerchantSafe.address}`);
 
     assert
       .dom(`${post} [data-test-balance-chooser-dropdown="DAI.CPXD"]`)
@@ -774,9 +774,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
       assert
         .dom(cancelationPostableSel(0))
         .containsText(
-          `Looks like you don’t have a merchant or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
+          `Looks like you don’t have a business account or depot with enough balance to fund a prepaid card. Before you can continue, you can add funds by bridging some tokens from your ${
             c.layer2.fullName
-          } wallet, or by claiming merchant revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
+          } wallet, or by claiming business revenue in Card Wallet. The minimum balance needed to issue a prepaid card is approximately ${Math.ceil(
             Number(fromWei(MIN_AMOUNT_TO_PASS.toString()))
           )} DAI.CPXD (${convertAmountToNativeDisplay(
             spendToUsd(MIN_SPEND_AMOUNT)!,

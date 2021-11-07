@@ -138,7 +138,7 @@ export default class WorkflowPersistence extends Service {
       flow = 'issue-prepaid-card';
     } else if (workflowName === 'MERCHANT_CREATION') {
       route = 'payments';
-      flow = 'create-merchant';
+      flow = 'create-business';
     } else if (workflowName === 'RESERVE_POOL_DEPOSIT') {
       route = 'deposit-withdrawal';
       flow = 'deposit';

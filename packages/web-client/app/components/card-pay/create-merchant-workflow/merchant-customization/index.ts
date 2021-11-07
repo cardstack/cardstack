@@ -184,7 +184,7 @@ export default class CardPayCreateMerchantWorkflowMerchantCustomizationComponent
       Sentry.captureException(e);
 
       this.merchantIdValidationMessage =
-        'There was an error validating merchant ID uniqueness';
+        'There was an error validating business ID uniqueness';
 
       if (e.message.startsWith('No valid auth token')) {
         let { workflowSession } = this.args;

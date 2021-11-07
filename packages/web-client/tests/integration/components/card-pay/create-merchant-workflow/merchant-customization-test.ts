@@ -49,22 +49,22 @@ const MERCHANT_ID_INVALID_INPUTS = [
   {
     value: 'an invalid id because of spaces',
     errorMessage:
-      'The Merchant ID can only contain lowercase letters or numbers, no special characters',
+      'The Business ID can only contain lowercase letters or numbers, no special characters',
   },
   {
     value: 'INVALIDCASING',
     errorMessage:
-      'The Merchant ID can only contain lowercase letters or numbers, no special characters',
+      'The Business ID can only contain lowercase letters or numbers, no special characters',
   },
   {
     value: '😤',
     errorMessage:
-      'The Merchant ID can only contain lowercase letters or numbers, no special characters',
+      'The Business ID can only contain lowercase letters or numbers, no special characters',
   },
   {
     value: 'thisisexactlyfiftyfivecharacterslongbutisotherwisevalid',
     errorMessage:
-      'The Merchant ID cannot be more than 50 characters long. It is currently 55 characters long',
+      'The Business ID cannot be more than 50 characters long. It is currently 55 characters long',
   },
 ];
 
@@ -124,10 +124,10 @@ module(
 
     test('It displays the default state correctly', async function (assert) {
       assert.dom(PREVIEW).exists();
-      assert.dom(`${PREVIEW} ${MERCHANT}`).containsText('Enter merchant name');
+      assert.dom(`${PREVIEW} ${MERCHANT}`).containsText('Enter business name');
       assert
         .dom(`${PREVIEW} ${MERCHANT}`)
-        .hasAttribute('data-test-merchant', 'Enter merchant name');
+        .hasAttribute('data-test-merchant', 'Enter business name');
       assert.dom(MERCHANT_NAME_FIELD).exists();
       assert.dom(MERCHANT_ID_FIELD).exists();
       assert.dom(COLOR_FIELD).exists();
@@ -211,7 +211,7 @@ module(
       assert
         .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
         .containsText(
-          'This Merchant ID is already taken. Please choose another one'
+          'This Business ID is already taken. Please choose another one'
         );
 
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
@@ -234,7 +234,7 @@ module(
       );
       assert
         .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
-        .containsText('This Merchant ID is not allowed');
+        .containsText('This Business ID is not allowed');
 
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
     });
@@ -256,7 +256,7 @@ module(
       );
       assert
         .dom(`${MERCHANT_ID_FIELD} [data-test-boxel-input-error-message]`)
-        .containsText('There was an error validating merchant ID uniqueness');
+        .containsText('There was an error validating business ID uniqueness');
 
       assert.dom(SAVE_DETAILS_BUTTON).isDisabled();
     });

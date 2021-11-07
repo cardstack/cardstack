@@ -128,7 +128,7 @@ module(
         );
       assert
         .dom(DEEP_LINK)
-        .containsText('Pay Merchant')
+        .containsText('Pay Business')
         .hasAttribute('href', deepLinkPaymentURL);
       assert.dom(PAYMENT_URL).containsText(paymentURL);
       assert.dom(LINK_VIEW_TOGGLE).containsText('Show as QR Code');
@@ -167,7 +167,7 @@ module(
       assert
         .dom(MERCHANT_INFO_MISSING_MESSAGE)
         .containsText(
-          'Unable to find merchant details for this address. Use caution when paying.'
+          'Unable to find business details for this address. Use caution when paying.'
         );
       assert.dom(AMOUNT).containsText(`§300`);
       assert.dom(SECONDARY_AMOUNT).containsText(`$3.00 USD`);
