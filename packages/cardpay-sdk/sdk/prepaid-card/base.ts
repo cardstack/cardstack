@@ -631,7 +631,7 @@ export default class PrepaidCard {
 
     if (!gnosisResult) {
       throw new Error(
-        `Unable to obtain a gnosis transaction result for register rewardee payment from prepaid card ${prepaidCardAddress}for ${rewardeeRegistrationFees} SPEND`
+        `Unable to obtain a gnosis transaction result for register rewardee payment from prepaid card ${prepaidCardAddress}`
       );
     }
 
