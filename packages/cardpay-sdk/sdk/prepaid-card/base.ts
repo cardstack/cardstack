@@ -608,11 +608,7 @@ export default class PrepaidCard {
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
 
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
-      let payload = await this.getRegisterRewardeePayload(
-        prepaidCardAddress,
-        rewardProgramId,
-        rateLock
-      );
+      let payload = await this.getRegisterRewardeePayload(prepaidCardAddress, rewardProgramId, rateLock);
       if (nonce == null) {
         nonce = getNextNonceFromEstimate(payload);
         if (typeof onNonce === 'function') {
