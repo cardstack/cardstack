@@ -10,7 +10,7 @@ Router.map(function () {
   this.route('card-pay', function () {
     this.route('balances');
     this.route('payments');
-    this.route('reward-programs');
+    this.route('reward');
     this.route('deposit-withdrawal');
   });
   this.route('card-space', function () {
