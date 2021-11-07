@@ -606,24 +606,11 @@ export default class PrepaidCard {
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
-    let rewardeeRegistrationFees = await rewardManager.getRewardeeRegistrationFees();
-    await this.convertFromSpendForPrepaidCard(
-      prepaidCardAddress,
-      rewardeeRegistrationFees,
-      (issuingToken, balanceAmount, requiredTokenAmount, symbol) =>
-        new Error(
-          `Prepaid card does not have enough balance to register rewardee. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
-            balanceAmount
-          )} ${symbol}, payment amount in issuing token is ${fromWei(requiredTokenAmount)} ${symbol}`
-        )
-    );
 
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
       let payload = await this.getRegisterRewardeePayload(
         prepaidCardAddress,
         rewardProgramId,
-        rewardeeRegistrationFees,
         rateLock
       );
       if (nonce == null) {
@@ -635,7 +622,6 @@ export default class PrepaidCard {
       return await this.executeRegisterRewardee(
         prepaidCardAddress,
         rewardProgramId,
-        rewardeeRegistrationFees,
         rateLock,
         payload,
         await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
@@ -838,13 +824,12 @@ export default class PrepaidCard {
   private async getRegisterRewardeePayload(
     prepaidCardAddress: string,
     rewardProgramId: string,
-    spendAmount: number,
     rate: string
   ): Promise<SendPayload> {
     return getSendPayload(
       this.layer2Web3,
       prepaidCardAddress,
-      spendAmount,
+      0,
       rate,
       'registerRewardee',
       this.layer2Web3.eth.abi.encodeParameters(['address'], [rewardProgramId])
@@ -948,7 +933,6 @@ export default class PrepaidCard {
   private async executeRegisterRewardee(
     prepaidCardAddress: string,
     rewardProgramId: string,
-    spendAmount: number,
     rate: string,
     payload: SendPayload,
     signatures: Signature[],
@@ -957,7 +941,7 @@ export default class PrepaidCard {
     return await executeSend(
       this.layer2Web3,
       prepaidCardAddress,
-      spendAmount,
+      0,
       rate,
       payload,
       'registerRewardee',
