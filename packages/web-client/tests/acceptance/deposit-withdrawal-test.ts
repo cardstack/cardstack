@@ -88,49 +88,35 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
     //   .dom('[data-test-card-pay-depot-header]')
     //   .containsText(`On ${c.layer2.fullName}`);
 
-    assert
-      .dom('[data-test-safe-balances]:nth-of-type(1)')
-      .containsText('0x1234...abcd');
+    let depotSafeSel = `[data-test-safe-balances]:nth-of-type(1)`;
+
+    assert.dom(depotSafeSel).containsText('0x1234...abcd');
 
     assert
-      .dom(
-        '[data-test-safe-balances]:nth-of-type(1) [data-test-safe-balances-count]'
-      )
+      .dom(`${depotSafeSel} [data-test-safe-balances-count]`)
       .containsText('2');
     assert
-      .dom(
-        '[data-test-safe-balances]:nth-of-type(1) [data-test-safe-balances-token]'
-      )
+      .dom(`${depotSafeSel} [data-test-safe-balances-token]`)
       .exists({ count: 2 });
     assert
-      .dom(
-        '[data-test-safe-balances]:nth-of-type(1) [data-test-safe-balances-token="DAI.CPXD"]'
-      )
+      .dom(`${depotSafeSel} [data-test-safe-balances-token="DAI.CPXD"]`)
       .containsText('14.1422987 DAI.CPXD');
     assert
-      .dom(
-        '[data-test-safe-balances]:nth-of-type(1) [data-test-safe-balances-token="CARD.CPXD"]'
-      )
+      .dom(`${depotSafeSel} [data-test-safe-balances-token="CARD.CPXD"]`)
       .containsText('567.8991 CARD.CPXD');
 
-    assert
-      .dom('[data-test-safe-balances]:nth-of-type(2)')
-      .containsText('0x2126...6F33');
+    let merchantSafeSel = `[data-test-safe-balances]:nth-of-type(2)`;
+
+    assert.dom(merchantSafeSel).containsText('0x2126...6F33');
 
     assert
-      .dom(
-        '[data-test-safe-balances]:nth-of-type(2) [data-test-safe-balances-count]'
-      )
+      .dom(`${merchantSafeSel} [data-test-safe-balances-count]`)
       .containsText('1');
     assert
-      .dom(
-        '[data-test-safe-balances]:nth-of-type(2) [data-test-safe-balances-token]'
-      )
+      .dom(`${merchantSafeSel} [data-test-safe-balances-token]`)
       .exists({ count: 1 });
     assert
-      .dom(
-        '[data-test-safe-balances]:nth-of-type(2) [data-test-safe-balances-token="CARD.CPXD"]'
-      )
+      .dom(`${merchantSafeSel} [data-test-safe-balances-token="CARD.CPXD"]`)
       .containsText('467.8991 CARD.CPXD');
     // assert.dom('[data-test-card-pay-depot-token-count]').containsText('2');
     // assert
