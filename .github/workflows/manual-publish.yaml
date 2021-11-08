@@ -37,4 +37,4 @@ jobs:
 
       - name: Publish
         run: |
-          npx lerna publish ${{ github.event.inputs.bump }} --force-publish "*" --yes
+          npx lerna publish ${{ github.event.inputs.bump }} --force-publish "*" --yes --no-verify-access
