@@ -33,6 +33,17 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
     ).strategy;
     let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
     let merchantSafeAddress = '0x212619c6Ea074C053eF3f1e1eF81Ec8De6Eb6F33';
+
+    this.server.create('merchant-info', {
+      id: await getFilenameFromDid(EXAMPLE_DID),
+      name: 'Mandello',
+      slug: 'mandello1',
+      did: EXAMPLE_DID,
+      color: '#00ffcc',
+      'text-color': '#000000',
+      'owner-address': layer2AccountAddress,
+    });
+
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
       createDepotSafe({
         address: '0x123400000000000000000000000000000000abcd',
@@ -58,17 +69,6 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
         transferrable: false,
       }),
     ]);
-    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-
-    this.server.create('merchant-info', {
-      id: await getFilenameFromDid(EXAMPLE_DID),
-      name: 'Mandello',
-      slug: 'mandello1',
-      did: EXAMPLE_DID,
-      color: '#00ffcc',
-      'text-color': '#000000',
-      'owner-address': layer2AccountAddress,
-    });
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
     await visit('/card-pay/deposit-withdrawal');
