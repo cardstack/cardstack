@@ -1,4 +1,4 @@
-import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+import { TEST_REALM, templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 import { expect } from 'chai';
 import { registry, setupHub } from '../../helpers/server';
 
@@ -12,7 +12,7 @@ if (process.env.COMPILER) {
       registry(this).register(
         'card-routes-config',
         class {
-          routeCard = 'https://my-realm/routes';
+          routeCard = `${TEST_REALM}routes`;
         }
       );
     });
@@ -21,18 +21,18 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realm}/routes`,
+        url: `${realm}routes`,
         schema: 'schema.js',
         files: {
           'schema.js': `
             export default class Routes {
               routeTo(path) {
                 if (path === 'homepage') {
-                  return 'https://my-realm/welcome';
+                  return '${TEST_REALM}welcome';
                 }
 
                 if (path === 'about') {
-                  return 'https://my-realm/about';
+                  return '${TEST_REALM}about';
                 }
               }
             }
@@ -40,14 +40,14 @@ if (process.env.COMPILER) {
         },
       });
       await cards.create({
-        url: `${realm}/homepage`,
+        url: `${realm}homepage`,
         isolated: 'isolated.js',
         files: {
           'isolated.js': templateOnlyComponentTemplate('<h1>Welcome to my homepage</h1>'),
         },
       });
       await cards.create({
-        url: `${realm}/about`,
+        url: `${realm}about`,
         isolated: 'isolated.js',
         files: {
           'isolated.js': templateOnlyComponentTemplate('<div>I like trains</div>'),
@@ -62,7 +62,7 @@ if (process.env.COMPILER) {
 
     it("can load a simple isolated card's data", async function () {
       let response = await getCardForPath('about').expect(200);
-      expect(response.body.data.id).to.equal('https://my-realm/about');
+      expect(response.body.data.id).to.equal(`${TEST_REALM}about`);
       let componentModule = response.body.data?.meta.componentModule;
       expect(componentModule, 'should have componentModule').to.not.be.undefined;
       expect(resolveCard(componentModule), 'component module is resolvable').to.not.be.undefined;

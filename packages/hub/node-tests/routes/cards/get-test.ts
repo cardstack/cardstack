@@ -11,7 +11,7 @@ if (process.env.COMPILER) {
 
     this.beforeEach(async function () {
       await cards.create({
-        url: `${realm}/pet`,
+        url: `${realm}pet`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -25,13 +25,13 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}/person`,
+        url: `${realm}person`,
         schema: 'schema.js',
         files: {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
-            import pet from "${realm}/pet";
+            import pet from "${realm}pet";
             export default class Person {
               @contains(string) name;
               @contains(pet) bestFriend;
@@ -41,7 +41,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}/post`,
+        url: `${realm}post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -49,7 +49,7 @@ if (process.env.COMPILER) {
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
             import datetime from "https://cardstack.com/base/datetime";
-            import person from '${realm}/person';
+            import person from '${realm}person';
             export default class Post {
               @contains(string) title;
               @contains(string) body;
@@ -65,7 +65,7 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
-        url: `${realm}/post0`,
+        url: `${realm}post0`,
         adoptsFrom: '../post',
         data: {
           title: 'Hello World',
@@ -86,7 +86,7 @@ if (process.env.COMPILER) {
     });
 
     it("can load a simple isolated card's data", async function () {
-      let response = await getCard('https://my-realm/post0'); // .expect(200);
+      let response = await getCard(`${realm}post0`); // .expect(200);
       // console.log(JSON.stringify(response.body, null, 2));
 
       expect(response.body).to.have.all.keys('data');
