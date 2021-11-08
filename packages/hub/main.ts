@@ -74,6 +74,7 @@ import HubBot from './services/discord-bots/hub-bot';
 import CardService from './services/card-service';
 import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
 import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
+import { SearchIndex } from './services/search-index';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -144,6 +145,7 @@ export function createRegistry(): Registry {
     );
     registry.register('card-builder', CardBuilder);
     registry.register('card-watcher', CardWatcher);
+    registry.register('searchIndex', SearchIndex);
   }
 
   return registry;

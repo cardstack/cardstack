@@ -7,11 +7,12 @@ import { inject } from '@cardstack/di';
 export const INSECURE_CONTEXT = {};
 
 export default class CardServiceFactory {
-  realmManager = inject('realm-manager', { as: 'realmManager' });
-  builder = inject('card-builder', { as: 'builder' });
+  private realmManager = inject('realm-manager', { as: 'realmManager' });
+  private builder = inject('card-builder', { as: 'builder' });
+  private searchIndex = inject('searchIndex');
 
   as(requestContext: unknown): CardService {
-    return new CardService(requestContext, this.realmManager, this.builder);
+    return new CardService(requestContext, this.realmManager, this.builder, this.searchIndex);
   }
 }
 
@@ -24,7 +25,8 @@ export class CardService {
   constructor(
     _requestContext: unknown,
     private realmManager: CardServiceFactory['realmManager'],
-    private builder: CardServiceFactory['builder']
+    private builder: CardServiceFactory['builder'],
+    private searchIndex: CardServiceFactory['searchIndex']
   ) {}
 
   async load(url: string): Promise<Card> {
@@ -54,10 +56,7 @@ export class CardService {
     }
 
     let rawCard = await this.realmManager.getRealm(realmURL).create(raw);
-    let compiled = await this.builder.getCompiledCard(rawCard.url);
-
-    // TODO:
-    // await updateIndexForThisCardAndEverybodyWhoDependsOnHim()
+    let compiled = await this.searchIndex.indexCard(rawCard);
 
     return { data: rawCard.data, compiled };
   }

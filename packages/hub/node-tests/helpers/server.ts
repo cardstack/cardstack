@@ -64,9 +64,6 @@ export function setupHub(mochaContext: Mocha.Suite) {
       currentCardService = await container.lookup('card-service');
     }
     server = await container.lookup('hubServer');
-
-    // TODO: by the time we return, the cards in all the configured realms (base, have been indexed
-    // await initialIndexing();
   });
 
   mochaContext.afterEach(async function () {

@@ -7,17 +7,20 @@ import { ensureTrailingSlash } from '../utils/path';
 import { nanoid } from '../utils/ids';
 import RealmManager from '../services/realm-manager';
 import { CardstackError, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
+import { IndexingOperations } from '../services/search-index';
 
 export default class FSRealm implements RealmInterface {
-  url: string;
-  directory: string;
-  manager: RealmManager;
+  private url: string;
+  private directory: string;
+  private manager: RealmManager;
 
-  constructor(config: RealmConfig, manager: RealmManager) {
+  constructor(config: RealmConfig, manager: RealmManager, private update: (ops: IndexingOperations) => Promise<void>) {
     this.url = config.url;
     this.directory = ensureTrailingSlash(config.directory!);
     this.manager = manager;
   }
+
+  private onFileChanged() {}
 
   private buildCardPath(cardURL: string, ...paths: string[]): string {
     return join(this.directory, cardURL.replace(this.url, ''), ...(paths || ''));

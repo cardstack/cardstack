@@ -105,11 +105,6 @@ export default class CardBuilder implements BuilderInterface {
       throw err;
     }
   }
-
-  async deleteCard(cardURL: string) {
-    await this.cache.deleteCard(cardURL);
-    await this.realmManager.delete(cardURL);
-  }
 }
 
 declare module '@cardstack/di' {

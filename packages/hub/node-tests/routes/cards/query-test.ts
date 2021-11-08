@@ -4,12 +4,12 @@ import { setupHub } from '../../helpers/server';
 import { map } from 'lodash';
 
 if (process.env.COMPILER) {
-  describe.skip('GET /cards/<QUERY>', function () {
+  describe('GET /cards/<QUERY>', function () {
     function get(url: string) {
       return request().get(url);
     }
 
-    let { cards, request, realm } = setupHub(this);
+    let { cards, request, realm, getContainer } = setupHub(this);
 
     this.beforeEach(async function () {
       // await cards.create({
@@ -62,6 +62,9 @@ if (process.env.COMPILER) {
       //   adoptsFrom: '../fancy-person',
       //   data: { name: 'Bob' },
       // });
+
+      let searchIndex = await getContainer().lookup('searchIndex');
+      await searchIndex.indexAllRealms();
 
       await cards.create({
         url: `${realm}post`,
