@@ -81,7 +81,7 @@ export function setupCardBuilding(mochaContext: Mocha.Suite) {
   mochaContext.beforeEach(async function () {
     let registry = createRegistry();
     registry.register('card-cache-config', TestCardCacheConfig);
-    let container = new Container(registry);
+    container = new Container(registry);
     cardCache = await container.lookup('card-cache');
     realms = await container.lookup('realm-manager');
     builder = await container.lookup('card-builder');

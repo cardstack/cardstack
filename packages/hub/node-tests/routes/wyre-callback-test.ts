@@ -252,7 +252,9 @@ function handleWyreTransfer(source: string, dest: string, amount: number, token:
 function handleProvisionPrepaidCard(userAddress: string, sku: string) {
   provisionPrepaidCardCallCount++;
   if (sku === 'boom') {
-    throw new Error('boom');
+    let err = new Error('boom');
+    (err as any).intentionalTestError = true;
+    throw err;
   }
   expect(userAddress).to.equal(stubUserAddress);
   expect(sku).to.equal(stubSKU);
