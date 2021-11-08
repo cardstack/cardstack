@@ -38,6 +38,10 @@ export default class RewardManager {
     return await (await this.getRewardManager()).methods.getRewardSafeOwner(rewardSafeAddress).call();
   }
 
+  async getRewardProgramAdmin(rewardProgramId: string): Promise<string> {
+    return await (await this.getRewardManager()).methods.rewardProgramAdmins(rewardProgramId).call();
+  }
+
   private async getRewardManager(): Promise<Contract> {
     if (this.rewardManager) {
       return this.rewardManager;

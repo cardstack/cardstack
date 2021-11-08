@@ -57,3 +57,29 @@ export async function isRewardProgramLocked(
   const locked = await rewardManager.isLocked(rewardProgramId);
   console.log(`Reward program ${rewardProgramId} is ${locked ? 'locked' : 'NOT locked'}`);
 }
+
+export async function updateRewardProgramAdmin(
+  network: string,
+  prepaidCard: string,
+  rewardProgramId: string,
+  newAdmin: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  await prepaidCardAPI.updateRewardProgramAdmin(prepaidCard, rewardProgramId, newAdmin, {
+    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
+}
+
+export async function rewardProgramAdmin(
+  network: string,
+  rewardProgramId: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardManager = await getSDK('RewardManager', web3);
+  const admin = await rewardManager.getRewardProgramAdmin(rewardProgramId);
+  console.log(`Reward program admin of ${rewardProgramId} is ${admin}`);
+}

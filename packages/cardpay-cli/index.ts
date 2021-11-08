@@ -21,7 +21,7 @@ import {
   gasFee,
   getPaymentLimits,
 } from './prepaid-card.js';
-import { registerRewardProgram, registerRewardee, lockRewardProgram, isRewardProgramLocked } from './reward-manager';
+import { registerRewardProgram, registerRewardee, lockRewardProgram, isRewardProgramLocked, updateRewardProgramAdmin, rewardProgramAdmin } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
   usdPrice as layer2UsdPrice,
@@ -95,7 +95,9 @@ type Commands =
   | 'claimRewards'
   | 'claimableRewardProofs'
   | 'lockRewardProgram'
-  | 'isRewardProgramLocked';
+  | 'isRewardProgramLocked'
+  | 'updateRewardProgramAdmin'
+  | 'rewardProgramAdmin';
 
 let command: Commands | undefined;
 interface Options {
@@ -135,6 +137,7 @@ interface Options {
   admin?: string;
   proof?: string;
   rewardSafe?: string;
+  newAdmin?: string;
 }
 let {
   network,
@@ -173,6 +176,7 @@ let {
   proof,
   quantity,
   rewardSafe,
+  newAdmin
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -846,6 +850,28 @@ let {
     });
     command = 'isRewardProgramLocked';
   })
+  .command('update-reward-program-admin <prepaidCard> <rewardProgramId> <newAdmin>', 'Update reward program admin', (yargs) => {
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The prepaid card used to pay for gas for the txn',
+    });
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    yargs.positional('newAdmin', {
+      type: 'string',
+      description: 'The eoa admin of reward program',
+    });
+    command = 'updateRewardProgramAdmin';
+  })
+  .command('reward-program-admin <rewardProgramId>', 'Get reward program admin', (yargs) => {
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    command = 'rewardProgramAdmin';
+  })
   .options({
     network: {
       alias: 'n',
@@ -1228,6 +1254,28 @@ if (!command) {
         return;
       }
       await isRewardProgramLocked(network, rewardProgramId, mnemonic);
+      break;
+    case 'updateRewardProgramAdmin':
+      if (prepaidCard == null) {
+        showHelpAndExit('prepaid card is a required value');
+        return;
+      }
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      if (newAdmin == null) {
+        showHelpAndExit('newAdmin is a required value');
+        return;
+      }
+      await updateRewardProgramAdmin(network, prepaidCard, rewardProgramId, newAdmin, mnemonic);
+      break;
+    case 'rewardProgramAdmin':
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      await rewardProgramAdmin(network, rewardProgramId, mnemonic);
       break;
     default:
       assertNever(command);
