@@ -1,20 +1,8 @@
-import { createContainer } from '../../main';
-import { Container, RegistryCallback } from '@cardstack/di';
+import { Container } from '@cardstack/di';
 
 export interface TestEnv {
   container: Container;
   destroy(): Promise<void>;
-}
-
-export async function createTestEnv(registryCallBack?: RegistryCallback): Promise<TestEnv> {
-  let container = createContainer(registryCallBack);
-  async function destroy() {
-    await container.teardown();
-  }
-  return {
-    container,
-    destroy,
-  };
 }
 
 export class AcceleratableClock {

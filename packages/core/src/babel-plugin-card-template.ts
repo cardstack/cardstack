@@ -14,7 +14,7 @@ import { CompiledCard, SerializerName, Format } from './interfaces';
 import { getObjectKey, error } from './utils/babel';
 import glimmerCardTemplateTransform from './glimmer-plugin-card-template';
 import { buildSerializerMapFromUsedFields, buildUsedFieldsListFromUsageMeta } from './utils/fields';
-import { CardError } from './utils/errors';
+import { augmentBadRequest } from './utils/errors';
 export interface CardComponentPluginOptions {
   cardURL: string;
   componentFile?: string;
@@ -44,8 +44,8 @@ export default function (templateSource: string, options: CardComponentPluginOpt
       filename: `/${options.cardURL}/${options.componentFile}`,
     });
     return out!.code!;
-  } catch (e) {
-    throw CardError.fromError(e);
+  } catch (e: any) {
+    throw augmentBadRequest(e);
   }
 }
 

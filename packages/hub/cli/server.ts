@@ -3,7 +3,7 @@
 import logger from '@cardstack/logger';
 import nodeCleanup from 'node-cleanup';
 import { Argv, Options } from 'yargs';
-import { HubServer } from '../main';
+import { createContainer, HubServer } from '../main';
 import { serverLog } from '../utils/logger';
 
 export let command = 'serve';
@@ -45,10 +45,14 @@ export async function handler(argv: any) {
       logLevels: [['hub/*', 'info']],
     });
   }
-  let server = await HubServer.create(argv).catch((err: Error) => {
+  let container = createContainer();
+  let server: HubServer;
+  try {
+    server = await container.lookup('hubServer');
+  } catch (err: any) {
     serverLog.error('Server failed to start cleanly: %s', err.stack || err);
     process.exit(-1);
-  });
+  }
 
   process.on('warning', (warning: Error) => {
     if (warning.stack) {
@@ -72,7 +76,7 @@ export async function handler(argv: any) {
   });
 
   nodeCleanup((_exitCode, signal) => {
-    server.teardown().then(() => {
+    container.teardown().then(() => {
       process.kill(process.pid, signal as string);
     });
     nodeCleanup.uninstall(); // don't call cleanup handler again

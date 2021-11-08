@@ -22,9 +22,6 @@ module.exports = function (defaults) {
     },
     vendorFiles: { 'jquery.js': null, 'app-shims.js': null },
 
-    // our app always uses faker, even in production
-    'ember-faker': { enabled: true },
-
     // Add options here
     'ember-power-select': { theme: false },
   });

@@ -17,7 +17,7 @@ module.exports = {
     '@typescript-eslint/semi': ['error'],
     '@typescript-eslint/adjacent-overload-signatures': 'error',
     '@typescript-eslint/array-type': 'error',
-    '@typescript-eslint/ban-types': 'error',
+
     // The defaults for the naming-convention rule are rather nuanced and helpful
     // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/naming-convention.md
     // '@typescript-eslint/naming-convention': 'error',

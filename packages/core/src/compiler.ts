@@ -16,7 +16,7 @@ import transformCardComponent, {
 import { Builder, CompiledCard, ComponentInfo, FEATURE_NAMES, Format, FORMATS, RawCard } from './interfaces';
 import { getBasenameAndExtension } from './utils';
 import { getFileType } from './utils/content';
-import { assertValidKeys, CardError } from './utils/errors';
+import { CardstackError, BadRequest, augmentBadRequest } from './utils/errors';
 
 export const baseCardURL = 'https://cardstack.com/base/base';
 
@@ -41,7 +41,7 @@ export class Compiler {
     let schemaModule = await this.prepareSchema(cardSource, options);
     let meta = getMeta(options);
 
-    let fields = await this.lookupFieldsForCard(meta.fields);
+    let fields = await this.lookupFieldsForCard(meta.fields, cardSource.url);
 
     this.defineAssets(cardSource);
 
@@ -54,7 +54,7 @@ export class Compiler {
       parentCard = await this.getParentCard(cardSource, meta);
 
       if (!parentCard) {
-        throw new CardError(`${cardSource.url} does not have a parent card. This is wrong and should not happen.`);
+        throw new CardstackError(`${cardSource.url} does not have a parent card. This is wrong and should not happen.`);
       }
 
       if (!schemaModule) {
@@ -65,7 +65,7 @@ export class Compiler {
 
       if (parentCard.serializer) {
         if (serializer && parentCard.serializer !== serializer) {
-          throw new CardError(
+          throw new CardstackError(
             `Your card declares a different deserializer than your parent. Thats not allowed. Card: ${cardSource.url}:${serializer} Parent: ${parentCard.url}:${parentCard.serializer}`
           );
         }
@@ -76,11 +76,10 @@ export class Compiler {
     let components = await this.prepareComponents(cardSource, fields, parentCard);
 
     if (cardSource.data) {
-      assertValidKeys(
-        Object.keys(cardSource.data),
-        Object.keys(fields),
-        `Field(s) %list% does not exist on card "${cardSource.url}"`
-      );
+      let unexpectedFields = difference(Object.keys(cardSource.data), Object.keys(fields));
+      if (unexpectedFields.length) {
+        throw new BadRequest(`Fields() ${unexpectedFields.join(',')} does not exist on card "${cardSource.url}"`);
+      }
     }
 
     return {
@@ -146,7 +145,7 @@ export class Compiler {
   private getFile(cardSource: RawCard, path: string): string {
     let fileSrc = cardSource.files && cardSource.files[path];
     if (!fileSrc) {
-      throw new CardError(`${cardSource.url} refers to ${path} in its card.json but that file does not exist`);
+      throw new CardstackError(`${cardSource.url} refers to ${path} in its card.json but that file does not exist`);
     }
     return fileSrc;
   }
@@ -175,19 +174,20 @@ export class Compiler {
           classPropertiesPlugin,
         ],
       })!;
-    } catch (error) {
-      throw CardError.fromError(error);
+    } catch (error: any) {
+      throw augmentBadRequest(error);
     }
 
     let code = out!.code!;
     return await this.builder.define(cardSource.url, schemaLocalFilePath, JS_TYPE, code);
   }
 
-  private async lookupFieldsForCard(metaFields: FieldsMeta): Promise<CompiledCard['fields']> {
+  private async lookupFieldsForCard(metaFields: FieldsMeta, ownURL: string): Promise<CompiledCard['fields']> {
     let fields: CompiledCard['fields'] = {};
     for (let [name, { cardURL, type }] of Object.entries(metaFields)) {
+      let fieldURL = new URL(cardURL, ownURL).href;
       fields[name] = {
-        card: await this.builder.getCompiledCard(cardURL),
+        card: await this.builder.getCompiledCard(fieldURL),
         type,
         name,
       };
@@ -202,7 +202,7 @@ export class Compiler {
     let fieldNameCollisions = intersection(cardFieldNames, parentFieldNames);
 
     if (fieldNameCollisions.length) {
-      throw new CardError(`Field collision on ${fieldNameCollisions.join()} with parent card ${parentCard.url}`);
+      throw new CardstackError(`Field collision on ${fieldNameCollisions.join()} with parent card ${parentCard.url}`);
     }
 
     return Object.assign({}, parentCard.fields, fields);
@@ -231,7 +231,9 @@ export class Compiler {
     if (!localFilePath) {
       // we don't have an implementation of our own
       if (!parentCard) {
-        throw new CardError(`${cardSource.url} doesn't have a ${which} component OR a parent card. This is not right.`);
+        throw new CardstackError(
+          `${cardSource.url} doesn't have a ${which} component OR a parent card. This is not right.`
+        );
       }
 
       if (cardSource.schema) {
@@ -239,7 +241,7 @@ export class Compiler {
         let originalRawCard = await this.builder.getRawCard(parentCard[which].sourceCardURL);
         let srcLocalPath = originalRawCard[which];
         if (!srcLocalPath) {
-          throw new CardError(
+          throw new CardstackError(
             `bug: ${parentCard.url} says it got ${which} from ${parentCard[which].sourceCardURL}, but that card does not have a ${which} component`
           );
         }

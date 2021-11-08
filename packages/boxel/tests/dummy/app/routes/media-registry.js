@@ -6,9 +6,7 @@ import 'dummy/css/templates/media-registry/collection.css';
 import 'dummy/css/templates/media-registry/item.css';
 import 'dummy/css/templates/media-registry/item-edit.css';
 import 'dummy/css/templates/media-registry/agreements.css';
-import 'dummy/css/templates/media-registry/embedded-collection-table.css';
-import 'dummy/css/templates/media-registry/discrepancies-index.css';
-import 'dummy/css/templates/media-registry/discrepancy.css';
+import 'dummy/css/templates/media-registry/discrepancies.css';
 
 export default class MediaRegistryRoute extends Route {
   titleToken(model) {

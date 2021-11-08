@@ -1,5 +1,5 @@
 {{! template-lint-disable deprecated-inline-view-helper }}
-<section class="discrepancy" {{did-insert (if this.nestedView this.getNestedFields this.adjustCount)}}>
+<section class="discrepancy" {{did-insert (if @nestedView this.getNestedFields this.adjustCount)}}>
   <div class="discrepancy__container">
     <header class="discrepancy__header">
       <h1 class="discrepancy__title">Discrepancy Card: Different Data</h1>
@@ -146,7 +146,7 @@
                           @labelClass="field-renderer__title"
                         >
                           <div class="field-renderer__value">
-                            <Boxel>
+                            <div class="boxel">
                             {{#if (or f.type (and (eq mode "comparison") f.tempField))}}
                               {{component
                                 (or field.component "card")
@@ -159,7 +159,7 @@
                             {{else}}
                               <div class="field-renderer__card field-renderer__card--blank" />
                             {{/if}}
-                            </Boxel>
+                            </div>
                           </div>
                         </Boxel::Field>
                       {{/each}}

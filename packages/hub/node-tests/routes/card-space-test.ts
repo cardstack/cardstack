@@ -1,7 +1,5 @@
-import supertest, { Test } from 'supertest';
-import { HubServer } from '../../main';
-import { Registry } from '@cardstack/di';
 import { Job, TaskSpec } from 'graphile-worker';
+import { registry, setupHub } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -41,22 +39,13 @@ class StubWorkerClient {
 }
 
 describe('POST /api/card-spaces', function () {
-  let server: HubServer;
-  let request: supertest.SuperTest<Test>;
-
-  this.beforeEach(async function () {
-    server = await HubServer.create({
-      registryCallback(registry: Registry) {
-        registry.register('authentication-utils', StubAuthenticationUtils);
-        registry.register('worker-client', StubWorkerClient);
-      },
-    });
-
-    request = supertest(server.app.callback());
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
   });
+  let { request, getContainer } = setupHub(this);
 
   this.afterEach(async function () {
-    server.teardown();
     lastAddedJobIdentifier = undefined;
     lastAddedJobPayload = undefined;
   });
@@ -80,7 +69,7 @@ describe('POST /api/card-spaces', function () {
 
     let resourceId = null;
 
-    await request
+    await request()
       .post('/api/card-spaces')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -119,7 +108,7 @@ describe('POST /api/card-spaces', function () {
   });
 
   it('returns an error when card space with same url is already present', async function () {
-    let dbManager = await server.container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     let db = await dbManager.getClient();
     await db.query(
       'INSERT INTO card_spaces(id, url, profile_name, profile_description, profile_category, profile_button_text, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7)',
@@ -142,7 +131,7 @@ describe('POST /api/card-spaces', function () {
       },
     };
 
-    await request
+    await request()
       .post('/api/card-spaces')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -181,7 +170,7 @@ describe('POST /api/card-spaces', function () {
       },
     };
 
-    await request
+    await request()
       .post('/api/card-spaces')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -220,7 +209,7 @@ describe('POST /api/card-spaces', function () {
       },
     };
 
-    await request
+    await request()
       .post('/api/card-spaces')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -243,7 +232,7 @@ describe('POST /api/card-spaces', function () {
   });
 
   it('returns 401 without bearer token', async function () {
-    await request
+    await request()
       .post('/api/card-spaces')
       .send({})
       .set('Accept', 'application/vnd.api+json')
@@ -259,109 +248,89 @@ describe('POST /api/card-spaces', function () {
       })
       .expect('Content-Type', 'application/vnd.api+json');
   });
+});
 
-  describe('POST /api/card-spaces/validate-url', async function () {
-    let server: HubServer;
-    let request: supertest.SuperTest<Test>;
+describe('POST /api/card-spaces/validate-url', async function () {
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
+  });
+  let { request, getContainer } = setupHub(this);
 
-    this.beforeEach(async function () {
-      server = await HubServer.create({
-        registryCallback(registry: Registry) {
-          registry.register('authentication-utils', StubAuthenticationUtils);
-          registry.register('worker-client', StubWorkerClient);
-        },
-      });
+  it('returns no url errors when url is available', async function () {
+    await request()
+      .post(`/api/card-spaces/validate-url`)
+      .send({ data: { attributes: { url: 'satoshi.card.space' } } })
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
 
-      request = supertest(server.app.callback());
-    });
+  it('returns url errors when url is already used', async function () {
+    let dbManager = await getContainer().lookup('database-manager');
+    let db = await dbManager.getClient();
+    await db.query(
+      'INSERT INTO card_spaces(id, profile_name, url, profile_description, profile_category, profile_button_text, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7)',
+      ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'Test', 'satoshi.card.space', 'Test', 'Test', 'Test', '0x0']
+    );
 
-    this.afterEach(async function () {
-      server.teardown();
-    });
+    await request()
+      .post(`/api/card-spaces/validate-url`)
+      .send({ data: { attributes: { url: 'satoshi.card.space' } } })
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid attribute',
+            source: { pointer: `/data/attributes/url` },
+            detail: 'Already exists',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
 
-    it('returns no url errors when url is available', async function () {
-      await request
-        .post(`/api/card-spaces/validate-url`)
-        .send({ data: { attributes: { url: 'satoshi.card.space' } } })
-        .set('Authorization', 'Bearer: abc123--def456--ghi789')
-        .set('Content-Type', 'application/vnd.api+json')
-        .expect(200)
-        .expect({
-          errors: [],
-        })
-        .expect('Content-Type', 'application/vnd.api+json');
-    });
-
-    it('returns url errors when url is already used', async function () {
-      let dbManager = await server.container.lookup('database-manager');
-      let db = await dbManager.getClient();
-      await db.query(
-        'INSERT INTO card_spaces(id, profile_name, url, profile_description, profile_category, profile_button_text, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7)',
-        ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'Test', 'satoshi.card.space', 'Test', 'Test', 'Test', '0x0']
-      );
-
-      await request
-        .post(`/api/card-spaces/validate-url`)
-        .send({ data: { attributes: { url: 'satoshi.card.space' } } })
-        .set('Authorization', 'Bearer: abc123--def456--ghi789')
-        .set('Content-Type', 'application/vnd.api+json')
-        .expect(200)
-        .expect({
-          errors: [
-            {
-              status: '422',
-              title: 'Invalid attribute',
-              source: { pointer: `/data/attributes/url` },
-              detail: 'Already exists',
-            },
-          ],
-        })
-        .expect('Content-Type', 'application/vnd.api+json');
-    });
-
-    it('returns 401 without bearer token', async function () {
-      await request
-        .post('/api/card-spaces')
-        .send({})
-        .set('Accept', 'application/vnd.api+json')
-        .set('Content-Type', 'application/vnd.api+json')
-        .expect(401)
-        .expect({
-          errors: [
-            {
-              status: '401',
-              title: 'No valid auth token',
-            },
-          ],
-        })
-        .expect('Content-Type', 'application/vnd.api+json');
-    });
+  it('returns 401 without bearer token', async function () {
+    await request()
+      .post('/api/card-spaces')
+      .send({})
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(401)
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
   });
 });
 
 describe('PUT /api/card-spaces', function () {
-  let server: HubServer;
-  let request: supertest.SuperTest<Test>;
-
-  this.beforeEach(async function () {
-    server = await HubServer.create({
-      registryCallback(registry: Registry) {
-        registry.register('authentication-utils', StubAuthenticationUtils);
-        registry.register('worker-client', StubWorkerClient);
-      },
-    });
-
-    request = supertest(server.app.callback());
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
   });
 
+  let { request, getContainer } = setupHub(this);
+
   this.afterEach(async function () {
-    server.teardown();
     lastAddedJobIdentifier = undefined;
     lastAddedJobPayload = undefined;
   });
 
   it('returns 404 when resource does not exist', async function () {
-    await request
+    await request()
       .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send({})
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -371,14 +340,14 @@ describe('PUT /api/card-spaces', function () {
   });
 
   it('returns 403 when resource does not belong to wallet', async function () {
-    let dbManager = await server.container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     let db = await dbManager.getClient();
     await db.query(
       'INSERT INTO card_spaces(id, url, profile_name, profile_description, profile_category, profile_button_text, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7)',
       ['AB70B8D5-95F5-4C20-997C-4DB9013B347C', 'satoshi.card.space', 'Test', 'Test', 'Test', 'Visit this Space', '0x0']
     );
 
-    await request
+    await request()
       .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send({})
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -388,7 +357,7 @@ describe('PUT /api/card-spaces', function () {
   });
 
   it('returns 401 without bearer token', async function () {
-    await request
+    await request()
       .post('/api/card-spaces')
       .send({})
       .set('Accept', 'application/vnd.api+json')
@@ -406,7 +375,7 @@ describe('PUT /api/card-spaces', function () {
   });
 
   it('updates the resource', async function () {
-    let dbManager = await server.container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     let db = await dbManager.getClient();
     await db.query(
       'INSERT INTO card_spaces(id, url, profile_name, profile_description, profile_category, profile_button_text, profile_image_url, profile_cover_image_url, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
@@ -443,7 +412,7 @@ describe('PUT /api/card-spaces', function () {
       },
     };
 
-    await request
+    await request()
       .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')
@@ -479,7 +448,7 @@ describe('PUT /api/card-spaces', function () {
   });
 
   it('returns errors when updating a resource with invalid attributes', async function () {
-    let dbManager = await server.container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     let db = await dbManager.getClient();
     await db.query(
       'INSERT INTO card_spaces(id, url, profile_name, profile_description, profile_category, profile_button_text, owner_address) VALUES($1, $2, $3, $4, $5, $6, $7)',
@@ -521,7 +490,7 @@ describe('PUT /api/card-spaces', function () {
       },
     };
 
-    await request
+    await request()
       .put('/api/card-spaces/AB70B8D5-95F5-4C20-997C-4DB9013B347C')
       .send(payload)
       .set('Authorization', 'Bearer: abc123--def456--ghi789')

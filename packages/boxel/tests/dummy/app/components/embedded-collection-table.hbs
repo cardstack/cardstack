@@ -19,7 +19,7 @@
   >
     <b.row as |r|>
       <r.cell as |cell column row cellMeta columnMeta|>
-        <Boxel class="embedded-collection-table__boxel-cell">
+        <div class="boxel embedded-collection-table__boxel-cell">
           <BoxelHighlight {{on "click" (optional (fn @expandAction row))}} @class="embedded-collection-table__highlight" />
           <div class="embedded-collection-table__cell {{if (eq columnMeta.index 0) "embedded-collection-table__cell--first-col"}} {{if row.selected "row-group-selected"}} embedded-collection-table__cell--{{@mode}}">
             <div class="embedded-collection-table__cell-value {{if (eq columnMeta.index 0) "embedded-collection-table__cell-value--first-col"}}">
@@ -35,7 +35,7 @@
               {{/if}}
             </div>
           </div>
-        </Boxel>
+        </div>
       </r.cell>
     </b.row>
   </t.body>

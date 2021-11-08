@@ -37,14 +37,12 @@
   </:api>
 </Freestyle::Usage>
 
-<Freestyle::Usage @slug="CardContainer-gridNote" @description="Suggestion to use CSS Grid">
-  <:example>
-    <Boxel::CardContainer @displayBoundaries={{true}}>
-      <div style="display:grid; grid-template-rows: 5rem;">
-        <div style="margin: auto">
-          One strategy to consider is using a root element with `display: grid` to layout the contents of your card.
-        </div>
+<FreestyleAnnotation>
+  <Boxel::CardContainer @displayBoundaries={{true}}>
+    <div style="display:grid; grid-template-rows: 5rem;">
+      <div style="margin: auto">
+        One strategy to consider is using a root element with `display: grid` to layout the contents of your card.
       </div>
-    </Boxel::CardContainer>
-  </:example>
-</Freestyle::Usage>
+    </div>
+  </Boxel::CardContainer>
+</FreestyleAnnotation>

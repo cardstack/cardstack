@@ -1,9 +1,7 @@
 <Freestyle::Usage @name="ActionChin">
   <:description>
-    <div class="remove-from-percy">
-      <p>Bottom action area for an action card, a.k.a the "Chin".</p>
-      <p>Use the API controls below to change <code>state</code> and <code>stepNumber</code>.</p>
-    </div>
+      Bottom action area for an action card, a.k.a the "Chin".<br><br>
+      Use the API controls below to change <code>state</code> and <code>stepNumber</code>.
   </:description>
   <:example>
     <Boxel::ActionChin
@@ -100,14 +98,11 @@
 
 <Freestyle::Usage @name="Usage with customized ActionStatusArea and InfoArea">
   <:description>
-    <div class="remove-from-percy">
-      <p>
-        <code>ActionStatusArea</code> displays custom content in the action chin.
-        It accepts an <code>@icon</code> argument.
-        In the <code>:memorialized</code> block, the icon is a checkmark by default.
-      </p>
-      <p><code>InfoArea</code> replaces the small text area. It can be used with any named block.</p>
-    </div>
+    <code>ActionStatusArea</code> displays custom content in the action chin.
+    It accepts an <code>@icon</code> argument.
+    In the <code>:memorialized</code> block, the icon is a checkmark by default.
+    <br><br>
+    <code>InfoArea</code> replaces the small text area. It can be used with any named block.
   </:description>
   <:example>
     <Boxel::ActionChin @state="in-progress" as |chin|>
@@ -179,106 +174,102 @@
   </:example>
 </Freestyle::Usage>
 
-<Freestyle::Usage @name="ActionChin Explanation">
-  <:description>
-    <div class="usage-cta-block-explanation remove-from-percy">
-      CTAs are meant to guide users to take a single action.
-      There are a few different states for this component:
-      <table class="usage-cta-block-explanation-table">
-        <tbody>
-          <tr><td>State</td><td>Explanation</td></tr>
-          <tr><td>default</td> <td>When the user has not met the requirements for the cta to be considered done</td></tr>
-          <tr><td>in-progress</td> <td>When the action is in progress</td></tr>
-          <tr><td>memorialized</td> <td>When the action is done</td></tr>
-        </tbody>
-      </table>
-      CtaBlock provides components to use within it - these components have appropriate classes to place them in the correct spots in the layout, and have correct states.
-      The ActionButton and CancelButton components use the Button component and should accept all arguments it does.
-      The InfoArea and ActionStatusArea components are essentially divs, which you can put your custom contents in.
-      <table class="usage-cta-block-explanation-table">
-        <tbody>
-          <tr>
-            <td>
-              Component
-            </td>
-            <td>
-              What it does
-            </td>
-            <td>
-              Provided in states
-            </td>
-          </tr>
-          <tr>
-            <td>
-              ActionButton
-            </td>
-            <td>
-              The button that's used to perform the main action for this CTA. It undergoes a few changes in styling in between states.
-            </td>
-            <td>
-              <ul>
-                <li>default</li>
-                <li>memorialized</li>
-                <li>in-progress</li>
-              </ul>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              ActionStatusArea
-            </td>
-            <td>
-              Memorialized state status update area for the main action, that is built to accept a small descriptive statement - eg. "Unlocked".
-              It should be used when an action is completed, replacing the ActionButton.
-              <br>
-              <br>
-              It accepts a `@icon` argument. By default, it shows a checkmark as the icon.
-              <br>
-              <br>
-              <strong>Don't use this and ActionButton together, they occupy the same grid area!</strong>
-            </td>
-            <td>
-              <ul>
-                <li>default</li>
-                <li>memorialized</li>
-                <li>in-progress</li>
-              </ul>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              CancelButton
-            </td>
-            <td>
-              Button to cancel the main action. It should only appear in the 'in-progress' state.
-            </td>
-            <td>
-              <ul>
-                <li>in-progress</li>
-              </ul>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              InfoArea
-            </td>
-            <td>
-              An area used for any relevant information to the action (eg for status updates)
-              If provided, it replaces the text:  "Actions only visible to you".
-            </td>
-            <td>
-              <ul>
-                <li>default</li>
-                <li>memorialized</li>
-                <li>in-progress</li>
-              </ul>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </:description>
-
-  <:example>
-  </:example>
-</Freestyle::Usage>
+<FreestyleAnnotation>
+  <h2>ActionChin Explanation</h2>
+  <div class="usage-cta-block-explanation">
+    CTAs are meant to guide users to take a single action.
+    There are a few different states for this component:
+    <table class="usage-cta-block-explanation-table">
+      <tbody>
+        <tr><td>State</td><td>Explanation</td></tr>
+        <tr><td>default</td> <td>When the user has not met the requirements for the cta to be considered done</td></tr>
+        <tr><td>in-progress</td> <td>When the action is in progress</td></tr>
+        <tr><td>memorialized</td> <td>When the action is done</td></tr>
+      </tbody>
+    </table>
+    CtaBlock provides components to use within it - these components have appropriate classes to place them in the correct spots in the layout, and have correct states.
+    The ActionButton and CancelButton components use the Button component and should accept all arguments it does.
+    The InfoArea and ActionStatusArea components are essentially divs, which you can put your custom contents in.
+    <table class="usage-cta-block-explanation-table">
+      <tbody>
+        <tr>
+          <td>
+            Component
+          </td>
+          <td>
+            What it does
+          </td>
+          <td>
+            Provided in states
+          </td>
+        </tr>
+        <tr>
+          <td>
+            ActionButton
+          </td>
+          <td>
+            The button that's used to perform the main action for this CTA. It undergoes a few changes in styling in between states.
+          </td>
+          <td>
+            <ul>
+              <li>default</li>
+              <li>memorialized</li>
+              <li>in-progress</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            ActionStatusArea
+          </td>
+          <td>
+            Memorialized state status update area for the main action, that is built to accept a small descriptive statement - eg. "Unlocked".
+            It should be used when an action is completed, replacing the ActionButton.
+            <br>
+            <br>
+            It accepts a `@icon` argument. By default, it shows a checkmark as the icon.
+            <br>
+            <br>
+            <strong>Don't use this and ActionButton together, they occupy the same grid area!</strong>
+          </td>
+          <td>
+            <ul>
+              <li>default</li>
+              <li>memorialized</li>
+              <li>in-progress</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            CancelButton
+          </td>
+          <td>
+            Button to cancel the main action. It should only appear in the 'in-progress' state.
+          </td>
+          <td>
+            <ul>
+              <li>in-progress</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            InfoArea
+          </td>
+          <td>
+            An area used for any relevant information to the action (eg for status updates)
+            If provided, it replaces the text:  "Actions only visible to you".
+          </td>
+          <td>
+            <ul>
+              <li>default</li>
+              <li>memorialized</li>
+              <li>in-progress</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</FreestyleAnnotation>

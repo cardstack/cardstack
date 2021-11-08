@@ -1,12 +1,12 @@
 import { Client as DBClient } from 'pg';
-import { setupServer } from '../helpers/server';
+import { setupHub } from '../helpers/server';
 
 describe('/api/wyre-prices', function () {
   let db: DBClient;
 
-  let { getServer, request } = setupServer(this);
+  let { request, getContainer } = setupHub(this);
   this.beforeEach(async function () {
-    let dbManager = await getServer().container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM wyre_prices`);
   });

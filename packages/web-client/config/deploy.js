@@ -7,7 +7,7 @@ module.exports = function (deployTarget) {
 
   // these get more aggressive caching because they are sub-resources with fingerprinted URLs
   let s3AssetPattern =
-    '**/*.{js,png,gif,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,ttc,otf}';
+    '**/*.{js,png,gif,webp,ico,jpg,map,xml,txt,svg,swf,eot,ttf,woff,woff2,ttc,otf}';
 
   let ENV = {
     build: {},
