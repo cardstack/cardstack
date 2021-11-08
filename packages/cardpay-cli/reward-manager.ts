@@ -47,7 +47,11 @@ export async function lockRewardProgram(
   });
 }
 
-export async function isRewardProgramLocked(network: string, rewardProgramId: string, mnemonic?: string): Promise<void> {
+export async function isRewardProgramLocked(
+  network: string,
+  rewardProgramId: string,
+  mnemonic?: string
+): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardManager = await getSDK('RewardManager', web3);
   const locked = await rewardManager.isLocked(rewardProgramId);
