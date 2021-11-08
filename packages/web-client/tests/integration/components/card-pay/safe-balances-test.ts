@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render } from '@ember/test-helpers';
+import { render, setupOnerror } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -84,13 +84,18 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
     assert.dom('[data-test-safe-balances-count]').containsText('1');
   });
 
-  test('it renders a prepaid card safe', async function (this: Context, assert) {
+  test('it throws an error rendering a prepaid card safe', async function (this: Context, assert) {
+    setupOnerror(function (err: Error) {
+      assert.equal(
+        err.message,
+        'CardPay::SafeBalances does not support a safe type of prepaid-card'
+      );
+    });
     this.set('safe', prepaidCardSafe);
     await render(hbs`
       <CardPay::SafeBalances
         @safe={{this.safe}}
       />
     `);
-    assert.dom('[data-test-safe-balances-count]').containsText('2');
   });
 });

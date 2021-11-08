@@ -9,8 +9,20 @@ interface CardPaySafeBalancesComponentArgs {
   safe: Safe;
 }
 
+const SUPPORTED_SAFE_TYPES = ['depot', 'merchant'];
+
 export default class CardPaySafeBalancesComponent extends Component<CardPaySafeBalancesComponentArgs> {
   @service declare tokenToUsd: TokenToUsd;
+
+  constructor(owner: unknown, args: CardPaySafeBalancesComponentArgs) {
+    super(owner, args);
+
+    if (!SUPPORTED_SAFE_TYPES.includes(args.safe.type)) {
+      throw new Error(
+        `CardPay::SafeBalances does not support a safe type of ${args.safe.type}`
+      );
+    }
+  }
 
   get tokenBalances() {
     return this.args.safe.tokens.map(
