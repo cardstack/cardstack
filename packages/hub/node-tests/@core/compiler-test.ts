@@ -50,7 +50,7 @@ if (process.env.COMPILER) {
     });
 
     it('deserializer is inherited', async function () {
-      cards.create({
+      await cards.create({
         url: `${TEST_REALM}fancy-date`,
         schema: 'schema.js',
         files: {
@@ -65,13 +65,13 @@ if (process.env.COMPILER) {
     });
 
     it('CompiledCard fields', async function () {
-      cards.create(PERSON_CARD);
+      await cards.create(PERSON_CARD);
       let compiled = await builder.getCompiledCard(PERSON_CARD.url);
       expect(Object.keys(compiled.fields)).to.deep.equal(['name', 'birthdate']);
     });
 
     it('CompiledCard embedded view', async function () {
-      cards.create(PERSON_CARD);
+      await cards.create(PERSON_CARD);
       let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
       expect(builder.cache.getModule(compiled.embedded.moduleName)).to.containsSource(
@@ -84,7 +84,7 @@ if (process.env.COMPILER) {
     });
 
     it('CompiledCard edit view', async function () {
-      cards.create(PERSON_CARD);
+      await cards.create(PERSON_CARD);
       let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
       expect(compiled.edit.usedFields).to.deep.equal(['name', 'birthdate']);
@@ -97,8 +97,8 @@ if (process.env.COMPILER) {
     });
 
     it('nested cards', async function () {
-      cards.create(PERSON_CARD);
-      cards.create({
+      await cards.create(PERSON_CARD);
+      await cards.create({
         url: `${TEST_REALM}post`,
         schema: 'schema.js',
         embedded: 'embedded.js',
@@ -135,7 +135,7 @@ if (process.env.COMPILER) {
     });
 
     it('deeply nested cards', async function () {
-      cards.create({
+      await cards.create({
         url: `${TEST_REALM}post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
@@ -163,7 +163,7 @@ if (process.env.COMPILER) {
           'embedded.js': templateOnlyComponentTemplate(`<h2><@fields.title /> - <@fields.createdAt /></h2>`),
         },
       });
-      cards.create({
+      await cards.create({
         url: `${TEST_REALM}post-list`,
         schema: 'schema.js',
         isolated: 'isolated.js',
@@ -232,8 +232,8 @@ if (process.env.COMPILER) {
         },
       };
 
-      this.beforeEach(function () {
-        cards.create(postCard);
+      this.beforeEach(async function () {
+        await cards.create(postCard);
       });
 
       it('iterators of fields and inlines templates', async function () {
@@ -273,8 +273,8 @@ if (process.env.COMPILER) {
           },
         };
 
-        cards.create(fancyPostCard);
-        cards.create(timelyPostCard);
+        await cards.create(fancyPostCard);
+        await cards.create(timelyPostCard);
 
         let timelyCompiled = await builder.getCompiledCard(timelyPostCard.url);
         let fancyCompiled = await builder.getCompiledCard(fancyPostCard.url);

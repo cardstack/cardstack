@@ -19,8 +19,8 @@ if (process.env.COMPILER) {
     this.beforeEach(async () => {
       builder = await getContainer().lookup('card-builder');
 
-      cards.create(ADDRESS_RAW_CARD);
-      cards.create(PERSON_RAW_CARD);
+      await cards.create(ADDRESS_RAW_CARD);
+      await cards.create(PERSON_RAW_CARD);
       personCard = await builder.getCompiledCard(PERSON_RAW_CARD.url);
 
       options = {
