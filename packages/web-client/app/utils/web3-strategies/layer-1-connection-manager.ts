@@ -451,6 +451,10 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
       this.onDisconnect(false);
     });
 
+    provider.on('websocket-disconnected', () => {
+      this.disconnect();
+    });
+
     this.provider = provider;
     return;
   }
