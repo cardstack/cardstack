@@ -37,7 +37,7 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
       (depotSafe = createDepotSafe({
         address: depotAddress,
         tokens: [
-          createSafeToken('DAI.CPXD', '250000000000000000000'),
+          createSafeToken('DAI.CPXD', '250111100000000000000'),
           createSafeToken('CARD.CPXD', '500000000000000000000'),
         ],
       })),
@@ -82,12 +82,12 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
 
     assert
       .dom('[data-test-safe-balances-usd-total]')
-      .containsText('$150.00 USD');
+      .containsText('$150.02 USD');
 
     assert
       .dom('[data-test-safe-balances-token="DAI.CPXD"]')
-      .containsText('250.00 DAI.CPXD')
-      .containsText('$50.00 USD');
+      .containsText('250.11 DAI.CPXD')
+      .containsText('$50.02 USD');
     assert
       .dom('[data-test-safe-balances-token="CARD.CPXD"]')
       .containsText('500.00 CARD.CPXD')

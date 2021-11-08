@@ -6,11 +6,12 @@ import Helper from '@ember/component/helper';
 import BN from 'bn.js';
 import { fromWei } from 'web3-utils';
 
-type FormatWeiAmountHelperParams = [BN, number];
+type FormatWeiAmountHelperParams = [BN, number, number?];
 
 export function formatWeiAmount(
   amountInSmallestUnit: BN,
-  minDecimals?: number
+  minDecimals?: number,
+  maxDecimals?: number
 ): string {
   if (amountInSmallestUnit == null) {
     return '';
@@ -28,17 +29,22 @@ export function formatWeiAmount(
   }
   let result = fromWei(amountInSmallestUnit).toString();
 
-  return formatCurrencyAmount(
-    result,
-    Math.max(minDecimals, countDecimalPlaces(result))
-  );
+  if (!maxDecimals) {
+    maxDecimals = Math.max(minDecimals, countDecimalPlaces(result));
+  }
+
+  return formatCurrencyAmount(result, maxDecimals);
 }
 
 class FormatWeiAmountHelper extends Helper {
   compute(
-    [amountInSmallestUnit, minDecimals]: FormatWeiAmountHelperParams /*, hash*/
+    [
+      amountInSmallestUnit,
+      minDecimals,
+      maxDecimals,
+    ]: FormatWeiAmountHelperParams /*, hash*/
   ) {
-    return formatWeiAmount(amountInSmallestUnit, minDecimals);
+    return formatWeiAmount(amountInSmallestUnit, minDecimals, maxDecimals);
   }
 }
 
