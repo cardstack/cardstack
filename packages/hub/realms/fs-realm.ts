@@ -8,16 +8,34 @@ import { nanoid } from '../utils/ids';
 import RealmManager from '../services/realm-manager';
 import { CardstackError, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
 import { IndexingOperations } from '../services/search-index';
+import { serverLog as logger } from '../utils/logger';
 
 export default class FSRealm implements RealmInterface {
   private url: string;
   private directory: string;
+  private logger = logger;
   private manager: RealmManager;
 
-  constructor(config: RealmConfig, manager: RealmManager, private update: (ops: IndexingOperations) => Promise<void>) {
+  // constructor(config: RealmConfig, manager: RealmManager, private update: (ops: IndexingOperations) => Promise<void>) {
+  constructor(config: RealmConfig, manager: RealmManager) {
     this.url = config.url;
     this.directory = ensureTrailingSlash(config.directory!);
     this.manager = manager;
+  }
+
+  // async reindex(ops: IndexingOperations, meta: Meta | undefined): Promise<Meta> {
+  async reindex(ops: IndexingOperations): Promise<void> {
+    this.logger.log(`Indexing realm: ${this.url}`);
+
+    ops.beginReplaceAll();
+    let cards = walkSync(this.directory, { globs: ['**/card.json'] });
+    for (let cardPath of cards) {
+      let fullCardUrl = new URL(cardPath.replace('card.json', ''), this.url).href;
+      this.logger.info(`--> ${fullCardUrl}`);
+      let rawCard = await this.read(fullCardUrl);
+      ops.save(rawCard);
+    }
+    ops.finishReplaceAll();
   }
 
   private onFileChanged() {}

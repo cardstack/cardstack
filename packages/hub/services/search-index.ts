@@ -7,7 +7,7 @@ export class SearchIndex {
 
   async indexAllRealms(): Promise<void> {
     let { ops, finalize } = IndexingOperations.create();
-    let promises = this.realmManager.realms.map((realm) => realm.reindex(ops));
+    let promises = this.realmManager.realms.map((realm) => realm.reindex(ops, undefined));
     await finalize();
     await Promise.all(promises);
   }

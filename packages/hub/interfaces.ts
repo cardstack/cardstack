@@ -18,12 +18,15 @@ export interface CardStackContext {
   requireCard: (path: string) => any;
 }
 
-export interface RealmInterface<Meta = unknown> {
+// export interface RealmInterface<Meta = unknown> {
+export interface RealmInterface {
+  url: string;
   read(cardURL: string): Promise<RawCard>;
   create(raw: RawCard | Omit<RawCard, 'url'>): Promise<RawCard>;
   update(raw: RawCard): Promise<RawCard>;
   delete(cardURL: string): Promise<void>;
-  reindex(ops: IndexingOperations, meta: Meta | undefined): Promise<Meta>;
+  // reindex(ops: IndexingOperations, meta: Meta | undefined): Promise<Meta>;
+  reindex(ops: IndexingOperations): Promise<void>;
 }
 
 export interface Cache<CardType> {

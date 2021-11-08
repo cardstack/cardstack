@@ -5,9 +5,9 @@ import { transformSync } from '@babel/core';
 import { NODE, BROWSER } from '../interfaces';
 import { JS_TYPE } from '@cardstack/core/src/utils/content';
 import { inject } from '@cardstack/di';
-import walkSync from 'walk-sync';
 import { serverLog as logger } from '../utils/logger';
-import { printCompilerError } from '@cardstack/core/src/utils/errors';
+// import walkSync from 'walk-sync';
+// import { printCompilerError } from '@cardstack/core/src/utils/errors';
 
 export default class CardBuilder implements BuilderInterface {
   realmManager = inject('realm-manager', { as: 'realmManager' });
@@ -19,33 +19,34 @@ export default class CardBuilder implements BuilderInterface {
     builder: this,
   });
 
-  async primeCache(stopOnError = false): Promise<void> {
-    let promises = [];
+  // TODO: move functionality over to SearchIndexer
+  // async primeCache(stopOnError = false): Promise<void> {
+  //   let promises = [];
 
-    this.logger.log('Priming card cache');
-    for (let realm of this.realmManager.realms) {
-      let cards = walkSync(realm.directory, { globs: ['**/card.json'] });
-      for (let cardPath of cards) {
-        let fullCardUrl = new URL(cardPath.replace('card.json', ''), realm.url).href;
-        this.logger.info(`--> ${fullCardUrl}`);
-        promises.push(
-          (async () => {
-            try {
-              await this.buildCard(fullCardUrl);
-            } catch (err) {
-              if (stopOnError) {
-                throw err;
-              }
-              this.logger.error(printCompilerError(err));
-            }
-          })()
-        );
-      }
-    }
+  //   this.logger.log('Priming card cache');
+  //   for (let realm of this.realmManager.realms) {
+  //     let cards = walkSync(realm.directory, { globs: ['**/card.json'] });
+  //     for (let cardPath of cards) {
+  //       let fullCardUrl = new URL(cardPath.replace('card.json', ''), realm.url).href;
+  //       this.logger.info(`--> ${fullCardUrl}`);
+  //       promises.push(
+  //         (async () => {
+  //           try {
+  //             await this.buildCard(fullCardUrl);
+  //           } catch (err) {
+  //             if (stopOnError) {
+  //               throw err;
+  //             }
+  //             this.logger.error(printCompilerError(err));
+  //           }
+  //         })()
+  //       );
+  //     }
+  //   }
 
-    await Promise.all(promises);
-    this.logger.log(`✅ Cache primed`);
-  }
+  //   await Promise.all(promises);
+  //   this.logger.log(`✅ Cache primed`);
+  // }
 
   async define(cardURL: string, localPath: string, type: string, source: string): Promise<string> {
     switch (type) {

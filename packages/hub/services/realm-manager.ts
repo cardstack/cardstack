@@ -7,7 +7,7 @@ import config from 'config';
 
 const realmsConfig = config.get('compiler.realmsConfig') as RealmConfig[];
 
-export default class RealmManager implements Omit<RealmInterface, 'create'> {
+export default class RealmManager {
   realms: RealmInterface[] = realmsConfig.map((realm) => new FSRealm(realm, this));
 
   createRealm(config: RealmConfig, klass?: any) {
