@@ -7,6 +7,8 @@ const EXTERNALLY_USED_ASSET_PATHS = [
   '/images/prepaid-card-customizations/pattern-4.svg',
   '/images/logos/tokens/card.cpxd.png',
   '/images/logos/tokens/dai.cpxd.png',
+  '/images/icon-apple-256x256.png',
+  '/images/icon-favicon-32x32.png',
 ];
 
 module('Acceptance | externally used assets', function () {
