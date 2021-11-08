@@ -4,6 +4,10 @@
     {{truncate-middle @safe.address}}
   </div>
   <span data-test-safe-balances-count>token count: {{this.tokenBalances.length}}</span>
+  <div class="card-pay-depot__balances-num" data-test-safe-balances-usd-total>
+    USD total:
+    {{format-usd this.usdBalanceTotal}}
+  </div>
   {{#each this.tokenBalances as |b|}}
     <div class="card-pay-depot__token" data-test-safe-balances-token={{b.symbol}}>
       <CardPay::BalanceDisplay

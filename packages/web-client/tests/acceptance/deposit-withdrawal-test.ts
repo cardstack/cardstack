@@ -99,6 +99,9 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
       .dom(`${depotSafeSel} [data-test-safe-balances-token]`)
       .exists({ count: 2 });
     assert
+      .dom(`${depotSafeSel} [data-test-safe-balances-usd-total]`)
+      .containsText(`$116.41 USD`);
+    assert
       .dom(`${depotSafeSel} [data-test-safe-balances-token="DAI.CPXD"]`)
       .containsText('14.1422987 DAI.CPXD')
       .containsText('$2.83 USD');
