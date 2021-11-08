@@ -3,6 +3,7 @@
   <div class="card-pay-depot__address">
     {{truncate-middle @safe.address}}
   </div>
+  <div data-test-safe-balances-type>{{this.safeType}}</div>
   <span data-test-safe-balances-count>token count: {{this.tokenBalances.length}}</span>
   <div class="card-pay-depot__balances-num" data-test-safe-balances-usd-total>
     USD total:

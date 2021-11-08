@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
-import { Safe } from '@cardstack/cardpay-sdk';
+import { DepotSafe, MerchantSafe, Safe } from '@cardstack/cardpay-sdk';
 import { TokenBalance, TokenSymbol } from '@cardstack/web-client/utils/token';
 import TokenToUsd from '@cardstack/web-client/services/token-to-usd';
 import BN from 'bn.js';
@@ -9,7 +9,7 @@ interface CardPaySafeBalancesComponentArgs {
   safe: Safe;
 }
 
-const SUPPORTED_SAFE_TYPES = ['depot', 'merchant'];
+type SupportedSafe = DepotSafe | MerchantSafe;
 
 export default class CardPaySafeBalancesComponent extends Component<CardPaySafeBalancesComponentArgs> {
   @service declare tokenToUsd: TokenToUsd;
@@ -17,11 +17,19 @@ export default class CardPaySafeBalancesComponent extends Component<CardPaySafeB
   constructor(owner: unknown, args: CardPaySafeBalancesComponentArgs) {
     super(owner, args);
 
-    if (!SUPPORTED_SAFE_TYPES.includes(args.safe.type)) {
+    if (!isSupportedSafe(args.safe)) {
       throw new Error(
         `CardPay::SafeBalances does not support a safe type of ${args.safe.type}`
       );
     }
+  }
+
+  get safeType() {
+    let safe = this.args.safe as SupportedSafe;
+    return {
+      depot: 'Depot',
+      merchant: 'Business',
+    }[safe.type];
   }
 
   get tokenBalances() {
@@ -43,4 +51,9 @@ export default class CardPaySafeBalancesComponent extends Component<CardPaySafeB
       return 0;
     }, 0);
   }
+}
+
+export function isSupportedSafe(safe: Safe): safe is SupportedSafe {
+  // FIXME how can I use the types here?
+  return ['depot', 'merchant'].includes(safe.type);
 }

@@ -72,6 +72,7 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
       />
     `);
     assert.dom('[data-test-safe-balances-count]').containsText('2');
+    assert.dom('[data-test-safe-balances-type]').containsText('Depot');
   });
 
   test('it renders a merchant safe', async function (this: Context, assert) {
@@ -82,6 +83,7 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
       />
     `);
     assert.dom('[data-test-safe-balances-count]').containsText('1');
+    assert.dom('[data-test-safe-balances-type]').containsText('Business');
   });
 
   test('it throws an error rendering a prepaid card safe', async function (this: Context, assert) {
