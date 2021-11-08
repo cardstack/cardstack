@@ -93,11 +93,11 @@
   grid-template-rows: 1fr auto;
   align-items: flex-start;
   padding-top: var(--boxel-sp-lg);
-  border-top: 1px solid var(--boxel-light-400);
+  border-bottom: 1px solid var(--boxel-light-400);
 }
 
-.card-pay-safe-balances__token:first-child {
-  border-top: 0;
+.card-pay-safe-balances__token:last-child {
+  border-bottom: 0;
 }
 
 .card-pay-safe-balances__token-balance-display {
