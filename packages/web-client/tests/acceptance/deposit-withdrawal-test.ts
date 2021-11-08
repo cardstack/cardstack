@@ -83,10 +83,6 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
 
     assert.dom('[data-test-safe-balances]').exists({ count: 2 });
 
-    // assert
-    //   .dom('[data-test-card-pay-depot-header]')
-    //   .containsText(`On ${c.layer2.fullName}`);
-
     let depotSafeSel = `[data-test-safe-balances]:nth-of-type(1)`;
 
     assert.dom(depotSafeSel).containsText('0x1234...abcd');
@@ -122,28 +118,6 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
     assert
       .dom(`${merchantSafeSel} [data-test-safe-balances-token="CARD.CPXD"]`)
       .containsText('467.90 CARD.CPXD');
-    // assert.dom('[data-test-card-pay-depot-token-count]').containsText('2');
-    // assert
-    //   .dom('[data-test-card-pay-depot-usd-total]')
-    //   .containsText(`$116.41 USD`);
-    // assert
-    //   .dom('[data-test-card-pay-depot-token="DAI.CPXD"]')
-    //   .containsText('14.1422987 DAI.CPXD');
-    // assert
-    //   .dom('[data-test-card-pay-depot-token="CARD.CPXD"]')
-    //   .containsText('567.8991 CARD.CPXD');
-    // assert
-    //   .dom('[data-test-card-pay-depot-token="DAI.CPXD"]')
-    //   .containsText('$2.83 USD');
-    // assert
-    //   .dom('[data-test-card-pay-depot-token="CARD.CPXD"]')
-    //   .containsText('$113.58 USD');
-
-    // assert
-    //   .dom(
-    //     `[data-test-card-pay-depot-address="${merchantSafeAddress}"] [data-test-card-pay-merchant-token="CARD.CPXD"]`
-    //   )
-    //   .containsText('467.8991 CARD.CPXD');
 
     let secondAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6EbAAAA';
     layer2Service.test__simulateRemoteAccountSafes(secondAddress, [
