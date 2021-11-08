@@ -9,7 +9,7 @@
 
 .card-pay-safe-balances__body {
   color: var(--boxel-dark);
-  padding: var(--boxel-sp-xxl) var(--boxel-sp-lg);
+  padding: var(--boxel-sp-xl) var(--boxel-sp-lg) var(--boxel-sp-sm);
 }
 
 .card-pay-safe-balances__header {
@@ -55,7 +55,6 @@
   font-weight: 600;
   letter-spacing: 0;
   line-height: calc(36 / 26);
-  margin-bottom: var(--boxel-sp-xl);
   display: flex;
   align-items: center;
 }
