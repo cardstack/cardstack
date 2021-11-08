@@ -21,7 +21,14 @@ import {
   gasFee,
   getPaymentLimits,
 } from './prepaid-card.js';
-import { registerRewardProgram, registerRewardee, lockRewardProgram, isRewardProgramLocked, updateRewardProgramAdmin, rewardProgramAdmin } from './reward-manager';
+import {
+  registerRewardProgram,
+  registerRewardee,
+  lockRewardProgram,
+  isRewardProgramLocked,
+  updateRewardProgramAdmin,
+  rewardProgramAdmin,
+} from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
   usdPrice as layer2UsdPrice,
@@ -176,7 +183,7 @@ let {
   proof,
   quantity,
   rewardSafe,
-  newAdmin
+  newAdmin,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -850,21 +857,25 @@ let {
     });
     command = 'isRewardProgramLocked';
   })
-  .command('update-reward-program-admin <prepaidCard> <rewardProgramId> <newAdmin>', 'Update reward program admin', (yargs) => {
-    yargs.positional('prepaidCard', {
-      type: 'string',
-      description: 'The prepaid card used to pay for gas for the txn',
-    });
-    yargs.positional('rewardProgramId', {
-      type: 'string',
-      description: 'The reward program id.',
-    });
-    yargs.positional('newAdmin', {
-      type: 'string',
-      description: 'The eoa admin of reward program',
-    });
-    command = 'updateRewardProgramAdmin';
-  })
+  .command(
+    'update-reward-program-admin <prepaidCard> <rewardProgramId> <newAdmin>',
+    'Update reward program admin',
+    (yargs) => {
+      yargs.positional('prepaidCard', {
+        type: 'string',
+        description: 'The prepaid card used to pay for gas for the txn',
+      });
+      yargs.positional('rewardProgramId', {
+        type: 'string',
+        description: 'The reward program id.',
+      });
+      yargs.positional('newAdmin', {
+        type: 'string',
+        description: 'The eoa admin of reward program',
+      });
+      command = 'updateRewardProgramAdmin';
+    }
+  )
   .command('reward-program-admin <rewardProgramId>', 'Get reward program admin', (yargs) => {
     yargs.positional('rewardProgramId', {
       type: 'string',
