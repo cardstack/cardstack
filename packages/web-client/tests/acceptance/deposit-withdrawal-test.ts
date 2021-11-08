@@ -94,6 +94,11 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
 
     assert
       .dom(
+        '[data-test-safe-balances]:nth-of-type(1) [data-test-safe-balances-count]'
+      )
+      .containsText('2');
+    assert
+      .dom(
         '[data-test-safe-balances]:nth-of-type(1) [data-test-safe-balances-token]'
       )
       .exists({ count: 2 });
@@ -112,6 +117,11 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
       .dom('[data-test-safe-balances]:nth-of-type(2)')
       .containsText('0x2126...6F33');
 
+    assert
+      .dom(
+        '[data-test-safe-balances]:nth-of-type(2) [data-test-safe-balances-count]'
+      )
+      .containsText('1');
     assert
       .dom(
         '[data-test-safe-balances]:nth-of-type(2) [data-test-safe-balances-token]'
