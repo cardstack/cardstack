@@ -689,7 +689,7 @@ export default class PrepaidCard {
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
 
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
-      let payload = await this.getLockRewardProgramPayload(prepaidCardAddress, rewardProgramId, 0, rateLock);
+      let payload = await this.getLockRewardProgramPayload(prepaidCardAddress, rewardProgramId, rateLock);
       if (nonce == null) {
         nonce = getNextNonceFromEstimate(payload);
         if (typeof onNonce === 'function') {
@@ -699,7 +699,6 @@ export default class PrepaidCard {
       return await this.executeLockRewardProgram(
         prepaidCardAddress,
         rewardProgramId,
-        0,
         rateLock,
         payload,
         await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
@@ -914,13 +913,12 @@ export default class PrepaidCard {
   private async getLockRewardProgramPayload(
     prepaidCardAddress: string,
     rewardProgramId: string,
-    spendAmount: number,
     rate: string
   ): Promise<SendPayload> {
     return getSendPayload(
       this.layer2Web3,
       prepaidCardAddress,
-      spendAmount,
+      0,
       rate,
       'lockRewardProgram',
       this.layer2Web3.eth.abi.encodeParameters(['address'], [rewardProgramId])
@@ -1046,7 +1044,6 @@ export default class PrepaidCard {
   private async executeLockRewardProgram(
     prepaidCardAddress: string,
     rewardProgramId: string,
-    spendAmount: number,
     rate: string,
     payload: SendPayload,
     signatures: Signature[],
@@ -1055,7 +1052,7 @@ export default class PrepaidCard {
     return await executeSend(
       this.layer2Web3,
       prepaidCardAddress,
-      spendAmount,
+      0,
       rate,
       payload,
       'lockRewardProgram',
