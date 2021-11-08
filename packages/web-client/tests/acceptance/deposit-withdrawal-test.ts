@@ -100,10 +100,12 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
       .exists({ count: 2 });
     assert
       .dom(`${depotSafeSel} [data-test-safe-balances-token="DAI.CPXD"]`)
-      .containsText('14.1422987 DAI.CPXD');
+      .containsText('14.1422987 DAI.CPXD')
+      .containsText('$2.83 USD');
     assert
       .dom(`${depotSafeSel} [data-test-safe-balances-token="CARD.CPXD"]`)
-      .containsText('567.8991 CARD.CPXD');
+      .containsText('567.8991 CARD.CPXD')
+      .containsText('$113.58 USD');
 
     let merchantSafeSel = `[data-test-safe-balances]:nth-of-type(2)`;
 
