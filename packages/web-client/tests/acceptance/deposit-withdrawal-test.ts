@@ -60,17 +60,13 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
         tokens: [createSafeToken('CARD.CPXD', '467899100000000000000')],
       }),
       createPrepaidCardSafe({
-        address: '0x123400000000000000000000000000000000abcd',
+        address: '0x234500000000000000000000000000000000abcd',
         owners: [layer2AccountAddress],
         spendFaceValue: 2324,
         prepaidCardOwner: layer2AccountAddress,
         issuer: layer2AccountAddress,
         reloadable: false,
         transferrable: false,
-        tokens: [
-          createSafeToken('DAI.CPXD', '14142298700000000000'),
-          createSafeToken('CARD.CPXD', '567899100000000000000'),
-        ],
       }),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
