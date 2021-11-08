@@ -1,12 +1,3 @@
-.boxel-edit-field {
-  --boxel-field-label-width: 7.5rem;
-
-  display: grid;
-  grid-template-columns: var(--boxel-field-label-width) 1fr;
-  align-items: center;
-  column-gap: var(--boxel-sp-lg);
-}
-
 .boxel-edit-field__label {
   color: var(--boxel-purple-400);
   font: 600 var(--boxel-font-xs);

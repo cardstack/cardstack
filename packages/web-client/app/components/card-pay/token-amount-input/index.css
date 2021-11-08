@@ -12,7 +12,7 @@
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.token-amount-input-group__input {
+.token-amount-input-group .token-amount-input-group__input {
   height: var(--input-height);
   padding-left: calc(var(--input-icon-size) + var(--input-icon-space) * 2);
   padding-right: calc(var(--input-symbol-width) + var(--input-symbol-space) * 2);

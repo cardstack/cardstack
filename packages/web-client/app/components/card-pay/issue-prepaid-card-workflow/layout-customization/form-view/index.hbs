@@ -17,7 +17,7 @@
         @network={{network-display-info "layer2" "fullName"}}
       />
     </CardPay::LabeledValue>
-    <Boxel::Field
+    <CardPay::LabeledValue
       @fieldMode="edit"
       @label="Name of Issuer *"
       class="layout-form-view__input-field"
@@ -31,7 +31,7 @@
         {{on "blur" (pick "target.value" @onNameInput)}}
         data-test-layout-customization-name-input
       />
-    </Boxel::Field>
+    </CardPay::LabeledValue>
     <CardPay::LabeledValue
       @label="Background Color"
     >

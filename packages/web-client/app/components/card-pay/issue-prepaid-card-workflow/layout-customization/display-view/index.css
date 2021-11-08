@@ -4,10 +4,11 @@
 }
 
 .layout-display-view__card-preview-field {
-  grid-template-columns: 1fr;
-  width: max-content;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
   align-items: center;
-  text-align: center;
+  gap: var(--boxel-sp-xs);
 }
 
 .layout-display-view__data {

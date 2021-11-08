@@ -3,7 +3,6 @@
   that is inline by default.
 */
 .boxel-custom-radio__label {
-  display: block;
   position: relative;
 }
 

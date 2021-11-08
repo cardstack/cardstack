@@ -1,8 +1,7 @@
-.merchant-customization__name {
-  --field-label-alignment: center;
-
+.merchant-customization .merchant-customization__name {
   display: flex;
   flex-direction: column-reverse;
+  align-items: center;
   gap: 0;
 }
 
