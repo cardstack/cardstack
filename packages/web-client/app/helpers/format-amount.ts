@@ -20,10 +20,10 @@ export function formatAmount(
   );
 }
 
-class FormatWeiAmountHelper extends Helper {
+class FormatAmountHelper extends Helper {
   compute([amount, minDecimals]: FormatAmountHelperParams /*, hash*/) {
     return formatAmount(amount, minDecimals);
   }
 }
 
-export default FormatWeiAmountHelper;
+export default FormatAmountHelper;
