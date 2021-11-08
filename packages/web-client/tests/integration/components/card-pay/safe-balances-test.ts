@@ -130,6 +130,8 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
       .containsText('cardstack.xyz/mandello1')
       .hasAttribute('href', 'https://cardstack.xyz/mandello1');
 
+    // FIXME add header background/text colour
+
     assert
       .dom('[data-test-merchant-logo]')
       .containsText('M')
