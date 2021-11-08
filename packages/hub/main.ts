@@ -11,7 +11,7 @@ import { Memoize } from 'typescript-memoize';
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
 import packageJson from './package.json';
-import { Registry, Container, inject, getOwner } from '@cardstack/di';
+import { Registry, Container, inject, getOwner, KnownServices } from '@cardstack/di';
 
 import DatabaseManager from '@cardstack/db';
 import WalletConnectService from './services/discord-bots/hub-bot/services/wallet-connect';
@@ -160,11 +160,17 @@ export class HubServer {
   private devProxy = inject('development-proxy-middleware', { as: 'devProxy' });
   private apiRouter = inject('api-router', { as: 'apiRouter' });
   private callbacksRouter = inject('callbacks-router', { as: 'callbacksRouter' });
-  private cardRoutes = inject('card-routes', { as: 'cardRoutes' });
+  private cardRoutes: KnownServices['card-routes'] | undefined;
   private healthCheck = inject('health-check', { as: 'healthCheck' });
 
   constructor() {
     initSentry();
+  }
+
+  async ready() {
+    if (process.env.COMPILER) {
+      this.cardRoutes = await getOwner(this).lookup('card-routes');
+    }
   }
 
   @Memoize()
@@ -180,7 +186,7 @@ export class HubServer {
     app.use(this.apiRouter.routes());
     app.use(this.callbacksRouter.routes());
 
-    if (process.env.COMPILER) {
+    if (this.cardRoutes) {
       app.use(this.cardRoutes.routes());
     }
 
