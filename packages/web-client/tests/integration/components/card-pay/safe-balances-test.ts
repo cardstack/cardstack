@@ -71,8 +71,23 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
         @safe={{this.safe}}
       />
     `);
+
+    assert.dom('[data-test-safe-balances]').containsText('0xB236...6666');
     assert.dom('[data-test-safe-balances-count]').containsText('2');
     assert.dom('[data-test-safe-balances-type]').containsText('Depot');
+
+    assert
+      .dom('[data-test-safe-balances-usd-total]')
+      .containsText('$150.00 USD');
+
+    assert
+      .dom('[data-test-safe-balances-token="DAI.CPXD"]')
+      .containsText('250.00 DAI.CPXD')
+      .containsText('$50.00 USD');
+    assert
+      .dom('[data-test-safe-balances-token="CARD.CPXD"]')
+      .containsText('500.00 CARD.CPXD')
+      .containsText('$100.00 USD');
   });
 
   test('it renders a merchant safe', async function (this: Context, assert) {
