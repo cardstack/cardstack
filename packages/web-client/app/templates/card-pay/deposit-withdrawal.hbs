@@ -42,9 +42,11 @@
         </nav>
       </header>
 
-      {{#each this.safes as |safe|}}
-        <CardPay::SafeBalances @safe={{safe}} />
-      {{/each}}
+      <section class='card-pay-dashboard__deposit-withdrawal-cards'>
+        {{#each this.safes as |safe|}}
+          <CardPay::SafeBalances @safe={{safe}} />
+        {{/each}}
+      </section>
 
       {{#if this.layer2Network.depotSafe}}
         {{!-- <CardPay::Depot

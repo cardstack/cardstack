@@ -1,4 +1,7 @@
 .card-pay-safe-balances__container {
+  --card-width: 22.75rem;
+
+  width: var(--card-width);
   background-color: var(--boxel-light);
   border-radius: var(--boxel-border-radius);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
@@ -13,6 +16,7 @@
   padding: var(--boxel-sp-xs) var(--boxel-sp);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   background-color: var(--boxel-dark);
   color: var(--boxel-light);
   border-top-left-radius: inherit;
@@ -20,7 +24,7 @@
 }
 
 .card-pay-safe-balances__network {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   padding-right: var(--boxel-sp-xxs);
@@ -41,6 +45,11 @@
   letter-spacing: var(--boxel-lsp-sm);
 }
 
+.card-pay-safe-balances__type {
+  text-transform: uppercase;
+  font-size: var(--boxel-font-size-xs);
+}
+
 .card-pay-safe-balances__title {
   font-size: 1.625rem;
   font-weight: 600;
@@ -53,10 +62,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid var(--boxel-light-400);
   padding-top: var(--boxel-sp-xl);
   margin-bottom: var(--boxel-sp-lg);
-  font-size: 1.25rem;
+  font-size: var(--boxel-font-size);
   font-weight: 400;
   letter-spacing: 0;
   line-height: calc(27 / 20);
@@ -67,4 +75,23 @@
   margin-left: var(--boxel-sp-xxxs);
   color: var(--boxel-dark-highlight);
   font-weight: 600;
+}
+
+.card-pay-safe-balances__token {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-items: flex-start;
+  padding-top: var(--boxel-sp-lg);
+  border-top: 1px solid var(--boxel-light-400);
+}
+
+.card-pay-safe-balances__token:first-child {
+  border-top: 0;
+}
+
+.card-pay-safe-balances__token-balance-display {
+  --icon-size: var(--boxel-icon-lg);
+  --balance-line-height: 1.2;
+
+  font-weight: 700;
 }

@@ -27,3 +27,9 @@
 .card-pay-dashboard__deposit-withdrawal-nav button {
   margin-left: var(--boxel-sp-sm);
 }
+
+.card-pay-dashboard__deposit-withdrawal-cards {
+  display: grid;
+  gap: var(--boxel-sp-xl) var(--boxel-sp);
+  grid-template-columns: repeat(auto-fill, 22.75rem);
+}

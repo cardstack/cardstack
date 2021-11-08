@@ -1,10 +1,12 @@
 <section class='card-pay-safe-balances__container' data-test-safe-balances>
   <header class='card-pay-safe-balances__header' data-test-card-pay-safe-balances-header>
-    <div class='card-pay-safe-balances__network' data-test-safe-balances-network>
-      On {{network-display-info 'layer2' 'fullName'}}
-    </div>
-    <div class='card-pay-safe-balances__address'>
-      {{truncate-middle @safe.address}}
+    <div>
+      <span class='card-pay-safe-balances__network' data-test-safe-balances-network>
+        On {{network-display-info 'layer2' 'fullName'}}
+      </span>
+      <span class='card-pay-safe-balances__address'>
+        {{truncate-middle @safe.address}}
+      </span>
     </div>
     <div class='card-pay-safe-balances__type' data-test-safe-balances-type>{{this.safeType}}</div>
   </header>
