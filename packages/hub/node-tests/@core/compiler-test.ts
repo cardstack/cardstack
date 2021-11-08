@@ -1,10 +1,11 @@
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { baseCardURL } from '@cardstack/core/src/compiler';
-import { ProjectTestRealm, setupCardBuilding, TEST_REALM } from '../helpers/cards';
 import CardBuilder from '../../services/card-builder';
+import { setupHub } from '../helpers/server';
+import { TEST_REALM } from '@cardstack/core/tests/helpers/fixtures';
 
 const PERSON_CARD = {
-  url: 'https://cardstack.local/person',
+  url: `${TEST_REALM}person`,
   schema: 'schema.js',
   embedded: 'embedded.js',
   files: {
@@ -29,12 +30,10 @@ const PERSON_CARD = {
 if (process.env.COMPILER) {
   describe('Compiler', function () {
     let builder: CardBuilder;
-    let realm: ProjectTestRealm;
-    let { createRealm, getCardBuilder } = setupCardBuilding(this);
+    let { cards, getContainer } = setupHub(this);
 
-    this.beforeEach(() => {
-      realm = createRealm(TEST_REALM);
-      builder = getCardBuilder();
+    this.beforeEach(async () => {
+      builder = await getContainer().lookup('card-builder');
     });
 
     it('string card', async function () {
@@ -51,8 +50,8 @@ if (process.env.COMPILER) {
     });
 
     it('deserializer is inherited', async function () {
-      realm.addRawCard({
-        url: 'https://cardstack.local/fancy-date',
+      cards.create({
+        url: `${TEST_REALM}fancy-date`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -61,32 +60,31 @@ if (process.env.COMPILER) {
           export default @adopts(date) class FancyDate { }`,
         },
       });
-      let compiled = await builder.getCompiledCard('https://cardstack.local/fancy-date');
+      let compiled = await builder.getCompiledCard(`${TEST_REALM}fancy-date`);
       expect(compiled.serializer, 'FancyDate card has date serializer inherited from its parent').to.equal('date');
     });
 
     it('CompiledCard fields', async function () {
-      realm.addRawCard(PERSON_CARD);
+      cards.create(PERSON_CARD);
       let compiled = await builder.getCompiledCard(PERSON_CARD.url);
       expect(Object.keys(compiled.fields)).to.deep.equal(['name', 'birthdate']);
     });
 
     it('CompiledCard embedded view', async function () {
-      realm.addRawCard(PERSON_CARD);
+      cards.create(PERSON_CARD);
       let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
       expect(builder.cache.getModule(compiled.embedded.moduleName)).to.containsSource(
         '{{@model.name}} was born on <HttpsCardstackComBaseDateField @model={{@model.birthdate}} data-test-field-name=\\"birthdate\\" />'
       );
 
-      expect(
-        builder.cache.getAsset('https://cardstack.local/person', 'embedded.css'),
-        'Styles are defined'
-      ).to.containsSource(PERSON_CARD.files['embedded.css']);
+      expect(builder.cache.getAsset(`${TEST_REALM}person`, 'embedded.css'), 'Styles are defined').to.containsSource(
+        PERSON_CARD.files['embedded.css']
+      );
     });
 
     it('CompiledCard edit view', async function () {
-      realm.addRawCard(PERSON_CARD);
+      cards.create(PERSON_CARD);
       let compiled = await builder.getCompiledCard(PERSON_CARD.url);
 
       expect(compiled.edit.usedFields).to.deep.equal(['name', 'birthdate']);
@@ -99,9 +97,9 @@ if (process.env.COMPILER) {
     });
 
     it('nested cards', async function () {
-      realm.addRawCard(PERSON_CARD);
-      realm.addRawCard({
-        url: 'https://cardstack.local/post',
+      cards.create(PERSON_CARD);
+      cards.create({
+        url: `${TEST_REALM}post`,
         schema: 'schema.js',
         embedded: 'embedded.js',
         isolated: 'isolated.js',
@@ -124,7 +122,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      let compiled = await builder.getCompiledCard('https://cardstack.local/post');
+      let compiled = await builder.getCompiledCard(`${TEST_REALM}post`);
       expect(compiled.fields).to.have.all.keys('title', 'author');
 
       expect(compiled.embedded.usedFields).to.deep.equal(['title', 'author.name', 'author.birthdate']);
@@ -137,8 +135,8 @@ if (process.env.COMPILER) {
     });
 
     it('deeply nested cards', async function () {
-      realm.addRawCard({
-        url: 'https://cardstack.local/post',
+      cards.create({
+        url: `${TEST_REALM}post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         embedded: 'embedded.js',
@@ -165,8 +163,8 @@ if (process.env.COMPILER) {
           'embedded.js': templateOnlyComponentTemplate(`<h2><@fields.title /> - <@fields.createdAt /></h2>`),
         },
       });
-      realm.addRawCard({
-        url: 'https://cardstack.local/post-list',
+      cards.create({
+        url: `${TEST_REALM}post-list`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         embedded: 'embedded.js',
@@ -195,7 +193,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      let compiled = await builder.getCompiledCard('https://cardstack.local/post-list');
+      let compiled = await builder.getCompiledCard(`${TEST_REALM}post-list`);
       expect(compiled.fields).to.have.all.keys('posts');
 
       expect(compiled.isolated.usedFields).to.deep.equal(['posts.title', 'posts.createdAt']);
@@ -217,7 +215,7 @@ if (process.env.COMPILER) {
 
     describe('@fields iterating', function () {
       let postCard = {
-        url: 'https://cardstack.local/post',
+        url: `${TEST_REALM}post`,
         schema: 'schema.js',
         embedded: 'embedded.js',
         files: {
@@ -235,11 +233,11 @@ if (process.env.COMPILER) {
       };
 
       this.beforeEach(function () {
-        realm.addRawCard(postCard);
+        cards.create(postCard);
       });
 
       it('iterators of fields and inlines templates', async function () {
-        let compiled = await builder.getCompiledCard('https://cardstack.local/post');
+        let compiled = await builder.getCompiledCard(`${TEST_REALM}post`);
         expect(builder.cache.getModule(compiled.embedded.moduleName)).to.containsSource(
           '<article><label>{{\\"title\\"}}</label></article>'
         );
@@ -247,7 +245,7 @@ if (process.env.COMPILER) {
 
       it('recompiled parent field iterator', async function () {
         let fancyPostCard = {
-          url: 'https://cardstack.local/fancy-post',
+          url: `${TEST_REALM}fancy-post`,
           schema: 'schema.js',
           files: {
             'schema.js': `
@@ -261,7 +259,7 @@ if (process.env.COMPILER) {
           },
         };
         let timelyPostCard = {
-          url: 'https://cardstack.local/timely-post',
+          url: `${TEST_REALM}timely-post`,
           schema: 'schema.js',
           files: {
             'schema.js': `
@@ -275,8 +273,8 @@ if (process.env.COMPILER) {
           },
         };
 
-        realm.addRawCard(fancyPostCard);
-        realm.addRawCard(timelyPostCard);
+        cards.create(fancyPostCard);
+        cards.create(timelyPostCard);
 
         let timelyCompiled = await builder.getCompiledCard(timelyPostCard.url);
         let fancyCompiled = await builder.getCompiledCard(fancyPostCard.url);

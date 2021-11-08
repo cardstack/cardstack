@@ -2,7 +2,7 @@ import { CompiledCard } from '@cardstack/core/src/interfaces';
 import transform, { Options } from '@cardstack/core/src/glimmer-plugin-card-template';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import CardBuilder from '../../services/card-builder';
-import { ProjectTestRealm, setupCardBuilding, TEST_REALM } from '../helpers/cards';
+import { setupHub } from '../helpers/server';
 
 function importAndChooseName() {
   return 'BestGuess';
@@ -11,19 +11,17 @@ function importAndChooseName() {
 if (process.env.COMPILER) {
   describe('Glimmer CardTemplatePlugin', function () {
     let builder: CardBuilder;
-    let realm: ProjectTestRealm;
     let options: Options;
     let defaultFieldFormat: Options['defaultFieldFormat'];
     let usageMeta: Options['usageMeta'];
     let compiledStringCard: CompiledCard, compiledDateCard: CompiledCard, compiledListCard: CompiledCard;
 
-    let { createRealm, getCardBuilder } = setupCardBuilding(this);
+    let { cards, realm, getContainer } = setupHub(this);
 
     this.beforeEach(async () => {
-      realm = createRealm(TEST_REALM);
-      builder = getCardBuilder();
-      realm.addRawCard({
-        url: 'https://cardstack.local/list',
+      builder = await getContainer().lookup('card-builder');
+      cards.create({
+        url: `${realm}list`,
         schema: 'schema.js',
         files: {
           'schema.js': `
@@ -42,7 +40,7 @@ if (process.env.COMPILER) {
           }`,
         },
       });
-      compiledListCard = await builder.getCompiledCard('https://cardstack.local/list');
+      compiledListCard = await builder.getCompiledCard(`${realm}list`);
       compiledStringCard = await builder.getCompiledCard('https://cardstack.com/base/string');
       compiledDateCard = await builder.getCompiledCard('https://cardstack.com/base/date');
     });
@@ -297,8 +295,8 @@ if (process.env.COMPILER) {
     });
 
     it('Tracking deeply nested field usage', async function () {
-      realm.addRawCard({
-        url: 'https://cardstack.local/post',
+      cards.create({
+        url: `${realm}post`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
@@ -320,8 +318,8 @@ if (process.env.COMPILER) {
         },
       });
       let template = `{{#each @fields.posts as |Post|}}<Post />{{/each}}`;
-      realm.addRawCard({
-        url: 'https://cardstack.local/post-list',
+      cards.create({
+        url: `${realm}post-list`,
         schema: 'schema.js',
         isolated: 'isolated.js',
         data: {
@@ -346,7 +344,7 @@ if (process.env.COMPILER) {
         },
       });
 
-      let card = await builder.getCompiledCard('https://cardstack.local/post-list');
+      let card = await builder.getCompiledCard(`${realm}post-list`);
       transform(template, {
         fields: card.fields,
         usageMeta,

@@ -4,25 +4,23 @@ import transformCardComponent, {
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 import { ADDRESS_RAW_CARD, PERSON_RAW_CARD } from '@cardstack/core/tests/helpers/fixtures';
 import { CompiledCard } from '@cardstack/core/src/interfaces';
-import { ProjectTestRealm, setupCardBuilding, TEST_REALM } from '../helpers/cards';
 import type CardBuilder from '../../services/card-builder';
+import { setupHub } from '../helpers/server';
 
 if (process.env.COMPILER) {
   describe('Babel CardTemplatePlugin', function () {
     let builder: CardBuilder;
-    let realm: ProjectTestRealm;
     let options: CardTemplateOptions;
     let personCard: CompiledCard;
     let code: string;
 
-    let { createRealm, getCardBuilder } = setupCardBuilding(this);
+    let { cards, getContainer } = setupHub(this);
 
     this.beforeEach(async () => {
-      realm = createRealm(TEST_REALM);
-      builder = getCardBuilder();
+      builder = await getContainer().lookup('card-builder');
 
-      realm.addRawCard(ADDRESS_RAW_CARD);
-      realm.addRawCard(PERSON_RAW_CARD);
+      cards.create(ADDRESS_RAW_CARD);
+      cards.create(PERSON_RAW_CARD);
       personCard = await builder.getCompiledCard(PERSON_RAW_CARD.url);
 
       options = {

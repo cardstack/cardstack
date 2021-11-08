@@ -7,9 +7,8 @@ import supertest from 'supertest';
 import { default as CardServiceFactory, CardService, INSECURE_CONTEXT } from '../../services/card-service';
 
 import tmp from 'tmp';
+import { TEST_REALM } from '@cardstack/core/tests/helpers/fixtures';
 tmp.setGracefulCleanup();
-
-const REALM = 'https://my-realm/';
 
 interface InternalContext {
   registry?: Registry;
@@ -59,7 +58,7 @@ export function setupHub(mochaContext: Mocha.Suite) {
       cardCache = await container.lookup('card-cache');
       cardCacheConfig = (await container.lookup('card-cache-config')) as TestCardCacheConfig;
       (await container.lookup('realm-manager')).createRealm({
-        url: REALM,
+        url: TEST_REALM,
         directory: tmp.dirSync().name,
       });
       currentCardService = await container.lookup('card-service');
@@ -90,7 +89,7 @@ export function setupHub(mochaContext: Mocha.Suite) {
       return resolveCard(cardCacheConfig.root, module);
     },
     get realm() {
-      return REALM;
+      return TEST_REALM;
     },
   };
 }
