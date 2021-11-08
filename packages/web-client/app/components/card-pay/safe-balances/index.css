@@ -33,7 +33,7 @@
   background-color: var(--boxel-light-400);
   border-radius: 50px;
   font: 600 var(--boxel-font-xs);
-  letter-spacing: var(--boxel-lsp-xl);
+  letter-spacing: var(--boxel-lsp-sm);
   text-transform: uppercase;
 }
 
@@ -48,6 +48,8 @@
 .card-pay-safe-balances__type {
   text-transform: uppercase;
   font-size: var(--boxel-font-size-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
 }
 
 .card-pay-safe-balances__title {
