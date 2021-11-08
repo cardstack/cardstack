@@ -4,9 +4,6 @@ import { Container as ContainerInterface, Factory, isFactoryByCreateMethod } fro
 
 let nonce = 0;
 
-export type RegistryCallback = (registry: Registry) => void;
-export type ContainerCallback = (container: Container) => void;
-
 export class Container implements ContainerInterface {
   private cache = new Map() as Map<CacheKey, CacheEntry>;
   private tearingDown: Deferred<void> | undefined;

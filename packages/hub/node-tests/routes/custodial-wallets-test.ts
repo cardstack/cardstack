@@ -1,6 +1,5 @@
-import { Registry } from '@cardstack/di';
 import Web3 from 'web3';
-import { setupServer } from '../helpers/server';
+import { registry, setupHub } from '../helpers/server';
 
 const { toChecksumAddress } = Web3.utils;
 const stubNonce = 'abc:123';
@@ -90,16 +89,13 @@ function handleGetWyreWalletByName(address: string) {
 }
 
 describe('GET /api/custodial-wallet', function () {
-  let { request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
-      registry.register('wyre', StubWyreService);
-    },
-  });
-
-  this.beforeEach(async function () {
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('wyre', StubWyreService);
     wyreCreateCallCount = 0;
   });
+
+  let { request } = setupHub(this);
 
   it('gets a the custodial wallet for an EOA that is not yet assigned a custodial wallet', async function () {
     await request()

@@ -1,14 +1,12 @@
-import { BadRequest, Conflict, NotFound } from '../utils/error';
 import { assertValidRawCard, RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
-import { ensureDirSync, existsSync, readFileSync, removeSync, writeJsonSync } from 'fs-extra';
+import { existsSync, readFileSync, outputFileSync, removeSync, writeJsonSync, mkdirSync } from 'fs-extra';
 import { join } from 'path';
 import walkSync from 'walk-sync';
 import { RealmInterface } from '../interfaces';
 import { ensureTrailingSlash } from '../utils/path';
 import { nanoid } from '../utils/ids';
 import RealmManager from '../services/realm-manager';
-import { CardError } from '@cardstack/core/src/utils/errors';
-import { chain, merge } from 'lodash';
+import { CardstackError, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
 
 export default class FSRealm implements RealmInterface {
   url: string;
@@ -21,58 +19,40 @@ export default class FSRealm implements RealmInterface {
     this.manager = manager;
   }
 
-  doesCardExist(cardURL: string): boolean {
-    let cardLocation = join(this.directory, cardURL.replace(this.url, ''));
-    return existsSync(cardLocation);
-  }
-
   private buildCardPath(cardURL: string, ...paths: string[]): string {
     return join(this.directory, cardURL.replace(this.url, ''), ...(paths || ''));
   }
 
-  private getRawCardLocation(cardURL: string): string {
-    let cardLocation = this.buildCardPath(cardURL);
-
-    if (existsSync(cardLocation)) {
-      return cardLocation;
-    }
-
-    throw new NotFound(`${cardURL} is not a card we know about`);
-  }
-
-  private ensureIDIsUnique(url: string): void {
-    let path = this.buildCardPath(url);
-    if (existsSync(path)) {
-      throw new Conflict(`Card with that ID already exists: ${url}`);
-    }
-  }
-
-  async getRawCard(cardURL: string): Promise<RawCard> {
-    let dir = this.getRawCardLocation(cardURL);
+  async read(cardURL: string): Promise<RawCard> {
+    let dir = this.buildCardPath(cardURL);
     let files: any = {};
 
-    for (let file of walkSync(dir, {
-      directories: false,
-    })) {
+    let entries: string[];
+    try {
+      entries = walkSync(dir, { directories: false });
+    } catch (err: any) {
+      if (err.code !== 'ENOENT') {
+        throw err;
+      }
+      throw new NotFound(`card ${cardURL} not found`);
+    }
+
+    for (let file of entries) {
       let fullPath = join(dir, file);
       files[file] = readFileSync(fullPath, 'utf8');
     }
 
     let cardJSON = files['card.json'];
     if (!cardJSON) {
-      throw new CardError(`${cardURL} is missing card.json`);
+      throw new CardstackError(`${cardURL} is missing card.json`);
     }
 
     delete files['card.json'];
     let card;
     try {
       card = JSON.parse(cardJSON);
-    } catch (e) {
-      if (e instanceof SyntaxError) {
-        throw new CardError(`${cardURL} has invalid JSON in card.json`, { cause: e });
-      } else {
-        throw e;
-      }
+    } catch (e: any) {
+      throw augmentBadRequest(e);
     }
     Object.assign(card, { files, url: cardURL });
     assertValidRawCard(card);
@@ -80,59 +60,72 @@ export default class FSRealm implements RealmInterface {
     return card;
   }
 
-  writeCardJSON(cardURL: string, card: RawCard): void {
-    let cardDir = this.getRawCardLocation(cardURL);
-    let clonedCard = chain(card).cloneDeep().omit('files').value();
-    writeJsonSync(join(cardDir, 'card.json'), clonedCard);
+  private payload(raw: Omit<RawCard, 'url'>): Omit<RawCard, 'url' | 'files'> {
+    let doc: Omit<RawCard, 'url' | 'files'> = Object.assign({}, raw);
+    delete (doc as any).files;
+    delete (doc as any).url;
+    return doc;
   }
 
-  async createDataCard(data: any, adoptsFrom: string, cardURL?: string): Promise<RawCard> {
-    if (!adoptsFrom) {
-      throw new BadRequest('Card needs to adopt from a parent. Please provide an `adoptsFrom` key');
-    }
-
-    if (!this.manager.doesCardExist(adoptsFrom)) {
-      throw new NotFound(`Parent card does not exist: ${adoptsFrom}`);
-    }
-
-    if (!cardURL) {
-      cardURL = await this.generateIdFromParent(adoptsFrom);
+  private ensureCardURL(raw: RawCard | Omit<RawCard, 'url'>): string {
+    if ('url' in raw) {
+      return raw.url;
     } else {
-      this.ensureIDIsUnique(cardURL);
+      return this.url + nanoid();
+    }
+  }
+
+  async create(raw: RawCard | Omit<RawCard, 'url'>): Promise<RawCard> {
+    let url = this.ensureCardURL(raw);
+    let cardDir = this.buildCardPath(url);
+
+    try {
+      mkdirSync(cardDir);
+    } catch (err: any) {
+      if (err.code !== 'EEXIST') {
+        throw err;
+      }
+      throw new Conflict(`card ${url} already exists`);
+    }
+    let completeRawCard: RawCard;
+    if ('url' in raw) {
+      completeRawCard = raw;
+    } else {
+      completeRawCard = Object.assign({}, raw, { url });
     }
 
+    this.write(cardDir, completeRawCard);
+    return completeRawCard;
+  }
+
+  async update(raw: RawCard): Promise<RawCard> {
+    let cardDir = this.buildCardPath(raw.url);
+    this.write(cardDir, raw);
+    return raw;
+  }
+
+  private write(cardDir: string, raw: RawCard) {
+    let payload = this.payload(raw);
+    try {
+      writeJsonSync(join(cardDir, 'card.json'), payload);
+    } catch (err: any) {
+      if (err.code !== 'ENOENT') {
+        throw err;
+      }
+      throw new NotFound(`tried to update card ${raw.url} but it does not exist`);
+    }
+    if (raw.files) {
+      for (let [name, contents] of Object.entries(raw.files)) {
+        outputFileSync(join(cardDir, name), contents);
+      }
+    }
+  }
+
+  async delete(cardURL: string): Promise<void> {
     let cardDir = this.buildCardPath(cardURL);
-    ensureDirSync(cardDir);
-
-    let card: RawCard = {
-      url: cardURL,
-      adoptsFrom,
-      data,
-    };
-
-    assertValidRawCard(card);
-    this.writeCardJSON(cardURL, card);
-
-    return card;
-  }
-
-  private generateIdFromParent(url: string): string {
-    let name = url.replace(this.url, '');
-    let id = nanoid();
-    return `${this.url}${name}-${id}`;
-  }
-
-  async updateCardData(cardURL: string, attributes: any): Promise<RawCard> {
-    let card = await this.getRawCard(cardURL);
-    card.data = merge(card.data, attributes);
-    assertValidRawCard(card);
-    this.writeCardJSON(cardURL, card);
-
-    return card;
-  }
-
-  deleteCard(cardURL: string) {
-    let cardDir = this.getRawCardLocation(cardURL);
+    if (!existsSync(cardDir)) {
+      throw new NotFound(`tried to delete ${cardURL} but it does not exist`);
+    }
     removeSync(cardDir);
   }
 }

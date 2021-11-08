@@ -1,6 +1,5 @@
-import { Registry } from '@cardstack/di';
 import { Job, TaskSpec } from 'graphile-worker';
-import { setupServer } from '../helpers/server';
+import { registry, setupHub } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -40,12 +39,12 @@ function handleValidateAuthToken(encryptedString: string) {
 }
 
 describe('POST /api/merchant-infos', function () {
-  let { request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
-      registry.register('worker-client', StubWorkerClient);
-    },
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
   });
+
+  let { request } = setupHub(this);
 
   this.afterEach(async function () {
     lastAddedJobIdentifier = undefined;
@@ -291,12 +290,12 @@ describe('POST /api/merchant-infos', function () {
 });
 
 describe('GET /api/merchant-infos/validate-slug/:slug', function () {
-  let { request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
-      registry.register('worker-client', StubWorkerClient);
-    },
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
   });
+
+  let { request } = setupHub(this);
 
   this.afterEach(async function () {
     lastAddedJobIdentifier = undefined;
