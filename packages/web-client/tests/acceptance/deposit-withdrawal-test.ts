@@ -67,6 +67,10 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
         issuer: layer2AccountAddress,
         reloadable: false,
         transferrable: false,
+        tokens: [
+          createSafeToken('DAI.CPXD', '14142298700000000000'),
+          createSafeToken('CARD.CPXD', '567899100000000000000'),
+        ],
       }),
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
