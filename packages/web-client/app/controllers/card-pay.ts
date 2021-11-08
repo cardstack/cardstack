@@ -7,7 +7,7 @@ import { tracked } from '@glimmer/tracking';
 import { currentNetworkDisplayInfo as c } from '../utils/web3-strategies/network-display-info';
 import config from '../config/environment';
 
-interface ChainChangeModalOptions {
+interface NetworkProblemModalOptions {
   title: string;
   body: string;
   actionText: string;
@@ -23,7 +23,7 @@ export default class CardPayController extends Controller {
   @tracked isShowingLayer1ConnectModal = false;
   @tracked isShowingLayer2ConnectModal = false;
   @tracked needsReload = false;
-  @tracked chainChangeModalOptions: ChainChangeModalOptions | null = null;
+  @tracked networkProblemModalOptions: NetworkProblemModalOptions | null = null;
 
   constructor() {
     super(...arguments);
@@ -46,11 +46,11 @@ export default class CardPayController extends Controller {
   }
 
   @action showNetworkUnstableModal(network: keyof typeof c) {
-    if (this.chainChangeModalOptions) return;
-    this.showChainChangeModal({
+    if (this.networkProblemModalOptions) return;
+    this.showNetworkProblemModal({
       title: `Disconnected from ${c[network].fullName}`,
       body: `Sorry! Card Pay is disconnected from ${c[network].fullName}. You can restore the connection by refreshing the page.`,
-      onClose: this.hideChainChangeModal,
+      onClose: this.hideNetworkProblemModal,
       action: () => window.open(config.urls.discordSupportChannelUrl, '_blank'),
       actionText: 'Contact Cardstack Support',
       dismissable: true,
@@ -60,7 +60,7 @@ export default class CardPayController extends Controller {
   @action
   onLayer1Incorrect() {
     this.needsReload = true;
-    this.showChainChangeModal({
+    this.showNetworkProblemModal({
       title: `Please connect to ${c.layer1.fullName}`,
       body: `Card Pay uses ${c.layer1.fullName} as its Layer 1 network. To ensure the safety of your assets and transactions, this page will reload as soon as you change your wallet’s network to ${c.layer1.fullName} or disconnect your wallet.`,
       onClose: () => {},
@@ -73,12 +73,12 @@ export default class CardPayController extends Controller {
   @action
   onLayer2Incorrect() {
     // don't allow layer 2 modal options to override layer 1
-    if (this.chainChangeModalOptions) return;
-    this.showChainChangeModal({
+    if (this.networkProblemModalOptions) return;
+    this.showNetworkProblemModal({
       title: `Please connect to ${c.layer2.fullName}`,
       body: `Card Pay uses ${c.layer2.fullName} as its Layer 2 network. To ensure the safety of your assets and transactions, we’ve disconnected your wallet. You can restart any incomplete workflows after reconnecting with ${c.layer2.fullName}.`,
-      onClose: this.hideChainChangeModal,
-      action: this.hideChainChangeModal,
+      onClose: this.hideNetworkProblemModal,
+      action: this.hideNetworkProblemModal,
       actionText: 'Dismiss',
       dismissable: true,
     });
@@ -94,13 +94,13 @@ export default class CardPayController extends Controller {
   }
 
   @action
-  showChainChangeModal(options: ChainChangeModalOptions) {
-    this.chainChangeModalOptions = options;
+  showNetworkProblemModal(options: NetworkProblemModalOptions) {
+    this.networkProblemModalOptions = options;
   }
 
   @action
-  hideChainChangeModal() {
-    this.chainChangeModalOptions = null;
+  hideNetworkProblemModal() {
+    this.networkProblemModalOptions = null;
   }
 
   @action transitionTo(routeName: string) {

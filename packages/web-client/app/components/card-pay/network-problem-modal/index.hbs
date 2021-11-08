@@ -1,11 +1,11 @@
 <Boxel::Modal
-  class="chain-change-modal"
+  class="network-problem-modal"
   @isOpen={{@isOpen}}
   @onClose={{@onClose}}
   @layer="urgent"
 >
   <div
-    class="chain-change-modal__scroll-wrapper"
+    class="network-problem-modal__scroll-wrapper"
     {{focus-trap
       focusTrapOptions=(hash
         allowOutsideClick=@dismissable
@@ -14,12 +14,12 @@
     }}
   >
     <Boxel::CardContainer
-      class="chain-change-modal__card"
+      class="network-problem-modal__card"
       tabindex="-1"
     >
-      <header class="chain-change-modal__card-title">
-          {{svg-jar "warning" class="chain-change-modal__card-title-icon" width="30" height="30"}}
-          <div class="chain-change-modal__card-title-content">
+      <header class="network-problem-modal__card-title">
+          {{svg-jar "warning" class="network-problem-modal__card-title-icon" width="30" height="30"}}
+          <div class="network-problem-modal__card-title-content">
             {{@title}}
           </div>
       </header>
