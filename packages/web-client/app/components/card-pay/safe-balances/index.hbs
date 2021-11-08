@@ -1,30 +1,30 @@
 <section class='card-pay-safe-balances__container' data-test-safe-balances>
-  <header class="card-pay-safe-balances__header" data-test-card-pay-safe-balances-header>
-    <div class="card-pay-safe-balances__network" data-test-safe-balances-network>
-      On {{network-display-info "layer2" "fullName"}}
+  <header class='card-pay-safe-balances__header' data-test-card-pay-safe-balances-header>
+    <div class='card-pay-safe-balances__network' data-test-safe-balances-network>
+      On {{network-display-info 'layer2' 'fullName'}}
     </div>
-    <div class="card-pay-safe-balances__address">
+    <div class='card-pay-safe-balances__address'>
       {{truncate-middle @safe.address}}
     </div>
     <div class='card-pay-safe-balances__type' data-test-safe-balances-type>{{this.safeType}}</div>
   </header>
-  <section class="card-pay-safe-balances__body">
-    <h3 class="card-pay-safe-balances__title">FIXME</h3>
-    <h4 class="card-pay-safe-balances__balances-title">
+  <section class='card-pay-safe-balances__body'>
+    <h3 class='card-pay-safe-balances__title'>FIXME</h3>
+    <h4 class='card-pay-safe-balances__balances-title'>
       <div>
         Balances
         <span class='card-pay-safe-balances__balances-num' data-test-safe-balances-count>
           {{this.tokenBalances.length}}
         </span>
       </div>
-      <div class="card-pay-safe-balances__balances-num" data-test-safe-balances-usd-total>
+      <div class='card-pay-safe-balances__balances-num' data-test-safe-balances-usd-total>
         {{format-usd this.usdBalanceTotal}}
       </div>
     </h4>
     {{#each this.tokenBalances as |b|}}
-      <div class="card-pay-safe-balances__token" data-test-safe-balances-token={{b.symbol}}>
+      <div class='card-pay-safe-balances__token' data-test-safe-balances-token={{b.symbol}}>
         <CardPay::BalanceDisplay
-          class="card-pay-safe-balances__token-balance-display"
+          class='card-pay-safe-balances__token-balance-display'
           @icon={{b.icon}}
           @balance={{format-wei-amount b.balance}}
           @symbol={{b.symbol}}
