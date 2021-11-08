@@ -4,14 +4,18 @@ import DatabaseManager from '@cardstack/db';
 import { Snowflake } from '@cardstack/discord-bot/types';
 import { SnowflakeUtil } from '@cardstack/discord-bot';
 import { createContainer } from '../../../main';
+import type { Container } from '@cardstack/di';
 
 describe('HubDiscordBotsDatabaseGateway', function () {
-  let subject: HubDiscordBotsDbGateway, dbManager: DatabaseManager, botId: SUUID;
+  let subject: HubDiscordBotsDbGateway, dbManager: DatabaseManager, botId: SUUID, container: Container;
   beforeEach(async function () {
-    let container = createContainer();
+    container = createContainer();
     subject = await container.lookup('hub-discord-bots-db-gateway');
     dbManager = await container.lookup('database-manager');
     botId = shortUuid.generate();
+  });
+  afterEach(async function () {
+    await container.teardown();
   });
 
   describe('updateStatus', function () {
