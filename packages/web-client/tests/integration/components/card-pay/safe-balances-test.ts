@@ -7,13 +7,14 @@ import { setupMirage } from 'ember-cli-mirage/test-support';
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
 
+import { Safe } from '@cardstack/cardpay-sdk';
 import {
   createDepotSafe,
   createMerchantSafe,
   createPrepaidCardSafe,
   createSafeToken,
 } from '@cardstack/web-client/utils/test-factories';
-import { Safe } from '@cardstack/cardpay-sdk';
+import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 interface Context extends MirageTestContext {}
 
@@ -73,6 +74,9 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
     `);
 
     assert.dom('[data-test-safe-balances]').containsText('0xB236...6666');
+    assert
+      .dom('[data-test-safe-balances-network]')
+      .containsText(`On ${c.layer2.shortName}`);
     assert.dom('[data-test-safe-balances-count]').containsText('2');
     assert.dom('[data-test-safe-balances-type]').containsText('Depot');
 
