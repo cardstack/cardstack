@@ -83,6 +83,10 @@ export default abstract class Layer1ChainWeb3Strategy
       'cross-tab-connection',
       this.onCrossTabConnection
     );
+    this.connectionManager.on(
+      'websocket-disconnected',
+      this.onWebsocketDisconnected
+    );
     this.nativeTokenSymbol = getConstantByNetwork(
       'nativeTokenSymbol',
       this.networkSymbol
@@ -150,6 +154,11 @@ export default abstract class Layer1ChainWeb3Strategy
       this.simpleEmitter.emit('disconnect');
     }
     this.cleanupConnectionState();
+  }
+
+  @action
+  private onWebsocketDisconnected() {
+    this.simpleEmitter.emit('websocket-disconnected');
   }
 
   async reconnect() {

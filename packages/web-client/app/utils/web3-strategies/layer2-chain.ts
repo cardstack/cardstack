@@ -171,8 +171,8 @@ export default abstract class Layer2ChainWeb3Strategy
     });
 
     this.provider.on('websocket-disconnected', () => {
+      this.simpleEmitter.emit('websocket-disconnected');
       this.disconnect();
-      // this.simpleEmitter.emit('websocket-disconnected');
     });
 
     this.web3.setProvider(this.provider as any);
