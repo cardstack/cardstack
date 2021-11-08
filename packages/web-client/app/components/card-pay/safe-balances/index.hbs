@@ -1,5 +1,5 @@
 <section class='card-pay-safe-balances__container' data-test-safe-balances>
-  <header class='card-pay-safe-balances__header' data-test-card-pay-safe-balances-header>
+  <header aria-label='metadata' class='card-pay-safe-balances__header' data-test-card-pay-safe-balances-header>
     <div>
       <span class='card-pay-safe-balances__network' data-test-safe-balances-network>
         On {{network-display-info 'layer2' 'fullName'}}
@@ -11,7 +11,7 @@
     <div class='card-pay-safe-balances__type' data-test-safe-balances-type>{{this.safeType}}</div>
   </header>
   <section class='card-pay-safe-balances__body'>
-    <h3 class='card-pay-safe-balances__title' data-test-safe-balances-title>
+    <header aria-label='title' class='card-pay-safe-balances__title-container' data-test-safe-balances-title>
       {{#if this.data.icon}}
         {{svg-jar this.data.icon width="20" height="20" class='card-pay-safe-balances__logo' data-test-safe-balances-logo=this.data.icon}}
       {{else}}
@@ -22,8 +22,22 @@
           @logoTextColor={{this.data.info.textColor}}
         />
       {{/if}}
-      <div>{{this.data.info.name}}</div>
-    </h3>
+      <div>
+        <h3 class='card-pay-safe-balances__title'>
+          {{this.data.info.name}}
+        </h3>
+        {{#if this.data.info.id}}
+          <a
+            href={{concat 'https://cardstack.xyz/' this.data.info.id}}
+            class='card-pay-safe-balances__title-link'
+            target='_blank'
+            rel='noopener noreferrer'
+            data-test-safe-balances-link>
+            cardstack.xyz/{{this.data.info.id}} {{!--FIXME does this work yet --}}
+          </a>
+        {{/if}}
+      </div>
+    </header>
     <h4 class='card-pay-safe-balances__balances-title'>
       <div>
         Balances

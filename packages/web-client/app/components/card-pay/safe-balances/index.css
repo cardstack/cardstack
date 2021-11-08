@@ -52,13 +52,16 @@
   letter-spacing: var(--boxel-lsp-xl);
 }
 
+.card-pay-safe-balances__title-container {
+  line-height: calc(36 / 26);
+  display: flex;
+  align-items: center;
+}
+
 .card-pay-safe-balances__title {
   font-size: 1.625rem;
   font-weight: 600;
   letter-spacing: 0;
-  line-height: calc(36 / 26);
-  display: flex;
-  align-items: center;
 }
 
 .card-pay-safe-balances__logo {
@@ -69,6 +72,16 @@
 
 .card-pay-safe-balances__logo.merchant-logo {
   font-size: var(--boxel-font-size-xl);
+}
+
+.card-pay-safe-balances__title-link {
+  color: var(--boxel-purple-400);
+  font-size: var(--boxel-font-size-sm);
+}
+
+.card-pay-safe-balances__title-link:hover {
+  color: var(--boxel-purple-400);
+  text-decoration: underline;
 }
 
 .card-pay-safe-balances__balances-title {

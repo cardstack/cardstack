@@ -97,6 +97,7 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
 
     assert.dom('[data-test-safe-balances-title]').containsText('Depot');
     assert.dom('[data-test-safe-balances-logo=depot-arrows]').exists();
+    assert.dom('[data-test-safe-balances-link]').doesNotExist();
 
     assert
       .dom('[data-test-safe-balances-usd-total]')
@@ -124,6 +125,10 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
 
     await settled();
     assert.dom('[data-test-safe-balances-title]').containsText('Mandello');
+    assert
+      .dom('[data-test-safe-balances-link]')
+      .containsText('cardstack.xyz/mandello1')
+      .hasAttribute('href', 'https://cardstack.xyz/mandello1');
 
     assert
       .dom('[data-test-merchant-logo]')
