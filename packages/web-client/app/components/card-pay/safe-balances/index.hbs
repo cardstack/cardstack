@@ -12,7 +12,17 @@
   </header>
   <section class='card-pay-safe-balances__body'>
     <h3 class='card-pay-safe-balances__title' data-test-safe-balances-title>
-      {{this.data.info.name}}
+      {{#if this.data.icon}}
+        {{svg-jar this.data.icon width="20" height="20" class='card-pay-safe-balances__logo' data-test-safe-balances-logo=this.data.icon}}
+      {{else}}
+        <CardPay::MerchantLogo
+          class='card-pay-safe-balances__logo'
+          @name={{first-char this.data.info.name}}
+          @logoBackground={{this.data.info.backgroundColor}}
+          @logoTextColor={{this.data.info.textColor}}
+        />
+      {{/if}}
+      <div>{{this.data.info.name}}</div>
     </h3>
     <h4 class='card-pay-safe-balances__balances-title'>
       <div>

@@ -16,6 +16,7 @@ import {
   getFilenameFromDid,
 } from '@cardstack/web-client/utils/test-factories';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
+import { TinyColor } from '@ctrl/tinycolor';
 
 interface Context extends MirageTestContext {}
 
@@ -95,6 +96,7 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
     assert.dom('[data-test-safe-balances-type]').containsText('Depot');
 
     assert.dom('[data-test-safe-balances-title]').containsText('Depot');
+    assert.dom('[data-test-safe-balances-logo=depot-arrows]').exists();
 
     assert
       .dom('[data-test-safe-balances-usd-total]')
@@ -122,6 +124,14 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
 
     await settled();
     assert.dom('[data-test-safe-balances-title]').containsText('Mandello');
+
+    assert
+      .dom('[data-test-merchant-logo]')
+      .containsText('M')
+      .hasStyle({
+        'background-color': new TinyColor('#00ffcc').toRgbString(),
+        color: new TinyColor('#000000').toRgbString(),
+      });
   });
 
   test('it throws an error rendering a prepaid card safe', async function (this: Context, assert) {

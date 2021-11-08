@@ -56,6 +56,18 @@
   letter-spacing: 0;
   line-height: calc(36 / 26);
   margin-bottom: var(--boxel-sp-xl);
+  display: flex;
+  align-items: center;
+}
+
+.card-pay-safe-balances__logo {
+  width: 80px;
+  height: 80px;
+  margin-right: var(--boxel-sp);
+}
+
+.card-pay-safe-balances__logo.merchant-logo {
+  font-size: var(--boxel-font-size-xl);
 }
 
 .card-pay-safe-balances__balances-title {
