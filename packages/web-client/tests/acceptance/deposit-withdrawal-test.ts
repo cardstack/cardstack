@@ -96,14 +96,6 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
     assert
       .dom(`${depotSafeSel} [data-test-safe-balances-usd-total]`)
       .containsText(`$116.41 USD`);
-    assert
-      .dom(`${depotSafeSel} [data-test-safe-balances-token="DAI.CPXD"]`)
-      .containsText('14.14 DAI.CPXD')
-      .containsText('$2.83 USD');
-    assert
-      .dom(`${depotSafeSel} [data-test-safe-balances-token="CARD.CPXD"]`)
-      .containsText('567.90 CARD.CPXD')
-      .containsText('$113.58 USD');
 
     let merchantSafeSel = `[data-test-safe-balances]:nth-of-type(2)`;
 
@@ -112,12 +104,6 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
     assert
       .dom(`${merchantSafeSel} [data-test-safe-balances-count]`)
       .containsText('1');
-    assert
-      .dom(`${merchantSafeSel} [data-test-safe-balances-token]`)
-      .exists({ count: 1 });
-    assert
-      .dom(`${merchantSafeSel} [data-test-safe-balances-token="CARD.CPXD"]`)
-      .containsText('467.90 CARD.CPXD');
 
     let secondAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6EbAAAA';
     layer2Service.test__simulateRemoteAccountSafes(secondAddress, [
