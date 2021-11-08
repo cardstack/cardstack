@@ -82,7 +82,7 @@ module(
       assert
         .dom('.ember-power-select-options li:nth-child(2)')
         .containsText('Mandello')
-        .containsText('Merchant account')
+        .containsText('Business account')
         .containsText('0xmerchantbAB0644ffCD32518eBF4924ba8666666');
       assert
         .dom(

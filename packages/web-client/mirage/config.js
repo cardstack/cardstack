@@ -31,18 +31,18 @@ export default function () {
       if (slug === 'www') {
         return {
           slugAvailable: false,
-          detail: 'This Merchant ID is not allowed',
+          detail: 'This Business ID is not allowed',
         };
       } else if (merchantBySlug) {
         return {
           slugAvailable: false,
           detail:
-            'This Merchant ID is already taken. Please choose another one',
+            'This Business ID is already taken. Please choose another one',
         };
       } else {
         return {
           slugAvailable: true,
-          detail: 'Merchant slug is available',
+          detail: 'Business slug is available',
         };
       }
     }

@@ -1,5 +1,5 @@
 {{#let @model as |item|}}
-  <Boxel @class="master-collection__boxel master-collection__boxel--{{@format}}">
+  <div class="boxel master-collection__boxel master-collection__boxel--{{@format}}">
     {{#if @expandAction}}
       <BoxelHighlight @expandAction={{@expandAction}} @class="master-collection__highlighter" @on={{item.selected}} />
       {{#if (eq @mode "edit")}}
@@ -43,5 +43,5 @@
         </ul>
       {{/if}}
     </div>
-  </Boxel>
+  </div>
 {{/let}}

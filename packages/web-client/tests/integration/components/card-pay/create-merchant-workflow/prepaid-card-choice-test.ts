@@ -17,10 +17,10 @@ interface Context extends MirageTestContext {}
 const USER_REJECTION_ERROR_MESSAGE =
   'It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.';
 const TIMEOUT_ERROR_MESSAGE =
-  'There was a problem creating your merchant. Please contact Cardstack support to find out the status of your transaction.';
-const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `It looks like your prepaid card doesn't have enough funds to pay the 100 SPEND ($1.00 USD) merchant creation fee. Please try another prepaid card, or buy one in Card Wallet.`;
+  'There was a problem creating your business account. Please contact Cardstack support to find out the status of your transaction.';
+const INSUFFICIENT_FUNDS_ERROR_MESSAGE = `It looks like your prepaid card doesn't have enough funds to pay the 100 SPEND ($1.00 USD) business account creation fee. Please try another prepaid card, or buy one in Card Wallet.`;
 const DEFAULT_ERROR_MESSAGE =
-  'There was a problem creating your merchant. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact Cardstack support.';
+  'There was a problem creating your business account. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact Cardstack support.';
 
 module(
   'Integration | Component | card-pay/create-merchant/prepaid-card-choice',
@@ -97,7 +97,9 @@ module(
     test('it shows the correct data in default state', async function (assert) {
       assert
         .dom(`[data-test-boxel-card-container]`)
-        .containsText('Choose a prepaid card to pay the merchant creation fee');
+        .containsText(
+          'Choose a prepaid card to pay the business account creation fee'
+        );
       assert
         .dom('[data-test-prepaid-card-choice-merchant-fee]')
         .containsText('100 SPEND');
@@ -181,7 +183,9 @@ module(
 
       assert
         .dom(`[data-test-boxel-card-container]`)
-        .containsText('Choose a prepaid card to pay the merchant creation fee');
+        .containsText(
+          'Choose a prepaid card to pay the business account creation fee'
+        );
       assert
         .dom('[data-test-prepaid-card-choice-merchant-fee]')
         .containsText('100 SPEND');
@@ -194,7 +198,7 @@ module(
     test('it allows canceling and retrying after a while', async function (assert) {
       assert
         .dom('[data-test-create-merchant-button]')
-        .containsText('Create Merchant');
+        .containsText('Create Business Account');
 
       await selectPrepaidCard(prepaidCardAddress);
       await click('[data-test-create-merchant-button]');
@@ -249,7 +253,7 @@ module(
 
         assert
           .dom('[data-test-create-merchant-button]')
-          .containsText('Create Merchant');
+          .containsText('Create Business Account');
 
         await selectPrepaidCard(prepaidCardAddress);
         await click('[data-test-create-merchant-button]');

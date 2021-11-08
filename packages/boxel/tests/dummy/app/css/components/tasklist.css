@@ -1,3 +1,12 @@
+.tasklist__platter {
+  width: 100%;
+  min-width: 230px;
+  min-height: 100px;
+  background-color: var(--boxel-light);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: var(--boxel-box-shadow);
+}
+
 .tasklist {
   --tasklist-user-tasks: var(--boxel-lime);
   --tasklist-assigned-tasks: var(--boxel-lilac);

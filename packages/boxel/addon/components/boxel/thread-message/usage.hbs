@@ -80,6 +80,7 @@
           @imgURL={{this.cardbotIcon}}
           @hideMeta={{gt i 0}}
           @hideName={{true}}
+          @datetime={{this.datetime}}
         >
           {{message}}
         </Boxel::ThreadMessage>
@@ -88,33 +89,33 @@
   </:example>
 </Freestyle::Usage>
 
-<Freestyle::Usage
-  @slug="with-cards"
->
-  <:description>
-    <p>
-      The examples with embedded cards below are using the <code>@fullWidth</code> argument to
-      have access to the full-width content area. Smaller cards have a left margin the size of
-      <code>var(--boxel-thread-message-margin-left)</code> css variable for alignment.
-    </p>
-    <p>
-      Using the <code>@fullWidth</code> argument:
-      <ul>
-        <li>Allows the content to have access to the full-width content area</li>
-        <li>Adds spacing between the timestamp and the content</li>
-        <li>Vertically centers the timestamp in relation to the avatar</li>
-      </ul>
-    </p>
-    <p>
-      (Note: The messages below also have custom css applied which restricts their max-width. See <code>usage.css</code> file.)
-    </p>
-  </:description>
+<FreestyleAnnotation>
+  <p>
+    The examples with embedded cards below are using the <code>@fullWidth</code> argument to
+    have access to the full-width content area. Smaller cards have a left margin the size of
+    <code>var(--boxel-thread-message-margin-left)</code> css variable for alignment.
+  </p>
+  <p>
+    Using the <code>@fullWidth</code> argument:
+    <ul>
+      <li>Allows the content to have access to the full-width content area</li>
+      <li>Adds spacing between the timestamp and the content</li>
+      <li>Vertically centers the timestamp in relation to the avatar</li>
+    </ul>
+  </p>
+  <p>
+    (Note: The messages below also have custom css applied which restricts their max-width. See <code>usage.css</code> file.)
+  </p>
+</FreestyleAnnotation>
+
+<Freestyle::Usage @slug="with-cards">
   <:example>
     <div class="thread-message-usage">
       <Boxel::ThreadMessage
         @name="Cardbot"
         @hideName={{true}}
         @imgURL={{this.cardbotIcon}}
+        @datetime={{this.datetime}}
       >
         <p class="thread-message-usage__content">
           Hello, it’s nice to see you!
@@ -125,6 +126,7 @@
         @hideName={{true}}
         @hideMeta={{true}}
         @imgURL={{this.cardbotIcon}}
+        @datetime={{this.datetime}}
       >
         <p class="thread-message-usage__content">
           Let’s issue a Prepaid Card.
@@ -134,6 +136,7 @@
         @name="Cardbot"
         @hideName={{true}}
         @imgURL={{this.cardbotIcon}}
+        @datetime={{this.datetime}}
       >
         <p class="thread-message-usage__content">
           Let’s get down to business. Please choose the asset you would like
@@ -146,6 +149,7 @@
         @hideMeta={{true}}
         @imgURL={{this.cardbotIcon}}
         @fullWidth={{true}}
+        @datetime={{this.datetime}}
       >
         <Boxel::CardContainer
           class={{cn
@@ -167,6 +171,7 @@
         @hideName={{true}}
         @imgURL={{this.cardbotIcon}}
         @fullWidth={{true}}
+        @datetime={{this.datetime}}
       >
         <Boxel::CardContainer
           class="thread-message-usage__card thread-message-usage__card--memorialized"
@@ -180,6 +185,7 @@
         @hideName={{true}}
         @imgURL={{this.cardbotIcon}}
         @fullWidth={{true}}
+        @datetime={{this.datetime}}
       >
         <Boxel::CardContainer
           class={{cn

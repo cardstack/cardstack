@@ -14,7 +14,7 @@ const BALANCES_PANEL = {
       icon: 'balances-customers',
       title: 'Customers',
       description: `You need a prepaid card to pay for products and services
-        offered by merchants in the Card Pay network. To start, you can buy
+        offered by businesses in the Card Pay network. To start, you can buy
         a prepaid card via Apple Pay in the Card Wallet mobile app.`,
       bullets: [
         'Pay with your prepaid card as you make purchases in the network',

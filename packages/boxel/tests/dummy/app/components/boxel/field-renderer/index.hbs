@@ -106,7 +106,7 @@
       {{#if (and @field.value (or @field.id (eq @field.type "card")))}}
         {{component (or @field.component "card") model=@field.value mode="view" status=(if @showCompHighlights (if @field.status @field.status "no-change")) comparisonType=@comparisonType drillDown=@drillDown fieldData=@field}}
       {{else if (and @field.value (is-array @field.value))}}
-        <Boxel>
+        <div class="boxel">
           {{#if @showCompHighlights}}
             <BoxelHighlight @status={{@field.status}} />
             <BoxelActions @class="boxel-actions--comparison-mode" @status={{if @field.status @field.status "no-change"}}>
@@ -136,10 +136,10 @@
               {{/let}}
             </div>
           </div>
-        </Boxel>
+        </div>
       {{else}}
         {{#if @field.value}}
-          <Boxel>
+          <div class="boxel">
             {{#if @showCompHighlights}}
               <BoxelHighlight @status={{@field.status}} />
               <BoxelActions @class="boxel-actions--comparison-mode" @status={{if @field.status @field.status "no-change"}}>
@@ -153,7 +153,7 @@
                 {{@field.value}}
               </div>
             </div>
-          </Boxel>
+          </div>
         {{else}}
           {{#if (includes @field.title @omittedFields)}}
             N/A
@@ -176,7 +176,7 @@
       <BoxelHighlight @status="added" />
       <BoxelActions @status="added" />
     {{/if}}
-    <Boxel @class="field-renderer__value {{if (eq @field.type "image") "field-renderer__value--img-field"}}">
+    <div class="boxel field-renderer__value {{if (eq @field.type "image") "field-renderer__value--img-field"}}">
       {{#if (and @comparisonMode (includes @field.title @addedValues))}}
         <BoxelHighlight @status="added" />
         <BoxelActions @status="added" />
@@ -190,18 +190,18 @@
           {{#if (and @comparisonMode @field.value.id (eq @changedCards.0.value.id @field.value.id))}}
             <div>
               <ins class="field-renderer--inserted">{{component (or @field.component "card") model=@field.value mode="view" status="changed"}}</ins>
-              <Boxel>
+              <div class="boxel">
                 <BoxelHighlight @status="deleted" />
                 <BoxelActions @status="deleted" />
                 <del class="field-renderer--deleted">{{@changedCards.0.oldValue}}</del>
-              </Boxel>
+              </div>
             </div>
           {{else if (and @comparisonMode @modifiedCard.value (is-equal @modifiedCard.value @field.value))}}
-            <Boxel>
+            <div class="boxel">
               <BoxelHighlight @status="modified" />
               <BoxelActions @status="modified"><div class="field-renderer__modified-count">{{@modifiedCard.value.fields.length}}</div></BoxelActions>
               {{component (or @field.component "card") model=@field.value mode="view"}}
-            </Boxel>
+            </div>
           {{else}}
             {{component (or @field.component "card") model=@field.value mode="view" expandAction=@expandAction}}
           {{/if}}
@@ -248,29 +248,29 @@
             {{#with (find-by "title" @field.title @changedFields) as |changed|}}
               {{#if (eq @field.type "image")}}
                 <div>
-                  <Boxel>
+                  <div class="boxel">
                     <BoxelHighlight @status="changed" />
                     <BoxelActions @status="changed" />
                     <ins class="field-renderer--inserted"><img src={{@field.value}} width="260" height="260" alt="cover" /></ins>
-                  </Boxel>
-                  <Boxel>
+                  </div>
+                  <div class="boxel">
                     <BoxelHighlight @status="deleted" />
                     <BoxelActions @status="deleted" />
                     <del class="field-renderer--deleted"><img src={{changed.oldValue}} width="260" height="260" alt="cover" /></del>
-                  </Boxel>
+                  </div>
                 </div>
               {{else}}
                 <div>
-                  <Boxel>
+                  <div class="boxel">
                     <BoxelHighlight @status="changed" />
                     <BoxelActions @status="changed" />
                     <ins class="field-renderer--inserted">{{if (eq @field.title "title") (titleize @field.value) @field.value}}</ins>
-                  </Boxel>
-                  <Boxel>
+                  </div>
+                  <div class="boxel">
                     <BoxelHighlight @status="deleted" />
                     <BoxelActions @status="deleted" />
                     <del class="field-renderer--deleted">{{changed.oldValue}}</del>
-                  </Boxel>
+                  </div>
                 </div>
               {{/if}}
             {{/with}}
@@ -290,6 +290,6 @@
       {{else}}
         <div class="field-renderer__placeholder field-renderer__placeholder--{{@field.title}} field-renderer__opacity-control">N/A</div>
       {{/if}}
-    </Boxel>
+    </div>
   </Boxel::Field>
 {{/if}}

@@ -1,18 +1,21 @@
 <Freestyle::Usage @name="Thread">
+  <:description>
+    <Boxel::Button {{on "click" this.addMessage}}>Add a message</Boxel::Button>
+  </:description>
   <:example>
-    <button {{on "click" this.addMessage}}>Add a message</button>
     <Boxel::Thread @autoscroll={{this.autoscroll}} class="boxel-thread-usage">
       <:header>
         <Boxel::ThreadHeader @title="Project Title" />
       </:header>
 
       <:content>
-        <Boxel::DateDivider @date={{dayjs-format (now)}} />
+        <Boxel::DateDivider @date={{dayjs-format "2021-10-31"}} />
         {{#each this.messages}}
           <Boxel::ThreadMessage
             @name="Cardbot"
             @hideName={{true}}
             @imgURL={{this.cardBotIcon}}
+            @datetime="2021-10-31T3:00"
           >
             Hello, it's nice to see you!
           </Boxel::ThreadMessage>
@@ -40,11 +43,12 @@
       </:header>
 
       <:content>
-        <Boxel::DateDivider @date={{dayjs-format (now)}} />
+        <Boxel::DateDivider @date={{dayjs-format "2021-10-31"}} />
         <Boxel::ThreadMessage
           @name="Cardbot"
           @hideName={{true}}
           @imgURL={{this.milestones.0.senderIcon}}
+          @datetime="2021-10-31T3:00"
         >
           {{this.milestones.0.message}}
         </Boxel::ThreadMessage>

@@ -12,11 +12,11 @@
           <div>
             {{component (or @cardComponent "card") model=val mode="view" status=(if added "added" (if changed "changed"))}}
             {{#if changed}}
-              <Boxel>
+              <div class="boxel">
                 <BoxelHighlight @status="deleted" />
                 <BoxelActions @status="deleted" />
                 <del class="field-renderer--deleted field-renderer--deleted-no-offset">{{changed.oldValue}}</del>
-              </Boxel>
+              </div>
             {{/if}}
           </div>
         {{/if}}
@@ -38,20 +38,20 @@
 
     {{#if (and (gt @collection.length this.displayCount) (eq i (sub @collection.length 1)))}}
       {{#unless this.expanded}}
-        <Boxel>
+        <div class="boxel">
           {{#if (and @addedCards.length (eq val.type @addedCards.0.type))}}
             <BoxelHighlight @status="added" />
             <BoxelActions @status="added" />
           {{/if}}
           <button {{on "click" this.viewAll}} class="field-renderer__view-all">View all ({{@collection.length}})</button>
-        </Boxel>
+        </div>
       {{/unless}}
     {{/if}}
 
     {{#if (and this.expanded (eq i (sub @collection.length 1)))}}
-      <Boxel>
+      <div class="boxel">
         <button {{on "click" this.collapse}} class="field-renderer__view-all">Collapse</button>
-      </Boxel>
+      </div>
     {{/if}}
   {{/each}}
 {{/if}}

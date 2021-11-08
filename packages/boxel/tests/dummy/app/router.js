@@ -13,14 +13,6 @@ Router.map(function () {
   this.route('docs', function () {});
   this.route('wave-player');
   this.route('scenarios', function () {
-    this.route('cardstack', { resetNamespace: true }, function () {
-      this.route('card-space', function () {
-        this.route('new');
-      });
-      this.route('card-pay', function () {
-        this.route('workflow', { path: '/:workflowId' });
-      });
-    });
     this.route(
       'media-registry',
       { path: '/media-registry/:orgId', resetNamespace: true },
@@ -32,7 +24,6 @@ Router.map(function () {
             this.route('edit');
           }
         );
-
         this.route('item', { path: '/:itemId' }, function () {
           this.route('edit');
           this.route('musical-work');
@@ -54,7 +45,6 @@ Router.map(function () {
           });
         });
         this.route('agreements', { path: '/agreements/:agreementId' });
-        this.route('cardflow');
       }
     );
     this.route('workflow', { resetNamespace: true }, function () {

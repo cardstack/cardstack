@@ -261,8 +261,8 @@ module('Acceptance | persistence view and restore', function () {
 
       assert
         .dom('[data-test-active-workflow]:nth-child(2)')
-        .containsText('Merchant Creation')
-        .containsText('Save merchant details');
+        .containsText('Business Account Creation')
+        .containsText('Save business details');
 
       assert.equal(
         getProgressIconCompletion(
@@ -309,7 +309,7 @@ module('Acceptance | persistence view and restore', function () {
 
       assert.equal(
         currentURL(),
-        '/card-pay/merchant-services?flow=create-merchant&flow-id=persisted-merchant-creation'
+        '/card-pay/payments?flow=create-business&flow-id=persisted-merchant-creation'
       );
     });
 
@@ -359,8 +359,8 @@ module('Acceptance | persistence view and restore', function () {
     });
 
     test('opening a workflow only increments the counter by one and shows the correct milestone', async function (assert) {
-      await visit('/card-pay/merchant-services');
-      await click('[data-test-workflow-button="create-merchant"]');
+      await visit('/card-pay/payments');
+      await click('[data-test-workflow-button="create-business"]');
 
       await fillIn(
         `[data-test-merchant-customization-merchant-name-field] input`,
@@ -385,7 +385,7 @@ module('Acceptance | persistence view and restore', function () {
       await click('[data-test-workflow-tracker-toggle]');
       assert
         .dom('[data-test-active-workflow]:nth-child(1)')
-        .containsText('Create merchant');
+        .containsText('Create business account');
     });
 
     test('a storage event causes the count to update', async function (assert) {

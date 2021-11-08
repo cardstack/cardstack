@@ -4,44 +4,33 @@ import Koa from 'koa';
 // @ts-ignore
 import mimeMatch from 'mime-match';
 import { CardstackError } from '@cardstack/core/src/utils/errors';
-import BoomRoute from '../routes/boom';
-import ExchangeRatesRoute from '../routes/exchange-rates';
-import SessionRoute from '../routes/session';
-import PrepaidCardColorSchemesRoute from '../routes/prepaid-card-color-schemes';
-import PrepaidCardPatternsRoute from '../routes/prepaid-card-patterns';
-import PrepaidCardCustomizationsRoute from '../routes/prepaid-card-customizations';
-import MerchantInfosRoute from '../routes/merchant-infos';
-import CardSpacesRoute from '../routes/card-spaces';
-import ReservationsRoute from '../routes/reservations';
-import OrdersRoute from '../routes/orders';
-import InventoryRoute from '../routes/inventory';
 import { inject } from '@cardstack/di';
-import CustodialWalletRoute from '../routes/custodial-wallet';
 import { parseBody } from '../middleware';
 
 export default class APIRouter {
-  boomRoute: BoomRoute = inject('boom-route', { as: 'boomRoute' });
-  exchangeRatesRoute: ExchangeRatesRoute = inject('exchange-rates-route', { as: 'exchangeRatesRoute' });
-  sessionRoute: SessionRoute = inject('session-route', { as: 'sessionRoute' });
-  prepaidCardColorSchemesRoute: PrepaidCardColorSchemesRoute = inject('prepaid-card-color-schemes-route', {
+  boomRoute = inject('boom-route', { as: 'boomRoute' });
+  exchangeRatesRoute = inject('exchange-rates-route', { as: 'exchangeRatesRoute' });
+  sessionRoute = inject('session-route', { as: 'sessionRoute' });
+  prepaidCardColorSchemesRoute = inject('prepaid-card-color-schemes-route', {
     as: 'prepaidCardColorSchemesRoute',
   });
-  prepaidCardPatternsRoute: PrepaidCardPatternsRoute = inject('prepaid-card-patterns-route', {
+  prepaidCardPatternsRoute = inject('prepaid-card-patterns-route', {
     as: 'prepaidCardPatternsRoute',
   });
-  prepaidCardCustomizationsRoute: PrepaidCardCustomizationsRoute = inject('prepaid-card-customizations-route', {
+  prepaidCardCustomizationsRoute = inject('prepaid-card-customizations-route', {
     as: 'prepaidCardCustomizationsRoute',
   });
-  merchantInfosRoute: MerchantInfosRoute = inject('merchant-infos-route', {
+  merchantInfosRoute = inject('merchant-infos-route', {
     as: 'merchantInfosRoute',
   });
-  cardSpacesRoute: CardSpacesRoute = inject('card-spaces-route', {
+  cardSpacesRoute = inject('card-spaces-route', {
     as: 'cardSpacesRoute',
   });
-  custodialWalletRoute: CustodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
-  ordersRoute: OrdersRoute = inject('orders-route', { as: 'ordersRoute' });
-  reservationsRoute: ReservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
-  inventoryRoute: InventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
+  custodialWalletRoute = inject('custodial-wallet-route', { as: 'custodialWalletRoute' });
+  ordersRoute = inject('orders-route', { as: 'ordersRoute' });
+  reservationsRoute = inject('reservations-route', { as: 'reservationsRoute' });
+  inventoryRoute = inject('inventory-route', { as: 'inventoryRoute' });
+  wyrePricesRoute = inject('wyre-prices-route', { as: 'wyrePricesRoute' });
   routes() {
     let {
       boomRoute,
@@ -56,6 +45,7 @@ export default class APIRouter {
       reservationsRoute,
       inventoryRoute,
       cardSpacesRoute,
+      wyrePricesRoute,
     } = this;
     let apiSubrouter = new Router();
     apiSubrouter.get('/boom', boomRoute.get);
@@ -76,6 +66,7 @@ export default class APIRouter {
     apiSubrouter.post('/card-spaces', parseBody, cardSpacesRoute.post);
     apiSubrouter.post('/card-spaces/validate-url', parseBody, cardSpacesRoute.postUrlValidation);
     apiSubrouter.put('/card-spaces/:id', parseBody, cardSpacesRoute.put);
+    apiSubrouter.get('/wyre-prices', parseBody, wyrePricesRoute.get);
     apiSubrouter.all('/(.*)', notFound);
 
     let apiRouter = new Router();

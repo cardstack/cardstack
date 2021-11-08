@@ -84,17 +84,15 @@ module('Acceptance | create merchant', function (hooks) {
 
   test('initiating workflow without wallet connections', async function (assert) {
     await visit('/card-pay');
-    await click(
-      '[data-test-card-pay-header-tab][href="/card-pay/merchant-services"]'
-    );
-    assert.equal(currentURL(), '/card-pay/merchant-services');
+    await click('[data-test-card-pay-header-tab][href="/card-pay/payments"]');
+    assert.equal(currentURL(), '/card-pay/payments');
 
-    await click('[data-test-workflow-button="create-merchant"]');
+    await click('[data-test-workflow-button="create-business"]');
 
     let post = postableSel(0, 0);
     assert.dom(`${postableSel(0, 0)} img`).exists();
     assert.dom(postableSel(0, 0)).containsText('Hello, nice to see you!');
-    assert.dom(postableSel(0, 1)).containsText('create a merchant account');
+    assert.dom(postableSel(0, 1)).containsText('create a business account');
 
     assert
       .dom(postableSel(0, 2))
@@ -164,13 +162,13 @@ module('Acceptance | create merchant', function (hooks) {
 
     assert
       .dom(postableSel(1, 2))
-      .containsText('Let’s create a new merchant account.');
+      .containsText('Let’s create a new business account.');
 
     post = postableSel(1, 3);
 
     await waitFor(post);
 
-    assert.dom(post).containsText('Choose a name and ID for the merchant');
+    assert.dom(post).containsText('Choose a name and ID for the business');
 
     // // merchant-customization card
     // TODO verify and interact with merchant customization card default state
@@ -193,7 +191,7 @@ module('Acceptance | create merchant', function (hooks) {
     await click(`[data-test-merchant-customization-save-details]`);
 
     await waitFor(milestoneCompletedSel(1));
-    assert.dom(milestoneCompletedSel(1)).containsText('Merchant details saved');
+    assert.dom(milestoneCompletedSel(1)).containsText('Business details saved');
 
     // prepaid-card-choice card
     post = postableSel(2, 2);
@@ -226,11 +224,13 @@ module('Acceptance | create merchant', function (hooks) {
       .containsText(merchantAddress);
 
     await waitFor(milestoneCompletedSel(2));
-    assert.dom(milestoneCompletedSel(2)).containsText('Merchant created');
+    assert
+      .dom(milestoneCompletedSel(2))
+      .containsText('Business account created');
 
     assert
       .dom(epiloguePostableSel(0))
-      .containsText('You have created a merchant.');
+      .containsText('You have created a business account.');
 
     await waitFor(epiloguePostableSel(1));
 
@@ -272,14 +272,14 @@ module('Acceptance | create merchant', function (hooks) {
     });
 
     test('initiating workflow with layer 2 wallet already connected', async function (assert) {
-      await visit('/card-pay/merchant-services?flow=create-merchant');
+      await visit('/card-pay/payments?flow=create-business');
 
       const flowId = new URL(
         'http://domain.test/' + currentURL()
       ).searchParams.get('flow-id');
       assert.equal(
         currentURL(),
-        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
+        `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
       assert
         .dom(postableSel(0, 2))
@@ -319,7 +319,7 @@ module('Acceptance | create merchant', function (hooks) {
     });
 
     test('changed merchant details after canceling the merchant creation request are persisted', async function (this: Context, assert) {
-      await visit('/card-pay/merchant-services?flow=create-merchant');
+      await visit('/card-pay/payments?flow=create-business');
       await waitFor('[data-test-merchant-customization-merchant-name-field]');
       await fillIn(
         `[data-test-merchant-customization-merchant-name-field] input`,
@@ -388,14 +388,14 @@ module('Acceptance | create merchant', function (hooks) {
     });
 
     test('disconnecting Layer 2 after proceeding beyond it', async function (assert) {
-      await visit('/card-pay/merchant-services?flow=create-merchant');
+      await visit('/card-pay/payments?flow=create-business');
 
       let flowId = new URL(
         'http://domain.test/' + currentURL()
       ).searchParams.get('flow-id');
       assert.equal(
         currentURL(),
-        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
+        `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
       assert
         .dom(
@@ -413,14 +413,14 @@ module('Acceptance | create merchant', function (hooks) {
       assert
         .dom('[data-test-postable="0"][data-test-cancelation]')
         .containsText(
-          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a merchant, please start again by connecting your wallet.`
+          `It looks like your ${c.layer2.fullName} wallet got disconnected. If you still want to create a business account, please start again by connecting your wallet.`
         );
       assert
-        .dom('[data-test-workflow-default-cancelation-cta="create-merchant"]')
+        .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
         .containsText('Workflow canceled');
 
       await click(
-        '[data-test-workflow-default-cancelation-restart="create-merchant"]'
+        '[data-test-workflow-default-cancelation-restart="create-business"]'
       );
 
       flowId = new URL('http://domain.test/' + currentURL()).searchParams.get(
@@ -428,7 +428,7 @@ module('Acceptance | create merchant', function (hooks) {
       );
       assert.equal(
         currentURL(),
-        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
+        `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
 
       layer2Service.test__simulateWalletConnectUri();
@@ -439,19 +439,19 @@ module('Acceptance | create merchant', function (hooks) {
         )
         .exists();
       assert
-        .dom('[data-test-workflow-default-cancelation-cta="create-merchant"]')
+        .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
         .doesNotExist();
     });
 
     test('changing Layer 2 account should cancel the workflow', async function (assert) {
-      await visit('/card-pay/merchant-services?flow=create-merchant');
+      await visit('/card-pay/payments?flow=create-business');
 
       let flowId = new URL(
         'http://domain.test/' + currentURL()
       ).searchParams.get('flow-id');
       assert.equal(
         currentURL(),
-        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
+        `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
       assert
         .dom(
@@ -482,21 +482,21 @@ module('Acceptance | create merchant', function (hooks) {
       assert
         .dom('[data-test-postable="0"][data-test-cancelation]')
         .containsText(
-          'It looks like you changed accounts in the middle of this workflow. If you still want to create a merchant, please restart the workflow.'
+          'It looks like you changed accounts in the middle of this workflow. If you still want to create a business account, please restart the workflow.'
         );
       assert
-        .dom('[data-test-workflow-default-cancelation-cta="create-merchant"]')
+        .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
         .containsText('Workflow canceled');
 
       await click(
-        '[data-test-workflow-default-cancelation-restart="create-merchant"]'
+        '[data-test-workflow-default-cancelation-restart="create-business"]'
       );
       flowId = new URL('http://domain.test/' + currentURL()).searchParams.get(
         'flow-id'
       );
       assert.equal(
         currentURL(),
-        `/card-pay/merchant-services?flow=create-merchant&flow-id=${flowId}`
+        `/card-pay/payments?flow=create-business&flow-id=${flowId}`
       );
     });
   });
@@ -512,7 +512,7 @@ module('Acceptance | create merchant', function (hooks) {
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    await visit('/card-pay/merchant-services?flow=create-merchant');
+    await visit('/card-pay/payments?flow=create-business');
     assert
       .dom(
         '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
@@ -530,10 +530,10 @@ module('Acceptance | create merchant', function (hooks) {
         )} SPEND (${convertAmountToNativeDisplay(
           spendToUsd(merchantRegistrationFee)!,
           'USD'
-        )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
+        )}) business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert
-      .dom('[data-test-workflow-default-cancelation-cta="create-merchant"]')
+      .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
       .containsText('Workflow canceled');
   });
 
@@ -554,7 +554,7 @@ module('Acceptance | create merchant', function (hooks) {
     ]);
     await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
 
-    await visit('/card-pay/merchant-services?flow=create-merchant');
+    await visit('/card-pay/payments?flow=create-business');
     assert
       .dom(
         '[data-test-postable] [data-test-layer-2-wallet-card] [data-test-address-field]'
@@ -572,10 +572,10 @@ module('Acceptance | create merchant', function (hooks) {
         )} SPEND (${convertAmountToNativeDisplay(
           spendToUsd(merchantRegistrationFee)!,
           'USD'
-        )}) merchant creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
+        )}) business account creation fee. Please buy a prepaid card in your Card Wallet mobile app before you continue with this workflow.`
       );
     assert
-      .dom('[data-test-workflow-default-cancelation-cta="create-merchant"]')
+      .dom('[data-test-workflow-default-cancelation-cta="create-business"]')
       .containsText('Workflow canceled');
   });
 });

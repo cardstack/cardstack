@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, settled } from '@ember/test-helpers';
+import { find, render, settled } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
@@ -72,6 +72,9 @@ module(
       `);
 
       assert.dom('[data-test-action-card-title-icon-name="clock"]').exists();
+      assert
+        .dom('[data-test-withdrawal-transaction-status-delay]')
+        .doesNotExist();
 
       assert
         .dom(`[data-test-token-bridge-step="0"][data-test-completed]`)
@@ -88,6 +91,20 @@ module(
       assert
         .dom(`[data-test-bridge-explorer-button]`)
         .hasAttribute('href', /relay$/);
+
+      await settled();
+
+      let bridgeExplorerHref = find(
+        '[data-test-bridge-explorer-button]'
+      )?.getAttribute('href')!;
+      assert
+        .dom('[data-test-withdrawal-transaction-status-delay] a')
+        .hasAttribute('href', bridgeExplorerHref);
+      assert
+        .dom('[data-test-withdrawal-transaction-status-delay]')
+        .containsText(
+          'Due to network conditions this transaction is taking longer to confirm'
+        );
     });
 
     test('It completes when the bridged transaction completes', async function (assert) {

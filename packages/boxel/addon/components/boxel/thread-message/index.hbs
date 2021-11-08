@@ -28,7 +28,7 @@
           {{@name}}
         </span>
       {{/if}}
-      <time datetime={{or @datetime (now)}} class="boxel-thread-message__time hide-in-percy">
+      <time datetime={{or @datetime (now)}} class="boxel-thread-message__time">
         {{dayjs-format (or @datetime (now)) "MMM D, h:mm A"}}
       </time>
     </h3>

@@ -1,12 +1,12 @@
 <ActionCardContainer
   class="prepaid-card-choice"
-  @header="Merchant Account"
+  @header="Business Account"
   @isComplete={{@isComplete}}
   {{did-insert this.checkForPendingTransaction}}
   data-test-prepaid-card-choice-is-complete={{@isComplete}}
 >
-  <ActionCardContainer::Section @title="Choose a prepaid card to pay the merchant creation fee">
-    <CardPay::LabeledValue @label="Merchant Name" class="prepaid-card-choice__field-label">
+  <ActionCardContainer::Section @title="Choose a prepaid card to pay the business account creation fee">
+    <CardPay::LabeledValue @label="Business Name" class="prepaid-card-choice__field-label">
       <CardPay::Merchant
         @name={{@workflowSession.state.merchantName}}
         @size="small"
@@ -14,10 +14,10 @@
         @logoTextColor={{@workflowSession.state.merchantTextColor}}
       />
     </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Merchant ID" class="prepaid-card-choice__field-label" data-test-prepaid-card-choice-merchant-id>
+    <CardPay::LabeledValue @label="Business ID" class="prepaid-card-choice__field-label" data-test-prepaid-card-choice-merchant-id>
       {{@workflowSession.state.merchantId}}
     </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Merchant Creation Fee" class="prepaid-card-choice__field-label">
+    <CardPay::LabeledValue @label="Business Account Creation Fee" class="prepaid-card-choice__field-label">
       <CardPay::BalanceDisplay
         class="prepaid-card-choice__cost"
         @icon="spend"
@@ -52,7 +52,7 @@
       {{/if}}
     </CardPay::LabeledValue>
     {{#if @isComplete}}
-      <CardPay::LabeledValue @label="Merchant Address" class="prepaid-card-choice__field-label">
+      <CardPay::LabeledValue @label="Business Address" class="prepaid-card-choice__field-label">
         <CardPay::Merchant
           @name={{@workflowSession.state.merchantName}}
           @address={{@workflowSession.state.merchantSafe.address}}
@@ -66,13 +66,13 @@
     {{#if this.error}}
       <CardPay::ErrorMessage data-test-prepaid-card-choice-error-message as |supportURL|>
         {{#if (eq this.error.message "INSUFFICIENT_FUNDS")}}
-          It looks like your prepaid card doesn't have enough funds to pay the {{format-amount this.merchantRegistrationFee 0}} SPEND ({{format-usd (spend-to-usd this.merchantRegistrationFee)}}) merchant creation fee. Please try another prepaid card, or buy one in Card Wallet.
+          It looks like your prepaid card doesn't have enough funds to pay the {{format-amount this.merchantRegistrationFee 0}} SPEND ({{format-usd (spend-to-usd this.merchantRegistrationFee)}}) business account creation fee. Please try another prepaid card, or buy one in Card Wallet.
         {{else if (eq this.error.message "TIMEOUT")}}
-          There was a problem creating your merchant. Please contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
+          There was a problem creating your business account. Please contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a> to find out the status of your transaction.
         {{else if (eq this.error.message "USER_REJECTION")}}
           It looks like you have canceled the request in your wallet. Please try again if you want to continue with this workflow.
         {{else}}
-          There was a problem creating your merchant. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
+          There was a problem creating your business account. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact <a href={{supportURL}} target="_blank" rel="noopener noreferrer">Cardstack support</a>.
         {{/if}}
       </CardPay::ErrorMessage>
     {{/if}}
@@ -87,7 +87,7 @@
         {{on "click" this.createMerchant}}
         data-test-create-merchant-button
       >
-        {{if this.hasTriedCreatingMerchant "Try Again" "Create Merchant"}}
+        {{if this.hasTriedCreatingMerchant "Try Again" "Create Business Account"}}
       </d.ActionButton>
     </:default>
     <:in-progress as |i|>

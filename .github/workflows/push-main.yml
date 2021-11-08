@@ -83,8 +83,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - run: yarn --prefer-offline
-      - run: yarn test:boxel
-      - run: yarn test:web-client
+      - name: Run boxel tests
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_BOXEL }}
+        run: yarn test:boxel:percy
+      - run: yarn global add @percy/cli
+      - name: Run web client tests
+        env:
+          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN_WEB_CLIENT }}
+        run: yarn test:web-client:percy
 
   change_check:
     name: Check which packages changed

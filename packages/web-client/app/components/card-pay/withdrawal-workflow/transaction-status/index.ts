@@ -2,14 +2,23 @@ import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import BN from 'bn.js';
+import { task } from 'ember-concurrency-decorators';
 import { taskFor } from 'ember-concurrency-ts';
-import { task, TaskGenerator } from 'ember-concurrency';
+import {
+  race,
+  rawTimeout,
+  TaskGenerator,
+  waitForProperty,
+} from 'ember-concurrency';
 import * as Sentry from '@sentry/browser';
+import config from '@cardstack/web-client/config/environment';
 import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
+
+const A_WHILE = config.environment === 'test' ? 1 : 1000 * 60 * 2;
 
 class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
@@ -18,9 +27,18 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
   @tracked completedCount = 1;
   @tracked error = false;
 
+  @tracked showSlowBridgingMessage = false;
+
   constructor(owner: unknown, args: WorkflowCardComponentArgs) {
     super(owner, args);
-    taskFor(this.awaitBridgingTask).perform();
+    taskFor(this.awaitTimerTask).perform();
+  }
+
+  @task *awaitTimerTask(): TaskGenerator<void> {
+    yield race([
+      taskFor(this.awaitBridgingTask).perform(),
+      taskFor(this.timerTask).perform(),
+    ]);
   }
 
   @task *awaitBridgingTask(): TaskGenerator<void> {
@@ -39,6 +57,7 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
         this.args.workflowSession.getValue<string>('withdrawalSafe')!
       );
       this.completedCount = 2;
+      this.showSlowBridgingMessage = false;
       this.args.onComplete?.();
     } catch (e) {
       console.error('Failed to complete bridging to layer 1');
@@ -46,6 +65,13 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
       Sentry.captureException(e);
       this.error = true;
     }
+  }
+
+  @task *timerTask(): TaskGenerator<void> {
+    this.showSlowBridgingMessage = false;
+    yield rawTimeout(A_WHILE);
+    this.showSlowBridgingMessage = true;
+    yield waitForProperty(this, 'showSlowBridgingMessage', false);
   }
 
   get isInProgress() {

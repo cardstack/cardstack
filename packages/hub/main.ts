@@ -42,6 +42,7 @@ import PersistOffChainCardSpaceTask from './tasks/persist-off-chain-card-space';
 import MerchantInfosRoute from './routes/merchant-infos';
 import CustodialWalletRoute from './routes/custodial-wallet';
 import WyreCallbackRoute from './routes/wyre-callback';
+import WyrePricesRoute from './routes/wyre-prices';
 import CardSpacesRoute from './routes/card-spaces';
 import MerchantInfoSerializer from './services/serializers/merchant-info-serializer';
 import MerchantInfoQueries from './services/queries/merchant-info';
@@ -127,6 +128,7 @@ export function createRegistry(): Registry {
   registry.register('web3', Web3Service);
   registry.register('wyre', WyreService);
   registry.register('wyre-callback-route', WyreCallbackRoute);
+  registry.register('wyre-prices-route', WyrePricesRoute);
 
   if (process.env.COMPILER) {
     registry.register('card-service', CardService);

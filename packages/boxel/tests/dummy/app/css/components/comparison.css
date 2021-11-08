@@ -1,0 +1,412 @@
+.discrepancy {
+  --boxel-revision-light-purple: #84829b;
+  --boxel-revision-lightest-purple: var(--boxel-purple-300);
+  --boxel-revision-hover-purple: #4f4a5d;
+  --disc-container-max-width: 1440px;
+  --disc-header-height: 80px;
+  --disc-footer-cta-height: 90px;
+  --disc-footer-cta-height-lg: 150px;
+
+  height: 100%;
+  background-color: var(--boxel-purple-500);
+  overflow: auto;
+}
+
+.discrepancy__container {
+  height: 100%;
+  max-width: var(--disc-container-max-width);
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.discrepancy__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.discrepancy__title {
+  padding-left: 35px;
+  padding-right: 20px;
+  color: var(--boxel-light);
+  background: url('../../../../public/@cardstack/boxel/images/icons/file-icon.svg') center left 5px/16px 20px no-repeat;
+  font: var(--boxel-font);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-sm);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.discrepancy__breadcrumbs {
+  border-bottom: 1px solid #7d7c93;
+  margin-bottom: 20px;
+}
+
+.discrepancy__main {
+  --icon-color: var(--boxel-light);
+}
+
+.discrepancy__main--comp-view {
+  --icon-color: var(--boxel-dark);
+
+  background-color: var(--boxel-highlight);
+  padding: 0 25px 25px;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+
+.discrepancy__comparison-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: var(--disc-header-height);
+  width: 100%;
+  max-width: 775px;
+  margin: 0 auto;
+  padding: 20px 20px 20px 30px;
+  border-radius: 10px;
+  background-color: var(--boxel-purple-700);
+  color: var(--boxel-light);
+  font: var(--boxel-font-sm);
+  font-weight: 700;
+  letter-spacing: var(--boxel-lsp-lg);
+  transition: max-width 0.2s ease-in;
+}
+
+.discrepancy__comparison-header-title-group {
+  display: inline-flex;
+  align-items: center;
+}
+
+.discrepancy__nested-level-back-btn {
+  padding: 10px 20px;
+  border: none;
+  background: url('../../../../public/@cardstack/boxel/images/icons/curved-arrow.svg') left center/12px 12px no-repeat;
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-lg);
+}
+
+.discrepancy__nested-level-back-btn:hover {
+  color: initial;
+}
+
+.discrepancy__comparison-header-icons {
+  display: inline-flex;
+  margin-right: 15px;
+}
+
+.discrepancy__profile-icon {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background-color: var(--boxel-dark);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  color: var(--boxel-light);
+  border: 1px solid var(--boxel-dark);
+  border-radius: 7px;
+  font: var(--boxel-font-sm);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 30px;
+  text-align: center;
+}
+
+.discrepancy__comparison-header-icons-caret {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+}
+
+.discrepancy__comparison-header--comp-mode {
+  max-width: 100%;
+  padding-right: 0;
+  padding-left: 0;
+  background-color: transparent;
+  color: var(--boxel-dark);
+}
+
+.discrepancy__cards {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 0 50px;
+  margin-top: 20px;
+  box-shadow: var(--boxel-box-shadow);
+}
+
+.discrepancy__cards.discrepancy__cards--comp-view {
+  gap: 0;
+  margin-top: 0;
+}
+
+.discrepancy__cards.discrepancy__cards--comp-view .discrepancy-card__header.your-version {
+  border-radius: 10px 0 0 0;
+}
+
+.discrepancy__cards.discrepancy__cards--comp-view .discrepancy-card__header.other-version {
+  border-radius: 0 10px 0 0;
+  border-left: 1px solid var(--boxel-purple-500);
+}
+
+.discrepancy-card__header {
+  position: relative;
+  height: var(--disc-header-height);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 15px;
+  background-color: var(--boxel-purple-700);
+  color: var(--boxel-light);
+  font: var(--boxel-font-sm);
+  letter-spacing: var(--boxel-lsp);
+  border-radius: 10px 10px 0 0;
+}
+
+.discrepancy-card__header.selected-version {
+  background-color: var(--boxel-highlight);
+  color: var(--boxel-dark);
+}
+
+.discrepancy-card__header-label {
+  position: absolute;
+  top: 8px;
+  left: 15px;
+  color: #a5a5a5;
+  font: var(--boxel-font-xs);
+  font-weight: 600;
+  letter-spacing: var(--boxel-lsp-xl);
+  text-transform: uppercase;
+}
+
+.discrepancy-card__header.selected-version .discrepancy-card__header-label {
+  color: var(--boxel-purple-700);
+}
+
+.discrepancy-card__header-title-group {
+  display: inline-flex;
+  align-items: center;
+  padding-top: 10px;
+}
+
+.discrepancy-card__header-icons {
+  margin-right: 15px;
+}
+
+.discrepancy-card__title {
+  font-weight: 700;
+}
+
+.discrepancy-card__datetime {
+  font: var(--boxel-font-xs);
+}
+
+button.discrepancy-card__header-btn {
+  width: 100%;
+  max-width: 225px;
+  height: 40px;
+  padding: 10px 40px;
+  font-weight: 400;
+  background: url('../../../../public/@cardstack/boxel/images/icons/select-empty.svg') left 12px top 10px/16px 16px no-repeat;
+  background-color: transparent;
+  border-color: var(--boxel-purple-400);
+  color: inherit;
+  text-align: left;
+  white-space: nowrap;
+  transition: border-color var(--boxel-transition);
+}
+
+button.discrepancy-card__header-btn:hover {
+  border-color: var(--boxel-light);
+}
+
+button.discrepancy-card__header-btn.checked {
+  background-image: url('../../../../public/@cardstack/boxel/images/icons/select-checked.svg');
+  border-color: var(--boxel-dark);
+  font-weight: 600;
+  cursor: initial;
+}
+
+button.discrepancy-card__header-btn--toggle.checked {
+  border-color: var(--boxel-success-200);
+}
+
+button.discrepancy-card__header-btn--toggle.checked:hover {
+  border-color: var(--boxel-dark);
+  cursor: pointer;
+}
+
+.discrepancy-field {
+  position: relative;
+  height: 100%;
+  padding: 30px 25px 30px 0;
+  background-color: var(--boxel-light);
+  border-bottom: var(--boxel-border);
+}
+
+.discrepancy-field--comp-field {
+  border-left: 1px solid #696969;
+}
+
+.discrepancy-field--base-field.linked-view,
+.discrepancy-field--comp-field.keep-current-view,
+.discrepancy-field--comp-field.comparison-view {
+  background-color: #ededef;
+}
+
+.discrepancy-field--base-field.linked-view .field-renderer__opacity-control,
+.discrepancy-field--comp-field.keep-current-view .field-renderer__opacity-control,
+.discrepancy-field--comp-field.comparison-view .field-renderer__opacity-control {
+  opacity: 0.25;
+}
+
+.discrepancy-field--base-field.linked-view .field-renderer__meta-field *,
+.discrepancy-field--comp-field.keep-current-view .field-renderer__meta-field *,
+.discrepancy-field--comp-field.comparison-view .field-renderer__meta-field * {
+  opacity: initial;
+}
+
+.discrepancy-card__footer {
+  height: var(--disc-footer-cta-height-lg);
+  background-color: var(--boxel-light);
+}
+
+.discrepancy__count-btn__link-copy {
+  display: inline-block;
+  color: var(--boxel-light);
+  background: url('../../../../public/@cardstack/boxel/images/icons/warning.svg') bottom left/25px 20px no-repeat;
+  font: var(--boxel-font-sm);
+  padding-top: 25px;
+  padding-left: 35px;
+}
+
+a.discrepancy__count-btn {
+  height: 50px;
+  width: 100%;
+  max-width: 500px;
+  font-weight: 600;
+  line-height: 3;
+}
+
+a.discrepancy__count-btn:hover {
+  color: initial;
+}
+
+.discrepancy__count-btn-container {
+  position: fixed;
+  z-index: 2;
+  bottom: 0;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  background-color: var(--boxel-purple-700);
+  text-align: center;
+  transform: translateY(110%);
+  transition: all 0.2s ease-in;
+}
+
+.discrepancy__count-btn-container--linked.container-right {
+  flex-direction: column;
+}
+
+.discrepancy__count-btn-container--comparison {
+  transition: all 0.2s ease-out;
+}
+
+.discrepancy__count-btn-container.visible {
+  transform: translateY(0);
+  transition: all 0.2s ease-out;
+}
+
+@media only screen and (max-width: 1439px) {
+  .discrepancy__count-btn-container {
+    width: calc((100vw - 90px) / 2);
+  }
+
+  .discrepancy__count-btn-container.container-left {
+    min-width: 685px;
+  }
+
+  .discrepancy__count-btn-container.container-right {
+    min-width: 666px;
+  }
+
+  .discrepancy__count-btn-container--comparison.container-right {
+    min-width: 596px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .discrepancy__count-btn-container {
+    width: 685px;
+  }
+
+  .discrepancy__count-btn-container--comparison {
+    width: 755px;
+  }
+}
+
+/* field renderer */
+.discrepancy-field-renderer {
+  grid-template-columns: auto 1fr;
+  max-width: initial;
+}
+
+.discrepancy-field-renderer > .field-renderer__title {
+  width: 160px;
+  transition: width 0.2s ease-in, visibility 0.2s ease-in;
+}
+
+.discrepancy-field-renderer > .field-renderer__value {
+  width: 450px;
+  transition: width 0.2s ease-in;
+}
+
+.discrepancy-field-renderer.comp-card-field.comp-view > .field-renderer__title {
+  visibility: collapse;
+  width: 90px;
+  transition: width 0.2s ease-out, visibility 0.2s ease-out;
+}
+
+.discrepancy-field-renderer.base-card-field.comp-view * {
+  opacity: 1;
+}
+
+.discrepancy-field--comp-field .publishing-representation__writers .field-renderer__opacity-control,
+.discrepancy-field--comp-field .publishing-representation__publishers .field-renderer__opacity-control,
+.discrepancy-field--comp-field .territory__wrapper .field-renderer__opacity-control,
+.discrepancy-field--base-field.linked-view .publishing-representation__writers .field-renderer__opacity-control,
+.discrepancy-field--base-field.linked-view .publishing-representation__publishers .field-renderer__opacity-control {
+  opacity: initial;
+}
+
+.discrepancy-field-renderer.base-card-field.comp-view .boxel-highlight {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Dummy */
+.discrepancy__profile-icon--allegro-music-publishing {
+  background-size: auto 23px;
+}
+
+.boxel-card__bg-img--allegro-music-publishing {
+  border-radius: 100px;
+}
+
+.discrepancy__profile-icon--warbler-music {
+  background-color: var(--boxel-navy);
+}
+
+.discrepancy__profile-icon--realtunes-publishing {
+  background-color: #3f356f;
+}
+
+.discrepancy__profile-icon--somoa {
+  background-color: var(--boxel-lilac);
+}

@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.4
--- Dumped by pg_dump version 14.0
+-- Dumped from database version 13.3
+-- Dumped by pg_dump version 13.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -855,6 +855,23 @@ CREATE TABLE public.wallet_orders (
 ALTER TABLE public.wallet_orders OWNER TO postgres;
 
 --
+-- Name: wyre_prices; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.wyre_prices (
+    sku text NOT NULL,
+    source_currency text NOT NULL,
+    dest_currency text NOT NULL,
+    source_currency_price numeric NOT NULL,
+    includes_fee boolean DEFAULT false NOT NULL,
+    disabled boolean DEFAULT false NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.wyre_prices OWNER TO postgres;
+
+--
 -- Name: jobs id; Type: DEFAULT; Schema: graphile_worker; Owner: postgres
 --
 
@@ -997,6 +1014,14 @@ ALTER TABLE ONLY public.wallet_orders
 
 
 --
+-- Name: wyre_prices wyre_prices_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.wyre_prices
+    ADD CONSTRAINT wyre_prices_pkey PRIMARY KEY (sku);
+
+
+--
 -- Name: jobs_priority_run_at_id_locked_at_without_failures_idx; Type: INDEX; Schema: graphile_worker; Owner: postgres
 --
 
@@ -1064,6 +1089,13 @@ CREATE INDEX wallet_orders_custodial_transfer_id_status_index ON public.wallet_o
 --
 
 CREATE INDEX wallet_orders_reservation_id_index ON public.wallet_orders USING btree (reservation_id);
+
+
+--
+-- Name: wyre_prices_disabled_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX wyre_prices_disabled_index ON public.wyre_prices USING btree (disabled);
 
 
 --
@@ -1173,8 +1205,8 @@ ALTER TABLE graphile_worker.known_crontabs ENABLE ROW LEVEL SECURITY;
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.4
--- Dumped by pg_dump version 14.0
+-- Dumped from database version 13.3
+-- Dumped by pg_dump version 13.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -1192,14 +1224,14 @@ SET row_security = off;
 --
 
 COPY graphile_worker.migrations (id, ts) FROM stdin;
-1	2021-10-15 07:15:58.376963+08
-2	2021-10-15 07:15:58.376963+08
-3	2021-10-15 07:15:58.376963+08
-4	2021-10-15 07:15:58.376963+08
-5	2021-10-15 07:15:58.376963+08
-6	2021-10-15 07:15:58.376963+08
-7	2021-10-15 07:15:58.376963+08
-8	2021-10-15 07:15:58.376963+08
+1	2021-10-25 14:13:27.499839-04
+2	2021-10-25 14:13:27.499839-04
+3	2021-10-25 14:13:27.499839-04
+4	2021-10-25 14:13:27.499839-04
+5	2021-10-25 14:13:27.499839-04
+6	2021-10-25 14:13:27.499839-04
+7	2021-10-25 14:13:27.499839-04
+8	2021-10-25 14:13:27.499839-04
 \.
 
 
@@ -1208,17 +1240,18 @@ COPY graphile_worker.migrations (id, ts) FROM stdin;
 --
 
 COPY public.pgmigrations (id, name, run_on) FROM stdin;
-1	20210527151505645_create-prepaid-card-tables	2021-10-14 19:15:58.376963
-2	20210614080132698_create-prepaid-card-customizations-table	2021-10-14 19:15:58.376963
-3	20210623052200757_create-graphile-worker-schema	2021-10-14 19:15:58.376963
-4	20210809113449561_merchant-infos	2021-10-14 19:15:58.376963
-5	20210817184105100_wallet-orders	2021-10-14 19:15:58.376963
-6	20210920142313915_prepaid-card-reservations	2021-10-14 19:15:58.376963
-7	20210924200122612_order-indicies	2021-10-14 19:15:58.376963
-47	20211006090701108_create-card-spaces	2021-10-22 11:31:31.004948
-48	20211013173917696_beta-testers	2021-10-22 11:31:31.004948
-49	20211014131843187_add-fields-to-card-spaces	2021-10-22 11:31:31.004948
-56	20211020231214235_discord-bots	2021-11-04 00:40:42.174568
+1	20210527151505645_create-prepaid-card-tables	2021-10-25 14:13:27.499839
+2	20210614080132698_create-prepaid-card-customizations-table	2021-10-25 14:13:27.499839
+3	20210623052200757_create-graphile-worker-schema	2021-10-25 14:13:27.499839
+4	20210809113449561_merchant-infos	2021-10-25 14:13:27.499839
+5	20210817184105100_wallet-orders	2021-10-25 14:13:27.499839
+6	20210920142313915_prepaid-card-reservations	2021-10-25 14:13:27.499839
+7	20210924200122612_order-indicies	2021-10-25 14:13:27.499839
+8	20211006090701108_create-card-spaces	2021-10-25 14:13:27.499839
+9	20211013173917696_beta-testers	2021-10-25 14:13:27.499839
+10	20211014131843187_add-fields-to-card-spaces	2021-10-25 14:13:27.499839
+11	20211020231214235_discord-bots	2021-11-04 13:23:05.679077
+17	20211105180905492_wyre-price-service	2021-11-05 14:24:55.098482
 \.
 
 
@@ -1226,7 +1259,7 @@ COPY public.pgmigrations (id, name, run_on) FROM stdin;
 -- Name: pgmigrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.pgmigrations_id_seq', 56, true);
+SELECT pg_catalog.setval('public.pgmigrations_id_seq', 17, true);
 
 
 --

@@ -44,9 +44,14 @@ export interface ITokenBridgeForeignSide {
   ): Promise<TransactionReceipt>;
 }
 
+// Note that as we support new CPXD tokens, we'll need to measure the gas limit
+// the new tokens require for transfer which will effect this value. Ultimately
+// this value reflects the gas limit that the token bridge is configured with
+// for performing withdrawals.
+const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 350000;
+
 // Note:  To accommodate the fix for infura block mismatch errors (made in
 // CS-2391), we are waiting one extra block for all layer 1 transactions.
-const CLAIM_BRIDGED_TOKENS_GAS_LIMIT = 350000;
 export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
   constructor(private layer1Web3: Web3) {}
 
@@ -232,6 +237,7 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
         from,
         to: foreignAmbAddress,
         data,
+        gas: CLAIM_BRIDGED_TOKENS_GAS_LIMIT,
       };
       if (nonce != null) {
         tx.nonce = parseInt(nonce.toString()); // the web3 API requires this be a number, it should be ok to downcast this
@@ -259,7 +265,10 @@ export default class TokenBridgeForeignSide implements ITokenBridgeForeignSide {
 
   private async getNextNonce(from?: string): Promise<BN> {
     from = from ?? (await this.layer1Web3.eth.getAccounts())[0];
-    let nonce = await this.layer1Web3.eth.getTransactionCount(from);
+    // To accommodate the fix for infura block mismatch errors (made in CS-2391), we
+    // are waiting one extra block for all layer 1 transactions.
+    let previousBlockNumber = (await this.layer1Web3.eth.getBlockNumber()) - 1;
+    let nonce = await this.layer1Web3.eth.getTransactionCount(from, previousBlockNumber);
     return new BN(String(nonce)); // EOA nonces are zero based
   }
 }
