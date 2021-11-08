@@ -21,7 +21,7 @@ import {
   gasFee,
   getPaymentLimits,
 } from './prepaid-card.js';
-import { registerRewardProgram, registerRewardee } from './reward-manager';
+import { registerRewardProgram, registerRewardee, lockRewardProgram, isRewardProgramLocked } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
   usdPrice as layer2UsdPrice,
@@ -93,7 +93,9 @@ type Commands =
   | 'addRewardTokens'
   | 'rewardPoolBalance'
   | 'claimRewards'
-  | 'claimableRewardProofs';
+  | 'claimableRewardProofs'
+  | 'lockRewardProgram'
+  | 'isRewardProgramLocked';
 
 let command: Commands | undefined;
 interface Options {
@@ -826,6 +828,24 @@ let {
       command = 'claimableRewardProofs';
     }
   )
+  .command('lock-reward-program <prepaidCard> <rewardProgramId>', 'Lock reward program', (yargs) => {
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The prepaid card used to pay for gas for the txn',
+    });
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    command = 'lockRewardProgram';
+  })
+  .command('is-reward-program-locked <rewardProgramId>', 'Check lock status of reward program', (yargs) => {
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    command = 'isRewardProgramLocked';
+  })
   .options({
     network: {
       alias: 'n',
@@ -1190,6 +1210,24 @@ if (!command) {
         return;
       }
       await getClaimableRewardProofs(network, address, rewardProgramId, tokenAddress, mnemonic);
+      break;
+    case 'lockRewardProgram':
+      if (prepaidCard == null) {
+        showHelpAndExit('prepaid card is a required value');
+        return;
+      }
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      await lockRewardProgram(network, prepaidCard, rewardProgramId, mnemonic);
+      break;
+    case 'isRewardProgramLocked':
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      await isRewardProgramLocked(network, rewardProgramId, mnemonic);
       break;
     default:
       assertNever(command);

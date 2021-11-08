@@ -32,3 +32,24 @@ export async function registerRewardee(
   console.log(`Registered rewardee for reward program ${rewardProgramId}. Created reward safe: ${rewardSafe}`);
   console.log('done');
 }
+
+export async function lockRewardProgram(
+  network: string,
+  prepaidCard: string,
+  rewardProgramId: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  await prepaidCardAPI.lockRewardProgram(prepaidCard, rewardProgramId, {
+    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
+}
+
+export async function isRewardProgramLocked(network: string, rewardProgramId: string, mnemonic?: string): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardManager = await getSDK('RewardManager', web3);
+  const locked = await rewardManager.isLocked(rewardProgramId);
+  console.log(`Reward program ${rewardProgramId} is ${locked ? 'locked' : 'NOT locked'}`);
+}

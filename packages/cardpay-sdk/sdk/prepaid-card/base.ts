@@ -661,6 +661,66 @@ export default class PrepaidCard {
     };
   }
 
+  async lockRewardProgram(txnHash: string): Promise<TransactionReceipt>;
+  async lockRewardProgram(
+    prepaidCardAddress: string,
+    rewardProgramId: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt>;
+  async lockRewardProgram(
+    prepaidCardAddressOrTxnHash: string,
+    rewardProgramId?: string,
+    txnOptions?: TransactionOptions,
+    contractOptions?: ContractOptions
+  ): Promise<TransactionReceipt> {
+    if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
+      let txnHash = prepaidCardAddressOrTxnHash;
+      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    }
+    if (!prepaidCardAddressOrTxnHash) {
+      throw new Error('prepaidCardAddress is required');
+    }
+    if (!rewardProgramId) {
+      throw new Error('rewardProgramId is required');
+    }
+    let prepaidCardAddress = prepaidCardAddressOrTxnHash;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+
+    let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
+      let payload = await this.getLockRewardProgramPayload(prepaidCardAddress, rewardProgramId, 0, rateLock);
+      if (nonce == null) {
+        nonce = getNextNonceFromEstimate(payload);
+        if (typeof onNonce === 'function') {
+          onNonce(nonce);
+        }
+      }
+      return await this.executeLockRewardProgram(
+        prepaidCardAddress,
+        rewardProgramId,
+        0,
+        rateLock,
+        payload,
+        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
+        nonce
+      );
+    });
+
+    if (!gnosisResult) {
+      throw new Error(
+        `Unable to obtain a gnosis transaction result for register rewardee payment from prepaid card ${prepaidCardAddress}`
+      );
+    }
+
+    let txnHash = gnosisResult.ethereumTx.txHash;
+
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+  }
+
   async convertFromSpendForPrepaidCard(
     prepaidCardAddress: string,
     minimumSpendBalance: number,
@@ -851,6 +911,22 @@ export default class PrepaidCard {
     );
   }
 
+  private async getLockRewardProgramPayload(
+    prepaidCardAddress: string,
+    rewardProgramId: string,
+    spendAmount: number,
+    rate: string
+  ): Promise<SendPayload> {
+    return getSendPayload(
+      this.layer2Web3,
+      prepaidCardAddress,
+      spendAmount,
+      rate,
+      'lockRewardProgram',
+      this.layer2Web3.eth.abi.encodeParameters(['address'], [rewardProgramId])
+    );
+  }
+
   private async executePayMerchant(
     prepaidCardAddress: string,
     merchantSafe: string,
@@ -961,6 +1037,28 @@ export default class PrepaidCard {
       rate,
       payload,
       'registerRewardee',
+      this.layer2Web3.eth.abi.encodeParameters(['address'], [rewardProgramId]),
+      signatures,
+      nonce
+    );
+  }
+
+  private async executeLockRewardProgram(
+    prepaidCardAddress: string,
+    rewardProgramId: string,
+    spendAmount: number,
+    rate: string,
+    payload: SendPayload,
+    signatures: Signature[],
+    nonce: BN
+  ): Promise<GnosisExecTx> {
+    return await executeSend(
+      this.layer2Web3,
+      prepaidCardAddress,
+      spendAmount,
+      rate,
+      payload,
+      'lockRewardProgram',
       this.layer2Web3.eth.abi.encodeParameters(['address'], [rewardProgramId]),
       signatures,
       nonce

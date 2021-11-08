@@ -810,5 +810,38 @@
         "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
       ]
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Lock Reward Program",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "lock-reward-program",
+        "0xb284f51Ac8dc7df9D7DAedEf485092dc4D41B8A8", //prepaid card
+        "0x1c20cB9A77aCd795636E97c639DadBb8f168D288", //reward program
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Check if Reward Program Locked",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "is-reward-program-locked",
+        "0x1c20cB9A77aCd795636E97c639DadBb8f168D288", //reward program
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },
   ]
 }
