@@ -1,6 +1,6 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render, setupOnerror } from '@ember/test-helpers';
+import { render, settled, setupOnerror } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 
 import { setupMirage } from 'ember-cli-mirage/test-support';
@@ -13,10 +13,13 @@ import {
   createMerchantSafe,
   createPrepaidCardSafe,
   createSafeToken,
+  getFilenameFromDid,
 } from '@cardstack/web-client/utils/test-factories';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 interface Context extends MirageTestContext {}
+
+const EXAMPLE_DID = 'did:cardstack:1moVYMRNGv6E5Ca3t7aXVD2Yb11e4e91103f084a';
 
 module('Integration | Component | card-pay/safe-balances', function (hooks) {
   setupRenderingTest(hooks);
@@ -30,7 +33,17 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
 
   let depotSafe: Safe, merchantSafe: Safe, prepaidCardSafe: Safe;
 
-  hooks.beforeEach(async function () {
+  hooks.beforeEach(async function (this: Context) {
+    this.server.create('merchant-info', {
+      id: await getFilenameFromDid(EXAMPLE_DID),
+      name: 'Mandello',
+      slug: 'mandello1',
+      did: EXAMPLE_DID,
+      color: '#00ffcc',
+      'text-color': '#000000',
+      'owner-address': layer2AccountAddress,
+    });
+
     layer2Service = this.owner.lookup('service:layer2-network')
       .strategy as Layer2TestWeb3Strategy;
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
@@ -46,6 +59,7 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
         merchant: '0xprepaidDbAB0644ffCD32518eBF4924ba8666666',
         tokens: [createSafeToken('DAI.CPXD', '125000000000000000000')],
         accumulatedSpendValue: 100,
+        infoDID: EXAMPLE_DID,
       })),
       (prepaidCardSafe = createPrepaidCardSafe({
         address: prepaidCardAddress,
@@ -80,6 +94,8 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
     assert.dom('[data-test-safe-balances-count]').containsText('2');
     assert.dom('[data-test-safe-balances-type]').containsText('Depot');
 
+    assert.dom('[data-test-safe-balances-title]').containsText('Depot');
+
     assert
       .dom('[data-test-safe-balances-usd-total]')
       .containsText('$150.02 USD');
@@ -103,6 +119,9 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
     `);
     assert.dom('[data-test-safe-balances-count]').containsText('1');
     assert.dom('[data-test-safe-balances-type]').containsText('Business');
+
+    await settled();
+    assert.dom('[data-test-safe-balances-title]').containsText('Mandello');
   });
 
   test('it throws an error rendering a prepaid card safe', async function (this: Context, assert) {

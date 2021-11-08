@@ -4,6 +4,8 @@ import { DepotSafe, MerchantSafe, Safe } from '@cardstack/cardpay-sdk';
 import { TokenBalance, TokenSymbol } from '@cardstack/web-client/utils/token';
 import TokenToUsd from '@cardstack/web-client/services/token-to-usd';
 import BN from 'bn.js';
+import { MerchantInfo } from '@cardstack/web-client/resources/merchant-info';
+import { useResource } from 'ember-resources';
 
 interface CardPaySafeBalancesComponentArgs {
   safe: Safe;
@@ -30,6 +32,30 @@ export default class CardPaySafeBalancesComponent extends Component<CardPaySafeB
       depot: 'Depot',
       merchant: 'Business',
     }[safe.type];
+  }
+
+  get data() {
+    if (this.args.safe.type === 'merchant') {
+      let merchant = this.args.safe as MerchantSafe;
+
+      return {
+        info: useResource(this, MerchantInfo, () => ({
+          infoDID: merchant.infoDID,
+        })),
+      };
+    } else if (this.args.safe.type === 'depot') {
+      return {
+        info: {
+          name: 'Depot',
+        },
+      };
+    } else {
+      return {
+        info: {
+          name: 'Unknown',
+        },
+      };
+    }
   }
 
   get tokenBalances() {
