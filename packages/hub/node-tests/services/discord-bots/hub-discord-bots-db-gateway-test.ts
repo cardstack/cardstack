@@ -3,15 +3,14 @@ import shortUuid, { SUUID } from 'short-uuid';
 import DatabaseManager from '@cardstack/db';
 import { Snowflake } from '@cardstack/discord-bot/types';
 import { SnowflakeUtil } from '@cardstack/discord-bot';
-import { setupHub } from '../../helpers/server';
+import { createContainer } from '../../../main';
 
 describe('HubDiscordBotsDatabaseGateway', function () {
-  let { getContainer } = setupHub(this);
-
   let subject: HubDiscordBotsDbGateway, dbManager: DatabaseManager, botId: SUUID;
   beforeEach(async function () {
-    subject = await getContainer().lookup('hub-discord-bots-db-gateway');
-    dbManager = await getContainer().lookup('database-manager');
+    let container = createContainer();
+    subject = await container.lookup('hub-discord-bots-db-gateway');
+    dbManager = await container.lookup('database-manager');
     botId = shortUuid.generate();
   });
 
