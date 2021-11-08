@@ -6,6 +6,7 @@ import * as cryptoLib from '@walletconnect/iso-crypto';
 
 import Connector from '@walletconnect/core';
 import SessionStorage from '@walletconnect/core/dist/cjs/storage';
+import config from '@cardstack/web-client/config/environment';
 
 const GET_STORAGE_ID = (chainId: number) => `wallet-connect-chain-${chainId}`;
 
@@ -33,5 +34,16 @@ export default class CustomStorageWalletConnect extends Connector {
       pushServerOpts,
       sessionStorage: storage,
     });
+  }
+
+  set clientMeta(_value: any) {}
+
+  get clientMeta() {
+    return {
+      description: '',
+      url: window.location.origin,
+      icons: config.walletConnectIcons,
+      name: 'Cardstack',
+    };
   }
 }
