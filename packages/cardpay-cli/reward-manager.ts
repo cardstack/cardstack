@@ -24,9 +24,9 @@ export async function registerRewardee(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+  let rewardManagerAPI = await getSDK('RewardManager', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  let { rewardSafe } = await prepaidCardAPI.registerRewardee(prepaidCard, rewardProgramId, {
+  let { rewardSafe } = await rewardManagerAPI.registerRewardee(prepaidCard, rewardProgramId, {
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log(`Registered rewardee for reward program ${rewardProgramId}. Created reward safe: ${rewardSafe}`);
@@ -40,9 +40,9 @@ export async function lockRewardProgram(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+  let rewardManagerAPI = await getSDK('RewardManager', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  await prepaidCardAPI.lockRewardProgram(prepaidCard, rewardProgramId, {
+  await rewardManagerAPI.lockRewardProgram(prepaidCard, rewardProgramId, {
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
 }
@@ -66,9 +66,9 @@ export async function updateRewardProgramAdmin(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+  let rewardManagerAPI = await getSDK('RewardManager', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  await prepaidCardAPI.updateRewardProgramAdmin(prepaidCard, rewardProgramId, newAdmin, {
+  await rewardManagerAPI.updateRewardProgramAdmin(prepaidCard, rewardProgramId, newAdmin, {
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
 }
