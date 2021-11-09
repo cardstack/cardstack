@@ -85,7 +85,7 @@
 >
   {{#if (is-network-initialized)}}
     {{#if (eq this.flow 'create-business')}}
-      <CardPay::CreateMerchantWorkflow />
+      <CardPay::CreateMerchantWorkflow @onClose={{this.resetQueryParams}} />
     {{/if}}
   {{/if}}
 </Boxel::Modal>

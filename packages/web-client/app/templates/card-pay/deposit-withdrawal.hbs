@@ -58,10 +58,10 @@
 >
   {{#if (is-network-initialized)}}
     {{#if (eq this.flow 'deposit')}}
-      <CardPay::DepositWorkflow />
+      <CardPay::DepositWorkflow @onClose={{this.resetQueryParams}} />
     {{/if}}
     {{#if (eq this.flow 'withdrawal')}}
-      <CardPay::WithdrawalWorkflow />
+      <CardPay::WithdrawalWorkflow @onClose={{this.resetQueryParams}} />
     {{/if}}
   {{/if}}
 </Boxel::Modal>

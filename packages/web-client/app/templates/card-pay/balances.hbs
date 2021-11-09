@@ -70,6 +70,6 @@
   @onClose={{this.resetQueryParams}}
 >
   {{#if (is-network-initialized)}}
-    <CardPay::IssuePrepaidCardWorkflow />
+    <CardPay::IssuePrepaidCardWorkflow @onClose={{this.resetQueryParams}} />
   {{/if}}
 </Boxel::Modal>
