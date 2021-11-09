@@ -47,16 +47,6 @@
           <CardPay::SafeBalances @safe={{safe}} />
         {{/each}}
       </section>
-
-      {{#if this.layer2Network.depotSafe}}
-        {{!-- <CardPay::Depot
-          @type="depot"
-          @address={{this.layer2Network.depotSafe.address}}
-          @tokens={{this.tokensToDisplay}}
-          @usdBalanceTotal={{this.usdBalanceTotal}}
-          @withdraw={{fn this.transitionToDepositWithdrawal "withdrawal"}}
-        /> --}}
-      {{/if}}
     </section>
   {{/if}}
 </section>
