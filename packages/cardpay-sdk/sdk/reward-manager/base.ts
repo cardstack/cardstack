@@ -601,6 +601,10 @@ export default class RewardManager {
     return await (await this.getRewardManager()).methods.rewardProgramAdmins(rewardProgramId).call();
   }
 
+  async getRewardRule(rewardProgramId: string): Promise<string> {
+    return await (await this.getRewardManager()).methods.rule(rewardProgramId).call();
+  }
+
   private async getRewardManager(): Promise<Contract> {
     if (this.rewardManager) {
       return this.rewardManager;

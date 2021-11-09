@@ -29,6 +29,7 @@ import {
   updateRewardProgramAdmin,
   rewardProgramAdmin,
   addRewardRule,
+  rewardRule
 } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
@@ -106,7 +107,8 @@ type Commands =
   | 'isRewardProgramLocked'
   | 'updateRewardProgramAdmin'
   | 'rewardProgramAdmin'
-  | 'addRewardRule';
+  | 'addRewardRule'
+  | 'rewardRule';
 
 let command: Commands | undefined;
 interface Options {
@@ -908,6 +910,13 @@ let {
     });
     command = 'addRewardRule';
   })
+  .command('reward-rule <rewardProgramId>', 'Get reward rule', (yargs) => {
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    command = 'rewardRule';
+  })
   .options({
     network: {
       alias: 'n',
@@ -1341,6 +1350,13 @@ if (!command) {
         return;
       }
       await addRewardRule(network, prepaidCard, rewardProgramId, blob, mnemonic);
+      break;
+    case 'rewardRule':
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      await rewardRule(network, rewardProgramId, mnemonic);
       break;
     default:
       assertNever(command);

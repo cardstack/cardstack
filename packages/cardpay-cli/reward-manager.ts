@@ -94,3 +94,10 @@ export async function rewardProgramAdmin(network: string, rewardProgramId: strin
   const admin = await rewardManager.getRewardProgramAdmin(rewardProgramId);
   console.log(`Reward program admin of ${rewardProgramId} is ${admin}`);
 }
+
+export async function rewardRule(network: string, rewardProgramId: string, mnemonic?: string): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardManager = await getSDK('RewardManager', web3);
+  const admin = await rewardManager.getRewardRule(rewardProgramId);
+  console.log(`Reward program admin of ${rewardProgramId} is ${admin}`);
+}
