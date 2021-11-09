@@ -40,8 +40,8 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
       name: 'Mandello',
       slug: 'mandello1',
       did: EXAMPLE_DID,
-      color: '#00ffcc',
-      'text-color': '#000000',
+      color: '#00ffc1',
+      'text-color': '#000001',
       'owner-address': layer2AccountAddress,
     });
 
@@ -130,14 +130,17 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
       .containsText('cardstack.xyz/mandello1')
       .hasAttribute('href', 'https://cardstack.xyz/mandello1');
 
-    // FIXME add header background/text colour
+    assert.dom('[data-test-safe-balances-header]').hasStyle({
+      'background-color': new TinyColor('#00ffc1').toRgbString(),
+      color: new TinyColor('#000001').toRgbString(),
+    });
 
     assert
       .dom('[data-test-merchant-logo]')
       .containsText('M')
       .hasStyle({
-        'background-color': new TinyColor('#00ffcc').toRgbString(),
-        color: new TinyColor('#000000').toRgbString(),
+        'background-color': new TinyColor('#00ffc1').toRgbString(),
+        color: new TinyColor('#000001').toRgbString(),
       });
   });
 

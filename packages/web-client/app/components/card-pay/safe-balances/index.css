@@ -13,12 +13,15 @@
 }
 
 .card-pay-safe-balances__header {
+  --safe-balances-header-background-color: var(--boxel-dark);
+  --safe-balances-header-text-color: var(--boxel-light);
+
   padding: var(--boxel-sp-xs) var(--boxel-sp);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: var(--boxel-dark);
-  color: var(--boxel-light);
+  background-color: var(--safe-balances-header-background-color);
+  color: var(--safe-balances-header-text-color);
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
 }
