@@ -61,7 +61,7 @@ if (process.env.COMPILER) {
         .to.be.false;
 
       // TODO: Can we make getRealm return the corrent realm type?
-      let fsrealm = (await getContainer().lookup('realm-manager')).getRealm(realm) as any;
+      let fsrealm = (await getContainer().lookup('realm-manager')).getRealmForCard(realm) as any;
       expect(existsSync(join(fsrealm.directory, 'post0')), 'card is deleted from realm').to.be.false;
     });
   });

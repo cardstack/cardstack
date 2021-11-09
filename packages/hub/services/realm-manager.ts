@@ -12,23 +12,30 @@ export default class RealmManager {
   realms: RealmInterface[] = [];
 
   async ready() {
-    this.realms = await Promise.all(
-      realmsConfig.map((realm) => {
-        let container = getOwner(this);
-        return container.instantiate(FSRealm, realm);
+    await Promise.all(
+      realmsConfig.map((config) => {
+        return this.createRealm(config);
       })
     );
   }
 
   async createRealm(config: RealmConfig) {
     config.url = ensureTrailingSlash(config.url);
-    // TODO: notify method
-    let realm = await getOwner(this).instantiate(FSRealm, config.url, config.directory);
+    let realm = await getOwner(this).instantiate(
+      FSRealm,
+      config.url,
+      config.directory,
+      config.watch ? this.notify : undefined
+    );
     this.realms.push(realm);
     return realm;
   }
 
-  getRealm(url: string): RealmInterface {
+  notify(cardURL: string, action: 'save' | 'delete'): void {
+    throw new Error('not implemented');
+  }
+
+  getRealmForCard(url: string): RealmInterface {
     url = ensureTrailingSlash(url);
 
     for (let realm of this.realms) {
@@ -43,15 +50,15 @@ export default class RealmManager {
   }
 
   async read(url: string): Promise<RawCard> {
-    return this.getRealm(url).read(url);
+    return this.getRealmForCard(url).read(url);
   }
 
   async update(raw: RawCard): Promise<RawCard> {
-    return this.getRealm(raw.url).update(raw);
+    return this.getRealmForCard(raw.url).update(raw);
   }
 
   async delete(cardURL: string) {
-    return this.getRealm(cardURL).delete(cardURL);
+    return this.getRealmForCard(cardURL).delete(cardURL);
   }
 }
 

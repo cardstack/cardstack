@@ -1,16 +1,18 @@
-import { assertValidRawCard, RawCard } from '@cardstack/core/src/interfaces';
 import { existsSync, readFileSync, outputFileSync, removeSync, writeJsonSync, mkdirSync } from 'fs-extra';
-import { join } from 'path';
+import { sep, join } from 'path';
+import sane from 'sane';
 import walkSync from 'walk-sync';
-import { RealmInterface, RealmNotify } from '../interfaces';
+
+import { assertValidRawCard, RawCard } from '@cardstack/core/src/interfaces';
+import { CardstackError, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
+
+import { RealmInterface } from '../interfaces';
 import { ensureTrailingSlash } from '../utils/path';
 import { nanoid } from '../utils/ids';
-import { CardstackError, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
-import { IndexingOperations } from '../services/search-index';
 import { serverLog as logger } from '../utils/logger';
-import sane from 'sane';
-import { serverLog } from '../utils/logger';
-import { sep } from 'path';
+
+import { IndexingOperations } from '../services/search-index';
+import RealmManager from '../services/realm-manager';
 
 export default class FSRealm implements RealmInterface {
   url: string;
@@ -18,7 +20,7 @@ export default class FSRealm implements RealmInterface {
   private logger = logger;
   private watcher?: sane.Watcher;
 
-  constructor(url: string, directory: string, private notify: RealmNotify | undefined) {
+  constructor(url: string, directory: string, private notify: RealmManager['notify'] | undefined) {
     this.url = url;
     this.directory = ensureTrailingSlash(directory);
 
@@ -51,16 +53,13 @@ export default class FSRealm implements RealmInterface {
 
   private onFileChanged(action: 'save' | 'delete', filepath: string) {
     let segments = filepath.split(sep);
-    if (shouldIgnoreChange(segments)) {
+    if (!this.notify || shouldIgnoreChange(segments)) {
       // top-level files in the realm are not cards, we're assuming all
       // cards are directories under the realm.
       return;
     }
     let url = new URL(segments[0] + '/', this.url).href;
-
-    serverLog.log(`Rebuilding::START ${url}`);
-
-    this.notify && this.notify(url, action);
+    this.notify(url, action);
   }
 
   private buildCardPath(cardURL: string, ...paths: string[]): string {

@@ -55,7 +55,7 @@ export class CardService {
       realmURL = realm.url;
     }
 
-    let rawCard = await this.realmManager.getRealm(realmURL).create(raw);
+    let rawCard = await this.realmManager.getRealmForCard(realmURL).create(raw);
     let compiled = await this.searchIndex.indexCard(rawCard);
 
     return { data: rawCard.data, compiled };

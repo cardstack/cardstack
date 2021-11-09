@@ -27,8 +27,6 @@ export interface RealmInterface<Meta = unknown> {
   reindex(ops: IndexingOperations, meta: Meta | undefined): Promise<Meta>;
 }
 
-export type RealmNotify = (cardURL: string, action: 'save' | 'delete') => void;
-
 export interface Cache<CardType> {
   get(url: string): CardType | undefined;
   set(url: string, payload: CardType): void;

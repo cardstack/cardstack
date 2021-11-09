@@ -92,7 +92,7 @@ export default class CardRoutes {
       params: { encodedCardURL: url },
     } = ctx;
 
-    await this.realmManager.getRealm(url).delete(url);
+    await this.realmManager.getRealmForCard(url).delete(url);
     this.cache.deleteCard(url);
 
     ctx.status = 204;
