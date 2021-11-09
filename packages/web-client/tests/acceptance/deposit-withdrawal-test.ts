@@ -119,20 +119,7 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
     await layer2Service.test__simulateAccountsChanged([secondAddress]);
     await settled();
 
-    // assert
-    //   .dom('[data-test-card-pay-depot-header]')
-    //   .containsText('0x1234...dcba');
-    // assert.dom('[data-test-card-pay-depot-token-count]').containsText('1');
-    // assert
-    //   .dom('[data-test-card-pay-depot-usd-total]')
-    //   .containsText('$47.60 USD');
-    // assert
-    //   .dom('[data-test-card-pay-depot-token]')
-    //   .containsText('238.00 CARD.CPXD');
-    // assert.dom('[data-test-card-pay-depot-token]').containsText('$47.60 USD');
-
-    // await click('[data-test-workflow-button="withdrawal"]');
-    // assert.dom('[data-test-boxel-thread-header] h2').hasText('Withdrawal');
+    assert.dom('[data-test-safe-balances]').exists({ count: 1 });
   });
 
   test('Depot balance section when user has no depot', async function (this: Context, assert) {
@@ -150,26 +137,5 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
       '[data-test-available-balances-section] [data-test-workflow-button="deposit"]'
     );
     assert.dom('[data-test-boxel-thread-header] h2').containsText('Deposit');
-  });
-
-  test('Depot balance section when user has depot but no tokens', async function (this: Context, assert) {
-    let layer2Service: Layer2TestWeb3Strategy = this.owner.lookup(
-      'service:layer2-network'
-    ).strategy;
-    let layer2AccountAddress = '0x182619c6Ea074C053eF3f1e1eF81Ec8De6Eb6E44';
-    layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
-      createDepotSafe({
-        address: '0x123400000000000000000000000000000000abcd',
-        owners: [layer2AccountAddress],
-      }),
-    ]);
-    await layer2Service.test__simulateAccountsChanged([layer2AccountAddress]);
-    await visit('/card-pay/deposit-withdrawal');
-
-    assert.dom('[data-test-safe-balances]').exists();
-    // assert.dom('[data-test-card-pay-depot]').exists();
-    // assert.dom('[data-test-card-pay-depot-token-count]').containsText('0');
-    // assert.dom('[data-test-card-pay-depot-usd-total]').containsText('$0.00');
-    // assert.dom('[data-test-card-pay-depot-token]').doesNotExist();
   });
 });
