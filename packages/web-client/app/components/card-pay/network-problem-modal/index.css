@@ -1,20 +1,20 @@
-.chain-change-modal {
-  --chain-change-modal-max-width: 36.25rem; /* 580px */
+.network-problem-modal {
+  --network-problem-modal-max-width: 36.25rem; /* 580px */
   --boxel-modal-max-width: unset;
   /* stylelint-disable-next-line length-zero-no-unit */
   --boxel-modal-offset-top: 0px; /* Do not remove the px here. It would break the `calc` calculation for the scroll. */
 }
 
-.chain-change-modal > div {
+.network-problem-modal > div {
   width: auto;
   display: flex;
   align-items: center;
   margin: 0 var(--boxel-sp-lg);
 }
 
-.chain-change-modal__scroll-wrapper {
+.network-problem-modal__scroll-wrapper {
   width: 100%;
-  max-width: var(--chain-change-modal-max-width);
+  max-width: var(--network-problem-modal-max-width);
   height: auto;
   max-height: 100%;
   margin: auto;
@@ -24,12 +24,12 @@
 }
 
 @media screen and (max-width: 40rem) {
-  .chain-change-modal__scroll-wrapper {
+  .network-problem-modal__scroll-wrapper {
     min-width: unset;
   }
 }
 
-.chain-change-modal__card {
+.network-problem-modal__card {
   position: relative;
   padding: var(--boxel-sp-xxl) var(--boxel-sp-lg);
   display: flex;
@@ -40,7 +40,7 @@
   outline-style: solid;
 }
 
-.chain-change-modal__card-title {
+.network-problem-modal__card-title {
   font: 700 1.125rem/calc(24 / 18) var(--boxel-font-family);
   letter-spacing: 0;
   display: flex;
@@ -48,11 +48,11 @@
   flex-flow: row nowrap;
 }
 
-.chain-change-modal__card-title-content {
+.network-problem-modal__card-title-content {
   flex-grow: 1;
 }
 
-.chain-change-modal__card-title-icon {
+.network-problem-modal__card-title-icon {
   margin-right: var(--boxel-sp-sm);
   flex-shrink: 0;
 }

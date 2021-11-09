@@ -26,7 +26,8 @@ interface ConnectionManagerOptions {
 type ConnectionManagerWalletEvent =
   | 'connected'
   | 'disconnected'
-  | 'chain-changed';
+  | 'chain-changed'
+  | 'websocket-disconnected';
 
 type ConnectionManagerCrossTabEvent = 'cross-tab-connection';
 
@@ -142,6 +143,7 @@ export class ConnectionManager {
     this.strategy.on('connected', this.onConnect);
     this.strategy.on('disconnected', this.onDisconnect);
     this.strategy.on('chain-changed', this.onChainChanged);
+    this.strategy.on('websocket-disconnected', this.onWebsocketDisconnected);
     await this.strategy.setup(session);
   }
 
@@ -207,6 +209,10 @@ export class ConnectionManager {
 
   @action onChainChanged(chainId: number) {
     this.emit('chain-changed', chainId);
+  }
+
+  @action onWebsocketDisconnected() {
+    this.emit('websocket-disconnected');
   }
 }
 
@@ -449,6 +455,11 @@ class WalletConnectConnectionStrategy extends ConnectionStrategy {
     provider.on('disconnect', (code: number, reason: string) => {
       console.log('disconnect from wallet connect', code, reason);
       this.onDisconnect(false);
+    });
+
+    provider.on('websocket-disconnected', () => {
+      this.emit('websocket-disconnected');
+      this.disconnect();
     });
 
     this.provider = provider;

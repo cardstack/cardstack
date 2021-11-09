@@ -169,6 +169,12 @@ export default abstract class Layer2ChainWeb3Strategy
       },
       connector: new CustomStorageWalletConnect(connectorOptions, this.chainId),
     });
+
+    this.provider.on('websocket-disconnected', () => {
+      this.simpleEmitter.emit('websocket-disconnected');
+      this.disconnect();
+    });
+
     this.web3.setProvider(this.provider as any);
 
     this.connector.on('display_uri', (err, payload) => {
