@@ -8,6 +8,6 @@ exports.builder = {};
 
 exports.handler = async function (/* argv: Argv */) {
   let container = createContainer();
-  let builder = await container.lookup('card-builder');
-  await builder.primeCache(true);
+  let searchIndex = await container.lookup('searchIndex');
+  await searchIndex.indexAllRealms();
 };

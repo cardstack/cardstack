@@ -5,11 +5,14 @@ import { RealmInterface } from '../interfaces';
 import { ensureTrailingSlash } from '../utils/path';
 import config from 'config';
 import { getOwner } from '@cardstack/di';
+import { inject } from '@cardstack/di';
 
 const realmsConfig = config.get('compiler.realmsConfig') as RealmConfig[];
 
 export default class RealmManager {
   realms: RealmInterface[] = [];
+
+  private searchIndex = inject('searchIndex');
 
   async ready() {
     await Promise.all(
@@ -25,14 +28,14 @@ export default class RealmManager {
       FSRealm,
       config.url,
       config.directory,
-      config.watch ? this.notify : undefined
+      config.watch ? this.notify.bind(this) : undefined
     );
     this.realms.push(realm);
     return realm;
   }
 
-  notify(cardURL: string, action: 'save' | 'delete'): void {
-    throw new Error('not implemented');
+  private notify(cardURL: string, action: 'save' | 'delete'): void {
+    this.searchIndex.notify(cardURL, action);
   }
 
   getRealmForCard(url: string): RealmInterface {

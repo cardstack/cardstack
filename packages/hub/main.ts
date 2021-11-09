@@ -229,8 +229,8 @@ export class HubServer {
     if (!process.env.COMPILER) {
       throw new Error('COMPILER feature flag is not present');
     }
-    let builder = await getOwner(this).lookup('card-builder');
-    await builder.primeCache();
+    let searchIndex = await getOwner(this).lookup('searchIndex');
+    await searchIndex.indexAllRealms();
   }
 }
 
