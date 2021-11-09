@@ -1,45 +1,57 @@
-import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
+import { TEST_REALM, templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers';
 import { expect } from 'chai';
-import { ProjectTestRealm } from '../../helpers/cards';
-import { setupServer } from '../../helpers/server';
+import { registry, setupHub } from '../../helpers/server';
 
 if (process.env.COMPILER) {
   describe('GET /cardFor/<path>', function () {
-    let realm: ProjectTestRealm;
-
     function getCardForPath(path: string) {
       return request().get(`/cardFor/${path}`);
     }
 
-    let { createRealm, resolveCard, getServer, request } = setupServer(this);
+    this.beforeEach(function () {
+      registry(this).register(
+        'card-routes-config',
+        class {
+          routeCard = `${TEST_REALM}routes`;
+        }
+      );
+    });
+
+    let { cards, resolveCard, request, realm } = setupHub(this);
 
     this.beforeEach(async function () {
-      realm = await createRealm('https://my-realm');
-      realm.addCard('routes', {
-        'card.json': { schema: 'schema.js' },
-        'schema.js': `
+      await cards.create({
+        url: `${realm}routes`,
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
             export default class Routes {
               routeTo(path) {
                 if (path === 'homepage') {
-                  return 'https://my-realm/welcome';
+                  return '${TEST_REALM}welcome';
                 }
 
                 if (path === 'about') {
-                  return 'https://my-realm/about';
+                  return '${TEST_REALM}about';
                 }
               }
             }
           `,
+        },
       });
-      let cardRoutes = await getServer().container.lookup('card-routes');
-      cardRoutes.setRoutingCard('https://my-realm/routes');
-      realm.addCard('homepage', {
-        'card.json': { isolated: 'isolated.js' },
-        'isolated.js': templateOnlyComponentTemplate('<h1>Welcome to my homepage</h1>'),
+      await cards.create({
+        url: `${realm}homepage`,
+        isolated: 'isolated.js',
+        files: {
+          'isolated.js': templateOnlyComponentTemplate('<h1>Welcome to my homepage</h1>'),
+        },
       });
-      realm.addCard('about', {
-        'card.json': { isolated: 'isolated.js' },
-        'isolated.js': templateOnlyComponentTemplate('<div>I like trains</div>'),
+      await cards.create({
+        url: `${realm}about`,
+        isolated: 'isolated.js',
+        files: {
+          'isolated.js': templateOnlyComponentTemplate('<div>I like trains</div>'),
+        },
       });
     });
 
@@ -50,7 +62,7 @@ if (process.env.COMPILER) {
 
     it("can load a simple isolated card's data", async function () {
       let response = await getCardForPath('about').expect(200);
-      expect(response.body.data.id).to.equal('https://my-realm/about');
+      expect(response.body.data.id).to.equal(`${TEST_REALM}about`);
       let componentModule = response.body.data?.meta.componentModule;
       expect(componentModule, 'should have componentModule').to.not.be.undefined;
       expect(resolveCard(componentModule), 'component module is resolvable').to.not.be.undefined;

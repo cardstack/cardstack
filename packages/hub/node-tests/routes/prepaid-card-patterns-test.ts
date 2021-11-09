@@ -1,12 +1,12 @@
 import { Client } from 'pg';
-import { setupServer } from '../helpers/server';
+import { setupHub } from '../helpers/server';
 
 describe('GET /api/prepaid-card-patterns', function () {
   let db: Client;
-  let { getServer, request } = setupServer(this);
+  let { getContainer, request } = setupHub(this);
 
   this.beforeEach(async function () {
-    let dbManager = await getServer().container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
 
     let rows = [

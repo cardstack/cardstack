@@ -35,6 +35,7 @@ declare const config: {
   version: string;
   infuraId: string;
   urls: UrlsOptions;
+  walletConnectIcons: string[];
   APP: Record<string, unknown>;
   threadAnimationInterval: number;
 };

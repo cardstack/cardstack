@@ -1,29 +1,21 @@
-import { createTestEnv } from '../../helpers';
-import { Container, Registry } from '@cardstack/di';
 import HubDiscordBotsDbGateway from '../../../services/discord-bots/discord-bots-db-gateway';
 import shortUuid, { SUUID } from 'short-uuid';
 import DatabaseManager from '@cardstack/db';
 import { Snowflake } from '@cardstack/discord-bot/types';
 import { SnowflakeUtil } from '@cardstack/discord-bot';
+import { createContainer } from '../../../main';
+import type { Container } from '@cardstack/di';
 
 describe('HubDiscordBotsDatabaseGateway', function () {
-  let destroy: () => Promise<void>;
-
-  let container: Container;
-  async function createSubject(registryCallback?: (registry: Registry) => void): Promise<HubDiscordBotsDbGateway> {
-    ({ container, destroy } = await createTestEnv(registryCallback));
-    return await container.lookup('hub-discord-bots-db-gateway');
-  }
-
-  let subject: HubDiscordBotsDbGateway, dbManager: DatabaseManager, botId: SUUID;
+  let subject: HubDiscordBotsDbGateway, dbManager: DatabaseManager, botId: SUUID, container: Container;
   beforeEach(async function () {
-    subject = await createSubject();
+    container = createContainer();
+    subject = await container.lookup('hub-discord-bots-db-gateway');
     dbManager = await container.lookup('database-manager');
     botId = shortUuid.generate();
   });
-
   afterEach(async function () {
-    await destroy();
+    await container.teardown();
   });
 
   describe('updateStatus', function () {

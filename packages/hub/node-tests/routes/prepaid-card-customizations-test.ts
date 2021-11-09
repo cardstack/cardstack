@@ -1,9 +1,8 @@
 import { Client } from 'pg';
 import shortUuid from 'short-uuid';
-import { Registry } from '@cardstack/di';
 import { parseIdentifier } from '@cardstack/did-resolver';
 import { Job, TaskSpec } from 'graphile-worker';
-import { setupServer } from '../helpers/server';
+import { registry, setupHub } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -46,15 +45,15 @@ describe('POST /api/prepaid-card-customizations', function () {
   let db: Client;
   let validPayload: any;
 
-  let { getServer, request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
-      registry.register('worker-client', StubWorkerClient);
-    },
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('worker-client', StubWorkerClient);
   });
 
+  let { getContainer, request } = setupHub(this);
+
   this.beforeEach(async function () {
-    let dbManager = await getServer().container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
 
     let rows = [

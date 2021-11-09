@@ -1,20 +1,8 @@
 import { CardSpace } from '../../routes/card-spaces';
-import CardSpaceValidator from '../../services/validators/card-space';
-import { createTestEnv } from '../helpers';
-import { Registry } from '@cardstack/di';
+import { setupHub } from '../helpers/server';
 
 describe('CardSpaceValidator', function () {
-  let destroy: () => Promise<void>;
-
-  async function createSubject(registryCallback?: (registry: Registry) => void): Promise<CardSpaceValidator> {
-    let container;
-    ({ container, destroy } = await createTestEnv(registryCallback));
-    return await container.lookup('card-space-validator');
-  }
-
-  afterEach(async function () {
-    await destroy();
-  });
+  let { getContainer } = setupHub(this);
 
   let invalidUrls = [
     'www.card.space',
@@ -32,14 +20,14 @@ describe('CardSpaceValidator', function () {
 
   invalidUrls.forEach(async (url) => {
     it(`should validate ${url}`, async function () {
-      let subject = await createSubject();
+      let subject = await getContainer().lookup('card-space-validator');
       let errors = await subject.validate({ url } as CardSpace);
       expect(errors.url).to.have.length.above(0);
     });
   });
 
   it('validates urls', async function () {
-    let subject = await createSubject();
+    let subject = await getContainer().lookup('card-space-validator');
 
     const cardSpace: CardSpace = {
       id: '',
@@ -55,7 +43,7 @@ describe('CardSpaceValidator', function () {
   });
 
   it('validates text field attributes', async function () {
-    let subject = await createSubject();
+    let subject = await getContainer().lookup('card-space-validator');
 
     const cardSpace: CardSpace = {
       id: '',
@@ -84,7 +72,7 @@ describe('CardSpaceValidator', function () {
   });
 
   it('validates links', async function () {
-    let subject = await createSubject();
+    let subject = await getContainer().lookup('card-space-validator');
     const cardSpace: CardSpace = {
       id: '',
       url: 'mike.card.space',
@@ -121,7 +109,7 @@ describe('CardSpaceValidator', function () {
   });
 
   it('validates the donation attributes', async function () {
-    let subject = await createSubject();
+    let subject = await getContainer().lookup('card-space-validator');
 
     const cardSpace: CardSpace = {
       id: '',

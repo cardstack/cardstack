@@ -1,0 +1,40 @@
+name: Manual publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: |
+          Increment version(s) by explicit version or_ semver keyword,
+          'major', 'minor', 'patch', 'premajor', 'preminor', 'prepatch', 'prerelease', 'from-git', or 'from-package'
+        required: true
+        default: patch
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: Set up yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - uses: volta-cli/action@v1
+
+      - name: Prepare dependencies
+        run: |
+          yarn --prefer-offline
+          echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' > $HOME/.npmrc
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Publish
+        run: |
+          npx lerna publish ${{ github.event.inputs.bump }} --force-publish "*" --yes --no-verify-access

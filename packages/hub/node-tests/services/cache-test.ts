@@ -1,7 +1,7 @@
 import { Environment } from '../../interfaces';
 import { expect } from 'chai';
-import { setupCardBuilding } from '../helpers/cards';
 import CardCache from '../../services/card-cache';
+import { setupHub } from '../helpers/server';
 
 if (process.env.COMPILER) {
   describe('CardCache', function () {
@@ -10,10 +10,10 @@ if (process.env.COMPILER) {
     let moduleName = 'isolated.js';
     let cardURL = 'https://acard.com/verycard';
 
-    let { getCardCache } = setupCardBuilding(this);
+    let { getContainer } = setupHub(this);
 
-    this.beforeEach(function () {
-      cache = getCardCache();
+    this.beforeEach(async function () {
+      cache = await getContainer().lookup('card-cache');
     });
 
     it('.setModule', function () {

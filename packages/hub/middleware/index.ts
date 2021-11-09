@@ -1,6 +1,6 @@
 import type Koa from 'koa';
 import KoaBody from 'koa-body';
-import { CardstackError } from '../utils/error';
+import { CardstackError } from '@cardstack/core/src/utils/errors';
 import logger from '@cardstack/logger';
 const serverLog = logger('hub/server');
 
