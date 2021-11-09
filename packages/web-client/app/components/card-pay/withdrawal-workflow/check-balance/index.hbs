@@ -45,7 +45,7 @@
         <CardPay::BalanceDisplay
           @size="large"
           @icon={{this.nativeTokenDisplayInfo.icon}}
-          @balance={{format-wei-amount this.minimumBalanceForWithdrawalClaim}}
+          @balance={{format-wei-amount this.minimumBalanceForWithdrawalClaim false}}
           @symbol={{this.nativeTokenDisplayInfo.symbol}}
           @usdBalance={{token-to-usd 'ETH' this.minimumBalanceForWithdrawalClaim}}
         />

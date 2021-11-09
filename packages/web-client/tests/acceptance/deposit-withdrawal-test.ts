@@ -60,10 +60,10 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
       .containsText(`$116.41 USD`);
     assert
       .dom('[data-test-card-pay-depot-token="DAI.CPXD"]')
-      .containsText('14.1422987 DAI.CPXD');
+      .containsText('14.14 DAI.CPXD');
     assert
       .dom('[data-test-card-pay-depot-token="CARD.CPXD"]')
-      .containsText('567.8991 CARD.CPXD');
+      .containsText('567.90 CARD.CPXD');
     assert
       .dom('[data-test-card-pay-depot-token="DAI.CPXD"]')
       .containsText('$2.83 USD');

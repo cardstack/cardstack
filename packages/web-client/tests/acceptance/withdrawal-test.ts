@@ -76,7 +76,7 @@ module('Acceptance | withdrawal', function (hooks) {
       card: new BN('10000000000000000000000'),
     });
     await waitFor(`${post} [data-test-balance="ETH"]`);
-    assert.dom(`${post} [data-test-balance="ETH"]`).containsText('2.1411');
+    assert.dom(`${post} [data-test-balance="ETH"]`).containsText('2.14');
     assert.dom(`${post} [data-test-balance="DAI"]`).containsText('150.50');
     assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10,000.00');
     await settled();
