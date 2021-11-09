@@ -88,6 +88,19 @@ export async function addRewardRule(
   });
 }
 
+export async function removeRewardProgram(
+  network: string,
+  rewardProgramId: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardManagerAPI = await getSDK('RewardManager', web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  await rewardManagerAPI.removeRewardProgram(rewardProgramId, {
+    onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
+}
+
 export async function rewardProgramAdmin(network: string, rewardProgramId: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardManager = await getSDK('RewardManager', web3);

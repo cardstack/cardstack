@@ -29,7 +29,8 @@ import {
   updateRewardProgramAdmin,
   rewardProgramAdmin,
   addRewardRule,
-  rewardRule
+  rewardRule,
+  removeRewardProgram,
 } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
@@ -108,7 +109,8 @@ type Commands =
   | 'updateRewardProgramAdmin'
   | 'rewardProgramAdmin'
   | 'addRewardRule'
-  | 'rewardRule';
+  | 'rewardRule'
+  | 'removeRewardProgram';
 
 let command: Commands | undefined;
 interface Options {
@@ -917,6 +919,13 @@ let {
     });
     command = 'rewardRule';
   })
+  .command('remove-reward-program <rewardProgramId>', 'Remove reward program', (yargs) => {
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    command = 'removeRewardProgram';
+  })
   .options({
     network: {
       alias: 'n',
@@ -1357,6 +1366,13 @@ if (!command) {
         return;
       }
       await rewardRule(network, rewardProgramId, mnemonic);
+      break;
+    case 'removeRewardProgram':
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      await removeRewardProgram(network, rewardProgramId, mnemonic);
       break;
     default:
       assertNever(command);
