@@ -62,6 +62,7 @@
   font-size: 1.625rem;
   font-weight: 600;
   letter-spacing: 0;
+  line-height: var(--boxel-font-size-lg);
 }
 
 .card-pay-safe-balances__logo {
@@ -76,7 +77,7 @@
 
 .card-pay-safe-balances__title-link {
   color: var(--boxel-purple-400);
-  font-size: var(--boxel-font-size-sm);
+  font-size: var(--boxel-font-size-xs);
 }
 
 .card-pay-safe-balances__title-link:hover {
