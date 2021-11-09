@@ -88,11 +88,7 @@ export async function addRewardRule(
   });
 }
 
-export async function removeRewardProgram(
-  network: string,
-  rewardProgramId: string,
-  mnemonic?: string
-): Promise<void> {
+export async function removeRewardProgram(network: string, rewardProgramId: string, mnemonic?: string): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
   let rewardManagerAPI = await getSDK('RewardManager', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
