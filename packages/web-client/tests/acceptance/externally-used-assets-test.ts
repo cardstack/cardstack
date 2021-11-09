@@ -21,17 +21,31 @@ module('Acceptance | externally used assets', function () {
     const container = document.querySelector((config as any).APP.rootElement)!;
     container.style.overflow = 'visible';
 
+    const pendingImageResults = [];
+
+    // loop over and add image elements to DOM
+    // and also add the image results to an array
+    // in the same order as the asset paths so that we can pair them by index
     for (let assetUrl of EXTERNALLY_USED_ASSET_PATHS) {
       const image = new Image();
-      let p = new Promise((resolve) => {
+      let pendingImageResult = new Promise((resolve) => {
         image.onload = () => resolve(true);
         image.onerror = () => resolve(false);
       });
       image.src = assetUrl;
 
-      container.appendChild(image);
+      pendingImageResults.push(pendingImageResult);
 
-      assert.ok(await p, `"${assetUrl}" can be loaded`);
+      container.appendChild(image);
+    }
+
+    let imageResults = await Promise.all(pendingImageResults);
+
+    for (let index = 0; index < imageResults.length; index++) {
+      assert.ok(
+        imageResults[index],
+        `"${EXTERNALLY_USED_ASSET_PATHS[index]}" can be loaded`
+      );
     }
 
     await percySnapshot('Externally used assets');
