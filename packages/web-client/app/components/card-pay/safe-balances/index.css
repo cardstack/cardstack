@@ -23,6 +23,11 @@
   border-top-right-radius: inherit;
 }
 
+.card-pay-safe-balances__network-and-address {
+  display: flex;
+  align-items: center;
+}
+
 .card-pay-safe-balances__network {
   display: inline-flex;
   align-items: center;
@@ -50,6 +55,7 @@
   font-size: var(--boxel-font-size-xs);
   font-weight: 600;
   letter-spacing: var(--boxel-lsp-xl);
+  line-height: 0;
 }
 
 .card-pay-safe-balances__title-container {
