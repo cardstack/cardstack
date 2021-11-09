@@ -9,14 +9,21 @@ import { getOwner } from '@cardstack/di';
 const realmsConfig = config.get('compiler.realmsConfig') as RealmConfig[];
 
 export default class RealmManager {
-  realms: RealmInterface[] = realmsConfig.map((realm) => {
-    let container = getOwner(this);
-    return container.instantiate(FSRealm, realm);
-  });
+  realms: RealmInterface[] = [];
 
-  createRealm(config: RealmConfig, klass?: any) {
+  async ready() {
+    this.realms = await Promise.all(
+      realmsConfig.map((realm) => {
+        let container = getOwner(this);
+        return container.instantiate(FSRealm, realm);
+      })
+    );
+  }
+
+  async createRealm(config: RealmConfig) {
     config.url = ensureTrailingSlash(config.url);
-    let realm = klass ? new klass(config) : new FSRealm(config);
+    // TODO: notify method
+    let realm = await getOwner(this).instantiate(FSRealm, config.url, config.directory);
     this.realms.push(realm);
     return realm;
   }
