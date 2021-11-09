@@ -87,6 +87,7 @@
 .card-pay-safe-balances__title-link {
   color: var(--boxel-purple-400);
   font-size: var(--boxel-font-size-xs);
+  display: none;
 }
 
 .card-pay-safe-balances__title-link:hover {

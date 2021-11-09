@@ -35,13 +35,14 @@
           {{this.data.info.name}}
         </h3>
         {{#if this.data.info.id}}
+          {{!-- this is currently hidden in CSS as the URLs aren’t valid yet --}}
           <a
             href={{concat 'https://cardstack.xyz/' this.data.info.id}}
             class='card-pay-safe-balances__title-link'
             target='_blank'
             rel='noopener noreferrer'
             data-test-safe-balances-link>
-            cardstack.xyz/{{this.data.info.id}} {{!--FIXME does this work yet --}}
+            cardstack.xyz/{{this.data.info.id}}
           </a>
         {{/if}}
       </div>
