@@ -77,7 +77,7 @@
 .card-pay-safe-balances__logo {
   width: 80px;
   height: 80px;
-  margin-right: var(--boxel-sp);
+  margin-right: var(--boxel-sp-sm);
 }
 
 .card-pay-safe-balances__logo.merchant-logo {
