@@ -525,6 +525,10 @@ class WalletConnectProvider extends ExtendedProviderEngine {
   }
 
   async maybeReconnect() {
+    // setTimeout is needed to delay execution of this code until the
+    // websocket provider has finished the callback for its close event,
+    // because part of that callback includes clearing all event listeners attached to it.
+    // We need to reattach the event listeners after that completes.
     setTimeout(() => {
       try {
         console.log('attempting websocket reconnection');
