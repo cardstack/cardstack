@@ -490,92 +490,6 @@ export default class PrepaidCard {
     };
   }
 
-  async registerRewardProgram(txnHash: string): Promise<{ rewardProgramId: string; txReceipt: TransactionReceipt }>;
-  async registerRewardProgram(
-    prepaidCardAddress: string,
-    admin: string,
-    txnOptions?: TransactionOptions,
-    contractOptions?: ContractOptions
-  ): Promise<{ rewardProgramId: string; txReceipt: TransactionReceipt }>;
-  async registerRewardProgram(
-    prepaidCardAddressOrTxnHash: string,
-    admin?: string,
-    txnOptions?: TransactionOptions,
-    contractOptions?: ContractOptions
-  ): Promise<{ rewardProgramId: string; txReceipt: TransactionReceipt }> {
-    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
-    let rewardProgramId = await rewardManager.newRewardProgramId();
-    if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
-      let txnHash = prepaidCardAddressOrTxnHash;
-      return {
-        rewardProgramId,
-        txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
-      };
-    }
-    if (!prepaidCardAddressOrTxnHash) {
-      throw new Error('prepaidCardAddress is required');
-    }
-    let prepaidCardAddress = prepaidCardAddressOrTxnHash;
-    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
-    let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let rewardProgramRegistrationFees = await rewardManager.getRewardProgramRegistrationFees();
-    await this.convertFromSpendForPrepaidCard(
-      prepaidCardAddress,
-      rewardProgramRegistrationFees,
-      (issuingToken, balanceAmount, requiredTokenAmount, symbol) =>
-        new Error(
-          `Prepaid card does not have enough balance to register reward program. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
-            balanceAmount
-          )} ${symbol}, payment amount in issuing token is ${fromWei(requiredTokenAmount)} ${symbol}`
-        )
-    );
-
-    let prepaidCardMgr = await this.getPrepaidCardMgr();
-    let rewardProgramAdmin: string =
-      admin ?? (await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCardAddress).call());
-    let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
-      let payload = await this.getRegisterRewardProgramPayload(
-        prepaidCardAddress,
-        rewardProgramAdmin,
-        rewardProgramId,
-        rewardProgramRegistrationFees,
-        rateLock
-      );
-      if (nonce == null) {
-        nonce = getNextNonceFromEstimate(payload);
-        if (typeof onNonce === 'function') {
-          onNonce(nonce);
-        }
-      }
-      return await this.executeRegisterRewardProgram(
-        prepaidCardAddress,
-        rewardProgramAdmin,
-        rewardProgramId,
-        rewardProgramRegistrationFees,
-        rateLock,
-        payload,
-        await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
-        nonce
-      );
-    });
-
-    if (!gnosisResult) {
-      throw new Error(
-        `Unable to obtain a gnosis transaction result for register reward program from prepaid card ${prepaidCardAddressOrTxnHash} to merchant safe ${prepaidCardAddress} for ${rewardProgramRegistrationFees} SPEND`
-      );
-    }
-
-    let txnHash = gnosisResult.ethereumTx.txHash;
-
-    if (typeof onTxnHash === 'function') {
-      await onTxnHash(txnHash);
-    }
-
-    return {
-      rewardProgramId,
-      txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
-    };
-  }
 
   async registerRewardee(txnHash: string): Promise<{ rewardSafe: string; txReceipt: TransactionReceipt }>;
   async registerRewardee(
@@ -832,7 +746,7 @@ export default class PrepaidCard {
     return prepaidCards;
   }
 
-  private async getPrepaidCardMgr() {
+  async getPrepaidCardMgr() {
     if (this.prepaidCardManager) {
       return this.prepaidCardManager;
     }
@@ -946,22 +860,6 @@ export default class PrepaidCard {
     );
   }
 
-  private async getRegisterRewardProgramPayload(
-    prepaidCardAddress: string,
-    admin: string,
-    rewardProgramId: string,
-    spendAmount: number,
-    rate: string
-  ): Promise<SendPayload> {
-    return getSendPayload(
-      this.layer2Web3,
-      prepaidCardAddress,
-      spendAmount,
-      rate,
-      'registerRewardProgram',
-      this.layer2Web3.eth.abi.encodeParameters(['address', 'address'], [admin, rewardProgramId])
-    );
-  }
 
   private async getRegisterRewardeePayload(
     prepaidCardAddress: string,
@@ -1081,28 +979,6 @@ export default class PrepaidCard {
     );
   }
 
-  private async executeRegisterRewardProgram(
-    prepaidCardAddress: string,
-    admin: string,
-    rewardProgramId: string,
-    spendAmount: number,
-    rate: string,
-    payload: SendPayload,
-    signatures: Signature[],
-    nonce: BN
-  ): Promise<GnosisExecTx> {
-    return await executeSend(
-      this.layer2Web3,
-      prepaidCardAddress,
-      spendAmount,
-      rate,
-      payload,
-      'registerRewardProgram',
-      this.layer2Web3.eth.abi.encodeParameters(['address', 'address'], [admin, rewardProgramId]),
-      signatures,
-      nonce
-    );
-  }
 
   private async executeRegisterRewardee(
     prepaidCardAddress: string,

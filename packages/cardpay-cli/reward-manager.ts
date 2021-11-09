@@ -8,10 +8,10 @@ export async function registerRewardProgram(
   mnemonic?: string
 ): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
-  let prepaidCardAPI = await getSDK('PrepaidCard', web3);
+  let rewardManagerAPI = await getSDK('RewardManager', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  let { rewardProgramId } = await prepaidCardAPI.registerRewardProgram(prepaidCard, admin, {
-    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  let { rewardProgramId } = await rewardManagerAPI.registerRewardProgram(prepaidCard, admin, {
+    onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log(`Registered reward program ${rewardProgramId} with admin ${admin}`);
   console.log('done');
@@ -27,7 +27,7 @@ export async function registerRewardee(
   let prepaidCardAPI = await getSDK('PrepaidCard', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
   let { rewardSafe } = await prepaidCardAPI.registerRewardee(prepaidCard, rewardProgramId, {
-    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+    onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
   console.log(`Registered rewardee for reward program ${rewardProgramId}. Created reward safe: ${rewardSafe}`);
   console.log('done');
@@ -43,7 +43,7 @@ export async function lockRewardProgram(
   let prepaidCardAPI = await getSDK('PrepaidCard', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
   await prepaidCardAPI.lockRewardProgram(prepaidCard, rewardProgramId, {
-    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+    onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
 }
 
@@ -69,7 +69,7 @@ export async function updateRewardProgramAdmin(
   let prepaidCardAPI = await getSDK('PrepaidCard', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
   await prepaidCardAPI.updateRewardProgramAdmin(prepaidCard, rewardProgramId, newAdmin, {
-    onTxnHash: (txnHash) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+    onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
 }
 
