@@ -1,7 +1,6 @@
-import { Registry } from '@cardstack/di';
 import packageJson from '../../package.json';
 import { AcceleratableClock } from '../helpers';
-import { setupServer } from '../helpers/server';
+import { registry, setupHub } from '../helpers/server';
 
 const stubNonce = 'abc:123';
 let stubAuthToken = 'def--456';
@@ -40,11 +39,11 @@ class StubNonceTracker {
 }
 
 describe('GET /api/session', function () {
-  let { request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
-    },
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
   });
+
+  let { request } = setupHub(this);
 
   it('without bearer token, responds with 401 and nonce in JSON', async function () {
     await request()
@@ -110,13 +109,13 @@ describe('GET /api/session', function () {
 describe('POST /api/session', function () {
   let bodyWithCorrectSignature: any;
 
-  let { request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
-      registry.register('clock', AcceleratableClock);
-      registry.register('nonce-tracker', StubNonceTracker);
-    },
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('clock', AcceleratableClock);
+    registry(this).register('nonce-tracker', StubNonceTracker);
   });
+
+  let { request } = setupHub(this);
 
   this.beforeEach(async function () {
     bodyWithCorrectSignature = {

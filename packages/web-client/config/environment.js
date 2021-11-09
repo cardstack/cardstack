@@ -70,7 +70,7 @@ module.exports = function (environment) {
     features: {
       createMerchant: true,
       enableCardSpace: process.env.DEPLOY_TARGET !== 'production',
-      enableCardPay: process.env.DEPLOY_TARGET !== 'production',
+      enableCardPay: true,
     },
     infuraId:
       infuraIdsByTarget[process.env.DEPLOY_TARGET] ?? process.env.INFURA_ID,
@@ -81,6 +81,17 @@ module.exports = function (environment) {
       discordSupportChannelUrl:
         'https://discord.com/channels/584043165066199050/899645340746141806',
     },
+    // basically our favicons for now
+    walletConnectIcons: [
+      '/images/icon-apple-256x256.png',
+      '/images/icon-favicon-32x32.png',
+    ].map((v) => {
+      return (
+        (process.env.DEPLOY_TARGET === 'production'
+          ? 'https://app.cardstack.com'
+          : 'https://app-staging.stack.cards') + v
+      );
+    }),
     threadAnimationInterval: 1000,
     'ember-cli-mirage': {
       enabled: false,

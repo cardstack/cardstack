@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { templateOnlyComponentTemplate } from './templates';
 
+export const TEST_REALM = 'https://cardstack.local/';
+
 export const ADDRESS_RAW_CARD = {
-  url: 'https://cardstack.local/address',
+  url: `${TEST_REALM}address`,
   schema: 'schema.js',
   embedded: 'embedded.js',
   files: {
@@ -26,7 +28,7 @@ export const ADDRESS_RAW_CARD = {
 };
 
 export const PERSON_RAW_CARD = {
-  url: 'https://cardstack.local/person',
+  url: `${TEST_REALM}person`,
   schema: 'schema.js',
   isolated: 'isolated.js',
   files: {

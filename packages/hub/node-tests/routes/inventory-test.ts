@@ -1,9 +1,8 @@
 import { Client as DBClient } from 'pg';
-import { Registry } from '@cardstack/di';
 import { InventorySubgraph } from '../../services/subgraph';
 import { makeInventoryData } from '../helpers';
 import Web3 from 'web3';
-import { setupServer } from '../helpers/server';
+import { registry, setupHub } from '../helpers/server';
 
 const { toWei } = Web3.utils;
 const stubNonce = 'abc:123';
@@ -110,17 +109,18 @@ function handleValidateAuthToken(encryptedString: string) {
 
 describe('GET /api/inventory', function () {
   let db: DBClient;
-  let { getServer, request } = setupServer(this, {
-    registryCallback(registry: Registry) {
-      registry.register('authentication-utils', StubAuthenticationUtils);
-      registry.register('subgraph', StubSubgraph);
-      registry.register('web3', StubWeb3);
-      registry.register('relay', StubRelay);
-    },
+
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+    registry(this).register('subgraph', StubSubgraph);
+    registry(this).register('web3', StubWeb3);
+    registry(this).register('relay', StubRelay);
   });
 
+  let { getContainer, request } = setupHub(this);
+
   this.beforeEach(async function () {
-    let dbManager = await getServer().container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM reservations`);
     await db.query(`DELETE FROM wallet_orders`);

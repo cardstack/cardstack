@@ -2,7 +2,7 @@ import { Client as DBClient } from 'pg';
 import { WyreOrder, WyreTransfer, WyreWallet } from '../../services/wyre';
 import { adminWalletName } from '../../routes/wyre-callback';
 import { v4 as uuidv4 } from 'uuid';
-import { setupServer } from '../helpers/server';
+import { registry, setupHub } from '../helpers/server';
 
 class StubWyreService {
   async getWalletByUserAddress(userAddress: string): Promise<WyreWallet | undefined> {
@@ -252,7 +252,9 @@ function handleWyreTransfer(source: string, dest: string, amount: number, token:
 function handleProvisionPrepaidCard(userAddress: string, sku: string) {
   provisionPrepaidCardCallCount++;
   if (sku === 'boom') {
-    throw new Error('boom');
+    let err = new Error('boom');
+    (err as any).intentionalTestError = true;
+    throw err;
   }
   expect(userAddress).to.equal(stubUserAddress);
   expect(sku).to.equal(stubSKU);
@@ -266,20 +268,20 @@ describe('POST /api/wyre-callback', function () {
     return request().post(url);
   }
 
-  let { getServer, request } = setupServer(this, {
-    registryCallback(registry) {
-      registry.register('wyre', StubWyreService);
-      registry.register('relay', StubRelayService);
-      registry.register('subgraph', StubSubgraphService);
-    },
+  this.beforeEach(function () {
+    registry(this).register('wyre', StubWyreService);
+    registry(this).register('relay', StubRelayService);
+    registry(this).register('subgraph', StubSubgraphService);
   });
+
+  let { getContainer, request } = setupHub(this);
 
   this.beforeEach(async function () {
     wyreTransferCallCount = 0;
     waitForPrepaidCardTxnCallCount = 0;
     provisionPrepaidCardCallCount = 0;
 
-    let dbManager = await getServer().container.lookup('database-manager');
+    let dbManager = await getContainer().lookup('database-manager');
     db = await dbManager.getClient();
     await db.query(`DELETE FROM wallet_orders`);
     await db.query(`DELETE FROM reservations`);

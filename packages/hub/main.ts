@@ -6,15 +6,15 @@ import { environment, httpLogging, errorMiddleware } from './middleware';
 import cors from '@koa/cors';
 import fetch from 'node-fetch';
 import * as Sentry from '@sentry/node';
+import { Memoize } from 'typescript-memoize';
 
 import { Helpers, LogFunctionFactory, Logger, run as runWorkers } from 'graphile-worker';
 import { LogLevel, LogMeta } from '@graphile/logger';
 import packageJson from './package.json';
-import { Registry, Container, RegistryCallback } from '@cardstack/di';
+import { Registry, Container, inject, getOwner, KnownServices } from '@cardstack/di';
 
 import DatabaseManager from '@cardstack/db';
 import WalletConnectService from './services/discord-bots/hub-bot/services/wallet-connect';
-import { HubServerConfig } from './interfaces';
 
 import AuthenticationMiddleware from './services/authentication-middleware';
 import DevelopmentConfig from './services/development-config';
@@ -71,13 +71,14 @@ import CardCache from './services/card-cache';
 import CardWatcher from './services/card-watcher';
 import ExchangeRatesService from './services/exchange-rates';
 import HubBot from './services/discord-bots/hub-bot';
+import CardService from './services/card-service';
 import HubDiscordBotsDbGateway from './services/discord-bots/discord-bots-db-gateway';
 import HubDmChannelsDbGateway from './services/discord-bots/dm-channels-db-gateway';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
 
-export function createContainer(registryCallback?: RegistryCallback): Container {
+export function createRegistry(): Registry {
   let registry = new Registry();
   registry.register('api-router', ApiRouter);
   registry.register('authentication-middleware', AuthenticationMiddleware);
@@ -93,6 +94,7 @@ export function createContainer(registryCallback?: RegistryCallback): Container 
   registry.register('exchange-rates', ExchangeRatesService);
   registry.register('exchange-rates-route', ExchangeRatesRoute);
   registry.register('health-check', HealthCheck);
+  registry.register('hubServer', HubServer);
   registry.register('hub-discord-bots-db-gateway', HubDiscordBotsDbGateway);
   registry.register('hub-dm-channels-db-gateway', HubDmChannelsDbGateway);
   registry.register('inventory', InventoryService);
@@ -129,17 +131,26 @@ export function createContainer(registryCallback?: RegistryCallback): Container 
   registry.register('wyre-prices-route', WyrePricesRoute);
 
   if (process.env.COMPILER) {
+    registry.register('card-service', CardService);
     registry.register('realm-manager', RealmManager);
     registry.register('card-cache-config', CardCacheConfig);
     registry.register('card-cache', CardCache);
     registry.register('card-routes', CardRoutes);
+    registry.register(
+      'card-routes-config',
+      class {
+        routeCard = config.has('compiler.routeCard') ? config.get('compiler.routeCard') : undefined;
+      }
+    );
     registry.register('card-builder', CardBuilder);
     registry.register('card-watcher', CardWatcher);
   }
 
-  if (registryCallback) {
-    registryCallback(registry);
-  }
+  return registry;
+}
+
+export function createContainer(): Container {
+  let registry = createRegistry();
   return new Container(registry);
 }
 
@@ -147,61 +158,56 @@ export class HubServer {
   logger = serverLog;
   static logger = serverLog;
 
-  static async create(serverConfig?: Partial<HubServerConfig>): Promise<HubServer> {
-    let container = createContainer(serverConfig?.registryCallback);
+  private auth = inject('authentication-middleware', { as: 'auth' });
+  private devProxy = inject('development-proxy-middleware', { as: 'devProxy' });
+  private apiRouter = inject('api-router', { as: 'apiRouter' });
+  private callbacksRouter = inject('callbacks-router', { as: 'callbacksRouter' });
+  private cardRoutes: KnownServices['card-routes'] | undefined;
+  private healthCheck = inject('health-check', { as: 'healthCheck' });
 
-    let fullConfig = Object.assign({}, serverConfig) as HubServerConfig;
-
+  constructor() {
     initSentry();
+  }
 
+  async ready() {
+    if (process.env.COMPILER) {
+      this.cardRoutes = await getOwner(this).lookup('card-routes');
+    }
+  }
+
+  @Memoize()
+  get app(): Koa<Koa.DefaultState, Koa.Context> {
     let app = new Koa<Koa.DefaultState, Koa.Context>()
       .use(errorMiddleware)
       .use(environment)
       .use(cors({ origin: '*', allowHeaders: 'Authorization, Content-Type, If-Match, X-Requested-With' }))
       .use(httpLogging);
 
-    app.use((await container.lookup('authentication-middleware')).middleware());
-    app.use((await container.lookup('development-proxy-middleware')).middleware());
-    app.use((await container.lookup('api-router')).routes());
-    app.use((await container.lookup('callbacks-router')).routes());
+    app.use(this.auth.middleware());
+    app.use(this.devProxy.middleware());
+    app.use(this.apiRouter.routes());
+    app.use(this.callbacksRouter.routes());
 
-    if (process.env.COMPILER) {
-      let cardRoutes = await container.lookup('card-routes');
-      app.use(cardRoutes.routes());
-
-      setupCardRouting(cardRoutes, fullConfig);
+    if (this.cardRoutes) {
+      app.use(this.cardRoutes.routes());
     }
 
-    app.use((await container.lookup('health-check')).routes()); // Setup health-check at "/"
-
-    let onError = (err: Error, ctx: Koa.Context) => {
-      if ((err as any).intentionalTestError) {
-        return;
-      }
-      this.logger.error(`Unhandled error:`, err);
-      Sentry.withScope(function (scope) {
-        scope.addEventProcessor(function (event) {
-          return Sentry.Handlers.parseRequest(event, ctx.request);
-        });
-        Sentry.captureException(err);
-      });
-    };
-
-    async function onClose() {
-      await container.teardown();
-      app.off('close', onClose);
-      app.off('error', onError);
-    }
-    app.on('close', onClose);
-    app.on('error', onError);
-
-    return new this(app, container);
+    app.use(this.healthCheck.routes()); // Setup health-check at "/"
+    app.on('error', this.onError.bind(this));
+    return app;
   }
 
-  private constructor(public app: Koa<Koa.DefaultState, Koa.Context>, public container: Container) {}
-
-  async teardown() {
-    await this.container.teardown();
+  private onError(err: Error, ctx: Koa.Context) {
+    if ((err as any).intentionalTestError) {
+      return;
+    }
+    this.logger.error(`Unhandled error:`, err);
+    Sentry.withScope(function (scope) {
+      scope.addEventProcessor(function (event) {
+        return Sentry.Handlers.parseRequest(event, ctx.request);
+      });
+      Sentry.captureException(err);
+    });
   }
 
   async listen(port = 3000) {
@@ -223,7 +229,7 @@ export class HubServer {
     if (!process.env.COMPILER) {
       throw new Error('COMPILER feature flag is not present');
     }
-    let builder = await this.container.lookup('card-builder');
+    let builder = await getOwner(this).lookup('card-builder');
     await builder.primeCache();
   }
 
@@ -232,20 +238,14 @@ export class HubServer {
       throw new Error('COMPILER feature flag is not present');
     }
 
-    let watcher = await this.container.lookup('card-watcher');
+    let watcher = await getOwner(this).lookup('card-watcher');
     watcher.watch();
   }
 }
 
-/**
- * If the command line or the environment config provides a route card url,
- * setup the card router to use it to resolve path requests
- */
-function setupCardRouting(cardRoutes: CardRoutes, serverConfig?: Partial<HubServerConfig>) {
-  if (serverConfig && serverConfig.routeCard) {
-    cardRoutes.setRoutingCard(serverConfig.routeCard);
-  } else if (config.has('compiler.routeCard')) {
-    cardRoutes.setRoutingCard(config.get('compiler.routeCard'));
+declare module '@cardstack/di' {
+  interface KnownServices {
+    hubServer: HubServer;
   }
 }
 
@@ -320,11 +320,15 @@ export class HubBotController {
   logger = botLog;
   static logger = botLog;
 
-  static async create(serverConfig?: Partial<HubServerConfig>): Promise<HubBotController> {
+  static async create(serverConfig?: { registryCallback?: (r: Registry) => void }): Promise<HubBotController> {
     this.logger.info(`booting pid:${process.pid}`);
     initSentry();
 
-    let container = createContainer(serverConfig?.registryCallback);
+    let registry = createRegistry();
+    if (serverConfig?.registryCallback) {
+      serverConfig.registryCallback(registry);
+    }
+    let container = new Container(registry);
     let bot: HubBot | undefined;
 
     try {
