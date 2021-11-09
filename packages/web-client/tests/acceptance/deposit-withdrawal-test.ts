@@ -44,6 +44,12 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
     });
 
     layer2Service.test__simulateRemoteAccountSafes(layer2AccountAddress, [
+      createMerchantSafe({
+        address: merchantSafeAddress,
+        owners: [layer2AccountAddress],
+        infoDID: EXAMPLE_DID,
+        tokens: [createSafeToken('CARD.CPXD', '467899100000000000000')],
+      }),
       createDepotSafe({
         address: '0x123400000000000000000000000000000000abcd',
         owners: [layer2AccountAddress],
@@ -51,12 +57,6 @@ module('Acceptance | deposit and withdrawal', function (hooks) {
           createSafeToken('DAI.CPXD', '14142298700000000000'),
           createSafeToken('CARD.CPXD', '567899100000000000000'),
         ],
-      }),
-      createMerchantSafe({
-        address: merchantSafeAddress,
-        owners: [layer2AccountAddress],
-        infoDID: EXAMPLE_DID,
-        tokens: [createSafeToken('CARD.CPXD', '467899100000000000000')],
       }),
       createPrepaidCardSafe({
         address: '0x234500000000000000000000000000000000abcd',

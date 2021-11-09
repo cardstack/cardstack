@@ -28,9 +28,9 @@ export default class CardPayDepositAndWithdrawalController extends Controller {
   }
 
   get safes() {
-    return this.layer2Network.safes.value?.filter(
-      (s) => s.type === 'merchant' || s.type === 'depot'
-    );
+    return this.layer2Network.safes.value
+      ?.filter((s) => s.type === 'merchant' || s.type === 'depot')
+      .sortBy('type');
   }
 
   get tokensToDisplay() {
