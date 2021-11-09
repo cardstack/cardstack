@@ -3,19 +3,64 @@ export default [
     anonymous: false,
     inputs: [
       {
-        indexed: true,
-        internalType: 'string',
-        name: 'tokenSymbol',
-        type: 'string',
+        indexed: false,
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
       },
       {
         indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'Burn',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
         internalType: 'address',
-        name: 'feed',
+        name: 'account',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'Mint',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'minter',
         type: 'address',
       },
     ],
-    name: 'ExchangeCreated',
+    name: 'MinterAdded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'minter',
+        type: 'address',
+      },
+    ],
+    name: 'MinterRemoved',
     type: 'event',
   },
   {
@@ -45,6 +90,95 @@ export default [
   },
   {
     constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: '_balances',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_minter',
+        type: 'address',
+      },
+    ],
+    name: 'addMinter',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'balanceOf',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'burn',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
     inputs: [],
     name: 'cardpayVersion',
     outputs: [
@@ -55,173 +189,13 @@ export default [
       },
     ],
     payable: false,
-    stateMutability: 'pure',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'convertFromCARD',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
     stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'convertFromSpend',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'usdRate',
-        type: 'uint256',
-      },
-    ],
-    name: 'convertFromSpendWithRate',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'convertToSpend',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'usdRate',
-        type: 'uint256',
-      },
-    ],
-    name: 'convertToSpendWithRate',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'string',
-        name: 'tokenSymbol',
-        type: 'string',
-      },
-      {
-        internalType: 'address',
-        name: 'feed',
-        type: 'address',
-      },
-    ],
-    name: 'createExchange',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: 'exchangeRateDecimals',
+    name: 'decimals',
     outputs: [
       {
         internalType: 'uint8',
@@ -235,76 +209,13 @@ export default [
   },
   {
     constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-    ],
-    name: 'exchangeRateOf',
+    inputs: [],
+    name: 'getMinters',
     outputs: [
       {
-        internalType: 'uint256',
-        name: 'price',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint8',
-        name: 'decimals',
-        type: 'uint8',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'bytes32',
+        internalType: 'address[]',
         name: '',
-        type: 'bytes32',
-      },
-    ],
-    name: 'exchanges',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: 'exists',
-        type: 'bool',
-      },
-      {
-        internalType: 'string',
-        name: 'tokenSymbol',
-        type: 'string',
-      },
-      {
-        internalType: 'address',
-        name: 'feed',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-    ],
-    name: 'hasExchange',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
+        type: 'address[]',
       },
     ],
     payable: false,
@@ -316,7 +227,7 @@ export default [
     inputs: [
       {
         internalType: 'address',
-        name: 'sender',
+        name: 'owner',
         type: 'address',
       },
     ],
@@ -324,32 +235,6 @@ export default [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'requestedRate',
-        type: 'uint256',
-      },
-    ],
-    name: 'isAllowableRate',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -368,6 +253,47 @@ export default [
     type: 'function',
   },
   {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'mint',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'name',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    stateMutability: 'pure',
+    type: 'function',
+  },
+  {
     constant: true,
     inputs: [],
     name: 'owner',
@@ -383,18 +309,24 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'rateDriftPercentage',
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_minter',
+        type: 'address',
+      },
+    ],
+    name: 'removeMinter',
     outputs: [
       {
-        internalType: 'uint256',
+        internalType: 'bool',
         name: '',
-        type: 'uint256',
+        type: 'bool',
       },
     ],
     payable: false,
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -410,15 +342,51 @@ export default [
     constant: false,
     inputs: [
       {
-        internalType: 'uint256',
-        name: '_rateDriftPercentage',
-        type: 'uint256',
+        internalType: 'address',
+        name: '_versionManager',
+        type: 'address',
       },
     ],
     name: 'setup',
-    outputs: [],
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'symbol',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    payable: false,
+    stateMutability: 'pure',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -434,6 +402,21 @@ export default [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'versionManager',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
 ];

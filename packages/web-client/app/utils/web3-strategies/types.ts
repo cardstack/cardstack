@@ -24,12 +24,14 @@ export type Layer1ChainEvent =
   | 'disconnect'
   | 'incorrect-chain'
   | 'correct-chain'
-  | 'account-changed';
+  | 'account-changed'
+  | 'websocket-disconnected';
 export type Layer2ChainEvent =
   | 'disconnect'
   | 'incorrect-chain'
   | 'correct-chain'
-  | 'account-changed';
+  | 'account-changed'
+  | 'websocket-disconnected';
 
 export interface Web3Strategy {
   isConnected: boolean;

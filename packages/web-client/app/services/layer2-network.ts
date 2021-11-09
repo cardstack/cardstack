@@ -88,6 +88,7 @@ export default class Layer2Network
     this.strategy.on('disconnect', this.onDisconnect);
     this.strategy.on('incorrect-chain', this.onIncorrectChain);
     this.strategy.on('account-changed', this.onAccountChanged);
+    this.strategy.on('websocket-disconnected', this.onWebsocketDisconnected);
 
     taskFor(this.strategy.initializeTask)
       .perform()
@@ -227,6 +228,10 @@ export default class Layer2Network
 
   @action onAccountChanged() {
     this.simpleEmitter.emit('account-changed');
+  }
+
+  @action onWebsocketDisconnected() {
+    this.simpleEmitter.emit('websocket-disconnected');
   }
 
   on(event: Layer2ChainEvent, cb: Function): UnbindEventListener {

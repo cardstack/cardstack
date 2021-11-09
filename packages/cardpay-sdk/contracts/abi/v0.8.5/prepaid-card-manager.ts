@@ -382,7 +382,7 @@ export default [
       },
     ],
     payable: false,
-    stateMutability: 'pure',
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -1073,6 +1073,11 @@ export default [
         name: '_contractSigners',
         type: 'address[]',
       },
+      {
+        internalType: 'address',
+        name: '_versionManager',
+        type: 'address',
+      },
     ],
     name: 'setup',
     outputs: [],
@@ -1154,6 +1159,21 @@ export default [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'versionManager',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
 ];

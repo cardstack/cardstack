@@ -20,43 +20,6 @@ export default [
   },
   {
     anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'prepaidCard',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'issuingToken',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'issuingTokenAmount',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'spendAmount',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'rewardProgramID',
-        type: 'address',
-      },
-    ],
-    name: 'RewardeeRegistrationFee',
-    type: 'event',
-  },
-  {
-    anonymous: false,
     inputs: [],
     name: 'Setup',
     type: 'event',
@@ -85,21 +48,6 @@ export default [
         internalType: 'string',
         name: '',
         type: 'string',
-      },
-    ],
-    payable: false,
-    stateMutability: 'pure',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'exchangeAddress',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
       },
     ],
     payable: false,
@@ -137,6 +85,37 @@ export default [
     type: 'function',
   },
   {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'address payable',
+        name: 'from',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
+      },
+    ],
+    name: 'onTokenTransfer',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     constant: true,
     inputs: [],
     name: 'owner',
@@ -154,7 +133,7 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'prepaidCardManager',
+    name: 'prepaidCardManagerAddress',
     outputs: [
       {
         internalType: 'address',
@@ -176,18 +155,39 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'rewardManagerAddress',
-    outputs: [
+    constant: false,
+    inputs: [
       {
         internalType: 'address',
-        name: '',
+        name: '_actionDispatcher',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_prepaidCardManager',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_tokenManagerAddress',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_versionManager',
         type: 'address',
       },
     ],
+    name: 'setup',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     payable: false,
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -221,75 +221,18 @@ export default [
     type: 'function',
   },
   {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address',
-        name: '_actionDispatcher',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_prepaidCardManager',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_exchangeAddress',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_tokenManagerAddress',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_rewardManagerAddress',
-        type: 'address',
-      },
-    ],
-    name: 'setup',
+    constant: true,
+    inputs: [],
+    name: 'versionManager',
     outputs: [
       {
-        internalType: 'bool',
+        internalType: 'address',
         name: '',
-        type: 'bool',
+        type: 'address',
       },
     ],
     payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        internalType: 'address payable',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
-    ],
-    name: 'onTokenTransfer',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
     type: 'function',
   },
 ];

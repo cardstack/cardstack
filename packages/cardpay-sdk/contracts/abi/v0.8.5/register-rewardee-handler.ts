@@ -20,6 +20,25 @@ export default [
   },
   {
     anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'prepaidCard',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'rewardProgramID',
+        type: 'address',
+      },
+    ],
+    name: 'RewardeeRegistered',
+    type: 'event',
+  },
+  {
+    anonymous: false,
     inputs: [],
     name: 'Setup',
     type: 'event',
@@ -51,7 +70,22 @@ export default [
       },
     ],
     payable: false,
-    stateMutability: 'pure',
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'exchangeAddress',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -94,7 +128,7 @@ export default [
       },
       {
         internalType: 'uint256',
-        name: '',
+        name: 'amount',
         type: 'uint256',
       },
       {
@@ -133,7 +167,7 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'prepaidCardManagerAddress',
+    name: 'prepaidCardManager',
     outputs: [
       {
         internalType: 'address',
@@ -155,6 +189,21 @@ export default [
     type: 'function',
   },
   {
+    constant: true,
+    inputs: [],
+    name: 'rewardManagerAddress',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     constant: false,
     inputs: [
       {
@@ -169,7 +218,22 @@ export default [
       },
       {
         internalType: 'address',
+        name: '_exchangeAddress',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
         name: '_tokenManagerAddress',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_rewardManagerAddress',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_versionManager',
         type: 'address',
       },
     ],
@@ -213,6 +277,21 @@ export default [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'versionManager',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
 ];

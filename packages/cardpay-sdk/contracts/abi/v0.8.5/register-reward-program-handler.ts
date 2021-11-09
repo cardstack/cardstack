@@ -3,15 +3,28 @@ export default [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
         internalType: 'address',
-        name: 'card',
+        name: 'previousOwner',
         type: 'address',
       },
       {
+        indexed: true,
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'OwnershipTransferred',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: false,
         internalType: 'address',
-        name: 'merchantSafe',
+        name: 'prepaidCard',
         type: 'address',
       },
       {
@@ -32,58 +45,20 @@ export default [
         name: 'spendAmount',
         type: 'uint256',
       },
-    ],
-    name: 'CustomerPayment',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
       {
         indexed: false,
         internalType: 'address',
-        name: 'merchantSafe',
+        name: 'admin',
         type: 'address',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: 'card',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'issuingToken',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'MerchantFeeCollected',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'previousOwner',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'newOwner',
+        name: 'rewardProgramID',
         type: 'address',
       },
     ],
-    name: 'OwnershipTransferred',
+    name: 'RewardProgramRegistrationFee',
     type: 'event',
   },
   {
@@ -119,7 +94,22 @@ export default [
       },
     ],
     payable: false,
-    stateMutability: 'pure',
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'exchangeAddress',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -146,21 +136,6 @@ export default [
         internalType: 'bool',
         name: '',
         type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'merchantManager',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
       },
     ],
     payable: false,
@@ -214,21 +189,6 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [],
-    name: 'prepaidCardManager',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     constant: false,
     inputs: [],
     name: 'renounceOwnership',
@@ -240,7 +200,7 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'revenuePoolAddress',
+    name: 'rewardManagerAddress',
     outputs: [
       {
         internalType: 'address',
@@ -262,27 +222,22 @@ export default [
       },
       {
         internalType: 'address',
-        name: '_merchantManager',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_prepaidCardManager',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_revenuePoolAddress',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_spendTokenAddress',
+        name: '_exchangeAddress',
         type: 'address',
       },
       {
         internalType: 'address',
         name: '_tokenManagerAddress',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_rewardManagerAddress',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_versionManager',
         type: 'address',
       },
     ],
@@ -296,21 +251,6 @@ export default [
     ],
     payable: false,
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'spendTokenAddress',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -341,6 +281,21 @@ export default [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'versionManager',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
 ];

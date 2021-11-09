@@ -3,25 +3,19 @@ export default [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
-        internalType: 'address',
-        name: 'merchantSafe',
-        type: 'address',
+        indexed: true,
+        internalType: 'string',
+        name: 'tokenSymbol',
+        type: 'string',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: 'payableToken',
+        name: 'feed',
         type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
       },
     ],
-    name: 'MerchantClaim',
+    name: 'ExchangeCreated',
     type: 'event',
   },
   {
@@ -52,12 +46,12 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'actionDispatcher',
+    name: 'cardpayVersion',
     outputs: [
       {
-        internalType: 'address',
+        internalType: 'string',
         name: '',
-        type: 'address',
+        type: 'string',
       },
     ],
     payable: false,
@@ -65,13 +59,8 @@ export default [
     type: 'function',
   },
   {
-    constant: false,
+    constant: true,
     inputs: [
-      {
-        internalType: 'address',
-        name: 'merchantSafe',
-        type: 'address',
-      },
       {
         internalType: 'address',
         name: 'token',
@@ -83,7 +72,7 @@ export default [
         type: 'uint256',
       },
     ],
-    name: 'addToMerchantBalance',
+    name: 'convertFromCARD',
     outputs: [
       {
         internalType: 'uint256',
@@ -92,30 +81,15 @@ export default [
       },
     ],
     payable: false,
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
     type: 'function',
   },
   {
     constant: true,
-    inputs: [],
-    name: 'cardpayVersion',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    payable: false,
-    stateMutability: 'pure',
-    type: 'function',
-  },
-  {
-    constant: false,
     inputs: [
       {
         internalType: 'address',
-        name: 'payableToken',
+        name: 'token',
         type: 'address',
       },
       {
@@ -124,14 +98,122 @@ export default [
         type: 'uint256',
       },
     ],
-    name: 'claimRevenue',
+    name: 'convertFromSpend',
     outputs: [
       {
-        internalType: 'bool',
+        internalType: 'uint256',
         name: '',
-        type: 'bool',
+        type: 'uint256',
       },
     ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'usdRate',
+        type: 'uint256',
+      },
+    ],
+    name: 'convertFromSpendWithRate',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'convertToSpend',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'usdRate',
+        type: 'uint256',
+      },
+    ],
+    name: 'convertToSpendWithRate',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'tokenSymbol',
+        type: 'string',
+      },
+      {
+        internalType: 'address',
+        name: 'feed',
+        type: 'address',
+      },
+    ],
+    name: 'createExchange',
+    outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
     type: 'function',
@@ -139,12 +221,90 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'exchangeAddress',
+    name: 'exchangeRateDecimals',
     outputs: [
       {
-        internalType: 'address',
+        internalType: 'uint8',
         name: '',
+        type: 'uint8',
+      },
+    ],
+    payable: false,
+    stateMutability: 'pure',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'token',
         type: 'address',
+      },
+    ],
+    name: 'exchangeRateOf',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'price',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint8',
+        name: 'decimals',
+        type: 'uint8',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    name: 'exchanges',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: 'exists',
+        type: 'bool',
+      },
+      {
+        internalType: 'string',
+        name: 'tokenSymbol',
+        type: 'string',
+      },
+      {
+        internalType: 'address',
+        name: 'feed',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+    ],
+    name: 'hasExchange',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
       },
     ],
     payable: false,
@@ -168,8 +328,19 @@ export default [
   },
   {
     constant: true,
-    inputs: [],
-    name: 'isOwner',
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'requestedRate',
+        type: 'uint256',
+      },
+    ],
+    name: 'isAllowableRate',
     outputs: [
       {
         internalType: 'bool',
@@ -184,72 +355,12 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'merchantFeeDecimals',
+    name: 'isOwner',
     outputs: [
       {
-        internalType: 'uint8',
+        internalType: 'bool',
         name: '',
-        type: 'uint8',
-      },
-    ],
-    payable: false,
-    stateMutability: 'pure',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'merchantFeePercentage',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'merchantFeeReceiver',
-    outputs: [
-      {
-        internalType: 'address payable',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'merchantManager',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'merchantRegistrationFeeInSPEND',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
+        type: 'bool',
       },
     ],
     payable: false,
@@ -274,12 +385,12 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: 'prepaidCardManager',
+    name: 'rateDriftPercentage',
     outputs: [
       {
-        internalType: 'address payable',
+        internalType: 'uint256',
         name: '',
-        type: 'address',
+        type: 'uint256',
       },
     ],
     payable: false,
@@ -296,89 +407,17 @@ export default [
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'merchantSafe',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'token',
-        type: 'address',
-      },
-    ],
-    name: 'revenueBalance',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'merchantSafe',
-        type: 'address',
-      },
-    ],
-    name: 'revenueTokens',
-    outputs: [
-      {
-        internalType: 'address[]',
-        name: '',
-        type: 'address[]',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     constant: false,
     inputs: [
       {
-        internalType: 'address',
-        name: '_exchangeAddress',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_merchantManager',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: '_actionDispatcher',
-        type: 'address',
-      },
-      {
-        internalType: 'address payable',
-        name: '_prepaidCardManager',
-        type: 'address',
-      },
-      {
-        internalType: 'address payable',
-        name: '_merchantFeeReceiver',
-        type: 'address',
-      },
-      {
         internalType: 'uint256',
-        name: '_merchantFeePercentage',
+        name: '_rateDriftPercentage',
         type: 'uint256',
       },
       {
-        internalType: 'uint256',
-        name: '_merchantRegistrationFeeInSPEND',
-        type: 'uint256',
+        internalType: 'address',
+        name: '_versionManager',
+        type: 'address',
       },
     ],
     name: 'setup',
@@ -400,6 +439,21 @@ export default [
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'versionManager',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
     type: 'function',
   },
 ];
