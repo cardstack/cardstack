@@ -3,8 +3,8 @@
     aria-label='metadata'
     class='card-pay-safe-balances__header'
     style={{css-var
-      safe-balances-header-background-color=(or this.data.info.backgroundColor "var(--boxel-dark)")
-      safe-balances-header-text-color=(or this.data.info.textColor "var(--boxel-light)")
+      safe-balances-header-background-color=(or this.data.info.backgroundColor 'var(--boxel-dark)')
+      safe-balances-header-text-color=(or this.data.info.textColor 'var(--boxel-light)')
     }}
     data-test-safe-balances-header
   >
@@ -21,7 +21,7 @@
   <section class='card-pay-safe-balances__body'>
     <header aria-label='title' class='card-pay-safe-balances__title-container' data-test-safe-balances-title>
       {{#if this.data.icon}}
-        {{svg-jar this.data.icon width="20" height="20" class='card-pay-safe-balances__logo' data-test-safe-balances-logo=this.data.icon}}
+        {{svg-jar this.data.icon width='20' height='20' class='card-pay-safe-balances__logo' data-test-safe-balances-logo=this.data.icon}}
       {{else}}
         <CardPay::MerchantLogo
           class='card-pay-safe-balances__logo'
