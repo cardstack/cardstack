@@ -73,10 +73,12 @@ module.exports = {
         {
           url: 'https://cardstack.com/base/',
           directory: join(__dirname, '..', '..', 'base-cards'),
+          watch: true,
         },
         {
           url: 'https://demo.com/',
           directory: join(__dirname, '..', '..', 'demo-cards'),
+          watch: true,
         },
       ];
     }),

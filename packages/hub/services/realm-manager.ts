@@ -4,20 +4,24 @@ import { NotFound } from '@cardstack/core/src/utils/errors';
 import { RealmInterface } from '../interfaces';
 import { ensureTrailingSlash } from '../utils/path';
 import config from 'config';
+import { getOwner } from '@cardstack/di';
 
 const realmsConfig = config.get('compiler.realmsConfig') as RealmConfig[];
 
 export default class RealmManager {
-  realms: RealmInterface[] = realmsConfig.map((realm) => new FSRealm(realm, this));
+  realms: RealmInterface[] = realmsConfig.map((realm) => {
+    let container = getOwner(this);
+    return container.instantiate(FSRealm, realm);
+  });
 
   createRealm(config: RealmConfig, klass?: any) {
     config.url = ensureTrailingSlash(config.url);
-    let realm = klass ? new klass(config, this) : new FSRealm(config, this);
+    let realm = klass ? new klass(config) : new FSRealm(config);
     this.realms.push(realm);
     return realm;
   }
 
-  getRealm(url: string): FSRealm {
+  getRealm(url: string): RealmInterface {
     url = ensureTrailingSlash(url);
 
     for (let realm of this.realms) {

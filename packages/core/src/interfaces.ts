@@ -144,6 +144,7 @@ export interface Builder {
 export interface RealmConfig {
   url: string;
   directory?: string;
+  watch?: boolean;
 }
 
 export interface CardJSONResponse {

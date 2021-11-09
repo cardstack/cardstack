@@ -4,7 +4,6 @@ import { join } from 'path';
 
 import { RawCard, RealmConfig } from '@cardstack/core/src/interfaces';
 import { CardCacheConfig } from '../../services/card-cache-config';
-import RealmManager from '../../services/realm-manager';
 import FSRealm from '../../realms/fs-realm';
 
 export class TestCardCacheConfig extends CardCacheConfig {
@@ -26,11 +25,11 @@ export class TestCardCacheConfig extends CardCacheConfig {
 export class ProjectTestRealm extends FSRealm {
   project: Project;
 
-  constructor(config: RealmConfig, manager: RealmManager) {
+  constructor(config: RealmConfig) {
     let project = new Project(config.url.replace(/\/$/, ''));
     project.writeSync();
     config.directory = project.baseDir;
-    super(config, manager);
+    super(config);
     this.project = project;
   }
 

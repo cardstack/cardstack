@@ -5,22 +5,33 @@ import walkSync from 'walk-sync';
 import { RealmInterface } from '../interfaces';
 import { ensureTrailingSlash } from '../utils/path';
 import { nanoid } from '../utils/ids';
-import RealmManager from '../services/realm-manager';
 import { CardstackError, Conflict, NotFound, augmentBadRequest } from '@cardstack/core/src/utils/errors';
 import { IndexingOperations } from '../services/search-index';
 import { serverLog as logger } from '../utils/logger';
+import sane from 'sane';
+import { serverLog } from '../utils/logger';
+import { sep } from 'path';
 
 export default class FSRealm implements RealmInterface {
-  private url: string;
+  url: string;
   private directory: string;
   private logger = logger;
-  private manager: RealmManager;
+  private watcher?: sane.Watcher;
 
   // constructor(config: RealmConfig, manager: RealmManager, private update: (ops: IndexingOperations) => Promise<void>) {
-  constructor(config: RealmConfig, manager: RealmManager) {
+  constructor(config: RealmConfig) {
     this.url = config.url;
     this.directory = ensureTrailingSlash(config.directory!);
-    this.manager = manager;
+
+    if (config.watch) {
+      this.watcher = sane(this.directory);
+      this.watcher.on('add', this.onFileChanged.bind(this));
+      this.watcher.on('change', this.onFileChanged.bind(this));
+    }
+  }
+
+  teardown() {
+    this.watcher?.close();
   }
 
   // async reindex(ops: IndexingOperations, meta: Meta | undefined): Promise<Meta> {
@@ -38,7 +49,20 @@ export default class FSRealm implements RealmInterface {
     ops.finishReplaceAll();
   }
 
-  private onFileChanged() {}
+  private onFileChanged(filepath: string) {
+    let segments = filepath.split(sep);
+    if (shouldIgnoreChange(segments)) {
+      // top-level files in the realm are not cards, we're assuming all
+      // cards are directories under the realm.
+      return;
+    }
+    let url = new URL(segments[0] + '/', this.url).href;
+
+    serverLog.log(`Rebuilding::START ${url}`);
+
+    // TODO: trigger a reindex
+    throw new Error('not implemented');
+  }
 
   private buildCardPath(cardURL: string, ...paths: string[]): string {
     return join(this.directory, cardURL.replace(this.url, ''), ...(paths || ''));
@@ -149,4 +173,10 @@ export default class FSRealm implements RealmInterface {
     }
     removeSync(cardDir);
   }
+}
+
+function shouldIgnoreChange(segments: string[]): boolean {
+  // top-level files in the realm are not cards, we're assuming all
+  // cards are directories under the realm.
+  return segments.length < 2;
 }

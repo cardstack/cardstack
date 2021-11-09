@@ -20,15 +20,6 @@ export function builder(yargs: Argv) {
       default: 3000,
     },
   };
-  if (process.env.COMPILER) {
-    options['noWatch'] = {
-      alias: 'nw',
-      describe: 'Disable watching for changes to cards',
-      type: 'boolean',
-      default: false,
-      nargs: 1,
-    };
-  }
   return yargs.options(options);
 }
 
@@ -85,10 +76,6 @@ export async function handler(argv: any) {
 
   if (process.env.COMPILER) {
     await server.primeCache();
-
-    if (!argv.noWatch) {
-      await server.watchCards();
-    }
   }
 
   return server.listen(argv.port);

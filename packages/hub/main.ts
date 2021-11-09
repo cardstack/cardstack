@@ -68,7 +68,6 @@ import CardBuilder from './services/card-builder';
 import CardRoutes from './routes/card-routes';
 import { CardCacheConfig } from './services/card-cache-config';
 import CardCache from './services/card-cache';
-import CardWatcher from './services/card-watcher';
 import ExchangeRatesService from './services/exchange-rates';
 import HubBot from './services/discord-bots/hub-bot';
 import CardService from './services/card-service';
@@ -144,7 +143,6 @@ export function createRegistry(): Registry {
       }
     );
     registry.register('card-builder', CardBuilder);
-    registry.register('card-watcher', CardWatcher);
     registry.register('searchIndex', SearchIndex);
   }
 
@@ -233,15 +231,6 @@ export class HubServer {
     }
     let builder = await getOwner(this).lookup('card-builder');
     await builder.primeCache();
-  }
-
-  async watchCards() {
-    if (!process.env.COMPILER) {
-      throw new Error('COMPILER feature flag is not present');
-    }
-
-    let watcher = await getOwner(this).lookup('card-watcher');
-    watcher.watch();
   }
 }
 
