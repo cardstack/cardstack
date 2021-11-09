@@ -531,7 +531,7 @@ export default class RewardManager {
     }
 
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
-    let rewardManagerAddress = await this.address()
+    let rewardManagerAddress = await this.address();
 
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let rewardSafeOwner = await rewardManager.getRewardSafeOwner(safeAddress);
