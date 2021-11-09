@@ -143,27 +143,9 @@ export default class RewardManager {
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let rewardManager = await getSDK('RewardManager', this.layer2Web3);
-    let rewardeeRegistrationFees = await rewardManager.getRewardeeRegistrationFees();
-    let prepaidCardAPI = await getSDK('PrepaidCard', this.layer2Web3);
-    await prepaidCardAPI.convertFromSpendForPrepaidCard(
-      prepaidCardAddress,
-      rewardeeRegistrationFees,
-      (issuingToken, balanceAmount, requiredTokenAmount, symbol) =>
-        new Error(
-          `Prepaid card does not have enough balance to register rewardee. The issuing token ${issuingToken} balance of prepaid card ${prepaidCardAddress} is ${fromWei(
-            balanceAmount
-          )} ${symbol}, payment amount in issuing token is ${fromWei(requiredTokenAmount)} ${symbol}`
-        )
-    );
 
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
-      let payload = await this.getRegisterRewardeePayload(
-        prepaidCardAddress,
-        rewardProgramId,
-        rewardeeRegistrationFees,
-        rateLock
-      );
+      let payload = await this.getRegisterRewardeePayload(prepaidCardAddress, rewardProgramId, rateLock);
       if (nonce == null) {
         nonce = getNextNonceFromEstimate(payload);
         if (typeof onNonce === 'function') {
@@ -173,7 +155,6 @@ export default class RewardManager {
       return await this.executeRegisterRewardee(
         prepaidCardAddress,
         rewardProgramId,
-        rewardeeRegistrationFees,
         rateLock,
         payload,
         await signPrepaidCardSendTx(this.layer2Web3, prepaidCardAddress, payload, nonce, from),
@@ -183,7 +164,7 @@ export default class RewardManager {
 
     if (!gnosisResult) {
       throw new Error(
-        `Unable to obtain a gnosis transaction result for register rewardee payment from prepaid card ${prepaidCardAddress}for ${rewardeeRegistrationFees} SPEND`
+        `Unable to obtain a gnosis transaction result for register rewardee payment from prepaid card ${prepaidCardAddress}`
       );
     }
 
@@ -347,13 +328,12 @@ export default class RewardManager {
   private async getRegisterRewardeePayload(
     prepaidCardAddress: string,
     rewardProgramId: string,
-    spendAmount: number,
     rate: string
   ): Promise<SendPayload> {
     return getSendPayload(
       this.layer2Web3,
       prepaidCardAddress,
-      spendAmount,
+      0,
       rate,
       'registerRewardee',
       this.layer2Web3.eth.abi.encodeParameters(['address'], [rewardProgramId])
@@ -416,7 +396,6 @@ export default class RewardManager {
   private async executeRegisterRewardee(
     prepaidCardAddress: string,
     rewardProgramId: string,
-    spendAmount: number,
     rate: string,
     payload: SendPayload,
     signatures: Signature[],
@@ -425,7 +404,7 @@ export default class RewardManager {
     return await executeSend(
       this.layer2Web3,
       prepaidCardAddress,
-      spendAmount,
+      0,
       rate,
       payload,
       'registerRewardee',
