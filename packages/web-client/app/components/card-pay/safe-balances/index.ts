@@ -82,6 +82,5 @@ export default class CardPaySafeBalancesComponent extends Component<CardPaySafeB
 }
 
 export function isSupportedSafe(safe: Safe): safe is SupportedSafe {
-  // FIXME how can I use the types here?
   return ['depot', 'merchant'].includes(safe.type);
 }
