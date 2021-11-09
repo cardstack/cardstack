@@ -39,6 +39,7 @@ export async function create(
   safe: string,
   faceValues: number[],
   tokenAddress: string,
+  force: boolean,
   customizationDID: string | undefined,
   mnemonic?: string
 ): Promise<void> {
@@ -52,12 +53,14 @@ export async function create(
   console.log(
     `Creating prepaid card(s) with face value(s) §${faceValues.join(
       ' SPEND, §'
-    )} SPEND and issuing token ${symbol} from depot ${safe}...`
+    )} SPEND and issuing token ${symbol} from depot ${safe}${
+      force ? '. Forcing creation even when DAI not snapped to USD rate' : ''
+    }...`
   );
   let onTxnHash = (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`);
   let {
     prepaidCards: [newCard],
-  } = await prepaidCard.create(safe, tokenAddress, faceValues, undefined, customizationDID, { onTxnHash });
+  } = await prepaidCard.create(safe, tokenAddress, faceValues, undefined, customizationDID, { onTxnHash }, {}, force);
   console.log(`created card ${newCard.address}`);
   console.log('done');
 }
