@@ -3,6 +3,8 @@
   @isOpen={{@isOpen}}
   @onClose={{@onClose}}
   @layer="urgent"
+  data-test-network-problem-modal
+  data-test-network-problem-modal-dismissable={{@dismissable}}
 >
   <div
     class="network-problem-modal__scroll-wrapper"
@@ -19,12 +21,14 @@
     >
       <header class="network-problem-modal__card-title">
           {{svg-jar "warning" class="network-problem-modal__card-title-icon" width="30" height="30"}}
-          <div class="network-problem-modal__card-title-content">
+          <div class="network-problem-modal__card-title-content" data-test-network-problem-modal-title>
             {{@title}}
           </div>
       </header>
-      {{@body}}
-      <Boxel::Button @kind="primary" {{on "click" (optional @action)}}>{{@actionText}}</Boxel::Button>
+      <div data-test-network-problem-modal-body>
+        {{@body}}
+      </div>
+      <Boxel::Button @kind="primary" {{on "click" (optional @action)}} data-test-network-problem-modal-action>{{@actionText}}</Boxel::Button>
     </Boxel::CardContainer>
   </div>
 </Boxel::Modal>
