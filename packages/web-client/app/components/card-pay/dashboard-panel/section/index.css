@@ -59,6 +59,42 @@
   color: var(--boxel-purple-500);
 }
 
+.dashboard-panel-section__badges {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  margin-top: var(--boxel-sp-lg);
+  margin-bottom: var(--boxel-sp-lg);
+}
+
+.dashboard-panel-section__badges img {
+  height: 2.8rem;
+  margin-right: var(--boxel-sp-lg);
+}
+
+.dashboard-panel-section-wallet {
+  justify-content: flex-start;
+}
+
+/* TODO make responsive */
+.dashboard-panel-section-wallet-background {
+  width: 600px;
+  position: absolute;
+  height: 367px;
+  bottom: 0;
+  left: -84px;
+  background-image: url(/images/dashboard/cards@3x.webp);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.dashboard-panel-section-wallet .dashboard-panel-section__disclaimer {
+  position: relative;
+  margin-top: var(--boxel-sp);
+  transform: none;
+}
+
 @media screen and (max-width: 800px) {
   .dashboard-panel-section + .dashboard-panel-section {
     border-top: 1px solid var(--border-color);
