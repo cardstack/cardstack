@@ -32,12 +32,12 @@ export default class CardPayController extends Controller {
     this.layer1Network.on('disconnect', this.maybeReload);
     this.layer1Network.on('incorrect-chain', this.onLayer1Incorrect);
     this.layer1Network.on('websocket-disconnected', () =>
-      this.showNetworkUnstableModal('layer1')
+      this.showWebsocketDisconnectedModal('layer1')
     );
 
     this.layer2Network.on('incorrect-chain', this.onLayer2Incorrect);
     this.layer2Network.on('websocket-disconnected', () =>
-      this.showNetworkUnstableModal('layer2')
+      this.showWebsocketDisconnectedModal('layer2')
     );
   }
 
@@ -45,7 +45,7 @@ export default class CardPayController extends Controller {
     this.layer1Network.disconnect();
   }
 
-  @action showNetworkUnstableModal(network: keyof typeof c) {
+  @action showWebsocketDisconnectedModal(network: keyof typeof c) {
     if (this.networkProblemModalOptions) return;
     this.showNetworkProblemModal({
       title: `Disconnected from ${c[network].fullName}`,
