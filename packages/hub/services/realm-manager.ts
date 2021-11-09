@@ -22,11 +22,16 @@ export default class RealmManager {
     );
   }
 
+  async teardown() {
+    for (let realm of this.realms) {
+      await realm.teardown();
+    }
+  }
+
   async createRealm(config: RealmConfig) {
-    config.url = ensureTrailingSlash(config.url);
     let realm = await getOwner(this).instantiate(
       FSRealm,
-      config.url,
+      ensureTrailingSlash(config.url),
       config.directory,
       config.watch ? this.notify.bind(this) : undefined
     );

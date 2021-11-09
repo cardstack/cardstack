@@ -11,7 +11,7 @@ import { ensureTrailingSlash } from '../utils/path';
 import { nanoid } from '../utils/ids';
 import { serverLog as logger } from '../utils/logger';
 
-import { IndexingOperations } from '../services/search-index';
+import { IndexerHandle } from '../services/search-index';
 import RealmManager from '../services/realm-manager';
 
 export default class FSRealm implements RealmInterface {
@@ -32,12 +32,12 @@ export default class FSRealm implements RealmInterface {
     }
   }
 
-  teardown() {
+  async teardown() {
     this.watcher?.close();
   }
 
   // async reindex(ops: IndexingOperations, meta: Meta | undefined): Promise<Meta> {
-  async reindex(ops: IndexingOperations): Promise<void> {
+  async reindex(ops: IndexerHandle): Promise<void> {
     this.logger.log(`Indexing realm: ${this.url}`);
 
     await ops.beginReplaceAll();

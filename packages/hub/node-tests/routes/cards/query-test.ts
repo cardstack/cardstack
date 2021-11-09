@@ -9,6 +9,11 @@ if (process.env.COMPILER) {
       return request().get(url);
     }
 
+    this.afterEach(async function () {
+      let si = await getContainer().lookup('searchIndex');
+      await si.reset();
+    });
+
     let { cards, request, realm, getContainer } = setupHub(this);
 
     this.beforeEach(async function () {

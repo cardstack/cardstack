@@ -84,7 +84,7 @@ function serializeResource(
   return resource;
 }
 
-export function serializeRawCard(card: RawCard, compiled?: CompiledCard): Promise<Record<string, unknown>> {
+export function serializeRawCard(card: RawCard, compiled?: CompiledCard): Record<string, unknown> {
   let resource = serializeResource(
     'raw-cards',
     card.url,

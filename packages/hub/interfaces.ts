@@ -1,6 +1,6 @@
 import type { RawCard, Builder } from '@cardstack/core/src/interfaces';
 import type RealmManager from './services/realm-manager';
-import { IndexingOperations } from './services/search-index';
+import { IndexerHandle } from './services/search-index';
 
 const ENVIRONMENTS_OBJ = {
   browser: '',
@@ -24,7 +24,8 @@ export interface RealmInterface<Meta = unknown> {
   create(raw: RawCard | Omit<RawCard, 'url'>): Promise<RawCard>;
   update(raw: RawCard): Promise<RawCard>;
   delete(cardURL: string): Promise<void>;
-  reindex(ops: IndexingOperations, meta: Meta | undefined): Promise<Meta>;
+  reindex(ops: IndexerHandle, meta: Meta | undefined): Promise<Meta>;
+  teardown(): Promise<void>;
 }
 
 export interface Cache<CardType> {
