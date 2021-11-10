@@ -19,14 +19,17 @@ export function formatWeiAmount(
 
   const minDecimals = 2;
 
-  let result: string | number = Number(fromWei(amountInSmallestUnit));
+  let result: string = fromWei(amountInSmallestUnit);
   if (!round) {
-    // return the exact same amount of decimal places if truncation should not occur
+    // return the exact same amount of decimal places if rounding should not occur
     return formatCurrencyAmount(
       result,
       Math.max(countDecimalPlaces(result), minDecimals)
     );
-  } else if (Math.abs(result) > 0.0001 && Math.abs(result) < 1) {
+  } else if (
+    Math.abs(Number(result)) > 0.0001 &&
+    Math.abs(Number(result)) < 1
+  ) {
     result = handleSignificantDecimals(result, 2, 2);
     return formatCurrencyAmount(
       result,
