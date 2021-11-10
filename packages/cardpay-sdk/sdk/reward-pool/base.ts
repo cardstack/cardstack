@@ -143,8 +143,8 @@ export default class RewardPool {
 
   async getProofsWithNonZeroBalance(
     address: string,
-    tokenAddress?: string,
-    rewardProgramId?: string
+    rewardProgramId?: string,
+    tokenAddress?: string
   ): Promise<ProofWithBalance[]> {
     const proofsWithBalance = await this.getProofsWithBalance(address, rewardProgramId, tokenAddress);
     return proofsWithBalance
