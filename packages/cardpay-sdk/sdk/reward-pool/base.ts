@@ -87,8 +87,8 @@ export default class RewardPool {
 
   async getProofs(
     address: string,
-    tokenAddress?: string,
     rewardProgramId?: string,
+    tokenAddress?: string,
     offset?: number,
     limit?: number
   ): Promise<Proof[]> {
@@ -124,7 +124,7 @@ export default class RewardPool {
     tokenAddress?: string
   ): Promise<ProofWithBalance[]> {
     let rewardPool = await this.getRewardPool();
-    let proofs = await this.getProofs(address, tokenAddress, rewardProgramId);
+    let proofs = await this.getProofs(address, rewardProgramId, tokenAddress);
     const tokenAddresses = [...new Set(proofs.map((item) => item.tokenAddress))];
     let tokenMapping = await this.tokenSymbolMapping(tokenAddresses);
     return await Promise.all(
@@ -165,7 +165,7 @@ export default class RewardPool {
     }
     const tokenContract = new this.layer2Web3.eth.Contract(ERC20ABI as AbiItem[], tokenAddress);
     let tokenSymbol = await tokenContract.methods.symbol().call();
-    let proofs = await this.getProofs(address, tokenAddress, rewardProgramId);
+    let proofs = await this.getProofs(address, rewardProgramId, tokenAddress);
 
     let rewardPool = await this.getRewardPool();
     let ungroupedTokenBalance = await Promise.all(
