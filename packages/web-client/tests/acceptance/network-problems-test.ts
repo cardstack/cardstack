@@ -36,7 +36,7 @@ module('Acceptance | network-problems', function (hooks) {
       'metamask'
     );
 
-    await visit('/card-pay/balances');
+    await visit('/card-pay/wallet');
   });
 
   test('Layer 2 incorrect chain event triggers the showing of a modal', async function (assert) {

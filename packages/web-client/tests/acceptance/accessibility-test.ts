@@ -13,8 +13,8 @@ module('Acceptance | accessibility', function (hooks) {
     assert.ok(true, 'no a11y errors found on cardstack orgs landing page');
 
     await visit('/card-pay');
-    assert.equal(currentURL(), '/card-pay/balances');
+    assert.equal(currentURL(), '/card-pay/wallet');
     await a11yAudit();
-    assert.ok(true, 'no a11y errors found on /card-pay/balances ');
+    assert.ok(true, 'no a11y errors found on /card-pay/wallet ');
   });
 });

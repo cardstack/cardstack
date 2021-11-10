@@ -1,24 +1,41 @@
-<details
-  class={{cn "dashboard-details-container" dashboard-details-container--no-collapse=@noCollapse}}
-  ...attributes
-  open={{if @noCollapse true @open}}
->
-  <summary class="dashboard-details-container__summary">
-    <div class="dashboard-panel__summary-hero" style={{css-url "background-image" @panel.summaryHeroImageUrl}} />
-    <div class="dashboard-details-container__summary-content">
-      <h2 class="dashboard-panel__summary-title">{{@panel.title}}</h2>
-      <p class="dashboard-panel__summary-desc">{{@panel.description}}</p>
-    </div>
-    <div class="dashboard-details-container__marker">
-      {{svg-jar "caret-right" class="dashboard-details-container__marker-icon" role="presentation"}}
-    </div>
-  </summary>
-  <section class="dashboard-panel">
-    <header class="dashboard-panel__header">
-      <h2 class="dashboard-panel__header-title">{{@panel.title}}</h2>
-      <p class="dashboard-panel__header-desc">{{@panel.description}}</p>
-    </header>
-    <div class="dashboard-panel__hero" style={{css-url "background-image" @panel.heroImageUrl}} />
-    {{yield}}
-  </section>
-</details>
+{{#let (if @noCollapse true @open) as |isOpen|}}
+  <details
+    class={{cn
+      "dashboard-details-container"
+      dashboard-details-container--no-collapse=@noCollapse
+      dashboard-details-container--noBottomPadding=@noBottomPadding
+      dashboard-details-container--hasFooter=(has-block 'footer')
+    }}
+    ...attributes
+    open={{isOpen}}
+  >
+    <summary class="dashboard-details-container__summary">
+      <div class="dashboard-details-container__summary-content">
+        <div class="dashboard-panel__summary-hero" style={{css-url "background-image" @panel.summaryHeroImageUrl}} />
+        <h2 class="dashboard-panel__summary-title">{{@panel.title}}</h2>
+        <p class="dashboard-panel__summary-desc">{{@panel.description}}</p>
+      </div>
+      <div class="dashboard-details-container__marker">
+        {{svg-jar "caret-right" class="dashboard-details-container__marker-icon" role="presentation"}}
+      </div>
+      {{#if (has-block 'footer')}}
+        <footer class="dashboard-panel__footer dashboard-panel__summary-footer" aria-label="closed-footer">
+          {{yield to="footer"}}
+        </footer>
+      {{/if}}
+    </summary>
+    <section class="dashboard-panel">
+      <header class="dashboard-panel__header">
+        <h2 class="dashboard-panel__header-title">{{@panel.title}}</h2>
+        <p class="dashboard-panel__header-desc">{{@panel.description}}</p>
+      </header>
+      <div class="dashboard-panel__hero" style={{css-url "background-image" @panel.heroImageUrl}} />
+      {{yield to="detail"}}
+    </section>
+    {{#if (has-block 'footer')}}
+      <footer class="dashboard-panel__footer dashboard-panel__detail-footer" aria-label="open-footer">
+        {{yield to="footer"}}
+      </footer>
+    {{/if}}
+  </details>
+  {{/let}}

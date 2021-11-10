@@ -1,5 +1,5 @@
 import BaseRoute from './base';
-import '../../css/card-pay/balances.css';
+import '../../css/card-pay/wallet.css';
 import heroImageUrl from '@cardstack/web-client/images/dashboard/balances-hero.svg';
 import summaryHeroImageUrl from '@cardstack/web-client/images/dashboard/balances-summary-hero.svg';
 
@@ -11,7 +11,7 @@ const WALLET_PANEL = {
   sections: [
     {
       workflow: 'issue-prepaid-card',
-      icon: 'balances-customers',
+      icon: 'prepaid-cards',
       title: 'Issue a Prepaid Card',
       description: `Use available balance in your merchant account or depot to issue a prepaid card.`,
       bullets: [

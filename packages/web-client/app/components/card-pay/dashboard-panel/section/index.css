@@ -64,12 +64,34 @@
   flex-flow: row nowrap;
   align-items: center;
   margin-top: var(--boxel-sp-lg);
-  margin-bottom: var(--boxel-sp-lg);
+  margin-bottom: var(--boxel-sp-xl);
+}
+
+.dashboard-panel-section__badges > div {
+  flex-basis: 50%;
+  height: 3.6rem;
+}
+
+.dashboard-panel-section__badges > div:last-child {
+  text-align: center;
 }
 
 .dashboard-panel-section__badges img {
   height: 2.8rem;
-  margin-right: var(--boxel-sp-lg);
+  object-fit: contain;
+}
+
+.dashboard-panel-section__badges-google-play-badge {
+  opacity: 0.3;
+}
+
+.dashboard-panel-section__badges-google-play-soon {
+  font-size: var(--boxel-font-size-xs);
+  text-align: center;
+}
+
+.dashboard-panel-section__purchase-card-phone {
+  display: block;
 }
 
 .dashboard-panel-section-wallet {
@@ -79,6 +101,7 @@
 /* TODO make responsive */
 .dashboard-panel-section-wallet-background {
   width: 600px;
+  max-width: calc(100% + (2 * 84px));
   position: absolute;
   height: 367px;
   bottom: 0;

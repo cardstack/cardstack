@@ -1,50 +1,64 @@
-.card-pay-dashboard__balances {
+.card-pay-dashboard__wallet {
   padding: var(--boxel-sp-xxl) var(--boxel-sp-xl);
 }
 
-.card-pay-dashboard__balances > * {
+.card-pay-dashboard__wallet > * {
   max-width: 70.75rem;
   margin-right: auto;
   margin-left: auto;
 }
 
-.card-pay-dashboard__balances > * + * {
+.card-pay-dashboard__wallet > * + * {
   margin-top: var(--boxel-sp-xxl);
 }
 
-.card-pay-dashboard__balances-title {
+.card-pay-dashboard__wallet-panel-footer-content {
+  font: var(--boxel-font-sm);
+  line-height: var(--boxel-sp-lg);
+  padding-left: var(--boxel-sp);
+}
+
+.card-pay-dashboard__wallet-panel-footer-content svg {
+  margin-bottom: -6px;
+}
+
+.card-pay-dashboard__wallet-panel-footer-content a {
+  margin-left: var(--boxel-sp-sm);
+}
+
+.card-pay-dashboard__wallet-title {
   margin-bottom: var(--boxel-sp-xxl);
   font: 600 var(--boxel-font-lg);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.card-pay-dashboard__balances-section {
+.card-pay-dashboard__wallet-section {
   border-top: 1px solid var(--boxel-purple-500);
   padding-top: var(--boxel-sp);
 }
 
-.card-pay-dashboard__balances-section-header {
+.card-pay-dashboard__wallet-section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.card-pay-dashboard__balances-section-header-button-icon {
+.card-pay-dashboard__wallet-section-header-button-icon {
   --icon-color: var(--boxel-highlight);
 
   margin-left: var(--boxel-sp-xs);
 }
 
-.card-pay-dashboard__balances-section-title {
+.card-pay-dashboard__wallet-section-title {
   font-weight: 400;
 }
 
-.card-pay-dashboard__balances-count {
+.card-pay-dashboard__wallet-count {
   padding-left: var(--boxel-sp-xxs);
   color: var(--boxel-cyan);
 }
 
-.card-pay-dashboard__balances-cards {
+.card-pay-dashboard__wallet-cards {
   display: grid;
   gap: var(--boxel-sp-xl) var(--boxel-sp);
   grid-template-columns: repeat(auto-fill, 22.75rem);

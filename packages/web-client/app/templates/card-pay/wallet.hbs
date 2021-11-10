@@ -1,56 +1,81 @@
-{{page-title "Card Balances"}}
+{{page-title "Wallet"}}
 
-<section class="card-pay-dashboard__balances" role="tabpanel" aria-labelledby="card-pay.wallet">
-  <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{or (not this.layer2Network.isConnected) (is-empty this.prepaidCards)}}>
-    {{#each @model.panel.sections as |section|}}
-      <CardPay::DashboardPanel::Section @section={{section}} class="dashboard-panel-section-wallet">
-        <:cta>
-          <Boxel::Button
-            {{on "click" (fn this.transitionToWallet section.workflow)}}
-            @kind="primary"
-            @size="touch"
-            @disabled={{section.isCtaDisabled}}
-            data-test-workflow-button={{section.workflow}}
-          >
-            {{section.cta}}
-          </Boxel::Button>
+<section class="card-pay-dashboard__wallet" role="tabpanel" aria-labelledby="card-pay.wallet">
+  <CardPay::DashboardPanel @panel={{@model.panel}} @noBottomPadding={{true}} @noCollapse={{or (not this.layer2Network.isConnected) (is-empty this.prepaidCards)}}>
+    <:detail>
+      {{#each @model.panel.sections as |section|}}
+        <CardPay::DashboardPanel::Section @section={{section}} class="dashboard-panel-section-wallet">
+          <:cta>
+            <Boxel::Button
+              {{on "click" (fn this.transitionToWallet section.workflow)}}
+              @kind="primary"
+              @size="touch"
+              @disabled={{section.isCtaDisabled}}
+              data-test-workflow-button={{section.workflow}}
+            >
+              {{section.cta}}
+            </Boxel::Button>
 
-          <small class="dashboard-panel-section__disclaimer">
-            This is possible if you have a balance of {{network-display-info "layer2" "daiToken"}} in your {{network-display-info "layer2" "fullName"}} wallet.
-            (You can <LinkTo @route="card-pay.deposit-withdrawal">deposit DAI</LinkTo>
-            from your {{network-display-info "layer1" "conversationalName"}} wallet to get a balance of {{network-display-info "layer2" "daiToken"}} in your {{network-display-info "layer2" "fullName"}} wallet.)
-          </small>
+            <small class="dashboard-panel-section__disclaimer">
+              This is possible if you have a balance of {{network-display-info "layer2" "daiToken"}} in your {{network-display-info "layer2" "fullName"}} wallet.
+              (You can <LinkTo @route="card-pay.deposit-withdrawal">deposit DAI</LinkTo>
+              from your {{network-display-info "layer1" "conversationalName"}} wallet to get a balance of {{network-display-info "layer2" "daiToken"}} in your {{network-display-info "layer2" "fullName"}} wallet.)
+            </small>
 
-          <div class="dashboard-panel-section-wallet-background"></div>
-        </:cta>
-      </CardPay::DashboardPanel::Section>
-    {{/each}}
+            <div class="dashboard-panel-section-wallet-background"></div>
+          </:cta>
+        </CardPay::DashboardPanel::Section>
+      {{/each}}
 
-    <section class="dashboard-panel-section">
-      <div class="dashboard-panel-section__body">
-        <p class="dashboard-panel-section__desc">
-          {{svg-jar "card-wallet-app-icon" alt="" role="presentation" height="79"}}
-          <h3 class="dashboard-panel-section__title">Buy a Prepaid Card</h3>
-          <p class="dashboard-panel-section__desc">With Card Wallet you can buy a Prepaid Card directly in the mobile application.</p>
-          <div class="dashboard-panel-section__badges">
-            {{!-- TODO: add links --}}
-            <img src="/images/icons/download-on-the-app-store-badge.png">
-            <img src="/images/icons/google-play-badge.png">
-          </div>
-          <img src="/images/dashboard/prepaid-card-phone.png">
-        </p>
+      <section class="dashboard-panel-section">
+        <div class="dashboard-panel-section__body">
+          <p class="dashboard-panel-section__desc">
+            {{svg-jar "card-wallet-app-icon" alt="" role="presentation" height="58"}}
+            <h3 class="dashboard-panel-section__title">Buy a Prepaid Card</h3>
+            <p class="dashboard-panel-section__desc">With Card Wallet you can buy a Prepaid Card directly in the mobile application.</p>
+            <div class="dashboard-panel-section__badges">
+              <div>
+                <a href={{this.testFlightLink}}><img src="/images/icons/download-on-the-app-store-badge.png" alt="Download on the App Store"></a>
+              </div>
+              <div>
+                <a href="#" onclick="return false"><img src="/images/icons/google-play-badge.png" class="dashboard-panel-section__badges-google-play-badge" alt="Get it on Google Play"></a>
+                <div class="dashboard-panel-section__badges-google-play-soon">Coming Soon</div>
+              </div>
+            </div>
+            <img src="/images/dashboard/prepaid-card-phone.png" alt="Screenshot of Card Wallet app showing screen to purchase a prepaid card" class="dashboard-panel-section__purchase-card-phone">
+          </p>
+        </div>
+      </section>
+    </:detail>
+    <:footer>
+      <div class="card-pay-dashboard__wallet-panel-footer-content">
+        {{svg-jar "discord-logo-color"
+          role="presentation"
+          alt="Discord"
+          width="50"
+          height="24"
+        }}
+        +
+        {{svg-jar "cardstack-logo"
+          role="presentation"
+          alt="Cardstack"
+          width="40"
+          height="26"
+        }}
+        Get a $5 prepaid card if you join the <strong>CardStack Community Discord</strong>
+        <a href="https://discord.gg/cardstack">Claim your invite &gt;</a>
       </div>
-    </section>
+    </:footer>
   </CardPay::DashboardPanel>
 
   {{#if this.layer2Network.isConnected}}
     <section data-test-card-balances>
-      <h3 class="card-pay-dashboard__balances-title">Card Balances</h3>
-      <section class="card-pay-dashboard__balances-section">
-        <header class="card-pay-dashboard__balances-section-header">
-          <h4 class="card-pay-dashboard__balances-section-title">
+      <h3 class="card-pay-dashboard__wallet-title">Wallet</h3>
+      <section class="card-pay-dashboard__wallet-section">
+        <header class="card-pay-dashboard__wallet-section-header">
+          <h4 class="card-pay-dashboard__wallet-section-title">
             Prepaid Cards
-            <span class="card-pay-dashboard__balances-count" data-test-prepaid-cards-count>{{this.prepaidCards.length}}</span>
+            <span class="card-pay-dashboard__wallet-count" data-test-prepaid-cards-count>{{this.prepaidCards.length}}</span>
           </h4>
 
           {{#let @model.panel.sections.lastObject as |section|}}
@@ -64,14 +89,14 @@
             >
               <span>{{section.cta}}</span>
               {{svg-jar "plus"
-                class="card-pay-dashboard__balances-section-header-button-icon"
+                class="card-pay-dashboard__wallet-section-header-button-icon"
                 role="presentation"
               }}
             </Boxel::Button>
           {{/let}}
         </header>
 
-        <section class="card-pay-dashboard__balances-cards">
+        <section class="card-pay-dashboard__wallet-cards">
           {{#each this.prepaidCards as |prepaidCard|}}
             <CardPay::PrepaidCardSafe @safe={{prepaidCard}} />
           {{/each}}

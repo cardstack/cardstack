@@ -15,7 +15,7 @@ import {
 
 interface Context extends MirageTestContext {}
 
-module('Acceptance | card balances', function (hooks) {
+module('Acceptance | wallet', function (hooks) {
   setupApplicationTest(hooks);
   setupMirage(hooks);
 
@@ -27,7 +27,7 @@ module('Acceptance | card balances', function (hooks) {
   });
 
   test('Cards are hidden when wallet is not connected', async function (assert) {
-    await visit('/card-pay/balances');
+    await visit('/card-pay/wallet');
 
     assert.dom('[data-test-card-balances]').doesNotExist();
   });
@@ -61,7 +61,7 @@ module('Acceptance | card balances', function (hooks) {
 
     this.server.create('prepaid-card-customization', customization);
 
-    await visit('/card-pay/balances');
+    await visit('/card-pay/wallet');
 
     assert.dom('[data-test-prepaid-cards-count]').containsText('1');
 
