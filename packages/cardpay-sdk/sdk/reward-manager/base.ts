@@ -523,13 +523,19 @@ export default class RewardManager {
       let txnHash = safeAddressOrTxnHash;
       return await waitUntilTransactionMined(this.layer2Web3, txnHash);
     }
-    let safeAddress = safeAddressOrTxnHash;
+    if (!safeAddressOrTxnHash) {
+      throw new Error('safeAddress is required');
+    }
     if (!tokenAddress) {
       throw new Error('tokenAddress must be provided');
     }
     if (!amount) {
       throw new Error('amount must be provided');
     }
+    if (!to) {
+      throw new Error('to must be provided');
+    }
+    let safeAddress = safeAddressOrTxnHash;
 
     let rewardManager = await getSDK('RewardManager', this.layer2Web3);
     let rewardManagerAddress = await this.address();
@@ -551,7 +557,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       throw new Error(`Insufficient funds for inside reward safe`);
     }
 
-    let transfer = await token.methods.transfer(to, weiAmount);
+    let transfer = await token.methods.transfer(rewardSafeOwner, weiAmount);
     let transferPayload = transfer.encodeABI();
 
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
@@ -566,15 +572,23 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       transferNonce = currentNonce.add(new BN('1'));
     }
     // to token contract
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, tokenAddress, '0', transferPayload, 0, tokenAddress);
+    let innerEstimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      tokenAddress,
+      '0',
+      transferPayload,
+      0,
+      tokenAddress
+    );
 
     let fullSignatureInnerExec = await fullSignatureTxAsBytes(
       this.layer2Web3,
-      safeAddress,
+      tokenAddress,
       0,
       transferPayload,
       0,
-      estimate,
+      innerEstimate,
       safeAddress, //or maybe zero address
       transferNonce,
       rewardSafeOwner,
@@ -582,7 +596,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       rewardManagerAddress
     );
 
-    let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    let gasCost = new BN(innerEstimate.dataGas).add(new BN(innerEstimate.baseGas)).mul(new BN(innerEstimate.gasPrice));
     if (weiAmount.lt(gasCost)) {
       throw new Error(
         `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
@@ -594,20 +608,21 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       .withdrawFromRewardSafe(
         tokenAddress,
         weiAmount,
-        estimate.safeTxGas,
-        estimate.baseGas,
-        estimate.gasPrice,
-        estimate.gasToken,
+        innerEstimate.safeTxGas,
+        innerEstimate.baseGas,
+        innerEstimate.gasPrice,
+        innerEstimate.gasToken,
         fullSignatureInnerExec
       )
       .encodeABI();
 
     if (nonce == null) {
-      nonce = getNextNonceFromEstimate(estimate);
+      nonce = getNextNonceFromEstimate(innerEstimate);
       if (typeof onNonce === 'function') {
         onNonce(nonce);
       }
     }
+    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardManagerAddress, '0', payload, 0, tokenAddress);
     let fullSignature = await signRewardSafe(
       this.layer2Web3,
       rewardManagerAddress,
