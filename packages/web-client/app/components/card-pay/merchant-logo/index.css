@@ -10,6 +10,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  flex-grow: 0;
   letter-spacing: -1px;
   line-height: var(--logo-size);
   width: var(--logo-size);
