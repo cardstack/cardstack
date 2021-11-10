@@ -8,49 +8,43 @@ import BN from 'bn.js';
 module('Integration | Helper | format-wei-amount', function (hooks) {
   setupRenderingTest(hooks);
 
-  test('It should by default return values with exactly 2 decimal places if they are > 1 or < -1', async function (assert) {
-    this.set('inputValue', toWei(new BN('1')));
-    this.set('round', false);
-    await render(hbs`{{format-wei-amount this.inputValue this.round}}`);
-    assert.dom(this.element).hasText('1.00');
+  for (let round of [true, false]) {
+    test(`${
+      round ? 'rounded' : 'not rounded'
+    }: it should return values with at least 2 decimal places`, async function (assert) {
+      this.set('inputValue', toWei(new BN('1')));
+      this.set('round', round);
 
-    this.set('round', true);
-    assert.dom(this.element).hasText('1.00');
+      await render(hbs`{{format-wei-amount this.inputValue this.round}}`);
+      assert.dom(this.element).hasText('1.00');
 
-    this.set('inputValue', toWei(new BN('11')).div(new BN('10')));
-    assert.dom(this.element).hasText('1.10');
+      this.set('inputValue', toWei(new BN('11')).div(new BN('10')));
+      assert.dom(this.element).hasText('1.10');
+    });
 
-    this.set('inputValue', toWei(new BN('111')).div(new BN('100')));
-    assert.dom(this.element).hasText('1.11');
+    test(`${
+      round ? 'rounded' : 'not rounded'
+    }: it should return values with separators`, async function (assert) {
+      this.set('inputValue', toWei(new BN('1000')));
+      this.set('round', round);
 
-    this.set('inputValue', toWei(new BN('-11')).div(new BN('10')));
-    assert.dom(this.element).hasText('-1.10');
+      await render(hbs`{{format-wei-amount this.inputValue this.round}}`);
+      assert.dom(this.element).hasText('1,000.00');
+    });
+  }
 
-    this.set('inputValue', toWei(new BN('-111')).div(new BN('100')));
-    assert.dom(this.element).hasText('-1.11');
-  });
-
-  test('It should return a precise value up to 18 decimals if round is false', async function (assert) {
+  test('not rounded: It should return a precise value up to 18 decimals', async function (assert) {
     this.set('inputValue', new BN('123456789123456789'));
     this.set('round', false);
     await render(hbs`{{format-wei-amount this.inputValue this.round}}`);
     assert.dom(this.element).hasText('0.123456789123456789');
   });
 
-  test('It should have a minDecimals of 2 if an invalid minDecimals is provided', async function (assert) {
-    this.set('inputValue', toWei(new BN('1')));
-    this.set('minDecimals', 'beep');
-    await render(hbs`{{format-wei-amount this.inputValue this.minDecimals}}`);
+  test('rounded: It should return a value with 2 significant digits for small but significant numbers (> 0.0001)', async function (assert) {
+    this.set('inputValue', new BN('123000000000000'));
+    this.set('round', true);
 
-    assert.dom(this.element).hasText('1.00');
-
-    this.set('minDecimals', -30);
-    assert.dom(this.element).hasText('1.00');
-  });
-
-  test('It should render separator commas if amount is 1000 or greater', async function (assert) {
-    this.set('inputValue', toWei(new BN('1000')));
-    await render(hbs`{{format-wei-amount this.inputValue}}`);
-    assert.dom(this.element).hasText('1,000.00');
+    await render(hbs`{{format-wei-amount this.inputValue this.round}}`);
+    assert.dom(this.element).hasText('0.00012');
   });
 });
