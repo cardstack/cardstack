@@ -79,3 +79,21 @@ export async function rewardProgramAdmin(network: string, rewardProgramId: strin
   const admin = await rewardManager.getRewardProgramAdmin(rewardProgramId);
   console.log(`Reward program admin of ${rewardProgramId} is ${admin}`);
 }
+
+export async function withdraw(
+  network: string,
+  rewardSafe: string,
+  to: string,
+  tokenAddress: string,
+  amount: string,
+  mnemonic?: string
+): Promise<void> {
+  let web3 = await getWeb3(network, mnemonic);
+  let rewardManagerAPI = await getSDK('RewardManager', web3);
+  let blockExplorer = await getConstant('blockExplorer', web3);
+  await rewardManagerAPI.withdraw(rewardSafe, to, tokenAddress, amount, {
+    onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
+  });
+  console.log(`Withdraw ${amount} of ${tokenAddress} out of ${rewardSafe} to ${to}`);
+  console.log('done');
+}
