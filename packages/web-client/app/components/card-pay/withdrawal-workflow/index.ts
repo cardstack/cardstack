@@ -104,17 +104,20 @@ class CheckBalanceWorkflowMessage
       } in your account on ${
         c.layer1.fullName
       } to perform the last step of this withdrawal workflow, which requires ~${formatWeiAmount(
-        minimumBalanceForWithdrawalClaim
+        minimumBalanceForWithdrawalClaim,
+        false
       )} ${c.layer1.nativeTokenSymbol}.`;
     } else {
       return `Checking your balance...
 
       The last step of this withdrawal requires that you have at least **~${formatWeiAmount(
-        minimumBalanceForWithdrawalClaim
+        minimumBalanceForWithdrawalClaim,
+        false
       )} ${c.layer1.nativeTokenSymbol}**.
-      You only have **${formatWeiAmount(layer1Network.defaultTokenBalance)} ${
-        c.layer1.nativeTokenSymbol
-      }**. You will need to deposit more
+      You only have **${formatWeiAmount(
+        layer1Network.defaultTokenBalance,
+        false
+      )} ${c.layer1.nativeTokenSymbol}**. You will need to deposit more
       ${
         c.layer1.nativeTokenSymbol
       } to your account shown below to continue the withdrawal.`;
