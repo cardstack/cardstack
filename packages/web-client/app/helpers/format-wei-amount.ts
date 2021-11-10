@@ -27,11 +27,17 @@ export function formatWeiAmount(
     valueInEther = initialValueInEther;
     decimals = Math.max(countDecimalPlaces(valueInEther), minDecimals);
   } else if (
-    // does not handle negative numbers currently.
-    Number(initialValueInEther) > 0.0001 &&
-    Number(initialValueInEther) < 1
+    Math.abs(Number(initialValueInEther)) > 0.0001 &&
+    Math.abs(Number(initialValueInEther)) < 1
   ) {
-    valueInEther = handleSignificantDecimals(initialValueInEther, 2, 2);
+    // handleSignificantDecimals doesn't work properly with numbers that are less than 0 && greater than -1
+    // There is a way to fix this in the SDK, but am being cautious about any "bug as a feature" use of this function
+    // This hack is temporary, until we address that
+    let isNegative = Number(initialValueInEther) < 0;
+    valueInEther = isNegative
+      ? '-' +
+        handleSignificantDecimals(initialValueInEther.replace(/^-/, ''), 2, 2)
+      : handleSignificantDecimals(initialValueInEther, 2, 2);
     decimals = Math.max(countDecimalPlaces(valueInEther), minDecimals);
   } else {
     valueInEther = initialValueInEther;

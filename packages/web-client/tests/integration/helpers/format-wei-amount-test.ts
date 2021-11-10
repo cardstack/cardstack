@@ -20,6 +20,12 @@ module('Integration | Helper | format-wei-amount', function (hooks) {
 
       this.set('inputValue', toWei(new BN('11')).div(new BN('10')));
       assert.dom(this.element).hasText('1.10');
+
+      this.set('inputValue', toWei(new BN('-1')));
+      assert.dom(this.element).hasText('-1.00');
+
+      this.set('inputValue', toWei(new BN('-11')).div(new BN('10')));
+      assert.dom(this.element).hasText('-1.10');
     });
 
     test(`${
@@ -30,6 +36,9 @@ module('Integration | Helper | format-wei-amount', function (hooks) {
 
       await render(hbs`{{format-wei-amount this.inputValue this.round}}`);
       assert.dom(this.element).hasText('1,000.00');
+
+      this.set('inputValue', toWei(new BN('-1000')));
+      assert.dom(this.element).hasText('-1,000.00');
     });
   }
 
@@ -38,6 +47,9 @@ module('Integration | Helper | format-wei-amount', function (hooks) {
     this.set('round', false);
     await render(hbs`{{format-wei-amount this.inputValue this.round}}`);
     assert.dom(this.element).hasText('0.123456789123456789');
+
+    this.set('inputValue', new BN('-123456789123456789'));
+    assert.dom(this.element).hasText('-0.123456789123456789');
   });
 
   test('rounded: It should return a value with 2 significant digits for small but significant numbers (> 0.0001)', async function (assert) {
@@ -46,5 +58,8 @@ module('Integration | Helper | format-wei-amount', function (hooks) {
 
     await render(hbs`{{format-wei-amount this.inputValue this.round}}`);
     assert.dom(this.element).hasText('0.00012');
+
+    this.set('inputValue', new BN('-123000000000000'));
+    assert.dom(this.element).hasText('-0.00012');
   });
 });
