@@ -19,26 +19,26 @@ export function formatWeiAmount(
 
   const minDecimals = 2;
 
-  let result: string = fromWei(amountInSmallestUnit);
+  let initialValueInEther: string = fromWei(amountInSmallestUnit);
+  let valueInEther: string;
+  let decimals: number;
+
   if (!round) {
-    // return the exact same amount of decimal places if rounding should not occur
-    return formatCurrencyAmount(
-      result,
-      Math.max(countDecimalPlaces(result), minDecimals)
-    );
+    valueInEther = initialValueInEther;
+    decimals = Math.max(countDecimalPlaces(valueInEther), minDecimals);
   } else if (
-    Math.abs(Number(result)) > 0.0001 &&
-    Math.abs(Number(result)) < 1
+    // does not handle negative numbers currently.
+    Number(initialValueInEther) > 0.0001 &&
+    Number(initialValueInEther) < 1
   ) {
-    result = handleSignificantDecimals(result, 2, 2);
-    return formatCurrencyAmount(
-      result,
-      Math.max(countDecimalPlaces(result), minDecimals)
-    );
+    valueInEther = handleSignificantDecimals(initialValueInEther, 2, 2);
+    decimals = Math.max(countDecimalPlaces(valueInEther), minDecimals);
   } else {
-    // by default, just truncate to 2 decimal places
-    return formatCurrencyAmount(result, minDecimals);
+    valueInEther = initialValueInEther;
+    decimals = minDecimals;
   }
+
+  return formatCurrencyAmount(valueInEther, decimals);
 }
 
 class FormatWeiAmountHelper extends Helper {
