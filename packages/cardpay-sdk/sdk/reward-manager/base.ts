@@ -1,6 +1,5 @@
 import Web3 from 'web3';
 import RewardManagerABI from '../../contracts/abi/v0.8.5/reward-manager';
-import { Contract } from 'web3-eth-contract';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, randomHex, toChecksumAddress } from 'web3-utils';
@@ -17,12 +16,13 @@ import {
   executeSendWithRateLock,
   GnosisExecTx,
   executeSend,
+  gasEstimate,
+  executeTransaction,
 } from '../utils/safe-utils';
 import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
 import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
-import { gasEstimate, executeTransaction, getNextNonceFromEstimate } from '../utils/safe-utils';
 import { signRewardSafe, fullSignatureTxAsBytes, createEIP1271VerifyingData } from '../utils/signing-utils';
 import { ZERO_ADDRESS } from '../constants';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
@@ -500,6 +500,7 @@ export default class RewardManager {
 
   async getRewardProgramAdmin(rewardProgramId: string): Promise<string> {
     return await (await this.getRewardManager()).methods.rewardProgramAdmins(rewardProgramId).call();
+  }
 
   async withdraw(txnHash: string): Promise<TransactionReceipt>;
   async withdraw(
