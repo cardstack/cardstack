@@ -63,7 +63,7 @@
         <CardPay::BalanceDisplay
           class='card-pay-safe-balances__token-balance-display'
           @icon={{b.icon}}
-          @balance={{format-wei-amount b.balance 2 2}}
+          @balance={{format-wei-amount b.balance}}
           @symbol={{b.symbol}}
           @usdBalance={{token-to-usd b.symbol b.balance}}
         />
