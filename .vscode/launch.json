@@ -294,7 +294,8 @@
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot safe feel free to use your own
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "",
-        "200",
+        "false",
+        "100",
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own

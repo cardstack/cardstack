@@ -145,6 +145,7 @@ interface Options {
   proof?: string;
   rewardSafe?: string;
   newAdmin?: string;
+  force?: string;
 }
 let {
   network,
@@ -184,6 +185,7 @@ let {
   quantity,
   rewardSafe,
   newAdmin,
+  force,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -368,7 +370,7 @@ let {
     }
   )
   .command(
-    'prepaidcard-create <safeAddress> <tokenAddress> <customizationDID> <faceValues..>',
+    'prepaidcard-create <safeAddress> <tokenAddress> <customizationDID> <force> <faceValues..>',
     'Create prepaid cards using the specified token from the specified safe with the amounts provided',
     (yargs) => {
       yargs.positional('safeAddress', {
@@ -382,6 +384,10 @@ let {
       yargs.positional('customizationDID', {
         type: 'string',
         description: 'The DID string that represents the prepaid card customization',
+      });
+      yargs.positional('force', {
+        type: 'string',
+        description: 'Force the prepaid card to be created even when the DAI rate is not snapped to USD',
       });
       yargs.positional('faceValues', {
         type: 'number',
@@ -996,11 +1002,25 @@ if (!command) {
       await setSupplierInfoDID(network, safeAddress, infoDID, token, mnemonic);
       break;
     case 'prepaidCardCreate':
-      if (tokenAddress == null || safeAddress == null || faceValues == null || faceValues.length === 0) {
-        showHelpAndExit('tokenAddress, safeAddress, and faceValues are required values');
+      if (
+        tokenAddress == null ||
+        safeAddress == null ||
+        force == null ||
+        faceValues == null ||
+        faceValues.length === 0
+      ) {
+        showHelpAndExit('tokenAddress, safeAddress, force, and faceValues are required values');
         return;
       }
-      await createPrepaidCard(network, safeAddress, faceValues, tokenAddress, customizationDID || undefined, mnemonic);
+      await createPrepaidCard(
+        network,
+        safeAddress,
+        faceValues,
+        tokenAddress,
+        force === 'true',
+        customizationDID || undefined,
+        mnemonic
+      );
       break;
     case 'split':
       if (prepaidCard == null || faceValue == null || quantity == null) {

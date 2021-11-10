@@ -9,10 +9,6 @@
   --inner-indent: var(--boxel-sp);
 }
 
-.withdrawal-workflow-check-balance__labeled-value {
-  --label-width: minmax(5rem, 33%);
-}
-
 .withdrawal-workflow-check-balance__balance-container {
   display: flex;
   justify-content: space-between;

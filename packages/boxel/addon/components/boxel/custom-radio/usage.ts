@@ -2,6 +2,7 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { A } from '@ember/array';
 import { action } from '@ember/object';
+import './usage.css';
 
 export default class CustomRadioUsage extends Component {
   @tracked items = A([

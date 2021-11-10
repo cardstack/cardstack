@@ -1,6 +1,8 @@
 import Component from '@glimmer/component';
 import { htmlSafe } from '@ember/template';
 import { SafeString } from '@ember/template/-private/handlebars';
+import '@cardstack/boxel/styles/global.css';
+import './index.css';
 
 interface ProgressIconArgs {
   isCancelled: boolean;
@@ -8,7 +10,7 @@ interface ProgressIconArgs {
   size: number;
 }
 
-export default class ProressIcon extends Component<ProgressIconArgs> {
+export default class ProgressIcon extends Component<ProgressIconArgs> {
   get elementStyle(): SafeString {
     let { size } = this.args;
     let styles = [`width: ${size}px`, `height: ${size}px`];

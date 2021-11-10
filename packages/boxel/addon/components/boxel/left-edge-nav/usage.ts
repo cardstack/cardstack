@@ -2,6 +2,7 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
+import './usage.css';
 
 import AMPLogo from '@cardstack/boxel/usage-support/images/orgs/amp-logo.png';
 import BunnyLogo from '@cardstack/boxel/usage-support/images/orgs/bunny-logo.svg';

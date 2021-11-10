@@ -5,7 +5,8 @@ import { Contract, ContractOptions } from 'web3-eth-contract';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import GnosisSafeABI from '../../contracts/abi/gnosis-safe';
 import PrepaidCardManagerABI from '../../contracts/abi/v0.8.5/prepaid-card-manager';
-import { getAddress } from '../../contracts/addresses';
+import DAIOracleABI from '../../contracts/abi//v0.8.5/chainlink-feed-adapter';
+import { getAddress, getOracle } from '../../contracts/addresses';
 import { ZERO_ADDRESS } from '../constants';
 import { getSDK } from '../version-resolver';
 
@@ -384,7 +385,8 @@ export default class PrepaidCard {
     marketAddress: string | undefined,
     customizationDID: string | undefined,
     txnOptions?: TransactionOptions,
-    contractOptions?: ContractOptions
+    contractOptions?: ContractOptions,
+    force?: boolean // force a prepaid card to be created when DAI Oracle is not snapped to USD rate
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }>;
   async create(
     safeAddressOrTxnHash: string,
@@ -393,7 +395,8 @@ export default class PrepaidCard {
     marketAddress?: string | undefined,
     customizationDID?: string | undefined,
     txnOptions?: TransactionOptions,
-    contractOptions?: ContractOptions
+    contractOptions?: ContractOptions,
+    force?: boolean // force a prepaid card to be created when DAI Oracle is not snapped to USD rate
   ): Promise<{ prepaidCards: PrepaidCardSafe[]; txnReceipt: TransactionReceipt }> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
@@ -411,6 +414,13 @@ export default class PrepaidCard {
     }
     if (faceValues.length > MAX_PREPAID_CARD_AMOUNT) {
       throw new Error(`Cannot create more than ${MAX_PREPAID_CARD_AMOUNT} at a time`);
+    }
+    let daiOracleAddress = await getOracle('DAI.CPXD', this.layer2Web3);
+    let daiOracle = new this.layer2Web3.eth.Contract(DAIOracleABI as AbiItem[], daiOracleAddress);
+    if (!(await daiOracle.methods.isSnappedToUSD().call()) && !force) {
+      throw new Error(
+        `Cannot create prepaid card without DAI Oracle being snapped to USD rate. Please use force=true to override`
+      );
     }
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
     let amountCache = new Map<number, string>();

@@ -3,6 +3,7 @@ import { action } from '@ember/object';
 import Component from '@glimmer/component';
 import CardBot from '@cardstack/boxel/usage-support/images/orgs/cardbot.svg';
 import User from '@cardstack/boxel/usage-support/images/users/Gary-Walker.jpg';
+import './usage.css';
 
 const USER = {
   title: 'Gary Walker',

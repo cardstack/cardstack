@@ -2,6 +2,7 @@
   <div class={{cn
     "card-pay-labeled-value"
     "card-pay-labeled-value--vertical"
+    card-pay-labeled-value--compact=@isCompact
     card-pay-labeled-value--address=@isAddress
     card-pay-labeled-value--has-icon=@icon
     card-pay-labeled-value--has-block=(has-block)
@@ -24,7 +25,12 @@
   <Boxel::Field
     @label={{@label}}
     @fieldMode={{if @fieldMode @fieldMode "view"}}
-    class={{cn "card-pay-labeled-value" card-pay-labeled-value--address=@isAddress card-pay-labeled-value--has-icon=@icon}}
+    class={{cn
+      "card-pay-labeled-value"
+      card-pay-labeled-value--compact=@isCompact
+      card-pay-labeled-value--address=@isAddress
+      card-pay-labeled-value--has-icon=@icon
+    }}
     @labelClass="card-pay-labeled-value__label"
     ...attributes
   >

@@ -6,7 +6,7 @@
   data-test-prepaid-card-choice-is-complete={{@isComplete}}
 >
   <ActionCardContainer::Section @title="Choose a prepaid card to pay the business account creation fee">
-    <CardPay::LabeledValue @label="Business Name" class="prepaid-card-choice__field-label">
+    <CardPay::LabeledValue @label="Business Name">
       <CardPay::Merchant
         @name={{@workflowSession.state.merchantName}}
         @size="small"
@@ -14,10 +14,10 @@
         @logoTextColor={{@workflowSession.state.merchantTextColor}}
       />
     </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Business ID" class="prepaid-card-choice__field-label" data-test-prepaid-card-choice-merchant-id>
+    <CardPay::LabeledValue @label="Business ID" data-test-prepaid-card-choice-merchant-id>
       {{@workflowSession.state.merchantId}}
     </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Business Account Creation Fee" class="prepaid-card-choice__field-label">
+    <CardPay::LabeledValue @label="Business Account Creation Fee">
       <CardPay::BalanceDisplay
         class="prepaid-card-choice__cost"
         @icon="spend"
@@ -28,7 +28,7 @@
         data-test-prepaid-card-choice-merchant-fee
       />
     </CardPay::LabeledValue>
-    <CardPay::LabeledValue @label="Pay Using Prepaid Card" class="prepaid-card-choice__field-label">
+    <CardPay::LabeledValue @label="Pay Using Prepaid Card">
       {{#if this.selectedPrepaidCard}}
         <div class="prepaid-card-choice__change-card">
           <CardPay::CardPicker::CardOption
@@ -52,7 +52,7 @@
       {{/if}}
     </CardPay::LabeledValue>
     {{#if @isComplete}}
-      <CardPay::LabeledValue @label="Business Address" class="prepaid-card-choice__field-label">
+      <CardPay::LabeledValue @label="Business Address">
         <CardPay::Merchant
           @name={{@workflowSession.state.merchantName}}
           @address={{@workflowSession.state.merchantSafe.address}}

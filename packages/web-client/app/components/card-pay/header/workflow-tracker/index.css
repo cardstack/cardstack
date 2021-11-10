@@ -1,4 +1,4 @@
-.workflow-tracker__toggle {
+button.workflow-tracker__toggle {
   min-width: 3.75rem;
   padding: var(--boxel-sp-xxxs);
 }
@@ -83,11 +83,4 @@
 .workflow-tracker__footer {
   padding: var(--boxel-sp-sm) var(--boxel-sp-xs);
   text-align: center;
-}
-
-.workflow-tracker__footer-cta {
-  --boxel-button-border: 1px solid var(--boxel-purple-300);
-
-  font: 600 var(--boxel-font-xs);
-  letter-spacing: var(--boxel-lsp-lg);
 }

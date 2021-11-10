@@ -1,10 +1,11 @@
 import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { A } from '@ember/array';
+import { action } from '@ember/object';
+import './usage.css';
 
 import LolaSampsonThumb from '@cardstack/boxel/usage-support/images/users/Lola-Sampson.jpg';
 import CardBot from '@cardstack/boxel/usage-support/images/orgs/cardbot.svg';
-import { action } from '@ember/object';
 
 export default class ThreadMessageUsageComponent extends Component {
   cardbotIcon = CardBot;

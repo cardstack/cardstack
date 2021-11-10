@@ -31,7 +31,7 @@
             class="transaction-amount__token"
             @size="large"
             @icon={{this.currentTokenDetails.icon}}
-            @balance={{format-wei-amount this.amountAsBigNumber}}
+            @balance={{format-wei-amount this.amountAsBigNumber false}}
             @symbol={{this.currentTokenSymbol}}
             @text={{concat (format-usd (token-to-usd this.currentTokenSymbol this.amountAsBigNumber)) "*"}}
             data-test-deposit-amount-entered

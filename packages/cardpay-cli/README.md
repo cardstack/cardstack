@@ -36,7 +36,7 @@ yarn cardpay safes-view --walletConnect
   - [`cardpay await-bridged-to-l1 <FROM_BLOCK> <TXN_HASH> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-await-bridged-to-l1-from_block-txn_hash---networknetwork---mnemonicmnemonic---walletconnect)
   - [`cardpay withdrawal-limits <TOKEN> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-withdrawal-limits-token---networknetwork---mnemonicmnemonic---walletconnect)
   - [`cardpay claim-tokens-bridged-to-l1 <MESSAGE_ID> <ENCODED_DATA> <SIGNATURES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-claim-tokens-bridged-to-l1-message_id-encoded_data-signatures---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaidcard-create-safe_address-token_address-customization_did-face_values---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FORCE> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaidcard-create-safe_address-token_address-customization_did-force-face_values---networknetwork---mnemonicmnemonic---walletconnect)
   - [`cardpay split <PREPAID_CARD> <FACE_VALUE> <QUANTITY> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-split-prepaid_card-face_value-quantity---networknetwork---mnemonicmnemonic---walletconnect)
   - [`cardpay prepaidcard-split <PREPAID_CARD> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaidcard-split-prepaid_card-customization_did-face_values---networknetwork---mnemonicmnemonic---walletconnect)
   - [`cardpay prepaidcard-transfer <PREPAID_CARD> <NEW_OWNER> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-prepaidcard-transfer-prepaid_card-new_owner---networknetwork---mnemonicmnemonic---walletconnect)
@@ -166,7 +166,7 @@ ARGUMENTS
   WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
 ```
 
-## `cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `cardpay prepaidcard-create <SAFE_ADDRESS> <TOKEN_ADDRESS> <CUSTOMIZATION_DID> <FORCE> <FACE_VALUES..> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
 
 Create a prepaid card from the CPXD tokens in a depot safe
 
@@ -179,6 +179,7 @@ ARGUMENTS
   CUSTOMIZATION_DID The DID string that represents the prepaid card customization
   SAFE_ADDRESS      Layer 2 safe address with DAI CPXD tokens
   TOKEN_ADDRESS     The token address of the token to use to pay for the prepaid cards
+  FORCE             Force the prepaid card to be created even when the DAI rate is not snapped to USD
   NETWORK           The network to use ("sokol" or "xdai")
   MNEMONIC          (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT    (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet

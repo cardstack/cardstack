@@ -27,7 +27,7 @@
   max-width: 19rem;
 }
 
-.layer-one-connect-card__cancel-button {
+.layer-one-connect-card .layer-one-connect-card__cancel-button {
   min-height: 1.25rem;
   min-width: unset;
   padding: 0 var(--boxel-sp-xxxs);

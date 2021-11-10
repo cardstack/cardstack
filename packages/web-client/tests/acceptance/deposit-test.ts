@@ -85,7 +85,7 @@ module('Acceptance | deposit', function (hooks) {
     });
 
     await waitFor(`${post} [data-test-balance="ETH"]`);
-    assert.dom(`${post} [data-test-balance="ETH"]`).containsText('2.1411');
+    assert.dom(`${post} [data-test-balance="ETH"]`).containsText('2.14');
     assert.dom(`${post} [data-test-balance="DAI"]`).containsText('250.50');
     assert.dom(`${post} [data-test-balance="CARD"]`).containsText('10,000.00');
 
@@ -324,7 +324,7 @@ module('Acceptance | deposit', function (hooks) {
     await waitFor(`${epiloguePostableSel(3)} [data-test-balance="ETH"]`);
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="ETH"]`)
-      .containsText('2.1411');
+      .containsText('2.14');
     assert
       .dom(`${epiloguePostableSel(3)} [data-test-balance="DAI"]`)
       .containsText('0.50');
@@ -735,7 +735,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(2, 0))
       .containsText('choose the asset you would like to deposit');
-    assert.dom('[data-test-layer-2-wallet-card]').containsText('0.1422');
+    assert.dom('[data-test-layer-2-wallet-card]').containsText('0.14');
     assert
       .dom(
         '[data-test-layer-2-wallet-card] [data-test-layer-2-wallet-disconnect-button]'
@@ -820,7 +820,7 @@ module('Acceptance | deposit', function (hooks) {
     assert
       .dom(postableSel(2, 0))
       .containsText('choose the asset you would like to deposit');
-    assert.dom('[data-test-layer-2-wallet-card]').containsText('0.1422');
+    assert.dom('[data-test-layer-2-wallet-card]').containsText('0.14');
     assert
       .dom(
         '[data-test-layer-2-wallet-card] [data-test-layer-2-wallet-disconnect-button]'
