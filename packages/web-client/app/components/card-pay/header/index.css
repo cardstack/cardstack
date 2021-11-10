@@ -1,23 +1,5 @@
 .card-pay-header {
   --boxel-org-header-background-color: var(--boxel-dark);
-  --boxel-org-header-color: var(--boxel-light);
-  --boxel-org-header-logo-size: 2.5rem; /* 40px */
-
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-.card-pay-header > *:last-child {
-  flex-grow: 1;
-}
-
-.card-pay-header h1 {
-  margin: 0;
-  font: 900 1.125rem/1.333 var(--boxel-font-family);
-  letter-spacing: var(--boxel-lsp-xxl);
-  gap: 0 var(--boxel-sp-xs);
-  white-space: nowrap;
 }
 
 /* Connect wallet component */

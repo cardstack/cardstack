@@ -1,3 +1,5 @@
+@import './action-status-area/index.css';
+
 .boxel-action-chin {
   --boxel-action-chin-padding-horizontal: var(--boxel-sp-lg);
   --boxel-action-chin-padding-vertical: var(--boxel-sp-lg);

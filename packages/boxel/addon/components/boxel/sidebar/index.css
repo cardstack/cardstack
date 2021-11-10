@@ -1,3 +1,6 @@
+@import './card-container/index.css';
+@import './section/index.css';
+
 .boxel-sidebar > * + * {
   margin-top: var(--boxel-sp);
 }

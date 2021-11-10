@@ -1,8 +1,13 @@
 .card-pay-labeled-value {
-  --label-width: minmax(4rem, 25%);
-  --boxel-field-label-width: var(--field-label-width, var(--label-width));
+  display: grid;
+  grid-template-columns: var(--field-label-width, minmax(4rem, 25%)) 1fr;
+  gap: var(--boxel-sp-sm) var(--boxel-sp-lg);
+}
 
-  align-items: var(--field-label-alignment, start);
+.card-pay-labeled-value--compact {
+  --field-label-width: 2.5rem;
+
+  row-gap: 0;
 }
 
 .card-pay-labeled-value__label {
@@ -40,6 +45,7 @@
 .card-pay-labeled-value--vertical {
   display: flex;
   flex-direction: column;
+  gap: 0;
 }
 
 .card-pay-labeled-value--vertical .card-pay-labeled-value__label {

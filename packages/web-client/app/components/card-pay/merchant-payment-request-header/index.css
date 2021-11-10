@@ -1,4 +1,5 @@
 .merchant-payment-request-header {
+  --boxel-org-header-background-color: none;
   --card-pay-logo-size: 2.5rem;
   --card-pay-logo-position: left center;
 }

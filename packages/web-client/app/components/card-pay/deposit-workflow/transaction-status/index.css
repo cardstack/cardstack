@@ -1,10 +1,10 @@
-.transaction-status__steps {
+.transaction-status .transaction-status__steps {
   color: var(--boxel-dark);
   font: 600 var(--boxel-font);
   letter-spacing: var(--boxel-lsp-xs);
 }
 
-.transaction-status__steps > li > span {
+.transaction-status .transaction-status__steps > li > span {
   grid-template-columns: auto 1fr auto;
   grid-template-rows: auto;
   gap: var(--boxel-sp-xs) var(--boxel-sp);

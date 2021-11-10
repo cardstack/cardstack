@@ -2,6 +2,8 @@ import Component from '@glimmer/component';
 import { tracked } from '@glimmer/tracking';
 import { A } from '@ember/array';
 import { action } from '@ember/object';
+import './usage.css';
+
 const SAMPLE_PROGRESS_STEPS = [
   {
     title: 'Place order',

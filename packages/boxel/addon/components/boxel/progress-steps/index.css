@@ -2,7 +2,6 @@
   --bullet-fill-color: var(--boxel-light-600);
 
   list-style-type: none;
-  margin: 0;
   padding: 0;
   color: var(--boxel-purple-400);
   font: var(--boxel-font-sm);

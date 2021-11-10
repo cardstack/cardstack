@@ -8,10 +8,7 @@
     class="withdrawal-workflow-check-balance__display-box"
   >
     <ActionCardContainer::Section>
-      <CardPay::LabeledValue
-        @label={{concat 'CURRENT ' (uppercase (network-display-info "layer1" "conversationalName")) ' BALANCE:'}}
-        class="withdrawal-workflow-check-balance__labeled-value"
-      >
+      <CardPay::LabeledValue @label={{concat "Current " (uppercase (network-display-info "layer1" "conversationalName")) " Balance:"}}>
         <CardPay::NestedItems class="withdrawal-workflow-check-balance__details">
           <:outer>
             <CardPay::AccountDisplay
@@ -44,10 +41,7 @@
       </CardPay::LabeledValue>
     </ActionCardContainer::Section>
     <ActionCardContainer::Section data-test-funds-needed>
-      <CardPay::LabeledValue
-        @label="FUNDS NEEDED FOR TRANSACTION:"
-        class="withdrawal-workflow-check-balance__labeled-value"
-      >
+      <CardPay::LabeledValue @label="Funds Needed for Transaction:">
         <CardPay::BalanceDisplay
           @size="large"
           @icon={{this.nativeTokenDisplayInfo.icon}}

@@ -5,12 +5,7 @@
   text-transform: uppercase;
 }
 
-.card-pay-header-connection-button__button {
-  min-width: 10rem; /* ~175px */
-  transition: min-width var(--boxel-transition);
-}
-
-.card-pay-header-connection-button__button--connected {
+.card-pay-header-connection-button__button.card-pay-header-connection-button__button--connected {
   min-width: 15.6rem; /* ~250px */
   padding: var(--boxel-sp-sm);
   border-color: var(--boxel-purple-700);

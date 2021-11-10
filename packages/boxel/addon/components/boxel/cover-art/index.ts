@@ -1,6 +1,8 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { reads } from 'macro-decorators';
+import '@cardstack/boxel/styles/global.css';
+import './index.css';
 
 interface CoverArtUsage {
   size: number | undefined;

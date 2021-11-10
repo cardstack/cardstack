@@ -1,5 +1,7 @@
 .boxel-next-steps-box {
+  position: relative;
   background-color: var(--boxel-purple-750);
+  border-radius: var(--boxel-border-radius);
   color: var(--boxel-light);
   min-width: min-content;
 }

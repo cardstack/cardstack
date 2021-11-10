@@ -1,14 +1,12 @@
 .boxel-org-title {
   display: grid;
   align-items: center;
-  gap: 0 3px;
+  gap: 0 var(--boxel-sp-xs);
   min-height: 3.125rem;
-  margin: 0;
-  font: var(--boxel-font-sm);
-  font-weight: 700;
+  color: var(--boxel-org-title-color, inherit);
+  font: 900 1.125rem/1.333 var(--boxel-font-family);
   letter-spacing: var(--boxel-lsp-xxl);
   text-transform: uppercase;
-  color: var(--boxel-org-title-color, inherit);
 }
 
 .boxel-org-title--has-logo {

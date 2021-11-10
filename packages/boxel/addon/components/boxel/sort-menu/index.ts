@@ -1,6 +1,8 @@
 import Component from '@glimmer/component';
 import { htmlSafe } from '@ember/template';
 import { SafeString } from '@ember/template/-private/handlebars';
+import '@cardstack/boxel/styles/global.css';
+import './index.css';
 
 const MINIMUM_USEFUL_MAX_HEIGHT_PX = 150;
 const VERTICAL_BUFFER_BELOW_MENU_PX = 40;
