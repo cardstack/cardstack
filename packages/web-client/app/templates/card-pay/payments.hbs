@@ -79,7 +79,7 @@
 </section>
 
 <Boxel::Modal
-  style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
+  @size="large"
   @isOpen={{eq this.flow 'create-business'}}
   @onClose={{this.resetQueryParams}}
 >

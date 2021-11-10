@@ -53,7 +53,7 @@
 </section>
 
 <Boxel::Modal
-  style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
+  @size="large"
   @isOpen={{or (eq this.flow 'deposit') (eq this.flow 'withdrawal')}}
   @onClose={{this.resetQueryParams}}
 >

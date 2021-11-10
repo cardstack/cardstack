@@ -1,37 +1,8 @@
-.layer-connect-modal {
-  --layer-max-width: 43.75rem; /* 700px */
-  --layer-connected-max-width: 36.25rem; /* 580px */
-  --boxel-modal-max-width: unset;
-  /* stylelint-disable-next-line length-zero-no-unit */
-  --boxel-modal-offset-top: 0px; /* Do not remove the px here. It would break the `calc` calculation for the scroll. */
-}
-
-.layer-connect-modal > div {
-  width: auto;
-  display: flex;
-  align-items: center;
-  margin: 0 var(--boxel-sp-lg);
-}
-
 .layer-connect-modal__scroll-wrapper {
   width: 100%;
-  max-width: var(--layer-max-width);
-  height: auto;
   max-height: 100%;
-  margin: auto;
-  padding: var(--boxel-sp-xs) 0;
+  padding: var(--boxel-sp-lg) 0;
   overflow-y: auto;
-  transition: max-width var(--boxel-transition);
-}
-
-.layer-connect-modal--connected .layer-connect-modal__scroll-wrapper {
-  max-width: var(--layer-connected-max-width);
-}
-
-@media screen and (max-width: 40rem) {
-  .layer-connect-modal__scroll-wrapper {
-    min-width: unset;
-  }
 }
 
 .layer-connect-modal__card {
