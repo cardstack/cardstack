@@ -3,8 +3,18 @@ import { setupHub } from '../helpers/server';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 if (process.env.COMPILER) {
-  describe.skip('CardService', function () {
-    let { cards, realm } = setupHub(this);
+  describe('CardService', function () {
+    this.afterEach(async function () {
+      let si = await getContainer().lookup('searchIndex');
+      await si.reset();
+    });
+    let { getContainer, cards, realm } = setupHub(this);
+
+    this.beforeEach(async function () {
+      let si = await getContainer().lookup('searchIndex');
+      await si.reset();
+      await si.indexAllRealms();
+    });
 
     this.beforeEach(async function () {
       await cards.create({
@@ -72,6 +82,13 @@ if (process.env.COMPILER) {
           createdAt: new Date(2020, 0, 1),
         },
       });
+    });
+
+    it.only(`can filter by card type`, async function () {
+      let matching = await cards.query({
+        filter: { type: `${realm}post` },
+      });
+      expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`, `${realm}post0`]);
     });
 
     it(`can filter on a card's own fields using gt`, async function () {

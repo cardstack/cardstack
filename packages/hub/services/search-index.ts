@@ -2,9 +2,11 @@ import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import { serializeRawCard } from '../utils/serialization';
+import CardBuilder from './card-builder';
 
 export class SearchIndex {
   private realmManager = inject('realm-manager', { as: 'realmManager' });
+  private builder = inject('card-builder', { as: 'builder' });
   private database = inject('database-manager', { as: 'database' });
 
   async indexAllRealms(): Promise<void> {
@@ -22,7 +24,7 @@ export class SearchIndex {
   private async runIndexing<Out>(fn: (ops: IndexerRun) => Promise<Out>): Promise<Out> {
     let db = await this.database.getPool();
     try {
-      let run = new IndexerRun(db);
+      let run = new IndexerRun(db, this.builder);
       let result = await fn(run);
       await run.finalize();
       return result;
@@ -54,7 +56,7 @@ export interface IndexerHandle {
 }
 
 class IndexerRun implements IndexerHandle {
-  constructor(private db: PoolClient) {}
+  constructor(private db: PoolClient, private builder: CardBuilder) {}
 
   async finalize() {}
 
@@ -63,12 +65,10 @@ class IndexerRun implements IndexerHandle {
   }
 
   async saveAndReturn(card: RawCard): Promise<CompiledCard> {
-    function callBuilderHere(): CompiledCard {
-      throw new Error('implement me');
-    }
-    let compiledCard = callBuilderHere();
-    await this.db.query(`INSERT into cards (url, data) VALUES ($1, $2)`, [
+    let compiledCard = await this.builder.compileCardFromRaw(card);
+    await this.db.query(`INSERT into cards (url, ancestors, data) VALUES ($1, $2, $3)`, [
       card.url,
+      ancestorsOf(compiledCard),
       serializeRawCard(card, compiledCard),
     ]);
     return compiledCard;
@@ -87,4 +87,10 @@ declare module '@cardstack/di' {
   interface KnownServices {
     searchIndex: SearchIndex;
   }
+}
+function ancestorsOf(compiledCard: CompiledCard): string[] {
+  if (!compiledCard.adoptsFrom) {
+    return [];
+  }
+  return [compiledCard.adoptsFrom.url, ...ancestorsOf(compiledCard.adoptsFrom)];
 }

@@ -1,6 +1,7 @@
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
-import { Query } from '@cardstack/core/src/query';
+import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
+import { Expression, expressionToSql, param } from '../utils/expressions';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -10,9 +11,10 @@ export default class CardServiceFactory {
   private realmManager = inject('realm-manager', { as: 'realmManager' });
   private builder = inject('card-builder', { as: 'builder' });
   private searchIndex = inject('searchIndex');
+  private db = inject('database-manager', { as: 'db' });
 
   as(requestContext: unknown): CardService {
-    return new CardService(requestContext, this.realmManager, this.builder, this.searchIndex);
+    return new CardService(requestContext, this.realmManager, this.builder, this.searchIndex, this.db);
   }
 }
 
@@ -26,7 +28,8 @@ export class CardService {
     _requestContext: unknown,
     private realmManager: CardServiceFactory['realmManager'],
     private builder: CardServiceFactory['builder'],
-    private searchIndex: CardServiceFactory['searchIndex']
+    private searchIndex: CardServiceFactory['searchIndex'],
+    private db: CardServiceFactory['db']
   ) {}
 
   async load(url: string): Promise<Card> {
@@ -71,12 +74,47 @@ export class CardService {
     return { data: raw.data, compiled };
   }
 
-  query(_query: Query): Promise<Card[]> {
-    // Query to sql
-    throw new Error('Method not implemented.');
+  async query(query: Query): Promise<Card[]> {
+    let client = await this.db.getPool();
+    try {
+      // Query to sql
+      let expression: Expression = ['select data from cards'];
+      if (query.filter) {
+        expression = [...expression, 'where', ...filterToExpression(query.filter)];
+      }
+      let sql = expressionToSql(expression);
+      let result = await client.query(expressionToSql(expression));
+      console.log(result);
+    } finally {
+      client.release();
+    }
   }
 
   teardown() {}
+}
+
+function filterToExpression(filter: Filter): Expression {
+  if ('any' in filter) {
+    throw unimpl('any');
+  }
+  if ('every' in filter) {
+    throw unimpl('every');
+  }
+  if ('not' in filter) {
+    throw unimpl('not');
+  }
+  if ('eq' in filter) {
+    throw unimpl('eq');
+  }
+  if ('range' in filter) {
+    throw unimpl('range');
+  }
+
+  return [param(filter.type), '= ANY (ancestors)'];
+}
+
+function unimpl(which: string) {
+  new Error(`unimpl ${which}`);
 }
 
 declare module '@cardstack/di' {

@@ -53,7 +53,7 @@ export default class CardBuilder implements BuilderInterface {
     return await this.compileCardFromRaw(rawCard);
   }
 
-  private async compileCardFromRaw(rawCard: RawCard): Promise<CompiledCard> {
+  async compileCardFromRaw(rawCard: RawCard): Promise<CompiledCard> {
     let compiledCard: CompiledCard | undefined;
     let err: unknown;
     try {

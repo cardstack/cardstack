@@ -87,7 +87,7 @@ if (process.env.COMPILER) {
             }
           `,
           'isolated.js': templateOnlyComponentTemplate(
-            '<h1><@fields.title/></h1><h2><@fields.createdAt/><article><@fields.body/></article>'
+            '<h1><@fields.title/></h1><h2><@fields.createdAt/></h2><article><@fields.body/></article>'
           ),
         },
       });
@@ -121,7 +121,7 @@ if (process.env.COMPILER) {
     */
 
     it(`can filter on a card's own fields`, async function () {
-      let response = await get(`/cards/?adoptsFrom=${realm}post`).expect(200);
+      let response = await get(`/cards/?filter[type]=${realm}post`).expect(200);
 
       expect(response.body).to.have.all.keys('data');
       expect(response.body.data).to.be.an('array').and.have.lengthOf(3);

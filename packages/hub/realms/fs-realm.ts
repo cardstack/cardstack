@@ -43,7 +43,7 @@ export default class FSRealm implements RealmInterface {
     await ops.beginReplaceAll();
     let cards = walkSync(this.directory, { globs: ['**/card.json'] });
     for (let cardPath of cards) {
-      let fullCardUrl = new URL(cardPath.replace('card.json', ''), this.url).href;
+      let fullCardUrl = new URL(cardPath.replace('/card.json', ''), this.url).href;
       this.logger.info(`--> ${fullCardUrl}`);
       let rawCard = await this.read(fullCardUrl);
       await ops.save(rawCard);
