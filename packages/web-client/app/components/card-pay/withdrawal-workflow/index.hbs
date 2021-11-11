@@ -1,5 +1,5 @@
 {{#if this.workflow}}
-  <WorkflowThread class="withdrawal-workflow" @workflow={{this.workflow}}>
+  <WorkflowThread class="withdrawal-workflow" @workflow={{this.workflow}} @onClose={{@onClose}}>
     <:before-content>
       <Boxel::ExpandableBanner
         @icon="info"

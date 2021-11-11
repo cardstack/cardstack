@@ -55,7 +55,7 @@ module('Acceptance | deposit persistence', function (hooks) {
     workflowPersistenceService.clear();
   });
 
-  test('Generates a flow uuid query parameter used as a persistence identifier', async function (this: Context, assert) {
+  test('Generates a flow uuid query parameter used as a persistence identifier and can be dismissed via the header button', async function (this: Context, assert) {
     await visit('/card-pay/deposit-withdrawal');
     await click('[data-test-workflow-button="deposit"]');
     assert.equal(
@@ -63,6 +63,9 @@ module('Acceptance | deposit persistence', function (hooks) {
         ?.length,
       22
     );
+
+    await click('[data-test-return-to-dashboard]');
+    assert.dom('[data-test-workflow-thread]').doesNotExist();
   });
 
   module('Restoring from a previously saved state', function () {

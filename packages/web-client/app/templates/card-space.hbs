@@ -28,7 +28,7 @@
     @onClose={{this.resetQueryParams}}
   >
     {{#if (is-network-initialized)}}
-      <CardSpace::CreateSpaceWorkflow />
+      <CardSpace::CreateSpaceWorkflow @onClose={{this.resetQueryParams}} />
     {{/if}}
   </Boxel::Modal>
 </main>

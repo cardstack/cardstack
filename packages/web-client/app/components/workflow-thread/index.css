@@ -3,6 +3,10 @@
   --outer-max-width: 43.75rem; /* 700px; */
 }
 
+.workflow-thread .boxel-thread-header {
+  grid-template-columns: 1fr auto auto;
+}
+
 .workflow-thread__status {
   color: var(--boxel-dark);
   font: 600 var(--boxel-font-sm);
