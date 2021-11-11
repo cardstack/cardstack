@@ -1,4 +1,5 @@
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
+import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
 import { serializeRawCard } from '../utils/serialization';
@@ -13,6 +14,19 @@ export class SearchIndex {
     await this.runIndexing(async (ops) => {
       await Promise.all(this.realmManager.realms.map((realm) => realm.reindex(ops, undefined)));
     });
+  }
+
+  async getCard(cardURL: string): Promise<{ raw: RawCard; compiled: CompiledCard | undefined }> {
+    let db = await this.database.getPool();
+    let deserializer = new RawCardDeserializer();
+    try {
+      let {
+        rows: [result],
+      } = await db.query('SELECT data from cards where url = $1', [cardURL]);
+      return deserializer.deserialize(result.data.data, result.data);
+    } finally {
+      db.release();
+    }
   }
 
   async indexCard(raw: RawCard): Promise<CompiledCard> {
@@ -83,14 +97,15 @@ class IndexerRun implements IndexerHandle {
   async finishReplaceAll(): Promise<void> {}
 }
 
-declare module '@cardstack/di' {
-  interface KnownServices {
-    searchIndex: SearchIndex;
-  }
-}
 function ancestorsOf(compiledCard: CompiledCard): string[] {
   if (!compiledCard.adoptsFrom) {
     return [];
   }
   return [compiledCard.adoptsFrom.url, ...ancestorsOf(compiledCard.adoptsFrom)];
+}
+
+declare module '@cardstack/di' {
+  interface KnownServices {
+    searchIndex: SearchIndex;
+  }
 }

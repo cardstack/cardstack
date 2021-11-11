@@ -84,25 +84,36 @@ if (process.env.COMPILER) {
       });
     });
 
-    it(`can filter by card type`, async function () {
-      let matching = await cards.query({
-        filter: { type: `${realm}post` },
+    describe('.load()', function () {
+      it('returns a card thats been indexed', async function () {
+        let card = await cards.load(`${realm}post1`);
+        expect(card.data!.title).to.eq('Hello again');
+        expect(card.compiled!.url).to.eq(`${realm}post1`);
+        expect(card.compiled!.adoptsFrom!.url).to.eq(`${realm}post`);
       });
-      expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`, `${realm}post0`]);
     });
 
-    it(`can filter on a card's own fields using gt`, async function () {
-      let matching = await cards.query({
-        filter: { type: `${realm}post`, range: { createdAt: { gt: '2019-01-01' } } },
+    describe('.query()', function () {
+      it(`can filter by card type`, async function () {
+        let matching = await cards.query({
+          filter: { type: `${realm}post` },
+        });
+        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`, `${realm}post0`]);
       });
-      expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`]);
-    });
 
-    it(`can filter on a nested field using eq`, async function () {
-      let matching = await cards.query({
-        filter: { type: `${realm}post`, eq: { 'author.name': 'Sue' } },
+      it(`can filter on a card's own fields using gt`, async function () {
+        let matching = await cards.query({
+          filter: { type: `${realm}post`, range: { createdAt: { gt: '2019-01-01' } } },
+        });
+        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`]);
       });
-      expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`]);
+
+      it(`can filter on a nested field using eq`, async function () {
+        let matching = await cards.query({
+          filter: { type: `${realm}post`, eq: { 'author.name': 'Sue' } },
+        });
+        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`]);
+      });
     });
   });
 }

@@ -34,9 +34,11 @@ export class CardService {
   ) {}
 
   async load(url: string): Promise<Card> {
-    let rawCard = await this.realmManager.read(url);
-    let card = await this.builder.getCompiledCard(url);
-    return { data: rawCard.data, compiled: card };
+    let { raw, compiled } = await this.searchIndex.getCard(url);
+    if (!compiled) {
+      throw new Error(`bug: database entry for ${raw.url} is missing the compiled card`);
+    }
+    return { data: raw.data, compiled };
   }
 
   async create(raw: RawCard): Promise<Card>;
