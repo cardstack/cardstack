@@ -98,24 +98,29 @@
   justify-content: flex-start;
 }
 
-/* TODO make responsive */
-.dashboard-panel-section-wallet-background {
-  width: 600px;
-  max-width: calc(100% + (2 * 84px));
+.dashboard-panel-section-wallet__cards {
+  width: calc(100% + (2 * 84px));
   position: absolute;
-  height: 367px;
   bottom: 0;
   left: -84px;
-  background-image: url(/images/dashboard/cards@3x.webp);
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
 }
 
 .dashboard-panel-section-wallet .dashboard-panel-section__disclaimer {
   position: relative;
   margin-top: var(--boxel-sp);
   transform: none;
+}
+
+@media screen and (max-width: 1200px) {
+  .dashboard-panel-section-wallet__cards {
+    width: calc(80% + (2 * 84px));
+  }
+}
+
+@media screen and (max-width: 1050px) {
+  .dashboard-panel-section-wallet__cards {
+    display: none;
+  }
 }
 
 @media screen and (max-width: 800px) {
