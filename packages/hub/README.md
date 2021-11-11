@@ -59,7 +59,7 @@ AWS_PROFILE=cardstack
 ```
 
 ## Setting up Discord
-Some of the packages in this mono repo support the operation of a discord bot that uses the hub's DI system. We leverage [CordeJS](https://cordejs.org/docs/cordebot/) for our unit tests. CordeJS uses a discord bot running in discord to test the bot functionality by emulating a discord user and sending commands to the bot under test. In order to run the cordejs tests, you'll need to setup a discord server and install the cordebot with full permissions into the discord server.
+Some of the packages in this mono repo support the operation of a discord bot that uses the hub's DI system. We leverage [CordeJS](https://cordejs.org/docs/cordebot/) for our unit tests. CordeJS uses a discord bot running in discord to test the bot functionality by emulating a discord user and sending commands to the bot under test. In order to run the cordejs tests, you'll need to setup a discord server and install the cordebot with full permissions as well as the cardbot into the discord server.
 
 The instructions for setting up the cordebot (and cardbot) are here: https://cordejs.org/docs/creatingdiscordbot. In these instructions you need to setup 2 bots (the instructions outline how to setup a single bot). One bot that you setup will be the cardbot, the other bot that you setup will be the cordebot (used to test the cardbot).
 
