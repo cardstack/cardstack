@@ -22,7 +22,9 @@
               from your {{network-display-info "layer1" "conversationalName"}} wallet to get a balance of {{network-display-info "layer2" "daiToken"}} in your {{network-display-info "layer2" "fullName"}} wallet.)
             </small>
 
-            <div class="dashboard-panel-section-wallet-background"></div>
+            <div class="dashboard-panel-section-wallet__cards">
+              <img src="/images/dashboard/cards@3x.webp" alt="">
+            </div>
           </:cta>
         </CardPay::DashboardPanel::Section>
       {{/each}}
@@ -35,7 +37,7 @@
             <p class="dashboard-panel-section__desc">With Card Wallet you can buy a Prepaid Card directly in the mobile application.</p>
             <div class="dashboard-panel-section__badges">
               <div>
-                <a href={{this.testFlightLink}}><img src="/images/icons/download-on-the-app-store-badge.png" alt="Download on the App Store"></a>
+                <a href={{this.testFlightLink}} target="_blank" rel="noopener noreferrer"><img src="/images/icons/download-on-the-app-store-badge.png" alt="Download on the App Store"></a>
               </div>
               <div>
                 <a href="#" onclick="return false"><img src="/images/icons/google-play-badge.png" class="dashboard-panel-section__badges-google-play-badge" alt="Get it on Google Play"></a>
@@ -63,7 +65,7 @@
           height="26"
         }}
         Get a $5 prepaid card if you join the <strong>CardStack Community Discord</strong>
-        <a href="https://discord.gg/cardstack">Claim your invite &gt;</a>
+        <a href="https://discord.gg/cardstack" target="_blank" rel="noopener noreferrer">Claim your invite &gt;</a>
       </div>
     </:footer>
   </CardPay::DashboardPanel>
