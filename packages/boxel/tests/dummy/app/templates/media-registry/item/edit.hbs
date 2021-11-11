@@ -1,19 +1,21 @@
-<Boxel::Modal @isOpen={{true}} @onClose={{this.transitionToView}}>
-  <header class="item-edit__sticky-header">
-    <div>
-      <h1 class="item-edit__title">{{titleize @model.title}}</h1>
-      <h2 class="item-edit__description">Original Recording</h2>
-    </div>
-    <Boxel::ModeIndicator @mode="edit" {{on "click" this.transitionToView}} />
-  </header>
+<Boxel::Modal @size="large" @isOpen={{true}} @onClose={{this.transitionToView}}>
+  <article>
+    <header class="item-edit__sticky-header">
+      <div>
+        <h1 class="item-edit__title">{{titleize @model.title}}</h1>
+        <h2 class="item-edit__description">Original Recording</h2>
+      </div>
+      <Boxel::ModeIndicator @mode="edit" {{on "click" this.transitionToView}} />
+    </header>
 
-  <div class="item-edit__scroll-container">
-    <div class="item-edit__body-plate">
-      <MusicDetailCard
-        @mode="edit"
-        @model={{@model}}
-      >
-      </MusicDetailCard>
+    <div class="item-edit__scroll-container">
+      <div class="item-edit__body-plate">
+        <MusicDetailCard
+          @mode="edit"
+          @model={{@model}}
+        >
+        </MusicDetailCard>
+      </div>
     </div>
-  </div>
+  </article>
 </Boxel::Modal>

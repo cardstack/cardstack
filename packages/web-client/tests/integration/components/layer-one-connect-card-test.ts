@@ -64,7 +64,7 @@ module('Integration | Component | layer-one-connect-card', function (hooks) {
         <CardPay::LayerOneConnectCard/>
       `);
 
-    assert.dom('[data-test-balance="ETH"]').containsText('2.1411');
+    assert.dom('[data-test-balance="ETH"]').containsText('2.14');
     assert.dom('[data-test-balance="DAI"]').containsText('0.50');
     assert.dom('[data-test-balance="CARD"]').containsText('10,000.00');
 

@@ -27,6 +27,12 @@ export default class CardPayDepositAndWithdrawalController extends Controller {
     this.workflowPersistenceId = null;
   }
 
+  get safes() {
+    return this.layer2Network.safes.value
+      ?.filter((s) => s.type === 'merchant' || s.type === 'depot')
+      .sortBy('type');
+  }
+
   get tokensToDisplay() {
     if (!this.layer2Network.isConnected) {
       return [];

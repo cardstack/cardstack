@@ -1,6 +1,8 @@
 import Component from '@glimmer/component';
 import { action } from '@ember/object';
 import { Link } from 'ember-link';
+import '@cardstack/boxel/styles/global.css';
+import './index.css';
 
 interface MenuArgs {
   closeMenu: () => never;

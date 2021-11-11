@@ -9,7 +9,17 @@
   ...attributes
 >
   <:header>
-    <Boxel::ThreadHeader @title={{this.workflow.displayName}} />
+    <Boxel::ThreadHeader @title={{this.workflow.displayName}}>
+      {{#if @onClose}}
+        <Boxel::Button
+          @size='extra-small'
+          {{on 'click' @onClose}}
+          data-test-return-to-dashboard
+        >
+          Return to Dashboard
+        </Boxel::Button>
+      {{/if}}
+    </Boxel::ThreadHeader>
   </:header>
   <:content>
     {{#if (has-block 'before-content')}}

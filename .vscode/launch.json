@@ -294,7 +294,8 @@
         "0x00F0FBDEEa1cDEc029Ba6025ca726Fdcf43E9025", // Hassan's depot safe feel free to use your own
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
         "",
-        "200",
+        "false",
+        "100",
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own
@@ -804,6 +805,73 @@
         // "0x4767D0D74356433d54880Fcd7f083751d64388aF",
         // "--tokenAddress",
         // "0xB236ca8DbAB0644ffCD32518eBF4924ba866f7Ee",
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Lock Reward Program",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "lock-reward-program",
+        "0xb284f51Ac8dc7df9D7DAedEf485092dc4D41B8A8", //prepaid card
+        "0x1c20cB9A77aCd795636E97c639DadBb8f168D288", //reward program
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Check if Reward Program Locked",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "is-reward-program-locked",
+        "0x1c20cB9A77aCd795636E97c639DadBb8f168D288", //reward program
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Update Reward Program Admin",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "update-reward-program-admin",
+        "0xb284f51Ac8dc7df9D7DAedEf485092dc4D41B8A8", //prepaid card
+        "0x1c20cB9A77aCd795636E97c639DadBb8f168D288", //reward program
+        "0x372f9d2a25F4255dCc4d1922EB548E02ab427310", //new admin (some random address)
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Get Reward Program Admin",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "reward-program-admin",
+        "0x1c20cB9A77aCd795636E97c639DadBb8f168D288", //reward program
         "--network",
         "sokol",
         "--mnemonic",

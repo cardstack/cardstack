@@ -78,7 +78,7 @@ module(
       assert.dom('[data-test-withdrawal-source]').containsText(depotAddress);
       assert
         .dom('[data-test-withdrawal-balance]')
-        .containsText(`${startDaiAmountString} DAI.CPXD`);
+        .containsText(`100.11 DAI.CPXD`);
     });
 
     test('the amount is marked invalid when a value is entered and then cleared', async function (assert) {

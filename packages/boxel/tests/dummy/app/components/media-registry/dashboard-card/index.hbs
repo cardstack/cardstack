@@ -40,7 +40,10 @@
         @iconURL={{@currentOrg.iconURL}}
         class="media-registry__header media-registry__header--{{@currentOrg.id}}"
       >
-        <Boxel::Input class="media-registry__search-bar" type="search" placeholder="Search" />
+        <label>
+          <span class="boxel-sr-only">Search</span>
+          <Input class="media-registry__search-bar" @type="search" placeholder="Search" />
+        </label>
       </Boxel::OrgHeader>
       {{!-- TODO: navbar component (also see CardPay::DashboardCard) --}}
       <nav class="media-registry__nav">

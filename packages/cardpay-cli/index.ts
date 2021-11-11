@@ -21,7 +21,14 @@ import {
   gasFee,
   getPaymentLimits,
 } from './prepaid-card.js';
-import { registerRewardProgram, registerRewardee } from './reward-manager';
+import {
+  registerRewardProgram,
+  registerRewardee,
+  lockRewardProgram,
+  isRewardProgramLocked,
+  updateRewardProgramAdmin,
+  rewardProgramAdmin,
+} from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
   usdPrice as layer2UsdPrice,
@@ -93,7 +100,11 @@ type Commands =
   | 'addRewardTokens'
   | 'rewardPoolBalance'
   | 'claimRewards'
-  | 'claimableRewardProofs';
+  | 'claimableRewardProofs'
+  | 'lockRewardProgram'
+  | 'isRewardProgramLocked'
+  | 'updateRewardProgramAdmin'
+  | 'rewardProgramAdmin';
 
 let command: Commands | undefined;
 interface Options {
@@ -133,6 +144,8 @@ interface Options {
   admin?: string;
   proof?: string;
   rewardSafe?: string;
+  newAdmin?: string;
+  force?: string;
 }
 let {
   network,
@@ -171,6 +184,8 @@ let {
   proof,
   quantity,
   rewardSafe,
+  newAdmin,
+  force,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -355,7 +370,7 @@ let {
     }
   )
   .command(
-    'prepaidcard-create <safeAddress> <tokenAddress> <customizationDID> <faceValues..>',
+    'prepaidcard-create <safeAddress> <tokenAddress> <customizationDID> <force> <faceValues..>',
     'Create prepaid cards using the specified token from the specified safe with the amounts provided',
     (yargs) => {
       yargs.positional('safeAddress', {
@@ -369,6 +384,10 @@ let {
       yargs.positional('customizationDID', {
         type: 'string',
         description: 'The DID string that represents the prepaid card customization',
+      });
+      yargs.positional('force', {
+        type: 'string',
+        description: 'Force the prepaid card to be created even when the DAI rate is not snapped to USD',
       });
       yargs.positional('faceValues', {
         type: 'number',
@@ -826,6 +845,50 @@ let {
       command = 'claimableRewardProofs';
     }
   )
+  .command('lock-reward-program <prepaidCard> <rewardProgramId>', 'Lock reward program', (yargs) => {
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The prepaid card used to pay for gas for the txn',
+    });
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    command = 'lockRewardProgram';
+  })
+  .command('is-reward-program-locked <rewardProgramId>', 'Check lock status of reward program', (yargs) => {
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    command = 'isRewardProgramLocked';
+  })
+  .command(
+    'update-reward-program-admin <prepaidCard> <rewardProgramId> <newAdmin>',
+    'Update reward program admin',
+    (yargs) => {
+      yargs.positional('prepaidCard', {
+        type: 'string',
+        description: 'The prepaid card used to pay for gas for the txn',
+      });
+      yargs.positional('rewardProgramId', {
+        type: 'string',
+        description: 'The reward program id.',
+      });
+      yargs.positional('newAdmin', {
+        type: 'string',
+        description: 'The eoa admin of reward program',
+      });
+      command = 'updateRewardProgramAdmin';
+    }
+  )
+  .command('reward-program-admin <rewardProgramId>', 'Get reward program admin', (yargs) => {
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    command = 'rewardProgramAdmin';
+  })
   .options({
     network: {
       alias: 'n',
@@ -939,11 +1002,25 @@ if (!command) {
       await setSupplierInfoDID(network, safeAddress, infoDID, token, mnemonic);
       break;
     case 'prepaidCardCreate':
-      if (tokenAddress == null || safeAddress == null || faceValues == null || faceValues.length === 0) {
-        showHelpAndExit('tokenAddress, safeAddress, and faceValues are required values');
+      if (
+        tokenAddress == null ||
+        safeAddress == null ||
+        force == null ||
+        faceValues == null ||
+        faceValues.length === 0
+      ) {
+        showHelpAndExit('tokenAddress, safeAddress, force, and faceValues are required values');
         return;
       }
-      await createPrepaidCard(network, safeAddress, faceValues, tokenAddress, customizationDID || undefined, mnemonic);
+      await createPrepaidCard(
+        network,
+        safeAddress,
+        faceValues,
+        tokenAddress,
+        force === 'true',
+        customizationDID || undefined,
+        mnemonic
+      );
       break;
     case 'split':
       if (prepaidCard == null || faceValue == null || quantity == null) {
@@ -1190,6 +1267,46 @@ if (!command) {
         return;
       }
       await getClaimableRewardProofs(network, address, rewardProgramId, tokenAddress, mnemonic);
+      break;
+    case 'lockRewardProgram':
+      if (prepaidCard == null) {
+        showHelpAndExit('prepaid card is a required value');
+        return;
+      }
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      await lockRewardProgram(network, prepaidCard, rewardProgramId, mnemonic);
+      break;
+    case 'isRewardProgramLocked':
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      await isRewardProgramLocked(network, rewardProgramId, mnemonic);
+      break;
+    case 'updateRewardProgramAdmin':
+      if (prepaidCard == null) {
+        showHelpAndExit('prepaid card is a required value');
+        return;
+      }
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      if (newAdmin == null) {
+        showHelpAndExit('newAdmin is a required value');
+        return;
+      }
+      await updateRewardProgramAdmin(network, prepaidCard, rewardProgramId, newAdmin, mnemonic);
+      break;
+    case 'rewardProgramAdmin':
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      await rewardProgramAdmin(network, rewardProgramId, mnemonic);
       break;
     default:
       assertNever(command);

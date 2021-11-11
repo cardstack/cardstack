@@ -65,11 +65,11 @@
 </section>
 
 <Boxel::Modal
-  style={{css-var boxel-modal-max-width="65rem"}} {{!-- ~1040px --}}
+  @size="large"
   @isOpen={{eq this.flow 'issue-prepaid-card'}}
   @onClose={{this.resetQueryParams}}
 >
   {{#if (is-network-initialized)}}
-    <CardPay::IssuePrepaidCardWorkflow />
+    <CardPay::IssuePrepaidCardWorkflow @onClose={{this.resetQueryParams}} />
   {{/if}}
 </Boxel::Modal>

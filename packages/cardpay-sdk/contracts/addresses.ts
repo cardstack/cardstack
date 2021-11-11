@@ -5,15 +5,15 @@ import { networkName } from '../sdk/utils/general-utils';
 // this silly consumption of the ABI's. The ABI's are indeed consumed, however,
 // we consume them outside of ts due to the way the codegen operates for the
 // subgraph assembly script.
-import PayMerchantHandlerABI from './abi/v0.8.4/pay-merchant-handler';
-import RegisterMerchantHandlerABI from './abi/v0.8.4/register-merchant-handler';
-import TransferPrepaidCardHandlerABI from './abi/v0.8.4/transfer-prepaid-card-handler';
-import SplitPrepaidCardHandlerABI from './abi/v0.8.4/split-prepaid-card-handler';
-import SpendABI from './abi/v0.8.4/spend';
-import MerchantManagerABI from './abi/v0.8.4/merchant-manager';
-import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.4/deprecated-merchant-manager-0_6_7';
-import RegisterRewardProgramHandlerABI from './abi/v0.8.4/register-reward-program-handler';
-import RegisterRewardeeHandlerABI from './abi/v0.8.4/register-rewardee-handler';
+import PayMerchantHandlerABI from './abi/v0.8.5/pay-merchant-handler';
+import RegisterMerchantHandlerABI from './abi/v0.8.5/register-merchant-handler';
+import TransferPrepaidCardHandlerABI from './abi/v0.8.5/transfer-prepaid-card-handler';
+import SplitPrepaidCardHandlerABI from './abi/v0.8.5/split-prepaid-card-handler';
+import SpendABI from './abi/v0.8.5/spend';
+import MerchantManagerABI from './abi/v0.8.5/merchant-manager';
+import DeprecatedMerchantManagerABI_0_6_7 from './abi/v0.8.5/deprecated-merchant-manager-0_6_7';
+import RegisterRewardProgramHandlerABI from './abi/v0.8.5/register-reward-program-handler';
+import RegisterRewardeeHandlerABI from './abi/v0.8.5/register-rewardee-handler';
 
 function consumeModule(_module: any) {}
 consumeModule(PayMerchantHandlerABI);
@@ -59,9 +59,9 @@ const SOKOL = {
   uniswapV2Router: '0xd57B4D7B7FED6b47492A362e113e26F9804DbCc6', // This is the UniswapV2Router02
   uniswapV2Factory: '0x6b67f08F08B715B162aa09239488318A660F24BF',
   rewardPool: '0x2D23acfEA32492911E8DF12E697AF0013B8D4E7b',
-  rewardManager: '0xC42a0E9Df2445D5b6918D44091524cDA4c13BbFd',
+  rewardManager: '0x3ED4129d0076f3357e4915C5dd12F10c1335F49a',
   registerRewardProgramHandler: '0xaF5B2869Be9Eb9c45cc0501F17B145A3229dD2C0',
-  registerRewardeeHandler: '0x0B793A280F2E47997432a9047073F5e634A9A731',
+  registerRewardeeHandler: '0xD46f5eE431eAA309ABeC7a3561E06586450171b0',
   deprecatedMerchantManager_v0_6_7: '0xA113ECa0Af275e1906d1fe1B7Bef1dDB033113E2',
   oracles: {
     'DAI.CPXD': '0x74beF86c9d4a5b96B81D8d8e44157DFd35Eda5fB',

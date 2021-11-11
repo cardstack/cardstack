@@ -13,19 +13,13 @@
 }
 
 .boxel-modal {
-  --boxel-modal-offset-top: 30px;
-  --boxel-modal-offset-right: 0;
-  --boxel-modal-offset-left: 0;
-  --boxel-modal-max-width: 1000px;
-
   position: fixed;
   width: 100%;
-  height: calc(100vh - var(--boxel-modal-offset-top));
-  top: var(--boxel-modal-offset-top);
-  left: var(--boxel-modal-offset-left);
-  right: var(--boxel-modal-offset-right);
-  margin: 0 auto;
-  padding: 0;
+  height: calc(100vh - var(--boxel-modal-offset-top, 0px));
+  top: var(--boxel-modal-offset-top, 0px);
+  left: var(--boxel-modal-offset-left, 0px);
+  right: var(--boxel-modal-offset-right, 0px);
+  padding: 0 var(--boxel-sp);
   background: none;
   border: none;
   overflow: hidden;
@@ -33,14 +27,30 @@
   pointer-events: none;
 }
 
+.boxel-modal--small {
+  --boxel-modal-max-width: 36.25rem; /* 580px */
+}
+
+.boxel-modal--medium {
+  --boxel-modal-max-width: 43.75rem; /* 700px */
+}
+
+.boxel-modal--large {
+  --boxel-modal-offset-top: var(--boxel-sp-lg);
+  --boxel-modal-max-width: 65rem;   /* 1040px */
+}
+
 .boxel-modal__inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
-  max-width: var(--boxel-modal-max-width);
-  margin: 0 auto;
-  transition: max-width var(--boxel-transition);
+  margin: auto;
+  max-width: var(--boxel-modal-max-width, 65rem);
 }
 
 .boxel-modal__inner > * {
+  width: 100%;
   pointer-events: auto;
 }

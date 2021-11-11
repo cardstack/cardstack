@@ -1,3 +1,5 @@
+@import './item/index.css';
+
 .boxel-sort-menu {
   font: var(--boxel-font-sm);
   letter-spacing: var(--boxel-lsp-sm);

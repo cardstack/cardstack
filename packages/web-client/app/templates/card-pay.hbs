@@ -45,15 +45,15 @@
   @isLayerConnected={{this.layer2Network.isConnected}}
 />
 
-{{#if this.chainChangeModalOptions}}
-  <CardPay::ChainChangeModal
+{{#if this.networkProblemModalOptions}}
+  <CardPay::NetworkProblemModal
     @isOpen={{true}}
-    @title={{this.chainChangeModalOptions.title}}
-    @body={{this.chainChangeModalOptions.body}}
-    @actionText={{this.chainChangeModalOptions.actionText}}
-    @action={{this.chainChangeModalOptions.action}}
-    @onClose={{this.chainChangeModalOptions.onClose}}
-    @dismissable={{this.chainChangeModalOptions.dismissable}}
+    @title={{this.networkProblemModalOptions.title}}
+    @body={{this.networkProblemModalOptions.body}}
+    @actionText={{this.networkProblemModalOptions.actionText}}
+    @action={{this.networkProblemModalOptions.action}}
+    @onClose={{this.networkProblemModalOptions.onClose}}
+    @dismissable={{this.networkProblemModalOptions.dismissable}}
   />
 {{/if}}
 

@@ -9,14 +9,19 @@
     <button
       type="button"
       {{on "click" @onClose}}
-      class="boxel-modal-overlay {{@overlayClass}}"
+      class="boxel-modal-overlay"
       tabindex="-1"
     >
       <span class="boxel-sr-only">Close modal</span>
     </button>
 
     <dialog
-      class="boxel-modal"
+      class={{cn
+        "boxel-modal"
+        boxel-modal--small=(eq @size "small")
+        boxel-modal--medium=(eq @size "medium")
+        boxel-modal--large=(eq @size "large")
+      }}
       open={{@isOpen}}
       aria-modal="true"
       ...attributes

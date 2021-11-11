@@ -1,15 +1,3 @@
-.red {
-  background-color: rgba(255, 0, 0, 0.75);
-}
-
-.blue {
-  background-color: rgba(0, 0, 255, 0.75);
-}
-
-.white {
-  background-color: white;
-}
-
 .boxel-modal-usage-container {
   max-height: 100%;
   padding: var(--boxel-sp-lg);

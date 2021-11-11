@@ -1,5 +1,7 @@
 import Component from '@glimmer/component';
 import { equal } from 'macro-decorators';
+import '@cardstack/boxel/styles/global.css';
+import './index.css';
 
 enum ActionChinState {
   // state before the cta has been activated/the action done

@@ -5,32 +5,30 @@
 <:example>
 <Boxel::Button @kind="primary" {{on "click" (fn (mut this.isOpen) true)}}>Open</Boxel::Button>
 <Boxel::Modal
+  @size={{this.size}}
   @onClose={{this.onClose}}
   @isOpen={{this.isOpen}}
-  @overlayClass={{this.overlayClass}}
   aria-labelledby="boxel-modal-usage-example-id"
   style={{css-var
     boxel-modal-offset-top=this.offsetTop
     boxel-modal-offset-left=this.offsetLeft
     boxel-modal-offset-right=this.offsetRight
-    boxel-modal-max-width=this.maxWidth
   }}
 >
   <Boxel::CardContainer class="boxel-modal-usage-container">
     <h2 id="boxel-modal-usage-example-id">Boxel Modal</h2>
     <p>
-      Hi! This is some content. Try changing `@overlayClass` to red, or blue.
+      Hi! This is some content.
     </p>
     <Boxel::Button {{on "click" this.onClose}}>OK</Boxel::Button>
   </Boxel::CardContainer>
 </Boxel::Modal>
 </:example>
 <:api as |Args|>
-  <Args.String @name="overlayClass" @description="Class(es) assigned to the modal's background overlay" @value={{this.overlayClass}} @onInput={{fn (mut this.overlayClass)}} @optional={{true}}/>
-  <Args.String @name="--boxel-modal-offset-right" @description="Right offset for the inner modal" @value={{this.offsetRight}} @onInput={{fn (mut this.offsetRight)}} @optional={{true}} @defaultValue="0" />
-  <Args.String @name="--boxel-modal-offset-left" @description="Left offset for the inner modal" @value={{this.offsetLeft}} @onInput={{fn (mut this.offsetLeft)}} @optional={{true}} @defaultValue="0" />
-  <Args.String @name="--boxel-modal-offset-top" @description="Top offset for the inner modal" @value={{this.offsetTop}} @onInput={{fn (mut this.offsetTop)}} @optional={{true}} @defaultValue="30px" />
-  <Args.String @name="--boxel-modal-max-width" @description="Maximum width of the modal" @value={{this.maxWidth}} @onInput={{fn (mut this.maxWidth)}} @optional={{true}} @defaultValue="1000px" />
+  <Args.String @name="size" @description="Can be `small`, `medium`, `large`, or unspecified. Sets a predetermined max-width to inner modal." @value={{this.size}} @options={{array "small" "medium" "large" "n/a"}} @onInput={{fn (mut this.size)}} @defaultValue="65rem" />
+  <Args.String @name="--boxel-modal-offset-right" @description="Right offset for the inner modal" @value={{this.offsetRight}} @onInput={{fn (mut this.offsetRight)}} @optional={{true}} @defaultValue="0px" />
+  <Args.String @name="--boxel-modal-offset-left" @description="Left offset for the inner modal" @value={{this.offsetLeft}} @onInput={{fn (mut this.offsetLeft)}} @optional={{true}} @defaultValue="0px" />
+  <Args.String @name="--boxel-modal-offset-top" @description="Top offset for the inner modal" @value={{this.offsetTop}} @onInput={{fn (mut this.offsetTop)}} @optional={{true}} @defaultValue="0px" />
   <Args.Bool
     @name="isOpen"
     @description="Condition for opening the modal"

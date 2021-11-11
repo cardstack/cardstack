@@ -12,10 +12,6 @@
   border-bottom-right-radius: var(--boxel-border-radius);
 }
 
-.prepaid-card-choice__field-label {
-  --field-label-width: minmax(4rem, 20%);
-}
-
 .prepaid-card-choice__cost {
   --icon-alignment: flex-start;
 

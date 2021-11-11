@@ -2,6 +2,8 @@
   --boxel-field-label-width: 12rem;
 
   position: relative;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
   align-items: start;
   gap: 30px;
   padding: 10px;

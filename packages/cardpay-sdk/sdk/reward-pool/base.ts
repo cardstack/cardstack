@@ -1,7 +1,7 @@
 /*global fetch */
 
 import Web3 from 'web3';
-import RewardPoolABI from '../../contracts/abi/v0.8.4/reward-pool';
+import RewardPoolABI from '../../contracts/abi/v0.8.5/reward-pool';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, fromWei, toWei } from 'web3-utils';
@@ -143,8 +143,8 @@ export default class RewardPool {
 
   async getProofsWithNonZeroBalance(
     address: string,
-    tokenAddress?: string,
-    rewardProgramId?: string
+    rewardProgramId?: string,
+    tokenAddress?: string
   ): Promise<ProofWithBalance[]> {
     const proofsWithBalance = await this.getProofsWithBalance(address, rewardProgramId, tokenAddress);
     return proofsWithBalance

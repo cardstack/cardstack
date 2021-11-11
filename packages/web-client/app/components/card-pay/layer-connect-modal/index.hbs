@@ -1,15 +1,16 @@
 <Boxel::Modal
-  class={{cn "layer-connect-modal" layer-connect-modal--connected=@isLayerConnected}}
+  class="layer-connect-modal"
+  @size={{if @isLayerConnected "small" "medium"}}
   @isOpen={{@isOpen}}
   @onClose={{@onClose}}
   data-test-layer-connect-modal={{@name}}
 >
   <div class="layer-connect-modal__scroll-wrapper">
-    <Boxel::CardContainer 
-      class="layer-connect-modal__card" 
+    <Boxel::CardContainer
+      class="layer-connect-modal__card"
       tabindex="-1"
-      {{!-- 
-        Focus is trapped within this element, with the element as the initial focus 
+      {{!--
+        Focus is trapped within this element, with the element as the initial focus
         outside clicks are allowed to trigger @onClose
 
         This should ideally be replaced with a selector for the primary/first action
@@ -18,7 +19,7 @@
         Forcing the user to press Tab will create focus that does match :focus-visible
         and hence show a ring.
 
-        Also, there is no distinguishing state for focused radio buttons - leading to the same 
+        Also, there is no distinguishing state for focused radio buttons - leading to the same
         problem of the user not knowing what is being focused, if we try to select the radio
         button for layer one as the initial focus.
 
@@ -28,8 +29,8 @@
       --}}
       {{focus-trap
         isActive=@isOpen
-        focusTrapOptions=(hash 
-          allowOutsideClick=true 
+        focusTrapOptions=(hash
+          allowOutsideClick=true
           clickOutsideDeactivates=true
           initialFocus=".layer-connect-modal__card"
         )

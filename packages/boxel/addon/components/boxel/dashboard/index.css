@@ -1,14 +1,12 @@
 .boxel-dashboard {
-  --boxel-dashboard-background-color: inherit;
-  --boxel-dashboard-color: inherit;
   --boxel-dashboard-left-edge-width: 5rem; /* 80px */
 
   position: relative;
   min-height: 100%;
   display: grid;
   grid-template-rows: auto 1fr;
-  background-color: var(--boxel-dashboard-background-color);
-  color: var(--boxel-dashboard-color);
+  background-color: var(--boxel-dashboard-background-color, inherit);
+  color: var(--boxel-dashboard-color, inherit);
   font: var(--boxel-font);
   letter-spacing: var(--boxel-lsp-lg);
   z-index: 0;

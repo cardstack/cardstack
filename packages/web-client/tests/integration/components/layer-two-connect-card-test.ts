@@ -42,7 +42,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
       <CardPay::LayerTwoConnectCard @workflowSession={{this.session}} />
     `);
 
-    assert.dom('[data-test-balance="DAI.CPXD"]').containsText('2.1411');
+    assert.dom('[data-test-balance="DAI.CPXD"]').containsText('2.14');
     assert.dom('[data-test-balance="CARD.CPXD"]').doesNotExist();
 
     layer2Service.test__simulateRemoteAccountSafes('address', [
@@ -57,7 +57,7 @@ module('Integration | Component | layer-two-connect-card', function (hooks) {
     await layer2Service.safes.fetch();
     await waitFor('[data-test-balance="CARD.CPXD"]');
 
-    assert.dom('[data-test-balance="DAI.CPXD"]').containsText('2.1411');
+    assert.dom('[data-test-balance="DAI.CPXD"]').containsText('2.14');
     assert.dom('[data-test-balance="CARD.CPXD"]').containsText('2.99');
 
     layer2Service.test__simulateRemoteAccountSafes('address', [

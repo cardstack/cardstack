@@ -68,6 +68,7 @@ export default class Layer1Network
     this.strategy.on('account-changed', this.onAccountChanged);
     this.strategy.on('incorrect-chain', this.onIncorrectChain);
     this.strategy.on('correct-chain', this.onCorrectChain);
+    this.strategy.on('websocket-disconnected', this.onWebsocketDisconnected);
   }
 
   connect(walletProvider: WalletProvider) {
@@ -85,6 +86,10 @@ export default class Layer1Network
 
   @action onIncorrectChain() {
     this.simpleEmitter.emit('incorrect-chain');
+  }
+
+  @action onWebsocketDisconnected() {
+    this.simpleEmitter.emit('websocket-disconnected');
   }
 
   @action onCorrectChain() {
