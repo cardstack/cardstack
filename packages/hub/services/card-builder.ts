@@ -10,6 +10,7 @@ import { serverLog as logger } from '../utils/logger';
 export default class CardBuilder implements BuilderInterface {
   realmManager = inject('realm-manager', { as: 'realmManager' });
   cache = inject('card-cache', { as: 'cache' });
+  cards = inject('card-service', { as: 'cards' });
 
   logger = logger;
 
@@ -34,7 +35,6 @@ export default class CardBuilder implements BuilderInterface {
       filenameRelative: moduleURL,
       plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-transform-modules-commonjs'],
     });
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return out!.code!;
   }
 
@@ -43,12 +43,6 @@ export default class CardBuilder implements BuilderInterface {
   }
 
   async getCompiledCard(url: string): Promise<CompiledCard> {
-    let compiledCard = this.cache.getCard(url);
-
-    if (compiledCard) {
-      return compiledCard;
-    }
-
     let rawCard = await this.getRawCard(url);
     return await this.compileCardFromRaw(rawCard);
   }
@@ -61,13 +55,12 @@ export default class CardBuilder implements BuilderInterface {
     } catch (e) {
       err = e;
     }
-    if (compiledCard) {
-      this.cache.setCard(rawCard.url, compiledCard);
-      return compiledCard;
-    } else {
+    if (!compiledCard) {
       this.cache.deleteCard(rawCard.url);
       throw err;
     }
+
+    return compiledCard;
   }
 }
 

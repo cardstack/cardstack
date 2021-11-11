@@ -1,9 +1,7 @@
-import { CompiledCard } from '@cardstack/core/src/interfaces';
 import { encodeCardURL } from '@cardstack/core/src/utils';
-import { Environment, NODE, ENVIRONMENTS } from '../interfaces';
+import { Environment, ENVIRONMENTS } from '../interfaces';
 import {
   writeFileSync,
-  readJSONSync,
   readFileSync,
   existsSync,
   mkdirpSync,
@@ -116,27 +114,6 @@ export default class CardCache {
     return this.readFile(this.getFileLocation('assets', cardURL, filename));
   }
 
-  setCard(cardURL: string, source: CompiledCard) {
-    this.setModule(NODE, cardURL, 'compiled.json', JSON.stringify(source, null, 2));
-    this.indexCard(cardURL, source);
-  }
-
-  indexCard(cardURL: string, source: CompiledCard): void {
-    let query = `
-      INSERT INTO card_index (id, name, data, adoptsFrom, schemaModule, fields, views)
-      VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (id) DO UPDATE
-    `;
-
-    this.client.query(query, [
-      cardURL,
-      'name TODO',
-      'adoptsFrom TODO',
-      source.schemaModule,
-      source.fields,
-      { isolated: source.isolated, embedded: source.embedded, edit: source.edit },
-    ]);
-  }
-
   entryExists(env: Environment | 'assets', cardURL: string, localFile: string): boolean {
     return pathExistsSync(this.getFileLocation(env, cardURL, localFile));
   }
@@ -155,16 +132,6 @@ export default class CardCache {
 
   getModule(moduleURL: string, env: Environment = 'node'): string | undefined {
     return this.readFile(join(this.dir, env, moduleURL.replace(this.pkgName + '', '')));
-  }
-
-  getCard(cardURL: string, env: Environment = NODE): CompiledCard | undefined {
-    let loc = this.getFileLocation(env, encodeCardURL(cardURL), 'compiled.json');
-
-    if (existsSync(loc)) {
-      return readJSONSync(loc);
-    }
-
-    return;
   }
 
   deleteCard(cardURL: string): void {
