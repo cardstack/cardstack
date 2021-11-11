@@ -51,7 +51,9 @@ const KOVAN = {
   name: 'Kovan',
   rpcNode: `${KOVAN_INFURA_URL}/${INFURA_PROJECT_ID}`,
   rpcWssNode: `${KOVAN_WSS_INFURA_URL}/${INFURA_PROJECT_ID}`,
-  ambFinalizationRate: '12' /* 12 block confirmations */,
+  // https://docs.tokenbridge.net/kovan-sokol-amb-bridge/about-the-kovan-sokol-amb shows 1 for finalization rate
+  // but making this the same as mainnet so that the dev experience matches prod
+  ambFinalizationRate: '20',
 };
 const MAINNET = {
   apiBaseUrl: 'https://api.etherscan.io/api',
@@ -66,7 +68,8 @@ const MAINNET = {
   name: 'Ethereum Mainnet',
   rpcNode: `${MAINNET_INFURA_URL}/${INFURA_PROJECT_ID}`,
   rpcWssNode: `${MAINNET_WSS_INFURA_URL}/${INFURA_PROJECT_ID}`,
-  ambFinalizationRate: '12' /* 12 block confirmations */,
+  // check https://docs.tokenbridge.net/eth-xdai-amb-bridge/about-the-eth-xdai-amb for the finalization rate
+  ambFinalizationRate: '20',
 };
 const XDAI = {
   apiBaseUrl: 'https://blockscout.com/xdai/mainnet/api',
