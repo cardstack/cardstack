@@ -1,32 +1,8 @@
-.network-problem-modal {
-  --network-problem-modal-max-width: 36.25rem; /* 580px */
-  --boxel-modal-max-width: unset;
-  /* stylelint-disable-next-line length-zero-no-unit */
-  --boxel-modal-offset-top: 0px; /* Do not remove the px here. It would break the `calc` calculation for the scroll. */
-}
-
-.network-problem-modal > div {
-  width: auto;
-  display: flex;
-  align-items: center;
-  margin: 0 var(--boxel-sp-lg);
-}
-
 .network-problem-modal__scroll-wrapper {
   width: 100%;
-  max-width: var(--network-problem-modal-max-width);
-  height: auto;
   max-height: 100%;
-  margin: auto;
-  padding: var(--boxel-sp-xs) 0;
+  padding: var(--boxel-sp) 0;
   overflow-y: auto;
-  transition: max-width var(--boxel-transition);
-}
-
-@media screen and (max-width: 40rem) {
-  .network-problem-modal__scroll-wrapper {
-    min-width: unset;
-  }
 }
 
 .network-problem-modal__card {

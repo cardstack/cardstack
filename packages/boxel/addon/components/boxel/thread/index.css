@@ -3,6 +3,7 @@
   display: grid;
   grid-template-rows: auto 1fr;
   height: 100%;
+  width: 100%;
   background-color: var(--boxel-light-300);
   color: var(--boxel-dark);
   border-radius: var(--boxel-border-radius);
