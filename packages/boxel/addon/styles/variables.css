@@ -55,6 +55,15 @@
   --boxel-outline-color: var(--boxel-blue);
   --boxel-outline: 2px solid var(--boxel-outline-color);
 
+  /* Container sizes */
+  --boxel-xxs-container: 15.625rem; /* 250px */
+  --boxel-xs-container: 17.8125rem; /* 285px */
+  --boxel-sm-container: 36.25rem;   /* 580px */
+  --boxel-md-container: 40.625rem;  /* 650px */
+  --boxel-lg-container: 43.75rem;   /* 700px */
+  --boxel-xl-container: 65rem;      /* 1040px */
+  --boxel-xxl-container: 83.76rem;  /* 1340px */
+
   /* COLOR PALETTE */
 
   /* Primary colors */

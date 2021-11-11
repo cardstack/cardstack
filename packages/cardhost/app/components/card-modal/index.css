@@ -1,10 +1,10 @@
-.modal.edit .field ~ .field {
-  margin-top: 0.5em;
+.modal.edit {
+  max-height: 100%;
+  overflow-y: auto;
 }
 
-.modal.edit .field label {
-  display: block;
-  text-transform: capitalize;
+.modal.edit .field ~ .field {
+  margin-top: 0.5em;
 }
 
 .card-modal__action-chin-button {

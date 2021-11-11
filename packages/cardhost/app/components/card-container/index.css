@@ -1,8 +1,13 @@
-.card-container__content {
-  padding: var(--boxel-sp-lg);
+.card-container {
+  max-width: 100%;
+  margin: var(--boxel-sp-lg) var(--boxel-sp);
 }
 
 .card-container__action-chin {
   display: flex;
+  padding: var(--boxel-sp-lg);
+}
+
+.card-container.edit {
   padding: var(--boxel-sp-lg);
 }

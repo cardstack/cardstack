@@ -5,7 +5,17 @@ import './isolated.css';
 
 export default setComponentTemplate(
   precompileTemplate(
-    '<article class="card-space-layout"><section class="card-space-layout__module"><@fields.profile/></section><section class="card-space-layout__optional-modules"><@fields.bio/><@fields.links/><@fields.donations/></section></article>',
+    `<article class="card-space-layout">
+      <div class="card-space-layout__cover-photo"><@fields.coverPhoto/></div>
+      <section class="card-space-layout__modules card-space-layout__modules--xs">
+        <@fields.profile/>
+      </section>
+      <section class="card-space-layout__modules card-space-layout__modules--md">
+        <@fields.bio/>
+        <@fields.links/>
+        <@fields.donations/>
+      </section>
+    </article>`,
     {
       strictMode: true,
       scope: () => ({}),
