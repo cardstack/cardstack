@@ -72,7 +72,7 @@ Once the cardbot and cordebot bots are setup, you can then configure environment
  - `CORDE_BOT_TOKEN`: The bot token for the cordebot
  - `CARDBOT_ID`: The bot ID for the cardbot
  - `CARDBOT_TOKEN`: The bot token for the cardbot
- - `CARDBOT_ALLOWED_GUILDS`: The discord server ID that the cardbot is allowed to communicate on (this should be the server that you added the cardbot to).
+ - `CARDBOT_ALLOWED_GUILDS`: A comma separated list of the discord server IDs that the cardbot is allowed to communicate on. This should be the server(s) that you added the cardbot to.
  - `CARDBOT_ALLOWED_CHANNELS`: A comma separated list of channel IDs the cardbot is allowed to communicate in.
 
  (Note: to easily obtain server and channel ID's enable  `User Settings -> Advanced -> Enable Developer Mode` in Discord. This will reveal a "Copy ID" item in the settings panel for servers and channels to retrieve these ID's.)
