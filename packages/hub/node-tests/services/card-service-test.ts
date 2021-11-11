@@ -84,7 +84,7 @@ if (process.env.COMPILER) {
       });
     });
 
-    it.only(`can filter by card type`, async function () {
+    it(`can filter by card type`, async function () {
       let matching = await cards.query({
         filter: { type: `${realm}post` },
       });

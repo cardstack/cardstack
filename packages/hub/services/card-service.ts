@@ -1,4 +1,5 @@
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
+import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
 import { Expression, expressionToSql, param } from '../utils/expressions';
@@ -77,14 +78,19 @@ export class CardService {
   async query(query: Query): Promise<Card[]> {
     let client = await this.db.getPool();
     try {
-      // Query to sql
       let expression: Expression = ['select data from cards'];
       if (query.filter) {
         expression = [...expression, 'where', ...filterToExpression(query.filter)];
       }
-      let sql = expressionToSql(expression);
-      let result = await client.query(expressionToSql(expression));
-      console.log(result);
+      let result = await client.query<{ data: any }>(expressionToSql(expression));
+      let deserializer = new RawCardDeserializer();
+      return result.rows.map((row) => {
+        let { raw, compiled } = deserializer.deserialize(row.data.data, row.data);
+        if (!compiled) {
+          throw new Error(`bug: database entry for ${raw.url} is missing the compiled card`);
+        }
+        return { data: raw.data, compiled };
+      });
     } finally {
       client.release();
     }
