@@ -342,7 +342,7 @@ export default class RewardManager {
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
 
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
-      let payload = await this.addRewardRulePayload(prepaidCardAddress, rewardProgramId, blob, rateLock);
+      let payload = await this.getAddRewardRulePayload(prepaidCardAddress, rewardProgramId, blob, rateLock);
       if (nonce == null) {
         nonce = getNextNonceFromEstimate(payload);
         if (typeof onNonce === 'function') {
@@ -495,7 +495,7 @@ export default class RewardManager {
     );
   }
 
-  private async addRewardRulePayload(
+  private async getAddRewardRulePayload(
     prepaidCardAddress: string,
     rewardProgramId: string,
     blob: string,
@@ -612,8 +612,8 @@ export default class RewardManager {
       0,
       rate,
       payload,
-      'updateRewardProgramAdmin',
-      this.layer2Web3.eth.abi.encodeParameters(['address', 'blob'], [rewardProgramId, blob]),
+      'addRewardRule',
+      this.layer2Web3.eth.abi.encodeParameters(['address', 'bytes'], [rewardProgramId, blob]),
       signatures,
       nonce
     );

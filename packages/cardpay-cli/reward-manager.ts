@@ -108,5 +108,5 @@ export async function rewardRule(network: string, rewardProgramId: string, mnemo
   let web3 = await getWeb3(network, mnemonic);
   let rewardManager = await getSDK('RewardManager', web3);
   const admin = await rewardManager.getRewardRule(rewardProgramId);
-  console.log(`Reward program admin of ${rewardProgramId} is ${admin}`);
+  console.log(`Reward Rule of ${rewardProgramId} is ${admin}`);
 }
