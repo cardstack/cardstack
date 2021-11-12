@@ -161,13 +161,23 @@ export async function waitForSubgraphIndex(
       await new Promise<void>((res) => setTimeout(() => res(), POLL_INTERVAL));
     }
     queryResults = await gqlQuery(network, transactionQuery, { txnHash });
-  } while (!queryResults.data.transaction == null && Date.now() < start + duration);
+  } while (queryResults.data.transaction == null && Date.now() < start + duration);
 
   if (!queryResults.data.transaction) {
     throw new Error(`Timed out waiting for txnHash to be indexed ${txnHash}`);
   }
 
   return;
+}
+
+export async function waitForSubgraphIndexWithTxnReceipt(
+  web3: Web3,
+  txnHash: string,
+  duration = 60 * 10 * 1000
+): Promise<TransactionReceipt> {
+  let txnReceipt = await waitUntilTransactionMined(web3, txnHash, duration);
+  await waitForSubgraphIndex(txnHash, web3, duration);
+  return txnReceipt;
 }
 
 // because BN does not handle floating point, and the numbers from ethereum

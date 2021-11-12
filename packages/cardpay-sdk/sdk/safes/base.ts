@@ -9,7 +9,7 @@ import { signSafeTx } from '../utils/signing-utils';
 import BN from 'bn.js';
 import { query } from '../utils/graphql';
 import { TransactionReceipt } from 'web3-core';
-import { TransactionOptions, waitUntilTransactionMined, isTransactionHash } from '../utils/general-utils';
+import { TransactionOptions, waitForSubgraphIndexWithTxnReceipt, isTransactionHash } from '../utils/general-utils';
 const { fromWei } = Web3.utils;
 
 export type Safe = DepotSafe | PrepaidCardSafe | MerchantSafe | RewardSafe | ExternalSafe;
@@ -270,7 +270,7 @@ export default class Safes {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
     if (!tokenAddress) {
@@ -326,7 +326,7 @@ export default class Safes {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
   async setSupplierInfoDID(txnHash: string): Promise<TransactionReceipt>;
@@ -346,7 +346,7 @@ export default class Safes {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
     if (infoDID == null) {
@@ -381,7 +381,7 @@ export default class Safes {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
   private transferTokenPayload(tokenAddress: string, recipient: string, amount: string): string {
