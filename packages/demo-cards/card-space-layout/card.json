@@ -1,4 +1,18 @@
 {
   "schema": "schema.js",
-  "isolated": "isolated.js"
+  "isolated": "isolated.js",
+  "edit": "edit.js",
+  "data": {
+    "bio": {
+      "name": "Your Name",
+      "description": "Enter a short description of yourself and/or your business"
+    },
+    "donations": {
+      "title": "Donation module",
+      "description": "Receive donations from supporters and choose custom denominations (requires you to set up a merchant account)"
+    },
+    "links": {
+      "links": [{ "linkTitle": "List your Twitter, Facebook, Instagram, Youtube accounts" }]
+    }
+  }
 }

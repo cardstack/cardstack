@@ -7,7 +7,3 @@
   display: flex;
   padding: var(--boxel-sp-lg);
 }
-
-.card-container.edit {
-  padding: var(--boxel-sp-lg);
-}

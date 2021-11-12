@@ -1,7 +1,9 @@
 {
   "adoptsFrom": "../card-space-layout",
   "data": {
-    "coverPhoto": "[PHOTO]",
+    "background": {
+      "coverPhoto": "[COVER PHOTO]"
+    },
     "profile": {
       "name": "Amazing Emily",
       "url": "card.space/emily",

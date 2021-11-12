@@ -1,0 +1,8 @@
+.card-space-layout-edit {
+  display: grid;
+  gap: var(--boxel-sp-lg);
+  max-width: var(--boxel-lg-container);
+  margin-right: auto;
+  margin-left: auto;
+  padding: var(--boxel-sp-lg);
+}
