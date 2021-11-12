@@ -1,0 +1,131 @@
+.card-pay-dashboard__wallet {
+  padding: var(--boxel-sp-xxl) var(--boxel-sp-xl);
+}
+
+.card-pay-dashboard__wallet > * {
+  max-width: 70.75rem;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.card-pay-dashboard__wallet > * + * {
+  margin-top: var(--boxel-sp-xxl);
+}
+
+.card-pay-dashboard__wallet-panel-footer-content {
+  font: var(--boxel-font-sm);
+  line-height: var(--boxel-sp-lg);
+  padding-left: var(--boxel-sp);
+}
+
+.card-pay-dashboard__wallet-panel-footer-content svg {
+  margin-bottom: -6px;
+}
+
+.card-pay-dashboard__wallet-panel-footer-content a {
+  margin-left: var(--boxel-sp-sm);
+}
+
+.card-pay-dashboard__wallet-title {
+  margin-bottom: var(--boxel-sp-xxl);
+  font: 600 var(--boxel-font-lg);
+  letter-spacing: var(--boxel-lsp-xs);
+}
+
+.card-pay-dashboard__wallet-section {
+  border-top: 1px solid var(--boxel-purple-500);
+  padding-top: var(--boxel-sp);
+}
+
+.card-pay-dashboard__wallet-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-pay-dashboard__wallet-section-header-button-icon {
+  --icon-color: var(--boxel-highlight);
+
+  margin-left: var(--boxel-sp-xs);
+}
+
+.card-pay-dashboard__wallet-section-title {
+  font-weight: 400;
+}
+
+.card-pay-dashboard__wallet-count {
+  padding-left: var(--boxel-sp-xxs);
+  color: var(--boxel-cyan);
+}
+
+.card-pay-dashboard__wallet-cards {
+  display: grid;
+  gap: var(--boxel-sp-xl) var(--boxel-sp);
+  grid-template-columns: repeat(auto-fill, 22.75rem);
+  margin-top: var(--boxel-sp);
+}
+
+.card-pay-dashboard__wallet-badges {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  margin-top: var(--boxel-sp-lg);
+  margin-bottom: var(--boxel-sp-xl);
+}
+
+.card-pay-dashboard__wallet-badges > div {
+  flex-basis: 50%;
+  height: 3.6rem;
+}
+
+.card-pay-dashboard__wallet-badges > div:last-child {
+  text-align: center;
+}
+
+.card-pay-dashboard__wallet-badges img {
+  height: 2.8rem;
+  object-fit: contain;
+}
+
+.card-pay-dashboard__wallet-badges-google-play-badge {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.card-pay-dashboard__wallet-badges-google-play-soon {
+  font-size: var(--boxel-font-size-xs);
+  text-align: center;
+}
+
+.card-pay-dashboard__wallet-purchase-card-phone {
+  display: block;
+}
+
+.dashboard-panel-section-wallet {
+  justify-content: flex-start;
+}
+
+.dashboard-panel-section-wallet__cards {
+  width: calc(100% + (2 * 84px));
+  position: absolute;
+  bottom: 0;
+  left: -84px;
+}
+
+.dashboard-panel-section-wallet .dashboard-panel-section__disclaimer {
+  position: relative;
+  margin-top: var(--boxel-sp);
+  transform: none;
+}
+
+@media screen and (max-width: 1200px) {
+  .dashboard-panel-section-wallet__cards {
+    width: calc(80% + (2 * 84px));
+  }
+}
+
+@media screen and (max-width: 1050px) {
+  .dashboard-panel-section-wallet__cards {
+    display: none;
+  }
+}

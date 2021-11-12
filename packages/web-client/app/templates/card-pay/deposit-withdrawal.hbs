@@ -2,21 +2,23 @@
 
 <section class="card-pay-dashboard__deposit-withdrawal" role="tabpanel" aria-labelledby="card-pay.deposit-withdrawal">
   <CardPay::DashboardPanel @panel={{@model.panel}} @noCollapse={{or (not this.layer2Network.isConnected) (is-empty this.layer2Network.depotSafe)}}>
-    {{#each @model.panel.sections as |section|}}
-      <CardPay::DashboardPanel::Section @section={{section}}>
-        <:cta>
-          <Boxel::Button
-            {{on "click" (fn this.transitionToDepositWithdrawal section.workflow)}}
-            @kind="primary"
-            @size="touch"
-            @disabled={{section.isCtaDisabled}}
-            data-test-workflow-button={{section.workflow}}
-          >
-            {{section.cta}}
-          </Boxel::Button>
-        </:cta>
-      </CardPay::DashboardPanel::Section>
-    {{/each}}
+    <:detail>
+      {{#each @model.panel.sections as |section|}}
+        <CardPay::DashboardPanel::Section @section={{section}}>
+          <:cta>
+            <Boxel::Button
+              {{on "click" (fn this.transitionToDepositWithdrawal section.workflow)}}
+              @kind="primary"
+              @size="touch"
+              @disabled={{section.isCtaDisabled}}
+              data-test-workflow-button={{section.workflow}}
+            >
+              {{section.cta}}
+            </Boxel::Button>
+          </:cta>
+        </CardPay::DashboardPanel::Section>
+      {{/each}}
+    </:detail>
   </CardPay::DashboardPanel>
 
   {{#if this.layer2Network.isConnected}}

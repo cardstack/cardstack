@@ -19,7 +19,7 @@ module('Acceptance | Connect Wallet', function (hooks) {
     await visit('/');
     assert.equal(currentURL(), '/');
     await click('[data-test-cardstack-org-link="card-pay"]');
-    assert.equal(currentURL(), '/card-pay/balances');
+    assert.equal(currentURL(), '/card-pay/wallet');
 
     await click(
       '[data-test-card-pay-layer-1-connect] [data-test-card-pay-connect-button]'
@@ -52,7 +52,7 @@ module('Acceptance | Connect Wallet', function (hooks) {
     await visit('/');
     assert.equal(currentURL(), '/');
     await click('[data-test-cardstack-org-link="card-pay"]');
-    assert.equal(currentURL(), '/card-pay/balances');
+    assert.equal(currentURL(), '/card-pay/wallet');
 
     await click(
       '[data-test-card-pay-layer-2-connect] [data-test-card-pay-connect-button]'

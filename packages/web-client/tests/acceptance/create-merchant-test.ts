@@ -243,7 +243,7 @@ module('Acceptance | create merchant', function (hooks) {
     );
     assert.dom('[data-test-workflow-thread]').doesNotExist();
 
-    await visit('/card-pay/balances');
+    await visit('/card-pay/wallet');
     assert
       .dom('[data-test-card-balances]')
       .containsText('§0', 'expected card balance to have updated');

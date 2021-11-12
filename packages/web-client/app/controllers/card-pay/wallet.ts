@@ -4,11 +4,13 @@ import { inject as service } from '@ember/service';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { action } from '@ember/object';
 import RouterService from '@ember/routing/router-service';
+import config from '@cardstack/web-client/config/environment';
 
-class CardPayBalancesController extends Controller {
+class CardPayWalletController extends Controller {
   @service declare layer2Network: Layer2Network;
   @service declare router: RouterService;
 
+  testFlightLink = config.urls.testFlightLink;
   queryParams = ['flow', { workflowPersistenceId: 'flow-id' }];
   @tracked flow: string | null = null;
   @tracked workflowPersistenceId: string | null = null;
@@ -17,8 +19,8 @@ class CardPayBalancesController extends Controller {
     return this.layer2Network.safes.value?.filterBy('type', 'prepaid-card');
   }
 
-  @action transitionToBalances(flow: string) {
-    this.router.transitionTo('card-pay.balances', {
+  @action transitionToWallet(flow: string) {
+    this.router.transitionTo('card-pay.wallet', {
       queryParams: { flow },
     });
   }
@@ -29,4 +31,4 @@ class CardPayBalancesController extends Controller {
   }
 }
 
-export default CardPayBalancesController;
+export default CardPayWalletController;

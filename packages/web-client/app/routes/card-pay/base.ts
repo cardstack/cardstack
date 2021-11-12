@@ -1,5 +1,5 @@
 import Route from '@ember/routing/route';
-import '../../css/card-pay/balances.css';
+import '../../css/card-pay/wallet.css';
 import * as short from 'short-uuid';
 
 export default class CardPayTabBaseRoute extends Route {
