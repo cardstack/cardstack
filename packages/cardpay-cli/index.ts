@@ -28,6 +28,7 @@ import {
   isRewardProgramLocked,
   updateRewardProgramAdmin,
   rewardProgramAdmin,
+  addRewardRule,
 } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
@@ -104,7 +105,8 @@ type Commands =
   | 'lockRewardProgram'
   | 'isRewardProgramLocked'
   | 'updateRewardProgramAdmin'
-  | 'rewardProgramAdmin';
+  | 'rewardProgramAdmin'
+  | 'addRewardRule';
 
 let command: Commands | undefined;
 interface Options {
@@ -146,6 +148,7 @@ interface Options {
   rewardSafe?: string;
   newAdmin?: string;
   force?: string;
+  blob?: string;
 }
 let {
   network,
@@ -186,6 +189,7 @@ let {
   rewardSafe,
   newAdmin,
   force,
+  blob,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -889,6 +893,21 @@ let {
     });
     command = 'rewardProgramAdmin';
   })
+  .command('add-reward-rule <prepaidCard> <rewardProgramId> <blob>', 'Add/Update reward rule', (yargs) => {
+    yargs.positional('prepaidCard', {
+      type: 'string',
+      description: 'The prepaid card used to pay for gas for the txn',
+    });
+    yargs.positional('rewardProgramId', {
+      type: 'string',
+      description: 'The reward program id.',
+    });
+    yargs.positional('blob', {
+      type: 'string',
+      description: 'Hex encoding of rule blob',
+    });
+    command = 'addRewardRule';
+  })
   .options({
     network: {
       alias: 'n',
@@ -1307,6 +1326,21 @@ if (!command) {
         return;
       }
       await rewardProgramAdmin(network, rewardProgramId, mnemonic);
+      break;
+    case 'addRewardRule':
+      if (prepaidCard == null) {
+        showHelpAndExit('prepaid card is a required value');
+        return;
+      }
+      if (rewardProgramId == null) {
+        showHelpAndExit('rewardProgramId is a required value');
+        return;
+      }
+      if (blob == null) {
+        showHelpAndExit('blob is a required value');
+        return;
+      }
+      await addRewardRule(network, prepaidCard, rewardProgramId, blob, mnemonic);
       break;
     default:
       assertNever(command);
