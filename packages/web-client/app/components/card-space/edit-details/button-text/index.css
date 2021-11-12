@@ -1,0 +1,37 @@
+.card-space-button-text-field__option {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  align-items: center;
+  gap: var(--boxel-sp);
+  padding: var(--boxel-sp-lg) var(--boxel-sp);
+  border-radius: var(--boxel-border-radius);
+  box-shadow: 0 0 0 1px var(--boxel-light-400);
+  transition: box-shadow var(--boxel-transition);
+}
+
+.card-space-button-text-field__option + .card-space-button-text-field__option {
+  margin-top: var(--boxel-sp);
+}
+
+.card-space-button-text-field--checked,
+.card-space-button-text-field__option:focus,
+.card-space-button-text-field__option:focus-within {
+  box-shadow: 0 0 0 2px var(--boxel-highlight);
+  outline: 1px solid transparent;
+}
+
+.card-space-button-text-field__input {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  border: 1.5px solid var(--boxel-dark);
+  border-radius: 100px;
+  background-color: transparent;
+}
+
+.card-space-button-text-field__input--checked {
+  background-color: var(--boxel-highlight);
+  border-width: 3px;
+}
