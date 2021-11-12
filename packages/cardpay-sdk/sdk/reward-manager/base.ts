@@ -3,7 +3,7 @@ import RewardManagerABI from '../../contracts/abi/v0.8.5/reward-manager';
 import { Contract } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
 import { AbiItem, randomHex, toChecksumAddress } from 'web3-utils';
-import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
+import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import { getSDK } from '../version-resolver';
 import { ContractOptions } from 'web3-eth-contract';
 import { TransactionReceipt } from 'web3-core';
@@ -45,7 +45,7 @@ export default class RewardManager {
       let txnHash = prepaidCardAddressOrTxnHash;
       return {
         rewardProgramId,
-        txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+        txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
       };
     }
     if (!prepaidCardAddressOrTxnHash) {
@@ -110,7 +110,7 @@ export default class RewardManager {
 
     return {
       rewardProgramId,
-      txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+      txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
     };
   }
 
@@ -131,7 +131,7 @@ export default class RewardManager {
       let txnHash = prepaidCardAddressOrTxnHash;
       return {
         rewardSafe: await this.getRewardSafeFromTxn(txnHash),
-        txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+        txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
       };
     }
     if (!prepaidCardAddressOrTxnHash) {
@@ -176,7 +176,7 @@ export default class RewardManager {
 
     return {
       rewardSafe: await this.getRewardSafeFromTxn(gnosisResult.ethereumTx.txHash),
-      txReceipt: await waitUntilTransactionMined(this.layer2Web3, txnHash),
+      txReceipt: await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash),
     };
   }
 
@@ -195,7 +195,7 @@ export default class RewardManager {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     if (!prepaidCardAddressOrTxnHash) {
       throw new Error('prepaidCardAddress is required');
@@ -236,7 +236,7 @@ export default class RewardManager {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
   async updateRewardProgramAdmin(txnHash: string): Promise<TransactionReceipt>;
@@ -256,7 +256,7 @@ export default class RewardManager {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     if (!prepaidCardAddressOrTxnHash) {
       throw new Error('prepaidCardAddress is required');
@@ -306,7 +306,7 @@ export default class RewardManager {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
   private async getRegisterRewardProgramPayload(
     prepaidCardAddress: string,
@@ -458,7 +458,7 @@ export default class RewardManager {
   }
   private async getRewardSafeFromTxn(txnHash: string): Promise<any> {
     let rewardMgrAddress = await getAddress('rewardManager', this.layer2Web3);
-    let txnReceipt = await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    let txnReceipt = await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     return getParamsFromEvent(this.layer2Web3, txnReceipt, this.rewardeeRegisteredABI(), rewardMgrAddress)[0]
       .rewardSafe;
   }

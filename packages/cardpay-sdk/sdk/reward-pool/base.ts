@@ -12,7 +12,7 @@ import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import ERC677ABI from '../../contracts/abi/erc-677';
 import { gasEstimate, executeTransaction, getNextNonceFromEstimate } from '../utils/safe-utils';
-import { isTransactionHash, TransactionOptions, waitUntilTransactionMined } from '../utils/general-utils';
+import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import { TransactionReceipt } from 'web3-core';
 interface Proof {
   rootHash: string;
@@ -247,7 +247,7 @@ export default class RewardPool {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
     if (!rewardProgramId) {
@@ -300,7 +300,7 @@ export default class RewardPool {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
   }
 
   async claim(txnHash: string): Promise<TransactionReceipt>;
@@ -324,7 +324,7 @@ export default class RewardPool {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     let safeAddress = safeAddressOrTxnHash;
     if (!rewardProgramId) {
@@ -434,7 +434,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
   }
 
   async balance(rewardProgramId: string, tokenAddress: string): Promise<RewardTokenBalance> {

@@ -126,8 +126,9 @@
 
         // Kovan DAI Bridge args
         "bridge-to-l2",
-        "10",
+        "200",
         "0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa", // Kovan DAI
+        "0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13", // L2 wallet EOA
         "--network",
         "kovan",
         // Hassan's testing mnemonic feel free to use your own
@@ -424,7 +425,7 @@
       "args": [
         "pay-merchant",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
-        "0x9972D7972130E1Ba9E87d39C7e7229F56dC82e4e", // Hassan's prepaid card --feel free to use your own
+        "0x70fdd952d8b4DC0E3E91d2e7392bdb600d637b40", // Hassan's prepaid card --feel free to use your own
         "100",
         "--network",
         "sokol",
@@ -567,7 +568,7 @@
         "claim-revenue",
         "0x3e6C2b2c3a842b6492F9F43349D77A40568e3d7E", // safe for Hassan's merchant (whose address the correlates with the mnemenoic 0x2f58630CA445Ab1a6DE2Bb9892AA2e1d60876C13)
         "0xFeDc0c803390bbdA5C4C296776f4b574eC4F30D1", // DAI.CPXD
-        "5",
+        "1",
         "--network",
         "sokol",
         // Hassan's testing mnemonic feel free to use your own
