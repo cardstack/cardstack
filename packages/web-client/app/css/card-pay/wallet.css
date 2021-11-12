@@ -65,7 +65,7 @@
   margin-top: var(--boxel-sp);
 }
 
-.dashboard-panel-section__badges {
+.card-pay-dashboard__wallet-badges {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -73,31 +73,31 @@
   margin-bottom: var(--boxel-sp-xl);
 }
 
-.dashboard-panel-section__badges > div {
+.card-pay-dashboard__wallet-badges > div {
   flex-basis: 50%;
   height: 3.6rem;
 }
 
-.dashboard-panel-section__badges > div:last-child {
+.card-pay-dashboard__wallet-badges > div:last-child {
   text-align: center;
 }
 
-.dashboard-panel-section__badges img {
+.card-pay-dashboard__wallet-badges img {
   height: 2.8rem;
   object-fit: contain;
 }
 
-.dashboard-panel-section__badges-google-play-badge {
+.card-pay-dashboard__wallet-badges-google-play-badge {
   opacity: 0.3;
   pointer-events: none;
 }
 
-.dashboard-panel-section__badges-google-play-soon {
+.card-pay-dashboard__wallet-badges-google-play-soon {
   font-size: var(--boxel-font-size-xs);
   text-align: center;
 }
 
-.dashboard-panel-section__purchase-card-phone {
+.card-pay-dashboard__wallet-purchase-card-phone {
   display: block;
 }
 
