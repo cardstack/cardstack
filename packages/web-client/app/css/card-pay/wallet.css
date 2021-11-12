@@ -64,3 +64,68 @@
   grid-template-columns: repeat(auto-fill, 22.75rem);
   margin-top: var(--boxel-sp);
 }
+
+.dashboard-panel-section__badges {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  margin-top: var(--boxel-sp-lg);
+  margin-bottom: var(--boxel-sp-xl);
+}
+
+.dashboard-panel-section__badges > div {
+  flex-basis: 50%;
+  height: 3.6rem;
+}
+
+.dashboard-panel-section__badges > div:last-child {
+  text-align: center;
+}
+
+.dashboard-panel-section__badges img {
+  height: 2.8rem;
+  object-fit: contain;
+}
+
+.dashboard-panel-section__badges-google-play-badge {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.dashboard-panel-section__badges-google-play-soon {
+  font-size: var(--boxel-font-size-xs);
+  text-align: center;
+}
+
+.dashboard-panel-section__purchase-card-phone {
+  display: block;
+}
+
+.dashboard-panel-section-wallet {
+  justify-content: flex-start;
+}
+
+.dashboard-panel-section-wallet__cards {
+  width: calc(100% + (2 * 84px));
+  position: absolute;
+  bottom: 0;
+  left: -84px;
+}
+
+.dashboard-panel-section-wallet .dashboard-panel-section__disclaimer {
+  position: relative;
+  margin-top: var(--boxel-sp);
+  transform: none;
+}
+
+@media screen and (max-width: 1200px) {
+  .dashboard-panel-section-wallet__cards {
+    width: calc(80% + (2 * 84px));
+  }
+}
+
+@media screen and (max-width: 1050px) {
+  .dashboard-panel-section-wallet__cards {
+    display: none;
+  }
+}
