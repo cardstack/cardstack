@@ -1,21 +1,21 @@
 <details
   class={{cn
-    "dashboard-details-container"
-    dashboard-details-container--no-collapse=@noCollapse
-    dashboard-details-container--noBottomPadding=@noBottomPadding
-    dashboard-details-container--hasFooter=(has-block 'footer')
+    "dashboard-details"
+    dashboard-details--no-collapse=@noCollapse
+    dashboard-details--noBottomPadding=@noBottomPadding
+    dashboard-details--hasFooter=(has-block 'footer')
   }}
   ...attributes
   open={{or @noCollapse @open}}
   >
-  <summary class="dashboard-details-container__summary">
-    <div class="dashboard-details-container__summary-content">
+  <summary class="dashboard-details__summary">
+    <div class="dashboard-details__summary-content">
       <div class="dashboard-panel__summary-hero" style={{css-url "background-image" @panel.summaryHeroImageUrl}} />
       <h2 class="dashboard-panel__summary-title">{{@panel.title}}</h2>
       <p class="dashboard-panel__summary-desc">{{@panel.description}}</p>
     </div>
-    <div class="dashboard-details-container__marker">
-      {{svg-jar "caret-right" class="dashboard-details-container__marker-icon" role="presentation"}}
+    <div class="dashboard-details__marker">
+      {{svg-jar "caret-right" class="dashboard-details__marker-icon" role="presentation"}}
     </div>
     {{#if (has-block 'footer')}}
       <footer class="dashboard-panel__footer dashboard-panel__summary-footer" aria-label="closed-footer">
