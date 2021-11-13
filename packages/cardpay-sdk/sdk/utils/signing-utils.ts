@@ -135,6 +135,55 @@ export async function signSafeTxAsBytes(
   return [await signTypedData(web3, owner, typedData)];
 }
 
+export async function fullSignatureTxAsBytes(
+  web3: Web3,
+  to: string,
+  value: number,
+  data: any,
+  operation: number,
+  estimate: Estimate,
+  refundReceiver: string,
+  nonce: any,
+  owner: string,
+  gnosisSafeAddress: string,
+  verifyingContractAddress: string
+) {
+  let eoaSignature = (
+    await signSafeTxAsBytes(
+      web3,
+      to,
+      value,
+      data,
+      operation,
+      estimate.safeTxGas,
+      estimate.baseGas,
+      estimate.gasPrice,
+      estimate.gasToken,
+      refundReceiver,
+      nonce,
+      owner,
+      gnosisSafeAddress
+    )
+  )[0];
+  let contractSignature = createEIP1271ContractSignature(verifyingContractAddress);
+
+  let sortedSignatures = sortSignaturesAsBytes(eoaSignature, contractSignature, owner, verifyingContractAddress);
+  let verifyingData = createEIP1271VerifyingData(
+    web3,
+    to,
+    value.toString(),
+    data,
+    operation.toString(),
+    estimate.safeTxGas,
+    estimate.baseGas,
+    estimate.gasPrice,
+    estimate.gasToken,
+    refundReceiver,
+    nonce
+  );
+  return sortedSignatures[0] + sortedSignatures[1].replace('0x', '') + verifyingData;
+}
+
 function safeTransactionTypedData(
   to: string,
   value: number,
@@ -297,6 +346,19 @@ export function createEIP1271VerifyingData(
 function sortSignatures(
   ownerSignature: Signature,
   contractSignature: Signature,
+  safeOwnerAddress: string,
+  contractAddress: string
+) {
+  if (safeOwnerAddress.toLowerCase() < contractAddress.toLowerCase()) {
+    return [ownerSignature, contractSignature];
+  } else {
+    return [contractSignature, ownerSignature];
+  }
+}
+
+function sortSignaturesAsBytes(
+  ownerSignature: string,
+  contractSignature: string,
   safeOwnerAddress: string,
   contractAddress: string
 ) {
