@@ -2,10 +2,9 @@ import Web3 from 'web3';
 import RewardManagerABI from '../../contracts/abi/v0.8.5/reward-manager';
 import { Contract, ContractOptions } from 'web3-eth-contract';
 import { getAddress } from '../../contracts/addresses';
-import { AbiItem, randomHex, toChecksumAddress } from 'web3-utils';
+import { AbiItem, randomHex, toChecksumAddress, fromWei, toWei } from 'web3-utils';
 import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import { getSDK } from '../version-resolver';
-import { ContractOptions } from 'web3-eth-contract';
 import { TransactionReceipt } from 'web3-core';
 import {
   EventABI,
@@ -20,7 +19,6 @@ import {
   executeTransaction,
 } from '../utils/safe-utils';
 import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
-import { getSDK } from '../version-resolver';
 import BN from 'bn.js';
 import ERC20ABI from '../../contracts/abi/erc-20';
 import { signRewardSafe, fullSignatureTxAsBytes, createEIP1271VerifyingData } from '../utils/signing-utils';
@@ -521,7 +519,7 @@ export default class RewardManager {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(safeAddressOrTxnHash)) {
       let txnHash = safeAddressOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     if (!safeAddressOrTxnHash) {
       throw new Error('safeAddress is required');
@@ -664,7 +662,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     if (typeof onTxnHash === 'function') {
       await onTxnHash(gnosisTxn.ethereumTx.txHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, gnosisTxn.ethereumTx.txHash);
   }
 
   async address(): Promise<string> {
