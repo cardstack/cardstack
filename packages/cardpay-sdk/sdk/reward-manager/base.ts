@@ -329,7 +329,7 @@ export default class RewardManager {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(prepaidCardAddressOrTxnHash)) {
       let txnHash = prepaidCardAddressOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     if (!prepaidCardAddressOrTxnHash) {
       throw new Error('prepaidCardAddress is required');
@@ -374,7 +374,7 @@ export default class RewardManager {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
   async removeRewardProgram(txnHash: string): Promise<TransactionReceipt>;
@@ -392,7 +392,7 @@ export default class RewardManager {
   ): Promise<TransactionReceipt> {
     if (isTransactionHash(safeAddressIdOrTxnHash)) {
       let txnHash = safeAddressIdOrTxnHash;
-      return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+      return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
     }
     if (!safeAddressIdOrTxnHash) {
       throw new Error('safeAddress is required');
@@ -443,7 +443,7 @@ export default class RewardManager {
     if (typeof onTxnHash === 'function') {
       await onTxnHash(txnHash);
     }
-    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
+    return await waitForSubgraphIndexWithTxnReceipt(this.layer2Web3, txnHash);
   }
 
   private async getRegisterRewardProgramPayload(
