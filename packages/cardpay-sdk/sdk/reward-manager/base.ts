@@ -6,8 +6,8 @@ import { AbiItem, randomHex, toChecksumAddress } from 'web3-utils';
 import { isTransactionHash, TransactionOptions, waitForSubgraphIndexWithTxnReceipt } from '../utils/general-utils';
 import { getSDK } from '../version-resolver';
 import { ContractOptions } from 'web3-eth-contract';
-import { TransactionReceipt, TransactionConfig } from 'web3-core';
-const { fromWei } = Web3.utils;
+import { TransactionReceipt } from 'web3-core';
+const { fromWei, toBN } = Web3.utils;
 import {
   EventABI,
   getParamsFromEvent,
@@ -17,9 +17,12 @@ import {
   executeSendWithRateLock,
   GnosisExecTx,
   executeSend,
+  gasEstimate,
+  executeTransaction,
 } from '../utils/safe-utils';
-import { Signature, signPrepaidCardSendTx } from '../utils/signing-utils';
+import { Signature, signPrepaidCardSendTx, signSafeTx } from '../utils/signing-utils';
 import BN from 'bn.js';
+import ERC677ABI from '../../contracts/abi/erc-677';
 
 export default class RewardManager {
   private rewardManager: Contract | undefined;
@@ -376,60 +379,71 @@ export default class RewardManager {
 
   async removeRewardProgram(txnHash: string): Promise<TransactionReceipt>;
   async removeRewardProgram(
-    rewardProgramIdOrTxnHash: string,
+    safeAddressIdOrTxnHash: string,
+    rewardProgramId: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt>;
   async removeRewardProgram(
-    rewardProgramIdOrTxnHash: string,
+    safeAddressIdOrTxnHash: string,
+    rewardProgramId?: string,
     txnOptions?: TransactionOptions,
     contractOptions?: ContractOptions
   ): Promise<TransactionReceipt> {
-    if (isTransactionHash(rewardProgramIdOrTxnHash)) {
-      let txnHash = rewardProgramIdOrTxnHash;
+    if (isTransactionHash(safeAddressIdOrTxnHash)) {
+      let txnHash = safeAddressIdOrTxnHash;
       return await waitUntilTransactionMined(this.layer2Web3, txnHash);
     }
-    if (!rewardProgramIdOrTxnHash) {
+    if (!safeAddressIdOrTxnHash) {
+      throw new Error('safeAddress is required');
+    }
+    if (!rewardProgramId) {
       throw new Error('rewardProgramId is required');
     }
-    let rewardProgramId = rewardProgramIdOrTxnHash;
+    let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
+    let safeAddress = safeAddressIdOrTxnHash;
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    let rewardManager = await this.getRewardManager();
     let rewardManagerAddress = await getAddress('rewardManager', this.layer2Web3);
-    let nextNonce = await this.getNextNonce(from);
+    let rewardManager = await this.getRewardManager();
 
-    return await new Promise((resolve, reject) => {
-      let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
-      let data = rewardManager.methods.removeRewardProgram(rewardProgramId);
-      let tx: TransactionConfig = {
-        ...contractOptions,
-        from,
-        to: rewardManagerAddress,
-        data,
-      };
-
-      if (nonce != null) {
-        tx.nonce = parseInt(nonce.toString()); // the web3 API requires this be a number, it should be ok to downcast this
-      } else if (typeof onNonce === 'function') {
-        onNonce(nextNonce);
+    let payload = rewardManager.methods.removeRewardProgram(rewardProgramId).encodeABI();
+    let gasTokenAddress = await this.defaultGasToken();
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      rewardManagerAddress,
+      '0',
+      payload,
+      0,
+      gasTokenAddress
+    );
+    let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    let token = new this.layer2Web3.eth.Contract(ERC677ABI as AbiItem[], gasTokenAddress);
+    let balance = toBN(await token.methods.balanceOf(safeAddress).call());
+    if (balance.lt(gasCost)) {
+      throw new Error(`Governance admin safe does not have enoutgh to pay for gas when removing reward program`);
+    }
+    if (nonce == null) {
+      nonce = getNextNonceFromEstimate(estimate);
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
       }
+    }
+    let gnosisResult = await executeTransaction(
+      this.layer2Web3,
+      safeAddress,
+      rewardManagerAddress,
+      payload,
+      estimate,
+      nonce,
+      await signSafeTx(this.layer2Web3, safeAddress, rewardManagerAddress, payload, estimate, nonce, from)
+    );
 
-      this.layer2Web3.eth
-        .sendTransaction(tx)
-        .on('transactionHash', async (txnHash: string) => {
-          if (typeof onTxnHash === 'function') {
-            onTxnHash(txnHash);
-          }
-          try {
-            resolve(await waitUntilTransactionMined(this.layer2Web3, txnHash));
-          } catch (e) {
-            reject(e);
-          }
-        })
-        .on('error', (error: Error) => {
-          reject(error);
-        });
-    });
+    let txnHash = gnosisResult.ethereumTx.txHash;
+    if (typeof onTxnHash === 'function') {
+      await onTxnHash(txnHash);
+    }
+    return await waitUntilTransactionMined(this.layer2Web3, txnHash);
   }
 
   private async getRegisterRewardProgramPayload(
@@ -692,12 +706,7 @@ export default class RewardManager {
     };
   }
 
-  private async getNextNonce(from?: string): Promise<BN> {
-    from = from ?? (await this.layer2Web3.eth.getAccounts())[0];
-    // To accommodate the fix for infura block mismatch errors (made in CS-2391), we
-    // are waiting one extra block for all layer 1 transactions.
-    let previousBlockNumber = (await this.layer2Web3.eth.getBlockNumber()) - 1;
-    let nonce = await this.layer2Web3.eth.getTransactionCount(from, previousBlockNumber);
-    return new BN(String(nonce)); // EOA nonces are zero based
+  private async defaultGasToken(): Promise<string> {
+    return await getAddress('cardCpxd', this.layer2Web3);
   }
 }
