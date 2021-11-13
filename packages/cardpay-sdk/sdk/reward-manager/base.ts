@@ -630,10 +630,6 @@ export default class RewardManager {
     return Number(await (await this.getRewardManager()).methods.rewardProgramRegistrationFeeInSPEND().call());
   }
 
-  async getRewardeeRegistrationFees(): Promise<number> {
-    return Number(await (await this.getRewardManager()).methods.rewardeeRegistrationFeeInSPEND().call());
-  }
-
   async isRewardProgram(rewardProgramId: string): Promise<boolean> {
     return (await this.getRewardManager()).methods.isRewardProgram(rewardProgramId).call();
   }
