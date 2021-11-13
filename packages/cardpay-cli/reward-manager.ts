@@ -97,7 +97,7 @@ export async function removeRewardProgram(
   let web3 = await getWeb3(network, mnemonic);
   let rewardManagerAPI = await getSDK('RewardManager', web3);
   let blockExplorer = await getConstant('blockExplorer', web3);
-  await rewardManagerAPI.removeRewardProgram(governanceAdmin,rewardProgramId, {
+  await rewardManagerAPI.removeRewardProgram(governanceAdmin, rewardProgramId, {
     onTxnHash: (txnHash: string) => console.log(`Transaction hash: ${blockExplorer}/tx/${txnHash}/token-transfers`),
   });
 }
