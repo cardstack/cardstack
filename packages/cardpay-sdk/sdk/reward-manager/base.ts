@@ -655,6 +655,9 @@ export default class RewardManager {
     return await (await this.getRewardManager()).methods.rewardProgramAdmins(rewardProgramId).call();
   }
 
+  async getGovernanceAdmin(): Promise<string> {
+    return await (await this.getRewardManager()).methods.governanceAdmin().call();
+  }
   async getRewardRule(rewardProgramId: string): Promise<string> {
     return await (await this.getRewardManager()).methods.rule(rewardProgramId).call();
   }
