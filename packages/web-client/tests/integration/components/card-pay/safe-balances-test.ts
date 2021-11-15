@@ -72,7 +72,7 @@ module('Integration | Component | card-pay/safe-balances', function (hooks) {
     assert.dom('[data-test-safe-balances-type]').containsText('Depot');
 
     assert.dom('[data-test-safe-balances-title]').containsText('Depot');
-    assert.dom('[data-test-safe-balances-logo=depot-arrows]').exists();
+    assert.dom('[data-test-safe-balances-logo=depot]').exists();
     assert.dom('[data-test-safe-balances-link]').doesNotExist();
 
     assert
