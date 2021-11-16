@@ -7,6 +7,7 @@ import {
   Layer2ChainEvent,
   Layer2Web3Strategy,
   TransactionHash,
+  TxnBlockNumber,
   WithdrawalLimits,
 } from '../utils/web3-strategies/types';
 import {
@@ -236,6 +237,10 @@ export default class Layer2Network
 
   on(event: Layer2ChainEvent, cb: Function): UnbindEventListener {
     return this.simpleEmitter.on(event, cb);
+  }
+
+  async getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
+    return this.strategy.getBlockConfirmation(blockNumber);
   }
 
   getBlockHeight() {

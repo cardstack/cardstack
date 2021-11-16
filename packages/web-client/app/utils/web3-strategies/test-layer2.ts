@@ -1,6 +1,11 @@
 import { tracked } from '@glimmer/tracking';
 import WalletInfo from '../wallet-info';
-import { Layer2Web3Strategy, TransactionHash, WithdrawalLimits } from './types';
+import {
+  Layer2Web3Strategy,
+  TransactionHash,
+  TxnBlockNumber,
+  WithdrawalLimits,
+} from './types';
 import {
   BridgedTokenSymbol,
   ConvertibleSymbol,
@@ -68,6 +73,7 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   bridgingToLayer2Deferred!: RSVP.Deferred<TransactionReceipt>;
   bridgingToLayer1HashDeferred!: RSVP.Deferred<TransactionHash>;
   bridgingToLayer1Deferred!: RSVP.Deferred<BridgeValidationResult>;
+  blockConfirmationDeferred!: RSVP.Deferred<void>;
   @tracked isInitializing = false;
   @tracked issuePrepaidCardSpendMinValue: number = 500;
   @tracked issuePrepaidCardDaiMinValue: BN = new BN(toWei('5'));
@@ -81,6 +87,8 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
   // to test if balances are refreshed after relaying tokens
   // this is only a mock property
   @tracked balancesRefreshed = false;
+
+  test__autoResolveBlockConfirmations = true;
 
   test__blockNumber = 0;
   test__withdrawalMinimum = new BN('500000000000000000');
@@ -123,6 +131,19 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
       min: this.test__withdrawalMinimum,
       max: this.test__withdrawalMaximum,
     };
+  }
+
+  async getBlockConfirmation(_blockNumber: TxnBlockNumber): Promise<void> {
+    if (this.test__autoResolveBlockConfirmations) {
+      return Promise.resolve();
+    } else {
+      this.blockConfirmationDeferred = defer<void>();
+      return this.blockConfirmationDeferred.promise as Promise<void>;
+    }
+  }
+
+  test__simulateBlockConfirmation() {
+    this.blockConfirmationDeferred.resolve();
   }
 
   awaitBridgedToLayer2(

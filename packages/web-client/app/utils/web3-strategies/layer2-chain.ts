@@ -25,6 +25,7 @@ import {
   Layer2NetworkSymbol,
   Layer2ChainEvent,
   WithdrawalLimits,
+  TxnBlockNumber,
 } from './types';
 import {
   networkIds,
@@ -39,6 +40,7 @@ import {
   PrepaidCardSafe,
   Safe,
   TransactionOptions,
+  waitUntilBlock,
 } from '@cardstack/cardpay-sdk';
 import { taskFor } from 'ember-concurrency-ts';
 import config from '../../config/environment';
@@ -458,6 +460,12 @@ export default abstract class Layer2ChainWeb3Strategy
       'blockExplorer',
       this.networkSymbol
     )}/tx/${txnHash}`;
+  }
+
+  async getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
+    if (!this.web3)
+      throw new Error('Cannot get block confirmations without web3');
+    return await waitUntilBlock(this.web3, blockNumber);
   }
 
   async getBlockHeight(): Promise<BN> {

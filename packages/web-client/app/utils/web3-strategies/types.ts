@@ -115,6 +115,7 @@ export interface Layer2Web3Strategy
     symbolsToUpdate: UsdConvertibleSymbol[]
   ): Promise<Record<UsdConvertibleSymbol, ConversionFunction>>;
   blockExplorerUrl(txnHash: TransactionHash): string;
+  getBlockConfirmation(blockNumber: number): Promise<void>;
   getBlockHeight(): Promise<BN>;
   awaitBridgedToLayer2(
     fromBlock: BN,
