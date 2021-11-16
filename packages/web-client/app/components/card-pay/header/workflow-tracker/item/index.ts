@@ -96,8 +96,7 @@ export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayH
     this.deleteButtonShown = false;
   }
 
-  @action showDeleteConfirmation(event: MouseEvent) {
-    event.stopPropagation();
+  @action showDeleteConfirmation() {
     this.deleteConfirmDialogShown = true;
   }
 
