@@ -1,12 +1,13 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { find, render, settled } from '@ember/test-helpers';
+import { find, render, settled, waitFor } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 
 import sinon from 'sinon';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
+import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import {
   createDepotSafe,
   generateMockAddress,
@@ -61,6 +62,10 @@ module(
     });
 
     test('It renders transaction status and links', async function (assert) {
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+      layer2Service.test__autoResolveBlockConfirmations = false;
+
       await render(hbs`
         <CardPay::WithdrawalWorkflow::TransactionStatus
           @onComplete={{this.onComplete}}
@@ -83,11 +88,24 @@ module(
         .dom(`[data-test-blockscout-button]`)
         .hasAttribute('href', /relay$/);
 
+      for (let i = 1; i <= layer1Service.bridgeConfirmationBlockCount; i++) {
+        await waitFor(`[data-test-withdrawal-bridging-block-count="${i}"]`);
+
+        assert
+          .dom(`[data-test-token-bridge-step-status="1"]`)
+          .hasText(`${i} of 5 blocks confirmed`);
+
+        layer2Service.test__simulateBlockConfirmation();
+      }
+
       assert
         .dom(`[data-test-token-bridge-step="1"]:not([data-test-completed])`)
         .containsText(
           `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.fullName}`
         );
+
+      await waitFor('[data-test-bridge-explorer-button]');
+
       assert
         .dom(`[data-test-bridge-explorer-button]`)
         .hasAttribute('href', /relay$/);
