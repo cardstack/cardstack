@@ -5,6 +5,7 @@ import {
   fillIn,
   find,
   settled,
+  triggerEvent,
   visit,
   waitUntil,
 } from '@ember/test-helpers';
@@ -305,12 +306,59 @@ module('Acceptance | persistence view and restore', function () {
 
       await visit('/card-pay/');
       await click('[data-test-workflow-tracker-toggle]');
-      await click('[data-test-active-workflow] button');
+      await click('[data-test-visit-workflow-button]');
 
       assert.equal(
         currentURL(),
         '/card-pay/payments?flow=create-business&flow-id=persisted-merchant-creation'
       );
+    });
+
+    test('clicking delete icon deletes the workflow', async function (assert) {
+      workflowPersistenceService.persistData('persisted-merchant-creation', {
+        name: 'MERCHANT_CREATION',
+        state: buildState({
+          meta: {
+            version: MERCHANT_CREATION_WORKFLOW_VERSION,
+            completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+            completedMilestonesCount: 1,
+            milestonesCount: 3,
+          },
+        }),
+      });
+
+      await visit('/card-pay/');
+      await click('[data-test-workflow-tracker-toggle]');
+      await triggerEvent('[data-test-workflow-tracker-item]', 'mouseover');
+      await click('[data-test-delete-workflow-button]');
+
+      assert
+        .dom('[data-test-workflow-delete-confirmation-modal] h2')
+        .containsText('Abandon this workflow?');
+
+      await click('[data-test-abandon-workflow-button]');
+
+      assert.dom('[data-test-workflow-tracker-item]').doesNotExist();
+    });
+
+    test('completed workflows can not be deleted', async function (assert) {
+      workflowPersistenceService.persistData('persisted-merchant-creation', {
+        name: 'MERCHANT_CREATION',
+        state: buildState({
+          meta: {
+            version: MERCHANT_CREATION_WORKFLOW_VERSION,
+            completedCardNames: ['LAYER2_CONNECT', 'MERCHANT_CUSTOMIZATION'],
+            completedMilestonesCount: 3,
+            milestonesCount: 3,
+          },
+        }),
+      });
+
+      await visit('/card-pay/');
+      await click('[data-test-workflow-tracker-toggle]');
+      await triggerEvent('[data-test-workflow-tracker-item]', 'mouseover');
+
+      assert.dom('[data-test-delete-workflow]').doesNotExist();
     });
 
     test('completed workflows can be cleared', async function (this: Context, assert) {
@@ -551,7 +599,7 @@ module('Acceptance | persistence view and restore', function () {
         await visit('/card-pay/');
         assert.dom('[data-test-workflow-tracker-count]').containsText('3');
         await click('[data-test-workflow-tracker-toggle]');
-        await click('[data-test-workflow-tracker-item]');
+        await click('[data-test-visit-workflow-button]');
 
         assert
           .dom('[data-test-cancelation]')
@@ -644,7 +692,7 @@ module('Acceptance | persistence view and restore', function () {
         assert.dom('[data-test-workflow-tracker-count]').containsText('2');
         await click('[data-test-workflow-tracker-toggle]');
         await click(
-          `[data-test-workflow-tracker-item="persisted-old-complete"]`
+          `[data-test-workflow-tracker-item="persisted-old-complete"] [data-test-visit-workflow-button]`
         );
 
         assert

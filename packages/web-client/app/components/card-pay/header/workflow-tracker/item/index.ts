@@ -14,6 +14,7 @@ import { MILESTONE_TITLES as MERCHANT_CREATION_MILESTONES } from '@cardstack/web
 import { MILESTONE_TITLES as PREPAID_CARD_ISSUANCE_MILESTONES } from '@cardstack/web-client/components/card-pay/issue-prepaid-card-workflow';
 import { MILESTONE_TITLES as RESERVE_POOL_DEPOSIT_MILESTONES } from '@cardstack/web-client/components/card-pay/deposit-workflow';
 import { MILESTONE_TITLES as WITHDRAWAL_MILESTONES } from '@cardstack/web-client/components/card-pay/withdrawal-workflow';
+import { tracked } from '@glimmer/tracking';
 
 const WORKFLOW_TITLE_TO_MILESTONES: Record<CardPayWorkflowName, string[]> = {
   PREPAID_CARD_ISSUANCE: PREPAID_CARD_ISSUANCE_MILESTONES,
@@ -29,6 +30,8 @@ interface CardPayHeaderWorkflowTrackerItemArgs {
 
 export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayHeaderWorkflowTrackerItemArgs> {
   @service declare workflowPersistence: WorkflowPersistence;
+  @tracked deleteButtonShown: boolean = false;
+  @tracked deleteConfirmDialogShown: boolean = false;
 
   get workflowId() {
     return this.args.workflowMeta.id;
@@ -36,6 +39,10 @@ export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayH
 
   get workflowName() {
     return this.args.workflowMeta.name;
+  }
+
+  get canDelete() {
+    return !this.isComplete;
   }
 
   get workflowDisplayName() {
@@ -77,5 +84,29 @@ export default class CardPayHeaderWorkflowTrackerItem extends Component<CardPayH
   @action visit() {
     this.workflowPersistence.visitPersistedWorkflow(this.workflowId);
     this.args.closeList();
+  }
+
+  @action showDeleteButton() {
+    if (this.canDelete) {
+      this.deleteButtonShown = true;
+    }
+  }
+
+  @action hideDeleteButton() {
+    this.deleteButtonShown = false;
+  }
+
+  @action showDeleteConfirmation(event: MouseEvent) {
+    event.stopPropagation();
+    this.deleteConfirmDialogShown = true;
+  }
+
+  @action hideDeleteConfirmation() {
+    this.deleteConfirmDialogShown = false;
+  }
+
+  @action deleteWorkflow() {
+    this.workflowPersistence.clearWorkflowWithId(this.workflowId);
+    this.deleteConfirmDialogShown = false;
   }
 }
