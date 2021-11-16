@@ -393,6 +393,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
         onNonce(nonce);
       }
     }
+    console.log("rewardSafeOwner", rewardSafeOwner);
     let fullSignature = await signRewardSafe(
       this.layer2Web3,
       rewardPoolAddress,
@@ -407,6 +408,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       safeAddress,
       await getAddress('rewardManager', this.layer2Web3)
     );
+    console.log('fullSignature', fullSignature);
 
     let eip1271Data = createEIP1271VerifyingData(
       this.layer2Web3,
@@ -421,6 +423,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       ZERO_ADDRESS,
       nonce.toString()
     );
+
     let gnosisTxn = await executeTransaction(
       this.layer2Web3,
       safeAddress,

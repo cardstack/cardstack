@@ -580,6 +580,12 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       tokenAddress
     );
 
+    console.log('innerEstimate', innerEstimate);
+    innerEstimate = {
+      ...innerEstimate,
+      safeTxGas: '10000000',
+      baseGas: '0',
+    };
     let fullSignatureInnerExec = await fullSignatureTxAsBytes(
       this.layer2Web3,
       tokenAddress,
@@ -602,6 +608,8 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         )}, amount being claimed is ${amount}, the gas cost is ${fromWei(gasCost)}`
       );
     }
+    console.log('tokenAddress', tokenAddress);
+    console.log('innerEstimate', innerEstimate);
     let payload = (await this.getRewardManager()).methods
       .withdrawFromRewardSafe(
         tokenAddress,
@@ -620,21 +628,28 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         onNonce(nonce);
       }
     }
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardManagerAddress, '0', payload, 0, tokenAddress);
+    // let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardManagerAddress, '0', payload, 0, tokenAddress);
+    let rewardSafe = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], safeAddress);
+    let currentNonce = new BN(await rewardSafe.methods.nonce().call());
+    console.log('nonce', nonce.toString());
+    console.log('currentNonce', currentNonce.toString());
+    console.log('transferNonce', transferNonce.toString());
+    console.log('rewardSafeOwner', rewardSafeOwner);
     let fullSignature = await signRewardSafe(
       this.layer2Web3,
       rewardManagerAddress,
       0,
       payload,
       0,
-      estimate,
+      innerEstimate,
       tokenAddress,
       ZERO_ADDRESS,
-      nonce,
+      currentNonce,
       rewardSafeOwner,
       safeAddress,
       rewardManagerAddress
     );
+    console.log('fullSignature', fullSignature);
 
     let eip1271Data = createEIP1271VerifyingData(
       this.layer2Web3,
@@ -642,20 +657,20 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       '0',
       payload,
       '0',
-      estimate.safeTxGas,
-      estimate.baseGas,
-      estimate.gasPrice,
+      innerEstimate.safeTxGas,
+      innerEstimate.baseGas,
+      innerEstimate.gasPrice,
       tokenAddress,
       ZERO_ADDRESS,
-      nonce.toString()
+      currentNonce.toString()
     );
     let gnosisTxn = await executeTransaction(
       this.layer2Web3,
       safeAddress,
       rewardManagerAddress,
       payload,
-      estimate,
-      nonce,
+      innerEstimate,
+      currentNonce,
       fullSignature,
       eip1271Data
     );
