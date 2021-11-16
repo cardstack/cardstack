@@ -1,12 +1,12 @@
 {
   "name": "@cardstack/db",
   "description": "db support for cardstack hub",
-  "version": "0.27.26",
+  "version": "0.27.27",
   "author": "Hassan Abdel-Rahman @habdelra",
   "repository": "cardstack/cardstack",
   "license": "MIT",
   "dependencies": {
-    "@cardstack/di": "0.27.26",
+    "@cardstack/di": "0.27.27",
     "config": "^3.3.6",
     "pg": "^8.6.0"
   }
