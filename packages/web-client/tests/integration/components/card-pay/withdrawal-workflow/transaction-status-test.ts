@@ -88,6 +88,12 @@ module(
         .dom(`[data-test-blockscout-button]`)
         .hasAttribute('href', /relay$/);
 
+      assert
+        .dom(`[data-test-token-bridge-step="1"]`)
+        .containsText(
+          `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.fullName}`
+        );
+
       for (let i = 1; i <= layer1Service.bridgeConfirmationBlockCount; i++) {
         await waitFor(`[data-test-withdrawal-bridging-block-count="${i}"]`);
 
@@ -97,12 +103,6 @@ module(
 
         layer2Service.test__simulateBlockConfirmation();
       }
-
-      assert
-        .dom(`[data-test-token-bridge-step="1"]:not([data-test-completed])`)
-        .containsText(
-          `Bridge tokens from ${c.layer2.fullName} to ${c.layer1.fullName}`
-        );
 
       await waitFor('[data-test-bridge-explorer-button]');
 
