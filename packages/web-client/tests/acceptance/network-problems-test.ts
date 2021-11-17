@@ -78,9 +78,9 @@ module('Acceptance | network-problems', function (hooks) {
     assert
       .dom(MODAL_BODY)
       .containsText(
-        'Sorry! Card Pay is disconnected from L2 test chain. You can restore the connection by refreshing the page.'
+        'An unexpected error happened and the connection with L2 test chain was lost. To restore the connection and resume your work, please refresh the page.'
       );
-    assert.dom(MODAL_ACTION).containsText('Contact Cardstack Support');
+    assert.dom(MODAL_ACTION).containsText('Refresh Page');
     assert.dom(MODAL).hasAttribute(MODAL_IS_DISMISSABLE_ATTRIBUTE);
   });
 
@@ -93,9 +93,9 @@ module('Acceptance | network-problems', function (hooks) {
     assert
       .dom(MODAL_BODY)
       .containsText(
-        'Sorry! Card Pay is disconnected from L1 test chain. You can restore the connection by refreshing the page.'
+        'An unexpected error happened and the connection with L1 test chain was lost. To restore the connection and resume your work, please refresh the page.'
       );
-    assert.dom(MODAL_ACTION).containsText('Contact Cardstack Support');
+    assert.dom(MODAL_ACTION).containsText('Refresh Page');
     assert.dom(MODAL).hasAttribute(MODAL_IS_DISMISSABLE_ATTRIBUTE);
   });
 });
