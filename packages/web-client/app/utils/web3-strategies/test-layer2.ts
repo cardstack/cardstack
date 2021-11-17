@@ -154,21 +154,30 @@ export default class TestLayer2Web3Strategy implements Layer2Web3Strategy {
     return this.bridgingToLayer2Deferred.promise as Promise<TransactionReceipt>;
   }
 
-  bridgeToLayer1(
+  async bridgeToLayer1(
     safeAddress: string,
     receiverAddress: string,
     tokenSymbol: BridgedTokenSymbol,
-    amountInWei: string
-  ): Promise<TransactionHash> {
+    amountInWei: string,
+    options: TransactionOptions
+  ): Promise<TransactionReceipt> {
     this.bridgeToLayer1Requests.push({
       safeAddress,
       receiverAddress,
       tokenSymbol,
       amountInWei,
     });
-    this.bridgingToLayer1HashDeferred = defer<TransactionHash>();
     this.bridgingToLayer1Deferred = defer<BridgeValidationResult>();
-    return this.bridgingToLayer1HashDeferred.promise;
+    options.onTxnHash?.('exampleTxnHash');
+    return {
+      blockNumber: this.test__blockNumber,
+    } as TransactionReceipt;
+  }
+
+  async resumeBridgeToLayer1(_txnHash: string) {
+    return {
+      blockNumber: this.test__blockNumber,
+    } as TransactionReceipt;
   }
 
   awaitBridgedToLayer1(

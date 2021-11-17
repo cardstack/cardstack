@@ -128,8 +128,10 @@ export interface Layer2Web3Strategy
     safeAddress: string,
     receiverAddress: string,
     tokenSymbol: BridgedTokenSymbol,
-    amountInWei: string
-  ): Promise<TransactionHash>;
+    amountInWei: string,
+    options: TransactionOptions
+  ): Promise<TransactionReceipt>;
+  resumeBridgeToLayer1(txnHash: string): Promise<TransactionReceipt>;
   awaitBridgedToLayer1(
     fromBlock: BN,
     txnHash: TransactionHash

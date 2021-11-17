@@ -511,26 +511,26 @@ export default abstract class Layer2ChainWeb3Strategy
     safeAddress: string,
     receiverAddress: string,
     tokenSymbol: BridgedTokenSymbol,
-    amountInWei: string
-  ): Promise<TransactionHash> {
+    amountInWei: string,
+    options: TransactionOptions
+  ): Promise<TransactionReceipt> {
     let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
     let tokenAddress = new TokenContractInfo(tokenSymbol, this.networkSymbol)!
       .address;
 
-    // in this case we don't want to wait for mining to complete. there is a
-    // purpose built await in the SDK for the bridge validators that is
-    // performed after this action--we can just rely on that for the timing
+    return await tokenBridge.relayTokens(
+      safeAddress,
+      tokenAddress,
+      receiverAddress,
+      amountInWei,
+      options
+    );
+  }
 
-    let transactionHash = await new Promise<TransactionHash>((res, reject) => {
-      tokenBridge
-        .relayTokens(safeAddress, tokenAddress, receiverAddress, amountInWei, {
-          onTxnHash: (txnHash) => res(txnHash),
-        })
-        .catch((e) => {
-          reject(e);
-        });
-    });
-    return transactionHash;
+  async resumeBridgeToLayer1(txnHash: string) {
+    let tokenBridge = await getSDK('TokenBridgeHomeSide', this.web3);
+
+    return await tokenBridge.relayTokens(txnHash);
   }
 
   async awaitBridgedToLayer1(

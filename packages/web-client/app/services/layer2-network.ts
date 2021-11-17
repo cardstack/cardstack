@@ -37,6 +37,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { UsdConvertibleSymbol } from './token-to-usd';
 import { TransactionOptions } from '@cardstack/cardpay-sdk';
 import { Safes } from '../resources/safes';
+import { TransactionReceipt } from 'web3-core';
 export default class Layer2Network
   extends Service
   implements Emitter<Layer2ChainEvent>
@@ -271,14 +272,20 @@ export default class Layer2Network
     safeAddress: string,
     receiverAddress: string,
     tokenSymbol: BridgedTokenSymbol,
-    amount: string
-  ): Promise<TransactionHash> {
+    amount: string,
+    options: TransactionOptions
+  ): Promise<TransactionReceipt> {
     return this.strategy.bridgeToLayer1(
       safeAddress,
       receiverAddress,
       tokenSymbol,
-      amount
+      amount,
+      options
     );
+  }
+
+  async resumeBridgeToLayer1(txnHash: string) {
+    return this.strategy.resumeBridgeToLayer1(txnHash);
   }
 
   async awaitBridgedToLayer1(fromBlock: BN, transactionHash: TransactionHash) {
