@@ -32,7 +32,7 @@ jobs:
   try-scenarios:
     name: Tests - ${{ matrix.ember-try-scenario }}
     runs-on: ubuntu-latest
-    continue-on-error: false
+    continue-on-error: true
     needs: test
     strategy:
       fail-fast: true
