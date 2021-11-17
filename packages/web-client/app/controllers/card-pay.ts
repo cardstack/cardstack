@@ -5,7 +5,6 @@ import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { tracked } from '@glimmer/tracking';
 import { currentNetworkDisplayInfo as c } from '../utils/web3-strategies/network-display-info';
-import config from '../config/environment';
 
 interface NetworkProblemModalOptions {
   title: string;
@@ -49,10 +48,10 @@ export default class CardPayController extends Controller {
     if (this.networkProblemModalOptions) return;
     this.showNetworkProblemModal({
       title: `Disconnected from ${c[network].fullName}`,
-      body: `Sorry! Card Pay is disconnected from ${c[network].fullName}. You can restore the connection by refreshing the page.`,
+      body: `An unexpected error happened and the connection with ${c[network].fullName} was lost. To restore the connection and resume your work, please refresh the page.`,
       onClose: this.hideNetworkProblemModal,
-      action: () => window.open(config.urls.discordSupportChannelUrl, '_blank'),
-      actionText: 'Contact Cardstack Support',
+      action: () => window.location.reload(),
+      actionText: 'Refresh Page',
       dismissable: true,
     });
   }
