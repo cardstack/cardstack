@@ -2,8 +2,9 @@ import { module, test } from 'qunit';
 import { setupApplicationTest } from 'ember-qunit';
 
 import { setupMirage } from 'ember-cli-mirage/test-support';
-
 import { MirageTestContext } from 'ember-cli-mirage/test-support';
+
+import sinon from 'sinon';
 
 import WorkflowPersistence from '@cardstack/web-client/services/workflow-persistence';
 import { click, currentURL, visit, waitFor } from '@ember/test-helpers';
@@ -19,6 +20,7 @@ import {
   MILESTONE_TITLES,
   WORKFLOW_VERSION,
 } from '@cardstack/web-client/components/card-pay/withdrawal-workflow';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 interface Context extends MirageTestContext {}
 
@@ -329,6 +331,64 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         );
     });
 
+    test('it restores the workflow and resumes the transaction when restoring during withdraw step', async function (this: Context, assert) {
+      const state = buildState({
+        withdrawalToken: 'DAI.CPXD',
+        withdrawnAmount: new BN('1000000000000000000'),
+        layer2BlockHeightBeforeBridging: new BN('22867914'),
+        minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
+        relayTokensTxnHash:
+          '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
+        withdrawalSafe: withdrawalSafeAddress,
+        meta: {
+          version: WORKFLOW_VERSION,
+          completedMilestonesCount: 5,
+          milestonesCount: 6,
+          completedCardNames: [
+            'LAYER1_CONNECT',
+            'CHECK_BALANCE',
+            'LAYER2_CONNECT',
+            'CHOOSE_BALANCE',
+          ],
+        },
+      });
+
+      workflowPersistenceService.persistData('abc123', {
+        name: 'WITHDRAWAL',
+        state,
+      });
+      let layer2Network: Layer2Network = this.owner.lookup(
+        'service:layer2-network'
+      );
+      layer2Network.strategy.bridgeToLayer1(
+        '0xsource',
+        '0xdestination',
+        'DAI.CPXD',
+        '20',
+        {
+          onTxnHash: () => {},
+        }
+      );
+      let resumeSpy = sinon.spy(layer2Network, 'resumeBridgeToLayer1');
+
+      await visit(
+        '/card-pay/deposit-withdrawal?flow=withdrawal&flow-id=abc123'
+      );
+
+      assert.dom('[data-test-milestone="0"]').exists(); // L1
+      assert.dom('[data-test-milestone="1"]').exists(); // Check ETH balance
+      assert.dom('[data-test-milestone="2"]').exists(); // Connect L2 wallet
+      assert.dom('[data-test-milestone="3"]').exists(); // Withdraw from L2
+
+      assert.ok(resumeSpy.calledOnce);
+      assert.true(
+        JSON.parse(
+          workflowPersistenceService.getPersistedData('abc123').state.meta
+        ).value.completedCardNames.includes('TRANSACTION_AMOUNT') // Did complete
+      );
+      assert.dom('[data-test-milestone="4"]').exists(); // Bridge to L1
+    });
+
     test('it restores the workflow when restoring during bridging', async function (this: Context, assert) {
       const state = buildState({
         withdrawalToken: 'DAI.CPXD',
@@ -337,6 +397,9 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         minimumBalanceForWithdrawalClaim: new BN('290000000000000'),
         relayTokensTxnHash:
           '0x08ef93a1ac2911210c8e1b351dd90aa00f033b3658abdfb449eda75f84e9f501',
+        relayTokensTxnReceipt: {
+          blockNumber: 0,
+        },
         withdrawalSafe: withdrawalSafeAddress,
         meta: {
           version: WORKFLOW_VERSION,
@@ -364,7 +427,10 @@ module('Acceptance | withdrawal persistence', function (hooks) {
         '0xsource',
         '0xdestination',
         'DAI.CPXD',
-        '20'
+        '20',
+        {
+          onTxnHash: () => {},
+        }
       );
       layer2Service.test__simulateBridgedToLayer1();
       await visit(

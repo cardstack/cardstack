@@ -10,6 +10,7 @@ import {
 } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import Layer2TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer2';
+import Layer1TestWeb3Strategy from '@cardstack/web-client/utils/web3-strategies/test-layer1';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
 import { toWei } from 'web3-utils';
 import BN from 'bn.js';
@@ -19,6 +20,7 @@ import {
   createSafeToken,
   generateMockAddress,
 } from '@cardstack/web-client/utils/test-factories';
+import Layer2Network from '@cardstack/web-client/services/layer2-network';
 
 const startDaiAmountString = '100.1111111111111111';
 let startDaiAmount = toWei(startDaiAmountString);
@@ -247,6 +249,75 @@ module(
         .containsText(
           'There was a problem initiating the withdrawal of your tokens'
         );
+    });
+
+    test('it can complete and save necessary properties to the workflow session', async function (assert) {
+      let layer2Service: Layer2Network = this.owner.lookup(
+        'service:layer2-network'
+      );
+      let layer1Service = this.owner.lookup('service:layer1-network')
+        .strategy as Layer1TestWeb3Strategy;
+      let layer1AccountAddress = '0xaCD5f5534B756b856ae3B2CAcF54B3321dd6654Fb6';
+      layer1Service.test__simulateAccountsChanged(
+        [layer1AccountAddress],
+        'metamask'
+      );
+
+      let bridgeSpy = sinon.spy(layer2Service, 'bridgeToLayer1');
+
+      this.set('onComplete', () => {
+        this.set('isComplete', true);
+      });
+
+      await render(hbs`
+      <CardPay::WithdrawalWorkflow::TransactionAmount
+        @workflowSession={{this.session}}
+        @isComplete={{this.isComplete}}
+        @onComplete={{this.onComplete}}
+        @onIncomplete={{noop}}
+      />
+    `);
+      await fillIn('input', '5');
+      await click('[data-test-withdrawal-transaction-amount] button');
+
+      assert.ok(
+        bridgeSpy.calledOnceWith(
+          depotAddress,
+          layer1AccountAddress,
+          'DAI.CPXD',
+          toWei('5'),
+          sinon.match.has('onTxnHash', sinon.match.func)
+        )
+      );
+
+      assert
+        .dom('[data-test-withdrawal-transaction-amount-is-complete]')
+        .isVisible();
+
+      assert.ok(session.getValue('withdrawnAmount'));
+      assert.ok(session.getValue('layer2BlockHeightBeforeBridging'));
+      assert.ok(session.getValue('relayTokensTxnHash'));
+      assert.ok(session.getValue('relayTokensTxnReceipt'));
+    });
+
+    test('it resumes the transaction to relay tokens if provied with a transaction hash', async function (assert) {
+      let layer2Service: Layer2Network = this.owner.lookup(
+        'service:layer2-network'
+      );
+      let resumeSpy = sinon.spy(layer2Service, 'resumeBridgeToLayer1');
+      session.setValue({
+        withdrawnAmount: new BN(toWei('12')),
+        relayTokensTxnHash: 'anystring',
+        layer2BlockHeightBeforeBridging: 0,
+      });
+
+      await renderSubject();
+
+      assert
+        .dom('[data-test-withdrawal-transaction-amount-in-progress]')
+        .isVisible();
+
+      assert.ok(resumeSpy.calledOnceWith('anystring'));
     });
   }
 );

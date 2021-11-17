@@ -24,13 +24,13 @@ import { taskFor } from 'ember-concurrency-ts';
 import { task, TaskGenerator } from 'ember-concurrency';
 import { reads } from 'macro-decorators';
 import * as Sentry from '@sentry/browser';
+import { TransactionReceipt } from 'web3-eth';
 
 class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
   @tracked amount = '';
   @tracked amountIsValid = false;
-  @tracked txnHash: string | undefined;
   @tracked isConfirmed = false;
   @tracked validationMessage = '';
   @reads('withdrawTask.last.error') declare error: Error | undefined;
@@ -42,6 +42,13 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
       this.args.workflowSession.getValue<BN>('withdrawnAmount');
     if (withdrawnAmount) {
       this.amount = fromWei(withdrawnAmount);
+    }
+
+    if (
+      this.txnHash &&
+      !this.args.workflowSession.getValue('relayTokensTxnReceipt')
+    ) {
+      this.withdraw();
     }
   }
 
@@ -104,10 +111,15 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
     }
   }
 
+  get txnHash() {
+    return this.args.workflowSession.getValue<string>('relayTokensTxnHash');
+  }
+
   get txViewerUrl() {
     if (!this.txnHash) {
       return '';
     }
+
     return this.layer2Network.blockExplorerUrl(this.txnHash);
   }
 
@@ -160,21 +172,38 @@ class CardPayWithdrawalWorkflowTransactionAmountComponent extends Component<Work
 
       assertBridgedTokenSymbol(currentTokenSymbol);
 
-      let transactionHash = yield this.layer2Network.bridgeToLayer1(
-        this.currentSafe.address,
-        layer1Address!,
-        currentTokenSymbol,
-        withdrawnAmount.toString()
+      this.args.workflowSession.setValue('withdrawnAmount', withdrawnAmount);
+
+      let transactionReceipt: TransactionReceipt;
+
+      if (this.txnHash) {
+        transactionReceipt = yield this.layer2Network.resumeBridgeToLayer1(
+          this.txnHash
+        );
+      } else {
+        let layer2BlockHeight = yield this.layer2Network.getBlockHeight();
+        this.args.workflowSession.setValue(
+          'layer2BlockHeightBeforeBridging',
+          layer2BlockHeight
+        );
+
+        transactionReceipt = yield this.layer2Network.bridgeToLayer1(
+          this.currentSafe.address,
+          layer1Address!,
+          currentTokenSymbol,
+          withdrawnAmount.toString(),
+          {
+            onTxnHash: (txnHash: string) => {
+              this.args.workflowSession.setValue('relayTokensTxnHash', txnHash);
+            },
+          }
+        );
+      }
+
+      this.args.workflowSession.setValue(
+        'relayTokensTxnReceipt',
+        transactionReceipt
       );
-      let layer2BlockHeight = yield this.layer2Network.getBlockHeight();
-
-      this.txnHash = transactionHash;
-
-      this.args.workflowSession.setValue({
-        withdrawnAmount,
-        layer2BlockHeightBeforeBridging: layer2BlockHeight,
-        relayTokensTxnHash: transactionHash,
-      });
       this.args.onComplete?.();
     } catch (e) {
       this.isConfirmed = false;

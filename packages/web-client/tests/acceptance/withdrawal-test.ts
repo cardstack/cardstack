@@ -246,16 +246,7 @@ module('Acceptance | withdrawal', function (hooks) {
     await click(
       `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
     );
-    layer2Service.bridgingToLayer1HashDeferred.resolve('abc123');
-    assert
-      .dom(
-        `${post} [data-test-withdrawal-transaction-amount] [data-test-boxel-button]`
-      )
-      .doesNotExist();
-    assert
-      .dom('[data-test-withdrawal-transaction-amount]')
-      .containsText('Waiting for you to confirm');
-    await waitFor('[data-test-withdrawal-transaction-amount-is-complete]');
+
     assert
       .dom('[data-test-withdrawal-transaction-amount]')
       .containsText('Confirmed');

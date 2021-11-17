@@ -17,6 +17,7 @@ import Layer1Network from '@cardstack/web-client/services/layer1-network';
 import Layer2Network from '@cardstack/web-client/services/layer2-network';
 import { currentNetworkDisplayInfo as c } from '@cardstack/web-client/utils/web3-strategies/network-display-info';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
+import { TransactionReceipt } from 'web3-core';
 
 const A_WHILE = config.environment === 'test' ? 1 : 1000 * 60 * 2;
 
@@ -24,6 +25,7 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
 
+  @tracked blockCount = 0;
   @tracked completedCount = 1;
   @tracked error = false;
 
@@ -41,11 +43,25 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
     ]);
   }
 
+  @task *waitForBlockConfirmationsTask() {
+    let transactionReceipt: TransactionReceipt =
+      this.args.workflowSession.getValue<TransactionReceipt>(
+        'relayTokensTxnReceipt'
+      )!;
+    this.blockCount = 1;
+    let blockNumber = transactionReceipt.blockNumber;
+    while (this.blockCount <= this.totalBlockCount) {
+      yield this.layer2Network.getBlockConfirmation(blockNumber++);
+      this.blockCount++;
+    }
+  }
+
   @task *awaitBridgingTask(): TaskGenerator<void> {
     let { workflowSession } = this.args;
     let relayTokensTxnHash =
       workflowSession.getValue<TransactionHash>('relayTokensTxnHash')!;
     try {
+      yield taskFor(this.waitForBlockConfirmationsTask).perform();
       if (!workflowSession.getValue('bridgeValidationResult')) {
         let result = yield this.layer2Network.awaitBridgedToLayer1(
           this.layer2BlockHeightBeforeBridging!,
@@ -64,6 +80,7 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
       console.error(e);
       Sentry.captureException(e);
       this.error = true;
+      this.blockCount = 0;
     }
   }
 
@@ -74,6 +91,10 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
     yield waitForProperty(this, 'showSlowBridgingMessage', false);
   }
 
+  get totalBlockCount(): number {
+    return this.layer1Network.strategy.bridgeConfirmationBlockCount;
+  }
+
   get isInProgress() {
     return !this.args.workflowSession.getValue('bridgeValidationResult');
   }
@@ -82,6 +103,16 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
     return this.args.workflowSession.getValue(
       'layer2BlockHeightBeforeBridging'
     );
+  }
+
+  get showBridgingSubstate() {
+    return this.blockCount <= this.totalBlockCount;
+  }
+
+  get bridgingSubstate() {
+    if (this.blockCount === 0) return 'Waiting for transaction to be mined';
+    else
+      return `${this.blockCount} of ${this.totalBlockCount} blocks confirmed`;
   }
 
   get progressSteps() {
