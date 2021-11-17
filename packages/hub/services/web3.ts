@@ -3,7 +3,8 @@
 import Web3 from 'web3';
 import config from 'config';
 import Logger from '@cardstack/logger';
-import { getConstantByNetwork } from '@cardstack/cardpay-sdk';
+import { getConstantByNetwork, HttpProvider } from '@cardstack/cardpay-sdk';
+import { provider as Provider } from 'web3-core';
 
 interface Web3Config {
   network: string;
@@ -18,7 +19,9 @@ export default class Web3Service {
   getInstance() {
     if (!this.web3) {
       let rpcURL = getConstantByNetwork('rpcNode', network);
-      this.web3 = new Web3(rpcURL);
+      // We use the special HttpProvider from the SDK which has fixes to deal
+      // with parity annoyances
+      this.web3 = new Web3(new HttpProvider(rpcURL) as Provider);
     }
     return this.web3;
   }
