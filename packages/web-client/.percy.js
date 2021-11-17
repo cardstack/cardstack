@@ -22,7 +22,10 @@ module.exports = {
     }
 
     /* Hide frequently-changing elements: dates, times, and the sidebar application version */
-    .boxel-date-divider__date, .boxel-thread-message__time, .workflow-thread__app-version {
+    .boxel-date-divider__date,
+    .boxel-thread-message__time,
+    .workflow-thread__app-version,
+    .styled-qr-code {
       visibility: hidden;
     }
   `,
