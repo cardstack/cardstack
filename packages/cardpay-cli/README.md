@@ -55,7 +55,7 @@ yarn cardpay safes-view --walletConnect
   - [`cardpay claim-revenue <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-claim-revenue-merchant_safe-token_address-amount---networknetwork---mnemonicmnemonic---walletconnect)
   - [`cardpay claim-revenue-gas-estimate <MERCHANT_SAFE> <TOKEN_ADDRESS> <AMOUNT> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-claim-revenue-gas-estimate-merchant_safe-token_address-amount---networknetwork---mnemonicmnemonic---walletconnect)
   - [`cardpay new-prepaidcard-gas-fee <TOKEN_ADDRESS> --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-new-prepaidcard-gas-fee-token_address---networknetwork---mnemonicmnemonic---walletconnect)
-  - [`cardpay safes-view [ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-safes-view-address---networknetwork---mnemonicmnemonic---walletconnect)
+  - [`cardpay safes-view [ADDRESS] [SAFE_TYPE] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-safes-view-address-safe_type---networknetwork---mnemonicmnemonic---walletconnect)
   - [`cardpay safe-view [SAFE_ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-safe-view-safe_address---networknetwork---mnemonicmnemonic---walletconnect)
   - [`cardpay safe-transfer-tokens [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-safe-transfer-tokens-safe_address-token_address-recipient-amount---networknetwork---mnemonicmnemonic---walletconnect)
   - [`cardpay safe-transfer-tokens-gas-estimate [SAFE_ADDRESS] [TOKEN_ADDRESS] [RECIPIENT] [AMOUNT] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`](#cardpay-safe-transfer-tokens-gas-estimate-safe_address-token_address-recipient-amount---networknetwork---mnemonicmnemonic---walletconnect)
@@ -459,16 +459,17 @@ ARGUMENTS
   MNEMONIC           (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT     (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet
 ```
-## `cardpay safes-view [ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
+## `cardpay safes-view [ADDRESS] [SAFE_TYPE] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]`
 
 View safes that your wallet is the owner of
 
 ```
 USAGE
-  $ cardpay safes-view [ADDRESS] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
+  $ cardpay safes-view [ADDRESS] [SAFE_TYPE] --network=NETWORK [--mnemonic=MNEMONIC] [--walletConnect]
 
 ARGUMENTS
   ADDRESS         (Optional) an address of an owner whose safes you wish to view (defaults to the wallet's default account)
+  SAFE_TYPE       (Optional) The type of safe to view: 'depot', 'merchant', 'prepaid-card', 'reward'
   NETWORK         The network to use ("sokol" or "xdai")
   MNEMONIC        (Optional) Phrase for mnemonic wallet. Also can be pulled from env using MNEMONIC_PHRASE
   WALLET_CONNECT  (Optional) A flag that indicates that you wish to use wallet connect (and hence the card wallet app) for your wallet

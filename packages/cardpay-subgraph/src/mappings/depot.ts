@@ -1,7 +1,14 @@
 import { SupplierSafeCreated, SupplierInfoDIDUpdated } from '../../generated/Depot/SupplierManager';
 import { TokensBridgedToSafe, TokensBridgingInitiated } from '../../generated/TokenBridge/HomeMultiAMBErc20ToErc677';
 import { Depot, BridgeToLayer1Event, BridgeToLayer2Event, SupplierInfoDIDUpdate, Safe } from '../../generated/schema';
-import { makeToken, makeEOATransaction, toChecksumAddress, makeEOATransactionForSafe, makeAccount } from '../utils';
+import {
+  makeToken,
+  makeEOATransaction,
+  toChecksumAddress,
+  makeEOATransactionForSafe,
+  makeAccount,
+  setSafeType,
+} from '../utils';
 import { log, BigInt, Address } from '@graphprotocol/graph-ts';
 import { GnosisSafe } from '../../generated/Gnosis/GnosisSafe';
 
@@ -28,6 +35,8 @@ export function handleReceivedBridgedTokens(event: TokensBridgedToSafe): void {
   bridgeEventEntity.token = makeToken(event.params.token);
   bridgeEventEntity.amount = event.params.value;
   bridgeEventEntity.save();
+
+  setSafeType(safe, 'depot');
   log.debug('created bridge event entity {} for depot {}', [bridgeEventEntity.id, bridgeEventEntity.depot]);
 }
 

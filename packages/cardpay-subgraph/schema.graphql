@@ -410,6 +410,7 @@ type SafeOwner @entity {
   id: ID!               # Set to safe.id-owner.id
   owner: Account!
   safe: Safe!
+  type: String
   createdAt: BigInt!
   ownershipChangedAt: BigInt!
 }

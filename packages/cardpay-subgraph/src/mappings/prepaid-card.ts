@@ -19,6 +19,7 @@ import {
   getPrepaidCardFaceValue,
   makeEOATransactionForSafe,
   makeAccount,
+  setSafeType,
 } from '../utils';
 import { log } from '@graphprotocol/graph-ts';
 
@@ -65,6 +66,8 @@ export function handleCreatePrepaidCard(event: CreatePrepaidCard): void {
   creationEntity.spendAmount = event.params.spendAmount;
   creationEntity.creationGasFeeCollected = event.params.gasFeeCollected;
   creationEntity.save();
+
+  setSafeType(prepaidCard, 'prepaid-card');
 }
 
 export function handleTransferPrepaidCard(event: TransferredPrepaidCard): void {

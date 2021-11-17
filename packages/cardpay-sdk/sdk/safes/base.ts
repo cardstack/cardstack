@@ -61,6 +61,7 @@ export interface TokenInfo {
 
 export interface Options {
   viewAll: boolean;
+  type?: Safe['type'];
 }
 const defaultOptions: Options = { viewAll: false };
 
@@ -159,6 +160,24 @@ const safesQuery = `
   }
 `;
 
+const safesFilteredQuery = `
+  query($account: ID!, $type: String) {
+    account(id: $account) {
+      safes(orderBy:ownershipChangedAt orderDirection:desc, where: {type: $type}) {
+        safe {
+          ${safeQueryFields}
+        }
+      }
+    }
+
+    _meta {
+      block {
+        number
+      }
+    }
+  }
+`;
+
 export async function viewSafe(network: 'xdai' | 'sokol', safeAddress: string): Promise<ViewSafeResult> {
   let {
     data: { safe, _meta },
@@ -196,15 +215,25 @@ export default class Safes {
       _options = { ...defaultOptions, ...(ownerOrOptions ?? {}) };
     }
     _options = { ...defaultOptions, ...(options ?? _options ?? {}) };
-    let {
-      data: { account, _meta },
-    } = await query(this.layer2Web3, safesQuery, { account: owner });
+
+    let account, _meta;
+    if (options?.type) {
+      let type = options.type === 'external' ? null : options.type;
+      ({
+        data: { account, _meta },
+      } = await query(this.layer2Web3, safesFilteredQuery, { account: owner, type }));
+    } else {
+      ({
+        data: { account, _meta },
+      } = await query(this.layer2Web3, safesQuery, { account: owner }));
+    }
     if (account == null) {
       return {
         safes: [],
         blockNumber: _meta.block.number,
       };
     }
+
     let { safes } = account;
     let result: Safe[] = [];
     for (let { safe } of safes as { safe: GraphQLSafeResult }[]) {
