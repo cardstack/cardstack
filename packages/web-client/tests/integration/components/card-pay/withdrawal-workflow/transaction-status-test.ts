@@ -29,6 +29,9 @@ module(
       workflowSession.setValue({
         layer2BlockHeightBeforeBridging: 1234,
         relayTokensTxnHash: 'relay',
+        relayTokensTxnReceipt: {
+          blockNumber: 0,
+        },
         withdrawalToken: 'CARD.CPXD',
         withdrawalSafe: safeAddress,
       });
@@ -57,7 +60,10 @@ module(
         '0xsource',
         '0xdestination',
         'DAI.CPXD',
-        '20'
+        '20',
+        {
+          onTxnHash: () => {},
+        }
       );
     });
 
