@@ -393,7 +393,6 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
         onNonce(nonce);
       }
     }
-    console.log("rewardSafeOwner", rewardSafeOwner);
     let fullSignature = await signRewardSafe(
       this.layer2Web3,
       rewardPoolAddress,

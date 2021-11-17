@@ -579,13 +579,13 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       0,
       tokenAddress
     );
+    // innerEstimate = {
+    //   ...innerEstimate,
+    //   safeTxGas: '0',
+    //   baseGas: '0',
+    //   dataGas: '0',
+    // };
 
-    console.log('innerEstimate', innerEstimate);
-    innerEstimate = {
-      ...innerEstimate,
-      safeTxGas: '10000000',
-      baseGas: '0',
-    };
     let fullSignatureInnerExec = await fullSignatureTxAsBytes(
       this.layer2Web3,
       tokenAddress,
@@ -628,20 +628,23 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
         onNonce(nonce);
       }
     }
-    // let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardManagerAddress, '0', payload, 0, tokenAddress);
+    let estimate = {
+      ...innerEstimate,
+      safeTxGas: '100000000000',
+      baseGas: '0',
+      dataGas: '0',
+    };
+    // estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardManagerAddress, '0', payload, 0, tokenAddress);
+    // console.log(estimate);
     let rewardSafe = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], safeAddress);
     let currentNonce = new BN(await rewardSafe.methods.nonce().call());
-    console.log('nonce', nonce.toString());
-    console.log('currentNonce', currentNonce.toString());
-    console.log('transferNonce', transferNonce.toString());
-    console.log('rewardSafeOwner', rewardSafeOwner);
     let fullSignature = await signRewardSafe(
       this.layer2Web3,
       rewardManagerAddress,
       0,
       payload,
       0,
-      innerEstimate,
+      estimate,
       tokenAddress,
       ZERO_ADDRESS,
       currentNonce,
@@ -657,9 +660,9 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       '0',
       payload,
       '0',
-      innerEstimate.safeTxGas,
-      innerEstimate.baseGas,
-      innerEstimate.gasPrice,
+      estimate.safeTxGas,
+      estimate.baseGas,
+      estimate.gasPrice,
       tokenAddress,
       ZERO_ADDRESS,
       currentNonce.toString()
@@ -669,7 +672,7 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       safeAddress,
       rewardManagerAddress,
       payload,
-      innerEstimate,
+      estimate,
       currentNonce,
       fullSignature,
       eip1271Data

@@ -84,6 +84,29 @@ export async function signSafeTxAsRSV(
   owner: string,
   gnosisSafeAddress: string
 ): Promise<Signature[]> {
+  console.log('owner in sign safe tx as rsv', owner);
+  console.log('to');
+  console.log(to);
+  console.log('value');
+  console.log(value);
+  console.log('data');
+  console.log(data);
+  console.log('operation');
+  console.log(operation);
+  console.log('txGasEstimate');
+  console.log(txGasEstimate);
+  console.log('baseGasEstimate');
+  console.log(baseGasEstimate);
+  console.log('gasPrice');
+  console.log(gasPrice);
+  console.log('txGasToken');
+  console.log(txGasToken);
+  console.log('refundReceiver');
+  console.log(refundReceiver);
+  console.log('nonce');
+  console.log(nonce.toString());
+  console.log('gnosisSafeAddress');
+  console.log(gnosisSafeAddress);
   const typedData = safeTransactionTypedData(
     to,
     value,
@@ -288,6 +311,8 @@ export async function signRewardSafe(
   gnosisSafeAddress: string,
   verifyingContractAddress: string
 ): Promise<any> {
+  console.log('in sign reward safe');
+  console.log('data', data);
   let [ownerSignature] = await signSafeTxAsRSV(
     web3,
     to,
