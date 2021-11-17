@@ -358,7 +358,7 @@ module('Acceptance | persistence view and restore', function () {
       await click('[data-test-workflow-tracker-toggle]');
       await triggerEvent('[data-test-workflow-tracker-item]', 'mouseover');
 
-      assert.dom('[data-test-delete-workflow]').doesNotExist();
+      assert.dom('[data-test-delete-workflow-button]').doesNotExist();
     });
 
     test('completed workflows can be cleared', async function (this: Context, assert) {
