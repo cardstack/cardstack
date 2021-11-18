@@ -135,12 +135,12 @@ module(
       assert.dom('[data-test-deposit-retry-button]').isVisible();
       assert
         .dom('[data-test-deposit-retry-button]')
-        .containsText('Resend signing request');
+        .containsText('Resend Signing Request');
       assert.dom('[data-test-deposit-retry-button]').isEnabled();
       assert
         .dom('[data-test-deposit-error-message]')
         .containsText(
-          `If you haven't received a signing request, make sure to check your connected L1 test chain wallet. You can also try to click on "Resend signing request" below, or contact Cardstack Support.`
+          `If you haven't received a signing request, make sure to check your connected L1 test chain wallet. You can also try to click on "Resend Signing Request" below, or contact Cardstack Support.`
         );
 
       await click('[data-test-deposit-retry-button]');
