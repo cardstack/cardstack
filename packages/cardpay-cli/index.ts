@@ -53,6 +53,7 @@ import {
   removeFromInventory as removePrepaidCardInventory,
   addToInventory as addPrepaidCardInventory,
 } from './prepaid-card-market.js';
+import { Safe } from '@cardstack/cardpay-sdk';
 
 //@ts-ignore polyfilling fetch
 global.fetch = fetch;
@@ -146,6 +147,7 @@ interface Options {
   rewardSafe?: string;
   newAdmin?: string;
   force?: string;
+  safeType?: Exclude<Safe['type'], 'external'>;
 }
 let {
   network,
@@ -186,6 +188,7 @@ let {
   rewardSafe,
   newAdmin,
   force,
+  safeType,
 } = yargs(process.argv.slice(2))
   .scriptName('cardpay')
   .usage('Usage: $0 <command> [options]')
@@ -285,12 +288,16 @@ let {
     }
   )
   .command(
-    'safes-view [address]',
+    'safes-view [address] [safeType]',
     'View contents of the safes owned by the specified address (or default wallet account)',
     (yargs) => {
       yargs.positional('address', {
         type: 'string',
         description: "The address of the safe owner. This defaults to your wallet's default account when not provided",
+      });
+      yargs.positional('safeType', {
+        type: 'string',
+        description: "The type of safe to view: 'depot', 'merchant', 'prepaid-card', 'reward'",
       });
       command = 'safesView';
     }
@@ -971,7 +978,7 @@ if (!command) {
       await claimLayer1BridgedTokens(network, messageId, encodedData, signatures, mnemonic);
       break;
     case 'safesView':
-      await viewSafes(network, address, mnemonic);
+      await viewSafes(network, address, safeType, mnemonic);
       break;
     case 'safeView':
       if (safeAddress == null) {
