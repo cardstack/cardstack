@@ -108,9 +108,9 @@
       <i.ActionButton data-test-deposit-button>
         Depositing
       </i.ActionButton>
-      {{#if this.depositTaskCancelable}}
-        <i.CancelButton {{on "click" this.cancelDeposit}} data-test-deposit-cancel-button>
-          Cancel
+      {{#if this.depositTaskRetriable}}
+        <i.CancelButton {{on "click" this.retryDeposit}} data-test-deposit-retry-button>
+          Retry
         </i.CancelButton>
       {{/if}}
       {{#if this.depositTxnViewerUrl}}

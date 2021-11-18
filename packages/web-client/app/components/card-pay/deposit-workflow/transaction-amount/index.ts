@@ -78,7 +78,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     });
   }
 
-  get depositTaskCancelable() {
+  get depositTaskRetriable() {
     return !this.relayTokensTxnHash && this.depositTaskRunningForAWhile;
   }
 
@@ -213,7 +213,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     }
   }
 
-  @action cancelDeposit() {
+  @action retryDeposit() {
     taskFor(this.depositTask).cancelAll();
     this.depositTaskRunningForAWhile = false;
   }
