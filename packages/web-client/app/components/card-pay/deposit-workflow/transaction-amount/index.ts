@@ -18,23 +18,26 @@ import {
   shouldUseTokenInput,
   validateTokenInput,
 } from '@cardstack/web-client/utils/validation';
-import { bool, reads } from 'macro-decorators';
+import { bool, or, reads } from 'macro-decorators';
 import {
-  forever,
-  race,
+  didCancel,
   rawTimeout,
   task,
   TaskGenerator,
+  TaskInstance,
 } from 'ember-concurrency';
 import { next } from '@ember/runloop';
 import { TransactionHash } from '@cardstack/web-client/utils/web3-strategies/types';
 import config from '@cardstack/web-client/config/environment';
+import { guidFor } from '@ember/object/internals';
 
 const A_WHILE = config.environment === 'test' ? 500 : 1000 * 10;
 
 class CardPayDepositWorkflowTransactionAmountComponent extends Component<WorkflowCardComponentArgs> {
   @service declare layer1Network: Layer1Network;
   @service declare layer2Network: Layer2Network;
+  depositTaskMap: Record<string, TaskInstance<any>> = {};
+
   get currentTokenSymbol(): BridgeableSymbol {
     return this.args.workflowSession.getValue('depositSourceToken')!;
   }
@@ -54,7 +57,8 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     return this.args.workflowSession.getValue('relayTokensTxnReceipt')!;
   }
   @bool('relayTokensTxnReceipt') declare hasDeposited: boolean;
-  @reads('depositTask.isRunning') declare isDepositing: boolean;
+  @or('newDeposit.isRunning', 'depositTask.isRunning')
+  declare isDepositing: boolean;
   @tracked amount = '';
   @tracked errorMessage = '';
   @tracked validationMessage = '';
@@ -79,7 +83,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   }
 
   get depositTaskRetriable() {
-    return !this.relayTokensTxnHash && this.depositTaskRunningForAWhile;
+    return (
+      !this.relayTokensTxnHash &&
+      this.depositTaskRunningForAWhile &&
+      taskFor(this.newDeposit).isRunning
+    );
   }
 
   get currentTokenDetails(): TokenDisplayInfo<BridgeableSymbol> | undefined {
@@ -181,7 +189,6 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     this.depositTaskRunningForAWhile = false;
     yield rawTimeout(A_WHILE);
     this.depositTaskRunningForAWhile = true;
-    yield forever;
   }
 
   @task *unlockTask(): TaskGenerator<void> {
@@ -214,8 +221,57 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
   }
 
   @action retryDeposit() {
-    taskFor(this.depositTask).cancelAll();
-    this.depositTaskRunningForAWhile = false;
+    taskFor(this.newDeposit).perform();
+  }
+
+  @task *newDeposit(): TaskGenerator<void> {
+    try {
+      let session = this.args.workflowSession;
+      let layer2BlockHeightBeforeBridging =
+        yield this.layer2Network.getBlockHeight();
+      let layer2Address = this.layer2Network.walletInfo.firstAddress!;
+      taskFor(this.depositTimerTask).perform();
+      let uid = guidFor({});
+      let task = taskFor(this.layer1Network.relayTokensTask).perform(
+        this.currentTokenSymbol,
+        layer2Address,
+        this.amountAsBigNumber,
+        (txnHash) => {
+          if (this.relayTokensTxnHash) return;
+          session.setValue(
+            'layer2BlockHeightBeforeBridging',
+            layer2BlockHeightBeforeBridging
+          );
+          session.setValue('relayTokensTxnHash', txnHash);
+          this.errorMessage = '';
+          this.depositTaskRunningForAWhile = false;
+          this.cancelDepositsOtherThan(uid);
+        }
+      );
+      session.setValue('setting task', uid);
+      this.depositTaskMap[uid] = task;
+
+      let transactionReceipt = yield task;
+      session.setValue('relayTokensTxnReceipt', transactionReceipt);
+      this.args.onComplete?.();
+    } catch (e) {
+      if (didCancel(e)) {
+        return;
+      }
+      console.error(e);
+      this.errorMessage = `There was a problem initiating the bridging of your tokens to the ${c.layer2.fullName}. This may be due to a network issue, or perhaps you canceled the request in your wallet.`;
+    }
+  }
+
+  cancelDepositsOtherThan(uid: string) {
+    for (let key in this.depositTaskMap) {
+      if (key !== uid) {
+        this.depositTaskMap[key].cancel(
+          'Another transaction successfully returned a transaction hash'
+        );
+        delete this.depositTaskMap[key];
+      }
+    }
   }
 
   @task *depositTask(): TaskGenerator<void> {
@@ -229,28 +285,11 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
         transactionReceipt = yield this.layer1Network.resumeRelayTokens(
           this.relayTokensTxnHash
         );
+        session.setValue('relayTokensTxnReceipt', transactionReceipt);
+        this.args.onComplete?.();
       } else {
-        let layer2Address = this.layer2Network.walletInfo.firstAddress!;
-        let layer2BlockHeightBeforeBridging =
-          yield this.layer2Network.getBlockHeight();
-        session.setValue(
-          'layer2BlockHeightBeforeBridging',
-          layer2BlockHeightBeforeBridging
-        );
-        transactionReceipt = yield race([
-          taskFor(this.depositTimerTask).perform(),
-          taskFor(this.layer1Network.relayTokensTask).perform(
-            this.currentTokenSymbol,
-            layer2Address,
-            this.amountAsBigNumber,
-            (txnHash) => {
-              session.setValue('relayTokensTxnHash', txnHash);
-            }
-          ),
-        ]);
+        taskFor(this.newDeposit).perform();
       }
-      session.setValue('relayTokensTxnReceipt', transactionReceipt);
-      this.args.onComplete?.();
     } catch (e) {
       console.error(e);
       this.errorMessage = `There was a problem initiating the bridging of your tokens to the ${c.layer2.fullName}. This may be due to a network issue, or perhaps you canceled the request in your wallet.`;
