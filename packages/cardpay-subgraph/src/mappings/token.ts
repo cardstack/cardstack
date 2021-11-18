@@ -35,7 +35,10 @@ export function handleTransfer(event: TransferEvent): void {
     if (receiverSafe != null) {
       makeEOATransactionForSafe(event, receiverSafe.id);
 
-      if (receiverSafe.merchant != null) {
+      let revenuePoolAddress = addresses.get('revenuePool') as string;
+      // token transfers from the revenue pool are actually claims, so don't include
+      // those as MerchantDeposits
+      if (receiverSafe.merchant != null && from != revenuePoolAddress) {
         let merchantDepositEntity = new MerchantDeposit(txnHash);
         merchantDepositEntity.timestamp = event.block.timestamp;
         merchantDepositEntity.transaction = txnHash;
