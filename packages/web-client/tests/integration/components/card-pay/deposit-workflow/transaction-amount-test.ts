@@ -133,8 +133,15 @@ module(
       await new Promise((resolve) => setTimeout(() => resolve(true), 500));
 
       assert.dom('[data-test-deposit-retry-button]').isVisible();
+      assert
+        .dom('[data-test-deposit-retry-button]')
+        .containsText('Resend signing request');
       assert.dom('[data-test-deposit-retry-button]').isEnabled();
-      // additional assertions on the error message
+      assert
+        .dom('[data-test-deposit-error-message]')
+        .containsText(
+          `If you haven't received a signing request, make sure to check your connected L1 test chain wallet. You can also try to click on "Resend signing request" below, or contact Cardstack Support.`
+        );
 
       await click('[data-test-deposit-retry-button]');
 
@@ -364,7 +371,7 @@ module(
         assert
           .dom('[data-test-deposit-error-message]')
           .containsText(
-            'Please try again if you want to continue with this workflow, or contact Cardstack support.'
+            'There was a problem initiating the bridging of your tokens to the L2 test chain. This may be due to a network issue, or perhaps you canceled the request in your wallet. Please try again if you want to continue with this workflow, or contact Cardstack support.'
           );
       });
 
