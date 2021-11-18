@@ -43,6 +43,9 @@ class CardPayWithdrawalWorkflowTransactionStatusComponent extends Component<Work
     ]);
   }
 
+  /**
+   * Waiting for block confirmations is to be more certain that we did not relay tokens from the wrong side of a blockchain fork.
+   */
   @task *waitForBlockConfirmationsTask() {
     let transactionReceipt: TransactionReceipt =
       this.args.workflowSession.getValue<TransactionReceipt>(
