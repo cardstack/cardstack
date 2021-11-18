@@ -239,6 +239,7 @@ type MerchantWithdraw @entity {
   merchantSafe: MerchantSafe!
   token: Token!
   amount: BigInt!
+  to: String!
 }
 
 type MerchantDeposit @entity {
@@ -248,6 +249,7 @@ type MerchantDeposit @entity {
   merchantSafe: MerchantSafe!
   token: Token!
   amount: BigInt!
+  from: String!
 }
 
 type MerchantRevenueEvent @entity {

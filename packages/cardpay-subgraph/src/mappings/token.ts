@@ -24,6 +24,7 @@ import { addresses } from '../generated/addresses';
 export function handleTransfer(event: TransferEvent): void {
   let txnHash = event.transaction.hash.toHex();
   let tokenAddress = makeToken(event.address);
+  let relayFunder = addresses.get('relay') as string;
 
   let sender: TokenHolder | null = null;
   let receiver: TokenHolder | null = null;
@@ -42,13 +43,14 @@ export function handleTransfer(event: TransferEvent): void {
         let merchantDepositEntity = new MerchantDeposit(txnHash);
         merchantDepositEntity.timestamp = event.block.timestamp;
         merchantDepositEntity.transaction = txnHash;
-        merchantDepositEntity.merchantSafe = receiverSafe.id;
+        merchantDepositEntity.merchantSafe = to;
         merchantDepositEntity.token = tokenAddress;
         merchantDepositEntity.amount = event.params.value;
+        merchantDepositEntity.from = from;
         merchantDepositEntity.save();
 
-        let revenueEventEntity = makeMerchantRevenueEvent(event, receiverSafe.id, tokenAddress);
-        revenueEventEntity.merchantDeposit = merchantDepositEntity.id;
+        let revenueEventEntity = makeMerchantRevenueEvent(event, to, tokenAddress);
+        revenueEventEntity.merchantDeposit = txnHash;
         revenueEventEntity.save();
       }
     } else {
@@ -61,24 +63,25 @@ export function handleTransfer(event: TransferEvent): void {
     if (senderSafe != null) {
       makeEOATransactionForSafe(event, senderSafe.id);
 
-      if (senderSafe.merchant != null) {
+      // don't count gas payments as merchant withdrawals
+      if (senderSafe.merchant != null && to != relayFunder) {
         let merchantWithdrawEntity = new MerchantWithdraw(txnHash);
         merchantWithdrawEntity.timestamp = event.block.timestamp;
         merchantWithdrawEntity.transaction = txnHash;
-        merchantWithdrawEntity.merchantSafe = senderSafe.id;
+        merchantWithdrawEntity.merchantSafe = from;
         merchantWithdrawEntity.token = tokenAddress;
         merchantWithdrawEntity.amount = event.params.value;
+        merchantWithdrawEntity.to = to;
         merchantWithdrawEntity.save();
 
-        let revenueEventEntity = makeMerchantRevenueEvent(event, senderSafe.id, tokenAddress);
-        revenueEventEntity.merchantWithdraw = merchantWithdrawEntity.id;
+        let revenueEventEntity = makeMerchantRevenueEvent(event, from, tokenAddress);
+        revenueEventEntity.merchantWithdraw = txnHash;
         revenueEventEntity.save();
       }
     } else {
       makeEOATransaction(event, from);
     }
   }
-  let relayFunder = addresses.get('relay') as string;
 
   let transferEntity = new TokenTransfer(tokenAddress + '-' + txnHash + '-' + event.transactionLogIndex.toString());
   transferEntity.transaction = txnHash;
