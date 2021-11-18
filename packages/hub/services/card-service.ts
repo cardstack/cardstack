@@ -1,8 +1,8 @@
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
-import { Filter, Query } from '@cardstack/core/src/query';
+import { baseType, Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
-import { Expression, expressionToSql, param } from '../utils/expressions';
+import { addExplicitParens, any, every, Expression, expressionToSql, param } from '../utils/expressions';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -103,16 +103,36 @@ export class CardService {
 
 function filterToExpression(filter: Filter): Expression {
   if ('any' in filter) {
-    throw unimpl('any');
+    return matchType(any(filter.any.map(filterToExpression)), filter);
   }
   if ('every' in filter) {
-    throw unimpl('every');
+    return matchType(every(filter.every.map(filterToExpression)), filter);
   }
   if ('not' in filter) {
-    throw unimpl('not');
+    return matchType(['NOT', ...addExplicitParens(filterToExpression(filter.not))], filter);
   }
   if ('eq' in filter) {
-    throw unimpl('eq');
+    return matchType(
+      every(
+        Object.entries(filter.eq).map(([fieldPath, value]) => [
+          // this data is the column name
+          'data #>>',
+          param([
+            // this is the top-level jsonapi resource representing the RawCard
+            'data',
+            'attributes',
+            // RawCard has an attribute named "data" whose shape is controlled by
+            // this particular card's schema
+            'data',
+            // user's query targets some path within that card-controlled schema
+            ...fieldPath.split('.'),
+          ]),
+          '=',
+          param(value),
+        ])
+      ),
+      filter
+    );
   }
   if ('range' in filter) {
     throw unimpl('range');
@@ -121,8 +141,16 @@ function filterToExpression(filter: Filter): Expression {
   return [param(filter.type), '= ANY (ancestors)'];
 }
 
+function matchType(baseExpression: Expression, filter: Filter): Expression {
+  if (filter.type) {
+    return every([baseExpression, [param(filter.type), '= ANY (ancestors)']]);
+  } else {
+    return baseExpression;
+  }
+}
+
 function unimpl(which: string) {
-  new Error(`unimpl ${which}`);
+  return new Error(`unimpl ${which}`);
 }
 
 declare module '@cardstack/di' {

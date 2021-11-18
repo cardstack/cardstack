@@ -24,6 +24,7 @@ export function expressionToSql(query: Expression) {
       }
     })
     .join(' ');
+  console.log(text, values);
   return {
     text,
     values,
@@ -59,6 +60,9 @@ export function every(expressions: Expression[]): Expression {
   if (expressions.length === 0) {
     return ['true']; // this is "SQL true", not javascript true
   }
+  if (expressions.length === 1) {
+    return expressions[0];
+  }
   return expressions
     .map((expression) => addExplicitParens(expression))
     .reduce((accum, expression: Expression) => [...accum, 'AND', ...expression]);
@@ -67,6 +71,9 @@ export function every(expressions: Expression[]): Expression {
 export function any(expressions: Expression[]): Expression {
   if (expressions.length === 0) {
     return ['false']; // this is "SQL false", not javascript false
+  }
+  if (expressions.length === 1) {
+    return expressions[0];
   }
   return expressions
     .map((expression) => addExplicitParens(expression))

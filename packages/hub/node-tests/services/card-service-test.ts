@@ -82,6 +82,32 @@ if (process.env.COMPILER) {
           createdAt: new Date(2020, 0, 1),
         },
       });
+
+      await cards.create({
+        url: `${realm}book`,
+        schema: 'schema.js',
+        isolated: 'isolated.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import person from "./person";
+            export default class Post {
+              @contains(person) author;
+            }
+          `,
+          'isolated.js': templateOnlyComponentTemplate('<@field.author.name />'),
+        },
+      });
+
+      await cards.create({
+        url: `${realm}book0`,
+        adoptsFrom: '../book',
+        data: {
+          author: {
+            name: 'Sue',
+          },
+        },
+      });
     });
 
     describe('.load()', function () {
@@ -114,6 +140,34 @@ if (process.env.COMPILER) {
         });
         expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`]);
       });
+    });
+
+    it(`can negate a filter`, async function () {
+      let matching = await cards.query({
+        filter: {
+          type: `${realm}post`,
+          not: { eq: { 'author.name': 'Sue' } },
+        },
+      });
+      expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`]);
+    });
+
+    it(`can combine multiple types`, async function () {
+      let matching = await cards.query({
+        filter: {
+          any: [
+            {
+              type: `${realm}post`,
+              eq: { 'author.name': 'Sue' },
+            },
+            {
+              type: `${realm}book`,
+              eq: { 'author.name': 'Sue' },
+            },
+          ],
+        },
+      });
+      expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`, `${realm}book0`]);
     });
   });
 }
