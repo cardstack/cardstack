@@ -16,9 +16,9 @@
   position: fixed;
   width: 100%;
   height: calc(100vh - var(--boxel-modal-offset-top, 0px));
-  top: var(--boxel-modal-offset-top, 0px);
-  left: var(--boxel-modal-offset-left, 0px);
-  right: var(--boxel-modal-offset-right, 0px);
+  top: var(--boxel-modal-offset-top, 0);
+  left: var(--boxel-modal-offset-left, 0);
+  right: var(--boxel-modal-offset-right, 0);
   padding: 0 var(--boxel-sp);
   background: none;
   border: none;

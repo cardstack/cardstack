@@ -48,6 +48,8 @@ module.exports = async function () {
           devDependencies: {},
         },
       },
+      embroiderSafe(),
+      embroiderOptimized(),
     ],
   };
 };
