@@ -3,7 +3,7 @@ import { setupHub } from '../helpers/server';
 import { templateOnlyComponentTemplate } from '@cardstack/core/tests/helpers/templates';
 
 if (process.env.COMPILER) {
-  describe('CardService', function () {
+  describe.only('CardService', function () {
     this.afterEach(async function () {
       let si = await getContainer().lookup('searchIndex');
       await si.reset();
@@ -38,19 +38,40 @@ if (process.env.COMPILER) {
       });
 
       await cards.create({
+        url: `${realm}dated`,
+        schema: 'schema.js',
+        files: {
+          'schema.js': `
+            import { contains } from "@cardstack/types";
+            import date from "https://cardstack.com/base/date";
+            export default class Dated {
+              @contains(date) createdAt;
+            }
+          `,
+        },
+      });
+
+      await cards.create({
+        url: `${realm}something-else-dated`,
+        adoptsFrom: '../dated',
+        data: {
+          createdAt: new Date(2018, 0, 1),
+        },
+      });
+
+      await cards.create({
         url: `${realm}post`,
+        adoptsFrom: '../dated',
         schema: 'schema.js',
         isolated: 'isolated.js',
         files: {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
-            import date from "https://cardstack.com/base/date";
             import person from "./person";
             export default class Post {
               @contains(string) title;
               @contains(string) body;
-              @contains(date) createdAt;
               @contains(person) author;
             }
           `,
@@ -136,38 +157,53 @@ if (process.env.COMPILER) {
 
       it(`can filter on a nested field using eq`, async function () {
         let matching = await cards.query({
-          filter: { type: `${realm}post`, eq: { 'author.name': 'Sue' } },
+          filter: {
+            on: `${realm}post`,
+            eq: { 'author.name': 'Sue' },
+          },
         });
         expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`]);
       });
-    });
 
-    it(`can negate a filter`, async function () {
-      let matching = await cards.query({
-        filter: {
-          type: `${realm}post`,
-          not: { eq: { 'author.name': 'Sue' } },
-        },
+      it.only(`can negate a filter`, async function () {
+        let matching = await cards.query({
+          filter: {
+            on: `${realm}post`,
+            not: { eq: { 'author.name': 'Sue' } },
+          },
+        });
+        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`]);
       });
-      expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`]);
-    });
 
-    it(`can combine multiple types`, async function () {
-      let matching = await cards.query({
-        filter: {
-          any: [
-            {
-              type: `${realm}post`,
+      it(`can negate a filter that has its own type`, async function () {
+        let matching = await cards.query({
+          filter: {
+            not: {
+              on: `${realm}post`,
               eq: { 'author.name': 'Sue' },
             },
-            {
-              type: `${realm}book`,
-              eq: { 'author.name': 'Sue' },
-            },
-          ],
-        },
+          },
+        });
+        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`]);
       });
-      expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`, `${realm}book0`]);
+
+      it(`can combine multiple types`, async function () {
+        let matching = await cards.query({
+          filter: {
+            any: [
+              {
+                on: `${realm}post`,
+                eq: { 'author.name': 'Sue' },
+              },
+              {
+                on: `${realm}book`,
+                eq: { 'author.name': 'Sue' },
+              },
+            ],
+          },
+        });
+        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`, `${realm}book0`]);
+      });
     });
   });
 }

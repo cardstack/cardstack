@@ -80,10 +80,11 @@ class IndexerRun implements IndexerHandle {
 
   async saveAndReturn(card: RawCard): Promise<CompiledCard> {
     let compiledCard = await this.builder.compileCardFromRaw(card);
-    await this.db.query(`INSERT into cards (url, ancestors, data) VALUES ($1, $2, $3)`, [
+    await this.db.query(`INSERT into cards (url, ancestors, data, "searchData") VALUES ($1, $2, $3, $4)`, [
       card.url,
       ancestorsOf(compiledCard),
       serializeRawCard(card, compiledCard),
+      card.data ? searchOptimizedData(card.data, compiledCard) : null,
     ]);
     return compiledCard;
   }
@@ -102,6 +103,24 @@ function ancestorsOf(compiledCard: CompiledCard): string[] {
     return [];
   }
   return [compiledCard.adoptsFrom.url, ...ancestorsOf(compiledCard.adoptsFrom)];
+}
+
+function searchOptimizedData(data: Record<string, any>, compiled: CompiledCard): Record<string, any> {
+  let result: Record<string, any> = {};
+
+  for (let fieldName of Object.keys(compiled.fields)) {
+    let currentCard: CompiledCard | undefined = compiled;
+    do {
+      let entry = result[currentCard.url];
+      if (!entry) {
+        entry = result[currentCard.url] = {};
+      }
+      entry[fieldName] = data[fieldName];
+      currentCard = currentCard.adoptsFrom;
+    } while (currentCard && currentCard.fields[fieldName]);
+  }
+
+  return result;
 }
 
 declare module '@cardstack/di' {

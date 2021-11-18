@@ -1,6 +1,6 @@
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
-import { baseType, Filter, Query } from '@cardstack/core/src/query';
+import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
 import { addExplicitParens, any, every, Expression, expressionToSql, param } from '../utils/expressions';
 
@@ -82,7 +82,7 @@ export class CardService {
     try {
       let expression: Expression = ['select data from cards'];
       if (query.filter) {
-        expression = [...expression, 'where', ...filterToExpression(query.filter)];
+        expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
       let result = await client.query<{ data: any }>(expressionToSql(expression));
       let deserializer = new RawCardDeserializer();
@@ -101,52 +101,34 @@ export class CardService {
   teardown() {}
 }
 
-function filterToExpression(filter: Filter): Expression {
+function filterToExpression(filter: Filter, parentType: string): Expression {
+  if ('type' in filter) {
+    return [param(filter.type), '= ANY (ancestors)'];
+  }
+
+  let on = filter?.on ?? parentType;
   if ('any' in filter) {
-    return matchType(any(filter.any.map(filterToExpression)), filter);
+    return any(filter.any.map((expr) => filterToExpression(expr, on)));
   }
   if ('every' in filter) {
-    return matchType(every(filter.every.map(filterToExpression)), filter);
+    return every(filter.every.map((expr) => filterToExpression(expr, on)));
   }
   if ('not' in filter) {
-    return matchType(['NOT', ...addExplicitParens(filterToExpression(filter.not))], filter);
+    return ['NOT', ...addExplicitParens(filterToExpression(filter.not, on))];
   }
   if ('eq' in filter) {
-    return matchType(
-      every(
-        Object.entries(filter.eq).map(([fieldPath, value]) => [
-          // this data is the column name
-          'data #>>',
-          param([
-            // this is the top-level jsonapi resource representing the RawCard
-            'data',
-            'attributes',
-            // RawCard has an attribute named "data" whose shape is controlled by
-            // this particular card's schema
-            'data',
-            // user's query targets some path within that card-controlled schema
-            ...fieldPath.split('.'),
-          ]),
-          '=',
-          param(value),
-        ])
-      ),
-      filter
+    return every(
+      Object.entries(filter.eq).map(([fieldPath, value]) => {
+        let segments = fieldPath.split('.');
+        let lastSegment = segments.pop()!;
+        return every([
+          ['"searchData" #>', param([on, ...segments]), '? cast(', param(lastSegment), 'as text)'],
+          ['"searchData" #>>', param([on, ...segments, lastSegment]), 'IS NOT DISTINCT FROM', param(value)],
+        ]);
+      })
     );
   }
-  if ('range' in filter) {
-    throw unimpl('range');
-  }
-
-  return [param(filter.type), '= ANY (ancestors)'];
-}
-
-function matchType(baseExpression: Expression, filter: Filter): Expression {
-  if (filter.type) {
-    return every([baseExpression, [param(filter.type), '= ANY (ancestors)']]);
-  } else {
-    return baseExpression;
-  }
+  throw unimpl('range');
 }
 
 function unimpl(which: string) {

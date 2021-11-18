@@ -15,7 +15,7 @@ export type Filter = AnyFilter | EveryFilter | NotFilter | EqFilter | RangeFilte
 export type InteriorFilter = Exclude<Filter, CardTypeFilter>;
 
 export interface TypedFilter {
-  type?: CardURL;
+  on?: CardURL;
 }
 
 // The CardTypeFilter is used when you solely want to filter for all cards that
@@ -50,10 +50,6 @@ export interface RangeFilter extends TypedFilter {
       lte?: JSON.Primitive;
     };
   };
-}
-
-export function baseType(filter: Filter | undefined): CardURL {
-  return filter?.type || 'https://cardstack.com/base/base';
 }
 
 export function assertQuery(query: any, pointer: string[] = ['']): asserts query is Query {

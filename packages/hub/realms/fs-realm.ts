@@ -38,7 +38,7 @@ export default class FSRealm implements RealmInterface {
 
   // async reindex(ops: IndexingOperations, meta: Meta | undefined): Promise<Meta> {
   async reindex(ops: IndexerHandle): Promise<void> {
-    this.logger.log(`Indexing realm: ${this.url}`);
+    this.logger.info(`Indexing realm: ${this.url}`);
 
     await ops.beginReplaceAll();
     let cards = walkSync(this.directory, { globs: ['**/card.json'] });
