@@ -165,17 +165,7 @@ if (process.env.COMPILER) {
         expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`]);
       });
 
-      it.only(`can negate a filter`, async function () {
-        let matching = await cards.query({
-          filter: {
-            on: `${realm}post`,
-            not: { eq: { 'author.name': 'Sue' } },
-          },
-        });
-        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`]);
-      });
-
-      it(`can negate a filter that has its own type`, async function () {
+      it(`can negate a filter`, async function () {
         let matching = await cards.query({
           filter: {
             not: {

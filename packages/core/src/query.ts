@@ -25,15 +25,15 @@ export interface CardTypeFilter {
   type: CardURL;
 }
 
-export interface AnyFilter extends TypedFilter {
+export interface AnyFilter {
   any: InteriorFilter[];
 }
 
-export interface EveryFilter extends TypedFilter {
+export interface EveryFilter {
   every: InteriorFilter[];
 }
 
-export interface NotFilter extends TypedFilter {
+export interface NotFilter {
   not: InteriorFilter;
 }
 

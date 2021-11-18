@@ -1,6 +1,6 @@
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
-import { Filter, Query } from '@cardstack/core/src/query';
+import { Filter, Query, TypedFilter } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
 import { addExplicitParens, any, every, Expression, expressionToSql, param } from '../utils/expressions';
 
@@ -82,7 +82,7 @@ export class CardService {
     try {
       let expression: Expression = ['select data from cards'];
       if (query.filter) {
-        expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
+        expression = [...expression, 'where', ...filterToExpression(query.filter)];
       }
       let result = await client.query<{ data: any }>(expressionToSql(expression));
       let deserializer = new RawCardDeserializer();
@@ -101,34 +101,42 @@ export class CardService {
   teardown() {}
 }
 
-function filterToExpression(filter: Filter, parentType: string): Expression {
+function filterToExpression(filter: Filter): Expression {
   if ('type' in filter) {
     return [param(filter.type), '= ANY (ancestors)'];
   }
-
-  let on = filter?.on ?? parentType;
   if ('any' in filter) {
-    return any(filter.any.map((expr) => filterToExpression(expr, on)));
+    return any(filter.any.map(filterToExpression));
   }
   if ('every' in filter) {
-    return every(filter.every.map((expr) => filterToExpression(expr, on)));
+    return every(filter.every.map(filterToExpression));
   }
   if ('not' in filter) {
-    return ['NOT', ...addExplicitParens(filterToExpression(filter.not, on))];
+    return ['NOT', ...addExplicitParens(filterToExpression(filter.not))];
   }
   if ('eq' in filter) {
-    return every(
-      Object.entries(filter.eq).map(([fieldPath, value]) => {
-        let segments = fieldPath.split('.');
-        let lastSegment = segments.pop()!;
-        return every([
-          ['"searchData" #>', param([on, ...segments]), '? cast(', param(lastSegment), 'as text)'],
-          ['"searchData" #>>', param([on, ...segments, lastSegment]), 'IS NOT DISTINCT FROM', param(value)],
-        ]);
-      })
+    let on = filter.on ?? 'https://cardstack.com/base/base';
+    return typedFilter(
+      every(
+        Object.entries(filter.eq).map(([fieldPath, value]) => [
+          '"searchData" #>>',
+          param([on, ...fieldPath.split('.')]),
+          'IS NOT DISTINCT FROM',
+          param(value),
+        ])
+      ),
+      filter
     );
   }
   throw unimpl('range');
+}
+
+function typedFilter(baseExpression: Expression, filter: TypedFilter): Expression {
+  if (filter.on) {
+    return every([baseExpression, [param(filter.on), '= ANY (ancestors)']]);
+  } else {
+    return baseExpression;
+  }
 }
 
 function unimpl(which: string) {
