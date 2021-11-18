@@ -16,6 +16,7 @@ import {
   MerchantRevenueEvent,
   MerchantDeposit,
   MerchantWithdraw,
+  MerchantSafe,
 } from '../../generated/schema';
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit';
 import { Transfer as TransferEvent, ERC20 } from '../erc-20/ERC20';
@@ -39,7 +40,7 @@ export function handleTransfer(event: TransferEvent): void {
       let revenuePoolAddress = addresses.get('revenuePool') as string;
       // token transfers from the revenue pool are actually claims, so don't include
       // those as MerchantDeposits
-      if (receiverSafe.merchant != null && from != revenuePoolAddress) {
+      if (MerchantSafe.load(to) != null && from != revenuePoolAddress) {
         let merchantDepositEntity = new MerchantDeposit(txnHash);
         merchantDepositEntity.timestamp = event.block.timestamp;
         merchantDepositEntity.transaction = txnHash;
@@ -64,7 +65,7 @@ export function handleTransfer(event: TransferEvent): void {
       makeEOATransactionForSafe(event, senderSafe.id);
 
       // don't count gas payments as merchant withdrawals
-      if (senderSafe.merchant != null && to != relayFunder) {
+      if (MerchantSafe.load(from) != null && to != relayFunder) {
         let merchantWithdrawEntity = new MerchantWithdraw(txnHash);
         merchantWithdrawEntity.timestamp = event.block.timestamp;
         merchantWithdrawEntity.transaction = txnHash;

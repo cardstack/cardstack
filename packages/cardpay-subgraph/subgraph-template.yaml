@@ -498,6 +498,9 @@ dataSources:
         - TokenHistory
         - Transaction
         - EOATransaction
+        - MerchantDeposit
+        - MerchantWithdraw
+        - MerchantRevenueEvent
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
@@ -533,6 +536,9 @@ dataSources:
         - TokenHistory
         - Transaction
         - EOATransaction
+        - MerchantDeposit
+        - MerchantWithdraw
+        - MerchantRevenueEvent
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
