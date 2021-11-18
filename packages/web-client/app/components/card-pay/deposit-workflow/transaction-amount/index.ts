@@ -82,7 +82,7 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     });
   }
 
-  get depositTaskRetriable() {
+  get depositTaskRetryable() {
     return (
       !this.relayTokensTxnHash &&
       this.depositTaskRunningForAWhile &&
