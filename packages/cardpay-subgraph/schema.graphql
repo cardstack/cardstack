@@ -232,6 +232,24 @@ type MerchantClaim @entity {
   amount: BigInt!
 }
 
+type MerchantWithdraw @entity {
+  id: ID!
+  timestamp: BigInt!
+  transaction: Transaction!
+  merchantSafe: MerchantSafe!
+  token: Token!
+  amount: BigInt!
+}
+
+type MerchantDeposit @entity {
+  id: ID!
+  timestamp: BigInt!
+  transaction: Transaction!
+  merchantSafe: MerchantSafe!
+  token: Token!
+  amount: BigInt!
+}
+
 type MerchantRevenueEvent @entity {
   id: ID!
   transaction: Transaction!
@@ -241,6 +259,8 @@ type MerchantRevenueEvent @entity {
   merchantRevenue: MerchantRevenue!
   prepaidCardPayment: PrepaidCardPayment
   merchantClaim: MerchantClaim
+  merchantWithdraw: MerchantWithdraw
+  MerchantDeposit: MerchantDeposit
 }
 
 type SpendAccumulation @entity {

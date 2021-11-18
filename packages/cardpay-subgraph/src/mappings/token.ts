@@ -17,6 +17,7 @@ export function handleTransfer(event: TransferEvent): void {
     let receiverSafe = Safe.load(to);
     if (receiverSafe != null) {
       makeEOATransactionForSafe(event, receiverSafe.id);
+      // TODO handle merchant deposit
     } else {
       makeEOATransaction(event, to);
     }
@@ -26,6 +27,7 @@ export function handleTransfer(event: TransferEvent): void {
     let senderSafe = Safe.load(from);
     if (senderSafe != null) {
       makeEOATransactionForSafe(event, senderSafe.id);
+      // TODO handle merchant withdraw
     } else {
       makeEOATransaction(event, from);
     }
@@ -98,3 +100,5 @@ function makeAccount(address: Address): string {
   entity.save();
   return account;
 }
+
+function makeMerchantRevenueEvent(merchantSafe: string, token: string) {}
