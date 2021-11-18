@@ -12,15 +12,15 @@ module('Integration | Helper | dayjs-format', function (hooks) {
   setupRenderingTest(hooks);
 
   test('one arg (date)', async function (assert) {
-    this.set('date', date(date(0)));
+    this.set('date', '2020-01-02');
     await render(hbs`{{dayjs-format this.date}}`);
-    assert.equal(this.element.textContent.trim(), '1 January, 1970');
+    assert.equal(this.element.textContent.trim(), '2 January, 2020');
   });
 
   test('two args (date, inputFormat)', async function (assert) {
     this.setProperties({
       format: 'MMMM D, YYYY',
-      date: dayjs(Date.parse('2011-10-10')),
+      date: dayjs(new Date(2011, 9, 10)),
     });
 
     await render(hbs`{{dayjs-format this.date this.format}}`);
@@ -41,10 +41,10 @@ module('Integration | Helper | dayjs-format', function (hooks) {
   });
 
   test('works with change in input', async function (assert) {
-    this.set('date', date(0));
+    this.set('date', '2020-01-02');
 
     await render(hbs`{{dayjs-format this.date}}`);
-    assert.equal(this.element.textContent.trim(), '1 January, 1970');
+    assert.equal(this.element.textContent.trim(), '2 January, 2020');
 
     this.set('date', date('5/3/10'));
     assert.equal(this.element.textContent.trim(), '3 May, 2010');
