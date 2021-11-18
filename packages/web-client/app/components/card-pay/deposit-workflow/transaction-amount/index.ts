@@ -248,7 +248,6 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
           this.cancelDepositsOtherThan(uid);
         }
       );
-      session.setValue('setting task', uid);
       this.depositTaskMap[uid] = task;
 
       let transactionReceipt = yield task;
