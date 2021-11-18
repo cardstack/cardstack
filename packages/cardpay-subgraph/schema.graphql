@@ -260,7 +260,7 @@ type MerchantRevenueEvent @entity {
   prepaidCardPayment: PrepaidCardPayment
   merchantClaim: MerchantClaim
   merchantWithdraw: MerchantWithdraw
-  MerchantDeposit: MerchantDeposit
+  merchantDeposit: MerchantDeposit
 }
 
 type SpendAccumulation @entity {

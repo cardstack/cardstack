@@ -1,11 +1,28 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts';
-import { makeToken, makeEOATransaction, makeEOATransactionForSafe, toChecksumAddress } from '../utils';
-import { Safe, Account, TokenTransfer, TokenHolder, TokenHistory } from '../../generated/schema';
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
+import { RevenuePool } from '../../generated/RevenuePool/RevenuePool';
+import {
+  makeToken,
+  makeEOATransaction,
+  makeEOATransactionForSafe,
+  toChecksumAddress,
+  makeMerchantRevenue,
+} from '../utils';
+import {
+  Safe,
+  Account,
+  TokenTransfer,
+  TokenHolder,
+  TokenHistory,
+  MerchantRevenueEvent,
+  MerchantDeposit,
+  MerchantWithdraw,
+} from '../../generated/schema';
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit';
 import { Transfer as TransferEvent, ERC20 } from '../erc-20/ERC20';
 import { addresses } from '../generated/addresses';
 
 export function handleTransfer(event: TransferEvent): void {
+  let txnHash = event.transaction.hash.toHex();
   let tokenAddress = makeToken(event.address);
 
   let sender: TokenHolder | null = null;
@@ -17,7 +34,20 @@ export function handleTransfer(event: TransferEvent): void {
     let receiverSafe = Safe.load(to);
     if (receiverSafe != null) {
       makeEOATransactionForSafe(event, receiverSafe.id);
-      // TODO handle merchant deposit
+
+      if (receiverSafe.merchant != null) {
+        let merchantDepositEntity = new MerchantDeposit(txnHash);
+        merchantDepositEntity.timestamp = event.block.timestamp;
+        merchantDepositEntity.transaction = txnHash;
+        merchantDepositEntity.merchantSafe = receiverSafe.id;
+        merchantDepositEntity.token = tokenAddress;
+        merchantDepositEntity.amount = event.params.value;
+        merchantDepositEntity.save();
+
+        let revenueEventEntity = makeMerchantRevenueEvent(event, receiverSafe.id, tokenAddress);
+        revenueEventEntity.merchantDeposit = merchantDepositEntity.id;
+        revenueEventEntity.save();
+      }
     } else {
       makeEOATransaction(event, to);
     }
@@ -27,12 +57,24 @@ export function handleTransfer(event: TransferEvent): void {
     let senderSafe = Safe.load(from);
     if (senderSafe != null) {
       makeEOATransactionForSafe(event, senderSafe.id);
-      // TODO handle merchant withdraw
+
+      if (senderSafe.merchant != null) {
+        let merchantWithdrawEntity = new MerchantWithdraw(txnHash);
+        merchantWithdrawEntity.timestamp = event.block.timestamp;
+        merchantWithdrawEntity.transaction = txnHash;
+        merchantWithdrawEntity.merchantSafe = senderSafe.id;
+        merchantWithdrawEntity.token = tokenAddress;
+        merchantWithdrawEntity.amount = event.params.value;
+        merchantWithdrawEntity.save();
+
+        let revenueEventEntity = makeMerchantRevenueEvent(event, senderSafe.id, tokenAddress);
+        revenueEventEntity.merchantWithdraw = merchantWithdrawEntity.id;
+        revenueEventEntity.save();
+      }
     } else {
       makeEOATransaction(event, from);
     }
   }
-  let txnHash = event.transaction.hash.toHex();
   let relayFunder = addresses.get('relay') as string;
 
   let transferEntity = new TokenTransfer(tokenAddress + '-' + txnHash + '-' + event.transactionLogIndex.toString());
@@ -101,4 +143,22 @@ function makeAccount(address: Address): string {
   return account;
 }
 
-function makeMerchantRevenueEvent(merchantSafe: string, token: string) {}
+function makeMerchantRevenueEvent(event: ethereum.Event, merchantSafe: string, token: string): MerchantRevenueEvent {
+  let txnHash = event.transaction.hash.toHex();
+  let revenuePoolAddress = addresses.get('revenuePool') as string;
+  let revenueEntity = makeMerchantRevenue(merchantSafe, token);
+  let revenuePool = RevenuePool.bind(Address.fromString(revenuePoolAddress));
+  revenueEntity.unclaimedBalance = revenuePool.revenueBalance(
+    Address.fromString(merchantSafe),
+    Address.fromString(token)
+  );
+  revenueEntity.save();
+
+  let revenueEventEntity = new MerchantRevenueEvent(txnHash);
+  revenueEventEntity.transaction = txnHash;
+  revenueEventEntity.timestamp = event.block.timestamp;
+  revenueEventEntity.merchantRevenue = revenueEntity.id;
+  revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
+  revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;
+  return revenueEventEntity;
+}

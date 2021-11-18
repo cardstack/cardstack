@@ -507,6 +507,8 @@ dataSources:
           file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
+        - name: RevenuePool
+          file: ./abis/generated/RevenuePool.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -540,6 +542,8 @@ dataSources:
           file: ./abis/ERC20NameBytes.json
         - name: GnosisSafe
           file: ./abis/GnosisSafe.json
+        - name: RevenuePool
+          file: ./abis/generated/RevenuePool.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
