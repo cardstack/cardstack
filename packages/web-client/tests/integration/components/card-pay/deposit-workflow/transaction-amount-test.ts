@@ -347,12 +347,12 @@ module(
         });
 
         await render(hbs`
-        <CardPay::DepositWorkflow::TransactionAmount
-          @workflowSession={{this.session}}
-          @onComplete={{this.onComplete}}
-          @onIncomplete={{noop}}
-        />
-      `);
+          <CardPay::DepositWorkflow::TransactionAmount
+            @workflowSession={{this.session}}
+            @onComplete={{this.onComplete}}
+            @onIncomplete={{noop}}
+          />
+        `);
 
         await layer1Service.test__simulateUnlock();
 
