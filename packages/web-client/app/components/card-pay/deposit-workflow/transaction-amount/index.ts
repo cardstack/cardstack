@@ -222,6 +222,8 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
     this.errorMessage = '';
     let session = this.args.workflowSession;
     try {
+      session.setValue('depositedAmount', this.amountAsBigNumber);
+
       let transactionReceipt;
       if (this.relayTokensTxnHash) {
         transactionReceipt = yield this.layer1Network.resumeRelayTokens(
@@ -248,7 +250,6 @@ class CardPayDepositWorkflowTransactionAmountComponent extends Component<Workflo
         ]);
       }
       session.setValue('relayTokensTxnReceipt', transactionReceipt);
-      session.setValue('depositedAmount', this.amountAsBigNumber);
       this.args.onComplete?.();
     } catch (e) {
       console.error(e);
