@@ -1,12 +1,31 @@
-import { Address, BigInt } from '@graphprotocol/graph-ts';
-import { makeToken, makeEOATransaction, makeEOATransactionForSafe, toChecksumAddress } from '../utils';
-import { Safe, Account, TokenTransfer, TokenHolder, TokenHistory } from '../../generated/schema';
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
+import { RevenuePool } from '../../generated/RevenuePool/RevenuePool';
+import {
+  makeToken,
+  makeEOATransaction,
+  makeEOATransactionForSafe,
+  toChecksumAddress,
+  makeMerchantRevenue,
+} from '../utils';
+import {
+  Safe,
+  Account,
+  TokenTransfer,
+  TokenHolder,
+  TokenHistory,
+  MerchantRevenueEvent,
+  MerchantDeposit,
+  MerchantWithdraw,
+  MerchantSafe,
+} from '../../generated/schema';
 import { ZERO_ADDRESS } from '@protofire/subgraph-toolkit';
 import { Transfer as TransferEvent, ERC20 } from '../erc-20/ERC20';
 import { addresses } from '../generated/addresses';
 
 export function handleTransfer(event: TransferEvent): void {
+  let txnHash = event.transaction.hash.toHex();
   let tokenAddress = makeToken(event.address);
+  let relayFunder = addresses.get('relay') as string;
 
   let sender: TokenHolder | null = null;
   let receiver: TokenHolder | null = null;
@@ -17,6 +36,24 @@ export function handleTransfer(event: TransferEvent): void {
     let receiverSafe = Safe.load(to);
     if (receiverSafe != null) {
       makeEOATransactionForSafe(event, receiverSafe.id);
+
+      let revenuePoolAddress = addresses.get('revenuePool') as string;
+      // token transfers from the revenue pool are actually claims, so don't include
+      // those as MerchantDeposits
+      if (MerchantSafe.load(to) != null && from != revenuePoolAddress) {
+        let merchantDepositEntity = new MerchantDeposit(txnHash);
+        merchantDepositEntity.timestamp = event.block.timestamp;
+        merchantDepositEntity.transaction = txnHash;
+        merchantDepositEntity.merchantSafe = to;
+        merchantDepositEntity.token = tokenAddress;
+        merchantDepositEntity.amount = event.params.value;
+        merchantDepositEntity.from = from;
+        merchantDepositEntity.save();
+
+        let revenueEventEntity = makeMerchantRevenueEvent(event, to, tokenAddress);
+        revenueEventEntity.merchantDeposit = txnHash;
+        revenueEventEntity.save();
+      }
     } else {
       makeEOATransaction(event, to);
     }
@@ -26,12 +63,26 @@ export function handleTransfer(event: TransferEvent): void {
     let senderSafe = Safe.load(from);
     if (senderSafe != null) {
       makeEOATransactionForSafe(event, senderSafe.id);
+
+      // don't count gas payments as merchant withdrawals
+      if (MerchantSafe.load(from) != null && to != relayFunder) {
+        let merchantWithdrawEntity = new MerchantWithdraw(txnHash);
+        merchantWithdrawEntity.timestamp = event.block.timestamp;
+        merchantWithdrawEntity.transaction = txnHash;
+        merchantWithdrawEntity.merchantSafe = from;
+        merchantWithdrawEntity.token = tokenAddress;
+        merchantWithdrawEntity.amount = event.params.value;
+        merchantWithdrawEntity.to = to;
+        merchantWithdrawEntity.save();
+
+        let revenueEventEntity = makeMerchantRevenueEvent(event, from, tokenAddress);
+        revenueEventEntity.merchantWithdraw = txnHash;
+        revenueEventEntity.save();
+      }
     } else {
       makeEOATransaction(event, from);
     }
   }
-  let txnHash = event.transaction.hash.toHex();
-  let relayFunder = addresses.get('relay') as string;
 
   let transferEntity = new TokenTransfer(tokenAddress + '-' + txnHash + '-' + event.transactionLogIndex.toString());
   transferEntity.transaction = txnHash;
@@ -97,4 +148,24 @@ function makeAccount(address: Address): string {
   let entity = new Account(account);
   entity.save();
   return account;
+}
+
+function makeMerchantRevenueEvent(event: ethereum.Event, merchantSafe: string, token: string): MerchantRevenueEvent {
+  let txnHash = event.transaction.hash.toHex();
+  let revenuePoolAddress = addresses.get('revenuePool') as string;
+  let revenueEntity = makeMerchantRevenue(merchantSafe, token);
+  let revenuePool = RevenuePool.bind(Address.fromString(revenuePoolAddress));
+  revenueEntity.unclaimedBalance = revenuePool.revenueBalance(
+    Address.fromString(merchantSafe),
+    Address.fromString(token)
+  );
+  revenueEntity.save();
+
+  let revenueEventEntity = new MerchantRevenueEvent(txnHash);
+  revenueEventEntity.transaction = txnHash;
+  revenueEventEntity.timestamp = event.block.timestamp;
+  revenueEventEntity.merchantRevenue = revenueEntity.id;
+  revenueEventEntity.historicLifetimeAccumulation = revenueEntity.lifetimeAccumulation;
+  revenueEventEntity.historicUnclaimedBalance = revenueEntity.unclaimedBalance;
+  return revenueEventEntity;
 }

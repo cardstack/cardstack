@@ -140,6 +140,7 @@ writeFileSync(
 export let addresses = new Map<string, string>();
 addresses.set("prepaidCardManager", "${getAddress('prepaidCardManager', cleanNetwork)}");
 addresses.set("relay", "${getAddress('relay', cleanNetwork)}");
+addresses.set("revenuePool", "${getAddress('revenuePool', cleanNetwork)}");
 `
 );
 
