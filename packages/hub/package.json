@@ -86,7 +86,7 @@
     "walk-sync": "^2.2.0",
     "web3": "1.5.2",
     "web3-core": "1.5.2",
-    "web3.storage": "^3.3.3",
+    "web3.storage": "^3.3.4",
     "yargs": "^17.0.0"
   },
   "devDependencies": {
