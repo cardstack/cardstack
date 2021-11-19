@@ -51,5 +51,8 @@
     "sku": "BETA_TEST_SKU",
     "discordRole": "CARDBOT_BETA_TESTER_ROLE"
   },
+  "web3storage": {
+    "token": "WEB3_STORAGE_TOKEN"
+  },
   "serverSecret": "SERVER_SECRET"
 }
