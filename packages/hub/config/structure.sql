@@ -694,6 +694,18 @@ CREATE TABLE public.card_spaces (
 ALTER TABLE public.card_spaces OWNER TO postgres;
 
 --
+-- Name: cards; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.cards (
+    url text NOT NULL,
+    data jsonb
+);
+
+
+ALTER TABLE public.cards OWNER TO postgres;
+
+--
 -- Name: discord_bots; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -958,6 +970,14 @@ ALTER TABLE ONLY public.beta_testers
 
 ALTER TABLE ONLY public.card_spaces
     ADD CONSTRAINT card_spaces_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cards cards_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.cards
+    ADD CONSTRAINT cards_pkey PRIMARY KEY (url);
 
 
 --
