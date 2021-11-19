@@ -33,21 +33,21 @@ module.exports = async function () {
           },
         },
       },
-      {
-        name: 'ember-canary',
-        allowedToFail: true,
-        npm: {
-          devDependencies: {
-            'ember-source': await getChannelURL('canary'),
-          },
-        },
-      },
-      {
-        name: 'ember-default',
-        npm: {
-          devDependencies: {},
-        },
-      },
+      // {
+      //   name: 'ember-canary',
+      //   allowedToFail: true,
+      //   npm: {
+      //     devDependencies: {
+      //       'ember-source': await getChannelURL('canary'),
+      //     },
+      //   },
+      // },
+      // {
+      //   name: 'ember-default',
+      //   npm: {
+      //     devDependencies: {},
+      //   },
+      // },
     ],
   };
 };
