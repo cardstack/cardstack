@@ -168,10 +168,17 @@ if (process.env.COMPILER) {
       it(`can negate a filter`, async function () {
         let matching = await cards.query({
           filter: {
-            not: {
-              on: `${realm}post`,
-              eq: { 'author.name': 'Sue' },
-            },
+            every: [
+              {
+                type: `${realm}post`,
+              },
+              {
+                on: `${realm}post`,
+                not: {
+                  eq: { 'author.name': 'Sue' },
+                },
+              },
+            ],
           },
         });
         expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`]);

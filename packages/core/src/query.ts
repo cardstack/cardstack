@@ -12,7 +12,6 @@ export interface Query {
 
 export type CardURL = string;
 export type Filter = AnyFilter | EveryFilter | NotFilter | EqFilter | RangeFilter | CardTypeFilter;
-export type InteriorFilter = Exclude<Filter, CardTypeFilter>;
 
 export interface TypedFilter {
   on?: CardURL;
@@ -25,16 +24,16 @@ export interface CardTypeFilter {
   type: CardURL;
 }
 
-export interface AnyFilter {
-  any: InteriorFilter[];
+export interface AnyFilter extends TypedFilter {
+  any: Filter[];
 }
 
-export interface EveryFilter {
-  every: InteriorFilter[];
+export interface EveryFilter extends TypedFilter {
+  every: Filter[];
 }
 
-export interface NotFilter {
-  not: InteriorFilter;
+export interface NotFilter extends TypedFilter {
+  not: Filter;
 }
 
 export interface EqFilter extends TypedFilter {
@@ -128,6 +127,10 @@ function assertFilter(filter: any, pointer: string[]): asserts filter is Filter 
     if (isEqual(Object.keys(filter), ['type'])) {
       return; // This is a pure card type filter
     }
+  }
+
+  if ('on' in filter) {
+    assertCardId(filter.on, pointer.concat('on'));
   }
 
   if ('any' in filter) {

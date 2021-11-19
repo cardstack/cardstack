@@ -82,7 +82,7 @@ export class CardService {
     try {
       let expression: Expression = ['select data from cards'];
       if (query.filter) {
-        expression = [...expression, 'where', ...filterToExpression(query.filter)];
+        expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
       let result = await client.query<{ data: any }>(expressionToSql(expression));
       let deserializer = new RawCardDeserializer();
@@ -101,21 +101,23 @@ export class CardService {
   teardown() {}
 }
 
-function filterToExpression(filter: Filter): Expression {
+function filterToExpression(filter: Filter, parentType: string): Expression {
   if ('type' in filter) {
     return [param(filter.type), '= ANY (ancestors)'];
   }
+
+  let on = filter?.on ?? parentType;
+
   if ('any' in filter) {
-    return any(filter.any.map(filterToExpression));
+    return any(filter.any.map((expr) => filterToExpression(expr, on)));
   }
   if ('every' in filter) {
-    return every(filter.every.map(filterToExpression));
+    return every(filter.every.map((expr) => filterToExpression(expr, on)));
   }
   if ('not' in filter) {
-    return ['NOT', ...addExplicitParens(filterToExpression(filter.not))];
+    return ['NOT', ...addExplicitParens(filterToExpression(filter.not, on))];
   }
   if ('eq' in filter) {
-    let on = filter.on ?? 'https://cardstack.com/base/base';
     return typedFilter(
       every(
         Object.entries(filter.eq).map(([fieldPath, value]) => [
