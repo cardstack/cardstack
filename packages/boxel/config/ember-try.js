@@ -10,6 +10,7 @@ module.exports = async function () {
     scenarios: [
       {
         name: 'ember-release',
+        allowedToFail: true, // Allowed to fail until we handle ember-4 related deprecations
         npm: {
           devDependencies: {
             'ember-source': await getChannelURL('release'),
