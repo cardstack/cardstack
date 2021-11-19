@@ -1,6 +1,6 @@
 import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
-import { Filter, Query, TypedFilter } from '@cardstack/core/src/query';
+import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
 import { addExplicitParens, any, every, Expression, expressionToSql, param } from '../utils/expressions';
 
@@ -118,28 +118,42 @@ function filterToExpression(filter: Filter, parentType: string): Expression {
     return ['NOT', ...addExplicitParens(filterToExpression(filter.not, on))];
   }
   if ('eq' in filter) {
-    return typedFilter(
-      every(
-        Object.entries(filter.eq).map(([fieldPath, value]) => [
-          '"searchData" #>>',
-          param([on, ...fieldPath.split('.')]),
-          'IS NOT DISTINCT FROM',
-          param(value),
-        ])
-      ),
-      filter
+    return every(
+      Object.entries(filter.eq).map(([fieldPath, value]) => [
+        '"searchData" #>>',
+        param([on, ...fieldPath.split('.')]),
+        'IS NOT DISTINCT FROM',
+        param(value),
+      ])
     );
   }
-  throw unimpl('range');
+
+  if ('range' in filter) {
+    // NEXT steps: based on schema, we need to cast integer field like:
+    //  select url, cast("searchData" #>> '{https://cardstack.local/post,views}' as bigint) > 7 from cards
+    return every(
+      Object.entries(filter.range).map(([fieldPath, predicates]) =>
+        every(
+          Object.entries(predicates).map(([operator, value]) => [
+            '"searchData" #>>',
+            param([on, ...fieldPath.split('.')]),
+            pgComparisons[operator],
+            param(value!),
+          ])
+        )
+      )
+    );
+  }
+
+  throw unimpl('unknown');
 }
 
-function typedFilter(baseExpression: Expression, filter: TypedFilter): Expression {
-  if (filter.on) {
-    return every([baseExpression, [param(filter.on), '= ANY (ancestors)']]);
-  } else {
-    return baseExpression;
-  }
-}
+const pgComparisons: { [operator: string]: string } = {
+  gte: '>=',
+  gt: '>',
+  lt: '<',
+  lte: '<=',
+};
 
 function unimpl(which: string) {
   return new Error(`unimpl ${which}`);

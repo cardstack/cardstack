@@ -1,5 +1,8 @@
 import isPlainObject from 'lodash/isPlainObject';
 import * as JSON from 'json-typescript';
+import Logger from '@cardstack/logger';
+
+const log = Logger('utils:expression');
 
 export type Expression = (string | Param)[];
 
@@ -24,7 +27,7 @@ export function expressionToSql(query: Expression) {
       }
     })
     .join(' ');
-  console.log(text, values);
+  log.debug('built expression %s %j', text, values);
   return {
     text,
     values,

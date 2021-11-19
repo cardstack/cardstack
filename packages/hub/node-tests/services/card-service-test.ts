@@ -68,11 +68,13 @@ if (process.env.COMPILER) {
           'schema.js': `
             import { contains } from "@cardstack/types";
             import string from "https://cardstack.com/base/string";
+            import integer from "https://cardstack.com/base/integer";
             import person from "./person";
             export default class Post {
               @contains(string) title;
               @contains(string) body;
               @contains(person) author;
+              @contains(integer) views;
             }
           `,
           'isolated.js': templateOnlyComponentTemplate(
@@ -91,6 +93,7 @@ if (process.env.COMPILER) {
             name: 'Sue',
           },
           createdAt: new Date(2018, 0, 1),
+          views: 10,
         },
       });
 
@@ -101,6 +104,7 @@ if (process.env.COMPILER) {
           title: 'Hello again',
           body: 'second post.',
           createdAt: new Date(2020, 0, 1),
+          views: 5,
         },
       });
 
@@ -148,11 +152,11 @@ if (process.env.COMPILER) {
         expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`, `${realm}post0`]);
       });
 
-      it(`can filter on a card's own fields using gt`, async function () {
+      it.only(`can filter on a card's own fields using gt`, async function () {
         let matching = await cards.query({
-          filter: { type: `${realm}post`, range: { createdAt: { gt: '2019-01-01' } } },
+          filter: { on: `${realm}post`, range: { views: { gt: 7 } } },
         });
-        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`]);
+        expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post0`]);
       });
 
       it(`can filter on a nested field using eq`, async function () {

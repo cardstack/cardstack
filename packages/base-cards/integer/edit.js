@@ -1,11 +1,10 @@
 import { setComponentTemplate } from '@ember/component';
-import Component from '@glimmer/component';
+import templateOnlyComponent from '@ember/component/template-only';
 import { precompileTemplate } from '@ember/template-compilation';
 
 export default setComponentTemplate(
-  precompileTemplate("<input type='number' value={{@model}} ...attributes />", {
+  precompileTemplate('TODO: edit integer here {{@model}}', {
     strictMode: true,
-    scope: () => ({}), // NOTE: this is tricking our inline detector into not inlining this component
   }),
-  class extends Component {}
+  templateOnlyComponent()
 );
