@@ -63,7 +63,8 @@
     "file-loader": "^6.2.0",
     "macro-decorators": "^0.1.2",
     "qunit": "^2.16.0",
-    "walk-sync": "^2.2.0"
+    "walk-sync": "^2.2.0",
+    "webpack": "^5.64.1"
   },
   "devDependencies": {
     "@ember/jquery": "^1.1.0",
