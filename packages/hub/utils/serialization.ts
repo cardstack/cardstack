@@ -6,6 +6,7 @@ import _camelCase from 'lodash/camelCase';
 import mergeWith from 'lodash/mergeWith';
 import uniq from 'lodash/uniq';
 import { findIncluded } from '@cardstack/core/src/jsonapi';
+import { PgPrimitive } from './expressions';
 
 export async function serializeCard(
   url: string,
@@ -84,7 +85,7 @@ function serializeResource(
   return resource;
 }
 
-export function serializeRawCard(card: RawCard, compiled?: CompiledCard): Record<string, unknown> {
+export function serializeRawCard(card: RawCard, compiled?: CompiledCard): PgPrimitive {
   let resource = serializeResource(
     'raw-cards',
     card.url,

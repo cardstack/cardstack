@@ -2,6 +2,7 @@ import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { inject } from '@cardstack/di';
 import { PoolClient } from 'pg';
+import { expressionToSql, param, upsert } from '../utils/expressions';
 import { serializeRawCard } from '../utils/serialization';
 import CardBuilder from './card-builder';
 
@@ -80,12 +81,13 @@ class IndexerRun implements IndexerHandle {
 
   async saveAndReturn(card: RawCard): Promise<CompiledCard> {
     let compiledCard = await this.builder.compileCardFromRaw(card);
-    await this.db.query(`INSERT into cards (url, ancestors, data, "searchData") VALUES ($1, $2, $3, $4)`, [
-      card.url,
-      ancestorsOf(compiledCard),
-      serializeRawCard(card, compiledCard),
-      card.data ? searchOptimizedData(card.data, compiledCard) : null,
-    ]);
+    let expression = upsert('cards', 'cards_pkey', {
+      url: param(card.url),
+      ancestors: param(ancestorsOf(compiledCard)),
+      data: param(serializeRawCard(card, compiledCard)),
+      searchData: param(card.data ? searchOptimizedData(card.data, compiledCard) : null),
+    });
+    await this.db.query(expressionToSql(expression));
     return compiledCard;
   }
 

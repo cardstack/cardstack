@@ -87,10 +87,14 @@ export function safeName(name: string) {
   return name;
 }
 
+export function columnName(name: string) {
+  return `"${safeName(name)}"`;
+}
+
 // takes a pojo with column name keys and expression values
-export function upsert(table: string, constraint: string, values: { [column: string]: Param }) {
+export function upsert(table: string, constraint: string, values: { [column: string]: Param }): Expression {
   let names = Object.keys(values).map(safeName);
-  let nameExpressions = names.map((name) => [name]);
+  let nameExpressions = names.map((name) => [columnName(name)]);
   let valueExpressions = Object.keys(values).map((k) => {
     let v = values[k];
     if (!Array.isArray(v) && !isParam(v)) {
@@ -115,7 +119,7 @@ export function upsert(table: string, constraint: string, values: { [column: str
     // don't add any more interpolations
     // unless you've really thought hard
     // about the security implications.
-    ...separatedByCommas(names.map((name) => [`${name}=EXCLUDED.${name}`])),
+    ...separatedByCommas(names.map((name) => [`${columnName(name)}=EXCLUDED.${columnName(name)}`])),
   ];
 }
 
