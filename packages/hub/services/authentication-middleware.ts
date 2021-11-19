@@ -17,7 +17,7 @@ export default class AuthenticationMiddleware {
   middleware() {
     return async (ctxt: Koa.Context, next: Koa.Next) => {
       if (ctxt.headers['authorization']) {
-        let authToken = (ctxt.headers['authorization'] as string).replace('Bearer: ', '');
+        let authToken = (ctxt.headers['authorization'] as string).replace('Bearer ', '');
         try {
           let userAddress = this.authenticationUtils.validateAuthToken(authToken);
           ctxt.state.userAddress = userAddress;

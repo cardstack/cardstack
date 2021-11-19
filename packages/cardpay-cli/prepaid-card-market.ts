@@ -230,7 +230,7 @@ async function getInventoriesFromAPI(web3: Web3, environment: string): Promise<J
   let authToken = await (await getSDK('HubAuth', web3, hubRootURL)).authenticate();
   let response = await fetch(`${hubRootURL}/api/inventories`, {
     headers: {
-      Authorization: `Bearer: ${authToken}`,
+      Authorization: `Bearer ${authToken}`,
       'Content-Type': 'application/vnd.api+json',
     },
   });
