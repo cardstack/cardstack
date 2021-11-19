@@ -17,7 +17,7 @@ module('Integration | Component | SortMenu', function (hooks) {
   test('It renders numeric items as an ascending-descending pair', async function (assert) {
     this.set('columns', [{ name: 'Year', sortType: 'numeric' }]);
     await render(
-      hbs`<Boxel::SortMenu @onSort={{noop}} @sortableColumns={{this.columns}}/>`
+      hbs`<Boxel::SortMenu @onSort={{(noop)}} @sortableColumns={{this.columns}}/>`
     );
     assert
       .dom(
@@ -41,7 +41,7 @@ module('Integration | Component | SortMenu', function (hooks) {
   test('It renders alphabetical items as an ascending-descending pair', async function (assert) {
     this.set('columns', [{ name: 'Title', sortType: 'alpha' }]);
     await render(
-      hbs`<Boxel::SortMenu @onSort={{noop}} @sortableColumns={{this.columns}}/>`
+      hbs`<Boxel::SortMenu @onSort={{(noop)}} @sortableColumns={{this.columns}}/>`
     );
     assert
       .dom(
@@ -65,7 +65,7 @@ module('Integration | Component | SortMenu', function (hooks) {
     this.set('sortedColumn', columns[0]);
     this.set('sortedDirection', 'asc');
     await render(
-      hbs`<Boxel::SortMenu @onSort={{noop}} @sortableColumns={{this.sortableColumns}} @sortedColumn={{this.sortedColumn}} @sortedDirection={{this.sortedDirection}}/>`
+      hbs`<Boxel::SortMenu @onSort={{(noop)}} @sortableColumns={{this.sortableColumns}} @sortedColumn={{this.sortedColumn}} @sortedDirection={{this.sortedDirection}}/>`
     );
 
     assert
