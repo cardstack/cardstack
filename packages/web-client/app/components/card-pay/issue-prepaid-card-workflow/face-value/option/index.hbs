@@ -1,21 +1,15 @@
-<label
+<Common::RadioOption
+  @name='funding-amount'
+  @checked={{@checked}}
+  @disabled={{@disabled}}
+  @onInput={{@onInput}}
   class={{cn
-    "face-value-option"
+    'face-value-option'
     face-value-option--checked=@checked
     face-value-option--disabled=@disabled
   }}
   data-test-face-value-option={{@spendFaceValue}}
-  data-test-face-value-option-checked={{@checked}}
-  data-test-face-value-option-disabled={{@disabled}}
 >
-  <Input
-    name="funding-amount"
-    class={{cn "face-value-option__input" face-value-option__input--checked=@checked}}
-    @type="radio"
-    @checked={{@checked}}
-    disabled={{@disabled}}
-    {{on "input" @onInput}}
-  />
   <div class="face-value-option__value">
     {{svg-jar "spend" width="20" height="20" role="presentation"}}
     <div class="face-value-option__amount">
@@ -28,4 +22,4 @@
       ≈ {{@approxTokenAmount}} {{@tokenSymbol}}*
     </div>
   </div>
-</label>
+</Common::RadioOption>

@@ -1,51 +1,6 @@
-.token-option {
-  display: grid;
-  grid-template-columns: auto 1fr 1fr;
-  align-items: center;
-  gap: var(--boxel-sp);
+/* FIXME scandalous? */
+.radio-option.token-option {
   padding: var(--boxel-sp-xl) var(--boxel-sp);
-  border-radius: var(--boxel-border-radius);
-  box-shadow: 0 0 0 1px var(--boxel-light-400);
-  transition: box-shadow var(--boxel-transition);
-}
-
-.token-option:hover:not(.token-option--disabled) {
-  box-shadow: 0 0 0 1px var(--boxel-dark);
-}
-
-.token-option--checked:not(.token-option--disabled),
-.token-option:focus:not(.token-option--disabled),
-.token-option:focus-within:not(.token-option--disabled) {
-  box-shadow: 0 0 0 2px var(--boxel-highlight);
-  outline: 1px solid transparent;
-}
-
-.token-option--disabled > * {
-  opacity: 0.5;
-}
-
-.token-option__input {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 1rem;
-  height: 1rem;
-  margin: 0;
-  border: 1.5px solid var(--boxel-dark);
-  border-radius: 100px;
-  background-color: transparent;
-}
-
-.token-option__input--checked {
-  background-color: var(--boxel-highlight);
-  border-width: 3px;
-}
-
-.token-option__input:disabled {
-  border-color: var(--boxel-purple-300);
-}
-
-.token-option__input:focus:not(:disabled) {
-  outline: 1px solid transparent;
 }
 
 .token-option__currency {
