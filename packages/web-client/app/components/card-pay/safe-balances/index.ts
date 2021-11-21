@@ -45,7 +45,7 @@ export default class CardPaySafeBalancesComponent extends Component<CardPaySafeB
       };
     } else if (this.args.safe.type === 'depot') {
       return {
-        icon: 'depot-arrows',
+        icon: 'depot',
         info: {
           name: 'Depot',
         },

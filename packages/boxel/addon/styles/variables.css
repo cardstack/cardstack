@@ -78,6 +78,8 @@
   --boxel-highlight-hover: #00d3ce;
   --boxel-dark-highlight: var(--boxel-teal);
   --boxel-link-highlight: var(--boxel-dark-highlight);
+  --boxel-danger: #ff4852;
+  --boxel-danger-hover: #fa1521;
 
   /* Boxel purples */
   --boxel-purple-100: #f8f7fa;

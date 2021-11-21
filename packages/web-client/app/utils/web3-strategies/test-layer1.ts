@@ -97,7 +97,7 @@ export default class TestLayer1Web3Strategy implements Layer1Web3Strategy {
     _destinationAddress: string,
     _amountInWei: BN,
     { onTxnHash }: RelayTokensOptions
-  ) {
+  ): Promise<TransactionReceipt> {
     this.#depositOnTxnHash = onTxnHash;
     this.#depositDeferred = RSVP.defer();
     return this.#depositDeferred.promise;

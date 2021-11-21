@@ -7,6 +7,7 @@ import {
   Layer2ChainEvent,
   Layer2Web3Strategy,
   TransactionHash,
+  TxnBlockNumber,
   WithdrawalLimits,
 } from '../utils/web3-strategies/types';
 import {
@@ -36,6 +37,7 @@ import { taskFor } from 'ember-concurrency-ts';
 import { UsdConvertibleSymbol } from './token-to-usd';
 import { TransactionOptions } from '@cardstack/cardpay-sdk';
 import { Safes } from '../resources/safes';
+import { TransactionReceipt } from 'web3-core';
 export default class Layer2Network
   extends Service
   implements Emitter<Layer2ChainEvent>
@@ -238,6 +240,10 @@ export default class Layer2Network
     return this.simpleEmitter.on(event, cb);
   }
 
+  async getBlockConfirmation(blockNumber: TxnBlockNumber): Promise<void> {
+    return this.strategy.getBlockConfirmation(blockNumber);
+  }
+
   getBlockHeight() {
     return this.strategy.getBlockHeight();
   }
@@ -266,14 +272,20 @@ export default class Layer2Network
     safeAddress: string,
     receiverAddress: string,
     tokenSymbol: BridgedTokenSymbol,
-    amount: string
-  ): Promise<TransactionHash> {
+    amount: string,
+    options: TransactionOptions
+  ): Promise<TransactionReceipt> {
     return this.strategy.bridgeToLayer1(
       safeAddress,
       receiverAddress,
       tokenSymbol,
-      amount
+      amount,
+      options
     );
+  }
+
+  async resumeBridgeToLayer1(txnHash: string) {
+    return this.strategy.resumeBridgeToLayer1(txnHash);
   }
 
   async awaitBridgedToLayer1(fromBlock: BN, transactionHash: TransactionHash) {

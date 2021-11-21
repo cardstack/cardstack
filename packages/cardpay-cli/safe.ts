@@ -1,7 +1,6 @@
 import Web3 from 'web3';
-import { getConstant, getSDK } from '@cardstack/cardpay-sdk';
+import { getConstant, getSDK, Safe } from '@cardstack/cardpay-sdk';
 import { getWeb3 } from './utils';
-import { Safe } from '@cardstack/cardpay-sdk/sdk/safes';
 
 const { toWei, fromWei } = Web3.utils;
 
@@ -21,15 +20,21 @@ export async function viewSafe(network: string, address: string, mnemonic?: stri
   console.log();
 }
 
-export async function viewSafes(network: string, address: string | undefined, mnemonic?: string): Promise<void> {
+export async function viewSafes(
+  network: string,
+  address: string | undefined,
+  type: Exclude<Safe['type'], 'external'> | undefined,
+  mnemonic?: string
+): Promise<void> {
   let web3 = await getWeb3(network, mnemonic);
+  address = address || undefined;
 
   let safesApi = await getSDK('Safes', web3);
-  console.log('Getting safes...');
+  console.log(`Getting ${type ? type + ' ' : ''}safes...`);
   console.log();
-  let safes = (await safesApi.view(address)).safes.filter((safe) => safe.type !== 'external');
+  let safes = (await safesApi.view(address, { type })).safes.filter((safe) => safe.type !== 'external');
   if (safes.length === 0) {
-    console.log('You have no safes (not counting safes external to the cardpay protocol)');
+    console.log('Found no safes (not counting safes external to the cardpay protocol)');
   }
   safes.forEach((safe) => {
     displaySafe(safe.address, safe);
