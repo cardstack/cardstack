@@ -511,7 +511,7 @@ export default class RewardManager {
   ): Promise<TransactionReceipt>;
   async withdraw(
     safeAddressOrTxnHash: string,
-    to?: string,
+    to?: string, // TODO: use this when https://github.com/cardstack/card-pay-protocol/pull/141 is deployed
     tokenAddress?: string,
     amount?: string,
     txnOptions?: TransactionOptions,
@@ -561,15 +561,16 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let transferNonce: BN;
     if (nonce != null) {
-      // a passed in nonce represents the next nonce to use, so we add 1 to it
-      // to get the nonce we'd want to use for the transfer execTransaction
       transferNonce = nonce.add(new BN(1));
     } else {
       let rewardSafe = new this.layer2Web3.eth.Contract(GnosisSafeABI as AbiItem[], safeAddress);
-      let currentNonce = new BN(await rewardSafe.methods.nonce().call());
-      transferNonce = currentNonce.add(new BN('1'));
+      nonce = new BN(await rewardSafe.methods.nonce().call());
+      if (typeof onNonce === 'function') {
+        onNonce(nonce);
+      }
+      transferNonce = nonce.add(new BN('1'));
     }
-    // to token contract
+
     let innerEstimate = await gasEstimate(
       this.layer2Web3,
       safeAddress,
@@ -587,21 +588,55 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       transferPayload,
       0,
       innerEstimate,
-      safeAddress, //or maybe zero address
+      safeAddress,
       transferNonce,
       rewardSafeOwner,
       safeAddress,
       rewardManagerAddress
     );
 
-    let gasCost = new BN(innerEstimate.dataGas).add(new BN(innerEstimate.baseGas)).mul(new BN(innerEstimate.gasPrice));
-    if (weiAmount.lt(gasCost)) {
-      throw new Error(
-        `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
-          safeBalance
-        )}, amount being claimed is ${amount}, the gas cost is ${fromWei(gasCost)}`
-      );
-    }
+    //=============================================================================================================================================
+    // for nested gnosis executions, gasEstimate() call will fail if we sign for incremented nonce within the inner gnosis execution
+    // therefore, we intentionally sign for a NON-incremented  nonce so the relayer can return a gas estimate
+
+    let fullSignatureInnerExecNonIncrementingNonce = await fullSignatureTxAsBytes(
+      this.layer2Web3,
+      tokenAddress,
+      0,
+      transferPayload,
+      0,
+      innerEstimate,
+      safeAddress,
+      nonce,
+      rewardSafeOwner,
+      safeAddress,
+      rewardManagerAddress
+    );
+
+    let payloadNonIncrementingNonce = (await this.getRewardManager()).methods
+      .withdrawFromRewardSafe(
+        tokenAddress,
+        weiAmount,
+        innerEstimate.safeTxGas,
+        innerEstimate.baseGas,
+        innerEstimate.gasPrice,
+        innerEstimate.gasToken,
+        fullSignatureInnerExecNonIncrementingNonce
+      )
+      .encodeABI();
+
+    let estimate = await gasEstimate(
+      this.layer2Web3,
+      safeAddress,
+      rewardManagerAddress,
+      '0',
+      payloadNonIncrementingNonce,
+      0,
+      tokenAddress
+    );
+
+    //=============================================================================================================================================
+
     let payload = (await this.getRewardManager()).methods
       .withdrawFromRewardSafe(
         tokenAddress,
@@ -614,13 +649,14 @@ The owner of reward safe ${safeAddress} is ${rewardSafeOwner}, but the signer is
       )
       .encodeABI();
 
-    if (nonce == null) {
-      nonce = getNextNonceFromEstimate(innerEstimate);
-      if (typeof onNonce === 'function') {
-        onNonce(nonce);
-      }
+    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    if (weiAmount.lt(gasCost)) {
+      throw new Error(
+        `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} balance for token ${tokenAddress} is ${fromWei(
+          safeBalance
+        )}, amount being claimed is ${amount}, the gas cost is ${fromWei(gasCost)}`
+      );
     }
-    let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardManagerAddress, '0', payload, 0, tokenAddress);
     let fullSignature = await signRewardSafe(
       this.layer2Web3,
       rewardManagerAddress,
