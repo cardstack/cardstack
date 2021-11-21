@@ -377,7 +377,7 @@ The reward program ${rewardProgramId} has balance equals ${fromWei(
       .encodeABI();
     let estimate = await gasEstimate(this.layer2Web3, safeAddress, rewardPoolAddress, '0', payload, 0, tokenAddress);
 
-    let gasCost = new BN(estimate.dataGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
+    let gasCost = new BN(estimate.safeTxGas).add(new BN(estimate.baseGas)).mul(new BN(estimate.gasPrice));
     if (weiAmount.lt(gasCost)) {
       throw new Error(
         `Reward safe does not have enough to pay for gas when claiming rewards. The reward safe ${safeAddress} unclaimed balance for token ${tokenAddress} is ${fromWei(
