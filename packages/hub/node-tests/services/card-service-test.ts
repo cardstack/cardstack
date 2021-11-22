@@ -152,7 +152,7 @@ if (process.env.COMPILER) {
         expect(matching.map((m) => m.compiled.url)).to.have.members([`${realm}post1`, `${realm}post0`]);
       });
 
-      it.only(`can filter on a card's own fields using gt`, async function () {
+      it(`can filter on a card's own fields using gt`, async function () {
         let matching = await cards.query({
           filter: { on: `${realm}post`, range: { views: { gt: 7 } } },
         });

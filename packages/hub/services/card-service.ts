@@ -2,7 +2,16 @@ import { CompiledCard, RawCard } from '@cardstack/core/src/interfaces';
 import { RawCardDeserializer } from '@cardstack/core/src/raw-card-deserializer';
 import { Filter, Query } from '@cardstack/core/src/query';
 import { inject } from '@cardstack/di';
-import { addExplicitParens, any, every, Expression, expressionToSql, param } from '../utils/expressions';
+import {
+  addExplicitParens,
+  any,
+  columnName,
+  every,
+  Expression,
+  expressionToSql,
+  param,
+  resolveNestedPath,
+} from '../utils/expressions';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -82,7 +91,11 @@ export class CardService {
     try {
       let expression: Expression = ['select data from cards'];
       if (query.filter) {
-        expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
+        expression = [
+          ...expression,
+          'where',
+          ...this.filterToExpression(query.filter, 'https://cardstack.com/base/base'),
+        ];
       }
       let result = await client.query<{ data: any }>(expressionToSql(expression));
       let deserializer = new RawCardDeserializer();
@@ -99,53 +112,49 @@ export class CardService {
   }
 
   teardown() {}
-}
 
-function filterToExpression(filter: Filter, parentType: string): Expression {
-  if ('type' in filter) {
-    return [param(filter.type), '= ANY (ancestors)'];
-  }
+  private filterToExpression(filter: Filter, parentType: string): Expression {
+    if ('type' in filter) {
+      return [param(filter.type), '= ANY (ancestors)'];
+    }
 
-  let on = filter?.on ?? parentType;
+    let on = filter?.on ?? parentType;
 
-  if ('any' in filter) {
-    return any(filter.any.map((expr) => filterToExpression(expr, on)));
-  }
-  if ('every' in filter) {
-    return every(filter.every.map((expr) => filterToExpression(expr, on)));
-  }
-  if ('not' in filter) {
-    return ['NOT', ...addExplicitParens(filterToExpression(filter.not, on))];
-  }
-  if ('eq' in filter) {
-    return every(
-      Object.entries(filter.eq).map(([fieldPath, value]) => [
-        '"searchData" #>>',
-        param([on, ...fieldPath.split('.')]),
-        'IS NOT DISTINCT FROM',
-        param(value),
-      ])
-    );
-  }
+    if ('any' in filter) {
+      return any(filter.any.map((expr) => this.filterToExpression(expr, on)));
+    }
+    if ('every' in filter) {
+      return every(filter.every.map((expr) => this.filterToExpression(expr, on)));
+    }
+    if ('not' in filter) {
+      return ['NOT', ...addExplicitParens(this.filterToExpression(filter.not, on))];
+    }
+    if ('eq' in filter) {
+      return every(
+        Object.entries(filter.eq).map(([fieldPath, value]) => {
+          let { expression, leaf } = resolveNestedPath([columnName('searchData')], [on, ...fieldPath.split('.')]);
+          return [...expression, '->>', param(leaf), 'IS NOT DISTINCT FROM', param(value!)];
+        })
+      );
+    }
 
-  if ('range' in filter) {
-    // NEXT steps: based on schema, we need to cast integer field like:
-    //  select url, cast("searchData" #>> '{https://cardstack.local/post,views}' as bigint) > 7 from cards
-    return every(
-      Object.entries(filter.range).map(([fieldPath, predicates]) =>
-        every(
-          Object.entries(predicates).map(([operator, value]) => [
-            '"searchData" #>>',
-            param([on, ...fieldPath.split('.')]),
-            pgComparisons[operator],
-            param(value!),
-          ])
+    if ('range' in filter) {
+      // NEXT steps: based on schema, we need to cast integer field like:
+      //  select url, cast("searchData" #>> '{https://cardstack.local/post,views}' as bigint) > 7 from cards
+      return every(
+        Object.entries(filter.range).map(([fieldPath, predicates]) =>
+          every(
+            Object.entries(predicates).map(([operator, value]) => {
+              let { expression, leaf } = resolveNestedPath([columnName('searchData')], [on, ...fieldPath.split('.')]);
+              return [...expression, '->>', param(leaf), pgComparisons[operator], param(value!)];
+            })
+          )
         )
-      )
-    );
-  }
+      );
+    }
 
-  throw unimpl('unknown');
+    throw unimpl('unknown');
+  }
 }
 
 const pgComparisons: { [operator: string]: string } = {

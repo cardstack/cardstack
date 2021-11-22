@@ -126,6 +126,19 @@ export function upsert(table: string, constraint: string, values: { [column: str
   ];
 }
 
+export function resolveNestedPath(
+  parentExpression: Expression,
+  segments: string[]
+): { expression: Expression; leaf: string } {
+  if (segments.length === 1) {
+    return { expression: parentExpression, leaf: segments[segments.length - 1] };
+  }
+  return {
+    expression: addExplicitParens([...parentExpression, '#>', param(segments.slice(0, -1))]),
+    leaf: segments[segments.length - 1],
+  };
+}
+
 function assertNever(value: never) {
   throw new Error(`should never happen ${value}`);
 }
