@@ -20,7 +20,7 @@
     <Common::RadioOption
       @name='category'
       @checked={{this.otherIsChecked}}
-      @onInput={{fn this.setCategoryValue 'jortle'}}
+      @onInput={{fn this.setCategoryValue this.otherValue}}
       class='card-space-category-field__option'
       data-test-category-option
     >
@@ -29,7 +29,7 @@
         {{!-- RadioOption contains a label --}}
         {{!-- template-lint-disable require-input-label --}}
         <Input
-          @value={{readonly this.categoryValue}}
+          @value={{readonly this.otherValue}}
           {{on 'input' this.setOtherValue}}
           data-test-category-option-other
         />

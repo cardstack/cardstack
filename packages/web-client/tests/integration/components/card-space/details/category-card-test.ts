@@ -65,6 +65,14 @@ module(
         .hasClass('radio-option__input--checked');
 
       assert.equal(workflowSession.getValue<string>('category'), 'Something');
+
+      await click('[data-test-category-option]:nth-child(2)');
+      assert.dom('[data-test-category-option-other]').hasValue('Something');
+
+      await click(
+        `[data-test-category-option]:nth-child(${OPTIONS.length + 1})`
+      );
+      assert.equal(workflowSession.getValue<string>('category'), 'Something');
     });
 
     test('it restores input from session', async function (assert) {

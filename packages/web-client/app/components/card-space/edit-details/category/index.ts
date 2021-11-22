@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
-import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 import { action } from '@ember/object';
+import { tracked } from '@glimmer/tracking';
+import { WorkflowCardComponentArgs } from '@cardstack/web-client/models/workflow';
 
 export const OPTIONS = [
   'Music',
@@ -12,7 +13,17 @@ export const OPTIONS = [
 ];
 
 class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardComponentArgs> {
+  @tracked otherValue: string | null = null;
+
   options = OPTIONS;
+
+  constructor(owner: unknown, args: WorkflowCardComponentArgs) {
+    super(owner, args);
+
+    if (this.otherIsChecked) {
+      this.otherValue = this.categoryValue;
+    }
+  }
 
   get categoryValue() {
     return this.args.workflowSession.getValue<string>('category');
@@ -27,7 +38,8 @@ class CardSpaceEditDetailsCategoryComponent extends Component<WorkflowCardCompon
   }
 
   @action setOtherValue(event: InputEvent) {
-    this.setCategoryValue((event.target! as HTMLInputElement).value);
+    this.otherValue = (event.target! as HTMLInputElement).value;
+    this.setCategoryValue(this.otherValue);
   }
 }
 
