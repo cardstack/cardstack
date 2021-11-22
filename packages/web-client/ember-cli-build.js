@@ -3,7 +3,36 @@
 const EmberApp = require('ember-cli/lib/broccoli/ember-app');
 const path = require('path');
 const concat = require('broccoli-concat');
+const compileCSS = require('broccoli-postcss');
+const postcss = require('postcss');
 const webpack = require('webpack');
+
+const prependSelector = postcss.plugin(
+  'postcss-prepend-selector',
+  function (opts) {
+    opts = opts || {};
+    return function (css) {
+      css.walkRules(function (rule) {
+        rule.selectors = rule.selectors.map(function (selector) {
+          if (/\b(body|html|:root|\.ember-application)\b/.test(selector)) {
+            return selector;
+          }
+          // eslint-disable-next-line no-useless-escape
+          if (/^([0-9]*[.])?[0-9]+\%$|^from$|^to$/.test(selector)) {
+            // This is part of a keyframe
+            return selector;
+          }
+
+          if (selector.startsWith(opts.selector.trim())) {
+            return selector;
+          }
+
+          return opts.selector + selector;
+        });
+      });
+    };
+  }
+);
 
 process.env.EMBROIDER_REBUILD_ADDONS = '@cardstack/boxel';
 
@@ -38,11 +67,23 @@ module.exports = function (defaults) {
 
   const { Webpack } = require('@embroider/webpack');
 
-  let appComponentsStylesTree = concat(path.join(__dirname, 'app/components'), {
-    inputFiles: ['**/*.css'],
-    outputFile: '/assets/app-components.css',
-    sourceMapConfig: { enabled: true },
-  });
+  // prepend .ember-application to all styles of web client's components
+  // so that it has a bit more specificity and will take priority over Boxel's CSS
+  // since Boxel's CSS is appearing after the DApp's in production
+  let appComponentsStylesTree = new compileCSS(
+    concat(path.join(__dirname, 'app/components'), {
+      inputFiles: ['**/*.css'],
+      outputFile: '/assets/app-components.css',
+      sourceMapConfig: { enabled: true },
+    }),
+    {
+      plugins: [
+        prependSelector({
+          selector: '.ember-application ',
+        }),
+      ],
+    }
+  );
 
   return require('@embroider/compat').compatBuild(app, Webpack, {
     extraPublicTrees: [appComponentsStylesTree],
@@ -66,6 +107,24 @@ module.exports = function (defaults) {
               options: {
                 name: '[path][name]-[contenthash].[ext]',
               },
+            },
+            {
+              test: /\.css$/,
+              include: [/web-client/],
+              use: [
+                {
+                  loader: 'postcss-loader',
+                  options: {
+                    postcssOptions: {
+                      plugins: [
+                        prependSelector({
+                          selector: '.ember-application ',
+                        }),
+                      ],
+                    },
+                  },
+                },
+              ],
             },
           ],
         },
