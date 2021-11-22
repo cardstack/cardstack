@@ -23,12 +23,16 @@ export default class FSRealm implements RealmInterface {
   constructor(url: string, directory: string, private notify: RealmManager['notify'] | undefined) {
     this.url = url;
     this.directory = ensureTrailingSlash(directory);
+  }
 
-    if (notify) {
-      this.watcher = sane(this.directory);
-      this.watcher.on('add', this.onFileChanged.bind(this, 'save'));
-      this.watcher.on('change', this.onFileChanged.bind(this, 'save'));
-      this.watcher.on('delete', this.onFileChanged.bind(this, 'delete'));
+  async ready() {
+    if (this.notify) {
+      let watcher = sane(this.directory);
+      await new Promise<void>((resolve) => watcher.once('ready', resolve));
+      watcher.on('add', this.onFileChanged.bind(this, 'save'));
+      watcher.on('change', this.onFileChanged.bind(this, 'save'));
+      watcher.on('delete', this.onFileChanged.bind(this, 'delete'));
+      this.watcher = watcher;
     }
   }
 
