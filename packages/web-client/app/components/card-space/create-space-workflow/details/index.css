@@ -1,0 +1,5 @@
+/* FIXME without this, cannot see the whole form, but this causes a permanent scroll thumb */
+.create-space-workflow-details__modal .boxel-modal__inner {
+  align-items: flex-start;
+  overflow: scroll;
+}
