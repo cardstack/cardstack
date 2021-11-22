@@ -117,7 +117,6 @@ export interface CompiledCard {
   };
   schemaModule: string;
   serializer?: SerializerName;
-
   isolated: ComponentInfo;
   embedded: ComponentInfo;
   edit: ComponentInfo;

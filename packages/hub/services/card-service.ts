@@ -14,8 +14,8 @@ import {
   isField,
   resolveNestedPath,
   expressionToSql,
+  Expression,
 } from '../utils/expressions';
-import { flatMap } from 'lodash';
 
 // This is a placeholder because we haven't built out different per-user
 // authorization contexts.
@@ -97,7 +97,7 @@ export class CardService {
       if (query.filter) {
         expression = [...expression, 'where', ...filterToExpression(query.filter, 'https://cardstack.com/base/base')];
       }
-      let result = await client.query<{ data: any }>(await this.prepareExpression(expression));
+      let result = await client.query<{ data: any }>(expressionToSql(await this.prepareExpression(expression)));
       let deserializer = new RawCardDeserializer();
       return result.rows.map((row) => {
         let { raw, compiled } = deserializer.deserialize(row.data.data, row.data);
@@ -111,15 +111,28 @@ export class CardService {
     }
   }
 
-  private async prepareExpression(cardExpression: CardExpression): Promise<{ text: string; values: PgPrimitive[] }> {
-    let expression = flatMap(cardExpression, (element) => {
-      if (!isField(element)) {
-        return [element];
+  private async prepareExpression(cardExpression: CardExpression): Promise<Expression> {
+    let expression: Expression = [];
+    for (let element of cardExpression) {
+      if (isField(element)) {
+        let segments = element.path.split('.');
+        let { expression: inner, leaf } = resolveNestedPath(element.parentExpression, [element.on, ...segments]);
+
+        let card = (await this.load(element.on)).compiled;
+        while (segments.length) {
+          let first = segments.shift()!;
+          card = card.fields[first].card;
+        }
+        if (cardHasType(card, 'https://cardstack.com/base/integer')) {
+          expression.push('cast(', ...inner, '->>', param(leaf), 'as bigint)');
+        } else {
+          expression.push(...inner, '->>', param(leaf));
+        }
+      } else {
+        expression.push(element);
       }
-      let { expression, leaf } = resolveNestedPath(element.parentExpression, [element.on, ...element.path.split('.')]);
-      return [...expression, '->>', param(leaf)];
-    });
-    return expressionToSql(expression);
+    }
+    return expression;
   }
 
   teardown() {}
@@ -180,5 +193,15 @@ function unimpl(which: string) {
 declare module '@cardstack/di' {
   interface KnownServices {
     'card-service': CardServiceFactory;
+  }
+}
+
+function cardHasType(card: CompiledCard, url: string): boolean {
+  if (card.url === url) {
+    return true;
+  } else if (!card.adoptsFrom) {
+    return false;
+  } else {
+    return cardHasType(card.adoptsFrom, url);
   }
 }
