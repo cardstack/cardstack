@@ -1,0 +1,3 @@
+.card-space-category-field__option + .card-space-category-field__option {
+  margin-top: var(--boxel-sp);
+}
