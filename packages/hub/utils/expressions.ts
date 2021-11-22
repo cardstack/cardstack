@@ -8,15 +8,27 @@ export type Expression = (string | Param)[];
 
 export type PgPrimitive = number | string | boolean | JSON.Object | JSON.Arr | null;
 
+export type CardExpression = (string | Param | Field)[];
+
 export interface Param {
   param: PgPrimitive;
-  kind: 'param';
 }
 
-export function expressionToSql(query: Expression) {
+export interface Field {
+  field: true;
+  parentExpression: Expression;
+  on: string; // cardURL
+  path: string;
+}
+
+export function expressionToSql(query: Expression): { text: string; values: PgPrimitive[] } {
   let values: PgPrimitive[] = [];
+  return _expressionToSql(query, values);
+}
+
+function _expressionToSql(query: Expression, values: PgPrimitive[]): { text: string; values: PgPrimitive[] } {
   let text = query
-    .map((element) => {
+    .map((element): string => {
       if (isParam(element)) {
         values.push(element.param);
         return `$${values.length}`;
@@ -34,11 +46,11 @@ export function expressionToSql(query: Expression) {
   };
 }
 
-export function addExplicitParens(expression: Expression): Expression {
+export function addExplicitParens<T extends Expression | CardExpression>(expression: T): T {
   if (expression.length === 0) {
     return expression;
   } else {
-    return ['(', ...expression, ')'];
+    return ['(', ...expression, ')'] as T;
   }
 }
 
@@ -52,35 +64,35 @@ export function separatedByCommas(expressions: Expression[]): Expression {
 }
 
 export function param(value: PgPrimitive): Param {
-  return { param: value, kind: 'param' };
+  return { param: value };
 }
 
 export function isParam(expression: any): expression is Param {
   return isPlainObject(expression) && 'param' in expression;
 }
 
-export function every(expressions: Expression[]): Expression {
+export function every<T extends Expression | CardExpression>(expressions: T[]): T {
   if (expressions.length === 0) {
-    return ['true']; // this is "SQL true", not javascript true
+    return ['true'] as T; // this is "SQL true", not javascript true
   }
   if (expressions.length === 1) {
     return expressions[0];
   }
   return expressions
     .map((expression) => addExplicitParens(expression))
-    .reduce((accum, expression: Expression) => [...accum, 'AND', ...expression]);
+    .reduce((accum, expression: T) => [...accum, 'AND', ...expression] as T);
 }
 
-export function any(expressions: Expression[]): Expression {
+export function any<T extends Expression | CardExpression>(expressions: T[]): T {
   if (expressions.length === 0) {
-    return ['false']; // this is "SQL false", not javascript false
+    return ['false'] as T; // this is "SQL false", not javascript false
   }
   if (expressions.length === 1) {
     return expressions[0];
   }
   return expressions
     .map((expression) => addExplicitParens(expression))
-    .reduce((accum, expression: Expression) => [...accum, 'OR', ...expression]);
+    .reduce((accum, expression: T) => [...accum, 'OR', ...expression] as T);
 }
 
 export function safeName(name: string) {
@@ -137,6 +149,19 @@ export function resolveNestedPath(
     expression: addExplicitParens([...parentExpression, '#>', param(segments.slice(0, -1))]),
     leaf: segments[segments.length - 1],
   };
+}
+
+export function field(parentExpression: Expression, on: string, path: string): Field {
+  return {
+    field: true,
+    parentExpression,
+    on,
+    path,
+  };
+}
+
+export function isField(expression: any): expression is Field {
+  return isPlainObject(expression) && 'field' in expression;
 }
 
 function assertNever(value: never) {
