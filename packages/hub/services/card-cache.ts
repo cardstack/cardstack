@@ -118,24 +118,24 @@ export default class CardCache {
 
   setCard(cardURL: string, source: CompiledCard) {
     this.setModule(NODE, cardURL, 'compiled.json', JSON.stringify(source, null, 2));
-    this.indexCard(cardURL, source);
+    // this.indexCard(cardURL, source);
   }
 
-  indexCard(cardURL: string, source: CompiledCard): void {
-    let query = `
-      INSERT INTO card_index (id, name, data, adoptsFrom, schemaModule, fields, views)
-      VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (id) DO UPDATE
-    `;
+  // indexCard(cardURL: string, source: CompiledCard): void {
+  //   let query = `
+  //     INSERT INTO card_index (id, name, data, adoptsFrom, schemaModule, fields, views)
+  //     VALUES ($1, $2, $3, $4, $5, $6, $7)
+  //   `;
 
-    this.client.query(query, [
-      cardURL,
-      'name TODO',
-      'adoptsFrom TODO',
-      source.schemaModule,
-      source.fields,
-      { isolated: source.isolated, embedded: source.embedded, edit: source.edit },
-    ]);
-  }
+  //   this.client.query(query, [
+  //     cardURL,
+  //     'name TODO',
+  //     'adoptsFrom TODO',
+  //     source.schemaModule,
+  //     source.fields,
+  //     { isolated: source.isolated, embedded: source.embedded, edit: source.edit },
+  //   ]);
+  // }
 
   entryExists(env: Environment | 'assets', cardURL: string, localFile: string): boolean {
     return pathExistsSync(this.getFileLocation(env, cardURL, localFile));
