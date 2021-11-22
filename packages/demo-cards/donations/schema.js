@@ -1,10 +1,10 @@
 import { contains } from '@cardstack/types';
 import string from 'https://cardstack.com/base/string';
 
-export default class Link {
+export default class Donations {
   @contains(string)
-  linkTitle;
+  title;
 
   @contains(string)
-  url;
+  description;
 }

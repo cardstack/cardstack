@@ -118,7 +118,10 @@ export default class CardCache {
 
   setCard(cardURL: string, source: CompiledCard) {
     this.setModule(NODE, cardURL, 'compiled.json', JSON.stringify(source, null, 2));
+    this.indexCard(cardURL, source);
   }
+
+  indexCard(_cardURL: string, _source: CompiledCard): void {}
 
   entryExists(env: Environment | 'assets', cardURL: string, localFile: string): boolean {
     return pathExistsSync(this.getFileLocation(env, cardURL, localFile));

@@ -4,15 +4,9 @@ import templateOnlyComponent from '@ember/component/template-only';
 import './embedded.css';
 
 export default setComponentTemplate(
-  precompileTemplate(
-    `<section class="donations">
-      <header class="donations__header"><@fields.title/></header>
-      <p><@fields.description/></p>
-    </section>`,
-    {
-      strictMode: true,
-      scope: () => ({}),
-    }
-  ),
+  precompileTemplate(`<div class="background"><@fields.coverPhoto/></div>`, {
+    strictMode: true,
+    scope: () => ({}),
+  }),
   templateOnlyComponent()
 );
