@@ -26,11 +26,18 @@
     >
       <span>
         Other:
-        {{!-- RadioOption contains a label --}}
-        {{!-- template-lint-disable require-input-label --}}
-        <Input
+
+        <Common::ValidationStateInput
+          @state={{this.categoryValidationState}}
           @value={{readonly this.otherValue}}
-          {{on 'input' this.setOtherValue}}
+          @onInput={{this.onOtherValueInput}}
+          @errorMessage={{this.categoryValidationMessage}}
+          autocomplete='off'
+          autocorrect='off'
+          autocapitalize='off'
+          spellcheck='false'
+          {{!-- FIXME length? --}}
+          {{on 'blur' this.validateCategory}}
           data-test-category-option-other
         />
       </span>

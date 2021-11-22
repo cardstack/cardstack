@@ -316,6 +316,64 @@ describe('POST /api/card-spaces/validate-url', async function () {
   });
 });
 
+describe('POST /api/card-spaces/validate-profile-category', async function () {
+  this.beforeEach(function () {
+    registry(this).register('authentication-utils', StubAuthenticationUtils);
+  });
+  let { request } = setupHub(this);
+
+  it('returns no category errors when category is valid', async function () {
+    await request()
+      .post(`/api/card-spaces/validate-profile-category`)
+      .send({ data: { attributes: { 'profile-category': 'yes' } } })
+      .set('Authorization', 'Bearer: abc123--def456--ghi789') // FIXME note colon, and below
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('returns category errors when category is invalid', async function () {
+    await request()
+      .post(`/api/card-spaces/validate-profile-category`)
+      .send({ data: { attributes: { 'profile-category': '123456789012345678901234567890123456789012345678901' } } })
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(200)
+      .expect({
+        errors: [
+          {
+            status: '422',
+            title: 'Invalid attribute',
+            source: { pointer: `/data/attributes/profile-category` },
+            detail: 'Max length is 50',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+
+  it('returns 401 without bearer token', async function () {
+    await request()
+      .post('/api/card-spaces/validate-profile-category')
+      .send({})
+      .set('Accept', 'application/vnd.api+json')
+      .set('Content-Type', 'application/vnd.api+json')
+      .expect(401)
+      .expect({
+        errors: [
+          {
+            status: '401',
+            title: 'No valid auth token',
+          },
+        ],
+      })
+      .expect('Content-Type', 'application/vnd.api+json');
+  });
+});
+
 describe('PUT /api/card-spaces', function () {
   this.beforeEach(function () {
     registry(this).register('authentication-utils', StubAuthenticationUtils);

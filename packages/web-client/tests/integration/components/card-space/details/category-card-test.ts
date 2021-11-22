@@ -1,14 +1,26 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { click, fillIn, render } from '@ember/test-helpers';
+import { click, fillIn, find, render, waitUntil } from '@ember/test-helpers';
 import hbs from 'htmlbars-inline-precompile';
 import { WorkflowSession } from '@cardstack/web-client/models/workflow';
+import { Response as MirageResponse } from 'ember-cli-mirage';
+import { setupMirage } from 'ember-cli-mirage/test-support';
+import { MirageTestContext } from 'ember-cli-mirage/test-support';
 import { OPTIONS } from '@cardstack/web-client/components/card-space/edit-details/category';
+
+interface Context extends MirageTestContext {}
 
 module(
   'Integration | Component | card-space/edit-details/category',
   function (hooks) {
     setupRenderingTest(hooks);
+    setupMirage(hooks);
+
+    hooks.beforeEach(async function (this: Context) {
+      this.server.post('/card-spaces/validate-profile-category', function () {
+        return new MirageResponse(200, {}, { errors: [] });
+      });
+    });
 
     test('it lists the allowed categories and persists the choice to the workflow session', async function (assert) {
       let workflowSession = new WorkflowSession();
@@ -56,7 +68,13 @@ module(
         )
         .exists();
 
-      await fillIn('[data-test-category-option-other]', 'Something');
+      await fillIn('[data-test-category-option-other] input', 'Something');
+
+      await waitUntil(
+        () =>
+          (find('[data-test-validation-state-input]') as HTMLElement).dataset
+            .testValidationStateInput !== 'initial'
+      );
 
       assert
         .dom(
@@ -67,12 +85,47 @@ module(
       assert.equal(workflowSession.getValue<string>('category'), 'Something');
 
       await click('[data-test-category-option]:nth-child(2)');
-      assert.dom('[data-test-category-option-other]').hasValue('Something');
+      assert
+        .dom('[data-test-category-option-other] input')
+        .hasValue('Something');
 
       await click(
         `[data-test-category-option]:nth-child(${OPTIONS.length + 1})`
       );
       assert.equal(workflowSession.getValue<string>('category'), 'Something');
+    });
+
+    test('it shows the error when custom category validation fails', async function (this: Context, assert) {
+      this.server.post('/card-spaces/validate-profile-category', function () {
+        return new MirageResponse(200, {}, { errors: [{ detail: 'Is bad' }] });
+      });
+
+      let workflowSession = new WorkflowSession();
+      this.set('workflowSession', workflowSession);
+
+      await render(hbs`
+        <CardSpace::EditDetails::Category
+          @workflowSession={{this.workflowSession}}
+        />
+      `);
+
+      await fillIn('[data-test-category-option-other] input', 'Something');
+
+      await waitUntil(
+        () =>
+          (find('[data-test-validation-state-input]') as HTMLElement).dataset
+            .testValidationStateInput !== 'initial'
+      );
+
+      assert
+        .dom('[data-test-validation-state-input]')
+        .hasAttribute('data-test-validation-state-input', 'invalid');
+
+      assert
+        .dom(
+          `[data-test-card-space-category-field] [data-test-boxel-input-error-message]`
+        )
+        .containsText('Is bad');
     });
 
     test('it restores input from session', async function (assert) {
@@ -108,7 +161,7 @@ module(
         )
         .hasClass('radio-option__input--checked');
 
-      assert.dom('[data-test-category-option-other]').hasValue('Hello');
+      assert.dom('[data-test-category-option-other] input').hasValue('Hello');
     });
   }
 );

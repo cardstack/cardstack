@@ -170,6 +170,21 @@ export default class CardSpacesRoute {
     ctx.type = 'application/vnd.api+json';
   }
 
+  async postProfileCategoryValidation(ctx: Koa.Context) {
+    if (!ensureLoggedIn(ctx)) {
+      return;
+    }
+
+    let profileCategory: string = ctx.request.body.data.attributes['profile-category'];
+    let errors = await this.cardSpaceValidator.validate({ profileCategory } as CardSpace);
+
+    ctx.status = 200;
+    ctx.body = {
+      errors: serializeErrors(errors).filter((e) => e.source.pointer === '/data/attributes/profile-category'),
+    };
+    ctx.type = 'application/vnd.api+json';
+  }
+
   async postUrlValidation(ctx: Koa.Context) {
     if (!ensureLoggedIn(ctx)) {
       return;
