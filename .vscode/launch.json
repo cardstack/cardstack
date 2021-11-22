@@ -879,5 +879,55 @@
         "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
       ]
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Add Reward Rule",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "add-reward-rule",
+        "0x95864b14c7AEa30cf741B921130003e2323aA2FE", //prepaid card
+        "0x41F568d470da4A1e19e7E0b780C775AE2D3256aD", //reward program
+        "0xefe53af1", //blob
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Get Reward Rule",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "reward-rule",
+        "0x41F568d470da4A1e19e7E0b780C775AE2D3256aD", //reward program
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    },    
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Cardpay testnet: Remove Reward Program",
+      "program": "${workspaceFolder}/packages/cardpay-cli/cardpay.js",
+      "console": "integratedTerminal",
+      "env": {},
+      "args": [
+        "remove-reward-program",
+        "0x41F568d470da4A1e19e7E0b780C775AE2D3256aD", //reward program
+        "--network",
+        "sokol",
+        "--mnemonic",
+        "fortune reduce accuse famous fetch waste debate alcohol notice salmon wish okay"
+      ]
+    }
   ]
 }
