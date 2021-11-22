@@ -210,6 +210,8 @@ export default class RewardManager {
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
 
+    await this.checkPrepaidCardOwnerIsAdmin(rewardProgramId, prepaidCardAddress);
+
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
       let payload = await this.getLockRewardProgramPayload(prepaidCardAddress, rewardProgramId, rateLock);
       if (nonce == null) {
@@ -273,6 +275,8 @@ export default class RewardManager {
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+
+    await this.checkPrepaidCardOwnerIsAdmin(rewardProgramId, prepaidCardAddress);
 
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
       let payload = await this.getUpdateRewardProgramAdminPayload(
@@ -343,6 +347,8 @@ export default class RewardManager {
     let prepaidCardAddress = prepaidCardAddressOrTxnHash;
     let { nonce, onNonce, onTxnHash } = txnOptions ?? {};
     let from = contractOptions?.from ?? (await this.layer2Web3.eth.getAccounts())[0];
+
+    await this.checkPrepaidCardOwnerIsAdmin(rewardProgramId, prepaidCardAddress);
 
     let gnosisResult = await executeSendWithRateLock(this.layer2Web3, prepaidCardAddress, async (rateLock) => {
       let payload = await this.getAddRewardRulePayload(prepaidCardAddress, rewardProgramId, blob, rateLock);
@@ -674,6 +680,19 @@ export default class RewardManager {
   }
   async getRewardRule(rewardProgramId: string): Promise<string> {
     return await (await this.getRewardManager()).methods.rule(rewardProgramId).call();
+  }
+
+  async checkPrepaidCardOwnerIsAdmin(rewardProgramId: string, prepaidCardAddress: string): Promise<void> {
+    let prepaidCardAPI = await getSDK('PrepaidCard', this.layer2Web3);
+    let prepaidCardMgr = await prepaidCardAPI.getPrepaidCardMgr();
+    let prepaidCardOwner = await prepaidCardMgr.methods.getPrepaidCardOwner(prepaidCardAddress).call();
+    let rewardProgramAdmin = await this.getRewardProgramAdmin(rewardProgramId);
+
+    if (!(prepaidCardOwner == rewardProgramAdmin)) {
+      throw new Error(
+        `Owner ${prepaidCardOwner} of prepaid card ${prepaidCardAddress} is not the reward program admin ${rewardProgramAdmin}`
+      );
+    }
   }
 
   private async getRewardManager(): Promise<Contract> {
