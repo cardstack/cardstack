@@ -69,6 +69,31 @@ describe('POST /upload', function () {
     expect(queryResult.rows.length).to.equal(1);
   });
 
+  it('rejects a non jpg/png format', async function () {
+    let base64 = 'data:image/gif;base64,BASE64_IMAGE_DATA';
+    let buffer = Buffer.from(base64, 'base64');
+    await request()
+      .post('/upload')
+      .set('Content-Type', 'multipart/form-data')
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .attach('image', buffer, 'cat.gif')
+      .expect(422)
+      .expect('File type unsupported. Allowed types: JPG, JPEG, PNG');
+  });
+
+  it('rejects a large file', async function () {
+    let approximateCharactersForOneMegabyte = 1400000; // Calculated experimentally
+    let base64 = `data:image/png;base64,${'a'.repeat(approximateCharactersForOneMegabyte)}`;
+    let buffer = Buffer.from(base64, 'base64');
+    await request()
+      .post('/upload')
+      .set('Content-Type', 'multipart/form-data')
+      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .attach('image', buffer, 'cat.png')
+      .expect(422)
+      .expect('File is too large. Max file size is 1MB.');
+  });
+
   it('detects abuse', async function () {
     let dbManager = await getContainer().lookup('database-manager');
     let db = await dbManager.getClient();
