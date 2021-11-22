@@ -70,7 +70,7 @@ describe('POST /api/merchant-infos', function () {
     await request()
       .post('/api/merchant-infos')
       .send(payload)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(201)
@@ -137,7 +137,7 @@ describe('POST /api/merchant-infos', function () {
     await request()
       .post('/api/merchant-infos')
       .send(payload)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(422)
@@ -166,7 +166,7 @@ describe('POST /api/merchant-infos', function () {
     await request()
       .post('/api/merchant-infos')
       .send(payload)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(422)
@@ -196,7 +196,7 @@ describe('POST /api/merchant-infos', function () {
       return request()
         .post('/api/merchant-infos')
         .send(payload)
-        .set('Authorization', 'Bearer: abc123--def456--ghi789')
+        .set('Authorization', 'Bearer abc123--def456--ghi789')
         .set('Accept', 'application/vnd.api+json')
         .set('Content-Type', 'application/vnd.api+json');
     };
@@ -268,7 +268,7 @@ describe('POST /api/merchant-infos', function () {
     await request()
       .post('/api/merchant-infos')
       .send(payload)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(201);
@@ -276,7 +276,7 @@ describe('POST /api/merchant-infos', function () {
     await request()
       .post('/api/merchant-infos')
       .send(payload2)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(422)
@@ -323,7 +323,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
     const slug1 = 'sat-oshi';
     await request()
       .get(`/api/merchant-infos/validate-slug/${slug1}`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .expect({
@@ -335,7 +335,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
     const slug2 = 'sat oshi';
     await request()
       .get(`/api/merchant-infos/validate-slug/${slug2}`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .expect({
@@ -347,7 +347,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
     const slug3 = 'Satoshi';
     await request()
       .get(`/api/merchant-infos/validate-slug/${slug3}`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .expect({
@@ -361,7 +361,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
     const slug = 'satoshisatoshisatoshisatoshisatoshisatoshisatoshi11';
     await request()
       .get(`/api/merchant-infos/validate-slug/${slug}`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .expect({
@@ -388,7 +388,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
     await request()
       .post('/api/merchant-infos')
       .send(payload)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(201);
@@ -396,7 +396,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
     const slug1 = 'mandello1';
     await request()
       .get(`/api/merchant-infos/validate-slug/${slug1}`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .expect({
@@ -408,7 +408,7 @@ describe('GET /api/merchant-infos/validate-slug/:slug', function () {
     const slug2 = 'mandello2';
     await request()
       .get(`/api/merchant-infos/validate-slug/${slug2}`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
       .expect({

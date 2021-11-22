@@ -74,7 +74,7 @@ describe('GET /api/session', function () {
     await request()
       .get('/api/session')
       .set('Accept', 'application/vnd.api+json')
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .expect(200)
       .expect({ data: { attributes: { user: stubUserAddress } } })
       .expect('Content-Type', 'application/vnd.api+json');
@@ -88,7 +88,7 @@ describe('GET /api/session', function () {
     await request()
       .get('/api/session')
       .set('Accept', 'application/vnd.api+json')
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .expect(401)
       .expect({
         errors: [

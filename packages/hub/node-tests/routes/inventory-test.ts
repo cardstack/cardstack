@@ -154,7 +154,7 @@ describe('GET /api/inventory', function () {
 
     await request()
       .get(`/api/inventories`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
@@ -216,7 +216,7 @@ describe('GET /api/inventory', function () {
 
     await request()
       .get(`/api/inventories`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
@@ -258,7 +258,7 @@ describe('GET /api/inventory', function () {
 
     await request()
       .get(`/api/inventories`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
@@ -300,7 +300,7 @@ describe('GET /api/inventory', function () {
 
     await request()
       .get(`/api/inventories`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
@@ -349,7 +349,7 @@ describe('GET /api/inventory', function () {
 
     await request()
       .get(`/api/inventories?filter[issuer]=${stubIssuer}`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
@@ -387,7 +387,7 @@ describe('GET /api/inventory', function () {
     });
     await request()
       .get(`/api/inventories`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
@@ -433,7 +433,7 @@ describe('GET /api/inventory', function () {
 
     await request()
       .get(`/api/inventories`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)
@@ -489,7 +489,7 @@ describe('GET /api/inventory', function () {
     });
     await request()
       .get(`/api/inventories`)
-      .set('Authorization', 'Bearer: abc123--def456--ghi789')
+      .set('Authorization', 'Bearer abc123--def456--ghi789')
       .set('Accept', 'application/vnd.api+json')
       .set('Content-Type', 'application/vnd.api+json')
       .expect(200)

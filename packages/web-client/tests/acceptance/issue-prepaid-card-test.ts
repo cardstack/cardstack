@@ -487,7 +487,7 @@ module('Acceptance | issue prepaid card', function (hooks) {
 
     assert.equal(
       customizationStorageRequest.requestHeaders['authorization'],
-      'Bearer: abc123--def456--ghi789'
+      'Bearer abc123--def456--ghi789'
     );
 
     let customizationRequestJson = JSON.parse(
