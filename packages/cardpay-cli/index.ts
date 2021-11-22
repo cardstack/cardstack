@@ -28,6 +28,7 @@ import {
   isRewardProgramLocked,
   updateRewardProgramAdmin,
   rewardProgramAdmin,
+  withdraw,
 } from './reward-manager';
 import { ethToUsdPrice, priceOracleUpdatedAt as layer1PriceOracleUpdatedAt } from './layer-one-oracle';
 import {
@@ -105,7 +106,8 @@ type Commands =
   | 'lockRewardProgram'
   | 'isRewardProgramLocked'
   | 'updateRewardProgramAdmin'
-  | 'rewardProgramAdmin';
+  | 'rewardProgramAdmin'
+  | 'withdrawRewardSafe';
 
 let command: Commands | undefined;
 interface Options {
@@ -896,6 +898,29 @@ let {
     });
     command = 'rewardProgramAdmin';
   })
+  .command(
+    'withdraw-reward-safe <rewardSafe> <recipient> <tokenAddress> <amount>',
+    'Withdraw from reward safe',
+    (yargs) => {
+      yargs.positional('rewardSafe', {
+        type: 'string',
+        description: 'The address of the rewardSafe that already contains rewards',
+      });
+      yargs.positional('recipient', {
+        type: 'string',
+        description: "The token recipient's address",
+      });
+      yargs.positional('tokenAddress', {
+        type: 'string',
+        description: 'The address of the tokens that are being transferred from reward safe',
+      });
+      yargs.positional('amount', {
+        type: 'string',
+        description: 'The amount of tokens to transfer (not in units of wei, but in eth)',
+      });
+      command = 'withdrawRewardSafe';
+    }
+  )
   .options({
     network: {
       alias: 'n',
@@ -1314,6 +1339,25 @@ if (!command) {
         return;
       }
       await rewardProgramAdmin(network, rewardProgramId, mnemonic);
+      break;
+    case 'withdrawRewardSafe':
+      if (recipient == null) {
+        showHelpAndExit('recipient is a required value');
+        return;
+      }
+      if (rewardSafe == null) {
+        showHelpAndExit('rewardSafe is a required value');
+        return;
+      }
+      if (tokenAddress == null) {
+        showHelpAndExit('tokenAddress is a required value');
+        return;
+      }
+      if (amount == null) {
+        showHelpAndExit('amount is a required value');
+        return;
+      }
+      await withdraw(network, rewardSafe, recipient, tokenAddress, amount, mnemonic);
       break;
     default:
       assertNever(command);
