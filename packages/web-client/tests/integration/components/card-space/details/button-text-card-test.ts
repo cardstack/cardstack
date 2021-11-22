@@ -57,7 +57,7 @@ module(
 
       assert
         .dom('[data-test-button-text-option]:nth-child(2) input')
-        .hasClass('card-space-button-text-field__input--checked');
+        .hasClass('radio-option__input--checked');
     });
   }
 );

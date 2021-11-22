@@ -360,7 +360,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
       .containsText('499.00 DAI');
     assert.dom('[data-test-face-value-display]').doesNotExist();
     assert.dom('[data-test-face-value-option]').exists({ count: 6 });
-    assert.dom('[data-test-face-value-option-checked]').doesNotExist();
+    assert
+      .dom('[data-test-face-value-option][data-test-radio-option-checked]')
+      .doesNotExist();
     assert.dom('[data-test-face-value-option="10000"] input').isNotDisabled();
     assert.dom('[data-test-face-value-option="50000"] input').isDisabled();
     assert
@@ -376,7 +378,9 @@ module('Acceptance | issue prepaid card', function (hooks) {
     assert.dom('[data-test-face-value-option="5000"] input').isNotDisabled();
     await click('[data-test-face-value-option="5000"]');
     assert.dom('[data-test-face-value-option="5000"] input').isChecked();
-    assert.dom('[data-test-face-value-option-checked]').exists({ count: 1 });
+    assert
+      .dom('[data-test-face-value-option][data-test-radio-option-checked]')
+      .exists({ count: 1 });
     await click(
       `${postableSel(
         2,
