@@ -121,21 +121,7 @@ export default class CardCache {
     this.indexCard(cardURL, source);
   }
 
-  indexCard(cardURL: string, source: CompiledCard): void {
-    let query = `
-      INSERT INTO card_index (id, name, data, adoptsFrom, schemaModule, fields, views)
-      VALUES ($1, $2, $3, $4, $5, $6, $7) ON CONFLICT (id) DO UPDATE
-    `;
-
-    this.client.query(query, [
-      cardURL,
-      'name TODO',
-      'adoptsFrom TODO',
-      source.schemaModule,
-      source.fields,
-      { isolated: source.isolated, embedded: source.embedded, edit: source.edit },
-    ]);
-  }
+  indexCard(_cardURL: string, _source: CompiledCard): void {}
 
   entryExists(env: Environment | 'assets', cardURL: string, localFile: string): boolean {
     return pathExistsSync(this.getFileLocation(env, cardURL, localFile));
